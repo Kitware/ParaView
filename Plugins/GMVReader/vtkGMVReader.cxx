@@ -35,6 +35,14 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVertex.h"
+#include "vtkPolyhedron.h"
+#include "vtkCellArray.h"
+#include <set>
+
+#ifdef PARAVIEW_USE_MPI
+#include "vtkMultiProcessController.h"
+vtkCxxSetObjectMacro(vtkGMVReader, Controller, vtkMultiProcessController);
+#endif
 
 vtkStandardNewMacro(vtkGMVReader);
 
@@ -166,6 +174,11 @@ vtkGMVReader::vtkGMVReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   // this->CurrentOutput = 0;
+
+#ifdef PARAVIEW_USE_MPI
+  this->Controller = NULL;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
+#endif
 }
 
 
@@ -204,6 +217,10 @@ vtkGMVReader::~vtkGMVReader()
     this->Tracers->Delete();
   if (this->Polygons)
     this->Polygons->Delete();
+
+#ifdef PARAVIEW_USE_MPI
+  this->SetController(NULL);
+#endif
 }
 
 
@@ -215,21 +232,18 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
   bool keepParsing;
   bool firstPolygonParsed;
   float progress;
-  int *nodeMarker;
   int dims[3];
   int incr = 0;
   int polygonMaterialPosInDataArray;
   int posInDataArray;
-  long *longIds;
   size_t k;
-  size_t numFaces;
+  size_t numFaces;  // number of faces of element i
   size_t numNodes;
   size_t numNodesSoFar = 0;
   unsigned int blockNo;
   vtkCellArray* polygonCells;
   vtkCellArray* tracerCells;
   vtkFloatArray *coords;
-  vtkIdType *nodeIds;
   vtkIdType list[8];
   vtkTypeInt64Array *polygonMaterials;
   vtkPoints *points;
@@ -531,12 +545,24 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_LINE, numNodes, list);
                 }
+              else if (numNodes == 3 && numFaces == 2)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_EDGE, numNodes, list);
+                }
               // Triangle
               else if (numNodes == 3 && numFaces == 1)
                 {
                 for (k = 0; k < numNodes; ++k)
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_TRIANGLE, numNodes, list);
+                }
+              else if (numNodes == 6 && numFaces == 1)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_TRIANGLE, numNodes, list);
                 }
               // Quad
               else if (numNodes == 4 && numFaces == 1)
@@ -545,12 +571,24 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_QUAD, numNodes, list);
                 }
+              else if (numNodes == 8 && numFaces == 1)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_QUAD, numNodes, list);
+                }
               // Tetraeder
               else if (numNodes == 4 && numFaces == 4)
                 {
                 for (k = 0; k < numNodes; ++k)
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_TETRA, numNodes, list);
+                }
+              else if (numNodes == 10 && numFaces == 4)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_TETRA, numNodes, list);
                 }
               // Hexaeder
               else if (numNodes == 8 && numFaces == 6)
@@ -559,15 +597,60 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_HEXAHEDRON, numNodes, list);
                 }
+              else if (numNodes == 20 && numFaces == 6)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_HEXAHEDRON, numNodes, list);
+                }
+              else if (numNodes == 27 && numFaces == 48)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+
+                list[20] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 23] + incr;
+                list[22] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 20] + incr;
+                list[23] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 22] + incr;
+
+                ugrid->InsertNextCell(VTK_TRIQUADRATIC_HEXAHEDRON, numNodes, list);
+                }
               // Pyramid
               else if (numNodes == 5 && numFaces == 5)
                 {
-                // Pyramid node numbering in GMV see page 80. Top of the pyramid is the first node.
-                // Pyramid node number in VTK: top of the pyramd is the last node
-                for (k = 1; k < numNodes; ++k)
-                  list[k-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
-                list[numNodes-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 0] + incr;
+                // This branch catches both the GMV cell types 'pyramid' and 'ppyrmd5'.
+                // Distinguish them by checking the number of vertices used for the first
+                // face of the pyramdi: 3 for 'pyramid', 4 for 'ppyrmd5'.
+
+                // face offset (= face number, counting from 0)
+                const unsigned long j = 0;
+                // number of unique vertices of first face of pyramid element i
+                unsigned long numPtsFirstFace =
+                  GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j+1 ] -
+                  GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j ];
+
+                if (numPtsFirstFace == 3)
+                  {
+                  // Node numbering for GMV cell type 'pyramid', see gmvdoc.color.pdf page 80:
+                  //   top of the pyramid is the first node.
+                  // Pyramid node number in VTK: top of the pyramid is the last node
+                  for (k = 1; k < numNodes; ++k)
+                    list[k-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                  list[numNodes-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 0] + incr;
+                  }
+                else
+                  {
+                  // Node numbering for GMV cell type 'ppyrmd5', see gmvdoc.color.pdf page 80,
+                  // is identical to that in VTK: top of the pyramid is the last node
+                  for (k = 0; k < numNodes; ++k)
+                    list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                  }
                 ugrid->InsertNextCell(VTK_PYRAMID, numNodes, list);
+                }
+              else if (numNodes == 13 && numFaces == 5)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_PYRAMID, numNodes, list);
                 }
               // Prism
               else if (numNodes == 6 && numFaces == 5)
@@ -576,54 +659,87 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_WEDGE, numNodes, list);
                 }
+              else if (numNodes == 15 && numFaces == 5)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_WEDGE, numNodes, list);
+                }
               // General (generic cell type, the only case where
               // GMVRead::gmv_meshdata.cellnnode[i] keeps its default value of 0)
               else if (numNodes == 0 && numFaces > 0)
                 {
-                // (number of nodes per face) x (number of faces of generic element i)
-                unsigned long numNodesAllFaces =
-                  GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i+1] ]
-                  - GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] ];
-
-                // Initialise nodeMarker to -1
-                nodeMarker = new int[this->NumberOfNodes];
-                for (k = 0; k < this->NumberOfNodes; k++)
+                // Distinguish between 1 face and more than 1 face to avoid using VTK_POLYHEDRON for
+                // all cases as that would introduce unnecessary complexity in downstream filters.
+                if (numFaces == 1) // 2D cell
                   {
-                  nodeMarker[k] = -1;
-                  }
+                  // face offset (= face number, counting from 0)
+                  const unsigned long j = 0;
+                  vtkIdType *pointIds;
+                  // number of unique vertices (of single face) of generic element i
+                  unsigned long numPts =
+                    GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j+1 ] -
+                    GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j ];
 
-                // Get element node ids
-                longIds =
-                  &GMVRead::gmv_meshdata.faceverts[
-                                                   GMVRead::gmv_meshdata.facetoverts[
-                                                                                     GMVRead::gmv_meshdata.celltoface[i] ]];
-
-                // Build element
-                nodeIds = new vtkIdType[numNodesAllFaces];
-                int elementNodeCount = 0;
-                for (k = 0; k < numNodesAllFaces; k++)
-                  {
-                  if (nodeMarker[longIds[k] + incr] < 0)
+                  pointIds = new vtkIdType[numPts];
+                  for (k = 0; k < numPts; k++)
                     {
-                    nodeIds[elementNodeCount] = longIds[k] + incr;
-                    nodeMarker[longIds[k] + incr] = 0;
-                    elementNodeCount += 1;
+                    pointIds[k] =
+                      GMVRead::gmv_meshdata.faceverts[GMVRead::gmv_meshdata.facetoverts[GMVRead::gmv_meshdata.celltoface[i] + j] + k] + incr;
                     }
+
+                  ugrid->InsertNextCell(VTK_POLYGON, numPts, pointIds);
+                  delete [] pointIds;
+                  pointIds = NULL;
                   }
 
-                // Distinguish between 1 face and more than 1 face because
-                // VTK_CONVEX_POINT_SET does not handle the case well
-                // where all points lie in the same plane.
-                if (numFaces == 1)
-                  ugrid->InsertNextCell(VTK_POLYGON,
-                                        elementNodeCount,
-                                        nodeIds);
-                else
-                  ugrid->InsertNextCell(VTK_CONVEX_POINT_SET,
-                                        elementNodeCount,
-                                        nodeIds);
-                delete [] nodeIds;
-                delete [] nodeMarker;
+                else // 3D cell
+                  {
+                  // number of vertices of face j of generic element i
+                  unsigned long numVerts;
+                  // number of unique vertices of generic element i
+                  int numPts;
+                  vtkIdType *pointIds;
+                  std::set<int> auxIds;
+                  std::set<int>::iterator auxIt;
+
+                  vtkIdType *face = NULL;
+                  vtkCellArray *faces = NULL;
+                  faces = vtkCellArray::New();
+                  for (unsigned long j = 0; j < numFaces; j++)
+                    {
+                    numVerts =
+                      GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j+1 ] -
+                      GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j ];
+
+                    face = new vtkIdType[numVerts];
+                    for (k = 0; k < numVerts; k++)
+                      {
+                      face[k] =
+                        GMVRead::gmv_meshdata.faceverts[GMVRead::gmv_meshdata.facetoverts[GMVRead::gmv_meshdata.celltoface[i] + j] + k] + incr;
+                      auxIds.insert(face[k]);
+                      }
+                    faces->InsertNextCell(numVerts, face);
+                    delete [] face;
+                    face = NULL;
+                    }
+
+                  // number of unique vertices of generic element i
+                  numPts = auxIds.size();
+                  pointIds = new vtkIdType[numPts];
+                  for (auxIt = auxIds.begin(), k = 0; auxIt != auxIds.end(); auxIt++, k++)
+                    {
+                    pointIds[k] = *auxIt;
+                    }
+                  ugrid->InsertNextCell(VTK_POLYHEDRON,
+                                        numPts, pointIds,
+                                        faces->GetNumberOfCells(), faces->GetPointer());
+                  delete [] pointIds;
+                  pointIds = NULL;
+                  faces->Delete();
+                  faces = NULL;
+                  }
+
                 }
               // Unknown/no handler yet
               else
@@ -1858,6 +1974,16 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
                                      vtkInformationVector **vtkNotUsed(inputVector),
                                      vtkInformationVector *outputVector)
 {
+#ifdef PARAVIEW_USE_MPI
+  if (this->Controller)
+    {
+    if (this->Controller->GetNumberOfProcesses() > 1)
+      {
+      vtkWarningMacro("GMVReader is not parallel-aware: all pvserver processes will read the entire file!");
+      }
+    }
+#endif
+
   vtkDebugMacro( << "GMVReader::RequestInformation: Parsing file " << this->FileName << " for fields, #polygons and time steps");
   int ierr = GMVRead::gmvread_open(this->FileName);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);

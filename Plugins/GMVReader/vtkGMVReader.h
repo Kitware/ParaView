@@ -49,6 +49,7 @@
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkPolyData.h"
+#include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI
 
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
@@ -61,6 +62,9 @@ class vtkIntArray;
 class vtkStringArray;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
+#ifdef PARAVIEW_USE_MPI
+class vtkMultiProcessController;
+#endif
 
 class vtkGMVReader : public vtkMultiBlockDataSetAlgorithm
 {
@@ -185,6 +189,21 @@ public:
   int GetHasPolygons();
   int GetHasProbtimeKeyword();
 
+//BTX
+#ifdef PARAVIEW_USE_MPI
+//ETX
+//BTX
+    // Description:
+    // Set the controller use in compositing (set to
+    // the global controller by default)
+    // If not using the default, this must be called before any
+    // other methods.
+    virtual void SetController(vtkMultiProcessController* controller);
+//ETX
+//BTX
+#endif
+//ETX
+
 protected:
   vtkGMVReader();
   ~vtkGMVReader();
@@ -225,6 +244,14 @@ protected:
   // Callback registered with the SelectionObserver.
   static void SelectionModifiedCallback(vtkObject* caller, unsigned long eid,
                                         void* clientdata, void* calldata);
+
+//BTX
+#ifdef PARAVIEW_USE_MPI
+//ETX
+  vtkMultiProcessController* Controller;
+//BTX
+#endif
+//ETX
 
 private:
   vtkGMVReader(const vtkGMVReader&);  // Not implemented.
