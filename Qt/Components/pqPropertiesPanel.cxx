@@ -201,11 +201,12 @@ public:
   QPointer<pqDataRepresentation> Representation;
   QMap<void*, QPointer<pqProxyWidgets> > SourceWidgets;
   QPointer<pqProxyWidgets> DisplayWidgets;
+  bool ReceivedChangeAvailable;
 
   vtkNew<vtkEventQtSlotConnect> RepresentationEventConnect;
 
   //---------------------------------------------------------------------------
-  pqInternals(pqPropertiesPanel* panel)
+  pqInternals(pqPropertiesPanel* panel): ReceivedChangeAvailable(false)
     {
     this->Ui.setupUi(panel);
 
@@ -560,6 +561,17 @@ void pqPropertiesPanel::sourcePropertyChanged(bool change_finished/*=true*/)
     //  }
     }
 
+  if (!change_finished)
+    {
+    this->Internals->ReceivedChangeAvailable = true;
+    }
+  if (change_finished && !this->Internals->ReceivedChangeAvailable)
+    {
+    DEBUG_APPLY_BUTTON()
+      << "Received change-finished before change-available. Ignoring it.";
+    return;
+    }
+
   DEBUG_APPLY_BUTTON()
       << "Property change "
       << (change_finished? "finished" : "available")
@@ -622,6 +634,14 @@ void pqPropertiesPanel::updateButtonState()
       this->Internals->Ui.Accept->setEnabled(true);
       this->Internals->Ui.Reset->setEnabled(true);
       }
+    }
+
+  if (!this->Internals->Ui.Accept->isEnabled())
+    {
+    // It's a good place to reset the ReceivedChangeAvailable if Accept button
+    // is not enabled. This is same as doing it in apply()/reset() or if the
+    // only modified proxy is deleted.
+    this->Internals->ReceivedChangeAvailable = false;
     }
 }
 
