@@ -58,7 +58,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSpreadSheetView::pqInternal
 {
 public:
-  pqInternal(pqSpreadSheetViewModel* model):Model(model), SelectionModel(model)
+  pqInternal(pqSpreadSheetViewModel* model):
+    Model(model),
+    SelectionModel(model),
+    EmptySelectionModel(model)
   {
   pqSpreadSheetViewWidget* table = new pqSpreadSheetViewWidget();
   table->setAlternatingRowColors(true);
@@ -85,6 +88,11 @@ public:
   QPointer<QTableView> Table;
   pqSpreadSheetViewModel *Model;
   pqSpreadSheetViewSelectionModel SelectionModel;
+
+  // We use EmptySelectionModel as the selection model for the view when in
+  // SelectionOnly mode i.e. when we showing only the selected elements.
+  QItemSelectionModel EmptySelectionModel;
+
   bool SingleColumnMode;
 };
 
@@ -255,12 +263,16 @@ void pqSpreadSheetView::onSelectionOnly()
     // The user is disallowed to make further (embedded / recursive) selection
     // once checkbox "Show Only Selected Elements" is checked.
     this->Internal->Table->setSelectionMode(QAbstractItemView::NoSelection);
+    this->Internal->Table->setSelectionModel(
+      &this->Internal->EmptySelectionModel);
     }
   else
     {
     // Once the checkbox is un-checked, the user to allowed to make selections.
     this->Internal->Table->setSelectionMode(
       QAbstractItemView::ExtendedSelection);
+    this->Internal->Table->setSelectionModel(
+      &this->Internal->SelectionModel);
     }
 }
 
