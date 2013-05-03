@@ -6035,6 +6035,13 @@ found and the point will be rejected.</Documentation>
         </Documentation>
       </IntVectorProperty>
 
+      <PropertyGroup label="Glyph Source">
+        <Property name="Source" />
+      </PropertyGroup>
+      <PropertyGroup label="Glyph Transform">
+        <Property name="GlyphTransform" />
+      </PropertyGroup>
+
       <Hints>
         <!-- Visibility Element can be used to suggest the GUI about
           visibility of this filter (or its input) on creation.
@@ -6237,6 +6244,10 @@ found and the point will be rejected.</Documentation>
         and in the same order between timesteps.
         </Documentation>
       </IntVectorProperty>
+
+      <PropertyGroup label="Glyph Source">
+        <Property name="Source" />
+      </PropertyGroup>
 
       <Hints>
         <!-- Visibility Element can be used to suggest the GUI about

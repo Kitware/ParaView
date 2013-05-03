@@ -86,8 +86,8 @@ bool pqStandardLegacyCustomPanels::canCreatePanel(pqProxy* proxy) const
       //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
       QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
       QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
-      QString("Contour") == proxy->getProxy()->GetXMLName() ||
-      QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
+      //QString("Contour") == proxy->getProxy()->GetXMLName() ||
+      //QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
       QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName() ||
       QString("PassArrays") == proxy->getProxy()->GetXMLName() )
       {
