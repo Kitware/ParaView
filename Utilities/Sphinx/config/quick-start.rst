@@ -50,7 +50,9 @@ Tab-completion
 
 The Python shell in the ParaView Qt client provides auto-completion. One can
 also use IDLE, for example to enable auto-completion. To use auto-completion in
-pvpython, one can use the tips provided at **[1]** **FIXME**.
+pvpython, one can use the tips provided at TabCompletion_.
+
+.. _TabCompletion: http://www.razorvine.net/blog/user/irmen/article/2004-11-22/17
 
 In summary, you need to create a variable PYTHONSTARTUP as (in bash):
 
@@ -194,12 +196,7 @@ is created automatically with Show().
     >>> Show(shrinkFilter)
     >>> Render()
 
-Et voila:
-
-
-**Figure 14.1 Server manager snapshot ** **FIXME**
-
-In example Figure 14.1, the value returned by Cone() and Shrink() was assigned
+In this example the value returned by Cone() and Shrink() was assigned
 to Python variables and used to build the pipeline. ParaView keeps track of the
 last pipeline object created by the user. This allows you to accomplish
 everything you did above using the following code:

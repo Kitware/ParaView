@@ -21,6 +21,11 @@ paraview_paths = @paraview_paths@
 for path in paraview_paths:
     sys.path.insert(0, path)
 
+# Setting this variables tells paraview.simple to not import all the functions
+# to create proxies in the scope. That keeps the documentation from being
+# clobberred with those functions.
+os.environ["PARAVIEW_DOCUMENTATION_SKIP_ADD_FUNCTIONS"] = "1"
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

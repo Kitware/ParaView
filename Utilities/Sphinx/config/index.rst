@@ -10,7 +10,7 @@ ParaView offers rich scripting support through Python. This support is available
 as part of the ParaView client (paraview), an MPI-enabled batch application
 (pvbatch), the ParaView python client (pvpython), or any other Python-enabled
 application. Using Python, users and developers can gain access to the ParaView
-engine called **Server Manager**.
+visualization engine.
 
 Contents:
 
