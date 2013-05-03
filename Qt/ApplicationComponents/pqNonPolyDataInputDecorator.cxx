@@ -94,9 +94,6 @@ bool pqNonPolyDataInputDecorator::enableWidget() const
     pqOutputPort* cur_input = NULL;
     QList<pqOutputPort*> ports = source->getOutputPorts();
     cur_input = ports.size() > 0? ports[0] : NULL;
-
-    bool is_input_polydata = false;
-    bool is_data_structured = false;
     if (cur_input)
       {
       vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
