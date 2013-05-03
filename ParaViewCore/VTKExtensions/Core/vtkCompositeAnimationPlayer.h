@@ -68,7 +68,7 @@ protected:
 
   // Description:
   // Delegated to the active animation player.
-  virtual void StartLoop(double starttime, double endtime, double currenttime);
+  virtual void StartLoop(double starttime, double endtime, double* playbackWindow);
   virtual void EndLoop();
   virtual double GetNextTime(double currentime);
 

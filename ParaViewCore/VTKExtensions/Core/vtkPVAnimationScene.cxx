@@ -28,6 +28,8 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->AnimationCues = vtkCollection::New();
   this->AnimationCuesIterator = this->AnimationCues->NewIterator();
   this->SceneTime = 0;
+  this->PlaybackTimeWindow[0] = 1.0;
+  this->PlaybackTimeWindow[1] = -1.0;
   this->InTick = false;
 }
 

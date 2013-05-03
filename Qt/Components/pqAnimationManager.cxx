@@ -420,6 +420,7 @@ bool pqAnimationManager::saveAnimation()
   // when saving in SNAP_TO_TIMESTEPS mode.
   dialogUI.spinBoxFramesPerTimestep->hide();
   dialogUI.labelFramesPerTimestep->hide();
+  dialogUI.labelTimeRange->setText("Frame range");
 
   int playMode = pqSMAdaptor::getElementProperty(
     sceneProxy->GetProperty("PlayMode")).toInt();
@@ -442,6 +443,9 @@ bool pqAnimationManager::saveAnimation()
     dialogUI.spinBoxNumberOfFrames->setValue(num_frames);
     dialogUI.animationDuration->setEnabled(false);
     dialogUI.animationDuration->setValue(num_frames/frame_rate);
+    dialogUI.startTime->setMaximum(num_frames-1);
+    dialogUI.endTime->setMaximum(num_frames-1);
+    dialogUI.endTime->setValue(num_frames-1);
     break;
 
   case REALTIME:
@@ -459,6 +463,11 @@ bool pqAnimationManager::saveAnimation()
     dialogUI.spinBoxFramesPerTimestep->show();
     dialogUI.spinBoxFramesPerTimestep->setValue(frames_per_timestep);
     dialogUI.labelFramesPerTimestep->show();
+    dialogUI.labelTimeRange->setText("Timestep range");
+    int nbTimeSteps = scene->getTimeSteps().size() - 1;
+    dialogUI.startTime->setMaximum(nbTimeSteps);
+    dialogUI.endTime->setMaximum(nbTimeSteps);
+    dialogUI.endTime->setValue(nbTimeSteps);
     break;
     }
 
@@ -592,27 +601,33 @@ bool pqAnimationManager::saveAnimation()
     pqRenderViewBase::setStereo(stereo);
     }
 
+  double playbackTimeWindow[2] = {1,-1};
+  double start, end;
+  int nbFrames = dialogUI.spinBoxNumberOfFrames->value();
   switch (playMode)
     {
-  case SEQUENCE:
-    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
-      dialogUI.spinBoxNumberOfFrames->value());
-    break;
-
   case REALTIME:
-    // Since even in real-time mode, while saving animation, it is played back 
+    // Since even in real-time mode, while saving animation, it is played back
     // in sequence mode, we change the NumberOfFrames instead of changing the
     // Duration. The spinBoxNumberOfFrames is updated to satisfy
     // duration * frame rate = number of frames.
-    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),
-      dialogUI.spinBoxNumberOfFrames->value());
-    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("PlayMode"),
-      SEQUENCE);
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("PlayMode"), SEQUENCE);
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"),nbFrames);
+    break; // Break or not break, this is the question...
+
+  case SEQUENCE:
+    pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"), nbFrames);
+    start = pqSMAdaptor::getElementProperty(sceneProxy->GetProperty("StartTime")).toDouble();
+    end = pqSMAdaptor::getElementProperty(sceneProxy->GetProperty("EndTime")).toDouble();
+    playbackTimeWindow[0] = start + (end-start) * ((double)dialogUI.startTime->value()) / ((double)(nbFrames-1));
+    playbackTimeWindow[1] = start + (end-start) * ((double)dialogUI.endTime->value()) / ((double)(nbFrames-1));
     break;
 
   case SNAP_TO_TIMESTEPS:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("FramesPerTimestep"),
       dialogUI.spinBoxFramesPerTimestep->value());
+    playbackTimeWindow[0] = scene->getTimeSteps().at(dialogUI.startTime->value());
+    playbackTimeWindow[1] = scene->getTimeSteps().at(dialogUI.endTime->value());
     break;
     }
 
@@ -637,6 +652,7 @@ bool pqAnimationManager::saveAnimation()
     vtkSMPropertyHelper(writer, "Magnification").Set(magnification);
     vtkSMPropertyHelper(writer, "FrameRate").Set(dialogUI.frameRate->value());
     vtkSMPropertyHelper(writer, "Compression").Set(compression);
+    vtkSMPropertyHelper(writer, "PlaybackTimeWindow").Set(playbackTimeWindow, 2);
     writer->UpdateVTKObjects();
     writer->Delete();
 
@@ -693,6 +709,7 @@ bool pqAnimationManager::saveAnimation()
   writer->SetAnimationScene(sceneProxy);
   writer->SetFrameRate(dialogUI.frameRate->value());
   writer->SetCompression(compression);
+  writer->SetPlaybackTimeWindow(playbackTimeWindow);
 
   pqProgressManager* progress_manager = 
     pqApplicationCore::instance()->getProgressManager();

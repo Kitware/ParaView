@@ -64,7 +64,7 @@ protected:
   vtkTimestepsAnimationPlayer();
   ~vtkTimestepsAnimationPlayer();
 
-  virtual void StartLoop(double, double, double);
+  virtual void StartLoop(double, double, double*);
   virtual void EndLoop() {};
 
   // Description:
@@ -82,6 +82,7 @@ protected:
     return this->GetPreviousTimeStep(currenttime);
     }
 
+  double PlaybackWindow[2];
   unsigned long FramesPerTimestep;
   unsigned long Count;
 private:

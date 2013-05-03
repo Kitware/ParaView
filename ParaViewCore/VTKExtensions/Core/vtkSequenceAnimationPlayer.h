@@ -37,7 +37,7 @@ protected:
   vtkSequenceAnimationPlayer();
   ~vtkSequenceAnimationPlayer();
 
-  virtual void StartLoop(double, double, double);
+  virtual void StartLoop(double, double, double*);
   virtual void EndLoop() {};
 
   // Description:
@@ -48,6 +48,7 @@ protected:
   virtual double GoToPrevious(double start, double end, double currenttime);
 
   int NumberOfFrames;
+  int MaxFrameWindow;
   double StartTime;
   double EndTime;
   int FrameNo;

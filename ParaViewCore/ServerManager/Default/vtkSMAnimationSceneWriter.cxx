@@ -29,6 +29,9 @@ vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
   this->ObserverID = 0;
   this->FileName = 0;
   this->SaveFailed = false;
+
+  this->PlaybackTimeWindow[0] = 1.0;
+  this->PlaybackTimeWindow[1] = -1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -139,7 +142,10 @@ bool vtkSMAnimationSceneWriter::Save()
     {
     this->Saving = true;
     this->SaveFailed = false;
+
+    this->AnimationScene->SetPlaybackTimeWindow(this->GetPlaybackTimeWindow());
     this->AnimationScene->Play();
+    this->AnimationScene->SetPlaybackTimeWindow(1.0, -1.0);// Reset to full range
     this->Saving = false;
     }
 
