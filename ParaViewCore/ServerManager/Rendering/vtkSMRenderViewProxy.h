@@ -104,10 +104,6 @@ public:
   vtkPVGenericRenderWindowInteractor* GetInteractor();
 
   // Description:
-  // Returns the client-side render window.
-  vtkRenderWindow* GetRenderWindow();
-
-  // Description:
   // Returns the client-side renderer (composited or 3D).
   vtkRenderer* GetRenderer();
 

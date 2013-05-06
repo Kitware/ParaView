@@ -52,7 +52,7 @@ public:
   // Description:
   // Return the render window from which offscreen rendering and interactor can
   // be accessed
-  vtkRenderWindow* GetRenderWindow();
+  virtual vtkRenderWindow* GetRenderWindow();
 
 //BTX
 protected:

@@ -35,6 +35,7 @@
 class vtkImageData;
 class vtkSMRepresentationProxy;
 class vtkView;
+class vtkRenderWindow;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewProxy : public vtkSMProxy
 {
@@ -86,6 +87,11 @@ public:
   // Return true any internal representation is dirty. This can be usefull to
   // know if the internal geometry has changed.
   virtual bool HasDirtyRepresentation();
+
+  // Description:
+  // Return the render window from which offscreen rendering and interactor can
+  // be accessed
+  virtual vtkRenderWindow* GetRenderWindow();
 
 //BTX
 protected:

@@ -19,17 +19,18 @@
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
+#include "vtkSmartPointer.h"
 
 #include <assert.h>
 
@@ -330,4 +331,12 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkSMViewProxy::HasDirtyRepresentation()
 {
   return this->NeedsUpdate;
+}
+//----------------------------------------------------------------------------
+vtkRenderWindow* vtkSMViewProxy::GetRenderWindow()
+{
+  this->CreateVTKObjects();
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+    this->GetClientSideObject());
+  return rv? rv->GetRenderWindow() : NULL;
 }
