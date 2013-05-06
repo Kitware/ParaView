@@ -45,6 +45,11 @@ protected:
   vtkSMMultiSliceViewProxy();
   ~vtkSMMultiSliceViewProxy();
 
+  // Description:
+  // Use the center of the source to initialize the view with three orthogonal
+  // slices in x, y, z.
+  void InitDefaultSlices(vtkSMSourceProxy* source, int opport);
+
 private:
   vtkSMMultiSliceViewProxy(const vtkSMMultiSliceViewProxy&); // Not implemented
   void operator=(const vtkSMMultiSliceViewProxy&); // Not implemented
