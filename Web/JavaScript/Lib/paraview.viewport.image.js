@@ -360,6 +360,7 @@
 
                 if(opts) {
                     quality = opts.hasOwnProperty('quality') ? opts.quality : quality;
+                    options.view = opts.hasOwnProperty('view') ? opts.view : options.view;
                     forceRender = opts.hasOwnProperty('forceRender');
                 }
 
