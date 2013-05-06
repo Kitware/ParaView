@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqFileDialogModel.h"
 #include "pqObjectBuilder.h"
 #include "pqRecentlyUsedResourcesList.h"
 #include "pqServerConfiguration.h"
@@ -277,14 +278,22 @@ bool pqRecentFilesMenu::open(
     qCritical() << "Cannot open a resource with NULL server";
     return false;
     }
-    
+  pqFileDialogModel fileModel(server, NULL);
   if(resource.scheme() == "session")
     {
     if(!resource.path().isEmpty())
       {
+      // make sure the file exists
+      QString sessionFile = resource.path();
+      if (sessionFile.isEmpty() || !fileModel.fileExists(sessionFile, sessionFile))
+        {
+        qCritical() << "File does not exist: " << sessionFile << "\n";
+        return false;
+        }
+
       // Read in the xml file to restore.
       vtkSmartPointer<vtkPVXMLParser> xmlParser = vtkSmartPointer<vtkPVXMLParser>::New();
-      xmlParser->SetFileName(resource.path().toAscii().data());
+      xmlParser->SetFileName(sessionFile.toAscii().data());
       xmlParser->Parse();
 
       // Get the root element from the parser.
@@ -310,23 +319,31 @@ bool pqRecentFilesMenu::open(
 
       if (!readerName.isEmpty() && !readerGroup.isEmpty())
         {
-        pqApplicationCore* core = pqApplicationCore::instance();
-        pqObjectBuilder* builder = core->getObjectBuilder();
-        BEGIN_UNDO_SET("Create Reader");
         QStringList files;
-        files.push_back(resource.path());
+        // make sure the file exists
+        QString filename = resource.path();
+        if (filename.isEmpty() || !fileModel.fileExists(filename, filename))
+          {
+          qCritical() << "File does not exist: " << filename << "\n";
+          return false;
+          }
+        files.push_back(filename);
         QString extrafilesCount = resource.data("extrafilesCount");
         if (!extrafilesCount.isEmpty() && extrafilesCount.toInt() > 0)
           {
           for (int cc=0; cc < extrafilesCount.toInt(); cc++)
             {
             QString extrafile = resource.data(QString("file.%1").arg(cc));
-            if (!extrafile.isEmpty())
+            if (!extrafile.isEmpty() &&
+              fileModel.fileExists(extrafile, extrafile))
               {
               files.push_back(extrafile);
               }
             }
           }
+        pqApplicationCore* core = pqApplicationCore::instance();
+        pqObjectBuilder* builder = core->getObjectBuilder();
+        BEGIN_UNDO_SET("Create Reader");
         reader = builder->createReader(
           readerGroup, readerName, files, server);
         END_UNDO_SET();
