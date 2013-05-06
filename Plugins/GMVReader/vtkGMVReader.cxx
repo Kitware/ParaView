@@ -244,7 +244,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
   vtkCellArray* polygonCells;
   vtkCellArray* tracerCells;
   vtkFloatArray *coords;
-  vtkIdType list[8];
+  vtkIdType list[27];
   vtkTypeInt64Array *polygonMaterials;
   vtkPoints *points;
   vtkPoints *polygonPoints;
