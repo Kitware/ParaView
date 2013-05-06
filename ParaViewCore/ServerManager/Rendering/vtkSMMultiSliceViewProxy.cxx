@@ -115,9 +115,12 @@ void vtkSMMultiSliceViewProxy::InitDefaultSlices(
       ySlices.push_back(center[1]);
       zSlices.push_back(center[2]);
 
-      vtkSMPropertyHelper(this, "XSlicesValues").Set(&xSlices[0], xSlices.size());
-      vtkSMPropertyHelper(this, "YSlicesValues").Set(&ySlices[0], ySlices.size());
-      vtkSMPropertyHelper(this, "ZSlicesValues").Set(&zSlices[0], ySlices.size());
+      vtkSMPropertyHelper(this, "XSlicesValues").Set(&xSlices[0],
+       static_cast<unsigned int>(xSlices.size()));
+      vtkSMPropertyHelper(this, "YSlicesValues").Set(&ySlices[0],
+       static_cast<unsigned int>(ySlices.size()));
+      vtkSMPropertyHelper(this, "ZSlicesValues").Set(&zSlices[0],
+       static_cast<unsigned int>(ySlices.size()));
       }
     }
 }

@@ -23,6 +23,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRenderViewProxy.h"
 
+class vtkSMSourceProxy;
+
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMultiSliceViewProxy : public vtkSMRenderViewProxy
 {
 public:
