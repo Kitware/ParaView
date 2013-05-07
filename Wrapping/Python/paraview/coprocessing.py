@@ -71,20 +71,21 @@ class CoProcessor(object):
 
         timestep = datadescription.GetTimeStep()
         num_inputs = datadescription.GetNumberOfInputDescriptions()
+        # first set all inputs to be off and set to on as needed.
+        # we don't use vtkCPInputDataDescription::Reset() because
+        # that will reset any field names that were added in.
+        for cc in range(num_inputs):
+            datadescription.GetInputDescription(cc).AllFieldsOff()
+            datadescription.GetInputDescription(cc).GenerateMeshOff()
+
         for cc in range(num_inputs):
             input_name = datadescription.GetInputDescriptionName(cc)
 
             freqs = self.__Frequencies.get(input_name, [])
             if freqs:
                 if IsInModulo(timestep, freqs) :
-                    datadescription.GetInputDescriptionByName(input_name).AllFieldsOn()
-                    datadescription.GetInputDescriptionByName(input_name).GenerateMeshOn()
-                else:
-                    # FIXME: should we ever be turning things off? Shouldn't
-                    # they be off by default and turned ON as needed? That way
-                    # one could combine multiple pipelines?
-                    datadescription.GetInputDescriptionByName(input_name).AllFieldsOff()
-                    datadescription.GetInputDescriptionByName(input_name).GenerateMeshOff()
+                    datadescription.GetInputDescription(cc).AllFieldsOn()
+                    datadescription.GetInputDescription(cc).GenerateMeshOn()
 
     def UpdateProducers(self, datadescription):
         """This method will update the producers in the pipeline. If the
@@ -180,7 +181,9 @@ class CoProcessor(object):
         grid = datadescription.GetInputDescriptionByName(inputname).GetGrid()
 
         producer = simple.PVTrivialProducer()
-        producer.GetClientSideObject().SetOutput(grid, datadescription.GetTime())
+        # we purposefully don't set the time for the PVTrivialProducer here.
+        # when we update the pipeline we will do it then.
+        producer.GetClientSideObject().SetOutput(grid)
 
         if grid.IsA("vtkImageData") == True or \
                 grid.IsA("vtkStructuredGrid") == True or \
