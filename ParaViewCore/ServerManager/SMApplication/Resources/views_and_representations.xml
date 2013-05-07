@@ -1304,6 +1304,12 @@
             <Property name="CustomRangeActive" />
             <Property name="UseAxesOrigin" />
             <Property name="AxesOrigin" />
+            <Property exposed_name="CubeAxesXLabelFormat"
+                      name="XLabelFormat" />
+            <Property exposed_name="CubeAxesYLabelFormat"
+                      name="YLabelFormat" />
+            <Property exposed_name="CubeAxesZLabelFormat"
+                      name="ZLabelFormat" />
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -3079,6 +3085,28 @@
         <BooleanDomain name="bool" />
         <Documentation>Specify if the AxesCenter should be used to draw the axes.</Documentation>
       </IntVectorProperty>
+
+      <StringVectorProperty command="SetXLabelFormat"
+                         default_values="%-#6.3g"
+                         name="XLabelFormat"
+                         number_of_elements="1">
+        <Documentation>Specify the axis label format.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetYLabelFormat"
+                         default_values="%-#6.3g"
+                         name="YLabelFormat"
+                         number_of_elements="1">
+        <Documentation>Specify the axis label format.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetZLabelFormat"
+                         default_values="%-#6.3g"
+                         name="ZLabelFormat"
+                         number_of_elements="1">
+        <Documentation>Specify the axis label format.</Documentation>
+      </StringVectorProperty>
+
       <!-- End of CubeAxesRepresentation -->
     </RepresentationProxy>
     <!-- ================================================================== -->
@@ -4498,6 +4526,12 @@
           <Property name="CustomRangeActive" />
           <Property name="UseAxesOrigin" />
           <Property name="AxesOrigin" />
+          <Property exposed_name="CubeAxesXLabelFormat"
+                    name="XLabelFormat" />
+          <Property exposed_name="CubeAxesYLabelFormat"
+                    name="YLabelFormat" />
+          <Property exposed_name="CubeAxesZLabelFormat"
+                    name="ZLabelFormat" />
         </PropertyGroup>
       </ExposedProperties>
       <ShareProperties subproxy="SurfaceRepresentation">

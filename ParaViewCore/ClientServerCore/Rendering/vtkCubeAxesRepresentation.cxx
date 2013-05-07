@@ -495,6 +495,22 @@ void vtkCubeAxesRepresentation::SetAxesOrigin(double val[3])
 }
 
 //----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetXLabelFormat(const char* format)
+{
+  this->CubeAxesActor->SetXLabelFormat(format);
+}
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetYLabelFormat(const char* format)
+{
+  this->CubeAxesActor->SetYLabelFormat(format);
+}
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetZLabelFormat(const char* format)
+{
+  this->CubeAxesActor->SetYLabelFormat(format);
+}
+
+//----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
 {
 

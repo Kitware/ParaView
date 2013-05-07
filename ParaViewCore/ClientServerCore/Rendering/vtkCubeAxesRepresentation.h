@@ -163,6 +163,10 @@ public:
   virtual void SetAxesOrigin(double valX, double valY, double valZ);
   virtual void SetAxesOrigin(double val[3]);
 
+  virtual void SetXLabelFormat(const char* format);
+  virtual void SetYLabelFormat(const char* format);
+  virtual void SetZLabelFormat(const char* format);
+
 //BTX
 protected:
   vtkCubeAxesRepresentation();
