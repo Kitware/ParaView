@@ -6,7 +6,7 @@
 #include <vtkCellType.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
-#include <vtkCPPythonProcessor.h>
+#include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
@@ -17,7 +17,7 @@
 
 namespace
 {
-  vtkCPPythonProcessor* Processor = NULL;
+  vtkCPProcessor* Processor = NULL;
   vtkUnstructuredGrid* VTKGrid;
 
   void BuildVTKGrid(Grid& grid)
@@ -104,7 +104,7 @@ namespace FEAdaptor
   {
     if(Processor == NULL)
       {
-      Processor = vtkCPPythonProcessor::New();
+      Processor = vtkCPProcessor::New();
       Processor->Initialize();
       }
     else

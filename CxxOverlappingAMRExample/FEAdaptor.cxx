@@ -5,7 +5,7 @@
 #include <vtkCompositeDataIterator.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
-#include <vtkCPPythonProcessor.h>
+#include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
 #include <vtkNew.h>
 #include <vtkOverlappingAMR.h>
@@ -13,7 +13,7 @@
 
 namespace
 {
-  vtkCPPythonProcessor* Processor = NULL;
+  vtkCPProcessor* Processor = NULL;
   vtkOverlappingAMR* VTKGrid;
 
   void BuildVTKGrid()
@@ -44,15 +44,12 @@ namespace
     vtkAMRBox level2Box(origin, level2Dims, level2Spacing, origin, VTK_XYZ_GRID);
     VTKGrid->SetSpacing(0, level0Spacing);
     VTKGrid->SetAMRBox(0, 0, level0Box);
-    VTKGrid->SetAMRBlockSourceIndex(0, 0, 0);
 
     VTKGrid->SetSpacing(1, level1Spacing);
     VTKGrid->SetAMRBox(1, 0, level1Box);
-    VTKGrid->SetAMRBlockSourceIndex(1, 0, 1);
 
     VTKGrid->SetSpacing(2, level2Spacing);
     VTKGrid->SetAMRBox(2, 0, level2Box);
-    VTKGrid->SetAMRBlockSourceIndex(2, 0, 2);
 
     VTKGrid->GenerateParentChildInformation();
 
@@ -84,7 +81,7 @@ namespace FEAdaptor
   {
     if(Processor == NULL)
       {
-      Processor = vtkCPPythonProcessor::New();
+      Processor = vtkCPProcessor::New();
       Processor->Initialize();
       }
     else

@@ -4,7 +4,7 @@
 #include <vtkCompositeDataIterator.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
-#include <vtkCPPythonProcessor.h>
+#include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
 #include <vtkNew.h>
 #include <vtkNonOverlappingAMR.h>
@@ -12,7 +12,7 @@
 
 namespace
 {
-  vtkCPPythonProcessor* Processor = NULL;
+  vtkCPProcessor* Processor = NULL;
   vtkNonOverlappingAMR* VTKGrid;
 
   void BuildVTKGrid()
@@ -71,7 +71,7 @@ namespace FEAdaptor
   {
     if(Processor == NULL)
       {
-      Processor = vtkCPPythonProcessor::New();
+      Processor = vtkCPProcessor::New();
       Processor->Initialize();
       }
     else

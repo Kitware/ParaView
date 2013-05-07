@@ -6,7 +6,7 @@
 #include <vtkCPAdaptorAPI.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
-#include <vtkCPPythonProcessor.h>
+#include <vtkCPProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>

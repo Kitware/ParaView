@@ -1,82 +1,83 @@
-# sample Python script for CxxFullExample. Run with:
-# <FEDriver path>/FEDriver <path to this script>/feslicescript.py
 
 try: paraview.simple
 except: from paraview.simple import *
 
-# Make sure the helper methods are loaded
-try:
-  __cp_helper_script_loaded__
-except:
-  import vtkPVPythonCatalystPython
-  exec vtkPVPythonCatalystPython.vtkCPPythonHelper.GetPythonHelperScript()
+from paraview import coprocessing
 
+
+#--------------------------------------------------------------
+# Code generated from cpstate.py to create the CoProcessor.
+
+
+# ----------------------- CoProcessor definition -----------------------
+
+def CreateCoProcessor():
+  def _CreatePipeline(coprocessor, datadescription):
+    class Pipeline:
+      filename_10_vthb = coprocessor.CreateProducer( datadescription, "input" )
+      
+      Slice1 = Slice( guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
+      Slice1.SliceType.Offset = 0.0
+      Slice1.SliceType.Origin = [1.9627925694422252, 50.0, 50.0]
+      Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
+      
+      ParallelMultiBlockDataSetWriter1 = coprocessor.CreateWriter( XMLMultiBlockDataWriter, "filename_%t.vtm", 10 )
+      
+    return Pipeline()
+
+  class CoProcessor(coprocessing.CoProcessor):
+    def CreatePipeline(self, datadescription):
+      self.Pipeline = _CreatePipeline(self, datadescription)
+
+  coprocessor = CoProcessor()
+  freqs = {'input': [10]}
+  coprocessor.SetUpdateFrequencies(freqs)
+  return coprocessor
+
+#--------------------------------------------------------------
 # Global variables that will hold the pipeline for each timestep
-pipeline = None
+# Creating the CoProcessor object, doesn't actually create the ParaView pipeline.
+# It will be automatically setup when coprocessor.UpdateProducers() is called the
+# first time.
+coprocessor = CreateCoProcessor()
 
-# Live visualization inside ParaView
-live_visu_active = False
-pv_host = "localhost"
-pv_port = 22222
-
-write_frequencies    = {'input': [10, 100]}
-simulation_input_map = {'filename_*': 'input'}
-
-# ----------------------- Pipeline definition -----------------------
-
-def CreatePipeline(datadescription):
-  class Pipeline:
-    global cp_views, cp_writers
-    filename_ = CreateProducer( datadescription, "input" )
-
-    Slice2 = Slice( guiName="Slice2", Crinkleslice=0, SliceOffsetValues=[-3.0, -1.0, 1.0, 3.0], Triangulatetheslice=1, SliceType="Plane" )
-    Slice2.SliceType.Offset = 0.0
-    Slice2.SliceType.Origin = [2.0, 2.75, 3.9000000000000004]
-    Slice2.SliceType.Normal = [0.0, 0.0, 1.0]
-
-    SetActiveSource(filename_)
-    ParallelImageDataWriter1 = CreateCPWriter( XMLUniformGridAMRWriter, "fullgrid_%t.vth", 100, cp_writers )
-
-    SetActiveSource(Slice2)
-    ParallelPolyDataWriter1 = CreateCPWriter( XMLMultiBlockDataWriter, "slice_%t.vtm", 10, cp_writers )
-
-  return Pipeline()
+#--------------------------------------------------------------
+# Enable Live-Visualizaton with ParaView
+coprocessor.EnableLiveVisualization(False)
 
 
 # ---------------------- Data Selection method ----------------------
 
 def RequestDataDescription(datadescription):
     "Callback to populate the request for current timestep"
+    global coprocessor
     if datadescription.GetForceOutput() == True:
+        # We are just going to request all fields and meshes from the simulation
+        # code/adaptor.
         for i in range(datadescription.GetNumberOfInputDescriptions()):
             datadescription.GetInputDescription(i).AllFieldsOn()
             datadescription.GetInputDescription(i).GenerateMeshOn()
         return
 
-    for input_name in simulation_input_map.values():
-       LoadRequestedData(datadescription, input_name)
+    # setup requests for all inputs based on the requirements of the
+    # pipeline.
+    coprocessor.LoadRequestedData(datadescription)
 
 # ------------------------ Processing method ------------------------
 
 def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
-    global pipeline, cp_writers, cp_views
-    timestep = datadescription.GetTimeStep()
+    global coprocessor
 
-    # Load the Pipeline if not created yet
-    if not pipeline:
-       pipeline = CreatePipeline(datadescription)
-    else:
-      # update to the new input and time
-      UpdateProducers(datadescription)
+    # Update the coprocessor by providing it the newly generated simulation data.
+    # If the pipeline hasn't been setup yet, this will setup the pipeline.
+    coprocessor.UpdateProducers(datadescription)
 
-    # Write output data
-    WriteAllData(datadescription, cp_writers, timestep);
+    # Write output data, if appropriate.
+    coprocessor.WriteData(datadescription);
 
-    # Write image capture (Last arg: rescale lookup table)
-    WriteAllImages(datadescription, cp_views, timestep, False)
+    # Write image capture (Last arg: rescale lookup table), if appropriate.
+    coprocessor.WriteImages(datadescription, rescale_lookuptable=False)
 
-    # Live Visualization
-    if live_visu_active:
-       DoLiveInsitu(timestep, pv_host, pv_port)
-
+    # Live Visualization, if enabled.
+    coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)

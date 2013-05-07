@@ -1,82 +1,92 @@
-"""
-A Catalyst pipeline Python script that writes out the
-full grid and all attributes independent of the grid
-type created by the adaptor. It works in parallel and
-writes to a file called filename_%t.<ext>" where %t is
-the time step and <ext> is the appropriate file name
-extension for the data set. This script is useful if
-there is no existing data set to create a Catalyst
-pipeline from.
-"""
 try: paraview.simple
 except: from paraview.simple import *
 
-# Make sure the helper methods are loaded
-try:
-  __cp_helper_script_loaded__
-except:
-  import vtkPVPythonCatalystPython
-  exec vtkPVPythonCatalystPython.vtkCPPythonHelper.GetPythonHelperScript()
+from paraview import coprocessing
 
+
+#--------------------------------------------------------------
+# Code generated from cpstate.py to create the CoProcessor.
+
+
+# ----------------------- CoProcessor definition -----------------------
+
+def CreateCoProcessor():
+  def _CreatePipeline(coprocessor, datadescription):
+    class Pipeline:
+      adaptorinput = coprocessor.CreateProducer( datadescription, "input" )
+      grid = adaptorinput.GetClientSideObject().GetOutputDataObject(0)
+      if  grid.IsA('vtkImageData') or grid.IsA('vtkUniformGrid'):
+        writer = coprocessor.CreateWriter( XMLPImageDataWriter, "filename_%t.pvti", 1 )
+      elif  grid.IsA('vtkRectilinearGrid'):
+        writer = coprocessor.CreateWriter( XMLPRectilinearGridWriter, "filename_%t.pvtr", 1 )
+      elif  grid.IsA('vtkStructuredGrid'):
+        writer = coprocessor.CreateWriter( XMLPStructuredGridWriter, "filename_%t.pvts", 1 )
+      elif  grid.IsA('vtkPolyData'):
+        writer = coprocessor.CreateWriter( XMLPPolyDataWriter, "filename_%t.pvtp", 1 )
+      elif  grid.IsA('vtkUnstructuredGrid'):
+        writer = coprocessor.CreateWriter( XMLPUnstructuredGridWriter, "filename_%t.pvtu", 1 )
+      elif  grid.IsA('vtkUniformGridAMR'):
+        writer = coprocessor.CreateWriter( XMLHierarchicalBoxDataWriter, "filename_%t.vthb", 1 )
+      elif  grid.IsA('vtkMultiBlockDataSet'):
+        writer = coprocessor.CreateWriter( XMLMultiBlockDataWriter, "filename_%t.vtm", 1 )
+      else:
+        print "Don't know how to create a writer for a ", grid.GetClassName()
+
+    return Pipeline()
+
+  class CoProcessor(coprocessing.CoProcessor):
+    def CreatePipeline(self, datadescription):
+      self.Pipeline = _CreatePipeline(self, datadescription)
+
+  coprocessor = CoProcessor()
+  freqs = {'input': [1]}
+  coprocessor.SetUpdateFrequencies(freqs)
+  return coprocessor
+
+#--------------------------------------------------------------
 # Global variables that will hold the pipeline for each timestep
-pipeline = None
+# Creating the CoProcessor object, doesn't actually create the ParaView pipeline.
+# It will be automatically setup when coprocessor.UpdateProducers() is called the
+# first time.
+coprocessor = CreateCoProcessor()
 
-write_frequencies    = {'input': [1]}
-simulation_input_map = {'adaptorinput': 'input'}
-
-# ----------------------- Pipeline definition -----------------------
-
-def CreatePipeline(datadescription):
-  class Pipeline:
-    global cp_views, cp_writers
-    adaptorinput = CreateProducer( datadescription, "input" )
-    adaptorinput.UpdatePipeline()
-    gridtype = adaptorinput.GetDataInformation().DataInformation.GetDataClassName()
-    if  gridtype == 'vtkImageData' or gridtype == 'vtkUniformGrid':
-      writer = CreateCPWriter( XMLPImageDataWriter, "filename_%t.pvti", 1, cp_writers )
-    elif  gridtype == 'vtkRectilinearGrid':
-      writer = CreateCPWriter( XMLPRectilinearGridWriter, "filename_%t.pvtr", 1, cp_writers )
-    elif  gridtype == 'vtkStructuredGrid':
-      writer = CreateCPWriter( XMLPStructuredGridWriter, "filename_%t.pvts", 1, cp_writers )
-    elif  gridtype == 'vtkPolyData':
-      writer = CreateCPWriter( XMLPPolyDataWriter, "filename_%t.pvtp", 1, cp_writers )
-    elif  gridtype == 'vtkUnstructuredGrid':
-      writer = CreateCPWriter( XMLPUnstructuredGridWriter, "filename_%t.pvtu", 1, cp_writers )
-    elif  gridtype == 'vtkHierarchicalBoxDataSet':
-      writer = CreateCPWriter( XMLHierarchicalBoxDataWriter, "filename_%t.vthb", 1, cp_writers )
-    elif  gridtype == 'vtkMultiBlockDataSet':
-      writer = CreateCPWriter( XMLMultiBlockDataWriter, "filename_%t.vtm", 1, cp_writers )
-    else:
-      print "Don't know how to create a writer for a ", gridtype
-  return Pipeline()
+#--------------------------------------------------------------
+# Enable Live-Visualizaton with ParaView
+coprocessor.EnableLiveVisualization(False)
 
 
 # ---------------------- Data Selection method ----------------------
 
 def RequestDataDescription(datadescription):
     "Callback to populate the request for current timestep"
+    global coprocessor
     if datadescription.GetForceOutput() == True:
+        # We are just going to request all fields and meshes from the simulation
+        # code/adaptor.
         for i in range(datadescription.GetNumberOfInputDescriptions()):
             datadescription.GetInputDescription(i).AllFieldsOn()
             datadescription.GetInputDescription(i).GenerateMeshOn()
         return
 
-    for input_name in simulation_input_map.values():
-       LoadRequestedData(datadescription, input_name)
+    # setup requests for all inputs based on the requirements of the
+    # pipeline.
+    coprocessor.LoadRequestedData(datadescription)
 
 # ------------------------ Processing method ------------------------
 
 def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
-    global pipeline, cp_writers, cp_views
-    timestep = datadescription.GetTimeStep()
+    global coprocessor
 
-    # Load the Pipeline if not created yet
-    if not pipeline:
-       pipeline = CreatePipeline(datadescription)
-    else:
-      # update to the new input and time
-      UpdateProducers(datadescription)
+    # Update the coprocessor by providing it the newly generated simulation data.
+    # If the pipeline hasn't been setup yet, this will setup the pipeline.
+    coprocessor.UpdateProducers(datadescription)
 
-    # Write output data
-    WriteAllData(datadescription, cp_writers, timestep);
+    # Write output data, if appropriate.
+    coprocessor.WriteData(datadescription);
+
+    # Write image capture (Last arg: rescale lookup table), if appropriate.
+    coprocessor.WriteImages(datadescription, rescale_lookuptable=False)
+
+    # Live Visualization, if enabled.
+    coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)
