@@ -5421,12 +5421,19 @@ found and the point will be rejected.</Documentation>
         <Documentation>Generate clipping outlines in the output wherever an
         input face is cut by the clipping plane.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetGenerateColorScalars"
+      <IntVectorProperty command="SetScalarMode"
                          default_values="0"
                          label="Generate Cell Origins"
-                         name="GenerateColorScalars"
+                         name="ScalarMode"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+                         <EnumerationDomain name="enum">
+                           <Entry text="None"
+                                  value="0" />
+                           <Entry text="Color"
+                                  value="1" />
+                           <Entry text="Label"
+                                  value="2" />
+                         </EnumerationDomain>
         <Documentation>Generate (cell) data for coloring purposes such that the
         newly generated cells (including capping faces and clipping outlines)
         can be distinguished from the input cells.</Documentation>
