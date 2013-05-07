@@ -316,15 +316,6 @@ void vtkSMRenderViewProxy::SynchronizeCameraProperties()
 }
 
 //----------------------------------------------------------------------------
-vtkRenderWindow* vtkSMRenderViewProxy::GetRenderWindow()
-{
-  this->CreateVTKObjects();
-  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
-    this->GetClientSideObject());
-  return rv? rv->GetRenderWindow() : NULL;
-}
-
-//----------------------------------------------------------------------------
 vtkRenderer* vtkSMRenderViewProxy::GetRenderer()
 {
   this->CreateVTKObjects();

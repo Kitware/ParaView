@@ -153,7 +153,6 @@
         isZooming = false, isDragging = false, mouseAction = 'up', target;
 
         function mobileTouchInteraction(evt) {
-            console.log('touch');
             evt.gesture.preventDefault();
             switch(evt.type) {
                 case 'drag':

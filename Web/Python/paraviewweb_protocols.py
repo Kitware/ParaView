@@ -117,7 +117,10 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         """
         view = self.getView(view)
         simple.ResetCamera(view)
-        view.CenterOfRotation = view.CameraFocalPoint
+        try:
+            view.CenterOfRotation = view.CameraFocalPoint
+        except:
+            pass
 
         self.getApplication().InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()

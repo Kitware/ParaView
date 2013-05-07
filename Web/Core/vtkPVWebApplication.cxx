@@ -218,21 +218,11 @@ const char* vtkPVWebApplication::StillRenderToString(vtkSMViewProxy* view, unsig
 bool vtkPVWebApplication::HandleInteractionEvent(
   vtkSMViewProxy* view, vtkPVWebInteractionEvent* event)
 {
-  vtkSMRenderViewProxy* rvview = vtkSMRenderViewProxy::SafeDownCast(view);
-  vtkSMContextViewProxy* ctxView = vtkSMContextViewProxy::SafeDownCast(view);
-
-  vtkRenderWindow* renWin = NULL;
   vtkRenderWindowInteractor *iren = NULL;
 
-  if (rvview)
+  if (view->GetRenderWindow())
     {
-    renWin = rvview->GetRenderWindow();
-    iren = rvview->GetInteractor();
-    }
-  else if (ctxView)
-    {
-    renWin = ctxView->GetRenderWindow();
-    iren = renWin->GetInteractor();
+    iren = view->GetRenderWindow()->GetInteractor();
     }
   else
     {
@@ -307,20 +297,10 @@ const char* vtkPVWebApplication::GetWebGLSceneMetaData(vtkSMViewProxy* view)
     vtkErrorMacro("No view specified.");
     return NULL;
     }
-  vtkSMRenderViewProxy* rvview = vtkSMRenderViewProxy::SafeDownCast(view);
-  vtkSMContextViewProxy* ctxView = vtkSMContextViewProxy::SafeDownCast(view);
 
-  vtkRenderWindow* renWin = NULL;
+  vtkRenderWindow* renWin = view->GetRenderWindow();
 
-  if (rvview)
-    {
-    renWin = rvview->GetRenderWindow();
-    }
-  else if (ctxView)
-    {
-    renWin = ctxView->GetRenderWindow();
-    }
-  else
+  if(renWin == NULL)
     {
     vtkErrorMacro("The view is supported for WebGL export: " << view);
     return NULL;
