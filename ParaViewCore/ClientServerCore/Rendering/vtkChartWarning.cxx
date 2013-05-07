@@ -208,6 +208,15 @@ bool vtkChartWarning::ArePlotsImproperlyScaled(vtkChart* chart)
       (plot->GetYAxis()->GetLogScale() ? 2 : 0);
     if (badAxes & logAxes)
       {
+      if (
+        (!(badAxes & logAxes & 1) || plot->GetXAxis()->GetLogScaleActive()) &&
+        (!(badAxes & logAxes & 2) || plot->GetYAxis()->GetLogScaleActive()))
+        {
+        // Has the user changed the vtkAxis range so that no invalid
+        // region of the unscaled axis is shown? If so, we do not
+        // need to warn (for this plot).
+        continue;
+        }
       return true;
       }
     }

@@ -167,8 +167,9 @@ void vtkPVXYChartView::SetChartType(const char *type)
       "WARNING!\n"
       "One or more plot series crosses or contains\n"
       "an axis origin. Use the View Options menu to\n"
-      "turn off log-scaling or remove the series from\n"
-      "the Line Series section of the Properties Tab."
+      "turn off log-scaling or specify a valid axis\n"
+      "range; or scroll the view; or remove the line\n"
+      "series from the chart in the Properties Tab."
       );
     this->LogScaleWarningLabel->SetVisible(1);
     this->LogScaleWarningLabel->SetDimensions(150, 150, 150, 150);
