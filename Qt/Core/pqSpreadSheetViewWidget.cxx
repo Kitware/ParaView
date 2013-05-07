@@ -91,6 +91,7 @@ public:
       }
     if (option.state & QStyle::State_Selected)
       {
+      painter->fillRect(option.rect, option.palette.brush(QPalette::Highlight));
       painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
       }
     else
