@@ -342,6 +342,8 @@ void pqSpreadSheetViewModel::forceUpdate()
       emit this->dataChanged(this->index(0, 0), this->index(rows-1, columns-1));
       }
     }
+  // this ensures that we update the selected based on the current state.
+  this->Internal->SelectionTimer.start();
 }
 
 //-----------------------------------------------------------------------------

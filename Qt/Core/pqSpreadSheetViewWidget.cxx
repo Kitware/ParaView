@@ -176,6 +176,7 @@ pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
   this->setCornerButtonEnabled(false);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->horizontalHeader()->setMovable(true);
+  this->horizontalHeader()->setHighlightSections(false);
   this->SingleColumnMode = false;
 
   //setup the delegate.
