@@ -313,6 +313,20 @@ namespace
       return true;
       }
 
+    bool enableWidget() const
+      {
+      foreach (const pqPropertyWidgetDecorator* decorator,
+        this->PropertyWidget->decorators())
+        {
+        if (decorator && !decorator->enableWidget())
+          {
+          return false;
+          }
+        }
+
+      return true;
+      }
+
     bool isAdvanced(vtkSMProxy* proxy) const
       {
       if (this->DefaultVisibilityForRepresentations.size() > 0 &&
@@ -327,7 +341,7 @@ namespace
       }
 
     void show(QGridLayout* layout, int &row_index,
-              const pqProxyWidgetItem* prevItem) const
+              const pqProxyWidgetItem* prevItem, bool enabled=true) const
       {
       if (this->GroupFooter)
         {
@@ -368,6 +382,7 @@ namespace
         layout->addWidget(this->PropertyWidget, row_index, 0, 1, -1);
         }
       this->PropertyWidget->show();
+      this->PropertyWidget->setEnabled(enabled);
       row_index++;
       }
 
@@ -831,6 +846,8 @@ void pqProxyWidget::createPropertyWidgets()
       {
       QObject::connect(decorator, SIGNAL(visibilityChanged()),
         this, SLOT(updatePanel()));
+      QObject::connect(decorator, SIGNAL(enableStateChanged()),
+        this, SLOT(updatePanel()));
       }
 
     this->Internals->Items.append(item);
@@ -969,7 +986,8 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
       show_advanced, filterText, this->Internals->Proxy);
     if (visible)
       {
-      item->show(gridLayout, row_index, prevItem);
+      bool enabled = item->enableWidget();
+      item->show(gridLayout, row_index, prevItem, enabled);
       prevItem = item;
       }
     else

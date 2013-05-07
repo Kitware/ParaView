@@ -32,13 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleVectorPropertyWidget.h"
 
-#include "vtkSMDomain.h"
-#include "vtkSMProperty.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
+#include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 
 #include "pqSignalAdaptors.h"
 #include "pqDoubleRangeWidget.h"
@@ -84,12 +86,16 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
   if(vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain))
     {
-    if(vtkSMBoundsDomain::SafeDownCast(range) && smProperty->GetRepeatable())
+    if((vtkSMBoundsDomain::SafeDownCast(range) ||
+      vtkSMArrayRangeDomain::SafeDownCast(range))
+      && smProperty->GetRepeatable())
       {
       pqScalarValueListPropertyWidget *widget =
         new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
       widget->setObjectName("ScalarValueList");
+      widget->setRangeDomain(range);
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+
       this->setChangeAvailableAsChangeFinished(true);
       layoutLocal->addWidget(widget);
       this->setShowLabel(false);

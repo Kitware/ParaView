@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QCheckBox>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -44,13 +45,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollapsedGroup.h"
 #include "pqSampleScalarAddRangeDialog.h"
 
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkNew.h"
 #include "vtkSMProperty.h"
+#include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkWeakPointer.h"
 
 class pqScalarValueListPropertyWidgetPrivate
 {
 public:
     QListWidget *ListWidget;
+    QLabel* ScalarRange;
+
+    vtkNew<vtkEventQtSlotConnect> VTKRangeConnector;
+    vtkWeakPointer<vtkSMDoubleRangeDomain> RangeDomain;
 };
 
 pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *smProperty,
@@ -61,15 +71,17 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *
 {
   this->setShowLabel(false);
 
-  pqCollapsedGroup *groupBox = new pqCollapsedGroup(this);
-  groupBox->setTitle(smProperty->GetXMLLabel());
-
-  QHBoxLayout *groupBoxLayout = new QHBoxLayout;
+  QVBoxLayout *groupBoxLayout = new QVBoxLayout;
+  QHBoxLayout *groupListLayout = new QHBoxLayout;
   d->ListWidget = new QListWidget;
   d->ListWidget->setSortingEnabled(false);
   this->connect(d->ListWidget, SIGNAL(itemChanged(QListWidgetItem*)),
                 this, SLOT(itemChanged(QListWidgetItem*)));
-  groupBoxLayout->addWidget(d->ListWidget);
+  groupListLayout->addWidget(d->ListWidget);
+
+  d->ScalarRange = new QLabel("Scalar Range: 0.0 - 1.0", this);
+  groupBoxLayout->addWidget(d->ScalarRange);
+  d->ScalarRange->setVisible(false);
 
   QVBoxLayout *buttonBox = new QVBoxLayout;
   QPushButton *addValueButton = new QPushButton("Add Value", this);
@@ -86,20 +98,18 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *
   buttonBox->addWidget(deleteAllButton);
   QCheckBox *scientificModeCheckBox = new QCheckBox("Scientific");
   buttonBox->addWidget(scientificModeCheckBox);
-  groupBoxLayout->addLayout(buttonBox);
-  groupBox->setLayout(groupBoxLayout);
+  groupListLayout->addLayout(buttonBox);
+  groupBoxLayout->addLayout(groupListLayout);
 
   // create top-level layout for the group box
-  QVBoxLayout *internalLayout = new QVBoxLayout;
-  internalLayout->addWidget(groupBox);
-  this->setLayout(internalLayout);
+  this->setLayout(groupBoxLayout);
 
-  // set initial values
   this->setScalars(pqSMAdaptor::getMultipleElementProperty(smProperty, pqSMAdaptor::UNCHECKED));
 }
 
 pqScalarValueListPropertyWidget::~pqScalarValueListPropertyWidget()
 {
+  d->VTKRangeConnector->Disconnect();
   delete d;
 }
 
@@ -116,6 +126,7 @@ void pqScalarValueListPropertyWidget::setScalars(const QVariantList &values)
     item->setData(Qt::UserRole, value);
     d->ListWidget->addItem(item);
     }
+  emit scalarsChanged();
 }
 
 QVariantList pqScalarValueListPropertyWidget::scalars() const
@@ -183,7 +194,13 @@ QListWidgetItem* pqScalarValueListPropertyWidget::addScalar(double scalar)
 
 void pqScalarValueListPropertyWidget::addRange()
 {
-  pqSampleScalarAddRangeDialog dialog(0.0, 10.0, 10, false);
+  double range_min, range_max;
+  if(!this->getRange(range_min, range_max))
+    {
+    range_min=0.0;
+    range_max=10.0;
+    }
+  pqSampleScalarAddRangeDialog dialog(range_min, range_max, 10, false);
 
   if(dialog.exec() != QDialog::Accepted)
     {
@@ -241,4 +258,63 @@ void pqScalarValueListPropertyWidget::deleteAllScalars()
   d->ListWidget->clear();
 
   emit scalarsChanged();
+}
+
+void pqScalarValueListPropertyWidget::setRangeDomain(
+  vtkSMDoubleRangeDomain* smRangeDomain)
+{
+  if(d->RangeDomain)
+    {
+    d->VTKRangeConnector->Disconnect();
+    }
+    
+  d->RangeDomain = smRangeDomain;
+ 
+  if(d->RangeDomain)
+    {
+    d->VTKRangeConnector->Connect(
+        d->RangeDomain, vtkCommand::DomainModifiedEvent,
+        this, SLOT(smRangeModified()));
+    d->ScalarRange->setVisible(true);
+    this->smRangeModified();
+    }
+  else
+    {
+    d->ScalarRange->setVisible(false);
+    }
+}
+
+void pqScalarValueListPropertyWidget::smRangeModified()
+{
+  double range_min;
+  double range_max;
+  if(this->getRange(range_min, range_max))
+    {
+    d->ScalarRange->setText(
+      tr("Value Range: [%1, %2]").arg(range_min).arg(range_max));
+    }
+  else
+    {
+    d->ScalarRange->setText(tr("Value Range: unlimited"));
+    }
+}
+
+bool pqScalarValueListPropertyWidget::getRange(double& range_min, double& range_max)
+{
+  // Return the range of values in the input (if available)
+  if(d->RangeDomain)
+    {
+    int min_exists = 0;
+    range_min = d->RangeDomain->GetMinimum(0, min_exists);
+    
+    int max_exists = 0;
+    range_max = d->RangeDomain->GetMaximum(0, max_exists);
+    
+    if(min_exists && max_exists)
+      {
+      return true;
+      }
+    }
+
+  return false;
 }

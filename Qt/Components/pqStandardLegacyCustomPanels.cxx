@@ -66,15 +66,6 @@ pqObjectPanel* pqStandardLegacyCustomPanels::createPanel(pqProxy* proxy, QWidget
       {
       return new pqGlyphPanel(proxy, p);
       }
-    //      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
-    //        {
-    //        return new pqParticleTracerPanel(proxy, p);
-    //        }
-    if(QString("Contour") == proxy->getProxy()->GetXMLName() ||
-      QString("GenericContour") == proxy->getProxy()->GetXMLName())
-      {
-      return new pqContourPanel(proxy, p);
-      }
     if (QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName())
       {
       return new pqYoungsMaterialInterfacePanel(proxy, p);
@@ -95,8 +86,8 @@ bool pqStandardLegacyCustomPanels::canCreatePanel(pqProxy* proxy) const
       //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
       QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
       QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
-      QString("Contour") == proxy->getProxy()->GetXMLName() ||
-      QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
+      //QString("Contour") == proxy->getProxy()->GetXMLName() ||
+      //QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
       QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName() ||
       QString("PassArrays") == proxy->getProxy()->GetXMLName() )
       {
