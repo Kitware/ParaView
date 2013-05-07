@@ -698,7 +698,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   // number of vertices of face j of generic element i
                   unsigned long numVerts;
                   // number of unique vertices of generic element i
-                  int numPts;
+                  vtkIdType numPts;
                   vtkIdType *pointIds;
                   std::set<int> auxIds;
                   std::set<int>::iterator auxIt;
