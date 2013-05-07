@@ -1,71 +1,39 @@
 INCLUDE(ParaViewTestingMacros)
 
+SET(_SUFFIX "")
 IF(VISIT_BUILD_READER_GMV)
-  SET(GMV_READER_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead_WithVisitBridge.xml
-  )
-  SET(GMVReaderBasicRead_WithVisitBridge_BREAK TRUE)
-
-  SET(GMV_READER_SERVER_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead_WithVisitBridge.xml
-  )
-  SET(serverGMVReaderBasicRead_WithVisitBridge_BREAK TRUE)
-
-  SET(GMV_READER_STATIC_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead_WithVisitBridge-static.xml
-  )
-  SET(GMVReaderBasicRead_WithVisitBridge-static_BREAK TRUE)
-
-  SET(GMV_READER_STATIC_SERVER_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead_WithVisitBridge-static.xml
-  )
-  SET(serverGMVReaderBasicRead_WithVisitBridge-static_BREAK TRUE)
-
-ELSE(VISIT_BUILD_READER_GMV)
-  SET(GMV_READER_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead.xml
-  )
-  SET(GMVReaderBasicRead_BREAK TRUE)
-
-  SET(GMV_READER_SERVER_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead.xml
-  )
-  SET(serverGMVReaderBasicRead_BREAK TRUE)
-
-  SET(GMV_READER_STATIC_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead-static.xml
-  )
-  SET(GMVReaderBasicRead-static_BREAK TRUE)
-
-  SET(GMV_READER_STATIC_SERVER_TESTS
-    ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead-static.xml
-  )
-  SET(serverGMVReaderBasicRead-static_BREAK TRUE)
+   SET(_SUFFIX "${_SUFFIX}_WithVisitBridge")
 ENDIF(VISIT_BUILD_READER_GMV)
+IF(NOT BUILD_SHARED_LIBS)
+   SET(_SUFFIX "${_SUFFIX}-static")
+ENDIF(NOT BUILD_SHARED_LIBS)
+
+
+SET(GMV_READER_TESTS
+  ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead${_SUFFIX}.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderInvalidFiles${_SUFFIX}.xml
+)
+SET(GMVReaderBasicRead${_SUFFIX}_BREAK TRUE)
+SET(GMVReaderInvalidFiles${_SUFFIX}_BREAK TRUE)
+
+SET(GMV_READER_SERVER_TESTS
+  ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead${_SUFFIX}.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderInvalidFiles${_SUFFIX}.xml
+)
+SET(serverGMVReaderBasicRead${_SUFFIX}_BREAK TRUE)
+SET(serverGMVReaderInvalidFiles${_SUFFIX}_BREAK TRUE)
+
 
 IF (PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_QT_GUI)
-  IF (BUILD_SHARED_LIBS)
-    ADD_CLIENT_TESTS("pv"
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-      TEST_SCRIPTS ${GMV_READER_TESTS}
-    )
+  ADD_CLIENT_TESTS("pv"
+    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+    TEST_SCRIPTS ${GMV_READER_TESTS}
+  )
+  SET_PROPERTY(TEST "pv.GMVReaderInvalidFiles${_SUFFIX}" PROPERTY PASS_REGULAR_EXPRESSION "client0 process exited with code 0")
 
-    ADD_CLIENT_SERVER_TESTS("pvcs"
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-      TEST_SCRIPTS ${GMV_READER_SERVER_TESTS}
-    )
-
-  ELSE(BUILD_SHARED_LIBS)
-    # Static build no need to load plugins
-    ADD_CLIENT_TESTS("pv"
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-      TEST_SCRIPTS ${GMV_READER_STATIC_TESTS}
-    )
-
-    ADD_CLIENT_SERVER_TESTS("pvcs"
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-      TEST_SCRIPTS ${GMV_READER_STATIC_SERVER_TESTS}
-    )
-
-  ENDIF(BUILD_SHARED_LIBS)
+  ADD_CLIENT_SERVER_TESTS("pvcs"
+    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+    TEST_SCRIPTS ${GMV_READER_SERVER_TESTS}
+  )
+  SET_PROPERTY(TEST "pvcs.serverGMVReaderInvalidFiles${_SUFFIX}" PROPERTY PASS_REGULAR_EXPRESSION "server process exited with code 0")
 ENDIF (PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_QT_GUI)
