@@ -36,6 +36,7 @@ set (Module_SRCS
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkChartSelectionRepresentation.cxx
+  vtkChartWarning.cxx
   vtkClientServerMoveData.cxx
   vtkCompositeRepresentation.cxx
   vtkCompositeSliceRepresentation.cxx
