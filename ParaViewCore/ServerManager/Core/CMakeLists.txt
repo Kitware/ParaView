@@ -51,6 +51,8 @@ set (Module_SRCS
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
+  vtkSMDoubleMapProperty.cxx
+  vtkSMDoubleMapPropertyIterator.cxx
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
@@ -68,6 +70,7 @@ set (Module_SRCS
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
   vtkSMLiveInsituLinkProxy.cxx
+  vtkSMMapProperty.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNumberOfComponentsDomain.cxx
   vtkSMNumberOfGroupsDomain.cxx

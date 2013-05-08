@@ -186,6 +186,21 @@ public:
   virtual void RemoveBlockVisibility(unsigned int index, bool = true);
   virtual void RemoveBlockVisibilities();
 
+  // Description:
+  // Set/get the color for a single block.
+  virtual void SetBlockColor(unsigned int index, double r, double g, double b);
+  virtual void SetBlockColor(unsigned int index, double *color);
+  virtual double* GetBlockColor(unsigned int index);
+  virtual void RemoveBlockColor(unsigned int index);
+  virtual void RemoveBlockColors();
+
+  // Description:
+  // Set/get the opacityfor a single block.
+  virtual void SetBlockOpacity(unsigned int index, double opacity);
+  virtual void SetBlockOpacity(unsigned int index, double *opacity);
+  virtual double GetBlockOpacity(unsigned int index);
+  virtual void RemoveBlockOpacity(unsigned int index);
+  virtual void RemoveBlockOpacities();
 //BTX
 protected:
   vtkGeometryRepresentation();

@@ -41,7 +41,8 @@ bool vtkSIVectorProperty::ReadXMLAttributes(
 {
   if (!this->Superclass::ReadXMLAttributes(proxyhelper, element))
     {
-    return false;
+    return false;;
+
     }
 
   const char* numCommand = element->GetAttribute("set_number_command");

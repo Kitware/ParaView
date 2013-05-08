@@ -100,5 +100,7 @@ void pqColorChooserButton::chooseColor()
 //-----------------------------------------------------------------------------
 void pqColorChooserButton::resizeEvent(QResizeEvent *rEvent)
 {
+  (void) rEvent;
+
   this->setIcon(this->renderColorSwatch(this->Color));
 }

@@ -59,6 +59,8 @@ set(Module_SRCS
   pqConsoleWidget.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
+  pqDoubleRangeDialog.cxx
+  pqDoubleRangeDialog.h
   pqDoubleRangeWidget.cxx
   pqDoubleRangeWidget.h
   pqDoubleSpinBox.cxx
@@ -130,6 +132,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqColorTableModel.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
+  pqDoubleRangeDialog.h
   pqDoubleRangeWidget.h
   pqDoubleSpinBox.h
   pqExpanderButton.h

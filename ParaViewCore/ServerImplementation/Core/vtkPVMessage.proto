@@ -18,6 +18,7 @@ message Variant {
     PROXY   = 4; // proxy_global_id + port_number
     INPUT   = 5; // proxy_global_id + port_number
     BYTES   = 6;
+    MAP     = 7;
     }
 
   required Type    type            = 1;
