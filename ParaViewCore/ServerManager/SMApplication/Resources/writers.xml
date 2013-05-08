@@ -1004,6 +1004,13 @@
          (AVI on Linux and Mac) backend.
         </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetStartFileCount"
+                         default_values="0"
+                         name="StartFileCount"
+                         number_of_elements="1">
+      </IntVectorProperty>
+
       <Hints>
         <Property name="Input"
                   show="0" />

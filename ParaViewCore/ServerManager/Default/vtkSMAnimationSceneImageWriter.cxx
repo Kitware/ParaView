@@ -96,7 +96,7 @@ vtkSMAnimationSceneImageWriter::~vtkSMAnimationSceneImageWriter()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMAnimationSceneImageWriter::SaveInitialize()
+bool vtkSMAnimationSceneImageWriter::SaveInitialize(int startCount)
 {
   // Create writers.
   if (!this->CreateWriter())
@@ -118,7 +118,7 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize()
 
   this->AnimationScene->SetOverrideStillRender(1);
 
-  this->FileCount = 0;
+  this->FileCount = startCount;
 
 #if !defined(__APPLE__)
   // Iterate over all views and enable offscreen rendering. This avoid toggling

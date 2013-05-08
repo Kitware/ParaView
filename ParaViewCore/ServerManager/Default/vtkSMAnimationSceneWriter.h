@@ -53,6 +53,11 @@ public:
   vtkGetStringMacro(FileName);
 
   // Description:
+  // Get/Set the start file count.
+  vtkSetMacro(StartFileCount, int);
+  vtkGetMacro(StartFileCount, int);
+
+  // Description:
   // Get/Set time window that we want to write
   // If PlaybackTimeWindow[0] > PlaybackTimeWindow[1] that mean that we
   // want to export the full time range available.
@@ -69,7 +74,7 @@ protected:
   // Description:
   // Subclasses should override this method.
   // Called to initialize saving.
-  virtual bool SaveInitialize() = 0;
+  virtual bool SaveInitialize(int countStart) = 0;
 
   // Description:
   // Subclasses should override this method.
@@ -89,6 +94,7 @@ protected:
   bool SaveFailed;
   char* FileName;
   double PlaybackTimeWindow[2];
+  int    StartFileCount;
 private:
   vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&); // Not implemented.
   void operator=(const vtkSMAnimationSceneWriter&); // Not implemented.
