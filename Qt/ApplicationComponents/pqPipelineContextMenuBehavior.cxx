@@ -478,6 +478,11 @@ void pqPipelineContextMenuBehavior::showOnlyBlock()
   if(panel)
     {
     panel->showOnlyBlock(this->PickedBlocks.front());
+
+    for(int i = 1; i < this->PickedBlocks.size(); i++)
+      {
+      panel->setBlockVisibility(this->PickedBlocks[i], true);
+      }
     }
 }
 
