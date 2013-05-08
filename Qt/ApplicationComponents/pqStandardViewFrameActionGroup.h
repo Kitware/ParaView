@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QWidget;
 class pqViewFrame;
 
+/// pqStandardViewFrameActionGroup is a pqViewFrameActionGroup subclass that
+/// handles the buttons to be rendered on the left-side of the view-frame for
+/// standard views in ParaView including the Render View and Chart views.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionGroup : public pqViewFrameActionGroup
 {
   Q_OBJECT

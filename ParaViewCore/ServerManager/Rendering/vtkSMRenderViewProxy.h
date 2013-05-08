@@ -78,6 +78,13 @@ public:
   vtkSMRepresentationProxy* PickBlock(int x, int y, unsigned int &flatIndex);
 
   // Description:
+  // Given a location is display coordinates (pixels), tries to compute and
+  // return the world location on a surface, if possible. Returns true if the
+  // conversion was successful, else returns false.
+  bool ConvertDisplayToPointOnSurface(
+    const int display_position[2], double world_position[3]);
+
+  // Description:
   // Checks if color depth is sufficient to support selection.
   // If not, will return 0 and any calls to SelectVisibleCells will
   // quietly return an empty selection.

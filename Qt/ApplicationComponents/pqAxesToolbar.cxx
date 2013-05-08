@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqAxesToolbar.h"
 
 #include "pqActiveObjects.h"
-#include "pqRenderView.h"
 #include "pqDataRepresentation.h"
-#include "pqRubberBandHelper.h"
-
+#include "pqRenderView.h"
+#include "vtkSMRenderViewProxy.h"
+#include "pqRenderViewSelectionReaction.h"
 
 class pqAxesToolbar::pqInternals : public Ui::pqAxesToolbar
 {
@@ -47,15 +47,6 @@ void pqAxesToolbar::constructor()
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
-
-  this->PickHelper = new pqRubberBandHelper(this);
-  QObject::connect(this->PickHelper, SIGNAL(enablePick(bool)),
-    this->Internals->actionPickCenter, SLOT(setEnabled(bool)));
-  QObject::connect(this->PickHelper, SIGNAL(selecting(bool)),
-    this->Internals->actionPickCenter, SLOT(setChecked(bool)));
-  QObject::connect(this->PickHelper,
-    SIGNAL(intersectionFinished(double, double, double)),
-    this, SLOT(pickCenterOfRotationFinished(double, double, double)));
 
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(viewChanged(pqView*)),
@@ -79,8 +70,13 @@ void pqAxesToolbar::constructor()
   QObject::connect(this->Internals->actionResetCenter, SIGNAL(triggered()),
     this, SLOT(resetCenterOfRotationToCenterOfCurrentData()));
 
-  QObject::connect(this->Internals->actionPickCenter, SIGNAL(toggled(bool)),
-    this, SLOT(pickCenterOfRotation(bool)));
+  pqRenderViewSelectionReaction* selectionReaction = new
+    pqRenderViewSelectionReaction(
+      this->Internals->actionPickCenter, NULL /* track active view*/,
+      pqRenderViewSelectionReaction::SELECT_CUSTOM_BOX);
+  QObject::connect(
+    selectionReaction, SIGNAL(selectedCustomBox(int, int, int, int)),
+    this, SLOT(pickCenterOfRotation(int, int)));
 
   this->updateEnabledState();
 }
@@ -111,7 +107,6 @@ void pqAxesToolbar::updateEnabledState()
   this->Internals->actionShowCenterAxes->blockSignals(false);
   this->Internals->actionResetCenter->setEnabled(
     pqActiveObjects::instance().activeRepresentation() != NULL);
-  this->PickHelper->setView(renderView);
 }
 
 //-----------------------------------------------------------------------------
@@ -168,34 +163,20 @@ void pqAxesToolbar::resetCenterOfRotationToCenterOfCurrentData()
 }
 
 //-----------------------------------------------------------------------------
-void pqAxesToolbar::pickCenterOfRotation(bool begin)
+void pqAxesToolbar::pickCenterOfRotation(int x, int y)
 {
-  if (begin)
+  pqRenderView* rm = qobject_cast<pqRenderView*>(
+    pqActiveObjects::instance().activeView());
+  if (rm)
     {
-    this->PickHelper->beginFastIntersect();
-    }
-  else
-    {
-    this->PickHelper->endSelection();
-    }
-}
+    int pos[2] = {x, y};
+    double center[3];
 
-//-----------------------------------------------------------------------------
-void pqAxesToolbar::pickCenterOfRotationFinished(double _x, double _y, double _z)
-{
-  this->pickCenterOfRotation(false);
-  pqRenderView* rm =
-    qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (!rm)
-    {
-    qDebug("No active render module. Cannot reset center of rotation.");
-    return;
+    vtkSMRenderViewProxy* proxy = rm->getRenderViewProxy();
+    if (proxy->ConvertDisplayToPointOnSurface(pos, center))
+      {
+      rm->setCenterOfRotation(center);
+      rm->render();
+      }
     }
-
-  double center[3];
-  center[0] = _x;
-  center[1] = _y;
-  center[2] = _z;
-  rm->setCenterOfRotation(center);
-  rm->render();
 }

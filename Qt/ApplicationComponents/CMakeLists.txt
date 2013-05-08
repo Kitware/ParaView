@@ -161,6 +161,8 @@ set (Module_SRCS
   pqQtMessageHandlerBehavior.h
   pqReaction.cxx
   pqReaction.h
+  pqRenderViewSelectionReaction.cxx
+  pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.cxx
   pqRepresentationToolbar.h
   pqResetScalarRangeReaction.cxx
@@ -177,8 +179,6 @@ set (Module_SRCS
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
-  pqSelection3DHelper.cxx
-  pqSelection3DHelper.h
   pqSelectionInspectorWidget.cxx
   pqSelectionInspectorWidget.h
   pqServerConnectReaction.cxx
@@ -291,6 +291,7 @@ set (Module_MOC_HDRS
   pqPythonShellReaction.h
   pqQtMessageHandlerBehavior.h
   pqReaction.h
+  pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.h
   pqResetScalarRangeReaction.h
   pqSaveAnimationGeometryReaction.h
@@ -299,7 +300,6 @@ set (Module_MOC_HDRS
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.h
-  pqSelection3DHelper.h
   pqSelectionInspectorWidget.h
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h

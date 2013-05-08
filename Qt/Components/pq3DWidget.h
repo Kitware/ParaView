@@ -165,6 +165,9 @@ public slots:
 protected slots:
   /// Called to request a render.
   void render();
+
+  /// triggers a pick action using the current location of the mouse.
+  virtual void pick();
   
   /// Called on each pick, default implementation does nothing.
   virtual void pick(double, double, double) {};

@@ -37,17 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraUndoRedoReaction.h"
 #include "pqChartSelectionReaction.h"
 #include "pqContextView.h"
+#include "pqDataQueryReaction.h"
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqRenderView.h"
+#include "pqRenderViewSelectionReaction.h"
 #include "pqToggleInteractionViewMode.h"
 #include "pqUndoStack.h"
 #include "pqViewFrame.h"
 #include "pqViewModuleInterface.h"
 #include "pqViewSettingsReaction.h"
-#include "pqSelection3DHelper.h"
-#include "pqDataQueryReaction.h"
 
 #include "vtkContextScene.h"
 #include "vtkChart.h"
@@ -108,33 +108,36 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
   optionsAction->setObjectName("OptionsButton");
   new pqViewSettingsReaction(optionsAction, view);
 
-  pqRenderView* const render_module = qobject_cast<pqRenderView*>(view);
-  if (render_module)
+  pqRenderView* const renderView = qobject_cast<pqRenderView*>(view);
+  if (renderView)
     {
-    pqSelection3DHelper *selectionHelper = new pqSelection3DHelper(this);
-    selectionHelper->setView(view);
-
-    QAction* actionPickObject = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqMousePick15.png"), "Pick Object (n)");
-    actionPickObject->setObjectName("actionPickObject");
-    actionPickObject->setCheckable (true);
-    actionPickObject->setShortcut(QString("n"));
+    //QAction* actionPickObject = frame->addTitleBarAction(
+    //  QIcon(":/pqWidgets/Icons/pqMousePick15.png"), "Pick Object (n)");
+    //actionPickObject->setObjectName("actionPickObject");
+    //actionPickObject->setCheckable (true);
+    //actionPickObject->setShortcut(QString("n"));
 
     QAction* actionSelect_Block = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSelectBlock24.png"), "Select Block (b)");
     actionSelect_Block->setObjectName("actionSelect_Block");
     actionSelect_Block->setCheckable (true);
     actionSelect_Block->setShortcut(QString("b"));
+    new pqRenderViewSelectionReaction(actionSelect_Block, renderView,
+      pqRenderViewSelectionReaction::SELECT_BLOCKS);
 
     QAction* actionSelectionPolygonPoints = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfacePoint24.png"), "Select Points With Polygon");
     actionSelectionPolygonPoints->setObjectName("actionPolygonSelectionPoints");
     actionSelectionPolygonPoints->setCheckable (true);
+    new pqRenderViewSelectionReaction(actionSelectionPolygonPoints, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS_POLYGON);
 
     QAction* actionSelectionPolygonCells = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfaceCell24.png"), "Select Cells With Polygon");
     actionSelectionPolygonCells->setObjectName("actionPolygonSelectionCells");
     actionSelectionPolygonCells->setCheckable (true);
+    new pqRenderViewSelectionReaction(actionSelectionPolygonCells, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS_POLYGON);
 
     QAction* actionSelectFrustumPoints = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqFrustumSelectionPoint24.png"),
@@ -142,6 +145,8 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     actionSelectFrustumPoints->setObjectName("actionSelectFrustumPoints");
     actionSelectFrustumPoints->setCheckable (true);
     actionSelectFrustumPoints->setShortcut(QString("g"));
+    new pqRenderViewSelectionReaction(actionSelectFrustumPoints, renderView,
+      pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS);
 
     QAction* actionSelect_Frustum = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqFrustumSelectionCell24.png"),
@@ -149,28 +154,24 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     actionSelect_Frustum->setObjectName("actionSelect_Frustum");
     actionSelect_Frustum->setCheckable (true);
     actionSelect_Frustum->setShortcut(QString("f"));
+    new pqRenderViewSelectionReaction(actionSelect_Frustum, renderView,
+      pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS);
 
     QAction* actionSelectSurfacePoints = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPoint24.png"), "Select Points On (d)");
     actionSelectSurfacePoints->setObjectName("actionSelectSurfacePoints");
     actionSelectSurfacePoints->setCheckable (true);
     actionSelectSurfacePoints->setShortcut(QString("d"));
+    new pqRenderViewSelectionReaction(actionSelectSurfacePoints, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS);
 
     QAction* actionSelectionMode = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCell24.png"), "Select Cells On (s)");
     actionSelectionMode->setObjectName("actionSelectionMode");
     actionSelectionMode->setCheckable (true);
     actionSelectionMode->setShortcut(QString("s"));
-
-    // Register all actions with the pqSelection3DHelper.
-    selectionHelper->setActionSelectionMode(actionSelectionMode);
-    selectionHelper->setActionSelectSurfacePoints(actionSelectSurfacePoints);
-    selectionHelper->setActionSelect_Frustum(actionSelect_Frustum);
-    selectionHelper->setActionSelectFrustumPoints(actionSelectFrustumPoints);
-    selectionHelper->setActionSelect_Block(actionSelect_Block);
-    selectionHelper->setActionPickObject(actionPickObject);
-    selectionHelper->setActionSelectPolygonPoints(actionSelectionPolygonPoints);
-    selectionHelper->setActionSelectPolygonCells(actionSelectionPolygonCells);
+    new pqRenderViewSelectionReaction(actionSelectionMode, renderView,
+      pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS);
 
     QAction* cameraAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), "Adjust Camera");
