@@ -538,10 +538,13 @@ void pqPipelineContextMenuBehavior::setBlockOpacity()
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    foreach(vtkIdType blockIndex, this->PickedBlocks)
+    QList<unsigned int> indices;
+    foreach(vtkIdType id, this->PickedBlocks)
       {
-      panel->promptAndSetBlockOpacity(blockIndex);
+      indices.append(static_cast<unsigned int>(id));
       }
+
+    panel->promptAndSetBlockOpacity(indices);
     }
 }
 
