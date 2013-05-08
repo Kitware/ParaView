@@ -23,6 +23,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRenderViewProxy.h"
 
+class vtkSMSourceProxy;
+
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMultiSliceViewProxy : public vtkSMRenderViewProxy
 {
 public:
@@ -44,6 +46,11 @@ public:
 protected:
   vtkSMMultiSliceViewProxy();
   ~vtkSMMultiSliceViewProxy();
+
+  // Description:
+  // Use the center of the source to initialize the view with three orthogonal
+  // slices in x, y, z.
+  void InitDefaultSlices(vtkSMSourceProxy* source, int opport);
 
 private:
   vtkSMMultiSliceViewProxy(const vtkSMMultiSliceViewProxy&); // Not implemented
