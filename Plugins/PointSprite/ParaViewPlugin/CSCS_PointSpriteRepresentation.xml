@@ -19,7 +19,7 @@
           </ShareProperties>
 
           <ExposedProperties>
-            <PropertyGroup label="Point Sprite" type="point_sprite_controls">
+            <PropertyGroup label="Point Sprite" panel_widget="point_sprite_controls">
               <Property name="RenderMode"/>
               <Property name="RadiusMode"/>
               <Property name="MaxPixelSize"/>
@@ -74,35 +74,37 @@
             <Exception name="Representation" />
           </ShareProperties>
           <ExposedProperties>
-            <Property name="RenderMode"/>
-            <Property name="RadiusMode"/>
-            <Property name="MaxPixelSize"/>
+            <PropertyGroup label="Point Sprite" panel_widget="point_sprite_controls">
+              <Property name="RenderMode"/>
+              <Property name="RadiusMode"/>
+              <Property name="MaxPixelSize"/>
 
-            <Property name="OpacityArray"/>
-            <Property name="OpacityTransferFunctionEnabled"/>
-            <Property name="OpacityPainterEnabled"/>
-            <Property name="OpacityVectorComponent"/>
-            <Property name="OpacityScalarRange"/>
-            <Property name="OpacityUseScalarRange"/>
-            <Property name="OpacityTableValues"/>
-            <Property name="OpacityGaussianControlPoints"/>
-            <Property name="OpacityTransferFunctionMode"/>
-            <Property name="OpacityIsProportional"/>
-            <Property name="OpacityProportionalFactor"/>
+              <Property name="OpacityArray"/>
+              <Property name="OpacityTransferFunctionEnabled"/>
+              <Property name="OpacityPainterEnabled"/>
+              <Property name="OpacityVectorComponent"/>
+              <Property name="OpacityScalarRange"/>
+              <Property name="OpacityUseScalarRange"/>
+              <Property name="OpacityTableValues"/>
+              <Property name="OpacityGaussianControlPoints"/>
+              <Property name="OpacityTransferFunctionMode"/>
+              <Property name="OpacityIsProportional"/>
+              <Property name="OpacityProportionalFactor"/>
 
-            <Property name="RadiusArray"/>
-            <Property name="RadiusTransferFunctionEnabled"/>
-            <Property name="RadiusTableValues"/>
-            <Property name="RadiusGaussianControlPoints"/>
-            <Property name="RadiusTransferFunctionMode"/>
-            <Property name="RadiusVectorComponent"/>
-            <Property name="RadiusScalarRange"/>
-            <Property name="RadiusUseScalarRange"/>
-            <Property name="RadiusRange"/>
-            <Property name="ConstantRadius"/>
-            <Property name="RadiusIsProportional"/>
-            <Property name="RadiusProportionalFactor"/>
-            <Property name="PointSpriteDefaultsInitialized"/>
+              <Property name="RadiusArray"/>
+              <Property name="RadiusTransferFunctionEnabled"/>
+              <Property name="RadiusTableValues"/>
+              <Property name="RadiusGaussianControlPoints"/>
+              <Property name="RadiusTransferFunctionMode"/>
+              <Property name="RadiusVectorComponent"/>
+              <Property name="RadiusScalarRange"/>
+              <Property name="RadiusUseScalarRange"/>
+              <Property name="RadiusRange"/>
+              <Property name="ConstantRadius"/>
+              <Property name="RadiusIsProportional"/>
+              <Property name="RadiusProportionalFactor"/>
+              <Property name="PointSpriteDefaultsInitialized"/>
+            </PropertyGroup>
           </ExposedProperties>
       </SubProxy>
 
@@ -128,36 +130,37 @@
             <Exception name="Representation" />
           </ShareProperties>
           <ExposedProperties>
-            <Property name="RenderMode"/>
-            <Property name="RadiusMode"/>
-            <Property name="MaxPixelSize"/>
+            <PropertyGroup label="Point Sprite" panel_widget="point_sprite_controls">
+              <Property name="RenderMode"/>
+              <Property name="RadiusMode"/>
+              <Property name="MaxPixelSize"/>
 
-            <Property name="OpacityArray"/>
-            <Property name="OpacityTransferFunctionEnabled"/>
-            <Property name="OpacityPainterEnabled"/>
-            <Property name="OpacityVectorComponent"/>
-            <Property name="OpacityScalarRange"/>
-            <Property name="OpacityUseScalarRange"/>
-            <Property name="OpacityTableValues"/>
-            <Property name="OpacityGaussianControlPoints"/>
-            <Property name="OpacityTransferFunctionMode"/>
-            <Property name="OpacityIsProportional"/>
-            <Property name="OpacityProportionalFactor"/>
+              <Property name="OpacityArray"/>
+              <Property name="OpacityTransferFunctionEnabled"/>
+              <Property name="OpacityPainterEnabled"/>
+              <Property name="OpacityVectorComponent"/>
+              <Property name="OpacityScalarRange"/>
+              <Property name="OpacityUseScalarRange"/>
+              <Property name="OpacityTableValues"/>
+              <Property name="OpacityGaussianControlPoints"/>
+              <Property name="OpacityTransferFunctionMode"/>
+              <Property name="OpacityIsProportional"/>
+              <Property name="OpacityProportionalFactor"/>
 
-            <Property name="RadiusArray"/>
-            <Property name="RadiusTransferFunctionEnabled"/>
-            <Property name="RadiusTableValues"/>
-            <Property name="RadiusGaussianControlPoints"/>
-            <Property name="RadiusTransferFunctionMode"/>
-            <Property name="RadiusVectorComponent"/>
-            <Property name="RadiusScalarRange"/>
-            <Property name="RadiusUseScalarRange"/>
-            <Property name="RadiusRange"/>
-            <Property name="ConstantRadius"/>
-            <Property name="RadiusIsProportional"/>
-            <Property name="RadiusProportionalFactor"/>
-            <Property name="PointSpriteDefaultsInitialized"/>
-
+              <Property name="RadiusArray"/>
+              <Property name="RadiusTransferFunctionEnabled"/>
+              <Property name="RadiusTableValues"/>
+              <Property name="RadiusGaussianControlPoints"/>
+              <Property name="RadiusTransferFunctionMode"/>
+              <Property name="RadiusVectorComponent"/>
+              <Property name="RadiusScalarRange"/>
+              <Property name="RadiusUseScalarRange"/>
+              <Property name="RadiusRange"/>
+              <Property name="ConstantRadius"/>
+              <Property name="RadiusIsProportional"/>
+              <Property name="RadiusProportionalFactor"/>
+              <Property name="PointSpriteDefaultsInitialized"/>
+            </PropertyGroup>
           </ExposedProperties>
       </SubProxy>
 
