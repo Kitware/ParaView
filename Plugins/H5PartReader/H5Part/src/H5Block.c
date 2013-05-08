@@ -964,14 +964,14 @@ _select_hyperslab_for_reading (
  int rank;
  hsize_t field_dims[3];
  hsize_t start[3] = {
-  p->k_start,
-  p->j_start,
-  p->i_start };
+  static_cast<hsize_t>(p->k_start),
+  static_cast<hsize_t>(p->j_start),
+  static_cast<hsize_t>(p->i_start) };
  hsize_t stride[3] = { 1, 1, 1 };
  hsize_t part_dims[3] = {
-  p->k_end - p->k_start + 1,
-  p->j_end - p->j_start + 1,
-  p->i_end - p->i_start + 1 };
+  static_cast<hsize_t>(p->k_end - p->k_start + 1),
+  static_cast<hsize_t>(p->j_end - p->j_start + 1),
+  static_cast<hsize_t>(p->i_end - p->i_start + 1) };
 
  h5part_int64_t herr = _release_hyperslab ( f );
  if ( herr < 0 ) return HANDLE_H5S_CLOSE_ERR;
@@ -1175,21 +1175,21 @@ _select_hyperslab_for_writing (
  int rank = 3;
  
  hsize_t field_dims[3] = {
-  b->k_max+1,
-  b->j_max+1,
-  b->i_max+1
+  static_cast<hsize_t>(b->k_max+1),
+  static_cast<hsize_t>(b->j_max+1),
+  static_cast<hsize_t>(b->i_max+1)
  };
 
  hsize_t start[3] = {
-  p->k_start,
-  p->j_start,
-  p->i_start
+  static_cast<hsize_t>(p->k_start),
+  static_cast<hsize_t>(p->j_start),
+  static_cast<hsize_t>(p->i_start)
  };
  hsize_t stride[3] = { 1, 1, 1 };
  hsize_t part_dims[3] = {
-  p->k_end - p->k_start + 1,
-  p->j_end - p->j_start + 1,
-  p->i_end - p->i_start + 1
+  static_cast<hsize_t>(p->k_end - p->k_start + 1),
+  static_cast<hsize_t>(p->j_end - p->j_start + 1),
+  static_cast<hsize_t>(p->i_end - p->i_start + 1)
  };
 
 
