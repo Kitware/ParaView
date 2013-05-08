@@ -130,14 +130,19 @@ int vtkCPProcessor::Initialize()
     vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
     vtkSMSessionProxyManager* sessionProxyManager =
       proxyManager->GetActiveSessionProxyManager();
-    vtkSmartPointer<vtkSMProxy> globalMapperProperties;
-    globalMapperProperties.TakeReference(
-      sessionProxyManager->NewProxy("misc", "GlobalMapperProperties"));
-    vtkSMIntVectorProperty* immediateModeRendering =
-      vtkSMIntVectorProperty::SafeDownCast(
-        globalMapperProperties->GetProperty("GlobalImmediateModeRendering"));
-    immediateModeRendering->SetElements1(1);
-    globalMapperProperties->UpdateVTKObjects();
+    // Catalyst configurations may not have rendering enable and thus
+    // won't have GlobalMapperProperties.
+    if(sessionProxyManager->HasDefinition("misc", "GlobalMapperProperties"))
+      {
+      vtkSmartPointer<vtkSMProxy> globalMapperProperties;
+      globalMapperProperties.TakeReference(
+        sessionProxyManager->NewProxy("misc", "GlobalMapperProperties"));
+      vtkSMIntVectorProperty* immediateModeRendering =
+        vtkSMIntVectorProperty::SafeDownCast(
+          globalMapperProperties->GetProperty("GlobalImmediateModeRendering"));
+      immediateModeRendering->SetElements1(1);
+      globalMapperProperties->UpdateVTKObjects();
+      }
     }
   return 1;
 }

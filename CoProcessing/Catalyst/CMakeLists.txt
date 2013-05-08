@@ -45,6 +45,7 @@ set_source_files_properties(
 
 set_source_files_properties(
   CAdaptorAPI
+  vtkCPCxxHelper
   WRAP_EXCLUDE)
 
 set (${vtk-module}_HDRS CAdaptorAPI.h)
