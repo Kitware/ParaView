@@ -163,17 +163,17 @@ void pqAxesToolbar::resetCenterOfRotationToCenterOfCurrentData()
 }
 
 //-----------------------------------------------------------------------------
-void pqAxesToolbar::pickCenterOfRotation(int x, int y)
+void pqAxesToolbar::pickCenterOfRotation(int posx, int posy)
 {
   pqRenderView* rm = qobject_cast<pqRenderView*>(
     pqActiveObjects::instance().activeView());
   if (rm)
     {
-    int pos[2] = {x, y};
+    int posxy[2] = {posx, posy};
     double center[3];
 
     vtkSMRenderViewProxy* proxy = rm->getRenderViewProxy();
-    if (proxy->ConvertDisplayToPointOnSurface(pos, center))
+    if (proxy->ConvertDisplayToPointOnSurface(posxy, center))
       {
       rm->setCenterOfRotation(center);
       rm->render();

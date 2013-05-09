@@ -46,15 +46,15 @@ QPointer<pqRenderViewSelectionReaction> pqRenderViewSelectionReaction::ActiveRea
 
 //-----------------------------------------------------------------------------
 pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
-  QAction* parentAction, pqRenderView* view, SelectionMode mode)
-  : Superclass(parentAction),
+  QAction* parentObject, pqRenderView* view, SelectionMode mode)
+  : Superclass(parentObject),
   View(view),
   Mode(mode),
   PreviousRenderViewMode(-1),
   ObserverId(0),
   ZoomCursor(QCursor(zoom_xpm))
 {
-  QObject::connect(parentAction, SIGNAL(triggered(bool)),
+  QObject::connect(parentObject, SIGNAL(triggered(bool)),
     this, SLOT(actionTriggered(bool)));
 
   // if view == NULL, we track the active view.

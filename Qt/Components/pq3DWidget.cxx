@@ -320,7 +320,7 @@ void pq3DWidget::setView(pqView* pqview)
     this->Internal->PickShortcut = new QShortcut(
       this->Internal->PickSequence, pqview->getWidget());
     QObject::connect(this->Internal->PickShortcut, SIGNAL(activated()),
-      this, SLOT(pick()));
+      this, SLOT(pickPoint()));
     }
 
   if (rview && widget)
@@ -351,7 +351,7 @@ void pq3DWidget::render()
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::pick()
+void pq3DWidget::pickPoint()
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(this->renderView());
   if (rview && rview->getRenderViewProxy())

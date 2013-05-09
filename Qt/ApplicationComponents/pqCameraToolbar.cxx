@@ -53,8 +53,6 @@ void pqCameraToolbar::constructor()
   pqRenderViewSelectionReaction* selReaction = new
     pqRenderViewSelectionReaction(ui.actionZoomToBox, NULL,
       pqRenderViewSelectionReaction::ZOOM_TO_BOX);
-  QObject::connect(selReaction, SIGNAL(selectedCustomBox(const int[4])),
-    this, SLOT(zoomToBox(const int[4])));
 
   this->ZoomToDataAction = ui.actionZoomToData;
   this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
@@ -71,10 +69,4 @@ void pqCameraToolbar::updateEnabledState()
   pqView* view  = pqActiveObjects::instance().activeView();
   pqPipelineSource* source = pqActiveObjects::instance().activeSource();
   this->ZoomToDataAction->setEnabled(source && view);
-}
-
-//-----------------------------------------------------------------------------
-void pqCameraToolbar::zoomToBox(const int region[4])
-{
-  cout << "Zoom To Box: " << endl;
 }

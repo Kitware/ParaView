@@ -54,7 +54,6 @@ public:
     }
 
 private slots:
-  void zoomToBox(const int[4]);
   void updateEnabledState();
 
 private:

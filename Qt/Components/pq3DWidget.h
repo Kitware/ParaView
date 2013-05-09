@@ -167,7 +167,7 @@ protected slots:
   void render();
 
   /// triggers a pick action using the current location of the mouse.
-  virtual void pick();
+  void pickPoint();
   
   /// Called on each pick, default implementation does nothing.
   virtual void pick(double, double, double) {};
