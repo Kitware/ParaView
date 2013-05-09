@@ -50,9 +50,8 @@ void pqCameraToolbar::constructor()
   new pqCameraReaction(ui.actionPositiveZ, pqCameraReaction::RESET_POSITIVE_Z);
   new pqCameraReaction(ui.actionNegativeZ, pqCameraReaction::RESET_NEGATIVE_Z);
 
-  pqRenderViewSelectionReaction* selReaction = new
-    pqRenderViewSelectionReaction(ui.actionZoomToBox, NULL,
-      pqRenderViewSelectionReaction::ZOOM_TO_BOX);
+  new pqRenderViewSelectionReaction(ui.actionZoomToBox, NULL,
+    pqRenderViewSelectionReaction::ZOOM_TO_BOX);
 
   this->ZoomToDataAction = ui.actionZoomToData;
   this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
