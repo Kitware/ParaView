@@ -72,6 +72,11 @@
         {
           "path":"Testing"
         }
+      ],
+      "replace":[
+        {
+          "path":"CoProcessing/Catalyst/module.cmake"
+        }
       ]
     },
     {
