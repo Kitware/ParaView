@@ -50,13 +50,21 @@
     width: 225px;
     height: 32px;
     position: absolute;
-    right: 5px;
+    right: 50px;
 }
 
 .toolbar .logo {
     background: url("paraview/toolbar/common/logo.png") no-repeat left top transparent;
     width: 32px;
     height: 32px;
+}
+
+.toolbar .disconnect {
+    background: url("paraview/toolbar/common/disconnect.png") no-repeat left top transparent;
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    right: 5px;
 }
 
 .toolbar .logo-title {
