@@ -357,9 +357,10 @@ static void pqAnimationSceneResetCameraKeyFrameToCurrent(vtkSMProxy* ren,
                                                          vtkSMProxy* dest)
 {
   ren->UpdatePropertyInformation();
-  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle",  0 };
+  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle", 
+                          "ParallelScale", 0 };
   const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", 
-    "CameraViewUpInfo",  "CameraViewAngle", 0 };
+    "CameraViewUpInfo",  "CameraViewAngle", "CameraParallelScale", 0 };
   for (int cc=0; names[cc] && snames[cc]; cc++)
     {
     QList<QVariant> p =

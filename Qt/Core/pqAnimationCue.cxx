@@ -139,17 +139,19 @@ vtkSMProxy* pqAnimationCue::getAnimatedProxy() const
 //-----------------------------------------------------------------------------
 vtkSMProperty* pqAnimationCue::getAnimatedProperty() const
 {
+  vtkSMProxy* selfProxy = this->getProxy();
   vtkSMProxy* proxy = pqSMAdaptor::getProxyProperty(
-    this->getProxy()->GetProperty("AnimatedProxy"));
-  if (proxy)
+    selfProxy->GetProperty("AnimatedProxy"));
+  if (proxy && selfProxy->GetProperty("AnimatedPropertyName"))
     {
     QString pname = pqSMAdaptor::getElementProperty(
-      this->getProxy()->GetProperty("AnimatedPropertyName")).toString();
+      selfProxy->GetProperty("AnimatedPropertyName")).toString();
     if (pname != "")
       {
       return proxy->GetProperty(pname.toAscii().data());
       }
     }
+
   return 0;
 }
 
