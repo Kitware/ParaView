@@ -33,10 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqStandardViewFrameActionGroup_h
 
 #include "pqViewFrameActionGroup.h"
-#include "pqApplicationComponentsModule.h"
+#include "pqApplicationComponentsModule.h" // needed for export macros
+#include <QPointer> // needed for QPointer 
 
 class QWidget;
 class pqViewFrame;
+class QShortcut;
 
 /// pqStandardViewFrameActionGroup is a pqViewFrameActionGroup subclass that
 /// handles the buttons to be rendered on the left-side of the view-frame for
@@ -63,13 +65,24 @@ protected slots:
   /// the buttons on an empty frame.
   void invoked();
 
+  /// slots for various shortcuts.
+  void selectSurfaceCellsTrigerred();
+  void selectSurfacePointsTrigerred();
+  void selectFrustumCellsTriggered();
+  void selectFrustumPointsTriggered();
+  void selectBlocksTriggered();
+
 protected:
   void setupEmptyFrame(QWidget* frame);
 
 private:
   Q_DISABLE_COPY(pqStandardViewFrameActionGroup)
+
+  QPointer<QShortcut> ShortCutSurfaceCells;
+  QPointer<QShortcut> ShortCutSurfacePoints;
+  QPointer<QShortcut> ShortCutFrustumCells;
+  QPointer<QShortcut> ShortCutFrustumPoints;
+  QPointer<QShortcut> ShortCutBlocks;
 };
 
 #endif
-
-

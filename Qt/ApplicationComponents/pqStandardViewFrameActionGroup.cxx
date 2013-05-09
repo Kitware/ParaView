@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraUndoRedoReaction.h"
 #include "pqChartSelectionReaction.h"
 #include "pqContextView.h"
+#include "pqCoreUtilities.h"
 #include "pqDataQueryReaction.h"
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
@@ -48,13 +49,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewFrame.h"
 #include "pqViewModuleInterface.h"
 #include "pqViewSettingsReaction.h"
-
-#include "vtkContextScene.h"
 #include "vtkChart.h"
+#include "vtkContextScene.h"
 
 #include <QMenu>
 #include <QPushButton>
 #include <QSet>
+#include <QShortcut>
 
 //-----------------------------------------------------------------------------
 inline QAction* createChartSelectionAction(
@@ -76,6 +77,23 @@ inline QAction* createChartSelectionAction(
 pqStandardViewFrameActionGroup::pqStandardViewFrameActionGroup(QObject* parentObject)
   : Superclass(parentObject)
 {
+  QWidget* mainWindow = pqCoreUtilities::mainWidget();
+  this->ShortCutSurfaceCells = new QShortcut(QKeySequence(tr("s")), mainWindow);
+  this->ShortCutSurfacePoints = new QShortcut(QKeySequence(tr("d")), mainWindow);
+  this->ShortCutFrustumCells = new QShortcut(QKeySequence(tr("f")), mainWindow);
+  this->ShortCutFrustumPoints = new QShortcut(QKeySequence(tr("g")), mainWindow);
+  this->ShortCutBlocks = new QShortcut(QKeySequence("b"), mainWindow);
+
+  QObject::connect(this->ShortCutSurfaceCells, SIGNAL(activated()),
+    this, SLOT(selectSurfaceCellsTrigerred()));
+  QObject::connect(this->ShortCutSurfacePoints, SIGNAL(activated()),
+    this, SLOT(selectSurfacePointsTrigerred()));
+  QObject::connect(this->ShortCutFrustumCells, SIGNAL(activated()),
+    this, SLOT(selectFrustumCellsTriggered()));
+  QObject::connect(this->ShortCutFrustumPoints, SIGNAL(activated()),
+    this, SLOT(selectFrustumPointsTriggered()));
+  QObject::connect(this->ShortCutBlocks, SIGNAL(activated()),
+    this, SLOT(selectBlocksTriggered()));
 }
 
 //-----------------------------------------------------------------------------
@@ -121,7 +139,6 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       QIcon(":/pqWidgets/Icons/pqSelectBlock24.png"), "Select Block (b)");
     actionSelect_Block->setObjectName("actionSelect_Block");
     actionSelect_Block->setCheckable (true);
-    actionSelect_Block->setShortcut(QString("b"));
     new pqRenderViewSelectionReaction(actionSelect_Block, renderView,
       pqRenderViewSelectionReaction::SELECT_BLOCKS);
 
@@ -144,7 +161,6 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       "Select Points Through (g)");
     actionSelectFrustumPoints->setObjectName("actionSelectFrustumPoints");
     actionSelectFrustumPoints->setCheckable (true);
-    actionSelectFrustumPoints->setShortcut(QString("g"));
     new pqRenderViewSelectionReaction(actionSelectFrustumPoints, renderView,
       pqRenderViewSelectionReaction::SELECT_FRUSTUM_POINTS);
 
@@ -153,7 +169,6 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       "Select Cells Through (f)");
     actionSelect_Frustum->setObjectName("actionSelect_Frustum");
     actionSelect_Frustum->setCheckable (true);
-    actionSelect_Frustum->setShortcut(QString("f"));
     new pqRenderViewSelectionReaction(actionSelect_Frustum, renderView,
       pqRenderViewSelectionReaction::SELECT_FRUSTUM_CELLS);
 
@@ -161,7 +176,6 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPoint24.png"), "Select Points On (d)");
     actionSelectSurfacePoints->setObjectName("actionSelectSurfacePoints");
     actionSelectSurfacePoints->setCheckable (true);
-    actionSelectSurfacePoints->setShortcut(QString("d"));
     new pqRenderViewSelectionReaction(actionSelectSurfacePoints, renderView,
       pqRenderViewSelectionReaction::SELECT_SURFACE_POINTS);
 
@@ -169,7 +183,6 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCell24.png"), "Select Cells On (s)");
     actionSelectionMode->setObjectName("actionSelectionMode");
     actionSelectionMode->setCheckable (true);
-    actionSelectionMode->setShortcut(QString("s"));
     new pqRenderViewSelectionReaction(actionSelectionMode, renderView,
       pqRenderViewSelectionReaction::SELECT_SURFACE_CELLS);
 
@@ -342,4 +355,59 @@ void pqStandardViewFrameActionGroup::invoked()
     }
 
   END_UNDO_SET();
+}
+
+
+//-----------------------------------------------------------------------------
+namespace
+{
+  inline QAction* findActiveAction(const QString& name)
+    {
+    pqView* activeView = pqActiveObjects::instance().activeView();
+    if (activeView && activeView->getWidget() &&
+      activeView->getWidget()->parentWidget())
+      {
+      return activeView->getWidget()->parentWidget()->findChild<QAction*>(name);
+      }
+    return NULL;
+    }
+
+  inline void triggerAction(const QString& name)
+    {
+    QAction* atcn = findActiveAction(name);
+    if (atcn)
+      {
+      atcn->trigger();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::selectSurfaceCellsTrigerred()
+{
+  triggerAction("actionSelectionMode");
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::selectSurfacePointsTrigerred()
+{
+  triggerAction("actionSelectSurfacePoints");
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::selectFrustumCellsTriggered()
+{
+  triggerAction("actionSelect_Frustum");
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::selectFrustumPointsTriggered()
+{
+  triggerAction("actionSelectFrustumPoints");
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionGroup::selectBlocksTriggered()
+{
+  triggerAction("actionSelect_Block");
 }
