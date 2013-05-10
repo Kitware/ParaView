@@ -50,6 +50,14 @@
 #include <algorithm>
 #include <sstream>
 
+#include <stdio.h> // for snprintf
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#  define SNPRINTF _snprintf
+#else
+#  define SNPRINTF snprintf
+#endif
+
 #define COLOR_TEXTURE_MAP_SIZE 256
 
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
@@ -172,8 +180,8 @@ int vtkPVScalarBarActor::CreateLabel(
       {
       char format[512];
       char string2[1024];
-      sprintf(format, "%%-0.%dg", i);
-      sprintf(string2, format, value);
+      SNPRINTF(format, 511, "%%-0.%dg", i);
+      SNPRINTF(string2, 1023, format, value);
 
       //we want the reduced size used so that we can get better fitting
       // Extra filter: Used to remove unwanted 0 after e+ or e-
@@ -216,7 +224,7 @@ int vtkPVScalarBarActor::CreateLabel(
   else
     {
     // Potential of buffer overrun (onto the stack) here.
-    sprintf(string, this->LabelFormat, value);
+    SNPRINTF(string, 1023, this->LabelFormat, value);
     }
 
   // Set the txt label
@@ -907,12 +915,30 @@ void vtkPVScalarBarActor::EditAnnotations()
     vtkColor3ub maxCol;
     minX = this->P->ScalarBarBox.Posn[this->P->TL[1]];
     maxX = this->P->ScalarBarBox.Size[1] + minX;
-    vtkVariant min(range[0]);
-    vtkVariant max(range[1]);
-    std::ostringstream minLabel;
-    std::ostringstream maxLabel;
-    minLabel << range[0];
-    maxLabel << range[1];
+
+    // Print min + max labels that have 3 significant digits
+    // or the number of digits it takes to distinguish them,
+    // whichever is more.
+    char minLabel[64];
+    char maxLabel[64];
+    char minFmt[64];
+    char maxFmt[64];
+    double dr = range[1] - range[0];
+    double ldr = log10(dr);
+    // The least significant digit in which the min and max vary:
+    int least = (ldr > 0 ? +1 : -1) * static_cast<int>(floor(fabs(ldr)));
+    // The most significant digit of the min and max:
+    int minMost = static_cast<int>(ceil(log10(fabs(range[0]))));
+    int maxMost = static_cast<int>(ceil(log10(fabs(range[1]))));
+    // How many digits of precision are required to distinguish min and max:
+    int minDig = minMost - least;
+    int maxDig = maxMost - least;
+    // Labels for min and max:
+    SNPRINTF(minFmt, 63, "%%.%dg", minDig < 3 ? 3 : minDig);
+    SNPRINTF(maxFmt, 63, "%%.%dg", maxDig < 3 ? 3 : maxDig);
+    SNPRINTF(minLabel, 63, minFmt, range[0]);
+    SNPRINTF(maxLabel, 63, maxFmt, range[1]);
+
     lut->GetColor(range[0], minFltCol.GetData());
     lut->GetColor(range[1], maxFltCol.GetData());
     for (int j = 0; j < 3; ++j)
@@ -922,8 +948,8 @@ void vtkPVScalarBarActor::EditAnnotations()
       maxCol.GetData()[j] =
         static_cast<unsigned char>(maxFltCol.GetData()[j] * 255.);
       }
-    AddLabelIfUnoccluded(minX, minCol, minLabel.str(), this->P);
-    AddLabelIfUnoccluded(maxX, maxCol, maxLabel.str(), this->P);
+    AddLabelIfUnoccluded(minX, minCol, minLabel, this->P);
+    AddLabelIfUnoccluded(maxX, maxCol, maxLabel, this->P);
     }
 }
 
