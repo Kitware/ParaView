@@ -7,7 +7,11 @@ Note that, upon load, this module will create several sub-modules: sources,
 filters and rendering. These modules can be used to instantiate specific
 proxy types. For a list, try "dir(servermanager.sources)"
 
-A simple example:
+Usually users should use the paraview.simple module instead as it provide a
+more user friendly API.
+
+A simple example::
+
   from paraview.servermanager import *
 
   # Creates a new built-in session and makes it the active session.
@@ -25,6 +29,7 @@ A simple example:
   display = CreateRepresentation(sphere, renModule)
 
   renModule.StillRender()
+
 """
 #==============================================================================
 #
