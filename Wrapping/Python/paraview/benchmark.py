@@ -209,6 +209,10 @@ def get_logs() :
             logs.append(alog)
 
 def print_logs() :
+    """
+    Print logs on the root node by gathering logs accross all the nodes
+    regardless if the process was started in symmetric mode or not.
+    """
     global logs
 
     if len(logs) == 0:
