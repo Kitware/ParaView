@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ParaView's Python documentation!
+ParaView's Python documentation!
 ===========================================
 
 ParaView offers rich scripting support through Python. This support is available
@@ -20,6 +20,10 @@ Contents:
    quick-start
    The ParaView Python Package <paraview>
 
+Main modules
+==================
+* paraview.simple
+* paraview.servermanager
 
 Indices and tables
 ==================
