@@ -1,3 +1,14 @@
+r"""
+This module is not meant to be used directly. Please look at one of the modules
+it provides:
+  servermanager
+  pvfilters
+  vtk
+  numeric
+  util
+  simple
+"""
+
 #==============================================================================
 #
 #  Program:   ParaView
@@ -12,16 +23,6 @@
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-r"""
-This module is not meant to be used directly. Please look at one of the modules
-it provides:
-  servermanager
-  pvfilters
-  vtk
-  numeric
-  util
-  simple
-"""
 
 class compatibility:
     minor = None 
