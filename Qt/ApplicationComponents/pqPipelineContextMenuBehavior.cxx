@@ -210,46 +210,60 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
     vtkPVCompositeDataInformation *compositeInfo = info->GetCompositeDataInformation();
     if(compositeInfo && compositeInfo->GetDataIsComposite())
       {
-      QString blockName = this->lookupBlockName(blockIndex);
-      this->Menu->addAction(QString("Block '%1'").arg(blockName));
+      bool multipleBlocks = this->PickedBlocks.size() > 1;
+
+      if(multipleBlocks)
+        {
+        this->Menu->addAction(QString("%1 Blocks").arg(this->PickedBlocks.size()));
+        }
+      else
+        {
+        QString blockName = this->lookupBlockName(blockIndex);
+        this->Menu->addAction(QString("Block '%1'").arg(blockName));
+        }
       this->Menu->addSeparator();
 
       QAction *hideBlockAction =
-        this->Menu->addAction(QString("Hide Block"));
+        this->Menu->addAction(QString("Hide Block%1").arg(multipleBlocks ? "s" : ""));
       this->connect(hideBlockAction, SIGNAL(triggered()),
                     this, SLOT(hideBlock()));
 
       QAction *showOnlyBlockAction =
-        this->Menu->addAction(QString("Show Only Block"));
+        this->Menu->addAction(QString("Show Only Block%1").arg(multipleBlocks ? "s" : ""));
       this->connect(showOnlyBlockAction, SIGNAL(triggered()),
                     this, SLOT(showOnlyBlock()));
 
       QAction *unsetVisibilityAction =
-        this->Menu->addAction("Unset Block Visibility");
+        this->Menu->addAction(QString("Unset Block %1")
+            .arg(multipleBlocks ? "Visibilities" : "Visibility"));
       this->connect(unsetVisibilityAction, SIGNAL(triggered()),
                     this, SLOT(unsetBlockVisibility()));
 
       this->Menu->addSeparator();
 
       QAction *setBlockColorAction =
-        this->Menu->addAction("Set Block Color");
+        this->Menu->addAction(QString("Set Block Color%1")
+          .arg(multipleBlocks ? "s" : ""));
       this->connect(setBlockColorAction, SIGNAL(triggered()),
                     this, SLOT(setBlockColor()));
 
       QAction *unsetBlockColorAction =
-        this->Menu->addAction("Unset Block Color");
+        this->Menu->addAction(QString("Unset Block Color%1")
+          .arg(multipleBlocks ? "s" : ""));
       this->connect(unsetBlockColorAction, SIGNAL(triggered()),
                     this, SLOT(unsetBlockColor()));
 
       this->Menu->addSeparator();
 
       QAction *setBlockOpacityAction =
-        this->Menu->addAction("Set Block Opacity");
+        this->Menu->addAction(QString("Set Block %1")
+          .arg(multipleBlocks ? "Opacities" : "Opacity"));
       this->connect(setBlockOpacityAction, SIGNAL(triggered()),
                     this, SLOT(setBlockOpacity()));
 
       QAction *unsetBlockOpacityAction =
-        this->Menu->addAction("Unset Block Opacity");
+        this->Menu->addAction(QString("Unset Block %1")
+            .arg(multipleBlocks ? "Opacities" : "Opacity"));
       this->connect(unsetBlockOpacityAction, SIGNAL(triggered()),
                     this, SLOT(unsetBlockOpacity()));
 
@@ -464,6 +478,11 @@ void pqPipelineContextMenuBehavior::showOnlyBlock()
   if(panel)
     {
     panel->showOnlyBlock(this->PickedBlocks.front());
+
+    for(int i = 1; i < this->PickedBlocks.size(); i++)
+      {
+      panel->setBlockVisibility(this->PickedBlocks[i], true);
+      }
     }
 }
 
@@ -538,10 +557,13 @@ void pqPipelineContextMenuBehavior::setBlockOpacity()
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    foreach(vtkIdType blockIndex, this->PickedBlocks)
+    QList<unsigned int> indices;
+    foreach(vtkIdType id, this->PickedBlocks)
       {
-      panel->promptAndSetBlockOpacity(blockIndex);
+      indices.append(static_cast<unsigned int>(id));
       }
+
+    panel->promptAndSetBlockOpacity(indices);
     }
 }
 
