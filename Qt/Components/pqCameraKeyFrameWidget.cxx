@@ -78,13 +78,16 @@ public:
     this->viewUp0->setValidator(new QDoubleValidator(parent));
     this->viewUp1->setValidator(new QDoubleValidator(parent));
     this->viewUp2->setValidator(new QDoubleValidator(parent));
+
+    this->viewAngle->setValidator(new QDoubleValidator(parent));
+    this->parallelScale->setValidator(new QDoubleValidator(parent));
     }
 
   void setPosition(const double pos[3])
     {
-    this->position0->setText(QString::number(pos[0]));
-    this->position1->setText(QString::number(pos[1]));
-    this->position2->setText(QString::number(pos[2]));
+    this->position0->setTextAndResetCursor(QString::number(pos[0]));
+    this->position1->setTextAndResetCursor(QString::number(pos[1]));
+    this->position2->setTextAndResetCursor(QString::number(pos[2]));
     }
 
   const double* position()
@@ -97,9 +100,9 @@ public:
 
   void setFocalPoint(const double pos[3])
     {
-    this->focalPoint0->setText(QString::number(pos[0]));
-    this->focalPoint1->setText(QString::number(pos[1]));
-    this->focalPoint2->setText(QString::number(pos[2]));
+    this->focalPoint0->setTextAndResetCursor(QString::number(pos[0]));
+    this->focalPoint1->setTextAndResetCursor(QString::number(pos[1]));
+    this->focalPoint2->setTextAndResetCursor(QString::number(pos[2]));
     }
 
   const double* focalPoint()
@@ -112,13 +115,13 @@ public:
 
   void setViewUp(const double pos[3])
     {
-    this->viewUp0->setText(QString::number(pos[0]));
-    this->viewUp1->setText(QString::number(pos[1]));
-    this->viewUp2->setText(QString::number(pos[2]));
+    this->viewUp0->setTextAndResetCursor(QString::number(pos[0]));
+    this->viewUp1->setTextAndResetCursor(QString::number(pos[1]));
+    this->viewUp2->setTextAndResetCursor(QString::number(pos[2]));
 
-    this->viewUpX->setText(QString::number(pos[0]));
-    this->viewUpY->setText(QString::number(pos[1]));
-    this->viewUpZ->setText(QString::number(pos[2]));
+    this->viewUpX->setTextAndResetCursor(QString::number(pos[0]));
+    this->viewUpY->setTextAndResetCursor(QString::number(pos[1]));
+    this->viewUpZ->setTextAndResetCursor(QString::number(pos[2]));
     }
 
   const double* viewUp_NonPath()
@@ -139,12 +142,22 @@ public:
 
   void setViewAngle(double val)
     {
-    this->viewAngle->setValue(val);
+    this->viewAngle->setTextAndResetCursor(QString("%1").arg(val));
     }
 
   double getViewAngle()
     {
-    return this->viewAngle->value();
+    return this->viewAngle->text().toDouble();
+    }
+
+  void setParallelScale(double val)
+    {
+    this->parallelScale->setTextAndResetCursor(QString("%1").arg(val));
+    }
+
+  double getParallelScale() const
+    {
+    return this->parallelScale->text().toDouble();
     }
 };
 
@@ -258,6 +271,8 @@ void pqCameraKeyFrameWidget::initializeUsingKeyFrame(vtkSMProxy* keyFrame)
     &vtkSMPropertyHelper(keyFrame, "ViewUp").GetDoubleArray()[0]);
   this->Internal->setViewAngle(
     vtkSMPropertyHelper(keyFrame, "ViewAngle").GetAsDouble());
+  this->Internal->setParallelScale(
+    vtkSMPropertyHelper(keyFrame, "ParallelScale").GetAsDouble());
 
   this->Internal->PSplineProxy->GetProperty("Points")->Copy(
     keyFrame->GetProperty("PositionPathPoints"));
@@ -283,6 +298,7 @@ void pqCameraKeyFrameWidget::initializeUsingCamera(vtkCamera* camera)
   this->Internal->setFocalPoint(camera->GetFocalPoint());
   this->Internal->setViewUp(camera->GetViewUp());
   this->Internal->setViewAngle(camera->GetViewAngle());
+  this->Internal->setParallelScale(camera->GetParallelScale());
 }
 
 //-----------------------------------------------------------------------------
@@ -302,8 +318,12 @@ void pqCameraKeyFrameWidget::saveToKeyFrame(vtkSMProxy* keyFrame)
     this->usePathBasedMode()?
     this->Internal->viewUp_Path():
     this->Internal->viewUp_NonPath(), 3);
+
   vtkSMPropertyHelper(keyFrame, "ViewAngle").Set(
     this->Internal->getViewAngle());
+
+  vtkSMPropertyHelper(keyFrame, "ParallelScale").Set(
+    this->Internal->getParallelScale());
 
   keyFrame->GetProperty("PositionPathPoints")->Copy(
     this->Internal->PSplineProxy->GetProperty("Points"));
