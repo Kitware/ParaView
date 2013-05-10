@@ -1521,6 +1521,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
         }
       }
 
+    output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
     return;
     }
 
