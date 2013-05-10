@@ -106,7 +106,10 @@ pqCustomViewButtonDialog::pqCustomViewButtonDialog(
 
 //------------------------------------------------------------------------------
 pqCustomViewButtonDialog::~pqCustomViewButtonDialog()
-{}
+{
+  delete this->ui;
+  this->ui = NULL;
+}
 
 //------------------------------------------------------------------------------
 void pqCustomViewButtonDialog::setToolTips(QStringList &toolTips)
