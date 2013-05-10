@@ -65,17 +65,22 @@
   },
   "modules":[
     {
-      "name":"Catalyst",
+      "name":"vtkPVCatalyst",
       "path":"CoProcessing/Catalyst",
       "pythonwrap":true,
       "exclude": [
         {
           "path":"Testing"
         }
+      ],
+      "replace":[
+        {
+          "path":"CoProcessing/Catalyst/module.cmake"
+        }
       ]
     },
     {
-      "name":"PythonCatalyst",
+      "name":"vtkPVPythonCatalyst",
       "path":"CoProcessing/PythonCatalyst",
       "pythonwrap":true,
       "exclude": [
