@@ -20,6 +20,7 @@
 
         <script src="../../lib/js/paraview-all.js"></script>
         <script src="../../lib/js/paraview.ui.pipeline.js"></script>
+        <script src="../../lib/js/paraview.ui.toolbar.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.vcr.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.viewport.js"></script>
     </head>
@@ -31,6 +32,7 @@
             <div class="vcr-toolbar"></div>
             <div class="rescale-data" style="display: none;"><img src="../../lib/css/paraview/pipeline/resetRange.png" style="position: relative; top: 5px;" title="Rescale data range to the current time step" alt="Rescale data range to the current time step"/></div>
             <div class="loading"></div>
+            <div class="disconnect"></div>
         </div>
         <div class="splitter">
             <div class="viewport-container">
@@ -165,6 +167,8 @@
                     }
                 }).trigger('click');
 
+                // Add disconnect button listener
+                $('.disconnect').disconnectButton(pv.connection.session);
 
                 // - loading done...
                 $(".loading").hide();

@@ -16,6 +16,7 @@
 
         <script src="../../lib/js/paraview-all.js"></script>
         <script src="../../lib/js/paraview.ui.pipeline.js"></script>
+        <script src="../../lib/js/paraview.ui.toolbar.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.vcr.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.viewport.js"></script>
 
@@ -28,6 +29,7 @@
             <div class="viewport-toolbar"></div>
             <div class="vcr-toolbar"></div>
             <div class="loading"></div>
+            <div class="disconnect"></div>
         </div>
         <div class="splitter">
             <div class="file-list"></div>
@@ -86,6 +88,9 @@
                     }
                     updateView();
                 });
+
+                // Add disconnect button listener
+                $('.disconnect').disconnectButton(pv.connection.session);
             }
 
             function connect() {
