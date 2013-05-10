@@ -83,6 +83,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqViewFrameActionsBehavior(this);
   new pqSpreadSheetVisibilityBehavior(this);
   new pqPipelineContextMenuBehavior(this);
+  new pqObjectPickingBehavior(this);
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
   new pqPVNewSourceBehavior(this);
@@ -96,7 +97,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqFixPathsInStateFilesBehavior(this);
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
-  new pqObjectPickingBehavior(this);
   new pqCollaborationBehavior(this);
   new pqMultiServerBehavior(this);
   new pqViewStreamingBehavior(this);

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
@@ -65,14 +66,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlaneWidget.h"
 #include "pqInterfaceTracker.h"
 #include "pqLineSourceWidget.h"
-#include "pqRubberBandHelper.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
-#include "pqProxy.h"
-#include "pqRenderViewBase.h"
-#include "pqSMAdaptor.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
+#include "pqSMAdaptor.h"
 #include "pqSphereWidget.h"
 #include "pqSplineWidget.h"
 
@@ -172,7 +171,6 @@ public:
   /// Stores the selected/not selected state of the 3D widget (controlled by the owning panel)
   bool Selected;
 
-  pqRubberBandHelper PickHelper;
   QKeySequence PickSequence;
   QPointer<QShortcut> PickShortcut;
   bool IsMaster;
@@ -194,10 +192,6 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   this->Internal->IgnorePropertyChange = false;
 
   this->setControlledProxy(pxy);
-
-  QObject::connect(&this->Internal->PickHelper,
-    SIGNAL(intersectionFinished(double, double, double)),
-    this, SLOT(pick(double, double, double)));
 
   QObject::connect( pqApplicationCore::instance(),
                     SIGNAL(updateMasterEnableState(bool)),
@@ -319,7 +313,6 @@ void pq3DWidget::setView(pqView* pqview)
     }
 
   this->Superclass::setView(pqview);
-  this->Internal->PickHelper.setView(pqview);
 
   rview = this->renderView();
   if (rview && !this->Internal->PickSequence.isEmpty())
@@ -327,7 +320,7 @@ void pq3DWidget::setView(pqView* pqview)
     this->Internal->PickShortcut = new QShortcut(
       this->Internal->PickSequence, pqview->getWidget());
     QObject::connect(this->Internal->PickShortcut, SIGNAL(activated()),
-      &this->Internal->PickHelper, SLOT(triggerFastIntersect()));
+      this, SLOT(pickPoint()));
     }
 
   if (rview && widget)
@@ -354,6 +347,29 @@ void pq3DWidget::render()
   if (pqRenderViewBase* rview = this->renderView())
     {
     rview->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::pickPoint()
+{
+  pqRenderView* rview = qobject_cast<pqRenderView*>(this->renderView());
+  if (rview && rview->getRenderViewProxy())
+    {
+    vtkRenderWindowInteractor* rwi = rview->getRenderViewProxy()->GetInteractor();
+    if (!rwi)
+      {
+      return;
+      }
+
+    // Get region
+    const int* eventpos = rwi->GetEventPosition();
+    double position[3];
+    if (rview->getRenderViewProxy()->ConvertDisplayToPointOnSurface(eventpos,
+      position))
+      {
+      this->pick(position[0], position[1], position[2]);
+      }
     }
 }
 

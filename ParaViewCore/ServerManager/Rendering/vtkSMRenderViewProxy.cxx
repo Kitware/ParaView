@@ -27,6 +27,7 @@
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
@@ -52,6 +53,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
@@ -765,6 +767,98 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x,
 
   // return selected representation
   return repr;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
+    const int display_position[2], double world_position[3])
+{
+  int region[4] = {display_position[0], display_position[1],
+    display_position[0], display_position[1] };
+
+  vtkSMSessionProxyManager* spxm = this->GetSessionProxyManager();
+  vtkNew<vtkCollection> representations;
+  vtkNew<vtkCollection> sources;
+  this->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
+
+  if (representations->GetNumberOfItems() > 0 && sources->GetNumberOfItems() > 0)
+    {
+    vtkSMPVRepresentationProxy* rep =
+      vtkSMPVRepresentationProxy::SafeDownCast(representations->GetItemAsObject(0));
+    vtkSMProxy* input = vtkSMPropertyHelper(rep, "Input").GetAsProxy(0);
+    vtkSMSourceProxy* selection = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
+
+    // Picking info
+    // {r0, r1, 1} => We want to make sure the ray that start from the camera reach
+    // the end of the scene so it could cross any cell of the scene
+    double nearDisplayPoint[3] = { (double)region[0], (double)region[1], 0.0 };
+    double farDisplayPoint[3]  = { (double)region[0], (double)region[1], 1.0 };
+    double farLinePoint[3];
+    double nearLinePoint[3];
+
+    vtkRenderer* renderer = this->GetRenderer();
+
+    // compute near line point
+    renderer->SetDisplayPoint(nearDisplayPoint);
+    renderer->DisplayToWorld();
+    const double* world = renderer->GetWorldPoint();
+    for (int i=0; i < 3; i++)
+      {
+      nearLinePoint[i] = world[i] / world[3];
+      }
+
+    // compute far line point
+    renderer->SetDisplayPoint(farDisplayPoint);
+    renderer->DisplayToWorld();
+    world = renderer->GetWorldPoint();
+    for (int i=0; i < 3; i++)
+      {
+      farLinePoint[i] = world[i] / world[3];
+      }
+
+    // Compute the  intersection...
+    vtkSMProxy* pickingHelper = spxm->NewProxy("misc","PickingHelper");
+    vtkSMPropertyHelper(pickingHelper, "Input").Set( input );
+    vtkSMPropertyHelper(pickingHelper, "Selection").Set( selection );
+    vtkSMPropertyHelper(pickingHelper, "PointA").Set(nearLinePoint, 3);
+    vtkSMPropertyHelper(pickingHelper, "PointB").Set(farLinePoint, 3);
+    pickingHelper->UpdateVTKObjects();
+    pickingHelper->UpdateProperty("Update",1);
+    vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
+    vtkSMPropertyHelper(pickingHelper, "Intersection").Get(world_position, 3);
+    pickingHelper->Delete();
+    }
+  else
+    {
+    // Need to warn user when used in RenderServer mode
+    if(!this->IsSelectionAvailable())
+      {
+      vtkWarningMacro("Snapping to the surface is not available therefore "
+        "the camera focal point will be used to determine "
+        "the depth of the picking.");
+      }
+
+    // Use camera focal point to get some Zbuffer
+    double cameraFP[4];
+    vtkRenderer* renderer = this->GetRenderer();
+    vtkCamera* camera = renderer->GetActiveCamera();
+    camera->GetFocalPoint(cameraFP); cameraFP[3] = 1.0;
+    renderer->SetWorldPoint(cameraFP);
+    renderer->WorldToDisplay();
+    double *displayCoord = renderer->GetDisplayPoint();
+
+    // Handle display to world conversion
+    double display[3] = {(double)region[0], (double)region[1], displayCoord[2]};
+    renderer->SetDisplayPoint(display);
+    renderer->DisplayToWorld();
+    const double* world = renderer->GetWorldPoint();
+    for (int i=0; i < 3; i++)
+      {
+      world_position[i] = world[i] / world[3];
+      }
+    }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------

@@ -32,18 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraToolbar.h"
 #include "ui_pqCameraToolbar.h"
 
-#include "pqCameraReaction.h"
-#include "pqRubberBandHelper.h"
 #include "pqActiveObjects.h"
-
-#include "vtkSMRenderViewProxy.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkCommand.h"
+#include "pqCameraReaction.h"
+#include "pqRenderViewSelectionReaction.h"
 
 //-----------------------------------------------------------------------------
 void pqCameraToolbar::constructor()
 {
-  this->ZoomToBoxStarted = false;
   Ui::pqCameraToolbar ui;
   ui.setupUi(this);
   new pqCameraReaction(ui.actionResetCamera, pqCameraReaction::RESET_CAMERA);
@@ -55,88 +50,22 @@ void pqCameraToolbar::constructor()
   new pqCameraReaction(ui.actionPositiveZ, pqCameraReaction::RESET_POSITIVE_Z);
   new pqCameraReaction(ui.actionNegativeZ, pqCameraReaction::RESET_NEGATIVE_Z);
 
-  /// HACK: Please FIX me at some point.
-  this->SelectionHelper = new pqRubberBandHelper(this);
-  // Set up connection with selection helpers for all views.
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this->SelectionHelper, SLOT(setView(pqView*)));
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(activeViewChanged(pqView*)));
-  QObject::connect(this->SelectionHelper,
-    SIGNAL(enableZoom(bool)),
-    ui.actionZoomToBox, SLOT(setEnabled(bool)));
-  QObject::connect(ui.actionZoomToBox, SIGNAL(triggered()),
-    this->SelectionHelper, SLOT(beginZoom()));
-  QObject::connect(this->SelectionHelper, SIGNAL(startSelection()),
-    this, SLOT(startZoomToBox()));
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
-    this, SLOT(activeSourceChanged(pqPipelineSource*)));
+  new pqRenderViewSelectionReaction(ui.actionZoomToBox, NULL,
+    pqRenderViewSelectionReaction::ZOOM_TO_BOX);
 
-  // When a selection is marked, we revert to interaction mode.
-  QObject::connect(
-    this->SelectionHelper,
-    SIGNAL(selectionFinished(int, int, int, int)),
-    this->SelectionHelper, SLOT(endSelection()));
-  QObject::connect(
-    this->SelectionHelper,
-    SIGNAL(stopSelection()),
-    this, SLOT(endZoomToBox()));
-  QObject::connect(
-    this->SelectionHelper,
-    SIGNAL(selectionModeChanged(int)),
-    this, SLOT(onSelectionModeChanged(int)));
-  this->ZoomAction = ui.actionZoomToBox;
   this->ZoomToDataAction = ui.actionZoomToData;
   this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
+
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(updateEnabledState()));
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
+    this, SLOT(updateEnabledState()));
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraToolbar::onSelectionModeChanged(int mode)
+void pqCameraToolbar::updateEnabledState()
 {
-  this->ZoomAction->setChecked(mode == pqRubberBandHelper::ZOOM);
-}
-//-----------------------------------------------------------------------------
-void pqCameraToolbar::startZoomToBox()
-{
-  if(this->ZoomAction->isChecked() && this->Interactor)
-    {
-    this->Interactor->InvokeEvent(vtkCommand::StartInteractionEvent);
-    this->ZoomToBoxStarted = true;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqCameraToolbar::endZoomToBox()
-{
-  if(this->ZoomToBoxStarted && this->Interactor)
-    {
-    this->Interactor->InvokeEvent(vtkCommand::EndInteractionEvent);
-    }
-  this->ZoomToBoxStarted = false;
-}
-//-----------------------------------------------------------------------------
-void pqCameraToolbar::activeViewChanged(pqView* view)
-{
-  // Reset always
-  this->Interactor = NULL;
-
-  // If we are lucky just set it.
-  if(view)
-    {
-    vtkSMRenderViewProxy* viewProxy =
-        vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
-    this->Interactor = viewProxy ? viewProxy->GetInteractor() : NULL;
-    }
-  else
-    {
-    this->ZoomToDataAction->setEnabled(false);
-    }
-}
-//-----------------------------------------------------------------------------
-void pqCameraToolbar::activeSourceChanged(pqPipelineSource *source)
-{
-  this->ZoomToDataAction->setEnabled(source != 0);
+  pqView* view  = pqActiveObjects::instance().activeView();
+  pqPipelineSource* source = pqActiveObjects::instance().activeSource();
+  this->ZoomToDataAction->setEnabled(source && view);
 }

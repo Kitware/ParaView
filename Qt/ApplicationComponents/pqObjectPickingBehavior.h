@@ -33,12 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqObjectPickingBehavior_h
 
 #include <QObject>
-
+#include <QPoint>
 #include "pqApplicationComponentsModule.h"
 
 class pqView;
 class pqOutputPort;
-class pqRubberBandHelper;
 
 /// @ingroup Behaviors
 /// pqObjectPickingBehavior is used to add support for picking "source" by
@@ -52,13 +51,18 @@ public:
   pqObjectPickingBehavior(QObject* parent=0);
   virtual ~pqObjectPickingBehavior();
 
-protected slots:
-  void setActiveView(pqView*);
-
 protected:
-  pqRubberBandHelper* PickHelper;
+  /// event filter to capture the left-click.
+  virtual bool eventFilter(QObject* caller, QEvent* e);
+
+protected slots:
+  /// Called when a new view is added. We install event-filter to get click
+  /// events.
+  void onViewAdded(pqView*);
+
 private:
   Q_DISABLE_COPY(pqObjectPickingBehavior)
+  QPoint Position;
 };
 
 #endif

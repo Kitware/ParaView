@@ -34,19 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QToolBar>
 #include "pqApplicationComponentsModule.h"
-#include "vtkWeakPointer.h"
-
-class pqRubberBandHelper;
-class pqView;
-class pqPipelineSource;
-class vtkPVGenericRenderWindowInteractor;
 
 /// pqCameraToolbar is the toolbar that has icons for resetting camera
-/// orientation.
-///
-/// CAVEATS: This class currently uses pqRubberBandHelper for zooming. That
-/// needs to be cleaned up soon since pqRubberBandHelper is resulting in hacky
-/// code in pqParaViewMenuBuilders::buildToolbars().
+/// orientations as well as zoom-to-data and zoom-to-box.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCameraToolbar : public QToolBar
 {
   Q_OBJECT
@@ -64,23 +54,12 @@ public:
     }
 
 private slots:
-  void onSelectionModeChanged(int mode);
-  void startZoomToBox();
-  void endZoomToBox();
-  void activeViewChanged(pqView*);
-  void activeSourceChanged(pqPipelineSource*);
+  void updateEnabledState();
 
 private:
   Q_DISABLE_COPY(pqCameraToolbar)
   void constructor();
-
-  QAction* ZoomAction;
   QAction* ZoomToDataAction;
-  bool ZoomToBoxStarted;
-  pqRubberBandHelper* SelectionHelper;
-  vtkWeakPointer<vtkPVGenericRenderWindowInteractor> Interactor;
 };
 
 #endif
-
-

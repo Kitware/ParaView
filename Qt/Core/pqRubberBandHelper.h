@@ -46,12 +46,16 @@ class vtkObject;
  * are switched between interaction and rubber band modes.
  * TODO: We may want to extend this class to create different type of selections
  * i.e. surface/frustrum.
+ *
+ * @deprecated Use pqRenderViewSelectionReaction instead.
  */
 class PQCORE_EXPORT pqRubberBandHelper : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
+  // @deprecated Please modify your code to use pqRenderViewSelectionReaction
+  // instead.
   pqRubberBandHelper(QObject* parent=NULL);
   virtual ~pqRubberBandHelper();
 

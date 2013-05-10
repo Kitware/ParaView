@@ -536,94 +536,9 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
       {
       vtkSMRenderViewProxy* renderViewProxy =
           this->Internal->RenderView->getRenderViewProxy();
-      vtkSMSessionProxyManager* spxm = renderViewProxy->GetSessionProxyManager();
-
-      vtkNew<vtkCollection> representations;
-      vtkNew<vtkCollection> sources;
-      renderViewProxy->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
-
-      if(representations->GetNumberOfItems() > 0 && sources->GetNumberOfItems() > 0)
-        {
-        vtkSMPVRepresentationProxy* rep =
-            vtkSMPVRepresentationProxy::SafeDownCast(representations->GetItemAsObject(0));
-        vtkSMProxy* input = vtkSMPropertyHelper(rep, "Input").GetAsProxy(0);
-        vtkSMSourceProxy* selection = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
-
-        // Picking info
-        // {r0, r1, 1} => We want to make sure the ray that start from the camera reach
-        // the end of the scene so it could cross any cell of the scene
-        double nearDisplayPoint[3] = { (double)region[0], (double)region[1], 0.0 };
-        double farDisplayPoint[3]  = { (double)region[0], (double)region[1], 1.0 };
-        double farLinePoint[3];
-        double nearLinePoint[3];
-        double* world;
-
-        vtkRenderer* renderer = renderViewProxy->GetRenderer();
-
-        // compute near line point
-        renderer->SetDisplayPoint(nearDisplayPoint);
-        renderer->DisplayToWorld();
-        world = renderer->GetWorldPoint();
-        for (int i=0; i < 3; i++)
-          {
-          nearLinePoint[i] = world[i] / world[3];
-          }
-
-        // compute far line point
-        renderer->SetDisplayPoint(farDisplayPoint);
-        renderer->DisplayToWorld();
-        world = renderer->GetWorldPoint();
-        for (int i=0; i < 3; i++)
-          {
-          farLinePoint[i] = world[i] / world[3];
-          }
-
-        // Compute the  intersection...
-        double intersection[3] = {0,0,0};
-        vtkSMProxy* pickingHelper = spxm->NewProxy("misc","PickingHelper");
-        vtkSMPropertyHelper(pickingHelper, "Input").Set( input );
-        vtkSMPropertyHelper(pickingHelper, "Selection").Set( selection );
-        vtkSMPropertyHelper(pickingHelper, "PointA").Set(nearLinePoint, 3);
-        vtkSMPropertyHelper(pickingHelper, "PointB").Set(farLinePoint, 3);
-        pickingHelper->UpdateVTKObjects();
-        pickingHelper->UpdateProperty("Update",1);
-        vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
-        vtkSMPropertyHelper(pickingHelper, "Intersection").Get(intersection, 3);
-        pickingHelper->Delete();
-
-        emit intersectionFinished(intersection[0], intersection[1], intersection[2]);
-        }
-      else
-        {
-        // Need to warn user when used in RenderServer mode
-        if(!renderViewProxy->IsSelectionAvailable())
-          {
-          qWarning("Snapping to the surface is not available therefore "
-                   "the camera focal point will be used to determine "
-                   "the depth of the picking.");
-          }
-
-        // Use camera focal point to get some Zbuffer
-        double cameraFP[4];
-        vtkRenderer* renderer = renderViewProxy->GetRenderer();
-        vtkCamera* camera = renderer->GetActiveCamera();
-        camera->GetFocalPoint(cameraFP); cameraFP[3] = 1.0;
-        renderer->SetWorldPoint(cameraFP);
-        renderer->WorldToDisplay();
-        double *displayCoord = renderer->GetDisplayPoint();
-
-        // Handle display to world conversion
-        double display[3] = {(double)region[0], (double)region[1], displayCoord[2]};
-        double center[3];
-        renderer->SetDisplayPoint(display);
-        renderer->DisplayToWorld();
-        double* world = renderer->GetWorldPoint();
-        for (int i=0; i < 3; i++)
-          {
-          center[i] = world[i] / world[3];
-          }
-        emit intersectionFinished(center[0], center[1], center[2]);
-        }
+      double world[3];
+      renderViewProxy->ConvertDisplayToPointOnSurface(region, world);
+      emit intersectionFinished(world[0], world[1], world[2]);
       }
     break;
     }

@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolBar>
 #include "pqApplicationComponentsModule.h"
 
-class pqRubberBandHelper;
-
 /// pqAxesToolbar is the toolbar that has buttons for setting the center
 /// rotation axes, toggling its visibility etc.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqAxesToolbar : public QToolBar
@@ -61,13 +59,10 @@ protected slots:
   void showCenterAxes(bool);
   void showOrientationAxes(bool);
   void resetCenterOfRotationToCenterOfCurrentData();
-  void pickCenterOfRotation(bool);
-  void pickCenterOfRotationFinished(double, double, double);
+  void pickCenterOfRotation(int, int);
 
 private:
   Q_DISABLE_COPY(pqAxesToolbar)
-
-  pqRubberBandHelper* PickHelper;
 
   class pqInternals;
   pqInternals* Internals;
@@ -75,5 +70,3 @@ private:
 };
 
 #endif
-
-

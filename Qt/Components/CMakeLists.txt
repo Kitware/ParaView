@@ -339,8 +339,6 @@ set (Module_SRCS
   pqSelectionManager.h
   pqSelectReaderDialog.cxx
   pqSelectReaderDialog.h
-  pqSelectThroughPanel.cxx
-  pqSelectThroughPanel.h
   pqServerConfigurationImporter.cxx
   pqServerConfigurationImporter.h
   pqServerConnectDialog.cxx
@@ -572,7 +570,6 @@ set (Module_MOC_HDRS
   pqSelectionInspectorPanel.h
   pqSelectionManager.h
   pqSelectReaderDialog.h
-  pqSelectThroughPanel.h
   pqServerConfigurationImporter.h
   pqServerConnectDialog.h
   pqServerLauncher.h
