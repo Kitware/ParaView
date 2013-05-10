@@ -106,7 +106,7 @@ protected:
 
   // Description:
   // Called to initialize saving.
-  virtual bool SaveInitialize();
+  virtual bool SaveInitialize(int startCount);
 
   // Description:
   // Called to save a particular frame.

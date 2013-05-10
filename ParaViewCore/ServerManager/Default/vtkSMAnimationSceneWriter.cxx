@@ -29,6 +29,7 @@ vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
   this->ObserverID = 0;
   this->FileName = 0;
   this->SaveFailed = false;
+  this->StartFileCount = 0;
 
   this->PlaybackTimeWindow[0] = 1.0;
   this->PlaybackTimeWindow[1] = -1.0;
@@ -134,7 +135,7 @@ bool vtkSMAnimationSceneWriter::Save()
   int loop = this->AnimationScene->GetLoop();
   this->AnimationScene->SetLoop(0);
 
-  bool status = this->SaveInitialize();
+  bool status = this->SaveInitialize(this->StartFileCount);
   bool caching = this->AnimationScene->GetCaching();
   this->AnimationScene->SetCaching(false);
 
