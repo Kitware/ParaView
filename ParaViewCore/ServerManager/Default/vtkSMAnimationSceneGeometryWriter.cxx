@@ -49,7 +49,7 @@ vtkSMAnimationSceneGeometryWriter::~vtkSMAnimationSceneGeometryWriter()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMAnimationSceneGeometryWriter::SaveInitialize(int startCount)
+bool vtkSMAnimationSceneGeometryWriter::SaveInitialize(int vtkNotUsed(startCount))
 {
   if (!this->ViewModule)
     {
