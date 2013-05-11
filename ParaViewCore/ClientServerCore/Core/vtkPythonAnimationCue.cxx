@@ -17,9 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVPythonInterpretor.h"
-#include "vtkPythonProgrammableFilter.h"
-#include "vtkPVOptions.h"
+#include "vtkPythonInterpreter.h"
 
 #include <vtksys/ios/sstream>
 
@@ -35,36 +33,12 @@ vtkPythonAnimationCue::vtkPythonAnimationCue()
     this, &vtkPythonAnimationCue::HandleTickEvent);
   this->AddObserver(vtkCommand::EndAnimationCueEvent,
     this, &vtkPythonAnimationCue::HandleEndCueEvent);
-  this->Interpretor = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPythonAnimationCue::~vtkPythonAnimationCue()
 {
   this->SetScript(NULL);
-  if (this->Interpretor)
-    {
-    this->Interpretor->Delete();
-    this->Interpretor = NULL;
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkPVPythonInterpretor* vtkPythonAnimationCue::GetInterpretor()
-{
-  if (!this->Interpretor)
-    {
-    this->Interpretor = vtkPVPythonInterpretor::New();
-    this->Interpretor->SetCaptureStreams(true);
-    const char* argv0 = vtkProcessModule::GetProcessModule()->
-      GetOptions()->GetArgv0();
-    this->Interpretor->InitializeSubInterpretor(1, (char**)&argv0);
-    this->Interpretor->ExecuteInitFromGUI();
-    vtkProcessModule::GetProcessModule()->AddObserver(vtkCommand::ExitEvent,
-      this, &vtkPythonAnimationCue::DeleteInterpretor);
-    }
-
-  return this->Interpretor;
 }
 
 //----------------------------------------------------------------------------
@@ -96,8 +70,10 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
               "  del _me\n"
               "  import gc\n"
               "  gc.collect()\n";
-    this->GetInterpretor()->RunSimpleString(stream.str().c_str());
-    this->GetInterpretor()->FlushMessages();
+
+    // ensure Python is initialized.
+    vtkPythonInterpreter::Initialize();
+    vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
     }
 }
 
@@ -129,8 +105,10 @@ void vtkPythonAnimationCue::HandleTickEvent()
               "  del _me\n"
               "  import gc\n"
               "  gc.collect()\n";
-    this->GetInterpretor()->RunSimpleString(stream.str().c_str());
-    this->GetInterpretor()->FlushMessages();
+
+    // ensure Python is initialized.
+    vtkPythonInterpreter::Initialize();
+    vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
     }
 }
 
@@ -163,18 +141,8 @@ void vtkPythonAnimationCue::HandleEndCueEvent()
               "  del _me\n"
               "  import gc\n"
               "  gc.collect()\n";
-    this->GetInterpretor()->RunSimpleString(stream.str().c_str());
-    this->GetInterpretor()->FlushMessages();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPythonAnimationCue::DeleteInterpretor()
-{
-  if (this->Interpretor)
-    {
-    this->Interpretor->Delete();
-    this->Interpretor = NULL;
+    vtkPythonInterpreter::Initialize();
+    vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
     }
 }
 

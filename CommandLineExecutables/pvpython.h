@@ -21,8 +21,8 @@ extern "C" {
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkProcessModule.h"
-#include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
+#include "vtkPythonInterpreter.h"
 #include "vtkSMSession.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -102,14 +102,13 @@ namespace ParaViewPython {
         remaining_argc, remaining_argv);
 
       // Start interpretor
-      vtkPVPythonInterpretor* interpretor = vtkPVPythonInterpretor::New();
+      vtkPythonInterpreter::Initialize();
 
       // register callback to initialize modules statically. The callback is
       // empty when BUILD_SHARED_LIBS is ON.
       vtkPVInitializePythonModules();
 
-      ret_val = interpretor->PyMain(static_cast<int>(pythonArgs.size()), &*pythonArgs.begin());
-      interpretor->Delete();
+      ret_val = vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()), &*pythonArgs.begin());
 
       // Free python args
       std::vector<char*>::iterator it = pythonArgs.begin();

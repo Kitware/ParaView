@@ -236,6 +236,11 @@ private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
   void operator=(const vtkProcessModule&); // Not implemented.
 
+  // Helper to initialize Python environment. This doesn't initialize Python
+  // but simply sets up the environment so when Python is initialized, it can
+  // find ParaView modules. This does nothing is not build with Python support.
+  bool InitializePythonEnvironment(int argc, char** argv);
+
   static ProcessTypes ProcessType;
 
   // Set to true in Initialize if Finalize() should cleanup MPI.

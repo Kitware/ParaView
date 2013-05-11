@@ -29,33 +29,33 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#include <vtkPython.h> // python first
+#include "vtkPython.h" // python first
+#include "pqPythonShell.h"
 
 #include "pqApplicationCore.h"
 #include "pqConsoleWidget.h"
-#include "pqPythonShell.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
-#include "vtkEventQtSlotConnect.h"
-#include "vtkPVOptions.h"
-#include "vtkPVPythonInteractiveInterpretor.h"
 #include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
+#include "vtkPythonInteractiveInterpreter.h"
+#include "vtkPythonInterpreter.h"
 #include "vtkStdString.h"
+#include "vtkWeakPointer.h"
 
-#include <QCoreApplication>
-#include <QResizeEvent>
-#include <QScrollBar>
+#include <QInputDialog>
 #include <QStringListModel>
 #include <QTextCharFormat>
 #include <QVBoxLayout>
 
-
 class pqPythonShellCompleter : public pqConsoleWidgetCompleter
 {
+  vtkWeakPointer<vtkPythonInteractiveInterpreter> Interpreter;
 public:
-  pqPythonShellCompleter(pqPythonShell& p) : Parent(p)
+  pqPythonShellCompleter(pqPythonShell& p,
+    vtkPythonInteractiveInterpreter* interp)
     {
+    this->Interpreter = interp;
     this->setParent(&p);
     }
 
@@ -99,7 +99,7 @@ public:
     QStringList attrs;
     if (!lookup.isEmpty() || !compareText.isEmpty())
       {
-      attrs = Parent.getPythonAttributes(lookup);
+      attrs = this->getPythonAttributes(lookup);
       }
 
     // Initialize the completion model
@@ -112,372 +112,323 @@ public:
       this->popup()->setCurrentIndex(this->completionModel()->index(0, 0));
       }
     }
-  pqPythonShell& Parent;
-};
 
-
-/////////////////////////////////////////////////////////////////////////
-// pqPythonShell::pqImplementation
-
-struct pqPythonShell::pqImplementation
-{
-  pqImplementation(QWidget* Parent) 
-    : Console(Parent), Interpreter(0)
-  {
-    this->VTKConnect = vtkEventQtSlotConnect::New();
-  }
-
-  void initialize(int argc, char* argv[])
-  {
-    this->destroyInterpretor();
-    this->Interpreter = vtkPVPythonInteractiveInterpretor::New();
-    this->Interpreter->SetCaptureStreams(true);
-    this->Interpreter->InitializeSubInterpretor(argc, argv);
-    this->Interpreter->MakeCurrent();
-    
-    // Setup Python's interactive prompts
-    PyObject* ps1 = PySys_GetObject(const_cast<char*>("ps1"));
-    if(!ps1)
-      {
-      PySys_SetObject(const_cast<char*>("ps1"), ps1 = PyString_FromString(">>> "));
-      Py_XDECREF(ps1);
-      }
-
-    PyObject* ps2 = PySys_GetObject(const_cast<char*>("ps2"));
-    if(!ps2)
-      {
-      PySys_SetObject(const_cast<char*>("ps2"), ps2 = PyString_FromString("... "));
-      Py_XDECREF(ps2);
-      }
-    this->Interpreter->ReleaseControl();
-    this->MultilineStatement = false;
-  }
-
-  ~pqImplementation()
-  {
-    this->VTKConnect->Disconnect();
-    this->VTKConnect->Delete();
-    this->destroyInterpretor();
-  }
-
-  void destroyInterpretor()
+  /// Given a python variable name, lookup its attributes and return them in a
+  /// string list.
+  QStringList getPythonAttributes(const QString& pythonObjectName)
     {
-    if (this->Interpreter)
+    if (this->Interpreter == NULL ||
+      this->Interpreter->GetInteractiveConsoleLocalsPyObject() == NULL)
       {
-      QTextCharFormat format = this->Console.getFormat();
-      format.setForeground(QColor(255, 0, 0));
-      this->Console.setFormat(format);
-      this->Console.printString("\n... restarting ...\n");
-      format.setForeground(QColor(0, 0, 0));
-      this->Console.setFormat(format);
-
-      this->Interpreter->MakeCurrent();
-
-      // Restore Python's original stdout and stderr
-      PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
-      PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
-      this->Interpreter->ReleaseControl();
-      this->Interpreter->Delete();
+      return QStringList();
       }
-    this->Interpreter = 0;
-    }
 
-  void executeCommand(const QString& Command)
-  {
-    this->MultilineStatement = 
-      this->Interpreter->Push(Command.toAscii().data());
-  }
+    PyObject* object = reinterpret_cast<PyObject*>(
+      this->Interpreter->GetInteractiveConsoleLocalsPyObject());
+    Py_INCREF(object);
 
-  void promptForInput(const QString& indent=QString())
-  {
-    QTextCharFormat format = this->Console.getFormat();
-    format.setForeground(QColor(0, 0, 0));
-    this->Console.setFormat(format);
-
-    this->Interpreter->MakeCurrent();
-    if(!this->MultilineStatement)
+    if (!pythonObjectName.isEmpty())
       {
-      this->Console.prompt(
-        PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
-      }
-    else
-      {
-      this->Console.prompt(
-        PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
-      }
-    this->Console.printCommand(indent);
-    this->Interpreter->ReleaseControl();
-  }
-
-  /// Provides a console for gathering user input and displaying 
-  /// Python output
-  pqConsoleWidget Console;
-
-  /// Indicates if the last statement processes was incomplete.
-  bool MultilineStatement;
-
-  /// Separate Python interpreter that will be used for this shell
-  vtkPVPythonInteractiveInterpretor* Interpreter;
-
-  vtkEventQtSlotConnect *VTKConnect;
-};
-
-/////////////////////////////////////////////////////////////////////////
-// pqPythonShell
-
-pqPythonShell::pqPythonShell(QWidget* Parent) :
-  QWidget(Parent),
-  Implementation(new pqImplementation(this))
-{
-  QVBoxLayout* const boxLayout = new QVBoxLayout(this);
-  boxLayout->setMargin(0);
-  boxLayout->addWidget(&this->Implementation->Console);
-
-  this->setObjectName("pythonShell");
-
-  pqPythonShellCompleter* completer = new pqPythonShellCompleter(*this);
-  this->Implementation->Console.setCompleter(completer);
-  
-  QObject::connect(
-    &this->Implementation->Console, SIGNAL(executeCommand(const QString&)), 
-    this, SLOT(onExecuteCommand(const QString&)));
-
-  // Make sure we clear the UndoStack if any python execution occurs
-  QObject::connect( this, SIGNAL(executing(bool)),
-                    this, SLOT(clearUndoStack()));
-}
-
-pqPythonShell::~pqPythonShell()
-{
-  delete this->Implementation;
-}
-
-void pqPythonShell::initializeInterpretor()
-{
-  const char* argv0 = vtkProcessModule::GetProcessModule()->
-    GetOptions()->GetArgv0();
-  this->initializeInterpretor(1, (char**)&argv0);
-}
-
-void pqPythonShell::initializeInterpretor(int argc, char* argv[])
-{
-  this->Implementation->VTKConnect->Disconnect();
-
-  this->Implementation->initialize(argc, argv);
-  QTextCharFormat format = this->Implementation->Console.getFormat();
-  format.setForeground(QColor(0, 0, 255));
-  this->Implementation->Console.setFormat(format);
-  this->Implementation->Console.printString(
-    QString("Python %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()));
-  this->promptForInput();
-
-  this->Implementation->VTKConnect->Connect(
-    this->Implementation->Interpreter, vtkCommand::ErrorEvent, 
-    this, SLOT(printStderr(vtkObject*, unsigned long, void*, void*))); 
-  this->Implementation->VTKConnect->Connect(
-    this->Implementation->Interpreter, vtkCommand::WarningEvent, 
-    this, SLOT(printStdout(vtkObject*, unsigned long, void*, void*))); 
-
-  this->Implementation->VTKConnect->Connect(
-    this->Implementation->Interpreter, vtkCommand::UpdateEvent, 
-    this, SLOT(readInputLine(vtkObject*, unsigned long, void*, void*))); 
-}
-
-void pqPythonShell::clear()
-{
-  this->Implementation->Console.clear();
-  this->Implementation->promptForInput();
-}
-
-void pqPythonShell::makeCurrent()
-{
-  this->Implementation->Interpreter->MakeCurrent();
-}
-void pqPythonShell::releaseControl()
-{
-  this->Implementation->Interpreter->ReleaseControl();
-}
-
-void pqPythonShell::executeInitFromGUI()
-{
-  this->Implementation->Interpreter->ExecuteInitFromGUI();
-}
-
-void pqPythonShell::executeScript(const QString& script)
-{
-  this->printStdout("\n");
-  emit this->executing(true);  
-  this->Implementation->Interpreter->RunSimpleString(
-    script.toAscii().data());
-  emit this->executing(false);
-  this->Implementation->promptForInput();
-}
-
-QStringList pqPythonShell::getPythonAttributes(const QString& pythonObjectName)
-{
-  this->makeCurrent();
-
-  PyObject* dict = PyImport_GetModuleDict();
-  PyObject* object = PyDict_GetItemString(dict, "__main__");
-  Py_INCREF(object);
-
-
-  if (!pythonObjectName.isEmpty())
-    {
-    QStringList tmpNames = pythonObjectName.split('.');
-    for (int i = 0; i < tmpNames.size() && object; ++i)
-      {
-      QByteArray tmpName = tmpNames.at(i).toLatin1();
-      PyObject* prevObj = object;
-      if (PyDict_Check(object))
+      QStringList tmpNames = pythonObjectName.split('.');
+      for (int i = 0; i < tmpNames.size() && object; ++i)
         {
-        object = PyDict_GetItemString(object, tmpName.data());
-        Py_XINCREF(object);
+        QByteArray tmpName = tmpNames.at(i).toLatin1();
+        PyObject* prevObj = object;
+        if (PyDict_Check(object))
+          {
+          object = PyDict_GetItemString(object, tmpName.data());
+          Py_XINCREF(object);
+          }
+        else
+          {
+          object = PyObject_GetAttrString(object, tmpName.data());
+          }
+        Py_DECREF(prevObj);
+        }
+      PyErr_Clear();
+      }
+
+    QStringList results;
+    if (object)
+      {
+      PyObject* keys = NULL;
+      bool is_dict = PyDict_Check(object);
+      if (is_dict)
+        {
+        keys = PyDict_Keys(object); // returns *new* reference.
         }
       else
         {
-        object = PyObject_GetAttrString(object, tmpName.data());
+        keys = PyObject_Dir(object); // returns *new* reference.
         }
-      Py_DECREF(prevObj);
-      }
-    PyErr_Clear();
-    }
-
-  QStringList results;
-  if (object)
-    {
-    PyObject* keys = PyObject_Dir(object);
-    if (keys)
-      {
-      PyObject* key;
-      PyObject* value;
-      QString keystr;
-      int nKeys = PyList_Size(keys);
-      for (int i = 0; i < nKeys; ++i)
+      if (keys)
         {
-        key = PyList_GetItem(keys, i);
-        value = PyObject_GetAttr(object, key);
-        if (!value)
+        PyObject* key;
+        PyObject* value;
+        QString keystr;
+        int nKeys = PyList_Size(keys);
+        for (int i = 0; i < nKeys; ++i)
           {
-          continue;
+          key = PyList_GetItem(keys, i);
+          if (is_dict)
+            {
+            value = PyDict_GetItem(object, key); // Return value: Borrowed reference.
+            Py_XINCREF(value); // so we can use Py_DECREF later.
+            }
+          else
+            {
+            value = PyObject_GetAttr(object, key); // Return value: New refernce.
+            }
+          if (!value)
+            {
+            continue;
+            }
+          results << PyString_AsString(key);
+          Py_DECREF(value);
           }
-
-        results << PyString_AsString(key);
-        Py_DECREF(value);
+        Py_DECREF(keys);
         }
-      Py_DECREF(keys);
+      Py_DECREF(object);
       }
-    Py_DECREF(object);
+
+    return results;
     }
-
-  this->releaseControl();
-  return results;
-}
-
-void pqPythonShell::printStdout(vtkObject*, unsigned long, void*, void* calldata)
-{
-  const char* text = reinterpret_cast<const char*>(calldata);
-  this->printStdout(text);
-  this->Implementation->Interpreter->ClearMessages();
-}
-
-#include <QDialog>
-#include <QLineEdit>
-#include <QVBoxLayout>
-class LineInput : public QDialog {
-public:
-  LineInput(QWidget* p=NULL) : QDialog(p, Qt::FramelessWindowHint)
-  {
-    QVBoxLayout* internalLayout = new QVBoxLayout(this);
-    internalLayout->setMargin(0);
-    this->Edit = new QLineEdit;
-    internalLayout->addWidget(this->Edit);
-    this->connect(this->Edit, SIGNAL(returnPressed()), SLOT(accept()));
-  }
-  QLineEdit* Edit;
 };
 
-void pqPythonShell::readInputLine(vtkObject*, unsigned long, void*, void* calldata)
+
+//-----------------------------------------------------------------------------
+pqPythonShell::pqPythonShell(QWidget* parentObject, Qt::WindowFlags _flags):
+  Superclass(parentObject, _flags),
+  ConsoleWidget(new pqConsoleWidget(this)),
+  Interpreter(vtkPythonInteractiveInterpreter::New()),
+  Prompt(pqPythonShell::PS1()),
+  Prompted(false)
 {
-  vtkStdString* ret = reinterpret_cast<vtkStdString*>(calldata);
-  QPoint cursorPosition = this->Implementation->Console.getCursorPosition();
-  LineInput input(this);
-  input.move(this->mapToGlobal(cursorPosition));
-  input.exec();
-  *ret = input.Edit->text().toAscii().data();
+  this->setObjectName("pythonShell");
+
+  QVBoxLayout* vbox = new QVBoxLayout(this);
+  vbox->setMargin(0);
+  vbox->addWidget(this->ConsoleWidget);
+
+  // Setup completer for the console widget.
+  pqPythonShellCompleter* completer =
+    new pqPythonShellCompleter(*this, this->Interpreter);
+  this->ConsoleWidget->setCompleter(completer);
+
+  // Accept user input from the console and push it into the Python interpreter.
+  QObject::connect(
+    this->ConsoleWidget, SIGNAL(executeCommand(const QString&)),
+    this, SLOT(pushScript(const QString&)));
+
+  this->Interpreter->AddObserver(vtkCommand::AnyEvent,
+    this, &pqPythonShell::HandleInterpreterEvents);
+
+  // Initialize Python if not already.
+  if (!vtkPythonInterpreter::Initialize())
+    {
+    // if Initialize() returns false, it means Python was already initialized,
+    // so we call setupInterpreter() callback since it won't get called
+    // otherwise.
+    this->setupInterpreter();
+    }
+
+  QObject::connect(&this->CreatePythonTimer, SIGNAL(timeout()),
+    this, SLOT(initPythonInterpreter()));
 }
 
-void pqPythonShell::printStderr(vtkObject*, unsigned long, void*, void* calldata)
+//-----------------------------------------------------------------------------
+pqPythonShell::~pqPythonShell()
 {
-  const char* text = reinterpret_cast<const char*>(calldata);
-  this->printStderr(text);
-  this->Implementation->Interpreter->ClearMessages();
+  this->Interpreter->RemoveObservers(vtkCommand::AnyEvent);
+  this->Interpreter->Delete();
+  this->Interpreter = NULL;
+
+  delete this->ConsoleWidget;
+  this->ConsoleWidget = NULL;
 }
 
-void pqPythonShell::printStdout(const QString& text)
+//-----------------------------------------------------------------------------
+void pqPythonShell::initPythonInterpreter()
 {
-  QTextCharFormat format = this->Implementation->Console.getFormat();
-  format.setForeground(QColor(0, 150, 0));
-  this->Implementation->Console.setFormat(format);
-  
-  this->Implementation->Console.printString(text);
-  
-  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  vtkPythonInterpreter::Initialize();
 }
 
+//-----------------------------------------------------------------------------
+void pqPythonShell::setupInterpreter()
+{
+  vtkPythonInterpreter::SetCaptureStdin(true);
+
+  // Print the default Python interpreter greeting.
+  this->executeScript(
+    "def ___init_pqpython_shell():\n"
+    "  import sys\n"
+    "  print 'Python %s on %s' % (sys.version, sys.platform)\n"
+    "___init_pqpython_shell()\n"
+    "del ___init_pqpython_shell");
+  this->printString("from paraview.simple import *\n");
+  this->pushScript("from paraview.simple import *");
+  this->prompt();
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonShell::reset()
+{
+  this->Interpreter->Reset();
+  this->printString("\n...resetting...\n", ERROR);
+  this->setupInterpreter();
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonShell::printString(const QString& text, pqPythonShell::PrintMode mode)
+{
+  QString string = text;
+  if (!string.isEmpty())
+    {
+    QTextCharFormat format = this->ConsoleWidget->getFormat();
+    switch (mode)
+      {
+    case OUTPUT:
+      format.setForeground(QColor(0, 150, 0));
+      break;
+
+    case ERROR:
+      format.setForeground(QColor(255, 0, 0));
+      break;
+
+    case STATUS:
+    default:
+      format.setForeground(QColor(0, 0, 150));
+      }
+    this->ConsoleWidget->setFormat(format);
+    this->ConsoleWidget->printString(string);
+    format.setForeground(QColor(0, 0, 0));
+    this->ConsoleWidget->setFormat(format);
+
+    this->Prompted = false;
+    
+    // printString by itself should never affect the Prompt, just whether it
+    // needs to be shown.
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqPythonShell::prompt(const QString &indent)
+{
+  if (!this->Prompted)
+    {
+    this->Prompted = true;
+    QTextCharFormat format = this->ConsoleWidget->getFormat();
+    format.setForeground(QColor(0, 0, 0));
+    this->ConsoleWidget->setFormat(format);
+    this->ConsoleWidget->prompt(this->Prompt);
+    this->ConsoleWidget->printCommand(indent);
+    return true;
+    }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 void pqPythonShell::printMessage(const QString& text)
 {
-  QTextCharFormat format = this->Implementation->Console.getFormat();
-  format.setForeground(QColor(0, 0, 150));
-  this->Implementation->Console.setFormat(format);
-  
-  this->Implementation->Console.printString(text);
+  this->printString(text, STATUS);
+  this->prompt();
 }
 
-void pqPythonShell::printStderr(const QString& text)
+//-----------------------------------------------------------------------------
+void pqPythonShell::clear()
 {
-  QTextCharFormat format = this->Implementation->Console.getFormat();
-  format.setForeground(QColor(255, 0, 0));
-  this->Implementation->Console.setFormat(format);
-  
-  this->Implementation->Console.printString(text);
-  
-  QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  this->ConsoleWidget->clear();
+  this->Prompted = false;
+  this->prompt();
 }
 
-void pqPythonShell::onExecuteCommand(const QString& Command)
+//-----------------------------------------------------------------------------
+void pqPythonShell::executeScript(const QString& script)
 {
-  QString command = Command;
-  command.replace(QRegExp("\\s*$"), "");
-  this->internalExecuteCommand(command);
+  emit this->executing(true);  
+  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
+  emit this->executing(false);
+  CLEAR_UNDO_STACK();
+
+  this->printString("\n", STATUS);
+  this->prompt();
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonShell::pushScript(const QString& script)
+{
+  emit this->executing(true);
+
+  // remove terminal "\n" from the script. (refer to Python code.push()).
+  QString command = script;
+  command.replace(QRegExp("\\n$"), "");
+  // cout << "Push [" << script.toAscii().data() << "]" << endl;
+
+  this->Prompted = false;
+  bool more_input_needed = this->Interpreter->Push(script.toAscii().data());
+  this->Prompt = more_input_needed? pqPythonShell::PS2() : pqPythonShell::PS1();
+  emit this->executing(false);
 
   // Find the indent for the command.
   QRegExp regExp("^(\\s+)");
   QString indent;
-  if (regExp.indexIn(command) != -1)
+  if (more_input_needed && regExp.indexIn(command) != -1)
     {
     indent = regExp.cap(1);
     }
-  this->Implementation->promptForInput(indent);
+
+  this->prompt(indent);
+  CLEAR_UNDO_STACK();
 }
 
-void pqPythonShell::promptForInput()
+//-----------------------------------------------------------------------------
+void pqPythonShell::HandleInterpreterEvents(
+  vtkObject*, unsigned long eventid, void* calldata)
 {
-  this->Implementation->promptForInput();
-}
-
-void pqPythonShell::internalExecuteCommand(const QString& command)
-{
-  emit this->executing(true);  
-  this->Implementation->executeCommand(command);
-  emit this->executing(false);
-}
-
-void pqPythonShell::clearUndoStack()
-{
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
+  switch (eventid)
     {
-    stack->clear();
+  case vtkCommand::ErrorEvent:
+      {
+      const char* message = reinterpret_cast<const char*>(calldata);
+      this->printString(message, ERROR);
+      this->repaint();
+      }
+    break;
+
+  case vtkCommand::SetOutputEvent:
+      {
+      const char* message = reinterpret_cast<const char*>(calldata);
+      this->printString(message, OUTPUT);
+      this->repaint();
+      }
+    break;
+
+  case vtkCommand::ExitEvent:
+    this->printString("\n...restarting...\n", ERROR);
+    this->CreatePythonTimer.start(1000);
+    break;
+
+  case vtkCommand::EnterEvent:
+    // Python initialized.
+    this->setupInterpreter();
+    break;
+
+  case vtkCommand::UpdateEvent:
+      {
+      vtkStdString* data = reinterpret_cast<vtkStdString*>(calldata);
+      bool ok;
+      QString inputText = QInputDialog::getText(this,
+        tr("Enter Input requested by Python"),
+        tr("Input: "),
+        QLineEdit::Normal,
+        QString(),
+        &ok);
+      if (ok)
+        {
+        *data = inputText.toStdString();
+        }
+      }
+    break;
     }
 }

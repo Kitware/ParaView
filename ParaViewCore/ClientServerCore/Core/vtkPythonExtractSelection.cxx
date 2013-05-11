@@ -15,8 +15,8 @@
 #include "vtkPythonExtractSelection.h"
 
 #include "vtkCellData.h"
+#include "vtkCell.h"
 #include "vtkCellTypes.h"
-#include "vtkCharArray.h"
 #include "vtkCharArray.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkIdTypeArray.h"
@@ -26,19 +26,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
-#include "vtkPVPythonInterpretor.h"
-#include "vtkPythonProgrammableFilter.h"
+#include "vtkPythonInterpreter.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSignedCharArray.h"
 #include "vtkTable.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkCell.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
 
 #include <assert.h>
-#include <vtksys/ios/sstream>
-#include <vector>
 #include <map>
+#include <vector>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPythonExtractSelection);
 //----------------------------------------------------------------------------
@@ -133,6 +131,9 @@ void vtkPythonExtractSelection::ExecuteScript(void* arg)
 //----------------------------------------------------------------------------
 void vtkPythonExtractSelection::Exec()
 {
+  // ensure Python is initialized.
+  vtkPythonInterpreter::Initialize();
+
   // Set self to point to this
   char addrofthis[1024];
   sprintf(addrofthis, "%p", this);
@@ -144,16 +145,12 @@ void vtkPythonExtractSelection::Exec()
     }
 
   vtksys_ios::ostringstream stream;
-  stream << "import paraview" << endl
-         << "paraview.fromFilter = True" << endl
-         << "from paraview import extract_selection as pv_es" << endl
+  stream << "from paraview import extract_selection as pv_es" << endl
          << "me = paraview.servermanager.vtkPythonExtractSelection('" << aplus << " ')" << endl
          << "pv_es.Exec(me, me.GetInputDataObject(0, 0),  me.GetInputDataObject(1, 0), me.GetOutputDataObject(0))" << endl
          << "del me" << endl;
 
-  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(
-    stream.str().c_str());
-  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->FlushMessages();
+  vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -394,6 +391,7 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
 vtkTable* vtkPythonExtractSelection::ExtractElements(
   vtkTable* vtkNotUsed(data), vtkCharArray* vtkNotUsed(mask))
 {
+  vtkErrorMacro("Not supported yet. Aborting for debugging purposes.");
   abort();
   return NULL;
 }

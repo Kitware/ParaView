@@ -14,15 +14,14 @@
 =========================================================================*/
 // .NAME vtkPythonAnimationCue
 // .SECTION Description
-//
+// vtkPythonAnimationCue is an animation cue that can execute arbitrary Python
+// scripts.
 
 #ifndef __vtkPythonAnimationCue_h
 #define __vtkPythonAnimationCue_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkAnimationCue.h"
-
-class vtkPVPythonInterpretor;
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonAnimationCue : public vtkAnimationCue
 {
@@ -52,11 +51,6 @@ protected:
   ~vtkPythonAnimationCue();
 
   // Description:
-  // Returns the interpretor. Creates a new one the first time this method is
-  // called.
-  vtkPVPythonInterpretor* GetInterpretor();
-
-  // Description:
   // Callbacks that forward the call to corresponding Python function.
   virtual void HandleStartCueEvent();
   virtual void HandleTickEvent();
@@ -68,7 +62,6 @@ protected:
 
   bool Enabled;
   char* Script;
-  vtkPVPythonInterpretor* Interpretor;  
 
 private:
   vtkPythonAnimationCue(const vtkPythonAnimationCue&); // Not implemented

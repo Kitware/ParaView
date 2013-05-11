@@ -29,85 +29,97 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #ifndef _pqPythonShell_h
 #define _pqPythonShell_h
 
-#include "pqPythonModule.h"
+#include "pqPythonModule.h" //  needed for PQPYTHON_EXPORT.
 #include <QWidget>
-/**
-  Qt widget that provides an interactive "shell" interface to an embedded Python interpreter.
-  You can put an instance of pqPythonShell in a dialog or a window, and the user will be able
-  to enter Python commands and see their output, while the UI is still responsive.
-  
-  \sa pqConsoleWidget, pqPythonDialog
-*/  
-  
+#include <QTimer>
+
 class vtkObject;
-class PQPYTHON_EXPORT pqPythonShell :
-  public QWidget
+class pqConsoleWidget;
+class vtkPythonInteractiveInterpreter;
+
+/// pqPythonShell is a QWidget subclass that provides an interactive Python
+/// shell. It uses vtkPythonInterpreter to provide an interactive Python
+/// terminal without starting a separate Python event loop.
+///
+/// Python will be initialized (if not already), when pqPythonShell is
+/// instantiated.
+///
+/// \sa pqConsoleWidget, pqPythonDialog.
+class PQPYTHON_EXPORT pqPythonShell : public QWidget
 {
   Q_OBJECT
-  
+  typedef QWidget Superclass; 
 public:
-  pqPythonShell(QWidget* Parent);
+  pqPythonShell(QWidget* parent=0, Qt::WindowFlags flags=0);
   ~pqPythonShell();
 
-  /// Initializes the interpretor. If an interpretor is already setup (by an
-  /// earlier call to this method), it will be destroyed.
-  void initializeInterpretor(int argc, char* argv[]);
-  void initializeInterpretor();
-
+public slots:
   /// Prints some text on the shell.
   void printMessage(const QString&);
 
-  /// Calls MakeCurrent in the internal vtkPVPythonInteractiveInterpretor instance
-  void makeCurrent();
-
-  /// Calls ReleaseControl in the internal vtkPVPythonInteractiveInterpretor instance
-  void releaseControl();
-
-  /// Given a python variable name, lookup its attributes and return them in a
-  /// string list.
-  QStringList getPythonAttributes(const QString& name);
-
-  /// Call this method to initialize the interpretor for ParaView GUI
-  /// applications. This is typically called right after
-  /// InitializeSubInterpretor().
-  void executeInitFromGUI();
-
-  void promptForInput();
-signals:
-  void executing(bool);
-  void getInputLine(QString& input);
-
-public slots:
+  /// Clears the terminal. This does not change the state of the Python
+  /// interpreter, just clears the text shown in the Widget.
   void clear();
+
+  /// Execute an arbitrary python script/string. This simply execute the Python
+  /// script in the global Python interpreter.
   void executeScript(const QString&);
 
+  /// Resets the python interactive interpreter. This does not affect the global
+  /// Python interpreter.
+  void reset();
+
+signals:
+  /// signal fired whenever the shell starts (starting=true) and finishes
+  /// (starting=false) executing a Python command/script. This can be used by
+  /// the UI to block user input while the script is executing.
+  void executing(bool starting);
+
+protected slots:
+  void pushScript(const QString&);
+
+protected:
+  pqConsoleWidget* ConsoleWidget;
+  vtkPythonInteractiveInterpreter* Interpreter;
+  const char* Prompt;
+
+  static const char* PS1() { return ">>> "; }
+  static const char* PS2() { return "... "; }
+
+  /// Called to setup the Python interpreter during startup or after the Python
+  /// environment was finalized.
+  void setupInterpreter();
+
+  enum PrintMode
+    {
+    STATUS,
+    OUTPUT,
+    ERROR
+    };
+
+  /// Use this method instead of calling pqConsoleWidget::printString()
+  /// directly. That helps us keep track of whether we need to show the prompt
+  /// or not.
+  void printString(const QString&, PrintMode mode=STATUS);
+
+  /// Show the user-input prompt, if needed. Returns true if the prompt was
+  /// re-rendered, otherwise false.
+  bool prompt(const QString& indent=QString());
+
+  void HandleInterpreterEvents(
+    vtkObject* caller, unsigned long eventid, void* calldata);
+
 private slots:
-  void printStderr(vtkObject*, unsigned long, void*, void*);
-  void printStdout(vtkObject*, unsigned long, void*, void*);
-
-  void readInputLine(vtkObject*, unsigned long, void*, void*);
-
-  void onExecuteCommand(const QString&);
-
-  void clearUndoStack();
+  void initPythonInterpreter();
 
 private:
-  pqPythonShell(const pqPythonShell&);
-  pqPythonShell& operator=(const pqPythonShell&);
+  Q_DISABLE_COPY(pqPythonShell);
 
-  void internalExecuteCommand(const QString&);
-
-  struct pqImplementation;
-  pqImplementation* const Implementation;
-
-  void printStderr(const QString&);
-  void printStdout(const QString&);
-
+  QTimer CreatePythonTimer;
+  bool Prompted;
 };
 
 #endif // !_pqPythonShell_h
-

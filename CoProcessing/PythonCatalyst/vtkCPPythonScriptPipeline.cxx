@@ -12,10 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// vtkPython is at the very beginning since it defines stuff
-// that will get defined elsewhere if it's not already defined
-#include "vtkPython.h"
-
 #include "vtkCPPythonScriptPipeline.h"
 
 #include "vtkCPDataDescription.h"
@@ -24,8 +20,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
-#include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
+#include "vtkPythonInterpreter.h"
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
@@ -40,8 +36,45 @@ extern "C" {
   void vtkPVInitializePythonModules();
 }
 
-// static member variable.
-vtkWeakPointer<vtkPVPythonInterpretor> vtkCPPythonScriptPipeline::GlobalPythonInterpretor;
+namespace
+{
+  //----------------------------------------------------------------------------
+  void InitializePython()
+    {
+    static bool initialized = false;
+    if (initialized) { return; }
+    initialized = true;
+
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_INSTALL_DIR "/lib");
+    vtkPythonInterpreter::PrependPythonPath(
+      PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION);
+    vtkPythonInterpreter::PrependPythonPath(
+      PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");
+
+    vtkPythonInterpreter::Initialize();
+    
+    // register callback to initialize modules statically. The callback is
+    // empty when BUILD_SHARED_LIBS is ON.
+    vtkPVInitializePythonModules();
+
+    vtksys_ios::ostringstream loadPythonModules;
+    loadPythonModules
+      << "import sys\n"
+      << "import paraview\n"
+      << "f1 = paraview.print_error\n"
+      << "f2 = paraview.print_debug_info\n"
+      << "def print_dummy(text):\n"
+      << "  pass\n"
+      << "paraview.print_error = print_dummy\n"
+      << "paraview.print_debug_info = print_dummy\n"
+      << "paraview.print_error = f1\n"
+      << "paraview.print_debug_info = f2\n"
+      << "import vtkPVCatalystPython\n";
+    vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
+    }
+}
 
 vtkStandardNewMacro(vtkCPPythonScriptPipeline);
 //----------------------------------------------------------------------------
@@ -54,7 +87,6 @@ vtkCPPythonScriptPipeline::vtkCPPythonScriptPipeline()
 vtkCPPythonScriptPipeline::~vtkCPPythonScriptPipeline()
 {
   this->SetPythonScriptName(0);
-  this->PythonInterpretor = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -66,12 +98,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
     return 0;
     }
 
-  vtkPVPythonInterpretor* interp = this->GetPythonInterpretor();
-  if (!interp)
-    {
-    vtkErrorMacro("Could not setup Python interpretor correctly.")
-    return 0;
-    }
+  InitializePython();
 
   // for now do not check on filename extension:
   //vtksys::SystemTools::GetFilenameLastExtension(FileName) == ".py" == 0)
@@ -87,8 +114,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
     << "sys.path.append('" << fileNamePath << "')\n"
     << "import " << fileNameName << "\n";
 
-  interp->RunSimpleString(loadPythonModules.str().c_str());
-  interp->FlushMessages();
+  vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
   return 1;
 }
 
@@ -102,11 +128,7 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
     return 0;
     }
 
-  vtkPVPythonInterpretor* interp = this->GetPythonInterpretor();
-  if (!interp)
-    {
-    return 0;
-    }
+  InitializePython();
 
   // check the script to see if it should be run...
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
@@ -116,8 +138,7 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
               << dataDescriptionString << "')\n"
               << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
 
-  interp->RunSimpleString(pythonInput.str().c_str());
-  interp->FlushMessages();
+  vtkPythonInterpreter::RunSimpleString(pythonInput.str().c_str());
 
   return dataDescription->GetIfAnyGridNecessary()? 1: 0;
 }
@@ -132,11 +153,7 @@ int vtkCPPythonScriptPipeline::CoProcess(
     return 0;
     }
 
-  vtkPVPythonInterpretor* interp = this->GetPythonInterpretor();
-  if (!interp)
-    {
-    return 0;
-    }
+  InitializePython();
 
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
@@ -146,8 +163,7 @@ int vtkCPPythonScriptPipeline::CoProcess(
     << dataDescriptionString << "')\n"
     << this->PythonScriptName << ".DoCoProcessing(dataDescription)\n";
 
-  interp->RunSimpleString(pythonInput.str().c_str());
-  interp->FlushMessages();
+  vtkPythonInterpreter::RunSimpleString(pythonInput.str().c_str());
 
   return 1;
 }
@@ -170,74 +186,6 @@ vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
 
   vtkStdString value = aplus;
   return value;
-}
-
-//----------------------------------------------------------------------------
-vtkPVPythonInterpretor* vtkCPPythonScriptPipeline::GetPythonInterpretor()
-{
-  if (this->PythonInterpretor == NULL)
-    {
-    this->PythonInterpretor.TakeReference(
-      vtkCPPythonScriptPipeline::NewPythonInterpretor());
-    }
-  return this->PythonInterpretor;
-}
-
-//----------------------------------------------------------------------------
-vtkPVPythonInterpretor* vtkCPPythonScriptPipeline::NewPythonInterpretor()
-{
-  if (vtkCPPythonScriptPipeline::GlobalPythonInterpretor)
-    {
-    vtkCPPythonScriptPipeline::GlobalPythonInterpretor->Register(NULL);
-    return vtkCPPythonScriptPipeline::GlobalPythonInterpretor;
-    }
-
-  // create and setup a new interpretor.
-  vtkNew<vtkPVPythonInterpretor> interp;
-
-  // register callback to initialize modules statically. The callback is
-  // empty when BUILD_SHARED_LIBS is ON.
-  vtkPVInitializePythonModules();
-
-  int argc = 1;
-  char* argv[1];;
-  std::string CWD = vtksys::SystemTools::GetCurrentWorkingDirectory();
-  argv[0] = new char[CWD.size()+1];
-#ifdef COPROCESSOR_WIN32_BUILD
-  strcpy_s(argv[0], strlen(CWD.c_str()), CWD.c_str());
-#else
-  strcpy(argv[0], CWD.c_str());
-#endif
-
-  interp->InitializeSubInterpretor(argc, argv);
-  interp->AddPythonPath(PARAVIEW_INSTALL_DIR "/lib");
-  interp->AddPythonPath(
-    PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
-  interp->AddPythonPath(PARAVIEW_BINARY_DIR "/lib");
-  interp->AddPythonPath(
-    PARAVIEW_BINARY_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
-
-  vtksys_ios::ostringstream loadPythonModules;
-  loadPythonModules
-    << "import sys\n"
-    << "import paraview\n"
-    << "f1 = paraview.print_error\n"
-    << "f2 = paraview.print_debug_info\n"
-    << "def print_dummy(text):\n"
-    << "  pass\n"
-    << "paraview.print_error = print_dummy\n"
-    << "paraview.print_debug_info = print_dummy\n"
-    << "from paraview.simple import *\n"
-    << "paraview.print_error = f1\n"
-    << "paraview.print_debug_info = f2\n"
-    << "import vtkPVCatalystPython\n";
-  interp->RunSimpleString(loadPythonModules.str().c_str());
-  interp->FlushMessages();
-  delete []argv[0];
-
-  vtkCPPythonScriptPipeline::GlobalPythonInterpretor = interp.GetPointer();
-  interp->Register(NULL);
-  return interp.GetPointer();
 }
 
 //----------------------------------------------------------------------------

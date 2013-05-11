@@ -31,13 +31,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <vtkPython.h> // Python first
 #include "pqPythonManager.h"
+
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqPythonDialog.h"
 #include "pqPythonMacroSupervisor.h"
-#include "pqPythonShell.h"
 #include "pqPythonScriptEditor.h"
+#include "pqPythonShell.h"
 #include "pqSettings.h"
+#include "vtkCommand.h"
+#include "vtkNew.h"
+#include "vtkPVConfig.h"
+#include "vtkPythonInterpreter.h"
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.
@@ -60,16 +65,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTimer>
 
+#define __mySTR_HELPER(x) #x
+#define __mySTR(x) __mySTR_HELPER(x)
+
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
 {
+  vtkNew<vtkPythonInterpreter> DummyInterpreter;
+  void interpreterInitialized()
+    {
+    const char* command = "try:\n"
+                          "  import paraview\n"
+                          "  paraview.fromGUI = True\n"
+                          "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
+                          "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
+                          "except: pass\n";
+    vtkPythonInterpreter::RunSimpleString(command);
+    }
+
 public:
   pqInternal() : Editor(NULL) 
-  {};
+  {
+  // Setup initializer so that whenever Python is initialized, we can set the
+  // "paraview.fromGUI" to true.
+  this->DummyInterpreter->AddObserver(vtkCommand::EnterEvent,
+    this, &pqPythonManager::pqInternal::interpreterInitialized);
+  }
+
   QTimer                              StatusBarUpdateTimer;
   QPointer<pqPythonDialog>            PythonDialog;
   QPointer<pqPythonMacroSupervisor>   MacroSupervisor;
-  QPointer<pqServer>                  ActiveServer;
   bool                                IsPythonTracing;
   QPointer<pqPythonScriptEditor>      Editor;
 };
@@ -98,14 +123,6 @@ pqPythonManager::pqPythonManager(QObject* _parent/*=null*/) :
   this->connect(core->getServerManagerModel(),
       SIGNAL(aboutToRemoveServer(pqServer*)),
       this, SLOT(onRemovingServer(pqServer*)));
-
-  // Listen for signal when server is finished being created
-  this->connect(core->getObjectBuilder(), 
-    SIGNAL(finishedAddingServer(pqServer*)),
-    this, SLOT(onServerCreationFinished(pqServer*)));
-  this->connect(core->getObjectBuilder(),
-    SIGNAL(activeServerChanged(pqServer*)),
-    this, SLOT(onServerCreationFinished(pqServer*)));
 
   // Init Python tracing ivar
   this->Internal->IsPythonTracing = false;
@@ -152,36 +169,9 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     this->Internal->PythonDialog =
       new pqPythonDialog(pqCoreUtilities::mainWidget());
-
-    // Initialize the interpreter and then import paraview modules
-    this->Internal->PythonDialog->initializeInterpretor();
-    this->initializeParaviewPythonModules();
-
-    // Listen for the signal when the interpreter is reset so we can
-    // reimport the paraview modules.  Note, this signal is connected
-    // AFTER the two initialization calls above.
-    this->connect(this->Internal->PythonDialog,
-      SIGNAL(interpreterInitialized()),
-      SLOT(onPythonInterpreterInitialized()));
-
     QApplication::restoreOverrideCursor();
     }
   return this->Internal->PythonDialog;
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonManager::initializeParaviewPythonModules()
-{
-  // If there is an active server, import the paraview modules and initialize
-  // the servermanager.ActiveConnection object.
-  pqServer* activeServer = this->Internal->ActiveServer;
-  if (activeServer)
-    {
-    //this->Internal->PythonDialog->print("from paraview.simple import *\n");
-    this->Internal->PythonDialog->shell()->executeInitFromGUI();
-    this->Internal->PythonDialog->shell()->promptForInput();
-    emit this->paraviewPythonModulesImported();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -201,12 +191,6 @@ void pqPythonManager::addWidgetForDeleteMacros(QWidget* widget)
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::onPythonInterpreterInitialized()
-{
-  this->initializeParaviewPythonModules();
-}
-
-//-----------------------------------------------------------------------------
 void pqPythonManager::executeScript(const QString & filename)
 {
   pqPythonDialog* dialog = this->pythonShellDialog();
@@ -216,39 +200,25 @@ void pqPythonManager::executeScript(const QString & filename)
 //-----------------------------------------------------------------------------
 void pqPythonManager::onRemovingServer(pqServer* /*server*/)
 {
-  // Clear our stored pointer to the active server.
-  this->Internal->ActiveServer = 0;
-
-  // If the interpreter has been initialized then we need to reset it because
-  // the active server is about to be destroyed.  Later, when a new server
-  // is created we will catch the signal in onServerCreationFinished and then
-  // re-import the paraview modules.
-  if (this->interpreterIsInitialized())
+  if (this->Internal->PythonDialog)
     {
-    this->pythonShellDialog()->initializeInterpretor();
+    // Destroy the Python shell. A new one will be created on-idle.
+    vtkPythonInterpreter::Finalize();
     }
 }
 
-//-----------------------------------------------------------------------------
-void pqPythonManager::onServerCreationFinished(pqServer* server)
-{
-  this->Internal->ActiveServer = server;
-  // Initialize interpretor using the new server connection.
-  if (this->interpreterIsInitialized())
-    {
-    this->initializeParaviewPythonModules();
-    }
-}
 //-----------------------------------------------------------------------------
 bool pqPythonManager::canStartTrace()
 {
   return !this->Internal->IsPythonTracing;
 }
+
 //-----------------------------------------------------------------------------
 bool pqPythonManager::canStopTrace()
 {
   return this->Internal->IsPythonTracing;
 }
+
 //-----------------------------------------------------------------------------
 void pqPythonManager::startTrace()
 {
@@ -268,6 +238,7 @@ void pqPythonManager::startTrace()
     emit canStopTrace(canStopTrace());
     }
 }
+
 //-----------------------------------------------------------------------------
 void pqPythonManager::stopTrace()
 {
@@ -287,6 +258,7 @@ void pqPythonManager::stopTrace()
     emit canStopTrace(canStopTrace());
     }
 }
+
 //----------------------------------------------------------------------------
 QString pqPythonManager::getTraceString()
 {
@@ -296,7 +268,6 @@ QString pqPythonManager::getTraceString()
     {
     pyDiag->runString("from paraview import smtrace\n"
                       "__smtraceString = smtrace.get_trace_string()\n");
-    pyDiag->shell()->makeCurrent();
     PyObject* main_module = PyImport_AddModule((char*)"__main__");
     PyObject* global_dict = PyModule_GetDict(main_module);
     PyObject* string_object = PyDict_GetItemString(
@@ -306,10 +277,10 @@ QString pqPythonManager::getTraceString()
       {
       traceString = string_ptr;
       }
-    pyDiag->shell()->releaseControl();
     }
   return traceString;
 }
+
 //-----------------------------------------------------------------------------
 void pqPythonManager::editTrace()
 {
@@ -339,7 +310,6 @@ QString pqPythonManager::getPVModuleDirectory()
     {
     pyDiag->runString("import os\n"
                       "__pvModuleDirectory = os.path.dirname(paraview.__file__)\n");
-    pyDiag->shell()->makeCurrent();
     PyObject* main_module = PyImport_AddModule((char*)"__main__");
     PyObject* global_dict = PyModule_GetDict(main_module);
     PyObject* string_object = PyDict_GetItemString(
@@ -349,7 +319,6 @@ QString pqPythonManager::getPVModuleDirectory()
       {
       dirString = string_ptr;
       }
-    pyDiag->shell()->releaseControl();
     }
   return dirString;
 }

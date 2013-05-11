@@ -42,9 +42,9 @@ A simple example:
 #==============================================================================
 import paraview, re, os, os.path, new, sys, atexit, vtk
 
-if not paraview.compatibility.minor:
-    paraview.compatibility.major = 3
 if not paraview.compatibility.major:
+    paraview.compatibility.major = 3
+if not paraview.compatibility.minor:
     paraview.compatibility.minor = 5
 
 from vtkPVServerImplementationCorePython import *
@@ -1969,30 +1969,6 @@ def LoadState(filename, connection=None):
             view.GetRenderWindow().SetSize(view.ViewSize[0], \
                                            view.ViewSize[1])
 
-def InitFromGUI():
-    """
-    Method used to initialize the Python Shell from the ParaView GUI.
-    """
-    global fromGUI, ActiveConnection
-    if not fromGUI:
-       paraview.print_debug_info("from paraview.simple import *")
-    fromGUI = True
-    # ToggleProgressPrinting() ### FIXME COLLABORATION
-    enableMultiServer(vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport())
-    iter = vtkProcessModule.GetProcessModule().NewSessionIterator();
-    iter.InitTraversal()
-    ActiveConnection = None
-    activeSession = vtkSMProxyManager.GetProxyManager().GetActiveSession()
-    tmpActiveConnection = None
-    while not iter.IsDoneWithTraversal():
-       c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
-       if c.Session == activeSession:
-          tmpActiveConnection = c
-       iter.GoToNextItem()
-    iter.UnRegister(None)
-    if tmpActiveConnection:
-       ActiveConnection = tmpActiveConnection
-
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
     Use this function call to create a new session. On success,
@@ -2042,8 +2018,7 @@ def Disconnect(session=None):
     first."""
     global ActiveConnection
     global MultiServerConnections
-    global fromGUI
-    if fromGUI:
+    if paraview.fromGUI:
         # Let the UI know that we want to disconnect
         ActiveConnection.Session.InvokeEvent('ExitEvent')
         return
@@ -2379,7 +2354,7 @@ def SetProgressPrintingEnabled(value):
 
     # If value is true and progress printing is currently off...
     if value and not GetProgressPrintingIsEnabled():
-        if fromGUI:
+        if paraview.fromGUI:
             raise RuntimeError("Printing progress in the GUI is not supported.")
         progressObserverTag = vtkProcessModule.GetProcessModule().AddObserver(\
             "ProgressEvent", _printProgress)
@@ -3058,8 +3033,8 @@ if not vtkProcessModule.GetProcessModule():
 progressObserverTag = None
 currentAlgorithm = False
 currentProgress = 0
-fromGUI = False
-ToggleProgressPrinting()
+if not paraview.fromGUI:
+    ToggleProgressPrinting()
 
 _pyproxies = {}
 
@@ -3079,11 +3054,7 @@ def __InitAfterConnect__(connection):
     """
     _createModules(connection.Modules)
 
-    if not paraview.fromFilter:
-        # fromFilter is set when this module is imported from the programmable
-        # filter
-        connection.AttachDefinitionUpdater()
-        pass
+    connection.AttachDefinitionUpdater()
 
 def __exposeActiveModules__():
     """Update servermanager submodules to point to the current
@@ -3115,4 +3086,23 @@ def GetConnectionAt(index):
 def GetNumberOfConnections():
    return len(MultiServerConnections)
 
-atexit.register(vtkPythonProgrammableFilter.DeleteGlobalPythonInterpretor)
+def __initialize():
+    """Does initialization of the module, ensuring that the module's state
+        correctly reflects that of the ProcessModule/ServerManager."""
+    global ActiveConnection
+    # ToggleProgressPrinting() ### FIXME COLLABORATION
+    enableMultiServer(vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport())
+    iter = vtkProcessModule.GetProcessModule().NewSessionIterator();
+    iter.InitTraversal()
+    ActiveConnection = None
+    activeSession = vtkSMProxyManager.GetProxyManager().GetActiveSession()
+    tmpActiveConnection = None
+    while not iter.IsDoneWithTraversal():
+       c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
+       if c.Session == activeSession:
+          tmpActiveConnection = c
+       iter.GoToNextItem()
+    iter.UnRegister(None)
+    if tmpActiveConnection:
+       ActiveConnection = tmpActiveConnection
+__initialize()

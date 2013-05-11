@@ -55,13 +55,13 @@ def Disconnect(ns=None, force=True):
        if ns:
           _remove_functions(ns)
        _remove_functions(globals())
-       if not servermanager.fromGUI:
+       if not paraview.fromGUI:
           servermanager.ProxyManager().DisableStateUpdateNotification()
           servermanager.ProxyManager().UnRegisterProxies()
        active_objects.view = None
        active_objects.source = None
        servermanager.Disconnect()
-       if not servermanager.fromGUI:
+       if not paraview.fromGUI:
           import gc
           gc.collect()
 
@@ -74,28 +74,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     Disconnect(globals(), False)
     connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     _add_functions(globals())
-
-    servermanager.ProxyManager().DisableStateUpdateNotification()
-    servermanager.ProxyManager().UpdateFromRemote()
-    tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
-    if not tk:
-       try:
-           tk = servermanager.misc.TimeKeeper()
-           servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
-       except AttributeError:
-           paraview.print_error("Error: Could not create TimeKeeper")
-
-    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
-    if not scene:
-       try:
-           scene = AnimationScene()
-           scene.TimeKeeper = tk
-       except NameError:
-           paraview.print_error("Error: Could not create AnimationScene")
-
-    servermanager.ProxyManager().EnableStateUpdateNotification()
-    servermanager.ProxyManager().TriggerStateUpdate()
-
+    _CreateEssentialProxies()
     return connection
 
 def ReverseConnect(port=11111):
@@ -104,22 +83,7 @@ def ReverseConnect(port=11111):
     Disconnect(globals(), False)
     connection = servermanager.ReverseConnect(port)
     _add_functions(globals())
-
-    servermanager.ProxyManager().DisableStateUpdateNotification()
-    servermanager.ProxyManager().UpdateFromRemote()
-    tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
-    if not tk:
-       tk = servermanager.misc.TimeKeeper()
-       servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
-
-    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
-    if not scene:
-       scene = AnimationScene()
-       scene.TimeKeeper = tk
-
-    servermanager.ProxyManager().EnableStateUpdateNotification()
-    servermanager.ProxyManager().TriggerStateUpdate()
-
+    _CreateEssentialProxies()
     return connection
 
 def _create_view(view_xml_name):
@@ -1170,10 +1134,38 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     SetDisplayProperties(ColorArrayName = "Pres")
     Render()
 
+
+def _CreateEssentialProxies():
+    """Ensures that essetial proxies like TimeKeeper and AnimationScene are
+       present and are created if not"""
+
+    servermanager.ProxyManager().DisableStateUpdateNotification()
+    servermanager.ProxyManager().UpdateFromRemote()
+    tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
+    if not tk:
+       try:
+           tk = servermanager.misc.TimeKeeper()
+           servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
+       except AttributeError:
+           paraview.print_error("Error: Could not create TimeKeeper")
+
+    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
+    if not scene:
+       try:
+           scene = AnimationScene()
+           scene.TimeKeeper = tk
+       except NameError:
+           paraview.print_error("Error: Could not create AnimationScene")
+
+    servermanager.ProxyManager().EnableStateUpdateNotification()
+    servermanager.ProxyManager().TriggerStateUpdate()
+
+
 if not servermanager.ActiveConnection:
     Connect()
 else:
     _add_functions(globals())
+    _CreateEssentialProxies()
 
 active_objects = ActiveObjects()
 

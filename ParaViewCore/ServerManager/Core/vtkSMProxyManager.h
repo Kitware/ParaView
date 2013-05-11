@@ -151,7 +151,6 @@ public:
   // is essential that it's configured correctly.
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
 
-//BTX
 
   enum eventId
     {
@@ -194,6 +193,7 @@ public:
     vtkPVXMLElement* StateChangeElement;
     };
 
+//BTX
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
