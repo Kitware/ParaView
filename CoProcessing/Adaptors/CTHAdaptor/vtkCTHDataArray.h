@@ -68,7 +68,7 @@ public:
   //BTX
   vtkIdType LookupValue (vtkVariant value);
   void LookupValue (vtkVariant value, vtkIdList* ids);
-  void SetVariantValue (vtkIdType index, vtkVariant value) { /* TODO */ } 
+  void SetVariantValue (vtkIdType vtkNotUsed(index), vtkVariant vtkNotUsed(value)) { /* TODO */ } 
   //ETX
 
   // Description:
@@ -190,7 +190,7 @@ public:
     return this->Fallback->WriteVoidPointer (i, j);
   }
 
-  void DeepCopy (vtkAbstractArray* aa)
+  virtual void DeepCopy (vtkAbstractArray* aa)
   { 
     this->BuildFallback ();
     return this->Fallback->DeepCopy (aa);
