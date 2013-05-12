@@ -196,6 +196,11 @@ public:
     return this->Fallback->DeepCopy (aa);
   }
 
+  virtual void DeepCopy(vtkDataArray *da)
+  {
+    return this->DeepCopy( (vtkAbstractArray*) da); 
+  }
+
   void SetVoidArray (void *p, vtkIdType id, int i)
   { 
     this->BuildFallback ();
