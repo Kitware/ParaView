@@ -458,7 +458,8 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities()
 
   if(ivp)
     {
-    for(vtkIdType i = 0; i + 1 < ivp->GetNumberOfElements(); i += 2)
+    vtkIdType nbElems = static_cast<vtkIdType>(ivp->GetNumberOfElements());
+    for(vtkIdType i = 0; i + 1 < nbElems; i += 2)
       {
       this->BlockVisibilites[ivp->GetElement(i)] = ivp->GetElement(i+1);
       }
