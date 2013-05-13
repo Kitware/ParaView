@@ -11,7 +11,6 @@
 #include "vtkImageData.h"
 
 // Fortran specific header
-//#include "FortranPythonAdaptorAPI.h"
 #include "vtkCPPythonAdaptorAPI.h"
 
 
@@ -20,7 +19,8 @@
 // since VTK/ParaView uses different internal layouts for each.
 
 // Creates the data container for the CoProcessor.
-extern "C" void createcpimagedata_(int* nx, int* ny, int* nz)
+extern "C" void createcpimagedata_(int* nxstart, int* nxend, int* nx,
+                                   int* ny, int* nz)
 {
   if (!vtkCPPythonAdaptorAPI::GetCoProcessorData())
     {
@@ -30,12 +30,12 @@ extern "C" void createcpimagedata_(int* nx, int* ny, int* nz)
 
   // The simulation grid is a 2-dimensional topologically and geometrically
   // regular grid. In VTK/ParaView, this is considered an image data set.
-  vtkSmartPointer<vtkImageData> Grid = vtkSmartPointer<vtkImageData>::New();
+  vtkSmartPointer<vtkImageData> grid = vtkSmartPointer<vtkImageData>::New();
 
-  Grid->SetExtent(0, *nx-1, 0, *ny-1, 0, *nz-1);
+  grid->SetExtent(*nxstart-1, *nxend-1, 0, *ny-1, 0, *nz-1);
 
   // Name should be consistent between here, Fortran and Python client script.
-  vtkCPPythonAdaptorAPI::GetCoProcessorData()->GetInputDescriptionByName("input")->SetGrid(Grid);
+  vtkCPPythonAdaptorAPI::GetCoProcessorData()->GetInputDescriptionByName("input")->SetGrid(grid);
   vtkCPPythonAdaptorAPI::GetCoProcessorData()->GetInputDescriptionByName("input")->SetWholeExtent(0, *nx-1, 0, *ny-1, 0, *nz-1);
 }
 

@@ -7,10 +7,10 @@ module tcp
     end interface
     contains
 
-subroutine testcoprocessor(nx,ny,nz,step,time,psi01)
+subroutine testcoprocessor(nxstart,nxend,nx,ny,nz,step,time,psi01)
   use iso_c_binding
   implicit none
-  integer, intent(in) :: nx,ny,nz,step
+  integer, intent(in) :: nxstart,nxend,nx,ny,nz,step
   real(kind=8), intent(in) :: time
   complex(kind=8), dimension(:,:,:), intent (in) :: psi01
   integer :: flag
@@ -18,7 +18,7 @@ subroutine testcoprocessor(nx,ny,nz,step,time,psi01)
   if (flag .ne. 0) then
     call needtocreategrid(flag)
     if (flag .ne. 0) then
-      call createcpimagedata(nx,nz,nz)
+      call createcpimagedata(nxstart,nxend,nx,nz,nz)
     end if
     ! adding //char(0) appends the C++ terminating character
     ! to the Fortran array
