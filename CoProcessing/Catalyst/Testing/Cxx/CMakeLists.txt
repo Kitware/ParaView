@@ -3,3 +3,7 @@ vtk_module_test_executable(SimpleDriver2 SimpleDriver2.cxx)
 vtk_module_test_executable(AdaptorDriver
   AdaptorDriver.cxx
   vtkCustomUnstructuredGridBuilder.cxx)
+vtk_module_test_executable(CoProcessingTestOutputs CoProcessingTestOutputs.cxx)
+add_test(NAME CoProcessingTestOutputs
+  COMMAND CoProcessingTestOutputs)
+set_tests_properties(CoProcessingTestOutputs PROPERTIES LABELS "PARAVIEW;CATALYST")

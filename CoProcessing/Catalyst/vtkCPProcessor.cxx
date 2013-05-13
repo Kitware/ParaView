@@ -156,6 +156,11 @@ int vtkCPProcessor::RequestDataDescription(
     vtkWarningMacro("DataDescription is NULL.");
     return 0;
     }
+  if(dataDescription->GetForceOutput() == true)
+    {
+    return 1;
+    }
+
   dataDescription->ResetInputDescriptions();
   int doCoProcessing = 0;
   for(vtkCPProcessorInternals::PipelineListIterator iter =
@@ -183,9 +188,13 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
         this->Internal->Pipelines.begin();
       iter!=this->Internal->Pipelines.end();iter++)
     {
-    if(!iter->GetPointer()->CoProcess(dataDescription))
+    if(dataDescription->GetForceOutput() == true ||
+       iter->GetPointer()->RequestDataDescription(dataDescription))
       {
-      success = 0;
+      if(!iter->GetPointer()->CoProcess(dataDescription))
+        {
+        success = 0;
+        }
       }
     }
   // we want to reset everything here to make sure that new information
