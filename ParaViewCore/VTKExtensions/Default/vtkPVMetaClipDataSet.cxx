@@ -132,3 +132,46 @@ void vtkPVMetaClipDataSet::SetInsideOut(int insideOut)
   this->Internal->ExtractCells->SetExtractInside(insideOut);
   this->Modified();
 }
+
+//----------------------------------------------------------------------------
+bool vtkPVMetaClipDataSet::SwitchFilterForCrinkle()
+{
+  if(!this->Internal->ExtractCells->GetImplicitFunction() &&
+    this->GetActiveFilter() == this->Internal->ExtractCells.GetPointer())
+    {
+    // We can not use vtkExtractGeometry without the ImplicitFunction being set
+    this->PreserveInputCells(0);
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVMetaClipDataSet::ProcessRequest(
+    vtkInformation *request,
+    vtkInformationVector **inputVector,
+    vtkInformationVector *outputVector)
+{
+  bool needSwitch = this->SwitchFilterForCrinkle();
+  int res = this->Superclass::ProcessRequest(request, inputVector, outputVector);
+  if(needSwitch)
+    {
+    this->PreserveInputCells(1);
+    }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVMetaClipDataSet::ProcessRequest(
+    vtkInformation *request,
+    vtkCollection *inputVector,
+    vtkInformationVector *outputVector)
+{
+  bool needSwitch = this->SwitchFilterForCrinkle();
+  int res = this->Superclass::ProcessRequest(request, inputVector, outputVector);
+  if(needSwitch)
+    {
+    this->PreserveInputCells(1);
+    }
+  return res;
+}

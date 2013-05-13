@@ -79,7 +79,7 @@ public:
 
   // Description:
   // Forward those methods to the underneath filters
-  int ProcessRequest(vtkInformation* request,
+  virtual int ProcessRequest(vtkInformation* request,
                      vtkCollection* inInfo,
                      vtkInformationVector* outInfo);
 

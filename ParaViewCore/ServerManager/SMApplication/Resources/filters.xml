@@ -5363,6 +5363,9 @@ found and the point will be rejected.</Documentation>
         <Documentation>This parameter controls whether to extract entire cells
         in the given region or clip those cells so all of the output one stay
         only inside that region.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ClipScalarsDecorator" exclude="1" />
+        </Hints>
       </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
@@ -5737,7 +5740,7 @@ found and the point will be rejected.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Hints>
-          <PropertyWidgetDecorator type="StructuredInputDecorator" />
+          <PropertyWidgetDecorator type="InputDataTypeDecorator" name="Structured" />
         </Hints>
         <Documentation>If this property is set to 1, a scalar array containing
         a gradient value at each point in the isosurface or isoline will be
@@ -8005,7 +8008,9 @@ found and the point will be rejected.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Hints>
-          <PropertyWidgetDecorator type="NonPolyDataInputDecorator" />
+          <PropertyWidgetDecorator type="InputDataTypeDecorator"
+                                   name="vtkPolyData"
+                                   exclude="1" />
         </Hints>
         <Documentation>Select whether to compute normals.</Documentation>
       </IntVectorProperty>

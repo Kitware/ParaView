@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqNonPolyDataInputDecorator.h"
+#include "pqInputDataTypeDecorator.h"
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
@@ -43,9 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
-pqNonPolyDataInputDecorator::pqNonPolyDataInputDecorator(
+pqInputDataTypeDecorator::pqInputDataTypeDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject),
   ObserverId(0)
@@ -55,7 +56,7 @@ pqNonPolyDataInputDecorator::pqNonPolyDataInputDecorator(
   if (!prop)
     {
     qDebug("Could not locate property named 'Input'. "
-      "pqNonPolyDataInputDecorator will have no effect.");
+      "pqInputDataTypeDecorator will have no effect.");
     return;
     }
 
@@ -66,7 +67,7 @@ pqNonPolyDataInputDecorator::pqNonPolyDataInputDecorator(
 }
 
 //-----------------------------------------------------------------------------
-pqNonPolyDataInputDecorator::~pqNonPolyDataInputDecorator()
+pqInputDataTypeDecorator::~pqInputDataTypeDecorator()
 {
   if (this->ObservedObject && this->ObserverId)
     {
@@ -75,7 +76,7 @@ pqNonPolyDataInputDecorator::~pqNonPolyDataInputDecorator()
 }
 
 //-----------------------------------------------------------------------------
-bool pqNonPolyDataInputDecorator::enableWidget() const
+bool pqInputDataTypeDecorator::enableWidget() const
 {
   pqPropertyWidget* parentObject = this->parentWidget();
   vtkSMProxy* proxy = parentObject->proxy();
@@ -94,10 +95,33 @@ bool pqNonPolyDataInputDecorator::enableWidget() const
     pqOutputPort* cur_input = NULL;
     QList<pqOutputPort*> ports = source->getOutputPorts();
     cur_input = ports.size() > 0? ports[0] : NULL;
-    if (cur_input)
+    int exclude = 0;
+    if(!this->xml()->GetScalarAttribute("exclude", &exclude))
+      {
+      exclude = 0;
+      }
+    const char* dataname = this->xml()->GetAttribute("name");
+    if (cur_input && dataname)
       {
       vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
-      return !dataInfo->DataSetTypeIsA("vtkPolyData");
+      bool match = (dataInfo->IsDataStructured() &&
+                   !strcmp(dataname, "Structured")) ||
+                   (dataInfo->DataSetTypeIsA(dataname));
+      if(exclude)
+        {
+        if(match)
+          {
+          return false;
+          }
+        }
+      else if(!match)
+        {
+        return false;
+        }
+      }
+    else
+      {
+      return false;
       }
     }
 

@@ -980,10 +980,10 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
 
   int row_index = 0;
   const pqProxyWidgetItem* prevItem = NULL;
+  vtkSMProxy* smProxy = this->Internals->Proxy;
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
     {
-    bool visible = item->canShowWidget(
-      show_advanced, filterText, this->Internals->Proxy);
+    bool visible = item->canShowWidget(show_advanced, filterText, smProxy);
     if (visible)
       {
       bool enabled = item->enableWidget();

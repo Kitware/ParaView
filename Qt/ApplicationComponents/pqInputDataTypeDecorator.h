@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqNonPolyDataInputDecorator_h
-#define __pqNonPolyDataInputDecorator_h
+#ifndef __pqInputDataTypeDecorator_h
+#define __pqInputDataTypeDecorator_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidgetDecorator.h"
@@ -38,24 +38,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkObject;
 
-/// pqNonPolyDataInputDecorator is a pqPropertyWidgetDecorator subclass.
-/// For certain properties, they should update the enable state based on
-/// input data types. This decorator is used to enable a property widget
-/// only when an input data type is a Non-polydata.
-/// For example, "Computer Normals" in Contour filter.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqNonPolyDataInputDecorator : public pqPropertyWidgetDecorator
+/// pqInputDataTypeDecorator is a pqPropertyWidgetDecorator subclass.
+/// For certain properties, they should update the enable state
+/// based on input data types.
+/// For example, "Computer Gradients" in Contour filter should only
+/// be enabled when an input data type is a StructuredData. Please see
+/// vtkPVDataInformation::IsDataStructured() for structured types.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqInputDataTypeDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
   typedef pqPropertyWidgetDecorator Superclass;
 public:
-  pqNonPolyDataInputDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  virtual ~pqNonPolyDataInputDecorator();
+  pqInputDataTypeDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
+  virtual ~pqInputDataTypeDecorator();
 
   /// Overridden to enable/disable the widget based on input data type.
   virtual bool enableWidget() const;
 
 private:
-  Q_DISABLE_COPY(pqNonPolyDataInputDecorator)
+  Q_DISABLE_COPY(pqInputDataTypeDecorator)
 
   vtkWeakPointer<vtkObject> ObservedObject;
   unsigned long ObserverId;
