@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkSMSessionProxyManager.h>
 #include <vtkSMViewProxy.h>
 
 #include <vtksys/SystemTools.hxx>
@@ -189,7 +190,7 @@ void pqImageOutputInfo::setupScreenshotInfo()
   vtkSmartPointer<vtkImageData> image;
   image.TakeReference(this->View->captureImage(thumbnailSize));
   vtkNew<vtkPNGWriter> pngWriter;
-  pngWriter->SetInput(image);
+  pngWriter->SetInputData(image);
   pngWriter->WriteToMemoryOn();
   pngWriter->Update();
   pngWriter->Write();
@@ -421,7 +422,8 @@ bool pqTPExportStateWizard::validateCurrentPage()
     export_rendering = "False";
     // check to make sure that there is a writer hooked up since we aren't
     // exporting an image
-    vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* proxyManager =
+        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
     pqServerManagerModel* smModel =
       pqApplicationCore::instance()->getServerManagerModel();
     bool haveSomeWriters = false;

@@ -97,10 +97,7 @@ import paraview
 paraview.servermanager.misc.GlobalMapperProperties.GlobalImmediateModeRendering = 1
 
 # trying to import the library where I can specify the global and subcontrollers
-try:
-    import libvtkParallelPython as vtkParallel # requires LD_LIBRARY_PATH being properly set
-except ImportError:
-    import vtkParallelPython as vtkParallel # for a static build, i.e. jaguarpf, use this instead and don't worry about LD_LIBRARY_PATH
+import vtkParallelCorePython
 
 paraview.options.batch = True # this may not be necessary
 paraview.simple._DisableFirstRenderCameraReset()
@@ -122,8 +119,7 @@ def CreateTimeCompartments(globalController, timeCompartmentSize):
     if newController.GetReferenceCount() > 1:
         newController.UnRegister(None)
 
-    #print gid, timeCompartmentGroupId, gid %% timeCompartmentSize
-    print gid, ' of global comm is ', newController.GetLocalProcessId()
+    #print gid, ' of global comm is ', newController.GetLocalProcessId()
     globalController.SetGlobalController(newController)
     return newController
 
@@ -173,7 +169,7 @@ def WriteFiles(currentTimeStep, currentTime, writers):
 def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, writers, views):
     currentTimeStep = UpdateCurrentTimeStep(globalController, timeCompartmentSize)
     while currentTimeStep < len(timeSteps):
-        print globalController.GetLocalProcessId(), " is working on ", currentTimeStep
+        #print globalController.GetLocalProcessId(), " is working on ", currentTimeStep
         WriteImages(currentTimeStep, timeSteps[currentTimeStep], views)
         WriteFiles(currentTimeStep, timeSteps[currentTimeStep], writers)
         currentTimeStep = UpdateCurrentTimeStep(globalController, timeCompartmentSize)

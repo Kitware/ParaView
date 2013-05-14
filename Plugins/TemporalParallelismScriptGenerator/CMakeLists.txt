@@ -1,15 +1,9 @@
-# Include other cmake fiels
-INCLUDE(wrap-python.cmake)
-
 #--------------------------------------------------
 # Find and Use ParaView
 #--------------------------------------------------
 IF (ParaView_SOURCE_DIR)
   INCLUDE_DIRECTORIES(
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-    ${VTK_INCLUDE_DIR}
+    ${VTK_INCLUDE_DIRS}
   )
 ELSE (ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
@@ -29,11 +23,7 @@ SET (TP_SOURCES
   pqTPActionsGroup.h
   pqTPExportStateWizard.cxx
   pqTPExportStateWizard.h
-  vtkTPTest.cxx
 )
-
-SET (TP_RESOURCES
-  Resources/Writers.xml)
 
 SET (UI_RESOURCES
   Resources/ExportStateWizard.ui
@@ -70,17 +60,16 @@ ADD_PARAVIEW_AUTO_START(
   PARAVIEW_PLUGIN_SRCS2
   CLASS_NAME pqTPPluginManager)
 
-
 ADD_CUSTOM_COMMAND(
   OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/tp_export_py.cxx"
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tp_export.py"
-  COMMAND ${VTK_ENCODESTRING_EXE}
+  COMMAND vtkEncodeString
   ARGS "${CMAKE_CURRENT_BINARY_DIR}/tp_export_py.cxx"
        "${CMAKE_CURRENT_SOURCE_DIR}/tp_export.py"
        tp_export_py)
 
 ADD_PARAVIEW_PLUGIN(
-  TemporalParallelismPlugin
+  TemporalParallelismScriptGenerator
   "0.1.0"
   SERVER_MANAGER_XML Resources/servermanager.xml
   GUI_INTERFACES
@@ -93,10 +82,4 @@ ADD_PARAVIEW_PLUGIN(
     ${PARAVIEW_PLUGIN_SRCS}
     ${PARAVIEW_PLUGIN_SRCS2}
     tp_export_py.cxx
-  GUI_RESOURCE_FILES
-    ${TP_RESOURCES}
 )
-
-if(VTK_WRAP_PYTHON)
-  wrap_python(TemporalParallelismPlugin "vtkTPTest.cxx")
-endif()

@@ -49,8 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
-// the new way of getting the proxymanager -- probably after 3.12 or so
-//#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProxySelectionModel.h"
 
@@ -164,10 +163,8 @@ void pqTPWritersMenuManager::createMenu()
     }
   this->Menu->clear();
 
-  // the new way of getting the proxymanager -- probably after 3.12 or so
-  // vtkSMSessionProxyManager* pxm =
-  //     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   vtkSMProxyDefinitionManager* proxyDefinitions =
     pxm->GetProxyDefinitionManager();
@@ -212,8 +209,8 @@ void pqTPWritersMenuManager::updateEnableState()
   // the new way of getting the proxymanager -- probably after 3.12 or so
   // vtkSMSessionProxyManager* pxm =
   //     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   if (!this->Menu || !pxm)
     {
     return;
@@ -327,11 +324,8 @@ void pqTPWritersMenuManager::createWriter(const QString& xmlgroup,
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
 
-  // the new way of getting the proxymanager -- probably after 3.12 or so
-  // vtkSMSessionProxyManager* pxm =
-  //     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
+  vtkSMSessionProxyManager* pxm =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype =
     pxm->GetPrototypeProxy(xmlgroup.toAscii().data(), xmlname.toAscii().data());
   if (!prototype)
