@@ -102,6 +102,12 @@ private:
   class pqImplementation;
   pqImplementation* const Implementation;
   friend class pqImplementation;
+
+  friend class pqConsoleWidgetEventPlayer;
+
+  /// Prints and executes the command. Used by pqConsoleWidgetEventPlayer for
+  /// text playback.
+  void printAndExecuteCommand(const QString& text);
 };
 
 
