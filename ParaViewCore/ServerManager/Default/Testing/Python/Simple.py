@@ -1,6 +1,10 @@
 # Simple Test for pvbatch.
 
 import SMPythonTesting
+import paraview
+paraview.compatibility.major = 3
+paraview.compatibility.minor = 4
+
 from paraview import servermanager
 
 import sys
