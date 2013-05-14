@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqServerDisconnectReaction_h
 
 #include "pqReaction.h"
+#include "pqTimer.h" // needed for pqTimer.
 
 /// @ingroup Reactions
 /// Reaction to disconnect from a server.
@@ -50,15 +51,14 @@ public:
   static void disconnectFromServerWithWarning();
   static void disconnectFromServer();
 
-public slots:
-  // This slot is used to reenable the disconnect button which is disabled when
-  // the button is clicked (triggered).
-  void reEnableButton();
+private slots:
+  void updateState();
 
 protected:
   /// Called when the action is triggered.
-   virtual void onTriggered();
+  virtual void onTriggered();
 
+  pqTimer UpdateTimer;
 private:
   Q_DISABLE_COPY(pqServerDisconnectReaction)
 };

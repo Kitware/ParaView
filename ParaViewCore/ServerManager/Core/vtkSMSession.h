@@ -196,6 +196,14 @@ public:
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
 
   // Description:
+  // Use this method to disconnect from a session. This ensures that
+  // appropriate cleanup happens before the disconnect such as unregistering
+  // proxies. It also ensures that if in collaboration mode, the proxy
+  // unregistering doesn't affect other connected clients.
+  static void Disconnect(vtkIdType sessionid);
+  static void Disconnect(vtkSMSession* session);
+
+  // Description:
   // This flag if set indicates that the current session
   // module has automatically started "pvservers" as MPI processes as
   // default pipeline.

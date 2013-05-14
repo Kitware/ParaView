@@ -127,8 +127,6 @@ set (Module_SRCS
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.cxx
   pqMasterOnlyReaction.h
-  pqMultiServerBehavior.cxx
-  pqMultiServerBehavior.h
   pqNonPolyDataInputDecorator.cxx
   pqNonPolyDataInputDecorator.h
   pqObjectPickingBehavior.cxx
@@ -275,7 +273,6 @@ set (Module_MOC_HDRS
   pqManageLinksReaction.h
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
-  pqMultiServerBehavior.h
   pqNonPolyDataInputDecorator.h
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h

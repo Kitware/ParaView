@@ -202,8 +202,7 @@ void pqPythonManager::onRemovingServer(pqServer* /*server*/)
 {
   if (this->Internal->PythonDialog)
     {
-    // Destroy the Python shell. A new one will be created on-idle.
-    vtkPythonInterpreter::Finalize();
+    this->Internal->PythonDialog->shell()->reset();
     }
 }
 

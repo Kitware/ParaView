@@ -248,6 +248,7 @@ vtkProcessModule::vtkProcessModule()
   this->ReportInterpreterErrors = true;
   this->SymmetricMPIMode = false;
   this->MultipleSessionsSupport = false; // Set MULTI-SERVER to false as DEFAULT
+  this->EventCallDataSessionId = 0;
 
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
@@ -272,7 +273,9 @@ vtkIdType vtkProcessModule::RegisterSession(vtkSession* session)
   assert(session != NULL);
   this->MaxSessionId++;
   this->Internals->Sessions[this->MaxSessionId] = session;
+  this->EventCallDataSessionId = this->MaxSessionId;
   this->InvokeEvent(vtkCommand::ConnectionCreatedEvent, &this->MaxSessionId);
+  this->EventCallDataSessionId = 0;
   return this->MaxSessionId;
 }
 
@@ -283,15 +286,15 @@ bool vtkProcessModule::UnRegisterSession(vtkIdType sessionID)
     this->Internals->Sessions.find(sessionID);
   if (iter != this->Internals->Sessions.end())
     {
-    this->InvokeEvent(vtkCommand::ConnectionClosedEvent,
-      &sessionID);
+    this->EventCallDataSessionId = sessionID;
+    this->InvokeEvent(vtkCommand::ConnectionClosedEvent, &sessionID);
+    this->EventCallDataSessionId = 0;
     this->Internals->Sessions.erase(iter);
     return true;
     }
 
   return false;
 }
-
 
 //----------------------------------------------------------------------------
 bool vtkProcessModule::UnRegisterSession(vtkSession* session)
@@ -303,7 +306,9 @@ bool vtkProcessModule::UnRegisterSession(vtkSession* session)
     if (iter->second == session)
       {
       vtkIdType sessionID = iter->first;
+      this->EventCallDataSessionId = sessionID;
       this->InvokeEvent(vtkCommand::ConnectionClosedEvent, &sessionID);
+      this->EventCallDataSessionId = 0;
       this->Internals->Sessions.erase(iter);
       return true;
       }

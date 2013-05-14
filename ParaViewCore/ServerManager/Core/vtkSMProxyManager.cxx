@@ -54,7 +54,11 @@ public:
     }
   }
 
-  vtkWeakPointer<vtkSMSession> ActiveSession;
+  vtkPXMInternal() : ActiveSessionID(0)
+  {
+  }
+  
+  vtkIdType ActiveSessionID;
 
   // Data structure for storing GlobalPropertiesManagers.
   typedef std::map<std::string,
@@ -140,6 +144,14 @@ vtkSMProxyManager::vtkSMProxyManager()
 
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
+
+  // Monitor session creations. If a new session is created and we don't have an
+  // active one, we make that new session active.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->AddObserver(vtkCommand::ConnectionCreatedEvent,
+    this, &vtkSMProxyManager::ConnectionsUpdated);
+  pm->AddObserver(vtkCommand::ConnectionClosedEvent,
+    this, &vtkSMProxyManager::ConnectionsUpdated);
 }
 
 //---------------------------------------------------------------------------
@@ -210,53 +222,68 @@ int vtkSMProxyManager::GetVersionPatch()
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMProxyManager::GetActiveSession()
 {
-  // If no active session, find the first available session and set it to active
-  if (this->PXMStorage->ActiveSession == NULL)
-    {
-    vtkSMSession* session = 0;
-    vtkSmartPointer<vtkSessionIterator> iter;
-    iter.TakeReference(
-      vtkProcessModule::GetProcessModule()->NewSessionIterator());
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-      iter->GoToNextItem())
-      {
-      vtkSMSession* temp = vtkSMSession::SafeDownCast(
-        iter->GetCurrentSession());
-      if (temp && session)
-        {
-        // more than 1 vtkSMSession is present. In that case, user has to
-        // explicitly set the active session.
-        return NULL;
-        }
-      session = temp;
-      }
-    this->PXMStorage->ActiveSession = session;
-    }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return pm?  vtkSMSession::SafeDownCast(
+    pm->GetSession(this->PXMStorage->ActiveSessionID)) : NULL;
+}
 
-  return this->PXMStorage->ActiveSession;
+//----------------------------------------------------------------------------
+void vtkSMProxyManager::ConnectionsUpdated(
+  vtkObject*, unsigned long eventid, void* calldata)
+{
+  // Callback called when a new session is registered. Update active session
+  // accordingly.
+  if (eventid == vtkCommand::ConnectionCreatedEvent)
+    {
+    // A new session always becomes active.
+    vtkIdType sid = *(reinterpret_cast<vtkIdType*>(calldata));
+    this->SetActiveSession(sid);
+    }
+  else if (eventid == vtkCommand::ConnectionClosedEvent)
+    {
+    vtkIdType sid = *(reinterpret_cast<vtkIdType*>(calldata));
+    if (this->PXMStorage->ActiveSessionID == sid)
+      {
+      vtkIdType newSID = 0;
+
+      // Find another session, if available, and make that active.
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      vtkSessionIterator* iter = pm->NewSessionIterator();
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+        iter->GoToNextItem())
+        {
+        if (iter->GetCurrentSession() != NULL &&
+          iter->GetCurrentSessionId() != sid)
+          {
+          newSID = iter->GetCurrentSessionId();
+          break;
+          }
+        }
+      iter->Delete();
+
+      this->SetActiveSession(newSID);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::SetActiveSession(vtkIdType sid)
 {
-  this->SetActiveSession(
-    vtkSMSession::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetSession(sid)));
+  if (this->PXMStorage->ActiveSessionID != sid)
+    {
+    cout << "SetActiveSession: " << sid << endl;
+    this->PXMStorage->ActiveSessionID = sid;
+    vtkSMSession* session = this->GetActiveSession();
+    this->InvokeEvent(vtkSMProxyManager::ActiveSessionChanged, session);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::SetActiveSession(vtkSMSession* session)
 {
-  bool changeDetected = (this->PXMStorage->ActiveSession != session);
-  this->PXMStorage->ActiveSession = session;
-
-  // ensures that the active session is updated if session == NULL.
-  session = this->GetActiveSession();
-
-  if(changeDetected)
-    {
-    this->InvokeEvent(ActiveSessionChanged, session);
-    }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkIdType sid = session? pm->GetSessionID(session) : 0;
+  this->SetActiveSession(sid);
 }
 
 //----------------------------------------------------------------------------

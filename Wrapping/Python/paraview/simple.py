@@ -40,30 +40,18 @@ paraview.compatibility.major = 3
 paraview.compatibility.minor = 5
 import servermanager
 
-def enableMultiServer():
-    servermanager.enableMultiServer()
-
-def switchActiveConnection(newActiveConnection=None, ns=None):
-    if not ns:
-       ns = globals()
-    _remove_functions(ns)
-    servermanager.switchActiveConnection(newActiveConnection)
-    _add_functions(ns)
-
-def Disconnect(ns=None, force=True):
-    if servermanager.ActiveConnection and (force or servermanager.MultiServerConnections == None):
-       if ns:
-          _remove_functions(ns)
-       _remove_functions(globals())
-       if not paraview.fromGUI:
-          servermanager.ProxyManager().DisableStateUpdateNotification()
-          servermanager.ProxyManager().UnRegisterProxies()
-       active_objects.view = None
-       active_objects.source = None
+def Disconnect(ns=globals(), force=True):
+    supports_simutaneous_connections =\
+        servermanager.vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport()
+    if not force and supports_simutaneous_connections:
+        # This is an internal Disconnect request that doesn't need to happen in
+        # multi-server setup. Ignore it.
+        return
+    if servermanager.ActiveConnection:
+       _remove_functions(ns)
        servermanager.Disconnect()
-       if not paraview.fromGUI:
-          import gc
-          gc.collect()
+       import gc
+       gc.collect()
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """Creates a connection to a server. Example usage::
@@ -679,6 +667,8 @@ def _add_functions(g):
     import os
     if os.environ.has_key("PARAVIEW_DOCUMENTATION_SKIP_ADD_FUNCTIONS"):
         return
+    if not servermanager.ActiveConnection:
+        return
 
     activeModule = servermanager.ActiveConnection.Modules
     for m in [activeModule.filters, activeModule.sources,
@@ -1134,7 +1124,6 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     SetDisplayProperties(ColorArrayName = "Pres")
     Render()
 
-
 def _CreateEssentialProxies():
     """Ensures that essetial proxies like TimeKeeper and AnimationScene are
        present and are created if not"""
@@ -1160,6 +1149,34 @@ def _CreateEssentialProxies():
     servermanager.ProxyManager().EnableStateUpdateNotification()
     servermanager.ProxyManager().TriggerStateUpdate()
 
+def _switchToActiveConnectionCallback(caller, event):
+    """Callback called when the active session/connection changes in the
+        ServerManager. We update the Python state to reflect the change."""
+    print "_switchToActiveConnectionCallback called"
+    if servermanager:
+        session = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSession()
+        connection = servermanager.GetConnectionFromSession(session)
+        SetActiveConnection(connection)
+
+def SetActiveConnection(connection=None, ns=globals()):
+    """Set the active connection. If the process was run without multi-server
+       enabled and this method is called with a non-None argument while an
+       ActiveConnection is present, it will raise a RuntimeError."""
+    if servermanager.ActiveConnection != connection:
+        _remove_functions(ns)
+        servermanager.SetActiveConnection(connection)
+        _add_functions(ns)
+
+class ActiveSessionObserver:
+    def __init__(self):
+        pxm = servermanager.vtkSMProxyManager.GetProxyManager()
+        self.ObserverTag = pxm.AddObserver(pxm.ActiveSessionChanged,
+            _switchToActiveConnectionCallback)
+
+    def __del__(self):
+        if servermanager:
+            servermanager.vtkSMProxyManager.GetProxyManager().RemoveObserver(self.ObserverTag)
+active_session_observer = ActiveSessionObserver()
 
 if not servermanager.ActiveConnection:
     Connect()
@@ -1168,19 +1185,3 @@ else:
     _CreateEssentialProxies()
 
 active_objects = ActiveObjects()
-
-def _switchToActiveConnectionCallback(caller, event):
-   if servermanager:
-      session = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSession()
-      if session and ((not servermanager.ActiveConnection) or session != servermanager.ActiveConnection.Session):
-         switchActiveConnection(servermanager.GetConnectionFromSession(session))
-
-class ActiveSessionObserver:
-    def __init__(self):
-        self.ObserverTag = servermanager.vtkSMProxyManager.GetProxyManager().AddObserver(9753, _switchToActiveConnectionCallback)
-
-    def __del__(self):
-        if servermanager:
-            servermanager.vtkSMProxyManager.GetProxyManager().RemoveObserver(self.ObserverTag)
-
-active_session_observer = ActiveSessionObserver()

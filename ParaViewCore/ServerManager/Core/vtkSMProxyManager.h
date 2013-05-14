@@ -207,6 +207,10 @@ protected:
   // Save global property managers.
   void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
 
+  // Description:
+  // Connections updated. Update the active session accordingly.
+  void ConnectionsUpdated(vtkObject*, unsigned long, void*);
+
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;
   vtkSMReaderFactory* ReaderFactory;
