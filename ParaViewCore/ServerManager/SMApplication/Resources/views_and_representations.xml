@@ -2693,22 +2693,6 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData" />
         </DataTypeDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="sources"
-                 name="ArrowSource" />
-          <Proxy group="sources"
-                 name="ConeSource" />
-          <Proxy group="sources"
-                 name="CubeSource" />
-          <Proxy group="sources"
-                 name="CylinderSource" />
-          <Proxy group="sources"
-                 name="LineSource" />
-          <Proxy group="sources"
-                 name="SphereSource" />
-          <Proxy group="sources"
-                 name="GlyphSource2D" />
-        </ProxyListDomain>
       </InputProperty>
       <IntVectorProperty command="SetMeshVisibility"
                          default_values="0"
