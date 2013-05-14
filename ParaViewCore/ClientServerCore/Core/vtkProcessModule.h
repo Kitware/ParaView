@@ -253,6 +253,10 @@ private:
   // Set to true in Initialize if Finalize() should cleanup MPI.
   static bool FinalizeMPI;
 
+  // Set to true in InitializePythonEnvironment() if Finalize() should cleanup
+  // Python.
+  static bool FinalizePython;
+
   static vtkSmartPointer<vtkProcessModule> Singleton;
   static vtkSmartPointer<vtkMultiProcessController> GlobalController;
 
