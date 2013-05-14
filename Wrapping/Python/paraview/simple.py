@@ -1152,7 +1152,6 @@ def _CreateEssentialProxies():
 def _switchToActiveConnectionCallback(caller, event):
     """Callback called when the active session/connection changes in the
         ServerManager. We update the Python state to reflect the change."""
-    print "_switchToActiveConnectionCallback called"
     if servermanager:
         session = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSession()
         connection = servermanager.GetConnectionFromSession(session)

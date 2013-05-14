@@ -226,17 +226,10 @@ pqPythonShell::pqPythonShell(QWidget* parentObject, Qt::WindowFlags _flags):
   this->Interpreter->AddObserver(vtkCommand::AnyEvent,
     this, &pqPythonShell::HandleInterpreterEvents);
 
-  // Initialize Python if not already.
-  if (!vtkPythonInterpreter::Initialize())
-    {
-    // if Initialize() returns false, it means Python was already initialized,
-    // so we call setupInterpreter() callback since it won't get called
-    // otherwise.
-    this->setupInterpreter();
-    }
-
   QObject::connect(&this->CreatePythonTimer, SIGNAL(timeout()),
     this, SLOT(initPythonInterpreter()));
+  this->CreatePythonTimer.setSingleShot(true);
+  this->CreatePythonTimer.start();
 }
 
 //-----------------------------------------------------------------------------
@@ -253,7 +246,14 @@ pqPythonShell::~pqPythonShell()
 //-----------------------------------------------------------------------------
 void pqPythonShell::initPythonInterpreter()
 {
-  vtkPythonInterpreter::Initialize();
+  // Initialize Python if not already.
+  if (!vtkPythonInterpreter::Initialize())
+    {
+    // if Initialize() returns false, it means Python was already initialized,
+    // so we call setupInterpreter() callback since it won't get called
+    // otherwise.
+    this->setupInterpreter();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -404,7 +404,7 @@ void pqPythonShell::HandleInterpreterEvents(
 
   case vtkCommand::ExitEvent:
     this->printString("\n...restarting...\n", ERROR);
-    this->CreatePythonTimer.start(1000);
+    this->CreatePythonTimer.start(100);
     break;
 
   case vtkCommand::EnterEvent:

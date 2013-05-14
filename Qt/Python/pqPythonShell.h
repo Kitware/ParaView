@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPythonModule.h" //  needed for PQPYTHON_EXPORT.
 #include <QWidget>
-#include <QTimer>
+#include "pqTimer.h"
 
 class vtkObject;
 class pqConsoleWidget;
@@ -123,7 +123,7 @@ private slots:
 private:
   Q_DISABLE_COPY(pqPythonShell);
 
-  QTimer CreatePythonTimer;
+  pqTimer CreatePythonTimer;
   bool Prompted;
   bool Executing;
 };

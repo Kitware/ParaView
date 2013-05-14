@@ -271,7 +271,6 @@ void vtkSMProxyManager::SetActiveSession(vtkIdType sid)
 {
   if (this->PXMStorage->ActiveSessionID != sid)
     {
-    cout << "SetActiveSession: " << sid << endl;
     this->PXMStorage->ActiveSessionID = sid;
     vtkSMSession* session = this->GetActiveSession();
     this->InvokeEvent(vtkSMProxyManager::ActiveSessionChanged, session);

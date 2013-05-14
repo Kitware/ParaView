@@ -3082,7 +3082,6 @@ def __connectionCreatedCallback(obj, string):
     global Connections
     pm = vtkProcessModule.GetProcessModule()
     sid = pm.GetEventCallDataSessionId()
-    print "__connectionCreatedCallback", sid
     # this creates the Connection object if needed.
     GetConnectionFromSession(pm.GetSession(sid))
 
