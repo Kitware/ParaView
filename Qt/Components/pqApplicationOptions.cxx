@@ -228,7 +228,7 @@ void pqApplicationOptions::updatePalettes()
 {
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  if (pxm->GetSession() == NULL)
+  if (pxm == NULL || pxm->GetSession() == NULL)
     {
     // cannot update the definitions since no valid session is present.
     return;

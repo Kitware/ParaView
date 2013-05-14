@@ -465,6 +465,18 @@ void pqConsoleWidget::printCommand(const QString& cmd)
 }
 
 //-----------------------------------------------------------------------------
+void pqConsoleWidget::printAndExecuteCommand(const QString& text)
+{
+  this->printCommand(text);
+
+  QTextCursor text_cursor = this->Implementation->textCursor();
+  text_cursor.setPosition(this->Implementation->documentEnd());
+  this->Implementation->setTextCursor(text_cursor);
+
+  this->Implementation->internalExecuteCommand();
+}
+
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::prompt(const QString& text)
 {
   QTextCursor text_cursor = this->Implementation->textCursor();

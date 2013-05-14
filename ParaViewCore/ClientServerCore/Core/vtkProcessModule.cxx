@@ -50,6 +50,7 @@ vtkProcessModule::ProcessTypes
 vtkProcessModule::ProcessType = vtkProcessModule::PROCESS_INVALID;
 
 bool vtkProcessModule::FinalizeMPI = false;
+bool vtkProcessModule::FinalizePython = false;
 
 vtkSmartPointer<vtkProcessModule> vtkProcessModule::Singleton;
 vtkSmartPointer<vtkMultiProcessController> vtkProcessModule::GlobalController;
@@ -198,6 +199,13 @@ bool vtkProcessModule::Finalize()
   vtkMultiProcessController::SetGlobalController(NULL);
   vtkProcessModule::GlobalController->Finalize(/*finalizedExternally*/1);
   vtkProcessModule::GlobalController = NULL;
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+  if (vtkProcessModule::FinalizePython && vtkPythonInterpreter::IsInitialized())
+    {
+    vtkPythonInterpreter::Finalize();
+    }
+#endif
 
 #ifdef PARAVIEW_USE_MPI
   if (vtkProcessModule::FinalizeMPI)
@@ -435,6 +443,14 @@ bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
   assert(argc >= 1);
+  if (!vtkPythonInterpreter::IsInitialized())
+    {
+    // If someone already initialized Python before ProcessModule was started,
+    // we don't finalize it when ProcessModule finalizes. This is for the cases
+    // where ParaView modules are directly imported in python (not pvpython).
+    vtkProcessModule::FinalizePython = true;
+    }
+
   std::string self_dir = vtksys::SystemTools::CollapseFullPath(
     vtksys::SystemTools::GetFilenamePath(argv[0]).c_str());
   vtkPythonAppInitPrependPath(self_dir.c_str());

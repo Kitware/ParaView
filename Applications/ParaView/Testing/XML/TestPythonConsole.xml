@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- This test ensures that Python Console continues to work even after
+  mutliple disconnects and that Connect/Disconnect from Python Console works.
+  -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsPythonShell" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Sphere()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Show()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Render()" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerDisconnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Sphere()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Show()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Render()" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerDisconnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Wavelet()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Show()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Render()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Disconnect()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Connect()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Sphere()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Show()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Render()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="ResetCamera()" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/shellWidget/1pqConsoleWidget0" command="executeCommand" arguments="Render()" />
+</pqevents>
