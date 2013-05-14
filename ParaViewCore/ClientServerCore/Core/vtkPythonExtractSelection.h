@@ -14,7 +14,8 @@
 =========================================================================*/
 // .NAME vtkPythonExtractSelection
 // .SECTION Description
-//
+// vtkPythonExtractSelection is a used to extra cells/points using numpy. This
+// enables creation of arbitrary queries to be used as the selection criteria.
 
 #ifndef __vtkPythonExtractSelection_h
 #define __vtkPythonExtractSelection_h

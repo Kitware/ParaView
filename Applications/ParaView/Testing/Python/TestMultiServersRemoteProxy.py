@@ -19,45 +19,44 @@ def getPort(url):
 #--------------------
 
 print "Start multi-server testing"
-enableMultiServer()
 
 options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
 available_server_urls = options.GetServerURL().split('|')
 built_in_connection = servermanager.ActiveConnection
 
 # Test if the built-in connection is here
-if (len(servermanager.MultiServerConnections) != 1):
+if (len(servermanager.Connections) != 1):
   errors += 1
-  print "Error pvpython should be connected to a built-in session. Currently connected to ", servermanager.MultiServerConnections
+  print "Error pvpython should be connected to a built-in session. Currently connected to ", servermanager.Connections
 
 url = available_server_urls[0]
 print "Connect to first server ", url
 server1_connection = Connect(getHost(url), getPort(url))
 
 # Test that we have one more connection
-if (len(servermanager.MultiServerConnections) != 2):
+if (len(servermanager.Connections) != 2):
   errors += 1
-  print "Error pvpython should be connected to a built-in session + one remote one. Currently connected to ", servermanager.MultiServerConnections
+  print "Error pvpython should be connected to a built-in session + one remote one. Currently connected to ", servermanager.Connections
 
 url = available_server_urls[1]
 print "Connect to second server ", url
 server2_connection = Connect(getHost(url), getPort(url))
 
 # Test that we have one more connection
-if (len(servermanager.MultiServerConnections) != 3):
+if (len(servermanager.Connections) != 3):
   errors += 1
-  print "Error pvpython should be connected to a built-in session + two remote one. Currently connected to ", servermanager.MultiServerConnections
+  print "Error pvpython should be connected to a built-in session + two remote one. Currently connected to ", servermanager.Connections
 
 url = available_server_urls[2]
 print "Connect to third server ", url
 server3_connection = Connect(getHost(url), getPort(url))
 
 # Test that we have one more connection
-if (len(servermanager.MultiServerConnections) != 4):
+if (len(servermanager.Connections) != 4):
   errors += 1
-  print "Error pvpython should be connected to a built-in session + three remote one. Currently connected to ", servermanager.MultiServerConnections
+  print "Error pvpython should be connected to a built-in session + three remote one. Currently connected to ", servermanager.Connections
 
-print "Available connections: ", servermanager.MultiServerConnections
+print "Available connections: ", servermanager.Connections
 
 # Test that last created connection is the active one
 if ( servermanager.ActiveConnection != server3_connection):
@@ -67,23 +66,23 @@ if ( servermanager.ActiveConnection != server3_connection):
 # ------- Do the proper RemoteSourceProxy testing --------------
 
 # Create a set of sphere across the remote sessions
-switchActiveConnection(server1_connection, globals())
+SetActiveConnection(server1_connection, globals())
 rSphere1 = Sphere(ThetaResolution=10, PhiResolution=10)
 rSphere1.UpdatePipeline()
 size1 = rSphere1.GetDataInformation().GetNumberOfPoints()
 
-switchActiveConnection(server2_connection, globals())
+SetActiveConnection(server2_connection, globals())
 rSphere2 = Sphere(ThetaResolution=11, PhiResolution=11)
 rSphere2.UpdatePipeline()
 size2 = rSphere2.GetDataInformation().GetNumberOfPoints()
 
-switchActiveConnection(server3_connection, globals())
+SetActiveConnection(server3_connection, globals())
 rSphere3 = Sphere(ThetaResolution=12, PhiResolution=12)
 rSphere3.UpdatePipeline()
 size3 = rSphere3.GetDataInformation().GetNumberOfPoints()
 
 # Create remote source on the built-in session
-switchActiveConnection(built_in_connection, globals())
+SetActiveConnection(built_in_connection, globals())
 remoteProxy = RemoteSourceProxy()
 remoteProxy.SetExternalProxy(rSphere1, 0)
 remoteProxy.UpdatePipeline()
@@ -139,13 +138,13 @@ if ( size == 0 or size1 == 0 or size1 == 0 or size1 == 0):
 # --------------------------------------------------------------
 # Disconnect and quit application...
 Disconnect()
-print "Available connections after disconnect: ", servermanager.MultiServerConnections
+print "Available connections after disconnect: ", servermanager.Connections
 Disconnect()
-print "Available connections after disconnect: ", servermanager.MultiServerConnections
+print "Available connections after disconnect: ", servermanager.Connections
 Disconnect()
-print "Available connections after disconnect: ", servermanager.MultiServerConnections
+print "Available connections after disconnect: ", servermanager.Connections
 Disconnect()
-print "Available connections after disconnect: ", servermanager.MultiServerConnections
+print "Available connections after disconnect: ", servermanager.Connections
 
 if errors > 0:
   raise RuntimeError, "An error occured during the execution"

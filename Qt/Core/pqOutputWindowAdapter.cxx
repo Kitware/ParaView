@@ -74,6 +74,24 @@ void pqOutputWindowAdapter::setActive(bool active)
   this->Active=active;
 }
 
+void pqOutputWindowAdapter::DisplayTextInWindow(const QString& text)
+{
+  ++this->TextCount;
+  if (this->Active)
+    {
+    emit displayTextInWindow(text);
+    }
+}
+
+void pqOutputWindowAdapter::DisplayErrorTextInWindow(const QString& text)
+{
+  ++this->ErrorCount;
+  if (this->Active)
+    {
+    emit displayErrorTextInWindow(text);
+    }
+}
+
 void pqOutputWindowAdapter::DisplayText(const char* text)
 {
   ++this->TextCount;

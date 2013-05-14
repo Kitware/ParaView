@@ -14,24 +14,23 @@
 =========================================================================*/
 #include "vtkPythonCalculator.h"
 
+#include "vtkCellData.h"
+#include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
-#include "vtkPVPythonInterpretor.h"
 #include "vtkPointData.h"
-#include "vtkPythonProgrammableFilter.h"
-#include "vtkCellData.h"
 #include "vtkProcessModule.h"
-#include "vtkDataArray.h"
+#include "vtkPVOptions.h"
+#include "vtkPythonInterpreter.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <algorithm>
 #include <map>
 #include <string>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPythonCalculator);
 
@@ -220,8 +219,10 @@ void vtkPythonCalculator::Exec(const char* expression,
     {
     fscript += "  return None\n";
     }
-  
-  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(fscript.c_str());
+ 
+  // ensure Python is initialized.
+  vtkPythonInterpreter::Initialize();
+  vtkPythonInterpreter::RunSimpleString(fscript.c_str());
 
   std::string runscript;
   runscript += "import paraview\n";
@@ -287,8 +288,7 @@ void vtkPythonCalculator::Exec(const char* expression,
   runscript += "del retVal\n";
   runscript += "del output\n";
   
-  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(runscript.c_str());
-  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->FlushMessages();
+  vtkPythonInterpreter::RunSimpleString(runscript.c_str());
 }
 
 //----------------------------------------------------------------------------

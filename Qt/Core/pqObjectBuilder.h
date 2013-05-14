@@ -211,9 +211,6 @@ signals:
   /// Emitted after a new server connection is created
   void finishedAddingServer(pqServer *server);
 
-  /// Emitted when another server is avilable after a server remove
-  void activeServerChanged(pqServer *server);
-
   /// Fired on successful completion of createSource().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client

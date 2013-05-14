@@ -59,10 +59,6 @@ public slots:
   /// Execute a commond in the python shell.
   void runString(const QString& script);
 
-  /// Calling this slot will destroy the current python interpretor and start a
-  /// new one without closing the dialog.
-  void initializeInterpretor();
-
   /// Simply prints some text onto the shell. Note that this does not treat it
   /// as a python script and hence doesn't execute it.
   void print(const QString& msg);
@@ -74,11 +70,7 @@ public slots:
   /// Return a pointer to the pqPythonShell widget used by this dialog.
   pqPythonShell* shell();
 
-signals:
-  void interpreterInitialized();
-
 protected:
-
   /// Overloaded to save window geometry on close events.
   void closeEvent(QCloseEvent *event);
 

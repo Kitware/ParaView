@@ -38,6 +38,10 @@
 # include "vtkMPI.h"
 #endif
 
+#ifdef PARAVIEW_ENABLE_PYTHON
+# include "vtkProcessModuleInitializePython.h"
+#endif
+
 #include <assert.h>
 
 //----------------------------------------------------------------------------
@@ -54,61 +58,6 @@ vtkSmartPointer<vtkMultiProcessController> vtkProcessModule::GlobalController;
 bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 {
   setlocale(LC_NUMERIC,"C");
-
-  // If python is enabled, matplotlib can be used for text rendering. VTK needs
-  // to know which python environment to use (especially for non-system python
-  // installations, e.g. ParaView superbuild).
-#ifdef PARAVIEW_ENABLE_PYTHON
-  if (argc > 0)
-    {
-    vtkStdString execPath = vtksys::SystemTools::GetFilenamePath(argv[0]);
-    if (execPath.size() != 0)
-      {
-      execPath += "/";
-      }
-#ifdef _WIN32
-      // On windows, remove the drive designation if present
-      if (execPath.size() > 2 && execPath.at(1) == ':')
-        {
-        execPath = execPath.substr(2);
-        }
-#endif // _WIN32
-
-    // The VTK_MATPLOTLIB_PYTHONINTERP variable tells
-    // vtkMatplotlibMathTextUtilities which interpretor path to use. Set it to
-    // our pvpython path. This is passed to Py_SetProgramName.
-    vtkStdString mplPyInterp;
-    if (!vtksys::SystemTools::GetEnv("VTK_MATPLOTLIB_PYTHONINTERP", mplPyInterp)
-        || mplPyInterp.size() == 0)
-      {
-      mplPyInterp = "VTK_MATPLOTLIB_PYTHONINTERP=";
-      // Change slashes to appropriate format, escape spaces
-      mplPyInterp += vtksys::SystemTools::ConvertToOutputPath(
-            (execPath + "../bin/pvpython").c_str());
-      vtksys::SystemTools::PutEnv(mplPyInterp.c_str());
-      }
-
-    // The VTK_MATPLOTLIB_PYTHONPATH variable holds paths which are prepended
-    // to sys.path after initialization.
-#ifdef __APPLE__
-      // On apple, we'll need to give the path to matplotlib in the bundle:
-       vtkStdString mplPyPath;
-       if (!vtksys::SystemTools::GetEnv("VTK_MATPLOTLIB_PYTHONPATH", mplPyPath)
-           || mplPyPath.size() == 0)
-         {
-         mplPyPath = "VTK_MATPLOTLIB_PYTHONPATH=";
-         }
-       else
-         {
-         mplPyPath += ":";
-         }
-       // Change slashes to appropriate format, escape spaces
-       mplPyPath += vtksys::SystemTools::ConvertToOutputPath(
-             (execPath + "../Python").c_str());
-       vtksys::SystemTools::PutEnv(mplPyPath.c_str());
-#endif // __APPLE__
-    }
-#endif // PARAVIEW_ENABLE_PYTHON
 
   vtkProcessModule::ProcessType = type;
 
@@ -224,6 +173,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 
   // Create the process module.
   vtkProcessModule::Singleton = vtkSmartPointer<vtkProcessModule>::New();
+  vtkProcessModule::Singleton->InitializePythonEnvironment(argc, argv);
   return true;
 }
 
@@ -298,6 +248,7 @@ vtkProcessModule::vtkProcessModule()
   this->ReportInterpreterErrors = true;
   this->SymmetricMPIMode = false;
   this->MultipleSessionsSupport = false; // Set MULTI-SERVER to false as DEFAULT
+  this->EventCallDataSessionId = 0;
 
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
@@ -322,7 +273,9 @@ vtkIdType vtkProcessModule::RegisterSession(vtkSession* session)
   assert(session != NULL);
   this->MaxSessionId++;
   this->Internals->Sessions[this->MaxSessionId] = session;
+  this->EventCallDataSessionId = this->MaxSessionId;
   this->InvokeEvent(vtkCommand::ConnectionCreatedEvent, &this->MaxSessionId);
+  this->EventCallDataSessionId = 0;
   return this->MaxSessionId;
 }
 
@@ -333,15 +286,15 @@ bool vtkProcessModule::UnRegisterSession(vtkIdType sessionID)
     this->Internals->Sessions.find(sessionID);
   if (iter != this->Internals->Sessions.end())
     {
-    this->InvokeEvent(vtkCommand::ConnectionClosedEvent,
-      &sessionID);
+    this->EventCallDataSessionId = sessionID;
+    this->InvokeEvent(vtkCommand::ConnectionClosedEvent, &sessionID);
+    this->EventCallDataSessionId = 0;
     this->Internals->Sessions.erase(iter);
     return true;
     }
 
   return false;
 }
-
 
 //----------------------------------------------------------------------------
 bool vtkProcessModule::UnRegisterSession(vtkSession* session)
@@ -353,7 +306,9 @@ bool vtkProcessModule::UnRegisterSession(vtkSession* session)
     if (iter->second == session)
       {
       vtkIdType sessionID = iter->first;
+      this->EventCallDataSessionId = sessionID;
       this->InvokeEvent(vtkCommand::ConnectionClosedEvent, &sessionID);
+      this->EventCallDataSessionId = 0;
       this->Internals->Sessions.erase(iter);
       return true;
       }
@@ -473,6 +428,18 @@ void vtkProcessModule::SetOptions(vtkPVOptions* options)
     this->SetSymmetricMPIMode(
       options->GetSymmetricMPIMode() != 0);
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
+{
+#ifdef PARAVIEW_ENABLE_PYTHON
+  assert(argc >= 1);
+  std::string self_dir = vtksys::SystemTools::CollapseFullPath(
+    vtksys::SystemTools::GetFilenamePath(argv[0]).c_str());
+  vtkPythonAppInitPrependPath(self_dir.c_str());
+#endif
+  return true;
 }
 
 //----------------------------------------------------------------------------

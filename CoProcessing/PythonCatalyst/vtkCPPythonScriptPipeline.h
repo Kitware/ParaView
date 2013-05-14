@@ -18,11 +18,8 @@
 #include "vtkCPPipeline.h"
 #include "vtkStdString.h"  // for the string
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries
-#include "vtkSmartPointer.h" // for vtkSmartPointer.
-#include "vtkWeakPointer.h" // for vtkWeakPointer.
 
 class vtkCPDataDescription;
-class vtkPVPythonInterpretor;
 
 /// @ingroup CoProcessing
 /// Class that creates a coprocessing pipeline starting from a coprocessing
@@ -63,10 +60,6 @@ protected:
   vtkSetStringMacro(PythonScriptName);
   vtkGetStringMacro(PythonScriptName);
 
-  /// Provides access to the Python interpretor.
-  vtkPVPythonInterpretor* GetPythonInterpretor();
-  vtkSmartPointer<vtkPVPythonInterpretor> PythonInterpretor;
-
 private:
   vtkCPPythonScriptPipeline(const vtkCPPythonScriptPipeline&); // Not implemented
   void operator=(const vtkCPPythonScriptPipeline&); // Not implemented
@@ -74,9 +67,6 @@ private:
   /// The name of the python script (without the path or extension)
   /// that is used as the namespace of the functions of the script.
   char* PythonScriptName;
-  
-  static vtkPVPythonInterpretor* NewPythonInterpretor();
-  static vtkWeakPointer<vtkPVPythonInterpretor> GlobalPythonInterpretor;
 };
 
 #endif

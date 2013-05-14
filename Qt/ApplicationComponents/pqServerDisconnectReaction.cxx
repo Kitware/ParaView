@@ -33,16 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqAnimationManager.h"
-#include "pqServer.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqPVApplicationCore.h"
-
-#include "vtkSMSession.h"
 
 #include <QMessageBox>
 
@@ -50,9 +45,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqServerDisconnectReaction::pqServerDisconnectReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  pqAnimationManager* anim = pqPVApplicationCore::instance()->animationManager();
-  QObject::connect(anim, SIGNAL(activeServerChanged(pqServer*)),
-                    this, SLOT(reEnableButton()));
+  this->UpdateTimer.setInterval(500);
+  this->UpdateTimer.setSingleShot(true);
+
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
+    &this->UpdateTimer, SLOT(start()));
+  QObject::connect(&this->UpdateTimer, SIGNAL(timeout()),
+    this, SLOT(updateState()));
+  this->updateState();
 }
 
 //-----------------------------------------------------------------------------
@@ -86,20 +86,20 @@ void pqServerDisconnectReaction::disconnectFromServer()
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (server)
     {
-    server->session()->PreDisconnection();
     core->getObjectBuilder()->removeServer(server);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqServerDisconnectReaction::reEnableButton()
+void pqServerDisconnectReaction::updateState()
 {
-  this->parentAction()->setEnabled(true);
+  this->parentAction()->setEnabled(
+    pqActiveObjects::instance().activeServer() != NULL);
 }
 
-// ----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void pqServerDisconnectReaction::onTriggered()
 {
-  this->parentAction ()->setEnabled (false);
+  this->parentAction()->setEnabled(false);
   pqServerDisconnectReaction::disconnectFromServerWithWarning();
 }
