@@ -20,15 +20,11 @@ vtk_module_test_executable(CoProcessingCompareImagesTester CompareImages.cxx)
 #------------------------------------------------------------------------------
 # a simple test to see if the input is changing, i.e. that the initial
 # pipeline is having it's trivial producer updated with a new grid
-# this is disabled for static builds as pvpython doesn't link in
-# vtkCPPythonCatalyst.
-if(BUILD_SHARED_LIBS)
-  add_test(NAME CoProcessingTestInput
-    COMMAND pvpython ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
-    ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py 4
-    )
-  set_tests_properties(CoProcessingTestInput PROPERTIES LABELS "${CP_LABELS}")
-endif()
+add_test(NAME CoProcessingTestInput
+  COMMAND pvpython ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py 4
+  )
+set_tests_properties(CoProcessingTestInput PROPERTIES LABELS "${CP_LABELS}")
 
 # the CoProcessingTestPythonScript needs to be run with ${MPIEXEC} if
 # CoProcessingPythonScriptExample was built with MPI because certain
