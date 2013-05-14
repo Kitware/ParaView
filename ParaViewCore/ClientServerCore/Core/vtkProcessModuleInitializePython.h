@@ -178,3 +178,4 @@ namespace
 }
 
 #endif
+// VTK-HeaderTest-Exclude: vtkProcessModuleInitializePython.h
