@@ -56,6 +56,13 @@ public:
   pqPythonShell(QWidget* parent=0, Qt::WindowFlags flags=0);
   ~pqPythonShell();
 
+  enum PrintMode
+    {
+    STATUS,
+    OUTPUT,
+    ERROR
+    };
+
 public slots:
   /// Prints some text on the shell.
   void printMessage(const QString&);
@@ -72,6 +79,15 @@ public slots:
   /// Python interpreter.
   void reset();
 
+  /// Returns true is the shell is currently executing a script/command.
+  bool isExecuting() const
+    { return this->Executing; }
+
+  /// Use this method instead of calling pqConsoleWidget::printString()
+  /// directly. That helps us keep track of whether we need to show the prompt
+  /// or not.
+  void printString(const QString&, PrintMode mode=STATUS);
+
 signals:
   /// signal fired whenever the shell starts (starting=true) and finishes
   /// (starting=false) executing a Python command/script. This can be used by
@@ -80,6 +96,7 @@ signals:
 
 protected slots:
   void pushScript(const QString&);
+  void setExecuting(bool val) { this->Executing = val; }
 
 protected:
   pqConsoleWidget* ConsoleWidget;
@@ -92,18 +109,6 @@ protected:
   /// Called to setup the Python interpreter during startup or after the Python
   /// environment was finalized.
   void setupInterpreter();
-
-  enum PrintMode
-    {
-    STATUS,
-    OUTPUT,
-    ERROR
-    };
-
-  /// Use this method instead of calling pqConsoleWidget::printString()
-  /// directly. That helps us keep track of whether we need to show the prompt
-  /// or not.
-  void printString(const QString&, PrintMode mode=STATUS);
 
   /// Show the user-input prompt, if needed. Returns true if the prompt was
   /// re-rendered, otherwise false.
@@ -120,6 +125,7 @@ private:
 
   QTimer CreatePythonTimer;
   bool Prompted;
+  bool Executing;
 };
 
 #endif // !_pqPythonShell_h

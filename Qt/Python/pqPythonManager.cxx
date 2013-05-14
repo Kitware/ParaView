@@ -46,8 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.
-#include "pqServer.h"
+#include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
+#include "pqOutputWindowAdapter.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 
 #include <QApplication>
@@ -72,15 +74,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPythonManager::pqInternal
 {
   vtkNew<vtkPythonInterpreter> DummyInterpreter;
-  void interpreterInitialized()
+  void interpreterEvents(vtkObject*, unsigned long eventid, void* calldata)
     {
-    const char* command = "try:\n"
-                          "  import paraview\n"
-                          "  paraview.fromGUI = True\n"
-                          "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
-                          "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
-                          "except: pass\n";
-    vtkPythonInterpreter::RunSimpleString(command);
+    if (eventid == vtkCommand::EnterEvent)
+      {
+      // Python interpreter was initialized, set the correct compatibility.
+      const char* command = "try:\n"
+        "  import paraview\n"
+        "  paraview.fromGUI = True\n"
+        "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
+        "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
+        "except: pass\n";
+      vtkPythonInterpreter::RunSimpleString(command);
+      }
+    else if (eventid == vtkCommand::ErrorEvent)
+      {
+      const char* message = reinterpret_cast<const char*>(calldata);
+      if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
+        {
+        this->PythonDialog->shell()->printString(message, pqPythonShell::ERROR);
+        }
+      else
+        {
+        pqOutputWindowAdapter* window =
+          pqApplicationCore::instance()->outputWindowAdapter();
+        if (window)
+          {
+          window->DisplayErrorTextInWindow(message);
+          }
+        }
+      }
+    else if (eventid == vtkCommand::SetOutputEvent)
+      {
+      const char* message = reinterpret_cast<const char*>(calldata);
+      if (this->PythonDialog && this->PythonDialog->shell()->isExecuting())
+        {
+        this->PythonDialog->shell()->printString(message, pqPythonShell::OUTPUT);
+        }
+      else
+        {
+        pqOutputWindowAdapter* window =
+          pqApplicationCore::instance()->outputWindowAdapter();
+        if (window)
+          {
+          window->DisplayTextInWindow(message);
+          }
+        }
+      }
     }
 
 public:
@@ -88,9 +128,13 @@ public:
   {
   // Setup initializer so that whenever Python is initialized, we can set the
   // "paraview.fromGUI" to true.
-  this->DummyInterpreter->AddObserver(vtkCommand::EnterEvent,
-    this, &pqPythonManager::pqInternal::interpreterInitialized);
+  this->DummyInterpreter->AddObserver(vtkCommand::AnyEvent,
+    this, &pqPythonManager::pqInternal::interpreterEvents);
   }
+  ~pqInternal()
+    {
+    this->DummyInterpreter->RemoveObservers(vtkCommand::AnyEvent);
+    }
 
   QTimer                              StatusBarUpdateTimer;
   QPointer<pqPythonDialog>            PythonDialog;

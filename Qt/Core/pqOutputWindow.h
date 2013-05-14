@@ -59,11 +59,20 @@ public:
   void setShowOutput(bool state)
     { this->ShowOutput = state; }
 
+  ///
+  static pqOutputWindow* instance();
+
 public slots:
   void onDisplayText(const QString&);
   void onDisplayErrorText(const QString&);
   void onDisplayWarningText(const QString&);
   void onDisplayGenericWarningText(const QString&);
+
+  /// These are same as onDisplayText() and onDisplayErrorText() except that
+  /// they don't pad the text with "\n" nor do they echo the text to the
+  /// terminal. Used in pqPythonManager to display Python text.
+  void onDisplayTextInWindow(const QString&);
+  void onDisplayErrorTextInWindow(const QString&);
 
 private slots:
   void accept();

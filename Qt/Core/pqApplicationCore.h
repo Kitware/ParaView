@@ -178,6 +178,10 @@ public:
   pqDisplayPolicy* getDisplayPolicy() const
     { return this->DisplayPolicy; }
 
+  /// Returns the output window.
+  pqOutputWindowAdapter* outputWindowAdapter()
+    { return this->OutputWindowAdapter; }
+
   /// It is possible to change the display policy used by
   /// the application. Used to change the active display
   /// policy. The pqApplicationCore takes over the ownership of the display policy.

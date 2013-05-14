@@ -202,8 +202,11 @@ pqPythonShell::pqPythonShell(QWidget* parentObject, Qt::WindowFlags _flags):
   ConsoleWidget(new pqConsoleWidget(this)),
   Interpreter(vtkPythonInteractiveInterpreter::New()),
   Prompt(pqPythonShell::PS1()),
-  Prompted(false)
+  Prompted(false),
+  Executing(false)
 {
+  QObject::connect(this, SIGNAL(executing(bool)), this, SLOT(setExecuting(bool)));
+
   this->setObjectName("pythonShell");
 
   QVBoxLayout* vbox = new QVBoxLayout(this);
@@ -256,15 +259,14 @@ void pqPythonShell::initPythonInterpreter()
 //-----------------------------------------------------------------------------
 void pqPythonShell::setupInterpreter()
 {
+  Q_ASSERT(vtkPythonInterpreter::IsInitialized());
+
   vtkPythonInterpreter::SetCaptureStdin(true);
 
   // Print the default Python interpreter greeting.
-  this->executeScript(
-    "def ___init_pqpython_shell():\n"
-    "  import sys\n"
-    "  print 'Python %s on %s' % (sys.version, sys.platform)\n"
-    "___init_pqpython_shell()\n"
-    "del ___init_pqpython_shell");
+  this->printString(
+    QString("Python %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()),
+    OUTPUT);
   this->printString("from paraview.simple import *\n");
   this->pushScript("from paraview.simple import *");
   this->prompt();
@@ -390,16 +392,12 @@ void pqPythonShell::HandleInterpreterEvents(
     {
   case vtkCommand::ErrorEvent:
       {
-      const char* message = reinterpret_cast<const char*>(calldata);
-      this->printString(message, ERROR);
       this->repaint();
       }
     break;
 
   case vtkCommand::SetOutputEvent:
       {
-      const char* message = reinterpret_cast<const char*>(calldata);
-      this->printString(message, OUTPUT);
       this->repaint();
       }
     break;
