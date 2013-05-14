@@ -1,5 +1,8 @@
 """This is a test to test the paraview proxy manager API."""
 
+import paraview
+paraview.compatibility.major = 3
+paraview.compatibility.minor = 4
 from paraview import servermanager
 
 def Error(message):

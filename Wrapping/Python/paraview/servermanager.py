@@ -42,9 +42,9 @@ A simple example:
 #==============================================================================
 import paraview, re, os, os.path, new, sys, atexit, vtk
 
-if not paraview.compatibility.minor:
-    paraview.compatibility.major = 3
 if not paraview.compatibility.major:
+    paraview.compatibility.major = 3
+if not paraview.compatibility.minor:
     paraview.compatibility.minor = 5
 
 from vtkPVServerImplementationCorePython import *
@@ -1875,8 +1875,16 @@ class ProxyIterator(object):
 
 # Caution: Observers must be global methods otherwise we run into memory
 #          leak when the interpreter get reset from the C++ layer.
-def _update_definitions(caller, event):
-    updateModules(ActiveConnection.Modules)
+def _update_definitions_callback(self):
+    def _update_definitions(caller, event):
+        global ActiveConnection
+        # HACK: updateModules() works on ActiveConnection, hence we trick it
+        # for now.
+        old_activeconnection = ActiveConnection
+        ActiveConnection = self
+        updateModules(self.Modules)
+        ActiveConnection = old_activeconnection
+    return _update_definitions
 
 class Connection(object):
     """
@@ -1885,7 +1893,6 @@ class Connection(object):
     def __init__(self, connectionId, session):
         """Default constructor. Creates a Connection with the given
         ID, all other data members initialized to None."""
-        global MultiServerConnections
         global ActiveConnection
         self.ID = connectionId
         self.Session = session
@@ -1893,13 +1900,18 @@ class Connection(object):
         self.Alive = True
         self.DefinitionObserverTag = 0
         self.CustomDefinitionObserverTag = 0
-        if MultiServerConnections == None and ActiveConnection:
-            raise RuntimeError, "Concurrent connections not supported!"
-        if MultiServerConnections != None and not self in MultiServerConnections:
-           MultiServerConnections.append(self)
+
+        # newly created connection always become the active connection.
         ActiveConnection = self
-        __InitAfterConnect__(self)
-        __exposeActiveModules__()
+
+        # Build the list of available proxies for this connection.
+        _createModules(self.Modules)
+
+        # additionally, if the proxy definitions change, we monitor them.
+        self.AttachDefinitionUpdater()
+
+        ActiveConnection = None
+        #SetActiveConnection(self)
 
     def __eq__(self, other):
         "Returns true if the connection ids are the same."
@@ -1927,10 +1939,11 @@ class Connection(object):
 
     def AttachDefinitionUpdater(self):
         """Attach observer to automatically update modules when needed."""
-        # ProxyDefinitionsUpdated = 2000
-        self.DefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2000, _update_definitions)
-        # CompoundProxyDefinitionsUpdated = 2001
-        self.CustomDefinitionObserverTag = self.Session.GetProxyDefinitionManager().AddObserver(2001, _update_definitions)
+        dfnMgr = self.Session.GetProxyDefinitionManager()
+        self.DefinitionObserverTag = dfnMgr.AddObserver(
+            dfnMgr.ProxyDefinitionsUpdated, _update_definitions_callback(self))
+        self.CustomDefinitionObserverTag = dfnMgr.AddObserver(
+            dfnMgr.CompoundProxyDefinitionsUpdated, _update_definitions_callback(self))
         pass
 
     def close(self):
@@ -1969,30 +1982,6 @@ def LoadState(filename, connection=None):
             view.GetRenderWindow().SetSize(view.ViewSize[0], \
                                            view.ViewSize[1])
 
-def InitFromGUI():
-    """
-    Method used to initialize the Python Shell from the ParaView GUI.
-    """
-    global fromGUI, ActiveConnection
-    if not fromGUI:
-       paraview.print_debug_info("from paraview.simple import *")
-    fromGUI = True
-    # ToggleProgressPrinting() ### FIXME COLLABORATION
-    enableMultiServer(vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport())
-    iter = vtkProcessModule.GetProcessModule().NewSessionIterator();
-    iter.InitTraversal()
-    ActiveConnection = None
-    activeSession = vtkSMProxyManager.GetProxyManager().GetActiveSession()
-    tmpActiveConnection = None
-    while not iter.IsDoneWithTraversal():
-       c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
-       if c.Session == activeSession:
-          tmpActiveConnection = c
-       iter.GoToNextItem()
-    iter.UnRegister(None)
-    if tmpActiveConnection:
-       ActiveConnection = tmpActiveConnection
-
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
     Use this function call to create a new session. On success,
@@ -2017,7 +2006,11 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
         session = vtkSMSessionClient()
         session.Connect("cdsrs://%s:%d/%s:%d" % (ds_host, ds_port, rs_host, rs_port))
     id = vtkProcessModule.GetProcessModule().RegisterSession(session)
-    connection = Connection(id, session)
+    connection = GetConnectionFromId(id)
+
+    # This shouldn't be needed. However, it's needed for old Python scripts that
+    # directly import servermanager.py without simple.py
+    SetActiveConnection(connection)
     return connection
 
 def ReverseConnect(port=11111):
@@ -2034,37 +2027,22 @@ def ReverseConnect(port=11111):
     session = vtkSMSessionClient()
     session.Connect("csrc://hostname:" + port)
     id = vtkProcessModule.GetProcessModule().RegisterSession(session)
-    connection = Connection(id, session)
+    connection = GetConnectionFromId(id)
+
+    # This shouldn't be needed. However, it's needed for old Python scripts that
+    # directly import servermanager.py without simple.py
+    SetActiveConnection(connection)
     return connection
 
-def Disconnect(session=None):
+def Disconnect(connection=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
     global ActiveConnection
-    global MultiServerConnections
-    global fromGUI
-    if fromGUI:
-        # Let the UI know that we want to disconnect
-        ActiveConnection.Session.InvokeEvent('ExitEvent')
-        return
-    if ActiveConnection and (not session or session == ActiveConnection.Session):
-        session = ActiveConnection.Session
-        if MultiServerConnections:
-           MultiServerConnections.remove(ActiveConnection)
-           ActiveConnection.close()
-           ActiveConnection = None
-           switchActiveConnection()
-        else:
-           ActiveConnection.close()
-           ActiveConnection = None
-    elif MultiServerConnections:
-        for connection in MultiServerConnections:
-          if connection.Session == session:
-            connection.close()
-            MultiServerConnections.remove(connection)
-    if session:
-      vtkProcessModule.GetProcessModule().UnRegisterSession(session)
-    return
+    if not connection:
+        connection = ActiveConnection
+
+    if connection:
+        vtkSMSession.Disconnect(connection.ID)
 
 def CreateProxy(xml_group, xml_name, session=None):
     """Creates a proxy. If session is set, the proxy's session is
@@ -2379,7 +2357,7 @@ def SetProgressPrintingEnabled(value):
 
     # If value is true and progress printing is currently off...
     if value and not GetProgressPrintingIsEnabled():
-        if fromGUI:
+        if paraview.fromGUI:
             raise RuntimeError("Printing progress in the GUI is not supported.")
         progressObserverTag = vtkProcessModule.GetProcessModule().AddObserver(\
             "ProgressEvent", _printProgress)
@@ -2999,47 +2977,37 @@ ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' 
 # Connect() automatically sets this if it is not already set.
 ActiveConnection = None
 
-# Fields for multi-server support
-MultiServerConnections = None
+"""Keeps track of all connection objects. Unless the process was run with
+--multi-servers flag set to True, this will generally be just 1 item long at the
+most."""
+Connections = []
 
-# API for multi-server support
-def enableMultiServer(multiServer=True):
-  """This method enable the current servermanager to support several
-  connections. Once we enable the multi-server support, the user can create
-  as many connection as he want and switch from one to another in order to
-  create and manage proxy."""
-  global MultiServerConnections, ActiveConnection
-  if not multiServer and MultiServerConnections:
-      raise RuntimeError, "Once we enable Multi-Server support we can not get back"
-  MultiServerConnections = []
-  if ActiveConnection:
-    MultiServerConnections.append(ActiveConnection)
+def SetActiveConnection(connection=None):
+    """Set the active connection. If the process was run without multi-server
+       enabled and this method is called with a non-None argument while an
+       ActiveConnection is present, it will raise a RuntimeError."""
+    global ActiveConnection
 
-def switchActiveConnection(newActiveConnection=None):
-  """Switch active connection to be the provided one or if none just pick the
-  other one"""
-  global MultiServerConnections, ActiveConnection
-  if MultiServerConnections == None:
-    raise RuntimeError, "enableMultiServer() must be called before"
+    #supports_simutaneous_connections =\
+    #    vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport()
 
-  # Manage the case when no connection is provided
-  if newActiveConnection:
-    ActiveConnection = newActiveConnection
+    #print "updating active connection", connection
+    ActiveConnection = connection
+
+    #  This will ensure that servemanager.sources.* will point to the right
+    #  constructors.
     __exposeActiveModules__()
-    # Update active session for ParaView
-    if vtkSMProxyManager.GetProxyManager().GetActiveSession() != ActiveConnection.Session:
-       vtkSMProxyManager.GetProxyManager().SetActiveSession(ActiveConnection.Session)
+
+    # If this method was initiated from Python, we need to pass that info to the
+    # ServerManager.
+    session = None
+    if ActiveConnection:
+        session = ActiveConnection.Session
+
+    # This is a no-op if the session is unchanged.
+    pxm = vtkSMProxyManager.GetProxyManager()
+    pxm.SetActiveSession(session)
     return ActiveConnection
-  else:
-    for connection in MultiServerConnections:
-      if connection != ActiveConnection:
-         ActiveConnection = connection
-         __exposeActiveModules__()
-         # Update active session for ParaView
-         if vtkSMProxyManager.GetProxyManager().GetActiveSession() != ActiveConnection.Session:
-            vtkSMProxyManager.GetProxyManager().SetActiveSession(ActiveConnection.Session)
-         return ActiveConnection
-  return None
 
 # Needs to be called when paraview module is loaded from python instead
 # of pvpython, pvbatch or GUI.
@@ -3058,8 +3026,8 @@ if not vtkProcessModule.GetProcessModule():
 progressObserverTag = None
 currentAlgorithm = False
 currentProgress = 0
-fromGUI = False
-ToggleProgressPrinting()
+if not paraview.fromGUI:
+    ToggleProgressPrinting()
 
 _pyproxies = {}
 
@@ -3071,48 +3039,96 @@ _pyproxies = {}
 loader = _ModuleLoader()
 sys.meta_path.append(loader)
 
-def __InitAfterConnect__(connection):
-    """
-    This function is called everytime after a server connection is made.
-    Since the ProxyManager and all proxy definitions are changed every time a
-    new connection is made, we re-create all the modules
-    """
-    _createModules(connection.Modules)
-
-    if not paraview.fromFilter:
-        # fromFilter is set when this module is imported from the programmable
-        # filter
-        connection.AttachDefinitionUpdater()
-        pass
 
 def __exposeActiveModules__():
     """Update servermanager submodules to point to the current
     ActiveConnection.Modules.*"""
+    global ActiveConnection
+
     # Expose all active module to the current servermanager module
     if ActiveConnection:
        for m in [mName for mName in dir(ActiveConnection.Modules) if mName[0] != '_' ]:
           exec "global %s;%s = ActiveConnection.Modules.%s" % (m,m,m)
 
+def GetConnectionFromId(id):
+    """Returns the Connection object corresponding a connection identified by
+       the id."""
+    global Connections
+    for connection in Connections:
+        if connection.ID == id:
+            return connection
+    return None
+
+def GetConnectionFromSession(session):
+    """Retuns the Connection object corresponding to a vtkSMSession instance."""
+    global Connections
+    for connection in Connections:
+        if connection.Session == session:
+            return connection
+
+    pm = vtkProcessModule.GetProcessModule()
+    sid = pm.GetSessionID(session)
+    if session and sid:
+        # it implies that the we simply may not have received the
+        # ConnectionCreatedEvent event yet. Create a connection object.
+        c = Connection(sid, session)
+        Connections.append(c)
+        return c
+    return None
+
+
+def __connectionCreatedCallback(obj, string):
+    """Callback called when a new session is created."""
+    global Connections
+    pm = vtkProcessModule.GetProcessModule()
+    sid = pm.GetEventCallDataSessionId()
+    # this creates the Connection object if needed.
+    GetConnectionFromSession(pm.GetSession(sid))
+
+def __connectionClosedCallback(obg, string):
+    """Callback called when a new session is closed."""
+    global Connections, ActiveConnection
+    pm = vtkProcessModule.GetProcessModule()
+    sid = pm.GetEventCallDataSessionId()
+    if sid:
+        c = GetConnectionFromId(sid)
+        if c:
+            for cc in range(len(Connections)):
+                if Connections[cc] == c:
+                    del Connections[cc]
+                    break
+            c.close()
+            del c
+    import gc
+    gc.collect()
+
+def __initialize():
+    """Does initialization of the module, ensuring that the module's state
+        correctly reflects that of the ProcessModule/ServerManager."""
+    global ActiveConnection, Connections
+
+    # Monitor connection creations/deletions on the ProcessModule.
+    pm = vtkProcessModule.GetProcessModule()
+    pm.AddObserver("ConnectionCreatedEvent", __connectionCreatedCallback)
+    pm.AddObserver("ConnectionClosedEvent", __connectionClosedCallback)
+
+    # Iterate over existing connections, if any, and set the datastructures up.
+    iter = vtkProcessModule.GetProcessModule().NewSessionIterator();
+    iter.UnRegister(None)
+    iter.InitTraversal()
+    firstSession = None
+    while not iter.IsDoneWithTraversal():
+        c = Connection(iter.GetCurrentSessionId(), iter.GetCurrentSession())
+        Connections.append(c)
+        iter.GoToNextItem()
+
+    # Update active session.
+    activeConnection = GetConnectionFromSession(\
+        vtkSMProxyManager.GetProxyManager().GetActiveSession())
+    SetActiveConnection(activeConnection)
+
+__initialize()
+
 if hasattr(sys, "ps1"):
     # session is interactive.
     paraview.print_debug_info(vtkSMProxyManager.GetParaViewSourceVersion());
-
-def GetConnectionFromId(id):
-   for connection in MultiServerConnections:
-      if connection.ID == id:
-         return connection
-   return None
-
-def GetConnectionFromSession(session):
-   for connection in MultiServerConnections:
-      if connection.Session == session:
-         return connection
-   return None
-
-def GetConnectionAt(index):
-   return MultiServerConnections[index]
-
-def GetNumberOfConnections():
-   return len(MultiServerConnections)
-
-atexit.register(vtkPythonProgrammableFilter.DeleteGlobalPythonInterpretor)

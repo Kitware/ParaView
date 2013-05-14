@@ -116,6 +116,13 @@ public:
   bool UnRegisterSession(vtkSession* session);
 
   // Description:
+  // RegisterSession and UnRegisterSession fire events with SessionID in
+  // calldata. To provide access to that in Python, we have this method. The
+  // value is valid only in vtkCommand::ConnectionCreatedEvent and
+  // vtkCommand::ConnectionClosedEvent callbacks and is set to 0 at other times.
+  vtkGetMacro(EventCallDataSessionId, vtkIdType);
+
+  // Description:
   // Returns the session associated with a given ID.
   vtkSession* GetSession(vtkIdType);
 
@@ -236,6 +243,11 @@ private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
   void operator=(const vtkProcessModule&); // Not implemented.
 
+  // Helper to initialize Python environment. This doesn't initialize Python
+  // but simply sets up the environment so when Python is initialized, it can
+  // find ParaView modules. This does nothing is not build with Python support.
+  bool InitializePythonEnvironment(int argc, char** argv);
+
   static ProcessTypes ProcessType;
 
   // Set to true in Initialize if Finalize() should cleanup MPI.
@@ -247,6 +259,8 @@ private:
   bool SymmetricMPIMode;
 
   bool MultipleSessionsSupport;
+
+  vtkIdType EventCallDataSessionId;
 //ETX
 };
 

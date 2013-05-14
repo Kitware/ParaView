@@ -151,7 +151,6 @@ public:
   // is essential that it's configured correctly.
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
 
-//BTX
 
   enum eventId
     {
@@ -194,6 +193,7 @@ public:
     vtkPVXMLElement* StateChangeElement;
     };
 
+//BTX
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -206,6 +206,10 @@ protected:
   // Description:
   // Save global property managers.
   void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
+
+  // Description:
+  // Connections updated. Update the active session accordingly.
+  void ConnectionsUpdated(vtkObject*, unsigned long, void*);
 
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;

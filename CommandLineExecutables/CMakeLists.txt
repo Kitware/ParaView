@@ -51,7 +51,6 @@ if (PARAVIEW_ENABLE_PYTHON)
     pv_add_executable(${name} ${name}.cxx)
     target_link_libraries(${name}
       vtkPVServerManagerApplication
-      vtkPVPythonSupport
       vtkUtilitiesPythonInitializer
       ${VTK_PYTHON_LIBRARIES})
   endforeach()

@@ -4,6 +4,9 @@ import SMPythonTesting
 import os
 import os.path
 import sys
+import paraview
+paraview.compatibility.major = 3
+paraview.compatibility.minor = 4
 from paraview import servermanager
 from paraview import util
 

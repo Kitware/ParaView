@@ -111,6 +111,8 @@ set (Module_SRCS
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
+  pqInputDataTypeDecorator.cxx
+  pqInputDataTypeDecorator.h
   pqListPropertyWidget.cxx
   pqListPropertyWidget.h
   pqLoadDataReaction.cxx
@@ -127,10 +129,6 @@ set (Module_SRCS
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.cxx
   pqMasterOnlyReaction.h
-  pqMultiServerBehavior.cxx
-  pqMultiServerBehavior.h
-  pqNonPolyDataInputDecorator.cxx
-  pqNonPolyDataInputDecorator.h
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.cxx
@@ -195,8 +193,6 @@ set (Module_SRCS
   pqStandardViewFrameActionGroup.h
   pqStatusBar.cxx
   pqStatusBar.h
-  pqStructuredInputDecorator.cxx
-  pqStructuredInputDecorator.h
   pqTestingReaction.cxx
   pqTestingReaction.h
   pqTimerLogReaction.cxx
@@ -267,6 +263,7 @@ set (Module_MOC_HDRS
   pqFixPathsInStateFilesBehavior.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
+  pqInputDataTypeDecorator.h
   pqListPropertyWidget.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
@@ -275,8 +272,6 @@ set (Module_MOC_HDRS
   pqManageLinksReaction.h
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
-  pqMultiServerBehavior.h
-  pqNonPolyDataInputDecorator.h
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
@@ -308,7 +303,6 @@ set (Module_MOC_HDRS
   pqStandardPropertyWidgetInterface.h
   pqStandardViewFrameActionGroup.h
   pqStatusBar.h
-  pqStructuredInputDecorator.h
   pqTestingReaction.h
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.h

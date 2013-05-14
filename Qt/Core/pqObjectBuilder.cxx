@@ -960,14 +960,8 @@ void pqObjectBuilder::removeServer(pqServer* server)
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* sModel = core->getServerManagerModel();
   sModel->beginRemoveServer(server);
-  this->destroyAllProxies(server);
-  vtkProcessModule::GetProcessModule()->UnRegisterSession(server->session());
+  vtkSMSession::Disconnect(server->sessionId());
   sModel->endRemoveServer();
-
-  if (sModel->getNumberOfItems<pqServer*>() > 0)
-    {
-    emit activeServerChanged(sModel->getItemAtIndex<pqServer*>(0));
-    }
 }
 
 //-----------------------------------------------------------------------------

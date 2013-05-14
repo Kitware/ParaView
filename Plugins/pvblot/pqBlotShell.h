@@ -29,7 +29,7 @@ class pqServer;
 
 class vtkObject;
 class vtkEventQtSlotConnect;
-class vtkPVPythonInterpretor;
+class vtkPythonInteractiveInterpreter;
 
 /**
    Qt widget that provides an interactive "shell" interface to a PV Blot
@@ -78,7 +78,7 @@ protected:
 
   vtkEventQtSlotConnect *VTKConnect;
   // Interpreter is spelled wrong.  Maybe someone should fix that.
-  vtkPVPythonInterpretor *Interpretor;
+  vtkPythonInteractiveInterpreter *Interpretor;
 
   virtual void destroyInterpretor();
 

@@ -76,6 +76,9 @@ pqPVApplicationCore::pqPVApplicationCore(
   this->PythonManager = 0;
 #ifdef PARAVIEW_ENABLE_PYTHON
   this->PythonManager = new pqPythonManager(this);
+
+  // Ensure that whenever Python is initialized, we tell paraview.servermanager
+  // that is being done from the GUI.
 #endif
   
   // Lookuptable management will soon enough move to the server manager.

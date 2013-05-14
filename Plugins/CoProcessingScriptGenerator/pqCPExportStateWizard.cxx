@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPipelineFilter.h>
 #include <pqPipelineRepresentation.h>
 #include <pqPipelineSource.h>
-#include <pqPythonDialog.h>
-#include <pqPythonManager.h>
 #include <pqRenderViewBase.h>
 #include <pqServerManagerModel.h>
 
@@ -46,11 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkNew.h>
 #include <vtkPNGWriter.h>
 #include <vtkPVXMLElement.h>
+#include <vtkPythonInterpreter.h>
+#include <vtkSmartPointer.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMViewProxy.h>
-#include <vtkSmartPointer.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -542,18 +541,6 @@ bool pqCPExportStateWizard::validateCurrentPage()
   QString filename = file_dialog.getSelectedFiles()[0];
 
   // Last Page, export the state.
-  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
-    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
-  pqPythonDialog* dialog = 0;
-  if (manager)
-    {
-    dialog = manager->pythonShellDialog();
-    }
-  if (!dialog)
-    {
-    qCritical("Failed to locate Python dialog. Cannot save state.");
-    return true;
-    }
 
   // the map from the simulation inputs in the paraview gui
   // to the adaptor's named inputs (usually 'input')
@@ -581,6 +568,6 @@ bool pqCPExportStateWizard::validateCurrentPage()
                    .arg(rescale_data_range)
                    .arg(live_visualization)
                    .arg(filename);
-  dialog->runString(command);
+  vtkPythonInterpreter::RunSimpleString(command.toAscii().data());
   return true;
 }

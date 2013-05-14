@@ -1,7 +1,7 @@
 vtk_module(vtkPVPythonCatalyst
   DEPENDS
     vtkPVCatalyst
-    vtkPVPythonSupport
+    vtkPythonInterpreter
   TEST_DEPENDS
     vtkIOImage
     vtkTestingRendering

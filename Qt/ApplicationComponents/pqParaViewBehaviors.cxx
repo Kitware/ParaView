@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDeleteBehavior.h"
 #include "pqFixPathsInStateFilesBehavior.h"
 #include "pqInterfaceTracker.h"
-#include "pqMultiServerBehavior.h"
 #include "pqObjectPickingBehavior.h"
 #include "pqPVNewSourceBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
@@ -98,7 +97,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqCollaborationBehavior(this);
-  new pqMultiServerBehavior(this);
   new pqViewStreamingBehavior(this);
 
   // Setup quick-launch shortcuts.

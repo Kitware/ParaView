@@ -65,9 +65,26 @@ public:
   // Expose method from vtkClip
   void SetUseValueAsOffset(int);
 
+  // Description:
+  // Add validation for active filter so that the vtkExtractGeometry
+  // won't be used without ImplicifFuntion being set.
+  virtual int ProcessRequest(vtkInformation* request,
+    vtkInformationVector** inInfo,
+    vtkInformationVector* outInfo);
+
+  // Add validation for active filter so that the vtkExtractGeometry
+  // won't be used without ImplicifFuntion being set.
+  virtual int ProcessRequest(vtkInformation* request,
+    vtkCollection* inInfo,
+    vtkInformationVector* outInfo);
+
 protected:
   vtkPVMetaClipDataSet();
   ~vtkPVMetaClipDataSet();
+
+  // Check to see if this filter can do crinkle, return true if
+  // we need to switch active filter, so that we can switch back after.
+  bool SwitchFilterForCrinkle();
 
 private:
   vtkPVMetaClipDataSet(const vtkPVMetaClipDataSet&);  // Not implemented.
