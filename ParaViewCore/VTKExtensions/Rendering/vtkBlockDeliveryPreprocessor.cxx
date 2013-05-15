@@ -15,10 +15,8 @@
 #include "vtkBlockDeliveryPreprocessor.h"
 
 #include "vtkAttributeDataToTableFilter.h"
-#include "vtkSplitColumnComponents.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkExtractBlock.h"
-#include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
@@ -26,7 +24,9 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
+#include "vtkSplitColumnComponents.h"
 #include "vtkTable.h"
+#include "vtkUniformGridAMRDataIterator.h"
 
 vtkStandardNewMacro(vtkBlockDeliveryPreprocessor);
 //----------------------------------------------------------------------------
@@ -149,32 +149,31 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
     output->ShallowCopy(filter->GetOutputDataObject(0));
     }
 
-  vtkCompositeDataSet* input = vtkCompositeDataSet::SafeDownCast(inputDO);
-
   // Add meta-data about composite-index/hierarchical index to help
   // vtkSelectionStreamer.
-  vtkCompositeDataIterator* iter = input->NewIterator();
-  vtkHierarchicalBoxDataIterator* hbIter =
-    vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
+  vtkCompositeDataIterator* iter = output->NewIterator();
+  vtkUniformGridAMRDataIterator* ugIter =
+    vtkUniformGridAMRDataIterator::SafeDownCast(iter);
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextItem())
     {
-    vtkInformation* metaData = output->GetMetaData(iter);
-    metaData->Set(
-      vtkSelectionNode::COMPOSITE_INDEX(), iter->GetCurrentFlatIndex());
-    if (hbIter)
+    vtkInformation* metaData = iter->GetCurrentMetaData();
+    if(metaData)
       {
       metaData->Set(
-        vtkSelectionNode::HIERARCHICAL_LEVEL(), hbIter->GetCurrentLevel());
-      metaData->Set(
-        vtkSelectionNode::HIERARCHICAL_INDEX(), hbIter->GetCurrentIndex());
+        vtkSelectionNode::COMPOSITE_INDEX(), iter->GetCurrentFlatIndex());
+      if(ugIter)
+        {
+        metaData->Set(
+          vtkSelectionNode::HIERARCHICAL_LEVEL(), ugIter->GetCurrentLevel());
+        metaData->Set(
+          vtkSelectionNode::HIERARCHICAL_INDEX(), ugIter->GetCurrentIndex());
+        }
       }
-
     }
   iter->Delete();
   return 1;
 }
-
 
 //----------------------------------------------------------------------------
 vtkExecutive* vtkBlockDeliveryPreprocessor::CreateDefaultExecutive()
