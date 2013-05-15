@@ -335,9 +335,6 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
 
   runscript += "from paraview import vtk\n";
   runscript += "from paraview import vtk\n";
-  runscript += "from paraview import servermanager\n";
-  runscript += "if servermanager.progressObserverTag:\n";
-  runscript += "  servermanager.ToggleProgressPrinting()\n";
   runscript += "hasnumpy = True\n";
   runscript += "try:\n";
   runscript += "  from numpy import *\n";

@@ -4,7 +4,6 @@ except ImportError:
     raise RuntimeError("This module depends on the numpy module. Please make\
 sure that it is installed properly.")
 
-from paraview import servermanager
 from paraview import numpy_support
 
 class ArrayAssociation :
