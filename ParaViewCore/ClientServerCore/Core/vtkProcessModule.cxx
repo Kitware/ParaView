@@ -457,6 +457,8 @@ bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
     vtksys::SystemTools::GetFilenamePath(argv[0]).c_str());
   vtkPythonAppInitPrependPath(self_dir.c_str());
 #endif
+  (void)argc;
+  (void)argv;
   return true;
 }
 
