@@ -79,6 +79,7 @@ vtkCxxSetObjectMacro(vtkH5PartReader, Controller, vtkMultiProcessController);
 #endif
 
 #include <algorithm>
+#include <functional>
 
 #include "H5Part.h"
 //----------------------------------------------------------------------------
