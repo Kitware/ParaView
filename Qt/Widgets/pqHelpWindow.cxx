@@ -222,7 +222,7 @@ pqHelpWindow::pqHelpWindow(
     this, SLOT(showPage(const QUrl&)));
 
 #ifndef PQWIDGETS_DISABLE_QTWEBKIT
-  this->Browser = new pqWebView(this);
+  this->Browser = new QWebView(this);
   this->setCentralWidget(this->Browser);
 
   QNetworkAccessManager *oldManager = this->Browser->page()->networkAccessManager();
