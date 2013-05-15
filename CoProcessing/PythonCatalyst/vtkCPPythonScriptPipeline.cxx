@@ -50,8 +50,18 @@ namespace
       PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION);
     vtkPythonInterpreter::PrependPythonPath(
       PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
+
+#if defined(_WIN32)
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/bin/site-packages");
+# if defined(CMAKE_INTDIR)
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR);
+# else
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/bin");
+# endif
+#else // UNIX/OsX
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");
+#endif
 
     vtkPythonInterpreter::Initialize();
     
