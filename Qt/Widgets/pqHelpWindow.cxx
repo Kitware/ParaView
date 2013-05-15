@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QUrl>
 #include <QLabel>
 
-#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+#ifndef PQWIDGETS_DISABLE_QTWEBKIT
 # include <QtNetwork/QNetworkReply>
 # include <QNetworkAccessManager>
 # include <QNetworkProxy>
@@ -57,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # include <QWebView>
 #endif
 
-#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+#ifndef PQWIDGETS_DISABLE_QTWEBKIT
 namespace
 {
 
@@ -181,7 +181,7 @@ private:
   Q_DISABLE_COPY(pqNetworkAccessManager);
 };
 
-#endif // end of ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+#endif // end of ifndef PQWIDGETS_DISABLE_QTWEBKIT
 
 // ****************************************************************************
 //            CLASS pqHelpWindow
@@ -221,7 +221,7 @@ pqHelpWindow::pqHelpWindow(
     SIGNAL(requestShowLink(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 
-#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+#ifndef PQWIDGETS_DISABLE_QTWEBKIT
   this->Browser = new pqWebView(this);
   this->setCentralWidget(this->Browser);
 
@@ -251,7 +251,7 @@ pqHelpWindow::~pqHelpWindow()
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QString& url)
 {
-#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+#ifndef PQWIDGETS_DISABLE_QTWEBKIT
   this->Browser->setUrl(url);
 #endif
 }
@@ -259,7 +259,7 @@ void pqHelpWindow::showPage(const QString& url)
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QUrl& url)
 {
-#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+#ifndef PQWIDGETS_DISABLE_QTWEBKIT
   this->Browser->setUrl(url);
 #endif
 }
