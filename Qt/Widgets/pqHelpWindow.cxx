@@ -43,16 +43,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHelpSearchEngine>
 #include <QHelpSearchQueryWidget>
 #include <QHelpSearchResultWidget>
-#include <QNetworkAccessManager>
-#include <QNetworkProxy>
 #include <QPointer>
 #include <QtDebug>
 #include <QTimer>
-#include <QtNetwork/QNetworkReply>
 #include <QUrl>
-#include <QWebPage>
-#include <QWebView>
+#include <QLabel>
 
+#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+# include <QtNetwork/QNetworkReply>
+# include <QNetworkAccessManager>
+# include <QNetworkProxy>
+# include <QWebPage>
+# include <QWebView>
+#endif
+
+#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
 namespace
 {
 
@@ -176,6 +181,8 @@ private:
   Q_DISABLE_COPY(pqNetworkAccessManager);
 };
 
+#endif // end of ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+
 // ****************************************************************************
 //            CLASS pqHelpWindow
 // ****************************************************************************
@@ -214,7 +221,8 @@ pqHelpWindow::pqHelpWindow(
     SIGNAL(requestShowLink(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 
-  this->Browser = new QWebView(this);
+#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
+  this->Browser = new pqWebView(this);
   this->setCentralWidget(this->Browser);
 
   QNetworkAccessManager *oldManager = this->Browser->page()->networkAccessManager();
@@ -226,6 +234,13 @@ pqHelpWindow::pqHelpWindow(
   QObject::connect(
     this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
+#else
+  this->Browser = NULL;
+  QLabel* label = new QLabel(this);
+  label->setText(
+    "<html><center><b>QtWebKit support was not enabled. Hence help is not avialable.</b></center></html>");
+  this->setCentralWidget(label);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -236,13 +251,17 @@ pqHelpWindow::~pqHelpWindow()
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QString& url)
 {
+#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
   this->Browser->setUrl(url);
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QUrl& url)
 {
+#ifndef QT_WIDGETS_DISABLE_QTWEBKIT
   this->Browser->setUrl(url);
+#endif
 }
 
 //-----------------------------------------------------------------------------

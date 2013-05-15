@@ -193,9 +193,20 @@ SET(QT_WIDGETS_ALL_SRCS ${Module_SRCS} ${QtWidgets_MOC_SOURCES}
 
 ##########################################################################
 # import Qt4 build settings
+
+# Option to disable WebKit since QtWebkit has build issues on certain platforms.
+option(QT_WIDGETS_DISABLE_QTWEBKIT "Disable use of QtWebKit." OFF)
+mark_as_advanced(QT_WIDGETS_DISABLE_QTWEBKIT)
+
 set(QT_USE_QTNETWORK 1)
 set(QT_USE_QTHELP 1)
-set(QT_USE_QTWEBKIT 1)
+
+if (QT_WIDGETS_DISABLE_QTWEBKIT)
+  set (QT_USE_QTWEBKIT 0)
+else()
+  set(QT_USE_QTWEBKIT 1)
+endif()
+
 find_package(Qt4 REQUIRED QUIET)
 include(${QT_USE_FILE})
 
@@ -208,6 +219,11 @@ set(${vtk-module}_NO_HeaderTest 1)
 
 vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
 target_link_libraries(${vtk-module} ${QT_LIBRARIES})
+
+if (QT_WIDGETS_DISABLE_QTWEBKIT)
+  set_target_properties(${vtk-module}
+    PROPERTIES DEFINE_SYMBOL QT_WIDGETS_DISABLE_QTWEBKIT)
+endif()
 
 #IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 #  # Headers
