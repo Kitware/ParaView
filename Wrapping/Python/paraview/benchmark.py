@@ -100,6 +100,13 @@ class OneLog :
             for i in self.lines:
                 print i
 
+    def toString(self, showlines=False):
+        result = "#RunMode: " + self.runmode + " ServerType: " + self.servertype + " Component: " + self.componentString() + " processor#: " + str(self.rank) + "\n"
+        if showlines:
+            for i in self.lines:
+                result += i + "\n"
+        return result
+
 logs = []
 
 def maximize_logs () :
@@ -207,8 +214,45 @@ def print_logs() :
     if len(logs) == 0:
         get_logs()
 
-    for i in logs:
-       i.print_log(True)
+    # Handle symetric mode specificaly if need be
+    pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+    is_symmetric_mode = False
+    if pm != None:
+        is_symmetric_mode = pm.GetSymmetricMPIMode()
+
+    if is_symmetric_mode:
+        # Need to provide extra synchronization
+        ctrl = pm.GetGlobalController()
+        proc = pm.GetPartitionId()
+        nbProc = pm.GetNumberOfLocalPartitions()
+        if proc == 0:
+            # Start with my logs
+            for i in logs:
+                i.print_log(True)
+            # Then Print the log of every other rank
+            for otherProc in range(1, nbProc):
+                # Max buffer size 999999
+                logSize = " " * 6
+                ctrl.Receive(logSize, len(logSize), otherProc, 987455)
+                logSize = int(logSize)
+                logTxt = " " * logSize
+                ctrl.Receive(logTxt, logSize, otherProc, 987456)
+                print logTxt
+        else:
+            # Extract logs text
+            logTxt = ""
+            for i in logs:
+                logTxt += i.toString(True)
+            logSize = str(len(logTxt))
+
+            # Push local logs to process 0
+            ctrl.Send(logSize, len(logSize), 0, 987455)
+            ctrl.Send(logTxt, len(logTxt), 0, 987456)
+
+    else:
+        # Regular local print
+        for i in logs:
+            i.print_log(True)
 
 def __process_frame() :
     global filters
