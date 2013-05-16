@@ -43,8 +43,9 @@ public:
     QWidget *parentObject=0, Qt::WindowFlags parentFlags=0);
   virtual ~pqCPExportStateWizard();
 
-protected:
   virtual void customize();
+
+protected:
   virtual bool getCommandString(QString& command);
 
 private:

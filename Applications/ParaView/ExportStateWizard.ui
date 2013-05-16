@@ -159,7 +159,7 @@
     <string>Select state configuration options.</string>
    </property>
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0">
      <widget class="QCheckBox" name="liveViz">
       <property name="text">
        <string>Live Visualization</string>
@@ -195,19 +195,6 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>215</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
     <item row="2" column="0" colspan="2">
      <widget class="QCheckBox" name="outputRendering">
       <property name="enabled">
@@ -221,7 +208,7 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="0" colspan="2">
+    <item row="3" column="0">
      <widget class="QCheckBox" name="rescaleDataRange">
       <property name="enabled">
        <bool>true</bool>
@@ -263,22 +250,22 @@
      </widget>
     </item>
     <item row="5" column="0">
-     <widget class="QPushButton" name="nextView">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Next View</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0" colspan="2">
      <widget class="QPushButton" name="previousView">
       <property name="enabled">
        <bool>false</bool>
       </property>
       <property name="text">
        <string>Previous View</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QPushButton" name="nextView">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Next View</string>
       </property>
      </widget>
     </item>
