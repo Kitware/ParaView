@@ -56,7 +56,7 @@ namespace blas {
          const int& incx,  const double *y, const int& incy){
     F77NAME(daxpy)(n,alpha,x,incx,y,incy);}
   /// - BLAS level 1: Swap \a x with  \a y
-  static void dswap (const int& n,double *x, const int& incx,
+  inline static void dswap (const int& n,double *x, const int& incx,
          double *y, const int& incy){
     F77NAME(dswap)(n,x,incx,y,incy);}
   /// - BLAS level 1: x = alpha \a x
@@ -64,25 +64,25 @@ namespace blas {
          const int& incx){
     F77NAME(dscal)(n,alpha,x,incx);}
   /// - BLAS level 1: Plane rotation by c = cos(theta), s = sin(theta)
-  static void drot (const int& n,  double *x,  const int& incx,
+  inline static void drot (const int& n,  double *x,  const int& incx,
         double *y, const int& incy, const double& c,
         const double& s){
     F77NAME(drot)(n,x,incx,y,incy,c,s);}
   /// - BLAS level 1: output =   \f$ x^T  y \f$
-  static double ddot (const int& n, const double *x, const int& incx,
+  inline static double ddot (const int& n, const double *x, const int& incx,
           const double *y, const int& incy){
     return F77NAME(ddot)(n,x,incx,y,incy);}
   /// - BLAS level 1: output = \f$ ||x||_2 \f$
-  static double dnrm2 (const int& n, const double *x, const int& incx){
+  inline static double dnrm2 (const int& n, const double *x, const int& incx){
     return F77NAME(dnrm2)(n,x,incx);}
   /// - BLAS level 1: output = \f$ ||x||_1 \f$
-  static double dasum (const int& n, const double *x, const int& incx){
+  inline static double dasum (const int& n, const double *x, const int& incx){
     return F77NAME(dasum)(n,x,incx);}
 
   /// - BLAS level 1: output = 1st value where \f$ |x[i]| = max |x|_1 \f$
   /// Note it is modified to return a value between (0,n-1) as per
   /// the standard C convention
-  static int idamax (const int& n, const double *x,  const int& incx){
+  inline static int idamax (const int& n, const double *x,  const int& incx){
     return F77NAME(idamax)(n,x,incx) -1;
   }
   /// - BLAS level 2: Matrix vector multiply y = A \e x where A[m x n]
@@ -93,7 +93,7 @@ namespace blas {
     F77NAME(dgemv) (trans,m,n,alpha,a,lda,x,incx,beta,y,incy);
   }
 
-  static void dspmv (const char& trans,  const int& n,    const double& alpha,
+  inline void dspmv (const char& trans,  const int& n,    const double& alpha,
          const double* a,    const double* x, const int& incx,
          const double& beta,       double* y, const int& incy){
     F77NAME(dspmv) (trans,n,alpha,a,x,incx,beta,y,incy);

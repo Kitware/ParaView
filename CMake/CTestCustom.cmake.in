@@ -80,6 +80,9 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   # exclude warnings from mpi4py
   ".*mpi4py.*"
+
+  # exclude Nektar plugin warnings about overloaded virtual methods
+  "Nektar/include*overloaded-virtual"
 )
 
 #------------------------------------------------------------------------------

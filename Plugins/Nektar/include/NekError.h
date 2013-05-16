@@ -13,7 +13,7 @@ enum ErrType {
 namespace NekError{
 
 
-  static void error(ErrType type, char *routine, char *msg){
+  static void error(ErrType type, const char *routine, const char *msg){
 
   switch(type){
     case fatal:

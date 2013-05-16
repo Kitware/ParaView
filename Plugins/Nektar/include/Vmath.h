@@ -205,7 +205,7 @@ namespace vmath {
   }
 
   // copy one int vector to another
-  static void vcopy(int n, const int  *x, const int incx, int *y,
+  inline static void vcopy(int n, const int  *x, const int incx, int *y,
         int const incy){
     if( incx ==1 && incy == 1)
       memcpy(y,x,n*sizeof(int));

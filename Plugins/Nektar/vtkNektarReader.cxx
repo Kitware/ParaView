@@ -148,10 +148,6 @@ void vtkNektarReader::GetAllTimes(vtkInformationVector *outputVector)
 {
   FILE* dfPtr = NULL;
   char dfName[265];
-  char* scan_ret;
-  char* p;
-  char* p2;
-  char param[32];
   char paramLine[256];
   int file_index;
   float test_time_val;
@@ -183,9 +179,9 @@ void vtkNektarReader::GetAllTimes(vtkInformationVector *outputVector)
         // skip the first 5 lines
         for(int j=0; j<5; j++)
           {
-          scan_ret = fgets(paramLine, 256, dfPtr);
+          fgets(paramLine, 256, dfPtr);
           }
-        scan_ret = fgets(paramLine, 256, dfPtr);
+        fgets(paramLine, 256, dfPtr);
 
         //fprintf(stderr, "Line: \'%s\'\n", paramLine);
         //sscanf(paramLine, "%f", &(this->TimeSteps[i]));
@@ -376,7 +372,6 @@ void vtkNektarReader::GetVariableNamesFromData()
 {
   FILE* dfPtr = NULL;
   char  dfName[265];
-  char* scan_ret;
   char  paramLine[256];
   int   ind = 4;
   char  var_name[2];
@@ -391,9 +386,9 @@ void vtkNektarReader::GetVariableNamesFromData()
     // skip the first 8 lines
     for(int j=0; j<8; j++)
       {
-      scan_ret = fgets(paramLine, 256, dfPtr);
+      fgets(paramLine, 256, dfPtr);
       }
-    scan_ret = fgets(paramLine, 256, dfPtr);
+    fgets(paramLine, 256, dfPtr);
 
     fclose(dfPtr);
     dfPtr = NULL;
@@ -436,9 +431,6 @@ int vtkNektarReader::RequestInformation(
 {
   vtkDebugMacro(<<"vtkNektarReader::RequestInformation(): ENTER");
 
-  int numArrays;
-  int nprocs;
-  int mytid;
   FILE* inPtr = NULL;
   char* scan_ret;
   char* p;
@@ -932,13 +924,10 @@ int vtkNektarReader::RequestData(
 
 void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructuredGrid* pv_wss_ugrid) //, int outputPort)
 {
-  register int i,j,k,n,e,nelmts;
+  register int i,j,k,n;
   int      qa,wss_qa,cnt;
   int      alloc_res;
-  const int    nel = this->master[0]->nel;
-  int      dim = this->master[0]->fhead->dim(),ntot;
-  double   *z,*w, ave;
-  char     *outformat;
+  int      ntot;
   double timer_diff;
 
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
@@ -1426,9 +1415,9 @@ void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructur
           int some_number = get_number_of_vertices_WSS(&this->fl, this->master, this->Ubc, 0);
           // allocate enough memory for them
           this->WSS_all_vals= new double*[3];
-          for(int w=0; w<3; w++)
+          for(int w2=0; w2<3; w2++)
             {
-            this->WSS_all_vals[w] = (double*) malloc(some_number *sizeof(double));
+            this->WSS_all_vals[w2] = (double*) malloc(some_number *sizeof(double));
             }
           }
         if(NEED_TO_CALC_WSS)
@@ -1510,9 +1499,9 @@ void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructur
 
     if(this->GetDerivedVariableArrayStatus("Wall Shear Stress"))
       {
-      vtkNew<vtkUnstructuredGrid> tmpGrid;
-      tmpGrid->ShallowCopy(this->WSS_UGrid);
-      wss_clean->SetInputData(tmpGrid.GetPointer());
+      vtkNew<vtkUnstructuredGrid> tmpGrid2;
+      tmpGrid2->ShallowCopy(this->WSS_UGrid);
+      wss_clean->SetInputData(tmpGrid2.GetPointer());
       wss_clean->Update();
       vtkDebugMacro(<< "updateVtuData: my_rank= " << my_rank<<": they want WSS, do shallow copy\n");
       // this will need to be updated to be the real wss grid
@@ -1655,9 +1644,9 @@ void vtkNektarReader::addCellsToContinuumMesh(int qa, double ***num)
 
 void vtkNektarReader::generateWSSconnectivity(int * wss_index, int res)
 {
-  int j, k=0;
+  int cnt_local=0, k=0;
 
-  for(int cnt_local = 0,j = 0; j < res-1; ++j)
+  for(int j = 0; j < res-1; ++j)
     {
     for(int i = 0; i < res-2-j; ++i)
       {
@@ -1672,7 +1661,7 @@ void vtkNektarReader::generateWSSconnectivity(int * wss_index, int res)
     wss_index[k++] = cnt_local + res - j - 1;
     wss_index[k++] = cnt_local + 2*res - 2*j - 1 - 1;
     cnt_local += res - j;
-    }// for(cnt_local = 0,j = 0; j < qa-1; ++j)
+    }// for(int j = 0; j < qa-1; ++j)
 }// vtkNektarReader::generateWSSconnectivity()
 
 void vtkNektarReader::addCellsToWSSMesh(int * wss_index, int wss_qa)
@@ -1686,7 +1675,6 @@ void vtkNektarReader::addCellsToWSSMesh(int * wss_index, int wss_qa)
       {
 
       int vert_index = 0;
-      int cnt = 0;
       for(int j = 0; j < wss_qa-1; ++j)
         {
         //for(i = 0; i < QGmax-2-j; ++i)

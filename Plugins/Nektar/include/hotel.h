@@ -382,10 +382,10 @@ void   vector_set    (int   vsize, ... /* v1, v2, ..., f(vn) */ );
 double scalar        (char *function);
 double dparam_set    (char *name, double value);
 double dparam        (char *name);
-int    option_set    (char *name, int value);
+int    option_set    (const char *name, int value);
 int    option        (char *name);
-int    iparam_set    (char *name, int value);
-int    iparam        (char *name);
+int    iparam_set    (const char *name, int value);
+int    iparam        (const char *name);
 }
 
 /* functions in Fieldfiles.C */
