@@ -19,9 +19,6 @@
                 </div>
             </div>
             <div id="page">
-                <h1>
-                    <a href="#">ParaView/Users Guide/Python Calculator</a>
-                </h1>
                 <div id="content">
                     <div class="post">
                         <h2 class="title">
@@ -30,7 +27,7 @@
                         <div class="entry">
                             <p align="center">
                                 <p>
-                                    <img src="13523635837402370048.png" align="center"/>
+                                    <img src="13687165819356971008.png" align="center"/>
                                 </p>
                                 <strong>Figure 6.3</strong>
                             </p>
@@ -78,13 +75,13 @@
                             <p/>
                             <p> Go to the Menu Bar, and select File &gt; Disconnect to clear the Pipeline.</p>
                             <p> Select Source &gt; Mandelbrot, and then click Apply, which will set up a default version of the Mandelbrot Set. The data for this set are stored in a 251x251 scalar array.</p>
-                            <p> Select Source &gt; Mandelbrot again, and then go to the Object Inspector and set the Maximum Number of Iterations to 50. Click Apply, which will set up a different version of the Mandelbrot Set, represented by the same size array. </p>
+                            <p> Select Source &gt; Mandelbrot again, and then go to the Properties panel and set the Maximum Number of Iterations to 50. Click Apply, which will set up a different version of the Mandelbrot Set, represented by the same size array. </p>
                             <p> Hold the Shift key down and select both of the Mandelbrot entries in the Pipeline Inspector, and then go to the Menu Bar and select Filter &gt; Python Calculator. The two Mandelbrot entries will now be shown as linked, as inputs, to the Python Calculator.</p>
-                            <p> In the Object Inspector for the Python Calculator filter, enter the following into the Expression box:</p>
+                            <p> In the Properties panel for the Python Calculator filter, enter the following into the Expression box:</p>
                             <p/>
                             <div id="preformatted">inputs[1].PointData['Iterations'] - inputs[0].PointData['Iterations']</div>
                             <p>This expression specifies the  difference between the second and first Mandelbrot arrays. The result is saved in a new array called 'results'. The prefixes in the names for the array variables, inputs[1] and inputs[0], refer to the first and second Mandelbrot entries, respectively, in the Pipeline. PointData specifies that the inputs contain point values. The quoted label 'Iterations' is the local name for these arrays. Click Apply to initiate the calculation.</p>
-                            <p>Click the Display tab in the Object Inspector for the Python Calculator, and go to the first tab to the right of the 'Color by' label. Select the item results in that tab, which will cause the display window to the right to show the results of the expression we entered in the Python Calculator. The scalar values representing the difference between the two Mandelbrot arrays are represented by colors that are set by the current color map (see Edit Color Map... for details).</p>
+                            <p>Click the Display tab in the Properties panel for the Python Calculator, and go to the first tab to the right of the 'Color by' label. Select the item results in that tab, which will cause the display window to the right to show the results of the expression we entered in the Python Calculator. The scalar values representing the difference between the two Mandelbrot arrays are represented by colors that are set by the current color map (see Edit Color Map... for details).</p>
                             <p>There are a few things to note: </p>
                             <ul>
                                 <li>
