@@ -133,13 +133,14 @@ def create_cmake_script(config, manifest_list):
   # what modules to client/server wrap?
 
   for manifest in manifest_list:
-    modules = manifest["modules"]
-    for module in modules:
-      if 'cswrap' in module and module['cswrap']:
-        cs_modules.add(module['name'])
+    if manifest.has_key("modules"):
+      modules = manifest["modules"]
+      for module in modules:
+        if 'cswrap' in module and module['cswrap']:
+          cs_modules.add(module['name'])
 
-      if 'pythonwrap' in module and module['pythonwrap']:
-        python_modules.add(module['name'])
+        if 'pythonwrap' in module and module['pythonwrap']:
+          python_modules.add(module['name'])
 
   # ClientServer wrap
   cmake_script += 'cmake \\\n'
@@ -190,8 +191,10 @@ def process(config):
     with open(input_dir + '/manifest.json' , 'r') as fp:
       manifest = json.load(fp)
       config.current_input_dir  = input_dir
-      copy_paths(config, manifest['paths'])
-      copy_paths(config, manifest['modules'])
+      if manifest.has_key('paths'):
+        copy_paths(config, manifest['paths'])
+      if manifest.has_key('modules'):
+        copy_paths(config, manifest['modules'])
 
       all_manifests.append(manifest)
 
