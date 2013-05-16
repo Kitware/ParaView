@@ -31,9 +31,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTPExportStateWizard.h"
 
-#include <QLabel>
-#include <QList>
+#include <vtkSMProxyManager.h>
+#include <vtkSMSessionProxyManager.h>
+#include <vtkSMSourceProxy.h>
+#include <vtkSMViewProxy.h>
+#include <vtkPVXMLElement.h>
+
+#include <pqApplicationCore.h>
+#include <pqFileDialog.h>
 #include <pqImageOutputInfo.h>
+#include <pqPipelineSource.h>
+#include <pqPythonDialog.h>
+#include <pqPythonManager.h>
+#include <pqServerManagerModel.h>
+#include <pqView.h>
+
+#include <QMessageBox>
+
+extern const char* tp_export_py;
 
 //-----------------------------------------------------------------------------
 pqTPExportStateWizard::pqTPExportStateWizard(
@@ -73,5 +88,126 @@ void pqTPExportStateWizard::customize()
 bool pqTPExportStateWizard::getCommandString(QString& command)
 {
   command.clear();
+
+  QString export_rendering = "True";
+  QString rendering_info; // a map from the render view name to render output params
+  if (this->Internals->outputRendering->isChecked() == 0)
+    {
+    export_rendering = "False";
+    // check to make sure that there is a writer hooked up since we aren't
+    // exporting an image
+    vtkSMSessionProxyManager* proxyManager =
+        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    pqServerManagerModel* smModel =
+      pqApplicationCore::instance()->getServerManagerModel();
+    bool haveSomeWriters = false;
+    QStringList filtersWithoutConsumers;
+    for(unsigned int i=0;i<proxyManager->GetNumberOfProxies("sources");i++)
+      {
+      if(vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
+           proxyManager->GetProxy("sources", proxyManager->GetProxyName("sources", i))))
+        {
+        vtkPVXMLElement* proxyHint = proxy->GetHints();
+        if(proxyHint && proxyHint->FindNestedElementByName("WriterProxy"))
+          {
+          haveSomeWriters = true;
+          }
+        else
+          {
+          pqPipelineSource* input = smModel->findItem<pqPipelineSource*>(proxy);
+          if(input && input->getNumberOfConsumers() == 0)
+            {
+            filtersWithoutConsumers << proxyManager->GetProxyName("sources", i);
+            }
+          }
+        }
+      }
+    if(!haveSomeWriters)
+      {
+      QMessageBox messageBox;
+      QString message(tr("No output writers specified. Either add writers in the pipeline or check <b>Output rendering components</b>."));
+      messageBox.setText(message);
+      messageBox.exec();
+      return false;
+      }
+    if(filtersWithoutConsumers.size() != 0)
+      {
+      QMessageBox messageBox;
+      QString message(tr("The following filters have no consumers and will not be saved:\n"));
+      for(QStringList::const_iterator iter=filtersWithoutConsumers.constBegin();
+          iter!=filtersWithoutConsumers.constEnd();iter++)
+        {
+        message.append("  ");
+        message.append(iter->toLocal8Bit().constData());
+        message.append("\n");
+        }
+      messageBox.setText(message);
+      messageBox.exec();
+      }
+    }
+  else // we are creating an image so we need to get the proper information from there
+    {
+    vtkSMSessionProxyManager* proxyManager =
+        vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+    for(int i=0;i<this->Internals->viewsContainer->count();i++)
+      {
+      pqImageOutputInfo* viewInfo = dynamic_cast<pqImageOutputInfo*>(
+        this->Internals->viewsContainer->widget(i));
+      pqView* view = viewInfo->getView();
+      QSize viewSize = view->getSize();
+      vtkSMViewProxy* viewProxy = view->getViewProxy();
+      QString info = QString(" '%1' : ['%2', '%3', '%4', '%5'],").
+        arg(proxyManager->GetProxyName("views", viewProxy)).
+        arg(viewInfo->getImageFileName()).arg(viewInfo->getMagnification()).
+        arg(viewSize.width()).arg(viewSize.height());
+      rendering_info+= info;
+      }
+    // remove the last comma -- assume that there's at least one view
+    rendering_info.chop(1);
+    }
+
+  QString filters ="ParaView Python State Files (*.py);;All files (*)";
+
+  pqFileDialog file_dialog (NULL, this,
+    tr("Save Server State:"), QString(), filters);
+  file_dialog.setObjectName("ExportSpatio-TemporalStateFileDialog");
+  file_dialog.setFileMode(pqFileDialog::AnyFile);
+  if (!file_dialog.exec())
+    {
+    return false;
+    }
+
+  QString filename = file_dialog.getSelectedFiles()[0];
+
+  // Last Page, export the state.
+  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
+    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+  pqPythonDialog* dialog = 0;
+  if (manager)
+    {
+    dialog = manager->pythonShellDialog();
+    }
+  if (!dialog)
+    {
+    qCritical("Failed to locate Python dialog. Cannot save state.");
+    return true;
+    }
+
+  // mapping from readers and their filenames on the current machine
+  // to the filenames on the remote machine
+  QString reader_inputs_map;
+  for (int cc=0; cc < this->Internals->nameWidget->rowCount(); cc++)
+    {
+    QTableWidgetItem* item0 = this->Internals->nameWidget->item(cc, 0);
+    QTableWidgetItem* item1 = this->Internals->nameWidget->item(cc, 1);
+    reader_inputs_map +=
+      QString(" '%1' : '%2',").arg(item0->text()).arg(item1->text());
+    }
+  // remove last ","
+  reader_inputs_map.chop(1);
+
+  int timeCompartmentSize = this->Internals->timeCompartmentSize->value();
+  command = QString(tp_export_py).arg(export_rendering).arg(reader_inputs_map).arg(rendering_info).arg(timeCompartmentSize).arg(filename);
+
   return true;
 }
