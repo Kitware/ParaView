@@ -613,7 +613,20 @@ void vtkPVXYChartView::Render(bool interactive)
       }
     if (this->Internals->UseCustomLabels[axis])
       {
-      chartAxis->SetCustomTickPositions(this->Internals->CustomLabelPositions[axis].GetPointer());
+      vtkSmartPointer<vtkDoubleArray> ticks =
+        this->Internals->CustomLabelPositions[axis].GetPointer();
+      if (chartAxis->GetLogScaleActive())
+        {
+        vtkNew<vtkDoubleArray> logTicks;
+        logTicks->DeepCopy(ticks.GetPointer());
+        double* p = logTicks->GetPointer(0);
+        for (vtkIdType i = 0; i <= logTicks->GetMaxId(); ++i, ++p)
+          {
+          *p = log10(fabs(*p));
+          }
+        ticks = logTicks.GetPointer();
+        }
+      chartAxis->SetCustomTickPositions(ticks.GetPointer());
       }
     else
       {
