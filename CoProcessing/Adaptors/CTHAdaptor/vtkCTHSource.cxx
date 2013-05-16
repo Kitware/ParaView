@@ -40,8 +40,9 @@ vtkCTHSource::~vtkCTHSource ()
 
 //---------------------------------------------------------------------------
 void vtkCTHSource::Initialize (int vtkNotUsed (igm), int n_blocks, 
-    int nmat, int max_mat, int NCFieldNames, int NMFieldNames, 
-    double *min, double *max, int max_level)
+   int nmat, int vtkNotUsed(max_mat),
+   int NCFieldNames, int NMFieldNames, 
+   double *min, double *max, int max_level)
 {
   this->MaxLevel = max_level;
   this->Bounds.SetMinPoint (min);
@@ -70,7 +71,7 @@ void vtkCTHSource::Initialize (int vtkNotUsed (igm), int n_blocks,
 
 //---------------------------------------------------------------------------
 void vtkCTHSource::SetCellFieldName (int field_id, char *field_name, 
-    char *comment, int matid)
+   char *comment, int vtkNotUsed(matid))
 {
   if (strncmp (field_name, "P ", 2) && strncmp (field_name, "T ", 2) &&
       strncmp (field_name, "VX ", 3) && strncmp (field_name, "VY ", 3) && 
@@ -262,7 +263,6 @@ void vtkCTHSource::UpdateBlock(int block_id, int allocated, int active,
 void vtkCTHSource::UpdateRepresentation ()
 {
   // A call to viz implies that our data is modified.
-  vtkMultiProcessController* ctrl = vtkMultiProcessController::GetGlobalController ();
   for (size_t i = 0; i < Blocks.size (); i ++)
     {
     Block &b = this->Blocks[i]; 
@@ -314,10 +314,10 @@ void vtkCTHSource::UpdateRepresentation ()
           if (da) 
             {
             int len = b.MFieldData[m][f]->GetNumberOfTuples ();
-            for (int i = 0; i < len; i ++)
+            for (int idx = 0; idx < len; idx ++)
               {
-              double *tup = b.MFieldData[m][f]->GetTuple (i);
-              da->SetComponent (i, 0, tup[0] * 255.0);
+              double *tup = b.MFieldData[m][f]->GetTuple (idx);
+              da->SetComponent (idx, 0, tup[0] * 255.0);
               }
             }
           }
@@ -366,6 +366,8 @@ int vtkCTHSource::FillInputData (vtkCPInputDataDescription *input)
     // this->AllocationsChanged = false;
     } 
   UpdateRepresentation ();
+
+  return 1;
 }
 
 //---------------------------------------------------------------------------
