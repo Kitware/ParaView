@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqMultiServerBehavior.cxx
+   Module:  pqConsoleWidgetEventTranslator.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,33 +29,58 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqMultiServerBehavior.h"
+#include "pqConsoleWidgetEventTranslator.h"
 
-#include "pqApplicationCore.h"
-#include "pqCoreUtilities.h"
-#include "pqServer.h"
-#include "pqServerDisconnectReaction.h"
-#include "pqServerManagerModel.h"
-
-#include <QMessageBox>
+#include "pqConsoleWidget.h"
+#include <QEvent>
 
 //-----------------------------------------------------------------------------
-pqMultiServerBehavior::pqMultiServerBehavior(QObject* parentObject)
+pqConsoleWidgetEventTranslator::pqConsoleWidgetEventTranslator(QObject* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(), 
-    SIGNAL(serverAdded(pqServer*)),
-    this, SLOT(onServerCreation(pqServer*)));
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiServerBehavior::onServerCreation(pqServer* server)
+pqConsoleWidgetEventTranslator::~pqConsoleWidgetEventTranslator()
 {
-  QObject::connect(server, SIGNAL(closeSessionRequest()), this, SLOT(closeServer()), Qt::QueuedConnection );
+}
+  
+//-----------------------------------------------------------------------------
+bool pqConsoleWidgetEventTranslator::translateEvent(
+  QObject* target, QEvent* qtevent, bool& errorFlag)
+{
+  // Capture inputs for pqConsoleWidget and all its children
+  pqConsoleWidget* object = NULL;
+  for (QObject* current = target; current != NULL; current = current->parent())
+    {
+    object = qobject_cast<pqConsoleWidget*>(current);
+    if (object)
+      {
+      break;
+      }
+    }
+  if (!object)
+    {
+    return false;
+    }
+
+  if (qtevent->type() == QEvent::FocusIn)
+    {
+    if (this->CurrentObject)
+      {
+      QObject::disconnect(this->CurrentObject, NULL, this, NULL);
+      }
+    this->CurrentObject = object;
+    QObject::connect(
+      this->CurrentObject, SIGNAL(executeCommand(const QString&)),
+      this, SLOT(recordCommand(const QString&)));
+    }
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiServerBehavior::closeServer()
+void pqConsoleWidgetEventTranslator::recordCommand(const QString& text)
 {
-  pqServerDisconnectReaction::disconnectFromServer();
+  emit this->recordEvent(this->CurrentObject, "executeCommand", text);
 }

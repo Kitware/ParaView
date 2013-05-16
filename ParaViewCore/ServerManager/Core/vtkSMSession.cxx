@@ -245,6 +245,49 @@ void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSession::Disconnect(vtkSMSession* session)
+{
+  if (!session)
+    {
+    return;
+    }
+
+  // Ensure that the session no longer sends state updates to the server-side.
+  // This is critical to ensure we don't mess up the collaboration state.
+  session->PreDisconnection();
+
+  // Unregister all proxies.
+  session->GetSessionProxyManager()->UnRegisterProxies();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->UnRegisterSession(session);
+  // Although I'd like to have this check, when Disconnect() is called from
+  // Python, we have 1 reference that gets cleared with the Python call returns.
+  //if (session != NULL)
+  //  {
+  //  vtkGenericWarningMacro(
+  //    "vtkSMSession wasn't destroyed after UnRegisterSession. "
+  //    "This indicates a development problem. Please notify the "
+  //    "developers.");
+  //  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSession::Disconnect(vtkIdType sid)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkWeakPointer<vtkSMSession> session = vtkSMSession::SafeDownCast(pm->GetSession(sid));
+  if (!session)
+    {
+    vtkGenericWarningMacro(
+      "Failed to locate session " << sid << ". Cannot disconnect.");
+    return;
+    }
+
+  vtkSMSession::Disconnect(session);
+}
+
+//----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToSelf()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();

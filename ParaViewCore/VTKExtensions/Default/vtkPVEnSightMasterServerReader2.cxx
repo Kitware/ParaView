@@ -674,9 +674,16 @@ int vtkPVEnSightMasterServerReader2::CanReadFile(const char* fname)
 //----------------------------------------------------------------------------
 void vtkPVEnSightMasterServerReader2::SetCaseFileName(const char* fileName)
 {
+  // If the CaseFileName is already set with the same file, do nothing.
+  if ( this->CaseFileName && fileName &&
+       (!strcmp(this->CaseFileName, fileName)))
+    {
+    return;
+    }
+
   int rIdx;
   this->Superclass::SetCaseFileName(fileName);
-  for(rIdx = static_cast<int> (this->Internal->RealReaders.size()); rIdx > 0; rIdx--)
+  for(rIdx = static_cast<int> (this->Internal->RealReaders.size()-1); rIdx >= 0; rIdx--)
     {
     this->Internal->RealReaders[rIdx]->Delete();
     this->Internal->RealReaders.pop_back();

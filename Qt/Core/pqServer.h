@@ -74,6 +74,7 @@ public:
 
   /// Returns the connection id for the server connection.
   vtkIdType GetConnectionID() const;
+  vtkIdType sessionId() const { return this->GetConnectionID(); }
 
   /// Returns the proxy manager for this session.
   vtkSMSessionProxyManager* proxyManager() const;
@@ -200,9 +201,6 @@ signals:
   void triggeredUserName(int, QString&);
   void triggeredUserListChanged();
   void triggerFollowCamera(int);
-
-  /// Forward request for disconnection
-  void closeSessionRequest();
 
 public slots:
   /// Allow user to broadcast to other client a given message

@@ -235,24 +235,6 @@ void pqServer::initialize()
       }
     this->setMonitorServerNotifications(true);
     }
-
-  // Force a proper active SessionProxyManager once this one is fully initialized
-  // after a collaborative update
-  // As well as multi-server, force the newly created server connection to be the
-  // active one
-  if(vtkSMProxyManager::GetProxyManager()->GetActiveSession() == this->Session)
-    {
-    vtkSMProxyManager::GetProxyManager()->SetActiveSession((vtkSMSession*)NULL);
-    vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
-    }
-  else
-    {
-    vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
-    }
-
-  // Allow Python shell to trigger a disconnect request. Make sure that request
-  // get forwarded to pqServerDisconnectReaction
-  pqCoreUtilities::connect(this->session(), vtkCommand::ExitEvent, this, SIGNAL(closeSessionRequest()));
 }
 
 //-----------------------------------------------------------------------------

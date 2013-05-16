@@ -19,8 +19,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVPythonInterpretor.h"
-#include "vtkPythonProgrammableFilter.h"
+#include "vtkPythonInterpreter.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
@@ -153,17 +152,16 @@ void vtkPythonAnnotationFilter::EvaluateExpression()
     }
 
   vtksys_ios::ostringstream stream;
-  stream << "import paraview" << endl
-         << "paraview.fromFilter = True" << endl
-         << "from paraview import annotation as pv_ann" << endl
+  stream << "from paraview import annotation as pv_ann" << endl
          << "me = paraview.servermanager.vtkPythonAnnotationFilter('" << aplus << " ')" << endl
          << "pv_ann.ComputeAnnotation(me, me.GetInputDataObject(0, 0), me.GetPythonExpression()"
          << this->TimeInformations << ")" << endl
          << "del me" << endl;
 
-  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(
-    stream.str().c_str());
-  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->FlushMessages();
+
+  // ensure Python is initialized.
+  vtkPythonInterpreter::Initialize();
+  vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
 }
 
 //----------------------------------------------------------------------------

@@ -9,7 +9,7 @@ endif()
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND __dependencies
-      vtkPVPythonSupport
+      vtkPythonInterpreter
       vtkFiltersProgrammable)
 endif (PARAVIEW_ENABLE_PYTHON)
 

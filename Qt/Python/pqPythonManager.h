@@ -40,7 +40,7 @@ class QToolBar;
 class pqServer;
 class pqPythonDialog;
 
-/// pqPythonManager is a class to faciliate the use of a python interpreter
+/// pqPythonManager is a class to facilitate the use of a python interpreter
 /// by various paraview GUI components.  The manager has a single instance 
 /// of the pqPythonDialog.  Currently the pqPythonDialog "owns" the
 /// python interpreter.  Anyone who wants to execute python code should call
@@ -139,29 +139,13 @@ public slots:
   void updateStatusMessage();
 
 protected slots:
-
   // Description:
-  // Triggered when the pqPythonDialog is reset/initialized.
-  // Calls initializeParaviewPythonModules().
-  void onPythonInterpreterInitialized();
-
-  // Description:
-  // Triggered when a new active server is ready.
-  // Calls initializeParaviewPythonModules() if the pqPythonDialog
-  // is initialized.
-  void onServerCreationFinished(pqServer* server);
-
-  // Description:
-  // Resets the python interpreter.
+  // Whenever we are about to disconnect from a server, we "reset" the Python
+  // shell, if created. This will ensure all Python objects created by the shell
+  // are released.
   void onRemovingServer(pqServer* server);
 
 protected:
-
-  // Description:
-  // Executes code in the python interpreter to import paraview modules and
-  // create an ActiveConnection object.
-  void initializeParaviewPythonModules();
-
   QString getTraceString();
   QString getPVModuleDirectory();
 

@@ -102,10 +102,6 @@
       "path":"Utilities/TestDriver"
     },
     {
-      "name":"vtkPVPythonSupport",
-      "path":"ParaViewCore/PythonSupport"
-    },
-    {
       "name":"vtkPVServerImplementationCore",
       "path":"ParaViewCore/ServerImplementation/Core",
       "cswrap":true,
@@ -840,7 +836,9 @@
     {
       "path":"VTK/Wrapping/PythonCore"
     },
-
+    {
+      "path":"VTK/Utilities/PythonInterpreter"
+    },
     {
       "path":"VTK/Utilities/GitSetup"
     },

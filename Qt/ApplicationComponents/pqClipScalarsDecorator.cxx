@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 pqClipScalarsDecorator::pqClipScalarsDecorator(
@@ -76,9 +77,23 @@ bool pqClipScalarsDecorator::canShowWidget(bool show_advanced) const
   vtkSMProperty* prop = proxy? proxy->GetProperty("ClipFunction") : NULL;
   if (prop)
     {
+    int exclude = 0;
+    if(!this->xml()->GetScalarAttribute("exclude", &exclude))
+      {
+      exclude = 0;
+      }
+
     vtkSMProxy* functionProxy = vtkSMUncheckedPropertyHelper(prop).GetAsProxy();
-    if (!functionProxy || !functionProxy->GetXMLName() ||
-      strcmp(functionProxy->GetXMLName(),"Scalar") != 0)
+    bool match = functionProxy && functionProxy->GetXMLName() &&
+      !strcmp(functionProxy->GetXMLName(),"Scalar");
+    if(exclude)
+      {
+      if(match)
+        {
+        return false;
+        }
+      }
+    else if(!match)
       {
       return false;
       }

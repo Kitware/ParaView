@@ -286,6 +286,12 @@ void pqApplicationCore::createOutputWindow()
   this->OutputWindow->connect(owAdapter,
     SIGNAL(displayGenericWarningText(const QString&)),
     SLOT(onDisplayGenericWarningText(const QString&)));
+  this->OutputWindow->connect(owAdapter,
+    SIGNAL(displayTextInWindow(const QString&)),
+    SLOT(onDisplayTextInWindow(const QString&)));
+  this->OutputWindow->connect(owAdapter,
+    SIGNAL(displayErrorTextInWindow(const QString&)),
+    SLOT(onDisplayErrorTextInWindow(const QString&)));
   vtkOutputWindow::SetInstance(owAdapter);
   this->OutputWindowAdapter = owAdapter;
 }

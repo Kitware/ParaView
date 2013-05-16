@@ -29,36 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqNonPolyDataInputDecorator_h
-#define __pqNonPolyDataInputDecorator_h
+#ifndef __pqConsoleWidgetEventPlayer_h
+#define __pqConsoleWidgetEventPlayer_h
 
-#include "pqApplicationComponentsModule.h"
-#include "pqPropertyWidgetDecorator.h"
-#include "vtkWeakPointer.h"
+#include "pqWidgetEventPlayer.h"
+#include "pqWidgetsModule.h" // needed for EXPORT macro.
 
-class vtkObject;
-
-/// pqNonPolyDataInputDecorator is a pqPropertyWidgetDecorator subclass.
-/// For certain properties, they should update the enable state based on
-/// input data types. This decorator is used to enable a property widget
-/// only when an input data type is a Non-polydata.
-/// For example, "Computer Normals" in Contour filter.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqNonPolyDataInputDecorator : public pqPropertyWidgetDecorator
+/// pqConsoleWidgetEventPlayer is used to play back test commands recorded by
+/// pqConsoleWidgetEventTranslator for pqConsoleWidget.
+class PQWIDGETS_EXPORT pqConsoleWidgetEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
-  typedef pqPropertyWidgetDecorator Superclass;
+  typedef pqWidgetEventPlayer Superclass;
 public:
-  pqNonPolyDataInputDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  virtual ~pqNonPolyDataInputDecorator();
+  pqConsoleWidgetEventPlayer(QObject* parent=0);
+  virtual ~pqConsoleWidgetEventPlayer();
 
-  /// Overridden to enable/disable the widget based on input data type.
-  virtual bool enableWidget() const;
+  /// Callback to play a command.
+  virtual bool playEvent(QObject* target,
+    const QString& cmd, const QString& args, bool& errorFlag);
 
 private:
-  Q_DISABLE_COPY(pqNonPolyDataInputDecorator)
-
-  vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverId;
+  Q_DISABLE_COPY(pqConsoleWidgetEventPlayer)
 };
 
 #endif

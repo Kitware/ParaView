@@ -67,6 +67,12 @@ public:
   /// If active signals are emitted on messages.
   void setActive(bool active);
 
+  /// These are same as DisplayText() and DisplayErrorText() except that
+  /// they don't pad the text with "\n" nor do they echo the text to the
+  /// terminal. Used in pqPythonManager to display Python text.
+  void DisplayTextInWindow(const QString&);
+  void DisplayErrorTextInWindow(const QString&);
+
 signals:
   /// Signal emitted by VTK messages
   void displayText(const QString&);
@@ -76,7 +82,11 @@ signals:
   void displayWarningText(const QString&);
   /// Signal emitted by VTK warning messages
   void displayGenericWarningText(const QString&);
-  
+  /// Signal emitted by Python messages
+  void displayTextInWindow(const QString&);
+  /// Signal emitted by Python errors.
+  void displayErrorTextInWindow(const QString&);
+
 private:
   pqOutputWindowAdapter();
   pqOutputWindowAdapter(const pqOutputWindowAdapter&);

@@ -76,8 +76,8 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent) :
   QObject::connect(
     this->Implementation->Ui.reset,
     SIGNAL(clicked()),
-    this,
-    SLOT(initializeInterpretor()));                
+    this->Implementation->Ui.shellWidget,
+    SLOT(reset()));
 
   QObject::connect(
     this->Implementation->Ui.shellWidget,
@@ -189,10 +189,3 @@ void pqPythonDialog::clearConsole()
 {
   this->Implementation->Ui.shellWidget->clear();
 }
-
-void pqPythonDialog::initializeInterpretor()
-{
-  this->Implementation->Ui.shellWidget->initializeInterpretor();
-  emit this->interpreterInitialized();
-}
-

@@ -67,5 +67,8 @@ def print_error(text):
 def print_debug_info(text):
    print text
 
-"""Set by vvtkPythonProgrammableFilter"""
-fromFilter = False
+"""This variable is set whenever Python is initialized within a ParaView
+Qt-based application. Modules within the 'paraview' package often use this to
+taylor their behaviour based on whether the Python environment is embedded
+within an application or not."""
+fromGUI = False

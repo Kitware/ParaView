@@ -38,14 +38,11 @@
 // Note that this algorithm sets the output extent translator to be
 // vtkOnePieceExtentTranslator. This means that all processes will ask
 // for the whole extent. This behaviour can be overridden in InformationScript.
-
 #ifndef __vtkPythonProgrammableFilter_h
 #define __vtkPythonProgrammableFilter_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkProgrammableFilter.h"
-
-class vtkPVPythonInterpretor;
 
 class vtkPythonProgrammableFilterImplementation;
 
@@ -101,14 +98,6 @@ public:
   vtkSetStringMacro(PythonPath);
   vtkGetStringMacro(PythonPath);
 
-  // Description:
-  // Returns the Python interp that should be used by all pipeline objects.
-  // The interp is created this first time this function is called and it
-  // is destroyed when vtkPVSessionBase invokes the ExitEvent.
-//BTX
-  static vtkPVPythonInterpretor* GetGlobalPipelineInterpretor();
-//ETX
-  static void DeleteGlobalPythonInterpretor();
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
@@ -146,10 +135,7 @@ private:
   vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&);  // Not implemented.
   void operator=(const vtkPythonProgrammableFilter&);  // Not implemented.
 
-  static vtkPVPythonInterpretor* GlobalPipelineInterpretor;
-
 //BTX
-  friend class vtkPythonProgrammableFilterObserver;
   vtkPythonProgrammableFilterImplementation* const Implementation;
 //ETX
 };

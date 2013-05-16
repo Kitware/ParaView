@@ -57,6 +57,10 @@ set(Module_SRCS
   pqConnect.h
   pqConsoleWidget.cxx
   pqConsoleWidget.h
+  pqConsoleWidgetEventPlayer.cxx
+  pqConsoleWidgetEventPlayer.h
+  pqConsoleWidgetEventTranslator.cxx
+  pqConsoleWidgetEventTranslator.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
   pqDoubleRangeDialog.cxx
@@ -130,6 +134,8 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqCollapsedGroup.h
   pqColorChooserButton.h
   pqColorTableModel.h
+  pqConsoleWidgetEventPlayer.h
+  pqConsoleWidgetEventTranslator.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
   pqDoubleRangeDialog.h

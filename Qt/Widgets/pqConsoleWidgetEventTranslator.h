@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqMultiServerBehavior.h
+   Module:  pqConsoleWidgetEventTranslator.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,33 +29,36 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqMultiServerBehavior_h
-#define __pqMultiServerBehavior_h
+#ifndef __pqConsoleWidgetEventTranslator_h
+#define __pqConsoleWidgetEventTranslator_h
 
-#include <QObject>
-#include "pqApplicationComponentsModule.h"
+#include "pqWidgetEventTranslator.h"
+#include "pqWidgetsModule.h" // needed for EXPORT macro.
+#include <QPointer> // needed for QPointer
 
-class pqServer;
+class pqConsoleWidget;
 
-/// @ingroup Behaviors
-/// pqMultiServerBehavior ensures that when a new server connection is made,
-/// a listener get attached to it so if the python shell ask to disconnect
-/// the UI can response by triggering the propper disconnect reaction.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqMultiServerBehavior : public QObject
+/// pqConsoleWidgetEventTranslator is used to record events from pqConsoleWidget
+/// testing. 
+class PQWIDGETS_EXPORT pqConsoleWidgetEventTranslator :
+  public pqWidgetEventTranslator
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef pqWidgetEventTranslator Superclass;
 public:
-  pqMultiServerBehavior(QObject* parent=0);
+  pqConsoleWidgetEventTranslator(QObject* parent=0);
+  virtual ~pqConsoleWidgetEventTranslator();
+
+  /// Translate the event, if possible.
+  virtual bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag);
 
 protected slots:
-  void onServerCreation(pqServer*);
-  void closeServer();
+  void recordCommand(const QString& text);
 
 private:
-  Q_DISABLE_COPY(pqMultiServerBehavior)
+  Q_DISABLE_COPY(pqConsoleWidgetEventTranslator)
+
+  QPointer<pqConsoleWidget> CurrentObject;
 };
 
 #endif
-
-

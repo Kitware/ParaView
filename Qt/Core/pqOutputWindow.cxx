@@ -67,6 +67,32 @@ pqOutputWindow::~pqOutputWindow()
   delete Implementation;
 }
 
+void pqOutputWindow::onDisplayTextInWindow(const QString& text)
+{
+  QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
+  format.setForeground(Qt::darkGreen);
+  format.clearBackground();
+  this->Implementation->Ui.consoleWidget->setFormat(format);
+  this->Implementation->Ui.consoleWidget->printString(text);
+  if (this->ShowOutput)
+    {
+    this->show();
+    }
+}
+
+void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
+{
+  QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
+  format.setForeground(Qt::darkRed);
+  format.clearBackground();
+  this->Implementation->Ui.consoleWidget->setFormat(format);
+  this->Implementation->Ui.consoleWidget->printString(text);
+  if (this->ShowOutput)
+    {
+    this->show();
+    }
+}
+
 void pqOutputWindow::onDisplayText(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();

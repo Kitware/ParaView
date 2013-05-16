@@ -14,29 +14,23 @@ def failed(msg):
 from paraview.simple import *
 from paraview import servermanager
 
-try:
-  Connect()
-  failed("This should have complained that you can not create another connection.")
-except:
-  print "1) Without enabling multi-server, the user is not allowed to reconnect. <== OK"
+servermanager.vtkProcessModule.GetProcessModule().SetMultipleSessionsSupport(True)
 
 # keep ref to connections
 firstConnection = servermanager.ActiveConnection
 
-# ---- Enable multi-server ----
-enableMultiServer()
 Connect()
 
-if len(servermanager.MultiServerConnections) != 2:
-   failed("We should have 2 connections instead of %s" % str(servermanager.MultiServerConnections))
-print "2) We have two server connections. <== OK"
+if len(servermanager.Connections) != 2:
+   failed("We should have 2 connections instead of %s" % str(servermanager.Connections))
+print "1) We have two server connections. <== OK"
 
 # keep ref to connections
 secondConnection = servermanager.ActiveConnection
 
 sphere2 = Sphere()
 
-switchActiveConnection(firstConnection, globals())
+SetActiveConnection(firstConnection, globals())
 sphere1 = Sphere()
 
 # make sure proxy are related to right session/connection
@@ -51,12 +45,12 @@ if servermanager.ActiveConnection != firstConnection:
 
 # Disconnect
 servermanager.Disconnect()
-if len(servermanager.MultiServerConnections) != 1:
-   failed("We should have 1 connection left instead of %s" % str(servermanager.MultiServerConnections))
+if len(servermanager.Connections) != 1:
+   failed("We should have 1 connection left instead of %s" % str(servermanager.Connections))
 
 servermanager.Disconnect()
-if len(servermanager.MultiServerConnections) != 0:
-   failed("We should have 0 connection left instead of %s" % str(servermanager.MultiServerConnections))
+if len(servermanager.Connections) != 0:
+   failed("We should have 0 connection left instead of %s" % str(servermanager.Connections))
 
 # Even if we don't have any connection, this should not failed
 servermanager.Disconnect()

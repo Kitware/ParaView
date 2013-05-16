@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqServerDisconnectReaction.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,40 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqServerDisconnectReaction_h 
-#define __pqServerDisconnectReaction_h
+#include "pqConsoleWidgetEventPlayer.h"
 
-#include "pqReaction.h"
-#include "pqTimer.h" // needed for pqTimer.
+#include "pqConsoleWidget.h"
+#include <QtDebug>
 
-/// @ingroup Reactions
-/// Reaction to disconnect from a server.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqServerDisconnectReaction : public pqReaction
+//-----------------------------------------------------------------------------
+pqConsoleWidgetEventPlayer::pqConsoleWidgetEventPlayer(QObject* parentObject)
+  : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef pqReaction Superclass;
-public:
-  /// Constructor. Parent cannot be NULL.
-  pqServerDisconnectReaction(QAction* parent);
+}
 
-  /// Disconnects from active server.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
-  static void disconnectFromServerWithWarning();
-  static void disconnectFromServer();
+//-----------------------------------------------------------------------------
+pqConsoleWidgetEventPlayer::~pqConsoleWidgetEventPlayer()
+{
+}
 
-private slots:
-  void updateState();
+//-----------------------------------------------------------------------------
+bool pqConsoleWidgetEventPlayer::playEvent(QObject* target,
+    const QString& cmd, const QString& args, bool& errorFlag)
+{
+  pqConsoleWidget* widget = qobject_cast<pqConsoleWidget*>(target);
+  if (!widget)
+    {
+    return false;
+    }
 
-protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered();
+  if (cmd == "executeCommand")
+    {
+    widget->printAndExecuteCommand(args);
+    return true;
+    }
 
-  pqTimer UpdateTimer;
-private:
-  Q_DISABLE_COPY(pqServerDisconnectReaction)
-};
-
-#endif
-
-
+  qCritical() << "Unknown command for pqConsoleWidget : "
+    << target << " " << cmd << " " << args;
+  errorFlag = true;
+  return true;
+}
