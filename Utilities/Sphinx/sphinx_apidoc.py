@@ -282,7 +282,7 @@ Note: By default this script will not overwrite already created files.""")
                       help='Directory to place all output', default='')
     parser.add_option('-d', '--maxdepth', action='store', dest='maxdepth',
                       help='Maximum depth of submodules to show in the TOC '
-                      '(default: 4)', type='int', default=4)
+                      '(default: 2)', type='int', default=2)
     parser.add_option('-f', '--force', action='store_true', dest='force',
                       help='Overwrite all files')
     parser.add_option('-n', '--dry-run', action='store_true', dest='dryrun',

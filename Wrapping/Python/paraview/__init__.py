@@ -25,13 +25,13 @@ it provides:
 #==============================================================================
 
 class compatibility:
-    minor = None 
+    """Class used to check version number and compatibility"""
+    minor = None
     major = None
-    
-#    @classmethod
+
     def GetVersion(cls):
         if compatibility.minor and compatibility.major:
-            return compatibility.major + float(compatibility.minor)/10
+            return compatibility.major + float(compatibility.minor)/100
         return None
     GetVersion = classmethod(GetVersion)
 
@@ -60,12 +60,15 @@ class options:
     symmetric = False
 
 def print_warning(text):
+   """Print text"""
    print text
 
 def print_error(text):
+   """Print text"""
    print text
 
 def print_debug_info(text):
+   """Print text"""
    print text
 
 """This variable is set whenever Python is initialized within a ParaView

@@ -1,3 +1,7 @@
+r"""
+   This module provide classes to handle Rest API for WebGL piece request.
+"""
+
 from twisted.web import server, resource
 from twisted.web import server, resource
 from twisted.web.error import Error

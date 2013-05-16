@@ -12,22 +12,24 @@ as part of the ParaView client (paraview), an MPI-enabled batch application
 application. Using Python, users and developers can gain access to the ParaView
 visualization engine.
 
-Contents:
+Main modules
+==================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    quick-start
    The ParaView Python Package <paraview>
+   Simple <paraview.simple>
+   ServerManager <paraview.servermanager>
 
-Main modules
-==================
-* paraview.simple
-* paraview.servermanager
-
-Indices and tables
+ParaViewWeb
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+
+   WebVisualization application <paraview.pipeline_manager>
+   Simple server sample <paraview.simple_server>
+   Basic file loader <paraview.file_loader>
+   Data Prober <paraview.data_prober>

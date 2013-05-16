@@ -123,41 +123,63 @@ class Proxy(object):
     one or more server manager objects. It also provides an interface
     to set and get the properties of the server side objects. These
     properties are presented as Python properties. For example,
-    you can set a property Foo using the following:
-     proxy.Foo = (1,2)
+    you can set a property Foo using the following::
+
+       proxy.Foo = (1,2)
+
     or
-     proxy.Foo.SetData((1,2))
+
+       proxy.Foo.SetData((1,2))
+
     or
-     proxy.Foo[0:2] = (1,2)
+
+       proxy.Foo[0:2] = (1,2)
+
     For more information, see the documentation of the property which
     you can obtain with
     help(proxy.Foo).
 
     This class also provides an iterator which can be used to iterate
     over all properties.
-    eg:
-      proxy = Proxy(proxy=smproxy)
-      for property in proxy:
-          print property
+    eg::
+
+        proxy = Proxy(proxy=smproxy)
+        for property in proxy:
+            print property
+
 
     For advanced users:
     This is a python class that wraps a vtkSMProxy.. Makes it easier to
     set/get properties.
-    Instead of:
-     proxy.GetProperty("Foo").SetElement(0, 1)
-     proxy.GetProperty("Foo").SetElement(0, 2)
-    you can do:
-     proxy.Foo = (1,2)
+    Instead of::
+
+        proxy.GetProperty("Foo").SetElement(0, 1)
+        proxy.GetProperty("Foo").SetElement(0, 2)
+
+    you can do::
+
+        proxy.Foo = (1,2)
+
     or
-     proxy.Foo.SetData((1,2))
+
+        proxy.Foo.SetData((1,2))
+
     or
-     proxy.Foo[0:2] = (1,2)
-    Instead of:
-      proxy.GetProperty("Foo").GetElement(0)
-    you can do:
-      proxy.Foo.GetData()[0]
+
+        proxy.Foo[0:2] = (1,2)
+
+    Instead of::
+
+        proxy.GetProperty("Foo").GetElement(0)
+
+    you can do::
+
+        proxy.Foo.GetData()[0]
+
     or
-      proxy.Foo[0]
+
+        proxy.Foo[0]
+
     For proxy properties, you can use append:
      proxy.GetProperty("Bar").AddProxy(foo)
     you can do:
@@ -1994,7 +2016,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     Otherwise, it returns None.
     There are several ways in which this function can be called:
     * When called with no arguments, it creates a new session
-     to the built-in server on the client itself.
+      to the built-in server on the client itself.
     * When called with ds_host and ds_port arguments, it
       attempts to connect to a server(data and render server on the same server)
       on the indicated host:port.

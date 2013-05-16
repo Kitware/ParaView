@@ -106,23 +106,25 @@ html_theme = 'default'
 # documentation.
 html_theme_options = {
 'footerbgcolor': '#ffffff',
-'footertextcolor': '#cccccc',
-'sidebarbgcolor': '#dddddd',
-'sidebarbtncolor': '#aaaaaa',
-'sidebartextcolor': '#111111',
-'sidebarlinkcolor': '#111111',
-'relbarbgcolor': '#222222',
-'relbartextcolor': '#dddddd',
-'relbarlinkcolor': '#dddddd',
-'bgcolor': '#ffffff',
-'textcolor': '#000000',
-'linkcolor': '#000000',
-'visitedlinkcolor': '#000000',
-'headbgcolor': '#cccccc',
-'headtextcolor': '#ffffff',
-'headlinkcolor': '#ffffff',
-'codebgcolor': '#aaaaaa',
-'codetextcolor': '#000000'
+'footertextcolor': '#484848',
+'sidebarbgcolor': '#b2cace',
+'sidebarbtncolor': '#b0d0e7',
+'sidebartextcolor': '#484848',
+'sidebarlinkcolor': '#006699',
+'relbarbgcolor': '#1b5a63',
+'relbartextcolor': '#ffffff',
+'relbarlinkcolor': '#559998',
+'bgcolor': '#e4edef',
+'textcolor': '#484848',
+'linkcolor': '#006699',
+'visitedlinkcolor': '#006699',
+'headbgcolor': '#e4edef',
+'headtextcolor': '#484848',
+'headlinkcolor': '#006699',
+'codebgcolor': '#d4dcdf',
+'codetextcolor': '#000000',
+'bodyfont': 'Tahoma, Geneva, sans-serif',
+'headfont': 'Myriad Pro, Arial, Helvetica, sans-serif'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -174,7 +176,7 @@ html_static_path = ['_static']
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True

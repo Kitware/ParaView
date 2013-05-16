@@ -1,3 +1,30 @@
+r"""
+    This module is a ParaViewWeb server application.
+    The following command line illustrate how to use it::
+
+        $ pvpython .../pipeline_manager.py --data-dir /.../path-to-your-data-directory
+
+    --data-dir is used to list that directory on the server and let the client choose a file to load.
+
+    Any ParaViewWeb executable script come with a set of standard arguments that
+    can be overriden if need be::
+
+        --port 8080
+             Port number on which the HTTP server will listen to.
+
+        --content /path-to-web-content/
+             Directory that you want to server as static web content.
+             By default, this variable is empty which mean that we rely on another server
+             to deliver the static content and the current process only focus on the
+             WebSocket connectivity of clients.
+
+        --authKey paraviewweb-secret
+             Secret key that should be provided by the client to allow it to make any
+             WebSocket communication. The client will assume if none is given that the
+             server expect "paraviewweb-secret" as secret key.
+
+"""
+
 # import to process args
 import os
 
@@ -15,7 +42,7 @@ except ImportError:
 # Create custom Pipeline Manager class to handle clients requests
 # =============================================================================
 
-class PipelineManager(paraviewweb_wamp.ServerProtocol):
+class __PipelineManager(paraviewweb_wamp.ServerProtocol):
 
     dataDir = None
     authKey = "paraviewweb-secret"
@@ -31,7 +58,7 @@ class PipelineManager(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebFileManager(PipelineManager.dataDir))
 
         # Update authentication key to use
-        self.updateSecret(PipelineManager.authKey)
+        self.updateSecret(__PipelineManager.authKey)
 
 # =============================================================================
 # Main: Parse args and start server
@@ -51,8 +78,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure our current application
-    PipelineManager.authKey = args.authKey
-    PipelineManager.dataDir = args.path
+    __PipelineManager.authKey = args.authKey
+    __PipelineManager.dataDir = args.path
 
     # Start server
-    web.start_webserver(options=args, protocol=PipelineManager)
+    web.start_webserver(options=args, protocol=__PipelineManager)
