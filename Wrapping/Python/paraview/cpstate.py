@@ -82,11 +82,11 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
 
     # handle writers.
     if not proxy.GetHints() or \
-      not proxy.GetHints().FindNestedElementByName("CoProcessing"):
+      not proxy.GetHints().FindNestedElementByName("WriterProxy"):
         return (ctorMethod, ctorArgs, extraCtorCommands)
 
     # this is a writer we are dealing with.
-    xmlElement = proxy.GetHints().FindNestedElementByName("CoProcessing")
+    xmlElement = proxy.GetHints().FindNestedElementByName("WriterProxy")
     xmlgroup = xmlElement.GetAttribute("group")
     xmlname = xmlElement.GetAttribute("name")
     pxm = smtrace.servermanager.ProxyManager()

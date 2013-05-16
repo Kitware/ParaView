@@ -31,38 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCPExportStateWizard.h"
 
-// #include <pqApplicationCore.h>
-// #include <pqContextView.h>
-// #include <pqFileDialog.h>
-// #include <pqPipelineFilter.h>
-// #include <pqPipelineRepresentation.h>
-// #include <pqPipelineSource.h>
-// #include <pqRenderViewBase.h>
-// #include <pqServerManagerModel.h>
+#include <vtkSMProxyManager.h>
+#include <vtkSMSessionProxyManager.h>
+#include <vtkSMSourceProxy.h>
+#include <vtkSMViewProxy.h>
+#include <vtkPVXMLElement.h>
 
-// #include <vtkImageData.h>
-// #include <vtkNew.h>
-// #include <vtkPNGWriter.h>
-// #include <vtkPVXMLElement.h>
-// #include <vtkPythonInterpreter.h>
-// #include <vtkSmartPointer.h>
-// #include <vtkSMProxyManager.h>
-// #include <vtkSMSessionProxyManager.h>
-// #include <vtkSMSourceProxy.h>
-// #include <vtkSMViewProxy.h>
-// #include <vtkUnsignedCharArray.h>
-// #include <vtksys/SystemTools.hxx>
+#include <pqApplicationCore.h>
+#include <pqFileDialog.h>
+#include <pqImageOutputInfo.h>
+#include <pqPipelineSource.h>
+#include <pqPythonDialog.h>
+#include <pqPythonManager.h>
+#include <pqServerManagerModel.h>
+#include <pqView.h>
 
-// #include <QLabel>
-// #include <QPixmap>
-// #include <QSize>
-// #include <QMessageBox>
-// #include <QPointer>
-// #include <QRegExp>
-// #include <QRegExpValidator>
-// #include <QWizardPage>
-
-// #include <QDebug>
+#include <QMessageBox>
 
 namespace
 {
@@ -93,11 +77,10 @@ void pqCPExportStateWizard::customize()
 {
   this->Internals->timeCompartmentSize->hide();
   this->Internals->label_2->hide();
-  //this->Internals->horizontalSpacer->hide();
 }
 
 //-----------------------------------------------------------------------------
-QString pqCPExportStateWizard::getCommandString()
+bool pqCPExportStateWizard::getCommandString(QString& command)
 {
   QString export_rendering = this->Internals->outputRendering->isChecked() ?
     "True" : "False";
@@ -190,19 +173,6 @@ QString pqCPExportStateWizard::getCommandString()
 
   QString filename = file_dialog.getSelectedFiles()[0];
 
-  // Last Page, export the state.
-  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
-    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
-  pqPythonDialog* dialog = 0;
-  if (manager)
-    {
-    dialog = manager->pythonShellDialog();
-    }
-  if (!dialog)
-    {
-    qCritical("Failed to locate Python dialog. Cannot save state.");
-    return true;
-    }
   // the map from the simulation inputs in the paraview gui
   // to the adaptor's named inputs (usually 'input')
   QString sim_inputs_map;
@@ -222,7 +192,7 @@ QString pqCPExportStateWizard::getCommandString()
   QString live_visualization = (this->Internals->liveViz->isChecked() == true ?
                                 "True" : "False");
 
-  QString command(cp_python_export_code);
+  command = cp_python_export_code;
   command = command.arg(export_rendering)
                    .arg(sim_inputs_map)
                    .arg(rendering_info)
@@ -230,5 +200,5 @@ QString pqCPExportStateWizard::getCommandString()
                    .arg(live_visualization)
                    .arg(filename);
 
-  return command;
+  return true;
 }

@@ -70,7 +70,8 @@ void pqTPExportStateWizard::customize()
 }
 
 //-----------------------------------------------------------------------------
-QString pqTPExportStateWizard::getCommandString()
+bool pqTPExportStateWizard::getCommandString(QString& command)
 {
-  return "";
+  command.clear();
+  return true;
 }

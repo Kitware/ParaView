@@ -329,7 +329,25 @@ bool pqSGExportStateWizard::validateCurrentPage()
     return true;
     }
 
-  QString command = this->getCommandString();
-  dialog->runString(command);
-  return true;
+  // Last Page, export the state.
+  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
+    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+  pqPythonDialog* dialog = 0;
+  if (manager)
+    {
+    dialog = manager->pythonShellDialog();
+    }
+  if (!dialog)
+    {
+    qCritical("Failed to locate Python dialog. Cannot save state.");
+    return true;
+    }
+
+  QString command;
+  if(this->getCommandString(command))
+    {
+    dialog->runString(command);
+    return true;
+    }
+  return false;
 }

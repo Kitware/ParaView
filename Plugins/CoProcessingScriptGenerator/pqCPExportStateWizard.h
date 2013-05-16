@@ -45,7 +45,7 @@ public:
 
 protected:
   virtual void customize();
-  virtual QString getCommandString();
+  virtual bool getCommandString(QString& command);
 
 private:
   Q_DISABLE_COPY(pqCPExportStateWizard)

@@ -62,7 +62,7 @@ protected slots:
   void decrementView();
 
 protected:
-  virtual QString getCommandString() = 0;
+  virtual bool getCommandString(QString& command) = 0;
   QList<pqImageOutputInfo*> getImageOutputInfos();
 
   class pqInternals;
