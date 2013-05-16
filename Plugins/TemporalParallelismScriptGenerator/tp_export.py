@@ -141,17 +141,6 @@ def CreateControllers(timeCompartmentSize):
     temporalController = CreateTimeCompartments(globalController, timeCompartmentSize)
     return globalController, temporalController, timeCompartmentSize
 
-currentTimeStep = -1
-def UpdateCurrentTimeStep(globalController, timeCompartmentSize):
-    global currentTimeStep
-    if currentTimeStep == -1:
-        currentTimeStep = globalController.GetLocalProcessId() / timeCompartmentSize
-        return currentTimeStep
-
-    numTimeStepsPerIteration = globalController.GetNumberOfProcesses() / timeCompartmentSize
-    currentTimeStep = currentTimeStep + numTimeStepsPerIteration
-    return currentTimeStep
-
 def WriteImages(currentTimeStep, currentTime, views):
     for view in views:
         filename = view.tpFileName.replace("%%t", str(currentTimeStep))
@@ -167,12 +156,24 @@ def WriteFiles(currentTimeStep, currentTime, writers):
         writer.FileName = originalfilename
 
 def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, writers, views):
-    currentTimeStep = UpdateCurrentTimeStep(globalController, timeCompartmentSize)
-    while currentTimeStep < len(timeSteps):
+    numProcs = globalController.GetNumberOfProcesses()
+    numTimeCompartments = numProcs/timeCompartmentSize
+    tpp = len(timeSteps)/numTimeCompartments
+    remainder = len(timeSteps)%%numTimeCompartments
+    timeCompartmentIndex = int(globalController.GetLocalProcessId()/timeCompartmentSize)
+    myStartTimeStep = tpp*timeCompartmentIndex
+    myEndTimeStep = myStartTimeStep+tpp
+    if timeCompartmentIndex < remainder:
+        myStartTimeStep = myStartTimeStep+timeCompartmentIndex
+        myEndTimeStep = myStartTimeStep+tpp+1
+    else:
+        myStartTimeStep = myStartTimeStep+remainder
+        myEndTimeStep = myStartTimeStep+tpp
+
+    for currentTimeStep in range(myStartTimeStep,myEndTimeStep):
         #print globalController.GetLocalProcessId(), " is working on ", currentTimeStep
         WriteImages(currentTimeStep, timeSteps[currentTimeStep], views)
         WriteFiles(currentTimeStep, timeSteps[currentTimeStep], writers)
-        currentTimeStep = UpdateCurrentTimeStep(globalController, timeCompartmentSize)
 
 def CreateReader(ctor, args, fileInfo):
     "Creates a reader, checks if it can be used, and sets the filenames"
