@@ -32,14 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTPActionsGroup.h"
 
 #include "pqTPExportStateWizard.h"
+#include <pqCoreUtilities.h>
 
 //-----------------------------------------------------------------------------
 pqTPActionsGroup::pqTPActionsGroup(QObject* parentObject)
   : Superclass(parentObject)
 {
   QAction* export_action = this->addAction("Export State");
-  export_action->setToolTip("Export state for co-processing");
-  export_action->setStatusTip("Export state for co-processing");
+  export_action->setToolTip("Export state for spatio-temporal parallelism");
+  export_action->setStatusTip("Export state for spatio-temporal parallelism");
 
   QObject::connect(export_action, SIGNAL(triggered()),
     this, SLOT(exportState()), Qt::QueuedConnection);
@@ -53,6 +54,7 @@ pqTPActionsGroup::~pqTPActionsGroup()
 //-----------------------------------------------------------------------------
 void pqTPActionsGroup::exportState()
 {
-  pqTPExportStateWizard wizard;
+  pqTPExportStateWizard wizard(pqCoreUtilities::mainWidget());
+  wizard.customize();
   wizard.exec();
 }

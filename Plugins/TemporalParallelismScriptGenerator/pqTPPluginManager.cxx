@@ -31,11 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTPPluginManager.h"
 
-#include "pqTPWritersMenuManager.h"
-
-#include <QDebug>
-#include <QMainWindow>
-#include <QMenuBar>
+#include "pqSGWritersMenuManager.h"
 
 //-----------------------------------------------------------------------------
 pqTPPluginManager::pqTPPluginManager(QObject* parentObject):
@@ -45,19 +41,5 @@ pqTPPluginManager::pqTPPluginManager(QObject* parentObject):
 
 //-----------------------------------------------------------------------------
 pqTPPluginManager::~pqTPPluginManager()
-{
-}
-
-//-----------------------------------------------------------------------------
-void pqTPPluginManager::startup()
-{
-  pqTPWritersMenuManager *menuMgr = new pqTPWritersMenuManager(this);
-  menuMgr->createMenu();
-
-  // don't delete menuMgr, it will be cleaned up by Qt.
-}
-
-//-----------------------------------------------------------------------------
-void pqTPPluginManager::shutdown()
 {
 }

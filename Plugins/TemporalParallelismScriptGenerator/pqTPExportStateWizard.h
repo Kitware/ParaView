@@ -32,73 +32,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTPExportStateWizard_h
 #define __pqTPExportStateWizard_h
 
-#include <QWizard>
-#include <QString>
+#include "pqSGExportStateWizard.h"
 
-class pqView;
-
-class pqTPExportStateWizard : public QWizard
+class pqTPExportStateWizard : public pqSGExportStateWizard
 {
   Q_OBJECT
-  typedef QWizard Superclass;
+  typedef pqSGExportStateWizard Superclass;
 public:
   pqTPExportStateWizard(
     QWidget *parentObject=0, Qt::WindowFlags parentFlags=0);
   virtual ~pqTPExportStateWizard();
 
-  virtual bool validateCurrentPage();
+  void customize();
 
-protected slots:
-  void updateAddRemoveButton();
-  void onAdd();
-  void onRemove();
-  void incrementView();
-  void decrementView();
+protected:
+  virtual QString getCommandString();
 
 private:
   Q_DISABLE_COPY(pqTPExportStateWizard)
-
-  class pqInternals;
-  pqInternals* Internals;
-  int CurrentView;
-  friend class pqTPExportStateWizardPage2;
-  friend class pqTPExportStateWizardPage3;
 };
 
-#include "ui_ImageOutputInfo.h"
-
-class pqImageOutputInfo : public QWidget
-{
-  Q_OBJECT
-  typedef QWidget Superclass;
-public:
-  pqImageOutputInfo(
-    QWidget *parentObject, Qt::WindowFlags parentFlags, pqView* view, QString& viewName);
-
-  void setupScreenshotInfo();
-
-  pqView* getView()
-  {
-    return this->View;
-  }
-
-  QString getImageFileName()
-  {
-    return this->Info.imageFileName->displayText();
-  }
-
-  int getMagnification()
-  {
-    return this->Info.imageMagnification->value();
-  }
-
-public slots:
-  void updateImageFileName();
-  void updateImageFileNameExtension(const QString&);
-
-private:
-  Q_DISABLE_COPY(pqImageOutputInfo)
-  Ui::ImageOutputInfo Info;
-  pqView* View;
-};
 #endif

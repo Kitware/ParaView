@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    pqSGPluginManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,17 +29,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#ifndef __pqSGPluginManager_h
+#define __pqSGPluginManager_h
 
-#include "pqSGWritersMenuManager.h"
+#include <QObject>
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
-  Superclass(parentObject)
+/// pqSGPluginManager is the central class that orchestrates the behaviour of
+/// this co-processing plugin.
+class pqSGPluginManager : public QObject
 {
-}
+  Q_OBJECT
+  typedef QObject Superclass;
+public:
+  pqSGPluginManager(QObject* parent=0);
+  ~pqSGPluginManager();
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
-{
-}
+  /// Methods used to shartup and shutdown the plugin.
+  void startup();
+
+  /// Methods used to shartup and shutdown the plugin.
+  void shutdown();
+
+private:
+  pqSGPluginManager(const pqSGPluginManager&); // Not implemented.
+  void operator=(const pqSGPluginManager&); // Not implemented.
+};
+
+#endif

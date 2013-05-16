@@ -3,41 +3,29 @@ project(CoProcessingScriptGeneratorPlugin)
 #--------------------------------------------------
 # Find and Use ParaView
 #--------------------------------------------------
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${VTK_INCLUDE_DIRS}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
- 
+INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/Resources)
+INCLUDE_DIRECTORIES(${ParaView_SOURCE_DIR}/Applications/ParaView)
+INCLUDE_DIRECTORIES(${ParaView_BINARY_DIR}/Applications/ParaView)
 
 # Plugins for ParaView that add support to export state for CoProcessing etc.
 #------------------------------------------------------------------------------
 SET (CP_SOURCES
-  pqCPPluginManager.cxx
-  pqCPPluginManager.h
-  pqCPWritersMenuManager.cxx
-  pqCPWritersMenuManager.h
   pqCPActionsGroup.cxx
   pqCPActionsGroup.h
   pqCPExportStateWizard.cxx
   pqCPExportStateWizard.h
+  pqCPPluginManager.cxx
+  pqCPPluginManager.h
 )
-
-SET (UI_RESOURCES
-  Resources/ExportStateWizard.ui
-  Resources/ImageOutputInfo.ui)
 
 INCLUDE(${QT_USE_FILE})
 
 QT4_WRAP_CPP(MOC_SRCS
-  pqCPPluginManager.h
-  pqCPWritersMenuManager.h
-  pqCPActionsGroup.h
   pqCPExportStateWizard.h
+  pqCPActionsGroup.h
+  pqCPPluginManager.h
 )
 
 QT4_WRAP_UI(UI_SRCS
@@ -67,7 +55,7 @@ ADD_PARAVIEW_PLUGIN(
   CoProcessingPlugin
   #"${CoProcessing_VERSION_MAJOR}.${CoProcessing_VERSION_MINOR}.${CoProcessing_VERSION_PATCH}"
   "0.1.0"
-  SERVER_MANAGER_XML Resources/servermanager.xml
+  SERVER_MANAGER_XML Resources/servermanagercp.xml
   GUI_INTERFACES
     ${PARAVIEW_PLUGIN_IFACES}
     ${PARAVIEW_PLUGIN_IFACES2}

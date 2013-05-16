@@ -32,23 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTPPluginManager_h
 #define __pqTPPluginManager_h
 
-#include <QObject>
+#include <pqSGPluginManager.h>
 
 /// pqTPPluginManager is the central class that orchestrates the behaviour of
-/// this co-processing plugin.
-class pqTPPluginManager : public QObject
+/// this spatio-temporal script creator plugin.
+class pqTPPluginManager :  public pqSGPluginManager
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef pqSGPluginManager Superclass;
 public:
   pqTPPluginManager(QObject* parent=0);
   ~pqTPPluginManager();
-
-  /// Methods used to shartup and shutdown the plugin.
-  void startup();
-
-  /// Methods used to shartup and shutdown the plugin.
-  void shutdown();
 
 private:
   pqTPPluginManager(const pqTPPluginManager&); // Not implemented.
