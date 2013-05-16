@@ -11,12 +11,15 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif()
 
 SET (TESTS_WITH_INLINE_COMPARES
-  ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -228,6 +231,7 @@ set(MultiSliceWavelet_DISABLE_CRS TRUE)
 set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 set(PolygonCellSelection_DISABLE_CRS TRUE)
 set(PolygonPointSelection_DISABLE_CRS TRUE)
+set(NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
 
 # These tests should not be run along with those using the new panels
 set(3DWidgetInCustomFilter_BREAK TRUE)
@@ -336,6 +340,12 @@ SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
 SET(SLACTools_THRESHOLD 20)
+
+# DisconnectAndSaveAnimation is only support in Client-Server mode.
+set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
+set (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
+set (DisconnectAndSaveAnimation_BREAK TRUE)
+
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.

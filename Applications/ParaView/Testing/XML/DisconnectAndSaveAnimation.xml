@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments=""/>
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/SplitVertical" command="activate" arguments=""/>
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Center/LineEdit0" command="set_string" arguments="1"/>
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments=""/>
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0"/>
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,12,/0:0/0:1"/>
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,12,/0:0/0:1"/>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View"/>
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View"/>
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo" command="set_string" arguments="Start Theta"/>
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,2"/>
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0" command="mouseRelease" arguments="1,1,0,0,0,2"/>
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments=""/>
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments=""/>
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments=""/>
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveAnimation"/>
+  <pqevent object="pqAnimationSettingsDialog/checkBoxDisconnect" command="set_boolean" arguments="true"/>
+  <pqevent object="pqAnimationSettingsDialog/width" command="set_string" arguments="300"/>
+  <pqevent object="pqAnimationSettingsDialog/height" command="set_string" arguments="300"/>
+  <pqevent object="pqAnimationSettingsDialog/okButton" command="activate" arguments=""/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0000.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0001.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0002.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0003.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0004.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0005.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0006.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0007.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0008.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.0009.png"/>
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/disconnectSave.png"/>
+
+  <!-- wait for 20 seconds -->
+  <pqevent object="pqClientMainWindow" command="pause" arguments="20000"/>
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/disconnectSave.0005.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/DisconnectAndSaveAnimation.png" />
+</pqevents>

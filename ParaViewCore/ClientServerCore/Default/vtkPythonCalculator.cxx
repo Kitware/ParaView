@@ -226,14 +226,10 @@ void vtkPythonCalculator::Exec(const char* expression,
 
   std::string runscript;
   runscript += "import paraview\n";
-  runscript += "paraview.fromFilter = True\n";
   runscript += "from paraview import vtk\n";
   runscript += "from paraview.vtk import dataset_adapter\n";
   runscript += "from numpy import *\n";
   runscript += "from paraview.vtk.algorithms import *\n";
-  runscript += "from paraview import servermanager\n";
-  runscript += "if servermanager.progressObserverTag:\n";
-  runscript += "  servermanager.ToggleProgressPrinting()\n";
 
   // Set self to point to this
   char addrofthis[1024];

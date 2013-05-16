@@ -153,7 +153,8 @@ void vtkPythonAnnotationFilter::EvaluateExpression()
 
   vtksys_ios::ostringstream stream;
   stream << "from paraview import annotation as pv_ann" << endl
-         << "me = paraview.servermanager.vtkPythonAnnotationFilter('" << aplus << " ')" << endl
+         << "from vtkPVClientServerCoreCorePython import vtkPythonAnnotationFilter" << endl
+         << "me = vtkPythonAnnotationFilter('" << aplus << " ')" << endl
          << "pv_ann.ComputeAnnotation(me, me.GetInputDataObject(0, 0), me.GetPythonExpression()"
          << this->TimeInformations << ")" << endl
          << "del me" << endl;

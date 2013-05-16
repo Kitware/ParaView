@@ -19,9 +19,6 @@ import paraview
 from paraview.vtk import dataset_adapter
 from numpy import *
 from paraview.vtk.algorithms import *
-from paraview import servermanager
-if servermanager.progressObserverTag:
-    servermanager.ToggleProgressPrinting()
 
 def __vtk_in1d(a, b):
     return array([item in b for item in a])

@@ -181,6 +181,15 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 //----------------------------------------------------------------------------
 bool vtkProcessModule::Finalize()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
+  // Finalize Python before anything else. This ensures that all proxy
+  // references are removed before the process module disappears.
+  if (vtkProcessModule::FinalizePython && vtkPythonInterpreter::IsInitialized())
+    {
+    vtkPythonInterpreter::Finalize();
+    }
+#endif
+
   if(vtkProcessModule::Singleton)
     {
     // Make sure no session are kept inside ProcessModule so SessionProxyManager
@@ -199,13 +208,6 @@ bool vtkProcessModule::Finalize()
   vtkMultiProcessController::SetGlobalController(NULL);
   vtkProcessModule::GlobalController->Finalize(/*finalizedExternally*/1);
   vtkProcessModule::GlobalController = NULL;
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-  if (vtkProcessModule::FinalizePython && vtkPythonInterpreter::IsInitialized())
-    {
-    vtkPythonInterpreter::Finalize();
-    }
-#endif
 
 #ifdef PARAVIEW_USE_MPI
   if (vtkProcessModule::FinalizeMPI)
@@ -455,6 +457,8 @@ bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
     vtksys::SystemTools::GetFilenamePath(argv[0]).c_str());
   vtkPythonAppInitPrependPath(self_dir.c_str());
 #endif
+  (void)argc;
+  (void)argv;
   return true;
 }
 

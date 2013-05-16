@@ -146,7 +146,8 @@ void vtkPythonExtractSelection::Exec()
 
   vtksys_ios::ostringstream stream;
   stream << "from paraview import extract_selection as pv_es" << endl
-         << "me = paraview.servermanager.vtkPythonExtractSelection('" << aplus << " ')" << endl
+         << "from vtkPVClientServerCoreCorePython import vtkPythonExtractSelection" << endl
+         << "me = vtkPythonExtractSelection('" << aplus << " ')" << endl
          << "pv_es.Exec(me, me.GetInputDataObject(0, 0),  me.GetInputDataObject(1, 0), me.GetOutputDataObject(0))" << endl
          << "del me" << endl;
 

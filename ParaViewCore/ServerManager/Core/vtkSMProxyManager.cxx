@@ -148,10 +148,13 @@ vtkSMProxyManager::vtkSMProxyManager()
   // Monitor session creations. If a new session is created and we don't have an
   // active one, we make that new session active.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->AddObserver(vtkCommand::ConnectionCreatedEvent,
-    this, &vtkSMProxyManager::ConnectionsUpdated);
-  pm->AddObserver(vtkCommand::ConnectionClosedEvent,
-    this, &vtkSMProxyManager::ConnectionsUpdated);
+  if (pm)
+    {
+    pm->AddObserver(vtkCommand::ConnectionCreatedEvent,
+      this, &vtkSMProxyManager::ConnectionsUpdated);
+    pm->AddObserver(vtkCommand::ConnectionClosedEvent,
+      this, &vtkSMProxyManager::ConnectionsUpdated);
+    }
 }
 
 //---------------------------------------------------------------------------

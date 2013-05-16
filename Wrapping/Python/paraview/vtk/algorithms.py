@@ -1,8 +1,8 @@
 from paraview.vtk import dataset_adapter
 import numpy
-from paraview import servermanager
 from paraview import numpy_support
 from paraview import vtk
+from vtkPVClientServerCoreCorePython import vtkProcessModule
 
 from vtkFiltersCorePython import vtkPolyDataNormals, vtkCellDataToPointData
 from vtkFiltersVerdictPython import vtkCellQuality, vtkMatrixMathFilter
@@ -299,7 +299,7 @@ def eigenvector (narray) :
 def global_max(narray):
     "Returns the maximum value of an array of scalars/vectors/tensors among all process."
     M = max(narray).astype(numpy.float64)
-    if servermanager.vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
+    if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
        MPI.COMM_WORLD.Allreduce(None, [M, MPI.DOUBLE], MPI.MAX)
     return M
@@ -318,7 +318,7 @@ def global_mean (narray) :
     if len(S.shape) == 2 and S.shape[0] == 3 and S.shape[1] == 3:
        S = numpy.reshape(S, 9)
 
-    if servermanager.vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
+    if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
        comm = MPI.COMM_WORLD
        comm.Allreduce(None, [S, MPI.DOUBLE], MPI.SUM)
@@ -329,7 +329,7 @@ def global_mean (narray) :
 def global_min(narray):
     "Returns the minimum value of an array of scalars/vectors/tensors among all process."
     m = min(narray).astype(numpy.float64)
-    if servermanager.vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
+    if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
        MPI.COMM_WORLD.Allreduce(None, [m, MPI.DOUBLE], MPI.MIN)
     return m

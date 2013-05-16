@@ -28,7 +28,9 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (QT_TESTING_WITH_PYTHON ${PARAVIEW_ENABLE_PYTHON})
+# ParaView can no longer support QT_TESTING_WITH_PYTHON due to Matplotlib
+# initializing Python.
+set (QT_TESTING_WITH_PYTHON FALSE)
 set (QtTesting_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
 set (QtTesting_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (QtTesting_INSTALL_LIBRARY_DIR ${VTK_INSTALL_LIBRARY_DIR})

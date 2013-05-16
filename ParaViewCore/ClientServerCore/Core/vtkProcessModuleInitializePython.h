@@ -35,6 +35,7 @@ namespace
   // sanitize and clean it up. Since I don't want to muck with the search paths
   // close to a release, I am leaving this untouched.
 
+  // THIS NEEDS TO BE CLEANED LIKE THE PLAGUE!!!
   //----------------------------------------------------------------------------
   void vtkPythonAppInitPrependPythonPath(const char* dir)
     {
@@ -42,18 +43,23 @@ namespace
     }
 
   //----------------------------------------------------------------------------
-  bool vtkPythonAppInitPrependPath2(const std::string& prefix,
-    const std::string& path)
+  bool vtkPythonAppInitPrependPath2(const std::string& prefix, const std::string& path)
     {
-    std::string package_dir;
-    package_dir = prefix + "/../" + path;
+    std::string package_dir = prefix + path;
     package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
+    if (!vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
+      {
+      package_dir = prefix + "/../" + path;
+      package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
+      }
+
     if (!vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
       {
       // This is the right path for app bundles on OS X
       package_dir = prefix + "/../../../../" + path;
       package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
       }
+
     if(vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
       {
       // This executable is running from the build tree.  Prepend the

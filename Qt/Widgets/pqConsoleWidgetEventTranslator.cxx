@@ -49,6 +49,7 @@ pqConsoleWidgetEventTranslator::~pqConsoleWidgetEventTranslator()
 bool pqConsoleWidgetEventTranslator::translateEvent(
   QObject* target, QEvent* qtevent, bool& errorFlag)
 {
+  Q_UNUSED(errorFlag);
   // Capture inputs for pqConsoleWidget and all its children
   pqConsoleWidget* object = NULL;
   for (QObject* current = target; current != NULL; current = current->parent())
