@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqRenderView.h"
+#include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkIntArray.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -216,6 +217,8 @@ void pqRenderViewSelectionReaction::selectionChanged(
   vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
   Q_ASSERT(rmp != NULL);
 
+  BEGIN_UNDO_EXCLUDE();
+
   bool ctrl = (rmp->GetInteractor()->GetControlKey() == 1);
   int* region = reinterpret_cast<int*>(calldata);
   vtkObject* unsafe_object = reinterpret_cast<vtkObject*>(calldata);
@@ -265,6 +268,8 @@ void pqRenderViewSelectionReaction::selectionChanged(
     this->View->resetCenterOfRotationIfNeeded();
     break;
     }
+
+  END_UNDO_EXCLUDE();
 
   this->endSelection();
 }
