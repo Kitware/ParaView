@@ -242,7 +242,7 @@ pqSpreadSheetViewModel::pqSpreadSheetViewModel(vtkSMProxy* view,
     this, SLOT(delayedUpdate()));
 
   this->Internal->SelectionTimer.setSingleShot(true);
-  this->Internal->SelectionTimer.setInterval(10);//milliseconds.
+  this->Internal->SelectionTimer.setInterval(100);//milliseconds.
   QObject::connect(&this->Internal->SelectionTimer, SIGNAL(timeout()),
     this, SLOT(triggerSelectionChanged()));
 

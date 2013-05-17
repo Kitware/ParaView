@@ -51,6 +51,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSpreadSheetViewModel.h"
 
+namespace
+{
+  class pqScopedBool
+    {
+    bool& Variable;
+  public:
+    pqScopedBool(bool& var) :Variable(var)
+      {
+      this->Variable = true;
+      }
+    ~pqScopedBool()
+      {
+      this->Variable = false;
+      }
+    };
+}
+
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
   return qHash(index.Tuple[2]);
@@ -86,9 +103,41 @@ pqSpreadSheetViewSelectionModel::~pqSpreadSheetViewSelectionModel()
 void pqSpreadSheetViewSelectionModel::serverSelectionChanged(
   const QItemSelection& sel)
 {
-  this->UpdatingSelection = true;
-  this->select(sel, QItemSelectionModel::ClearAndSelect);
-  this->UpdatingSelection = false;
+  if (this->UpdatingSelection)
+    {
+    return;
+    }
+
+  // turn on this->UpdatingSelection so that we don't attempt to update the
+  // SM-selection as the UI is being updated.
+  pqScopedBool updatingSelection(this->UpdatingSelection);
+
+  // Don't simple call ClearAndSelect, that causes the UI to flicker. Instead
+  // determine what changed and update those.
+  QSet<int> currentRows, newRows;
+  foreach (const QModelIndex& idx, this->selectedIndexes())
+    {
+    currentRows.insert(idx.row());
+    }
+  foreach (const QModelIndex& idx, sel.indexes())
+    {
+    newRows.insert(idx.row());
+    }
+
+  QSet<int> toDeselectRows = currentRows - newRows;
+  QSet<int> toSelectRows = newRows - currentRows;
+  // cout << "Selecting: " << toSelectRows.size()
+  //      << " De-Selection: " << toDeselectRows.size() <<  endl;
+  foreach (int idx, toDeselectRows)
+    {
+    this->select(this->Internal->Model->index(idx, 0), 
+      QItemSelectionModel::Deselect|QItemSelectionModel::Rows);
+    }
+  foreach (int idx, toSelectRows)
+    {
+    this->select(this->Internal->Model->index(idx, 0), 
+      QItemSelectionModel::Select|QItemSelectionModel::Rows);
+    }
 }
 
 //-----------------------------------------------------------------------------
