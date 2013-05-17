@@ -19,9 +19,15 @@ Main modules
    :maxdepth: 2
 
    quick-start
+
    The ParaView Python Package <paraview>
-   Simple <paraview.simple>
-   ServerManager <paraview.servermanager>
+   simple <paraview.simple>
+   servermanager <paraview.servermanager>
+   algortihm <paraview.vtk.algorithms>
+
+   coprocessing <paraview.coprocessing>
+   benchmark <paraview.benchmark>
+
 
 ParaViewWeb
 ==================

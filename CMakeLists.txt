@@ -143,6 +143,9 @@ endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
+if(NOT PARAVIEW_WWW_DIR)
+  set(PARAVIEW_WWW_DIR "${ParaView_BINARY_DIR}/www")
+endif()
 set(PARAVIEW_MODULES_DIR ${VTK_MODULES_DIR})
 
 if (NOT DEFINED VTK_CUSTOM_LIBRARY_SUFFIX)
@@ -473,11 +476,6 @@ if (PARAVIEW_ENABLE_WEB)
                Web)
 endif()
 
-if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
-  list (APPEND ParaViewModulesDirs
-    Web/Documentation)
-endif()
-
 include(ParaViewModuleTop)
 
 #----------------------------------------------------------------------------------
@@ -683,8 +681,19 @@ endif()
 #-----------------------------------------------------------------------------
 # Build doxygen documentation.
 if (BUILD_DOCUMENTATION)
+  add_custom_target(ParaViewDoc)
+
+  if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
+    list (APPEND ParaViewModulesDirs
+      Web/Documentation)
+  endif()
+
   add_subdirectory(Utilities/Doxygen)
   add_subdirectory(Utilities/Sphinx)
+
+  install(DIRECTORY "${PARAVIEW_WWW_DIR}"
+    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www
+    COMPONENT Runtime)
 endif()
 
 

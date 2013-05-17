@@ -43,3 +43,8 @@ add_custom_target(ParaViewPythonDoc
           config/index.rst
           config/quick-start.rst
           config/conf.py.in)
+
+# Install the documentation into the ParaView generated WebSite
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html_pages"
+  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/py-doc
+  COMPONENT Runtime)

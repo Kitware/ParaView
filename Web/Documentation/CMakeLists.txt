@@ -61,12 +61,12 @@ add_custom_command(OUTPUT ${jsduck_stamp}
 add_custom_target(vtkParaViewWebDocumentation ALL
   DEPENDS ${jsduck_stamp}
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${docs_tmp_dir} ${docs_binary_dir}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${docs_binary_dir} ${WWW_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${docs_binary_dir} "${WWW_DIR}/js-doc"
 )
 
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "${docs_binary_dir}")
 
 install(DIRECTORY "${docs_binary_dir}/"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/
+  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/js-doc
   COMPONENT Runtime)
