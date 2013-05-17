@@ -31,7 +31,11 @@ class compatibility:
 
     def GetVersion(cls):
         if compatibility.minor and compatibility.major:
-            return compatibility.major + float(compatibility.minor)/100
+            version = float(compatibility.minor)
+            while version > 1.0:
+                version = version / 10.0
+            version += float(compatibility.major)
+            return version
         return None
     GetVersion = classmethod(GetVersion)
 
