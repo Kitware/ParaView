@@ -9,7 +9,7 @@ vtk_module_export("")
 # =================================================================
 
 set(ext_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Ext")
-set(ext_binary_dir "${CMAKE_BINARY_DIR}/www/ext/widgets")
+set(ext_binary_dir "${PARAVIEW_WWW_DIR}/ext/widgets")
 
 copy_files_recursive(${ext_source_dir}
   DESTINATION ${ext_binary_dir}
@@ -22,7 +22,7 @@ copy_files_recursive(${ext_source_dir}
 # =================================================================
 
 set(nvcharts_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/NVCharts")
-set(nvcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
+set(nvcharts_binary_dir_js "${PARAVIEW_WWW_DIR}/lib/js")
 
 copy_files_recursive(${nvcharts_source_dir}
   DESTINATION ${nvcharts_binary_dir_js}
@@ -35,7 +35,7 @@ copy_files_recursive(${nvcharts_source_dir}
 # =================================================================
 
 set(rickshawcharts_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/RickshawCharts")
-set(rickshawcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
+set(rickshawcharts_binary_dir_js "${PARAVIEW_WWW_DIR}/lib/js")
 
 copy_files_recursive(${rickshawcharts_source_dir}
   DESTINATION ${rickshawcharts_binary_dir_js}
@@ -48,8 +48,8 @@ copy_files_recursive(${rickshawcharts_source_dir}
 # =================================================================
 
 set(paraview_pipeline_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/PipelineBrowser")
-set(paraview_pipeline_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
-set(paraview_pipeline_binary_dir_css "${CMAKE_BINARY_DIR}/www/lib/css")
+set(paraview_pipeline_binary_dir_js "${PARAVIEW_WWW_DIR}/lib/js")
+set(paraview_pipeline_binary_dir_css "${PARAVIEW_WWW_DIR}/lib/css")
 
 copy_files_recursive(${paraview_pipeline_source_dir}
   DESTINATION ${paraview_pipeline_binary_dir_js}
@@ -97,14 +97,14 @@ add_custom_target(ParaViewWebWidgets ALL DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_toolbars-css-copy-complete"
   )
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/www/lib/js"
+install(DIRECTORY "${PARAVIEW_WWW_DIR}/lib/js"
   DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/
   COMPONENT Runtime)
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/www/lib/css"
+install(DIRECTORY "${PARAVIEW_WWW_DIR}/lib/css"
   DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/
   COMPONENT Runtime)
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/www/ext/widgets"
+install(DIRECTORY "${PARAVIEW_WWW_DIR}/ext/widgets"
   DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/ext/
   COMPONENT Runtime)

@@ -471,9 +471,21 @@ list (APPEND PARAVIEW_MODULE_ROOTS
              CoProcessing/Catalyst
              CoProcessing/TestDriver)
 
+add_custom_target(ParaViewDoc)
+add_custom_command(
+     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/www.stamp
+     COMMAND ${CMAKE_COMMAND} -E make_directory "${PARAVIEW_WWW_DIR}")
+
+install(DIRECTORY "${PARAVIEW_WWW_DIR}"
+    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www
+    COMPONENT Runtime)
+
 if (PARAVIEW_ENABLE_WEB)
-  list (APPEND PARAVIEW_MODULE_ROOTS
-               Web)
+  list (APPEND PARAVIEW_MODULE_ROOTS Web)
+
+  if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
+    list (APPEND ParaViewModulesDirs Web/Documentation)
+  endif()
 endif()
 
 include(ParaViewModuleTop)
@@ -681,21 +693,9 @@ endif()
 #-----------------------------------------------------------------------------
 # Build doxygen documentation.
 if (BUILD_DOCUMENTATION)
-  add_custom_target(ParaViewDoc)
-
-  if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
-    list (APPEND ParaViewModulesDirs
-      Web/Documentation)
-  endif()
-
   add_subdirectory(Utilities/Doxygen)
   add_subdirectory(Utilities/Sphinx)
-
-  install(DIRECTORY "${PARAVIEW_WWW_DIR}"
-    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www
-    COMPONENT Runtime)
 endif()
-
 
 #-----------------------------------------------------------------------------
 # Configure the CTestCustom.cmake file for exclusions.

@@ -38,13 +38,10 @@ add_custom_target(ParaViewPythonDoc
           "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview"
   COMMAND ${sphinx-build}
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
-          "${CMAKE_CURRENT_BINARY_DIR}/html_pages"
+          "${PARAVIEW_WWW_DIR}/py-doc"
   SOURCES sphinx_apidoc.py
           config/index.rst
           config/quick-start.rst
           config/conf.py.in)
 
-# Install the documentation into the ParaView generated WebSite
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html_pages"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/py-doc
-  COMPONENT Runtime)
+add_dependencies(ParaViewDoc ParaViewPythonDoc)

@@ -62,7 +62,9 @@ add_custom_target(ParaViewDoxygenDoc
   -P ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake
   DEPENDS ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake)
 
-# Install the documentation into the ParaView generated WebSite
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doc/html"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/cxx-doc
-  COMPONENT Runtime)
+add_custom_target(ParaViewDoxygenDoc-copy
+  DEPENDS ParaViewDoxygenDoc
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc/html "${PARAVIEW_WWW_DIR}/cxx-doc"
+)
+
+add_dependencies(ParaViewDoc ParaViewDoxygenDoc-copy)
