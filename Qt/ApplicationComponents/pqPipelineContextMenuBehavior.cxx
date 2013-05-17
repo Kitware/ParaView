@@ -176,6 +176,7 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
   // get currently selected block ids
   this->PickedBlocks.clear();
 
+  bool picked_block_in_selected_blocks = false;
   pqSelectionManager *selectionManager =
     pqPVApplicationCore::instance()->selectionManager();
   if(selectionManager)
@@ -188,18 +189,30 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
          strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") == 0)
         {
         vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
-        this->PickedBlocks.resize(blocksProp.GetNumberOfElements());
-        blocksProp.Get(&this->PickedBlocks[0], blocksProp.GetNumberOfElements());
+        QVector <vtkIdType> vblocks;
+        vblocks.resize(blocksProp.GetNumberOfElements());
+        blocksProp.Get(&vblocks[0], blocksProp.GetNumberOfElements());
+        foreach (const vtkIdType &index, vblocks)
+          {
+          if (index >= 0)
+            {
+            if (static_cast<unsigned int>(index) == blockIndex)
+              {
+              picked_block_in_selected_blocks = true;
+              }
+            this->PickedBlocks.push_back(static_cast<unsigned int>(index));
+            }
+          }
         }
       }
     }
 
-  if(!this->PickedBlocks.contains(blockIndex))
+  if (!picked_block_in_selected_blocks)
     {
     // the block that was clicked on is not one of the currently selected
     // block so actions should only affect that block
     this->PickedBlocks.clear();
-    this->PickedBlocks.append(blockIndex);
+    this->PickedBlocks.append(static_cast<unsigned int>(blockIndex));
     }
 
   if (repr)
@@ -456,12 +469,9 @@ void pqPipelineContextMenuBehavior::hideBlock()
     }
 
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
-  if(panel)
+  if (panel)
     {
-    foreach(vtkIdType blockIndex, this->PickedBlocks)
-      {
-      panel->setBlockVisibility(blockIndex, false);
-      }
+    panel->setBlockVisibility(this->PickedBlocks, false);
     }
 }
 
@@ -475,14 +485,9 @@ void pqPipelineContextMenuBehavior::showOnlyBlock()
     }
 
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
-  if(panel)
+  if (panel)
     {
-    panel->showOnlyBlock(this->PickedBlocks.front());
-
-    for(int i = 1; i < this->PickedBlocks.size(); i++)
-      {
-      panel->setBlockVisibility(this->PickedBlocks[i], true);
-      }
+    panel->showOnlyBlocks(this->PickedBlocks);
     }
 }
 
@@ -498,10 +503,7 @@ void pqPipelineContextMenuBehavior::unsetBlockVisibility()
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    foreach(vtkIdType blockIndex, this->PickedBlocks)
-      {
-      panel->clearBlockVisibility(blockIndex);
-      }
+    panel->clearBlockVisibility(this->PickedBlocks);
     }
 }
 
@@ -515,14 +517,10 @@ void pqPipelineContextMenuBehavior::setBlockColor()
     }
 
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
-  if(panel)
+  if (panel)
     {
     QColor color = QColorDialog::getColor(Qt::gray);
-
-    foreach(vtkIdType blockIndex, this->PickedBlocks)
-      {
-      panel->setBlockColor(blockIndex, color);
-      }
+    panel->setBlockColor(this->PickedBlocks, color);
     }
 }
 
@@ -538,10 +536,7 @@ void pqPipelineContextMenuBehavior::unsetBlockColor()
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    foreach(vtkIdType blockIndex, this->PickedBlocks)
-      {
-      panel->clearBlockColor(blockIndex);
-      }
+    panel->clearBlockColor(this->PickedBlocks);
     }
 }
 
@@ -557,13 +552,7 @@ void pqPipelineContextMenuBehavior::setBlockOpacity()
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    QList<unsigned int> indices;
-    foreach(vtkIdType id, this->PickedBlocks)
-      {
-      indices.append(static_cast<unsigned int>(id));
-      }
-
-    panel->promptAndSetBlockOpacity(indices);
+    panel->promptAndSetBlockOpacity(this->PickedBlocks);
     }
 }
 
@@ -579,10 +568,7 @@ void pqPipelineContextMenuBehavior::unsetBlockOpacity()
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    foreach(vtkIdType blockIndex, this->PickedBlocks)
-      {
-      panel->clearBlockOpacity(blockIndex);
-      }
+    panel->clearBlockOpacity(this->PickedBlocks);
     }
 }
 

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPoint> // needed for QPoint.
 #include <QPointer>
-#include <QVector> // needed for QVector.
+#include <QList> // needed for QList.
 #include "vtkType.h"
 #include "pqApplicationComponentsModule.h"
 
@@ -124,7 +124,7 @@ protected:
   QMenu* Menu;
   QPoint Position;
   QPointer<pqDataRepresentation> PickedRepresentation;
-  QVector<vtkIdType> PickedBlocks;
+  QList<unsigned int> PickedBlocks;
 private:
   Q_DISABLE_COPY(pqPipelineContextMenuBehavior)
 

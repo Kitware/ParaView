@@ -21,6 +21,7 @@
 #include <QMap>
 #include <QWidget>
 #include <QPointer>
+#include "pqTimer.h" // needed for pqTimer.
 
 class QModelIndex;
 class QTreeWidget;
@@ -48,15 +49,27 @@ public slots:
   void setOutputPort(pqOutputPort *port);
   void setRepresentation(pqRepresentation *representation);
   void updateInformation();
+
   void setBlockVisibility(unsigned int index, bool visible);
   void clearBlockVisibility(unsigned int index);
+  void setBlockVisibility(const QList<unsigned int>& indices, bool visible);
+  void clearBlockVisibility(const QList<unsigned int>& indices);
+
   void setBlockColor(unsigned int index, const QColor &color);
   void clearBlockColor(unsigned int index);
+  void setBlockColor(const QList<unsigned int>& indices, const QColor &color);
+  void clearBlockColor(const QList<unsigned int>& indices);
+
   void setBlockOpacity(unsigned int index, double opacity);
   void clearBlockOpacity(unsigned int index);
+  void setBlockOpacity(const QList<unsigned int> &indices, double opacity);
+  void clearBlockOpacity(const QList<unsigned int> &indices);
+
   void promptAndSetBlockOpacity(unsigned int index);
   void promptAndSetBlockOpacity(const QList<unsigned int> &indices);
+
   void showOnlyBlock(unsigned int index);
+  void showOnlyBlocks(const QList<unsigned int>& indices);
 
 private slots:
   void treeWidgetCustomContextMenuRequested(const QPoint &pos);
@@ -90,6 +103,7 @@ private:
   QMap<unsigned int, QColor> BlockColors;
   QMap<unsigned int, double> BlockOpacities;
   vtkEventQtSlotConnect *VisibilityPropertyListener;
+  pqTimer UpdateUITimer;
 };
 
 #endif // __pqMultiBlockInspectorPanel_h
