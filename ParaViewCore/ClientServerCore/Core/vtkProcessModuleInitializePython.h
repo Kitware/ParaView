@@ -116,9 +116,11 @@ namespace
       vtkPythonAppInitPrependPythonPath(self_dir); // Propbably not needed any longer.
 
 #if defined(WIN32)
+      // for when running from installed location.
       std::string lib_dir = std::string(prefix + "/../lib/paraview-" + PARAVIEW_VERSION);
       lib_dir = vtksys::SystemTools::CollapseFullPath( lib_dir.c_str());
       vtkPythonAppInitPrependPythonPath(lib_dir.c_str());
+      vtkPythonAppInitPrependPythonPath( (lib_dir + "/site-packages").c_str() );
 #endif
 
       // These two directories should be all that is necessary when running the
