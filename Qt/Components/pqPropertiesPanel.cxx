@@ -490,7 +490,10 @@ void pqPropertiesPanel::updateDisplayPanel()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
 {
-  if (this->Internals->Representation != repr)
+  // since this->Internals->Representation is QPointer, it can go NULL (e.g. during
+  // disconnect) before we get the chance to clear the panel's widgets. Hence we
+  // do the block of code if (repr==NULL) event if nothing has changed.
+  if (this->Internals->Representation != repr || repr == NULL)
     {
     // Representation has changed, destroy the current display panel and create
     // a new one. Unlike properties panels, display panels are not cached.
