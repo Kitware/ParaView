@@ -19,9 +19,6 @@
                 </div>
             </div>
             <div id="page">
-                <h1>
-                    <a href="#">ParaView/Users Guide/Command line arguments</a>
-                </h1>
                 <div id="content">
                     <div class="post">
                         <h2 class="title">
@@ -116,28 +113,6 @@
                                     <p> --disable-composite, -dc : Use this command-line option if the data server does not have rendering resources and you are not using a render server. All the rendering will then be done on the client. </p>
                                 </li>
                             </ul>
-                            <p>In addition to the command-line options previously listed, ParaView also recognizes the following environment variables. </p>
-                            <ul>
-                                <li>
-                                    <p> PV_DISABLE_COMPOSITE_INTERRUPTS If this variable is set to 1, it is not possible to interrupt the compositing of images in parallel rendering. Otherwise it is interruptible through mouse interaction. </p>
-                                </li>
-                                <li>
-                                    <p> PV_ICET_WINDOW_BORDERS Setting this variable to 1 when running ParaView in tiled display mode using IceT causes the render window for each tile to be the same size as the display area in ParaView’s main application window. (Normally each render window fills the whole screen when tiled display mode is used.) This feature is sometimes useful when debugging ParaView. </p>
-                                </li>
-                                <li>
-                                    <p> PV_PLUGIN_PATH  If you have shared libraries containing plugins you wish to load in ParaView at startup, set this environment variable to the path for these libraries. </p>
-                                </li>
-                                <li>
-                                    <p> PV_SOFTWARE_RENDERING This environment variable has the same effect as setting both the ‑‑use‑software‑rendering and --use-satellite-software environment variables. </p>
-                                </li>
-                                <li>
-                                    <p> VTK_CLIENT_SERVER_LOG If set to 1, a log file will be created for the ParaView client, server, and render server. The log files will contain any client-server streams sent to the corresponding client, server, or render server. </p>
-                                </li>
-                                <li>
-                                    <p> PV_DEBUG_PANELS If set to 1 a debug message will be printed with an explaination as to why each property widget in the properties panel was created.</p>
-                                </li>
-                            </ul>
-                            <p/>
                         </div>
                     </div>
                     <div id="about">

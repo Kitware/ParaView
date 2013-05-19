@@ -19,9 +19,6 @@
                 </div>
             </div>
             <div id="page">
-                <h1>
-                    <a href="#">ParaView/Users Guide/Plugins</a>
-                </h1>
                 <div id="content">
                     <div class="post">
                         <h2 class="title">
@@ -67,21 +64,10 @@
                             <p>Generally, users don't have to worry whether a plugin is a server-side or client-side plugin. Simply load the plugin on the server as well as the client. ParaView will include relevant components from plugin on each of the processes.</p>
                         </div>
                     </div>
-                    <div id="about">
-                        <p>
-          This is an abridged version of the ParaView User's Manual. For a
-          regularly updated version of the manual, refer to the
-          <a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">
-          ParaView Wiki (Manual)</a>
-                        </p>
-                    </div>
                 </div>
                 <div style="clear: both;"/>
             </div>
             <div id="page">
-                <h1>
-                    <a href="#">ParaView/Users Guide/Included Plugins</a>
-                </h1>
                 <div id="content">
                     <div class="post">
                         <h2 class="title">
@@ -93,7 +79,7 @@
                                 <li>
                                     <p> Adios </p>
                                 </li>
-                            </ul> Loads pixie format files written with the Adios library. This reader supports the staging capability of Adios which allow the user to pipe simulation kernels to post-processing tools : such as ParaView throw MPI communication channel and follow in live the computation with no disk IO.  <ul>
+                            </ul> Loads pixie format files written with the Adios library. This reader support the staging capability of Adios which allow the user to pipe simulation kernels to post-processing tools : such as ParaView throw MPI communication channel and follow in live the computation with no disk IO.  <ul>
                                 <li>
                                     <p> Eye Dome Lighting </p>
                                 </li>
@@ -107,17 +93,13 @@
                                 </li>
                             </ul> Overrides the VTK time requests. This can be used to create complex animation with different datasets following independent times evolutions.  Note: As this filter overrides the time requests, time-aware filters such as PathLines or PlotOverTime will not behave correctly if they are inserted in a pipeline after this filter. <ul>
                                 <li>
-                                    <p> GMV Reader </p>
-                                </li>
-                            </ul> The GMV Reader plugin adds support for reading point and cell based, time varying data stored in ASCII or binary form in the file format defined for LANL's General Mesh Viewer. Structured regular brick meshes, logically rectangular brick meshes and unstructured meshes are supported, as are tracers and polygonal data. Face based, surface and ray data is not. <ul>
-                                <li>
                                     <p> H5PartReader </p>
                                 </li>
                             </ul> The H5Part Reader plugin adds support for reading particle datasets stored in H5Part format. H5Part is a simple wrapper around the HDF5 library and provides a number of convenience functions to manage time steps and access field arrays. The reader supports parallel reading of data using hyperslabs, when used with ParaView compiled with MPI and HDF5 with parallel IO enabled, the reader automatically uses hyperslabs to read portions of data on each process. <ul>
                                 <li>
                                     <p> Nifti </p>
                                 </li>
-                            </ul> Reads time varying volumetric/image data from ANALYZE. Supports single (.nii) and dual (.img &amp; .hdr) file storage including zlib compression.  Able to write out ascii or binary files. <ul>
+                            </ul> Reades time varying volumetric/image data from ANALYZE. Supports single (.nii) and dual (.img &amp; .hdr) file storage including zlib compression.  Able to write out ascii or binary files. <ul>
                                 <li>
                                     <p> Manta View </p>
                                 </li>
@@ -175,21 +157,10 @@
                                 </li>
                             </ul> Adds a Uncertainty Surface representation which is able to display both data values and data uncertainties on a surface.</div>
                     </div>
-                    <div id="about">
-                        <p>
-          This is an abridged version of the ParaView User's Manual. For a
-          regularly updated version of the manual, refer to the
-          <a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">
-          ParaView Wiki (Manual)</a>
-                        </p>
-                    </div>
                 </div>
                 <div style="clear: both;"/>
             </div>
             <div id="page">
-                <h1>
-                    <a href="#">ParaView/Users Guide/Loading Plugins</a>
-                </h1>
                 <div id="content">
                     <div class="post">
                         <h2 class="title">
@@ -205,12 +176,12 @@
                             </ul>
                             <p/> Plugins can be loaded into ParaView using the <strong>Plugin Manager</strong> accessible from <strong>Tools | Manage Plugins/Extensions</strong> menu. The Plugin Manager has two sections for loading local plugins and remote plugins (enabled only when connected to a server). To load a plugin on the local as well as remote side, simply browse to the plugin shared library. If the loading is successful, the plugin will appear in the list of loaded plugins. The Plugin manager also lists the paths it searched to load plugins automatically. The Plugin Manager remembers all loaded plugins, so next time to load the plugin, simply locate it in the list and click "Load Selected" button.   You can set up ParaView to automatically load the plugin at startup (in case of client-side plugins) or on connecting to the server (in case of server-side plugins) by checking the "Auto Load" checkbox on a loaded plugin. <p align="center">
                                 <p>
-                                    <img src="13523633405335750656.png" align="center"/>
+                                    <img src="13687185422204000256.png" align="center"/>
                                 </p>
                                 <strong>Figure 16.1:</strong> Plugin Manager when not connected to a remote server, showing loaded plugins on the local site.</p>
                             <p align="center">
                                 <p>
-                                    <img src="13523633405346551808.png" align="center"/>
+                                    <img src="13687185422214400000.png" align="center"/>
                                 </p>
                                 <strong>Figure 16.2:</strong> Plugin Manager when connected to a server showing loaded plugins on the local as well as remote sites.</p>
                             <p/>

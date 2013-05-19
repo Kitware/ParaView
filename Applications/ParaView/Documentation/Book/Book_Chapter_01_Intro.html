@@ -19,9 +19,6 @@
                 </div>
             </div>
             <div id="page">
-                <h1>
-                    <a href="#">ParaView/Users Guide/Introduction</a>
-                </h1>
                 <div id="content">
                     <div class="post">
                         <h2 class="title">
@@ -49,7 +46,7 @@
                                     <p>Pipeline Browser which displays the visualization pipeline </p>
                                 </li>
                                 <li>
-                                    <p>Object Inspector with its Properties, Display and Information tabs where you can control any given module within the pipeline </p>
+                                    <p>Properties panel where you can can control any given module within the pipeline </p>
                                 </li>
                                 <li>
                                     <p>View area where data is displayed in one or more windows </p>
@@ -58,40 +55,40 @@
                             <p/>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630767290368.png" align="center"/>
+                                    <img src="13687149652079210496.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.1</strong> ParaView GUI Overview</p>
-                            <p> One very important thing to keep in mind when using ParaView is that the GUI is very modal. At any given time you will have one "active" module within the visualization pipeline, one "active" view, and one "active" selection. For example, when you click on the name of a reader or source within the Pipeline Browser, it becomes the active module and the properties of that filter are displayed in the Object Inspector. Likewise when you click within a different view, that view becomes the active view and the visibility "eye" icons in the Pipeline Browser are changed to show what filters are displayed within this View. These concepts will be described in detail in later chapters  ( Multiple Views, Pipeline Basics, Selection). For now you should be aware that the information displayed in the GUI always pertains to these active entities. </p>
+                            <p> One very important thing to keep in mind when using ParaView is that the GUI is very modal. At any given time you will have one "active" module within the visualization pipeline, one "active" view, and one "active" selection. For example, when you click on the name of a reader or source within the Pipeline Browser, it becomes the active module and the properties of that filter are displayed in the Properties panel. Likewise when you click within a different view, that view becomes the active view and the visibility "eye" icons in the Pipeline Browser are changed to show what filters are displayed within this View. These concepts will be described in detail in later chapters  ( Multiple Views, Pipeline Basics, Selection). For now you should be aware that the information displayed in the GUI always pertains to these active entities. </p>
                             <p> Modern graphical applications allow users to treat the GUI as a document where informations can be queried and used by Copy/Paste from one place to another and that's precisely where we are heading to with ParaView. Typically user can query any Tree/Table/List view widget in the UI by activating that component and by hitting the Ctrl+F or Command+F on Mac keyboard shortcut, while the view widget is in focus. This will enable a dynamic widget showing up which get illustrated in the following screenshot. This search-widget will be closed when the view widget lost focus, or the Esc button is pressed, or the Close button on the search-widget is clicked.  </p>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630787788800.png" align="center"/>
+                                    <img src="13687149652099530752.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.2</strong> Searching in lists </p>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630797901824.png" align="center"/>
+                                    <img src="13687149652109740032.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.3</strong> Searching in trees </p>
                             <p>In order to retrieve data from spreadsheet or complex UI, you will need to double click on the area that you are interested in and select the portion of text that you want to select to Copy. The set of screenshots below illustrate different selection use case across the UI components. </p>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630809409536.png" align="center"/>
+                                    <img src="13687149652120958976.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.4</strong> Copying time values from Information Tab</p>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630819850240.png" align="center"/>
+                                    <img src="13687149652131209216.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.5</strong> Copying values from trees on the Information Tab</p>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630830450688.png" align="center"/>
+                                    <img src="13687149652141840384.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.6</strong> Copying values from Spreadsheet View</p>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630840809472.png" align="center"/>
+                                    <img src="13687149652152330240.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.7</strong> Copying values from Information Tab</p>
                         </div>
@@ -111,14 +108,14 @@
                         </h2>
                         <div class="entry">
                             <p> In ParaView, these steps are made manifest in a visualization pipeline. That is, you visualize data by building up a set of modules, each of which takes in some data, operates on it, and presents the result as a new dataset. This begins with a reader module that ingests data off of files on disk.  </p>
-                            <p>Reading data into ParaView is often as simple as selecting Open from the File menu, and then clicking the glowing Accept button on the reader's Object Inspector tab. ParaView comes with support for a large number of file formats [0], and its modular architecture makes it possible to add new file readers [1]. </p>
+                            <p>Reading data into ParaView is often as simple as selecting Open from the File menu, and then clicking the glowing Accept button on the Properties panel. ParaView comes with support for a large number of file formats [0], and its modular architecture makes it possible to add new file readers [1]. </p>
                             <p>Once a file is read, ParaView automatically renders it in a view. In ParaView, a view is simply a window that shows data. There are different types of views, ranging from qualitative computer graphics rendering of the data to quantitative spreadsheet presentations of the data values as text. ParaView picks a suitable view type for your data automatically, but you are free to change the view type, modify the rendering parameters of the data in the view, and even create new views simultaneously as you see fit to better understand what you have read in. Additionally, high-level meta information about the data including names, types and ranges of arrays, temporal ranges, memory size and geometric extent can be found in the Information tab. </p>
-                            <p>You can learn a great deal about a given dataset with a one element visualization pipeline consisting of just a reader module. In ParaView, you can create arbitrarily complex visualization pipelines, including ones with multiple readers, merging and branching pipelines. You build up a pipeline by choosing the next filter in the sequence from the Filters menu. Once you click Accept, this new filter will read in the data produced by the formerly active filter and perform some processing on that data. The new filter then becomes the active one. Filters then are created differently from but operate in the same manner as readers. At all points you use the Pipeline Inspector to choose the active filter and then the Object Inspector to configure it. </p>
-                            <p>The Pipeline Browser is where the overall visualization pipeline is displayed and controlled from. The Object Inspector is where the specific parameters of one particular module within the pipeline are displayed and controlled from. The Object Inspector has three tabs; one presents the parameters of the processing done within that module, another presents the parameters of how the output of that module will be displayed in a view, and the last presents the meta information about the data produced by the module as described above. </p>
+                            <p>You can learn a great deal about a given dataset with a one element visualization pipeline consisting of just a reader module. In ParaView, you can create arbitrarily complex visualization pipelines, including ones with multiple readers, merging and branching pipelines. You build up a pipeline by choosing the next filter in the sequence from the Filters menu. Once you click Accept, this new filter will read in the data produced by the formerly active filter and perform some processing on that data. The new filter then becomes the active one. Filters then are created differently from but operate in the same manner as readers. At all points you use the Pipeline Inspector to choose the active filter and then the Properties panel to configure it. </p>
+                            <p>The Pipeline Browser is where the overall visualization pipeline is displayed and controlled from. The Properties panel is where the specific parameters of one particular module within the pipeline are displayed and controlled from. The Properties panel has two sections: Properties section presents the parameters for the processing done within that module, Display section presents the parameters of how the output of that module will be displayed in a view (namely, the active view). There's also in Information panel, which presents the meta information about the data produced by the module as described above.</p>
                             <p>Figure 1.8 demonstrates a three-element visualization pipeline, where the output of each module in the the pipeline is displayed in its own view. A reader takes in a vector field, defined on a curvilinear grid, which comes from a simulation study of a wind turbine. Next a slice filter produces slices of the field on five equally spaced planes along the X-axis. Finally, a warp filter warps those planes along the direction of the vector field, which primarily moves the planes downwind but also shows some complexity at the location of the wind turbine. </p>
                             <p align="center">
                                 <p>
-                                    <img src="13523631630864920576.png" align="center"/>
+                                    <img src="13687149652178522112.png" align="center"/>
                                 </p>
                                 <strong>Figure 1.8</strong> A three-element visualization pipeline</p>
                             <p>There are more than one hundred filters available to choose from, all of which manipulate the data in different ways. The full list of filters is available in the  Appendix and within the application under the Help menu. Note that many of the filters in the menu will be grayed out and not selectable at any given time. That is because any given filter may only operate on particular types of data. For example, the Extract Subset filter will only operate on structured data sets so it is only enabled when the module you are building on top of produces image data, rectilinear grid data, or structured grid data. (These input restrictions are also listed in the  Appendix and help menu). In this situation you can often find a similar filter which does accept your data, or apply a filter which transforms your data into the required format. In ParaView 3.10, you can ask ParaView to try to do the conversion for you automatically, by clicking "Auto convert properties" in the application  settings.  The mechanics of applying filters are described fully in the  Manipulating Data chapter. </p>
