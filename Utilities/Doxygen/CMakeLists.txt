@@ -61,3 +61,10 @@ add_custom_target(ParaViewDoxygenDoc
   ${CMAKE_COMMAND}
   -P ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake
   DEPENDS ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake)
+
+add_custom_target(ParaViewDoxygenDoc-copy
+  DEPENDS ParaViewDoxygenDoc
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc/html "${PARAVIEW_WWW_DIR}/cxx-doc"
+)
+
+add_dependencies(ParaViewDoc ParaViewDoxygenDoc-copy)

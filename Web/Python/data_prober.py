@@ -1,3 +1,28 @@
+r"""
+    This module is a ParaViewWeb server application.
+    The following command line illustrate how to use it::
+
+        $ pvpython .../data_prober.py --data-dir /.../path-to-your-data-directory
+
+    Any ParaViewWeb executable script come with a set of standard arguments that
+    can be overriden if need be::
+
+        --port 8080
+             Port number on which the HTTP server will listen to.
+
+        --content /path-to-web-content/
+             Directory that you want to server as static web content.
+             By default, this variable is empty which mean that we rely on another server
+             to deliver the static content and the current process only focus on the
+             WebSocket connectivity of clients.
+
+        --authKey paraviewweb-secret
+             Secret key that should be provided by the client to allow it to make any
+             WebSocket communication. The client will assume if none is given that the
+             server expect "paraviewweb-secret" as secret key.
+
+"""
+
 # Application to probe datasets.
 
 import sys
@@ -24,7 +49,7 @@ except ImportError:
 # Create custom Data Prober class to handle clients requests
 # =============================================================================
 
-class DataProber(paraviewweb_wamp.ServerProtocol):
+class __DataProber(paraviewweb_wamp.ServerProtocol):
     """DataProber extends web.ParaViewServerProtocol to add API for loading
         datasets add probing them."""
 
@@ -43,7 +68,7 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
 
         # Update authentication key to use
-        self.updateSecret(DataProber.authKey)
+        self.updateSecret(__DataProber.authKey)
 
     @classmethod
     def setupApplication(cls):
@@ -52,8 +77,8 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
 
         root = { "name": "ROOT", "dirs" : [], "files" : []}
         directory_map = {}
-        directory_map[DataProber.DataPath] = root
-        for path, dirs, files in os.walk(DataProber.DataPath):
+        directory_map[__DataProber.DataPath] = root
+        for path, dirs, files in os.walk(__DataProber.DataPath):
             element = directory_map[path]
 
             for name in dirs:
@@ -64,7 +89,7 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
             element["files"] = []
             for name in files:
                 relpath = os.path.relpath(os.path.join(path, name),
-                    DataProber.DataPath)
+                    __DataProber.DataPath)
                 item = { "name" : name, "itemValue" : relpath}
                 element["files"].append(item)
         cls.Database = root
@@ -161,7 +186,7 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
         pipelines for interactive probing all loaded datasets.
         """
 
-        datafile = os.path.join(DataProber.DataPath, datafile)
+        datafile = os.path.join(__DataProber.DataPath, datafile)
         log.msg("Loading data-file", datafile, logLevel=logging.DEBUG)
         reader = simple.OpenDataFile(datafile)
         if not reader:
@@ -174,16 +199,16 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
         item["ReaderRepresentation"] = rep
         item["Probe"] = probe
         item["name"] = os.path.split(datafile)[1]
-        DataProber.PipelineObjects.append(item)
+        __DataProber.PipelineObjects.append(item)
 
     @exportRpc("loadDatasets")
     def loadDatasets(self, datafiles):
         # initially, we'll only support loading 1 dataset.
-        for item in DataProber.PipelineObjects:
+        for item in __DataProber.PipelineObjects:
             simple.Delete(item["Probe"])
             simple.Delete(item["ReaderRepresentation"])
             simple.Delete(item["Reader"])
-        DataProber.PipelineObjects = []
+        __DataProber.PipelineObjects = []
 
         for path in datafiles:
             self.loadData(path)
@@ -205,13 +230,13 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
             ]
         """
         retVal = []
-        for item in DataProber.PipelineObjects:
+        for item in __DataProber.PipelineObjects:
             name = item["name"]
             probe = item["Probe"]
-            probe.Source.Point1 = DataProber.Widget.Point1WorldPosition
-            probe.Source.Point2 = DataProber.Widget.Point2WorldPosition
+            probe.Source.Point1 = __DataProber.Widget.Point1WorldPosition
+            probe.Source.Point2 = __DataProber.Widget.Point2WorldPosition
             print "Probing ", probe.Source.Point1, probe.Source.Point2
-            simple.UpdatePipeline(time=DataProber.View.ViewTime, proxy=probe)
+            simple.UpdatePipeline(time=__DataProber.View.ViewTime, proxy=probe)
             # fetch probe result from root node.
             do = simple.servermanager.Fetch(probe, 0)
             data = web.vtkPVWebUtilities.WriteAttributesToJavaScript(
@@ -230,19 +255,19 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
 
     def resetCameraWithBounds(self, bounds):
         if vtk.vtkMath.AreBoundsInitialized(bounds):
-            DataProber.View.SMProxy.ResetCamera(bounds)
-            DataProber.View.CenterOfRotation = [
+            __DataProber.View.SMProxy.ResetCamera(bounds)
+            __DataProber.View.CenterOfRotation = [
                 (bounds[0] + bounds[1]) * 0.5,
                 (bounds[2] + bounds[3]) * 0.5,
                 (bounds[4] + bounds[5]) * 0.5]
 
     @exportRpc("getDatabase")
     def getDatabase(self):
-        return DataProber.Database
+        return __DataProber.Database
 
     @exportRpc("getDatabaseAsHTML")
     def getDatabaseAsHTML(self):
-        return DataProber.toHTML(DataProber.Database)
+        return __DataProber.toHTML(__DataProber.Database)
 
     @exportRpc("goToNext")
     def goToNext(self):
@@ -280,9 +305,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure our current application
-    DataProber.DataPath = args.path
-    DataProber.setupApplication()
-    DataProber.authKey = args.authKey
+    __DataProber.DataPath = args.path
+    __DataProber.setupApplication()
+    __DataProber.authKey = args.authKey
 
     # Start server
-    web.start_webserver(options=args, protocol=DataProber)
+    web.start_webserver(options=args, protocol=__DataProber)

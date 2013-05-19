@@ -11,9 +11,15 @@ import math
 
 # -----------------------------------------------------------------------------
 def IsInModulo(timestep, frequencyArray):
-    """Return True if the given timestep is in one of the provided frequency.
-       This is the same thing as doing that if frequencyArray = [2,3,7]
-       return (timestep % 2 == 0) or (timestep % 3 == 0) or (timestep % 7 == 0)
+    """
+    Return True if the given timestep is in one of the provided frequency.
+    This can be interpreted as follow::
+
+        isFM = IsInModulo(timestep, [2,3,7])
+
+    is similar to::
+
+        isFM = (timestep % 2 == 0) or (timestep % 3 == 0) or (timestep % 7 == 0)
     """
     for freqency in frequencyArray:
         if (timestep % freqency == 0):

@@ -2,7 +2,7 @@ vtk_module_impl()
 vtk_module_export("")
 
 set(Apps_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(Apps_BINARY_DIR "${CMAKE_BINARY_DIR}/www/apps")
+set(Apps_BINARY_DIR "${PARAVIEW_WWW_DIR}/apps")
 
 set (apps DataProber
           LiveArticles

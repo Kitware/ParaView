@@ -8,23 +8,26 @@ rate achieved in triangles/sec. run() is the entrypoint for that usage.
 Second, you can set up arbitrary pipelines and this module helps you obtain,
 interpret and report the information recorded by ParaView's logs.
 Do that like so:
-1) optionally, call maximize logs first
-2) setup and run your visualization pipeline (via GUI or script as you prefer)
-3) either
-- call print_logs() to print out the logs in raw format
-or
-- call parse_logs() to let the script identify and report on per frame and per
-filter execution times
 
-WARNING: This was meant for server side rendering, but it could work
-reasonably well when geometry is delivered to the client and rendered there
-if the script were changed to recognize MPIMoveData as end of frame and did
-something sensible on the server which has no other end of frame knowledge
+1. optionally, call maximize logs first
+2. setup and run your visualization pipeline (via GUI or script as you prefer)
+3. either
+      call print_logs() to print out the logs in raw format
 
-TODO: builtin mode shouldn't show server info, it is redundant
-TODO: this doesn't handle split render/data server mode
-TODO: the end of frame markers are heuristic, likely buggy, and have not
-been tried since before 3.9's view restructuring
+      call parse_logs() to let the script identify and report on per frame and per filter execution times
+
+
+::
+
+    WARNING: This was meant for server side rendering, but it could work
+             reasonably well when geometry is delivered to the client and rendered there
+             if the script were changed to recognize MPIMoveData as end of frame and did
+             something sensible on the server which has no other end of frame knowledge
+
+    TODO: builtin mode shouldn't show server info, it is redundant
+    TODO: this doesn't handle split render/data server mode
+    TODO: the end of frame markers are heuristic, likely buggy, and have not
+          been tried since before 3.9's view restructuring
 """
 
 import time
@@ -209,6 +212,10 @@ def get_logs() :
             logs.append(alog)
 
 def print_logs() :
+    """
+    Print logs on the root node by gathering logs accross all the nodes
+    regardless if the process was started in symmetric mode or not.
+    """
     global logs
 
     if len(logs) == 0:

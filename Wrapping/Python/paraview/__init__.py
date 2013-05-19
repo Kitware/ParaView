@@ -1,3 +1,14 @@
+r"""
+This module is not meant to be used directly. Please look at one of the modules
+it provides:
+  servermanager
+  pvfilters
+  vtk
+  numeric
+  util
+  simple
+"""
+
 #==============================================================================
 #
 #  Program:   ParaView
@@ -12,25 +23,19 @@
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-r"""
-This module is not meant to be used directly. Please look at one of the modules
-it provides:
-  servermanager
-  pvfilters
-  vtk
-  numeric
-  util
-  simple
-"""
 
 class compatibility:
-    minor = None 
+    """Class used to check version number and compatibility"""
+    minor = None
     major = None
-    
-#    @classmethod
+
     def GetVersion(cls):
         if compatibility.minor and compatibility.major:
-            return compatibility.major + float(compatibility.minor)/10
+            version = float(compatibility.minor)
+            while version > 1.0:
+                version = version / 10.0
+            version += float(compatibility.major)
+            return version
         return None
     GetVersion = classmethod(GetVersion)
 
@@ -59,12 +64,15 @@ class options:
     symmetric = False
 
 def print_warning(text):
+   """Print text"""
    print text
 
 def print_error(text):
+   """Print text"""
    print text
 
 def print_debug_info(text):
+   """Print text"""
    print text
 
 """This variable is set whenever Python is initialized within a ParaView

@@ -143,6 +143,9 @@ endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
+if(NOT PARAVIEW_WWW_DIR)
+  set(PARAVIEW_WWW_DIR "${ParaView_BINARY_DIR}/www")
+endif()
 set(PARAVIEW_MODULES_DIR ${VTK_MODULES_DIR})
 
 if (NOT DEFINED VTK_CUSTOM_LIBRARY_SUFFIX)
@@ -468,14 +471,21 @@ list (APPEND PARAVIEW_MODULE_ROOTS
              CoProcessing/Catalyst
              CoProcessing/TestDriver)
 
-if (PARAVIEW_ENABLE_WEB)
-  list (APPEND PARAVIEW_MODULE_ROOTS
-               Web)
-endif()
+add_custom_target(ParaViewDoc)
+add_custom_command(
+     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/www.stamp
+     COMMAND ${CMAKE_COMMAND} -E make_directory "${PARAVIEW_WWW_DIR}")
 
-if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
-  list (APPEND ParaViewModulesDirs
-    Web/Documentation)
+install(DIRECTORY "${PARAVIEW_WWW_DIR}"
+    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www
+    COMPONENT Runtime)
+
+if (PARAVIEW_ENABLE_WEB)
+  list (APPEND PARAVIEW_MODULE_ROOTS Web)
+
+  if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
+    list (APPEND ParaViewModulesDirs Web/Documentation)
+  endif()
 endif()
 
 include(ParaViewModuleTop)
@@ -686,7 +696,6 @@ if (BUILD_DOCUMENTATION)
   add_subdirectory(Utilities/Doxygen)
   add_subdirectory(Utilities/Sphinx)
 endif()
-
 
 #-----------------------------------------------------------------------------
 # Configure the CTestCustom.cmake file for exclusions.

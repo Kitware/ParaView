@@ -104,7 +104,28 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+'footerbgcolor': '#ffffff',
+'footertextcolor': '#484848',
+'sidebarbgcolor': '#b2cace',
+'sidebarbtncolor': '#b0d0e7',
+'sidebartextcolor': '#484848',
+'sidebarlinkcolor': '#006699',
+'relbarbgcolor': '#1b5a63',
+'relbartextcolor': '#ffffff',
+'relbarlinkcolor': '#559998',
+'bgcolor': '#e4edef',
+'textcolor': '#484848',
+'linkcolor': '#006699',
+'visitedlinkcolor': '#006699',
+'headbgcolor': '#e4edef',
+'headtextcolor': '#484848',
+'headlinkcolor': '#006699',
+'codebgcolor': '#d4dcdf',
+'codetextcolor': '#000000',
+'bodyfont': 'Tahoma, Geneva, sans-serif',
+'headfont': 'Myriad Pro, Arial, Helvetica, sans-serif'
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -114,11 +135,11 @@ html_theme = 'default'
 #html_title = None
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+html_short_title = 'ParaView'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = '@ParaView_SOURCE_DIR@/Utilities/Doxygen/paraview-logo-small.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -155,7 +176,7 @@ html_static_path = ['_static']
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True

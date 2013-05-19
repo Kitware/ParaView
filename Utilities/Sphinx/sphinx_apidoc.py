@@ -30,6 +30,16 @@ import sys
 import optparse
 from os import path
 
+# Custom module filter for ParaView
+def is_exclude_module(module):
+    excludeList = ['paraview/vtk/vtk','paraview/vtk/tk','paraview/vtk/gtk','paraview/vtk/test', 'paraview/vtk/qt', 'paraview/vtk/wx', 'paraview/vtk/util', 'paraview/_arg', 'paraview/compile_all', 'paraview/vtkConstants']
+    m = str(module)
+    for exclude in excludeList:
+        if m.__contains__(exclude):
+            print "Exclude:", m
+            return True
+    return False
+
 # automodule options
 if 'SPHINX_APIDOC_OPTIONS' in os.environ:
     OPTIONS = os.environ['SPHINX_APIDOC_OPTIONS'].split(',')
@@ -164,6 +174,9 @@ def create_modules_toc_file(modules, opts, name='modules'):
 def shall_skip(module):
     """Check if we want to skip this module."""
     # skip it if there is nothing (or just \n or \r\n) in the file
+    if is_exclude_module(module):
+        return True
+
     return path.getsize(module) <= 2
 
 
@@ -269,7 +282,7 @@ Note: By default this script will not overwrite already created files.""")
                       help='Directory to place all output', default='')
     parser.add_option('-d', '--maxdepth', action='store', dest='maxdepth',
                       help='Maximum depth of submodules to show in the TOC '
-                      '(default: 4)', type='int', default=4)
+                      '(default: 2)', type='int', default=2)
     parser.add_option('-f', '--force', action='store_true', dest='force',
                       help='Overwrite all files')
     parser.add_option('-n', '--dry-run', action='store_true', dest='dryrun',

@@ -8,7 +8,7 @@ list(APPEND args "-b" "${CMAKE_CURRENT_SOURCE_DIR}/banner.js.in")
 list(APPEND args "-v" "v2.0")
 
 set(lib_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Lib")
-set(lib_binary_dir "${CMAKE_BINARY_DIR}/www/lib/js")
+set(lib_binary_dir "${PARAVIEW_WWW_DIR}/lib/js")
 
 set(lib_js_min_files
   "${lib_source_dir}/paraview.js"
@@ -37,7 +37,7 @@ add_custom_command(OUTPUT ${paraview_all_min_js} ${paraview_all_js}
 
 # Copy Ext js files
 set(ext_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Ext")
-set(ext_binary_dir "${CMAKE_BINARY_DIR}/www/ext/js-core")
+set(ext_binary_dir "${PARAVIEW_WWW_DIR}/ext/js-core")
 
 copy_files_recursive(${ext_source_dir}
   DESTINATION ${ext_binary_dir}
@@ -49,10 +49,10 @@ add_custom_target(vtkParaViewWebJavaScript ALL DEPENDS
   ${paraview_all_min_js}
   "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete")
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/www/ext/js-core"
+install(DIRECTORY "${PARAVIEW_WWW_DIR}/ext/js-core"
   DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/ext/
   COMPONENT Runtime)
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/www/lib/js/"
+install(DIRECTORY "${PARAVIEW_WWW_DIR}/lib/js/"
   DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/js
   COMPONENT Runtime)

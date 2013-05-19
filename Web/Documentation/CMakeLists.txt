@@ -9,7 +9,6 @@ set(docs_tmp_dir "${CMAKE_CURRENT_BINARY_DIR}/tmp")
 set(JAVASCRIPT_LIB_DIR "${CMAKE_SOURCE_DIR}/Web/JavaScript")
 set(JAVASCRIPT_WIDGETS_DIR "${CMAKE_SOURCE_DIR}/Web/Widgets")
 set(DOC_OUTPUT_DIR "${docs_binary_dir}")
-set(WWW_DIR "${CMAKE_CURRENT_BINARY_DIR}/../../www")
 
 # favicon.ico"
 configure_file("${docs_source_dir}/images/logo/favicon.ico"
@@ -53,20 +52,17 @@ set(jsduck_stamp "${CMAKE_CURRENT_BINARY_DIR}/jsduck.stamp")
 
 add_custom_command(OUTPUT ${jsduck_stamp}
   COMMAND ${CMAKE_COMMAND} -E make_directory ${docs_tmp_dir}
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${WWW_DIR}"
   COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_CURRENT_BINARY_DIR}/jsduck.stamp"
   COMMAND ${JSDUCK_EXECUTABLE} ${args}
   DEPENDS ${doc_input_files})
 
-add_custom_target(vtkParaViewWebDocumentation ALL
+add_custom_target(ParaViewWebDoc
   DEPENDS ${jsduck_stamp}
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${docs_tmp_dir} ${docs_binary_dir}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${docs_binary_dir} ${WWW_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${docs_binary_dir} "${PARAVIEW_WWW_DIR}/js-doc"
 )
+
+add_dependencies(ParaViewDoc ParaViewWebDoc)
 
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "${docs_binary_dir}")
-
-install(DIRECTORY "${docs_binary_dir}/"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/
-  COMPONENT Runtime)

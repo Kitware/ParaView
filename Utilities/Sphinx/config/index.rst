@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ParaView's Python documentation!
+ParaView's Python documentation!
 ===========================================
 
 ParaView offers rich scripting support through Python. This support is available
@@ -12,18 +12,30 @@ as part of the ParaView client (paraview), an MPI-enabled batch application
 application. Using Python, users and developers can gain access to the ParaView
 visualization engine.
 
-Contents:
-
-.. toctree::
-   :maxdepth: 1
-
-   quick-start
-   The ParaView Python Package <paraview>
-
-
-Indices and tables
+Main modules
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+
+   quick-start
+
+   The ParaView Python Package <paraview>
+   simple <paraview.simple>
+   servermanager <paraview.servermanager>
+   algortihm <paraview.vtk.algorithms>
+
+   coprocessing <paraview.coprocessing>
+   benchmark <paraview.benchmark>
+
+
+ParaViewWeb
+==================
+
+.. toctree::
+   :maxdepth: 2
+
+   WebVisualization application <paraview.pipeline_manager>
+   Simple server sample <paraview.simple_server>
+   Basic file loader <paraview.file_loader>
+   Data Prober <paraview.data_prober>
