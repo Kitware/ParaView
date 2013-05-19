@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqUndoStack.h"
 #include "vtkPVRenderView.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
@@ -96,6 +97,8 @@ bool pqObjectPickingBehavior::eventFilter(QObject* caller, QEvent* e)
           pqActiveObjects::instance().activeView());
         if (view)
           {
+          BEGIN_UNDO_EXCLUDE();
+
           // check if the view is currently doing a selection, in that case,
           // ignore the "pick".
           int mode =
@@ -120,8 +123,10 @@ bool pqObjectPickingBehavior::eventFilter(QObject* caller, QEvent* e)
                   picked->getOutputPortFromInput()->getOutputPortProxy(),
                   vtkSMProxySelectionModel::CLEAR_AND_SELECT);
                 }
-              } 
+              }
             }
+
+          END_UNDO_EXCLUDE();
           }
         }
       this->Position = QPoint();

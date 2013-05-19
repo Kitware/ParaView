@@ -93,6 +93,13 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
                 this, SLOT(treeWidgetCustomContextMenuRequested(QPoint)));
   this->connect(this->TreeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
                 this, SLOT(blockItemChanged(QTreeWidgetItem*, int)));
+
+  //  UpdateUITimer helps use collapse updates to the UI whenever the SM
+  //  properties change.
+  this->UpdateUITimer.setSingleShot(true);
+  this->UpdateUITimer.setInterval(0);
+  this->connect(&this->UpdateUITimer, SIGNAL(timeout()),
+                this, SLOT(updateTreeWidgetBlockVisibilities()));
 }
 
 pqMultiBlockInspectorPanel::~pqMultiBlockInspectorPanel()
@@ -157,8 +164,8 @@ void pqMultiBlockInspectorPanel::setRepresentation(pqRepresentation *representat
       {
       this->VisibilityPropertyListener->Connect(visibilityProperty,
                                                 vtkCommand::ModifiedEvent,
-                                                this,
-                                                SLOT(updateBlockVisibilities()));
+                                                &this->UpdateUITimer,
+                                                SLOT(start()));
       }
 
     vtkSMProperty *colorProperty = proxy->GetProperty("BlockColors");
@@ -166,8 +173,8 @@ void pqMultiBlockInspectorPanel::setRepresentation(pqRepresentation *representat
       {
       this->VisibilityPropertyListener->Connect(colorProperty,
                                                 vtkCommand::ModifiedEvent,
-                                                this,
-                                                SLOT(updateBlockColors()));
+                                                &this->UpdateUITimer,
+                                                SLOT(start()));
       }
     }
   else
@@ -270,55 +277,139 @@ void pqMultiBlockInspectorPanel::updateInformation()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::setBlockVisibility(unsigned int index, bool visible)
 {
-  this->BlockVisibilites[index] = visible;
-  this->updateBlockVisibilities();
-  this->Representation->renderViewEventually();
+  QList<unsigned int> indices;
+  indices.push_back(index);
+  this->setBlockVisibility(indices, visible);
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::clearBlockVisibility(unsigned int index)
 {
-  this->BlockVisibilites.remove(index);
+  QList<unsigned int> indices;
+  indices.push_back(index);
+  this->clearBlockVisibility(indices);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::setBlockVisibility(
+  const QList<unsigned int>& indices, bool visible)
+{
+  foreach(const unsigned int &index, indices)
+    {
+    this->BlockVisibilites[index] = visible;
+    }
+
   this->updateBlockVisibilities();
   this->Representation->renderViewEventually();
 }
 
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::clearBlockVisibility(
+  const QList<unsigned int>& indices)
+{
+  foreach(const unsigned int &index, indices)
+    {
+    this->BlockVisibilites.remove(index);
+    }
+
+  this->updateBlockVisibilities();
+  this->Representation->renderViewEventually();
+}
+
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::setBlockColor(unsigned int index, const QColor &color)
 {
-  this->BlockColors[index] = color;
-  this->updateBlockColors();
-  this->Representation->renderViewEventually();
+  QList<unsigned int> indices;
+  indices.push_back(index);
+  this->setBlockColor(indices, color);
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::clearBlockColor(unsigned int index)
 {
-  this->BlockColors.remove(index);
+  QList<unsigned int> indices;
+  indices.push_back(index);
+  this->clearBlockColor(indices);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::setBlockColor(
+  const QList<unsigned int>& indices, const QColor &color)
+{
+  foreach(const unsigned int &index, indices)
+    {
+    this->BlockColors[index] = color;
+    }
+
   this->updateBlockColors();
   this->Representation->renderViewEventually();
 }
 
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::clearBlockColor(const QList<unsigned int>& indices)
+{
+  foreach(const unsigned int &index, indices)
+    {
+    this->BlockColors.remove(index);
+    }
+  this->updateBlockColors();
+  this->Representation->renderViewEventually();
+}
+
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::setBlockOpacity(unsigned int index, double opacity)
 {
-  this->BlockOpacities[index] = opacity;
+  QList<unsigned int> indices;
+  indices.push_back(index);
+  this->setBlockOpacity(indices, opacity);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::setBlockOpacity(
+  const QList<unsigned int>& indices, double opacity)
+{
+  foreach(const unsigned int &index, indices)
+    {
+    this->BlockOpacities[index] = opacity;
+    }
+
   this->updateBlockOpacities();
   this->Representation->renderViewEventually();
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::clearBlockOpacity(unsigned int index)
 {
-  this->BlockOpacities.remove(index);
+  QList<unsigned int> indices;
+  indices.push_back(index);
+  this->clearBlockOpacity(indices);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::clearBlockOpacity(
+  const QList<unsigned int>& indices)
+{
+  foreach(const unsigned int &index, indices)
+    {
+    this->BlockOpacities.remove(index);
+    }
+
   this->updateBlockOpacities();
   this->Representation->renderViewEventually();
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(unsigned int index)
 {
   QList<unsigned int> list;
   list.append(index);
-  promptAndSetBlockOpacity(list);
+  this->promptAndSetBlockOpacity(list);
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(const QList<unsigned int> &indices)
 {
   if(indices.isEmpty())
@@ -327,28 +418,38 @@ void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(const QList<unsigned i
     }
 
   double current_opacity = this->BlockOpacities.value(indices[0], 1.0);
-
   pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, this);
   dialog.setValue(current_opacity);
   bool ok = dialog.exec();
   if(ok)
     {
-    foreach(unsigned int index, indices)
-      {
-      this->setBlockOpacity(index, dialog.value());
-      }
+    this->setBlockOpacity(indices, dialog.value());
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::showOnlyBlock(unsigned int index)
+{
+  QList<unsigned int> indices;
+  indices.push_back(index);
+  this->showOnlyBlocks(indices);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::showOnlyBlocks(
+  const QList<unsigned int>& indices)
 {
   this->BlockVisibilites.clear();
   this->BlockVisibilites[0] = false; // hide root block
-  this->BlockVisibilites[index] = true;
+  foreach (const unsigned int &index, indices)
+    {
+    this->BlockVisibilites[index] = true;
+    }
   this->updateBlockVisibilities();
   this->Representation->renderViewEventually();
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::updateBlockVisibilities()
 {
   std::vector<int> vector;
@@ -369,20 +470,18 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
     BEGIN_UNDO_SET("Change Block Visibilities");
     vtkSMIntVectorProperty *ivp =
       vtkSMIntVectorProperty::SafeDownCast(property_);
-
-    ivp->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
     if(!vector.empty())
       {
-      ivp->SetElements(&vector[0]);
+      // if property changes, ModifiedEvent will be fired and
+      // this->UpdateUITimer will be started.
+      ivp->SetElements(&vector[0], static_cast<unsigned int>(vector.size()));
       }
-
     proxy->UpdateVTKObjects();
     END_UNDO_SET();
     }
-
-  this->updateTreeWidgetBlockVisibilities();
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::updateBlockColors()
 {
   // update vtk property
@@ -395,6 +494,8 @@ void pqMultiBlockInspectorPanel::updateBlockColors()
     vtkSMDoubleMapProperty *dmp =
       vtkSMDoubleMapProperty::SafeDownCast(property_);
 
+    // if property changes, ModifiedEvent will be fired and
+    // this->UpdateUITimer will be started.
     dmp->ClearElements();
 
     QMap<unsigned int, QColor>::const_iterator iter;
@@ -426,6 +527,8 @@ void pqMultiBlockInspectorPanel::updateBlockOpacities()
     vtkSMDoubleMapProperty *dmp =
       vtkSMDoubleMapProperty::SafeDownCast(property_);
 
+    // if property changes, ModifiedEvent will be fired and
+    // this->UpdateUITimer will be started.
     dmp->ClearElements();
 
     QMap<unsigned int, double>::const_iterator iter;

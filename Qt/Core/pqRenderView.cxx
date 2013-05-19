@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIntArray.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
@@ -43,10 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballRoll.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
-#include "vtkProcessModule.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -55,9 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUndoStack.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
 #include "vtkStructuredData.h"
 #include "vtkTrackballPan.h"
 
@@ -85,6 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 
 pqRenderView::ManipulatorType pqRenderView::DefaultManipulatorTypes[] =
 {
@@ -701,9 +702,11 @@ void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
 //-----------------------------------------------------------------------------
 pqDataRepresentation* pqRenderView::pick(int pos[2])
 {
+  BEGIN_UNDO_EXCLUDE();
   vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
   vtkSMRepresentationProxy* repr = renderView->Pick(pos[0], pos[1]);
   pqDataRepresentation* pq_repr = findRepresentationFromProxy(repr);
+  END_UNDO_EXCLUDE();
   if(pq_repr)
     {
     emit this->picked(pq_repr->getOutputPortFromInput());
@@ -715,9 +718,11 @@ pqDataRepresentation* pqRenderView::pick(int pos[2])
 pqDataRepresentation* pqRenderView::pickBlock(int pos[2],
                                               unsigned int &flatIndex)
 {
+  BEGIN_UNDO_EXCLUDE();
   vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
   vtkSMRepresentationProxy* repr = renderView->PickBlock(pos[0], pos[1], flatIndex);
   pqDataRepresentation* pq_repr = findRepresentationFromProxy(repr);
+  END_UNDO_EXCLUDE();
   if(pq_repr)
     {
     emit this->picked(pq_repr->getOutputPortFromInput());
@@ -798,6 +803,8 @@ void pqRenderView::selectOnSurfaceInternal(
   bool expand,
   bool select_blocks)
 {
+  BEGIN_UNDO_EXCLUDE();
+
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
 
   vtkSmartPointer<vtkCollection> selectedRepresentations =
@@ -810,6 +817,7 @@ void pqRenderView::selectOnSurfaceInternal(
         selectedRepresentations, selectionSources,
         this->UseMultipleRepresentationSelection))
       {
+      END_UNDO_EXCLUDE();
       return;
       }
     }
@@ -819,10 +827,12 @@ void pqRenderView::selectOnSurfaceInternal(
         selectedRepresentations, selectionSources,
         this->UseMultipleRepresentationSelection))
       {
+      END_UNDO_EXCLUDE();
       return;
       }
     }
 
+  END_UNDO_EXCLUDE();
   this->collectSelectionPorts(selectedRepresentations,
     selectionSources, pqOutputPorts, expand, select_blocks);
 }
@@ -863,17 +873,19 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon,
   bool expand, bool select_blocks)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
-
   vtkSmartPointer<vtkCollection> selectedRepresentations =
     vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> selectionSources =
     vtkSmartPointer<vtkCollection>::New();
+
+  BEGIN_UNDO_EXCLUDE();
   if (select_points)
     {
     if (!renderModuleP->SelectPolygonPoints(polygon,
       selectedRepresentations, selectionSources,
       this->UseMultipleRepresentationSelection))
       {
+      END_UNDO_EXCLUDE();
       return;
       }
     }
@@ -883,10 +895,12 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon,
       selectedRepresentations, selectionSources,
       this->UseMultipleRepresentationSelection))
       {
+      END_UNDO_EXCLUDE();
       return;
       }
     }
 
+  END_UNDO_EXCLUDE();
   this->collectSelectionPorts(selectedRepresentations,
     selectionSources, pqOutputPorts, expand, select_blocks);
 }
@@ -901,13 +915,17 @@ void pqRenderView::selectFrustum(int rect[4])
   vtkSmartPointer<vtkCollection> selectionSources =
     vtkSmartPointer<vtkCollection>::New();
   QList<pqOutputPort*> output_ports;
+
+  BEGIN_UNDO_EXCLUDE();
   if (!renderModuleP->SelectFrustumCells(rect,
     selectedRepresentations, selectionSources,
     this->UseMultipleRepresentationSelection))
     {
+    END_UNDO_EXCLUDE();
     this->emitSelectionSignal(output_ports);
     return;
     }
+  END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(selectedRepresentations,
     selectionSources, output_ports, false, false);
@@ -926,15 +944,18 @@ void pqRenderView::selectFrustumPoints(int rect[4])
     vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> selectionSources =
     vtkSmartPointer<vtkCollection>::New();
-
   QList<pqOutputPort*> output_ports;
+
+  BEGIN_UNDO_EXCLUDE();
   if (!renderModuleP->SelectFrustumPoints(rect,
     selectedRepresentations, selectionSources,
     this->UseMultipleRepresentationSelection))
     {
+    END_UNDO_EXCLUDE();
     this->emitSelectionSignal(output_ports);
     return;
     }
+  END_UNDO_EXCLUDE();
 
   this->collectSelectionPorts(selectedRepresentations,
     selectionSources, output_ports, false, false);
