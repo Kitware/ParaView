@@ -42,7 +42,7 @@ except ImportError:
 # Create custom Pipeline Manager class to handle clients requests
 # =============================================================================
 
-class __PipelineManager(paraviewweb_wamp.ServerProtocol):
+class _PipelineManager(paraviewweb_wamp.ServerProtocol):
 
     dataDir = None
     authKey = "paraviewweb-secret"
@@ -55,10 +55,10 @@ class __PipelineManager(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebTimeHandler())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebPipelineManager())
-        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebFileManager(PipelineManager.dataDir))
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebFileManager(_PipelineManager.dataDir))
 
         # Update authentication key to use
-        self.updateSecret(__PipelineManager.authKey)
+        self.updateSecret(_PipelineManager.authKey)
 
 # =============================================================================
 # Main: Parse args and start server
@@ -78,8 +78,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure our current application
-    __PipelineManager.authKey = args.authKey
-    __PipelineManager.dataDir = args.path
+    _PipelineManager.authKey = args.authKey
+    _PipelineManager.dataDir = args.path
 
     # Start server
-    web.start_webserver(options=args, protocol=__PipelineManager)
+    web.start_webserver(options=args, protocol=_PipelineManager)
