@@ -9,6 +9,7 @@
 
         <link rel="icon" type="image/png" href="img/favicon.png"/>
         <link href="kitware.css" rel="stylesheet" type="text/css"/>
+        <script src="ext/js-core/jquery-1.8.2.min.js"></script>
 
     </head>
     <body>
@@ -29,9 +30,9 @@
                     <div id="Content">
                         <div class="doc-links">
                             <ul>
-                                <li><a href="js-doc/index.html" target="js_doc"><img src="img/js-doc.png"/></a></li>
-                                <li><a href="cxx-doc/index.html" target="cxx_doc"><img src="img/cxx-doc.png"/></a></li>
-                                <li><a href="py-doc/index.html" target="py_doc"><img src="img/py-doc.png"/></a></li>
+                                <li><a type="js-doc" title='ParaViewWeb JavaScript documentation'><img src="img/js-doc-disable.png"/></a></li>
+                                <li><a type="cxx-doc" title='ParaView C++ documentation'><img src="img/cxx-doc-disable.png"/></a></li>
+                                <li><a type="py-doc" title='ParaView Python documentation'><img src="img/py-doc-disable.png"/></a></li>
                             </ul>
                         </div>
                         <div id="ContentTxtProd">
@@ -61,5 +62,17 @@
                 </div>
             </div>
         </div>
+         <script type="text/javascript">
+            $('.doc-links a').each(function(){
+                var me = $(this), key = me.attr('type'), url = key + '/index.html';
+                $.ajax({
+                    url: url,
+                    success: function() {
+                        var image = me.attr('href', url).attr('target', key).children().eq(0);
+                        image.attr('src', image.attr('src').replace(/-disable/g,''));
+                    }
+                })
+            });
+         </script>
     </body>
 </html>
