@@ -48,11 +48,3 @@ copy_files_recursive(${ext_source_dir}
 add_custom_target(vtkParaViewWebJavaScript ALL DEPENDS
   ${paraview_all_min_js}
   "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete")
-
-install(DIRECTORY "${PARAVIEW_WWW_DIR}/ext/js-core"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/ext/
-  COMPONENT Runtime)
-
-install(DIRECTORY "${PARAVIEW_WWW_DIR}/lib/js/"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/js
-  COMPONENT Runtime)
