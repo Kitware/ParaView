@@ -74,7 +74,7 @@ void pqOutputWindow::onDisplayTextInWindow(const QString& text)
   format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   this->Implementation->Ui.consoleWidget->printString(text);
-  if (this->ShowOutput)
+  if (this->ShowOutput && !text.trimmed().isEmpty())
     {
     this->show();
     }
@@ -87,7 +87,7 @@ void pqOutputWindow::onDisplayErrorTextInWindow(const QString& text)
   format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   this->Implementation->Ui.consoleWidget->printString(text);
-  if (this->ShowOutput)
+  if (this->ShowOutput && !text.trimmed().isEmpty())
     {
     this->show();
     }
@@ -102,8 +102,7 @@ void pqOutputWindow::onDisplayText(const QString& text)
   
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
-
-  if (this->ShowOutput)
+  if (this->ShowOutput && !text.trimmed().isEmpty())
     {
     this->show();
     }
@@ -128,7 +127,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
 
-  if (this->ShowOutput)
+  if (this->ShowOutput && !text.trimmed().isEmpty())
     {
     this->show();
     }
@@ -144,7 +143,7 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
 
-  if (this->ShowOutput)
+  if (this->ShowOutput && !text.trimmed().isEmpty())
     {
     this->show();
     }
@@ -170,7 +169,7 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
   cerr << text.toAscii().data() << endl;
 
-  if (this->ShowOutput)
+  if (this->ShowOutput && !text.trimmed().isEmpty())
     {
     this->show();
     }

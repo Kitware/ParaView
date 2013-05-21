@@ -453,8 +453,20 @@ bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
     vtkProcessModule::FinalizePython = true;
     }
 
-  std::string self_dir = vtksys::SystemTools::CollapseFullPath(
-    vtksys::SystemTools::GetFilenamePath(argv[0]).c_str());
+  std::string self_dir, programname;
+
+  if (argc > 0)
+    {
+    programname = vtksys::SystemTools::CollapseFullPath(argv[0]);
+    self_dir = vtksys::SystemTools::GetFilenamePath(programname.c_str());
+    }
+  else
+    {
+    self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
+    programname = self_dir + "/unknown_exe";
+    }
+
+  vtkPythonInterpreter::SetProgramName(programname.c_str());
   vtkPythonAppInitPrependPath(self_dir.c_str());
 #endif
   (void)argc;
