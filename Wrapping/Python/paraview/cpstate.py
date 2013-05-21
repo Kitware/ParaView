@@ -66,7 +66,7 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
         return ('coprocessor.CreateProducer',\
           [ 'datadescription', '\"%s\"' % (cpstate_globals.simulation_input_map[info.ProxyName]) ], '')
 
-    # handle views 
+    # handle views
     proxy = info.Proxy
     if proxy.GetXMLGroup() == 'views' and cpstate_globals.export_rendering:
         proxyName = servermanager.ProxyManager().GetProxyName("views", proxy)
@@ -211,7 +211,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
 def run(filename=None):
     """Create a dummy pipeline and save the coprocessing state in the filename
         specified, if any, else dumps it out on stdout."""
-    
+
     from paraview import simple, servermanager
     wavelet = simple.Wavelet(registrationName="Wavelet1")
     contour = simple.Contour()

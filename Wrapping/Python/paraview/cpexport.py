@@ -79,7 +79,7 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
     rescale_data_range, enable_live_viz, filename=None):
     """Returns a string with the generated CoProcessing script based on the
         options specified.
-        
+
         First three arguments are same as those expected by
         cpstate.DumpPipeline() function.
 
@@ -101,7 +101,7 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
 def run(filename=None):
     """Create a dummy pipeline and save the coprocessing state in the filename
     specified, if any, else dumps it out on stdout."""
-    
+
     from paraview import simple, servermanager
     wavelet = simple.Wavelet(registrationName="Wavelet1")
     contour = simple.Contour()

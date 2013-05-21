@@ -449,11 +449,12 @@ bool pqCPExportStateWizard::validateCurrentPage()
     return true;
     }
 
-  QString export_rendering = "True";
+  QString export_rendering = this->Internals->outputRendering->isChecked() ?
+    "True" : "False";
   QString rendering_info; // a map from the render view name to render output params
-  if (this->Internals->outputRendering->isChecked() == 0)
+  if (this->Internals->outputRendering->isChecked() == 0 &&
+      this->Internals->liveViz->isChecked() == 0)
     {
-    export_rendering = "False";
     // check to make sure that there is a writer hooked up since we aren't
     // exporting an image
     vtkSMSessionProxyManager* proxyManager =
@@ -485,12 +486,11 @@ bool pqCPExportStateWizard::validateCurrentPage()
     if(!haveSomeWriters)
       {
       QMessageBox messageBox;
-      QString message(tr("No output writers specified. Either add writers in the pipeline or check <b>Output rendering components</b>."));
+      QString message(tr("No output specified. Generated script should be modified to output information."));
       messageBox.setText(message);
       messageBox.exec();
-      return false;
       }
-    if(filtersWithoutConsumers.size() != 0)
+    else if(filtersWithoutConsumers.size() != 0)
       {
       QMessageBox messageBox;
       QString message(tr("The following filters have no consumers and will not be saved:\n"));
@@ -505,8 +505,8 @@ bool pqCPExportStateWizard::validateCurrentPage()
       messageBox.exec();
       }
     }
-  else // we are creating images so add information to the view proxies
-    {
+  else if(this->Internals->outputRendering->isChecked())
+    { // we are creating images so add information to the view proxies
     vtkSMSessionProxyManager* proxyManager =
         vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
     for(int i=0;i<this->Internals->viewsContainer->count();i++)
@@ -568,6 +568,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
                    .arg(rescale_data_range)
                    .arg(live_visualization)
                    .arg(filename);
+
   vtkPythonInterpreter::RunSimpleString(command.toAscii().data());
   return true;
 }
