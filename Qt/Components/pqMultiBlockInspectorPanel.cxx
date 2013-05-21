@@ -860,7 +860,10 @@ void pqMultiBlockInspectorPanel::currentSelectionChanged(pqOutputPort *port)
       {
       vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
       block_ids.resize(blocksProp.GetNumberOfElements());
-      blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+      if (block_ids.size() > 0)
+        {
+        blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+        }
       }
     }
 
@@ -903,8 +906,15 @@ void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
     proxyManager->NewProxy("sources", "BlockSelectionSource");
 
   // set selected blocks
-  vtkSMPropertyHelper(selectionSource, "Blocks")
+  if (blockIds.size() > 0)
+    {
+    vtkSMPropertyHelper(selectionSource, "Blocks")
       .Set(&blockIds[0], static_cast<unsigned int>(blockIds.size()));
+    }
+  else
+    {
+    vtkSMPropertyHelper(selectionSource, "Blocks").SetNumberOfElements(0);
+    }
   selectionSource->UpdateVTKObjects();
 
   vtkSMSourceProxy *selectionSourceProxy =
