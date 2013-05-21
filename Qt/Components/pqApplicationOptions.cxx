@@ -432,7 +432,7 @@ void pqApplicationOptions::resetChanges()
     settings->value("strictLoadBalancing", false).toBool());
 
   this->Internal->DisableSplashScreen->setChecked(
-    settings->value("disableSplashScreen", false).toBool());
+    settings->value("disableSplashScreen", true).toBool());
 
   this->Internal->OnlyApplyCurrentPanel->setChecked(
     settings->value("onlyApplyCurrentPanel", false).toBool());
