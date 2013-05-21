@@ -107,16 +107,18 @@ namespace
   //===========================================================================
   void vtkPythonAppInitPrependPathWindows(const std::string& SELF_DIR)
     {
-    bool is_build_dir = vtksys::SystemTools::FileExists(
-      (SELF_DIR + "/site-packages").c_str());
+    std::string build_dir_site_packages;
+#if defined(CMAKE_INTDIR)
+    build_dir_site_packages = SELF_DIR + "/../site-packages";
+#else
+    build_dir_site_packages = SELF_DIR + "/site-packages";
+#endif
+    bool is_build_dir =
+      vtksys::SystemTools::FileExists(build_dir_site_packages.c_str());
     if (is_build_dir)
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR);
-#if defined(CMAKE_INTDIR)
-      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../site-packages");
-#else
-      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages");
-#endif
+      vtkPythonAppInitPrependPythonPath(build_dir_site_packages);
       }
     else
       {
