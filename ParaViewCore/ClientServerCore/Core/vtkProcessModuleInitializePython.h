@@ -163,8 +163,8 @@ namespace
       is_app = (vtksys::SystemTools::GetFilenameName(contents_dir) == "Contents");
       }
 
-    std::string lib_dir = is_app? (SELF_DIR + "/../lib") :
-      (SELF_DIR + "/../../../../lib");
+    std::string lib_dir = (is_app==false)? (SELF_DIR + "/../lib") :
+                                           (SELF_DIR + "/../../../../lib");
     lib_dir = vtksys::SystemTools::CollapseFullPath(lib_dir.c_str());
 
     bool is_build_dir = vtksys::SystemTools::FileExists(lib_dir.c_str());
