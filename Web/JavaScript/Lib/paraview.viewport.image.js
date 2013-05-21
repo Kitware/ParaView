@@ -352,6 +352,8 @@
             if(renderer.hasClass('active')){
                 render(true);
             }
+        }).bind('resetViewId', function(e){
+            options.view = -1;
         }).bind('render', function(e){
             if(renderer.hasClass('active')){
                 var opts = e.options,

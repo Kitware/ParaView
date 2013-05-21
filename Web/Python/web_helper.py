@@ -531,6 +531,8 @@ def listFiles(pathToList):
     }
     """
     global fileList
+    if pathToList[-1] == '/':
+       pathToList = pathToList[:-1]
     nodeTree = {}
     nodeTree[pathToList] = {'children': []}
     for path, directories, files in os.walk(pathToList):

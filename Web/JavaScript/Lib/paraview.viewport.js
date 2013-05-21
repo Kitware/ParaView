@@ -564,6 +564,16 @@
             },
 
             /**
+             * Reset view id.
+             * This allow to invalidate the viewport and use the new active view
+             *
+             * @member pv.Viewport
+             */
+            resetViewId: function () {
+                rendererContainer.trigger('resetViewId');
+            },
+
+            /**
              * Attach viewport to a DOM element
              *
              * @member pv.Viewport
