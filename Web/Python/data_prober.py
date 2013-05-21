@@ -49,7 +49,7 @@ except ImportError:
 # Create custom Data Prober class to handle clients requests
 # =============================================================================
 
-class __DataProber(paraviewweb_wamp.ServerProtocol):
+class _DataProber(paraviewweb_wamp.ServerProtocol):
     """DataProber extends web.ParaViewServerProtocol to add API for loading
         datasets add probing them."""
 
@@ -68,7 +68,7 @@ class __DataProber(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
 
         # Update authentication key to use
-        self.updateSecret(__DataProber.authKey)
+        self.updateSecret(_DataProber.authKey)
 
     @classmethod
     def setupApplication(cls):
@@ -77,8 +77,8 @@ class __DataProber(paraviewweb_wamp.ServerProtocol):
 
         root = { "name": "ROOT", "dirs" : [], "files" : []}
         directory_map = {}
-        directory_map[__DataProber.DataPath] = root
-        for path, dirs, files in os.walk(__DataProber.DataPath):
+        directory_map[_DataProber.DataPath] = root
+        for path, dirs, files in os.walk(_DataProber.DataPath):
             element = directory_map[path]
 
             for name in dirs:
@@ -89,7 +89,7 @@ class __DataProber(paraviewweb_wamp.ServerProtocol):
             element["files"] = []
             for name in files:
                 relpath = os.path.relpath(os.path.join(path, name),
-                    __DataProber.DataPath)
+                    _DataProber.DataPath)
                 item = { "name" : name, "itemValue" : relpath}
                 element["files"].append(item)
         cls.Database = root
@@ -186,7 +186,7 @@ class __DataProber(paraviewweb_wamp.ServerProtocol):
         pipelines for interactive probing all loaded datasets.
         """
 
-        datafile = os.path.join(__DataProber.DataPath, datafile)
+        datafile = os.path.join(_DataProber.DataPath, datafile)
         log.msg("Loading data-file", datafile, logLevel=logging.DEBUG)
         reader = simple.OpenDataFile(datafile)
         if not reader:
@@ -199,16 +199,16 @@ class __DataProber(paraviewweb_wamp.ServerProtocol):
         item["ReaderRepresentation"] = rep
         item["Probe"] = probe
         item["name"] = os.path.split(datafile)[1]
-        __DataProber.PipelineObjects.append(item)
+        _DataProber.PipelineObjects.append(item)
 
     @exportRpc("loadDatasets")
     def loadDatasets(self, datafiles):
         # initially, we'll only support loading 1 dataset.
-        for item in __DataProber.PipelineObjects:
+        for item in _DataProber.PipelineObjects:
             simple.Delete(item["Probe"])
             simple.Delete(item["ReaderRepresentation"])
             simple.Delete(item["Reader"])
-        __DataProber.PipelineObjects = []
+        _DataProber.PipelineObjects = []
 
         for path in datafiles:
             self.loadData(path)
@@ -230,13 +230,13 @@ class __DataProber(paraviewweb_wamp.ServerProtocol):
             ]
         """
         retVal = []
-        for item in __DataProber.PipelineObjects:
+        for item in _DataProber.PipelineObjects:
             name = item["name"]
             probe = item["Probe"]
-            probe.Source.Point1 = __DataProber.Widget.Point1WorldPosition
-            probe.Source.Point2 = __DataProber.Widget.Point2WorldPosition
+            probe.Source.Point1 = _DataProber.Widget.Point1WorldPosition
+            probe.Source.Point2 = _DataProber.Widget.Point2WorldPosition
             print "Probing ", probe.Source.Point1, probe.Source.Point2
-            simple.UpdatePipeline(time=__DataProber.View.ViewTime, proxy=probe)
+            simple.UpdatePipeline(time=_DataProber.View.ViewTime, proxy=probe)
             # fetch probe result from root node.
             do = simple.servermanager.Fetch(probe, 0)
             data = web.vtkPVWebUtilities.WriteAttributesToJavaScript(
@@ -255,19 +255,19 @@ class __DataProber(paraviewweb_wamp.ServerProtocol):
 
     def resetCameraWithBounds(self, bounds):
         if vtk.vtkMath.AreBoundsInitialized(bounds):
-            __DataProber.View.SMProxy.ResetCamera(bounds)
-            __DataProber.View.CenterOfRotation = [
+            _DataProber.View.SMProxy.ResetCamera(bounds)
+            _DataProber.View.CenterOfRotation = [
                 (bounds[0] + bounds[1]) * 0.5,
                 (bounds[2] + bounds[3]) * 0.5,
                 (bounds[4] + bounds[5]) * 0.5]
 
     @exportRpc("getDatabase")
     def getDatabase(self):
-        return __DataProber.Database
+        return _DataProber.Database
 
     @exportRpc("getDatabaseAsHTML")
     def getDatabaseAsHTML(self):
-        return __DataProber.toHTML(__DataProber.Database)
+        return _DataProber.toHTML(_DataProber.Database)
 
     @exportRpc("goToNext")
     def goToNext(self):
@@ -305,9 +305,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure our current application
-    __DataProber.DataPath = args.path
-    __DataProber.setupApplication()
-    __DataProber.authKey = args.authKey
+    _DataProber.DataPath = args.path
+    _DataProber.setupApplication()
+    _DataProber.authKey = args.authKey
 
     # Start server
-    web.start_webserver(options=args, protocol=__DataProber)
+    web.start_webserver(options=args, protocol=_DataProber)

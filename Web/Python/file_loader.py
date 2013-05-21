@@ -47,7 +47,7 @@ except ImportError:
 # Create custom File Opener class to handle clients requests
 # =============================================================================
 
-class __FileOpener(paraviewweb_wamp.ServerProtocol):
+class _FileOpener(paraviewweb_wamp.ServerProtocol):
 
     # Application configuration
     reader     = None
@@ -65,53 +65,53 @@ class __FileOpener(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebTimeHandler())
 
         # Update authentication key to use
-        self.updateSecret(__FileOpener.authKey)
+        self.updateSecret(_FileOpener.authKey)
 
         # Create default pipeline
-        if __FileOpener.fileToLoad:
-            __FileOpener.reader = simple.OpenDataFile(__FileOpener.fileToLoad)
+        if _FileOpener.fileToLoad:
+            _FileOpener.reader = simple.OpenDataFile(_FileOpener.fileToLoad)
             simple.Show()
 
-            __FileOpener.view = simple.Render()
-            __FileOpener.view.ViewSize = [800,800]
+            _FileOpener.view = simple.Render()
+            _FileOpener.view.ViewSize = [800,800]
             # If this is running on a Mac DO NOT use Offscreen Rendering
             #view.UseOffscreenRendering = 1
             simple.ResetCamera()
         else:
-            __FileOpener.view = simple.GetRenderView()
+            _FileOpener.view = simple.GetRenderView()
             simple.Render()
-            __FileOpener.view.ViewSize = [800,800]
-        simple.SetActiveView(__FileOpener.view)
+            _FileOpener.view.ViewSize = [800,800]
+        simple.SetActiveView(_FileOpener.view)
 
     @exportRpc("openFile")
     def openFile(self, file):
         id = ""
-        if __FileOpener.reader:
+        if _FileOpener.reader:
             try:
-                simple.Delete(__FileOpener.reader)
+                simple.Delete(_FileOpener.reader)
             except:
-                __FileOpener.reader = None
+                _FileOpener.reader = None
         try:
-            __FileOpener.reader = simple.OpenDataFile(file)
+            _FileOpener.reader = simple.OpenDataFile(file)
             simple.Show()
             simple.Render()
             simple.ResetCamera()
-            id = __FileOpener.reader.GetGlobalIDAsString()
+            id = _FileOpener.reader.GetGlobalIDAsString()
         except:
-            __FileOpener.reader = None
+            _FileOpener.reader = None
         return id
 
     @exportRpc("openFileFromPath")
     def openFileFromPath(self, file):
-        file = os.path.join(__FileOpener.pathToList, file)
+        file = os.path.join(_FileOpener.pathToList, file)
         return self.openFile(file)
 
     @exportRpc("listFiles")
     def listFiles(self):
         nodeTree = {}
         rootNode = { "data": "/", "children": [] , "state" : "open"}
-        nodeTree[__FileOpener.pathToList] = rootNode
-        for path, directories, files in os.walk(__FileOpener.pathToList):
+        nodeTree[_FileOpener.pathToList] = rootNode
+        for path, directories, files in os.walk(_FileOpener.pathToList):
             parent = nodeTree[path]
             for directory in directories:
                 child = {'data': directory , 'children': [], "state" : "open", 'metadata': {'path': 'dir'}}
@@ -144,9 +144,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Configure our current application
-    __FileOpener.fileToLoad = args.data
-    __FileOpener.pathToList = args.path
-    __FileOpener.authKey    = args.authKey
+    _FileOpener.fileToLoad = args.data
+    _FileOpener.pathToList = args.path
+    _FileOpener.authKey    = args.authKey
 
     # Start server
-    web.start_webserver(options=args, protocol=__FileOpener)
+    web.start_webserver(options=args, protocol=_FileOpener)

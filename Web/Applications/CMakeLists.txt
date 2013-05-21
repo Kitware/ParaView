@@ -29,7 +29,3 @@ endforeach()
 
 add_custom_target(WebApplications ALL
   DEPENDS ${all-copy-complete})
-
-install(DIRECTORY ${Apps_BINARY_DIR}
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www
-  COMPONENT Runtime)

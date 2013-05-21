@@ -96,15 +96,3 @@ add_custom_target(ParaViewWebWidgets ALL DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_toolbars-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_toolbars-css-copy-complete"
   )
-
-install(DIRECTORY "${PARAVIEW_WWW_DIR}/lib/js"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/
-  COMPONENT Runtime)
-
-install(DIRECTORY "${PARAVIEW_WWW_DIR}/lib/css"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/
-  COMPONENT Runtime)
-
-install(DIRECTORY "${PARAVIEW_WWW_DIR}/ext/widgets"
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/ext/
-  COMPONENT Runtime)

@@ -477,7 +477,7 @@ add_custom_command(
      COMMAND ${CMAKE_COMMAND} -E make_directory "${PARAVIEW_WWW_DIR}")
 
 install(DIRECTORY "${PARAVIEW_WWW_DIR}"
-    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www
+    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
     COMPONENT Runtime)
 
 if (PARAVIEW_ENABLE_WEB)
@@ -695,6 +695,7 @@ endif()
 if (BUILD_DOCUMENTATION)
   add_subdirectory(Utilities/Doxygen)
   add_subdirectory(Utilities/Sphinx)
+  add_subdirectory(Documentation)
 endif()
 
 #-----------------------------------------------------------------------------
