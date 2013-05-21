@@ -55,6 +55,7 @@ class _PipelineManager(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebTimeHandler())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebPipelineManager())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebRemoteConnection())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebFileManager(_PipelineManager.dataDir))
 
         # Update authentication key to use

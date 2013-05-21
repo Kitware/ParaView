@@ -1247,6 +1247,8 @@
             if(renderer.hasClass('active')){
                 drawScene();
             }
+        }).bind('resetViewId', function(e){
+            options.view = -1;
         }).bind('mouse', function(event){
             if(renderer.hasClass('active')){
                 event.preventDefault();

@@ -446,3 +446,58 @@ class ParaViewWebFileManager(ParaViewWebProtocol):
         if not self.dirCache:
             self.dirCache = web_helper.listFiles(self.directory)
         return self.dirCache
+
+
+# =============================================================================
+#
+# Handle remote Connection
+#
+# =============================================================================
+
+class ParaViewWebRemoteConnection(ParaViewWebProtocol):
+
+    @exportRpc("connect")
+    def connect(self, options):
+        """
+        Creates a connection to a remote pvserver.
+        Expect an option argument which should override any of
+        those default properties::
+
+            {
+            'host': 'localhost',
+            'port': 11111,
+            'rs_host': None,
+            'rs_port': 11111
+            }
+
+        """
+        ds_host = "localhost"
+        ds_port = 11111
+        rs_host = None
+        rs_port = 11111
+
+
+        if options:
+            if options.has_key("host"):
+                ds_host = options["host"]
+            if options.has_key("port"):
+                ds_port = options["port"]
+            if options.has_key("rs_host"):
+                rs_host = options["rs_host"]
+            if options.has_key("rs_port"):
+                rs_host = options["rs_port"]
+
+        simple.Connect(ds_host, ds_port, rs_host, rs_port)
+
+    @exportRpc("reverseConnect")
+    def reverseConnect(self, port=11111):
+        """
+        Create a reverse connection to a server.  Listens on port and waits for
+        an incoming connection from the server.
+        """
+        simple.ReverseConnect(port)
+
+    @exportRpc("pvDisconnect")
+    def pvDisconnect(self, message):
+        """Free the current active session"""
+        simple.Disconnect()

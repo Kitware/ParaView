@@ -30,6 +30,7 @@
 
             function disconnect() {
                 session.call("pv:exit");
+                session.close();
                 setTimeout("window.close()", 100);
             }
 

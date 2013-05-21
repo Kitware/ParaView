@@ -8,6 +8,7 @@
         <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.css'            type='text/css'>
         <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.vcr.css'        type='text/css'>
         <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.viewport.css'   type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.connect.css'   type='text/css'>
         <link rel='stylesheet' href='main.css' type='text/css'>
 
         <script src="../../ext/js-core/autobahn.min.js"></script>
@@ -23,6 +24,7 @@
         <script src="../../lib/js/paraview.ui.toolbar.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.vcr.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.viewport.js"></script>
+        <script src="../../lib/js/paraview.ui.toolbar.connect.js"></script>
     </head>
 
     <body onbeforeunload="stop()" onunload="stop()" class="page">
@@ -31,8 +33,8 @@
             <div class="viewport-toolbar"></div>
             <div class="vcr-toolbar"></div>
             <div class="rescale-data" style="display: none;"><img src="../../lib/css/paraview/pipeline/resetRange.png" style="position: relative; top: 5px;" title="Rescale data range to the current time step" alt="Rescale data range to the current time step"/></div>
+            <div class="connection-toolbar"></div>
             <div class="loading"></div>
-            <div class="disconnect"></div>
         </div>
         <div class="splitter">
             <div class="viewport-container">
@@ -133,6 +135,9 @@
                 // - vcr toolbar
                 $('.vcr-toolbar').vcrToolbar(pv.connection.session).bind('dataChanged', updateView);
 
+                // - connection toolbar
+                $('.connection-toolbar').connectionToolbar({session: pv.connection.session, showReverseConnect: false});
+
                 // - viewport toolbar
                 $('.viewport-toolbar').viewportToolbar(pv.viewport);
 
@@ -166,9 +171,6 @@
                         });
                     }
                 }).trigger('click');
-
-                // Add disconnect button listener
-                $('.disconnect').disconnectButton(pv.connection.session);
 
                 // - loading done...
                 $(".loading").hide();

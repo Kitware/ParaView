@@ -1,0 +1,17 @@
+.paraview.toolbar.connect li[action=connect] div.icon {
+    background: url("paraview/toolbar/connect/connect.png") no-repeat center center transparent;
+    height: 26px;
+    width: 26px;
+}
+
+.paraview.toolbar.connect li[action=pvDisconnect] div.icon {
+    background: url("paraview/toolbar/connect/disconnect.png") no-repeat center center transparent;
+    height: 26px;
+    width: 26px;
+}
+
+.paraview.toolbar.connect li[action=reverseConnect] div.icon {
+    background: url("paraview/toolbar/connect/reverseConnect.png") no-repeat center center transparent;
+    height: 26px;
+    width: 26px;
+}
