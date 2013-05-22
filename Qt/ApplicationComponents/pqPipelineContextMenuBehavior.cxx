@@ -535,7 +535,10 @@ void pqPipelineContextMenuBehavior::setBlockColor()
   if (panel)
     {
     QColor color = QColorDialog::getColor(Qt::gray);
-    panel->setBlockColor(this->PickedBlocks, color);
+    if(color.isValid())
+      {
+      panel->setBlockColor(this->PickedBlocks, color);
+      }
     }
 }
 
