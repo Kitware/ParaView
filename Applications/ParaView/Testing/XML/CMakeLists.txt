@@ -409,6 +409,9 @@ SET (NewColorEditor1_DISABLE_CRS TRUE)
 SET (ViewSettingsDialog_DISABLE_CS TRUE)
 SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 
+# MultiBlockAttributes1 requires selection which doesn't work on pvcrs
+SET (MultiBlockAttributes1_DISABLE_CRS TRUE)
+
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
   SET (AnalyzeReaderWriterPlugin_DISABLE_C TRUE)
