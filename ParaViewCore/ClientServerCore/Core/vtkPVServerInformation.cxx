@@ -51,7 +51,7 @@ vtkPVServerInformation::vtkPVServerInformation()
 #if defined(_WIN32)
   this->AVISupport = 1;
 #else
-# if defined(VTK_HAS_FFMPEG_SUPPORT)
+# if defined(PARAVIEW_ENABLE_FFMPEG)
   this->AVISupport = 1;
 # endif
 #endif

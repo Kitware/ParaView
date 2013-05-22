@@ -351,11 +351,11 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif()
 
 if (PARAVIEW_ENABLE_FFMPEG)
-  list(APPEND extra_depends vtkIOFFMPEG)
+  list(APPEND _vtk_modules vtkIOFFMPEG)
 endif()
 
 if (NOT "${CMAKE_C_COMPILER_ID}" MATCHES "^XL$")
-  list(APPEND extra_depends vtkoggtheora)
+  list(APPEND _vtk_modules vtkoggtheora)
 endif()
 
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this

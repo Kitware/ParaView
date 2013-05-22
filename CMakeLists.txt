@@ -517,10 +517,6 @@ mark_as_advanced(
 # FIXME: VTK_HAS_* variables need to be removed, it's not wise to enable
 # ParaView components based on if something was enabled in VTK or not.
 set (VTK_HAS_OGGTHEORA_SUPPORT FALSE)
-set (VTK_HAS_FFMPEG_SUPPORT FALSE)
-if (TARGET vtkIOFFMPEG AND PARAVIEW_ENABLE_FFMPEG)
-  set (VTK_HAS_FFMPEG_SUPPORT TRUE)
-endif()
 if (TARGET vtkoggtheora)
   set (VTK_HAS_OGGTHEORA_SUPPORT TRUE)
 endif()
