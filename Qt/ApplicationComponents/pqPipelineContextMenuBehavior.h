@@ -75,6 +75,9 @@ protected slots:
   /// signal will contain the block index in its data().
   void showOnlyBlock();
 
+  /// called to show all blocks.
+  void showAllBlocks();
+
   /// called to unset the visibility flag for the block. after this call the
   /// block will inherit the visibility from its parent. the action which
   /// emits the signal will contain the block index in its data()

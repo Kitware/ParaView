@@ -70,6 +70,7 @@ public slots:
 
   void showOnlyBlock(unsigned int index);
   void showOnlyBlocks(const QList<unsigned int>& indices);
+  void showAllBlocks();
 
 private slots:
   void treeWidgetCustomContextMenuRequested(const QPoint &pos);
