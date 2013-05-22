@@ -354,10 +354,6 @@ if (PARAVIEW_ENABLE_FFMPEG)
   list(APPEND _vtk_modules vtkIOFFMPEG)
 endif()
 
-if (NOT "${CMAKE_C_COMPILER_ID}" MATCHES "^XL$")
-  list(APPEND _vtk_modules vtkoggtheora)
-endif()
-
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
 # list of modules to ensure that these are enabled when the corresponding module
 # is enabled.

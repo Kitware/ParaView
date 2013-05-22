@@ -514,13 +514,6 @@ mark_as_advanced(
 # Based on state of VTK modules, set up some variables that paraview needs to
 # compile optional code.
 
-# FIXME: VTK_HAS_* variables need to be removed, it's not wise to enable
-# ParaView components based on if something was enabled in VTK or not.
-set (VTK_HAS_OGGTHEORA_SUPPORT FALSE)
-if (TARGET vtkoggtheora)
-  set (VTK_HAS_OGGTHEORA_SUPPORT TRUE)
-endif()
-
 configure_file(
   ${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPVConfig.h

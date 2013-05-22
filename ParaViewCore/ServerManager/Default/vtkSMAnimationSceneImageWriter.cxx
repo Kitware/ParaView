@@ -50,6 +50,7 @@
 # endif
 #endif
 
+#include "vtkIOMovieConfigure.h" // for VTK_HAS_OGGTHEORA_SUPPORT
 #ifdef VTK_HAS_OGGTHEORA_SUPPORT
 #  include "vtkOggTheoraWriter.h"
 #endif
