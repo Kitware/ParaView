@@ -41,6 +41,7 @@ class vtkPVDataSetAttributesInformation;
 class vtkSMProxy;
 class pqView;
 class pqRepresentation;
+class pqSelectionManager;
 
 /// pqQueryDialog is the dialog that allows the user to query/search for
 /// cells/points satisfying a particular criteria.
@@ -60,6 +61,9 @@ public:
   pqOutputPort* producer() const
     { return this->Producer; }
 
+  /// Set the object used to manage selection specifications.
+  virtual void setSelectionManager(pqSelectionManager* selMgr);
+
 signals:
   /// fired every time user submits a query.
   void selected(pqOutputPort*);
@@ -77,7 +81,10 @@ protected slots:
   void freeSMProxy();
 
   /// Triggered when the data to process has changed
-  void onSelectionChange(pqOutputPort*);
+  void onProxySelectionChange(pqOutputPort*);
+
+  /// Triggered when the selection manager indicates the selection specification has changed.
+  void onSelectionSpecificationChanged(pqOutputPort*);
 
   /// Triggerd when the active view has changed
   void onActiveViewChanged(pqView*);

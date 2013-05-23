@@ -86,11 +86,7 @@ void pqDataQueryReaction::showQueryDialog()
   // realizes a new selection has been made.
   pqSelectionManager* selManager =
     pqPVApplicationCore::instance()->selectionManager();
-  if (selManager)
-    {
-    QObject::connect(&dialog, SIGNAL(selected(pqOutputPort*)),
-      selManager, SLOT(select(pqOutputPort*)));
-    }
+  dialog.setSelectionManager(selManager);
   dialog.show();
   QEventLoop loop;
   QObject::connect(&dialog, SIGNAL(finished(int)),
