@@ -350,10 +350,6 @@ if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules vtkRenderingMatplotlib)
 endif()
 
-if (PARAVIEW_ENABLE_FFMPEG)
-  list(APPEND _vtk_modules vtkIOFFMPEG)
-endif()
-
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
 # list of modules to ensure that these are enabled when the corresponding module
 # is enabled.

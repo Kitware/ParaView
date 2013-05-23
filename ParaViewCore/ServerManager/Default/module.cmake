@@ -1,3 +1,9 @@
+# If FFMPEG support is enabled, we need to depend on FFMPEG.
+set (__extra_dependencies)
+if (PARAVIEW_ENABLE_FFMPEG)
+  list(APPEND __extra_dependencies vtkIOFFMPEG)
+endif()
+
 vtk_module(vtkPVServerManagerDefault
   DEPENDS
     vtkIOMovie
@@ -6,9 +12,10 @@ vtk_module(vtkPVServerManagerDefault
     vtkPVServerManagerRendering
     vtkRenderingVolumeOpenGL
     vtkTestingRendering
+    ${__extra_dependencies}
   TEST_DEPENDS
     vtkPVServerManagerApplication
   TEST_LABELS
     PARAVIEW
 )
-unset(extra_depends)
+unset(__extra_dependencies)
