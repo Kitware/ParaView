@@ -73,19 +73,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
 {
+
+  void importParaViewModule()
+    {
+    const char* command = "try:\n"
+      "  import paraview\n"
+      "  paraview.fromGUI = True\n"
+      "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
+      "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
+      "except: pass\n";
+    vtkPythonInterpreter::RunSimpleString(command);
+    }
+
   vtkNew<vtkPythonInterpreter> DummyInterpreter;
   void interpreterEvents(vtkObject*, unsigned long eventid, void* calldata)
     {
     if (eventid == vtkCommand::EnterEvent)
       {
-      // Python interpreter was initialized, set the correct compatibility.
-      const char* command = "try:\n"
-        "  import paraview\n"
-        "  paraview.fromGUI = True\n"
-        "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
-        "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
-        "except: pass\n";
-      vtkPythonInterpreter::RunSimpleString(command);
+      importParaViewModule();
       }
     else if (eventid == vtkCommand::ErrorEvent)
       {
@@ -126,10 +131,15 @@ class pqPythonManager::pqInternal
 public:
   pqInternal() : Editor(NULL) 
   {
-  // Setup initializer so that whenever Python is initialized, we can set the
-  // "paraview.fromGUI" to true.
   this->DummyInterpreter->AddObserver(vtkCommand::AnyEvent,
     this, &pqPythonManager::pqInternal::interpreterEvents);
+
+  // import the paraview module now if Python was already
+  // initialized (by a startup plugin, for example)
+  if (vtkPythonInterpreter::IsInitialized())
+    {
+    importParaViewModule();
+    }
   }
   ~pqInternal()
     {
