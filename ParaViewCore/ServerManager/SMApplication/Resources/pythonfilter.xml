@@ -276,7 +276,7 @@
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="ClearParameters"
-                            command="SetParameter"
+                            command="SetParameterInternal"
                             is_internal="1"
                             name="Parameters"
                             number_of_elements_per_command="2"
@@ -369,7 +369,7 @@
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="ClearParameters"
-                            command="SetParameter"
+                            command="SetParameterInternal"
                             is_internal="1"
                             name="Parameters"
                             number_of_elements_per_command="2"

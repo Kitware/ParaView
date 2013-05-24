@@ -80,6 +80,7 @@ SET(PY_TESTS_NO_BASELINE
   CSVWriterReader
   IntegrateAttributes
   ProgrammableFilter
+  ProgrammableFilterProperties
   ProxyManager
   SMPropertyAdaptor
   VRMLSource
