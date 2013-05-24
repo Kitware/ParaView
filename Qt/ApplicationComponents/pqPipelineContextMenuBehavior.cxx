@@ -246,6 +246,11 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
       this->connect(showOnlyBlockAction, SIGNAL(triggered()),
                     this, SLOT(showOnlyBlock()));
 
+      QAction *showAllBlocksAction =
+        this->Menu->addAction("Show All Blocks");
+      this->connect(showAllBlocksAction, SIGNAL(triggered()),
+                    this, SLOT(showAllBlocks()));
+
       QAction *unsetVisibilityAction =
         this->Menu->addAction(QString("Unset Block %1")
             .arg(multipleBlocks ? "Visibilities" : "Visibility"));
@@ -492,6 +497,16 @@ void pqPipelineContextMenuBehavior::showOnlyBlock()
 }
 
 //-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::showAllBlocks()
+{
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
+  if (panel)
+    {
+    panel->showAllBlocks();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineContextMenuBehavior::unsetBlockVisibility()
 {
   QAction *action = qobject_cast<QAction *>(sender());
@@ -520,7 +535,10 @@ void pqPipelineContextMenuBehavior::setBlockColor()
   if (panel)
     {
     QColor color = QColorDialog::getColor(Qt::gray);
-    panel->setBlockColor(this->PickedBlocks, color);
+    if(color.isValid())
+      {
+      panel->setBlockColor(this->PickedBlocks, color);
+      }
     }
 }
 

@@ -436,6 +436,15 @@ void pqMultiBlockInspectorPanel::showOnlyBlock(unsigned int index)
 }
 
 //-----------------------------------------------------------------------------
+void pqMultiBlockInspectorPanel::showAllBlocks()
+{
+  this->BlockVisibilites.clear();
+  this->BlockVisibilites[0] = true; // show root block
+  this->updateBlockVisibilities();
+  this->Representation->renderViewEventually();
+}
+
+//-----------------------------------------------------------------------------
 void pqMultiBlockInspectorPanel::showOnlyBlocks(
   const QList<unsigned int>& indices)
 {
