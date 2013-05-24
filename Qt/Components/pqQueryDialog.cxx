@@ -107,6 +107,10 @@ pqQueryDialog::pqQueryDialog(
     this->Internals->source->setCurrentPort(_producer);
     this->populateSelectionType();
     }
+  else
+    {
+    _producer = this->Internals->source->currentPort();
+    }
 
   // Ensure that there's only 1 clause
   this->resetClauses();
@@ -181,6 +185,12 @@ pqQueryDialog::~pqQueryDialog()
     delete this->Internals;
     }
   this->Internals = 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::setProducer(pqOutputPort* port)
+{
+  this->Internals->source->setCurrentPort(port);
 }
 
 //-----------------------------------------------------------------------------
@@ -620,7 +630,7 @@ void pqQueryDialog::linkLabelColorWidget( vtkSMProxy* proxy,
 void pqQueryDialog::onProxySelectionChange(pqOutputPort* newSelectedPort)
 {
   // Reset the spreadsheet view
-  this->resetClauses();
+  //this->resetClauses();
   this->freeSMProxy();
 
   // Once converted, a selection can no longer be frozen.
@@ -639,6 +649,8 @@ void pqQueryDialog::onProxySelectionChange(pqOutputPort* newSelectedPort)
 
   if(this->Producer != NULL)
     {
+    this->populateSelectionType();
+    this->resetClauses();
     // Render all views when any selection property is modified.
     QObject::connect( &this->Internals->Links, SIGNAL(qtWidgetChanged()),
                       this->Producer, SLOT(renderAllViews()));
@@ -682,6 +694,8 @@ void pqQueryDialog::onProxySelectionChange(pqOutputPort* newSelectedPort)
 //-----------------------------------------------------------------------------
 void pqQueryDialog::onSelectionSpecificationChanged(pqOutputPort* port)
 {
+  this->freeSMProxy();
+
   // This should never happen, but just in case...
   if (port != this->Producer)
     {
@@ -691,6 +705,8 @@ void pqQueryDialog::onSelectionSpecificationChanged(pqOutputPort* port)
 
   if (this->Producer)
     {
+    this->setupSpreadSheet();
+    this->Internals->spreadsheet->setModel(this->Internals->DataModel);
     // See if we should enable the Freeze Selection button
     vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(
       this->Producer->getSelectionInput());

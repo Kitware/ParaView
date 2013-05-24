@@ -61,6 +61,9 @@ public:
   pqOutputPort* producer() const
     { return this->Producer; }
 
+  /// Set the source whose data will be queried.
+  virtual void setProducer(pqOutputPort*);
+
   /// Set the object used to manage selection specifications.
   virtual void setSelectionManager(pqSelectionManager* selMgr);
 

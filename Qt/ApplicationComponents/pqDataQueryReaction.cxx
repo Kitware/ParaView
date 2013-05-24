@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEventLoop>
 #include <QMessageBox>
 
+static QPointer<pqQueryDialog> pqFindDataSingleton;
+
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -77,27 +79,37 @@ void pqDataQueryReaction::showHelp()
 void pqDataQueryReaction::showQueryDialog()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
-  pqQueryDialog dialog(
-    pqActiveObjects::instance().activePort(),
-    pqCoreUtilities::mainWidget());
+  pqOutputPort* port = pqActiveObjects::instance().activePort();
+  if (pqFindDataSingleton.isNull())
+    {
+    pqQueryDialog* dialog = new pqQueryDialog(
+      port, pqCoreUtilities::mainWidget());
 
-  // We want to make the query the active application wide selection, so we
-  // hookup the query action to selection manager so that the application
-  // realizes a new selection has been made.
-  pqSelectionManager* selManager =
-    pqPVApplicationCore::instance()->selectionManager();
-  dialog.setSelectionManager(selManager);
-  dialog.show();
-  QEventLoop loop;
-  QObject::connect(&dialog, SIGNAL(finished(int)),
-                   &loop,   SLOT(quit()));
-  QObject::connect(&dialog, SIGNAL(extractSelection()),
-                   this,    SLOT(onExtractSelection()));
-  QObject::connect(&dialog, SIGNAL(extractSelectionOverTime()),
-                   this,    SLOT(onExtractSelectionOverTime()));
-  QObject::connect(&dialog, SIGNAL(helpRequested()),
-                   this,    SLOT(showHelp()));
-  loop.exec();
+    // We want to make the query the active application wide selection, so we
+    // hookup the query action to selection manager so that the application
+    // realizes a new selection has been made.
+    pqSelectionManager* selManager =
+      pqPVApplicationCore::instance()->selectionManager();
+    dialog->setSelectionManager(selManager);
+
+    QObject::connect(
+      dialog, SIGNAL(extractSelection()),
+      this,     SLOT(onExtractSelection()));
+    QObject::connect(
+      dialog, SIGNAL(extractSelectionOverTime()),
+      this,     SLOT(onExtractSelectionOverTime()));
+    QObject::connect(
+      dialog, SIGNAL(helpRequested()),
+      this,     SLOT(showHelp()));
+
+    pqFindDataSingleton = dialog;
+    }
+  if (port)
+    {
+    pqFindDataSingleton->setProducer(port);
+    }
+  pqFindDataSingleton->show();
+  pqFindDataSingleton->raise();
 #else
   QMessageBox::warning(0,
                        "Selection Not Supported",
