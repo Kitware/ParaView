@@ -267,6 +267,7 @@ void pqPythonShell::setupInterpreter()
   this->printString(
     QString("Python %1 on %2\n").arg(Py_GetVersion()).arg(Py_GetPlatform()),
     OUTPUT);
+  this->prompt();
   this->printString("from paraview.simple import *\n");
   this->pushScript("from paraview.simple import *");
   this->prompt();
