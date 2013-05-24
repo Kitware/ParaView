@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __CAdaptorAPI_h
-#define __CAdaptorAPI_h
+#ifndef __CPythonAdaptorAPI_h
+#define __CPythonAdaptorAPI_h
 
 #include "vtkPVPythonCatalystModule.h"
 
