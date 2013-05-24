@@ -282,6 +282,11 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
       }
     }
 
+  // Remove the function if it already exists
+  std::string cleanupScript = "try: del " + std::string(funcname) + "\n"
+                              "except NameError: pass\n";
+  vtkPythonInterpreter::RunSimpleString(cleanupScript.c_str());
+
   // Construct a script that defines a function
   std::string fscript;
   fscript  = "def ";
