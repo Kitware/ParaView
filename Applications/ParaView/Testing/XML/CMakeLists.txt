@@ -106,6 +106,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockAttributes1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceWavelet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
@@ -407,6 +408,9 @@ SET (NewColorEditor1_DISABLE_CRS TRUE)
 # in local render mode.
 SET (ViewSettingsDialog_DISABLE_CS TRUE)
 SET (ViewSettingsDialog_DISABLE_CRS TRUE)
+
+# MultiBlockAttributes1 requires selection which doesn't work on pvcrs
+SET (MultiBlockAttributes1_DISABLE_CRS TRUE)
 
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
