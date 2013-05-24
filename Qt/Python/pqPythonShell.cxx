@@ -360,27 +360,22 @@ void pqPythonShell::executeScript(const QString& script)
 //-----------------------------------------------------------------------------
 void pqPythonShell::pushScript(const QString& script)
 {
-  emit this->executing(true);
-
-  // remove terminal "\n" from the script. (refer to Python code.push()).
   QString command = script;
-  command.replace(QRegExp("\\n$"), "");
-  // cout << "Push [" << script.toAscii().data() << "]" << endl;
+  command.replace("\r\n", "\n");
+  command.replace("\r", "\n");
+  QStringList lines = command.split("\n");
 
   this->Prompted = false;
-  bool more_input_needed = this->Interpreter->Push(script.toAscii().data());
-  this->Prompt = more_input_needed? pqPythonShell::PS2() : pqPythonShell::PS1();
+
+  emit this->executing(true);
+  foreach (QString line, lines)
+    {
+    bool isMultilineStatement = this->Interpreter->Push(line.toAscii().data());
+    this->Prompt = isMultilineStatement ? pqPythonShell::PS2() : pqPythonShell::PS1();
+    }
   emit this->executing(false);
 
-  // Find the indent for the command.
-  QRegExp regExp("^(\\s+)");
-  QString indent;
-  if (more_input_needed && regExp.indexIn(command) != -1)
-    {
-    indent = regExp.cap(1);
-    }
-
-  this->prompt(indent);
+  this->prompt();
   CLEAR_UNDO_STACK();
 }
 
