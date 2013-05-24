@@ -56,6 +56,15 @@ extern "C" {
 
 #include "ParaViewDocumentationInitializer.h"
 
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+# include "pqPythonDebugLeaksView.h"
+  typedef pqPythonDebugLeaksView DebugLeaksViewType;
+#else
+# include "vtkQtDebugLeaksView.h"
+  typedef vtkQtDebugLeaksView DebugLeaksViewType;
+#endif
+
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
 };
@@ -63,6 +72,15 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 //-----------------------------------------------------------------------------
 ParaViewMainWindow::ParaViewMainWindow()
 {
+  // the debug leaks view should be constructed as early as possible
+  // so that it can monitor vtk objects created at application startup.
+  if (getenv("PV_DEBUG_LEAKS_VIEW"))
+    {
+    vtkQtDebugLeaksView* leaksView = new DebugLeaksViewType(this);
+    leaksView->setWindowFlags(Qt::Window);
+    leaksView->show();
+    }
+
 #ifdef PARAVIEW_ENABLE_PYTHON
   vtkPVInitializePythonModules();
 #endif

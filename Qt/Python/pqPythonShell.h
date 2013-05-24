@@ -56,6 +56,11 @@ public:
   pqPythonShell(QWidget* parent=0, Qt::WindowFlags flags=0);
   ~pqPythonShell();
 
+  /// Returns the interactive console context (the locals() dict).
+  /// You can use static_cast<PythonObject*>() to convert the void pointer.
+  /// See vtkPythonInteractiveInterpreter::GetInteractiveConsoleLocalsPyObject().
+  void* consoleLocals();
+
   enum PrintMode
     {
     STATUS,
