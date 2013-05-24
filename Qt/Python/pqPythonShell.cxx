@@ -354,7 +354,6 @@ void pqPythonShell::executeScript(const QString& script)
   emit this->executing(false);
   CLEAR_UNDO_STACK();
 
-  this->printString("\n", STATUS);
   this->prompt();
 }
 
