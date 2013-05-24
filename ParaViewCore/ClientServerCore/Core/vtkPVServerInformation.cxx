@@ -25,6 +25,17 @@
 #include "vtkPVSession.h"
 #include "vtkCompositeMultiProcessController.h"
 
+// ------------------------
+// NOTE for OGVSupport
+// ------------------------
+// Ideally, we should include vtkIOMovieConfigure to determine if OGGTHEORA
+// support has been enabled. However, this module cannot depend on vtkIOMovie
+// (for Catalyst builds). Also, since vtkOggTheoraWriter is used in
+// vtkPVServerManagerDefault module which adds a hard dependency on vtkIOMovie
+// module, that can indeed check is OGGTHEORA support is available. So it's
+// reasonably safe to assume OGGTHEORA is always enabled here.
+// #include "vtkIOMovieConfigure.h"
+
 vtkStandardNewMacro(vtkPVServerInformation);
 
 //----------------------------------------------------------------------------
@@ -51,15 +62,13 @@ vtkPVServerInformation::vtkPVServerInformation()
 #if defined(_WIN32)
   this->AVISupport = 1;
 #else
-# if defined(VTK_HAS_FFMPEG_SUPPORT)
+# if defined(PARAVIEW_ENABLE_FFMPEG)
   this->AVISupport = 1;
 # endif
 #endif
-#if defined(VTK_HAS_OGGTHEORA_SUPPORT)
+
+  // Refer to note at the top of this file abount OGVSupport.
   this->OGVSupport = 1;
-#else
-  this->OGVSupport = 0;
-#endif
 
   this->RenderModuleName = NULL;
   this->MachinesInternals = new vtkPVServerOptionsInternals;

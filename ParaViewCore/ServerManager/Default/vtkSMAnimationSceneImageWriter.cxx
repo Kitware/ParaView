@@ -45,11 +45,12 @@
 #ifdef _WIN32
 # include "vtkAVIWriter.h"
 #else
-# ifdef VTK_HAS_FFMPEG_SUPPORT
+# ifdef PARAVIEW_ENABLE_FFMPEG
 #   include "vtkFFMPEGWriter.h"
 # endif
 #endif
 
+#include "vtkIOMovieConfigure.h" // for VTK_HAS_OGGTHEORA_SUPPORT
 #ifdef VTK_HAS_OGGTHEORA_SUPPORT
 #  include "vtkOggTheoraWriter.h"
 #endif
@@ -345,7 +346,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     mwriter = avi;
     }
 #else
-# ifdef VTK_HAS_FFMPEG_SUPPORT
+# ifdef PARAVIEW_ENABLE_FFMPEG
   else if (extension == ".avi")
     {
     vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
