@@ -38,8 +38,16 @@ if(BUILD_SHARED_LIBS)
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersRemoteProxy.py
   )
 
+  add_test(NAME py-multi-servers.TestRemoteProgrammableFilter
+    COMMAND smTestDriver
+    --server $<TARGET_FILE:pvserver>
+    --client $<TARGET_FILE:pvpython>
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestRemoteProgrammableFilter.py
+  )
+
   set_tests_properties(
     py-multi-servers.TestMultiServersConfig
     py-multi-servers.TestMultiServersRemoteProxy
+    py-multi-servers.TestRemoteProgrammableFilter
     PROPERTIES LABELS "PARAVIEW")
 endif(BUILD_SHARED_LIBS)
