@@ -350,7 +350,7 @@ void pqPythonShell::clear()
 void pqPythonShell::executeScript(const QString& script)
 {
   emit this->executing(true);  
-  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
+  this->Interpreter->RunStringWithConsoleLocals(script.toAscii().data());
   emit this->executing(false);
   CLEAR_UNDO_STACK();
 
