@@ -224,6 +224,7 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
     vtkPythonInterpreter::Initialize();
     this->Internal->PythonDialog =
       new pqPythonDialog(pqCoreUtilities::mainWidget());
+    this->Internal->PythonDialog->shell()->setupInterpreter();
     QApplication::restoreOverrideCursor();
     }
   return this->Internal->PythonDialog;
