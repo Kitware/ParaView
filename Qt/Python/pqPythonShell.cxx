@@ -402,11 +402,6 @@ void pqPythonShell::HandleInterpreterEvents(
     this->CreatePythonTimer.start(100);
     break;
 
-  case vtkCommand::EnterEvent:
-    // Python initialized.
-    this->setupInterpreter();
-    break;
-
   case vtkCommand::UpdateEvent:
       {
       vtkStdString* data = reinterpret_cast<vtkStdString*>(calldata);

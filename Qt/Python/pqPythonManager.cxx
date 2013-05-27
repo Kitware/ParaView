@@ -221,6 +221,7 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
   if (!this->Internal->PythonDialog)
     {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    vtkPythonInterpreter::Initialize();
     this->Internal->PythonDialog =
       new pqPythonDialog(pqCoreUtilities::mainWidget());
     QApplication::restoreOverrideCursor();
