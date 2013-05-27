@@ -356,71 +356,7 @@ void pqPythonManager::editTrace()
     }
 
 }
-//----------------------------------------------------------------------------
-QString pqPythonManager::getPVModuleDirectory()
-{
-  QString dirString;
-  pqPythonDialog* pyDiag = this->pythonShellDialog();
-  if (pyDiag)
-    {
-    pyDiag->runString("import os\n"
-                      "__pvModuleDirectory = os.path.dirname(paraview.__file__)\n");
-    PyObject* main_module = PyImport_AddModule((char*)"__main__");
-    PyObject* global_dict = PyModule_GetDict(main_module);
-    PyObject* string_object = PyDict_GetItemString(
-      global_dict, "__pvModuleDirectory");
-    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
-    if (string_ptr)
-      {
-      dirString = string_ptr;
-      }
-    }
-  return dirString;
-}
 
-//----------------------------------------------------------------------------
-void pqPythonManager::saveTrace()
-{
-  // Get the script directory
-  QString scriptDir;
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings->contains("pqPythonToolsWidget/ScriptDirectory"))
-    {
-    scriptDir = pqApplicationCore::instance()->settings()->value(
-      "pqPythonToolsWidget/ScriptDirectory").toString();
-    }
-  else
-    {
-    scriptDir = this->getPVModuleDirectory();
-    if (scriptDir.size())
-      {
-      scriptDir += QDir::separator() + QString("demos");
-      }
-    }
-
-  QString traceString = this->getTraceString();
-  QString fileName = QFileDialog::getSaveFileName(pqCoreUtilities::mainWidget(), tr("Save File"),
-                                                  scriptDir,
-                                                  tr("Python script (*.py)"));
-  if (fileName.isEmpty())
-    {
-    return;
-    }
-  if (!fileName.endsWith(".py"))
-    {
-    fileName.append(".py");
-    }
-
-  QFile file(fileName);
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-    qWarning() << "Could not open file:" << fileName;
-    return;
-    }
-
-  QTextStream out(&file);
-  out << traceString;
-}
 //----------------------------------------------------------------------------
 void pqPythonManager::saveTraceState(const QString& fileName)
 {
