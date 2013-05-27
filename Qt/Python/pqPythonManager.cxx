@@ -277,62 +277,54 @@ bool pqPythonManager::canStopTrace()
 //-----------------------------------------------------------------------------
 void pqPythonManager::startTrace()
 {
-  pqPythonShell* shell = this->pythonShellDialog()->shell();
+  QString script = "from paraview import smtrace\n"
+                   "smtrace.start_trace()\n";
+  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
 
-  if(shell)
-    {
-    QString script = "from paraview import smtrace\nsmtrace.start_trace()\nprint 'Trace started.'\n";
-    shell->executeScript(script);
+  // Update internal state
+  this->Internal->IsPythonTracing = true;
 
-    // Update internal state
-    this->Internal->IsPythonTracing = true;
-
-    // Emit signals
-    emit startTraceDone();
-    emit canStartTrace(canStartTrace());
-    emit canStopTrace(canStopTrace());
-    }
+  // Emit signals
+  emit startTraceDone();
+  emit canStartTrace(canStartTrace());
+  emit canStopTrace(canStopTrace());
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonManager::stopTrace()
 {
-  pqPythonShell* shell = this->pythonShellDialog()->shell();
+  QString script = "from paraview import smtrace\n"
+                   "smtrace.stop_trace()\n";
+  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
 
-  if(shell)
-    {
-    QString script = "from paraview import smtrace\nsmtrace.stop_trace()\nprint 'Trace stopped.'\n";
-    shell->executeScript(script);
+  // Update internal state
+  this->Internal->IsPythonTracing = false;
 
-    // Update internal state
-    this->Internal->IsPythonTracing = false;
-
-    // Emit signals
-    emit stopTraceDone();
-    emit canStartTrace(canStartTrace());
-    emit canStopTrace(canStopTrace());
-    }
+  // Emit signals
+  emit stopTraceDone();
+  emit canStartTrace(canStartTrace());
+  emit canStopTrace(canStopTrace());
 }
 
 //----------------------------------------------------------------------------
 QString pqPythonManager::getTraceString()
 {
+  QString script = "from paraview import smtrace\n"
+                   "__smtraceString = smtrace.get_trace_string()\n";
+  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
+
+  PyObject* main_module = PyImport_AddModule((char*)"__main__");
+  PyObject* global_dict = PyModule_GetDict(main_module);
+  PyObject* string_object = PyDict_GetItemString(
+    global_dict, "__smtraceString");
+  char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
+
   QString traceString;
-  pqPythonDialog* pyDiag = this->pythonShellDialog();
-  if (pyDiag)
+  if (string_ptr)
     {
-    pyDiag->runString("from paraview import smtrace\n"
-                      "__smtraceString = smtrace.get_trace_string()\n");
-    PyObject* main_module = PyImport_AddModule((char*)"__main__");
-    PyObject* global_dict = PyModule_GetDict(main_module);
-    PyObject* string_object = PyDict_GetItemString(
-      global_dict, "__smtraceString");
-    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
-    if (string_ptr)
-      {
-      traceString = string_ptr;
-      }
+    traceString = string_ptr;
     }
+
   return traceString;
 }
 
@@ -360,22 +352,18 @@ void pqPythonManager::editTrace()
 //----------------------------------------------------------------------------
 void pqPythonManager::saveTraceState(const QString& fileName)
 {
-  pqPythonDialog* pyDiag = this->pythonShellDialog();
-  if (pyDiag)
+  vtkPythonInterpreter::RunSimpleString("from paraview import smstate\n"
+                                        "smstate.run()\n");
+  QFile file(fileName);
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-    pyDiag->runString("from paraview import smstate\n"
-                      "smstate.run()\n");
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-      {
-      qWarning() << "Could not open file:" << fileName;
-      return;
-      }
-
-    QString traceString = this->getTraceString();
-    QTextStream out(&file);
-    out << traceString;
+    qWarning() << "Could not open file:" << fileName;
+    return;
     }
+
+  QString traceString = this->getTraceString();
+  QTextStream out(&file);
+  out << traceString;
 }
 //----------------------------------------------------------------------------
 void pqPythonManager::updateMacroList()
