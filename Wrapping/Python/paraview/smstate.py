@@ -154,9 +154,8 @@ def _trace_state():
     # python.
     smtrace.append_trace()
 
-    # Stop trace and print it to the console
+    # Stop trace
     smtrace.stop_trace()
-    smtrace.print_trace()
 
 
 def run():
