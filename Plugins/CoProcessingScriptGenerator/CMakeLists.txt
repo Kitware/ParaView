@@ -86,10 +86,12 @@ IF (BUILD_TESTING)
   # add it here as well. this test though is a subset of that test.
   IF ( BUILD_SHARED_LIBS )
     add_client_tests("pv"
+      LOAD_PLUGIN "CoProcessingPlugin"
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
     SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON)
   ELSE ( BUILD_SHARED_LIBS )
     add_client_tests("pv"
+      LOAD_PLUGIN "CoProcessingPlugin"
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI-static.xml )
     SET_TESTS_PROPERTIES(pv.CoProcessingGUI-static PROPERTIES RUN_SERIAL ON)
   ENDIF ( BUILD_SHARED_LIBS )

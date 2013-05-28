@@ -1,10 +1,5 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
-    <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="PrismPlugin" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/PrismBrick.e" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables" command="setCurrent" arguments="0.0" />

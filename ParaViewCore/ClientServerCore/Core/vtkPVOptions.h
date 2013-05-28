@@ -134,6 +134,11 @@ public:
   // Should this process just print monitor information and exit?
   vtkGetMacro(PrintMonitors, int);
 
+  // Description:
+  // Adding ability to test plugins by loading them at command line
+  vtkGetStringMacro(TestPlugin);
+  vtkGetStringMacro(TestPluginPath);
+
   enum ProcessTypeEnum
     {
     PARAVIEW = 0x2,
@@ -196,6 +201,11 @@ protected:
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
 
+  // Option to load plugins from command line for tests
+  vtkSetStringMacro(TestPlugin);
+  vtkSetStringMacro(TestPluginPath);
+  char* TestPlugin;
+  char* TestPluginPath;
 
 private:
   // Options:
