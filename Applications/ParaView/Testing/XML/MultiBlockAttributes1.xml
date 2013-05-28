@@ -37,25 +37,4 @@
   <pqevent object="1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,15,56" />
   <pqevent object="1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,15,56" />
   <pqevent object="1QColorDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mousePress" arguments="(0.554133,0.754955,2,2,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.554133,0.754955,2,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.554133,0.754955,2,0,0)" />
-  <pqevent object="PipelineContextMenu" command="activate" arguments="Set Block Opacity" />
-  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1pqDoubleRangeDialog0/1pqDoubleRangeWidget0/LineEdit" command="set_string" arguments="0" />
-  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1pqDoubleRangeDialog0/1pqDoubleRangeWidget0/LineEdit" command="key" arguments="46" />
-  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1pqDoubleRangeDialog0/1pqDoubleRangeWidget0/LineEdit" command="set_string" arguments="0.3" />
-  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1pqDoubleRangeDialog0" command="mousePress" arguments="1,1,0,123,34" />
-  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1pqDoubleRangeDialog0" command="mouseRelease" arguments="1,0,0,123,34" />
-  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1pqDoubleRangeDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mousePress" arguments="(0.203725,0.645045,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.192084,0.387387,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.192084,0.387387,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="keyEvent" arguments="6:16777251:134217728::0:1" />
 </pqevents>
