@@ -931,8 +931,8 @@ void vtkPVScalarBarActor::EditAnnotations()
     int minMost = static_cast<int>(ceil(log10(fabs(range[0]))));
     int maxMost = static_cast<int>(ceil(log10(fabs(range[1]))));
     // How many digits of precision are required to distinguish min and max:
-    int minDig = minMost - least;
-    int maxDig = maxMost - least;
+    int minDig = (minMost == VTK_INT_MIN) ? 3 : (minMost - least);
+    int maxDig = (maxMost == VTK_INT_MIN) ? 3 : (maxMost - least);
     // Labels for min and max:
     SNPRINTF(minFmt, 63, "%%.%dg", minDig < 3 ? 3 : minDig);
     SNPRINTF(maxFmt, 63, "%%.%dg", maxDig < 3 ? 3 : maxDig);
