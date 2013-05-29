@@ -15,7 +15,7 @@ usecp = True
 def initialize():
     global globalController, coProcessor, usecp
     if usecp:
-        coProcessor = pythoncatalyst.vtkCPPythonProcessor()
+        coProcessor = catalyst.vtkCPProcessor()
         coProcessor.Initialize()
 
 

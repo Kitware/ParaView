@@ -71,7 +71,7 @@ namespace
       vtkNew<vtkFloatArray> pressure;
       pressure->SetName("pressure");
       pressure->SetNumberOfComponents(1);
-      dataSet->GetPointData()->AddArray(pressure.GetPointer());
+      dataSet->GetCellData()->AddArray(pressure.GetPointer());
       }
     vtkDoubleArray* velocity = vtkDoubleArray::SafeDownCast(
       dataSet->GetPointData()->GetArray("velocity"));

@@ -10,22 +10,31 @@
 #include <vtkCPPythonScriptPipeline.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
+#include <vtkImageData.h>
 #include <vtkNew.h>
 #include <vtkPoints.h>
 #include <vtkPointData.h>
-#include <vtkUnstructuredGrid.h>
 
 namespace
 {
   vtkCPProcessor* Processor = NULL;
-  vtkImageData* VTKGrid;
+  vtkImageData* VTKGrid = NULL;
 
   void BuildVTKGrid(Grid& grid)
   {
+    // The grid structure isn't changing so we only build it
+    // the first time it's needed. If we needed the memory
+    // we could delete it and rebuild as necessary.
     if(VTKGrid == NULL)
       {
       VTKGrid = vtkImageData::New();
-      VTKGrid->SetExtent(0, grid->Get
+      int extent[6];
+      for(int i=0;i<6;i++)
+        {
+        extent[i] = grid.GetExtent()[i];
+        }
+      VTKGrid->SetExtent(extent);
+      VTKGrid->SetSpacing(grid.GetSpacing());
       }
   }
 
@@ -37,7 +46,7 @@ namespace
       vtkNew<vtkDoubleArray> velocity;
       velocity->SetName("velocity");
       velocity->SetNumberOfComponents(3);
-      velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfPoints()));
+      velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfLocalPoints()));
       VTKGrid->GetPointData()->AddArray(velocity.GetPointer());
       }
     if(VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
@@ -67,19 +76,12 @@ namespace
     // The pressure array is a scalar array so we can reuse
     // memory as long as we ordered the points properly.
     float* pressureData = attributes.GetPressureArray();
-    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfCells()), 1);
+    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfLocalCells()), 1);
   }
 
   void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
   {
-    if(VTKGrid == NULL)
-      {
-      // The grid structure isn't changing so we only build it
-      // the first time it's needed. If we needed the memory
-      // we could delete it and rebuild as necessary.
-      VTKGrid = vtkUnstructuredGrid::New();
-      BuildVTKGrid(grid);
-      }
+    BuildVTKGrid(grid);
     UpdateVTKAttributes(grid, attributes);
   }
 }
@@ -136,6 +138,13 @@ namespace FEAdaptor
       {
       BuildVTKDataStructures(grid, attributes);
       dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
+      int wholeExtent[6];
+      for(int i=0;i<6;i++)
+        {
+        wholeExtent[i] = grid.GetNumPoints()[i];
+        }
+
+      dataDescription->GetInputDescriptionByName("input")->SetWholeExtent(wholeExtent);
       Processor->CoProcess(dataDescription.GetPointer());
       }
   }

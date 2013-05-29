@@ -9,13 +9,15 @@ class Grid
 public:
   Grid();
   void Initialize(const unsigned int numPoints[3], const double spacing[3]);
-  size_t GetNumberOfPoints();
-  size_t GetNumberOfCells();
-  double* GetPointsArray();
-  double* GetPoint(size_t pointId);
-  unsigned int* GetCellPoints(size_t cellId);
+  unsigned int GetNumberOfLocalPoints();
+  unsigned int GetNumberOfLocalCells();
+  void GetLocalPoint(unsigned int pointId, double* point);
+  unsigned int* GetNumPoints();
+  unsigned int* GetExtent();
+  double* GetSpacing();
 private:
   unsigned int NumPoints[3];
+  unsigned int Extent[6];
   double Spacing[3];
 };
 
