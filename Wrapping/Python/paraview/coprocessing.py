@@ -117,7 +117,7 @@ class CoProcessor(object):
             if (timestep % writer.cpFrequency) == 0 or \
                     datadescription.GetForceOutput() == True:
                 writer.FileName = writer.cpFileName.replace("%t", str(timestep))
-                writer.UpdatePipeline()
+                writer.UpdatePipeline(datadescription.GetTime())
 
     def WriteImages(self, datadescription, rescale_lookuptable=False):
         """This method will update all views, if present and write output
@@ -138,7 +138,7 @@ class CoProcessor(object):
                         print ' do not know what to do with a ', view.GetClassName()
                 view.ViewTime = datadescription.GetTime()
                 if rescale_lookuptable:
-                    self.RescaleDataRange(view)
+                    self.RescaleDataRange(view, datadescription.GetTime())
                 simple.WriteImage(fname, view, Magnification=view.cpMagnification)
 
     def DoLiveVisualization(self, datadescription, hostname, port):
@@ -152,12 +152,13 @@ class CoProcessor(object):
         # make sure the live insitu is initialized
         if not self.__LiveVisualizationLink:
            # Create the vtkLiveInsituLink i.e.  the "link" to the visualization processes.
+           from paraview import servermanager
            self.__LiveVisualizationLink = servermanager.vtkLiveInsituLink()
 
            # Tell vtkLiveInsituLink what host/port must it connect to for the visualization
            # process.
            self.__LiveVisualizationLink.SetHostname(hostname)
-           self.__LiveVisualizationLink.SetInsituPort(int(portnumber))
+           self.__LiveVisualizationLink.SetInsituPort(int(port))
 
            # Initialize the "link"
            self.__LiveVisualizationLink.SimulationInitialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
@@ -170,7 +171,8 @@ class CoProcessor(object):
         # sources need to be updated by insitu code. vtkLiveInsituLink never updates
         # the pipeline, it simply uses the data available at the end of the pipeline,
         # if any.
-        for source in GetSources().values():
+        from paraview import simple
+        for source in simple.GetSources().values():
            source.UpdatePipeline(time)
 
         # push extracts to the visualization process.
@@ -226,7 +228,7 @@ class CoProcessor(object):
         self.__ViewsList.append(view)
         return view
 
-    def RescaleDataRange(view):
+    def RescaleDataRange(self, view, time):
         """DataRange can change across time, sometime we want to rescale the
            color map to match to the closer actual data range."""
         reps = view.Representations
@@ -240,7 +242,7 @@ class CoProcessor(object):
                 continue;
 
             input = rep.Input
-            input.UpdatePipeline() #make sure range is up-to-date
+            input.UpdatePipeline(time) #make sure range is up-to-date
             lut = rep.LookupTable
             if rep.ColorAttributeType == 'POINT_DATA':
                 datainformation = input.GetPointDataInformation()
@@ -268,6 +270,7 @@ class CoProcessor(object):
 
             import vtkParallelCorePython
             import paraview.vtk as vtk
+            import paraview.servermanager
             pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
             globalController = pm.GetGlobalController()
             localarray = vtk.vtkDoubleArray()
