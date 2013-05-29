@@ -211,34 +211,6 @@ double Tri_iprodhelm(Element *T, int i, int j, double lambda){
 }
 void  Tri_setup_iprodlap();
 
-void  Tri_HelmMat(Element *T, LocMat *helm, double lambda){
-
-  if(!Tri_iplap)
-    Tri_setup_iprodlap();
-
-  double **a = helm->a,
-         **b = helm->b,
-         **c = helm->c;
-  int    nbl    = T->Nbmodes;
-  int    Nmodes = T->Nmodes;
-  int    i,j;
-
-  /* `A' matrix */
-  for(i = 0; i < nbl; ++i)
-    for(j = i; j < nbl; ++j)
-      a[i][j] = a[j][i] = Tri_iprodhelm(T, i, j, lambda);
-
-  /* `B' matrix */
-  for(i = 0; i < nbl; ++i)
-    for(j = nbl; j < Nmodes; ++j)
-      b[i][j-nbl] = Tri_iprodhelm(T, i, j, lambda);
-
-  /* 'C' matrix */
-  for(i = nbl; i < Nmodes; ++i)
-    for(j = nbl; j < Nmodes; ++j)
-      c[i-nbl][j-nbl] = c[j-nbl][i-nbl] = Tri_iprodhelm(T, i, j, lambda);
-
-}
 
 void Tri_setup_iprodlap(){
 
@@ -667,3 +639,34 @@ void Tri::BET_Mat(Element *P, LocMatDiv *bet, double *beta, double *sigma){
   }
 
 }  // end namespage nektarTri
+
+
+using namespace nektarTri;
+void  Tri_HelmMat(Element *T, LocMat *helm, double lambda){
+
+  if(!Tri_iplap)
+    Tri_setup_iprodlap();
+
+  double **a = helm->a,
+         **b = helm->b,
+         **c = helm->c;
+  int    nbl    = T->Nbmodes;
+  int    Nmodes = T->Nmodes;
+  int    i,j;
+
+  /* `A' matrix */
+  for(i = 0; i < nbl; ++i)
+    for(j = i; j < nbl; ++j)
+      a[i][j] = a[j][i] = Tri_iprodhelm(T, i, j, lambda);
+
+  /* `B' matrix */
+  for(i = 0; i < nbl; ++i)
+    for(j = nbl; j < Nmodes; ++j)
+      b[i][j-nbl] = Tri_iprodhelm(T, i, j, lambda);
+
+  /* 'C' matrix */
+  for(i = nbl; i < Nmodes; ++i)
+    for(j = nbl; j < Nmodes; ++j)
+      c[i-nbl][j-nbl] = c[j-nbl][i-nbl] = Tri_iprodhelm(T, i, j, lambda);
+
+}

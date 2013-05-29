@@ -517,8 +517,7 @@ void FacFullMatrix (double *a, int n, int *ipiv, int bwidth);
 void PackFullMatrix(double **a, int n, double *b, int bwidth);
 
 // Functions in H_Matrix.C
-void  Tri_HelmMat(Element *T, LocMat *helm, double lambda);
-
+void Tri_HelmMat(Element *T, LocMat *helm, double lambda);
 
 
 

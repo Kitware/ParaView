@@ -106,7 +106,12 @@ typedef struct range{
 static Range *rnge;
 
 #ifndef BUILD_EXE
-int  setup (FileList *f, Element_List **U, int *nftot, int Nsnapshots);
+int  setup (FileList *f, Element_List **U, int *nft, int Nsnapshots, bool mesh_only);
+
+int  setup (FileList *f, Element_List **U, int *nftot, int Nsnapshots)
+{
+  return setup(f, U, nftot, Nsnapshots, false);
+}
 #endif
 void ReadCopyField (FileList *f, Element_List **U);
 void ReadAppendField (FileList *f, Element_List **U,  int start_fieled_index);
