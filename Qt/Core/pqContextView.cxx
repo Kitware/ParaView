@@ -293,32 +293,6 @@ vtkImageData* pqContextView::captureImage(int magnification)
 }
 
 //-----------------------------------------------------------------------------
-/// Called to undo interaction.
-void pqContextView::undo()
-{
-}
-
-//-----------------------------------------------------------------------------
-/// Called to redo interaction.
-void pqContextView::redo()
-{
-}
-
-//-----------------------------------------------------------------------------
-/// Returns true if undo can be done.
-bool pqContextView::canUndo() const
-{
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-/// Returns true if redo can be done.
-bool pqContextView::canRedo() const
-{
-  return false;
-}
-
-//-----------------------------------------------------------------------------
 bool pqContextView::supportsSelection() const
 {
   return true;

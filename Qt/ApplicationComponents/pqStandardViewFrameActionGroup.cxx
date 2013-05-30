@@ -126,6 +126,7 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
   optionsAction->setObjectName("OptionsButton");
   new pqViewSettingsReaction(optionsAction, view);
 
+
   pqRenderView* const renderView = qobject_cast<pqRenderView*>(view);
   if (renderView)
     {
@@ -195,6 +196,24 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     interactionModeAction->setObjectName("ToggleInteractionMode");
     new pqToggleInteractionViewMode(interactionModeAction, view);
     }
+
+  if (view->supportsUndo())
+    {
+    // Setup undo/redo connections if the view module
+    // supports interaction undo.
+    QAction* forwardAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
+      "Camera Redo");
+    forwardAction->setObjectName("ForwardButton");
+    new pqCameraUndoRedoReaction(forwardAction, false, view);
+
+    QAction* backAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
+      "Camera Undo");
+    backAction->setObjectName("BackButton");
+    new pqCameraUndoRedoReaction(backAction, true, view);
+    }
+
 
   // Adding special selection controls for chart/context view
   pqContextView* const chart_view = qobject_cast<pqContextView*>(view);
