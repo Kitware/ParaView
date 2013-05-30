@@ -81,10 +81,12 @@ protected:
 
   // Description:
   // These methods override the subclass implementation.
+  virtual void PrepareTitleText();
   virtual void ComputeScalarBarThickness();
   virtual void LayoutTitle();
   virtual void ComputeScalarBarLength();
   virtual void LayoutTicks();
+  virtual void ConfigureAnnotations();
   virtual void ConfigureTitle();
   virtual void ConfigureTicks();
 
