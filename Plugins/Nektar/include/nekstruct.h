@@ -484,10 +484,10 @@ class Element{
   virtual void MassMatC(LocMat *);
   virtual void HelmMatC(LocMat *, Metric *lambda);   // return Helmholtz op.
   virtual void PSE_Mat(Element *E, Metric *lambda, LocMat *pse, double *DU);
-  virtual void PSE_Mat(Element *E, LocMat *pse, double *DU){
+  virtual void PSE_Mat(Element *, LocMat *, double *){
     fprintf(stderr,"Not valid call on Element"); exit(1);}
-  virtual void BET_Mat(Element *P, LocMatDiv *bet, double *beta, 
-		       double *sigma){
+  virtual void BET_Mat(Element *, LocMatDiv *, double *, 
+		       double *){
     fprintf(stderr,"Not valid call on Element"); exit(1);}
   virtual void LapMat  (LocMat *);                   // return Laplacian op.
   virtual void mat_free(LocMat *m);
@@ -560,18 +560,18 @@ class Element{
 
   // Derivatives routines
   virtual void Grad  (Element *, Element *, Element *, char Trip);
-  virtual void GradT (Element *, Element *, Element *, char Trip){
+  virtual void GradT (Element *, Element *, Element *, char){
     fprintf(stderr,"This function is not yet define for the region\n");
     exit(1);}
-  virtual void GradT (Element *, Element *, Element *, char Trip, bool invW){
+  virtual void GradT (Element *, Element *, Element *, char, bool){
     fprintf(stderr,"This function is not yet define for the region\n");
     exit(1);}
   virtual void Grad_d (double *, double *, double *, char Trip);
   virtual void Grad_h (double *, double *, double *, double *, char Trip); 
-  virtual void GradT_h (double *, double *, double *, double *, char Trip){
+  virtual void GradT_h (double *, double *, double *, double *, char){
     fprintf(stderr,"This function is not yet define for the region\n");
     exit(1);}
-  virtual void GradT_h (double *, double *, double *, double *, char Trip, bool invW){
+  virtual void GradT_h (double *, double *, double *, double *, char, bool){
     fprintf(stderr,"This function is not yet define for the region\n");
     exit(1);}
   
@@ -683,13 +683,13 @@ class Element{
 
 
   // local identifiers
-  virtual int get_face_q1(int faceid){
+  virtual int get_face_q1(int){
     fprintf(stderr,"This class does not have the function get_face_q1\n");
     exit(1);
     return 0;
   }
 
-  virtual int get_face_q2(int faceid){
+  virtual int get_face_q2(int){
     fprintf(stderr,"This class does not have the function get_face_q2\n");
     exit(1);
     return 0;

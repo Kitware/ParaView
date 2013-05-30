@@ -382,10 +382,10 @@ void   vector_set    (int   vsize, ... /* v1, v2, ..., f(vn) */ );
 double scalar        (char *function);
 double dparam_set    (char *name, double value);
 double dparam        (char *name);
-int    option_set    (char *name, int value);
+int    option_set    (const char *name, int value);
 int    option        (char *name);
-int    iparam_set    (char *name, int value);
-int    iparam        (char *name);
+int    iparam_set    (const char *name, int value);
+int    iparam        (const char *name);
 }
 
 /* functions in Fieldfiles.C */
@@ -517,8 +517,7 @@ void FacFullMatrix (double *a, int n, int *ipiv, int bwidth);
 void PackFullMatrix(double **a, int n, double *b, int bwidth);
 
 // Functions in H_Matrix.C
-void  Tri_HelmMat(Element *T, LocMat *helm, double lambda);
-
+void Tri_HelmMat(Element *T, LocMat *helm, double lambda);
 
 
 

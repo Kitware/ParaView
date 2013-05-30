@@ -39,10 +39,8 @@ namespace NekBlkMat {
     }
 
     void Reset_Rows(){
-      int i,j;
-
-      for(i=0; i < _max_rowblk; ++i)
-  for(j=0;j < _Row[i]._Blk.size(); ++j)
+      for(int i=0; i < _max_rowblk; ++i)
+  for(size_t j=0;j < _Row[i]._Blk.size(); ++j)
     _Row[i].reset();
     }
 
@@ -68,7 +66,7 @@ namespace NekBlkMat {
       vmath::zero(_max_colblk+1,_offset,1);
 
       for(int i = 0; i < _max_rowblk; ++i)
-  for(int j = 0; j < _Row[i]._Blk.size(); ++j)
+  for(size_t j = 0; j < _Row[i]._Blk.size(); ++j)
     update_offset(_Row[i]._Blk[j]->get_id(),_Row[i]._Blk[j]->get_cols());
     }
 
@@ -161,7 +159,7 @@ namespace NekBlkMat {
     double get_val(const int i, const int j, const int id1, const int id2){
       int id;
       if((id = _Row[i]._entries[j])+1){
-  int m = _Row[i]._Blk[id]->get_cols();
+      //int m = _Row[i]._Blk[id]->get_cols();
   return _Row[i]._Blk[id]->get_val(id1,id2);
       }
       else
@@ -176,17 +174,15 @@ namespace NekBlkMat {
     }
 
     void neg(){
-      int i,j;
-
-      for(i=0; i < _max_rowblk; ++i)
-  for(j=0;j < _Row[i]._Blk.size(); ++j)
+      for(int i=0; i < _max_rowblk; ++i)
+  for(size_t j=0;j < _Row[i]._Blk.size(); ++j)
     _Row[i]._Blk[j]->neg();
     }
 
     int cnt_blks(){
       int i,cnt;
       for(cnt = i =0; i < _max_rowblk; ++i)
-  cnt += _Row[i]._Blk.size();
+        cnt += static_cast<int>(_Row[i]._Blk.size());
 
       return cnt;
     }

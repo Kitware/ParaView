@@ -177,9 +177,9 @@ typedef struct Symbol {  /* Symbol table entry */
   extern double doUserdefBu(double x, double y, double z);
   extern double doUserdefBv(double x, double y, double z);
 #ifndef BUILD_EXE
-  extern double doUserdefBw(double x, double y, double z);
-  extern double doUserdefC(double x, double y, double z);
-  extern double doUserdefD(double x, double y, double z);
+  extern double doUserdefBw(double x, double y, double z) {return 0;};
+  extern double doUserdefC(double x, double y, double z) {return 0;};
+  extern double doUserdefD(double x, double y, double z) {return 0;};
 #endif
 
 /* --------------------------------------------------------------------- *

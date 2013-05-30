@@ -169,7 +169,8 @@ namespace MatSolve{
 
       for(i = 0; i < cols; ++i){
   for(j = 0; j < rows; ++j)
-    if(mat = M.get_mat(j,i,n,m)){  // do static condensation solve
+    mat = M.get_mat(j,i,n,m);
+    if(mat){  // do static condensation solve
       Csc[i].SolveFull(mat+i*m);
     }
       }
@@ -283,8 +284,6 @@ namespace MatSolve{
     /** \brief Solve condensed system
     */
     void SolveFull(double *V){
-      int     i,n;
-      double *b,*sc;
       double *u = new double [_Asize+_Csize];
 
       // f_b - BC^{-1} f_i
@@ -303,7 +302,7 @@ namespace MatSolve{
     }
 
     void Assemble(SClevel& NewSClev, const int *noffsetA, const int *noffsetC){
-      int p,q,i,j,id,id1,id2,nr,nc,neidr,neidc;
+      int p,q,i,j,id1,id2,nr,nc,neidr,neidc;
       int nrow, max_A, *offset;
       double val,*Asub;
 
@@ -314,14 +313,16 @@ namespace MatSolve{
 
       for(p = 0; p < nrow; ++p) // assumes system is square
   for(q = 0; q < nrow; ++q)
-    if(Asub = _Am->get_mat(p,q,nr,nc)){
+    if((Asub = _Am->get_mat(p,q,nr,nc))){
 
       if(_signchange )  // signchange necessary on first level
+        {
         if(p == q)
-    _Am->rescale(p,q,_signchange+offset[p]);
+          _Am->rescale(p,q,_signchange+offset[p]);
         else
-    NekError::error(warning,"SClevel::Assemble",
-      "Attempt to change sign on off diagonal block");
+          NekError::error(warning,"SClevel::Assemble",
+                          "Attempt to change sign on off diagonal block");
+        }
 
       neidr = _eidmap[p];
       neidc = _eidmap[q];
@@ -376,11 +377,13 @@ namespace MatSolve{
         }
 
       if(_signchange )  // signchange back if necc.
+        {
         if(p == q)
-    _Am->rescale(p,q,_signchange+offset[p]);
+          _Am->rescale(p,q,_signchange+offset[p]);
         else
-    NekError::error(warning,"SClevel::Assemble",
-      "Attempt to change sign on off diagonal block");
+          NekError::error(warning,"SClevel::Assemble",
+                          "Attempt to change sign on off diagonal block");
+        }
     }
 
       if(_symmetric)

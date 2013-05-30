@@ -23,13 +23,13 @@ namespace NekBlkMat {
 
     /// default destructor
     ~BlkVec(){
-      for(int i = 0; i < _Blk.size(); ++i) delete _Blk[i];
+      for(size_t i = 0; i < _Blk.size(); ++i) delete _Blk[i];
       delete[] _entries;
     }
 
     /// default destructor
      void reset(){
-       for(int i = 0; i < _Blk.size(); ++i) delete _Blk[i];
+       for(size_t i = 0; i < _Blk.size(); ++i) delete _Blk[i];
        _Blk.erase(_Blk.begin(),_Blk.end());
        vmath::fill(_max_blk,-1,_entries,1);
      }
@@ -118,7 +118,7 @@ namespace NekBlkMat {
        if(this != &a){
    BlkSubMat *B;
 
-   for(int i = 0; i < a._Blk.size(); ++i){
+   for(size_t i = 0; i < a._Blk.size(); ++i){
      B = new BlkSubMat(*a._Blk[i]);
       _entries[B->get_id()] = _Blk.size();
       _Blk.push_back(B);
