@@ -390,6 +390,9 @@ bool pqAnimationManager::saveAnimation()
   intValidator->setBottom(50);
   dialogUI.height->setValidator(intValidator);
 
+  dialogUI.startTime->setValidator(new QIntValidator(this));
+  dialogUI.endTime->setValidator(new QIntValidator(this));
+
   // Cannot disconnect and save animation unless connected to a remote server.
   dialogUI.checkBoxDisconnect->setEnabled(
         this->Internals->ActiveServer->isRemote() &&
@@ -445,9 +448,8 @@ bool pqAnimationManager::saveAnimation()
     dialogUI.spinBoxNumberOfFrames->setValue(num_frames);
     dialogUI.animationDuration->setEnabled(false);
     dialogUI.animationDuration->setValue(num_frames/frame_rate);
-    dialogUI.startTime->setMaximum(num_frames-1);
-    dialogUI.endTime->setMaximum(num_frames-1);
-    dialogUI.endTime->setValue(num_frames-1);
+    dialogUI.startTime->setText("0");
+    dialogUI.endTime->setText(QString::number(num_frames-1));
     break;
 
   case REALTIME:
@@ -467,9 +469,8 @@ bool pqAnimationManager::saveAnimation()
     dialogUI.labelFramesPerTimestep->show();
     dialogUI.labelTimeRange->setText("Timestep range");
     int nbTimeSteps = scene->getTimeSteps().size() - 1;
-    dialogUI.startTime->setMaximum(nbTimeSteps);
-    dialogUI.endTime->setMaximum(nbTimeSteps);
-    dialogUI.endTime->setValue(nbTimeSteps);
+    dialogUI.startTime->setText("0");
+    dialogUI.endTime->setText(QString::number(nbTimeSteps));
     break;
     }
 
@@ -621,17 +622,17 @@ bool pqAnimationManager::saveAnimation()
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("NumberOfFrames"), nbFrames);
     start = pqSMAdaptor::getElementProperty(sceneProxy->GetProperty("StartTime")).toDouble();
     end = pqSMAdaptor::getElementProperty(sceneProxy->GetProperty("EndTime")).toDouble();
-    startFrameCount = dialogUI.startTime->value();
-    playbackTimeWindow[0] = start + (end-start) * ((double)dialogUI.startTime->value()) / ((double)(nbFrames-1));
-    playbackTimeWindow[1] = start + (end-start) * ((double)dialogUI.endTime->value()) / ((double)(nbFrames-1));
+    startFrameCount = dialogUI.startTime->text().toInt();
+    playbackTimeWindow[0] = start + (end-start) * ((double)dialogUI.startTime->text().toInt()) / ((double)(nbFrames-1));
+    playbackTimeWindow[1] = start + (end-start) * ((double)dialogUI.endTime->text().toInt()) / ((double)(nbFrames-1));
     break;
 
   case SNAP_TO_TIMESTEPS:
     pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("FramesPerTimestep"),
       dialogUI.spinBoxFramesPerTimestep->value());
-    startFrameCount = dialogUI.spinBoxFramesPerTimestep->value() * dialogUI.startTime->value();
-    playbackTimeWindow[0] = scene->getTimeSteps().at(dialogUI.startTime->value());
-    playbackTimeWindow[1] = scene->getTimeSteps().at(dialogUI.endTime->value());
+    startFrameCount = dialogUI.spinBoxFramesPerTimestep->text().toInt() * dialogUI.startTime->text().toInt();
+    playbackTimeWindow[0] = scene->getTimeSteps().at(dialogUI.startTime->text().toInt());
+    playbackTimeWindow[1] = scene->getTimeSteps().at(dialogUI.endTime->text().toInt());
     break;
     }
 

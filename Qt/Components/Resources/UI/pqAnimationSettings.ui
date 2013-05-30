@@ -24,6 +24,9 @@
        <property name="maximum">
         <double>999999.000000000000000</double>
        </property>
+       <property name="value">
+        <double>15.000000000000000</double>
+       </property>
       </widget>
      </item>
      <item row="2" column="1" colspan="3">
@@ -195,10 +198,10 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QSpinBox" name="startTime"/>
+      <widget class="QLineEdit" name="startTime"/>
      </item>
-     <item row="5" column="2" colspan="2">
-      <widget class="QSpinBox" name="endTime"/>
+     <item row="5" column="2">
+      <widget class="QLineEdit" name="endTime"/>
      </item>
     </layout>
    </item>
