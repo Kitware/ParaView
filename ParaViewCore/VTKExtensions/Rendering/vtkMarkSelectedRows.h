@@ -20,18 +20,22 @@
 // It has two input ports:
 // \li 0 : vtkTable
 // \li 1 : vtkTable (the extracted selection).
+// Alternatively, for composite datasets, both inputs can be composite datasets
+// with vtkTable leaf nodes with identical structure.
 
 #ifndef __vtkMarkSelectedRows_h
 #define __vtkMarkSelectedRows_h
 
-#include "vtkTableAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMarkSelectedRows : public vtkTableAlgorithm
+class vtkTable;
+
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMarkSelectedRows : public vtkDataObjectAlgorithm
 {
 public:
   static vtkMarkSelectedRows* New();
-  vtkTypeMacro(vtkMarkSelectedRows, vtkTableAlgorithm);
+  vtkTypeMacro(vtkMarkSelectedRows, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -58,6 +62,19 @@ protected:
   virtual int RequestData(vtkInformation*,
                           vtkInformationVector**,
                           vtkInformationVector*);
+
+  // Description:
+  // Overridden to create a vtkTable or vtkMultiBlockDataSet as the output based
+  // on  the input type.
+  virtual int RequestDataObject(vtkInformation*,
+    vtkInformationVector**, vtkInformationVector*);
+
+  // Description:
+  // Operates on vtkTable instances. RequestData() handles composite datasets
+  // by iterating over the leaves and calling this method.
+  int RequestDataInternal(
+    vtkTable* input, vtkTable* extractedInput, vtkTable* output);
+
 
   int FieldAssociation;
 private:
