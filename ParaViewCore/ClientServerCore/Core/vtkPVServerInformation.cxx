@@ -70,14 +70,12 @@ vtkPVServerInformation::vtkPVServerInformation()
   // Refer to note at the top of this file abount OGVSupport.
   this->OGVSupport = 1;
 
-  this->RenderModuleName = NULL;
   this->MachinesInternals = new vtkPVServerOptionsInternals;
 }
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::~vtkPVServerInformation()
 {
-  this->SetRenderModuleName(NULL);
   delete this->MachinesInternals;
 }
 
@@ -92,8 +90,6 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TileMullions: " << this->TileMullions[0]
      << ", " << this->TileMullions[1] << endl;
   os << indent << "UseIceT: " << this->UseIceT << endl;
-  os << indent << "RenderModuleName: "
-     << (this->RenderModuleName ? this->RenderModuleName : "(none)") << endl;
   os << indent << "OGVSupport: " << this->OGVSupport << endl;
   os << indent << "AVISupport: " << this->AVISupport << endl;
   os << indent << "Timeout: " << this->Timeout << endl;
@@ -112,7 +108,6 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
   info->GetTileMullions(this->TileMullions);
   this->UseOffscreenRendering = info->GetUseOffscreenRendering();
   this->UseIceT = info->GetUseIceT();
-  this->SetRenderModuleName(info->GetRenderModuleName());
   this->Timeout = info->GetTimeout();
   this->SetNumberOfMachines(info->GetNumberOfMachines());
   unsigned int idx;
@@ -151,7 +146,6 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   this->UseOffscreenRendering = 0;
 #endif
   this->Timeout = options->GetTimeout();
-  this->SetRenderModuleName(options->GetRenderModuleName());
 
   // Server options
   vtkPVServerOptions *serverOptions = vtkPVServerOptions::SafeDownCast(options);
@@ -231,7 +225,6 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
 
     // IceT either is there or is not.
     this->UseIceT = serverInfo->GetUseIceT();
-    this->SetRenderModuleName(serverInfo->GetRenderModuleName());
     this->SetNumberOfMachines(serverInfo->GetNumberOfMachines());
     unsigned int idx;
     for (idx = 0; idx < serverInfo->GetNumberOfMachines(); idx++)
@@ -273,7 +266,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->UseOffscreenRendering;
   *css << this->Timeout;
   *css << this->UseIceT;
-  *css << this->RenderModuleName;
+  *css << "<obsolete>"; // we used to pass RenderModuleName.
   *css << this->OGVSupport;
   *css << this->AVISupport;
   *css << this->NumberOfProcesses;
@@ -335,13 +328,15 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing IceT flag from message.");
     return;
     }
+  // for client-server compatibility, 
   const char *rmName;
   if (!css->GetArgument(0, 8, &rmName))
     {
     vtkErrorMacro("Error parsing render module name from message.");
     return;
     }
-  this->SetRenderModuleName(rmName);
+  // leaving this for client-server compatibility.
+  // this->SetRenderModuleName(rmName);
   if (!css->GetArgument(0, 9, &this->OGVSupport))
     {
     vtkErrorMacro("Error parsing OGVSupport flag from message.");

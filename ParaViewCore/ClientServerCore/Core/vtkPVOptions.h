@@ -38,32 +38,28 @@ public:
   vtkTypeMacro(vtkPVOptions,vtkCommandOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkGetMacro(ServerMode, int);
-  vtkGetMacro(RenderServerMode, int);
   vtkGetMacro(ConnectID, int);
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetStringMacro(StereoType);
 
-  vtkGetMacro(ClientMode, int);
   // Description:
   // Get Various ports.
   vtkGetMacro(ServerPort, int);
   vtkGetMacro(DataServerPort, int);
   vtkGetMacro(RenderServerPort, int);
-  vtkGetMacro(RenderNodePort, int);
 
-  vtkGetMacro(DisableComposite, int);
   vtkGetMacro(UseSoftwareRendering, int);
   vtkGetMacro(UseSatelliteSoftwareRendering, int);
   vtkGetMacro(ReverseConnection, int);
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileMullions, int);
-  vtkGetStringMacro(RenderModuleName);
-  vtkGetStringMacro(CaveConfigurationFileName);
-  vtkGetStringMacro(MachinesFileName);
-  vtkGetStringMacro(GroupFileName);
+
+  // Description:
+  // This is the argument specified by --data on the command line. Additionally,
+  // this can also correspond to the last argument specified on the command
+  // line if the argument is unknown.
   vtkGetStringMacro(ParaViewDataName);
 
   // Description:
@@ -83,14 +79,7 @@ public:
 
   // Description:
   // Get the various types of host names.
-  vtkGetStringMacro(ServerHostName);
-  vtkGetStringMacro(DataServerHostName);
-  vtkGetStringMacro(RenderServerHostName);
   vtkGetStringMacro(ClientHostName);
-
-  // Description:
-  // vtkProcessModule needs to set the render module name
-  vtkSetStringMacro(RenderModuleName);
 
   // Description:
   // Log filename.
@@ -102,10 +91,6 @@ public:
   vtkSetVector2Macro(TileDimensions, int);
   vtkSetVector2Macro(TileMullions, int);
   vtkSetMacro(UseOffscreenRendering, int);
-
-  // Description:
-  // Is this in render server mode.
-  vtkGetMacro(ClientRenderServer, int);
 
   // Description:
   // Is this server was started for collaboration meaning that it allow
@@ -201,17 +186,9 @@ protected:
   // Subclasses may need to access these
   char* ParaViewDataName;
 
-  vtkSetStringMacro(RenderServerHostName);
-  char* RenderServerHostName;
-
   vtkSetStringMacro(ClientHostName);
   char* ClientHostName;
 
-  vtkSetStringMacro(DataServerHostName);
-  char* DataServerHostName;
-
-  vtkSetStringMacro(ServerHostName);
-  char* ServerHostName;
 
   //server URL information
   vtkSetStringMacro(ServerURL);
@@ -221,7 +198,6 @@ protected:
   int ServerPort;
   int DataServerPort;
   int RenderServerPort;
-  int RenderNodePort;
 
   int ServerMode;
   int ClientMode;
@@ -238,13 +214,9 @@ protected:
 
 private:
   // Options:
-  int ClientRenderServer;
-  int ConnectRenderToData;
-  int ConnectDataToRender;
   int ConnectID;
   int UseOffscreenRendering;
   int UseStereoRendering;
-  int DisableComposite;
   int UseSoftwareRendering;
   int UseSatelliteSoftwareRendering;
   int ReverseConnection;
@@ -253,17 +225,6 @@ private:
   int UseRenderingGroup;
   int Timeout;
 
-
-  char* RenderModuleName;
-
-  vtkSetStringMacro(CaveConfigurationFileName);
-  char* CaveConfigurationFileName;
-
-  vtkSetStringMacro(MachinesFileName);
-  char* MachinesFileName;
-
-  vtkSetStringMacro(GroupFileName);
-  char* GroupFileName;
 
   char* LogFileName;
   int TellVersion;

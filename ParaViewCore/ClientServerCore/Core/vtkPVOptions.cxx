@@ -34,18 +34,9 @@ vtkPVOptions::vtkPVOptions()
   this->SetProcessType(ALLPROCESS);
 
   // Initialize vtksys::CommandLineArguments
-  this->CaveConfigurationFileName = 0;
-  this->MachinesFileName = 0;
-  this->RenderModuleName = NULL;
   this->UseRenderingGroup = 0;
-  this->GroupFileName = 0;
   this->ParaViewDataName = 0;
   this->StateFileName = 0;
-
-  this->ClientRenderServer = 0;
-  this->ConnectRenderToData = 0;
-  this->ConnectDataToRender = 0;
-
 
   this->TileDimensions[0] = 0;
   this->TileDimensions[1] = 0;
@@ -76,19 +67,12 @@ vtkPVOptions::vtkPVOptions()
   const char* sys_hostname = sys_info.GetHostname()?
     sys_info.GetHostname() : "localhost";
 
-  this->ServerHostName = 0;
-  this->SetServerHostName(sys_hostname);
-  this->DataServerHostName = 0;
-  this->SetDataServerHostName(sys_hostname);
-  this->RenderServerHostName = 0;
-  this->SetRenderServerHostName(sys_hostname);
   this->ClientHostName = 0;
   this->SetClientHostName(sys_hostname);
   // initialize ports to defaults
   this->ServerPort = 11111;
   this->DataServerPort = 11111;
   this->RenderServerPort = 22221;
-  this->RenderNodePort = 0;  // this means pick a random port
   this->ServerURL = 0;
 
   this->ReverseConnection = 0;
@@ -96,7 +80,6 @@ vtkPVOptions::vtkPVOptions()
   this->UseSatelliteSoftwareRendering = 0;
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
-  this->DisableComposite = 0;
   this->ConnectID = 0;
   this->LogFileName = 0;
   this->StereoType = 0;
@@ -111,20 +94,12 @@ vtkPVOptions::vtkPVOptions()
     }
   this->XMLParser = vtkPVOptionsXMLParser::New();
   this->XMLParser->SetPVOptions(this);
-
 }
 
 //----------------------------------------------------------------------------
 vtkPVOptions::~vtkPVOptions()
 {
-  this->SetRenderModuleName(0);
-  this->SetCaveConfigurationFileName(NULL);
-  this->SetGroupFileName(0);
-  this->SetServerHostName(0);
-  this->SetDataServerHostName(0);
-  this->SetRenderServerHostName(0);
   this->SetClientHostName(0);
-  this->SetMachinesFileName(0);
   this->SetStateFileName(0);
   this->SetLogFileName(0);
   this->SetStereoType(0);
@@ -185,27 +160,6 @@ void vtkPVOptions::Initialize()
                     "To specify file series replace the numeral with a '.' eg. "
                     "my0.vtk, my1.vtk...myN.vtk becomes my..vtk",
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
-  /*
-  this->AddBooleanArgument("--client-render-server", "-crs", &this->ClientRenderServer,
-                           "Run ParaView as a client to a data and render server."
-                           " The render server will wait for the data server.",
-                           vtkPVOptions::PVCLIENT);
-  this->AddBooleanArgument("--connect-render-to-data", "-r2d", &this->ConnectRenderToData,
-                           "Run ParaView as a client to a data and render server."
-                           " The data server will wait for the render server.",
-                           vtkPVOptions::PVCLIENT);
-  this->AddBooleanArgument("--connect-data-to-render", "-d2r", &this->ConnectDataToRender,
-                           "Run ParaView as a client to a data and render server."
-                           " The render server will wait for the data server.",
-                           vtkPVOptions::PVCLIENT);
-  this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName,
-                    "Tell the client the host name of the render server (default: localhost).",
-                    vtkPVOptions::PVCLIENT);
-  this->AddArgument("--render-module", 0, &this->RenderModuleName,
-                    "User specified rendering module.",
-                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER
-                    | vtkPVOptions::PVSERVER | vtkPVOptions::PARAVIEW);
-  */
 
   this->AddArgument("--server-url", "-url",
                     &this->ServerURL,
@@ -233,17 +187,7 @@ void vtkPVOptions::Initialize()
                            "\"Dresden\", \"Anaglyph\", \"Checkerboard\",\"SplitViewportHorizontal\"",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
-  /*
-  this->AddArgument("--server-host", "-sh", &this->ServerHostName,
-                    "Tell the client the host name of the data server.",
-                    vtkPVOptions::PVCLIENT);
-  this->AddArgument("--data-server-host", "-dsh", &this->DataServerHostName,
-                    "Tell the client the host name of the data server.",
-                    vtkPVOptions::PVCLIENT);
-  this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName,
-                    "Tell the client the host name of the render server.",
-                    vtkPVOptions::PVCLIENT);
-  */
+
   this->AddArgument("--client-host", "-ch", &this->ClientHostName,
                     "Tell the data|render server the host name of the client, use with -rc.",
                     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
@@ -258,13 +202,6 @@ void vtkPVOptions::Initialize()
                     "What port should the combined server use to connect to the client. (default 11111).",
                     /*vtkPVOptions::PVCLIENT |*/ vtkPVOptions::PVSERVER);
 
-  this->AddArgument("--render-node-port", 0, &this->RenderNodePort,
-                    "Specify the port to be used by each render node (--render-node-port=22222)."
-                    "  Client and render servers ports must match.",
-                    vtkPVOptions::XMLONLY);
-  this->AddBooleanArgument("--disable-composite", "-dc", &this->DisableComposite,
-                           "Use this option when rendering resources are not available on the server.",
-                           vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection,
                            "Have the server connect to the client.",
                            vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
@@ -288,13 +225,6 @@ void vtkPVOptions::Initialize()
                     "after which the server may timeout. The client typically shows warning "
                     "messages before the server times out.",
                     vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
-
-  // Disabling for now since we don't support Cave anymore.
-  // this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
-  // "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
-
-  this->AddArgument("--machines", "-m", &this->MachinesFileName,
-                    "Specify the network configurations file for the render server.");
 
   this->AddBooleanArgument("--version", "-V", &this->TellVersion,
                            "Give the version number and exit.");
@@ -345,7 +275,6 @@ int vtkPVOptions::PostProcess(int, const char* const*)
       this->ServerMode = 1;
       break;
     case vtkPVOptions::PVBATCH:
-    case vtkPVOptions::XMLONLY:
     case vtkPVOptions::ALLPROCESS:
       break;
     }
@@ -369,25 +298,6 @@ int vtkPVOptions::PostProcess(int, const char* const*)
       {
       this->TileDimensions[1] = 1;
       }
-    }
-  if ( this->ClientRenderServer )
-    {
-    this->ClientMode = 1;
-    this->RenderServerMode = 1;
-    }
-  if ( this->ConnectDataToRender )
-    {
-    this->ClientMode = 1;
-    this->RenderServerMode = 1;
-    }
-  if ( this->ConnectRenderToData )
-    {
-    this->ClientMode = 1;
-    this->RenderServerMode = 2;
-    }
-  if ( this->CaveConfigurationFileName )
-    {
-    this->SetRenderModuleName("CaveRenderModule");
     }
 #ifdef PARAVIEW_ALWAYS_SECURE_CONNECTION
   if ( (this->ClientMode || this->ServerMode) && !this->ConnectID)
@@ -439,7 +349,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ParaViewDataName: " << (this->ParaViewDataName?this->ParaViewDataName:"(none)") << endl;
-  os << indent << "GroupFileName: " << (this->GroupFileName?this->GroupFileName:"(none)") << endl;
 
   // Everything after this line will be showned in Help/About dialog
   os << indent << "Runtime information:" << endl; //important please leave it here, for more info: vtkPVApplication::AddAboutText
@@ -452,20 +361,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   if (this->ServerMode)
     {
     os << indent << "Running as a server\n";
-    }
-  if (this->ConnectRenderToData)
-    {
-    os << indent << "Running as a client to a data and render server\n";
-    }
-
-  if (this->ConnectDataToRender)
-    {
-    os << indent << "Running as a client to a data and render server\n";
-    }
-
-  if (this->ClientRenderServer)
-    {
-    os << indent << "Running as a client connected to a render server\n";
     }
 
   if (this->MultiClientMode)
@@ -489,19 +384,11 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     if (this->RenderServerMode)
       {
       os << indent << "DataServerPort: " << this->DataServerPort << endl;
-      os << indent << "Render Node Port: " << this->RenderNodePort << endl;
       os << indent << "Render Server Port: " << this->RenderServerPort << endl;
-      os << indent << "Connect Render Server to Data Server: "
-         << (this->ConnectRenderToData?"on":"off") << endl;
-      os << indent << "Connect Data Server to Render Server: "
-         << (this->ConnectDataToRender?"on":"off") << endl;
-      os << indent << "DataServerHostName: " << (this->DataServerHostName?this->DataServerHostName:"(none)") << endl;
-      os << indent << "RenderServerHostName: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
       }
     else
       {
       os << indent << "ServerPort: " << this->ServerPort << endl;
-      os << indent << "ServerHostName: " << (this->ServerHostName?this->ServerHostName:"(none)") << endl;
       }
     os << indent << "ClientHostName: " << (this->ClientHostName?this->ClientHostName:"(none)") << endl;
     }
@@ -525,14 +412,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     }
 
   os << indent << "Using RenderingGroup: " << (this->UseRenderingGroup?"Enabled":"Disabled") << endl;
-
-  os << indent << "Render Module Used: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
-
-  os << indent << "Network Configuration: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
-
-  os << indent << "Cave Configuration: " << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(none)") << endl;
-
-  os << indent << "Compositing: " << (this->DisableComposite?"Disabled":"Enabled") << endl;
 
   if (this->TellVersion)
     {

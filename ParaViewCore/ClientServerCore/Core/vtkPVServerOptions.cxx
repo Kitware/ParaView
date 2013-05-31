@@ -171,8 +171,6 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     }
   if(caveBounds)
     {
-    // if there are cave bounds then set the render module to CaveRenderModule
-    this->SetRenderModuleName("CaveRenderModule");
     info.CaveBoundsSet = 1;
     }
   this->Internals->MachineInformationVector.push_back(info);
