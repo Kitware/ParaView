@@ -35,28 +35,16 @@ public:
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
-  // Get class name of VTK object.
-  vtkGetStringMacro(HostName);
+  // Set the port and host information for a specific process number.
+  void SetConnectionInformation(
+    unsigned int processNumber, int portNumber, const char* hostname);
 
   // Description:
-  // Set/Get the ProcessNumber
-  vtkSetMacro(ProcessNumber, int);
-  vtkGetMacro(ProcessNumber, int);
-  // description:
-  // Set/Get the ProcessNumber
-  vtkSetMacro(PortNumber, int);
-  vtkGetMacro(PortNumber, int);
-  
-  // Description:
-  // Set the port and host information for a specific process number.
-  void SetPortNumber(unsigned int processNumber, int port);
-  void SetHostName(unsigned int processNumber, const char* host);
-  
-  // Description:
   // Set/Get the number of connections.
-  vtkSetMacro(NumberOfConnections, int);
-  vtkGetMacro(NumberOfConnections, int);
-  
+  int GetNumberOfConnections();
+ 
+  // Description:
+  // Access information about a particular process.
   int GetProcessPort(unsigned int processNumber);
   const char* GetProcessHostName(unsigned int processNumber);
   
@@ -72,17 +60,12 @@ public:
   // Manage a serialized version of the information.
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
-  // Description:
-  // Set the host name.
-  vtkSetStringMacro(HostName);
+
 protected:
   vtkMPIMToNSocketConnectionPortInformation();
   ~vtkMPIMToNSocketConnectionPortInformation();
 
-  char* HostName;
   int NumberOfConnections;
-  int ProcessNumber;
-  int PortNumber;
   vtkMPIMToNSocketConnectionPortInformationInternals* Internals;
 private:
   vtkMPIMToNSocketConnectionPortInformation(const vtkMPIMToNSocketConnectionPortInformation&); // Not implemented

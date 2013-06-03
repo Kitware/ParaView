@@ -196,6 +196,7 @@ protected:
   vtkSetStringMacro(StateFileName);
   char* StateFileName;
 
+
 private:
   // Options:
   int ConnectID;
@@ -221,13 +222,14 @@ private:
   int SatelliteMessageIds;
 
   int PrintMonitors;
+
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented
   void operator=(const vtkPVOptions&); // Not implemented
 
-  char* HostName;
   vtkSetStringMacro(HostName);
+  char* HostName;
 };
 
 #endif

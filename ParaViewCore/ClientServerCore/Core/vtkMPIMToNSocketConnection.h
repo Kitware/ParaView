@@ -77,10 +77,6 @@ protected:
   vtkSetMacro(PortNumber,int);
 
   // Description:
-  // Add a machine name.
-  void SetMachineName(unsigned int idx, const char* name);
-
-  // Description:
   // Setup the wait for connection, but do not wait yet.
   // This should determine the network to be used and the port to be used.
   void SetupWaitForConnection();
@@ -103,8 +99,6 @@ private:
   int PortNumber;
   int Socket;
   vtkServerSocket* ServerSocket;
-  char* HostName;
-  vtkSetStringMacro(HostName);
   int NumberOfConnections;
   vtkMPIMToNSocketConnectionInternals* Internals;
   vtkMultiProcessController *Controller;

@@ -23,6 +23,7 @@
 #include "vtkServerSocket.h"
 #include "vtkSocketCommunicator.h"
 
+#include <assert.h>
 #include <string>
 #include <vector>
 
@@ -35,19 +36,19 @@ class vtkMPIMToNSocketConnectionInternals
 {
 public:
   struct NodeInformation
-  {
+    {
     int PortNumber;
     std::string HostName;
-  };
+    };
   std::vector<NodeInformation> ServerInformation;
-  std::vector<std::string> MachineNames;
+
+  std::string SelfHostName;
 };
 
 
 vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
 {
   this->Socket = 0;
-  this->HostName = 0;
   this->PortNumber = 0;
   this->Internals = new vtkMPIMToNSocketConnectionInternals;
   this->Controller = 0;
@@ -71,17 +72,18 @@ vtkMPIMToNSocketConnection::~vtkMPIMToNSocketConnection()
     this->SocketCommunicator->Delete();
     } 
   this->SetController(0);
-  delete [] this->HostName;
-  this->HostName = 0;
   delete this->Internals;
   this->Internals = 0;
 }
 
-
+//------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  
+ 
+  os << indent << "SelfHostName: "
+    << this->Internals->SelfHostName.c_str() << endl;
+
   os << indent << "NumberOfConnections: (" << this->NumberOfConnections << ")\n";
   os << indent << "Controller: (" << this->Controller << ")\n";
   os << indent << "Socket: (" << this->Socket << ")\n";
@@ -92,7 +94,8 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
     os << i2 << "Server Information for Process: " << i << ":\n";
     vtkIndent i3 = i2.GetNextIndent();
     os << i3 << "PortNumber: " << this->Internals->ServerInformation[i].PortNumber << "\n";
-    os << i3 << "HostName: " << this->Internals->ServerInformation[i].HostName.c_str() << "\n";
+    os << i3 << "HostName: " <<
+      this->Internals->ServerInformation[i].HostName.c_str() << "\n";
     }
   os << indent << "PortNumber: " << this->PortNumber << endl;
 }
@@ -101,15 +104,11 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
 void vtkMPIMToNSocketConnection::Initialize(int waiting_process_type)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVServerOptions* options = vtkPVServerOptions::SafeDownCast(
-    pm->GetOptions());
-  if (options)
-    {
-    for (unsigned int cc=0; cc < options->GetNumberOfMachines(); cc++)
-      {
-      this->SetMachineName(cc, options->GetMachineName(cc));
-      }
-    }
+  vtkPVOptions* options = pm->GetOptions();
+  assert(options != NULL);
+
+  this->SetController(pm->GetGlobalController());
+  this->Internals->SelfHostName = options->GetHostName();
 
   this->IsWaiting = (waiting_process_type == pm->GetProcessType());
   if (this->IsWaiting)
@@ -133,22 +132,6 @@ void vtkMPIMToNSocketConnection::ConnectMtoN()
 }
 
 //------------------------------------------------------------------------------
-void vtkMPIMToNSocketConnection::SetMachineName(unsigned int idx,
-                                                const char* name)
-{
-  if (name && strlen(name) > 0)
-    {
-    if (idx >= this->Internals->MachineNames.size())
-      {
-      this->Internals->MachineNames.push_back(name);
-      }
-    else
-      {
-      this->Internals->MachineNames[idx] = name;
-      }
-    }
-}
-
 void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
 {
   if(this->SocketCommunicator)
@@ -168,27 +151,7 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
   this->ServerSocket->CreateServer(this->PortNumber);
   
   // find out the random port picked
-  int port = this->ServerSocket->GetServerPort();
-  if(this->Internals->MachineNames.size())
-    {
-    if( myId < this->Internals->MachineNames.size())
-      {
-      this->SetHostName(this->Internals->MachineNames[myId].c_str());
-      }
-    else
-      {
-      vtkErrorMacro("Bad configuration file more processes than machines listed."
-                    << " process id = " << myId << "\n"
-                    << " number of machines in file: " <<  
-                    this->Internals->MachineNames.size() << "\n");
-      this->SetHostName("localhost");
-      }
-    }
-  else
-    {
-    this->SetHostName("localhost");
-    }
-  this->PortNumber = port;
+  this->PortNumber = this->ServerSocket->GetServerPort();
   if(this->NumberOfConnections == -1)
     {
       this->NumberOfConnections = this->Controller->GetNumberOfProcesses();
@@ -196,6 +159,7 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
   cout.flush();
 }
 
+//------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::WaitForConnection()
 { 
   unsigned int myId = this->Controller->GetLocalProcessId();
@@ -208,8 +172,11 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
     vtkErrorMacro("SetupWaitForConnection must be called before WaitForConnection");
     return;
     }
-  cout << "WaitForConnection: id :" 
-       << myId << "  Port:" << this->PortNumber << "\n";
+  cout << "Waiting for connection:"
+       << " rank :" << myId
+       << " host :" << this->Internals->SelfHostName.c_str()
+       << " port :" << this->PortNumber << "\n";
+
   vtkClientSocket* socket = this->ServerSocket->WaitForConnection();
   this->ServerSocket->Delete();
   this->ServerSocket = 0;
@@ -220,7 +187,6 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
     }
   this->SocketCommunicator->SetSocket(socket);
   this->SocketCommunicator->ServerSideHandshake();
-
   socket->Delete();
 
   int data;
@@ -229,6 +195,7 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
   cout.flush();
 } 
 
+//------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::Connect()
 { 
    if(this->SocketCommunicator)
@@ -241,20 +208,28 @@ void vtkMPIMToNSocketConnection::Connect()
     {
     return;
     }
+
   this->SocketCommunicator = vtkSocketCommunicator::New();
-  cout << "Connect: id :" << myId << "  host: " 
-       << this->Internals->ServerInformation[myId].HostName.c_str() 
-       << "  Port:" 
-       << this->Internals->ServerInformation[myId].PortNumber 
-       << "\n";
-  cout.flush();
-  this->SocketCommunicator->ConnectTo((char*)this->Internals->ServerInformation[myId].HostName.c_str(),
-                                      this->Internals->ServerInformation[myId].PortNumber );
+
+  const vtkMPIMToNSocketConnectionInternals::NodeInformation& targetNode
+    = this->Internals->ServerInformation[myId];
+
+  cout << "Connecting :"
+       << " rank :" << myId
+       << " dest-host :" << targetNode.HostName.c_str()
+       << " dest-port :" << targetNode.PortNumber
+       << endl;
+
+  this->SocketCommunicator->ConnectTo(
+    const_cast<char*>(targetNode.HostName.c_str()),
+    targetNode.PortNumber);
+
   int id = static_cast<int>(myId);
   this->SocketCommunicator->Send(&id, 1, 1, 1238);
 }
 
 
+//------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::SetNumberOfConnections(int c)
 {
   this->NumberOfConnections = c;
@@ -262,7 +237,7 @@ void vtkMPIMToNSocketConnection::SetNumberOfConnections(int c)
   this->Modified();
 }
 
-
+//------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::SetPortInformation(unsigned int processNumber,
                                                     int port, const char* host)
 { 
@@ -280,45 +255,17 @@ void vtkMPIMToNSocketConnection::SetPortInformation(unsigned int processNumber,
     }
 }
 
-
-
+//------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::GetPortInformation(
   vtkMPIMToNSocketConnectionPortInformation* info)
 {
-  // if the number of connections are not set then
-  // use the number of processes for this group
-  // if not, then use the set number of connections
-  // this is for support of connections both ways
-  if(this->NumberOfConnections == -1)
+  // This method must be called only on the "Waiting" process.
+  if (this->NumberOfConnections == -1)
     {
-      info->SetNumberOfConnections(this->Controller->GetNumberOfProcesses()); 
+    return;
     }
-  else
-    {
-      info->SetNumberOfConnections(this->NumberOfConnections); 
-    }
-  int myId = this->Controller->GetLocalProcessId();
-  // for id = 0 set the port information for process 0 in
-  // in the information object, this is because the gather does
-  // not call AddInformation for process 0
-  if(myId == 0)
-    {
-    info->SetPortNumber(0, this->PortNumber);
-    if(this->Internals->MachineNames.size() &&
-       (this->Internals->MachineNames.size() 
-        < static_cast<unsigned int>(info->GetNumberOfConnections())))
-      {
-      vtkErrorMacro("Bad Configuration file, expected " << info->GetNumberOfConnections()
-                    << " machines and found " << this->Internals->MachineNames.size());
-      }
-    for(unsigned int i = 0; i < this->Internals->MachineNames.size(); ++i)
-      {
-      info->SetHostName(i, this->Internals->MachineNames[i].c_str());
-      }
-    }
-  info->SetHostName(this->HostName);
-  info->SetProcessNumber(myId);
-  info->SetPortNumber(this->PortNumber);
-}
 
-  
+  // Pass the current processes information.
+  info->SetConnectionInformation(this->Controller->GetLocalProcessId(),
+    this->PortNumber, this->Internals->SelfHostName.c_str());
+}

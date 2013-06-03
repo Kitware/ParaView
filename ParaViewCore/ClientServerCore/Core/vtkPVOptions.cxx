@@ -130,6 +130,15 @@ void vtkPVOptions::Initialize()
     break;
     }
 
+  // On occasion, one would want to force the hostname used by a particular
+  // process (overriding the default detected by making System calls). This
+  // option makes it possible).
+  this->AddArgument(
+    "--hostname", 0, &this->HostName,
+    "Override the hostname to be used to connect to this process. "
+    "By default, the hostname is determined using appropriate system calls.",
+    vtkPVOptions::ALLPROCESS);
+
   this->AddArgument("--cslog", 0, &this->LogFileName,
                     "ClientServerStream log file.",
                     vtkPVOptions::ALLPROCESS);
