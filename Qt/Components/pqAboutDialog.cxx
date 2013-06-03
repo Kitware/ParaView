@@ -171,7 +171,6 @@ void pqAboutDialog::AddServerInformation()
 //-----------------------------------------------------------------------------
 void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
 {
-  pqOptions* clientOptions = pqOptions::SafeDownCast(server->getOptions());
   vtkPVServerInformation* serverInfo = server->getServerInformation();
   if (!server->isRemote())
     {
