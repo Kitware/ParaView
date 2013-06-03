@@ -38,19 +38,15 @@ public:
   vtkTypeMacro(vtkPVOptions,vtkCommandOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Convenience method to get the local process's host name.
+  vtkGetStringMacro(HostName);
+
   vtkGetMacro(ConnectID, int);
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetStringMacro(StereoType);
 
-  // Description:
-  // Get Various ports.
-  vtkGetMacro(ServerPort, int);
-  vtkGetMacro(DataServerPort, int);
-  vtkGetMacro(RenderServerPort, int);
-
-  vtkGetMacro(UseSoftwareRendering, int);
-  vtkGetMacro(UseSatelliteSoftwareRendering, int);
   vtkGetMacro(ReverseConnection, int);
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
@@ -76,10 +72,6 @@ public:
   // Clients need to set the ConnectID so they can handle server connections
   // after the client has started.
   vtkSetMacro(ConnectID, int);
-
-  // Description:
-  // Get the various types of host names.
-  vtkGetStringMacro(ClientHostName);
 
   // Description:
   // Log filename.
@@ -186,18 +178,10 @@ protected:
   // Subclasses may need to access these
   char* ParaViewDataName;
 
-  vtkSetStringMacro(ClientHostName);
-  char* ClientHostName;
-
 
   //server URL information
   vtkSetStringMacro(ServerURL);
   char* ServerURL;
-
-  // Port information
-  int ServerPort;
-  int DataServerPort;
-  int RenderServerPort;
 
   int ServerMode;
   int ClientMode;
@@ -217,8 +201,6 @@ private:
   int ConnectID;
   int UseOffscreenRendering;
   int UseStereoRendering;
-  int UseSoftwareRendering;
-  int UseSatelliteSoftwareRendering;
   int ReverseConnection;
   int TileDimensions[2];
   int TileMullions[2];
@@ -243,6 +225,9 @@ private:
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented
   void operator=(const vtkPVOptions&); // Not implemented
+
+  char* HostName;
+  vtkSetStringMacro(HostName);
 };
 
 #endif

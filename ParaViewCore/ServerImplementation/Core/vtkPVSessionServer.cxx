@@ -26,7 +26,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
 #include "vtkPVInstantiator.h"
-#include "vtkPVOptions.h"
+#include "vtkPVServerOptions.h"
 #include "vtkPVSessionCore.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSIProxyDefinitionManager.h"
@@ -269,23 +269,61 @@ bool vtkPVSessionServer::Connect()
     return true;
     }
 
-  vtkPVOptions* options = pm->GetOptions();
+  vtkPVServerOptions* options = vtkPVServerOptions::SafeDownCast(pm->GetOptions());
+  if (!options)
+    {
+    vtkErrorMacro("Missing vtkPVServerOptions. "
+      "Process must use vtkPVServerOptions (or subclass).");
+    return false;
+    }
 
   switch (pm->GetProcessType())
     {
   case vtkProcessModule::PROCESS_SERVER:
-    url << "cs";
-    url << ((options->GetReverseConnection())?  "rc://" : "://");
-    url << options->GetClientHostName() << ":" << options->GetServerPort();
+    if (options->GetReverseConnection())
+      {
+      url << "csrc://";
+      url << options->GetClientHostName() << ":" << options->GetServerPort();
+      }
+    else
+      {
+      url << "cs://";
+      url << options->GetHostName() << ":" << options->GetServerPort();
+      }
     break;
 
   case vtkProcessModule::PROCESS_RENDER_SERVER:
+    if (options->GetReverseConnection())
+      {
+      url << "cdsrsrc://"
+          << options->GetClientHostName() << ":11111" // default ds-port
+          << "/"
+          << options->GetClientHostName() << ":" << options->GetServerPort();
+      }
+    else
+      {
+      url << "cdsrs://"
+          << "<data-server-hostname>:11111"
+          << "/"
+          << options->GetHostName() << ":" << options->GetServerPort();
+      }
+    break;
+
   case vtkProcessModule::PROCESS_DATA_SERVER:
-    url << "cdsrs";
-    url << ((options->GetReverseConnection())?  "rc://" : "://");
-    url << options->GetClientHostName() << ":" << options->GetDataServerPort()
-      << "/"
-      << options->GetClientHostName() << ":" << options->GetRenderServerPort();
+    if (options->GetReverseConnection())
+      {
+      url << "cdsrsrc://"
+          << options->GetClientHostName() << ":" << options->GetServerPort()
+          << "/"
+          << options->GetClientHostName() << ":22221"; // default rs-port
+      }
+    else
+      {
+      url << "cdsrs://"
+          << options->GetHostName() << ":" << options->GetServerPort()
+          << "/"
+          << "<render-server-hostname>:22221";
+      }
     break;
 
   default:

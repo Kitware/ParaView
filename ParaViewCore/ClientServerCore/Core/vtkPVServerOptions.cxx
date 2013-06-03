@@ -13,11 +13,13 @@
 
 =========================================================================*/
 #include "vtkPVServerOptions.h"
+
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVServerOptionsInternals.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
 
 #include <cstdio>
 
@@ -43,18 +45,63 @@ vtkStandardNewMacro(vtkPVServerOptions);
 vtkPVServerOptions::vtkPVServerOptions()
 {
   this->Internals = new vtkPVServerOptionsInternals;
+
+  // initialize host names
+  this->ClientHostName = 0;
+  this->SetClientHostName(this->GetHostName());
+
+  // This default value for ServerPort is setup in Initialize().
+  this->ServerPort = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVServerOptions::~vtkPVServerOptions()
 {
+  this->SetClientHostName(0);
+
   delete this->Internals;
+  this->Internals = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerOptions::Initialize()
 {
   this->Superclass::Initialize();
+
+  this->AddArgument("--client-host", "-ch", &this->ClientHostName,
+                    "Tell the data|render server the host name of the client, use with -rc.",
+                    vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
+                    vtkPVOptions::PVSERVER);
+
+  switch (vtkProcessModule::GetProcessType())
+    {
+  case vtkProcessModule::PROCESS_SERVER:
+    this->ServerPort = 11111;
+    this->AddArgument(
+      "--server-port", "-sp", &this->ServerPort,
+      "What port should the combined server use to connect to the client. (default 11111).",
+      vtkPVOptions::PVSERVER);
+    break;
+
+  case vtkProcessModule::PROCESS_DATA_SERVER:
+    this->ServerPort = 11111;
+    this->AddArgument(
+      "--data-server-port", "-dsp", &this->ServerPort,
+      "What port data server use to connect to the client. (default 11111).",
+      vtkPVOptions::PVDATA_SERVER);
+    break;
+
+  case vtkProcessModule::PROCESS_RENDER_SERVER:
+    this->ServerPort = 22221;
+    this->AddArgument(
+      "--render-server-port", "-rsp", &this->ServerPort,
+      "What port should the render server use to connect to the client. (default 22221).",
+      vtkPVOptions::PVRENDER_SERVER);
+    break;
+
+  default:
+    vtkErrorMacro("vtkPVServerOptions is only meant for server-processes.");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -325,5 +372,10 @@ void vtkPVServerOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   this->Internals->PrintSelf(os, indent);
+
+  os << indent << "ClientHostName: "
+     << (this->ClientHostName?this->ClientHostName:"(none)") << endl;
+  os << indent << "ServerPort: " << this->ServerPort << endl;
+
 }
 

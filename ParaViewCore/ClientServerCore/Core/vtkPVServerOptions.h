@@ -12,9 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVServerOptions - ParaView options storage
+// .NAME vtkPVServerOptions - ParaView options for server executables.
 // .SECTION Description
-// An object of this class represents a storage for ParaView options
+// An object of this class represents a storage for command line options for
+// various server executables.
 //
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
@@ -33,6 +34,16 @@ public:
   static vtkPVServerOptions* New();
   vtkTypeMacro(vtkPVServerOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Name of the client-host. By default, the client are server are assumed to
+  // be on the same host.
+  vtkGetStringMacro(ClientHostName);
+
+  // Description:
+  // The configuration port for this process. The interpretation of the port
+  // number depends on the configuration and process type.
+  vtkGetMacro(ServerPort, int);
 
   // Description:
   // Pass in the name and the attributes for all tags that are not Options.
@@ -75,6 +86,10 @@ protected:
 
   virtual void Initialize();
 
+  vtkSetStringMacro(ClientHostName);
+  char* ClientHostName;
+
+  int ServerPort;
 private:
   vtkPVServerOptions(const vtkPVServerOptions&); // Not implemented
   void operator=(const vtkPVServerOptions&); // Not implemented
@@ -83,4 +98,3 @@ private:
 };
 
 #endif // #ifndef __vtkPVServerOptions_h
-

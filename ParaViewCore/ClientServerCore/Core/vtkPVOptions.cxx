@@ -33,6 +33,14 @@ vtkPVOptions::vtkPVOptions()
 {
   this->SetProcessType(ALLPROCESS);
 
+  // initialize host names
+  vtksys::SystemInformation sys_info;
+  sys_info.RunOSCheck();
+  const char* sys_hostname = sys_info.GetHostname()?
+    sys_info.GetHostname() : "localhost";
+  this->HostName= 0;
+  this->SetHostName(sys_hostname);
+
   // Initialize vtksys::CommandLineArguments
   this->UseRenderingGroup = 0;
   this->ParaViewDataName = 0;
@@ -61,23 +69,9 @@ vtkPVOptions::vtkPVOptions()
 
   this->PrintMonitors = 0;
 
-  // initialize host names
-  vtksys::SystemInformation sys_info;
-  sys_info.RunOSCheck();
-  const char* sys_hostname = sys_info.GetHostname()?
-    sys_info.GetHostname() : "localhost";
-
-  this->ClientHostName = 0;
-  this->SetClientHostName(sys_hostname);
-  // initialize ports to defaults
-  this->ServerPort = 11111;
-  this->DataServerPort = 11111;
-  this->RenderServerPort = 22221;
   this->ServerURL = 0;
 
   this->ReverseConnection = 0;
-  this->UseSoftwareRendering = 0;
-  this->UseSatelliteSoftwareRendering = 0;
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
   this->ConnectID = 0;
@@ -99,7 +93,7 @@ vtkPVOptions::vtkPVOptions()
 //----------------------------------------------------------------------------
 vtkPVOptions::~vtkPVOptions()
 {
-  this->SetClientHostName(0);
+  this->SetHostName(0);
   this->SetStateFileName(0);
   this->SetLogFileName(0);
   this->SetStereoType(0);
@@ -188,19 +182,6 @@ void vtkPVOptions::Initialize()
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
 
-  this->AddArgument("--client-host", "-ch", &this->ClientHostName,
-                    "Tell the data|render server the host name of the client, use with -rc.",
-                    vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
-                    vtkPVOptions::PVSERVER);
-  this->AddArgument("--data-server-port", "-dsp", &this->DataServerPort,
-                    "What port data server use to connect to the client. (default 11111).",
-                    /*vtkPVOptions::PVCLIENT | */vtkPVOptions::PVDATA_SERVER);
-  this->AddArgument("--render-server-port", "-rsp", &this->RenderServerPort,
-                    "What port should the render server use to connect to the client. (default 22221).",
-                    /*vtkPVOptions::PVCLIENT |*/ vtkPVOptions::PVRENDER_SERVER);
-  this->AddArgument("--server-port", "-sp", &this->ServerPort,
-                    "What port should the combined server use to connect to the client. (default 11111).",
-                    /*vtkPVOptions::PVCLIENT |*/ vtkPVOptions::PVSERVER);
 
   this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection,
                            "Have the server connect to the client.",
@@ -279,15 +260,6 @@ int vtkPVOptions::PostProcess(int, const char* const*)
       break;
     }
 
-  if ( this->UseSatelliteSoftwareRendering )
-    {
-    this->UseSoftwareRendering = 1;
-    }
-  if ( getenv("PV_SOFTWARE_RENDERING") )
-    {
-    this->UseSoftwareRendering = 1;
-    this->UseSatelliteSoftwareRendering = 1;
-    }
   if ( this->TileDimensions[0] > 0 || this->TileDimensions[1] > 0 )
     {
     if ( this->TileDimensions[0] <= 0 )
@@ -348,6 +320,9 @@ int vtkPVOptions::DeprecatedArgument(const char* argument)
 void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "HostName: "
+     << (this->HostName? this->HostName : "(none)") << endl;
+
   os << indent << "ParaViewDataName: " << (this->ParaViewDataName?this->ParaViewDataName:"(none)") << endl;
 
   // Everything after this line will be showned in Help/About dialog
@@ -381,23 +356,9 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "ConnectID is: " << this->ConnectID << endl;
     os << indent << "Reverse Connection: " << (this->ReverseConnection?"on":"off") << endl;
-    if (this->RenderServerMode)
-      {
-      os << indent << "DataServerPort: " << this->DataServerPort << endl;
-      os << indent << "Render Server Port: " << this->RenderServerPort << endl;
-      }
-    else
-      {
-      os << indent << "ServerPort: " << this->ServerPort << endl;
-      }
-    os << indent << "ClientHostName: " << (this->ClientHostName?this->ClientHostName:"(none)") << endl;
     }
 
   os << indent << "Timeout: " << this->Timeout << endl;
-  os << indent << "Software Rendering: " << (this->UseSoftwareRendering?"Enabled":"Disabled") << endl;
-
-  os << indent << "Satellite Software Rendering: " << (this->UseSatelliteSoftwareRendering?"Enabled":"Disabled") << endl;
-
   os << indent << "Stereo Rendering: " << (this->UseStereoRendering?"Enabled":"Disabled") << endl;
 
   os << indent << "Offscreen Rendering: " << (this->UseOffscreenRendering?"Enabled":"Disabled") << endl;
