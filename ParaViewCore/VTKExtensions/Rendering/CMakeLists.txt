@@ -52,7 +52,6 @@ set(Module_SRCS
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGL2PSExporter.cxx
-  vtkPVHardwareSelector.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx

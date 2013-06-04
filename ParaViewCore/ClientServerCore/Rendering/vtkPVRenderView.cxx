@@ -580,6 +580,7 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation)
 
   this->Selector->SetRenderer(this->GetRenderer());
   this->Selector->SetFieldAssociation(fieldAssociation);
+  this->Selector->SetSynchronizedWindows(this->SynchronizedWindows);
   return true;
 }
 

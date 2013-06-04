@@ -16,6 +16,7 @@
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 
 #include <map>
@@ -45,8 +46,28 @@ vtkPVHardwareSelector::~vtkPVHardwareSelector()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVHardwareSelector::SetSynchronizedWindows(
+  vtkPVSynchronizedRenderWindows* sw)
+{
+  if (this->SynchronizedWindows != sw)
+    {
+    this->SynchronizedWindows = sw;
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::PassRequired(int pass)
 {
+  if (pass == MIN_KNOWN_PASS + 1)
+    {
+    // synchronize the MaxAttributeId among all active processes (BUG #141112).
+    if (this->SynchronizedWindows && this->SynchronizedWindows->GetEnabled())
+      {
+      this->SynchronizedWindows->Reduce(this->MaxAttributeId,
+        vtkPVSynchronizedRenderWindows::MAX_OP);
+      }
+    }
   return (pass == PROCESS_PASS?  true : this->Superclass::PassRequired(pass));
 }
 
