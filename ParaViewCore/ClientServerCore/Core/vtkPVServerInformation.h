@@ -76,11 +76,6 @@ public:
   vtkGetMacro(UseIceT, int);
 
   // Description:
-  // Name of render module to use.
-  vtkSetStringMacro(RenderModuleName);
-  vtkGetStringMacro(RenderModuleName);
-
-  // Description:
   // Get/Set if the server supports saving OGVs.
   vtkSetMacro(OGVSupport, int);
   vtkGetMacro(OGVSupport, int);
@@ -175,7 +170,6 @@ protected:
   int UseOffscreenRendering;
   int MultiClientsEnable;
   int ClientId;
-  char* RenderModuleName;
 
   vtkPVServerOptionsInternals* MachinesInternals;
 

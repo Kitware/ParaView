@@ -32,46 +32,33 @@ public:
       this->PortNumber = -1;
       }
   };
-  std::vector<NodeInformation> ServerInformation;
+  std::vector<NodeInformation> Connections;
 };
 
-
-
 vtkStandardNewMacro(vtkMPIMToNSocketConnectionPortInformation);
-
 //----------------------------------------------------------------------------
 vtkMPIMToNSocketConnectionPortInformation::vtkMPIMToNSocketConnectionPortInformation()
 {
   this->Internals = new vtkMPIMToNSocketConnectionPortInformationInternals;
-  this->HostName = 0;
-  this->NumberOfConnections = 0;
-  this->ProcessNumber = 0;
-  this->PortNumber = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkMPIMToNSocketConnectionPortInformation::~vtkMPIMToNSocketConnectionPortInformation()
 {
   delete this->Internals;
-  this->SetHostName(0);
+  this->Internals = NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkMPIMToNSocketConnectionPortInformation::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "\n";
-  os << indent << "HostName: "
-     << (this->HostName?this->HostName:"(none)") << "\n";
-  os << indent << "NumberOfConnections: " << this->NumberOfConnections << "\n";
-  os << indent << "ProcessNumber: " << this->ProcessNumber << "\n";
-  os << indent << "PortNumber: " << this->PortNumber << "\n";
   vtkIndent i2 = indent.GetNextIndent();
   os << indent << "All Process Information:\n";
-  for(unsigned int i = 0; i < this->Internals->ServerInformation.size(); ++i)
+  for(unsigned int i = 0; i < this->Internals->Connections.size(); ++i)
     {
-    os << i2 << "P" << i << ":  PortNumber: " << this->Internals->ServerInformation[i].PortNumber << "\n";
-    os << i2 << "P" << i << ":  HostName: " << this->Internals->ServerInformation[i].HostName.c_str() << "\n";
+    os << i2 << "P" << i << ":  PortNumber: " << this->Internals->Connections[i].PortNumber << "\n";
+    os << i2 << "P" << i << ":  HostName: " << this->Internals->Connections[i].HostName.c_str() << "\n";
     }
 }
 
@@ -87,33 +74,24 @@ void vtkMPIMToNSocketConnectionPortInformation::CopyFromObject(vtkObject* obj)
   c->GetPortInformation(this);
 }
 
-
-void vtkMPIMToNSocketConnectionPortInformation::SetPortNumber(unsigned int processNumber,
-                                                              int port)
+//----------------------------------------------------------------------------
+int vtkMPIMToNSocketConnectionPortInformation::GetNumberOfConnections()
 {
-  if(this->Internals->ServerInformation.size() == 0)
-    {
-    this->Internals->ServerInformation.resize(this->NumberOfConnections);
-    }
-  if(processNumber >= this->Internals->ServerInformation.size())
-    {
-      return;
-    }
-  this->Internals->ServerInformation[processNumber].PortNumber = port;
+  return static_cast<int>(this->Internals->Connections.size());
 }
 
-void vtkMPIMToNSocketConnectionPortInformation::SetHostName(unsigned int processNumber,
-                                                            const char* hostname)
+//----------------------------------------------------------------------------
+void vtkMPIMToNSocketConnectionPortInformation::SetConnectionInformation(
+  unsigned int processNumber, int port, const char* hostname)
 {
-  if(this->Internals->ServerInformation.size() == 0)
+  if (processNumber >= this->Internals->Connections.size())
     {
-    this->Internals->ServerInformation.resize(this->NumberOfConnections);
+    this->Internals->Connections.resize(processNumber+1);
     }
-  if(processNumber >= this->Internals->ServerInformation.size())
-    {
-      return;
-    }
-  this->Internals->ServerInformation[processNumber].HostName = hostname;
+
+  this->Internals->Connections[processNumber].HostName =
+    hostname?  hostname : "";
+  this->Internals->Connections[processNumber].PortNumber = port;
 }
 
 //----------------------------------------------------------------------------
@@ -127,98 +105,79 @@ void vtkMPIMToNSocketConnectionPortInformation::AddInformation(vtkPVInformation*
     return;
     }
 
-  for (size_t cc=0; cc < info->Internals->ServerInformation.size(); cc++)
+  if (this->Internals->Connections.size() < info->Internals->Connections.size())
     {
-    if (info->Internals->ServerInformation[cc].PortNumber > 0)
+    this->Internals->Connections.resize(info->Internals->Connections.size());
+    }
+
+  for (size_t cc=0; cc < info->Internals->Connections.size(); cc++)
+    {
+    if (info->Internals->Connections[cc].PortNumber > 0)
       {
-      this->SetPortNumber(
-        static_cast<unsigned int>(cc),
-        info->Internals->ServerInformation[cc].PortNumber);
+      this->Internals->Connections[cc] = info->Internals->Connections[cc];
       }
     }
-  this->SetPortNumber(info->ProcessNumber, info->PortNumber);
 }
 
 //----------------------------------------------------------------------------
-void
-vtkMPIMToNSocketConnectionPortInformation::CopyToStream(vtkClientServerStream* css)
+void vtkMPIMToNSocketConnectionPortInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply 
-       << this->HostName
-       << this->NumberOfConnections
-       << this->ProcessNumber
-       << this->PortNumber
-       << this->Internals->ServerInformation.size();
-  for(unsigned int i=0; i <  this->Internals->ServerInformation.size(); ++i)
+       << this->Internals->Connections.size();
+  for (size_t i=0; i < this->Internals->Connections.size(); ++i)
     {
-    *css << this->Internals->ServerInformation[i].PortNumber
-         << this->Internals->ServerInformation[i].HostName.c_str();
+    *css << this->Internals->Connections[i].PortNumber
+         << this->Internals->Connections[i].HostName.c_str();
     }
   *css << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
-void
-vtkMPIMToNSocketConnectionPortInformation::CopyFromStream(const vtkClientServerStream* css)
+void vtkMPIMToNSocketConnectionPortInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  const char* hostname = 0;
-  css->GetArgument(0, 0, &hostname);
-  this->SetHostName(hostname);
-  int i = 0;
-  css->GetArgument(0, 1, &i);
-  this->SetNumberOfConnections(i); 
-  css->GetArgument(0, 2, &i);
-  this->SetProcessNumber(i);
-  css->GetArgument(0, 3, &i);
-  this->SetPortNumber(i);
   int numProcesses;
-  css->GetArgument(0, 4, &numProcesses);
-  this->Internals->ServerInformation.resize(numProcesses);
+  css->GetArgument(0, 0, &numProcesses);
+  this->Internals->Connections.resize(numProcesses);
 
   int port;
-  int pos = 5;
+  int pos = 1;
+  const char* hostname = 0;
   for(int j =0; j < numProcesses; ++j)
     {
-    css->GetArgument(0, pos, &port);
-    pos++;
-    css->GetArgument(0, pos, &hostname);
-    pos++;
-    this->Internals->ServerInformation[j].PortNumber = port;
-    this->Internals->ServerInformation[j].HostName = hostname;
+    css->GetArgument(0, pos, &port); pos++;
+    css->GetArgument(0, pos, &hostname); pos++;
+
+    this->Internals->Connections[j].PortNumber = port;
+    this->Internals->Connections[j].HostName = hostname? hostname : "";
     }
 }
 
-
-
+//----------------------------------------------------------------------------
 int vtkMPIMToNSocketConnectionPortInformation::GetProcessPort(unsigned int processNumber)
 {
-  if(this->Internals->ServerInformation.size() == 0 && processNumber == 0)
-    {
-    return this->PortNumber;
-    }
-  if(processNumber >= this->Internals->ServerInformation.size())
+  if (processNumber >= this->Internals->Connections.size())
     {
     vtkErrorMacro("Process number greater than number of processes");
     return 0;
     }
-  return this->Internals->ServerInformation[processNumber].PortNumber;
+
+  return this->Internals->Connections[processNumber].PortNumber;
 }
 
+//----------------------------------------------------------------------------
 const char* vtkMPIMToNSocketConnectionPortInformation::GetProcessHostName(unsigned int processNumber)
 {
-  if(this->Internals->ServerInformation.size() == 0 && processNumber == 0)
-    {
-    return this->GetHostName();
-    }
-  if(processNumber >= this->Internals->ServerInformation.size())
+  if (processNumber >= this->Internals->Connections.size())
     {
     vtkErrorMacro("Process number greater than number of processes");
-    return 0;
+    return NULL;
     }
-  if(this->Internals->ServerInformation[processNumber].HostName.size() == 0)
+
+  if (this->Internals->Connections[processNumber].HostName.size() == 0)
     {
-    return this->GetHostName();
+    return "localhost";
     }
-  return this->Internals->ServerInformation[processNumber].HostName.c_str();
+
+  return this->Internals->Connections[processNumber].HostName.c_str();
 }

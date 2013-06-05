@@ -335,6 +335,7 @@ void vtkSMSessionClient::SetupDataServerRenderServerConnection()
   vtkMPIMToNSocketConnectionPortInformation* info =
     vtkMPIMToNSocketConnectionPortInformation::New();
   this->GatherInformation(RENDER_SERVER, info, mpiMToN->GetGlobalID());
+  // info->Print(cout);
 
   vtkSMPropertyHelper helper(mpiMToN, "Connections");
   for (int cc = 0; cc < info->GetNumberOfConnections(); cc++)

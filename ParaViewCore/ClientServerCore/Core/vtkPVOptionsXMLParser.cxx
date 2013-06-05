@@ -16,6 +16,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkStdString.h"
 
+#include <vtksys/SystemTools.hxx>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptionsXMLParser);
 
@@ -27,7 +29,8 @@ void vtkPVOptionsXMLParser::SetProcessType(const char* ptype)
     this->SetProcessTypeInt(vtkCommandOptions::EVERYBODY);
     return;
     }
-  std::string type = ptype;
+
+  std::string type = vtksys::SystemTools::LowerCase((ptype? ptype : ""));
   if(type == "client")
     {
     this->SetProcessTypeInt(vtkPVOptions::PVCLIENT);
@@ -38,16 +41,18 @@ void vtkPVOptionsXMLParser::SetProcessType(const char* ptype)
     this->SetProcessTypeInt(vtkPVOptions::PVSERVER);
     return;
     }
-  if(type == "render-server")
+  if(type == "render-server" || type == "renderserver")
     {
     this->SetProcessTypeInt(vtkPVOptions::PVRENDER_SERVER);
     return;
     }
-  if(type == "data-server")
+
+  if(type == "data-server" || type == "dataserver")
     {
     this->SetProcessTypeInt(vtkPVOptions::PVDATA_SERVER);
     return;
     }
+
   if(type == "paraview")
     {
     this->SetProcessTypeInt(vtkPVOptions::PARAVIEW);

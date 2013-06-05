@@ -171,7 +171,6 @@ void pqAboutDialog::AddServerInformation()
 //-----------------------------------------------------------------------------
 void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
 {
-  pqOptions* clientOptions = pqOptions::SafeDownCast(server->getOptions());
   vtkPVServerInformation* serverInfo = server->getServerInformation();
   if (!server->isRemote())
     {
@@ -187,31 +186,6 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
   ::addItem(tree, "Separate Render Server", separate_render_server? "Yes":"No");
   ::addItem(tree, "Reverse Connection", reverse_connection? "Yes" : "No");
 
-  int port;
-  if (separate_render_server)
-    {
-    if (!reverse_connection)
-      {
-      ::addItem(tree, "Data Server Host", resource.dataServerHost());
-      }
-    port = resource.dataServerPort();
-    ::addItem(tree, "Data Server Port", port==-1? clientOptions->GetDataServerPort(): port);
-    if (!reverse_connection)
-      {
-      ::addItem(tree, "Render Server Host", resource.renderServerHost());
-      }
-    port = resource.renderServerPort();
-    ::addItem(tree, "Render Server Port", port==-1? clientOptions->GetRenderServerPort() : port);
-    }
-  else
-    {
-    if (!reverse_connection)
-      {
-      ::addItem(tree, "Server Host", resource.host());
-      }
-    port = resource.port();
-    ::addItem(tree, "Server Port", port==-1?clientOptions->GetServerPort():port);
-    }
   // TODO: handle separate render server partitions.
   ::addItem(tree, "Number of Processes", server->getNumberOfPartitions());
 
