@@ -30,6 +30,8 @@ if(PARAVIEW_USE_VRPN)
   if(UNIX AND NOT APPLE)
     find_path(VRPN_LIBUSB_INCLUDE_DIR libusb.h PATHS /usr/include /usr/local/include)
     if(NOT EXISTS VRPN_LIBUSB_INCLUDE_DIR)
+      # Not all platforms require this directory to be set
+      set(VRPN_LIBUSB_INCLUDE_DIR "")
       mark_as_advanced(CLEAR VRPN_LIBUSB_INCLUDE_DIR)
     endif()
   endif()
