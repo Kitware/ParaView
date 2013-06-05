@@ -145,8 +145,9 @@ extern int LZero; /* Flag to determine whether to use Legendre quad zeros   */
 
 /* Macros */
 
-#define max(a,b) ( (b) < (a) ? (a) : (b) )
-#define min(a,b) ( (b) > (a) ? (a) : (b) )
+#include <algorithm>
+using std::max;
+using std::min;
 #define clamp(t,a,b)  (max (min(t,b), a) )
 
 #define set_state(E,c) {Element *El; for(El=E;El;El=El->next)  El->state = c;}
