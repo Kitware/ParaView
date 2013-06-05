@@ -69,21 +69,6 @@ public:
   virtual vtkImageData* captureImage(const QSize& asize)
     { return this->Superclass::captureImage(asize); }
 
-  /// This view supports undo so this method always returns true.
-  virtual bool supportsUndo() const {return true;}
-
-  /// Called to undo interaction.
-  virtual void undo();
-
-  /// Called to redo interaction.
-  virtual void redo();
-
-  /// Returns true if undo can be done.
-  virtual bool canUndo() const;
-
-  /// Returns true if redo can be done.
-  virtual bool canRedo() const;
-
   /// Returns true if selection can be done.
   virtual bool supportsSelection() const;
 
