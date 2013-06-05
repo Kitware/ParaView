@@ -119,7 +119,6 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVGlyphFilter.h"
-#include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVJoystickFly.h"
 #include "vtkPVJoystickFlyIn.h"
@@ -323,7 +322,6 @@ int main(int , char *[])
   PRINT_SELF(vtkPVGenericRenderWindowInteractor);
   PRINT_SELF(vtkPVGeometryFilter);
   PRINT_SELF(vtkPVGlyphFilter);
-  PRINT_SELF(vtkPVHardwareSelector);
   PRINT_SELF(vtkPVInteractorStyle);
   PRINT_SELF(vtkPVJoystickFly);
   PRINT_SELF(vtkPVJoystickFlyIn);

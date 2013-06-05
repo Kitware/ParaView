@@ -26,9 +26,11 @@
 #define __vtkPVHardwareSelector_h
 
 #include "vtkHardwareSelector.h"
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
+class vtkPVSynchronizedRenderWindows;
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
 {
 public:
   static vtkPVHardwareSelector* New();
@@ -56,6 +58,11 @@ public:
 
   int AssignUniqueId(vtkProp*);
 
+  // Description:
+  // Set the vtkPVSynchronizedRenderWindows instance. This is used to
+  // communicate between all active processes.
+  void SetSynchronizedWindows(vtkPVSynchronizedRenderWindows*);
+
 //BTX
 protected:
   vtkPVHardwareSelector();
@@ -79,7 +86,7 @@ protected:
 
   vtkTimeStamp CaptureTime;
   int UniqueId;
-
+  vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
 private:
   vtkPVHardwareSelector(const vtkPVHardwareSelector&); // Not implemented
   void operator=(const vtkPVHardwareSelector&); // Not implemented

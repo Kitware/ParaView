@@ -1331,8 +1331,31 @@ bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
+  template <class T>
+  T vtkEvaluateReductionOperation(T val0, T val1,
+    vtkPVSynchronizedRenderWindows::StandardOperations operation)
+    {
+    switch (operation)
+      {
+    case vtkPVSynchronizedRenderWindows::MAX_OP:
+      return val0 > val1? val0 : val1;
+
+    case vtkPVSynchronizedRenderWindows::MIN_OP:
+      return val0 < val1? val0 : val1;
+
+    case vtkPVSynchronizedRenderWindows::SUM_OP:
+      return val0 + val1;
+      }
+    return val0;
+    }
+}
+
+//----------------------------------------------------------------------------
 template <class T>
-bool vtkPVSynchronizedRenderWindows::SynchronizeSizeTemplate(T& size)
+bool vtkPVSynchronizedRenderWindows::ReduceTemplate(T& size,
+  vtkPVSynchronizedRenderWindows::StandardOperations operation)
 {
   // handle trivial case.
   if (this->Mode == BUILTIN || this->Mode == INVALID)
@@ -1356,7 +1379,7 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSizeTemplate(T& size)
   if (parallelController)
     {
     T result = size;
-    parallelController->Reduce(&size, &result, 1, vtkCommunicator::SUM_OP, 0);
+    parallelController->Reduce(&size, &result, 1, operation, 0);
     size = result;
     }
 
@@ -1370,13 +1393,13 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSizeTemplate(T& size)
         {
         T other_size;
         c_ds_controller->Receive(&other_size, 1, 1, 41232);
-        size += other_size;
+        size = vtkEvaluateReductionOperation(size, other_size, operation);
         }
       if (c_rs_controller)
         {
         T other_size;
         c_rs_controller->Receive(&other_size, 1, 1, 41232);
-        size += other_size;
+        size = vtkEvaluateReductionOperation(size, other_size, operation);
         }
       if (c_ds_controller)
         {
@@ -1420,13 +1443,20 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSizeTemplate(T& size)
 //----------------------------------------------------------------------------
 bool vtkPVSynchronizedRenderWindows::SynchronizeSize(double& size)
 {
-  return this->SynchronizeSizeTemplate<double>(size);
+  return this->ReduceTemplate<double>(size, SUM_OP);
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned int& size)
 {
-  return this->SynchronizeSizeTemplate<unsigned int>(size);
+  return this->ReduceTemplate<unsigned int>(size, SUM_OP);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::Reduce(
+  vtkIdType& value, vtkPVSynchronizedRenderWindows::StandardOperations operation)
+{
+  return this->ReduceTemplate<vtkIdType>(value, operation);
 }
 
 //----------------------------------------------------------------------------

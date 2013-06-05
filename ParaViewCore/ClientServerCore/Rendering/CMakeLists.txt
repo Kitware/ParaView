@@ -64,6 +64,7 @@ set (Module_SRCS
   vtkPVDataRepresentation.cxx
   vtkPVDataRepresentationPipeline.cxx
   vtkPVDisplayInformation.cxx
+  vtkPVHardwareSelector.cxx
   vtkPVImageSliceMapper.cxx
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx

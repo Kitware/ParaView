@@ -119,6 +119,14 @@ public:
   bool BroadcastToDataServer(vtkSelection* selection);
   bool BroadcastToRenderServer(vtkDataObject*);
 
+  enum StandardOperations
+    {
+    MAX_OP = vtkCommunicator::MAX_OP,
+    MIN_OP = vtkCommunicator::MIN_OP,
+    SUM_OP = vtkCommunicator::SUM_OP
+    };
+  bool Reduce(vtkIdType& value, StandardOperations operation);
+
   // Description:
   // Convenience method to trigger an RMI call from the client/root node.
   void TriggerRMI(vtkMultiProcessStream& stream, int tag);
@@ -268,8 +276,9 @@ private:
   class vtkObserver;
   vtkObserver* Observer;
 
+
   template <class T>
-  bool SynchronizeSizeTemplate(T &size);
+  bool ReduceTemplate(T &size, StandardOperations operation);
 //ETX
 };
 
