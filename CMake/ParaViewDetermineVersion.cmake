@@ -55,7 +55,7 @@ function(determine_version source_dir git_command var_prefix)
 
   if (${result} EQUAL 0)
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)[-]*(.*)"
-      version_matches ${output})
+      version_matches "${output}")
     if (CMAKE_MATCH_0)
       message(STATUS "Determined Source Version : ${CMAKE_MATCH_0}")
       set (full ${CMAKE_MATCH_0})
