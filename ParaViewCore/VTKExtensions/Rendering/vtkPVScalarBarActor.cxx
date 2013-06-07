@@ -41,7 +41,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
-#include "vtkTextRenderer.h"
 #include "vtkTexture.h"
 #include "vtkWindow.h"
 
@@ -70,6 +69,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
 {
   this->AspectRatio = 20.0;
   this->AutomaticLabelFormat = 1;
+  this->AnnotationTextScaling = 1;
 
   this->ScalarBarTexture = vtkTexture::New();
 
@@ -156,17 +156,18 @@ int vtkPVScalarBarActor::CreateLabel(
   char string[1024];
 
   vtkNew<vtkTextActor> textActor;
-  vtkNew<vtkTextRenderer> textRenderer;
   textActor->GetProperty()->DeepCopy(this->GetProperty());
   textActor->GetPositionCoordinate()->
     SetReferenceCoordinate(this->PositionCoordinate);
 
-  // Shallow copy here so that the size of the label prop is not affected by the
-  // automatic adjustment of its text mapper's size (i.e. its mapper's text
-  // property is identical except for the font size which will be modified
-  // later). This allows text actors to share the same text property, and in
-  // that case specifically allows the title and label text prop to be the same.
+  // Copy the text property here so that the size of the label prop is not
+  // affected by the automatic adjustment of its text mapper's size.
   textActor->GetTextProperty()->ShallowCopy(this->LabelTextProperty);
+  if (this->P->Viewport)
+    {
+    textActor->SetTextScaleModeToViewport();
+    textActor->ComputeScaledFont(this->P->Viewport);
+    }
 
   if (this->AutomaticLabelFormat)
     {
@@ -198,26 +199,21 @@ int vtkPVScalarBarActor::CreateLabel(
       strcpy(string2, strToFilter.c_str());
       textActor->SetInput(string2);
 
-      int fontSize = textRenderer->GetConstrainedFontSize(
-        string2, textActor->GetTextProperty(), VTK_INT_MAX, targetHeight,
-        viewport->GetVTKWindow()->GetDPI());
-      textActor->GetTextProperty()->SetFontSize(fontSize);
-      int bbox[4];
-      textRenderer->GetBoundingBox(
-        textActor->GetTextProperty(), string2, bbox,
-        viewport->GetVTKWindow()->GetDPI());
-      int actualWidth = bbox[1] - bbox[0];
-      if (actualWidth < targetWidth)
+      textActor->SetConstrainedFontSize(
+        viewport, VTK_INT_MAX, targetHeight);
+      double tsize[2];
+      textActor->GetSize(viewport, tsize);
+      if (tsize[0] < targetWidth)
         {
         // Found a string that fits.  Keep it unless we find something better.
         strcpy(string, string2);
         foundValid = true;
         }
-      else if ((actualWidth < smallestFoundWidth) && !foundValid)
+      else if ((tsize[0] < smallestFoundWidth) && !foundValid)
         {
         // String does not fit, but it is the smallest so far.
         strcpy(string, string2);
-        smallestFoundWidth = actualWidth;
+        smallestFoundWidth = tsize[0];
         }
       }
     }
@@ -233,27 +229,22 @@ int vtkPVScalarBarActor::CreateLabel(
 
   // Size the font to fit in the targetHeight, which we are using
   // to size the font because it is (relatively?) constant.
-  int fontSize = textRenderer->GetConstrainedFontSize(
-    string, textActor->GetTextProperty(),
-    VTK_INT_MAX, targetHeight,
-    viewport->GetVTKWindow()->GetDPI());
+  int fontSize = textActor->SetConstrainedFontSize(
+    viewport, targetHeight, VTK_INT_MAX);
   int maxFontSize = this->LabelTextProperty->GetFontSize();
-  fontSize = fontSize > maxFontSize ? maxFontSize : fontSize;
-  textActor->GetTextProperty()->SetFontSize(fontSize);
+  if (fontSize > maxFontSize)
+    {
+    textActor->GetTextProperty()->SetFontSize(maxFontSize);
+    }
 
   // Make sure that the string fits in the allotted space.
-  int bbox[4];
-  textRenderer->GetBoundingBox(
-    textActor->GetTextProperty(), string, bbox,
-    viewport->GetVTKWindow()->GetDPI());
-  int actualWidth = bbox[1] - bbox[0];
-  if (actualWidth > targetWidth)
+  //
+  double tsize[2];
+  textActor->GetSize(viewport, tsize);
+  if (tsize[0] > targetWidth)
     {
-    fontSize = textRenderer->GetConstrainedFontSize(
-      string, textActor->GetTextProperty(),
-      targetWidth, targetHeight,
-      viewport->GetVTKWindow()->GetDPI());
-    textActor->GetTextProperty()->SetFontSize(fontSize);
+    fontSize = textActor->SetConstrainedFontSize(
+      viewport, targetWidth, targetHeight);
     }
 
   this->P->TextActors.push_back(textActor.GetPointer());
@@ -414,6 +405,20 @@ std::vector<double> vtkPVScalarBarActor::LogTickMarks(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVScalarBarActor::PrepareTitleText()
+{
+  // Let the superclass prepare the actor:
+  this->Superclass::PrepareTitleText();
+
+  // Set font scaling
+  if (this->P->Viewport)
+    {
+    this->TitleActor->ComputeScaledFont(this->P->Viewport);
+    this->TitleActor->SetTextScaleModeToViewport();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVScalarBarActor::ComputeScalarBarThickness()
 {
   double aspectRatio = this->AspectRatio;
@@ -545,28 +550,19 @@ void vtkPVScalarBarActor::LayoutTicks()
     }
 
   // Figure out the precision to use based on the width of the scalar bar.
+  vtkNew<vtkTextActor> dummyActor;
+  dummyActor->GetTextProperty()->ShallowCopy(this->LabelTextProperty);
+  dummyActor->SetInput("()"); // parentheses are taller than numbers for all useful fonts.
+  if (this->P->Viewport)
+    {
+    dummyActor->SetTextScaleModeToViewport();
+    dummyActor->ComputeScaledFont(this->P->Viewport);
+    }
 
-  double fontScaling = 1.; // vtkTextActor::GetFontScale(this->P->Viewport);
-  vtkNew<vtkTextRenderer> dummyRenderer;
-  vtkNew<vtkTextProperty> dummyProp;
-  dummyProp->ShallowCopy(this->LabelTextProperty);
-  int targetHeight;
-  int bbox[4];
-
-  // Initialize the height with the requested height from the font (which
-  // should be about the same for all mappers).
-  dummyRenderer->GetBoundingBox(
-    dummyProp.GetPointer(), "()", bbox,
-    this->P->Viewport->GetVTKWindow()->GetDPI());
+  double tsize[2];
+  dummyActor->GetSize(this->P->Viewport, tsize);
   // Now constrain the width of the text with our target height:
-  targetHeight = (int)(fontScaling*(bbox[3] - bbox[2]));
-  dummyRenderer->GetConstrainedFontSize(
-    "()", dummyProp.GetPointer(), VTK_INT_MAX, targetHeight,
-    this->P->Viewport->GetVTKWindow()->GetDPI());
-  // Finally, set the height.
-  dummyRenderer->GetBoundingBox(
-    dummyProp.GetPointer(), "()", bbox,
-    this->P->Viewport->GetVTKWindow()->GetDPI());
+  int targetHeight = static_cast<int>(ceil(tsize[1]));
 
   if (this->Orientation == VTK_ORIENT_VERTICAL)
     {
@@ -584,16 +580,17 @@ void vtkPVScalarBarActor::LayoutTicks()
       this->P->TickBox.Posn[0] += this->P->ScalarBarBox.Size[0];
       }
 
+    /* FYI, this is how height is used in ConfigureTicks:
     int maxHeight = static_cast<int>(
       this->P->ScalarBarBox.Size[1] / this->NumberOfLabels);
     targetHeight = std::min(targetHeight, maxHeight);
+    */
     }
   else
     {
     this->P->TickBox.Size[0] =
       this->LabelSpace + 2 + targetHeight;
     this->P->TickBox.Size[1] = this->P->ScalarBarBox.Size[1];
-    //targetHeight = std::min(targetHeight, this->P->TickBox.Size[0]);
     if (this->TextPosition == PrecedeScalarBar)
       { // Push scalar bar and NaN swatch up to make room for ticks.
       this->P->TickBox.Posn = this->P->ScalarBarBox.Posn;
@@ -607,6 +604,16 @@ void vtkPVScalarBarActor::LayoutTicks()
       this->P->TitleBox.Posn[1] += this->P->TickBox.Size[0];
       }
     }
+}
+
+void vtkPVScalarBarActor::ConfigureAnnotations()
+{
+  // Work around an issue in VTK.
+  if (this->P->Labels.empty())
+    {
+    this->P->AnnotationBoxes->Initialize();
+    }
+  this->Superclass::ConfigureAnnotations();
 }
 
 void vtkPVScalarBarActor::ConfigureTitle()
