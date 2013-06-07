@@ -31,7 +31,7 @@
         "left": "0px",
         "right": "0px",
         "bottom": "0px",
-        "z-index" : "1000"
+        "z-index" : "3"
     },
 
     DEFAULT_STATISTIC_HTML = "<div class='statistics'></div>",
@@ -41,7 +41,7 @@
         "left": "0px",
         "right": "0px",
         "bottom": "0px",
-        "z-index" : "999",
+        "z-index" : "2",
         "display" : "none"
     },
 
