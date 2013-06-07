@@ -44,4 +44,5 @@ add_custom_target(ParaViewPythonDoc
           config/quick-start.rst
           config/conf.py.in)
 
+add_dependencies(ParaViewPythonDoc ParaViewWWW)
 add_dependencies(ParaViewDoc ParaViewPythonDoc)

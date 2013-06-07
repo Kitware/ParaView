@@ -62,6 +62,7 @@ add_custom_target(ParaViewWebDoc
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${docs_binary_dir} "${PARAVIEW_WWW_DIR}/js-doc"
 )
 
+add_dependencies(ParaViewWebDoc ParaViewWWW)
 add_dependencies(ParaViewDoc ParaViewWebDoc)
 
 set_directory_properties(PROPERTIES
