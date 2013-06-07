@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "pqColorDialog.h"
 
 #include <QWidget>
 #include <QAction>
@@ -56,7 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QRegExp>
 #include <QApplication>
-#include <QColorDialog>
 
 namespace
 {
@@ -534,7 +534,9 @@ void pqPipelineContextMenuBehavior::setBlockColor()
   pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if (panel)
     {
-    QColor color = QColorDialog::getColor(Qt::gray);
+    pqColorDialog dialog;
+    dialog.exec();
+    QColor color = dialog.selectedColor();
     if(color.isValid())
       {
       panel->setBlockColor(this->PickedBlocks, color);

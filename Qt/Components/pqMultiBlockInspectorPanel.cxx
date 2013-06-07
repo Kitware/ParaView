@@ -34,13 +34,13 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMDoubleMapProperty.h"
 #include "vtkSMDoubleMapPropertyIterator.h"
+#include "pqColorDialog.h"
 
 #include <QMenu>
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QColorDialog>
 #include <QIcon>
 #include <QPixmap>
 #include <QPainter>
@@ -789,7 +789,9 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(const QPoi
     }
   else if(action == setColorAction)
     {
-    QColor color = QColorDialog::getColor(Qt::gray, this);
+    pqColorDialog dialog(this);
+    dialog.chooseColor();
+    QColor color = dialog.chosenColor();
     if(color.isValid())
       {
       foreach(QTreeWidgetItem *item, items)

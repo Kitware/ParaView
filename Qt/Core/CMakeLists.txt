@@ -53,6 +53,10 @@ set(Module_SRCS
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.cxx
   pqColorButtonEventTranslator.h
+  pqColorDialogEventPlayer.cxx
+  pqColorDialogEventPlayer.h
+  pqColorDialogEventTranslator.cxx
+  pqColorDialogEventTranslator.h
   pqComparativeContextView.cxx
   pqComparativeContextView.h
   pqComparativeRenderView.cxx
@@ -256,6 +260,8 @@ set (Module_MOC_HDRS
   pqCollaborationManager.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
+  pqColorDialogEventPlayer.h
+  pqColorDialogEventTranslator.h
   pqComparativeContextView.h
   pqComparativeRenderView.h
   pqComparativeXYBarChartView.h
