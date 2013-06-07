@@ -975,7 +975,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
     "vtkLiveInsituLink::OnSimulationPostProcess: " << time);
 
   // Obtains extracts from the simulations processes.
-  this->ExtractsDeliveryHelper->Update();
+  bool dataAvailable = this->ExtractsDeliveryHelper->Update();
 
   // Retreive the vtkPVDataInformations
   std::map<std::pair<vtkTypeUInt32,unsigned int>,std::string> dataInformationToSend;
@@ -1009,7 +1009,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
     }
 
   // notify the client that updated data is available.
-  if (this->VisualizationSession)
+  if (this->VisualizationSession && dataAvailable)
     {
     assert (myId == 0);
 

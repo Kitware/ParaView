@@ -59,7 +59,9 @@ public:
 
   void AddExtractProducer(const char* key, vtkAlgorithmOutput* producerPort);
 
-  void Update();
+  // Description:
+  // Returns true if the data has been made available.
+  bool Update();
 
   vtkSetMacro(NumberOfVisualizationProcesses, int);
   vtkGetMacro(NumberOfVisualizationProcesses, int);
@@ -77,7 +79,11 @@ protected:
   int NumberOfSimulationProcesses;
   int NumberOfVisualizationProcesses;
 
-  typedef std::map<std::string, vtkSmartPointer<vtkTrivialProducer> >
+  // the bool is to keep track of whether the trivial producer has had
+  // its output set yet. we don't want to update the pipeline until
+  // it gets its output.
+  typedef std::map<std::string,
+    std::pair<vtkSmartPointer<vtkTrivialProducer>,bool> >
     ExtractConsumersType;
   ExtractConsumersType ExtractConsumers;
 
