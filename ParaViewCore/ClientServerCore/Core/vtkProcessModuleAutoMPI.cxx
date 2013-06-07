@@ -539,7 +539,7 @@ int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const c
     }
   if(foundWaiting)
     {
-    cerr << "AutoMPI: " << name << " sucessfully started.\n";
+    cerr << "AutoMPI: " << name << " successfully started.\n";
     return 1;
     }
   else
