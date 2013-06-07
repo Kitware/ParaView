@@ -758,10 +758,7 @@ void vtkPVSynchronizedRenderWindows::UpdateRendererDrawStates(unsigned int id)
   renderers->InitTraversal();
   while (vtkRenderer* ren = renderers->GetNextItem())
     {
-    if (ren->GetErase() != 0)
-      {
-      ren->DrawOff();
-      }
+    ren->DrawOff();
     }
 
   vtkInternals::VectorOfRenderers::iterator iterRen;
