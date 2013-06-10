@@ -124,6 +124,9 @@ public:
   bool m_SymmetricMoves;
 
   QString m_HandleToolTip;
+
+private:
+  ctkRangeSliderPrivate & operator=(const ctkRangeSliderPrivate &);
 };
 
 // --------------------------------------------------------------------------
@@ -343,8 +346,8 @@ void ctkRangeSliderPrivate::drawMaximumSlider( QStylePainter* painter ) const
 }
 
 // --------------------------------------------------------------------------
-ctkRangeSlider::ctkRangeSlider(QWidget* parent)
-  : QSlider(parent)
+ctkRangeSlider::ctkRangeSlider(QWidget* _parent)
+  : QSlider(_parent)
   , d_ptr(new ctkRangeSliderPrivate(*this))
 {
   Q_D(ctkRangeSlider);
@@ -362,8 +365,8 @@ ctkRangeSlider::ctkRangeSlider( Qt::Orientation o,
 }
 
 // --------------------------------------------------------------------------
-ctkRangeSlider::ctkRangeSlider(ctkRangeSliderPrivate* impl, QWidget* parent)
-  : QSlider(parent)
+ctkRangeSlider::ctkRangeSlider(ctkRangeSliderPrivate* impl, QWidget* _parent)
+  : QSlider(_parent)
   , d_ptr(impl)
 {
   Q_D(ctkRangeSlider);
@@ -417,22 +420,22 @@ void ctkRangeSlider::setMaximumValue( int max )
 void ctkRangeSlider::setValues(int l, int u)
 {
   Q_D(ctkRangeSlider);
-  const int minimumValue = 
+  const int minValue = 
     qBound(this->minimum(), qMin(l,u), this->maximum());
-  const int maximumValue = 
+  const int maxValue = 
     qBound(this->minimum(), qMax(l,u), this->maximum());
-  bool emitMinValChanged = (minimumValue != d->m_MinimumValue);
-  bool emitMaxValChanged = (maximumValue != d->m_MaximumValue);
+  bool emitMinValChanged = (minValue != d->m_MinimumValue);
+  bool emitMaxValChanged = (maxValue != d->m_MaximumValue);
   
-  d->m_MinimumValue = minimumValue;
-  d->m_MaximumValue = maximumValue;
+  d->m_MinimumValue = minValue;
+  d->m_MaximumValue = maxValue;
   
   bool emitMinPosChanged = 
-    (minimumValue != d->m_MinimumPosition);
+    (minValue != d->m_MinimumPosition);
   bool emitMaxPosChanged = 
-    (maximumValue != d->m_MaximumPosition);
-  d->m_MinimumPosition = minimumValue;
-  d->m_MaximumPosition = maximumValue;
+    (maxValue != d->m_MaximumPosition);
+  d->m_MinimumPosition = minValue;
+  d->m_MaximumPosition = maxValue;
   
   if (isSliderDown())
     {
@@ -558,10 +561,10 @@ bool ctkRangeSlider::symmetricMoves()const
 }
 
 // --------------------------------------------------------------------------
-void ctkRangeSlider::onRangeChanged(int minimum, int maximum)
+void ctkRangeSlider::onRangeChanged(int _minimum, int _maximum)
 {
-  Q_UNUSED(minimum);
-  Q_UNUSED(maximum);
+  Q_UNUSED(_minimum);
+  Q_UNUSED(_maximum);
   Q_D(ctkRangeSlider);
   this->setValues(d->m_MinimumValue, d->m_MaximumValue);
 }

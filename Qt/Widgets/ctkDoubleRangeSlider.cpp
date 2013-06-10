@@ -92,6 +92,9 @@ public:
   double SingleStep;
   double MinValue;
   double MaxValue;
+
+private:
+  ctkDoubleRangeSliderPrivate & operator=(const ctkDoubleRangeSliderPrivate &);
 };
 
 // --------------------------------------------------------------------------
@@ -670,19 +673,19 @@ ctkRangeSlider* ctkDoubleRangeSlider::slider()const
 }
 
 // --------------------------------------------------------------------------
-void ctkDoubleRangeSlider::setSlider(ctkRangeSlider* slider)
+void ctkDoubleRangeSlider::setSlider(ctkRangeSlider* newslider)
 {
   Q_D(ctkDoubleRangeSlider);
-  slider->setOrientation(d->Slider->orientation());
-  slider->setMinimum(d->Slider->minimum());
-  slider->setMaximum(d->Slider->maximum());
-  slider->setValues(d->Slider->minimumValue(), d->Slider->maximumValue());
-  slider->setSingleStep(d->Slider->singleStep());
-  slider->setTracking(d->Slider->hasTracking());
-  slider->setTickInterval(d->Slider->tickInterval());
-  slider->setTickPosition(d->Slider->tickPosition());
+  newslider->setOrientation(d->Slider->orientation());
+  newslider->setMinimum(d->Slider->minimum());
+  newslider->setMaximum(d->Slider->maximum());
+  newslider->setValues(d->Slider->minimumValue(), d->Slider->maximumValue());
+  newslider->setSingleStep(d->Slider->singleStep());
+  newslider->setTracking(d->Slider->hasTracking());
+  newslider->setTickInterval(d->Slider->tickInterval());
+  newslider->setTickPosition(d->Slider->tickPosition());
   delete d->Slider;
-  qobject_cast<QHBoxLayout*>(this->layout())->addWidget(slider);
-  d->Slider = slider;
+  qobject_cast<QHBoxLayout*>(this->layout())->addWidget(newslider);
+  d->Slider = newslider;
   d->connectSlider();
 }
