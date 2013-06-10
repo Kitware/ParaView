@@ -683,11 +683,11 @@ void ctkRangeSlider::mousePressEvent(QMouseEvent* mouseEvent)
   this->initStyleOption( &option );
 
   QRect handleRect;
-  ctkRangeSliderPrivate::Handle handle = d->handleAtPos(mouseEvent->pos(), handleRect);
+  ctkRangeSliderPrivate::Handle handle_ = d->handleAtPos(mouseEvent->pos(), handleRect);
 
-  if (handle != ctkRangeSliderPrivate::NoHandle)
+  if (handle_ != ctkRangeSliderPrivate::NoHandle)
     {
-    d->m_SubclassPosition = (handle == ctkRangeSliderPrivate::MinimumHandle)?
+    d->m_SubclassPosition = (handle_ == ctkRangeSliderPrivate::MinimumHandle)?
       d->m_MinimumPosition : d->m_MaximumPosition;
 
     // save the position of the mouse inside the handle for later
@@ -696,9 +696,9 @@ void ctkRangeSlider::mousePressEvent(QMouseEvent* mouseEvent)
 
     this->setSliderDown(true);
 
-    if (d->m_SelectedHandles != handle)
+    if (d->m_SelectedHandles != handle_)
       {
-      d->m_SelectedHandles = handle;
+      d->m_SelectedHandles = handle_;
       this->update(handleRect);
       }
     // Accept the mouseEvent

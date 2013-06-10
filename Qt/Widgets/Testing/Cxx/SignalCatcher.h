@@ -41,7 +41,7 @@ class SignalCatcher : public QObject
 Q_OBJECT
 
 public:
-  explicit SignalCatcher(QObject* parent = NULL) : QObject(parent)
+  explicit SignalCatcher(QObject* _parent = NULL) : QObject(_parent)
   {
   }
 
