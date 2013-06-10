@@ -350,6 +350,11 @@ void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
         if (line)
           {
           line->SetMarkerStyle(plotInfo.MarkerStyle);
+
+          // the vtkValidPointMask array is used by some filters (like plot
+          // over line) to indicate invalid points. this instructs the line
+          // plot to not render those points
+          line->SetValidPointMaskName("vtkValidPointMask");
           }
         plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
         plot->SetInputData(plotInfo.Tables[i],
