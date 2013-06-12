@@ -68,8 +68,14 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->Observer->AxesWidget = this;
   this->Renderer = vtkRenderer::New();
   this->Renderer->SetViewport(0.0, 0.0, 0.2, 0.2);
+
+  // Since Layer==1, the renderer is treated as transparent and
+  // vtkOpenGLRenderer::Clear() won't clear the color-buffer.
   this->Renderer->SetLayer(1);
-  this->Renderer->EraseOff();
+  // Leaving Erase==1 ensures that the depth buffer is cleared. This ensures
+  // that the orientation widget always stays on top of the rendered scene.
+  this->Renderer->EraseOn();
+
   this->Renderer->InteractiveOff();
   this->Priority = 0.55;
   this->AxesActor = vtkPVAxesActor::New();
