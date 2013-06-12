@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QLineEdit>
 #include <QMap>
+#include <QPushButton>
 #include <QSet>
 #include <QStringList>
 #include <QFileInfo>
@@ -252,6 +253,9 @@ pqFixStateFilenamesDialog::pqFixStateFilenamesDialog(
   Q_ASSERT(xml != 0);
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+
+  QPushButton* discardButton = this->Internals->buttonBox->button(QDialogButtonBox::Discard);
+  this->connect(discardButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   this->Internals->XMLRoot = xml;
 
