@@ -67,7 +67,7 @@ void vtkAnimationPlayer::Play()
 
   this->InvokeEvent(vtkCommand::StartEvent);
 
-  double starttime = this->AnimationScene->GetStartTime();
+  double starttime = this->AnimationScene->GetSceneTime();
   double endtime = this->AnimationScene->GetEndTime();
   double playbackWindow[2];
   this->AnimationScene->GetPlaybackTimeWindow(playbackWindow);
