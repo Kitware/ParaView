@@ -80,7 +80,8 @@ void vtkExtractsDeliveryHelper::AddExtractConsumer(
   assert (this->ProcessIsProducer == false);
   assert (key != NULL && consumer != NULL);
 
-  this->ExtractConsumers[key] = consumer;
+  this->ExtractConsumers[key] =
+    std::make_pair<vtkSmartPointer<vtkTrivialProducer>,bool>(consumer, false);
 }
 
 //----------------------------------------------------------------------------
@@ -152,8 +153,9 @@ vtkDataObject* vtkExtractsDeliveryHelper::Collect(
 }
 
 //----------------------------------------------------------------------------
-void vtkExtractsDeliveryHelper::Update()
+bool vtkExtractsDeliveryHelper::Update()
 {
+  bool retVal = true;
   if (this->ProcessIsProducer)
     {
 //    cout << "Push extracts for: " << endl;
@@ -240,7 +242,8 @@ void vtkExtractsDeliveryHelper::Update()
         iter = this->ExtractConsumers.find(key);
         if (iter != this->ExtractConsumers.end())
           {
-          iter->second->SetOutput(extract);
+          iter->second.first->SetOutput(extract);
+          iter->second.second = true;
           }
         else
           {
@@ -297,7 +300,8 @@ void vtkExtractsDeliveryHelper::Update()
             this->ParallelController->Broadcast(dObj, 0);
             }
 
-          iter->second->SetOutput(dObj);
+          iter->second.first->SetOutput(dObj);
+          iter->second.second = true;
           dObj->FastDelete();
           }
         else
@@ -310,7 +314,14 @@ void vtkExtractsDeliveryHelper::Update()
         data_types_stream >> key;
         }
       }
+    // figure out if we have all of the extracted data objects on the server
+    for(ExtractConsumersType::iterator iter=this->ExtractConsumers.begin();
+        iter!=this->ExtractConsumers.end();iter++)
+      {
+      retVal = retVal && iter->second.second;
+      }
     }
+  return retVal;
 }
 
 //----------------------------------------------------------------------------
