@@ -476,6 +476,9 @@ add_custom_command(
      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/www.stamp
      COMMAND ${CMAKE_COMMAND} -E make_directory "${PARAVIEW_WWW_DIR}")
 
+add_custom_target(ParaViewWWW ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/www.stamp)
+
 install(DIRECTORY "${PARAVIEW_WWW_DIR}"
     DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
     COMPONENT Runtime)

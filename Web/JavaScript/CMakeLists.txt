@@ -46,5 +46,6 @@ copy_files_recursive(${ext_source_dir}
   LABEL "Copying JavaScript files")
 
 add_custom_target(vtkParaViewWebJavaScript ALL DEPENDS
+  ParaViewWWW
   ${paraview_all_min_js}
   "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete")
