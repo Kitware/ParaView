@@ -105,8 +105,8 @@ def SetActiveConnection(connection=None, ns=None):
 # Views and Layout methods
 #==============================================================================
 
-def _create_view(view_xml_name):
-    "Creates and returns a 3D render view."
+def CreateView(view_xml_name):
+    "Creates and returns the specified proxy view based on its name/label."
     view = servermanager._create_view(view_xml_name)
     servermanager.ProxyManager().RegisterProxy("views", \
       "my_view%d" % _funcs_internals.view_counter, view)
@@ -129,49 +129,49 @@ def _create_view(view_xml_name):
 
 def CreateRenderView():
     """"Create standard 3D render view"""
-    return _create_view("RenderView")
+    return CreateView("RenderView")
 
 # -----------------------------------------------------------------------------
 
 def CreateXYPlotView():
     """Create XY plot Chart view"""
-    return _create_view("XYChartView")
+    return CreateView("XYChartView")
 
 # -----------------------------------------------------------------------------
 
 def CreateBarChartView():
     """"Create Bar Chart view"""
-    return _create_view("XYBarChartView")
+    return CreateView("XYBarChartView")
 
 # -----------------------------------------------------------------------------
 
 def CreateComparativeRenderView():
     """"Create Comparative view"""
-    return _create_view("ComparativeRenderView")
+    return CreateView("ComparativeRenderView")
 
 # -----------------------------------------------------------------------------
 
 def CreateComparativeXYPlotView():
     """"Create comparative XY plot Chart view"""
-    return _create_view("ComparativeXYPlotView")
+    return CreateView("ComparativeXYPlotView")
 
 # -----------------------------------------------------------------------------
 
 def CreateComparativeBarChartView():
     """"Create comparative Bar Chart view"""
-    return _create_view("ComparativeBarChartView")
+    return CreateView("ComparativeBarChartView")
 
 # -----------------------------------------------------------------------------
 
 def CreateParallelCoordinatesChartView():
     """"Create Parallele coordinate Chart view"""
-    return _create_view("ParallelCoordinatesChartView")
+    return CreateView("ParallelCoordinatesChartView")
 
 # -----------------------------------------------------------------------------
 
 def Create2DRenderView():
     """"Create the standard 3D render view with the 2D interaction mode turned ON"""
-    return _create_view("2DRenderView")
+    return CreateView("2DRenderView")
 
 # -----------------------------------------------------------------------------
 
