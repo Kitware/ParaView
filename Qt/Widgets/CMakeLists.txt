@@ -29,6 +29,10 @@
 #
 #==========================================================================
 set(Module_SRCS
+  ctkRangeSlider.h
+  ctkRangeSlider.cpp
+  ctkDoubleRangeSlider.h
+  ctkDoubleRangeSlider.cpp
   pqAnimationKeyFrame.cxx
   pqAnimationKeyFrame.h
   pqAnimationModel.cxx
@@ -123,6 +127,8 @@ set(Module_SRCS
 QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
 #  QtWidgetsPlugin.h
 
+  ctkRangeSlider.h
+  ctkDoubleRangeSlider.h
   pqAnimationKeyFrame.h
   pqAnimationModel.h
   pqAnimationTrack.h
