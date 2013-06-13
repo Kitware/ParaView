@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationEventPlayer.h"
 #include "pqColorButtonEventPlayer.h"
 #include "pqColorButtonEventTranslator.h"
+#include "pqColorDialogEventPlayer.h"
+#include "pqColorDialogEventTranslator.h"
 #include "pqConsoleWidgetEventPlayer.h"
 #include "pqConsoleWidgetEventTranslator.h"
 #include "pqFileDialogEventPlayer.h"
@@ -128,6 +130,8 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
   this->eventTranslator()->addWidgetEventTranslator(
        new pqColorButtonEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(
+       new pqColorDialogEventTranslator(this));
+  this->eventTranslator()->addWidgetEventTranslator(
        new pqConsoleWidgetEventTranslator(this));
 
   this->eventPlayer()->addWidgetEventPlayer(
@@ -138,6 +142,8 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqFlatTreeViewEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
        new pqColorButtonEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(
+       new pqColorDialogEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
       new pqCollaborationEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(

@@ -53,6 +53,8 @@ set(Module_SRCS
   pqCollapsedGroup.h
   pqColorChooserButton.cxx
   pqColorChooserButton.h
+  pqColorDialog.cxx
+  pqColorDialog.h
   pqColorTableDelegate.cxx
   pqColorTableDelegate.h
   pqColorTableModel.cxx
@@ -139,6 +141,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqCheckBoxPixMaps.h
   pqCollapsedGroup.h
   pqColorChooserButton.h
+  pqColorDialog.h
   pqColorTableModel.h
   pqConsoleWidgetEventPlayer.h
   pqConsoleWidgetEventTranslator.h
