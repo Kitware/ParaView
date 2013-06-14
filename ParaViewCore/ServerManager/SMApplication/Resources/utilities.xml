@@ -735,10 +735,9 @@
                          name="Mode"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Interpolate Camera"
-                 value="0" />
-          <Entry text="Path-based"
-                 value="1" />
+          <Entry text="Interpolate Camera" value="0" />
+          <Entry text="Path-based" value="1" />
+          <Entry text="Follow-data" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
       <ProxyProperty command="AddKeyFrame"
@@ -751,7 +750,12 @@
       </ProxyProperty>
       <IntVectorProperty command="GetLastAddedKeyFrameIndex"
                          information_only="1"
-                         name="LastAddedKeyFrameIndex"></IntVectorProperty>
+                         name="LastAddedKeyFrameIndex">
+      </IntVectorProperty>
+      <ProxyProperty name="DataSource"
+                     argument_type="SMProxy"
+                     command="SetDataSourceProxy">
+      </ProxyProperty>
       <!-- End of CameraAnimationCue -->
     </Proxy>
     <Proxy base_proxygroup="animation"

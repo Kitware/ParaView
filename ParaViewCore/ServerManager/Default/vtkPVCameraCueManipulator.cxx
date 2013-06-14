@@ -20,6 +20,10 @@
 #include "vtkPVCameraAnimationCue.h"
 #include "vtkPVCameraKeyFrame.h"
 #include "vtkPVRenderView.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkPVDataInformation.h"
+#include "vtkVector.h"
+#include "vtkVectorOperators.h"
 
 vtkStandardNewMacro(vtkPVCameraCueManipulator);
 //------------------------------------------------------------------------------
@@ -27,6 +31,7 @@ vtkPVCameraCueManipulator::vtkPVCameraCueManipulator()
 {
   this->Mode = PATH;
   this->CameraInterpolator = vtkCameraInterpolator::New();
+  this->DataSourceProxy = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -48,9 +53,10 @@ void vtkPVCameraCueManipulator::Initialize(vtkPVAnimationCue* cue)
     return;
     }
 
-  if (this->Mode == PATH)
+  if (this->Mode == PATH || this->Mode == FOLLOW_DATA)
     {
-    // No need to initialize this->CameraInterpolator in PATH mode.
+    // No need to initialize this->CameraInterpolator in PATH or
+    // FOLLOW_DATA mode
     return;
     }
 
@@ -109,9 +115,54 @@ void vtkPVCameraCueManipulator::UpdateValue(double currenttime,
 
     cameraCue->GetView()->ResetCameraClippingRange();
     }
+  else if(this->Mode == FOLLOW_DATA)
+    {
+    vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(this->DataSourceProxy);
+    if (proxy)
+      {
+      // update pipeline
+      proxy->UpdatePipeline();
+
+      // get the data bounds
+      vtkPVDataInformation *info = proxy->GetDataInformation();
+      double bounds[6];
+      info->GetBounds(bounds);
+
+      // calculate the center of the data
+      vtkVector3d center((bounds[0] + bounds[1]) * 0.5,
+                         (bounds[2] + bounds[3]) * 0.5,
+                         (bounds[4] + bounds[5]) * 0.5);
+
+      // move the camera's position and focal point based on
+      // the data's position at the current time
+      vtkVector3d position;
+      cameraCue->GetCamera()->GetPosition(&position[0]);
+
+      vtkVector3d focalPoint;
+      cameraCue->GetCamera()->GetFocalPoint(&focalPoint[0]);
+
+      cameraCue->GetCamera()->SetFocalPoint(&center[0]);
+
+      position = center + (position - focalPoint);
+      cameraCue->GetCamera()->SetPosition(&position[0]);
+      }
+    else
+      {
+      vtkWarningMacro("No Data Source for Follow-Data Animation");
+      }
+    }
   else
     {
     this->Superclass::UpdateValue(currenttime, cue);
+    }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVCameraCueManipulator::SetDataSourceProxy(vtkSMProxy *dataSourceProxy)
+{
+  if(dataSourceProxy != this->DataSourceProxy)
+    {
+    this->DataSourceProxy = dataSourceProxy;
     }
 }
 

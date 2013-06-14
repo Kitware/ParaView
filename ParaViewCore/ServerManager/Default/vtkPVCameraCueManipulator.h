@@ -25,12 +25,13 @@
 #ifndef __vtkPVCameraCueManipulator_h
 #define __vtkPVCameraCueManipulator_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkPVKeyFrameCueManipulator.h"
 
 class vtkCameraInterpolator;
+class vtkSMProxy;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCameraCueManipulator : public vtkPVKeyFrameCueManipulator
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVCameraCueManipulator : public vtkPVKeyFrameCueManipulator
 {
 public:
   static vtkPVCameraCueManipulator* New();
@@ -41,12 +42,13 @@ public:
   enum Modes
     {
     CAMERA,
-    PATH
+    PATH,
+    FOLLOW_DATA
     };
   //ETX
 
   // Description:
-  // This manipulator has two modes:
+  // This manipulator has three modes:
   // \li CAMERA - the traditional mode using vtkCameraInterpolator where camera
   // values are directly interpolated.
   // \li PATH - the easy-to-use path  based interpolation where the camera
@@ -54,8 +56,15 @@ public:
   // We may eventually deprecate CAMERA mode since it may run out of usability
   // as PATH mode matures. So the code precariously meanders between the two
   // right now, but deprecating the old should help clean that up.
-  vtkSetClampMacro(Mode, int, CAMERA, PATH);
+  // \li FOLLOW_DATA - the camera will follow the data set with the
+  // SetDataSourceProxy() method.
+  vtkSetClampMacro(Mode, int, CAMERA, FOLLOW_DATA);
   vtkGetMacro(Mode, int);
+
+  // Description:
+  // Set the data soruce proxy. This is used when in the FOLLOW_DATA mode. The
+  // camera will track the data refered to by the data source proxy.
+  void SetDataSourceProxy(vtkSMProxy *dataSourceProxy);
 
 protected:
   vtkPVCameraCueManipulator();
@@ -72,6 +81,7 @@ protected:
                            vtkPVAnimationCue* cueproxy);
 
   vtkCameraInterpolator* CameraInterpolator;
+  vtkSMProxy* DataSourceProxy;
 private:
   vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&); // Not implemented.
   void operator=(const vtkPVCameraCueManipulator&); // Not implemented.

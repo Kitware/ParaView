@@ -57,6 +57,13 @@ void vtkPVCameraAnimationCue::EndUpdateAnimationValues()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCameraAnimationCue::SetDataSourceProxy(vtkSMProxy *dataSourceProxy)
+{
+  vtkPVCameraCueManipulator::SafeDownCast(this->Manipulator)->
+    SetDataSourceProxy(dataSourceProxy);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCameraAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

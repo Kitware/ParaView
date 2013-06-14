@@ -54,9 +54,6 @@ set (Module_SRCS
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
   vtkPVCacheSizeInformation.cxx
-  vtkPVCameraAnimationCue.cxx
-  vtkPVCameraCueManipulator.cxx
-  vtkPVCameraKeyFrame.cxx
   vtkPVClientServerSynchronizedRenderers.cxx
   vtkPVCompositeRepresentation.cxx
   vtkPVContextView.cxx

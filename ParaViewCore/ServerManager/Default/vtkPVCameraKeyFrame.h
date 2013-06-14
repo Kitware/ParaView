@@ -20,14 +20,14 @@
 #ifndef __vtkPVCameraKeyFrame_h
 #define __vtkPVCameraKeyFrame_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkPVKeyFrame.h"
 
 class vtkCamera;
 class vtkCameraInterpolator2;
 class vtkPVAnimationCue;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCameraKeyFrame : public vtkPVKeyFrame
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVCameraKeyFrame : public vtkPVKeyFrame
 {
 public:
   static vtkPVCameraKeyFrame* New();

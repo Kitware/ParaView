@@ -20,14 +20,15 @@
 #ifndef __vtkPVCameraAnimationCue_h
 #define __vtkPVCameraAnimationCue_h
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkPVKeyFrameAnimationCue.h"
 
 class vtkCamera;
 class vtkPVCameraCueManipulator;
 class vtkPVRenderView;
+class vtkSMProxy;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCameraAnimationCue : public vtkPVKeyFrameAnimationCue
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVCameraAnimationCue : public vtkPVKeyFrameAnimationCue
 {
 public:
   static vtkPVCameraAnimationCue* New();
@@ -50,12 +51,15 @@ public:
   virtual void BeginUpdateAnimationValues() {}
   virtual void SetAnimationValue(int, double){}
   virtual void EndUpdateAnimationValues();
+
+  void SetDataSourceProxy(vtkSMProxy *dataSourceProxy);
 //BTX
 protected:
   vtkPVCameraAnimationCue();
   ~vtkPVCameraAnimationCue();
 
   vtkPVRenderView* View;
+  vtkSMProxy* DataSourceProxy;
 private:
   vtkPVCameraAnimationCue(const vtkPVCameraAnimationCue&); // Not implemented
   void operator=(const vtkPVCameraAnimationCue&); // Not implemented
