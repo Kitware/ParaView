@@ -61,8 +61,16 @@ void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime,
 }
 
 //----------------------------------------------------------------------------
-double vtkSequenceAnimationPlayer::GetNextTime(double vtkNotUsed(curtime))
-{ 
+double vtkSequenceAnimationPlayer::GetNextTime(double curtime)
+{
+  if(this->FrameNo == 0 && curtime > this->StartTime)
+    {
+    // Invalid Frame No, compute it correctly
+    this->FrameNo = static_cast<int>( (curtime - this->StartTime) *
+                                      (this->NumberOfFrames - 1) / 
+                                      (this->EndTime - this->StartTime) + 0.5
+                                    ) + 1;
+    }
   this->FrameNo++;
   if (this->StartTime >= this->EndTime && this->FrameNo >= this->MaxFrameWindow)
     {
