@@ -474,7 +474,8 @@ list (APPEND PARAVIEW_MODULE_ROOTS
 add_custom_target(ParaViewDoc)
 add_custom_command(
      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/www.stamp
-     COMMAND ${CMAKE_COMMAND} -E make_directory "${PARAVIEW_WWW_DIR}")
+     COMMAND ${CMAKE_COMMAND} -E make_directory "${PARAVIEW_WWW_DIR}"
+     COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_CURRENT_BINARY_DIR}/www.stamp")
 
 add_custom_target(ParaViewWWW ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/www.stamp)
