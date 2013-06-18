@@ -24,8 +24,6 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkStdString.h" // for vtkStdString
 
-class vtkPVScalarBarActor;
-
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGL2PSExporter
     : public vtkGL2PSExporter
 {
@@ -55,9 +53,6 @@ protected:
   ~vtkPVGL2PSExporter();
 
   void WriteData();
-  void HandleSpecialProp(vtkProp *prop, vtkRenderer *ren);
-
-  void DrawPVScalarBarActor(vtkPVScalarBarActor *actor, vtkRenderer *ren);
 
   vtkStdString FileName;
   int ExcludeCubeAxesActorsFromRasterization;

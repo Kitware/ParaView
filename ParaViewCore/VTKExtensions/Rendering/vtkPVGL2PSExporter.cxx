@@ -20,7 +20,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkProp3DCollection.h"
 #include "vtkPropCollection.h"
-#include "vtkPVScalarBarActor.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
@@ -127,34 +126,6 @@ void vtkPVGL2PSExporter::WriteData()
     vtkErrorMacro("Cannot rename exported graphics file.");
     return;
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGL2PSExporter::HandleSpecialProp(vtkProp *prop, vtkRenderer *ren)
-{
-  if (vtkPVScalarBarActor *actor =
-      vtkPVScalarBarActor::SafeDownCast(prop))
-    {
-    this->DrawPVScalarBarActor(actor, ren);
-    return;
-    }
-
-  this->Superclass::HandleSpecialProp(prop, ren);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGL2PSExporter::DrawPVScalarBarActor(vtkPVScalarBarActor *actor,
-                                              vtkRenderer *ren)
-{
-  // Render the ticks
-  int drawColorBarOrig(actor->GetDrawColorBar());
-  actor->SetDrawColorBar(0);
-  actor->RenderOpaqueGeometry(ren);
-  actor->RenderOverlay(ren);
-  actor->SetDrawColorBar(drawColorBarOrig);
-  int rect[4];
-  actor->GetScalarBarRect(rect, ren);
-  this->CopyPixels(rect, ren);
 }
 
 //----------------------------------------------------------------------------
