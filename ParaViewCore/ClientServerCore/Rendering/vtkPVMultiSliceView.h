@@ -145,11 +145,17 @@ public:
   void SetSliceNormal(int sliceIndex, double x, double y, double z);
   double* GetSliceNormal(int sliceIndex) const;
 
+  // Description:
+  // Show/hide the bounding box outline
+  vtkSetMacro(ShowOutline, int);
+  vtkGetMacro(ShowOutline, int);
+
 //BTX
 protected:
   vtkPVMultiSliceView();
   ~vtkPVMultiSliceView();
 
+  int ShowOutline;
 private:
   vtkPVMultiSliceView(const vtkPVMultiSliceView&); // Not implemented
   void operator=(const vtkPVMultiSliceView&); // Not implemented

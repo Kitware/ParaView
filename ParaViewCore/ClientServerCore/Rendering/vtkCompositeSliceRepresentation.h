@@ -23,6 +23,7 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVCompositeRepresentation.h"
+#include "vtkWeakPointer.h"
 
 class vtkOutlineRepresentation;
 class vtkSliceFriendGeometryRepresentation;
@@ -104,6 +105,8 @@ protected:
 
   void ModifiedInternalCallback(vtkObject* src, unsigned long event, void* data);
   void UpdateSliceConfigurationCallBack(vtkObject* src, unsigned long event, void* data);
+  // Update Show flag for Outline
+  void UpdateFromViewConfigurationCallBack(vtkObject* view, unsigned long event, void* data);
 
   unsigned long ViewObserverId;
   bool OutlineVisibility;

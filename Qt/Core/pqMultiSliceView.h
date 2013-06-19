@@ -61,6 +61,10 @@ public:
   /// Override for custom management
   virtual void setCursor(const QCursor &);
 
+  /// Update Outline visibility
+  bool getOutlineVisibility();
+  void setOutlineVisibility(bool visible);
+
 signals:
   void slicesChanged();
   void sliceClicked(int axisIndex, double sliceOffsetOnAxis, int button, int modifier);

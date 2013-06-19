@@ -39,6 +39,8 @@ set (Module_SRCS
   pqAboutDialog.h
   pqActionGroupInterface.cxx
   pqActionGroupInterface.h
+  pqActiveMultiSliceViewOptions.cxx
+  pqActiveMultiSliceViewOptions.h
   pqActiveObjects.cxx
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.cxx
@@ -226,6 +228,8 @@ set (Module_SRCS
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorPanel.cxx
   pqMultiBlockInspectorPanel.h
+  pqMultiSliceViewOptions.cxx
+  pqMultiSliceViewOptions.h
   pqMultiViewWidget.cxx
   pqMultiViewWidget.h
   pqNamedObjectPanel.cxx
@@ -430,6 +434,7 @@ set (Module_MOC_HDRS
   pq3DWidget.h
   pq3DWidgetPropertyWidget.h
   pqAboutDialog.h
+  pqActiveMultiSliceViewOptions.h
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.h
   pqActiveRenderViewOptions.h
@@ -516,6 +521,7 @@ set (Module_MOC_HDRS
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorPanel.h
+  pqMultiSliceViewOptions.h
   pqMultiViewWidget.h
   pqNamedObjectPanel.h
   pqNetCDFPanel.h
@@ -656,6 +662,7 @@ set (Module_UI_FILES
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMemoryInspectorPanelForm.ui
+  Resources/UI/pqMultiSliceViewOptions.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui

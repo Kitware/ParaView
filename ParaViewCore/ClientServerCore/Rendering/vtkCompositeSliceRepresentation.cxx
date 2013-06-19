@@ -165,6 +165,9 @@ bool vtkCompositeSliceRepresentation::AddToView(vtkView* view)
           vtkCommand::ConfigureEvent, this,
           &vtkCompositeSliceRepresentation::UpdateSliceConfigurationCallBack);
     this->UpdateSliceConfigurationCallBack(sliceView, 0, NULL);
+    this->ViewObserverId = sliceView->AddObserver(
+          vtkCommand::ModifiedEvent, this,
+          &vtkCompositeSliceRepresentation::UpdateFromViewConfigurationCallBack);
     }
   return this->Superclass::AddToView(view);
 }
@@ -367,6 +370,17 @@ void vtkCompositeSliceRepresentation::UpdateSliceConfigurationCallBack(vtkObject
 
   this->MarkModified();
 }
+
+//----------------------------------------------------------------------------
+void vtkCompositeSliceRepresentation::UpdateFromViewConfigurationCallBack(vtkObject* view, unsigned long, void*)
+{
+  vtkPVMultiSliceView* sliceView = vtkPVMultiSliceView::SafeDownCast(view);
+  if(sliceView)
+    {
+    this->SetOutlineVisibility(sliceView->GetShowOutline() != 0);
+    }
+}
+
 //----------------------------------------------------------------------------
 vtkDataObject* vtkCompositeSliceRepresentation::GetRenderedDataObject(int vtkNotUsed(port))
 {
