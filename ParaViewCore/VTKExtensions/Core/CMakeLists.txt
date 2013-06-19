@@ -34,6 +34,7 @@ set(Module_SRCS
   vtkCommunicationErrorCatcher.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeMultiProcessController.cxx
+  vtkDistributedTrivialProducer.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkPriorityHelper.cxx
   vtkPVAnimationCue.cxx
@@ -44,9 +45,9 @@ set(Module_SRCS
   vtkPVCueManipulator.cxx
   vtkPVExponentialKeyFrame.cxx
   vtkPVExtentTranslator.cxx
+  vtkPVKeyFrame.cxx
   vtkPVKeyFrameAnimationCue.cxx
   vtkPVKeyFrameCueManipulator.cxx
-  vtkPVKeyFrame.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVRampKeyFrame.cxx
