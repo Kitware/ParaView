@@ -20,9 +20,10 @@ endif()
 
 # Tests with data
 if (PARAVIEW_DATA_ROOT)
+  # TODO: update these to use the new external data
   # Use the testing object factory, to reduce boilerplate code in tests.
-  include(vtkTestingObjectFactory)
-  vtk_module_test_executable(${vtk-module}CxxTests ${Tests})
+  #include(vtkTestingObjectFactory)
+  #vtk_module_test_executable(${vtk-module}CxxTests ${Tests})
 
   set(TestsToRun ${Tests})
   remove(TestsToRun CxxTests.cxx)
