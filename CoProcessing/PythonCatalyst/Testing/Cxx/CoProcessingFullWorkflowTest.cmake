@@ -30,6 +30,7 @@ endif()
 
 execute_process_with_echo(COMMAND
     ${PARAVIEW_EXECUTABLE} -dr
+    --test-plugin=CoProcessingPlugin
     --test-directory=${COPROCESSING_TEST_DIR}
     --test-script=${PARAVIEW_TEST_XML}
     --exit
