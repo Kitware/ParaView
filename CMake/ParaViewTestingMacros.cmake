@@ -113,6 +113,7 @@ FUNCTION (add_client_server_tests prefix)
 ENDFUNCTION (add_client_server_tests)
 
 FUNCTION (add_client_render_server_tests prefix)
+  PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
   add_pv_test(${prefix} "_DISABLE_CRS"
     COMMAND
        --data-server $<TARGET_FILE:pvdataserver>
