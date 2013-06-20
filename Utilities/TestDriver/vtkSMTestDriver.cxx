@@ -296,11 +296,6 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->SeparateArguments(argv[i+1], this->MPIServerPreFlags);
       fprintf(stderr, "Extras server preflags were specified: %s\n", argv[i+1]);
       }
-    if(strncmp(argv[i], "--server-postflags",18 ) == 0)
-      {
-      this->SeparateArguments(argv[i+1], this->MPIServerPostFlags);
-      fprintf(stderr, "Extras server postflags were specified: %s\n", argv[i+1]);
-      }
     if (strncmp(argv[i], "--allow-errors", strlen("--allow-errors"))==0)
       {
       this->AllowErrorInOutput = 1;
