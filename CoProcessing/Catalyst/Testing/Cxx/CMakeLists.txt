@@ -14,7 +14,7 @@ if (NOT PARAVIEW_USE_MPI)
   set_tests_properties(vtkPVCatalystCxx-CoProcessingTestOutputs
     PROPERTIES LABELS "PARAVIEW;CATALYST")
 else()
-  add_test_mpi(CoProcessingTestOutputs)
+  vtk_add_test_mpi(CoProcessingTestOutputs)
   set_tests_properties(vtkPVCatalystCxx-MPI-CoProcessingTestOutputs
     PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()
