@@ -29,6 +29,8 @@
 #
 #==========================================================================
 set(Module_SRCS
+  pqPythonDebugLeaksView.cxx
+  pqPythonDebugLeaksView.h
   pqPythonDialog.cxx
   pqPythonDialog.h
   pqPythonMacroSupervisor.cxx
@@ -42,6 +44,7 @@ set(Module_SRCS
 )
 
 set (Module_MOC_HDRS
+  pqPythonDebugLeaksView.h
   pqPythonDialog.h
   pqPythonMacroSupervisor.h
   pqPythonManager.h
