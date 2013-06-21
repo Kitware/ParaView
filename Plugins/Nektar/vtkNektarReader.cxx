@@ -927,7 +927,7 @@ void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructur
   register int i,j,k,n;
   int      qa,wss_qa,cnt;
   int      alloc_res;
-  int      ntot;
+  int      ntot = 0;
   double timer_diff;
 
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
@@ -1406,7 +1406,9 @@ void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructur
       if(!this->USE_MESH_ONLY)
         {
         if(this->Ubc == NULL)
+          {
           vtkDebugMacro(<< "updateVtuData: my_rank= " << my_rank<<": Want to call Calc_WSS(, but (this->Ubc == NULL");
+          }
         vtkDebugMacro(<< "updateVtuData: my_rank= " << my_rank<<": Lets call Calc_WSS()");
         // if WSS_all_vals is NULL, then we need to allocate it
         if(this->WSS_all_vals == NULL)
