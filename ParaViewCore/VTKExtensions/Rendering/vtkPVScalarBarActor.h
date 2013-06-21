@@ -66,12 +66,6 @@ public:
   virtual void ReleaseGraphicsResources(vtkWindow*);
 
   // Description:
-  // Fills rect with the dimensions of the scalar bar in viewport coordinates.
-  // Only the color bar is considered -- text labels are not considered.
-  // rect is {xmin, xmax, width, height}
-  virtual void GetScalarBarRect(int rect[4], vtkViewport* viewport);
-
-  // Description:
   // Draw the scalar bar and annotation text to the screen.
   virtual int RenderOverlay(vtkViewport* viewport);
 

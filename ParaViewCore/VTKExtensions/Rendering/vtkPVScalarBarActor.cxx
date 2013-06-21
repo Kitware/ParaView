@@ -120,21 +120,6 @@ void vtkPVScalarBarActor::ReleaseGraphicsResources(vtkWindow *window)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScalarBarActor::GetScalarBarRect(int rect[], vtkViewport *viewport)
-{
-  vtkCoordinate *origin = this->ScalarBarActor->GetPositionCoordinate();
-  int * vpPos = origin->GetComputedViewportValue(viewport);
-  rect[0] = vpPos[0];
-  rect[1] = vpPos[1];
-
-  double *bounds = this->ScalarBar->GetBounds();
-  rect[0] += static_cast<int>(bounds[0] + 0.5);
-  rect[1] += static_cast<int>(bounds[2] + 0.5);
-  rect[2] = static_cast<int>(bounds[1] - bounds[0] + 0.5);
-  rect[3] = static_cast<int>(bounds[3] - bounds[2] + 0.5);
-}
-
-//----------------------------------------------------------------------------
 int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
 {
   int renderedSomething = this->Superclass::RenderOverlay(viewport);
