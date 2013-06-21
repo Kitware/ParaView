@@ -19,7 +19,7 @@ ENDMACRO (process_args)
 SET (TEST_GROUP_SIZE 3)
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
-  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND" "" ${ARGN})
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND;LOAD_PLUGIN;PLUGIN_PATH" "" ${ARGN})
   while (ACT_TEST_SCRIPTS)
     set (counter 0)
     set (extra_args)
@@ -84,21 +84,28 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
 
 ENDFUNCTION (add_pv_test)
 
-
+# ----------------------------------------------------------------------------
+# Test functions
 FUNCTION (add_client_tests prefix)
+  PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
+
   add_pv_test(${prefix} "_DISABLE_C" 
     COMMAND --client ${CLIENT_EXECUTABLE}
             -dr
+            ${CLIENT_SERVER_ARGS}
             --disable-light-kit
             --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_tests)
 
 FUNCTION (add_client_server_tests prefix)
+  PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
   add_pv_test(${prefix} "_DISABLE_CS"
     COMMAND
        --server $<TARGET_FILE:pvserver>
+         ${CLIENT_SERVER_ARGS}
        --client ${CLIENT_EXECUTABLE}
+         ${CLIENT_SERVER_ARGS}
        -dr
        --disable-light-kit
        --test-directory=${PARAVIEW_TEST_DIR}
@@ -106,11 +113,15 @@ FUNCTION (add_client_server_tests prefix)
 ENDFUNCTION (add_client_server_tests)
 
 FUNCTION (add_client_render_server_tests prefix)
+  PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
   add_pv_test(${prefix} "_DISABLE_CRS"
     COMMAND
        --data-server $<TARGET_FILE:pvdataserver>
+            ${CLIENT_SERVER_ARGS}
        --render-server $<TARGET_FILE:pvrenderserver>
+            ${CLIENT_SERVER_ARGS}
        --client ${CLIENT_EXECUTABLE}
+            ${CLIENT_SERVER_ARGS}
        -dr
        --disable-light-kit
        --test-directory=${PARAVIEW_TEST_DIR}
@@ -187,8 +198,8 @@ FUNCTION(add_multi_server_tests prefix nbServers)
 ENDFUNCTION(add_multi_server_tests)
 
 FUNCTION (add_tile_display_tests prefix tdx tdy )
-  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
-
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;LOAD_PLUGIN;PLUGIN_PATH" "" ${ARGN})
+  PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
 
   MATH(EXPR REQUIRED_CPU '${tdx}*${tdy}-1') # -1 is for LESS
   if (${PARAVIEW_USE_MPI})
@@ -205,8 +216,9 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
             COMMAND smTestDriver
             --test-tiled ${tdx} ${tdy}
             --server $<TARGET_FILE:pvserver>
-
+            ${CLIENT_SERVER_ARGS}
             --client ${CLIENT_EXECUTABLE}
+            ${CLIENT_SERVER_ARGS}
             -dr
             --disable-light-kit
             --test-directory=${PARAVIEW_TEST_DIR}

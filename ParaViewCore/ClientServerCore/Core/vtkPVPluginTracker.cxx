@@ -92,6 +92,13 @@ namespace
     // On windows configuration files are in the parent directory
     paths_to_search.push_back(app_dir + "/../");
 
+    // Add test plugin path into the search path.
+    std::string test_plugin_dir ( options->GetTestPluginPath());
+    if ( !test_plugin_dir.empty() )
+      {
+      paths_to_search.push_back( test_plugin_dir );
+      }
+
     std::string name = plugin;
     std::string filename = name;
     if (add_extensions)

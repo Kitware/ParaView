@@ -66,6 +66,23 @@ MACRO(PV_PARSE_ARGUMENTS prefix arg_names option_names)
 ENDMACRO(PV_PARSE_ARGUMENTS)
 
 #----------------------------------------------------------------------------
+# Macro for extracting Plugin path and name from arguments
+#----------------------------------------------------------------------------
+MACRO(PV_EXTRACT_CLIENT_SERVER_ARGS)
+  set(options)
+  set(oneValueArgs LOAD_PLUGIN PLUGIN_PATH)
+  set(multiValueArgs )
+  cmake_parse_arguments(PV "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  set(CLIENT_SERVER_ARGS)
+  if(PV_PLUGIN_PATH)
+    set(CLIENT_SERVER_ARGS ${CLIENT_SERVER_ARGS} "--test-plugin-path=${PV_PLUGIN_PATH}")
+  endif()
+  if(PV_LOAD_PLUGIN)
+    set(CLIENT_SERVER_ARGS ${CLIENT_SERVER_ARGS} "--test-plugin=${PV_LOAD_PLUGIN}")
+  endif()
+ENDMACRO(PV_EXTRACT_CLIENT_SERVER_ARGS)
+
+#----------------------------------------------------------------------------
 # Macro for setting values if a user did not overwrite them
 #----------------------------------------------------------------------------
 MACRO(pv_set_if_not_set name value)

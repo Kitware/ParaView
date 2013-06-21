@@ -76,9 +76,11 @@ protected:
   std::string GetDirectory(std::string location);
 
 private:
-  struct ClientExecutableInfo
+  struct ExecutableInfo
     {
-    std::string ClientExecutable; //< fullpath to paraview executable
+    std::string Executable; //< fullpath to paraview executable
+    ProcessType Type;
+    std::string TypeName;
     int ArgStart;
     int ArgEnd;
     };
@@ -86,15 +88,13 @@ private:
   // Description:
   // These method setup the \c process appropriately i.e. set the command,
   // timeout etc.
-  bool SetupRenderServer(vtksysProcess* process);
-  bool SetupServer(vtksysProcess* process);
-  bool SetupClient(vtksysProcess* process, const ClientExecutableInfo& info,
-    char* argv[]);
+  bool SetupServer(vtksysProcess* process, const ExecutableInfo& info, char* argv[]);
+  bool SetupClient(vtksysProcess* process, const ExecutableInfo &info, char* argv[]);
 
-  std::vector<ClientExecutableInfo> ClientExecutables;
-  std::string ServerExecutable;  // fullpath to paraview server executable
-  std::string RenderServerExecutable;  // fullpath to paraview renderserver executable
-  std::string DataServerExecutable;  // fullpath to paraview dataserver executable
+  std::vector<ExecutableInfo> ClientExecutables;
+  ExecutableInfo ServerExecutable;  // fullpath to paraview server executable + args
+  ExecutableInfo RenderServerExecutable;  // fullpath to paraview renderserver executable + args
+  ExecutableInfo DataServerExecutable;  // fullpath to paraview dataserver executable + args
   std::string MPIRun;  // fullpath to mpirun executable
 
 

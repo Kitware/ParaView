@@ -46,6 +46,11 @@ vtkPVOptions::vtkPVOptions()
   this->ParaViewDataName = 0;
   this->StateFileName = 0;
 
+  this->TestPlugin = 0;
+  this->TestPluginPath = 0;
+  this->SetTestPlugin("");
+  this->SetTestPluginPath("");
+  
   this->TileDimensions[0] = 0;
   this->TileDimensions[1] = 0;
   this->TileMullions[0] = 0;
@@ -99,6 +104,8 @@ vtkPVOptions::~vtkPVOptions()
   this->SetStereoType(0);
   this->SetParaViewDataName(0);
   this->SetServerURL(0);
+  this->SetTestPlugin(0);
+  this->SetTestPluginPath(0);
 }
 
 //----------------------------------------------------------------------------
@@ -243,6 +250,15 @@ void vtkPVOptions::Initialize()
     &this->SatelliteMessageIds,
     "When specified, server side messages shown on client show rank of originating process",
     vtkPVOptions::PVSERVER);
+
+  this->AddArgument("--test-plugin", 0, &this->TestPlugin,
+                    "Specify the name of the plugin to load for testing",
+                    vtkPVOptions::ALLPROCESS);
+
+  this->AddArgument("--test-plugin-path", 0, &this->TestPluginPath,
+                    "Specify the path where more plugins can be found."
+                    "This is typically used when testing plugins.",
+                    vtkPVOptions::ALLPROCESS);
 
   this->AddBooleanArgument("--print-monitors", 0, &this->PrintMonitors,
                            "Print detected monitors and exit (windows only).");

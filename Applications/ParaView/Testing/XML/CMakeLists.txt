@@ -195,7 +195,7 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
     add_pv_test(pvcs "_DISABLE_CS"
       COMMAND
          --server $<TARGET_FILE:pvserver>
-         --server-postflags --enable-streaming
+         --enable-streaming
          --client ${CLIENT_EXECUTABLE}
          -dr
          --enable-streaming

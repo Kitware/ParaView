@@ -42,6 +42,19 @@ namespace
       }
     return false;
     }
+
+  int FindLastExecutableArg(int startArg, int maxArgs, char* argv[])
+  {
+    for(int i = startArg; i < maxArgs; ++i)
+      {
+      if(!strcmp(argv[i],"--data-server") || !strcmp(argv[i],"--render-server")
+         ||!strcmp(argv[i],"--client") || !strcmp(argv[i],"--server") )
+        {
+        return i;
+        }
+      }
+    return maxArgs;
+  }
 }
 
 // The main function as this class should only be used by this program
@@ -63,6 +76,14 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->TestRemoteRendering = 0;
   this->TestMultiClient = 0;
   this->NumberOfServers = 1;
+
+  // Setup process types
+  this->ServerExecutable.Type = SERVER;
+  this->ServerExecutable.TypeName = "server";
+  this->DataServerExecutable.Type = DATA_SERVER;
+  this->DataServerExecutable.TypeName = "server";
+  this->RenderServerExecutable.Type = RENDER_SERVER;
+  this->RenderServerExecutable.TypeName = "renderserver";
 }
 
 vtkSMTestDriver::~vtkSMTestDriver()
@@ -184,8 +205,8 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
     {
     if(strcmp(argv[i], "--client") == 0)
       {
-      ClientExecutableInfo info;
-      info.ClientExecutable = ::FixExecutablePath(argv[i+1]);
+      ExecutableInfo info;
+      info.Executable = ::FixExecutablePath(argv[i+1]);
       info.ArgStart = i+2;
       info.ArgEnd = argc;
       this->ClientExecutables.push_back(info);
@@ -193,7 +214,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
         {
         // if more than one client executable was specified, we truncate the
         // previous client's arguments processing at the "--client".
-        ClientExecutableInfo &prevInfo =
+        ExecutableInfo &prevInfo =
           this->ClientExecutables[this->ClientExecutables.size()-2];
         prevInfo.ArgEnd = i;
         }
@@ -206,19 +227,25 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
     if(strcmp(argv[i], "--render-server") == 0)
       {
       this->TestRenderServer = 1;
-      this->RenderServerExecutable = ::FixExecutablePath(argv[i+1]);
+      this->RenderServerExecutable.Executable = ::FixExecutablePath(argv[i+1]);
+      this->RenderServerExecutable.ArgStart = i+2;
+      this->RenderServerExecutable.ArgEnd = FindLastExecutableArg(i+2, argc, argv);
       fprintf(stderr, "Test Render Server.\n");
       }
     if (strcmp(argv[i], "--data-server") == 0)
       {
       this->TestServer = 1;
-      this->DataServerExecutable = ::FixExecutablePath(argv[i+1]);
+      this->DataServerExecutable.Executable = ::FixExecutablePath(argv[i+1]);
+      this->DataServerExecutable.ArgStart = i+2;
+      this->DataServerExecutable.ArgEnd = FindLastExecutableArg(i+2, argc, argv);
       fprintf(stderr, "Test Render Server.\n");
       }
     if(strcmp(argv[i], "--server") == 0)
       {
       this->TestServer = 1;
-      this->ServerExecutable = ::FixExecutablePath(argv[i+1]);
+      this->ServerExecutable.Executable = ::FixExecutablePath(argv[i+1]);
+      this->ServerExecutable.ArgStart = i+2;
+      this->ServerExecutable.ArgEnd = FindLastExecutableArg(i+2, argc, argv);
       fprintf(stderr, "Test Server.\n");
       }
     if(strcmp(argv[i], "--test-tiled") == 0)
@@ -268,11 +295,6 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       {
       this->SeparateArguments(argv[i+1], this->MPIServerPreFlags);
       fprintf(stderr, "Extras server preflags were specified: %s\n", argv[i+1]);
-      }
-    if(strncmp(argv[i], "--server-postflags",18 ) == 0)
-      {
-      this->SeparateArguments(argv[i+1], this->MPIServerPostFlags);
-      fprintf(stderr, "Extras server postflags were specified: %s\n", argv[i+1]);
       }
     if (strncmp(argv[i], "--allow-errors", strlen("--allow-errors"))==0)
       {
@@ -719,7 +741,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     // Now run the server
     if(!servers.empty())
       {
-      this->SetupServer(servers[0]);
+      this->SetupServer(servers[0], this->TestRenderServer ? this->DataServerExecutable : this->ServerExecutable, argv);
       if(!this->StartProcess(servers[0], "server"))
         {
         this->Stop(clients[0], "client");
@@ -731,7 +753,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     // Now run the render server
     if(!renderServers.empty())
       {
-      this->SetupRenderServer(renderServers[0]);
+      this->SetupServer(renderServers[0], this->RenderServerExecutable, argv);
       if(!this->StartProcess(renderServers[0], "renderserver"))
         {
         this->Stop(clients[0], "client");
@@ -751,7 +773,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       {
       vtksysProcess* renderServer = *iter;
       std::string rs_connection_info;
-      this->SetupRenderServer(renderServer);
+      this->SetupServer(renderServer, this->RenderServerExecutable, argv);
 
       vtksys_ios::ostringstream processName;
       processName << "renderserver " << rs_connection_infos.size();
@@ -776,7 +798,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       {
       vtksysProcess* server = *iter;
       std::string s_connection_info;
-      this->SetupServer(server);
+      this->SetupServer(server, this->TestRenderServer ? this->DataServerExecutable : this->ServerExecutable, argv);
 
       vtksys_ios::ostringstream processName;
       processName << (renderServers.empty() ? "server " : "dataserver ")
@@ -1239,46 +1261,20 @@ int vtkSMTestDriver::WaitForAndPrintLine(const char* pname, vtksysProcess* proce
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTestDriver::SetupRenderServer(vtksysProcess* renderServer)
-{
-  // Construct the render server process command line
-  if(renderServer)
-    {
-    std::vector<const char*> renderServerCommand;
-    this->CreateCommandLine(renderServerCommand,
-      this->RenderServerExecutable.c_str(),
-      RENDER_SERVER,
-      this->MPIRenderServerNumProcessFlag.c_str());
-    this->ReportCommand(&renderServerCommand[0], "renderserver");
-    vtksysProcess_SetCommand(renderServer, &renderServerCommand[0]);
-    vtksysProcess_SetWorkingDirectory(renderServer,
-      this->GetDirectory(this->RenderServerExecutable).c_str());
-    return true;
-    }
-  return false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMTestDriver::SetupServer(vtksysProcess* server)
+bool vtkSMTestDriver::SetupServer(vtksysProcess* server, const ExecutableInfo& info, char* argv[])
 {
   if (server)
     {
     std::vector<const char*> serverCommand;
-    const char* serverExe = this->ServerExecutable.c_str();
-    vtkSMTestDriver::ProcessType serverType = SERVER;
-    if(this->TestRenderServer)
-      {
-      serverExe = this->DataServerExecutable.c_str();
-      serverType = DATA_SERVER;
-      }
-
     this->CreateCommandLine(serverCommand,
-      serverExe,
-      serverType,
-      this->MPIServerNumProcessFlag.c_str());
-    this->ReportCommand(&serverCommand[0], "server");
+                            info.Executable.c_str(),
+                            info.Type,
+                            this->MPIServerNumProcessFlag.c_str(),
+                            info.ArgStart,
+                            info.ArgEnd, argv);
+    this->ReportCommand(&serverCommand[0], info.TypeName.c_str());
     vtksysProcess_SetCommand(server, &serverCommand[0]);
-    vtksysProcess_SetWorkingDirectory(server, this->GetDirectory(serverExe).c_str());
+    vtksysProcess_SetWorkingDirectory(server, this->GetDirectory(info.Executable).c_str());
     return true;
     }
   return false;
@@ -1286,13 +1282,13 @@ bool vtkSMTestDriver::SetupServer(vtksysProcess* server)
 
 //----------------------------------------------------------------------------
 bool vtkSMTestDriver::SetupClient(
-  vtksysProcess* process, const ClientExecutableInfo& info, char* argv[])
+  vtksysProcess* process, const ExecutableInfo& info, char* argv[])
 {
   if (process)
     {
     std::vector<const char*> clientCommand;
     this->CreateCommandLine(clientCommand,
-      info.ClientExecutable.c_str(),
+      info.Executable.c_str(),
       CLIENT,
       "",
       info.ArgStart, info.ArgEnd, argv);
@@ -1307,7 +1303,7 @@ bool vtkSMTestDriver::SetupClient(
     this->ReportCommand(&clientCommand[0], "client");
     vtksysProcess_SetCommand(process, &clientCommand[0]);
     vtksysProcess_SetWorkingDirectory(process, this->GetDirectory(
-        info.ClientExecutable.c_str()).c_str());
+        info.Executable.c_str()).c_str());
     return true;
     }
   return false;
