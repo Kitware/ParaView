@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalMapper>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <QFormLayout>
 #include <QtDebug>
 
 #include "pqActiveObjects.h"
@@ -110,6 +111,8 @@ public:
   pqAnimatablePropertiesComboBox* CreateProperty;
   QToolButton* LockEndTime;
   QToolButton* LockStartTime;
+  vtkSMProxy *SelectedCueProxy;
+  vtkSMProxy *SelectedDataProxy;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
@@ -677,6 +680,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     {
     this->Internal->Editor = 
       new pqPipelineTimeKeyFrameEditor(this->Internal->Scene, cue, NULL);
+    this->Internal->Editor->resize(600, 400);
     }
   else if (this->Internal->pythonCue(cue))
     {
@@ -695,31 +699,62 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     }
   else
     {
+    int mode = -1;
+    if(cue->getProxy()->GetProperty("Mode"))
+      {
+      mode = vtkSMPropertyHelper(cue->getProxy(), "Mode").GetAsInt();
+      }
+
     this->Internal->Editor = new QDialog;
     QVBoxLayout* l = new QVBoxLayout(this->Internal->Editor);
     QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok
                                                 | QDialogButtonBox::Cancel);
-    pqKeyFrameEditor* editor = new pqKeyFrameEditor(this->Internal->Scene, cue,
-                        QString("Editing ") + this->Internal->cueName(cue),
-                        this->Internal->Editor);
 
-    l->addWidget(editor);
-    l->addWidget(buttons);
-    
-    connect(buttons, SIGNAL(accepted()), 
+    // FOLLOW_DATA mode
+    if(mode == 2)
+      {
+      // show a combo-box allowing the user to select the data source to follow
+      QFormLayout *layout_ = new QFormLayout;
+      pqAnimatableProxyComboBox *comboBox =
+        new pqAnimatableProxyComboBox(this->Internal->Editor);
+      this->Internal->SelectedCueProxy = cue->getProxy();
+      comboBox->setCurrentIndex(
+        comboBox->findProxy(
+          vtkSMPropertyHelper(cue->getProxy(), "DataSource").GetAsProxy()
+        )
+      );
+      connect(comboBox, SIGNAL(currentProxyChanged(vtkSMProxy*)),
+              this, SLOT(selectedDataProxyChanged(vtkSMProxy*)));
+      connect(this->Internal->Editor, SIGNAL(accepted()),
+              this, SLOT(changeDataProxyDialogAccepted()));
+      layout_->addRow("Data Source to Follow:", comboBox);
+      l->addLayout(layout_);
+      this->Internal->Editor->setWindowTitle(tr("Select Data Source"));
+      }
+    else
+      {
+      pqKeyFrameEditor* editor = new pqKeyFrameEditor(this->Internal->Scene, cue,
+                          QString("Editing ") + this->Internal->cueName(cue),
+                          this->Internal->Editor);
+
+      l->addWidget(editor);
+
+      connect(this->Internal->Editor, SIGNAL(accepted()),
+              editor, SLOT(writeKeyFrameData()));
+      this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
+      this->Internal->Editor->resize(600, 400);
+      }
+
+    connect(buttons, SIGNAL(accepted()),
             this->Internal->Editor, SLOT(accept()));
-    connect(buttons, SIGNAL(rejected()), 
+    connect(buttons, SIGNAL(rejected()),
             this->Internal->Editor, SLOT(reject()));
-    connect(this->Internal->Editor, SIGNAL(accepted()), 
-            editor, SLOT(writeKeyFrameData()));
+    l->addWidget(buttons);
     }
-  
-  this->Internal->Editor->setWindowTitle(tr("Animation Keyframes"));
+
   this->Internal->Editor->setAttribute(Qt::WA_QuitOnClose, false);
   this->Internal->Editor->setAttribute(Qt::WA_DeleteOnClose);
-  
 
-  this->Internal->Editor->resize(600, 400);
   this->Internal->Editor->show();
 }
   
@@ -864,6 +899,8 @@ void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
     this->Internal->CreateProperty->addSMProperty(
       "Follow Path", "path", 0);
     this->Internal->CreateProperty->addSMProperty(
+      "Follow Data", "data", 0);
+    this->Internal->CreateProperty->addSMProperty(
       "Interpolate camera locations", "camera", 0);
     }
   else
@@ -949,6 +986,19 @@ void pqAnimationViewWidget::createTrack()
       pqSMAdaptor::setElementProperty(
         cue->getProxy()->GetProperty("Mode"), 1); // PATH-based animation.
       }
+    else if (mode == "data")
+      {
+      pqSMAdaptor::setElementProperty(
+        cue->getProxy()->GetProperty("Mode"), 2); // DATA-based animation.
+
+      // set the data source for the follow-data animation
+      pqPipelineSource *source = pqActiveObjects::instance().activeSource();
+      if(source)
+        {
+        pqSMAdaptor::setProxyProperty(
+          cue->getProxy()->GetProperty("DataSource"), source->getProxy());
+        }
+      }
     else
       {
       pqSMAdaptor::setElementProperty(
@@ -1007,4 +1057,29 @@ void pqAnimationViewWidget::onTimeLabelChanged()
   this->Internal->TimeLabel->setText(timeName);
   this->Internal->StartTimeLabel->setText(QString("Start %1:").arg(timeName));
   this->Internal->EndTimeLabel->setText(QString("End %1:").arg(timeName));
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::selectedDataProxyChanged(vtkSMProxy *proxy)
+{
+  this->Internal->SelectedDataProxy = proxy;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::changeDataProxyDialogAccepted()
+{
+  if(!this->Internal->SelectedCueProxy)
+    {
+    return;
+    }
+
+  // set the proxy property
+  vtkSMProxy *currentDataProxy =
+    vtkSMPropertyHelper(this->Internal->SelectedCueProxy, "DataSource").GetAsProxy();
+  if(this->Internal->SelectedDataProxy != currentDataProxy)
+    {
+    vtkSMPropertyHelper(this->Internal->SelectedCueProxy, "DataSource")
+      .Set(this->Internal->SelectedDataProxy);
+    this->Internal->SelectedCueProxy->UpdateVTKObjects();
+    }
 }

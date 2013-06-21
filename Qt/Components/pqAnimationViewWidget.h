@@ -106,6 +106,13 @@ protected slots:
   // update the time labels
   void onTimeLabelChanged();
 
+  // called when the user selects a proxy in the combo box
+  void selectedDataProxyChanged(vtkSMProxy*);
+
+  // called when the user accepts the change data proxy dialog
+  // when configuring the follow-data animation
+  void changeDataProxyDialogAccepted();
+
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.
   void operator=(const pqAnimationViewWidget&); // Not implemented.

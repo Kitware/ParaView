@@ -29,6 +29,9 @@
 #
 #==========================================================================
 set (Module_SRCS
+  vtkPVCameraAnimationCue.cxx
+  vtkPVCameraCueManipulator.cxx
+  vtkPVCameraKeyFrame.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
   vtkPVMultiServerDataSource.cxx
   vtkPVRepresentationAnimationHelper.cxx

@@ -26,9 +26,6 @@
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVCacheKeeperPipeline.h"
 #include "vtkPVCacheSizeInformation.h"
-#include "vtkPVCameraAnimationCue.h"
-#include "vtkPVCameraCueManipulator.h"
-#include "vtkPVCameraKeyFrame.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVCompositeDataInformation.h"
@@ -137,9 +134,6 @@ int main(int, char**)
   PRINT_SELF(vtkPVCacheKeeper);
   PRINT_SELF(vtkPVCacheKeeperPipeline);
   PRINT_SELF(vtkPVCacheSizeInformation);
-  PRINT_SELF(vtkPVCameraAnimationCue);
-  PRINT_SELF(vtkPVCameraCueManipulator);
-  PRINT_SELF(vtkPVCameraKeyFrame);
   PRINT_SELF(vtkPVClassNameInformation);
   PRINT_SELF(vtkPVClientServerSynchronizedRenderers);
   PRINT_SELF(vtkPVCompositeDataInformation);
