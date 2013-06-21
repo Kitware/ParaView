@@ -193,41 +193,55 @@ void vtkPythonProgrammableFilter::SetParameterInternal(const char *raw_name,
   this->Modified();
 }
 
+//----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
-                                               const int value)
+                                               int value)
 {
   std::ostringstream buf;
   buf << value;
   this->SetParameterInternal(raw_name, buf.str().c_str() );
 }
 
+//----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
-                                               const double value)
+                                               double value)
 {
   std::ostringstream buf;
   buf << value;
   this->SetParameterInternal(raw_name, buf.str().c_str() );
 }
 
+//----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
                                                const char *value)
 {
   std::ostringstream buf;
-  buf << value;
+  buf << "'" << value << "'";
   this->SetParameterInternal(raw_name, buf.str().c_str() );
 }
 
+//----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::SetParameter(
     const char *raw_name,
-    const double value1, 
-    const double value2,
-    const double value3)
+    double value1, 
+    double value2,
+    double value3)
 {
   std::ostringstream buf;
-  buf << value1 << value2 << value3;
+  buf << "[" << value1 << ", " << value2 << ", " << value3 << "]";
   this->SetParameterInternal(raw_name, buf.str().c_str() );
 }
 
+//----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::SetParameter(
+    const char *raw_name,
+    double value1,
+    double value2)
+{
+  std::ostringstream buf;
+  buf << "[" << value1 << ", " << value2 << "]";
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::ClearParameters()
@@ -281,6 +295,11 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
         }
       }
     }
+
+  // Remove the function if it already exists
+  std::string cleanupScript = "try: del " + std::string(funcname) + "\n"
+                              "except NameError: pass\n";
+  vtkPythonInterpreter::RunSimpleString(cleanupScript.c_str());
 
   // Construct a script that defines a function
   std::string fscript;

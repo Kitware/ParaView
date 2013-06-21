@@ -97,11 +97,7 @@ public:
   void editTrace();
 
   // Description:
-  // Show a file dialog in order to save the python trace into a file
-  void saveTrace();
-
-  // Description:
-  // Show a file dialog in order to save the python trace into a file
+  // Trace state and save the trace string to a file with the given filename.
   void saveTraceState(const QString& filename);
 
   // Description:
@@ -147,7 +143,6 @@ protected slots:
 
 protected:
   QString getTraceString();
-  QString getPVModuleDirectory();
 
 private:
   class pqInternal;

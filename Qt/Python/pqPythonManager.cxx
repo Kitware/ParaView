@@ -73,19 +73,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
 {
+
+  void importParaViewModule()
+    {
+    const char* command = "try:\n"
+      "  import paraview\n"
+      "  paraview.fromGUI = True\n"
+      "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
+      "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
+      "except: pass\n";
+    vtkPythonInterpreter::RunSimpleString(command);
+    }
+
   vtkNew<vtkPythonInterpreter> DummyInterpreter;
   void interpreterEvents(vtkObject*, unsigned long eventid, void* calldata)
     {
     if (eventid == vtkCommand::EnterEvent)
       {
-      // Python interpreter was initialized, set the correct compatibility.
-      const char* command = "try:\n"
-        "  import paraview\n"
-        "  paraview.fromGUI = True\n"
-        "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
-        "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
-        "except: pass\n";
-      vtkPythonInterpreter::RunSimpleString(command);
+      importParaViewModule();
       }
     else if (eventid == vtkCommand::ErrorEvent)
       {
@@ -126,10 +131,15 @@ class pqPythonManager::pqInternal
 public:
   pqInternal() : Editor(NULL) 
   {
-  // Setup initializer so that whenever Python is initialized, we can set the
-  // "paraview.fromGUI" to true.
   this->DummyInterpreter->AddObserver(vtkCommand::AnyEvent,
     this, &pqPythonManager::pqInternal::interpreterEvents);
+
+  // import the paraview module now if Python was already
+  // initialized (by a startup plugin, for example)
+  if (vtkPythonInterpreter::IsInitialized())
+    {
+    importParaViewModule();
+    }
   }
   ~pqInternal()
     {
@@ -211,8 +221,10 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
   if (!this->Internal->PythonDialog)
     {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    vtkPythonInterpreter::Initialize();
     this->Internal->PythonDialog =
       new pqPythonDialog(pqCoreUtilities::mainWidget());
+    this->Internal->PythonDialog->shell()->setupInterpreter();
     QApplication::restoreOverrideCursor();
     }
   return this->Internal->PythonDialog;
@@ -265,62 +277,54 @@ bool pqPythonManager::canStopTrace()
 //-----------------------------------------------------------------------------
 void pqPythonManager::startTrace()
 {
-  pqPythonShell* shell = this->pythonShellDialog()->shell();
+  QString script = "from paraview import smtrace\n"
+                   "smtrace.start_trace()\n";
+  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
 
-  if(shell)
-    {
-    QString script = "from paraview import smtrace\nsmtrace.start_trace()\nprint 'Trace started.'\n";
-    shell->executeScript(script);
+  // Update internal state
+  this->Internal->IsPythonTracing = true;
 
-    // Update internal state
-    this->Internal->IsPythonTracing = true;
-
-    // Emit signals
-    emit startTraceDone();
-    emit canStartTrace(canStartTrace());
-    emit canStopTrace(canStopTrace());
-    }
+  // Emit signals
+  emit startTraceDone();
+  emit canStartTrace(canStartTrace());
+  emit canStopTrace(canStopTrace());
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonManager::stopTrace()
 {
-  pqPythonShell* shell = this->pythonShellDialog()->shell();
+  QString script = "from paraview import smtrace\n"
+                   "smtrace.stop_trace()\n";
+  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
 
-  if(shell)
-    {
-    QString script = "from paraview import smtrace\nsmtrace.stop_trace()\nprint 'Trace stopped.'\n";
-    shell->executeScript(script);
+  // Update internal state
+  this->Internal->IsPythonTracing = false;
 
-    // Update internal state
-    this->Internal->IsPythonTracing = false;
-
-    // Emit signals
-    emit stopTraceDone();
-    emit canStartTrace(canStartTrace());
-    emit canStopTrace(canStopTrace());
-    }
+  // Emit signals
+  emit stopTraceDone();
+  emit canStartTrace(canStartTrace());
+  emit canStopTrace(canStopTrace());
 }
 
 //----------------------------------------------------------------------------
 QString pqPythonManager::getTraceString()
 {
+  QString script = "from paraview import smtrace\n"
+                   "__smtraceString = smtrace.get_trace_string()\n";
+  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
+
+  PyObject* main_module = PyImport_AddModule((char*)"__main__");
+  PyObject* global_dict = PyModule_GetDict(main_module);
+  PyObject* string_object = PyDict_GetItemString(
+    global_dict, "__smtraceString");
+  char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
+
   QString traceString;
-  pqPythonDialog* pyDiag = this->pythonShellDialog();
-  if (pyDiag)
+  if (string_ptr)
     {
-    pyDiag->runString("from paraview import smtrace\n"
-                      "__smtraceString = smtrace.get_trace_string()\n");
-    PyObject* main_module = PyImport_AddModule((char*)"__main__");
-    PyObject* global_dict = PyModule_GetDict(main_module);
-    PyObject* string_object = PyDict_GetItemString(
-      global_dict, "__smtraceString");
-    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
-    if (string_ptr)
-      {
-      traceString = string_ptr;
-      }
+    traceString = string_ptr;
     }
+
   return traceString;
 }
 
@@ -344,61 +348,12 @@ void pqPythonManager::editTrace()
     }
 
 }
-//----------------------------------------------------------------------------
-QString pqPythonManager::getPVModuleDirectory()
-{
-  QString dirString;
-  pqPythonDialog* pyDiag = this->pythonShellDialog();
-  if (pyDiag)
-    {
-    pyDiag->runString("import os\n"
-                      "__pvModuleDirectory = os.path.dirname(paraview.__file__)\n");
-    PyObject* main_module = PyImport_AddModule((char*)"__main__");
-    PyObject* global_dict = PyModule_GetDict(main_module);
-    PyObject* string_object = PyDict_GetItemString(
-      global_dict, "__pvModuleDirectory");
-    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
-    if (string_ptr)
-      {
-      dirString = string_ptr;
-      }
-    }
-  return dirString;
-}
 
 //----------------------------------------------------------------------------
-void pqPythonManager::saveTrace()
+void pqPythonManager::saveTraceState(const QString& fileName)
 {
-  // Get the script directory
-  QString scriptDir;
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings->contains("pqPythonToolsWidget/ScriptDirectory"))
-    {
-    scriptDir = pqApplicationCore::instance()->settings()->value(
-      "pqPythonToolsWidget/ScriptDirectory").toString();
-    }
-  else
-    {
-    scriptDir = this->getPVModuleDirectory();
-    if (scriptDir.size())
-      {
-      scriptDir += QDir::separator() + QString("demos");
-      }
-    }
-
-  QString traceString = this->getTraceString();
-  QString fileName = QFileDialog::getSaveFileName(pqCoreUtilities::mainWidget(), tr("Save File"),
-                                                  scriptDir,
-                                                  tr("Python script (*.py)"));
-  if (fileName.isEmpty())
-    {
-    return;
-    }
-  if (!fileName.endsWith(".py"))
-    {
-    fileName.append(".py");
-    }
-
+  vtkPythonInterpreter::RunSimpleString("from paraview import smstate\n"
+                                        "smstate.run()\n");
   QFile file(fileName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -406,28 +361,9 @@ void pqPythonManager::saveTrace()
     return;
     }
 
+  QString traceString = this->getTraceString();
   QTextStream out(&file);
   out << traceString;
-}
-//----------------------------------------------------------------------------
-void pqPythonManager::saveTraceState(const QString& fileName)
-{
-  pqPythonDialog* pyDiag = this->pythonShellDialog();
-  if (pyDiag)
-    {
-    pyDiag->runString("from paraview import smstate\n"
-                      "smstate.run()\n");
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-      {
-      qWarning() << "Could not open file:" << fileName;
-      return;
-      }
-
-    QString traceString = this->getTraceString();
-    QTextStream out(&file);
-    out << traceString;
-    }
 }
 //----------------------------------------------------------------------------
 void pqPythonManager::updateMacroList()

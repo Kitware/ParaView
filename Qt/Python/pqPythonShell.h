@@ -114,6 +114,7 @@ protected:
   /// Called to setup the Python interpreter during startup or after the Python
   /// environment was finalized.
   void setupInterpreter();
+  friend class pqPythonManager;
 
   /// Show the user-input prompt, if needed. Returns true if the prompt was
   /// re-rendered, otherwise false.
@@ -122,13 +123,9 @@ protected:
   void HandleInterpreterEvents(
     vtkObject* caller, unsigned long eventid, void* calldata);
 
-private slots:
-  void initPythonInterpreter();
-
 private:
   Q_DISABLE_COPY(pqPythonShell);
 
-  pqTimer CreatePythonTimer;
   bool Prompted;
   bool Executing;
 };

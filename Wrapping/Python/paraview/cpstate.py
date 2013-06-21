@@ -150,6 +150,10 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
     # Start trace
     smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
 
+    # Disconnect the smtrace module's observer.  It should not be
+    # active while tracing the state.
+    smtrace.reset_trace_observer()
+
     # update trace globals.
     smtrace.trace_globals.proxy_ctor_hook = staticmethod(cp_hook)
     smtrace.trace_globals.trace_output = []

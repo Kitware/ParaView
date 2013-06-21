@@ -1,0 +1,85 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="ProgrammableFilterPropertiesTest" class="vtkPythonProgrammableFilter" label="Programmable Filter Properties Test">
+
+      <Documentation
+        long_help="Programmable Filter Properties Test"
+        short_help="Programmable Filter Properties Test">
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty
+         name="IntTest"
+         label="Int Test"
+         command="SetParameter"
+         number_of_elements="1"
+         animateable="1"
+         initial_string="int_test"
+         default_values="123" >
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="DoubleTest"
+         label="Double Test"
+         command="SetParameter"
+         number_of_elements="1"
+         animateable="1"
+         initial_string="double_test"
+         default_values="1.23" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="DoubleTwoTest"
+         label="Double Two Test"
+         command="SetParameter"
+         number_of_elements="2"
+         animateable="1"
+         initial_string="double_two_test"
+         default_values="1.1 2.2" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="DoubleThreeTest"
+         label="Double Three Test"
+         command="SetParameter"
+         number_of_elements="3"
+         animateable="1"
+         initial_string="double_three_test"
+         default_values="1.1 2.2 3.3" >
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+         name="StringTest"
+         label="String Test"
+         command="SetParameter"
+         number_of_elements="1"
+         animateable="1"
+         initial_string="string_test"
+         default_values="string value" >
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="Script"
+        command="SetScript"
+        number_of_elements="1"
+        default_values="assert int_test == 123&#xA;assert double_test == 1.23&#xA;assert double_two_test == [1.1, 2.2]&#xA;assert double_three_test == [1.1, 2.2, 3.3]&#xA;assert string_test == &quot;string value&quot;&#xA;&#xA;# this tests that whitespace and newlines are kept intact&#xA;# when the script is stored as an xml attribute string&#xA;def addOne(x):&#xA;&#xA;    return x + 1&#xA;&#xA;assert addOne(5) == 6&#xA;&#xA;# this tests that we can store &quot;&lt;&quot; and &quot;&gt;&quot;&#xA;# characters in the xml attribute string&#xA;assert 1 &lt; 2 and 2 &gt; 1&#xA;&#xA;&#xA;"
+        panel_visibility="advanced">
+        <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+      </StringVectorProperty>
+
+    </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

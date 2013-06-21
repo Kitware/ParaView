@@ -73,10 +73,10 @@ public:
   // when it is run
   void SetParameterInternal(const char *name, const char *value);
   void SetParameter(const char *name, const char *value);
-  void SetParameter(const char *name, const int value);
-  void SetParameter(const char *name, const double value);
-  void SetParameter(const char *name, const double value1, 
-                    const double value2, const double value3);
+  void SetParameter(const char *name, int value);
+  void SetParameter(const char *name, double value);
+  void SetParameter(const char *name, double value1, double value2);
+  void SetParameter(const char *name, double value1, double value2, double value3);
 
   // Description:
   // Clear all name-value parameters
