@@ -39,6 +39,7 @@ import paraview
 paraview.compatibility.major = 3
 paraview.compatibility.minor = 5
 import servermanager
+import lookuptable
 
 #==============================================================================
 # Client/Server Connection methods
@@ -713,6 +714,46 @@ def GetLookupTableForArray(arrayname, num_components, **params):
     SetProperties(lut, **params)
     servermanager.Register(lut, registrationName=proxyName)
     return lut
+
+# global lookup table reader instance
+# the user can use the simple api below
+# rather than creating a lut reader themself
+_lutReader = None
+def _GetLUTReaderInstance():
+    """ Internal api. Return the lookup table reader singleton. Create
+    it if needed."""
+    global _lutReader
+    if _lutReader is None:
+      _lutReader = lookuptable.vtkPVLUTReader()
+    return _lutReader
+
+# -----------------------------------------------------------------------------
+
+def AssignLookupTable(arrayObject, LUTName, rangeOveride=[]):
+    """Assign a lookup table to an array by lookup table name. The array
+    may ber obtained from a ParaView source in it's point or cell data.
+    The lookup tables available in ParaView's GUI are loaded by default.
+    To get a list of the available lookup table names see GetLookupTableNames.
+    To load a custom lookup table see LoadLookupTable."""
+    return _GetLUTReaderInstance().GetLUT(arrayObject, LUTName, rangeOveride)
+
+# -----------------------------------------------------------------------------
+
+def GetLookupTableNames():
+    """Return a list containing the currently available lookup table names.
+    A name maybe used to assign a lookup table to an array. See
+    AssignLookupTable.
+    """
+    return _GetLUTReaderInstance().GetLUTNames()
+
+# -----------------------------------------------------------------------------
+
+def LoadLookupTable(fileName):
+    """Read the lookup tables in the named file and append them to the
+    global collection of lookup tables. The newly loaded lookup tables
+    may then be used with AssignLookupTable function.
+    """
+    return _GetLUTReaderInstance().Read(fileName)
 
 # -----------------------------------------------------------------------------
 
