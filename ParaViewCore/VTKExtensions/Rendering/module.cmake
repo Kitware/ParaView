@@ -9,7 +9,7 @@ if (PARAVIEW_USE_MPI)
   add_definitions("-DMPICH_IGNORE_CXX_SEEK")
 endif()
 
-if(PARAVIEW_ENABLE_PYTHON)
+if(PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_MATPLOTLIB)
   list(APPEND __dependencies vtkRenderingMatplotlib)
 endif()
 
