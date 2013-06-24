@@ -15,11 +15,18 @@
 #include "vtkPython.h"
 #include "pvpythonmodules.h"
 #include "vtkUtilitiesPythonInitializerModule.h"
+#ifdef PARAVIEW_FREEZE_PYTHON
+# include "vtkFrozenParaViewPython.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
   void VTKUTILITIESPYTHONINITIALIZER_EXPORT vtkPVInitializePythonModules()
     {
+#ifdef PARAVIEW_FREEZE_PYTHON
+    vtkFrozenParaViewPython();
+#endif
     CMakeLoadAllPythonModules();
     }
 #ifdef __cplusplus
