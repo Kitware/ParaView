@@ -36,6 +36,14 @@ public:
   static std::string WriteAttributesToJavaScript(int field_type, vtkDataSet*);
   static std::string WriteAttributeHeadersToJavaScript(
     int field_type, vtkDataSet*);
+
+  // Description
+  // This method is similar to the ProcessRMIs() method on the GlobalController
+  // except that it is Python friendly in the sense that it will release the
+  // Python GIS lock, so when run in a thread, this will trully work in the
+  // background without locking the main one.
+  static void ProcessRMIs();
+  static void ProcessRMIs(int reportError, int dont_loop=0);
 //BTX
 protected:
   vtkPVWebUtilities();
