@@ -101,12 +101,12 @@ namespace ParaViewPython {
       ProcessArgsForPython(pythonArgs, options->GetPythonScriptName(),
         remaining_argc, remaining_argv);
 
-      // Start interpretor
-      vtkPythonInterpreter::Initialize();
-
       // register callback to initialize modules statically. The callback is
       // empty when BUILD_SHARED_LIBS is ON.
       vtkPVInitializePythonModules();
+
+      // Start interpretor
+      vtkPythonInterpreter::Initialize();
 
       ret_val = vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()), &*pythonArgs.begin());
 

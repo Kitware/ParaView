@@ -62,12 +62,12 @@ namespace
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");
 #endif
-
-    vtkPythonInterpreter::Initialize();
-    
+ 
     // register callback to initialize modules statically. The callback is
     // empty when BUILD_SHARED_LIBS is ON.
     vtkPVInitializePythonModules();
+
+    vtkPythonInterpreter::Initialize();
 
     vtksys_ios::ostringstream loadPythonModules;
     loadPythonModules
