@@ -23,7 +23,6 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVCompositeRepresentation.h"
-#include "vtkWeakPointer.h"
 
 class vtkOutlineRepresentation;
 class vtkSliceFriendGeometryRepresentation;
