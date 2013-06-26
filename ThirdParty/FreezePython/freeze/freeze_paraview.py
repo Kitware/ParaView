@@ -471,45 +471,47 @@ def main():
             outfp.close()
         return
 
-    # generate config.c and Makefile
-    builtins.sort()
-    infp = open(config_c_in)
-    outfp = bkfile.open(config_c, 'w')
-    try:
-        makeconfig.makeconfig(infp, outfp, builtins)
-    finally:
-        outfp.close()
-    infp.close()
+    # --- We skip this part since CMake-ified Python doesn't have config_c_in
+    # file present and besides, we don't need the make files.
+    ## generate config.c and Makefile
+    #builtins.sort()
+    #infp = open(config_c_in)
+    #outfp = bkfile.open(config_c, 'w')
+    #try:
+    #    makeconfig.makeconfig(infp, outfp, builtins)
+    #finally:
+    #    outfp.close()
+    #infp.close()
 
-    cflags = ['$(OPT)']
-    cppflags = defines + includes
-    libs = [os.path.join(binlib, 'libpython$(VERSION).a')]
+    #cflags = ['$(OPT)']
+    #cppflags = defines + includes
+    #libs = [os.path.join(binlib, 'libpython$(VERSION).a')]
 
-    somevars = {}
-    if os.path.exists(makefile_in):
-        makevars = parsesetup.getmakevars(makefile_in)
-        for key in makevars.keys():
-            somevars[key] = makevars[key]
+    #somevars = {}
+    #if os.path.exists(makefile_in):
+    #    makevars = parsesetup.getmakevars(makefile_in)
+    #    for key in makevars.keys():
+    #        somevars[key] = makevars[key]
 
-    somevars['CFLAGS'] = ' '.join(cflags) # override
-    somevars['CPPFLAGS'] = ' '.join(cppflags) # override
-    files = [base_config_c, base_frozen_c] + \
-            files + supp_sources +  addfiles + libs + \
-            ['$(MODLIBS)', '$(LIBS)', '$(SYSLIBS)']
+    #somevars['CFLAGS'] = ' '.join(cflags) # override
+    #somevars['CPPFLAGS'] = ' '.join(cppflags) # override
+    #files = [base_config_c, base_frozen_c] + \
+    #        files + supp_sources +  addfiles + libs + \
+    #        ['$(MODLIBS)', '$(LIBS)', '$(SYSLIBS)']
 
-    outfp = bkfile.open(makefile, 'w')
-    try:
-        makemakefile.makemakefile(outfp, somevars, files, base_target)
-    finally:
-        outfp.close()
+    #outfp = bkfile.open(makefile, 'w')
+    #try:
+    #    makemakefile.makemakefile(outfp, somevars, files, base_target)
+    #finally:
+    ##    outfp.close()
 
     # Done!
 
-    if odir:
-        print 'Now run "make" in', odir,
-        print 'to build the target:', base_target
-    else:
-        print 'Now run "make" to build the target:', base_target
+    #if odir:
+    #    print 'Now run "make" in', odir,
+    #    print 'to build the target:', base_target
+    #else:
+    #    print 'Now run "make" to build the target:', base_target
 
 
 # Print usage message and exit
