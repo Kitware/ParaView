@@ -457,7 +457,13 @@ bool vtkProcessModule::InitializePythonEnvironment(int argc, char** argv)
 
   if (argc > 0)
     {
-    programname = vtksys::SystemTools::CollapseFullPath(argv[0]);
+    std::string errMsg;
+    if (!vtksys::SystemTools::FindProgramPath(argv[0], programname, errMsg))
+      {
+      // if FindProgramPath fails. We really don't have much of an alternative
+      // here. Python module importing is going to fail.
+      programname = vtksys::SystemTools::CollapseFullPath(argv[0]);
+      }
     self_dir = vtksys::SystemTools::GetFilenamePath(programname.c_str());
     }
   else
