@@ -470,19 +470,19 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
 
     vtkDataObject* data = item->GetDataObject();
 
-    if (data->IsA("vtkUniformGridAMR"))
-      {
-      // we are dealing with AMR datasets.
-      // We assume for now we're not running in render-server mode. We can
-      // ensure that at some point in future.
-      // So we are either in pass-through or collect mode.
+//    if (data != NULL && data->IsA("vtkUniformGridAMR"))
+//      {
+//      // we are dealing with AMR datasets.
+//      // We assume for now we're not running in render-server mode. We can
+//      // ensure that at some point in future.
+//      // So we are either in pass-through or collect mode.
 
-      // FIXME: check that the mode flags are "suitable" for AMR.
-      }
+//      // FIXME: check that the mode flags are "suitable" for AMR.
+//      }
 
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
-    dataMover->SetOutputDataType(data->GetDataObjectType());
+    dataMover->SetOutputDataType(data ? data->GetDataObjectType() : VTK_POLY_DATA);
     dataMover->SetMoveMode(mode);
     if (item->AlwaysClone)
       {
