@@ -46,6 +46,7 @@ include (TestNumPy)
 SET (PY_TESTS
   Animation
   ProxyPropertyLinks
+  PythonPVLookupTables
   PythonPVSimpleCone
   PythonPVSimpleExII
   PythonPVSimpleSphere
