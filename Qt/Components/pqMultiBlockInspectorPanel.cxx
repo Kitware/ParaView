@@ -216,7 +216,10 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
       vtkPVCompositeDataInformation *compositeChildInfo =
         childInfo->GetCompositeDataInformation();
 
-      if(compositeChildInfo->GetDataIsComposite())
+      // recurse down through child blocks only if the child block
+      // is composite and is not a multi-piece data set
+      if(compositeChildInfo->GetDataIsComposite() &&
+         !compositeChildInfo->GetDataIsMultiPiece())
         {
         this->buildTree(compositeChildInfo, item, flatIndex);
         }
@@ -670,7 +673,10 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities(
       vtkPVCompositeDataInformation *compositeChildInfo =
         childInfo->GetCompositeDataInformation();
 
-      if(compositeChildInfo->GetDataIsComposite())
+      // recurse down through child blocks only if the child block
+      // is composite and is not a multi-piece data set
+      if(compositeChildInfo->GetDataIsComposite() &&
+         !compositeChildInfo->GetDataIsMultiPiece())
         {
         this->updateTreeWidgetBlockVisibilities(compositeChildInfo,
                                                 item,
@@ -975,6 +981,16 @@ QString pqMultiBlockInspectorPanel::lookupBlockName(unsigned int flatIndex) cons
 
 QIcon pqMultiBlockInspectorPanel::makeBlockIcon(unsigned int flatIndex) const
 {
+  BlockIcon options;
+  options.HasColor = this->BlockColors.contains(flatIndex);
+  options.HasOpacity = this->BlockOpacities.contains(flatIndex);
+  options.Color = options.HasColor ? this->BlockColors[flatIndex] : QColor();
+  options.Opacity = options.HasOpacity ? this->BlockOpacities[flatIndex] : 1.0;
+
+  if(this->BlockIconCache.contains(options))
+    {
+    return this->BlockIconCache[options];
+    }
 
   QPixmap pixmap(32, 16);
   pixmap.fill(Qt::transparent);
@@ -1017,5 +1033,11 @@ QIcon pqMultiBlockInspectorPanel::makeBlockIcon(unsigned int flatIndex) const
     }
 
   painter.end();
-  return QIcon(pixmap);
+
+  QIcon icon(pixmap);
+
+  // store icon in the cache
+  this->BlockIconCache[options] = icon;
+
+  return icon;
 }

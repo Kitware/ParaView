@@ -21,7 +21,10 @@
 #include <QMap>
 #include <QWidget>
 #include <QPointer>
+#include <QIcon>
 #include "pqTimer.h" // needed for pqTimer.
+
+#include <iostream>
 
 class QModelIndex;
 class QTreeWidget;
@@ -105,6 +108,26 @@ private:
   QMap<unsigned int, double> BlockOpacities;
   vtkEventQtSlotConnect *VisibilityPropertyListener;
   pqTimer UpdateUITimer;
+
+  struct BlockIcon
+  {
+    bool HasColor;
+    bool HasOpacity;
+    QColor Color;
+    double Opacity;
+
+    bool operator<(const BlockIcon &other) const
+    {
+      QColor c = this->HasColor ? this->Color : QColor();
+      c.setAlphaF(this->HasOpacity ? this->Opacity : 1.0);
+
+      QColor oc = other.HasColor ? other.Color : QColor();
+      oc.setAlphaF(other.HasOpacity ? other.Opacity : 1.0);
+
+      return c.rgba() < oc.rgba();
+    }
+  };
+  mutable QMap<BlockIcon, QIcon> BlockIconCache;
 };
 
 #endif // __pqMultiBlockInspectorPanel_h
