@@ -194,6 +194,7 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
     bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
     vtkPVPluginTrackerDebugMacro("Locate and load distributed plugin list.");
 
+#ifdef BUILD_SHARED_LIBS
     // Locate ".plugins" file and process it.
     // This will setup the distributed-list of plugins. Also it will load any
     // auto-load plugins.
@@ -207,6 +208,10 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
       vtkPVPluginTrackerDebugMacro(
         "Could not find .plugins file for distributed plugins");
       }
+#else
+    vtkPVPluginTrackerDebugMacro(
+      "Static build. Skipping .plugins processing.");
+#endif
     }
 
   return Instance;

@@ -18,6 +18,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginTracker.h"
@@ -220,6 +221,7 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
 {
+#ifdef BUILD_SHARED_LIBS
   vtkPVPluginLoaderDebugMacro(
     "Loading Plugins from standard PLUGIN_PATHS \n"
     << this->SearchPaths);
@@ -230,6 +232,10 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
     {
     this->LoadPluginsFromPath(paths[cc].c_str());
     }
+#else
+  vtkPVPluginLoaderDebugMacro(
+    "Static build. Skipping PLUGIN_PATHS.");
+#endif
 }
 
 //-----------------------------------------------------------------------------

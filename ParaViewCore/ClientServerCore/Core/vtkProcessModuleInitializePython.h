@@ -18,6 +18,7 @@
 #include "vtkPythonInterpreter.h"
 #include <string>
 #include <vtksys/SystemTools.hxx>
+#include "vtkPVConfig.h" //  needed for PARAVIEW_FREEZE_PYTHON
 
 /* The maximum length of a file name.  */
 #if defined(PATH_MAX)
@@ -186,13 +187,17 @@ namespace
   //----------------------------------------------------------------------------
   void vtkPythonAppInitPrependPath(const std::string &SELF_DIR)
     {
-#if defined(_WIN32)
+    // We don't initialize Python paths when Frozen Python is being used. This
+    // avoid unnecessary file-system accesses..
+#ifndef PARAVIEW_FREEZE_PYTHON
+# if defined(_WIN32)
     vtkPythonAppInitPrependPathWindows(SELF_DIR);
-#elif defined(__APPLE__)
+# elif defined(__APPLE__)
     vtkPythonAppInitPrependPathOsX(SELF_DIR);
-#else
+# else
     vtkPythonAppInitPrependPathLinux(SELF_DIR);
-#endif
+# endif
+#endif // ifndef PARAVIEW_FREEZE_PYTHON
 
     // *** The following maybe obsolete. Need to verify and remove. ***
 
@@ -220,7 +225,7 @@ namespace
       strcat(system_path, oldpath);
       }
     putenv(system_path);
-#endif
+#endif // if defined(_WIN32)
     }
 }
 
