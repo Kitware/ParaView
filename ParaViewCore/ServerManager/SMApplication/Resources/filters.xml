@@ -10246,7 +10246,7 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPTableToStructuredGrid"
+    <SourceProxy class="vtkTableToStructuredGrid"
                  label="Table To Structured Grid"
                  name="TableToStructuredGrid">
       <Documentation long_help="Converts to table to structured grid."
