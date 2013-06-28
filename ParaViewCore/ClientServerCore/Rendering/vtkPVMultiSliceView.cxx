@@ -69,6 +69,7 @@ vtkStandardNewMacro(vtkPVMultiSliceView);
 //----------------------------------------------------------------------------
 vtkPVMultiSliceView::vtkPVMultiSliceView()
 {
+  this->ShowOutline = 1;
   this->Internal = new vtkSliceInternal();
 }
 

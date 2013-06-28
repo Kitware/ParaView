@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqViewSettingsManager.h"
 
+#include "pqActiveMultiSliceViewOptions.h"
 #include "pqActiveObjects.h"
 #include "pqActivePlotMatrixViewOptions.h"
 #include "pqActiveRenderViewOptions.h"
@@ -40,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
 #include "pqInterfaceTracker.h"
+#include "pqMultiSliceView.h"
 #include "pqPlotMatrixView.h"
 #include "pqViewOptionsInterface.h"
 #include "pqXYBarChartView.h"
@@ -67,6 +69,10 @@ pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   // register for plot matrix views.
   pqActivePlotMatrixViewOptions *plotMatrixOptions = new pqActivePlotMatrixViewOptions(this);
   this->registerOptions(pqPlotMatrixView::viewType(), plotMatrixOptions);
+
+  // register for multislice view
+  pqActiveMultiSliceViewOptions *multiSliceOptions = new pqActiveMultiSliceViewOptions(this);
+  this->registerOptions(pqMultiSliceView::multiSliceViewType(), multiSliceOptions);
 
   /// Add panes as plugins are loaded.
   QObject::connect(pqApplicationCore::instance()->interfaceTracker(),

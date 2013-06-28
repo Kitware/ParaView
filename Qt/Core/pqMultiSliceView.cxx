@@ -369,3 +369,16 @@ QVTKWidget* pqMultiSliceView::getInternalWidget()
 {
   return this->InternalWidget;
 }
+
+//-----------------------------------------------------------------------------
+bool pqMultiSliceView::getOutlineVisibility()
+{
+  return vtkSMPropertyHelper(this->getViewProxy(), "ShowOutline").GetAsInt() != 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiSliceView::setOutlineVisibility(bool visible)
+{
+  vtkSMPropertyHelper(this->getViewProxy(), "ShowOutline").Set(visible ? 1 : 0);
+  this->getViewProxy()->UpdateVTKObjects();
+}

@@ -4942,6 +4942,12 @@
                               number_of_elements="3"
                               default_values="0 0 0"/>
 
+         <IntVectorProperty command="SetShowOutline"
+                            default_values="1"
+                            name="ShowOutline"
+                            number_of_elements="1">
+         </IntVectorProperty>
+
      </MultiSliceViewProxy>
      <!-- ================================================================== -->
   </ProxyGroup>
