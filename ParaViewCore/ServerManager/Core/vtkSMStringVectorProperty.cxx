@@ -370,3 +370,9 @@ int vtkSMStringVectorProperty::SetElementAsString(int idx, const char* value)
 {
   return this->SetElement(idx, value);
 }
+
+//---------------------------------------------------------------------------
+bool vtkSMStringVectorProperty::IsValueDefault()
+{
+  return this->Internals->IsValueDefault();
+}

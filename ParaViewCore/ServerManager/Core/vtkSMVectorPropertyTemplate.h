@@ -327,6 +327,18 @@ public:
     this->UncheckedValues = this->Values;
     this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
     }
+
+  bool IsValueDefault()
+  {
+    if(this->Values.size() != this->DefaultValues.size())
+      {
+      return false;
+      }
+
+    return std::equal(this->Values.begin(),
+                      this->Values.end(),
+                      this->DefaultValues.begin());
+  }
 };
 #endif
 

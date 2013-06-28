@@ -210,3 +210,17 @@ if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE AND NOT WIN32)
                   ${CMAKE_CURRENT_SOURCE_DIR}/TestMPI4PY.py)
     set_tests_properties(TestMPI4PY-SymmetricBatch PROPERTIES LABELS "PARAVIEW")
 endif()
+
+# SavePythonState test
+if (PARAVIEW_BUILD_QT_GUI)
+  if(BUILD_SHARED_LIBS)
+    add_test(NAME SavePythonState
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+      -DPARAVIEW_DATA_ROOT:PATH=${PARAVIEW_DATA_ROOT}
+      -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.py
+      -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.xml
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.cmake)
+  endif()
+endif()

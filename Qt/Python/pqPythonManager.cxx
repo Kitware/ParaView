@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputWindowAdapter.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -352,8 +353,26 @@ void pqPythonManager::editTrace()
 //----------------------------------------------------------------------------
 void pqPythonManager::saveTraceState(const QString& fileName)
 {
-  vtkPythonInterpreter::RunSimpleString("from paraview import smstate\n"
-                                        "smstate.run()\n");
+  bool saveFullState = false;
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  if(settings)
+    {
+    saveFullState = settings->value("saveFullState", false).toBool();
+    }
+
+  std::string code;
+  code += "from paraview import smstate\n";
+  if(saveFullState)
+    {
+    code += "smstate._save_full_state = True\n";
+    }
+  else
+    {
+    code += "smstate._save_full_state = False\n";
+    }
+  code += "smstate.run()\n";
+
+  vtkPythonInterpreter::RunSimpleString(code.c_str());
   QFile file(fileName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {

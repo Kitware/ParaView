@@ -133,6 +133,8 @@ public:
 
   virtual void ClearUncheckedElements();
 
+  virtual bool IsValueDefault();
+
 //BTX
 protected:
   vtkSMIntVectorProperty();

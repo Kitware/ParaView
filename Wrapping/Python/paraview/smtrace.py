@@ -12,6 +12,7 @@ def reset_trace_observer():
 
 def reset_trace_globals():
   trace_globals.capture_all_properties = False
+  trace_globals.capture_modified_properties = False
   trace_globals.use_gui_name = False
   trace_globals.verbose = False
   trace_globals.active_source_at_start = None
@@ -397,6 +398,12 @@ def trace_proxy_registered(proxy, proxyGroup, proxyName):
     itr = servermanager.PropertyIterator(proxy)
     for prop in itr:
       if prop.GetInformationOnly() or prop.GetIsInternal(): continue
+
+      # skip saving properties which still have their default value
+      # if capture_modified_properties is true
+      if trace_globals.capture_modified_properties and prop.IsValueDefault():
+          continue
+
       trace_property_modified(info, prop)
   return info
 
@@ -826,13 +833,14 @@ def stop_trace():
   reset_trace_observer()
 
 # clear trace globals and initialize trace observer
-def start_trace(CaptureAllProperties=False, UseGuiName=False, Verbose=False):
+def start_trace(**kwargs):
   clear_trace()
   add_observers()
   trace_globals.active_source_at_start = simple.GetActiveSource()
   trace_globals.active_view_at_start = simple.GetActiveView()
-  trace_globals.capture_all_properties = CaptureAllProperties
-  trace_globals.use_gui_name = UseGuiName
-  trace_globals.verbose = Verbose
+  trace_globals.capture_all_properties = kwargs.get("CaptureAllProperties", False)
+  trace_globals.capture_modified_properties = kwargs.get("CaptureModifiedProperties", False)
+  trace_globals.use_gui_name = kwargs.get("UseGuiName", False)
+  trace_globals.verbose = kwargs.get("Verbose", False)
 
 

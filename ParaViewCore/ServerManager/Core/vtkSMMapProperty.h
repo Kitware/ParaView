@@ -25,6 +25,10 @@ public:
   vtkTypeMacro(vtkSMMapProperty, vtkSMProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  virtual vtkIdType GetNumberOfElements();
+
+  virtual bool IsValueDefault();
+
 protected:
   vtkSMMapProperty();
   ~vtkSMMapProperty();

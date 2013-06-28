@@ -71,7 +71,7 @@ public:
 
   // Description:
   // Returns the number of elements.
-  vtkIdType GetNumberOfElements();
+  virtual vtkIdType GetNumberOfElements();
 
   // Description:
   // Clears all of the elements from the property.

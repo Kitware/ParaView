@@ -316,3 +316,9 @@ int vtkSMDoubleVectorProperty::SetElementAsString(int idx, const char* value)
 {
   return this->Internals->SetElementAsString(idx, value);
 }
+
+//---------------------------------------------------------------------------
+bool vtkSMDoubleVectorProperty::IsValueDefault()
+{
+  return this->Internals->IsValueDefault();
+}

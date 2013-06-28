@@ -26,6 +26,18 @@ vtkSMMapProperty::~vtkSMMapProperty()
 }
 
 //---------------------------------------------------------------------------
+vtkIdType vtkSMMapProperty::GetNumberOfElements()
+{
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMMapProperty::IsValueDefault()
+{
+  return this->GetNumberOfElements() == 0;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMMapProperty::LoadState(vtkPVXMLElement* element,
                                 vtkSMProxyLocator* loader)
 {
