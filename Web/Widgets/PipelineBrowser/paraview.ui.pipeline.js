@@ -1222,7 +1222,12 @@
                 values.push($(this).is(':checked') ? 1 : 0);
             });
             $('select[type=array]', property).each(function(){
-                values = $(this).val().split(';');
+                value = $(this).val();
+                if(value != null) {
+                    values = $(this).val().split(';');
+                } else {
+                    values = null;
+                }
             });
             $('select[type=enum]', property).each(function(){
                 value = Number($(this).val());
@@ -1237,7 +1242,9 @@
             if(!state.hasOwnProperty(property.attr('proxy'))) {
                 state[property.attr('proxy')] = {};
             }
-            state[property.attr('proxy')][property.attr('label')] = values;
+            if(values != null) {
+                state[property.attr('proxy')][property.attr('label')] = values;
+            }
         });
 
         console.log(state);
