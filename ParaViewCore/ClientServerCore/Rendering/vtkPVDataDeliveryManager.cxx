@@ -297,14 +297,14 @@ void vtkPVDataDeliveryManager::SetDeliverToAllProcesses(
 
 //----------------------------------------------------------------------------
 void vtkPVDataDeliveryManager::MarkAsRedistributable(
-  vtkPVDataRepresentation* repr)
+  vtkPVDataRepresentation* repr, bool value/*=true*/)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false);
   vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true);
   if (item)
     {
-    item->Redistributable = true;
-    low_item->Redistributable = true;
+    item->Redistributable = value;
+    low_item->Redistributable = value;
     }
   else
     {

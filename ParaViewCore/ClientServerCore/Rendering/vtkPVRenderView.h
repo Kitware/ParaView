@@ -329,7 +329,7 @@ public:
   static void SetDeliverLODToAllProcesses(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
   static void MarkAsRedistributable(
-    vtkInformation* info, vtkPVDataRepresentation* repr);
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool value=true);
   static void SetGeometryBounds(vtkInformation* info,
     double bounds[6], vtkMatrix4x4* transform = NULL);
   static void SetStreamable(
