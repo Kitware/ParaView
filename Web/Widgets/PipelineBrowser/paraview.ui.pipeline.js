@@ -610,6 +610,17 @@
         dataChanged(uiWidget);
     }
 
+    /**
+     * Event that get triggered when the user wants to invalidate the full pipeline
+     * and get a new version from the server.
+     * @member jQuery.paraview.ui.PipelineBrowser
+     * @event reloadPipeline
+     */
+    function fireReloadPipeline(uiWidget) {
+        getPipeline(uiWidget).trigger({
+            type: 'reloadPipeline'
+        });
+    }
 
     /**
      * Event that get triggered when a source or a filter is getting added.
@@ -1266,6 +1277,38 @@
             });
         });
 
+        // Attach pipeline reload
+        pipelineBrowser.bind('reloadPipeline', function(e) {
+            session.call('pv:reloadPipeline').then(function(rootNode) {
+                var pipelineLineAfter, pipelineLineBefore;
+
+                // Update data model part
+                data = pipelineBrowser.data('pipeline');
+                data.pipeline = rootNode;
+                updateIndexMap(pipelineBrowser, 0, rootNode.children);
+
+                // Handle UI part
+                // Update subtree
+
+                // Generate html
+                buffer.clear();
+                addProxiesToBuffer(rootNode['children']);
+
+                // Update HTML
+                pipelineLineBefore = $('li.server > ul', pipelineBrowser);
+                pipelineLineAfter = $(buffer.toString());
+
+                pipelineLineBefore.empty()
+                pipelineLineBefore[0].innerHTML = pipelineLineAfter[0].innerHTML;
+
+                // Attach listeners
+                initializeListener(pipelineLineBefore);
+
+                // Update proxy editor
+                setActiveProxyId(pipelineBrowser, 0);
+            });
+        });
+
         // Attach representation change
         pipelineBrowser.bind('proxyModified', function(e) {
             var changeSet = e.changeSet,
@@ -1706,6 +1749,12 @@
 
         $('.reset', pipelineBrowser).unbind().click(function(){
             fireReset($(this));
+        });
+
+        // ============= Invalidate / Reload Pipeline ===========
+
+        $('.head-icon.server',pipelineBrowser).unbind().click(function(){
+            fireReloadPipeline($(this));
         });
     }
 

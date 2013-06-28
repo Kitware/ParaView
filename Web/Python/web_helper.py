@@ -70,6 +70,11 @@ class Pipeline:
 
     # --------------------------------------------------------------------------
 
+    def isEmpty(self):
+      return len(self.parent_ids) == 1
+
+    # --------------------------------------------------------------------------
+
     def getRootNode(self, lutManager = None):
         """
         Create a tree structure of the pipeline with the current proxy state.
@@ -260,6 +265,19 @@ def idToProxy(id):
     if remoteObject:
         return simple.servermanager._getPyProxy(remoteObject)
     return None
+
+# --------------------------------------------------------------------------
+
+def getParentProxyId(proxy):
+    """
+    Return '0' if the given proxy has no Input otherwise will return
+    the parent proxy id as a String.
+    """
+    if proxy and proxy.GetProperty("Input"):
+      parentProxy = proxy.GetProperty("Input").GetProxy(0)
+      if parentProxy:
+        return parentProxy.GetGlobalIDAsString()
+    return '0'
 
 # --------------------------------------------------------------------------
 

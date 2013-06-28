@@ -31,10 +31,11 @@ from webgl import WebGLResource
 
 # =============================================================================
 # Setup default arguments to be parsed
+#   -s, --nosignalhandlers
 #   -d, --debug
 #   -p, --port     8080
 #   -t, --timeout  300 (seconds)
-#   -c, --content  ''  (No content means WebSocket only)
+#   -c, --content  '/www'  (No content means WebSocket only)
 #   -a, --authKey  paraviewweb-secret
 # =============================================================================
 
@@ -46,6 +47,9 @@ def add_arguments(parser):
     import os
     parser.add_argument("-d", "--debug",
         help="log debugging messages to stdout",
+        action="store_true")
+    parser.add_argument("-s", "--nosignalhandlers",
+        help="Prevent Twisted to install the signal handlers so it can be started inside a thread.",
         action="store_true")
     parser.add_argument("-p", "--port", type=int, default=8080,
         help="port number for the web-server to listen on (default: 8080)")
@@ -127,7 +131,10 @@ def start_webserver(options, protocol=paraviewweb_wamp.ServerProtocol, disableLo
 
     # Start factory and reactor
     wampFactory.startFactory()
-    reactor.run()
+    if options.nosignalhandlers:
+       reactor.run(installSignalHandlers=0)
+    else:
+       reactor.run()
     wampFactory.stopFactory()
 
 if __name__ == "__main__":

@@ -275,9 +275,24 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         self.view.ViewSize = [800,800]
         self.lutManager.setView(self.view)
 
+    @exportRpc("reloadPipeline")
+    def reloadPipeline(self):
+        self.pipeline.clear()
+        pxm = simple.servermanager.ProxyManager()
+
+        # Fill tree structure (order-less)
+        for proxyInfo in pxm.GetProxiesInGroup("sources"):
+            id = str(proxyInfo[1])
+            proxy = web_helper.idToProxy(id)
+            parentId = web_helper.getParentProxyId(proxy)
+            self.pipeline.addNode(parentId, id)
+
+        return self.pipeline.getRootNode(self.lutManager)
 
     @exportRpc("getPipeline")
     def getPipeline(self):
+        if self.pipeline.isEmpty():
+            return self.reloadPipeline()
         return self.pipeline.getRootNode(self.lutManager)
 
     @exportRpc("addSource")

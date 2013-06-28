@@ -12,16 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // Need to be first and used for Py_xxx macros
 #include "vtkPVWebUtilities.h"
 
-#include "vtkDataSetAttributes.h"
 #include "vtkDataSet.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkJavaScriptDataWriter.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkSplitColumnComponents.h"
 #include "vtkTable.h"
-
 
 #include <vtksys/ios/sstream>
 
@@ -116,4 +118,19 @@ std::string vtkPVWebUtilities::WriteAttributeHeadersToJavaScript(
 void vtkPVWebUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWebUtilities::ProcessRMIs()
+{
+  vtkPVWebUtilities::ProcessRMIs(1,0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWebUtilities::ProcessRMIs(int reportError, int dont_loop)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  Py_BEGIN_ALLOW_THREADS
+  pm->GetGlobalController()->ProcessRMIs(reportError, dont_loop);
+  Py_END_ALLOW_THREADS
 }
