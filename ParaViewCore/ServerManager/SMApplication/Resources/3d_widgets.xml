@@ -1065,7 +1065,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty command="SetPosition"
-                            default_values="0.90 0.25"
+                            default_values="0.87 0.25"
                             information_property="PositionInfo"
                             name="Position"
                             number_of_elements="2">
@@ -1079,7 +1079,7 @@
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPosition2"
-                            default_values="0.05 0.5"
+                            default_values="0.13 0.5"
                             information_property="Position2Info"
                             name="Position2"
                             number_of_elements="2">
