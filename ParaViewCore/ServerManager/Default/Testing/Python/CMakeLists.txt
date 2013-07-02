@@ -222,5 +222,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.py
       -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.xml
       -P ${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.cmake)
+    set_tests_properties(SavePythonState PROPERTIES LABELS "PARAVIEW")
   endif()
 endif()
