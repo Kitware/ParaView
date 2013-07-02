@@ -223,6 +223,11 @@ protected:
   virtual bool OnWrongTagEvent( vtkObject* caller, unsigned long eventid,
                                 void* calldata);
 
+  // Description:
+  // Callback when any vtkMultiProcessController subclass fires a ErrorEvent.
+  virtual void OnConnectionLost( vtkObject* caller, unsigned long eventid,
+                                 void* calldata);
+
 private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
   void operator=(const vtkSMSessionClient&); // Not implemented

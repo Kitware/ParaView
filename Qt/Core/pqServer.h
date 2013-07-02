@@ -164,6 +164,9 @@ signals:
   /// This is not fired if timeout is not specified on the server process.
   void finalTimeoutWarning();
 
+  /// Fired if any server side crash or disconnection occured.
+  void serverSideDisconnected();
+
 protected:
   // Creates the TimeKeeper proxy for this connection.
   void createTimeKeeper();
@@ -219,6 +222,10 @@ protected slots:
   /// This will convert the given parameter into vtkSMMessage and
   /// emit sentFromOtherClient(pqServer*,vtkSMMessage*) signal.
   void onCollaborationCommunication(vtkObject*, unsigned long, void*, void*);
+
+  /// Called by vtkSMSessionClient is any communication error occured with the
+  /// server. This usually mean that the server side is dead.
+  void onConnectionLost(vtkObject*, unsigned long, void*, void*);
 
 private:
   pqServer(const pqServer&);  // Not implemented.

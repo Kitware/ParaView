@@ -44,7 +44,8 @@ public:
     {
     RegisterRemoteObjectEvent   = 1234,
     UnRegisterRemoteObjectEvent = 4321,
-    ProcessingRemoteEnd         = 2143
+    ProcessingRemoteEnd         = 2143,
+    ConnectionLost              = 6789
     };
 
   //---------------------------------------------------------------------------

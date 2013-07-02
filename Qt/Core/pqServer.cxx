@@ -217,6 +217,12 @@ void pqServer::initialize()
     proxy->FastDelete();
     }
 
+  // Monitor server crash for better error management
+  this->Internals->VTKConnect->Connect(
+      this->session(),
+      vtkPVSessionBase::ConnectionLost,
+      this,
+      SLOT(onConnectionLost(vtkObject*,ulong,void*,void*)));
 
   // In case of Multi-clients connection, the client has to listen
   // server notification so collaboration could happen
@@ -676,6 +682,12 @@ void pqServer::onCollaborationCommunication(vtkObject* vtkNotUsed(src),
       emit sentFromOtherClient(this, msg);
       break;
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::onConnectionLost(vtkObject*, unsigned long,void*,void*)
+{
+  emit serverSideDisconnected();
 }
 //-----------------------------------------------------------------------------
 void pqServer::sendToOtherClients(vtkSMMessage* msg)
