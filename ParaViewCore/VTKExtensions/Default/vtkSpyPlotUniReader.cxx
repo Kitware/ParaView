@@ -82,7 +82,7 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
   if ( !this->HaveInformation ) { vtkDebugMacro( << __LINE__ << " " << this << " Read: " << this->HaveInformation ); }
 
   this->MarkersOn = 0;
-  this->GenerateMarkers = 0;
+  this->GenerateMarkers = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -211,12 +211,15 @@ int vtkSpyPlotUniReader::MakeCurrent()
   spis.SetStream(&ifs);
   int dump;
   vtkSpyPlotUniReader::DataDump* dp;
+  int blocksUpdated = 0;
+  int needMarkers = this->GenerateMarkers && this->MarkersOn;
 
   // Do we have to update blocks
   if (this->GeomTimeStep != this->CurrentTimeStep)
     {
     int block;
     this->GeomTimeStep = this->CurrentTimeStep;
+    blocksUpdated = 1;
     dump = this->CurrentTimeStep;
     dp = this->DataDumps+dump;
     //vtkDebugMacro( "Dump: " << dump << " / " 
@@ -332,7 +335,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
       blocksExists = 1;
       }
     // Did we create data blocks that we do not need any more
-    if ( !this->CellArraySelection->ArrayIsEnabled(var->Name) ||
+    if ( (!needMarkers && !this->CellArraySelection->ArrayIsEnabled(var->Name)) ||
          (this->DataTypeChanged && this->IsVolumeFraction(var) ) )
       {
       if ( var->DataBlocks )
@@ -359,7 +362,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
         }
       }
 
-    if ( this->CellArraySelection->ArrayIsEnabled(var->Name) && 
+    if ( (needMarkers || this->CellArraySelection->ArrayIsEnabled(var->Name)) && 
          !var->DataBlocks )
       {
       vtkDebugMacro( " ** Allocate new space for variable: " 
@@ -395,8 +398,7 @@ int vtkSpyPlotUniReader::MakeCurrent()
         vtkFloatArray* floatArray = 0;
         vtkUnsignedCharArray* unsignedCharArray = 0;
         vtkDataArray* dataArray = 0;
-        // Note: Always read the last field so that marker file location is set properly
-        if ( (this->CellArraySelection->ArrayIsEnabled(var->Name) || fieldCnt == dp->NumVars - 1) && 
+        if ( this->CellArraySelection->ArrayIsEnabled(var->Name) && 
               !var->DataBlocks[actualBlockId] )
           {
           if ( this->DownConvertVolumeFraction && this->IsVolumeFraction(var) )
@@ -470,10 +472,13 @@ int vtkSpyPlotUniReader::MakeCurrent()
       }
     }
 
-  if (this->GenerateMarkers && this->MarkersOn && !this->ReadMarkerDumps(&spis)) 
+  if (blocksUpdated && needMarkers)
     {
-    vtkErrorMacro("Problem reading marker data");
-    return 0;
+    if (this->ReadMarkerDumps(&spis) == 0) 
+      {
+      vtkErrorMacro("Problem reading marker data");
+      return 0;
+      }
     }
 
   this->DataTypeChanged = 0;
@@ -1134,11 +1139,13 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
     }
   if ( this->FileVersion >= 105 )
     {
+    std::cerr << "File version is 1.05\n";
     if ( !spis->ReadInt32s(&(this->MarkersOn),1) )
       {
       vtkErrorMacro( "Cannot reader marker flag" );
       return 0;
       }
+    std::cerr << "Markers are on? " << this->MarkersOn << std::endl;
     if (this->MarkersOn) 
       {
       this->ReadMarkerHeader (spis);
@@ -1164,6 +1171,7 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
 
 int vtkSpyPlotUniReader::ReadMarkerHeader(vtkSpyPlotIStream *spis) 
 {
+  std::cerr << "read markers headers\n";
   this->Markers = new MaterialMarker[this->NumberOfMaterials];
   this->MarkersDumps = new MarkerDump[this->NumberOfMaterials];
   for (int n = 0; n < this->NumberOfMaterials; n ++) 
@@ -1227,6 +1235,7 @@ int vtkSpyPlotUniReader::ReadMarkerHeader(vtkSpyPlotIStream *spis)
         }
       }
     }
+  std::cerr << "done reading markers headers\n";
   return 1;
 }
 
@@ -1861,12 +1870,13 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream *spis)
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
 {
+  std::cerr << "Reading marker dumps\n";
   for (int n = 0; n < this->NumberOfMaterials; n ++) 
     {
     if (this->Markers[n].NumMarks > 0) 
       {
       // Reading XLoc array
-      int numBytes;
+      int numBytes = 0;
       if ( !spis->ReadInt32s(&numBytes, 1) )
         {
         vtkErrorMacro( "Problem reading the number of bytes" );
@@ -1883,14 +1893,16 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         return 0;
         }
       this->MarkersDumps[n].XLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
+      std::cerr << "Decoding " << numBytes << " into " << this->Markers[n].NumRealMarks << " xloc float values\n";
       float* ptr = this->MarkersDumps[n].XLoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                       numBytes, ptr, this->Markers[n].NumRealMarks) )
         {
-        vtkErrorMacro( "Problem RLD decoding float data array" );
+        vtkErrorMacro( "Problem RLD decoding float data array 1" );
         return 0;
         }
       // Reading ILoc array
+      numBytes = 0;
       if ( !spis->ReadInt32s(&numBytes, 1) )
         {
         vtkErrorMacro( "Problem reading the number of bytes" );
@@ -1906,17 +1918,19 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         return 0;
         }
       this->MarkersDumps[n].ILoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
+      std::cerr << "Decoding " << numBytes << " into " << this->Markers[n].NumRealMarks << " iloc int values\n";
       int* intptr = this->MarkersDumps[n].ILoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                       numBytes, intptr, this->Markers[n].NumRealMarks) )
         {
-        vtkErrorMacro( "Problem RLD decoding float data array" );
+        vtkErrorMacro( "Problem RLD decoding int data array 1" );
         return 0;
         }
 
       if (this->NumberOfDimensions > 1) 
         {
         // Reading YLoc array
+        numBytes = 0;
         if ( !spis->ReadInt32s(&numBytes, 1) )
           {
           vtkErrorMacro( "Problem reading the number of bytes" );
@@ -1932,14 +1946,16 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
           return 0;
           }
         this->MarkersDumps[n].YLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
+        std::cerr << "Decoding " << numBytes << " into " << this->Markers[n].NumRealMarks << " yloc float values\n";
         ptr = this->MarkersDumps[n].YLoc->GetPointer(0);
         if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                         numBytes, ptr, this->Markers[n].NumRealMarks) )
           {
-          vtkErrorMacro( "Problem RLD decoding float data array" );
+          vtkErrorMacro( "Problem RLD decoding float data array 2" );
           return 0;
           }
         // Reading JLoc array
+        numBytes = 0;
         if ( !spis->ReadInt32s(&numBytes, 1) )
           {
           vtkErrorMacro( "Problem reading the number of bytes" );
@@ -1956,15 +1972,17 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
           }
         this->MarkersDumps[n].JLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
         intptr = this->MarkersDumps[n].JLoc->GetPointer(0);
+        std::cerr << "Decoding " << numBytes << " into " << this->Markers[n].NumRealMarks << " jloc int values\n";
         if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                         numBytes, intptr, this->Markers[n].NumRealMarks) )
           {
-          vtkErrorMacro( "Problem RLD decoding float data array" );
+          vtkErrorMacro( "Problem RLD decoding int data array 2" );
           return 0;
           }
         }
       if (this->NumberOfDimensions > 2) 
         {
+        std::cerr << "skipping the z values, right?\n";
         // Reading ZLoc array
         if ( !spis->ReadInt32s(&numBytes, 1) )
           {
@@ -1985,7 +2003,7 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                         numBytes, ptr, this->Markers[n].NumRealMarks) )
           {
-          vtkErrorMacro( "Problem RLD decoding float data array" );
+          vtkErrorMacro( "Problem RLD decoding float data array 3" );
           return 0;
           }
         // Reading KLoc array
@@ -2008,7 +2026,7 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                         numBytes, intptr, this->Markers[n].NumRealMarks) )
           {
-          vtkErrorMacro( "Problem RLD decoding float data array" );
+          vtkErrorMacro( "Problem RLD decoding int data array 3" );
           return 0;
           }
         }
@@ -2032,7 +2050,7 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                       numBytes, intptr, this->Markers[n].NumRealMarks) )
         {
-        vtkErrorMacro( "Problem RLD decoding float data array" );
+        vtkErrorMacro( "Problem RLD decoding int data array 4" );
         return 0;
         }
       for (int v = 0; v < this->Markers[n].NumVars; v ++)
@@ -2056,11 +2074,12 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
                                       numBytes, ptr, this->Markers[n].NumRealMarks) )
           {
-          vtkErrorMacro( "Problem RLD decoding float data array" );
+          vtkErrorMacro( "Problem RLD decoding float data array 5" );
           return 0;
           }
         }
       }
     }
+  std::cerr << "done Reading marker dumps\n";
   return 1;
 }
