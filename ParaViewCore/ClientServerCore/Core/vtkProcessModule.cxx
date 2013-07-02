@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   ParaView
@@ -40,6 +41,10 @@
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 # include "vtkProcessModuleInitializePython.h"
+#endif
+
+#ifndef _WIN32
+#include <signal.h>
 #endif
 
 #include <assert.h>
