@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 
 // Qt includes
-#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QToolButton>
@@ -48,19 +47,19 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   this->ForceSingleFile = false;
   this->UseDirectoryMode = false;
   this->UseFilenameList = false;
-  
+
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
   l->setSpacing(2);
   this->LineEdit = new QLineEdit(this);
   this->LineEdit->setObjectName("FileLineEdit");
-  
+
   QToolButton* tb = new QToolButton(this);
   tb->setObjectName("FileButton");
   tb->setText("...");
   QObject::connect(tb, SIGNAL(clicked(bool)),
                    this, SLOT(chooseFile()));
-  
+
   l->addWidget(this->LineEdit);
   l->addWidget(tb);
 
@@ -92,18 +91,7 @@ void pqFileChooserWidget::setFilenames(const QStringList& files)
   this->UseFilenameList = false;
   this->LineEdit->setEnabled(true);
 
-  if(this->UseDirectoryMode)
-    {
-    if (!files.isEmpty())
-      {
-      this->LineEdit->setText(QFileInfo(files[0]).path());
-      }
-    else
-      {
-      this->LineEdit->setText("");
-      }
-    }
-  else if (this->ForceSingleFile)
+  if (this->ForceSingleFile || this->UseDirectoryMode)
     {
     if (!files.isEmpty())
       {

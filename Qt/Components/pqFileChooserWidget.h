@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -65,13 +65,16 @@ public:
   /// get the filename
   QStringList filenames() const;
   /// set the filename
+  // this doesn't verify that any of the filenames being passed
+  // in are valid for the mode or actually exist on the server. That
+  // must be down be what ever calls this method
   void setFilenames(const QStringList&);
 
   /// convienince functions for when using only a single file (see
   /// forceSingleFile property).
   QString singleFilename() const;
   void setSingleFilename(const QString &);
-  
+
   /// get the file extension for the file dialog
   QString extension();
   /// set the file extension for the file dialog
