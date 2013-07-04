@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqColorChooserButton::pqColorChooserButton(QWidget* p)
   : QToolButton(p)
 {
+  this->IconRadiusHeightRatio = 0.75;
   this->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   this->connect(this, SIGNAL(clicked()), SLOT(chooseColor()));
 }
@@ -73,7 +74,7 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
 //-----------------------------------------------------------------------------
 QIcon pqColorChooserButton::renderColorSwatch(const QColor& color)
 {
-  int radius = qRound(this->height() * 0.75);
+  int radius = qRound(this->height() * this->IconRadiusHeightRatio);
   if (radius <= 10)
     {
     radius = 10;

@@ -55,6 +55,12 @@ public:
   const QString& undoLabel() const
     { return this->UndoLabel; }
 
+  /// Set/Get the ratio of icon radius to button height
+  void setIconRadiusHeightRatio(double val)
+    { this->IconRadiusHeightRatio = val; }
+  double iconRadiusHeightRatio() const
+    { return this->IconRadiusHeightRatio; }
+
 signals:
   /// Signals fired before and after the chosenColorChanged() signal is fired.
   /// This is used in ParaView to set up the creation of undo set.
@@ -82,6 +88,8 @@ protected:
 
   QColor Color;
   QString UndoLabel;
+  /// the ratio of icon radius to button height
+  double IconRadiusHeightRatio;
 };
 
 #endif
