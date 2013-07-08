@@ -6,53 +6,50 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>94</width>
-    <height>38</height>
+    <width>284</width>
+    <height>46</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <property name="margin">
-    <number>0</number>
-   </property>
-   <property name="spacing">
-    <number>4</number>
-   </property>
+  <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0">
    <item row="0" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Minimum</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+    <widget class="pqLineEdit" name="ThresholdBetween_0">
+     <property name="maximumSize">
+      <size>
+       <width>70</width>
+       <height>16777215</height>
+      </size>
      </property>
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="pqDoubleRangeWidget" name="ThresholdBetween_0" native="true"/>
+    <widget class="ctkDoubleRangeSlider" name="RangeSlider" native="true"/>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Maximum</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+   <item row="0" column="2">
+    <widget class="pqLineEdit" name="ThresholdBetween_1">
+     <property name="maximumSize">
+      <size>
+       <width>70</width>
+       <height>16777215</height>
+      </size>
      </property>
     </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="pqDoubleRangeWidget" name="ThresholdBetween_1" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqDoubleRangeWidget</class>
+   <class>ctkDoubleRangeSlider</class>
    <extends>QWidget</extends>
-   <header>pqDoubleRangeWidget.h</header>
+   <header>ctkDoubleRangeSlider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
