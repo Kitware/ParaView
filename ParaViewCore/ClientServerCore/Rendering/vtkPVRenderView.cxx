@@ -1249,7 +1249,7 @@ vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(vtkInformation* info,
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::MarkAsRedistributable(
-  vtkInformation* info, vtkPVDataRepresentation* repr)
+  vtkInformation* info, vtkPVDataRepresentation* repr, bool value/*=true*/)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1258,7 +1258,7 @@ void vtkPVRenderView::MarkAsRedistributable(
     return;
     }
 
-  view->GetDeliveryManager()->MarkAsRedistributable(repr);
+  view->GetDeliveryManager()->MarkAsRedistributable(repr, value);
 }
 
 //----------------------------------------------------------------------------

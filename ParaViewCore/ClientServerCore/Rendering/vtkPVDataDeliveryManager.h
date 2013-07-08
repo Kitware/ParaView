@@ -92,7 +92,7 @@ public:
   // a representation as redistributable makes it possible for this class to
   // redistribute the geometry as needed. Only vtkPolyData, vtkUnstructuredGrid
   // or a multi-block comprising of vtkPolyData is currently supported.
-  void MarkAsRedistributable(vtkPVDataRepresentation*);
+  void MarkAsRedistributable(vtkPVDataRepresentation*, bool value=true);
 
   // Description:
   // Returns the size for all visible geometry. If low_res is true, and low-res

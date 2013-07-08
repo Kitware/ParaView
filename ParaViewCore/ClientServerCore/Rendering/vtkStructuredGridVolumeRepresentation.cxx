@@ -186,6 +186,12 @@ int vtkStructuredGridVolumeRepresentation::ProcessViewRequest(
       vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
         NULL, whole_extent, origin, spacing);
       }
+
+    // this is essential since this->Superclass::ProcessViewRequest(..) marks
+    // the data as redistributable, which it isn't in our case. We don't want
+    // the unstructured-grid we created from the structured-grid to be
+    // redistributed.
+    vtkPVRenderView::MarkAsRedistributable(inInfo, this, false);
     }
 
   return 1;
