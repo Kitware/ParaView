@@ -978,8 +978,9 @@ bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSessionClient::OnConnectionLost( vtkObject* obj, unsigned long event,
-                                       void* calldata )
+void vtkSMSessionClient::OnConnectionLost( vtkObject* vtkNotUsed(src),
+                                           unsigned long vtkNotUsed(event),
+                                           void* vtkNotUsed(calldata) )
 {
   this->InvokeEvent(vtkPVSessionBase::ConnectionLost, (void*)"The server had died, please look at the server side for more details.");
 }
