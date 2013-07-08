@@ -48,7 +48,10 @@ pqSGPluginManager::~pqSGPluginManager()
 void pqSGPluginManager::startup()
 {
   // don't delete menuMgr, it will be cleaned up by Qt.
-  pqSGWritersMenuManager *menuMgr = new pqSGWritersMenuManager(this);
+  const char* writersMenuName = this->getWritersMenuName();
+  const char* objectMenuName = this->getObjectMenuName();
+  pqSGWritersMenuManager *menuMgr = new pqSGWritersMenuManager(
+    writersMenuName, objectMenuName, this);
   menuMgr->createMenu();
 }
 

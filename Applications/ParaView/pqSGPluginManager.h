@@ -50,6 +50,12 @@ public:
   /// Methods used to shartup and shutdown the plugin.
   void shutdown();
 
+  /// Get the name of the writers menu from the concrete subclass.
+  virtual const char* getWritersMenuName() = 0;
+
+  /// Get the Qt name of the writers menu from the concrete subclass.
+  virtual const char* getObjectMenuName() = 0;
+
 private:
   pqSGPluginManager(const pqSGPluginManager&); // Not implemented.
   void operator=(const pqSGPluginManager&); // Not implemented.

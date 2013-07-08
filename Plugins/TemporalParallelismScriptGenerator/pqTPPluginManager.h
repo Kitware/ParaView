@@ -44,6 +44,12 @@ public:
   pqTPPluginManager(QObject* parent=0);
   ~pqTPPluginManager();
 
+  /// Get the name of the writers menu from the concrete subclass.
+  virtual const char* getWritersMenuName();
+
+  /// Get the Qt name of the writers menu from the concrete subclass.
+  virtual const char* getObjectMenuName();
+
 private:
   pqTPPluginManager(const pqTPPluginManager&); // Not implemented.
   void operator=(const pqTPPluginManager&); // Not implemented.

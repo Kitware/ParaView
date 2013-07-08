@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTPPluginManager.h"
 
-#include "pqSGWritersMenuManager.h"
-
 //-----------------------------------------------------------------------------
 pqTPPluginManager::pqTPPluginManager(QObject* parentObject):
   Superclass(parentObject)
@@ -42,4 +40,16 @@ pqTPPluginManager::pqTPPluginManager(QObject* parentObject):
 //-----------------------------------------------------------------------------
 pqTPPluginManager::~pqTPPluginManager()
 {
+}
+
+//-----------------------------------------------------------------------------
+const char* pqTPPluginManager::getWritersMenuName()
+{
+  return "&STP Writers";
+}
+
+//-----------------------------------------------------------------------------
+const char* pqTPPluginManager::getObjectMenuName()
+{
+  return "STPProxyWritersMenu";
 }

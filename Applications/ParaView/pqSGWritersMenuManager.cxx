@@ -83,10 +83,13 @@ namespace
 }
 
 //-----------------------------------------------------------------------------
-pqSGWritersMenuManager::pqSGWritersMenuManager(QObject* parentObject):
+pqSGWritersMenuManager::pqSGWritersMenuManager(
+  const char* writersMenuName, const char* objectMenuName, QObject* parentObject):
   Superclass(parentObject)
 {
   this->Menu = 0;
+  this->WritersMenuName = writersMenuName;
+  this->ObjectMenuName = objectMenuName;
 
   // this updates the available writers whenever the active
   // source changes
@@ -153,8 +156,8 @@ void pqSGWritersMenuManager::createMenu()
 
   if(this->Menu == NULL)
     {
-    this->Menu = new QMenu("&Writers", mainWindow);
-    this->Menu->setObjectName("ProxyWritersMenu");
+    this->Menu = new QMenu(this->WritersMenuName, mainWindow);
+    this->Menu->setObjectName(this->ObjectMenuName);
     mainWindow->menuBar()->insertMenu(
       ::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
 

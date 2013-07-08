@@ -50,11 +50,14 @@ class pqSGWritersMenuManager : public QObject
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  pqSGWritersMenuManager(QObject* parent=0);
+  pqSGWritersMenuManager(const char* writersMenuName, const char* objectMenuName,
+                         QObject* parent=0);
   ~pqSGWritersMenuManager();
 
 public slots:
-  /// Creates a new "Writers" menu and adds the co-processing writers to it.
+  /// Creates a new writers menu and adds the writers to it.
+  /// The name of the Qt menu object will be ObjectMenuName
+  /// and the the name of GUI menu will be WritersMenuName.
   void createMenu();
 
 protected slots:
@@ -68,8 +71,11 @@ protected:
 
 private:
   QMenu* Menu;
+  /// The name of the Qt writers menu object will be ObjectMenuName
+  /// and the the name of GUI menu will be WritersMenuName.
+  QString WritersMenuName;
+  QString ObjectMenuName;
 
-private:
   pqSGWritersMenuManager(const pqSGWritersMenuManager&); // Not implemented.
   void operator=(const pqSGWritersMenuManager&); // Not implemented.
 
