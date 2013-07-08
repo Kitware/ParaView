@@ -144,6 +144,8 @@ public:
 
   virtual void ClearUncheckedElements();
 
+  virtual bool IsValueDefault();
+
 protected:
   vtkSMDoubleVectorProperty();
   ~vtkSMDoubleVectorProperty();

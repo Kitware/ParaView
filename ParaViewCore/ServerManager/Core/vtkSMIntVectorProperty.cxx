@@ -303,3 +303,9 @@ int vtkSMIntVectorProperty::SetElementAsString(int idx, const char* value)
 {
   return this->Internals->SetElementAsString(idx, value);
 }
+
+//---------------------------------------------------------------------------
+bool vtkSMIntVectorProperty::IsValueDefault()
+{
+  return this->Internals->IsValueDefault();
+}

@@ -1,6 +1,11 @@
 import smtrace
 import servermanager
 
+# this flag determines if the full state of every property is
+# stored or only the state of modified (i.e. non-default) properties
+# is stored in the python state file
+_save_full_state = False
+
 _proxy_groups = ["sources", "representations", "views", "scalar_bars", "selection_sources",
                  "piecewise_functions", "implicit_functions", "lookup_tables"]
 
@@ -135,8 +140,12 @@ def _trace_state():
     generate a python trace script.  The proxies must be traced in the correct
     order so that no traced proxy refers to a proxy that is yet to be traced."""
 
+    capture_modified_properties = not _save_full_state
+
     # Start trace
-    smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
+    smtrace.start_trace(CaptureAllProperties=True,
+                        CaptureModifiedProperties=capture_modified_properties,
+                        UseGuiName=True)
 
     # Disconnect the smtrace module's observer.  It should not be
     # active while tracing the state.

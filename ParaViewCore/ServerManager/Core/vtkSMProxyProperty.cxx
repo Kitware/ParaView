@@ -740,3 +740,10 @@ bool vtkSMProxyProperty::CanCreateProxy()
 {
   return vtkSMProxyProperty::CreateProxyAllowed;
 }
+
+//---------------------------------------------------------------------------
+bool vtkSMProxyProperty::IsValueDefault()
+{
+  // proxy properties are default only if they contain no proxies
+  return this->GetNumberOfProxies() == 0;
+}

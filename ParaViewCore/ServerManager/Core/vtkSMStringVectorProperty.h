@@ -127,6 +127,8 @@ public:
 
   virtual void ClearUncheckedElements();
 
+  virtual bool IsValueDefault();
+
 protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();

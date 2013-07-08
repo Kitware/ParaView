@@ -281,6 +281,12 @@ public:
   // The default value is false.
   virtual bool IsStateIgnored() { return this->StateIgnored; }
 
+  // Description:
+  // Returns true if the property's value is different from the default value.
+  // This is used as a hint by the state saving code to determine if the value
+  // should be written to the file or if the defaults are sufficient.
+  virtual bool IsValueDefault() { return false; }
+
 //BTX
 protected:
   vtkSMProperty();

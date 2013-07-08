@@ -183,6 +183,8 @@ public:
   // Update all proxies referred by this property (if any).
   virtual void UpdateAllInputs();
 
+  virtual bool IsValueDefault();
+
 //BTX
 protected:
   vtkSMProxyProperty();
