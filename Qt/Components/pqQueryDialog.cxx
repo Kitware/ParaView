@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
+#include "pqSelectionManager.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqUndoStack.h"
 
@@ -73,6 +74,7 @@ public:
   QList<pqQueryClauseWidget*> Clauses;
   pqSpreadSheetViewModel* DataModel;
   pqPropertyLinks Links;
+  pqSelectionManager* SelectionManager;
   vtkSmartPointer<vtkSMViewProxy> ViewProxy;
   vtkSmartPointer<vtkSMProxy> RepresentationProxy;
 
@@ -82,6 +84,7 @@ public:
     {
     this->DataModel = NULL;
     this->LabelColorAdaptor = NULL;
+    this->SelectionManager = NULL;
     }
 };
 
@@ -103,6 +106,10 @@ pqQueryDialog::pqQueryDialog(
     {
     this->Internals->source->setCurrentPort(_producer);
     this->populateSelectionType();
+    }
+  else
+    {
+    _producer = this->Internals->source->currentPort();
     }
 
   // Ensure that there's only 1 clause
@@ -158,14 +165,14 @@ pqQueryDialog::pqQueryDialog(
   QObject::connect(this->Internals->source,
                    SIGNAL(currentIndexChanged(pqOutputPort*)),
                    this,
-                   SLOT(onSelectionChange(pqOutputPort*)));
+                   SLOT(onProxySelectionChange(pqOutputPort*)));
 
   // Connect the view manager to the pqActiveView.
   QObject::connect(&pqActiveView::instance(),
     SIGNAL(changed(pqView*)),
     this, SLOT(onActiveViewChanged(pqView*)));
 
-  this->onSelectionChange(_producer);
+  this->onProxySelectionChange(_producer);
 }
 
 //-----------------------------------------------------------------------------
@@ -174,9 +181,38 @@ pqQueryDialog::~pqQueryDialog()
   if(this->Internals)
     {
     this->freeSMProxy();
+    this->setSelectionManager(NULL);
     delete this->Internals;
     }
   this->Internals = 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::setProducer(pqOutputPort* port)
+{
+  this->Internals->source->setCurrentPort(port);
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::setSelectionManager(pqSelectionManager* selMgr)
+{
+  if (this->Internals->SelectionManager)
+    {
+    this->disconnect(this->Internals->SelectionManager);
+    }
+
+  this->Internals->SelectionManager = selMgr;
+
+  if (this->Internals->SelectionManager)
+    {
+    QObject::connect(
+      this, SIGNAL(selected(pqOutputPort*)),
+      this->Internals->SelectionManager, SLOT(select(pqOutputPort*)));
+
+    QObject::connect(
+      this->Internals->SelectionManager, SIGNAL(selectionChanged(pqOutputPort*)),
+      this, SLOT(onSelectionSpecificationChanged(pqOutputPort*)));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -591,11 +627,10 @@ void pqQueryDialog::linkLabelColorWidget( vtkSMProxy* proxy,
 }
 
 //-----------------------------------------------------------------------------
-void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
+void pqQueryDialog::onProxySelectionChange(pqOutputPort* newSelectedPort)
 {
-
   // Reset the spreadsheet view
-  this->resetClauses();
+  //this->resetClauses();
   this->freeSMProxy();
 
   // Once converted, a selection can no longer be frozen.
@@ -614,6 +649,8 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
 
   if(this->Producer != NULL)
     {
+    this->populateSelectionType();
+    this->resetClauses();
     // Render all views when any selection property is modified.
     QObject::connect( &this->Internals->Links, SIGNAL(qtWidgetChanged()),
                       this->Producer, SLOT(renderAllViews()));
@@ -631,11 +668,59 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
       this->Internals->extractSelectionOverTime->show();
       }
     this->updateLabels();
+
+    // Now see if we should re-enable the Freeze Selection button
+    vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(
+      this->Producer->getSelectionInput());
+
+    if (curSelSource)
+      {
+      if (
+        strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
+        strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
+        strcmp(curSelSource->GetXMLName(), "SelectionQuerySource") == 0)
+        {
+        this->Internals->freezeSelection->setEnabled(true);
+        }
+      }
     }
   else
     {
     // As no more datasource is available make sure that we free the ressources
     this->freeSMProxy();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::onSelectionSpecificationChanged(pqOutputPort* port)
+{
+  this->freeSMProxy();
+
+  // This should never happen, but just in case...
+  if (port != this->Producer)
+    {
+    this->onProxySelectionChange(port);
+    return;
+    }
+
+  if (this->Producer)
+    {
+    this->setupSpreadSheet();
+    this->Internals->spreadsheet->setModel(this->Internals->DataModel);
+    // See if we should enable the Freeze Selection button
+    vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(
+      this->Producer->getSelectionInput());
+
+    if (curSelSource)
+      {
+      if (
+        strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
+        strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
+        strcmp(curSelSource->GetXMLName(), "SelectionQuerySource") == 0)
+        {
+        this->Internals->freezeSelection->setEnabled(true);
+        }
+      }
     }
 }
 
