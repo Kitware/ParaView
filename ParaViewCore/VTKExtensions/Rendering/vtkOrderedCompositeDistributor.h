@@ -41,7 +41,6 @@
 
 #include "vtkPointSetAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
-#include "vtkPVConfig.h" // needed for PARAVIEW_USE_MPI
 
 class vtkBSPCuts;
 class vtkDataSet;
@@ -69,53 +68,29 @@ public:
 
   // Description:
   // When on, data is passed through without compositing.
-  vtkSetMacro(PassThrough, int);
-  vtkGetMacro(PassThrough, int);
-  vtkBooleanMacro(PassThrough, int);
+  vtkSetMacro(PassThrough, bool);
+  vtkGetMacro(PassThrough, bool);
+  vtkBooleanMacro(PassThrough, bool);
 
   // Description:
   // When non-null, the output will be converted to the given type.
   vtkSetStringMacro(OutputType);
   vtkGetStringMacro(OutputType);
 
-#ifdef PARAVIEW_USE_MPI
-  // Description:
-  // Set/get some internal filters.
-  vtkGetObjectMacro(D3, vtkDistributedDataFilter);
-  virtual void SetD3(vtkDistributedDataFilter *);
-#endif
-  vtkGetObjectMacro(ToPolyData, vtkDataSetSurfaceFilter);
-  virtual void SetToPolyData(vtkDataSetSurfaceFilter *);
-
 protected:
   vtkOrderedCompositeDistributor();
   ~vtkOrderedCompositeDistributor();
 
+  char *OutputType;
+  bool PassThrough;
   vtkPKdTree *PKdTree;
   vtkMultiProcessController *Controller;
-
-#ifdef PARAVIEW_USE_MPI
-  vtkDistributedDataFilter *D3;
-#endif
-  vtkDataSetSurfaceFilter *ToPolyData;
-
-  int PassThrough;
-
+ 
   int FillInputPortInformation(int port, vtkInformation *info);
-
-  int RequestDataObject(vtkInformation *,
-                        vtkInformationVector **, vtkInformationVector *);
-  int RequestData(vtkInformation *,
-                  vtkInformationVector **, vtkInformationVector *);
-
-  virtual void ReportReferences(vtkGarbageCollector *collector);
-
-  char *OutputType;
-
-  vtkDataSet *LastInput;
-  vtkDataSet *LastOutput;
-  vtkBSPCuts *LastCuts;
-  vtkTimeStamp LastUpdate;
+  int RequestDataObject(
+    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  int RequestData(
+    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 private:
   vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor &);  // Not implemented.

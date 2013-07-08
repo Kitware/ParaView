@@ -23,21 +23,20 @@
  */
 
 #include "vtkOrderedCompositeDistributor.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_USE_MPI 
 
 #include "vtkBSPCuts.h"
 #include "vtkCallbackCommand.h"
 #include "vtkDataObjectTypes.h"
-#include "vtkDataSet.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkPolyData.h"
-#include "vtkPVConfig.h" // needed for PARAVIEW_USE_MPI 
+#include "vtkDataSetSurfaceFilter.h"
 #include "vtkUnstructuredGrid.h"
 
 #ifdef PARAVIEW_USE_MPI
@@ -61,109 +60,60 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
-
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
-vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, Controller,
-                     vtkMultiProcessController);
-#ifdef PARAVIEW_USE_MPI
-vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, D3,
-                     vtkDistributedDataFilter);
-#endif
-vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, ToPolyData,
-                     vtkDataSetSurfaceFilter);
-
+vtkCxxSetObjectMacro(
+  vtkOrderedCompositeDistributor, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
-
 vtkOrderedCompositeDistributor::vtkOrderedCompositeDistributor()
 {
   this->PKdTree = NULL;
   this->Controller = NULL;
-
-#ifdef PARAVIEW_USE_MPI
-  this->D3 = NULL;
-#endif
-  this->ToPolyData = NULL;
-
-  this->PassThrough = 0;
-
+  this->PassThrough = false;
   this->OutputType = NULL;
-
-  this->LastInput = NULL;
-  this->LastOutput = NULL;
-  this->LastCuts = vtkBSPCuts::New();
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
+//-----------------------------------------------------------------------------
 vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
 {
   this->SetPKdTree(NULL);
   this->SetController(NULL);
-
-#ifdef PARAVIEW_USE_MPI
-  this->SetD3(NULL);
-#endif
-  this->SetToPolyData(NULL);
-
   this->SetOutputType(NULL);
-
-  if (this->LastOutput) this->LastOutput->Delete();
-  if (this->LastCuts) this->LastCuts->Delete();
 }
 
+//-----------------------------------------------------------------------------
 void vtkOrderedCompositeDistributor::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
   os << indent << "PKdTree: " << this->PKdTree << endl;
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "PassThrough: " << this->PassThrough << endl;
   os << indent << "OutputType: " << 
     (this->OutputType? this->OutputType : "(none)") << endl;
-#ifdef PARAVIEW_USE_MPI
-  os << indent << "D3: " << this->D3 << endl;
-#endif
-  os << indent << "ToPolyData" << this->ToPolyData << endl;
 }
 
 //-----------------------------------------------------------------------------
-
-void vtkOrderedCompositeDistributor::ReportReferences(
-                                                 vtkGarbageCollector *collector)
-{
-  this->Superclass::ReportReferences(collector);
-#ifdef PARAVIEW_USE_MPI
-  vtkGarbageCollectorReport(collector, this->D3, "D3");
-#endif
-  vtkGarbageCollectorReport(collector, this->ToPolyData, "ToPolyData");
-  vtkGarbageCollectorReport(collector, this->PKdTree, "PKdTree");
-  vtkGarbageCollectorReport(collector, this->Controller, "Controller");
-}
-
-//-----------------------------------------------------------------------------
-
 int vtkOrderedCompositeDistributor::FillInputPortInformation(
-                                                 int port, vtkInformation *info)
+  int port, vtkInformation *info)
 {
   if (!this->Superclass::FillInputPortInformation(port, info))
     {
     return 0;
     }
+
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-
-int vtkOrderedCompositeDistributor::RequestDataObject(
-                                             vtkInformation* request,
-                                             vtkInformationVector** inputVector,
-                                             vtkInformationVector* outputVector)
+int vtkOrderedCompositeDistributor::RequestDataObject(vtkInformation* request,
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->OutputType || this->OutputType[0] == '\0')
     {
     return this->Superclass::RequestDataObject(request,
                                                inputVector, outputVector);
     }
-
 
   // for each output
   for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
@@ -216,12 +166,15 @@ int vtkOrderedCompositeDistributor::RequestData(
     return 1;
     }
 
-  if (this->PassThrough || Controller->GetNumberOfProcesses() == 1)
+  if (this->PassThrough ||
+    this->Controller == NULL ||
+    this->Controller->GetNumberOfProcesses() == 1)
     {
     // Don't do anything to the data.
     output->ShallowCopy(input);
     return 1;
     }
+
 #ifdef PARAVIEW_USE_MPI
   if (!this->PKdTree)
     {
@@ -237,32 +190,12 @@ int vtkOrderedCompositeDistributor::RequestData(
     return 1;
     }
 
-  // Check to see if update needs to be done (parallel operation), and pass
-  // through old data if not.
-  int needUpdate = 0;
-  if (   (this->LastInput != input)
-      || (this->LastUpdate < input->GetMTime())
-      || !this->LastCuts->Equals(cuts) )
-    {
-    needUpdate = 1;
-    }
-
-  int reduced_needUpdate = 0;
-  this->Controller->AllReduce(&needUpdate, &reduced_needUpdate, 1,
-    vtkCommunicator::MAX_OP);
-  if (!reduced_needUpdate)
-    {
-    output->ShallowCopy(this->LastOutput);
-    return 1;
-    }
-
   // Handle the case where all inputs on all processes are empty.
   double bounds[6];
   input->GetBounds(bounds);
   int valid_bounds = vtkMath::AreBoundsInitialized(bounds);
   int reduced_valid_bounds = 0;
-  this->Controller->AllReduce(&valid_bounds, &reduced_valid_bounds, 1,
-    vtkCommunicator::MAX_OP);
+  this->Controller->AllReduce(&valid_bounds, &reduced_valid_bounds, 1, vtkCommunicator::MAX_OP);
   if (!reduced_valid_bounds)
     {
     output->ShallowCopy(input);
@@ -271,45 +204,37 @@ int vtkOrderedCompositeDistributor::RequestData(
 
   this->UpdateProgress(0.01);
 
-  if (this->D3 == NULL)
-    {
-    this->D3 = vtkDistributedDataFilter::New();
-    }
+  vtkNew<vtkDistributedDataFilter> d3;
 
-  vtkCallbackCommand *cbc = vtkCallbackCommand::New();
+  // add progress observer.
+  vtkNew<vtkCallbackCommand> cbc;
   cbc->SetClientData(this);
   cbc->SetCallback(D3UpdateProgress);
-  this->D3->AddObserver(vtkCommand::ProgressEvent, cbc);
+  d3->AddObserver(vtkCommand::ProgressEvent, cbc.GetPointer());
 
-  this->D3->SetBoundaryModeToSplitBoundaryCells();
-  this->D3->SetInputData(input);
-  this->D3->SetCuts(cuts);
+  d3->SetBoundaryModeToSplitBoundaryCells();
+  d3->SetInputData(input);
+  d3->SetCuts(cuts);
+
   // We need to pass the region assignments from PKdTree to D3
   // (Refer to BUG #10828).
-  this->D3->SetUserRegionAssignments(
+  d3->SetUserRegionAssignments(
     this->PKdTree->GetRegionAssignmentMap(),
     this->PKdTree->GetRegionAssignmentMapLength());
-  this->D3->SetController(this->Controller);
-  this->D3->Modified();
-  this->D3->Update();
-
-  this->D3->RemoveObserver(cbc);
-  cbc->Delete();
+  d3->SetController(this->Controller);
+  //d3->SetClipAlgorithmType(vtkDistributedDataFilter::USE_TABLEBASEDCLIPDATASET);
+  d3->Update();
 
   if (output->IsA("vtkUnstructuredGrid"))
     {
-    output->ShallowCopy(this->D3->GetOutput());
+    output->ShallowCopy(d3->GetOutput());
     }
   else if (output->IsA("vtkPolyData"))
     {
-    if (this->ToPolyData == NULL)
-      {
-      this->ToPolyData = vtkDataSetSurfaceFilter::New();
-      }
-    this->ToPolyData->SetInputConnection(0, this->D3->GetOutputPort(0));
-    this->ToPolyData->Update();
-
-    output->ShallowCopy(this->ToPolyData->GetOutput());
+    vtkNew<vtkDataSetSurfaceFilter> converter;
+    converter->UnstructuredGridExecute(
+      vtkDataSet::SafeDownCast(d3->GetOutputDataObject(0)),
+      vtkPolyData::SafeDownCast(output), 0);
     }
   else
     {
@@ -317,21 +242,7 @@ int vtkOrderedCompositeDistributor::RequestData(
                   << "type.");
     return 0;
     }
-
-  this->LastUpdate.Modified();
-  this->LastInput = input;
-  this->LastCuts->CreateCuts(cuts->GetKdNodeTree());
-
-  if (this->LastOutput && !this->LastOutput->IsA(output->GetClassName()))
-    {
-    this->LastOutput->Delete();
-    this->LastOutput = NULL;
-    }
-  if (!this->LastOutput)
-    {
-    this->LastOutput = output->NewInstance();
-    }
-  this->LastOutput->ShallowCopy(output);
 #endif
+
   return 1;
 }
