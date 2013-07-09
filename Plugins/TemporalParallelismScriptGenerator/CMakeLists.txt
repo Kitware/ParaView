@@ -74,3 +74,10 @@ ADD_PARAVIEW_PLUGIN(
     ${PARAVIEW_PLUGIN_SRCS2}
     tp_export_py.cxx
 )
+
+IF (BUILD_TESTING AND BUILD_SHARED_LIBS)
+  include(ParaViewTestingMacros)
+  add_client_tests("pv"
+    LOAD_PLUGIN "TemporalParallelismScriptGenerator"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/TemporalParallelism.xml )
+ENDIF (BUILD_TESTING AMD BUILD_SHARED_LIBS)
