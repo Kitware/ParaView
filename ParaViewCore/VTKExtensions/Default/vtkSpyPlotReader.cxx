@@ -453,36 +453,26 @@ int vtkSpyPlotRemoveBadGhostCells(
   return 1;
 }
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *vtkNotUsed(requestInfo),
+int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *requestInfo,
                                      vtkInformationVector *outputInfoVec,
                                      vtkCompositeDataSet *outputData)
 {
-  vtkInformation *outputInfo0=outputInfoVec->GetInformationObject(0);
-  vtkInformation *outputInfo1=outputInfoVec->GetInformationObject(1);
+  int port = requestInfo->Get (vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT());
+
+  vtkInformation *outputInfo=outputInfoVec->GetInformationObject(port);
 
   // Update the timestep.  
-  double* steps;
-
+  int tsLength =
+    outputInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  double *steps = outputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   int closestStep = 0;
-  if(outputInfo0->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+
+  if(outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
-    int tsLength =
-      outputInfo0->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    steps = outputInfo0->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     double requestedTimeStep =
-      outputInfo0->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    //double timeValue = requestedTimeSteps[0];
-
-    // find the first time value larger than requested time value
-    // this logic could be improved
-    //int cnt = 0;
-    //while (cnt < tsLength-1 && steps[cnt] < timeValue)
-    //  {
-    //  cnt++;
-    //  }
-    //this->CurrentTimeStep = cnt;
+      outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
     int cnt=0;
     double minDist=-1;
@@ -498,45 +488,6 @@ int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *vtkNotUsed(requestInfo),
         }
       }
     }
-#ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
-  // if the first port isn't changing, check the second
-  if (closestStep == 0 &&
-      outputInfo1->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
-    {
-    // Get the requested time step. We only supprt requests of a single time
-    // step in this reader right now
-    int tsLength =
-      outputInfo1->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    steps = outputInfo1->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    double requestedTimeStep =
-      outputInfo1->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    std::cerr << "requestedTimeStep " << requestedTimeStep << std::endl;
-    //double timeValue = requestedTimeSteps[0];
-
-    // find the first time value larger than requested time value
-    // this logic could be improved
-    //int cnt = 0;
-    //while (cnt < tsLength-1 && steps[cnt] < timeValue)
-    //  {
-    //  cnt++;
-    //  }
-    //this->CurrentTimeStep = cnt;
-
-    int cnt=0;
-    double minDist=-1;
-    for (cnt=0;cnt<tsLength;cnt++)
-      {
-      double tdist=(steps[cnt]-requestedTimeStep>requestedTimeStep-steps[cnt])?
-        steps[cnt]-requestedTimeStep:
-        requestedTimeStep-steps[cnt];
-      if (minDist<0 || tdist<minDist)
-        {
-        minDist=tdist;
-        closestStep=cnt;
-        }
-      }
-    }
-#endif
 
   this->CurrentTimeStep = closestStep;
 
