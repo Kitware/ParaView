@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqSGWritersMenuManager_h
 #define __pqSGWritersMenuManager_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
 #include <QTimer>
 
@@ -45,7 +46,7 @@ class QAction;
 /// if any writers were added with the CoProcessing hint in the XML file
 /// and if they were then the writers get added to the Writers menu.  See
 /// Resources/servermanager.xml for an example of how to do that.
-class pqSGWritersMenuManager : public QObject
+class PQCOMPONENTS_EXPORT pqSGWritersMenuManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;

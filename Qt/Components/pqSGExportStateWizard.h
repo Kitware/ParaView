@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqSGExportStateWizard_h
 #define __pqSGExportStateWizard_h
 
+#include "pqComponentsModule.h"
 #include <QWizard>
 #include <QWizardPage>
 #include <QString>
@@ -40,8 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QLabel;
 class pqImageOutputInfo;
 
-
-class pqSGExportStateWizard : public QWizard
+class PQCOMPONENTS_EXPORT pqSGExportStateWizard : public QWizard
 {
   Q_OBJECT
   typedef QWizard Superclass;
@@ -101,7 +101,7 @@ public:
 
 
 
-#include "ui_ExportStateWizard.h"
+#include "ui_pqExportStateWizard.h"
 
 class pqSGExportStateWizard::pqInternals : public Ui::ExportStateWizard
 {

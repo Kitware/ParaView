@@ -32,11 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqSGPluginManager_h
 #define __pqSGPluginManager_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
 
 /// pqSGPluginManager is the central class that orchestrates the behaviour of
 /// this co-processing plugin.
-class pqSGPluginManager : public QObject
+class PQCOMPONENTS_EXPORT pqSGPluginManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;

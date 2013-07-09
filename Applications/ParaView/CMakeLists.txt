@@ -1,18 +1,10 @@
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  ParaViewMainWindow.h
-  pqSGPluginManager.h
-  pqSGWritersMenuManager.h
-  pqSGExportStateWizard.h
-  pqImageOutputInfo.h
-)
+  ParaViewMainWindow.h)
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
-  ParaViewMainWindow.ui
-  ExportStateWizard.ui
-  ImageOutputInfo.ui
-)
+  ParaViewMainWindow.ui)
 
 set (QT_USE_QTNETWORK TRUE)
 include(${QT_USE_FILE})
@@ -25,14 +17,6 @@ include_directories(
 set(ParaView_SOURCE_FILES
   ParaViewMainWindow.cxx
   ParaViewMainWindow.h
-  pqImageOutputInfo.cxx
-  pqSGExportStateWizard.cxx
-  pqSGPluginManager.cxx
-  pqSGWritersMenuManager.cxx
-  pqImageOutputInfo.h
-  pqSGExportStateWizard.h
-  pqSGPluginManager.h
-  pqSGWritersMenuManager.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 

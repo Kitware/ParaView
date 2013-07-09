@@ -192,6 +192,8 @@ set (Module_SRCS
   pqGlyphPanel.h
   pqHandleWidget.cxx
   pqHandleWidget.h
+  pqImageOutputInfo.cxx
+  pqImageOutputInfo.h
   pqImageTip.cxx
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
@@ -349,6 +351,12 @@ set (Module_SRCS
   pqServerConnectDialog.h
   pqServerLauncher.cxx
   pqServerLauncher.h
+  pqSGExportStateWizard.cxx
+  pqSGExportStateWizard.h
+  pqSGPluginManager.cxx
+  pqSGPluginManager.h
+  pqSGWritersMenuManager.cxx
+  pqSGWritersMenuManager.h
   pqSignalAdaptorCompositeTreeWidget.cxx
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.cxx
@@ -503,6 +511,7 @@ set (Module_MOC_HDRS
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
   pqHandleWidget.h
+  pqImageOutputInfo.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
   pqIntRangeWidget.h
@@ -579,6 +588,9 @@ set (Module_MOC_HDRS
   pqServerConfigurationImporter.h
   pqServerConnectDialog.h
   pqServerLauncher.h
+  pqSGExportStateWizard.h
+  pqSGPluginManager.h
+  pqSGWritersMenuManager.h
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
@@ -648,9 +660,11 @@ set (Module_UI_FILES
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
+  Resources/UI/pqExportStateWizard.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
   Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
+  Resources/UI/pqImageOutputInfo.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqIsoVolumePanel.ui
   Resources/UI/pqItemViewSearchWidget.ui

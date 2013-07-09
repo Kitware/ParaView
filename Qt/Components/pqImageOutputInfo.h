@@ -32,13 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqImageOutputInfo_h
 #define __pqImageOutputInfo_h
 
+#include "pqComponentsModule.h"
 #include <QString>
 #include <QStringList>
-#include "ui_ImageOutputInfo.h"
+#include <QWidget>
+#include "ui_pqImageOutputInfo.h"
 
 class pqView;
 
-class pqImageOutputInfo : public QWidget
+class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
