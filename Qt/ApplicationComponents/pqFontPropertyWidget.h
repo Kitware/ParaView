@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqTransferFunctionEditorPropertyWidget.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2012 Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,49 +28,34 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-
-#ifndef _pqTransferFunctionEditorPropertyWidget_h
-#define _pqTransferFunctionEditorPropertyWidget_h
+========================================================================*/
+#ifndef __pqFontPropertyWidget_h
+#define __pqFontPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
-
 #include "pqPropertyWidget.h"
-#include "vtkSmartPointer.h"
-#include "vtkPiecewiseFunction.h"
 
-/// A property widget for editing a transfer function. 
-///
-/// To use this widget for a property add the 
-/// 'panel_widget="transfer_function_editor"' to the property's XML.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionEditorPropertyWidget : public pqPropertyWidget
+class vtkSMPropertyGroup;
+
+/// pqFontPropertyWidget is a pqPropertyWidget that can be used to set
+/// properties relating to fonts. The widget expects the property-group to have
+/// properties with functions set to "Color", "Opacity", "Family", "Size",
+/// "Bold", "Italics" and "Shadow". If any property is missing, the
+/// corresponding widget will be hidden.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget :
+  public pqPropertyWidget
 {
   Q_OBJECT
-
+  typedef pqPropertyWidget Superclass;
 public:
-  explicit pqTransferFunctionEditorPropertyWidget(vtkSMProxy *proxy,
-                                                  vtkSMProperty *property,
-                                                  QWidget *parent = 0);
-  ~pqTransferFunctionEditorPropertyWidget();
-
-private slots:
-  void buttonClicked();
+  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  virtual ~pqFontPropertyWidget();
 
 private:
-  vtkSMProperty* Property;
+  Q_DISABLE_COPY(pqFontPropertyWidget)
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
-#include <QDialog>
-
-class pqTransferFunctionEditorPropertyWidgetDialog : public QDialog
-{
-  Q_OBJECT
-
-public:
-  explicit pqTransferFunctionEditorPropertyWidgetDialog(vtkPiecewiseFunction *transferFunction, QWidget *parent = 0);
-
-private:
-  vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;
-};
-
-#endif // _pqTransferFunctionEditorPropertyWidget_h
+#endif

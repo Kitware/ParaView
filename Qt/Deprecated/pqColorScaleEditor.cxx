@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorScaleDialog.h"
 
 #include "pqApplicationCore.h"
-#include "pqBuiltinColorMaps.h"
 #include "pqChartValue.h"
 #include "pqColorMapModel.h"
 #include "pqColorPresetManager.h"
@@ -1927,38 +1926,7 @@ void pqColorScaleEditor::cleanupLegend()
 
 void pqColorScaleEditor::loadBuiltinColorPresets()
 {
-  pqColorPresetModel *model = this->Form->Presets->getModel();
-
-  // get builtin color maps xml
-  const char *xml = pqComponentsGetColorMapsXML();
-
-  // create xml parser
-  vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
-  xmlParser->InitializeParser();
-  xmlParser->ParseChunk(xml, static_cast<unsigned>(strlen(xml)));
-  xmlParser->CleanupParser();
-
-  // parse each color map element
-  vtkPVXMLElement *root = xmlParser->GetRootElement();
-  for(unsigned int i = 0; i < root->GetNumberOfNestedElements(); i++)
-    {
-    vtkPVXMLElement *colorMapElement = root->GetNestedElement(i);
-    if(std::string("ColorMap") != colorMapElement->GetName())
-      {
-      continue;
-      }
-
-    // load color map from its XML
-    pqColorMapModel colorMap =
-      pqColorPresetManager::createColorMapFromXML(colorMapElement);
-    QString name = colorMapElement->GetAttribute("name");
-
-    // add color map to the model
-    model->addBuiltinColorMap(colorMap, name);
-    }
-
-  // cleanup parser
-  xmlParser->Delete();
+  this->Form->Presets->loadBuiltinColorPresets();
 }
 
 /// Update the GUI annotations table with values from the SM proxy.

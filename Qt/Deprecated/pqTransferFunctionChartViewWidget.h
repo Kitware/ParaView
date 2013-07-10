@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTransferFunctionChartViewWidget_h
 #define __pqTransferFunctionChartViewWidget_h
 
-#include "pqComponentsModule.h"
+#include "pqDeprecatedModule.h"
 #include <QWidget>
 #include <QPointer>
 
@@ -52,7 +52,7 @@ class QVTKWidget;
 class QMouseEvent;
 
 /// TransferFunction chart view widget
-class PQCOMPONENTS_EXPORT pqTransferFunctionChartViewWidget : public QWidget
+class PQDEPRECATED_EXPORT pqTransferFunctionChartViewWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
@@ -147,5 +147,24 @@ private:
   class pqInternal;
   pqInternal* Internal;
 };
+
+// ----------------------------------------------------------------------------
+#include "vtkPlot.h"
+#include "vtkChartXY.h"
+template<class T>
+QList<T*> pqTransferFunctionChartViewWidget::plots()const
+{
+  QList<T*> res;
+  const vtkIdType count = this->chart()->GetNumberOfPlots();
+  for(vtkIdType i = 0; i < count; ++i)
+    {
+    vtkPlot* plot = this->chart()->GetPlot(i);
+    if (T::SafeDownCast(plot) != 0)
+      {
+      res << T::SafeDownCast(plot);
+      }
+    }
+  return res;
+}
 
 #endif

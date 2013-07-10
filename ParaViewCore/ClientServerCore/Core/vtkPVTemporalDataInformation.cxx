@@ -410,6 +410,15 @@ void vtkPVTemporalDataInformation::CopyFromStream(
 }
 
 //----------------------------------------------------------------------------
+vtkPVArrayInformation* vtkPVTemporalDataInformation::GetArrayInformation(
+  const char* arrayname, int attribute_type)
+{
+  vtkPVDataSetAttributesInformation* attrInfo =
+    this->GetAttributeInformation(attribute_type);
+  return attrInfo? attrInfo->GetArrayInformation(arrayname) : NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVTemporalDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -431,5 +440,3 @@ void vtkPVTemporalDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "FieldDataInformation " << endl;
   this->FieldDataInformation->PrintSelf(os, i2);
 }
-
-

@@ -20,6 +20,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/UpdateTransferFunctionRanges.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -71,11 +72,9 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartAxisRangeAndLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor1.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor3.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColorScalarBar1.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorControls.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorVolumeControls.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   # disabling overlay test for now. It has issues with Time 0.
   #  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeOverlay.xml
@@ -296,10 +295,9 @@ SET (ViewSettingsDialog_BREAK TRUE)
 SET (UnstructuredOutline_BREAK TRUE)
   # <-- since this changes view settings.
 
-set (NewColorEditor1_BREAK TRUE)
-set (ColorEditor2_BREAK TRUE)
-set (NewColorEditor3_BREAK TRUE)
-set (ColorEditor4_BREAK TRUE)
+set (ColorEditorControls_BREAK TRUE)
+set (ColorEditorVolumeControls_BREAK TRUE)
+set (UpdateTransferFunctionRanges_BREAK TRUE)
 set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
 SET (PlotEdges2_BREAK TRUE)
@@ -334,8 +332,8 @@ SET (XYHistogram_THRESHOLD 60)
 set (ChartAxisRangeAndLabels_THRESHOLD 60)
 
 # The color and opacity are often different on different machines.
-SET (NewColorEditor1_THRESHOLD 60)
-SET (NewColorEditor3_THRESHOLD 60)
+SET (ColorEditorControls_THRESHOLD 60)
+SET (ColorEditorVolumeControls_THRESHOLD 300)
 
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
@@ -396,13 +394,10 @@ SET (FFTOverTime_DISABLE_CRS TRUE)
 set (LoadStateMultiView_BREAK TRUE)
 set (RenderNan_BREAK TRUE)
 
-# NewColorEditor3 does volume rendering of structrued data which required remote
+# ColorEditorVolumeControls does volume rendering of structrued data which required remote
 # rendering in client-serve mode.
-SET (NewColorEditor3_DISABLE_CS TRUE)
-SET (NewColorEditor3_DISABLE_CRS TRUE)
-# NewColorEditor1 has a clip widget that can not be handled properly by
-# the collaboration render window yet, so disable for now.
-SET (NewColorEditor1_DISABLE_CRS TRUE)
+SET (ColorEditorVolumeControls_DISABLE_CS TRUE)
+SET (ColorEditorVolumeControls_DISABLE_CRS TRUE)
 
 # ViewSettingsDialog uses texture background which is currently supported only
 # in local render mode.
@@ -446,7 +441,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - LoadPlugins, NiftiReaderWriterPlugin, H5PartReaderPlugin
 #
 #   Does not work in CS or CRS mode
-#     - ViewSettingsDialog, NewColorEditor3, RectilinearFractal, NewColorEditor
+#     - ViewSettingsDialog, RectilinearFractal, NewColorEditor
 #
 #   Does not work because a disconnection is involved
 #     - ExportX3dPOVVRML
@@ -475,8 +470,6 @@ set (AnimatePipelineTime_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (CalcParens_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (Calculator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (CameraLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-#set (ColorEditor2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-#set (ColorEditor4_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (CompositeSurfaceSelection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Contour_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (ContourRange_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})

@@ -55,7 +55,7 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   this->connect(&this->Links, SIGNAL(qtWidgetChanged()),
                 this, SIGNAL(changeAvailable()));
 
-  this->connect(&this->Links, SIGNAL(qtWidgetChanged()),
+  this->connect(this, SIGNAL(changeAvailable()),
                 this, SLOT(onChangeAvailable()));
 
   this->connect(this, SIGNAL(changeFinished()),
@@ -169,6 +169,18 @@ void pqPropertyWidget::addPropertyLink(QObject *qobject,
                               this->Proxy,
                               smproperty,
                               smindex);
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::addPropertyLink(QObject *qobject,
+                                       const char *qproperty,
+                                       const char *qsignal,
+                                       vtkSMProxy* smproxy,
+                                       vtkSMProperty *smproperty,
+                                       int smindex)
+{
+  this->Links.addPropertyLink(qobject, qproperty, qsignal,
+    smproxy, smproperty, smindex);
 }
 
 //-----------------------------------------------------------------------------

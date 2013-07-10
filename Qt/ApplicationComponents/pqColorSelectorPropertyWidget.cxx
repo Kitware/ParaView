@@ -63,12 +63,9 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *smProxy
                         "color",
                         SIGNAL(colorChanged(const QVariant&)),
                         smProperty);
-  if (strcmp(smProxy->GetPropertyName(smProperty), "EdgeColor") == 0)
-    {
-    // pqStandardColorLinkAdaptor makes it possible to set this color to one of
-    // the standard colors.
-    new pqStandardColorLinkAdaptor(button, smProxy, smProxy->GetPropertyName(smProperty));
-    }
+  // pqStandardColorLinkAdaptor makes it possible to set this color to one of
+  // the standard colors.
+  new pqStandardColorLinkAdaptor(button, smProxy, smProxy->GetPropertyName(smProperty));
 
   vbox->addWidget(button);
 }

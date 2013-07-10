@@ -68,12 +68,16 @@ public:
   bool IsEmpty() const;
 
   // Description:
-  // Adds \p property to the group.
-  void AddProperty(vtkSMProperty *property);
+  // Adds \p property to the group. function can be NULL.
+  void AddProperty(const char* function, vtkSMProperty *property);
 
   // Description:
   // Returns the property at \p index.
   vtkSMProperty* GetProperty(unsigned int index) const;
+
+  // Description:
+  // Returns the property associated with a given function, if any.
+  vtkSMProperty* GetProperty(const char* function) const;
 
   // Description:
   // Returns the number of properties in the group.

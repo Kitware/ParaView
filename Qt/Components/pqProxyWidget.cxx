@@ -486,6 +486,22 @@ public:
       delete item;
       }
     }
+
+  /// Use this method to add pqProxyWidgetItem to the Items instance. Ensures
+  /// that signals/slots are setup correctly.
+  void appendToItems(pqProxyWidgetItem* item, pqProxyWidget* self)
+    {
+    this->Items.append(item);
+
+    foreach (pqPropertyWidgetDecorator* decorator,
+      item->propertyWidget()->decorators())
+      {
+      QObject::connect(decorator, SIGNAL(visibilityChanged()),
+        self, SLOT(updatePanel()));
+      QObject::connect(decorator, SIGNAL(enableStateChanged()),
+        self, SLOT(updatePanel()));
+      }
+    }
 };
 
 //*****************************************************************************
@@ -609,7 +625,7 @@ void pqProxyWidget::createWidgets()
       legacyObjectPanel, this);
     pqProxyWidgetItem *item = pqProxyWidgetItem::newItem(
       wdg, QString(), this);
-    this->Internals->Items.append(item);
+    this->Internals->appendToItems(item, this);
 
     PV_DEBUG_PANELS() << "Using custom (legacy) object panel:"
                       << legacyObjectPanel->metaObject()->className();
@@ -626,7 +642,7 @@ void pqProxyWidget::createWidgets()
       legacyDisplayPanel, this);
     pqProxyWidgetItem *item =
       pqProxyWidgetItem::newItem(wdg, QString(), this);
-    this->Internals->Items.append(item);
+    this->Internals->appendToItems(item, this);
     PV_DEBUG_PANELS() << "Using custom display panel:"
                       << legacyDisplayPanel->metaObject()->className();
     }
@@ -792,7 +808,7 @@ void pqProxyWidget::createPropertyWidgets()
         if (groupItems[property_group_tag] != NULL)
           {
           // insert the group-item.
-          this->Internals->Items.append(groupItems[property_group_tag]);
+          this->Internals->appendToItems(groupItems[property_group_tag], this);
 
           // clear the widget so we don't add it multiple times.
           groupItems[property_group_tag] = NULL;
@@ -841,16 +857,7 @@ void pqProxyWidget::createPropertyWidgets()
         smProperty->GetPanelVisibilityDefaultForRepresentation());
       }
 
-    foreach (pqPropertyWidgetDecorator* decorator,
-      item->propertyWidget()->decorators())
-      {
-      QObject::connect(decorator, SIGNAL(visibilityChanged()),
-        this, SLOT(updatePanel()));
-      QObject::connect(decorator, SIGNAL(enableStateChanged()),
-        this, SLOT(updatePanel()));
-      }
-
-    this->Internals->Items.append(item);
+    this->Internals->appendToItems(item, this);
     PV_DEBUG_PANELS() << ""; // this adds a newline.
     }
 }
@@ -873,7 +880,7 @@ void pqProxyWidget::create3DWidgets()
     pqProxyWidgetItem *item = pqProxyWidgetItem::newItem(wdg, QString(), this);
     widget3d->resetBounds();
     widget3d->reset();
-    this->Internals->Items.append(item);
+    this->Internals->appendToItems(item, this);
     }
 }
 

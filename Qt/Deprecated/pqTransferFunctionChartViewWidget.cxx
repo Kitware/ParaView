@@ -212,22 +212,6 @@ public:
   vtkSmartPointer<vtkControlPointsItem> CurrentControlPointsItem;
 };
 
-// ----------------------------------------------------------------------------
-template<class T>
-QList<T*> pqTransferFunctionChartViewWidget::plots()const
-{
-  QList<T*> res;
-  const vtkIdType count = this->chart()->GetNumberOfPlots();
-  for(vtkIdType i = 0; i < count; ++i)
-    {
-    vtkPlot* plot = this->chart()->GetPlot(i);
-    if (T::SafeDownCast(plot) != 0)
-      {
-      res << T::SafeDownCast(plot);
-      }
-    }
-  return res;
-}
 //-----------------------------------------------------------------------------
 pqTransferFunctionChartViewWidget::pqTransferFunctionChartViewWidget(
                              QWidget* pWidget/*=NULL*/):Superclass(pWidget)

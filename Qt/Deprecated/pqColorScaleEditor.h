@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqColorScaleEditor_h
 
 
-#include "pqComponentsModule.h"
+#include "pqDeprecatedModule.h"
 #include <QDialog>
 
 class pqColorScaleEditorForm;
@@ -79,7 +79,7 @@ class vtkPiecewiseFunction;
   * At a minimum, the "Apply" button should probably be placed next to the "Render immediately"
   * checkbox and disabled when "Render immediately" is checked.
   */
-class PQCOMPONENTS_EXPORT pqColorScaleEditor : public QDialog
+class PQDEPRECATED_EXPORT pqColorScaleEditor : public QDialog
 {
   Q_OBJECT
 

@@ -38,9 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqRenderViewBase.h"
 #include "pqScalarBarRepresentation.h"
-#include "pqScalarsToColors.h"
 #include "pqScalarOpacityFunction.h"
+#include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 //-----------------------------------------------------------------------------
 pqLookupTableManager::pqLookupTableManager(QObject* _parent/*=0*/)
@@ -141,4 +143,37 @@ pqScalarBarRepresentation* pqLookupTableManager::setScalarBarVisibility(
     qDebug() << "Failed to locate/create scalar bar.";
     }
   return sb;
+}
+
+//-----------------------------------------------------------------------------
+void pqLookupTableManager::saveAsDefault(vtkSMProxy* lutProxy, vtkSMProxy* viewProxy)
+{
+  pqServerManagerModel* smmodel=
+    pqApplicationCore::instance()->getServerManagerModel();
+  if (lutProxy)
+    {
+    pqScalarsToColors* stc = smmodel->findItem<pqScalarsToColors*>(lutProxy);
+    if (stc)
+      {
+      this->saveLUTAsDefault(stc);
+      }
+
+    vtkSMProxy* pwf = vtkSMPropertyHelper(lutProxy,
+      "ScalarOpacityFunction").GetAsProxy();
+    pqScalarOpacityFunction* sof = pwf?
+      smmodel->findItem<pqScalarOpacityFunction*>(pwf) : NULL;
+    if (sof)
+      {
+      this->saveOpacityFunctionAsDefault(sof);
+      }
+
+    vtkSMProxy* scalarBarProxy =
+      vtkSMTransferFunctionProxy::FindScalarBarRepresentation(viewProxy, lutProxy);
+    pqScalarBarRepresentation* sbr = scalarBarProxy?
+      smmodel->findItem<pqScalarBarRepresentation*>(scalarBarProxy) : NULL;
+    if (sbr)
+      {
+      this->saveScalarBarAsDefault(sbr);
+      }
+    }
 }

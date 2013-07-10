@@ -4,19 +4,21 @@
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SPCTH/DerivedDensity/2Dclyinder.spcth" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrayStatus/ArraySelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrayStatus/ArraySelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Derived Density - 2" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/UseAutoRescale" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/RescaleButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="8" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="8.2" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/PresetButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/Gradients" command="setCurrent" arguments="6.0" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/OkButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/CloseButton" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ResetRangeToCustom" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqRescaleRangeDialog/MinimumScalar" command="set_string" arguments="8" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqRescaleRangeDialog/MaximumScalar" command="set_string" arguments="8.2" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqRescaleRangeDialog/RescaleButton" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ChoosePreset" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqColorPresetDialog/Gradients" command="setCurrent" arguments="6.0" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqColorPresetDialog/OkButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Color Map Editor" />
+
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/axesToolbar/actionShowCenterAxes" command="set_boolean" arguments="false" />

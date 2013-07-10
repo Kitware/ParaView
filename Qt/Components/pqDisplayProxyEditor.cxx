@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqDisplayProxyEditor.h"
 
 // Qt includes
+#include <QDockWidget>
 #include <QDoubleValidator>
 #include <QFileInfo>
 #include <QIcon>
@@ -65,7 +66,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView client includes
 #include "pqApplicationCore.h"
-#include "pqColorScaleEditor.h"
 #include "pqCoreUtilities.h"
 #include "pqCubeAxesEditorDialog.h"
 #include "pqFileDialog.h"
@@ -889,10 +889,19 @@ void pqDisplayProxyEditor::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::openColorMapEditor()
 {
-  pqColorScaleEditor editor(pqCoreUtilities::mainWidget());
-  editor.setObjectName("pqColorScaleDialog");
-  editor.setRepresentation(this->Internal->Representation);
-  editor.exec();
+  // Raise the color editor is present in the application.
+  QDockWidget* widget = qobject_cast<QDockWidget*>(
+    pqApplicationCore::instance()->manager("COLOR_EDITOR_PANEL"));
+  if (widget)
+    {
+    widget->setVisible(true);
+    widget->setFloating(true);
+    widget->raise();
+    }
+  else
+    {
+    qDebug("Failed to find 'COLOR_EDITOR_PANEL'.");
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqTransferFunctionEditorPropertyWidget.cxx
+   Module: pqTransferFunctionWidgetPropertyWidget.cxx
 
    Copyright (c) 2005-2012 Kitware Inc.
    All rights reserved.
@@ -29,25 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqTransferFunctionWidgetPropertyWidget.h"
+#include "ui_pqTransferFunctionWidgetPropertyWidgetDialog.h"
 
-#include "pqTransferFunctionEditorPropertyWidget.h"
-
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
-#include "pqTransferFunctionChartViewWidget.h"
-#include "vtkPiecewiseFunction.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMProxyListDomain.h"
 #include "pqPVApplicationCore.h"
-#include "vtkChartXY.h"
+#include "pqTransferFunctionWidget.h"
 #include "vtkAxis.h"
+#include "vtkChartXY.h"
+#include "vtkPiecewiseFunction.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyProperty.h"
 
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
 
-pqTransferFunctionEditorPropertyWidget::pqTransferFunctionEditorPropertyWidget(vtkSMProxy *smProxy,
+namespace
+{
+  class pqTransferFunctionWidgetPropertyWidgetDialog : public QDialog
+  {
+  vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;
+  Ui::TransferFunctionWidgetPropertyWidgetDialog Ui;
+public:
+  pqTransferFunctionWidgetPropertyWidgetDialog(
+    const QString& label,
+    vtkPiecewiseFunction* transferFunction, QWidget* parentWdg=NULL) :
+    QDialog(parentWdg),
+    TransferFunction(transferFunction)
+    {
+    this->setWindowTitle(label);
+    this->Ui.setupUi(this);
+    this->Ui.Label->setText(
+      this->Ui.Label->text().arg(label));
+    this->Ui.TransferFunctionEditor->initialize(NULL, false,
+      this->TransferFunction.GetPointer(), true);
+    }
+  ~pqTransferFunctionWidgetPropertyWidgetDialog()
+    {
+    }
+  };
+};
+
+pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(vtkSMProxy *smProxy,
                                                                                vtkSMProperty *proxyProperty,
                                                                                QWidget *pWidget)
   : pqPropertyWidget(smProxy, pWidget),
@@ -62,15 +89,15 @@ pqTransferFunctionEditorPropertyWidget::pqTransferFunctionEditorPropertyWidget(v
 
   this->setLayout(l);
 
-  PV_DEBUG_PANELS() << "pqTransferFunctionEditorPropertyWidget for a property with "
+  PV_DEBUG_PANELS() << "pqTransferFunctionWidgetPropertyWidget for a property with "
                 << "the panel_widget=\"transfer_function_editor\" attribute";
 }
 
-pqTransferFunctionEditorPropertyWidget::~pqTransferFunctionEditorPropertyWidget()
+pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget()
 {
 }
 
-void pqTransferFunctionEditorPropertyWidget::buttonClicked()
+void pqTransferFunctionWidgetPropertyWidget::buttonClicked()
 {
   vtkSMProxyProperty *proxyProperty = vtkSMProxyProperty::SafeDownCast(this->Property);
   if(!proxyProperty)
@@ -95,41 +122,12 @@ void pqTransferFunctionEditorPropertyWidget::buttonClicked()
   vtkPiecewiseFunction *transferFunction =
     vtkPiecewiseFunction::SafeDownCast(object);
 
-  pqTransferFunctionEditorPropertyWidgetDialog dialog(transferFunction, this);
-  dialog.resize(600, 400);
+  pqTransferFunctionWidgetPropertyWidgetDialog dialog(
+    this->Property->GetXMLLabel(), transferFunction, this);
   dialog.exec();
 
+  // BUG: we are never propagating the vtkPiecewiseFunction change to the
+  // SMProperty on the proxy!!! This will never work in client-server mode.
   emit this->changeAvailable();
   emit this->changeFinished();
-}
-
-// === pqTransferFunctionEditorPropertyWidgetDialog ======================== //
-pqTransferFunctionEditorPropertyWidgetDialog::
-  pqTransferFunctionEditorPropertyWidgetDialog(vtkPiecewiseFunction *transferFunction, QWidget *parent_)
-  : QDialog(parent_)
-{
-  QVBoxLayout *l = new QVBoxLayout;
-
-  this->TransferFunction = transferFunction;
-
-  pqTransferFunctionChartViewWidget *widget =
-    new pqTransferFunctionChartViewWidget(this);
-  widget->setTitle("Edit Transfer Function");
-  widget->chart()->GetAxis(vtkAxis::BOTTOM)->SetTitle("Input");
-  widget->chart()->GetAxis(vtkAxis::LEFT)->SetTitle("Output");
-  double range[2];
-  this->TransferFunction->GetRange(range);
-  double validBounds[4] = { VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, range[0], range[1] };
-  widget->setValidBounds(validBounds);
-  widget->addPiecewiseFunction(this->TransferFunction.GetPointer());
-
-  l->addWidget(widget);
-
-  QHBoxLayout *buttonLayout = new QHBoxLayout;
-  QPushButton *closeButton = new QPushButton("Close", this);
-  closeButton->setObjectName("CloseButton");
-  this->connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
-  buttonLayout->addWidget(closeButton);
-  l->addLayout(buttonLayout);
-  this->setLayout(l);
 }

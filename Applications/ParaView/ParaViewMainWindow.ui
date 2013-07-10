@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>18</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -184,8 +184,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>70</width>
-          <height>178</height>
+          <width>77</width>
+          <height>152</height>
          </rect>
         </property>
        </widget>
@@ -219,8 +219,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>70</width>
-          <height>178</height>
+          <width>77</width>
+          <height>152</height>
          </rect>
         </property>
        </widget>
@@ -255,6 +255,15 @@
     <number>1</number>
    </attribute>
    <widget class="pqMultiBlockInspectorPanel" name="multiBlockInspectorPanel"/>
+  </widget>
+  <widget class="QDockWidget" name="colorMapEditorDock">
+   <property name="windowTitle">
+    <string>Color Map Editor</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqColorMapEditor" name="colorMapEditorPanel"/>
   </widget>
  </widget>
  <customwidgets>
@@ -339,6 +348,12 @@
    <class>pqMultiBlockInspectorPanel</class>
    <extends>QWidget</extends>
    <header>pqMultiBlockInspectorPanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqColorMapEditor</class>
+   <extends>QWidget</extends>
+   <header>pqColorMapEditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

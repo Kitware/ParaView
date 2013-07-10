@@ -47,6 +47,7 @@
         <file>Icons/pqEdgeSetData16.png</file>
         <file>Icons/pqEditCamera16.png</file>
         <file>Icons/pqEditColor24.png</file>
+        <file>Icons/pqEditScalarBar16.png</file>
         <file>Icons/pqElemData16.png</file>
         <file>Icons/pqElemMapData16.png</file>
         <file>Icons/pqElemSetData16.png</file>
@@ -91,6 +92,7 @@
         <file>Icons/pqHistogram16.png</file>
         <file>Icons/pqHistogram24.png</file>
         <file>Icons/pqImageData16.png</file>
+        <file>Icons/pqInvert24.png</file>
         <file>Icons/pqInspect22.png</file>
         <file>Icons/pqIsosurface24.png</file>
         <file>Icons/pqLineChart16.png</file>
@@ -152,6 +154,8 @@
         <file>Icons/pqResetCenter24.png</file>
         <file>Icons/pqResetCenter32.png</file>
         <file>Icons/pqResetRange24.png</file>
+        <file>Icons/pqResetRangeCustom24.png</file>
+        <file>Icons/pqResetRangeTemporal24.png</file>
         <file>Icons/pqRotate16.png</file>
         <file>Icons/pqRotate24.png</file>
         <file>Icons/pqRotate32.png</file>
@@ -263,5 +267,11 @@
         <file>Icons/SplitViewHorizontal.png</file>
         <file>Icons/SplitViewVertical.png</file>
         <file>Icons/warning.png</file>
+        <file>Icons/pqBold16.png</file>
+        <file>Icons/pqBold24.png</file>
+        <file>Icons/pqItalics16.png</file>
+        <file>Icons/pqItalics24.png</file>
+        <file>Icons/pqShadow16.png</file>
+        <file>Icons/pqShadow24.png</file>
     </qresource>
 </RCC>

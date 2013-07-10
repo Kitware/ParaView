@@ -53,6 +53,7 @@ set (Module_SRCS
   vtkSMSelectionHelper.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
+  vtkSMTransferFunctionProxy.cxx
   vtkSMUtilities.cxx
   vtkSMViewLayoutProxy.cxx
   vtkSMViewProxy.cxx

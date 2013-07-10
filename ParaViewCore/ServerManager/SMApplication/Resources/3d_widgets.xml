@@ -358,23 +358,25 @@
       <IntVectorProperty command="SetEnabled"
                          default_values="0"
                          name="Enabled"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never" >
         <BooleanDomain name="bool" />
         <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseNonCompositedRenderer"
                          default_values="1"
                          name="UseNonCompositedRenderer"
-                         number_of_elements="1"></IntVectorProperty>
+                         number_of_elements="1"
+                         panel_visibility="never"></IntVectorProperty>
       <SubProxy>
         <Proxy name="Prop2D"
                proxygroup="3d_widget_representations"
                proxyname="ScalarBarRepresentation"></Proxy>
         <ExposedProperties>
-          <Property name="Visibility" />
-          <Property name="Position" />
-          <Property name="Position2" />
-          <Property name="Orientation" />
+          <Property name="Visibility" panel_visibility="never"/>
+          <Property name="Position" panel_visibility="never"/>
+          <Property name="Position2" panel_visibility="never"/>
+          <Property name="Orientation" panel_visibility="never" />
           <Property name="PositionInfo" />
           <Property name="Position2Info" />
           <Property name="OrientationInfo" />
@@ -385,33 +387,49 @@
                proxygroup="annotations"
                proxyname="ScalarBarActor"></Proxy>
         <ExposedProperties>
-          <Property name="LookupTable" />
-          <Property name="Title" />
-          <Property name="ComponentTitle" />
-          <Property name="AutomaticLabelFormat" />
-          <Property name="LabelFormat" />
-          <Property name="NumberOfLabels" />
-          <Property name="AspectRatio" />
-          <Property name="DrawAnnotations" />
-          <Property name="DrawNanAnnotation" />
-          <Property name="NanAnnotation" />
-          <Property name="TextPosition" />
-          <!-- properties for Label -->
-          <Property name="LabelColor" />
-          <Property name="LabelOpacity" />
-          <Property name="LabelFontFamily" />
-          <Property name="LabelBold" />
-          <Property name="LabelItalic" />
-          <Property name="LabelShadow" />
-          <Property name="LabelFontSize" />
+          <Property name="LookupTable" panel_visibility="never"/>
+          <PropertyGroup label="Title Texts">
+            <Property name="Title" />
+            <Property name="ComponentTitle" />
+          </PropertyGroup>
+
           <!-- properties for Title -->
-          <Property name="TitleColor" />
-          <Property name="TitleOpacity" />
-          <Property name="TitleFontFamily" />
-          <Property name="TitleBold" />
-          <Property name="TitleItalic" />
-          <Property name="TitleShadow" />
-          <Property name="TitleFontSize" />
+          <PropertyGroup label="Title Font Properties"
+                         panel_widget="FontEditor">
+            <Property name="TitleColor" function="Color"/>
+            <Property name="TitleOpacity" function="Opacity"/>
+            <Property name="TitleFontFamily" function="Family"/>
+            <Property name="TitleBold" function="Bold" />
+            <Property name="TitleItalic" function="Italics"/>
+            <Property name="TitleShadow" function="Shadow" />
+            <Property name="TitleFontSize" function="Size" />
+          </PropertyGroup>
+
+          <!-- properties for Label -->
+          <PropertyGroup label="Text/Annotation Font Properties"
+                         panel_widget="FontEditor">
+            <Property name="LabelColor" function="Color"/>
+            <Property name="LabelOpacity" function="Opacity" />
+            <Property name="LabelFontFamily" function="Family"/>
+            <Property name="LabelBold" function="Bold" />
+            <Property name="LabelItalic" function="Italics" />
+            <Property name="LabelShadow" function="Shadow" />
+            <Property name="LabelFontSize" function="Size" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Annotations">
+            <Property name="DrawAnnotations" />
+            <Property name="DrawNanAnnotation" />
+            <Property name="NanAnnotation" />
+            <Property name="TextPosition" panel_visibility="never" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Miscellaneous">
+            <Property name="AutomaticLabelFormat" />
+            <Property name="LabelFormat" />
+            <Property name="NumberOfLabels" />
+            <Property name="AspectRatio" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -419,9 +437,9 @@
                proxygroup="3d_widgets"
                proxyname="ScalarBarWidget"></Proxy>
         <ExposedProperties>
-          <Property name="Selectable" />
-          <Property name="Resizable" />
-          <Property name="Repositionable" />
+          <Property name="Selectable" panel_visibility="never"/>
+          <Property name="Resizable" panel_visibility="never"/>
+          <Property name="Repositionable" panel_visibility="never"/>
         </ExposedProperties>
       </SubProxy>
     </ScalarBarWidgetRepresentationProxy>
