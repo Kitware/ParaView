@@ -296,7 +296,7 @@ class CoProcessor(object):
                          newrgbpoints[v*4] = globaldatarange[0]+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
 
                       # avoid numerical round-off, at least with the last point
-                      newrgbpoints[(numpts-1)*4] = rgbpoints[(numpts-1)*4]
+                      newrgbpoints[(numpts-1)*4] = globaldatarange[1]
                    else: # the old range is 0 so the best we can do is to space the new points evenly
                       for v in range(numpts+1):
                          newrgbpoints[v*4] = globaldatarange[0]+v*newrange/(1.0*numpts)
