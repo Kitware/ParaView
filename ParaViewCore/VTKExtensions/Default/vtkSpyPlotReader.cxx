@@ -491,8 +491,11 @@ int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *requestInfo,
 
   this->CurrentTimeStep = closestStep;
 
-  outputData->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
+  if (outputData != NULL) 
+    {
+    outputData->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
                             steps[this->CurrentTimeStep]);
+    }
   return 1;
 }
 //-----------------------------------------------------------------------------
@@ -853,7 +856,7 @@ int vtkSpyPlotReader::RequestData(
 #ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
   if (this->GenerateMarkers)
     {
-    vtkInformation *info=outputVector->GetInformationObject(1);
+    info=outputVector->GetInformationObject(1);
     vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
     vtkMultiBlockDataSet *mbds=vtkMultiBlockDataSet::SafeDownCast(doOutput);
 
@@ -1997,6 +2000,11 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
         }
 
       array = uniReader->GetCellFieldData(blockID, field, &fixed);
+      if (array == 0)
+        {
+        vtkErrorMacro ("Unable to read array " << fname);
+        continue;
+        }
       //vtkDebugMacro( << __LINE__ << " Read data block: " << blockID
       // << " " << field << "  [" << array->GetName() << "]" );
       cd->AddArray(array);
