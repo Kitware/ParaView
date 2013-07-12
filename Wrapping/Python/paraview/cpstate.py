@@ -148,7 +148,10 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
         cpstate_globals.write_frequencies[key] = []
 
     # Start trace
-    smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
+    capture_modified_properties = not smstate._save_full_state
+    smtrace.start_trace(CaptureAllProperties=True,
+                        CaptureModifiedProperties=capture_modified_properties,
+                        UseGuiName=True)
 
     # Disconnect the smtrace module's observer.  It should not be
     # active while tracing the state.

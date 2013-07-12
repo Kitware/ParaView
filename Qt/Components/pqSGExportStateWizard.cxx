@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPythonManager.h>
 #include <pqRenderViewBase.h>
 #include <pqServerManagerModel.h>
+#include <pqSettings.h>
 #include "pqImageOutputInfo.h"
 
 #include <vtkImageData.h>
@@ -332,6 +333,7 @@ bool pqSGExportStateWizard::validateCurrentPage()
   // Last Page, export the state.
   pqPythonManager* manager = qobject_cast<pqPythonManager*>(
     pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+
   pqPythonDialog* dialog = 0;
   if (manager)
     {
@@ -341,6 +343,14 @@ bool pqSGExportStateWizard::validateCurrentPage()
     {
     qCritical("Failed to locate Python dialog. Cannot save state.");
     return true;
+    }
+
+  // Get from the settings whether or not we should save the full state
+  // or just non-default values.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  if(settings)
+    {
+    manager->setSaveFullState(settings->value("saveFullState", false).toBool());
     }
 
   QString command;
