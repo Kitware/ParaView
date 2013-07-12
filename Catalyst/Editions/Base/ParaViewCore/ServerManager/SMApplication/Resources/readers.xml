@@ -1,6 +1,0 @@
-<ServerManagerConfiguration>
-  <ProxyGroup name="internal_sources">
-  </ProxyGroup>
-  <ProxyGroup name="sources">
-  </ProxyGroup>
-</ServerManagerConfiguration>
