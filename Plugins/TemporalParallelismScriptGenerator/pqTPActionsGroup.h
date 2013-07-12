@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    pqTPActionsGroup.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,27 +29,25 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#ifndef __pqTPActionsGroup_h
+#define __pqTPActionsGroup_h
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
-  Superclass(parentObject)
-{
-}
+#include <QActionGroup>
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
+// Adds actions for co-processing.
+class pqTPActionsGroup : public QActionGroup
 {
-}
+  Q_OBJECT
+  typedef QActionGroup Superclass;
+public:
+  pqTPActionsGroup(QObject* parent=0);
+  virtual ~pqTPActionsGroup();
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getWritersMenuName()
-{
-  return "&Writers";
-}
+protected slots:
+  void exportState();
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getObjectMenuName()
-{
-  return "CPProxyWritersMenu";
-}
+private:
+  Q_DISABLE_COPY(pqTPActionsGroup)
+};
+
+#endif

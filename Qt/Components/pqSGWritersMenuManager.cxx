@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPWritersMenuManager.cxx
+   Module:    pqSGWritersMenuManager.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPWritersMenuManager.h"
+#include "pqSGWritersMenuManager.h"
 
 #include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
@@ -83,10 +83,13 @@ namespace
 }
 
 //-----------------------------------------------------------------------------
-pqCPWritersMenuManager::pqCPWritersMenuManager(QObject* parentObject):
+pqSGWritersMenuManager::pqSGWritersMenuManager(
+  const char* writersMenuName, const char* objectMenuName, QObject* parentObject):
   Superclass(parentObject)
 {
   this->Menu = 0;
+  this->WritersMenuName = writersMenuName;
+  this->ObjectMenuName = objectMenuName;
 
   // this updates the available writers whenever the active
   // source changes
@@ -117,7 +120,7 @@ pqCPWritersMenuManager::pqCPWritersMenuManager(QObject* parentObject):
 }
 
 //-----------------------------------------------------------------------------
-pqCPWritersMenuManager::~pqCPWritersMenuManager()
+pqSGWritersMenuManager::~pqSGWritersMenuManager()
 {
 }
 
@@ -140,7 +143,7 @@ namespace
 }
 
 //-----------------------------------------------------------------------------
-void pqCPWritersMenuManager::createMenu()
+void pqSGWritersMenuManager::createMenu()
 {
   QMainWindow *mainWindow = qobject_cast<QMainWindow*>(
     pqCoreUtilities::mainWidget());
@@ -153,8 +156,8 @@ void pqCPWritersMenuManager::createMenu()
 
   if(this->Menu == NULL)
     {
-    this->Menu = new QMenu("&Writers", mainWindow);
-    this->Menu->setObjectName("CoProcessingWritersMenu");
+    this->Menu = new QMenu(this->WritersMenuName, mainWindow);
+    this->Menu->setObjectName(this->ObjectMenuName);
     mainWindow->menuBar()->insertMenu(
       ::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
 
@@ -170,7 +173,7 @@ void pqCPWritersMenuManager::createMenu()
     pxm->GetProxyDefinitionManager();
 
   // For now we only worry about proxies in the filter group and
-  // we search specifically for proxies with a coprocessing hint
+  // we search specifically for proxies with a proxy writer hint
   // since we've marked them as special
   const char proxyGroup[] = "filters";
   vtkPVProxyDefinitionIterator* iter =
@@ -179,7 +182,7 @@ void pqCPWritersMenuManager::createMenu()
     {
     if(vtkPVXMLElement* hints = iter->GetProxyHints())
       {
-      if(hints->FindNestedElementByName("CoProcessing"))
+      if(hints->FindNestedElementByName("WriterProxy"))
         {
         const char* proxyName = iter->GetProxyName();
         vtkSMProxy* prototype = pxm->GetPrototypeProxy(proxyGroup, proxyName);
@@ -204,7 +207,7 @@ void pqCPWritersMenuManager::createMenu()
 }
 
 //-----------------------------------------------------------------------------
-void pqCPWritersMenuManager::updateEnableState()
+void pqSGWritersMenuManager::updateEnableState()
 {
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
@@ -305,7 +308,7 @@ void pqCPWritersMenuManager::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqCPWritersMenuManager::onActionTriggered(QAction* action)
+void pqSGWritersMenuManager::onActionTriggered(QAction* action)
 {
   QStringList filterType = action->data().toStringList();
   if (filterType.size() == 2)
@@ -315,7 +318,7 @@ void pqCPWritersMenuManager::onActionTriggered(QAction* action)
 }
 
 //-----------------------------------------------------------------------------
-void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
+void pqSGWritersMenuManager::createWriter(const QString& xmlgroup,
   const QString& xmlname)
 {
   pqApplicationCore* core = pqApplicationCore::instance();

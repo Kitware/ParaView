@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPWritersMenuManager.h
+   Module:    pqSGPluginManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,53 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCPWritersMenuManager_h
-#define __pqCPWritersMenuManager_h
+#ifndef __pqSGPluginManager_h
+#define __pqSGPluginManager_h
 
+#include "pqComponentsModule.h"
 #include <QObject>
-#include <QTimer>
 
-class QMenu;
-class QAction;
-
-/// pqCPWritersMenuManager is responsible for managing the menu for "Writers".
-/// pqCPPluginManager calls createMenu() when the plugin is initialized, then
-/// pqCPWritersMenuManager creates and setups up the co-processing writers menu.
-/// If another plugin is loaded after this one is then it rechecks to see
-/// if any writers were added with the CoProcessing hint in the XML file
-/// and if they were then the writers get added to the Writers menu.  See
-/// Resources/servermanager.xml for an example of how to do that.
-class pqCPWritersMenuManager : public QObject
+/// pqSGPluginManager is the central class that orchestrates the behaviour of
+/// this co-processing plugin.
+class PQCOMPONENTS_EXPORT pqSGPluginManager : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  pqCPWritersMenuManager(QObject* parent=0);
-  ~pqCPWritersMenuManager();
+  pqSGPluginManager(QObject* parent=0);
+  ~pqSGPluginManager();
 
-public slots:
-  /// Creates a new "Writers" menu and adds the co-processing writers to it.
-  void createMenu();
+  /// Methods used to shartup and shutdown the plugin.
+  void startup();
 
-protected slots:
-  /// Updates the enable state for the writers menu.
-  void updateEnableState();
+  /// Methods used to shartup and shutdown the plugin.
+  void shutdown();
 
-  /// Called when user requests to create a writer.
-  void onActionTriggered(QAction*);
-protected:
-  void createWriter(const QString& xmlgroup, const QString& xmlname);
+  /// Get the name of the writers menu from the concrete subclass.
+  virtual const char* getWritersMenuName() = 0;
 
-private:
-  QMenu* Menu;
+  /// Get the Qt name of the writers menu from the concrete subclass.
+  virtual const char* getObjectMenuName() = 0;
 
 private:
-  pqCPWritersMenuManager(const pqCPWritersMenuManager&); // Not implemented.
-  void operator=(const pqCPWritersMenuManager&); // Not implemented.
-
-  QTimer Timer;
+  pqSGPluginManager(const pqSGPluginManager&); // Not implemented.
+  void operator=(const pqSGPluginManager&); // Not implemented.
 };
 
 #endif
-
-

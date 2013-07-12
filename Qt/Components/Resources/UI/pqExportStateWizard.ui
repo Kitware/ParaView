@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>568</width>
-    <height>460</height>
+    <height>513</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Export CoProcessing State</string>
+   <string>Export State</string>
   </property>
   <widget class="QWizardPage" name="wizardPage1">
    <property name="title">
@@ -30,7 +30,7 @@
     <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
-       <string>This wizard will guide you through the steps required to export the current visualization state as a python script that can be run in the co-processing component of ParaView.  Make sure to add appropriate writers for the desired pipelines to be used in the Writers menu.</string>
+       <string>This wizard will guide you through the steps required to export the current visualization state as a Python script that can be run in the co-processing component of ParaView.  Make sure to add appropriate writers for the desired pipelines to be used in the Writers menu.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -55,7 +55,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="pqCPExportStateWizardPage2" name="wizardPage2">
+  <widget class="pqSGExportStateWizardPage2" name="wizardPage2">
    <property name="title">
     <string>Select Simulation Inputs</string>
    </property>
@@ -115,7 +115,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="pqCPExportStateWizardPage3" name="wizardPage">
+  <widget class="pqSGExportStateWizardPage3" name="wizardPage">
    <property name="title">
     <string>Name Simulation Inputs</string>
    </property>
@@ -158,15 +158,44 @@
    <property name="subTitle">
     <string>Select state configuration options.</string>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
      <widget class="QCheckBox" name="liveViz">
       <property name="text">
        <string>Live Visualization</string>
       </property>
      </widget>
     </item>
-    <item>
+    <item row="1" column="0">
+     <widget class="QSpinBox" name="timeCompartmentSize">
+      <property name="toolTip">
+       <string>The number of processes working together on a specific time step.</string>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="suffix">
+       <string/>
+      </property>
+      <property name="prefix">
+       <string/>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Time compartment size</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
      <widget class="QCheckBox" name="outputRendering">
       <property name="enabled">
        <bool>true</bool>
@@ -179,7 +208,7 @@
       </property>
      </widget>
     </item>
-    <item>
+    <item row="3" column="0">
      <widget class="QCheckBox" name="rescaleDataRange">
       <property name="enabled">
        <bool>true</bool>
@@ -198,7 +227,7 @@
       </property>
      </widget>
     </item>
-    <item>
+    <item row="4" column="0" colspan="2">
      <widget class="QStackedWidget" name="viewsContainer">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -220,17 +249,7 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QPushButton" name="nextView">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Next View</string>
-      </property>
-     </widget>
-    </item>
-    <item>
+    <item row="5" column="0">
      <widget class="QPushButton" name="previousView">
       <property name="enabled">
        <bool>false</bool>
@@ -240,18 +259,28 @@
       </property>
      </widget>
     </item>
+    <item row="5" column="1">
+     <widget class="QPushButton" name="nextView">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Next View</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqCPExportStateWizardPage2</class>
+   <class>pqSGExportStateWizardPage2</class>
    <extends>QWizardPage</extends>
    <header>QWizardPage</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqCPExportStateWizardPage3</class>
+   <class>pqSGExportStateWizardPage3</class>
    <extends>QWizardPage</extends>
    <header>QWizardPage</header>
    <container>1</container>

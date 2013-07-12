@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPExportStateWizard.cxx
+   Module:    pqTPExportStateWizard.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPExportStateWizard.h"
+#include "pqTPExportStateWizard.h"
 
 #include <vtkSMProxyManager.h>
 #include <vtkSMSessionProxyManager.h>
@@ -48,46 +48,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMessageBox>
 
-namespace
-{
-  static const char* cp_python_export_code =
-    "from paraview import cpexport\n"
-    "cpexport.DumpCoProcessingScript(export_rendering=%1,\n"
-    "   simulation_input_map={%2},\n"
-    "   screenshot_info={%3},\n"
-    "   rescale_data_range=%4,\n"
-    "   enable_live_viz=%5,\n"
-    "   filename='%6')\n";
-}
+extern const char* tp_export_py;
 
 //-----------------------------------------------------------------------------
-pqCPExportStateWizard::pqCPExportStateWizard(
+pqTPExportStateWizard::pqTPExportStateWizard(
   QWidget *parentObject, Qt::WindowFlags parentFlags)
   : Superclass(parentObject, parentFlags)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqCPExportStateWizard::~pqCPExportStateWizard()
+pqTPExportStateWizard::~pqTPExportStateWizard()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqCPExportStateWizard::customize()
+void pqTPExportStateWizard::customize()
 {
-  this->Internals->timeCompartmentSize->hide();
-  this->Internals->label_2->hide();
-}
-
-//-----------------------------------------------------------------------------
-bool pqCPExportStateWizard::getCommandString(QString& command)
-{
-  QString export_rendering = this->Internals->outputRendering->isChecked() ?
-    "True" : "False";
-  QString rendering_info; // a map from the render view name to render output params
-  if (this->Internals->outputRendering->isChecked() == 0 &&
-      this->Internals->liveViz->isChecked() == 0)
+  // for spatio-temporal scripts we don't care about frequency or fitting
+  // the image to screen
+  QList<pqImageOutputInfo*> infos = this->getImageOutputInfos();
+  for(QList<pqImageOutputInfo*>::iterator it=infos.begin();
+      it!=infos.end();it++)
     {
+    (*it)->hideFrequencyInput();
+    (*it)->hideFitToScreen();
+    }
+
+  this->Internals->wizardPage1->setTitle("Export Spatio-Temporal Parallel Script");
+  this->Internals->label->setText("This wizard will guide you through the steps required to export the current visualization state as a Python script that can be run with spatio-temporal parallelism with ParaView.  Make sure to add appropriate writers for the desired pipelines to be used in the Writers menu.");
+  QStringList labels;
+  labels << "Pipeline Name" << "File Location";
+  this->Internals->nameWidget->setHorizontalHeaderLabels(labels);
+  this->Internals->liveViz->hide();
+  this->Internals->rescaleDataRange->hide();
+}
+
+//-----------------------------------------------------------------------------
+bool pqTPExportStateWizard::getCommandString(QString& command)
+{
+  command.clear();
+
+  QString export_rendering = "True";
+  QString rendering_info; // a map from the render view name to render output params
+  if (this->Internals->outputRendering->isChecked() == 0)
+    {
+    export_rendering = "False";
     // check to make sure that there is a writer hooked up since we aren't
     // exporting an image
     vtkSMSessionProxyManager* proxyManager =
@@ -101,8 +107,8 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       if(vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
            proxyManager->GetProxy("sources", proxyManager->GetProxyName("sources", i))))
         {
-        vtkPVXMLElement* writerProxyHint = proxy->GetHints();
-        if(writerProxyHint && writerProxyHint->FindNestedElementByName("WriterProxy"))
+        vtkPVXMLElement* proxyHint = proxy->GetHints();
+        if(proxyHint && proxyHint->FindNestedElementByName("WriterProxy"))
           {
           haveSomeWriters = true;
           }
@@ -119,11 +125,12 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     if(!haveSomeWriters)
       {
       QMessageBox messageBox;
-      QString message(tr("No output specified. Generated script should be modified to output information."));
+      QString message(tr("No output writers specified. Either add writers in the pipeline or check <b>Output rendering components</b>."));
       messageBox.setText(message);
       messageBox.exec();
+      return false;
       }
-    else if(filtersWithoutConsumers.size() != 0)
+    if(filtersWithoutConsumers.size() != 0)
       {
       QMessageBox messageBox;
       QString message(tr("The following filters have no consumers and will not be saved:\n"));
@@ -138,8 +145,8 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       messageBox.exec();
       }
     }
-  else if(this->Internals->outputRendering->isChecked())
-    { // we are creating images so add information to the view proxies
+  else // we are creating an image so we need to get the proper information from there
+    {
     vtkSMSessionProxyManager* proxyManager =
         vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
     for(int i=0;i<this->Internals->viewsContainer->count();i++)
@@ -149,11 +156,10 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       pqView* view = viewInfo->getView();
       QSize viewSize = view->getSize();
       vtkSMViewProxy* viewProxy = view->getViewProxy();
-      QString info = QString(" '%1' : ['%2', %3, '%4', '%5', '%6', '%7'],").
+      QString info = QString(" '%1' : ['%2', '%3', '%4', '%5'],").
         arg(proxyManager->GetProxyName("views", viewProxy)).
-        arg(viewInfo->getImageFileName()).arg(viewInfo->getWriteFrequency()).
-        arg(static_cast<int>(viewInfo->fitToScreen())).
-        arg(viewInfo->getMagnification()).arg(viewSize.width()).arg(viewSize.height());
+        arg(viewInfo->getImageFileName()).arg(viewInfo->getMagnification()).
+        arg(viewSize.width()).arg(viewSize.height());
       rendering_info+= info;
       }
     // remove the last comma -- assume that there's at least one view
@@ -164,7 +170,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
 
   pqFileDialog file_dialog (NULL, this,
     tr("Save Server State:"), QString(), filters);
-  file_dialog.setObjectName("ExportCoprocessingStateFileDialog");
+  file_dialog.setObjectName("ExportSpatio-TemporalStateFileDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
   if (!file_dialog.exec())
     {
@@ -173,32 +179,35 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
 
   QString filename = file_dialog.getSelectedFiles()[0];
 
-  // the map from the simulation inputs in the paraview gui
-  // to the adaptor's named inputs (usually 'input')
-  QString sim_inputs_map;
+  // Last Page, export the state.
+  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
+    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
+  pqPythonDialog* dialog = 0;
+  if (manager)
+    {
+    dialog = manager->pythonShellDialog();
+    }
+  if (!dialog)
+    {
+    qCritical("Failed to locate Python dialog. Cannot save state.");
+    return true;
+    }
+
+  // mapping from readers and their filenames on the current machine
+  // to the filenames on the remote machine
+  QString reader_inputs_map;
   for (int cc=0; cc < this->Internals->nameWidget->rowCount(); cc++)
     {
     QTableWidgetItem* item0 = this->Internals->nameWidget->item(cc, 0);
     QTableWidgetItem* item1 = this->Internals->nameWidget->item(cc, 1);
-    sim_inputs_map +=
+    reader_inputs_map +=
       QString(" '%1' : '%2',").arg(item0->text()).arg(item1->text());
     }
   // remove last ","
-  sim_inputs_map.chop(1);
+  reader_inputs_map.chop(1);
 
-  QString rescale_data_range = (this->Internals->rescaleDataRange->isChecked() == true ?
-                                "True" : "False");
-
-  QString live_visualization = (this->Internals->liveViz->isChecked() == true ?
-                                "True" : "False");
-
-  command = cp_python_export_code;
-  command = command.arg(export_rendering)
-                   .arg(sim_inputs_map)
-                   .arg(rendering_info)
-                   .arg(rescale_data_range)
-                   .arg(live_visualization)
-                   .arg(filename);
+  int timeCompartmentSize = this->Internals->timeCompartmentSize->value();
+  command = QString(tp_export_py).arg(export_rendering).arg(reader_inputs_map).arg(rendering_info).arg(timeCompartmentSize).arg(filename);
 
   return true;
 }

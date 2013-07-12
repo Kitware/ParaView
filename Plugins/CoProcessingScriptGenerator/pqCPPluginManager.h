@@ -32,23 +32,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqCPPluginManager_h
 #define __pqCPPluginManager_h
 
-#include <QObject>
+#include <pqSGPluginManager.h>
 
 /// pqCPPluginManager is the central class that orchestrates the behaviour of
 /// this co-processing plugin.
-class pqCPPluginManager : public QObject
+class pqCPPluginManager :  public pqSGPluginManager
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef pqSGPluginManager Superclass;
 public:
   pqCPPluginManager(QObject* parent=0);
   ~pqCPPluginManager();
 
-  /// Methods used to shartup and shutdown the plugin.
-  void startup();
+  /// Get the name of the writers menu from the concrete subclass.
+  virtual const char* getWritersMenuName();
 
-  /// Methods used to shartup and shutdown the plugin.
-  void shutdown();
+  /// Get the Qt name of the writers menu from the concrete subclass.
+  virtual const char* getObjectMenuName();
 
 private:
   pqCPPluginManager(const pqCPPluginManager&); // Not implemented.

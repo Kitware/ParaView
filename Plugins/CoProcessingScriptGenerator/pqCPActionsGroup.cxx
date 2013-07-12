@@ -55,6 +55,7 @@ pqCPActionsGroup::~pqCPActionsGroup()
 void pqCPActionsGroup::exportState()
 {
   pqCPExportStateWizard wizard(pqCoreUtilities::mainWidget());
+  wizard.customize();
   wizard.exec();
 }
 

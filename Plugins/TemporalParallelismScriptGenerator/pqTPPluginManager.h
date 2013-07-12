@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    pqTPPluginManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,27 +29,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#ifndef __pqTPPluginManager_h
+#define __pqTPPluginManager_h
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
-  Superclass(parentObject)
-{
-}
+#include <pqSGPluginManager.h>
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
+/// pqTPPluginManager is the central class that orchestrates the behaviour of
+/// this spatio-temporal script creator plugin.
+class pqTPPluginManager :  public pqSGPluginManager
 {
-}
+  Q_OBJECT
+  typedef pqSGPluginManager Superclass;
+public:
+  pqTPPluginManager(QObject* parent=0);
+  ~pqTPPluginManager();
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getWritersMenuName()
-{
-  return "&Writers";
-}
+  /// Get the name of the writers menu from the concrete subclass.
+  virtual const char* getWritersMenuName();
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getObjectMenuName()
-{
-  return "CPProxyWritersMenu";
-}
+  /// Get the Qt name of the writers menu from the concrete subclass.
+  virtual const char* getObjectMenuName();
+
+private:
+  pqTPPluginManager(const pqTPPluginManager&); // Not implemented.
+  void operator=(const pqTPPluginManager&); // Not implemented.
+};
+
+#endif

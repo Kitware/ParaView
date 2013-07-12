@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    pqTPExportStateWizard.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,27 +29,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#ifndef __pqTPExportStateWizard_h
+#define __pqTPExportStateWizard_h
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
-  Superclass(parentObject)
-{
-}
+#include "pqSGExportStateWizard.h"
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
+class pqTPExportStateWizard : public pqSGExportStateWizard
 {
-}
+  Q_OBJECT
+  typedef pqSGExportStateWizard Superclass;
+public:
+  pqTPExportStateWizard(
+    QWidget *parentObject=0, Qt::WindowFlags parentFlags=0);
+  virtual ~pqTPExportStateWizard();
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getWritersMenuName()
-{
-  return "&Writers";
-}
+  void customize();
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getObjectMenuName()
-{
-  return "CPProxyWritersMenu";
-}
+protected:
+  virtual bool getCommandString(QString& command);
+
+private:
+  Q_DISABLE_COPY(pqTPExportStateWizard)
+};
+
+#endif

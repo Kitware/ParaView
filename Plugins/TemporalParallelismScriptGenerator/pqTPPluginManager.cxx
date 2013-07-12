@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    pqTPPluginManager.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,27 +29,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#include "pqTPPluginManager.h"
 
 //-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject):
+pqTPPluginManager::pqTPPluginManager(QObject* parentObject):
   Superclass(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
+pqTPPluginManager::~pqTPPluginManager()
 {
 }
 
 //-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getWritersMenuName()
+const char* pqTPPluginManager::getWritersMenuName()
 {
-  return "&Writers";
+  return "&STP Writers";
 }
 
 //-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getObjectMenuName()
+const char* pqTPPluginManager::getObjectMenuName()
 {
-  return "CPProxyWritersMenu";
+  return "STPProxyWritersMenu";
 }

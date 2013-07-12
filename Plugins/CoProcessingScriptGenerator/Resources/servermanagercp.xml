@@ -30,8 +30,8 @@
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
-      <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLPImageDataWriter" />
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLPImageDataWriter" />
      </Hints>
      <!-- End of XMLPImageDataWriter -->
     </SourceProxy>
@@ -66,8 +66,8 @@
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
-      <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLPRectilinearGridWriter" />
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLPRectilinearGridWriter" />
      </Hints>
      <!-- End of XMLRectilinearGridWriter -->
     </SourceProxy>
@@ -102,8 +102,8 @@
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
-      <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLPStructuredGridWriter" />
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLPStructuredGridWriter" />
      </Hints>
      <!-- End of XMLPStructuredGridWriter -->
     </SourceProxy>
@@ -138,8 +138,8 @@
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
-      <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLPPolyDataWriter" />
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLPPolyDataWriter" />
      </Hints>
      <!-- End of XMLPPolyDataWriter -->
     </SourceProxy>
@@ -174,8 +174,8 @@
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
-      <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLPUnstructuredGridWriter" />
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLPUnstructuredGridWriter" />
      </Hints>
      <!-- End of XMLPUnstructuredGridWriter -->
     </SourceProxy>
@@ -210,8 +210,8 @@
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
-      <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLMultiBlockDataWriter" />
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLMultiBlockDataWriter" />
      </Hints>
      <!-- End of XMLMultiBlockDataWriter -->
     </SourceProxy>
@@ -246,8 +246,8 @@
       <!-- TODO: this doesn't work yet -->
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
-      <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLHierarchicalBoxDataWriter" />
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="XMLHierarchicalBoxDataWriter" />
      </Hints>
      <!-- End of XMLHierarchicalBoxDataWriter -->
     </SourceProxy>

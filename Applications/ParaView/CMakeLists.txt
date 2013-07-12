@@ -4,8 +4,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   ParaViewMainWindow.h)
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
-  ParaViewMainWindow.ui
-)
+  ParaViewMainWindow.ui)
 
 set (QT_USE_QTNETWORK TRUE)
 include(${QT_USE_FILE})

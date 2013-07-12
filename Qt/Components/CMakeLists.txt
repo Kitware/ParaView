@@ -702,6 +702,31 @@ set (Module_UI_FILES
   Resources/UI/pqXYChartDisplayPanel.ui
 )
 
+if(PARAVIEW_ENABLE_PYTHON)
+  # code for generating specialized Python scripts
+  # from the GUI using trace information
+  LIST(APPEND Module_SRCS
+    pqImageOutputInfo.cxx
+    pqImageOutputInfo.h
+    pqSGExportStateWizard.cxx
+    pqSGExportStateWizard.h
+    pqSGPluginManager.cxx
+    pqSGPluginManager.h
+    pqSGWritersMenuManager.cxx
+    pqSGWritersMenuManager.h
+    )
+  LIST(APPEND Module_MOC_HDRS
+    pqImageOutputInfo.h
+    pqSGExportStateWizard.h
+    pqSGPluginManager.h
+    pqSGWritersMenuManager.h
+    )
+  LIST(APPEND Module_UI_FILES
+    Resources/UI/pqImageOutputInfo.ui
+    Resources/UI/pqExportStateWizard.ui
+    )
+endif()
+
 GENERATE_QT_RESOURCE_FROM_FILES(
   "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
   "/ParaViewResources"
