@@ -60,10 +60,14 @@ def replace_paths(config, paths):
     replace_with = config.current_input_dir + '/' + replace['path']
     if os.path.isdir(replace_with):
       error('%s is a directory, only support replacing a file' % replace_with)
+    output = config.output_dir + '/' + replace['path']
+    dest_parent_dir = os.path.dirname(output)
+    if not os.path.exists(dest_parent_dir):
+      os.makedirs(dest_parent_dir)
     if not os.path.exists(replace_with):
       error('%s doesn\'t exist' % replace_with)
     try:
-      shutil.copyfile(replace_with, config.output_dir + '/' + replace['path'])
+      shutil.copyfile(replace_with, output)
     except shutil.Error as err:
       error(err)
 
