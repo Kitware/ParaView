@@ -98,7 +98,8 @@ target_link_libraries(vtkPVServerManagerApplication
 #------------------------------------------------------------------------------
 # Setup SM xmls. 
 #------------------------------------------------------------------------------
-SET(resourceFiles
+SET(requestedResourceFiles
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/catalyst.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
@@ -112,10 +113,16 @@ SET(resourceFiles
   )
 
 if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND resourceFiles
+  list(APPEND requestedResourceFiles
       ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
   )
 endif(PARAVIEW_ENABLE_PYTHON)
+set(resourceFiles)
+foreach(requestedResourceFile IN LISTS requestedResourceFiles)
+  if (EXISTS "${requestedResourceFile}")
+    list(APPEND resourceFiles "${requestedResourceFile}")
+  endif ()
+endforeach()
 set (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
     CACHE INTERNAL "Server Manager XMLs")
 
