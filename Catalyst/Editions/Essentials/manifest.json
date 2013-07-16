@@ -1,49 +1,147 @@
 {
+  "cmake":{
+    "cache":[
+      { "name":"Module_vtkFiltersSources",
+        "type":"BOOL",
+        "value":"ON"
+      },
+      { "name":"Module_vtkImagingCore",
+        "type":"BOOL",
+        "value":"ON"
+      },
+      { "name":"Module_vtkPVVTKExtensionsDefault",
+        "type":"BOOL",
+        "value":"ON"
+      }
+    ]
+  },
   "modules":[
-    {
-      "name":"vtkPVVTKExtensionsDefault",
+    { "name":"vtkPVVTKExtensionsDefault",
       "path":"ParaViewCore/VTKExtensions/Default",
       "include":[
-        {
-          "path":"vtkPVArrayCalculator.cxx"
-        },
-        {
-          "path":"vtkPVArrayCalculator.h"
-        }
+        { "path":"vtkAMRDualClip.cxx" },
+        { "path":"vtkAMRDualClip.h" },
+        { "path":"vtkAMRDualContour.cxx" },
+        { "path":"vtkAMRDualContour.h" },
+        { "path":"vtkAMRDualGridHelper.cxx" },
+        { "path":"vtkAMRDualGridHelper.h" },
+        { "path":"vtkPVArrayCalculator.cxx" },
+        { "path":"vtkPVArrayCalculator.h" },
+        { "path":"vtkPVBox.cxx" },
+        { "path":"vtkPVBox.h" },
+        { "path":"vtkPVClipDataSet.cxx" },
+        { "path":"vtkPVClipDataSet.h" },
+        { "path":"vtkPVContourFilter.cxx" },
+        { "path":"vtkPVContourFilter.h" },
+        { "path":"vtkPVDataSetAlgorithmSelectorFilter.cxx" },
+        { "path":"vtkPVDataSetAlgorithmSelectorFilter.h" },
+        { "path":"vtkPVGlyphFilter.cxx" },
+        { "path":"vtkPVGlyphFilter.h" },
+        { "path":"vtkPVMetaClipDataSet.cxx" },
+        { "path":"vtkPVMetaClipDataSet.h" },
+        { "path":"vtkPVMetaSliceDataSet.cxx" },
+        { "path":"vtkPVMetaSliceDataSet.h" },
+        { "path":"vtkPVPlane.cxx" },
+        { "path":"vtkPVPlane.h" }
       ],
       "replace":[
-        {
-          "path":"ParaViewCore/VTKExtensions/Default/CMakeLists.txt"
-        }
+        { "path":"ParaViewCore/VTKExtensions/Default/CMakeLists.txt" },
+        { "path":"ParaViewCore/VTKExtensions/Default/Essentials.catalyst.cmake" },
+        { "path":"ParaViewCore/VTKExtensions/Default/hints" },
+        { "path":"ParaViewCore/VTKExtensions/Default/module.cmake" }
       ],
-      "cswrap":true
+      "cswrap":true,
+      "pythonwrap":true
     },
-    {
-      "name":"vtkFiltersCore",
+    { "name":"vtkFiltersCore",
       "path":"VTK/Filters/Core",
       "include":[
-        {
-          "path":"vtkArrayCalculator.cxx"
-        },
-        {
-          "path":"vtkArrayCalculator.h"
-        }
+        { "path":"vtkArrayCalculator.cxx" },
+        { "path":"vtkArrayCalculator.h" },
+        { "path":"vtkContourFilter.cxx" },
+        { "path":"vtkContourFilter.h" },
+        { "path":"vtkContourGrid.cxx" },
+        { "path":"vtkContourGrid.h" },
+        { "path":"vtkContourHelper.cxx" },
+        { "path":"vtkContourHelper.h" },
+        { "path":"vtkCutter.cxx" },
+        { "path":"vtkCutter.h" },
+        { "path":"vtkGlyph3D.cxx" },
+        { "path":"vtkGlyph3D.h" },
+        { "path":"vtkGridSynchronizedTemplates3D.cxx" },
+        { "path":"vtkGridSynchronizedTemplates3D.h" },
+        { "path":"vtkMaskPoints.cxx" },
+        { "path":"vtkMaskPoints.h" },
+        { "path":"vtkPolyDataNormals.cxx" },
+        { "path":"vtkPolyDataNormals.h" },
+        { "path":"vtkRectilinearSynchronizedTemplates.cxx" },
+        { "path":"vtkRectilinearSynchronizedTemplates.h" },
+        { "path":"vtkSynchronizedTemplates2D.cxx" },
+        { "path":"vtkSynchronizedTemplates2D.h" },
+        { "path":"vtkSynchronizedTemplates3D.cxx" },
+        { "path":"vtkSynchronizedTemplates3D.h" },
+        { "path":"vtkSynchronizedTemplatesCutter3D.cxx" },
+        { "path":"vtkSynchronizedTemplatesCutter3D.h" }
       ],
       "replace":[
-        {
-          "path":"VTK/Filters/Core/CMakeLists.txt"
-        }
+        { "path":"VTK/Filters/Core/Essentials.catalyst.cmake" }
       ],
-      "cswrap":true
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkFiltersExtraction",
+      "path":"VTK/Filters/Extraction",
+      "include":[
+        { "path":"vtkExtractGeometry.cxx" },
+        { "path":"vtkExtractGeometry.h" }
+      ],
+      "replace":[
+        { "path":"VTK/Filters/Extraction/module.cmake" },
+        { "path":"VTK/Filters/Extraction/CMakeLists.txt" },
+        { "path":"VTK/Filters/Extraction/Essentials.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkFiltersGeneral",
+      "path":"VTK/Filters/General",
+      "include":[
+        { "path":"vtkClipDataSet.cxx" },
+        { "path":"vtkClipDataSet.h" },
+        { "path":"vtkClipVolume.cxx" },
+        { "path":"vtkClipVolume.h" },
+        { "path":"vtkTableBasedClipCases.h" },
+        { "path":"vtkTableBasedClipDataSet.cxx" },
+        { "path":"vtkTableBasedClipDataSet.h" }
+      ],
+      "replace":[
+        { "path":"VTK/Filters/General/module.cmake" },
+        { "path":"VTK/Filters/General/CMakeLists.txt" },
+        { "path":"VTK/Filters/General/Essentials.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
     }
   ],
-  "paths":[
-    {
-      "path":"ParaViewCore/ServerManager/SMApplication/Resources",
-      "replace":[
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml"
-        }
+  "proxies":[
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
+      "proxies":[
+        "Calculator",
+        "Contour",
+        "Clip",
+        "Cut",
+        "Glyph"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
+      "proxies":[
+        "MergePoints",
+        "IncrementalOctreeMergePoints",
+        "NonMergingPointLocator",
+        "Plane",
+        "Box",
+        "Sphere",
+        "Scalar"
       ]
     }
   ]
