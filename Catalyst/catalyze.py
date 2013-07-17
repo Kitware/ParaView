@@ -13,6 +13,7 @@ import os
 import subprocess
 import shutil
 import fnmatch
+from xml.etree import ElementTree as ET
 import argparse
 import json
 import stat
@@ -37,6 +38,25 @@ def _get_argument_parser():
   usage = "Usage: %prog [options]"
 
   return parser
+
+def filter_proxies(fin, fout, proxies):
+  root = ET.fromstring(fin.read())
+  if not root.tag == 'ServerManagerConfiguration':
+    raise RuntimeError('Invalid ParaView XML file input')
+  new_tree = ET.Element('ServerManagerConfiguration')
+  def is_wanted(proxy):
+    return 'name' in proxy.attrib and \
+           proxy.attrib['name'] in proxies
+  for group in root.iter('ProxyGroup'):
+    new_proxies = []
+    for proxytag in ('SourceProxy', 'NullProxy', 'Proxy'):
+      new_proxies += filter(is_wanted, group.iter(proxytag))
+    if new_proxies:
+      new_group = ET.Element(group.tag, group.attrib)
+      map(new_group.append, new_proxies)
+      new_tree.append(new_group)
+
+  fout.write(ET.tostring(new_tree))
 
 def error(err):
   print >> sys.stderr, "Error: %s" % str(err)
@@ -190,6 +210,7 @@ def cmake_cache(config, manifest_list):
 def process(config):
 
   all_manifests = []
+  all_proxies = []
   for input_dir in config.input_dirs:
     print "Processing ", input_dir
     with open(os.path.join(input_dir, 'manifest.json'), 'r') as fp:
@@ -199,8 +220,29 @@ def process(config):
         copy_paths(config, manifest['paths'])
       if manifest.has_key('modules'):
         copy_paths(config, manifest['modules'])
+      if manifest.has_key('proxies'):
+        all_proxies.append(manifest['proxies'])
 
       all_manifests.append(manifest)
+
+  proxy_map = {}
+  for proxies in all_proxies:
+    for proxy in proxies:
+      path = proxy['path']
+      if path not in proxy_map:
+        proxy_map[path] = []
+      proxy_map[path] += proxy['proxies']
+
+  for proxy_file, proxies in proxy_map.items():
+    input_path = os.path.join(config.repo, proxy_file)
+    output_path = os.path.join(config.output_dir, proxy_file)
+    output_dir = os.path.dirname(output_path)
+    if not os.path.exists(output_dir):
+      os.makedirs(output_dir)
+
+    with open(input_path, 'r') as fin:
+      with open(output_path, 'w+') as fout:
+        filter_proxies(fin, fout, set(proxies))
 
   create_cmake_script(config, all_manifests)
 
