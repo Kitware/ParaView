@@ -50,17 +50,17 @@ def copy_path(src, dest, exclude):
     else:
       dest_parent_dir = os.path.dirname(dest)
       if not os.path.exists(dest_parent_dir):
-        os.makedirs(dest_parent_dir);
+        os.makedirs(dest_parent_dir)
       shutil.copyfile(src, dest)
   except (IOError, shutil.Error, os.error) as err:
     error(err)
 
 def replace_paths(config, paths):
   for replace in paths:
-    replace_with = config.current_input_dir + '/' + replace['path']
+    replace_with = os.path.join(config.current_input_dir, replace['path'])
     if os.path.isdir(replace_with):
       error('%s is a directory, only support replacing a file' % replace_with)
-    output = config.output_dir + '/' + replace['path']
+    output = os.path.join(config.output_dir, replace['path'])
     dest_parent_dir = os.path.dirname(output)
     if not os.path.exists(dest_parent_dir):
       os.makedirs(dest_parent_dir)
@@ -75,13 +75,13 @@ def patch_path(config, path_entry):
   work_dir = config.output_dir
 
   if path_entry['path'].startswith('VTK/'):
-    work_dir = work_dir + '/VTK'
+    work_dir = os.path.join(work_dir, 'VTK')
 
   try:
-    p = subprocess.Popen(['/usr/bin/patch', '-p1'], cwd=work_dir, stdin=subprocess.PIPE)
+    p = subprocess.Popen(['patch', '-p1'], cwd=work_dir, stdin=subprocess.PIPE)
     patch = '\n'.join(path_entry['patch'])
     p.stdin.write(patch+'\n')
-    p.stdin.close();
+    p.stdin.close()
     p.wait()
     if p.returncode != 0:
       error('Failed to apply patch for: %s' % path_entry['path'])
@@ -90,24 +90,24 @@ def patch_path(config, path_entry):
 
 def include_paths(config, src_base, dest_base, paths):
   for inc in paths:
-    inc_src = src_base + '/' + inc['path']
-    inc_des = dest_base + '/' + inc['path']
+    inc_src = os.path.join(src_base, inc['path'])
+    inc_des = os.path.join(dest_base, inc['path'])
     copy_path(inc_src, inc_des, [])
 
 def copy_paths(config, paths):
   try:
     for path_entry in paths:
-      src = config.repo + '/' + path_entry['path']
-      dest = config.output_dir + '/' + path_entry['path']
+      src = os.path.join(config.repo, path_entry['path'])
+      dest = os.path.join(config.output_dir, path_entry['path'])
       dest_parent_dir = os.path.dirname(dest)
       if not os.path.exists(dest_parent_dir):
-        os.makedirs(dest_parent_dir);
+        os.makedirs(dest_parent_dir)
 
       exclude = []
 
       # exclude an paths listed.
       if 'exclude' in path_entry:
-        exclude = map(lambda d: d['path'], path_entry['exclude']);
+        exclude = map(lambda d: d['path'], path_entry['exclude'])
 
       # if we are replacing the file then don't bother copying
       if 'replace' in path_entry:
@@ -130,7 +130,7 @@ def copy_paths(config, paths):
     error(err)
 
 def create_cmake_script(config, manifest_list):
-  cmake_script='#!/bin/bash\n';
+  cmake_script='#!/bin/bash\n'
   cs_modules = set()
   python_modules = set()
 
@@ -165,7 +165,7 @@ def create_cmake_script(config, manifest_list):
 
   cmake_script += ' $@\n'
 
-  file = config.output_dir + '/cmake.sh'
+  file = os.path.join(config.output_dir, 'cmake.sh')
 
   try:
     with open(file, 'w') as fd:
@@ -192,7 +192,7 @@ def process(config):
   all_manifests = []
   for input_dir in config.input_dirs:
     print "Processing ", input_dir
-    with open(input_dir + '/manifest.json' , 'r') as fp:
+    with open(os.path.join(input_dir, 'manifest.json'), 'r') as fp:
       manifest = json.load(fp)
       config.current_input_dir  = input_dir
       if manifest.has_key('paths'):
