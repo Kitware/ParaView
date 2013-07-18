@@ -1,0 +1,193 @@
+{
+  "cmake":{
+    "cache":[
+      { "name":"Module_vtkPVVTKExtensionsRendering",
+        "type":"BOOL",
+        "value":"ON"
+      },
+      { "name":"Module_vtkFiltersGeometry",
+        "type":"BOOL",
+        "value":"ON"
+      },
+      { "name":"Module_vtkFiltersSources",
+        "type":"BOOL",
+        "value":"ON"
+      }
+    ]
+  },
+  "modules":[
+    { "name":"vtkPVClientServerCoreCore",
+      "path":"ParaViewCore/ClientServerCore/Core",
+      "include":[
+        { "path":"vtkPVExtractSelection.cxx" },
+        { "path":"vtkPVExtractSelection.h" }
+      ],
+      "patches":[
+        { "path": "ClientServerCore-Core-CMake.patch" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkFiltersExtraction",
+      "path":"VTK/Filters/Extraction",
+      "include":[
+        { "path":"vtkConvertSelection.cxx" },
+        { "path":"vtkConvertSelection.h" },
+        { "path":"vtkExtractSelectedBlock.cxx" },
+        { "path":"vtkExtractSelectedBlock.h" },
+        { "path":"vtkExtractSelectedIds.cxx" },
+        { "path":"vtkExtractSelectedIds.h" },
+        { "path":"vtkExtractSelectedFrustum.cxx" },
+        { "path":"vtkExtractSelectedFrustum.h" },
+        { "path":"vtkExtractSelectedLocations.cxx" },
+        { "path":"vtkExtractSelectedLocations.h" },
+        { "path":"vtkExtractSelectedThresholds.cxx" },
+        { "path":"vtkExtractSelectedThresholds.h" },
+        { "path":"vtkExtractSelectedRows.cxx" },
+        { "path":"vtkExtractSelectedRows.h" },
+        { "path":"vtkExtractSelection.cxx" },
+        { "path":"vtkExtractSelection.h" },
+        { "path":"vtkExtractSelectionBase.cxx" },
+        { "path":"vtkExtractSelectionBase.h" },
+        { "path":"vtkProbeSelectedLocations.cxx" },
+        { "path":"vtkProbeSelectedLocations.h" }
+      ],
+      "replace":[
+        { "path":"VTK/Filters/Extraction/Extras.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkFiltersGeometry",
+      "path":"VTK/Filters/Geometry",
+      "include":[
+        { "path":"module.cmake" },
+        { "path":"vtkDataSetSurfaceFilter.cxx" },
+        { "path":"vtkDataSetSurfaceFilter.h" },
+        { "path":"vtkStructuredGridGeometryFilter.cxx" },
+        { "path":"vtkStructuredGridGeometryFilter.h" },
+        { "path":"vtkUnstructuredGridGeometryFilter.cxx" },
+        { "path":"vtkUnstructuredGridGeometryFilter.h" }
+      ],
+      "replace":[
+        { "path":"VTK/Filters/Geometry/CMakeLists.txt" },
+        { "path":"VTK/Filters/Geometry/Extras.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkFiltersSources",
+      "path":"VTK/Filters/Sources",
+      "include":[
+        { "path":"vtkArrowSource.cxx" },
+        { "path":"vtkArrowSource.h" },
+        { "path":"vtkConeSource.cxx" },
+        { "path":"vtkConeSource.h" },
+        { "path":"vtkCubeSource.cxx" },
+        { "path":"vtkCubeSource.h" },
+        { "path":"vtkCylinderSource.cxx" },
+        { "path":"vtkCylinderSource.h" },
+        { "path":"vtkGlyphSource2D.cxx" },
+        { "path":"vtkGlyphSource2D.h" },
+        { "path":"vtkLineSource.cxx" },
+        { "path":"vtkLineSource.h" },
+        { "path":"vtkSphereSource.cxx" },
+        { "path":"vtkSphereSource.h" }
+      ],
+      "replace":[
+        { "path":"VTK/Filters/Sources/module.cmake" },
+        { "path":"VTK/Filters/Sources/CMakeLists.txt" },
+        { "path":"VTK/Filters/Sources/Extras.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkFiltersGeneral",
+      "path":"VTK/Filters/General",
+      "include":[
+        { "path":"vtkImageDataToPointSet.cxx" },
+        { "path":"vtkImageDataToPointSet.h" },
+        { "path":"vtkRectilinearGridToPointSet.cxx" },
+        { "path":"vtkRectilinearGridToPointSet.h" },
+        { "path":"vtkTransformFilter.cxx" },
+        { "path":"vtkTransformFilter.h" },
+        { "path":"vtkWarpScalar.cxx" },
+        { "path":"vtkWarpScalar.h" },
+        { "path":"vtkWarpVector.cxx" },
+        { "path":"vtkWarpVector.h" }
+      ],
+      "replace":[
+        { "path":"VTK/Filters/General/Extras.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkPVVTKExtensionsDefault",
+      "path":"ParaViewCore/VTKExtensions/Default",
+      "include":[
+        { "path":"vtkAttributeDataReductionFilter.cxx" },
+        { "path":"vtkAttributeDataReductionFilter.h" },
+        { "path":"vtkExtractHistogram.cxx" },
+        { "path":"vtkExtractHistogram.h" },
+        { "path":"vtkIntegrateAttributes.cxx" },
+        { "path":"vtkIntegrateAttributes.h" },
+        { "path":"vtkPExtractHistogram.cxx" },
+        { "path":"vtkPExtractHistogram.h" },
+        { "path":"vtkPVTransform.cxx" },
+        { "path":"vtkPVTransform.h" }
+      ],
+      "replace":[
+        { "path":"ParaViewCore/VTKExtensions/Default/Extras.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkPVVTKExtensionsRendering",
+      "path":"ParaViewCore/VTKExtensions/Rendering",
+      "include":[
+        { "path":"module.cmake" },
+        { "path":"vtkPVArrowSource.cxx" },
+        { "path":"vtkPVArrowSource.h" },
+        { "path":"vtkReductionFilter.cxx" },
+        { "path":"vtkReductionFilter.h" },
+        { "path":"vtkSelectionSerializer.cxx" },
+        { "path":"vtkSelectionSerializer.h" }
+      ],
+      "replace":[
+        { "path":"ParaViewCore/VTKExtensions/Rendering/CMakeLists.txt" },
+        { "path":"ParaViewCore/VTKExtensions/Rendering/module.cmake" },
+        { "path":"ParaViewCore/VTKExtensions/Rendering/Extras.catalyst.cmake" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    }
+  ],
+  "proxies":[
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
+      "proxies":[
+        "PVExtractSelection",
+        "ExtractHistogram",
+        "WarpScalar",
+        "WarpVector",
+        "IntegrateAttributes",
+        "DataSetSurfaceFilter"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
+      "proxies":[
+        "Transform2"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/sources.xml",
+      "proxies":[
+        "ArrowSource",
+        "ConeSource",
+        "CubeSource",
+        "CylinderSource",
+        "GlyphSource2D",
+        "LineSource",
+        "SphereSource"
+      ]
+    }
+  ]
+}
