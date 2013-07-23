@@ -201,7 +201,7 @@ void vtkEDLShading::EDLInitializeFramebuffers(vtkRenderState &s)
       || this->ProjectionColorTexture->GetHeight()
           != static_cast<unsigned int> (this->H))
     {
-    this->ProjectionColorTexture->Bind();
+    //this->ProjectionColorTexture->Bind();
     this->ProjectionColorTexture->Create2D(this->W, this->H, 4, VTK_FLOAT, false);
     }
   // Depth texture
@@ -214,7 +214,7 @@ void vtkEDLShading::EDLInitializeFramebuffers(vtkRenderState &s)
       || this->ProjectionDepthTexture->GetHeight()
           != static_cast<unsigned int> (this->H))
     {
-    this->ProjectionDepthTexture->Bind();
+    //this->ProjectionDepthTexture->Bind();
     this->ProjectionDepthTexture->Create2D(this->W, this->H, 1, VTK_VOID, false);
     }
   // Apply textures
