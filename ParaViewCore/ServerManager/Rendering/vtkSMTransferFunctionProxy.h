@@ -63,6 +63,34 @@ public:
   static bool InvertTransferFunction(vtkSMProxy*);
 
   // Description:
+  // Remaps control points by normalizing in linear-space and then interpolating
+  // in log-space. This is useful when converting the transfer function from
+  // linear- to log-mode. If \c inverse is true, the operation is reversed i.e.
+  // the control points are normalized in log-space and interpolated in
+  // linear-space, useful when converting from log- to linear-mode.
+  virtual bool MapControlPointsToLogSpace(bool inverse=false);
+  virtual bool MapControlPointsToLinearSpace()
+    { return this->MapControlPointsToLogSpace(true); }
+
+  // Description:
+  // Safely call MapControlPointsToLogSpace() after casting the proxy to the
+  // appropriate type.
+  static bool MapControlPointsToLogSpace(vtkSMProxy* proxy, bool inverse=false)
+    {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self? self->MapControlPointsToLogSpace(inverse) : false;
+    }
+
+  // Description:
+  // Safely call MapControlPointsToLinearSpace() after casting the proxy to the
+  // appropriate type.
+  static bool MapControlPointsToLinearSpace(vtkSMProxy* proxy)
+    {
+    return vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(proxy, true);
+    }
+
+  // Description:
   // Load a ColorMap XML. This will update a transfer function using the
   // ColorMap XML. Currently, this is only supported for color transfer
   // functions. Returns true on success.

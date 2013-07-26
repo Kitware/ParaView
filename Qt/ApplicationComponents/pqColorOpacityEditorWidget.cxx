@@ -240,8 +240,10 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     {
     this->addPropertyLink(
       this, "useLogScale", SIGNAL(useLogScaleChanged()), smproperty);
-    QObject::connect(ui.UseLogScale, SIGNAL(toggled(bool)),
-      this, SIGNAL(useLogScaleChanged()));
+    QObject::connect(ui.UseLogScale, SIGNAL(clicked(bool)),
+      this, SLOT(useLogScaleClicked(bool)));
+    // QObject::connect(ui.UseLogScale, SIGNAL(toggled(bool)),
+    //  this, SIGNAL(useLogScaleChanged()));
     }
   else
     {
@@ -401,7 +403,23 @@ void pqColorOpacityEditorWidget::setUseLogScale(bool val)
 {
   Ui::ColorOpacityEditorWidget &ui = this->Internals->Ui;
   ui.UseLogScale->setChecked(val);
-  // FIXME: reset-scalar range.
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
+{
+  if (log_space)
+    {
+    vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(this->proxy());
+    }
+  else
+    {
+    vtkSMTransferFunctionProxy::MapControlPointsToLinearSpace(this->proxy());
+    }
+
+  // FIXME: ensure scalar range is valid.
+
+  emit this->useLogScaleChanged();
 }
 
 //-----------------------------------------------------------------------------

@@ -14,6 +14,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml

@@ -23,6 +23,7 @@
 #include "vtkTuple.h"
 
 #include <algorithm>
+#include <math.h>
 #include <vector>
 
 vtkStandardNewMacro(vtkSMTransferFunctionProxy);
@@ -151,18 +152,38 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     return true;
     }
 
-  double dnew = (rangeMax - rangeMin);
+  // determine if the interpolation has to happen in log-space.
+  bool log_space =
+    (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
+  // ensure that log_space is valid for the ranges (before and after).
+  if (rangeMin <= 0.0 || rangeMax <= 0.0 ||
+      old_range[0] <= 0.0 || old_range[1] <= 0.0)
+    {
+    log_space = false;
+    }
+
+  double dnew = log_space? log10(rangeMax/rangeMin) :
+                           (rangeMax - rangeMin);
   // don't set empty ranges. Tweak it a bit.
   dnew = (dnew > 0)? dnew : 1.0;
 
-  double dold = old_range[1] - old_range[0];
+  double dold = log_space?  log10(old_range[1]/old_range[0]) :
+                            (old_range[1] - old_range[0]);
   dold = (dold > 0)? dold : 1.0;
 
   double scale = dnew / dold;
   for (size_t cc=0; cc < points.size(); cc++)
     {
     double &x = points[cc].GetData()[0];
-    x = (x - old_range[0])*scale + rangeMin;
+    if (log_space)
+      {
+      double logx = log10(x/old_range[0]) * scale + log10(rangeMin);
+      x = pow(10.0, logx);
+      }
+    else
+      {
+      x = (x - old_range[0])*scale + rangeMin;
+      }
     }
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
@@ -194,6 +215,10 @@ bool vtkSMTransferFunctionProxy::InvertTransferFunction()
     return true;
     }
 
+  // determine if the interpolation has to happen in log-space.
+  bool log_space =
+    (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
+
   std::vector<vtkTuple<double, 4> > points;
   points.resize(num_elements/4);
   cntrlPoints.Get(points[0].GetData(), num_elements);
@@ -203,10 +228,89 @@ bool vtkSMTransferFunctionProxy::InvertTransferFunction()
 
   double range[2] = {points.front().GetData()[0],
                      points.back().GetData()[0]};
+  if (range[0] <= 0.0 || range[1] <= 0.0)
+    {
+    // ranges not valid for log-space. Switch to linear space.
+    log_space = false;
+    }
+
   for (size_t cc=0; cc < points.size(); cc++)
     {
     double &x = points[cc].GetData()[0];
-    x = range[1] - (x - range[0]);
+    if (log_space)
+      {
+      // inverting needs to happen in log-space
+      double logxprime = log10(range[0]*range[1] / x);
+                       /* ^-- == log10(range[1]) - (log10(x) - log10(range[0])) */
+      x = pow(10.0, logxprime);
+      }
+    else
+      {
+      x = range[1] - (x - range[0]);
+      }
+    }
+  cntrlPoints.Set(points[0].GetData(), num_elements);
+  this->UpdateVTKObjects();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
+  bool inverse/*=false*/)
+{
+  vtkSMProperty* controlPointsProperty = GetControlPointsProperty(this);
+  if (!controlPointsProperty)
+    {
+    return false;
+    }
+
+  vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
+  unsigned int num_elements = cntrlPoints.GetNumberOfElements();
+  if (num_elements == 0 || num_elements == 4)
+    {
+    // nothing to do, but not an error, so return true.
+    return true;
+    }
+
+  std::vector<vtkTuple<double, 4> > points;
+  points.resize(num_elements/4);
+  cntrlPoints.Get(points[0].GetData(), num_elements);
+
+  // sort the points by x, just in case user didn't add them correctly.
+  std::sort(points.begin(), points.end(), StrictWeakOrdering());
+
+  double range[2] = {points.front().GetData()[0],
+                     points.back().GetData()[0]};
+
+  if (inverse == false && (range[0] <= 0.0 || range[1] <= 0.0))
+    {
+    // ranges not valid for log-space. Cannot convert.
+    vtkWarningMacro("Ranges not valid for log-space. "
+      "Cannot map control points to log-space.");
+    return false;
+    }
+  if (range[0] >= range[1])
+    {
+    vtkWarningMacro("Empty range! Cannot map control points.");
+    return false;
+    }
+
+  for (size_t cc=0; cc < points.size(); cc++)
+    {
+    double &x = points[cc].GetData()[0];
+    if (inverse)
+      {
+      // log-to-linear
+      double norm = log10(x/range[0]) / log10(range[1]/range[0]);
+      x = range[0] + norm * (range[1] - range[0]);  
+      }
+    else
+      {
+      // linear-to-log
+      double norm = (x - range[0])/(range[1] - range[0]);
+      double logx = log10(range[0]) + norm * (log10(range[1]/range[0]));
+      x = pow(10.0, logx);
+      }
     }
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
@@ -356,16 +460,36 @@ bool vtkSMTransferFunctionProxy::ApplyColorMap(vtkPVXMLElement* xml)
         points.resize(num_elements/4);
         cntrlPoints.Get(points[0].GetData(), num_elements);
         std::sort(points.begin(), points.end(), StrictWeakOrdering());
-
         double range[2] = {points.front().GetData()[0], points.back().GetData()[0]};
+
+        // determine if the interpolation has to happen in log-space.
+        bool log_space =
+          (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
+        if (range[0] <= 0.0 || range[1] <= 0.0)
+          {
+          // ranges not valid for log-space. Switch to linear space.
+          log_space = false;
+          }
+
         for (size_t cc=0; cc < new_points.size(); cc++)
           {
           double &x = new_points[cc].GetData()[0];
-          // since x is in [0, 1].
-          x = range[0] + (range[1] - range[0]) * x;
+          if (log_space)
+            {
+            double logx = log10(range[0]) + x*log10(range[1]/range[0]);
+              /// ==== log10(range[0]) + (log10(range[1] - log10(range[0])) * x;
+            x = pow(10.0, logx);
+            }
+          else
+            {
+            // since x is in [0, 1].
+            x = range[0] + (range[1] - range[0]) * x;
+            }
           }
         }
       }
+    // TODO: we may need to handle normalized/non-normalized color-map more
+    // elegantly.
     cntrlPoints.Set(new_points[0].GetData(),
       static_cast<unsigned int>(new_points.size() * 4));
     }

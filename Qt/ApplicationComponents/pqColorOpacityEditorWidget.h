@@ -137,6 +137,7 @@ signals:
 
   /// Signal fired when lockScalarRange changes.
   void lockScalarRangeChanged();
+
 protected slots:
   /// slots called when the current point changes on the two internal
   /// pqTransferFunctionWidget widgets.
@@ -155,6 +156,10 @@ protected slots:
   /// Ensures that the color-swatches for indexedColors are shown only when this
   /// is set to true.
   void updateIndexedLookupState();
+
+  /// called when the use-log-scale checkbox is clicked by the user. We then add
+  /// extra logic to valid ranges convert the color map to log/linear space.
+  void useLogScaleClicked(bool);
 
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget);
