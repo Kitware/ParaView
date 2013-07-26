@@ -50,6 +50,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
+#include "vtkOpenGLError.h"
 #include "vtkgl.h"
 
 #include <vector>
@@ -878,8 +879,10 @@ void vtkScatterPlotPainter::ReleaseDisplayList()
 {
   if(this->DisplayListId>0)
     {
+    vtkOpenGLClearErrorMacro();
     glDeleteLists(this->DisplayListId,1);
     this->DisplayListId = 0;
+    vtkOpenGLCheckErrorMacro("failed after ReleaseDisplayList");
     }
 }
 
@@ -969,6 +972,8 @@ void vtkScatterPlotPainter::RenderPoints(vtkRenderer *vtkNotUsed(ren),
                                          unsigned long vtkNotUsed(typeflags), 
                                          bool vtkNotUsed(forceCompileOnly))
 {
+  vtkOpenGLClearErrorMacro();
+
   //cout << "render points" << endl;
   vtkDataArray* xCoordsArray = this->GetArray(vtkScatterPlotMapper::X_COORDS);
   vtkDataArray* yCoordsArray = this->GetArray(vtkScatterPlotMapper::Y_COORDS);
@@ -1059,13 +1064,17 @@ void vtkScatterPlotPainter::RenderPoints(vtkRenderer *vtkNotUsed(ren),
     }
   //glVertex3f(0, 0, 0);
   glEnd();
- }
+
+  vtkOpenGLCheckErrorMacro("failed after RenderPoints");
+}
 
 //-----------------------------------------------------------------------------
 void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
                                          unsigned long vtkNotUsed(typeflags), 
                                          bool vtkNotUsed(forceCompileOnly))
 {
+  vtkOpenGLClearErrorMacro();
+
   vtkDataArray* xCoordsArray = this->GetArray(vtkScatterPlotMapper::X_COORDS);
   vtkDataArray* yCoordsArray = this->GetArray(vtkScatterPlotMapper::Y_COORDS);
   vtkDataArray* zCoordsArray = this->ThreeDMode ? this->GetArray(vtkScatterPlotMapper::Z_COORDS) : NULL;
@@ -1490,4 +1499,6 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
 
   trans->Delete();
   camTrans->Delete();
+
+  vtkOpenGLCheckErrorMacro("failed after RenderGlyphs");
  }

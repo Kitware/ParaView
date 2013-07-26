@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkRenderState.h"
+#include "vtkOpenGLError.h"
 
 #include "vtkgl.h"
 
@@ -34,6 +35,8 @@ vtkPVDefaultPass::~vtkPVDefaultPass()
 //----------------------------------------------------------------------------
 void vtkPVDefaultPass::Render(const vtkRenderState* render_state)
 {
+  vtkOpenGLClearErrorMacro();
+
   vtkRenderer* renderer = render_state->GetRenderer();
   this->ClearLights(renderer);
   this->UpdateLightGeometry(renderer);
@@ -45,6 +48,8 @@ void vtkPVDefaultPass::Render(const vtkRenderState* render_state)
   glMatrixMode(GL_MODELVIEW);
   this->UpdateGeometry(renderer);
   glMatrixMode(saved_matrix_mode);
+
+  vtkOpenGLCheckErrorMacro("failed after Render");
 }
 
 //----------------------------------------------------------------------------

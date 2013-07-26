@@ -29,6 +29,7 @@
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
+#include "vtkOpenGLError.h"
 
 #include <assert.h>
 #include <vtkgl.h>
@@ -52,9 +53,11 @@ public:
 
   virtual void Render(const vtkRenderState* render_state)
     {
+    vtkOpenGLClearErrorMacro();
     if (this->DelegatePass)
       {
       this->DelegatePass->Render(render_state);
+      vtkOpenGLCheckErrorMacro("failed after delegate pass render");
       }
     if (this->IceTCompositePass)
       {
@@ -70,6 +73,7 @@ public:
         }
       }
     glFinish();
+    vtkOpenGLCheckErrorMacro("failed after push depth buffer");
     }
 
   void SetImage(const vtkSynchronizedRenderers::vtkRawImage& image)
@@ -191,6 +195,7 @@ public:
   // multi-view configuration.
   virtual void SetupContext(const vtkRenderState* render_state)
     {
+    vtkOpenGLClearErrorMacro();
     this->Superclass::SetupContext(render_state);
 
     // Don't make icet render the composited image to the screen. We'll paste it
@@ -216,6 +221,7 @@ public:
     glClearColor((GLclampf)background[0], (GLclampf)background[1],
       (GLclampf)background[2], 0.0f);
     icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
+    vtkOpenGLCheckErrorMacro("failed after setup context");
     }
 protected:
 

@@ -833,5 +833,14 @@ void pqTransferFunctionChartViewWidget::resetView()
 // ----------------------------------------------------------------------------
 void pqTransferFunctionChartViewWidget::renderView()
 {
+  // bug 0013947
+  // on Mac OSX don't render into invalid drawable, all subsequent
+  // OpenGL calls fail with invalid framebuffer operation.
+  vtkRenderWindow *renWin = this->Internal->ChartView->GetRenderWindow();
+  if (!renWin->IsDrawable())
+    {
+    return;
+    }
+
   this->Internal->ChartView->GetRenderWindow()->Render();
 }

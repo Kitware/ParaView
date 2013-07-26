@@ -22,6 +22,7 @@
 #include "vtkPVOptions.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVView.h"
+#include "vtkRenderWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
@@ -122,6 +123,17 @@ void vtkSMViewProxy::ViewTimeChanged()
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::StillRender()
 {
+  // bug 0013947
+  // on Mac OSX don't render into invalid drawable, all subsequent
+  // OpenGL calls fail with invalid framebuffer operation.
+  vtkPVRenderView *rv
+    = dynamic_cast<vtkPVRenderView*>(this->GetClientSideObject());
+
+  if (rv && !rv->GetRenderWindow()->IsDrawable())
+    {
+    return;
+    }
+
   int interactive = 0;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
   // We call update separately from the render. This is done so that we don't
