@@ -4090,6 +4090,10 @@
                      file (extension .spcth). The case file lists all the
                      binary files containing the dataset. This reader produces
                      hierarchical datasets.</Documentation>
+      <OutputPort index="0"
+                  name="Volume Data" />
+      <OutputPort index="1"
+                  name="Markers" />
       <StringVectorProperty command="SetCellArrayStatus"
                             element_types="2 0"
                             information_property="CellArrayInfo"
@@ -4180,7 +4184,7 @@
         generated that stores the coordinates of any tracers.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetGenerateMarkers"
-                         default_values="0"
+                         default_values="1"
                          name="GenerateMarkers"
                          number_of_elements="1"
                          panel_visibility="advanced">

@@ -105,7 +105,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
   this->GenerateTracerArray = 0; // by default do not generate tracer array
-  this->GenerateMarkers = 0; // by default do not generate markers
+  this->GenerateMarkers = 1; // by default do generate markers
   this->IsAMR = 1;
   this->FileNameChanged = true;
   this->TimeSteps = new vtkSpyPlotReader::VectorOfDoubles();
@@ -453,37 +453,28 @@ int vtkSpyPlotRemoveBadGhostCells(
   return 1;
 }
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *vtkNotUsed(requestInfo),
+int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *requestInfo,
                                      vtkInformationVector *outputInfoVec,
                                      vtkCompositeDataSet *outputData)
 {
-  vtkInformation *outputInfo=outputInfoVec->GetInformationObject(0);
+  int port = requestInfo->Get (vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT());
 
-  // Update the timestep.
+  vtkInformation *outputInfo=outputInfoVec->GetInformationObject(port);
+
+  // Update the timestep.  
   int tsLength =
     outputInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  double* steps =
-    outputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  //
+  double *steps = outputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  int closestStep = 0;
+
   if(outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
     double requestedTimeStep =
       outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    //double timeValue = requestedTimeSteps[0];
-
-    // find the first time value larger than requested time value
-    // this logic could be improved
-    //int cnt = 0;
-    //while (cnt < tsLength-1 && steps[cnt] < timeValue)
-    //  {
-    //  cnt++;
-    //  }
-    //this->CurrentTimeStep = cnt;
 
     int cnt=0;
-    int closestStep=0;
     double minDist=-1;
     for (cnt=0;cnt<tsLength;cnt++)
       {
@@ -496,15 +487,15 @@ int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *vtkNotUsed(requestInfo),
         closestStep=cnt;
         }
       }
-    this->CurrentTimeStep=closestStep;
-    }
-  else
-    {
-    this->CurrentTimeStep = this->TimeStep;
     }
 
-  outputData->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
+  this->CurrentTimeStep = closestStep;
+
+  if (outputData != NULL) 
+    {
+    outputData->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
                             steps[this->CurrentTimeStep]);
+    }
   return 1;
 }
 //-----------------------------------------------------------------------------
@@ -865,9 +856,10 @@ int vtkSpyPlotReader::RequestData(
 #ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
   if (this->GenerateMarkers)
     {
-    vtkInformation *info=outputVector->GetInformationObject(1);
+    info=outputVector->GetInformationObject(1);
     vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
     vtkMultiBlockDataSet *mbds=vtkMultiBlockDataSet::SafeDownCast(doOutput);
+
     mbds->SetNumberOfBlocks (0);
 
     vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt;
@@ -2008,6 +2000,11 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
         }
 
       array = uniReader->GetCellFieldData(blockID, field, &fixed);
+      if (array == 0)
+        {
+        vtkErrorMacro ("Unable to read array " << fname);
+        continue;
+        }
       //vtkDebugMacro( << __LINE__ << " Read data block: " << blockID
       // << " " << field << "  [" << array->GetName() << "]" );
       cd->AddArray(array);
