@@ -1,0 +1,30 @@
+static QList<pqPipelineSource*> pqLoadDataReaction::loadData()
+
+static pqApplicationCore* pqApplicationCore::instance()
+
+static pqPVApplicationCore* pqPVApplicationCore::instance()
+
+pqSettings* pqApplicationCore::settings()
+
+pqPythonManager* pqPVApplicationCore::pythonManager() const
+
+pqPythonDialog* pqPythonManager::pythonShellDialog()
+
+pqServer* pqApplicationCore::getActiveServer() const
+
+pqTimeKeeper* pqServer::getTimeKeeper() const
+double pqTimeKeeper::getTime() const
+void pqTimeKeeper::setTime(double)
+int pqTimeKeeper::getNumberOfTimeStepValues() const
+
+pqServerManagerModel* pqApplicationCore::getServerManagerModel() const
+
+QWidget* pqRenderViewBase::getWidget()
+
+void pqRenderView::resetCamera()
+
+pqPythonEventFilter::pqPythonEventFilter()
+pqPythonEventFilter::~pqPythonEventFilter()
+
+
+static pqProxy* pqPythonQtMethodHelpers::findProxyItem(pqServerManagerModel*, vtkSMProxy*)
