@@ -66,7 +66,10 @@ except:
 
 
 # Start trace
-smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
+capture_modified_properties = not smstate._save_full_state
+smtrace.start_trace(CaptureAllProperties=True,
+                    CaptureModifiedProperties=capture_modified_properties,
+                    UseGuiName=True)
 
 # update trace globals.
 smtrace.trace_globals.proxy_ctor_hook = staticmethod(tp_hook)

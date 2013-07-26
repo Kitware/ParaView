@@ -109,6 +109,11 @@ public:
   // the content of the Macros directories...
   void updateMacroList();
 
+  // Description:
+  // Set the option to save the full state (true) or just the non-default
+  // values (false). This modifies the _save_full_state value in smstate.py.
+  void setSaveFullState(bool saveFullState);
+
 signals:
 
   void paraviewPythonModulesImported();

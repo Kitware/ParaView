@@ -353,24 +353,13 @@ void pqPythonManager::editTrace()
 //----------------------------------------------------------------------------
 void pqPythonManager::saveTraceState(const QString& fileName)
 {
-  bool saveFullState = false;
   pqSettings* settings = pqApplicationCore::instance()->settings();
   if(settings)
     {
-    saveFullState = settings->value("saveFullState", false).toBool();
+    this->setSaveFullState(settings->value("saveFullState", false).toBool());
     }
 
-  std::string code;
-  code += "from paraview import smstate\n";
-  if(saveFullState)
-    {
-    code += "smstate._save_full_state = True\n";
-    }
-  else
-    {
-    code += "smstate._save_full_state = False\n";
-    }
-  code += "smstate.run()\n";
+  std::string code = "smstate.run()\n";
 
   vtkPythonInterpreter::RunSimpleString(code.c_str());
   QFile file(fileName);
@@ -388,6 +377,23 @@ void pqPythonManager::saveTraceState(const QString& fileName)
 void pqPythonManager::updateMacroList()
 {
   this->Internal->MacroSupervisor->updateMacroList();
+}
+
+//----------------------------------------------------------------------------
+void pqPythonManager::setSaveFullState(bool saveFullState)
+{
+  std::string code;
+  code += "from paraview import smstate\n";
+  if(saveFullState)
+    {
+    code += "smstate._save_full_state = True\n";
+    }
+  else
+    {
+    code += "smstate._save_full_state = False\n";
+    }
+
+  vtkPythonInterpreter::RunSimpleString(code.c_str());
 }
 
 //----------------------------------------------------------------------------
