@@ -286,9 +286,9 @@ void pqColorMapEditor::setScalarBar(vtkSMProxy* sb, vtkSMProxy* viewProxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqColorMapEditor::showScalarBar(bool show)
+void pqColorMapEditor::showScalarBar(bool show_sb)
 {
-  if (show)
+  if (show_sb)
     {
     BEGIN_UNDO_SET("Show scalar bar");
     }
@@ -300,7 +300,7 @@ void pqColorMapEditor::showScalarBar(bool show)
   if (this->Internals->ScalarBarProxy)
     {
     vtkSMPropertyHelper(this->Internals->ScalarBarProxy,
-      "Visibility").Set(0, show? 1 : 0);
+      "Visibility").Set(0, show_sb? 1 : 0);
     this->Internals->ScalarBarProxy->UpdateVTKObjects();
     }
   else
@@ -313,7 +313,7 @@ void pqColorMapEditor::showScalarBar(bool show)
     if (lut_mgr)
       {
       lut_mgr->setScalarBarVisibility(
-        this->Internals->ActiveRepresentation, show);
+        this->Internals->ActiveRepresentation, show_sb);
       // this will ensure we set the current scalar bar proxy correctly.
       this->updateActive();
       }
