@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,14 +29,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorButtonEventPlayer_h 
+#ifndef __pqColorButtonEventPlayer_h
 #define __pqColorButtonEventPlayer_h
 
 #include "pqWidgetEventPlayer.h"
-#include "pqCoreModule.h"
+#include "pqWidgetsModule.h" // needed for EXPORT macro.
 
 /// pqColorButtonEventPlayer is the player for pqColorChooserButton.
-class PQCORE_EXPORT pqColorButtonEventPlayer : public pqWidgetEventPlayer
+class PQWIDGETS_EXPORT pqColorButtonEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
   typedef pqWidgetEventPlayer Superclass;
@@ -54,5 +54,3 @@ private:
 };
 
 #endif
-
-

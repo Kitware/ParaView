@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorDialogEventTranslator.h
+   Module:  pqColorDialogEventTranslator.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,17 +29,17 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorDialogEventTranslator_h 
+#ifndef __pqColorDialogEventTranslator_h
 #define __pqColorDialogEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
-#include "pqCoreModule.h"
+#include "pqWidgetsModule.h" // needed for EXPORT macro.
 #include <QColor>
 
-/// pqColorDialogEventTranslator translates events on pqColorChooserButton 
-/// or subclass so that they can be recorded in tests in a platform independent
+/// pqColorDialogEventTranslator translates events on QColorDialog
+/// that they can be recorded in tests in a platform independent
 /// way.
-class PQCORE_EXPORT pqColorDialogEventTranslator :
+class PQWIDGETS_EXPORT pqColorDialogEventTranslator :
   public pqWidgetEventTranslator
 {
   Q_OBJECT
@@ -47,13 +47,13 @@ class PQCORE_EXPORT pqColorDialogEventTranslator :
 public:
   pqColorDialogEventTranslator(QObject* parent=0);
   ~pqColorDialogEventTranslator();
- 
-  /// Overridden to handle events on QColorDialog. 
+
+  /// Overridden to handle events on QColorDialog.
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private slots:
   void onColorChosen(const QColor&);
-  void onAccepted();
+  void onFinished(int);
 
 private:
   pqColorDialogEventTranslator(const pqColorDialogEventTranslator&); // Not implemented.

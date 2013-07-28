@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorButtonEventTranslator.h
+   Module:  pqColorDialogEventPlayer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,36 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqColorButtonEventTranslator_h 
-#define __pqColorButtonEventTranslator_h
+#ifndef __pqColorDialogEventPlayer_h
+#define __pqColorDialogEventPlayer_h
 
-#include "pqWidgetEventTranslator.h"
-#include "pqCoreModule.h"
-#include <QColor>
+#include "pqWidgetEventPlayer.h"
+#include "pqWidgetsModule.h" // needed for EXPORT macro.
 
-/// pqColorButtonEventTranslator translates events on pqColorChooserButton 
-/// or subclass so that they can be recorded in tests in a platform independent
-/// way.
-class PQCORE_EXPORT pqColorButtonEventTranslator :
-  public pqWidgetEventTranslator
+/// pqColorDialogEventPlayer is the player for QColorDialog. Events are recorded
+/// using pqColorDialogEventTranslator.
+class PQWIDGETS_EXPORT pqColorDialogEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
-  typedef pqWidgetEventTranslator Superclass;
+  typedef pqWidgetEventPlayer Superclass;
 public:
-  pqColorButtonEventTranslator(QObject* parent=0);
-  ~pqColorButtonEventTranslator();
- 
-  /// Overridden to handle events on QColorDialog. 
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+  pqColorDialogEventPlayer(QObject* parent=0);
+  ~pqColorDialogEventPlayer();
 
-private slots:
-  void onColorChosen(const QColor&);
+  bool playEvent(QObject* object, const QString& command, const QString&
+    arguments, bool& error);
 
+  static const QString &EVENT_NAME();
 private:
-  pqColorButtonEventTranslator(const pqColorButtonEventTranslator&); // Not implemented.
-  void operator=(const pqColorButtonEventTranslator&); // Not implemented.
+  Q_DISABLE_COPY(pqColorDialogEventPlayer);
 };
 
 #endif
-
-

@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorDialogEventPlayer.cxx
+   Module:  pqColorDialogEventPlayer.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,10 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqColorDialogEventPlayer.h"
 
-#include "pqCoreTestUtility.h"
-#include "pqColorDialog.h"
-
-#include <QColor>
+#include <QColorDialog>
 #include <QRegExp>
 
 //----------------------------------------------------------------------------
@@ -50,10 +47,10 @@ pqColorDialogEventPlayer::~pqColorDialogEventPlayer()
 
 //-----------------------------------------------------------------------------
 bool pqColorDialogEventPlayer::playEvent(
-  QObject* object, const QString& command, 
+  QObject* object, const QString& command,
   const QString& arguments, bool& /*error*/)
 {
-  pqColorDialog* dialog = qobject_cast<pqColorDialog*>(object);
+  QColorDialog* dialog = qobject_cast<QColorDialog*>(object);
   if (!dialog)
     {
     return false;
@@ -68,9 +65,9 @@ bool pqColorDialogEventPlayer::playEvent(
     dialog->setCurrentColor(rgb);
     return true;
     }
-  if (command == "accepted")
+  else if (command == "done")
     {
-    dialog->accept();
+    static_cast<QDialog*>(dialog)->done(arguments.toInt());
     return true;
     }
   return false;

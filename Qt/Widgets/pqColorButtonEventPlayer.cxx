@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqColorButtonEventPlayer.h"
 
-#include "pqCoreTestUtility.h"
+#include "pqTestUtility.h"
 #include "pqColorChooserButton.h"
 
 #include <QColor>
@@ -50,7 +50,7 @@ pqColorButtonEventPlayer::~pqColorButtonEventPlayer()
 
 //-----------------------------------------------------------------------------
 bool pqColorButtonEventPlayer::playEvent(
-  QObject* object, const QString& command, 
+  QObject* object, const QString& command,
   const QString& arguments, bool& /*error*/)
 {
   pqColorChooserButton* button = qobject_cast<pqColorChooserButton*>(object);
@@ -58,7 +58,7 @@ bool pqColorButtonEventPlayer::playEvent(
     {
     return false;
     }
-  
+
   QRegExp regExp("^(\\d+),(\\d+),(\\d+)$");
   if (   (command == pqColorButtonEventPlayer::EVENT_NAME())
       && (regExp.indexIn(arguments) != -1) )

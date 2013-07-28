@@ -18,8 +18,8 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.442375,0.396396,2,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.442375,0.396396,2,0,0)" />
   <pqevent object="PipelineContextMenu" command="activate" arguments="Set Block Color" />
-  <pqevent object="pqColorDialog" command="setChosenColor" arguments="255,0,0" />
-  <pqevent object="pqColorDialog" command="accepted" arguments="" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1QColorDialog0" command="setChosenColor" arguments="255,0,0" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1QColorDialog0" command="done" arguments="1" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mousePress" arguments="(0.515716,0.78018,2,2,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1" command="contextMenu" arguments="" />
@@ -31,6 +31,6 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.515716,0.78018,2,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.515716,0.78018,2,0,0)" />
   <pqevent object="PipelineContextMenu" command="activate" arguments="Set Block Color" />
-  <pqevent object="pqColorDialog" command="setChosenColor" arguments="0,0,255" />
-  <pqevent object="pqColorDialog" command="accepted" arguments="" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1QColorDialog0" command="setChosenColor" arguments="0,0,255" />
+  <pqevent object="pqClientMainWindow/multiBlockInspectorDock/multiBlockInspectorPanel/1QColorDialog0" command="done" arguments="1" />
 </pqevents>

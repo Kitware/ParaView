@@ -376,7 +376,8 @@ void pqTransferFunctionWidget::onCurrentPointEditEvent()
   double xrgbms[6];
   ctf->GetNodeValue(currentIdx, xrgbms);
   QColor color = QColorDialog::getColor(
-    QColor::fromRgbF(xrgbms[1], xrgbms[2], xrgbms[3]), this);
+    QColor::fromRgbF(xrgbms[1], xrgbms[2], xrgbms[3]), this,
+    "Select Color", QColorDialog::DontUseNativeDialog);
   if (color.isValid())
     {
     xrgbms[1] = color.redF();

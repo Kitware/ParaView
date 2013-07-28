@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorAnnotationsPropertyWidget.h"
 
 #include "pqActiveObjects.h"
-#include "pqColorDialog.h"
 #include "pqColorMapModel.h"
 #include "pqColorPresetManager.h"
 #include "pqDataRepresentation.h"
@@ -56,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVariant.h"
 
 #include <QAbstractTableModel>
+#include <QColorDialog>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPointer>
@@ -468,15 +468,10 @@ void pqColorAnnotationsPropertyWidget::onDoubleClicked(const QModelIndex& idx)
 {
   if (idx.column() == 0)
     {
-    pqColorDialog editor;
     QColor color = this->Internals->Model.data(idx,
       Qt::DecorationRole).value<QColor>();
-    if (color.isValid())
-      {
-      editor.setChosenColor(color);
-      }
-    editor.chooseColor();
-    color = editor.chosenColor();
+    color = QColorDialog::getColor(color, this, "Choose Annotation Color",
+      QColorDialog::DontUseNativeDialog);
     if (color.isValid())
       {
       this->Internals->Model.setData(idx, color);

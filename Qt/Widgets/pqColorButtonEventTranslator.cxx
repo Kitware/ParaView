@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqColorButtonEventTranslator.h"
 
-#include "pqCoreTestUtility.h"
+#include "pqTestUtility.h"
 #include "pqColorButtonEventPlayer.h"
 #include "pqColorChooserButton.h"
 
@@ -68,7 +68,7 @@ bool pqColorButtonEventTranslator::translateEvent(
     color_button = qobject_cast<pqColorChooserButton*>(object);
     object = object->parent();
     }
-  
+
   if (!color_button)
     {
     return false;
@@ -80,7 +80,7 @@ bool pqColorButtonEventTranslator::translateEvent(
     QObject::connect(color_button, SIGNAL(validColorChosen(const QColor&)),
       this, SLOT(onColorChosen(const QColor&)));
     }
-      
+
   return true;
 }
 
@@ -89,10 +89,10 @@ bool pqColorButtonEventTranslator::translateEvent(
 void pqColorButtonEventTranslator::onColorChosen(const QColor& color)
 {
   pqColorChooserButton* color_button = qobject_cast<pqColorChooserButton*>(this->sender());
- 
+
   QString colorvalue = QString("%1,%2,%3").arg(
     color.red()).arg(color.green()).arg(color.blue());
- 
+
   emit this->recordEvent(color_button, pqColorButtonEventPlayer::EVENT_NAME(),
                          colorvalue);
 }

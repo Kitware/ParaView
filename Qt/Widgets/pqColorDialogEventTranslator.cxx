@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorDialogEventTranslator.cxx
+   Module:  pqColorDialogEventTranslator.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,13 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqColorDialogEventTranslator.h"
 
-#include "pqCoreTestUtility.h"
 #include "pqColorDialogEventPlayer.h"
-#include "pqColorDialog.h"
 
+#include <QColorDialog>
 #include <QEvent>
 #include <QtDebug>
-#include <QMenu>
 
 
 //-----------------------------------------------------------------------------
@@ -55,12 +53,12 @@ pqColorDialogEventTranslator::~pqColorDialogEventTranslator()
 bool pqColorDialogEventTranslator::translateEvent(
   QObject* object, QEvent* tr_event, bool& /*error*/)
 {
-  // Capture events from pqColorDialog and all its children.
+  // Capture events from QColorDialog and all its children.
 
-  pqColorDialog* color_dialog = 0;
+  QColorDialog* color_dialog = 0;
   while (object && !color_dialog)
     {
-    color_dialog = qobject_cast<pqColorDialog*>(object);
+    color_dialog = qobject_cast<QColorDialog*>(object);
     object = object->parent();
     }
 
@@ -71,20 +69,21 @@ bool pqColorDialogEventTranslator::translateEvent(
 
   if (tr_event->type() == QEvent::FocusIn)
     {
-    QObject::disconnect(color_dialog, 0, this, 0);
-    QObject::connect(color_dialog, SIGNAL(currentColorChanged(const QColor&)),
-      this, SLOT(onColorChosen(const QColor&)));
-    QObject::connect(color_dialog, SIGNAL(accepted()), this, SLOT(onAccepted()));
+    QObject::connect(
+      color_dialog, SIGNAL(currentColorChanged(const QColor&)),
+      this, SLOT(onColorChosen(const QColor&)), Qt::UniqueConnection);
+    QObject::connect(
+      color_dialog, SIGNAL(finished(int)),
+      this, SLOT(onFinished(int)), Qt::UniqueConnection);
     }
 
   return true;
 }
 
-
 //-----------------------------------------------------------------------------
 void pqColorDialogEventTranslator::onColorChosen(const QColor& color)
 {
-  pqColorDialog* color_dialog = qobject_cast<pqColorDialog*>(this->sender());
+  QColorDialog* color_dialog = qobject_cast<QColorDialog*>(this->sender());
 
   QString colorvalue = QString("%1,%2,%3").arg(
     color.red()).arg(color.green()).arg(color.blue());
@@ -94,9 +93,8 @@ void pqColorDialogEventTranslator::onColorChosen(const QColor& color)
 }
 
 //-----------------------------------------------------------------------------
-void pqColorDialogEventTranslator::onAccepted()
+void pqColorDialogEventTranslator::onFinished(int result)
 {
-  pqColorDialog* color_dialog = qobject_cast<pqColorDialog*>(this->sender());
-
-  emit recordEvent(color_dialog, "accepted", "");
+  QColorDialog* color_dialog = qobject_cast<QColorDialog*>(this->sender());
+  emit recordEvent(color_dialog, "done", QString::number(result));
 }
