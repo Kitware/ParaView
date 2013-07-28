@@ -36,7 +36,7 @@
 class vtkMultiBlockDataSet;
 class vtkMultiProcessController;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkStreamingParticlesPriorityQueue : public vtkObject
+class vtkStreamingParticlesPriorityQueue : public vtkObject
 {
 public:
   static vtkStreamingParticlesPriorityQueue* New();
