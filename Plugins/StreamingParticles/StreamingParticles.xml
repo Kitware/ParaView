@@ -1,0 +1,109 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <RepresentationProxy name="StreamingParticlesRepresentation"
+      class="vtkStreamingParticlesRepresentation"
+      processes="client|renderserver|dataserver">
+      <Documentation>
+        This is the new representation type we are adding. This is identical to
+        the SurfaceRepresentation except that we are overriding the mapper with
+        our mapper.
+      </Documentation>
+      <IntVectorProperty command="SetUseOutline"
+                         default_values="0"
+                         name="UseOutline"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPointSize"
+                            default_values="2.0"
+                            name="PointSize"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetColorAttributeType"
+                         default_values="0"
+                         name="ColorAttributeType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="POINT_DATA"
+                 value="0" />
+          <Entry text="CELL_DATA"
+                 value="1" />
+          <Entry text="FIELD_DATA"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetColorArrayName"
+                            default_values=""
+                            name="ColorArrayName"
+                            number_of_elements="1">
+        <Documentation>Set the array name to color by. Set it to empty string
+        to use solid color.</Documentation>
+        <ArrayListDomain attribute_type="Scalars"
+                         input_domain_name="input_array_any"
+                         name="array_list"></ArrayListDomain>
+      </StringVectorProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable"
+                     skip_dependency="1">
+        <Documentation>Set the lookup-table to use to map data array to colors.
+        Lookuptable is only used with MapScalars to ON.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    <!-- End of StreamingParticlesRepresentation -->
+    </RepresentationProxy>
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        StreamingParticlesRepresentation as a new type of representation.
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="StreamingParticlesRepresentation"
+        text="Streaming Particles" />
+
+      <SubProxy>
+        <Proxy name="StreamingParticlesRepresentation"
+          proxygroup="representations" proxyname="StreamingParticlesRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="UseOutline" />
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+      <Documentation>
+        Extends standard UnstructuredGridRepresentation by adding
+        StreamingParticlesRepresentation as a new type of representation.
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="StreamingParticlesRepresentation"
+        text="Streaming Particles" />
+
+      <SubProxy>
+        <Proxy name="StreamingParticlesRepresentation"
+          proxygroup="representations" proxyname="StreamingParticlesRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="UseOutline" />
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

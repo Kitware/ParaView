@@ -12,30 +12,32 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkAMRStreamingPriorityQueue.h"
+#include "vtkStreamingParticlesPriorityQueue.h"
 
-#include "vtkAMRInformation.h"
-#include "vtkBoundingBox.h"
-#include "vtkMath.h"
+#include "vtkDataObjectTreeIterator.h"
+#include "vtkInformation.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStreamingPriorityQueue.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <queue>
 #include <vector>
 
-class vtkAMRStreamingPriorityQueue::vtkInternals
+class vtkStreamingParticlesPriorityQueue::vtkInternals
 {
 public:
   vtkStreamingPriorityQueue PriorityQueue;
-  vtkSmartPointer<vtkAMRInformation> AMRMetadata;
+  vtkSmartPointer<vtkMultiBlockDataSet> Metadata;
 };
 
-vtkStandardNewMacro(vtkAMRStreamingPriorityQueue);
-vtkCxxSetObjectMacro(vtkAMRStreamingPriorityQueue, Controller, vtkMultiProcessController);
+vtkStandardNewMacro(vtkStreamingParticlesPriorityQueue);
+vtkCxxSetObjectMacro(vtkStreamingParticlesPriorityQueue, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
-vtkAMRStreamingPriorityQueue::vtkAMRStreamingPriorityQueue()
+vtkStreamingParticlesPriorityQueue::vtkStreamingParticlesPriorityQueue()
 {
   this->Internals = new vtkInternals();
   this->Controller = 0;
@@ -43,7 +45,7 @@ vtkAMRStreamingPriorityQueue::vtkAMRStreamingPriorityQueue()
 }
 
 //----------------------------------------------------------------------------
-vtkAMRStreamingPriorityQueue::~vtkAMRStreamingPriorityQueue()
+vtkStreamingParticlesPriorityQueue::~vtkStreamingParticlesPriorityQueue()
 {
   delete this->Internals;
   this->Internals = 0;
@@ -51,51 +53,80 @@ vtkAMRStreamingPriorityQueue::~vtkAMRStreamingPriorityQueue()
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRStreamingPriorityQueue::Initialize(vtkAMRInformation* amr)
+void vtkStreamingParticlesPriorityQueue::Initialize(vtkMultiBlockDataSet* metadata)
 {
   delete this->Internals;
   this->Internals = new vtkInternals();
-  this->Internals->AMRMetadata = amr;
+  this->Internals->Metadata = metadata;
 
-  for (unsigned int cc=0; cc < amr->GetTotalNumberOfBlocks(); cc++)
+  // This assumes for following structure:
+  // Root
+  //   Level 0
+  //     DS 0 (Block Idx 0)
+  //     DS 1 (Block Idx 1)
+  //   Level 1
+  //     DS 0 (Block Idx 2)
+  //     DS 1 (Block Idx 3)
+  //       .
+  //       .
+  //       .
+  // Where "Block Idx" is the key that needs to be sent up the pipeline to the
+  // reader to request a particular block and Level k is lower refinement than
+  // Level (k+1).
+
+  unsigned int block_index = 0;
+  unsigned int num_levels = metadata->GetNumberOfBlocks();
+  for (unsigned int level=0; level < num_levels; level++)
     {
-    vtkStreamingPriorityQueueItem item;
-    item.Identifier = cc;
-    item.Priority = (amr->GetTotalNumberOfBlocks() - cc);
+    vtkMultiBlockDataSet* mb =
+      vtkMultiBlockDataSet::SafeDownCast(metadata->GetBlock(level));
+    assert(mb != NULL);
 
-    unsigned int level=0, index=0;
-    this->Internals->AMRMetadata->ComputeIndexPair(
-      item.Identifier, level, index);
-    item.Refinement = static_cast<double>(level);
+    unsigned int num_blocks = mb->GetNumberOfBlocks();
+    for (unsigned int cc=0; cc < num_blocks; cc++, block_index++)
+      {
+      if (!mb->HasMetaData(cc) ||
+          !mb->GetMetaData(cc)->Has(
+            vtkStreamingDemandDrivenPipeline::BOUNDS()))
+        {
+        continue;
+        }
 
-    double block_bounds[6];
-    this->Internals->AMRMetadata->GetBounds(level, index, block_bounds);
-    item.Bounds.SetBounds(block_bounds);
+      vtkStreamingPriorityQueueItem item;
+      item.Identifier = block_index;
+      item.Refinement = level;
 
       // default priority is to prefer lower levels. Thus even without
       // view-planes we have reasonable priority.
-    this->Internals->PriorityQueue.push(item);
+      item.Priority = block_index;
+
+      double bounds[6];
+      mb->GetMetaData(cc)->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(), bounds);
+      item.Bounds.SetBounds(bounds);
+
+      this->Internals->PriorityQueue.push(item);
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRStreamingPriorityQueue::Reinitialize()
+void vtkStreamingParticlesPriorityQueue::Reinitialize()
 {
-  if (this->Internals->AMRMetadata)
+  if (this->Internals->Metadata)
     {
-    vtkSmartPointer<vtkAMRInformation> info = this->Internals->AMRMetadata;
+    vtkSmartPointer<vtkMultiBlockDataSet> info = this->Internals->Metadata;
     this->Initialize(info);
     }
 }
 
 //----------------------------------------------------------------------------
-bool vtkAMRStreamingPriorityQueue::IsEmpty()
+bool vtkStreamingParticlesPriorityQueue::IsEmpty()
 {
   return this->Internals->PriorityQueue.empty();
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkAMRStreamingPriorityQueue::Pop()
+unsigned int vtkStreamingParticlesPriorityQueue::Pop()
 {
   if (this->IsEmpty())
     {
@@ -117,12 +148,12 @@ unsigned int vtkAMRStreamingPriorityQueue::Pop()
 
   // at the end, when the queue empties out in the middle of a pop, right now,
   // all other processes are simply going to ask for block 0 (set in
-  // initialization of vtkStreamingPriorityQueueItem). We can change that, if needed.
+  // initialization of vtkPriorityQueueItem). We can change that, if needed.
   return items[myid].Identifier;
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24])
+void vtkStreamingParticlesPriorityQueue::Update(const double view_planes[24])
 {
   double clamp_bounds[6];
   vtkMath::UninitializeBounds(clamp_bounds);
@@ -130,10 +161,10 @@ void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24])
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24],
+void vtkStreamingParticlesPriorityQueue::Update(const double view_planes[24],
   const double clamp_bounds[6])
 {
-  if (!this->Internals->AMRMetadata)
+  if (!this->Internals->Metadata)
     {
     return;
     }
@@ -141,7 +172,7 @@ void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24],
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRStreamingPriorityQueue::PrintSelf(ostream& os, vtkIndent indent)
+void vtkStreamingParticlesPriorityQueue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Controller: " << this->Controller << endl;

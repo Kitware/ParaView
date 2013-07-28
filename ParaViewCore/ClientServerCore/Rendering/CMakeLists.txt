@@ -110,6 +110,8 @@ set_source_files_properties(
   vtkPVView
   ABSTRACT)
 
+set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
+
 # Use a custom hints file for this module.
 set(${vtk-module}_WRAP_HINTS "${CMAKE_CURRENT_SOURCE_DIR}/hints")
 vtk_module_library(vtkPVClientServerCoreRendering ${Module_SRCS})
