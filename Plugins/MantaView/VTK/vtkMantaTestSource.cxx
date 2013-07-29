@@ -200,7 +200,7 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
   double X = vtkMath::Random();
   double Y = vtkMath::Random();
   double Z = vtkMath::Random();
-  for (i = 0; i < this->Resolution; i++)
+  for (i = 0; (i < this->Resolution || i <= maxIndex); i++)
     {
     X = X+vtkMath::Random() * this->DriftFactor - this->DriftFactor*0.5;
     Y = Y+vtkMath::Random() * this->DriftFactor - this->DriftFactor*0.5;
