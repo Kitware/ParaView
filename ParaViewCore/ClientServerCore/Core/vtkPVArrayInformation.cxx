@@ -258,9 +258,11 @@ const char* vtkPVArrayInformation::GetComponentName(vtkIdType component)
       }
     }
   else if (this->ComponentNames && component == -1
-      && this->ComponentNames->size() >= 1)
+      && this->ComponentNames->size() == 1)
     {
-    //we have a scalar array, and we need the component name
+    // the array is a scalar i.e. single component. In that case, when one asks
+    // for the magnitude (i.e. component == -1) it's same as asking for the
+    // scalar. So return the scalar's component name.
     vtkStdString *compName = this->ComponentNames->at(0);
     if (compName)
       {
