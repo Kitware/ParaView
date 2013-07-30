@@ -63,10 +63,14 @@ set (Module_SRCS
   pqClipScalarsDecorator.h
   pqCollaborationBehavior.cxx
   pqCollaborationBehavior.h
-  pqColorSelectorPropertyWidget.cxx
-  pqColorSelectorPropertyWidget.h
+  pqColorAnnotationsPropertyWidget.cxx
+  pqColorAnnotationsPropertyWidget.h
   pqColorEditorPropertyWidget.cxx
   pqColorEditorPropertyWidget.h
+  pqColorOpacityEditorWidget.cxx
+  pqColorOpacityEditorWidget.h
+  pqColorSelectorPropertyWidget.cxx
+  pqColorSelectorPropertyWidget.h
   pqColorToolbar.cxx
   pqColorToolbar.h
   pqCommandButtonPropertyWidget.cxx
@@ -101,12 +105,16 @@ set (Module_SRCS
   pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
   pqEditColorMapReaction.h
+  pqEnableWidgetDecorator.cxx
+  pqEnableWidgetDecorator.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFiltersMenuReaction.cxx
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.cxx
   pqFixPathsInStateFilesBehavior.h
+  pqFontPropertyWidget.cxx
+  pqFontPropertyWidget.h
   pqHelpReaction.cxx
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
@@ -199,8 +207,8 @@ set (Module_SRCS
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.cxx
   pqToggleInteractionViewMode.h
-  pqTransferFunctionEditorPropertyWidget.cxx
-  pqTransferFunctionEditorPropertyWidget.h
+  pqTransferFunctionWidgetPropertyWidget.cxx
+  pqTransferFunctionWidgetPropertyWidget.h
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx
@@ -239,7 +247,9 @@ set (Module_MOC_HDRS
   pqChartSelectionReaction.h
   pqClipScalarsDecorator.h
   pqCollaborationBehavior.h
+  pqColorOpacityEditorWidget.h
   pqColorSelectorPropertyWidget.h
+  pqColorAnnotationsPropertyWidget.h
   pqColorEditorPropertyWidget.h
   pqColorToolbar.h
   pqCommandButtonPropertyWidget.h
@@ -258,9 +268,11 @@ set (Module_MOC_HDRS
   pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
+  pqEnableWidgetDecorator.h
   pqExportReaction.h
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
+  pqFontPropertyWidget.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
   pqInputDataTypeDecorator.h
@@ -306,7 +318,7 @@ set (Module_MOC_HDRS
   pqTestingReaction.h
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.h
-  pqTransferFunctionEditorPropertyWidget.h
+  pqTransferFunctionWidgetPropertyWidget.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h
@@ -335,14 +347,18 @@ endif()
 set (Module_UI_FILES
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqCameraToolbar.ui
+  Resources/UI/pqColorAnnotationsPropertyWidget.ui
   Resources/UI/pqColorEditorPropertyWidget.ui
+  Resources/UI/pqColorOpacityEditorWidget.ui
   Resources/UI/pqColorToolbar.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui
+  Resources/UI/pqFontPropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
+  Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
   Resources/UI/pqVCRToolbar.ui
 )
 

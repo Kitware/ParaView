@@ -52,13 +52,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QKeyEvent>
 #include <QPointer>
-#include <QShortcut>
 #include <QStyleFactory>
 #include <QTimer>
 
 namespace
 {
+  class pqClearTextOnEsc : public QObject
+  {
+public:
+  pqClearTextOnEsc(QLineEdit* parentObject) : QObject(parentObject)
+    {
+    }
+protected:
+  virtual bool eventFilter(QObject *obj, QEvent *evt)
+    {
+    if (evt->type() == QEvent::KeyPress)
+      {
+      QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
+      if (keyEvent->key() == Qt::Key_Escape)
+        {
+        qobject_cast<QLineEdit*>(this->parent())->clear();
+        }
+      }
+    return this->QObject::eventFilter(obj, evt);
+    }
+  };
+
   // internal class used to keep track of all the widgets associated with a
   // panel either for a source or representation.
   class pqProxyWidgets : public QObject
@@ -310,9 +331,8 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
       SLOT(updateButtonState()));
 
   // Setup shortcut to clear search text.
-  QShortcut *esc = new QShortcut(Qt::Key_Escape, this);
-  QObject::connect(esc, SIGNAL(activated()),
-                   this->Internals->Ui.SearchLineEdit, SLOT(clear()));
+  this->Internals->Ui.SearchLineEdit->installEventFilter(
+    new pqClearTextOnEsc(this->Internals->Ui.SearchLineEdit));
 
   // Listen to UI signals.
   QObject::connect(this->Internals->Ui.Accept, SIGNAL(clicked()),

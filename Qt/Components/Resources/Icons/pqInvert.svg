@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32px"
+   height="32px"
+   id="svg2985"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="pqInvert.svg"
+   inkscape:export-filename="/home/utkarsh/Kitware/ParaView3/ParaView/Qt/Components/Resources/Icons/pqInvert.png"
+   inkscape:export-xdpi="67.5"
+   inkscape:export-ydpi="67.5">
+  <defs
+     id="defs2987">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 16 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="32 : 16 : 1"
+       inkscape:persp3d-origin="16 : 10.666667 : 1"
+       id="perspective2997" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.197802"
+     inkscape:cx="0.14867489"
+     inkscape:cy="19.255138"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:grid-bbox="true"
+     inkscape:document-units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="1144"
+     inkscape:window-x="1920"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata2990">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.95832545px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 0.36172186,0.67265729 -0.0625,30.34374971 5.40625004,-5.34375 c -2.161377,-2.413207 -3.5,-5.599158 -3.5,-9.09375 0,-7.5319585 6.124291,-13.6249997 13.6562501,-13.6249997 3.542341,0 6.731609,1.379467 9.15625,3.59375 l 5.9375,-5.87500001 -30.59375014,0 z"
+       id="path3055-7"
+       inkscape:connector-curvature="0" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#010101;stroke-width:0.44600001;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:35.60001142"
+       id="path3908"
+       sodipodi:cx="7.501472"
+       sodipodi:cy="13.24632"
+       sodipodi:rx="14.556428"
+       sodipodi:ry="14.556428"
+       d="m 22.0579,13.24632 a 14.556428,14.556428 0 1 1 -29.112856,0 14.556428,14.556428 0 1 1 29.112856,0 z"
+       transform="matrix(0.98311997,0,0,0.96368186,9.525662,3.3459424)" />
+  </g>
+</svg>

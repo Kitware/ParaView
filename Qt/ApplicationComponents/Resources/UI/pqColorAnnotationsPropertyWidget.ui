@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ColorAnnotationsPropertyWidget</class>
+ <widget class="QWidget" name="ColorAnnotationsPropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>358</width>
+    <height>338</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QToolButton" name="Add">
+       <property name="toolTip">
+        <string>Add new entry</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+         <normaloff>:/QtWidgets/Icons/pqPlus16.png</normaloff>:/QtWidgets/Icons/pqPlus16.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="Remove">
+       <property name="toolTip">
+        <string>Remove current entry</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+         <normaloff>:/QtWidgets/Icons/pqMinus16.png</normaloff>:/QtWidgets/Icons/pqMinus16.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="AddActive">
+       <property name="toolTip">
+        <string>Add active values</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Components/Resources/pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqFilter16.png</normaloff>:/pqWidgets/Icons/pqFilter16.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="ChoosePreset">
+       <property name="toolTip">
+        <string>Choose preset</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Components/Resources/pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqFavorites16.png</normaloff>:/pqWidgets/Icons/pqFavorites16.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="SaveAsPreset">
+       <property name="toolTip">
+        <string>Save to preset</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Components/Resources/pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqSave16.png</normaloff>:/pqWidgets/Icons/pqSave16.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="DeleteAll">
+       <property name="toolTip">
+        <string>Delete all annotations</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+         <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0">
+    <widget class="QTableView" name="AnnotationsTable">
+     <property name="dragDropMode">
+      <enum>QAbstractItemView::InternalMove</enum>
+     </property>
+     <property name="defaultDropAction">
+      <enum>Qt::MoveAction</enum>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+  <include location="../pqApplicationComponents.qrc"/>
+  <include location="../../../Core/Resources/pqCore.qrc"/>
+  <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1407,7 +1407,8 @@ vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
       }
     else
       {
-      group->AddProperty(property);
+      group->AddProperty(
+        elem->GetAttribute("function"), property);
       }
     }
 

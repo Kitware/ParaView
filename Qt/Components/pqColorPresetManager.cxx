@@ -37,11 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorPresetDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqBuiltinColorMaps.h"
 #include "pqChartValue.h"
 #include "pqColorMapModel.h"
 #include "pqColorPresetModel.h"
 #include "pqFileDialog.h"
 #include "pqSettings.h"
+#include "vtkNew.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 
 #include <QHeaderView>
 #include <QItemDelegate>
@@ -56,8 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 
-#include "vtkPVXMLElement.h"
-#include "vtkPVXMLParser.h"
 #include <vtksys/ios/sstream>
 
 
@@ -111,8 +113,10 @@ void pqColorPresetDelegate::drawDecoration(QPainter *painter,
 
 
 //----------------------------------------------------------------------------
-pqColorPresetManager::pqColorPresetManager(QWidget *widgetParent)
-  : QDialog(widgetParent)
+pqColorPresetManager::pqColorPresetManager(
+  QWidget *widgetParent, pqColorPresetManager::Mode mode)
+  : QDialog(widgetParent),
+  DialogMode(mode)
 {
   this->Form = new pqColorPresetManagerForm();
   this->Model = new pqColorPresetModel(this);
@@ -154,11 +158,25 @@ pqColorPresetManager::pqColorPresetManager(QWidget *widgetParent)
 
   // Initialize the button enabled states.
   this->updateButtons();
+
+  this->connect(this->getSelectionModel(),
+    SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+    this, SLOT(currentChanged(const QModelIndex&)));
 }
 
 pqColorPresetManager::~pqColorPresetManager()
 {
   delete this->Form;
+}
+
+void pqColorPresetManager::currentChanged(const QModelIndex &current)
+{
+  const pqColorMapModel *colorMap = this->getModel()->getColorMap(
+    current.row());
+  if (colorMap)
+    {
+    emit this->currentChanged(colorMap);
+    }
 }
 
 QItemSelectionModel *pqColorPresetManager::getSelectionModel() const
@@ -252,6 +270,10 @@ void pqColorPresetManager::restoreSettings()
 
   settings->endGroup();
   this->Model->setModified(false);
+
+  // select the 1st item.
+  this->getSelectionModel()->setCurrentIndex(this->Model->index(0, 0),
+    QItemSelectionModel::ClearAndSelect);
 }
 
 bool pqColorPresetManager::eventFilter(QObject *object, QEvent *e)
@@ -362,7 +384,39 @@ void pqColorPresetManager::showEvent(QShowEvent *e)
         header->sectionSizeHint(1));
     header->resizeSection(1, header->sectionSizeHint(1));
     }
-  this->Form->Gradients->scrollToTop();
+
+  // based on the this->DialogMode hide items not matching the criteria.
+  for (int cc=0; cc < this->Model->rowCount(); cc++)
+    {
+    const pqColorMapModel* cmm = this->Model->getColorMap(cc);
+    switch (this->DialogMode)
+      {
+    case SHOW_INDEXED_COLORS_ONLY:
+      this->Form->Gradients->setRowHidden(cc, QModelIndex(),
+        !cmm->getIndexedLookup());
+      break;
+
+    case SHOW_NON_INDEXED_COLORS_ONLY:
+      this->Form->Gradients->setRowHidden(cc, QModelIndex(),
+        cmm->getIndexedLookup());
+      break;
+
+    case SHOW_ALL:
+      this->Form->Gradients->setRowHidden(cc, QModelIndex(), false);
+      break;
+      }
+    }
+
+  // scroll to current index or to top.
+  if (this->Form->Gradients->currentIndex().isValid())
+    {
+    this->Form->Gradients->scrollTo(
+      this->Form->Gradients->currentIndex());
+    }
+  else
+    {
+    this->Form->Gradients->scrollToTop();
+    }
 }
 
 void pqColorPresetManager::importColorMap()
@@ -504,6 +558,64 @@ void pqColorPresetManager::selectNewItem(const QModelIndex &, int first,
     selection->select(range, QItemSelectionModel::ClearAndSelect);
     selection->setCurrentIndex(lastIndex, QItemSelectionModel::NoUpdate);
     }
+}
+
+bool pqColorPresetManager::saveColorMapToXML(const pqColorMapModel* colorMap,
+  vtkPVXMLElement* element)
+{
+  if (!colorMap || !element)
+    {
+    return false;
+    }
+  const char *spaceNames[] = {"RGB", "HSV", "Wrapped", "Lab", "Diverging"};
+  element->SetAttribute("space", spaceNames[colorMap->getColorSpaceAsInt()]);
+  element->SetAttribute("indexedLookup", colorMap->getIndexedLookup() ? "true" : "false");
+  for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
+    {
+    QColor color;
+    pqChartValue value, opacity;
+    colorMap->getPointColor(i, color);
+    colorMap->getPointValue(i, value);
+    colorMap->getPointOpacity(i, opacity);
+    vtkPVXMLElement *point = vtkPVXMLElement::New();
+    point->SetName("Point");
+    point->SetAttribute("x",
+      QString::number(value.getDoubleValue()).toAscii().data());
+    point->SetAttribute("o",
+      QString::number(opacity.getDoubleValue()).toAscii().data());
+    point->SetAttribute("r",
+      QString::number(color.redF()).toAscii().data());
+    point->SetAttribute("g",
+      QString::number(color.greenF()).toAscii().data());
+    point->SetAttribute("b",
+      QString::number(color.blueF()).toAscii().data());
+    element->AddNestedElement(point);
+    point->Delete();
+    }
+
+  QColor color;
+  colorMap->getNanColor(color);
+  vtkPVXMLElement *nanElement = vtkPVXMLElement::New();
+  nanElement->SetName("NaN");
+  nanElement->SetAttribute("r",
+    QString::number(color.redF()).toAscii().data());
+  nanElement->SetAttribute("g",
+    QString::number(color.greenF()).toAscii().data());
+  nanElement->SetAttribute("b",
+    QString::number(color.blueF()).toAscii().data());
+  element->AddNestedElement(nanElement);
+  nanElement->Delete();
+
+  for ( int i = 0; i < colorMap->getNumberOfAnnotations(); ++ i )
+    {
+    vtkPVXMLElement* note = vtkPVXMLElement::New();
+    note->SetName( "Annotation" );
+    note->SetAttribute( "v", colorMap->getAnnotatedValue( i ).toAscii().data() );
+    note->SetAttribute( "t", colorMap->getAnnotation( i ).toAscii().data() );
+    element->AddNestedElement( note );
+    note->Delete();
+    }
+  return true;
 }
 
 pqColorMapModel pqColorPresetManager::createColorMapFromXML(vtkPVXMLElement *element)
@@ -657,66 +769,55 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
 void pqColorPresetManager::exportColorMap(const QModelIndex &index,
     vtkPVXMLElement *element)
 {
-  // Get the color map name from the preset model data.
-  QString name = this->Model->data(index, Qt::DisplayRole).toString();
-  if(!name.isEmpty())
-    {
-    element->SetAttribute("name", name.toAscii().data());
-    }
-
   // Get the color space and points from the color map model.
-  const char *spaceNames[] = {"RGB", "HSV", "Wrapped", "Lab", "Diverging"};
   const pqColorMapModel *colorMap = this->Model->getColorMap(index.row());
-  if(colorMap)
+  if (this->saveColorMapToXML(colorMap, element))
     {
-    element->SetAttribute("space", spaceNames[colorMap->getColorSpaceAsInt()]);
-    element->SetAttribute("indexedLookup", colorMap->getIndexedLookup() ? "true" : "false");
-    for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
+    // Get the color map name from the preset model data.
+    QString name = this->Model->data(index, Qt::DisplayRole).toString();
+    if(!name.isEmpty())
       {
-      QColor color;
-      pqChartValue value, opacity;
-      colorMap->getPointColor(i, color);
-      colorMap->getPointValue(i, value);
-      colorMap->getPointOpacity(i, opacity);
-      vtkPVXMLElement *point = vtkPVXMLElement::New();
-      point->SetName("Point");
-      point->SetAttribute("x",
-          QString::number(value.getDoubleValue()).toAscii().data());
-      point->SetAttribute("o",
-          QString::number(opacity.getDoubleValue()).toAscii().data());
-      point->SetAttribute("r",
-          QString::number(color.redF()).toAscii().data());
-      point->SetAttribute("g",
-          QString::number(color.greenF()).toAscii().data());
-      point->SetAttribute("b",
-          QString::number(color.blueF()).toAscii().data());
-      element->AddNestedElement(point);
-      point->Delete();
-      }
-
-    QColor color;
-    colorMap->getNanColor(color);
-    vtkPVXMLElement *nanElement = vtkPVXMLElement::New();
-    nanElement->SetName("NaN");
-    nanElement->SetAttribute("r",
-                             QString::number(color.redF()).toAscii().data());
-    nanElement->SetAttribute("g",
-                             QString::number(color.greenF()).toAscii().data());
-    nanElement->SetAttribute("b",
-                             QString::number(color.blueF()).toAscii().data());
-    element->AddNestedElement(nanElement);
-    nanElement->Delete();
-
-    for ( int i = 0; i < colorMap->getNumberOfAnnotations(); ++ i )
-      {
-      vtkPVXMLElement* note = vtkPVXMLElement::New();
-      note->SetName( "Annotation" );
-      note->SetAttribute( "v", colorMap->getAnnotatedValue( i ).toAscii().data() );
-      note->SetAttribute( "t", colorMap->getAnnotation( i ).toAscii().data() );
-      element->AddNestedElement( note );
-      note->Delete();
+      element->SetAttribute("name", name.toAscii().data());
       }
     }
 }
 
+void pqColorPresetManager::loadBuiltinColorPresets()
+{
+  pqColorPresetModel *model = this->getModel();
 
+  // get builtin color maps xml
+  const char *xml = pqComponentsGetColorMapsXML();
+
+  // create xml parser
+  vtkNew<vtkPVXMLParser> xmlParser;
+  if (!xmlParser->Parse(xml))
+    {
+    return;
+    }
+
+  // parse each color map element
+  vtkPVXMLElement *root = xmlParser->GetRootElement();
+  for(unsigned int i = 0; i < root->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement *colorMapElement = root->GetNestedElement(i);
+    if(std::string("ColorMap") != colorMapElement->GetName())
+      {
+      continue;
+      }
+
+    // load color map from its XML
+    pqColorMapModel colorMap =
+      pqColorPresetManager::createColorMapFromXML(colorMapElement);
+    QString name = colorMapElement->GetAttribute("name");
+
+    // add color map to the model
+    model->addBuiltinColorMap(colorMap, name);
+    }
+}
+
+void pqColorPresetManager::addColorMap(const pqColorMapModel& colorMap, const QString& name)
+{
+  pqColorPresetModel *model = this->getModel();
+  model->addColorMap(colorMap, name);
+}

@@ -21,10 +21,10 @@
   Choose a preset color map and make sure the corresponding NaN color is loaded.
   -->
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/PresetButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/Gradients" command="setCurrent" arguments="1.0" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/OkButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ChoosePreset" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqColorPresetDialog/Gradients" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqColorPresetDialog/OkButton" command="activate" arguments="" />
+
   <!--
   Image compare for preset color.
   -->
@@ -33,8 +33,8 @@
   Change the NaN color via the button in the color scale edit dialog.
   -->
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/NanColor" command="setChosenColor" arguments="255,0,255" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/NanColor/ColorButton" command="setChosenColor" arguments="255,0,255" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/Update" command="activate" arguments="" />
   <!--
   Image compare for color selected via GUI.
   -->

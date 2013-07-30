@@ -1451,3 +1451,12 @@ vtkPVDataInformationHelper* vtkPVDataInformation::FindHelper
     }
   return NULL;
 }
+
+//----------------------------------------------------------------------------
+vtkPVArrayInformation* vtkPVDataInformation::GetArrayInformation(
+  const char* arrayname, int attribute_type)
+{
+  vtkPVDataSetAttributesInformation* attrInfo =
+    this->GetAttributeInformation(attribute_type);
+  return attrInfo? attrInfo->GetArrayInformation(arrayname) : NULL;
+}

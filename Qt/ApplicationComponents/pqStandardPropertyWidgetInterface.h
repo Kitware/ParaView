@@ -59,7 +59,7 @@ public:
   /// \li \c double_range : pqDoubleRangeSliderPropertyWidget
   /// \li \c list : pqListPropertyWidget
   /// \li \c texture_selector : pqTextureSelectorPropertyWidget
-  /// \li \c transfer_function_editor : pqTransferFunctionEditorPropertyWidget
+  /// \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
   virtual pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy *proxy, vtkSMProperty *property);
 
@@ -67,9 +67,12 @@ public:
   /// For unsupported/unknown proxies/property-groups, implementations should simply
   /// return NULL without raising any errors (or messages).
   /// Supported types are:
+  /// \li \c AnnotationsEditor : pqColorAnnotationsPropertyWidget
   /// \li \c ArrayStatus : pqArrayStatusPropertyWidget
   /// \li \c ColorEditor : pqColorEditorPropertyWidget
+  /// \li \c ColorOpacityEditor : pqColorOpacityEditorWidget
   /// \li \c CubeAxes : pqCubeAxesPropertyWidget
+  /// \li \c FontEditor : pqFontPropertyWidget
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
 
@@ -80,6 +83,8 @@ public:
   /// Supported types are:
   /// \li \c ClipScalarsDecorator : pqClipScalarsDecorator
   /// \li \c CTHArraySelectionDecorator : pqCTHArraySelectionDecorator
+  /// \li \c EnableWidgetDecorator : pqEnableWidgetDecorator
+  /// \li \c InputDataTypeDecorator : pqInputDataTypeDecorator
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
 };

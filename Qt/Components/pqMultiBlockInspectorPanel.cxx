@@ -12,38 +12,37 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 #include "pqMultiBlockInspectorPanel.h"
 
 #include "pqActiveObjects.h"
-#include "pqOutputPort.h"
-#include "pqUndoStack.h"
 #include "pqDoubleRangeDialog.h"
-#include "vtkSMProxy.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVCompositeDataInformation.h"
-#include "vtkSMProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "pqTreeWidgetSelectionHelper.h"
-#include "vtkEventQtSlotConnect.h"
+#include "pqOutputPort.h"
 #include "pqSelectionManager.h"
-#include "vtkSelection.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
+#include "pqTreeWidgetSelectionHelper.h"
+#include "pqUndoStack.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMDoubleMapProperty.h"
 #include "vtkSMDoubleMapPropertyIterator.h"
-#include "pqColorDialog.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSelection.h"
 
-#include <QMenu>
+#include <QColorDialog>
 #include <QHeaderView>
-#include <QVBoxLayout>
+#include <QIcon>
+#include <QMenu>
+#include <QPainter>
+#include <QPixmap>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QIcon>
-#include <QPixmap>
-#include <QPainter>
+#include <QVBoxLayout>
 
 pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   : QWidget(parent_)
@@ -795,9 +794,8 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(const QPoi
     }
   else if(action == setColorAction)
     {
-    pqColorDialog dialog(this);
-    dialog.chooseColor();
-    QColor color = dialog.chosenColor();
+    QColor color = QColorDialog::getColor(QColor(), this, "Select Color",
+      QColorDialog::DontUseNativeDialog);
     if(color.isValid())
       {
       foreach(QTreeWidgetItem *item, items)

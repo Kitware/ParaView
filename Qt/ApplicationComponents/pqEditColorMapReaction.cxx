@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqEditColorMapReaction.h"
 
+#include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
-#include "pqColorScaleEditor.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqSMAdaptor.h"
@@ -41,8 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 
-#include <QDebug>
 #include <QColorDialog>
+#include <QDebug>
+#include <QDockWidget>
 
 //-----------------------------------------------------------------------------
 pqEditColorMapReaction::pqEditColorMapReaction(QAction* parentObject)
@@ -118,16 +119,19 @@ void pqEditColorMapReaction::editColorMap()
     }
   else
     {
-    // Create the color map editor if needed.
-    QWidget* rootWidget = pqCoreUtilities::mainWidget();
-    pqColorScaleEditor* editor = rootWidget->findChild<pqColorScaleEditor*>();
-    if(editor == NULL)
+    // Raise the color editor is present in the application.
+    QDockWidget* widget = qobject_cast<QDockWidget*>(
+      pqApplicationCore::instance()->manager("COLOR_EDITOR_PANEL"));
+    if (widget)
       {
-      editor = new pqColorScaleEditor(rootWidget);
-      editor->setAttribute(Qt::WA_DeleteOnClose);
+      widget->setVisible(true);
+      // widget->setFloating(true);
+      widget->raise();
       }
-    editor->setRepresentation(repr);
-    editor->show();
+    else
+      {
+      qDebug("Failed to find 'COLOR_EDITOR_PANEL'.");
+      }
     }
 
   repr->renderViewEventually();

@@ -40,6 +40,7 @@ extern "C" {
 #include "ui_ParaViewMainWindow.h"
 
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqHelpReaction.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqOptions.h"
@@ -98,6 +99,19 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
+  this->tabifyDockWidget(
+    this->Internals->colorMapEditorDock,
+    this->Internals->memoryInspectorDock);
+  this->tabifyDockWidget(
+    this->Internals->colorMapEditorDock,
+    this->Internals->selectionInspectorDock);
+  this->tabifyDockWidget(
+    this->Internals->colorMapEditorDock,
+    this->Internals->comparativePanelDock);
+  this->tabifyDockWidget(
+    this->Internals->colorMapEditorDock,
+    this->Internals->collaborationPanelDock);
+
   this->Internals->animationViewDock->hide();
   this->Internals->statisticsDock->hide();
   this->Internals->selectionInspectorDock->hide();
@@ -105,6 +119,10 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->collaborationPanelDock->hide();
   this->Internals->memoryInspectorDock->hide();
   this->Internals->multiBlockInspectorDock->hide();
+  this->Internals->colorMapEditorDock->hide();
+
+
+
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);
 
@@ -144,6 +162,10 @@ ParaViewMainWindow::ParaViewMainWindow()
       SIGNAL(helpRequested(const QString&, const QString&)),
       this, SLOT(showHelpForProxy(const QString&, const QString&)));
     }
+ 
+  /// Provide access to the color-editor panel for the application.
+  pqApplicationCore::instance()->registerManager(
+    "COLOR_EDITOR_PANEL", this->Internals->colorMapEditorDock);
 
   // Populate application menus with actions.
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);

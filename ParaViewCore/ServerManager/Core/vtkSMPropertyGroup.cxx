@@ -12,17 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 #include "vtkSMPropertyGroup.h"
 
-#include <vector>
-
 #include "vtkObjectFactory.h"
+#include "vtkSMProperty.h"
+#include "vtkWeakPointer.h"
+
+#include <map>
+#include <string>
+#include <vector>
 
 class vtkSMPropertyGroupInternals
 {
 public:
   std::vector<vtkSMProperty *> Properties;
+  std::map<std::string, vtkWeakPointer<vtkSMProperty> > PropertiesMap;
 };
 
 vtkStandardNewMacro(vtkSMPropertyGroup)
@@ -62,8 +66,12 @@ bool vtkSMPropertyGroup::IsEmpty() const
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPropertyGroup::AddProperty(vtkSMProperty *property)
+void vtkSMPropertyGroup::AddProperty(const char* function, vtkSMProperty *property)
 {
+  if (function)
+    {
+    this->Internals->PropertiesMap[function] = property;
+    }
   this->Internals->Properties.push_back(property);
 }
 
@@ -71,6 +79,19 @@ void vtkSMPropertyGroup::AddProperty(vtkSMProperty *property)
 vtkSMProperty* vtkSMPropertyGroup::GetProperty(unsigned int index) const
 {
   return this->Internals->Properties[index];
+}
+
+//---------------------------------------------------------------------------
+vtkSMProperty* vtkSMPropertyGroup::GetProperty(const char* function) const
+{
+  if (function &&
+    this->Internals->PropertiesMap.find(function) !=
+    this->Internals->PropertiesMap.end())
+    {
+    return this->Internals->PropertiesMap[function];
+    }
+
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

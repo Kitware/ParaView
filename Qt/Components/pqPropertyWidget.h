@@ -91,7 +91,7 @@ public:
   }
 
   /// Provides access to the decorators for this widget.
-  const QList<pqPropertyWidgetDecorator*>& decorators() const
+  const QList<QPointer<pqPropertyWidgetDecorator> >& decorators() const
     {
     return this->Decorators;
     }
@@ -120,6 +120,12 @@ protected:
                        const char *qsignal,
                        vtkSMProperty *smproperty,
                        int smindex = -1);
+  void addPropertyLink(QObject *qobject,
+                       const char *qproperty,
+                       const char *qsignal,
+                       vtkSMProxy *smproxy,
+                       vtkSMProperty *smproperty,
+                       int smindex = -1);
   void setShowLabel(bool show);
 
   /// For most pqPropertyWidget subclasses a changeAvailable() signal,
@@ -131,6 +137,11 @@ protected:
   void setChangeAvailableAsChangeFinished(bool status)
     { this->ChangeAvailableAsChangeFinished = status; }
 
+  /// Register a decorator. The pqPropertyWidget takes over the ownership of the
+  /// decorator. The decorator will be deleted when the pqPropertyWidget is
+  /// destroyed.
+  void addDecorator(pqPropertyWidgetDecorator*);
+
 private:
   /// setAutoUpdateVTKObjects no longer simply passes the flag to
   /// pqPropertyLinks. Instead we set a flag so that when this->changeFinished()
@@ -140,8 +151,6 @@ private:
   void setAutoUpdateVTKObjects(bool autoUpdate);
   void setUseUncheckedProperties(bool useUnchecked);
   void setProperty(vtkSMProperty *property);
-
-  void addDecorator(pqPropertyWidgetDecorator*);
 
   friend class pqPropertiesPanel;
   friend class pqPropertyWidgetDecorator;
@@ -158,7 +167,7 @@ private:
   vtkSMProxy *Proxy;
   vtkSMProperty *Property;
   QPointer<pqView> View;
-  QList<pqPropertyWidgetDecorator*> Decorators;
+  QList<QPointer<pqPropertyWidgetDecorator> > Decorators;
 
   pqPropertyLinks Links;
   bool ShowLabel;

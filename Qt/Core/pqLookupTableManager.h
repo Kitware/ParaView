@@ -41,6 +41,7 @@ class pqScalarBarRepresentation;
 class pqScalarsToColors;
 class pqScalarOpacityFunction;
 class pqServer;
+class vtkSMProxy;
 
 /// pqLookupTableManager is the manager that manages color lookup objects.
 /// This is an abstract class that defines the API for any LUT manager.
@@ -87,6 +88,10 @@ public:
   /// Return false if no such association exists.
   virtual bool getLookupTableProperties(pqScalarsToColors* lut,
     QString& arrayname, int &numComponents, int &component)=0;
+
+  /// Given a "PVLookupTable" proxy, saves the color/opacity and scalar bar
+  /// properties as default.
+  void saveAsDefault(vtkSMProxy* lutProxy, vtkSMProxy* viewProxy=NULL);
 
 public slots:
   /// Called to update scalar ranges of all lookup tables.

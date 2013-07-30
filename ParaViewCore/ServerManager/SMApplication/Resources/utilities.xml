@@ -68,10 +68,55 @@
                             name="ArrayName"
                             number_of_elements="1"></StringVectorProperty>
     </Proxy>
-    <Proxy class="vtkDiscretizableColorTransferFunction"
-           name="PVLookupTable"
-           post_push="Build"
-           processes="dataserver|renderserver|client">
+
+    <TransferFunctionProxy class="vtkDiscretizableColorTransferFunction"
+                           name="PVLookupTable"
+                           post_push="Build"
+                           processes="dataserver|renderserver|client">
+      <IntVectorProperty name="IndexedLookup"
+                         command="SetIndexedLookup"
+                         default_values="0"
+                         number_of_elements="1"
+                         label="Interpret Values As Categories">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the color transfer function switches to indexed-lookup
+          (categorical colors) mode.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableOpacityMapping"
+                         command="SetEnableOpacityMapping"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the opacity transfer function is used for
+          rendering, if applicable.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="ScalarOpacityFunction"
+                     command="SetScalarOpacityFunction">
+      </ProxyProperty>
+
+      <DoubleVectorProperty clean_command="RemoveAllPoints"
+                            command="AddRGBPoint"
+                            name="RGBPoints"
+                            number_of_elements_per_command="4"
+                            repeat_command="1">
+        <Documentation>
+          Specify the control points that form the color-transfer-function. These are
+          a list of 4-tuples of the form (x, r, g, b) where x is the data value,
+          and r,g,b are there color components in the range [0,1].
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseLogScale"
+                         default_values="0"
+                         name="UseLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty default_values="0"
                          name="LockScalarRange"
                          number_of_elements="1">
@@ -80,122 +125,149 @@
           hence the absence of "command" -->
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <DoubleVectorProperty default_values="0"
-                            name="ScalarRangeInitialized"
-                            number_of_elements="1">
-        <!-- This is used to keep track of whether the
-        user initialized the scalar range -->
-        <BooleanDomain name="bool" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty animateable="0"
-                            clean_command="RemoveAllPoints"
-                            command="AddRGBPoint"
-                            name="RGBPoints"
-                            number_of_elements_per_command="4"
-                            repeat_command="1"></DoubleVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetColorSpace"
+      <IntVectorProperty command="SetColorSpace"
                          default_values="0"
                          name="ColorSpace"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="RGB"
-                 value="0" />
-          <Entry text="HSV"
-                 value="1" />
-          <Entry text="Lab"
-                 value="2" />
-          <Entry text="Diverging"
-                 value="3" />
+          <Entry text="RGB" value="0" />
+          <Entry text="HSV" value="1" />
+          <Entry text="Lab" value="2" />
+          <Entry text="Diverging" value="3" />
         </EnumerationDomain>
+        <Documentation>
+          The color space used for interpolation: RGB, HSV, Lab (CIELAB), or
+          Diverging. In HSV mode, if HSVWrap is on, it will take the shortest
+          path in Hue (going back through 0 if that is the shortest way around
+          the hue circle) whereas if HSVWrap is off it will not go through 0
+          (in order the match the current functionality of vtkLookupTable).
+          Diverging is a special mode where colors will pass through white when
+          interpolating between two saturated colors.
+        </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetHSVWrap"
-                         default_values="0"
-                         name="HSVWrap"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <DoubleVectorProperty animateable="0"
-                            command="SetNanColor"
+      <DoubleVectorProperty command="SetNanColor"
                             default_values="0.5 0 0"
                             name="NanColor"
-                            number_of_elements="3"></DoubleVectorProperty>
+                            number_of_elements="3"
+                            panel_widget="color_selector" >
+        <Documentation>
+          Set the color to use when NaN (not-a-number) is encoundered.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetDiscretize"
+                         default_values="1"
+                         name="Discretize"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the color transfer function will comprise of discrete colors
+          with number of discrete colors specified using NumberOfTableValues.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfValues"
                          default_values="256"
                          name="NumberOfTableValues"
-                         number_of_elements="1">
-        <IntRangeDomain min="1"
-                        name="range" />
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <IntRangeDomain min="1" max="1024" name="range" />
+        <Documentation>
+          When Discretize is set, this specifies the number of discrete colors
+          that must be present in the transfer function.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="Discretize" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetDiscretize"
-                         default_values="1"
-                         name="Discretize"
-                         number_of_elements="1">
+
+      <DoubleVectorProperty default_values="0"
+                            name="ScalarRangeInitialized"
+                            number_of_elements="1"
+                            panel_visibility="never" >
+        <!-- This is used to keep track of whether the
+        user initialized the scalar range -->
+        <BooleanDomain name="bool" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetHSVWrap"
+                         default_values="0"
+                         name="HSVWrap"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <!-- FIXME: need to add "Wrapped HSV" as a color-space type instead -->
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <Property command="Build"
-                name="Build"></Property>
+      <Property command="Build" name="Build" panel_visibility="never" />
       <IntVectorProperty command="SetVectorComponent"
                          default_values="0"
                          name="VectorComponent"
-                         number_of_elements="1">
-        <IntRangeDomain max="0"
-                        min="0"
-                        name="range" />
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <IntRangeDomain name="range" />
       </IntVectorProperty>
       <IntVectorProperty command="SetVectorMode"
                          default_values="1"
                          name="VectorMode"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never" >
         <EnumerationDomain name="enum">
-          <Entry text="Magnitude"
-                 value="0" />
-          <Entry text="Component"
-                 value="1" />
+          <Entry text="Magnitude" value="0" />
+          <Entry text="Component" value="1" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <IntVectorProperty command="SetUseLogScale"
-                         default_values="0"
-                         name="UseLogScale"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <IntVectorProperty command="SetAllowDuplicateScalars"
-                         default_values="0"
+                         default_values="1"
                          name="AllowDuplicateScalars"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <ProxyProperty name="ScalarOpacityFunction"
-        command="SetScalarOpacityFunction">
-      </ProxyProperty>
-
-      <IntVectorProperty name="EnableOpacityMapping"
-        command="SetEnableOpacityMapping"
-        number_of_elements="1"
-        default_values="0">
+                         number_of_elements="1"
+                         panel_visibility="never" >
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
       <StringVectorProperty name="Annotations"
-        clean_command="ResetAnnotations"
-        command="SetAnnotation"
-        element_types="2 2"
-        number_of_elements_per_command="2"
-        repeat_command="1" />
+                            clean_command="ResetAnnotations"
+                            command="SetAnnotation"
+                            element_types="2 2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>
+          Specify annotations.
+        </Documentation>
+      </StringVectorProperty>
 
-      <IntVectorProperty name="IndexedLookup"
-        command="SetIndexedLookup"
-        default_values="0"
-        number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
+      <DoubleVectorProperty name="IndexedColors"
+                            command="SetIndexedColor"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfIndexedColors"
+                            use_index="1">
+        <Documentation>
+          Colors used when using IndexedLookup is true.
+        </Documentation>
+      </DoubleVectorProperty>
 
+      <PropertyGroup label="Mapping Data" panel_widget="ColorOpacityEditor">
+        <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
+        <Property name="RGBPoints" function="XRGBPoints" />
+        <Property name="ScalarOpacityFunction" function="ScalarOpacityFunction" />
+        <Property name="UseLogScale" function="UseLogScale" />
+        <Property name="LockScalarRange" function="LockScalarRange" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Color Mapping Parameters">
+        <Property name="ColorSpace" />
+        <Property name="NanColor" />
+        <Property name="Discretize" />
+        <Property name="NumberOfTableValues" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
+        <Property name="Annotations" />
+        <Property name="IndexedColors" />
+      </PropertyGroup>
       <!-- End of PVLookupTable -->
-    </Proxy>
+    </TransferFunctionProxy>
   </ProxyGroup>
   <ProxyGroup name="parametric_functions">
     <Proxy class="vtkParametricSpline"
@@ -1136,7 +1208,7 @@
     <!-- end of keyframes -->
   </ProxyGroup>
   <ProxyGroup name="piecewise_functions">
-    <Proxy class="vtkPiecewiseFunction"
+    <TransferFunctionProxy class="vtkPiecewiseFunction"
            name="PiecewiseFunction"
            processes="client|renderserver|dataserver">
       <DoubleVectorProperty animateable="0"
@@ -1147,12 +1219,19 @@
                             number_of_elements="4"
                             number_of_elements_per_command="4"
                             repeat_command="1"></DoubleVectorProperty>
-    </Proxy>
+      <IntVectorProperty command="SetAllowDuplicateScalars"
+                         default_values="1"
+                         name="AllowDuplicateScalars"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </TransferFunctionProxy>
   </ProxyGroup>
   <ProxyGroup name="transfer_functions">
-    <Proxy class="vtkColorTransferFunction"
-           name="ColorTransferFunction"
-           processes="client|renderserver|dataserver">
+    <TransferFunctionProxy class="vtkColorTransferFunction"
+                           name="ColorTransferFunction"
+                           processes="client|renderserver|dataserver">
       <DoubleVectorProperty animateable="0"
                             clean_command="RemoveAllPoints"
                             command="AddRGBPoint"
@@ -1182,7 +1261,7 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-    </Proxy>
+    </TransferFunctionProxy>
   </ProxyGroup>
   <ProxyGroup name="annotations">
     <Proxy class="vtkCubeAxesActor2D"
@@ -1279,7 +1358,13 @@
                             command="SetLabelFormat"
                             default_values="%-#6.3g"
                             name="LabelFormat"
-                            number_of_elements="1"></StringVectorProperty>
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AutomaticLabelFormat" function="boolean_invert" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty command="SetNumberOfLabels"
                          default_values="5"
                          name="NumberOfLabels"
@@ -1305,7 +1390,13 @@
                             command="SetNanAnnotation"
                             default_values="NaN"
                             name="NanAnnotation"
-                            number_of_elements="1"></StringVectorProperty>
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DrawNanAnnotation" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetTextPosition"
                          default_values="1"

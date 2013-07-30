@@ -102,16 +102,14 @@ set (Module_SRCS
   pqClipPanel.h
   pqCollaborationPanel.cxx
   pqCollaborationPanel.h
+  pqColorMapEditor.cxx
+  pqColorMapEditor.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorPresetManager.cxx
   pqColorPresetManager.h
   pqColorPresetModel.cxx
   pqColorPresetModel.h
-  pqColorScaleEditor.cxx
-  pqColorScaleEditor.h
-  pqColorScaleToolbar.cxx
-  pqColorScaleToolbar.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
   pqCommandPropertyWidget.h
@@ -309,6 +307,8 @@ set (Module_SRCS
   pqProxySILModel.h
   pqProxyWidget.h
   pqProxyWidget.cxx
+  pqProxyWidgetDialog.cxx
+  pqProxyWidgetDialog.h
   pqQueryClauseWidget.cxx
   pqQueryClauseWidget.h
   pqQueryDialog.cxx
@@ -397,8 +397,8 @@ set (Module_SRCS
   pqTimerLogDisplay.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
-  pqTransferFunctionChartViewWidget.cxx
-  pqTransferFunctionChartViewWidget.h 
+  pqTransferFunctionWidget.cxx
+  pqTransferFunctionWidget.h
   pqTriggerOnIdleHelper.cxx
   pqTriggerOnIdleHelper.h
   pqUndoStackBuilder.cxx
@@ -463,11 +463,10 @@ set (Module_MOC_HDRS
   pqChartSummaryDisplayPanel.h
   pqClipPanel.h
   pqCollaborationPanel.h
+  pqColorMapEditor.h
   pqColorMapModel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
-  pqColorScaleEditor.h
-  pqColorScaleToolbar.h
   pqComboBoxDomain.h
   pqCommandPropertyWidget.h
   pqComparativeCueWidget.h
@@ -559,6 +558,7 @@ set (Module_MOC_HDRS
   pqProxySelectionWidget.h
   pqProxySILModel.h
   pqProxyWidget.h
+  pqProxyWidgetDialog.h
   pqQueryClauseWidget.h
   pqQueryDialog.h
   pqRecentFilesMenu.h
@@ -603,7 +603,7 @@ set (Module_MOC_HDRS
   pqThresholdPanel.h
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
-  pqTransferFunctionChartViewWidget.h
+  pqTransferFunctionWidget.h
   pqTriggerOnIdleHelper.h
   pqVCRController.h
   pqViewContextMenuHandler.h
@@ -634,7 +634,7 @@ set (Module_UI_FILES
   Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqCollaborationPanel.ui
   Resources/UI/pqColorPresetDialog.ui
-  Resources/UI/pqColorScaleDialog.ui
+  Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqComparativeParameterRangeDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
   Resources/UI/pqContourControls.ui
@@ -674,6 +674,7 @@ set (Module_UI_FILES
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqPropertiesPanel.ui
   Resources/UI/pqProxyInformationWidget.ui
+  Resources/UI/pqProxyWidgetDialog.ui
   Resources/UI/pqPythonAnimationCue.ui
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui

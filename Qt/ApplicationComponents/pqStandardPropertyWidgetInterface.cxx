@@ -29,23 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqStandardPropertyWidgetInterface.h"
 
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqCalculatorWidget.h"
 #include "pqClipScalarsDecorator.h"
+#include "pqColorAnnotationsPropertyWidget.h"
 #include "pqColorEditorPropertyWidget.h"
+#include "pqColorOpacityEditorWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCTHArraySelectionDecorator.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
+#include "pqEnableWidgetDecorator.h"
+#include "pqFontPropertyWidget.h"
 #include "pqInputDataTypeDecorator.h"
 #include "pqListPropertyWidget.h"
 #include "pqTextureSelectorPropertyWidget.h"
-#include "pqTransferFunctionEditorPropertyWidget.h"
+#include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
 
@@ -68,52 +71,49 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
                                                            vtkSMProperty *smProperty)
 {
   // handle properties that specify custom panel widgets
-  // *** NOTE: When adding new types, please update the header documentation ***
   const char *custom_widget = smProperty->GetPanelWidget();
-  if(custom_widget)
+  if (!custom_widget)
     {
-    std::string name = custom_widget;
-
-    if(name == "color_selector")
-      {
-      return new pqColorSelectorPropertyWidget(smProxy, smProperty);
-      }
-    else if(name == "display_representation_selector")
-      {
-      return new pqDisplayRepresentationPropertyWidget(smProxy);
-      }
-    else if(name == "texture_selector")
-      {
-      return new pqTextureSelectorPropertyWidget(smProxy);
-      }
-    else if (name == "calculator")
-      {
-      return new pqCalculatorWidget(smProxy, smProperty);
-      }
-    else if(name == "command_button")
-      {
-      return new pqCommandButtonPropertyWidget(smProxy, smProperty);
-      }
-    else if(name == "transfer_function_editor")
-      {
-      return new pqTransferFunctionEditorPropertyWidget(smProxy, smProperty);
-      }
-    else if (name == "list")
-      {
-      return new pqListPropertyWidget(smProxy, smProperty);
-      }
-    else if (name == "double_range")
-      {
-      return new pqDoubleRangeSliderPropertyWidget(smProxy, smProperty);
-      }
-    // we should not report any errors/messages on failure.
-    //else
-    //  {
-    //  qDebug() << "Unknown \"panel_widget\" '" << name.c_str() << "' specified.";
-    //  }
+    return NULL;
     }
 
-  return 0;
+  std::string name = custom_widget;
+
+  // *** NOTE: When adding new types, please update the header documentation ***
+  if(name == "color_selector")
+    {
+    return new pqColorSelectorPropertyWidget(smProxy, smProperty);
+    }
+  else if(name == "display_representation_selector")
+    {
+    return new pqDisplayRepresentationPropertyWidget(smProxy);
+    }
+  else if(name == "texture_selector")
+    {
+    return new pqTextureSelectorPropertyWidget(smProxy);
+    }
+  else if (name == "calculator")
+    {
+    return new pqCalculatorWidget(smProxy, smProperty);
+    }
+  else if(name == "command_button")
+    {
+    return new pqCommandButtonPropertyWidget(smProxy, smProperty);
+    }
+  else if(name == "transfer_function_editor")
+    {
+    return new pqTransferFunctionWidgetPropertyWidget(smProxy, smProperty);
+    }
+  else if (name == "list")
+    {
+    return new pqListPropertyWidget(smProxy, smProperty);
+    }
+  else if (name == "double_range")
+    {
+    return new pqDoubleRangeSliderPropertyWidget(smProxy, smProperty);
+    }
+  // *** NOTE: When adding new types, please update the header documentation ***
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -134,6 +134,19 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
     {
     return new pqArrayStatusPropertyWidget(proxy, group);
     }
+  else if (QString(group->GetPanelWidget()) == "ColorOpacityEditor")
+    {
+    return new pqColorOpacityEditorWidget(proxy, group);
+    }
+  else if (QString(group->GetPanelWidget()) == "AnnotationsEditor")
+    {
+    return new pqColorAnnotationsPropertyWidget(proxy, group);
+    }
+  else if (QString(group->GetPanelWidget()) == "FontEditor")
+    {
+    return new pqFontPropertyWidget(proxy, group);
+    }
+  // *** NOTE: When adding new types, please update the header documentation ***
 
   return 0;
 }
@@ -156,5 +169,10 @@ pqStandardPropertyWidgetInterface::createWidgetDecorator(
     {
     return new pqInputDataTypeDecorator(config, widget);
     }
+  if (type == "EnableWidgetDecorator")
+    {
+    return new pqEnableWidgetDecorator(config, widget);
+    }
+  // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
 }

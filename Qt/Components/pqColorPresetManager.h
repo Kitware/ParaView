@@ -56,7 +56,17 @@ class PQCOMPONENTS_EXPORT pqColorPresetManager : public QDialog
   Q_OBJECT
 
 public:
-  pqColorPresetManager(QWidget *parent=0);
+
+  /// Used to control what kinds of presets are shown in the dialog.
+  /// This merely affects the presets that are hidden from the view.
+  enum Mode
+    {
+    SHOW_ALL,
+    SHOW_INDEXED_COLORS_ONLY,
+    SHOW_NON_INDEXED_COLORS_ONLY
+    };
+
+  pqColorPresetManager(QWidget *parent=0, Mode mode=SHOW_ALL);
   virtual ~pqColorPresetManager();
 
   pqColorPresetModel *getModel() const {return this->Model;}
@@ -65,12 +75,22 @@ public:
   bool isUsingCloseButton() const;
   void setUsingCloseButton(bool showClose);
 
+  /// Load compiled in presets.
+  void loadBuiltinColorPresets();
+
+  /// add a new colormap.
+  void addColorMap(const pqColorMapModel& colorMap, const QString& name);
+
   void saveSettings();
   void restoreSettings();
 
   virtual bool eventFilter(QObject *object, QEvent *e);
 
   static pqColorMapModel createColorMapFromXML(vtkPVXMLElement *element);
+  static bool saveColorMapToXML(const pqColorMapModel* colorMap, vtkPVXMLElement* element);
+
+signals:
+  void currentChanged(const pqColorMapModel* preset);
 
 public slots:
   void importColorMap(const QStringList &files);
@@ -88,6 +108,7 @@ private slots:
   void showContextMenu(const QPoint &pos);
   void handleItemActivated();
   void selectNewItem(const QModelIndex &parent, int first, int last);
+  void currentChanged(const QModelIndex &current);
 
 private:
   void importColorMap(vtkPVXMLElement *element);
@@ -97,6 +118,7 @@ private:
   pqColorPresetManagerForm *Form;
   pqColorPresetModel *Model;
   bool InitSections;
+  Mode DialogMode;
 };
 
 #endif

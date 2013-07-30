@@ -52,6 +52,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Method to find and return attribute array information for a particular
+  // array for the given attribute type if one exists.
+  // Returns NULL if none is found.
+  // \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
+  // vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
+  // (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data) (or
+  // vtkDataObject::POINT, vtkDataObject::CELL, vtkDataObject::FIELD).
+  vtkPVArrayInformation* GetArrayInformation(
+    const char* arrayname, int fieldAssociation);
+
+  // Description:
   // Port number controls which output port the information is gathered from.
   // This is the only parameter that can be set on  the client-side before
   // gathering the information.
