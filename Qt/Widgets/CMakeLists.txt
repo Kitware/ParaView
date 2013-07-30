@@ -81,6 +81,8 @@ set(Module_SRCS
   pqDoubleRangeWidget.h
   pqDoubleSpinBox.cxx
   pqDoubleSpinBox.h
+  pqExpandableTableView.cxx
+  pqExpandableTableView.h
   pqExpanderButton.cxx
   pqExpanderButton.h
   pqFlatTreeView.cxx
@@ -159,6 +161,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.h
   pqDoubleSpinBox.h
+  pqExpandableTableView.h
   pqExpanderButton.h
   pqFlatTreeView.h
   pqLineEdit.h

@@ -116,7 +116,7 @@
     </layout>
    </item>
    <item row="0" column="0">
-    <widget class="QTableView" name="AnnotationsTable">
+    <widget class="pqExpandableTableView" name="AnnotationsTable">
      <property name="dragDropMode">
       <enum>QAbstractItemView::InternalMove</enum>
      </property>
@@ -133,6 +133,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqExpandableTableView</class>
+   <extends>QTableView</extends>
+   <header>pqExpandableTableView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
   <include location="../pqApplicationComponents.qrc"/>

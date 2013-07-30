@@ -76,7 +76,6 @@ signals:
 private slots:
   /// slots called when user presses corresponding buttons to add/remove
   /// annotations.
-
   void addAnnotation();
   void removeAnnotation();
   void addActiveAnnotations();
@@ -104,6 +103,8 @@ private slots:
   /// is set to true.
   void updateIndexedLookupState();
 
+  /// called when the user edits past the last row.
+  void editPastLastRow();
 private:
   Q_DISABLE_COPY(pqColorAnnotationsPropertyWidget);
 
