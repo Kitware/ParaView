@@ -29,7 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #ifndef _pqScalarValueListPropertyWidget_h
 #define _pqScalarValueListPropertyWidget_h
 
@@ -40,13 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QListWidgetItem;
 class vtkSMDoubleRangeDomain;
 class vtkSMDoubleVectorPropertyWidget;
-class pqScalarValueListPropertyWidgetPrivate;
 
+/// pqScalarValueListPropertyWidget provides a table widget to which users are
+/// add values e.g. for IsoValues for the Contour filter.
 class PQCOMPONENTS_EXPORT pqScalarValueListPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
   Q_PROPERTY(QVariantList scalars READ scalars WRITE setScalars)
 
+  typedef pqPropertyWidget Superclass;
 public:
   pqScalarValueListPropertyWidget(vtkSMProperty *property,
                                   vtkSMProxy *proxy,
@@ -63,19 +64,21 @@ signals:
   void scalarsChanged();
 
 private slots:
-  void itemChanged(QListWidgetItem *item);
-  void addScalar();
-  QListWidgetItem* addScalar(double scalar);
-  void addRange();
-  void deleteScalar();
-  void deleteAllScalars();
   void smRangeModified();
+
+  /// slots called when corresponding buttons are clicked.
+  void add();
+  void addRange();
+  void remove();
+  void removeAll();
+  void editPastLastRow();
+private:
+  Q_DISABLE_COPY(pqScalarValueListPropertyWidget);
+
   bool getRange(double& range_min, double& range_max);
 
-private:
-  Q_DISABLE_COPY(pqScalarValueListPropertyWidget)
-
-  pqScalarValueListPropertyWidgetPrivate* const d;
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif // _pqScalarValueListPropertyWidget_h
