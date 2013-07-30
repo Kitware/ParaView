@@ -45,13 +45,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include "vtkClientServerStream.h"
 
@@ -107,13 +110,33 @@ pqContourWidget::~pqContourWidget()
 //-----------------------------------------------------------------------------
 void pqContourWidget::createWidget(pqServer* server)
 {
+  vtkSMSessionProxyManager *proxyManager =
+      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  vtkSMProxyDefinitionManager* pxdm = proxyManager->GetProxyDefinitionManager();
+
+  bool hasContourWidgetRep2 = false;
+  const std::string contourWidgetRep2Name("ContourWidgetRepresentation2");
+  vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
+  iter.TakeReference(pxdm->NewSingleGroupIterator("representations"));
+  for(iter->InitTraversal();
+      (!iter->IsDoneWithTraversal()) && (!hasContourWidgetRep2);
+      iter->GoToNextItem())
+    {
+    hasContourWidgetRep2 = (iter->GetProxyName() == contourWidgetRep2Name);
+    }
+
   vtkSMNewWidgetRepresentationProxy* widget = NULL;
-  widget = pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("ContourWidgetRepresentation2", server, this->getReferenceProxy());
-  if ( !widget )
+  if(hasContourWidgetRep2)
     {
     widget = pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("ContourWidgetRepresentation", server, this->getReferenceProxy());
+      get3DWidget(contourWidgetRep2Name.c_str(),
+                  server, this->getReferenceProxy());
+    }
+  else
+    {
+    widget = pqApplicationCore::instance()->get3DWidgetFactory()->
+      get3DWidget("ContourWidgetRepresentation",
+                  server, this->getReferenceProxy());
     }
 
   this->setWidgetProxy(widget);
