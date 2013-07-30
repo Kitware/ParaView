@@ -56,6 +56,7 @@ vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
   this->PythonPath = 0;
   this->SetExecuteMethod(vtkPythonProgrammableFilter::ExecuteScript, this);
   this->OutputDataSetType = VTK_POLY_DATA;
+  this->Request = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -176,6 +177,17 @@ int vtkPythonProgrammableFilter::RequestUpdateExtent(
                                               inputVector,outputVector);
 }
 
+//----------------------------------------------------------------------------
+int vtkPythonProgrammableFilter::ProcessRequest(
+  vtkInformation*request,
+  vtkInformationVector**inputVector,
+  vtkInformationVector* outputVector)
+{
+  this->Request = request;
+  int retVal = this->Superclass::ProcessRequest(request, inputVector, outputVector);
+  this->Request = NULL;
+  return retVal;
+}
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::SetParameterInternal(const char *raw_name,
                                                const char *raw_value)
@@ -307,7 +319,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   fscript += funcname;
 
   // Set the parameters defined by user.
-  fscript += "(self, inputs = None, output = None):\n";
+  fscript += "(self, inputs = None, output = None, request = None):\n";
   for(ParametersT::const_iterator parameter =
         this->Implementation->Parameters.begin();
       parameter != this->Implementation->Parameters.end();
@@ -366,18 +378,42 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   // Set self to point to this
   char addrofthis[1024];
   sprintf(addrofthis, "%p", this);
-  char *aplus = addrofthis;
+  char *aplusthis = addrofthis;
   if ((addrofthis[0] == '0') &&
       ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
     {
-    aplus += 2; //skip over "0x"
+    aplusthis += 2; //skip over "0x"
     }
+
 
   // Call the function
   runscript += "myarg = ";
   runscript += "vtk.vtkProgrammableFilter('";
-  runscript += aplus;
+  runscript += aplusthis;
   runscript += "')\n";
+
+  // pass in the request, but do some error checking first.
+  runscript += "request = ";
+  if(this->Request)
+    {
+    // Set pointer to request
+    char addrofrequest[1024];
+    sprintf(addrofrequest, "%p", this->Request);
+    char *aplusrequest = addrofrequest;
+    if ((addrofrequest[0] == '0') &&
+        ((addrofrequest[1] == 'x') || addrofrequest[1] == 'X'))
+      {
+      aplusrequest += 2; //skip over "0x"
+      }
+    runscript += "vtk.vtkInformation('";
+    runscript += aplusrequest;
+    runscript += "')\n";
+    }
+  else
+    {
+    vtkWarningMacro("Request is not set.");
+    runscript += "None\n";
+    }
   runscript += "if hasnumpy:\n";
   runscript += "  inputs = []\n";
   runscript += "  index = 0\n";
@@ -395,10 +431,11 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
 
   // Call the function
   runscript += funcname;
-  runscript += "(myarg, inputs, output)\n";
+  runscript += "(myarg, inputs, output, request)\n";
   runscript += "del inputs\n";
   runscript += "del output\n";
   runscript += "del myarg\n";
+  runscript += "del request\n";
   runscript += "import gc\n";
   runscript += "gc.collect()\n";
 
@@ -438,4 +475,12 @@ void vtkPythonProgrammableFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "OutputDataSetType: " << this->OutputDataSetType << endl;
   os << indent << "PythonPath: "
     << (this->PythonPath? this->PythonPath : "(none)") << endl;
+  if(this->Request)
+    {
+    os << indent << "Request: " << this->Request << endl;
+    }
+  else
+    {
+    os << indent << "Request: (None)" << endl;
+    }
 }

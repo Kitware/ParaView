@@ -125,6 +125,14 @@ protected:
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
 
+  // Description:
+  // We want to temporarilly cache request to be used in the Python
+  // code so we override this method to store request for later use
+  // since otherwise we won't have access to it.
+  virtual int ProcessRequest(vtkInformation* request,
+                             vtkInformationVector** inInfo,
+                             vtkInformationVector* outInfo);
+
   char *Script;
   char *InformationScript;
   char *UpdateExtentScript;
@@ -134,6 +142,12 @@ protected:
 private:
   vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&);  // Not implemented.
   void operator=(const vtkPythonProgrammableFilter&);  // Not implemented.
+
+  // Description:
+  // When there is a request, cache it so that we can use it inside the Python
+  // source code of the filter. It is set at the beginning of ProcessRequest
+  // and removed at the end of that method.
+  vtkInformation* Request;
 
 //BTX
   vtkPythonProgrammableFilterImplementation* const Implementation;
