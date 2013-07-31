@@ -218,7 +218,7 @@ public:
     row -= 1;
     if (row >=0 && row < this->rowCount())
       {
-      return this->index(row, 1);
+      return this->index(row, toRemove.column());
       }
     return QModelIndex();
     }
