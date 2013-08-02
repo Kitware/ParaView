@@ -412,13 +412,13 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   lutProxy->Delete();
   this->setLUTDefaultState(lutProxy);
 
-  if (number_of_components >= 1)
-    {
-    vtkSMIntRangeDomain* componentsDomain =
-      vtkSMIntRangeDomain::SafeDownCast(
-        lutProxy->GetProperty("VectorComponent")->GetDomain("range"));
-    componentsDomain->AddMaximum(0, (number_of_components-1));
-    }
+  //if (number_of_components >= 1)
+  //  {
+  //  vtkSMIntRangeDomain* componentsDomain =
+  //    vtkSMIntRangeDomain::SafeDownCast(
+  //      lutProxy->GetProperty("VectorComponent")->GetDomain("range"));
+  //  componentsDomain->AddMaximum(0, (number_of_components-1));
+  //  }
   pqInternal::Key key(
     server->GetConnectionID(), arrayname, number_of_components);
   if (!this->Internal->LookupTables.contains(key))

@@ -16,7 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMBooleanDomain);
 
@@ -42,13 +42,9 @@ int vtkSMBooleanDomain::IsInDomain(vtkSMProperty* property)
     {
     return 0;
     }
-  vtkSMIntVectorProperty* ip = vtkSMIntVectorProperty::SafeDownCast(property);
-  if (ip)
-    {
-    return 1;
-    }
 
-  return 0;
+  int value = vtkSMPropertyHelper(property).GetAsInt();
+  return (value == 0 || value == 1)? 1 : 0;
 }
 
 //---------------------------------------------------------------------------
@@ -59,17 +55,11 @@ void vtkSMBooleanDomain::SetAnimationValue(vtkSMProperty* property,
     {
     return;
     }
-  vtkSMIntVectorProperty* ivp = 
-    vtkSMIntVectorProperty::SafeDownCast(property);
-  if (ivp)
-    {
-    ivp->SetElement(idx, static_cast<int>(value));
-    }
+  vtkSMPropertyHelper(property).Set(idx, static_cast<int>(value));
 }
 
 //---------------------------------------------------------------------------
 void vtkSMBooleanDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
 }

@@ -83,7 +83,6 @@ SET(PY_TESTS_NO_BASELINE
   ProgrammableFilter
   ProgrammableFilterProperties
   ProxyManager
-  SMPropertyAdaptor
   VRMLSource
   MultiServer
   ValidateSources

@@ -18,91 +18,65 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-
-vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
-
 //---------------------------------------------------------------------------
 vtkSMBoundsDomain::vtkSMBoundsDomain()
 {
   this->Mode = vtkSMBoundsDomain::NORMAL;
-  this->DefaultMode = vtkSMBoundsDomain::MID;
-  this->InputInformation = 0;
   this->ScaleFactor = 0.1;
 }
 
 //---------------------------------------------------------------------------
 vtkSMBoundsDomain::~vtkSMBoundsDomain()
 {
-  this->SetInputInformation(0);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMBoundsDomain::Update(vtkSMProperty*)
 {
-  this->RemoveAllMinima();
-  this->RemoveAllMaxima();
-  
   if (this->Mode == vtkSMBoundsDomain::ORIENTED_MAGNITUDE)
     {
     this->UpdateOriented();
-    this->InvokeModified();
     return;
     }
 
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetRequiredProperty("Input"));
-  if (pp)
+  vtkPVDataInformation* info = this->GetInputInformation();
+  if (info)
     {
-    this->Update(pp);
-    this->InvokeModified();
+    double bounds[6];
+    info->GetBounds(bounds);
+    this->SetDomainValues(bounds);
     }
 }
 
 //---------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMBoundsDomain::GetInputInformation()
 {
- vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetRequiredProperty("Input"));
-  if (pp)
+  vtkSMProperty* inputProperty = this->GetRequiredProperty("Input");
+  if (!inputProperty)
     {
-    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
-    if (pp->GetNumberOfUncheckedProxies() > 0)
-      {
-      vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(
-        pp->GetUncheckedProxy(0));
-      if (sp)
-        {
-        return sp->GetDataInformation(
-          (ip? ip->GetUncheckedOutputPortForConnection(0): 0));
-        }
-      }
-    else if (pp->GetNumberOfProxies() > 0)
-      {
-      vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(
-        pp->GetProxy(0));
-      if (sp)
-        {
-        return sp->GetDataInformation(
-          (ip? ip->GetOutputPortForConnection(0):0));
-        }
-      }
-
+    vtkErrorMacro("Missing required property with function 'Input'");
+    return NULL;
     }
-  return 0;
+
+  vtkSMUncheckedPropertyHelper helper(inputProperty);
+  if (helper.GetNumberOfElements() > 0)
+    {
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
+    if (sp)
+      {
+      return sp->GetDataInformation(helper.GetOutputPort());
+      }
+    }
+  return NULL;
 }
 
 //---------------------------------------------------------------------------
 void vtkSMBoundsDomain::UpdateOriented()
 {
-  vtkPVDataInformation* inputInformation = this->InputInformation;
-  if (!this->InputInformation)
-    {
-    inputInformation = this->GetInputInformation();
-    }
+  vtkPVDataInformation* inputInformation = this->GetInputInformation();
   if (!inputInformation)
     {
     return;
@@ -147,15 +121,6 @@ void vtkSMBoundsDomain::UpdateOriented()
         originv[i] = origin->GetUncheckedElement(i); 
         }
       }
-    else if (normal->GetNumberOfElements() > 2 && 
-             origin->GetNumberOfElements() > 2)
-      {
-      for (i=0; i<3; i++)
-        {
-        normalv[i] = normal->GetElement(i);
-        originv[i] = origin->GetElement(i); 
-        }
-      }
     else
       {
       return;
@@ -185,8 +150,10 @@ void vtkSMBoundsDomain::UpdateOriented()
         max = dist[i];
         }
       }
-    this->AddMinimum(0, min);
-    this->AddMaximum(0, max);
+
+    std::vector<vtkEntry> entries;
+    entries.push_back(vtkEntry(min, max));
+    this->SetEntries(entries); 
     }
 }
 
@@ -195,11 +162,12 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
 {
   if (this->Mode == vtkSMBoundsDomain::NORMAL)
     {
+    std::vector<vtkEntry> entries;
     for (int j = 0; j < 3; j++)
       {
-      this->AddMinimum(j, bounds[2*j]);
-      this->AddMaximum(j, bounds[2*j+1]);
+      entries.push_back(vtkEntry(bounds[2*j], bounds[2*j+1]));
       }
+    this->SetEntries(entries);
     }
   else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
     {
@@ -211,8 +179,9 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
       {
       magn = 1;
       }
-    this->AddMinimum(0, -magn/2.0);
-    this->AddMaximum(0,  magn/2.0);
+    std::vector<vtkEntry> entries;
+    entries.push_back(vtkEntry(-magn/2.0, magn/2.0));
+    this->SetEntries(entries);
     }
   else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
     {
@@ -225,139 +194,23 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
       {
       maxbounds = this->ScaleFactor;
       }
-    this->AddMinimum(0, 0);
-    this->AddMaximum(0, maxbounds);
+    std::vector<vtkEntry> entries;
+    entries.push_back(vtkEntry(0, maxbounds));
+    this->SetEntries(entries);
     }
-
-}
-
-//---------------------------------------------------------------------------
-void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
-{
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
-  unsigned int i;
-  unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
-  for (i=0; i<numProxs; i++)
-    {
-    vtkSMSourceProxy* sp = 
-      vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
-    if (sp)
-      {
-      vtkPVDataInformation *info = sp->GetDataInformation(
-        (ip? ip->GetUncheckedOutputPortForConnection(i):0));
-      this->UpdateFromInformation(info);
-      return;
-      }
-    }
-
-  // In case there is no valid unchecked proxy, use the actual
-  // proxy values
-  numProxs = pp->GetNumberOfProxies();
-  for (i=0; i<numProxs; i++)
-    {
-    vtkSMSourceProxy* sp = 
-      vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
-    if (sp)
-      {
-      vtkPVDataInformation *info = sp->GetDataInformation(
-        (ip? ip->GetOutputPortForConnection(i): 0));
-      this->UpdateFromInformation(info);
-      return;
-      }
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMBoundsDomain::UpdateFromInformation(vtkPVDataInformation* info)
-{
-  if (!info)
-    {
-    return;
-    }
-  double bounds[6];
-  info->GetBounds(bounds);
-  this->SetDomainValues(bounds);
-}
-
-//---------------------------------------------------------------------------
-int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* prop)
-{
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
-  if (!dvp)
-    {
-    vtkErrorMacro("vtkSMBoundsDomain only works on vtkSMDoubleVectorProperty.");
-    return 0;
-    }
-
-  int status = 0;
-  switch (this->Mode)
-    {
-  case vtkSMBoundsDomain::NORMAL:
-      {
-      for (unsigned int cc=0; cc < dvp->GetNumberOfElements(); cc++)
-        {
-        if (this->GetMaximumExists(cc) && this->GetMinimumExists(cc))
-          {
-          double value = 0.0;
-          switch (this->DefaultMode)
-            {
-           case vtkSMBoundsDomain::MIN:
-             value = this->GetMinimum(cc);
-             break;
-
-           case vtkSMBoundsDomain::MAX:
-             value = this->GetMaximum(cc);
-             break;
-
-           case vtkSMBoundsDomain::MID:
-           default:
-            value = (this->GetMaximum(cc) + this->GetMinimum(cc))/2.0;
-            break;
-            }
-          dvp->SetElement(cc, value);
-          status = 1; 
-          }
-        }
-      }
-    break;
-  case vtkSMBoundsDomain::SCALED_EXTENT:
-      {
-      for (unsigned int cc=0; cc < dvp->GetNumberOfElements(); cc++)
-        {
-        if (this->GetMaximumExists(cc))
-          {
-          dvp->SetElement(cc, this->GetMaximum(cc));
-          status = 1;
-          }
-        }
-      }
-    break;
-
-  case vtkSMBoundsDomain::MAGNITUDE:
-      {
-      if (this->GetMinimumExists(0) && this->GetMaximumExists(0))
-        {
-        double val = (this->GetMinimum(0)+this->GetMaximum(0))/2.0;
-        dvp->SetElement(0, val);
-        status = 1;
-        }
-      }
-    break;
-
-  default:
-    break;
-    }
-  return status;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMBoundsDomain::ReadXMLAttributes(
   vtkSMProperty* prop, vtkPVXMLElement* element)
 {
-  this->Superclass::ReadXMLAttributes(prop, element);
+  if (!this->Superclass::ReadXMLAttributes(prop, element))
+    {
+    return 0;
+    }
 
+  bool has_default_mode = (element->GetAttribute("default_mode") != NULL);
   const char* mode = element->GetAttribute("mode");
-
   if (mode)
     {
     if (strcmp(mode, "normal") == 0)
@@ -375,6 +228,10 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
     else if (strcmp(mode, "scaled_extent") == 0)
       {
       this->Mode = vtkSMBoundsDomain::SCALED_EXTENT;
+      if (!has_default_mode)
+        {
+        this->DefaultMode = vtkSMDoubleRangeDomain::MAX;
+        }
       }
     else
       {
@@ -383,29 +240,11 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
       }
     }
 
-  const char* default_mode = element->GetAttribute("default_mode");
-  if (default_mode)
-    {
-    if (strcmp(default_mode, "min") == 0)
-      {
-      this->DefaultMode = vtkSMBoundsDomain::MIN;
-      }
-    else if (strcmp(default_mode, "max") == 0)
-      {
-      this->DefaultMode = vtkSMBoundsDomain::MAX;
-      }
-    if (strcmp(default_mode, "mid") == 0)
-      {
-      this->DefaultMode = vtkSMBoundsDomain::MID;
-      }
-    }
-
   const char* scalefactor = element->GetAttribute("scale_factor");
   if (scalefactor)
     {
     sscanf(scalefactor,"%lf", &this->ScaleFactor);
     }
-  
   return 1;
 }
 
@@ -416,5 +255,4 @@ void vtkSMBoundsDomain::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Mode: " << this->Mode << endl;
   os << indent << "ScaleFactor: " << this->ScaleFactor << endl;
-  os << indent << "DefaultMode: " << this->DefaultMode << endl;
 }

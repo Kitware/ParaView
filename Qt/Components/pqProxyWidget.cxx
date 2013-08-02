@@ -662,8 +662,6 @@ void pqProxyWidget::createWidgets()
       this, SIGNAL(changeAvailable()));
     QObject::connect(item->propertyWidget(), SIGNAL(changeFinished()),
       this, SIGNAL(changeFinished()));
-    QObject::connect(item->propertyWidget(), SIGNAL(changeFinished()),
-      item->propertyWidget(), SLOT(updateDependentDomains()));
     }
 }
 

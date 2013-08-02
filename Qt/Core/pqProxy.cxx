@@ -345,7 +345,6 @@ void pqProxy::setDefaultPropertyValues()
         continue;
         }
       iter->GetProperty()->ResetToDefault();
-      iter->GetProperty()->UpdateDependentDomains();
       }
     }
 
@@ -364,7 +363,6 @@ void pqProxy::setDefaultPropertyValues()
         continue;
         }
       iter->GetProperty()->ResetToDefault();
-      iter->GetProperty()->UpdateDependentDomains();
       }
     }
 

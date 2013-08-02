@@ -284,12 +284,6 @@ public:
         {
         proxy->UpdatePropertyInformation();
         }
-
-      vtkSMProperty *inputProperty = proxy->GetProperty("Input");
-      if (inputProperty)
-        {
-        inputProperty->UpdateDependentDomains();
-        }
       }
     }
 };

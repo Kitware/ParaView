@@ -109,8 +109,6 @@ signals:
   void changeFinished();
 
 public slots:
-  virtual void updateDependentDomains();
-
   /// called to set the active view. This will fire the viewChanged() signal.
   virtual void setView(pqView*);
 

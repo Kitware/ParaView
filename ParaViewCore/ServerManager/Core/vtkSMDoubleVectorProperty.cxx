@@ -306,15 +306,28 @@ void vtkSMDoubleVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << endl;
 }
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::LoadState(
+  vtkPVXMLElement* element, vtkSMProxyLocator* loader)
+{
+  int prevImUpdate = this->ImmediateUpdate;
+
+  // Wait until all values are set before update (if ImmediateUpdate)
+  this->ImmediateUpdate = 0;
+  int retVal = this->Superclass::LoadState(element, loader);
+  if (retVal != 0)
+    {
+    retVal = this->Internals->LoadStateValues(element) ? 1 : 0;
+    }
+  this->ImmediateUpdate = prevImUpdate;
+  return retVal;
+}
+
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::SaveStateValues(vtkPVXMLElement* propElement)
 {
   this->Internals->SaveStateValues(propElement);
-}
-//---------------------------------------------------------------------------
-int vtkSMDoubleVectorProperty::SetElementAsString(int idx, const char* value)
-{
-  return this->Internals->SetElementAsString(idx, value);
 }
 
 //---------------------------------------------------------------------------

@@ -116,14 +116,6 @@ protected:
   vtkSMVectorProperty();
   ~vtkSMVectorProperty();
 
-  // Description:
-  // Generic implementation that use SetElementAsString to push the value the
-  // property
-  virtual int LoadState( vtkPVXMLElement* element, vtkSMProxyLocator* loader);
-  // Must be overriden if you want to use the default implementation
-  // of LoadState
-  virtual int SetElementAsString(int idx, const char* value) = 0;
-
   int RepeatCommand;
   int NumberOfElementsPerCommand;
   int UseIndex;

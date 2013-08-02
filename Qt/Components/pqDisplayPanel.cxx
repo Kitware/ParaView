@@ -64,12 +64,6 @@ void pqDisplayPanel::reloadGUI()
 
 void pqDisplayPanel::dataUpdated()
 {
-  vtkSMProxy* proxy = this->Representation->getProxy();
-  vtkSMProperty* prop = proxy->GetProperty("Input");
-  if (prop)
-    {
-    prop->UpdateDependentDomains();
-    }
 }
 
 void pqDisplayPanel::updateAllViews()

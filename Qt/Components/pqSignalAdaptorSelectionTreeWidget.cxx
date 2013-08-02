@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMStringListDomain.h"
-#include "vtkSMStringListRangeDomain.h"
 
 #include <QTreeWidget>
 #include <QPointer>
@@ -72,8 +71,7 @@ pqSignalAdaptorSelectionTreeWidget::pqSignalAdaptorSelectionTreeWidget(
     {
     vtkSMDomain* d = iter->GetDomain();
     if(vtkSMEnumerationDomain::SafeDownCast(d) ||
-       vtkSMStringListDomain::SafeDownCast(d) ||
-       vtkSMStringListRangeDomain::SafeDownCast(d))
+       vtkSMStringListDomain::SafeDownCast(d))
       {
       this->Internal->Domain = d;
       }

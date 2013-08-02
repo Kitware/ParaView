@@ -118,7 +118,6 @@ void pqDisplayRepresentationWidget::updateLinks()
       this->Internal->Display->getProxy()->GetProperty("Representation");
   if (repProperty)
     {
-    repProperty->UpdateDependentDomains();
     QList<QVariant> items = 
       pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
     foreach(QVariant item, items)

@@ -189,7 +189,6 @@ pqPipelineSource* pqObjectBuilder::createFilter(
       }
 
     proxy->UpdateVTKObjects();
-    prop->UpdateDependentDomains();
     }
 
   // Set default property values.
@@ -315,7 +314,6 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
       pqSMAdaptor::setMultipleElementProperty(prop, values);
       }
     proxy->UpdateVTKObjects();
-    prop->UpdateDependentDomains();
     }
   reader->setDefaultPropertyValues();
   reader->setModifiedState(pqProxy::UNINITIALIZED);

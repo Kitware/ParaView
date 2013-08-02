@@ -118,6 +118,18 @@ public:
   vtkVariant GetAsVariant(unsigned int index);
 
   // Description:
+  // Templated method to call GetIntArray(), GetDoubleArray(), GetIdTypeArray().
+  // Note, we  only provide implementations for T==double, int, vtkIdType.
+  template <class T>
+  std::vector<T> GetArray();
+
+  // Description:
+  // Templated method to call GetAsInt(), GetAsDouble(), GetAsIdType()
+  // Note, we  only provide implementations for T==double, int, vtkIdType.
+  template <class T>
+  T GetAs(unsigned int index=0);
+
+  // Description:
   // Set/Get methods with \c int API. Calling these method on
   // vtkSMStringVectorProperty or vtkSMProxyProperty will raise errors.
   void Set(int value)
@@ -241,6 +253,48 @@ private:
     };
 //ETX
 };
+
+
+template<>
+inline std::vector<int> vtkSMPropertyHelper::GetArray()
+{
+  return this->GetIntArray();
+}
+
+template<>
+inline std::vector<double> vtkSMPropertyHelper::GetArray()
+{
+  return this->GetDoubleArray();
+}
+
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
+template<>
+inline std::vector<vtkIdType> vtkSMPropertyHelper::GetArray()
+{
+  return this->GetIdTypeArray();
+}
+#endif
+
+
+template<>
+inline int vtkSMPropertyHelper::GetAs(unsigned int index)
+{
+  return this->GetAsInt(index);
+}
+
+template<>
+inline double vtkSMPropertyHelper::GetAs(unsigned int index)
+{
+  return this->GetAsDouble(index);
+}
+
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
+template<>
+inline vtkIdType vtkSMPropertyHelper::GetAs(unsigned int index)
+{
+  return this->GetAsIdType(index);
+}
+#endif
 
 #endif
 

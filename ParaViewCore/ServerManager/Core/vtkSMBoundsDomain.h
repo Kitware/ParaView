@@ -14,12 +14,29 @@
 =========================================================================*/
 // .NAME vtkSMBoundsDomain - double range domain based on data set bounds
 // .SECTION Description
-// vtkSMBoundsDomain is a subclass of vtkSMDoubleRangeDomain. In its Update
-// method, it determines the minimum and maximum coordinates of each dimension
-// of the bounding  box of the data set with which it is associated. It
-// requires a vtkSMSourceProxy to do this.
-// .SECTION See Also
-// vtkSMDoubleRangeDomain
+// vtkSMBoundsDomain extends vtkSMDoubleRangeDomain to add support to determine
+// the valid range for the values based on the dataset bounds. There are several
+// \c Modes which can be used to control how the range is computed based on the
+// data bounds (defined by the vtkSMBoundsDomain::Modes enum).
+// \li \c NORMAL : this is the basic mode where the domain will have 3 ranges which
+// are the min and max for the bounds along each of the coordinate axis.
+// \li \c MAGNITUDE: the domain has a single range set to (-magn/2.0, +magn/2.0)
+// where magn is the magnitude of the diagonal.
+// \li \c ORIENTED_MAGNITUDE:  same as MAGNITUDE, but instead of the dialog, a
+// vector determined using two additional required properties with functions
+// Normal, and Origin is used.
+// li \c SCALED_EXTENT: the range is set to (0, maxbounds * this->ScaleFactor)
+// where maxbounds is the length of the longest axis for the bounding box.
+//
+// To determine the input data bounds, this domain depends on a required
+// property with function \c Input. The data-information from the source-proxy
+// set as the value for that property is used to determine the bounds.
+//
+// Supported XML attributes:
+// \li \c mode : used to specify the Mode. Value can be "normal", "magnitude",
+// "oriented_magnitude", or "scaled_extent".
+// \li \c scale_factor : used in SCALED_EXTENT mode. Value is a floating point
+// number that is used as the scale factor.
 
 #ifndef __vtkSMBoundsDomain_h
 #define __vtkSMBoundsDomain_h
@@ -43,23 +60,9 @@ public:
   virtual void Update(vtkSMProperty*);
 
   // Description:
-  // A vtkSMProperty is often defined with a default value in the
-  // XML itself. However, many times, the default value must be determined
-  // at run time. To facilitate this, domains can override this method
-  // to compute and set the default value for the property.
-  // Note that unlike the compile-time default values, the
-  // application must explicitly call this method to initialize the
-  // property.
-  virtual int SetDefaultValues(vtkSMProperty*);
-
-  // Description:
   vtkSetClampMacro(Mode, int, 0, 3);
   vtkGetMacro(Mode, int);
 
-  // Description:
-  void SetInputInformation(vtkPVDataInformation* input);
-
-//BTX
   // Description:
   // SCALED_EXTENT: is used for vtkPVScaleFactorEntry.
   enum Modes
@@ -70,42 +73,25 @@ public:
     SCALED_EXTENT
   };
 
-  enum DefaultModes
-    {
-    MIN,
-    MAX,
-    MID
-    };
-//ETX
-
-  vtkSetMacro(ScaleFactor, double);
   vtkGetMacro(ScaleFactor, double);
 
-  vtkSetMacro(DefaultMode, int);
-  vtkGetMacro(DefaultMode, int);
 protected:
   vtkSMBoundsDomain();
   ~vtkSMBoundsDomain();
-
-  void Update(vtkSMProxyProperty *pp);
-  virtual void UpdateFromInformation(vtkPVDataInformation* information);
-  void UpdateOriented();
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
-  
-  int Mode;
-  int DefaultMode; // Used only in Normal mode while settings the default value.
-
-  vtkPVDataInformation* InputInformation;
-
-  double ScaleFactor; // Used only in SCALED_EXTENT mode.
 
   // Obtain the data information from the requried property with
   // function "Input", if any.
   vtkPVDataInformation* GetInputInformation();
+
+  void UpdateOriented();
+  
+  int Mode;
+  double ScaleFactor; // Used only in SCALED_EXTENT mode.
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented

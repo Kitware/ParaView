@@ -52,6 +52,10 @@ public:
   // the sub-domaine
   vtkGetStringMacro(SubTree);
 
+  // Description:
+  // Overridden to leave defaults unchanged.
+  virtual int SetDefaultValues(vtkSMProperty*){ return 1; }
+
 //BTX
 protected:
 

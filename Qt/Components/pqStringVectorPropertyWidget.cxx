@@ -120,10 +120,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       {
       arrayListDomain = vtkSMArrayListDomain::SafeDownCast(domain);
       }
-    if(!stringListDomain)
-      {
-      stringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
-      }
     if(!silDomain)
       {
       silDomain = vtkSMSILDomain::SafeDownCast(domain);
@@ -131,6 +127,10 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     if(!arraySelectionDomain)
       {
       arraySelectionDomain = vtkSMArraySelectionDomain::SafeDownCast(domain);
+      }
+    if(!stringListDomain)
+      {
+      stringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
       }
     if(!fieldDataDomain)
       {
@@ -268,29 +268,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                     << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
       }
     }
-  else if(stringListDomain)
-    {
-    QComboBox *comboBox = new QComboBox(this);
-    comboBox->setObjectName("ComboBox");
-
-    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
-
-    for(unsigned int i = 0; i < stringListDomain->GetNumberOfStrings(); i++)
-      {
-      comboBox->addItem(stringListDomain->GetString(i));
-      }
-
-    this->addPropertyLink(adaptor,
-                          "currentText",
-                          SIGNAL(currentTextChanged(QString)),
-                          svp);
-    this->setChangeAvailableAsChangeFinished(true);
-
-    vbox->addWidget(comboBox);
-
-    PV_DEBUG_PANELS() << "QComboBox for a StringVectorProperty with a "
-                  << "StringListDomain (" << stringListDomain->GetXMLName() << ")";
-    }
   else if (silDomain)
     {
     pqSILWidget* tree = new pqSILWidget(silDomain->GetSubTree(), this);
@@ -332,9 +309,39 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
     vbox->addWidget(selectorWidget);
 
+    new pqArrayListDomain(selectorWidget,
+      smProxy->GetPropertyName(smProperty),
+      smProxy, smProperty, arraySelectionDomain);
+
+    PV_DEBUG_PANELS() << " Also creating pqArrayListDomain to keep the list updated.";
+
+
     PV_DEBUG_PANELS() << "pqExodusIIVariableSelectionWidget for a StringVectorProperty "
                   << "with a ArraySelectionDomain (" << arraySelectionDomain->GetXMLName() << ")";
    }
+  else if(stringListDomain)
+    {
+    QComboBox *comboBox = new QComboBox(this);
+    comboBox->setObjectName("ComboBox");
+
+    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
+
+    for(unsigned int i = 0; i < stringListDomain->GetNumberOfStrings(); i++)
+      {
+      comboBox->addItem(stringListDomain->GetString(i));
+      }
+
+    this->addPropertyLink(adaptor,
+                          "currentText",
+                          SIGNAL(currentTextChanged(QString)),
+                          svp);
+    this->setChangeAvailableAsChangeFinished(true);
+
+    vbox->addWidget(comboBox);
+
+    PV_DEBUG_PANELS() << "QComboBox for a StringVectorProperty with a "
+                  << "StringListDomain (" << stringListDomain->GetXMLName() << ")";
+    }
   else if (multiline_text)
     {
     QLabel* label = new QLabel(smProperty->GetXMLLabel(), this);

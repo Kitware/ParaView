@@ -835,16 +835,16 @@ vtkSMProxy* vtkSMPropertyHelper::GetAsProxy(unsigned int index/*=0*/)
 //----------------------------------------------------------------------------
 unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
 {
-  if (this->UseUnchecked)
-    {
-    // FIXME
-    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
-    return 0;
-    }
-
   if (this->Type == INPUT)
     {
-    return this->InputProperty->GetOutputPortForConnection(index);
+    if (this->UseUnchecked)
+      {
+      return this->InputProperty->GetUncheckedOutputPortForConnection(index);
+      }
+    else
+      {
+      return this->InputProperty->GetOutputPortForConnection(index);
+      }
     }
 
   vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");

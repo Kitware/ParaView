@@ -292,7 +292,6 @@ void pqPointSpriteDisplayPanelDecorator::setRepresentation(
   // setup for render mode
   if ((prop = this->Internals->RepresentationProxy->GetProperty("RenderMode")))
     {
-    prop->UpdateDependentDomains();
     QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(prop);
     foreach(QVariant item, items)
         {
@@ -332,7 +331,6 @@ void pqPointSpriteDisplayPanelDecorator::LinkWithRange(QWidget* widget,
   if (!prop || !widget)
     return;
 
-  prop->UpdateDependentDomains();
 
   if (widgetRangeDomain != NULL)
     {

@@ -14,14 +14,19 @@
 =========================================================================*/
 // .NAME vtkSMDomain - represents the possible values a property can have
 // .SECTION Description
+//
 // vtkSMDomain is an abstract class that describes the "domain" of a
 // a widget. A domain is a collection of possible values a property
 // can have.
+//
 // Each domain can depend on one or more properties to compute it's
 // values. This are called "required" properties and can be set in
 // the XML configuration file.
-// .SECTION See Also
-// vtkSMProxyGroupDomain
+//
+// Every time a domain changes it must fire a vtkCommand::DomainModifiedEvent.
+// Applications may decide to update the UI every-time the domain changes. As a
+// result, domains ideally should only fire that event when their values change
+// for real not just potentially changed.
 
 #ifndef __vtkSMDomain_h
 #define __vtkSMDomain_h
@@ -50,12 +55,16 @@ public:
 
   // Description:
   // Update self based on the "unchecked" values of all required
-  // properties. Overwritten by sub-classes.
-  virtual void Update(vtkSMProperty*) {this->InvokeModified();};
+  // properties. Subclasses must override this method to update the domain based
+  // on the requestingProperty (and/or other required properties).
+  virtual void Update(vtkSMProperty* requestingProperty)
+    {
+    (void)requestingProperty;
+    }
 
   // Description:
   // Set the value of an element of a property from the animation editor.
-  virtual void SetAnimationValue(vtkSMProperty*, int, double) {}
+  virtual void SetAnimationValue(vtkSMProperty*, int index, double value) {}
 
   // Description:
   // A vtkSMProperty is often defined with a default value in the
@@ -76,26 +85,33 @@ public:
   vtkGetStringMacro(XMLName);
 
   // Description:
-  // Add a new required property to this domain.
-  void AddRequiredProperty(vtkSMProperty *prop, const char *function);
-
-  // Description:
   // When the IsOptional flag is set, IsInDomain() always returns true.
   // This is used by properties that use domains to provide information
   // (a suggestion to the gui for example) as opposed to restrict their
   // values.
-  vtkGetMacro(IsOptional, int);
+  vtkGetMacro(IsOptional, bool);
 
 protected:
   vtkSMDomain();
   ~vtkSMDomain();
 
-  virtual void SaveState(vtkPVXMLElement* parent, const char* uid);
-  virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
+  // Description:
+  // Add the header and creates a new vtkPVXMLElement for the
+  // domain, fills it up with the common attributes. The newly
+  // created element will also be added to the parent element as a child node.
+  // Subclasses can override ChildSaveState() method to fill it up with
+  // subclass specific values.
+  void SaveState(vtkPVXMLElement* parent, const char* uid);
+  virtual void ChildSaveState(vtkPVXMLElement* domainElement);
 
   // Load the state of the domain from the XML.
   virtual int LoadState(vtkPVXMLElement* vtkNotUsed(domainElement), 
     vtkSMProxyLocator* vtkNotUsed(loader)) { return 1;  }
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
 
 //BTX
   friend class vtkSMProperty;
@@ -112,19 +128,20 @@ protected:
   void RemoveRequiredProperty(vtkSMProperty* prop);
 
   // Description:
-  // Set the appropriate ivars from the xml element. Should
-  // be overwritten by subclass if adding ivars.
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
+  // Add a new required property to this domain.
+  // Whenever the \c prop fires vtkCommand::UncheckedPropertyModifiedEvent,
+  // vtkSMDomain::Update(prop) is called. Also whenever a vtkSMInputProperty is
+  // added as a required property, vtkSMDomain::Update(prop) will also be called
+  // the vtkCommand::UpdateDataEvent is fired by the proxies contained in that
+  // required property.
+  void AddRequiredProperty(vtkSMProperty *prop, const char *function);
 
   // Description:
   // When the IsOptional flag is set, IsInDomain() always returns true.
   // This is used by properties that use domains to provide information
   // (a suggestion to the gui for example) as opposed to restrict their
   // values.
-  vtkSetMacro(IsOptional, int);
-  int IsOptional;
-
-  char* XMLName;
+  vtkSetMacro(IsOptional, bool);
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -132,15 +149,19 @@ protected:
   // domain.
   vtkSetStringMacro(XMLName);
 
-  vtkSMDomainInternals* Internals;
-
   // Description:
-  // Invoked DomainModifiedEvent.
-  void InvokeModified();
+  // Invokes DomainModifiedEvent. Note that this event *must* be fired after the
+  // domain has changed (ideally, if and only if the domain has changed).
+  void DomainModified();
+  void InvokeModified() { this->DomainModified(); }
 
   // Description:
   // Gets the number of required properties added.
   unsigned int GetNumberOfRequiredProperties();
+
+  char* XMLName;
+  bool IsOptional;
+  vtkSMDomainInternals* Internals;
 private:
   vtkSMDomain(const vtkSMDomain&); // Not implemented
   void operator=(const vtkSMDomain&); // Not implemented

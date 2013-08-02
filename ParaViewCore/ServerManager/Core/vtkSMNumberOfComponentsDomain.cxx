@@ -36,13 +36,8 @@ vtkSMNumberOfComponentsDomain::~vtkSMNumberOfComponentsDomain()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty* vtkNotUsed(prop))
+void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
 {
-  this->RemoveAllMinima();
-  this->RemoveAllMaxima();
-  this->AddMinimum(0, 0);
-  this->AddMaximum(0, 0);
-
   vtkSMProxyProperty* ip = vtkSMProxyProperty::SafeDownCast(
     this->GetRequiredProperty("Input"));
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
@@ -50,28 +45,27 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   if (!ip || !svp)
     {
     // Missing required properties.
+    this->SetEntries(std::vector<vtkEntry>());
     return;
     }
 
-  if (svp->GetNumberOfElements() != 5 && svp->GetNumberOfElements() != 2 && 
-    svp->GetNumberOfElements() != 1)
+  if (svp->GetNumberOfUncheckedElements() != 5 &&
+      svp->GetNumberOfUncheckedElements() != 2 && 
+      svp->GetNumberOfUncheckedElements() != 1)
     {
     // We can only handle array selection properties with 5, 2 or 1 elements.
     // For 5 elements the array name is at indices [4]; for 2
     // elements it's at [1], while for 1 elements, it's at [0].
+    this->SetEntries(std::vector<vtkEntry>());
     return;
     }
 
-  int index = svp->GetNumberOfElements()-1;
+  int index = svp->GetNumberOfUncheckedElements()-1;
   const char* arrayName = svp->GetUncheckedElement(index);
   if (!arrayName || arrayName[0] == 0)
     {
-    arrayName = svp->GetElement(index);
-    }
-  
-  if (!arrayName || arrayName[0] == 0)
-    {
     // No array choosen.
+    this->SetEntries(std::vector<vtkEntry>());
     return;
     }
 
@@ -94,6 +88,7 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty* vtkNotUsed(prop))
     {
     // Failed to locate a vtkSMInputArrayDomain on the input property, which is
     // required.
+    this->SetEntries(std::vector<vtkEntry>());
     return;
     }
 
@@ -112,21 +107,6 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty* vtkNotUsed(prop))
       return;
       }
     }
-
-  // In case there is no valid unchecked proxy, use the actual
-  // proxy values
-  numProxs = ip->GetNumberOfProxies();
-  for (i=0; i<numProxs; i++)
-    {
-    vtkSMSourceProxy* source = 
-      vtkSMSourceProxy::SafeDownCast(ip->GetProxy(i));
-    if (source)
-      {
-      this->Update(arrayName, source, iad,
-        (inputProp? inputProp->GetOutputPortForConnection(i): 0));
-      return;
-      }
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -138,9 +118,9 @@ void vtkSMNumberOfComponentsDomain::Update(const char* arrayName,
   // Make sure the outputs are created.
   sp->CreateOutputPorts();
   vtkPVDataInformation* info = sp->GetDataInformation(outputport);
-
   if (!info)
     {
+    this->SetEntries(std::vector<vtkEntry>());
     return;
     }
 
@@ -175,8 +155,9 @@ void vtkSMNumberOfComponentsDomain::Update(const char* arrayName,
 
   if (ai)
     {
-    this->AddMaximum(0, ai->GetNumberOfComponents()-1);
-    this->InvokeModified();
+    std::vector<vtkEntry> entries;
+    entries.push_back(vtkEntry(0, ai->GetNumberOfComponents()-1));
+    this->SetEntries(std::vector<vtkEntry>());
     }
 }
 

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMAdaptor.h"
 #include "vtkCommand.h"
-#include "vtkSMArrayListDomain.h"
+#include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
@@ -47,7 +47,7 @@ public:
   QString QProperty;
   vtkWeakPointer<vtkSMProxy> SMProxy;
   vtkWeakPointer<vtkSMProperty> SMProperty;
-  vtkWeakPointer<vtkSMArrayListDomain> SMDomain;
+  vtkWeakPointer<vtkSMDomain> SMDomain;
   unsigned long ObserverId;
   pqInternals() : ObserverId(0)
     {
@@ -65,7 +65,7 @@ public:
 //-----------------------------------------------------------------------------
 pqArrayListDomain::pqArrayListDomain(
     QWidget* selectorWidget, const QString& qproperty,
-    vtkSMProxy* proxy, vtkSMProperty* smproperty, vtkSMArrayListDomain* domain)
+    vtkSMProxy* proxy, vtkSMProperty* smproperty, vtkSMDomain* domain)
   : Superclass(selectorWidget), Internals(new pqInternals())
 {
   Q_ASSERT(selectorWidget && proxy && smproperty && domain);

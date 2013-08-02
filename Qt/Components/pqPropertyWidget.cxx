@@ -196,15 +196,6 @@ void pqPropertyWidget::setUseUncheckedProperties(bool useUnchecked)
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyWidget::updateDependentDomains()
-{
-  if(this->Property)
-    {
-    this->Property->UpdateDependentDomains();
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqPropertyWidget::addDecorator(pqPropertyWidgetDecorator* decorator)
 {
   if (!decorator || decorator->parent() != this)

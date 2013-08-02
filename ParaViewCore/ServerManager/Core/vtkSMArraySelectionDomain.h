@@ -12,45 +12,32 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMArraySelectionDomain - adds all strings from information property
+// .NAME vtkSMArraySelectionDomain - used on properties that allow users to
+// select arrays.
 // .SECTION Description
-// vtkSMArraySelectionDomain overwrites vtkSMStringListRangeDomain's Update
-// in which it adds all strings from a required information property to
-// the domain. The information property must have been populated by 
-// an vtkSMArraySelectionInformationHelper. It also sets the IntDomainMode 
-// to BOOLEAN.
-// .SECTION See Also
-// vtkSMStringListRangeDomain vtkSMStringVectorProperty
-// vtkSMArraySelectionInformationHelper
-
+// vtkSMArraySelectionDomain is a domain that can be for used for properties
+// that allow users to set selection-statuses for multiple arrays (or similar
+// items). This is similar to vtkSMArrayListDomain, the only different is that
+// vtkSMArrayListDomain is designed to work with data-information obtained
+// from the required Input property, while vtkSMArraySelectionDomain depends on
+// a required information-only property ("ArrayList") that provides the 
+// arrays available.
+//
+// Supported Required-Property functions:
+// \li \c ArrayList : points a string-vector property that produces the
+// (array_name, status) tuples. This is typically an information-only property.
 #ifndef __vtkSMArraySelectionDomain_h
 #define __vtkSMArraySelectionDomain_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
-#include "vtkSMStringListRangeDomain.h"
+#include "vtkSMStringListDomain.h"
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArraySelectionDomain : public vtkSMStringListRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArraySelectionDomain : public vtkSMStringListDomain
 {
 public:
   static vtkSMArraySelectionDomain* New();
-  vtkTypeMacro(vtkSMArraySelectionDomain, vtkSMStringListRangeDomain);
+  vtkTypeMacro(vtkSMArraySelectionDomain, vtkSMStringListDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Populate the values of the domain from the given information
-  // property.
-  virtual void Update(vtkSMProperty*);
-  
-  // Description:
-  // A vtkSMProperty is often defined with a default value in the
-  // XML itself. However, many times, the default value must be determined
-  // at run time. To facilitate this, domains can override this method
-  // to compute and set the default value for the property.
-  // Note that unlike the compile-time default values, the
-  // application must explicitly call this method to initialize the
-  // property.
-  // Returns 1 if the domain updated the property.
-  virtual int SetDefaultValues(vtkSMProperty*);
 
 protected:
   vtkSMArraySelectionDomain();
