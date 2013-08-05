@@ -108,6 +108,22 @@ def patch_path(config, path_entry):
   except Exception as err:
     error(err)
 
+def run_patches(config, path_entry):
+  work_dir = config.output_dir
+
+  try:
+    for patch in path_entry['patches']:
+      p = subprocess.Popen(['patch', '-p1'], cwd=work_dir, stdin=subprocess.PIPE)
+      patch_path = os.path.join(config.current_input_dir, patch['path'])
+      with open(patch_path) as patch_file:
+        p.stdin.write(patch_file.read())
+      p.stdin.close()
+      p.wait()
+      if p.returncode != 0:
+        error('Failed to apply patch for: %s' % path_entry['path'])
+  except Exception as err:
+    error(err)
+
 def include_paths(config, src_base, dest_base, paths):
   for inc in paths:
     inc_src = os.path.join(src_base, inc['path'])
@@ -145,6 +161,9 @@ def copy_paths(config, paths):
 
       if 'patch' in path_entry:
         patch_path(config, path_entry)
+
+      if 'patches' in path_entry:
+        run_patches(config, path_entry)
 
   except (IOError, os.error) as err:
     error(err)
