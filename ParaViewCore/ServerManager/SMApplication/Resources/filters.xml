@@ -5820,7 +5820,8 @@ found and the point will be rejected.</Documentation>
       <!-- incremental point locator begin -->
       <ProxyProperty command="SetLocator"
                      label="Point Merge Method"
-                     name="Locator">
+                     name="Locator"
+                     panel_visibility="advanced" >
         <ProxyGroupDomain name="groups">
           <Group name="incremental_point_locators" />
         </ProxyGroupDomain>

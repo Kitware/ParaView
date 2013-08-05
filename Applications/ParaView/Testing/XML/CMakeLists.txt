@@ -11,6 +11,7 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif()
 
 SET (TESTS_WITH_INLINE_COMPARES
+  ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
@@ -80,8 +81,6 @@ SET (TESTS_WITH_BASELINES
   # disabling overlay test for now. It has issues with Time 0.
   #  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeOverlay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ContourRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CreateDelete.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomSourceProbe.xml
@@ -226,6 +225,7 @@ ENDIF ("1" STREQUAL ${HAS_NUMPY})
 set (GlobalProperties_USE_OLD_PANELS TRUE)
 
 #------------------------------------------------------------------------------
+set (TestPythonConsole_BREAK TRUE)
 
 # Selection is not available in CRS mode
 set(MultiSliceWavelet_DISABLE_CRS TRUE)
