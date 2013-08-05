@@ -59,6 +59,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPointer>
+#include <QPointer>
+
 
 namespace
 {
@@ -426,6 +428,9 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
   QObject::connect(
     ui.AnnotationsTable, SIGNAL(doubleClicked(const QModelIndex&)),
     this, SLOT(onDoubleClicked(const QModelIndex&)));
+  QObject::connect(
+    ui.AnnotationsTable, SIGNAL(editPastLastRow()),
+    this, SLOT(editPastLastRow()));
 }
 
 //-----------------------------------------------------------------------------
@@ -549,6 +554,14 @@ void pqColorAnnotationsPropertyWidget::addAnnotation()
   QModelIndex idx = this->Internals->Model.addAnnotation(
     this->Internals->Ui.AnnotationsTable->currentIndex());
   this->Internals->Ui.AnnotationsTable->setCurrentIndex(idx);
+  emit this->annotationsChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsPropertyWidget::editPastLastRow()
+{
+  QModelIndex idx = this->Internals->Model.addAnnotation(
+    this->Internals->Ui.AnnotationsTable->currentIndex());
   emit this->annotationsChanged();
 }
 
