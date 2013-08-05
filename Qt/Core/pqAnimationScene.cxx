@@ -649,7 +649,7 @@ void pqAnimationScene::updateApplicationSettings()
 void pqAnimationScene::setCacheGeometrySetting(bool flag)
 {
   pqSettings *settings = pqApplicationCore::instance()->settings();
-  settings->setValue("Animation/CacheGeometry", flag);
+  settings->setValue("Animation/CacheGeometryForAnimations", flag);
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -663,7 +663,7 @@ void pqAnimationScene::setCacheGeometrySetting(bool flag)
 bool pqAnimationScene::getCacheGeometrySetting()
 {
   pqSettings *settings = pqApplicationCore::instance()->settings();
-  return settings->value("Animation/CacheGeometry", true).toBool();
+  return settings->value("Animation/CacheGeometryForAnimations", false).toBool();
 }
 
 //-----------------------------------------------------------------------------

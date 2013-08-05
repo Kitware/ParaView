@@ -187,11 +187,6 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
                    this->Internal->AnimationCacheLimit,
                    SLOT(setEnabled(bool)));
 
-  QObject::connect(this->Internal->AnimationCacheGeometry,
-                   SIGNAL(toggled(bool)),
-                   this->Internal->AnimationCacheLimitLabel,
-                   SLOT(setEnabled(bool)));
-
   QObject::connect(this->Internal->ChartHiddenSeries,
                    SIGNAL(itemChanged(QListWidgetItem*)),
                    this, SIGNAL(changesAvailable()));
