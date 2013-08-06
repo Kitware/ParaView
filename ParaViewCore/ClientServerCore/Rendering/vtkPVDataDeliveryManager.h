@@ -86,6 +86,19 @@ public:
   void SetDeliverToAllProcesses(vtkPVDataRepresentation*, bool flag, bool low_res);
 
   // Description:
+  // By default, this class only delivers geometries to nodes that are doing the
+  // rendering at a given stage. However, certain representations, such as
+  // text-source representation, need to the geometry to be delivered to  the
+  // client as well.  That can be done by using this method (via
+  // vtkPVRenderView::SetDeliverToAllProcesses()). The different between
+  // SetDeliverToAllProcesses() and this is that the former gather-and-scatters
+  // the data on the server nodes, while the latter will optionally gather the data to
+  // deliver to the client and never scatter.
+  void SetDeliverToClientAndRenderingProcesses(
+    vtkPVDataRepresentation*, bool deliver_to_client,
+    bool gather_before_delivery, bool low_res);
+
+  // Description:
   // Under certain cases, e.g. when remote rendering in parallel with
   // translucent geometry, the geometry may need to be redistributed to ensure
   // ordered compositing can be employed correctly. Marking geometry provided by
