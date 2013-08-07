@@ -2119,7 +2119,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
     }
 }
 
-int vtkSpyPlotReader::PrepareBlocks (vtkMultiBlockDataSet* mbds, int numMat) 
+void vtkSpyPlotReader::PrepareBlocks (vtkMultiBlockDataSet* mbds, int numMat) 
 {
   mbds->SetNumberOfBlocks (numMat);
   for (int m = 0; m < numMat; m ++) 

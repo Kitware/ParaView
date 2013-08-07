@@ -256,8 +256,8 @@ protected:
                                vtkCellData *cd);
 
   // Sets up the blocks for the markers data 
-  int PrepareBlocks(vtkMultiBlockDataSet* poly,
-                    int numMat); 
+  void PrepareBlocks(vtkMultiBlockDataSet* poly,
+                     int numMat); 
 
   // Sets up the markers data on the second output port
   int PrepareMarkers(vtkMultiBlockDataSet* poly,
