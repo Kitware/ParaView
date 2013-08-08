@@ -34,5 +34,10 @@ vtk_module_export("")
 if (NOT CMAKE_CROSSCOMPILING)
   add_executable(vtkWrapClientServer vtkWrapClientServer.c)
   target_link_libraries(vtkWrapClientServer vtkWrappingTools)
+  if (PARAVIEW_USE_UNIFIED_BINDINGS)
+    set_target_properties(vtkWrapClientServer
+      PROPERTIES
+        COMPILE_DEFINITIONS PARAVIEW_USE_UNIFIED_BINDINGS)
+  endif ()
   vtk_compile_tools_target(vtkWrapClientServer)
 endif()

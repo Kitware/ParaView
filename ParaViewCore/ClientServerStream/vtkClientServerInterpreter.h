@@ -190,6 +190,8 @@ protected:
   int ExpandMessage(const vtkClientServerStream& in, int inIndex,
                     int startArgument, vtkClientServerStream& out);
 
+  // Load a module from an alternate backend implementation.
+  int LoadImpl(const char* moduleName);
   // Load a module dynamically given the full path to it.
   int LoadInternal(const char* moduleName, const char* fullPath);
 

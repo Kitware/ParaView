@@ -235,6 +235,8 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
+cmake_dependent_option(PARAVIEW_USE_UNIFIED_BINDINGS "If enabled, Python bindings will back the ClientServer wrapping implementation" ON
+  PARAVIEW_ENABLE_PYTHON OFF)
 option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON)
 mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
 
