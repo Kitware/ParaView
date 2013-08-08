@@ -20,6 +20,7 @@
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
 #include "vtkPVXMLElement.h"
 #include "vtkSessionIterator.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
@@ -143,6 +144,15 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->UndoStackBuilder = NULL;
 
   this->ReaderFactory = vtkSMReaderFactory::New();
+  // Keep track of when proxy definitions change and then if it's a new
+  // reader we add it to ReaderFactory.
+  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
+                    this->ReaderFactory,
+                    &vtkSMReaderFactory::NewProxyDefinitionCallback);
+  this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+                    this->ReaderFactory,
+                    &vtkSMReaderFactory::NewProxyDefinitionCallback);
+
   this->WriterFactory = vtkSMWriterFactory::New();
 
   // Monitor session creations. If a new session is created and we don't have an

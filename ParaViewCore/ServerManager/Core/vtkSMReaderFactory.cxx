@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMReaderFactory.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -74,9 +75,7 @@ public:
 
     void FillInformation(vtkSMSession* session)
       {
-
-      vtkSMProxy* prototype = this->GetPrototypeProxy(session,
-                                                      this->Group.c_str(),
+      vtkSMProxy* prototype = this->GetPrototypeProxy(session, this->Group.c_str(),
                                                       this->Name.c_str());
       if (!prototype || !prototype->GetHints())
         {
@@ -180,7 +179,10 @@ public:
       }
     }
 
-  typedef std::list<vtkValue> PrototypesType;
+  // we use a map here instead of a set because I'm avoiding const
+  // correctness of the methods of vtkValue. The key is a
+  // combination of the prototype name and group.
+  typedef std::map<std::string, vtkValue> PrototypesType;
   PrototypesType Prototypes;
   std::string SupportedFileTypes;
 };
@@ -300,150 +302,45 @@ void vtkSMReaderFactory::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMReaderFactory::RegisterPrototypes(vtkSMSession* session, const char* xmlgroup)
-{
-  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
-  vtkPVProxyDefinitionIterator* iter;
-  iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup);
-  for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkPVXMLElement* hints = pxm->GetProxyHints( iter->GetGroupName(),
-                                                 iter->GetProxyName());
-    if (hints && hints->FindNestedElementByName("ReaderFactory"))
-      {
-      this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
-      }
-    }
-  iter->Delete();
-}
-
-//----------------------------------------------------------------------------
 unsigned int vtkSMReaderFactory::GetNumberOfRegisteredPrototypes()
 {
   return static_cast<unsigned int>(this->Internals->Prototypes.size());
 }
 
+void vtkSMReaderFactory::NewProxyDefinitionCallback()
+{
+  vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+  // when we change the server we may not have a session yet. that's ok
+  // since we'll come back here after the proxy definitions are loaded
+  // from that session.
+  if(vtkSMSession* session = proxyManager->GetActiveSession())
+    {
+    vtkSMSessionProxyManager* sessionProxyManager = session->GetSessionProxyManager();
+    vtkSMProxyDefinitionManager* pdm = sessionProxyManager->GetProxyDefinitionManager();
+
+    vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator("sources");
+    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      vtkPVXMLElement* hints = sessionProxyManager->GetProxyHints( iter->GetGroupName(),
+                                                                   iter->GetProxyName());
+      if (hints && hints->FindNestedElementByName("ReaderFactory"))
+        {
+        this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
+        }
+      }
+    iter->Delete();
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xmlname)
 {
-  // If already present, we remove old one and append again so that the priority
-  // rule still works.
-  this->UnRegisterPrototype(xmlgroup, xmlname);
   vtkInternals::vtkValue value;
   value.Group = xmlgroup;
   value.Name = xmlname;
+  std::string key = value.Name+value.Group;
 
-  this->Internals->Prototypes.push_front(value);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMReaderFactory::RegisterPrototype(
-  const char* xmlgroup, const char* xmlname,
-  const char* extensions, const char* description)
-
-{
-  // If already present, we remove old one and append again so that the priority
-  // rule still works.
-  this->UnRegisterPrototype(xmlgroup, xmlname);
-  vtkInternals::vtkValue value;
-  value.Group = xmlgroup;
-  value.Name = xmlname;
-
-  if (description)
-    {
-    value.Description = description;
-    }
-  if (extensions)
-    {
-    vtksys::SystemTools::Split(extensions, value.Extensions, ' ');
-    }
-  this->Internals->Prototypes.push_front(value);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMReaderFactory::UnRegisterPrototype(
-  const char* xmlgroup, const char* xmlname)
-{
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin();
-    iter != this->Internals->Prototypes.end(); ++iter)
-    {
-    if (iter->Group == xmlgroup  && iter->Name == xmlname)
-      {
-      this->Internals->Prototypes.erase(iter);
-      break;
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMReaderFactory::LoadConfigurationFile(const char* filename)
-{
-  vtkSmartPointer<vtkPVXMLParser> parser =
-    vtkSmartPointer<vtkPVXMLParser>::New();
-  parser->SetFileName(filename);
-  if (!parser->Parse())
-    {
-    vtkErrorMacro("Failed to parse file: " << filename);
-    return false;
-    }
-
-  return this->LoadConfiguration(parser->GetRootElement());
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMReaderFactory::LoadConfiguration(const char* xmlcontents)
-{
-  vtkSmartPointer<vtkPVXMLParser> parser =
-    vtkSmartPointer<vtkPVXMLParser>::New();
-
-  if (!parser->Parse(xmlcontents))
-    {
-    vtkErrorMacro("Failed to parse xml. Not a valid XML.");
-    return false;
-    }
-
-  vtkPVXMLElement* rootElement = parser->GetRootElement();
-  return this->LoadConfiguration(rootElement);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMReaderFactory::LoadConfiguration(vtkPVXMLElement* elem)
-{
-  if (!elem)
-    {
-    return false;
-    }
-
-  if (elem->GetName() &&
-    strcmp(elem->GetName(), "ParaViewReaders") != 0)
-    {
-    return this->LoadConfiguration(
-      elem->FindNestedElementByName("ParaViewReaders"));
-    }
-
-  unsigned int num = elem->GetNumberOfNestedElements();
-  for(unsigned int i=0; i<num; i++)
-    {
-    vtkPVXMLElement* reader = elem->GetNestedElement(i);
-    if (reader->GetName() &&
-      (strcmp(reader->GetName(),"Reader") == 0 ||
-       strcmp(reader->GetName(), "Proxy") == 0))
-      {
-      const char* name = reader->GetAttribute("name");
-      const char* group = reader->GetAttribute("group");
-      group = group ? group : "sources";
-      if (name && group)
-        {
-        // NOTE this is N^2. We may want to use a separate set or something to
-        // test of existence if this becomes an issue.
-        this->RegisterPrototype(group, name,
-          reader->GetAttribute("extensions"),
-          reader->GetAttribute("file_description"));
-        }
-      }
-    }
-  return true;
+  this->Internals->Prototypes[key] = value;
 }
 
 //----------------------------------------------------------------------------
@@ -470,13 +367,13 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(session) &&
-        iter->CanReadFile(filename, extensions, session))
+    if (iter->second.CanCreatePrototype(session) &&
+        iter->second.CanReadFile(filename, extensions, session))
       {
-      iter->FillInformation(session);
-      this->Readers->AddString(iter->Group.c_str());
-      this->Readers->AddString(iter->Name.c_str());
-      this->Readers->AddString(iter->Description.c_str());
+      iter->second.FillInformation(session);
+      this->Readers->AddString(iter->second.Group.c_str());
+      this->Readers->AddString(iter->second.Name.c_str());
+      this->Readers->AddString(iter->second.Description.c_str());
       }
     }
 
@@ -502,13 +399,13 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(session) &&
-      (!filename || iter->CanReadFile(filename, extensions, session, true)))
+    if (iter->second.CanCreatePrototype(session) &&
+      (!filename || iter->second.CanReadFile(filename, extensions, session, true)))
       {
-      iter->FillInformation(session);
-      this->Readers->AddString(iter->Group.c_str());
-      this->Readers->AddString(iter->Name.c_str());
-      this->Readers->AddString(iter->Description.c_str());
+      iter->second.FillInformation(session);
+      this->Readers->AddString(iter->second.Group.c_str());
+      this->Readers->AddString(iter->second.Name.c_str());
+      this->Readers->AddString(iter->second.Description.c_str());
       }
     }
 
@@ -533,10 +430,11 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(session) && iter->CanReadFile(filename, extensions, session))
+    if (iter->second.CanCreatePrototype(session) &&
+        iter->second.CanReadFile(filename, extensions, session))
       {
-      this->SetReaderGroup(iter->Group.c_str());
-      this->SetReaderName(iter->Name.c_str());
+      this->SetReaderGroup(iter->second.Group.c_str());
+      this->SetReaderName(iter->second.Name.c_str());
       return true;
       }
     }
@@ -569,19 +467,19 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(session))
+    if (iter->second.CanCreatePrototype(session))
       {
-      iter->FillInformation(session);
+      iter->second.FillInformation(session);
       std::string ext_list;
-      if (iter->Extensions.size() > 0)
+      if (iter->second.Extensions.size() > 0)
         {
-        ext_list = ::vtkJoin(iter->Extensions, "*.", " ");
+        ext_list = ::vtkJoin(iter->second.Extensions, "*.", " ");
         }
 
-      if (iter->FilenameRegExs.size() > 0)
+      if (iter->second.FilenameRegExs.size() > 0)
         {
         std::string ext_join = ::vtkJoin(
-          iter->FilenamePatterns, "", " ");
+          iter->second.FilenamePatterns, "", " ");
         if (ext_list.size() > 0)
           {
           ext_list += " ";
@@ -596,7 +494,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
       if (ext_list.size() > 0)
         {
         vtksys_ios::ostringstream stream;
-        stream << iter->Description << "(" << ext_list << ")";
+        stream << iter->second.Description << "(" << ext_list << ")";
         sorted_types.insert(stream.str());
         all_types << ext_list << " ";
         }

@@ -75,9 +75,9 @@ include_directories(
   )
 
 add_paraview_plugin(pvNektarReader "2.0"
-   SERVER_MANAGER_XML pvNektarReader.xml
-   SERVER_MANAGER_SOURCES vtkNektarReader.cxx
-   GUI_RESOURCE_FILES pvNektarReaderGUI.xml)
+  SERVER_MANAGER_XML pvNektarReader.xml
+  SERVER_MANAGER_SOURCES vtkNektarReader.cxx
+  REQUIRED_ON_SERVER)
 
 target_link_libraries(pvNektarReader
   nektar

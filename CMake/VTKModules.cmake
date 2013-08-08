@@ -61,7 +61,6 @@ set(_vtk_modules
   # Modules that are required a runtime generated from:
   #
   # ParaViewFilters.xml
-  # ParaViewReaders.xml
   # ParaViewSources.xml
   # ParaViewWriters.xml
   #

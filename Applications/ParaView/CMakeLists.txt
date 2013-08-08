@@ -28,7 +28,6 @@ set(ParaView_SOURCE_FILES
 set (application_gui_xmls
        "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewSources.xml"
        "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml"
-       "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewReaders.xml"
        "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml")
 foreach (module IN LISTS VTK_MODULES_ENABLED)
   get_property(gui_xml GLOBAL PROPERTY ${module}_PARAVIEW_GUI_XMLS)

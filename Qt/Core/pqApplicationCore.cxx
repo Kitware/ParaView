@@ -745,7 +745,7 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
 
   // Load configuration files for server manager components since they don't
   // listen to Qt signals.
-  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->LoadConfiguration(root);
+  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->NewProxyDefinitionCallback();
   vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->LoadConfiguration(root);
 
   emit this->loadXML(root);
