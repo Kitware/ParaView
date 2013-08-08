@@ -1,5 +1,0 @@
-<ParaViewReaders>
-  <Reader name="H5PartReader"
-          extensions="h5part"
-          file_description="H5Part particle files (Plugin)" />
-</ParaViewReaders>

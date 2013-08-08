@@ -119,7 +119,7 @@
       </IntVectorProperty>
       <Hints>
         <ReaderFactory extensions="nektar"
-                       file_description="Nektar CFD results files" />
+                       file_description="Nektar CFD results files (Plugin)" />
       </Hints>
       <!-- End NekTar Reader -->
     </SourceProxy>

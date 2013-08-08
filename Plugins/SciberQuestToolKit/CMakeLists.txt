@@ -308,7 +308,6 @@ if(PARAVIEW_BUILD_QT_GUI)
 endif (PARAVIEW_BUILD_QT_GUI)
 
 set (SQTK_XML
-  SciberQuestToolKitReaders.xml
   SciberQuestToolKitWriters.xml
   SciberQuestToolKitSources.xml
   SciberQuestToolKitFilters.xml)

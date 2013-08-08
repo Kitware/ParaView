@@ -33,10 +33,4 @@
      </SourceProxy>
     </ProxyGroup>
   </ServerManagerConfiguration>
-
-  <!-- Now add any gui configuration xmls. These could be ParaViewReaders,
-       ParaViewWriters, ParaViewFilters, etc. -->
-  <ParaViewReaders>
-    <Reader name="PNGReaderFromXMLOnlyPlugin" />
-  </ParaViewReaders>
 </ParaViewPlugin>
