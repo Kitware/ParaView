@@ -324,10 +324,6 @@ public:
     vtkPVDataRepresentation* repr, vtkDataObject* data);
   static vtkAlgorithmOutput* GetPieceProducerLOD(vtkInformation* info,
     vtkPVDataRepresentation* repr);
-  static void SetDeliverToAllProcesses(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
-  static void SetDeliverLODToAllProcesses(
-    vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
   static void MarkAsRedistributable(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool value=true);
   static void SetGeometryBounds(vtkInformation* info,
@@ -338,6 +334,25 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* piece);
   static vtkDataObject* GetCurrentStreamedPiece(
     vtkInformation* info, vtkPVDataRepresentation* repr);
+
+  // Description:
+  // Requests the view to deliver the pieces produced by the \c repr to all
+  // processes after a gather to the root node to merge the datasets generated
+  // by each process.
+  static void SetDeliverToAllProcesses(
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
+
+  // Description:
+  // Requests the view to deliver the data to the client always. This is
+  // essential for representation that render in the non-composited views e.g.
+  // the text-source representation. If SetDeliverToAllProcesses() is true, this
+  // is redundant. \c gather_before_delivery can be used to indicate if the data
+  // on the server-nodes must be gathered to the root node before shipping to
+  // the client. If \c gather_before_delivery is false, only the data from the
+  // root node will be sent to the client without any parallel communication.
+  static void SetDeliverToClientAndRenderingProcesses(
+    vtkInformation* info, vtkPVDataRepresentation* repr,
+    bool deliver_to_client, bool gather_before_delivery);
 
   // Description:
   // Pass the structured-meta-data for determining rendering order for ordered

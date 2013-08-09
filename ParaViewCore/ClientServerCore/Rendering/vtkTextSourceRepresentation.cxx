@@ -167,7 +167,8 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
     {
     vtkPVRenderView::SetPiece(inInfo, this, 
       this->CacheKeeper->GetOutputDataObject(0));
-    vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
+    vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this,
+      /*deliver_to_client=*/ true, /*gather_before_delivery=*/ false);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {

@@ -1306,8 +1306,9 @@ void vtkPVRenderView::SetDeliverToAllProcesses(vtkInformation* info,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetDeliverLODToAllProcesses(vtkInformation* info,
-  vtkPVDataRepresentation* repr, bool clone)
+void vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(
+  vtkInformation* info, vtkPVDataRepresentation* repr,
+  bool deliver_to_client, bool gather_before_delivery)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1316,7 +1317,8 @@ void vtkPVRenderView::SetDeliverLODToAllProcesses(vtkInformation* info,
     return;
     }
 
-  view->GetDeliveryManager()->SetDeliverToAllProcesses(repr, clone, true);
+  view->GetDeliveryManager()->SetDeliverToClientAndRenderingProcesses(
+    repr, deliver_to_client, gather_before_delivery, false);
 }
 
 //----------------------------------------------------------------------------

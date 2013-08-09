@@ -76,7 +76,8 @@ public:
   void SetMoveModeToPassThrough(){this->MoveMode=vtkMPIMoveData::PASS_THROUGH;}
   void SetMoveModeToCollect(){this->MoveMode=vtkMPIMoveData::COLLECT;}
   void SetMoveModeToClone(){this->MoveMode=vtkMPIMoveData::CLONE;}
-  vtkSetClampMacro(MoveMode, int, vtkMPIMoveData::PASS_THROUGH, vtkMPIMoveData::CLONE);
+  vtkSetClampMacro(MoveMode, int, vtkMPIMoveData::PASS_THROUGH,
+    vtkMPIMoveData::COLLECT_AND_PASS_THROUGH);
 
   // Description:
   // Controls the output type. This is required because processes receiving
@@ -101,6 +102,13 @@ public:
   // returns true if valid data is available on the current processes after
   // successful Update() given the current ivars).
   bool GetOutputGeneratedOnProcess();
+
+  // Description:
+  // When set, vtkMPIMoveData will skip the gather-to-root-node process
+  // altogether. This is useful when the data is already cloned on the
+  // server-nodes or we are interested in the root-node result alone.
+  vtkSetMacro(SkipDataServerGatherToZero, bool);
+  vtkGetMacro(SkipDataServerGatherToZero, bool);
 
 //BTX
   enum MoveModes {
@@ -155,6 +163,7 @@ protected:
   int MoveMode;
   int Server;
 
+  bool SkipDataServerGatherToZero;
 //BTX
   enum Servers {
     CLIENT=0,

@@ -103,6 +103,8 @@ vtkMPIMoveData::vtkMPIMoveData()
 
   this->UpdateNumberOfPieces = 0;
   this->UpdatePiece = 0;
+
+  this->SkipDataServerGatherToZero = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -699,6 +701,14 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input,
       }
     return;
     }
+  if (this->SkipDataServerGatherToZero)
+    {
+    if (this->Controller->GetLocalProcessId() == 0 && input)
+      {
+      output->ShallowCopy(input); 
+      }
+    return;
+    }
 
     vtkTimerLog::MarkStartEvent("Dataserver gathering to 0");
 
@@ -1210,6 +1220,8 @@ void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfBuffers: " << this->NumberOfBuffers << endl;
   os << indent << "Server: " << this->Server << endl;
   os << indent << "MoveMode: " << this->MoveMode << endl;
+  os << indent << "SkipDataServerGatherToZero: " <<
+    this->SkipDataServerGatherToZero << endl;
   os << indent << "OutputDataType: ";
   if (this->OutputDataType == VTK_POLY_DATA)
     {
