@@ -238,8 +238,14 @@ void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
             factory->NewInteractorStyleFromClassName(class_name);
         if (style)
           {
-          style->Configure(child, locator);
-          this->add(style);
+          if (style->Configure(child, locator))
+            {
+              this->add(style);
+            }
+          else
+            {
+              style->Delete();
+            }
           }
         else
           {
