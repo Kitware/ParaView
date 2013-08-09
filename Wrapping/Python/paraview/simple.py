@@ -561,7 +561,7 @@ def OpenDataFile(filename, **extraArgs):
     session = servermanager.ActiveConnection.Session
     reader_factor = servermanager.vtkSMProxyManager.GetProxyManager().GetReaderFactory()
     if reader_factor.GetNumberOfRegisteredPrototypes() == 0:
-      reader_factor.RegisterPrototypes(session, "sources")
+        reader_factor.NewProxyDefinitionCallback()
     first_file = filename
     if type(filename) == list:
         first_file = filename[0]

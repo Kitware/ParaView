@@ -27,7 +27,6 @@
 //    ...
 // </ParaViewReaders>
 // \endverbatim
-// Alternatively, one can register prototypes using \c RegisterPrototype API.
 //
 // Once the factory has been configured, the API to create readers, get
 // available readers etc. can be used.
@@ -133,6 +132,12 @@ public:
   // Every time a new proxy definition is added we check to see if it is
   // a reader and then we add it to the list of available readers.
   void NewProxyDefinitionCallback();
+
+  // Description:
+  // Add/remove a group name to look for readers in. By default "source" is included.
+  void AddGroup(const char* groupName);
+  void RemoveGroup(const char* groupName);
+  void GetGroups(vtkStringList* groups);
 
 //BTX
 protected:

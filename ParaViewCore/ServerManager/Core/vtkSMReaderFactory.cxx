@@ -185,6 +185,9 @@ public:
   typedef std::map<std::string, vtkValue> PrototypesType;
   PrototypesType Prototypes;
   std::string SupportedFileTypes;
+  // The set of groups that are searched for readers. By default "sources" is
+  // included.
+  std::set<std::string> Groups;
 };
 
 //----------------------------------------------------------------------------
@@ -280,6 +283,7 @@ vtkStandardNewMacro(vtkSMReaderFactory);
 vtkSMReaderFactory::vtkSMReaderFactory()
 {
   this->Internals = new vtkInternals();
+  this->Internals->Groups.insert("sources");
   this->Readers = vtkStringList::New();
   this->ReaderName = 0;
   this->ReaderGroup = 0;
@@ -299,6 +303,8 @@ vtkSMReaderFactory::~vtkSMReaderFactory()
 void vtkSMReaderFactory::Initialize()
 {
   this->Internals->Prototypes.clear();
+  this->Internals->Groups.clear();
+  this->Internals->Groups.insert("sources");
 }
 
 //----------------------------------------------------------------------------
@@ -318,20 +324,56 @@ void vtkSMReaderFactory::NewProxyDefinitionCallback()
     vtkSMSessionProxyManager* sessionProxyManager = session->GetSessionProxyManager();
     vtkSMProxyDefinitionManager* pdm = sessionProxyManager->GetProxyDefinitionManager();
 
-    vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator("sources");
-    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    for(std::set<std::string>::iterator group=this->Internals->Groups.begin();
+        group!=this->Internals->Groups.end();group++)
       {
-      vtkPVXMLElement* hints = sessionProxyManager->GetProxyHints( iter->GetGroupName(),
-                                                                   iter->GetProxyName());
-      if (hints && hints->FindNestedElementByName("ReaderFactory"))
+      vtkPVProxyDefinitionIterator* iter =
+        pdm->NewSingleGroupIterator(group->c_str());
+      for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
         {
-        this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
+        vtkPVXMLElement* hints = sessionProxyManager->GetProxyHints(
+          iter->GetGroupName(), iter->GetProxyName());
+        if (hints && hints->FindNestedElementByName("ReaderFactory"))
+          {
+          this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
+          }
         }
+      iter->Delete();
       }
-    iter->Delete();
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkSMReaderFactory::AddGroup(const char* groupName)
+{
+  if(groupName)
+    {
+    this->Internals->Groups.insert(groupName);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMReaderFactory::RemoveGroup(const char* groupName)
+{
+  if(groupName)
+    {
+    this->Internals->Groups.erase(groupName);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMReaderFactory::GetGroups(vtkStringList* groups)
+{
+  if(groups)
+    {
+    groups->RemoveAllItems();
+    for(std::set<std::string>::iterator group=this->Internals->Groups.begin();
+        group!=this->Internals->Groups.end();group++)
+      {
+      groups->AddString(group->c_str());
+      }
+    }
+}
 //----------------------------------------------------------------------------
 void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xmlname)
 {
