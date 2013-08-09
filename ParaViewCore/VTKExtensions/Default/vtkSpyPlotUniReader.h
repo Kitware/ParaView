@@ -201,6 +201,9 @@ public:
   MaterialMarker* Markers;
   MarkerDump* MarkersDumps;
   vtkSetMacro(GenerateMarkers, int);
+  vtkGetMacro(GenerateMarkers, int);
+
+  vtkGetMacro(MarkersOn, int);
 
   vtkSpyPlotBlock* GetDataBlock(int block);
 
