@@ -27,6 +27,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
+#include "vtkStringList.h"
 
 #include <list>
 #include <set>
@@ -141,9 +142,15 @@ public:
       }
     };
 
-  typedef std::list<vtkValue> PrototypesType;
+  // we use a map here instead of a set because I'm avoiding const
+  // correctness of the methods of vtkValue. The key is a
+  // combination of the prototype name and group.
+  typedef std::map<std::string, vtkValue> PrototypesType;
   PrototypesType Prototypes;
   std::string SupportedFileTypes;
+  // The set of groups that are searched for writers. By default "writers" is
+  // included.
+  std::set<std::string> Groups;
 };
 
 vtkStandardNewMacro(vtkSMWriterFactory);
@@ -151,6 +158,7 @@ vtkStandardNewMacro(vtkSMWriterFactory);
 vtkSMWriterFactory::vtkSMWriterFactory()
 {
   this->Internals = new vtkInternals();
+  this->Internals->Groups.insert("writers");
 }
 
 //----------------------------------------------------------------------------
@@ -163,24 +171,8 @@ vtkSMWriterFactory::~vtkSMWriterFactory()
 void vtkSMWriterFactory::Initialize()
 {
   this->Internals->Prototypes.clear();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMWriterFactory::RegisterPrototypes(vtkSMSession* session, const char* xmlgroup)
-{
-  vtkPVProxyDefinitionIterator* iter = NULL;
-  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
-  iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup,0);
-  for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkPVXMLElement* hints = pxm->GetProxyHints( iter->GetGroupName(),
-                                                 iter->GetProxyName());
-    if (hints && hints->FindNestedElementByName("WriterFactory"))
-      {
-      this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
-      }
-    }
-  iter->Delete();
+  this->Internals->Groups.clear();
+  this->Internals->Groups.insert("writers");
 }
 
 //----------------------------------------------------------------------------
@@ -190,132 +182,77 @@ unsigned int vtkSMWriterFactory::GetNumberOfRegisteredPrototypes()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMWriterFactory::AddGroup(const char* groupName)
+{
+  if(groupName)
+    {
+    this->Internals->Groups.insert(groupName);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMWriterFactory::RemoveGroup(const char* groupName)
+{
+  if(groupName)
+    {
+    this->Internals->Groups.erase(groupName);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMWriterFactory::GetGroups(vtkStringList* groups)
+{
+  if(groups)
+    {
+    groups->RemoveAllItems();
+    for(std::set<std::string>::iterator group=this->Internals->Groups.begin();
+        group!=this->Internals->Groups.end();group++)
+      {
+      groups->AddString(group->c_str());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMWriterFactory::RegisterPrototype(const char* xmlgroup, const char* xmlname)
 {
-  // If already present, we remove old one and append again so that the priority
-  // rule still works.
-  this->UnRegisterPrototype(xmlgroup, xmlname);
-
   vtkInternals::vtkValue value;
   value.Group = xmlgroup;
   value.Name = xmlname;
-  
-  this->Internals->Prototypes.push_front(value);
+  std::string key = value.Name+value.Group;
+
+  this->Internals->Prototypes[key] = value;
 }
 
-//----------------------------------------------------------------------------
-void vtkSMWriterFactory::RegisterPrototype(
-  const char* xmlgroup, const char* xmlname,
-  const char* extensions, const char* description)
-
+void vtkSMWriterFactory::UpdateAvailableWriters()
 {
-  // If already present, we remove old one and append again so that the priority
-  // rule still works.
-  this->UnRegisterPrototype(xmlgroup, xmlname);
-  vtkInternals::vtkValue value;
-  value.Group = xmlgroup;
-  value.Name = xmlname;
-  
-  if (description)
+  vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+  // when we change the server we may not have a session yet. that's ok
+  // since we'll come back here after the proxy definitions are loaded
+  // from that session.
+  if(vtkSMSession* session = proxyManager->GetActiveSession())
     {
-    value.Description = description;
-    }
-  if (extensions)
-    {
-    std::vector<std::string> exts_v;
-    vtksys::SystemTools::Split(extensions, exts_v , ' ');
-    value.Extensions.clear();
-    value.Extensions.insert(exts_v.begin(), exts_v.end());
-    }
-  this->Internals->Prototypes.push_front(value);
-}
+    vtkSMSessionProxyManager* sessionProxyManager = session->GetSessionProxyManager();
+    vtkSMProxyDefinitionManager* pdm = sessionProxyManager->GetProxyDefinitionManager();
 
-//----------------------------------------------------------------------------
-void vtkSMWriterFactory::UnRegisterPrototype(
-  const char* xmlgroup, const char* xmlname)
-{
-  vtkInternals::PrototypesType::iterator iter;
-  for (iter = this->Internals->Prototypes.begin();
-    iter != this->Internals->Prototypes.end(); ++iter)
-    {
-    if (iter->Group == xmlgroup  && iter->Name == xmlname)
+    for(std::set<std::string>::iterator group=this->Internals->Groups.begin();
+        group!=this->Internals->Groups.end();group++)
       {
-      this->Internals->Prototypes.erase(iter);
-      break;
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMWriterFactory::LoadConfigurationFile(const char* filename)
-{
-  vtkSmartPointer<vtkPVXMLParser> parser = 
-    vtkSmartPointer<vtkPVXMLParser>::New();
-  parser->SetFileName(filename);
-  if (!parser->Parse())
-    {
-    vtkErrorMacro("Failed to parse file: " << filename);
-    return false;
-    }
-
-  return this->LoadConfiguration(parser->GetRootElement());
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMWriterFactory::LoadConfiguration(const char* xmlcontents)
-{
-  vtkSmartPointer<vtkPVXMLParser> parser = 
-    vtkSmartPointer<vtkPVXMLParser>::New();
-
-  if (!parser->Parse(xmlcontents))
-    {
-    vtkErrorMacro("Failed to parse xml. Not a valid XML.");
-    return false;
-    }
-
-  vtkPVXMLElement* rootElement = parser->GetRootElement();
-  return this->LoadConfiguration(rootElement);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMWriterFactory::LoadConfiguration(vtkPVXMLElement* elem)
-{
-  if (!elem)
-    {
-    return false;
-    }
-
-  if (elem->GetName() && 
-    strcmp(elem->GetName(), "ParaViewWriters") != 0)
-    {
-    return this->LoadConfiguration(
-      elem->FindNestedElementByName("ParaViewWriters"));
-    }
-
-  unsigned int num = elem->GetNumberOfNestedElements();
-  for(unsigned int i=0; i<num; i++)
-    {
-    vtkPVXMLElement* reader = elem->GetNestedElement(i);
-    if (reader->GetName() && 
-      (strcmp(reader->GetName(),"Writer") == 0 || 
-       strcmp(reader->GetName(), "Proxy") == 0))
-      {
-      const char* name = reader->GetAttribute("name");
-      const char* group = reader->GetAttribute("group");
-      group = group ? group : "writers";
-      if (name && group)
+      vtkPVProxyDefinitionIterator* iter =
+        pdm->NewSingleGroupIterator(group->c_str());
+      for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
         {
-        // NOTE this is N^2. We may want to use a separate set or something to
-        // test of existence if this becomes an issue.
-        this->RegisterPrototype(group, name,
-          reader->GetAttribute("extensions"),
-          reader->GetAttribute("file_description"));
+        vtkPVXMLElement* hints = sessionProxyManager->GetProxyHints(
+          iter->GetGroupName(), iter->GetProxyName());
+        if (hints && hints->FindNestedElementByName("WriterFactory"))
+          {
+          this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
+          }
         }
+      iter->Delete();
       }
     }
-  return true;
 }
-
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMWriterFactory::CreateWriter(
@@ -360,14 +297,14 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    iter->FillInformation(source->GetSession());
-    if (iter->CanCreatePrototype(source) &&
-        iter->ExtensionTest(extension.c_str()) &&
-        iter->CanWrite(source, outputport))
+    iter->second.FillInformation(source->GetSession());
+    if (iter->second.CanCreatePrototype(source) &&
+        iter->second.ExtensionTest(extension.c_str()) &&
+        iter->second.CanWrite(source, outputport))
       {
       vtkSMProxy* proxy = pxm->NewProxy(
-        iter->Group.c_str(),
-        iter->Name.c_str());
+        iter->second.Group.c_str(),
+        iter->second.Name.c_str());
       vtkSMPropertyHelper(proxy, "FileName").Set(filename);
       vtkSMPropertyHelper(proxy, "Input").Set(source, outputport);
       return proxy;
@@ -402,15 +339,15 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(source) &&
-      iter->CanWrite(source, outputport))
+    if (iter->second.CanCreatePrototype(source) &&
+      iter->second.CanWrite(source, outputport))
       {
-      iter->FillInformation(source->GetSession());
-      if (iter->Extensions.size() > 0)
+      iter->second.FillInformation(source->GetSession());
+      if (iter->second.Extensions.size() > 0)
         {
-        std::string ext_join = ::vtkJoin(iter->Extensions, "*.", " ");
+        std::string ext_join = ::vtkJoin(iter->second.Extensions, "*.", " ");
         vtksys_ios::ostringstream stream;
-        stream << iter->Description << "(" << ext_join << ")";
+        stream << iter->second.Description << "(" << ext_join << ")";
         sorted_types.insert(stream.str());
         }
       }
@@ -442,8 +379,8 @@ bool vtkSMWriterFactory::CanWrite(vtkSMSourceProxy* source, unsigned int outputp
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(source) &&
-      iter->CanWrite(source, outputport))
+    if (iter->second.CanCreatePrototype(source) &&
+      iter->second.CanWrite(source, outputport))
       {
       return true;
       }

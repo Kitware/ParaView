@@ -1,6 +1,0 @@
-<ParaViewReaders>
-  <Reader name="GMVSeriesReader"
-    extensions="gmv"
-    file_description="GMV Binary/ASCII Files (Plugin)">
-  </Reader>
-</ParaViewReaders>

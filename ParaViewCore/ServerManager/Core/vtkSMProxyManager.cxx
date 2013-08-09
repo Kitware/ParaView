@@ -148,12 +148,20 @@ vtkSMProxyManager::vtkSMProxyManager()
   // reader we add it to ReaderFactory.
   this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
                     this->ReaderFactory,
-                    &vtkSMReaderFactory::NewProxyDefinitionCallback);
+                    &vtkSMReaderFactory::UpdateAvailableReaders);
   this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
                     this->ReaderFactory,
-                    &vtkSMReaderFactory::NewProxyDefinitionCallback);
+                    &vtkSMReaderFactory::UpdateAvailableReaders);
 
   this->WriterFactory = vtkSMWriterFactory::New();
+  // Keep track of when proxy definitions change and then if it's a new
+  // writer we add it to WriterFactory.
+  this->AddObserver(vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated,
+                    this->WriterFactory,
+                    &vtkSMWriterFactory::UpdateAvailableWriters);
+  this->AddObserver(vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+                    this->WriterFactory,
+                    &vtkSMWriterFactory::UpdateAvailableWriters);
 
   // Monitor session creations. If a new session is created and we don't have an
   // active one, we make that new session active.

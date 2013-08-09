@@ -18,7 +18,7 @@
 // vtkSMWriterFactory is a factory for creating a writer to write the data
 // provided at an output port. The writer factory needs to be configured to
 // register the writer prototypes supported by the application. This can be done
-// using an XML with the following format:
+// using an XML with the following format in the Hints section:
 // \verbatim
 // <ParaViewWriters>
 //    <Proxy name="[xmlname for the writer proxy]"
@@ -46,6 +46,7 @@ class vtkSMProxy;
 class vtkSMSession;
 class vtkSMSessionProxyManager;
 class vtkSMSourceProxy;
+class vtkStringList;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMWriterFactory : public vtkSMObject
 {
@@ -61,22 +62,6 @@ public:
   // Description:
   // Register a prototype.
   void RegisterPrototype(const char* xmlgroup, const char* xmlname);
-  void UnRegisterPrototype(const char* xmlgroup, const char* xmlname);
-
-  // Description:
-  // Registers all prototypes from a particular group that have the
-  // "ReaderFactory" hint.
-  void RegisterPrototypes(vtkSMSession* session, const char* xmlgroup);
-
-  // Description:
-  // Load configuration XML. This adds the prototypes specified in the
-  // configuration XML to those already present in the factory. Use Initialize()
-  // is start with an empty factory before calling this method if needed. If two
-  // readers support reading the same file, the reader added more recently is
-  // given priority.
-  bool LoadConfigurationFile(const char* filename);
-  bool LoadConfiguration(const char* xmlcontents);
-  bool LoadConfiguration(vtkPVXMLElement* root);
 
   // Description:
   // Retruns true if the data from the output port can be written at all.
@@ -107,16 +92,23 @@ public:
 
   // Returns the number of registered prototypes.
   unsigned int GetNumberOfRegisteredPrototypes();
+
+  // Description:
+  // Every time a new proxy definition is added we check to see if it is
+  // a writer and then we add it to the list of available writers.
+  void UpdateAvailableWriters();
+
+  // Description:
+  // Add/remove a group name to look for writers in. By default
+  // "writers" is included.
+  void AddGroup(const char* groupName);
+  void RemoveGroup(const char* groupName);
+  void GetGroups(vtkStringList* groups);
+
 //BTX
 protected:
   vtkSMWriterFactory();
   ~vtkSMWriterFactory();
-
-  // To support legacy configuration files.
-  void RegisterPrototype(
-    const char* xmlgroup, const char* xmlname,
-    const char* extensions,
-    const char* description);
 
 private:
   vtkSMWriterFactory(const vtkSMWriterFactory&); // Not implemented

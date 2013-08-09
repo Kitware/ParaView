@@ -313,7 +313,7 @@ unsigned int vtkSMReaderFactory::GetNumberOfRegisteredPrototypes()
   return static_cast<unsigned int>(this->Internals->Prototypes.size());
 }
 
-void vtkSMReaderFactory::NewProxyDefinitionCallback()
+void vtkSMReaderFactory::UpdateAvailableReaders()
 {
   vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
   // when we change the server we may not have a session yet. that's ok
