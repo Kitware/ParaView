@@ -60,3 +60,15 @@ void vtkSMMapProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//---------------------------------------------------------------------------
+void vtkSMMapProperty::Copy(vtkSMProperty* src)
+{
+  this->Superclass::Copy(src);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMMapProperty::ResetToDefaultInternal()
+{
+  this->Superclass::ResetToDefaultInternal();
+}

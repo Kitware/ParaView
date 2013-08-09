@@ -62,6 +62,7 @@ vtkSMDoubleMapProperty::~vtkSMDoubleMapProperty()
 void vtkSMDoubleMapProperty::SetNumberOfComponents(unsigned int components)
 {
   this->Private->NumberOfComponents = components;
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------
@@ -75,8 +76,12 @@ void vtkSMDoubleMapProperty::SetElement(vtkIdType index,
                                         double value)
 {
   std::vector<double> &vector = this->Private->GetVector(index);
-  vector[0] = value;
-  this->Modified();
+
+  if(vector[0] != value)
+    {
+    vector[0] = value;
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -84,8 +89,12 @@ void vtkSMDoubleMapProperty::SetElements(vtkIdType index,
                                          const double *values)
 {
   std::vector<double> &vector = this->Private->GetVector(index);
-  vector.assign(values, values + this->Private->NumberOfComponents);
-  this->Modified();
+
+  if(!std::equal(vector.begin(), vector.end(), values))
+    {
+    vector.assign(values, values + this->Private->NumberOfComponents);
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -94,8 +103,12 @@ void vtkSMDoubleMapProperty::SetElements(vtkIdType index,
                                          unsigned int numValues)
 {
   std::vector<double> &vector = this->Private->GetVector(index);
-  vector.assign(values, values + numValues);
-  this->Modified();
+
+  if(!std::equal(vector.begin(), vector.begin() + numValues, values))
+    {
+    vector.assign(values, values + numValues);
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -104,8 +117,12 @@ void vtkSMDoubleMapProperty::SetElementComponent(vtkIdType index,
                                                  double value)
 {
   std::vector<double> &vector = this->Private->GetVector(index);
-  vector[component] = value;
-  this->Modified();
+
+  if(vector[component] != value)
+    {
+    vector[component] = value;
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -133,8 +150,11 @@ double vtkSMDoubleMapProperty::GetElementComponent(vtkIdType index,
 //---------------------------------------------------------------------------
 void vtkSMDoubleMapProperty::RemoveElement(vtkIdType index)
 {
-  this->Private->Map.erase(index);
-  this->Modified();
+  if(this->Private->Map.count(index) != 0)
+    {
+    this->Private->Map.erase(index);
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -146,8 +166,11 @@ vtkIdType vtkSMDoubleMapProperty::GetNumberOfElements()
 //---------------------------------------------------------------------------
 void vtkSMDoubleMapProperty::ClearElements()
 {
-  this->Private->Map.clear();
-  this->Modified();
+  if(!this->Private->Map.empty())
+    {
+    this->Private->Map.clear();
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -298,6 +321,8 @@ int vtkSMDoubleMapProperty::LoadState(vtkPVXMLElement* element, vtkSMProxyLocato
       }
     }
 
+  this->Modified();
+
   return 1;
 }
 
@@ -319,4 +344,28 @@ void* vtkSMDoubleMapProperty::GetMapPointer()
 void vtkSMDoubleMapProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleMapProperty::Copy(vtkSMProperty* src)
+{
+  vtkSMDoubleMapProperty *other = vtkSMDoubleMapProperty::SafeDownCast(src);
+  if(other &&
+     (other->Private->NumberOfComponents != this->Private->NumberOfComponents ||
+      other->Private->Map.size() != this->Private->Map.size() ||
+      !std::equal(other->Private->Map.begin(), other->Private->Map.end(), this->Private->Map.begin())))
+    {
+    this->Private->Map = other->Private->Map;
+    this->Private->NumberOfComponents = other->Private->NumberOfComponents;
+    this->Modified();
+    }
+
+  this->Superclass::Copy(src);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleMapProperty::ResetToDefaultInternal()
+{
+  // map properties are always empty by default
+  this->ClearElements();
 }
