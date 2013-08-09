@@ -862,7 +862,29 @@ int vtkSpyPlotReader::RequestData(
 
     mbds->SetNumberOfBlocks (0);
 
+    int maxMat = 0;
     vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt;
+    for ( mapIt = this->Map->Files.begin();
+          mapIt != this->Map->Files.end();
+          ++ mapIt )
+      {
+      uniReader = this->Map->GetReader(mapIt, this);
+      if (uniReader->GetMarkersOn () == false) 
+        {
+        // no markers available in this file, don't bother.
+        break;
+        }
+      int mat = uniReader->GetNumberOfMaterials ();
+      if (mat > maxMat) 
+        {
+        maxMat = mat;      
+        }
+      }
+
+    this->GlobalController->AllReduce (&maxMat, &maxMat, 1, vtkCommunicator::MAX_OP);
+
+    this->PrepareBlocks (mbds, maxMat);
+
     for ( mapIt = this->Map->Files.begin();
           mapIt != this->Map->Files.end();
           ++ mapIt )
@@ -2097,56 +2119,40 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
     }
 }
 
+void vtkSpyPlotReader::PrepareBlocks (vtkMultiBlockDataSet* mbds, int numMat) 
+{
+  mbds->SetNumberOfBlocks (numMat);
+  for (int m = 0; m < numMat; m ++) 
+    {
+    vtkPolyData* poly = vtkPolyData::New ();
+    poly->Allocate ();
+    vtkPoints* points = vtkPoints::New ();
+    points->SetNumberOfPoints (0);
+    poly->SetPoints (points);
+    points->Delete ();
+
+    vtkIntArray* location = vtkIntArray::New ();
+    location->SetName ("Location");
+    location->SetNumberOfComponents (3);
+    location->SetNumberOfTuples (0);
+    poly->GetPointData ()->AddArray (location);
+    location->Delete ();
+
+    vtkIntArray* blockId = vtkIntArray::New ();
+    blockId->SetName ("BlockId");
+    blockId->SetNumberOfComponents (1);
+    blockId->SetNumberOfTuples (0);
+    poly->GetPointData ()->AddArray (blockId);
+    blockId->Delete ();
+
+    mbds->SetBlock (m, poly);
+    poly->Delete ();
+    }
+}
+
 int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds, 
                 vtkSpyPlotUniReader* reader)
 {
-  if (mbds->GetNumberOfBlocks () == 0) 
-    {
-    mbds->SetNumberOfBlocks (reader->GetNumberOfMaterials ());
-    for (int m = 0; m < reader->GetNumberOfMaterials (); m ++) 
-      {
-      vtkPolyData* poly = vtkPolyData::New ();
-      poly->Allocate ();
-      vtkPoints* points = vtkPoints::New ();
-      points->SetNumberOfPoints (0);
-      poly->SetPoints (points);
-      points->Delete ();
-
-      vtkIntArray* location = vtkIntArray::New ();
-      location->SetName ("Location");
-      location->SetNumberOfComponents (3);
-      location->SetNumberOfTuples (0);
-      poly->GetPointData ()->AddArray (location);
-      location->Delete ();
-
-      vtkIntArray* blockId = vtkIntArray::New ();
-      blockId->SetName ("BlockId");
-      blockId->SetNumberOfComponents (1);
-      blockId->SetNumberOfTuples (0);
-      poly->GetPointData ()->AddArray (blockId);
-      blockId->Delete ();
-
-      for (int v = 0; v < reader->Markers[m].NumVars; v ++)
-        {
-        vtkFloatArray* var = vtkFloatArray::New ();
-        var->SetName (reader->Markers[m].Variables[v].Label);
-        var->SetNumberOfComponents (1);
-        var->SetNumberOfTuples (0);
-        poly->GetPointData ()->AddArray (var);
-        var->Delete ();
-        }
-
-      mbds->SetBlock (m, poly);
-      poly->Delete ();
-      }
-    }
-
-  if (static_cast<int>(mbds->GetNumberOfBlocks ()) != reader->GetNumberOfMaterials ()) 
-    {
-    vtkErrorMacro ("Number of materials not consistent across spyplot files");
-    return 0;
-    }
-
   for (int m = 0; m < reader->GetNumberOfMaterials (); m ++)
     {
     vtkPolyData* poly = vtkPolyData::SafeDownCast (mbds->GetBlock (m));
@@ -2164,10 +2170,21 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
     vtkFloatArray** vars = new vtkFloatArray*[reader->Markers[m].NumVars];
     for (int v = 0; v < reader->Markers[m].NumVars; v ++) 
       {
-      vars[v] = vtkFloatArray::SafeDownCast (pd->GetArray (reader->Markers[m].Variables[v].Label));
-      vars[v]->SetNumberOfTuples (length);
-      } 
 
+      vtkDataArray *array = pd->GetArray (reader->Markers[m].Variables[v].Label);
+      if (array == 0)
+        {
+        array = vtkFloatArray::New ();
+        array->SetName (reader->Markers[m].Variables[v].Label);
+        array->SetNumberOfComponents (1);
+        array->SetNumberOfTuples (0);
+        poly->GetPointData ()->AddArray (array);
+        array->Delete ();
+        }
+
+      vars[v] = vtkFloatArray::SafeDownCast (array);
+      vars[v]->SetNumberOfTuples (length);
+      }
 
     for (int mark = 0; mark < reader->Markers[m].NumRealMarks; mark ++) 
       {
