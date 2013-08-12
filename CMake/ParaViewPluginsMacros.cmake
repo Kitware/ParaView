@@ -136,7 +136,12 @@ macro(pv_plugin_search_under_root root_src root_build)
   file(GLOB_RECURSE files RELATIVE "${root_src}" "${root_src}/plugin.cmake")
   foreach(plugin_file IN LISTS files)
     get_filename_component(base "${plugin_file}" PATH)
-    pv_add_plugin("${root_src}/${base}" plugin.cmake "${root_build}/${base}")
+    if(base)
+      pv_add_plugin("${root_src}/${base}" plugin.cmake "${root_build}/${base}")
+    else()
+      # The root directory is in fact the plugin directory
+      pv_add_plugin("${root_src}" plugin.cmake "${root_build}")
+    endif()
   endforeach()
 endmacro()
 
