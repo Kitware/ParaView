@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
 //---------------------------------------------------------------------------

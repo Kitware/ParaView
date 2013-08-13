@@ -17,9 +17,13 @@
 // .SECTION Description
 // vtkSMIntRangeDomain is a type specific extension to
 // vtkSMRangeDomainTemplate for ints.
-
 #ifndef __vtkSMIntRangeDomain_h
 #define __vtkSMIntRangeDomain_h
+
+// Tell the template header how to give our superclass a DLL interface.
+#if !defined(__vtkSMIntRangeDomain_cxx)
+# define VTK_DATA_ARRAY_TEMPLATE_TYPE int
+#endif
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
@@ -51,9 +55,9 @@ public:
   // Description:
   // Returns if minimum/maximum bound is set for the domain.
   int GetMinimumExists(unsigned int idx)
-    { return this->RealSuperclass::GetMinimumExists(idx); }
+    { return this->RealSuperclass::GetMinimumExists(idx)? 1: 0; }
   int GetMaximumExists(unsigned int idx)
-    { return this->RealSuperclass::GetMaximumExists(idx); }
+    { return this->RealSuperclass::GetMaximumExists(idx)? 1: 0; }
 
   // Description:
   // Returns the minimum/maximum value, is exists, otherwise

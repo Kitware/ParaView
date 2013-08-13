@@ -334,5 +334,4 @@ void vtkSMRangeDomainTemplate<T>::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "DefaultMode: " << this->DefaultMode << endl;
 }
-
 #endif

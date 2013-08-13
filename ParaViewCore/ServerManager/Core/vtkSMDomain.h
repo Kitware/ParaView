@@ -64,7 +64,8 @@ public:
 
   // Description:
   // Set the value of an element of a property from the animation editor.
-  virtual void SetAnimationValue(vtkSMProperty*, int index, double value) {}
+  virtual void SetAnimationValue(
+    vtkSMProperty*, int vtkNotUsed(index), double vtkNotUsed(value)) {}
 
   // Description:
   // A vtkSMProperty is often defined with a default value in the

@@ -192,7 +192,31 @@ private:
 //ETX
 };
 
-#include "vtkSMRangeDomainTemplate.txx"
+#if !defined(VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION)
+# define VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(T) \
+   template class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangeDomainTemplate< T >
+#else
+# include "vtkSMRangeDomainTemplate.txx" // needed for templates.
+# define VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(T)
+#endif // !defined(VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION)
 
+#endif // !defined(__vtkSMRangeDomainTemplate_h)
+
+// This portion must be OUTSIDE the include blockers.  Each
+// vtkSMRangeDomainTemplate subclass uses this to give its instantiation
+// of this template a DLL interface.
+#if defined(VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE)
+# if defined(VTK_BUILD_SHARED_LIBS) && defined(_MSC_VER)
+#  pragma warning (push)
+#  pragma warning (disable: 4091) // warning C4091: 'extern ' :
+   // ignored on left of 'int' when no variable is declared
+#  pragma warning (disable: 4231) // Compiler-specific extension warning.
+   // Use an "extern explicit instantiation" to give the class a DLL
+   // interface.  This is a compiler-specific extension.
+   extern VTK_SM_RANGE_DOMAIN_TEMPLATE_INSTANTIATE(VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE);
+#  pragma warning (pop)
+# endif
+# undef VTK_SM_RANGE_DOMAIN_TEMPLATE_TYPE
 #endif
+
 // VTK-HeaderTest-Exclude: vtkSMRangeDomainTemplate.h
