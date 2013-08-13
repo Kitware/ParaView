@@ -877,9 +877,6 @@
       "path":"VTK/Utilities/OutputWindowProcess"
     },
     {
-      "path":"VTK/Utilities/Release"
-    },
-    {
       "path":"VTK/Utilities/Rpm"
     },
     {
