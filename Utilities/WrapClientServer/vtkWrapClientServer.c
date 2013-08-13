@@ -1137,7 +1137,7 @@ int main(int argc, char *argv[])
     }
   if (!data->IsAbstract)
     {
-    fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand()\n{\n",data->Name);
+    fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand(void* /*ctx*/)\n{\n",data->Name);
     fprintf(fp,"  return %s::New();\n}\n\n",data->Name);
     }
 
@@ -1146,7 +1146,7 @@ int main(int argc, char *argv[])
           "int VTK_EXPORT"
           " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
           " const char *method, const vtkClientServerStream& msg,"
-          " vtkClientServerStream& resultStream)\n"
+          " vtkClientServerStream& resultStream, void* /*ctx*/)\n"
           "{\n",
           data->Name);
 
@@ -1190,8 +1190,9 @@ int main(int argc, char *argv[])
     fprintf(fp,
       "\n"
       "  {\n"
-      "    vtkClientServerCommandFunction fn = arlu->GetCommandFunction(\"%s\");\n"
-      "    if (fn && fn(arlu, op, method, msg, resultStream)) { return 1; }\n"
+      "    const char* commandName = \"%s\";\n"
+      "    if (arlu->HasCommandFunction(commandName) &&\n"
+      "        arlu->CallCommandFunction(commandName, op, method, msg, resultStream)) { return 1; }\n"
       "  }\n",
       data->SuperClasses[i]);
     }
