@@ -29,7 +29,6 @@ class vtkClientServerInterpreter;
 class vtkClientServerInterpreterCommand;
 class vtkClientServerInterpreterInternals;
 class vtkClientServerStream;
-class vtkTimerLog;
 
 // Description:
 // The type of a command function.  One such function is generated per

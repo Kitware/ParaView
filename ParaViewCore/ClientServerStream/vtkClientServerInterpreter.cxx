@@ -265,7 +265,7 @@ vtkClientServerInterpreter
   this->LastResultMessage->Reset();
 
   // Make sure we have some instance creation functions registered.
-  if(this->Internal->NewInstanceFunctions.size() == 0)
+  if(this->Internal->NewInstanceFunctions.empty())
     {
     *this->LastResultMessage
       << vtkClientServerStream::Error
@@ -304,8 +304,10 @@ vtkClientServerInterpreter
 
     // Find a NewInstance function that knows about the class.
     int created = 0;
-    if(vtkClientServerNewInstanceFunction n = this->Internal->NewInstanceFunctions[cname])
+    if(this->Internal->NewInstanceFunctions.count(cname))
       {
+      vtkClientServerNewInstanceFunction n =
+        this->Internal->NewInstanceFunctions[cname];
       this->NewInstance(n(),id);
       created =1;
       }
@@ -374,8 +376,6 @@ vtkClientServerInterpreter
     // Find the command function for this object's type.
     if(vtkClientServerCommandFunction func = this->GetCommandFunction(obj))
       {
-      // Try to invoke the method.  If it fails, LastResultMessage
-      // will have the error message.
       if(func(this, obj, method, msg, *this->LastResultMessage))
         {
         return 1;
