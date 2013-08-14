@@ -7,7 +7,4 @@
         <file>UI/PrismPanelWidget.ui</file>
         <file>UI/PrismViewScalingWidget.ui</file>
     </qresource>
-    <qresource prefix="/ParaViewResources" >
-        <file>PrismReader.xml</file>
-    </qresource>
 </RCC>  

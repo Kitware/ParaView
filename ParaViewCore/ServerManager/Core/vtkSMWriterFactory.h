@@ -16,17 +16,8 @@
 // data type information from the output port.
 // .SECTION Description
 // vtkSMWriterFactory is a factory for creating a writer to write the data
-// provided at an output port. The writer factory needs to be configured to
-// register the writer prototypes supported by the application. This can be done
-// using an XML with the following format in the Hints section:
-// \verbatim
-// <ParaViewWriters>
-//    <Proxy name="[xmlname for the writer proxy]"
-//           group="[optional: xmlgroup for the writer proxy, 'writers' by default]"
-//           />
-//    ...
-// </ParaViewWriters>
-// \endverbatim
+// provided at an output port. This is done whenever a new proxy definition
+// is added in the writers group.
 //
 // Alternatively, one can register prototypes using \c RegisterPrototype API.
 // The proxy definitions for the writer proxies must provide hints that

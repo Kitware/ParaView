@@ -17,15 +17,13 @@
 // .SECTION Description
 // vtkSMReaderFactory is a factory for creating a reader that reads a particular
 // file. The reader factory needs to be configured to register the reader
-// prototypes supported by the application. This can be done using an XML with
-// the following format:
+// prototypes supported by the application. This is done automatically when
+// the reader's proxy definition is registered AND if it has the extensions
+// specified in the Hints section of the XML proxy definition. It is done
+// with the following format:
 // \verbatim
-// <ParaViewReaders>
-//    <Proxy name="[xmlname for the reader proxy]"
-//            group="[optional: xmlgroup for the reader proxy, sources by default]"
-//            />
-//    ...
-// </ParaViewReaders>
+// <ReaderFactory extensions="[list of expected extensions]"
+//     file_description="[description of the file]" />
 // \endverbatim
 //
 // Once the factory has been configured, the API to create readers, get

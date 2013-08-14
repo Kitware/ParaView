@@ -30,5 +30,4 @@ ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
                          vtknifti1_io.cxx
                          vtkznzlib.cxx
   SERVER_MANAGER_XML     AnalyzeNIfTISM.xml
-  GUI_RESOURCE_FILES     AnalyzeNIfTIWriters.xml
-  )
+  REQUIRED_ON_SERVER)

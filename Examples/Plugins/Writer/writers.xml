@@ -54,6 +54,8 @@
 
       <Hints>
         <Property name="Input" show="0"/>
+        <WriterFactory extensions="tif"
+                       file_description="My Tiff Files" />
       </Hints>
 
     </WriterProxy>

@@ -78,8 +78,6 @@ add_paraview_plugin(
     vtkSMStreamingViewProxy.cxx
   SERVER_MANAGER_XML
     StreamingView.xml
-  GUI_RESOURCE_FILES
-    StreamingReaders.xml
   GUI_INTERFACES
     ${VIEW1_IFACE}
     ${VIEW1_OPTIONS_IFACE}
