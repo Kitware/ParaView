@@ -94,8 +94,6 @@ set (Module_SRCS
   pqChangeInputDialog.h
   pqChartPixelScale.cxx
   pqChartPixelScale.h
-  pqChartSummaryDisplayPanel.cxx
-  pqChartSummaryDisplayPanel.h
   pqChartValue.cxx
   pqChartValue.h
   pqClipPanel.cxx
@@ -460,7 +458,6 @@ set (Module_MOC_HDRS
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.h
-  pqChartSummaryDisplayPanel.h
   pqClipPanel.h
   pqCollaborationPanel.h
   pqColorMapEditor.h
