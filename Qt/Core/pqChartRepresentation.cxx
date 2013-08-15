@@ -86,7 +86,14 @@ void pqChartRepresentation::setDefaultPropertyValues()
   if (series_arrays.contains("bin_values"))
     {
     // typically implies that the output is from a histogram filter.
-    x_array = series_arrays[0].toString();
+    if (series_arrays.contains("bin_extents"))
+      {
+      x_array = "bin_extents";
+      }
+    else
+      {
+      x_array = series_arrays[0].toString();
+      }
     y_array = "bin_values";
     }
   else if (series_arrays.contains(QVariant("Time")))
@@ -97,7 +104,6 @@ void pqChartRepresentation::setDefaultPropertyValues()
     {
     x_array = "arc_length";
     }
-
 
   if (!x_array.isEmpty())
     {
