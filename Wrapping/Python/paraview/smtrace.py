@@ -642,8 +642,12 @@ def append_trace():
           ctorMethod = "CreateParallelCoordinatesChartView"
         elif info.Proxy.GetXMLName() == "2DRenderView":
           ctorMethod = "Create2DRenderView"
-        else:
+        elif info.Proxy.GetXMLName() == "RenderView":
           ctorMethod = "CreateRenderView"
+        else:
+          # use the generic method to create this view.
+          ctorMethod = "CreateView"
+          ctorArgs.append('"%s"' % info.Proxy.GetXMLName())
 
         # Now track it as the last active view
         trace_globals.last_active_view = info.Proxy
