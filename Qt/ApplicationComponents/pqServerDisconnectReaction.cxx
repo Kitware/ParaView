@@ -56,7 +56,7 @@ pqServerDisconnectReaction::pqServerDisconnectReaction(QAction* parentObject)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerDisconnectReaction::disconnectFromServerWithWarning()
+bool pqServerDisconnectReaction::disconnectFromServerWithWarning()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
@@ -72,11 +72,12 @@ void pqServerDisconnectReaction::disconnectFromServerWithWarning()
       QMessageBox::Yes | QMessageBox::No);
     if (ret == QMessageBox::No)
       {
-      return;
+      return false;
       }
     }
 
   pqServerDisconnectReaction::disconnectFromServer();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -101,5 +102,10 @@ void pqServerDisconnectReaction::updateState()
 void pqServerDisconnectReaction::onTriggered()
 {
   this->parentAction()->setEnabled(false);
-  pqServerDisconnectReaction::disconnectFromServerWithWarning();
+  if (!pqServerDisconnectReaction::disconnectFromServerWithWarning())
+    {
+    // re-enable the action since user cancelled the disconnect, otherwise the
+    // action will be re-enabled when a new session, if any is created.
+    this->parentAction()->setEnabled(true);
+    }
 }
