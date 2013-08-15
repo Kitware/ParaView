@@ -119,8 +119,16 @@ struct vtkSMProxyPropertyInternals
 
   VectorOfProxies Proxies;
   std::vector<vtkSMProxy*> UncheckedProxies;
-  std::map<void*, int> ProducerCounts;
+
+  struct ProducerCountsItem
+    {
+    int Count;
+    unsigned long ObserverId;
+    ProducerCountsItem() : Count(0), ObserverId(0) { }
+    };
+  std::map<void*, ProducerCountsItem> ProducerCounts;
 };
+
 //***************************************************************************
 vtkStandardNewMacro(vtkSMProxyProperty);
 bool vtkSMProxyProperty::CreateProxyAllowed = false; // static init
@@ -577,9 +585,15 @@ void vtkSMProxyProperty::AddProducer(vtkSMProxy* producer)
 {
   if (producer && this->GetParent() && !this->SkipDependency)
     {
-    this->PPInternals->ProducerCounts[producer]++;
-    if (this->PPInternals->ProducerCounts[producer] == 1)
+    this->PPInternals->ProducerCounts[producer].Count++;
+    if (this->PPInternals->ProducerCounts[producer].Count == 1)
       {
+      // observer UpdateDataEvent, so we can update dependent domains when the
+      // data changes.
+      this->PPInternals->ProducerCounts[producer].ObserverId =
+        producer->AddObserver(vtkCommand::UpdateDataEvent,
+          this, &vtkSMProxyProperty::OnUpdateDataEvent);
+
       producer->AddConsumer(this, this->GetParent());
       this->GetParent()->AddProducer(this, producer);
       }
@@ -591,10 +605,13 @@ void vtkSMProxyProperty::RemoveProducer(vtkSMProxy* producer)
 {
   if (producer && this->GetParent() && !this->SkipDependency)
     {
-    this->PPInternals->ProducerCounts[producer]--;
-    assert(this->PPInternals->ProducerCounts[producer] >= 0);
-    if (this->PPInternals->ProducerCounts[producer] == 0)
+    this->PPInternals->ProducerCounts[producer].Count--;
+    assert(this->PPInternals->ProducerCounts[producer].Count >= 0);
+    if (this->PPInternals->ProducerCounts[producer].Count == 0)
       {
+      producer->RemoveObserver(this->PPInternals->ProducerCounts[producer].ObserverId);
+      this->PPInternals->ProducerCounts[producer].ObserverId = 0;
+
       producer->RemoveConsumer(this, this->GetParent());
       this->GetParent()->RemoveProducer(this, producer);
       }
