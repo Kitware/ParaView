@@ -108,7 +108,7 @@ private slots:
   void showContextMenu(const QPoint &pos);
   void handleItemActivated();
   void selectNewItem(const QModelIndex &parent, int first, int last);
-  void currentChanged(const QModelIndex &current);
+  void selectionChanged();
 
 private:
   void importColorMap(vtkPVXMLElement *element);
