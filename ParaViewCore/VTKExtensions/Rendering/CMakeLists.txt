@@ -138,3 +138,7 @@ endforeach()
 #---------------------------------------------------------
 
 vtk_module_library(vtkPVVTKExtensionsRendering ${Module_SRCS})
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+  vtk_mpi_link(${vtk-module})
+endif()

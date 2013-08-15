@@ -5,6 +5,8 @@ vtk_module(vtkPVCommon
     vtkCommonCore
     vtkIOXMLParser
     vtkClientServer
+  PRIVATE_DEPENDS
+    vtksys
   TEST_DEPENDS
     vtkTestingCore
   TEST_LABELS

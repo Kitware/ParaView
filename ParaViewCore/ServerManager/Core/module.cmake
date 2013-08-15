@@ -7,6 +7,8 @@ vtk_module(vtkPVServerManagerCore
     # of vtkPVServerImplementationCore off but still satisfy API dependcy.
     vtkCommonCore
     vtkPVServerImplementationCore
+  PRIVATE_DEPENDS
+    vtksys
   TEST_LABELS
     PARAVIEW
 )

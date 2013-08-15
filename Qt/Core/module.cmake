@@ -6,6 +6,8 @@ vtk_module(pqCore
     vtkGUISupportQt
     vtkPVServerManagerApplication
     vtkPVServerManagerDefault
+  PRIVATE_DEPENDS
+    vtksys
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW

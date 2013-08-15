@@ -13,6 +13,8 @@ vtk_module(vtkPVServerManagerDefault
     vtkRenderingVolumeOpenGL
     vtkTestingRendering
     ${__extra_dependencies}
+  PRIVATE_DEPENDS
+    vtksys
   TEST_DEPENDS
     vtkPVServerManagerApplication
   TEST_LABELS

@@ -2,6 +2,8 @@ vtk_module(vtkPVClientServerCoreDefault
   DEPENDS
     vtkPVClientServerCoreRendering
     vtkPVVTKExtensionsDefault
+  PRIVATE_DEPENDS
+    vtksys
   TEST_LABELS
     PARAVIEW
 )

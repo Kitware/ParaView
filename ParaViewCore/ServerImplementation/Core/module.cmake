@@ -4,6 +4,8 @@ vtk_module(vtkPVServerImplementationCore
   DEPENDS
     vtkPVClientServerCoreCore
     vtkprotobuf
+  PRIVATE_DEPENDS
+    vtksys
   TEST_LABELS
     PARAVIEW
 )

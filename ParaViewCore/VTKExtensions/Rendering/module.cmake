@@ -4,9 +4,6 @@ if (PARAVIEW_USE_MPI)
   if (PARAVIEW_USE_ICE_T)
     list(APPEND __dependencies vtkicet)
   endif()
-
-  # needed for mpich
-  add_definitions("-DMPICH_IGNORE_CXX_SEEK")
 endif()
 
 if(PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_MATPLOTLIB)

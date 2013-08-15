@@ -4,6 +4,8 @@ vtk_module(pqApplicationComponents
   DEPENDS
     pqComponents
     vtkGUISupportQt
+  PRIVATE_DEPENDS
+    vtksys
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW
