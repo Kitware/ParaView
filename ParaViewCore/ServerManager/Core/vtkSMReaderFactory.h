@@ -17,17 +17,14 @@
 // .SECTION Description
 // vtkSMReaderFactory is a factory for creating a reader that reads a particular
 // file. The reader factory needs to be configured to register the reader
-// prototypes supported by the application. This can be done using an XML with
-// the following format:
+// prototypes supported by the application. This is done automatically when
+// the reader's proxy definition is registered AND if it has the extensions
+// specified in the Hints section of the XML proxy definition. It is done
+// with the following format:
 // \verbatim
-// <ParaViewReaders>
-//    <Proxy name="[xmlname for the reader proxy]"
-//            group="[optional: xmlgroup for the reader proxy, sources by default]"
-//            />
-//    ...
-// </ParaViewReaders>
+// <ReaderFactory extensions="[list of expected extensions]"
+//     file_description="[description of the file]" />
 // \endverbatim
-// Alternatively, one can register prototypes using \c RegisterPrototype API.
 //
 // Once the factory has been configured, the API to create readers, get
 // available readers etc. can be used.
@@ -55,24 +52,9 @@ public:
   void Initialize();
 
   // Description:
-  // Register a prototype.
+  // Register a prototype. If it is already registered this becomes
+  // a no-op.
   void RegisterPrototype(const char* xmlgroup, const char* xmlname);
-  void UnRegisterPrototype(const char* xmlgroup, const char* xmlname);
-
-  // Description:
-  // Registers all prototypes from a particular group that have the
-  // "ReaderFactory" hint.
-  void RegisterPrototypes(vtkSMSession* session, const char* xmlgroup);
-
-  // Description:
-  // Load configuration XML. This adds the prototypes specified in the
-  // configuration XML to those already present in the factory. Use Initialize()
-  // is start with an empty factory before calling this method if needed. If two
-  // readers support reading the same file, the reader added more recently is
-  // given priority.
-  bool LoadConfigurationFile(const char* filename);
-  bool LoadConfiguration(const char* xmlcontents);
-  bool LoadConfiguration(vtkPVXMLElement* root);
 
   // Description:
   // Returns true if a reader can be determined that can read the file.
@@ -143,6 +125,17 @@ public:
   // Description:
   // Returns the number of registered prototypes.
   unsigned int GetNumberOfRegisteredPrototypes();
+
+  // Description:
+  // Every time a new proxy definition is added we check to see if it is
+  // a reader and then we add it to the list of available readers.
+  void UpdateAvailableReaders();
+
+  // Description:
+  // Add/remove a group name to look for readers in. By default "source" is included.
+  void AddGroup(const char* groupName);
+  void RemoveGroup(const char* groupName);
+  void GetGroups(vtkStringList* groups);
 
 //BTX
 protected:

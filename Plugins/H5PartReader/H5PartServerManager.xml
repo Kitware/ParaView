@@ -97,7 +97,10 @@
         default_values="1" >
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
-
+     <Hints>
+       <ReaderFactory extensions="h5part"
+                      file_description="H5Part particle files (Plugin)" />
+     </Hints>
    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -9,4 +9,5 @@ endif()
 
 add_paraview_plugin(
   ReaderXMLOnly "1.0"
-  SERVER_MANAGER_XML ReaderXMLOnly.xml)
+  SERVER_MANAGER_XML ReaderXMLOnly.xml
+  REQUIRED_ON_SERVER)

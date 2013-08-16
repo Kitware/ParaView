@@ -745,8 +745,21 @@ void pqApplicationCore::loadConfigurationXML(const char* xmldata)
 
   // Load configuration files for server manager components since they don't
   // listen to Qt signals.
-  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->LoadConfiguration(root);
-  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->LoadConfiguration(root);
+  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->UpdateAvailableReaders();
+  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->UpdateAvailableWriters();
+
+  // Give a warning that if there is ParaViewReaders or ParaViewWriters in root
+  // that it has been changed and people should change their code accordingly.
+  if(strcmp(root->GetName(), "ParaViewReaders") == 0)
+    {
+    vtkGenericWarningMacro("Readers have been changed such that the GUI definition is not needed."
+                           << " This should now be specified in the Hints section of the XML definition.");
+    }
+  else if(strcmp(root->GetName(), "ParaViewWriters") == 0)
+    {
+    vtkGenericWarningMacro("Writers have been changed such that the GUI definition is not needed."
+                           << " This should now be specified in the Hints section of the XML definition.");
+    }
 
   emit this->loadXML(root);
 }

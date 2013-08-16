@@ -561,7 +561,7 @@ def OpenDataFile(filename, **extraArgs):
     session = servermanager.ActiveConnection.Session
     reader_factor = servermanager.vtkSMProxyManager.GetProxyManager().GetReaderFactory()
     if reader_factor.GetNumberOfRegisteredPrototypes() == 0:
-      reader_factor.RegisterPrototypes(session, "sources")
+        reader_factor.UpdateAvailableReaders()
     first_file = filename
     if type(filename) == list:
         first_file = filename[0]
@@ -593,7 +593,7 @@ def CreateWriter(filename, proxy=None, **extraArgs):
     session = servermanager.ActiveConnection.Session
     writer_factory = servermanager.vtkSMProxyManager.GetProxyManager().GetWriterFactory()
     if writer_factory.GetNumberOfRegisteredPrototypes() == 0:
-        writer_factory.RegisterPrototypes(session, "writers")
+        writer_factory.UpdateAvailableWriters()
     if not proxy:
         proxy = GetActiveSource()
     if not proxy:

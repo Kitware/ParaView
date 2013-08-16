@@ -1,125 +1,127 @@
- <ServerManagerConfiguration>
+<ServerManagerConfiguration>
   <ProxyGroup name="sources">
-   <SourceProxy name="pvNektarReader"
-                class="vtkNektarReader"
-                label="nektar data reader"
-		multiprocess_support="multiple_processes">
-     <Documentation
-       short_help="Read a nektar file."
-       long_help="Read a nektar file into an unstructured grid.">
-       The NekTar reader reads NekTar files, and convert the data from modal to physical space, generating the output in an unstructured grid dataset.
-     </Documentation>
+    <SourceProxy name="pvNektarReader"
+                 class="vtkNektarReader"
+                 label="nektar data reader"
+                 multiprocess_support="multiple_processes">
+      <Documentation
+          short_help="Read a nektar file."
+          long_help="Read a nektar file into an unstructured grid.">
+        The NekTar reader reads NekTar files, and convert the data from modal to physical space, generating the output in an unstructured grid dataset.
+      </Documentation>
 
-     <OutputPort name="Continuum Field" index="0"/>
-     <OutputPort name="Exterior Wall" index="1"/>
+      <OutputPort name="Continuum Field" index="0"/>
+      <OutputPort name="Exterior Wall" index="1"/>
 
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1"
-	information_property="DataFileName">
+      <StringVectorProperty
+          name="FileName"
+          animateable="0"
+          command="SetFileName"
+          number_of_elements="1"
+          information_property="DataFileName">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the NekTar reader.
         </Documentation>
-     </StringVectorProperty>
+      </StringVectorProperty>
 
-     <DoubleVectorProperty
-        name="TimestepValues"
-        repeatable="1"
-        information_only="1">
+      <DoubleVectorProperty
+          name="TimestepValues"
+          repeatable="1"
+          information_only="1">
         <TimeStepsInformationHelper/>
         <Documentation>
           Available timestep values.
         </Documentation>
-     </DoubleVectorProperty>
+      </DoubleVectorProperty>
 
-     <StringVectorProperty
-        name="PointArrayInfo"
-        information_only="1">
+      <StringVectorProperty
+          name="PointArrayInfo"
+          information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+      </StringVectorProperty>
 
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="PointArrayInfo"
-        label="Variables">
-       <ArraySelectionDomain name="array_list">
+      <StringVectorProperty
+          name="PointArrayStatus"
+          command="SetPointArrayStatus"
+          number_of_elements="0"
+          repeat_command="1"
+          number_of_elements_per_command="2"
+          element_types="2 0"
+          information_property="PointArrayInfo"
+          label="Variables">
+        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
+            <Property name="PointArrayInfo" function="ArrayList"/>
           </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which point-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
 
-     <IntVectorProperty name="Project"
-        command="SetUseProjection"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty name="Project"
+                         command="SetUseProjection"
+                         number_of_elements="1"
+                         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
           When set to true, the reader will use projection for derived quantities.
         </Documentation>
       </IntVectorProperty>
 
-     <StringVectorProperty
-        name="DerivedVariableArrayInfo"
-        information_only="1">
+      <StringVectorProperty
+          name="DerivedVariableArrayInfo"
+          information_only="1">
         <ArraySelectionInformationHelper attribute_name="DerivedVariable"/>
-     </StringVectorProperty>
+      </StringVectorProperty>
 
-     <StringVectorProperty
-        name="DerivedVariableArrayStatus"
-        command="SetDerivedVariableArrayStatus"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="DerivedVariableArrayInfo"
-        label="Derived Quantities">
-       <ArraySelectionDomain name="array_list">
+      <StringVectorProperty
+          name="DerivedVariableArrayStatus"
+          command="SetDerivedVariableArrayStatus"
+          number_of_elements="0"
+          repeat_command="1"
+          number_of_elements_per_command="2"
+          element_types="2 0"
+          information_property="DerivedVariableArrayInfo"
+          label="Derived Quantities">
+        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
-             <Property name="DerivedVariableArrayInfo" function="ArrayList"/>
+            <Property name="DerivedVariableArrayInfo" function="ArrayList"/>
           </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which derived quantities to generate.
-       </Documentation>
-     </StringVectorProperty>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which derived quantities to generate.
+        </Documentation>
+      </StringVectorProperty>
 
-     <IntVectorProperty
-      name="Continuum Resolution"
-      command="SetElementResolution"
-      number_of_elements="1"
-      default_values="2">
-       <IntRangeDomain name="range" min="2" max="10"/>
-       <Documentation>
-         This property sets the number of subdivisions along each edge of the
-      continuum elements.
-       </Documentation>
-     </IntVectorProperty>
-     <IntVectorProperty
-      name="Wall Shear Stress Resolution"
-      command="SetWSSResolution"
-      number_of_elements="1"
-      default_values="2">
-       <IntRangeDomain name="range" min="2" max="10"/>
-       <Documentation>
-         This property sets the number of subdivisions along each edge of the
-      boundary elements.
-       </Documentation>
-     </IntVectorProperty>
-
-   <!-- End NekTar Reader -->
-   </SourceProxy>
+      <IntVectorProperty
+          name="Continuum Resolution"
+          command="SetElementResolution"
+          number_of_elements="1"
+          default_values="2">
+        <IntRangeDomain name="range" min="2" max="10"/>
+        <Documentation>
+          This property sets the number of subdivisions along each edge of the
+          continuum elements.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="Wall Shear Stress Resolution"
+          command="SetWSSResolution"
+          number_of_elements="1"
+          default_values="2">
+        <IntRangeDomain name="range" min="2" max="10"/>
+        <Documentation>
+          This property sets the number of subdivisions along each edge of the
+          boundary elements.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="nektar"
+                       file_description="Nektar CFD results files (Plugin)" />
+      </Hints>
+      <!-- End NekTar Reader -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
-
