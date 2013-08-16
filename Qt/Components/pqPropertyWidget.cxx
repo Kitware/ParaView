@@ -55,8 +55,10 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   this->connect(&this->Links, SIGNAL(qtWidgetChanged()),
                 this, SIGNAL(changeAvailable()));
 
+  // This has to be a QueuedConnection otherwise changeFinished() gets fired
+  // before changeAvailable() is handled by pqProxyWidget and see BUG #13029.
   this->connect(this, SIGNAL(changeAvailable()),
-                this, SLOT(onChangeAvailable()));
+                this, SLOT(onChangeAvailable()), Qt::QueuedConnection);
 
   this->connect(this, SIGNAL(changeFinished()),
     this, SLOT(onChangeFinished()));

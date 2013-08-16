@@ -32,15 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqIntVectorPropertyWidget.h"
 
-#include "vtkSMDomain.h"
-#include "vtkSMProperty.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMBooleanDomain.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMIntRangeDomain.h"
 #include "vtkSMCompositeTreeDomain.h"
+#include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 
 #include "pqIntRangeWidget.h"
 #include "pqLineEdit.h"
@@ -69,9 +70,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     }
   
   // find the domain
-  vtkSMIntRangeDomain *defaultDomain = NULL;
-
-  vtkSMDomain *domain = 0;
+  vtkSmartPointer<vtkSMDomain> domain;
   vtkSMDomainIterator *domainIter = ivp->NewDomainIterator();
   for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
     {
@@ -81,8 +80,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
   if(!domain)
     {
-    defaultDomain = vtkSMIntRangeDomain::New();
-    domain = defaultDomain;
+    domain = vtkSmartPointer<vtkSMIntRangeDomain>::New();
     }
 
   QHBoxLayout *layoutLocal = new QHBoxLayout;
@@ -270,9 +268,4 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     }
 
   this->setLayout(layoutLocal);
-
-  if (defaultDomain)
-    {
-    defaultDomain->Delete();
-    }
 }
