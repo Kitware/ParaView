@@ -280,7 +280,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->Internal->StyleInterpolation->clear();
   if ((prop = reprProxy->GetProperty("Interpolation")) != 0)
     {
-    prop->UpdateDependentDomains();
     QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(prop);
     foreach(QVariant item, items)
       {
@@ -564,7 +563,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->Internal->BackfaceStyleRepresentation->clear();
   if ((prop = reprProxy->GetProperty("BackfaceRepresentation")) != NULL)
     {
-    prop->UpdateDependentDomains();
     QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(prop);
     foreach (QVariant item, items)
       {
@@ -716,9 +714,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
 
   this->Internal->SliceDirectionAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SliceDirection);
-  QObject::connect(this->Internal->SliceDirectionAdaptor,
-    SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(sliceDirectionChanged()));
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectMapper);
@@ -794,13 +789,6 @@ void pqDisplayProxyEditor::updateEnableState()
 
   this->Internal->SliceGroup->setEnabled(
     reprType == "Slice" );
-  if (reprType == "Slice")
-    {
-    // every time the user switches to Slice mode we update the domain for the
-    // slider since the domain depends on the input to the image mapper which
-    // may have changed.
-    this->sliceDirectionChanged();
-    }
 
   this->Internal->compositeTree->setVisible(
    this->Internal->CompositeTreeAdaptor &&
@@ -1008,20 +996,6 @@ void pqDisplayProxyEditor::editCubeAxes()
 bool pqDisplayProxyEditor::isCubeAxesVisible()
 {
   return this->Internal->ShowCubeAxes->isChecked();
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayProxyEditor::sliceDirectionChanged()
-{
-  if (this->Internal->Representation)
-    {
-    vtkSMProxy* reprProxy = this->Internal->Representation->getProxy();
-    vtkSMProperty* prop = reprProxy->GetProperty("SliceMode");
-    if (prop)
-      {
-      prop->UpdateDependentDomains();
-      }
-    }
 }
 
 //-----------------------------------------------------------------------------

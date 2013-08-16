@@ -157,10 +157,6 @@ void pqGlyphPanel::updateScaleFactor()
     }
 
   vtkSMProxy* filterProxy = this->proxy();
-  filterProxy->GetProperty("Input")->UpdateDependentDomains();
-  filterProxy->GetProperty("SelectInputScalars")->UpdateDependentDomains();
-  filterProxy->GetProperty("SelectInputVectors")->UpdateDependentDomains();
-
   vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
     filterProxy->GetProperty("SetScaleMode")->GetDomain("enum"));
 
@@ -230,8 +226,6 @@ void pqGlyphPanel::updateScaleFactor()
 void pqGlyphPanel::updateScalarsVectorsEnable()
 {
   vtkSMProxy* filterProxy = this->proxy();
-  filterProxy->GetProperty("Input")->UpdateDependentDomains();
-
   vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
                    filterProxy->GetProperty("SetScaleMode")->GetDomain("enum"));
 

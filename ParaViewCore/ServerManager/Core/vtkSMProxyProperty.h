@@ -17,6 +17,16 @@
 // vtkSMProxyProperty is a concrete sub-class of vtkSMProperty representing
 // pointer(s) to vtkObject(s) (through vtkSMProxy).
 //
+// vtkSMProperty::UpdateDomains() is called by vtkSMProperty itself whenever
+// its unchecked values are modified. In case of proxy-properties, the dependent
+// domains typically tend to depend on the data information provided by the
+// source-proxies added to the property. Thus, to ensure that the domains get
+// updated if the data information changes, vtkSMProxyProperty ensures that
+// vtkSMProperty::UpdateDomains() is called whenever any of the added proxies
+// fires the vtkCommand::UpdateDataEvent (which is fired whenever the pipeline
+// us updated through the ServerManager indicating that the data-information
+// last used may have been invalidated).
+//
 // Besides the standard set of attributes, the following XML attributes are
 // supported:
 // \li command : identifies the method to call on the VTK object e.g.
@@ -226,6 +236,12 @@ protected:
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
+
+
+  // Description:
+  // Called when a producer fires the vtkCommand::UpdateDataEvent. We update all
+  // dependent domains since the data-information may have changed.
+  void OnUpdateDataEvent() { this->UpdateDomains(); }
 
   // Static flag used to know if the locator should be used to create proxy
   // or if the session should be used to find only the existing ones

@@ -74,7 +74,6 @@ protected slots:
   void updateEnableState();
   virtual void editCubeAxes();
   virtual void cubeAxesVisibilityChanged();
-  void sliceDirectionChanged();
   void volumeBlockSelected();
   void setSolidColor(const QColor& color);
   void setBackfaceSolidColor(const QColor& color);

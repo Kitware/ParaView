@@ -15,49 +15,105 @@
 // .NAME vtkSMProperty - superclass for all SM properties
 // .SECTION Description
 // Each instance of vtkSMProperty or a sub-class represents a method 
-// and associated arguments (if any) of a  a vtk object stored on one 
+// and associated arguments (if any) of a VTK object stored on one 
 // or more client manager or server nodes. It may have a state and can push 
-// this state to the vtk object it refers to. vtkSMPropery only supports
+// this state to the vtk object it refers to. vtkSMProperty only supports
 // methods with no arguments. Sub-classes support methods with different
 // arguments types and numbers.
-// A property can also be marked as an "information" property in which case
-// it's values are obtained from the server with the UpdateInformation()
-// call. This call is forwarded to an information helper. The type of
-// the information helper used is specified in the XML file.
-// Each property can have one or more sub-properties. The sub-properties
-// can be accessed using an iterator. It is possible to create composite
-// properties of any depth this way.
-// Each property can have one or more domains. A domain represents a
-// set of acceptable values the property can have. An Attempt to set a
-// value outside the domain will fail. If more than one domain is specified,
-// the actual domain is the intersection of all domains.
-// 
-// A property can be marked "animateable". "animateable" attribute can have 
-// value {0, 1, 2}. 
-// 0 :-- property is not animateable at all. 
-// 1 :-- property is shown as animateable on the key frame animation interface
-//       in the non-advanced mode.
-// 2 :-- property is animateable but only shown in the advanced mode.
-// Properties that are not vector properties or that don't have domain or that 
-// are information_only properties
-// can never be animated irrespective of the "animateable" attribute's value.
-// All vector properties (vtkSMIntVectorProperty, vtkSMDoubleVectorPropery,
-// vtkSMStringVectorProperty, vtkSMIdTypeVectorProperty) by default have
-// have animateable="2".
 //
-// A property can be marked "is_internal". "internal" attribute can have 
-// value {0, 1}.
-// 0 :-- property is not internal.
+// Property is typically meant for pushing its values to athe VTK object.
+// However, a property may be marked as an InformationOnly property
+// in which case its values are obtained from the server with the
+// UpdateInformation() call.
 //
-// 1 :-- property is internal. Hence, it is not saved when saving SM state
-//       or batch script. 
-// An instance of vtkSMProperty is always internal. All other concrete subclasses
-// are by default not internal (i.e. vtkSMProxyProperty and subclasses and
-// vtkSMVectorProperty subclasses).
-// .SECTION See Also
-// vtkSMProxyProperty vtkSMInputProperty vtkSMVectorProperty
-// vtkSMDoubleVectorPropery vtkSMIntVectorPropery vtkSMStringVectorProperty
-// vtkSMDomain vtkSMInformationHelper
+// Each non-information property can have one or more domains. A domain represents a
+// set of acceptable values the property can have. Domains provide applications
+// mechanisms to extract semantic inform a property.
+//
+// A property has two kinds of values: regular (or checked) values and unchecked
+// values. Regular values are the ones that are pushed to the VTK object when
+// the property is updated. These are the ones that get saved in state, etc.
+// Unchecked values are provided so that domains can update their conditions
+// without having the change the property's value e.g. if the domain range for the
+// IsoContour property changes based on the value of the ArrayName property
+// which selects the array to contour with, the can set the unchecked value on
+// the ArrayName property to each of the available arrays to determine what the
+// domain would be without having to modify the property and update its VTK
+// object. If a property has no unchecked-values explicitly set, then the "Get"
+// methods that access the unchecked-values should simply return the checked
+// values. If the checked values are changed, the unchecked values are reset to
+// match the checked values.
+//
+// A property fires the following events:
+//
+// \li \b vtkCommand::ModifiedEvent : fired when property's value(s) is(are)
+//        modified. This must be fired only when values are really changed, not
+//        just the "set" methods are called. This event must be fired no matter
+//        how the property's values are changed.
+//
+// \li \b vtkCommand::UncheckedPropertyModifiedEvent : fired when the property's
+//        unchecked-value(s) is(are) changed. Note that when a property's
+//        checked values change, it's unchecked values are reset to match the
+//        checked values, so technically,
+//        vtkCommand::UncheckedPropertyModifiedEvent must be fired every time
+//        vtkCommand::ModifiedEvent is fired.
+//
+// Properties are typically constructed from ServerManager XML configuration
+// files. Attributes available on a Property XML are as follows:
+//
+// \li \b name: \c string: This is the name for the property. This typically
+//        ends up being the name used by the Proxy to refer to this property. It
+//        must be unique for all properties on a Proxy.
+//
+// \li \b label: \c string:This is the user-friendly label. Ideally, the label
+//        should be same as the name, however traditionally that hasn't been the
+//        case.
+//
+// \li \b command: \c string: This is the name of the method to call on the VTK
+//        update for to property.
+//
+// \li \b repeatable or \b repeat_command: \c{0, 1}: This used to indicate that
+//        the command can be called repeatedly to update the VTK object. e.g.
+//        for multiple inputs, one must call AddInput(..) repeatedly. It also
+//        implies that the number of elements/items in the property can change.
+//
+// \li \b information_only: \c{0, 1}: When set, it implies that this property
+//        is used to obtain values from the VTK object, rather than the default
+//        which is set values on the VTK object.
+//
+// \li \b information_property: \c string: Value is the name of the property on the
+//        proxy to which this property belongs that can is information_only
+//        property corresponding to this. This is useful when the variable that
+//        this property sets can be changed by other means besides this property
+//        e.g. through interaction. Applications can use this information to
+//        update the value of this property to reflect the VTK-side state.
+//
+// \li \b immediate_update: \c{0, 1}: When set, the Proxy will attempt to push
+//        the value for this property to the VTK object as soon as the property
+//        is changed. It is no longer common and should be avoided. It may be
+//        deprecated in near future.
+//
+// \li \b state_ignored: \c{0, 1}: When set, changes to this property are not
+//        captured in undo-redo stacks. Unlike is_internal, the value for this
+//        property is saved in state files.
+//
+// \li \b ignore_synchronization: \c{0, 1}: When set, changes to this property
+//        are not synchronized among client-processes in collaborative mode.
+//
+// \li \b is_internal: \c{0, 1}: When set, the property is treated as internal
+//        which implies that it will not be shown in the UI; it value will not
+//        be pushed when the proxy is created, nor saved in state files or
+//        undo-redo stacks.
+//
+// \li \b animateable: \c{0, 1}: When set, the property is considered as
+//        animatable which the UI can use to build the animation interface.
+//
+// \li \b panel_visibility: \c{default, advanced, never}: Indicates to the UI
+//        that the widget corresponding to this property should be shown in the
+//        default or advanced mode, or never at all.
+//
+// \li \b panel_widget: \c string: provides a hint to the UI to determine which
+//        what widget to create to edit this property.
 
 #ifndef __vtkSMProperty_h
 #define __vtkSMProperty_h
@@ -144,7 +200,11 @@ public:
   // because the domain does not really "depend" on the property.
   // When calling Update() on dependent domains, the property
   // passes itself as the argument.
-  void UpdateDependentDomains();
+  // @deprecated This method is no longer needed. Dependent domains are now
+  // automatically updated when a property fires
+  // vtkCommand::UncheckedPropertyModifiedEvent. The implementation has been
+  // changed to do nothing and the method will be removed in future releases.
+  VTK_LEGACY(void UpdateDependentDomains());
 
   // Description:
   // Is InformationOnly is set to true, this property is used to
@@ -347,6 +407,18 @@ protected:
   // Description:
   // Removes all dependents.
   void RemoveAllDependents();
+
+  // Description:
+  // Calls Update() on all domains contained by the property
+  // as well as all dependant domains. This is autimatically called
+  // after SetUncheckedXXX() to tell all dependant domains to
+  // update themselves according to the new value.
+  // Note that when calling Update() on domains contained by
+  // this property, a NULL is passed as the argument. This is
+  // because the domain does not really "depend" on the property.
+  // When calling Update() on dependent domains, the property
+  // passes itself as the argument.
+  void UpdateDomains();
 
   // Description:
   // Save the property state in XML.

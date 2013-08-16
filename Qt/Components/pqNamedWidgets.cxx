@@ -142,9 +142,6 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
 {
   vtkSMProperty* SMProperty = proxy->GetProperty(property.toAscii().data());
 
-  // update domains that we might ask for
-  SMProperty->UpdateDependentDomains();
-
   pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
 
   if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
@@ -890,9 +887,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy, bo
       }
 
     vtkPVXMLElement *hints = SMProperty->GetHints();
-
-    // update domains we might ask for
-    SMProperty->UpdateDependentDomains();
 
     pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
     QList<QString> domainsTypes = pqSMAdaptor::getDomainTypes(SMProperty);

@@ -842,6 +842,7 @@ void vtkSMSessionProxyManager::UpdateRegisteredProxies(const char* groupname,
           != this->Internals->ModifiedProxies.end())
           {
           it3->GetPointer()->Proxy.GetPointer()->UpdateVTKObjects();
+          it3->GetPointer()->Proxy.GetPointer()->UpdatePipelineInformation();
           }
         }
       }
@@ -876,6 +877,7 @@ void vtkSMSessionProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
           != this->Internals->ModifiedProxies.end())
           {
           it3->GetPointer()->Proxy.GetPointer()->UpdateVTKObjects();
+          it3->GetPointer()->Proxy.GetPointer()->UpdatePipelineInformation();
           }
         }
       }

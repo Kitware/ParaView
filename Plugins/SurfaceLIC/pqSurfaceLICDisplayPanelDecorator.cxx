@@ -88,9 +88,6 @@ pqSurfaceLICDisplayPanelDecorator::pqSurfaceLICDisplayPanelDecorator(
       this->Internals->UseLICForLOD, "checked", SIGNAL(toggled(bool)),
       repr, repr->GetProperty("UseLICForLOD"));
 
-    repr->GetProperty("Input")->UpdateDependentDomains();
-    prop->UpdateDependentDomains();
-
     this->Internals->VTKConnect->Connect(repr->GetProperty("Representation"),
       vtkCommand::ModifiedEvent,
       this, SLOT(representationTypeChanged()));

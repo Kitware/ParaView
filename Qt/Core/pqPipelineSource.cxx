@@ -399,10 +399,6 @@ void pqPipelineSource::setDefaultPropertyValues()
     vtkSMPropertyIterator* diter = dproxy->NewPropertyIterator();
     for (diter->Begin(); !diter->IsAtEnd(); diter->Next())
       {
-      diter->GetProperty()->UpdateDependentDomains();
-      }
-    for (diter->Begin(); !diter->IsAtEnd(); diter->Next())
-      {
       diter->GetProperty()->ResetToDefault();
       }
     diter->Delete();

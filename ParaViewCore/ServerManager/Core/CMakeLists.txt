@@ -73,7 +73,6 @@ set (Module_SRCS
   vtkSMMapProperty.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNumberOfComponentsDomain.cxx
-  vtkSMNumberOfGroupsDomain.cxx
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutputPort.cxx
@@ -81,7 +80,6 @@ set (Module_SRCS
   vtkSMPipelineState.cxx
   vtkSMPluginLoaderProxy.cxx
   vtkSMPluginManager.cxx
-  vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx
   vtkSMPropertyGroup.cxx
   vtkSMPropertyHelper.cxx
@@ -114,7 +112,6 @@ set (Module_SRCS
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringListDomain.cxx
-  vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMUncheckedPropertyHelper.cxx
   vtkSMUndoElement.cxx

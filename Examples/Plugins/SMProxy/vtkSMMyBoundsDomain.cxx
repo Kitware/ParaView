@@ -21,14 +21,7 @@ void vtkSMMyBoundsDomain::PrintSelf(ostream& os, vtkIndent indent)
 
 void vtkSMMyBoundsDomain::Update(vtkSMProperty*)
 {
-  this->RemoveAllMinima();
-  this->RemoveAllMaxima();
-  
-  vtkPVDataInformation* inputInformation = this->InputInformation;
-  if (!this->InputInformation)
-    {
-    inputInformation = this->GetInputInformation();
-    }
+  vtkPVDataInformation* inputInformation = this->GetInputInformation();
   if (!inputInformation)
     {
     return;
@@ -41,14 +34,11 @@ void vtkSMMyBoundsDomain::Update(vtkSMProperty*)
   double avgx = ( bounds[1] + bounds[0] ) / 2.0;
   double avgy = ( bounds[3] + bounds[2] ) / 2.0;
 
-  this->AddMinimum(0, avgx);
-  this->AddMinimum(1, avgy);
-  this->AddMinimum(2, bounds[4]);
-  
-  this->AddMaximum(0, avgx);
-  this->AddMaximum(1, avgy);
-  this->AddMaximum(2, bounds[5]);
-  
-  this->InvokeModified();
+  std::vector<vtkEntry> entries;
+  entries.push_back(vtkEntry(avgx, avgx));
+  entries.push_back(vtkEntry(avgy, avgy));
+  entries.push_back(vtkEntry(bounds[4], bounds[5]));
+
+  this->SetEntries(entries);
 }
 

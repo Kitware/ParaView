@@ -480,17 +480,6 @@
                             default_values="0.0"
                             name="Offset"
                             number_of_elements="1">
-        <BoundsDomain mode="oriented_magnitude"
-                      name="range">
-          <RequiredProperties>
-            <Property function="Origin"
-                      name="Origin" />
-            <Property function="Normal"
-                      name="Normal" />
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </BoundsDomain>
       </DoubleVectorProperty>
       <Hints>
         <!-- Hints are metadata associated with the proxy.

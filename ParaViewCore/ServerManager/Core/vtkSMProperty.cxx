@@ -25,6 +25,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkCommand.h"
 
 #include <vector>
 #include <vtksys/ios/sstream>
@@ -68,6 +69,11 @@ vtkSMProperty::vtkSMProperty()
   this->SetPanelVisibility("default");
 
   this->Proxy = 0;
+
+  // Whenever the property fires UncheckedPropertyModifiedEvent, we update any
+  // dependent domains.
+  this->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent,
+    this, &vtkSMProperty::UpdateDomains);
 }
 
 //---------------------------------------------------------------------------
@@ -209,15 +215,23 @@ void vtkSMProperty::RemoveAllDependents()
 }
 
 //---------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void vtkSMProperty::UpdateDependentDomains()
 {
-  // Update own domains
-  this->DomainIterator->Begin();
-  while(!this->DomainIterator->IsAtEnd())
-    {
-    this->DomainIterator->GetDomain()->Update(0);
-    this->DomainIterator->Next();
-    }
+}
+#endif
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::UpdateDomains()
+{
+  // I genuinely doubt when a property changes, its domain should change!!
+  //// Update own domains
+  //this->DomainIterator->Begin();
+  //while(!this->DomainIterator->IsAtEnd())
+  //  {
+  //  this->DomainIterator->GetDomain()->Update(0);
+  //  this->DomainIterator->Next();
+  //  }
 
   // Update other dependent domains
   vtkSMPropertyInternals::DependentsVector::iterator iter =

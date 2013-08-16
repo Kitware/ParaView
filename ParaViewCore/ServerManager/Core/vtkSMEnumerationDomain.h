@@ -21,8 +21,6 @@
 // * <Entry text="" value=""/> where text is the descriptive
 // string and value is the integer value.
 // @endverbatim
-// .SECTION See Also
-// vtkSMDomain 
 
 #ifndef __vtkSMEnumerationDomain_h
 #define __vtkSMEnumerationDomain_h

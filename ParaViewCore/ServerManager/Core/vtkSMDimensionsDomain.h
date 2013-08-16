@@ -21,7 +21,11 @@
 // direction (VTK_XY_PLANE, VTK_YZ_PLANE or VTK_XZ_PLANE). If "Direction" is not
 // provided then the property must be a 3 element property while when Direction
 // is provided the property must be a 1 element property.
-
+//
+// Supported Required-Property functions:
+// \li \c Input : points to a property that provides the data producer.
+// \li \c Direction: points to a property that provides the value for the
+//                   selected direction.
 
 #ifndef __vtkSMDimensionsDomain_h
 #define __vtkSMDimensionsDomain_h

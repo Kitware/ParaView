@@ -53,8 +53,10 @@ void vtkSMCustomBoundsDomain::UpdateFromInformation(vtkPVDataInformation* info)
     {
     nn = 1.0;
     }
-  this->AddMinimum(0, 0);
-  this->AddMaximum(0, diag / nn / 2.0);
+
+  std::vector<vtkEntry> entries;
+  entries.push_back(vtkEntry(0, diag / nn / 2.0));
+  this->SetEntries(entries);
 }
 
 //----------------------------------------------------------------------------

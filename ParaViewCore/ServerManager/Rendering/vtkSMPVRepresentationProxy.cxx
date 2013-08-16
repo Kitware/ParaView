@@ -64,7 +64,6 @@ void vtkSMPVRepresentationProxy::CreateVTKObjects()
   // for "Representations" property before CreateVTKObjects() is finished. This
   // ensure that all representations have valid Representations domain.
   this->UpdatePropertyInformation();
-  this->GetProperty("RepresentationTypesInfo")->UpdateDependentDomains();
 
   // Whenever the "Representation" property is modified, we ensure that the
   // this->InvalidateDataInformation() is called.
@@ -131,7 +130,6 @@ void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int f
         {
         subProxy->GetProperty("Input")->Copy(this->GetProperty("Input"));
         subProxy->UpdateProperty("Input");
-        subProxy->GetProperty("Input")->UpdateDependentDomains();
         }
       }
     }

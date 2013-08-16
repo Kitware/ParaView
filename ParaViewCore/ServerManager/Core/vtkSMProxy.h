@@ -143,14 +143,6 @@ class vtkSMProxyObserver;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxy : public vtkSMRemoteObject
 {
 public:
-  // ----------- DEPRECATED API --------------
-  VTK_LEGACY(void SetServers(vtkTypeUInt32));
-  VTK_LEGACY(vtkTypeUInt32 GetServers());
-  VTK_LEGACY(vtkTypeUInt32 GetConnectionID());
-  VTK_LEGACY(void SetConnectionID(vtkTypeUInt32));
-  // ----------- DEPRECATED API --------------
-
-public:
   static vtkSMProxy* New();
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -302,9 +294,7 @@ public:
 
   // Description:
   // Updates all property informations by calling UpdateInformation()
-  // and populating the values. It also calls UpdateDependentDomains()
-  // on all properties to make sure that domains that depend on the
-  // information are updated.
+  // and populating the values.
   virtual void UpdatePropertyInformation();
 
   // Description:

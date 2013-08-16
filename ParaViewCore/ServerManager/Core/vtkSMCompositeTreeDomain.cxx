@@ -65,7 +65,7 @@ void vtkSMCompositeTreeDomain::InvokeModifiedIfChanged()
     {
     this->LastInformation = this->Information;
     this->UpdateTime.Modified();
-    this->InvokeModified();
+    this->DomainModified();
     }
 }
 

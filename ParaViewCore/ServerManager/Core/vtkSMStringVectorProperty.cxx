@@ -311,6 +311,7 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
         pos2 = initVal.find(delimiter, pos1);
         vtkStdString v = pos1 == pos2 ? "" : initVal.substr(pos1, pos2-pos1);
         this->Internals->DefaultValues.push_back(v);
+        this->Internals->DefaultsValid = true;
         this->SetElement(i, v.c_str());
         pos1 = pos2;
         }
@@ -319,6 +320,7 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       {
       this->SetElement(0, tmp);
       this->Internals->DefaultValues.push_back(tmp);
+      this->Internals->DefaultsValid = true;
       }
     }
   return 1;
@@ -360,15 +362,28 @@ void vtkSMStringVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << endl;
 }
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::LoadState(
+  vtkPVXMLElement* element, vtkSMProxyLocator* loader)
+{
+  int prevImUpdate = this->ImmediateUpdate;
+
+  // Wait until all values are set before update (if ImmediateUpdate)
+  this->ImmediateUpdate = 0;
+  int retVal = this->Superclass::LoadState(element, loader);
+  if (retVal != 0)
+    {
+    retVal = this->Internals->LoadStateValues(element) ? 1 : 0;
+    }
+  this->ImmediateUpdate = prevImUpdate;
+  return retVal;
+}
+
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SaveStateValues(vtkPVXMLElement* propElement)
 {
   this->Internals->SaveStateValues(propElement);
-}
-//---------------------------------------------------------------------------
-int vtkSMStringVectorProperty::SetElementAsString(int idx, const char* value)
-{
-  return this->SetElement(idx, value);
 }
 
 //---------------------------------------------------------------------------

@@ -41,7 +41,7 @@ vtkSMDomain::vtkSMDomain()
 {
   this->XMLName = 0;
   this->Internals = new vtkSMDomainInternals;
-  this->IsOptional = 0;
+  this->IsOptional = false;
 }
 
 //---------------------------------------------------------------------------
@@ -89,7 +89,7 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
   int retVal = element->GetScalarAttribute("optional", &isOptional);
   if(retVal) 
     { 
-    this->SetIsOptional(isOptional); 
+    this->SetIsOptional(isOptional!=0); 
     }
 
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
@@ -162,7 +162,7 @@ unsigned int vtkSMDomain::GetNumberOfRequiredProperties()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDomain::InvokeModified()
+void vtkSMDomain::DomainModified()
 {
   this->InvokeEvent(vtkCommand::DomainModifiedEvent, 0);
 }

@@ -14,18 +14,13 @@
 =========================================================================*/
 #include "vtkSMArrayRangeDomain.h"
 
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMInputArrayDomain.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMStringVectorProperty.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
 
@@ -42,273 +37,138 @@ vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain()
 //---------------------------------------------------------------------------
 void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
 {
-  this->RemoveAllMinima();
-  this->RemoveAllMaxima();
+  // Find the array whose range we are interested in and then find the producer
+  // who is producing the data with the array of interest.
 
-  vtkSMProxyProperty* ip = 0;
-  vtkSMStringVectorProperty* array = 0;
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetRequiredProperty("Input"));
-  if (pp)
-    {
-    ip = pp;
-    }
-
-  // Get the array name for the array selection
-  vtkSMStringVectorProperty* sp = vtkSMStringVectorProperty::SafeDownCast(
-    this->GetRequiredProperty("ArraySelection"));
-  if (sp)
-    {
-    array = sp;
-    }
-
-  if (!ip || !array)
+  vtkSMProperty* propForInput = this->GetRequiredProperty("Input");
+  vtkSMProperty* propForArraySelection =
+    this->GetRequiredProperty("ArraySelection");
+  if (!propForInput || !propForArraySelection)
     {
     return;
     }
 
-  if (array->GetNumberOfUncheckedElements() < 5)
+  vtkSMUncheckedPropertyHelper inputHelper(propForInput);
+  vtkSMUncheckedPropertyHelper arraySelectionHelper(propForArraySelection);
+  if (arraySelectionHelper.GetNumberOfElements() < 5)
     {
     return;
     }
-  const char* arrayName = array->GetUncheckedElement(4);
-  if (!arrayName || arrayName[0] == '\0')
-    {
-    if (array->GetNumberOfElements() < 5)
-      {
-      return;
-      }
-    arrayName = array->GetElement(4);
-    }
 
+  const char* arrayName = arraySelectionHelper.GetAsString(4);
   if (!arrayName || arrayName[0] == '\0')
     {
     return;
     }
-
-  vtkSMInputProperty* inputProp = vtkSMInputProperty::SafeDownCast(ip);
-  unsigned int i;
-  unsigned int numProxs = ip->GetNumberOfUncheckedProxies();
-  for (i=0; i<numProxs; i++)
+  if (vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()) != NULL)
     {
-    // Use the first input
-    vtkSMSourceProxy* source =
-      vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
-    if (source)
-      {
-      this->Update(arrayName, ip, source,
-        (inputProp? inputProp->GetUncheckedOutputPortForConnection(i): 0));
-      this->InvokeModified();
-      return;
-      }
+    this->Update(arrayName, arraySelectionHelper.GetAsInt(3),
+      vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()),
+      inputHelper.GetOutputPort());
     }
-
-  // In case there is no valid unchecked proxy, use the actual
-  // proxy values
-  numProxs = ip->GetNumberOfProxies();
-  for (i=0; i<numProxs; i++)
-    {
-    vtkSMSourceProxy* source =
-      vtkSMSourceProxy::SafeDownCast(ip->GetProxy(i));
-    if (source)
-      {
-      this->Update(arrayName, ip, source,
-        (inputProp? inputProp->GetOutputPortForConnection(i): 0));
-      this->InvokeModified();
-      return;
-      }
-    }
-
-
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::Update(const char* arrayName,
-                                   vtkSMProxyProperty* ip,
-                                   vtkSMSourceProxy* sp,
-                                   int outputport)
+void vtkSMArrayRangeDomain::Update(
+  const char* arrayName, int fieldAssociation,
+  vtkSMSourceProxy* producer, int producerPort)
 {
-  vtkSMDomainIterator* di = ip->NewDomainIterator();
-  di->Begin();
-  while (!di->IsAtEnd())
-    {
-    // We have to figure out whether we are working with cell data,
-    // point data or both.
-    vtkSMInputArrayDomain* iad = vtkSMInputArrayDomain::SafeDownCast(
-      di->GetDomain());
-    if (iad)
-      {
-      this->Update(arrayName, sp, iad, outputport);
-      break;
-      }
-    di->Next();
-    }
-  di->Delete();
-}
+  assert(producer != NULL && arrayName != NULL);
 
-//---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::Update(const char* arrayName,
-                                   vtkSMSourceProxy* sp,
-                                   vtkSMInputArrayDomain* iad,
-                                   int outputport)
-{
   // Make sure the outputs are created.
-  sp->CreateOutputPorts();
-  vtkPVDataInformation* info = sp->GetDataInformation(outputport);
+  producer->CreateOutputPorts();
 
+  vtkPVDataInformation* info = producer->GetDataInformation(producerPort);
   if (!info)
     {
     return;
     }
 
-  bool valid = true;
-  if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ANY )
+  vtkPVArrayInformation* arrayInfo = info->GetArrayInformation(
+    arrayName, fieldAssociation);
+ 
+  int component_number = VTK_INT_MAX;
+  if (arrayInfo == NULL && 
+    (fieldAssociation == vtkDataObject::POINT ||
+     fieldAssociation == vtkDataObject::CELL))
     {
-    this->SetArrayRange(info->GetPointDataInformation(), arrayName);
-    this->SetArrayRange(info->GetCellDataInformation(), arrayName);
-    this->SetArrayRange(info->GetVertexDataInformation(), arrayName);
-    this->SetArrayRange(info->GetEdgeDataInformation(), arrayName);
-    this->SetArrayRange(info->GetRowDataInformation(), arrayName);
-    }
-  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::POINT )
-    {
-    valid = this->SetArrayRange(info->GetPointDataInformation(), arrayName);
-    if (!valid)
+    // it's possible that the array name was mangled due to "auto-conversion" of
+    // field arrays.
+
+    // first try to see if there's a component suffix added and hence we failed
+    // to locate the array information.
+    std::string name = vtkSMArrayListDomain::ArrayNameFromMangledName(arrayName);
+    arrayInfo = name.length() > 0?
+                info->GetArrayInformation(name.c_str(), fieldAssociation) :
+                NULL;
+    if (!arrayInfo)
       {
-      this->SetArrayRangeForAutoConvertProperty(
-        info->GetCellDataInformation(),arrayName);
+      // try the other field association.
+      int otherField = fieldAssociation == vtkDataObject::POINT?
+        vtkDataObject::CELL : vtkDataObject::POINT;
+
+      arrayInfo = info->GetArrayInformation(arrayName, otherField);
+      arrayInfo = arrayInfo? arrayInfo : 
+        info->GetArrayInformation(name.c_str(), otherField);
+      }
+
+    // Now, extract component information. If name == arrayName, it means we
+    // don't have any component information in the array name itself.
+    if (arrayInfo && (name != arrayName))
+      {
+      int mangledCompNo = vtkSMArrayListDomain::ComponentIndexFromMangledName(
+        arrayInfo, arrayName);
+      // ComponentIndexFromMangledName returns -1 on error and num_of_component
+      // for magnitude. Which is not what vtkPVArrayInformation expects, to
+      // convert that.
+      if (mangledCompNo == -1)
+        {
+        return;
+        }
+      if (mangledCompNo >= arrayInfo->GetNumberOfComponents())
+        {
+        component_number = -1;
+        }
+      else
+        {
+        component_number = mangledCompNo;
+        }
       }
     }
-  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::CELL )
-    {
-    valid = this->SetArrayRange(info->GetCellDataInformation(), arrayName);
-    if (!valid)
-      {
-      this->SetArrayRangeForAutoConvertProperty(
-        info->GetPointDataInformation(),arrayName);
-      }
-    }
-  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::VERTEX)
-    {
-    this->SetArrayRange(info->GetVertexDataInformation(), arrayName);
-    }
-  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::EDGE )
-    {
-    this->SetArrayRange(info->GetEdgeDataInformation(), arrayName);
-    }
-  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ROW)
-    {
-    this->SetArrayRange(info->GetRowDataInformation(), arrayName);
-    }
-}
 
-//---------------------------------------------------------------------------
-bool vtkSMArrayRangeDomain::SetArrayRange(
-  vtkPVDataSetAttributesInformation* info, const char* arrayName)
-{
-  vtkPVArrayInformation* ai = info->GetArrayInformation(arrayName);
-  if (!ai)
-    {    
-    return false;
+  if (!arrayInfo)
+    {
+    return;
     }
 
-  int numArrComp = ai->GetNumberOfComponents();
-
-  // This creates numMinMax entries but leaves them unset (no min or max)
-  this->SetNumberOfEntries(numArrComp);
-
-  for (int i=0; i<numArrComp; i++)
+  if (component_number < arrayInfo->GetNumberOfComponents())
     {
-    this->AddMinimum(i, ai->GetComponentRange(i)[0]);
-    this->AddMaximum(i, ai->GetComponentRange(i)[1]);
-    }
-  if (numArrComp > 1) // vector magnitude range
-    {
-    this->AddMinimum(numArrComp, ai->GetComponentRange(-1)[0]);
-    this->AddMaximum(numArrComp, ai->GetComponentRange(-1)[1]);
-    }
-  return true;
-}
-
-//---------------------------------------------------------------------------
-bool vtkSMArrayRangeDomain::SetArrayRangeForAutoConvertProperty(
-  vtkPVDataSetAttributesInformation* info, const char* arrayName)
-{
-  vtkStdString name =
-      vtkSMArrayListDomain::ArrayNameFromMangledName(arrayName);
-  if ( name.length() == 0 )
-    {
-    //failed to extract the name from the mangled name
-    return false;
-    }
-  if ( name == vtkStdString(arrayName) )
-    {
-    return this->SetArrayRange(info,arrayName);
-    }
-
-  vtkPVArrayInformation* ai = info->GetArrayInformation(name.c_str());
-  if (!ai)
-    {
-    return false;
-    }
-  int numArrComp = ai->GetNumberOfComponents();
-  int comp =
-    vtkSMArrayListDomain::ComponentIndexFromMangledName(ai,arrayName);
-  if ( comp == -1 )
-    {
-    return false;
-    }
-
-  // This creates numMinMax entries but leaves them unset (no min or max)
-  this->SetNumberOfEntries(1);
-
-  if ( comp != numArrComp)
-    {
-    this->AddMinimum(0, ai->GetComponentRange(comp)[0]);
-    this->AddMaximum(0, ai->GetComponentRange(comp)[1]);
+    // a particular component was chosen, add ranges for that.
+    std::vector<vtkEntry> values(1);
+    values[0].Valid[0] = values[0].Valid[1] = true;
+    values[0].Value  = vtkTuple<double, 2>(
+      arrayInfo->GetComponentRange(component_number));
+    this->SetEntries(values);
     }
   else
     {
-    // vector magnitude range
-    this->AddMinimum(0, ai->GetComponentRange(-1)[0]);
-    this->AddMaximum(0, ai->GetComponentRange(-1)[1]);
-    }
-
-  return true;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMArrayRangeDomain::SetDefaultValues(vtkSMProperty* prop)
-{
-  vtkSMDoubleVectorProperty* dvp =
-    vtkSMDoubleVectorProperty::SafeDownCast(prop);
-  if (!dvp)
-    {
-    vtkErrorMacro(
-      "vtkSMArrayRangeDomain only works with vtkSMDoubleVectorProperty.");
-    return 0;
-    }
-  if (this->GetMinimumExists(0) && this->GetMaximumExists(0))
-    {
-    if (dvp->GetRepeatCommand())
+    std::vector<vtkEntry> values(arrayInfo->GetNumberOfComponents());
+    for (int cc=0; cc <arrayInfo->GetNumberOfComponents(); cc++)
       {
-      // This is the case when this domain is added to properties
-      // like "ContourValues".
-      dvp->SetNumberOfElements(1);
-      double value = (this->GetMinimum(0)+this->GetMaximum(0))/2.0;
-      dvp->SetElement(0, value);
-      return 1;
+      values[cc].Valid[0] = values[cc].Valid[1] = true;
+      values[cc].Value = vtkTuple<double, 2>(
+        arrayInfo->GetComponentRange(cc));
       }
-    else if(dvp->GetNumberOfElements() == 2)
+    if (arrayInfo->GetNumberOfComponents() > 1)
       {
-      // min,max case
-      dvp->SetElements2(this->GetMinimum(0), this->GetMaximum(0));
-      return 1;
+      // add vector magnitude.
+      vtkEntry entry;
+      entry.Valid[0] = entry.Valid[1] = true;
+      entry.Value = vtkTuple<double, 2>(arrayInfo->GetComponentRange(-1));
+      values.push_back(entry);
       }
+    this->SetEntries(values);
     }
-
-  return this->Superclass::SetDefaultValues(prop);
 }
 
 //---------------------------------------------------------------------------

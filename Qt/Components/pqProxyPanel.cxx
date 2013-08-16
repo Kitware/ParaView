@@ -254,11 +254,6 @@ void pqProxyPanel::updateInformationAndDomains()
       {
       this->Implementation->Proxy->UpdatePropertyInformation();
       }
-    vtkSMProperty* inputProp = this->Implementation->Proxy->GetProperty("Input");
-    if (inputProp)
-      {
-      inputProp->UpdateDependentDomains();
-      }
     this->Implementation->InformationObsolete = false;
     }
 }

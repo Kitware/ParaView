@@ -154,11 +154,12 @@ protected:
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
 
+  // Description:
+  // Load the XML state.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
+
   // Save concrete property values into the XML state property declaration
   virtual void SaveStateValues(vtkPVXMLElement* propElement);
-
-  // Used in the LoadState method of VectorProperty
-  virtual int SetElementAsString(int idx, const char* value);
 
 private:
   vtkSMIdTypeVectorProperty(const vtkSMIdTypeVectorProperty&); // Not implemented

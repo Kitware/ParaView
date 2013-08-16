@@ -16,6 +16,7 @@
 
 #include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -27,6 +28,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkStringList.h"
 
 #include <map>
 #include <vector>
@@ -643,10 +645,11 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
     return 0;
     }
 
-  const char* array = 0;
+  std::string array;
   if (this->GetNumberOfStrings() > 0)
     {
-    array = this->GetString(this->DefaultElement);
+    array = this->GetString(this->DefaultElement)?
+      this->GetString(this->DefaultElement): "";
     const char* defaultValue = svp->GetDefaultValue(0);
     unsigned int temp;
     if (defaultValue && this->IsInDomain(defaultValue, temp))
@@ -657,18 +660,23 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
 
     if (svp->GetNumberOfElements() == 5)
       {
+
+      vtkNew<vtkStringList> values;
+      svp->GetElements(values.GetPointer());
+
       vtksys_ios::ostringstream ass;
       ass << this->Association;
-      svp->SetElement(3, ass.str().c_str());
-      if (array)
+      values->SetString(3, ass.str().c_str());
+      if (array.size() > 0)
         {
-        svp->SetElement(4, array);
+        values->SetString(4, array.c_str());
+        svp->SetElements(values.GetPointer());
         return 1;
         }
       }
-    else if (svp->GetNumberOfElements() == 1 && array)
+    else if (svp->GetNumberOfElements() == 1 && array.size() > 0)
       {
-      svp->SetElement(0, array);
+      svp->SetElement(0, array.c_str());
       return 1;
       }
 

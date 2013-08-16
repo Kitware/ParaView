@@ -32,9 +32,7 @@ public:
 
   // Description:
   // Updates all property informations by calling UpdateInformation()
-  // and populating the values. It also calls UpdateDependentDomains()
-  // on all properties to make sure that domains that depend on the
-  // information are updated.
+  // and populating the values.
   virtual void UpdatePropertyInformation();
   virtual void UpdatePropertyInformation(vtkSMProperty* prop)
     { this->Superclass::UpdatePropertyInformation(prop); }

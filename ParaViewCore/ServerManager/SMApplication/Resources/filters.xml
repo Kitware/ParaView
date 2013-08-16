@@ -6713,7 +6713,8 @@ found and the point will be rejected.</Documentation>
                             label="Maximum Streamline Length"
                             name="MaximumPropagation"
                             number_of_elements="1">
-        <BoundsDomain mode="scaled_extent"
+        <BoundsDomain default_mode="max"
+                      mode="scaled_extent"
                       name="bounds"
                       scale_factor="1.0">
           <RequiredProperties>

@@ -27,10 +27,7 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDoubleRangeDomain.h"
 
-class vtkSMProxyProperty;
 class vtkSMSourceProxy;
-class vtkSMInputArrayDomain;
-class vtkPVDataSetAttributesInformation;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArrayRangeDomain : public vtkSMDoubleRangeDomain
 {
@@ -46,33 +43,15 @@ public:
   // only the first component of the array.
   virtual void Update(vtkSMProperty* prop);
 
-  // Description:
-  // A vtkSMProperty is often defined with a default value in the
-  // XML itself. However, many times, the default value must be determined
-  // at run time. To facilitate this, domains can override this method
-  // to compute and set the default value for the property.
-  // Note that unlike the compile-time default values, the
-  // application must explicitly call this method to initialize the
-  // property.
-  virtual int SetDefaultValues(vtkSMProperty*);
 protected:
   vtkSMArrayRangeDomain();
   ~vtkSMArrayRangeDomain();
 
+  void Update(
+    const char* arrayName, int fieldAssociation,
+    vtkSMSourceProxy* producer, int producerPort);
+
 private:
-  void Update(const char* arrayName,
-              vtkSMProxyProperty* ip,
-              vtkSMSourceProxy* sp,
-              int outputport);
-  void Update(const char* arrayName,
-              vtkSMSourceProxy* sp,
-              vtkSMInputArrayDomain* iad,
-              int outputport);
-  bool SetArrayRange(vtkPVDataSetAttributesInformation* info,
-                     const char* arrayName);
-  bool SetArrayRangeForAutoConvertProperty(
-          vtkPVDataSetAttributesInformation* info,
-          const char* arrayName);
 
   vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&); // Not implemented
   void operator=(const vtkSMArrayRangeDomain&); // Not implemented

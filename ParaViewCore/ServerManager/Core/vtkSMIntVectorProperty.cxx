@@ -293,15 +293,28 @@ void vtkSMIntVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << endl;
 }
+
+//---------------------------------------------------------------------------
+int vtkSMIntVectorProperty::LoadState(
+  vtkPVXMLElement* element, vtkSMProxyLocator* loader)
+{
+  int prevImUpdate = this->ImmediateUpdate;
+
+  // Wait until all values are set before update (if ImmediateUpdate)
+  this->ImmediateUpdate = 0;
+  int retVal = this->Superclass::LoadState(element, loader);
+  if (retVal != 0)
+    {
+    retVal = this->Internals->LoadStateValues(element) ? 1 : 0;
+    }
+  this->ImmediateUpdate = prevImUpdate;
+  return retVal;
+}
+
 //---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::SaveStateValues(vtkPVXMLElement* propElement)
 {
   this->Internals->SaveStateValues(propElement);
-}
-//---------------------------------------------------------------------------
-int vtkSMIntVectorProperty::SetElementAsString(int idx, const char* value)
-{
-  return this->Internals->SetElementAsString(idx, value);
 }
 
 //---------------------------------------------------------------------------

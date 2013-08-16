@@ -629,8 +629,9 @@
                          command="SetTimeStep"
                          default_values="0"
                          name="TimeStep"
-                         number_of_elements="1">
-        <IntRangeDomain name="range">
+                         number_of_elements="1" >
+        <IntRangeDomain name="range"
+                        default_mode="min" >
           <RequiredProperties>
             <Property function="Range"
                       name="TimeStepRangeInfo" />

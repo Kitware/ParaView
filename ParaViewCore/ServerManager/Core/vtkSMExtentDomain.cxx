@@ -35,15 +35,11 @@ vtkSMExtentDomain::~vtkSMExtentDomain()
 //---------------------------------------------------------------------------
 void vtkSMExtentDomain::Update(vtkSMProperty*)
 {
-  this->RemoveAllMinima();
-  this->RemoveAllMaxima();
-  
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
     this->GetRequiredProperty("Input"));
   if (pp)
     {
     this->Update(pp);
-    this->InvokeModified();
     }
 }
 
@@ -52,9 +48,8 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
 {
   vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
 
-  unsigned int i, j;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
-  for (i = 0; i < numProxs; i++)
+  for (unsigned int i = 0; i < numProxs; i++)
     {
     vtkSMSourceProxy* sp =
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
@@ -68,37 +63,13 @@ void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
         }
       int extent[6];
       info->GetExtent(extent);
-      for (j = 0; j < 3; j++)
-        {
-        this->AddMinimum(j, extent[2*j]);
-        this->AddMaximum(j, extent[2*j+1]);
-        }
-      return;
-      }
-    }
 
-  // In case there is no valid unchecked proxy, use the actual
-  // proxy values
-  numProxs = pp->GetNumberOfProxies();
-  for (i=0; i<numProxs; i++)
-    {
-    vtkSMSourceProxy* sp = 
-      vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
-    if (sp)
-      {
-      vtkPVDataInformation *info = sp->GetDataInformation(
-        (ip? ip->GetOutputPortForConnection(i):0));
-      if (!info)
+      std::vector<vtkEntry> entries;
+      for (int j = 0; j < 3; j++)
         {
-        continue;
+        entries.push_back(vtkEntry(extent[2*j], extent[2*j+1]));
         }
-      int extent[6];
-      info->GetExtent(extent);
-      for (j = 0; j < 3; j++)
-        {
-        this->AddMinimum(j, extent[2*j]);
-        this->AddMaximum(j, extent[2*j+1]);
-        }
+      this->SetEntries(entries);
       return;
       }
     }

@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QWidget;
 class vtkSMProperty;
 class vtkSMProxy;
-class vtkSMArrayListDomain;
+class vtkSMDomain;
 
 /// pqArrayListDomain is used to connect a widget showing a selection of arrays
 /// with its vtkSMArrayListDomain. Whenever the vtkSMArrayListDomain changes,
@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqArrayListDomain : public QObject
 public:
   pqArrayListDomain(
     QWidget* selectorWidget, const QString& qproperty,
-    vtkSMProxy* proxy, vtkSMProperty* smproperty, vtkSMArrayListDomain* domain);
+    vtkSMProxy* proxy, vtkSMProperty* smproperty, vtkSMDomain* domain);
   virtual ~pqArrayListDomain();
 
 private slots:

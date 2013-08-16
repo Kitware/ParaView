@@ -175,8 +175,6 @@ void pqDataRepresentation::setDefaultPropertyValues()
   // vtkSMRenderViewProxy::CreateDefaultRepresentation etc.
   vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());
-  proxy->GetProperty("Input")->UpdateDependentDomains();
-
   this->Superclass::setDefaultPropertyValues();
 }
 

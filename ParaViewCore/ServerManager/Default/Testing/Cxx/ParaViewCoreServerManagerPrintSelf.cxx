@@ -72,7 +72,6 @@
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMNullProxy.h"
 #include "vtkSMNumberOfComponentsDomain.h"
-#include "vtkSMNumberOfGroupsDomain.h"
 #include "vtkSMObject.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMOutputPort.h"
@@ -81,7 +80,6 @@
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMProperty.h"
-#include "vtkSMPropertyAdaptor.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
@@ -120,7 +118,6 @@
 #include "vtkSMStateVersionController.h"
 #include "vtkSMStateVersionControllerBase.h"
 #include "vtkSMStringListDomain.h"
-#include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTesting.h"
 #include "vtkSMTextWidgetRepresentationProxy.h"
@@ -203,7 +200,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMNewWidgetRepresentationProxy);
   PRINT_SELF(vtkSMNullProxy);
   PRINT_SELF(vtkSMNumberOfComponentsDomain);
-  PRINT_SELF(vtkSMNumberOfGroupsDomain);
   PRINT_SELF(vtkSMObject);
   PRINT_SELF(vtkSMOrderedPropertyIterator);
   PRINT_SELF(vtkSMOutputPort);
@@ -212,7 +208,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMPluginLoaderProxy);
   PRINT_SELF(vtkSMPluginManager);
   PRINT_SELF(vtkSMProperty);
-  PRINT_SELF(vtkSMPropertyAdaptor);
   //PRINT_SELF(vtkSMPropertyHelper);
   PRINT_SELF(vtkSMPropertyIterator);
   PRINT_SELF(vtkSMPropertyLink);
@@ -251,7 +246,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMStateVersionController);
   PRINT_SELF(vtkSMStateVersionControllerBase);
   PRINT_SELF(vtkSMStringListDomain);
-  PRINT_SELF(vtkSMStringListRangeDomain);
   PRINT_SELF(vtkSMStringVectorProperty);
   PRINT_SELF(vtkSMTesting);
   PRINT_SELF(vtkSMTextWidgetRepresentationProxy);
