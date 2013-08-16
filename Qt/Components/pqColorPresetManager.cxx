@@ -160,8 +160,8 @@ pqColorPresetManager::pqColorPresetManager(
   this->updateButtons();
 
   this->connect(this->getSelectionModel(),
-    SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
-    this, SLOT(currentChanged(const QModelIndex&)));
+    SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection&)),
+    this, SLOT(selectionChanged()));
 }
 
 pqColorPresetManager::~pqColorPresetManager()
@@ -169,13 +169,18 @@ pqColorPresetManager::~pqColorPresetManager()
   delete this->Form;
 }
 
-void pqColorPresetManager::currentChanged(const QModelIndex &current)
+void pqColorPresetManager::selectionChanged()
 {
-  const pqColorMapModel *colorMap = this->getModel()->getColorMap(
-    current.row());
-  if (colorMap)
+  QModelIndexList items = this->getSelectionModel()->selectedRows();
+
+  if (items.size() > 0)
     {
-    emit this->currentChanged(colorMap);
+    const pqColorMapModel *colorMap =
+      this->getModel()->getColorMap(items[0].row());
+    if (colorMap)
+      {
+      emit this->currentChanged(colorMap);
+      }
     }
 }
 
@@ -271,9 +276,8 @@ void pqColorPresetManager::restoreSettings()
   settings->endGroup();
   this->Model->setModified(false);
 
-  // select the 1st item.
-  this->getSelectionModel()->setCurrentIndex(this->Model->index(0, 0),
-    QItemSelectionModel::ClearAndSelect);
+  // clear the selection.
+  this->getSelectionModel()->clear();
 }
 
 bool pqColorPresetManager::eventFilter(QObject *object, QEvent *e)
