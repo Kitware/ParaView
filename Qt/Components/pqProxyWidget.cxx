@@ -76,6 +76,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QPointer>
 #include <QShowEvent>
+
+//-----------------------------------------------------------------------------------
 namespace
 {
   QFrame* newHLine(QWidget* parent)
@@ -96,24 +98,6 @@ namespace
       pqPropertiesPanel::suggestedVerticalSpacing());
     vbox->setSpacing(0);
     vbox->addWidget(newHLine(widget));
-    return widget;
-    }
-
-  QWidget* newGroupLabel(const QString& labelText, QWidget* parent)
-    {
-    QWidget* widget = new QWidget(parent);
-
-    QVBoxLayout* hbox = new QVBoxLayout(widget);
-    hbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
-    hbox->setSpacing(0);
-
-    QLabel* label = new QLabel(
-      QString("<html><b>%1</b></html>").arg(labelText), widget);
-    label->setWordWrap(true);
-    label->setAlignment(Qt::AlignBottom|Qt::AlignLeft);
-    hbox->addWidget(label);
-
-    hbox->addWidget(newHLine(parent));
     return widget;
     }
 
@@ -214,7 +198,8 @@ namespace
       item->Group = true;
       if (!label.isEmpty() && widget->showLabel())
         {
-        item->GroupHeader = newGroupLabel(label, widget->parentWidget());
+        item->GroupHeader = pqProxyWidget::newGroupLabelWidget(
+          label, widget->parentWidget());
         item->GroupFooter = newGroupSeparator(widget->parentWidget());
         }
       item->hide();
@@ -233,7 +218,8 @@ namespace
 
       if (!group_label.isEmpty())
         {
-        item->GroupHeader = newGroupLabel(group_label, widget->parentWidget());
+        item->GroupHeader = pqProxyWidget::newGroupLabelWidget(
+          group_label, widget->parentWidget());
         item->GroupFooter = newGroupSeparator(widget->parentWidget());
         }
       item->hide();
@@ -464,6 +450,25 @@ namespace
       }
     return NULL;
     }
+}
+
+//-----------------------------------------------------------------------------------
+QWidget* pqProxyWidget::newGroupLabelWidget(const QString& labelText, QWidget* parent)
+{
+  QWidget* widget = new QWidget(parent);
+
+  QVBoxLayout* hbox = new QVBoxLayout(widget);
+  hbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
+  hbox->setSpacing(0);
+
+  QLabel* label = new QLabel(
+    QString("<html><b>%1</b></html>").arg(labelText), widget);
+  label->setWordWrap(true);
+  label->setAlignment(Qt::AlignBottom|Qt::AlignLeft);
+  hbox->addWidget(label);
+
+  hbox->addWidget(newHLine(parent));
+  return widget;
 }
 
 //*****************************************************************************

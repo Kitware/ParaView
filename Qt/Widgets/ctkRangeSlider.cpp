@@ -806,6 +806,45 @@ void ctkRangeSlider::mouseReleaseEvent(QMouseEvent* mouseEvent)
 }
 
 // --------------------------------------------------------------------------
+void ctkRangeSlider::mouseDoubleClickEvent(QMouseEvent *mouseEvent)
+{
+  Q_D(ctkRangeSlider);
+  this->QSlider::mouseDoubleClickEvent(mouseEvent);
+
+  // if the user-double clicked outside the current range, move the min or max
+  // slider as appropriate.
+  if (minimum() == maximum() || (mouseEvent->buttons() ^ mouseEvent->button()) ||
+    this->isMinimumSliderDown() || this->isMaximumSliderDown())
+    {
+    mouseEvent->ignore();
+    return;
+    }
+
+  int mepos = this->orientation() == Qt::Horizontal ?
+    mouseEvent->pos().x() : mouseEvent->pos().y();
+  // convert pixel to data-value.
+  mepos = d->pixelPosToRangeValue(mepos);
+  if (mepos < d->m_MinimumPosition)
+    {
+    // move min.
+    this->setPositions(mepos, d->m_MaximumPosition +
+      (d->m_SymmetricMoves? d->m_MinimumPosition - mepos : 0));
+    mouseEvent->accept();
+    }
+  else if (mepos > d->m_MaximumPosition)
+    {
+    // move max.
+    this->setPositions(d->m_MinimumPosition -
+      (d->m_SymmetricMoves ? mepos - d->m_MaximumPosition: 0), mepos);
+    mouseEvent->accept();
+    }
+  else
+    {
+    mouseEvent->ignore();
+    }
+}
+
+// --------------------------------------------------------------------------
 bool ctkRangeSlider::isMinimumSliderDown()const
 {
   Q_D(const ctkRangeSlider);

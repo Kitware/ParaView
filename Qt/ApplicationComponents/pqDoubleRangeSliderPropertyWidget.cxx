@@ -34,7 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ctkDoubleRangeSlider.h"
 #include "pqPropertiesPanel.h"
+#include "pqProxyWidget.h"
 #include "pqWidgetRangeDomain.h"
+#include "vtkSMProperty.h"
 
 #include <QDoubleValidator>
 #include <QGridLayout>
@@ -63,6 +65,14 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
   ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+
+  ui.gridLayout->removeWidget(ui.placeHolder);
+  delete ui.placeHolder;
+  ui.placeHolder = NULL;
+
+  QWidget* labelWidget = pqProxyWidget::newGroupLabelWidget(
+    smProperty->GetXMLLabel(), this);
+  ui.gridLayout->addWidget(labelWidget, 0, 0, 1, -1);
 
   ui.RangeSlider->setOrientation(Qt::Horizontal);
   ui.ThresholdBetween_0->setValidator(new QDoubleValidator(this));

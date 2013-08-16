@@ -70,6 +70,11 @@ public:
   bool applyChangesImmediately() const
     { return this->ApplyChangesImmediately; }
 
+  /// Returns a new widget that has the label and a h-line separator. This is
+  /// used on the pqProxyWidget to separate groups. Other widgets can use it for
+  /// the same purpose, as needed.
+  static QWidget* newGroupLabelWidget(const QString& label, QWidget* parentWidget);
+
 signals:
   /// This signal is fired as soon as the user starts editing in the widget. The
   /// editing may not be complete.
