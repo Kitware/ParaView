@@ -48,9 +48,12 @@ public:
   /// Disconnects from active server.
   /// Note that this method is static. Applications can simply use this without
   /// having to create a reaction instance.
-  static void disconnectFromServerWithWarning();
   static void disconnectFromServer();
 
+  /// Disconnects from active server with a warning message to the user to
+  /// confirm that active proxies will be destroyed, if any. Returns true if
+  /// disconnect happened, false if not i.e. the user cancelled the operation.
+  static bool disconnectFromServerWithWarning();
 private slots:
   void updateState();
 
