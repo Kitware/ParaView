@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include "pqApplicationComponentsModule.h"
 
+class pqServer;
+
 /// @ingroup Behaviors
 /// pqCrashRecoveryBehavior manages saving/loading of crash recovery state. If
 /// you want your application to be able to recover from crashes, simply
@@ -52,6 +54,8 @@ public:
 protected slots:
   void delayedSaveRecoveryState();
   void saveRecoveryState();
+  void onServerAdded(pqServer* server);
+  void onServerDisconnect();
 
 private:
   Q_DISABLE_COPY(pqCrashRecoveryBehavior)

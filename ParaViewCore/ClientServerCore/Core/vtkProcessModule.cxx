@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   ParaView
@@ -40,6 +41,10 @@
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 # include "vtkProcessModuleInitializePython.h"
+#endif
+
+#ifndef _WIN32
+#include <signal.h>
 #endif
 
 #include <assert.h>
@@ -170,6 +175,16 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 
   // The running dashboard tests avoid showing the abort/retry popup dialog.
   vtksys::SystemTools::EnableMSVCDebugHook();
+
+#ifndef _WIN32
+  // When trying to send data to a socket/pipe and that socket/pipe is
+  // closed/broken, the system will trigger a SIGPIPE signal which has by
+  // default a quit/crash handler that won't give you any chance to handle the
+  // error in any way.
+  // Instead, we ignore the default handler to properly capture the error and
+  // eventually provide some type of recovery.
+  signal(SIGPIPE, SIG_IGN);
+#endif
 
 
   // Create the process module.

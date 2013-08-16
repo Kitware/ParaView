@@ -259,6 +259,8 @@ bool vtkSMSessionClient::Connect(const char* url)
     this->SetDataServerController(dcontroller);
     dcontroller->GetCommunicator()->AddObserver(
         vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
+    dcontroller->GetCommunicator()->AddObserver(
+        vtkCommand::ErrorEvent, this, &vtkSMSessionClient::OnConnectionLost);
     dcontroller->AddRMICallback( &RMICallback, this,
                                  vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI);
     dcontroller->Delete();
@@ -268,6 +270,8 @@ bool vtkSMSessionClient::Connect(const char* url)
     this->SetRenderServerController(rcontroller);
     rcontroller->GetCommunicator()->AddObserver(
         vtkCommand::WrongTagEvent, this, &vtkSMSessionClient::OnWrongTagEvent);
+    rcontroller->GetCommunicator()->AddObserver(
+        vtkCommand::ErrorEvent, this, &vtkSMSessionClient::OnConnectionLost);
     rcontroller->Delete();
     }
 
@@ -877,9 +881,12 @@ void vtkSMSessionClient::RegisterSIObject(vtkSMMessage* message)
     stream.GetRawData(raw_message);
     for (int cc=0; cc < num_controllers; cc++)
       {
-      controllers[cc]->TriggerRMIOnAllChildren(
-        &raw_message[0], static_cast<int>(raw_message.size()),
-        vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+      if(controllers[cc] != NULL)
+        {
+        controllers[cc]->TriggerRMIOnAllChildren(
+              &raw_message[0], static_cast<int>(raw_message.size()),
+            vtkPVSessionServer::CLIENT_SERVER_MESSAGE_RMI);
+        }
       }
     }
 
@@ -969,6 +976,15 @@ bool vtkSMSessionClient::OnWrongTagEvent( vtkObject* obj, unsigned long event,
   this->Superclass::OnWrongTagEvent(obj, event, calldata);
   return false;
 }
+
+//-----------------------------------------------------------------------------
+void vtkSMSessionClient::OnConnectionLost( vtkObject* vtkNotUsed(src),
+                                           unsigned long vtkNotUsed(event),
+                                           void* vtkNotUsed(calldata) )
+{
+  this->InvokeEvent(vtkPVSessionBase::ConnectionLost, (void*)"The server had died, please look at the server side for more details.");
+}
+
 
 //-----------------------------------------------------------------------------
 bool vtkSMSessionClient::IsNotBusy()
