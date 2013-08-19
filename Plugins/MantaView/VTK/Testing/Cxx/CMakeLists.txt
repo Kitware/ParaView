@@ -46,9 +46,11 @@ endif()
 
 
 if (PARAVIEW_USE_MPI)
+  include(vtkMPI)
   include_directories(${MPI_C_INCLUDE_PATH})
   vtk_module_test_executable(MantaBenchmark MantaBenchmark.cxx)
-  target_link_libraries(MantaBenchmark vtkParallelMPI )
+  target_link_libraries(MantaBenchmark vtkParallelMPI)
+  vtk_mpi_link(MantaBenchmark)
   add_test(NAME Manta-TestBenchmark
     COMMAND MantaBenchmark
            -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
