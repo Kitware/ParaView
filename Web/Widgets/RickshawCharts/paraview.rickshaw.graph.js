@@ -201,7 +201,7 @@
                 self.options.connection.session == null) { return; }
 
             var session = self.options.connection.session;
-            session.call("pv:getProbeData").then(function(result) {
+            session.call("vtk:getProbeData").then(function(result) {
                 var data = processPlotData(result, -1, self.options.mask);
                 var key_map = {};
                 self.series.forEach(function(d) {

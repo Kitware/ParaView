@@ -43,7 +43,7 @@ macro(cleanup_bundle app app_root libdir pluginsdir)
   endforeach()
 
   # Package web server content
-  file(INSTALL ${libdir}/www DESTINATION ${app_root}/Contents)
+  # FIXME file(INSTALL ${libdir}/www DESTINATION ${app_root}/Contents)
 
   # package other executables such as pvserver.
   get_filename_component(bin_dir "${app_root}" PATH)

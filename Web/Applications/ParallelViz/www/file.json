@@ -1,0 +1,23 @@
+{
+	"None" : {"label": "None"},
+	"/home/seb/Data/can.ex2": { "label" : "can.ex2"},
+	"/home/seb/Data/diskout.ex2": { "label" : "diskout.ex2"},
+	"/home/seb/Data/cone": { "label" : "Cone"},
+	"/home/seb/Data/visit": { "label" : "Visit", "children": {
+		"/home/seb/Data/visit/wavelet": { "label": "Wavelet" },
+		"/home/seb/Data/yo": { "label" : "YO", "children": {
+		"/home/seb/Data/visit/yo/ttt": { "label": "tttt" , "children" : {
+			"/home/seb/Data/visit": { "label" : "Visit", "children": {
+		"/home/seb/Data/visit/wavelet": { "label": "Wavelet" },
+		"/home/seb/Data/yo": { "label" : "YO", "children": {
+		"/home/seb/Data/visit/yo/ttt": { "label": "tttt" }
+		}
+	}
+			}}
+		}
+	}
+		}
+	}
+}
+}
+}

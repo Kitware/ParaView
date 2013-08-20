@@ -88,7 +88,6 @@ copy_files_recursive(${paraview_toolbars_source_dir}
 # =================================================================
 
 add_custom_target(ParaViewWebWidgets ALL DEPENDS
-  ParaViewWWW
   "${CMAKE_CURRENT_BINARY_DIR}/ext-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/nvcharts-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"

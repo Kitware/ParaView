@@ -64,7 +64,7 @@
         action = me.attr('action');
 
         if(session != null && session != undefined) {
-            session.call("pv:updateTime", action).then(function(time){
+            session.call("vtk:updateTime", action).then(function(time){
                 $('input.time', rootWidget).val(time);
             });
         }
@@ -89,7 +89,7 @@
 
         function next() {
             if(session != null && session != undefined) {
-                session.call("pv:updateTime", 'next').then(function(time){
+                session.call("vtk:updateTime", 'next').then(function(time){
                     $('input.time', rootWidget).val(time);
                     rootWidget.trigger('dataChanged');
                     if($('.pause', rootWidget).is(':visible')) {

@@ -22,9 +22,9 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
-#include "vtkPVDataEncoder.h"
+#include "vtkDataEncoder.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVWebInteractionEvent.h"
+#include "vtkWebInteractionEvent.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
@@ -95,7 +95,7 @@ public:
   typedef std::map<void*, unsigned int > ButtonStatesType;
   ButtonStatesType ButtonStates;
 
-  vtkNew<vtkPVDataEncoder> Encoder;
+  vtkNew<vtkDataEncoder> Encoder;
 
   // WebGL related struct
   struct WebGLObjCacheValue
@@ -216,7 +216,7 @@ const char* vtkPVWebApplication::StillRenderToString(vtkSMViewProxy* view, unsig
 
 //----------------------------------------------------------------------------
 bool vtkPVWebApplication::HandleInteractionEvent(
-  vtkSMViewProxy* view, vtkPVWebInteractionEvent* event)
+  vtkSMViewProxy* view, vtkWebInteractionEvent* event)
 {
   vtkRenderWindowInteractor *iren = NULL;
 
@@ -238,18 +238,18 @@ bool vtkPVWebApplication::HandleInteractionEvent(
   int posY = std::floor(viewSize[1] * event->GetY() + 0.5);
 
   int ctrlKey =
-    (event->GetModifiers() & vtkPVWebInteractionEvent::CTRL_KEY) != 0?  1: 0;
+    (event->GetModifiers() & vtkWebInteractionEvent::CTRL_KEY) != 0?  1: 0;
   int shiftKey =
-    (event->GetModifiers() & vtkPVWebInteractionEvent::SHIFT_KEY) != 0?  1: 0;
+    (event->GetModifiers() & vtkWebInteractionEvent::SHIFT_KEY) != 0?  1: 0;
   iren->SetEventInformation(posX, posY, ctrlKey, shiftKey, event->GetKeyCode());
 
 
   unsigned int prev_buttons = this->Internals->ButtonStates[view];
   unsigned int changed_buttons = (event->GetButtons() ^ prev_buttons);
   iren->MouseMoveEvent();
-  if ( (changed_buttons & vtkPVWebInteractionEvent::LEFT_BUTTON) != 0 )
+  if ( (changed_buttons & vtkWebInteractionEvent::LEFT_BUTTON) != 0 )
     {
-    if ( (event->GetButtons() & vtkPVWebInteractionEvent::LEFT_BUTTON) != 0)
+    if ( (event->GetButtons() & vtkWebInteractionEvent::LEFT_BUTTON) != 0)
       {
       iren->LeftButtonPressEvent();
       }
@@ -259,9 +259,9 @@ bool vtkPVWebApplication::HandleInteractionEvent(
       }
     }
 
-  if ( (changed_buttons & vtkPVWebInteractionEvent::RIGHT_BUTTON) != 0 )
+  if ( (changed_buttons & vtkWebInteractionEvent::RIGHT_BUTTON) != 0 )
     {
-    if ( (event->GetButtons() & vtkPVWebInteractionEvent::RIGHT_BUTTON) != 0)
+    if ( (event->GetButtons() & vtkWebInteractionEvent::RIGHT_BUTTON) != 0)
       {
       iren->RightButtonPressEvent();
       }
@@ -270,9 +270,9 @@ bool vtkPVWebApplication::HandleInteractionEvent(
       iren->RightButtonReleaseEvent();
       }
     }
-  if ( (changed_buttons & vtkPVWebInteractionEvent::MIDDLE_BUTTON) != 0 )
+  if ( (changed_buttons & vtkWebInteractionEvent::MIDDLE_BUTTON) != 0 )
     {
-    if ( (event->GetButtons() & vtkPVWebInteractionEvent::MIDDLE_BUTTON) != 0)
+    if ( (event->GetButtons() & vtkWebInteractionEvent::MIDDLE_BUTTON) != 0)
       {
       iren->MiddleButtonPressEvent();
       }
@@ -330,7 +330,7 @@ const char* vtkPVWebApplication::GetWebGLSceneMetaData(vtkSMViewProxy* view)
   vtkInternals::WebGLObjId2IndexMap webglMap;
   for(int i=0; i<webglExporter->GetNumberOfObjects(); ++i)
     {
-    vtkWebGLObject* wObj = webglExporter->GetObject(i);
+    vtkWebGLObject* wObj = webglExporter->GetWebGLObject(i);
     if(wObj && wObj->isVisible())
       {
       vtkInternals::WebGLObjCacheValue val;
@@ -382,7 +382,7 @@ const char* vtkPVWebApplication::GetWebGLBinaryData(
       {
       if(cachedVal->BinaryParts[part].empty())
         {
-        vtkWebGLObject* obj = webglExporter->GetObject(cachedVal->ObjIndex);
+        vtkWebGLObject* obj = webglExporter->GetWebGLObject(cachedVal->ObjIndex);
         if(obj && obj->isVisible())
           {
           // Manage Base64

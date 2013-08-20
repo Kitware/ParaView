@@ -26,7 +26,7 @@
 
 class vtkUnsignedCharArray;
 class vtkSMViewProxy;
-class vtkPVWebInteractionEvent;
+class vtkWebInteractionEvent;
 
 class VTKPARAVIEWWEBCORE_EXPORT vtkPVWebApplication : public vtkObject
 {
@@ -72,7 +72,7 @@ public:
   // Communicate mouse interaction to a view.
   // Returns true if the interaction changed the view state, otherwise returns false.
   bool HandleInteractionEvent(
-    vtkSMViewProxy* view, vtkPVWebInteractionEvent* event);
+    vtkSMViewProxy* view, vtkWebInteractionEvent* event);
 
   // Description:
   // Invalidate view cache

@@ -29,7 +29,7 @@
             var me = $(this);
 
             function disconnect() {
-                session.call("pv:exit");
+                session.call("vtk:exit");
                 session.close();
                 setTimeout("window.close()", 100);
             }

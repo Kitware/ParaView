@@ -1,5 +1,8 @@
 r"""
    This module provide classes to handle Rest API for WebGL piece request.
+
+   This module need more work to be truly available.
+   Right now it is left here for further work but you should not expect to work as is.
 """
 
 from twisted.web import server, resource
@@ -7,10 +10,12 @@ from twisted.web import server, resource
 from twisted.web.error import Error
 
 from paraview import simple
-import web
+from paraview.web import helper
 
 import exceptions
 import base64
+
+pv_web_app = vtkPVWebApplication()
 
 class WebGLResource(resource.Resource):
     """
@@ -69,7 +74,7 @@ class WebGLResource(resource.Resource):
 
         if vid:
             try:
-                view = web.mapIdToProxy(vid)
+                view = helper.mapIdToProxy(vid)
             except exceptions.TypeError:
                 pass
 
@@ -95,9 +100,7 @@ class WebGLResource(resource.Resource):
         if part > 0:
             part = part - 1
 
-        data = web.ParaViewServerProtocol.WebApplication.GetWebGLBinaryData(view.SMProxy,
-                                                                            object_id,
-                                                                            part);
+        data = pv_web_app.GetWebGLBinaryData(view.SMProxy, object_id, part);
 
         if data:
             request.setHeader('content-type', 'application/octet-stream+webgl')
@@ -114,7 +117,7 @@ class WebGLResource(resource.Resource):
         """
         view = self._get_view(vid)
 
-        data = web.ParaViewServerProtocol.WebApplication. GetWebGLSceneMetaData(view.SMProxy)
+        data = pv_web_app.GetWebGLSceneMetaData(view.SMProxy)
 
         if data:
             request.setHeader('content-type', 'application/json')

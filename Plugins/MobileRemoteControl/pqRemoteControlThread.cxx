@@ -198,7 +198,7 @@ bool pqRemoteControlThread::sendObjects()
 
   for (int i = 0; i < this->Internal->Exporter->GetNumberOfObjects(); ++i)
     {
-    vtkWebGLObject* obj = this->Internal->Exporter->GetObject(i);
+    vtkWebGLObject* obj = this->Internal->Exporter->GetWebGLObject(i);
 
     for(int partIndex = 0; partIndex < obj->GetNumberOfParts(); ++partIndex)
       {
