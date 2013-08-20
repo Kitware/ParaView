@@ -1,7 +1,7 @@
 ## Thanks to John Biddiscombe of
 ## CSCS - Swiss National Supercomputing Centre for creating and contributing
 ## this plugin.
-  
+
 IF (QT_USE_FILE)
   INCLUDE(${QT_USE_FILE})
 ENDIF (QT_USE_FILE)
@@ -34,6 +34,8 @@ ADD_PARAVIEW_PLUGIN(H5PartReader "1.0"
 
   REQUIRED_ON_SERVER
 )
+
+target_link_libraries(H5PartReader LINK_PRIVATE vtksys)
 
 SET_SOURCE_FILES_PROPERTIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/H5Part/src/H5Part.c

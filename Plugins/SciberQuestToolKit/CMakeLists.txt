@@ -330,7 +330,8 @@ if (SQTK_CUDA AND CUDA_FOUND)
   target_link_libraries(SciberQuestToolKit CUDAConvolutionDriver)
 endif()
 
-target_link_libraries(SciberQuestToolKit vtkFiltersFlowPaths)
+target_link_libraries(SciberQuestToolKit LINK_PUBLIC vtkFiltersFlowPaths
+  LINK_PRIVATE vtksys)
 install(TARGETS SciberQuestToolKit DESTINATION ${SQTK_LIB_INSTALL_PATH})
 
 if (SQTK_PYTHON_BINDINGS)
