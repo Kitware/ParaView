@@ -1,6 +1,3 @@
-
-project(metis)
-
 include_directories(
   ${metis_SOURCE_DIR}
   )
@@ -79,5 +76,5 @@ set(metis_sources
   subdomains.c
   )
 
-add_library(metis STATIC ${metis_sources})
+vtk_module_library(metis STATIC ${metis_sources})
 set_target_properties(metis PROPERTIES LINKER_LANGUAGE CXX)

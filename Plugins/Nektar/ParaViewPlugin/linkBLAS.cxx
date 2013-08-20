@@ -1,4 +1,4 @@
-#include "include/Blas.h"
+#include "../include/Blas.h"
 
 int main()
 {

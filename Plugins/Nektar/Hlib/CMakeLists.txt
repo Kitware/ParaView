@@ -1,5 +1,4 @@
-
-project(hybrid C CXX Fortran)
+enable_language(C CXX Fortran)
 
 if(NOT MPI_INCLUDE_PATH)
   find_package(MPI REQUIRED)
@@ -82,6 +81,7 @@ set(hybrid_sources
   src/FelisaF.F
   )
 
-add_library(hybrid STATIC ${hybrid_sources})
+
+vtk_module_library(hybrid STATIC ${hybrid_sources})
 
 set_target_properties(hybrid PROPERTIES LINKER_LANGUAGE C)

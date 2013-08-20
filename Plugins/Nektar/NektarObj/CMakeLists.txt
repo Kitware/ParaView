@@ -1,7 +1,3 @@
-
-project(nektarobj)
-
-
 if(NOT WIN32)
 # need some try compiles
   set(CMAKE_CXX_FLAGS "-fPIC")
@@ -13,4 +9,4 @@ if(NOT ParaView_SOURCE_DIR)
   include(${PARAVIEW_USE_FILE})
 endif()
 
-add_library(nektarobj STATIC nektarObject.C)
+vtk_module_library(nektarobj STATIC nektarObject.C)

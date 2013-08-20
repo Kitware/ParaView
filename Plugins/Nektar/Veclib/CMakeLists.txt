@@ -1,5 +1,4 @@
-
-project(vec C Fortran)
+enable_language(C Fortran)
 
 include_directories(${Nektar_SOURCE_DIR}/include)
 
@@ -100,8 +99,7 @@ set(veclib_memory_sources
   memory/icopy.c
   )
 
-
-add_library(vec STATIC 
+vtk_module_library(vec STATIC
   ${veclib_math_sources}
   ${veclib_triad_sources}
   ${veclib_relational_sources}
@@ -109,6 +107,6 @@ add_library(vec STATIC
   ${veclib_conversion_sources}
   ${veclib_misc_sources}
   ${veclib_memory_sources}
-  )
+)
 
 set_target_properties(vec PROPERTIES LINKER_LANGUAGE C)

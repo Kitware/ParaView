@@ -7,8 +7,6 @@
 #        dgalerkin  ScaLapackNektar_new test_partition_connectivity \
 #        sgs
 
-project(nektar CXX)
-
 if(NOT MPI_INCLUDE_PATH)
   find_package(MPI REQUIRED)
 endif()
@@ -54,18 +52,10 @@ endif()
 
 SET(SCALAPACK_LIBRARIES ${SCALAPACK_LIBRARY} ${BLACS_LIBRARY})
 
-add_library(nektar STATIC ${nektar_sources})
+vtk_module_library(nektar STATIC ${nektar_sources})
 target_link_libraries(nektar
-  nektarobj
-  hybrid
-  vec
-  metis
   ${SCALAPACK_LIBRARIES}
   ${LAPACK_lapack_LIBRARY}
   ${BLAS_LIBRARIES}
+  ${MPI_LIBRARY}
 )
-#target_link_libraries(nektar
-#  ${MPI_LIBRARY}
-#  metis
-#  gs
-#  )
