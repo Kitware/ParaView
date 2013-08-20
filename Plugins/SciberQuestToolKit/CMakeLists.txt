@@ -52,6 +52,10 @@ mark_as_advanced(SQTK_CUDA)
 set(SQTK_PYTHON_BINDINGS OFF CACHE BOOL "Enable Python bindings.")
 mark_as_advanced(SQTK_PYTHON_BINDINGS)
 
+if (PARAVIEW_USE_UNIFIED_BINDINGS)
+  set(SQTK_PYTHON_BINDINGS ON CACHE BOOL "Enable Python bindings (needed for unified bindings)." FORCE)
+endif ()
+
 if (BUILD_TESTING)
   #message(STATUS "SQTK Building regression tests.")
   subdirs(Testing)
@@ -316,6 +320,13 @@ set (SQTK_SM_XML
   SciberQuestToolKitSMSources.xml
   SciberQuestToolKitSMFilters.xml)
 
+if (SQTK_PYTHON_BINDINGS)
+  #message(STATUS "SQTK generating vtk python bindings.")
+  generate_python_bindings(SciberQuestToolKit "${SM_CXX_SOURCES}")
+  install(TARGETS SciberQuestToolKitPython DESTINATION ${SQTK_LIB_INSTALL_PATH})
+  install(TARGETS SciberQuestToolKitPythonD DESTINATION ${SQTK_LIB_INSTALL_PATH})
+endif()
+
 # Generate the plugin, servermanager and wrapped language bindings.
 add_paraview_plugin(
   SciberQuestToolKit "${SQTK_VERSION}"
@@ -335,13 +346,6 @@ target_link_libraries(SciberQuestToolKit
   LINK_PRIVATE vtksys)
 
 install(TARGETS SciberQuestToolKit DESTINATION ${SQTK_LIB_INSTALL_PATH})
-
-if (SQTK_PYTHON_BINDINGS)
-  #message(STATUS "SQTK generating vtk python bindings.")
-  generate_python_bindings(SciberQuestToolKit "${SM_CXX_SOURCES}")
-  install(TARGETS SciberQuestToolKitPython DESTINATION ${SQTK_LIB_INSTALL_PATH})
-  install(TARGETS SciberQuestToolKitPythonD DESTINATION ${SQTK_LIB_INSTALL_PATH})
-endif()
 
 if(PARAVIEW_USE_MPI)
   include(vtkMPI)

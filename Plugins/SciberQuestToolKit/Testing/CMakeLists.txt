@@ -24,19 +24,16 @@ macro(sq_add_exec _name)
   set(TEST_EXEC)
   sq_exec_name(${_name} TEST_NAME TEST_EXEC)
   add_executable(${TEST_NAME} ${_name}.cpp TestUtils.cxx)
+  target_link_libraries(
+      ${TEST_NAME}
+      SciberQuestToolKit
+      vtkPVServerManagerApplication
+      vtkTestingRendering
+      vtkIOXML
+      vtksys)
   if (PARAVIEW_USE_MPI AND (NOT WIN32))
     add_definitions(-DPARAVIEW_USE_MPI)
-    target_link_libraries(
-        ${TEST_NAME}
-        SciberQuestToolKit
-        vtksys)
     vtk_mpi_link(${TEST_NAME})
-  else()
-    target_link_libraries(
-        ${TEST_NAME}
-        SciberQuestToolKit
-        vtksys)
-        #vtkPVServerManagerApplication)
   endif()
 endmacro()
 

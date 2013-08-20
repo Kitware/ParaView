@@ -28,14 +28,16 @@ macro(
       ${Python_SRCS}
       ${Kit_PYTHON_EXTRA_SRCS})
 
-    PYTHON_ADD_MODULE(
+    _vtk_add_python_module(
       ${CXX_LIB_NAME}Python
       ${CXX_LIB_NAME}PythonInit.cxx)
 
     target_link_libraries(
-      ${CXX_LIB_NAME}PythonD
+        ${CXX_LIB_NAME}Python
+      LINK_PRIVATE
+        ${CXX_LIB_NAME}PythonD
       LINK_PUBLIC
-      ${CXX_LIB_NAME})
+        ${CXX_LIB_NAME})
 
     if(WIN32 AND NOT CYGWIN)
       set_target_properties(
