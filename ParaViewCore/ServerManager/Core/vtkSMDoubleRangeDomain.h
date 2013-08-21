@@ -31,9 +31,13 @@
 #include "vtkSMRangeDomainTemplate.h" // Read superclass
 
 // Fake the superclass for the wrappers.
+#ifndef __WRAP__
 #define vtkSMDomain vtkSMRangeDomainTemplate<double>
+#endif
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDoubleRangeDomain : public vtkSMDomain
+#ifndef __WRAP__
 #undef vtkSMDomain
+#endif
 {
 public:
   static vtkSMDoubleRangeDomain* New();

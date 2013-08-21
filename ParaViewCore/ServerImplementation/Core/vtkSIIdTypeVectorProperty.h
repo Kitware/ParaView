@@ -23,9 +23,13 @@
 #include "vtkSIVectorProperty.h"
 #include "vtkSIVectorPropertyTemplate.h" // real superclass
 
+#ifndef __WRAP__
 #define vtkSIVectorProperty vtkSIVectorPropertyTemplate<vtkIdType, bool>
+#endif
 class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIIdTypeVectorProperty : public vtkSIVectorProperty
+#ifndef __WRAP__
 #undef vtkSIVectorProperty
+#endif
 {
 public:
   static vtkSIIdTypeVectorProperty* New();
