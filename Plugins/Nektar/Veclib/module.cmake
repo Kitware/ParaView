@@ -1,5 +1,5 @@
 vtk_module(vec
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
-    PARAVIEW
+    NEKTAR
 )
