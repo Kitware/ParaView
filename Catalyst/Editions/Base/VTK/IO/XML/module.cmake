@@ -3,6 +3,8 @@ vtk_module(vtkIOXML
     StandAlone
   DEPENDS
     vtkIOXMLParser
+  PRIVATE_DEPENDS
+    vtksys
   TEST_DEPENDS
     vtkFiltersAMR
     vtkFiltersCore
