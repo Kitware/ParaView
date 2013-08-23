@@ -1,0 +1,5 @@
+vtk_module(metis
+  EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    NEKTAR
+)
