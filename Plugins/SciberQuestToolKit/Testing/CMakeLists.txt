@@ -14,6 +14,10 @@ macro(sq_exec_name _name _test_name _exec_name)
   endif()
 endmacro()
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 # add an exec
 macro(sq_add_exec _name)
   set(TEST_NAME)
@@ -25,11 +29,13 @@ macro(sq_add_exec _name)
     target_link_libraries(
         ${TEST_NAME}
         SciberQuestToolKit
-        ${MPI_LIBRARIES})
+        vtksys)
+    vtk_mpi_link(${TEST_NAME})
   else()
     target_link_libraries(
         ${TEST_NAME}
-        SciberQuestToolKit)
+        SciberQuestToolKit
+        vtksys)
         #vtkPVServerManagerApplication)
   endif()
 endmacro()

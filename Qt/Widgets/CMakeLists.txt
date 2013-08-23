@@ -245,7 +245,7 @@ set (${vtk-module}_INCLUDE_DIRS
 set(${vtk-module}_NO_HeaderTest 1)
 
 vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
-target_link_libraries(${vtk-module} ${QT_LIBRARIES})
+target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})
 
 if (PQWIDGETS_DISABLE_QTWEBKIT)
   set_target_properties(${vtk-module}

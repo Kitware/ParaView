@@ -5,4 +5,6 @@ vtk_module(vtkPVVTKExtensionsCore
     vtkFiltersCore
     vtkParallelCore
     vtkPVCommon
+  PRIVATE_DEPENDS
+    vtksys
 )

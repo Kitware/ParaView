@@ -18,6 +18,8 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkViewsContext2D
     vtkViewsCore
     ${__dependencies}
+  PRIVATE_DEPENDS
+    vtksys
   TEST_LABELS
     PARAVIEW
 )

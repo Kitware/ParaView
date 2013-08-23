@@ -386,13 +386,13 @@ vtk_module_library(${vtk-module}
   ${__Module_RESOURCE_SRCS}
   ${__Module_MOC_SRCS}
   ${__Module_UI_SRCS})
-target_link_libraries(${vtk-module} ${QT_LIBRARIES})
+target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})
 
 #IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 #  # Headers
 #  GLOB_INSTALL_DEVELOPMENT(
 #      ${CMAKE_CURRENT_SOURCE_DIR}
-#      ${PV_INSTALL_INCLUDE_DIR} 
+#      ${PV_INSTALL_INCLUDE_DIR}
 #      "*.h;*.hxx;*.txx")
 #  INSTALL(
 #      FILES ${dynamicHeaders}
@@ -400,12 +400,12 @@ target_link_libraries(${vtk-module} ${QT_LIBRARIES})
 #      COMPONENT Development)
 #  # QT resources
 #  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
-#  GLOB_INSTALL_DEVELOPMENT( 
+#  GLOB_INSTALL_DEVELOPMENT(
 #    "${CMAKE_CURRENT_SOURCE_DIR}"
 #    "${PV_INSTALL_INCLUDE_DIR}/Qt/Core/Resources/UI"
 #    "${resPath}/*.ui")
 #  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
-#  GLOB_INSTALL_DEVELOPMENT( 
+#  GLOB_INSTALL_DEVELOPMENT(
 #    "${CMAKE_CURRENT_SOURCE_DIR}"
 #    "${PV_INSTALL_INCLUDE_DIR}/Qt/Core/Resources/Icons"
 #    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
