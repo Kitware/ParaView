@@ -13,17 +13,10 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.293333,0.47,1,0,0)" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ApplyDisplacements/CheckBox" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
-  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Selection Inspector" />
-  <pqevent object="pqClientMainWindow/selectionInspectorDock/selectionInspector/scrollArea/qt_scrollarea_viewport/scrollWidget/groupSelectionLabel/tabWidget_SelectionLabelStyle/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Cell Label" />
-  <pqevent object="pqClientMainWindow/selectionInspectorDock/selectionInspector/scrollArea/qt_scrollarea_viewport/scrollWidget/groupSelectionLabel/tabWidget_SelectionLabelStyle/qt_tabwidget_stackedwidget/tab_CellLabel/checkBoxLabelCells" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/selectionInspectorDock/selectionInspector/scrollArea/qt_scrollarea_viewport/scrollWidget/groupSelectionLabel/tabWidget_SelectionLabelStyle/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Point Label" />
-  <pqevent object="pqClientMainWindow/selectionInspectorDock/selectionInspector/scrollArea/qt_scrollarea_viewport/scrollWidget/groupSelectionLabel/tabWidget_SelectionLabelStyle/qt_tabwidget_stackedwidget/tab_PointLabel/checkBoxLabelPoints" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/selectionInspectorDock/selectionInspector/scrollArea/qt_scrollarea_viewport/scrollWidget/groupSelectionLabel/tabWidget_SelectionLabelStyle/qt_tabwidget_stackedwidget/tab_PointLabel/frame_PointLabelStyle/comboLabelMode_Point" command="set_string" arguments="DISPL" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget" command="setCurrent" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/selectionInspectorDock/selectionInspector/scrollArea/qt_scrollarea_viewport/scrollWidget/groupSelectionLabel/tabWidget_SelectionLabelStyle/qt_tabwidget_stackedwidget/tab_PointLabel/checkBoxLabelPoints" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/selectionInspectorDock/selectionInspector/scrollArea/qt_scrollarea_viewport/scrollWidget/groupSelectionLabel/tabWidget_SelectionLabelStyle/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Cell Label" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="Find Data..." />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="EQPS" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/actionSelectionMode" command="set_boolean" arguments="true" />
@@ -31,8 +24,6 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.434238,0.441989,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.434238,0.441989,1,0,0)" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
-  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Selection Inspector" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />

@@ -1632,6 +1632,15 @@
         <Documentation>Reconstructs the query as a user friendly text eg. "IDs
         &gt;= 12".</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetInverse"
+                         default_values="0"
+                         name="InsideOut"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When this property is false the selection describes
+        everything that should be extracted. When this is true the selection
+        describes everything that should NOT be extracted.</Documentation>
+      </IntVectorProperty>
       <!-- end of SelectionQuerySource -->
     </SourceProxy>
     <!-- ==================================================================== -->

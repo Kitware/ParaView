@@ -43,6 +43,7 @@ vtkStandardNewMacro(vtkPythonExtractSelection);
 vtkPythonExtractSelection::vtkPythonExtractSelection()
 {
   this->PreserveTopology = 0;
+  this->Inverse = 0;
   this->SetExecuteMethod(vtkPythonExtractSelection::ExecuteScript, this);
 
   // eventually, once this class starts taking in a real vtkSelection.
@@ -162,6 +163,10 @@ vtkDataObject* vtkPythonExtractSelection::ExtractElements(
   vtkTable* table = vtkTable::SafeDownCast(data);
   vtkSelectionNode* selNode = selection->GetNode(0);
 
+  // get the inverse flag for the selection
+  vtkInformation* selProperties = selNode->GetProperties();
+  this->Inverse = selProperties->Get(vtkSelectionNode::INVERSE());
+
   if (ds)
     {
     switch (selNode->GetFieldType())
@@ -229,7 +234,8 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractPoints(
     std::vector<vtkIdType> pointIds;
     for (vtkIdType id = 0; id < numPoints; ++id)
       {
-      if (pmask[id] == 0)
+      // extract selected points if inverse flag is false and vice versa
+      if (pmask[id] == this->Inverse)
         {
         continue;
         }
@@ -318,7 +324,7 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
 
     for (vtkIdType inCellId = 0; inCellId < numCells; inCellId++)
       {
-      if (pmask[inCellId] == 0)
+      if (pmask[inCellId] == this->Inverse)
         {
         continue;
         }

@@ -53,6 +53,7 @@ vtkStandardNewMacro(vtkPVExtractSelection);
 vtkPVExtractSelection::vtkPVExtractSelection()
 {
   this->SetNumberOfOutputPorts(2);
+  this->Inverse = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -141,6 +142,7 @@ int vtkPVExtractSelection::RequestData(
     pythonExtractSelection->SetInputData(0, localInputDO);
     pythonExtractSelection->SetInputData(1, localSel);
     pythonExtractSelection->SetPreserveTopology(this->PreserveTopology);
+    pythonExtractSelection->SetInverse(this->Inverse);
 
     pythonExtractSelection->Update();
 

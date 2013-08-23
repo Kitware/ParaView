@@ -57,15 +57,18 @@ public:
     QWidget* parent=0, Qt::WindowFlags flags=0);
   virtual ~pqQueryDialog();
 
+  void setProducer(pqOutputPort *port);
+
   /// Get the source whose data is to be queried.
   pqOutputPort* producer() const
     { return this->Producer; }
 
-  /// Set the source whose data will be queried.
-  virtual void setProducer(pqOutputPort*);
-
   /// Set the object used to manage selection specifications.
   virtual void setSelectionManager(pqSelectionManager* selMgr);
+
+public slots:
+  /// Sets the current selection to display.
+  void setSelection(pqOutputPort *port);
 
 signals:
   /// fired every time user submits a query.
@@ -85,9 +88,6 @@ protected slots:
 
   /// Triggered when the data to process has changed
   void onProxySelectionChange(pqOutputPort*);
-
-  /// Triggered when the selection manager indicates the selection specification has changed.
-  void onSelectionSpecificationChanged(pqOutputPort*);
 
   /// Triggerd when the active view has changed
   void onActiveViewChanged(pqView*);
@@ -120,7 +120,19 @@ protected slots:
     this->accept();
     }
 
+  // freezes the selection. this means create an ID selection for the
+  // currently selected points/cells.
   void onFreezeSelection();
+
+  // called when the user clicks the "show display properties" button
+  // and shows the advanced selection display properties widget
+  void onShowDisplayPropertiesButtonToggled(bool state);
+
+  // called when the invert selection check box is toggled
+  void onInvertSelectionToggled(bool state);
+
+  // called when the 'Show Type' changes (e.g. Points/Cells)
+  void onShowTypeChanged(const QString &type);
 
 protected:
   /// populate the list of available labels.
@@ -132,11 +144,25 @@ protected:
   /// creates the proxies needed for the spreadsheet view.
   void setupSpreadSheet();
 
+  /// sets up the property links for global properties such as selection
+  /// color which are shared with all representations
+  void setupGlobalPropertyLinks();
+
 private:
   Q_DISABLE_COPY(pqQueryDialog)
   class pqInternals;
 
   pqOutputPort* Producer;
+
+  // The output port which produced the current selection. This may
+  // have been produced outside the query dialog. This gets set in
+  // the setSelection() method.
+  pqOutputPort* SelectionProducer;
+
+  // flag which indicates if the current selection was made by us
+  // or came from the global selection.
+  bool CurrentSelectionIsOurs;
+
   pqInternals* Internals;
 };
 

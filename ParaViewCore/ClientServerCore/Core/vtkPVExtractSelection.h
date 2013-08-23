@@ -54,6 +54,11 @@ public:
   void RemoveAllSelectionsInputs()
     { this->SetInputConnection(1, 0); }
 
+  // Description:
+  // Set/get the inverse flag.
+  vtkSetMacro(Inverse, int);
+  vtkGetMacro(Inverse, int);
+
 //BTX
 protected:
   vtkPVExtractSelection();
@@ -74,6 +79,8 @@ protected:
   vtkSelectionNode* LocateSelection(unsigned int level,
     unsigned int index, vtkSelection* sel);
   vtkSelectionNode* LocateSelection(unsigned int composite_index, vtkSelection* sel);
+
+  int Inverse;
 
 private:
   vtkPVExtractSelection(const vtkPVExtractSelection&);  // Not implemented.

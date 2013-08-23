@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqOutputPortComboBox.h"
@@ -47,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqUndoStack.h"
+#include "pqProxyWidget.h"
 
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
@@ -65,8 +67,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQuerySelectionSource.h"
 #include "vtkPVCompositeDataInformation.h"
 
+#include "QVTKWidget.h"
+
 #include <QList>
 #include <QMessageBox>
+#include <QInputEvent>
 
 class pqQueryDialog::pqInternals : public Ui::pqQueryDialog
 {
@@ -80,10 +85,12 @@ public:
 
   pqPropertyLinks LabelColorLinks;
   pqSignalAdaptorColor* LabelColorAdaptor;
+  pqSignalAdaptorColor* SelectionColorAdaptor;
   pqInternals()
     {
     this->DataModel = NULL;
     this->LabelColorAdaptor = NULL;
+    this->SelectionColorAdaptor = NULL;
     this->SelectionManager = NULL;
     }
 };
@@ -96,6 +103,8 @@ pqQueryDialog::pqQueryDialog(
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
+
+  this->CurrentSelectionIsOurs = false;
 
   this->Producer = NULL;
 
@@ -119,34 +128,18 @@ pqQueryDialog::pqQueryDialog(
     SIGNAL(currentIndexChanged(int)),
     this, SLOT(resetClauses()));
 
-  QObject::connect(this->Internals->addRow,
-    SIGNAL(clicked()), this, SLOT(addClause()));
-
-  /// Currently we don't support multiple clauses.
-  this->Internals->addRow->hide();
-
   QObject::connect(this->Internals->runQuery,
     SIGNAL(clicked()), this, SLOT(runQuery()));
 
   // Setup the spreadsheet view.
   this->Internals->spreadsheet->setModel(NULL);
 
-  // Link the selection color to the global selection color so that it will
-  // affect all views, otherwise user may be get confused ;).
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-
-  pqSignalAdaptorColor* adaptor = new pqSignalAdaptorColor(
-    this->Internals->selectionColor, "chosenColor",
-    SIGNAL(chosenColorChanged(const QColor&)), false);
-  this->Internals->Links.addPropertyLink(
-    adaptor,
-    "color", SIGNAL(colorChanged(const QVariant&)),
-    globalPropertiesManager,
-    globalPropertiesManager->GetProperty("SelectionColor"));
-
   this->Internals->LabelColorAdaptor = new pqSignalAdaptorColor(
     this->Internals->labelColor,
+    "chosenColor",
+    SIGNAL(chosenColorChanged(const QColor&)), false);
+  this->Internals->SelectionColorAdaptor = new pqSignalAdaptorColor(
+    this->Internals->selectionColor,
     "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
 
@@ -172,7 +165,21 @@ pqQueryDialog::pqQueryDialog(
     SIGNAL(changed(pqView*)),
     this, SLOT(onActiveViewChanged(pqView*)));
 
+  // connect the show advanced selection display properties button to
+  // the advanced display properties widget
+  QObject::connect(this->Internals->showDisplayPropertiesButton,
+    SIGNAL(toggled(bool)), this, SLOT(onShowDisplayPropertiesButtonToggled(bool)));
+
+  // default to hidden for the advanced selection display properties
+  this->Internals->fontPropertiesFrame->hide();
+
+  QObject::connect(this->Internals->showTypeComboBox,
+    SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onShowTypeChanged(const QString&)));
+  QObject::connect(this->Internals->invertSelectionCheckBox,
+    SIGNAL(toggled(bool)), this, SLOT(onInvertSelectionToggled(bool)));
+
   this->onProxySelectionChange(_producer);
+  this->onActiveViewChanged(pqActiveObjects::instance().activeView());
 }
 
 //-----------------------------------------------------------------------------
@@ -188,9 +195,73 @@ pqQueryDialog::~pqQueryDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqQueryDialog::setProducer(pqOutputPort* port)
+void pqQueryDialog::setProducer(pqOutputPort *port)
 {
-  this->Internals->source->setCurrentPort(port);
+  this->Producer = port;
+  if(port)
+    {
+    this->Internals->source->setCurrentPort(port);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::setSelection(pqOutputPort *port)
+{
+  this->freeSMProxy();
+  this->setupGlobalPropertyLinks();
+
+  if(!this->CurrentSelectionIsOurs)
+    {
+    this->resetClauses();
+    }
+
+  this->SelectionProducer = port;
+
+  if(this->SelectionProducer)
+    {
+    this->setupSpreadSheet();
+    this->Internals->spreadsheet->setModel(this->Internals->DataModel);
+
+    // setup current selection label
+    this->Internals->currentSelectionLabel->setText(
+      QString("Current Selection (%1 : %2)")
+        .arg(port->getSource()->getSMName())
+        .arg(port->getPortNumber())
+    );
+
+    // this may cause progress events. These can result in paint-event for the table
+    // view which could prematurely start querying information from the model.
+    // To avoid that issue, we don't set the model on  the view until after this call.
+    this->Internals->ViewProxy->StillRender();
+
+    // now set the model on the view.
+    this->Internals->spreadsheet->setModel(this->Internals->DataModel);
+
+    // update the list of available labels.
+    this->updateLabels();
+
+    // update the show type (e.g points/cells) based on the selection type
+    vtkSMSourceProxy *selectionSource = this->SelectionProducer->getSelectionInput();
+    int attributeType = vtkSMPropertyHelper(selectionSource, "FieldType").GetAsInt();
+    if(attributeType == vtkSelectionNode::CELL)
+      {
+      this->Internals->showTypeComboBox->setCurrentIndex(1);
+      }
+    else if(attributeType == vtkSelectionNode::POINT)
+      {
+      this->Internals->showTypeComboBox->setCurrentIndex(0);
+      }
+
+    // make sure spreadsheet is updated
+    this->onShowTypeChanged(attributeType == vtkSelectionNode::POINT ? "Points" : "Cells");
+    }
+  else
+    {
+    // no selection - update the label
+    this->Internals->currentSelectionLabel->setText("Current Selection");
+    }
+
+  this->CurrentSelectionIsOurs = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -211,7 +282,7 @@ void pqQueryDialog::setSelectionManager(pqSelectionManager* selMgr)
 
     QObject::connect(
       this->Internals->SelectionManager, SIGNAL(selectionChanged(pqOutputPort*)),
-      this, SLOT(onSelectionSpecificationChanged(pqOutputPort*)));
+      this, SLOT(setSelection(pqOutputPort*)));
     }
 }
 
@@ -219,31 +290,32 @@ void pqQueryDialog::setSelectionManager(pqSelectionManager* selMgr)
 void pqQueryDialog::setupSpreadSheet()
 {
   this->Internals->spreadsheet->setModel(NULL);
-  if(this->Internals->source->currentPort() == NULL ||
-     this->Internals->source->currentPort()->getSource()->getProxy()->GetObjectsCreated() != 1)
+  if(!this->SelectionProducer)
     {
     return;
     }
   vtkSMSessionProxyManager* pxm =
-      this->Internals->source->currentPort()->getSource()->proxyManager();
+    this->SelectionProducer->getSource()->proxyManager();
 
   vtkSMProxy* repr = pxm->NewProxy("representations", "SpreadSheetRepresentation");
+  repr->PrototypeOn();
   // we always want to show all the blocks in the dataset, since we don't have a
   // block chooser widget in this dialog.
   vtkSMPropertyHelper(repr, "CompositeDataSetIndex").Set(0);
   vtkSMPropertyHelper(repr, "Input").Set(
-      this->Internals->source->currentPort()->getSource()->getProxy(),
-      this->Internals->source->currentPort()->getPortNumber());
+      this->SelectionProducer->getSource()->getProxy(),
+      this->SelectionProducer->getPortNumber());
   repr->UpdateVTKObjects();
 
   vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
     pxm->NewProxy("views", "SpreadSheetView"));
+  view->PrototypeOn();
   vtkSMPropertyHelper(view, "SelectionOnly").Set(1);
   vtkSMPropertyHelper(view, "Representations").Set(repr);
   vtkSMPropertyHelper(view, "ViewSize").Set(0, 1);
   vtkSMPropertyHelper(view, "ViewSize").Set(1, 1);
   view->UpdateVTKObjects();
-  view->StillRender();;
+  view->StillRender();
 
   this->Internals->ViewProxy.TakeReference(view);
   this->Internals->RepresentationProxy.TakeReference(repr);
@@ -255,12 +327,11 @@ void pqQueryDialog::setupSpreadSheet()
   // dashboards (FindDataDialog test).
 }
 
-#include <QInputEvent>
-#include <pqCoreUtilities.h>
-#include "QVTKWidget.h"
 //-----------------------------------------------------------------------------
 void pqQueryDialog::populateSelectionType()
 {
+  QString original = this->Internals->selectionType->currentText();
+
   this->Internals->selectionType->clear();
   vtkPVDataInformation* dataInfo =
       this->Internals->source->currentPort()->getDataInformation();
@@ -277,6 +348,16 @@ void pqQueryDialog::populateSelectionType()
     {
     this->Internals->selectionType->addItem("Cell",  vtkDataObject::CELL);
     this->Internals->selectionType->addItem("Point", vtkDataObject::POINT);
+    }
+
+  // try to restore the previous text
+  for(int i = 0; i < this->Internals->selectionType->count(); i++)
+    {
+    if(this->Internals->selectionType->itemText(i) == original)
+      {
+      this->Internals->selectionType->setCurrentIndex(i);
+      break;
+      }
     }
 }
 
@@ -331,13 +412,16 @@ void pqQueryDialog::runQuery()
     return;
     }
 
-  // create selection source
+  // create a new selection source for the query
+  this->Producer = this->Internals->source->currentPort();
+  this->Internals->Clauses[0]->setProducer(this->Producer);
   vtkSMProxy* selectionSource = this->Internals->Clauses[0]->newSelectionSource();
-    if (!selectionSource)
-      {
-      return;
-      }
+  if(!selectionSource)
+    {
+    return;
+    }
 
+  // set the attribute type (e.g. points/cells) for the selection
   int attr_type = this->Internals->selectionType->itemData(
     this->Internals->selectionType->currentIndex()).toInt();
 
@@ -350,45 +434,28 @@ void pqQueryDialog::runQuery()
     vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::POINT);
     }
 
+  // if the "Invert Selection" check box is checked we set the "InsideOut"
+  // property so that down-stream filters will extract only non-selected
+  // points/cells
+  if(this->Internals->invertSelectionCheckBox->isChecked())
+    {
+    vtkSMPropertyHelper(selectionSource, "InsideOut").Set(1);
+    }
+
   selectionSource->UpdateVTKObjects();
 
-  this->setupSpreadSheet();
-
-  // setupSpreadSheet already does this, but I am doing this again to be
-  // extra sure :).
-  this->Internals->spreadsheet->setModel(NULL);
-
-  this->Internals->source->currentPort()->setSelectionInput(
-      vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
+  // set the selection on the currently selected port
+  this->Producer->setSelectionInput(
+    vtkSMSourceProxy::SafeDownCast(selectionSource), 0
+  );
   selectionSource->Delete();
 
-  this->Internals->source->currentPort()->renderAllViews();
+  this->CurrentSelectionIsOurs = true;
 
-  vtkSMProxy* repr = this->Internals->RepresentationProxy;
-  // Pass the chosen attribute type to the spreasheet so we show cells or
-  // points etc. based on what was selected.
-  vtkSMPropertyHelper(repr, "FieldAssociation").Set(attr_type);
-  repr->UpdateVTKObjects();
-
-  // this may cause progress events. These can result in paint-event for the table
-  // view which could prematurely start querying information from the model.
-  // To avoid that issue, we don't set the model on  the view until after this call.
-  this->Internals->ViewProxy->StillRender();
-
-  // now set the model on the view.
-  this->Internals->spreadsheet->setModel(this->Internals->DataModel);
-
-  // Once a query has been made, we enable components of the GUI that use the
-  // selection
-  this->Internals->selectionColor->setEnabled(true);
-  this->Internals->labels->setEnabled(true);
-  this->Internals->extractSelection->setEnabled(true);
-  this->Internals->extractSelectionOverTime->setEnabled(true);
-  this->Internals->freezeSelection->setEnabled(true);
-
-  // update the list of available labels.
-  this->updateLabels();
-  emit this->selected(this->Internals->source->currentPort());
+  // emit the selected() signal which informs the selection manager
+  // about the new selection. eventually this will return to the
+  // setSelection() method where the spreadsheet will be updated.
+  emit this->selected(this->Producer);
 }
 
 //-----------------------------------------------------------------------------
@@ -539,9 +606,6 @@ void pqQueryDialog::onFreezeSelection()
       }
 
     selSource->Delete();
-
-    // Once converted, a selection can no longer be frozen.
-    this->Internals->freezeSelection->setEnabled(false);
     }
 }
 
@@ -629,13 +693,6 @@ void pqQueryDialog::linkLabelColorWidget( vtkSMProxy* proxy,
 //-----------------------------------------------------------------------------
 void pqQueryDialog::onProxySelectionChange(pqOutputPort* newSelectedPort)
 {
-  // Reset the spreadsheet view
-  //this->resetClauses();
-  this->freeSMProxy();
-
-  // Once converted, a selection can no longer be frozen.
-  this->Internals->freezeSelection->setEnabled(false);
-
   if(this->Producer != NULL)
     {
     // Disconnect previous render
@@ -668,59 +725,11 @@ void pqQueryDialog::onProxySelectionChange(pqOutputPort* newSelectedPort)
       this->Internals->extractSelectionOverTime->show();
       }
     this->updateLabels();
-
-    // Now see if we should re-enable the Freeze Selection button
-    vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(
-      this->Producer->getSelectionInput());
-
-    if (curSelSource)
-      {
-      if (
-        strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
-        strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
-        strcmp(curSelSource->GetXMLName(), "SelectionQuerySource") == 0)
-        {
-        this->Internals->freezeSelection->setEnabled(true);
-        }
-      }
     }
   else
     {
-    // As no more datasource is available make sure that we free the ressources
+    // As no more datasource is available make sure that we free the resources
     this->freeSMProxy();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqQueryDialog::onSelectionSpecificationChanged(pqOutputPort* port)
-{
-  this->freeSMProxy();
-
-  // This should never happen, but just in case...
-  if (port != this->Producer)
-    {
-    this->onProxySelectionChange(port);
-    return;
-    }
-
-  if (this->Producer)
-    {
-    this->setupSpreadSheet();
-    this->Internals->spreadsheet->setModel(this->Internals->DataModel);
-    // See if we should enable the Freeze Selection button
-    vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(
-      this->Producer->getSelectionInput());
-
-    if (curSelSource)
-      {
-      if (
-        strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
-        strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
-        strcmp(curSelSource->GetXMLName(), "SelectionQuerySource") == 0)
-        {
-        this->Internals->freezeSelection->setEnabled(true);
-        }
-      }
     }
 }
 
@@ -760,14 +769,20 @@ void pqQueryDialog::onActiveViewChanged(pqView* view)
   // Get point infos
   vtkSMPropertyHelper(reprProxy, "SelectionPointLabelVisibility", true).Get(&pointLabel, 1);
   vtkSMPropertyHelper(reprProxy, "SelectionPointLabelColor", true).Get(pointColor, 3);
-  pointArrayName = vtkSMStringVectorProperty::SafeDownCast(
+  if(reprProxy->GetProperty("SelectionPointFieldDataArrayName"))
+    {
+    pointArrayName = vtkSMStringVectorProperty::SafeDownCast(
       reprProxy->GetProperty("SelectionPointFieldDataArrayName"))->GetElement(0);
+    }
 
   // Get cell infos
   vtkSMPropertyHelper(reprProxy, "SelectionCellLabelVisibility", true).Get(&cellLabel, 1);
   vtkSMPropertyHelper(reprProxy, "SelectionCellLabelColor", true).Get(cellColor, 3);
-  cellArrayName = vtkSMStringVectorProperty::SafeDownCast(
+  if(reprProxy->GetProperty("SelectionCellFieldDataArrayName"))
+    {
+    cellArrayName = vtkSMStringVectorProperty::SafeDownCast(
       reprProxy->GetProperty("SelectionCellFieldDataArrayName"))->GetElement(0);
+    }
 
   // Set those values to the UI
   int new_index = 0;
@@ -812,7 +827,40 @@ void pqQueryDialog::onActiveViewChanged(pqView* view)
     this->Internals->labels->blockSignals(false);
     this->Internals->labelColor->setEnabled(new_index > 0);
     }
+
+  // update selection property widgets
+  QVBoxLayout *fontPropertiesLayout = new QVBoxLayout;
+
+  QStringList properties;
+  properties << "SelectionOpacity"
+             << "SelectionPointSize"
+             << "Cell Label Font"
+             << "SelectionCellLabelBold"
+             << "SelectionCellLabelColor"
+             << "SelectionCellLabelFontFamily"
+             << "SelectionCellLabelFontSize"
+             << "SelectionCellLabelFormat"
+             << "SelectionCellLabelItalic"
+             << "SelectionCellLabelJustification"
+             << "SelectionCellLabelOpacity"
+             << "SelectionCellLabelShadow"
+             << "Point Label Font"
+             << "SelectionPointLabelBold"
+             << "SelectionPointLabelColor"
+             << "SelectionPointLabelFontFamily"
+             << "SelectionPointLabelFontSize"
+             << "SelectionPointLabelFormat"
+             << "SelectionPointLabelItalic"
+             << "SelectionPointLabelJustification"
+             << "SelectionPointLabelOpacity"
+             << "SelectionPointLabelShadow";
+  pqProxyWidget *selectionPropertiesWidget = new pqProxyWidget(reprProxy, properties);
+  selectionPropertiesWidget->setApplyChangesImmediately(true);
+  connect(selectionPropertiesWidget, SIGNAL(changeFinished()), view, SLOT(render()));
+  fontPropertiesLayout->addWidget(selectionPropertiesWidget);
+  this->Internals->fontPropertiesFrame->setLayout(fontPropertiesLayout);
 }
+
 //-----------------------------------------------------------------------------
 void pqQueryDialog::freeSMProxy()
 {
@@ -822,4 +870,65 @@ void pqQueryDialog::freeSMProxy()
   this->Internals->ViewProxy = NULL;
   this->Internals->RepresentationProxy = NULL;
   this->Internals->spreadsheet->setModel(NULL);
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::onShowDisplayPropertiesButtonToggled(bool state)
+{
+  this->Internals->fontPropertiesFrame->setVisible(state);
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::setupGlobalPropertyLinks()
+{
+  // Link the selection color to the global selection color so that it will
+  // affect all views, otherwise user may be get confused ;).
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+
+  this->Internals->Links.addPropertyLink(
+    this->Internals->SelectionColorAdaptor,
+    "color", SIGNAL(colorChanged(const QVariant&)),
+    globalPropertiesManager,
+    globalPropertiesManager->GetProperty("SelectionColor"));
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::onInvertSelectionToggled(bool state)
+{
+  if(!this->SelectionProducer)
+    {
+    return;
+    }
+
+  vtkSMSourceProxy *selectionSource = this->SelectionProducer->getSelectionInput();
+  if(!selectionSource)
+    {
+    return;
+    }
+
+  vtkSMPropertyHelper(selectionSource, "InsideOut").Set(state ? 1 : 0);
+  selectionSource->UpdateVTKObjects();
+  this->SelectionProducer->renderAllViews();
+
+  // update spread sheet
+  vtkSMProxy* repr = this->Internals->RepresentationProxy;
+  repr->UpdateVTKObjects();
+  this->Internals->ViewProxy->StillRender();
+}
+
+//-----------------------------------------------------------------------------
+void pqQueryDialog::onShowTypeChanged(const QString &type)
+{
+  vtkSMProxy* repr = this->Internals->RepresentationProxy;
+  if(!repr)
+    {
+    return;
+    }
+
+  vtkSMPropertyHelper(repr, "FieldAssociation").Set(
+    type == "Points" ? vtkSelection::POINT : vtkSelection::CELL
+  );
+  repr->UpdateVTKObjects();
+  this->Internals->ViewProxy->StillRender();
 }
