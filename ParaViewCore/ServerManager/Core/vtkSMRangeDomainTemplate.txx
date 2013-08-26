@@ -142,12 +142,16 @@ void vtkSMRangeDomainTemplate<T>::Update(vtkSMProperty* property)
 
     for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
       {
-      if (cc == static_cast<unsigned int>(new_entries.size()))
+      int entry_index = cc/2;
+      // ensure new_entries is of the size
+      if (entry_index >= static_cast<unsigned int>(new_entries.size()))
         {
-        new_entries.resize(cc+1);
+        new_entries.resize(entry_index + 1);
         }
-      new_entries[cc/2].Valid[cc%2] = true;
-      new_entries[cc/2].Value[cc%2] = helper.GetAs<T>(cc);
+
+      int min_max_index = cc%2;
+      new_entries[entry_index].Valid[min_max_index] = true;
+      new_entries[entry_index].Value[min_max_index] = helper.GetAs<T>(cc);
       }
 
     this->SetEntries(new_entries);
