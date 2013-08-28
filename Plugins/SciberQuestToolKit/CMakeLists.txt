@@ -25,7 +25,6 @@ endif()
 IF (ParaView_SOURCE_DIR)
   INCLUDE_DIRECTORIES(
     ${VTK_INCLUDE_DIRS}
-    ${MPI_INCLUDE_PATH}
     ${OPENGL_INCLUDE_DIR}
   )
 ELSE (ParaView_SOURCE_DIR)
@@ -36,7 +35,9 @@ ENDIF (ParaView_SOURCE_DIR)
 #--------------------------------------------------
 # Use ParaView configuration for MPI
 #--------------------------------------------------
-if(${PARAVIEW_USE_MPI})
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+  vtk_mpi_link(SciberQuestToolKit)
   set(SQTK_WITHOUT_MPI OFF)
   add_definitions("-DMPICH_IGNORE_CXX_SEEK")
 else()

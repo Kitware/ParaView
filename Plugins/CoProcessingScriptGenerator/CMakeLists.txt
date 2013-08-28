@@ -84,3 +84,8 @@ IF (BUILD_TESTING)
     SET_TESTS_PROPERTIES(pv.CoProcessingGUI-static PROPERTIES RUN_SERIAL ON)
   ENDIF ( BUILD_SHARED_LIBS )
 ENDIF (BUILD_TESTING)
+
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+  vtk_mpi_link(CoProcessingPlugin)
+endif()
