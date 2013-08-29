@@ -225,24 +225,33 @@ int vtkOrderedCompositeDistributor::RequestData(
   //d3->SetClipAlgorithmType(vtkDistributedDataFilter::USE_TABLEBASEDCLIPDATASET);
   d3->Update();
 
-  if (output->IsA("vtkUnstructuredGrid"))
+  vtkDataSet* distributedData =
+    vtkDataSet::SafeDownCast(d3->GetOutputDataObject(0));
+  // D3 can result in certain processes having empty datasets. Since we use
+  // internal methods on vtkDataSetSurfaceFilter, they are not empty-data safe
+  // and hence can segfault. This check avoids such segfaults.
+  if (distributedData &&
+      distributedData->GetNumberOfPoints() > 0 &&
+      distributedData->GetNumberOfCells() > 0)
     {
-    output->ShallowCopy(d3->GetOutput());
-    }
-  else if (output->IsA("vtkPolyData"))
-    {
-    vtkNew<vtkDataSetSurfaceFilter> converter;
-    converter->UnstructuredGridExecute(
-      vtkDataSet::SafeDownCast(d3->GetOutputDataObject(0)),
-      vtkPolyData::SafeDownCast(output), 0);
-    }
-  else
-    {
-    vtkErrorMacro(<< "vtkOrderedCompositeDistributor used with unsupported "
-                  << "type.");
-    return 0;
-    }
+    if (output->IsA("vtkUnstructuredGrid"))
+      {
+      output->ShallowCopy(distributedData);
+      }
+    else if (output->IsA("vtkPolyData"))
+      {
+      vtkNew<vtkDataSetSurfaceFilter> converter;
+      converter->UnstructuredGridExecute(
+        distributedData, vtkPolyData::SafeDownCast(output), 0);
+      }
+    else
+      {
+      vtkErrorMacro(<< "vtkOrderedCompositeDistributor used with unsupported "
+        << "type.");
+      return 0;
+      }
 #endif
+    }
 
   return 1;
 }
