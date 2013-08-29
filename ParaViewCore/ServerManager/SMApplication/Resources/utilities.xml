@@ -2389,7 +2389,7 @@
       <!-- End of POVExporter -->
     </RenderViewExporterProxy>
     <GL2PSExporterProxy class="not-used"
-                             name="GL2PSExporterBase">
+                        name="GL2PSExporterBase">
       <Documentation>Base API definition for all GL2PS vector graphic exporters.
       </Documentation>
       <StringVectorProperty command="SetFileName"
@@ -2408,6 +2408,7 @@
                          default_values="1"
                          name="SetSort"
                          label="GL2PS depth sort method"
+                         panel_visibility="advanced"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="No sorting (fastest, poor)"
@@ -2430,6 +2431,7 @@
                          default_values="1"
                          name="SetDrawBackground"
                          label="Draw background"
+                         panel_visibility="advanced"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -2437,6 +2439,7 @@
                          default_values="1"
                          name="SetOcclusionCull"
                          label="Cull hidden primitives"
+                         panel_visibility="advanced"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -2453,6 +2456,7 @@
                          default_values="1"
                          name="ExcludeCubeAxesActorsFromRasterization"
                          label="Don't rasterize cube axes"
+                         panel_visibility="advanced"
                          number_of_elements="1">
         <Documentation>If rasterizing 3D geometry, setting this option will
         export all cube axes actors as vector graphics.</Documentation>
@@ -2462,6 +2466,7 @@
                             default_values="0.714"
                             name="LineWidthFactor"
                             label="Line width scaling factor"
+                            panel_visibility="advanced"
                             number_of_elements="1">
         <DoubleRangeDomain max="10"
                            min="0"
@@ -2471,6 +2476,7 @@
                             default_values="0.714"
                             name="PointSizeFactor"
                             label="Point size scaling factor"
+                            panel_visibility="advanced"
                             number_of_elements="1">
         <DoubleRangeDomain max="10"
                            min="0"
@@ -2479,10 +2485,10 @@
       <!-- End of "GL2PSExporterBase" -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
-                             base_proxyname="GL2PSExporterBase"
-                             class="vtkPVGL2PSExporter"
-                             file_extension="ps"
-                             name="GL2PSExporterPS">
+                        base_proxyname="GL2PSExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="ps"
+                        name="GL2PSExporterPS">
       <Documentation long_help="Export PostScript (PS) Files"
                      short_help="PS Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
@@ -2498,6 +2504,7 @@
                          default_values="1"
                          name="SetPS3Shading"
                          label="Use shfill shading operator"
+                         panel_visibility="advanced"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -2512,10 +2519,10 @@
       <!-- End of GL2PSExporterPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
-                             base_proxyname="GL2PSExporterBase"
-                             class="vtkPVGL2PSExporter"
-                             file_extension="eps"
-                             name="GL2PSExporterEPS">
+                        base_proxyname="GL2PSExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="eps"
+                        name="GL2PSExporterEPS">
       <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
                      short_help="EPS Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
@@ -2538,10 +2545,10 @@
       <!-- End of GL2PSExporterEPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
-                             base_proxyname="GL2PSExporterBase"
-                             class="vtkPVGL2PSExporter"
-                             file_extension="pdf"
-                             name="GL2PSExporterPDF">
+                        base_proxyname="GL2PSExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="pdf"
+                        name="GL2PSExporterPDF">
       <Documentation long_help="Export Portable Document Format (PDF) Files"
                      short_help="PDF Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
@@ -2550,6 +2557,7 @@
                          default_values="1"
                          name="SetTextAsPath"
                          label="Render text as paths"
+                         panel_visibility="advanced"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -2564,10 +2572,10 @@
       <!-- End of GL2PSExporterPDF -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
-                             base_proxyname="GL2PSExporterBase"
-                             class="vtkPVGL2PSExporter"
-                             file_extension="svg"
-                             name="GL2PSExporterSVG">
+                        base_proxyname="GL2PSExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="svg"
+                        name="GL2PSExporterSVG">
       <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
                      short_help="SVG Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into

@@ -40,11 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMExporterProxy.h"
 #include "vtkSMProperty.h"
 
-#include <QtGui/QCheckBox>
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
-#include <QtGui/QFormLayout>
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
+#include <QtGui/QToolButton>
 #include <QtGui/QVBoxLayout>
 
 //-----------------------------------------------------------------------------
@@ -105,15 +105,43 @@ void pqExportReaction::exportActiveView()
     if (proxyWidget->filterWidgets(true))
       {
       QDialog dialog(pqCoreUtilities::mainWidget());
-      QVBoxLayout* vbox = new QVBoxLayout(&dialog);
+      QVBoxLayout *vbox = new QVBoxLayout(&dialog);
+
+      QHBoxLayout *hbox = new QHBoxLayout;
+
+      QLabel *label = new QLabel;
+      label->setText(tr("Show advanced options:"));
+      hbox->addWidget(label);
+
+      QToolButton *advancedButton = new QToolButton;
+      advancedButton->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
+      advancedButton->setCheckable(true);
+      connect(advancedButton, SIGNAL(toggled(bool)),
+              proxyWidget, SLOT(filterWidgets(bool)));
+      hbox->addWidget(advancedButton);
+
+      vbox->addLayout(hbox);
+
       vbox->addWidget(proxyWidget);
 
-      QDialogButtonBox bbox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
-      connect(&bbox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-      connect(&bbox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-      vbox->addWidget(&bbox);
+      vbox->addStretch();
+
+      QDialogButtonBox *bbox =
+          new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
+      connect(bbox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+      connect(bbox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+      vbox->addWidget(bbox);
 
       dialog.setWindowTitle(tr("Export Options"));
+
+      // While all widgets are shown, fix the size of the dialog. Add a bit to
+      // the width, since the default size doesn't leave much room for text in
+      // the line edits.
+      dialog.adjustSize();
+      dialog.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+      // Hide advanced options:
+      proxyWidget->filterWidgets();
 
       // Show the dialog:
       int dialogCode = dialog.exec();
