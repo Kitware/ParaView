@@ -12,8 +12,6 @@ INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIR}
   )
 
 if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
-  vtk_mpi_link(H5PartReader)
   ADD_DEFINITIONS(-DH5PART_HAS_MPI)
 endif()
 
@@ -37,6 +35,11 @@ ADD_PARAVIEW_PLUGIN(H5PartReader "1.0"
 )
 
 target_link_libraries(H5PartReader LINK_PRIVATE vtksys)
+
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+  vtk_mpi_link(H5PartReader)
+endif()
 
 SET_SOURCE_FILES_PROPERTIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/H5Part/src/H5Part.c
