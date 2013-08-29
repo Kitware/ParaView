@@ -15,11 +15,14 @@
 #include "vtkSMStateVersionController.h"
 
 #include "vtkCollection.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 
 #include <vector>
+#include <set>
+#include <string>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -145,7 +148,17 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
 
   if (this->GetMajor(version)==3 && this->GetMinor(version) <= 14)
     {
-    status = status && this->Process_3_14_to_next(root);
+    status = status && this->Process_3_14_to_4_0(root);
+
+    // Since now the state file has been updated to version 4.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = { 4, 0, 1 };
+    this->UpdateVersion( version, updated_version );
+    }
+
+  if (this->GetMajor(version) == 4 && this->GetMinor(version) <= 0)
+    {
+    status = status && this->Process_4_0_to_next(root);
     }
 
   return status;
@@ -1212,48 +1225,133 @@ bool vtkSMStateVersionController::ConvertRepresentationProperty(
 }
 
 //----------------------------------------------------------------------------
- bool vtkSMStateVersionController::Process_3_14_to_next(vtkPVXMLElement* root)
- {
-   // For 2D views we simply remove the InteractionMode property element to rely
-   // on the default value of the proxy definition itself
-   if (root)
-     {
-     const char* twoDRenderType = "2DRenderView";
-     const char* interactionModeName = "InteractionMode";
-     const char* currentType;
-     const char* currentName;
-     unsigned int nbElements = root->GetNumberOfNestedElements();
-     for(unsigned int elemIndex = 0; elemIndex < nbElements; elemIndex++)
-       {
-       vtkPVXMLElement* proxy = root->GetNestedElement(elemIndex);
-       if( (currentType = proxy->GetAttribute("type")) &&
-           !strcmp(twoDRenderType, currentType))
-         {
-         for( unsigned int propIndex = 0;
-              propIndex < proxy->GetNumberOfNestedElements();
-              propIndex++)
-           {
-           vtkPVXMLElement* property = proxy->GetNestedElement(propIndex);
-           if( (currentName = property->GetAttribute("name")) &&
-               !strcmp(interactionModeName, currentName))
-             {
-             proxy->RemoveNestedElement(property);
-             break;
-             }
-           }
-         }
-       }
-     }
+bool vtkSMStateVersionController::Process_3_14_to_4_0(vtkPVXMLElement* root)
+{
+  // For 2D views we simply remove the InteractionMode property element to rely
+  // on the default value of the proxy definition itself
+  if (root)
+    {
+    const char* twoDRenderType = "2DRenderView";
+    const char* interactionModeName = "InteractionMode";
+    const char* currentType;
+    const char* currentName;
+    unsigned int nbElements = root->GetNumberOfNestedElements();
+    for(unsigned int elemIndex = 0; elemIndex < nbElements; elemIndex++)
+      {
+      vtkPVXMLElement* proxy = root->GetNestedElement(elemIndex);
+      if( (currentType = proxy->GetAttribute("type")) &&
+        !strcmp(twoDRenderType, currentType))
+        {
+        for( unsigned int propIndex = 0;
+          propIndex < proxy->GetNumberOfNestedElements();
+          propIndex++)
+          {
+          vtkPVXMLElement* property = proxy->GetNestedElement(propIndex);
+          if( (currentName = property->GetAttribute("name")) &&
+            !strcmp(interactionModeName, currentName))
+            {
+            proxy->RemoveNestedElement(property);
+            break;
+            }
+          }
+        }
+      }
+    }
 
-   // ExodusIIReader now uses shorter name without "Size: ... "
-   // This deals with old state files
-   if(root)
-     {
-     const char* attrs[] = {"group","sources","type","ExodusIIReader", 0};
-     this->Select( root, "Proxy",attrs, &::ConvertExodusIIReader, this);
-     }
-   return true;
- }
+  // ExodusIIReader now uses shorter name without "Size: ... "
+  // This deals with old state files
+  if(root)
+    {
+    const char* attrs[] = {"group","sources","type","ExodusIIReader", 0};
+    this->Select( root, "Proxy",attrs, &::ConvertExodusIIReader, this);
+    }
+  return true;
+}
+
+namespace
+{
+  bool ConvertCTHPartProperties(vtkPVXMLElement* element, void* callData)
+    {
+    vtkSMStateVersionController * self
+      = reinterpret_cast< vtkSMStateVersionController * >( callData );
+    return self->ConvertCTHPartProperties(element);
+    }
+};
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::ConvertCTHPartProperties(vtkPVXMLElement* root)
+{
+  // find property elements for AddFloatVolumeArrayName,
+  // AddDoubleVolumeArrayName, AddUnsignedCharVolumeArrayName.
+  std::set<std::string> names;
+  std::vector<vtkPVXMLElement*> to_remove;
+  for (unsigned int cc=0; cc < root->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* child = root->GetNestedElement(cc);
+    if (child->GetName() && strcmp(child->GetName(), "Property")==0 &&
+      child->GetAttribute("name") != 0 &&
+      (strcmp(child->GetAttribute("name"), "AddFloatVolumeArrayName") == 0 ||
+       strcmp(child->GetAttribute("name"), "AddDoubleVolumeArrayName") == 0 ||
+       strcmp(child->GetAttribute("name"), "AddUnsignedCharVolumeArrayName") == 0))
+      {
+      to_remove.push_back(child);
+
+      for (unsigned int kk=0; kk < child->GetNumberOfNestedElements(); kk++)
+        {
+        vtkPVXMLElement* element = child->GetNestedElement(kk);
+        if (element->GetName() && strcmp(element->GetName(), "Element") == 0 &&
+          element->GetAttribute("value") != 0)
+          {
+          names.insert(element->GetAttribute("value"));
+          }
+        }
+      }
+    }
+  for (size_t cc=0; cc < to_remove.size(); cc++)
+    {
+    root->RemoveNestedElement(to_remove[cc]);
+    }
+  to_remove.clear();
+
+  if (names.size() > 0)
+    {
+    vtkNew<vtkPVXMLElement> child;
+    child->SetName("Property");
+    child->SetAttribute("name", "VolumeArrays");
+    int index = 0;
+    for (std::set<std::string>::iterator iter=names.begin();
+      iter != names.end(); ++iter, ++index)
+      {
+      vtkNew<vtkPVXMLElement> element;
+      element->SetName("Element");
+      element->AddAttribute("index", index);
+      element->AddAttribute("value", iter->c_str());
+      child->AddNestedElement(element.GetPointer());
+      }
+    root->AddNestedElement(child.GetPointer());
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::Process_4_0_to_next(vtkPVXMLElement* root)
+{
+  if (!root)
+    {
+    return false;
+    }
+
+  // For CTHPart filter, we need to convert AddDoubleVolumeArrayName,
+  // AddUnsignedCharVolumeArrayName and AddFloatVolumeArrayName to a single
+  // VolumeArrays property. The type specific separation is no longer
+  // needed.
+
+  const char* attrs[] = {
+    "group","filters",
+    "type", "CTHPart", 0};
+  this->Select( root, "Proxy",attrs, &::ConvertCTHPartProperties, this);
+  return true;
+}
 
 //----------------------------------------------------------------------------
 void vtkSMStateVersionController::PrintSelf(ostream& os, vtkIndent indent)

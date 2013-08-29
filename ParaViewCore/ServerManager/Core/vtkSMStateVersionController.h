@@ -45,7 +45,8 @@ public:
   bool Process_3_8_to_3_10(vtkPVXMLElement* root);
   bool Process_3_10_to_3_12(vtkPVXMLElement* root);
   bool Process_3_12_to_3_14(vtkPVXMLElement* root, vtkPVXMLElement* parent);
-  bool Process_3_14_to_next(vtkPVXMLElement* root);
+  bool Process_3_14_to_4_0(vtkPVXMLElement* root);
+  bool Process_4_0_to_next(vtkPVXMLElement* root);
 
 //BTX
   bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
@@ -54,6 +55,7 @@ public:
   bool ConvertExodusIIReader(vtkPVXMLElement* parent);
   bool ConvertPVAnimationSceneToAnimationScene(vtkPVXMLElement* parent);
   bool ConvertRepresentationProperty(vtkPVXMLElement* element);
+  bool ConvertCTHPartProperties(vtkPVXMLElement* element);
 protected:
   vtkSMStateVersionController();
   ~vtkSMStateVersionController();
