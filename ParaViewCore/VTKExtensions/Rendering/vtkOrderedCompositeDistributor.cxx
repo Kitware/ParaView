@@ -250,8 +250,8 @@ int vtkOrderedCompositeDistributor::RequestData(
         << "type.");
       return 0;
       }
-#endif
     }
+#endif
 
   return 1;
 }
