@@ -61,6 +61,9 @@ public:
   /// Returns the current point index. -1 is none is selected.
   vtkIdType currentPoint() const;
 
+  /// Returns the number of control points in the editor widget.
+  vtkIdType numberOfControlPoints() const;
+
 public slots:
   /// Set the current point. Set to -1 clear the current point.
   void setCurrentPoint(vtkIdType index);

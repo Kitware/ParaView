@@ -334,15 +334,27 @@ void pqColorOpacityEditorWidget::updateCurrentData()
     {
     double xrgbms[6];
     stc->GetNodeValue(ui.ColorEditor->currentPoint(), xrgbms);
-    ui.CurrentDataValue->setEnabled(true);
     ui.CurrentDataValue->setText(QString::number(xrgbms[0]));
+
+    // Don't enable widget for first/last control point. For those, users must
+    // rescale the transfer function manually
+    ui.CurrentDataValue->setEnabled(
+      ui.ColorEditor->currentPoint() != 0 &&
+      ui.ColorEditor->currentPoint() !=
+      (ui.ColorEditor->numberOfControlPoints()-1));
     }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
     {
     double xvms[4];
     pwf->GetNodeValue(ui.OpacityEditor->currentPoint(), xvms);
-    ui.CurrentDataValue->setEnabled(true);
     ui.CurrentDataValue->setText(QString::number(xvms[0]));
+
+    // Don't enable widget for first/last control point. For those, users must
+    // rescale the transfer function manually
+    ui.CurrentDataValue->setEnabled(
+      ui.OpacityEditor->currentPoint() != 0 &&
+      ui.OpacityEditor->currentPoint() !=
+      (ui.OpacityEditor->numberOfControlPoints()-1));
     }
   else
     {
