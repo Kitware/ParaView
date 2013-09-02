@@ -70,7 +70,6 @@ QModelIndex	pqExpandableTableView::moveCursor(
       sflags |= QItemSelectionModel::NoUpdate;
       }
 
-    QAbstractItemModel* curModel = this->model();
     while (idx.isValid() && !(idx.flags() & Qt::ItemIsEditable))
       {
       QPersistentModelIndex persistent(idx);
