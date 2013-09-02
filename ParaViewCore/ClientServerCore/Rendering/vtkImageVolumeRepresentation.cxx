@@ -103,30 +103,8 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 
     vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
 
-    // The KdTree generation code that uses the image cuts needs to be updated
-    // bigtime. But due to time shortage, I'm leaving the old code as is. We
-    // will get back to it later.
-    if (this->GetNumberOfInputConnections(0) == 1)
-      {
-      vtkAlgorithmOutput* connection = this->GetInputConnection(0, 0);
-      vtkAlgorithm* inputAlgo = connection->GetProducer();
-      vtkStreamingDemandDrivenPipeline* sddp =
-        vtkStreamingDemandDrivenPipeline::SafeDownCast(inputAlgo->GetExecutive());
-      vtkExtentTranslator* translator =
-        sddp->GetExtentTranslator(connection->GetIndex());
-    
-      int extent[6] = {1, -1, 1, -1, 1, -1};
-      sddp->GetWholeExtent(sddp->GetOutputInformation(connection->GetIndex()),
-        extent);
-
-      double origin[3], spacing[3];
-      vtkImageData* image = vtkImageData::SafeDownCast(
-        inputAlgo->GetOutputDataObject(connection->GetIndex()));
-      image->GetOrigin(origin);
-      image->GetSpacing(spacing);
-      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-        translator, extent, origin, spacing);
-      }
+    vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
+      this, inInfo);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -139,6 +117,36 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
       }
     }
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
+  vtkPVDataRepresentation* self, vtkInformation* inInfo)
+{
+  // The KdTree generation code that uses the image cuts needs to be updated
+  // bigtime. But due to time shortage, I'm leaving the old code as is. We
+  // will get back to it later.
+  if (self->GetNumberOfInputConnections(0) == 1)
+    {
+    vtkAlgorithmOutput* connection = self->GetInputConnection(0, 0);
+    vtkAlgorithm* inputAlgo = connection->GetProducer();
+    vtkStreamingDemandDrivenPipeline* sddp =
+      vtkStreamingDemandDrivenPipeline::SafeDownCast(inputAlgo->GetExecutive());
+    vtkExtentTranslator* translator =
+      sddp->GetExtentTranslator(connection->GetIndex());
+
+    int extent[6] = {1, -1, 1, -1, 1, -1};
+    sddp->GetWholeExtent(sddp->GetOutputInformation(connection->GetIndex()),
+      extent);
+
+    double origin[3], spacing[3];
+    vtkImageData* image = vtkImageData::SafeDownCast(
+      inputAlgo->GetOutputDataObject(connection->GetIndex()));
+    image->GetOrigin(origin);
+    image->GetSpacing(spacing);
+    vtkPVRenderView::SetOrderedCompositingInformation(
+      inInfo, self, translator, extent, origin, spacing);
+    }
 }
 
 //----------------------------------------------------------------------------

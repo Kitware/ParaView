@@ -113,6 +113,12 @@ public:
   // Provides access to the actor used by this representation.
   vtkPVLODVolume* GetActor() { return this->Actor; }
 
+  // Description:
+  // Helper method to pass input image extent information to the view to use in
+  // determining the cuts for ordered compositing.
+  static void PassOrderedCompositingInformation(
+    vtkPVDataRepresentation* self, vtkInformation* inInfo);
+
 //BTX
 protected:
   vtkImageVolumeRepresentation();
