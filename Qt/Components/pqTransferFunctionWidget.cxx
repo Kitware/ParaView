@@ -425,6 +425,13 @@ void pqTransferFunctionWidget::setCurrentPoint(vtkIdType index)
 }
 
 //-----------------------------------------------------------------------------
+vtkIdType pqTransferFunctionWidget::numberOfControlPoints() const
+{
+  return this->Internals->ControlPointsItem? 
+    this->Internals->ControlPointsItem->GetNumberOfPoints() : 0;
+}
+
+//-----------------------------------------------------------------------------
 void pqTransferFunctionWidget::render()
 {
   this->Internals->Timer.start();
