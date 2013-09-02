@@ -91,3 +91,8 @@ ENDIF (PARAVIEW_BUILD_QT_GUI)
 IF (BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
 ENDIF (BUILD_TESTING)
+
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+  vtk_mpi_link(GMVReader)
+endif()

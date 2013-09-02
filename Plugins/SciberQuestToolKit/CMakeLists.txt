@@ -25,7 +25,6 @@ endif()
 IF (ParaView_SOURCE_DIR)
   INCLUDE_DIRECTORIES(
     ${VTK_INCLUDE_DIRS}
-    ${MPI_INCLUDE_PATH}
     ${OPENGL_INCLUDE_DIR}
   )
 ELSE (ParaView_SOURCE_DIR)
@@ -36,7 +35,7 @@ ENDIF (ParaView_SOURCE_DIR)
 #--------------------------------------------------
 # Use ParaView configuration for MPI
 #--------------------------------------------------
-if(${PARAVIEW_USE_MPI})
+if(PARAVIEW_USE_MPI)
   set(SQTK_WITHOUT_MPI OFF)
   add_definitions("-DMPICH_IGNORE_CXX_SEEK")
 else()
@@ -339,4 +338,9 @@ if (SQTK_PYTHON_BINDINGS)
   generate_python_bindings(SciberQuestToolKit "${SM_CXX_SOURCES}")
   install(TARGETS SciberQuestToolKitPython DESTINATION ${SQTK_LIB_INSTALL_PATH})
   install(TARGETS SciberQuestToolKitPythonD DESTINATION ${SQTK_LIB_INSTALL_PATH})
+endif()
+
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+  vtk_mpi_link(SciberQuestToolKit)
 endif()
