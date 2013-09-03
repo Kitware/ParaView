@@ -333,9 +333,16 @@ bool vtkSMRangeDomainTemplate<T>::GetComputedDefaultValue(unsigned int index, T&
 
 //-----------------------------------------------------------------------------
 template <class T>
+int vtkSMRangeDomainTemplate<T>::GetDefaultMode()
+{
+  return this->DefaultMode;
+}
+
+//-----------------------------------------------------------------------------
+template <class T>
 void vtkSMRangeDomainTemplate<T>::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "DefaultMode: " << this->DefaultMode << endl;
+  os << indent << "DefaultMode: " << this->GetDefaultMode() << endl;
 }
 #endif
