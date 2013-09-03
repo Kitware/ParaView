@@ -121,7 +121,7 @@ public:
 
   // Description:
   // Get the default-mode that controls how SetDefaultValues() behaves.
-  vtkGetMacro(DefaultMode, int);
+  int GetDefaultMode();
 
   // Description:
   // Set the property's default value based on the domain. How the value is
@@ -132,8 +132,6 @@ public:
 protected:
   vtkSMRangeDomainTemplate();
   ~vtkSMRangeDomainTemplate();
-
-  vtkSetClampMacro(DefaultMode, int, MIN, MID);
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
