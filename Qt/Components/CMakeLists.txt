@@ -256,8 +256,6 @@ set (Module_SRCS
   pqOrbitWidget.h
   pqOutputPortComboBox.cxx
   pqOutputPortComboBox.h
-  pqParallelCoordinatesChartDisplayPanel.cxx
-  pqParallelCoordinatesChartDisplayPanel.h
 #  pqParticleTracerPanel.cxx
 #  pqParticleTracerPanel.h
   pqPassArraysPanel.cxx
@@ -272,8 +270,6 @@ set (Module_SRCS
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.cxx
   pqPipelineTimeKeyFrameEditor.h
-  pqPlotMatrixDisplayPanel.cxx
-  pqPlotMatrixDisplayPanel.h
   pqPlotMatrixOptionsEditor.cxx
   pqPlotMatrixOptionsEditor.h
   pqPluginDialog.cxx
@@ -418,8 +414,6 @@ set (Module_SRCS
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx
   pqWriterDialog.h
-  pqXYChartDisplayPanel.cxx
-  pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.cxx
   pqXYChartOptionsEditor.h
   pqYoungsMaterialInterfacePanel.cxx
@@ -529,7 +523,6 @@ set (Module_MOC_HDRS
   pqOrbitCreatorDialog.h
   pqOrbitWidget.h
   pqOutputPortComboBox.h
-  pqParallelCoordinatesChartDisplayPanel.h
 #  pqParticleTracerPanel.h
   pqPassArraysPanel.h
   pqPipelineAnnotationFilterModel.h
@@ -537,7 +530,6 @@ set (Module_MOC_HDRS
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.h
-  pqPlotMatrixDisplayPanel.h
   pqPlotMatrixOptionsEditor.h
   pqPluginDialog.h
   pqPluginTreeWidgetEventPlayer.h
@@ -607,7 +599,6 @@ set (Module_MOC_HDRS
   pqViewManager.h
   pqWidgetRangeDomain.h
   pqWriterDialog.h
-  pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.h
   pqYoungsMaterialInterfacePanel.h
 )
@@ -662,10 +653,8 @@ set (Module_UI_FILES
   Resources/UI/pqMemoryInspectorPanelForm.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
-  Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
-  Resources/UI/pqPlotMatrixDisplayPanel.ui
   Resources/UI/pqPlotMatrixOptionsWidget.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
@@ -695,7 +684,6 @@ set (Module_UI_FILES
   Resources/UI/pqThresholdPanel.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqWriterDialog.ui
-  Resources/UI/pqXYChartDisplayPanel.ui
 )
 
 if(PARAVIEW_ENABLE_PYTHON)

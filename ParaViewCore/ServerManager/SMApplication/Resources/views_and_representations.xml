@@ -3717,7 +3717,8 @@
                               class="vtkXYChartRepresentation"
                               name="XYChartRepresentationBase"
                               processes="client|dataserver|renderserver">
-      <Documentation>Representation used by XYChartView.</Documentation>
+      <Documentation>API for representations used by XYChartView and XYBarChartView.
+      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <Documentation>Data input for the representation.</Documentation>
@@ -3728,7 +3729,8 @@
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Visibility of the representation.</Documentation>
       </IntVectorProperty>
@@ -3758,63 +3760,35 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetFieldAssociation"
-                         default_values="0"
-                         name="AttributeType"
-                         number_of_elements="1">
-        <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
-                         name="enum">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
-      </IntVectorProperty>
       <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
                          command="AddCompositeDataSetIndex"
                          default_values="1"
-			 number_of_elements="1"
+			                   number_of_elements="1"
                          name="CompositeDataSetIndex"
                          number_of_elements_per_command="1"
                          panel_visibility="default"
                          repeat_command="1">
-        <CompositeTreeDomain mode="all"
-                             name="tree">
+        <CompositeTreeDomain mode="leaves" name="tree">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
         <Documentation>This property lists the ids of the blocks to extract
         from the input multiblock dataset.</Documentation>
       </IntVectorProperty>
-
-
-
-
-      <StringVectorProperty element_types="2"
-                            information_only="1"
-                            name="SeriesNamesInfo"
-                            number_of_elements_per_command="1"
-                            si_class="vtkSIContextArraysProperty">
-        <Documentation>Property providing list of available series that can be
-        plotted.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetXAxisSeriesName"
-                            default_values=""
-                            name="XArrayName"
-                            number_of_elements="1">
-        <Documentation>Set the array to use on X axis. This is used only when
-        UseIndexForXAxis is set to 0.</Documentation>
-        <StringListDomain name="array_list">
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="AttributeType"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to render.</Documentation>
+        <FieldDataDomain disable_update_domain_entries="1"
+                         enable_field_data="1"
+                         name="enum">
           <RequiredProperties>
-            <Property function="ArrayList"
-                      name="SeriesNamesInfo" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
-        </StringListDomain>
-      </StringVectorProperty>
+        </FieldDataDomain>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseIndexForXAxis"
                          default_values="1"
                          name="UseIndexForXAxis"
@@ -3824,41 +3798,96 @@
         otherwise the array identified by XArrayName will be
         used.</Documentation>
       </IntVectorProperty>
-      <SubProxy>
-        <Proxy name="PlotOptions"
-               proxygroup="options"
-               proxyname="XYPlotOptions"></Proxy>
-        <ExposedProperties>
-          <Property exposed_name="SeriesVisibility"
-                    name="Visibility" />
-          <Property exposed_name="SeriesColor"
-                    name="Color" />
-          <Property exposed_name="SeriesLineThickness"
-                    name="LineThickness" />
-          <Property exposed_name="SeriesLineStyle"
-                    name="LineStyle" />
-          <Property exposed_name="SeriesLabel"
-                    name="Label" />
-          <Property exposed_name="SeriesMarkerStyle"
-                    name="MarkerStyle" />
-          <Property exposed_name="SeriesPlotCorner"
-                    name="PlotCorner" />
-          <Property exposed_name="SeriesVisibilityInfo"
-                    name="VisibilityInfo" />
-          <Property exposed_name="SeriesColorInfo"
-                    name="ColorInfo" />
-          <Property exposed_name="SeriesLineThicknessInfo"
-                    name="LineThicknessInfo" />
-          <Property exposed_name="SeriesLineStyleInfo"
-                    name="LineStyleInfo" />
-          <Property exposed_name="SeriesLabelInfo"
-                    name="LabelInfo" />
-          <Property exposed_name="SeriesMarkerStyleInfo"
-                    name="MarkerStyleInfo" />
-          <Property exposed_name="SeriesPlotCornerInfo"
-                    name="PlotCornerInfo" />
-        </ExposedProperties>
-      </SubProxy>
+      <StringVectorProperty command="SetXAxisSeriesName"
+                            default_values=""
+                            name="XArrayName"
+                            number_of_elements="1">
+        <Documentation>Set the array to use on X axis. This is used only when
+        UseIndexForXAxis is set to 0.</Documentation>
+        <ChartSeriesListDomain name="array_list"
+                              hide_partial_arrays="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+          </RequiredProperties>
+        </ChartSeriesListDomain>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          UseIndexForXAxis is unchecked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseIndexForXAxis" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <PropertyGroup label="X Axis Parameters">
+        <Property name="UseIndexForXAxis" />
+        <Property name="XArrayName" />
+      </PropertyGroup>
+
+      <StringVectorProperty command="SetSeriesVisibility"
+                            clean_command="ClearSeriesVisibilities"
+                            element_types="2 0"
+                            name="SeriesVisibility"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series visibility.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="visibility">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetLabel"
+                            clean_command="ClearLabels"
+                            element_types="2 2"
+                            name="SeriesLabel"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series labels.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list" default_mode="label">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColor"
+                            clean_command="ClearColors"
+                            element_types="2 1 1 1"
+                            name="SeriesColor"
+                            number_of_elements_per_command="4"
+                            repeat_command="1">
+        <Documentation>Set the series line/bar color.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list" default_mode="color">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetAxisCorner"
+                            clean_command="ClearAxisCorners"
+                            element_types="2 0"
+                            name="SeriesPlotCorner"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series axis corner.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="0">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+
 
       <SubProxy>
         <!--
@@ -3874,6 +3903,7 @@
                          name="SelectionInput"/>
         </RepresentationProxy>
       </SubProxy>
+
       <!-- End of XYChartRepresentationBase -->
     </ChartRepresentationProxy>
 
@@ -3893,7 +3923,8 @@
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Visibility of the representation.</Documentation>
       </IntVectorProperty>
@@ -3923,20 +3954,6 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetFieldAssociation"
-                         default_values="0"
-                         name="FieldAssociation"
-                         number_of_elements="1">
-        <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
-                         name="enum">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
-      </IntVectorProperty>
       <IntVectorProperty command="SetCompositeDataSetIndex"
                          default_values="1"
                          name="CompositeDataSetIndex"
@@ -3953,78 +3970,95 @@
           </RequiredProperties>
         </CompositeTreeDomain>
       </IntVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="LineThicknessInfo"
-                            number_of_elements_per_command="1">
-        <Documentation>Property which has the current state of line thickness
-        for the series available currently.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetLineThickness"
-                            element_types="0"
-                            information_property="LineThicknessInfo"
-                            name="LineThickness"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Set the series line thickness.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="LineStyleInfo"
-                            number_of_elements_per_command="1">
-        <Documentation>Property which has the current state of line style for
-        the series available currently.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetLineStyle"
-                            element_types="0"
-                            information_property="LineStyleInfo"
-                            name="LineStyle"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Set the series line style.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="ColorInfo"
-                            number_of_elements_per_command="3">
-        <Documentation>Property which has the current state of line color for
-        the series.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetColor"
-                            element_types="1 1 1"
-                            information_property="ColorInfo"
-                            name="Color"
-                            number_of_elements_per_command="3"
-                            repeat_command="1">
-        <Documentation>Set the series line color.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="OpacityInfo"
-                            number_of_elements_per_command="1">
-        <Documentation>Property which has the current state of line color for
-        the series.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetOpacity"
-                            element_types="1"
-                            information_property="OpacityInfo"
-                            name="Opacity"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Set the opacity of the lines.</Documentation>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <FieldDataDomain disable_update_domain_entries="1"
+                         enable_field_data="1"
+                         name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetSeriesVisibility"
+                            element_types="2 0"
+                            name="SeriesVisibility"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            clean_command="ClearSeriesVisibilities">
+        <Documentation>Set the series visibility.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="visibility">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="FieldAssociation" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+        <Hints>
+          <!-- when present, the SeriesEditor widget will allow user to
+          re-order the series which will affect the rendered plot -->
+          <SeriesEditor supports_reordering="1" />
+        </Hints>
       </StringVectorProperty>
 
-      <SubProxy>
-        <Proxy name="PlotOptions"
-               proxygroup="options"
-               proxyname="PlotOptionsBase"></Proxy>
-        <ExposedProperties>
-          <Property exposed_name="SeriesVisibility"
-                    name="Visibility" />
-          <Property exposed_name="SeriesLabel"
-                    name="Label" />
-          <Property exposed_name="SeriesVisibilityInfo"
-                    name="VisibilityInfo" />
-          <Property exposed_name="SeriesLabelInfo"
-                    name="LabelInfo" />
-        </ExposedProperties>
-      </SubProxy>
+      <DoubleVectorProperty command="SetColor"
+                            name="Color"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Set the series line color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOpacity"
+                            name="Opacity"
+                            number_of_elements="1"
+                            default_values="0.1"
+                            panel_visibility="advanced">
+        <Documentation>Set the opacity of the lines.</Documentation>
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetLineThickness"
+                         name="LineThickness"
+                         number_of_elements="1"
+                         default_values="2"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line thickness.</Documentation>
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLineStyle"
+                         name="LineStyle"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line style.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Solid" value="1" />
+          <Entry text="Dash" value="2" />
+          <Entry text="Dot" value="3" />
+          <Entry text="Dash Dot" value="4" />
+          <Entry text="Dash Dot Dot" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Series Parameters"
+                     panel_widget="SeriesEditor" >
+        <Property name="SeriesVisibility" function="SeriesVisibility" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Styling">
+        <Property name="Color" />
+        <Property name="Opacity" />
+        <Property name="LineThickness" />
+        <Property name="LineStyle" />
+      </PropertyGroup>
 
       <SubProxy>
         <!--
@@ -4058,7 +4092,8 @@
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Visibility of the representation.</Documentation>
       </IntVectorProperty>
@@ -4088,20 +4123,6 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetFieldAssociation"
-                         default_values="0"
-                         name="FieldAssociation"
-                         number_of_elements="1">
-        <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
-                         name="enum">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
-      </IntVectorProperty>
       <IntVectorProperty command="SetCompositeDataSetIndex"
                          default_values="1"
                          name="CompositeDataSetIndex"
@@ -4118,79 +4139,126 @@
           </RequiredProperties>
         </CompositeTreeDomain>
       </IntVectorProperty>
-      <StringVectorProperty element_types="2"
-                            information_only="1"
-                            name="SeriesNamesInfo"
-                            number_of_elements_per_command="1"
-                            si_class="vtkSIContextArraysProperty">
-        <Documentation>Property providing list of available series that can be
-        plotted.</Documentation>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <FieldDataDomain disable_update_domain_entries="1"
+                         enable_field_data="1"
+                         name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetSeriesVisibility"
+                            element_types="2 0"
+                            name="SeriesVisibility"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            clean_command="ClearSeriesVisibilities">
+        <Documentation>Set the series visibility.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="visibility">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="FieldAssociation" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+        <Hints>
+          <!-- when present, the SeriesEditor widget will allow user to
+          re-order the series which will affect the rendered plot -->
+          <SeriesEditor supports_reordering="1" />
+        </Hints>
       </StringVectorProperty>
+
+      <PropertyGroup label="Series Parameters"
+                     panel_widget="SeriesEditor" >
+        <Property name="SeriesVisibility" function="SeriesVisibility" />
+      </PropertyGroup>
+
       <DoubleVectorProperty command="SetColor"
                             default_values="0 0 0"
-                            name="Color"
+                            name="ScatterPlotsColor"
                             number_of_elements_per_command="3"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
         <Documentation>Sets the color.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetActivePlotColor"
-                            default_values="0 0 0"
-                            name="ActivePlotColor"
-                            number_of_elements_per_command="3"
-                            repeat_command="1">
-        <Documentation>Sets the color for the active plot.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetHistogramColor"
                             default_values="0 0 0"
                             name="HistogramColor"
                             number_of_elements_per_command="3"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
         <Documentation>Sets the color for the histograms.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetMarkerStyle"
                          default_values="4"
                          name="ScatterPlotMarkerStyle"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <Documentation>Property which sets the marker style for the scatter
         plots.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetActivePlotMarkerStyle"
-                         default_values="4"
-                         name="ActivePlotMarkerStyle"
-                         number_of_elements="1">
-        <Documentation>Property which sets the marker style for the active
-        plot.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0"/>
+          <Entry text="Cross" value="1"/>
+          <Entry text="Plus" value="2"/>
+          <Entry text="Square" value="3"/>
+          <Entry text="Circle" value="4"/>
+          <Entry text="Diamond" value="5"/>
+        </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetMarkerSize"
                             default_values="5"
                             name="ScatterPlotMarkerSize"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>Property which sets the marker size for the scatter
         plots.</Documentation>
+        <DoubleRangeDomain name="range" min="1" max="20" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetActivePlotColor"
+                            default_values="0 0 0"
+                            name="ActivePlotColor"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Sets the color for the active plot.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetActivePlotMarkerStyle"
+                         default_values="4"
+                         name="ActivePlotMarkerStyle"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Property which sets the marker style for the active
+        plot.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0"/>
+          <Entry text="Cross" value="1"/>
+          <Entry text="Plus" value="2"/>
+          <Entry text="Square" value="3"/>
+          <Entry text="Circle" value="4"/>
+          <Entry text="Diamond" value="5"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetActivePlotMarkerSize"
                             default_values="8"
                             name="ActivePlotMarkerSize"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>Property which sets the marker size for the active
         plots.</Documentation>
+        <DoubleRangeDomain name="range" min="1" max="20" />
       </DoubleVectorProperty>
-
-      <SubProxy>
-        <Proxy name="PlotOptions"
-               proxygroup="options"
-               proxyname="PlotOptionsBase"></Proxy>
-        <ExposedProperties>
-          <Property exposed_name="SeriesVisibility"
-                    name="Visibility" />
-          <Property exposed_name="SeriesLabel"
-                    name="Label" />
-          <Property exposed_name="SeriesVisibilityInfo"
-                    name="VisibilityInfo" />
-          <Property exposed_name="SeriesLabelInfo"
-                    name="LabelInfo" />
-        </ExposedProperties>
-      </SubProxy>
 
       <SubProxy>
         <!--
@@ -4206,35 +4274,143 @@
                          name="SelectionInput"/>
         </RepresentationProxy>
       </SubProxy>
+
+      <PropertyGroup label="Styling">
+        <Property name="ScatterPlotsColor" />
+        <Property name="HistogramColor" />
+        <Property name="ScatterPlotMarkerStyle" />
+        <Property name="ScatterPlotMarkerSize" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Styling (Active Plot)">
+        <Property name="ActivePlotColor" />
+        <Property name="ActivePlotMarkerStyle" />
+        <Property name="ActivePlotMarkerSize" />
+      </PropertyGroup>
       <!-- End of PlotMatrixRepresentation -->
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
-    <!-- New representation for ContextView based charts. -->
     <ChartRepresentationProxy base_proxygroup="representations"
                               base_proxyname="XYChartRepresentationBase"
                               class="vtkXYChartRepresentation"
                               name="XYChartRepresentation"
                               processes="client|dataserver|renderserver">
       <Documentation>Representation used by XYChartView.</Documentation>
-      <StringVectorProperty command="SetChartType"
-                            default_values="Line"
-                            name="ChartType"
-                            number_of_elements="1"></StringVectorProperty>
+      <IntVectorProperty command="SetChartType"
+                         default_values="0"
+                         name="ChartType"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <EnumerationDomain name="enum">
+          <Entry text="Line" value="0" />
+          <Entry text="Bar" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetLineStyle"
+                            clean_command="ClearLineStyles"
+                            element_types="2 0"
+                            name="SeriesLineStyle"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series line style.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetLineThickness"
+                            clean_command="ClearLineThicknesses"
+                            element_types="2 0"
+                            name="SeriesLineThickness"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series line thickness.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="2">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetMarkerStyle"
+                            clean_command="ClearMarkerStyles"
+                            element_types="2 0"
+                            name="SeriesMarkerStyle"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series marker style.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="0">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Series Parameters"
+                     panel_widget="SeriesEditor"
+                     panel_visibility="default" >
+        <Property name="SeriesVisibility"
+                  function="SeriesVisibility" />
+        <Property name="SeriesColor"
+                  function="SeriesColor" />
+        <Property name="SeriesLineThickness"
+                  function="SeriesLineThickness" />
+        <Property name="SeriesLineStyle"
+                  function="SeriesLineStyle" />
+        <Property name="SeriesLabel"
+                  function="SeriesLabel" />
+        <Property name="SeriesMarkerStyle"
+                  function="SeriesMarkerStyle" />
+        <Property name="SeriesPlotCorner"
+                  function="SeriesPlotCorner"/>
+      </PropertyGroup>
     </ChartRepresentationProxy>
+
     <!-- =================================================================== -->
-    <!-- New representation for ContextView based charts. -->
     <ChartRepresentationProxy base_proxygroup="representations"
                               base_proxyname="XYChartRepresentationBase"
                               class="vtkXYChartRepresentation"
                               name="XYBarChartRepresentation"
                               processes="client|dataserver|renderserver">
       <Documentation>Representation used by XYBarChartView.</Documentation>
-      <StringVectorProperty command="SetChartType"
-                            default_values="Bar"
-                            name="ChartType"
-                            number_of_elements="1"></StringVectorProperty>
+      <IntVectorProperty command="SetChartType"
+                         default_values="2"
+                         name="ChartType"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <EnumerationDomain name="enum">
+          <Entry text="Line" value="0" />
+          <Entry text="Bar" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Series Parameters"
+                     panel_widget="SeriesEditor"
+                     panel_visibility="default" >
+        <Property name="SeriesVisibility"
+                  function="SeriesVisibility" />
+        <Property name="SeriesColor"
+                  function="SeriesColor" />
+        <Property name="SeriesLabel"
+                  function="SeriesLabel" />
+        <Property name="SeriesPlotCorner"
+                  function="SeriesPlotCorner"/>
+      </PropertyGroup>
     </ChartRepresentationProxy>
+
     <!-- =================================================================== -->
     <SpreadSheetRepresentationProxy class="vtkSpreadSheetRepresentation"
                                     name="SpreadSheetRepresentation"

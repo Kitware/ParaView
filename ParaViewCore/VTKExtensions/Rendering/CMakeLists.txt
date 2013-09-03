@@ -34,7 +34,6 @@ set(Module_SRCS
   vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
-  vtkChartNamedOptions.cxx
   vtkCleanArrays.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkCSVExporter.cxx
@@ -84,7 +83,6 @@ set(Module_SRCS
   vtkUpdateSuppressorPipeline.cxx
   vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
-  vtkXYChartNamedOptions.cxx
   vtkZlibImageCompressor.cxx
 )
 

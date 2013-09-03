@@ -46,6 +46,36 @@ void vtkSMChartRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+int vtkSMChartRepresentationProxy::ReadXMLAttributes(
+  vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
+
+  vtkSMProxy* optionsProxy = this->GetSubProxy("PlotOptions");
+  if (optionsProxy)
+    {
+    const char* names[] = {
+      "Input",
+      "CompositeDataSetIndex",
+      "AttributeType",
+      NULL
+    };
+    for (int cc=0; names[cc] != NULL; cc++)
+      {
+      vtkSMProperty* src = this->GetProperty(names[cc]);
+      vtkSMProperty* dest = optionsProxy->GetProperty(names[cc]);
+      if (src && dest)
+        {
+        this->LinkProperty(src, dest);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMChartRepresentationProxy::SetPropertyModifiedFlag(
   const char* name, int flag)
 {

@@ -120,6 +120,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
     pipeline->Delete();
     filter = split;
     split->SetInputConnection(adtf->GetOutputPort());
+    split->SetNamingModeToNamesWithUnderscores();
     split->Update();
     }
 

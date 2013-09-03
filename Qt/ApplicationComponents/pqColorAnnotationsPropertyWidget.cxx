@@ -190,7 +190,7 @@ public:
           }
         }
       }
-    else if (role == Qt::DisplayRole)
+    else if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
       switch (idx.column())
         {

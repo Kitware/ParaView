@@ -211,6 +211,13 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
  if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
    this->InTileDisplayMode())
    {
+   vtkTimerLog::MarkStartEvent("vtkPVContextView::PrepareForRender");
+   // on rendering-nodes call Render-pass so that representations can update the
+   // vtk-charts as needed.
+   this->CallProcessViewRequest(vtkPVView::REQUEST_RENDER(),
+     this->RequestInformation, this->ReplyInformationVector);
+   vtkTimerLog::MarkEndEvent("vtkPVContextView::PrepareForRender");
+
    this->ContextView->Render();
    }
  this->SynchronizedWindows->SetEnabled(false);

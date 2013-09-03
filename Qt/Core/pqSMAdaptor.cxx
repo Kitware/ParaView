@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBoundsDomain.h"
+#include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
@@ -128,6 +129,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     vtkSMStringListDomain* stringListDomain = NULL;
     vtkSMCompositeTreeDomain* compositeTreeDomain = NULL;
     vtkSMSILDomain* silDomain = NULL;
+    vtkSMChartSeriesSelectionDomain* chartSeriesSelectionDomain = NULL;
     
     vtkSMDomainIterator* iter = Property->NewDomainIterator();
     for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -160,6 +162,11 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
         {
         compositeTreeDomain = vtkSMCompositeTreeDomain::SafeDownCast(iter->GetDomain());
         }
+      if (!chartSeriesSelectionDomain)
+        {
+        chartSeriesSelectionDomain =
+          vtkSMChartSeriesSelectionDomain::SafeDownCast(iter->GetDomain());
+        }
       }
     iter->Delete();
 
@@ -174,6 +181,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
     else if (silDomain)
       {
       type = pqSMAdaptor::SIL;
+      }
+    else if (chartSeriesSelectionDomain)
+      {
+      type = pqSMAdaptor::MULTIPLE_ELEMENTS;
       }
     else if(!silDomain && (
       (VectorProperty && VectorProperty->GetRepeatCommand() && 

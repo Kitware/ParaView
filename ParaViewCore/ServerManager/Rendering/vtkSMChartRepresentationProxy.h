@@ -35,6 +35,10 @@ public:
   // Returns client side representation object.
   vtkChartRepresentation* GetRepresentation();
 
+  // Description:
+  // Overridden to handle links with subproxy properties.
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+
 //BTX
 protected:
   vtkSMChartRepresentationProxy();

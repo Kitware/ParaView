@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkSIChartRepresentationProxy.h"
 
-#include "vtkChartNamedOptions.h"
 #include "vtkChartRepresentation.h"
 #include "vtkChartSelectionRepresentation.h"
 #include "vtkObjectFactory.h"
@@ -33,16 +32,6 @@ vtkSIChartRepresentationProxy::~vtkSIChartRepresentationProxy()
 //----------------------------------------------------------------------------
 void vtkSIChartRepresentationProxy::OnCreateVTKObjects()
 {
-  vtkSIProxy* optionsProxy = this->GetSubSIProxy("PlotOptions");
-  if (optionsProxy)
-    {
-    vtkChartNamedOptions* options = vtkChartNamedOptions::SafeDownCast(
-      optionsProxy->GetVTKObject());
-    vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
-      this->GetVTKObject());
-    repr->SetOptions(options);
-    }
-
   vtkSIProxy* selectionProxy = this->GetSubSIProxy("SelectionRepresentation");
   if (selectionProxy)
     {

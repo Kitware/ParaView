@@ -29,13 +29,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkPVPlotMatrixRepresentation - vtkChartRepresentation subclass for
+// scatter-plot-matrix representation.
+// .SECTION Description:
+// vtkPVPlotMatrixRepresentation manages representations in a
+// vtkScatterPlotMatrix view. It exposes API that affects how the matrix is
+// rendered as well as API to control which of the columns in the input vtkTable
+// are to be plotted in the matrix.
+//
+// vtkPVPlotMatrixRepresentation currently does not support multiblock of tables
+// and only the first table is rendered.
 #ifndef _vtkPVPlotMatrixRepresentation_h
 #define _vtkPVPlotMatrixRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"
 #include "vtkColor.h" // for ivars
-#include "vtkNew.h" // for ivars
 
 class vtkScatterPlotMatrix;
 class vtkStringArray;
@@ -52,10 +61,11 @@ public:
   virtual void SetVisibility(bool visible);
 
   // Description:
-  // Get the name of the series with the given index.  Returns 0 if the index
-  // is out of range.  The returned pointer is only valid until the next call
-  // to GetSeriesName.
-  virtual const char* GetSeriesName(int series);
+  // Set series visibility given its name. The order in which
+  // SetSeriesVisibility is called is used to determine the order for each of
+  // the plots in the grid.
+  void SetSeriesVisibility(const char* series, bool visibility);
+  void ClearSeriesVisibilities();
 
   // Description:
   // Sets the color for the scatter plots in the plot matrix.
@@ -86,11 +96,6 @@ public:
   void SetActivePlotMarkerSize(double size);
 
   // Description:
-  // Move the column of the input table so that the scatter plot
-  // will be re-arranged accordingly.
-  void MoveInputTableColumn(int fromCol, int toCol);
-
-  // Description:
   // Returns the scatter plot matrix.
   vtkScatterPlotMatrix* GetPlotMatrix() const;
 
@@ -98,9 +103,10 @@ protected:
   vtkPVPlotMatrixRepresentation();
   ~vtkPVPlotMatrixRepresentation();
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
+  // Description:
+  // Overridden to pass information about changes to series visibility etc. to
+  // the plot-matrix.
+  virtual void PrepareForRendering();
 
   // Description:
   // Add the plot matrix representation to the view.
@@ -114,6 +120,9 @@ private:
   vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&); // Not implemented
   void operator=(const vtkPVPlotMatrixRepresentation&); // Not implemented
 
+  class vtkInternals;
+  vtkInternals* Internals;
+
   vtkColor4ub ActivePlotColor;
   vtkColor4ub ScatterPlotColor;
   vtkColor4ub HistogramColor;
@@ -121,7 +130,6 @@ private:
   int ActivePlotMarkerStyle;
   double ScatterPlotMarkerSize;
   double ActivePlotMarkerSize;
-  vtkNew<vtkStringArray> OrderedColumns;
 };
 
 #endif

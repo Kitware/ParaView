@@ -42,6 +42,22 @@ vtkSMStringListDomain::~vtkSMStringListDomain()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMStringListDomain::SetStrings(const std::vector<vtkStdString>& strings)
+{
+  if (this->SLInternals->Strings != strings)
+    {
+    this->SLInternals->Strings = strings;
+    this->DomainModified();
+    }
+}
+
+//---------------------------------------------------------------------------
+const std::vector<vtkStdString>& vtkSMStringListDomain::GetStrings()
+{
+  return this->SLInternals->Strings;
+}
+
+//---------------------------------------------------------------------------
 unsigned int vtkSMStringListDomain::GetNumberOfStrings()
 {
   return static_cast<unsigned int>(this->SLInternals->Strings.size());

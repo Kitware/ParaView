@@ -41,10 +41,6 @@ set(Module_SRCS
   pqApplicationCore.h
   pqAutoStartInterface.cxx
   pqAutoStartInterface.h
-  pqChartRepresentation.cxx
-  pqChartRepresentation.h
-  pqChartSeriesSettingsModel.cxx
-  pqChartSeriesSettingsModel.h
   pqCollaborationEventPlayer.cxx
   pqCollaborationEventPlayer.h
   pqCollaborationManager.cxx
@@ -137,8 +133,6 @@ set(Module_SRCS
   pqPipelineSource.h
   pqPlotMatrixView.cxx
   pqPlotMatrixView.h
-  pqPlotSettingsModel.cxx
-  pqPlotSettingsModel.h
   pqPluginManager.cxx
   pqPluginManager.h
   pqProgressManager.cxx
@@ -246,8 +240,6 @@ set (Module_MOC_HDRS
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
-  pqChartRepresentation.h
-  pqChartSeriesSettingsModel.h
   pqCollaborationEventPlayer.h
   pqCollaborationManager.h
   pqComparativeContextView.h
@@ -285,7 +277,6 @@ set (Module_MOC_HDRS
   pqPipelineRepresentation.h
   pqPipelineSource.h
   pqPlotMatrixView.h
-  pqPlotSettingsModel.h
   pqPluginManager.h
   pqProgressManager.h
   pqPropertyLinksConnection.h

@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
-#include "pqChartRepresentation.h"
 #include "pqInterfaceTracker.h"
 #include "pqPropertiesPanel.h"
 #include "pqPipelineRepresentation.h"
@@ -361,12 +360,13 @@ void pqApplicationOptions::applyChanges()
   pqAnimationScene::setCacheLimitSetting(
                                   this->Internal->AnimationCacheLimit->value());
 
-  QStringList hidden;
-  for (int i = 0; i < this->Internal->ChartHiddenSeries->count(); i++)
-    {
-    hidden << this->Internal->ChartHiddenSeries->item(i)->text();
-    }
-  pqChartRepresentation::setHiddenSeriesSetting(hidden);
+  // FIXME: pqChartRepresentation is being deprecated.
+  //QStringList hidden;
+  //for (int i = 0; i < this->Internal->ChartHiddenSeries->count(); i++)
+  //  {
+  //  hidden << this->Internal->ChartHiddenSeries->item(i)->text();
+  //  }
+  //pqChartRepresentation::setHiddenSeriesSetting(hidden);
 
   pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
 
@@ -469,12 +469,13 @@ void pqApplicationOptions::resetChanges()
     {
     delete this->Internal->ChartHiddenSeries->takeItem(0);
     }
-  foreach (QString hidden, pqChartRepresentation::getHiddenSeriesSetting())
-    {
-    QListWidgetItem *item
-      = new QListWidgetItem(hidden, this->Internal->ChartHiddenSeries);
-    item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
-    }
+  // FIXME: pqChartRepresentation is being deprecated.
+  //foreach (QString hidden, pqChartRepresentation::getHiddenSeriesSetting())
+  //  {
+  //  QListWidgetItem *item
+  //    = new QListWidgetItem(hidden, this->Internal->ChartHiddenSeries);
+  //  item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
+  //  }
 }
 
 //-----------------------------------------------------------------------------
@@ -564,12 +565,14 @@ void pqApplicationOptions::onChartResetHiddenSeries()
     {
     delete this->Internal->ChartHiddenSeries->takeItem(0);
     }
-  foreach (QString hidden, pqChartRepresentation::defaultHiddenSeriesSetting())
-    {
-    QListWidgetItem *item
-      = new QListWidgetItem(hidden, this->Internal->ChartHiddenSeries);
-    item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
-    }
+
+  // FIXME: pqChartRepresentation is being deprecated.
+  //foreach (QString hidden, pqChartRepresentation::defaultHiddenSeriesSetting())
+  //  {
+  //  QListWidgetItem *item
+  //    = new QListWidgetItem(hidden, this->Internal->ChartHiddenSeries);
+  //  item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
+  //  }
 
   emit this->changesAvailable();
 }

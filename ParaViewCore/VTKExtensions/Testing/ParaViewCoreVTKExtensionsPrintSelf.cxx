@@ -33,7 +33,6 @@
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
-#include "vtkChartNamedOptions.h"
 #include "vtkCSVExporter.h"
 #include "vtkCSVWriter.h"
 #include "vtkDataSetToRectilinearGrid.h"
@@ -235,7 +234,6 @@ int main(int , char *[])
   PRINT_SELF(vtkCleanUnstructuredGrid);
   PRINT_SELF(vtkCompositeAnimationPlayer);
   PRINT_SELF(vtkCompositeDataToUnstructuredGridFilter);
-  PRINT_SELF(vtkChartNamedOptions);
   PRINT_SELF(vtkCSVExporter);
   PRINT_SELF(vtkCSVWriter);
   PRINT_SELF(vtkDataSetToRectilinearGrid);
