@@ -761,10 +761,10 @@ void pqQueryDialog::onActiveViewChanged(pqView* view)
   // Value container
   int pointLabel;
   double pointColor[3];
-  const char* pointArrayName;
+  const char* pointArrayName = "";
   int cellLabel;
   double cellColor[3];
-  const char* cellArrayName;
+  const char* cellArrayName = "";
 
   // Get point infos
   vtkSMPropertyHelper(reprProxy, "SelectionPointLabelVisibility", true).Get(&pointLabel, 1);
