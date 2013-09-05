@@ -11480,6 +11480,7 @@ found and the point will be rejected.</Documentation>
       </Hints>
     </SourceProxy>
     <!-- PCAStatistics -->
+#ifdef PARAVIEW_USE_MPI
     <SourceProxy class="vtkPCosmoHaloFinder"
                  label="FOF/SOD Halo Finder"
                  name="HaloFinder">
@@ -11672,6 +11673,7 @@ found and the point will be rejected.</Documentation>
         halo.</Documentation>
       </DoubleVectorProperty>
     </SourceProxy>
+#endif
     <!-- ==================================================================== -->
     <SourceProxy class="vtkMaterialInterfaceFilter"
                  label="Material Interface Filter"

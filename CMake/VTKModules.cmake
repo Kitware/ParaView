@@ -18,6 +18,10 @@ set(_vtk_mpi_modules
 
   vtkFiltersParallelFlowPaths
   #  vtkStreamTracer (Parallel)
+
+  vtkFiltersCosmo
+  # Needed for:
+  #  vtkPCosmoReader
   )
 
 set(_vtk_modules
@@ -316,11 +320,6 @@ set(_vtk_modules
   vtkRenderingFreeType
   # Needed for:
   #  vtkVectorText
-
-  vtkFiltersCosmo
-  # Note: Not in ParaViewXXX.xml but required by a test.
-  # Needed for:
-  #  vtkPCosmoReader
 
   vtkIOParallelLSDyna
   # Note: Not in ParaViewXXX.xml but required by a test.
