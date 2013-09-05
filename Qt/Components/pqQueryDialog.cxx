@@ -494,7 +494,7 @@ void pqQueryDialog::updateLabels()
   int cur_item_data = 0;
   if (cur_index != -1)
     {
-    this->Internals->labels->currentText();
+    cur_text = this->Internals->labels->currentText();
     cur_item_data = this->Internals->labels->itemData(cur_index).toInt();
     }
 
@@ -509,7 +509,7 @@ void pqQueryDialog::updateLabels()
   QIcon cellDataIcon(":/pqWidgets/Icons/pqCellData16.png");
   QIcon pointDataIcon(":/pqWidgets/Icons/pqPointData16.png");
 
-  vtkPVDataInformation* dataInfo = this->Internals->source->currentPort()->getDataInformation();
+  vtkPVDataInformation* dataInfo = this->SelectionProducer->getDataInformation();
 
   // Only adding cells and points for now since our labelling code doesn't
   // support vertex or edge labels.
@@ -615,8 +615,13 @@ void pqQueryDialog::setLabel(int index)
   // disabled when not labelling.
   this->Internals->labelColor->setEnabled(index > 0);
 
+  if(!this->SelectionProducer)
+    {
+    return;
+    }
+
   pqDataRepresentation* repr =
-      this->Internals->source->currentPort()->getRepresentation(
+      this->SelectionProducer->getRepresentation(
           pqActiveObjects::instance().activeView());
   if (!repr)
     {
@@ -674,7 +679,7 @@ void pqQueryDialog::setLabel(int index)
 
   reprProxy->UpdateVTKObjects();
   END_UNDO_SET();
-  this->Internals->source->currentPort()->renderAllViews();
+  this->SelectionProducer->renderAllViews();
 }
 
 //-----------------------------------------------------------------------------
@@ -724,7 +729,6 @@ void pqQueryDialog::onProxySelectionChange(pqOutputPort* newSelectedPort)
       {
       this->Internals->extractSelectionOverTime->show();
       }
-    this->updateLabels();
     }
   else
     {
