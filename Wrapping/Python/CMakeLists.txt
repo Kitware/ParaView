@@ -38,21 +38,10 @@ endif()
 set(PV_PYTHON_MODULE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/paraview")
 set(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview")
 
-# Handle out-of-source builds correctly.
-#
-#  1. Create a list of Python files to be installed/copied.
-#  2. Copy them to the binary directory. Since paraview cannot be built
-#     in place, we must always copy the files to the binary directory.
-#  3. Use Python's compileall to compile the copied files.
-#
-# *** Step 1 has to be done carefully to avoid missing out files ***
-
 # Copy generated module files from VTK.
-# To this first so we can replace some of the VTK files by ParaView
-# customizations.
 if (VTK_BINARY_DIR)
   file (COPY "${VTK_BINARY_DIR}/Wrapping/Python/vtk"
-        DESTINATION "${PV_PYTHON_MODULE_BINARY_DIR}"
+        DESTINATION "${VTK_BUILD_PYTHON_MODULE_DIR}"
         USE_SOURCE_PERMISSIONS)
 endif()
 
