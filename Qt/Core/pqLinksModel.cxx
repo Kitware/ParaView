@@ -649,7 +649,7 @@ void pqLinksModelObject::proxyModified(pqServerManagerModelItem* item)
     {
     foreach(pqProxy* p, this->Internal->OutputProxies)
       {
-      if(p != source && !p->modifiedState() != pqProxy::MODIFIED)
+      if(p != source && p->modifiedState() != pqProxy::MODIFIED)
         {
         p->setModifiedState(pqProxy::MODIFIED);
         }

@@ -371,7 +371,7 @@ void pqPointSpriteControls::onRadiusArrayChanged(
   svp->SetElement(0, 0); // idx
   svp->SetElement(1, 0); //port
   svp->SetElement(2, 0); //connection
-  svp->SetElement(3, (int) vtkDataObject::FIELD_ASSOCIATION_POINTS); //type
+  svp->SetElement(3, "0" /* vtkDataObject::FIELD_ASSOCIATION_POINTS */); //type
   svp->SetElement(4, name.toAscii().data()); //name
 
   this->Internals->TransferFunctionDialog->radiusEditor()->needReloadGUI();
@@ -422,7 +422,7 @@ void pqPointSpriteControls::onOpacityArrayChanged(
   svp->SetElement(0, 0); // idx
   svp->SetElement(1, 0); //port
   svp->SetElement(2, 0); //connection
-  svp->SetElement(3, (int) vtkDataObject::FIELD_ASSOCIATION_POINTS); //type
+  svp->SetElement(3, "0" /* vtkDataObject::FIELD_ASSOCIATION_POINTS */); //type
   svp->SetElement(4, name.toAscii().data()); //name
 
   this->Internals->TransferFunctionDialog->opacityEditor()->needReloadGUI();
