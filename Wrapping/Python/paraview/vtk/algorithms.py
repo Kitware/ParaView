@@ -6,7 +6,7 @@ from vtkPVClientServerCoreCorePython import vtkProcessModule
 
 from vtkFiltersCorePython import vtkPolyDataNormals, vtkCellDataToPointData
 from vtkFiltersVerdictPython import vtkCellQuality, vtkMatrixMathFilter
-from vtkFiltersGeneral import vtkCellDerivatives
+from vtkFiltersGeneralPython import vtkCellDerivatives
 
 def _cell_derivatives (narray, dataset, attribute_type, filter):
     if not dataset :
