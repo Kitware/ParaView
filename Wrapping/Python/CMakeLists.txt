@@ -38,15 +38,20 @@ endif()
 set(PV_PYTHON_MODULE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/paraview")
 set(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview")
 
-# Copy generated module files from VTK.
-if (VTK_BINARY_DIR)
-  file (COPY "${VTK_BINARY_DIR}/Wrapping/Python/vtk"
-        DESTINATION "${VTK_BUILD_PYTHON_MODULE_DIR}"
-        USE_SOURCE_PERMISSIONS)
-endif()
+# Copy vtk python module once ready and compiled
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/vtk_py_copy_completed"
+  COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
+          "${VTK_BINARY_DIR}/Wrapping/Python/vtk"
+          "${VTK_BUILD_PYTHON_MODULE_DIR}/vtk"
+  COMMAND ${CMAKE_COMMAND} ARGS -E touch
+          "${CMAKE_CURRENT_BINARY_DIR}/vtk_py_copy_completed"
+  )
+add_custom_target(copy_vtk_py_files ALL
+  DEPENDS vtkpython_pyc "${CMAKE_CURRENT_BINARY_DIR}/vtk_py_copy_completed"
+)
 
-# This will replace the "vtk/__init__.py" file as well as add a few extra files
-# to the "vtk" module.
+# Copy ParaView specific python files
 file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/paraview
       DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages
       USE_SOURCE_PERMISSIONS
@@ -79,7 +84,7 @@ ADD_CUSTOM_COMMAND(
   )
 
 ADD_CUSTOM_TARGET(paraview_pyc ALL 
-  DEPENDS "${PV_PYTHON_MODULE_BINARY_DIR}/pv_compile_complete")
+  DEPENDS copy_vtk_py_files "${PV_PYTHON_MODULE_BINARY_DIR}/pv_compile_complete")
 
 # Install the paraview module files.
 INSTALL(DIRECTORY ${PV_PYTHON_MODULE_BINARY_DIR}
