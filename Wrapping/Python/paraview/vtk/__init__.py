@@ -30,9 +30,9 @@ try:
 except ImportError:
     paraview.print_error("Error: Could not import vtkRenderingCorePython")
 try:
-    from vtkFiltersCore import *
+    from vtkFiltersCorePython import *
 except ImportError:
-    paraview.print_error("Error: Could not import vtkFiltersCore")
+    paraview.print_error("Error: Could not import vtkFiltersCorePython")
 
 # --------------------------------------
 
