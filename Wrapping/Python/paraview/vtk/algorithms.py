@@ -4,9 +4,9 @@ from paraview import numpy_support
 from paraview import vtk
 from vtkPVClientServerCoreCorePython import vtkProcessModule
 
-from vtk.vtkFiltersCorePython import vtkPolyDataNormals, vtkCellDataToPointData
-from vtk.vtkFiltersVerdictPython import vtkCellQuality, vtkMatrixMathFilter
-from vtk.vtkFiltersGeneral import vtkCellDerivatives
+from vtkFiltersCorePython import vtkPolyDataNormals, vtkCellDataToPointData
+from vtkFiltersVerdictPython import vtkCellQuality, vtkMatrixMathFilter
+from vtkFiltersGeneral import vtkCellDerivatives
 
 def _cell_derivatives (narray, dataset, attribute_type, filter):
     if not dataset :
