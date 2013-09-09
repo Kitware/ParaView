@@ -2407,6 +2407,65 @@
       </Hints>
     </SourceProxy>
     <!-- End PNetCDFPOPReaderCore -->
+
+#ifdef PARAVIEW_USE_MPI
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkACosmoReader"
+                 name="AdaptiveCosmoCore">
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the file name for the COSMO reader.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetByteSwap"
+                         default_values="0"
+                         name="ByteSwap"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If checked, the data will be read and byte-swapped.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTagSize"
+                         default_values="0"
+                         name="TagSize"
+                         number_of_elements="1">
+        <EnumerationDomain name="file_byte_order">
+          <Entry value="0" text="32-bit" />
+          <Entry value="1" text="64-bit" />
+        </EnumerationDomain>
+        <Documentation>
+          Set the endian of the file.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBoxSize"
+                            default_values="100"
+                            name="BoxSize"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0" name="range" />
+        <Documentation>
+          The box side length is used to wrap particles around if
+          they exceed rL (or less than 0) in any dimension.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetLevel"
+                         default_values="1"
+                         name="Level"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" max="100" name="range" />
+        <Documentation>
+          Specify the desired level of resolution.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+#endif
+
+#ifdef PARAVIEW_USE_MPI
+    <!-- ============================================================= -->
     <SourceProxy class="vtkPCosmoReader"
                  label="COSMO Reader"
                  name="CosmoReaderCore">
@@ -2424,10 +2483,23 @@
                          label="Cosmo Format"
                          name="CosmoFormat"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <EnumerationDomain name="enum">
+          <Entry text="Gadget" value="0" />
+          <Entry text="Cosmo" value="1" />
+        </EnumerationDomain>
         <Documentation>If checked, the data will be read as the LANL Cosmo
         format. If unchecked, the data will be read as Gadget-2
         format.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetByteSwap"
+                         default_values="1"
+                         name="ByteSwap"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If checked, the data will be read and swapped after. This
+          option is only applicable to the LANL Cosmo format.
+        </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetRL"
                             default_values="100"
@@ -2452,6 +2524,9 @@
         computation.</Documentation>
       </DoubleVectorProperty>
     </SourceProxy>
+#endif
+
+    <!-- ============================================================= -->
     <SourceProxy class="vtkPNGReader"
                  label="PNG Reader"
                  name="PNGReader">
@@ -6951,6 +7026,67 @@
     </SourceProxy>
     <!-- End PNetCDFPOPReader -->
 #endif
+
+#ifdef PARAVIEW_USE_MPI
+    <!-- =================================================================== -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 name="AdaptiveCosmoReader"
+                 si_class="vtkSIFileSeriesReaderProxy">
+      <Documentation long_help="Reads a cosmology file into a vtkUnstructuredGrid."
+                     short_help="Read a cosmology file.">
+                     The Cosmology reader
+                     reads a binary file of particle location, velocity, and id
+                     creating a vtkUnstructuredGrid. The default file extension
+                     is .cosmo64. Reads LANL Cosmo format or Gadget
+                     format. This reader support multi-resolution streaming of
+                     particles.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="AdaptiveCosmoCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ByteSwap" />
+          <Property name="BoxSize" />
+          <Property name="TagSize" />
+          <Property name="Level"  />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="cosmo cosmo64"
+                       file_description="Adaptive cosmo files" />
+      </Hints>
+    </SourceProxy>
+#endif
+#ifdef PARAVIEW_USE_MPI
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="COSMO Reader"
@@ -6968,6 +7104,7 @@
                proxyname="CosmoReaderCore"></Proxy>
         <ExposedProperties>
           <Property name="CosmoFormat" />
+          <Property name="ByteSwap" />
           <Property name="RL" />
           <Property name="Overlap" />
         </ExposedProperties>
@@ -6996,10 +7133,11 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="cosmo gadget2"
+        <ReaderFactory extensions="cosmo gadget2 cosmo64"
                        file_description="Cosmology files" />
       </Hints>
     </SourceProxy>
+#endif
     <SourceProxy class="vtkMPASReader"
                  label="NetCDF MPAS reader"
                  name="MPASReader">
