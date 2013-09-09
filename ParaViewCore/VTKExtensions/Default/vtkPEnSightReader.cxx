@@ -1353,7 +1353,6 @@ int vtkPEnSightReader::ReadCaseFileFile(char* line)
 
     filenameNums->Delete();
     numSteps->Delete();
-    lineRead = this->ReadNextDataLine(line);
     }
 
   return lineRead;
