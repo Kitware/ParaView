@@ -119,6 +119,15 @@ endif()
 if(NOT VTK_INSTALL_LIBRARY_DIR)
   set(VTK_INSTALL_LIBRARY_DIR lib/paraview-${PARAVIEW_VERSION})
 endif()
+# ParaView installs the vtk python modules specifically to appropriate locations.
+if(NOT VTK_INSTALL_PYTHON_MODULE_DIR)
+  set (VTK_INSTALL_PYTHON_MODULE_DIR "${VTK_INSTALL_LIBRARY_DIR}/site-packages" CACHE
+       PATH "Directory where python modules will be installed")
+endif()
+if(NOT VTK_BUILD_PYTHON_MODULE_DIR)
+  set (VTK_BUILD_PYTHON_MODULE_DIR "${CMAKE_BINARY_DIR}/lib/site-packages" CACHE
+       PATH "Directory where python modules will be installed")
+endif()
 if(NOT VTK_INSTALL_ARCHIVE_DIR)
   set(VTK_INSTALL_ARCHIVE_DIR lib/paraview-${PARAVIEW_VERSION})
 endif()
@@ -167,16 +176,12 @@ if(NOT PV_INSTALL_PLUGIN_DIR)
   endif()
 endif()
 
-#set (VTK_INSTALL_NO_LIBRARIES TRUE)
-#set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
-
 # Disable installing of the Qt Designer plugin. There's no need for it in
 # ParaView install rules.
 set (VTK_INSTALL_NO_QT_PLUGIN TRUE)
 
-# ParaView install the vtk python modules specifically to appropriate locations.
-set (VTK_INSTALL_NO_PYTHON TRUE)
-set (VTK_INSTALL_PYTHON_USING_CMAKE TRUE)
+# Disable installing of the vtkpython executables. 
+set (VTK_INSTALL_NO_PYTHON_EXES TRUE)
 
 # for temporary backwards compatibility.
 set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})

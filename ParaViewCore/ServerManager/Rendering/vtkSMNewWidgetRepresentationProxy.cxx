@@ -260,7 +260,7 @@ void vtkSMNewWidgetRepresentationProxy::UnRegister(vtkObjectBase* obj)
   if ( pm && this->Internal )
     {
     int size = static_cast<int>(this->Internal->Links.size());
-    if (size > 0 && this->ReferenceCount == 2 + 2*size)
+    if (size > 0 && this->ReferenceCount.Get() == 2 + 2*size)
       {
       vtkSMNewWidgetRepresentationInternals* aInternal = this->Internal;
       this->Internal = 0;

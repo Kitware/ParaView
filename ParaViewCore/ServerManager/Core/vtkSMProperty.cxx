@@ -98,7 +98,7 @@ vtkSMProperty::~vtkSMProperty()
 // through the domain iterator.
 void vtkSMProperty::UnRegister(vtkObjectBase* obj)
 {
-  if (this->ReferenceCount == 2)
+  if (this->ReferenceCount.Get() == 2)
     {
     this->Superclass::UnRegister(obj);
 

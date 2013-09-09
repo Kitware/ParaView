@@ -1194,16 +1194,13 @@ MACRO(WRAP_PLUGIN_FOR_PYTHON NAME WRAP_LIST WRAP_EXCLUDE_LIST)
       TARGET_LINK_LIBRARIES (${NAME}Python ${VTK_PYTHON_LIBRARIES})
     ENDIF(WIN32 OR APPLE)
 
-    # Generally the pyhon extension module created is installed using setup.py.
-    # However projects that include VTK (such as ParaView) can override this
-    # behaviour by not using setup.py, instead directly installing the extension
-    # module at the same location as other libraries.
-    IF (VTK_INSTALL_PYTHON_USING_CMAKE AND NOT VTK_INSTALL_NO_LIBRARIES)
+    # Install the extension module at the same location as other libraries.
+    IF (NOT VTK_INSTALL_NO_LIBRARIES)
       INSTALL(TARGETS ${NAME}Python
         RUNTIME DESTINATION ${VTK_INSTALL_BIN_DIR_CM24} COMPONENT RuntimeLibraries
         LIBRARY DESTINATION ${VTK_INSTALL_LIB_DIR_CM24} COMPONENT RuntimeLibraries
         ARCHIVE DESTINATION ${VTK_INSTALL_LIB_DIR_CM24} COMPONENT Development)
-    ENDIF (VTK_INSTALL_PYTHON_USING_CMAKE AND NOT VTK_INSTALL_NO_LIBRARIES)
+    ENDIF (NOT VTK_INSTALL_NO_LIBRARIES)
   ENDIF(PYTHON_ENABLE_MODULE_${NAME}Python)
 
 ENDMACRO(WRAP_PLUGIN_FOR_PYTHON)
