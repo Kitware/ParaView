@@ -71,8 +71,6 @@ public:
 
   /// Returns the currently selected source, if any.
   pqOutputPort* getSelectedPort() const;
-  
-  friend class vtkPQSelectionObserver;
 
   /// Make a selection source proxy for a client-side selection.
   /// Only supports pedigree id selections.

@@ -532,6 +532,30 @@ pqProxyWidget::pqProxyWidget(
 }
 
 //-----------------------------------------------------------------------------
+pqProxyWidget::pqProxyWidget(
+  vtkSMProxy* smproxy, const QStringList &properties, QWidget *parentObject, Qt::WindowFlags wflags)
+  : Superclass(parentObject, wflags),
+  ApplyChangesImmediately(false),
+  Internals(new pqProxyWidget::pqInternals(smproxy))
+{
+  Q_ASSERT(smproxy);
+
+  QGridLayout* gridLayout = new QGridLayout(this);
+  gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+  gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+  gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+  gridLayout->setColumnStretch(0, 0);
+  gridLayout->setColumnStretch(1, 1);
+
+  this->createWidgets(properties);
+
+  this->setApplyChangesImmediately(false);
+  this->hideEvent(NULL);
+
+  this->updatePanel();
+}
+
+//-----------------------------------------------------------------------------
 pqProxyWidget::~pqProxyWidget()
 {
   delete this->Internals;
@@ -607,7 +631,7 @@ void pqProxyWidget::setApplyChangesImmediately(bool immediate_apply)
 }
 
 //---------------------------------------------------------------------------
-void pqProxyWidget::createWidgets()
+void pqProxyWidget::createWidgets(const QStringList &properties)
 {
   vtkSMProxy* smproxy = this->proxy();
 
@@ -655,10 +679,13 @@ void pqProxyWidget::createWidgets()
   // Create widgets for properties if legacy panels were not created.
   if (!legacyObjectPanel && !legacyDisplayPanel)
     {
-    this->createPropertyWidgets();
+    this->createPropertyWidgets(properties);
 
     // handle hints to create 3D widgets, if any.
-    this->create3DWidgets();
+    if(properties.isEmpty())
+      {
+      this->create3DWidgets();
+      }
     }
 
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
@@ -671,7 +698,7 @@ void pqProxyWidget::createWidgets()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidget::createPropertyWidgets()
+void pqProxyWidget::createPropertyWidgets(const QStringList &properties)
 {
   vtkSMProxy *smproxy = this->proxy();
 
@@ -701,7 +728,20 @@ void pqProxyWidget::createPropertyWidgets()
       continue;
       }
 
-    if (QString(group->GetPanelVisibility()) == "never")
+    bool ignorePanelVisibility = false;
+    if(!properties.isEmpty())
+      {
+      if(!properties.contains(group->GetXMLLabel()))
+        {
+        continue;
+        }
+      else
+        {
+        ignorePanelVisibility = true;
+        }
+      }
+
+    if (QString(group->GetPanelVisibility()) == "never" && !ignorePanelVisibility)
       {
       // skip property groups marked as never show
       PV_DEBUG_PANELS() << "  - Group " << group->GetXMLLabel()
@@ -759,6 +799,30 @@ void pqProxyWidget::createPropertyWidgets()
   for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
     {
     vtkSMProperty *smProperty = propertyIter->GetProperty();
+
+    QString propertyKeyName = propertyIter->GetKey();
+    propertyKeyName.replace(" ", "");
+    const char *xmlLabel = smProperty->GetXMLLabel()? smProperty->GetXMLLabel():
+      propertyIter->GetKey();
+
+    bool ignorePanelVisibility = false;
+    if(!properties.isEmpty())
+      {
+      if(!properties.contains(propertyKeyName))
+        {
+        PV_DEBUG_PANELS()
+          << "Property:" << propertyIter->GetKey()
+          << " (" << smProperty->GetXMLLabel() << ")"
+          << " gets skipped because it is not listed in the properties argument";
+        PV_DEBUG_PANELS() << ""; // this adds a newline.
+        continue;
+        }
+      else
+        {
+        ignorePanelVisibility = true;
+        }
+      }
+
     if (smProperty->GetInformationOnly())
       {
       // skip information only properties
@@ -781,7 +845,7 @@ void pqProxyWidget::createPropertyWidgets()
       continue;
       }
 
-    if (QString(smProperty->GetPanelVisibility()) == "never")
+    if (QString(smProperty->GetPanelVisibility()) == "never" && !ignorePanelVisibility)
       {
       // skip properties marked as never show
       PV_DEBUG_PANELS()
@@ -824,11 +888,6 @@ void pqProxyWidget::createPropertyWidgets()
       // custom widget. That simply means we will add framing around this
       // property.
       }
-
-    QString propertyKeyName = propertyIter->GetKey();
-    propertyKeyName.replace(" ", "");
-    const char *xmlLabel = smProperty->GetXMLLabel()? smProperty->GetXMLLabel():
-      propertyIter->GetKey();
 
     // create property widget
     PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << "(" << xmlLabel << ")";

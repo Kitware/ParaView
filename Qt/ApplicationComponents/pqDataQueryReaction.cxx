@@ -80,6 +80,8 @@ void pqDataQueryReaction::showQueryDialog()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqOutputPort* port = pqActiveObjects::instance().activePort();
+  pqSelectionManager* selManager =
+    pqPVApplicationCore::instance()->selectionManager();
   if (pqFindDataSingleton.isNull())
     {
     pqQueryDialog* dialog = new pqQueryDialog(
@@ -88,8 +90,6 @@ void pqDataQueryReaction::showQueryDialog()
     // We want to make the query the active application wide selection, so we
     // hookup the query action to selection manager so that the application
     // realizes a new selection has been made.
-    pqSelectionManager* selManager =
-      pqPVApplicationCore::instance()->selectionManager();
     dialog->setSelectionManager(selManager);
 
     QObject::connect(
@@ -104,10 +104,19 @@ void pqDataQueryReaction::showQueryDialog()
 
     pqFindDataSingleton = dialog;
     }
-  if (port)
+  // set the current producer to the currently selected port
+  // in the pipeline browser
+  if(port)
     {
     pqFindDataSingleton->setProducer(port);
     }
+
+  // if there is a current selection then display it
+  if (pqOutputPort *selection = selManager->getSelectedPort())
+    {
+    pqFindDataSingleton->setSelection(selection);
+    }
+
   pqFindDataSingleton->show();
   pqFindDataSingleton->raise();
 #else

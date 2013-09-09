@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>25</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -123,15 +123,6 @@
    </attribute>
    <widget class="pqPVAnimationWidget" name="animationView"/>
   </widget>
-  <widget class="QDockWidget" name="selectionInspectorDock">
-   <property name="windowTitle">
-    <string>Selection Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="pqSelectionInspectorWidget" name="selectionInspector"/>
-  </widget>
   <widget class="QDockWidget" name="comparativePanelDock">
    <property name="windowTitle">
     <string>Comparative View Inspector</string>
@@ -184,8 +175,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>77</width>
-          <height>152</height>
+          <width>70</width>
+          <height>150</height>
          </rect>
         </property>
        </widget>
@@ -219,8 +210,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>77</width>
-          <height>152</height>
+          <width>70</width>
+          <height>150</height>
          </rect>
         </property>
        </widget>
@@ -277,12 +268,6 @@
    <class>pqTabbedMultiViewWidget</class>
    <extends>QWidget</extends>
    <header>pqTabbedMultiViewWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqSelectionInspectorWidget</class>
-   <extends>QWidget</extends>
-   <header>pqSelectionInspectorWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

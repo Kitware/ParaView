@@ -66,6 +66,11 @@ public:
   // well ;) )
   const char* GetUserFriendlyText();
 
+  // Description:
+  // Set/get the invert selection flag.
+  vtkSetMacro(Inverse, int);
+  vtkGetMacro(Inverse, int);
+
 //BTX
 protected:
   vtkQuerySelectionSource();
@@ -94,6 +99,8 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  int Inverse;
 //ETX
 };
 

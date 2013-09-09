@@ -214,6 +214,9 @@ void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* modelToUse)
       modelToUse, SIGNAL(modelReset()),
       this, SLOT(sortColumns()));
     }
+
+  // ensure headers are properly displayed for the new data
+  this->onHeaderDataChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -221,6 +224,11 @@ void pqSpreadSheetViewWidget::onHeaderDataChanged()
 {
   pqSpreadSheetViewModel* shModel =
       qobject_cast<pqSpreadSheetViewModel*>(this->model());
+  if(!shModel)
+    {
+    return;
+    }
+
   for (int cc=0; cc < shModel->columnCount(); cc++)
     {
     QString headerTitle =

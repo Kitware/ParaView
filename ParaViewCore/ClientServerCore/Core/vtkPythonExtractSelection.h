@@ -51,6 +51,11 @@ public:
   vtkBooleanMacro(PreserveTopology, int);
 
   // Description:
+  // Set/get the inverse flag.
+  vtkSetMacro(Inverse, int);
+  vtkGetMacro(Inverse, int);
+
+  // Description:
   // Internal method.
   vtkDataObject* ExtractElements(vtkDataObject* data, vtkSelection* selection, vtkCharArray* mask);
 
@@ -76,6 +81,7 @@ protected:
                                 vtkInformationVector* outputVector);
 
   int PreserveTopology;
+  int Inverse;
 
 private:
   vtkPythonExtractSelection(const vtkPythonExtractSelection&); // Not implemented

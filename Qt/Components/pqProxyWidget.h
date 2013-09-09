@@ -58,6 +58,7 @@ class PQCOMPONENTS_EXPORT pqProxyWidget : public QWidget
   typedef QWidget Superclass;
 public:
   pqProxyWidget(vtkSMProxy* proxy, QWidget *parent=0, Qt::WindowFlags flags=0);
+  pqProxyWidget(vtkSMProxy* proxy, const QStringList &properties, QWidget *parent=0, Qt::WindowFlags flags=0);
   virtual ~pqProxyWidget();
 
   /// Returns the proxy this panel shows.
@@ -111,10 +112,10 @@ protected:
 
 private:
   /// create all widgets
-  void createWidgets();
+  void createWidgets(const QStringList &properties = QStringList());
 
   /// create individual property widgets.
-  void createPropertyWidgets();
+  void createPropertyWidgets(const QStringList &properties = QStringList());
 
   /// create 3D widgets, if any.
   void create3DWidgets();

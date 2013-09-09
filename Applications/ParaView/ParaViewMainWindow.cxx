@@ -104,9 +104,6 @@ ParaViewMainWindow::ParaViewMainWindow()
     this->Internals->memoryInspectorDock);
   this->tabifyDockWidget(
     this->Internals->colorMapEditorDock,
-    this->Internals->selectionInspectorDock);
-  this->tabifyDockWidget(
-    this->Internals->colorMapEditorDock,
     this->Internals->comparativePanelDock);
   this->tabifyDockWidget(
     this->Internals->colorMapEditorDock,
@@ -114,7 +111,6 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   this->Internals->animationViewDock->hide();
   this->Internals->statisticsDock->hide();
-  this->Internals->selectionInspectorDock->hide();
   this->Internals->comparativePanelDock->hide();
   this->Internals->collaborationPanelDock->hide();
   this->Internals->memoryInspectorDock->hide();

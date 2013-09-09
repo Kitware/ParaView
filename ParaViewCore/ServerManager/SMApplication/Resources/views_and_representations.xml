@@ -1335,84 +1335,36 @@
           <Exception name="PointSize" />
         </ShareProperties>
         <ExposedProperties>
-          <Property exposed_name="SelectionCellLabelBold"
-                    name="CellLabelBold"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelColor"
-                    name="CellLabelColor"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelFontFamily"
-                    name="CellLabelFontFamily"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelFontSize"
-                    name="CellLabelFontSize"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelFormat"
-                    name="CellLabelFormat"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelItalic"
-                    name="CellLabelItalic"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelJustification"
-                    name="CellLabelJustification"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelOpacity"
-                    name="CellLabelOpacity"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelShadow"
-                    name="CellLabelShadow"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionCellLabelVisibility"
-                    name="CellLabelVisibility"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionColor"
-                    name="Color"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionLineWidth"
-                    name="LineWidth"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionOpacity"
-                    name="Opacity"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelBold"
-                    name="PointLabelBold"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelColor"
-                    name="PointLabelColor"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelFontFamily"
-                    name="PointLabelFontFamily"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelFontSize"
-                    name="PointLabelFontSize"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelFormat"
-                    name="PointLabelFormat"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelItalic"
-                    name="PointLabelItalic"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelJustification"
-                    name="PointLabelJustification"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelOpacity"
-                    name="PointLabelOpacity"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelShadow"
-                    name="PointLabelShadow"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointLabelVisibility"
-                    name="PointLabelVisibility"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionPointSize"
-                    name="PointSize"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionRepresentation"
-                    name="Representation"
-                    panel_visibility="never" />
-          <Property exposed_name="SelectionUseOutline"
-                    name="UseOutline"
-                    panel_visibility="never" />
+          <Property exposed_name="SelectionColor" name="Color" panel_visibility="never" />
+          <Property exposed_name="SelectionOpacity" name="Opacity" panel_visibility="never" />
+          <Property exposed_name="SelectionUseOutline" name="UseOutline" panel_visibility="never" />
+          <Property exposed_name="SelectionRepresentation" name="Representation" panel_visibility="never" />
+          <Property exposed_name="SelectionPointSize" name="PointSize" panel_visibility="never" />
+          <Property exposed_name="SelectionLineWidth" name="LineWidth" panel_visibility="never" />
+	  <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" />
+          <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
+	    <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" function="Bold"/>
+	    <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" function="Color"/>
+	    <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
+	    <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" function="Size"/>
+	    <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" />
+	    <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" function="Italics"/>
+	    <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" />
+	    <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
+	    <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
+          </PropertyGroup>
+          <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility"/>
+          <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
+            <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
+            <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
+            <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize" function="Size"/>
+            <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat"/>
+            <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic" function="Italics"/>
+            <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification"/>
+            <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity" function="Opacity"/>
+            <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow" function="Shadow"/>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
     </PVRepresentationProxy>
@@ -4559,84 +4511,36 @@
         <Exception name="PointSize" />
       </ShareProperties>
       <ExposedProperties>
-        <Property exposed_name="SelectionCellLabelBold"
-                  name="CellLabelBold"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelColor"
-                  name="CellLabelColor"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelFontFamily"
-                  name="CellLabelFontFamily"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelFontSize"
-                  name="CellLabelFontSize"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelFormat"
-                  name="CellLabelFormat"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelItalic"
-                  name="CellLabelItalic"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelJustification"
-                  name="CellLabelJustification"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelOpacity"
-                  name="CellLabelOpacity"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelShadow"
-                  name="CellLabelShadow"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionCellLabelVisibility"
-                  name="CellLabelVisibility"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionColor"
-                  name="Color"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionLineWidth"
-                  name="LineWidth"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionOpacity"
-                  name="Opacity"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelBold"
-                  name="PointLabelBold"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelColor"
-                  name="PointLabelColor"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelFontFamily"
-                  name="PointLabelFontFamily"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelFontSize"
-                  name="PointLabelFontSize"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelFormat"
-                  name="PointLabelFormat"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelItalic"
-                  name="PointLabelItalic"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelJustification"
-                  name="PointLabelJustification"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelOpacity"
-                  name="PointLabelOpacity"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelShadow"
-                  name="PointLabelShadow"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointLabelVisibility"
-                  name="PointLabelVisibility"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionPointSize"
-                  name="PointSize"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionRepresentation"
-                  name="Representation"
-                  panel_visibility="never" />
-        <Property exposed_name="SelectionUseOutline"
-                  name="UseOutline"
-                  panel_visibility="never" />
+        <Property exposed_name="SelectionColor" name="Color" panel_visibility="never" />
+        <Property exposed_name="SelectionOpacity" name="Opacity" panel_visibility="never" />
+        <Property exposed_name="SelectionUseOutline" name="UseOutline" panel_visibility="never" />
+        <Property exposed_name="SelectionRepresentation" name="Representation" panel_visibility="never" />
+        <Property exposed_name="SelectionPointSize" name="PointSize" panel_visibility="never" />
+        <Property exposed_name="SelectionLineWidth" name="LineWidth" panel_visibility="never" />
+        <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
+	  <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" />
+	  <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" />
+	  <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
+	  <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" />
+	  <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" />
+	  <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" />
+	  <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" />
+	  <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" />
+	  <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" />
+	  <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" />
+        </PropertyGroup>
+        <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
+          <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold"/>
+          <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor"/>
+          <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily"/>
+          <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize"/>
+          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat"/>
+          <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic"/>
+          <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification"/>
+          <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity"/>
+          <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow"/>
+          <Property exposed_name="SelectionPtintLabelVisibility" name="PointLabelVisibility"/>
+        </PropertyGroup>
       </ExposedProperties>
     </SubProxy>
     </PVRepresentationProxy>
