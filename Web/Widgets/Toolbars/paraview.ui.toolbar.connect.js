@@ -124,9 +124,9 @@
                 arg = Number(prompt("Wait connection on port:", "11111"));
             }
 
-            session.call("pv:" + action, arg).then(function(){
+            session.call("vtk:" + action, arg).then(function(){
                 if(me.hasClass('close')) {
-                    session.call("pv:exit");
+                    session.call("vtk:exit");
                     session.close();
                     setTimeout("window.close()", 100);
                 }

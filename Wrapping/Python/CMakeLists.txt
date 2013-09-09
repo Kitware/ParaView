@@ -61,12 +61,12 @@ file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/paraview
 # Add a couple of vtk python files to "paraview" module.
 file (COPY "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python/vtk/util/numpy_support.py"
            "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python/vtk/util/vtkConstants.py"
-      DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview
+      DESTINATION ${PV_PYTHON_MODULE_BINARY_DIR}
       USE_SOURCE_PERMISSIONS)
 
 # copy ParaView's default lookup tables
 file(COPY "${CMAKE_SOURCE_DIR}/Qt/Components/Resources/XML/ColorMaps.xml"
-  DESTINATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview"
+  DESTINATION "${PV_PYTHON_MODULE_BINARY_DIR}"
   USE_SOURCE_PERMISSIONS)
 
 # Byte compile the Python files.
@@ -88,5 +88,7 @@ ADD_CUSTOM_TARGET(paraview_pyc ALL
 
 # Install the paraview module files.
 INSTALL(DIRECTORY ${PV_PYTHON_MODULE_BINARY_DIR}
-    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/site-packages
-    COMPONENT Runtime)
+    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
+    COMPONENT Runtime
+    PATTERN *-complete EXCLUDE
+    PATTERN *_complete EXCLUDE)

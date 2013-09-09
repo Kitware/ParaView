@@ -1,7 +1,10 @@
 vtk_module(vtkParaViewWeb
   DEPENDS
+    vtkWebCore
+    vtkWebJavaScript
+    vtkWebPython
+    vtkWebGLExporter
     vtkParaViewWebCore
-    vtkParaViewWebJavaScript
     vtkParaViewWebPython
     vtkParaViewWebApplications
   EXCLUDE_FROM_WRAPPING)

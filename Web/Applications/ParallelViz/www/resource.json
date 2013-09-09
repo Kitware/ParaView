@@ -1,0 +1,8 @@
+{
+	"pipeline" : { "label": "1 Node" },
+	"pipeline_2" : { "label": "2 Nodes" },
+	"pipeline_5" : { "label": "5 Nodes" },
+	"pipeline_10" : { "label": "10 Nodes" },
+	"pipeline_nersc_512" : { "label": "512 Nodes - NERSC" },
+	"pipeline_titan_1024" : { "label": "1024 Nodes - Titan" }
+}

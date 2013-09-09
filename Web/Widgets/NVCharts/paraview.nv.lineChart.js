@@ -87,7 +87,7 @@
             }
 
             var session = self.options.connection.session;
-            session.call("pv:getProbeData").then(function(result) {
+            session.call("vtk:getProbeData").then(function(result) {
                 var selection = d3.select(self.svg);
 
                 // save data selection, if any.
@@ -99,7 +99,7 @@
                   }
                 }
 
-                var data = paraview.processPlotData(result, -1);
+                var data = vtkWeb.processPlotData(result, -1);
 
                 var vectorRegEx = /.*[(]\d+[)].*/;
                 for (var cc=0; cc < data.data.length; cc++) {

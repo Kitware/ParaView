@@ -1272,21 +1272,21 @@
         // Attach filter creation
         pipelineBrowser.bind('addSource', function(e) {
             var parentId = (e.parent_id ? e.parent_id : 0);
-            session.call('pv:addSource', e.name, parentId).then(function(newNode) {
+            session.call('vtk:addSource', e.name, parentId).then(function(newNode) {
                 addProxy(pipelineBrowser, parentId, newNode);
             });
         });
 
         // Attach file loading
         pipelineBrowser.bind('openFile', function(e) {
-            session.call('pv:openFile', e.path).then(function(newFile) {
+            session.call('vtk:openFile', e.path).then(function(newFile) {
                 addProxy(pipelineBrowser, 0, newFile);
             });
         });
 
         // Attach pipeline reload
         pipelineBrowser.bind('reloadPipeline', function(e) {
-            session.call('pv:reloadPipeline').then(function(rootNode) {
+            session.call('vtk:reloadPipeline').then(function(rootNode) {
                 var pipelineLineAfter, pipelineLineBefore;
 
                 // Update data model part
@@ -1331,7 +1331,7 @@
                     options['Visibility'] = 1;
                     options['Representation'] = changeSet.representation;
                 }
-                session.call('pv:updateDisplayProperty', options);
+                session.call('vtk:updateDisplayProperty', options);
             } else if(e.origin === 'colorBy') {
                 if(changeSet.hasOwnProperty('color')) {
                     // Solid color
@@ -1348,15 +1348,15 @@
                 }
 
                 // Update server
-                session.call('pv:updateDisplayProperty', options).then(function(){
-                    session.call('pv:updateScalarbarVisibility').then(function(status){
+                session.call('vtk:updateDisplayProperty', options).then(function(){
+                    session.call('vtk:updateScalarbarVisibility').then(function(status){
                         pipelineBrowser.data('scalarbars', status);
                         updateUIPipeline(pipelineBrowser);
                         updateScalarBarUI(pipelineBrowser, status);
                     });
                 });
             } else if(e.origin === 'scalarbar') {
-                session.call('pv:updateScalarbarVisibility', changeSet).then(function(status){
+                session.call('vtk:updateScalarbarVisibility', changeSet).then(function(status){
                     pipelineBrowser.data('scalarbars', status);
                     updateScalarBarUI(pipelineBrowser, status);
                 });
@@ -1364,7 +1364,7 @@
                 for(var key in changeSet) {
                     options[key] = changeSet[key];
                 }
-                session.call('pv:pushState', options).then(function(newState){
+                session.call('vtk:pushState', options).then(function(newState){
                     updateProxy(pipelineBrowser, newState);
                 });
             }
@@ -1372,7 +1372,7 @@
 
         // Attach delete action
         pipelineBrowser.bind('deleteProxy', function(e) {
-            session.call('pv:deleteSource', e.proxy_id).then(function(){
+            session.call('vtk:deleteSource', e.proxy_id).then(function(){
                 removeProxy(pipelineBrowser, e.proxy_id);
 
                 var fullLutStatus = pipelineBrowser.data('scalarbars'),
@@ -1391,7 +1391,7 @@
                 }
 
                 if(needToUpdateServer) {
-                    session.call('pv:updateScalarbarVisibility', lutToDelete).then(function(status){
+                    session.call('vtk:updateScalarbarVisibility', lutToDelete).then(function(status){
                         updateScalarBarUI(pipelineBrowser, status);
                     });
                 }
@@ -1402,7 +1402,7 @@
         // Attach property editing
         pipelineBrowser.bind('apply', function() {
             var proxyState = getProxyPropertyPanelState(pipelineBrowser);
-            session.call('pv:pushState', proxyState).then(function(newState){
+            session.call('vtk:pushState', proxyState).then(function(newState){
                 updateProxy(pipelineBrowser, newState);
             });
         });
