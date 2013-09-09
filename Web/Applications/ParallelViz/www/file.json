@@ -1,23 +1,60 @@
 {
-	"None" : {"label": "None"},
-	"/home/seb/Data/can.ex2": { "label" : "can.ex2"},
-	"/home/seb/Data/diskout.ex2": { "label" : "diskout.ex2"},
-	"/home/seb/Data/cone": { "label" : "Cone"},
-	"/home/seb/Data/visit": { "label" : "Visit", "children": {
-		"/home/seb/Data/visit/wavelet": { "label": "Wavelet" },
-		"/home/seb/Data/yo": { "label" : "YO", "children": {
-		"/home/seb/Data/visit/yo/ttt": { "label": "tttt" , "children" : {
-			"/home/seb/Data/visit": { "label" : "Visit", "children": {
-		"/home/seb/Data/visit/wavelet": { "label": "Wavelet" },
-		"/home/seb/Data/yo": { "label" : "YO", "children": {
-		"/home/seb/Data/visit/yo/ttt": { "label": "tttt" }
-		}
-	}
-			}}
-		}
-	}
-		}
-	}
-}
-}
+    "None" : {
+        "label": "None"
+    },
+    "can.ex2": {
+        "label" : "can.ex2"
+    },
+    "disk_out_ref.ex2": {
+        "label" : "disk_out_ref.ex2"
+    },
+    "bot2.wrl": {
+        "label" : "bot2.wrl"
+    },
+    "bunny.ply": {
+        "label" : "bunny.ply"
+    },
+    "cow.vtp": {
+        "label" : "cow.vtp"
+    },
+    "disk_out_ref.ex2": {
+        "label" : "disk_out_ref.ex2"
+    },
+    "disk_out_ref.ex2": {
+        "label" : "disk_out_ref.ex2"
+    },
+    "subdir/": {
+        "label" : "sub-directory",
+        "children": {
+            "subdir/wavelet": {
+                "label": "Wavelet"
+            },
+            "subdir/subdir": {
+                "label" : "another directory",
+                "children": {
+                    "subdir/subdir/subdir": {
+                        "label": "one more dir" ,
+                        "children" : {
+                            "/home/seb/Data/visit": {
+                                "label" : "Visit",
+                                "children": {
+                                    "the-path-you-want": {
+                                        "label": "Wavelet"
+                                    },
+                                    "the-path-you-want/yo": {
+                                        "label" : "YO",
+                                        "children": {
+                                            "the-path-you-want/yo/ttt": {
+                                                "label": "tttt"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

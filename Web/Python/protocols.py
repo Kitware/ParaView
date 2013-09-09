@@ -261,7 +261,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
 
 class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
-    def __init__(self):
+    def __init__(self, fileToLoad=None):
         super(ParaViewWebPipelineManager, self).__init__()
         # Setup global variables
         self.pipeline = helper.Pipeline('Kitware')
@@ -271,6 +271,11 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         simple.Render()
         self.view.ViewSize = [800,800]
         self.lutManager.setView(self.view)
+        if fileToLoad:
+            try:
+                self.openFile(fileToLoad)
+            except:
+                print "error loading..."
 
     @exportRpc("reloadPipeline")
     def reloadPipeline(self):
@@ -513,3 +518,20 @@ class ParaViewWebRemoteConnection(ParaViewWebProtocol):
     def pvDisconnect(self, message):
         """Free the current active session"""
         simple.Disconnect()
+
+
+# =============================================================================
+#
+# Handle remote Connection at startup
+#
+# =============================================================================
+
+class ParaViewWebStartupRemoteConnection(ParaViewWebProtocol):
+
+    connected = False
+
+    def __init__(self, dsHost = None, dsPort = 11111, rsHost=None, rsPort=22222):
+        super(ParaViewWebStartupRemoteConnection, self).__init__()
+        if not ParaViewWebStartupRemoteConnection.connected and dsHost:
+            ParaViewWebStartupRemoteConnection.connected = True
+            simple.Connect(dsHost, dsPort, rsHost, rsPort)
