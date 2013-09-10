@@ -2,7 +2,7 @@ r"""
     This module is a ParaViewWeb server application.
     The following command line illustrate how to use it::
 
-        $ pvpython .../data_prober.py --data-dir /.../path-to-your-data-directory
+        $ pvpython .../pv_web_data_prober.py --data-dir /.../path-to-your-data-directory
 
     Any ParaViewWeb executable script come with a set of standard arguments that
     can be overriden if need be::

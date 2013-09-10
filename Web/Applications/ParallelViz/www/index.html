@@ -16,14 +16,15 @@
     </head>
 
     <body onbeforeunload="stop()" onunload="stop()" class="page">
-        <div class="row-fluid">
+        <div class="viewport-container"></div>
+        <div class="row-fluid background">
             <div class="span1"></div>
             <div class="span10">
                 <img class="homepage_logo" src="../../lib/css/paraview/toolbar/common/logo_title.png">
             </div>
         </div>
 
-        <div class="row-fluid">
+        <div class="row-fluid start-content">
             <div class="span1"></div>
             <div class="span10 main-block">
                 <h2>
@@ -77,8 +78,13 @@
             </div>
         </div>
 
+        <script src="../../ext/js-core/autobahn.min.js"></script>
         <script src="../../ext/js-core/jquery-1.8.3.min.js"></script>
+        <script src="../../ext/js-core/gl-matrix-min.js"></script>
+        <script src="../../ext/js-core/jquery.hammer.min.js"></script>
+
         <script src="../../lib/js/vtkweb-all.js"></script>
+
         <script src="../../ext/widgets/bootstrap/js/bootstrap.min.js"></script>
         <script src="js/jquery.backstretch.min.js"></script>
         <script type="text/javascript">
@@ -122,6 +128,7 @@
             updateDataSelector("file");
 
             // Start visualization
+            var pv = {};
             $(".launch").click(function(){
                 var appConf = $("#resource").attr("data"),
                 file = $("#file").attr("data"),
@@ -130,8 +137,10 @@
                     "sessionManagerURL" : serviceURL,
                     "name" : "ResourceManager",
                     "application" : appConf,
-                    "generate-secret": 0
+                    "generate-secret": 0,
+                    "file": file
                 };
+
                 if(file && file !== "None") {
                     connection["load"] = file;
                 }
@@ -146,16 +155,34 @@
                         alert(connectionInfo.error);
                         window.close();
                     } else {
-                        $("body .row-fluid").remove();
+                        $(".start-content").remove();
+                        $(".background").remove();
                         $(".backstretch").remove();
-                        '<div class="container-fluid"><div class="row-fluid"><div class="span2 pv-sidebar"></div><div class="span10 pv-content"></div></div></div>'
-                        alert("Use " + connectionInfo.sessionURL + " to connect.");
+
+                        pv.connection = connectionInfo;
+
+                        vtkWeb.connect(connectionInfo, function(fullConnection) {
+                            pv.connection = fullConnection;
+                            setTimeout(function(){
+                                $('.viewport-container').show();
+                                pv.viewport = vtkWeb.createViewport({session: pv.connection.session});
+                                pv.viewport.bind(".viewport-container");
+                                pv.viewport.resetCamera();
+                                setTimeout(function(){
+                                    pv.viewport.resetCamera();
+                                }, 500);
+                            }, 500);
+                        }, function(code,reason) {
+                            console.log("Error " + code);
+                            console.log("Reason " + reason);
+                        });
+
+                        //alert("Use " + connectionInfo.sessionURL + " to connect.");
                     }
                 }, function(msg){
                     alert("Sorry unable to allocate requested resources.");
                 });
             });
-
 
             // ==== Global variables ===========================================
             var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview",
@@ -165,15 +192,14 @@
                 "application": "pipeline-",
                 "generate-secret": 0 // 0: None / 1: JavaScript generation / 2: Server side generation
             };
-            // ==== Start a new ParaView Session ===============================
 
             // ==== Release resources at exit time ============================
             function stop() {
                 // Kill job
-                // if(pv.hasOwnProperty('connection') && pv.connection.session) {
-                //     vtkWeb.stop(pv.connection);
-                //     pv = {};
-                // }
+                if(pv.hasOwnProperty('connection') && pv.connection.session) {
+                    pv.connection.session.call("vtk:exit");
+                    pv = {};
+                }
             }
         </script>
     </body>

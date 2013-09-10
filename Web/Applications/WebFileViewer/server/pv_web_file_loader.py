@@ -2,7 +2,7 @@ r"""
     This module is a ParaViewWeb server application.
     The following command line illustrate how to use it::
 
-        $ pvpython .../file_loader.py --data-dir /.../path-to-your-data-directory --file-to-load /.../any-vtk-friendly-file.vtk
+        $ pvpython .../pv_web_file_loader.py --data-dir /.../path-to-your-data-directory --file-to-load /.../any-vtk-friendly-file.vtk
 
     --file-to-load is optional and allow the user to pre-load a given dataset.
     --data-dir is used to list that directory on the server and let the client
