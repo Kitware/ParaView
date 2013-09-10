@@ -8,10 +8,8 @@ vtkStandardNewMacro (vtkCTHDataArray);
 
 //---------------------------------------------------------------------------
 
-vtkCTHDataArray::vtkCTHDataArray (vtkIdType numComp) : vtkDataArray()
+vtkCTHDataArray::vtkCTHDataArray()
 {
-  this->SetNumberOfComponents(numComp);
-
   this->ExtentsSet = false;
   this->PointerTime = 0;
 

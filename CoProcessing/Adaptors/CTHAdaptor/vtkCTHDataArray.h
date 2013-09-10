@@ -25,11 +25,6 @@ public:
   int GetDataTypeSize () { return static_cast<int>(sizeof(double)); }
 
   // Description:
-  // TODO implement new API
-  virtual void InsertTuples(vtkIdList*, vtkIdList*, vtkAbstractArray*)
-    { vtkErrorMacro("New InsertTuples API is not implemented"); }
-
-  // Description:
   // Return the size, in bytes, of the lowest-level element of an
   // array.  For vtkDataArray and subclasses this is the size of the
   // data type.
@@ -140,6 +135,12 @@ public:
     this->BuildFallback ();
     this->Fallback->InsertTuple (i, d);
   }
+  void InsertTuples(vtkIdList *dstIds, vtkIdList *srcIds,
+                    vtkAbstractArray* source)
+  {
+    this->BuildFallback();
+    this->Fallback->InsertTuples(dstIds, srcIds, source);
+  }
 
   vtkIdType InsertNextTuple(vtkIdType i, vtkAbstractArray* aa)
   {
@@ -245,7 +246,7 @@ public:
     return this->Fallback->ClearLookup ();
   }
 protected:
-  vtkCTHDataArray (vtkIdType numComp = 1);
+  vtkCTHDataArray ();
   ~vtkCTHDataArray ();
 
   int Dimensions[3];
