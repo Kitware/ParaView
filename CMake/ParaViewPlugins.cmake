@@ -1277,21 +1277,28 @@ endmacro()
 # ParaVIew's source tree.
 macro(pv_setup_module_environment _name)
   # Setup enviroment to build VTK modules outside of VTK source tree.
-  set (VTK_INSTALL_EXPORT_NAME "${_name}Targets")
+  set (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
+
   set (VTK_INSTALL_RUNTIME_DIR "bin")
   set (VTK_INSTALL_LIBRARY_DIR "lib")
   set (VTK_INSTALL_ARCHIVE_DIR "lib")
   set (VTK_INSTALL_INCLUDE_DIR "include")
   set (VTK_INSTALL_PACKAGE_DIR "lib/cmake/${_name}")
-  set (VTK_MODULES_DIR
-    "${CMAKE_CURRENT_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
-  set (VTK_EXPORTS_FILE
-    "${CMAKE_CURRENT_BINARY_DIR}/${_name}Targets.cmake")
-  set (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 
-  include(vtkModuleMacros)
-  include(vtkModuleAPI)
+  if (NOT VTK_FOUND)
+    set (VTK_FOUND ${ParaView_FOUND})
+  endif()
+  if (VTK_FOUND)
+    set (VTK_VERSION
+      "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
+  endif()
+
+  include(vtkExternalModuleMacros)
   include(vtkClientServerWrapping)
+  if (PARAVIEW_ENABLE_PYTHON)
+    include(vtkPythonWrapping)
+  endif()
+
   # load information about existing modules.
   foreach (mod IN LISTS VTK_MODULES_ENABLED)
     vtk_module_load("${mod}")
