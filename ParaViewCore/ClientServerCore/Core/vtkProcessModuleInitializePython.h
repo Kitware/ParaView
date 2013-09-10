@@ -81,6 +81,7 @@ namespace
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR);
       vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages");
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/vtk");
       }
     }
   //===========================================================================
