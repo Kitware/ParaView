@@ -6,7 +6,7 @@ approriate for co-processing.
 """
 
 from paraview import simple
-from paraview.vtk import vtkPVVTKExtensionsCore
+from vtkPVVTKExtensionsCorePython import *
 import math
 
 # -----------------------------------------------------------------------------
