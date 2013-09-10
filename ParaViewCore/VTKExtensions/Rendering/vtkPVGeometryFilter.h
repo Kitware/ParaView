@@ -39,7 +39,7 @@ class vtkPolyData;
 class vtkPVRecoverGeometryWireframe;
 class vtkRectilinearGrid;
 class vtkStructuredGrid;
-class vtkUnstructuredGrid;
+class vtkUnstructuredGridBase;
 class vtkUnstructuredGridGeometryFilter;
 class vtkAMRBox;
 class vtkOverlappingAMR;
@@ -229,7 +229,7 @@ protected:
     const int* wholeExtent);
 
   void UnstructuredGridExecute(
-    vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate);
+    vtkUnstructuredGridBase* input, vtkPolyData* output, int doCommunicate);
 
   void PolyDataExecute(
     vtkPolyData* input, vtkPolyData* output, int doCommunicate);
