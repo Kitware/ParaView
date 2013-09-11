@@ -18,10 +18,6 @@ set(_vtk_mpi_modules
 
   vtkFiltersParallelFlowPaths
   #  vtkStreamTracer (Parallel)
-
-  vtkFiltersCosmo
-  # Needed for:
-  #  vtkPCosmoReader
   )
 
 set(_vtk_modules
@@ -329,9 +325,9 @@ set(_vtk_modules
   vtkDomainsChemistry
   # Needed for:
   #  vtkMoleculeRepresentation
-  
+
   vtkPVServerManagerDefault
-  # Needed by plugins 
+  # Needed by plugins
   )
 
 if (PARAVIEW_USE_MPI)
@@ -352,7 +348,7 @@ endif()
 set(PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED TRUE
     CACHE BOOL "Turn off to avoid ParaView depending on all used VTK modules.")
 mark_as_advanced(PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED)
-    
+
 if (PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED)
   set (PARAVIEW_DEFAULT_VTK_MODULES ${_vtk_modules})
 else ()
