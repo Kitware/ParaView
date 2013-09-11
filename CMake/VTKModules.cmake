@@ -20,6 +20,15 @@ set(_vtk_mpi_modules
   #  vtkStreamTracer (Parallel)
   )
 
+# Add CosmoTools VTK extensions if enabled.
+if (UNIX AND PARAVIEW_ENABLE_COSMOTOOLS)
+  list(APPEND _vtk_mpi_modules
+    vtkPVVTKExtensionsCosmoTools
+    # Needed for:
+    #  vtkPVVTKExtensionsCosmoTools
+    )
+endif()
+
 set(_vtk_modules
   # VTK modules which ParaView has a explicity compile
   # time dependency on

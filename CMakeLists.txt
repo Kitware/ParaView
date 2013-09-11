@@ -180,7 +180,7 @@ endif()
 # ParaView install rules.
 set (VTK_INSTALL_NO_QT_PLUGIN TRUE)
 
-# Disable installing of the vtkpython executables. 
+# Disable installing of the vtkpython executables.
 set (VTK_INSTALL_NO_PYTHON_EXES TRUE)
 
 # for temporary backwards compatibility.
@@ -236,6 +236,15 @@ option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON)
 mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
 
+# If building on Unix with MPI enabled, we will present another option to
+# enable building of CosmoTools VTK extensions. This option is by default
+# OFF and set to OFF if ParaView is not built with MPI.
+if (UNIX)
+  cmake_dependent_option(PARAVIEW_ENABLE_COSMOTOOLS
+    "Build ParaView with CosmoTools VTK Extensions" OFF
+    "PARAVIEW_USE_MPI" OFF)
+  mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
+endif()
 
 # Is this a 32 bit or 64bit build. Display this in about dialog.
 if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)

@@ -14,6 +14,12 @@
     <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
   </Category>
 
+  <Category name="CosmoTools" menu_label="&amp;CosmoTools" show_in_toolbar="0">
+    <Proxy group="filters" name="LANLHaloFinder" />
+    <Proxy group="filters" name="Minkowski" />
+    <Proxy group="filters" name="DensityProfile" />
+  </Category>
+
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1" hide_for_tests="1">
     <Proxy group="filters" name="Calculator"
             icon=":/pqWidgets/Icons/pqCalculator24.png" omit_from_toolbar="1"/>
