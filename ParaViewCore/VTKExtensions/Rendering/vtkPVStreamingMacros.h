@@ -28,7 +28,12 @@
 //# define vtkStreamingStatusMacro(x)
 //#endif
 
+#ifndef PV_DEBUG_STREAMING
 # define vtkStreamingStatusMacro(x)
+#else
+# define vtkStreamingStatusMacro(x) cout << "streaming: " x << endl;
+#endif
+
 
 #endif
 // VTK-HeaderTest-Exclude: vtkPVStreamingMacros.h
