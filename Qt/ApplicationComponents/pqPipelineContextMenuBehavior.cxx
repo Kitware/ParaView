@@ -215,10 +215,9 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
     this->PickedBlocks.append(static_cast<unsigned int>(blockIndex));
     }
 
+  this->Menu->clear();
   if (repr)
     {
-    this->Menu->clear();
-
     vtkPVDataInformation *info = repr->getInputDataInformation();
     vtkPVCompositeDataInformation *compositeInfo = info->GetCompositeDataInformation();
     if(compositeInfo && compositeInfo->GetDataIsComposite())
@@ -324,14 +323,13 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
 
     action = this->Menu->addAction("Edit Color");
     new pqEditColorMapReaction(action);
+
+    this->Menu->addSeparator();
     }
-  else
-    {
-      // when nothing was picked we show the "link camera" menu.
-      this->Menu->clear();
-      this->Menu->addAction("Link Camera...",
-        view, SLOT(linkToOtherView()));
-    }
+
+  // when nothing was picked we show the "link camera" menu.
+  this->Menu->addAction("Link Camera...",
+    view, SLOT(linkToOtherView()));
 }
 
 //-----------------------------------------------------------------------------
