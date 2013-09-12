@@ -25,10 +25,17 @@ set(vtkPVVTKExtensionsCosmoTools_INCLUDE_DIRS
 
 # List of module sources
 set(Module_SRCS
+
+  ## Readers
   vtkACosmoReader.cxx
   vtkPCosmoReader.cxx
   vtkPGenericIOReader.cxx
+  vtkPVoronoiReader.cxx
+
+  ## Filters
+  vtkMinkowskiFilter.cxx
   vtkPLANLHaloFinder.cxx
+  vtkPMergeConnected.cxx
   )
 
 vtk_module_library(vtkPVVTKExtensionsCosmoTools ${Module_SRCS})
