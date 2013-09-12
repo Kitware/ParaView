@@ -32,6 +32,7 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" // for export macros
 #include "vtkObject.h"
+#include <set> // needed for set
 
 class vtkMultiBlockDataSet;
 class vtkMultiProcessController;
@@ -81,10 +82,19 @@ public:
   // Test if the queue is empty before calling this method.
   unsigned int Pop();
 
+  // Description:
+  // After every Update() call, returns the list of blocks that should be purged
+  // given the current view.
+  const std::set<unsigned int>& GetBlocksToPurge() const;
+
 //BTX
 protected:
   vtkStreamingParticlesPriorityQueue();
   ~vtkStreamingParticlesPriorityQueue();
+
+  // Description:
+  // Updates priorities and builds a BlocksToPurge list.
+  void UpdatePriorities(const double view_planes[24]);
 
   vtkMultiProcessController* Controller;
 

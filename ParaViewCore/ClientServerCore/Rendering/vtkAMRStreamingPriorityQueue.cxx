@@ -28,7 +28,7 @@
 class vtkAMRStreamingPriorityQueue::vtkInternals
 {
 public:
-  vtkStreamingPriorityQueue PriorityQueue;
+  vtkStreamingPriorityQueue<> PriorityQueue;
   vtkSmartPointer<vtkAMRInformation> AMRMetadata;
 };
 
