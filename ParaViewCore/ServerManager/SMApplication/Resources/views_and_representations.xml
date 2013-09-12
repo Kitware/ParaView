@@ -4645,6 +4645,8 @@
                proxygroup="views"
                proxyname="RenderView"></Proxy>
         <ExposedProperties>
+          <Property name="HiddenRepresentations" />
+          <Property name="HiddenProps" />
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
           <Property name="ResetCamera" />
