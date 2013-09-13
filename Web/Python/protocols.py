@@ -51,6 +51,7 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
         if not view:
             # Use active view is none provided.
             view = simple.GetActiveView()
+
         if not view:
             raise Exception("no view provided: " + vid)
 
@@ -271,7 +272,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         simple.Render()
         self.view.ViewSize = [800,800]
         self.lutManager.setView(self.view)
-        if fileToLoad:
+        if fileToLoad and fileToLoad[-5:] != '.pvsm':
             try:
                 self.openFile(fileToLoad)
             except:
@@ -535,3 +536,27 @@ class ParaViewWebStartupRemoteConnection(ParaViewWebProtocol):
         if not ParaViewWebStartupRemoteConnection.connected and dsHost:
             ParaViewWebStartupRemoteConnection.connected = True
             simple.Connect(dsHost, dsPort, rsHost, rsPort)
+
+# =============================================================================
+#
+# Handle State Loading
+#
+# =============================================================================
+
+class ParaViewWebStateLoader(ParaViewWebProtocol):
+
+    def __init__(self, state_path = None):
+        super(ParaViewWebStateLoader, self).__init__()
+        if state_path and state_path[-5:] == '.pvsm':
+            self.loadState(state_path)
+
+    @exportRpc("loadState")
+    def loadState(self, state_file):
+        """
+        Load a state file and return the list of view ids
+        """
+        simple.LoadState(state_file)
+        ids = []
+        for view in simple.GetRenderViews():
+            ids.append(view.GetGlobalIDAsString())
+        return ids

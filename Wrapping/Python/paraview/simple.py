@@ -259,6 +259,36 @@ def GetLayout(view=None):
             return layout
     return None
 
+# -----------------------------------------------------------------------------
+
+def RemoveViewsAndLayouts():
+    pxm = servermanager.ProxyManager()
+    layouts = pxm.GetProxiesInGroup("layouts")
+
+    for view in GetRenderViews():
+        Delete(view)
+
+    # Can not use regular delete for layouts
+    for name, id in layouts:
+        proxy = layouts[(name, id)]
+        pxm.UnRegisterProxy('layouts', name, layouts[(name, id)])
+
+#==============================================================================
+# XML State management
+#==============================================================================
+
+def LoadState(filename, connection=None):
+    RemoveViewsAndLayouts()
+    servermanager.LoadState(filename, connection)
+    # Try to set the new view active
+    if len(GetRenderViews()) > 0:
+        SetActiveView(GetRenderViews()[0])
+
+# -----------------------------------------------------------------------------
+
+def SaveState(filename):
+    servermanager.SaveXMLState(filename)
+
 #==============================================================================
 # Representation methods
 #==============================================================================
