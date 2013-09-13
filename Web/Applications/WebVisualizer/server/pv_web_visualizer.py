@@ -114,7 +114,8 @@ if __name__ == "__main__":
     _PipelineManager.dsPort     = args.dsPort
     _PipelineManager.rsHost     = args.rsHost
     _PipelineManager.rsPort     = args.rsPort
-    _PipelineManager.fileToLoad = args.path + '/' + args.file
+    if args.file:
+        _PipelineManager.fileToLoad = args.path + '/' + args.file
 
     # Start server
     server.start_webserver(options=args, protocol=_PipelineManager)
