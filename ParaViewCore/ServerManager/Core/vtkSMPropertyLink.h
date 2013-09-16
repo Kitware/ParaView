@@ -51,20 +51,6 @@ public:
   void RemoveLinkedProperty(vtkSMProxy* proxy, const char* propertyname);
 
   // Description:
-  // Another API to add a property link. In this case. we don't provide
-  // the link with the proxy to which the property belongs. Consequently
-  // we cannot propagate UpdateVTKObjects() calls irrespective
-  // of the PropagateUpdateVTKObjects flag. If one wants to propagate 
-  // UpdateVTKObjects, use the overload with vtkSMProxy as the argument.
-  // When a link is added, all output property values are
-  // synchronized with that of the input.
-  // DEPRECATED void AddLinkedProperty(vtkSMProperty* property, int updateDir);
-
-  // Description:
-  // Remove a linked property.
-  // DEPRECATED void RemoveLinkedProperty(vtkSMProperty* property);
-
-  // Description:
   // Get the number of properties that are involved in this link.
   unsigned int GetNumberOfLinkedProperties();
 

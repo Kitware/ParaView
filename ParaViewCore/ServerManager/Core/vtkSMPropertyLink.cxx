@@ -182,56 +182,6 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-//void vtkSMPropertyLink::AddLinkedProperty(vtkSMProperty* property, int updateDir)
-//{
-//  if (!property)
-//    {
-//    vtkErrorMacro("Cannot add link to a NULL property.");
-//    return;
-//    }
-//  int addToList = 1;
-//  int addObserver = updateDir & INPUT;
-//  bool input_exists = false;
-
-//  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
-//    this->Internals->LinkedProperties.begin();
-//  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
-//    {
-//    if (iter->Property == property && iter->UpdateDirection == updateDir)
-//      {
-//      addObserver = 0;
-//      addToList = 0;
-//      }
-
-//    if (iter->UpdateDirection & INPUT)
-//      {
-//      input_exists = true;
-//      }
-//    }
-
-//  if (addToList)
-//    {
-//    vtkSMPropertyLinkInternals::LinkedProperty link(property, updateDir);
-//    this->Internals->LinkedProperties.push_back(link);
-//    if (addObserver)
-//      {
-//      this->Internals->LinkedProperties.back().Observer =
-//        this->Internals->PropertyObserver;
-//      }
-//    }
-
-//  if (addObserver)
-//    {
-//    property->AddObserver(vtkCommand::ModifiedEvent,
-//      this->Internals->PropertyObserver);
-//    }
-
-//  this->Synchronize();
-//  this->Modified();
-//}
-
-
-//-----------------------------------------------------------------------------
 // Find input property and update all output properties
 // to match the value of the input property.
 void vtkSMPropertyLink::Synchronize()
@@ -266,22 +216,6 @@ void vtkSMPropertyLink::RemoveAllLinks()
   this->UpdateState();
   this->PushStateToSession();
 }
-
-//-----------------------------------------------------------------------------
-//void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProperty* property)
-//{
-//  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
-//    this->Internals->LinkedProperties.begin();
-//  for (; iter != this->Internals->LinkedProperties.end(); ++iter)
-//    {
-//    if (iter->Property == property)
-//      {
-//      this->Internals->LinkedProperties.erase(iter);
-//      this->Modified();
-//      break;
-//      }
-//    }
-//}
 
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProxy* proxy,
