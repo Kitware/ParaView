@@ -129,7 +129,6 @@ SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveCSV.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SimpleInteraction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Slice.xml
@@ -160,6 +159,13 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
+
+if(PARAVIEW_ENABLE_PYTHON)
+  set(TESTS_WITH_BASELINES
+    ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
+  )
+endif()
 
 #------------------------------------------------------------------------------
 # Add streaming tests.
@@ -276,6 +282,7 @@ set (StructuredGridVolumeRendering_DISABLE_CRS TRUE)
   # <-- since volume rendering is not supported in CRS mode.
 
 # Since this test needs selection, disable in CRS mode.
+set (SelectionLabels_BREAK TRUE)
 set (SelectionLabels_DISABLE_CRS TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
