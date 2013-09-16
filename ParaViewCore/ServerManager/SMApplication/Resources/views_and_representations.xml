@@ -1341,7 +1341,7 @@
           <Property exposed_name="SelectionRepresentation" name="Representation" panel_visibility="never" />
           <Property exposed_name="SelectionPointSize" name="PointSize" panel_visibility="never" />
           <Property exposed_name="SelectionLineWidth" name="LineWidth" panel_visibility="never" />
-	  <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" />
+	  <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" panel_visibility="never"/>
           <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
 	    <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" function="Bold"/>
 	    <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" function="Color"/>
@@ -1353,7 +1353,7 @@
 	    <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
 	    <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
           </PropertyGroup>
-          <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility"/>
+          <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
           <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
             <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
             <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
