@@ -275,7 +275,8 @@ public:
   vtkGetStringMacro(PanelWidget)
 
   // Description:
-  // Copy all property values.
+  // Copy all property values. This will copy both checked and unchecked values,
+  // if applicable.
   virtual void Copy(vtkSMProperty* src);
 
   // Description:

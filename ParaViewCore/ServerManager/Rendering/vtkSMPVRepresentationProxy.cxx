@@ -114,24 +114,6 @@ void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int f
           }
         }
       }
-
-    // Next we ensure that input is set on all input properties for the
-    // subproxies. This ensures that domains and such on subproxies can still
-    // function correctly.
-
-    // This piece of code is a disgrace :). We shouldn't have to do these kinds of
-    // hacks. It implies that something's awry with the way domains and
-    // updated/defined for sub-proxies.
-    for (vtkStringSet::iterator iter = this->RepresentationSubProxies->begin();
-      iter != this->RepresentationSubProxies->end(); ++iter)
-      {
-      vtkSMProxy* subProxy = this->GetSubProxy((*iter).c_str());
-      if (subProxy && subProxy->GetProperty("Input"))
-        {
-        subProxy->GetProperty("Input")->Copy(this->GetProperty("Input"));
-        subProxy->UpdateProperty("Input");
-        }
-      }
     }
 
   this->Superclass::SetPropertyModifiedFlag(name, flag);
@@ -155,6 +137,25 @@ int vtkSMPVRepresentationProxy::ReadXMLAttributes(
 
   int retVal = this->Superclass::ReadXMLAttributes(pm, element);
   this->InReadXMLAttributes = false;
+
+  // Setup property links for sub-proxies. This ensures that whenever the
+  // this->GetProperty("Input") changes (either checked or un-checked values),
+  // all the sub-proxy's "Input" is also changed to the same value. This ensures
+  // that the domains are updated correctly.
+  vtkSMProperty* inputProperty = this->GetProperty("Input");
+  if (inputProperty)
+    {
+    for (vtkStringSet::iterator iter = this->RepresentationSubProxies->begin();
+      iter != this->RepresentationSubProxies->end(); ++iter)
+      {
+      vtkSMProxy* subProxy = this->GetSubProxy((*iter).c_str());
+      vtkSMProperty* subProperty = subProxy? subProxy->GetProperty("Input") : NULL;
+      if (subProperty)
+        {
+        this->LinkProperty(inputProperty, subProperty);
+        }
+      }
+    }
   return retVal;
 }
 
