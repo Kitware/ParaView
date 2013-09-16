@@ -1,0 +1,26 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="PMergeConnected"
+                 class="vtkPMergeConnected"
+                 label="VoronoiMergeConnected">
+      <Documentation
+         long_help="Use global RegionId and merge cells with the same RegionId to a polyhedron cell"
+         short_help="PMergeConnected filter settings">
+      </Documentation>
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiBlockDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input for this filter.
+        </Documentation>
+      </InputProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

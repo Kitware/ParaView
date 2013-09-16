@@ -5601,14 +5601,14 @@ found and the point will be rejected.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
-	  If off, the vertex scalars are treated as a discrete set. If on, they
-	  are treated as a continuous interval over the minimum and maximum. One
-	  important "on" use case: When setting lower and upper threshold
-	  equal to some value and turning AllScalars off, the results are
-	  cells containing the iso-surface for that value.  WARNING: Whether on
-	  or off, for higher order input, the filter will not give accurate
-	  results.
-	</Documentation>
+          If off, the vertex scalars are treated as a discrete set. If on, they
+          are treated as a continuous interval over the minimum and maximum. One
+          important "on" use case: When setting lower and upper threshold
+          equal to some value and turning AllScalars off, the results are
+          cells containing the iso-surface for that value.  WARNING: Whether on
+          or off, for higher order input, the filter will not give accurate
+          results.
+        </Documentation>
       </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
@@ -7695,127 +7695,119 @@ found and the point will be rejected.</Documentation>
      - Leo 12/30/2012  -->
 
     <SourceProxy name="ParticlePathLines"
-	      class="vtkTemporalPathLineFilter"
-	      label="Temporal Particles To Pathlines">
+        class="vtkTemporalPathLineFilter"
+        label="Temporal Particles To Pathlines">
       <Documentation
-	 long_help="Creates polylines representing pathlines of animating particles"
-	 short_help="Particle Pathlines">
-	Particle Pathlines takes any dataset as input, it extracts the
-	point locations of all cells over time to build up a polyline
-	trail.  The point number (index) is used as the 'key' if the points
-	are randomly changing their respective order in the points list,
-	then you should specify a scalar that represents the unique
-	ID. This is intended to handle the output of a filter such as the
-	TemporalStreamTracer.
+        long_help="Creates polylines representing pathlines of animating particles"
+        short_help="Particle Pathlines">
+        Particle Pathlines takes any dataset as input, it extracts the
+        point locations of all cells over time to build up a polyline
+        trail.  The point number (index) is used as the 'key' if the points
+        are randomly changing their respective order in the points list,
+        then you should specify a scalar that represents the unique
+        ID. This is intended to handle the output of a filter such as the
+        TemporalStreamTracer.
       </Documentation>
 
       <OutputPort name="Pathlines" index="0" />
       <OutputPort name="Particles" index="1" />
 
-      <InputProperty
-	 name="Input"
-	 command="SetInputConnection">
-	<ProxyGroupDomain name="groups">
-	  <Group name="sources"/>
-	  <Group name="filters"/>
-	</ProxyGroupDomain>
-	<DataTypeDomain name="input_type">
-	  <DataType value="vtkPointSet"/>
-	</DataTypeDomain>
-	<InputArrayDomain name="input_array" attribute_type="point"
-			  optional="1"/>
-	<Documentation>
-	  The input cells to create pathlines for.
-	</Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" attribute_type="point"
+              optional="1"/>
+        <Documentation>
+          The input cells to create pathlines for.
+        </Documentation>
       </InputProperty>
 
-      <InputProperty
-	 name="Selection"
-	 command="SetSelectionConnection">
-	<ProxyGroupDomain name="groups">
-	  <Group name="sources"/>
-	  <Group name="filters"/>
-	</ProxyGroupDomain>
-	<DataTypeDomain name="input_type">
-	  <DataType value="vtkDataSet"/>
-	</DataTypeDomain>
-	<Hints>
-	  <Optional />
-	</Hints>
-	<Documentation>
-	  Set a second input, which is a selection. Particles with the same
-	  Id in the selection as the primary input will be chosen for
-	  pathlines Note that you must have the same IdChannelArray in the
-	  selection as the input
-	</Documentation>
+      <InputProperty name="Selection" command="SetSelectionConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
+        <Documentation>
+          Set a second input, which is a selection. Particles with the same
+          Id in the selection as the primary input will be chosen for
+          pathlines Note that you must have the same IdChannelArray in the
+          selection as the input
+        </Documentation>
       </InputProperty>
 
-      <IntVectorProperty
-	  name="MaskPoints"
-	  command="SetMaskPoints"
-	  number_of_elements="1"
-	  default_values="100" >
-	<Documentation>
-	  Set the number of particles to track as a ratio of the input.
-	  Example: setting MaskPoints to 10 will track every 10th point.
-	</Documentation>
+      <IntVectorProperty name="MaskPoints"
+                         command="SetMaskPoints"
+                         number_of_elements="1"
+                         default_values="100" >
+        <Documentation>
+          Set the number of particles to track as a ratio of the input.
+          Example: setting MaskPoints to 10 will track every 10th point.
+        </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
-	  name="MaxTrackLength"
-	  command="SetMaxTrackLength"
-	  number_of_elements="1"
-	  default_values="25" >
-	<Documentation>
-	  If the Particles being traced animate for a long time, the trails
-	  or traces will become long and stringy. Setting the
-	  MaxTraceTimeLength will limit how much of the trace is
-	  displayed. Tracks longer then the Max will disappear and the
-	  trace will apppear like a snake of fixed length which progresses
-	  as the particle moves.  This length is given with respect to
-	  timesteps.
-	</Documentation>
+      <IntVectorProperty name="MaxTrackLength"
+                         command="SetMaxTrackLength"
+                         number_of_elements="1"
+                         default_values="25" >
+        <Documentation>
+          If the Particles being traced animate for a long time, the trails
+          or traces will become long and stringy. Setting the
+          MaxTraceTimeLength will limit how much of the trace is
+          displayed. Tracks longer then the Max will disappear and the
+          trace will apppear like a snake of fixed length which progresses
+          as the particle moves.  This length is given with respect to
+          timesteps.
+        </Documentation>
       </IntVectorProperty>
 
-      <DoubleVectorProperty
-	 name="MaxStepDistance"
-	 command="SetMaxStepDistance"
-	 number_of_elements="3"
-	 animateable="1"
-	 default_values="1.0 1.0 1.0" >
-	<DoubleRangeDomain name="range"/>
-	<Documentation>
-	  If a particle disappears from one end of a simulation and
-	  reappears on the other side, the track left will be
-	  unrepresentative.  Set a MaxStepDistance{x,y,z} which acts as a
-	  threshold above which if a step occurs larger than the value (for
-	  the dimension), the track will be dropped and restarted after the
-	  step. (ie the part before the wrap around will be dropped and the
-	  newer part kept).
-	</Documentation>
+      <DoubleVectorProperty name="MaxStepDistance"
+                            command="SetMaxStepDistance"
+                            number_of_elements="3"
+                            animateable="1"
+                            default_values="1.0 1.0 1.0" >
+          <DoubleRangeDomain name="range"/>
+          <Documentation>
+            If a particle disappears from one end of a simulation and
+            reappears on the other side, the track left will be
+            unrepresentative.  Set a MaxStepDistance{x,y,z} which acts as a
+            threshold above which if a step occurs larger than the value (for
+            the dimension), the track will be dropped and restarted after the
+            step. (ie the part before the wrap around will be dropped and the
+            newer part kept).
+          </Documentation>
       </DoubleVectorProperty>
 
-      <StringVectorProperty
-	  name="IdChannelArray"
-	  command="SetIdChannelArray"
-	  number_of_elements="1"
-	  default_values="Global or Local IDs"
-	  animateable="0">
-	  <ArrayListDomain
-	    name="array_list" attribute_type="Scalars"
-	    none_string="Global or Local IDs">
-	    <RequiredProperties>
-	      <Property name="Input" function="Input"/>
-	    </RequiredProperties>
-	  </ArrayListDomain>
-	<Documentation>
-	  Specify the name of a scalar array which will be used to fetch
-	  the index of each point. This is necessary only if the particles
-	  change position (Id order) on each time step. The Id can be used
-	  to identify particles at each step and hence track them properly.
-	  If this array is set to "Global or Local IDs", the global point
-	  ids are used if they exist or the point index is otherwise.
-	</Documentation>
+      <StringVectorProperty name="IdChannelArray"
+                            command="SetIdChannelArray"
+                            number_of_elements="1"
+                            default_values="Global or Local IDs"
+                            animateable="0">
+            <ArrayListDomain
+              name="array_list" attribute_type="Scalars"
+              none_string="Global or Local IDs">
+              <RequiredProperties>
+                <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+          <Documentation>
+            Specify the name of a scalar array which will be used to fetch
+            the index of each point. This is necessary only if the particles
+            change position (Id order) on each time step. The Id can be used
+            to identify particles at each step and hence track them properly.
+            If this array is set to "Global or Local IDs", the global point
+            ids are used if they exist or the point index is otherwise.
+          </Documentation>
       </StringVectorProperty>
 
    </SourceProxy>
@@ -11480,200 +11472,7 @@ found and the point will be rejected.</Documentation>
       </Hints>
     </SourceProxy>
     <!-- PCAStatistics -->
-#ifdef PARAVIEW_USE_MPI
-    <SourceProxy class="vtkPCosmoHaloFinder"
-                 label="FOF/SOD Halo Finder"
-                 name="HaloFinder">
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkUnstructuredGrid" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input of the
-        filter.</Documentation>
-      </InputProperty>
-      <DoubleVectorProperty command="SetRL"
-                            default_values="100"
-                            label="rL (physical box side length)"
-                            name="RL"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-        <Documentation>The box side length used to wrap particles around if
-        they exceed rL (or less than 0) in any dimension (only positive
-        positions are allowed in the input, or they are wrapped
-        around).</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetOverlap"
-                            default_values="5"
-                            label="overlap (shared point/ghost cell gap distance)"
-                            name="Overlap"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-        <Documentation>The space (in rL units) to extend processor particle
-        ownership for ghost particles/cells. Needed for correct halo
-        calculation when halos cross processor boundaries in parallel
-        computation.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetNP"
-                         default_values="256"
-                         label="np (number of seeded particles in one dimension, i.e., total particles = np^3)"
-                         name="NP"
-                         number_of_elements="1">
-        <IntRangeDomain min="0"
-                        name="range" />
-        <Documentation>Number of seeded particles in one dimension. Therefore,
-        total simulation particles is np^3 (cubed).</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetBB"
-                            default_values="0.20"
-                            label="bb (linking length)"
-                            name="BB"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-        <Documentation>Linking length measured in units of interparticle
-        spacing and is dimensionless. Used to link particles into halos for the
-        friends-of-friends (FOF) algorithm.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetPMin"
-                         default_values="100"
-                         label="pmin (minimum particle threshold for an FOF halo)"
-                         name="PMin"
-                         number_of_elements="1">
-        <IntRangeDomain min="1"
-                        name="range" />
-        <Documentation>Minimum number of particles (threshold) needed before a
-        group is called a friends-of-friends (FOF) halo.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetCopyHaloDataToParticles"
-                         default_values="0"
-                         label="Copy FOF halo catalog to original particles"
-                         name="CopyHaloDataToParticles"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If checked, the friends-of-friends (FOF) halo catalog
-        information will be copied to the original particles as
-        well.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetComputeMostBoundParticle"
-                         default_values="0"
-                         label="Compute the most bound particle"
-                         name="ComputeMostBoundParticle"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If checked, the most bound particle for an FOF halo will
-        be calculated. WARNING: This can be very slow.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetComputeMostConnectedParticle"
-                         default_values="0"
-                         label="Compute the most connected particle"
-                         name="ComputeMostConnectedParticle"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If checked, the most connected particle for an FOF halo
-        will be calculated. WARNING: This can be very slow.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetComputeSOD"
-                         default_values="0"
-                         label="Compute spherical overdensity (SOD) halos"
-                         name="ComputeSOD"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If checked, spherical overdensity (SOD) halos will be
-        calculated in addition to friends-of-friends (FOF)
-        halos.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetSODCenterType"
-                         default_values="0"
-                         label="initial SOD center"
-                         name="SODCenterType"
-                         number_of_elements="1">
-        <EnumerationDomain name="sod_center_type">
-          <Entry text="Center of mass"
-                 value="0" />
-          <Entry text="Average position"
-                 value="1" />
-          <Entry text="Most bound particle"
-                 value="2" />
-          <Entry text="Most connected particle"
-                 value="3" />
-        </EnumerationDomain>
-        <Documentation>The initial friends-of-friends (FOF) center used for
-        calculating a spherical overdensity (SOD) halo. WARNING: Using MBP or
-        MCP can be very slow.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetRhoC"
-                            default_values="2.77536627e11"
-                            label="rho_c"
-                            name="RhoC"
-                            number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-        <Documentation>rho_c (critical density) for SOD halo
-        finding.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSODMass"
-                            default_values="1.0e14"
-                            label="initial SOD mass"
-                            name="SODMass"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-        <Documentation>The initial SOD mass.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMinRadiusFactor"
-                            default_values="0.5"
-                            label="minimum radius factor"
-                            name="MinRadiusFactor"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-        <Documentation>Minimum radius factor for SOD finding.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMaxRadiusFactor"
-                            default_values="2.0"
-                            label="maximum radius factor"
-                            name="MaxRadiusFactor"
-                            number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
-        <Documentation>Maximum radius factor for SOD finding.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetSODBins"
-                         default_values="20"
-                         label="number of bins"
-                         name="SODBins"
-                         number_of_elements="1">
-        <IntRangeDomain min="1"
-                        name="range" />
-        <Documentation>Number of bins for SOD finding.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMinFOFSize"
-                         default_values="1000"
-                         label="minimum FOF size"
-                         name="MinFOFSize"
-                         number_of_elements="1">
-        <IntRangeDomain min="0"
-                        name="range" />
-        <Documentation>Minimum FOF halo size to calculate an SOD
-        halo.</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetMinFOFMass"
-                            default_values="5.0e12"
-                            label="minimum FOF mass"
-                            name="MinFOFMass"
-                            number_of_elements="1">
-        <DoubleRangeDomain name="range" />
-        <Documentation>Minimum FOF mass to calculate an SOD
-        halo.</Documentation>
-      </DoubleVectorProperty>
-    </SourceProxy>
-#endif
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkMaterialInterfaceFilter"
                  label="Material Interface Filter"

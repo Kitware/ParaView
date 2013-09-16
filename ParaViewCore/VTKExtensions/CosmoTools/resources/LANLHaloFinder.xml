@@ -1,0 +1,206 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+     <SourceProxy name="LANLHaloFinder"
+                  class="vtkPLANLHaloFinder"
+                  label="LANL FOF/SOD Halo Finder">
+     <InputProperty
+      name="Input"
+      command="SetInputConnection">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkUnstructuredGrid"/>
+      </DataTypeDomain>
+      <Documentation>
+       This property specifies the input of the filter.
+      </Documentation>
+     </InputProperty>
+
+     <DoubleVectorProperty
+      name="RL"
+      command="SetRL"
+      label="Box size"
+      number_of_elements="1"
+      default_values="100" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The box side length used to wrap particles around if they exceed rL
+       (or less than 0) in any dimension (only positive positions are allowed
+       in the input, or they are wrapped around).
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+      name="Overlap"
+      command="SetOverlap"
+      label="Overlap"
+      number_of_elements="1"
+      default_values="5" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The space (in rL units) to extend processor particle ownership for ghost
+       particles/cells.  Needed for correct halo calculation when halos cross
+       processor boundaries in parallel computation.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+      name="NP"
+      command="SetNP"
+      label="Seed particles"
+      number_of_elements="1"
+      default_values="256" >
+     <IntRangeDomain name="range" min="0" />
+       <Documentation>
+       Number of seeded particles in one dimension.  Therefore, total simulation
+       particles is np^3 (cubed).
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+      name="BB"
+      command="SetBB"
+      label="Linking length"
+      number_of_elements="1"
+      default_values="0.20" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+        Linking length measured in units of interparticle spacing and is
+        dimensionless.  Used to link particles into halos for the
+        friends-of-friends (FOF) algorithm.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+      name="PMin"
+      command="SetPMin"
+      label="FOF particle threshold"
+      number_of_elements="1"
+      default_values="100" >
+     <IntRangeDomain name="range" min="1" />
+       <Documentation>
+        Minimum number of particles (threshold) needed before a group is called
+        a friends-of-friends (FOF) halo.
+       </Documentation>
+     </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CenterFindingMethod"
+        command="SetCenterFindingMethod"
+        label="Center finder"
+        number_of_elements="1"
+        default_values="0">
+       <EnumerationDomain name="center_detection_algorithm">
+        <Entry value="0" text="Average position"/>
+        <Entry value="1" text="Center of mass"/>
+        <Entry value="2" text="Most Bound Particle (MBP)"/>
+        <Entry value="3" text="Most Connected Particle (MCP)"/>
+       </EnumerationDomain>
+       <Documentation>
+       Method used for computing the halo center.
+       WARNING: Using MBP or MCP can be very slow.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+      name="ComputeSOD"
+      command="SetComputeSOD"
+      label="Sphere Overdensity Halos (SOD)"
+      number_of_elements="1"
+      default_values="0" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, spherical overdensity (SOD) halos will be calculated in
+       addition to friends-of-friends (FOF) halos.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+      name="RhoC"
+      command="SetRhoC"
+      label="rho_c"
+      number_of_elements="1"
+      default_values="2.77536627e11" >
+     <DoubleRangeDomain name="range" />
+       <Documentation>
+        Specify the scale factor for rho_c (critical density) for SOD
+        halo finding.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+      name="SODMass"
+      command="SetSODMass"
+      label="Initial SOD mass"
+      number_of_elements="1"
+      default_values="1.0e14" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The initial SOD mass.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+      name="MinRadiusFactor"
+      command="SetMinRadiusFactor"
+      label="Minimum radius factor"
+      number_of_elements="1"
+      default_values="0.5" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       Minimum radius factor for SOD finding.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+      name="MaxRadiusFactor"
+      command="SetMaxRadiusFactor"
+      label="Maximum radius factor"
+      number_of_elements="1"
+      default_values="2.0" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       Maximum radius factor for SOD finding.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+      name="SODBins"
+      command="SetSODBins"
+      label="Number of bins"
+      number_of_elements="1"
+      default_values="20" >
+     <IntRangeDomain name="range" min="1" />
+       <Documentation>
+       Number of bins for SOD finding.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+      name="MinFOFSize"
+      command="SetMinFOFSize"
+      label="FOF size threshold"
+      number_of_elements="1"
+      default_values="1000" >
+     <IntRangeDomain name="range" min="0" />
+       <Documentation>
+       Minimum FOF halo size to calculate an SOD halo.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+      name="MinFOFMass"
+      command="SetMinFOFMass"
+      label="FOF mass threshold"
+      number_of_elements="1"
+      default_values="5.0e12" >
+     <DoubleRangeDomain name="range" />
+       <Documentation>
+       Minimum FOF mass to calculate an SOD halo.
+       </Documentation>
+     </DoubleVectorProperty>
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

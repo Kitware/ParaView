@@ -439,12 +439,15 @@ void pqProxyGroupMenuManager::populateMenu()
     this->Internal->Categories.begin();
   for (; categoryIter != this->Internal->Categories.end(); ++categoryIter)
     {
-    QMenu* categoryMenu = _menu->addMenu(categoryIter.value().Label)
-      << pqSetName(categoryIter.key());
     QList<QAction*> action_list = this->actions(categoryIter.key());
-    foreach (QAction* action, action_list)
+    if( action_list.size() > 0)
       {
-      categoryMenu->addAction(action);
+      QMenu* categoryMenu = _menu->addMenu(categoryIter.value().Label)
+           << pqSetName(categoryIter.key());
+      foreach (QAction* action, action_list)
+        {
+        categoryMenu->addAction(action);
+        }
       }
     }
 
