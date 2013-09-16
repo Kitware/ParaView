@@ -160,6 +160,7 @@ protected:
   // Returns the internal reader instance according to IOType.
   gio::GenericIOReader* GetInternalReader();
 
+
   // Description:
   // Return the point from the raw data.
   void GetPointFromRawData(
@@ -180,10 +181,6 @@ protected:
   // Description:
   // Loads the particle coordinates
   void LoadCoordinates(vtkUnstructuredGrid *grid);
-
-  // Description:
-  // Loads the VTK dataarray with the given name
-  vtkDataArray* GetVtkDataArray(std::string name);
 
   // Description:
   // Loads the particle data arrays

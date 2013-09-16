@@ -96,7 +96,8 @@ int vtkPVoronoiReader::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
-  int i, j;
+//  int i, j;
+  int i = 0;
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   int piece, numPieces;
@@ -528,16 +529,15 @@ void vtkPVoronoiReader::Swap2(char *n)
 
 void vtkPVoronoiReader::vor2ugrid(struct vblock_t *block, vtkSmartPointer<vtkUnstructuredGrid> &ugrid)
 {
-  int i, j, k;
-  int num_cells, num_verts, num_faces;
-  char msg[100];
+//  int i, j, k;
+  int j = 0;
+  int k = 0;
+  int num_cells, num_verts;
 
   num_cells = block->num_complete_cells;
   num_verts = block->num_verts;
-  num_faces = block->tot_num_cell_faces;
 
   float *vert_vals = block->save_verts;
-  vtkMultiProcessController *contr = this->Controller;
 
   //create points
   VTK_CREATE(vtkFloatArray, points_array);

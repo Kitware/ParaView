@@ -99,6 +99,7 @@
     </StringVectorProperty>
 
     <IntVectorProperty command="SetQueryRankNeighbors"
+                         panel_visibility="advanced"
                          default_values="0"
                          name="QueryRankNeighbors"
                          number_of_elements="1">
@@ -110,6 +111,7 @@
     </IntVectorProperty>
 
     <IntVectorProperty command="SetRankInQuery"
+                       panel_visibility="advanced"
                        default_values="0"
                        name="RankInQuery"
                        number_of_elements="1">

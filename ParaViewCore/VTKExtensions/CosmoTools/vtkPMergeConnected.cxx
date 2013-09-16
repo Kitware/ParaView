@@ -116,7 +116,7 @@ int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
 
   output->CopyStructure(input);
 
-  int i, j, k, tc, tb;
+  int i, j, tb;
   tb = input->GetNumberOfBlocks();
   for (i=piece; i<tb; i+=numPieces)
   {
@@ -149,7 +149,6 @@ int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
     // Checking RegionId range
     double rid_range[2];
     crid_array->GetRange(rid_range, 0);
-    int num_regions = rid_range[1] - rid_range[0] + 1;
 
     // Initialize the size of rid arrays
     ocrid_array->SetName("RegionId");
@@ -159,7 +158,6 @@ int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
     ovol_array->SetNumberOfComponents(1);
 
     // Compute cell/point data
-    tc = ugrid->GetNumberOfCells();
     for (j=rid_range[0]; j<=rid_range[1]; j++)
     {
       // Compute face stream of merged polyhedron cell
@@ -190,7 +188,8 @@ int vtkPMergeConnected::RequestData(vtkInformation *vtkNotUsed(request),
 }
 
 // Convert local region id to global ones
-int vtkPMergeConnected::LocalToGlobalRegionId(vtkMultiProcessController *contr, vtkMultiBlockDataSet *data)
+void vtkPMergeConnected::LocalToGlobalRegionId(
+    vtkMultiProcessController *contr, vtkMultiBlockDataSet *data)
 {
   int i, j;
   int rank, num_p, tb;
@@ -260,7 +259,9 @@ int vtkPMergeConnected::LocalToGlobalRegionId(vtkMultiProcessController *contr, 
 // Comparision function to sort point id list
 int compare_ids(const void *a, const void *b)
 {
-  return (*(vtkIdType *)a - *(vtkIdType *)b);
+  vtkIdType A = *( static_cast<const vtkIdType*>( a ) );
+  vtkIdType B = *( static_cast<const vtkIdType*>( b ) );
+  return ( static_cast<int>( A-B ) );
 }
 
 // Generate FaceWithKey struct from vtkIdList to use for indexing
