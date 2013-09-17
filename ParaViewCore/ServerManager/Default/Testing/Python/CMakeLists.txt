@@ -122,10 +122,11 @@ ENDIF ()
 # Add tests for pvbatch.
 
 SET (PVBATCH_TESTS
-  Simple
-  UserTransformOnRepresentation
+  MultiView
   ParallelImageWriter
   ParallelSerialWriter
+  Simple
+  UserTransformOnRepresentation
 )
 
 IF ("1" STREQUAL ${HAS_NUMPY})
