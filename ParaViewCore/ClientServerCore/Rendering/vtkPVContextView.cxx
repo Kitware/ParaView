@@ -22,7 +22,9 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataRepresentation.h"
+#include "vtkPVOptions.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -35,7 +37,15 @@
 //----------------------------------------------------------------------------
 vtkPVContextView::vtkPVContextView()
 {
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
+    vtkProcessModule::GetProcessModule()->GetOptions() : NULL;
+
+  this->UseOffscreenRenderingForScreenshots = false;
+  this->UseOffscreenRendering =
+    (options? options->GetUseOffscreenRendering() != 0 : false);
+
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
+  this->RenderWindow->SetOffScreenRendering(this->UseOffscreenRendering? 1 : 0);
   this->ContextView = vtkContextView::New();
   this->ContextView->SetRenderWindow(this->RenderWindow);
 
@@ -82,6 +92,21 @@ void vtkPVContextView::Initialize(unsigned int id)
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderWindow);
   this->SynchronizedWindows->AddRenderer(id, this->ContextView->GetRenderer());
   this->Superclass::Initialize(id);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContextView::SetUseOffscreenRendering(bool use_offscreen)
+{
+  if (this->UseOffscreenRendering == use_offscreen)
+    {
+    return;
+    }
+
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  bool process_use_offscreen = options->GetUseOffscreenRendering() != 0;
+
+  this->UseOffscreenRendering = use_offscreen || process_use_offscreen;
+  this->GetRenderWindow()->SetOffScreenRendering(this->UseOffscreenRendering);
 }
 
 //----------------------------------------------------------------------------
