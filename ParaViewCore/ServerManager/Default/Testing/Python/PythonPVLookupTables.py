@@ -1,8 +1,8 @@
 from paraview.simple import *
-import SMPythonTesting
+from paraview import smtesting
 
-SMPythonTesting.ProcessCommandLineArguments()
-lutfile='%s/testlut.xml'%(SMPythonTesting.TempDir)
+smtesting.ProcessCommandLineArguments()
+lutfile='%s/testlut.xml'%(smtesting.TempDir)
 testlut="""<ColorMaps>
 <ColorMap name="testlut" space="RGB" indexedLookup="false">
   <Point x="1.86486" o="0" r="0.0392157" g="0.0392157" b="0.94902"/>
@@ -39,15 +39,15 @@ v.CenterAxesVisibility = 0
 
 # verify default laoding
 if len(GetLookupTableNames())<1:
-  raise SMPythonTesting.TestError('Failed to load the default LUTs.')
+  raise smtesting.TestError('Failed to load the default LUTs.')
 
 # exercsie the simple loader
 if not LoadLookupTable(lutfile):
-  raise SMPythonTesting.TestError('Failed to load the testlut file.')
+  raise smtesting.TestError('Failed to load the testlut file.')
 
 names = GetLookupTableNames()
 if 'testlut' not in names:
-  raise SMPythonTesting.TestError('Failed to parse the testlut lut.')
+  raise smtesting.TestError('Failed to parse the testlut lut.')
 
 # exercise simple assignment
 print
@@ -63,5 +63,5 @@ for name in names:
 r.LookupTable=AssignLookupTable(wa,'Cold and Hot')
 ren = Render()
 
-if not SMPythonTesting.DoRegressionTesting(ren.SMProxy):
-   raise SMPythonTesting.TestError('Image comparison failed.')
+if not smtesting.DoRegressionTesting(ren.SMProxy):
+   raise smtesting.TestError('Image comparison failed.')

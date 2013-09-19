@@ -2,10 +2,10 @@
 
 from paraview.simple import *
 
-import SMPythonTesting
-SMPythonTesting.ProcessCommandLineArguments()
+from paraview import smtesting
+smtesting.ProcessCommandLineArguments()
 
-filename = SMPythonTesting.DataDir + '/Data/can.ex2'
+filename = smtesting.DataDir + '/Data/can.ex2'
 can_ex2 = OpenDataFile(filename)
 
 AnimationScene1 = GetAnimationScene()
@@ -94,7 +94,7 @@ Render()
 AnimationScene1.GoToNext()
 Render()
 
-if not SMPythonTesting.DoRegressionTesting(RenderView1.SMProxy):
+if not smtesting.DoRegressionTesting(RenderView1.SMProxy):
   # This will lead to VTK object leaks.
   import sys
   sys.exit(1)

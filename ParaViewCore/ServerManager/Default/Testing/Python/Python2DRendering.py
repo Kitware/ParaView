@@ -5,9 +5,9 @@ import sys
 from paraview import servermanager
 from paraview import simple
 
-import SMPythonTesting
+from paraview import smtesting
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 # Make sure the test driver know that process has properly started
 print "Process started"
@@ -70,7 +70,7 @@ scalarbar.Visibility = True
 legend.Text = "123"
 simple.Render()
 
-if not SMPythonTesting.DoRegressionTesting(view.SMProxy):
-  raise SMPythonTesting.TestError, 'Test failed.'
+if not smtesting.DoRegressionTesting(view.SMProxy):
+  raise smtesting.TestError, 'Test failed.'
 
 simple.Disconnect()

@@ -4,10 +4,10 @@
 # This work was supported by CEA/DIF - Commissariat a l'Energie Atomique,
 # Centre DAM Ile-De-France, BP12, F-91297 Arpajon, France
 
-import SMPythonTesting
+from paraview import smtesting
 from paraview.simple import *
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 data = Sphere()
 display = Show()
@@ -27,5 +27,5 @@ for j in range(4):
 
 display.UserTransform = flattened_transform
 view = Render()
-if not SMPythonTesting.DoRegressionTesting(view.SMProxy):
-    raise SMPythonTesting.TestError, 'Test failed.'
+if not smtesting.DoRegressionTesting(view.SMProxy):
+    raise smtesting.TestError, 'Test failed.'

@@ -1,6 +1,6 @@
 # Test the CSV writer and reader.
 
-import SMPythonTesting
+from paraview import smtesting
 import os
 import os.path
 import sys
@@ -10,7 +10,7 @@ paraview.compatibility.major = 3
 paraview.compatibility.minor = 4
 from paraview import servermanager
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
@@ -19,7 +19,7 @@ sourceProxy = servermanager.sources.RTAnalyticSource()
 filterProxy = servermanager.filters.ExtractHistogram(Input=sourceProxy)
 filterProxy.UpdatePipeline()
 
-temp_filename = os.path.join(SMPythonTesting.TempDir, "histogram.csv")
+temp_filename = os.path.join(smtesting.TempDir, "histogram.csv")
 
 writerProxy = servermanager.writers.CSVWriter(Input=filterProxy, FileName=temp_filename)
 writerProxy.UpdatePipeline()

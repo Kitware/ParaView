@@ -2,8 +2,8 @@
 # connection as well as switching from one to another.
 
 import sys
-import SMPythonTesting
-SMPythonTesting.ProcessCommandLineArguments()
+from paraview import smtesting
+smtesting.ProcessCommandLineArguments()
 
 # Test fails method
 def failed(msg):

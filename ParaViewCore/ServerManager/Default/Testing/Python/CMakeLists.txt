@@ -11,12 +11,12 @@ set (SMSTATE_FILES
   TestPHT
   SPCTH2)
 set (SMSTATE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../SMStates")
-  
+
 IF (PARAVIEW_DATA_ROOT)
   FOREACH (tfile ${SMSTATE_FILES})
     ADD_TEST(NAME "${tfile}-ServerManagerPython"
       COMMAND $<TARGET_FILE:pvpython>
-        ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
+        "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview/smtesting.py"
         -D ${PARAVIEW_DATA_ROOT}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -V ${PARAVIEW_DATA_ROOT}/Baseline/${tfile}.png
@@ -28,7 +28,7 @@ IF (PARAVIEW_DATA_ROOT)
   # state for regression testing.
   ADD_TEST(NAME "LoadSave-ServerManagerPython"
       COMMAND $<TARGET_FILE:pvpython>
-        ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
+        "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview/smtesting.py"
         -D ${PARAVIEW_DATA_ROOT}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -V ${PARAVIEW_DATA_ROOT}/Baseline/Arrow.png

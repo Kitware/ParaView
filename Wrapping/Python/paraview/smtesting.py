@@ -1,4 +1,4 @@
-# This is a module for Server Manager testing using Python. 
+# This is a module for Server Manager testing using Python.
 # This provides several utility functions useful for testing
 import os
 import re
@@ -31,7 +31,7 @@ UseSavedStateForRegressionTests = False
 def Error(message):
   print "ERROR: %s" % message
   return False
-  
+
 def ProcessCommandLineArguments():
   """Processes the command line areguments."""
   global DataDir
@@ -83,7 +83,7 @@ def LoadServerManagerState(filename):
     fp.close()
   except:
     return Error("Failed to open state file %s" % filename)
- 
+
   regExp = re.compile("\${DataDir}")
   data = regExp.sub(DataDir, data)
   if not parser.Parse(data):
@@ -104,7 +104,7 @@ def DoRegressionTesting(rmProxy=None):
   global BaselineImage
   global Threshold
   ProcessCommandLineArguments()
-  
+
   testing = vtkSMTesting()
   testing.AddArgument("-T")
   testing.AddArgument(TempDir)
@@ -125,8 +125,8 @@ def DoRegressionTesting(rmProxy=None):
   if testing.RegressionTest(Threshold) == 1:
     return True
   return Error("Regression Test Failed!")
-  
-  
+
+
 if __name__ == "__main__":
   # This script loads the state, saves out a temp state and loads the saved state.
   # This saved state is used for testing -- this will ensure load/save SM state
@@ -154,4 +154,3 @@ if __name__ == "__main__":
     # This leads to vtkDebugLeaks reporting leaks, hence we do this
     # only when the tests failed.
     sys.exit(ret)
-

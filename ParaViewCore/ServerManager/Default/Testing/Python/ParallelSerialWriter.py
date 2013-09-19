@@ -1,6 +1,6 @@
 # Simple Test for pvbatch.
 
-import SMPythonTesting
+from paraview import smtesting
 import paraview
 paraview.compatibility.major = 3
 paraview.compatibility.minor = 4
@@ -8,12 +8,12 @@ from paraview import servermanager
 
 import sys
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
 sphere = servermanager.sources.SphereSource()
-fname = SMPythonTesting.TempDir+"/stlfile.stl"
+fname = smtesting.TempDir+"/stlfile.stl"
 writer = servermanager.writers.PSTLWriter(Input=sphere, FileName=fname)
 writer.UpdatePipeline()
 
@@ -40,6 +40,6 @@ view.StillRender()
 view.ResetCamera()
 view.StillRender()
 
-SMPythonTesting.DoRegressionTesting(view.SMProxy)
-if not SMPythonTesting.DoRegressionTesting(view.SMProxy):
-    raise SMPythonTesting.TestError, 'Test failed.'
+smtesting.DoRegressionTesting(view.SMProxy)
+if not smtesting.DoRegressionTesting(view.SMProxy):
+    raise smtesting.TestError, 'Test failed.'

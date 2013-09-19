@@ -4,9 +4,9 @@ import math
 
 import os
 import os.path
-import SMPythonTesting
+from paraview import smtesting
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 # Connect to the "builtin"
 #(in-process) ParaView server ...
@@ -15,7 +15,7 @@ servermanager.Connect()
 
 # Create an Exodus reader to load our data ...
 #==============================================
-exodus_file = os.path.join(SMPythonTesting.DataDir, "Data/disk_out_ref.ex2")
+exodus_file = os.path.join(smtesting.DataDir, "Data/disk_out_ref.ex2")
 reader = servermanager.sources.ExodusIIReader(FileName=exodus_file)
 reader.UpdatePipeline()
 reader.UpdatePropertyInformation()
@@ -77,7 +77,7 @@ if pointData.GetArray("PedigreeNodeId").GetValue(0) != 36120750:
 
 # Create an Exodus reader to load our data ...
 #==============================================
-exodus_file = os.path.join(SMPythonTesting.DataDir, "Data/disk_out_ref.ex2")
+exodus_file = os.path.join(smtesting.DataDir, "Data/disk_out_ref.ex2")
 reader = servermanager.sources.ExodusIIReader(FileName=exodus_file)
 reader.UpdatePipeline()
 reader.UpdatePropertyInformation()

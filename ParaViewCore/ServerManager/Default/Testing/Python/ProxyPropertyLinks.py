@@ -6,15 +6,15 @@ import sys
 
 from paraview import servermanager
 
-import SMPythonTesting
+from paraview import smtesting
   
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 servermanager.Connect()
 
-pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "ProxyPropertyLinks.pvsm")
+pvsm_file = os.path.join(smtesting.SMStatesDir, "ProxyPropertyLinks.pvsm")
 print "State file: %s" % pvsm_file
 
-SMPythonTesting.LoadServerManagerState(pvsm_file)
+smtesting.LoadServerManagerState(pvsm_file)
 
 pxm = servermanager.ProxyManager()
 sphere1 = pxm.GetProxy("sources", "Sphere1")
@@ -34,7 +34,7 @@ propertyLink.AddLinkedProperty(sphere1.SMProxy, "StartTheta", 2) # Output.
 pxm.RegisterLink("MyPropertyLink", propertyLink)
 propertyLink = None
 
-temp_state = os.path.join(SMPythonTesting.TempDir,"links_temp.pvsm")
+temp_state = os.path.join(smtesting.TempDir,"links_temp.pvsm")
 pxm.SaveState(temp_state)
 
 sphere1 = None
@@ -43,7 +43,7 @@ sphere3 = None
 pxm.UnRegisterProxies()
 
 # Load the saved state which also has the links.
-SMPythonTesting.LoadServerManagerState(temp_state)
+smtesting.LoadServerManagerState(temp_state)
 try:
   os.remove(saved_state)
 except:
@@ -64,6 +64,6 @@ sphere3.UpdateVTKObjects()
 rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
 rmProxy.StillRender()
 
-if not SMPythonTesting.DoRegressionTesting():
+if not smtesting.DoRegressionTesting():
   # This will lead to VTK object leaks.
   sys.exit(1)

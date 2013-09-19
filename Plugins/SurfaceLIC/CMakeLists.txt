@@ -23,3 +23,7 @@ endif()
 if (VTK_RENDERINGPARALLELHYBRIDOPENGL_LINEINTEGRALCONVLOLUTION2D_TIMER)
   add_definitions("-DvtkLineIntegralConvolution2DTIME")
 endif()
+
+if (PARAVIEW_ENABLE_PYTHON AND BUILD_TESTING)
+  add_subdirectory(Testing/Python)
+endif()

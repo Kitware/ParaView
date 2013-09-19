@@ -1,6 +1,6 @@
 import sys
 
-import SMPythonTesting
+from paraview import smtesting
 import os
 import os.path
 import sys
@@ -10,9 +10,9 @@ print 'starting'
 
 paraview.simple._DisableFirstRenderCameraReset()
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
-fname = os.path.join(SMPythonTesting.TempDir, "parallelimagewritertest.pvti")
+fname = os.path.join(smtesting.TempDir, "parallelimagewritertest.pvti")
 
 import paraview.servermanager
 pm = paraview.servermanager.vtkProcessModule.GetProcessModule()

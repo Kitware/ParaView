@@ -1,6 +1,6 @@
 # Simple Test for pvbatch.
 
-import SMPythonTesting
+from paraview import smtesting
 import paraview
 paraview.compatibility.major = 3
 paraview.compatibility.minor = 4
@@ -9,7 +9,7 @@ from paraview import servermanager
 
 import sys
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
@@ -39,5 +39,5 @@ view.StillRender()
 view.ResetCamera()
 view.StillRender()
 
-if not SMPythonTesting.DoRegressionTesting(view.SMProxy):
-    raise SMPythonTesting.TestError, 'Test failed.'
+if not smtesting.DoRegressionTesting(view.SMProxy):
+    raise smtesting.TestError, 'Test failed.'

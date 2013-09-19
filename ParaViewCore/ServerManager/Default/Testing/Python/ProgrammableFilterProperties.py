@@ -2,7 +2,7 @@ import os
 import random
 import textwrap
 
-import SMPythonTesting
+from paraview import smtesting
 import paraview.simple as smp
 
 
@@ -18,9 +18,9 @@ def testScript(programmableFilter, script):
     return programmableFilter.GetClientSideObject().GetOutput().GetFieldData().GetArray(arrayName) is not None
 
 
-SMPythonTesting.ProcessCommandLineArguments()
-tempDir = SMPythonTesting.TempDir
-stateDir = SMPythonTesting.SMStatesDir
+smtesting.ProcessCommandLineArguments()
+tempDir = smtesting.TempDir
+stateDir = smtesting.SMStatesDir
 
 
 sphere = smp.Sphere()
