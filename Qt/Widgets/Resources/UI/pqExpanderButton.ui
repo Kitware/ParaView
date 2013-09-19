@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>95</width>
-    <height>22</height>
+    <width>115</width>
+    <height>27</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -50,6 +50,12 @@
    </item>
    <item>
     <widget class="QLabel" name="label">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Properties</string>
      </property>
