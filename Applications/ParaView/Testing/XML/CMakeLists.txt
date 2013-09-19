@@ -184,6 +184,7 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
   foreach (tname ${streaming_tests})
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client ${CLIENT_EXECUTABLE}
+              --enable-bt
               -dr
               --enable-streaming
               --disable-light-kit
@@ -194,8 +195,10 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
     add_pv_test(pvcs "_DISABLE_CS"
       COMMAND
          --server $<TARGET_FILE:pvserver>
+         --enable-bt
          --enable-streaming
          --client ${CLIENT_EXECUTABLE}
+         --enable-bt
          -dr
          --enable-streaming
          --disable-light-kit
@@ -617,6 +620,7 @@ IF (PARAVIEW_DATA_ROOT)
       "${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm" @ONLY)
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client $<TARGET_FILE:paraview>
+              --enable-bt
               -dr
               --test-directory=${PARAVIEW_TEST_DIR}
               --state=${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm

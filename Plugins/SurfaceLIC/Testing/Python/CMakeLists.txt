@@ -17,6 +17,7 @@ IF (PARAVIEW_DATA_ROOT)
       ADD_TEST(NAME ${tfile}-Batch
         COMMAND ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 4 ${VTK_MPI_PREFLAGS}
           $<TARGET_FILE:pvbatch>
+          --enable-bt
           ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICTestDriver.py
           -D ${PARAVIEW_DATA_ROOT}
           -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -26,6 +27,7 @@ IF (PARAVIEW_DATA_ROOT)
       # run the test serially
       ADD_TEST(NAME ${tfile}-Batch
         COMMAND $<TARGET_FILE:pvbatch>
+          --enable-bt
           ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICTestDriver.py
           -D ${PARAVIEW_DATA_ROOT}
           -T ${ParaView_BINARY_DIR}/Testing/Temporary

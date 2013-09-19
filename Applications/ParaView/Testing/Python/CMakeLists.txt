@@ -5,10 +5,12 @@ if (FOUND_NUMPY)
   # Add pvpython tests
   add_test(NAME pvpython.TestPythonAnnotationFilter
       COMMAND pvpython
+      --enable-bt
       --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
       ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilter.py)
   add_test(NAME pvpython.TestPythonAnnotationFilterNoMerge
       COMMAND pvpython
+      --enable-bt
       --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
       ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilterNoMerge.py)
   set_tests_properties(
@@ -24,6 +26,7 @@ ENDIF (PARAVIEW_DATA_ROOT)
 if(BUILD_SHARED_LIBS)
   add_test(NAME py-multi-servers.TestMultiServersConfig
     COMMAND smTestDriver
+    --enable-bt
     --test-multi-servers 2
     --server $<TARGET_FILE:pvserver>
     --client $<TARGET_FILE:pvpython>
@@ -32,6 +35,7 @@ if(BUILD_SHARED_LIBS)
 
   add_test(NAME py-multi-servers.TestMultiServersRemoteProxy
     COMMAND smTestDriver
+    --enable-bt
     --test-multi-servers 3
     --server $<TARGET_FILE:pvserver>
     --client $<TARGET_FILE:pvpython>
@@ -40,6 +44,7 @@ if(BUILD_SHARED_LIBS)
 
   add_test(NAME py-multi-servers.TestRemoteProgrammableFilter
     COMMAND smTestDriver
+    --enable-bt
     --server $<TARGET_FILE:pvserver>
     --client $<TARGET_FILE:pvpython>
     ${CMAKE_CURRENT_SOURCE_DIR}/TestRemoteProgrammableFilter.py

@@ -43,7 +43,7 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
             list(INSERT ACT_TEST_SCRIPTS 0 ${test})
           endif (${test_name}_BREAK)
         endif (${counter} GREATER 0)
-        
+
         if (${counter} LESS 100000)
           if (NOT ${test_name}${skip_test_flag_suffix})
             set (full_test_name "${full_test_name}.${test_name}")
@@ -67,6 +67,7 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     if (extra_args)
       ADD_TEST(NAME "${prefix}${full_test_name}"
         COMMAND smTestDriver
+        --enable-bt
         ${ACT_COMMAND}
         ${extra_args}
         --exit
@@ -75,7 +76,7 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
         message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
       endif()
- 
+
       # add the "PARAVIEW" label to the test properties. this allows for the user
       # to instruct cmake to run just the ParaView tests with the '-L' flag
       set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "PARAVIEW")
@@ -89,8 +90,9 @@ ENDFUNCTION (add_pv_test)
 FUNCTION (add_client_tests prefix)
   PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
 
-  add_pv_test(${prefix} "_DISABLE_C" 
+  add_pv_test(${prefix} "_DISABLE_C"
     COMMAND --client ${CLIENT_EXECUTABLE}
+            --enable-bt
             -dr
             ${CLIENT_SERVER_ARGS}
             --disable-light-kit
@@ -103,8 +105,10 @@ FUNCTION (add_client_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CS"
     COMMAND
        --server $<TARGET_FILE:pvserver>
+       --enable-bt
          ${CLIENT_SERVER_ARGS}
        --client ${CLIENT_EXECUTABLE}
+       --enable-bt
          ${CLIENT_SERVER_ARGS}
        -dr
        --disable-light-kit
@@ -117,10 +121,13 @@ FUNCTION (add_client_render_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CRS"
     COMMAND
        --data-server $<TARGET_FILE:pvdataserver>
+       --enable-bt
             ${CLIENT_SERVER_ARGS}
        --render-server $<TARGET_FILE:pvrenderserver>
+       --enable-bt
             ${CLIENT_SERVER_ARGS}
        --client ${CLIENT_EXECUTABLE}
+       --enable-bt
             ${CLIENT_SERVER_ARGS}
        -dr
        --disable-light-kit
@@ -145,8 +152,10 @@ FUNCTION(add_multi_client_tests prefix)
         COMMAND smTestDriver
         --test-multi-clients
         --server $<TARGET_FILE:pvserver>
+        --enable-bt
 
         --client ${CLIENT_EXECUTABLE}
+        --enable-bt
         -dr
         --disable-light-kit
         --test-directory=${PARAVIEW_TEST_DIR}
@@ -156,6 +165,7 @@ FUNCTION(add_multi_client_tests prefix)
         --exit
 
         --client ${CLIENT_EXECUTABLE}
+        --enable-bt
         -dr
         --disable-light-kit
         --test-directory=${PARAVIEW_TEST_DIR}
@@ -184,8 +194,10 @@ FUNCTION(add_multi_server_tests prefix nbServers)
         COMMAND smTestDriver
         --test-multi-servers ${nbServers}
         --server $<TARGET_FILE:pvserver>
+        --enable-bt
 
         --client ${CLIENT_EXECUTABLE}
+        --enable-bt
         -dr
         --disable-light-kit
         --test-directory=${PARAVIEW_TEST_DIR}
@@ -216,8 +228,10 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
             COMMAND smTestDriver
             --test-tiled ${tdx} ${tdy}
             --server $<TARGET_FILE:pvserver>
+            --enable-bt
             ${CLIENT_SERVER_ARGS}
             --client ${CLIENT_EXECUTABLE}
+            --enable-bt
             ${CLIENT_SERVER_ARGS}
             -dr
             --disable-light-kit

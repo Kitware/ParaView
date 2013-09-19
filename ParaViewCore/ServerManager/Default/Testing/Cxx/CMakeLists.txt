@@ -9,7 +9,7 @@ vtk_module_test_executable(TestMultipleSessions
 #------------------------------------------------------------------------------
 set(test_srcs
   ParaViewCoreServerManagerPrintSelf
-  TestComparativeAnimationCueProxy 
+  TestComparativeAnimationCueProxy
   TestXMLSaveLoadState
   TestProxyAnnotation
   )
@@ -41,10 +41,11 @@ if (PARAVIEW_DATA_ROOT)
     ExtractGrid
     TestPHT
     SPCTH2)
- 
+
   foreach (tfile ${TEST_STATES})
     add_test(NAME ${tfile}-ServerManager
       COMMAND ServerManagerStateLoader
+        --enable-bt
         -D=${PARAVIEW_DATA_ROOT}
         -T=${ParaView_BINARY_DIR}/Testing/Temporary
         -V=${PARAVIEW_DATA_ROOT}/Baseline/${tfile}.png
