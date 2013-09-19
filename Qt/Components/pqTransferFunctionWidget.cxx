@@ -293,27 +293,28 @@ void pqTransferFunctionWidget::initialize(
     this->Internals->TransferFunctionItem = item.GetPointer();
     if (pwf_editable && stc_editable)
       {
+      abort();
       // NOTE: this hasn't been tested yet.
       vtkNew<vtkCompositeControlPointsItem> cpItem;
+      cpItem->SetPointsFunction(vtkCompositeControlPointsItem::ColorAndOpacityPointsFunction);
       cpItem->SetOpacityFunction(pwf);
       cpItem->SetColorTransferFunction(ctf);
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(true);
       cpItem->SetUseOpacityPointHandles(true);
       cpItem->SetLabelFormat("%.3f: %.3f");
-      cpItem->SetPointsFunction(vtkCompositeControlPointsItem::ColorAndOpacityPointsFunction);
       this->Internals->ControlPointsItem = cpItem.GetPointer();
       }
     else if (pwf_editable)
       {
       vtkNew<vtkCompositeControlPointsItem> cpItem;
+      cpItem->SetPointsFunction(vtkCompositeControlPointsItem::OpacityPointsFunction);
       cpItem->SetOpacityFunction(pwf);
       cpItem->SetColorTransferFunction(ctf);
       cpItem->SetEndPointsXMovable(false);
       cpItem->SetEndPointsYMovable(true);
       cpItem->SetUseOpacityPointHandles(true);
       cpItem->SetLabelFormat("%.3f: %.3f");
-      cpItem->SetPointsFunction(vtkCompositeControlPointsItem::OpacityPointsFunction);
       this->Internals->ControlPointsItem = cpItem.GetPointer();
       }
     }
