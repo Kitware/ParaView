@@ -11,12 +11,17 @@
                   "name": "apache_setup",
                   "url": "guides/apache_setup",
                   "title": "Setup Apache front-end",
-                  "description": "This document explain how to use Apache as front-end for ParaViewWeb."
+                  "description": "This document explains how to use Apache as the front-end for ParaViewWeb."
               },{
                   "name": "jetty_session_manager",
                   "url": "guides/jetty_session_manager",
                   "title": "Session Manager front-end",
-                  "description": "This document explain how to use the Jetty Session Manager front-end for ParaViewWeb."
+                  "description": "This document explains how to use the Jetty Session Manager front-end for ParaViewWeb."
+              },{
+                  "name": "configure_and_build",
+                  "url": "guides/configure_and_build",
+                  "title": "Configure and build Paraview",
+                  "description": "This document explains how to configure and build ParaView from source."
               }
           ]
       }
