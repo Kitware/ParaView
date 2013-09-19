@@ -109,6 +109,11 @@ protected:
 private:
   vtkSMRepresentationProxy(const vtkSMRepresentationProxy&); // Not implemented
   void operator=(const vtkSMRepresentationProxy&); // Not implemented
+  
+  // Description:
+  // HACK: Returns true for lookuptable, piecewise function proxies which are
+  // not expected to modify data pipeline.
+  bool SkipDependency(vtkSMProxy* producer);
 
   bool RepresentedDataInformationValid;
   vtkPVDataInformation* RepresentedDataInformation;

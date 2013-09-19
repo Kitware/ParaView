@@ -20,7 +20,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVRepresentedDataInformation.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMProxyInternals.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
 
@@ -185,7 +186,11 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
     // marking all representations dirty when a sub-representation is modified.
     (this->GetSubProxyName(modifiedProxy) == NULL))
     {
-    if (!this->MarkedModified)
+    // We need to check that modified proxy is a type of proxy that affects data
+    // rendered/processed by the representation. This is basically a HACK to
+    // avoid invalidating geometry when lookuptable and piecewise-function is
+    // modified.
+    if (!this->MarkedModified && !this->SkipDependency(modifiedProxy))
       {
       this->MarkedModified = true;
       vtkClientServerStream stream;
@@ -207,6 +212,26 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   this->NeedsUpdate = false;
 
   this->Superclass::MarkDirty(modifiedProxy);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRepresentationProxy::SkipDependency(vtkSMProxy* producer)
+{
+  if (producer && producer->GetXMLName() &&
+    (strcmp(producer->GetXMLName(), "PVLookupTable") == 0 ||
+     strcmp(producer->GetXMLName(), "PiecewiseFunction") == 0))
+    {
+    return true;
+    }
+
+  if (producer && producer->GetXMLGroup() &&
+    (strcmp(producer->GetXMLGroup(), "lookup_tables") == 0 ||
+     strcmp(producer->GetXMLGroup(), "piecewise_functions") == 0))
+    {
+    return true;
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
