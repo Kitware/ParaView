@@ -15,13 +15,23 @@ int main(int argc, char **argv)
 
 #if defined(TEST_MPI_CAPS)
   // info about the MPI libraru
-  int major=0, minor=0;
-  MPI_Get_version(&major, &minor);
+  int major=-1, minor=-1;
+#if defined(MPI_VERSION)
+  major = MPI_VERSION;
+#endif
+#if defined(MPI_SUBVERSION)
+  minor = MPI_SUBVERSION;
+#endif
+  //MPI_Get_version(&major, &minor);
 
+#if defined(MPI_VERSION) && (MPI_VERSION >= 3)
   char libVer[MPI_MAX_LIBRARY_VERSION_STRING] = {'\0'};
   int libVerLen = MPI_MAX_LIBRARY_VERSION_STRING;
   MPI_Get_library_version(libVer, &libVerLen);
   libVer[libVerLen] = '\0';
+#else
+  const char *libVer = "Unknown";
+#endif
 #endif
 
   // info about the Open GL
