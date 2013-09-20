@@ -18,6 +18,7 @@ add_test(NAME TestSystemCaps COMMAND TestSystemCaps)
 if (PARAVIEW_USE_MPI)
   set_source_files_properties(TestSystemCaps
     PROPERTIES COMPILE_DEFINITIONS TEST_MPI_CAPS)
+  vtk_mpi_link(TestSystemCaps)
 endif()
 
 set_tests_properties(
