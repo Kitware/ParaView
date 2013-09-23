@@ -901,9 +901,25 @@ void vtkPVSynchronizedRenderWindows::BeginRender(unsigned int id)
   this->Internals->ActiveId = id;
 
   // BeginRender() is needed to be explicitly called in cases where there's a
-  // SharedRenderWindow. In that case, we also need to hide the renderers
-  // belonging to the other views. So let's do that.
-  this->UpdateRendererDrawStates(this->Internals->ActiveId);
+  // SharedRenderWindow.
+  if (this->Internals->SharedRenderWindow)
+    {
+    // BUG #14280 and BUG #13797.
+    // When vtkPVSynchronizedRenderWindows is enabled, the
+    // vtkPVSynchronizedRenderWindows will take care for updating the layout of
+    // all render windows and renderer at the start of render.
+    // However, in cases when the vtkPVSynchronizedRenderWindows is not enabled
+    // e.g. chart-views or other views that don't do parallel rendering (except
+    // in tile-display mode), we still need to relay out the windows and
+    // activate correct renderers. This piece of code takes care of that.
+    if (!this->GetEnabled() && this->GetLocalProcessIsDriver())
+      {
+      this->UpdateWindowLayout();
+      }
+
+    // Ensure the right renderers are visible in shared windows.
+    this->UpdateRendererDrawStates();
+    }
 }
 
 //----------------------------------------------------------------------------
