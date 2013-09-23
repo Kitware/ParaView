@@ -1,21 +1,25 @@
-# SurfaceLIC tests
-
-SET(NP 3)
-
-SET(PVBATCH_TESTS
-  SurfaceLIC-ShuttleZoom1
-  SurfaceLIC-ShuttleZoom2
-  SurfaceLIC-ShuttleAll
-  SurfaceLIC-OfficeHSlice
-  SurfaceLIC-OfficeVSlice
-  SurfaceLIC-OfficeSlices
-  SurfaceLIC-OfficeContour
-  )
-
+# Surface LIC Plugin testing
 IF (PARAVIEW_DATA_ROOT)
-  FOREACH (tfile ${PVBATCH_TESTS})
-    IF (VTK_MPIRUN_EXE)
-      # run the tests in parallel
+  # these tests could run safely in serial and
+  # in parallel.
+  SET(PVBATCH_TESTS
+    SurfaceLIC-ShuttleZoom1
+    SurfaceLIC-ShuttleZoom2
+    SurfaceLIC-ShuttleAll
+    )
+  IF (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
+    # run the tests in parallel
+    SET(NP 3)
+    # these depend on the D3 filter and
+    # can't run serially
+    SET(PVBATCH_TESTS
+      ${PVBATCH_TESTS}
+      SurfaceLIC-OfficeHSlice
+      SurfaceLIC-OfficeVSlice
+      SurfaceLIC-OfficeSlices
+      SurfaceLIC-OfficeContour
+      )
+    FOREACH (tfile ${PVBATCH_TESTS})
       ADD_TEST(NAME ${tfile}-Batch
         COMMAND ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} ${NP} ${VTK_MPI_PREFLAGS}
           $<TARGET_FILE:pvbatch>
@@ -26,8 +30,10 @@ IF (PARAVIEW_DATA_ROOT)
           -V ${PARAVIEW_DATA_ROOT}/Baseline/SurfaceLICPlugin/${tfile}.png
           --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
       SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
-    ELSE()
-      # run the test serially
+    ENDFOREACH()
+  ELSE()
+    # run the test serially
+    FOREACH (tfile ${PVBATCH_TESTS})
       ADD_TEST(NAME ${tfile}-Batch
         COMMAND $<TARGET_FILE:pvbatch>
           --enable-bt
@@ -37,6 +43,6 @@ IF (PARAVIEW_DATA_ROOT)
           -V ${PARAVIEW_DATA_ROOT}/Baseline/SurfaceLICPlugin/${tfile}.png
           --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
       SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
-    ENDIF()
-  ENDFOREACH (tfile)
+    ENDFOREACH()
+  ENDIF()
 ENDIF()

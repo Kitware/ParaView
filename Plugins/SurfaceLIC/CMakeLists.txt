@@ -17,13 +17,20 @@ if (PARAVIEW_USE_MPI)
 endif()
 target_link_libraries(SurfaceLIC ${SurfaceLIC_DEPENDENCIES})
 
-if (VTK_RENDERINGPARALLELHYBRIDOPENGL_SURFACELICPAINTER_TIMER)
+if (VTK_RENDERINGPARALLELLIC_SURFACELICPAINTER_TIMER)
   add_definitions("-DvtkSurfaceLICPainterTIME")
 endif()
-if (VTK_RENDERINGPARALLELHYBRIDOPENGL_LINEINTEGRALCONVLOLUTION2D_TIMER)
+if (VTK_RENDERINGPARALLELLIC_LINEINTEGRALCONVLOLUTION2D_TIMER)
   add_definitions("-DvtkLineIntegralConvolution2DTIME")
 endif()
 
-if (PARAVIEW_ENABLE_PYTHON AND BUILD_TESTING)
+# because these tests can be a little flakey provide the
+# option to disable them on problematic systems.
+SET(SURFACELIC_PLUGIN_TESTING
+  ON CACHE BOOL
+  "Explicitly disable SurfaceLIC plugin ctests"
+  )
+
+if (BUILD_TESTING AND SURFACELIC_PLUGIN_TESTING AND PARAVIEW_ENABLE_PYTHON)
   add_subdirectory(Testing/Python)
 endif()
