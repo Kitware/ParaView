@@ -209,6 +209,7 @@ endif()
 
 # Probe picking does not work in render server mode
 set(ProbePicking_DISABLE_CRS TRUE)
+set(ProbePicking_THRESHOLD 40)
 
 # only enable find data tests if numpy is available
 include("TestNumPy")
@@ -339,7 +340,7 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
-SET(SLACTools_THRESHOLD 20)
+set (SLACTools_THRESHOLD 40)
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
