@@ -42,6 +42,16 @@ add_custom_target(pvw ALL DEPENDS ${_paraview_all_min_js} webcontent)
 configure_file(${docs_source_dir}/config.json.in
    "${CMAKE_CURRENT_BINARY_DIR}/config.json")
 
+configure_file(${docs_source_dir}/guides.json
+   "${vtkWeb_WWW_DEST}/doc/guides.json" COPYONLY)
+
+file (
+  COPY
+  "${CMAKE_CURRENT_SOURCE_DIR}/guides"
+  DESTINATION
+  "${vtkWeb_WWW_DEST}/doc"
+)
+
 # setup up dependencies ...
 set(doc_input_files "${CMAKE_CURRENT_BINARY_DIR}/config.json")
 file(GLOB_RECURSE _doc_files ${docs_source_dir} "*.*")

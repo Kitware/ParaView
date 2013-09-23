@@ -24,5 +24,16 @@
                   "description": "This document explains how to configure and build ParaView from source."
               }
           ]
+      },
+      {
+         "title": "VTK Web Guide",
+         "items": [
+             {
+                  "name": "build_vtk_web",
+                  "url": "guides/build_vtk_web",
+                  "title": "Configure and build VTK Web",
+                  "description": "Configure and build VTK Web"
+             }
+         ]
       }
   ]

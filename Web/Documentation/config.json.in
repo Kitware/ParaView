@@ -4,7 +4,7 @@
     "--warnings": ["-no_doc"],
     "--categories": "@CMAKE_CURRENT_SOURCE_DIR@/categories.json",
     "--images": "@CMAKE_CURRENT_SOURCE_DIR@/images",
-    "--guides": "@CMAKE_CURRENT_SOURCE_DIR@/guides.json",
+    "--guides": "@vtkWeb_WWW_DEST@/doc/guides.json",
     "--videos": "@CMAKE_CURRENT_SOURCE_DIR@/videos.json",
     "--footer": "Kitware",
     "-o": "@DOC_OUTPUT_DIR@",
