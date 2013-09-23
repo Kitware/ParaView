@@ -1,9 +1,9 @@
-# ParaViewWeb Source Configure and Build
+# VTKWeb Source Configure and Build
 
 
 ## Introduction
 
-This document describes the process of configuring and building paraview from source.
+This document describes the process of configuring and building VTK from source.
 
 
 ##Required Tools

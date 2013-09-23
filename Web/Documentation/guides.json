@@ -1,13 +1,8 @@
  [
       {
-          "title": "Developer Guide",
-          "items": [
-              {
-                  "name": "developer_style",
-                  "url": "guides/developer_style",
-                  "title": "Code Style Guidelines",
-                  "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
-              },{
+         "title": "Deployment Guide",
+         "items": [
+             {
                   "name": "apache_setup",
                   "url": "guides/apache_setup",
                   "title": "Setup Apache front-end",
@@ -17,22 +12,33 @@
                   "url": "guides/jetty_session_manager",
                   "title": "Session Manager front-end",
                   "description": "This document explains how to use the Jetty Session Manager front-end for ParaViewWeb."
+              }
+         ]
+      },
+      {
+          "title": "ParaView Web Developer's Guide",
+          "items": [
+              {
+                  "name": "developer_style",
+                  "url": "guides/developer_style",
+                  "title": "Code Style Guidelines",
+                  "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
               },{
                   "name": "configure_and_build",
-                  "url": "guides/configure_and_build",
+                  "url": "guides/configure_and_build_pvweb",
                   "title": "Configure and build Paraview",
                   "description": "This document explains how to configure and build ParaView from source."
               }
           ]
       },
       {
-         "title": "VTK Web Guide",
+         "title": "VTK Web Developer's Guide",
          "items": [
              {
                   "name": "build_vtk_web",
-                  "url": "guides/build_vtk_web",
-                  "title": "Configure and build VTK Web",
-                  "description": "Configure and build VTK Web"
+                  "url": "guides/configure_and_build_vtkweb",
+                  "title": "Configure and build VTK",
+                  "description": "This document explains how to configure and build VTK from source"
              }
          ]
       }
