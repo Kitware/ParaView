@@ -185,6 +185,20 @@ macro(pv_process_plugins root_src root_build)
     if (PARAVIEW_BUILD_PLUGIN_${pv-plugin})
       message(STATUS "Plugin: ${pv-plugin} - ${${pv-plugin}_DESCRIPTION} : Enabled")
       add_subdirectory("${${pv-plugin}_SOURCE_DIR}" "${${pv-plugin}_BINARY_DIR}")
+      # The plugin's CMakeLists.txt might not add targets for all the
+      # plugin-names that it said it will generate based on CMake settings e.g.
+      # GUI is not being built. To handle that case, we prune the plugin-names
+      # list to include only the valid ones.
+      set (real_plugin_names)
+      foreach (libname IN LISTS ${pv-plugin}_PLUGIN_NAMES)
+        if(TARGET ${libname})
+          list(APPEND real_plugin_names ${libname})
+        else()
+          message(STATUS "Plugin '${pv-plugin}' lists plugin library named "
+            "'${libname}', which isn't being built. So skipping it.")
+        endif()
+      endforeach()
+      set (${pv-plugin}_PLUGIN_NAMES ${real_plugin_names})
     else()
       message(STATUS "Plugin: ${pv-plugin} - ${${pv-plugin}_DESCRIPTION} : Disabled")
     endif()
@@ -221,7 +235,6 @@ macro(pv_process_plugins root_src root_build)
   _write_static_plugins_init_file(
     ${CMAKE_CURRENT_BINARY_DIR}/pvStaticPluginsInit.h
     ${PARAVIEW_PLUGINLIST})
-
 endmacro()
 
 #------------------------------------------------------------------------------
