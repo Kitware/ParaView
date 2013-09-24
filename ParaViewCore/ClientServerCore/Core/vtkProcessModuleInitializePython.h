@@ -96,7 +96,7 @@ namespace
   //    + ParaView C/C++ library location
   //      - SELF_DIR
   //    + ParaView Python modules
-  //      - SELF_DIR/site-packages    (when CMAKE_INTDIR is not defined).
+  //      - SELF_DIR/../lib/site-packages    (when CMAKE_INTDIR is not defined).
   //          OR
   //      - SELF_DIR/../../lib/site-packages (when CMAKE_INTDIR is defined).
   //  + INSTALL_LOCATION
@@ -118,7 +118,7 @@ namespace
 #if defined(CMAKE_INTDIR)
     build_dir_site_packages = SELF_DIR + "/../../lib/site-packages";
 #else
-    build_dir_site_packages = SELF_DIR + "/site-packages";
+    build_dir_site_packages = SELF_DIR + "/../lib/site-packages";
 #endif
     bool is_build_dir =
       vtksys::SystemTools::FileExists(build_dir_site_packages.c_str());
@@ -128,6 +128,8 @@ namespace
 #if defined(CMAKE_INTDIR)
       vtkPythonAppInitPrependPythonPath(
         SELF_DIR + "/../../lib/" + std::string(CMAKE_INTDIR));
+#else
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib");
 #endif
       vtkPythonAppInitPrependPythonPath(build_dir_site_packages);
       }
