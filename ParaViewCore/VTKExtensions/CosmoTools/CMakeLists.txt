@@ -13,8 +13,8 @@ include_directories(
 
 # Define external libraries used by this module
 set(CosmoToolsExternalLibs
-    ${GENERIC_IO_LIBRARIES}
     ${COSMOTOOLS_LIBRARIES}
+    ${GENERIC_IO_LIBRARIES}
     )
 
 # Set external includes for the CosmoTools module
