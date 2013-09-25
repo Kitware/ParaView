@@ -5,7 +5,7 @@
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkAMRBox.h"
 #include "vtkUniformGrid.h"
 #include "vtkBoundingBox.h"
@@ -332,7 +332,7 @@ int vtkCTHSource::FillInputData (vtkCPInputDataDescription *input)
 {
   if (this->AllocationsChanged)
     {
-    this->AMRSet = vtkSmartPointer<vtkHierarchicalBoxDataSet>::New ();
+    this->AMRSet = vtkSmartPointer<vtkNonOverlappingAMR>::New ();
     input->SetGrid (this->AMRSet);
 
     std::vector<int> datasets (this->MaxLevel + 1, 0);
@@ -694,7 +694,7 @@ void vtkCTHSource::AddActivationArray (Block& b)
 }
 
 //---------------------------------------------------------------------------
-void vtkCTHSource::AddAttributesToAMR (vtkHierarchicalBoxDataSet* amr)
+void vtkCTHSource::AddAttributesToAMR (vtkNonOverlappingAMR* amr)
 {
   vtkFieldData *fd = amr->GetFieldData ();
 
