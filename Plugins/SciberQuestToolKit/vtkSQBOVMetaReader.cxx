@@ -166,9 +166,12 @@ int vtkSQBOVMetaReader::Initialize(
   GetOptionalAttribute<int,3>(elem,"block_size",block_size);
   this->SetBlockSize(block_size);
 
+  // TODO -- See comment in EstimateBlockCacheSize
+  /*
   double block_cache_ram_factor=0.75;
   GetOptionalAttribute<double,1>(elem,"block_cache_ram_factor",&block_cache_ram_factor);
   this->SetBlockCacheRamFactor(block_cache_ram_factor);
+  */
 
   // if these are provided by the user, then this will
   // override the default intialization of the block cache
@@ -234,12 +237,21 @@ void vtkSQBOVMetaReader::SetFileName(const char* _arg)
     << (_arg==NULL?"NULL":_arg) << endl;
   #endif
 
-  if (this->FileName == NULL && _arg == NULL) { return;}
-  if (this->FileName && _arg && (!strcmp(this->FileName,_arg))) { return;}
+  if (this->FileName == NULL && _arg == NULL)
+    {
+    return;
+    }
+  if (this->FileName && _arg && (!strcmp(this->FileName,_arg)))
+    {
+    return;
+    }
 
   this->vtkSQBOVReaderBase::SetFileName(_arg);
 
-  if (_arg == NULL) return;
+  if (_arg == NULL)
+    {
+    return;
+    }
 
   BOVMetaData *md=this->Reader->GetMetaData();
   if (md->IsDatasetOpen())
@@ -405,6 +417,11 @@ void vtkSQBOVMetaReader::EstimateBlockCacheSize()
   decompDims[2]=max(1,subsetSize[2]/this->BlockSize[2]);
   this->SetDecompDims(decompDims);
 
+  // TODO
+  // Trying to set the block cache size by the available
+  // memory on the system was problematic and lead to some
+  // performance issues.
+  /*
   size_t blockSize=this->BlockSize[0]*this->BlockSize[1]*this->BlockSize[2];
   double blockRam=max(1.0,blockSize*sizeof(float)*3.0/1024.0);
   double procRam=this->GetProcRam();
@@ -419,6 +436,7 @@ void vtkSQBOVMetaReader::EstimateBlockCacheSize()
        << " decrease the blocksize before continuing.");
      }
   this->SetBlockCacheSize(min(maxBlocks,fitBlocks));
+  */
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   int globalLogLevel=log->GetGlobalLevel();

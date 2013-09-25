@@ -1,0 +1,142 @@
+<html>
+<head>
+<title>vis</title>
+<meta name="copyright" content="Copyright (c) 2011 Burlen Loring" />
+<style type="text/css">
+a:link    { color:black; text-decoration: none; font-size:10pt;}
+a:visited { color:black; text-decoration: none; font-size:10pt;}
+a:active  { color:black; text-decoration: none; font-size:10pt;}
+a:hover   { color:black; text-decoration: underline; font-weight: bold; font-size:10pt;}
+dt { font-weight: bold; }
+</style>
+<!--
+<link rel="stylesheet" type="text/css" href="Slimbox/css/slimbox.css" media="screen" />
+<script src="Slideshow/js/mootools-1.3.2-core.js"></script>
+<script src="Slideshow/js/mootools-1.3.2.1-more.js"></script>
+<script type="text/javascript" src="Slimbox/js/slimbox.js"></script>
+<script type="text/javascript">
+  window.addEvent('domready', function(){
+
+    var box = new Lightbox({
+      'onClose': function(){ this.pause(false); }.bind(myShow),
+      'onOpen': function(){ this.pause(true); }.bind(myShow)
+      });
+  });
+</script>
+-->
+</head>
+<body>
+<h1>Configuring the Poincare Map filter</h1>
+<hr>
+<h2>General Procedure</h2>
+<hr>
+The Poincare Map filter takes three inputs:
+<dl>
+<dt>Vector Field</dt>
+<dd>The filter's first input should be connected to a compatible reader that can service the filter's custom pipeline requests and provide a vector field block by block on demand.</dd>
+<dt>Seed Source</dt>
+<dd>The filter's second input should be connected to a single source containing seed point geometry. This can be any ParaView source that generates vertices, lines, or polygons. In the case of lines or polygons, the seed point used will be the line or polygon cell's center. If multiple seed sources are desired, one can first apply the append filter to any number of sources.</dd>
+<dt>Map Surface</dt>
+<dd>The filter's third input should be connected to a source providing the map surface geometry. Typically this will be a plane source, although any source or filter that generates polygons will do. The test for streamline map surface intersection is applied with each integration step. Reducing the number of polygons in map surface will increase the filters performance.</dd>
+</dl>
+ and produces a single output, containing the set of points intersecting the Map Surface.
+
+<h2>Configuring the Meta-Reader</h2>
+<hr>
+The Poincare mapper requires a special reader called a meta-reader. The meta reader differs from a typical ParaView reader in that when ParaView executes it, the meta-read does not read the data but rather queries the dataset for meta data such as bounds, lists of available arrays, and so on. The meta-data is passed on to compatible filters in custom pipeline information. A visual representation of the data is provided to ParaView on the filters output. This output is an empty dataset and cannot be used directly.
+
+<h3>SciberQuest BOV Meta-Reader</h3>
+<h4>SciberQuest BOV Meta Reader Panel.</h4>
+
+<dl>
+<dt>Arrays</dt>
+<dd>Select the set of arrays that will be available downstream.</dd>
+<dt>I,J,K Subset</dt>
+<dd>Controls the subset of the array that is read.</dd>
+<dt>X,Y,Z Periodic</dt>
+<dd>Enables periodic boundary conditions in each of the coordinate directions. Ghost cells at the periodic boundaries are loaded from the periodic image.</dd>
+<dt>Number of Ghost Cells</dt>
+<dd>Controls the generation of ghost cells at block boundaries. One layer of ghost cells is required. To prevent spurious integration error, the number of ghost cell layers should be large enough that a single integration step cannot pass through the ghost cells (see Max Step Size integrator parameter).</dd>
+<dt>Decomp Dims</dt>
+<dd>Controls the size and number of blocks in each direction. If the array to process is small enough to fit entirely into memory and less than 2GB in size then no domain decomposition is required. When Decomp Dims is to (1,1,1) no domain decomposition is performed. If the array size is larger than the available memory or larger than 2GB then the domain decomposition is required. For large arrays it can be beneficial to use a domain decomposition to reduce IO overhead. This is especially true when only a subset of the data will be used by the downstream filter, and the subset of required domains can fit into the available memory. In that case the domains can be cached and the IO requirements are minimized. As a rule of thumb set the domain decomposition resolution high enough that blocks are relatively small so that not too much wasted data is loaded on each cache miss, reads complete quickly while providing large enough blocks to keep the interval between successive reads reasonably large. This is balancing act when in doubt favor moderately high resolutions and modify to achieve the desired performance characteristic.</dd>
+<dt>Block Cache Size</dt>
+<dd>Limits the number of blocks in memory at any given time. This will limit a downstream filter's memory usage. When the number of unique blocks required by a down stream filter exceeds the cache size the least recently used block is removed before loading a new block. Select a block cache size by determining how many blocks will simultaneously fit in memory. Ideally the block cache size will be larger than the number of unique blocks required by the downstream filter. In that case the filter runs in core with the minimal amount of memory used and the minimal amount of IO performed. When the cache is cleared statistics are sent to the standard error device that show among others, the number of unique blocks used. This report is useful in determining how large the cache size would be for optimal operation.</dd>
+<dt>Use Collective IO</dt>
+<dd>Enables MPI Collective IO.</dd>
+<dt>Number of IO Nodes</dt>
+<dd>Sets the number of aggregators used in MPI Collective IO.Set to 0 for the implementation default, typically this one per host.</dd>
+<dt>Collect Buffer Size</dt>
+<dd>Buffer size used for data aggregation in MPI Collective IO. When this is smaller than the aggregators needs the aggregation occurs in multiple passes. Set to 0 for the implementation default.</dd>
+<dt>Use Data Seiving</dt>
+<dd>Enables MPI-IO data seiving.</dd>
+<dt>Seive Buffer Size</dt>
+<dd>Set the MPI-IO data seive buffer. This should be larger than the individual block size.</dd>
+</dl>
+Collective IO should be disabled for the Poincare Mapper as each process needs to operate independently of the others.
+
+<h2>Configuring the Seed Point Source</h2>
+<hr>
+Seeding the mapper can be done with most any ParaView source or filter that produces polygonal data with cells of type VERT,LINE, or POLYGON. In the case of POLYGON seeds, the center of the cell is used as the seed point. A few simple seed genration options are as follows:
+
+<dl>
+<dt>Point Source</dt>
+<dd>Interactively position a single seed point.</dd>
+<dt>Line Source</dt>
+<dd>Interactively positon a uniformly spaced set of seed point on a line.</dd>
+<dt>Plane Source</dt>
+<dd>Produce a grid of seed points lying on a quadrilateral.</dd>
+<dt>SQ Seed Point Latice</dt>
+<dd>Produce an axis aligned linear,planar or volumetric grid of seed points.</dd>
+</dl>
+NOTE: The point and line source produce only a single cell and are not processed in parallel.
+
+<h2>Configuring the Poincare Mapper</h2>
+<hr>
+There are two UI's for the Poincare mapper depending on which of the integrators employed.
+<h3>The Standard (RK2, and RK4) Integrators</h3>
+<h4>The SQ Poincare mapper panel.</h4>
+<dl>
+<dt>Vector Field</dt>
+<dd>Select the vector field to map the map of.</dd>
+<dt>Integrator</dt>
+<dd>Select the integrator to use.</dd>
+<dt>Max Step Size</dt>
+<dd>Sets the integration step size. Both the error and time to complete a trace are functions of the step size. One must be careful not to use a Maximum Step size that would pass through the available ghost cells in a single step. If a step size larger than the length of a cell is desired then multiple ghost cells can be used.</dd>
+<dt>Max Arc Length</dt>
+<dd>The integration will be continued until the streamline arc length exceeds this value. The default is 10 times the largest side of the input dataset. To generate more map points increase this value.</dd>
+<dt>Null Threshold</dt>
+<dd>The integration will be stopped if a region where the vector field magnitude is ebllow this value.</dd>
+<dt>Disable reverse integrate</dt>
+<dd>When checked only forward(along the vector field) integration is made. Uncheck for both forward and reverse(against the direction) of the vector field.</dd>
+<dt>Master Block Size</dt>
+<dd>Sets the number of streamlines traced by the scheduler between servicing worker requests. When tracing many short streamlines increasing the value will reduce scheduler overhead. When tracing very long streamlines (as in the case of the Poincare mapper) a small value should be used so that worker requests are serviced quickly.</dd>
+<dt>Worker Block Size</dt>
+<dd>Sets the number of streamlines assigned to a worker process at each request. When tracing many streamlines this parameter is used to limit the communication overhead while insuring an even distribution of work. When tracing a small number of streamlines it's beneficial to use a small value. Using a value greater than or equal to the number of streamlines divided by the number of processes results in a evenly partitioned static distribution of work. </dd>
+</dl>
+
+<h3>The Adaptive Step Size (RK4-5) Integrator</h3>
+<h4>The SQ RK-4-5 Poincare mapper panel.</h4>
+<dl>
+<dt>Vector Field</dt>
+<dd>Select the vector field to map the map of.</dd>
+<dt>Integrator</dt>
+<dd>Select the integrator to use.</dd>
+<dt>Min Step Size</dt>
+<dd>The function of the Minimum Step parameter is to place a lower bound on the step size. If the integrator attempts to use a step equal to or smaller than this then the integration is terminated an error is reported. In this case to proceed either reduce the Min Step Size or increase the Max Error.</dd>
+<dt>Max Step Size</dt>
+<dd>The function of the Maximum Step is to place an upper bound on the step size used. The integrator will use this step size unless the estimated error exceeds the value set in Max Error. In that case the step size is automatically decreased. One must be careful not to use a Maximum Step size that would pass through the available ghost cells in a single step. If a step size larger than the length of a cell is desired then multiple ghost cells can be used.</dd>
+<dt>Max Error</dt>
+<dd>Sets a bound on the integration error. The integrator will adjust the step size to meet the specified error.</dd>
+<dt>Max Arc Length</dt>
+<dd>The integration will be continued until the streamline arc length exceeds this value. The default is 10 times the largest side of the input dataset. To generate more map points increase this value.</dd>
+<dt>Null Threshold</dt>
+<dd>The integration will be stopped if a region where the vector field magnitude is ebllow this value.</dd>
+<dt>Disable reverse integrate</dt>
+<dd>When checked only forward(along the vector field) integration is made. Uncheck for both forward and reverse(against the direction) of the vector field.</dd>
+<dt>Master Block Size</dt>
+<dd>Sets the number of streamlines traced by the scheduler between servicing worker requests. When tracing many short streamlines increasing the value will reduce scheduler overhead. When tracing very long streamlines (as in the case of the Poincare mapper) a small value should be used so that worker requests are serviced quickly.</dd>
+<dt>Worker Block Size</dt>
+<dd>Sets the number of streamlines assigned to a worker process at each request. When tracing many streamlines this parameter is used to limit the communication overhead while insuring an even distribution of work. When tracing a small number of streamlines it's beneficial to use a small value. Using a value greater than or equal to the number of streamlines divided by the number of processes results in a evenly partitioned static distribution of work.</dd>
+</dl>
+</body>
+</html>

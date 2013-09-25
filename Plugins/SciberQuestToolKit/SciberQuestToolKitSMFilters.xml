@@ -2595,7 +2595,7 @@ Copyright 2012 SciberQuest Inc.
         </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty
+     <DoubleVectorProperty
         name="TimeInterval"
         label="Time Interval"
         command="SetTimeInterval"
@@ -2606,7 +2606,7 @@ Copyright 2012 SciberQuest Inc.
         <Documentation>
           Time range displacement map was computed over.
         </Documentation>
-     </IntVectorProperty>
+     </DoubleVectorProperty>
 
     <Hints>
       <View type="RenderView"/>

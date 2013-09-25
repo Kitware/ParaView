@@ -79,7 +79,7 @@ sq_add_exec(TestFieldTracer)
 sq_add_exec(TestPlaneSource)
 
 if (PARAVIEW_DATA_ROOT)
-  if (PARAVIEW_USE_MPI AND (NOT WIN32))
+  if (PARAVIEW_USE_MPI)
     # parallel invocations, these could run with any number of
     # processes.
     sq_add_test(TestBOVIO 4)

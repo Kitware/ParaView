@@ -483,10 +483,10 @@ Copyright 2012 SciberQuest Inc.
         >
       <IntRangeDomain name="range"/>
       <Documentation>
-        Number of ghost cells to read.
+      Number of ghost cells to read. The integrator requires at least one
+      to correctly handle block to block transitions.
       </Documentation>
     </IntVectorProperty>
-
 
     <IntVectorProperty
         name="BlockSizeInfo"
@@ -499,16 +499,34 @@ Copyright 2012 SciberQuest Inc.
         command="SetBlockSize"
         number_of_elements="3"
         animateable="0"
-        default_values="96 96 96"
+        default_values="128 128 128"
         information_property="BlockSizeInfo"
         immediate_update="1"
         >
       <IntRangeDomain name="range" min="16"/>
       <Documentation>
-      Set the block size.
+      Sets the size of each block used for I/O subsetting during demand loading.
+      Smaller block size means less wasted I/O but remember that I/O is more
+      faster with larger blocks. Set this parameter in conjuntion with the
+      block cahce size.
       </Documentation>
     </IntVectorProperty>
 
+    <IntVectorProperty
+        name="BlockCacheSize"
+        label="Block Cache Size"
+        command="SetBlockCacheSize"
+        number_of_elements="1"
+        default_values="16"
+        >
+      <IntRangeDomain name="range" min="1"/>
+      <Documentation>
+      Sets the maximum number of blocks to hold in the cache. If set
+      too high the system will run out of RAM. Set this parameter in
+      conjuntion with the block size.
+      </Documentation>
+    </IntVectorProperty>
+    <!-- TODO see notes in source.
     <DoubleVectorProperty
         name="BlockCacheRamFactor"
         command="SetBlockCacheRamFactor"
@@ -522,6 +540,7 @@ Copyright 2012 SciberQuest Inc.
       Set the percent of local (ram per-core) to use for the block cache.
       </Documentation>
     </DoubleVectorProperty>
+    -->
 
     <IntVectorProperty
         name="ClearCachedBlocks"
@@ -532,7 +551,8 @@ Copyright 2012 SciberQuest Inc.
         >
       <BooleanDomain name="bool"/>
       <Documentation>
-        If set the block cache is explcitly cleared after each pipeline update.
+      If set the block cache is explcitly cleared after each pipeline update.
+      This will free up RAM for use by other filters.
       </Documentation>
     </IntVectorProperty>
 
