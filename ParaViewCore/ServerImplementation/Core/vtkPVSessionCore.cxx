@@ -568,10 +568,13 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
   if (obj != NULL)
     {
     // Register the object in case some concurrent request will delete it
-    this->RegisterSIObject(message);
+    obj->Register(this);
 
     // Generic SIObject
     obj->Pull(message);
+
+    // release the reference.
+    obj->UnRegister(this);
     }
   else
     {
