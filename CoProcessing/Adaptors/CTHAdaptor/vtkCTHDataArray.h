@@ -10,6 +10,7 @@ class VTK_EXPORT vtkCTHDataArray : public vtkDataArray
 {
 public:
   static vtkCTHDataArray *New ();
+  vtkTypeMacro(vtkCTHDataArray, vtkDataArray);
   void PrintSelf (ostream& os, vtkIndent indent);
 
   // Description:
