@@ -133,6 +133,7 @@ vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, USE_OUTLINE_FOR_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
+vtkInformationKeyMacro(vtkPVRenderView, RENDER_EMPTY_IMAGES, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, REQUEST_STREAMING_UPDATE, Request);
 vtkInformationKeyMacro(vtkPVRenderView, REQUEST_PROCESS_STREAMED_PIECE, Request);
 vtkInformationKeyRestrictedMacro(
@@ -184,6 +185,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Selector = vtkPVHardwareSelector::New();
   this->PreviousParallelProjectionStatus = 0;
   this->NeedsOrderedCompositing = false;
+  this->RenderEmptyImages = false;
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -902,18 +904,26 @@ void vtkPVRenderView::Update()
   // use-lod or not, etc. All these decisions are made right here to avoid
   // making them during each render-call.
 
-  // Check if any representation told us that it needed ordered compositing.
+  // Check if any representation told us:
+  // 1 needed ordered compositing
+  // 2 needed render empty images
   this->NeedsOrderedCompositing = false;
+  this->RenderEmptyImages = false;
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
   for (int cc=0; cc < num_reprs; cc++)
     {
     vtkInformation* info =
       this->ReplyInformationVector->GetInformationObject(cc);
-    if (info->Has(NEED_ORDERED_COMPOSITING()) &&
-      info->Get(NEED_ORDERED_COMPOSITING()) != 0)
+    if ( info->Has(NEED_ORDERED_COMPOSITING())
+      && (info->Get(NEED_ORDERED_COMPOSITING()) != 0))
       {
-      this->NeedsOrderedCompositing= true;
-      break;
+      this->NeedsOrderedCompositing = true;
+      }
+    else
+    if ( info->Has(RENDER_EMPTY_IMAGES())
+      && (info->Get(RENDER_EMPTY_IMAGES()) != 0))
+      {
+      this->RenderEmptyImages = true;
       }
     }
 
@@ -958,6 +968,7 @@ void vtkPVRenderView::Update()
 void vtkPVRenderView::CopyViewUpdateOptions(vtkPVRenderView* otherView)
 {
   this->NeedsOrderedCompositing = otherView->NeedsOrderedCompositing;
+  this->RenderEmptyImages = otherView->RenderEmptyImages;
   this->UseLODForInteractiveRender = otherView->UseLODForInteractiveRender;
   this->UseDistributedRenderingForStillRender = otherView->UseDistributedRenderingForStillRender;
   this->StillRenderProcesses = otherView->StillRenderProcesses;
@@ -1088,6 +1099,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     {
     this->SynchronizedRenderers->SetKdTree(NULL);
     }
+
+  // enable render empty images if it was requested
+  this->SynchronizedRenderers->SetRenderEmptyImages(this->GetRenderEmptyImages());
 
   // Render each representation with available geometry.
   // This is the pass where representations get an opportunity to get the
@@ -1434,6 +1448,21 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
   default:
     return false;
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::GetRenderEmptyImages()
+{
+  int ptype = vtkProcessModule::GetProcessType();
+  if ( this->RenderEmptyImages
+    && ((ptype == vtkProcessModule::PROCESS_SERVER)
+    || (ptype == vtkProcessModule::PROCESS_BATCH)
+    || (ptype == vtkProcessModule::PROCESS_RENDER_SERVER))
+    && (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1) )
+    {
+    return true;
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------

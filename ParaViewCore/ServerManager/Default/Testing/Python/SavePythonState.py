@@ -3,15 +3,15 @@
 # on the command line), and verifys the resulting image
 
 import sys
-import SMPythonTesting
+from paraview import smtesting
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 execfile(sys.argv[1])
 
 RenderView1.ViewSize = [300, 300]
 RenderView1.SMProxy.UpdateVTKObjects()
 
-if not SMPythonTesting.DoRegressionTesting(RenderView1.SMProxy):
+if not smtesting.DoRegressionTesting(RenderView1.SMProxy):
   # This will lead to VTK object leaks.
   sys.exit(1)

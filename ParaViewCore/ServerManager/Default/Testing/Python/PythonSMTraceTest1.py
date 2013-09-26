@@ -12,12 +12,12 @@
 
 from paraview.simple import *
 from paraview import smtrace
-import SMPythonTesting
+from paraview import smtesting
 import sys
 
 # Process command line args and get temp dir
-SMPythonTesting.ProcessCommandLineArguments()
-tempDir = SMPythonTesting.TempDir
+smtesting.ProcessCommandLineArguments()
+tempDir = smtesting.TempDir
 
 # Set APPLY to be an alias for append_trace function.  When running paraview
 # from the gui append_trace is called whenever the user hits the Apply button.
@@ -127,6 +127,6 @@ if not FindSource("My Clip"):
     sys.exit(1)
 
 # Do a screenshot regression test
-if not SMPythonTesting.DoRegressionTesting(ren.SMProxy):
-    raise SMPythonTesting.Error('Image comparison failed.')
+if not smtesting.DoRegressionTesting(ren.SMProxy):
+    raise smtesting.Error('Image comparison failed.')
 

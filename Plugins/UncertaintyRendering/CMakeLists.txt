@@ -23,16 +23,16 @@ IF (PARAVIEW_BUILD_QT_GUI)
   )
 
   ADD_PARAVIEW_PLUGIN(UncertaintyRendering "1.0"
-    SERVER_MANAGER_XML 
+    SERVER_MANAGER_XML
       ${SM_XMLS}
-      
-    SERVER_MANAGER_SOURCES 
+
+    SERVER_MANAGER_SOURCES
       ${SM_SOURCES}
       ${SHADER_SOURCES}
   )
 
   # add dependency with required vtk modules.
-  target_link_libraries(UncertaintyRendering vtkRenderingHybridOpenGL)
+  target_link_libraries(UncertaintyRendering vtkRenderingParallel)
 ENDIF()
 
 if(BUILD_TESTING)

@@ -1,7 +1,7 @@
 # Test Undo/Redo.
 # Tests registering/unregistering/property modification.
 
-import SMPythonTesting
+from paraview import smtesting
 
 import os.path
 import sys
@@ -15,11 +15,11 @@ def RenderAndWait(ren):
   time.sleep(.1)
 
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
-pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "CompoundProxyUndoRedo.pvsm")
+pvsm_file = os.path.join(smtesting.SMStatesDir, "CompoundProxyUndoRedo.pvsm")
 print "State file: %s" % pvsm_file
-SMPythonTesting.LoadServerManagerState(pvsm_file)
+smtesting.LoadServerManagerState(pvsm_file)
 
 pxm = servermanager.ProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
@@ -93,7 +93,7 @@ if compound_proxy2.GetProperty("Input").GetNumberOfProxies() != 0:
   print "ERROR: Instantiated proxy should really have any inputs set as yet."
   sys.exit(1)
 
-if not SMPythonTesting.DoRegressionTesting():
+if not smtesting.DoRegressionTesting():
   # This will lead to VTK object leaks.
   sys.exit(1)
   pass

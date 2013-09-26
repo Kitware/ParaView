@@ -1,6 +1,6 @@
 # Test the vtkIntegrateAttributes filter.
 
-import SMPythonTesting
+from paraview import smtesting
 import os
 import os.path
 import sys
@@ -11,11 +11,11 @@ paraview.compatibility.minor = 4
 
 from paraview import *
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
-file1 = os.path.join(SMPythonTesting.DataDir, "Data/quadraticTetra01.vtu")
+file1 = os.path.join(smtesting.DataDir, "Data/quadraticTetra01.vtu")
 reader1 = servermanager.sources.XMLUnstructuredGridReader(FileName=file1)
 
 filter1 = servermanager.filters.IntegrateAttributes(Input=reader1)
@@ -30,7 +30,7 @@ if val < 0.128 or val > 0.1284:
     print "ERROR: Wrong Volume value for dataset 1"
     sys.exit(1)
 
-file2 = os.path.join(SMPythonTesting.DataDir, "Data/elements.vtu")
+file2 = os.path.join(smtesting.DataDir, "Data/elements.vtu")
 reader2 = servermanager.sources.XMLUnstructuredGridReader(FileName=file2)
 
 filter2 = servermanager.filters.IntegrateAttributes(Input=reader2)
@@ -45,7 +45,7 @@ val = filter2Output.GetPointData().GetArray("pointScalars").GetValue(0)
 #    print "ERROR: Wrong Volume value for dataset 2"
 #    sys.exit(1)
 
-file3 = os.path.join(SMPythonTesting.DataDir, "Data/blow.vtk")
+file3 = os.path.join(smtesting.DataDir, "Data/blow.vtk")
 reader3 = servermanager.sources.LegacyVTKFileReader(FileNames=file3)
 
 filter3 = servermanager.filters.DataSetSurfaceFilter(Input=reader3)

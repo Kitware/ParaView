@@ -311,7 +311,7 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
     {
     return;
     }
-  
+
 #if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
   if (this->ParallelSynchronizer->IsA("vtkIceTSynchronizedRenderers") == 1)
     {
@@ -321,6 +321,25 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
     }
 #else
   static_cast<void>(useDB); // unused warning when MPI is off.
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetRenderEmptyImages(bool useREI)
+{
+  if (this->ParallelSynchronizer == 0)
+    {
+    return;
+    }
+#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+  vtkIceTSynchronizedRenderers *sync
+    = vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
+  if (sync)
+    {
+    sync->SetRenderEmptyImages(useREI);
+    }
+#else
+  static_cast<void>(useREI); // unused warning when MPI is off.
 #endif
 }
 

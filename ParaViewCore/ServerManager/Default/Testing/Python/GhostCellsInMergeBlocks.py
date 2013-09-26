@@ -1,13 +1,13 @@
 from paraview.simple import *
-import SMPythonTesting
+from paraview import smtesting
 
 import sys
 import os
 import os.path
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
-xmf_file = os.path.join(SMPythonTesting.DataDir, "Data/poisson_3dall_2.xmf")
+xmf_file = os.path.join(smtesting.DataDir, "Data/poisson_3dall_2.xmf")
 OpenDataFile(xmf_file)
 MergeBlocks()
 Show()
@@ -22,5 +22,5 @@ view.CenterOfRotation = [0.5, 0.5, 0.5]
 
 Render()
 
-if not SMPythonTesting.DoRegressionTesting(view.SMProxy):
-    raise SMPythonTesting.TestError, 'Test failed.'
+if not smtesting.DoRegressionTesting(view.SMProxy):
+    raise smtesting.TestError, 'Test failed.'

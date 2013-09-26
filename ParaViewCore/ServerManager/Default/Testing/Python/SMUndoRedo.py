@@ -1,7 +1,7 @@
 # Test Undo/Redo.
 # Tests registering/unregistering/property modification.
 
-import SMPythonTesting
+from paraview import smtesting
 
 import os.path
 import sys
@@ -16,11 +16,11 @@ def RenderAndWait(ren):
   #time.sleep(.5)
 
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
-pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "UndoRedo.pvsm")
+pvsm_file = os.path.join(smtesting.SMStatesDir, "UndoRedo.pvsm")
 print "State file: %s" % pvsm_file
-SMPythonTesting.LoadServerManagerState(pvsm_file)
+smtesting.LoadServerManagerState(pvsm_file)
 
 pxm = servermanager.ProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
@@ -141,7 +141,7 @@ UpdateVTKObjects(pxm)
 
 RenderAndWait(renModule)
 
-if not SMPythonTesting.DoRegressionTesting():
+if not smtesting.DoRegressionTesting():
   # This will lead to VTK object leaks.
   sys.exit(1)
   pass

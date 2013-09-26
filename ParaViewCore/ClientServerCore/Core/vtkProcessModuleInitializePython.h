@@ -86,20 +86,20 @@ namespace
     }
   //===========================================================================
 
-  
+
   //===========================================================================
   // Windows
   // Key:
   //    - SELF_DIR: directory containing the pvserver/pvpython/paraview
-  //      executables. 
+  //      executables.
   //---------------------------------------------------------------------------
   //  + BUILD_LOCATION
   //    + ParaView C/C++ library location
   //      - SELF_DIR
   //    + ParaView Python modules
-  //      - SELF_DIR/site-packages    (when CMAKE_INTDIR is not defined).
+  //      - SELF_DIR/../lib/site-packages    (when CMAKE_INTDIR is not defined).
   //          OR
-  //      - SELF_DIR/../site-packages (when CMAKE_INTDIR is defined).
+  //      - SELF_DIR/../../lib/site-packages (when CMAKE_INTDIR is defined).
   //  + INSTALL_LOCATION
   //    + ParaView C/C++ library location
   //      - SELF_DIR
@@ -109,17 +109,29 @@ namespace
   //===========================================================================
   void vtkPythonAppInitPrependPathWindows(const std::string& SELF_DIR)
     {
+    // For use in MS VS IDE builds we need to account for selection of
+    // build configuration in the IDE. CMAKE_INTDIR is how we know which
+    // configuration user has selected. It will be one of Debug, Release,
+    // ... etc. With in VS builds SELF_DIR will be set like
+    // "builddir/bin/CMAKE_INTDIR". PYHTONPATH should have SELF_DIR and
+    // "builddir/lib/CMAKE_INTDIR"
     std::string build_dir_site_packages;
 #if defined(CMAKE_INTDIR)
-    build_dir_site_packages = SELF_DIR + "/../site-packages";
+    build_dir_site_packages = SELF_DIR + "/../../lib/site-packages";
 #else
-    build_dir_site_packages = SELF_DIR + "/site-packages";
+    build_dir_site_packages = SELF_DIR + "/../lib/site-packages";
 #endif
     bool is_build_dir =
       vtksys::SystemTools::FileExists(build_dir_site_packages.c_str());
     if (is_build_dir)
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR);
+#if defined(CMAKE_INTDIR)
+      vtkPythonAppInitPrependPythonPath(
+        SELF_DIR + "/../../lib/" + std::string(CMAKE_INTDIR));
+#else
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib");
+#endif
       vtkPythonAppInitPrependPythonPath(build_dir_site_packages);
       }
     else

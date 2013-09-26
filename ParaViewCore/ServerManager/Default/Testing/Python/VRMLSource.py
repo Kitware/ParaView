@@ -1,6 +1,6 @@
 # Test the vtkVRMLSource and fetching multi-group data.
 
-import SMPythonTesting
+from paraview import smtesting
 import os
 import os.path
 import sys
@@ -10,11 +10,11 @@ paraview.compatibility.major = 3
 paraview.compatibility.minor = 4
 from paraview import servermanager
 
-SMPythonTesting.ProcessCommandLineArguments()
+smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
-file1 = os.path.join(SMPythonTesting.DataDir, "Data/bot2.wrl")
+file1 = os.path.join(smtesting.DataDir, "Data/bot2.wrl")
 reader = servermanager.sources.vrmlreader(FileName = file1)
 readerOutput = servermanager.Fetch(reader)
 if readerOutput.GetClassName() != "vtkMultiBlockDataSet":

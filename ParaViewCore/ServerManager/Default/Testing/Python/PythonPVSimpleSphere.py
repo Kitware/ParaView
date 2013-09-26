@@ -1,6 +1,6 @@
 from paraview.simple import *
 import sys
-import SMPythonTesting
+from paraview import smtesting
 
 sphere = Sphere()
 sphere.PhiResolution = 20
@@ -8,7 +8,7 @@ sphere.ThetaResolution = 20
 
 clientsphere = servermanager.Fetch(sphere)
 if clientsphere.GetNumberOfPolys() != 720L:
-    raise SMPythonTesting.Error('Test failed: Problem fetching polydata.')
+    raise smtesting.Error('Test failed: Problem fetching polydata.')
 
 elev = Elevation(sphere)
 mm = MinMax(None)
@@ -17,12 +17,12 @@ mm.Operation = "MIN"
 mindata = servermanager.Fetch(elev, mm, mm)
 
 if mindata.GetPointData().GetNumberOfArrays() != 2:
-    raise SMPythonTesting.Error('Test failed: Wrong number of arrays.')
+    raise smtesting.Error('Test failed: Wrong number of arrays.')
 
 array = mindata.GetPointData().GetArray('Elevation')
 
 if array.GetTuple1(0) != 0.0:
-    raise SMPythonTesting.Error('Test failed: Bad array value.')    
+    raise smtesting.Error('Test failed: Bad array value.')
 
 rep = Show(elev)
 ai = elev.PointData[1]
@@ -38,8 +38,8 @@ rep.ColorAttributeType = 'POINT_DATA'
 camera = GetActiveCamera()
 camera.Elevation(45)
 
-ren = Render() 
+ren = Render()
 
-if not SMPythonTesting.DoRegressionTesting(ren.SMProxy):
-    raise SMPythonTesting.Error('Image comparison failed.')
+if not smtesting.DoRegressionTesting(ren.SMProxy):
+    raise smtesting.Error('Image comparison failed.')
 

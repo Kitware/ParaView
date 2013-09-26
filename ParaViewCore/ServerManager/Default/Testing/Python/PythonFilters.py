@@ -1,7 +1,7 @@
 import os.path
 from paraview.simple import *
 import sys
-import SMPythonTesting
+from paraview import smtesting
 
 servermanager.ToggleProgressPrinting()
 
@@ -12,7 +12,7 @@ except ImportError:
   hasnumpy = False
 
 if not hasnumpy :
-   raise SMPythonTesting.Error("NumPy library is not found")
+   raise smtesting.Error("NumPy library is not found")
 
 # This function prints an array of scalars/vectors/tensors for display. Since
 # it will be called with a loop, it offers the option to display the entire
@@ -163,7 +163,7 @@ def test1 (query, types=[], associations=[], debug=1) :
             elif 'hex'  == type :
                 # I don't know how to generate mesh composed of hexahedra, instead
                 # just read in a dataset directly.
-                file = os.path.join(SMPythonTesting.DataDir, "Data/multicomb_0.vts")
+                file = os.path.join(smtesting.DataDir, "Data/multicomb_0.vts")
                 reader = servermanager.sources.XMLStructuredGridReader(FileName=file)
             else : continue # Ideally, we should never come to here
 
@@ -193,7 +193,7 @@ def test1 (query, types=[], associations=[], debug=1) :
                 Wavelet()
                 Tetrahedralize()
             elif 'hex'  == type :
-                dir = SMPythonTesting.DataDir
+                dir = smtesting.DataDir
                 file = os.path.join(dir, "Data/multicomb_0.vts")
                 reader = servermanager.sources.XMLStructuredGridReader(FileName=file)
             else : continue
@@ -265,6 +265,6 @@ def main () :
     #test0('norm',           ['scalar', 'vector'], 1, ['point', 'cell'])
 
 if __name__ == "__main__" :
-   SMPythonTesting.ProcessCommandLineArguments()
+   smtesting.ProcessCommandLineArguments()
    main()
 

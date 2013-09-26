@@ -1,4 +1,4 @@
-import SMPythonTesting
+from paraview import smtesting
 from paraview.simple import *
 import sys
 
@@ -32,6 +32,6 @@ AnimationScene1.Cues = []
 Delete(PythonAnimationCue1)
 del PythonAnimationCue1
 
-if not SMPythonTesting.DoRegressionTesting(GetActiveView().SMProxy):
+if not smtesting.DoRegressionTesting(GetActiveView().SMProxy):
   # This will lead to VTK object leaks.
   sys.exit(1)

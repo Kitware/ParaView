@@ -1,6 +1,9 @@
 set (__dependencies)
 if (PARAVIEW_USE_MPI)
-  set (__dependencies vtkFiltersParallelMPI)
+  set (__dependencies
+    vtkFiltersParallelMPI
+    vtkRenderingParallelLIC
+    )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND __dependencies vtkicet)
   endif()
@@ -33,6 +36,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkRenderingFreeTypeOpenGL
     vtkRenderingOpenGL
     vtkRenderingParallel
+    vtkRenderingLIC
 
     ${__dependencies}
   COMPILE_DEPENDS
@@ -43,6 +47,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkIOAMR
     vtkIOXML
     vtkRenderingOpenGL
+    vtkRenderingLIC
     vtkTestingRendering
 
   TEST_LABELS

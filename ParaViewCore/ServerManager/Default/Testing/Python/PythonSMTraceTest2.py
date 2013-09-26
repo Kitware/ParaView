@@ -4,12 +4,12 @@
 
 from paraview.simple import *
 from paraview import smstate
-import SMPythonTesting
+from paraview import smtesting
 import sys
 
 # Process command line args and get temp dir
-SMPythonTesting.ProcessCommandLineArguments()
-tempDir = SMPythonTesting.TempDir
+smtesting.ProcessCommandLineArguments()
+tempDir = smtesting.TempDir
 
 def fail(message):
     raise Exception(message)

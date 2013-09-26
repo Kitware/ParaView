@@ -3,20 +3,20 @@
 
 from paraview.simple import *
 import sys
-import SMPythonTesting
-SMPythonTesting.ProcessCommandLineArguments()
+from paraview import smtesting
+smtesting.ProcessCommandLineArguments()
 
 LoadDistributedPlugin('SLACTools', False, globals())
 LoadDistributedPlugin('SurfaceLIC', False, globals())
 
-filename = SMPythonTesting.DataDir + '/Data/disk_out_ref.ex2'
+filename = smtesting.DataDir + '/Data/disk_out_ref.ex2'
 data = OpenDataFile(filename)
 rep = Show()
 
 # Ensure that loading the SurfaceLIC lead to adding the SelectLICVectors
 # property correctly.
-print rep.GetProperty("SelectLICVectors")
-print rep.SelectLICVectors
+print rep.GetProperty("SelectInputVectors")
+print rep.SelectInputVectors
 
 try:
     LoadDistributedPlugin("NonExistantPluginName", False, globals())
