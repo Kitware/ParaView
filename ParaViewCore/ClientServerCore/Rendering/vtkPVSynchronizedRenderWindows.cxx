@@ -32,9 +32,10 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-#include <map>
-#include <vector>
 #include <assert.h>
+#include <map>
+#include <set>
+#include <vector>
 
 class vtkPVSynchronizedRenderWindows::vtkInternals
 {
@@ -746,6 +747,13 @@ const int *vtkPVSynchronizedRenderWindows::GetWindowPosition(unsigned int id)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::UpdateRendererDrawStates(unsigned int id)
 {
+  if (this->Internals->SharedRenderWindow == NULL)
+    {
+    // If there's no shared render window, we don't need to hide any renders
+    // since each view is rendering in a separate render-window.
+    return;
+    }
+
   vtkInternals::RenderWindowsMap::iterator iter =
     this->Internals->RenderWindows.find(id);
   if (iter == this->Internals->RenderWindows.end())
@@ -753,20 +761,29 @@ void vtkPVSynchronizedRenderWindows::UpdateRendererDrawStates(unsigned int id)
     return;
     }
 
+  std::set<vtkRenderer*> to_enable;
+  vtkInternals::VectorOfRenderers::iterator iterRen;
+  for (iterRen = iter->second.Renderers.begin();
+    iterRen != iter->second.Renderers.end(); ++iterRen)
+    {
+    to_enable.insert(iterRen->GetPointer());
+    }
+
   // disable all other renderers.
   vtkRendererCollection* renderers = iter->second.RenderWindow->GetRenderers();
   renderers->InitTraversal();
   while (vtkRenderer* ren = renderers->GetNextItem())
     {
-    ren->DrawOff();
+    if (to_enable.find(ren) != to_enable.end())
+      {
+      ren->DrawOn();
+      }
+    else
+      {
+      ren->DrawOff();
+      }
     }
 
-  vtkInternals::VectorOfRenderers::iterator iterRen;
-  for (iterRen = iter->second.Renderers.begin();
-    iterRen != iter->second.Renderers.end(); ++iterRen)
-    {
-    iterRen->GetPointer()->DrawOn();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -804,7 +821,6 @@ void vtkPVSynchronizedRenderWindows::HandleStartRender(vtkRenderWindow* renWin)
 
   case RENDER_SERVER:
   case BATCH:
-    this->UpdateRendererDrawStates(this->Internals->ActiveId);
     if (this->ParallelController->GetLocalProcessId() == 0)
       {
       // root node.
@@ -883,6 +899,11 @@ void vtkPVSynchronizedRenderWindows::ClientStartRender(vtkRenderWindow* renWin)
 void vtkPVSynchronizedRenderWindows::BeginRender(unsigned int id)
 {
   this->Internals->ActiveId = id;
+
+  // BeginRender() is needed to be explicitly called in cases where there's a
+  // SharedRenderWindow. In that case, we also need to hide the renderers
+  // belonging to the other views. So let's do that.
+  this->UpdateRendererDrawStates(this->Internals->ActiveId);
 }
 
 //----------------------------------------------------------------------------

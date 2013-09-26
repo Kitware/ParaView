@@ -503,19 +503,19 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoCapableWindow"
-                         default_values="1"
+                         default_values="none"
                          name="StereoCapableWindow"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoRender"
-                         default_values="0"
+                         default_values="none"
                          name="StereoRender"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
-                         default_values="2"
+                         default_values="none"
                          name="StereoType"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -896,6 +896,22 @@
                         min="0"
                         name="range" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
+                         default_values="0"
+                         name="UseOffscreenRenderingForScreenshots"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether offscreen rendering should be used during
+        CaptureWindow calls.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseOffscreenRendering"
+                         default_values="0"
+                         ignore_synchronization="1"
+                         name="UseOffscreenRendering"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to use offscreen rendering.</Documentation>
+      </IntVectorProperty>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
@@ -925,6 +941,22 @@
                       representation_name="ParallelCoordinatesRepresentation">
       <Documentation>This is the proxy for parallel coordinates chart
       view.</Documentation>
+      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
+                         default_values="0"
+                         name="UseOffscreenRenderingForScreenshots"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether offscreen rendering should be used during
+        CaptureWindow calls.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseOffscreenRendering"
+                         default_values="0"
+                         ignore_synchronization="1"
+                         name="UseOffscreenRendering"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to use offscreen rendering.</Documentation>
+      </IntVectorProperty>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <PlotMatrixViewProxy base_proxygroup="views"
@@ -935,6 +967,22 @@
                          representation_name="PlotMatrixRepresentation">
       <Documentation>This is the proxy for the plot matrix
       view.</Documentation>
+      <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
+                         default_values="0"
+                         name="UseOffscreenRenderingForScreenshots"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether offscreen rendering should be used during
+        CaptureWindow calls.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseOffscreenRendering"
+                         default_values="0"
+                         ignore_synchronization="1"
+                         name="UseOffscreenRendering"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to use offscreen rendering.</Documentation>
+      </IntVectorProperty>
     </PlotMatrixViewProxy>
     <!-- ================================================================== -->
     <ViewProxy base_proxygroup="views"

@@ -147,7 +147,12 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   // Do not use it.
 #if !defined(__APPLE__)
   int prevOffscreen = window->GetOffScreenRendering();
-  window->SetOffScreenRendering(1);
+
+  vtkPVContextView* view = vtkPVContextView::SafeDownCast(
+    this->GetClientSideObject());
+  bool use_offscreen = view->GetUseOffscreenRendering() ||
+    view->GetUseOffscreenRenderingForScreenshots();
+  window->SetOffScreenRendering(use_offscreen? 1: 0);
 #endif
 
   window->SwapBuffersOff();
