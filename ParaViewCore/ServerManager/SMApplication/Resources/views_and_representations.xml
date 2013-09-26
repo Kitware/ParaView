@@ -1759,15 +1759,13 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <ProxyProperty command="SetColor"
-                     name="LookupTable"
-                     skip_dependency="1">
+                     name="LookupTable" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
       <ProxyProperty command="SetScalarOpacity"
-                     name="ScalarOpacityFunction"
-                     skip_dependency="1">
+                     name="ScalarOpacityFunction" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -1962,8 +1960,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <ProxyProperty command="SetColor"
-                     name="LookupTable"
-                     skip_dependency="1">
+                     name="LookupTable" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
@@ -2016,8 +2013,7 @@
         unsigned char RGBA data array.</Documentation>
       </IntVectorProperty>
       <ProxyProperty command="SetScalarOpacity"
-                     name="ScalarOpacityFunction"
-                     skip_dependency="1">
+                     name="ScalarOpacityFunction" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -2185,8 +2181,7 @@
         as colors.</Documentation>
       </IntVectorProperty>
       <ProxyProperty command="SetLookupTable"
-                     name="LookupTable"
-                     skip_dependency="1">
+                     name="LookupTable" >
         <Documentation>Set the lookup table to use for scalar
         mapping.</Documentation>
         <ProxyGroupDomain name="groups">
@@ -2493,8 +2488,7 @@
         </ProxyGroupDomain>
       </ProxyProperty>
       <ProxyProperty command="SetLookupTable"
-                     name="LookupTable"
-                     skip_dependency="1">
+                     name="LookupTable">
         <Documentation>Set the lookup-table to use to map data array to colors.
         Lookuptable is only used with MapScalars to ON.</Documentation>
         <ProxyGroupDomain name="groups">
