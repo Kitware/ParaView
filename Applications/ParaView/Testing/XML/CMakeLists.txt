@@ -209,6 +209,7 @@ endif()
 
 # Probe picking does not work in render server mode
 set(ProbePicking_DISABLE_CRS TRUE)
+set(ProbePicking_THRESHOLD 40)
 
 # only enable find data tests if numpy is available
 include("TestNumPy")
@@ -339,7 +340,7 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
-SET(SLACTools_THRESHOLD 20)
+set (SLACTools_THRESHOLD 40)
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
@@ -583,22 +584,27 @@ IF (PARAVIEW_DATA_ROOT)
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
 
+  set (TileDisplayScatterPlot-2x1_THRESHOLD 40)
   add_tile_display_tests("pvcs-tile-display" 2 1
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x1.xml)
 
+  set (TileDisplayScatterPlot-2x2_THRESHOLD 40)
   add_tile_display_tests("pvcs-tile-display" 2 2
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x2.xml)
 
+  set (TileDisplay3DTesting-1x2_THRESHOLD 40)
   add_tile_display_tests("pvcs-tile-display" 1 2
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-1x2.xml)
 
+  set (TileDisplay3DTesting-2x1_THRESHOLD 40)
   add_tile_display_tests("pvcs-tile-display" 2 1
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-2x1.xml)
 
+  set (TileDisplay3DTesting-2x2_THRESHOLD 40)
   add_tile_display_tests("pvcs-tile-display" 2 2
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-2x2.xml)
