@@ -8,7 +8,7 @@
 
 class vtkCTHDataArray;
 class vtkIntArray;
-class vtkHierarchicalBoxDataSet;
+class vtkNonOverlappingAMR;
 class vtkAMRBox;
 class vtkUniformGrid;
 class vtkCPInputDataDescription;
@@ -89,7 +89,7 @@ protected:
     vtkAMRBox* box;
   };
   std::vector<Block> Blocks;
-  vtkSmartPointer<vtkHierarchicalBoxDataSet> AMRSet;
+  vtkSmartPointer<vtkNonOverlappingAMR> AMRSet;
 //ETX
 
   void AllocateBlock (Block &b);
@@ -101,7 +101,7 @@ protected:
   void AddFieldArrays (Block& b);
   void AddFieldArrays (Block& b, int loCorner[3], int hiCorner[3]);
   void AddActivationArray (Block &b);
-  void AddAttributesToAMR (vtkHierarchicalBoxDataSet* amr);
+  void AddAttributesToAMR (vtkNonOverlappingAMR* amr);
 
 private:
   vtkCTHSource (const vtkCTHSource&); // Not implemented
