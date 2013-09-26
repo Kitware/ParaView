@@ -337,7 +337,7 @@ void pqTransferFunctionWidget::initialize(
       vtkControlPointsItem::CurrentPointChangedEvent,
       this, SLOT(onCurrentChangedEvent()));
     pqCoreUtilities::connect(this->Internals->ControlPointsItem,
-      vtkControlPointsItem::PointsModifiedEvent,
+      vtkCommand::EndEvent,
       this, SIGNAL(controlPointsModified()));
     }
 
