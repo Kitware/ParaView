@@ -129,56 +129,9 @@ bool vtkChartWarning::Paint(vtkContext2D* painter)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkChartWarning::Hit(const vtkContextMouseEvent& mouse)
-{
-  vtkChart* parent = vtkChart::SafeDownCast(this->GetParent());
-  if (!parent)
-    {
-    return this->vtkAbstractContextItem::Hit(mouse);
-    }
-  vtkRectf cbds = parent->GetSize();
-  vtkVector2f pos = mouse.GetPos();
-  if (pos[0] > cbds.GetX() + this->Dimensions[0] &&
-      pos[0] < cbds.GetX() + cbds.GetWidth() - this->Dimensions[2] &&
-      pos[1] > cbds.GetY() + this->Dimensions[1] &&
-      pos[1] < cbds.GetY() + cbds.GetHeight() - this->Dimensions[3])
-    {
-    return true;
-    }
-  else
-    {
-    return this->vtkAbstractContextItem::Hit(mouse);
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool vtkChartWarning::MouseEnterEvent(const vtkContextMouseEvent&)
-{
-  return true;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkChartWarning::MouseMoveEvent(const vtkContextMouseEvent&)
+bool vtkChartWarning::Hit(const vtkContextMouseEvent&)
 {
   return false;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkChartWarning::MouseLeaveEvent(const vtkContextMouseEvent&)
-{
-  return true;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkChartWarning::MouseButtonPressEvent(const vtkContextMouseEvent&)
-{
-  return true;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkChartWarning::MouseButtonReleaseEvent(const vtkContextMouseEvent&)
-{
-  return true;
 }
 
 //-----------------------------------------------------------------------------
