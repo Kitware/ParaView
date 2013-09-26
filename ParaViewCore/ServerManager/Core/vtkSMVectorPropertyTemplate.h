@@ -281,7 +281,17 @@ public:
       if (modified)
         {
         this->Property->Modified();
-        this->ClearUncheckedElements();
+        }
+
+      // now copy unchecked values.
+      if (this->UncheckedValues != dsrc->Values)
+        {
+        this->UncheckedValues = dsrc->Values;
+        modified = true;
+        }
+      if (modified)
+        {
+        this->Property->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
         }
       }
     }
