@@ -352,7 +352,6 @@ void pqScalarValueListPropertyWidget::removeAll()
   emit this->scalarsChanged();
 }
 
-
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::addRange()
 {
@@ -403,6 +402,7 @@ void pqScalarValueListPropertyWidget::addRange()
       }
     }
   this->Internals->Model.setValue(value);
+  emit this->scalarsChanged();
 }
 
 //-----------------------------------------------------------------------------
