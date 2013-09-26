@@ -918,7 +918,7 @@ void vtkPVSynchronizedRenderWindows::BeginRender(unsigned int id)
       }
 
     // Ensure the right renderers are visible in shared windows.
-    this->UpdateRendererDrawStates();
+    this->UpdateRendererDrawStates(this->Internals->ActiveId);
     }
 }
 
