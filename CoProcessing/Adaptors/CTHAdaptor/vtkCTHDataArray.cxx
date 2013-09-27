@@ -8,8 +8,10 @@ vtkStandardNewMacro (vtkCTHDataArray);
 
 //---------------------------------------------------------------------------
 
-vtkCTHDataArray::vtkCTHDataArray (vtkIdType numComp) : vtkDataArray (numComp)
+vtkCTHDataArray::vtkCTHDataArray (vtkIdType numComp) : vtkDataArray()
 {
+  this->SetNumberOfComponents(numComp);
+
   this->ExtentsSet = false;
   this->PointerTime = 0;
 
@@ -28,10 +30,10 @@ vtkCTHDataArray::~vtkCTHDataArray ()
 
 void vtkCTHDataArray::PrintSelf (ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf (os, indent); 
-  os << indent << "Dimensions " << 
-    this->Dimensions[0] << " " << 
-    this->Dimensions[1] << " " << 
+  this->Superclass::PrintSelf (os, indent);
+  os << indent << "Dimensions " <<
+    this->Dimensions[0] << " " <<
+    this->Dimensions[1] << " " <<
     this->Dimensions[2] << endl;
 }
 
@@ -49,10 +51,10 @@ void vtkCTHDataArray::Initialize ()
       {
       if (this->Data[i])
         {
-        delete [] this->Data[i];        
+        delete [] this->Data[i];
         }
       }
-    delete [] this->Data;        
+    delete [] this->Data;
     }
   this->Data = 0;
 
@@ -78,7 +80,7 @@ void vtkCTHDataArray::SetDimensions (int x, int y, int z)
     this->Fallback = 0;
     }
 
-  this->Dimensions[0] = x; 
+  this->Dimensions[0] = x;
   this->Dimensions[1] = y;
   this->Dimensions[2] = z;
   this->MaxId = x * y * z - 1;
@@ -118,7 +120,7 @@ void vtkCTHDataArray::SetExtents (int x0, int x1, int y0, int y1, int z0, int z1
 
 void vtkCTHDataArray::UnsetExtents ()
 {
-  this->MaxId = 
+  this->MaxId =
       this->Dimensions[0] * this->Dimensions[1] * this->Dimensions[2] - 1;
   this->Size = (MaxId + 1) * this->GetNumberOfComponents ();
   this->ExtentsSet = false;
@@ -175,14 +177,14 @@ double* vtkCTHDataArray::GetTuple (vtkIdType i)
       }
     // fall through to the next if(), i.e. the initial case
     }
-  if (!this->Tuple) 
+  if (!this->Tuple)
     {
     this->TupleSize = numComp;
     this->Tuple = new double [this->TupleSize];
     }
   this->GetTuple (i, this->Tuple);
   return this->Tuple;
-} 
+}
 
 double* vtkCTHDataArray::GetPointer (vtkIdType id)
 {
@@ -200,7 +202,7 @@ double* vtkCTHDataArray::GetPointer (vtkIdType id)
       }
     else
       {
-      int plane = this->Dimensions[2] * this->Dimensions[1]; 
+      int plane = this->Dimensions[2] * this->Dimensions[1];
       size = numComp * plane * this->Dimensions[0];
       }
     if (this->CopiedData)
@@ -212,11 +214,11 @@ double* vtkCTHDataArray::GetPointer (vtkIdType id)
         this->CopiedData = new double[this->CopiedSize];
         }
       }
-    else 
+    else
       {
       this->CopiedSize = size;
       this->CopiedData = new double[this->CopiedSize];
-      } 
+      }
     this->ExportToVoidPointer (this->CopiedData);
     this->PointerTime = this->GetMTime ();
     }
@@ -229,7 +231,7 @@ void vtkCTHDataArray::ExportToVoidPointer (void *out_ptr)
     {
     return this->Fallback->ExportToVoidPointer (out_ptr);
     }
-  if (!out_ptr) return; 
+  if (!out_ptr) return;
   double *out_data = static_cast<double *>(out_ptr);
   int rawIndex = 0;
   int numComp = this->GetNumberOfComponents ();
