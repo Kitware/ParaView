@@ -7,6 +7,11 @@ IF (PARAVIEW_DATA_ROOT)
     SurfaceLIC-ShuttleZoom2
     SurfaceLIC-ShuttleAll
     )
+  # don't attempt to load plugin if linked static
+  SET(STATIC_LINK 1)
+  IF (BUILD_SHARED_LIBS)
+    set(STATIC_LINK 0)
+  ENDIF()
   IF (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
     # run the tests in parallel
     SET(NP 3)
@@ -28,6 +33,7 @@ IF (PARAVIEW_DATA_ROOT)
           -D ${PARAVIEW_DATA_ROOT}
           -T ${ParaView_BINARY_DIR}/Testing/Temporary
           -V ${PARAVIEW_DATA_ROOT}/Baseline/SurfaceLICPlugin/${tfile}.png
+          -S ${STATIC_LINK}
           --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
       SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
     ENDFOREACH()
@@ -41,6 +47,7 @@ IF (PARAVIEW_DATA_ROOT)
           -D ${PARAVIEW_DATA_ROOT}
           -T ${ParaView_BINARY_DIR}/Testing/Temporary
           -V ${PARAVIEW_DATA_ROOT}/Baseline/SurfaceLICPlugin/${tfile}.png
+          -S ${STATIC_LINK}
           --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
       SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
     ENDFOREACH()

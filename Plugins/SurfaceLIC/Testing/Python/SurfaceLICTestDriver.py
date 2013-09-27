@@ -25,9 +25,12 @@ del painter
 del rw
 
 if ok:
-  LoadDistributedPlugin('SurfaceLIC', True, globals())
-
   smtesting.ProcessCommandLineArguments()
+  static = smtesting.SMStatesDir
+
+  if int(static) == 0:
+    LoadDistributedPlugin('SurfaceLIC', True, globals())
+
   smtesting.LoadServerManagerState(smtesting.StateXMLFileName)
 
   view = GetRenderView()

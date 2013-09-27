@@ -38,12 +38,16 @@ vtk_module_dep_includes(vtkPVServerManagerApplication)
 include_directories(${vtkPVServerManagerApplication_DEPENDS_INCLUDE_DIRS}
                     ${vtkPVServerManagerApplication_INCLUDE_DIRS})
 
+set(STATIC_LINK_PLUGINS)
+if (NOT BUILD_SHARED_LIBS)
+  set(STATIC_LINK_PLUGINS ${PARAVIEW_PLUGINLIST})
+endif()
+
 foreach (name pvserver pvdataserver pvrenderserver)
   pv_add_executable(${name} ${name}.cxx)
-  target_link_libraries(${name} vtkPVServerManagerApplication)
-  if (NOT BUILD_SHARED_LIBS)
-    target_link_libraries(${name} ${PARAVIEW_PLUGINLIST})
-  endif()
+  target_link_libraries(${name}
+    vtkPVServerManagerApplication
+    ${STATIC_LINK_PLUGINS})
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
@@ -52,7 +56,8 @@ if (PARAVIEW_ENABLE_PYTHON)
     target_link_libraries(${name}
       vtkPVServerManagerApplication
       vtkUtilitiesPythonInitializer
-      ${VTK_PYTHON_LIBRARIES})
+      ${VTK_PYTHON_LIBRARIES}
+      ${STATIC_LINK_PLUGINS})
   endforeach()
 
   # add python module dependencies to the server-executables for static builds.
