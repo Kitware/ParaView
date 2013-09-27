@@ -52,12 +52,21 @@ namespace
       PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
 
 #if defined(_WIN32)
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/bin/site-packages");
 # if defined(CMAKE_INTDIR)
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR);
+    std::string bin_dir = PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR;
 # else
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/bin");
+    std::string bin_dir = PARAVIEW_BINARY_DIR "/bin";
 # endif
+    // Also update PATH to include the bin_dir so when the DLLs for the Python
+    // modules are searched, they can located.
+    std::string cpathEnv = vtksys::SystemTools::GetEnv("PATH");
+    cpathEnv = "PATH=" + bin_dir + ";" + cpathEnv;
+    vtksys::SystemTools::PutEnv(cpathEnv.c_str());
+
+    vtkPythonInterpreter::PrependPythonPath(bin_dir.c_str());
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");
+    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
+
 #else // UNIX/OsX
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");

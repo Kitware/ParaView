@@ -69,15 +69,14 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
 
     vtkCPCxxHelper::Instance = instance;
 
+    // Since when coprocessing, we have no information about the executable, we
+    // make one up using the current working directory.
+    std::string self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
+    std::string programname = self_dir + "/unknown_exe";
+
     int argc = 1;
     char** argv = new char*[1];
-    std::string CWD = vtksys::SystemTools::GetCurrentWorkingDirectory();
-    argv[0] = new char[CWD.size()+1];
-#ifdef COPROCESSOR_WIN32_BUILD
-    strcpy_s(argv[0], strlen(CWD.c_str()), CWD.c_str());
-#else
-    strcpy(argv[0], CWD.c_str());
-#endif
+    argv[0] = vtksys::SystemTools::DuplicateString(programname.c_str());
 
     vtkCPCxxHelper::Instance->Options = vtkPVOptions::New();
     vtkCPCxxHelper::Instance->Options->SetSymmetricMPIMode(1);
