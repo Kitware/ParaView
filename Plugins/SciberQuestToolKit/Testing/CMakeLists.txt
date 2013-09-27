@@ -7,7 +7,7 @@ include_directories(
 macro(sq_exec_name _name _test_name _exec_name)
   set(${_test_name} SciberQuestToolKit-${_name})
   set(CXX_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-  if (WIN32)
+  if (MSVC_IDE)
     set(${_exec_name} "${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/${${_test_name}}")
   else()
     set(${_exec_name} "${CXX_TEST_PATH}/${${_test_name}}")
