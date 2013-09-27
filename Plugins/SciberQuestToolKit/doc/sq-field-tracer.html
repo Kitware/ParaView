@@ -8,8 +8,6 @@ a:visited { color:black; text-decoration: none; font-size:10pt;}
 a:active  { color:black; text-decoration: none; font-size:10pt;}
 a:hover   { color:black; text-decoration: underline; font-weight: bold; font-size:10pt;}
 </style>
-
-
 <!--
 <link rel="stylesheet" type="text/css" href="Slimbox/css/slimbox.css" media="screen" />
 <script src="Slideshow/js/mootools-1.3.2-core.js"></script>
@@ -25,7 +23,6 @@ a:hover   { color:black; text-decoration: underline; font-weight: bold; font-siz
   });
 </script>
 -->
-
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script> <!-- optional -->
 <!--[if lt IE 9]>
@@ -44,7 +41,7 @@ a:hover   { color:black; text-decoration: underline; font-weight: bold; font-siz
 In order to provide scalable parallel performance the SciberQuest (SQ) field tracer implements a load-on-demand strategy and distributed or demand generated seed geometry. This document describes these features and how to make use of them.
 
 <h2>A Test Dataset</h2>
-A small dataset is provided for the following example. Download and untar this dataset on your local system. (<a href=images/sq-field-tracer/Rankine.tar.gz>download Rankine.tar.gz</a>)
+A small dataset is provided for the following example. The test dataset is distributed in the ParaViewData git repository, in <i> ParaViewData/Data/SciberQuestToolKit/Rankine </i>.
 
 <h2>Reading in Data</h2>
 The load on demand feature of our stream tracer depends on the reader exporting a specific api that gives the integrator access to I/O functionality. For this reason our reader has to operating modes, 1) normal mode, 2) meta-mode. It is the second, meta-mode, that is used with our parallel stream tracer. The reader is placed in meta-mode by opening a file ending in the extension ".bovm".
@@ -53,13 +50,12 @@ Using ParaView's <i>File Open</i> dialog to browse to the test dataset and selec
 
 <table>
 <tr><td>
-<a href="images/sq-field-tracer/bov-reader-panel.png" class='lightview' data-lightview-options="" data-lightview-group='reader' ><img src="images/sq-field-tracer/bov-reader-panel.png" height="100" /></a>
+<a href="bov-reader-panel.png" class='lightview' data-lightview-options="" data-lightview-group='reader' ><img src="bov-reader-panel.png" height="300" /></a>
 </td></tr>
 <tr><td>
 Figure 1. The SQ BOV Meta Reader Panel.
 </td></tr>
 </table>
-
 
 <h2>Creating Seed Geometry</h2>
 Our field tracer expects vtkPolyData or vtkUnstructuredData for it's seed input.  There are two methods of distrubting work in our field tracer, 1) static decomposition, 2) dynamic decomposition. Dynamic decomposition is usually not not needed when generating streamline geometry so it will be discussed elsewhere. In the static decomposition method of distributing of work  to the field tracer each process's work is determined by the domain decomposition of the seed geometry. The static domain decomposition of seed cells is acheived through standard ParaView mechanisms, where the source responds to ParaView's piece based requests. The seed geometry is generated in a distributed manner and in the field tracer each rank will integrate streamlines from the local seeds.
@@ -69,7 +65,7 @@ In ParaView create a plane using the <i>Sources->SciberQuest->Plane Source</i> m
 <table>
 <tr><td>
 
-<a href="images/sq-field-tracer/sq-plane-source-panel.png" class='lightview' data-lightview-options="" data-lightview-group='seeds' ><img src="images/sq-field-tracer/sq-plane-source-panel.png" height="100" /></a>
+<a href="sq-plane-source-panel.png" class='lightview' data-lightview-options="" data-lightview-group='seeds' ><img src="sq-plane-source-panel.png" height="300" /></a>
 </td></tr>
 <tr><td>
 Figure 2. The SQ Plane Source Panel.
@@ -83,8 +79,8 @@ Select the meta-reader in ParaView's pipeline browser. Create the field tracer f
 <table>
 <tr>
 <td>
-<a href="images/sq-field-tracer/pv-input-dialog.png" class='lightview' data-lightview-options="" data-lightview-group='tracer' ><img src="images/sq-field-tracer/pv-input-dialog.png" height="50" /></a>
-<a href="images/sq-field-tracer/sq-field-tracer-panel.png" class='lightview' data-lightview-options="" data-lightview-group='tracer' ><img src="images/sq-field-tracer/sq-field-tracer-panel.png" height="100" /></a>
+<a href="pv-input-dialog.png" class='lightview' data-lightview-options="" data-lightview-group='tracer' ><img src="pv-input-dialog.png" height="50" /></a>
+<a href="sq-field-tracer-panel.png" class='lightview' data-lightview-options="" data-lightview-group='tracer' ><img src="sq-field-tracer-panel.png" height="300" /></a>
 </td>
 </tr>
 <tr><td colspan="2">
@@ -95,13 +91,12 @@ Figure 2. The ParaView input dialog and the SQ Field Tracer Panel.
 <table>
 <tr>
 <td>
-<a href="images/sq-field-tracer/pv-window.png" class='lightview' data-lightview-options="" data-lightview-group='result' ><img src="images/sq-field-tracer/pv-window.png" height="100" /></a>
+<a href="pv-window.png" class='lightview' data-lightview-options="" data-lightview-group='result' ><img src="pv-window.png" height="300" /></a>
 </td>
 </tr>
 <tr><td colspan="3">
 Figure 3. Result of tracing 256 streamlines using 4 cores, colored by process id.
 </table>
-
 
 </body>
 </html>
