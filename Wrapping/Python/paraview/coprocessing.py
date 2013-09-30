@@ -260,13 +260,8 @@ class CoProcessor(object):
                datainformation.GetArray(rep.ColorArrayName).GetNumberOfComponents() == 1:
                 datarange = datainformation.GetArray(rep.ColorArrayName).GetRange(lut.VectorComponent)
             else:
-                datarange = [0,0]
-                for i in range(datainformation.GetArray(rep.ColorArrayName).GetNumberOfComponents()):
-                    for j in range(2):
-                        datarange[j] += datainformation.GetArray(rep.ColorArrayName).GetRange(i)[j]*datainformation.GetArray(rep.ColorArrayName).GetRange(i)[j]
-                datarange[0] = math.sqrt(datarange[0])
-                datarange[1] = math.sqrt(datarange[1])
-
+                # -1 corresponds to the magnitude.
+                datarange = datainformation.GetArray(rep.ColorArrayName).GetRange(-1)
 
             import vtkParallelCorePython
             import paraview.vtk as vtk
