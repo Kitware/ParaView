@@ -20,6 +20,10 @@ if (PARAVIEW_USE_MPI)
     PROPERTIES COMPILE_DEFINITIONS TEST_MPI_CAPS)
   vtk_mpi_link(TestSystemCaps)
 endif()
+if (PARAVIEW_ENABLE_PYTHON)
+  set_source_files_properties(TestSystemCaps
+    PROPERTIES COMPILE_DEFINITIONS TEST_PY_CAPS)
+endif()
 
 set_tests_properties(
   ${vtk-module}PrintSelf

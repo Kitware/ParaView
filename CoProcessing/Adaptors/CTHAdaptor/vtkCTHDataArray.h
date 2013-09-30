@@ -25,10 +25,15 @@ public:
   int GetDataTypeSize () { return static_cast<int>(sizeof(double)); }
 
   // Description:
+  // TODO implement new API
+  virtual void InsertTuples(vtkIdList*, vtkIdList*, vtkAbstractArray*)
+    { vtkErrorMacro("New InsertTuples API is not implemented"); }
+
+  // Description:
   // Return the size, in bytes, of the lowest-level element of an
   // array.  For vtkDataArray and subclasses this is the size of the
-  // data type. 
-  virtual int GetElementComponentSize() 
+  // data type.
+  virtual int GetElementComponentSize()
     { return this->GetDataTypeSize(); }
 
   // Description:
@@ -69,7 +74,7 @@ public:
   //BTX
   vtkIdType LookupValue (vtkVariant value);
   void LookupValue (vtkVariant value, vtkIdList* ids);
-  void SetVariantValue (vtkIdType vtkNotUsed(index), vtkVariant vtkNotUsed(value)) { /* TODO */ } 
+  void SetVariantValue (vtkIdType vtkNotUsed(index), vtkVariant vtkNotUsed(value)) { /* TODO */ }
   //ETX
 
   // Description:
@@ -80,11 +85,11 @@ public:
   void ExportToVoidPointer(void *out_ptr);
 
   int Allocate (vtkIdType sz, vtkIdType ext=1000)
-  { 
-    BuildFallback (); 
-    return Fallback->Allocate (sz, ext); 
+  {
+    BuildFallback ();
+    return Fallback->Allocate (sz, ext);
   }
-  
+
   void SetNumberOfComponents (int number)
   {
     this->Superclass::SetNumberOfComponents (number);
@@ -96,7 +101,7 @@ public:
 
   void SetNumberOfTuples (vtkIdType number)
   {
-    this->BuildFallback (); 
+    this->BuildFallback ();
     this->Fallback->SetNumberOfTuples (number);
     this->Size = this->Fallback->GetSize ();
     this->MaxId = this->Fallback->GetMaxId ();
@@ -105,39 +110,39 @@ public:
   // Description:
   // A number of abstract functions from the super class that must not be called
   void SetTuple(vtkIdType i, vtkIdType j, vtkAbstractArray* aa)
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->SetTuple (i, j, aa);
   }
   void SetTuple(vtkIdType i, const float *f)
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->SetTuple (i, f);
   }
   void SetTuple(vtkIdType i, const double *d)
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->SetTuple (i, d);
   }
 
   void InsertTuple(vtkIdType i, vtkIdType j, vtkAbstractArray* aa)
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->InsertTuple (i, j, aa);
   }
   void InsertTuple (vtkIdType i, const float *f)
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->InsertTuple (i, f);
   }
   void InsertTuple (vtkIdType i, const double *d)
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->InsertTuple (i, d);
   }
 
   vtkIdType InsertNextTuple(vtkIdType i, vtkAbstractArray* aa)
-  { 
+  {
     this->BuildFallback ();
     vtkIdType ret = this->Fallback->InsertNextTuple (i, aa);
     this->Size = this->Fallback->GetSize ();
@@ -145,7 +150,7 @@ public:
     return ret;
   }
   vtkIdType InsertNextTuple(const float *f)
-  { 
+  {
     this->BuildFallback ();
     vtkIdType ret = this->Fallback->InsertNextTuple (f);
     this->Size = this->Fallback->GetSize ();
@@ -153,7 +158,7 @@ public:
     return ret;
   }
   vtkIdType InsertNextTuple(const double *d)
-  { 
+  {
     this->BuildFallback ();
     vtkIdType ret = this->Fallback->InsertNextTuple (d);
     this->Size = this->Fallback->GetSize ();
@@ -170,49 +175,49 @@ public:
   //ETX
 
   void RemoveTuple (vtkIdType id)
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->RemoveTuple (id);
   }
   void RemoveFirstTuple ()
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->RemoveFirstTuple ();
   }
   void RemoveLastTuple ()
-  { 
+  {
     this->BuildFallback ();
     this->Fallback->RemoveLastTuple ();
   }
 
-  void* WriteVoidPointer (vtkIdType i, vtkIdType j) 
-  { 
+  void* WriteVoidPointer (vtkIdType i, vtkIdType j)
+  {
     this->BuildFallback ();
     return this->Fallback->WriteVoidPointer (i, j);
   }
 
   virtual void DeepCopy (vtkAbstractArray* aa)
-  { 
+  {
     this->BuildFallback ();
     return this->Fallback->DeepCopy (aa);
   }
 
   virtual void DeepCopy(vtkDataArray *da)
   {
-    return this->DeepCopy( (vtkAbstractArray*) da); 
+    return this->DeepCopy( (vtkAbstractArray*) da);
   }
 
   void SetVoidArray (void *p, vtkIdType id, int i)
-  { 
+  {
     this->BuildFallback ();
     return this->Fallback->SetVoidArray (p, id, i);
   }
 
   // Description:
-  // Since we don't allocate, this does nothing 
+  // Since we don't allocate, this does nothing
   // unless we're already falling back
-  void Squeeze () 
-  { 
+  void Squeeze ()
+  {
     if (this->Fallback)
       {
       this->Size = this->Fallback->GetSize ();
@@ -223,19 +228,19 @@ public:
 
   // Description:
   int Resize (vtkIdType numTuples)
-  { 
+  {
     this->BuildFallback ();
     return this->Fallback->Resize (numTuples);
   }
 
   void DataChanged ()
-  { 
+  {
     this->BuildFallback ();
     return this->Fallback->DataChanged ();
   }
 
   void ClearLookup ()
-  { 
+  {
     this->BuildFallback ();
     return this->Fallback->ClearLookup ();
   }
@@ -247,12 +252,12 @@ protected:
 
   bool ExtentsSet;
   int Extents[6];
-  int Dx; 
-  int Dy; 
+  int Dx;
+  int Dy;
   int Dz;
 
   unsigned long PointerTime;
-  
+
   double ***Data;
   double *CopiedData;
   int CopiedSize;

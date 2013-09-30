@@ -5,12 +5,30 @@
 #if defined(TEST_MPI_CAPS)
 # include "vtkMPI.h"
 #endif
+#if defined(TEST_PY_CAPS)
+# include "patchlevel.h"
+#endif
 #include <vtksys/SystemInformation.hxx>
 #include <string>
 #include <sstream>
 
 using std::string;
 using std::ostringstream;
+
+// Description:
+// Get python version
+#if defined(TEST_PY_CAPS)
+string GetPythonVersion()
+{
+  ostringstream oss;
+#if defined(PY_VERSION)
+  oss << PY_VERSION;
+#else
+  oss << "unknown";
+#endif
+  return oss.str();
+}
+#endif
 
 // Description:
 // Get the version of the standard implemented by this
@@ -63,6 +81,8 @@ string GetMPILibraryVersion()
 #if defined(MPICH2_VERSION)
   oss << " " << MPICH2_VERSION;
 #endif
+#elif defined(MSMPI_VER)
+  oss << "Microsoft MPI " << MSMPI_VER;
 #else
   oss << "unknown";
 #endif
@@ -105,6 +125,11 @@ int main(int argc, char **argv)
     << "MPI:" << endl
     << "Version = " << GetMPIVersion() << endl
     << "Library = " << GetMPILibraryVersion() << endl
+    << endl
+#endif
+#if defined(TEST_PY_CAPS)
+    << "Python:" << endl
+    << "Version = " << GetPythonVersion() << endl
     << endl
 #endif
     << "OpenGL:" << endl

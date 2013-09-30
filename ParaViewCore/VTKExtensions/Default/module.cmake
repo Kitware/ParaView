@@ -20,6 +20,7 @@ vtk_module(vtkPVVTKExtensionsDefault
     vtkPVClientServerCoreRendering
     vtkIOParallel
     ${_dependencies}
+    vtknetcdf
   PRIVATE_DEPENDS
     vtksys
 )

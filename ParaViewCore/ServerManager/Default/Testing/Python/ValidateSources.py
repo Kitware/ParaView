@@ -1,12 +1,16 @@
 """This is a test to test the paraview proxy manager API."""
 from paraview import servermanager
+import sys
 
 servermanager.Connect()
 sources = servermanager.sources.__dict__
 
 for source in sources:
   try:
+    sys.stderr.write('Creating %s...'%(source))
     s = sources[source]()
     s.UpdateVTKObjects()
-  except Exception, e:
-    print "Error creating:", str(s)
+    sys.stderr.write('ok\n')
+  except:
+    sys.stderr.write('failed\n')
+    raise RuntimeError('ERROR: Failed to create %s'%(source))
