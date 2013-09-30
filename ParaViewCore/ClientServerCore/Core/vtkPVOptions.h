@@ -223,6 +223,8 @@ private:
   int SatelliteMessageIds;
   int PrintMonitors;
   int EnableStackTrace;
+  int ForceMPIInitOnClient;
+  int ForceNoMPIInitOnClient;
 
   // inline setters
   vtkSetStringMacro(StereoType);
