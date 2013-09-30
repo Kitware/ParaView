@@ -33,6 +33,8 @@
 #include "vtkStructuredData.h"
 #include "vtkTexture.h"
 
+#include "vtkgl.h"
+
 vtkStandardNewMacro(vtkTexturePainter);
 vtkCxxSetObjectMacro(vtkTexturePainter, LookupTable, vtkScalarsToColors);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE, Integer);
@@ -107,7 +109,7 @@ void vtkTexturePainter::ProcessInformation(vtkInformation* information)
     {
     this->SetMapScalars(information->Get(MAP_SCALARS()));
     }
-  
+
   if (information->Has(SCALAR_MODE()))
     {
     this->SetScalarMode(information->Get(SCALAR_MODE()));
@@ -403,9 +405,14 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
 
   // Lighting needs to be disabled since this painter always employs scalar
   // coloring and when coloring with scalars we always disable lighting.
-  device->MakeLighting(0);
+  bool lighting = glIsEnabled(GL_LIGHTING);
+  if (lighting)
+    {
+    glDisable(GL_LIGHTING);
+    }
+
   this->Texture->Load(renderer);
- 
+
   float tcoords[4][2] = { {0, 0}, {1, 0}, {1, 1}, {0, 1} };
   device->BeginPrimitive(VTK_QUAD);
   for (int cc=0; cc < 4; cc++)
@@ -415,9 +422,12 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
       &this->QuadPoints[cc][0], 0);
     }
   device->EndPrimitive();
-  // Ideally, we'd like to "restore" state of lighting. For now, we just assume
-  // it was enabled before we disabled it.
-  device->MakeLighting(1);
+
+  // restore lighting if needed
+  if (lighting)
+    {
+    glEnable(GL_LIGHTING);
+    }
 
   this->Superclass::RenderInternal(renderer, actor, typeflags,forceCompileOnly);
 }
