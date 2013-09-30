@@ -1,0 +1,137 @@
+<html>
+<head>
+<title>sq-bov-reader</title>
+<meta name="copyright" content="Copyright (c) 2011 Burlen Loring" />
+<style type="text/css">
+a:link    { color:black; text-decoration: none; font-size:10pt;}
+a:visited { color:black; text-decoration: none; font-size:10pt;}
+a:active  { color:black; text-decoration: none; font-size:10pt;}
+a:hover   { color:black; text-decoration: underline; font-weight: bold; font-size:10pt;}
+</style>
+<!--
+<link rel="stylesheet" type="text/css" href="Slimbox/css/slimbox.css" media="screen" />
+<script src="Slideshow/js/mootools-1.3.2-core.js"></script>
+<script src="Slideshow/js/mootools-1.3.2.1-more.js"></script>
+<script type="text/javascript" src="Slimbox/js/slimbox.js"></script>
+<script type="text/javascript">
+  window.addEvent('domready', function(){
+
+    var box = new Lightbox({
+      'onClose': function(){ this.pause(false); }.bind(myShow),
+      'onOpen': function(){ this.pause(true); }.bind(myShow)
+      });
+  });
+</script>
+-->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script> <!-- optional -->
+<!--[if lt IE 9]>
+  <script type="text/javascript" src="Lightview/lightview-3.0.1/js/excanvas/excanvas.js"></script>
+<![endif]-->
+<script type="text/javascript" src="Lightview/lightview-3.0.1/js/spinners/spinners.js"></script>
+<script type="text/javascript" src="Lightview/lightview-3.0.1/js/lightview/lightview.js"></script>
+<link rel="stylesheet" type="text/css" href="Lightview/lightview-3.0.1/css/lightview/lightview.css" />
+<script type='text/javascript'> Lightview.setDefaultSkin('mac'); </script>
+</head>
+
+<h1>SciberQuest BOV Reader</h1>
+<hr>
+The SciberQuest BOV Reader designed for fast parallel I/O of binary Brick-Of-Values files where the brick files contain arrays in single precision IEEE floating point (in FORTRAN speak real*4) format, one array per file. Any given dataset will contain a number of files per time step and a number of timesteps. Arrays may be classified as scalars(1 component), vectors(3 coponents), symetric tensors(6 components) and tensors(9 components), each with one component per-file. Multi-dimensional arrays are expected to be ordered with x-dimension changing fastest, followed by y, followed by z, which is the same ordering as most FORTRAN simulations use and used by VTK. The SQ BOV Reader identifies a dataset which it can read by presence of a single file that has the <b>.bov</b> file extension.
+
+<h2> Using the reader in ParaView </h2>
+As of version 3.98.0 the reader comes in ParaView's SciberQuestToolKit plugin which must be loaded on both the client and server before attempting to open a file. The reader depends on MPI-I/O library and thus ParaView must be compiled with MPI enabled (set PARAVIEW_USE_MPI=ON in the CMakeCache). Additionally ParaView must be launched in client-server mode and the server must be launched by mpirun (or the system's equivelent). When ParaView is compiled with MPI enabled and run in client server mode with the server launched by mpirun, the reader will recognize ".bov"files.
+
+<h2> BOV Dataset Format </h2>
+The SQ BOV meta-data format is illustrated by the following example:
+</p>
+
+<table bgcolor="#deeeee" style="border:1px dashed black;" width="100%">
+<tr><td>
+<pre>
+# comments in the metadata file are ignored
+
+# grid dimensions are specified using the following convention:
+nx=1024, ny=1024, nz=512
+
+# Data arrays are expected in single precision IEEE floating
+# point format, one array per file, in the same folder, and
+# named following the pattern:
+#
+# NAME_XXXX.gda
+#
+# where "NAME" is an aribtrary identifier and optionally a
+# component id (eg, den, Vx, or pi-xx). "XXXX" identifies
+# the time step id and must be present even when there is
+# only a single timestep.
+#
+# Arrays must be enumerated in the metadata file using the
+# following conventions typed and named using the following
+# conventions:
+
+# for scalars name a single array
+scalar:den
+
+# for vectors the the component arrays are grouped
+# into VTK vector for visualization. All vector
+# components must be present and named following the
+# convention NAMEx, NAMEy, NAMEz
+vector:B
+
+# for tensors all components must be present
+# and follow the convention NAME-xx, NAME-xy, ... NAME-zz
+tensor:V
+
+# for symetric tensors 6 components must be present
+# following the same convention
+stensor:pi
+
+# vector, stensor, and tensor components could be treated as
+# scalars by enumerating them as follows:
+scalar:Bx
+scalar:By
+scalar:Bz
+scalar:pi-xx
+scalar:pi-xy
+scalar:pi-xz
+scalar:pi-yy
+scalar:pi-yz
+scalar:pi-zz
+</pre>
+</tr></td>
+</table>
+
+<h2> Limitations of MPI-I/O </h2>
+There are a couple of limitations of MPI-I/O to keep in mind. The first being that the reader depends on MPI and must be run with mpirun. The second is that because MPI using int's in its api a single MPI process cannot handle more than 2GB array. This isn't too much of an issue because you can always run more MPI processes if needed.
+
+<h2> Shared File I/O on Lustre </h2>
+when working with large shared files on Lustre there are a few things to be aware of.
+
+<ul>
+<li> file striping parameters affect shared file IO performance</li>
+<li> file striping parameters are inherited from the directory in which the file is created</li>
+<li> moving a file preserves its striping parameters. file striping parameters can not be modified in place, the file must be copied.</li>
+<li> the default striping parameters on most HPC systems do not favor large files and shared I/O so you must set the correct striping parameters if you expect to get reasonable performance.</li>
+</ul>
+
+Our reader (and shared file io in general) runs best when the stripe count on a file is set to its maximal value (use -1) and a alarge stripe size (for eg 512M). You can see the current settings on a file by the command:
+
+<table bgcolor="#deeeee" style="border:1px dashed black;" width="100%">
+<tr><td>
+<pre>
+lfs getstripe -v /path/to/a/file | grep -E count\|size
+</pre>
+</tr></td>
+</table>
+
+The easiest way to set the stripe parameters on file is to create a directory with the desired stripe parameters and either create the file there, or copy the file in. For example:
+
+<table bgcolor="#deeeee" style="border:1px dashed black;" width="100%">
+<tr><td>
+<pre>
+lfs setstripe -s 512M -c -1 /path/to/directory
+</pre>
+</tr></td>
+</table>
+
+</body>
+</html>

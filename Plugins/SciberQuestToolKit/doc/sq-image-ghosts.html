@@ -1,0 +1,66 @@
+<html>
+<head>
+<title>sq-image-ghosts</title>
+<meta name="copyright" content="Copyright (c) 2011 Burlen Loring" />
+<style type="text/css">
+a:link    { color:black; text-decoration: none; font-size:10pt;}
+a:visited { color:black; text-decoration: none; font-size:10pt;}
+a:active  { color:black; text-decoration: none; font-size:10pt;}
+a:hover   { color:black; text-decoration: underline; font-weight: bold; font-size:10pt;}
+</style>
+
+
+<!--
+<link rel="stylesheet" type="text/css" href="Slimbox/css/slimbox.css" media="screen" />
+<script src="Slideshow/js/mootools-1.3.2-core.js"></script>
+<script src="Slideshow/js/mootools-1.3.2.1-more.js"></script>
+<script type="text/javascript" src="Slimbox/js/slimbox.js"></script>
+<script type="text/javascript">
+  window.addEvent('domready', function(){
+
+    var box = new Lightbox({
+      'onClose': function(){ this.pause(false); }.bind(myShow),
+      'onOpen': function(){ this.pause(true); }.bind(myShow)
+      });
+  });
+</script>
+-->
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script> <!-- optional -->
+<!--[if lt IE 9]>
+  <script type="text/javascript" src="Lightview/lightview-3.0.1/js/excanvas/excanvas.js"></script>
+<![endif]-->
+<script type="text/javascript" src="Lightview/lightview-3.0.1/js/spinners/spinners.js"></script>
+<script type="text/javascript" src="Lightview/lightview-3.0.1/js/lightview/lightview.js"></script>
+<link rel="stylesheet" type="text/css" href="Lightview/lightview-3.0.1/css/lightview/lightview.css" />
+<script type='text/javascript'> Lightview.setDefaultSkin('mac'); </script>
+</head>
+
+<h1>Ghosts Cells in ParaView</h1>
+<hr>
+
+<h2>The SQ Image Ghosts Filter</h2>
+Some of the SciberQuest ToolKit filters operating on Cartesian grids require ghost cells to function. These can be provided by the SQ BOV reader , however, with each new request for ghost cells the reader will read the entire dataset which results in two full pipeline executions. For this reason filter that require ghost cells should always be used with the <i>SQ Image Ghost</i> filter that generates the requested ghost cells with re-executing the entire pipeline.
+
+<p>
+The following figure illustrates the use of <i>SQ Image Ghosts</i> in ParaView.
+
+<table>
+<tr><td>
+<a href="image-ghosts-example-pipeline.png" class='lightview' data-lightview-options="" data-lightview-group='exmaple' ><img src="image-ghosts-example-pipeline.png" height="200" /></a>
+</td></tr>
+<tr><td>
+Figure 1. Image Ghosts filter example.
+</td></tr>
+</table>
+
+<h2>SQ filters that require ghost cells</h2>
+The following filters require an instance of <i>SQ Image Ghosts</i> immediately upstream.
+<ul>
+<li>SQ Kernel Convolution</li>
+<li>SQ Vortex filter</li>
+</ul>
+
+</body>
+</html>
