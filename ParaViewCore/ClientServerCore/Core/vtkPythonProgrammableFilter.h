@@ -34,10 +34,6 @@
 // call are defined as Python variables inside both scripts. This allows
 // the developer to keep the scripts the same but change their behaviour
 // using parameters.
-// .SECTION Caveat
-// Note that this algorithm sets the output extent translator to be
-// vtkOnePieceExtentTranslator. This means that all processes will ask
-// for the whole extent. This behaviour can be overridden in InformationScript.
 #ifndef __vtkPythonProgrammableFilter_h
 #define __vtkPythonProgrammableFilter_h
 

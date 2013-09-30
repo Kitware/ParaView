@@ -21,7 +21,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkOnePieceExtentTranslator.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPythonInterpreter.h"
@@ -137,23 +136,8 @@ int vtkPythonProgrammableFilter::RequestDataObject(
 
 //----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::RequestInformation(
-  vtkInformation*,
-  vtkInformationVector**,
-  vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector**, vtkInformationVector*)
 {
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  // Setup ExtentTranslator so that all downstream piece requests are
-  // converted to whole extent update requests, as need by the histogram filter.
-  if (strcmp(
-      vtkStreamingDemandDrivenPipeline::GetExtentTranslator(outInfo)->GetClassName(),
-      "vtkOnePieceExtentTranslator") != 0)
-    {
-    vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
-    vtkStreamingDemandDrivenPipeline::SetExtentTranslator(outInfo, et);
-    et->Delete();
-    }
-
   if (this->InformationScript)
     {
     this->Exec(this->InformationScript, "RequestInformation");
