@@ -489,6 +489,20 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     }
 
   prototype = pxm->GetPrototypeProxy("representations",
+    "UnstructuredGridBaseRepresentation");
+
+  pp = vtkSMInputProperty::SafeDownCast(prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool usgb = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (usgb)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "UnstructuredGridBaseRepresentation"));
+    }
+
+  prototype = pxm->GetPrototypeProxy("representations",
     "StructuredGridRepresentation");
 
   pp = vtkSMInputProperty::SafeDownCast(prototype->GetProperty("Input"));

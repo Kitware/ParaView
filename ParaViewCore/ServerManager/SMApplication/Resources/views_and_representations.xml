@@ -1449,6 +1449,54 @@
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
+                           name="UnstructuredGridBaseRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>This representation is used to show unstructured grid as
+      Surface/Outline/Points/Wireframe/Volume</Documentation>
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation"
+                          text="Volume" />
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkUnstructuredGridBase" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1"></InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1"></InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+               proxygroup="representations"
+               proxyname="UnstructuredGridVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScalarOpacityFunction"
+                    panel_visibility="never" />
+          <Property name="ScalarOpacityUnitDistance"
+                    panel_visibility="never" />
+          <Property name="ExtractedBlockIndex"
+                    panel_visibility="never" />
+          <Property name="SelectMapper"
+                    panel_visibility="advanced"
+                    panel_visibility_default_for_representation="volume" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of UnstructuredGridBaseRepresentation -->
+    </PVRepresentationProxy>
+    <!-- ================================================================== -->
+
+    <PVRepresentationProxy base_proxygroup="internal_representations"
+                           base_proxyname="PVRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
                            name="UnstructuredGridRepresentation"
                            processes="client|renderserver|dataserver">
       <Documentation>This representation is used to show unstructured grid as
@@ -1682,7 +1730,7 @@
                      name="Input">
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
-          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkUnstructuredGridBase" />
         </DataTypeDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
