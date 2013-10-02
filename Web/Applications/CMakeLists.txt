@@ -13,8 +13,7 @@ set (WEB_APPLICATIONS
 )
 
 # Create paraview/web directory
-get_property(pv_pymodule_build_dir GLOBAL PROPERTY PV_PYMODULE_BUILD_DIR)
-file(MAKE_DIRECTORY "${pv_pymodule_build_dir}/paraview/web")
+file(MAKE_DIRECTORY "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview/web")
 
 if (BUILD_TESTING)
   list(APPEND WEB_APPLICATIONS TestApp)
@@ -34,7 +33,7 @@ foreach (_app ${WEB_APPLICATIONS})
     LABEL "Copying Web files for ${_app}")
 
   copy_files_recursive(${Apps_SOURCE_DIR}/${_app}/server
-    DESTINATION "${pv_pymodule_build_dir}/paraview/web"
+    DESTINATION "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview/web"
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/py-${_app}-complete"
     REGEX "^(.*\\.py)$"
     LABEL "Copying Server files for ${_app}")

@@ -5,12 +5,8 @@ find_package(PythonInterp)
 
 include(vtkPythonPackages)
 
-# Set global Python module directory for build tree
-set(pv_python_base_path "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages")
-set_property(GLOBAL PROPERTY PV_PYMODULE_BUILD_DIR ${pv_python_base_path})
-
 set(ParaViewPython_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(ParaViewPython_BINARY_DIR "${pv_python_base_path}/paraview/web")
+set(ParaViewPython_BINARY_DIR "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview/web")
 
 build_python_package(
   "ParaViewWebPython"
@@ -19,5 +15,5 @@ build_python_package(
 )
 
 install(DIRECTORY ${ParaViewPython_BINARY_DIR}
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/site-packages/paraview
+  DESTINATION ${VTK_INSTALL_PYTHON_MODULE_DIR}/paraview
   COMPONENT Runtime)
