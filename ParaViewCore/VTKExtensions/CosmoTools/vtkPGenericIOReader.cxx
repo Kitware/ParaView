@@ -92,6 +92,7 @@ public:
   std::map< std::string, bool > VariableStatus;
   std::map< std::string, void* > RawCache;
   MPI_Comm MPICommunicator;
+  std::set< int > RanksToLoad;
 
   /**
    * @brief Metadata constructor.
@@ -102,6 +103,16 @@ public:
    * @brief Destructor
    */
   ~vtkGenericIOMetaData() { this->Clear();};
+
+  /**
+   * @brief Checks if the supplied rank should load data.
+   * @param r the rank in query.
+   * @return status true or false.
+   */
+  bool LoadRank( const int r )
+  {
+    return( (this->RanksToLoad.find(r) != this->RanksToLoad.end()) );
+  }
 
   /**
    * @brief Get the raw MPI communicator from a Multi-process controller.
@@ -166,6 +177,7 @@ public:
   this->VariableGenericIOType.clear();
   this->VariableStatus.clear();
   this->Information.clear();
+  this->RanksToLoad.clear();
 
   std::map<std::string,void*>::iterator iter;
   for( iter=this->RawCache.begin(); iter != this->RawCache.end(); ++iter)
@@ -200,6 +212,9 @@ vtkPGenericIOReader::vtkPGenericIOReader()
 
   this->RequestInfoCounter = 0;
   this->RequestDataCounter = 0;
+
+  this->RankInQuery        = 0;
+  this->QueryRankNeighbors = 0;
 
   this->ArrayList = vtkStringArray::New();
   this->PointDataArraySelection = vtkDataArraySelection::New();
@@ -695,6 +710,12 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
 {
   assert("pre: grid is NULL!" && (grid != NULL) );
 
+  if( this->QueryRankNeighbors && (this->BlockAssignment==RCB) &&
+      !this->MetaData->LoadRank(this->Controller->GetLocalProcessId()))
+    {
+    return;
+    }
+
   std::string xaxis = std::string(this->XAxisVariableName);
   xaxis = vtkPGenericIOInternals::trim(xaxis);
 
@@ -834,6 +855,12 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
 {
   assert("pre: grid is NULL!" && (grid != NULL) );
 
+  if( this->QueryRankNeighbors && (this->BlockAssignment==RCB) &&
+      !this->MetaData->LoadRank(this->Controller->GetLocalProcessId()))
+    {
+    return;
+    }
+
   vtkPointData *PD = grid->GetPointData();
   int arrayIdx = 0;
   for(;arrayIdx < this->PointDataArraySelection->GetNumberOfArrays(); ++arrayIdx)
@@ -848,6 +875,79 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
       } // END if the array is enabled
     } // END for all arrays
 
+}
+
+//------------------------------------------------------------------------------
+void vtkPGenericIOReader::FindRankNeighbors()
+{
+  if( !this->QueryRankNeighbors || this->BlockAssignment != RCB)
+    {
+    return;
+    }
+
+  this->MetaData->RanksToLoad.clear();
+
+  // Sanity checks
+  assert("pre: rank in query is out-of bounds!" &&
+        (this->RankInQuery >= 0) &&
+        (this->RankInQuery < this->Controller->GetNumberOfProcesses()) );
+  assert("pre: reader should not be NULL!" && (this->Reader!=NULL) );
+  assert("pre: block assignment is not RCB!" &&
+    (this->Reader->GetBlockAssignmentStrategy()==gio::RCB_BLOCK_ASSIGNMENT) );
+
+  std::vector<int> neiRanks;
+  if( this->Controller->GetLocalProcessId() == this->RankInQuery )
+    {
+#ifdef DEBUG
+    std::cout << "[INFO]: Loading neighbors for process P[";
+    std::cout << this->Controller->GetLocalProcessId();
+    std::cout << "]\n";
+    std::cout.flush();
+#endif
+
+    int numNeis = this->Reader->GetNumberOfRankNeighbors();
+    std::vector< gio::RankNeighbor > rankNeighbors;
+    rankNeighbors.resize(numNeis);
+    this->Reader->GetRankNeighbors( &rankNeighbors[0] );
+
+    neiRanks.resize(numNeis);
+    for(int nei=0; nei < numNeis; ++nei)
+      {
+#ifdef DEBUG
+     std::cout << "\t Neighboring rank P[";
+     std::cout << rankNeighbors[ nei ].RankID;
+     std::cout << "] Orientation {";
+     std::cout << gio::NEIGHBOR_ORIENTATION[rankNeighbors[nei].Orient[0]];
+     std::cout << ", ";
+     std::cout << gio::NEIGHBOR_ORIENTATION[rankNeighbors[nei].Orient[1]];
+     std::cout << ", ";
+     std::cout << gio::NEIGHBOR_ORIENTATION[rankNeighbors[nei].Orient[2]];
+     std::cout << "}\n";
+     std::cout.flush();
+#endif
+      neiRanks[ nei ] = rankNeighbors[ nei ].RankID;
+      } // END for all neis
+    rankNeighbors.clear();
+
+    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MPICommunicator);
+    MPI_Bcast(&neiRanks[0],numNeis,MPI_INT,
+              this->RankInQuery,this->MPICommunicator);
+    } // END if
+  else
+    {
+    int numNeis = -1;
+    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MPICommunicator);
+    neiRanks.resize(numNeis);
+    MPI_Bcast(&neiRanks[0],numNeis,MPI_INT,
+              this->RankInQuery,this->MPICommunicator);
+    } // END else
+
+  this->MetaData->RanksToLoad.insert( this->RankInQuery );
+  for(unsigned int i=0; i < neiRanks.size(); ++i )
+    {
+    this->MetaData->RanksToLoad.insert( neiRanks[i] );
+    }
+  neiRanks.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -909,13 +1009,19 @@ int vtkPGenericIOReader::RequestData(
   // STEP 1: Load raw data
   this->LoadRawData();
 
-  // STEP 1: Load coordinates
+  // STEP 2: See if we should only show
+  this->FindRankNeighbors();
+  MPI_Barrier(this->MPICommunicator);
+
+  // STEP 3: Load coordinates
   this->LoadCoordinates(output);
+  MPI_Barrier(this->MPICommunicator);
 
-  // STEP 2: Load data
+  // STEP 4: Load data
   this->LoadData(output);
+  MPI_Barrier(this->MPICommunicator);
 
-  // STEP 3: Clear variables
+  // STEP 5: Clear variables
   this->Reader->ClearVariables();
   return 1;
 }
