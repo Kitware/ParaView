@@ -24,9 +24,6 @@
 #include "vtkUnstructuredGridAlgorithm.h" // Base class
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
-// MPI include
-#include <mpi.h>
-
 // Forward Declarations
 class vtkCallbackCommand;
 class vtkDataArray;
@@ -151,11 +148,6 @@ protected:
   gio::GenericIOReader* GetInternalReader();
 
   // Description:
-  // Returns the corresponding MPI communicator for the multi-process
-  // controller used by this instance.
-  MPI_Comm GetMPICommunicator();
-
-  // Description:
   // Return the point from the raw data.
   void GetPointFromRawData(
           std::string xName,
@@ -208,7 +200,6 @@ protected:
   vtkCallbackCommand* SelectionObserver;
 
 // BTX
-  MPI_Comm MPICommunicator;
   gio::GenericIOReader* Reader;
   vtkGenericIOMetaData* MetaData;
 // ETX

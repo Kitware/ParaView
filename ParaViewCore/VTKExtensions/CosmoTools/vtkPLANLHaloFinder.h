@@ -70,15 +70,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnstructuredGridAlgorithm.h" // Base class
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
-// CosmoTools includes
-#include "BasicDefinition.h" // For POSVEL_T, ID_T, etc.
-
-
-// C/C++ includes
-#include <map> // For STL map
-#include <vector> // For STL vector
-
-
 // Forward declarations
 class vtkMultiProcessController;
 class vtkIndent;
@@ -89,6 +80,12 @@ class vtkUnstructuredGrid;
 // CosmoTools Forward declarations
 namespace cosmotk {
   class CosmoHaloFinderP;
+}
+
+// HaloFinderInternals Forward declarations
+namespace HaloFinderInternals {
+  class ParticleData;
+  class HaloData;
 }
 
 class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
@@ -284,28 +281,9 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPLANLHaloFinder :
   int MinFOFSize;         // Minimum FOF size for SOD (1000)
   float MinFOFMass;       // Minimum FOF mass for SOD (5.0e12)
 
-  // Internal storage for vectorized particle data information
 // BTX
-  std::vector<POSVEL_T> xx,yy,zz, vx,vy,vz, mass,potential;
-  std::vector<ID_T> tag;
-  std::vector<STATUS_T> status;
-  std::vector<MASK_T> mask;
-
-  // Computed FOF properties
-  std::vector<POSVEL_T> fofMass;     // mass of every halo
-  std::vector<POSVEL_T> fofXPos;     // x-component of the FOF position
-  std::vector<POSVEL_T> fofYPos;     // y-component of the FOF position
-  std::vector<POSVEL_T> fofZPos;     // z-component of the FOF position
-  std::vector<POSVEL_T> fofXVel;     // x-component of the FOF velocity
-  std::vector<POSVEL_T> fofYVel;     // y-component of the FOF velocity
-  std::vector<POSVEL_T> fofZVel;     // z-component of the FOF velocity
-  std::vector<POSVEL_T> fofXCofMass; // x-component of the FOF center of mass
-  std::vector<POSVEL_T> fofYCofMass; // y-component of the FOF center of mass
-  std::vector<POSVEL_T> fofZCofMass; // z-component of the FOF center of mass
-  std::vector<POSVEL_T> fofVelDisp;  // velocity dispersion of every halo
-
-  std::vector< int > ExtractedHalos; // list of halo IDs within the PMin thres.
-
+  HaloFinderInternals::ParticleData *Particles;
+  HaloFinderInternals::HaloData *Halos;
   cosmotk::CosmoHaloFinderP *HaloFinder;
 // ETX
 

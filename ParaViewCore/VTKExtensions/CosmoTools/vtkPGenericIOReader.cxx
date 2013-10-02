@@ -52,6 +52,9 @@
 #include <stdexcept>
 #include <vector>
 
+// MPI
+#include <mpi.h>
+
 // Uncomment the line below to get debugging information
 //#define DEBUG
 
@@ -88,6 +91,7 @@ public:
   std::map< std::string, int >  VariableGenericIOType;
   std::map< std::string, bool > VariableStatus;
   std::map< std::string, void* > RawCache;
+  MPI_Comm MPICommunicator;
 
   /**
    * @brief Metadata constructor.
@@ -98,6 +102,30 @@ public:
    * @brief Destructor
    */
   ~vtkGenericIOMetaData() { this->Clear();};
+
+  /**
+   * @brief Get the raw MPI communicator from a Multi-process controller.
+   * @param controller the multi-process controller
+   */
+  void InitCommunicator(vtkMultiProcessController *controller)
+  {
+     assert("pre: controller is NULL!" && (controller != NULL) );
+
+     // STEP 0: Get the communicator from the controller
+     vtkCommunicator *vtkComm =  controller->GetCommunicator();
+     assert("pre: VTK communicator is NULL" && (vtkComm != NULL) );
+
+     // STEP 1: Safe downcast to an vtkMPICommunicator
+     vtkMPICommunicator* vtkMPIComm = vtkMPICommunicator::SafeDownCast(vtkComm);
+     assert("pre: MPI communicator is NULL" && (vtkMPIComm != NULL) );
+
+     // STEP 2: Get the opaque VTK MPI communicator
+     vtkMPICommunicatorOpaqueComm* mpiComm = vtkMPIComm->GetMPIComm();
+     assert("pre: Opaque MPI communicator is NULL" && (mpiComm != NULL) );
+
+     // STEP 3: Finally, get the MPI comm
+     this->MPICommunicator = *(mpiComm->GetHandle());
+  }
 
   /**
    * @brief Performs a quick sanity on the metadata
@@ -158,7 +186,6 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   this->Controller        = vtkMultiProcessController::GetGlobalController();
-  this->MPICommunicator   = this->GetMPICommunicator();
   this->Reader            = NULL;
   this->FileName          = NULL;
   this->XAxisVariableName = NULL;
@@ -169,6 +196,7 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->BuildMetaData     = false;
 
   this->MetaData  = new vtkGenericIOMetaData();
+  this->MetaData->InitCommunicator( this->Controller );
 
   this->RequestInfoCounter = 0;
   this->RequestDataCounter = 0;
@@ -293,29 +321,6 @@ void vtkPGenericIOReader::SetPointArrayStatus(
     this->PointDataArraySelection->DisableArray( name );
     assert(!this->PointDataArraySelection->ArrayIsEnabled(name));
     }
-}
-
-//------------------------------------------------------------------------------
-MPI_Comm vtkPGenericIOReader::GetMPICommunicator()
-{
-  MPI_Comm comm = MPI_COMM_NULL;
-
-  // STEP 0: Get the communicator from the controller
-  vtkCommunicator *vtkComm =  this->Controller->GetCommunicator();
-  assert("pre: VTK communicator is NULL" && (vtkComm != NULL) );
-
-  // STEP 1: Safe downcast to an vtkMPICommunicator
-  vtkMPICommunicator* vtkMPIComm = vtkMPICommunicator::SafeDownCast(vtkComm);
-  assert("pre: MPI communicator is NULL" && (vtkMPIComm != NULL) );
-
-  // STEP 2: Get the opaque VTK MPI communicator
-  vtkMPICommunicatorOpaqueComm* mpiComm = vtkMPIComm->GetMPIComm();
-  assert("pre: Opaque MPI communicator is NULL" && (mpiComm != NULL) );
-
-  // STEP 3: Finally, get the MPI comm
-  comm = *(mpiComm->GetHandle());
-
-  return( comm );
 }
 
 //------------------------------------------------------------------------------
@@ -446,7 +451,7 @@ gio::GenericIOReader* vtkPGenericIOReader::GetInternalReader()
       r = NULL;
     } // END switch
 
-  r->SetCommunicator( this->MPICommunicator );
+  r->SetCommunicator( this->MetaData->MPICommunicator );
   r->SetFileName(this->FileName);
 
   if( this->BlockAssignment == ROUND_ROBIN)
