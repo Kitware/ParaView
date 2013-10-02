@@ -8,7 +8,7 @@ the Python and JavaScript code comprising the ParaViewWeb distribution. This
 document blatantly copies structure and text from the "Style Guide for Python
 Code" (PEP-0008).
 
-## Code lay-out
+## Code layout
 
 ### Indentation
 
