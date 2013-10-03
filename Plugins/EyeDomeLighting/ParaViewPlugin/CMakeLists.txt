@@ -23,9 +23,6 @@ add_paraview_plugin(
     ${MOC_SRCS}
 )
 
-target_link_libraries(EyeDomeLightingView
-  vtkEyeDomeLighting)
-
 # Add testing if necessary
 if (BUILD_TESTING)
   add_subdirectory(Testing)
