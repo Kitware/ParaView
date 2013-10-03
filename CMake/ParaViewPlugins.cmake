@@ -1053,12 +1053,9 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
            "${module}CS_Initialize(interp);\n${PLUGIN_EXTRA_CS_INITS}")
       set (PLUGIN_EXTRA_CS_INITS_EXTERNS
            "extern \"C\" void ${module}CS_Initialize(vtkClientServerInterpreter*);\n${PLUGIN_EXTRA_CS_INITS_EXTERNS}")
-      list(APPEND extradependencies ${module}CS) 
+      list(APPEND extradependencies ${module} ${module}CS) 
     endforeach()
     set(INITIALIZE_EXTRA_CS_MODULES TRUE)
-  endif()
-  if (pv-plugin AND ${pv-plugin}_MODULES)
-    set (extradependencies ${${pv-plugin}_MODULES} ${extradependencies})
   endif()
 
   IF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
@@ -1275,11 +1272,9 @@ macro(pv_process_modules)
   endforeach()
 
   set (plugin_cs_modules)
-  set (plugin_modules)
   foreach(_module IN LISTS current_module_set_sorted)
     if (NOT ${_module}_IS_TEST)
       set(vtk-module ${_module})
-     list(APPEND plugin_modules ${_module})
     else()
       set(vtk-module ${${_module}_TESTS_FOR})
     endif()
@@ -1295,14 +1290,12 @@ macro(pv_process_modules)
   
   # save the modules so any new plugins added, we can automatically make them
   # depend on these new modules.
-  set (${pv-plugin}_MODULES ${plugin_modules})
   set (${pv-plugin}_CS_MODULES ${plugin_cs_modules})
 
   unset (VTK_MODULES_ALL)
   unset (current_module_set)
   unset (current_module_set_sorted)
   unset (plugin_cs_modules)
-  unset (plugin_modules)
 endmacro()
 
 # this macro is used to setup the environment for loading/building VTK modules
