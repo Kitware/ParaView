@@ -124,6 +124,12 @@ public:
   // and 2 render-server nodes, then this method will return 3.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
+  // Description:
+  // Returns whether or not MPI is initialized on the specified server/s. If
+  // more than 1 server is identified it will return true only if all of the
+  // servers have MPI initialized.
+  virtual bool IsMPIInitialized(vtkTypeUInt32 servers);
+
   //---------------------------------------------------------------------------
   // API for Collaboration management
   //---------------------------------------------------------------------------

@@ -148,6 +148,10 @@ public:
   vtkGetMacro(NumberOfProcesses, int);
 
   // Description:
+  // Return whether MPI is initialized or not.
+  virtual bool IsMPIInitialized() const;
+
+  // Description:
   // Return true if the server allow server client to connect to itself
   vtkGetMacro(MultiClientsEnable, int);
 
@@ -160,6 +164,7 @@ protected:
   ~vtkPVServerInformation();
 
   int NumberOfProcesses;
+  bool MPIInitialized;
   int OGVSupport;
   int AVISupport;
   int RemoteRendering;

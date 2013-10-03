@@ -63,11 +63,17 @@ public:
 
   // Description:
   // Returns the number of processes on the given server/s. If more than 1
-  // server is identified, than it returns the maximum number of processes e.g.
+  // server is identified, then it returns the maximum number of processes e.g.
   // is servers = DATA_SERVER | RENDER_SERVER and there are 3 data-server nodes
   // and 2 render-server nodes, then this method will return 3.
   // Implementation provided simply returns the number of local processes.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
+
+  // Description:
+  // Returns whether or not MPI is initialized on the specified server/s. If
+  // more than 1 server is identified it will return true only if all of the
+  // servers have MPI initialized.
+  virtual bool IsMPIInitialized(vtkTypeUInt32 servers);
 
   //---------------------------------------------------------------------------
   // API for Proxy Finder/ReNew

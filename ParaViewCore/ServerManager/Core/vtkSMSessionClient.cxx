@@ -408,6 +408,44 @@ int vtkSMSessionClient::GetNumberOfProcesses(vtkTypeUInt32 servers)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSessionClient::IsMPIInitialized(vtkTypeUInt32 servers)
+{
+  // keep track to make sure that we checked something before returning true
+  bool checked = false;
+  if (servers & vtkPVSession::CLIENT)
+    {
+    if (this->Superclass::IsMPIInitialized(servers) == false)
+      {
+      return false;
+      }
+    checked = true;
+    }
+  if (servers & vtkPVSession::DATA_SERVER ||
+    servers & vtkPVSession::DATA_SERVER_ROOT)
+    {
+    if (this->DataServerInformation->IsMPIInitialized() == false)
+      {
+      return false;
+      }
+    checked = true;
+    }
+  if (servers & vtkPVSession::RENDER_SERVER ||
+    servers & vtkPVSession::RENDER_SERVER_ROOT)
+    {
+    if (this->RenderServerInformation->IsMPIInitialized() == false)
+      {
+      return false;
+      }
+    checked = true;
+    }
+  if(checked == false)
+    {
+    vtkWarningMacro("Did not check any servers for MPI.");
+    }
+  return checked;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSessionClient::CloseSession()
 {
   if (this->DataServerController)

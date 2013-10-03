@@ -588,6 +588,17 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
   vtkSMSession* session = proxy->GetSession();
 
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(proxy);
+
+  // first check if the source requires MPI to be initialized and
+  // that it is initialized on the server.
+  if (source && source->GetMPIRequired() &&
+      session->IsMPIInitialized(source->GetLocation()) == false)
+    {
+    return false;
+    }
+
+  // Check if the source requires multiple processes and if we have
+  // multiple processes on the server.
   if (source && session->GetNumberOfProcesses(source->GetLocation()) > 1)
     {
     if (source->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS)
