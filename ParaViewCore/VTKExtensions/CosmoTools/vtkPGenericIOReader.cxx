@@ -929,17 +929,17 @@ void vtkPGenericIOReader::FindRankNeighbors()
       } // END for all neis
     rankNeighbors.clear();
 
-    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MPICommunicator);
+    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MetaData->MPICommunicator);
     MPI_Bcast(&neiRanks[0],numNeis,MPI_INT,
-              this->RankInQuery,this->MPICommunicator);
+              this->RankInQuery,this->MetaData->MPICommunicator);
     } // END if
   else
     {
     int numNeis = -1;
-    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MPICommunicator);
+    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MetaData->MPICommunicator);
     neiRanks.resize(numNeis);
     MPI_Bcast(&neiRanks[0],numNeis,MPI_INT,
-              this->RankInQuery,this->MPICommunicator);
+              this->RankInQuery,this->MetaData->MPICommunicator);
     } // END else
 
   this->MetaData->RanksToLoad.insert( this->RankInQuery );
@@ -1011,15 +1011,15 @@ int vtkPGenericIOReader::RequestData(
 
   // STEP 2: See if we should only show
   this->FindRankNeighbors();
-  MPI_Barrier(this->MPICommunicator);
+  MPI_Barrier(this->MetaData->MPICommunicator);
 
   // STEP 3: Load coordinates
   this->LoadCoordinates(output);
-  MPI_Barrier(this->MPICommunicator);
+  MPI_Barrier(this->MetaData->MPICommunicator);
 
   // STEP 4: Load data
   this->LoadData(output);
-  MPI_Barrier(this->MPICommunicator);
+  MPI_Barrier(this->MetaData->MPICommunicator);
 
   // STEP 5: Clear variables
   this->Reader->ClearVariables();
