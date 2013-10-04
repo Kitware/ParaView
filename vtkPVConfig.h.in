@@ -66,6 +66,9 @@
 // defined when SSEND must be used for communication by default.
 #cmakedefine PARAVIEW_USE_MPI_SSEND
 
+// defined when client processes must init MPI by default.
+#cmakedefine PARAVIEW_INITIALIZE_MPI_ON_CLIENT
+
 // defined when qt support is enabled
 #cmakedefine PARAVIEW_ENABLE_QT_SUPPORT
 

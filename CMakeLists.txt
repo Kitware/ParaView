@@ -221,8 +221,14 @@ cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
 cmake_dependent_option(PARAVIEW_USE_ICE_T
   "Enable IceT (needed for parallel rendering)" ON
   "PARAVIEW_USE_MPI" OFF)
+cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
+  "Initialize MPI on client-processes by default. Can be overridden using command line arguments"
+  OFF
+  "PARAVIEW_USE_MPI" OFF)
+
 mark_as_advanced(PARAVIEW_USE_ICE_T
-  PARAVIEW_USE_MPI_SSEND)
+  PARAVIEW_USE_MPI_SSEND
+  PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
 
 cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
   "Build ParaView with Qt support (without GUI)" OFF
