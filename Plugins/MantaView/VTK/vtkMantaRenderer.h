@@ -88,7 +88,7 @@ class VTKMANTA_EXPORT vtkMantaRenderer : public vtkOpenGLRenderer
 {
 public:
   static vtkMantaRenderer *New();
-  vtkTypeMacro(vtkMantaRenderer,vtkRenderer);
+  vtkTypeMacro(vtkMantaRenderer, vtkOpenGLRenderer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //Description:
