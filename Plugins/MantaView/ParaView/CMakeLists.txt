@@ -60,11 +60,7 @@ add_paraview_plugin(
     MantaView.cxx
     MantaDisplay.cxx
     MantaViewOptions.cxx
-  CS_KITS
-    vtkManta
 )
-
-TARGET_LINK_LIBRARIES (MantaView vtkManta vtkMantaCS)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

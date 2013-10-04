@@ -1029,6 +1029,8 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     ${ARG_SERVER_SOURCES}
     ${PY_SRCS})
 
+  set (extradependencies)
+
   SET (PLUGIN_EXTRA_CS_INITS)
   SET (PLUGIN_EXTRA_CS_INITS_EXTERNS)
   SET (INITIALIZE_EXTRA_CS_MODULES)
@@ -1042,6 +1044,19 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
 
     SET (INITIALIZE_EXTRA_CS_MODULES TRUE)
   ENDIF (ARG_CS_KITS)
+
+  # If this plugin is being built as a part of an environment that provdes other
+  # modules, we handle those.
+  if (pv-plugin AND ${pv-plugin}_CS_MODULES)
+    foreach(module ${${pv-plugin}_CS_MODULES})
+      set (PLUGIN_EXTRA_CS_INITS
+           "${module}CS_Initialize(interp);\n${PLUGIN_EXTRA_CS_INITS}")
+      set (PLUGIN_EXTRA_CS_INITS_EXTERNS
+           "extern \"C\" void ${module}CS_Initialize(vtkClientServerInterpreter*);\n${PLUGIN_EXTRA_CS_INITS_EXTERNS}")
+      list(APPEND extradependencies ${module} ${module}CS) 
+    endforeach()
+    set(INITIALIZE_EXTRA_CS_MODULES TRUE)
+  endif()
 
   IF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
     CONFIGURE_FILE(
@@ -1090,6 +1105,10 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
         vtkPVServerManagerDefault
         vtkPVServerManagerApplicationCS)
     ENDIF(SM_SRCS)
+
+    if (extradependencies)
+      target_link_libraries(${NAME} ${extradependencies})
+    endif()
 
     # Add install rules for the plugin. Currently only the plugins in ParaView
     # source are installed.
@@ -1252,6 +1271,7 @@ macro(pv_process_modules)
     endif ()
   endforeach()
 
+  set (plugin_cs_modules)
   foreach(_module IN LISTS current_module_set_sorted)
     if (NOT ${_module}_IS_TEST)
       set(vtk-module ${_module})
@@ -1263,13 +1283,19 @@ macro(pv_process_modules)
         NOT ${_module}_IS_TEST AND
         NOT ${_module}_THIRD_PARTY)
         vtk_add_cs_wrapping(${_module})
+        list(APPEND plugin_cs_modules ${_module})
     endif()
     unset(vtk-module)
   endforeach()
+  
+  # save the modules so any new plugins added, we can automatically make them
+  # depend on these new modules.
+  set (${pv-plugin}_CS_MODULES ${plugin_cs_modules})
 
   unset (VTK_MODULES_ALL)
   unset (current_module_set)
   unset (current_module_set_sorted)
+  unset (plugin_cs_modules)
 endmacro()
 
 # this macro is used to setup the environment for loading/building VTK modules
@@ -1278,6 +1304,16 @@ endmacro()
 macro(pv_setup_module_environment _name)
   # Setup enviroment to build VTK modules outside of VTK source tree.
   set (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
+
+  if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  endif()
+  if (NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+  endif()
+  if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+  endif()
 
   set (VTK_INSTALL_RUNTIME_DIR "bin")
   set (VTK_INSTALL_LIBRARY_DIR "lib")
@@ -1303,4 +1339,12 @@ macro(pv_setup_module_environment _name)
   foreach (mod IN LISTS VTK_MODULES_ENABLED)
     vtk_module_load("${mod}")
   endforeach()
+
+  # Set this so that we can track all the modules we're building for this
+  # plugin. add_paraview_plugin() call will then add logic to automatically link
+  # and (do CS init) for all modules that are built for the plugin. Note
+  # pv_setup_module_environment() is not called for plugin being built as part
+  # of the ParaView build, in that case pv-plugin is set when processing the
+  # plugin.cmake file, and hence this logic still works!
+  set (pv-plugin "${_name}")
 endmacro()
