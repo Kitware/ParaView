@@ -24,9 +24,6 @@
 #include "vtkUnstructuredGridAlgorithm.h" // Base class
 #include "vtkPVVTKExtensionsCosmoToolsModule.h" // For export macro
 
-// MPI include
-#include <mpi.h>
-
 // Forward Declarations
 class vtkCallbackCommand;
 class vtkDataArray;
@@ -95,6 +92,19 @@ public:
   vtkGetMacro(BlockAssignment,int);
 
   // Description:
+  // Set/Get the RankInQuery. Used in combination with SetQueryRankNeighbors(1)
+  // tells the reader to render only the data of the RankInQuery and its
+  // neighbors.
+  vtkSetMacro(RankInQuery,int);
+  vtkGetMacro(RankInQuery,int);
+
+  // Description:
+  // Set/Get whether the reader should read/render only the data of the
+  // user-supplied rank, via SetRankInQuery(),
+  vtkSetMacro(QueryRankNeighbors,int);
+  vtkGetMacro(QueryRankNeighbors,int);
+
+  // Description:
   // Returns the list of arrays used to select the variables to be used
   // for the x,y and z axis.
   vtkGetObjectMacro(ArrayList,vtkStringArray);
@@ -151,11 +161,6 @@ protected:
   gio::GenericIOReader* GetInternalReader();
 
   // Description:
-  // Returns the corresponding MPI communicator for the multi-process
-  // controller used by this instance.
-  MPI_Comm GetMPICommunicator();
-
-  // Description:
   // Return the point from the raw data.
   void GetPointFromRawData(
           std::string xName,
@@ -184,6 +189,10 @@ protected:
   // Loads the particle data arrays
   void LoadData(vtkUnstructuredGrid *grid);
 
+  // Description:
+  // Finds the neighbors of the user-supplied rank
+  void FindRankNeighbors();
+
   // Descriptions
   // Call-back registered with the SelectionObserver.
   static void SelectionModifiedCallback(
@@ -198,6 +207,9 @@ protected:
   int GenericIOType;
   int BlockAssignment;
 
+  int QueryRankNeighbors;
+  int RankInQuery;
+
   bool BuildMetaData;
 
 
@@ -208,7 +220,6 @@ protected:
   vtkCallbackCommand* SelectionObserver;
 
 // BTX
-  MPI_Comm MPICommunicator;
   gio::GenericIOReader* Reader;
   vtkGenericIOMetaData* MetaData;
 // ETX

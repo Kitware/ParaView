@@ -95,10 +95,101 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Partition.h"
 #include "SODHalo.h"
 
-// C++ includes
+// C/C++ includes
 #include <cassert>
 #include <vector>
 
+namespace HaloFinderInternals {
+
+class ParticleData
+{
+public:
+
+   // Input particle data
+   std::vector<POSVEL_T> xx,yy,zz, vx,vy,vz, mass,potential;
+   std::vector<ID_T> tag;
+   std::vector<STATUS_T> status;
+   std::vector<MASK_T> mask;
+
+   /**
+    * @brief Resizes
+    * @param numParticles
+    */
+   void Resize( const int numParticles )
+   {
+     this->xx.resize( numParticles );
+     this->yy.resize( numParticles );
+     this->zz.resize( numParticles );
+     this->vx.resize( numParticles );
+     this->vy.resize( numParticles );
+     this->vz.resize( numParticles );
+     this->mass.resize( numParticles );
+     this->tag.resize( numParticles );
+     this->status.resize( numParticles );
+     this->mask.resize( numParticles );
+     this->potential.resize( numParticles );
+   }
+
+   /**
+    * @brief Clears all internal vectors.
+    */
+   void Clear()
+   {
+     this->xx.clear();
+     this->yy.clear();
+     this->zz.clear();
+     this->vx.clear();
+     this->vy.clear();
+     this->vz.clear();
+     this->mass.clear();
+     this->tag.clear();
+     this->status.clear();
+     this->potential.clear();
+     this->mask.clear();
+   }
+
+};
+
+class HaloData
+{
+public:
+
+  // Computed FOF properties
+  std::vector<POSVEL_T> fofMass;     // mass of every halo
+  std::vector<POSVEL_T> fofXPos;     // x-component of the FOF position
+  std::vector<POSVEL_T> fofYPos;     // y-component of the FOF position
+  std::vector<POSVEL_T> fofZPos;     // z-component of the FOF position
+  std::vector<POSVEL_T> fofXVel;     // x-component of the FOF velocity
+  std::vector<POSVEL_T> fofYVel;     // y-component of the FOF velocity
+  std::vector<POSVEL_T> fofZVel;     // z-component of the FOF velocity
+  std::vector<POSVEL_T> fofXCofMass; // x-component of the FOF center of mass
+  std::vector<POSVEL_T> fofYCofMass; // y-component of the FOF center of mass
+  std::vector<POSVEL_T> fofZCofMass; // z-component of the FOF center of mass
+  std::vector<POSVEL_T> fofVelDisp;  // velocity dispersion of every halo
+  std::vector< int > ExtractedHalos; // list of halo IDs within the PMin thres.
+
+  /**
+   * @brief Clears all internal vectors.
+   */
+  void Clear()
+  {
+    this->fofMass.clear();
+    this->fofXPos.clear();
+    this->fofYPos.clear();
+    this->fofZPos.clear();
+    this->fofXVel.clear();
+    this->fofYVel.clear();
+    this->fofZVel.clear();
+    this->fofXCofMass.clear();
+    this->fofYCofMass.clear();
+    this->fofZCofMass.clear();
+    this->fofVelDisp.clear();
+    this->ExtractedHalos.clear();
+  }
+
+};
+
+}
 
 vtkStandardNewMacro(vtkPLANLHaloFinder);
 
@@ -127,6 +218,9 @@ vtkPLANLHaloFinder::vtkPLANLHaloFinder()
   this->SODBins         = cosmotk::NUM_SOD_BINS;
   this->MinFOFSize      = cosmotk::MIN_SOD_SIZE;
   this->MinFOFMass      = cosmotk::MIN_SOD_MASS;
+
+  this->Particles = new HaloFinderInternals::ParticleData();
+  this->Halos     = new HaloFinderInternals::HaloData();
 }
 
 //------------------------------------------------------------------------------
@@ -139,31 +233,21 @@ vtkPLANLHaloFinder::~vtkPLANLHaloFinder()
     delete this->HaloFinder;
     }
 
-  this->xx.clear();
-  this->yy.clear();
-  this->zz.clear();
-  this->vx.clear();
-  this->vy.clear();
-  this->vz.clear();
-  this->mass.clear();
-  this->tag.clear();
-  this->status.clear();
-  this->potential.clear();
-  this->mask.clear();
+  if( this->Particles != NULL )
+    {
+    this->Particles->Clear();
+    delete this->Particles;
+    this->Particles = NULL;
+    }
 
-  this->fofMass.clear();
-  this->fofXPos.clear();
-  this->fofYPos.clear();
-  this->fofZPos.clear();
-  this->fofXVel.clear();
-  this->fofYVel.clear();
-  this->fofZVel.clear();
-  this->fofXCofMass.clear();
-  this->fofYCofMass.clear();
-  this->fofZCofMass.clear();
-  this->fofVelDisp.clear();
+  if( this->Halos != NULL )
+    {
+    this->Halos->Clear();
+    delete this->Halos;
+    this->Halos = NULL;
+    }
 
-  this->ExtractedHalos.clear();
+;
 }
 
 //------------------------------------------------------------------------------
@@ -350,15 +434,15 @@ void vtkPLANLHaloFinder::ComputeSODHalos(
   cosmotk::ChainingMesh *chainMesh =
       new cosmotk::ChainingMesh(
           this->RL,this->Overlap,cosmotk::CHAIN_SIZE,
-          &this->xx,&this->yy,&this->zz);
+          &this->Particles->xx,&this->Particles->yy,&this->Particles->zz);
 
   // STEP 2: Loop through all halos and compute SOD halos
-  for(unsigned int i=0; i < this->ExtractedHalos.size(); ++i)
+  for(unsigned int i=0; i < this->Halos->ExtractedHalos.size(); ++i)
     {
-    int internalHaloIdx = this->ExtractedHalos[ i ];
+    int internalHaloIdx = this->Halos->ExtractedHalos[ i ];
     int haloSize        = this->HaloFinder->getHaloCount()[internalHaloIdx];
 
-    double haloMass     = this->fofMass[internalHaloIdx];
+    double haloMass     = this->Halos->fofMass[internalHaloIdx];
 
     if( (haloMass < this->MinFOFMass) || (haloSize < this->MinFOFSize) )
       {
@@ -370,20 +454,21 @@ void vtkPLANLHaloFinder::ComputeSODHalos(
                         this->RhoC, this->SODMass, this->RhoC,
                         this->MinRadiusFactor, this->MaxRadiusFactor );
     sod->setParticles(
-        &this->xx,&this->yy,&this->zz,
-        &this->vx,&this->vy,&this->vz,
-        &this->mass,
-        &this->tag);
+        &(this->Particles->xx),&(this->Particles->yy),&(this->Particles->zz),
+        &(this->Particles->vx),&(this->Particles->vy),&(this->Particles->vz),
+        &(this->Particles->mass),
+        &(this->Particles->tag)
+        );
 
     double center[3];
     fofHaloCenters->GetPoint(i,center);
     sod->createSODHalo(
         this->HaloFinder->getHaloCount()[internalHaloIdx],
         center[0],center[1],center[2],
-        this->fofXVel[internalHaloIdx],
-        this->fofYVel[internalHaloIdx],
-        this->fofZVel[internalHaloIdx],
-        this->fofMass[internalHaloIdx]);
+        this->Halos->fofXVel[internalHaloIdx],
+        this->Halos->fofYVel[internalHaloIdx],
+        this->Halos->fofZVel[internalHaloIdx],
+        this->Halos->fofMass[internalHaloIdx]);
 
     if(sod->SODHaloSize() > 0)
       {
@@ -514,36 +599,29 @@ void vtkPLANLHaloFinder::VectorizeData(
   int *haloTagPtr = static_cast<int*>( haloTag->GetVoidPointer(0) );
 
   vtkIdType numParticles = points->GetNumberOfPoints();
-  this->xx.resize( numParticles );
-  this->yy.resize( numParticles );
-  this->zz.resize( numParticles );
-  this->vx.resize( numParticles );
-  this->vy.resize( numParticles );
-  this->vz.resize( numParticles );
-  this->mass.resize( numParticles );
-  this->tag.resize( numParticles );
-  this->status.resize( numParticles );
+  this->Particles->Resize( numParticles );
+
 
   for( vtkIdType idx=0; idx < numParticles; ++idx )
     {
     // Extract position vector
-    this->xx[ idx ] = points->GetPoint( idx )[ 0 ];
-    this->yy[ idx ] = points->GetPoint( idx )[ 1 ];
-    this->zz[ idx ] = points->GetPoint( idx )[ 2 ];
+    this->Particles->xx[ idx ] = points->GetPoint( idx )[ 0 ];
+    this->Particles->yy[ idx ] = points->GetPoint( idx )[ 1 ];
+    this->Particles->zz[ idx ] = points->GetPoint( idx )[ 2 ];
 
     // Extract velocity vector
-    this->vx[ idx ] = velocity->GetComponent(idx, 0);
-    this->vy[ idx ] = velocity->GetComponent(idx, 1);
-    this->vz[ idx ] = velocity->GetComponent(idx, 2);
+    this->Particles->vx[ idx ] = velocity->GetComponent(idx, 0);
+    this->Particles->vy[ idx ] = velocity->GetComponent(idx, 1);
+    this->Particles->vz[ idx ] = velocity->GetComponent(idx, 2);
 
     // Extract the mass
-    this->mass[ idx ] = pmass->GetValue( idx );
+    this->Particles->mass[ idx ] = pmass->GetValue( idx );
 
     // Extract global particle ID information & also setup global-to-local map
-    this->tag[ idx ] = uid->GetValue( idx );
+    this->Particles->tag[ idx ] = uid->GetValue( idx );
 
     // Extract status
-    this->status[ idx ] = owner->GetValue( idx );
+    this->Particles->status[ idx ] = owner->GetValue( idx );
 
     // Initialize all halo IDs to -1, i.e., all particles are not in halos
     haloTagPtr[ idx ] = -1;
@@ -569,19 +647,19 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
   this->VectorizeData(particles);
 
   // STEP 1: Allocate potential & mask vectors required by the halo-finder
-  this->potential.resize( particles->GetNumberOfPoints() );
-  this->mask.resize( particles->GetNumberOfPoints() );
+  this->Particles->potential.resize( particles->GetNumberOfPoints() );
+  this->Particles->mask.resize( particles->GetNumberOfPoints() );
 
   // STEP 2: Initialize halo-finder parameters
   this->HaloFinder->setParameters(
       "",this->RL,this->Overlap,this->NP,this->PMin,this->BB);
   this->HaloFinder->setParticles(
-      &this->xx,&this->yy,&this->zz,
-      &this->vx,&this->vy,&this->vz,
-      &this->potential,
-      &this->tag,
-      &this->mask,
-      &this->status
+      &this->Particles->xx,&this->Particles->yy,&this->Particles->zz,
+      &this->Particles->vx,&this->Particles->vy,&this->Particles->vz,
+      &this->Particles->potential,
+      &this->Particles->tag,
+      &this->Particles->mask,
+      &this->Particles->status
       );
 
   // STEP 3: Execute the halo-finder
@@ -601,7 +679,7 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
     // Disregard halos that do not fall within the PMin threshold
     if( fofHaloCount[ halo ] >= this->PMin )
       {
-      this->ExtractedHalos.push_back( halo );
+      this->Halos->ExtractedHalos.push_back( halo );
       } // END if haloSize is within threshold
     } // END for all halos
 
@@ -609,7 +687,7 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
   //          1. Compute the halo-centers
   //          2. Attach halo-properties to each halo-center,e.g.,mass,vel,etc.
   //          3. Mark all particles within each halo
-  this->InitializeHaloCenters( haloCenters, this->ExtractedHalos.size() );
+  this->InitializeHaloCenters( haloCenters, this->Halos->ExtractedHalos.size() );
   assert("pre: halo mass array not present!" &&
           haloCenters->GetPointData()->HasArray("HaloMass") );
   assert("pre: AverageVelocity array not present!" &&
@@ -631,20 +709,20 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
       PD->GetArray("HaloID")->GetVoidPointer(0));
 
   double center[3];
-  for(unsigned int halo=0; halo < this->ExtractedHalos.size(); ++halo )
+  for(unsigned int halo=0; halo < this->Halos->ExtractedHalos.size(); ++halo )
     {
-    int haloIdx = this->ExtractedHalos[ halo ];
+    int haloIdx = this->Halos->ExtractedHalos[ halo ];
     assert( "pre: haloIdx is out-of-bounds!" &&
-            (haloIdx >= 0) && (haloIdx < this->fofMass.size() ) );
+            (haloIdx >= 0) && (haloIdx < this->Halos->fofMass.size() ) );
 
     this->MarkHaloParticlesAndGetCenter(halo,haloIdx,center,particles);
     pnts->SetPoint( halo, center );
 
-    haloMass[ halo ]          = this->fofMass[ haloIdx ];
-    haloVelDisp[ halo ]       = this->fofVelDisp[ haloIdx ];
-    haloAverageVel[ halo*3  ] = this->fofXVel[ haloIdx ];
-    haloAverageVel[ halo*3+1] = this->fofYVel[ haloIdx ];
-    haloAverageVel[ halo*3+2] = this->fofZVel[ haloIdx ];
+    haloMass[ halo ]          = this->Halos->fofMass[ haloIdx ];
+    haloVelDisp[ halo ]       = this->Halos->fofVelDisp[ haloIdx ];
+    haloAverageVel[ halo*3  ] = this->Halos->fofXVel[ haloIdx ];
+    haloAverageVel[ halo*3+1] = this->Halos->fofYVel[ haloIdx ];
+    haloAverageVel[ halo*3+2] = this->Halos->fofZVel[ haloIdx ];
     haloId[ halo ]            = halo;
     } // END for all extracted halos
 }
@@ -676,13 +754,13 @@ void vtkPLANLHaloFinder::MarkHaloParticlesAndGetCenter(
   fof->setHalos(numberOfHalos,fofHalos,fofHaloCount,fofHaloList);
   fof->setParameters("",this->RL,this->Overlap,this->BB);
   fof->setParticles(
-      &this->xx,&this->yy,&this->zz,
-      &this->vx,&this->vy,&this->vz,
-      &this->mass,
-      &this->potential,
-      &this->tag,
-      &this->mask,
-      &this->status
+      &this->Particles->xx,&this->Particles->yy,&this->Particles->zz,
+      &this->Particles->vx,&this->Particles->vy,&this->Particles->vz,
+      &this->Particles->mass,
+      &this->Particles->potential,
+      &this->Particles->tag,
+      &this->Particles->mask,
+      &this->Particles->status
       );
 
   // STEP 2: Get the particle halo information for the given halo with the given
@@ -718,25 +796,25 @@ void vtkPLANLHaloFinder::MarkHaloParticlesAndGetCenter(
     {
     case CENTER_OF_MASS:
       assert("pre:center of mass has not been constructed correctly!" &&
-             (this->fofXCofMass.size()==numberOfHalos));
+             (this->Halos->fofXCofMass.size()==numberOfHalos));
       assert("pre:center of mass has not been constructed correctly!" &&
-             (this->fofYCofMass.size()==numberOfHalos));
+             (this->Halos->fofYCofMass.size()==numberOfHalos));
       assert("pre:center of mass has not been constructed correctly!" &&
-             (this->fofZCofMass.size()==numberOfHalos));
-      center[0] = this->fofXCofMass[ internalHaloIdx ];
-      center[1] = this->fofYCofMass[ internalHaloIdx ];
-      center[2] = this->fofZCofMass[ internalHaloIdx ];
+             (this->Halos->fofZCofMass.size()==numberOfHalos));
+      center[0] = this->Halos->fofXCofMass[ internalHaloIdx ];
+      center[1] = this->Halos->fofYCofMass[ internalHaloIdx ];
+      center[2] = this->Halos->fofZCofMass[ internalHaloIdx ];
       break;
     case AVERAGE:
       assert("pre:average halo center has not been constructed correctly!" &&
-             (this->fofXPos.size()==numberOfHalos));
+             (this->Halos->fofXPos.size()==numberOfHalos));
       assert("pre:average halo center has not been constructed correctly!" &&
-             (this->fofYPos.size()==numberOfHalos));
+             (this->Halos->fofYPos.size()==numberOfHalos));
       assert("pre:average halo center has not been constructed correctly!" &&
-             (this->fofZPos.size()==numberOfHalos));
-      center[0] = this->fofXPos[ internalHaloIdx ];
-      center[1] = this->fofYPos[ internalHaloIdx ];
-      center[2] = this->fofZPos[ internalHaloIdx ];
+             (this->Halos->fofZPos.size()==numberOfHalos));
+      center[0] = this->Halos->fofXPos[ internalHaloIdx ];
+      center[1] = this->Halos->fofYPos[ internalHaloIdx ];
+      center[2] = this->Halos->fofZPos[ internalHaloIdx ];
       break;
     case MBP:
     case MCP:
@@ -861,44 +939,44 @@ void vtkPLANLHaloFinder::ComputeFOFHaloProperties()
   fof->setHalos(numberOfHalos,fofHalos,fofHaloCount,fofHaloList);
   fof->setParameters("",this->RL,this->Overlap,this->BB);
   fof->setParticles(
-      &this->xx,&this->yy,&this->zz,
-      &this->vx,&this->vy,&this->vz,
-      &this->mass,
-      &this->potential,
-      &this->tag,
-      &this->mask,
-      &this->status);
+      &this->Particles->xx,&this->Particles->yy,&this->Particles->zz,
+      &this->Particles->vx,&this->Particles->vy,&this->Particles->vz,
+      &this->Particles->mass,
+      &this->Particles->potential,
+      &this->Particles->tag,
+      &this->Particles->mask,
+      &this->Particles->status);
 
   // Compute average halo position if that's what will be used as the halo
   // center position
   if( this->CenterFindingMethod == AVERAGE )
     {
-    fof->FOFPosition(&this->fofXPos,&this->fofYPos,&this->fofZPos);
+    fof->FOFPosition(&this->Halos->fofXPos,&this->Halos->fofYPos,&this->Halos->fofZPos);
     }
   // Compute center of mass of every FOF halo if that's what will be used as
   // the halo center
   else if( this->CenterFindingMethod == CENTER_OF_MASS )
     {
     fof->FOFCenterOfMass(
-      &this->fofXCofMass,&this->fofYCofMass,&this->fofZCofMass);
+      &this->Halos->fofXCofMass,&this->Halos->fofYCofMass,&this->Halos->fofZCofMass);
     }
 
   fof->FOFAttributes(
-      &this->fofMass,
-      &this->fofXVel, &this->fofYVel,&this->fofZVel,
-      &this->fofVelDisp);
+      &this->Halos->fofMass,
+      &this->Halos->fofXVel, &this->Halos->fofYVel,&this->Halos->fofZVel,
+      &this->Halos->fofVelDisp);
 
   // Sanity checks!
   assert("post: FOF mass property not correctly computed!" &&
-         (this->fofMass.size()==numberOfHalos) );
+         (this->Halos->fofMass.size()==numberOfHalos) );
   assert("post: FOF x-velocity component not correctly computed!" &&
-         (this->fofXVel.size()==numberOfHalos) );
+         (this->Halos->fofXVel.size()==numberOfHalos) );
   assert("post: FOF y-velocity component not correctly computed!" &&
-         (this->fofYVel.size()==numberOfHalos) );
+         (this->Halos->fofYVel.size()==numberOfHalos) );
   assert("post: FOF z-velocity component not correctly computed!" &&
-         (this->fofZVel.size()==numberOfHalos) );
+         (this->Halos->fofZVel.size()==numberOfHalos) );
   assert("post: FOF velocity dispersion not correctly computed!" &&
-         (this->fofVelDisp.size()==numberOfHalos));
+         (this->Halos->fofVelDisp.size()==numberOfHalos));
 
   delete fof;
 }
@@ -907,23 +985,23 @@ void vtkPLANLHaloFinder::ComputeFOFHaloProperties()
 void vtkPLANLHaloFinder::ResetHaloFinderInternals()
 {
   // input particle information
-  this->xx.resize(0); this->yy.resize(0);  this->zz.resize(0);
-  this->vx.resize(0); this->vy.resize(0);  this->vz.resize(0);
-  this->mass.resize(0);
-  this->potential.resize(0);
-  this->tag.resize(0);
-  this->status.resize(0);
-  this->mask.resize(0);
+  this->Particles->xx.resize(0); this->Particles->yy.resize(0);  this->Particles->zz.resize(0);
+  this->Particles->vx.resize(0); this->Particles->vy.resize(0);  this->Particles->vz.resize(0);
+  this->Particles->mass.resize(0);
+  this->Particles->potential.resize(0);
+  this->Particles->tag.resize(0);
+  this->Particles->status.resize(0);
+  this->Particles->mask.resize(0);
 
   // computed FOF properties
-  this->fofMass.resize(0);
-  this->fofXPos.resize(0); this->fofYPos.resize(0); this->fofZPos.resize(0);
-  this->fofXVel.resize(0); this->fofYVel.resize(0); this->fofZVel.resize(0);
-  this->fofXCofMass.resize(0);
-  this->fofYCofMass.resize(0);
-  this->fofZCofMass.resize(0);
-  this->fofVelDisp.resize(0);
-  this->ExtractedHalos.resize(0);
+  this->Halos->fofMass.resize(0);
+  this->Halos->fofXPos.resize(0); this->Halos->fofYPos.resize(0); this->Halos->fofZPos.resize(0);
+  this->Halos->fofXVel.resize(0); this->Halos->fofYVel.resize(0); this->Halos->fofZVel.resize(0);
+  this->Halos->fofXCofMass.resize(0);
+  this->Halos->fofYCofMass.resize(0);
+  this->Halos->fofZCofMass.resize(0);
+  this->Halos->fofVelDisp.resize(0);
+  this->Halos->ExtractedHalos.resize(0);
 }
 
 //------------------------------------------------------------------------------

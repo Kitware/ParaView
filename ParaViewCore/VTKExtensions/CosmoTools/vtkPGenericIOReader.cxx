@@ -52,6 +52,9 @@
 #include <stdexcept>
 #include <vector>
 
+// MPI
+#include <mpi.h>
+
 // Uncomment the line below to get debugging information
 //#define DEBUG
 
@@ -88,6 +91,8 @@ public:
   std::map< std::string, int >  VariableGenericIOType;
   std::map< std::string, bool > VariableStatus;
   std::map< std::string, void* > RawCache;
+  MPI_Comm MPICommunicator;
+  std::set< int > RanksToLoad;
 
   /**
    * @brief Metadata constructor.
@@ -98,6 +103,40 @@ public:
    * @brief Destructor
    */
   ~vtkGenericIOMetaData() { this->Clear();};
+
+  /**
+   * @brief Checks if the supplied rank should load data.
+   * @param r the rank in query.
+   * @return status true or false.
+   */
+  bool LoadRank( const int r )
+  {
+    return( (this->RanksToLoad.find(r) != this->RanksToLoad.end()) );
+  }
+
+  /**
+   * @brief Get the raw MPI communicator from a Multi-process controller.
+   * @param controller the multi-process controller
+   */
+  void InitCommunicator(vtkMultiProcessController *controller)
+  {
+     assert("pre: controller is NULL!" && (controller != NULL) );
+
+     // STEP 0: Get the communicator from the controller
+     vtkCommunicator *vtkComm =  controller->GetCommunicator();
+     assert("pre: VTK communicator is NULL" && (vtkComm != NULL) );
+
+     // STEP 1: Safe downcast to an vtkMPICommunicator
+     vtkMPICommunicator* vtkMPIComm = vtkMPICommunicator::SafeDownCast(vtkComm);
+     assert("pre: MPI communicator is NULL" && (vtkMPIComm != NULL) );
+
+     // STEP 2: Get the opaque VTK MPI communicator
+     vtkMPICommunicatorOpaqueComm* mpiComm = vtkMPIComm->GetMPIComm();
+     assert("pre: Opaque MPI communicator is NULL" && (mpiComm != NULL) );
+
+     // STEP 3: Finally, get the MPI comm
+     this->MPICommunicator = *(mpiComm->GetHandle());
+  }
 
   /**
    * @brief Performs a quick sanity on the metadata
@@ -138,6 +177,7 @@ public:
   this->VariableGenericIOType.clear();
   this->VariableStatus.clear();
   this->Information.clear();
+  this->RanksToLoad.clear();
 
   std::map<std::string,void*>::iterator iter;
   for( iter=this->RawCache.begin(); iter != this->RawCache.end(); ++iter)
@@ -158,7 +198,6 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   this->Controller        = vtkMultiProcessController::GetGlobalController();
-  this->MPICommunicator   = this->GetMPICommunicator();
   this->Reader            = NULL;
   this->FileName          = NULL;
   this->XAxisVariableName = NULL;
@@ -169,9 +208,13 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->BuildMetaData     = false;
 
   this->MetaData  = new vtkGenericIOMetaData();
+  this->MetaData->InitCommunicator( this->Controller );
 
   this->RequestInfoCounter = 0;
   this->RequestDataCounter = 0;
+
+  this->RankInQuery        = 0;
+  this->QueryRankNeighbors = 0;
 
   this->ArrayList = vtkStringArray::New();
   this->PointDataArraySelection = vtkDataArraySelection::New();
@@ -293,29 +336,6 @@ void vtkPGenericIOReader::SetPointArrayStatus(
     this->PointDataArraySelection->DisableArray( name );
     assert(!this->PointDataArraySelection->ArrayIsEnabled(name));
     }
-}
-
-//------------------------------------------------------------------------------
-MPI_Comm vtkPGenericIOReader::GetMPICommunicator()
-{
-  MPI_Comm comm = MPI_COMM_NULL;
-
-  // STEP 0: Get the communicator from the controller
-  vtkCommunicator *vtkComm =  this->Controller->GetCommunicator();
-  assert("pre: VTK communicator is NULL" && (vtkComm != NULL) );
-
-  // STEP 1: Safe downcast to an vtkMPICommunicator
-  vtkMPICommunicator* vtkMPIComm = vtkMPICommunicator::SafeDownCast(vtkComm);
-  assert("pre: MPI communicator is NULL" && (vtkMPIComm != NULL) );
-
-  // STEP 2: Get the opaque VTK MPI communicator
-  vtkMPICommunicatorOpaqueComm* mpiComm = vtkMPIComm->GetMPIComm();
-  assert("pre: Opaque MPI communicator is NULL" && (mpiComm != NULL) );
-
-  // STEP 3: Finally, get the MPI comm
-  comm = *(mpiComm->GetHandle());
-
-  return( comm );
 }
 
 //------------------------------------------------------------------------------
@@ -446,7 +466,7 @@ gio::GenericIOReader* vtkPGenericIOReader::GetInternalReader()
       r = NULL;
     } // END switch
 
-  r->SetCommunicator( this->MPICommunicator );
+  r->SetCommunicator( this->MetaData->MPICommunicator );
   r->SetFileName(this->FileName);
 
   if( this->BlockAssignment == ROUND_ROBIN)
@@ -690,6 +710,12 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
 {
   assert("pre: grid is NULL!" && (grid != NULL) );
 
+  if( this->QueryRankNeighbors && (this->BlockAssignment==RCB) &&
+      !this->MetaData->LoadRank(this->Controller->GetLocalProcessId()))
+    {
+    return;
+    }
+
   std::string xaxis = std::string(this->XAxisVariableName);
   xaxis = vtkPGenericIOInternals::trim(xaxis);
 
@@ -829,6 +855,12 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
 {
   assert("pre: grid is NULL!" && (grid != NULL) );
 
+  if( this->QueryRankNeighbors && (this->BlockAssignment==RCB) &&
+      !this->MetaData->LoadRank(this->Controller->GetLocalProcessId()))
+    {
+    return;
+    }
+
   vtkPointData *PD = grid->GetPointData();
   int arrayIdx = 0;
   for(;arrayIdx < this->PointDataArraySelection->GetNumberOfArrays(); ++arrayIdx)
@@ -843,6 +875,79 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
       } // END if the array is enabled
     } // END for all arrays
 
+}
+
+//------------------------------------------------------------------------------
+void vtkPGenericIOReader::FindRankNeighbors()
+{
+  if( !this->QueryRankNeighbors || this->BlockAssignment != RCB)
+    {
+    return;
+    }
+
+  this->MetaData->RanksToLoad.clear();
+
+  // Sanity checks
+  assert("pre: rank in query is out-of bounds!" &&
+        (this->RankInQuery >= 0) &&
+        (this->RankInQuery < this->Controller->GetNumberOfProcesses()) );
+  assert("pre: reader should not be NULL!" && (this->Reader!=NULL) );
+  assert("pre: block assignment is not RCB!" &&
+    (this->Reader->GetBlockAssignmentStrategy()==gio::RCB_BLOCK_ASSIGNMENT) );
+
+  std::vector<int> neiRanks;
+  if( this->Controller->GetLocalProcessId() == this->RankInQuery )
+    {
+#ifdef DEBUG
+    std::cout << "[INFO]: Loading neighbors for process P[";
+    std::cout << this->Controller->GetLocalProcessId();
+    std::cout << "]\n";
+    std::cout.flush();
+#endif
+
+    int numNeis = this->Reader->GetNumberOfRankNeighbors();
+    std::vector< gio::RankNeighbor > rankNeighbors;
+    rankNeighbors.resize(numNeis);
+    this->Reader->GetRankNeighbors( &rankNeighbors[0] );
+
+    neiRanks.resize(numNeis);
+    for(int nei=0; nei < numNeis; ++nei)
+      {
+#ifdef DEBUG
+     std::cout << "\t Neighboring rank P[";
+     std::cout << rankNeighbors[ nei ].RankID;
+     std::cout << "] Orientation {";
+     std::cout << gio::NEIGHBOR_ORIENTATION[rankNeighbors[nei].Orient[0]];
+     std::cout << ", ";
+     std::cout << gio::NEIGHBOR_ORIENTATION[rankNeighbors[nei].Orient[1]];
+     std::cout << ", ";
+     std::cout << gio::NEIGHBOR_ORIENTATION[rankNeighbors[nei].Orient[2]];
+     std::cout << "}\n";
+     std::cout.flush();
+#endif
+      neiRanks[ nei ] = rankNeighbors[ nei ].RankID;
+      } // END for all neis
+    rankNeighbors.clear();
+
+    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MetaData->MPICommunicator);
+    MPI_Bcast(&neiRanks[0],numNeis,MPI_INT,
+              this->RankInQuery,this->MetaData->MPICommunicator);
+    } // END if
+  else
+    {
+    int numNeis = -1;
+    MPI_Bcast(&numNeis,1,MPI_INT,this->RankInQuery,this->MetaData->MPICommunicator);
+    neiRanks.resize(numNeis);
+    MPI_Bcast(&neiRanks[0],numNeis,MPI_INT,
+              this->RankInQuery,this->MetaData->MPICommunicator);
+    } // END else
+
+  this->MetaData->RanksToLoad.insert( this->RankInQuery );
+  for(unsigned int i=0; i < neiRanks.size(); ++i )
+    {
+    this->MetaData->RanksToLoad.insert( neiRanks[i] );
+    }
+  neiRanks.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -904,13 +1009,19 @@ int vtkPGenericIOReader::RequestData(
   // STEP 1: Load raw data
   this->LoadRawData();
 
-  // STEP 1: Load coordinates
+  // STEP 2: See if we should only show
+  this->FindRankNeighbors();
+  MPI_Barrier(this->MetaData->MPICommunicator);
+
+  // STEP 3: Load coordinates
   this->LoadCoordinates(output);
+  MPI_Barrier(this->MetaData->MPICommunicator);
 
-  // STEP 2: Load data
+  // STEP 4: Load data
   this->LoadData(output);
+  MPI_Barrier(this->MetaData->MPICommunicator);
 
-  // STEP 3: Clear variables
+  // STEP 5: Clear variables
   this->Reader->ClearVariables();
   return 1;
 }

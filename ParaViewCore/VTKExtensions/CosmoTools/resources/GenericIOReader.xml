@@ -98,6 +98,28 @@
         </Documentation>
     </StringVectorProperty>
 
+    <IntVectorProperty command="SetQueryRankNeighbors"
+                         default_values="0"
+                         name="QueryRankNeighbors"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If checked, only the data of the RankInQuery and its neighbors
+          will be rendered.
+        </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty command="SetRankInQuery"
+                       default_values="0"
+                       name="RankInQuery"
+                       number_of_elements="1">
+     <IntRangeDomain min="0" name="range" />
+     <Documentation>
+      Used in combination with QueryRankNeighbors, this property tells the
+      reader to only render the data of this rank and its neighbors.
+     </Documentation>
+    </IntVectorProperty>
+
   </SourceProxy>
 </ProxyGroup>
 
@@ -124,6 +146,8 @@
         <Property name="xAxis" />
         <Property name="yAxis" />
         <Property name="zAxis" />
+        <Property name="QueryRankNeighbors" />
+        <Property name="RankInQuery" />
       </ExposedProperties>
     </SubProxy>
     <StringVectorProperty command="GetCurrentFileName"
