@@ -436,7 +436,6 @@ gio::GenericIOReader* vtkPGenericIOReader::GetInternalReader()
     } // END if the reader is not NULL
 
   this->BuildMetaData = true; // signal to re-build metadata
-  this->PointDataArraySelection->DisableAllArrays();
 
   assert("pre: Reader should be NULL" && (this->Reader==NULL));
   gio::GenericIOReader *r = NULL;
@@ -507,7 +506,6 @@ void vtkPGenericIOReader::LoadMetaData()
     }
 
   this->MetaData->Clear();
-  this->PointDataArraySelection->RemoveAllArrays();
 
 #ifdef DEBUG
     std::cout << "\t[INFO]: Reading header to build metadata!\n";
@@ -535,8 +533,11 @@ void vtkPGenericIOReader::LoadMetaData()
     this->MetaData->VariableStatus[vname]= false;
     this->MetaData->RawCache[vname]      = NULL;
 
-    this->PointDataArraySelection->AddArray(vname.c_str());
-    this->PointDataArraySelection->DisableArray( vname.c_str() );
+    if( !this->PointDataArraySelection->ArrayExists(vname.c_str()) )
+      {
+      this->PointDataArraySelection->AddArray(vname.c_str());
+      this->PointDataArraySelection->DisableArray( vname.c_str() );
+      }
     } // END for all variables in the file
 
   this->BuildMetaData = false; /* signal that the metadata is build */
