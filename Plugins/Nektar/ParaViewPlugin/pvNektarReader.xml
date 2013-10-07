@@ -3,7 +3,7 @@
     <SourceProxy name="pvNektarReader"
                  class="vtkNektarReader"
                  label="nektar data reader"
-                 multiprocess_support="multiple_processes">
+                 mpi_required="true">
       <Documentation
           short_help="Read a nektar file."
           long_help="Read a nektar file into an unstructured grid.">

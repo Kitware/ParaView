@@ -107,6 +107,7 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->NumberOfAlgorithmOutputPorts = VTK_UNSIGNED_INT_MAX;
   this->NumberOfAlgorithmRequiredInputPorts = VTK_UNSIGNED_INT_MAX;
   this->ProcessSupport = vtkSMSourceProxy::BOTH;
+  this->MPIRequired = false;
 }
 
 //---------------------------------------------------------------------------
@@ -230,8 +231,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
     {
     this->SetExecutiveName(executiveName);
     }
-  const char* mp = element->GetAttribute("multiprocess_support");
-  if (mp)
+  if (const char* mp = element->GetAttribute("multiprocess_support"))
     {
     if (strcmp(mp, "multiple_processes") == 0)
       {
@@ -244,6 +244,18 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
     else
       {
       this->ProcessSupport = vtkSMSourceProxy::BOTH;
+      }
+    }
+
+  if (const char* mpi = element->GetAttribute("mpi_required"))
+    {
+    if (strcmp(mpi, "true") == 0)
+      {
+      this->MPIRequired = true;
+      }
+    else
+      {
+      this->MPIRequired = false;
       }
     }
 

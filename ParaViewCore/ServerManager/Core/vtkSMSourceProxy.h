@@ -154,9 +154,17 @@ public:
   // This returns information about whether the VTK algorithm supports
   // multiple processes or not. SINGLE_PROCESS means that this algorithm
   // works only in serial, MULTIPLE_PROCESSES means that it will only
-  // work in parallel (or it is useless in serial), BOTH means both :-)
+  // useful in parallel (or it is useless in serial), BOTH means both :-)
   // Default is BOTH. This ivar is filled from the xml configuration.
+  // This variable should not be used to determine if MPI is initialized.
+  // Instead use MPISupport for that.
   vtkGetMacro(ProcessSupport, int);
+
+  // Description:
+  // This returns information about whether the VTK algorithm explicitly
+  // needs MPI to be initialized. It still may only run with a single
+  // process. An example of this is a reader that uses MPI IO routines.
+  vtkGetMacro(MPIRequired, bool);
 
   // Description:
   // Returns the number of output ports provided by the algorithm.
@@ -194,6 +202,7 @@ protected:
   int OutputPortsCreated; 
 
   int ProcessSupport;
+  bool MPIRequired;
 
   // Description:
   // Mark the data information as invalid.

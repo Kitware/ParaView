@@ -43,9 +43,11 @@ vtkPVServerInformation::vtkPVServerInformation()
 {
   this->MultiClientsEnable = 0;
   this->ClientId = 0;
-  this->NumberOfProcesses = vtkMultiProcessController::GetGlobalController() ?
-                            vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() :
-                            1;
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::GetGlobalController();
+  this->NumberOfProcesses = controller ? controller->GetNumberOfProcesses():1;
+  this->MPIInitialized =
+    controller ? controller->IsA("vtkMPIController") != 0 : false;
   this->RootOnly = 1;
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
@@ -94,6 +96,7 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AVISupport: " << this->AVISupport << endl;
   os << indent << "Timeout: " << this->Timeout << endl;
   os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
+  os << indent << "MPIInitialized: " << this->MPIInitialized << endl;
   os << indent << "MultiClientsEnable: " << this->MultiClientsEnable << endl;
   os << indent << "ClientId: " << this->ClientId << endl;
 }
@@ -124,6 +127,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
     }
   this->SetEyeSeparation(info->GetEyeSeparation());
   this->NumberOfProcesses = info->NumberOfProcesses;
+  this->MPIInitialized = info->MPIInitialized;
 }
 
 //----------------------------------------------------------------------------
@@ -244,6 +248,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       {
       this->NumberOfProcesses = serverInfo->NumberOfProcesses;
       }
+    this->MPIInitialized = serverInfo->MPIInitialized;
     if (this->MultiClientsEnable < serverInfo->MultiClientsEnable)
       {
       this->MultiClientsEnable = serverInfo->MultiClientsEnable;
@@ -270,6 +275,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->OGVSupport;
   *css << this->AVISupport;
   *css << this->NumberOfProcesses;
+  *css << this->MPIInitialized;
   *css << this->GetNumberOfMachines();
   unsigned int idx;
   for (idx = 0; idx < this->GetNumberOfMachines(); idx++)
@@ -355,8 +361,16 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     }
   this->NumberOfProcesses = numProcs;
 
+  int mpiInitialized;
+  if (!css->GetArgument(0, 12, &mpiInitialized))
+    {
+    vtkErrorMacro("Error parsing mpi initialized from message.");
+    return;
+    }
+  this->MPIInitialized = mpiInitialized;
+
   unsigned int numMachines;
-  if (!css->GetArgument(0, 12, &numMachines))
+  if (!css->GetArgument(0, 13, &numMachines))
     {
     vtkErrorMacro("Error parsing number of machines from message.");
     return;
@@ -364,7 +378,7 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   this->SetNumberOfMachines(numMachines);
   unsigned int idx;
   const char* env;
-  int machineOffset = 13;
+  int machineOffset = 14;
   int valuesPerMachine = 17;
   for (idx = 0; idx < numMachines; idx++)
     {
@@ -709,4 +723,10 @@ double* vtkPVServerInformation::GetUpperRight(unsigned int idx) const
     return NULL;
     }
   return this->MachinesInternals->MachineInformationVector[idx].UpperRight;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerInformation::IsMPIInitialized() const
+{
+  return this->MPIInitialized;
 }

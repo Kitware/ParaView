@@ -196,6 +196,10 @@ public:
   int GetPartitionId();
 
   // Description:
+  // Return whether MPI is initialized in this process group.
+  bool IsMPIInitialized();
+
+  // Description:
   // Set/Get whether to report errors from the Interpreter.
   vtkGetMacro(ReportInterpreterErrors, bool);
   vtkSetMacro(ReportInterpreterErrors, bool);

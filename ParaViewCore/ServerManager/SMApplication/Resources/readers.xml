@@ -6861,7 +6861,7 @@
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="Parallel NetCDF POP reader"
-                 multiprocess_support="multiple_processes"
+                 mpi_required="true"
                  name="PNetCDFPOPReader"
                  si_class="vtkSIFileSeriesReaderProxy">
       <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file in parallel."

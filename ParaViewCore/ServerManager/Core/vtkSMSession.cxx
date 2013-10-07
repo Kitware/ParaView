@@ -239,6 +239,12 @@ int vtkSMSession::GetNumberOfProcesses(vtkTypeUInt32 servers)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSession::IsMPIInitialized(vtkTypeUInt32)
+{
+  return vtkProcessModule::GetProcessModule()->IsMPIInitialized();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
