@@ -166,7 +166,7 @@ static const int *XY_PLANE_QPOINTS_INDICES_ORTHO =
 XY_PLANE_QPOINTS_INDICES;
 static const int YZ_PLANE_QPOINTS_INDICES_ORTHO[] =
 {2, 4, 0, 3, 4, 0, 3, 5, 0, 2, 5, 0};
-static const int XZ_PLANE_QPOINTS_INDICES_ORTHO[] = 
+static const int XZ_PLANE_QPOINTS_INDICES_ORTHO[] =
 { 4, 0, 2, 4, 1, 2, 5, 1, 2, 5, 0, 2 };
 
 //----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ int vtkTexturePainter::SetupScalars(vtkImageData* input)
   // we need to tell the vtkTexture to use the appropriate scalars.
   int cellFlag = 0;
   vtkDataArray* scalars = vtkAbstractMapper::GetScalars(input,
-    this->ScalarMode, 
+    this->ScalarMode,
     this->ScalarArrayName? VTK_GET_ARRAY_BY_NAME : VTK_GET_ARRAY_BY_ID,
     this->ScalarArrayIndex,
     this->ScalarArrayName,
@@ -210,11 +210,11 @@ int vtkTexturePainter::SetupScalars(vtkImageData* input)
   << ext[2] << ",  " \
   << ext[3] << ",  " \
   << ext[4] << ",  " \
-  << ext[5] 
+  << ext[5]
 
 //----------------------------------------------------------------------------
 void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
-                                       vtkActor *actor, 
+                                       vtkActor *actor,
                                        unsigned long typeflags,
                                        bool forceCompileOnly)
 {
@@ -235,11 +235,11 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
     dims[0] = inextent[1] - inextent[0] + 1;
     dims[1] = inextent[3] - inextent[2] + 1;
     dims[2] = inextent[5] - inextent[4] + 1;
-    
+
     // * Determine if we are using cell scalars or point scalars. That limits
     //   the extents/bounds etc.
-    int cellFlag = this->SetupScalars(input); 
-    
+    int cellFlag = this->SetupScalars(input);
+
     // Determine the VOI to extract:
     // * If the input image is 3D, then we respect the slice number and slice
     // direction the user recommended.
@@ -250,7 +250,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
       int slice = this->Slice;
       // clamp the slice number at min val.
       slice = (slice < 0)? 0 : slice;
-      
+
       // if cell centered, then dimensions reduces by 1.
       int curdim = cellFlag? (dims[this->SliceMode]-1) :
         dims[this->SliceMode];
@@ -296,16 +296,16 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
       return;
       }
 
-    vtkSmartPointer<vtkImageData> clone = 
+    vtkSmartPointer<vtkImageData> clone =
       vtkSmartPointer<vtkImageData>::New();
     clone->ShallowCopy(input);
 
-    vtkSmartPointer<vtkExtractVOI> extractVOI = 
+    vtkSmartPointer<vtkExtractVOI> extractVOI =
       vtkSmartPointer<vtkExtractVOI>::New();
     extractVOI->SetVOI(outextent);
     extractVOI->SetInputData(clone);
     extractVOI->Update();
-    
+
     int evoi[6];
     extractVOI->GetOutput()->GetExtent(evoi);
     if (evoi[1] < evoi[0] && evoi[3] < evoi[2] && evoi[5] < evoi[4])
@@ -334,8 +334,8 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
 
     if (cellFlag)
       {
-      // Structured bounds are point bounds. Shrink them to reflect cell 
-      // center bounds. 
+      // Structured bounds are point bounds. Shrink them to reflect cell
+      // center bounds.
       // i.e move min bounds up by spacing/2 in that direction
       //     and move max bounds down by spacing/2 in that direction.
       double spacing[3];
@@ -405,7 +405,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
 
   // Lighting needs to be disabled since this painter always employs scalar
   // coloring and when coloring with scalars we always disable lighting.
-  bool lighting = glIsEnabled(GL_LIGHTING);
+  GLboolean lighting = glIsEnabled(GL_LIGHTING);
   if (lighting)
     {
     glDisable(GL_LIGHTING);
