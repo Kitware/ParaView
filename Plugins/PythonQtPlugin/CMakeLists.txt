@@ -48,7 +48,7 @@ add_paraview_plugin(PythonQtPlugin "1.0"
                     GUI_SOURCES ${OUTSRCS} ${MOC_SRCS} ${srcs}
                     REQUIRED_ON_CLIENT)
 
-target_link_libraries(PythonQtPlugin ${deps})
+target_link_libraries(PythonQtPlugin LINK_PRIVATE ${deps})
 
 find_package(PythonInterp REQUIRED)
 add_custom_command(OUTPUT ${decorator_file}

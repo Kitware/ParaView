@@ -326,11 +326,14 @@ add_paraview_plugin(
   SOURCES ${CXX_SOURCES})
 
 if (SQTK_CUDA AND CUDA_FOUND)
-  target_link_libraries(SciberQuestToolKit CUDAConvolutionDriver)
+  target_link_libraries(SciberQuestToolKit
+  LINK_PUBLIC CUDAConvolutionDriver)
 endif()
 
-target_link_libraries(SciberQuestToolKit LINK_PUBLIC vtkFiltersFlowPaths
+target_link_libraries(SciberQuestToolKit
+  LINK_PUBLIC vtkFiltersFlowPaths
   LINK_PRIVATE vtksys)
+
 install(TARGETS SciberQuestToolKit DESTINATION ${SQTK_LIB_INSTALL_PATH})
 
 if (SQTK_PYTHON_BINDINGS)

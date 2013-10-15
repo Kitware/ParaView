@@ -25,5 +25,6 @@ if(PARAVIEW_BUILD_QT_GUI)
                       GUI_INTERFACES ${OUTIFACES}
                       GUI_SOURCES ${OUTSRCS} ${MOC_SRCS} ${UI_SRCS} ${srcs})
 
-  target_link_libraries(MobileRemoteControl pqApplicationComponents)
+  target_link_libraries(MobileRemoteControl
+                        LINK_PRIVATE pqApplicationComponents)
 endif()

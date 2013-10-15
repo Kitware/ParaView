@@ -1053,7 +1053,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
            "${module}CS_Initialize(interp);\n${PLUGIN_EXTRA_CS_INITS}")
       set (PLUGIN_EXTRA_CS_INITS_EXTERNS
            "extern \"C\" void ${module}CS_Initialize(vtkClientServerInterpreter*);\n${PLUGIN_EXTRA_CS_INITS_EXTERNS}")
-      list(APPEND extradependencies ${module} ${module}CS) 
+      list(APPEND extradependencies ${module} ${module}CS)
     endforeach()
     set(INITIALIZE_EXTRA_CS_MODULES TRUE)
   endif()
@@ -1098,16 +1098,16 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     ENDIF(MSVC)
 
     IF(plugin_type_gui OR GUI_SRCS)
-      TARGET_LINK_LIBRARIES(${NAME} LINK_PUBLIC pqComponents)
+      target_link_libraries(${NAME} LINK_PUBLIC pqComponents)
     ENDIF(plugin_type_gui OR GUI_SRCS)
     IF(SM_SRCS)
-      TARGET_LINK_LIBRARIES(${NAME} LINK_PUBLIC vtkPVServerManagerApplication
+      target_link_libraries(${NAME} LINK_PUBLIC vtkPVServerManagerApplication
         vtkPVServerManagerDefault
         vtkPVServerManagerApplicationCS)
     ENDIF(SM_SRCS)
 
     if (extradependencies)
-      target_link_libraries(${NAME} ${extradependencies})
+      target_link_libraries(${NAME} LINK_PUBLIC ${extradependencies})
     endif()
 
     # Add install rules for the plugin. Currently only the plugins in ParaView
@@ -1287,7 +1287,7 @@ macro(pv_process_modules)
     endif()
     unset(vtk-module)
   endforeach()
-  
+
   # save the modules so any new plugins added, we can automatically make them
   # depend on these new modules.
   set (${pv-plugin}_CS_MODULES ${plugin_cs_modules})

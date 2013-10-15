@@ -15,7 +15,7 @@ set(SurfaceLIC_DEPENDENCIES vtkRenderingLIC)
 if (PARAVIEW_USE_MPI)
   list(APPEND SurfaceLIC_DEPENDENCIES vtkRenderingParallelLIC)
 endif()
-target_link_libraries(SurfaceLIC ${SurfaceLIC_DEPENDENCIES})
+target_link_libraries(SurfaceLIC LINK_PRIVATE ${SurfaceLIC_DEPENDENCIES})
 
 if (VTK_RENDERINGPARALLELLIC_SURFACELICPAINTER_TIMER)
   add_definitions("-DvtkSurfaceLICPainterTIME")

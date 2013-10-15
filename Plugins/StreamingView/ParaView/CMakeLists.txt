@@ -103,4 +103,4 @@ add_paraview_plugin(
     pqStreamingControls.cxx
 )
 
-TARGET_LINK_LIBRARIES (StreamingView vtkStreaming)
+target_link_libraries(StreamingView LINK_PRIVATE vtkStreaming)

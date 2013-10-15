@@ -54,6 +54,7 @@ SET(SCALAPACK_LIBRARIES ${SCALAPACK_LIBRARY} ${BLACS_LIBRARY})
 
 vtk_module_library(nektar STATIC ${nektar_sources})
 target_link_libraries(nektar
+  LINK_PUBLIC
   ${SCALAPACK_LIBRARIES}
   ${LAPACK_lapack_LIBRARY}
   ${BLAS_LIBRARIES}
