@@ -20,6 +20,7 @@ vtk_module(vtkPVClientServerCoreRendering
     ${__dependencies}
   PRIVATE_DEPENDS
     vtksys
+    vtkzlib
   TEST_LABELS
     PARAVIEW
 )
