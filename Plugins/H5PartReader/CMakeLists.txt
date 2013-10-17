@@ -34,7 +34,7 @@ ADD_PARAVIEW_PLUGIN(H5PartReader "1.0"
   REQUIRED_ON_SERVER
 )
 
-target_link_libraries(H5PartReader LINK_PRIVATE vtksys)
+target_link_libraries(H5PartReader LINK_PRIVATE vtksys vtkhdf5)
 
 if(PARAVIEW_USE_MPI)
   include(vtkMPI)

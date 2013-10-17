@@ -31,3 +31,5 @@ ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
                          vtkznzlib.cxx
   SERVER_MANAGER_XML     AnalyzeNIfTISM.xml
   REQUIRED_ON_SERVER)
+
+target_link_libraries(AnalyzeNIfTIIO LINK_PRIVATE vtkzlib)
