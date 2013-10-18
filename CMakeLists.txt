@@ -504,6 +504,14 @@ if (PARAVIEW_ENABLE_WEB)
   if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
     list (APPEND ParaViewModulesDirs Web/Documentation)
   endif()
+
+  # Setup install rules for Web Applications
+  install(
+     DIRECTORY "${PARAVIEW_WWW_DIR}"
+     DESTINATION "${VTK_INSTALL_DATA_DIR}"
+     USE_SOURCE_PERMISSIONS
+     COMPONENT Runtime
+  )
 endif()
 
 include(ParaViewModuleTop)
