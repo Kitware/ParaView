@@ -74,7 +74,7 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     vtk_module_test_executable(${name} ${name}.cxx ${${name}_MOC_SOURCES})
     add_test(NAME pvunit.${name}
              COMMAND ${name})
-    target_link_libraries(${name} ${QT_LIBRARIES})
+    target_link_libraries(${name} LINK_PRIVATE ${QT_LIBRARIES})
     set_tests_properties(pvunit.${name} PROPERTIES LABELS "PARAVIEW")
   endforeach()
 endif()

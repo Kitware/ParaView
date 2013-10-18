@@ -61,7 +61,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
 endif()
 
 vtk_module_library(${vtk-module} ${Module_SRCS})
-target_link_libraries(${vtk-module} vtkUtilitiesPythonInitializer)
+target_link_libraries(${vtk-module} LINK_PRIVATE vtkUtilitiesPythonInitializer)
 
 if (CATALYST_FORTRAN_USING_MANGLING)
   set_property(TARGET ${vtk-module} APPEND PROPERTY COMPILE_DEFINITIONS

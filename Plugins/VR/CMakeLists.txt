@@ -129,6 +129,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPVVRConfig.h.in
 
 # if VRPN is used then link to VRPN library
 if(PARAVIEW_USE_VRPN)
-  TARGET_LINK_LIBRARIES (VRPlugin "${VRPN_LIBRARY}")
-endif(PARAVIEW_USE_VRPN)
-TARGET_LINK_LIBRARIES (VRPlugin pqApplicationComponents)
+  target_link_libraries (VRPlugin LINK_PRIVATE "${VRPN_LIBRARY}")
+endif()
+
+target_link_libraries (VRPlugin LINK_PRIVATE pqApplicationComponents)

@@ -74,12 +74,14 @@ add_paraview_plugin(pvNektarReader "2.0"
   REQUIRED_ON_SERVER)
 
 target_link_libraries(pvNektarReader
+  LINK_PUBLIC
   nektar
   hybrid
   vec
   metis
   nektar
   nektarobj
+  LINK_PRIVATE
   ${BLAS_LIBRARIES}
   ${LAPACK_lapack_LIBRARY}
   ${BLAS_LIBRARIES}

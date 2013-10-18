@@ -36,4 +36,4 @@ qt4_wrap_cpp(MOC_SRCS
 set(vtkQvis_NO_HeaderTest 1)
 
 vtk_module_library(vtkQvis ${Qvis_SRCS} ${MOC_SRCS})
-target_link_libraries(vtkQvis ${QT_LIBRARIES})
+target_link_libraries(vtkQvis LINK_PRIVATE ${QT_LIBRARIES})

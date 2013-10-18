@@ -32,7 +32,8 @@ IF (PARAVIEW_BUILD_QT_GUI)
   )
 
   # add dependency with required vtk modules.
-  target_link_libraries(UncertaintyRendering vtkRenderingParallel)
+  target_link_libraries(UncertaintyRendering
+                        LINK_PRIVATE vtkRenderingParallel)
 ENDIF()
 
 if(BUILD_TESTING)

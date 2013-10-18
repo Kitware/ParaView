@@ -1,10 +1,10 @@
 #vtkManta is an interface from VTK's rendering classes to Manta,
-#a "real time" Ray Tracer. 
+#a "real time" Ray Tracer.
 
 #It creates a library that includes Manta specific subclasses
 #of VTK's rendering classes, Renderer, Camera, etc.
-#These can be instantiated by name, or by using object factory overloading 
-#at post compile time (ie, set VTK_AUTOLOAD_PATH to vtkManta's build 
+#These can be instantiated by name, or by using object factory overloading
+#at post compile time (ie, set VTK_AUTOLOAD_PATH to vtkManta's build
 #directory and run a normal vtk app)
 
 project(vtkManta)
@@ -12,7 +12,7 @@ project(vtkManta)
 
 #Configure vtkManta source proper ############################################
 
-# Define a flag 
+# Define a flag
 if (BUILD_AGAINST_PARAVIEW)
   add_definitions(-DVTKMANTA_FOR_PARAVIEW)
 endif()
@@ -51,11 +51,11 @@ SET ( MANTA_SRCS
 set (${vtk-module}_NO_HeaderTest 1)
 
 vtk_module_library(${vtk-module} ${MANTA_SRCS})
-TARGET_LINK_LIBRARIES (${vtk-module} ${MANTA_LINK_LIBRARIES})
+TARGET_LINK_LIBRARIES (${vtk-module} LINK_PRIVATE ${MANTA_LINK_LIBRARIES})
 
 # Manta_Core uses MMTime which is in it's own special library.
 if(WIN32)
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME} Winmm)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} LINK_PRIVATE Winmm)
 endif()
 
 #Examples ####################################################################

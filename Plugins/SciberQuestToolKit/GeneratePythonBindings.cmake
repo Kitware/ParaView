@@ -34,6 +34,7 @@ macro(
 
     target_link_libraries(
       ${CXX_LIB_NAME}PythonD
+      LINK_PUBLIC
       ${CXX_LIB_NAME})
 
     if(WIN32 AND NOT CYGWIN)
