@@ -136,15 +136,11 @@ public:
         }
       else if (event == vtkCommand::EndInteractionEvent)
         {
-        int cur_enabled = this->Target->GetInteractiveRenderEnabled();
-        if (cur_enabled)
+        if (this->Target->GetInteractiveRenderEnabled())
           {
-          bool need_render = this->Target->InteractiveRenderHappened;
           this->Target->SetInteractiveRenderEnabled(0);
-          if (need_render)
-            {
-            this->Target->Render();
-            }
+          // This call will call vtkPVGenericRenderWindowInteractor::Render()
+          // hence we don't call it explicitly here.
           }
         }
       }
