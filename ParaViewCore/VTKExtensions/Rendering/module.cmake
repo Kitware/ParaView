@@ -39,6 +39,8 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkRenderingLIC
 
     ${__dependencies}
+PRIVATE_DEPENDS
+    vtkzlib
   COMPILE_DEPENDS
     vtkUtilitiesEncodeString
 
