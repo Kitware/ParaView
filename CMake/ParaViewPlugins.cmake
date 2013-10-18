@@ -1139,7 +1139,7 @@ MACRO(WRAP_PLUGIN_FOR_PYTHON NAME WRAP_LIST WRAP_EXCLUDE_LIST)
   SET(Kit_PYTHON_EXTRA_SRCS)
 
   SET(KIT_PYTHON_LIBS
-    vtkPVServerManagerPythonD
+    vtkPVServerManagerCorePythonD
     ${NAME})
 
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
