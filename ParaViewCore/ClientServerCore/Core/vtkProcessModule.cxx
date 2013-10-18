@@ -200,20 +200,12 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
   vtkFloatingPointExceptions::Enable();
 #endif //PARAVIEW_ENABLE_FPE
 
-  // Don't prompt the user with startup errors on unix.
-  // On windows, don't prompt when running on the dashboard.
-#if defined(_WIN32) && !defined(__CYGWIN__)
-  if (getenv("DASHBOARD_TEST_FROM_CTEST") || getenv("DART_TEST_FROM_DART"))
-    {
-    vtkOutputWindow::GetInstance()->PromptUserOff();
-    }
-  else
-    {
-    vtkOutputWindow::GetInstance()->PromptUserOn();
-    }
-#else
+  // In general turn off error prompts. This is where the process waits for
+  // user-input on any error/warning. In past, we turned on prompts on Windows.
+  // However, for client processes, we capture the error messages in the UI and
+  // for the server-processes, prompts can cause unnecessary interruptions hence
+  // we turn off prompts all together.
   vtkOutputWindow::GetInstance()->PromptUserOff();
-#endif
 
 #ifdef PARAVIEW_USE_MPI_SSEND
   vtkMPIController::SetUseSsendForRMI(1);
