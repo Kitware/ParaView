@@ -12,6 +12,11 @@
                   "url": "guides/jetty_session_manager",
                   "title": "Session Manager front-end",
                   "description": "This document explains how to use the Jetty Session Manager front-end for ParaViewWeb."
+              },{
+                  "name": "virtualgl_turbovnc_howto",
+                  "url": "guides/virtualgl_turbovnc_howto",
+                  "title": "Using VirtualGL and TurboVNC",
+                  "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
               }
          ]
       },
