@@ -4,6 +4,8 @@
  * This module extend jQuery object to add support for graphical components
  * related to ParaViewWeb usage.
  *
+ * This module registers itself as: 'paraview-ui-pipeline'
+ *
  * @class jQuery.paraview.ui.PipelineBrowser
  */
 (function (GLOBAL, $) {
@@ -482,7 +484,7 @@
     $.fn.pipelineBrowser.defaults = {
         /**
          * @member pv.PipelineBrowserConfig
-         * @property {pv.Session} session
+         * @property {vtkWeb.Session} session
          * Session used to be attached with the given pipeline.
          */
         session: null,
@@ -2217,6 +2219,20 @@
         for(idx in propertyValue) {
             $('input.multi-value', container).eq(idx).val(propertyValue[idx]);
         }
+    }
+
+    // ----------------------------------------------------------------------
+    // Local module registration
+    // ----------------------------------------------------------------------
+    try {
+      // Tests for presence of jQuery, then registers this module
+      if ($ !== undefined) {
+        vtkWeb.registerModule('paraview-ui-pipeline');
+      } else {
+        console.error('Module failed to register, jQuery is missing: ' + err.message);
+      }
+    } catch(err) {
+      console.error('Caught exception while registering module: ' + err.message);
     }
 
 }(window, jQuery));
