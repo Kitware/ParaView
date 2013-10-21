@@ -489,10 +489,10 @@ def Delete(proxy=None):
             if listdomain.GetClassName() != 'vtkSMProxyListDomain':
                 continue
             group = "pq_helper_proxies." + proxy.GetGlobalIDAsString()
-            for i in xrange(listdomain.GetNumberOfProxies()):
-                pm = servermanager.ProxyManager()
-                iproxy = listdomain.GetProxy(i)
-                name = pm.GetProxyName(group, iproxy)
+            pm = servermanager.ProxyManager()
+            iproxies = [listdomain.GetProxy(i) for i in xrange(listdomain.GetNumberOfProxies())]
+            names = [pm.GetProxyName(group, iproxy) for iproxy in iproxies]
+            for name, iproxy in zip(names, iproxies):
                 if iproxy and name:
                     pm.UnRegisterProxy(group, name, iproxy)
 
