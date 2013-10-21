@@ -129,6 +129,12 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro ("NonOverlappingAMR not made up of UniformGrids");
       return 0;
       }
+    vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
+    if (!ghostLevels) 
+      {
+      vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
+      return 0;
+      }
     vtkDataArray* volArray = grid->GetCellData ()->GetArray (volumeName);
     if (!volArray)
       {
@@ -141,14 +147,13 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro (<< "There is no " << massName << " in cell field");
       return 0;
       }
+    double* spacing = grid->GetSpacing ();
+    double cellVol = spacing[0] * spacing[1] * spacing[2];
     for (int c = 0; c < grid->GetNumberOfCells (); c ++)
       {
-      if (volArray->GetTuple1 (c) > 0.0) 
+      if (volArray->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
         {
         double* bounds = grid->GetCell (c)->GetBounds ();
-        double cellVol = (bounds[1] - bounds[0]) * 
-                         (bounds[3] - bounds[2]) *
-                         (bounds[5] - bounds[4]);
         
         // This is the critical piece.
         // Because we've run the contour and we're operating this function on 
@@ -164,7 +169,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
           {
           fragments->InsertNextBlankRow ();
           }
-        fragVolume->SetTuple1 (fragId, fragVolume->GetTuple1 (fragId) + volArray->GetTuple1 (c) * cellVol);
+        fragVolume->SetTuple1 (fragId, fragVolume->GetTuple1 (fragId) + volArray->GetTuple1 (c) * cellVol / 255.0);
         fragMass->SetTuple1 (fragId, fragMass->GetTuple1 (fragId) + massArray->GetTuple1 (c));
         }
       }
