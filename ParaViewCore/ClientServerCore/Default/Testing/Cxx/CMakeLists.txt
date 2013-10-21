@@ -16,13 +16,13 @@ vtk_module_test_executable(TestSystemCaps TestSystemCaps.cxx)
 add_test(NAME TestSystemCaps COMMAND TestSystemCaps)
 
 if (PARAVIEW_USE_MPI)
-  set_source_files_properties(TestSystemCaps
-    PROPERTIES COMPILE_DEFINITIONS TEST_MPI_CAPS)
+  set_property(SOURCE TestSystemCaps.cxx
+    APPEND PROPERTY COMPILE_DEFINITIONS TEST_MPI_CAPS)
   vtk_mpi_link(TestSystemCaps)
 endif()
 if (PARAVIEW_ENABLE_PYTHON)
-  set_source_files_properties(TestSystemCaps
-    PROPERTIES COMPILE_DEFINITIONS TEST_PY_CAPS)
+  set_property(SOURCE TestSystemCaps.cxx
+    APPEND PROPERTY COMPILE_DEFINITIONS TEST_PY_CAPS)
 endif()
 
 set_tests_properties(
