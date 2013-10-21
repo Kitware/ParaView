@@ -32,6 +32,7 @@ set(Module_SRCS
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
+  vtkAMRFragmentIntegration.cxx
   vtkAMRFileSeriesReader.cxx
   vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx
@@ -86,6 +87,7 @@ set(Module_SRCS
   vtkPSciVizPCAStats.cxx
   vtkPVAMRDualClip.cxx
   vtkPVAMRDualContour.cxx
+  vtkPVAMRFragmentIntegration.cxx
   vtkPVArrayCalculator.cxx
   vtkPVBox.cxx
   vtkPVClipClosedSurface.cxx
