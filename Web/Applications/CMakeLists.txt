@@ -12,13 +12,14 @@ set (WEB_APPLICATIONS
   ParallelViz
 )
 
-if (BUILD_TESTING)
-  list(APPEND WEB_APPLICATIONS TestApp)
-endif()
-
 # Create paraview/web directory
 get_property(pv_pymodule_build_dir GLOBAL PROPERTY PV_PYMODULE_BUILD_DIR)
 file(MAKE_DIRECTORY "${pv_pymodule_build_dir}/paraview/web")
+
+if (BUILD_TESTING)
+  list(APPEND WEB_APPLICATIONS TestApp)
+  file(MAKE_DIRECTORY "${pv_pymodule_build_dir}/paraview/web/test")
+endif()
 
 set (WEB_APPS_DEPENDS)
 
@@ -43,8 +44,6 @@ foreach (_app ${WEB_APPLICATIONS})
     "${CMAKE_CURRENT_BINARY_DIR}/www-${_app}-complete")
 
   if (BUILD_TESTING)
-    file(MAKE_DIRECTORY "${pv_pymodule_build_dir}/paraview/web/test")
-
     copy_files_recursive(${Apps_SOURCE_DIR}/${_app}/test
       DESTINATION "${pv_pymodule_build_dir}/paraview/web/test"
       OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test-${_app}-complete"
