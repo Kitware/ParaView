@@ -21,13 +21,18 @@
 
 #include "vtkCellData.h"
 #include "vtkCell.h"
+#include "vtkCommunicator.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
+#include "vtkIdTypeArray.h"
+#include "vtkKdTreePointLocator.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkPointData.h"
+#include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
 
@@ -96,21 +101,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
                                   const char* volumeName,
                                   const char* massName)
 {
-  vtkTable* fragments = vtkTable::New ();
-
-  vtkDoubleArray* fragVolume = vtkDoubleArray::New ();
-  fragVolume->SetName ("Fragment Volume");
-  fragVolume->SetNumberOfComponents (1);
-  fragVolume->SetNumberOfTuples (0);
-  fragments->AddColumn (fragVolume);
-  fragVolume->Delete ();
-
-  vtkDoubleArray* fragMass = vtkDoubleArray::New ();
-  fragMass->SetName ("Fragment Mass");
-  fragMass->SetNumberOfComponents (1);
-  fragMass->SetNumberOfTuples (0);
-  fragments->AddColumn (fragMass);
-  fragMass->Delete ();
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
 
   vtkDataArray* regionId = contour->GetPointData ()->GetArray ("RegionId");
   if (!regionId) 
@@ -118,9 +109,48 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     vtkErrorMacro ("No RegionID in contour.  Run Connectivity filter.");
     return 0;
     }
+  vtkIdType maxRegion = 0;
+  for (int i = 0; i < regionId->GetNumberOfTuples (); i ++)
+    {
+    vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (i));
+    if (fragId > maxRegion)
+      {
+      maxRegion = fragId;
+      }
+    }
+
+  if (controller != 0)
+    {
+    controller->AllReduce (&maxRegion, &maxRegion, 1, vtkCommunicator::MAX_OP);
+    }
+
+  vtkTable* fragments = vtkTable::New ();
+
+  vtkIdTypeArray* fragIdArray = vtkIdTypeArray::New ();
+  fragIdArray->SetName ("Fragment ID");
+  fragIdArray->SetNumberOfComponents (1);
+  fragIdArray->SetNumberOfTuples (maxRegion + 1);
+  fragments->AddColumn (fragIdArray);
+  fragIdArray->Delete ();
+
+  vtkDoubleArray* fragVolume = vtkDoubleArray::New ();
+  fragVolume->SetName ("Fragment Volume");
+  fragVolume->SetNumberOfComponents (1);
+  fragVolume->SetNumberOfTuples (maxRegion + 1);
+  fragments->AddColumn (fragVolume);
+  fragVolume->Delete ();
+
+  vtkDoubleArray* fragMass = vtkDoubleArray::New ();
+  fragMass->SetName ("Fragment Mass");
+  fragMass->SetNumberOfComponents (1);
+  fragMass->SetNumberOfTuples (maxRegion + 1);
+  fragments->AddColumn (fragMass);
+  fragMass->Delete ();
+
+  vtkSmartPointer<vtkKdTreePointLocator> locator = vtkKdTreePointLocator::New ();
+  locator->SetDataSet (contour);
 
   vtkCompositeDataIterator* iter = volume->NewIterator ();
-
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
     vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
@@ -154,6 +184,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       if (volArray->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
         {
         double* bounds = grid->GetCell (c)->GetBounds ();
+        double lower[3] = { bounds[0], bounds[2], bounds[4] };
         
         // This is the critical piece.
         // Because we've run the contour and we're operating this function on 
@@ -162,17 +193,20 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
         // nearest fragment contour to this cell and get its region ID.  This
         // tells us the regionID for this cell as computed by the AMRDualContour 
         // and Connectivity filters.
-        vtkIdType pointId = contour->FindPoint (bounds[0], bounds[2], bounds[4]);
+        vtkIdType pointId = locator->FindClosestPoint (lower);
         vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (pointId));
 
-        while (fragments->GetNumberOfRows () <= fragId) 
-          {
-          fragments->InsertNextBlankRow ();
-          }
+        fragIdArray->SetTuple1 (fragId, fragId);
         fragVolume->SetTuple1 (fragId, fragVolume->GetTuple1 (fragId) + volArray->GetTuple1 (c) * cellVol / 255.0);
         fragMass->SetTuple1 (fragId, fragMass->GetTuple1 (fragId) + massArray->GetTuple1 (c));
         }
       }
+    }
+
+  if (controller != 0)
+    {
+    controller->Reduce (fragVolume, fragVolume, vtkCommunicator::SUM_OP, 0);
+    controller->Reduce (fragMass, fragMass, vtkCommunicator::SUM_OP, 0);
     }
 
   return fragments;

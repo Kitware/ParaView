@@ -44,10 +44,10 @@ protected:
   vtkAMRFragmentIntegration();
   virtual ~vtkAMRFragmentIntegration();
 
+  //BTX
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
 
-  //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   // Description:
