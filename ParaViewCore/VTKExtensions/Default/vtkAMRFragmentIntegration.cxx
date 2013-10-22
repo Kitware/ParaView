@@ -205,8 +205,36 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
 
   if (controller != 0)
     {
-    controller->Reduce (fragVolume, fragVolume, vtkCommunicator::SUM_OP, 0);
-    controller->Reduce (fragMass, fragMass, vtkCommunicator::SUM_OP, 0);
+    int myProc = controller->GetLocalProcessId ();
+
+    vtkDoubleArray *copyFragVolume;
+    vtkDoubleArray *copyFragMass;
+    if (myProc == 0)
+      {
+      copyFragVolume = vtkDoubleArray::New ();
+      copyFragVolume->DeepCopy (fragVolume);
+      copyFragMass = vtkDoubleArray::New ();
+      copyFragMass->DeepCopy (fragMass);
+      }
+    else
+      {
+      copyFragVolume = fragVolume;
+      copyFragMass = fragMass;
+      }
+    
+    controller->Reduce (copyFragVolume, fragVolume, vtkCommunicator::SUM_OP, 0);
+    controller->Reduce (copyFragMass, fragMass, vtkCommunicator::SUM_OP, 0);
+
+    if (myProc == 0)
+      {
+      copyFragVolume->Delete ();
+      copyFragMass->Delete ();
+      }
+    else 
+      {
+      // it's all on process 0 now.
+      fragments->SetNumberOfRows (0);
+      }
     }
 
   return fragments;
