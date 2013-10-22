@@ -38,6 +38,7 @@
              The value of this property contains the name of the array to
              transform through the transfer function.
            </Documentation>
+           <Hints> <NoDefault /> </Hints>
       </StringVectorProperty>
 
       <IntVectorProperty name="OpacityTransferFunctionEnabled"
@@ -60,6 +61,7 @@
              The value of this property contains the name of the array to
              transform through the transfer function.
            </Documentation>
+           <Hints> <NoDefault /> </Hints>
       </StringVectorProperty>
 
       <IntVectorProperty name="RenderMode"
@@ -248,6 +250,7 @@
          name="PointSpriteDefaultsInitialized"
          number_of_elements="1"
          default_values="0">
+         <Hints><NoDefault /></Hints>
       </IntVectorProperty>
 
       <!-- End of PointSpriteRepresentation -->
