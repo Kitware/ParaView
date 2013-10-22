@@ -168,13 +168,15 @@
                             default_values="0.5 0.5 0.5"
                             label="Center"
                             name="Center"
-                            number_of_elements="3"></DoubleVectorProperty>
+                            number_of_elements="3"
+                            panel_visibility="never"></DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetNormal"
                             default_values="0 0 1"
                             label="Normal"
                             name="Normal"
-                            number_of_elements="3"></DoubleVectorProperty>
+                            number_of_elements="3"
+                            panel_visibility="never"></DoubleVectorProperty>
       <Hints>
         <PropertyGroup label="Slice Widget"
                        type="Plane">
@@ -1631,7 +1633,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0 0 0"
                             label="Low Point"
                             name="LowPoint"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="never">
         <BoundsDomain default_mode="min"
                       mode="normal"
                       name="range">
@@ -1648,7 +1651,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0 0 1"
                             label="High Point"
                             name="HighPoint"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="never">
         <BoundsDomain default_mode="max"
                       mode="normal"
                       name="range">
@@ -1661,7 +1665,7 @@ found and the point will be rejected.</Documentation>
         vector (large scalar values).</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <PropertyGroup label="Elevation Widget"
+        <PropertyGroup label="Elevation"
                        type="Line">
           <Property function="Point1WorldPosition"
                     name="LowPoint" />
