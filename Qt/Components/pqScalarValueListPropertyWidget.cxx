@@ -105,11 +105,11 @@ public:
     return QVariant();
     }
 
-  virtual bool setData(const QModelIndex &idx, const QVariant &value,
+  virtual bool setData(const QModelIndex &idx, const QVariant &aValue,
     int role=Qt::EditRole)
     {
     Q_UNUSED(role);
-    if (!value.toString().isEmpty())
+    if (!aValue.toString().isEmpty())
       {
       int offset = this->computeOffset(idx);
       if (offset >= this->Values.size())
@@ -119,9 +119,9 @@ public:
         // column value.
         this->Values.resize(offset+1);
         }
-      if (this->Values[offset] != value)
+      if (this->Values[offset] != aValue)
         {
-        this->Values[offset] = value;
+        this->Values[offset] = aValue;
         emit this->dataChanged(idx, idx);
         }
       }

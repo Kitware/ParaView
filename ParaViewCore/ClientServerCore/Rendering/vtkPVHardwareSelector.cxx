@@ -28,7 +28,9 @@ public:
   PropMapType PropMap;
 };
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVHardwareSelector);
+
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::vtkPVHardwareSelector()
 {

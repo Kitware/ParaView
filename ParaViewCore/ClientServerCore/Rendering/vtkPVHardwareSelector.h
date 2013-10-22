@@ -25,16 +25,16 @@
 #ifndef __vtkPVHardwareSelector_h
 #define __vtkPVHardwareSelector_h
 
-#include "vtkHardwareSelector.h"
+#include "vtkOpenGLHardwareSelector.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkPVSynchronizedRenderWindows;
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHardwareSelector : public vtkOpenGLHardwareSelector
 {
 public:
   static vtkPVHardwareSelector* New();
-  vtkTypeMacro(vtkPVHardwareSelector, vtkHardwareSelector);
+  vtkTypeMacro(vtkPVHardwareSelector, vtkOpenGLHardwareSelector);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -891,8 +891,8 @@ void pqMultiBlockInspectorPanel::currentSelectionChanged(pqOutputPort *port)
   foreach(QTreeWidgetItem *item,
           this->TreeWidget->findItems("", Qt::MatchContains | Qt::MatchRecursive))
     {
-    unsigned int flatIndex =
-      item->data(0, Qt::UserRole).value<unsigned int>();
+    vtkIdType flatIndex =
+      item->data(0, Qt::UserRole).value<vtkIdType>();
 
     item->setSelected(
       std::binary_search(block_ids.begin(), block_ids.end(), flatIndex));
