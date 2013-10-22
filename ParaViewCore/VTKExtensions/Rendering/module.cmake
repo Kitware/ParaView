@@ -21,6 +21,8 @@ vtk_module(vtkPVVTKExtensionsRendering
   GROUPS
     Qt
     ParaViewRendering
+  PRIVATE_DEPENDS
+    vtkCommonColor
   DEPENDS
     vtkChartsCore
     vtkFiltersExtraction
