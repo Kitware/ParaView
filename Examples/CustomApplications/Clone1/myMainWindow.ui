@@ -131,15 +131,6 @@
    </attribute>
    <widget class="pqPVAnimationWidget" name="animationView"/>
   </widget>
-  <widget class="QDockWidget" name="selectionInspectorDock">
-   <property name="windowTitle">
-    <string>Selection Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="pqSelectionInspectorWidget" name="selectionInspector"/>
-  </widget>
   <widget class="QDockWidget" name="comparativePanelDock">
    <property name="windowTitle">
     <string>Comparative View Inspector</string>
@@ -161,12 +152,6 @@
    <class>pqViewManager</class>
    <extends>QWidget</extends>
    <header>pqViewManager.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqSelectionInspectorWidget</class>
-   <extends>QWidget</extends>
-   <header>pqSelectionInspectorWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

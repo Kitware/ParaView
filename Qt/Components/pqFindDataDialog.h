@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSelectionInspectorWidget.cxx
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,19 +29,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqSelectionInspectorWidget.h"
+#ifndef __pqFindDataDialog_h
+#define __pqFindDataDialog_h
 
-#include "pqPVApplicationCore.h"
-#include "pqActiveObjects.h"
+#include <QDialog>
+#include "pqComponentsModule.h"
 
-//-----------------------------------------------------------------------------
-pqSelectionInspectorWidget::pqSelectionInspectorWidget(
-  QWidget* parentObject) :Superclass(parentObject)
+class pqOutputPort;
+
+/// pqFindDataDialog encapsulates the logic for the "Find Data" dialog in
+/// ParaView. This class puts together components provided by other
+/// classes e.g. pqFindDataCreateSelectionFrame and
+/// pqFindDataCurrentSelectionFrame. 
+class PQCOMPONENTS_EXPORT pqFindDataDialog : public QDialog
 {
-  this->setSelectionManager(
-    pqPVApplicationCore::instance()->selectionManager());
-  QObject::connect( &pqActiveObjects::instance(),
-                    SIGNAL(serverChanged(pqServer*)),
-                    this, SLOT(setServer(pqServer*)));
-}
+  Q_OBJECT
+  typedef QDialog Superclass;
+public:
+  pqFindDataDialog(QWidget* parent=0, Qt::WindowFlags flags=0);
+  virtual ~pqFindDataDialog();
 
+signals:
+  /// triggered to request help about the pqFindDataDialog.
+  void helpRequested();
+
+private slots:
+  /// called when pqFindDataCurrentSelectionFrame notifies the dialog that it's
+  /// showing a new selection. We update the UI accordingly.
+  void showing(pqOutputPort*);
+
+  void freezeSelection();
+  void extractSelection();
+  void extractSelectionOverTime();
+
+private:
+  Q_DISABLE_COPY(pqFindDataDialog)
+
+  class pqInternals;
+  pqInternals* Internals;
+  friend class pqInternals;
+};
+
+#endif

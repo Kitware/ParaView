@@ -38,27 +38,53 @@ class pqProxyWidgetDialog::pqInternals
 {
 public:
   Ui::ProxyWidgetDialog Ui;
+
+  pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self, 
+    const QStringList& properties = QStringList())
+    {
+    Q_ASSERT(proxy != NULL);
+
+    Ui::ProxyWidgetDialog& ui = this->Ui;
+    ui.setupUi(self);
+
+    QObject::connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)),
+      self, SLOT(buttonClicked(QAbstractButton*)));
+
+    QWidget *container = new QWidget(self);
+    container->setObjectName("Container");
+    QVBoxLayout* vbox = new QVBoxLayout(container);
+    vbox->setMargin(0);
+    vbox->setSpacing(0);
+
+    pqProxyWidget *widget = properties.size() > 0?
+      new pqProxyWidget(proxy, properties, container):
+      new pqProxyWidget(proxy, container);
+    widget->setObjectName("ProxyWidget");
+    vbox->addWidget(widget);
+
+    QSpacerItem* spacer = new QSpacerItem(0, 0,QSizePolicy::Fixed,
+      QSizePolicy::MinimumExpanding);
+    vbox->addItem(spacer);
+
+    ui.scrollArea->setWidget(container);
+    widget->filterWidgets(true);
+    QObject::connect(self, SIGNAL(accepted()), widget, SLOT(apply()));
+    }
 };
 
 //-----------------------------------------------------------------------------
 pqProxyWidgetDialog::pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parentObject)
   : Superclass(parentObject),
-  Internals(new pqProxyWidgetDialog::pqInternals())
+  Internals(new pqProxyWidgetDialog::pqInternals(proxy, this))
 {
-  Q_ASSERT(proxy != NULL);
+}
 
-  Ui::ProxyWidgetDialog& ui = this->Internals->Ui;
-  ui.setupUi(this);
-
-  QObject::connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)),
-    this, SLOT(buttonClicked(QAbstractButton*)));
-  
-  pqProxyWidget *widget = new pqProxyWidget(proxy, this);
-  ui.scrollArea->setWidget(widget);
-  widget->setObjectName("ProxyWidget");
-  widget->filterWidgets(true);
-
-  QObject::connect(this, SIGNAL(accepted()), widget, SLOT(apply()));
+//-----------------------------------------------------------------------------
+pqProxyWidgetDialog::pqProxyWidgetDialog(vtkSMProxy* proxy,
+  const QStringList& properties, QWidget* parentObject)
+  : Superclass(parentObject),
+  Internals(new pqProxyWidgetDialog::pqInternals(proxy, this, properties))
+{
 }
 
 //-----------------------------------------------------------------------------

@@ -55,7 +55,6 @@ myMainWindow::myMainWindow()
 
   this->Internals->animationViewDock->hide();
   this->Internals->statisticsDock->hide();
-  this->Internals->selectionInspectorDock->hide();
   this->Internals->comparativePanelDock->hide();
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);

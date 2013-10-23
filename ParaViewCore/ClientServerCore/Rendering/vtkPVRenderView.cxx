@@ -429,6 +429,18 @@ void vtkPVRenderView::UnRegisterPropForHardwareSelection(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::AddPropToRenderer(vtkProp* prop)
+{
+  this->GetRenderer()->AddViewProp(prop);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RemovePropFromRenderer(vtkProp* prop)
+{
+  this->GetRenderer()->RemoveViewProp(prop);
+}
+
+//----------------------------------------------------------------------------
 vtkRenderer* vtkPVRenderView::GetRenderer()
 {
   return this->RenderView->GetRenderer();
