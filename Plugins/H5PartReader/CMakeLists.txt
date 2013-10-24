@@ -6,7 +6,10 @@ IF (QT_USE_FILE)
   INCLUDE(${QT_USE_FILE})
 ENDIF (QT_USE_FILE)
 
-INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIR}
+vtk_module_load(vtkhdf5)
+
+INCLUDE_DIRECTORIES(
+  ${vtkhdf5_INCLUDE_DIRS}
   ${VTK_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/H5Part/src
   )
@@ -34,7 +37,9 @@ ADD_PARAVIEW_PLUGIN(H5PartReader "1.0"
   REQUIRED_ON_SERVER
 )
 
-target_link_libraries(H5PartReader LINK_PRIVATE vtksys vtkhdf5)
+target_link_libraries(H5PartReader LINK_PRIVATE
+  ${vtkhdf5_LIBRARIES}
+  vtksys)
 
 if(PARAVIEW_USE_MPI)
   include(vtkMPI)
