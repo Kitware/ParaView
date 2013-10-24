@@ -2,5 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 include(CTest)
 enable_testing()
 
-add_test(NAME wavelet
-  COMMAND ${PVPYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/wavelet.py)
+find_package(ParaView REQUIRED)
+include("${PARAVIEW_USE_FILE}")
+include_directories(${PARAVIEW_INCLUDE_DIRS})
+
+file(GLOB dirs */)
+
+foreach (dir ${dirs})
+  if (IS_DIRECTORY "${dir}")
+    add_subdirectory("${dir}")
+  endif ()
+endforeach ()

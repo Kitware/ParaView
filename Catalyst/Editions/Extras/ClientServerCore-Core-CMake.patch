@@ -1,0 +1,12 @@
+diff --git a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt
+index 4f283bd..f05aa2b 100644
+--- a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt
++++ b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt
+@@ -47,6 +47,7 @@ set (Module_SRCS
+   vtkPVDataSizeInformation.cxx
+   vtkPVDisableStackTraceSignalHandler.cxx
+   vtkPVEnableStackTraceSignalHandler.cxx
++  vtkPVExtractSelection.cxx
+   vtkPVGenericAttributeInformation.cxx
+   vtkPVInformation.cxx
+   vtkPVMemoryUseInformation.cxx

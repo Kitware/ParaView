@@ -6,4 +6,4 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
-vtk_module_library(vtkFiltersCore ${Module_SRCS})
+vtk_module_library(vtkFiltersExtraction ${Module_SRCS})

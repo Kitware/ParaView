@@ -1,388 +1,93 @@
 {
   "cmake":{
     "cache":[
-      {
-        "name":"CMAKE_BUILD_TYPE",
+      { "name":"CMAKE_BUILD_TYPE",
         "type":"STRING",
         "value":"Release"
       },
-      {
-        "name":"BUILD_TESTING",
+      { "name":"BUILD_TESTING",
         "type":"BOOL",
         "value":"OFF"
       },
-      {
-        "name":"PARAVIEW_BUILD_QT_GUI",
+      { "name":"PARAVIEW_BUILD_QT_GUI",
         "type":"BOOL",
         "value":"OFF"
       },
-      {
-        "name":"PARAVIEW_ENABLE_PYTHON",
-        "type":"BOOL",
-        "value":"ON"
-      },
-      {
-        "name":"PARAVIEW_USE_MPI",
-        "type":"BOOL",
-        "value":"ON"
-      },
-      {
-        "name":"PARAVIEW_USE_ICE_T",
-        "type":"BOOL",
-        "value":"ON"
-      },
-      {
-        "name":"PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED",
+      { "name":"PARAVIEW_ENABLE_PYTHON",
         "type":"BOOL",
         "value":"OFF"
       },
-      {
-        "name":"Module_vtkFiltersSources",
+      { "name":"PARAVIEW_USE_MPI",
         "type":"BOOL",
         "value":"ON"
       },
-      {
-        "name":"Module_vtkPVVTKExtensionsDefault",
+      { "name":"PARAVIEW_USE_ICE_T",
         "type":"BOOL",
         "value":"ON"
       },
-      {
-        "name":"Module_vtkImagingCore",
+      { "name":"PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED",
         "type":"BOOL",
-        "value":"ON"
-      },
-      {
-        "name":"Module_vtkIOXML",
-        "type":"BOOL",
-        "value":"ON"
-      },
-      {
-        "name": "Module_vtkUtilitiesEncodeString",
-        "type": "BOOL",
-        "value": "ON"
+        "value":"OFF"
       }
     ]
   },
   "modules":[
     {
-      "name":"vtkPVCatalyst",
+      "path":"Utilities",
+      "exclude":[
+        { "path":"WrapClientServer" },
+        { "path":"VisItBridge" },
+        { "path":"ColorSeriesToXML" }
+      ]
+    },
+    { "name":"vtkPVCatalyst",
       "path":"CoProcessing/Catalyst",
       "pythonwrap":true,
       "exclude": [
-        {
-          "path":"Testing"
-        }
+        { "path":"Testing" }
       ],
       "replace":[
-        {
-          "path":"CoProcessing/Catalyst/module.cmake"
-        }
+        { "path":"CoProcessing/Catalyst/module.cmake" }
       ]
     },
-    {
-      "name":"vtkPVPythonCatalyst",
-      "path":"CoProcessing/PythonCatalyst",
-      "pythonwrap":true,
-      "exclude": [
-        {
-          "path":"Testing"
-        }
-      ]
-    },
-    {
-      "name":"vtkUtilitiesWrapClientServer",
-      "path":"Utilities/WrapClientServer"
-    },
-    {
-      "name":"vtkUtilitiesProcessXML",
-      "path":"Utilities/ProcessXML"
-    },
-    {
-      "name":"vtkUtilitiesTestDriver",
-      "path":"Utilities/TestDriver"
-    },
-    {
-      "name":"vtkPVServerImplementationCore",
-      "path":"ParaViewCore/ServerImplementation/Core",
-      "cswrap":true,
-      "pythonwrap":true
-    },
-    {
-      "name":"vtkClientServer",
-      "path":"ParaViewCore/ClientServerStream",
+    { "name":"vtkCommonCore",
+      "path":"VTK/Common/Core",
       "exclude":[
-        {
-          "path":"Testing"
-        }
-      ]
-    },
-    {
-      "name":"vtkPVClientServerCoreCore",
-      "path":"ParaViewCore/ClientServerCore/Core",
-      "exclude": [
-          { "path": "vtkPConvertSelection*"
-          },
-          { "path": "vtkPVExtractSelection*"
-          },
-          { "path": "vtkPVExtractArraysOverTime*"
-          }
-
-      ],
-      "patch":[
-"diff --git a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
-"index 4f283bd..f05aa2b 100644",
-"--- a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
-"+++ b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
-"@@ -34,7 +34,6 @@ set (Module_SRCS",
-"   vtkMPIMToNSocketConnection.cxx",
-"   vtkMPIMToNSocketConnectionPortInformation.cxx",
-"   vtkNetworkAccessManager.cxx",
-"-  vtkPConvertSelection.cxx",
-"   vtkProcessModuleAutoMPI.cxx",
-"   vtkProcessModule.cxx",
-"   vtkPVAlgorithmPortsInformation.cxx",
-"@@ -48,8 +47,6 @@ set (Module_SRCS",
-"   vtkPVDataSizeInformation.cxx",
-"   vtkPVDisableStackTraceSignalHandler.cxx",
-"   vtkPVEnableStackTraceSignalHandler.cxx",
-"-  vtkPVExtractSelection.cxx",
-"-  vtkPVExtractArraysOverTime.cxx",
-"   vtkPVGenericAttributeInformation.cxx",
-"   vtkPVInformation.cxx",
-"   vtkPVMemoryUseInformation.cxx",
-"diff --git a/ParaViewCore/ClientServerCore/Core/module.cmake b/ParaViewCore/ClientServerCore/Core/module.cmake",
-"index f17c4df..f0db074 100644",
-"--- a/ParaViewCore/ClientServerCore/Core/module.cmake",
-"+++ b/ParaViewCore/ClientServerCore/Core/module.cmake",
-"@@ -18,7 +18,6 @@ vtk_module(vtkPVClientServerCoreCore",
-"     ParaViewCore",
-"   DEPENDS",
-"     vtkFiltersExtraction",
-"-    vtkFiltersParallel",
-"     # Explicitely list (rather than transiently through",
-"     # vtkPVVTKExtensionsCore) because it allows us to turn of wrapping",
-"     # of vtkPVVTKExtensionsCore off but still satisfy API dependcy."
+        { "path":"Testing" }
       ],
       "cswrap":true,
       "pythonwrap":true
     },
-    {
-      "name":"vtkPVServerManagerCore",
+    { "name":"vtkUtilitiesKWSys",
+      "path":"VTK/Utilities/KWSys"
+    },
+    { "name":"vtkPVServerManagerCore",
       "path":"ParaViewCore/ServerManager/Core",
       "cswrap":true,
       "pythonwrap":true
     },
-    {
-      "name":"vtkPVServerManagerApplication",
-      "path":"ParaViewCore/ServerManager/SMApplication"
-    },
-    {
-      "name":"vtkPVVTKExtensionsCore",
-      "path":"ParaViewCore/VTKExtensions/Core",
+    { "name":"vtkPVServerImplementationCore",
+      "path":"ParaViewCore/ServerImplementation/Core",
       "cswrap":true,
       "pythonwrap":true
     },
-    {
-      "name":"vtkPVVTKExtensionsDefault",
-      "path":"ParaViewCore/VTKExtensions/Default",
-      "include":[
-        {
-          "path":"vtkFileSeriesWriter.cxx"
-        },
-        {
-          "path":"vtkFileSeriesWriter.h"
-        }
+    { "name":"vtkPVClientServerCoreCore",
+      "path":"ParaViewCore/ClientServerCore/Core",
+      "exclude": [
+          { "path": "vtkPConvertSelection*" },
+          { "path": "vtkPVExtractSelection*" },
+          { "path": "vtkPVExtractArraysOverTime*" }
       ],
-      "replace":[
-        {
-          "path":"ParaViewCore/VTKExtensions/Default/module.cmake"
-        },
-        {
-          "path":"ParaViewCore/VTKExtensions/Default/CMakeLists.txt"
-        },
-        {
-          "path":"ParaViewCore/VTKExtensions/Default/hints"
-        }
-      ],
-      "cswrap":true
-    },
-    {
-      "name":"vtkPVCommon",
-      "path":"ParaViewCore/Common",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ],
-      "pythonwrap":true
-    },
-    {
-      "name":"vtkicet",
-      "path":"ThirdParty/IceT"
-    },
-    {
-      "name":"vtkprotobuf",
-      "path":"ThirdParty/protobuf"
-    },
-    {
-      "name":"vtkmpi4py",
-      "path":"ThirdParty/mpi4py"
-    },
-    {
-      "name":"vtkqttesting",
-      "path":"ThirdParty/QtTesting"
-    },
-    {
-      "name":"vtkWrappingTools",
-      "path":"VTK/Wrapping/Tools"
-    },
-    {
-      "name":"vtkParallelCore",
-      "path":"VTK/Parallel/Core",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ],
-      "pythonwrap":true
-    },
-    {
-      "name":"vtkParallelMPI",
-      "path":"VTK/Parallel/MPI",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ]
-    },
-    {
-      "name":"vtkCommonTransforms",
-      "path":"VTK/Common/Transforms",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ],
-      "pythonwrap":true
-    },
-    {
-      "name":"vtkCommonCore",
-      "path":"VTK/Common/Core",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
+      "patches": [
+          { "path": "ClientServerCore-Core-CMake.patch" }
       ],
       "cswrap":true,
       "pythonwrap":true
     },
-    {
-      "name":"vtkCommonComputationalGeometry",
-      "path":"VTK/Common/ComputationalGeometry",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ]
-    },
-    {
-      "name":"vtkCommonExecutionModel",
-      "path":"VTK/Common/ExecutionModel",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ],
-      "cswrap":true,
-      "pythonwrap":true
-    },
-    {
-      "name":"vtkCommonDataModel",
-      "path":"VTK/Common/DataModel",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ],
-      "cswrap":true,
-      "pythonwrap":true
-    },
-    {
-      "name":"vtkCommonMath",
-      "path":"VTK/Common/Math",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ],
-      "pythonwrap":true
-    },
-    {
-      "name":"vtkCommonSystem",
-      "path":"VTK/Common/System",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ]
-    },
-    {
-      "name":"vtkCommonMisc",
-      "path":"VTK/Common/Misc",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ]
-    },
-    {
-      "name":"vtkUtilitiesHashSource",
-      "path":"VTK/Utilities/HashSource"
-    },
-    {
-      "name":"vtkUtilitiesEncodeString",
-      "path":"VTK/Utilities/EncodeString"
-    },
-    {
-      "name":"vtkUtilitiesKWSys",
-      "path":"VTK/Utilities/KWSys"
-    },
-    {
-      "name":"vtkThirdPartyzlib",
-      "path":"VTK/ThirdParty/zlib"
-    },
-    {
-      "name":"vtkThirdPartyexpat",
-      "path":"VTK/ThirdParty/expat"
-    },
-    {
-      "name":"vtkFiltersExtraction",
+    { "name":"vtkFiltersExtraction",
       "path":"VTK/Filters/Extraction",
-      "patch": [
-          "diff --git a/Filters/Extraction/CMakeLists.txt b/Filters/Extraction/CMakeLists.txt",
-"index 359b4e7..65de7c9 100644",
-"--- a/Filters/Extraction/CMakeLists.txt",
-"+++ b/Filters/Extraction/CMakeLists.txt",
-"@@ -1,6 +1,5 @@",
-" set(Module_SRCS",
-"   vtkConvertSelection.cxx",
-"-  vtkExtractArraysOverTime.cxx",
-"   vtkExtractBlock.cxx",
-"   vtkExtractCells.cxx",
-"   vtkExtractDataOverTime.cxx",
-"diff --git a/Filters/Extraction/module.cmake b/Filters/Extraction/module.cmake",
-"index c578b62..e979d69 100644",
-"--- a/Filters/Extraction/module.cmake",
-"+++ b/Filters/Extraction/module.cmake",
-"@@ -4,8 +4,6 @@ vtk_module(vtkFiltersExtraction",
-"   DEPENDS",
-"     vtkCommonExecutionModel",
-"     vtkFiltersCore",
-"-    vtkFiltersGeneral",
-"-    vtkFiltersStatistics",
-"   TEST_DEPENDS",
-"     vtkIOLegacy",
-"     vtkIOXML"
+      "patches": [
+          { "path": "VTK-Filters-Extraction-CMake.patch" }
       ],
       "exclude":[
         {
@@ -391,517 +96,173 @@
         {"path": "vtkExtractArraysOverTime*"  }
       ]
     },
-    {
-      "name":"vtkFiltersProgrammable",
-      "path":"VTK/Filters/Programmable",
+    { "name":"vtkCommonExecutionModel",
+      "path":"VTK/Common/ExecutionModel",
       "exclude":[
-        {
-          "path":"Testing"
-        }
+        { "path":"Testing" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkCommonDataModel",
+      "path":"VTK/Common/DataModel",
+      "exclude":[
+        { "path":"Testing" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkCommonMath",
+      "path":"VTK/Common/Math",
+      "exclude":[
+        { "path":"Testing" }
       ],
       "pythonwrap":true
     },
-    {
-      "name":"vtkFiltersCore",
+    { "name":"vtkCommonMisc",
+      "path":"VTK/Common/Misc",
+      "exclude":[
+        { "path":"Testing" }
+      ]
+    },
+    { "name":"vtkCommonSystem",
+      "path":"VTK/Common/System",
+      "exclude":[
+        { "path":"Testing" }
+      ]
+    },
+    { "name":"vtkCommonTransforms",
+      "path":"VTK/Common/Transforms",
+      "exclude":[
+        { "path":"Testing" }
+      ],
+      "pythonwrap":true
+    },
+    { "name":"vtkFiltersCore",
       "path":"VTK/Filters/Core",
       "include":[
-        {
-          "path":"module.cmake"
-        },
-        {
-          "path":"vtkCellDataToPointData.cxx"
-        },
-        {
-          "path":"vtkCellDataToPointData.h"
-        },
-        {
-          "path":"vtkContourFilter.cxx"
-        },
-        {
-          "path":"vtkContourFilter.h"
-        },
-        {
-          "path":"vtkContourGrid.cxx"
-        },
-        {
-          "path":"vtkContourGrid.h"
-        },
-        {
-          "path":"vtkContourHelper.cxx"
-        },
-        {
-          "path":"vtkContourHelper.h"
-        },
-        {
-          "path":"vtkCutter.cxx"
-        },
-        {
-          "path":"vtkCutter.h"
-        },
-        {
-          "path":"vtkExecutionTimer.cxx"
-        },
-        {
-          "path":"vtkExecutionTimer.h"
-        },
-        {
-          "path":"vtkFeatureEdges.cxx"
-        },
-        {
-          "path":"vtkFeatureEdges.h"
-        },
-        {
-          "path":"vtkGridSynchronizedTemplates3D.cxx"
-        },
-        {
-          "path":"vtkGridSynchronizedTemplates3D.h"
-        },
-        {
-          "path":"vtkMarchingCubes.cxx"
-        },
-        {
-          "path":"vtkMarchingCubes.h"
-        },
-        {
-          "path":"vtkMarchingSquares.cxx"
-        },
-        {
-          "path":"vtkMarchingSquares.h"
-        },
-        {
-          "path":"vtkPointDataToCellData.cxx"
-        },
-        {
-          "path":"vtkPointDataToCellData.h"
-        },
-        {
-          "path":"vtkPolyDataNormals.cxx"
-        },
-        {
-          "path":"vtkPolyDataNormals.h"
-        },
-        {
-          "path":"vtkProbeFilter.cxx"
-        },
-        {
-          "path":"vtkProbeFilter.h"
-        },
-        {
-          "path":"vtkQuadricClustering.cxx"
-        },
-        {
-          "path":"vtkQuadricClustering.h"
-        },
-        {
-          "path":"vtkRectilinearSynchronizedTemplates.cxx"
-        },
-        {
-          "path":"vtkRectilinearSynchronizedTemplates.h"
-        },
-        {
-          "path":"vtkSynchronizedTemplates2D.cxx"
-        },
-        {
-          "path":"vtkSynchronizedTemplates2D.h"
-        },
-        {
-          "path":"vtkSynchronizedTemplates3D.cxx"
-        },
-        {
-          "path":"vtkSynchronizedTemplates3D.h"
-        },
-        {
-          "path":"vtkSynchronizedTemplatesCutter3D.cxx"
-        },
-        {
-          "path":"vtkSynchronizedTemplatesCutter3D.h"
-        },
-        {
-          "path":"vtkThreshold.cxx"
-        },
-        {
-          "path":"vtkThreshold.h"
-        }
-        ,
-        {
-          "path":"vtkAppendCompositeDataLeaves.h"
-        }
-        ,
-        {
-          "path":"vtkAppendCompositeDataLeaves.cxx"
-        },
-        {
-          "path":"vtkAppendFilter.h"
-        }
-        ,
-        {
-          "path":"vtkAppendFilter.cxx"
-        },
-        {
-          "path":"vtkAppendPolyData.h"
-        }
-        ,
-        {
-          "path":"vtkAppendPolyData.cxx"
-        },
-        {
-          "path":"vtkImageAppend.h"
-        }
-        ,
-        {
-          "path":"vtkImageAppend.cxx"
-        }
+        { "path":"module.cmake" },
+        { "path":"vtkAppendCompositeDataLeaves.h" },
+        { "path":"vtkAppendCompositeDataLeaves.cxx" },
+        { "path":"vtkAppendFilter.h" },
+        { "path":"vtkAppendFilter.cxx" },
+        { "path":"vtkAppendPolyData.h" },
+        { "path":"vtkAppendPolyData.cxx" },
+        { "path":"vtkCellDataToPointData.cxx" },
+        { "path":"vtkCellDataToPointData.h" },
+        { "path":"vtkFeatureEdges.cxx" },
+        { "path":"vtkFeatureEdges.h" },
+        { "path":"vtkImageAppend.h" },
+        { "path":"vtkImageAppend.cxx" },
+        { "path":"vtkPointDataToCellData.cxx" },
+        { "path":"vtkPointDataToCellData.h" },
+        { "path":"vtkProbeFilter.cxx" },
+        { "path":"vtkProbeFilter.h" },
+        { "path":"vtkQuadricClustering.cxx" },
+        { "path":"vtkQuadricClustering.h" },
+        { "path":"vtkThreshold.cxx" },
+        { "path":"vtkThreshold.h" }
       ],
       "replace":[
-        {
-          "path":"VTK/Filters/Core/CMakeLists.txt"
-        }
+        { "path":"VTK/Filters/Core/CMakeLists.txt" },
+        { "path":"VTK/Filters/Core/Base.catalyst.cmake" }
       ],
       "cswrap":true
     },
-    {
-      "name":"vtkFiltersSources",
-      "path":"VTK/Filters/Sources",
-      "include":[
-        {
-          "path":"vtkSphereSource.cxx"
-        },
-        {
-          "path":"vtkSphereSource.h"
-        }
+    { "name":"vtkPVCommon",
+      "path":"ParaViewCore/Common",
+      "exclude":[
+        { "path":"Testing" }
       ],
-      "replace":[
-        {
-          "path":"VTK/Filters/Sources/CMakeLists.txt"
-        },
-        {
-          "path":"VTK/Filters/Sources/module.cmake"
-        }
-      ],
-      "cswrap":true
+      "pythonwrap":true
     },
-    {
-      "name":"vtkIOXMLParser",
+    { "name":"vtkClientServer",
+      "path":"ParaViewCore/ClientServerStream",
+      "exclude":[
+        { "path":"Testing" }
+      ]
+    },
+    { "name":"vtkIOXMLParser",
       "path":"VTK/IO/XMLParser",
       "pythonwrap":true
     },
-    {
-      "name":"vtkIOXML",
-      "path":"VTK/IO/XML",
-      "include":[
-        {
-          "path":"vtkXMLOffsetsManager.h"
-        },
-        {
-          "path":"vtkXMLPDataWriter.cxx"
-        },
-        {
-          "path":"vtkXMLPDataWriter.h"
-        },
-        {
-          "path":"vtkXMLPolyDataWriter.cxx"
-        },
-        {
-          "path":"vtkXMLPolyDataWriter.h"
-        },
-        {
-          "path":"vtkXMLPPolyDataWriter.cxx"
-        },
-        {
-          "path":"vtkXMLPPolyDataWriter.h"
-        },
-        {
-          "path":"vtkXMLPUnstructuredDataWriter.cxx"
-        },
-        {
-          "path":"vtkXMLPUnstructuredDataWriter.h"
-        },
-        {
-          "path":"vtkXMLUnstructuredDataWriter.cxx"
-        },
-        {
-          "path":"vtkXMLUnstructuredDataWriter.h"
-        },
-        {
-          "path":"vtkXMLWriter.cxx"
-        },
-        {
-          "path":"vtkXMLWriter.h"
-        }
-      ],
-      "replace":[
-        {
-          "path":"VTK/IO/XML/module.cmake"
-        },
-        {
-          "path":"VTK/IO/XML/CMakeLists.txt"
-        }
-      ],
-      "cswrap":true
-    },
-    {
-      "name":"vtkIOCore",
+    { "name":"vtkIOCore",
       "path":"VTK/IO/Core",
       "exclude":[
-        {
-          "path":"Testing"
-        }
+        { "path":"Testing" }
       ],
       "pythonwrap":true
     },
-    {
-      "name":"vtkIOLegacy",
+    { "name":"vtkThirdPartyzlib",
+      "path":"VTK/ThirdParty/zlib"
+    },
+    { "name":"vtkThirdPartyexpat",
+      "path":"VTK/ThirdParty/expat"
+    },
+    { "name":"vtkPVVTKExtensionsCore",
+      "path":"ParaViewCore/VTKExtensions/Core",
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkParallelCore",
+      "path":"VTK/Parallel/Core",
+      "exclude":[
+        { "path":"Testing" }
+      ],
+      "pythonwrap":true
+    },
+    { "name":"vtkIOLegacy",
       "path":"VTK/IO/Legacy",
       "exclude":[
-        {
-          "path":"Testing"
-        }
+        { "path":"Testing" }
       ]
     },
-    {
-      "name":"vtkImagingCore",
-      "path":"VTK/Imaging/Core",
-      "include":[
-        {
-          "path":"vtkRTAnalyticSource.cxx"
-        },
-        {
-          "path":"vtkRTAnalyticSource.h"
-        }
+    { "name":"vtkUtilitiesHashSource",
+      "path":"VTK/Utilities/HashSource"
+    },
+    { "name":"vtkParallelMPI",
+      "path":"VTK/Parallel/MPI",
+      "exclude":[
+        { "path":"Testing" }
+      ]
+    },
+    { "name":"vtkUtilitiesWrapClientServer",
+      "path":"Utilities/WrapClientServer"
+    },
+    { "name":"vtkWrappingTools",
+      "path":"VTK/Wrapping/Tools"
+    },
+    { "name":"vtkprotobuf",
+      "path":"ThirdParty/protobuf"
+    },
+    { "path":"Wrapping" },
+    { "path":"VTK/Copyright.txt" },
+    { "path":"License_v1.2.txt" },
+    { "path":"CMakeLists.txt" },
+    { "path":"CMake" },
+    { "path":"VTK/CMake" },
+    { "path":"VTK/CMakeLists.txt" },
+    { "name":"vtkPVServerManagerApplication",
+      "path":"ParaViewCore/ServerManager/SMApplication",
+      "exclude":[
+        { "path":"Resources" }
       ],
       "replace":[
-        {
-          "path":"VTK/Imaging/Core/module.cmake"
-        },
-        {
-          "path":"VTK/Imaging/Core/CMakeLists.txt"
-        }
-      ],
-      "cswrap":true
-    }
-  ],
-  "paths":[
-    {
-      "path":"ParaViewCore/ServerManager/SMApplication/Resources",
-      "replace":[
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/3d_widgets.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/internal_writers.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/pythonfilter.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/readers.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/rendering.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/sources.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/views_and_representations.xml"
-        },
-        {
-          "path":"ParaViewCore/ServerManager/SMApplication/Resources/writers.xml"
-        }
+        { "path":"ParaViewCore/ServerManager/SMApplication/Resources/catalyst.xml" }
       ]
     },
-    {
-      "path":"ParaViewCore/ServerManager/SMApplication/CMakeLists.txt"
-    },
-    {
-      "path":"ParaViewCore/ServerManager/SMApplication/module.cmake"
-    },
-    {
-      "path":"ParaViewCore/ServerManager/SMApplication/vtkInitializationHelper.cxx"
-    },
-    {
-      "path":"ParaViewCore/ServerManager/SMApplication/vtkInitializationHelper.h"
-    },
-    {
-      "path":"ParaViewCore/ServerManager/SMApplication/vtkPVInitializer.h.in"
-    },
-    {
-      "path":"ParaViewCore/ServerImplementation/vtkParaViewIncludeModulesToSMApplication.h.in"
-    },
-    {
-      "path":"ParaViewCore/README.txt"
-    },
-    {
-      "path":"VTK/vtkLogo.ico"
-    },
-    {
-      "path":"VTK/Copyright.txt"
-    },
-    {
-      "path":"VTK/CMakeLists.txt"
-    },
-    {
-      "path":"VTK/README.html"
-    },
-    {
-      "path":"VTK/vtkLogo.jpg"
-    },
-    {
-      "path":"VTK/.hooks-config.bash"
-    },
-    {
-      "path":"VTK/CTestConfig.cmake"
-    },
-    {
-      "path":"VTK/vtkBanner.gif"
-    },
-    {
-      "path":"ParaViewConfigVersion.cmake.in"
-    },
-    {
-      "path":"CMakeLists.txt"
-    },
-    {
-      "path":"vtkPVConfig.h.in"
-    },
-    {
-      "path":"DartConfig.cmake"
-    },
-    {
-      "path":"ParaViewConfig.cmake.in"
-    },
-    {
-      "path":"CTestConfig.cmake"
-    },
-    {
-      "path":"cave.pvx"
-    },
-    {
-      "path":"License_v1.2.txt"
-    },
-    {
-      "path":"CMake"
-    },
-    {
-      "path":"Applications",
+    { "path":"vtkPVConfig.h.in" },
+    { "path":"CommandLineExecutables" },
+    { "path":"Applications",
       "exclude":[
-        {
-          "path":"ParaView"
-        }
+        { "path":"ParaView" }
       ]
     },
-    {
-      "path":"CommandLineExecutables"
-    },
-    {
-      "path":"Common/CMakeLists.txt"
-    },
-    {
-      "path":"Common/KWCommon",
-      "exclude":[
-        {
-          "path":"Testing"
-        }
-      ]
-    },
-    {
-      "path":"Wrapping"
-    },
-    {
-      "path":"Wrapping/Python/CMakeLists.txt",
-      "patch": [
-        "diff --git a/Wrapping/Python/CMakeLists.txt b/Wrapping/Python/CMakeLists.txt",
-        "index 7b3a7b8..2d101be 100644",
-        "--- a/Wrapping/Python/CMakeLists.txt",
-        "+++ b/Wrapping/Python/CMakeLists.txt",
-        "@@ -65,9 +65,9 @@ file (COPY \"${ParaView_SOURCE_DIR}/VTK/Wrapping/Python/vtk/util/numpy_support.py",
-        "       USE_SOURCE_PERMISSIONS)",
-        "",
-        " # copy ParaView's default lookup tables",
-        "-file(COPY \"${CMAKE_SOURCE_DIR}/Qt/Components/Resources/XML/ColorMaps.xml\"",
-        "-  DESTINATION \"${PV_PYTHON_MODULE_BINARY_DIR}\"",
-        "-  USE_SOURCE_PERMISSIONS)",
-        "+#file(COPY \"${CMAKE_SOURCE_DIR}/Qt/Components/Resources/XML/ColorMaps.xml\"",
-        "+#  DESTINATION \"${PV_PYTHON_MODULE_BINARY_DIR}\"",
-        "+#  USE_SOURCE_PERMISSIONS)",
-        "",
-        " # Byte compile the Python files.",
-        " CONFIGURE_FILE(${PV_PYTHON_MODULE_SOURCE_DIR}/compile_all_pv.py.in"
-      ]
-    },
-    {
-      "path":"VTK/CMake"
-    },
-    {
-      "path":"Utilities",
-      "exclude":[
-        {
-          "path":"VisItBridge"
-        },
-        {
-          "path":"ColorSeriesToXML"
-        }
-      ]
-    },
-    {
-      "path":"VTK/ThirdParty/utf8"
-    },
-    {
-      "path":"VTK/Wrapping/Python"
-    },
-    {
-      "path":"VTK/Wrapping/PythonCore"
-    },
-    {
-      "path":"VTK/Utilities/PythonInterpreter"
-    },
-    {
-      "path":"VTK/Utilities/GitSetup"
-    },
-    {
-      "path":"VTK/Utilities/internal_stdio_core.h.in"
-    },
-    {
-      "path":"VTK/Utilities/Maintenance"
-    },
-    {
-      "path":"VTK/Utilities/octree"
-    },
-    {
-      "path":"VTK/Utilities/OutputWindowProcess"
-    },
-    {
-      "path":"VTK/Utilities/Rpm"
-    },
-    {
-      "path":"VTK/Utilities/Scripts"
-    },
-    {
-      "path":"VTK/Utilities/SetupForDevelopment.sh"
-    },
-    {
-      "path":"VTK/Utilities/tcl2py.py"
-    },
-    {
-      "path":"VTK/Utilities/Upgrading"
-    },
-    {
-      "path":"VTK/Utilities/vtk2xml.py"
-    },
-    {
-      "path":"VTK/Utilities/vtkstd.h.in"
-    },
-    {
-      "path":"VTK/Utilities/vtkTclTest2Py"
-    },
-    {
-      "path":"VTK/Utilities/Python"
-    }
+    { "path":"ParaViewConfigVersion.cmake.in" },
+    { "path":"ParaViewConfig.cmake.in" },
+    { "path":"ParaViewCore/README.txt" },
+    { "path":"VTK/vtkLogo.ico" },
+    { "path":"VTK/README.html" },
+    { "path":"VTK/ThirdParty/utf8" }
   ]
 }

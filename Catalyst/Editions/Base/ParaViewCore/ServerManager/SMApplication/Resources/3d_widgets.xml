@@ -1,9 +1,0 @@
-<ServerManagerConfiguration>
-  <!-- We put all 3D widget definitions in this file -->
-  <ProxyGroup name="representations">
-  </ProxyGroup>
-  <ProxyGroup name="3d_widget_representations">
-  </ProxyGroup>
-  <ProxyGroup name="3d_widgets">
-  </ProxyGroup>
-</ServerManagerConfiguration>
