@@ -65,6 +65,8 @@ namespace
   //      - SELF_DIR
   //    + ParaView Python modules
   //      - SELF_DIR/site-packages
+  //    + VTK Python Module libraries
+  //      - SELF_DIR/site-packages/vtk
   void vtkPythonAppInitPrependPathLinux(const std::string& SELF_DIR)
     {
     // Determine if running from build or install dir.
@@ -81,7 +83,10 @@ namespace
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR);
       vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages");
-      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/vtk");
+      // site-packages/vtk needs to be added so the Python wrapped VTK modules
+      // can be loaded from paraview e.g. import vtkCommonCorePython can work
+      // (BUG #14263).
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages/vtk");
       }
     }
   //===========================================================================
