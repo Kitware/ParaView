@@ -137,7 +137,8 @@ public:
   enum
     {
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
-    GET_ZBUFFER_VALUE_TAG = 15003
+    GET_ZBUFFER_VALUE_TAG = 15003,
+    SYNC_TILE_DISPLAY_PARAMATERS = 15004
     };
 
   // Internal-callback-method
