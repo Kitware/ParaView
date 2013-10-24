@@ -1,6 +1,15 @@
-  [
-      {
-          "title": "ParaViewWeb",
+  [ { "title": "ParaView 4",
+      "items": [
+	 {
+	   "name": "WebVisualizer",
+	   "title": "ParaViewWeb generic visualizer",
+	   "description": "Generic web visualization and data processing with the WebVisualizer application that come with ParaView 4.",
+	   "id": "77824433",
+	   "thumb": "http://b.vimeocdn.com/ts/453/089/453089495_640.jpg"
+	 }
+      ]
+    }, {
+          "title": "ParaView 3.12+",
           "items": [
               {
                   "name": "Mummy",
