@@ -394,6 +394,8 @@ public:
     }
   virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
     {
+    (void)event;
+    (void)calldata;
     vtkSMProperty* input = vtkSMProperty::SafeDownCast(caller);
     if (input && this->Output)
       {

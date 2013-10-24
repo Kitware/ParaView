@@ -334,7 +334,7 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing IceT flag from message.");
     return;
     }
-  // for client-server compatibility, 
+  // for client-server compatibility,
   const char *rmName;
   if (!css->GetArgument(0, 8, &rmName))
     {
@@ -361,7 +361,7 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     }
   this->NumberOfProcesses = numProcs;
 
-  int mpiInitialized;
+  bool mpiInitialized;
   if (!css->GetArgument(0, 12, &mpiInitialized))
     {
     vtkErrorMacro("Error parsing mpi initialized from message.");
