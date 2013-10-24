@@ -3,25 +3,25 @@
           "name": "Client",
           "groups": [
               {
-                  "name": "Paraview",
+                  "name": "VTKWeb",
                   "classes": [
-                      "paraview",
-                      "paraview.launcher",
-                      "paraview.connect",
-                      "paraview.viewport",
-                      "paraview.viewport.image",
-                      "paraview.viewport.webgl"
+                      "vtkWeb",
+                      "vtkWeb.launcher",
+                      "vtkWeb.connect",
+                      "vtkWeb.viewport",
+                      "vtkWeb.viewport.image",
+                      "vtkWeb.viewport.webgl"
                   ]
               }, {
-                  "name": "ParaView Objects",
+                  "name": "VTKWeb Objects",
                   "classes": [
-                      "pv.ViewPortConfig",
-                      "pv.ConnectionConfig",
+                      "vtkWeb.ViewPortConfig",
+                      "vtkWeb.ConnectionConfig",
                       "pv.PipelineBrowserConfig",
-                      "pv.Connection",
-                      "pv.Session",
-                      "pv.Viewport",
-                      "pv.Future"
+                      "vtkWeb.Connection",
+                      "vtkWeb.Session",
+                      "vtkWeb.Viewport",
+                      "vtkWeb.Future"
                   ]
               }, {
                   "name": "Request",
