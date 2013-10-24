@@ -1166,13 +1166,16 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </StringVectorProperty>
 
+      <!--
+      TODO :  RK45 in VTK is broken!! Don't use it!!
+      -->
     <!-- Integrator type -->
     <IntVectorProperty
         name="IntegratorType"
         label="Integrator"
         command="SetIntegratorType"
         number_of_elements="1"
-        default_values="3"
+        default_values="2"
         panel_visibility="never"
         >
       <!--
@@ -1184,7 +1187,7 @@ Copyright 2012 SciberQuest Inc.
       -->
     </IntVectorProperty>
 
-    <!-- Integrator parameters -->
+    <!-- Integrator parameters
     <DoubleVectorProperty
         name="MinStep"
         label="Min Step Size"
@@ -1197,6 +1200,7 @@ Copyright 2012 SciberQuest Inc.
         Minimum integration step size as a multiple of cell lengths.
       </Documentation>
     </DoubleVectorProperty>
+    -->
 
     <DoubleVectorProperty
         name="MaxStep"
@@ -1211,6 +1215,7 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </DoubleVectorProperty>
 
+    <!--
     <DoubleVectorProperty
         name="MaxError"
         label="Max Error"
@@ -1236,6 +1241,7 @@ Copyright 2012 SciberQuest Inc.
         Maximum number of steps, beyond which integration is terminated.
       </Documentation>
     </IdTypeVectorProperty>
+    -->
 
     <DoubleVectorProperty
         name="MaxLineLength"
@@ -1445,6 +1451,9 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </StringVectorProperty>
 
+      <!--
+      TODO :  RK45 in VTK is broken!! Don't use it!!
+      -->
     <!-- Integrator type -->
     <IntVectorProperty
         name="IntegratorType"
