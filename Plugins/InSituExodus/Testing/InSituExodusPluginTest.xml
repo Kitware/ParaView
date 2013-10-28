@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- Open test file -->
+  <pqevent object="pqClientMainWindow/menubar"
+           command="activate"
+           arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File"
+           command="activate"
+           arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog"
+           command="filesSelected"
+           arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+
+  <!-- Select in-situ reader -->
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget"
+           command="currentChangedbyItemName"
+           arguments="Exodus II (InSitu)" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton"
+           command="activate" arguments="" />
+
+  <!-- Load data set and orient camera -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept"
+           command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/DisplayColorWidget/Variables"
+           command="set_string"
+           arguments="EQPS" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY"
+           command="activate" arguments="" />
+</pqevents>
