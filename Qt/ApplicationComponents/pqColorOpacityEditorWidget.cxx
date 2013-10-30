@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkVector.h"
+#include "vtkWeakPointer.h"
 
 #include <QDoubleValidator>
 #include <QMessageBox>
@@ -99,12 +100,14 @@ class pqColorOpacityEditorWidget::pqInternals
 public:
   Ui::ColorOpacityEditorWidget Ui;
   QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
+  vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
 
   // We use this pqPropertyLinks instance to simply monitor smproperty changes.
   pqPropertyLinks LinksForMonitoringChanges;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
 
-  pqInternals(pqColorOpacityEditorWidget* self)
+  pqInternals(pqColorOpacityEditorWidget* self, vtkSMPropertyGroup* group)
+    : PropertyGroup(group)
     {
     this->Ui.setupUi(self);
     this->Ui.CurrentDataValue->setValidator(new QDoubleValidator(self));
@@ -120,7 +123,7 @@ public:
 pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(smproxy, parentObject),
-  Internals(new pqInternals(this))
+  Internals(new pqInternals(this, smgroup))
 {
   Ui::ColorOpacityEditorWidget &ui = this->Internals->Ui;
   vtkDiscretizableColorTransferFunction* stc =
@@ -524,6 +527,10 @@ void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
     {
     BEGIN_UNDO_SET("Reset transfer function ranges using temporal data range");
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(repr->getProxy());
+
+    // disable auto-rescale of transfer function since the user has set on
+    // explicitly (BUG #14371).
+    this->setLockScalarRange(true);
     emit this->changeFinished();
     END_UNDO_SET();
     }
@@ -554,6 +561,9 @@ void pqColorOpacityEditorWidget::resetRangeToCustom(double min, double max)
   vtkSMTransferFunctionProxy::RescaleTransferFunction(
     vtkSMPropertyHelper(this->proxy(), "ScalarOpacityFunction").GetAsProxy(),
     min, max);
+  // disable auto-rescale of transfer function since the user has set on
+  // explicitly (BUG #14371).
+  this->setLockScalarRange(true);
   emit this->changeFinished();
   END_UNDO_SET();
 }
