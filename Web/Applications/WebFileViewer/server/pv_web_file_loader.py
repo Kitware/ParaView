@@ -34,6 +34,7 @@ import os
 from paraview import simple
 from paraview.web import wamp      as pv_wamp
 from paraview.web import protocols as pv_protocols
+from vtk.web import protocols as vtk_protocols
 
 from vtk.web import server
 from vtkWebCorePython import *
@@ -63,6 +64,7 @@ class _FileOpener(pv_wamp.PVServerProtocol):
 
     def initialize(self):
         # Bring used components
+        self.registerVtkWebProtocol(vtk_protocols.vtkWebFileBrowser(_FileOpener.pathToList, "Home"))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortImageDelivery())
@@ -88,7 +90,6 @@ class _FileOpener(pv_wamp.PVServerProtocol):
             _FileOpener.view.ViewSize = [800,800]
         simple.SetActiveView(_FileOpener.view)
 
-    @exportRpc("openFile")
     def openFile(self, file):
         id = ""
         if _FileOpener.reader:
@@ -111,25 +112,6 @@ class _FileOpener(pv_wamp.PVServerProtocol):
         file = os.path.join(_FileOpener.pathToList, file)
         return self.openFile(file)
 
-    @exportRpc("listFiles")
-    def listFiles(self):
-        nodeTree = {}
-        rootNode = { "data": "/", "children": [] , "state" : "open"}
-        nodeTree[_FileOpener.pathToList] = rootNode
-        for path, directories, files in os.walk(_FileOpener.pathToList):
-            parent = nodeTree[path]
-            for directory in directories:
-                child = {'data': directory , 'children': [], "state" : "open", 'metadata': {'path': 'dir'}}
-                nodeTree[path + '/' + directory] = child
-                parent['children'].append(child)
-                if directory == 'vtk':
-                    child['state'] = 'closed'
-            for filename in files:
-                child = {'data': { 'title': filename, 'icon': '/'}, 'children': [], 'metadata': {'path': path + '/' + filename}}
-                nodeTree[path + '/' + filename] = child
-                parent['children'].append(child)
-        return rootNode
-
 # =============================================================================
 # Main: Parse args and start server
 # =============================================================================
@@ -142,8 +124,8 @@ if __name__ == "__main__":
     server.add_arguments(parser)
 
     # Add local arguments
-    parser.add_argument("--file-to-load", help="path to data file to load", dest="data")
-    parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list", dest="path")
+    parser.add_argument("--file-to-load", help="relative file path to load based on --data-dir argument", dest="data")
+    parser.add_argument("--data-dir", default=os.getcwd(), help="Base path directory", dest="path")
 
     # Exctract arguments
     args = parser.parse_args()

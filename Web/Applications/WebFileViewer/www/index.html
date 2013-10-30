@@ -3,161 +3,115 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" href="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.css" type='text/css'>
-        <link rel='stylesheet' href='../../lib/css/paraview.ui.pipeline.css'           type='text/css'>
         <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.css'            type='text/css'>
         <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.vcr.css'        type='text/css'>
         <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.viewport.css'   type='text/css'>
+
         <link rel='stylesheet' href='style.css' type='text/css'>
+    </head>
 
-        <script src="../../ext/js-core/autobahn.min.js"></script>
-        <script src="../../ext/js-core/jquery-1.8.3.min.js"></script>
-        <script src="../../ext/js-core/gl-matrix-min.js"></script>
+    <body onbeforeunload="stop()" onunload="stop()" class="page">
+        <div class="header toolbar">
+            <div class="logo" alt="ParaViewWeb File loader application"></div>
+            <div class="open-file"></div>
+            <div class="viewport-toolbar"></div>
+            <div class="vcr-toolbar"></div>
+            <div class="loading"></div>
+        </div>
+        <div class="file-list"></div>
+        <div class="viewport-container"></div>
 
-        <script src="../../lib/js/vtkweb-all.js"></script>
+        <script src="../../lib/core/vtkweb-loader.js" load="all, filebrowser"></script>
+
         <script src="../../lib/js/paraview.ui.pipeline.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.vcr.js"></script>
         <script src="../../lib/js/paraview.ui.toolbar.viewport.js"></script>
 
-        <script src="js/jquery.jstree.js"></script>
-    </head>
-
-    <body onbeforeunload="stop()" onunload="stop()" class="page">
-        <div class="header toolbar">
-            <div class="logo" alt="Toggle pipeline browser visibility"></div>
-            <div class="viewport-toolbar"></div>
-            <div class="vcr-toolbar"></div>
-            <div class="loading"></div>
-            <div class="disconnect"></div>
-        </div>
-        <div class="splitter">
-            <div class="file-list"></div>
-            <div class="viewport-container">
-            </div>
-        </div>
-
         <script type="text/javascript">
-            var pv = {};
-            var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview";
+            // Get default variables
             var config = {
-                sessionManagerURL: serviceURL,
-                name: "File loader viz",
-                description: "3D visaulization with ParaViewWeb 2.0",
+                sessionManagerURL: vtkWeb.properties.sessionManagerURL,
                 application: "loader"
-            };
-            var fileList = $('.file-list');
-            var viewport = $(".viewport-container");
-
-            // By default start a ParaView on the server
-            if(!$('body').hasClass("initialized")) {
-                $('body').addClass("initialized");
-                vtkWeb.start( config,
-                function(connection){
-                    pv.connection = connection;
-
-                    // Add disconnect button listener
-                    $('.disconnect').disconnectButton(pv.connection.session);
-
-                    if(connection.error) {
-                        alert(connection.error);
-                        window.close();
-                    } else {
-                        connect();
-                    }
-                }, function(msg){
-                    $(".loading").hide();
-                    alert("The remote session did not properly start. Try to use embeded url.");
-                    pv.connection = {sessionURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
-                    connect();
-                });
-                /**
-                 * Make the viewport be full screen
-                 */
-                $(window).resize(function() {
-                    if(pv.viewport) {
-                        pv.viewport.render();
-                    }
-                }).trigger('resize');
-
-                // Manage VCR + ResetCamera
-                $(".logo").click(function(){
-                    if(fileList.is(':visible')) {
-                        fileList.hide();
-                        viewport.css('left',0);
-                    } else {
-                        fileList.show();
-                        viewport.css('left',fileList.width());
-                    }
-                    updateView();
-                });
-
-
-            }
-
-            function connect() {
-                if(location.protocol == "http:") {
-                    pv.connection.sessionURL = pv.connection.sessionURL.replace("wss:","ws:");
-                }
-
-                vtkWeb.connect(pv.connection,
-                startSession, function(code,reason){
-                    $(".loading").hide();
-                    console.log(reason);
-                });
-            }
-
-            /**
-             * Method called when the ParaView session is ready
-             */
-            function startSession(connection) {
-                // Save session for later
-                pv.session = connection.session;
-
+            },
+            stop = vtkWeb.NoOp,
+            start = function(connection) {
                 // Create viewport
-                pv.viewport = vtkWeb.createViewport({session:connection.session});
-                pv.viewport.bind(".viewport-container");
+                var viewport = vtkWeb.createViewport({session:connection.session});
+                viewport.bind(".viewport-container");
 
-                $('.vcr-toolbar').vcrToolbar(pv.session).bind('dataChanged', updateView);
+                // Create file browser widget
+                connection.session.call('vtk:listServerDirectory','.').then(function(files){
+                    $('.file-list').fileBrowser({data: [files], session: connection.session}).bind('file-click', function(e){
+                        connection.session.call("vtk:openFileFromPath", e.relativePath).then(function(reply){
+                            viewport.render();
+                            $('.file-list').hide();
+                        });
+                    });;
+                });
 
-                // - viewport toolbar
-                $('.viewport-toolbar').viewportToolbar(pv.viewport);
+                // Create toolbar for VCR control
+                $('.vcr-toolbar').vcrToolbar(connection.session).bind('dataChanged', function() {
+                    viewport.invalidateScene();
+                });
 
+                // Create toolbar for VIEWPORT manipulation
+                $('.viewport-toolbar').viewportToolbar(viewport);
+
+                // Loading is done
                 $(".loading").hide();
 
-                // Load the remote fs
-                pv.session.call("vtk:listFiles").then(function(fileTree){
-                    $(".file-list").jstree({
-                        "json_data" : { "data"  : [ fileTree ]},
-                        "plugins"   : [ "themes", "json_data", "ui" ],
-                        "themes"    : { "theme" : "classic" }
-                    }).bind("select_node.jstree", function (e, data) {
-                        var filePath = data.rslt.obj.data("path");
-                        if(filePath != 'dir') {
-                            pv.session.call("vtk:openFile", filePath).then(function(reply){
-                                pv.viewport.render();
-                            });
-                        }
-                    });
+                // Add resize listener
+                $(window).resize(function() {
+                    viewport.render();
+                }).trigger('resize');
+
+                // Add hide/show file browser behavior
+                $(".open-file").click(function(){
+                    var fileBrowser = $('.file-list');
+                    if(fileBrowser.is(':visible')) {
+                        fileBrowser.hide();
+                    } else {
+                        fileBrowser.show();
+                    }
+                    viewport.invalidateScene();
                 });
-            }
 
-            function updateView() {
-                if(pv.viewport) {
-                    pv.viewport.invalidateScene();
+                // Update stop method to use the connection
+                stop = function() {
+                    connection.session.call('vtk:exit');
                 }
-            }
+            };
 
-            /**
-             * Method called when the application close
-             */
-            function stop() {
-                if(pv.session) {
-                    pv.viewport.unbind();
-                    vtkWeb.stop(pv.connection);
-                    pv = {};
+            // Try to launch the Viz process
+            vtkWeb.start( config, function(connection) {
+                if(connection.error) {
+                    alert(connection.error);
+                    window.close();
+                } else {
+                    // The process successfuly started
+                    // => Just connect to the WebSocket
+                    vtkWeb.connect(
+                        connection,
+                        start,
+                        function(code,reason){
+                            $(".loading").hide();
+                            console.log(reason);
+                        }
+                    );
                 }
-            }
+            }, function(msg) {
+                // No launcher found or error
+                console.log("Try to connect using the direct WS url");
+                vtkWeb.connect(
+                    { sessionURL: vtkWeb.properties.sessionURL },
+                    start,
+                    function(code,reason){
+                        $(".loading").hide();
+                        console.log(reason);
+                    }
+                );
+            });
         </script>
     </body>
 </html>

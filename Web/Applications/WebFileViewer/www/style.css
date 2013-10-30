@@ -35,28 +35,26 @@ tbody, tfoot, thead, tr, th, td {
 .viewport-container {
     margin: 0;
     position: absolute;
-    left: 300px;
-    right: 0;
-    bottom: 0;
-    top: 0;
-}
-
-.splitter {
-    position: absolute;
-    top: 35px;
     left: 0;
     right: 0;
     bottom: 0;
+    top: 35px;
 }
 
 .file-list {
+    display: none;
     overflow: auto;
-     margin: 0;
+    margin: 10px;
+    padding: 10px;
+    padding-top: 35px;
     position: absolute;
     left: 0;
-    width: 300px;
-    bottom: 0;
-    top: 0;
+    width: 500px;
+    bottom: 5px;
+    top: 40px;
+    z-index: 999;
+    border-radius:15px;
+    background: white;
 }
 
 /* ========================= Override default ParaView css ================================== */
@@ -67,4 +65,23 @@ tbody, tfoot, thead, tr, th, td {
 
 .paraview.toolbar li:hover, .paraview.toolbar.viewport li.on:hover {
     background: #007878;
+}
+
+.file-list ul[type='path'] {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #aaa;
+    padding: 5px 0 0 20px;
+    border-bottom: 1px solid;
+}
+
+.open-file {
+    position: relative;
+    width: 25px;
+    height: 25px;
+    background: url("open.png") no-repeat transparent;
 }

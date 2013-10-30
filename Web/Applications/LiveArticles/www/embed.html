@@ -131,7 +131,7 @@
 
                         var filePath= getParameter("data");
                         if (filePath !== "") {
-                            pv.connection.session.call("pv:openFileFromPath", filePath).then(
+                            pv.connection.session.call("vtk:openFileFromPath", filePath).then(
                             function(reply){pv.viewport.render();});
                         }
                         $("#options").show();
