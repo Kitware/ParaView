@@ -19,6 +19,9 @@
      <property name="enabled">
       <bool>true</bool>
      </property>
+     <property name="toolTip">
+      <string>&lt;p&gt;Set the color to use to show selected elements&lt;/p&gt;</string>
+     </property>
      <property name="text">
       <string>Selection Color</string>
      </property>
@@ -26,6 +29,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="cellLabelsButton">
+     <property name="toolTip">
+      <string>&lt;p&gt;Set the array to label selected cells with&lt;/p&gt;</string>
+     </property>
      <property name="text">
       <string>Cell Labels</string>
      </property>
@@ -37,6 +43,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="pointLabelsButton">
+     <property name="toolTip">
+      <string>&lt;p&gt;Set the array to label to selected points with&lt;/p&gt;</string>
+     </property>
      <property name="text">
       <string>Point Labels</string>
      </property>
@@ -52,7 +61,7 @@
       <string>&lt;p&gt;For frustum based selections, show the frustum used to select the elements&lt;/p&gt;</string>
      </property>
      <property name="text">
-      <string>...</string>
+      <string>Show frustum</string>
      </property>
      <property name="icon">
       <iconset resource="../pqComponents.qrc">
