@@ -376,6 +376,11 @@ IF (PARAVIEW_USE_MPI)
   # needed.
   SET (RectilinearFractal_DISABLE_CS TRUE)
   SET (RectilinearFractal_DISABLE_CRS TRUE)
+
+  # Selections end up highlighting different set of ID based points in parallel.
+  # Hence disable them.
+  set (LineChartSelection_DISABLE_CS TRUE)
+  set (LineChartSelection_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
 
 # Composite Surface Selection is currently broken in everything but bultin
