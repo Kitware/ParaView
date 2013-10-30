@@ -72,6 +72,11 @@ protected slots:
   void selectFrustumPointsTriggered();
   void selectBlocksTriggered();
 
+  /// If a QAction is added to an exclusive QActionGroup, then a checked action
+  /// cannot be unchecked by clicking on it. We need that to work. Hence, we
+  /// manually manage the exclusivity of the action group.
+  void manageGroupExclusivity(QAction*);
+
 protected:
   void setupEmptyFrame(QWidget* frame);
 

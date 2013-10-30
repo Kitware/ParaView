@@ -31,6 +31,7 @@
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
+#include "vtkContextMouseEvent.h"
 
 #include <string>
 #include <vtksys/ios/sstream>
@@ -174,6 +175,13 @@ void vtkPVXYChartView::SetChartType(const char *type)
     this->LogScaleWarningLabel->SetVisible(1);
     this->LogScaleWarningLabel->SetDimensions(150, 150, 150, 150);
     this->Chart->AddItem(this->LogScaleWarningLabel);
+
+    // setup default mouse actions
+    this->Chart->SetActionToButton(vtkChart::PAN, vtkContextMouseEvent::LEFT_BUTTON);
+    this->Chart->SetActionToButton(vtkChart::ZOOM_AXIS, vtkContextMouseEvent::RIGHT_BUTTON);
+
+    // set default selection mode
+    this->Chart->SetSelectionMode(vtkContextScene::SELECTION_DEFAULT);
     }
 }
 
