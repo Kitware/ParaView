@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /// @ingroup Reactions
-/// pqDataQueryReaction is the reaction that popups the Data Query Dialog
-/// allowing the user to 'search' his data.
+/// pqDataQueryReaction is the reaction that popups the Data Query Dialog/Find
+/// Data Dialog allowing the user to 'search' his data.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDataQueryReaction : public pqReaction
 {
   Q_OBJECT
@@ -50,8 +50,6 @@ public:
   void showQueryDialog();
 
 public slots:
-  void onExtractSelection();
-  void onExtractSelectionOverTime();
   void showHelp();
 
 protected:

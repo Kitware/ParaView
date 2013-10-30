@@ -534,6 +534,12 @@ public:
   // for the quad view so internal views could use the decision that were made
   // in the main view.
   void CopyViewUpdateOptions(vtkPVRenderView* otherView);
+
+  // Description:
+  // Add props directly to the view.
+  void AddPropToRenderer(vtkProp* prop);
+  void RemovePropFromRenderer(vtkProp* prop);
+
 //BTX
 protected:
   vtkPVRenderView();

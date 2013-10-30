@@ -224,7 +224,8 @@ set(ProbePicking_THRESHOLD 40)
 include("TestNumPy")
 
 IF ("1" STREQUAL ${HAS_NUMPY})
-  SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES} ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
+  SET(TESTS_WITH_INLINE_COMPARES ${TESTS_WITH_INLINE_COMPARES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
 ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 #------------------------------------------------------------------------------

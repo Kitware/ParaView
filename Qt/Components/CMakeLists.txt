@@ -180,6 +180,14 @@ set (Module_SRCS
   pqFieldSelectionAdaptor.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
+  pqFindDataCreateSelectionFrame.cxx
+  pqFindDataCreateSelectionFrame.h
+  pqFindDataCurrentSelectionFrame.cxx
+  pqFindDataCurrentSelectionFrame.h
+  pqFindDataSelectionDisplayFrame.cxx
+  pqFindDataSelectionDisplayFrame.h
+  pqFindDataDialog.cxx
+  pqFindDataDialog.h
   pqFixStateFilenamesDialog.cxx
   pqFixStateFilenamesDialog.h
   pqGlobalRenderViewOptions.cxx
@@ -309,8 +317,6 @@ set (Module_SRCS
   pqProxyWidgetDialog.h
   pqQueryClauseWidget.cxx
   pqQueryClauseWidget.h
-  pqQueryDialog.cxx
-  pqQueryDialog.h
   pqRecentFilesMenu.cxx
   pqRecentFilesMenu.h
   pqRenderViewOptions.cxx
@@ -335,8 +341,6 @@ set (Module_SRCS
   pqSelectionAdaptor.h
   pqSelectionInputWidget.cxx
   pqSelectionInputWidget.h
-  pqSelectionInspectorPanel.cxx
-  pqSelectionInspectorPanel.h
   pqSelectionManager.cxx
   pqSelectionManager.h
   pqSelectReaderDialog.cxx
@@ -495,6 +499,10 @@ set (Module_MOC_HDRS
   pqExtractCTHPartsPanel.h
   pqFieldSelectionAdaptor.h
   pqFileChooserWidget.h
+  pqFindDataCreateSelectionFrame.h
+  pqFindDataCurrentSelectionFrame.h
+  pqFindDataSelectionDisplayFrame.h
+  pqFindDataDialog.h
   pqFixStateFilenamesDialog.h
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
@@ -557,7 +565,6 @@ set (Module_MOC_HDRS
   pqProxyWidget.h
   pqProxyWidgetDialog.h
   pqQueryClauseWidget.h
-  pqQueryDialog.h
   pqRecentFilesMenu.h
   pqRemoteCommandDialog.h
   pqRemoteCommandTemplateDialog.h
@@ -570,7 +577,6 @@ set (Module_MOC_HDRS
   pqScalarValueListPropertyWidget.h
   pqSelectionAdaptor.h
   pqSelectionInputWidget.h
-  pqSelectionInspectorPanel.h
   pqSelectionManager.h
   pqSelectReaderDialog.h
   pqServerConfigurationImporter.h
@@ -645,6 +651,10 @@ set (Module_UI_FILES
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
+  Resources/UI/pqFindDataCreateSelectionFrame.ui
+  Resources/UI/pqFindDataCurrentSelectionFrame.ui
+  Resources/UI/pqFindDataSelectionDisplayFrame.ui
+  Resources/UI/pqFindDataDialog.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
   Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
@@ -675,7 +685,6 @@ set (Module_UI_FILES
   Resources/UI/pqPythonAnimationCue.ui
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui
-  Resources/UI/pqQueryDialog.ui
   Resources/UI/pqRemoteCommandDialogForm.ui
   Resources/UI/pqRemoteCommandTemplateDialogForm.ui
   Resources/UI/pqRenderViewOptions.ui
@@ -685,7 +694,6 @@ set (Module_UI_FILES
   Resources/UI/pqSaveSnapshotDialog.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui
   Resources/UI/pqSelectionInputWidget.ui
-  Resources/UI/pqSelectionInspectorPanel.ui
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerConnectDialog.ui
   Resources/UI/pqServerLauncherDialog.ui

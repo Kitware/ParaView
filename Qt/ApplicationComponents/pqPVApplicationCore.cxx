@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"
+#include "pqApplicationCore.h"
 #include "pqApplyPropertiesManager.h"
 #include "pqComponentsInit.h"
 #include "pqComponentsTestUtility.h"
@@ -72,6 +73,9 @@ pqPVApplicationCore::pqPVApplicationCore(
   this->ApplyPropertiesManger = new pqApplyPropertiesManager(this);
   this->AnimationManager = new pqAnimationManager(this);
   this->SelectionManager = new pqSelectionManager(this);
+
+  pqApplicationCore::instance()->registerManager("SELECTION_MANAGER",
+    this->SelectionManager);
 
   this->PythonManager = 0;
 #ifdef PARAVIEW_ENABLE_PYTHON

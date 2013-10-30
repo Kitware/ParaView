@@ -29,35 +29,54 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqProxyWidgetDialog_h
-#define __pqProxyWidgetDialog_h
+#ifndef __pqFindDataCurrentSelectionFrame_h
+#define __pqFindDataCurrentSelectionFrame_h
 
-#include <QDialog>
+#include <QWidget>
 #include "pqComponentsModule.h"
 
-class QAbstractButton;
-class vtkSMProxy;
+class pqOutputPort;
 
-/// pqProxyWidgetDialog is used to show properties of any proxy in a dialog. It
-/// simply wraps the pqProxyWidget for the proxy in a dialog with Apply,
-/// Cancel, and Ok buttons.
-class PQCOMPONENTS_EXPORT pqProxyWidgetDialog : public QDialog
+/// pqFindDataCurrentSelectionFrame is designed to be used by pqFindDataDialog.
+/// pqFindDataDialog uses this class to show the current selection in a
+/// spreadsheet view. This class encapsulates the logic to monitor the current
+/// selection by tracking the pqSelectionManager and then showing the results in
+/// the spreadsheet.
+class PQCOMPONENTS_EXPORT pqFindDataCurrentSelectionFrame : public QWidget
 {
   Q_OBJECT
-  typedef QDialog Superclass;
+  typedef QWidget Superclass;
 public:
-  pqProxyWidgetDialog(vtkSMProxy* proxy, QWidget* parent=0);
-  pqProxyWidgetDialog(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent=0);
-  virtual ~pqProxyWidgetDialog();
+  pqFindDataCurrentSelectionFrame(QWidget* parent=0, Qt::WindowFlags f=0);
+  virtual ~pqFindDataCurrentSelectionFrame();
 
-protected slots:
-  /// slot to handle "Apply".
-  void buttonClicked(QAbstractButton*);
+  /// return the port from which this frame is showing the selected data, if
+  /// any.
+  pqOutputPort* showingPort() const;
+
+signals:
+  /// signal fired to indicate the selected port that currently being shown in
+  /// the frame.
+  void showing(pqOutputPort*);
+
+private slots:
+  /// show the selected data from the given output port in the frame.
+  void showSelectedData(pqOutputPort*);
+
+  /// update the field-type set of the internal spreadsheet view based on the
+  /// value in the combo-box.
+  void updateFieldType();
+
+  /// set the value for the "invert selection" property on the extract-selection
+  /// source to the one specified.
+  void invertSelection(bool);
 
 private:
-  Q_DISABLE_COPY(pqProxyWidgetDialog)
+  Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame);
 
   class pqInternals;
+  friend class pqInternals;
+
   pqInternals* Internals;
 };
 

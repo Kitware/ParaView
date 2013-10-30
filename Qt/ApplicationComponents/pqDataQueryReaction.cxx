@@ -31,20 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqDataQueryReaction.h"
 
-#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
-#include "pqFiltersMenuReaction.h"
+#include "pqFindDataDialog.h"
 #include "pqHelpReaction.h"
-#include "pqPVApplicationCore.h"
-#include "pqQueryDialog.h"
-#include "pqSelectionManager.h"
-#include "pqServerManagerModel.h"
 #include "vtkPVConfig.h"
 
-#include <QEventLoop>
 #include <QMessageBox>
 
-static QPointer<pqQueryDialog> pqFindDataSingleton;
+static QPointer<pqFindDataDialog> pqFindDataSingleton;
 
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
@@ -58,18 +52,6 @@ pqDataQueryReaction::~pqDataQueryReaction()
 }
 
 //-----------------------------------------------------------------------------
-void pqDataQueryReaction::onExtractSelection()
-{
-  pqFiltersMenuReaction::createFilter("filters", "ExtractSelection");
-}
-
-//-----------------------------------------------------------------------------
-void pqDataQueryReaction::onExtractSelectionOverTime()
-{
-  pqFiltersMenuReaction::createFilter("filters", "ExtractSelectionOverTime");
-}
-
-//-----------------------------------------------------------------------------
 void pqDataQueryReaction::showHelp()
 {
   pqHelpReaction::showHelp("qthelp://paraview.org/paraview/Book/Book_Chapter6.html");
@@ -79,42 +61,11 @@ void pqDataQueryReaction::showHelp()
 void pqDataQueryReaction::showQueryDialog()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
-  pqOutputPort* port = pqActiveObjects::instance().activePort();
-  pqSelectionManager* selManager =
-    pqPVApplicationCore::instance()->selectionManager();
   if (pqFindDataSingleton.isNull())
     {
-    pqQueryDialog* dialog = new pqQueryDialog(
-      port, pqCoreUtilities::mainWidget());
-
-    // We want to make the query the active application wide selection, so we
-    // hookup the query action to selection manager so that the application
-    // realizes a new selection has been made.
-    dialog->setSelectionManager(selManager);
-
-    QObject::connect(
-      dialog, SIGNAL(extractSelection()),
-      this,     SLOT(onExtractSelection()));
-    QObject::connect(
-      dialog, SIGNAL(extractSelectionOverTime()),
-      this,     SLOT(onExtractSelectionOverTime()));
-    QObject::connect(
-      dialog, SIGNAL(helpRequested()),
-      this,     SLOT(showHelp()));
-
+    pqFindDataDialog* dialog = new pqFindDataDialog(pqCoreUtilities::mainWidget());
+    this->connect(dialog, SIGNAL(helpRequested()), SLOT(showHelp()));
     pqFindDataSingleton = dialog;
-    }
-  // set the current producer to the currently selected port
-  // in the pipeline browser
-  if(port)
-    {
-    pqFindDataSingleton->setProducer(port);
-    }
-
-  // if there is a current selection then display it
-  if (pqOutputPort *selection = selManager->getSelectedPort())
-    {
-    pqFindDataSingleton->setSelection(selection);
     }
 
   pqFindDataSingleton->show();
