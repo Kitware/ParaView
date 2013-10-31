@@ -4,18 +4,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="ParaViewWeb application for large distributed visualization over the web.">
         <meta name="author" content="Kitware Inc.">
-
-        <link href="../../ext/widgets/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-        <link href="../../ext/widgets/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-        <link href="../../ext/widgets/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-
-        <link rel="stylesheet" href="../../ext/widgets/fontello/css/fontello.css">
-        <link rel="stylesheet" href="../../ext/widgets/fontello/css/animation.css">
-
         <link href="main.css" rel="stylesheet">
     </head>
 
-    <body onbeforeunload="stop()" onunload="stop()" class="page">
+    <body class="page">
         <div class="viewport-container"></div>
         <div class="row-fluid background">
             <div class="span1"></div>
@@ -30,7 +22,7 @@
                 <h2>
                     <div class="row-fluid action">
                         <div class="span7">
-                            <i class="pv-icon-sitemap icon"></i>
+                            <i class="vtk-icon-sitemap icon"></i>
                             Resources allocation
                         </div>
                         <div class="span4">
@@ -48,7 +40,25 @@
                     </div>
                     <div class="row-fluid action">
                         <div class="span7">
-                            <i class="pv-icon-hdd icon"></i>
+                            <i class="vtk-icon-lightbulb icon"></i>
+                            Client application
+                        </div>
+                        <div class="span4">
+                            <div class="input-append" style="width: 100%;">
+                                <input type="text" id="client" style="width: 70%;" disabled/>
+                                <div class="btn-group" style="width: 30%;">
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown" style="width: 100%;">
+                                        Application <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu client">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-fluid action">
+                        <div class="span7">
+                            <i class="vtk-icon-hdd icon"></i>
                             Data pre-loading
                         </div>
                         <div class="span4">
@@ -66,7 +76,7 @@
                     </div>
                     <div class="row-fluid action">
                         <div class="span7">
-                            <i class="pv-icon-login icon"></i>
+                            <i class="vtk-icon-login icon"></i>
                             Launch application
                         </div>
                         <div class="span4">
@@ -78,14 +88,7 @@
             </div>
         </div>
 
-        <script src="../../ext/js-core/autobahn.min.js"></script>
-        <script src="../../ext/js-core/jquery-1.8.3.min.js"></script>
-        <script src="../../ext/js-core/gl-matrix-min.js"></script>
-        <script src="../../ext/js-core/jquery.hammer.min.js"></script>
-
-        <script src="../../lib/js/vtkweb-all.js"></script>
-
-        <script src="../../ext/widgets/bootstrap/js/bootstrap.min.js"></script>
+        <script src="../../lib/core/vtkweb-loader.js" load="all, bootstrap, fontello"></script>
         <script src="js/jquery.backstretch.min.js"></script>
         <script type="text/javascript">
             $.backstretch("http://paraview.org/files/web/background.jpg");
@@ -125,82 +128,42 @@
 
             // Get server info
             updateDataSelector("resource");
+            updateDataSelector("client");
             updateDataSelector("file");
 
             // Start visualization
             var pv = {};
             $(".launch").click(function(){
-                var appConf = $("#resource").attr("data"),
+                var resources = $("#resource").attr("data"),
+                client = $("#client").attr('data'),
                 file = $("#file").attr("data"),
-                serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview",
                 connection = {
-                    "sessionManagerURL" : serviceURL,
-                    "name" : "ResourceManager",
-                    "application" : appConf,
-                    "generate-secret": 0,
+                    "sessionManagerURL" : vtkWeb.properties.sessionManagerURL,
+                    "application" : 'launcher',
+                    "client" : client,
+                    "resources": resources,
                     "file": file
                 };
-
-                if(file && file !== "None") {
-                    connection["load"] = file;
-                }
 
                 // Prevent double click
                 $(this).attr("disabled","").unbind("click");
 
                 // Request resource allocation
                 vtkWeb.start(connection,
-                function(connectionInfo){
-                    if(connectionInfo.error) {
-                        alert(connectionInfo.error);
-                        window.close();
-                    } else {
-                        $(".start-content").remove();
-                        $(".background").remove();
-                        $(".backstretch").remove();
-
-                        pv.connection = connectionInfo;
-
-                        vtkWeb.connect(connectionInfo, function(fullConnection) {
-                            pv.connection = fullConnection;
-                            setTimeout(function(){
-                                $('.viewport-container').show();
-                                pv.viewport = vtkWeb.createViewport({session: pv.connection.session});
-                                pv.viewport.bind(".viewport-container");
-                                pv.viewport.resetCamera();
-                                setTimeout(function(){
-                                    pv.viewport.resetCamera();
-                                }, 500);
-                            }, 500);
-                        }, function(code,reason) {
-                            console.log("Error " + code);
-                            console.log("Reason " + reason);
-                        });
-
-                        //alert("Use " + connectionInfo.sessionURL + " to connect.");
-                    }
-                }, function(msg){
-                    alert("Sorry unable to allocate requested resources.");
-                });
+                    function(connectionInfo){
+                        if(connectionInfo.error) {
+                            alert(connectionInfo.error);
+                            window.close();
+                        } else {
+                            window.location.href = window.location.protocol + '//' + window.location.host
+                             + '/apps/' + client
+                             + '/?session=' + connectionInfo.id
+                             + '&file=' + file;
+                        }
+                    }, function(msg){
+                        alert("Sorry unable to allocate requested resources.");
+                    });
             });
-
-            // ==== Global variables ===========================================
-            var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview",
-            config = {
-                "sessionManagerURL": serviceURL,
-                "name": "ParallelViz",
-                "application": "pipeline-",
-                "generate-secret": 0 // 0: None / 1: JavaScript generation / 2: Server side generation
-            };
-
-            // ==== Release resources at exit time ============================
-            function stop() {
-                // Kill job
-                if(pv.hasOwnProperty('connection') && pv.connection.session) {
-                    pv.connection.session.call("vtk:exit");
-                    pv = {};
-                }
-            }
         </script>
     </body>
 </html>
