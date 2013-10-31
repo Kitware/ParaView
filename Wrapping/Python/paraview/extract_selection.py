@@ -115,10 +115,11 @@ def ExecData(self, inputDS, selection):
     # is either an array or a boolean value.
     mask = None
 
-    try:
-      mask = eval(selection_node.GetQueryString(), globals(), new_locals)
-    except NameError:
-      pass
+    if len(selection_node.GetQueryString()) > 0:
+      try:
+        mask = eval(selection_node.GetQueryString(), globals(), new_locals)
+      except NameError:
+        pass
 
     # extract the elements from the input dataset using the mask.
     extracted_ds = ExtractElements(self, inputDS, selection, mask)
