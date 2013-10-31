@@ -31,40 +31,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqContextView.h"
 
+#include "pqDataRepresentation.h"
 #include "pqEventDispatcher.h"
 #include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqDataRepresentation.h"
+#include "pqQVTKWidget.h"
 #include "pqServer.h"
-#include "pqImageUtil.h"
 #include "pqSMAdaptor.h"
-
-#include "vtkEventQtSlotConnect.h"
+#include "vtkAnnotationLink.h"
+#include "vtkChartXY.h"
+#include "vtkCommand.h"
+#include "vtkContextView.h"
 #include "vtkErrorCode.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
+#include "vtkNew.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
-
-#include "vtkContextView.h"
-#include "vtkSMContextViewProxy.h"
-#include "vtkChartXY.h"
-#include "vtkAnnotationLink.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkAbstractArray.h"
-#include "vtkIdTypeArray.h"
-#include "vtkVariant.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMSessionProxyManager.h"
+#include "vtkSMContextViewProxy.h"
 #include "vtkSMPropertyHelper.h"
-
-#include "vtkCommand.h"
-#include "vtkNew.h"
-
-#include "pqQVTKWidget.h"
+#include "vtkSMSelectionHelper.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkVariant.h"
 
 #include <QList>
 #include <QVariant>
@@ -399,62 +392,15 @@ void pqContextView::setSelection(vtkSelection* sel)
   pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
   vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
     opPort->getSource()->getProxy());
-  vtkSMSourceProxy* selectionSource = opPort->getSelectionInput();
 
-  int selectionType = vtkSelectionNode::POINT;
-  if (QString(opPort->getDataClassName()) == "vtkTable")
-    {
-    selectionType = vtkSelectionNode::ROW;
-    }
-
-  if (!selectionSource)
-    {
-    vtkSMSessionProxyManager* pxm = this->proxyManager();
-    selectionSource =
-      vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IDSelectionSource"));
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(selectionType);
-    selectionSource->UpdateVTKObjects();
-    }
-  else
-    {
-    selectionSource->Register(repSource);
-    }
-
-  // Fill the selection source with the selection
-  vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(
-    selectionSource->GetProperty("IDs"));
-  QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(vp);
-
-  vtkSelectionNode* node = 0;
-
-  if (sel->GetNumberOfNodes())
-    {
-    node = sel->GetNode(0);
-    }
-  else
-    {
-    node = vtkSelectionNode::New();
-    sel->AddNode(node);
-    node->Delete();
-    }
-
-  vtkIdTypeArray *arr = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
-  ids.clear();
-  if (arr)
-    {
-    for (vtkIdType i = 0; i < arr->GetNumberOfTuples(); ++i)
-      {
-      ids.push_back(-1);
-      ids.push_back(arr->GetValue(i));
-      }
-    }
-
-  pqSMAdaptor::setMultipleElementProperty(vp, ids);
-  selectionSource->UpdateVTKObjects();
+  vtkSMProxy* selectionSource =
+    vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+      repSource->GetSession(), sel);
 
   // Set the selection on the representation's source
   repSource->CleanSelectionInputs(opPort->getPortNumber());
-  repSource->SetSelectionInput(opPort->getPortNumber(), selectionSource, 0);
+  repSource->SetSelectionInput(opPort->getPortNumber(),
+    vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
   selectionSource->Delete();
 
   emit this->selected(opPort);
