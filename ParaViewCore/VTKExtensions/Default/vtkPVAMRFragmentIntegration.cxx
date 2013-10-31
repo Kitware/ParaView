@@ -68,10 +68,6 @@ int vtkPVAMRFragmentIntegration::RequestData(vtkInformation* vtkNotUsed(request)
   vtkNonOverlappingAMR* amrInput=vtkNonOverlappingAMR::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  inInfo = inputVector[1]->GetInformationObject(0);
-  vtkMultiBlockDataSet* mbdsInput=vtkMultiBlockDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-
   vtkInformation *outInfo;
   outInfo = outputVector->GetInformationObject(0);
   vtkMultiBlockDataSet* mbdsOutput0 = vtkMultiBlockDataSet::SafeDownCast(
@@ -81,29 +77,8 @@ int vtkPVAMRFragmentIntegration::RequestData(vtkInformation* vtkNotUsed(request)
   unsigned int noOfArrays = static_cast<unsigned int>(this->Implementation->VolumeArrays.size());
   for(unsigned int i = 0; i < noOfArrays; i++)
     {
-    vtkMultiBlockDataSet* top = vtkMultiBlockDataSet::SafeDownCast (mbdsInput->GetBlock (i));
-    if (top == 0)
-      {
-      vtkErrorMacro ("Input contour doesn't have the right structure.  Use Connectivity filter");
-      return 01;
-      }
-
-    vtkMultiPieceDataSet* bot = vtkMultiPieceDataSet::SafeDownCast (top->GetBlock (0));
-    if (bot == 0)
-      {
-      vtkErrorMacro ("Input contour doesn't have the right structure.  Use Connectivity filter");
-      return 0;
-      }
-
-    vtkDataSet* contour = bot->GetPiece (0);
-    if (contour == 0)
-      {
-      vtkErrorMacro ("Input contour doesn't have the right structure.  Use Connectivity filter");
-      return 0;
-      }
-
     vtkTable* out = this->DoRequestData(
-      amrInput, contour,
+      amrInput, 
       this->Implementation->VolumeArrays[i].c_str(),
       this->Implementation->MassArrays[i].c_str());
 

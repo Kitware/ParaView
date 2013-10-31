@@ -17,8 +17,6 @@
 //
 // .SECTION Description
 //   Input 0: The AMR Volume
-//   Input 1: The AMR volume run through Connectivity filter to generate 
-//            RegionIDs
 //
 //   Output 0: A multiblock containing tables of fragments, one block 
 //             for each requested material
@@ -51,9 +49,8 @@ protected:
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   // Description:
-  //   Pipeline helper.  Run on each contour independently.
+  //   Pipeline helper.  Run on each material independently.
   vtkTable* DoRequestData(vtkNonOverlappingAMR* volume, 
-                          vtkDataSet* contour,
                           const char* volumeArray,
                           const char* massArray);
 

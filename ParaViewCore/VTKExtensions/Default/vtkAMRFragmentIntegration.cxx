@@ -40,7 +40,6 @@ vtkStandardNewMacro(vtkAMRFragmentIntegration);
 
 vtkAMRFragmentIntegration::vtkAMRFragmentIntegration ()
 {
-  this->SetNumberOfInputPorts (2);
 }
 
 vtkAMRFragmentIntegration::~vtkAMRFragmentIntegration()
@@ -60,9 +59,6 @@ int vtkAMRFragmentIntegration::FillInputPortInformation(int port,
     {
     case 0:
       info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkNonOverlappingAMR");
-      break;
-    case 1:
-      info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
       break;
     default:
       return 0;
@@ -97,25 +93,36 @@ int vtkAMRFragmentIntegration::RequestData(vtkInformation* vtkNotUsed(request),
 
 //----------------------------------------------------------------------------
 vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume, 
-                                  vtkDataSet* contour,
                                   const char* volumeName,
                                   const char* massName)
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
 
-  vtkDataArray* regionId = contour->GetPointData ()->GetArray ("RegionId");
-  if (!regionId) 
-    {
-    vtkErrorMacro ("No RegionID in contour.  Run Connectivity filter.");
-    return 0;
-    }
+  vtkTable* fragments = vtkTable::New ();
+
   vtkIdType maxRegion = 0;
-  for (int i = 0; i < regionId->GetNumberOfTuples (); i ++)
+  vtkCompositeDataIterator* iter = volume->NewIterator ();
+  for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
-    vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (i));
-    if (fragId > maxRegion)
+    vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
+    if (!grid) 
       {
-      maxRegion = fragId;
+      vtkErrorMacro ("NonOverlappingAMR not made up of UniformGrids");
+      return 0;
+      }
+    vtkDataArray* regionId = grid->GetCellData ()->GetArray ("RegionId");
+    if (!regionId) 
+      {
+      vtkErrorMacro ("No RegionID in volume.  Run Connectivity filter.");
+      return 0;
+      }
+    for (int c = 0; c < grid->GetNumberOfCells (); c ++)
+      {
+      vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
+      if (fragId > maxRegion)
+        {
+        maxRegion = fragId;
+        }
       }
     }
 
@@ -123,8 +130,6 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     {
     controller->AllReduce (&maxRegion, &maxRegion, 1, vtkCommunicator::MAX_OP);
     }
-
-  vtkTable* fragments = vtkTable::New ();
 
   vtkIdTypeArray* fragIdArray = vtkIdTypeArray::New ();
   fragIdArray->SetName ("Fragment ID");
@@ -147,10 +152,6 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
   fragments->AddColumn (fragMass);
   fragMass->Delete ();
 
-  vtkSmartPointer<vtkKdTreePointLocator> locator = vtkKdTreePointLocator::New ();
-  locator->SetDataSet (contour);
-
-  vtkCompositeDataIterator* iter = volume->NewIterator ();
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
     vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
@@ -163,6 +164,12 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     if (!ghostLevels) 
       {
       vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
+      return 0;
+      }
+    vtkDataArray* regionId = grid->GetCellData ()->GetArray ("RegionId");
+    if (!regionId) 
+      {
+      vtkErrorMacro ("No RegionID in volume.  Run Connectivity filter.");
       return 0;
       }
     vtkDataArray* volArray = grid->GetCellData ()->GetArray (volumeName);
@@ -186,16 +193,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
         double* bounds = grid->GetCell (c)->GetBounds ();
         double lower[3] = { bounds[0], bounds[2], bounds[4] };
         
-        // This is the critical piece.
-        // Because we've run the contour and we're operating this function on 
-        // one material contour at a time, we can expect an air gap of at least 
-        // one cell between fragments.  So we just need to find a point in the 
-        // nearest fragment contour to this cell and get its region ID.  This
-        // tells us the regionID for this cell as computed by the AMRDualContour 
-        // and Connectivity filters.
-        vtkIdType pointId = locator->FindClosestPoint (lower);
-        vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (pointId));
-
+        vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
         fragIdArray->SetTuple1 (fragId, fragId);
         fragVolume->SetTuple1 (fragId, fragVolume->GetTuple1 (fragId) + volArray->GetTuple1 (c) * cellVol / 255.0);
         fragMass->SetTuple1 (fragId, fragMass->GetTuple1 (fragId) + massArray->GetTuple1 (c));
