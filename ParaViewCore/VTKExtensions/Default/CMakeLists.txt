@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(Module_SRCS
+  vtkAMRConnectivity.cxx
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
@@ -73,6 +74,7 @@ set(Module_SRCS
   vtkPEnSightGoldBinaryReader.cxx
   vtkPEnSightGoldReader.cxx
   vtkPEnSightReader.cxx
+  vtkPEquivalenceSet.cxx
   vtkPExtractHistogram.cxx
   vtkPGenericEnSightReader.cxx
   vtkPhastaReader.cxx

@@ -49,7 +49,7 @@ public:
 
   // Equivalent set ids are reassinged to be sequential.
   // You cannot add anymore equivalences after this is called.
-  int ResolveEquivalences();
+  virtual int ResolveEquivalences();
 
   void DeepCopy(vtkEquivalenceSet* in);
 
@@ -67,7 +67,7 @@ public:
   // We should fix the pointer API and hide this ivar.
   int Resolved;
 
-private:
+protected:
   vtkEquivalenceSet();
   ~vtkEquivalenceSet();
 

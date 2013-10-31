@@ -122,9 +122,19 @@ void vtkEquivalenceSet::AddEquivalence(int id1, int id2)
   // Expand the range to include both ids.
   while (num <= id1 || num <= id2)
     {
-    // All values inserted are equivalent to only themselves.
-    this->EquivalenceArray->InsertNextTuple1(num);
+    // Insert -1 because these don't exist yet
+    // Later if added this will get overwritten
+    this->EquivalenceArray->InsertNextTuple1(-1);
     ++num;
+    }
+
+  if (this->EquivalenceArray->GetValue (id1) < 0)
+    {
+    this->EquivalenceArray->SetValue (id1, id1);
+    }
+  if (this->EquivalenceArray->GetValue (id2) < 0)
+    {
+    this->EquivalenceArray->SetValue (id2, id2);
     }
 
  // Our rule for references in the equivalent set is that
@@ -220,7 +230,11 @@ int vtkEquivalenceSet::ResolveEquivalences()
   for (int ii = 0; ii < numIds; ++ii)
     {
     id = this->EquivalenceArray->GetValue(ii);
-    if (id == ii)
+    if (id < 0)
+      { // This id was never added, skip it.
+      continue; 
+      }
+    else if (id == ii)
       { // This is a new equivalence set.
       this->EquivalenceArray->SetValue(ii, count);
       ++count;
