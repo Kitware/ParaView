@@ -19,6 +19,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 
+#include "vtkAMRDualGridHelper.h"
 #include "vtkCellData.h"
 #include "vtkCell.h"
 #include "vtkCompositeDataIterator.h"
@@ -38,6 +39,7 @@ vtkStandardNewMacro (vtkAMRConnectivity);
 vtkAMRConnectivity::vtkAMRConnectivity ()
 {
   this->VolumeFractionSurfaceValue = 0.5;
+  this->Helper = 0;
 }
 
 vtkAMRConnectivity::~vtkAMRConnectivity ()
@@ -107,7 +109,11 @@ int vtkAMRConnectivity::RequestData (vtkInformation* vtkNotUsed(request),
 
   amrOutput->ShallowCopy (amrInput);
 
-  // TODO Dual grid helper initialize
+  this->Helper = vtkAMRDualGridHelper::New ();
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
+  this->Helper->SetController(controller);
+  this->Helper->Initialize(amrInput);
+
   unsigned int noOfArrays = static_cast<unsigned int>(this->VolumeArrays.size());
   for(unsigned int i = 0; i < noOfArrays; i++)
     {
@@ -116,6 +122,7 @@ int vtkAMRConnectivity::RequestData (vtkInformation* vtkNotUsed(request),
       return 0;
       }
     }
+  this->Helper->Delete ();
 
   return 1;
 }
@@ -190,8 +197,10 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           }
         }
       }
-
     }
+
+  
+
   // Exchange points between blocks for the equivalence set
   // Each axis at a time.  In the positive direction only.
   // Reduce equivalence set.

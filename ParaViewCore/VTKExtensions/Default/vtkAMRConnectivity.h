@@ -29,6 +29,7 @@
 class vtkNonOverlappingAMR;
 class vtkUniformGrid;
 class vtkIdTypeArray;
+class vtkAMRDualGridHelper;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
@@ -52,6 +53,8 @@ protected:
   ~vtkAMRConnectivity();
 
   double VolumeFractionSurfaceValue;
+  vtkAMRDualGridHelper* Helper;
+
   vtkIdType NextRegionId;
 
   // BTX
