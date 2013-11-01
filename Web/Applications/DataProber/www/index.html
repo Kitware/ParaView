@@ -3,24 +3,8 @@
     <head>
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
 
-        <!-- Core-js ParaViewWeb dependency -->
-        <script type="text/javascript" src="../../ext/core/autobahn.min.js"></script>
-        <script type="text/javascript" src="../../ext/core/jquery-1.8.3.min.js"></script>
-        <script type="text/javascript" src="../../ext/core/gl-matrix-min.js"></script>
-        <script type="text/javascript" src="../../ext/core/jquery.hammer.min.js"></script>
-        <script type="text/javascript" src="../../lib/core/vtkweb-all.js"></script>
-
-        <!-- ParaViewWeb Widget dependency -->
-        <link   type='text/css'       href="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.css" rel="stylesheet">
-        <script type="text/javascript" src="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.min.js"></script>
-
-        <script type="text/javascript" src="../../ext/widgets/d3/d3.v2.js"></script>
-
-        <link   type='text/css'       href="../../ext/widgets/nvd3/nv.d3.css" rel="stylesheet">
-        <script type="text/javascript" src="../../ext/widgets/nvd3/nv.d3.js"></script>
-
-        <link   type='text/css'       href="../../ext/widgets/rickshaw/rickshaw.min.css" rel="stylesheet">
-        <script type="text/javascript" src="../../ext/widgets/rickshaw/rickshaw.min.js"></script>
+        <!-- Handle ParaViewWeb dependency -->
+        <script src="../../lib/core/vtkweb-loader.js" load="core, jquery-ui, d3, nvd3, rickshaw"></script>
 
         <!-- ParaViewWeb Widgets -->
         <script type="text/javascript" src="../../lib/js/paraview.nv.utils.js"></script>

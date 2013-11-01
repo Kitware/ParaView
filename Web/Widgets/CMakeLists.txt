@@ -5,19 +5,6 @@ vtk_module_export("")
 # Everything under other directories is placed in www/lib/js or www/lib/css
 
 # =================================================================
-# External components
-# =================================================================
-
-set(ext_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Ext")
-set(ext_binary_dir "${PARAVIEW_WWW_DIR}/ext/widgets")
-
-copy_files_recursive(${ext_source_dir}
-  DESTINATION ${ext_binary_dir}
-  REGEX "^.*$"
-  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ext-copy-complete"
-  LABEL "Copying widgets External files")
-
-# =================================================================
 # NV charts
 # =================================================================
 
@@ -88,7 +75,6 @@ copy_files_recursive(${paraview_toolbars_source_dir}
 # =================================================================
 
 add_custom_target(ParaViewWebWidgets ALL DEPENDS
-  "${CMAKE_CURRENT_BINARY_DIR}/ext-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/nvcharts-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-js-copy-complete"

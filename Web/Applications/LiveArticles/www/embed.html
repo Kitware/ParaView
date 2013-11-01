@@ -5,15 +5,8 @@
 
         <link rel='stylesheet' href='style_embed.css' type='text/css' />
 
-        <!-- Core-js ParaViewWeb dependency -->
-        <script type="text/javascript" src="../../ext/core/autobahn.min.js"></script>
-        <script type="text/javascript" src="../../ext/core/jquery-1.8.3.min.js"></script>
-        <script type="text/javascript" src="../../lib/core/vtkweb-all.js"></script>
-
-        <!-- ParaViewWeb Widget dependency -->
-        <link   type='text/css'       href="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.css" rel="stylesheet">
-        <script type="text/javascript" src="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.min.js"></script>
-
+        <!-- dependency -->
+        <script src="../../lib/core/vtkweb-loader-min.js" load="core-min, jquery-ui"></script>
         <script type="text/javascript">
             $(function() {
                 // Center the clicktostart element.
@@ -98,7 +91,7 @@
                         };
 
                         // Start a new ParaView/Web instance.
-                        paraview.start(config,
+                        vtkWeb.start(config,
                         function (conn) {
                             setupConnection(conn);
                         },
@@ -123,10 +116,10 @@
 
                     // connect to the ParaView/Web instance, so we can start
                     // visualizing.
-                    paraview.connect(connection,
+                    vtkWeb.connect(connection,
                     function(conn) {
                         pv.connection = conn;
-                        pv.viewport = paraview.createViewport({session:conn.session});
+                        pv.viewport = vtkWeb.createViewport({session:conn.session});
                         pv.viewport.bind("#viewport");
 
                         var filePath= getParameter("data");
@@ -149,7 +142,8 @@
                         pv.viewport.unbind();
                     }
                     if (pv.connection) {
-                        paraview.stop(pv.connection);
+                        pv.connection.session.call('vtk:exit');
+                        pv.connection.session.close();
                     }
                     $("#options").hide();
                     pv = {};
