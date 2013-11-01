@@ -195,7 +195,7 @@ FUNCTION(add_pvweb_tests prefix)
                   ${BASELINE_IMG_DIR}
                   --run-test-script ${test_path}
                   )
-        set_tests_properties(${browser_test_name} PROPERTIES LABELS "PARAVIEW")
+        set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
       endwhile()
     else()
       message(STATUS "${prefix}-${ACT_APP}-${browser} tests disabled, missing requirements")
