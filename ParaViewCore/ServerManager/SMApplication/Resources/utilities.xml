@@ -2388,7 +2388,10 @@
       </StringVectorProperty>
       <!-- End of POVExporter -->
     </RenderViewExporterProxy>
+
+    <!-- GL2PS exporter, shared options between render and context views: -->
     <GL2PSExporterProxy class="not-used"
+                        viewtype="none"
                         name="GL2PSExporterBase">
       <Documentation>Base API definition for all GL2PS vector graphic exporters.
       </Documentation>
@@ -2404,22 +2407,6 @@
                             default_values="ParaView GL2PS Export"
                             number_of_elements="1">
       </StringVectorProperty>
-      <IntVectorProperty command="SetSort"
-                         default_values="1"
-                         name="SetSort"
-                         label="GL2PS depth sort method"
-                         panel_visibility="advanced"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="No sorting (fastest, poor)"
-                 value="0" />
-          <Entry text="Simple sorting (fast, good)"
-                 value="1" />
-          <Entry text="BSP sorting (slow, best)"
-                 value="2" />
-        </EnumerationDomain>
-        <Documentation>Method of sorting 3D primitives.</Documentation>
-      </IntVectorProperty>
       <IntVectorProperty command="SetCompress"
                          default_values="0"
                          name="SetCompress"
@@ -2441,25 +2428,6 @@
                          label="Cull hidden primitives"
                          panel_visibility="advanced"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetWrite3DPropsAsRasterImage"
-                         default_values="1"
-                         name="Write3DPropsAsRasterImage"
-                         label="Rasterize 3D geometry"
-                         number_of_elements="1">
-        <Documentation>Export all 3D geometry as a rasterized image behind 2D
-        geometry, which is still rendered as vector graphics.</Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetExcludeCubeAxesActorsFromRasterization"
-                         default_values="1"
-                         name="ExcludeCubeAxesActorsFromRasterization"
-                         label="Don't rasterize cube axes"
-                         panel_visibility="advanced"
-                         number_of_elements="1">
-        <Documentation>If rasterizing 3D geometry, setting this option will
-        export all cube axes actors as vector graphics.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty command="SetLineWidthFactor"
@@ -2484,11 +2452,100 @@
       </DoubleVectorProperty>
       <!-- End of "GL2PSExporterBase" -->
     </GL2PSExporterProxy>
+
+    <!-- GL2PS exporter, additional render view options added: -->
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSExporterBase"
+                        class="not-used"
+                        viewtype="none"
+                        name="GL2PSRenderViewExporterBase">
+      <Documentation>Base API definition for all GL2PS render view exporters.
+      </Documentation>
+      <IntVectorProperty command="SetSort"
+                         default_values="1"
+                         name="SetSort"
+                         label="GL2PS depth sort method"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="No sorting (fastest, poor)"
+                 value="0" />
+          <Entry text="Simple sorting (fast, good)"
+                 value="1" />
+          <Entry text="BSP sorting (slow, best)"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Method of sorting 3D primitives.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWrite3DPropsAsRasterImage"
+                         default_values="1"
+                         name="Write3DPropsAsRasterImage"
+                         label="Rasterize 3D geometry"
+                         number_of_elements="1">
+        <Documentation>Export all 3D geometry as a rasterized image behind 2D
+        geometry, which is still rendered as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetExcludeCubeAxesActorsFromRasterization"
+                         default_values="1"
+                         name="ExcludeCubeAxesActorsFromRasterization"
+                         label="Don't rasterize cube axes"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <Documentation>If rasterizing 3D geometry, setting this option will
+        export all cube axes actors as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of "GL2PSRenderViewExporterBase" -->
+    </GL2PSExporterProxy>
+
+    <!-- GL2PS exporter, additional context view options added: -->
+    <GL2PSExporterProxy base_proxygroup="exporters"
+                        base_proxyname="GL2PSExporterBase"
+                        class="not-used"
+                        viewtype="none"
+                        name="GL2PSContextViewExporterBase">
+      <Documentation>Base API definition for all GL2PS context view exporters.
+      </Documentation>
+      <!-- No sorting, preserve painter order: -->
+      <IntVectorProperty command="SetSort"
+                         default_values="0"
+                         name="SetSort"
+                         label="GL2PS depth sort method"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Method of sorting 3D primitives.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWrite3DPropsAsRasterImage"
+                         default_values="0"
+                         name="Write3DPropsAsRasterImage"
+                         label="Rasterize 3D geometry"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Export all 3D geometry as a rasterized image behind 2D
+        geometry, which is still rendered as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetExcludeCubeAxesActorsFromRasterization"
+                         default_values="1"
+                         name="ExcludeCubeAxesActorsFromRasterization"
+                         label="Don't rasterize cube axes"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>If rasterizing 3D geometry, setting this option will
+        export all cube axes actors as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of "GL2PSContextViewExporterBase" -->
+    </GL2PSExporterProxy>
+
+    <!-- Actual render view GL2PS exporter proxies -->
+    <GL2PSExporterProxy base_proxygroup="exporters"
+                        base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
                         file_extension="ps"
-                        name="GL2PSExporterPS">
+                        viewtype="renderview"
+                        name="GL2PSRenderViewExporterPS">
       <Documentation long_help="Export PostScript (PS) Files"
                      short_help="PS Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
@@ -2516,13 +2573,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
-      <!-- End of GL2PSExporterPS -->
+      <!-- End of GL2PSRenderViewExporterPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
-                        base_proxyname="GL2PSExporterBase"
+                        base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
                         file_extension="eps"
-                        name="GL2PSExporterEPS">
+                        viewtype="renderview"
+                        name="GL2PSRenderViewExporterEPS">
       <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
                      short_help="EPS Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
@@ -2542,13 +2600,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
-      <!-- End of GL2PSExporterEPS -->
+      <!-- End of GL2PSRenderViewExporterEPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
-                        base_proxyname="GL2PSExporterBase"
+                        base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
                         file_extension="pdf"
-                        name="GL2PSExporterPDF">
+                        viewtype="renderview"
+                        name="GL2PSRenderViewExporterPDF">
       <Documentation long_help="Export Portable Document Format (PDF) Files"
                      short_help="PDF Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
@@ -2569,13 +2628,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
-      <!-- End of GL2PSExporterPDF -->
+      <!-- End of GL2PSRenderViewExporterPDF -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
-                        base_proxyname="GL2PSExporterBase"
+                        base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
                         file_extension="svg"
-                        name="GL2PSExporterSVG">
+                        viewtype="renderview"
+                        name="GL2PSRenderViewExporterSVG">
       <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
                      short_help="SVG Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
@@ -2595,7 +2655,126 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
-      <!-- End of GL2PSExporterSVG -->
+      <!-- End of GL2PSRenderViewExporterSVG -->
+    </GL2PSExporterProxy>
+
+    <!-- Actual context view GL2PS exporter proxies -->
+    <GL2PSExporterProxy base_proxygroup="exporters"
+                        base_proxyname="GL2PSContextViewExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="ps"
+                        viewtype="contextview"
+                        name="GL2PSContextViewExporterPS">
+      <Documentation long_help="Export PostScript (PS) Files"
+                     short_help="PS Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="0"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPS3Shading"
+                         default_values="1"
+                         name="SetPS3Shading"
+                         label="Use shfill shading operator"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="0"
+                         name="FileFormat"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <!-- End of GL2PSContextViewExporterPS -->
+    </GL2PSExporterProxy>
+    <GL2PSExporterProxy base_proxygroup="exporters"
+                        base_proxyname="GL2PSContextViewExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="eps"
+                        viewtype="contextview"
+                        name="GL2PSContextViewExporterEPS">
+      <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
+                     short_help="EPS Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="0"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="1"
+                         name="FileFormat"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <!-- End of GL2PSContextViewExporterEPS -->
+    </GL2PSExporterProxy>
+    <GL2PSExporterProxy base_proxygroup="exporters"
+                        base_proxyname="GL2PSContextViewExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="pdf"
+                        viewtype="contextview"
+                        name="GL2PSContextViewExporterPDF">
+      <Documentation long_help="Export Portable Document Format (PDF) Files"
+                     short_help="PDF Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="1"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="2"
+                         name="FileFormat"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <!-- End of GL2PSContextViewExporterPDF -->
+    </GL2PSExporterProxy>
+    <GL2PSExporterProxy base_proxygroup="exporters"
+                        base_proxyname="GL2PSContextViewExporterBase"
+                        class="vtkPVGL2PSExporter"
+                        file_extension="svg"
+                        viewtype="contextview"
+                        name="GL2PSContextViewExporterSVG">
+      <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
+                     short_help="SVG Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="0"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="4"
+                         name="FileFormat"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <!-- End of GL2PSContextViewExporterSVG -->
     </GL2PSExporterProxy>
 
     <RenderViewExporterProxy name="WebGLExporter" class="vtkPVWebGLExporter"
