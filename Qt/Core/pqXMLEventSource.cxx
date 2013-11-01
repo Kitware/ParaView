@@ -139,6 +139,17 @@ int pqXMLEventSource::getNextEvent(
     int width = 300, height = 300;
     elem->GetScalarAttribute("width", &width);
     elem->GetScalarAttribute("height", &height);
+    int threshold = 0;
+    if (elem->GetScalarAttribute("threshold", &threshold) && threshold >= 0)
+      {
+      // use the threshold specified by the XML
+      }
+    else
+      {
+      pqOptions* const options = pqOptions::SafeDownCast(
+        vtkProcessModule::GetProcessModule()->GetOptions());
+      threshold = options->GetCurrentImageThreshold();
+      }
 
     QWidget* widget =
       qobject_cast<QWidget*>(pqObjectNaming::GetObject(widgetName));
@@ -147,16 +158,12 @@ int pqXMLEventSource::getNextEvent(
       {
       return FAILURE;
       }
-    cout << width << ", " << height << endl;
     QSize old_size = widget->maximumSize();
     widget->setMaximumSize(width, height);
     widget->resize(width, height);
 
-    pqOptions* const options = pqOptions::SafeDownCast(
-      vtkProcessModule::GetProcessModule()->GetOptions());
     bool retVal = pqCoreTestUtility::CompareImage(widget, baseline,
-      options->GetCurrentImageThreshold(), std::cerr,
-      pqCoreTestUtility::TestDirectory());
+      threshold, std::cerr, pqCoreTestUtility::TestDirectory());
     widget->setMaximumSize(old_size);
     if (!retVal)
       {

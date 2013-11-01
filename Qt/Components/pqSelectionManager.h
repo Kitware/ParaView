@@ -72,10 +72,6 @@ public:
   /// Returns the currently selected source, if any.
   pqOutputPort* getSelectedPort() const;
 
-  /// Make a selection source proxy for a client-side selection.
-  /// Only supports pedigree id selections.
-  static vtkSMSourceProxy* createSelectionSource(vtkSelection* s, vtkSMSession* session);
-
 signals:
   /// Fired when the selection changes. Argument is the pqOutputPort (if any)
   /// that was selected. If selection was cleared then the argument is NULL.

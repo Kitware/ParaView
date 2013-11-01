@@ -14,6 +14,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
@@ -375,6 +376,11 @@ IF (PARAVIEW_USE_MPI)
   # needed.
   SET (RectilinearFractal_DISABLE_CS TRUE)
   SET (RectilinearFractal_DISABLE_CRS TRUE)
+
+  # Selections end up highlighting different set of ID based points in parallel.
+  # Hence disable them.
+  set (LineChartSelection_DISABLE_CS TRUE)
+  set (LineChartSelection_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
 
 # Composite Surface Selection is currently broken in everything but bultin

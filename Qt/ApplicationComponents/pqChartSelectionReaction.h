@@ -33,38 +33,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqChartSelectionReaction_h
 
 #include "pqReaction.h"
-#include <QPointer>
+#include <QPointer> // needed for QPointer.
 
 class pqContextView;
+class QActionGroup;
+class vtkObject;
 
 /// @ingroup Reactions
-/// Reaction for starting selections on chart.
+/// Reaction for creating selections on chart views.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqChartSelectionReaction(QAction* parent, pqContextView* view,
-    int selectionMode, int selectAction=0);
+  /// Constructor. \c parent is expected to have data() that indicates the
+  /// selection type e.g. vtkChart::SELECT_RECTANGLE or vtkChart::SELECT_POLYGON.
+  /// QActionGroup \c modifierGroup is used to determine selection modifier. If
+  /// there's a non-null checkedAction() in the group, we use that action's
+  /// data() to determine the selection mode e.g.
+  /// vtkContextScene::SELECTION_ADDITION,
+  /// vtkContextScene::SELECTION_SUBTRACTION etc. If no QActionGroup is
+  /// specified or no checked action is present, then the default mode of
+  /// vtkContextScene::SELECTION_DEFAULT is used.
+  pqChartSelectionReaction(QAction* parent,
+    pqContextView* view, QActionGroup* modifierGroup);
 
-  /// start selection on the view.
-  static void startSelection(pqContextView* view, int selectionMode,
-    int selectionAction);
+  /// start selection on the view where selectionType is one of
+  /// vtkChart::SELECT_POLYGON, vtkChart::SELECT_RECTANGLE, etc., and
+  /// selectionModifier is one of vtkContextScene::SELECTION_DEFAULT,
+  /// vtkContextScene::SELECTION_ADDITION, etc.
+  static void startSelection(pqContextView* view, 
+    int selectionType, int selectionModifier);
 
-public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
-  void updateEnableState();
-
-protected:
+protected slots:
   /// Called when the action is triggered.
-  virtual void onTriggered();
+  virtual void triggered(bool);
+
+  /// stops selecting on the view
+  void stopSelection();
 
 private:
   Q_DISABLE_COPY(pqChartSelectionReaction)
   QPointer<pqContextView> View;
-  int SelectionMode;
-  int SelectionAction;
+  QPointer<QActionGroup> ModifierGroup;
 };
 
 #endif
