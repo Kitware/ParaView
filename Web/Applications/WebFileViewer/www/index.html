@@ -81,36 +81,19 @@
                 stop = function() {
                     connection.session.call('vtk:exit');
                 }
+
+                // Auto load file if any available
+                if(connection.hasOwnProperty('file')) {
+                    connection.session.call('vtk:openFileFromPath', connection['file']).then(function(){
+                        viewport.invalidateScene();
+                    });
+                }
             };
 
             // Try to launch the Viz process
-            vtkWeb.start( config, function(connection) {
-                if(connection.error) {
-                    alert(connection.error);
-                    window.close();
-                } else {
-                    // The process successfuly started
-                    // => Just connect to the WebSocket
-                    vtkWeb.connect(
-                        connection,
-                        start,
-                        function(code,reason){
-                            $(".loading").hide();
-                            console.log(reason);
-                        }
-                    );
-                }
-            }, function(msg) {
-                // No launcher found or error
-                console.log("Try to connect using the direct WS url");
-                vtkWeb.connect(
-                    { sessionURL: vtkWeb.properties.sessionURL },
-                    start,
-                    function(code,reason){
-                        $(".loading").hide();
-                        console.log(reason);
-                    }
-                );
+            vtkWeb.smartConnect(config, start, function(code,reason){
+                $(".loading").hide();
+                console.log(reason);
             });
         </script>
     </body>

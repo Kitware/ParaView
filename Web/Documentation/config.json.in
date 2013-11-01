@@ -16,6 +16,7 @@
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.viewport.image.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.viewport.webgl.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.js",
+        "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.simple.js",
         "@JAVASCRIPT_WIDGETS_DIR@/PipelineBrowser/paraview.ui.pipeline.js",
         "@JAVASCRIPT_WIDGETS_DIR@/Toolbars/paraview.ui.toolbar.vcr.js",
         "@JAVASCRIPT_WIDGETS_DIR@/Toolbars/paraview.ui.toolbar.viewport.js",
