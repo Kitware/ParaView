@@ -124,10 +124,7 @@
     <string>Find data...</string>
    </property>
    <property name="toolTip">
-    <string>Find data by scalar value (v)</string>
-   </property>
-   <property name="shortcut">
-     <string>V</string>
+     <string>Find data matching various criteria from the current source (v)</string>
    </property>
   </action>
   <addaction name="actionOpenData"/>
