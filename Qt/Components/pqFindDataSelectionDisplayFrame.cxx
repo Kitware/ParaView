@@ -433,6 +433,57 @@ void pqFindDataSelectionDisplayFrame::showFrustum(bool val)
   this->Internals->showFrustum(val);
 }
 
+
+//-----------------------------------------------------------------------------
+void pqFindDataSelectionDisplayFrame::setUseVerticalLayout(bool vertical)
+{
+  // we support this so that we can add this widget in a dock panel to allow
+  // each access to these properties.
+  if (this->useVerticalLayout() == vertical)
+    {
+    return;
+    }
+
+  Ui::FindDataSelectionDisplayFrame &ui = this->Internals->Ui;
+  delete this->layout();
+  ui.horizontalLayout = NULL;
+
+  if (vertical)
+    {
+    QVBoxLayout* vbox = new QVBoxLayout(this);
+    vbox->setMargin(pqPropertiesPanel::suggestedMargin());
+    vbox->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+    vbox->addWidget(ui.cellLabelsButton);
+    vbox->addWidget(ui.pointLabelsButton);
+
+    QHBoxLayout* hbox = new QHBoxLayout();
+    hbox->addWidget(ui.selectionColor);
+    hbox->addStretch();
+    hbox->addWidget(ui.showFrustumButton);
+    hbox->addWidget(ui.showLabelPropertiesButton);
+
+    vbox->addLayout(hbox);
+    vbox->addStretch();
+    }
+  else
+    {
+    QHBoxLayout* hbox = new QHBoxLayout(this);
+    hbox->setMargin(pqPropertiesPanel::suggestedMargin());
+    hbox->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+    hbox->addWidget(ui.selectionColor);
+    hbox->addWidget(ui.cellLabelsButton);
+    hbox->addWidget(ui.pointLabelsButton);
+    hbox->addWidget(ui.showFrustumButton);
+    hbox->addWidget(ui.showLabelPropertiesButton);
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqFindDataSelectionDisplayFrame::useVerticalLayout() const
+{
+  return qobject_cast<QVBoxLayout*>(this->layout()) != NULL;
+}
+
 //-----------------------------------------------------------------------------
 void pqFindDataSelectionDisplayFrame::editLabelProperties()
 {

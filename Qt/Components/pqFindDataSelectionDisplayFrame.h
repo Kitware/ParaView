@@ -47,10 +47,20 @@ class pqView;
 class PQCOMPONENTS_EXPORT pqFindDataSelectionDisplayFrame : public QWidget
 {
   Q_OBJECT
+  Q_PROPERTY(bool useVerticalLayout
+             READ useVerticalLayout
+             WRITE setUseVerticalLayout)
+
   typedef QWidget Superclass;
 public:
   pqFindDataSelectionDisplayFrame(QWidget* parent=0, Qt::WindowFlags f=0);
   virtual ~pqFindDataSelectionDisplayFrame();
+
+  /// pqFindDataSelectionDisplayFrame can be made to lay itself out in a more
+  /// vertical fashion rather than the default, horizontal layout. To use a
+  /// vertical layout, use this method.
+  void setUseVerticalLayout(bool);
+  bool useVerticalLayout() const;
 
 public slots:
   /// Set the output port that is currently selected for which we are

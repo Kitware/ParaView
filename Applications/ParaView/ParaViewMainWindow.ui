@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>18</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -175,8 +175,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>70</width>
-          <height>150</height>
+          <width>77</width>
+          <height>152</height>
          </rect>
         </property>
        </widget>
@@ -210,8 +210,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>70</width>
-          <height>150</height>
+          <width>77</width>
+          <height>152</height>
          </rect>
         </property>
        </widget>
@@ -255,6 +255,25 @@
     <number>2</number>
    </attribute>
    <widget class="pqColorMapEditor" name="colorMapEditorPanel"/>
+  </widget>
+  <widget class="QDockWidget" name="selectionDisplayDock">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="windowTitle">
+    <string>Selection Display Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqFindDataSelectionDisplayFrame" name="selectionDisplayWidget">
+    <property name="useVerticalLayout" stdset="0">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
  </widget>
  <customwidgets>
@@ -339,6 +358,12 @@
    <class>pqColorMapEditor</class>
    <extends>QWidget</extends>
    <header>pqColorMapEditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqFindDataSelectionDisplayFrame</class>
+   <extends>QWidget</extends>
+   <header>pqFindDataSelectionDisplayFrame.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
