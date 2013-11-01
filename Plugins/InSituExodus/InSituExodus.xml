@@ -1,0 +1,26 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+   <SourceProxy name="InSituExodusReader"
+                class="vtkCPExodusIIInSituReader"
+                label="InSitu Exodus II Reader">
+     <Documentation
+        long_help="Read an Exodus II file into ParaView, reusing the memory
+                   allocated by the Exodus II library. Experimental use only."
+        short_help="Experimental memory-conserving Exodus II file reader.">
+     </Documentation>
+     <StringVectorProperty animateable="0"
+                           command="SetFileName"
+                           name="FileName"
+                           number_of_elements="1"
+                           panel_visibility="never">
+       <FileListDomain name="files" />
+       <Documentation>This property specifies the file name for the Exodus
+       reader.</Documentation>
+     </StringVectorProperty>
+     <Hints>
+       <ReaderFactory extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+                      file_description="Exodus II (InSitu)" />
+     </Hints>
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
