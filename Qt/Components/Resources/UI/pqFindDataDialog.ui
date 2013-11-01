@@ -171,6 +171,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>&lt;p&gt;Create a new &lt;b&gt;Extract Selection&lt;/b&gt; filter to extract the current selection&lt;/p&gt;</string>
+       </property>
        <property name="text">
         <string>Extract Selection</string>
        </property>
@@ -181,8 +184,11 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>&lt;p&gt;Create a new &lt;b&gt;Plot Selection Over Time&lt;/b&gt; filter to plot the current selection over time&lt;/p&gt;</string>
+       </property>
        <property name="text">
-        <string>Extract Selection Over Time</string>
+        <string>Plot Selection Over Time</string>
        </property>
       </widget>
      </item>
