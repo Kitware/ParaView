@@ -71,6 +71,8 @@ private slots:
   /// source to the one specified.
   void invertSelection(bool);
 
+  /// update the data shown in the spreadsheet aka render the spreadsheet.
+  void updateSpreadSheet();
 private:
   Q_DISABLE_COPY(pqFindDataCurrentSelectionFrame);
 

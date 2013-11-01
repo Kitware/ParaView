@@ -1184,8 +1184,11 @@ void vtkSMProxy::PostUpdateData()
     }
   if (this->NeedsUpdate)
     {
-    this->InvokeEvent(vtkCommand::UpdateDataEvent, 0);
+    // this->NeedsUpdate must be set to false before firing this event otherwise
+    // if the event handler results in other view updates, we end up
+    // unnecessarily thinking that this proxy needs update.
     this->NeedsUpdate = false;
+    this->InvokeEvent(vtkCommand::UpdateDataEvent, 0);
     }
 }
 

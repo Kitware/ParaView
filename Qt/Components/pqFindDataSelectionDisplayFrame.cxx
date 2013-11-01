@@ -121,7 +121,7 @@ public:
         throw false;
         }
       }
-    catch (bool code)
+    catch (bool)
       {
       self->setEnabled(false);
       this->destroyFrustum();

@@ -85,7 +85,7 @@ public:
     self->connect(this->Ui.invertSelectionCheckBox, SIGNAL(toggled(bool)),
       SLOT(invertSelection(bool)));
 
-    this->showSelectedData(this->SelectionManager->getSelectedPort());
+    this->showSelectedData(this->SelectionManager->getSelectedPort(), self);
     }
 
   ~pqInternals()
@@ -145,11 +145,21 @@ public:
     }
 
   //---------------------------------------------------------------------------
-  void showSelectedData(pqOutputPort* port)
+  void showSelectedData(pqOutputPort* port, pqFindDataCurrentSelectionFrame* self)
     {
     // FIXME: is port changes, let's pick the fieldtype based on the type of the
     // selection that was created.
+
+    if (this->ShowingPort)
+      {
+      self->disconnect(this->ShowingPort->getSource());
+      }
     this->ShowingPort = port;
+    if (port)
+      {
+      self->connect(port->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)),
+        SLOT(updateSpreadSheet()));
+      }
     this->setupSpreadsheet(port? port->getServer(): NULL);
 
     bool prev = this->Ui.showTypeComboBox->blockSignals(true);
@@ -218,7 +228,7 @@ pqFindDataCurrentSelectionFrame::~pqFindDataCurrentSelectionFrame()
 //-----------------------------------------------------------------------------
 void pqFindDataCurrentSelectionFrame::showSelectedData(pqOutputPort* port)
 {
-  this->Internals->showSelectedData(port);
+  this->Internals->showSelectedData(port, this);
   emit this->showing(port);
 }
 
@@ -256,4 +266,10 @@ void pqFindDataCurrentSelectionFrame::invertSelection(bool val)
       this->Internals->updateSpreadSheet();
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqFindDataCurrentSelectionFrame::updateSpreadSheet()
+{
+  this->Internals->updateSpreadSheet();
 }
