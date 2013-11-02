@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>212</width>
-    <height>184</height>
+    <height>215</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -85,7 +85,7 @@
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqFilter16.png</normaloff>:/pqWidgets/Icons/pqFilter16.png</iconset>
+         <normaloff>:/pqWidgets/Icons/pqRuler16.png</normaloff>:/pqWidgets/Icons/pqRuler16.png</iconset>
        </property>
       </widget>
      </item>
