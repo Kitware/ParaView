@@ -4,6 +4,8 @@
  * This module extend jQuery object to add support for VCR Time control
  * related to ParaViewWeb usage.
  *
+ * This module registers itself as: 'paraview-ui-toolbar-vcr'
+ *
  * @class jQuery.paraview.ui.toolbar.vcr
  */
 (function (GLOBAL, $) {
@@ -30,7 +32,7 @@
      *
      * @member jQuery.paraview.ui.toolbar.vcr
      * @method vcrToolbar
-     * @param {pv.Session} session
+     * @param {vtkWeb.Session} session
      * ParaViewWeb session object.
      *
      * Usage:
@@ -140,6 +142,20 @@
 
     function getVcrToolbarWiget(anyInnerProxyWidget) {
         return anyInnerProxyWidget.closest('.paraview.toolbar.vcr');
+    }
+
+    // ----------------------------------------------------------------------
+    // Local module registration
+    // ----------------------------------------------------------------------
+    try {
+      // Tests for presence of jQuery, then registers this module
+      if ($ !== undefined) {
+        vtkWeb.registerModule('paraview-ui-toolbar-vcr');
+      } else {
+        console.error('Module failed to register, jQuery is missing: ' + err.message);
+      }
+    } catch(err) {
+      console.error('Caught exception while registering module: ' + err.message);
     }
 
 }(window, jQuery));

@@ -16,6 +16,11 @@ set (WEB_APPLICATIONS
 get_property(pv_pymodule_build_dir GLOBAL PROPERTY PV_PYMODULE_BUILD_DIR)
 file(MAKE_DIRECTORY "${pv_pymodule_build_dir}/paraview/web")
 
+if (BUILD_TESTING)
+  list(APPEND WEB_APPLICATIONS TestApp)
+  file(MAKE_DIRECTORY "${pv_pymodule_build_dir}/paraview/web/test")
+endif()
+
 set (WEB_APPS_DEPENDS)
 
 foreach (_app ${WEB_APPLICATIONS})
@@ -37,6 +42,17 @@ foreach (_app ${WEB_APPLICATIONS})
   list(APPEND WEB_APPS_DEPENDS
     "${CMAKE_CURRENT_BINARY_DIR}/py-${_app}-complete"
     "${CMAKE_CURRENT_BINARY_DIR}/www-${_app}-complete")
+
+  if (BUILD_TESTING)
+    copy_files_recursive(${Apps_SOURCE_DIR}/${_app}/test
+      DESTINATION "${pv_pymodule_build_dir}/paraview/web/test"
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test-${_app}-complete"
+      REGEX "^(.*\\.py)$"
+      LABEL "Copying Testing files for ${_app}")
+
+    list(APPEND WEB_APPS_DEPENDS
+      "${CMAKE_CURRENT_BINARY_DIR}/test-${_app}-complete")
+  endif()
 
 endforeach()
 

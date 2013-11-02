@@ -85,6 +85,124 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
 
 ENDFUNCTION (add_pv_test)
 
+# Add macro to support addition of paraview web tests
+FUNCTION(add_pvweb_tests prefix)
+  PV_PARSE_ARGUMENTS(ACT
+    "APP;TEST_SCRIPTS;BASELINE_DIR;COMMAND;ARGS;SERVER;DEPEND_MODS;BROWSER"
+    ""
+    ${ARGN})
+
+  set(go_ahead_with_tests TRUE)
+
+  # First check that all requested Python modules are present
+  if(DEFINED ACT_DEPEND_MODS)
+    foreach(module_name ${ACT_DEPEND_MODS})
+      find_python_module(${module_name} got_${module_name})
+      if(NOT ${got_${module_name}})
+        message(STATUS "Missing Python module: ${module_name}")
+        set(go_ahead_with_tests FALSE)
+      endif()
+    endforeach()
+  endif()
+
+  # If this batch of tests has baseline images that need to be
+  # compared against, make sure to include the baseline image
+  # directory.  Otherwise, we will just leave this variable blank.
+  if(DEFINED ACT_BASELINE_DIR)
+    set(BASELINE_IMG_DIR "--baseline-img-dir;${ACT_BASELINE_DIR}")
+  else()
+    set(BASELINE_IMG_DIR "")
+  endif()
+
+  # Check for any args that we got
+  if(DEFINED ACT_ARGS)
+    set(ARGS ${ACT_ARGS})
+  else()
+    set(ARGS "")
+  endif()
+
+  # If there are browsers specified, we will iterate over them
+  # and run the test scripts on each one.  If there isn't a
+  # browser specified, we'll make one called "no-browser" to
+  # keep the code clean.
+  if (NOT DEFINED ACT_BROWSER)
+    set(ACT_BROWSER "nobrowser")
+  else()
+    # There is at least one browser test requested, so we need
+    # to find the selenium drivers
+    find_package(SeleniumDrivers)
+  endif()
+
+  while(ACT_BROWSER)
+    # Pull another browser off the list
+    list(GET ACT_BROWSER 0 browser)
+    list(REMOVE_AT ACT_BROWSER 0)
+
+    set(browser_${browser}_ok TRUE)
+
+    # In this section, we make sure that the needed browser driver is
+    # installed on the system.  Some tests might not require selenium
+    # or an actual browser.
+    if(${browser} STREQUAL "no-browser")
+      # Anything you need to do in the case of no browser.  Currently, nothing.
+    else()
+      if(${browser} STREQUAL "chrome")
+        if(${CHROMEDRIVER_EXECUTABLE} MATCHES "NOTFOUND")
+          set(browser_${browser}_ok FALSE)
+        endif()
+      elseif(${browser} STREQUAL "firefox")
+        if(${FIREFOXDRIVER_EXTENSION} MATCHES "NOTFOUND")
+          set(browser_${browser}_ok FALSE)
+        endif()
+      elseif(${browser} STREQUAL "ie")
+        if(${IEDRIVER_EXECUTABLE} MATCHES "NOTFOUND")
+          set(browser_${browser}_ok FALSE)
+        endif()
+      elseif(${browser} STREQUAL "safari")
+        if(${SAFARIDRIVER_EXTENSION} MATCHES "NOTFOUND")
+          set(browser_${browser}_ok FALSE)
+        endif()
+      endif()
+    endif()
+
+    # If we made it through checks for python modules and browser driver
+    # then we are ready to add the tests.
+    if(${go_ahead_with_tests} AND ${browser_${browser}_ok})
+
+      while (ACT_TEST_SCRIPTS)
+        # pop test script path from the top of the list
+        list(GET ACT_TEST_SCRIPTS 0 test_path)
+        list(REMOVE_AT ACT_TEST_SCRIPTS 0)
+        GET_FILENAME_COMPONENT(script_name ${test_path} NAME_WE)
+
+        set(short_script_name ${script_name})
+
+        # Use a regular expression to remove the first 4 batches of
+        # underscore-separated character strings
+        if(${script_name} MATCHES "^[^_]+_[^_]+_[^_]+_[^_]+_(.+)")
+          set(short_script_name ${CMAKE_MATCH_1})
+        endif()
+
+        set(test_name "${prefix}-${ACT_APP}-${browser}-${short_script_name}")
+
+        add_test(NAME ${test_name}
+          COMMAND ${ACT_COMMAND}
+                  ${ACT_SERVER}
+                  --content ${ParaView_BINARY_DIR}/www
+                  --data-dir ${PARAVIEW_DATA_ROOT}/Data
+                  --port 8080
+                  ${ARGS}
+                  ${BASELINE_IMG_DIR}
+                  --run-test-script ${test_path}
+                  )
+        set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
+      endwhile()
+    else()
+      message(STATUS "${prefix}-${ACT_APP}-${browser} tests disabled, missing requirements")
+    endif()
+  endwhile()
+ENDFUNCTION()
+
 # ----------------------------------------------------------------------------
 # Test functions
 FUNCTION (add_client_tests prefix)
