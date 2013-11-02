@@ -53,7 +53,7 @@
 
             // Make sure webgl is enable to show the switch button
             try {
-                if(paraview.ViewportFactory.webgl) {
+                if(vtkWeb.ViewportFactory.webgl) {
                     $('li.switch', me).show();
                 }
             } catch(error) {}

@@ -7,9 +7,9 @@ set(Apps_BINARY_DIR "${PARAVIEW_WWW_DIR}/apps")
 set (WEB_APPLICATIONS
   DataProber
   LiveArticles
-  WebFileViewer
-  WebVisualizer
-  ParallelViz
+  FileViewer
+  Visualizer
+  Parallel
 )
 
 # Create paraview/web directory

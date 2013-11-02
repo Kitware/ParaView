@@ -1,1 +1,0 @@
-This web application will start new visualization using existing server.

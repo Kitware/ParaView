@@ -17,6 +17,11 @@
                   "url": "guides/virtualgl_turbovnc_howto",
                   "title": "Using VirtualGL and TurboVNC",
                   "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
+              },{
+                  "name": "parallel_app",
+                  "url": "guides/parallel_app",
+                  "title": "Parallel Visualization Setup",
+                  "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
               }
          ]
       },

@@ -1,0 +1,8 @@
+{
+    "FileViewer" : {
+        "label": "File Loader"
+    },
+    "Visualizer" : {
+        "label": "Generic Visualizer"
+    }
+}
