@@ -30,14 +30,6 @@ add_test(NAME pvweb-FileLoader
   --timeout 1)
 set_tests_properties(pvweb-FileLoader PROPERTIES LABELS "PARAVIEW")
 
-# Make sure we can start the Parallel server
-add_test(NAME pvweb-ParallelViz
-  COMMAND $<TARGET_FILE:pvpython>
-  ${pv_pymodule_build_dir}/paraview/web/pv_web_parallel.py
-  --timeout 1)
-set_tests_properties(pvweb-ParallelViz PROPERTIES LABELS "PARAVIEW")
-
-
 ###
 ### Add some tests which interact with the WebVisualizer
 ###
