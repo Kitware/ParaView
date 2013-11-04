@@ -32,22 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "ui_pqDoubleRangeSliderPropertyWidget.h"
 
-#include "ctkDoubleRangeSlider.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
+#include "pqDoubleRangeWidget.h"
 #include "pqWidgetRangeDomain.h"
 #include "vtkSMProperty.h"
 
-#include <QDoubleValidator>
 #include <QGridLayout>
 
 class pqDoubleRangeSliderPropertyWidget::pqInternals
 {
 public:
   Ui::DoubleRangeSliderPropertyWidget Ui;
-  bool IgnoreSliders;
-
-  pqInternals() : IgnoreSliders(false) { }
 };
 
 //-----------------------------------------------------------------------------
@@ -66,46 +62,22 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
-  ui.gridLayout->removeWidget(ui.placeHolder);
-  delete ui.placeHolder;
-  ui.placeHolder = NULL;
+  this->addPropertyLink(ui.ThresholdBetween_0, "value", SIGNAL(valueChanged(double)),
+                        smProperty, 0);
+  this->addPropertyLink(ui.ThresholdBetween_1, "value", SIGNAL(valueChanged(double)),
+                        smProperty, 1);
 
-  QWidget* labelWidget = pqProxyWidget::newGroupLabelWidget(
-    smProperty->GetXMLLabel(), this);
-  ui.gridLayout->addWidget(labelWidget, 0, 0, 1, -1);
-
-  ui.RangeSlider->setOrientation(Qt::Horizontal);
-  ui.ThresholdBetween_0->setValidator(new QDoubleValidator(this));
-  ui.ThresholdBetween_1->setValidator(new QDoubleValidator(this));
-
-  this->addPropertyLink(ui.ThresholdBetween_0, "text2",
-    SIGNAL(textChanged(const QString&)), smProperty, 0);
-  this->addPropertyLink(ui.ThresholdBetween_1, "text2",
-    SIGNAL(textChanged(const QString&)), smProperty, 1);
-  this->connect(ui.ThresholdBetween_0, SIGNAL(textChangedAndEditingFinished()),
-                this, SIGNAL(changeFinished()));
-  this->connect(ui.ThresholdBetween_1, SIGNAL(textChangedAndEditingFinished()),
-                this, SIGNAL(changeFinished()));
-
-  QObject::connect(ui.ThresholdBetween_0, SIGNAL(textChanged(const QString&)),
-    this, SLOT(updateSlider()));
-  QObject::connect(ui.ThresholdBetween_1, SIGNAL(textChanged(const QString&)),
-    this, SLOT(updateSlider()));
-
-  QObject::connect(ui.RangeSlider, SIGNAL(minimumValueChanged(double)),
-    this, SLOT(minimumValueSliderChanged(double)));
-  QObject::connect(ui.RangeSlider, SIGNAL(maximumValueChanged(double)),
-    this, SLOT(maximumValueSliderChanged(double)));
+  this->connect(ui.ThresholdBetween_0, SIGNAL(valueEdited(double)),
+                   this, SLOT(lowerChanged(double)));
+  this->connect(ui.ThresholdBetween_1, SIGNAL(valueEdited(double)),
+                   this, SLOT(upperChanged(double)));
 
   /// pqWidgetRangeDomain ensures that whenever the domain changes, the slider's
   /// ranges are updated.
-  new pqWidgetRangeDomain(ui.RangeSlider, "minimum", "maximum", smProperty, 0);
-
-  // TODO: singleStep must be updated when the slider range changes to be
-  // proportional to the slider range.
-  ui.RangeSlider->setSingleStep(0.01);
-
-  this->updateSlider();
+  new pqWidgetRangeDomain(ui.ThresholdBetween_0, "minimum", "maximum",
+                          smProperty, 0);
+  new pqWidgetRangeDomain(ui.ThresholdBetween_1, "minimum", "maximum",
+                          smProperty, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -116,43 +88,25 @@ pqDoubleRangeSliderPropertyWidget::~pqDoubleRangeSliderPropertyWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeSliderPropertyWidget::updateSlider()
+void pqDoubleRangeSliderPropertyWidget::lowerChanged(double val)
 {
-  // updateSlider gets called as the user is editing the texts as well. Thus
-  // it's possible that max < min. But that's okay since the DoubleRangeWidget
-  // handles that reasonably okay.
-  if (!this->Internals->IgnoreSliders)
+  // clamp the lower threshold if we need to
+  if (this->Internals->Ui.ThresholdBetween_1->value() < val)
     {
-    this->Internals->IgnoreSliders = true;
-    const Ui::DoubleRangeSliderPropertyWidget &ui = this->Internals->Ui;
-    ui.RangeSlider->setMinimumValue(ui.ThresholdBetween_0->text().toDouble());
-    ui.RangeSlider->setMaximumValue(ui.ThresholdBetween_1->text().toDouble());
-    this->Internals->IgnoreSliders = false;
+    this->Internals->Ui.ThresholdBetween_1->setValue(val);
     }
+
+  emit this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleRangeSliderPropertyWidget::minimumValueSliderChanged(double val)
+void pqDoubleRangeSliderPropertyWidget::upperChanged(double val)
 {
-  if (!this->Internals->IgnoreSliders)
+  // clamp the lower threshold if we need to
+  if(this->Internals->Ui.ThresholdBetween_0->value() > val)
     {
-    this->Internals->IgnoreSliders = true;
-    const Ui::DoubleRangeSliderPropertyWidget &ui = this->Internals->Ui;
-    ui.ThresholdBetween_0->setTextAndResetCursor(QVariant(val).toString());
-    this->Internals->IgnoreSliders = false;
-    emit this->changeFinished();
+    this->Internals->Ui.ThresholdBetween_0->setValue(val);
     }
-}
 
-//-----------------------------------------------------------------------------
-void pqDoubleRangeSliderPropertyWidget::maximumValueSliderChanged(double val)
-{
-  if (!this->Internals->IgnoreSliders)
-    {
-    this->Internals->IgnoreSliders = true;
-    const Ui::DoubleRangeSliderPropertyWidget &ui = this->Internals->Ui;
-    ui.ThresholdBetween_1->setTextAndResetCursor(QVariant(val).toString());
-    this->Internals->IgnoreSliders = false;
-    emit this->changeFinished();
-    }
+  emit this->changeFinished();
 }
