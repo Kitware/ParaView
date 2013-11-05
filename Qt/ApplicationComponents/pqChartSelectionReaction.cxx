@@ -45,6 +45,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QActionGroup>
 #include <QtDebug>
 
+namespace
+{
+  inline int getSelectionModifier(QActionGroup* group)
+    {
+    if (!group)
+      {
+      return vtkContextScene::SELECTION_DEFAULT;
+      }
+
+    // we cannot use QActionGroup::checkedAction() since the ModifierGroup may
+    // not be exclusive.
+    foreach (QAction* maction, group->actions())
+      {
+      if (maction->isChecked() && maction->data().isValid())
+        {
+        return maction->data().toInt();
+        }
+      }
+
+    return vtkContextScene::SELECTION_DEFAULT;
+    }
+}
+
 //-----------------------------------------------------------------------------
 pqChartSelectionReaction::pqChartSelectionReaction(
   QAction *parentObject, pqContextView *view, QActionGroup* modifierGroup)
@@ -63,11 +86,21 @@ pqChartSelectionReaction::pqChartSelectionReaction(
       interactor, vtkCommand::LeftButtonReleaseEvent,
       this, SLOT(stopSelection()));
     }
+
+  // if modified is changed while selection is in progress, we need to ensure we
+  // update the selection modifier on the view.
+  if (modifierGroup)
+    {
+    this->connect(modifierGroup, SIGNAL(triggered(QAction*)),
+      SLOT(modifiersChanged()));
+    }
 }
 
 //-----------------------------------------------------------------------------
 inline void setChartParameters(
-  pqContextView* view, int selectionType, int selectionModifier)
+  pqContextView* view,
+  int selectionType, bool update_type,
+  int selectionModifier, bool update_modifier)
 {
   if (view == NULL && !view->supportsSelection() && view->getContextViewProxy() == NULL)
     {
@@ -84,8 +117,9 @@ inline void setChartParameters(
     chart = chartMatrix->GetMainChart();
     }
 
-  if (selectionModifier < vtkContextScene::SELECTION_NONE ||
-    selectionModifier > vtkContextScene::SELECTION_TOGGLE)
+  if (update_modifier &&
+    (selectionModifier < vtkContextScene::SELECTION_NONE ||
+     selectionModifier > vtkContextScene::SELECTION_TOGGLE))
     {
     qWarning() << "Invalid selection modifier  " << selectionModifier
       << ", using vtkContextScene::SELECTION_DEFAULT";
@@ -94,10 +128,16 @@ inline void setChartParameters(
 
   if (chart)
     {
-    chart->SetActionToButton(selectionType, vtkContextMouseEvent::LEFT_BUTTON);
-    chart->SetSelectionMode(selectionModifier);
+    if (update_type)
+      {
+      chart->SetActionToButton(selectionType, vtkContextMouseEvent::LEFT_BUTTON);
+      }
+    if (update_modifier)
+      {
+      chart->SetSelectionMode(selectionModifier);
+      }
     }
-  if (chartMatrix)
+  if (chartMatrix && update_modifier)
     {
     chart->SetSelectionMode(selectionModifier);
     }
@@ -107,15 +147,22 @@ inline void setChartParameters(
 void pqChartSelectionReaction::startSelection(
   pqContextView* view, int selectionType, int selectionModifier)
 {
-  ::setChartParameters(view, selectionType, selectionModifier);
+  ::setChartParameters(view, selectionType, true, selectionModifier, true);
 }
 
 //-----------------------------------------------------------------------------
 void pqChartSelectionReaction::stopSelection()
 {
-  ::setChartParameters(this->View, vtkChart::PAN, vtkContextScene::SELECTION_DEFAULT);
+  ::setChartParameters(this->View,
+    vtkChart::PAN, true, vtkContextScene::SELECTION_DEFAULT, true);
   this->parentAction()->setChecked(false);
-  this->ModifierGroup->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+void pqChartSelectionReaction::modifiersChanged()
+{
+  int selectionModifier = getSelectionModifier(this->ModifierGroup);
+  ::setChartParameters(this->View, -1, false, selectionModifier, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -132,26 +179,11 @@ void pqChartSelectionReaction::triggered(bool checked)
       selectionType = _action->data().toInt();
       }
 
-    int selectionModifier = vtkContextScene::SELECTION_DEFAULT;
-    if (this->ModifierGroup)
-      {
-      // we cannot use QActionGroup::checkedAction() since the ModifierGroup may
-      // not be exclusive.
-      foreach (QAction* maction, this->ModifierGroup->actions())
-        {
-        if (maction->isChecked() && maction->data().isValid())
-          {
-          selectionModifier = maction->data().toInt();
-          break;
-          }
-        }
-      }
-
+    int selectionModifier = getSelectionModifier(this->ModifierGroup);
     if (checked)
       {
       pqChartSelectionReaction::startSelection(this->View,
         selectionType, selectionModifier);
-      this->ModifierGroup->setEnabled(false);
       }
     else
       {
