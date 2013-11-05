@@ -115,6 +115,8 @@ class LookupTableManager:
         self.scalarbars = {}
         self.range = {}
         self.view = None
+        if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
+            self.registerArray('vtkProcessId', 1, [0, servermanager.ActiveConnection.GetNumberOfDataPartitions()-1])
 
     # --------------------------------------------------------------------------
 
@@ -293,6 +295,16 @@ def getProxyAsPipelineNode(id, lutManager = None):
 
     pointData = []
     searchArray = ('POINT_DATA' == rep.ColorAttributeType) and (len(rep.ColorArrayName) > 0)
+
+    if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
+        info = {                  \
+        'lutId': 'vtkProcessId_1', \
+        'name': 'vtkProcessId',     \
+        'size': 1,                   \
+        'range': [0, servermanager.ActiveConnection.GetNumberOfDataPartitions()-1] }
+        pointData.append(info)
+
+    # FIXME seb
     for array in proxy.GetPointDataInformation():
         nbComponents = array.GetNumberOfComponents()
         if searchArray and array.Name == rep.ColorArrayName:
