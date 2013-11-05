@@ -1,12 +1,18 @@
   [ { "title": "ParaView 4",
       "items": [
 	 {
-	   "name": "WebVisualizer",
-	   "title": "ParaViewWeb generic visualizer",
-	   "description": "Generic web visualization and data processing with the WebVisualizer application that come with ParaView 4.",
-	   "id": "77824433",
-	   "thumb": "http://b.vimeocdn.com/ts/453/089/453089495_640.jpg"
-	 }
+     "name": "WebVisualizer",
+     "title": "ParaViewWeb generic visualizer",
+     "description": "Generic web visualization and data processing with the WebVisualizer application that come with ParaView 4.",
+     "id": "77824433",
+     "thumb": "http://b.vimeocdn.com/ts/453/089/453089495_640.jpg"
+   },{
+     "name": "Open Chemistry",
+     "title": "Open Chemistry and ParaViewWeb",
+     "description": "This video present the OpenChemistry web portal leveraging the ParaViewWeb framework to handle the 3D rendering of the molecule inside your Web browser.",
+     "id": "78665632",
+     "thumb": "http://b.vimeocdn.com/ts/454/147/454147981_295.jpg"
+   }
       ]
     }, {
           "title": "ParaView 3.12+",
