@@ -40,10 +40,19 @@ public:
   // Export the current view.
   void Write();
 
+  // Description:
+  // See superclass documentation for description.
+  int ReadXMLAttributes(vtkSMSessionProxyManager *pm, vtkPVXMLElement *element);
+
 //BTX
 protected:
   vtkSMGL2PSExporterProxy();
   ~vtkSMGL2PSExporterProxy();
+
+  // Description:
+  // Type of view that this exporter is configured to export.
+  enum { None, ContextView, RenderView };
+  int ViewType;
 
 private:
   vtkSMGL2PSExporterProxy(const vtkSMGL2PSExporterProxy&); // Not implemented
