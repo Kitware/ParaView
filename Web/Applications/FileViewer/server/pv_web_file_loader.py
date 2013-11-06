@@ -108,7 +108,7 @@ class _FileOpener(pv_wamp.PVServerProtocol):
             _FileOpener.view.ViewSize = [800,800]
         simple.SetActiveView(_FileOpener.view)
 
-    def openFile(self, file):
+    def openFile(self, files):
         id = ""
         if _FileOpener.reader:
             try:
@@ -116,7 +116,7 @@ class _FileOpener(pv_wamp.PVServerProtocol):
             except:
                 _FileOpener.reader = None
         try:
-            _FileOpener.reader = simple.OpenDataFile(file)
+            _FileOpener.reader = simple.OpenDataFile(files)
             simple.Show()
             simple.Render()
             simple.ResetCamera()
@@ -126,9 +126,14 @@ class _FileOpener(pv_wamp.PVServerProtocol):
         return id
 
     @exportRpc("openFileFromPath")
-    def openFileFromPath(self, file):
-        file = os.path.join(_FileOpener.pathToList, file)
-        return self.openFile(file)
+    def openFileFromPath(self, files):
+        fileToLoad = []
+        if type(files) == list:
+            for file in files:
+               fileToLoad.append(os.path.join(_FileOpener.pathToList, file))
+        else:
+            fileToLoad.append(os.path.join(_FileOpener.pathToList, files))
+        return self.openFile(fileToLoad)
 
 # =============================================================================
 # Main: Parse args and start server

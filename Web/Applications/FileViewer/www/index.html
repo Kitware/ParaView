@@ -32,12 +32,12 @@
 
                 // Create file browser widget
                 connection.session.call('vtk:listServerDirectory','.').then(function(files){
-                    $('.file-list').fileBrowser({data: [files], session: connection.session}).bind('file-click', function(e){
-                        connection.session.call("vtk:openFileFromPath", e.relativePath).then(function(reply){
+                    $('.file-list').fileBrowser({data: [files], session: connection.session}).bind('file-click file-group-click', function(e){
+                        connection.session.call("vtk:openFileFromPath", e.relativePathList).then(function(reply){
                             viewport.render();
                             $('.file-list').hide();
                         });
-                    });;
+                    });
                 });
 
                 // Create toolbar for VCR control
