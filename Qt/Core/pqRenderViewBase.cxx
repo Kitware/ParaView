@@ -761,53 +761,6 @@ bool pqRenderViewBase::canDisplay(pqOutputPort* opPort) const
 }
 
 //-----------------------------------------------------------------------------
-bool pqRenderViewBase::saveImage(int width, int height, const QString& filename)
-{
-  QWidget* vtkwidget = this->getWidget();
-  QSize cursize = vtkwidget->size();
-  QSize fullsize = QSize(width, height);
-  QSize newsize = cursize;
-  int magnification = 1;
-  if (width>0 && height>0)
-    {
-    magnification = pqView::computeMagnification(fullsize, newsize);
-    vtkwidget->resize(newsize);
-    }
-  this->render();
-
-  int error_code = vtkErrorCode::UnknownError;
-  vtkImageData* vtkimage = this->captureImage(magnification);
-  if (vtkimage)
-    {
-    error_code = pqImageUtil::saveImage(vtkimage, filename);
-    vtkimage->Delete();
-    }
-
-  switch (error_code)
-    {
-  case vtkErrorCode::UnrecognizedFileTypeError:
-    qCritical() << "Failed to determine file type for file:" 
-      << filename.toAscii().data();
-    break;
-
-  case vtkErrorCode::NoError:
-    // success.
-    break;
-
-  default:
-    qCritical() << "Failed to save image.";
-    }
-
-  if (width>0 && height>0)
-    {
-    vtkwidget->resize(newsize);
-    vtkwidget->resize(cursize);
-    this->render();
-    }
-  return (error_code == vtkErrorCode::NoError);
-}
-
-//-----------------------------------------------------------------------------
 void pqRenderViewBase::setStereo(int mode)
 {
   QList<pqView*> views =

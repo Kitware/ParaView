@@ -41,6 +41,8 @@ set (Module_SRCS
   pqActionGroupInterface.h
   pqActiveMultiSliceViewOptions.cxx
   pqActiveMultiSliceViewOptions.h
+  pqActivePythonViewOptions.cxx
+  pqActivePythonViewOptions.h
   pqActiveObjects.cxx
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.cxx
@@ -315,6 +317,8 @@ set (Module_SRCS
   pqProxyWidget.cxx
   pqProxyWidgetDialog.cxx
   pqProxyWidgetDialog.h
+  pqPythonViewOptions.cxx
+  pqPythonViewOptions.h
   pqQueryClauseWidget.cxx
   pqQueryClauseWidget.h
   pqRecentFilesMenu.cxx
@@ -439,6 +443,7 @@ set (Module_MOC_HDRS
   pqActiveMultiSliceViewOptions.h
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.h
+  pqActivePythonViewOptions.h
   pqActiveRenderViewOptions.h
   pqActiveServer.h
   pqActiveView.h
@@ -564,6 +569,7 @@ set (Module_MOC_HDRS
   pqProxySILModel.h
   pqProxyWidget.h
   pqProxyWidgetDialog.h
+  pqPythonViewOptions.h
   pqQueryClauseWidget.h
   pqRecentFilesMenu.h
   pqRemoteCommandDialog.h
@@ -683,6 +689,7 @@ set (Module_UI_FILES
   Resources/UI/pqProxyInformationWidget.ui
   Resources/UI/pqProxyWidgetDialog.ui
   Resources/UI/pqPythonAnimationCue.ui
+  Resources/UI/pqPythonViewOptions.ui
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqRemoteCommandDialogForm.ui

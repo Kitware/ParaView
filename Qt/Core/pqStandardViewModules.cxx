@@ -39,12 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiSliceView.h"
 #include "pqParallelCoordinatesChartView.h"
 #include "pqPlotMatrixView.h"
+#include "pqPythonView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
 #include "pqTextRepresentation.h"
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
+#include "vtkPVConfig.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMProxyManager.h"
@@ -74,6 +76,9 @@ QStringList pqStandardViewModules::viewTypes() const
     pqComparativeXYBarChartView::chartViewType() <<
     pqParallelCoordinatesChartView::chartViewType() <<
     pqMultiSliceView::multiSliceViewType() <<
+#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
+    pqPythonView::pythonViewType() <<
+#endif
     pqPlotMatrixView::viewType();
 }
 
@@ -127,6 +132,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if (type == pqMultiSliceView::multiSliceViewType())
     {
     return pqMultiSliceView::multiSliceViewTypeName();
+    }
+  else if (type == pqPythonView::pythonViewType())
+    {
+    return pqPythonView::pythonViewTypeName();
     }
 
   return QString();
@@ -182,6 +191,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "MultiSlice";
     }
+  else if (viewtype == pqPythonView::pythonViewType())
+    {
+    root_xmlname = "PythonView";
+    }
 
   if (root_xmlname)
     {
@@ -216,6 +229,10 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
                                 viewmodule,
                                 server,
                                 p);
+    }
+  else if (viewtype == pqPythonView::pythonViewType())
+    {
+    return new pqPythonView(viewtype, group, viewname, viewmodule, server, p);
     }
   else if (viewmodule->IsA("vtkSMRenderViewProxy"))
     {

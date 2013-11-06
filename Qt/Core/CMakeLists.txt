@@ -155,6 +155,8 @@ set(Module_SRCS
   pqProxyModifiedStateUndoElement.h
   pqProxySelection.cxx
   pqProxySelection.h
+  pqPythonView.cxx
+  pqPythonView.h
   pqQVTKWidget.cxx
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
@@ -292,6 +294,7 @@ set (Module_MOC_HDRS
   pqPropertyLinks.h
   pqPropertyManager.h
   pqProxy.h
+  pqPythonView.h
   pqQVTKWidgetEventTranslator.h
   pqQVTKWidget.h
   pqRecentlyUsedResourcesList.h

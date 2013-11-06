@@ -10,6 +10,7 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkDomainsChemistry
     vtkFiltersAMR
     vtkPVClientServerCoreCore
+    vtkPVVTKExtensionsDefault
     vtkPVVTKExtensionsRendering
     vtkWebGLExporter
     vtkRenderingLabel
