@@ -25,7 +25,7 @@ def runTest(args) :
     testName = 'open_browser_and_click_renderer.py'
 
     # Request the WebVisualizer index.html
-    urlToRetrieve = 'http://localhost:' + str(args.port) + '/apps/WebVisualizer'
+    urlToRetrieve = 'http://localhost:' + str(args.port) + '/apps/Visualizer'
 
     # print 'The args parameter contains: ' + str(args)
 
