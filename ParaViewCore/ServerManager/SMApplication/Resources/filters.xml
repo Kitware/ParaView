@@ -1714,91 +1714,26 @@ found and the point will be rejected.</Documentation>
                  name="None" />
           <Proxy group="implicit_functions"
                  name="Plane" />
-          <Proxy group="implicit_functions"
-                 name="Box" />
-          <Proxy group="implicit_functions"
-                 name="Sphere" />
         </ProxyListDomain>
         <Documentation>This property specifies whether to clip the dataset, and
         if so, it also specifies the parameters of the plane with which to
         clip.</Documentation>
       </ProxyProperty>
-      <StringVectorProperty clean_command="RemoveDoubleVolumeArrayNames"
-                            command="AddDoubleVolumeArrayName"
-                            label="Double Volume Arrays"
-                            name="AddDoubleVolumeArrayName"
+      <StringVectorProperty clean_command="RemoveVolumeArrayNames"
+                            command="AddVolumeArrayName"
+                            label="Volume Arrays"
+                            name="VolumeArrays"
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>This property specifies the name(s) of the volume
         fraction array(s) for generating parts.</Documentation>
         <ArrayListDomain attribute_type="Scalars"
-                         data_type="VTK_DOUBLE"
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Hints>
-          <!-- This overrides the GUI's default mechanism to
-            not set the default value for this property
-            using the domain when the proxy is created -->
-          <NoDefault />
-          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
-            <Property name="AddFloatVolumeArrayName" />
-            <Property name="AddUnsignedCharVolumeArrayName" />
-          </PropertyWidgetDecorator>
-        </Hints>
-      </StringVectorProperty>
-      <StringVectorProperty clean_command="RemoveFloatVolumeArrayNames"
-                            command="AddFloatVolumeArrayName"
-                            label="Float Volume Arrays"
-                            name="AddFloatVolumeArrayName"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>This property specifies the name(s) of the volume
-        fraction array(s) for generating parts.</Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         data_type="VTK_FLOAT"
-                         name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Hints>
-          <!-- This overrides the GUI's default mechanism to
-            not set the default value for this property
-            using the domain when the proxy is created -->
-          <NoDefault />
-          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
-            <Property name="AddDoubleVolumeArrayName" />
-            <Property name="AddUnsignedCharVolumeArrayName" />
-          </PropertyWidgetDecorator>
-        </Hints>
-      </StringVectorProperty>
-      <StringVectorProperty clean_command="RemoveUnsignedCharVolumeArrayNames"
-                            command="AddUnsignedCharVolumeArrayName"
-                            label="Unsigned Character Volume Arrays"
-                            name="AddUnsignedCharVolumeArrayName"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>This property specifies the name(s) of the volume
-        fraction array(s) for generating parts.</Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         data_type="VTK_UNSIGNED_CHAR"
-                         name="array_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
-            <Property name="AddDoubleVolumeArrayName" />
-            <Property name="AddFloatVolumeArrayName" />
-          </PropertyWidgetDecorator>
-        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
                             default_values="0.1"
@@ -1811,6 +1746,40 @@ found and the point will be rejected.</Documentation>
         <Documentation>The value of this property is the volume fraction value
         for the surface.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="CapSurfaces"
+                         command="SetCapping"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, volume surfaces are capped to produce visually closed
+          surface.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="RemoveGhostCells"
+                         command="SetRemoveGhostCells"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to false, the output surfaces will not hide contours
+          extracted from ghost cells. This results in overlapping contours but
+          overcomes holes.  Default is set to true.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="GenerateTriangles"
+                         command="SetGenerateTriangles"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Triangulate results. When set to false, the internal cut and contour filters
+          are told not to triangulate results if possible.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End CTHPart -->
     </SourceProxy>
     <!-- ==================================================================== -->
