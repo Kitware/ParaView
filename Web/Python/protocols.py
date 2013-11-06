@@ -3,9 +3,7 @@ protocols that can be combined together to provide a flexible way to define
 very specific web application.
 """
 
-import types
-import logging
-import inspect
+import os, sys, logging, types, inspect, traceback, logging, re
 from time import time
 
 # import RPC annotation
@@ -262,12 +260,13 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
 
 class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
-    def __init__(self, fileToLoad=None):
+    def __init__(self, baseDir=None, fileToLoad=None):
         super(ParaViewWebPipelineManager, self).__init__()
         # Setup global variables
         self.pipeline = helper.Pipeline('Kitware')
         self.lutManager = helper.LookupTableManager()
         self.view = simple.GetRenderView()
+        self.baseDir = baseDir;
         simple.SetActiveView(self.view)
         simple.Render()
         self.view.ViewSize = [800,800]
@@ -375,6 +374,26 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
     @exportRpc("openFile")
     def openFile(self, path):
+        reader = simple.OpenDataFile(path)
+        simple.RenameSource( path.split("/")[-1], reader)
+        simple.Show()
+        simple.Render()
+        simple.ResetCamera()
+
+        # Add node to pipeline
+        self.pipeline.addNode('0', reader.GetGlobalIDAsString())
+
+        # Create LUT if need be
+        self.lutManager.registerFieldData(reader.GetPointDataInformation())
+        self.lutManager.registerFieldData(reader.GetCellDataInformation())
+
+        return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.lutManager)
+
+    @exportRpc("openRelativeFile")
+    def openRelativeFile(self, relativePath):
+        print relativePath
+        path = os.path.join(self.baseDir , relativePath)
+        print path
         reader = simple.OpenDataFile(path)
         simple.RenameSource( path.split("/")[-1], reader)
         simple.Show()
