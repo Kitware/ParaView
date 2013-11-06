@@ -72,6 +72,9 @@ protected slots:
   /// stops selecting on the view
   void stopSelection();
 
+  /// called when modifier group is changed.
+  void modifiersChanged();
+
 private:
   Q_DISABLE_COPY(pqChartSelectionReaction)
   QPointer<pqContextView> View;
