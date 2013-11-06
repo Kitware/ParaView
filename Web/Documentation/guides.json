@@ -22,6 +22,11 @@
                   "url": "guides/parallel_app",
                   "title": "Parallel Visualization Setup",
                   "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
+              },{
+                  "name": "py_launcher",
+                  "url": "guides/py_launcher",
+                  "title": "Python Process Launcher",
+                  "description": "This document explains how to set the Python Launcher instead of the Jetty Session Manager."
               }
          ]
       },
