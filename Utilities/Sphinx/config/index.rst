@@ -35,7 +35,6 @@ ParaViewWeb
 .. toctree::
    :maxdepth: 2
 
-   WebVisualization application <paraview.pipeline_manager>
-   Simple server sample <paraview.simple_server>
-   Basic file loader <paraview.file_loader>
-   Data Prober <paraview.data_prober>
+   Web Visualization application <paraview.web.pv_web_visualizer>
+   File loader <paraview.web.pv_web_file_loader>
+   Data Prober <paraview.web.pv_web_data_prober>
