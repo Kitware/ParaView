@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 /// pqDoubleRangeSliderPropertyWidget is a widget used for properties such as
-/// the "ThresholdRange" property on the Threshold filter's panel.
-/// It uses ctkDoubleRangeSlider to provide a widget capable of setting a
-/// range with min/max values ensuring that min <= max.
+/// the "ThresholdRange" property on the Threshold filter's panel. It provides
+/// two double sliders, one for min and one for max and has logic to ensure that
+/// the min <= max.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget :
   public pqPropertyWidget
 {
@@ -50,13 +50,9 @@ public:
   virtual ~pqDoubleRangeSliderPropertyWidget();
 
 private slots:
-  /// slots called when the slider is moved
-  void minimumValueSliderChanged(double);
-  void maximumValueSliderChanged(double);
-
-  /// slots called when the lineedits are modified. We update the values shown
-  /// by the slider.
-  void updateSlider();
+  /// slots called when the slider(s) are moved.
+  void lowerChanged(double);
+  void upperChanged(double);
 
 private:
   Q_DISABLE_COPY(pqDoubleRangeSliderPropertyWidget);
