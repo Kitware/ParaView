@@ -111,6 +111,8 @@ namespace
   //      - SELF_DIR/../lib/paraview-<major>.<minor>/
   //    + ParaView Python modules
   //      - SELF_DIR/../lib/paraview-<major>.<minor>/site-packages
+  //    + VTK Python Module libraries
+  //      - SELF_DIR/../lib/paraview-<major>.<minor>/site-packages/vtk
   //===========================================================================
   void vtkPythonAppInitPrependPathWindows(const std::string& SELF_DIR)
     {
@@ -146,6 +148,10 @@ namespace
         SELF_DIR + "/../lib/paraview-" PARAVIEW_VERSION);
       vtkPythonAppInitPrependPythonPath(
         SELF_DIR + "/../lib/paraview-" PARAVIEW_VERSION "/site-packages");
+      // BUG #14263 happened with windows installed versions too. This addresses
+      // that problem.
+      vtkPythonAppInitPrependPythonPath(
+        SELF_DIR + "/../lib/paraview-" PARAVIEW_VERSION "/site-packages/vtk");
       }
     }
 
