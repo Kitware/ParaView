@@ -211,7 +211,7 @@ pqPythonManager::~pqPythonManager()
 //-----------------------------------------------------------------------------
 bool pqPythonManager::interpreterIsInitialized()
 {
-  return (this->Internal->PythonDialog != NULL);
+  return vtkPythonInterpreter::IsInitialized();
 }
 
 //-----------------------------------------------------------------------------

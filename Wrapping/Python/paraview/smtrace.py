@@ -442,8 +442,7 @@ def trace_save_screenshot(filename, size, allViews):
   if not trace_globals.observer_active: return
 
   # make sure the trace is up to date
-  if len(trace_globals.last_registered_proxies):
-    append_trace()
+  append_trace()
 
   if not allViews:
     trace_globals.trace_output.append("WriteImage('%s')" % filename)
