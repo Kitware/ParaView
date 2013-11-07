@@ -28,7 +28,7 @@
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="VisibleLinesRepresentation"
-        text="Visible Wireframe" subtype="1" />
+        text="Visible Wireframe" subtype="Wireframe" />
 
       <SubProxy>
         <Proxy name="VisibleLinesRepresentation"
