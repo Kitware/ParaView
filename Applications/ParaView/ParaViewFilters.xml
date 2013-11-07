@@ -107,6 +107,7 @@
   <Proxy group="filters" name="ArbitrarySourceGlyph" />
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
   <Proxy group="filters" name="BlockIdScalars" />
+  <Proxy group="filters" name="RandomAttributeGenerator" />
   <Proxy group="filters" name="BrownianPoints" />
   <Proxy group="filters" name="Calculator" />
   <Proxy group="filters" name="CellCenters" />
