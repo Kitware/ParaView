@@ -7,7 +7,7 @@
      "id": "77824433",
      "thumb": "http://b.vimeocdn.com/ts/453/089/453089495_640.jpg"
    },{
-     "name": "Open Chemistry",
+     "name": "OpenChemistry",
      "title": "Open Chemistry and ParaViewWeb",
      "description": "This video present the OpenChemistry web portal leveraging the ParaViewWeb framework to handle the 3D rendering of the molecule inside your Web browser.",
      "id": "78665632",
@@ -30,7 +30,7 @@
                   "id": "45718821",
                   "thumb": "http://b.vimeocdn.com/ts/318/040/318040288_200.jpg"
               },{
-                  "name": "Open Chemistry",
+                  "name": "OpenChemistry1",
                   "title": "Open Chemistry ParaViewWeb application",
                   "description": "Show a usage of ParaViewWeb inside the OpenChemistry project",
                   "id": "45718820",
