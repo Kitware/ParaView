@@ -66,19 +66,35 @@ function ParaViewWebTestFunctions(connection) {
               var returnValue = true;
               var successMsg = "Successful test of protocol vtk:listFiles";
 
+              var names = obj.map(function(elt) {
+                  return elt.name;
+              });
+
               var expectedNames = [ 'dualSphereAnimation',
               'SPCTH',
               'ExRestarts',
               'ANALYZE',
-              'Iron Xdmf' ];
+              'Iron Xdmf',
+              'iron protein.vtk'];
 
               var errorMsg = "Error testing vtk:listFiles -- ";
 
+              // TODO: This is O(n*m) in the lengths of the two lists,
+              // which could made more efficient
               for (var idx = 0; idx < expectedNames.length; ++idx) {
-                if (obj[idx].name !== expectedNames[idx]) {
-                  errorMsg += "Item " + idx + ": found " + obj[idx].name +
-                  ", expected " + expectedNames[idx] + " ";
-                  returnValue = false;
+                var foundExpectedName = false;
+
+                // Check if the expected name is in the larger list
+                for (var namesIdx = 0; namesIdx < names.length; ++namesIdx) {
+                    if (expectedNames[idx] === names[namesIdx]) {
+                        foundExpectedName = true;
+                    }
+                }
+
+                if (foundExpectedName === false) {
+                    errorMsg += "Item " + idx + ": found " + obj[idx].name +
+                        ", expected " + expectedNames[idx] + " ";
+                    returnValue = false;
                 }
               }
 
