@@ -613,7 +613,7 @@ void pq3DWidget::setWidgetVisible(bool visible)
     pqApplicationCore* core = pqApplicationCore::instance();
     pqPythonManager* manager =
         qobject_cast<pqPythonManager*>(core->manager("PYTHON_MANAGER"));
-    if (manager && manager->interpreterIsInitialized() &&
+    if (manager && 
         manager->canStopTrace() && this->renderView() &&
         !this->Internal->InDeleteCall)
       {

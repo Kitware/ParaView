@@ -81,7 +81,7 @@ void pqSaveAnimationReaction::saveAnimation()
     this, SLOT(onWriteAnimation(const QString&, int, double)));
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
-  if (manager && manager->interpreterIsInitialized())
+  if (manager && manager->canStopTrace())
     {
     QString script =
     "try:\n"

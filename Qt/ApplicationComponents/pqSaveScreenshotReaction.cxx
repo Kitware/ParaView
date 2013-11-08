@@ -208,7 +208,7 @@ void pqSaveScreenshotReaction::saveScreenshot(
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
-  if (manager && manager->interpreterIsInitialized())
+  if (manager && manager->canStopTrace())
     {
     QString allViewsStr = all_views ? "True" : "False";
     QString script =
