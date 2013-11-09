@@ -32,7 +32,7 @@ def runTest(args) :
 
     # Create a Chrome window driver.
     browser = webdriver.Chrome()
-    browser.set_window_size(720, 480)
+    browser.set_window_size(1024, 768)
     browser.get(urlToRetrieve)
 
     sleepSeconds = 8
@@ -40,23 +40,28 @@ def runTest(args) :
     time.sleep(sleepSeconds)
     print "Ok, page should be loaded by now...continuing."
 
-    browser.execute_script("session.call('vtk:listFiles').then(callback)")
-    time.sleep(2)
-    listObject = browser.execute_script("return tmpReturnValue;")
+    startButton = browser.find_element_by_css_selector(".run-tests")
+    startButton.click()
 
-    for item in listObject :
-        print item['name']
+    # Loop until the javascript-side tests are finished
+    while True :
+        # Perform the check to see if tests are finished yet
+        currentResults = browser.execute_script("return vtkWeb.testing.getCurrentTestResults();")
 
-    '''
-    neededModules = ['', '', ...]
-    anyIn = lambda a, b: not set(b).isdisjoint(a)
-    anyIn(neededModules, listObject)
-    '''
+        if currentResults['finished'] is True :
+            # Done with tests, check results
+            testsSucceeded = currentResults['failures'] == 0
 
+            if testsSucceeded :
+                testing.test_pass(testName)
+            else :
+                testing.test_fail(testName)
+                messageLog = browser.execute_script("return vtkWeb.testing.getTestLog();");
+                print "Following is the message log from the tests:"
+                print messageLog
+                print
+
+            break;
+
+    # Don't forget to close the browser when we're done
     browser.quit()
-
-    if compareResult != 0 :
-        print "Images were different, diffsum was: " + str(compareResult)
-        testing.testFail(testName)
-
-    testing.testPass(testName)

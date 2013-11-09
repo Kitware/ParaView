@@ -69,3 +69,19 @@ add_pvweb_tests("pvweb"
   DEPEND_MODS  requests
   TEST_SCRIPTS ${WEB_TESTS_WITH_REQUESTS}
   )
+
+set(TESTAPP_WEB_TESTS_WITH_CHROME
+  ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_testapp_all.py
+  )
+
+add_pvweb_tests("pvweb"
+  APP          TestApp
+  COMMAND      $<TARGET_FILE:pvpython>
+  SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
+  DEPEND_MODS  selenium
+  BROWSER      chrome
+               firefox
+               ie
+               safari
+  TEST_SCRIPTS ${TESTAPP_WEB_TESTS_WITH_CHROME}
+  )

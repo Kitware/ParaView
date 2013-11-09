@@ -28,27 +28,34 @@ def runTest(args) :
     print "Content-Type: " + str(r.headers['content-type'])
     print "Encoding: " + str(r.encoding)
 
-    indexText = r.text
+    if r.status_code != 200 :
+        print 'Failing test because HTTP status code for main ' + \
+            'application url was other than 200: ' + str(r.status_code)
+        testing.test_fail(testName);
 
     # These are some vtk and paraview scripts that should appear in index.html
     # of the WebVisualizer application.
-    requiredJavascriptLibs = [ 'vtkweb-all.js',
-                               'paraview.ui.pipeline.js',
-                               'paraview.ui.toolbar.js',
-                               'paraview.ui.toolbar.vcr.js',
-                               'paraview.ui.toolbar.viewport.js' ]
+    baseUrl = 'http://localhost:' + str(args.port) + '/'
+    requiredJavascriptLibs = [ baseUrl + 'lib/core/vtkweb-all.js',
+                               baseUrl + 'lib/js/paraview.ui.pipeline.js',
+                               baseUrl + 'lib/js/paraview.ui.toolbar.js',
+                               baseUrl + 'lib/js/paraview.ui.toolbar.vcr.js',
+                               baseUrl + 'lib/js/paraview.ui.toolbar.viewport.js' ]
 
     failedTest = False
+    failMessage = "Unable to load the following modules: "
 
     # Iterate through the above Javascript include files and make sure
     # they are each included somewhere in the returned html text.
-    for jsLibName in requiredJavascriptLibs :
-        regex = re.compile('<script src="../../lib/js/' + jsLibName + '"></script>')
-        searchResults = regex.search(indexText)
-        if searchResults is None :
-            print 'ERROR: Could not find the required library: ' + jsLibName
-            testing.test_fail(testName)
-            return
+    for urlPath in requiredJavascriptLibs :
+        r = requests.get(urlPath)
 
-    # If we didn't break out early, then this test passed
-    testing.test_pass(testName)
+        if r.status_code != 200 :
+            failMessage += '\n   ' + urlPath
+            failedTest = True
+
+    if failedTest is False :
+        testing.test_pass(testName)
+    else :
+        print failMessage
+        testing.test_fail(testName)
