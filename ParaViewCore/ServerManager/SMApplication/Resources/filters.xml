@@ -3863,6 +3863,16 @@ found and the point will be rejected.</Documentation>
       </DoubleVectorProperty>
 
       <IntVectorProperty
+          name="AttributesConstantPerBlock"
+          command="SetAttributesConstantPerBlock"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>Indicate that the generated attributes are
+        constant within a block. This can be used to highlight
+        blocks in a composite dataset.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
           name="GeneratePointScalars"
           command="SetGeneratePointScalars"
           number_of_elements="1"
