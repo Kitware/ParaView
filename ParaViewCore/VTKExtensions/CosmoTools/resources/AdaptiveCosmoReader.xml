@@ -1,16 +1,24 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="cosmotools_internal_sources">
+  <ProxyGroup name="sources">
     <!-- ================================================================== -->
-    <SourceProxy class="vtkACosmoReader"
-                 name="AdaptiveCosmoCore">
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
+    <SourceProxy class="vtkACosmoReader" name="AdaptiveCosmoCore">
+      <Documentation
+        long_help="Reads a cosmology file into a vtkUnstructuredGrid."
+        short_help="Read a cosmology file.">
+             The Adaptive Cosmo reader reads in multi-resolution, sampled
+             binary data written in the LANL cosmo Format.
+      </Documentation>
+      <StringVectorProperty clean_command="RemoveAllFileNames"
+                            command="AddFileName"
                             name="FileName"
                             number_of_elements="1"
-                            panel_visibility="never">
+                            panel_visibility="never"
+                            repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
-          This property specifies the file name for the COSMO reader.
+          The list of files to be read by the reader. The list is treated as a
+          sequence as per a predefined adaptive structure generated from a
+          preprocessor.
         </Documentation>
       </StringVectorProperty>
 
@@ -58,59 +66,6 @@
         </Documentation>
       </IntVectorProperty>
 
-    </SourceProxy>
-  </ProxyGroup>
-    <!-- End core-reader -->
-
-  <ProxyGroup name="sources">
-    <SourceProxy class="vtkFileSeriesReader"
-                 file_name_method="SetFileName"
-                 name="AdaptiveCosmoReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
-      <Documentation
-        long_help="Reads a cosmology file into a vtkUnstructuredGrid."
-        short_help="Read a cosmology file.">
-             The Adaptive Cosmo reader reads in multi-resolution, sampled
-             binary data written in the LANL cosmo Format.
-      </Documentation>
-      <SubProxy>
-        <Proxy name="Reader"
-               proxygroup="cosmotools_internal_sources"
-               proxyname="AdaptiveCosmoCore">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="ByteSwap" />
-          <Property name="BoxSize" />
-          <Property name="TagSize" />
-          <Property name="Level"  />
-        </ExposedProperties>
-      </SubProxy>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="RemoveAllFileNames"
-                            command="AddFileName"
-                            information_property="FileNameInfo"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never"
-                            repeat_command="1">
-        <FileListDomain name="files" />
-        <Documentation>
-          The list of files to be read by the reader.
-        </Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-        <Documentation>
-          Available timestep values.
-        </Documentation>
-      </DoubleVectorProperty>
       <Hints>
         <ReaderFactory extensions="cosmo"
                        file_description="Adaptive cosmo files" />
