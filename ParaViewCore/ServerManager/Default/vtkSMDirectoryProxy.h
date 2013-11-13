@@ -41,6 +41,10 @@ public:
   // Rename a file or directory.
   bool Rename(const char* oldname, const char* newname, vtkTypeUInt32 processes);
 
+  // Description:
+  // List server side directory
+  void List(const char* dir);
+
 //BTX
 protected:
   vtkSMDirectoryProxy();

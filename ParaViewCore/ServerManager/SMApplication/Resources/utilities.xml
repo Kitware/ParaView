@@ -1873,7 +1873,17 @@
     <DirectoryProxy class="vtkDirectory"
                     name="Directory"
                     processes="client|dataserver|renderserver">
-                    </DirectoryProxy>
+    </DirectoryProxy>
+    <DirectoryProxy class="vtkDirectory"
+                    si_class="vtkSIDirectoryProxy"
+                    name="ListDirectory"
+                    processes="dataserver">
+
+      <!-- Fake properties that will be filled by the vtkSIDirectoryProxy
+           class in the pull request -->
+      <StringVectorProperty name="FileList"      information_only="1"/>
+      <StringVectorProperty name="DirectoryList" information_only="1"/>
+    </DirectoryProxy>
     <Proxy class="vtkPVFileInformationHelper"
            name="FileInformationHelper">
       <StringVectorProperty command="SetPath"

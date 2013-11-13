@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkClientServerStream.h"
 #include "vtkSMSession.h"
+#include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDirectoryProxy);
 //----------------------------------------------------------------------------
@@ -29,6 +30,23 @@ vtkSMDirectoryProxy::~vtkSMDirectoryProxy()
 {
 }
 
+//----------------------------------------------------------------------------
+void vtkSMDirectoryProxy::List(const char* dir)
+{
+  this->CreateVTKObjects();
+  if (!this->ObjectsCreated)
+    {
+    return;
+    }
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+    << VTKOBJECT(this) << "Open"
+    << dir
+    << vtkClientServerStream::End;
+  this->ExecuteStream(stream, false, vtkProcessModule::DATA_SERVER_ROOT);
+  this->UpdatePropertyInformation();
+}
 //----------------------------------------------------------------------------
 bool vtkSMDirectoryProxy::MakeDirectory(const char* dir, vtkTypeUInt32 processes)
 {
