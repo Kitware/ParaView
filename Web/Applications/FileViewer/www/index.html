@@ -31,12 +31,10 @@
                 viewport.bind(".viewport-container");
 
                 // Create file browser widget
-                connection.session.call('vtk:listServerDirectory','.').then(function(files){
-                    $('.file-list').fileBrowser({data: [files], session: connection.session}).bind('file-click file-group-click', function(e){
-                        connection.session.call("vtk:openFileFromPath", e.relativePathList).then(function(reply){
-                            viewport.render();
-                            $('.file-list').hide();
-                        });
+                $('.file-list').fileBrowser({session: connection.session}).bind('file-click file-group-click', function(e){
+                    connection.session.call("vtk:openFileFromPath", e.relativePathList).then(function(reply){
+                        viewport.render();
+                        $('.file-list').hide();
                     });
                 });
 

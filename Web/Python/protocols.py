@@ -391,11 +391,18 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
     @exportRpc("openRelativeFile")
     def openRelativeFile(self, relativePath):
-        print relativePath
-        path = os.path.join(self.baseDir , relativePath)
-        print path
-        reader = simple.OpenDataFile(path)
-        simple.RenameSource( path.split("/")[-1], reader)
+        fileToLoad = []
+        if type(relativePath) == list:
+            for file in relativePath:
+               fileToLoad.append(os.path.join(self.baseDir, file))
+        else:
+            fileToLoad.append(os.path.join(self.baseDir, files))
+
+        reader = simple.OpenDataFile(fileToLoad)
+        name = fileToLoad[0].split("/")[-1]
+        if len(name) > 15:
+            name = name[:15] + '*'
+        simple.RenameSource(name, reader)
         simple.Show()
         simple.Render()
         simple.ResetCamera()
@@ -427,7 +434,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
     @exportRpc("listFilters")
     def listFilters(self):
-        return [{
+        filterSet = [{
                     'name': 'Cone',
                     'icon': 'dataset',
                     'category': 'source'
@@ -464,6 +471,9 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
                     'icon': 'filter',
                     'category': 'filter'
                 }]
+        if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
+            filterSet.append({ 'name': 'D3', 'icon': 'filter', 'category': 'filter' })
+        return filterSet
 
 # =============================================================================
 #
