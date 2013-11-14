@@ -305,6 +305,22 @@ def getProxyAsPipelineNode(id, lutManager = None):
         pointData.append(info)
 
     # FIXME seb
+    # dataInfo = rep.GetRepresentedDataInformation()
+    # pointData = dataInfo.GetPointDataInformation()
+    # cellData = dataInfo.GetCellDataInformation()
+    # for idx in pointData.GetNumberOfArrays():
+    #     info = pointData.GetArrayInformation(idx)
+    #     nbComponents = info.GetNumberOfComponents()
+    #     if searchArray and array.Name == rep.ColorArrayName:
+    #         nbActiveComp = nbComponents
+    #     rangeOn = (nbComponents == 3 if -1 else 0)
+    #     info = {                                      \
+    #     'lutId': info.GetName() + '_' + str(nbComponents), \
+    #     'name': info.GetName,                             \
+    #     'size': nbComponents,                            \
+    #     'range': info.GetRange(rangeOn) }
+    #     pointData.append(info)
+
     for array in proxy.GetPointDataInformation():
         nbComponents = array.GetNumberOfComponents()
         if searchArray and array.Name == rep.ColorArrayName:
@@ -432,6 +448,8 @@ def updateProxyProperties(proxy, properties):
                  except:
                     traceback.print_stack()
                     pass
+             elif value == 'vtkProcessId':
+                property.SetElement(0, value)
              else:
                 property.SetData(value)
    except:

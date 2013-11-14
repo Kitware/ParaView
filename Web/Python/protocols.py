@@ -346,16 +346,16 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
             nbComp = 1
 
             if type == 'POINT_DATA':
-                data = proxy.GetPointDataInformation()
+                data = rep.GetRepresentedDataInformation().GetPointDataInformation()
                 for i in range(data.GetNumberOfArrays()):
-                    array = data.GetArray(i)
-                    if array.Name == name:
+                    array = data.GetArrayInformation(i)
+                    if array.GetName() == name:
                         nbComp = array.GetNumberOfComponents()
             elif type == 'CELL_DATA':
-                data = proxy.GetCellDataInformation()
+                data = rep.GetRepresentedDataInformation().GetCellDataInformation()
                 for i in range(data.GetNumberOfArrays()):
-                    array = data.GetArray(i)
-                    if array.Name == name:
+                    array = data.GetArrayInformation(i)
+                    if array.GetName() == name:
                         nbComp = array.GetNumberOfComponents()
             lut = self.lutManager.getLookupTable(name, nbComp)
             rep.LookupTable = lut
