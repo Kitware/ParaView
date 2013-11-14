@@ -136,6 +136,13 @@ public:
   ///returns the state of the show hidden flag
   bool getShowHidden();
 
+  /// static method similar to QFileDialog::getSaveFileName(...) to make it
+  /// easier to get a file name to save a file as.
+  static QString getSaveFileName(
+    pqServer* server, QWidget* parentWdg,
+    const QString& title = QString(),
+    const QString& directory = QString(),
+    const QString& filter = QString());
 signals:
   /// Signal emitted when the user has chosen a set of files
   void filesSelected(const QList<QStringList> &);

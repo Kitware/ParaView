@@ -30,8 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "pqPythonScriptEditor.h"
+
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
 #include "pqPythonManager.h"
 #include "pqSettings.h"
 
@@ -150,24 +152,14 @@ bool pqPythonScriptEditor::save()
 bool pqPythonScriptEditor::saveAsMacro()
 {
   QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
-
   QDir existCheck(userMacroDir);
   if(!existCheck.exists(userMacroDir))
     {
     existCheck.mkdir(userMacroDir);
     }
-
-  QString fileName = QFileDialog::getSaveFileName(this, tr("Save Macro"),
-    userMacroDir, tr("Python script (*.py)"));
-  if (fileName.isEmpty())
-    {
-    return false;
-    }
-  if (!fileName.endsWith(".py"))
-    {
-    fileName.append(".py");
-    }
-  if(this->saveFile(fileName))
+  QString fileName = pqFileDialog::getSaveFileName(NULL, this, 
+    tr("Save Macro"), userMacroDir, tr("Python script (*.py)"));
+  if (!fileName.isEmpty() && this->saveFile(fileName))
     {
     if(pythonManager)
       {
@@ -181,8 +173,7 @@ bool pqPythonScriptEditor::saveAsMacro()
 //-----------------------------------------------------------------------------
 bool pqPythonScriptEditor::saveAs()
 {
-
-  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+  QString fileName = pqFileDialog::getSaveFileName(NULL, this, tr("Save File"),
     this->DefaultSaveDirectory, tr("Python script (*.py)"));
   if (fileName.isEmpty())
     {

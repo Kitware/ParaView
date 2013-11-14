@@ -1191,3 +1191,18 @@ void pqFileDialog::showEvent(QShowEvent *_showEvent )
   //matter the tab order
   this->Implementation->Ui.FileName->setFocus(Qt::OtherFocusReason);
 }
+
+//-----------------------------------------------------------------------------
+QString pqFileDialog::getSaveFileName(
+  pqServer* server, QWidget* parentWdg,
+  const QString& title, const QString& directory, const QString& filter)
+{
+  pqFileDialog fileDialog(server, parentWdg, title, directory, filter);
+  fileDialog.setObjectName("FileOpenDialog");
+  fileDialog.setFileMode(pqFileDialog::AnyFile);
+  if (fileDialog.exec() == QDialog::Accepted)
+    {
+    return fileDialog.getSelectedFiles()[0];
+    }
+  return QString();
+}
