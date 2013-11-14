@@ -110,7 +110,9 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro ("NonOverlappingAMR not made up of UniformGrids");
       return 0;
       }
-    vtkDataArray* regionId = grid->GetCellData ()->GetArray ("RegionId");
+    std::string regionName ("RegionId-");
+    regionName += volumeName;
+    vtkDataArray* regionId = grid->GetCellData ()->GetArray (regionName.c_str());
     if (!regionId) 
       {
       vtkErrorMacro ("No RegionID in volume.  Run Connectivity filter.");
@@ -166,7 +168,9 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
       return 0;
       }
-    vtkDataArray* regionId = grid->GetCellData ()->GetArray ("RegionId");
+    std::string regionName ("RegionId-");
+    regionName += volumeName;
+    vtkDataArray* regionId = grid->GetCellData ()->GetArray (regionName.c_str());
     if (!regionId) 
       {
       vtkErrorMacro ("No RegionID in volume.  Run Connectivity filter.");

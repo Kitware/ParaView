@@ -30,6 +30,8 @@ class vtkNonOverlappingAMR;
 class vtkUniformGrid;
 class vtkIdTypeArray;
 class vtkAMRDualGridHelper;
+class vtkAMRDualGridHelperBlock; 
+class vtkPEquivalenceSet;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
@@ -54,11 +56,15 @@ protected:
 
   double VolumeFractionSurfaceValue;
   vtkAMRDualGridHelper* Helper;
+  vtkPEquivalenceSet* Equivalence;
 
+  std::string RegionName;
   vtkIdType NextRegionId;
 
   // BTX
   std::vector<std::string> VolumeArrays;
+
+  std::vector<std::vector <vtkIdTypeArray*> > BoundaryArrays;
 
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
@@ -72,6 +78,17 @@ protected:
                        vtkIdTypeArray* regionId,
                        vtkDataArray* volArray,
                        vtkDataArray* ghostLevels);
+
+  vtkAMRDualGridHelperBlock* GetBlockNeighbor (
+                       vtkAMRDualGridHelperBlock* block, 
+                       int dir);
+  void ProcessBoundaryAtBlock (vtkNonOverlappingAMR* volume,
+                               vtkAMRDualGridHelperBlock* block, 
+                               vtkAMRDualGridHelperBlock* neighbor, 
+                               int dir);
+  void ProcessBoundaryAtNeighbor (vtkNonOverlappingAMR* volume,
+                                  vtkIdTypeArray *array);
+
 private:
   vtkAMRConnectivity(const vtkAMRConnectivity&);  // Not implemented.
   void operator=(const vtkAMRConnectivity&);  // Not implemented.

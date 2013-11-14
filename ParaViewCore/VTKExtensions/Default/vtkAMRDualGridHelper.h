@@ -146,7 +146,7 @@ private:
 
   vtkMultiProcessController *Controller;
   void ComputeGlobalMetaData(vtkNonOverlappingAMR* input);
-  void AddBlock(int level, vtkImageData* volume);
+  void AddBlock(int level, int id, vtkImageData* volume);
 
   // Manage connectivity seeds between blocks.
   void CreateFaces();
@@ -250,6 +250,7 @@ public:
   void AddBackGhostLevels(int standardBlockDimensions[3]);
 
   int Level;
+  int BlockId;
   
   // I am sick of looping over the grid to find the grid index
   // of the blocks.

@@ -128,6 +128,8 @@ void vtkEquivalenceSet::AddEquivalence(int id1, int id2)
     ++num;
     }
 
+  num = this->EquivalenceArray->GetNumberOfTuples();
+
   if (this->EquivalenceArray->GetValue (id1) < 0)
     {
     this->EquivalenceArray->SetValue (id1, id1);

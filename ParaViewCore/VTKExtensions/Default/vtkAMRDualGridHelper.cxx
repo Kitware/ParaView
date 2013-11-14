@@ -137,7 +137,7 @@ public:
   int GridIncZ;
   vtkAMRDualGridHelperBlock** Grid;
 
-  vtkAMRDualGridHelperBlock* AddGridBlock(int x, int y, int z, vtkImageData* volume);
+  vtkAMRDualGridHelperBlock* AddGridBlock(int x, int y, int z, int id, vtkImageData* volume);
   vtkAMRDualGridHelperBlock* GetGridBlock(int x, int y, int z);
 
 private:
@@ -847,7 +847,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelper::GetBlock(
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
+void vtkAMRDualGridHelper::AddBlock(int level, int id, vtkImageData* volume)
 {
   // First compute the grid location of this block.
   double blockSize[3];
@@ -864,7 +864,7 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
   int y = (int)((center[1]-this->GlobalOrigin[1])/blockSize[1]);
   int z = (int)((center[2]-this->GlobalOrigin[2])/blockSize[2]);
   vtkAMRDualGridHelperBlock* block =
-    this->Levels[level]->AddGridBlock(x, y, z, volume);
+    this->Levels[level]->AddGridBlock(x, y, z, id, volume);
 
   // We need to set this ivar here because we need to compute the index
   // from the global origin and root spacing.  The issue is that some blocks
@@ -898,7 +898,7 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
 //----------------------------------------------------------------------------
 vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::AddGridBlock(
   int x, int y, int z,
-  vtkImageData* volume)
+  int id, vtkImageData* volume)
 {
   // std::cerr << "Adding a grid block to level " << this->Level << " at " << x << " " << y << " " << z << std::endl;
   // Expand the grid array if necessary.
@@ -942,6 +942,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::AddGridBlock(
     vtkAMRDualGridHelperBlock* newBlock = new vtkAMRDualGridHelperBlock();
     newBlock->Image = volume;
     newBlock->Level = this->Level;
+    newBlock->BlockId = id;
     this->Grid[x+(y*this->GridIncY)+(z*this->GridIncZ)] =  newBlock;
     this->Blocks.push_back(newBlock);
     newBlock->GridIndex[0] = x;
@@ -2304,7 +2305,7 @@ vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Co
       vtkImageData* image = input->GetDataSet(level,blockId);
       if (image)
         {
-        this->AddBlock(level, image);
+        this->AddBlock(level, blockId, image);
         }
       }
     }
@@ -2591,7 +2592,7 @@ void vtkAMRDualGridHelper::UnmarshalBlocks(vtkIntArray *inBuffer)
         int y = *buffer++;
         int z = *buffer++;
 
-        vtkAMRDualGridHelperBlock *block = level->AddGridBlock(x, y, z, NULL);
+        vtkAMRDualGridHelperBlock *block = level->AddGridBlock(x, y, z, blockIdx, NULL);
         block->ProcessId = *buffer++;
 
         block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
@@ -2623,7 +2624,7 @@ void vtkAMRDualGridHelper::UnmarshalBlocksFromOne(vtkIntArray *inBuffer, int vtk
       int y = *buffer++;
       int z = *buffer++;
 
-      vtkAMRDualGridHelperBlock *block = level->AddGridBlock(x, y, z, NULL);
+      vtkAMRDualGridHelperBlock *block = level->AddGridBlock(x, y, z, blockIdx, NULL);
       block->ProcessId = *buffer++;
 
       block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
