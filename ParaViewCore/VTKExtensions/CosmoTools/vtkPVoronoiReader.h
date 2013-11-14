@@ -50,7 +50,7 @@ public:
 
 protected:
   vtkPVoronoiReader();
-  ~vtkPVoronoiReader(){}
+  ~vtkPVoronoiReader();
 
   int FillOutputPortInformation( int port, vtkInformation* info );
   int RequestData(vtkInformation *,

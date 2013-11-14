@@ -134,7 +134,7 @@ public:
 
   // Description:
   // Set the communicator object for interprocess communication
-  virtual vtkMultiProcessController* GetController();
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController*);
 
 protected:
