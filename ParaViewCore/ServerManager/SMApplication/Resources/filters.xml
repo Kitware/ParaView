@@ -1959,6 +1959,28 @@ found and the point will be rejected.</Documentation>
         results of this computation should be used as point coordinates or as a
         new array.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetResultNormals"
+                         default_values="0"
+                         name="ResultNormals"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to output results as point/cell
+        normals. Outputing as normals is only valid with vector
+        results. Point or cell normals are selected using
+        AttributeMode.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetResultTCoords"
+                         default_values="0"
+                         name="ResultTCoords"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether to output results as point/cell
+        texture coordinates.  Point or cell texture coordinates are
+        selected using AttributeMode. 2-component texture coordinates
+        cannot be generated at this time.</Documentation>
+      </IntVectorProperty>
       <StringVectorProperty command="SetResultArrayName"
                             default_values="Result"
                             name="ResultArrayName"
