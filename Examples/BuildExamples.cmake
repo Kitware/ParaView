@@ -27,7 +27,8 @@ foreach (flag CMAKE_C_FLAGS_DEBUG
 endforeach()
 
 set (examples_dependencies
-  vtkPVServerManagerApplication)
+  vtkPVServerManagerApplication
+  vtkPVServerManagerApplicationCS)
 if (PARAVIEW_BUILD_QT_GUI)
   list (APPEND examples_dependencies pqApplicationComponents)
 endif()
