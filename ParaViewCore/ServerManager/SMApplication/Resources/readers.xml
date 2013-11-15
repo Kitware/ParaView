@@ -5122,6 +5122,71 @@
       </Hints>
       <!-- End of XdmfReader -->
     </SourceProxy>
+
+#ifdef Module_vtkIOXdmf3
+    <SourceProxy name="Xdmf3Reader" class="vtkXdmf3Reader">
+      <StringVectorProperty name="FileName"
+        command="SetFileName" number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="xmf xdmf"
+                       file_description="Xdmf3 Reader" />
+      </Hints>
+      <!-- End of Xdmf3Reader -->
+    </SourceProxy>
+#endif
+
     <SourceProxy class="vtkExodusFileSeriesReader"
                  file_name_method="SetFileName"
                  name="ExodusIIReader"
