@@ -17,9 +17,11 @@ add_paraview_plugin(StreamingParticles "1.0"
     vtkStreamingParticlesPriorityQueue.h
 )
 
-if (PARAVIEW_ENABLE_COSMOTOOLS AND BUILD_TESTING AND PARAVIEW_DATA_ROOT)
+if(PARAVIEW_ENABLE_COSMOTOOLS 
+    AND BUILD_TESTING
+    AND PARAVIEW_DATA_ROOT
+    AND PARAVIEW_BUILD_QT_GUI)
     include(ParaViewTestingMacros)
-
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client ${CLIENT_EXECUTABLE}
               --enable-bt
