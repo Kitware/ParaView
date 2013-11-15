@@ -69,43 +69,73 @@ for the service to run. The following listing illustrate what that file could co
 __launcher.config__
 
     {
-    'url'        : 'http://localhost:8080/paraview',# Endpoint for the RESTful API
-    'log'        : '/tmp/pw-logs',                  # Directory that will contains all the process output
-    'map_file'   : '/var/www/proxy.map',            # Text file for the websocket proxy module (Apache 2.4+)
-    'proxy_url'  : 'ws://localhost:8080/proxy/$id', # URL returned for sessionURL where $ID is replaced
-    'wait_line'  : ['Starting factory', 'Ready'],   # The launcher only returns once a line contains that output or timeout
-    'timeout'    : 10000,                           # The timeout value in seconds if no valid wait_line found
-    'max_session': 10,                              # Prevent the start of two many concurrent process
-    'resources'  : [ {'host': 'localhost', port: [9001, 9100]} ] # Resource range
-    'applications': {
-       'loader': {
-          'cmd': ['$python_exec', '$server_base_path/pv_web_file_loader.py', '--data-dir', '$data_dir',
-                  '--authKey', '$super_secret'],
-          'dir': '/tmp'
-       },
-       'pipeline': {
-          'cmd': ['$python_exec', '$server_base_path/pv_web_visualizer.py', '--data-dir', '$data_dir',
-                  '--authKey', '$super_secret'],
-          'dir': '/tmp'
-       },
-       'launcher': {
-          'cmd': ['$launcher_exec', '$host', '$port', '$node', '$app', '$user', '$password', '$secret'],
-          'dir': '/tmp'
-       }
-    },
-    'properties': {
-       'python_exec': '/home/kitware/ParaView/bin/pvpython',
-       'launcher_exec': '/home/kitware/launcher.sh',
-       'data_dir': '/home/kitware/ParaViewData/Data',
-       'super_secret': 'paraviewweb-secret',
-       'server_base_path': '/home/kitware/ParaView/lib/site-package/paraview/web'
+      ## ===============================
+      ## General launcher configuration
+      ## ===============================
+
+      "configuration": {
+        "host" : "localhost",
+        "port" : 8080,
+        "endpoint": "paraview",                   # SessionManager Endpoint
+        "content": "/.../www",                    # Optional: Directory shared over HTTP
+        "proxy_file" : "/.../proxy-mapping.txt",  # Proxy-Mapping file for Apache
+        "sessionURL" : "ws://${host}:${port}/ws", # ws url used by the client to connect to the started process
+        "timeout" : 5,                            # Wait time in second after process start
+        "log_dir" : "/.../viz-logs",              # Directory for log files
+        "fields" : ["file", "host", "port"]       # List of fields that should be send back to client
+      },
+
+      ## ===============================
+      ## Resources list for applications
+      ## ===============================
+
+      "resources" : [ { "host" : "localhost", "port_range" : [9001, 9003] } ],
+
+      ## ===============================
+      ## Set of properties for cmd line
+      ## ===============================
+
+      "properties" : {
+        "build_dir" : "/.../build",
+        "python_exec" : "/.../build/bin/vtkpython",
+        "WWW" : "/.../build/www",
+        "source_dir": "/.../src"
+      },
+
+      ## ===============================
+      ## Application list with cmd line
+      ## ===============================
+
+      "apps" : {
+        "cone" : {
+          "cmd" : [
+            "${python_exec}", "${build_dir}/Wrapping/Python/vtk/web/vtk_web_cone.py", "--content", "${WWW}", "--port", "$port", "-f"
+              ],
+          "ready_line" : "Starting factory"
+        },
+        "test" : {
+          "cmd" : [
+            "${python_exec}", "${build_dir}/PhylogeneticTree/server/vtk_web_phylogenetic_tree.py", "--content", "${WWW}" ],
+          "ready_line" : "Starting factory"
+        },
+        "launcher" : {
+          "cmd" : [
+            "/home/kitware/launcher.sh", "${host}", "${port}", "${node}", "${app}", "${user}", "${password}", "${secret}" ],
+          "ready_line" : "Good to go"
+        }
+      }
     }
-    }
+
 
 In order to run that service, you will need to execute the following command line.
 
-    $ cd ParaView
-    $ ./bin/pvpython lib/site-package/paraview/web/launcher.py launcher.config
+    $ cd ParaView/build
+    $ ./bin/pvpython lib/site-package/vtk/web/launcher.py launcher.config
+
+or inside VTK
+
+    $ cd VTK/build
+    $ ./bin/vtkpython Wrapping/Python/vtk/web/launcher.py launcher.config
 
 Then once the service receive a POST request it will trigger a new command line which will have its output redirected to __/tmp/pw-log/${session_id}.log__ where the __${session_id}__ will be a unique generated string that will ID the given process.
 
