@@ -30,13 +30,69 @@
 #include "vtkDoubleArray.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
+#include "vtkIntArray.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMPIController.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkSmartPointer.h"
 #include "vtkUniformGrid.h"
+#include "vtksys/SystemTools.hxx"
+
+#include <list>
 
 vtkStandardNewMacro (vtkAMRConnectivity);
 
+
+static const int BOUNDARY_TAG = 39857089;
+
+//-----------------------------------------------------------------------------
+// Simple containers for managing asynchronous communication.
+struct vtkAMRConnectivityCommRequest
+{
+  vtkMPICommunicator::Request Request;
+  vtkSmartPointer<vtkIntArray> Buffer;
+  int SendProcess;
+  int ReceiveProcess;
+};
+
+// This class is a STL list of vtkAMRConnectivityCommRequest structs with some
+// helper methods added.
+class vtkAMRConnectivityCommRequestList
+  : public std::list<vtkAMRConnectivityCommRequest>
+{
+public:
+  // Description:
+  // Waits for all of the communication to complete.
+  void WaitAll()
+  {
+    for (iterator i = this->begin(); i != this->end(); i++) i->Request.Wait();
+  }
+  // Description:
+  // Waits for one of the communications to complete, removes it from the list,
+  // and returns it.
+  value_type WaitAny()
+  {
+    while (!this->empty())
+      {
+      for (iterator i = this->begin(); i != this->end(); i++)
+        {
+        if (i->Request.Test())
+          {
+          value_type retval = *i;
+          this->erase(i);
+          return retval;
+          }
+        }
+      vtksys::SystemTools::Delay(1);
+      }
+    vtkGenericWarningMacro(<< "Nothing to wait for.");
+    return value_type();
+  }
+};
+
+
+
+//-----------------------------------------------------------------------------
 vtkAMRConnectivity::vtkAMRConnectivity ()
 {
   this->VolumeFractionSurfaceValue = 0.5;
@@ -134,12 +190,14 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
                                       const char* volumeName)
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
+  vtkMPIController *mpiController = vtkMPIController::SafeDownCast(controller);
   int myProc = controller->GetLocalProcessId ();
   int numProcs = controller->GetNumberOfProcesses ();
 
   // initialize with a global unique region id
   this->NextRegionId = myProc+1;
 
+  // Find the block local fragments
   vtkCompositeDataIterator* iter = volume->NewIterator ();
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
@@ -169,12 +227,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       vtkErrorMacro (<< "There is no " << volumeName << " in cell field");
       return 0;
       }
-    vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
-    if (!ghostLevels) 
-      {
-      vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
-      return 0;
-      }
 
     // within each block find all fragments
     int extents[6];
@@ -189,11 +241,10 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           int ijk[3] = { i, j, k };
           vtkIdType cellId = grid->ComputeCellId (ijk);
           if (regionId->GetTuple1 (cellId) == 0 
-              && volArray->GetTuple1 (cellId) > this->VolumeFractionSurfaceValue 
-              /* && ghostLevels->GetTuple1 (cellId) < 0.5 */)
+              && volArray->GetTuple1 (cellId) > this->VolumeFractionSurfaceValue);
             {
             // wave propagation sets the region id as it propagates
-            this->WavePropagation (cellId, grid, regionId, volArray, ghostLevels);
+            this->WavePropagation (cellId, grid, regionId, volArray);
             // increment this way so the region id remains globally unique
             this->NextRegionId += numProcs;
             }
@@ -202,7 +253,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       }
     }
 
+  // Determine boundaries at the block that need to be sent to neighbors
   this->BoundaryArrays.resize (numProcs);
+  this->ReceiveList.resize (numProcs);
   for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
     {
     for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
@@ -235,8 +288,95 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       }
     }
 
-  // TODO send all arrays to other processes, receive all arrays.
+  // Exchange all boundaries between processes where block and neighbor are different procs
+  if (this->ReceiveList.size () > 0 && mpiController == 0)
+    {
+    vtkErrorMacro ("vtkAMRConnectivity only works parallel in MPI environment");
+    return 0;
+    }
 
+  vtkAMRConnectivityCommRequestList receiveList;
+  for (int i = 0; i < this->ReceiveList.size (); i ++) 
+    {
+    if (i == myProc) { continue; }
+    int messageLength = 0;
+    for (int j = 0; j < this->ReceiveList[i].size (); j ++)
+      {
+      messageLength += 10 + this->ReceiveList[i][j];
+      }
+    this->ReceiveList[i].clear ();
+
+    vtkIntArray* array = vtkIntArray::New ();
+    array->SetNumberOfComponents (1);
+    array->SetNumberOfTuples (messageLength);
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = i;
+    request.ReceiveProcess = myProc;
+    request.Buffer = array;
+
+    mpiController->NoBlockReceive(array->GetPointer (0),
+                                  messageLength,
+                                  i, BOUNDARY_TAG,
+                                  request.Request);
+    array->Delete ();
+    } 
+
+  vtkAMRConnectivityCommRequestList sendList;
+  for (int i = 0; i < this->BoundaryArrays.size (); i ++)
+    {
+    if (i == myProc) { continue; }
+    vtkIntArray* array = vtkIntArray::New ();
+    array->SetNumberOfComponents (1);
+    array->SetNumberOfTuples (0);
+    for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
+      {
+      int tuples = this->BoundaryArrays[i][j]->GetNumberOfTuples () + 1;
+      array->InsertNextTuple1 (tuples);
+      for (int k = 0; k < tuples; k ++) 
+        {
+        array->InsertNextTuple1 (this->BoundaryArrays[i][j]->GetTuple1 (k));
+        }
+      }
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = myProc;
+    request.ReceiveProcess = i;
+    request.Buffer = array;
+
+    mpiController->NoBlockSend(array->GetPointer(0),
+                               array->GetNumberOfTuples (),
+                               i, BOUNDARY_TAG,
+                               request.Request);
+
+    array->Delete ();
+    }
+
+  while (!receiveList.empty())
+    {
+    vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
+    vtkIntArray* array = request.Buffer;
+    int total = array->GetNumberOfTuples ();
+    int index = 0;
+    while (index < total)
+      {
+      int tuples = array->GetTuple1 (index);
+      index ++;
+      vtkIdTypeArray* boundary = vtkIdTypeArray::New ();
+      boundary->SetNumberOfComponents (1);
+      boundary->SetNumberOfTuples (tuples);
+      for (int i = 0; i < tuples; i ++) 
+        {
+        boundary->SetTuple1 (i, array->GetTuple1 (index));
+        index ++;
+        }
+      this->BoundaryArrays[myProc].push_back (boundary);
+      }
+    }
+
+  sendList.WaitAll();
+
+  // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
   this->Equivalence = vtkPEquivalenceSet::New ();
   for (int i = 0; i < this->BoundaryArrays.size (); i ++) 
     {
@@ -251,11 +391,13 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       this->BoundaryArrays[i].clear ();
     }
 
+  // Reduce all equivalence pairs into equivalence sets
   this->Equivalence->ResolveEquivalences ();
   
+  // Relabel all fragment IDs with the equivalence set number 
+  // (set numbers start with 0 and -1 is considered "no set" or "no fragment")
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
-    // Relabel all RegionIds with lowest equivalence.
     vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
     vtkIdTypeArray* regionIdArray = vtkIdTypeArray::SafeDownCast (
                                       grid->GetCellData ()->GetArray (this->RegionName.c_str()));
@@ -282,8 +424,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 int vtkAMRConnectivity::WavePropagation (vtkIdType cellIdStart, 
                                          vtkUniformGrid* grid, 
                                          vtkIdTypeArray* regionId,
-                                         vtkDataArray* volArray,
-                                         vtkDataArray* ghostLevels)
+                                         vtkDataArray* volArray)
 {
   vtkSmartPointer<vtkIdList> todoList = vtkIdList::New ();
   todoList->SetNumberOfIds (0);
@@ -306,8 +447,7 @@ int vtkAMRConnectivity::WavePropagation (vtkIdType cellIdStart,
         {
         vtkIdType neighbor = cellIds->GetId (j);
         if (regionId->GetTuple1 (neighbor) == 0 
-            && volArray->GetTuple1 (neighbor) > this->VolumeFractionSurfaceValue 
-            /* && ghostLevels->GetTuple1 (neighbor) < 0.5 */)
+            && volArray->GetTuple1 (neighbor) > this->VolumeFractionSurfaceValue)
           {
           todoList->InsertNextId (neighbor);
           }
@@ -501,7 +641,15 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
     }
   else if (neighbor->ProcessId == myProc)
     {
-    // TODO setup to receive from the block->ProcessId
+    vtkUniformGrid* grid = volume->GetDataSet (neighbor->Level, neighbor->BlockId);
+    // estimate the size of the receive by the extent of this neighbor
+    int extent[6];
+    grid->GetExtent (extent);
+    extent[dir*2 + 1] = extent[dir*2] + 1;
+    this->ReceiveList[block->ProcessId].push_back (9 + 
+                                                   (extent[1] - extent[0]) *
+                                                   (extent[3] - extent[2]) *
+                                                   (extent[5] - extent[4]));
     }
 }
 //

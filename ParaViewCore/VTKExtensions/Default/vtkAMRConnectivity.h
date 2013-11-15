@@ -65,6 +65,7 @@ protected:
   std::vector<std::string> VolumeArrays;
 
   std::vector<std::vector <vtkIdTypeArray*> > BoundaryArrays;
+  std::vector<std::vector <int> > ReceiveList;
 
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
@@ -76,8 +77,7 @@ protected:
   int WavePropagation (vtkIdType cellIdStart, 
                        vtkUniformGrid* grid, 
                        vtkIdTypeArray* regionId,
-                       vtkDataArray* volArray,
-                       vtkDataArray* ghostLevels);
+                       vtkDataArray* volArray);
 
   vtkAMRDualGridHelperBlock* GetBlockNeighbor (
                        vtkAMRDualGridHelperBlock* block, 
