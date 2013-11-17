@@ -18,6 +18,11 @@
                   "title": "Using VirtualGL and TurboVNC",
                   "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
               },{
+                  "name": "paraviewweb_on_aws_ec2",
+                  "url": "guides/paraviewweb_on_aws_ec2",
+                  "title": "ParaViewWeb on an Amazon EC2 AMI Instance",
+                  "description": "This document explains how to set up an Amazon EC2 AMI instance with Apache, Jetty, and ParaViewWeb."
+              },{
                   "name": "parallel_app",
                   "url": "guides/parallel_app",
                   "title": "Parallel Visualization Setup",
