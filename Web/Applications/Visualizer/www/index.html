@@ -3,7 +3,6 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel='stylesheet' href='main.css' type='text/css'>
-        <script src="../../lib/core/vtkweb-loader.js" load="core, color, pv-pipeline, pv-toolbar"></script>
     </head>
 
     <body onbeforeunload="stop()" onunload="stop()" class="page">
@@ -23,6 +22,7 @@
         </div>
 
 
+        <script src="../../lib/core/vtkweb-loader.js" load="core, filebrowser, color, pv-pipeline, pv-toolbar"></script>
         <script type="text/javascript">
             var config = {
                 sessionManagerURL: vtkWeb.properties.sessionManagerURL,
@@ -33,7 +33,6 @@
             start = function(connection) {
                 var pipeline = null,
                 filters = null,
-                files = null,
                 session = connection.session;
 
                 s = session;
@@ -54,8 +53,7 @@
                     $('.control-panel').pipelineBrowser({
                         session: session,
                         pipeline: pipeline,
-                        sources: filters,
-                        files: files
+                        sources: filters
                     }).bind('dataChanged', updateView);
 
                     // - vcr toolbar
@@ -127,10 +125,7 @@
                     pipeline = a;
                     session.call('vtk:listFilters').then(function(b) {
                         filters = b;
-                        session.call('vtk:listFiles').then(function(c) {
-                            files = c;
-                            init();
-                        });
+                        init();
                     });
                 });
             };

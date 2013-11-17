@@ -47,7 +47,6 @@ import os
 from paraview import simple
 from paraview.web import wamp      as pv_wamp
 from paraview.web import protocols as pv_protocols
-from vtk.web import protocols as vtk_protocols
 
 from vtk.web import server
 from vtkWebCorePython import *
@@ -82,7 +81,7 @@ class _FileOpener(pv_wamp.PVServerProtocol):
     def initialize(self):
         # Bring used components
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_FileOpener.dsHost, _FileOpener.dsPort, _FileOpener.rsHost, _FileOpener.rsPort))
-        self.registerVtkWebProtocol(vtk_protocols.vtkWebFileBrowser(_FileOpener.pathToList, "Home"))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_FileOpener.pathToList, "Home"))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortImageDelivery())

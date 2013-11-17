@@ -486,7 +486,7 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     padding: 0;
 }
 
-.pipeline-files li, .pipeline-sources li {
+.pipeline-sources li {
     position: relative;
     line-height: 1.5;
     text-align: left;
@@ -496,28 +496,16 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     padding-left: 30px;
 }
 
-.pipeline-files .icon {
-    width: 25px;
-    height: 25px;
-    position: absolute;
-    top: -1px;
-    left: 2px;
-}
-
-.pipeline-files li.menu-link .icon {
-    background: url("paraview/pipeline/folder.png") no-repeat left center transparent;
-}
-
-.pipeline-files li.open-file .icon {
-    background: url("paraview/pipeline/file.png") no-repeat left center transparent;
-}
-
 .pipeline-files li:hover {
     background: #CFCFCF; /* for non-css3 browsers */
 
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#CFCFCF'); /* for IE */
     background: -webkit-gradient(linear, center top, center bottom, from(#FFFFFF), to(#CFCFCF)); /* for webkit browsers */
     background: -moz-linear-gradient(center top,  #FFFFFF,  #CFCFCF); /* for firefox 3.6+ */
+}
+
+.pipeline-files li.vtk-path:hover {
+    background: none;
 }
 
 /* =======================  Source/Filter Browser  ========================= */

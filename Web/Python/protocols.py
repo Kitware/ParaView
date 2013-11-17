@@ -346,16 +346,16 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
             nbComp = 1
 
             if type == 'POINT_DATA':
-                data = proxy.GetPointDataInformation()
+                data = rep.GetRepresentedDataInformation().GetPointDataInformation()
                 for i in range(data.GetNumberOfArrays()):
-                    array = data.GetArray(i)
-                    if array.Name == name:
+                    array = data.GetArrayInformation(i)
+                    if array.GetName() == name:
                         nbComp = array.GetNumberOfComponents()
             elif type == 'CELL_DATA':
-                data = proxy.GetCellDataInformation()
+                data = rep.GetRepresentedDataInformation().GetCellDataInformation()
                 for i in range(data.GetNumberOfArrays()):
-                    array = data.GetArray(i)
-                    if array.Name == name:
+                    array = data.GetArrayInformation(i)
+                    if array.GetName() == name:
                         nbComp = array.GetNumberOfComponents()
             lut = self.lutManager.getLookupTable(name, nbComp)
             rep.LookupTable = lut
@@ -391,11 +391,18 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
     @exportRpc("openRelativeFile")
     def openRelativeFile(self, relativePath):
-        print relativePath
-        path = os.path.join(self.baseDir , relativePath)
-        print path
-        reader = simple.OpenDataFile(path)
-        simple.RenameSource( path.split("/")[-1], reader)
+        fileToLoad = []
+        if type(relativePath) == list:
+            for file in relativePath:
+               fileToLoad.append(os.path.join(self.baseDir, file))
+        else:
+            fileToLoad.append(os.path.join(self.baseDir, files))
+
+        reader = simple.OpenDataFile(fileToLoad)
+        name = fileToLoad[0].split("/")[-1]
+        if len(name) > 15:
+            name = name[:15] + '*'
+        simple.RenameSource(name, reader)
         simple.Show()
         simple.Render()
         simple.ResetCamera()
@@ -427,7 +434,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
     @exportRpc("listFilters")
     def listFilters(self):
-        return [{
+        filterSet = [{
                     'name': 'Cone',
                     'icon': 'dataset',
                     'category': 'source'
@@ -464,6 +471,9 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
                     'icon': 'filter',
                     'category': 'filter'
                 }]
+        if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
+            filterSet.append({ 'name': 'D3', 'icon': 'filter', 'category': 'filter' })
+        return filterSet
 
 # =============================================================================
 #
@@ -579,3 +589,87 @@ class ParaViewWebStateLoader(ParaViewWebProtocol):
         for view in simple.GetRenderViews():
             ids.append(view.GetGlobalIDAsString())
         return ids
+
+# =============================================================================
+#
+# Handle Server File Listing
+#
+# =============================================================================
+
+class ParaViewWebFileListing(ParaViewWebProtocol):
+
+    def __init__(self, basePath, name, excludeRegex=r"^\.|~$|^\$", groupRegex=r"[0-9]+\."):
+        """
+        Configure the way the WebFile browser will expose the server content.
+         - basePath: specify the base directory that we should start with
+         - name: Name of that base directory that will show up on the web
+         - excludeRegex: Regular expression of what should be excluded from the list of files/directories
+        """
+        self.baseDirectory = basePath
+        self.rootName = name
+        self.pattern = re.compile(excludeRegex)
+        self.gPattern = re.compile(groupRegex)
+        pxm = simple.servermanager.ProxyManager()
+        self.directory_proxy = pxm.NewProxy('misc', 'ListDirectory')
+        self.fileList = simple.servermanager.VectorProperty(self.directory_proxy,self.directory_proxy.GetProperty('FileList'))
+        self.directoryList = simple.servermanager.VectorProperty(self.directory_proxy,self.directory_proxy.GetProperty('DirectoryList'))
+
+    @exportRpc("listServerDirectory")
+    def listServerDirectory(self, relativeDir='.'):
+        """
+        RPC Callback to list a server directory relative to the basePath
+        provided at start-up.
+        """
+        path = [ self.rootName ]
+        if len(relativeDir) > len(self.rootName):
+            relativeDir = relativeDir[len(self.rootName)+1:]
+            path += relativeDir.replace('\\','/').split('/')
+
+        currentPath = os.path.join(self.baseDirectory, relativeDir)
+
+        self.directory_proxy.List(currentPath)
+
+        # build file/dir lists
+        files = []
+        if len(self.fileList) > 1:
+            for f in self.fileList.GetData():
+                if not re.search(self.pattern, f):
+                    files.append( { 'label': f })
+        elif len(self.fileList) == 1 and not re.search(self.pattern, self.fileList.GetData()):
+            files.append( { 'label': self.fileList.GetData() })
+
+        dirs = []
+        if len(self.directoryList) > 1:
+            for d in self.directoryList.GetData():
+                if not re.search(self.pattern, d):
+                    dirs.append(d)
+        elif len(self.directoryList) == 1 and not re.search(self.pattern, self.directoryList.GetData()):
+            dirs.append(self.directoryList.GetData())
+
+        result =  { 'label': relativeDir, 'files': files, 'dirs': dirs, 'groups': [], 'path': path }
+        if relativeDir == '.':
+            result['label'] = self.rootName
+
+        # Filter files to create groups
+        files.sort()
+        groups = result['groups']
+        groupIdx = {}
+        filesToRemove = []
+        for file in files:
+            fileSplit = re.split(self.gPattern, file['label'])
+            if len(fileSplit) == 2:
+                filesToRemove.append(file)
+                gName = '*.'.join(fileSplit)
+                if groupIdx.has_key(gName):
+                    groupIdx[gName]['files'].append(file['label'])
+                else:
+                    groupIdx[gName] = { 'files' : [file['label']], 'label': gName }
+                    groups.append(groupIdx[gName])
+        for file in filesToRemove:
+            gName = '*.'.join(re.split(self.gPattern, file['label']))
+            if len(groupIdx[gName]['files']) > 1:
+                files.remove(file)
+            else:
+                groups.remove(groupIdx[gName])
+
+        return result

@@ -73,6 +73,7 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
         # Bring used components
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_PipelineManager.dsHost, _PipelineManager.dsPort, _PipelineManager.rsHost, _PipelineManager.rsPort))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader(_PipelineManager.fileToLoad))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_PipelineManager.dataDir, "Home"))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager(_PipelineManager.dataDir, _PipelineManager.fileToLoad))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())

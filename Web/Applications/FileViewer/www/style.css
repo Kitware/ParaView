@@ -67,7 +67,7 @@ tbody, tfoot, thead, tr, th, td {
     background: #007878;
 }
 
-.file-list ul[type='path'] {
+.file-list ul[data='path'] {
     overflow: hidden;
     position: absolute;
     top: 0;

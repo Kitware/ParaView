@@ -381,43 +381,7 @@
         icon: 'filter',
         category: 'filter'
     }],
-    DEFAULT_FILES =  [{
-        name: 'can.ex2',
-        path: '/can.ex2'
-    },{
-        name: 'cow.vtu',
-        path: '/cow.vtu'
-    },{
-        name: 'VTKData',
-        path: '/VTKData',
-        children: [{
-            name: 'cow.vtu',
-            path: '/VTKData/cow.vtu'
-        },{
-            name: 'sphere.vtu',
-            path: '/VTKData/sphere.vtu'
-        }]
-    },{
-        name: 'ParaViewData',
-        path: '/ParaViewData',
-        children: [{
-            name: 'asfdg.vtu',
-            path: '/ParaViewData/asfdg.vtu'
-        },{
-            name: 'can.ex2',
-            path: '/ParaViewData/can.ex2'
-        },{
-            name: 'AnotherDir',
-            path: '/ParaViewData/AnotherDir',
-            children: [{
-                name: 'aaaaa.vtu',
-                path: '/ParaViewData/AnotherDir/aaaaa.vtu'
-            },{
-                name: 'bbbbb.ex2',
-                path: '/ParaViewData/AnotherDir/bbbbb.ex2'
-            }]
-        }]
-    }], buffer = null;
+    buffer = null;
 
 
     // =======================================================================
@@ -446,7 +410,8 @@
         var opts = $.extend({},$.fn.pipelineBrowser.defaults, options);
 
         return this.each(function() {
-            var me = $(this).empty().addClass('pipelineBrowser view-pipeline');
+            var me = $(this).empty().addClass('pipelineBrowser view-pipeline'),
+            session = opts.session;
 
             // Initialize global html buffer
             if (buffer === null) {
@@ -461,6 +426,17 @@
             // Fill buffer with pipeline HTML
             addPipelineToBuffer(opts.title, opts);
             me[0].innerHTML = buffer.toString();
+
+            // Initialize file section
+            $('.pipeline-files').fileBrowser({session: session}).bind('file-click file-group-click', function(e){
+                session.call("vtk:openRelativeFile", e.relativePathList).then(function(newFile){
+                    dataChanged(me);
+                    addProxy(me, 0, newFile);
+                    pipeline = getPipeline(me), toggleButton = $('.files.active', pipeline);
+                    pipeline.removeClass(PIPELINE_VIEW_TYPES).addClass('view-pipeline');
+                    toggleButton.removeClass('active');
+                });
+            });
 
             // Initialize pipelineBrowser (Visibility + listeners)
             initializeListener(me);
@@ -500,12 +476,6 @@
          * List of source and filters available for the pipeline.
          */
         sources: DEFAULT_SOURCES,
-        /**
-         * @member pv.PipelineBrowserConfig
-         * @property {reply.FileList[]} files
-         * List of files and directory accessible to the pipeline browser.
-         */
-        files: DEFAULT_FILES,
         /**
          * @member pv.PipelineBrowserConfig
          * @property {String} title
@@ -595,21 +565,6 @@
             type: 'proxySelected',
             proxy_id: activeProxyId
         });
-    }
-
-    /**
-     * Event that get triggered when a request for a new file open is made.
-     * @member jQuery.paraview.ui.PipelineBrowser
-     * @event openFile
-     * @param {String} path
-     * File path that is requested to be open.
-     */
-    function fireOpenFile(uiWidget, filePath) {
-        getPipeline(uiWidget).trigger({
-            type: 'openFile',
-            path: filePath
-        });
-        dataChanged(uiWidget);
     }
 
     /**
@@ -959,9 +914,7 @@
 
 
         // Build file selector
-        buffer.append("<div class='pipeline-files'>");
-        addFilePanelToBuffer(data.files, "ROOT", null);
-        buffer.append("</div>");
+        buffer.append("<div class='pipeline-files'></div>");
 
         // Build source/filter selector
         buffer.append("<div class='pipeline-sources'>");
@@ -1035,53 +988,6 @@
             addProxiesToBuffer(proxy.children);
         }
         buffer.append("</li>");
-    }
-
-    // =======================================================================
-
-    function addFilePanelToBuffer(fileList, panelClassName, parentClassName) {
-        if(fileList === null || fileList === undefined) {
-            return;
-        }
-
-        var childrenList = [], i;
-        buffer.append("<ul class='file-panel ");
-        buffer.append(panelClassName);
-        buffer.append("'");
-        if(parentClassName != null) {
-            buffer.append(" style='display: none;'");
-        }
-        buffer.append(">");
-        if(parentClassName) {
-            buffer.append("<li class='parent menu-link' link='");
-            buffer.append(parentClassName);
-            buffer.append("'>..</li>");
-        }
-        for(i in fileList) {
-            if(fileList[i].hasOwnProperty("children") && fileList[i].children.length > 0) {
-                buffer.append("<li class='child menu-link' link='");
-                var obj = {
-                    id: fileList[i].path.replace(/\//g, "_"),
-                    children: fileList[i].children
-                };
-                childrenList.push(obj);
-                buffer.append(obj.id);
-                buffer.append("'><div class='icon'></div>");
-            } else {
-                buffer.append("<li class='open-file' path='");
-                buffer.append(fileList[i].path);
-                buffer.append("'><div class='icon'></div>");
-            }
-            buffer.append(fileList[i].name);
-            buffer.append("</li>");
-        }
-
-        buffer.append("</ul>\n");
-
-        // Add all child panels
-        for(i in childrenList) {
-            addFilePanelToBuffer(childrenList[i].children, childrenList[i].id, panelClassName);
-        }
     }
 
     // =======================================================================
@@ -1276,13 +1182,6 @@
             var parentId = (e.parent_id ? e.parent_id : 0);
             session.call('vtk:addSource', e.name, parentId).then(function(newNode) {
                 addProxy(pipelineBrowser, parentId, newNode);
-            });
-        });
-
-        // Attach file loading
-        pipelineBrowser.bind('openFile', function(e) {
-            session.call('vtk:openFile', e.path).then(function(newFile) {
-                addProxy(pipelineBrowser, 0, newFile);
             });
         });
 
@@ -1705,23 +1604,6 @@
             var me = $(this), pipeline = getPipeline(me);
             pipeline.toggleClass('view-pipeline-editor');
             me.toggleClass('active');
-        });
-
-        // ============= File browsing ===========
-
-        $(".open-file", pipelineBrowser).unbind().click(function() {
-            var me = $(this), pipeline = getPipeline(me), toggleButton = $('.files.active', pipeline);
-            pipeline.removeClass(PIPELINE_VIEW_TYPES).addClass('view-pipeline');
-
-            fireOpenFile(pipelineBrowser, me.attr('path'));
-            toggleButton.removeClass('active');
-        });
-
-        $(".menu-link", pipelineBrowser).unbind().click(function() {
-            var me = $(this), menuToShow = $("." + me.attr('link'), pipelineBrowser);
-            me.parent().hide('slide', 250, function(){
-                menuToShow.show('slide',250);
-            });
         });
 
         // ============= Source/Filter browsing ===========

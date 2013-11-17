@@ -110,6 +110,7 @@
         if(viewport != null && viewport != undefined) {
             me.attr('action', other).attr('other', action);
             viewport.setActiveRenderer(other);
+            viewport.invalidateScene();
         }
 
         rootWidget.trigger({
