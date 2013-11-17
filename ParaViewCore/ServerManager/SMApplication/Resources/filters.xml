@@ -3770,6 +3770,116 @@ found and the point will be rejected.</Documentation>
       <!-- End QuadricClustering -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkRandomAttributeGenerator"
+                 label="Random Attributes"
+                 name="RandomAttributeGenerator">
+      <Documentation long_help=
+                     "This filter creates a new random attribute
+                      array and sets it as the default array."
+                     short_help="Creates random data attributes.">
+        The Random Attributes filter creates random attributes
+        including scalars and vectors. These attributes can be
+        generated as point data or cell data. The generation of each
+        component is normalized between a user-specified minimum and
+        maximum value.
+
+        This filter provides that capability to specify the data type
+        of the attributes and the range for each of the components.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Random Scalars
+        filter.</Documentation>
+      </InputProperty>
+      <IntVectorProperty
+          name="DataType"
+          command="SetDataType"
+          number_of_elements="1"
+          default_values="3">
+        <EnumerationDomain name="enum">
+          <Entry value="1" text="Bit"/>
+          <Entry value="2" text="Char"/>
+          <Entry value="3" text="UnsignedChar"/>
+          <Entry value="4" text="Short"/>
+          <Entry value="5" text="UnsignedShort"/>
+          <Entry value="6" text="Int"/>
+          <Entry value="7" text="UnsignedInt"/>
+          <Entry value="8" text="Long"/>
+          <Entry value="9" text="UnsignedLong"/>
+          <Entry value="10" text="Float"/>
+          <Entry value="11" text="Double"/>
+        </EnumerationDomain>
+        <Documentation>
+          Specify the type of array to create (all components of this
+          array are of this type). This holds true for all arrays that
+          are created.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetComponentRange"
+                            default_values="0 255"
+                            name="ComponentRange"
+                            number_of_elements="2">
+        <Documentation>Set the range values (minimum and maximum) for
+        each component. This applies to all data that is
+        generated.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+          name="AttributesConstantPerBlock"
+          command="SetAttributesConstantPerBlock"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>Indicate that the generated attributes are
+        constant within a block. This can be used to highlight
+        blocks in a composite dataset.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="GeneratePointScalars"
+          command="SetGeneratePointScalars"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>Indicate that point scalars are to be
+        generated.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="GeneratePointVectors"
+          command="SetGeneratePointVectors"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>Indicate that point vectors are to be
+        generated.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="GenerateCellScalars"
+          command="SetGenerateCellScalars"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>Indicate that point scalars are to be
+        generated.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty
+          name="GenerateCellVectors"
+          command="SetGenerateCellVectors"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>Indicate that point vectors are to be
+        generated.</Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkBrownianPoints"
                  label="Random Vectors"
                  name="BrownianPoints">
