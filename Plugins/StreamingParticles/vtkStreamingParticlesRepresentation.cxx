@@ -35,6 +35,7 @@
 #include "vtkRenderer.h"
 #include "vtkStreamingParticlesPriorityQueue.h"
 
+#include <algorithm>
 #include <assert.h>
 
 vtkStandardNewMacro(vtkStreamingParticlesRepresentation);
@@ -44,6 +45,7 @@ vtkStreamingParticlesRepresentation::vtkStreamingParticlesRepresentation()
   this->StreamingCapablePipeline = false;
   this->InStreamingUpdate = false;
   this->UseOutline = false;
+  this->StreamingRequestSize = 1;
 
   this->PriorityQueue = vtkSmartPointer<vtkStreamingParticlesPriorityQueue>::New();
   this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
@@ -54,7 +56,7 @@ vtkStreamingParticlesRepresentation::vtkStreamingParticlesRepresentation()
   this->Actor->GetProperty()->SetAmbient(1.0);
   this->Actor->GetProperty()->SetDiffuse(0.0);
   this->Actor->GetProperty()->SetSpecular(0.0);
-  this->Actor->SetPickable(0); 
+  this->Actor->SetPickable(0);
 }
 
 //----------------------------------------------------------------------------
@@ -67,6 +69,12 @@ void vtkStreamingParticlesRepresentation::SetVisibility(bool val)
 {
   this->Actor->SetVisibility(val);
   this->Superclass::SetVisibility(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamingParticlesRepresentation::SetOpacity(double val)
+{
+  this->Actor->GetProperty()->SetOpacity(val);
 }
 
 //----------------------------------------------------------------------------
@@ -127,7 +135,7 @@ int vtkStreamingParticlesRepresentation::ProcessViewRequest(
   else if (request_type == vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE())
     {
     vtkDataObject* piece = vtkPVRenderView::GetCurrentStreamedPiece(inInfo, this);
-    if (piece)
+    if (piece && piece->IsA("vtkMultiBlockDataSet"))
       {
       assert (this->RenderedData != NULL);
       vtkStreamingStatusMacro( << this << ": received new piece.");
@@ -192,12 +200,14 @@ int vtkStreamingParticlesRepresentation::RequestUpdateExtent(
       vtkInformation* info = inputVector[cc]->GetInformationObject(kk);
       if (this->InStreamingUpdate)
         {
-        assert(this->PriorityQueue->IsEmpty() == false);
-        int cid = static_cast<int>(this->PriorityQueue->Pop());
-        vtkStreamingStatusMacro(<< this << ": requesting blocks: " << cid);
+        assert(this->StreamingRequestSize > 0);
+        assert(this->StreamingRequest.size() > 0);
+
         // Request the next "group of blocks" to stream.
         info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
-        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(), &cid, 1);
+        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(),
+          &this->StreamingRequest[0],
+          static_cast<int>(this->StreamingRequest.size()));
         }
       else
         {
@@ -212,6 +222,7 @@ int vtkStreamingParticlesRepresentation::RequestUpdateExtent(
     }
   return 1;
 }
+
 
 //----------------------------------------------------------------------------
 int vtkStreamingParticlesRepresentation::RequestData(vtkInformation *rqst,
@@ -306,25 +317,91 @@ int vtkStreamingParticlesRepresentation::RequestData(vtkInformation *rqst,
 bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_planes[24])
 {
   assert(this->InStreamingUpdate == false);
-  if (!this->PriorityQueue->IsEmpty())
+
+  // update the priority queue, if needed.
+  this->PriorityQueue->Update(view_planes);
+
+  // FIXME: This will not work in client-server mode.
+  // For this demo, we'll just use the local data object.
+  if (this->RenderedData && this->PriorityQueue->GetBlocksToPurge().size() > 0)
     {
-    this->InStreamingUpdate = true;
-    vtkStreamingStatusMacro(<< this << ": doing streaming-update.")
+    // purge blocks that no longer have sufficient coverage in the new
+    // view-frustum.
+    const std::set<unsigned int> &blocksToPurge
+      =this->PriorityQueue->GetBlocksToPurge();
 
-    // update the priority queue, if needed.
-    this->PriorityQueue->Update(view_planes);
+    vtkMultiBlockDataSet* data = vtkMultiBlockDataSet::SafeDownCast(
+      this->RenderedData);
+    unsigned int block_index = 0;
+    unsigned int num_levels = data->GetNumberOfBlocks();
+    for (unsigned int level=0; level < num_levels; level++)
+      {
+      vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(data->GetBlock(level));
+      assert(mb != NULL);
 
-    // This ensure that the representation re-executes.
-    this->MarkModified();
+      unsigned int num_blocks = mb->GetNumberOfBlocks();
+      for (unsigned int cc=0; cc < num_blocks; cc++, block_index++)
+        {
+        if (blocksToPurge.find(block_index) != blocksToPurge.end())
+          {
+          mb->SetBlock(cc, NULL);
+          }
+        }
+      }
 
-    // Execute the pipeline.
-    this->Update();
-
-    this->InStreamingUpdate = false;
-    return true;
+    this->RenderedData->Modified();
+    if (this->PriorityQueue->IsEmpty())
+      {
+      vtkNew<vtkMultiBlockDataSet> clone;
+      clone->CopyStructure(vtkMultiBlockDataSet::SafeDownCast(this->ProcessedPiece));
+      this->ProcessedPiece = clone.GetPointer();
+      return true;
+      }
     }
 
-  return false;
+  if (this->PriorityQueue->IsEmpty())
+    {
+    return false;
+    }
+
+  // determine if we need to stream any blocks.
+  if (!this->DetermineBlocksToStream())
+    {
+    // nothing to stream at the moment.
+    return false;
+    }
+
+  // We've determined we need to request something. Do it.
+  this->InStreamingUpdate = true;
+  vtkStreamingStatusMacro(<< this << ": doing streaming-update.");
+
+  // This ensure that the representation re-executes.
+  this->MarkModified();
+
+  // Execute the pipeline.
+  this->Update();
+
+  this->InStreamingUpdate = false;
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkStreamingParticlesRepresentation::DetermineBlocksToStream()
+{
+  assert(this->PriorityQueue->IsEmpty() == false);
+  assert(this->StreamingRequestSize > 0);
+  this->StreamingRequest.clear();
+
+  for (int jj=0; jj < this->StreamingRequestSize; jj++)
+    {
+    unsigned int cid = this->PriorityQueue->Pop();
+    if (cid != VTK_UNSIGNED_INT_MAX)
+      {
+      vtkStreamingStatusMacro(<< this << ": requesting blocks: " << cid);
+      this->StreamingRequest.push_back(static_cast<int>(cid));
+      }
+    }
+  return this->StreamingRequest.size() > 0;
 }
 
 //----------------------------------------------------------------------------
@@ -370,10 +447,10 @@ bool vtkStreamingParticlesRepresentation::RemoveFromView(vtkView* view)
 void vtkStreamingParticlesRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "StreamingCapablePipeline: " << this->StreamingCapablePipeline
-    << endl;
+  os << indent << "StreamingCapablePipeline: " << this->StreamingCapablePipeline << endl;
+  os << indent << "UseOutline: " << this->UseOutline << endl;
+  os << indent << "StreamingRequestSize: " << this->StreamingRequestSize << endl;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkStreamingParticlesRepresentation::SetColorAttributeType(int type)

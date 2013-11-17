@@ -128,26 +128,36 @@ class vtkStreamingPriorityQueueItem
 {
 public:
   unsigned int Identifier; // this is used to identify this block when making a
-  // request.
+                           // request.
   double Refinement;       // Where lower the Refinement cheaper is the
-  // processing for this block. 0 is considered as
-  // undefined.
+                           // processing for this block. 0 is considered as
+                           // undefined.
+  double ScreenCoverage;   // computed coverage for the block.
   double Priority;         // Computed priority for this block.
+  double Distance;
   vtkBoundingBox Bounds;   // Bounds for the block.
 
-  vtkStreamingPriorityQueueItem() : Identifier(0), Refinement(0), Priority(0)
+  vtkStreamingPriorityQueueItem() :
+    Identifier(0), Refinement(0), ScreenCoverage(0), Priority(0), Distance(0)
   {
   }
+};
 
-  bool operator < (const vtkStreamingPriorityQueueItem& other) const
+class vtkStreamingPriorityQueueItemComparator
+{
+public:
+  bool operator()(const vtkStreamingPriorityQueueItem& me,
+    const vtkStreamingPriorityQueueItem& other) const
     {
-    return this->Priority < other.Priority;
+    return me.Priority < other.Priority;
     }
 };
 
 
+template <typename Comparator = vtkStreamingPriorityQueueItemComparator>
 class vtkStreamingPriorityQueue :
-  public std::priority_queue<vtkStreamingPriorityQueueItem>
+  public std::priority_queue<vtkStreamingPriorityQueueItem,
+  std::vector<vtkStreamingPriorityQueueItem>, Comparator>
 {
 public:
   // Description:
@@ -189,7 +199,17 @@ public:
       double refinement2 = item.Refinement * item.Refinement;
       double distance;
       double coverage = vtkComputeScreenCoverage(view_planes, block_bounds, distance);
-      item.Priority =  coverage * coverage / ( 1 + refinement2 + distance);
+      item.ScreenCoverage = coverage;
+      item.Distance = distance;
+      if (coverage > 0)
+        {
+//        item.Priority =  coverage / (item.Refinement/* * distance*/) ;// / distance; //coverage * coverage / ( 1 + refinement2 + distance);
+        item.Priority = coverage * coverage / ( 1 + refinement2 + distance);
+        }
+      else
+        {
+        item.Priority = 0;
+        }
       this->push(item);
       }
     }

@@ -249,7 +249,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm,
 
   if (const char* mpi = element->GetAttribute("mpi_required"))
     {
-    if (strcmp(mpi, "true") == 0)
+    if (strcmp(mpi, "true") == 0 || strcmp(mpi, "1") == 0)
       {
       this->MPIRequired = true;
       }

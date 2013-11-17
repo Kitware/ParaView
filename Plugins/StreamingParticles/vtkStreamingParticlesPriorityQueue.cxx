@@ -26,12 +26,54 @@
 #include <assert.h>
 #include <queue>
 #include <vector>
+#include <set>
 
+namespace
+{
+  class vtkParticlesComparator
+    {
+  public:
+    bool operator()(const vtkStreamingPriorityQueueItem& me, const
+      vtkStreamingPriorityQueueItem& other) const
+      {
+      if (me.ScreenCoverage != other.ScreenCoverage)
+        {
+        return me.ScreenCoverage < other.ScreenCoverage;
+        }
+      if (me.Refinement != other.Refinement)
+        {
+        return me.Refinement > other.Refinement;
+        }
+      return me.Distance > other.Distance;
+      }
+    };
+}
 class vtkStreamingParticlesPriorityQueue::vtkInternals
 {
 public:
-  vtkStreamingPriorityQueue PriorityQueue;
   vtkSmartPointer<vtkMultiBlockDataSet> Metadata;
+  std::queue<unsigned int> BlocksToRequest;
+  std::set<unsigned int> BlocksRequested;
+  std::set<unsigned int> BlocksToPurge;
+
+  double PreviousViewPlanes[24];
+
+  vtkInternals()
+    {
+    this->ResetPreviousViewPlanes();
+    }
+  void ResetPreviousViewPlanes()
+    {
+    memset(this->PreviousViewPlanes, sizeof(double)*24, 0);
+    }
+  bool PlanesChanged(const double view_planes[24])
+    {
+    return !std::equal(this->PreviousViewPlanes, this->PreviousViewPlanes + 24, view_planes);
+    }
+  void SetViewPlanes(const double view_planes[24])
+    {
+    std::copy(view_planes, view_planes + 24, this->PreviousViewPlanes);
+    }
 };
 
 vtkStandardNewMacro(vtkStreamingParticlesPriorityQueue);
@@ -58,6 +100,32 @@ void vtkStreamingParticlesPriorityQueue::Initialize(vtkMultiBlockDataSet* metada
   delete this->Internals;
   this->Internals = new vtkInternals();
   this->Internals->Metadata = metadata;
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamingParticlesPriorityQueue::Reinitialize()
+{
+  if (this->Internals->Metadata)
+    {
+    std::set<unsigned int> blocksRequested;
+    blocksRequested.swap(this->Internals->BlocksRequested);
+
+    vtkSmartPointer<vtkMultiBlockDataSet> info = this->Internals->Metadata;
+    this->Initialize(info);
+
+    // restore blocks requested since data didn;t change.
+    this->Internals->BlocksRequested.swap(blocksRequested);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
+  const double view_planes[24])
+{
+  assert(this->Internals && this->Internals->Metadata);
+  assert(this->Internals->BlocksToRequest.empty());
+
+  vtkMultiBlockDataSet* metadata = this->Internals->Metadata;
 
   // This assumes for following structure:
   // Root
@@ -73,6 +141,8 @@ void vtkStreamingParticlesPriorityQueue::Initialize(vtkMultiBlockDataSet* metada
   // Where "Block Idx" is the key that needs to be sent up the pipeline to the
   // reader to request a particular block and Level k is lower refinement than
   // Level (k+1).
+
+  vtkStreamingPriorityQueue<vtkParticlesComparator> queue;
 
   unsigned int block_index = 0;
   unsigned int num_levels = metadata->GetNumberOfBlocks();
@@ -96,33 +166,57 @@ void vtkStreamingParticlesPriorityQueue::Initialize(vtkMultiBlockDataSet* metada
       item.Identifier = block_index;
       item.Refinement = level;
 
-      // default priority is to prefer lower levels. Thus even without
-      // view-planes we have reasonable priority.
-      item.Priority = block_index;
-
       double bounds[6];
       mb->GetMetaData(cc)->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(), bounds);
       item.Bounds.SetBounds(bounds);
 
-      this->Internals->PriorityQueue.push(item);
+      queue.push(item);
       }
     }
-}
+  double clamp_bounds[6];
+  vtkMath::UninitializeBounds(clamp_bounds);
+  queue.UpdatePriorities(view_planes, clamp_bounds);
 
-//----------------------------------------------------------------------------
-void vtkStreamingParticlesPriorityQueue::Reinitialize()
-{
-  if (this->Internals->Metadata)
+  std::set<unsigned int> blocksRequested;
+  blocksRequested.swap(this->Internals->BlocksRequested);
+
+  while (!queue.empty())
     {
-    vtkSmartPointer<vtkMultiBlockDataSet> info = this->Internals->Metadata;
-    this->Initialize(info);
+    vtkStreamingPriorityQueueItem item = queue.top();
+    queue.pop();
+    if (item.Refinement <= 1 || item.ScreenCoverage >= 0.75)
+      {
+      if (blocksRequested.find(item.Identifier) != blocksRequested.end())
+        {
+        // this block was previously requested, pretend we already requested it
+        // in the current iteration as well.
+        this->Internals->BlocksRequested.insert(item.Identifier);
+        blocksRequested.erase(item.Identifier);
+        }
+      else
+        {
+        // we need to request this block.
+        this->Internals->BlocksToRequest.push(item.Identifier);
+        }
+      }
     }
+
+  // - anything in blocksRequested is what is "extra" and should
+  // be purged.
+  // - anything in this->Internals->BlocksToRequest is to be requested.
+
+  this->Internals->BlocksToPurge.clear();
+  this->Internals->BlocksToPurge.swap(blocksRequested);
+  cout << "Update information  : "  << endl
+       << "  To request        : " << this->Internals->BlocksToRequest.size() << endl
+       << "  Already requested : " << this->Internals->BlocksRequested.size() << endl
+       << "  To purge          : " << this->Internals->BlocksToPurge.size() << endl;
 }
 
 //----------------------------------------------------------------------------
 bool vtkStreamingParticlesPriorityQueue::IsEmpty()
 {
-  return this->Internals->PriorityQueue.empty();
+  return this->Internals->BlocksToRequest.empty();
 }
 
 //----------------------------------------------------------------------------
@@ -130,26 +224,27 @@ unsigned int vtkStreamingParticlesPriorityQueue::Pop()
 {
   if (this->IsEmpty())
     {
-    vtkErrorMacro("Queue is empty!");
-    return 0;
+    return VTK_UNSIGNED_INT_MAX;
     }
 
   int num_procs = this->Controller? this->Controller->GetNumberOfProcesses() : 1;
   int myid = this->Controller? this->Controller->GetLocalProcessId() : 0;
   assert(myid < num_procs);
 
-  std::vector<vtkStreamingPriorityQueueItem> items;
-  items.resize(num_procs);
-  for (int cc=0; cc < num_procs && !this->Internals->PriorityQueue.empty(); cc++)
+  std::vector<unsigned int> items;
+  items.resize(num_procs, VTK_UNSIGNED_INT_MAX);
+
+  for (int cc=0; cc < num_procs && !this->Internals->BlocksToRequest.empty(); cc++)
     {
-    items[cc] = this->Internals->PriorityQueue.top();
-    this->Internals->PriorityQueue.pop();
+    items[cc] = this->Internals->BlocksToRequest.front();
+    this->Internals->BlocksToRequest.pop();
+    this->Internals->BlocksRequested.insert(items[cc]);
     }
 
   // at the end, when the queue empties out in the middle of a pop, right now,
   // all other processes are simply going to ask for block 0 (set in
   // initialization of vtkPriorityQueueItem). We can change that, if needed.
-  return items[myid].Identifier;
+  return items[myid];
 }
 
 //----------------------------------------------------------------------------
@@ -164,11 +259,28 @@ void vtkStreamingParticlesPriorityQueue::Update(const double view_planes[24])
 void vtkStreamingParticlesPriorityQueue::Update(const double view_planes[24],
   const double clamp_bounds[6])
 {
+  this->Internals->BlocksToPurge.clear();
+
   if (!this->Internals->Metadata)
     {
     return;
     }
-  this->Internals->PriorityQueue.UpdatePriorities(view_planes, clamp_bounds);
+
+  // Check if the view has changed. If so, we update the priorities.
+  if (!this->Internals->PlanesChanged(view_planes))
+    {
+    return;
+    }
+
+  this->Reinitialize();
+  this->UpdatePriorities(view_planes);
+  this->Internals->SetViewPlanes(view_planes);
+}
+
+//----------------------------------------------------------------------------
+const std::set<unsigned int>& vtkStreamingParticlesPriorityQueue::GetBlocksToPurge() const
+{
+  return this->Internals->BlocksToPurge;
 }
 
 //----------------------------------------------------------------------------

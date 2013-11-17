@@ -90,7 +90,7 @@ using namespace std;
 using namespace cosmotk;
 
 vtkStandardNewMacro(vtkPCosmoReader);
-
+vtkCxxSetObjectMacro(vtkPCosmoReader, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkPCosmoReader::vtkPCosmoReader()
 {
@@ -98,9 +98,11 @@ vtkPCosmoReader::vtkPCosmoReader()
 
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
-  if(!this->Controller)
+  if (!this->Controller)
     {
-      this->SetController(vtkSmartPointer<vtkDummyController>::New());
+    vtkSmartPointer<vtkDummyController> controller =
+      vtkSmartPointer<vtkDummyController>::New();
+    this->SetController(controller);
     }
 
   this->FileName = NULL;
@@ -118,7 +120,6 @@ vtkPCosmoReader::~vtkPCosmoReader()
     {
     delete [] this->FileName;
     }
-
   this->SetController(0);
 }
 
@@ -141,36 +142,6 @@ void vtkPCosmoReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Overlap: " << this->Overlap << endl;
   os << indent << "ReadMode: " << this->ReadMode << endl;
   os << indent << "CosmoFormat: " << this->CosmoFormat << endl;
-}
-
-//----------------------------------------------------------------------------
-void vtkPCosmoReader::SetController(vtkMultiProcessController *c)
-{
-  if(this->Controller == c)
-    {
-    return;
-    }
-
-  this->Modified();
-
-  if(this->Controller != 0)
-    {
-    this->Controller->UnRegister(this);
-    this->Controller = 0;
-    }
-
-  if(c == 0)
-    {
-    return;
-    }
-
-  this->Controller = c;
-  c->Register(this);
-}
-
-vtkMultiProcessController* vtkPCosmoReader::GetController()
-{
-  return (vtkMultiProcessController*)this->Controller;
 }
 
 //----------------------------------------------------------------------------

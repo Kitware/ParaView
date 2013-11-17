@@ -126,7 +126,6 @@ vtkACosmoReader::vtkACosmoReader()
   this->SetNumberOfOutputPorts(1);
 
   this->BaseFileName = "";
-  this->FileName     = NULL;
 
   this->ByteSwap  = 0;
   this->BoxSize   = 90.140846;
@@ -141,11 +140,6 @@ vtkACosmoReader::vtkACosmoReader()
 //----------------------------------------------------------------------------
 vtkACosmoReader::~vtkACosmoReader()
 {
-  if( this->FileName != NULL)
-    {
-    delete [] this->FileName;
-    }
-
   if( this->MetaData != NULL )
     {
     this->MetaData->Delete();
@@ -157,12 +151,32 @@ vtkACosmoReader::~vtkACosmoReader()
 }
 
 //----------------------------------------------------------------------------
+void vtkACosmoReader::AddFileName(const char* name)
+{
+  if (!name)
+    {
+    vtkErrorMacro("FileName cannot be empty.");
+    return;
+    }
+
+  if (this->FileNames.find(name) == this->FileNames.end())
+    {
+    this->FileNames.insert(name);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkACosmoReader::RemoveAllFileNames()
+{
+  this->FileNames.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkACosmoReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "File Name: "
-     << (this->FileName ? this->FileName : "(none)") << endl;
   os << indent << "Byte Swap: "
      << (this->ByteSwap ? "ON" : "OFF") << endl;
   os << indent << "BoxSize: " << this->BoxSize << endl;
@@ -238,7 +252,7 @@ void vtkACosmoReader::ReadMetaDataFile(
 //----------------------------------------------------------------------------
 void vtkACosmoReader::LoadMetaData()
 {
-  this->ExtractInfoFromFileName();
+  this->ExtractInfoFromFileNames();
 
   // Note we start numbering levels from 1, level 0 has no blocks
   this->NBlocks.resize( this->TotalNumberOfLevels+1 );
@@ -266,17 +280,15 @@ void vtkACosmoReader::LoadMetaData()
 
   this->MetadataIsLoaded = true;
 }
-//----------------------------------------------------------------------------
-void vtkACosmoReader::ExtractInfoFromFileName()
-{
-  if( (this->FileName==NULL) || (strcmp(this->FileName,"")==0) )
-    {
-    // unspecified or empty filename
-    return;
-    }
 
+namespace
+{
+bool ExtractFileNameComponents(
+  std::string& basename, int &process, int &number_of_levels,
+  const std::string& filename)
+  {
   std::vector<std::string> tokens;
-  std::string tmpFileName = std::string(this->FileName);
+  std::string tmpFileName = filename;
   std::string delimiter = ".";
   size_t pos = tmpFileName.find(delimiter);
   for( ;pos != std::string::npos; pos=tmpFileName.find(delimiter) )
@@ -284,20 +296,47 @@ void vtkACosmoReader::ExtractInfoFromFileName()
     tokens.push_back( tmpFileName.substr(0,pos) );
     tmpFileName.erase(0,pos+delimiter.length());
     }
-
-  if(tokens.size() != 3 )
+  if (tokens.size() != 3 )
     {
-    vtkErrorMacro("Cannot process file: " << this->FileName);
+    return false;
     }
 
-  this->BaseFileName        = tokens[0];
-  int process = atoi(tokens[1].c_str());
-  if( process > 0 )
+  basename = tokens[0];
+  process = atoi(tokens[1].c_str());
+  number_of_levels = atoi(tokens[2].c_str());
+  return true;
+  }
+}
+//----------------------------------------------------------------------------
+void vtkACosmoReader::ExtractInfoFromFileNames()
+{
+  if (this->FileNames.size() == 0)
     {
-    vtkErrorMacro(
-      "Data was sampled in parallel, this is currently not supported");
+    // unspecified or empty filename
+    return;
     }
-  this->TotalNumberOfLevels = atoi(tokens[2].c_str());
+
+  this->TotalNumberOfLevels = 0;
+
+  // pick the filename that tells us there are max number of levels.
+  for (std::set<std::string>::iterator iter = this->FileNames.begin();
+    iter != this->FileNames.end(); ++iter)
+    {
+    int cur_levels = 0, process=0;
+    std::string basefile;
+    if (ExtractFileNameComponents(basefile, process, cur_levels, *iter) &&
+        cur_levels > this->TotalNumberOfLevels)
+      {
+      if (process > 0)
+        {
+        vtkErrorMacro(
+          "Data was sampled in parallel, this is currently not supported");
+        continue;
+        }
+      this->TotalNumberOfLevels = cur_levels;
+      this->BaseFileName = basefile;
+      }
+    }
 
 #ifdef DEBUG
   std::cout << "\t[INFO]: BASEFILE: " << this->BaseFileName  << std::endl;

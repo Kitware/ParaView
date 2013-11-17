@@ -8,6 +8,9 @@ sources = servermanager.sources.__dict__
 for source in sources:
   try:
     sys.stderr.write('Creating %s...'%(source))
+    if source in ["GenericIOReader"]:
+        print sys.stderr.write("...skipping (in exclusion list).\n")
+        continue
     s = sources[source]()
     s.UpdateVTKObjects()
     sys.stderr.write('ok\n')

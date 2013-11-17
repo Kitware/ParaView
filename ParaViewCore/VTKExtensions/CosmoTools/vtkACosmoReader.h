@@ -70,6 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // C/C++ includes
 #include <string> // For C++ string
 #include <vector> // For STL vector
+#include <set>    // For STL set
 
 // Forward declarations
 struct block_t; // defined in the implementation
@@ -88,9 +89,10 @@ public:
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Specify the name of the cosmology particle binary file to read
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
+  // Add/Remove files to read. These files are treated as set in the adaptive
+  // cosmo files.
+  void AddFileName(const char*);
+  void RemoveAllFileNames();
 
   // Set/Get the box size for the simulation (range along x,y,z)
   // Negative x,y,z values are subtracted from this for wraparound
@@ -123,7 +125,6 @@ protected:
   virtual int RequestData(vtkInformation *,
     vtkInformationVector **, vtkInformationVector *);
 
-
   // Description:
   // Loads the metadata
   void LoadMetaData();
@@ -131,7 +132,7 @@ protected:
   // Description:
   // Processes the user-supplied FileName and extracts the
   // base file name, as well as, the total number of levels.
-  void ExtractInfoFromFileName();
+  void ExtractInfoFromFileNames();
 
   // Description:
   // Reads the metadata file with the given filename at the specified level.
@@ -180,6 +181,7 @@ protected:
   std::vector< int > NBlocks; // Number of blocks at level "i"
   std::vector< block_t > ParticleBlocks; // stores block info for each block
   std::vector< int > RequestedBlocks; // list of blocks to load
+  std::set<std::string> FileNames;
 // ETX
 
 private:

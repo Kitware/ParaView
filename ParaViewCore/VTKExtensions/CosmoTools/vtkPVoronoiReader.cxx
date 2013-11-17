@@ -41,6 +41,11 @@ vtkPVoronoiReader::vtkPVoronoiReader()
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
+vtkPVoronoiReader::~vtkPVoronoiReader()
+{
+  this->SetController(NULL);
+}
+
 void vtkPVoronoiReader::SetController(vtkMultiProcessController *c)
 {
   if ((c == NULL) || (c->GetNumberOfProcesses() == 0))

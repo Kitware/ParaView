@@ -127,7 +127,8 @@
   <SourceProxy class="vtkFileSeriesReader"
                file_name_method="SetFileName"
                name="GenericIOReader"
-               si_class="vtkSIFileSeriesReaderProxy">
+               si_class="vtkSIFileSeriesReaderProxy"
+               mpi_required="1" >
     <Documentation long_help="Reads a cosmology file into a vtkUnstructuredGrid."
                    short_help="Read a cosmology file.">
                    Reads GenericIO
