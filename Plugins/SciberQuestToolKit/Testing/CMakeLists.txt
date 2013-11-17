@@ -26,6 +26,7 @@ macro(sq_add_exec _name)
   add_executable(${TEST_NAME} ${_name}.cpp TestUtils.cxx)
   target_link_libraries(
       ${TEST_NAME}
+      LINK_PRIVATE
       SciberQuestToolKit
       vtkPVServerManagerApplication
       vtkTestingRendering
