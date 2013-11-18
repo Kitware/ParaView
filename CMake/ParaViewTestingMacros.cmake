@@ -143,7 +143,7 @@ FUNCTION(add_pvweb_tests prefix)
     # In this section, we make sure that the needed browser driver is
     # installed on the system.  Some tests might not require selenium
     # or an actual browser.
-    if(${browser} STREQUAL "no-browser")
+    if(${browser} STREQUAL "nobrowser")
       # Anything you need to do in the case of no browser.  Currently, nothing.
     else()
       if(${browser} STREQUAL "chrome")
@@ -154,7 +154,7 @@ FUNCTION(add_pvweb_tests prefix)
         if(${FIREFOXDRIVER_EXTENSION} MATCHES "NOTFOUND")
           set(browser_${browser}_ok FALSE)
         endif()
-      elseif(${browser} STREQUAL "ie")
+      elseif(${browser} STREQUAL "internet_explorer")
         if(${IEDRIVER_EXECUTABLE} MATCHES "NOTFOUND")
           set(browser_${browser}_ok FALSE)
         endif()
@@ -169,10 +169,13 @@ FUNCTION(add_pvweb_tests prefix)
     # then we are ready to add the tests.
     if(${go_ahead_with_tests} AND ${browser_${browser}_ok})
 
-      while (ACT_TEST_SCRIPTS)
+      # Create a copy of the scripts list so we keep the original intact
+      set(TEST_SCRIPTS_LIST ${ACT_TEST_SCRIPTS})
+
+      while (TEST_SCRIPTS_LIST)
         # pop test script path from the top of the list
-        list(GET ACT_TEST_SCRIPTS 0 test_path)
-        list(REMOVE_AT ACT_TEST_SCRIPTS 0)
+        list(GET TEST_SCRIPTS_LIST 0 test_path)
+        list(REMOVE_AT TEST_SCRIPTS_LIST 0)
         GET_FILENAME_COMPONENT(script_name ${test_path} NAME_WE)
 
         set(short_script_name ${script_name})
@@ -194,6 +197,7 @@ FUNCTION(add_pvweb_tests prefix)
                   ${ARGS}
                   ${BASELINE_IMG_DIR}
                   --run-test-script ${test_path}
+                  --test-use-browser ${browser}
                   )
         set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
       endwhile()

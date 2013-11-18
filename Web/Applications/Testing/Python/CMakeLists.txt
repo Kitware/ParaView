@@ -47,7 +47,7 @@ add_pvweb_tests("pvweb"
                selenium
   BROWSER      chrome
                firefox
-               ie
+               internet_explorer
                safari
   BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline/WebTesting/ParaView
   TEST_SCRIPTS ${WEB_TESTS_WITH_CHROME}
@@ -81,7 +81,7 @@ add_pvweb_tests("pvweb"
   DEPEND_MODS  selenium
   BROWSER      chrome
                firefox
-               ie
+               internet_explorer
                safari
   TEST_SCRIPTS ${TESTAPP_WEB_TESTS_WITH_CHROME}
   )

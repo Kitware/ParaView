@@ -1,116 +1,77 @@
 
-import time
-
 # import modules for automating web testing using a real browser
 import selenium
-from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
 
 from vtk.web import testing
+from vtk.web.testing import ImageComparatorWebTest
 
 
 # =============================================================================
-# This function uses Selenium library to open a browser window and load the
-# ParaView WebVisualizer appliction.  Then it interacts with the browser app
-# to open a known file (the iron protein file).  Then the image is captured
-# and compared with a baseline.
+# Define a subclass of one of the testing base classes.
 # =============================================================================
-def runTest(args) :
+class VisualizerCrushedCanTest(ImageComparatorWebTest) :
+    """
+    This class is based on ImageComparatorWebTest, and is designed to interact
+    with the WebVisualizer application.  It overrides the setup phase of testing
+    to open the can.ex2 data file, changes the coloring scheme, advances to the
+    final time step, rescales the data coloring, and then re-centers the data.
+    It overrides the capture phase of testing to save only a portion of the
+    browser window as a png.  It reliese on the base class postprocessing phase.
+    """
+    def __init__(self, host='localhost', port=8080, **kwargs) :
+        # Only the author of this test script knows what application is
+        # being tested and how to get to it.
+        self.urlPath = '/apps/Visualizer'
 
-    # print 'We were passed the following args: ' + str(args)
+        self.host = host
+        self.port = port
 
-    # This name is used in error reporting
-    testName = 'pv_web_visualizer_open_browser_and_click_renderer.py'
+        appUrl = 'http://' + self.host + ':' + str(self.port) + self.urlPath
 
-    # Request the WebVisualizer index.html
-    urlToRetrieve = 'http://localhost:' + str(args.port) + '/apps/Visualizer'
+        # Continue with initialization of base classes
+        ImageComparatorWebTest.__init__(self, url=appUrl, size=(720, 480), **kwargs)
 
-    # The author of pv_web_visualizer.py grabbed the --data-dir argument
-    # from the command line and put it in a variable called "path" in the
-    # arguments object, so that's where we look for the ParaViewData dir
-    # inside this test script.
-    baselineImgDir = args.baselineImgDir
+    def setup(self) :
+        testing.wait_with_timeout(delay=8)
 
-    # Create a Chrome window driver.
-    browser = webdriver.Chrome()
-    browser.set_window_size(720, 480)
-    browser.get(urlToRetrieve)
+        # Click on the "Open file" icon to start the process of loading a file
+        filesDiv = self.window.find_element_by_css_selector(".action.files")
+        filesDiv.click()
+        testing.wait_with_timeout(delay=1)
 
-    sleepSeconds = 8
-    time.sleep(sleepSeconds)
+        # Click on the "can" link to load some paraview data.  We have the
+        # expectation here that the paraview data dir with which we started the
+        # server points to the "Data" folder in the standard ParaViewData git
+        # repo.
+        canLi = self.window.execute_script("return $('.open-file:contains(can.ex2)')[0]")
+        canLi.click()
+        testing.wait_with_timeout(delay=3)
 
-    # Click on the "Open file" icon to start the process of loading a file
-    filesDiv = browser.find_element_by_css_selector(".action.files")
-    filesDiv.click()
-    time.sleep(1)
+        # Now choose how to color the object
+        colorByLink = self.window.find_element_by_css_selector(".colorBy.color")
+        colorByLink.click()
+        testing.wait_with_timeout(delay=1)
 
-    # Click on the "can" link to load some paraview data.  We have the
-    # expectation here that the paraview data dir with which we started the
-    # server points to the "Data" folder in the standard ParaViewData git
-    # repo.
-    canLi = browser.execute_script("return $('.open-file:contains(can.ex2)')[0]")
-    canLi.click()
-    time.sleep(3)
+        colorByDispLi = self.window.find_element_by_css_selector(".points[name=DISPL]")
+        colorByDispLi.click()
+        testing.wait_with_timeout(delay=1)
 
-    # Now choose how to color the object
-    colorByLink = browser.find_element_by_css_selector(".colorBy.color")
-    colorByLink.click()
-    time.sleep(1)
+        # Jump to the final time step
+        endTimeLi = self.window.find_element_by_css_selector(".action[action=last]")
+        endTimeLi.click()
+        testing.wait_with_timeout(delay=1)
 
-    colorByDispLi = browser.find_element_by_css_selector(".points[name=DISPL]")
-    colorByDispLi.click()
-    time.sleep(1)
+        # Rescale now that we're at the final time step
+        rescaleIcon = self.window.find_element_by_css_selector(".rescale-data")
+        rescaleIcon.click()
+        testing.wait_with_timeout(delay=1)
 
-    endTimeLi = browser.find_element_by_css_selector(".action[action=last]")
-    endTimeLi.click()
-    time.sleep(1)
+        # Now click the resetCamera icon so that we change the center of
+        # rotation
+        resetCameraIcon = self.window.find_element_by_css_selector("[action=resetCamera]");
+        resetCameraIcon.click()
+        testing.wait_with_timeout(delay=1)
 
-    rescaleIcon = browser.find_element_by_css_selector(".rescale-data")
-    rescaleIcon.click()
-    time.sleep(1)
-
-    # Now click the resetCamera icon so that we change the center of
-    # rotation
-    resetCameraIcon = browser.find_element_by_css_selector("[action=resetCamera]");
-    resetCameraIcon.click()
-    time.sleep(1)
-
-    '''
-    # Click-and-drag on the cone to change its orientation a bit.
-    listenerDiv = browser.find_element_by_css_selector(".mouse-listener")
-    drag = ActionChains(browser)
-    drag.move_to_element(listenerDiv)
-    drag.click_and_hold()
-    drag.move_by_offset(100, 0)
-    drag.release()
-    drag.perform()
-    time.sleep(1)
-    '''
-
-    # Now grab the renderer image and write it to disk
-    imgdata = testing.get_image_data(browser, ".image.active>img")
-    filename = 'test_pv_web_visualizer_can_test.jpg'
-    testing.write_image_to_disk(imgdata, filename)
-
-    knownGoodFileName = testing.concat_paths(baselineImgDir,
-                                             'test_pv_web_visualizer_can_test_known_good.jpg')
-
-    compareResult = -1
-
-    try :
-        compareResult = testing.compare_images(knownGoodFileName, filename)
-        print 'Images compared with diff = ' + str(compareResult)
-    except Exception as inst :
-        print 'Caught exception in compareImages:'
-        print inst
-        testing.test_fail(testName)
-
-    browser.quit()
-
-    if compareResult != 0 :
-        print "Images were different, diffsum was: " + str(compareResult)
-        testing.test_fail(testName)
-
-    testing.test_pass(testName)
+    def capture(self) :
+        # Now grab the renderer image and write it to disk
+        testing.save_image_data_as_png(self.window, ".image.active>img", self.filename)
