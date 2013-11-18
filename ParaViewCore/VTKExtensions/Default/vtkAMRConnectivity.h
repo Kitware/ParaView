@@ -32,6 +32,7 @@ class vtkIdTypeArray;
 class vtkAMRDualGridHelper;
 class vtkAMRDualGridHelperBlock; 
 class vtkPEquivalenceSet;
+class vtkMPIController;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
@@ -86,6 +87,7 @@ protected:
                                vtkAMRDualGridHelperBlock* block, 
                                vtkAMRDualGridHelperBlock* neighbor, 
                                int dir);
+  int ExchangeBoundaries (vtkMPIController* controller);
   void ProcessBoundaryAtNeighbor (vtkNonOverlappingAMR* volume,
                                   vtkIdTypeArray *array);
 

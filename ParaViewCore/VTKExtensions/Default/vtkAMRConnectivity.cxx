@@ -289,92 +289,10 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
     }
 
   // Exchange all boundaries between processes where block and neighbor are different procs
-  if (this->ReceiveList.size () > 0 && mpiController == 0)
+  if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
     {
-    vtkErrorMacro ("vtkAMRConnectivity only works parallel in MPI environment");
     return 0;
     }
-
-  vtkAMRConnectivityCommRequestList receiveList;
-  for (int i = 0; i < this->ReceiveList.size (); i ++) 
-    {
-    if (i == myProc) { continue; }
-    int messageLength = 0;
-    for (int j = 0; j < this->ReceiveList[i].size (); j ++)
-      {
-      messageLength += 10 + this->ReceiveList[i][j];
-      }
-    this->ReceiveList[i].clear ();
-
-    vtkIntArray* array = vtkIntArray::New ();
-    array->SetNumberOfComponents (1);
-    array->SetNumberOfTuples (messageLength);
-
-    vtkAMRConnectivityCommRequest request;
-    request.SendProcess = i;
-    request.ReceiveProcess = myProc;
-    request.Buffer = array;
-
-    mpiController->NoBlockReceive(array->GetPointer (0),
-                                  messageLength,
-                                  i, BOUNDARY_TAG,
-                                  request.Request);
-    array->Delete ();
-    } 
-
-  vtkAMRConnectivityCommRequestList sendList;
-  for (int i = 0; i < this->BoundaryArrays.size (); i ++)
-    {
-    if (i == myProc) { continue; }
-    vtkIntArray* array = vtkIntArray::New ();
-    array->SetNumberOfComponents (1);
-    array->SetNumberOfTuples (0);
-    for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
-      {
-      int tuples = this->BoundaryArrays[i][j]->GetNumberOfTuples () + 1;
-      array->InsertNextTuple1 (tuples);
-      for (int k = 0; k < tuples; k ++) 
-        {
-        array->InsertNextTuple1 (this->BoundaryArrays[i][j]->GetTuple1 (k));
-        }
-      }
-
-    vtkAMRConnectivityCommRequest request;
-    request.SendProcess = myProc;
-    request.ReceiveProcess = i;
-    request.Buffer = array;
-
-    mpiController->NoBlockSend(array->GetPointer(0),
-                               array->GetNumberOfTuples (),
-                               i, BOUNDARY_TAG,
-                               request.Request);
-
-    array->Delete ();
-    }
-
-  while (!receiveList.empty())
-    {
-    vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
-    vtkIntArray* array = request.Buffer;
-    int total = array->GetNumberOfTuples ();
-    int index = 0;
-    while (index < total)
-      {
-      int tuples = array->GetTuple1 (index);
-      index ++;
-      vtkIdTypeArray* boundary = vtkIdTypeArray::New ();
-      boundary->SetNumberOfComponents (1);
-      boundary->SetNumberOfTuples (tuples);
-      for (int i = 0; i < tuples; i ++) 
-        {
-        boundary->SetTuple1 (i, array->GetTuple1 (index));
-        index ++;
-        }
-      this->BoundaryArrays[myProc].push_back (boundary);
-      }
-    }
-
-  sendList.WaitAll();
 
   // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
   this->Equivalence = vtkPEquivalenceSet::New ();
@@ -652,7 +570,101 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
                                                    (extent[5] - extent[4]));
     }
 }
-//
+//----------------------------------------------------------------------------
+int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
+{
+  int myProc = controller->GetLocalProcessId ();
+  int numProcs = controller->GetNumberOfProcesses ();
+
+  if (controller == 0)
+    {
+    vtkErrorMacro ("vtkAMRConnectivity only works parallel in MPI environment");
+    return 0;
+    }
+
+  vtkAMRConnectivityCommRequestList receiveList;
+  for (int i = 0; i < this->ReceiveList.size (); i ++) 
+    {
+    if (i == myProc) { continue; }
+    int messageLength = 0;
+    for (int j = 0; j < this->ReceiveList[i].size (); j ++)
+      {
+      messageLength += 10 + this->ReceiveList[i][j];
+      }
+    this->ReceiveList[i].clear ();
+
+    vtkIntArray* array = vtkIntArray::New ();
+    array->SetNumberOfComponents (1);
+    array->SetNumberOfTuples (messageLength);
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = i;
+    request.ReceiveProcess = myProc;
+    request.Buffer = array;
+
+    controller->NoBlockReceive(array->GetPointer (0),
+                                  messageLength,
+                                  i, BOUNDARY_TAG,
+                                  request.Request);
+    array->Delete ();
+    } 
+
+  vtkAMRConnectivityCommRequestList sendList;
+  for (int i = 0; i < this->BoundaryArrays.size (); i ++)
+    {
+    if (i == myProc) { continue; }
+    vtkIntArray* array = vtkIntArray::New ();
+    array->SetNumberOfComponents (1);
+    array->SetNumberOfTuples (0);
+    for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
+      {
+      int tuples = this->BoundaryArrays[i][j]->GetNumberOfTuples () + 1;
+      array->InsertNextTuple1 (tuples);
+      for (int k = 0; k < tuples; k ++) 
+        {
+        array->InsertNextTuple1 (this->BoundaryArrays[i][j]->GetTuple1 (k));
+        }
+      }
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = myProc;
+    request.ReceiveProcess = i;
+    request.Buffer = array;
+
+    controller->NoBlockSend(array->GetPointer(0),
+                               array->GetNumberOfTuples (),
+                               i, BOUNDARY_TAG,
+                               request.Request);
+
+    array->Delete ();
+    }
+
+  while (!receiveList.empty())
+    {
+    vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
+    vtkIntArray* array = request.Buffer;
+    int total = array->GetNumberOfTuples ();
+    int index = 0;
+    while (index < total)
+      {
+      int tuples = array->GetTuple1 (index);
+      index ++;
+      vtkIdTypeArray* boundary = vtkIdTypeArray::New ();
+      boundary->SetNumberOfComponents (1);
+      boundary->SetNumberOfTuples (tuples);
+      for (int i = 0; i < tuples; i ++) 
+        {
+        boundary->SetTuple1 (i, array->GetTuple1 (index));
+        index ++;
+        }
+      this->BoundaryArrays[myProc].push_back (boundary);
+      }
+    }
+
+  sendList.WaitAll();
+  return 1;
+}
+
 //----------------------------------------------------------------------------
 void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
                 vtkNonOverlappingAMR* volume, vtkIdTypeArray *array)
