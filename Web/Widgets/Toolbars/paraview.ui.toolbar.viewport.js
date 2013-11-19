@@ -17,6 +17,7 @@
     + "<li action='toggleCenterOfRotation' class='action on' alt='Toggle visibility of center of rotation' title='Toggle visibility of center of rotation'><div class='icon'></div></li>"
     + "<li action='image' class='switch' other='webgl' alt='Toggle delivery mechanism from Image to Geometry' title='Toggle delivery mechanism from Image to Geometry'><div class='icon'></div></li>"
     + "<li action='toggleInfo' class='action' alt='Toggle viewport information' title='Toggle viewport information'><div class='icon'></div></li>"
+    + "<select class='switch' type='enum'><option value='image' selected>Image</option><option value='webgl'>WebGL</option><option value='vgl'>VGL-WebGL</option></select>"
     + "</ul>\n",
     VIEWPORT_DATA_KEY = 'pvViewport';
 
@@ -50,13 +51,14 @@
             // Attach listeners
             $('li.action', me).bind('click', actionListener);
             $('li.switch', me).bind('click', switchListener).hide();
+            $('select.switch', me).bind('change', switchListener);
 
             // Make sure webgl is enable to show the switch button
-            try {
-                if(vtkWeb.ViewportFactory.webgl) {
-                    $('li.switch', me).show();
-                }
-            } catch(error) {}
+ //           try {
+ //               if(vtkWeb.ViewportFactory.webgl) {
+//                    $('li.switch', me).show();
+ //               }
+//            } catch(error) {}
 
         });
     };
@@ -105,19 +107,20 @@
         var me = $(this), rootWidget = getToolbarWiget(me),
         viewport = getViewport(rootWidget),
         action = me.attr('action'),
-        other = me.attr('other');
+        other = me.attr('other'),
+        selected = me.attr('value');
 
         if(viewport != null && viewport != undefined) {
-            me.attr('action', other).attr('other', action);
-            viewport.setActiveRenderer(other);
+ //           me.attr('action', other).attr('other', action);
+            viewport.setActiveRenderer(selected);
             viewport.invalidateScene();
         }
 
-        rootWidget.trigger({
-            type: 'viewport-action',
-            action: other,
-            status: true
-        });
+//        rootWidget.trigger({
+//            type: 'viewport-action',
+//            action: other,
+//            status: true
+//        });
     }
 
     // =======================================================================
