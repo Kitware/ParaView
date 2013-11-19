@@ -241,7 +241,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           int ijk[3] = { i, j, k };
           vtkIdType cellId = grid->ComputeCellId (ijk);
           if (regionId->GetTuple1 (cellId) == 0 
-              && volArray->GetTuple1 (cellId) > this->VolumeFractionSurfaceValue);
+              && volArray->GetTuple1 (cellId) > this->VolumeFractionSurfaceValue)
             {
             // wave propagation sets the region id as it propagates
             this->WavePropagation (cellId, grid, regionId, volArray);
