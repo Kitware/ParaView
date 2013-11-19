@@ -15,7 +15,7 @@
     + "<li action='resetCamera' class='action' alt='Reset camera' title='Reset camera'><div class='icon'></div></li>"
     + "<li action='toggleOrientationAxis' class='action on' alt='Toggle visibility of orientation axis' title='Toggle visibility of orientation axis'><div class='icon'></div></li>"
     + "<li action='toggleCenterOfRotation' class='action on' alt='Toggle visibility of center of rotation' title='Toggle visibility of center of rotation'><div class='icon'></div></li>"
-    + "<li action='image' class='switch' other='webgl' alt='Toggle delivery mechanism from Image to Geometry' title='Toggle delivery mechanism from Image to Geometry'><div class='icon'></div></li>"
+//    + "<li action='image' class='switch' other='webgl' alt='Toggle delivery mechanism from Image to Geometry' title='Toggle delivery mechanism from Image to Geometry'><div class='icon'></div></li>"
     + "<li action='toggleInfo' class='action' alt='Toggle viewport information' title='Toggle viewport information'><div class='icon'></div></li>"
     + "<select class='switch' type='enum'><option value='image' selected>Image</option><option value='webgl'>WebGL</option><option value='vgl'>VGL-WebGL</option></select>"
     + "</ul>\n",
