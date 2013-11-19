@@ -482,51 +482,37 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
       sumArray->SetName("Volume");
       break;
     }
-  sumArray->SetNumberOfTuples(1);
-  sumArray->SetValue(0, this->Sum);
-  output->GetCellData()->AddArray(sumArray);
+  if (this->IntegrationDimension > 0)
+    {
+    sumArray->SetNumberOfTuples(1);
+    sumArray->SetValue(0, this->Sum);
+    output->GetCellData()->AddArray(sumArray);
+    }
   sumArray->Delete();
 
-  if (this->Controller->GetLocalProcessId() > 0)
+  int globalMin = this->PieceNodeMinToNode0 (output);
+  int processId = this->Controller->GetLocalProcessId();
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  if (globalMin == numProcs)
     {
-    double msg[5];
-    msg[0] = (double)(this->IntegrationDimension);
-    msg[1] = this->Sum;
-    msg[2] = this->SumCenter[0];
-    msg[3] = this->SumCenter[1];
-    msg[4] = this->SumCenter[2];
-    this->Controller->Send(msg, 5, 0, vtkIntegrateAttributes::IntegrateAttrInfo);
-    this->Controller->Send(output, 0, vtkIntegrateAttributes::IntegrateAttrData);
-    // Done sending.  Reset output so satellites will have empty data.
-    output->Initialize();
+    // there is no data in any of the processors
+    return 1;
+    }
+  if (processId > 0)
+    {
+    if (processId != globalMin)
+      {
+      this->SendPiece (output);
+      }
     }
   else
     {
-    int numProcs = this->Controller->GetNumberOfProcesses();
     for (int id = 1; id < numProcs; ++id)
       {
-      double msg[5];
-      this->Controller->Receive(msg,
-                                5,
-                                id,
-                                vtkIntegrateAttributes::IntegrateAttrInfo);
-      vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
-      this->Controller->Receive(tmp,
-                                id,
-                                vtkIntegrateAttributes::IntegrateAttrData);
-      if (this->CompareIntegrationDimension(output, (int)(msg[0])))
+      if (id != globalMin)
         {
-        this->Sum += msg[1];
-        this->SumCenter[0] += msg[2];
-        this->SumCenter[1] += msg[3];
-        this->SumCenter[2] += msg[4];
-        this->IntegrateSatelliteData(tmp->GetPointData(),
-                                     output->GetPointData());
-        this->IntegrateSatelliteData(tmp->GetCellData(),
-                                     output->GetCellData());
+        this->ReceivePiece (output, id);
         }
-      tmp->Delete();
-      tmp = 0;
       }
 
     // now that we have all of the sums from each process
@@ -557,6 +543,77 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
 
   return 1;
 }
+
+int vtkIntegrateAttributes::PieceNodeMinToNode0(vtkUnstructuredGrid *data)
+{
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int processId = this->Controller->GetLocalProcessId();
+  int localMin = (data->GetNumberOfCells() == 0 ? numProcs : processId);
+  int globalMin = numProcs;
+  if (numProcs == 1)
+    {
+    return 0;
+    }
+  this->Controller->AllReduce (&localMin, &globalMin, 1,
+                               vtkCommunicator::MIN_OP);
+  if (globalMin == 0 || globalMin == numProcs)
+    {
+    return globalMin;
+    }
+  if (processId == 0)
+    {
+    this->ReceivePiece(data, globalMin);
+    }
+  else if (processId == globalMin)
+    {
+    this->SendPiece (data);
+    }
+  return globalMin;
+}
+
+void vtkIntegrateAttributes::SendPiece(vtkUnstructuredGrid *src)
+{
+  double msg[5];
+  msg[0] = (double)(this->IntegrationDimension);
+  msg[1] = this->Sum;
+  msg[2] = this->SumCenter[0];
+  msg[3] = this->SumCenter[1];
+  msg[4] = this->SumCenter[2];
+  this->Controller->Send(msg, 5, 0, vtkIntegrateAttributes::IntegrateAttrInfo);
+  this->Controller->Send(src, 0, vtkIntegrateAttributes::IntegrateAttrData);
+  // Done sending.  Reset src so satellites will have empty data.
+  src->Initialize();
+}
+
+void vtkIntegrateAttributes::ReceivePiece (vtkUnstructuredGrid *mergeTo,
+                                           int fromId)
+{
+  double msg[5];
+  this->Controller->Receive(msg,
+                            5,
+                            fromId,
+                            vtkIntegrateAttributes::IntegrateAttrInfo);
+  vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
+  this->Controller->Receive(tmp,
+                            fromId,
+                            vtkIntegrateAttributes::IntegrateAttrData);
+  if (this->CompareIntegrationDimension(mergeTo, (int)(msg[0])))
+    {
+    this->Sum += msg[1];
+    this->SumCenter[0] += msg[2];
+    this->SumCenter[1] += msg[3];
+    this->SumCenter[2] += msg[4];
+    this->IntegrateSatelliteData(tmp->GetPointData(),
+                                 mergeTo->GetPointData());
+    this->IntegrateSatelliteData(tmp->GetCellData(),
+                                 mergeTo->GetCellData());
+    }
+  tmp->Delete();
+  tmp = 0;
+}
+
+
+
 
 //-----------------------------------------------------------------------------
 void vtkIntegrateAttributes::AllocateAttributes(
@@ -742,28 +799,38 @@ void vtkIntegrateAttributes::IntegrateData4(vtkDataSetAttributes* inda,
 
 //-----------------------------------------------------------------------------
 // Used to sum arrays from all processes.
-void vtkIntegrateAttributes::IntegrateSatelliteData(vtkDataSetAttributes* inda,
-                                                    vtkDataSetAttributes* outda)
+void vtkIntegrateAttributes::IntegrateSatelliteData(
+  vtkDataSetAttributes* sendingProcAttributes,
+  vtkDataSetAttributes* proc0Attributes)
 {
-  if (inda->GetNumberOfArrays() != outda->GetNumberOfArrays())
+  // if the sending processor has no data
+  if (sendingProcAttributes->GetNumberOfArrays() == 0)
     {
+    return;
+    }
+
+  // when processor 0 that has no data, receives data from the min
+  // processor that has data
+  if (proc0Attributes->GetNumberOfArrays() == 0)
+    {
+    proc0Attributes->DeepCopy (sendingProcAttributes);
     return;
     }
 
   int numArrays, i, numComponents, j;
   vtkDataArray* inArray;
   vtkDataArray* outArray;
-  numArrays = outda->GetNumberOfArrays();
+  numArrays = proc0Attributes->GetNumberOfArrays();
   double vIn, vOut;
   for (i = 0; i < numArrays; ++i)
     {
-    outArray = outda->GetArray(i);
+    outArray = proc0Attributes->GetArray(i);
     numComponents = outArray->GetNumberOfComponents();
     // Protect against arrays in a different order.
     const char* name = outArray->GetName();
     if (name && name[0] != '\0')
       {
-      inArray = inda->GetArray(name);
+      inArray = sendingProcAttributes->GetArray(name);
       if (inArray && inArray->GetNumberOfComponents() == numComponents)
         {
         // We could template for speed.
