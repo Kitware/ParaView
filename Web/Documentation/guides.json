@@ -1,65 +1,78 @@
- [
-      {
-         "title": "Deployment Guide",
-         "items": [
-             {
-                  "name": "apache_setup",
-                  "url": "guides/apache_setup",
-                  "title": "Setup Apache front-end",
-                  "description": "This document explains how to use Apache as the front-end for ParaViewWeb."
-              },{
-                  "name": "jetty_session_manager",
-                  "url": "guides/jetty_session_manager",
-                  "title": "Session Manager front-end",
-                  "description": "This document explains how to use the Jetty Session Manager front-end for ParaViewWeb."
-              },{
-                  "name": "virtualgl_turbovnc_howto",
-                  "url": "guides/virtualgl_turbovnc_howto",
-                  "title": "Using VirtualGL and TurboVNC",
-                  "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
-              },{
-                  "name": "paraviewweb_on_aws_ec2",
-                  "url": "guides/paraviewweb_on_aws_ec2",
-                  "title": "ParaViewWeb on an Amazon EC2 AMI Instance",
-                  "description": "This document explains how to set up an Amazon EC2 AMI instance with Apache, Jetty, and ParaViewWeb."
-              },{
-                  "name": "parallel_app",
-                  "url": "guides/parallel_app",
-                  "title": "Parallel Visualization Setup",
-                  "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
-              },{
-                  "name": "py_launcher",
-                  "url": "guides/py_launcher",
-                  "title": "Python Process Launcher",
-                  "description": "This document explains how to set the Python Launcher instead of the Jetty Session Manager."
-              }
-         ]
-      },
-      {
-          "title": "ParaView Web Developer's Guide",
-          "items": [
-              {
-                  "name": "developer_style",
-                  "url": "guides/developer_style",
-                  "title": "Code Style Guidelines",
-                  "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
-              },{
-                  "name": "configure_and_build",
-                  "url": "guides/configure_and_build_pvweb",
-                  "title": "Configure and build Paraview",
-                  "description": "This document explains how to configure and build ParaView from source."
-              }
-          ]
-      },
-      {
-         "title": "VTK Web Developer's Guide",
-         "items": [
-             {
-                  "name": "build_vtk_web",
-                  "url": "guides/configure_and_build_vtkweb",
-                  "title": "Configure and build VTK",
-                  "description": "This document explains how to configure and build VTK from source"
-             }
-         ]
-      }
+[
+  {
+  "title": "Startup guides",
+  "items": [
+    {
+      "name": "quick_start",
+      "url": "guides/getting_started",
+      "title": "Quick start",
+      "description": "This quick start guide show how to test quicly ParaViewWeb locally."
+    }
   ]
+  },{
+   "title": "Deployment Guide",
+   "items": [
+      {
+        "name": "paraviewweb_on_aws_ec2",
+        "url": "guides/paraviewweb_on_aws_ec2",
+        "title": "ParaViewWeb on an Amazon EC2 AMI Instance",
+        "description": "This document explains how to set up an Amazon EC2 AMI instance with Apache, Jetty and ParaViewWeb using Apache 2.4+."
+      },{
+        "name": "apache_setup",
+        "url": "guides/apache_setup",
+        "title": "Using Apache as a front-end (version < 2.4)",
+        "description": "This document explains how to use Apache as the front-end for ParaViewWeb."
+      },{
+        "name": "virtualgl_turbovnc_howto",
+        "url": "guides/virtualgl_turbovnc_howto",
+        "title": "Using VirtualGL and TurboVNC",
+        "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
+      },{
+        "name": "parallel_app",
+        "url": "guides/parallel_app",
+        "title": "Parallel Visualization Setup",
+        "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
+      }
+    ]
+  },{
+   "title": "Session managers",
+   "items": [
+    {
+      "name": "jetty_session_manager",
+      "url": "guides/jetty_session_manager",
+      "title": "Jetty launcher",
+      "description": "This document explains how to use the Jetty Session Manager for ParaViewWeb."
+    },{
+      "name": "py_launcher",
+      "url": "guides/py_launcher",
+      "title": "Python Launcher",
+      "description": "This document explains how to use the provided Python Launcher for ParaViewWeb."
+    }
+   ]
+  },{
+    "title": "Compilation guides",
+    "items": [
+      {
+        "name": "build_vtk_web",
+        "url": "guides/configure_and_build_vtkweb",
+        "title": "Configure and build VTK",
+        "description": "This document explains how to configure and build VTK from source"
+      },{
+        "name": "configure_and_build",
+        "url": "guides/configure_and_build_pvweb",
+        "title": "Configure and build Paraview",
+        "description": "This document explains how to configure and build ParaView from source."
+      }
+    ]
+  },{
+    "title": "Developer corner",
+    "items": [
+      {
+      "name": "developer_style",
+      "url": "guides/developer_style",
+      "title": "Code Style Guidelines",
+      "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
+      }
+    ]
+  }
+]
