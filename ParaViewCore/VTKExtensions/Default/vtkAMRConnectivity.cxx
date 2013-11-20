@@ -372,6 +372,7 @@ int vtkAMRConnectivity::WavePropagation (vtkIdType cellIdStart,
         }
       }
     }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -564,6 +565,33 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
     int extent[6];
     grid->GetExtent (extent);
     extent[dir*2 + 1] = extent[dir*2] + 1;
+
+/*
+    if (block->Level < neighbor->Level) 
+      {
+      // we only want the quarter of the boundary that applies to this neighbor
+      int del[3];
+      del[0] = (extent[1] - extent[0]) >> 1;
+      del[1] = (extent[3] - extent[2]) >> 1;
+      del[2] = (extent[5] - extent[4]) >> 1;
+
+      for (int i = 0; i < 3; i ++)
+        {
+        if (i == dir) 
+          { 
+          continue; 
+          }
+        // shrink the orthogonal directions by half depending on which offset the neighbor is
+        if ((neighbor->GridIndex[i] % 2) == 0) 
+          {
+            extent[i*2+1] -= del[i];
+          } else {
+            extent[i*2+0] += del[i];
+          }
+        }
+      }
+*/
+
     this->ReceiveList[block->ProcessId].push_back (9 + 
                                                    (extent[1] - extent[0]) *
                                                    (extent[3] - extent[2]) *
@@ -573,23 +601,24 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
 //----------------------------------------------------------------------------
 int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
 {
-  int myProc = controller->GetLocalProcessId ();
-  int numProcs = controller->GetNumberOfProcesses ();
-
   if (controller == 0)
     {
     vtkErrorMacro ("vtkAMRConnectivity only works parallel in MPI environment");
     return 0;
     }
 
+  int myProc = controller->GetLocalProcessId ();
+  int numProcs = controller->GetNumberOfProcesses ();
+
   vtkAMRConnectivityCommRequestList receiveList;
   for (int i = 0; i < this->ReceiveList.size (); i ++) 
     {
     if (i == myProc) { continue; }
+
     int messageLength = 0;
     for (int j = 0; j < this->ReceiveList[i].size (); j ++)
       {
-      messageLength += 10 + this->ReceiveList[i][j];
+      messageLength += 1 + this->ReceiveList[i][j];
       }
     this->ReceiveList[i].clear ();
 
@@ -603,9 +632,11 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     request.Buffer = array;
 
     controller->NoBlockReceive(array->GetPointer (0),
-                                  messageLength,
-                                  i, BOUNDARY_TAG,
-                                  request.Request);
+                               messageLength,
+                               i, BOUNDARY_TAG,
+                               request.Request);
+
+    receiveList.push_back(request);
     array->Delete ();
     } 
 
@@ -618,13 +649,14 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     array->SetNumberOfTuples (0);
     for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
       {
-      int tuples = this->BoundaryArrays[i][j]->GetNumberOfTuples () + 1;
+      int tuples = this->BoundaryArrays[i][j]->GetNumberOfTuples ();
       array->InsertNextTuple1 (tuples);
       for (int k = 0; k < tuples; k ++) 
         {
         array->InsertNextTuple1 (this->BoundaryArrays[i][j]->GetTuple1 (k));
         }
       }
+    array->InsertNextTuple1 (-1);
 
     vtkAMRConnectivityCommRequest request;
     request.SendProcess = myProc;
@@ -632,10 +664,11 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     request.Buffer = array;
 
     controller->NoBlockSend(array->GetPointer(0),
-                               array->GetNumberOfTuples (),
-                               i, BOUNDARY_TAG,
-                               request.Request);
+                            array->GetNumberOfTuples (),
+                            i, BOUNDARY_TAG,
+                            request.Request);
 
+    sendList.push_back(request);
     array->Delete ();
     }
 
@@ -648,6 +681,10 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     while (index < total)
       {
       int tuples = array->GetTuple1 (index);
+      if (tuples < 0) 
+        {
+        break;
+        }
       index ++;
       vtkIdTypeArray* boundary = vtkIdTypeArray::New ();
       boundary->SetNumberOfComponents (1);
