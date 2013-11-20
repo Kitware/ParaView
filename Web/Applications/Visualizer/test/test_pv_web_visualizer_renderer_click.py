@@ -39,6 +39,12 @@ class VisualizerRendererClick(ImageComparatorWebTest) :
     def setup(self) :
         testing.wait_with_timeout(delay=8)
 
+        # First change the viewport size so that all browsers get the
+        # same results.
+        scriptToExecute = "$('.renderers').parent().css('width', '350px').css('height', '350px')"
+        self.window.execute_script(scriptToExecute)
+        testing.wait_with_timeout(delay=1)
+
         clickPanel = self.window.find_element_by_css_selector(".mouse-listener")
         clickPanel.click()
         testing.wait_with_timeout(delay=1)

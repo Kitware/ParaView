@@ -186,7 +186,7 @@ FUNCTION(add_pvweb_tests prefix)
           set(short_script_name ${CMAKE_MATCH_1})
         endif()
 
-        set(test_name "${prefix}-${ACT_APP}-${browser}-${short_script_name}")
+        set(test_name "${prefix}-${browser}.${ACT_APP}-${short_script_name}")
 
         add_test(NAME ${test_name}
           COMMAND ${ACT_COMMAND}

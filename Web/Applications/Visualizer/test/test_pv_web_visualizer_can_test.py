@@ -34,6 +34,13 @@ class VisualizerCrushedCanTest(ImageComparatorWebTest) :
     def setup(self) :
         testing.wait_with_timeout(delay=8)
 
+        # First change the viewport size so that all browsers get the
+        # same results.
+        # $(".viewport-container").css("width", "350px").css("height", "350px")
+        scriptToExecute = "$('.renderers').parent().css('width', '350px').css('height', '350px')"
+        self.window.execute_script(scriptToExecute)
+        testing.wait_with_timeout(delay=1)
+
         # Click on the "Open file" icon to start the process of loading a file
         filesDiv = self.window.find_element_by_css_selector(".action.files")
         filesDiv.click()
@@ -43,7 +50,7 @@ class VisualizerCrushedCanTest(ImageComparatorWebTest) :
         # expectation here that the paraview data dir with which we started the
         # server points to the "Data" folder in the standard ParaViewData git
         # repo.
-        canLi = self.window.execute_script("return $('.open-file:contains(can.ex2)')[0]")
+        canLi = self.window.execute_script("return $('.vtk-files.action:contains(can.ex2)')[0]")
         canLi.click()
         testing.wait_with_timeout(delay=3)
 
