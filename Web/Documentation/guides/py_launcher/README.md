@@ -12,7 +12,7 @@ for launching new visualization process.
 This document will first explain the expected RESTful API for launching a ParaViewWeb
 process and then will focus on how to customize the service for a real deployment.
 
-## Process launching RESTful API
+## Process launcher RESTful API
 
 VTKWeb/ParaViewWeb come with a JavaScript library which allow the user to
 trigger new process on the server side in a configurable manner.

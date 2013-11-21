@@ -65,9 +65,11 @@ Please copy the paraview.app inside /Applications
 
 Server arguments are explain in the server files (pv_web_*.py) or online inside the Python documentation.
 
-- [Web visualizer](http://www.paraview.org/ParaView3/Doc/Nightly/www/py-doc/paraview.web.pv_web_visualizer.html)
-- [File loader](http://www.paraview.org/ParaView3/Doc/Nightly/www/py-doc/paraview.web.paraview.web.pv_web_file_loader.html)
-- [Data prober](http://www.paraview.org/ParaView3/Doc/Nightly/www/py-doc/paraview.web.pv_web_data_prober.html)
+- [Web visualizer](http://www.paraview.org/ParaView3/Doc/Nightly/www/py-doc/paraview.web.pv_web_visualizer.html) => http://localhost:8080/apps/Visualizer
+- [File loader](http://www.paraview.org/ParaView3/Doc/Nightly/www/py-doc/paraview.web.pv_web_file_loader.html) => http://localhost:8080/apps/FileViewer
+- [Data prober](http://www.paraview.org/ParaView3/Doc/Nightly/www/py-doc/paraview.web.pv_web_data_prober.html) => http://localhost:8080/apps/DataProber
+
+while http://localhost:8080/apps/LiveArticles and http://localhost:8080/apps/Parallel require a special configuration inside a session manager.
 
 ### Interacting with the web visualizer
 
