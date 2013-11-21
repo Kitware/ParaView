@@ -32,7 +32,6 @@ Copyright 2012 SciberQuest Inc.
     <Proxy group="filters" name="vtkSQSeedPointLatice"/>
     <Proxy group="filters" name="vtkSQSurfaceVectors"/>
     <Proxy group="filters" name="vtkSQTubeFilter"/>
-    <Proxy group="filters" name="vtkSQTensorGlyph"/>
     <!--<Proxy group="filters" name="vtkSQVortexDetect"/>-->
     <Proxy group="filters" name="vtkSQVortexFilter"/>
   </Category>

@@ -196,6 +196,7 @@
   <Proxy group="filters" name="TemporalSnapToTimeStep" />
   <Proxy group="filters" name="TemporalShiftScale" />
   <Proxy group="filters" name="TemporalStatistics" />
+  <Proxy group="filters" name="TensorGlyph" />
   <Proxy group="filters" name="TessellatorFilter" />
   <Proxy group="filters" name="TextureMapToCylinder" />
   <Proxy group="filters" name="TextureMapToPlane" />
