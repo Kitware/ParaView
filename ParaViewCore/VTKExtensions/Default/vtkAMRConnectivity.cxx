@@ -97,6 +97,7 @@ vtkAMRConnectivity::vtkAMRConnectivity ()
 {
   this->VolumeFractionSurfaceValue = 0.5;
   this->Helper = 0;
+  this->Equivalence = 0;
 }
 
 vtkAMRConnectivity::~vtkAMRConnectivity ()
@@ -194,6 +195,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   int myProc = controller->GetLocalProcessId ();
   int numProcs = controller->GetNumberOfProcesses ();
 
+  this->RegionName = std::string ("RegionId-");
+  this->RegionName += volumeName;
+
   // initialize with a global unique region id
   this->NextRegionId = myProc+1;
 
@@ -209,8 +213,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       return 0;
       }
     vtkIdTypeArray* regionId = vtkIdTypeArray::New ();
-    this->RegionName = std::string ("RegionId-");
-    this->RegionName += volumeName;
     regionId->SetName (this->RegionName.c_str());
     regionId->SetNumberOfComponents (1);
     regionId->SetNumberOfTuples (grid->GetNumberOfCells ());
@@ -324,7 +326,8 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       vtkIdType regionId = regionIdArray->GetTuple1 (i);
       if (regionId > 0) 
         {
-        regionIdArray->SetTuple1 (i, this->Equivalence->GetEquivalentSetId (regionId));
+        int setId = this->Equivalence->GetEquivalentSetId (regionId);
+        regionIdArray->SetTuple1 (i, setId);
         }
       else
         {
@@ -566,32 +569,6 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
     grid->GetExtent (extent);
     extent[dir*2 + 1] = extent[dir*2] + 1;
 
-/*
-    if (block->Level < neighbor->Level) 
-      {
-      // we only want the quarter of the boundary that applies to this neighbor
-      int del[3];
-      del[0] = (extent[1] - extent[0]) >> 1;
-      del[1] = (extent[3] - extent[2]) >> 1;
-      del[2] = (extent[5] - extent[4]) >> 1;
-
-      for (int i = 0; i < 3; i ++)
-        {
-        if (i == dir) 
-          { 
-          continue; 
-          }
-        // shrink the orthogonal directions by half depending on which offset the neighbor is
-        if ((neighbor->GridIndex[i] % 2) == 0) 
-          {
-            extent[i*2+1] -= del[i];
-          } else {
-            extent[i*2+0] += del[i];
-          }
-        }
-      }
-*/
-
     this->ReceiveList[block->ProcessId].push_back (9 + 
                                                    (extent[1] - extent[0]) *
                                                    (extent[3] - extent[2]) *
@@ -818,6 +795,12 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
           int blockRegion = array->GetTuple1 (index);
           if (neighborRegion != 0 && blockRegion != 0) 
             {
+	    int neighborRef = this->Equivalence->GetReference (neighborRegion);
+            int blockRef = this->Equivalence->GetReference (blockRegion);
+            if (neighborRef < 0 || blockRef < 0 || (neighborRef == neighborRegion && blockRef == blockRegion))
+              {
+              cerr << "myProc " << myProc << " adding equiv1 " << neighborRegion << " == " << blockRegion << endl;
+              }
             this->Equivalence->AddEquivalence (neighborRegion, blockRegion);
             }
           }
@@ -839,6 +822,12 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
           int blockRegion = array->GetTuple1 (index);
           if (neighborRegion != 0 && blockRegion != 0) 
             {
+	    int neighborRef = this->Equivalence->GetReference (neighborRegion);
+            int blockRef = this->Equivalence->GetReference (blockRegion);
+            if (neighborRef < 0 || blockRef < 0 || (neighborRef == neighborRegion && blockRef == blockRegion))
+              {
+              cerr << "myProc " << myProc << " adding equiv2 " << neighborRegion << " == " << blockRegion << endl;
+              }
             this->Equivalence->AddEquivalence (neighborRegion, blockRegion);
             }
           index ++;

@@ -67,6 +67,7 @@ public:
   // We should fix the pointer API and hide this ivar.
   int Resolved;
 
+  int GetReference(int memberId);
 protected:
   vtkEquivalenceSet();
   ~vtkEquivalenceSet();
@@ -78,7 +79,6 @@ protected:
   vtkIntArray *EquivalenceArray;
 
   // Return the id of the equivalent set.
-  int GetReference(int memberId);
   void EquateInternal(int id1, int id2);
 
 private:
