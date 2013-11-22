@@ -55,3 +55,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: RectilinearDecomp.h

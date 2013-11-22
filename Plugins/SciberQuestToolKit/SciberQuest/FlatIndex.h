@@ -47,3 +47,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: FlatIndex.h

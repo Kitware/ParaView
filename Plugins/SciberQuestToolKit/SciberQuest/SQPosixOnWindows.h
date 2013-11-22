@@ -24,3 +24,5 @@ inline void posix_memalign(void **pData, size_t alignAt, size_t nBytes)
 #endif
 
 #endif
+
+// VTK-HeaderTest-Exclude: SQPosixOnWindows.h

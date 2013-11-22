@@ -33,3 +33,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: IdBlock.h

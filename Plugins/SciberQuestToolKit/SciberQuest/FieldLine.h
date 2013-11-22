@@ -222,3 +222,5 @@ vtkIdType FieldLine::GetNumberOfPoints()
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: FieldLine.h

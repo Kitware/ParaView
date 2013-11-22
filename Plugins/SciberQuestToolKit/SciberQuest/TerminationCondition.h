@@ -245,3 +245,5 @@ int TerminationCondition::OutsideProblemDomain(const double p0[3], double p1[3])
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: TerminationCondition.h

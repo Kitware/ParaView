@@ -61,3 +61,5 @@ void CLASS::SetNew##NAME(TYPE *v)\
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: RefCountedPointer.h

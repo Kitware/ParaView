@@ -132,3 +132,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVWriter.h

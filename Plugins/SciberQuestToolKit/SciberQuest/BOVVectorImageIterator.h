@@ -48,3 +48,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVVectorImageIterator.h

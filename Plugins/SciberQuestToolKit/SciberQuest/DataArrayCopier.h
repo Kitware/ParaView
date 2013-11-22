@@ -56,3 +56,5 @@ public:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: DataArrayCopier.h

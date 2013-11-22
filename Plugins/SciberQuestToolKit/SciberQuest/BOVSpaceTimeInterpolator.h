@@ -120,3 +120,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVSpaceTimeInterpolator.h

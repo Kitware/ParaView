@@ -148,3 +148,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: CUDAFlatIndex.h

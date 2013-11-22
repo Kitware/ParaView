@@ -64,3 +64,5 @@ private:
 std::ostream &operator<<(std::ostream &os, const BOVVectorImage &vi);
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVVectorImage.h

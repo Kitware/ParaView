@@ -37,3 +37,5 @@ public:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: SimpleTerminationCondition.h

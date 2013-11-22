@@ -59,3 +59,5 @@ protected:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: FieldTopologyMapData.h

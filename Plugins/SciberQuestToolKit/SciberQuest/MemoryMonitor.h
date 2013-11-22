@@ -38,3 +38,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: MemoryMonitor.h

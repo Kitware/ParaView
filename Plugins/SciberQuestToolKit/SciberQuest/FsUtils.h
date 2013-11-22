@@ -127,3 +127,5 @@ size_t ParseValue(std::string &in,size_t at, std::string key, T &value)
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: FsUtils.h

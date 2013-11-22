@@ -58,3 +58,5 @@ private:
 std::ostream &operator<<(std::ostream &os, const BOVScalarImage &si);
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVScalarImage.h

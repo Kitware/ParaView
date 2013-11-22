@@ -61,3 +61,5 @@ private:
 std::ostream &operator<<(std::ostream &os, const CartesianDataBlockIODescriptorIterator &it);
 
 #endif
+
+// VTK-HeaderTest-Exclude: CartesianDataBlockIODescriptorIterator.h

@@ -249,3 +249,5 @@ int GhostTransaction::Execute(
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: GhostTransaction.h

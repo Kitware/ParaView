@@ -36,3 +36,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: TopologicalClassSelector.h

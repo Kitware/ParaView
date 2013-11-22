@@ -91,3 +91,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: UnstructuredFieldTopologyMap.h

@@ -89,3 +89,5 @@ protected:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: CellCopier.h

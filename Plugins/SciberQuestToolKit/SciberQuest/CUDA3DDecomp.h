@@ -124,3 +124,5 @@ int PartitionBlocks(
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: CUDA3DDecomp.h

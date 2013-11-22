@@ -78,3 +78,5 @@ private:
 std::ostream &operator<<(std::ostream &os, const BOVTimeStepImage &si);
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVTimeStepImage.h

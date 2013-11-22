@@ -406,3 +406,5 @@ void CartesianBounds::Shift(int q, double s)
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: CartesianBounds.h

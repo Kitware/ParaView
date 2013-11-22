@@ -321,3 +321,5 @@ protected:
 std::ostream &operator<<(std::ostream &os, const BOVMetaData &md);
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVMetaData.h

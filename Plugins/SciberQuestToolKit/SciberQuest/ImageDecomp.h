@@ -68,3 +68,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: ImageDecomp.h

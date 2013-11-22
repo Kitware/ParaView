@@ -17,3 +17,5 @@ Helper that prints rank of caller and returns cerr.
 std::ostream &pCerr();
 
 #endif
+
+// VTK-HeaderTest-Exclude: postream.h

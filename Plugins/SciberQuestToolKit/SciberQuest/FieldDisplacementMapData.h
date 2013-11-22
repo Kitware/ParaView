@@ -49,3 +49,5 @@ protected:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: FieldDisplacementMapData.h

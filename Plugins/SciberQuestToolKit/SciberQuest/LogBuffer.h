@@ -74,3 +74,5 @@ LogBuffer &LogBuffer::operator<<(const char v[N])
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: LogBuffer.h

@@ -46,3 +46,5 @@ void               win_rewinddir(win_DIR *);
 #endif
 
 #endif
+
+// VTK-HeaderTest-Exclude: win_windirent.h

@@ -75,3 +75,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: UnstructuredGridCellCopier.h

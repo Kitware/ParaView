@@ -113,3 +113,5 @@ private:
 std::ostream &operator<<(std::ostream &os, CartesianDataBlock &b);
 
 #endif
+
+// VTK-HeaderTest-Exclude: CartesianDataBlock.h

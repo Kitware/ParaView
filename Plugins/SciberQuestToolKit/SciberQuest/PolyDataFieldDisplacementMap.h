@@ -96,3 +96,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: PolyDataFieldDisplacementMap.h

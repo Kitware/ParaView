@@ -795,3 +795,5 @@ void CartesianExtent::NodeToCell()
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: CartesianExtent.h

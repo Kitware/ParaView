@@ -164,3 +164,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: IntersectionSet.h

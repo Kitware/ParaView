@@ -192,3 +192,5 @@ int ExtractValues(
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: XMLUtils.h

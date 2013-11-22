@@ -27,3 +27,5 @@ std::ostream &operator<<(std::ostream &os, const std::vector<int> &v);
 
 //ETX
 #endif
+
+// VTK-HeaderTest-Exclude: PrintUtils.h

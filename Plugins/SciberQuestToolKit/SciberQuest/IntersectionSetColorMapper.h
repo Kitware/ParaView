@@ -221,3 +221,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: IntersectionSetColorMapper.h

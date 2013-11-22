@@ -212,3 +212,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVReader.h

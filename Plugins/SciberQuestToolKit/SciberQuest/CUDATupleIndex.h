@@ -550,3 +550,5 @@ private:
 };
 */
 #endif
+
+// VTK-HeaderTest-Exclude: CUDATupleIndex.h

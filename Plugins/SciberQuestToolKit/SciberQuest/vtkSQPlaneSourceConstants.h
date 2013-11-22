@@ -19,3 +19,5 @@ enum {
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSQPlaneSourceConstants.h

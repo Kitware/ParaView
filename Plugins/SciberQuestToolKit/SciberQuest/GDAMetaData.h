@@ -98,3 +98,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: GDAMetaData.h

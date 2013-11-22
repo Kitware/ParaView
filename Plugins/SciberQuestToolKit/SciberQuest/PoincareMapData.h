@@ -111,3 +111,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: PoincareMapData.h

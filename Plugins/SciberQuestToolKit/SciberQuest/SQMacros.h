@@ -46,3 +46,5 @@ Copyright 2012 SciberQuest Inc.
 #pragma warning(disable : 4800) // int to bool performance
 #endif
 #endif
+
+// VTK-HeaderTest-Exclude: SQMacros.h

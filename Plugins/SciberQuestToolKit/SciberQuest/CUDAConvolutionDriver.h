@@ -129,3 +129,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: CUDAConvolutionDriver.h

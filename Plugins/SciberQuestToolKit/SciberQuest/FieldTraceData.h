@@ -108,3 +108,5 @@ protected:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: FieldTraceData.h

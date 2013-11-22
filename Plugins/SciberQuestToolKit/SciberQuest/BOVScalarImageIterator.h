@@ -71,3 +71,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVScalarImageIterator.h

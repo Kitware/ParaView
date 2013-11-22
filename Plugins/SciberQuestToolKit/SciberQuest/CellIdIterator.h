@@ -58,3 +58,5 @@ CellIdIterator &CellIdIterator::Increment()
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: CellIdIterator.h

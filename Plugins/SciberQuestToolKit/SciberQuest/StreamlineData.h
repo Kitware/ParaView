@@ -97,3 +97,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: StreamlineData.h

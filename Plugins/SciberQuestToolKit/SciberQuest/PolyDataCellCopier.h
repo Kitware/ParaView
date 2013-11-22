@@ -77,3 +77,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: PolyDataCellCopier.h

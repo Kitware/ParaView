@@ -19,3 +19,5 @@ public:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSQMetaDataKeys.h

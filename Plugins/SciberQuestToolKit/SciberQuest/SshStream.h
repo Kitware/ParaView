@@ -74,3 +74,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: SshStream.h

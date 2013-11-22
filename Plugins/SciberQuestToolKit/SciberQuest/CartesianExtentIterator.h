@@ -80,3 +80,5 @@ CellIdIterator &CartesianExtentIterator::Increment()
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: CartesianExtentIterator.h

@@ -119,3 +119,5 @@ BOVArrayImageIteratorImplMacro(Tensor,9);
 BOVArrayImageIteratorImplMacro(SymetricTensor,6);
 
 #endif
+
+// VTK-HeaderTest-Exclude: BOVArrayImageIterator.h

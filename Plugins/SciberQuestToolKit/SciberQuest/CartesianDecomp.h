@@ -198,3 +198,5 @@ protected:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: CartesianDecomp.h

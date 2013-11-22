@@ -20,3 +20,5 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #endif
+
+// VTK-HeaderTest-Exclude: SQMPICHWarningSupression.h

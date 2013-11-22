@@ -23,3 +23,5 @@ public:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: GDAMetaDataKeys.h
