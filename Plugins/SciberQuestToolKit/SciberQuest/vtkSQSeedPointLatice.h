@@ -16,7 +16,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQSeedPointLatice_h
 #define __vtkSQSeedPointLatice_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 

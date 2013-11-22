@@ -10,10 +10,9 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQImageSource_h
 #define __vtkSQImageSource_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkImageAlgorithm.h"
-#include "CartesianExtent.h"
-#include "GhostTransaction.h"
+#include "CartesianExtent.h" // for CartesianExtent
 
 class vtkInformation;
 class vtkInformationVector;

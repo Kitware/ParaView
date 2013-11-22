@@ -11,8 +11,8 @@ Copyright 2012 SciberQuest Inc.
 
 #include "FieldLine.h"
 
-#include "vtkIntArray.h"
-#include <vector>
+#include "vtkIntArray.h" // for vtkIntArray
+#include <vector> // for vector
 
 class IdBlock;
 class FieldLine;

@@ -23,7 +23,7 @@ Copyright 2012 SciberQuest Inc.
 //#define vtkSQLogDEBUG 1
 //#endif
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkObject.h"
 
 //BTX
@@ -181,8 +181,8 @@ protected:
   virtual ~vtkSQLog();
 
 private:
-  vtkSQLog(const vtkSQLog &); // not implemented
-  void operator=(const vtkSQLog &); // not implemented
+  vtkSQLog(const vtkSQLog&); // Not implemented
+  void operator=(const vtkSQLog&); // Not implemented
 
 private:
   int GlobalLevel;

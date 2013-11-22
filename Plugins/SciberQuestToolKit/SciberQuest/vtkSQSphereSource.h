@@ -29,7 +29,7 @@
 #ifndef __vtkSQSphereSource_h
 #define __vtkSQSphereSource_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 #define VTK_MAX_SPHERE_RESOLUTION 1024

@@ -9,7 +9,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQCellGenerator_h
 #define __vtkSQCellGenerator_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkObject.h"
 
 class vtkInformationObjectBaseKey;

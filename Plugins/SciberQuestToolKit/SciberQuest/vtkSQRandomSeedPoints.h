@@ -17,7 +17,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQRandomSeedPoints_h
 #define __vtkSQRandomSeedPoints_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 class VTKSCIBERQUEST_EXPORT vtkSQRandomSeedPoints : public vtkPolyDataAlgorithm

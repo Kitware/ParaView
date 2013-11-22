@@ -9,11 +9,11 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CartesianBounds_h
 #define __CartesianBounds_h
 
-#include <algorithm>
-#include <iostream>
-#include <cmath>
+#include <algorithm> // for min and max
+#include <iostream> // for ostream
+#include <cmath> // for pow and log10
 
-/// Represnetation of a cartesian volume.
+/// Representation of a cartesian volume.
 /**
 Represnetation of a cartesian volume and common operations
 on it. The implementation is intended to be fast and light

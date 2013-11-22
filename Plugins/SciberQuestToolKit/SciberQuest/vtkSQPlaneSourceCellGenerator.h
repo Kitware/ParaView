@@ -9,9 +9,9 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQPlaneSourceCellGenerator_h
 #define __vtkSQPlaneSourceCellGenerator_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkSQCellGenerator.h"
-#include "vtkCellType.h"
+#include "vtkCellType.h" // for VTK_POLYGON
 
 /// A plane source that provide data on demand
 /**
@@ -23,7 +23,7 @@ class VTKSCIBERQUEST_EXPORT vtkSQPlaneSourceCellGenerator : public vtkSQCellGene
 public:
   static vtkSQPlaneSourceCellGenerator *New();
   void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeMacro(vtkSQPlaneSourceCellGenerator, vtkObject);
+  vtkTypeMacro(vtkSQPlaneSourceCellGenerator, vtkSQCellGenerator);
 
   /**
   Return the total number of cells available.
@@ -96,6 +96,9 @@ public:
 protected:
   vtkSQPlaneSourceCellGenerator();
   virtual ~vtkSQPlaneSourceCellGenerator(){};
+private:
+  vtkSQPlaneSourceCellGenerator(const vtkSQPlaneSourceCellGenerator&); // Not implemented
+  void operator=(const vtkSQPlaneSourceCellGenerator&); // Not implemented
 
 private:
   int Resolution[3];

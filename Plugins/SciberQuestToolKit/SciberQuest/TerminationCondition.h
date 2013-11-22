@@ -9,12 +9,12 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __TerminationCondition_h
 #define __TerminationCondition_h
 
-#include "CartesianBounds.h"
-#include "FieldLine.h"
-#include "IntersectionSetColorMapper.h"
-#include "SQMacros.h"
+#include "CartesianBounds.h" // for CartesianBounds
+#include "FieldLine.h" // for FieldLine
+#include "IntersectionSetColorMapper.h" // for IntersectionSetColorMapper
+#include "SQMacros.h" // for sqErrorMacro
 
-#include <vector>
+#include <vector> // for vector
 
 class vtkPolyData;
 class vtkCellLocator;

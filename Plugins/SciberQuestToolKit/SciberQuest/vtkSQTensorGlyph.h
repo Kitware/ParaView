@@ -84,7 +84,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQTensorGlyph_h
 #define __vtkSQTensorGlyph_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 class VTKSCIBERQUEST_EXPORT vtkSQTensorGlyph : public vtkPolyDataAlgorithm

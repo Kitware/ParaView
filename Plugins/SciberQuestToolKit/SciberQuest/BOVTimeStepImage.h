@@ -13,12 +13,12 @@ Copyright 2012 SciberQuest Inc.
 typedef void * MPI_Comm;
 typedef void * MPI_Info;
 #else
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Comm and MPI_Info
 #endif
 
-#include <vector>
-#include <iostream>
+#include <vector> // for vector
+#include <iostream> // for ostream
 
 class BOVMetaData;
 

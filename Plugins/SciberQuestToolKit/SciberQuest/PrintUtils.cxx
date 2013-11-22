@@ -12,7 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include<string>
 #include<map>
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #if defined PV_3_4_BUILD
   #include "vtkAMRBox_3.7.h"
 #else

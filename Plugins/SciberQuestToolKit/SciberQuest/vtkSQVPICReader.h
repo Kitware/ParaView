@@ -26,11 +26,11 @@
 #ifndef __vtkSQVPICReader_h
 #define __vtkSQVPICReader_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkImageAlgorithm.h"
 
-#include <string>
-#include <vector>
+#include <string> // for string
+#include <vector> // for vector
 
 class vtkCallbackCommand;
 class vtkDataArraySelection;

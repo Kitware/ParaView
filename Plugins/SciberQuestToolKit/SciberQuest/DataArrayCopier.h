@@ -10,7 +10,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __DataArrayCopier_h
 #define __DataArrayCopier_h
 
-#include "IdBlock.h"
+#include "IdBlock.h" // for IdBlock
 
 #include "vtkType.h"
 

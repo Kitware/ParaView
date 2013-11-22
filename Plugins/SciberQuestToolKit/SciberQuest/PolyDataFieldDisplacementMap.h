@@ -11,7 +11,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "FieldDisplacementMapData.h"
 
-#include <map>
+#include <map> // for map
 
 class IdBlock;
 class FieldLine;

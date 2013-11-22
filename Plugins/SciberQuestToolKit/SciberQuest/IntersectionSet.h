@@ -10,16 +10,16 @@ Copyright 2012 SciberQuest Inc.
 #ifndef IntersectionSet_h
 #define IntersectionSet_h
 
-#include "SQMacros.h"
+#include "SQMacros.h" // for sqErrorMacro
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Datatype;
 #else
-#include "SQMPICHWarningSupression.h"
-#include "mpi.h"
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include "mpi.h" // for MPI_Datatype
 #endif
 
-#include <string>
+#include <string> // for string
 
 /**
 /// Data associated with a stream line surface intersection set.

@@ -10,20 +10,20 @@ Copyright 2012 SciberQuest Inc.
 #define IntersectionSetColorMapper_h
 
 #include "IntersectionSet.h"
-#include "SQMacros.h"
+#include "SQMacros.h" // for sqErrorMacro
 
 #ifndef SQTK_WITHOUT_MPI
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Comm*
 #endif
 
-#include <vector>
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <sstream>
+#include <vector> // for vector
+#include <algorithm> // for min and max
+#include <iostream> // for cerr and endl
+#include <string> // for string
+#include <sstream> // for ostringstream
 
-#include "vtkIntArray.h"
+#include "vtkIntArray.h" // for vtkIntArray
 
 /**
 /// Class that manages color assignement operation for insterection sets.

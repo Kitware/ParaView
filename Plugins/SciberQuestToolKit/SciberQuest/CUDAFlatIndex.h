@@ -10,10 +10,10 @@ Copyright 2012 SciberQuest Inc.
 #define __CUDAFlatIndex_h
 
 #include "CartesianExtent.h"
-#include "CUDAMemoryManager.hxx"
+#include "CUDAMemoryManager.hxx" // for CUDAMemoryManager
 
-#include <cuda.h>
-#include <cuda_runtime.h>
+#include <cuda.h> // standard cuda header
+#include <cuda_runtime.h> //
 
 /// CUDAFlatIndex - A class to convert i,j,k tuples into flat indices
 /**

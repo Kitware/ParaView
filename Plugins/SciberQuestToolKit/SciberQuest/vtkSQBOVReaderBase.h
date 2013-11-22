@@ -19,7 +19,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQBOVReaderBase_h
 #define __vtkSQBOVReaderBase_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 #include <vector> // for vector

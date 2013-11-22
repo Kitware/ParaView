@@ -9,11 +9,11 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQVortexFilter_h
 #define __vtkSQVortexFilter_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
-#include <set>
-#include <string>
+#include <set> // for set
+#include <string> // for string
 
 class vtkPVXMLElement;
 class vtkInformation;

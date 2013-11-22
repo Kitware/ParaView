@@ -10,7 +10,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQEdgeFilter_h
 #define __vtkSQEdgeFilter_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 class vtkInformation;

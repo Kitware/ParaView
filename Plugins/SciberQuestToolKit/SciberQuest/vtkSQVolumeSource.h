@@ -14,7 +14,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQVolumeSource_h
 #define __vtkSQVolumeSource_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkPVXMLElement;

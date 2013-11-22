@@ -10,8 +10,8 @@ Copyright 2012 SciberQuest Inc.
 #ifndef CUDA3DDecomp_h
 #define CUDA3DDecomp_h
 
-#include <cuda.h>
-#include <cuda_runtime.h>
+#include <cuda.h> // standard cuda header
+#include <cuda_runtime.h> //
 
 /**
 A flat array is

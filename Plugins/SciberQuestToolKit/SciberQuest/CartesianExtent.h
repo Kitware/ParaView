@@ -9,8 +9,8 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CartesianExtent_h
 #define __CartesianExtent_h
 
-#include <algorithm>
-#include <iostream>
+#include <algorithm> // for min and max
+#include <iostream> // for ostream
 
 /// Index space representation of a cartesian volume.
 /**

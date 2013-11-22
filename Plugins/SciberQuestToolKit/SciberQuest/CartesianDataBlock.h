@@ -9,10 +9,10 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CartesianDataBlock_h
 #define __CartesianDataBlock_h
 
-#include <iostream>
+#include <iostream> // for ostream
 
-#include "CartesianExtent.h"
-#include "CartesianBounds.h"
+#include "CartesianExtent.h" // for CartesianExtent
+#include "CartesianBounds.h" // for CartesianBounds
 
 class vtkDataSet;
 

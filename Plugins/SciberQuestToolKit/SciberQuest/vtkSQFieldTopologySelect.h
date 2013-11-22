@@ -45,7 +45,7 @@ Copyright 2012 SciberQuest Inc.
 #define __vtkSQFieldTopologySelect_h
 
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 class VTKSCIBERQUEST_EXPORT vtkSQFieldTopologySelect : public vtkDataSetAlgorithm

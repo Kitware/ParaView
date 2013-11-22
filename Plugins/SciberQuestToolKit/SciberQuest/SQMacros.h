@@ -9,7 +9,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __SQMacros_h
 #define __SQMacros_h
 
-#include <iostream>
+#include <iostream> // for endl
 
 #define safeio(s) (s?s:"NULL")
 

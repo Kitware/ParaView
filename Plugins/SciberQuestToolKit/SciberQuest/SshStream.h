@@ -1,10 +1,10 @@
 #ifndef __SshStream_h
 #define __SshStream_h
 
-#include <libssh/libssh.h>
+#include <libssh/libssh.h> // for ssh_session
 
-#include <string>
-#include <vector>
+#include <string> // for string
+#include <vector> // for vector
 
 /**
 Class that encapsulates an ssh connection and stream between

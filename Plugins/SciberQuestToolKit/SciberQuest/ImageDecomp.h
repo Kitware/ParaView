@@ -10,9 +10,7 @@ Copyright 2012 SciberQuest Inc.
 #define __ImageDecomp_h
 
 
-#include "CartesianDecomp.h"
-#include "CartesianExtent.h"
-#include "CartesianBounds.h"
+#include "CartesianDecomp.h" // for CartesianDecomp
 
 class CartesianDataBlock;
 class CartesianDataBlockIODescriptor;

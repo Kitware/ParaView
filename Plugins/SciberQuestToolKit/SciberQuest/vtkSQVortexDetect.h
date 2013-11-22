@@ -20,7 +20,7 @@
 #ifndef __vtkSQVortexDetect_h
 #define __vtkSQVortexDetect_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 class vtkInformation;

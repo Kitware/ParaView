@@ -9,18 +9,18 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQOOCBOVReader_h
 #define __vtkSQOOCBOVReader_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkSQOOCReader.h"
-#include "RefCountedPointer.h"
+#include "RefCountedPointer.h" // for SetRefCountedPointer
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Comm;
 #else
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Comm
 #endif
 
-#include <vector>
+#include <vector> // for vector
 
 class vtkDataSet;
 class vtkImageData;
@@ -40,7 +40,7 @@ class VTKSCIBERQUEST_EXPORT vtkSQOOCBOVReader : public vtkSQOOCReader
 {
 public:
   static vtkSQOOCBOVReader *New();
-  vtkTypeMacro(vtkSQOOCBOVReader, vtkObject);
+  vtkTypeMacro(vtkSQOOCBOVReader, vtkSQOOCReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
@@ -137,8 +137,8 @@ protected:
   virtual ~vtkSQOOCBOVReader();
 
 private:
-  vtkSQOOCBOVReader(const vtkSQOOCBOVReader &o);
-  const vtkSQOOCBOVReader &operator=(const vtkSQOOCBOVReader &o);
+  vtkSQOOCBOVReader(const vtkSQOOCBOVReader&); // Not implemented
+  void operator=(const vtkSQOOCBOVReader&); // Not implemented
 
 private:
   BOVReader *Reader;                            // reader

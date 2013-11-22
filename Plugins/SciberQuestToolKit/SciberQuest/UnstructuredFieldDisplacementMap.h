@@ -9,9 +9,9 @@ Copyright 2012 SciberQuest Inc.
 #ifndef UnstructuredFieldDisplacementMap_h
 #define UnstructuredFieldDisplacementMap_h
 
-#include "FieldDisplacementMapData.h"
+#include "FieldDisplacementMapData.h" // for FieldDisplacementMapData
 
-#include <map>
+#include <map> // for map
 
 class IdBlock;
 class vtkDataSet;

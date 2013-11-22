@@ -9,10 +9,10 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CUDATupleIndex_h
 #define __CUDATupleIndex_h
 
-#include "CartesianExtent.h"
-#include "CUDAMemoryManager.hxx"
-#include <cuda.h>
-#include <cuda_runtime.h>
+#include "CartesianExtent.h" // for CartesianExtent
+#include "CUDAMemoryManager.hxx" // for CUDAMemoryManager
+#include <cuda.h> // standard cuda header
+#include <cuda_runtime.h> //
 
 /// CUDATupleIndex - A class to convert a flat index into an i,j,k tuple
 /**

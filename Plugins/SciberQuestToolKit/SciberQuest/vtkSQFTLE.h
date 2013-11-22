@@ -17,11 +17,11 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQFTLE_h
 #define __vtkSQFTLE_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
-#include <set> //
-#include <string> //
+#include <set> // for set
+#include <string> // for string
 
 class vtkInformation;
 class vtkInformationVector;

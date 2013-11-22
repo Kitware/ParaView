@@ -10,9 +10,8 @@ Copyright 2012 SciberQuest Inc.
 #define __RectilinearDecomp_h
 
 #include "CartesianDecomp.h"
-#include "CartesianExtent.h"
-#include "CartesianBounds.h"
-#include "SharedArray.hxx"
+#include "CartesianExtent.h" // for CartesianExtent
+#include "SharedArray.hxx" // for SharedArray
 
 class CartesianDataBlock;
 class CartesianDataBlockIODescriptor;

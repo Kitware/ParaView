@@ -9,8 +9,8 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __BOVArrayImageIterator_h
 #define __BOVArrayImageIterator_h
 
-#include "BOVScalarImage.h"
-#include "BOVVectorImage.h"
+#include "BOVScalarImage.h" // for BOVScalarImage
+#include "BOVVectorImage.h" // for BOVVectorImage
 
 /// Base class for an iterator for a collection of array handles.
 /**

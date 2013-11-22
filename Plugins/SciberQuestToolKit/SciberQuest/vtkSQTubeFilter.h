@@ -59,7 +59,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQTubeFilter_h
 #define __vtkSQTubeFilter_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 #define VTK_VARY_RADIUS_OFF 0

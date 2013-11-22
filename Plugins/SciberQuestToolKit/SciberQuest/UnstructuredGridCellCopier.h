@@ -10,8 +10,8 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __UnstructuredGridCellCopier_h
 #define __UnstructuredGridCellCopier_h
 
-#include "CellCopier.h"
-#include "IdBlock.h"
+#include "CellCopier.h" // for CellCopier
+#include "IdBlock.h" // for IdBlock
 
 class vtkCellArray;
 class vtkFloatArray;

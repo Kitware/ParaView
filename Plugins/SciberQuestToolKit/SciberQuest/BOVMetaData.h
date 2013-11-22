@@ -9,14 +9,14 @@ Copyright 2012 SciberQuest Inc.
 #ifndef BOVMetaData_h
 #define BOVMetaData_h
 
-#include "BinaryStream.hxx"
-#include "CartesianExtent.h"
-#include "SharedArray.hxx"
+#include "BinaryStream.hxx" // for BinaryStream
+#include "CartesianExtent.h" // for CartesianExtent
+#include "SharedArray.hxx" // for SharedArray
 
-#include <cstdlib>
-#include <map>
-#include <vector>
-#include <string>
+#include <cstdlib> // for size_t
+#include <map> // for map
+#include <vector> // for vector
+#include <string> // for string
 
 // These masks are used with array status methods.
 // ACTIVE_BIT is set to indicate an array is to be read

@@ -14,7 +14,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQHemisphereSource_h
 #define __vtkSQHemisphereSource_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkPVXMLElement;

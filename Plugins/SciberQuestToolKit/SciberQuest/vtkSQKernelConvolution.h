@@ -10,12 +10,12 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQKernelConvolution_h
 #define __vtkSQKernelConvolution_h
 
-#include <set>
-#include <string>
+#include <set> // for set
+#include <string> // for string
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
-#include "CartesianExtent.h"
+#include "CartesianExtent.h" // for CartesianExtent
 
 class vtkPVXMLElement;
 class vtkInformation;

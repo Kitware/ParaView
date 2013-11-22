@@ -11,7 +11,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "IdBlock.h"
 
-#include <algorithm>
+#include <algorithm> // for min
 
 /// Partitions a contiguous set of indices on demand.
 class WorkQueue

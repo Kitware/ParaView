@@ -9,8 +9,8 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __BOVScalarImageIterator_h
 #define __BOVScalarImageIterator_h
 
-#include "BOVTimeStepImage.h"
-#include "BOVScalarImage.h"
+#include "BOVTimeStepImage.h" // for BOVTimeStepImage
+#include "BOVScalarImage.h" // for BOVScalarImage
 
 /// Iterator for a collection of scalar handles.
 class BOVScalarImageIterator

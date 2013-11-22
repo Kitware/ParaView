@@ -18,7 +18,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQAgyrotropyFilter_h
 #define __vtkSQAgyrotropyFilter_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 class vtkPVXMLElement;

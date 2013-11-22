@@ -45,7 +45,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQFieldTopologySplit_h
 #define __vtkSQFieldTopologySplit_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 class VTKSCIBERQUEST_EXPORT vtkSQFieldTopologySplit : public vtkDataSetAlgorithm

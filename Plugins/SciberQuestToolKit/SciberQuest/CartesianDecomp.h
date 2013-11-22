@@ -10,11 +10,11 @@ Copyright 2012 SciberQuest Inc.
 #define __CartesianDecomp_h
 
 
-#include "RefCountedPointer.h"
-#include "CartesianExtent.h"
-#include "CartesianBounds.h"
+#include "RefCountedPointer.h" // for RefCountedPointer
+#include "CartesianExtent.h" // for CartesianExtent
+#include "CartesianBounds.h" // for CartesianBounds
 
-#include <vector>
+#include <vector> // for vector
 
 class CartesianDataBlock;
 class CartesianDataBlockIODescriptor;

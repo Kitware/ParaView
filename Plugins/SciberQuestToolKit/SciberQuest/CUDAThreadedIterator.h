@@ -10,8 +10,8 @@ Copyright 2012 SciberQuest Inc.
 #ifndef CUDAThreadedIterator_h
 #define CUDAThreadedIterator_h
 
-#include <cuda.h>
-#include <cuda_runtime.h>
+#include <cuda.h> // standard cuda header
+#include <cuda_runtime.h> //
 
 /// CUDAThreadedIterator -- Iterator that works with CUDA
 /**

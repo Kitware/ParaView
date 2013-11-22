@@ -9,14 +9,14 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __XMLUtils_h
 #define __XMLUtils_h
 
-#include "vtkPVXMLElement.h"
-#include "vtkXMLDataElement.h"
-#include "SQMacros.h"
-#include "postream.h"
+#include "vtkPVXMLElement.h" // for vtkPVXMLElement
+#include "vtkXMLDataElement.h" // for vtkXMLDataElement
+#include "SQMacros.h" // for sqErrorMacro
+#include "postream.h" // for pCerr
 
-#include <iostream>
-#include <sstream>
-#include <string>
+#include <iostream> // for cerr
+#include <sstream> // for istringstream
+#include <string> // for string
 
 /**
 In the element elem return the value of attribute attName

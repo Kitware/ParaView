@@ -9,18 +9,19 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQVolumeSourceCellGenerator_h
 #define __vtkSQVolumeSourceCellGenerator_h
 
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkSQCellGenerator.h"
-#include "vtkCellType.h"
+#include "vtkCellType.h" // for VTK_HEXAHEDRON
 
 /// Plane sources that provide data on demand
 /**
 */
-class vtkSQVolumeSourceCellGenerator : public vtkSQCellGenerator
+class VTKSCIBERQUEST_EXPORT vtkSQVolumeSourceCellGenerator : public vtkSQCellGenerator
 {
 public:
   static vtkSQVolumeSourceCellGenerator *New();
   void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeMacro(vtkSQVolumeSourceCellGenerator, vtkObject);
+  vtkTypeMacro(vtkSQVolumeSourceCellGenerator, vtkSQCellGenerator);
 
   /**
   Return the total number of cells available.
@@ -91,6 +92,10 @@ public:
 protected:
   vtkSQVolumeSourceCellGenerator();
   virtual ~vtkSQVolumeSourceCellGenerator(){};
+
+private:
+  vtkSQVolumeSourceCellGenerator(const vtkSQVolumeSourceCellGenerator&); // Not implemented
+  void operator=(const vtkSQVolumeSourceCellGenerator&); // Not implemented
 
 private:
   int Resolution[6];

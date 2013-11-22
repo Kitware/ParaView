@@ -53,7 +53,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQPlaneSource_h
 #define __vtkSQPlaneSource_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkPVXMLElement;

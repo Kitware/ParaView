@@ -14,11 +14,11 @@ Copyright 2012 SciberQuest Inc.
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Datatype;
 #else
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Datatype
 #endif
 
-#include <vector>
+#include <vector> // for vector
 
 /// Container for the MPI file and memory views
 /**

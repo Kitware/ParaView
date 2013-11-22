@@ -9,7 +9,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __PoincareMapData_h
 #define __PoincareMapData_h
 
-#include "FieldTraceData.h"
+#include "FieldTraceData.h" // for FieldTraceData
 
 class IdBlock;
 class vtkDataSet;

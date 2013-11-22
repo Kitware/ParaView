@@ -11,17 +11,17 @@ Copyright 2012 SciberQuest Inc.
 
 #include "BOVScalarImage.h"
 
-#include <iostream>
-#include <vector>
-#include <string>
+#include <iostream> // for ostream
+#include <vector> // for vector
+#include <string> // for string
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Comm;
 typedef void * MPI_Info;
 typedef void * MPI_File;
 #else
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Comm, MPI_Info, and MPI_File
 #endif
 
 /// Handle to the files comprising a multi-component vector.

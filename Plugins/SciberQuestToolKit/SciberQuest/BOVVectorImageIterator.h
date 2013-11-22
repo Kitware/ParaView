@@ -11,8 +11,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "BOVArrayImageIterator.h"
 
-#include "BOVTimeStepImage.h"
-#include "BOVVectorImage.h"
+#include "BOVTimeStepImage.h" // for BOVTimeStepImage
 
 /// Iterator for a collection of vector handles.
 class BOVVectorImageIterator : public BOVArrayImageIterator

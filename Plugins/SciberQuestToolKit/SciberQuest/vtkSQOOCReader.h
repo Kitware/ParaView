@@ -9,14 +9,14 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQOOCReader_h
 #define __vtkSQOOCReader_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkObject.h"
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Comm;
 #else
-#include "SQMPICHWarningSupression.h"
-#include "mpi.h"
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include "mpi.h" // for MPI_Comm
 #endif
 
 class vtkInformation;
@@ -115,8 +115,8 @@ public:
   /// \@}
 
 private:
-  vtkSQOOCReader(const vtkSQOOCReader &o);
-  const vtkSQOOCReader &operator=(const vtkSQOOCReader &o);
+  vtkSQOOCReader(const vtkSQOOCReader&); // Not implemented
+  void operator=(const vtkSQOOCReader&); // Not implemented
 
 protected:
   vtkSQOOCReader()

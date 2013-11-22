@@ -20,7 +20,7 @@ Copyright 2012 SciberQuest Inc.
 #define __vtkSQBOVReader_h
 // #define vtkSQBOVReaderDEBUG
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkSQBOVReaderBase.h"
 
 #include <vector> // for vector

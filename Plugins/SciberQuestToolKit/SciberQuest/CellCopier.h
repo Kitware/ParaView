@@ -10,12 +10,12 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CellCopier_h
 #define __CellCopier_h
 
-#include "IdBlock.h"
+#include "IdBlock.h" // for IdBlock
 
 #include "vtkType.h"
 
-#include <map>
-#include <vector>
+#include <map> // for map
+#include <vector> // for vector
 
 class DataArrayCopier;
 class vtkDataSet;

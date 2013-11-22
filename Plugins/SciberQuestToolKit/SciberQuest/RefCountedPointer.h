@@ -10,7 +10,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef RefCountedPointer_h
 #define RefCountedPointer_h
 
-#include <iostream>
+#include <iostream> // for ostream
 
 //=============================================================================
 class RefCountedPointer

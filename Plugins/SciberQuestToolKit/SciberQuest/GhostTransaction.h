@@ -10,20 +10,20 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __GhostTransaction_h
 #define __GhostTransaction_h
 
-#include "CartesianExtent.h"
-#include "MPIRawArrayIO.hxx"
+#include "CartesianExtent.h" // for CartesianExtent
+#include "SQMacros.h" // for sqErrorMacro
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Request;
 typedef void * MPI_Comm;
 #else
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
-#include "MPIRawArrayIO.hxx"
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Request and MPI_Comm
+#include "MPIRawArrayIO.hxx" // for CreateCartesianView
 #endif
 
-#include <sstream>
-#include <vector>
+#include <sstream> // for ostringstream
+#include <vector> // for vector
 
 // #define GhostTransactionDEBUG
 

@@ -11,7 +11,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "BOVMetaData.h"
 
-#include <ostream>
+#include <ostream> // for ostream
 
 /// Parser for SciberQuest GDA dataset format.
 /**

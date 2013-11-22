@@ -22,7 +22,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQBOVWriter_h
 #define __vtkSQBOVWriter_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 // define this for cerr status.

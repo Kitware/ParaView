@@ -10,9 +10,9 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQMedianFilter_h
 #define __vtkSQMedianFilter_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
-#include "CartesianExtent.h"
+#include "CartesianExtent.h" // for Cartesian extent
 
 class vtkPVXMLElement;
 class vtkInformation;

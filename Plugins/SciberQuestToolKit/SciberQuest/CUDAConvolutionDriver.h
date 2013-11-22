@@ -10,7 +10,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CUDAConvolutionDriver_h
 #define __CUDAConvolutionDriver_h
 
-#include <algorithm>
+#include <algorithm> // for min
 
 class vtkDataArray;
 class CartesianExtent;

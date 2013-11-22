@@ -10,8 +10,8 @@ Copyright 2012 SciberQuest Inc.
 #define __CartesianExtentIterator_h
 
 #include "CellIdIterator.h"
-#include "CartesianExtent.h"
-#include "FlatIndex.h"
+#include "CartesianExtent.h" // for CartesianExtent
+#include "FlatIndex.h" // for FlatIndex
 #include <cstdlib> // for size_t
 
 /// extent iterator

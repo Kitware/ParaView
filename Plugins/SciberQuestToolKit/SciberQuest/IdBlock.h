@@ -9,7 +9,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __IdBlock_h
 #define __IdBlock_h
 
-#include <iostream>
+#include <iostream> // for ostream
 
 /// A block of adjecent indexes uint64_to a collection (typically of cells or pouint64_ts).
 class IdBlock

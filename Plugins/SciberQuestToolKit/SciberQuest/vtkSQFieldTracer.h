@@ -17,7 +17,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQFieldTracer_h
 #define __vtkSQFieldTracer_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 class vtkUnstructuredGrid;

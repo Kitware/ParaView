@@ -21,7 +21,7 @@
 #ifndef __vtkSQSurfaceVectors_h
 #define __vtkSQSurfaceVectors_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
 
 class vtkFloatArray;

@@ -9,11 +9,11 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __fsutil_h
 #define __fsutil_h
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <vector> // for vector
+#include <string> // for string
+#include <iostream> // for ostream
+#include <fstream> // for fstream
+#include <sstream> // for istringstream
 
 #ifndef WIN32
   #define PATH_SEP "/"

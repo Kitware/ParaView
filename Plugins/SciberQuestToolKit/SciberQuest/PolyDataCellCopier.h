@@ -11,7 +11,7 @@ Copyright 2012 SciberQuest Inc.
 #define __PolyDataCellCopier_h
 
 #include "CellCopier.h"
-#include "IdBlock.h"
+#include "IdBlock.h" // For IdBlock
 
 class vtkCellArray;
 class vtkFloatArray;

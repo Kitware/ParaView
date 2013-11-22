@@ -10,20 +10,20 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQImageGhosts_h
 #define __vtkSQImageGhosts_h
 
-#include "vtkSciberQuestModule.h"
+#include "vtkSciberQuestModule.h" // for export macro
 #include "vtkDataSetAlgorithm.h"
-#include "CartesianExtent.h"
-#include "GhostTransaction.h"
+#include "CartesianExtent.h" // for CartesianExtent
+#include "GhostTransaction.h" // for GhostTransaction
 
-#include <vector>
-#include <set>
-#include <string>
+#include <vector> // for vector
+#include <set> // for set
+#include <string> // for string
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Comm;
 #else
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Comm
 #endif
 
 class vtkInformation;

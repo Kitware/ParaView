@@ -14,12 +14,12 @@ typedef void * MPI_Comm;
 typedef void * MPI_Info;
 typedef void * MPI_File;
 #else
-#include "SQMPICHWarningSupression.h"
-#include <mpi.h>
+#include "SQMPICHWarningSupression.h" // for suppressing MPI warnings
+#include <mpi.h> // for MPI_Comm, MPI_Info, and MPI_File
 #endif
 
-#include <string>
-#include <iostream>
+#include <string> // for string
+#include <iostream> // for ostream
 
 /// Handle to file containing a scalar array.
 class BOVScalarImage
