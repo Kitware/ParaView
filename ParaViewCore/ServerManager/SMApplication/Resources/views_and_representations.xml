@@ -2606,6 +2606,12 @@
                          name="InterpolateScalarsBeforeMapping"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>When set to true (default), texture coordinates
+        are sent to and interpolated by the graphics card. This is
+        equivalent with interpolating scalars and then mapping them to
+        obtain colors between points. Otherwise, colors are sent to
+        and interpolated by the graphics card.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetStatic"
                          default_values="0"
