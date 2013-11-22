@@ -27,6 +27,6 @@ vtkInformationKeyRestrictedMacro(vtkSQOOCReader,PERIODIC_BC,IntegerVector,3);
 void vtkSQOOCReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->vtkObject::PrintSelf(os,indent.GetNextIndent());
-  os << indent << "TimeIndex: " << this->TimeIndex << endl;
-  os << indent << "Time:      " << this->Time << endl;
+  os << indent << "TimeIndex: " << this->TimeIndex << std::endl;
+  os << indent << "Time:      " << this->Time << std::endl;
 }

@@ -9,14 +9,8 @@ Copyright 2012 SciberQuest Inc.
 #include "GDAMetaDataKeys.h"
 
 #include <iostream>
-using std::ostream;
-using std::endl;
 #include <ios>
-using std::ios_base;
-
 #include <sstream>
-using std::istringstream;
-using std::ostringstream;
 
 #include "vtkInformation.h"
 #include "vtkExecutive.h"
@@ -67,7 +61,7 @@ int GDAMetaData::OpenDataset(const char *fileName, char mode)
       }
     else
       {
-      sqErrorMacro(cerr,"Invalid mode " << mode << ".");
+      sqErrorMacro(std::cerr,"Invalid mode " << mode << ".");
       }
 
     return 0;
@@ -89,10 +83,10 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   this->IsOpen=0;
 
   // Open
-  ifstream metaFile(fileName);
+  std::ifstream metaFile(fileName);
   if (!metaFile.is_open())
     {
-    sqErrorMacro(cerr,"Could not open " << fileName << ".");
+    sqErrorMacro(std::cerr,"Could not open " << fileName << ".");
     return 0;
     }
 
@@ -107,7 +101,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   char *metaDataBuffer=static_cast<char *>(malloc(metaFileLen+1));
   metaDataBuffer[metaFileLen]='\0';
   metaFile.read(metaDataBuffer,metaFileLen);
-  string metaData(metaDataBuffer);
+  std::string metaData(metaDataBuffer);
   free(metaDataBuffer); // TODO use string's memory directly
 
   // Parse
@@ -116,11 +110,11 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   // We are expecting are nx,ny, and nz in the header for all
   // mesh types.
   int nx,ny,nz;
-  if ( ParseValue(metaData,0,"nx=",nx)==string::npos
-    || ParseValue(metaData,0,"ny=",ny)==string::npos
-    || ParseValue(metaData,0,"nz=",nz)==string::npos )
+  if ( ParseValue(metaData,0,"nx=",nx)==std::string::npos
+    || ParseValue(metaData,0,"ny=",ny)==std::string::npos
+    || ParseValue(metaData,0,"nz=",nz)==std::string::npos )
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
          << "Parsing " << fileName
          << " dimensions not found. Expected nx=N, ny=M, nz=P.");
     return 0;
@@ -141,7 +135,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
     // the network.
     size_t n[3]={size_t(nx+1),size_t(ny+1),size_t(nz+1)};
     char coordId[]="xyz";
-    ostringstream coordFn;
+    std::ostringstream coordFn;
 
     for (int q=0; q<3; ++q)
       {
@@ -156,7 +150,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
 
       if (LoadBin(coordFn.str().c_str(),n[q],pCoord)==0)
         {
-        sqErrorMacro(cerr,
+        sqErrorMacro(std::cerr,
           << "Error: Failed to read coordinate "
           << q << " from \"" << coordFn.str() << "\".");
         return 0;
@@ -179,9 +173,9 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
     this->SetDataSetType("vtkImageData");
 
     double x0,y0,z0;
-    if ( ParseValue(metaData,0,"x0=",x0)==string::npos
-      || ParseValue(metaData,0,"y0=",y0)==string::npos
-      || ParseValue(metaData,0,"z0=",z0)==string::npos )
+    if ( ParseValue(metaData,0,"x0=",x0)==std::string::npos
+      || ParseValue(metaData,0,"y0=",y0)==std::string::npos
+      || ParseValue(metaData,0,"z0=",z0)==std::string::npos )
       {
       // if no origin provided assume 0,0,0
       x0=y0=z0=0.0;
@@ -190,9 +184,9 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
     this->SetOrigin(X0);
 
     double dx,dy,dz;
-    if ( ParseValue(metaData,0,"dx=",dx)==string::npos
-      || ParseValue(metaData,0,"dy=",dy)==string::npos
-      || ParseValue(metaData,0,"dz=",dz)==string::npos )
+    if ( ParseValue(metaData,0,"dx=",dx)==std::string::npos
+      || ParseValue(metaData,0,"dy=",dy)==std::string::npos
+      || ParseValue(metaData,0,"dz=",dz)==std::string::npos )
       {
       // if no spacing is provided assume 1,1,1
       dx=dy=dz=1.0;
@@ -209,12 +203,12 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
 
   // // Look for the dipole center
   // double di_i,di_j,di_k;
-  // if ( ParseValue(metaData,0,"i_dipole=",di_i)==string::npos
-  //   || ParseValue(metaData,0,"j_dipole=",di_j)==string::npos
-  //   || ParseValue(metaData,0,"k_dipole=",di_k)==string::npos)
+  // if ( ParseValue(metaData,0,"i_dipole=",di_i)==std::string::npos
+  //   || ParseValue(metaData,0,"j_dipole=",di_j)==std::string::npos
+  //   || ParseValue(metaData,0,"k_dipole=",di_k)==std::string::npos)
   //   {
-  //   // cerr << __LINE__ << " Warning: Parsing " << fileName
-  //   //       << " dipole center not found." << endl;
+  //   // std::cerr << __LINE__ << " Warning: Parsing " << fileName
+  //   //           << " dipole center not found." << std::endl;
   //   this->HasDipoleCenter=false;
   //   }
   // else
@@ -227,11 +221,11 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
 
   // double r_mp;
   // double r_obs_to_mp;
-  // if ( ParseValue(metaData,0,"R_MP=",r_mp)==string::npos
-  //   || ParseValue(metaData,0,"R_obstacle_to_MP=",r_obs_to_mp)==string::npos)
+  // if ( ParseValue(metaData,0,"R_MP=",r_mp)==std::string::npos
+  //   || ParseValue(metaData,0,"R_obstacle_to_MP=",r_obs_to_mp)==std::string::npos)
   //   {
-  //   cerr << __LINE__ << " Warning: Parsing " << fileName
-  //         << " magnetopause dimension not found." << endl;
+  //   std::cerr << __LINE__ << " Warning: Parsing " << fileName
+  //             << " magnetopause dimension not found." << std::endl;
   //   this->CellSizeRe=-1.0;
   //   }
   // else
@@ -250,11 +244,11 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   // look for explicitly named arrays
   size_t at;
   at=0;
-  while (at!=string::npos)
+  while (at!=std::string::npos)
     {
-    string scalar;
+    std::string scalar;
     at=ParseValue(metaData,at,"scalar:",scalar);
-    if (at!=string::npos)
+    if (at!=std::string::npos)
       {
       if (ScalarRepresented(path,scalar.c_str()))
         {
@@ -263,17 +257,17 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
         }
       else
         {
-        sqErrorMacro(cerr,"Named scalar " << scalar << " not present.");
+        sqErrorMacro(std::cerr,"Named scalar " << scalar << " not present.");
         }
       }
     }
 
   at=0;
-  while (at!=string::npos)
+  while (at!=std::string::npos)
     {
-    string vector;
+    std::string vector;
     at=ParseValue(metaData,at,"vector:",vector);
-    if (at!=string::npos)
+    if (at!=std::string::npos)
       {
       if (VectorRepresented(path,vector.c_str()))
         {
@@ -282,17 +276,17 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
         }
       else
         {
-        sqErrorMacro(cerr,"Named vector " << vector << " not present.");
+        sqErrorMacro(std::cerr,"Named vector " << vector << " not present.");
         }
       }
     }
 
   at=0;
-  while (at!=string::npos)
+  while (at!=std::string::npos)
     {
-    string stensor;
+    std::string stensor;
     at=ParseValue(metaData,at,"stensor:",stensor);
-    if (at!=string::npos)
+    if (at!=std::string::npos)
       {
       if (SymetricTensorRepresented(path,stensor.c_str()))
         {
@@ -301,17 +295,17 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
         }
       else
         {
-        sqErrorMacro(cerr,"Named stensor " << stensor << " not present.");
+        sqErrorMacro(std::cerr,"Named stensor " << stensor << " not present.");
         }
       }
     }
 
   at=0;
-  while (at!=string::npos)
+  while (at!=std::string::npos)
     {
-    string tensor;
+    std::string tensor;
     at=ParseValue(metaData,at,"tensor:",tensor);
-    if (at!=string::npos)
+    if (at!=std::string::npos)
       {
       if (SymetricTensorRepresented(path,tensor.c_str()))
         {
@@ -320,7 +314,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
         }
       else
         {
-        sqErrorMacro(cerr,"Named tensor " << tensor << " not present.");
+        sqErrorMacro(std::cerr,"Named tensor " << tensor << " not present.");
         }
       }
     }
@@ -330,7 +324,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   if (nArrays)
     {
     const char *arrayName=this->GetArrayName(0);
-    string prefix(arrayName);
+    std::string prefix(arrayName);
     if (this->IsArrayVector(arrayName))
       {
       prefix+="x_";
@@ -348,7 +342,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
     GetSeriesIds(path,prefix.c_str(),this->TimeSteps);
     if (!this->TimeSteps.size())
       {
-      sqErrorMacro(cerr,
+      sqErrorMacro(std::cerr,
         << " Error: Time series was not found in " << path << "."
         << " Expected files named according to the following convention \"array_time.ext\".");
       return 0;
@@ -356,7 +350,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
     }
   else
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << " Error: No bricks found in " << path << "."
       << " Expected bricks in the same directory as the metdata file.");
     return 0;
@@ -387,31 +381,31 @@ int GDAMetaData::Write()
 {
   if (!this->IsOpen)
     {
-    sqErrorMacro(cerr, "Can't write because file is not open.");
+    sqErrorMacro(std::cerr, "Can't write because file is not open.");
     return 0;
     }
 
   if ((this->Mode!='w')&&(this->Mode!='a'))
     {
-    sqErrorMacro(cerr, "Writing to a read only file.");
+    sqErrorMacro(std::cerr, "Writing to a read only file.");
     return 0;
     }
 
   bool writeHeader=true;
-  ofstream os;
+  std::ofstream os;
   if (this->Mode=='a')
     {
     writeHeader=!FileExists(this->FileName.c_str());
-    os.open(this->FileName.c_str(),ios_base::app);
+    os.open(this->FileName.c_str(),std::ios_base::app);
     }
   else
     {
-    os.open(this->FileName.c_str(),ios_base::trunc);
+    os.open(this->FileName.c_str(),std::ios_base::trunc);
     }
 
   if (!os.good())
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "Failed to open " << this->FileName << " for writing.");
     return 0;
     }
@@ -419,10 +413,10 @@ int GDAMetaData::Write()
   if (writeHeader)
     {
     os
-      << "#################################" << endl
-      << "# SciberQuestToolKit" << endl
-      << "# Metadata version 1.0" << endl
-      << "#################################" << endl;
+      << "#################################" << std::endl
+      << "# SciberQuestToolKit" << std::endl
+      << "# Metadata version 1.0" << std::endl
+      << "#################################" << std::endl;
 
     if (this->DataSetTypeIsImage())
       {
@@ -436,18 +430,18 @@ int GDAMetaData::Write()
       this->GetSpacing(dx);
 
       os
-        << "nx=" << nCells[0] << ", ny=" << nCells[1] << ", nz=" << nCells[2] << endl
-        << "x0=" << x0[0] << ", y0=" << x0[1] << ", z0=" << x0[2] << endl
-        << "dx=" << dx[0] << ", dy=" << dx[1] << ", dz=" << dx[2] << endl;
+        << "nx=" << nCells[0] << ", ny=" << nCells[1] << ", nz=" << nCells[2] << std::endl
+        << "x0=" << x0[0] << ", y0=" << x0[1] << ", z0=" << x0[2] << std::endl
+        << "dx=" << dx[0] << ", dy=" << dx[1] << ", dz=" << dx[2] << std::endl;
       }
     else
       {
-      sqErrorMacro(cerr,
+      sqErrorMacro(std::cerr,
         << "Unsuported dataset type " << this->GetDataSetType());
       return 0;
       }
 
-    os << endl;
+    os << std::endl;
     }
 
   size_t nArrays=this->GetNumberOfArrays();
@@ -462,54 +456,54 @@ int GDAMetaData::Write()
 
     if (this->IsArrayScalar(arrayName))
       {
-      os << "scalar:" << arrayName << endl;
+      os << "scalar:" << arrayName << std::endl;
       }
     else
     if (this->IsArrayVector(arrayName))
       {
       os
-        << "vector:" << arrayName << endl
-        << "scalar:" << arrayName << "x" << endl
-        << "scalar:" << arrayName << "y" << endl
-        << "scalar:" << arrayName << "z" << endl;
+        << "vector:" << arrayName << std::endl
+        << "scalar:" << arrayName << "x" << std::endl
+        << "scalar:" << arrayName << "y" << std::endl
+        << "scalar:" << arrayName << "z" << std::endl;
 
       }
     else
     if (this->IsArraySymetricTensor(arrayName))
       {
       os
-        << "stensor:" << arrayName << endl
-        << "scalar:" << arrayName << "-xx" << endl
-        << "scalar:" << arrayName << "-xy" << endl
-        << "scalar:" << arrayName << "-xz" << endl
-        << "scalar:" << arrayName << "-yy" << endl
-        << "scalar:" << arrayName << "-yz" << endl
-        << "scalar:" << arrayName << "-zz" << endl;
+        << "stensor:" << arrayName << std::endl
+        << "scalar:" << arrayName << "-xx" << std::endl
+        << "scalar:" << arrayName << "-xy" << std::endl
+        << "scalar:" << arrayName << "-xz" << std::endl
+        << "scalar:" << arrayName << "-yy" << std::endl
+        << "scalar:" << arrayName << "-yz" << std::endl
+        << "scalar:" << arrayName << "-zz" << std::endl;
       }
     else
     if (this->IsArrayTensor(arrayName))
       {
       os
-        << "tensor:" << arrayName << endl
-        << "scalar:" << arrayName << "-xx" << endl
-        << "scalar:" << arrayName << "-xy" << endl
-        << "scalar:" << arrayName << "-xz" << endl
-        << "scalar:" << arrayName << "-yx" << endl
-        << "scalar:" << arrayName << "-yy" << endl
-        << "scalar:" << arrayName << "-yz" << endl
-        << "scalar:" << arrayName << "-zx" << endl
-        << "scalar:" << arrayName << "-zy" << endl
-        << "scalar:" << arrayName << "-zz" << endl;
+        << "tensor:" << arrayName << std::endl
+        << "scalar:" << arrayName << "-xx" << std::endl
+        << "scalar:" << arrayName << "-xy" << std::endl
+        << "scalar:" << arrayName << "-xz" << std::endl
+        << "scalar:" << arrayName << "-yx" << std::endl
+        << "scalar:" << arrayName << "-yy" << std::endl
+        << "scalar:" << arrayName << "-yz" << std::endl
+        << "scalar:" << arrayName << "-zx" << std::endl
+        << "scalar:" << arrayName << "-zy" << std::endl
+        << "scalar:" << arrayName << "-zz" << std::endl;
       }
     else
       {
-      sqErrorMacro(cerr,"Unsupported array type for " << arrayName);
+      sqErrorMacro(std::cerr,"Unsupported array type for " << arrayName);
       return 0;
       }
 
     }
 
-  os << endl;
+  os << std::endl;
   os.close();
 
   return 1;
@@ -533,13 +527,13 @@ void GDAMetaData::PushPipelineInformation(
 }
 
 //-----------------------------------------------------------------------------
-void GDAMetaData::Print(ostream &os) const
+void GDAMetaData::Print(std::ostream &os) const
 {
-  os << "GDAMetaData:  " << this << endl;
-  os << "\tDipole:     " << Tuple<double>(this->DipoleCenter,3) << endl;
-  //os << "\tCellSizeRe: " << this->CellSizeRe << endl;
+  os << "GDAMetaData:  " << this << std::endl;
+  os << "\tDipole:     " << Tuple<double>(this->DipoleCenter,3) << std::endl;
+  //os << "\tCellSizeRe: " << this->CellSizeRe << std::endl;
 
   this->BOVMetaData::Print(os);
 
-  os << endl;
+  os << std::endl;
 }

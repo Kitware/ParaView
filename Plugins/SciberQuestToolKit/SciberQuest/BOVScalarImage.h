@@ -19,9 +19,7 @@ typedef void * MPI_File;
 #endif
 
 #include <string>
-using std::string;
 #include <iostream>
-using std::ostream;
 
 /// Handle to file containing a scalar array.
 class BOVScalarImage
@@ -48,8 +46,8 @@ public:
 
 private:
   MPI_File File;
-  string FileName;
-  string Name;
+  std::string FileName;
+  std::string Name;
 
 private:
   const BOVScalarImage &operator=(const BOVScalarImage &other);
@@ -57,6 +55,6 @@ private:
   BOVScalarImage();
 };
 
-ostream &operator<<(ostream &os, const BOVScalarImage &si);
+std::ostream &operator<<(std::ostream &os, const BOVScalarImage &si);
 
 #endif

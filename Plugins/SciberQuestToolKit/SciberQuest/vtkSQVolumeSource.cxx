@@ -43,11 +43,9 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSQLog.h"
 
 #include <map>
-using std::map;
-using std::pair;
 
-typedef pair<map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
-typedef pair<vtkIdType,vtkIdType> MapElement;
+typedef std::pair<std::map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
+typedef std::pair<vtkIdType,vtkIdType> MapElement;
 
 // #define SQTK_DEBUG
 
@@ -57,7 +55,7 @@ vtkStandardNewMacro(vtkSQVolumeSource);
 vtkSQVolumeSource::vtkSQVolumeSource()
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQVolumeSource::vtkSQVolumeSource" << endl;
+  std::cerr << "=====vtkSQVolumeSource::vtkSQVolumeSource" << std::endl;
   #endif
 
   this->ImmediateMode=1;
@@ -92,7 +90,7 @@ vtkSQVolumeSource::vtkSQVolumeSource()
 vtkSQVolumeSource::~vtkSQVolumeSource()
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQVolumeSource::~vtkSQVolumeSource" << endl;
+  std::cerr << "=====vtkSQVolumeSource::~vtkSQVolumeSource" << std::endl;
   #endif
 }
 
@@ -154,7 +152,7 @@ int vtkSQVolumeSource::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQVolumeSource::RequestInformation" << endl;
+  std::cerr << "=====vtkSQVolumeSource::RequestInformation" << std::endl;
   #endif
 
   (void)req;
@@ -176,7 +174,7 @@ int vtkSQVolumeSource::RequestData(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQVolumeSource::RequestData" << endl;
+  std::cerr << "=====vtkSQVolumeSource::RequestData" << std::endl;
   #endif
 
   (void)req;
@@ -281,7 +279,7 @@ int vtkSQVolumeSource::RequestData(
   vtkIdType loc=0;
 
   // to prevent duplicate insertion of points
-  map<vtkIdType,vtkIdType> usedPointIds;
+  std::map<vtkIdType,vtkIdType> usedPointIds;
 
   // cell generator
   vtkSQVolumeSourceCellGenerator *source=vtkSQVolumeSourceCellGenerator::New();
@@ -354,7 +352,7 @@ int vtkSQVolumeSource::RequestData(
 void vtkSQVolumeSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQVolumeSource::PrintSelf" << endl;
+  std::cerr << "=====vtkSQVolumeSource::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

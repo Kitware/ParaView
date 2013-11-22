@@ -9,7 +9,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "IdBlock.h"
 
-ostream &operator<<(ostream &os, const IdBlock &b)
+std::ostream &operator<<(std::ostream &os, const IdBlock &b)
 {
   os << "(" << b.m_data[0] << ", " << b.m_data[1] << ")";
   return os;

@@ -11,13 +11,6 @@ Copyright 2012 SciberQuest Inc.
 
 #include "FieldTraceData.h"
 
-#include<vector>
-using std::vector;
-
-#include<map>
-using std::map;
-using std::pair;
-
 class IdBlock;
 class vtkDataSet;
 class vtkFloatArray;

@@ -39,11 +39,8 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkColorTransferFunction.h"
 #include <cfloat>
 #include <iostream>
-using std::cerr;
 #include <string>
-using std::string;
 #include <vector>
-using std::vector;
 
 // when not set process id arrays are rendered
 // and written to the temp dir.
@@ -137,11 +134,11 @@ int Finalize(vtkMultiProcessController* controller, int code)
 }
 
 // ****************************************************************************
-void Broadcast(vtkMultiProcessController *controller, string &s, int root)
+void Broadcast(vtkMultiProcessController *controller, std::string &s, int root)
 {
   int worldRank=controller->GetLocalProcessId();
 
-  vector<char> buffer;
+  std::vector<char> buffer;
 
   if (worldRank==root)
     {
@@ -168,9 +165,9 @@ void BroadcastConfiguration(
       vtkMultiProcessController *controller,
       int argc,
       char **argv,
-      string &dataRoot,
-      string &tempDir,
-      string &baseline)
+      std::string &dataRoot,
+      std::string &tempDir,
+      std::string &baseline)
 {
   int worldRank=controller->GetLocalProcessId();
   if (worldRank==0)
@@ -262,14 +259,14 @@ vtkDoubleArray *ComputeMagnitude(vtkDataArray *inDa)
 
   if (inDa==NULL)
     {
-    cerr << "Null pointer to input array." << endl;
+    std::cerr << "Null pointer to input array." << std::endl;
     return outDa;
     }
 
   vtkIdType nTups=inDa->GetNumberOfTuples();
   outDa->SetNumberOfTuples(nTups);
 
-  string name=inDa->GetName();
+  std::string name=inDa->GetName();
   name+="-mag";
   outDa->SetName(name.c_str());
 
@@ -309,7 +306,7 @@ void ComputeRange(vtkDataArray *da, double *range)
 {
   if (da==NULL)
     {
-    cerr << "Null pointer to input array." << endl;
+    std::cerr << "Null pointer to input array." << std::endl;
     return;
     }
 
@@ -349,17 +346,17 @@ void ComputeRange(vtkDataArray *da, double *range)
         );
       }
     }
-  cerr << da->GetName() << "=[" << range[0] << ", " << range[1] << "]" << endl;
+  std::cerr << da->GetName() << "=[" << range[0] << ", " << range[1] << "]" << std::endl;
 }
 
 // ****************************************************************************
 void PrintArrayNames(vtkDataSetAttributes *dsa)
 {
   int n=dsa->GetNumberOfArrays();
-  cerr << n << " " << dsa->GetClassName() << " arrays found." << endl;
+  std::cerr << n << " " << dsa->GetClassName() << " arrays found." << std::endl;
   for (int i=0; i<n; ++i)
     {
-    cerr << dsa->GetArray(i)->GetName() << endl;
+    std::cerr << dsa->GetArray(i)->GetName() << std::endl;
     }
 }
 
@@ -392,7 +389,7 @@ vtkActor *MapArrayToActor(
   vtkPolyData *pd=dynamic_cast<vtkPolyData*>(data);
   if (pd==NULL)
     {
-    cerr << "unsuported dataset type " << data->GetClassName() << endl;
+    std::cerr << "unsuported dataset type " << data->GetClassName() << std::endl;
     return 0;
     }
 
@@ -447,7 +444,7 @@ vtkActor *MapArrayToActor(
 
   if (arrayName && da==NULL)
     {
-    cerr << "Error you requested a non-existant array " << arrayName << endl;
+    std::cerr << "Error you requested a non-existant array " << arrayName << std::endl;
     PrintArrayNames(pd->GetPointData());
     PrintArrayNames(pd->GetCellData());
     }
@@ -456,9 +453,9 @@ vtkActor *MapArrayToActor(
 }
 
 // ****************************************************************************
-string NativePath(string path)
+std::string NativePath(std::string path)
 {
-  string nativePath;
+  std::string nativePath;
   #ifdef WIN32
   size_t n=path.size();
   for (size_t i=0; i<n; ++i)
@@ -483,9 +480,9 @@ int SerialRender(
     vtkMultiProcessController *controller,
     vtkPolyData *data,
     bool showBounds,
-    string &tempDir,
-    string &baseline,
-    string testName,
+    std::string &tempDir,
+    std::string &baseline,
+    std::string testName,
     int iwx,
     int iwy,
     double px,
@@ -536,7 +533,7 @@ int SerialRender(
       int nArrays=dsa[j]->GetNumberOfArrays();
       for (int i=0; i<nArrays; ++i)
         {
-        string arrayName=dsa[j]->GetArray(i)->GetName();
+        std::string arrayName=dsa[j]->GetArray(i)->GetName();
 
         if (arrayName == "ProcessId")
           {
@@ -574,7 +571,7 @@ int SerialRender(
           vtkWindowToImageFilter *decompImage = vtkWindowToImageFilter::New();
           decompImage->SetInput(rwin);
 
-          string tempDecomp;
+          std::string tempDecomp;
           tempDecomp+=tempDir;
           tempDecomp+="/";
           tempDecomp+=testName;
@@ -617,7 +614,7 @@ int SerialRender(
         ren->ResetCamera();
         cam->Zoom(cz);
 
-        string base;
+        std::string base;
         base+=baseline;
         base+="-";
         base+=arrayName;
@@ -633,7 +630,7 @@ int SerialRender(
         if (result!=vtkTesting::PASSED)
           {
           aTestFailed=1;
-          cerr << "Test for array " << arrayName << " failed." << endl;
+          std::cerr << "Test for array " << arrayName << " failed." << std::endl;
           }
         testHelper->Delete();
         rwin->RemoveRenderer(ren);

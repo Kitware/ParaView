@@ -15,18 +15,18 @@ virtual void RefCountedPointer::Delete()
 {
   if ((--this->N)==0)
     {
-    cerr << "Deleted : "; this->Print(cerr); cerr << endl;
+    std::cerr << "Deleted : "; this->Print(std::cerr); std::cerr << std::endl;
     delete this;
     }
   else
     {
-    this->PrintRefCount(cerr); cerr << " "; this->Print(cerr); cerr << endl;
+    this->PrintRefCount(std::cerr); std::cerr << " "; this->Print(std::cerr); std::cerr << std::endl;
     }
 }
 #endif
 
 //*****************************************************************************
-ostream &operator<<(ostream &os, RefCountedPointer &rcp)
+std::ostream &operator<<(std::ostream &os, RefCountedPointer &rcp)
 {
   rcp.Print(os);
   return os;

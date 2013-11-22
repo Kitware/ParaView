@@ -108,11 +108,11 @@ int vtkSQRandomSeedPoints::RequestData(
   int nLocal=this->NumberOfPoints/nPieces+(pieceNo<nLarge?1:0);
 
   #ifdef SQTK_DEBUG
-  cerr
-    << "pieceNo = " << pieceNo << endl
-    << "nPieces = " << nPieces << endl
-    << "rank    = " << rank << endl
-    << "nLocal  = " << nLocal << endl;
+  std::cerr
+    << "pieceNo = " << pieceNo << std::endl
+    << "nPieces = " << nPieces << std::endl
+    << "rank    = " << rank << std::endl
+    << "nLocal  = " << nLocal << std::endl;
   #endif
 
   // If the input is present then use it for bounds

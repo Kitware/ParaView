@@ -47,20 +47,10 @@ Copyright 2012 SciberQuest Inc.
 #include <QDebug>
 
 #include <string>
-using std::string;
-
 #include <iostream>
-using std::cerr;
-using std::endl;
-
 #include "FsUtils.h"
 #include <fstream>
-using std::ofstream;
-using std::ifstream;
-using std::ios_base;
 #include <sstream>
-using std::ostringstream;
-using std::istringstream;
 
 // #define pqSQPlaneSourceDEBUG
 
@@ -72,7 +62,7 @@ pqSQPlaneSource::pqSQPlaneSource(
       pqNamedObjectPanel(l_proxy, widget)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::pqSQPlaneSource" << endl;
+  std::cerr << ":::::pqSQPlaneSource::pqSQPlaneSource" << std::endl;
   #endif
 
   this->Dims[0]=this->Dims[1]=1.0;
@@ -340,7 +330,7 @@ pqSQPlaneSource::pqSQPlaneSource(
 pqSQPlaneSource::~pqSQPlaneSource()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::~pqSQPlaneSource" << endl;
+  std::cerr << ":::::pqSQPlaneSource::~pqSQPlaneSource" << std::endl;
   #endif
 
   delete this->Form;
@@ -351,7 +341,7 @@ pqSQPlaneSource::~pqSQPlaneSource()
 void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *aEvent)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::contextMenuEvent" << endl;
+  std::cerr << ":::::pqSQPlaneSource::contextMenuEvent" << std::endl;
   #endif
 
   QMenu context(this);
@@ -375,11 +365,11 @@ void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *aEvent)
 void pqSQPlaneSource::CopyConfiguration()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::CopyConfiguration" << endl;
+  std::cerr << ":::::pqSQPlaneSource::CopyConfiguration" << std::endl;
   #endif
 
   // grab the current configuration.
-  ostringstream os;
+  std::ostringstream os;
 
   vtkSQPlaneSourceConfigurationWriter *writer
     = vtkSQPlaneSourceConfigurationWriter::New();
@@ -398,7 +388,7 @@ void pqSQPlaneSource::CopyConfiguration()
 void pqSQPlaneSource::PasteConfiguration()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::PasteConfiguration" << endl;
+  std::cerr << ":::::pqSQPlaneSource::PasteConfiguration" << std::endl;
   #endif
 
   QClipboard *clipboard=QApplication::clipboard();
@@ -437,7 +427,7 @@ void pqSQPlaneSource::PasteConfiguration()
 void pqSQPlaneSource::ShowTranslateDialog()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::pqSQPlaneSource::ShowTranslateDialog" << endl;
+  std::cerr << ":::::pqSQPlaneSource::pqSQPlaneSource::ShowTranslateDialog" << std::endl;
   #endif
 
   pqSQTranslateDialog dialog(this,0);
@@ -491,12 +481,12 @@ void pqSQPlaneSource::Restore()
   QString fn=QFileDialog::getOpenFileName(this,"Open SQ Plane Source",lastUsedDir,"*.sqps");
   if (fn.size())
     {
-    ifstream f(fn.toStdString().c_str(),ios_base::in);
+    std::ifstream f(fn.toStdString().c_str(),std::ios_base::in);
     if (f.is_open())
       {
       char buf[1024];
       f.getline(buf,1024);
-      if (string(buf).find("SQ Plane Source")!=string::npos)
+      if (std::string(buf).find("SQ Plane Source")!=std::string::npos)
         {
         // DescriptiveName
         f.getline(buf,1024);
@@ -505,8 +495,8 @@ void pqSQPlaneSource::Restore()
         // Origin
         f.getline(buf,1024);
         f.getline(buf,1024);
-        istringstream *is;
-        is=new istringstream(buf);
+        std::istringstream *is;
+        is=new std::istringstream(buf);
         double p[3];
         *is >> p[0] >> p[1] >> p[2];
         delete is;
@@ -516,7 +506,7 @@ void pqSQPlaneSource::Restore()
         // Point1
         f.getline(buf,1024);
         f.getline(buf,1024);
-        is=new istringstream(buf);
+        is=new std::istringstream(buf);
         *is >> p[0] >> p[1] >> p[2];
         delete is;
         this->Form->p1_x->setText(QString("%1").arg(p[0]));
@@ -525,7 +515,7 @@ void pqSQPlaneSource::Restore()
         // Point2
         f.getline(buf,1024);
         f.getline(buf,1024);
-        is=new istringstream(buf);
+        is=new std::istringstream(buf);
         *is >> p[0] >> p[1] >> p[2];
         delete is;
         this->Form->p2_x->setText(QString("%1").arg(p[0]));
@@ -534,7 +524,7 @@ void pqSQPlaneSource::Restore()
         // Resolution
         f.getline(buf,1024);
         f.getline(buf,1024);
-        is=new istringstream(buf);
+        is=new std::istringstream(buf);
         int r[2];
         *is >> r[0] >> r[1];
         delete is;
@@ -567,7 +557,7 @@ void pqSQPlaneSource::Restore()
 void pqSQPlaneSource::Save()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::Save" << endl;
+  std::cerr << ":::::pqSQPlaneSource::Save" << std::endl;
   #endif
 
   QString fn=QFileDialog::getSaveFileName(this,"Save SQ Plane Source","","*.sqps");
@@ -577,28 +567,28 @@ void pqSQPlaneSource::Save()
     QSettings settings("SciberQuest", "SciberQuestToolKit");
     settings.setValue("SQPlaneSource/lastUsedDir",lastUsedDir);
 
-    ofstream f(fn.toStdString().c_str(),ios_base::out|ios_base::trunc);
+    std::ofstream f(fn.toStdString().c_str(),std::ios_base::out|std::ios_base::trunc);
     if (f.is_open())
       {
-      f << "SQ Plane Source 1.0" << endl
-        << "DescriptiveName" << endl
-        << this->Form->name->text().toStdString() << endl
-        << "Origin" << endl
+      f << "SQ Plane Source 1.0" << std::endl
+        << "DescriptiveName" << std::endl
+        << this->Form->name->text().toStdString() << std::endl
+        << "Origin" << std::endl
         << this->Form->o_x->text().toDouble() << " "
         << this->Form->o_y->text().toDouble() << " "
-        << this->Form->o_z->text().toDouble() << endl
-        << "Point1" << endl
+        << this->Form->o_z->text().toDouble() << std::endl
+        << "Point1" << std::endl
         << this->Form->p1_x->text().toDouble() << " "
         << this->Form->p1_y->text().toDouble() << " "
-        << this->Form->p1_z->text().toDouble() << endl
-        << "Point2" << endl
+        << this->Form->p1_z->text().toDouble() << std::endl
+        << "Point2" << std::endl
         << this->Form->p2_x->text().toDouble() << " "
         << this->Form->p2_y->text().toDouble() << " "
-        << this->Form->p2_z->text().toDouble() << endl
-        << "Resolution" << endl
+        << this->Form->p2_z->text().toDouble() << std::endl
+        << "Resolution" << std::endl
         << this->Form->res_x->value() << " "
-        << this->Form->res_y->value() << endl
-        << endl;
+        << this->Form->res_y->value() << std::endl
+        << std::endl;
       f.close();
       }
     else
@@ -642,7 +632,7 @@ void pqSQPlaneSource::loadConfiguration()
 void pqSQPlaneSource::saveConfiguration()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::saveConfiguration" << endl;
+  std::cerr << ":::::pqSQPlaneSource::saveConfiguration" << std::endl;
   #endif
 
   vtkSQPlaneSourceConfigurationWriter *writer=vtkSQPlaneSourceConfigurationWriter::New();
@@ -673,7 +663,7 @@ void pqSQPlaneSource::saveConfiguration()
 int pqSQPlaneSource::ValidateCoordinates()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::ValidateCoordinates" << endl;
+  std::cerr << ":::::pqSQPlaneSource::ValidateCoordinates" << std::endl;
   #endif
 
   double n[3]={0.0};
@@ -792,7 +782,7 @@ void pqSQPlaneSource::SetNormal(double *n)
 int pqSQPlaneSource::CalculateNormal(double *n)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::CaclulateNormal" << endl;
+  std::cerr << ":::::pqSQPlaneSource::CaclulateNormal" << std::endl;
   #endif
 
   this->Form->coordStatus->setText("OK");
@@ -840,7 +830,7 @@ int pqSQPlaneSource::CalculateNormal(double *n)
 int pqSQPlaneSource::GetDecompType()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::GetDecompType" << endl;
+  std::cerr << ":::::pqSQPlaneSource::GetDecompType" << std::endl;
   #endif
 
   return this->Form->constraint->currentIndex();
@@ -850,7 +840,7 @@ int pqSQPlaneSource::GetDecompType()
 void pqSQPlaneSource::SetDecompType(int type)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::SetDecompType" << endl;
+  std::cerr << ":::::pqSQPlaneSource::SetDecompType" << std::endl;
   #endif
 
   this->Form->constraint->setCurrentIndex(type);
@@ -860,7 +850,7 @@ void pqSQPlaneSource::SetDecompType(int type)
 int pqSQPlaneSource::GetConstraint()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::GetConstraint" << endl;
+  std::cerr << ":::::pqSQPlaneSource::GetConstraint" << std::endl;
   #endif
 
   return this->Form->constraint->currentIndex();
@@ -870,7 +860,7 @@ int pqSQPlaneSource::GetConstraint()
 void pqSQPlaneSource::SetConstraint(int type)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::SetConstraint" << endl;
+  std::cerr << ":::::pqSQPlaneSource::SetConstraint" << std::endl;
   #endif
 
   this->Form->constraint->setCurrentIndex(type);
@@ -880,7 +870,7 @@ void pqSQPlaneSource::SetConstraint(int type)
 void pqSQPlaneSource::ApplyConstraint()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::ApplyConstraint" << endl;
+  std::cerr << ":::::pqSQPlaneSource::ApplyConstraint" << std::endl;
   #endif
 
   int type=this->Form->constraint->currentIndex();
@@ -942,7 +932,7 @@ void pqSQPlaneSource::ApplyConstraint()
 void pqSQPlaneSource::DimensionsModified()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::DimensionsModified" << endl;
+  std::cerr << ":::::pqSQPlaneSource::DimensionsModified" << std::endl;
   #endif
 
   int ok=this->CalculateNormal(this->N);
@@ -991,7 +981,7 @@ void pqSQPlaneSource::DimensionsModified()
 void pqSQPlaneSource::SpacingModified()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::SpacingModified" << endl;
+  std::cerr << ":::::pqSQPlaneSource::SpacingModified" << std::endl;
   #endif
 
   // retreive the requested spacing.
@@ -1022,7 +1012,7 @@ void pqSQPlaneSource::SpacingModified()
 void pqSQPlaneSource::ResolutionModified()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::ResolutionModified" << endl;
+  std::cerr << ":::::pqSQPlaneSource::ResolutionModified" << std::endl;
   #endif
 
   // retreive the requested resolution.
@@ -1053,7 +1043,7 @@ void pqSQPlaneSource::ResolutionModified()
 void pqSQPlaneSource::SnapViewToNormal()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::SnapViewToNormal" << endl;
+  std::cerr << ":::::pqSQPlaneSource::SnapViewToNormal" << std::endl;
   #endif
 
   double o[3];
@@ -1143,7 +1133,7 @@ void pqSQPlaneSource::SnapViewToNormal()
 void pqSQPlaneSource::PullServerConfig()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::PullServerConfig" << endl;
+  std::cerr << ":::::pqSQPlaneSource::PullServerConfig" << std::endl;
   #endif
 
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
@@ -1152,7 +1142,7 @@ void pqSQPlaneSource::PullServerConfig()
   vtkSMStringVectorProperty *nameProp
     = dynamic_cast<vtkSMStringVectorProperty*>(pProxy->GetProperty("Name"));
   pProxy->UpdatePropertyInformation(nameProp);
-  string name=nameProp->GetElement(0);
+  std::string name=nameProp->GetElement(0);
   if (!name.empty())
     {
     this->Form->name->setText(name.c_str());
@@ -1215,7 +1205,7 @@ void pqSQPlaneSource::PullServerConfig()
 void pqSQPlaneSource::PushServerConfig()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::PushServerConfig" << endl;
+  std::cerr << ":::::pqSQPlaneSource::PushServerConfig" << std::endl;
   #endif
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
 
@@ -1281,7 +1271,7 @@ void pqSQPlaneSource::PushServerConfig()
 void pqSQPlaneSource::accept()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::accept" << endl;
+  std::cerr << ":::::pqSQPlaneSource::accept" << std::endl;
   #endif
 
   if (!this->ValidateCoordinates())
@@ -1298,7 +1288,7 @@ void pqSQPlaneSource::accept()
 void pqSQPlaneSource::reset()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::pqSQPlaneSource::reset" << endl;
+  std::cerr << ":::::pqSQPlaneSource::reset" << std::endl;
   #endif
 
   pqNamedObjectPanel::reset();

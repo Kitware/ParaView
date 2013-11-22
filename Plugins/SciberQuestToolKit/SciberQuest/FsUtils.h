@@ -10,19 +10,10 @@ Copyright 2012 SciberQuest Inc.
 #define __fsutil_h
 
 #include <vector>
-using std::vector;
 #include <string>
-using std::string;
 #include <iostream>
-using std::ostream;
-using std::cerr;
-using std::endl;
 #include <fstream>
-using std::ifstream;
-using std::ios;
 #include <sstream>
-using std::istringstream;
-#include <cstdio>
 
 #ifndef WIN32
   #define PATH_SEP "/"
@@ -30,7 +21,7 @@ using std::istringstream;
   #define PATH_SEP "\\"
 #endif
 
-void ToLower(string &in);
+void ToLower(std::string &in);
 int FileExists(const char *path);
 int Present(const char *path, const char *file);
 int Represented(const char *path, const char *prefix);
@@ -38,38 +29,38 @@ int ScalarRepresented(const char *path, const char *prefix);
 int VectorRepresented(const char *path, const char *prefix);
 int SymetricTensorRepresented(const char *path, const char *prefix);
 int TensorRepresented(const char *path, const char *prefix);
-int GetSeriesIds(const char *path, const char *prefix, vector<int> &ids);
-string StripFileNameFromPath(const string fileName);
-string StripExtensionFromFileName(const string fileName);
-string StripPathFromFileName(const string fileName);
-size_t LoadLines(const char *fileName, vector<string> &lines);
-size_t LoadText(const string &fileName, string &text);
-int WriteText(string &fileName, string &text);
-int SearchAndReplace(const string &searchFor,const string &replaceWith,string &inText);
-ostream &operator<<(ostream &os, vector<string> v);
-bool operator&(vector<string> &v, const string &s);
+int GetSeriesIds(const char *path, const char *prefix, std::vector<int> &ids);
+std::string StripFileNameFromPath(const std::string fileName);
+std::string StripExtensionFromFileName(const std::string fileName);
+std::string StripPathFromFileName(const std::string fileName);
+size_t LoadLines(const char *fileName, std::vector<std::string> &lines);
+size_t LoadText(const std::string &fileName, std::string &text);
+int WriteText(std::string &fileName, std::string &text);
+int SearchAndReplace(const std::string &searchFor,const std::string &replaceWith,std::string &inText);
+std::ostream &operator<<(std::ostream &os, std::vector<std::string> v);
+bool operator&(std::vector<std::string> &v, const std::string &s);
 
 
 //*****************************************************************************
 template<typename T>
 size_t LoadBin(const char *fileName, size_t dlen, T *buffer)
 {
-  ifstream file(fileName,ios::binary);
+  std::ifstream file(fileName,std::ios::binary);
   if (!file.is_open())
     {
-    cerr << "ERROR: File " << fileName << " could not be opened." << endl;
+    std::cerr << "ERROR: File " << fileName << " could not be opened." << std::endl;
     return 0;
     }
 
   // determine file size
-  file.seekg(0,ios::end);
+  file.seekg(0,std::ios::end);
   size_t flen=file.tellg();
-  file.seekg(0,ios::beg);
+  file.seekg(0,std::ios::beg);
 
   // check if file size matches expected read size.
   if (dlen*sizeof(T)!=flen)
     {
-    cerr
+    std::cerr
       << "ERROR: Expected " << dlen << " bytes but found "
       << flen << " bytes in \"" << fileName << "\".";
     return 0;
@@ -87,13 +78,13 @@ size_t LoadBin(const char *fileName, size_t dlen, T *buffer)
 */
 // ****************************************************************************
 template<typename T>
-int NameValue(vector<string> &lines, string name, T &value)
+int NameValue(std::vector<std::string> &lines, std::string name, T &value)
 {
   size_t nLines=lines.size();
   for (size_t i=0; i<nLines; ++i)
     {
-    string tok;
-    istringstream is(lines[i]);
+    std::string tok;
+    std::istringstream is(lines[i]);
     is >> tok;
     if (tok==name)
       {
@@ -113,22 +104,22 @@ the key is returned.
 */
 // ****************************************************************************
 template <typename T>
-size_t ParseValue(string &in,size_t at, string key, T &value)
+size_t ParseValue(std::string &in,size_t at, std::string key, T &value)
 {
   size_t p=in.find(key,at);
-  if (p!=string::npos)
+  if (p!=std::string::npos)
     {
     size_t n=key.size();
 
     // check to make sure match is the whole word
     if ((p!=0) && isalpha(in[p-1]) && isalpha(in[p+n]))
       {
-      return string::npos;
+      return std::string::npos;
       }
     // convert value
     const int maxValueLen=64;
     p+=n;
-    istringstream valss(in.substr(p,maxValueLen));
+    std::istringstream valss(in.substr(p,maxValueLen));
 
     valss >> value;
     }

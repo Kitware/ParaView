@@ -9,7 +9,6 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #include <vector>
-using std::vector;
 
 
 //*****************************************************************************
@@ -22,7 +21,7 @@ void SubsetReorder(
       CartesianExtent &extV,
       CartesianExtent &extW,
       T*  V,
-      vector<T*> &W,
+      std::vector<T*> &W,
       int dimMode,
       int split)
 {
@@ -175,7 +174,7 @@ template<typename T>
 void Split(
       size_t n,
       T * __restrict__ V,
-      vector<T*> &W)
+      std::vector<T*> &W)
 {
   // reorder a vtk vector array into contiguous
   // scalar components
@@ -194,7 +193,7 @@ void Split(
 template<typename T>
 void Interleave(
       size_t n,
-      vector<T *> &W,
+      std::vector<T *> &W,
       T * __restrict__  V)
 {
   // interleave array in contiguous component order

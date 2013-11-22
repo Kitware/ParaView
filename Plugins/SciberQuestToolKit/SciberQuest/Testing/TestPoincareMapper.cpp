@@ -44,10 +44,7 @@ Copyright 2012 SciberQuest Inc.
 #include "TestUtils.h"
 
 #include <iostream>
-using std::cerr;
-
 #include <string>
-using std::string;
 
 int main(int argc, char **argv)
 {
@@ -56,15 +53,15 @@ int main(int argc, char **argv)
   int worldSize=controller->GetNumberOfProcesses();
 
   // configure
-  string dataRoot;
-  string tempDir;
-  string baseline;
+  std::string dataRoot;
+  std::string tempDir;
+  std::string baseline;
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
-  string inputFileName;
+  std::string inputFileName;
   inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov");
 
-  string logFileName;
+  std::string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestPoincareMapper.log");
   vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
   vtkSQLog::GetGlobalInstance()->SetGlobalLevel(2);
@@ -217,7 +214,7 @@ int main(int argc, char **argv)
     cam->Zoom(1.25);
 
     // Perform the regression test.
-    string base;
+    std::string base;
     base+=baseline;
     base+=".png";
 

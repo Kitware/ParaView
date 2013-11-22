@@ -97,7 +97,7 @@ LogBuffer &LogBuffer::operator<<(const char *v)
 }
 
 //-----------------------------------------------------------------------------
-LogBuffer &LogBuffer::operator>>(ostringstream &s)
+LogBuffer &LogBuffer::operator>>(std::ostringstream &s)
 {
   size_t i=0;
   while (i<this->At)

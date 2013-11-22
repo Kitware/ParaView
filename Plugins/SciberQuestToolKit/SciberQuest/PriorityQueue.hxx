@@ -153,7 +153,7 @@ void PriorityQueue<T>::Push(int id, T &key)
 {
   if (this->Full())
     {
-    sqErrorMacro(cerr,"Queue is full.");
+    sqErrorMacro(std::cerr,"Queue is full.");
     return;
     }
 
@@ -172,7 +172,7 @@ int PriorityQueue<T>::Pop()
 {
   if (this->Empty())
     {
-    sqErrorMacro(cerr,"Queue is empty.");
+    sqErrorMacro(std::cerr,"Queue is empty.");
     return 0;
     }
 
@@ -251,7 +251,7 @@ void PriorityQueue<T>::Print(ostream &os)
 {
   if (this->NIds<1)
     {
-    os << "The heap is empty." << endl;
+    os << "The heap is empty." << std::endl;
     return;
     }
   //
@@ -269,7 +269,7 @@ void PriorityQueue<T>::Print(ostream &os)
         }
       os << this->Keys[this->Ids[i]] << ", ";
       }
-     os << (char)0x08 << (char)0x08 << endl;
+     os << (char)0x08 << (char)0x08 << std::endl;
      ++p;
     }
 }

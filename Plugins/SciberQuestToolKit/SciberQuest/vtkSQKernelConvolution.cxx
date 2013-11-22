@@ -43,18 +43,11 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #include <sstream>
-using std::ostringstream;
 #include <string>
-using std::string;
 #include <map>
-using std::map;
 #include <vector>
-using std::vector;
 #include <utility>
-using std::pair;
 #include <algorithm>
-using std::min;
-using std::max;
 
 #ifndef SQTK_WITHOUT_MPI
 #include "SQMPICHWarningSupression.h"
@@ -104,7 +97,7 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
   LogLevel(0)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::vtkSQKernelConvolution" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::vtkSQKernelConvolution" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -146,14 +139,14 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
       {
       hostRanks=(int*)malloc(this->WorldSize*sizeof(int));
 
-      vector<string> keys(this->WorldSize);
-      typedef map<string,int> CountMapType;
+      std::vector<std::string> keys(this->WorldSize);
+      typedef std::map<std::string,int> CountMapType;
       typedef CountMapType::iterator CountMapItType;
-      typedef pair<CountMapItType,bool> CountMapInsType;
-      typedef pair<const string,int> CountMapValType;
+      typedef std::pair<CountMapItType,bool> CountMapInsType;
+      typedef std::pair<const std::string,int> CountMapValType;
       CountMapType counts;
 
-      pair<const string,int> val;
+      std::pair<const std::string,int> val;
       for (int i=0; i<this->WorldSize; ++i)
         {
         keys[i]=hostNames[i*hostNameLen];
@@ -227,8 +220,8 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
   this->SetNumberOfActiveCUDADevices(this->NumberOfCUDADevices);
 
   #ifdef SQTK_DEBUG
-  pCerr() << "HostSize=" << this->HostSize << endl;
-  pCerr() << "HostRank=" << this->HostRank << endl;
+  pCerr() << "HostSize=" << this->HostSize << std::endl;
+  pCerr() << "HostRank=" << this->HostRank << std::endl;
   #endif
 }
 
@@ -236,7 +229,7 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
 vtkSQKernelConvolution::~vtkSQKernelConvolution()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::~vtkSQKernelConvolution" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::~vtkSQKernelConvolution" << std::endl;
   #endif
 
   if (this->Kernel)
@@ -253,7 +246,7 @@ vtkSQKernelConvolution::~vtkSQKernelConvolution()
 int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::Initialize" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -320,8 +313,8 @@ int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
       << "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
       << "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n"
       << "#   input_arrays=";
-    set<string>::iterator it=this->InputArrays.begin();
-    set<string>::iterator end=this->InputArrays.end();
+    std::set<std::string>::iterator it=this->InputArrays.begin();
+    std::set<std::string>::iterator end=this->InputArrays.end();
     for (; it!=end; ++it)
       {
       log->GetHeader() << *it << " ";
@@ -387,7 +380,7 @@ void vtkSQKernelConvolution::AddInputArray(const char *name)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::AddInputArray"
-    << "name=" << name << endl;
+    << "name=" << name << std::endl;
   #endif
 
   if (this->InputArrays.insert(name).second)
@@ -401,7 +394,7 @@ void vtkSQKernelConvolution::ClearInputArrays()
 {
   #ifdef SQTK_DEBUG
   pCerr()
-    << "=====vtkSQKernelConvolution::ClearInputArrays" << endl;
+    << "=====vtkSQKernelConvolution::ClearInputArrays" << std::endl;
   #endif
 
   if (this->InputArrays.size())
@@ -416,8 +409,8 @@ void vtkSQKernelConvolution::AddArrayToCopy(const char *name)
 {
   #ifdef SQTK_DEBUG
   pCerr()
-    << "=====vtkSQKernelConvolution::ArraysToCopy" << endl
-    << "name=" << name << endl;
+    << "=====vtkSQKernelConvolution::ArraysToCopy" << std::endl
+    << "name=" << name << std::endl;
   #endif
 
   if (this->ArraysToCopy.insert(name).second)
@@ -430,7 +423,7 @@ void vtkSQKernelConvolution::AddArrayToCopy(const char *name)
 void vtkSQKernelConvolution::ClearArraysToCopy()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::ClearArraysToCopy" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::ClearArraysToCopy" << std::endl;
   #endif
 
   if (this->ArraysToCopy.size())
@@ -446,7 +439,7 @@ void vtkSQKernelConvolution::SetCPUDriverOptimization(int opt)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetCPUDriverOptimization"
-    << " " << opt << endl;
+    << " " << opt << std::endl;
   #endif
   this->CPUDriver->SetOptimization(opt);
   this->Modified();
@@ -465,7 +458,7 @@ void vtkSQKernelConvolution::SetAllMPIRanksToUseCUDA(int allUse)
   pCerr()
     << "=====vtkSQKernelConvolution::SetAllMPIRanksToUseCUDA"
     << " " << allUse
-    << endl;
+    << std::endl;
   #endif
 
   if (allUse && this->NumberOfActiveCUDADevices)
@@ -480,7 +473,7 @@ void vtkSQKernelConvolution::SetAllMPIRanksToUseCUDA(int allUse)
   this->Modified();
 
   #ifdef SQTK_DEBUG
-  pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
+  pCerr() << "EnableCUDA=" << this->EnableCUDA << std::endl;
   #endif
 }
 
@@ -491,7 +484,7 @@ void vtkSQKernelConvolution::SetNumberOfMPIRanksToUseCUDA(int nRanks)
   pCerr()
     << "=====vtkSQKernelConvolution::SetNumberOfMPIRanksToUseCUDA"
     << " " << nRanks
-    << endl;
+    << std::endl;
   #endif
   if (nRanks==this->NumberOfMPIRanksToUseCUDA)
     {
@@ -522,7 +515,7 @@ void vtkSQKernelConvolution::SetNumberOfMPIRanksToUseCUDA(int nRanks)
   this->Modified();
 
   #ifdef SQTK_DEBUG
-  pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
+  pCerr() << "EnableCUDA=" << this->EnableCUDA << std::endl;
   #endif
 }
 
@@ -533,7 +526,7 @@ void vtkSQKernelConvolution::SetNumberOfActiveCUDADevices(int nActive)
   pCerr()
     << "=====vtkSQKernelConvolution::SetNumberOfActiveCUDADevices"
     << " " << nActive
-    << endl;
+    << std::endl;
   #endif
 
   //nActive=max(0,nActive);
@@ -559,7 +552,7 @@ void vtkSQKernelConvolution::SetNumberOfActiveCUDADevices(int nActive)
     int deviceId=this->HostRank%this->NumberOfActiveCUDADevices;
     this->SetCUDADeviceId(deviceId);
     #ifdef SQTK_DEBUG
-    pCerr() << "assigned to cuda device " << deviceId << endl;
+    pCerr() << "assigned to cuda device " << deviceId << std::endl;
     #endif
     }
 
@@ -573,7 +566,7 @@ int vtkSQKernelConvolution::SetCUDADeviceId(int deviceId)
   pCerr()
     << "=====vtkSQKernelConvolution::SetCUDADeviceId"
     << " " << deviceId
-    << endl;
+    << std::endl;
   #endif
   if (this->CUDADeviceId==deviceId)
     {
@@ -592,7 +585,7 @@ void vtkSQKernelConvolution::SetKernelCUDAMemoryType(int memType)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetKernelCUDAMemoryType"
-    << " " << memType << endl;
+    << " " << memType << std::endl;
   #endif
   this->CUDADriver->SetKernelMemoryType(memType);
   this->Modified();
@@ -610,7 +603,7 @@ void vtkSQKernelConvolution::SetInputCUDAMemoryType(int memType)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetInputCUDAMemoryType"
-    << " " << memType << endl;
+    << " " << memType << std::endl;
   #endif
   this->CUDADriver->SetInputMemoryType(memType);
   this->Modified();
@@ -639,7 +632,7 @@ int vtkSQKernelConvolution::GetNumberOfWarpsPerCUDABlock()
 void vtkSQKernelConvolution::SetMode(int mode)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::SetMode" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::SetMode" << std::endl;
   #endif
 
   if (mode==this->Mode)
@@ -656,7 +649,7 @@ void vtkSQKernelConvolution::SetMode(int mode)
 void vtkSQKernelConvolution::SetKernelType(int type)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::SetKernelType" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::SetKernelType" << std::endl;
   #endif
 
   if (type==this->KernelType)
@@ -673,7 +666,7 @@ void vtkSQKernelConvolution::SetKernelType(int type)
 void vtkSQKernelConvolution::SetKernelWidth(int width)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::SetKernelWidth" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::SetKernelWidth" << std::endl;
   #endif
 
   if (width==this->KernelWidth)
@@ -696,7 +689,7 @@ void vtkSQKernelConvolution::SetKernelWidth(int width)
 int vtkSQKernelConvolution::UpdateKernel()
 {
   #ifdef SQTK_DEBUG
-  //pCerr() << "=====vtkSQKernelConvolution::UpdateKernel" << endl;
+  //pCerr() << "=====vtkSQKernelConvolution::UpdateKernel" << std::endl;
   #endif
 
   if (!this->KernelModified)
@@ -825,9 +818,9 @@ int vtkSQKernelConvolution::UpdateKernel()
   pCerr() << "Kernel=[";
   for (size_t i=0; i<size; ++i)
     {
-    cerr << this->Kernel[i] << " ";
+    std::cerr << this->Kernel[i] << " ";
     }
-  cerr << "]" << endl;
+  std::cerr << "]" << std::endl;
   */
   #endif
 
@@ -841,7 +834,7 @@ int vtkSQKernelConvolution::RequestDataObject(
     vtkInformationVector* outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::RequestDataObject" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::RequestDataObject" << std::endl;
   #endif
 
 
@@ -870,8 +863,8 @@ int vtkSQKernelConvolution::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQKernelConvolution::RequestInformation" << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestInformation" << std::endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -922,12 +915,12 @@ int vtkSQKernelConvolution::RequestInformation(
 
   #ifdef SQTK_DEBUG
   oss
-    << "WHOLE_EXTENT(input)=" << inputDomain << endl
-    << "WHOLE_EXTENT(output)=" << outputDomain << endl
-    << "ORIGIN=" << Tuple<double>(X0,3) << endl
-    << "SPACING=" << Tuple<double>(dX,3) << endl
-    << "nGhost=" << nGhosts << endl;
-  pCerr() << oss.str() << endl;
+    << "WHOLE_EXTENT(input)=" << inputDomain << std::endl
+    << "WHOLE_EXTENT(output)=" << outputDomain << std::endl
+    << "ORIGIN=" << Tuple<double>(X0,3) << std::endl
+    << "SPACING=" << Tuple<double>(dX,3) << std::endl
+    << "nGhost=" << nGhosts << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   return 1;
@@ -940,8 +933,8 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQKernelConvolution::RequestUpdateExtent" << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestUpdateExtent" << std::endl;
   #endif
 
   (void)req;
@@ -993,10 +986,10 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
 
   #ifdef SQTK_DEBUG
   oss
-    << "WHOLE_EXTENT=" << wholeExt << endl
-    << "UPDATE_EXTENT=" << outputExt << endl
-    << "nGhosts=" << nGhosts << endl;
-  pCerr() << oss.str() << endl;
+    << "WHOLE_EXTENT=" << wholeExt << std::endl
+    << "UPDATE_EXTENT=" << outputExt << std::endl
+    << "nGhosts=" << nGhosts << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   return 1;
@@ -1009,8 +1002,8 @@ int vtkSQKernelConvolution::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQKernelConvolution::RequestData" << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -1112,17 +1105,17 @@ int vtkSQKernelConvolution::RequestData(
 
     #ifdef SQTK_DEBUG
     oss
-      << "WHOLE_EXTENT=" << domainExt << endl
-      << "UPDATE_EXTENT(input)=" << inputExt << endl
-      << "UPDATE_EXTENT(output)=" << outputExt << endl
-      << "ORIGIN" << Tuple<double>(X0,3) << endl
-      << "SPACING" << Tuple<double>(dX,3) << endl
-      << endl;
+      << "WHOLE_EXTENT=" << domainExt << std::endl
+      << "UPDATE_EXTENT(input)=" << inputExt << std::endl
+      << "UPDATE_EXTENT(output)=" << outputExt << std::endl
+      << "ORIGIN" << Tuple<double>(X0,3) << std::endl
+      << "SPACING" << Tuple<double>(dX,3) << std::endl
+      << std::endl;
     #endif
 
-    set<string>::iterator it;
-    set<string>::iterator begin=this->InputArrays.begin();
-    set<string>::iterator end=this->InputArrays.end();
+    std::set<std::string>::iterator it;
+    std::set<std::string>::iterator begin=this->InputArrays.begin();
+    std::set<std::string>::iterator end=this->InputArrays.end();
     for (it=begin; it!=end; ++it)
       {
       vtkDataArray *V=inImData->GetPointData()->GetArray((*it).c_str());
@@ -1149,7 +1142,7 @@ int vtkSQKernelConvolution::RequestData(
       W->SetNumberOfComponents(nComps);
       W->SetNumberOfTuples(outputTups);
 
-      ostringstream wname;
+      std::ostringstream wname;
       wname << V->GetName();
       if (this->ComputeResidual || (this->ArraysToCopy.size() > 0))
         {
@@ -1173,7 +1166,7 @@ int vtkSQKernelConvolution::RequestData(
       if (this->EnableCUDA)
         {
         #ifdef SQTK_DEBUG
-        oss << "using the GPU" << endl;
+        oss << "using the GPU" << std::endl;
         #endif
         this->CUDADriver->Convolution(
             inputExt,
@@ -1188,7 +1181,7 @@ int vtkSQKernelConvolution::RequestData(
       else
         {
         #ifdef SQTK_DEBUG
-        oss << "using the CPU" << endl;
+        oss << "using the CPU" << std::endl;
         #endif
         this->CPUDriver->Convolution(
             inputExt,
@@ -1302,7 +1295,7 @@ int vtkSQKernelConvolution::RequestData(
     }
 
   #ifdef SQTK_DEBUG
-  pCerr() << oss.str() << endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
  return 1;
@@ -1312,7 +1305,7 @@ int vtkSQKernelConvolution::RequestData(
 void vtkSQKernelConvolution::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQKernelConvolution::PrintSelf" << endl;
+  pCerr() << "=====vtkSQKernelConvolution::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

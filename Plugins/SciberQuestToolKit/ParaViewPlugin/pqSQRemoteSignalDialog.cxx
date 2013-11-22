@@ -19,16 +19,14 @@
 #include "FsUtils.h"
 
 #include <iostream>
-using std::cerr;
-using std::endl;
 
 #include "pqFileDialog.h"
 
 #define pqErrorMacro(estr)\
   qDebug()\
-      << "Error in:" << endl\
-      << __FILE__ << ", line " << __LINE__ << endl\
-      << "" estr << endl;
+      << "Error in:" << std::endl\
+      << __FILE__ << ", line " << __LINE__ << std::endl\
+      << "" estr << std::endl;
 
 
 // User interface

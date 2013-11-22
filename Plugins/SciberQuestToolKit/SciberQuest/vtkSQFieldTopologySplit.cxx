@@ -24,7 +24,7 @@ vtkStandardNewMacro(vtkSQFieldTopologySplit);
 vtkSQFieldTopologySplit::vtkSQFieldTopologySplit()
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQFieldTopologySplit::vtkSQFieldTopologySplit" << endl;
+  std::cerr << "=====vtkSQFieldTopologySplit::vtkSQFieldTopologySplit" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -35,7 +35,7 @@ vtkSQFieldTopologySplit::vtkSQFieldTopologySplit()
 vtkSQFieldTopologySplit::~vtkSQFieldTopologySplit()
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQFieldTopologySplit::~vtkSQFieldTopologySplit" << endl;
+  std::cerr << "=====vtkSQFieldTopologySplit::~vtkSQFieldTopologySplit" << std::endl;
   #endif
 }
 
@@ -45,7 +45,7 @@ int vtkSQFieldTopologySplit::FillInputPortInformation(
       vtkInformation *info)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQFieldTopologySplit::FillInputPortInformation" << endl;
+  std::cerr << "=====vtkSQFieldTopologySplit::FillInputPortInformation" << std::endl;
   #endif
 
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(),"vtkDataSet");
@@ -59,7 +59,7 @@ int vtkSQFieldTopologySplit::FillOutputPortInformation(
       vtkInformation *info)
 {
   #if SQTK_DEBUG>1
-  pCerr() << "=====vtkSQFieldTopologySplit::FillOutputPortInformation" << endl;
+  pCerr() << "=====vtkSQFieldTopologySplit::FillOutputPortInformation" << std::endl;
   #endif
 
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid");
@@ -73,7 +73,7 @@ int vtkSQFieldTopologySplit::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQFieldTopologySplit::RequestInformation" << endl;
+  std::cerr << "=====vtkSQFieldTopologySplit::RequestInformation" << std::endl;
   #endif
 
 
@@ -95,7 +95,7 @@ int vtkSQFieldTopologySplit::RequestData(
       vtkInformationVector *outputVector)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQFieldTopologySplit::RequestData" << endl;
+  std::cerr << "=====vtkSQFieldTopologySplit::RequestData" << std::endl;
   #endif
 
   vtkInformation *inInfo=inputVector[0]->GetInformationObject(0);

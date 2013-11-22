@@ -76,7 +76,7 @@ void PolyDataFieldTopologyMap::SetSource(vtkDataSet *s)
   vtkPolyData *source=dynamic_cast<vtkPolyData*>(s);
   if (source==0)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       "Error: Source must be polydata. " << s->GetClassName());
     return;
     }
@@ -84,7 +84,7 @@ void PolyDataFieldTopologyMap::SetSource(vtkDataSet *s)
   this->SourcePts=dynamic_cast<vtkFloatArray*>(source->GetPoints()->GetData());
   if (this->SourcePts==0)
     {
-    sqErrorMacro(cerr,"Error: Points are not float precision.");
+    sqErrorMacro(std::cerr,"Error: Points are not float precision.");
     return;
     }
   this->SourcePts->Register(0);
@@ -102,7 +102,7 @@ void PolyDataFieldTopologyMap::SetSource(vtkDataSet *s)
     }
   else
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
         "Error: Polydata doesn't have any supported cells.");
     return;
     }
@@ -119,7 +119,7 @@ void PolyDataFieldTopologyMap::SetOutput(vtkDataSet *o)
   vtkPolyData *out=dynamic_cast<vtkPolyData*>(o);
   if (out==0)
     {
-    sqErrorMacro(cerr,"Error: Out must be polydata. " << o->GetClassName());
+    sqErrorMacro(std::cerr,"Error: Out must be polydata. " << o->GetClassName());
     return;
     }
 
@@ -141,7 +141,7 @@ void PolyDataFieldTopologyMap::SetOutput(vtkDataSet *o)
       break;
 
     default:
-      sqErrorMacro(cerr,"Error: Unsuported cell type.");
+      sqErrorMacro(std::cerr,"Error: Unsuported cell type.");
       return;
     }
 }
@@ -174,8 +174,8 @@ vtkIdType PolyDataFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
   size_t lId=this->Lines.size();
   this->Lines.resize(lId+nCellsLocal,0);
 
-  vector<vtkIdType> sourcePtIds;
-  vector<float> sourcePts;
+  std::vector<vtkIdType> sourcePtIds;
+  std::vector<float> sourcePts;
 
   // For each cell asigned to us we'll get its center (this is the seed point)
   // and build corresponding cell in the output, The output only will have

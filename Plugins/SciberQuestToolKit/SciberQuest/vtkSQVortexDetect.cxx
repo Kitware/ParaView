@@ -29,10 +29,7 @@
 #include <cmath>
 
 #include <string>
-using std::string;
-
 #include <algorithm>
-using std::max;
 
 #include "SQEigenWarningSupression.h"
 #include<Eigen/Eigenvalues>
@@ -57,7 +54,7 @@ void ComputeVectorGradient(
 
   gradV->SetNumberOfComponents(9);
   gradV->SetNumberOfTuples(nCells);
-  string name="grad-";
+  std::string name="grad-";
   name+=V->GetName();
   gradV->SetName(name.c_str());
   double *pGradV=gradV->GetPointer(0);
@@ -119,8 +116,8 @@ void ComputeVorticity(
   vortV=vtkDoubleArray::New();
   vortV->SetNumberOfComponents(3);
   vortV->SetNumberOfTuples(nCells);
-  string name="vorticity-";
-  name+=string(gradV->GetName()).substr(5,string::npos);
+  std::string name="vorticity-";
+  name+=std::string(gradV->GetName()).substr(5,std::string::npos);
   vortV->SetName(name.c_str());
   double *pVortV=vortV->GetPointer(0);
 
@@ -162,7 +159,7 @@ void ComputeHelicity(
 
   helV->SetNumberOfComponents(3);
   helV->SetNumberOfTuples(nCells);
-  string name="helicity-";
+  std::string name="helicity-";
   name+=V->GetName();
   helV->SetName(name.c_str());
   double *pVortV=helV->GetPointer(0);
@@ -405,7 +402,7 @@ vtkSQVortexDetect::vtkSQVortexDetect()
   ComputeEigenvalueDiagnostic(0)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexDetect::vtkSQVortexDetect" << endl;
+  pCerr() << "=====vtkSQVortexDetect::vtkSQVortexDetect" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -424,7 +421,7 @@ vtkSQVortexDetect::vtkSQVortexDetect()
 int vtkSQVortexDetect::Initialize(vtkPVXMLElement *root)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexDetect::Initialize" << endl;
+  pCerr() << "=====vtkSQVortexDetect::Initialize" << std::endl;
   #endif
 
   (void)root;
@@ -439,7 +436,7 @@ int vtkSQVortexDetect::RequestData(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexDetect::RequestData" << endl;
+  pCerr() << "=====vtkSQVortexDetect::RequestData" << std::endl;
   #endif
 
   vtkInformation *inInfo = inInfos[0]->GetInformationObject(0);
@@ -560,7 +557,7 @@ int vtkSQVortexDetect::RequestData(
       vtkDataArray *mda=da->NewInstance();
       size_t daNt=da->GetNumberOfTuples();
       mda->SetNumberOfTuples(daNt);
-      string name="mag-";
+      std::string name="mag-";
       name+=da->GetName();
       mda->SetName(name.c_str());
       output->GetPointData()->AddArray(mda);

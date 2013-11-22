@@ -1,7 +1,7 @@
 #include "GhostTransaction.h"
 
 //*****************************************************************************
-ostream &operator<<(ostream &os, const GhostTransaction &gt)
+std::ostream &operator<<(std::ostream &os, const GhostTransaction &gt)
 {
   os
     << "(" << gt.GetSourceRank() << ", " << gt.GetSourceExtent() << ")->"

@@ -10,8 +10,6 @@ Copyright 2012 SciberQuest Inc.
 #include "CartesianExtent.h"
 
 #include <iostream>
-using std::cerr;
-using std::endl;
 
 //-----------------------------------------------------------------------------
 FlatIndex::FlatIndex(int ni, int nj, int nk, int mode)
@@ -75,7 +73,7 @@ void FlatIndex::Initialize(int ni, int nj, int nk, int mode)
       break;
 
     default:
-      cerr << "Unsupported mode " << mode << endl;
+      std::cerr << "Unsupported mode " << mode << std::endl;
       break;
     }
 }

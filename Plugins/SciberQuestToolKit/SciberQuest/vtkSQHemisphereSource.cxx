@@ -49,7 +49,7 @@ void LocateHemisphere(float *pX, size_t nx,double *C, double *N)
   float magN=(float)sqrt(N[0]*N[0]+N[1]*N[1]+N[2]*N[2]);
   if (magN<1.0e-3f)
     {
-    sqErrorMacro(cerr,"Vector magniude must be non-zero.");
+    sqErrorMacro(std::cerr,"Vector magniude must be non-zero.");
     return;
     }
 
@@ -85,11 +85,11 @@ void LocateHemisphere(float *pX, size_t nx,double *C, double *N)
     pX[ii+1] =  x*q*l + y*m + z*p*l + c[1];
     pX[ii+2] = -x*p         + z*q   + c[2];
 
-    // cerr
+    // std::cerr
     //   << Tuple<float>(x,y,z)
     //   << "->"
     //   << Tuple<float>(pX[ii],pX[ii+1],pX[ii+2])
-    //   << endl;
+    //   << std::endl;
     }
 }
 
@@ -105,7 +105,7 @@ vtkSQHemisphereSource::vtkSQHemisphereSource()
       SouthHemisphereName(0)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQHemisphereSource::vtkSQHemisphereSource" << endl;
+  std::cerr << "=====vtkSQHemisphereSource::vtkSQHemisphereSource" << std::endl;
   #endif
   this->Radius=1.0;
 
@@ -132,7 +132,7 @@ vtkSQHemisphereSource::vtkSQHemisphereSource()
 vtkSQHemisphereSource::~vtkSQHemisphereSource()
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQHemisphereSource::~vtkSQHemisphereSource" << endl;
+  std::cerr << "=====vtkSQHemisphereSource::~vtkSQHemisphereSource" << std::endl;
   #endif
   this->SetNorthHemisphereName(0);
   this->SetSouthHemisphereName(0);
@@ -142,7 +142,7 @@ vtkSQHemisphereSource::~vtkSQHemisphereSource()
 int vtkSQHemisphereSource::Initialize(vtkPVXMLElement *root)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQHemisphereSource::vtkSQHemisphereSource::Initialize" << endl;
+  pCerr() << "=====vtkSQHemisphereSource::vtkSQHemisphereSource::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -189,7 +189,7 @@ int vtkSQHemisphereSource::FillInputPortInformation(
       vtkInformation *info)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQHemisphereSource::FillInputPortInformation" << endl;
+  std::cerr << "=====vtkSQHemisphereSource::FillInputPortInformation" << std::endl;
   #endif
   // The input is optional, if used we'll look for some keys that define
   // the sphere's attriibutes coming from upstram (e.g from a reader).
@@ -205,7 +205,7 @@ int vtkSQHemisphereSource::RequestInformation(
       vtkInformationVector* outInfos)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQHemisphereSource::RequestInformation" << endl;
+  std::cerr << "=====vtkSQHemisphereSource::RequestInformation" << std::endl;
   #endif
   // The GDA meta data reader will insert information about
   // the center and radius of the dipole. If its there we'll
@@ -221,7 +221,7 @@ int vtkSQHemisphereSource::RequestInformation(
       inInfo->Modified();
       this->Modified();
       //inInfo->Modified((vtkInformationKey*)GDAMetaDataKeys::DIPOLE_CENTER());
-      cerr << "Found DIPOLE_CENTER." << endl;
+      std::cerr << "Found DIPOLE_CENTER." << std::endl;
       }
 
 //     if (inInfo->Has(GDAMetaDataKeys::CELL_SIZE_RE()))
@@ -231,7 +231,7 @@ int vtkSQHemisphereSource::RequestInformation(
 //       inInfo->Get(GDAMetaDataKeys::CELL_SIZE_RE(),cellSizeRe);
 //       this->Radius=2.5/cellSizeRe; // sphere will have 2.5 re.
 //
-//       cerr << "Found CELL_SIZE_RE." << endl;
+//       std::cerr << "Found CELL_SIZE_RE." << std::endl;
 //       }
 
   vtkInformation *outInfo = outInfos->GetInformationObject(0);
@@ -255,8 +255,8 @@ int vtkSQHemisphereSource::RequestData(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQHemisphereSource::RequestData" << endl;
-  this->Print(cerr);
+  std::cerr << "=====vtkSQHemisphereSource::RequestData" << std::endl;
+  this->Print(std::cerr);
   #endif
 
   vtkInformation *northInfo=outInfos->GetInformationObject(0);
@@ -320,22 +320,22 @@ int vtkSQHemisphereSource::RequestData(
 void vtkSQHemisphereSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQHemisphereSource::PrintSelf" << endl;
+  std::cerr << "=====vtkSQHemisphereSource::PrintSelf" << std::endl;
   #endif
   // this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Center "
      << this->Center[0] << ", "
      << this->Center[1] << ", "
-     << this->Center[2] << endl
+     << this->Center[2] << std::endl
      << indent << "Radius "
-     << this->Radius << endl
+     << this->Radius << std::endl
      << indent << "Resolution"
-     << this->Resolution << endl
+     << this->Resolution << std::endl
      << indent << "NorthHemisphereName "
-     << this->NorthHemisphereName << endl
+     << this->NorthHemisphereName << std::endl
      << indent << "SouthHemisphereName "
-     << this->SouthHemisphereName << endl;
+     << this->SouthHemisphereName << std::endl;
 
   // TODO
 }

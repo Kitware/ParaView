@@ -21,7 +21,6 @@ typedef void * MPI_Comm;
 #endif
 
 #include <vector>
-using std::vector;
 
 class vtkDataSet;
 class vtkImageData;
@@ -150,8 +149,8 @@ private:
   PriorityQueue<unsigned long int> *LRUQueue;   // least-recently-used block queue
   int CloseClearsCachedBlocks;                  // controls cache flush on close
 
-  vector<int> CacheHit;                         // count the number of times each block is accessed
-  vector<int> CacheMiss;                        // count the number of times each block is accessed
+  std::vector<int> CacheHit;                    // count the number of times each block is accessed
+  std::vector<int> CacheMiss;                   // count the number of times each block is accessed
   long long CacheHitCount;                      // track block cache hits
   long long CacheMissCount;                     // track block cache misses
 

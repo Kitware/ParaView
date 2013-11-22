@@ -21,7 +21,7 @@ MPI_File Open(MPI_Comm comm, MPI_Info hints, const char *fileName, int mode)
   return 0;
   #else
   // added this to deal with vpic data arrays which use spaces.
-  string cleanFileName=fileName;
+  std::string cleanFileName=fileName;
   size_t fileNameLen=cleanFileName.size();
   for (size_t i=0; i<fileNameLen; ++i)
     {
@@ -42,8 +42,8 @@ MPI_File Open(MPI_Comm comm, MPI_Info hints, const char *fileName, int mode)
   if (iErr!=MPI_SUCCESS)
     {
     MPI_Error_string(iErr,eStr,const_cast<int *>(&eStrLen));
-    sqErrorMacro(cerr,
-        << "Error opeing file: " << cleanFileName << endl
+    sqErrorMacro(std::cerr,
+        << "Error opeing file: " << cleanFileName << std::endl
         << eStr);
     file=0;
     }
@@ -87,16 +87,16 @@ BOVScalarImage::~BOVScalarImage()
 }
 
 //-----------------------------------------------------------------------------
-ostream &operator<<(ostream &os, const BOVScalarImage &si)
+std::ostream &operator<<(std::ostream &os, const BOVScalarImage &si)
 {
-  os << si.GetName() << endl
-     << "  " << si.GetFileName() << " " << si.GetFile() << endl;
+  os << si.GetName() << std::endl
+     << "  " << si.GetFileName() << " " << si.GetFile() << std::endl;
 
   #ifndef SQTK_WITHOUT_MPI
   MPI_File file=si.GetFile();
   if (file)
     {
-    os << "  Hints:" << endl;
+    os << "  Hints:" << std::endl;
 
     int WorldRank;
     MPI_Comm_rank(MPI_COMM_WORLD,&WorldRank);
@@ -114,7 +114,7 @@ ostream &operator<<(ostream &os, const BOVScalarImage &si)
         MPI_Info_get_nthkey(info,i,key);
         MPI_Info_get(info,key,MPI_MAX_INFO_KEY,val,&flag);
 
-        os << "    " << key << "=" << val << endl;
+        os << "    " << key << "=" << val << std::endl;
         }
       }
     }

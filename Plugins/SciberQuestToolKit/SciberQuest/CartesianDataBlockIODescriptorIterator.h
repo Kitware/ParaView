@@ -50,7 +50,7 @@ private:
   void operator=(const CartesianDataBlockIODescriptorIterator &);
   /// \@}
 
-  friend ostream &operator<<(ostream &os, const CartesianDataBlockIODescriptorIterator &it);
+  friend std::ostream &operator<<(std::ostream &os, const CartesianDataBlockIODescriptorIterator &it);
 
 private:
   const CartesianDataBlockIODescriptor *Descriptor;
@@ -58,6 +58,6 @@ private:
   size_t Of;
 };
 
-ostream &operator<<(ostream &os, const CartesianDataBlockIODescriptorIterator &it);
+std::ostream &operator<<(std::ostream &os, const CartesianDataBlockIODescriptorIterator &it);
 
 #endif

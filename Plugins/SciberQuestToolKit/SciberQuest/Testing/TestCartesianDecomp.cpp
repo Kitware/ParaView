@@ -4,8 +4,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <time.h>
-using std::cerr;
-using std::endl;
 
 #include "vtkImageData.h"
 
@@ -46,19 +44,19 @@ int main(int argc, char **argv)
 
     CartesianDataBlock *b=D->GetBlock(pt);
 
-    // cerr
+    // std::cerr
     //   << Tuple<double>(pt,3)
     //   << " is in "  << Tuple<double>(b->GetBounds(),6)
     //   << " " << Tuple<int>(b->GetId(),4)
-    //   << endl;
+    //   << std::endl;
 
-    cerr << "Accessing " << Tuple<int>(b->GetId(),4);
+    std::cerr << "Accessing " << Tuple<int>(b->GetId(),4);
 
     vtkImageData *data=b->GetData();
     if (data==0)
       {
       // cache miss
-      cerr << "\tCache miss";
+      std::cerr << "\tCache miss";
 
       // If the cache is full pop least-recently-used block.
       if (cache.Full())
@@ -66,7 +64,7 @@ int main(int argc, char **argv)
         CartesianDataBlock *ob=D->GetBlock(cache.Pop());
         ob->SetData(0);
 
-        cerr << "\tRemoved " << Tuple<int>(ob->GetId(),4);
+        std::cerr << "\tRemoved " << Tuple<int>(ob->GetId(),4);
         }
 
       // allocate data
@@ -76,11 +74,11 @@ int main(int argc, char **argv)
 
       // insert the block into the cache
       cache.Push(b->GetIndex(),++accessTime);
-      cerr << "\tInserted " << Tuple<int>(b->GetId(),4) << endl;
+      std::cerr << "\tInserted " << Tuple<int>(b->GetId(),4) << std::endl;
       }
     else
       {
-      cerr << "\tCache hit" << endl;
+      std::cerr << "\tCache hit" << std::endl;
       cache.Update(b->GetIndex(),++accessTime);
       }
     }

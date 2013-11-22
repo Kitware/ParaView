@@ -13,11 +13,8 @@ Copyright 2012 SciberQuest Inc.
 
 #include <cstdlib>
 #include <string>
-using std::string;
 #include <map>
-using std::map;
 #include <vector>
-using std::vector;
 
 /// Serialize objects into a binary stream.
 class BinaryStream
@@ -71,14 +68,14 @@ public:
   template <typename T> void UnPack(T *val, size_t n);
 
   // specializations
-  void Pack(const string &str);
-  void UnPack(string &str);
-  template<typename T> void Pack(vector<T> &v);
-  template<typename T> void UnPack(vector<T> &v);
+  void Pack(const std::string &str);
+  void UnPack(std::string &str);
+  template<typename T> void Pack(std::vector<T> &v);
+  template<typename T> void UnPack(std::vector<T> &v);
   template<typename T> void Pack(SharedArray<T> &v);
   template<typename T> void UnPack(SharedArray<T> &v);
-  void Pack(map<string,int> &m);
-  void UnPack(map<string,int> &m);
+  void Pack(std::map<std::string,int> &m);
+  void UnPack(std::map<std::string,int> &m);
 
 private:
   size_t Size;
@@ -176,7 +173,7 @@ template <typename T>
 void BinaryStream::Pack(T *val)
 {
   (void)val;
-  cerr << "Error: Packing a pointer." << endl;
+  std::cerr << "Error: Packing a pointer." << std::endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -225,7 +222,7 @@ void BinaryStream::UnPack(T *val, size_t n)
 
 //-----------------------------------------------------------------------------
 inline
-void BinaryStream::Pack(const string &str)
+void BinaryStream::Pack(const std::string &str)
 {
   size_t strLen=str.size();
   this->Pack(strLen);
@@ -234,7 +231,7 @@ void BinaryStream::Pack(const string &str)
 
 //-----------------------------------------------------------------------------
 inline
-void BinaryStream::UnPack(string &str)
+void BinaryStream::UnPack(std::string &str)
 {
   size_t strLen=0;
   this->UnPack(strLen);
@@ -247,7 +244,7 @@ void BinaryStream::UnPack(string &str)
 
 //-----------------------------------------------------------------------------
 template<typename T>
-void BinaryStream::Pack(vector<T> &v)
+void BinaryStream::Pack(std::vector<T> &v)
 {
   const size_t vLen=v.size();
   this->Pack(vLen);
@@ -256,7 +253,7 @@ void BinaryStream::Pack(vector<T> &v)
 
 //-----------------------------------------------------------------------------
 template<typename T>
-void BinaryStream::UnPack(vector<T> &v)
+void BinaryStream::UnPack(std::vector<T> &v)
 {
   size_t vLen;
   this->UnPack(vLen);
@@ -285,13 +282,13 @@ void BinaryStream::UnPack(SharedArray<T> &v)
 
 //-----------------------------------------------------------------------------
 inline
-void BinaryStream::Pack(map<string,int> &m)
+void BinaryStream::Pack(std::map<std::string,int> &m)
 {
   size_t mLen=m.size();
   this->Pack(mLen);
 
-  map<string,int>::iterator it=m.begin();
-  map<string,int>::iterator end=m.end();
+  std::map<std::string,int>::iterator it=m.begin();
+  std::map<std::string,int>::iterator end=m.end();
   for (;it!=end; ++it)
     {
     this->Pack(it->first);
@@ -301,14 +298,14 @@ void BinaryStream::Pack(map<string,int> &m)
 
 //-----------------------------------------------------------------------------
 inline
-void BinaryStream::UnPack(map<string,int> &m)
+void BinaryStream::UnPack(std::map<std::string,int> &m)
 {
   size_t mLen=0;
   this->UnPack(mLen);
 
   for (size_t i=0; i<mLen; ++i)
     {
-    string key;
+    std::string key;
     this->UnPack(key);
     int val;
     this->UnPack(val);

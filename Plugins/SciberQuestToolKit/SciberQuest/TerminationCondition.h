@@ -15,7 +15,6 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #include <vector>
-using std::vector;
 
 class vtkPolyData;
 class vtkCellLocator;
@@ -145,12 +144,12 @@ private:
   void DomainToLocator(vtkCellLocator *cellLoc, double dom[6]);
 
 private:
-  CartesianBounds ProblemDomain;                 // simulation bounds
-  vtkCellLocator *PeriodicBCFaces[6];            // periodic faces
-  CartesianBounds WorkingDomain;                 // current data bounds
-  vector<vtkCellLocator*> TerminationSurfaces;   // map surfaces
-  vector<string> TerminationSurfaceNames;        // names used in the map legend
-  IntersectionSetColorMapper CMap;               // helper assigning classes
+  CartesianBounds ProblemDomain;                    // simulation bounds
+  vtkCellLocator *PeriodicBCFaces[6];               // periodic faces
+  CartesianBounds WorkingDomain;                    // current data bounds
+  std::vector<vtkCellLocator*> TerminationSurfaces; // map surfaces
+  std::vector<std::string> TerminationSurfaceNames; // names used in the map legend
+  IntersectionSetColorMapper CMap;                  // helper assigning classes
 };
 
 //-----------------------------------------------------------------------------
@@ -236,7 +235,7 @@ int TerminationCondition::OutsideProblemDomain(const double p0[3], double p1[3])
     else
       {
       // never supposed to happen
-      sqErrorMacro(cerr,"No intersection.");
+      sqErrorMacro(std::cerr,"No intersection.");
       }
     return 1;
     }

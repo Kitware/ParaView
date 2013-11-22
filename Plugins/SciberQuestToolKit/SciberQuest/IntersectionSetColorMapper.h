@@ -18,21 +18,10 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #include <vector>
-using std::vector;
-
 #include <algorithm>
-using std::min;
-using std::max;
-
-#include<iostream>
-using std::cerr;
-using std::endl;
-
-#include<string>
-using std::string;
-
-#include<sstream>
-using std::ostringstream;
+#include <iostream>
+#include <string>
+#include <sstream>
 
 #include "vtkIntArray.h"
 
@@ -51,7 +40,7 @@ public:
     {
     #ifdef SQTK_WITHOUT_MPI
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires MPI however it was built without MPI.");
     #endif
     };
@@ -78,16 +67,16 @@ public:
   /// if a the surfaceName vector is provided these are used in the
   /// legend.
   void BuildColorMap(int nSurfaces){
-    vector<string> names(nSurfaces);
+    std::vector<std::string> names(nSurfaces);
     for (int i=0; i<nSurfaces; ++i)
       {
-      ostringstream os;
+      std::ostringstream os;
       os << i;
       names[i]=os.str();
       }
     this->BuildColorMap(nSurfaces,names);
     }
-  void BuildColorMap(int nSurfaces, vector<string> &names){
+  void BuildColorMap(int nSurfaces, std::vector<std::string> &names){
     // Store the color values in the upper triangle of a nxn matrix.
     // Note that we only need n=sum_{i=1}^{n+1}i colors, but using the
     // matrix sinmplifies look ups.
@@ -103,13 +92,13 @@ public:
       for (int i=j; i<nSurfaces+1; ++i)
         {
         // set the color entry
-        int x=max(i,j);
-        int y=min(i,j);
+        int x=std::max(i,j);
+        int y=std::min(i,j);
         int idx=x+(nSurfaces+1)*y;
         this->Colors[idx]=color;
         ++color;
         // set its legend entry
-        ostringstream os;
+        std::ostringstream os;
         os << "(" << names[x] << ", " << names[y] << ")";
         this->ColorLegend[idx]=os.str();
         }
@@ -123,8 +112,8 @@ public:
     }
   /// Get color associated with 2 surfaces.
   int LookupColor(const int s1, const int s2){
-    int x=max(s1,s2);
-    int y=min(s1,s2);
+    int x=std::max(s1,s2);
+    int y=std::min(s1,s2);
     int idx=x+(this->NSurfaces+1)*y;
     this->ColorsUsed[idx]=1;
     return this->Colors[idx];
@@ -146,8 +135,8 @@ public:
       {
       for (int i=j; i<this->NSurfaces+1; ++i)
         {
-        int x=max(i,j);
-        int y=min(i,j);
+        int x=std::max(i,j);
+        int y=std::min(i,j);
         int idx=x+(this->NSurfaces+1)*y;
         int color=this->Colors[idx];
         int colorUsed=0;
@@ -157,7 +146,7 @@ public:
           // print the lengend.
           if (procId==0)
             {
-            cerr << this->ColorLegend[idx] << "->" << nUsed << endl;
+            std::cerr << this->ColorLegend[idx] << "->" << nUsed << std::endl;
             }
           for (vtkIdType q=0; q<nCells; ++q)
             {
@@ -183,8 +172,8 @@ public:
       {
       for (int i=j; i<this->NSurfaces+1; ++i)
         {
-        int x=max(i,j);
-        int y=min(i,j);
+        int x=std::max(i,j);
+        int y=std::min(i,j);
         int idx=x+(this->NSurfaces+1)*y;
         int colorUsed=0;
         MPI_Allreduce(&this->ColorsUsed[idx],&colorUsed,1,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
@@ -193,7 +182,7 @@ public:
           // print the lengend.
           if (procId==0)
             {
-            cerr << this->ColorLegend[idx] << "->" << this->Colors[idx] << endl;
+            std::cerr << this->ColorLegend[idx] << "->" << this->Colors[idx] << std::endl;
             }
           }
         }
@@ -214,11 +203,11 @@ public:
       {
       for (int i=j; i<this->NSurfaces+1; ++i)
         {
-        int x=max(i,j);
-        int y=min(i,j);
+        int x=std::max(i,j);
+        int y=std::min(i,j);
         int idx=x+(this->NSurfaces+1)*y;
         // print the lengend.
-        cerr << this->ColorLegend[idx] << "->" << this->Colors[idx] << endl;
+        std::cerr << this->ColorLegend[idx] << "->" << this->Colors[idx] << std::endl;
         }
       }
     #endif
@@ -226,9 +215,9 @@ public:
 
 private:
   int NSurfaces;
-  vector<int> Colors;
-  vector<int> ColorsUsed;
-  vector<string> ColorLegend;
+  std::vector<int> Colors;
+  std::vector<int> ColorsUsed;
+  std::vector<std::string> ColorLegend;
 };
 
 #endif

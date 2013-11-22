@@ -8,7 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "CartesianDataBlockIODescriptorIterator.h"
 
-ostream &operator<<(ostream &os, const CartesianDataBlockIODescriptorIterator &it)
+std::ostream &operator<<(std::ostream &os, const CartesianDataBlockIODescriptorIterator &it)
 {
   os << it.GetFileView() << " -> " << it.GetMemView();
   return os;

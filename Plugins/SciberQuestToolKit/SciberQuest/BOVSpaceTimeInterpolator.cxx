@@ -18,7 +18,7 @@ int BOVSpaceTimeInterpolator::Open(const char *file)
   // Determine which time steps are available.
   int nSteps=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
   const int *steps=this->Reader->GetMetaData()->GetTimeSteps();
-  vector<double> times(nSteps,0.0);
+  std::vector<double> times(nSteps,0.0);
   for (int i=0; i<nSteps; ++i)
     {
     times[i]=(double)steps[i]; // use the index rather than the actual.
@@ -272,7 +272,7 @@ int BOVSpaceTimeInterpolator::GetNumberOfTimeSteps()
 }
 
 //-----------------------------------------------------------------------------
-void BOVSpaceTimeInterpolator::GetTimeSteps(vector<double> &times)
+void BOVSpaceTimeInterpolator::GetTimeSteps(std::vector<double> &times)
 {
   int n=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
   times.resize(n);
@@ -596,7 +596,7 @@ int BOVSpaceTimeInterpolator::Interpolate(
             );
 
           default:
-            sqErrorMacro(cerr,"Unsupprted numeric type " << inArray->GetClassName()):
+            sqErrorMacro(std::cerr,"Unsupprted numeric type " << inArray->GetClassName()):
           }
         }
       }
@@ -677,7 +677,7 @@ int BOVSpaceTimeInterpolator::Interpolate(
             );
 
           default:
-            sqErrorMacro(cerr,"Unsupprted numeric type " << inArray->GetClassName()):
+            sqErrorMacro(std::cerr,"Unsupprted numeric type " << inArray->GetClassName()):
           }
         }
       }

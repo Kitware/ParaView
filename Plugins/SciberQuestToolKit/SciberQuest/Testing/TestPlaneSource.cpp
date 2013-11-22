@@ -17,10 +17,7 @@ Copyright 2012 SciberQuest Inc.
 #include "TestUtils.h"
 
 #include <iostream>
-using std::cerr;
-
 #include <string>
-using std::string;
 
 int main(int argc, char **argv)
 {
@@ -29,12 +26,12 @@ int main(int argc, char **argv)
   int worldSize=controller->GetNumberOfProcesses();
 
   // configure
-  string dataRoot;
-  string tempDir;
-  string baseline;
+  std::string dataRoot;
+  std::string tempDir;
+  std::string baseline;
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
-  string logFileName;
+  std::string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestPlaneSource.log");
   vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
   vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
@@ -87,7 +84,7 @@ int main(int argc, char **argv)
       vtkPolyData *output=dynamic_cast<vtkPolyData*>(pid->GetOutput());
 
       // rename resolution dependent arrays
-      ostringstream oss;
+      std::ostringstream oss;
       oss << "Decomp-" << decompName[j] << "-" << res[0] << "x" << res[1];
       vtkDataArray *ids=output->GetPointData()->GetArray("ProcessId");
       if (ids)

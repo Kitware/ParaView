@@ -185,8 +185,8 @@ float *BOVMetaData::SubsetCoordinate(int q, CartesianExtent &ext) const
 size_t BOVMetaData::GetNumberOfArrayFiles() const
 {
   size_t nFiles=0;
-  map<string,int>::const_iterator it=this->Arrays.begin();
-  map<string,int>::const_iterator end=this->Arrays.end();
+  std::map<std::string,int>::const_iterator it=this->Arrays.begin();
+  std::map<std::string,int>::const_iterator end=this->Arrays.end();
   for (;it!=end; ++it)
     {
     if (it->second&SCALAR_BIT)
@@ -215,7 +215,7 @@ size_t BOVMetaData::GetNumberOfArrayFiles() const
 //-----------------------------------------------------------------------------
 const char *BOVMetaData::GetArrayName(size_t i) const
 {
-  map<string,int>::const_iterator it=this->Arrays.begin();
+  std::map<std::string,int>::const_iterator it=this->Arrays.begin();
   while(i--) it++;
   return it->first.c_str();
 }
@@ -283,31 +283,31 @@ void BOVMetaData::UnPack(BinaryStream &is)
 }
 
 //-----------------------------------------------------------------------------
-void BOVMetaData::Print(ostream &os) const
+void BOVMetaData::Print(std::ostream &os) const
 {
   os
-    << "BOVMetaData: " << this << endl
-    << "\tMode: " << this->Mode << endl
-    << "\tIsOpen: " << this->IsOpen << endl
-    << "\tFileName: " << this->FileName << endl
-    << "\tPathToBricks: " << this->PathToBricks << endl
-    << "\tDomain: " << this->Domain << endl
-    << "\tSubset: " << this->Subset << endl
-    << "\tDecomp: " << this->Decomp << endl
-    << "\tArrays: " << this->Arrays << endl
-    << "\tTimeSteps: " << this->TimeSteps << endl
-    << "\tDataSetType: " << this->DataSetType << endl
-    << "\tOrigin: " << Tuple<double>(this->Origin,3) << endl
-    << "\tSpacing: " << Tuple<double>(this->Spacing,3) << endl
-    << "\tCoordinates: " << endl
-    << "\t\t" << *this->Coordinates[0] << endl
-    << "\t\t" << *this->Coordinates[1] << endl
-    << "\t\t" << *this->Coordinates[2] << endl
-    << endl;
+    << "BOVMetaData: " << this << std::endl
+    << "\tMode: " << this->Mode << std::endl
+    << "\tIsOpen: " << this->IsOpen << std::endl
+    << "\tFileName: " << this->FileName << std::endl
+    << "\tPathToBricks: " << this->PathToBricks << std::endl
+    << "\tDomain: " << this->Domain << std::endl
+    << "\tSubset: " << this->Subset << std::endl
+    << "\tDecomp: " << this->Decomp << std::endl
+    << "\tArrays: " << this->Arrays << std::endl
+    << "\tTimeSteps: " << this->TimeSteps << std::endl
+    << "\tDataSetType: " << this->DataSetType << std::endl
+    << "\tOrigin: " << Tuple<double>(this->Origin,3) << std::endl
+    << "\tSpacing: " << Tuple<double>(this->Spacing,3) << std::endl
+    << "\tCoordinates: " << std::endl
+    << "\t\t" << *this->Coordinates[0] << std::endl
+    << "\t\t" << *this->Coordinates[1] << std::endl
+    << "\t\t" << *this->Coordinates[2] << std::endl
+    << std::endl;
 }
 
 //-----------------------------------------------------------------------------
-ostream &operator<<(ostream &os, const BOVMetaData &md)
+std::ostream &operator<<(std::ostream &os, const BOVMetaData &md)
 {
   md.Print(os);
   return os;

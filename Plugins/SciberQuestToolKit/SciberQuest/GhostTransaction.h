@@ -19,13 +19,11 @@ typedef void * MPI_Comm;
 #else
 #include "SQMPICHWarningSupression.h"
 #include <mpi.h>
+#include "MPIRawArrayIO.hxx"
 #endif
 
 #include <sstream>
-using std::ostringstream;
-
 #include <vector>
-using std::vector;
 
 // #define GhostTransactionDEBUG
 
@@ -92,7 +90,7 @@ public:
         T *destData,
         bool pointData,
         int dimMode,
-        vector<MPI_Request> &req,
+        std::vector<MPI_Request> &req,
         int tag);
 
 private:
@@ -107,7 +105,7 @@ private:
   CartesianExtent IntExt;
 };
 
-ostream &operator<<(ostream &os, const GhostTransaction &gt);
+std::ostream &operator<<(std::ostream &os, const GhostTransaction &gt);
 
 //-----------------------------------------------------------------------------
 template<typename T>
@@ -119,7 +117,7 @@ int GhostTransaction::Execute(
        T *destData,
        bool pointData,
        int dimMode,
-       vector<MPI_Request> &req,
+       std::vector<MPI_Request> &req,
        int tag)
 {
   int iErr=0;
@@ -134,9 +132,9 @@ int GhostTransaction::Execute(
   (void)dimMode;
   (void)req;
   (void)tag;
-  sqErrorMacro(cerr,"Attempting to execute MPI code in a serial build.");
+  sqErrorMacro(std::cerr,"Attempting to execute MPI code in a serial build.");
   #else
-  ostringstream oss;
+  std::ostringstream oss;
 
   if (rank==this->SrcRank)
     {
@@ -144,8 +142,8 @@ int GhostTransaction::Execute(
     oss
       << this->Id << " "
       << rank << " sending " //  << this->IntExt
-      << " to " << this->DestRank << endl;
-    cerr << oss.str();
+      << " to " << this->DestRank << std::endl;
+    std::cerr << oss.str();
     #endif
 
     // sender
@@ -187,8 +185,8 @@ int GhostTransaction::Execute(
 
     #ifdef GhostTransactionDEBUG
     oss.str("");
-    oss << this->Id << " " << rank << " ok." << endl;
-    cerr << oss.str();
+    oss << this->Id << " " << rank << " ok." << std::endl;
+    std::cerr << oss.str();
     #endif
     }
   else
@@ -198,8 +196,8 @@ int GhostTransaction::Execute(
     oss
       << this->Id << " "
       << rank << " receiving " // << this->IntExt
-      << " from " << this->SrcRank << endl;
-    cerr << oss.str();
+      << " from " << this->SrcRank << std::endl;
+    std::cerr << oss.str();
     #endif
 
     // reciever
@@ -241,8 +239,8 @@ int GhostTransaction::Execute(
 
     #ifdef GhostTransactionDEBUG
     oss.str("");
-    oss << this->Id << " " << rank << " ok." << endl;
-    cerr << oss.str();
+    oss << this->Id << " " << rank << " ok." << std::endl;
+    std::cerr << oss.str();
     #endif
     }
   #endif

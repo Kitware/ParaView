@@ -11,15 +11,11 @@ Copyright 2012 SciberQuest Inc.
 #define __Tuple_h
 
 #include <vector>
-using std::vector;
-
 #include <iostream>
-using std::ostream;
-using std::endl;
 
 template <typename T> class Tuple;
 template<typename T>
-ostream &operator<<(ostream &os, const Tuple<T> &t);
+std::ostream &operator<<(std::ostream &os, const Tuple<T> &t);
 
 /// Class to handle printing of Tuples commmonly used in VTK.
 template<typename T>
@@ -30,7 +26,7 @@ public:
   Tuple(T t1, T t2, T t3);
   Tuple(T t1 ,T t2, T t3, T t4, T t5, T t6);
   Tuple(const T *t, int n);
-  Tuple(vector<T> &v);
+  Tuple(std::vector<T> &v);
   ~Tuple();
 
   const Tuple &operator=(const Tuple &rhs);
@@ -39,7 +35,7 @@ private:
   Tuple(); // not implemented
   void Initialize(const T *t, int n);
 
-  friend ostream &operator<< <> (ostream &os, const Tuple<T> &t);
+  friend std::ostream &operator<< <> (std::ostream &os, const Tuple<T> &t);
 
 private:
   int Size;
@@ -87,7 +83,7 @@ Tuple<T>::Tuple(T t1 ,T t2, T t3, T t4, T t5, T t6)
 
 //-----------------------------------------------------------------------------
 template<typename T>
-Tuple<T>::Tuple(vector<T> &v)
+Tuple<T>::Tuple(std::vector<T> &v)
       :
   Size(0),
   Data(0)
@@ -137,7 +133,7 @@ const Tuple<T> & Tuple<T>::operator=(const Tuple<T> &rhs)
 
 //-----------------------------------------------------------------------------
 template<typename T>
-ostream &operator<<(ostream &os, const Tuple<T> &t)
+std::ostream &operator<<(std::ostream &os, const Tuple<T> &t)
 {
   os << "(";
   if (t.Size)

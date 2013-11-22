@@ -11,9 +11,7 @@ Copyright 2012 SciberQuest Inc.
 #define __vtkSQKernelConvolution_h
 
 #include <set>
-using std::set;
 #include <string>
-using std::string;
 
 #include "vtkSciberQuestModule.h"
 #include "vtkDataSetAlgorithm.h"
@@ -167,8 +165,8 @@ private:
   int HostSize;
   int HostRank;
   //
-  set<string> InputArrays;
-  set<string> ArraysToCopy;
+  std::set<std::string> InputArrays;
+  std::set<std::string> ArraysToCopy;
   int ComputeResidual;
   //
   int KernelWidth;

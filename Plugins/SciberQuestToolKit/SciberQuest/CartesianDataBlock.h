@@ -10,7 +10,6 @@ Copyright 2012 SciberQuest Inc.
 #define __CartesianDataBlock_h
 
 #include <iostream>
-using std::ostream;
 
 #include "CartesianExtent.h"
 #include "CartesianBounds.h"
@@ -102,7 +101,7 @@ private:
   CartesianDataBlock(CartesianDataBlock &other);
   void operator=(CartesianDataBlock &other);
 
-  friend ostream &operator<<(ostream &os, CartesianDataBlock &b);
+  friend std::ostream &operator<<(std::ostream &os, CartesianDataBlock &b);
 
 private:
   int Id[4];
@@ -111,6 +110,6 @@ private:
   vtkDataSet *Data;
 };
 
-ostream &operator<<(ostream &os, CartesianDataBlock &b);
+std::ostream &operator<<(std::ostream &os, CartesianDataBlock &b);
 
 #endif

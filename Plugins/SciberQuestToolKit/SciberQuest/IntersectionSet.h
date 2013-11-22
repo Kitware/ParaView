@@ -20,7 +20,6 @@ typedef void * MPI_Datatype;
 #endif
 
 #include <string>
-using std::string;
 
 /**
 /// Data associated with a stream line surface intersection set.
@@ -45,7 +44,7 @@ public:
     {
     #ifdef SQTK_WITHOUT_MPI
     sqErrorMacro(
-      cerr,
+      std::cerr,
       "This class requires MPI however it was built without MPI.");
     #endif
     }
@@ -62,7 +61,7 @@ public:
     {
     #ifdef SQTK_WITHOUT_MPI
     sqErrorMacro(
-      cerr,
+      std::cerr,
       "This class requires MPI however it was built without MPI.");
     #endif
     }
@@ -77,7 +76,7 @@ public:
   int CommitType(MPI_Datatype *classType);
 
   /// Print the object state to a string.
-  string Print();
+  std::string Print();
 
 public:
   int seedPointId;
@@ -153,7 +152,7 @@ public:
   int AllReduce();
 
   /// Print object state into a string.
-  string Print();
+  std::string Print();
 
 private:
   /// Reduce in place.

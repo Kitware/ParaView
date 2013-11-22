@@ -30,16 +30,11 @@ Copyright 2012 SciberQuest Inc.
 #include "LogBuffer.h" // for LogBuffer
 
 #include <vector> // for vector
-using std::vector;
 #include <string> // for string
-using std::string;
 #include <sstream> // for sstream
-using std::ostringstream;
 
 #if vtkSQLogDEBUG > 0
 #include <iostream> // for cerr
-using std::cerr;
-using std::endl;
 #endif
 //ETX
 
@@ -108,7 +103,7 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   //BTX
-  void SetFileName(const string &fileName){ this->SetFileName(fileName.c_str()); }
+  void SetFileName(const std::string &fileName){ this->SetFileName(fileName.c_str()); }
   //ETX
 
   // Description:
@@ -196,9 +191,9 @@ private:
   int WriterRank;
   char *FileName;
   int WriteOnClose;
-  vector<double> StartTime;
+  std::vector<double> StartTime;
   #if vtkSQLogDEBUG < 0
-  vector<string> EventId;
+  std::vector<std::string> EventId;
   #endif
 
   LogBuffer *Log;
@@ -206,7 +201,7 @@ private:
   static vtkSQLog *GlobalInstance;
   static vtkSQLogDestructor GlobalInstanceDestructor;
 
-  ostringstream HeaderBuffer;
+  std::ostringstream HeaderBuffer;
 
   friend class LogHeaderType;
   friend class LogBodyType;
@@ -221,7 +216,7 @@ vtkSQLog &vtkSQLog::operator<<(const T& s)
     {
     this->HeaderBuffer << s;
     #if vtkSQLogDEBUG > 0
-    cerr << s;
+    std::cerr << s;
     #endif
     }
   return *this;
@@ -237,7 +232,7 @@ LogHeaderType &LogHeaderType::operator<<(const T& s)
     {
     log->HeaderBuffer << s;
     #if vtkSQLogDEBUG > 0
-    cerr << s;
+    std::cerr << s;
     #endif
     }
 
@@ -252,7 +247,7 @@ LogBodyType &LogBodyType::operator<<(const T& s)
 
   *(log->Log) <<  s;
   #if vtkSQLogDEBUG > 0
-  cerr << s;
+  std::cerr << s;
   #endif
 
   return *this;

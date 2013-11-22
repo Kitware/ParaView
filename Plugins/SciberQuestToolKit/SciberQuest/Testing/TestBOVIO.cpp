@@ -21,9 +21,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkTesting.h"
 #include "TestUtils.h"
 #include <iostream>
-using std::cerr;
 #include <string>
-using std::string;
 
 int main(int argc, char **argv)
 {
@@ -35,18 +33,18 @@ int main(int argc, char **argv)
   int worldSize=controller->GetNumberOfProcesses();
 
   // configure
-  string dataRoot;
-  string tempDir;
-  string baseline;
+  std::string dataRoot;
+  std::string tempDir;
+  std::string baseline;
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
-  string inputFileName;
+  std::string inputFileName;
   inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/Asym2D/Asym2D.bov");
 
-  string tempOutputFileName;
+  std::string tempOutputFileName;
   tempOutputFileName=NativePath(tempDir+"/SciberQuestToolKit-Asym2D.bov");
 
-  string logFileName;
+  std::string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestBOVIO.log");
   vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
   vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);

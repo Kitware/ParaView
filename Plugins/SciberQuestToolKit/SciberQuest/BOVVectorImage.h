@@ -12,14 +12,8 @@ Copyright 2012 SciberQuest Inc.
 #include "BOVScalarImage.h"
 
 #include <iostream>
-using std::ostream;
-using std::endl;
-
 #include <vector>
-using std::vector;
-
 #include <string>
-using std::string;
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Comm;
@@ -58,15 +52,15 @@ public:
   const char *GetName() const { return this->Name.c_str(); }
 
 private:
-  string Name;
-  vector<BOVScalarImage *> ComponentFiles;
+  std::string Name;
+  std::vector<BOVScalarImage *> ComponentFiles;
 
 private:
-  friend ostream &operator<<(ostream &os, const BOVVectorImage &si);
+  friend std::ostream &operator<<(std::ostream &os, const BOVVectorImage &si);
   const BOVVectorImage &operator=(const BOVVectorImage &other);
   BOVVectorImage(const BOVVectorImage &other);
 };
 
-ostream &operator<<(ostream &os, const BOVVectorImage &vi);
+std::ostream &operator<<(std::ostream &os, const BOVVectorImage &vi);
 
 #endif

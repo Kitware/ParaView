@@ -30,10 +30,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkPVXMLElement.h"
 
 #include <string>
-using std::string;
-
 #include <utility>
-using std::pair;
 
 #include "Numerics.hxx"
 
@@ -65,7 +62,7 @@ vtkSQVortexFilter::vtkSQVortexFilter()
 
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::vtkSQVortexFilter" << endl;
+  pCerr() << "=====vtkSQVortexFilter::vtkSQVortexFilter" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -76,7 +73,7 @@ vtkSQVortexFilter::vtkSQVortexFilter()
 vtkSQVortexFilter::~vtkSQVortexFilter()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::~vtkSQVortexFilter" << endl;
+  pCerr() << "=====vtkSQVortexFilter::~vtkSQVortexFilter" << std::endl;
   #endif
 }
 
@@ -84,7 +81,7 @@ vtkSQVortexFilter::~vtkSQVortexFilter()
 int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::Initialize" << endl;
+  pCerr() << "=====vtkSQVortexFilter::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=GetRequiredElement(root,"vtkSQVortexFilter");
@@ -160,8 +157,8 @@ int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
       << "#   computeGradient=" << this->ComputeGradient << "\n"
       << "#   arraysToCopy=";
 
-    set<string>::iterator it=this->ArraysToCopy.begin();
-    set<string>::iterator end=this->ArraysToCopy.end();
+    std::set<std::string>::iterator it=this->ArraysToCopy.begin();
+    std::set<std::string>::iterator end=this->ArraysToCopy.end();
     for (; it!=end; ++it)
       {
       log->GetHeader() << " " << *it;
@@ -178,7 +175,7 @@ void vtkSQVortexFilter::AddInputArray(const char *name)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQVortexFilter::AddInputArray"
-    << "name=" << name << endl;
+    << "name=" << name << std::endl;
   #endif
 
   if (this->InputArrays.insert(name).second)
@@ -192,7 +189,7 @@ void vtkSQVortexFilter::ClearInputArrays()
 {
   #ifdef SQTK_DEBUG
   pCerr()
-    << "=====vtkSQVortexFilter::ClearInputArrays" << endl;
+    << "=====vtkSQVortexFilter::ClearInputArrays" << std::endl;
   #endif
 
   if (this->InputArrays.size())
@@ -207,8 +204,8 @@ void vtkSQVortexFilter::AddArrayToCopy(const char *name)
 {
   #ifdef SQTK_DEBUG
   pCerr()
-    << "=====vtkSQVortexFilter::ArraysToCopy" << endl
-    << "name=" << name << endl;
+    << "=====vtkSQVortexFilter::ArraysToCopy" << std::endl
+    << "name=" << name << std::endl;
   #endif
 
   if (this->ArraysToCopy.insert(name).second)
@@ -221,7 +218,7 @@ void vtkSQVortexFilter::AddArrayToCopy(const char *name)
 void vtkSQVortexFilter::ClearArraysToCopy()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::ClearArraysToCopy" << endl;
+  pCerr() << "=====vtkSQVortexFilter::ClearArraysToCopy" << std::endl;
   #endif
 
   if (this->ArraysToCopy.size())
@@ -238,7 +235,7 @@ int vtkSQVortexFilter::RequestDataObject(
     vtkInformationVector* outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::RequestDataObject" << endl;
+  pCerr() << "=====vtkSQVortexFilter::RequestDataObject" << std::endl;
   #endif
 
   (void)request;
@@ -268,7 +265,7 @@ int vtkSQVortexFilter::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::RequestInformation" << endl;
+  pCerr() << "=====vtkSQVortexFilter::RequestInformation" << std::endl;
   #endif
 
   (void)req;
@@ -316,11 +313,11 @@ int vtkSQVortexFilter::RequestInformation(
 
   #ifdef SQTK_DEBUG
   pCerr()
-    << "WHOLE_EXTENT(input)=" << inputDomain << endl
-    << "WHOLE_EXTENT(output)=" << outputDomain << endl
-    << "ORIGIN=" << Tuple<double>(X0,3) << endl
-    << "SPACING=" << Tuple<double>(dX,3) << endl
-    << "nGhost=" << nGhosts << endl;
+    << "WHOLE_EXTENT(input)=" << inputDomain << std::endl
+    << "WHOLE_EXTENT(output)=" << outputDomain << std::endl
+    << "ORIGIN=" << Tuple<double>(X0,3) << std::endl
+    << "SPACING=" << Tuple<double>(dX,3) << std::endl
+    << "nGhost=" << nGhosts << std::endl;
   #endif
 
   return 1;
@@ -333,7 +330,7 @@ int vtkSQVortexFilter::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::RequestUpdateExtent" << endl;
+  pCerr() << "=====vtkSQVortexFilter::RequestUpdateExtent" << std::endl;
   #endif
 
   (void)req;
@@ -385,9 +382,9 @@ int vtkSQVortexFilter::RequestUpdateExtent(
 
   #ifdef SQTK_DEBUG
   pCerr()
-    << "WHOLE_EXTENT=" << wholeExt << endl
-    << "UPDATE_EXTENT=" << outputExt << endl
-    << "nGhosts=" << nGhosts << endl;
+    << "WHOLE_EXTENT=" << wholeExt << std::endl
+    << "UPDATE_EXTENT=" << outputExt << std::endl
+    << "nGhosts=" << nGhosts << std::endl;
   #endif
 
   return 1;
@@ -400,7 +397,7 @@ int vtkSQVortexFilter::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::RequestData" << endl;
+  pCerr() << "=====vtkSQVortexFilter::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -493,12 +490,12 @@ int vtkSQVortexFilter::RequestData(
 
     #ifdef SQTK_DEBUG
     pCerr()
-      << "WHOLE_EXTENT=" << domainExt << endl
-      << "UPDATE_EXTENT(input)=" << inputExt << endl
-      << "UPDATE_EXTENT(output)=" << outputExt << endl
-      << "ORIGIN" << Tuple<double>(X0,3) << endl
-      << "SPACING" << Tuple<double>(dX,3) << endl
-      << endl;
+      << "WHOLE_EXTENT=" << domainExt << std::endl
+      << "UPDATE_EXTENT(input)=" << inputExt << std::endl
+      << "UPDATE_EXTENT(output)=" << outputExt << std::endl
+      << "ORIGIN" << Tuple<double>(X0,3) << std::endl
+      << "SPACING" << Tuple<double>(dX,3) << std::endl
+      << std::endl;
     #endif
 
 
@@ -508,9 +505,9 @@ int vtkSQVortexFilter::RequestData(
       {
       log->StartEvent("vtkSQVortexFilter::PassInput");
       }
-    set<string>::iterator it;
-    set<string>::iterator begin=this->ArraysToCopy.begin();
-    set<string>::iterator end=this->ArraysToCopy.end();
+    std::set<std::string>::iterator it;
+    std::set<std::string>::iterator begin=this->ArraysToCopy.begin();
+    std::set<std::string>::iterator end=this->ArraysToCopy.end();
     for (it=begin; it!=end; ++it)
       {
       vtkDataArray *M=inImData->GetPointData()->GetArray((*it).c_str());
@@ -575,7 +572,7 @@ int vtkSQVortexFilter::RequestData(
           {
           log->StartEvent("vtkSQVortexFilter::Rotation");
           }
-        string name;
+        std::string name;
 
         vtkDataArray *Rx=V->NewInstance();
         Rx->SetNumberOfComponents(1);
@@ -665,7 +662,7 @@ int vtkSQVortexFilter::RequestData(
         H->Delete();
         H->SetNumberOfComponents(1);
         H->SetNumberOfTuples(outputTups);
-        string name("hel-");
+        std::string name("hel-");
         name+=V->GetName();
         H->SetName(name.c_str());
         //
@@ -703,7 +700,7 @@ int vtkSQVortexFilter::RequestData(
         HN->Delete();
         HN->SetNumberOfComponents(1);
         HN->SetNumberOfTuples(outputTups);
-        string name("norm-hel-");
+        std::string name("norm-hel-");
         name+=V->GetName();
         HN->SetName(name.c_str());
         //
@@ -740,7 +737,7 @@ int vtkSQVortexFilter::RequestData(
         Q->Delete();
         Q->SetNumberOfComponents(1);
         Q->SetNumberOfTuples(outputTups);
-        string name("q-");
+        std::string name("q-");
         name+=V->GetName();
         Q->SetName(name.c_str());
         //
@@ -777,7 +774,7 @@ int vtkSQVortexFilter::RequestData(
         L->Delete();
         L->SetNumberOfComponents(3);
         L->SetNumberOfTuples(outputTups);
-        string name("lam-");
+        std::string name("lam-");
         name+=V->GetName();
         L->SetName(name.c_str());
         //
@@ -814,7 +811,7 @@ int vtkSQVortexFilter::RequestData(
         L2->Delete();
         L2->SetNumberOfComponents(1);
         L2->SetNumberOfTuples(outputTups);
-        string name("lam2-");
+        std::string name("lam2-");
         name+=V->GetName();
         L2->SetName(name.c_str());
         //
@@ -851,7 +848,7 @@ int vtkSQVortexFilter::RequestData(
         D->Delete();
         D->SetNumberOfComponents(1);
         D->SetNumberOfTuples(outputTups);
-        string name("div-");
+        std::string name("div-");
         name+=V->GetName();
         D->SetName(name.c_str());
         //
@@ -883,7 +880,7 @@ int vtkSQVortexFilter::RequestData(
           {
           log->StartEvent("vtkSQVortexFilter::Gradient");
           }
-        string name;
+        std::string name;
 
         vtkDataArray *Gxx=V->NewInstance();
         Gxx->SetNumberOfComponents(1);
@@ -1049,7 +1046,7 @@ int vtkSQVortexFilter::RequestData(
         D->Delete();
         D->SetNumberOfComponents(1);
         D->SetNumberOfTuples(outputTups);
-        string name("eigen-diag-");
+        std::string name("eigen-diag-");
         name+=V->GetName();
         D->SetName(name.c_str());
         //
@@ -1081,7 +1078,7 @@ int vtkSQVortexFilter::RequestData(
           {
           log->StartEvent("vtkSQVortexFilter::GradientDiagnostic");
           }
-        string name;
+        std::string name;
 
         vtkDataArray *Gxx=V->NewInstance();
         Gxx->SetNumberOfComponents(1);
@@ -1261,7 +1258,7 @@ int vtkSQVortexFilter::RequestData(
         vtkDataArray *mda=da->NewInstance();
         size_t daNt=da->GetNumberOfTuples();
         mda->SetNumberOfTuples(daNt);
-        string name="mag-";
+        std::string name="mag-";
         name+=da->GetName();
         mda->SetName(name.c_str());
         outImData->GetPointData()->AddArray(mda);
@@ -1285,7 +1282,7 @@ int vtkSQVortexFilter::RequestData(
         log->EndEvent("vtkSQVortexFilter::ResultMagnitude");
         }
       }
-    // outImData->Print(cerr);
+    // outImData->Print(std::cerr);
     }
   else
   if (isRecti)
@@ -1305,7 +1302,7 @@ int vtkSQVortexFilter::RequestData(
 void vtkSQVortexFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQVortexFilter::PrintSelf" << endl;
+  pCerr() << "=====vtkSQVortexFilter::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

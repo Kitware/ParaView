@@ -10,12 +10,8 @@ Copyright 2012 SciberQuest Inc.
 #define __CartesianBounds_h
 
 #include <algorithm>
-using std::min;
-using std::max;
-
-#include <cmath>
 #include <iostream>
-using std::ostream;
+#include <cmath>
 
 /// Represnetation of a cartesian volume.
 /**
@@ -132,7 +128,7 @@ private:
   double Data[6];
 };
 
-ostream &operator<<(ostream &os,const CartesianBounds &bounds);
+std::ostream &operator<<(std::ostream &os,const CartesianBounds &bounds);
 
 class vtkUnstructuredGrid;
 vtkUnstructuredGrid &operator<<(vtkUnstructuredGrid &, const CartesianBounds &bounds);
@@ -318,12 +314,12 @@ void CartesianBounds::operator&=(const CartesianBounds &other)
     return;
     }
 
-  this->Data[0]=max(this->Data[0],other.Data[0]);
-  this->Data[1]=min(this->Data[1],other.Data[1]);
-  this->Data[2]=max(this->Data[2],other.Data[2]);
-  this->Data[3]=min(this->Data[3],other.Data[3]);
-  this->Data[4]=max(this->Data[4],other.Data[4]);
-  this->Data[5]=min(this->Data[5],other.Data[5]);
+  this->Data[0]=std::max(this->Data[0],other.Data[0]);
+  this->Data[1]=std::min(this->Data[1],other.Data[1]);
+  this->Data[2]=std::max(this->Data[2],other.Data[2]);
+  this->Data[3]=std::min(this->Data[3],other.Data[3]);
+  this->Data[4]=std::max(this->Data[4],other.Data[4]);
+  this->Data[5]=std::min(this->Data[5],other.Data[5]);
 }
 
 //-----------------------------------------------------------------------------
@@ -357,8 +353,8 @@ void CartesianBounds::ShrinkScaledEpsilon()
     double eps=((i%2)==0?1.0E-15:-1.0E-15);
     if (this->Data[i]>1.0)
         {
-        int s=(int)log10(this->Data[i]);
-        eps*=pow(10.0,s);
+        int s=(int)std::log10(this->Data[i]);
+        eps*=std::pow(10.0,s);
         }
     this->Data[i]=this->Data[i]+eps;
     }

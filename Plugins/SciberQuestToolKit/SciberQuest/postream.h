@@ -10,12 +10,10 @@ Copyright 2012 SciberQuest Inc.
 #define __pOstream_h
 
 #include <iostream>
-using std::ostream;
-using std::cerr;
 
 /**
 Helper that prints rank of caller and returns cerr.
 */
-ostream &pCerr();
+std::ostream &pCerr();
 
 #endif

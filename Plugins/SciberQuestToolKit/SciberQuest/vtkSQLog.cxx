@@ -46,8 +46,6 @@ int gettimeofday(struct timeval *tv, void *)
 #endif
 
 #include <fstream>
-using std::ofstream;
-using std::ios_base;
 
 #ifndef SQTK_WITHOUT_MPI
 #include "SQMPICHWarningSupression.h"
@@ -84,7 +82,7 @@ vtkSQLog::vtkSQLog()
     Log(0)
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::vtkSQLog" << endl;
+  pCerr() << "=====vtkSQLog::vtkSQLog" << std::endl;
   #endif
 
   #ifndef SQTK_WITHOUT_MPI
@@ -106,7 +104,7 @@ vtkSQLog::vtkSQLog()
 vtkSQLog::~vtkSQLog()
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::~vtkSQLog" << endl;
+  pCerr() << "=====vtkSQLog::~vtkSQLog" << std::endl;
   #endif
 
   // Alert the user that he left events on the stack,
@@ -130,7 +128,7 @@ vtkSQLog::~vtkSQLog()
       << nIds << " remaining.");
     for (size_t i=0; i<nIds; ++i)
       {
-      pCerr() << "EventId[" << i << "]=" << this->EventId[i] << endl;
+      pCerr() << "EventId[" << i << "]=" << this->EventId[i] << std::endl;
       }
     }
   #endif
@@ -144,13 +142,13 @@ vtkSQLog::~vtkSQLog()
 vtkSQLog *vtkSQLog::GetGlobalInstance()
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::GetGlobalInstance" << endl;
+  pCerr() << "=====vtkSQLog::GetGlobalInstance" << std::endl;
   #endif
 
   if (vtkSQLog::GlobalInstance==0)
     {
     vtkSQLog *log=vtkSQLog::New();
-    ostringstream oss;
+    std::ostringstream oss;
     oss << getpid() << ".log";
     log->SetFileName(oss.str().c_str());
 
@@ -164,7 +162,7 @@ vtkSQLog *vtkSQLog::GetGlobalInstance()
 void vtkSQLog::DeleteGlobalInstance()
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::GetGlobalInstance" << endl;
+  pCerr() << "=====vtkSQLog::GetGlobalInstance" << std::endl;
   #endif
 
   if (vtkSQLog::GlobalInstance)
@@ -178,7 +176,7 @@ void vtkSQLog::DeleteGlobalInstance()
 void vtkSQLog::Clear()
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::Clear" << endl;
+  pCerr() << "=====vtkSQLog::Clear" << std::endl;
   #endif
 
   this->Log->Clear();
@@ -189,7 +187,7 @@ void vtkSQLog::Clear()
 int vtkSQLog::Initialize(vtkPVXMLElement *root)
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::Initialize" << endl;
+  pCerr() << "=====vtkSQLog::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -203,8 +201,8 @@ int vtkSQLog::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"global_level",&global_level);
   this->SetGlobalLevel(global_level);
 
-  string file_name;
-  GetOptionalAttribute<string,1>(elem,"file_name",&file_name);
+  std::string file_name;
+  GetOptionalAttribute<std::string,1>(elem,"file_name",&file_name);
   if (file_name.size()>0)
     {
     this->SetFileName(file_name.c_str());
@@ -225,7 +223,7 @@ int vtkSQLog::Initialize(vtkPVXMLElement *root)
 void vtkSQLog::StartEvent(int rank, const char *event)
 {
   #if vtkSQLogDEBUG > 1
-  //pCerr() << "=====vtkSQLog::StartEvent" << endl;
+  //pCerr() << "=====vtkSQLog::StartEvent" << std::endl;
   #endif
 
   if (this->WorldRank!=rank) return;
@@ -236,7 +234,7 @@ void vtkSQLog::StartEvent(int rank, const char *event)
 void vtkSQLog::StartEvent(const char *event)
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::StartEvent" << endl;
+  pCerr() << "=====vtkSQLog::StartEvent" << std::endl;
   #endif
 
   double walls=0.0;
@@ -255,7 +253,7 @@ void vtkSQLog::StartEvent(const char *event)
 void vtkSQLog::EndEvent(int rank, const char *event)
 {
   #if vtkSQLogDEBUG > 1
-  //pCerr() << "=====vtkSQLog::EndEvent" << endl;
+  //pCerr() << "=====vtkSQLog::EndEvent" << std::endl;
   #endif
 
   if (this->WorldRank!=rank) return;
@@ -266,7 +264,7 @@ void vtkSQLog::EndEvent(int rank, const char *event)
 void vtkSQLog::EndEvent(const char *event)
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::EndEvent" << endl;
+  pCerr() << "=====vtkSQLog::EndEvent" << std::endl;
   #endif
 
   double walle=0.0;
@@ -294,8 +292,8 @@ void vtkSQLog::EndEvent(const char *event)
     << "\n";
 
   #if vtkSQLogDEBUG < 0
-  const string &sEventId=this->EventId.back();
-  const string eEventId=event;
+  const std::string &sEventId=this->EventId.back();
+  const std::string eEventId=event;
   if (sEventId!=eEventId)
     {
     sqErrorMacro(
@@ -311,7 +309,7 @@ void vtkSQLog::EndEvent(const char *event)
 void vtkSQLog::EndEventSynch(int rank, const char *event)
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::EndEventSynch" << endl;
+  pCerr() << "=====vtkSQLog::EndEventSynch" << std::endl;
   #endif
 
   #ifdef SQTK_WITHOUT_MPI
@@ -327,7 +325,7 @@ void vtkSQLog::EndEventSynch(int rank, const char *event)
 void vtkSQLog::EndEventSynch(const char *event)
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::EndEventSynch" << endl;
+  pCerr() << "=====vtkSQLog::EndEventSynch" << std::endl;
   #endif
 
   #ifndef SQTK_WITHOUT_MPI
@@ -340,7 +338,7 @@ void vtkSQLog::EndEventSynch(const char *event)
 void vtkSQLog::Update()
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::Update" << endl;
+  pCerr() << "=====vtkSQLog::Update" << std::endl;
   #endif
 
   this->Log->Gather(
@@ -353,16 +351,16 @@ void vtkSQLog::Update()
 int vtkSQLog::Write()
 {
   #if vtkSQLogDEBUG > 1
-  pCerr() << "=====vtkSQLog::Write" << endl;
+  pCerr() << "=====vtkSQLog::Write" << std::endl;
   #endif
 
   if (this->WorldRank==this->WriterRank)
     {
-    cerr << "Wrote " << this->FileName << endl;
+    std::cerr << "Wrote " << this->FileName << std::endl;
 
-    ostringstream oss;
+    std::ostringstream oss;
     *this->Log >> oss;
-    ofstream f(this->FileName, ios_base::out|ios_base::app);
+    std::ofstream f(this->FileName, std::ios_base::out|std::ios_base::app);
     if (!f.good())
       {
       sqErrorMacro(
@@ -381,7 +379,7 @@ int vtkSQLog::Write()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSQLog::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSQLog::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   time_t t;
   time(&t);
@@ -390,7 +388,7 @@ void vtkSQLog::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << this->HeaderBuffer.str();
     }
-  ostringstream oss;
+  std::ostringstream oss;
   *this->Log >> oss;
   os << oss.str();
 }

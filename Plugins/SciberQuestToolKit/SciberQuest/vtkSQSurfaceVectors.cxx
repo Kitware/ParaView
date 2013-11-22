@@ -27,10 +27,7 @@
 #include "vtkCellType.h"
 
 #include <vector>
-using std::vector;
-
 #include <sstream>
-using std::ostringstream;
 
 
 //*****************************************************************************
@@ -129,7 +126,7 @@ int vtkSQSurfaceVectors::RequestData(
   output->ShallowCopy(input);
 
   // locate all available vectors
-  vector<vtkDataArray *>vectors;
+  std::vector<vtkDataArray *>vectors;
   int nArrays=input->GetPointData()->GetNumberOfArrays();
   for (int i=0; i<nArrays; ++i)
     {
@@ -159,7 +156,7 @@ int vtkSQSurfaceVectors::RequestData(
       progRep+=0.1;
       }
 
-    ostringstream os;
+    std::ostringstream os;
 
     vtkDataArray *proj=vectors[i]->NewInstance();
     proj->SetNumberOfComponents(3);

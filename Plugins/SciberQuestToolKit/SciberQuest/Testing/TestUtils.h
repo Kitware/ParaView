@@ -17,7 +17,6 @@ class vtkActor;
 class vtkAlgorithm;
 class vtkStreamingDemandDrivenPipeline;
 #include <string>
-using std::string;
 
 /**
 Initialize MPI and the pipeline.
@@ -32,7 +31,7 @@ int Finalize(vtkMultiProcessController* controller, int code);
 /**
 Broadcast the string.
 */
-void Broadcast(vtkMultiProcessController *controller, string &s, int root=0);
+void Broadcast(vtkMultiProcessController *controller, std::string &s, int root=0);
 
 /**
 Broadcast the test configuration.
@@ -41,9 +40,9 @@ void BroadcastConfiguration(
       vtkMultiProcessController *controller,
       int argc,
       char **argv,
-      string &dataRoot,
-      string &tempDir,
-      string &baseline);
+      std::string &dataRoot,
+      std::string &tempDir,
+      std::string &baseline);
 
 /**
 Gather polydata.
@@ -61,9 +60,9 @@ int SerialRender(
     vtkMultiProcessController *controller,
     vtkPolyData *data,
     bool showBounds,
-    string &tempDir,
-    string &baseline,
-    string testName,
+    std::string &tempDir,
+    std::string &baseline,
+    std::string testName,
     int iwx,
     int iwy,
     double px,
@@ -104,6 +103,6 @@ vtkActor *MapArrayToActor(
 /**
 Convert unix to windows paths on windows.
 */
-string NativePath(string path);
+std::string NativePath(std::string path);
 
 #endif

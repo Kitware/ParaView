@@ -17,7 +17,6 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkDataArray.h"
 
 #include <iostream>
-using std::cerr;
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -286,16 +285,16 @@ int CUDAGlobalMemoryManager<T>::NewDeviceBlock(
   ierr=cudaMallocPitch(&this->DeviceBlock,&pitch,ni*sizeof(T),nj);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"NewDeviceBlock failed");
+    CUDAErrorMacro(std::cerr,ierr,"NewDeviceBlock failed");
     return -1;
     }
   this->Pitch=pitch;
 
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Allocated " << this->DeviceBlock << ", " << ni << "-x-" << nj
     << " bytes on the device. Pitch=" << pitch
-    << endl;
+    << std::endl;
   #endif
   return 0;
 }
@@ -310,14 +309,14 @@ int CUDAGlobalMemoryManager<T>::NewDeviceBlock(unsigned long n)
   ierr=cudaMalloc(&this->DeviceBlock,n);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"NewDeviceBlock failed");
+    CUDAErrorMacro(std::cerr,ierr,"NewDeviceBlock failed");
     return -1;
     }
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Allocated " << this->DeviceBlock << ", " << n
     << " bytes on the device"
-    << endl;
+    << std::endl;
   #endif
   return 0;
 }
@@ -329,7 +328,7 @@ int CUDAGlobalMemoryManager<T>::DeleteDeviceBlock()
   if (this->DeviceBlock)
     {
     #ifdef CUDAMemoryManagerDEBUG
-    cerr << "Deleted " << this->DeviceBlock << endl;
+    std::cerr << "Deleted " << this->DeviceBlock << std::endl;
     #endif
     cudaFree(this->DeviceBlock);
     this->DeviceBlock=0;
@@ -371,10 +370,10 @@ int CUDAGlobalMemoryManager<T>::Push(T *hostBlock, unsigned long nT)
 {
   unsigned long n=nT*sizeof(T);
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Pushing " << this->DeviceBlock << ", " << n
     << " bytes to the device"
-    << endl;
+    << std::endl;
   #endif
   cudaError_t ierr;
   ierr=cudaMemcpy(
@@ -384,7 +383,7 @@ int CUDAGlobalMemoryManager<T>::Push(T *hostBlock, unsigned long nT)
       cudaMemcpyHostToDevice);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Push failed");
+    CUDAErrorMacro(std::cerr,ierr,"Push failed");
     return -1;
     }
   return 0;
@@ -398,10 +397,10 @@ int CUDAGlobalMemoryManager<T>::Push(
       unsigned long nj)
 {
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Pushing " << this->DeviceBlock << ", " << ni*nj*sizeof(T)
     << " bytes to the device"
-    << endl;
+    << std::endl;
   #endif
   cudaError_t ierr;
   unsigned long hostPitch=ni*sizeof(T);
@@ -415,7 +414,7 @@ int CUDAGlobalMemoryManager<T>::Push(
       cudaMemcpyHostToDevice);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Push 2d failed");
+    CUDAErrorMacro(std::cerr,ierr,"Push 2d failed");
     return -1;
     }
   return 0;
@@ -456,10 +455,10 @@ int CUDAGlobalMemoryManager<T>::Pull(T *hostBlock, unsigned long nT)
 {
   unsigned long n=nT*sizeof(T);
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Pulling " << this->DeviceBlock << ", " << n
     << " bytes from the device"
-    << endl;
+    << std::endl;
   #endif
   cudaError_t ierr;
   ierr=cudaMemcpy(
@@ -469,7 +468,7 @@ int CUDAGlobalMemoryManager<T>::Pull(T *hostBlock, unsigned long nT)
       cudaMemcpyDeviceToHost);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Pull failed");
+    CUDAErrorMacro(std::cerr,ierr,"Pull failed");
     return -1;
     }
   return 0;
@@ -483,10 +482,10 @@ int CUDAGlobalMemoryManager<T>::Pull(
       unsigned long nj)
 {
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Pulling " << this->DeviceBlock << ", " << ni*nj*sizeof(T)
     << " bytes from the device"
-    << endl;
+    << std::endl;
   #endif
   cudaError_t ierr;
   unsigned long hostPitch=ni*sizeof(T);
@@ -500,7 +499,7 @@ int CUDAGlobalMemoryManager<T>::Pull(
       cudaMemcpyDeviceToHost);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Pull failed");
+    CUDAErrorMacro(std::cerr,ierr,"Pull failed");
     return -1;
     }
   return 0;
@@ -523,16 +522,16 @@ template<typename T>
 int CUDAGlobalMemoryManager<T>::Zero(unsigned long ni, unsigned long nj)
 {
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Zero'd " << this->DeviceBlock << ", " << ni*nj*sizeof(T)
     << " bytes"
-    << endl;
+    << std::endl;
   #endif
   cudaError_t ierr;
   ierr=cudaMemset2D(this->DeviceBlock,this->Pitch,0,ni*sizeof(T),nj);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Memset 0 failed");
+    CUDAErrorMacro(std::cerr,ierr,"Memset 0 failed");
     return -1;
     }
   return 0;
@@ -544,16 +543,16 @@ int CUDAGlobalMemoryManager<T>::Zero(unsigned long nT)
 {
   unsigned long n=nT*sizeof(T);
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Zero'd " << this->DeviceBlock << ", " << n
     << " bytes"
-    << endl;
+    << std::endl;
   #endif
   cudaError_t ierr;
   ierr=cudaMemset(this->DeviceBlock,0,n);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Memset 0 failed");
+    CUDAErrorMacro(std::cerr,ierr,"Memset 0 failed");
     return -1;
     }
   return 0;
@@ -589,7 +588,7 @@ CUDAGlobalMemoryManager<T>::BindToTexture(
   if (ierr)
     {
     CUDAErrorMacro(
-        cerr,
+        std::cerr,
         ierr,
         << "Failed to bind " << this->DeviceBlock);
     return -1;
@@ -617,7 +616,7 @@ CUDAGlobalMemoryManager<T>::BindToTexture(
   if (ierr)
     {
     CUDAErrorMacro(
-        cerr,
+        std::cerr,
         ierr,
         << "Failed to bind 2d " << this->DeviceBlock);
     return -1;
@@ -636,7 +635,7 @@ CUDAGlobalMemoryManager<T>::BindToTexture(
         int nk)
 {
   // TODO
-  sqErrorMacro(cerr,"Not implemented.");
+  sqErrorMacro(std::cerr,"Not implemented.");
   return -1;
 }
 
@@ -651,7 +650,7 @@ CUDAGlobalMemoryManager<T>::GetTextureReference(
   ierr=cudaGetTextureReference(&ref,name);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Failed to find a texture reference for " << name);
+    CUDAErrorMacro(std::cerr,ierr,"Failed to find a texture reference for " << name);
     return 0;
     }
   return ref;

@@ -151,7 +151,7 @@ vtkSQVPICReader::~vtkSQVPICReader()
 int vtkSQVPICReader::Initialize(
       vtkPVXMLElement *root,
       const char *fileName,
-      vector<string> &arrays)
+      std::vector<std::string> &arrays)
 {
   vtkPVXMLElement *elem=GetOptionalElement(root,"vtkSQVPICReader");
   if (elem==0)
@@ -206,7 +206,7 @@ int vtkSQVPICReader::Initialize(
     // will be replaced with - in the xml config.
     for (int i=0; i<nArrays; ++i)
       {
-      string &arrayName=arrays[i];
+      std::string &arrayName=arrays[i];
       int arrayNameLen=arrayName.size();
       for (int j=0; j<arrayNameLen; ++j)
         {
@@ -582,7 +582,7 @@ void vtkSQVPICReader::LoadVariableData(int var, int timeStep)
   /*
   if (this->Rank == 0)
     cout << "LoadVariableData " << this->VariableName[var]
-         << " time " << timeStep << endl;
+         << " time " << timeStep << std::endl;
   */
 
   // First set the number of components for this variable
@@ -754,15 +754,15 @@ void vtkSQVPICReader::SetPointArrayStatus(const char* name, int status)
 
 void vtkSQVPICReader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  os << indent << "FileName: " << (this->FileName != NULL ? this->FileName : "") << endl;
+  os << indent << "FileName: " << (this->FileName != NULL ? this->FileName : "") << std::endl;
   os << indent << "Stride: {" << this->Stride[0] << ", " << this->Stride[1]
-     << ", " << this->Stride[2] << "}" << endl;
-  os << indent << "XLayout: {" << this->XLayout[0] << ", " << this->XLayout[1] << "}" << endl;
-  os << indent << "YLayout: {" << this->YLayout[0] << ", " << this->YLayout[1] << "}" << endl;
-  os << indent << "ZLayout: {" << this->ZLayout[0] << ", " << this->ZLayout[1] << "}" << endl;
-  os << indent << "XExtent: {" << this->XExtent[0] << ", " << this->XExtent[1] << "}" << endl;
-  os << indent << "YExtent: {" << this->YExtent[0] << ", " << this->YExtent[1] << "}" << endl;
-  os << indent << "ZExtent: {" << this->ZExtent[0] << ", " << this->ZExtent[1] << "}" << endl;
+     << ", " << this->Stride[2] << "}" << std::endl;
+  os << indent << "XLayout: {" << this->XLayout[0] << ", " << this->XLayout[1] << "}" << std::endl;
+  os << indent << "YLayout: {" << this->YLayout[0] << ", " << this->YLayout[1] << "}" << std::endl;
+  os << indent << "ZLayout: {" << this->ZLayout[0] << ", " << this->ZLayout[1] << "}" << std::endl;
+  os << indent << "XExtent: {" << this->XExtent[0] << ", " << this->XExtent[1] << "}" << std::endl;
+  os << indent << "YExtent: {" << this->YExtent[0] << ", " << this->YExtent[1] << "}" << std::endl;
+  os << indent << "ZExtent: {" << this->ZExtent[0] << ", " << this->ZExtent[1] << "}" << std::endl;
 
   this->Superclass::PrintSelf(os, indent);
 }

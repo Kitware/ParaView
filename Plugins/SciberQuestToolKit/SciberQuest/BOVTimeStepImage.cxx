@@ -15,7 +15,6 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #include <sstream>
-using std::ostringstream;
 
 #ifdef WIN32
   #define PATH_SEP "\\"
@@ -32,7 +31,7 @@ BOVTimeStepImage::BOVTimeStepImage(
 {
   #ifdef SQTK_WITHOUT_MPI
   sqErrorMacro(
-    cerr,
+    std::cerr,
     << "This class requires MPI but it was built without MPI.");
   (void)comm;
   (void)hints;
@@ -51,10 +50,10 @@ BOVTimeStepImage::BOVTimeStepImage(
     }
   else
     {
-    sqErrorMacro(cerr,"Invalid mode " << metaData->GetMode());
+    sqErrorMacro(std::cerr,"Invalid mode " << metaData->GetMode());
     }
 
-  ostringstream seriesExt;
+  std::ostringstream seriesExt;
   seriesExt << "_" << stepIdx << "." << metaData->GetBrickFileExtension();
   // Open each array.
   size_t nArrays=metaData->GetNumberOfArrays();
@@ -71,7 +70,7 @@ BOVTimeStepImage::BOVTimeStepImage(
       {
       // deduce the file name from the following convention:
       // arrayname_step.ext
-      ostringstream fileName;
+      std::ostringstream fileName;
       fileName << metaData->GetPathToBricks() << PATH_SEP << arrayName << seriesExt.str();
 
       // open
@@ -86,7 +85,7 @@ BOVTimeStepImage::BOVTimeStepImage(
       {
       // deduce the file name from the following convention:
       // arrayname{x,y,z}_step.ext
-      ostringstream xFileName,yFileName,zFileName;
+      std::ostringstream xFileName,yFileName,zFileName;
       xFileName << metaData->GetPathToBricks() << PATH_SEP << arrayName << "x" << seriesExt.str();
       yFileName << metaData->GetPathToBricks() << PATH_SEP << arrayName << "y" << seriesExt.str();
       zFileName << metaData->GetPathToBricks() << PATH_SEP << arrayName << "z" << seriesExt.str();
@@ -107,7 +106,7 @@ BOVTimeStepImage::BOVTimeStepImage(
       {
       // deduce the file name from the following convention:
       // arrayname{xx,xy, ... ,zz}_step.ext
-      ostringstream
+      std::ostringstream
             xxFileName,xyFileName,xzFileName,
             yxFileName,yyFileName,yzFileName,
             zxFileName,zyFileName,zzFileName;
@@ -144,7 +143,7 @@ BOVTimeStepImage::BOVTimeStepImage(
       {
       // deduce the file name from the following convention:
       // arrayname{xx,xy, ... ,zz}_step.ext
-      ostringstream
+      std::ostringstream
             xxFileName,xyFileName,xzFileName,
                        yyFileName,yzFileName,
                                   zzFileName;
@@ -172,7 +171,7 @@ BOVTimeStepImage::BOVTimeStepImage(
     // other ?
     else
       {
-      sqErrorMacro(cerr,"Bad array type for array " << arrayName << ".");
+      sqErrorMacro(std::cerr,"Bad array type for array " << arrayName << ".");
       }
     }
   #endif
@@ -207,34 +206,34 @@ BOVTimeStepImage::~BOVTimeStepImage()
 }
 
 //-----------------------------------------------------------------------------
-ostream &operator<<(ostream &os, const BOVTimeStepImage &si)
+std::ostream &operator<<(std::ostream &os, const BOVTimeStepImage &si)
 {
-  os << "Scalars:" << endl;
+  os << "Scalars:" << std::endl;
   size_t nScalars=si.Scalars.size();
   for (size_t i=0; i<nScalars; ++i)
     {
-    os << *si.Scalars[i] << endl;
+    os << *si.Scalars[i] << std::endl;
     }
 
-  os << "Vectors:" << endl;
+  os << "Vectors:" << std::endl;
   size_t nVectors=si.Vectors.size();
   for (size_t i=0; i<nVectors; ++i)
     {
-    os << *si.Vectors[i] << endl;
+    os << *si.Vectors[i] << std::endl;
     }
 
-  os << "Tensors:" << endl;
+  os << "Tensors:" << std::endl;
   size_t nTensors=si.Tensors.size();
   for (size_t i=0; i<nTensors; ++i)
     {
-    os << *si.Tensors[i] << endl;
+    os << *si.Tensors[i] << std::endl;
     }
 
-  os << "SymetricTensors:" << endl;
+  os << "SymetricTensors:" << std::endl;
   size_t nSymetricTensors=si.SymetricTensors.size();
   for (size_t i=0; i<nSymetricTensors; ++i)
     {
-    os << *si.SymetricTensors[i] << endl;
+    os << *si.SymetricTensors[i] << std::endl;
     }
 
   return os;

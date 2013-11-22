@@ -26,7 +26,6 @@ Copyright 2012 SciberQuest Inc.
 #include "SQVTKTemplateMacroWarningSupression.h"
 
 #include <sstream>
-using std::ostringstream;
 
 #ifdef WIN32
   #define PATH_SEP "\\"
@@ -43,7 +42,7 @@ BOVWriter::BOVWriter()
 {
   #ifdef SQTK_WITHOUT_MPI
   sqErrorMacro(
-    cerr,
+    std::cerr,
     "This class requires MPI but it was built without MPI.");
   #else
   this->Comm=MPI_COMM_NULL;
@@ -54,7 +53,7 @@ BOVWriter::BOVWriter()
   if (!ok)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     }
@@ -102,7 +101,7 @@ void BOVWriter::SetCommunicator(MPI_Comm comm)
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return;
@@ -140,7 +139,7 @@ void BOVWriter::SetHints(MPI_Info hints)
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return;
@@ -188,7 +187,7 @@ int BOVWriter::Open(const char *fileName, char mode)
 {
   if (this->MetaData==0)
     {
-    sqErrorMacro(cerr,"No MetaData object.");
+    sqErrorMacro(std::cerr,"No MetaData object.");
     return 0;
     }
 
@@ -311,7 +310,7 @@ int BOVWriter::WriteVectorArray(
               0,
               buf))
           {
-              sqErrorMacro(cerr,
+              sqErrorMacro(std::cerr,
                 "WriteDataArray "<< it.GetName() << " component " << q << " failed.");
               free(buf);
               return 0;
@@ -373,7 +372,7 @@ int BOVWriter::WriteSymetricTensorArray(
               0,
               buf))
           {
-          sqErrorMacro(cerr,
+          sqErrorMacro(std::cerr,
             "WriteDataArray "<< it.GetName() << " component " << q << " failed.");
           free(buf);
           return 0;
@@ -392,7 +391,7 @@ BOVTimeStepImage *BOVWriter::OpenTimeStep(int stepNo)
 {
   if (!(this->MetaData && this->MetaData->IsDatasetOpen()))
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "Cannot open a timestep because the "
       << "dataset is not open.");
     return 0;
@@ -478,17 +477,17 @@ int BOVWriter::WriteTimeStep(
 void BOVWriter::PrintSelf(ostream &os)
 {
   os
-    << "BOVWriter: " << this << endl
-    << "  Comm: " << this->Comm << endl
-    << "  ProcId: " << this->ProcId << endl
-    << "  NProcs: " << this->NProcs << endl;
+    << "BOVWriter: " << this << std::endl
+    << "  Comm: " << this->Comm << std::endl
+    << "  ProcId: " << this->ProcId << std::endl
+    << "  NProcs: " << this->NProcs << std::endl;
 
   #ifndef SQTK_WITHOUT_MPI
   int mpiOk;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return;
@@ -496,7 +495,7 @@ void BOVWriter::PrintSelf(ostream &os)
 
   if (this->Hints!=MPI_INFO_NULL)
     {
-    os << "  Hints:" << endl;
+    os << "  Hints:" << std::endl;
     int nKeys=0;
     MPI_Info_get_nkeys(this->Hints,&nKeys);
     for (int i=0; i<nKeys; ++i)
@@ -506,7 +505,7 @@ void BOVWriter::PrintSelf(ostream &os)
       int flag=0;
       MPI_Info_get_nthkey(this->Hints,i,key);
       MPI_Info_get(this->Hints,key,256,val,&flag);
-      os << "    " << key << "=" << val << endl;
+      os << "    " << key << "=" << val << std::endl;
       }
     }
   #endif

@@ -17,11 +17,6 @@ typedef void * MPI_Info;
 #include <mpi.h>
 #endif
 
-#include <vector>
-using std::vector;
-#include <string>
-using std::string;
-
 #include "RefCountedPointer.h"
 #include "BOVMetaData.h"
 
@@ -112,7 +107,7 @@ public:
   /**
   Print internal state.
   */
-  void PrintSelf(ostream &os);
+  void PrintSelf(std::ostream &os);
 
 protected:
   BOVWriter();

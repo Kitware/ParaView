@@ -42,11 +42,7 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #include <algorithm>
-using std::min;
-using std::max;
-
 #include <sstream>
-using std::ostringstream;
 
 typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
@@ -62,7 +58,7 @@ vtkStandardNewMacro(vtkSQBOVWriter);
 vtkSQBOVWriter::vtkSQBOVWriter()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVWriter::vtkSQBOVWriter" << endl;
+  pCerr() << "=====vtkSQBOVWriter::vtkSQBOVWriter" << std::endl;
   #endif
 
   // Initialize pipeline.
@@ -118,7 +114,7 @@ vtkSQBOVWriter::vtkSQBOVWriter()
 vtkSQBOVWriter::~vtkSQBOVWriter()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVWriter::~vtkSQBOVWriter" << endl;
+  pCerr() << "=====vtkSQBOVWriter::~vtkSQBOVWriter" << std::endl;
   #endif
 
   this->Clear();
@@ -220,10 +216,10 @@ int vtkSQBOVWriter::Initialize(vtkPVXMLElement *root)
 void vtkSQBOVWriter::SetFileName(const char* _arg)
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
+  std::ostringstream oss;
   oss
-    << "=====vtkSQBOVWriter::SetFileName" << endl
-    << "Set FileName " << safeio(_arg) << "." << endl;
+    << "=====vtkSQBOVWriter::SetFileName" << std::endl
+    << "Set FileName " << safeio(_arg) << "." << std::endl;
   #endif
 
   #ifdef SQTK_WITHOUT_MPI
@@ -278,7 +274,7 @@ void vtkSQBOVWriter::SetFileName(const char* _arg)
       }
 
     #if defined SQTK_DEBUG
-    oss << " Open succeeded." << endl;
+    oss << " Open succeeded." << std::endl;
     #endif
     }
 
@@ -286,7 +282,7 @@ void vtkSQBOVWriter::SetFileName(const char* _arg)
   #endif
 
   #if defined SQTK_DEBUG
-  pCerr() << oss.str() << endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 }
 
@@ -300,10 +296,10 @@ bool vtkSQBOVWriter::IsOpen()
 int vtkSQBOVWriter::WriteMetaData()
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
+  std::ostringstream oss;
   oss
-    << "=====vtkSQBOVWriter::WriteMetaData" << endl;
-  pCerr() << oss.str() << endl;
+    << "=====vtkSQBOVWriter::WriteMetaData" << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
   this->Writer->GetMetaData()->ActivateAllArrays();
   return this->Writer->WriteMetaData();
@@ -336,11 +332,11 @@ double vtkSQBOVWriter::GetTimeStep(int i)
 void vtkSQBOVWriter::SetPointArrayStatus(const char *name, int status)
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
+  std::ostringstream oss;
   oss
-    << "=====vtkSQBOVWriter::SetPointArrayStatus" << endl
-    << safeio(name) << " " << status << endl;
-  pCerr() << oss.str() << endl;
+    << "=====vtkSQBOVWriter::SetPointArrayStatus" << std::endl
+    << safeio(name) << " " << status << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
   if (status)
     {
@@ -357,7 +353,7 @@ void vtkSQBOVWriter::SetPointArrayStatus(const char *name, int status)
 int vtkSQBOVWriter::GetPointArrayStatus(const char *name)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVWriter::GetPointArrayStatus" << endl;
+  pCerr() << "=====vtkSQBOVWriter::GetPointArrayStatus" << std::endl;
   #endif
   return this->Writer->GetMetaData()->IsArrayActive(name);
 }
@@ -366,7 +362,7 @@ int vtkSQBOVWriter::GetPointArrayStatus(const char *name)
 int vtkSQBOVWriter::GetNumberOfPointArrays()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVWriter::GetNumberOfPointArrays" << endl;
+  pCerr() << "=====vtkSQBOVWriter::GetNumberOfPointArrays" << std::endl;
   #endif
   return (int)this->Writer->GetMetaData()->GetNumberOfArrays();
 }
@@ -375,7 +371,7 @@ int vtkSQBOVWriter::GetNumberOfPointArrays()
 const char* vtkSQBOVWriter::GetPointArrayName(int idx)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVWriter::GetArrayName" << endl;
+  pCerr() << "=====vtkSQBOVWriter::GetArrayName" << std::endl;
   #endif
   return this->Writer->GetMetaData()->GetArrayName(idx);
 }
@@ -384,7 +380,7 @@ const char* vtkSQBOVWriter::GetPointArrayName(int idx)
 void vtkSQBOVWriter::ClearPointArrayStatus()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVWriter::ClearPointArrayStatus" << endl;
+  pCerr() << "=====vtkSQBOVWriter::ClearPointArrayStatus" << std::endl;
   #endif
 
   int nArrays=this->GetNumberOfPointArrays();
@@ -430,14 +426,14 @@ void vtkSQBOVWriter::SetMPIFileHints()
 
   if (this->NumberOfIONodes>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->NumberOfIONodes;
     MPI_Info_set(hints,"cb_nodes",const_cast<char *>(os.str().c_str()));
     }
 
   if (this->CollectBufferSize>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->CollectBufferSize;
     MPI_Info_set(hints,"cb_buffer_size",const_cast<char *>(os.str().c_str()));
     //MPI_Info_set(hints,"striping_unit", const_cast<char *>(os.str().c_str()));
@@ -493,7 +489,7 @@ void vtkSQBOVWriter::SetMPIFileHints()
 
   if (this->SieveBufferSize>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->SieveBufferSize;
     MPI_Info_set(hints,"ind_rd_buffer_size", const_cast<char *>(os.str().c_str()));
     }
@@ -505,14 +501,14 @@ void vtkSQBOVWriter::SetMPIFileHints()
     }
   if (this->StripeCount>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->StripeCount;
     MPI_Info_set(hints,"striping_count", const_cast<char *>(os.str().c_str()));
     }
 
   if (this->StripeSize>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->StripeSize;
     MPI_Info_set(hints,"striping_unit", const_cast<char *>(os.str().c_str()));
     }
@@ -530,8 +526,8 @@ int vtkSQBOVWriter::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQBOVWriter::RequestUpdateExtent" << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQBOVWriter::RequestUpdateExtent" << std::endl;
   #endif
 
   (void)req;
@@ -541,8 +537,8 @@ int vtkSQBOVWriter::RequestUpdateExtent(
 
   #ifdef SQTK_DEBUG
   oss
-    << "WorldRank=" << this->WorldRank << endl
-    << "UPDATE_PIECE=" << inInfo->Get(vtkSDDPipeline::UPDATE_PIECE_NUMBER()) << endl;
+    << "WorldRank=" << this->WorldRank << std::endl
+    << "UPDATE_PIECE=" << inInfo->Get(vtkSDDPipeline::UPDATE_PIECE_NUMBER()) << std::endl;
   #endif
 
   // if we are writing all times we need to set the speciic
@@ -579,10 +575,10 @@ int vtkSQBOVWriter::RequestUpdateExtent(
 
   #ifdef SQTK_DEBUG
   oss
-    << "WHOLE_EXTENT=" << wholeExt << endl
-    << "UPDATE_EXTENT=" << updateExt << endl
-    << "UPDATE_TIME_STEPS=" << time << endl;
-  pCerr() << oss.str() << endl;
+    << "WHOLE_EXTENT=" << wholeExt << std::endl
+    << "UPDATE_EXTENT=" << updateExt << std::endl
+    << "UPDATE_TIME_STEPS=" << time << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   return 1;
@@ -595,7 +591,7 @@ int vtkSQBOVWriter::RequestDataObject(
       vtkInformationVector *outInfos)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVWriter::RequestDataObject" << endl;
+  pCerr() << "=====vtkSQBOVWriter::RequestDataObject" << std::endl;
   #endif
 
   (void)req;
@@ -612,9 +608,9 @@ int vtkSQBOVWriter::RequestInformation(
   vtkInformationVector* /*outInfos*/)
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQBOVWriter::RequestInformation" << endl;
-  pCerr() << oss.str() << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQBOVWriter::RequestInformation" << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   if (!this->Writer->IsOpen())
@@ -646,7 +642,7 @@ int vtkSQBOVWriter::RequestInformation(
   int nSteps
     = info->Length(vtkSDDPipeline::TIME_STEPS());
 
-  vector<double> times(nSteps,0.0);
+  std::vector<double> times(nSteps,0.0);
 
   info->Get(
         vtkSDDPipeline::TIME_STEPS(),
@@ -667,8 +663,8 @@ int vtkSQBOVWriter::RequestData(
         vtkInformationVector * /*outInfos*/)
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQBOVWriter::RequestData" << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQBOVWriter::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -725,7 +721,7 @@ int vtkSQBOVWriter::RequestData(
       }
 
     #if defined SQTK_DEBUG
-    oss << "Requested time " << step << " using " << stepId << "." << endl;
+    oss << "Requested time " << step << " using " << stepId << "." << std::endl;
     #endif
     }
 
@@ -786,10 +782,10 @@ int vtkSQBOVWriter::RequestData(
 
   #if defined SQTK_DEBUG
   oss
-    << "WHOLE_EXTENT=" << wholeExtent << endl
-    << "domain=" << domain << endl
-    << "UPDATE_EXTENT=" << updateExtent << endl
-    << "decomp=" << decomp << endl;
+    << "WHOLE_EXTENT=" << wholeExtent << std::endl
+    << "domain=" << domain << std::endl
+    << "UPDATE_EXTENT=" << updateExtent << std::endl
+    << "decomp=" << decomp << std::endl;
   #endif
 
   md->SetDataSetType(input->GetClassName());
@@ -814,8 +810,8 @@ int vtkSQBOVWriter::RequestData(
 
     #if defined SQTK_DEBUG
     oss
-      << "ORIGIN=" << Tuple<double>(X0,3) << endl
-      << "SPACING=" << Tuple<double>(dX,3) << endl;
+      << "ORIGIN=" << Tuple<double>(X0,3) << std::endl
+      << "SPACING=" << Tuple<double>(dX,3) << std::endl;
     #endif
     }
   else
@@ -866,7 +862,7 @@ int vtkSQBOVWriter::RequestData(
   #if defined SQTK_DEBUG
   // this->Writer->PrintSelf(pCerr());
   // input->Print(pCerr());
-  pCerr() << oss.str() << endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   if (this->LogLevel || globalLogLevel)
@@ -881,9 +877,9 @@ int vtkSQBOVWriter::RequestData(
 void vtkSQBOVWriter::Write()
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQBOVWriter::Write" << endl;
-  pCerr() << oss.str() << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQBOVWriter::Write" << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   if (!this->Writer->IsOpen())
@@ -906,9 +902,9 @@ void vtkSQBOVWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "FileName:        " << safeio(this->FileName) << endl;
-  os << indent << "FileNameChanged: " << this->FileNameChanged << endl;
-  os << indent << "Raeder: " << endl;
+  os << indent << "FileName:        " << safeio(this->FileName) << std::endl;
+  os << indent << "FileNameChanged: " << this->FileNameChanged << std::endl;
+  os << indent << "Raeder: " << std::endl;
   this->Writer->PrintSelf(os);
-  os << endl;
+  os << std::endl;
 }

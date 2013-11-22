@@ -18,7 +18,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkCellType.h"
 
 //*****************************************************************************
-ostream &operator<<(ostream &os,const CartesianBounds &bounds)
+std::ostream &operator<<(std::ostream &os,const CartesianBounds &bounds)
 {
   os << Tuple<double>(bounds.GetData(),6);
 

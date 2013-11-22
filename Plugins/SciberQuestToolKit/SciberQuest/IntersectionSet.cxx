@@ -11,7 +11,6 @@ Copyright 2012 SciberQuest Inc.
 
 #include <sstream>
 #include <iostream>
-using namespace std;
 
 //*****************************************************************************
 inline bool InRange(int a, int b, int v){ return v>=a && v<=b; }
@@ -68,14 +67,14 @@ int IntersectData::CommitType(MPI_Datatype *classType)
 }
 
 //-----------------------------------------------------------------------------
-string IntersectData::Print()
+std::string IntersectData::Print()
 {
-  ostringstream os;
-  os << "SeedPointId:      " << this->seedPointId << endl
-     << "fwdSurfaceId:     " << this->fwdSurfaceId << endl
-     << "fwdIntersectTime: " << this->fwdIntersectTime << endl
-     << "bwdSurfaceId:     " << this->bwdSurfaceId << endl
-     << "bwdIntersectTime: " << this->bwdIntersectTime << endl;
+  std::ostringstream os;
+  os << "SeedPointId:      " << this->seedPointId << std::endl
+     << "fwdSurfaceId:     " << this->fwdSurfaceId << std::endl
+     << "fwdIntersectTime: " << this->fwdIntersectTime << std::endl
+     << "bwdSurfaceId:     " << this->bwdSurfaceId << std::endl
+     << "bwdIntersectTime: " << this->bwdIntersectTime << std::endl;
   return os.str();
 }
 
@@ -109,7 +108,7 @@ IntersectionSet::IntersectionSet()
 {
   #ifdef SQTK_WITHOUT_MPI
   sqErrorMacro(
-    cerr,
+    std::cerr,
     "This class requires MPI however it was built without MPI.");
   #endif
   this->Data.CommitType(&this->DataType);
@@ -124,7 +123,7 @@ IntersectionSet::~IntersectionSet()
 }
 
 //-----------------------------------------------------------------------------
-string IntersectionSet::Print()
+std::string IntersectionSet::Print()
 {
   return this->Data.Print();
 }
@@ -205,14 +204,14 @@ int IntersectionSet::AllReduce()
   // everybody find what their children have.
   if (ValidId(lcid))
     {
-    // cerr << "proc " << procId << " recv from left " << lcid << endl;
+    // std::cerr << "proc " << procId << " recv from left " << lcid << std::endl;
     IntersectData lcd;
     MPI_Recv(&lcd,1,this->DataType,lcid,lcid,MPI_COMM_WORLD,&stat);
     this->Reduce(lcd);
     }
   if (ValidId(rcid))
     {
-    // cerr << "proc " << procId << " recv from right " << rcid << endl;
+    // std::cerr << "proc " << procId << " recv from right " << rcid << std::endl;
     IntersectData rcd;
     MPI_Recv(&rcd,1,this->DataType,rcid,rcid,MPI_COMM_WORLD,&stat);
     this->Reduce(rcd);
@@ -221,7 +220,7 @@ int IntersectionSet::AllReduce()
   // the parent for the reduction.
   if (ValidId(pid))
     {
-    // cerr << "proc " << procId << " send to, recv from parent " << pid << endl;
+    // std::cerr << "proc " << procId << " send to, recv from parent " << pid << std::endl;
     MPI_Send(&this->Data,1,this->DataType,pid,procId,MPI_COMM_WORLD);
     IntersectData pd;
     MPI_Recv(&pd,1,this->DataType,pid,pid,MPI_COMM_WORLD,&stat);
@@ -230,12 +229,12 @@ int IntersectionSet::AllReduce()
   // everybody pass the reduction on to their children.
   if (ValidId(lcid))
     {
-    // cerr << "proc " << procId << " send to left " << lcid << endl;
+    // std::cerr << "proc " << procId << " send to left " << lcid << std::endl;
     MPI_Send(&this->Data,1,this->DataType,lcid,procId,MPI_COMM_WORLD);
     }
   if (ValidId(rcid))
     {
-    // cerr << "proc " << procId << " send to right " << rcid << endl;
+    // std::cerr << "proc " << procId << " send to right " << rcid << std::endl;
     MPI_Send(&this->Data,1,this->DataType,rcid,procId,MPI_COMM_WORLD);
     }
   #endif

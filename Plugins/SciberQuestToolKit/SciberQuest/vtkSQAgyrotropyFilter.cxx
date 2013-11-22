@@ -36,12 +36,8 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #include <algorithm>
-using std::min;
-using std::max;
 #include <typeinfo>
-
 #include <string>
-using std::string;
 #include <cmath>
 
 // #define SQTK_DEBUG
@@ -117,7 +113,7 @@ vtkStandardNewMacro(vtkSQAgyrotropyFilter);
 vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter" << endl;
+  pCerr() << "=====vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter" << std::endl;
   #endif
 
   this->NoiseThreshold=1.0e-4;
@@ -131,7 +127,7 @@ vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
 vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter" << endl;
+  pCerr() << "=====vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter" << std::endl;
   #endif
 }
 
@@ -139,7 +135,7 @@ vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter()
 int vtkSQAgyrotropyFilter::Initialize(vtkPVXMLElement *root)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQAgyrotropyFilter::Initialize" << endl;
+  pCerr() << "=====vtkSQAgyrotropyFilter::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -167,7 +163,7 @@ int vtkSQAgyrotropyFilter::RequestData(
                 vtkInformationVector *outputVector)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQAgyrotropyFilter::RequestData" << endl;
+  pCerr() << "=====vtkSQAgyrotropyFilter::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -208,20 +204,20 @@ int vtkSQAgyrotropyFilter::RequestData(
     {
     vtkErrorMacro("pressure tensor not found.");
     }
-  string TName=T->GetName();
+  std::string TName=T->GetName();
 
   vtkDataArray *V=this->GetInputArrayToProcess(1,inputVector);
   if (V==0)
     {
     vtkErrorMacro("magnetic field vector  not found.");
     }
-  string VName=V->GetName();
+  std::string VName=V->GetName();
 
   size_t nTups = V->GetNumberOfTuples();
 
   // add the agyrotropy array to the output
   vtkDataArray *A=V->NewInstance();
-  string AName;
+  std::string AName;
   AName+="agyrotropy-";
   AName+=TName;
   AName+="-";

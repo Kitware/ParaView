@@ -12,8 +12,6 @@ Copyright 2012 SciberQuest Inc.
 #include "IdBlock.h"
 
 #include <algorithm>
-using std::min;
-using std::max;
 
 /// Partitions a contiguous set of indices on demand.
 class WorkQueue
@@ -32,7 +30,7 @@ public:
       b.first()=b.size()=0;
       return 0;
       }
-    int next_at=min(m_at+size,m_end);
+    int next_at=std::min(m_at+size,m_end);
     size=next_at-m_at;
     b.first()=m_at;
     b.size()=size;

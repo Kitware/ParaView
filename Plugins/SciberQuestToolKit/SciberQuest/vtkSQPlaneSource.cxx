@@ -40,10 +40,7 @@
 #include "postream.h"
 
 #include <map>
-using std::map;
-using std::pair;
 #include <list>
-using std::list;
 
 // #define SQTK_DEBUG
 
@@ -90,10 +87,10 @@ CartesianExtentIterator *DecomposePatches(
   int nPasses[2]={0,0};
   int maxPasses[2]={xResolution/2,yResolution/2};
 
-  list<CartesianExtent> blocks;
+  std::list<CartesianExtent> blocks;
   blocks.push_back(domain);
 
-  list<CartesianExtent> splitBlocks;
+  std::list<CartesianExtent> splitBlocks;
 
   int dir=0;
   while(1)
@@ -137,7 +134,7 @@ CartesianExtentIterator *DecomposePatches(
   CartesianExtentIterator *it=new CartesianExtentIterator;
   if (pieceNo<(int)blocks.size())
     {
-    list<CartesianExtent>::iterator bit=blocks.begin();
+    std::list<CartesianExtent>::iterator bit=blocks.begin();
     for (int i=0; i<pieceNo; ++i,++bit);
     it->SetDomain(domain);
     it->SetExtent(*bit);
@@ -152,7 +149,7 @@ vtkStandardNewMacro(vtkSQPlaneSource);
 vtkSQPlaneSource::vtkSQPlaneSource()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQPlaneSource::vtkSQPlaneSource" << endl;
+  pCerr() << "=====vtkSQPlaneSource::vtkSQPlaneSource" << std::endl;
   #endif
 
   this->ImmediateMode=1;
@@ -185,7 +182,7 @@ vtkSQPlaneSource::vtkSQPlaneSource()
 vtkSQPlaneSource::~vtkSQPlaneSource()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQPlaneSource::~vtkSQPlaneSource" << endl;
+  pCerr() << "=====vtkSQPlaneSource::~vtkSQPlaneSource" << std::endl;
   #endif
   this->SetDescriptiveName(0);
 }
@@ -245,7 +242,7 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
 void vtkSQPlaneSource::SetResolution(const int xR, const int yR)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQPlaneSource::SetResolution" << endl;
+  pCerr() << "=====vtkSQPlaneSource::SetResolution" << std::endl;
   #endif
   // Set the number of x-y subdivisions in the plane.
   if ( xR != this->XResolution || yR != this->YResolution )
@@ -267,7 +264,7 @@ int vtkSQPlaneSource::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQPlaneSource::RequestInformation" << endl;
+  pCerr() << "=====vtkSQPlaneSource::RequestInformation" << std::endl;
   #endif
 
   // tell the excutive that we are handling our own decomposition.
@@ -283,7 +280,7 @@ int vtkSQPlaneSource::RequestData(
       vtkInformationVector *outputVector)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQPlaneSource::RequestData" << endl;
+  pCerr() << "=====vtkSQPlaneSource::RequestData" << std::endl;
   #endif
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   int globalLogLevel=log->GetGlobalLevel();
@@ -428,8 +425,8 @@ int vtkSQPlaneSource::RequestData(
   source->SetResolution(resolution);
 
   int ptId=0;
-  map<vtkIdType,vtkIdType> idMap;
-  pair<map<vtkIdType,vtkIdType>::iterator,bool> idMapInsert;
+  std::map<vtkIdType,vtkIdType> idMap;
+  std::pair<std::map<vtkIdType,vtkIdType>::iterator,bool> idMapInsert;
 
   for (;it->Good(); it->Increment())
     {
@@ -454,7 +451,7 @@ int vtkSQPlaneSource::RequestData(
     for (int i=0; i<4; ++i)
       {
       // Attempt an insert of the new point's index
-      idMapInsert=idMap.insert(pair<vtkIdType,vtkIdType>(cpids[i],ptId));
+      idMapInsert=idMap.insert(std::pair<vtkIdType,vtkIdType>(cpids[i],ptId));
       if (idMapInsert.second)
         {
         // this is a new point id and point. Add the point.
@@ -505,7 +502,7 @@ int vtkSQPlaneSource::RequestData(
 void vtkSQPlaneSource::SetNormal(double N[3])
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQPlaneSource::SetNormal" << endl;
+  pCerr() << "=====vtkSQPlaneSource::SetNormal" << std::endl;
   #endif
 
   // Set the normal to the plane. Will modify the Origin, Point1, and Point2
@@ -578,7 +575,7 @@ void vtkSQPlaneSource::SetNormal(double nx, double ny, double nz)
 void vtkSQPlaneSource::SetCenter(double center[3])
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQPlaneSource::SetCenter" << endl;
+  pCerr() << "=====vtkSQPlaneSource::SetCenter" << std::endl;
   #endif
 
   // Set the center of the plane. Will modify the Origin, Point1, and Point2
@@ -626,7 +623,7 @@ void vtkSQPlaneSource::ApplyConstraint()
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQPlaneSource::ApplyConstraint "
-    <<  this->Constraint << endl;
+    <<  this->Constraint << std::endl;
   #endif
 
   double p[3]={0.0};
@@ -687,7 +684,7 @@ void vtkSQPlaneSource::SetConstraint(int type)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQPlaneSource::SetConstraint "
-    << type << endl;
+    << type << std::endl;
   #endif
 
   if (this->Constraint == type )
@@ -706,7 +703,7 @@ void vtkSQPlaneSource::SetOrigin(double ox, double oy, double oz)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQPlaneSource::SetOrigin "
-    << ox << " " << oy << " " << oz << endl;
+    << ox << " " << oy << " " << oz << std::endl;
   #endif
 
   // modifies the normal and origin
@@ -757,7 +754,7 @@ void vtkSQPlaneSource::SetPoint1(double x, double y, double z)
 #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQPlaneSource::SetPoint1 "
-    << x << " " << y << " " << z << endl;
+    << x << " " << y << " " << z << std::endl;
   #endif
 
   // modifies the normal and origin
@@ -801,7 +798,7 @@ void vtkSQPlaneSource::SetPoint2(double x, double y, double z)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQPlaneSource::SetPoint2 "
-    << x << " " << y << " " << z << endl;
+    << x << " " << y << " " << z << std::endl;
   #endif
 
   // modifies the normal and origin

@@ -16,11 +16,8 @@ Copyright 2012 SciberQuest Inc.
 #include "GhostTransaction.h"
 
 #include <vector>
-using std::vector;
 #include <set>
-using std::set;
 #include <string>
-using std::string;
 
 #ifdef SQTK_WITHOUT_MPI
 typedef void * MPI_Comm;
@@ -99,7 +96,7 @@ private:
       vtkDataSetAttributes *outDsa,
       CartesianExtent inputExt,
       CartesianExtent outputExt,
-      vector<GhostTransaction> &transactions,
+      std::vector<GhostTransaction> &transactions,
       bool pointData);
   //ETX
 
@@ -111,7 +108,7 @@ private:
   CartesianExtent ProblemDomain;
   MPI_Comm Comm;
   int CopyAllArrays;
-  set<string> ArraysToCopy;
+  std::set<std::string> ArraysToCopy;
   int LogLevel;
 
 private:

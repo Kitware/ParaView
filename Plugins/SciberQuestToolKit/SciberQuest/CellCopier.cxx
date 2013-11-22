@@ -15,8 +15,8 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkCellData.h"
 #include "vtkDataSet.h"
 
-typedef pair<map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
-typedef pair<vtkIdType,vtkIdType> MapElement;
+typedef std::pair<std::map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
+typedef std::pair<vtkIdType,vtkIdType> MapElement;
 
 //*****************************************************************************
 DataArrayCopier *NewDataArrayCopier(vtkDataArray *da)
@@ -45,7 +45,7 @@ DataArrayCopier *NewDataArrayCopier(vtkDataArray *da)
       break;
 
     default:
-      sqErrorMacro(cerr,"Unsupported array type.");
+      sqErrorMacro(std::cerr,"Unsupported array type.");
       return 0;
     }
   return dac;

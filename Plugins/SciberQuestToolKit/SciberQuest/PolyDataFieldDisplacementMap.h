@@ -11,12 +11,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "FieldDisplacementMapData.h"
 
-#include<vector>
-using std::vector;
-
-#include<map>
-using std::map;
-using std::pair;
+#include <map>
 
 class IdBlock;
 class FieldLine;
@@ -78,9 +73,9 @@ private:
   vtkIdType InsertCellsFromDataset(IdBlock *SourceIds);
 
 private:
-  typedef pair<map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
-  typedef pair<vtkIdType,vtkIdType> MapElement;
-  map<vtkIdType,vtkIdType> IdMap;
+  typedef std::pair<std::map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
+  typedef std::pair<vtkIdType,vtkIdType> MapElement;
+  std::map<vtkIdType,vtkIdType> IdMap;
 
   vtkSQCellGenerator *SourceGen;
 

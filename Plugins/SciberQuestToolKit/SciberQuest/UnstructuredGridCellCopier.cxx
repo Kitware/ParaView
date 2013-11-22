@@ -73,7 +73,7 @@ void UnstructuredGridCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
   vtkUnstructuredGrid *source=dynamic_cast<vtkUnstructuredGrid*>(s);
   if (source==0)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
        "Error: Source must be unstructured. " << s->GetClassName());
     return;
     }
@@ -87,7 +87,7 @@ void UnstructuredGridCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
   this->SourcePts=dynamic_cast<vtkFloatArray*>(source->GetPoints()->GetData());
   if (this->SourcePts==0)
     {
-    sqErrorMacro(cerr,"Error: Points are not float precision.");
+    sqErrorMacro(std::cerr,"Error: Points are not float precision.");
     return;
     }
   this->SourcePts->Register(0);
@@ -102,7 +102,7 @@ void UnstructuredGridCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
   vtkUnstructuredGrid *out=dynamic_cast<vtkUnstructuredGrid*>(o);
   if (out==0)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       "Error: Out must be unstructured grid. " << o->GetClassName());
     return;
     }

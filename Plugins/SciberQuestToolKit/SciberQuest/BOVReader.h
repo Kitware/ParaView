@@ -20,11 +20,6 @@ typedef void *MPI_Info;
 #include "RefCountedPointer.h"
 #include "BOVMetaData.h"
 
-#include <vector>
-using std::vector;
-#include <string>
-using std::string;
-
 class vtkDataSet;
 class vtkAlgorithm;
 class BOVScalarImageIterator;
@@ -171,7 +166,7 @@ public:
   /**
   Print internal state.
   */
-  void PrintSelf(ostream &os);
+  void PrintSelf(std::ostream &os);
 
 protected:
   BOVReader();

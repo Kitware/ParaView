@@ -70,7 +70,7 @@ void PolyDataCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
   vtkPolyData *source=dynamic_cast<vtkPolyData*>(s);
   if (source==0)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       "Error: Source must be polydata. " << s->GetClassName());
     return;
     }
@@ -84,7 +84,7 @@ void PolyDataCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
   this->SourcePts=dynamic_cast<vtkFloatArray*>(source->GetPoints()->GetData());
   if (this->SourcePts==0)
     {
-    sqErrorMacro(cerr,"Error: Points are not float precision.");
+    sqErrorMacro(std::cerr,"Error: Points are not float precision.");
     return;
     }
   this->SourcePts->Register(0);
@@ -116,7 +116,7 @@ void PolyDataCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
     {
     // this is an error because there are cells, but none of
     // them are the type we expect.
-    sqErrorMacro(cerr,"Error: Polydata doesn't have any supported cells.");
+    sqErrorMacro(std::cerr,"Error: Polydata doesn't have any supported cells.");
     return;
     }
   this->SourceCells->Register(0);
@@ -126,7 +126,7 @@ void PolyDataCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
   vtkPolyData *out=dynamic_cast<vtkPolyData*>(o);
   if (out==0)
     {
-    sqErrorMacro(cerr,"Error: Out must be polydata. " << o->GetClassName());
+    sqErrorMacro(std::cerr,"Error: Out must be polydata. " << o->GetClassName());
     return;
     }
 
@@ -156,7 +156,7 @@ void PolyDataCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
       break;
 
     default:
-      sqErrorMacro(cerr,"Error: Unsuported cell type.");
+      sqErrorMacro(std::cerr,"Error: Unsuported cell type.");
       return;
     }
 }

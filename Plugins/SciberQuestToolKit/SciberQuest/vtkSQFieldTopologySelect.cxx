@@ -35,7 +35,7 @@ vtkStandardNewMacro(vtkSQFieldTopologySelect);
 vtkSQFieldTopologySelect::vtkSQFieldTopologySelect()
 {
   #ifdef SQTK_DEBUG
-  cerr << "===============================vtkSQFieldTopologySelect::vtkSQFieldTopologySelect" << endl;
+  std::cerr << "===============================vtkSQFieldTopologySelect::vtkSQFieldTopologySelect" << std::endl;
   #endif
 
   // select all by default.
@@ -52,7 +52,7 @@ vtkSQFieldTopologySelect::vtkSQFieldTopologySelect()
 vtkSQFieldTopologySelect::~vtkSQFieldTopologySelect()
 {
   #ifdef SQTK_DEBUG
-  cerr << "===============================vtkSQFieldTopologySelect::~vtkSQFieldTopologySelect" << endl;
+  std::cerr << "===============================vtkSQFieldTopologySelect::~vtkSQFieldTopologySelect" << std::endl;
   #endif
 }
 
@@ -62,7 +62,7 @@ int vtkSQFieldTopologySelect::FillInputPortInformation(
       vtkInformation *info)
 {
   #ifdef SQTK_DEBUG
-  cerr << "===============================vtkSQFieldTopologySelect::FillInputPortInformation" << endl;
+  std::cerr << "===============================vtkSQFieldTopologySelect::FillInputPortInformation" << std::endl;
   #endif
 
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(),"vtkDataSet");
@@ -76,7 +76,7 @@ int vtkSQFieldTopologySelect::FillOutputPortInformation(
       vtkInformation *info)
 {
   #if SQTK_DEBUG>1
-  pCerr() << "===============================vtkSQFieldTopologySelect::FillOutputPortInformation" << endl;
+  pCerr() << "===============================vtkSQFieldTopologySelect::FillOutputPortInformation" << std::endl;
   #endif
 
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid");
@@ -90,7 +90,7 @@ int vtkSQFieldTopologySelect::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-    cerr << "===============================vtkSQFieldTopologySelect::RequestInformation" << endl;
+  std::cerr << "===============================vtkSQFieldTopologySelect::RequestInformation" << std::endl;
   #endif
 
   // tell the excutive that we are handling our own decomposition.
@@ -107,7 +107,7 @@ int vtkSQFieldTopologySelect::RequestData(
       vtkInformationVector *outputVector)
 {
   #ifdef SQTK_DEBUG
-  cerr << "===============================vtkSQFieldTopologySelect::RequestData" << endl;
+  std::cerr << "===============================vtkSQFieldTopologySelect::RequestData" << std::endl;
   #endif
 
   vtkInformation *inInfo=inputVector[0]->GetInformationObject(0);

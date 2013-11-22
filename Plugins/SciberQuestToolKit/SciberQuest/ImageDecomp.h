@@ -14,9 +14,6 @@ Copyright 2012 SciberQuest Inc.
 #include "CartesianExtent.h"
 #include "CartesianBounds.h"
 
-#include <vector>
-using std::vector;
-
 class CartesianDataBlock;
 class CartesianDataBlockIODescriptor;
 

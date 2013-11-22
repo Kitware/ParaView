@@ -11,8 +11,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "BOVMetaData.h"
 
-#include <iostream>
-using std::ostream;
+#include <ostream>
 
 /// Parser for SciberQuest GDA dataset format.
 /**
@@ -86,7 +85,7 @@ public:
         vtkInformation *pinfo);
 
   /// Print internal state.
-  virtual void Print(ostream &os) const;
+  virtual void Print(std::ostream &os) const;
 
 private:
   void ClearCoordinates();

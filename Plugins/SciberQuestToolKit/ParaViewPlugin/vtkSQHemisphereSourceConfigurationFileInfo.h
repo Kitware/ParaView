@@ -42,9 +42,9 @@ public:
   virtual void PrintSelf(ostream &os, vtkIndent indent)
     {
     os
-      << indent << "FileIdentifier: " << this->FileIdentifier << endl
-      << indent << "FileDescription: " << this->FileDescription << endl
-      << indent << "FileExtension: " << this->FileExtension << endl;
+      << indent << "FileIdentifier: " << this->FileIdentifier << std::endl
+      << indent << "FileDescription: " << this->FileDescription << std::endl
+      << indent << "FileExtension: " << this->FileExtension << std::endl;
     }
 
   const char *FileIdentifier;

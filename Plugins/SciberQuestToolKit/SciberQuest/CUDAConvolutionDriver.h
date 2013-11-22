@@ -11,8 +11,6 @@ Copyright 2012 SciberQuest Inc.
 #define __CUDAConvolutionDriver_h
 
 #include <algorithm>
-using std::min;
-using std::max;
 
 class vtkDataArray;
 class CartesianExtent;

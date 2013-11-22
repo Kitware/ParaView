@@ -19,7 +19,7 @@ void SimpleTerminationCondition::InitializeColorMapper()
   //    ...
   // n   -> sn
   // n+1 -> noise
-  vector<string> names;
+  std::vector<string> names;
   names.push_back("problem domain");
   names.insert(names.end(),this->SurfaceNames.begin(),this->SurfaceNames.end());
   names.push_back("noise");

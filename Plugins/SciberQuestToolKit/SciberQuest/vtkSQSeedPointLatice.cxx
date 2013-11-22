@@ -100,7 +100,7 @@ vtkStandardNewMacro(vtkSQSeedPointLatice);
 vtkSQSeedPointLatice::vtkSQSeedPointLatice()
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::vtkSQSeedPointLatice" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::vtkSQSeedPointLatice" << std::endl;
   #endif
 
 
@@ -117,7 +117,7 @@ vtkSQSeedPointLatice::vtkSQSeedPointLatice()
 vtkSQSeedPointLatice::~vtkSQSeedPointLatice()
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::~vtkSQSeedPointLatice" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::~vtkSQSeedPointLatice" << std::endl;
   #endif
 
 }
@@ -126,7 +126,7 @@ vtkSQSeedPointLatice::~vtkSQSeedPointLatice()
 void vtkSQSeedPointLatice::SetTransformPower(double itp, double jtp, double ktp)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::SetTransformPower" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::SetTransformPower" << std::endl;
   #endif
 
 
@@ -138,7 +138,7 @@ void vtkSQSeedPointLatice::SetTransformPower(double itp, double jtp, double ktp)
 void vtkSQSeedPointLatice::SetTransformPower(double *tp)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::SetTransformPower" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::SetTransformPower" << std::endl;
   #endif
 
 
@@ -161,7 +161,7 @@ void vtkSQSeedPointLatice::SetTransformPower(double *tp)
 void vtkSQSeedPointLatice::SetIBounds(double lo, double hi)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::SetIBounds" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::SetIBounds" << std::endl;
   #endif
 
 
@@ -175,7 +175,7 @@ void vtkSQSeedPointLatice::SetIBounds(double lo, double hi)
 double *vtkSQSeedPointLatice::GetIBounds()
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::GetIBounds" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::GetIBounds" << std::endl;
   #endif
 
   return this->Bounds;
@@ -187,7 +187,7 @@ double *vtkSQSeedPointLatice::GetIBounds()
 void vtkSQSeedPointLatice::SetJBounds(double lo, double hi)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::SetJBounds" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::SetJBounds" << std::endl;
   #endif
 
 
@@ -201,7 +201,7 @@ void vtkSQSeedPointLatice::SetJBounds(double lo, double hi)
 double *vtkSQSeedPointLatice::GetJBounds()
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::GetJBounds" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::GetJBounds" << std::endl;
   #endif
 
   return this->Bounds+2;
@@ -212,7 +212,7 @@ double *vtkSQSeedPointLatice::GetJBounds()
 void vtkSQSeedPointLatice::SetKBounds(double lo, double hi)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::SetKBounds" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::SetKBounds" << std::endl;
   #endif
 
 
@@ -226,7 +226,7 @@ void vtkSQSeedPointLatice::SetKBounds(double lo, double hi)
 double *vtkSQSeedPointLatice::GetKBounds()
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::GetKBounds" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::GetKBounds" << std::endl;
   #endif
 
   return this->Bounds+4;
@@ -238,7 +238,7 @@ int vtkSQSeedPointLatice::FillInputPortInformation(
       vtkInformation *info)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::FillInputPortInformation" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::FillInputPortInformation" << std::endl;
   #endif
 
 
@@ -256,7 +256,7 @@ int vtkSQSeedPointLatice::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::RequestInformation" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::RequestInformation" << std::endl;
   #endif
 
 
@@ -276,7 +276,7 @@ int vtkSQSeedPointLatice::RequestData(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-    cerr << "=====vtkSQSeedPointLatice::RequestData" << endl;
+    std::cerr << "=====vtkSQSeedPointLatice::RequestData" << std::endl;
   #endif
 
 
@@ -444,15 +444,15 @@ int vtkSQSeedPointLatice::RequestData(
 
   #ifdef SQTK_DEBUG
   int rank=vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
-  cerr
-    << "pieceNo = " << pieceNo << endl
-    << "nPieces = " << nPieces << endl
-    << "rank    = " << rank << endl
-    << "nLocal  = " << nLocal << endl
-    << "startId = " << startId << endl
-    << "endId   = " << endId << endl
-    << "NX=" << Tuple<int>(this->NX,3) << endl
-    << "Bounds=" << Tuple<double>(this->Bounds,6) << endl;
+  std::cerr
+    << "pieceNo = " << pieceNo << std::endl
+    << "nPieces = " << nPieces << std::endl
+    << "rank    = " << rank << std::endl
+    << "nLocal  = " << nLocal << std::endl
+    << "startId = " << startId << std::endl
+    << "endId   = " << endId << std::endl
+    << "NX=" << Tuple<int>(this->NX,3) << std::endl
+    << "Bounds=" << Tuple<double>(this->Bounds,6) << std::endl;
   #endif
 
   return 1;
@@ -462,7 +462,7 @@ int vtkSQSeedPointLatice::RequestData(
 void vtkSQSeedPointLatice::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQSeedPointLatice::PrintSelf" << endl;
+  std::cerr << "=====vtkSQSeedPointLatice::PrintSelf" << std::endl;
   #endif
 
 

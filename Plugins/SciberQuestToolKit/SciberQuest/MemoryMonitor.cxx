@@ -12,9 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #include <vector>
-using std::vector;
 #include <string>
-using std::string;
 
 
 //-----------------------------------------------------------------------------
@@ -24,17 +22,17 @@ MemoryMonitor::MemoryMonitor()
 {
   // get the total system memory
   int ok;
-  vector<string> meminfo;
+  std::vector<std::string> meminfo;
   ok=LoadLines("/proc/meminfo",meminfo);
   if (!ok)
     {
-    sqErrorMacro(cerr,"Failed to open /proc/meminfo.");
+    sqErrorMacro(std::cerr,"Failed to open /proc/meminfo.");
     return;
     }
   ok=NameValue(meminfo,"MemTotal:",this->SystemTotal);
   if (!ok)
     {
-    sqErrorMacro(cerr,"Failed to get the total system memory.");
+    sqErrorMacro(std::cerr,"Failed to get the total system memory.");
     return;
     }
 }
@@ -117,18 +115,18 @@ unsigned long long MemoryMonitor::GetStatusField(const char *name)
   // load a fresh copy of /proc/self/status get the value from name
   // value pairs there in
   int ok;
-  vector<string> status;
+  std::vector<std::string> status;
   ok=LoadLines("/proc/self/status",status);
   if (!ok)
     {
-    sqErrorMacro(cerr,"Failed to open /proc/self/status.");
+    sqErrorMacro(std::cerr,"Failed to open /proc/self/status.");
     return -1;
     }
   unsigned long long value;
   ok=NameValue(status,name,value);
   if (!ok)
     {
-    sqErrorMacro(cerr,"Failed to find " << name << ".");
+    sqErrorMacro(std::cerr,"Failed to find " << name << ".");
     return -1;
     }
 

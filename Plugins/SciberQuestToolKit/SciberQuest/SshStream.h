@@ -4,11 +4,7 @@
 #include <libssh/libssh.h>
 
 #include <string>
-using std::string;
-
 #include <vector>
-using std::vector;
-
 
 /**
 Class that encapsulates an ssh connection and stream between
@@ -37,7 +33,7 @@ public:
   Make a connection to a remote host. After connection you
   must authenticate and open a channel for use.
   */
-  int Connect(string user, string host);
+  int Connect(std::string user, std::string host);
 
   /**
   Disconnect and free resources.
@@ -47,7 +43,7 @@ public:
   /**
   Authenticate with the server.
   */
-  int Authenticate(string user,string passwd);
+  int Authenticate(std::string user,std::string passwd);
 
   /**
   Open a channel, if successful an channel id >0 is returned.
@@ -63,7 +59,7 @@ public:
   /**
   Execute the command on the remote host over the channel identified by cid.
   */
-  int Exec(int cid, string command, string &buffer);
+  int Exec(int cid, std::string command, std::string &buffer);
 
   /**
   Validate the stream;
@@ -74,7 +70,7 @@ protected:
 
 private:
   ssh_session Session;
-  vector<ssh_channel> Channel;
+  std::vector<ssh_channel> Channel;
 };
 
 #endif

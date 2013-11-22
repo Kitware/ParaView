@@ -9,27 +9,21 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __SQMacros_h
 #define __SQMacros_h
 
-#include <iomanip>
-using std::setprecision;
-using std::setw;
-using std::scientific;
-#include<iostream>
-using std::endl;
-using std::cerr;
+#include <iostream>
 
 #define safeio(s) (s?s:"NULL")
 
-#define sqErrorMacro(os,estr)                       \
-    os                                              \
-      << "Error in:" << endl                        \
-      << __FILE__ << ", line " << __LINE__ << endl  \
-      << "" estr << endl;
+#define sqErrorMacro(os,estr)                            \
+    os                                                   \
+      << "Error in:" << std::endl                        \
+      << __FILE__ << ", line " << __LINE__ << std::endl  \
+      << "" estr << std::endl;
 
-#define sqWarningMacro(os,estr)                     \
-    os                                              \
-      << "Warning in:" << endl                      \
-      << __FILE__ << ", line " << __LINE__ << endl  \
-      << "" estr << endl;
+#define sqWarningMacro(os,estr)                          \
+    os                                                   \
+      << "Warning in:" << std::endl                      \
+      << __FILE__ << ", line " << __LINE__ << std::endl  \
+      << "" estr << std::endl;
 
 #define SafeDelete(a)\
   if (a)\

@@ -188,7 +188,7 @@ void CreateCartesianView(
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return;
@@ -261,7 +261,7 @@ void CreateCartesianView(
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return;
@@ -345,7 +345,7 @@ int WriteDataArray(
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return 0;
@@ -366,7 +366,7 @@ int WriteDataArray(
     {
     MPI_Error_string(iErr,eStr,const_cast<int *>(&eStrLen));
     sqErrorMacro(pCerr(),
-        << "Error opeing file: " << fileName << endl
+        << "Error opeing file: " << fileName << std::endl
         << eStr);
     return 0;
     }
@@ -435,7 +435,7 @@ int WriteDataArray(
     {
     MPI_Error_string(iErr,eStr,const_cast<int *>(&eStrLen));
     sqErrorMacro(pCerr(),
-        << "Error writing file: " << fileName << endl
+        << "Error writing file: " << fileName << std::endl
         << eStr);
     return 0;
     }
@@ -476,7 +476,7 @@ int ReadDataArray(
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return 0;
@@ -497,7 +497,7 @@ int ReadDataArray(
     {
     MPI_Error_string(iErr,eStr,const_cast<int *>(&eStrLen));
     sqErrorMacro(pCerr(),
-        << "Error opeing file: " << fileName << endl
+        << "Error opeing file: " << fileName << std::endl
         << eStr);
     return 0;
     }
@@ -578,7 +578,7 @@ int ReadDataArray(
     {
     MPI_Error_string(iErr,eStr,&eStrLen);
     sqErrorMacro(pCerr(),
-        << "Error reading file: " << fileName << endl
+        << "Error reading file: " << fileName << std::endl
         << eStr);
     return 0;
     }
@@ -617,7 +617,7 @@ int WriteDataArray(
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return 0;
@@ -701,7 +701,7 @@ int WriteDataArray(
     {
     MPI_Error_string(iErr,eStr,&eStrLen);
     sqErrorMacro(pCerr(),
-        << "Error writing file." << endl
+        << "Error writing file." << std::endl
         << eStr);
     return 0;
     }
@@ -734,7 +734,7 @@ int ReadDataArray(
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return 0;
@@ -818,7 +818,7 @@ int ReadDataArray(
     {
     MPI_Error_string(iErr,eStr,&eStrLen);
     sqErrorMacro(pCerr(),
-        << "Error reading file." << endl
+        << "Error reading file." << std::endl
         << eStr);
     return 0;
     }
@@ -850,7 +850,7 @@ int ReadDataArray(
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return 0;
@@ -875,7 +875,7 @@ int ReadDataArray(
     {
     MPI_Error_string(iErr,eStr,&eStrLen);
     sqErrorMacro(pCerr(),
-        << "Error reading file." << endl
+        << "Error reading file." << std::endl
         << eStr);
     return 0;
     }

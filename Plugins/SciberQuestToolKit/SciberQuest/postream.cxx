@@ -20,7 +20,7 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 //-----------------------------------------------------------------------------
-ostream &pCerr()
+std::ostream &pCerr()
 {
   int WorldRank=0;
   #ifndef SQTK_WITHOUT_MPI
@@ -32,7 +32,7 @@ ostream &pCerr()
   char host[256]={'\0'};
   gethostname(host,256);
 
-  cerr << "[" << host << ":" << WorldRank << "] ";
+  std::cerr << "[" << host << ":" << WorldRank << "] ";
 
-  return cerr;
+  return std::cerr;
 }

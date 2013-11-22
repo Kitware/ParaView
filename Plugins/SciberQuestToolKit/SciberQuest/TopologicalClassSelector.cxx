@@ -103,8 +103,8 @@ vtkUnstructuredGrid *TopologicalClassSelector::GetOutput()
   this->Append->Update();
   vtkUnstructuredGrid *ug=this->Append->GetOutput();
 
-//   cerr << "Geting output" << endl;
-//   ug->Print(cerr);
+//   std::cerr << "Geting output" << std::endl;
+//   ug->Print(std::cerr);
 
   return ug;
 }

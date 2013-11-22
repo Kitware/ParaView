@@ -17,7 +17,6 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkDataArray.h"
 
 #include <iostream>
-using std::cerr;
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -123,7 +122,7 @@ int CUDAConstMemoryManager<T>::Initialize(const char *name)
   cudaError_t ierr=cudaGetSymbolAddress((void**)&this->DeviceBlock,name);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Failed to get address for symbol " << name);
+    CUDAErrorMacro(std::cerr,ierr,"Failed to get address for symbol " << name);
     return -1;
     }
   return 0;
@@ -205,10 +204,10 @@ int CUDAConstMemoryManager<T>::Push(T *hostBlock, unsigned long nT)
 {
   unsigned long n=nT*sizeof(T);
   #ifdef CUDAMemoryManagerDEBUG
-  cerr
+  std::cerr
     << "Pushing " << this->DeviceBlock << ", " << n
     << " bytes to the device"
-    << endl;
+    << std::endl;
   #endif
   cudaError_t ierr;
   ierr=cudaMemcpyToSymbol(
@@ -217,7 +216,7 @@ int CUDAConstMemoryManager<T>::Push(T *hostBlock, unsigned long nT)
       n);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Push failed");
+    CUDAErrorMacro(std::cerr,ierr,"Push failed");
     return -1;
     }
   return 0;

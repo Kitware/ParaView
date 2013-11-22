@@ -21,10 +21,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkDataArray.h"
 
 #include <iostream>
-using std::cerr;
-using std::endl;
 #include <vector>
-using std::vector;
 #include <cstdlib>
 
 //#define CPUConvolutionDriverDEBUG
@@ -50,7 +47,7 @@ int CPUConvolutionDriver::Convolution(
 
   #ifdef CPUConvolutionDriverDEBUG
   pCerr()
-    << "===============CPUConvolutionDriver::Convolution" << endl;
+    << "===============CPUConvolutionDriver::Convolution" << std::endl;
   #endif
 
   int nV[3];
@@ -87,18 +84,18 @@ int CPUConvolutionDriver::Convolution(
       slowDim=1;
       break;
     default:
-      sqErrorMacro(cerr,"Bad dim mode.");
+      sqErrorMacro(std::cerr,"Bad dim mode.");
       return -1;
     }
 
   #ifdef CPUConvolutionDriverDEBUG
-  pCerr() << "wnijk=" << wnijk << endl;
-  pCerr() << "fastDim=" << fastDim << endl;
-  pCerr() << "slowDim=" << slowDim << endl;
-  pCerr() << "extV=" << extV << endl;
-  pCerr() << "nV=(" << nV[fastDim] <<  ", " << nV[slowDim] << ")" << endl;
-  pCerr() << "extW=" << extW << endl;
-  pCerr() << "nW=(" << nW[fastDim] <<  ", " << nW[slowDim] << ")" << endl;
+  pCerr() << "wnijk=" << wnijk << std::endl;
+  pCerr() << "fastDim=" << fastDim << std::endl;
+  pCerr() << "slowDim=" << slowDim << std::endl;
+  pCerr() << "extV=" << extV << std::endl;
+  pCerr() << "nV=(" << nV[fastDim] <<  ", " << nV[slowDim] << ")" << std::endl;
+  pCerr() << "extW=" << extW << std::endl;
+  pCerr() << "nW=(" << nW[fastDim] <<  ", " << nW[slowDim] << ")" << std::endl;
   #endif
 
   switch (this->Optimization)
@@ -128,8 +125,8 @@ int CPUConvolutionDriver::Convolution(
         // TODO -- replace with vtkTemplateMacro
         case VTK_FLOAT:
           {
-          vector<float*> sV((size_t)nComp,NULL);
-          vector<float*> sW((size_t)nComp,NULL);
+          std::vector<float*> sV((size_t)nComp,NULL);
+          std::vector<float*> sW((size_t)nComp,NULL);
           for (int q=0; q<nComp; ++q)
             {
             posix_memalign((void**)&sV[q],16,vnijk*sizeof(float));
@@ -190,7 +187,7 @@ int CPUConvolutionDriver::Convolution(
           break;
         default:
           // TODO
-          sqErrorMacro(cerr,"Not currently using vtkTemplateMacro");
+          sqErrorMacro(std::cerr,"Not currently using vtkTemplateMacro");
           return -1;
         }
       break;

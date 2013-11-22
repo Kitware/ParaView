@@ -15,11 +15,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkType.h"
 
 #include <map>
-using std::map;
-using std::pair;
-
 #include <vector>
-using std::vector;
 
 class DataArrayCopier;
 class vtkDataSet;
@@ -86,10 +82,10 @@ protected:
   void ClearPointIdMap(){ this->PointIdMap.clear(); }
 
 protected:
-  map<vtkIdType,vtkIdType> PointIdMap;
+  std::map<vtkIdType,vtkIdType> PointIdMap;
 
-  vector<DataArrayCopier *> PointDataCopier;
-  vector<DataArrayCopier *> CellDataCopier;
+  std::vector<DataArrayCopier *> PointDataCopier;
+  std::vector<DataArrayCopier *> CellDataCopier;
 };
 
 #endif

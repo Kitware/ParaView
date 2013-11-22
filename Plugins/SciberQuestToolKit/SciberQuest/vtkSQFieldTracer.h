@@ -20,10 +20,6 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSciberQuestModule.h"
 #include "vtkDataSetAlgorithm.h"
 
-#include<map>
-using std::map;
-using std::pair;
-
 class vtkUnstructuredGrid;
 class vtkSQOOCReader;
 class vtkMultiProcessController;

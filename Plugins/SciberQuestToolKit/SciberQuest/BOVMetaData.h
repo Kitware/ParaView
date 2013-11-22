@@ -15,11 +15,8 @@ Copyright 2012 SciberQuest Inc.
 
 #include <cstdlib>
 #include <map>
-using std::map;
 #include <vector>
-using std::vector;
 #include <string>
-using std::string;
 
 // These masks are used with array status methods.
 // ACTIVE_BIT is set to indicate an array is to be read
@@ -300,27 +297,27 @@ public:
 
 
   /// Print internal state.
-  virtual void Print(ostream &os) const;
+  virtual void Print(std::ostream &os) const;
 
 private:
-  friend ostream &operator<<(ostream &os, const BOVMetaData &md);
+  friend std::ostream &operator<<(std::ostream &os, const BOVMetaData &md);
 
 protected:
-  char Mode;                    // 'r' reading, 'w' writing
+  char Mode;                          // 'r' reading, 'w' writing
   int IsOpen;
-  string FileName;              // path and file name of metadata file.
-  string PathToBricks;          // path to the brick files.
-  CartesianExtent Domain;       // Dataset domain on disk.
-  CartesianExtent Subset;       // Subset of interst to read.
-  CartesianExtent Decomp;       // Part of the subset this process will read.
-  map<string,int> Arrays;       // map of srray names to a status flag.
-  vector<int> TimeSteps;        // Time values.
-  string DataSetType;           // vtk data set type string
-  double Origin[3];             // dataset origin for image
-  double Spacing[3];            // grid spacing for image
+  std::string FileName;               // path and file name of metadata file.
+  std::string PathToBricks;           // path to the brick files.
+  CartesianExtent Domain;             // Dataset domain on disk.
+  CartesianExtent Subset;             // Subset of interst to read.
+  CartesianExtent Decomp;             // Part of the subset this process will read.
+  std::map<std::string,int> Arrays;   // map of array names to a status flag.
+  std::vector<int> TimeSteps;         // Time values.
+  std::string DataSetType;            // vtk data set type string
+  double Origin[3];                   // dataset origin for image
+  double Spacing[3];                  // grid spacing for image
   SharedArray<float> *Coordinates[3]; // x,y,z coordinate arrays for rectilinear
 };
 
-ostream &operator<<(ostream &os, const BOVMetaData &md);
+std::ostream &operator<<(std::ostream &os, const BOVMetaData &md);
 
 #endif

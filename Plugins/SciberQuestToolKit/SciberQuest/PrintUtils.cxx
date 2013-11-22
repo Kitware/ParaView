@@ -11,7 +11,6 @@ Copyright 2012 SciberQuest Inc.
 #include<vector>
 #include<string>
 #include<map>
-using namespace std;
 
 #include "vtkSciberQuestModule.h"
 #if defined PV_3_4_BUILD
@@ -21,33 +20,33 @@ using namespace std;
 #endif
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT  ostream &operator<<(ostream &os, const map<string,int> &m)
+ VTKSCIBERQUEST_EXPORT  std::ostream &operator<<(std::ostream &os, const std::map<std::string,int> &m)
 {
-  map<string,int>::const_iterator it=m.begin();
-  map<string,int>::const_iterator end=m.end();
+  std::map<std::string,int>::const_iterator it=m.begin();
+  std::map<std::string,int>::const_iterator end=m.end();
   while (it!=end)
     {
-    os << it->first << ", " << it->second << endl;
+    os << it->first << ", " << it->second << std::endl;
     ++it;
     }
   return os;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &operator<<(ostream &os, const vector<vtkAMRBox> &v)
+ VTKSCIBERQUEST_EXPORT std::ostream &operator<<(std::ostream &os, const std::vector<vtkAMRBox> &v)
 {
-  os << "\t[" << endl;
+  os << "\t[" << std::endl;
   size_t n=v.size();
   for (size_t i=0; i<n; ++i)
     {
-    os << "\t\t"; v[i].Print(os) << endl;
+    os << "\t\t"; v[i].Print(os) << std::endl;
     }
-  os << "\t]" << endl;
+  os << "\t]" << std::endl;
   return os;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &operator<<(ostream &os, const vector<string> &v)
+ VTKSCIBERQUEST_EXPORT std::ostream &operator<<(std::ostream &os, const std::vector<std::string> &v)
 {
   os << "[";
   size_t n=v.size();
@@ -64,7 +63,7 @@ using namespace std;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &operator<<(ostream &os, const vector<double> &v)
+ VTKSCIBERQUEST_EXPORT std::ostream &operator<<(std::ostream &os, const std::vector<double> &v)
 {
   os << "[";
   size_t n=v.size();
@@ -81,7 +80,7 @@ using namespace std;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &operator<<(ostream &os, const vector<float> &v)
+ VTKSCIBERQUEST_EXPORT std::ostream &operator<<(std::ostream &os, const std::vector<float> &v)
 {
   os << "[";
   size_t n=v.size();
@@ -99,7 +98,7 @@ using namespace std;
 
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &operator<<(ostream &os, const vector<int> &v)
+ VTKSCIBERQUEST_EXPORT std::ostream &operator<<(std::ostream &os, const std::vector<int> &v)
 {
   os << "[";
   size_t n=v.size();
@@ -116,9 +115,9 @@ using namespace std;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &PrintD3(ostream &os, const double *v3)
+ VTKSCIBERQUEST_EXPORT std::ostream &PrintD3(std::ostream &os, const double *v3)
 {
-  vector<double> dv(3,0.0);
+  std::vector<double> dv(3,0.0);
   dv[0]=v3[0];
   dv[1]=v3[1];
   dv[2]=v3[2];
@@ -127,9 +126,9 @@ using namespace std;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &PrintD6(ostream &os, const double *v6)
+ VTKSCIBERQUEST_EXPORT std::ostream &PrintD6(std::ostream &os, const double *v6)
 {
-  vector<double> dv(6,0.0);
+  std::vector<double> dv(6,0.0);
   dv[0]=v6[0];
   dv[1]=v6[1];
   dv[2]=v6[2];
@@ -141,9 +140,9 @@ using namespace std;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &PrintI3(ostream &os, const int *v3)
+ VTKSCIBERQUEST_EXPORT std::ostream &PrintI3(std::ostream &os, const int *v3)
 {
-  vector<int> dv(3,0);
+  std::vector<int> dv(3,0);
   dv[0]=v3[0];
   dv[1]=v3[1];
   dv[2]=v3[2];
@@ -152,9 +151,9 @@ using namespace std;
 }
 
 //*****************************************************************************
- VTKSCIBERQUEST_EXPORT ostream &PrintI6(ostream &os, const int *v6)
+ VTKSCIBERQUEST_EXPORT std::ostream &PrintI6(std::ostream &os, const int *v6)
 {
-  vector<int> dv(6,0);
+  std::vector<int> dv(6,0);
   dv[0]=v6[0];
   dv[1]=v6[1];
   dv[2]=v6[2];

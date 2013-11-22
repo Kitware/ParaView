@@ -114,7 +114,7 @@ private:
   BOVReader *Reader;
   BOVOCCReader *Cache[2];
   vtkDataSet *Data[2];
-  string ActiveArrayName;        // name of array to be interpolated
+  std::string ActiveArrayName;   // name of array to be interpolated
   vtkDataArray *ActiveArray[2];  // reference to the active array at bracketing times
 
 };

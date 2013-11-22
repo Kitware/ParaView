@@ -13,7 +13,6 @@ Copyright 2012 SciberQuest Inc.
 
 #include "vtkIntArray.h"
 #include <vector>
-using std::vector;
 
 class IdBlock;
 class FieldLine;
@@ -104,7 +103,7 @@ public:
   virtual void PrintLegend(int){}
 
 protected:
-  vector<FieldLine *> Lines;
+  std::vector<FieldLine *> Lines;
   TerminationCondition *Tcon;
 };
 

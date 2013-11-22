@@ -27,7 +27,7 @@ CartesianDataBlockIODescriptor::CartesianDataBlockIODescriptor(
   (void)periodic;
   (void)nGhosts;
   sqErrorMacro(
-    cerr,
+    std::cerr,
     << "This class requires MPI but it was built without MPI.");
   #else
   this->Mode
@@ -96,10 +96,10 @@ CartesianDataBlockIODescriptor::CartesianDataBlockIODescriptor(
           #ifdef CartesianDataBlockIODescriptorDEBUG
           int regSize[3];
           memRegion.Size(regSize);
-          cerr
+          std::cerr
             << "    "
             << fileRegion << " -> " << memRegion
-            << " n=" << Tuple<int>(regSize,3) << endl;
+            << " n=" << Tuple<int>(regSize,3) << std::endl;
           #endif
           }
         }
@@ -136,12 +136,12 @@ void CartesianDataBlockIODescriptor::Clear()
 }
 
 //-----------------------------------------------------------------------------
-ostream &operator<<(ostream &os,const CartesianDataBlockIODescriptor &descr)
+std::ostream &operator<<(std::ostream &os,const CartesianDataBlockIODescriptor &descr)
 {
   size_t n=descr.MemViews.size();
   for (size_t i=0; i<n; ++i)
     {
-    os << "    " << descr.FileViews[i] << " -> " << descr.MemViews[i] << endl;
+    os << "    " << descr.FileViews[i] << " -> " << descr.MemViews[i] << std::endl;
     }
   return os;
 }

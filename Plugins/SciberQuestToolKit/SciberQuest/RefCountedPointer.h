@@ -11,9 +11,6 @@ Copyright 2012 SciberQuest Inc.
 #define RefCountedPointer_h
 
 #include <iostream>
-using std::ostream;
-using std::cerr;
-using std::endl;
 
 //=============================================================================
 class RefCountedPointer
@@ -32,15 +29,15 @@ public:
   virtual int GetRefCount(){ return this->N; }
   virtual void SetRefCount(int rc){ this->N=rc; }
 
-  virtual void Print(ostream &){}
-  virtual void PrintRefCount(ostream &os){ os << "RefCount=" << this->N; }
+  virtual void Print(std::ostream &){}
+  virtual void PrintRefCount(std::ostream &os){ os << "RefCount=" << this->N; }
 
 private:
   int N;
 };
 
 //*****************************************************************************
-ostream &operator<<(ostream &os, RefCountedPointer &rcp);
+std::ostream &operator<<(std::ostream &os, RefCountedPointer &rcp);
 
 #define SetRefCountedPointer(NAME,TYPE)\
   virtual void Set##NAME(TYPE *v);\

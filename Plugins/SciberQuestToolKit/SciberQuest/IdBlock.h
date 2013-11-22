@@ -10,7 +10,6 @@ Copyright 2012 SciberQuest Inc.
 #define __IdBlock_h
 
 #include <iostream>
-using std::ostream;
 
 /// A block of adjecent indexes uint64_to a collection (typically of cells or pouint64_ts).
 class IdBlock
@@ -30,7 +29,7 @@ public:
 private:
   unsigned long long m_data[2]; // id, size
 private:
-  friend ostream &operator<<(ostream &os, const IdBlock &b);
+  friend std::ostream &operator<<(std::ostream &os, const IdBlock &b);
 };
 
 #endif

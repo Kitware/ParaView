@@ -13,7 +13,7 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 
 //*****************************************************************************
-ostream &operator<<(ostream &os, const CartesianExtent &ext)
+std::ostream &operator<<(std::ostream &os, const CartesianExtent &ext)
 {
   os << Tuple<int>(ext.GetData(),6);
 
@@ -37,10 +37,10 @@ int CartesianExtent::GetDimensionMode(
     {
     sqErrorMacro(
       pCerr(),
-      << "The extent is too small." << endl
-      << "minExt=" << minExt << endl
-      << "problemDomain=" << problemDomain << endl
-      << "problemDomainSize=" << Tuple<int>(inExt,3) << endl
+      << "The extent is too small." << std::endl
+      << "minExt=" << minExt << std::endl
+      << "problemDomain=" << problemDomain << std::endl
+      << "problemDomainSize=" << Tuple<int>(inExt,3) << std::endl
       << "NOTE: This filter does not support less than 2D.");
     return DIM_MODE_INVALID;
     }

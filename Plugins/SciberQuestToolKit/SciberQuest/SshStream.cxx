@@ -1,18 +1,14 @@
 #include "SshStream.h"
 
 #include <iostream>
-using std::cerr;
-using std::endl;
-
 #include <sstream>
-using std::ostringstream;
 
 #include <cstdio>
 #include <cstring>
 #include <cerrno>
 
 //-----------------------------------------------------------------------------
-int SshStream::Connect(string user, string host)
+int SshStream::Connect(std::string user, std::string host)
 {
   this->Disconnect();
 
@@ -25,11 +21,11 @@ int SshStream::Connect(string user, string host)
   stat=ssh_connect(this->Session);
   if (stat!=SSH_OK)
     {
-    cerr
-      << "Error:" << endl
-      << "Failed to connect " << user << "@" << host << endl
-      << ssh_get_error(this->Session) << endl
-      << endl;
+    std::cerr
+      << "Error:" << std::endl
+      << "Failed to connect " << user << "@" << host << std::endl
+      << ssh_get_error(this->Session) << std::endl
+      << std::endl;
     return -1;
     }
 
@@ -46,10 +42,10 @@ int SshStream::Connect(string user, string host)
     case SSH_SERVER_NOT_KNOWN:
       if (ssh_write_knownhost(this->Session)<0)
         {
-        cerr
-          << "Error:" << endl
-          << "Write known hosts faild." << endl
-          << strerror(errno) << endl;
+        std::cerr
+          << "Error:" << std::endl
+          << "Write known hosts failed." << std::endl
+          << strerror(errno) << std::endl;
         return -1;
         }
       break;
@@ -58,10 +54,10 @@ int SshStream::Connect(string user, string host)
     case SSH_SERVER_ERROR:
     case SSH_SERVER_FILE_NOT_FOUND:
     default:
-      cerr
-        << "Error:" << endl
-        << ssh_get_error(this->Session) << endl
-        << endl;
+      std::cerr
+        << "Error:" << std::endl
+        << ssh_get_error(this->Session) << std::endl
+        << std::endl;
       return -1;
     }
 
@@ -69,16 +65,16 @@ int SshStream::Connect(string user, string host)
 }
 
 //-----------------------------------------------------------------------------
-int SshStream::Authenticate(string user, string passwd)
+int SshStream::Authenticate(std::string user, std::string passwd)
 {
   // authenticate
   int stat=ssh_userauth_password(this->Session,user.c_str(),passwd.c_str());
   if (stat!=SSH_OK)
     {
-    cerr
-      << "Error:" << endl
-      << "Failed to authenticate using password." << endl
-      << endl;
+    std::cerr
+      << "Error:" << std::endl
+      << "Failed to authenticate using password." << std::endl
+      << std::endl;
     return -1;
     }
 
@@ -92,22 +88,22 @@ int SshStream::OpenChannel()
   ssh_channel chan=channel_new(this->Session);
   if (chan==NULL)
     {
-    cerr
-      << "Error:" << endl
-      << "Failed to open a channel." << endl
-      << ssh_get_error(this->Session) << endl
-      << endl;
+    std::cerr
+      << "Error:" << std::endl
+      << "Failed to open a channel." << std::endl
+      << ssh_get_error(this->Session) << std::endl
+      << std::endl;
     return -1;
     }
 
   int stat=channel_open_session(chan);
   if (stat!=SSH_OK)
     {
-    cerr
-      << "Error:" << endl
-      << "Failed to open a channel." << endl
-      << ssh_get_error(this->Session) << endl
-      << endl;
+    std::cerr
+      << "Error:" << std::endl
+      << "Failed to open a channel." << std::endl
+      << ssh_get_error(this->Session) << std::endl
+      << std::endl;
     return -1;
     }
 
@@ -123,8 +119,8 @@ int SshStream::CloseChannel(size_t cid)
 {
   if (cid>=this->Channel.size())
     {
-    cerr
-      << "Error: CloseChannel failed, no channel " << cid << "." << endl;
+    std::cerr
+      << "Error: CloseChannel failed, no channel " << cid << "." << std::endl;
     return -1;
     }
 
@@ -166,25 +162,25 @@ int SshStream::Disconnect()
 }
 
 //-----------------------------------------------------------------------------
-int SshStream::Exec(int cid, string command, string &buffer)
+int SshStream::Exec(int cid, std::string command, std::string &buffer)
 {
   int stat;
 
   stat=channel_request_exec(this->Channel[cid],command.c_str());
   if (stat!=SSH_OK)
     {
-    cerr
-      << "Error:" << endl
-      << "Failed to exec \"" << command << "\" on channel " << cid << "." << endl
-      << ssh_get_error(this->Session) << endl
-      << endl;
+    std::cerr
+      << "Error:" << std::endl
+      << "Failed to exec \"" << command << "\" on channel " << cid << "." << std::endl
+      << ssh_get_error(this->Session) << std::endl
+      << std::endl;
     return -1;
     }
 
   int n=0;
   char buf[1024]={'\0'};
 
-  ostringstream resss;
+  std::ostringstream resss;
   while ((n=channel_read(this->Channel[cid],buf,sizeof(buf)-1,0))>0)
     {
     buf[n]='\0';
@@ -192,11 +188,11 @@ int SshStream::Exec(int cid, string command, string &buffer)
     }
   if (n<0)
     {
-    cerr
-      << "Error:" << endl
-      << "Failed to read channel " << cid << "." << endl
-      << ssh_get_error(this->Session) << endl
-      << endl;
+    std::cerr
+      << "Error:" << std::endl
+      << "Failed to read channel " << cid << "." << std::endl
+      << ssh_get_error(this->Session) << std::endl
+      << std::endl;
     return -1;
     }
 

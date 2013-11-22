@@ -10,11 +10,7 @@ Copyright 2012 SciberQuest Inc.
 #define __CartesianExtent_h
 
 #include <algorithm>
-using std::min;
-using std::max;
-
 #include <iostream>
-using std::ostream;
 
 /// Index space representation of a cartesian volume.
 /**
@@ -325,7 +321,7 @@ private:
   int Data[6];
 };
 
-ostream &operator<<(ostream &os, const CartesianExtent &ext);
+std::ostream &operator<<(std::ostream &os, const CartesianExtent &ext);
 
 //-----------------------------------------------------------------------------
 inline
@@ -636,12 +632,12 @@ void CartesianExtent::operator&=(const CartesianExtent &other)
     return;
     }
 
-  this->Data[0]=max(this->Data[0],other.Data[0]);
-  this->Data[1]=min(this->Data[1],other.Data[1]);
-  this->Data[2]=max(this->Data[2],other.Data[2]);
-  this->Data[3]=min(this->Data[3],other.Data[3]);
-  this->Data[4]=max(this->Data[4],other.Data[4]);
-  this->Data[5]=min(this->Data[5],other.Data[5]);
+  this->Data[0]=std::max(this->Data[0],other.Data[0]);
+  this->Data[1]=std::min(this->Data[1],other.Data[1]);
+  this->Data[2]=std::max(this->Data[2],other.Data[2]);
+  this->Data[3]=std::min(this->Data[3],other.Data[3]);
+  this->Data[4]=std::max(this->Data[4],other.Data[4]);
+  this->Data[5]=std::min(this->Data[5],other.Data[5]);
 
   if (this->Empty())
     {

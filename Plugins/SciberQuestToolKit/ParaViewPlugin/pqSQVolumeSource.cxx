@@ -45,14 +45,8 @@ Copyright 2012 SciberQuest Inc.
 #include <QDebug>
 
 #include <string>
-using std::string;
-
 #include <iostream>
-using std::cerr;
-using std::endl;
-
 #include <sstream>
-using std::ostringstream;
 
 // #define pqSQVolumeSourceDEBUG
 
@@ -64,7 +58,7 @@ pqSQVolumeSource::pqSQVolumeSource(
       pqNamedObjectPanel(l_proxy, widget)
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::pqSQVolumeSource" << endl;
+  std::cerr << ":::::pqSQVolumeSource::pqSQVolumeSource" << std::endl;
   #endif
 
   // Construct Qt form.
@@ -347,7 +341,7 @@ pqSQVolumeSource::pqSQVolumeSource(
 pqSQVolumeSource::~pqSQVolumeSource()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::~pqSQVolumeSource" << endl;
+  std::cerr << ":::::pqSQVolumeSource::~pqSQVolumeSource" << std::endl;
   #endif
 
   delete this->Form;
@@ -374,7 +368,7 @@ void pqSQVolumeSource::contextMenuEvent(QContextMenuEvent *evnt)
 void pqSQVolumeSource::CopyConfiguration()
 {
   // grab the current configuration.
-  ostringstream os;
+  std::ostringstream os;
 
   vtkSQVolumeSourceConfigurationWriter *writer
     = vtkSQVolumeSourceConfigurationWriter::New();
@@ -460,7 +454,7 @@ void pqSQVolumeSource::loadConfiguration()
 void pqSQVolumeSource::saveConfiguration()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::saveConfiguration" << endl;
+  std::cerr << ":::::pqSQVolumeSource::saveConfiguration" << std::endl;
   #endif
 
   vtkSQVolumeSourceConfigurationWriter *writer
@@ -603,7 +597,7 @@ void pqSQVolumeSource::SetSpacing(double *dx)
 int pqSQVolumeSource::ValidateCoordinates()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::ValidateCoordinates" << endl;
+  std::cerr << ":::::pqSQVolumeSource::ValidateCoordinates" << std::endl;
   #endif
 
   this->Form->coordStatus->setText("OK");
@@ -644,7 +638,7 @@ int pqSQVolumeSource::ValidateCoordinates()
     double norm=vtkMath::Normalize(n);
     if (norm<1.0e-6)
       {
-      ostringstream os;
+      std::ostringstream os;
       os
         << "Error: A"
         << cases[qq]
@@ -670,7 +664,7 @@ int pqSQVolumeSource::ValidateCoordinates()
 void pqSQVolumeSource::DimensionsModified()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::DimensionsModified" << endl;
+  std::cerr << ":::::pqSQVolumeSource::DimensionsModified" << std::endl;
   #endif
 
   if (!this->ValidateCoordinates())
@@ -724,7 +718,7 @@ void pqSQVolumeSource::DimensionsModified()
 void pqSQVolumeSource::SpacingModified()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::SpacingModified" << endl;
+  std::cerr << ":::::pqSQVolumeSource::SpacingModified" << std::endl;
   #endif
 
   // retreive the requested spacing.
@@ -756,7 +750,7 @@ void pqSQVolumeSource::SpacingModified()
 void pqSQVolumeSource::ResolutionModified()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::ResolutionModified" << endl;
+  std::cerr << ":::::pqSQVolumeSource::ResolutionModified" << std::endl;
   #endif
 
   // retreive the requested resolution.
@@ -790,7 +784,7 @@ void pqSQVolumeSource::ResolutionModified()
 void pqSQVolumeSource::PullServerConfig()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::PullServerConfig" << endl;
+  std::cerr << ":::::pqSQVolumeSource::PullServerConfig" << std::endl;
   #endif
 
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
@@ -842,7 +836,7 @@ void pqSQVolumeSource::PushServerConfig()
 {
   #if defined pqSQVolumeSourceDEBUG
 
-  cerr << ":::::pqSQVolumeSource::PushServerConfig" << endl;
+  std::cerr << ":::::pqSQVolumeSource::PushServerConfig" << std::endl;
   #endif
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
 
@@ -895,7 +889,7 @@ void pqSQVolumeSource::PushServerConfig()
 void pqSQVolumeSource::accept()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::accept" << endl;
+  std::cerr << ":::::pqSQVolumeSource::accept" << std::endl;
   #endif
 
   if (!this->ValidateCoordinates())
@@ -910,7 +904,7 @@ void pqSQVolumeSource::accept()
 void pqSQVolumeSource::reset()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::pqSQVolumeSource::reset" << endl;
+  std::cerr << ":::::pqSQVolumeSource::reset" << std::endl;
   #endif
 
   pqNamedObjectPanel::reset();

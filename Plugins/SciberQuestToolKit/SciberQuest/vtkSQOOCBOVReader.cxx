@@ -31,8 +31,6 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 
 #include <sstream>
-using std::ostringstream;
-
 #include <iostream>
 #include <iomanip>
 
@@ -54,8 +52,8 @@ using std::ostringstream;
 // ****************************************************************************
 static
 void WriteBlockUse(
-      vector<int> &cacheHit,
-      vector<int> &cacheMiss,
+      std::vector<int> &cacheHit,
+      std::vector<int> &cacheMiss,
       CartesianDecomp *decomp,
       const char *fileName)
 {
@@ -201,7 +199,7 @@ void vtkSQOOCBOVReader::Close()
     {
     // write a datatset that could be used to visualize
     // cache hits.
-    ostringstream oss;
+    std::ostringstream oss;
     oss << "cache." << setfill('0') << setw(6) << worldRank << ".vtk";
 
     WriteBlockUse(
@@ -214,7 +212,7 @@ void vtkSQOOCBOVReader::Close()
     #ifndef SQTK_WITHOUT_MPI
     int nBlocks=(int)this->DomainDecomp->GetNumberOfBlocks();
 
-    vector<int> globalCacheHit(nBlocks,0);
+    std::vector<int> globalCacheHit(nBlocks,0);
     MPI_Reduce(
           &this->CacheHit[0],
           &globalCacheHit[0],
@@ -224,7 +222,7 @@ void vtkSQOOCBOVReader::Close()
           0,
           MPI_COMM_WORLD);
 
-    vector<int> globalCacheMiss(nBlocks,0);
+    std::vector<int> globalCacheMiss(nBlocks,0);
     MPI_Reduce(
           &this->CacheMiss[0],
           &globalCacheMiss[0],
@@ -304,7 +302,7 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
     }
 
   #if vtkSQOOCBOVReaderDEBUG>1
-  cerr << "Accessing " << Tuple<int>(block->GetId(),4);
+  std::cerr << "Accessing " << Tuple<int>(block->GetId(),4);
   #endif
 
   // update the working domain.
@@ -315,7 +313,7 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
   if (data)
     {
     #if vtkSQOOCBOVReaderDEBUG>1
-    cerr << "\tCache hit" << endl;
+    std::cerr << "\tCache hit" << std::endl;
     #endif
 
     this->CacheHitCount+=1;
@@ -330,7 +328,7 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
   else
     {
     #if vtkSQOOCBOVReaderDEBUG>1
-    cerr << "\tCache miss";
+    std::cerr << "\tCache miss";
     #endif
 
     this->CacheMissCount+=1;
@@ -349,7 +347,7 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
       lruBlock->SetData(0);
 
       #if vtkSQOOCBOVReaderDEBUG>1
-      cerr << "\tRemoved " << Tuple<int>(lruBlock->GetId(),4);
+      std::cerr << "\tRemoved " << Tuple<int>(lruBlock->GetId(),4);
       #endif
       }
 
@@ -432,7 +430,7 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
     if (this->BlockCacheSize>0)
       {
       #if vtkSQOOCBOVReaderDEBUG>1
-      cerr << "\tInserted " << Tuple<int>(block->GetId(),4) << endl;
+      std::cerr << "\tInserted " << Tuple<int>(block->GetId(),4) << std::endl;
       #endif
 
       // cache the newly read dataset, and insert this block into
@@ -443,9 +441,9 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
       }
 
     #if vtkSQOOCBOVReaderDEBUG>2
-    // data->Print(cerr);
+    // data->Print(std::cerr);
     vtkDataSetWriter *idw=vtkDataSetWriter::New();
-    ostringstream oss;
+    std::ostringstream oss;
     oss << "block." << block->GetIndex() << ".vtk";
     idw->SetFileName(oss.str().c_str());
     idw->SetInput(data);
@@ -484,7 +482,7 @@ void vtkSQOOCBOVReader::DeActivateAllArrays()
 void vtkSQOOCBOVReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->vtkObject::PrintSelf(os,indent.GetNextIndent());
-  os << indent << "Reader: " << endl;
+  os << indent << "Reader: " << std::endl;
   this->Reader->PrintSelf(os);
-  os << endl;
+  os << std::endl;
 }

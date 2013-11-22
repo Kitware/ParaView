@@ -94,7 +94,7 @@ int PartitionBlocks(
       if (blockGrid.z>blockGridMax[2])
         {
         sqErrorMacro(
-          cerr,
+          std::cerr,
             << "Too many blocks " << nBlocks
             << " of size " << blockSize
             << " required for a grid of ("

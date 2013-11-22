@@ -10,13 +10,10 @@ Copyright 2012 SciberQuest Inc.
 #define __Numerics_hxx
 
 #include<iostream>
-using std::cerr;
-using std::endl;
 
 #include <cstdlib>
 #include <cmath>
 #include <complex>
-using std::complex;
 
 #include "SQPOSIXOnWindowsWarningSupression.h"
 #include "SQPosixOnWindows.h"
@@ -30,14 +27,14 @@ using namespace Eigen;
 
 //*****************************************************************************
 template<typename T>
-bool IsReal(complex<T> &c, T eps=T(1.0e-6))
+bool IsReal(std::complex<T> &c, T eps=T(1.0e-6))
 {
   return (fabs(imag(c)) < eps);
 }
 
 //*****************************************************************************
 template<typename T>
-bool IsComplex(complex<T> &c, T eps=T(1.0e-6))
+bool IsComplex(std::complex<T> &c, T eps=T(1.0e-6))
 {
   return (fabs(imag(c)) >= eps);
 }
@@ -380,9 +377,9 @@ bool Find(int *I, T *V, T *val)
          if (hit==nComp)
           {
           has=true;
-          cerr
+          std::cerr
             << __LINE__ << " FOUND val=" << val
-            << " at " << Tuple<int>(i,j,k) << endl;
+            << " at " << Tuple<int>(i,j,k) << std::endl;
           }
         }
       }
@@ -414,10 +411,10 @@ bool HasNans(int *I, T *V, T *val)
           if (isnan(V[q+p]))
             {
             has=true;
-            cerr
+            std::cerr
               << __LINE__ << " ERROR NAN. "
               << "I+" << q+p <<"=" << Tuple<int>(i,j,k)
-              << endl;
+              << std::endl;
             }
           }
         }
@@ -1145,7 +1142,7 @@ void ScalarMedianFilter2D(
     //std::sort(ids,ids+knij,comp);
     std::partial_sort(ids,ids+knij/2+1,ids+knij,comp);
 
-    // cerr << wi << " " << V[ids[0]] << " " << V[ids[knij/2]] << " " << V[ids[knij-1]] << endl;
+    // std::cerr << wi << " " << V[ids[0]] << " " << V[ids[knij/2]] << " " << V[ids[knij-1]] << std::endl;
 
     // median
     W[wi]=V[ids[knij/2]];
@@ -1241,7 +1238,7 @@ void DivergenceFace(int *I, double *dX, T *V, T *mV, T *div)
         const int vklo = 3 * (   k *pihi*pjhi+j*pihi+i) + 2;
         const int vkhi = 3 * ((k+1)*pihi*pjhi+j*pihi+i) + 2;
 
-        //cerr << "(" << vilo << ", " << vihi << ", " << vjlo << ", " << vjhi << ", " << vklo << ", " << vkhi << ")" << endl;
+        //std::cerr << "(" << vilo << ", " << vihi << ", " << vjlo << ", " << vjhi << ", " << vklo << ", " << vkhi << ")" << std::endl;
 
         // const double modV=mV[cId];
         // (sqrt(V[vilo]*V[vilo] + V[vjlo]*V[vjlo] + V[vklo]*V[vklo])
@@ -1800,13 +1797,13 @@ void NormalizedHelicity(
         // Cosine of the angle between v and w. Angle between v and w is small
         // near vortex, H_n = +-1.
 
-        // cerr
+        // std::cerr
         //   << "H=" << H[pi] << " "
         //   << "modV= " << modV << " "
         //   << "modW=" << modW << " "
         //   << "w=" << Tuple<double>((double *)w,3) << " "
         //   << "V=" << Tuple<T>(&V[vi],3)
-        //   << endl;
+        //   << std::endl;
         }
       }
     }
@@ -2023,7 +2020,7 @@ void Lambda(int *input, int *output, TP *x, TP *y, TP *z, TD *V, TD *L)
         L[vk]=(((L[vk]>=((TD)-1E-5))&&(L[vk]<=((TD)1E-5)))?TD(0):L[vk]);
 
         slowSort(&L[vi],0,3);
-        // cerr << L[vi] << ", "  << L[vj] << ", " << L[vk] << endl;
+        // std::cerr << L[vi] << ", "  << L[vj] << ", " << L[vk] << std::endl;
         }
       }
     }
@@ -3165,13 +3162,13 @@ void EigenvalueDiagnostic(
           j31, j32, j33;
 
         // compute eigen values, lambda
-        Matrix<complex<T>,3,1> e;
+        Matrix<std::complex<T>,3,1> e;
         EigenSolver<Matrix<T,3,3> >solver(J,false);
         e=solver.eigenvalues();
 
-        complex<T> &e1 = e(0);
-        complex<T> &e2 = e(1);
-        complex<T> &e3 = e(2);
+        std::complex<T> &e1 = e(0);
+        std::complex<T> &e2 = e(1);
+        std::complex<T> &e3 = e(2);
 
         // see Haimes, and Kenwright VGT and Feature Extraction fig 2
         // 0 - repelling node
@@ -3214,7 +3211,7 @@ void EigenvalueDiagnostic(
             }
           else
             {
-            cerr << "No real eigne value." << endl;
+            std::cerr << "No real eigne value." << std::endl;
             return;
             }
 

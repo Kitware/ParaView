@@ -11,22 +11,16 @@ Copyright 2012 SciberQuest Inc.
 #define __CUDAMacros_h
 
 #if defined SQTK_CUDA
-#include <cuda.h>
+#include <cuda.h> // standard cuda header
 
-#include <iomanip>
-using std::setprecision;
-using std::setw;
-using std::scientific;
-#include<iostream>
-using std::endl;
-using std::cerr;
+#include <iostream> // for endl
 
-#define CUDAErrorMacro(os,eno,estr)                 \
-    os                                              \
-      << "Error in:" << endl                        \
-      << __FILE__ << ", line " << __LINE__ << endl  \
-      << cudaGetErrorString(eno) << endl            \
-      << "" estr << endl;
+#define CUDAErrorMacro(os,eno,estr)                      \
+    os                                                   \
+      << "Error in:" << std::endl                        \
+      << __FILE__ << ", line " << __LINE__ << std::endl  \
+      << cudaGetErrorString(eno) << std::endl            \
+      << "" estr << std::endl;
 #else
 #define CUDAErrorMacro(os,eno,estr)
 #endif

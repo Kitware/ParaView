@@ -27,10 +27,7 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #include <iostream>
-using std::cerr;
-using std::endl;
 #include <vector>
-using std::vector;
 
 //-----------------------------------------------------------------------------
 CUDAConvolutionDriver::CUDAConvolutionDriver()
@@ -59,15 +56,15 @@ int CUDAConvolutionDriver::SetDeviceId(int deviceId)
 {
   #ifdef CUDAConvolutionDriverDEBUG
   pCerr()
-    << "===============CUDAConvolutionDriver::SetDeviceId" << endl
-    << deviceId << endl;
+    << "===============CUDAConvolutionDriver::SetDeviceId" << std::endl
+    << deviceId << std::endl;
   #endif
   #if defined SQTK_CUDA
   this->DeviceId=deviceId;
   cudaError_t ierr=cudaSetDevice(deviceId);
   if (ierr)
     {
-    CUDAErrorMacro(cerr,ierr,"Failed to select device " << deviceId);
+    CUDAErrorMacro(std::cerr,ierr,"Failed to select device " << deviceId);
     return -1;
     }
 
@@ -107,7 +104,7 @@ int CUDAConvolutionDriver::Convolution(
 
   #ifdef CUDAConvolutionDriverDEBUG
   pCerr()
-    << "===============CUDAConvolutionDriver::Convolution" << endl;
+    << "===============CUDAConvolutionDriver::Convolution" << std::endl;
   #endif
 
   #if defined SQTK_CUDA
@@ -128,7 +125,7 @@ int CUDAConvolutionDriver::Convolution(
     && (knijk*sizeof(float)<65536) )
     {
     #ifdef CUDAConvolutionDriverDEBUG
-    pCerr() << "Using constant memory for kernel" << endl;
+    pCerr() << "Using constant memory for kernel" << std::endl;
     #endif
     devK=CUDAConstMemoryManager<float>::New("gK",K,knijk);
     }
@@ -136,13 +133,13 @@ int CUDAConvolutionDriver::Convolution(
   if (this->KernelMemoryType==CUDA_MEM_TYPE_TEX)
     {
     // TODO
-    sqErrorMacro(cerr,"Kernel texture memory is not implemented!");
+    sqErrorMacro(std::cerr,"Kernel texture memory is not implemented!");
     return -1;
     }
   else
     {
     #ifdef CUDAConvolutionDriverDEBUG
-    pCerr() << "Using global memory for kernel" << endl;
+    pCerr() << "Using global memory for kernel" << std::endl;
     #endif
     devK=CUDAGlobalMemoryManager<float>::New(K,knijk);
     }
@@ -188,24 +185,24 @@ int CUDAConvolutionDriver::Convolution(
       slowDim=1;
       break;
     default:
-      sqErrorMacro(cerr,"Bad dim mode.");
+      sqErrorMacro(std::cerr,"Bad dim mode.");
       return -1;
     }
 
   #ifdef CUDAConvolutionDriverDEBUG
-  pCerr() << "wnijk=" << wnijk << endl;
-  pCerr() << "WarpsPerBlock=" << this->WarpsPerBlock << endl;
-  pCerr() << "WarpSize=" << this->WarpSize << endl;
-  pCerr() << "blockGridMaxMax=(" << this->BlockGridMax[0] << ", " << this->BlockGridMax[1] << ", " << this->BlockGridMax[2] << ")" << endl;
-  pCerr() << "blockGrid=(" << blockGrid.x << ", " << blockGrid.y << ", " << blockGrid.z << ")" << endl;
-  pCerr() << "nBlocks=" << nBlocks << endl;
-  pCerr() << "threadGrid=(" << threadGrid.x << ", " << threadGrid.y << ", " << threadGrid.z << ")" << endl;
-  pCerr() << "fastDim=" << fastDim << endl;
-  pCerr() << "slowDim=" << slowDim << endl;
-  pCerr() << "extV=" << extV << endl;
-  pCerr() << "nV=(" << nV[fastDim] <<  ", " << nV[slowDim] << ")" << endl;
-  pCerr() << "extW=" << extW << endl;
-  pCerr() << "nW=(" << nW[fastDim] <<  ", " << nW[slowDim] << ")" << endl;
+  pCerr() << "wnijk=" << wnijk << std::endl;
+  pCerr() << "WarpsPerBlock=" << this->WarpsPerBlock << std::endl;
+  pCerr() << "WarpSize=" << this->WarpSize << std::endl;
+  pCerr() << "blockGridMaxMax=(" << this->BlockGridMax[0] << ", " << this->BlockGridMax[1] << ", " << this->BlockGridMax[2] << ")" << std::endl;
+  pCerr() << "blockGrid=(" << blockGrid.x << ", " << blockGrid.y << ", " << blockGrid.z << ")" << std::endl;
+  pCerr() << "nBlocks=" << nBlocks << std::endl;
+  pCerr() << "threadGrid=(" << threadGrid.x << ", " << threadGrid.y << ", " << threadGrid.z << ")" << std::endl;
+  pCerr() << "fastDim=" << fastDim << std::endl;
+  pCerr() << "slowDim=" << slowDim << std::endl;
+  pCerr() << "extV=" << extV << std::endl;
+  pCerr() << "nV=(" << nV[fastDim] <<  ", " << nV[slowDim] << ")" << std::endl;
+  pCerr() << "extW=" << extW << std::endl;
+  pCerr() << "nW=(" << nW[fastDim] <<  ", " << nW[slowDim] << ")" << std::endl;
   #endif
 
   switch (V->GetDataType())
@@ -217,10 +214,10 @@ int CUDAConvolutionDriver::Convolution(
       //MPI_Comm_rank(MPI_COMM_WORLD,&worldRank);
       cudaError_t uerr;
       // allocate device memory for vector components
-      vector<float*> sV(nComp,0);
-      vector<CUDAGlobalMemoryManager<float>*> devV(nComp,0);
-      vector<CUDAGlobalMemoryManager<float>*> devW(nComp,0);
-      vector<float*> sW(nComp,0);
+      std::vector<float*> sV(nComp,0);
+      std::vector<CUDAGlobalMemoryManager<float>*> devV(nComp,0);
+      std::vector<CUDAGlobalMemoryManager<float>*> devW(nComp,0);
+      std::vector<float*> sW(nComp,0);
       for (int q=0; q<nComp; ++q)
         {
         // input arrays
@@ -243,7 +240,7 @@ int CUDAConvolutionDriver::Convolution(
           else
             {
             // TODO
-            sqErrorMacro(cerr,"3D Texture kernel is not implemented!");
+            sqErrorMacro(std::cerr,"3D Texture kernel is not implemented!");
             return -1;
             }
           }
@@ -283,7 +280,7 @@ int CUDAConvolutionDriver::Convolution(
         if (this->InputMemoryType==CUDA_MEM_TYPE_TEX)
           {
           #ifdef CUDAConvolutionDriverDEBUG
-          pCerr() << "Using texture memory for input" << endl;
+          pCerr() << "Using texture memory for input" << std::endl;
           #endif
             if ((mode==CartesianExtent::DIM_MODE_2D_XY)
               ||(mode==CartesianExtent::DIM_MODE_2D_XZ)
@@ -304,7 +301,7 @@ int CUDAConvolutionDriver::Convolution(
             else
               {
               // TODO
-              sqErrorMacro(cerr,"3D Texture kernel is not implemented!");
+              sqErrorMacro(std::cerr,"3D Texture kernel is not implemented!");
               return -1;
               }
             uerr=cudaGetLastError();
@@ -320,7 +317,7 @@ int CUDAConvolutionDriver::Convolution(
         else
           {
           #ifdef CUDAConvolutionDriverDEBUG
-          pCerr() << "Using global memory for input" << endl;
+          pCerr() << "Using global memory for input" << std::endl;
           #endif
           if ((mode==CartesianExtent::DIM_MODE_2D_XY)
             ||(mode==CartesianExtent::DIM_MODE_2D_XZ)
@@ -380,7 +377,7 @@ int CUDAConvolutionDriver::Convolution(
       break;
     default:
       // TODO
-      sqErrorMacro(cerr,"Not currently using vtkTemplateMacro");
+      sqErrorMacro(std::cerr,"Not currently using vtkTemplateMacro");
       return -1;
     }
 
@@ -413,9 +410,9 @@ void CUDAConvolutionDriver::Convolution(
     float *K)
 {
   pCerr()
-    << "===============CUDAConvolutionDriver::Convolution" << endl
-    << "NBlocks=" << this->NBlocks << endl
-    << "NThreads=" << this->NThreads << endl;
+    << "===============CUDAConvolutionDriver::Convolution" << std::endl
+    << "NBlocks=" << this->NBlocks << std::endl
+    << "NThreads=" << this->NThreads << std::endl;
 
   CUDAFlatIndex  idxV(extV,mode);
   CUDATupleIndex tupW(extW,ghostV,mode);
@@ -445,7 +442,7 @@ void CUDAConvolutionDriver::Convolution(
       //devW->Zero(); bug in cuda!
       //devW->Push();
 
-      cerr << "Calling" << endl;
+      std::cerr << "Calling" << std::endl;
       ::CUDAConvolution<float><<<this->NBlocks,this->NThreads>>>(
           idxV.GetDevicePointer(),
           devV->GetDevicePointer(),
@@ -472,7 +469,7 @@ void CUDAConvolutionDriver::Convolution(
 
   delete devExtK;
   delete devK;
-  cerr << "Finished." << endl;
+  std::cerr << "Finished." << std::endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -515,9 +512,9 @@ void CUDAConvolutionDriver::Convolution3D(
   devK->Push();
 
   pCerr()
-    << "===============CUDAConvolutionDriver::Convolution3D" << endl
-    << "NBlocks=" << wSize[0] << ", " << wSize[1] << ", " << wSize[2] << endl
-    << "NThreads=" << nCompV << endl;
+    << "===============CUDAConvolutionDriver::Convolution3D" << std::endl
+    << "NBlocks=" << wSize[0] << ", " << wSize[1] << ", " << wSize[2] << std::endl
+    << "NThreads=" << nCompV << std::endl;
 
   switch (V->GetDataType())
     {
@@ -532,7 +529,7 @@ void CUDAConvolutionDriver::Convolution3D(
       //devW->Zero(); bug in cuda! not all bytes are zerod
       //devW->Push();
 
-      cerr << "Calling" << endl;
+      std::cerr << "Calling" << std::endl;
       ::CUDAConvolution<float><<<blockDecomp,nCompV>>>(
           idxV.GetDevicePointer(),
           nCompV,
@@ -560,7 +557,7 @@ void CUDAConvolutionDriver::Convolution3D(
 
     delete devK;
     delete devExtK;
-    cerr << "Finished." << endl;
+    std::cerr << "Finished." << std::endl;
 }
 
 */

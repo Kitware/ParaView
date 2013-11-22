@@ -32,14 +32,9 @@ Copyright 2012 SciberQuest Inc.
 #include "Tuple.hxx"
 
 #include <algorithm>
-using std::min;
-using std::max;
-
 #include <set>
-using std::set;
-using std::pair;
 
-typedef pair<set<unsigned long long>::iterator,bool> SetInsert;
+typedef std::pair<std::set<unsigned long long>::iterator,bool> SetInsert;
 
 #include <cstdlib>
 #include <ctime>
@@ -57,7 +52,7 @@ void dumpBlocks(IdBlock *bins, int n)
 {
   for (int i=0; i<n; ++i)
     {
-    cerr << "proc " << i << " has " << bins[i] << endl;
+    std::cerr << "proc " << i << " has " << bins[i] << std::endl;
     }
 }
 
@@ -70,7 +65,7 @@ int findProcByCellId(unsigned long long cellId, IdBlock *bins, int s, int e)
 
   // if (s>e || e<s)
   //   {
-  //   sqErrorMacro(cerr,"Index error s=" << s << " e=" << e << ".");
+  //   sqErrorMacro(std::cerr,"Index error s=" << s << " e=" << e << ".");
   //   return -1;
   //   }
 
@@ -93,7 +88,7 @@ int findProcByCellId(unsigned long long cellId, IdBlock *bins, int s, int e)
 
   if (bins[m].contains(cellId))
     {
-    //cerr << "proc=" << m << " owns " << cellId << "." << endl;
+    //std::cerr << "proc=" << m << " owns " << cellId << "." << std::endl;
     return m;
     }
   else
@@ -108,7 +103,7 @@ int findProcByCellId(unsigned long long cellId, IdBlock *bins, int s, int e)
     }
 
   // not found, should always be found
-  sqErrorMacro(cerr,"Error: CellId=" << cellId << " was not found.");
+  sqErrorMacro(std::cerr,"Error: CellId=" << cellId << " was not found.");
   return -1;
 }
 
@@ -119,7 +114,7 @@ vtkStandardNewMacro(vtkSQRandomCells);
 vtkSQRandomCells::vtkSQRandomCells()
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQRandomCells::vtkSQRandomCells" << endl;
+  std::cerr << "=====vtkSQRandomCells::vtkSQRandomCells" << std::endl;
   #endif
 
   this->SampleSize=0;
@@ -133,7 +128,7 @@ vtkSQRandomCells::vtkSQRandomCells()
 vtkSQRandomCells::~vtkSQRandomCells()
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQRandomCells::~vtkSQRandomCells" << endl;
+  std::cerr << "=====vtkSQRandomCells::~vtkSQRandomCells" << std::endl;
   #endif
 }
 
@@ -144,7 +139,7 @@ int vtkSQRandomCells::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQRandomCells::RequestInformation" << endl;
+  std::cerr << "=====vtkSQRandomCells::RequestInformation" << std::endl;
   #endif
 
   // tell the excutive that we are handling our own paralelization.
@@ -163,7 +158,7 @@ int vtkSQRandomCells::RequestData(
     vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQRandomCells::RequestData" << endl;
+  std::cerr << "=====vtkSQRandomCells::RequestData" << std::endl;
   #endif
 
 
@@ -231,7 +226,7 @@ int vtkSQRandomCells::RequestData(
   // number and local cell ids of cells which we own which
   // are to be passed through to the output.
   unsigned long long nCellsToPass=0;
-  vector<unsigned long long> cellsToPass;
+  std::vector<unsigned long long> cellsToPass;
 
   const int masterRank=(worldSize==1?0:1);
 
@@ -279,13 +274,13 @@ int vtkSQRandomCells::RequestData(
       {
       nAssigned[i]=0ll;
       }
-    vector<unsigned long long> *assignments=new vector<unsigned long long>[worldSize];
+    std::vector<unsigned long long> *assignments=new std::vector<unsigned long long>[worldSize];
 
     // seed the number generator.
     int seed=(this->Seed<0?((int)time(0)):this->Seed);
     srand(seed);
 
-    set<unsigned long long> usedCellIds;
+    std::set<unsigned long long> usedCellIds;
     SetInsert ok;
 
     // fraction of the available set that the sample
@@ -326,7 +321,7 @@ int vtkSQRandomCells::RequestData(
       // sample size is large enough that random selection of n unique cells
       // is impractical.
       unsigned long long reducedSampleSize
-        = (unsigned long long)max(1.0,0.75*(double)nCellsTotal);
+        = (unsigned long long)std::max(1.0,0.75*(double)nCellsTotal);
 
       vtkWarningMacro(
         << "Reducing sample size from "
@@ -475,7 +470,7 @@ int vtkSQRandomCells::RequestData(
 void vtkSQRandomCells::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  cerr << "=====vtkSQRandomCells::PrintSelf" << endl;
+  std::cerr << "=====vtkSQRandomCells::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

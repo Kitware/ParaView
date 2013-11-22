@@ -45,10 +45,7 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #include <algorithm>
-using std::min;
-using std::max;
 #include <sstream>
-using std::ostringstream;
 
 // #define SQTK_DEBUG
 #ifdef WIN32
@@ -63,7 +60,7 @@ vtkStandardNewMacro(vtkSQBOVReaderBase);
 vtkSQBOVReaderBase::vtkSQBOVReaderBase()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::vtkSQBOVReaderBase" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::vtkSQBOVReaderBase" << std::endl;
   #endif
 
   // Initialize pipeline.
@@ -121,7 +118,7 @@ vtkSQBOVReaderBase::vtkSQBOVReaderBase()
 vtkSQBOVReaderBase::~vtkSQBOVReaderBase()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::~vtkSQBOVReaderBase" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::~vtkSQBOVReaderBase" << std::endl;
   #endif
 
   this->Clear();
@@ -160,10 +157,10 @@ void vtkSQBOVReaderBase::Clear()
 int vtkSQBOVReaderBase::Initialize(
       vtkPVXMLElement *root,
       const char *fileName,
-      vector<string> &arrays)
+      std::vector<std::string> &arrays)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReader::Initialize" << endl;
+  pCerr() << "=====vtkSQBOVReader::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=(vtkPVXMLElement*)0;
@@ -277,8 +274,8 @@ int vtkSQBOVReaderBase::Initialize(
 int vtkSQBOVReaderBase::CanReadFile(const char *file)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::CanReadFile" << endl;
-  pCerr() << "Check " << safeio(file) << "." << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::CanReadFile" << std::endl;
+  pCerr() << "Check " << safeio(file) << "." << std::endl;
   #endif
 
   int status=0;
@@ -311,8 +308,8 @@ int vtkSQBOVReaderBase::CanReadFile(const char *file)
 void vtkSQBOVReaderBase::SetFileName(const char* _arg)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::SetFileName" << endl;
-  pCerr() << "Set FileName " << safeio(_arg) << "." << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::SetFileName" << std::endl;
+  pCerr() << "Set FileName " << safeio(_arg) << "." << std::endl;
   #endif
 
   #ifdef SQTK_WITHOUT_MPI
@@ -386,7 +383,7 @@ void vtkSQBOVReaderBase::SetFileName(const char* _arg)
     pCerr()
       << "vtkSQBOVReaderBase "
       << this->WorldRank
-      << " Open succeeded." << endl;
+      << " Open succeeded." << std::endl;
     #endif
     }
 
@@ -404,7 +401,7 @@ bool vtkSQBOVReaderBase::IsOpen()
 void vtkSQBOVReaderBase::SetSubset(const int *s)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::SetSubset*" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::SetSubset*" << std::endl;
   #endif
   this->SetSubset(s[0],s[1],s[2],s[3],s[4],s[5]);
 }
@@ -413,7 +410,7 @@ void vtkSQBOVReaderBase::SetSubset(const int *s)
 void vtkSQBOVReaderBase::SetSubset(int ilo,int ihi, int jlo, int jhi, int klo, int khi)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::SetSubset" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::SetSubset" << std::endl;
   #endif
   // Avoid unecessary pipeline execution.
   if ( this->Subset[0]==ilo && this->Subset[1]==ihi
@@ -439,7 +436,7 @@ void vtkSQBOVReaderBase::SetSubset(int ilo,int ihi, int jlo, int jhi, int klo, i
   this->Modified();
 
   #if defined SQTK_DEBUG
-  pCerr() << "SetSubset(" << subset << ")" << endl;
+  pCerr() << "SetSubset(" << subset << ")" << std::endl;
   #endif
 }
 
@@ -498,8 +495,8 @@ void vtkSQBOVReaderBase::GetTimeSteps(double *times)
 void vtkSQBOVReaderBase::SetPointArrayStatus(const char *name, int status)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::SetPointArrayStatus" << endl;
-  pCerr() << safeio(name) << " " << status << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::SetPointArrayStatus" << std::endl;
+  pCerr() << safeio(name) << " " << status << std::endl;
   #endif
   if (status)
     {
@@ -516,7 +513,7 @@ void vtkSQBOVReaderBase::SetPointArrayStatus(const char *name, int status)
 int vtkSQBOVReaderBase::GetPointArrayStatus(const char *name)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::GetPointArrayStatus" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::GetPointArrayStatus" << std::endl;
   #endif
   return this->Reader->GetMetaData()->IsArrayActive(name);
 }
@@ -525,7 +522,7 @@ int vtkSQBOVReaderBase::GetPointArrayStatus(const char *name)
 int vtkSQBOVReaderBase::GetNumberOfPointArrays()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::GetNumberOfPointArrays" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::GetNumberOfPointArrays" << std::endl;
   #endif
   return (int)this->Reader->GetMetaData()->GetNumberOfArrays();
 }
@@ -534,7 +531,7 @@ int vtkSQBOVReaderBase::GetNumberOfPointArrays()
 const char* vtkSQBOVReaderBase::GetPointArrayName(int idx)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::GetArrayName" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::GetArrayName" << std::endl;
   #endif
   return this->Reader->GetMetaData()->GetArrayName(idx);
 }
@@ -543,7 +540,7 @@ const char* vtkSQBOVReaderBase::GetPointArrayName(int idx)
 void vtkSQBOVReaderBase::ClearPointArrayStatus()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::ClearPointArrayStatus" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::ClearPointArrayStatus" << std::endl;
   #endif
 
   int nArrays=this->GetNumberOfPointArrays();
@@ -561,7 +558,7 @@ int vtkSQBOVReaderBase::RequestDataObject(
       vtkInformationVector* outInfos)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReaderBase::RequestDataObject" << endl;
+  pCerr() << "=====vtkSQBOVReaderBase::RequestDataObject" << std::endl;
   #endif
 
   vtkInformation* info=outInfos->GetInformationObject(0);
@@ -575,9 +572,9 @@ int vtkSQBOVReaderBase::RequestDataObject(
   dataset->Delete();
 
   #if defined SQTK_DEBUG
-  pCerr() << "datasetType=" << info->Get(vtkDataObject::DATA_TYPE_NAME()) << endl;
-  pCerr() << "dataset=" << info->Get(vtkDataObject::DATA_OBJECT()) << endl;
-  pCerr() << "info="; info->Print(cerr);
+  pCerr() << "datasetType=" << info->Get(vtkDataObject::DATA_TYPE_NAME()) << std::endl;
+  pCerr() << "dataset=" << info->Get(vtkDataObject::DATA_OBJECT()) << std::endl;
+  pCerr() << "info="; info->Print(std::cerr);
   #endif
 
   return 1;
@@ -590,7 +587,7 @@ int vtkSQBOVReaderBase::RequestInformation(
   vtkInformationVector* outInfos)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReader::RequestInformationImage" << endl;
+  pCerr() << "=====vtkSQBOVReader::RequestInformationImage" << std::endl;
   #endif
 
   (void)req;
@@ -605,15 +602,15 @@ int vtkSQBOVReaderBase::RequestInformation(
   // Determine which time steps are available.
   size_t nSteps=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
   const int *steps=this->Reader->GetMetaData()->GetTimeSteps();
-  vector<double> times(nSteps,0.0);
+  std::vector<double> times(nSteps,0.0);
   for (size_t i=0; i<nSteps; ++i)
     {
     times[i]=(double)steps[i]; // use the index rather than the actual.
     }
 
   #if defined SQTK_DEBUG
-  pCerr() << times << endl;
-  pCerr() << "Total: " << nSteps << endl;
+  pCerr() << times << std::endl;
+  pCerr() << "Total: " << nSteps << std::endl;
   #endif
 
   // Set available time steps on pipeline.
@@ -659,14 +656,14 @@ void vtkSQBOVReaderBase::SetMPIFileHints()
 
   if (this->NumberOfIONodes>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->NumberOfIONodes;
     MPI_Info_set(hints,"cb_nodes",const_cast<char *>(os.str().c_str()));
     }
 
   if (this->CollectBufferSize>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->CollectBufferSize;
     MPI_Info_set(hints,"cb_buffer_size",const_cast<char *>(os.str().c_str()));
     }
@@ -721,7 +718,7 @@ void vtkSQBOVReaderBase::SetMPIFileHints()
 
   if (this->SieveBufferSize>0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << this->SieveBufferSize;
     MPI_Info_set(hints,"ind_rd_buffer_size", const_cast<char *>(os.str().c_str()));
     }
@@ -762,7 +759,7 @@ int vtkSQBOVReaderBase::GetTimeStepId(
     outInfo->Set(vtkDataObject::DATA_TIME_STEP(),step);
 
     #if defined SQTK_DEBUG
-    pCerr() << "Requested time " << step << " using " << stepId << "." << endl;
+    pCerr() << "Requested time " << step << " using " << stepId << "." << std::endl;
     #endif
     }
 
@@ -774,9 +771,9 @@ void vtkSQBOVReaderBase::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "FileName:        " << safeio(this->FileName) << endl;
-  os << indent << "FileNameChanged: " << this->FileNameChanged << endl;
-  os << indent << "Raeder: " << endl;
+  os << indent << "FileName:        " << safeio(this->FileName) << std::endl;
+  os << indent << "FileNameChanged: " << this->FileNameChanged << std::endl;
+  os << indent << "Raeder: " << std::endl;
   this->Reader->PrintSelf(os);
-  os << endl;
+  os << std::endl;
 }

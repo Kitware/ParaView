@@ -834,7 +834,7 @@ void vtkSQTubeFilter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Radius: " << this->Radius << "\n";
-  os << indent << "Vary Radius: " << this->GetVaryRadiusAsString() << endl;
+  os << indent << "Vary Radius: " << this->GetVaryRadiusAsString() << std::endl;
   os << indent << "Radius Factor: " << this->RadiusFactor << "\n";
   os << indent << "Number Of Sides: " << this->NumberOfSides << "\n";
   os << indent << "On Ratio: " << this->OnRatio << "\n";
@@ -849,6 +849,6 @@ void vtkSQTubeFilter::PrintSelf(ostream& os, vtkIndent indent)
      " )\n";
   os << indent << "Capping: " << (this->Capping ? "On\n" : "Off\n");
   os << indent << "Generate TCoords: "
-     << this->GetGenerateTCoordsAsString() << endl;
-  os << indent << "Texture Length: " << this->TextureLength << endl;
+     << this->GetGenerateTCoordsAsString() << std::endl;
+  os << indent << "Texture Length: " << this->TextureLength << std::endl;
 }

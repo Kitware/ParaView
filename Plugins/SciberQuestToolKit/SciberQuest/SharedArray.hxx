@@ -61,7 +61,7 @@ private:
   void operator=(SharedArray &); // not implemented
 
   template<typename T1>
-  friend ostream &operator<<(ostream &os, SharedArray<T1> &sa);
+  friend std::ostream &operator<<(std::ostream &os, SharedArray<T1> &sa);
 
 private:
   T *Data;
@@ -104,7 +104,7 @@ void SharedArray<T>::Assign(SharedArray<T> *other)
 
 //-----------------------------------------------------------------------------
 template<typename T>
-ostream &operator<<(ostream &os, SharedArray<T> &sa)
+std::ostream &operator<<(std::ostream &os, SharedArray<T> &sa)
 {
   size_t n=sa.Size();
   if (n)

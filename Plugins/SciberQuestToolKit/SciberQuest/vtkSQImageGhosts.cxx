@@ -33,7 +33,6 @@ typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 #include "vtkCellData.h"
 #include "vtkPVXMLElement.h"
 #include <string>
-using std::string;
 
 // #define SQTK_DEBUG
 
@@ -51,7 +50,7 @@ vtkSQImageGhosts::vtkSQImageGhosts()
   LogLevel(0)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageGhosts::vtkSQImageGhosts" << endl;
+  pCerr() << "=====vtkSQImageGhosts::vtkSQImageGhosts" << std::endl;
   #endif
 
   #ifdef SQTK_WITHOUT_MPI
@@ -69,7 +68,7 @@ vtkSQImageGhosts::vtkSQImageGhosts()
 vtkSQImageGhosts::~vtkSQImageGhosts()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageGhosts::~vtkSQImageGhosts" << endl;
+  pCerr() << "=====vtkSQImageGhosts::~vtkSQImageGhosts" << std::endl;
   #endif
 
   #ifndef SQTK_WITHOUT_MPI
@@ -141,8 +140,8 @@ void vtkSQImageGhosts::AddArrayToCopy(const char *name)
 {
   #ifdef SQTK_DEBUG
   pCerr()
-    << "=====vtkSQImageGhosts::ArraysToCopy" << endl
-    << "name=" << name << endl;
+    << "=====vtkSQImageGhosts::ArraysToCopy" << std::endl
+    << "name=" << name << std::endl;
   #endif
 
   if (this->ArraysToCopy.insert(name).second)
@@ -155,7 +154,7 @@ void vtkSQImageGhosts::AddArrayToCopy(const char *name)
 void vtkSQImageGhosts::ClearArraysToCopy()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageGhosts::ClearArraysToCopy" << endl;
+  pCerr() << "=====vtkSQImageGhosts::ClearArraysToCopy" << std::endl;
   #endif
 
   if (this->ArraysToCopy.size())
@@ -171,8 +170,8 @@ int vtkSQImageGhosts::RequestUpdateExtent(
   vtkInformationVector *outputVector)
 {
   #ifdef SQTK_DEBUG
-  ostringstream oss;
-  oss <<  "=====vtkSQImageGhosts::RequestUpdateExtent" << endl;
+  std::ostringstream oss;
+  oss <<  "=====vtkSQImageGhosts::RequestUpdateExtent" << std::endl;
   #endif
 
   // We require preceding filters to refrain from creating ghost cells.
@@ -219,11 +218,11 @@ int vtkSQImageGhosts::RequestUpdateExtent(
 
   #ifdef SQTK_DEBUG
   oss
-    << "WHOLE_EXTENT=" << this->ProblemDomain << endl
-    << "UPDATE_EXTENT=" << updateExt << endl
-    << "Mode=" << this->Mode << endl
-    << "NGhosts=" << this->NGhosts << endl;
-  pCerr() << oss.str() << endl;
+    << "WHOLE_EXTENT=" << this->ProblemDomain << std::endl
+    << "UPDATE_EXTENT=" << updateExt << std::endl
+    << "Mode=" << this->Mode << std::endl
+    << "NGhosts=" << this->NGhosts << std::endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   return 1;
@@ -236,7 +235,7 @@ int vtkSQImageGhosts::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageGhosts::RequestInformation" << endl;
+  pCerr() << "=====vtkSQImageGhosts::RequestInformation" << std::endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -261,10 +260,10 @@ int vtkSQImageGhosts::RequestInformation(
 
   #ifdef SQTK_DEBUG
   pCerr()
-    << "NGhosts=" << this->NGhosts << endl
-    << "Mode=" << this->Mode << endl
-    << "WHOLE_EXTENT(intput)=" << this->ProblemDomain << endl
-    << "UPDATE_EXTENT(intput)=" << origExt << endl;
+    << "NGhosts=" << this->NGhosts << std::endl
+    << "Mode=" << this->Mode << std::endl
+    << "WHOLE_EXTENT(intput)=" << this->ProblemDomain << std::endl
+    << "UPDATE_EXTENT(intput)=" << origExt << std::endl;
   #endif
 
   return 1;
@@ -277,7 +276,7 @@ int vtkSQImageGhosts::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageGhosts::RequestData" << endl;
+  pCerr() << "=====vtkSQImageGhosts::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -353,12 +352,12 @@ int vtkSQImageGhosts::RequestData(
   // construct the set of transactions needed to transfer the
   // ghost data from remote processes. if not a parallel build
   // or run then we need not do this
-  vector<GhostTransaction> transactions;
+  std::vector<GhostTransaction> transactions;
   #ifndef SQTK_WITHOUT_MPI
   if (this->WorldSize>1)
     {
     // gather input extents
-    vector<CartesianExtent> inputExts(this->WorldSize);
+    std::vector<CartesianExtent> inputExts(this->WorldSize);
     int *buffer=new int [6*this->WorldSize];
     MPI_Allgather(
           inCells.GetData(),
@@ -454,7 +453,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
       vtkDataSetAttributes *outputDsa,
       CartesianExtent inputExt,
       CartesianExtent outputExt,
-      vector<GhostTransaction> &transactions,
+      std::vector<GhostTransaction> &transactions,
       bool pointData)
 {
 
@@ -481,7 +480,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
   else
     {
     // only selected arrays
-    set<string>::iterator it,begin,end;
+    std::set<std::string>::iterator it,begin,end;
     it=begin=this->ArraysToCopy.begin();
     end=this->ArraysToCopy.end();
     for (;it!=end; ++it)
@@ -513,7 +512,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
     void *pIn = inArray->GetVoidPointer(0);
 
     #ifdef SQTK_DEBUG
-    //cerr << "Copying array " << inArray->GetName() << endl;
+    //std::cerr << "Copying array " << inArray->GetName() << std::endl;
     #endif
 
     // copy the valid data directly
@@ -536,7 +535,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
     if (this->WorldSize>1)
       {
       static int tag=0;
-      vector<MPI_Request> req;
+      std::vector<MPI_Request> req;
       size_t nTransactions = transactions.size();
       for (size_t j=0; j<nTransactions; ++j, ++tag)
         {
@@ -559,7 +558,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
         }
       //MPI_Waitall((int)req.size(), &req[0], MPI_STATUSES_IGNORE);
       int nReqs=(int)req.size();
-      vector<MPI_Status> stat(nReqs);
+      std::vector<MPI_Status> stat(nReqs);
       int ierr=MPI_Waitall(nReqs, &req[0],&stat[0]);
       if (ierr!=MPI_ERR_IN_STATUS)
         {
@@ -572,9 +571,9 @@ void vtkSQImageGhosts::ExecuteTransactions(
             int eStrLen=0;
             MPI_Error_string(ierr,eStr,&eStrLen);
             pCerr()
-              << "transaction for request " << q << " failed." << endl
-              << eStr << endl
-              << endl;
+              << "transaction for request " << q << " failed." << std::endl
+              << eStr << std::endl
+              << std::endl;
             }
           }
         }
@@ -587,7 +586,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
 void vtkSQImageGhosts::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageGhosts::PrintSelf" << endl;
+  pCerr() << "=====vtkSQImageGhosts::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

@@ -27,7 +27,6 @@ typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 #include "vtkDataSetAttributes.h"
 #include "vtkPVXMLElement.h"
 #include <string>
-using std::string;
 
 // #define SQTK_DEBUG
 // #define vtkSQImageSourceTIME
@@ -40,7 +39,7 @@ vtkStandardNewMacro(vtkSQImageSource);
 vtkSQImageSource::vtkSQImageSource()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageSource::vtkSQImageSource" << endl;
+  pCerr() << "=====vtkSQImageSource::vtkSQImageSource" << std::endl;
   #endif
 
   this->Extent[0]=0;
@@ -66,7 +65,7 @@ vtkSQImageSource::vtkSQImageSource()
 vtkSQImageSource::~vtkSQImageSource()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageSource::~vtkSQImageSource" << endl;
+  pCerr() << "=====vtkSQImageSource::~vtkSQImageSource" << std::endl;
   #endif
 }
 
@@ -112,7 +111,7 @@ int vtkSQImageSource::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageSource::RequestInformation" << endl;
+  pCerr() << "=====vtkSQImageSource::RequestInformation" << std::endl;
   #endif
 
   (void)req;
@@ -135,7 +134,7 @@ int vtkSQImageSource::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageSource::RequestData" << endl;
+  pCerr() << "=====vtkSQImageSource::RequestData" << std::endl;
   #endif
   #if defined vtkSQImageSourceTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -179,7 +178,7 @@ int vtkSQImageSource::RequestData(
 void vtkSQImageSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQImageSource::PrintSelf" << endl;
+  pCerr() << "=====vtkSQImageSource::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

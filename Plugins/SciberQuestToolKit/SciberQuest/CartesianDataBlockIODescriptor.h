@@ -19,9 +19,6 @@ typedef void * MPI_Datatype;
 #endif
 
 #include <vector>
-using std::vector;
-#include <iostream>
-using std::ostream;
 
 /// Container for the MPI file and memory views
 /**
@@ -70,15 +67,15 @@ private:
   /// \@}
 
   friend class CartesianDataBlockIODescriptorIterator;
-  friend ostream &operator<<(ostream &os,const CartesianDataBlockIODescriptor &descr);
+  friend std::ostream &operator<<(std::ostream &os,const CartesianDataBlockIODescriptor &descr);
 
 private:
   int Mode;
   CartesianExtent MemExtent;
-  vector<MPI_Datatype> FileViews;
-  vector<MPI_Datatype> MemViews;
+  std::vector<MPI_Datatype> FileViews;
+  std::vector<MPI_Datatype> MemViews;
 };
 
-ostream &operator<<(ostream &os,const CartesianDataBlockIODescriptor &descr);
+std::ostream &operator<<(std::ostream &os,const CartesianDataBlockIODescriptor &descr);
 
 #endif

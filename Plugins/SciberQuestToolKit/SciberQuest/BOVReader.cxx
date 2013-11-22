@@ -27,7 +27,6 @@ Copyright 2012 SciberQuest Inc.
 #include "PrintUtils.h"
 
 #include <sstream>
-using std::ostringstream;
 
 #ifdef WIN32
   #define PATH_SEP "\\"
@@ -60,7 +59,7 @@ BOVReader::BOVReader()
   // don't report this error since the reader get's constructed
   // as part of PV's format selection process.
   //sqErrorMacro(
-  //    cerr,
+  //    std::cerr,
   //    << "This class requires MPI however it was built without MPI.");
   #else
   this->Comm=MPI_COMM_NULL;
@@ -71,7 +70,7 @@ BOVReader::BOVReader()
   if (!mpiOk)
     {
     sqWarningMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     }
@@ -122,7 +121,7 @@ void BOVReader::SetCommunicator(MPI_Comm comm)
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return;
@@ -161,7 +160,7 @@ void BOVReader::SetHints(MPI_Info hints)
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return;
@@ -226,7 +225,7 @@ int BOVReader::Open(const char *fileName)
   if (!mpiOk)
     {
     sqErrorMacro(
-      cerr,
+      std::cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");
     return 0;
@@ -234,7 +233,7 @@ int BOVReader::Open(const char *fileName)
 
   if (this->MetaData==0)
     {
-    sqErrorMacro(cerr,"No MetaData object.");
+    sqErrorMacro(std::cerr,"No MetaData object.");
     return 0;
     }
 
@@ -310,7 +309,7 @@ vtkDataSet *BOVReader::GetDataSet()
     }
   else
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "Unsupported dataset type \""
       << this->MetaData->GetDataSetType()
       <<  "\".");
@@ -389,7 +388,7 @@ int BOVReader::ReadScalarArray(
             ioit.GetFileView(),
             pScal))
       {
-      sqErrorMacro(cerr,
+      sqErrorMacro(std::cerr,
         << "ReadDataArray "<< fhit.GetName()
         << " views " << ioit
         << " failed.");
@@ -461,7 +460,7 @@ int BOVReader::ReadVectorArray(
             1,0,
             buf))
       {
-      sqErrorMacro(cerr,
+      sqErrorMacro(std::cerr,
         "ReadDataArray "<< it.GetName() << " component " << q << " failed.");
       free(buf);
       return 0;
@@ -534,7 +533,7 @@ int BOVReader::ReadVectorArray(
               ioit.GetFileView(),
               buf))
         {
-        sqErrorMacro(cerr,
+        sqErrorMacro(std::cerr,
           << "ReadDataArray "<< fhit.GetName()
           << " component " << q
           << " views " << ioit
@@ -605,7 +604,7 @@ int BOVReader::ReadSymetricTensorArray(
             1,0,
             buf))
       {
-      sqErrorMacro(cerr,
+      sqErrorMacro(std::cerr,
         "ReadDataArray "<< it.GetName() << " component " << q << " failed.");
       free(buf);
       return 0;
@@ -677,7 +676,7 @@ int BOVReader::ReadSymetricTensorArray(
               ioit.GetFileView(),
               buf))
         {
-        sqErrorMacro(cerr,
+        sqErrorMacro(std::cerr,
           << "ReadDataArray "<< fhit.GetName()
           << " component " << q
           << " views " << ioit
@@ -723,7 +722,7 @@ BOVTimeStepImage *BOVReader::OpenTimeStep(int stepNo)
 
   if (!(this->MetaData && this->MetaData->IsDatasetOpen()))
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "Cannot open a timestep because the "
       << "dataset is not open.");
     return 0;
@@ -905,17 +904,17 @@ int BOVReader::ReadMetaTimeStep(int stepIdx, vtkDataSet *grid, vtkAlgorithm *alg
 
   if (!(this->MetaData && this->MetaData->IsDatasetOpen()))
     {
-    sqErrorMacro(cerr,"Cannot read because the dataset is not open.");
+    sqErrorMacro(std::cerr,"Cannot read because the dataset is not open.");
     return 0;
     }
 
   if (grid==NULL)
     {
-    sqErrorMacro(cerr,"Empty output.");
+    sqErrorMacro(std::cerr,"Empty output.");
     return 0;
     }
 
-  ostringstream seriesExt;
+  std::ostringstream seriesExt;
   seriesExt << "_" << stepIdx << "." << this->MetaData->GetBrickFileExtension();
   // In a meta read we won't read the arrays, rather we'll put a place holder
   // for each in the output. Downstream array can then be selected.
@@ -972,7 +971,7 @@ int BOVReader::ReadMetaTimeStep(int stepIdx, vtkDataSet *grid, vtkAlgorithm *alg
     // other ?
     else
       {
-      sqErrorMacro(cerr,"Bad array type for array " << arrayName << ".");
+      sqErrorMacro(std::cerr,"Bad array type for array " << arrayName << ".");
       }
     grid->GetPointData()->AddArray(array);
     array->Delete();
@@ -992,17 +991,17 @@ int BOVReader::ReadMetaTimeStep(int stepIdx, vtkDataSet *grid, vtkAlgorithm *alg
 void BOVReader::PrintSelf(ostream &os)
 {
   os
-    << "BOVReader: " << this << endl
-    << "  Comm: " << this->Comm << endl
-    << "  NGhost: " << this->NGhost << endl
-    << "  ProcId: " << this->ProcId << endl
-    << "  NProcs: " << this->NProcs << endl
-    << "  VectorProjection: " << this->VectorProjection << endl;
+    << "BOVReader: " << this << std::endl
+    << "  Comm: " << this->Comm << std::endl
+    << "  NGhost: " << this->NGhost << std::endl
+    << "  ProcId: " << this->ProcId << std::endl
+    << "  NProcs: " << this->NProcs << std::endl
+    << "  VectorProjection: " << this->VectorProjection << std::endl;
 
   #ifndef SQTK_WITHOUT_MPI
   if (this->Hints!=MPI_INFO_NULL)
     {
-    os << "  Hints:" << endl;
+    os << "  Hints:" << std::endl;
     int nKeys=0;
     MPI_Info_get_nkeys(this->Hints,&nKeys);
     for (int i=0; i<nKeys; ++i)
@@ -1012,7 +1011,7 @@ void BOVReader::PrintSelf(ostream &os)
       int flag=0;
       MPI_Info_get_nthkey(this->Hints,i,key);
       MPI_Info_get(this->Hints,key,256,val,&flag);
-      os << "    " << key << "=" << val << endl;
+      os << "    " << key << "=" << val << std::endl;
       }
     }
   #endif

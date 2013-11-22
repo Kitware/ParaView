@@ -79,7 +79,7 @@ int RectilinearDecomp::DecomposeDomain()
     || this->DecompDims[1]>nCells[1]
     || this->DecompDims[2]>nCells[2] )
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
       << "Too many blocks "
       << Tuple<int>(this->DecompDims,3)
       << " requested for extent "
@@ -106,11 +106,11 @@ int RectilinearDecomp::DecomposeDomain()
     }
 
   #ifdef RectilinearDecompDEBUG
-  cerr
-    << "DecompDims=" << Tuple<int>(this->DecompDims,3) << endl
-    << "nCells=" << Tuple<int>(nCells,3) << endl
-    << "smBlockSize=" << Tuple<int>(smBlockSize,3) << endl
-    << "nLarge=" << Tuple<int>(nLarge,3) << endl;
+  std::cerr
+    << "DecompDims=" << Tuple<int>(this->DecompDims,3) << std::endl
+    << "nCells=" << Tuple<int>(nCells,3) << std::endl
+    << "smBlockSize=" << Tuple<int>(smBlockSize,3) << std::endl
+    << "nLarge=" << Tuple<int>(nLarge,3) << std::endl;
   #endif
 
   CartesianExtent fileExt(this->FileExtent);
@@ -163,7 +163,7 @@ int RectilinearDecomp::DecomposeDomain()
         block->GetBounds().Set(bounds);
 
         #ifdef RectilinearDecompDEBUG
-        cerr << *block << endl;
+        std::cerr << *block << std::endl;
         #endif
 
         // create an io descriptor.

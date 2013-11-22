@@ -24,9 +24,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include <cmath>
 #include <string>
-using std::string;
 #include <algorithm>
-using std::max;
 
 #include "SQEigenWarningSupression.h"
 #include <Eigen/Eigenvalues>
@@ -44,13 +42,13 @@ void ComputeVectorGradient(
       vtkDoubleArray *gradV)
 {
   const vtkIdType nProgSteps=10;
-  const vtkIdType progInt=max(nCells/nProgSteps,vtkIdType(1));
+  const vtkIdType progInt=std::max(nCells/nProgSteps,vtkIdType(1));
   const double progInc=(prog1-prog0)/nProgSteps;
   double prog=prog0;
 
   gradV->SetNumberOfComponents(9);
   gradV->SetNumberOfTuples(nCells);
-  string name="grad-";
+  std::string name="grad-";
   name+=V->GetName();
   gradV->SetName(name.c_str());
   double *pGradV=gradV->GetPointer(0);
@@ -105,7 +103,7 @@ void ComputeFTLE(
       vtkDoubleArray *ftleV)
 {
   const vtkIdType nProgSteps=10;
-  const vtkIdType progInt=max(nCells/nProgSteps,vtkIdType(1));
+  const vtkIdType progInt=std::max(nCells/nProgSteps,vtkIdType(1));
   const double progInc=(prog1-prog0)/nProgSteps;
   double prog=prog0;
 
@@ -139,9 +137,9 @@ void ComputeFTLE(
     e=solver.eigenvalues();
 
     double lam;
-    lam=max(e(0,0),e(1,0));
-    lam=max(lam,e(2,0));
-    lam=max(lam,1.0);
+    lam=std::max(e(0,0),e(1,0));
+    lam=std::max(lam,e(2,0));
+    lam=std::max(lam,1.0);
 
     pFtleV[0]=log(sqrt(lam))/timeInterval;
 
@@ -161,7 +159,7 @@ vtkSQFTLE::vtkSQFTLE()
   LogLevel(0)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQFTLE::vtkSQFTLE" << endl;
+  pCerr() << "=====vtkSQFTLE::vtkSQFTLE" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -172,7 +170,7 @@ vtkSQFTLE::vtkSQFTLE()
 int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQFTLE::Initialize" << endl;
+  pCerr() << "=====vtkSQFTLE::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -214,8 +212,8 @@ int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
       << "#   time_interval=" << this->TimeInterval << "\n"
       << "#   input_arrays=";
 
-    set<string>::iterator it=this->InputArrays.begin();
-    set<string>::iterator end=this->InputArrays.end();
+    std::set<std::string>::iterator it=this->InputArrays.begin();
+    std::set<std::string>::iterator end=this->InputArrays.end();
     for (; it!=end; ++it)
       {
       log->GetHeader() << *it << " ";
@@ -232,7 +230,7 @@ void vtkSQFTLE::AddInputArray(const char *name)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQFTLE::AddInputArray"
-    << "name=" << name << endl;
+    << "name=" << name << std::endl;
   #endif
 
   if (this->InputArrays.insert(name).second)
@@ -246,7 +244,7 @@ void vtkSQFTLE::ClearInputArrays()
 {
   #ifdef SQTK_DEBUG
   pCerr()
-    << "=====vtkSQFTLE::ClearInputArrays" << endl;
+    << "=====vtkSQFTLE::ClearInputArrays" << std::endl;
   #endif
 
   if (this->InputArrays.size())
@@ -263,7 +261,7 @@ int vtkSQFTLE::RequestData(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQFTLE::RequestData" << endl;
+  pCerr() << "=====vtkSQFTLE::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -301,9 +299,9 @@ int vtkSQFTLE::RequestData(
   vtkIdType nCells=input->GetNumberOfCells();
   if (nCells>0)
     {
-    set<string>::iterator it;
-    set<string>::iterator begin=this->InputArrays.begin();
-    set<string>::iterator end=this->InputArrays.end();
+    std::set<std::string>::iterator it;
+    std::set<std::string>::iterator begin=this->InputArrays.begin();
+    std::set<std::string>::iterator end=this->InputArrays.end();
     for (it=begin; it!=end; ++it)
       {
       vtkDataArray *V=input->GetPointData()->GetArray((*it).c_str());
@@ -327,7 +325,7 @@ int vtkSQFTLE::RequestData(
       ComputeVectorGradient(this,0.0,0.4,input,nCells,V,gradV);
 
       // FTLE
-      string name;
+      std::string name;
       name+="ftle-";
       name+=V->GetName();
 

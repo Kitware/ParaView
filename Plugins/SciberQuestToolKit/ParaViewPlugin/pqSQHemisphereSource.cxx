@@ -42,17 +42,9 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #include <string>
-using std::string;
 #include <fstream>
-using std::ofstream;
-using std::ifstream;
-using std::ios_base;
 #include <sstream>
-using std::ostringstream;
-using std::istringstream;
 #include <iostream>
-using std::cerr;
-using std::endl;
 
 //-----------------------------------------------------------------------------
 pqSQHemisphereSource::pqSQHemisphereSource(
@@ -62,7 +54,7 @@ pqSQHemisphereSource::pqSQHemisphereSource(
       pqNamedObjectPanel(l_proxy,l_parent)
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::pqSQHemisphereSource::pqSQHemisphereSource" << endl;
+  std::cerr << ":::::pqSQHemisphereSource::pqSQHemisphereSource" << std::endl;
   #endif
 
   // Construct Qt form.
@@ -175,7 +167,7 @@ pqSQHemisphereSource::pqSQHemisphereSource(
 pqSQHemisphereSource::~pqSQHemisphereSource()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::pqSQHemisphereSource::~pqSQHemisphereSource" << endl;
+  std::cerr << ":::::pqSQHemisphereSource::~pqSQHemisphereSource" << std::endl;
   #endif
 
   delete this->Form;
@@ -191,18 +183,18 @@ void pqSQHemisphereSource::Restore()
   QString fn=QFileDialog::getOpenFileName(this,"Open SQ Hemisphere Source",lastUsedDir,"*.sqhs");
   if (fn.size())
     {
-    ifstream f(fn.toStdString().c_str(),ios_base::in);
+    std::ifstream f(fn.toStdString().c_str(),std::ios_base::in);
     if (f.is_open())
       {
       char buf[1024];
       f.getline(buf,1024);
-      if (string(buf).find("SQ Hemisphere Source")!=string::npos)
+      if (std::string(buf).find("SQ Hemisphere Source")!=std::string::npos)
         {
         // Center
         f.getline(buf,1024);
         f.getline(buf,1024);
-        istringstream *is;
-        is=new istringstream(buf);
+        std::istringstream *is;
+        is=new std::istringstream(buf);
         double c[3];
         *is >> c[0] >> c[1] >> c[2];
         delete is;
@@ -212,7 +204,7 @@ void pqSQHemisphereSource::Restore()
         // North
         f.getline(buf,1024);
         f.getline(buf,1024);
-        is=new istringstream(buf);
+        is=new std::istringstream(buf);
         double n[3];
         *is >> n[0] >> n[1] >> n[2];
         delete is;
@@ -222,7 +214,7 @@ void pqSQHemisphereSource::Restore()
         // Radius
         f.getline(buf,1024);
         f.getline(buf,1024);
-        is=new istringstream(buf);
+        is=new std::istringstream(buf);
         double r;
         *is >> r;
         delete is;
@@ -230,7 +222,7 @@ void pqSQHemisphereSource::Restore()
         // Resolution
         f.getline(buf,1024);
         f.getline(buf,1024);
-        is=new istringstream(buf);
+        is=new std::istringstream(buf);
         int res;
         *is >> res;
         delete is;
@@ -267,23 +259,23 @@ void pqSQHemisphereSource::Save()
     QSettings settings("SciberQuest", "SciberQuestToolKit");
     settings.setValue("SQHemisphereSource/lastUsedDir",lastUsedDir);
 
-    ofstream f(fn.toStdString().c_str(),ios_base::out|ios_base::trunc);
+    std::ofstream f(fn.toStdString().c_str(),std::ios_base::out|std::ios_base::trunc);
     if (f.is_open())
       {
-      f << "SQ Hemisphere Source 1.0" << endl
-        << "Center" << endl
+      f << "SQ Hemisphere Source 1.0" << std::endl
+        << "Center" << std::endl
         << this->Form->c_x->text().toDouble() << " "
         << this->Form->c_y->text().toDouble() << " "
-        << this->Form->c_z->text().toDouble() << endl
-        << "North" << endl
+        << this->Form->c_z->text().toDouble() << std::endl
+        << "North" << std::endl
         << this->Form->n_x->text().toDouble() << " "
         << this->Form->n_y->text().toDouble() << " "
-        << this->Form->n_z->text().toDouble() << endl
-        << "Radius" << endl
-        << this->Form->r->text().toDouble() << endl
-        << "Resolution" << endl
-        << this->Form->res->value() << endl
-        << endl;
+        << this->Form->n_z->text().toDouble() << std::endl
+        << "Radius" << std::endl
+        << this->Form->r->text().toDouble() << std::endl
+        << "Resolution" << std::endl
+        << this->Form->res->value() << std::endl
+        << std::endl;
       f.close();
       }
     else
@@ -332,7 +324,7 @@ void pqSQHemisphereSource::loadConfiguration()
 void pqSQHemisphereSource::saveConfiguration()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::pqSQHemisphereSource::saveConfiguration" << endl;
+  std::cerr << ":::::pqSQHemisphereSource::saveConfiguration" << std::endl;
   #endif
 
   vtkSQHemisphereSourceConfigurationWriter *writer
@@ -365,7 +357,7 @@ void pqSQHemisphereSource::saveConfiguration()
 void pqSQHemisphereSource::PullServerConfig()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::pqSQHemisphereSource::PullServerConfig" << endl;
+  std::cerr << ":::::pqSQHemisphereSource::PullServerConfig" << std::endl;
   #endif
 
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
@@ -403,12 +395,12 @@ void pqSQHemisphereSource::PullServerConfig()
   this->Form->res->setValue(res);
 
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << "Pulled: " << endl
-       << "C   " << c[0] << ", " << c[1] << ", " << c[2] << endl
-       << "N   " << n[0] << ", " << n[1] << ", " << n[2] << endl
-       << "r   " << r << endl
-       << "res " << res << endl
-       << endl;
+  std::cerr << "Pulled: " << std::endl
+            << "C   " << c[0] << ", " << c[1] << ", " << c[2] << std::endl
+            << "N   " << n[0] << ", " << n[1] << ", " << n[2] << std::endl
+            << "r   " << r << std::endl
+            << "res " << res << std::endl
+            << std::endl;
   #endif
 }
 
@@ -416,7 +408,7 @@ void pqSQHemisphereSource::PullServerConfig()
 void pqSQHemisphereSource::PushServerConfig()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::pqSQHemisphereSource::PushServerConfig" << endl;
+  std::cerr << ":::::pqSQHemisphereSource::PushServerConfig" << std::endl;
   #endif
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
 
@@ -453,12 +445,12 @@ void pqSQHemisphereSource::PushServerConfig()
   resProp->SetElement(0,res);
 
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << "Pushed: " << endl
-       << "C   " << c[0] << ", " << c[1] << ", " << c[2] << endl
-       << "N   " << n[0] << ", " << n[1] << ", " << n[2] << endl
-       << "r   " << r << endl
-       << "res " << res << endl
-       << endl;
+  std::cerr << "Pushed: " << std::endl
+            << "C   " << c[0] << ", " << c[1] << ", " << c[2] << std::endl
+            << "N   " << n[0] << ", " << n[1] << ", " << n[2] << std::endl
+            << "r   " << r << std::endl
+            << "res " << res << std::endl
+            << std::endl;
   #endif
 
   // Let proxy send updated values.
@@ -469,7 +461,7 @@ void pqSQHemisphereSource::PushServerConfig()
 void pqSQHemisphereSource::accept()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::pqSQHemisphereSource::accept" << endl;
+  std::cerr << ":::::pqSQHemisphereSource::accept" << std::endl;
   #endif
 
   pqNamedObjectPanel::accept();
@@ -479,7 +471,7 @@ void pqSQHemisphereSource::accept()
 void pqSQHemisphereSource::reset()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::pqSQHemisphereSource::reset" << endl;
+  std::cerr << ":::::pqSQHemisphereSource::reset" << std::endl;
   #endif
 
   pqNamedObjectPanel::reset();

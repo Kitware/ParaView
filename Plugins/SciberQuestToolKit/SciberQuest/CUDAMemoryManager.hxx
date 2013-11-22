@@ -13,7 +13,6 @@ Copyright 2012 SciberQuest Inc.
 class vtkDataArray;
 
 #include <iostream>
-using std::cerr;
 
 // this enables call trace printed to std::cerr
 //#define CUDAMemoryManagerDEBUG
@@ -75,7 +74,7 @@ private:
 template<typename T>
 int CUDAMemoryManager<T>::WarnNoImplem(const char *id)
 {
-  sqErrorMacro(cerr,<< id);
+  sqErrorMacro(std::cerr,<< id);
   return -1;
 }
 

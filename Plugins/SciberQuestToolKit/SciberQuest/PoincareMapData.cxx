@@ -85,7 +85,7 @@ void PoincareMapData::SetSource(vtkDataSet *s)
     this->SourcePts=dynamic_cast<vtkFloatArray*>(sourceug->GetPoints()->GetData());
     if (this->SourcePts==0)
       {
-      cerr << "Error: Points are not float precision." << endl;
+      std::cerr << "Error: Points are not float precision." << std::endl;
       return;
       }
     this->SourcePts->Register(0);
@@ -103,7 +103,7 @@ void PoincareMapData::SetSource(vtkDataSet *s)
     this->SourcePts=dynamic_cast<vtkFloatArray*>(sourcepd->GetPoints()->GetData());
     if (this->SourcePts==0)
       {
-      cerr << "Error: Points are not float precision." << endl;
+      std::cerr << "Error: Points are not float precision." << std::endl;
       return;
       }
     this->SourcePts->Register(0);
@@ -124,14 +124,14 @@ void PoincareMapData::SetSource(vtkDataSet *s)
       }
     else
       {
-      cerr << "Error: Polydata doesn't have any supported cells." << endl;
+      std::cerr << "Error: Polydata doesn't have any supported cells." << std::endl;
       return;
       }
     this->SourceCells->Register(0);
     return;
     }
 
-  cerr << "Error: Unsupported input data type." << endl;
+  std::cerr << "Error: Unsupported input data type." << std::endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ void PoincareMapData::SetOutput(vtkDataSet *o)
   vtkPolyData *out=dynamic_cast<vtkPolyData*>(o);
   if (out==0)
     {
-    cerr << "Error: Out must be polydata. " << o->GetClassName() << endl;
+    std::cerr << "Error: Out must be polydata. " << o->GetClassName() << std::endl;
     return;
     }
 
@@ -235,8 +235,8 @@ vtkIdType PoincareMapData::InsertCellsFromGenerator(IdBlock *SourceIds)
   size_t lId=this->Lines.size();
   this->Lines.resize(lId+nCellsLocal,0);
 
-  vector<vtkIdType> sourcePtIds;
-  vector<float> sourcePts;
+  std::vector<vtkIdType> sourcePtIds;
+  std::vector<float> sourcePts;
 
   // For each cell asigned to us we'll get its center (this is the seed point)
   // and build corresponding cell in the output, The output only will have

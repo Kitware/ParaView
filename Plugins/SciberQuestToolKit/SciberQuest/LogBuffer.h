@@ -10,7 +10,6 @@ Copyright 2012 SciberQuest Inc.
 #define __LogBuffer_h
 
 #include <sstream> // for ostringstream
-using std::ostringstream;
 
 /**
 A parallel buffer for logging events and other data during an mpi run.
@@ -45,7 +44,7 @@ public:
   template<size_t N> LogBuffer &operator<<(const char v[N]);
 
   /// formatted extraction operator.
-  LogBuffer &operator>>(ostringstream &s);
+  LogBuffer &operator>>(std::ostringstream &s);
 
   /// collect buffer to a root process
   void Gather(int worldRank, int worldSize, int rootRank);

@@ -72,14 +72,14 @@ void UnstructuredFieldDisplacementMap::SetSource(vtkDataSet *s)
   vtkUnstructuredGrid *source=dynamic_cast<vtkUnstructuredGrid*>(s);
   if (source==0)
     {
-    cerr << "Error: Source must be unstructured. " << s->GetClassName() << endl;
+    std::cerr << "Error: Source must be unstructured. " << s->GetClassName() << std::endl;
     return;
     }
 
   this->SourcePts=dynamic_cast<vtkFloatArray*>(source->GetPoints()->GetData());
   if (this->SourcePts==0)
     {
-    cerr << "Error: Points are not float precision." << endl;
+    std::cerr << "Error: Points are not float precision." << std::endl;
     return;
     }
   this->SourcePts->Register(0);
@@ -101,7 +101,7 @@ void UnstructuredFieldDisplacementMap::SetOutput(vtkDataSet *o)
   vtkUnstructuredGrid *out=dynamic_cast<vtkUnstructuredGrid*>(o);
   if (out==0)
     {
-    cerr << "Error: Out must be unstructured grid. " << o->GetClassName() << endl;
+    std::cerr << "Error: Out must be unstructured grid. " << o->GetClassName() << std::endl;
     return;
     }
 
@@ -156,8 +156,8 @@ vtkIdType UnstructuredFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *So
   vtkIdType endOfLocs=this->OutLocs->GetNumberOfTuples();
   vtkIdType *pOutLocs=this->OutLocs->WritePointer(endOfLocs,nCellsLocal);
 
-  vector<float> sourcePts;
-  vector<vtkIdType> sourceIds;
+  std::vector<float> sourcePts;
+  std::vector<vtkIdType> sourceIds;
 
   vtkIdType sourceCellId=startCellId;
 

@@ -55,9 +55,9 @@ void BOVVectorImage::SetNumberOfComponents(int nComps)
 }
 
 //-----------------------------------------------------------------------------
-ostream &operator<<(ostream &os, const BOVVectorImage &vi)
+std::ostream &operator<<(std::ostream &os, const BOVVectorImage &vi)
 {
-  os << vi.GetName() << endl;
+  os << vi.GetName() << std::endl;
 
   int nComps = vi.GetNumberOfComponents();
   for (int i=0; i<nComps; ++i)
@@ -65,7 +65,7 @@ ostream &operator<<(ostream &os, const BOVVectorImage &vi)
     os
       << "    " << vi.ComponentFiles[i]->GetFileName()
       << " "    << vi.ComponentFiles[i]->GetFile()
-      << endl;
+      << std::endl;
     }
 
   #ifndef SQTK_WITHOUT_MPI
@@ -73,7 +73,7 @@ ostream &operator<<(ostream &os, const BOVVectorImage &vi)
   MPI_File file=vi.ComponentFiles[0]->GetFile();
   if (file)
     {
-    os << "  Hints:" << endl;
+    os << "  Hints:" << std::endl;
     int WorldRank;
     MPI_Comm_rank(MPI_COMM_WORLD,&WorldRank);
     if (WorldRank==0)
@@ -89,7 +89,7 @@ ostream &operator<<(ostream &os, const BOVVectorImage &vi)
         int flag;
         MPI_Info_get_nthkey(info,i,key);
         MPI_Info_get(info,key,MPI_MAX_INFO_KEY,val,&flag);
-        os << "    " << key << "=" << val << endl;
+        os << "    " << key << "=" << val << std::endl;
         }
       }
     }

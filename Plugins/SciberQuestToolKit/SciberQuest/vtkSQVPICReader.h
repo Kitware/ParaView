@@ -30,9 +30,7 @@
 #include "vtkImageAlgorithm.h"
 
 #include <string>
-using std::string;
 #include <vector>
-using std::vector;
 
 class vtkCallbackCommand;
 class vtkDataArraySelection;
@@ -60,7 +58,7 @@ public:
   int Initialize(
       vtkPVXMLElement *root,
       const char *fileName,
-      vector<string> &arrays);
+      std::vector<string> &arrays);
   //ETX
 
   // Description:

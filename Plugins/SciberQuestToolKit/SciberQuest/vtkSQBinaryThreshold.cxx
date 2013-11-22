@@ -21,7 +21,6 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #include <string>
-using std::string;
 
 // #define SQTK_DEBUG
 // #define vtkSQBinaryThresholdTIME
@@ -94,7 +93,7 @@ vtkStandardNewMacro(vtkSQBinaryThreshold);
 vtkSQBinaryThreshold::vtkSQBinaryThreshold()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBinaryThreshold::vtkSQBinaryThreshold" << endl;
+  pCerr() << "=====vtkSQBinaryThreshold::vtkSQBinaryThreshold" << std::endl;
   #endif
 
   this->Threshold=0.0;
@@ -112,7 +111,7 @@ vtkSQBinaryThreshold::vtkSQBinaryThreshold()
 vtkSQBinaryThreshold::~vtkSQBinaryThreshold()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBinaryThreshold::~vtkSQBinaryThreshold" << endl;
+  pCerr() << "=====vtkSQBinaryThreshold::~vtkSQBinaryThreshold" << std::endl;
   #endif
 }
 
@@ -120,7 +119,7 @@ vtkSQBinaryThreshold::~vtkSQBinaryThreshold()
 int vtkSQBinaryThreshold::Initialize(vtkPVXMLElement *root)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBinaryThreshold::Initialize" << endl;
+  pCerr() << "=====vtkSQBinaryThreshold::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -148,7 +147,7 @@ int vtkSQBinaryThreshold::RequestData(
                 vtkInformationVector *outInfos)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBinaryThreshold::RequestData" << endl;
+  pCerr() << "=====vtkSQBinaryThreshold::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -191,13 +190,13 @@ int vtkSQBinaryThreshold::RequestData(
     {
     vtkErrorMacro("Array to threshold not found.");
     }
-  string SName=S->GetName();
+  std::string SName=S->GetName();
   size_t nTups=(size_t)S->GetNumberOfTuples();
   int nComps=S->GetNumberOfComponents();
 
   // add the agyrotropy array to the output
   vtkDataArray *T=S->NewInstance();
-  string TName;
+  std::string TName;
   TName+="threshold-";
   TName+=SName;
   T->SetName(TName.c_str());
@@ -240,7 +239,7 @@ void vtkSQBinaryThreshold::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os
-   << "Threshold=" << this->Threshold << endl
-   << "LowValue=" << this->LowValue << endl
-   << "HighValue=" << this->HighValue << endl;
+   << "Threshold=" << this->Threshold << std::endl
+   << "LowValue=" << this->LowValue << std::endl
+   << "HighValue=" << this->HighValue << std::endl;
 }

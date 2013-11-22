@@ -79,7 +79,7 @@ CartesianDecomp::CartesianDecomp()
 {
   #ifdef SQTK_WITHOUT_MPI
   sqErrorMacro(
-    cerr,
+    std::cerr,
     << "This class requires MPI however it was built without MPI.");
   #endif
 
@@ -215,7 +215,7 @@ int CartesianDecomp::SetDecompDims(int nBlocks)
   #else
   if (nBlocks==0)
     {
-    sqErrorMacro(cerr,"0 is an invald number of blocks.");
+    sqErrorMacro(std::cerr,"0 is an invald number of blocks.");
     return 0;
     }
 
@@ -244,7 +244,7 @@ int CartesianDecomp::SetDecompDims(const int decompDims[3])
 {
   if (decompDims[0]<1)
     {
-    sqErrorMacro(cerr,"Decomp dims cannot be zero.");
+    sqErrorMacro(std::cerr,"Decomp dims cannot be zero.");
     return 0;
     }
 
@@ -260,7 +260,7 @@ int CartesianDecomp::SetDecompDims(const int decompDims[3])
   else
   if (decompDims[0]<1 || decompDims[1]<1 || decompDims[2]<1)
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
         << "Invald decomp dims requested "
         << Tuple<int>(decompDims,3) << ".");
     return 0;
@@ -305,7 +305,7 @@ CartesianDataBlock *CartesianDecomp::GetBlock(const double *pt)
     || DecompSearch(this,dext,1,pt,I)
     || DecompSearch(this,dext,2,pt,I) )
     {
-    sqErrorMacro(cerr,
+    sqErrorMacro(std::cerr,
         "Point "
         << Tuple<double>(pt,3)
         << " not found in "

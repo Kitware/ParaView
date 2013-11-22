@@ -22,10 +22,8 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSciberQuestModule.h"
 #include "vtkDataSetAlgorithm.h"
 
-#include <vector>
-using std::vector;
-#include <string>
-using std::string;
+#include <vector> // for vector
+#include <string> // for string
 
 // #define vtkSQBOVReaderDEBUG
 
@@ -54,7 +52,7 @@ public:
   virtual int Initialize(
         vtkPVXMLElement *root,
         const char *fileName,
-        vector<string> &arrays);
+        std::vector<std::string> &arrays);
   //ETX
 
   // Description:

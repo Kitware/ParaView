@@ -85,7 +85,7 @@ void DataArrayCopierImpl<T>::Initialize(vtkDataArray *in)
     {
     this->SetInput(0);
     this->SetOutput(0);
-    sqErrorMacro(cerr,"Can't initialize from null pointer.");
+    sqErrorMacro(std::cerr,"Can't initialize from null pointer.");
     return;
     }
 

@@ -15,13 +15,8 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 
 #include <iostream>
-using std::ws;
 #include <sstream>
-using std::istringstream;
-#include <vector>
-using std::vector;
 #include <string>
-using std::string;
 
 /**
 In the element elem return the value of attribute attName
@@ -69,7 +64,7 @@ int GetAttribute(
     }
 
   T *pAttValue=attValue;
-  istringstream is(attValueStr);
+  std::istringstream is(attValueStr);
   for (int i=0; i<N; ++i)
     {
     if (!is.good())
@@ -124,9 +119,9 @@ void ExtractValues(
     S dataStr,
     T &data)
 {
-  istringstream ss(dataStr);
+  std::istringstream ss(dataStr);
 
-  while (ss && (ss >> ws) &&
+  while (ss && (ss >> std::ws) &&
       Delim(ss,',' ) && (ss >> std::ws) &&
       Delim(ss,'\n') && (ss >> std::ws) &&
       Delim(ss,'\t') && (ss >> std::ws))
@@ -140,7 +135,7 @@ void ExtractValues(
 template<typename T>
 int ExtractValues(
     vtkXMLDataElement *elem,
-    const string &xml,
+    const std::string &xml,
     T &data
     )
 {
@@ -154,7 +149,7 @@ int ExtractValues(
     }
 
   const char *elemName = elem->GetName();
-  string elemClose;
+  std::string elemClose;
   elemClose += "<";
   elemClose += elemName;
   elemClose += "/>";
@@ -166,7 +161,7 @@ int ExtractValues(
   size_t elemNameLen=strlen(elemName);
   size_t startsAt=tagAt+elemNameLen+1;
   size_t endsAt=xml.find(elemClose, tagAt);
-  if (endsAt==string::npos)
+  if (endsAt==std::string::npos)
     {
     sqErrorMacro(
         pCerr(),
@@ -175,23 +170,23 @@ int ExtractValues(
     }
 
   // read in the values
-  string text=xml.substr(startsAt,endsAt-startsAt);
+  std::string text=xml.substr(startsAt,endsAt-startsAt);
 
-  cerr << endl << endl << "text=" << text << endl << endl;
+  std::cerr << std::endl << std::endl << "text=" << text << std::endl << std::endl;
 
-  istringstream ss(text);
+  std::istringstream ss(text);
 
-  while (ss && (ss >> ws) &&
-      Delim(ss,',' ) && (ss >> ws) &&
-      Delim(ss,'\n') && (ss >> ws) &&
-      Delim(ss,'\t') && (ss >> ws))
+  while (ss && (ss >> std::ws) &&
+      Delim(ss,',' ) && (ss >> std::ws) &&
+      Delim(ss,'\n') && (ss >> std::ws) &&
+      Delim(ss,'\t') && (ss >> std::ws))
     {
     typename T::value_type val;
     ss >> val;
     data.insert(data.end(),val);
     }
 
-  cerr << endl << endl << data << endl << endl;
+  std::cerr << std::endl << std::endl << data << std::endl << std::endl;
 
   return 0;
 }

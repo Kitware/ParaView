@@ -27,7 +27,6 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkCellData.h"
 
 #include <string>
-using std::string;
 
 #include "Numerics.hxx"
 
@@ -45,7 +44,7 @@ vtkSQEdgeFilter::vtkSQEdgeFilter()
   Mode(CartesianExtent::DIM_MODE_3D)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQEdgeFilter::vtkSQEdgeFilter" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::vtkSQEdgeFilter" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -57,7 +56,7 @@ vtkSQEdgeFilter::vtkSQEdgeFilter()
 vtkSQEdgeFilter::~vtkSQEdgeFilter()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQEdgeFilter::~vtkSQEdgeFilter" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::~vtkSQEdgeFilter" << std::endl;
   #endif
 
 }
@@ -69,7 +68,7 @@ int vtkSQEdgeFilter::RequestDataObject(
     vtkInformationVector* outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQEdgeFilter::RequestDataObject" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestDataObject" << std::endl;
   #endif
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
@@ -98,7 +97,7 @@ int vtkSQEdgeFilter::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQEdgeFilter::RequestInformation" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestInformation" << std::endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -145,11 +144,11 @@ int vtkSQEdgeFilter::RequestInformation(
 
   #ifdef SQTK_DEBUG
   pCerr()
-    << "WHOLE_EXTENT(input)=" << inputDomain << endl
-    << "WHOLE_EXTENT(output)=" << outputDomain << endl
-    << "ORIGIN=" << Tuple<double>(X0,3) << endl
-    << "SPACING=" << Tuple<double>(dX,3) << endl
-    << "nGhost=" << nGhosts << endl;
+    << "WHOLE_EXTENT(input)=" << inputDomain << std::endl
+    << "WHOLE_EXTENT(output)=" << outputDomain << std::endl
+    << "ORIGIN=" << Tuple<double>(X0,3) << std::endl
+    << "SPACING=" << Tuple<double>(dX,3) << std::endl
+    << "nGhost=" << nGhosts << std::endl;
   #endif
 
   return 1;
@@ -162,7 +161,7 @@ int vtkSQEdgeFilter::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQEdgeFilter::RequestUpdateExtent" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestUpdateExtent" << std::endl;
   #endif
 
   (void)req;
@@ -214,9 +213,9 @@ int vtkSQEdgeFilter::RequestUpdateExtent(
 
   #ifdef SQTK_DEBUG
   pCerr()
-    << "WHOLE_EXTENT=" << wholeExt << endl
-    << "UPDATE_EXTENT=" << outputExt << endl
-    << "nGhosts=" << nGhosts << endl;
+    << "WHOLE_EXTENT=" << wholeExt << std::endl
+    << "UPDATE_EXTENT=" << outputExt << std::endl
+    << "nGhosts=" << nGhosts << std::endl;
   #endif
 
   return 1;
@@ -229,7 +228,7 @@ int vtkSQEdgeFilter::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQEdgeFilter::RequestData" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestData" << std::endl;
   #endif
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
@@ -313,12 +312,12 @@ int vtkSQEdgeFilter::RequestData(
 
     #ifdef SQTK_DEBUG
     pCerr()
-      << "WHOLE_EXTENT=" << domainExt << endl
-      << "UPDATE_EXTENT(input)=" << inputExt << endl
-      << "UPDATE_EXTENT(output)=" << outputExt << endl
-      << "ORIGIN" << Tuple<double>(X0,3) << endl
-      << "SPACING" << Tuple<double>(dX,3) << endl
-      << endl;
+      << "WHOLE_EXTENT=" << domainExt << std::endl
+      << "UPDATE_EXTENT(input)=" << inputExt << std::endl
+      << "UPDATE_EXTENT(output)=" << outputExt << std::endl
+      << "ORIGIN" << Tuple<double>(X0,3) << std::endl
+      << "SPACING" << Tuple<double>(dX,3) << std::endl
+      << std::endl;
     #endif
 
     vtkDataArray *V=this->GetInputArrayToProcess(0,inImData);
@@ -359,7 +358,7 @@ int vtkSQEdgeFilter::RequestData(
     // Gradient.
     if (this->ComputeGradient)
       {
-      string name;
+      std::string name;
 
       vtkDataArray *Gx=V->NewInstance();
       Gx->SetNumberOfComponents(1);
@@ -441,7 +440,7 @@ int vtkSQEdgeFilter::RequestData(
       L->Delete();
       L->SetNumberOfComponents(1);
       L->SetNumberOfTuples(outputTups);
-      string name("lapl-");
+      std::string name("lapl-");
       name+=V->GetName();
       L->SetName(name.c_str());
       //
@@ -457,7 +456,7 @@ int vtkSQEdgeFilter::RequestData(
               (VTK_TT*)L->GetVoidPointer(0)));
         }
       }
-    // outImData->Print(cerr);
+    // outImData->Print(std::cerr);
     }
   else
   if (isRecti)
@@ -472,7 +471,7 @@ int vtkSQEdgeFilter::RequestData(
 void vtkSQEdgeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQEdgeFilter::PrintSelf" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

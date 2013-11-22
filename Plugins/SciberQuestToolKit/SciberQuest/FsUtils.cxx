@@ -15,7 +15,6 @@ Copyright 2012 SciberQuest Inc.
 #include <string>
 #include <vector>
 #include <algorithm>
-using namespace std;
 
 #ifndef WIN32
   #include <dirent.h>
@@ -34,7 +33,7 @@ using namespace std;
 #endif
 
 //*****************************************************************************
-void ToLower(string &in)
+void ToLower(std::string &in)
 {
   size_t n=in.size();
   for (size_t i=0; i<n; ++i)
@@ -62,7 +61,7 @@ int FileExists(const char *path)
 //******************************************************************************
 int Present(const char *path, const char *fileName)
 {
-  ostringstream fn;
+  std::ostringstream fn;
   fn << path << PATH_SEP << fileName;
   FILE *fp=fopen(fn.str().c_str(),"r");
   if (fp==0)
@@ -83,7 +82,7 @@ int Represented(const char *path, const char *prefix)
   #ifndef NDEBUG
   if (prefix[prefixLen-1]!='_')
     {
-    cerr << __LINE__ << " Error: prefix is expected to end with '_' but it does not." << endl;
+    std::cerr << __LINE__ << " Error: prefix is expected to end with '_' but it does not." << std::endl;
     return 0;
     }
   #endif
@@ -105,8 +104,8 @@ int Represented(const char *path, const char *prefix)
     }
   else
     {
-    cerr << __LINE__ << " Error: Failed to open the given directory. " << endl
-         << path << endl;
+    std::cerr << __LINE__ << " Error: Failed to open the given directory. " << std::endl
+              << path << std::endl;
     }
   //We failed to find any files starting with the given prefix
   return 0;
@@ -115,7 +114,7 @@ int Represented(const char *path, const char *prefix)
 //******************************************************************************
 int ScalarRepresented(const char *path, const char *scalar)
 {
-  string prefix(scalar);
+  std::string prefix(scalar);
   prefix+="_";
 
   return Represented(path,prefix.c_str());
@@ -124,13 +123,13 @@ int ScalarRepresented(const char *path, const char *scalar)
 //******************************************************************************
 int VectorRepresented(const char *path, const char *vector)
 {
-  string xprefix(vector);
+  std::string xprefix(vector);
   xprefix+="x_";
 
-  string yprefix(vector);
+  std::string yprefix(vector);
   yprefix+="y_";
 
-  string zprefix(vector);
+  std::string zprefix(vector);
   zprefix+="z_";
 
   return
@@ -142,22 +141,22 @@ int VectorRepresented(const char *path, const char *vector)
 //******************************************************************************
 int SymetricTensorRepresented(const char *path, const char *tensor)
 {
-  string xxprefix(tensor);
+  std::string xxprefix(tensor);
   xxprefix+="-xx_";
 
-  string xyprefix(tensor);
+  std::string xyprefix(tensor);
   xyprefix+="-xy_";
 
-  string xzprefix(tensor);
+  std::string xzprefix(tensor);
   xzprefix+="-xz_";
 
-  string yyprefix(tensor);
+  std::string yyprefix(tensor);
   yyprefix+="-yy_";
 
-  string yzprefix(tensor);
+  std::string yzprefix(tensor);
   yzprefix+="-yz_";
 
-  string zzprefix(tensor);
+  std::string zzprefix(tensor);
   zzprefix+="-zz_";
 
   return
@@ -172,31 +171,31 @@ int SymetricTensorRepresented(const char *path, const char *tensor)
 //******************************************************************************
 int TensorRepresented(const char *path, const char *tensor)
 {
-  string xxprefix(tensor);
+  std::string xxprefix(tensor);
   xxprefix+="-xx_";
 
-  string xyprefix(tensor);
+  std::string xyprefix(tensor);
   xyprefix+="-xy_";
 
-  string xzprefix(tensor);
+  std::string xzprefix(tensor);
   xzprefix+="-xz_";
 
-  string yxprefix(tensor);
+  std::string yxprefix(tensor);
   yxprefix+="-yx_";
 
-  string yyprefix(tensor);
+  std::string yyprefix(tensor);
   yyprefix+="-yy_";
 
-  string yzprefix(tensor);
+  std::string yzprefix(tensor);
   yzprefix+="-yz_";
 
-  string zxprefix(tensor);
+  std::string zxprefix(tensor);
   zxprefix+="-zx_";
 
-  string zyprefix(tensor);
+  std::string zyprefix(tensor);
   zyprefix+="-zy_";
 
-  string zzprefix(tensor);
+  std::string zzprefix(tensor);
   zzprefix+="-zz_";
 
   return
@@ -215,13 +214,13 @@ int TensorRepresented(const char *path, const char *tensor)
 // the same prefix (eg. prefix_ID.ext). The prefix should include
 // the underscore.
 //*****************************************************************************
-int GetSeriesIds(const char *path, const char *prefix, vector<int> &ids)
+int GetSeriesIds(const char *path, const char *prefix, std::vector<int> &ids)
 {
   size_t prefixLen=strlen(prefix);
   #ifndef NDEBUG
   if (prefix[prefixLen-1]!='_')
     {
-    cerr << __LINE__ << " Error: prefix is expected to end with '_' but it does not." << endl;
+    std::cerr << __LINE__ << " Error: prefix is expected to end with '_' but it does not." << std::endl;
     return 0;
     }
   #endif
@@ -243,13 +242,13 @@ int GetSeriesIds(const char *path, const char *prefix, vector<int> &ids)
         }
       }
     closedir(ds);
-    sort(ids.begin(),ids.end());
+    std::sort(ids.begin(),ids.end());
     return 1;
     }
   else
     {
-    cerr << __LINE__ << " Error: Failed to open the given directory. " << endl
-         << path << endl;
+    std::cerr << __LINE__ << " Error: Failed to open the given directory. " << std::endl
+              << path << std::endl;
     }
   //We failed to find any files starting with the given prefix
   return 0;
@@ -260,11 +259,11 @@ int GetSeriesIds(const char *path, const char *prefix, vector<int> &ids)
 // including the final PATH_SEP. If PATH_SEP isn't found
 // then ".PATH_SEP" is returned.
 //*****************************************************************************
-string StripFileNameFromPath(const string fileName)
+std::string StripFileNameFromPath(const std::string fileName)
 {
   size_t p;
   p=fileName.find_last_of(PATH_SEP);
-  if (p==string::npos)
+  if (p==std::string::npos)
     {
     // current directory
     return "." PATH_SEP;
@@ -275,11 +274,11 @@ string StripFileNameFromPath(const string fileName)
 // Returns the file name not including the extension (ie what ever is after
 // the last ".". If there is no "." then the fileName is retnurned unmodified.
 //*****************************************************************************
-string StripExtensionFromFileName(const string fileName)
+std::string StripExtensionFromFileName(const std::string fileName)
 {
   size_t p;
   p=fileName.rfind(".");
-  if (p==string::npos)
+  if (p==std::string::npos)
     {
     // current directory
     return fileName;
@@ -290,30 +289,30 @@ string StripExtensionFromFileName(const string fileName)
 // Returns the file name from the given path. If PATH_SEP isn't found
 // then the filename is returned unmodified.
 //*****************************************************************************
-string StripPathFromFileName(const string fileName)
+std::string StripPathFromFileName(const std::string fileName)
 {
   size_t p;
   p=fileName.find_last_of(PATH_SEP);
-  if (p==string::npos)
+  if (p==std::string::npos)
     {
     // current directory
     return fileName;
     }
-  return fileName.substr(p+1,string::npos); // TODO Why does this leak?
+  return fileName.substr(p+1,std::string::npos); // TODO Why does this leak?
 }
 
 
 //*****************************************************************************
-size_t LoadLines(const char *fileName, vector<string> &lines)
+size_t LoadLines(const char *fileName, std::vector<std::string> &lines)
 {
   // Load each line in the given file into a the vector.
   size_t nRead=0;
   const int bufSize=1024;
   char buf[bufSize]={'\0'};
-  ifstream file(fileName);
+  std::ifstream file(fileName);
   if (!file.is_open())
     {
-    cerr << "ERROR: File " << fileName << " could not be opened." << endl;
+    std::cerr << "ERROR: File " << fileName << " could not be opened." << std::endl;
     return 0;
     }
   while(file.good())
@@ -330,18 +329,18 @@ size_t LoadLines(const char *fileName, vector<string> &lines)
 }
 
 //*****************************************************************************
-size_t LoadText(const string &fileName, string &text)
+size_t LoadText(const std::string &fileName, std::string &text)
 {
-  ifstream file(fileName.c_str());
+  std::ifstream file(fileName.c_str());
   if (!file.is_open())
     {
-    cerr << "ERROR: File " << fileName << " could not be opened." << endl;
+    std::cerr << "ERROR: File " << fileName << " could not be opened." << std::endl;
     return 0;
     }
   // Determine the length of the file ...
-  file.seekg (0,ios::end);
+  file.seekg (0,std::ios::end);
   size_t nBytes=(size_t)file.tellg();
-  file.seekg (0, ios::beg);
+  file.seekg (0, std::ios::beg);
   // and allocate a buffer to hold its contents.
   char *buf=new char [nBytes];
   memset(buf,0,nBytes);
@@ -353,29 +352,29 @@ size_t LoadText(const string &fileName, string &text)
 }
 
 //*****************************************************************************
-int WriteText(string &fileName, string &text)
+int WriteText(std::string &fileName, std::string &text)
 {
-  ofstream file(fileName.c_str());
+  std::ofstream file(fileName.c_str());
   if (!file.is_open())
     {
-    cerr << "ERROR: File " << fileName << " could not be opened." << endl;
+    std::cerr << "ERROR: File " << fileName << " could not be opened." << std::endl;
     return 0;
     }
-  file << text << endl;
+  file << text << std::endl;
   file.close();
   return 1;
 }
 
 //*****************************************************************************
 int SearchAndReplace(
-        const string &searchFor,
-        const string &replaceWith,
-        string &inText)
+        const std::string &searchFor,
+        const std::string &replaceWith,
+        std::string &inText)
 {
   int nFound=0;
   const size_t n=searchFor.size();
-  size_t at=string::npos;
-  while ((at=inText.find(searchFor))!=string::npos)
+  size_t at=std::string::npos;
+  while ((at=inText.find(searchFor))!=std::string::npos)
     {
     inText.replace(at,n,replaceWith);
     ++nFound;
@@ -384,7 +383,7 @@ int SearchAndReplace(
 }
 
 //*****************************************************************************
-ostream &operator<<(ostream &os, vector<string> v)
+std::ostream &operator<<(std::ostream &os, std::vector<std::string> v)
 {
   size_t n=v.size();
   if (n>0)
@@ -399,7 +398,7 @@ ostream &operator<<(ostream &os, vector<string> v)
 }
 
 //*****************************************************************************
-bool operator&(vector<string> &v, const string &s)
+bool operator&(std::vector<std::string> &v, const std::string &s)
 {
   // test for set inclusion.
   const size_t n=v.size();

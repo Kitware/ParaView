@@ -40,16 +40,10 @@ Copyright 2012 SciberQuest Inc.
 
 #include <cstdlib>
 #include <string>
-using std::string;
 #include <map>
-using std::map;
 #include <vector>
-using std::vector;
 #include <utility>
-using std::pair;
 #include <algorithm>
-using std::min;
-using std::max;
 
 vtkStandardNewMacro(vtkSQMedianFilter);
 
@@ -73,7 +67,7 @@ vtkSQMedianFilter::vtkSQMedianFilter()
   LogLevel(0)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::vtkSQMedianFilter" << endl;
+  pCerr() << "=====vtkSQMedianFilter::vtkSQMedianFilter" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -115,14 +109,14 @@ vtkSQMedianFilter::vtkSQMedianFilter()
       {
       hostRanks=(int*)malloc(this->WorldSize*sizeof(int));
 
-      vector<string> keys(this->WorldSize);
-      typedef map<string,int> CountMapType;
+      std::vector<std::string> keys(this->WorldSize);
+      typedef std::map<std::string,int> CountMapType;
       typedef CountMapType::iterator CountMapItType;
-      typedef pair<CountMapItType,bool> CountMapInsType;
-      typedef pair<const string,int> CountMapValType;
+      typedef std::pair<CountMapItType,bool> CountMapInsType;
+      typedef std::pair<const std::string,int> CountMapValType;
       CountMapType counts;
 
-      pair<const string,int> val;
+      std::pair<const std::string,int> val;
       for (int i=0; i<this->WorldSize; ++i)
         {
         keys[i]=hostNames[i*hostNameLen];
@@ -195,8 +189,8 @@ vtkSQMedianFilter::vtkSQMedianFilter()
   this->SetNumberOfActiveCUDADevices(this->NumberOfCUDADevices);
 
   #ifdef SQTK_DEBUG
-  pCerr() << "HostSize=" << this->HostSize << endl;
-  pCerr() << "HostRank=" << this->HostRank << endl;
+  pCerr() << "HostSize=" << this->HostSize << std::endl;
+  pCerr() << "HostRank=" << this->HostRank << std::endl;
   #endif
   */
 }
@@ -205,7 +199,7 @@ vtkSQMedianFilter::vtkSQMedianFilter()
 vtkSQMedianFilter::~vtkSQMedianFilter()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::~vtkSQMedianFilter" << endl;
+  pCerr() << "=====vtkSQMedianFilter::~vtkSQMedianFilter" << std::endl;
   #endif
 
   /*
@@ -224,7 +218,7 @@ vtkSQMedianFilter::~vtkSQMedianFilter()
 int vtkSQMedianFilter::Initialize(vtkPVXMLElement *root)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::Initialize" << endl;
+  pCerr() << "=====vtkSQMedianFilter::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -326,7 +320,7 @@ void vtkSQMedianFilter::SetCPUDriverOptimization(int opt)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQMedianFilter::SetCPUDriverOptimization"
-    << " " << opt << endl;
+    << " " << opt << std::endl;
   #endif
   this->CPUDriver->SetOptimization(opt);
   this->Modified();
@@ -345,7 +339,7 @@ void vtkSQMedianFilter::SetAllMPIRanksToUseCUDA(int allUse)
   pCerr()
     << "=====vtkSQMedianFilter::SetAllMPIRanksToUseCUDA"
     << " " << allUse
-    << endl;
+    << std::endl;
   #endif
 
   if (allUse && this->NumberOfActiveCUDADevices)
@@ -360,7 +354,7 @@ void vtkSQMedianFilter::SetAllMPIRanksToUseCUDA(int allUse)
   this->Modified();
 
   #ifdef SQTK_DEBUG
-  pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
+  pCerr() << "EnableCUDA=" << this->EnableCUDA << std::endl;
   #endif
 }
 
@@ -371,7 +365,7 @@ void vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA(int nRanks)
   pCerr()
     << "=====vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA"
     << " " << nRanks
-    << endl;
+    << std::endl;
   #endif
   if (nRanks==this->NumberOfMPIRanksToUseCUDA)
     {
@@ -402,7 +396,7 @@ void vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA(int nRanks)
   this->Modified();
 
   #ifdef SQTK_DEBUG
-  pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
+  pCerr() << "EnableCUDA=" << this->EnableCUDA << std::endl;
   #endif
 }
 
@@ -413,7 +407,7 @@ void vtkSQMedianFilter::SetNumberOfActiveCUDADevices(int nActive)
   pCerr()
     << "=====vtkSQMedianFilter::SetNumberOfActiveCUDADevices"
     << " " << nActive
-    << endl;
+    << std::endl;
   #endif
 
   //nActive=max(0,nActive);
@@ -439,7 +433,7 @@ void vtkSQMedianFilter::SetNumberOfActiveCUDADevices(int nActive)
     int deviceId=this->HostRank%this->NumberOfActiveCUDADevices;
     this->SetCUDADeviceId(deviceId);
     #ifdef SQTK_DEBUG
-    pCerr() << "assigned to cuda device " << deviceId << endl;
+    pCerr() << "assigned to cuda device " << deviceId << std::endl;
     #endif
     }
 
@@ -453,7 +447,7 @@ int vtkSQMedianFilter::SetCUDADeviceId(int deviceId)
   pCerr()
     << "=====vtkSQMedianFilter::SetCUDADeviceId"
     << " " << deviceId
-    << endl;
+    << std::endl;
   #endif
   if (this->CUDADeviceId==deviceId)
     {
@@ -472,7 +466,7 @@ void vtkSQMedianFilter::SetKernelCUDAMemoryType(int memType)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQMedianFilter::SetKernelCUDAMemoryType"
-    << " " << memType << endl;
+    << " " << memType << std::endl;
   #endif
   this->CUDADriver->SetKernelMemoryType(memType);
   this->Modified();
@@ -490,7 +484,7 @@ void vtkSQMedianFilter::SetInputCUDAMemoryType(int memType)
   #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQMedianFilter::SetInputCUDAMemoryType"
-    << " " << memType << endl;
+    << " " << memType << std::endl;
   #endif
   this->CUDADriver->SetInputMemoryType(memType);
   this->Modified();
@@ -520,7 +514,7 @@ int vtkSQMedianFilter::GetNumberOfWarpsPerCUDABlock()
 void vtkSQMedianFilter::SetMode(int mode)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::SetMode" << endl;
+  pCerr() << "=====vtkSQMedianFilter::SetMode" << std::endl;
   #endif
 
   if (mode==this->Mode)
@@ -537,7 +531,7 @@ void vtkSQMedianFilter::SetMode(int mode)
 void vtkSQMedianFilter::SetKernelType(int type)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::SetKernelType" << endl;
+  pCerr() << "=====vtkSQMedianFilter::SetKernelType" << std::endl;
   #endif
 
   if (type==this->KernelType)
@@ -554,7 +548,7 @@ void vtkSQMedianFilter::SetKernelType(int type)
 void vtkSQMedianFilter::SetKernelWidth(int width)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::SetKernelWidth" << endl;
+  pCerr() << "=====vtkSQMedianFilter::SetKernelWidth" << std::endl;
   #endif
 
   if (width==this->KernelWidth)
@@ -577,7 +571,7 @@ void vtkSQMedianFilter::SetKernelWidth(int width)
 int vtkSQMedianFilter::UpdateKernel()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::UpdateKernel" << endl;
+  pCerr() << "=====vtkSQMedianFilter::UpdateKernel" << std::endl;
   #endif
 
   if (!this->KernelModified)
@@ -616,7 +610,7 @@ int vtkSQMedianFilter::RequestDataObject(
     vtkInformationVector* outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::RequestDataObject" << endl;
+  pCerr() << "=====vtkSQMedianFilter::RequestDataObject" << std::endl;
   #endif
 
 
@@ -645,7 +639,7 @@ int vtkSQMedianFilter::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::RequestInformation" << endl;
+  pCerr() << "=====vtkSQMedianFilter::RequestInformation" << std::endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -696,11 +690,11 @@ int vtkSQMedianFilter::RequestInformation(
 
   #ifdef SQTK_DEBUG
   pCerr()
-    << "WHOLE_EXTENT(input)=" << inputDomain << endl
-    << "WHOLE_EXTENT(output)=" << outputDomain << endl
-    << "ORIGIN=" << Tuple<double>(X0,3) << endl
-    << "SPACING=" << Tuple<double>(dX,3) << endl
-    << "nGhost=" << nGhosts << endl;
+    << "WHOLE_EXTENT(input)=" << inputDomain << std::endl
+    << "WHOLE_EXTENT(output)=" << outputDomain << std::endl
+    << "ORIGIN=" << Tuple<double>(X0,3) << std::endl
+    << "SPACING=" << Tuple<double>(dX,3) << std::endl
+    << "nGhost=" << nGhosts << std::endl;
   #endif
 
   return 1;
@@ -713,7 +707,7 @@ int vtkSQMedianFilter::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::RequestUpdateExtent" << endl;
+  pCerr() << "=====vtkSQMedianFilter::RequestUpdateExtent" << std::endl;
   #endif
 
   (void)req;
@@ -765,9 +759,9 @@ int vtkSQMedianFilter::RequestUpdateExtent(
 
   #ifdef SQTK_DEBUG
   pCerr()
-    << "WHOLE_EXTENT=" << wholeExt << endl
-    << "UPDATE_EXTENT=" << outputExt << endl
-    << "nGhosts=" << nGhosts << endl;
+    << "WHOLE_EXTENT=" << wholeExt << std::endl
+    << "UPDATE_EXTENT=" << outputExt << std::endl
+    << "nGhosts=" << nGhosts << std::endl;
   #endif
 
   return 1;
@@ -780,7 +774,7 @@ int vtkSQMedianFilter::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::RequestData" << endl;
+  pCerr() << "=====vtkSQMedianFilter::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -885,12 +879,12 @@ int vtkSQMedianFilter::RequestData(
 
     #ifdef SQTK_DEBUG
     pCerr()
-      << "WHOLE_EXTENT=" << domainExt << endl
-      << "UPDATE_EXTENT(input)=" << extV << endl
-      << "UPDATE_EXTENT(output)=" << extW << endl
-      << "ORIGIN" << Tuple<double>(X0,3) << endl
-      << "SPACING" << Tuple<double>(dX,3) << endl
-      << endl;
+      << "WHOLE_EXTENT=" << domainExt << std::endl
+      << "UPDATE_EXTENT(input)=" << extV << std::endl
+      << "UPDATE_EXTENT(output)=" << extW << std::endl
+      << "ORIGIN" << Tuple<double>(X0,3) << std::endl
+      << "SPACING" << Tuple<double>(dX,3) << std::endl
+      << std::endl;
     #endif
 
     vtkDataArray *V=this->GetInputArrayToProcess(0,inImData);
@@ -944,18 +938,18 @@ int vtkSQMedianFilter::RequestData(
         slowDim=1;
         break;
       default:
-        sqErrorMacro(cerr,"Bad dim mode.");
+        sqErrorMacro(std::cerr,"Bad dim mode.");
         return -1;
       }
 
     #ifdef SQTK_DEBUG
-    pCerr() << "wnijk=" << wnijk << endl;
-    pCerr() << "fastDim=" << fastDim << endl;
-    pCerr() << "slowDim=" << slowDim << endl;
-    pCerr() << "extV=" << extV << endl;
-    pCerr() << "nV=(" << nV[fastDim] <<  ", " << nV[slowDim] << ")" << endl;
-    pCerr() << "extW=" << extW << endl;
-    pCerr() << "nW=(" << nW[fastDim] <<  ", " << nW[slowDim] << ")" << endl;
+    pCerr() << "wnijk=" << wnijk << std::endl;
+    pCerr() << "fastDim=" << fastDim << std::endl;
+    pCerr() << "slowDim=" << slowDim << std::endl;
+    pCerr() << "extV=" << extV << std::endl;
+    pCerr() << "nV=(" << nV[fastDim] <<  ", " << nV[slowDim] << ")" << std::endl;
+    pCerr() << "extW=" << extW << std::endl;
+    pCerr() << "nW=(" << nW[fastDim] <<  ", " << nW[slowDim] << ")" << std::endl;
     #endif
 
     switch (V->GetDataType())
@@ -963,8 +957,8 @@ int vtkSQMedianFilter::RequestData(
       // TODO -- replace with vtkTemplateMacro
       case VTK_FLOAT:
         {
-        vector<float*> sV(nComp,0);
-        vector<float*> sW(nComp,0);
+        std::vector<float*> sV(nComp,0);
+        std::vector<float*> sW(nComp,0);
         for (unsigned long q=0; q<nComp; ++q)
           {
           posix_memalign((void**)&sV[q],16,vnijk*sizeof(float));
@@ -1023,14 +1017,14 @@ int vtkSQMedianFilter::RequestData(
         break;
       default:
         // TODO
-        sqErrorMacro(cerr,"Not currently using vtkTemplateMacro");
+        sqErrorMacro(std::cerr,"Not currently using vtkTemplateMacro");
         return -1;
       }
 
     outImData->GetPointData()->AddArray(W);
     W->Delete();
 
-    // outImData->Print(cerr);
+    // outImData->Print(std::cerr);
     }
   else
   if (isRecti)
@@ -1050,7 +1044,7 @@ int vtkSQMedianFilter::RequestData(
 void vtkSQMedianFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQMedianFilter::PrintSelf" << endl;
+  pCerr() << "=====vtkSQMedianFilter::PrintSelf" << std::endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

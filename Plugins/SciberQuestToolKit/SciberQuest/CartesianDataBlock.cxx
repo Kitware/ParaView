@@ -100,7 +100,7 @@ vtkDataSet *CartesianDataBlock::GetData()
 }
 
 //*****************************************************************************
-ostream &operator<<(ostream &os, CartesianDataBlock &b)
+std::ostream &operator<<(std::ostream &os, CartesianDataBlock &b)
 {
   os
     << Tuple<int>(b.Id,4) << " "

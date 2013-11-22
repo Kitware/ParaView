@@ -18,7 +18,6 @@ Copyright 2012 SciberQuest Inc.
 #include "Tuple.hxx"
 
 #include <sstream>
-using std::ostringstream;
 #include "vtkPolyDataWriter.h"
 
 //-----------------------------------------------------------------------------
@@ -150,7 +149,7 @@ void TerminationCondition::PushTerminationSurface(
 
   if (name==0)
     {
-    ostringstream os;
+    std::ostringstream os;
     os << "S" << this->TerminationSurfaces.size();
     this->TerminationSurfaceNames.push_back(os.str().c_str());
     }
@@ -288,7 +287,7 @@ void TerminationCondition::InitializeColorMapper()
   // n   -> sn
   // n+1 -> field null
   // n+2 -> short integration
-  vector<string> names;
+  std::vector<std::string> names;
   names.push_back("domain bounds");
   names.insert(
       names.end(),

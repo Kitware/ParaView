@@ -30,7 +30,7 @@ vtkSQLogSource::vtkSQLogSource()
       FileName(NULL)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQLogSource::vtkSQLogSource" << endl;
+  pCerr() << "=====vtkSQLogSource::vtkSQLogSource" << std::endl;
   #endif
 
   this->SetNumberOfInputPorts(0);
@@ -41,7 +41,7 @@ vtkSQLogSource::vtkSQLogSource()
 vtkSQLogSource::~vtkSQLogSource()
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQLogSource::~vtkSQLogSource" << endl;
+  pCerr() << "=====vtkSQLogSource::~vtkSQLogSource" << std::endl;
   #endif
 
   if (this->GlobalLevel && this->FileName)
@@ -61,7 +61,7 @@ vtkSQLogSource::~vtkSQLogSource()
 int vtkSQLogSource::Initialize(vtkPVXMLElement *root)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQLogSource::Initialize" << endl;
+  pCerr() << "=====vtkSQLogSource::Initialize" << std::endl;
   #endif
 
   return vtkSQLog::GetGlobalInstance()->Initialize(root);
@@ -71,7 +71,7 @@ int vtkSQLogSource::Initialize(vtkPVXMLElement *root)
 void vtkSQLogSource::SetGlobalLevel(int level)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQLogSource::SetGlobalLevel" << endl;
+  pCerr() << "=====vtkSQLogSource::SetGlobalLevel" << std::endl;
   #endif
 
   if (this->GlobalLevel==level) return;
@@ -89,7 +89,7 @@ int vtkSQLogSource::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQLogSource::RequestInformation" << endl;
+  pCerr() << "=====vtkSQLogSource::RequestInformation" << std::endl;
   #endif
 
   (void)req;
@@ -106,8 +106,8 @@ int vtkSQLogSource::RequestData(
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQLogSource::RequestData" << endl;
-  //this->Print(cerr);
+  pCerr() << "=====vtkSQLogSource::RequestData" << std::endl;
+  //this->Print(std::cerr);
   #endif
 
   (void)req;
@@ -121,16 +121,16 @@ int vtkSQLogSource::RequestData(
 void vtkSQLogSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef SQTK_DEBUG
-  pCerr() << "=====vtkSQLogSource::PrintSelf" << endl;
+  pCerr() << "=====vtkSQLogSource::PrintSelf" << std::endl;
   #endif
 
   (void)indent;
 
   const char *fileName = (this->FileName==NULL?"NULL":this->FileName);
   os
-    << "GlobalLevel=" << this->GlobalLevel << endl
-    << "FileName=" << fileName << endl
-    << endl;
+    << "GlobalLevel=" << this->GlobalLevel << std::endl
+    << "FileName=" << fileName << std::endl
+    << std::endl;
 
   // this->Superclass::PrintSelf(os,indent);
 }

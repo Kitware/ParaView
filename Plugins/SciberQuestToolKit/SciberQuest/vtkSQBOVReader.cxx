@@ -45,11 +45,7 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #include <algorithm>
-using std::min;
-using std::max;
-
 #include <sstream>
-using std::ostringstream;
 
 // #define SQTK_DEBUG
 
@@ -64,7 +60,7 @@ vtkStandardNewMacro(vtkSQBOVReader);
 vtkSQBOVReader::vtkSQBOVReader()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReader::vtkSQBOVReader" << endl;
+  pCerr() << "=====vtkSQBOVReader::vtkSQBOVReader" << std::endl;
   #endif
 
   // Initialize pipeline.
@@ -76,7 +72,7 @@ vtkSQBOVReader::vtkSQBOVReader()
 vtkSQBOVReader::~vtkSQBOVReader()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReader::~vtkSQBOVReader" << endl;
+  pCerr() << "=====vtkSQBOVReader::~vtkSQBOVReader" << std::endl;
   #endif
 
   this->Clear();
@@ -86,7 +82,7 @@ vtkSQBOVReader::~vtkSQBOVReader()
 void vtkSQBOVReader::Clear()
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReader::Clear" << endl;
+  pCerr() << "=====vtkSQBOVReader::Clear" << std::endl;
   #endif
 
   vtkSQBOVReaderBase::Clear();
@@ -96,10 +92,10 @@ void vtkSQBOVReader::Clear()
 int vtkSQBOVReader::Initialize(
       vtkPVXMLElement *root,
       const char *fileName,
-      vector<string> &arrays)
+      std::vector<std::string> &arrays)
 {
   #if defined SQTK_DEBUG
-  pCerr() << "=====vtkSQBOVReader::Initialize" << endl;
+  pCerr() << "=====vtkSQBOVReader::Initialize" << std::endl;
   #endif
 
   vtkPVXMLElement *elem=GetOptionalElement(root,"vtkSQBOVReader");
@@ -125,8 +121,8 @@ int vtkSQBOVReader::RequestInformation(
   vtkInformationVector* outInfos)
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQBOVReader::RequestInformation" << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQBOVReader::RequestInformation" << std::endl;
   #endif
 
   if (!this->Reader->IsOpen())
@@ -153,7 +149,7 @@ int vtkSQBOVReader::RequestInformation(
   //     vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
 
   #if defined SQTK_DEBUG
-  oss << "WHOLE_EXTENT=" << Tuple<int>(wholeExtent,6) << endl;
+  oss << "WHOLE_EXTENT=" << Tuple<int>(wholeExtent,6) << std::endl;
   #endif
 
   if (this->Reader->DataSetTypeIsImage())
@@ -170,15 +166,15 @@ int vtkSQBOVReader::RequestInformation(
 
     #if defined SQTK_DEBUG
     oss
-      << "ORIGIN=" << Tuple<double>(X0,3) << endl
-      << "SPACING=" << Tuple<double>(dX,3) << endl;
+      << "ORIGIN=" << Tuple<double>(X0,3) << std::endl
+      << "SPACING=" << Tuple<double>(dX,3) << std::endl;
     #endif
     }
 
 
 
   #if defined SQTK_DEBUG
-  pCerr() << oss.str() << endl;
+  pCerr() << oss.str() << std::endl;
   #endif
 
   return vtkSQBOVReaderBase::RequestInformation(req,inInfos,outInfos);
@@ -191,8 +187,8 @@ int vtkSQBOVReader::RequestData(
         vtkInformationVector *outInfos)
 {
   #if defined SQTK_DEBUG
-  ostringstream oss;
-  oss << "=====vtkSQBOVReader::RequestData" << endl;
+  std::ostringstream oss;
+  oss << "=====vtkSQBOVReader::RequestData" << std::endl;
   #endif
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -225,7 +221,7 @@ int vtkSQBOVReader::RequestData(
   oss
     << "WHOLE_EXTENT=" << subset
     << " size=" << subset.Size()*sizeof(float)
-    << endl;
+    << std::endl;
   #endif
 
   // shift to the dual grid
@@ -251,7 +247,7 @@ int vtkSQBOVReader::RequestData(
   md->SetDecomp(decomp);
 
   #if defined SQTK_DEBUG
-  oss << "UPDATE_EXTENT=" << decomp << endl;
+  oss << "UPDATE_EXTENT=" << decomp << std::endl;
   #endif
 
   // Construct MPI File hints for the reader.
@@ -376,7 +372,7 @@ int vtkSQBOVReader::RequestData(
   md->PushPipelineInformation(req, info);
 
   #if defined SQTK_DEBUG
-  pCerr() << oss.str() << endl;
+  pCerr() << oss.str() << std::endl;
   //this->Reader->PrintSelf(pCerr());
   //output->Print(pCerr());
   #endif
@@ -394,9 +390,9 @@ void vtkSQBOVReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "FileName:        " << safeio(this->FileName) << endl;
-  os << indent << "FileNameChanged: " << this->FileNameChanged << endl;
-  os << indent << "Raeder: " << endl;
+  os << indent << "FileName:        " << safeio(this->FileName) << std::endl;
+  os << indent << "FileNameChanged: " << this->FileNameChanged << std::endl;
+  os << indent << "Raeder: " << std::endl;
   this->Reader->PrintSelf(os);
-  os << endl;
+  os << std::endl;
 }

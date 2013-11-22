@@ -19,9 +19,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSQBOVReaderBase.h"
 
 #include <vector> // for vector
-using std::vector;
 #include <string> // for string
-using std::string;
 
 //BTX
 class BOVReader;
@@ -43,7 +41,7 @@ public:
   virtual int Initialize(
         vtkPVXMLElement *root,
         const char *fileName,
-        vector<string> &arrays);
+        std::vector<std::string> &arrays);
   //ETX
 
   // Description:

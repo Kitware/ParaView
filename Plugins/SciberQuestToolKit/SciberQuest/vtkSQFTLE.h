@@ -21,9 +21,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkDataSetAlgorithm.h"
 
 #include <set> //
-using std::set;
 #include <string> //
-using std::string;
 
 class vtkInformation;
 class vtkInformationVector;
@@ -75,7 +73,7 @@ protected:
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 private:
-  set<string> InputArrays;
+  std::set<std::string> InputArrays;
   int PassInput;
   double TimeInterval;
   int LogLevel;

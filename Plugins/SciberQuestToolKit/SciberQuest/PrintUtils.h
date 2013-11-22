@@ -12,22 +12,18 @@ Copyright 2012 SciberQuest Inc.
 
 //BTX
 #include <iostream>
-using std::ostream;
 #include <map>
-using std::map;
 #include <vector>
-using std::vector;
 #include <string>
-using std::string;
 
 #include "vtkAMRBox.h"
 
-ostream &operator<<(ostream &os, const map<string,int> &m);
-ostream &operator<<(ostream &os, const vector<vtkAMRBox> &v);
-ostream &operator<<(ostream &os, const vector<string> &v);
-ostream &operator<<(ostream &os, const vector<double> &v);
-ostream &operator<<(ostream &os, const vector<float> &v);
-ostream &operator<<(ostream &os, const vector<int> &v);
+std::ostream &operator<<(std::ostream &os, const std::map<std::string,int> &m);
+std::ostream &operator<<(std::ostream &os, const std::vector<vtkAMRBox> &v);
+std::ostream &operator<<(std::ostream &os, const std::vector<std::string> &v);
+std::ostream &operator<<(std::ostream &os, const std::vector<double> &v);
+std::ostream &operator<<(std::ostream &os, const std::vector<float> &v);
+std::ostream &operator<<(std::ostream &os, const std::vector<int> &v);
 
 //ETX
 #endif

@@ -18,10 +18,7 @@ typedef void * MPI_Info;
 #endif
 
 #include <vector>
-using std::vector;
-
 #include <iostream>
-using std::ostream;
 
 class BOVMetaData;
 
@@ -60,10 +57,10 @@ public:
     }
 
 private:
-  vector<BOVScalarImage*> Scalars;
-  vector<BOVVectorImage*> Vectors;
-  vector<BOVVectorImage*> Tensors;
-  vector<BOVVectorImage*> SymetricTensors;
+  std::vector<BOVScalarImage*> Scalars;
+  std::vector<BOVVectorImage*> Vectors;
+  std::vector<BOVVectorImage*> Tensors;
+  std::vector<BOVVectorImage*> SymetricTensors;
 
 private:
   BOVTimeStepImage();
@@ -71,13 +68,13 @@ private:
   const BOVTimeStepImage &operator=(const BOVTimeStepImage &);
 
 private:
-  friend ostream &operator<<(ostream &os, const BOVTimeStepImage &si);
+  friend std::ostream &operator<<(std::ostream &os, const BOVTimeStepImage &si);
   friend class BOVScalarImageIterator;
   friend class BOVVectorImageIterator;
   friend class BOVTensorImageIterator;
   friend class BOVSymetricTensorImageIterator;
 };
 
-ostream &operator<<(ostream &os, const BOVTimeStepImage &si);
+std::ostream &operator<<(std::ostream &os, const BOVTimeStepImage &si);
 
 #endif

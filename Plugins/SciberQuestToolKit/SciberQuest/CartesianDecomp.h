@@ -15,7 +15,6 @@ Copyright 2012 SciberQuest Inc.
 #include "CartesianBounds.h"
 
 #include <vector>
-using std::vector;
 
 class CartesianDataBlock;
 class CartesianDataBlockIODescriptor;
@@ -191,8 +190,8 @@ protected:
   int NGhosts;                  // number of ghost cells.
   int PeriodicBC[3];            // boolean set if periodic boundary in the direction
   int DecompDims[4];            // block array size (ni,nj,nk,ni*nj)
-  vector<CartesianDataBlock *> Decomp;   // block array
-  vector<CartesianDataBlockIODescriptor *> IODescriptors;
+  std::vector<CartesianDataBlock *> Decomp;   // block array
+  std::vector<CartesianDataBlockIODescriptor *> IODescriptors;
   CartesianBounds Bounds;       // domain world space bounds
   CartesianExtent Extent;       // domain index space bounds
   CartesianExtent FileExtent;   // extent of all data on disk

@@ -13,9 +13,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkDataSetAlgorithm.h"
 
 #include <set>
-using std::set;
 #include <string>
-using std::string;
 
 class vtkPVXMLElement;
 class vtkInformation;
@@ -129,8 +127,8 @@ protected:
 
 private:
   // controls to turn on/off array generation
-  set<string> InputArrays;
-  set<string> ArraysToCopy;
+  std::set<std::string> InputArrays;
+  std::set<std::string> ArraysToCopy;
   int SplitComponents;
   int ResultMagnitude;
   int ComputeRotation;
