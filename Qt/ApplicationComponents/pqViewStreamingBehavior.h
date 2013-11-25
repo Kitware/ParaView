@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqViewStreamingBehavior_h
 
 #include <QObject>
-#include <QTimer>
 #include "pqApplicationComponentsModule.h"
+#include "pqTimer.h"
 
 class pqView;
 class vtkObject;
@@ -70,7 +70,7 @@ protected slots:
 
 private:
   Q_DISABLE_COPY(pqViewStreamingBehavior)
-  QTimer Timer;
+  pqTimer Timer;
   int Pass;
   bool DelayUpdate;
   bool DisableAutomaticUpdates;
