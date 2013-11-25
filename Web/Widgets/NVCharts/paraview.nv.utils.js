@@ -3,7 +3,7 @@
  *
  * This module provides utility functions use for charting/plotting data.
  *
- * @class paraview.ui.nv.utils
+ * @class vtkWeb.helper
  */
 (function(GLOBAL, $) {
     // ----------------------------------------------------------------------
@@ -67,7 +67,7 @@
     }
 
     /**
-     * @member paraview.ui.nv.utils
+     * @member vtkWeb.helper
      * @method processPlotData
      * @param {Object} data
      * Object representing a vtkTable.
