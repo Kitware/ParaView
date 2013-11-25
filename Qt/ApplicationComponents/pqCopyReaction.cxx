@@ -31,11 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCopyReaction.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqUndoStack.h"
-#include "pqActiveObjects.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyListDomain.h"
 
 //-----------------------------------------------------------------------------
 pqCopyReaction::pqCopyReaction(QAction* parentObject, bool paste_mode)
@@ -99,24 +102,76 @@ void pqCopyReaction::paste()
     qDebug("No source on clipboard to copy from.");
     return;
     }
-  pqCopyReaction::copy(activeSource->getProxy(), clipboard->getProxy(), true);
+  pqCopyReaction::copy(activeSource->getProxy(), clipboard->getProxy());
   activeSource->renderAllViews();
 }
 
 //-----------------------------------------------------------------------------
-void pqCopyReaction::copy(vtkSMProxy* dest, vtkSMProxy* source, bool skip_inputs)
+void pqCopyReaction::copy(vtkSMProxy* dest, vtkSMProxy* source)
 {
   if (dest && source)
     {
     BEGIN_UNDO_SET("Copy Properties");
-    if (skip_inputs)
+    dest->Copy(source, "vtkSMProxyProperty");
+
+    // handle proxy properties.
+    vtkSMPropertyIterator* destIter = dest->NewPropertyIterator();
+    for (destIter->Begin(); !destIter->IsAtEnd(); destIter->Next())
       {
-      dest->Copy(source, "vtkSMInputProperty");
+      if (vtkSMInputProperty::SafeDownCast(destIter->GetProperty()))
+        {
+        // skip input properties.
+        continue;
+        }
+
+      vtkSMProxyProperty* destPP =
+        vtkSMProxyProperty::SafeDownCast(destIter->GetProperty());
+      vtkSMProxyProperty* srcPP = vtkSMProxyProperty::SafeDownCast(
+          source->GetProperty(destIter->GetKey()));
+      if (!destPP || !srcPP || srcPP->GetNumberOfProxies() > 1)
+        {
+        // skip non-proxy properties since those were already copied.
+        continue;
+        }
+
+      vtkSMProxyListDomain* destPLD = vtkSMProxyListDomain::SafeDownCast(
+        destPP->FindDomain("vtkSMProxyListDomain"));
+      vtkSMProxyListDomain* srcPLD = vtkSMProxyListDomain::SafeDownCast(
+        srcPP->FindDomain("vtkSMProxyListDomain"));
+      if (!destPLD || !srcPLD)
+        {
+        // we copy proxy properties that have proxy list domains.
+        continue;
+        }
+
+      if (srcPP->GetNumberOfProxies() == 0)
+        {
+        destPP->SetNumberOfProxies(0);
+        continue;
+        }
+
+      vtkSMProxy* srcValue = srcPP->GetProxy(0);
+      vtkSMProxy* destValue = NULL;
+      // find srcValue type in destPLD and that's the proxy to use as destValue.
+      for (unsigned int cc=0; srcValue != NULL && cc < destPLD->GetNumberOfProxyTypes(); cc++)
+        {
+        if (srcValue->GetXMLName() && destPLD->GetProxyName(cc) &&
+            strcmp(srcValue->GetXMLName(), destPLD->GetProxyName(cc)) == 0 &&
+            srcValue->GetXMLGroup() && destPLD->GetProxyGroup(cc) &&
+            strcmp(srcValue->GetXMLGroup(), destPLD->GetProxyGroup(cc)) == 0)
+          {
+          destValue = destPLD->GetProxy(cc);
+          break;
+          }
+        }
+      if (destValue)
+        {
+        Q_ASSERT(srcValue != NULL);
+        pqCopyReaction::copy(destValue, srcValue);
+        destPP->SetProxy(0, destValue);
+        }
       }
-    else
-      {
-      dest->Copy(source);
-      }
+    destIter->Delete();
     dest->UpdateVTKObjects();
     END_UNDO_SET();
     }
