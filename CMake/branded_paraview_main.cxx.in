@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPlastiqueStyle>
 #endif
 
+#include <stdlib.h>
 #include <clocale>
 
 int main(int argc, char* argv[])
