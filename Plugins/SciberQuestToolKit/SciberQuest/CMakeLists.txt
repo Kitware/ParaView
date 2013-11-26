@@ -103,7 +103,6 @@ set(CXX_SOURCES
   vtkSQSeedPointLatice.cxx
   vtkSQSphereSource.cxx
   vtkSQSurfaceVectors.cxx
-  vtkSQTensorGlyph.cxx
   vtkSQTubeFilter.cxx
   vtkSQVolumeSource.cxx
   vtkSQVolumeSourceCellGenerator.cxx
