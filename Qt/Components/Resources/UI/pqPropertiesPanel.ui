@@ -85,7 +85,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for properties by name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="placeholderText">
-        <string>Search...</string>
+        <string>Search ... (use Esc to clear text)</string>
        </property>
       </widget>
      </item>
