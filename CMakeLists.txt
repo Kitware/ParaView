@@ -413,6 +413,20 @@ set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
 set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
 
 #------------------------------------------------------------------------------
+# Test to check install tree
+#------------------------------------------------------------------------------
+if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  add_test( NAME pv.TestDevelopmentInstall
+    COMMAND ${CMAKE_COMMAND}
+    -DPARAVIEW_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}
+    -DPARAVIEW_INSTALL_DIR:PATH=${CMAKE_INSTALL_PREFIX}
+    -DPARAVIEW_SOURCE_DIR:PATH=${CMAKE_SOURCE_DIR}
+    -DPARAVIEW_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+    -DPARAVIEW_VERSION:STRING=${PARAVIEW_VERSION}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ParaViewTestInstall.cmake)
+  set_tests_properties(TestInstall PROPERTIES LABELS "PARAVIEW")
+endif()
+#------------------------------------------------------------------------------
 
 include_directories(${ParaView_BINARY_DIR})
 
