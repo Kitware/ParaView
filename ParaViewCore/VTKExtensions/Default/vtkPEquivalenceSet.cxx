@@ -43,7 +43,7 @@ int vtkPEquivalenceSet::ResolveEquivalences ()
 
   int tag = 475893745;
   int pivot = (numProcs + 1) / 2;
-  while (pivot > 0)
+  while (pivot > 0 && myProc < (pivot * 2))
     {
     int tuples;
     if (myProc >= pivot)

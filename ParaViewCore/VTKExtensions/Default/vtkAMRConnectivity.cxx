@@ -567,7 +567,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
     // estimate the size of the receive by the extent of this neighbor
     int extent[6];
     grid->GetExtent (extent);
-    extent[dir*2 + 1] = extent[dir*2] + 1;
+    extent[dir*2 + 1] = extent[dir*2] + 2;
 
     this->ReceiveList[block->ProcessId].push_back (9 + 
                                                    (extent[1] - extent[0]) *
@@ -592,12 +592,13 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     {
     if (i == myProc) { continue; }
 
-    int messageLength = 0;
+    int messageLength = 0; 
     for (int j = 0; j < this->ReceiveList[i].size (); j ++)
       {
       messageLength += 1 + this->ReceiveList[i][j];
       }
-    this->ReceiveList[i].clear ();
+    if (messageLength == 0) { continue; }
+    messageLength ++; // end of message marker
 
     vtkIntArray* array = vtkIntArray::New ();
     array->SetNumberOfComponents (1);
@@ -613,6 +614,7 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
                                i, BOUNDARY_TAG,
                                request.Request);
 
+    this->ReceiveList[i].clear ();
     receiveList.push_back(request);
     array->Delete ();
     } 
@@ -633,6 +635,9 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
         array->InsertNextTuple1 (this->BoundaryArrays[i][j]->GetTuple1 (k));
         }
       }
+
+    if (array->GetNumberOfTuples () == 0) { continue; }
+    
     array->InsertNextTuple1 (-1);
 
     vtkAMRConnectivityCommRequest request;
@@ -797,10 +802,6 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
             {
 	    int neighborRef = this->Equivalence->GetReference (neighborRegion);
             int blockRef = this->Equivalence->GetReference (blockRegion);
-            if (neighborRef < 0 || blockRef < 0 || (neighborRef == neighborRegion && blockRef == blockRegion))
-              {
-              cerr << "myProc " << myProc << " adding equiv1 " << neighborRegion << " == " << blockRegion << endl;
-              }
             this->Equivalence->AddEquivalence (neighborRegion, blockRegion);
             }
           }
@@ -824,10 +825,6 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
             {
 	    int neighborRef = this->Equivalence->GetReference (neighborRegion);
             int blockRef = this->Equivalence->GetReference (blockRegion);
-            if (neighborRef < 0 || blockRef < 0 || (neighborRef == neighborRegion && blockRef == blockRegion))
-              {
-              cerr << "myProc " << myProc << " adding equiv2 " << neighborRegion << " == " << blockRegion << endl;
-              }
             this->Equivalence->AddEquivalence (neighborRegion, blockRegion);
             }
           index ++;
