@@ -150,7 +150,7 @@ set_source_files_properties(
 vtk_module_library(vtkSciberQuest ${CXX_SOURCES})
 
 if (SQTK_CUDA AND CUDA_FOUND)
-  target_link_libraries(SciberQuestToolKit
+  target_link_libraries(vtkSciberQuest
   LINK_PUBLIC CUDAConvolutionDriver)
 endif()
 
