@@ -89,7 +89,7 @@ public:
         {
         this->XRange[0] = bounds[0];
         this->XRange[1] = bounds[1];
-        this->DataValid = ( (this->XRange[1] - this->XRange[0]) > 1e-5 );
+        this->DataValid = ((this->XRange[1] - this->XRange[0]) >= 1e-10);
         this->RecalculateBounds();
         }
       }
