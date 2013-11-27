@@ -110,8 +110,8 @@ vtkPVXMLElement *GetOptionalElement(
       const char *name);
 
 /// extract Delimiting character from stream
-istream &
-Delim(istream &s,char c);
+std::istream &
+Delim(std::istream &s,char c);
 
 /// append values Delimted by any combination of ',','\t','\n' or ' '
 template<typename S, typename T>

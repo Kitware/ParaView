@@ -69,7 +69,7 @@ vtkPVXMLElement *GetOptionalElement(
 }
 
 //*****************************************************************************
-istream &Delim(istream &s,char c)
+std::istream &Delim(std::istream &s,char c)
 {
     char w=(char)s.peek();
     while (s && (w=((char)s.peek())) && (((char)s.peek())==c))
