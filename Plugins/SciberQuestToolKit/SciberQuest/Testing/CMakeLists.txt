@@ -25,6 +25,10 @@ if(PARAVIEW_USE_MPI)
   include(vtkMPI)
 endif()
 
+if (PARAVIEW_USE_MPI AND (NOT WIN32))
+  add_definitions(-DPARAVIEW_USE_MPI)
+endif ()
+
 # add an exec
 macro(sq_add_exec _name)
   set(TEST_NAME)
@@ -36,14 +40,20 @@ macro(sq_add_exec _name)
       LINK_PRIVATE
       ${vtksys_LIBRARIES}
       ${vtkSciberQuest_LIBRARIES}
+      vtkCommonCore
+      vtkCommonDataModel
+      vtkCommonExecutionModel
       vtkFiltersGeometry
+      vtkIOImage
+      vtkIOXML
       vtkPVServerManagerApplication
       vtkParallelCore
       vtkRenderingOpenGL
-      vtkTestingRendering
-      vtkIOXML)
+      vtkTestingRendering)
   if (PARAVIEW_USE_MPI AND (NOT WIN32))
-    add_definitions(-DPARAVIEW_USE_MPI)
+    target_link_libraries(${TEST_NAME}
+      LINK_PRIVATE
+      vtkParallelMPI)
     vtk_mpi_link(${TEST_NAME})
   endif()
 endmacro()
