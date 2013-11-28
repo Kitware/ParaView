@@ -32,7 +32,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkPointData.h"
-#include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
 
@@ -154,6 +153,13 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
   fragments->AddColumn (fragMass);
   fragMass->Delete ();
 
+  for (int i = 0; i < fragIdArray->GetNumberOfTuples (); i ++) 
+    {
+    fragIdArray->SetTuple1 (i, 0);
+    fragVolume->SetTuple1 (i, 0);
+    fragMass->SetTuple1 (i, 0);
+    }
+
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
     vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
@@ -192,14 +198,16 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     double cellVol = spacing[0] * spacing[1] * spacing[2];
     for (int c = 0; c < grid->GetNumberOfCells (); c ++)
       {
-      if (volArray->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
+      if (regionId->GetTuple1 (c) >= 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
         {
-        double* bounds = grid->GetCell (c)->GetBounds ();
-        double lower[3] = { bounds[0], bounds[2], bounds[4] };
-        
         vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
+        if (fragId > fragIdArray->GetNumberOfTuples ()) 
+          {
+          vtkErrorMacro (<< "Invalid Region Id " << fragId);
+          }
         fragIdArray->SetTuple1 (fragId, fragId);
-        fragVolume->SetTuple1 (fragId, fragVolume->GetTuple1 (fragId) + volArray->GetTuple1 (c) * cellVol / 255.0);
+        fragVolume->SetTuple1 (fragId, 
+            fragVolume->GetTuple1 (fragId) + volArray->GetTuple1 (c) * cellVol / 255.0);
         fragMass->SetTuple1 (fragId, fragMass->GetTuple1 (fragId) + massArray->GetTuple1 (c));
         }
       }

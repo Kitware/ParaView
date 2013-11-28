@@ -315,7 +315,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   this->Equivalence->ResolveEquivalences ();
   
   // Relabel all fragment IDs with the equivalence set number 
-  // (set numbers start with 0 and -1 is considered "no set" or "no fragment")
+  // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
     vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
@@ -327,11 +327,11 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       if (regionId > 0) 
         {
         int setId = this->Equivalence->GetEquivalentSetId (regionId);
-        regionIdArray->SetTuple1 (i, setId);
+        regionIdArray->SetTuple1 (i, setId + 1);
         }
       else
         {
-        regionIdArray->SetTuple1 (i, -1);
+        regionIdArray->SetTuple1 (i, 0);
         }
       }
     }
