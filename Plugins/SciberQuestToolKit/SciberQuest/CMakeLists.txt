@@ -33,7 +33,6 @@ set(SCIBER_QUEST_SOURCES
   CellIdIterator.cxx
   CPUConvolutionDriver.cxx
   CUDAConstMemoryManager.hxx
-  CUDAConvolutionDriver.cxx
   FieldDisplacementMapData.cxx
   FieldLine.cxx
   FieldTopologyMapData.cxx
@@ -123,7 +122,14 @@ if (CUDA_FOUND AND SQTK_CUDA)
     SOURCE ${CU_SOURCES}
     APPEND PROPERTY COMPILE_DEFINITIONS SQTK_CUDA
     )
-  cuda_compile(convolution_srcs ${CU_SOURCES})
+  if(BUILD_SHARED_LIBS)
+    set(gpgpu_build_type SHARED)
+  else()
+    set(gpgpu_build_type STATIC)
+  endif()
+  vtk_module_load(vtkCommonCore)
+  cuda_include_directories(${vtkCommonCore_INCLUDE_DIRS})
+  cuda_compile(convolution_srcs ${CU_SOURCES} ${gpgpu_build_type})
 else()
   set(convolution_srcs
     CUDAConvolutionDriver.cxx
@@ -145,6 +151,7 @@ set_source_files_properties(
   vtkSQOOCBOVReader.cxx
   vtkSQMetaDataKeys.cxx
   ${SCIBER_QUEST_SOURCES}
+  ${convolution_srcs}
   WRAP_EXCLUDE
   )
 
@@ -152,7 +159,7 @@ vtk_module_library(vtkSciberQuest ${CXX_SOURCES})
 
 if (SQTK_CUDA AND CUDA_FOUND)
   target_link_libraries(vtkSciberQuest
-  LINK_PUBLIC CUDAConvolutionDriver)
+  LINK_PRIVATE ${CUDA_LIBRARIES})
 endif()
 
 install(TARGETS vtkSciberQuest DESTINATION lib/paraview-${PARAVIEW_VERSION_MAJOR}-${PARAVIEW_VERSION_MINOR})
