@@ -1063,7 +1063,13 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     // if Render() is called on server side, then we are indeed remote
     // rendering, irrespective of what the local flags tell us and we need to
     // coordinate with the client to update the local flags correctly.
-    this->SynchronizeForCollaboration();
+
+    // Although Selection do trigger a Render on the server side and in such
+    // case we MUST NOT execute that collaboration synchronization
+    if(!this->MakingSelection)
+      {
+      this->SynchronizeForCollaboration();
+      }
     }
 
   // BUG #13534. Reset the clip planes on every render. Since this does not
