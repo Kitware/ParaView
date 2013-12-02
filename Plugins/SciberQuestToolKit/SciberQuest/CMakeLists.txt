@@ -123,14 +123,15 @@ if (CUDA_FOUND AND SQTK_CUDA)
     SOURCE ${CU_SOURCES}
     APPEND PROPERTY COMPILE_DEFINITIONS SQTK_CUDA
     )
-  cuda_add_library(CUDAConvolutionDriver ${CU_SOURCES})
-  install(TARGETS CUDAConvolutionDriver DESTINATION lib/paraview-${PARAVIEW_VERSION_MAJOR}-${PARAVIEW_VERSION_MINOR})
-  cuda_build_clean_target()
+  cuda_compile(convolution_srcs ${CU_SOURCES})
 else()
-  list(APPEND CXX_SOURCES
+  set(convolution_srcs
     CUDAConvolutionDriver.cxx
     )
 endif()
+list(APPEND CXX_SOURCES
+  ${convolution_srcs}
+  )
 
 set_source_files_properties(
   vtkSQBOVReaderBase.cxx
