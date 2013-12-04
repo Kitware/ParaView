@@ -493,6 +493,7 @@ void pqFindDataSelectionDisplayFrame::editLabelProperties()
   QStringList properties;
   properties << "SelectionOpacity"
              << "SelectionPointSize"
+             << "SelectionLineWidth"
              << "Cell Label Font"
              << "SelectionCellLabelBold"
              << "SelectionCellLabelColor"
