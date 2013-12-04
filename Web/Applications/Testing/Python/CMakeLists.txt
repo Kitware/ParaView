@@ -2,6 +2,12 @@
 ### Add tests for the python web services
 ###
 
+find_package(PythonInterp 2.7)
+if(NOT ${PythonInterp_FOUND})
+  message(STATUS "Sufficient Python version not found, disabling pvweb tests")
+  return()
+endif()
+
 include(ParaViewTestingMacros)
 include(FindPythonModules)
 
@@ -47,7 +53,7 @@ add_pvweb_tests("pvweb"
                selenium
   BROWSER      chrome
                firefox
-               ie
+               internet_explorer
                safari
   BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline/WebTesting/ParaView
   TEST_SCRIPTS ${WEB_TESTS_WITH_CHROME}
@@ -81,7 +87,7 @@ add_pvweb_tests("pvweb"
   DEPEND_MODS  selenium
   BROWSER      chrome
                firefox
-               ie
+               internet_explorer
                safari
   TEST_SCRIPTS ${TESTAPP_WEB_TESTS_WITH_CHROME}
   )

@@ -1,61 +1,68 @@
 
-
-import sys
 import requests
-import re
 
 from vtk.web import testing
+from vtk.web.testing import WebTest
 
 
 # =============================================================================
-# This function uses the python "requests" library and retrieves the index.html
-# file of the ParaView WebVisualizer application.  Then it checks the retrieved
-# html text for a few javascript source includes which are required.
+# This test class extends the most basic kind of web test, WebTest.  It over-
+# rides the setup, and postprocess methods to do it's work, which does not
+# require a browser, but rather simply uses the the Python "requests" module
+# to fetch content over HTTP.  The work done in this test could have been split
+# up differently, for example, we could have overridden capture() to do some
+# of the work.  The only requiremen
 # =============================================================================
-def runTest(args) :
+class SimpleRequestBasedTest(WebTest) :
 
-    # print 'Here is info on the supplied args: ' + str(dir(args))
-    # print 'And here are the values: ' + str(args)
+    def __init__(self, host=None, port=None, **kwargs) :
+        self.urlPath = '/apps/TestApp'
 
-    # This name is used in error reporting
-    testName = 'retrieve_index_and_check_includes.py'
+        self.host = host
+        self.port = port
 
-    # Request the WebVisualizer index.html
-    urlToRetrieve = 'http://localhost:' + str(args.port) + '/apps/TestApp'
-    r = requests.get(urlToRetrieve)
+        appUrl = 'http://' + self.host + ':' + str(self.port) + self.urlPath
 
-    print "Status code: " + str(r.status_code)
-    print "Content-Type: " + str(r.headers['content-type'])
-    print "Encoding: " + str(r.encoding)
+        # Continue with initialization of base classes
+        WebTest.__init__(self, url=appUrl, **kwargs)
 
-    if r.status_code != 200 :
-        print 'Failing test because HTTP status code for main ' + \
-            'application url was other than 200: ' + str(r.status_code)
-        testing.test_fail(testName);
+    def setup(self) :
+        self.requestResult = requests.get(self.url)
 
-    # These are some vtk and paraview scripts that should appear in index.html
-    # of the WebVisualizer application.
-    baseUrl = 'http://localhost:' + str(args.port) + '/'
-    requiredJavascriptLibs = [ baseUrl + 'lib/core/vtkweb-all.js',
-                               baseUrl + 'lib/js/paraview.ui.pipeline.js',
-                               baseUrl + 'lib/js/paraview.ui.toolbar.js',
-                               baseUrl + 'lib/js/paraview.ui.toolbar.vcr.js',
-                               baseUrl + 'lib/js/paraview.ui.toolbar.viewport.js' ]
+        print "Status code: " + str(self.requestResult.status_code)
+        print "Content-Type: " + str(self.requestResult.headers['content-type'])
+        print "Encoding: " + str(self.requestResult.encoding)
 
-    failedTest = False
-    failMessage = "Unable to load the following modules: "
+    def postprocess(self) :
+        if self.requestResult.status_code != 200 :
+            print 'Failing test because HTTP status code for main ' + \
+                'application url was other than 200: ' + \
+                str(self.requestResult.status_code)
+            testing.test_fail(self.testname);
 
-    # Iterate through the above Javascript include files and make sure
-    # they are each included somewhere in the returned html text.
-    for urlPath in requiredJavascriptLibs :
-        r = requests.get(urlPath)
+        # These are some vtk and paraview scripts that should appear in index.html
+        # of the WebVisualizer application.
+        baseUrl = 'http://' + self.host + ':' + str(self.port) + '/'
+        requiredJavascriptLibs = [ baseUrl + 'lib/core/vtkweb-all.js',
+                                   baseUrl + 'lib/js/paraview.ui.pipeline.js',
+                                   baseUrl + 'lib/js/paraview.ui.toolbar.js',
+                                   baseUrl + 'lib/js/paraview.ui.toolbar.vcr.js',
+                                   baseUrl + 'lib/js/paraview.ui.toolbar.viewport.js' ]
 
-        if r.status_code != 200 :
-            failMessage += '\n   ' + urlPath
-            failedTest = True
+        failedTest = False
+        failMessage = "Unable to load the following modules: "
 
-    if failedTest is False :
-        testing.test_pass(testName)
-    else :
-        print failMessage
-        testing.test_fail(testName)
+        # Iterate through the above Javascript include files and make sure
+        # they are each included somewhere in the returned html text.
+        for urlPath in requiredJavascriptLibs :
+            r = requests.get(urlPath)
+
+            if r.status_code != 200 :
+                failMessage += '\n   ' + urlPath
+                failedTest = True
+
+        if failedTest is False :
+            testing.test_pass(self.testname)
+        else :
+            print failMessage
+            testing.test_fail(self.testname)
