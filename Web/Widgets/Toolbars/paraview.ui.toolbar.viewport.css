@@ -38,4 +38,23 @@
 .paraview.toolbar.viewport li.on {
     border-radius: 8px;
     background: #cccccc;
+
+}.paraview.toolbar.viewport .selected {
+    margin-left: -10px;
+    margin-top: -1px;
+    height: 24px;
+
+    padding-left: 4px;
+
+    border: 1px solid #B4B4B4;
+    border-radius: 8px;
+    background: #CFCFCF; /* for non-css3 browsers */
+
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#EFEFEF', endColorstr='#CFCFCF'); /* for IE */
+    background: -webkit-gradient(linear, left center, right center, from(#EFEFEF), to(#CFCFCF)); /* for webkit browsers */
+    background: -moz-linear-gradient(left center,  #EFEFEF,  #CFCFCF); /* for firefox 3.6+ */
+}
+
+.paraview.toolbar.viewport .pv-widget > select {
+    width: 96%;
 }
