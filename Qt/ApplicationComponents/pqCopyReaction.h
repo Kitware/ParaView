@@ -47,7 +47,7 @@ public:
 
   /// Copy all properties from source to dest. Uses the property names as the
   /// key for matching properties.
-  static void copy(vtkSMProxy* dest, vtkSMProxy* source, bool skip_inputs);
+  static void copy(vtkSMProxy* dest, vtkSMProxy* source);
 
   static void copy();
   static void paste();
