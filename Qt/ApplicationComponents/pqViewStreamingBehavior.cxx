@@ -185,6 +185,11 @@ void pqViewStreamingBehavior::onTimeout()
     {
     vtkSMRenderViewProxy* rvProxy = vtkSMRenderViewProxy::SafeDownCast(
       view->getProxy());
+    if(rvProxy == NULL)
+      {
+      // Not the valid active view. Then do nothing
+      return;
+      }
 
     if (rvProxy->GetSession()->GetPendingProgress() ||
       view->getServer()->isProcessingPending() || this->DelayUpdate)
