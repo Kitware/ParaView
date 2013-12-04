@@ -304,9 +304,9 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     info->GetComponentRange(component, range);
     if (range[1] >= range[0])
       {
-      if ( (range[1] - range[0] < 1e-5) )
+      if ( (range[1] - range[0]) < 1e-16 )
         {
-        range[1] = range[0] + 1e-5;
+        range[1] = range[0] + 1e-16;
         }
       // If data range is too small then we tweak it a bit so scalar mapping
       // produces valid/reproducible results.
