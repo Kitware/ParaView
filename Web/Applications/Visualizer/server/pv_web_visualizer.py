@@ -20,6 +20,12 @@ r"""
         --rs-port 22222
               Port number to use to connect to the renderserver
 
+        --exclude-regex "[0-9]+\\."
+              Regular expression used to filter out files in directory/file listing.
+
+        --group-regex "^\\.|~$|^\\$"
+              Regular expression used to group files into a single loadable entity.
+
     Any ParaViewWeb executable script come with a set of standard arguments that
     can be overriden if need be::
 
@@ -68,12 +74,14 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
     rsHost = None
     rsPort = 11111
     fileToLoad = None
+    groupRegex = "[0-9]+\\."
+    excludeRegex = "^\\.|~$|^\\$"
 
     def initialize(self):
         # Bring used components
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_PipelineManager.dsHost, _PipelineManager.dsPort, _PipelineManager.rsHost, _PipelineManager.rsPort))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader(_PipelineManager.fileToLoad))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_PipelineManager.dataDir, "Home"))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_PipelineManager.dataDir, "Home", _PipelineManager.excludeRegex, _PipelineManager.groupRegex))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager(_PipelineManager.dataDir, _PipelineManager.fileToLoad))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())
@@ -104,17 +112,22 @@ if __name__ == "__main__":
     parser.add_argument("--ds-port", default=11111, type=int, help="Port number to connect to for DataServer", dest="dsPort")
     parser.add_argument("--rs-host", default=None, help="Hostname to connect to for RenderServer", dest="rsHost")
     parser.add_argument("--rs-port", default=11111, type=int, help="Port number to connect to for RenderServer", dest="rsPort")
+    parser.add_argument("--exclude-regex", default="^\\.|~$|^\\$", help="Regular expression for file filtering", dest="exclude")
+    parser.add_argument("--group-regex", default="[0-9]+\\.", help="Regular expression for grouping files", dest="group")
 
     # Exctract arguments
     args = parser.parse_args()
 
     # Configure our current application
-    _PipelineManager.authKey    = args.authKey
-    _PipelineManager.dataDir    = args.path
-    _PipelineManager.dsHost     = args.dsHost
-    _PipelineManager.dsPort     = args.dsPort
-    _PipelineManager.rsHost     = args.rsHost
-    _PipelineManager.rsPort     = args.rsPort
+    _PipelineManager.authKey      = args.authKey
+    _PipelineManager.dataDir      = args.path
+    _PipelineManager.dsHost       = args.dsHost
+    _PipelineManager.dsPort       = args.dsPort
+    _PipelineManager.rsHost       = args.rsHost
+    _PipelineManager.rsPort       = args.rsPort
+    _PipelineManager.excludeRegex = args.exclude
+    _PipelineManager.groupRegex   = args.group
+
     if args.file:
         _PipelineManager.fileToLoad = args.path + '/' + args.file
 
