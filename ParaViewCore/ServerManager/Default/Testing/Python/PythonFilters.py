@@ -12,7 +12,7 @@ except ImportError:
   hasnumpy = False
 
 if not hasnumpy :
-   raise smtesting.Error("NumPy library is not found")
+   raise smtesting.TestError("NumPy library is not found")
 
 # This function prints an array of scalars/vectors/tensors for display. Since
 # it will be called with a loop, it offers the option to display the entire

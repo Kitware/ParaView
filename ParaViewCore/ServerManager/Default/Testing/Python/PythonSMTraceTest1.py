@@ -128,5 +128,5 @@ if not FindSource("My Clip"):
 
 # Do a screenshot regression test
 if not smtesting.DoRegressionTesting(ren.SMProxy):
-    raise smtesting.Error('Image comparison failed.')
+    raise smtesting.TestError('Image comparison failed.')
 
