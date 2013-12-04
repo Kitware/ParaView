@@ -139,6 +139,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TensorGlyph.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Tessellate.xml
@@ -319,6 +320,7 @@ SET (ComparativeVisPanel_BREAK TRUE)
 SET (ComparativeOverlay_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
+SET (TensorGlyph_BREAK TRUE)
 SET (XYChart_BREAK TRUE)
 SET (XYHistogram_BREAK TRUE)
 set (ChartAxisRangeAndLabels_BREAK TRUE)

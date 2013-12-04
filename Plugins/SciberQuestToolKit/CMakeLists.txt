@@ -120,7 +120,6 @@ set(SM_CXX_SOURCES
   vtkSQSeedPointLatice.cxx
   vtkSQSphereSource.cxx
   vtkSQSurfaceVectors.cxx
-  vtkSQTensorGlyph.cxx
   vtkSQTubeFilter.cxx
   vtkSQVolumeSource.cxx
   vtkSQVortexFilter.cxx
@@ -285,15 +284,6 @@ if(PARAVIEW_BUILD_QT_GUI)
   set(_IFACES ${_IFACES} ${IFACES})
   set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
 
-  QT4_WRAP_CPP(MOC_SRCS pqSQTensorGlyph.h)
-  ADD_PARAVIEW_OBJECT_PANEL(
-    IFACES IFACE_SRCS
-    CLASS_NAME pqSQTensorGlyph
-    XML_NAME vtkSQTensorGlyph
-    XML_GROUP filters)
-  set(_IFACES ${_IFACES} ${IFACES})
-  set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
-
   set (CXX_SOURCES
     ${CXX_SOURCES}
     ${MOC_SRCS}
@@ -303,7 +293,6 @@ if(PARAVIEW_BUILD_QT_GUI)
     pqSQHemisphereSource.cxx
     pqSQImageGhosts.cxx
     pqSQPlaneSource.cxx
-    pqSQTensorGlyph.cxx
     pqSQTranslateDialog.cxx
     pqSQVolumeSource.cxx
     )
