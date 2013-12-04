@@ -32,6 +32,13 @@
 #
 # This script tests the ParaView install tree by building the examples
 #
+# The script expects the following input variables:
+# PARAVIEW_BINARY_DIR : Build path for ParaView (To run 'make install' here)
+# PARAVIEW_INSTALL_DIR : Install path for ParaView Examples are built against
+#                        (This should be CMAKE_INSTALL_PREFIX set for ParaView)
+# PARAVIEW_SOURCE_DIR : ParaView source dir (For source location of Examples)
+# PARAVIEW_TEST_DIR : Temporary directory for location of Examples build tree
+# PARAVIEW_VERSION : ParaView version string used when creating the installtree
 
 message (STATUS "Building Examples against ParaView install tree")
 set (ParaView_DIR

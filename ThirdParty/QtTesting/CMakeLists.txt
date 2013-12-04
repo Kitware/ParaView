@@ -36,10 +36,7 @@ set (QtTesting_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (QtTesting_INSTALL_LIBRARY_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (QT_TESTING_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 set (QtTesting_INSTALL_INCLUDE_DIR ${VTK_INSTALL_INCLUDE_DIR})
-if (NOT VTK_INSTALL_NO_DEVELOPMENT)
-  set (QT_TESTING_INSTALL_DEVELOPMENT TRUE)
-endif()
-
+set (QtTesting_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
 
 ##########################################################################
 # import Qt4 build settings
@@ -54,4 +51,3 @@ vtk_module_third_party(qttesting
 )
 
 vtk_target_export(QtTesting)
-mark_as_advanced(QT_TESTING_INSTALL_DEVELOPMENT)
