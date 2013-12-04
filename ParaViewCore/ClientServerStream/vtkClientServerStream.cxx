@@ -1125,8 +1125,8 @@ int vtkClientServerStream::GetArgument(int message, int argument,
 
 int vtkClientServerStream::GetArgument(int message, int argument, vtkStdString* value) const
 {
-  char* tmp;
-  if (this->GetArgument(message, argument, &tmp))
+  char* tmp = NULL;
+  if (this->GetArgument(message, argument, &tmp) && tmp)
     {
     *value = tmp;
     return 1;
