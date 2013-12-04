@@ -108,6 +108,9 @@ protected:
   void IntegrateSatelliteData(vtkDataSetAttributes* inda,
                               vtkDataSetAttributes* outda);
   void ZeroAttributes(vtkDataSetAttributes* outda);
+  int PieceNodeMinToNode0 (vtkUnstructuredGrid *data);
+  void SendPiece(vtkUnstructuredGrid *src);
+  void ReceivePiece (vtkUnstructuredGrid *mergeTo, int fromId);
 
 private:
   vtkIntegrateAttributes(const vtkIntegrateAttributes&);  // Not implemented.
