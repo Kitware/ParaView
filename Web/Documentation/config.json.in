@@ -15,6 +15,7 @@
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.viewport.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.viewport.image.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.viewport.webgl.js",
+        "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.viewport.vgl.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/vtkweb.simple.js",
         "@JAVASCRIPT_WIDGETS_DIR@/PipelineBrowser/paraview.ui.pipeline.js",
@@ -23,7 +24,6 @@
         "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.lineChart.js",
         "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.utils.js",
         "@JAVASCRIPT_WIDGETS_DIR@/RickshawCharts/paraview.rickshaw.graph.js",
-        "@CMAKE_CURRENT_SOURCE_DIR@/api/Web.py",
-        "@CMAKE_CURRENT_SOURCE_DIR@/api/server.py"
+        "@CMAKE_CURRENT_SOURCE_DIR@/api/pv_protocol.py"
     ]
 }

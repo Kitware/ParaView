@@ -394,9 +394,10 @@
      *
      * @member jQuery.paraview.ui.PipelineBrowser
      * @method pipelineBrowser
-     * @param {pv.PipelineBrowserConfig} options
+     * @param {Object} options
      *
      * Usage:
+     *
      *      $('.pipeline-container-div').pipelineBrowser({
      *          session: sessionObj,
      *          pipeline: pipeline,
@@ -446,41 +447,10 @@
         });
     };
 
-    /**
-     * @class pv.PipelineBrowserConfig
-     * Configuration object used to create a Pipeline Browser Widget.
-     *
-     *     DEFAULT_VALUES = {
-     *       session: null,
-     *       pipeline: DEFAULT_PIPELINE,
-     *       sources: DEFAULT_SOURCES,
-     *       files: DEFAULT_FILES
-     *     }
-     */
     $.fn.pipelineBrowser.defaults = {
-        /**
-         * @member pv.PipelineBrowserConfig
-         * @property {vtkWeb.Session} session
-         * Session used to be attached with the given pipeline.
-         */
         session: null,
-        /**
-         * @member pv.PipelineBrowserConfig
-         * @property {reply.Pipeline} pipeline
-         * Pipeline used to initialized the widget.
-         */
         pipeline: DEFAULT_PIPELINE,
-        /**
-         * @member pv.PipelineBrowserConfig
-         * @property {pv.Algorithm} sources[]
-         * List of source and filters available for the pipeline.
-         */
         sources: DEFAULT_SOURCES,
-        /**
-         * @member pv.PipelineBrowserConfig
-         * @property {String} title
-         * Label used inside the pipeline browser title bar
-         */
         title: 'Kitware'
     };
 

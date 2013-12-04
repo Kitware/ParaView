@@ -9,30 +9,17 @@
                       "vtkWeb.launcher",
                       "vtkWeb.connect",
                       "vtkWeb.viewport",
-                      "vtkWeb.viewport.image",
-                      "vtkWeb.viewport.webgl"
+                      "vtkWeb.viewports.image",
+                      "vtkWeb.viewports.webgl",
+                      "vtkWeb.viewports.vgl"
                   ]
               }, {
                   "name": "VTKWeb Objects",
                   "classes": [
-                      "vtkWeb.ViewPortConfig",
-                      "vtkWeb.ConnectionConfig",
-                      "pv.PipelineBrowserConfig",
                       "vtkWeb.Connection",
                       "vtkWeb.Session",
                       "vtkWeb.Viewport",
                       "vtkWeb.Future"
-                  ]
-              }, {
-                  "name": "Request",
-                  "classes": [
-                      "request.InteractionEvent",
-                      "request.Render"
-                  ]
-              }, {
-                  "name": "Reply",
-                  "classes": [
-                      "reply.Render"
                   ]
               }, {
                   "name": "Widgets",
@@ -51,12 +38,17 @@
               {
                   "name": "Protocols",
                   "classes": [
-                      "server.ParaViewProtocol"
-                  ]
-              },{
-                  "name": "WebHandler",
-                  "classes": [
-                      "server.WebServer"
+                      "server.paraview.web.ParaViewWebProtocol",
+                      "server.paraview.web.ParaViewWebMouseHandler",
+                      "server.paraview.web.ParaViewWebViewPortImageDelivery",
+                      "server.paraview.web.ParaViewWebViewPortGeometryDelivery",
+                      "server.paraview.web.ParaViewWebViewPort",
+                      "server.paraview.web.ParaViewWebTimeHandler",
+                      "server.paraview.web.ParaViewWebPipelineManager",
+                      "server.paraview.web.ParaViewWebFileManager",
+                      "server.paraview.web.ParaViewWebRemoteConnection",
+                      "server.paraview.web.ParaViewWebStateLoader",
+                      "server.paraview.web.ParaViewWebFileListing"
                   ]
               }
           ]
