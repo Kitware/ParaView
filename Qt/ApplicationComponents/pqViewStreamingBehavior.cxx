@@ -172,8 +172,11 @@ void pqViewStreamingBehavior::onEndInteractionEvent()
     }
   else
     {
-    this->Timer.start(PQ_STREAMING_INTERVAL);
-    vtkStreamingStatusMacro("View interaction changed. Restart streaming loop.");
+    if (vtkPVView::GetEnableStreaming())
+      {
+      this->Timer.start(PQ_STREAMING_INTERVAL);
+      vtkStreamingStatusMacro("View interaction changed. Restart streaming loop.");
+      }
     }
 }
 
