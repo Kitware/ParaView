@@ -175,7 +175,7 @@ int vtkAMRConnectivity::RequestData (vtkInformation* vtkNotUsed(request),
   unsigned int noOfArrays = static_cast<unsigned int>(this->VolumeArrays.size());
   for(unsigned int i = 0; i < noOfArrays; i++)
     {
-    if (this->DoRequestData (amrInput, this->VolumeArrays[i].c_str()) == 0) 
+    if (this->DoRequestData (amrOutput, this->VolumeArrays[i].c_str()) == 0) 
       {
       return 0;
       }
@@ -230,6 +230,13 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       return 0;
       }
 
+    vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
+    if (!ghostLevels) 
+      {
+      vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
+      return 0;
+      }
+
     // within each block find all fragments
     int extents[6];
     grid->GetExtent (extents);
@@ -243,10 +250,11 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           int ijk[3] = { i, j, k };
           vtkIdType cellId = grid->ComputeCellId (ijk);
           if (regionId->GetTuple1 (cellId) == 0 
-              && volArray->GetTuple1 (cellId) > this->VolumeFractionSurfaceValue)
+              && volArray->GetTuple1 (cellId) > this->VolumeFractionSurfaceValue
+              && ghostLevels->GetTuple1 (cellId) < 0.5)
             {
             // wave propagation sets the region id as it propagates
-            this->WavePropagation (cellId, grid, regionId, volArray);
+            this->WavePropagation (cellId, grid, regionId, volArray, ghostLevels);
             // increment this way so the region id remains globally unique
             this->NextRegionId += numProcs;
             }
@@ -255,88 +263,96 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       }
     }
 
-  // Determine boundaries at the block that need to be sent to neighbors
-  this->BoundaryArrays.resize (numProcs);
-  this->ReceiveList.resize (numProcs);
-  for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
+  if (this->ResolveBlocks)
     {
-    for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
+    // Determine boundaries at the block that need to be sent to neighbors
+    this->BoundaryArrays.resize (numProcs);
+    this->ReceiveList.resize (numProcs);
+    for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
       {
-      vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock (level, blockId);
-      for (int dir = 0; dir < 3; dir ++)
+      for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
         {
-        vtkAMRDualGridHelperBlock* neighbor = this->GetBlockNeighbor (block, dir);
-        if (neighbor != 0)
+        vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock (level, blockId);
+        for (int dir = 0; dir < 3; dir ++)
           {
-          this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
-          if (neighbor->Level > block->Level) 
+          vtkAMRDualGridHelperBlock* neighbor = this->GetBlockNeighbor (block, dir);
+          if (neighbor != 0)
             {
-            int index[3] = { neighbor->GridIndex[0], neighbor->GridIndex[1], neighbor->GridIndex[2] };
-
-            index[(dir+1) % 3] ++;
-            neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
             this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
-
-            index[(dir+2) % 3] ++;
-            neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-            this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
-
-            index[(dir+1) % 3] --;
-            neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-            this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+            if (neighbor->Level > block->Level) 
+              {
+              int index[3] = { neighbor->GridIndex[0], neighbor->GridIndex[1], neighbor->GridIndex[2] };
+  
+              index[(dir+1) % 3] ++;
+              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
+              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+  
+              index[(dir+2) % 3] ++;
+              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
+              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+  
+              index[(dir+1) % 3] --;
+              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
+              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+              }
             }
           }
         }
       }
-    }
-
-  // Exchange all boundaries between processes where block and neighbor are different procs
-  if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
-    {
-    return 0;
-    }
-
-  // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
-  this->Equivalence = vtkPEquivalenceSet::New ();
-  for (int i = 0; i < this->BoundaryArrays.size (); i ++) 
-    {
-    for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
-      {
-      if (i == myProc)
-        {
-        this->ProcessBoundaryAtNeighbor (volume, this->BoundaryArrays[myProc][j]);
-        }
-      this->BoundaryArrays[i][j]->Delete ();
-      }
-      this->BoundaryArrays[i].clear ();
-    }
-
-  // Reduce all equivalence pairs into equivalence sets
-  this->Equivalence->ResolveEquivalences ();
   
-  // Relabel all fragment IDs with the equivalence set number 
-  // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
-  for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
-    {
-    vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
-    vtkIdTypeArray* regionIdArray = vtkIdTypeArray::SafeDownCast (
-                                      grid->GetCellData ()->GetArray (this->RegionName.c_str()));
-    for (int i = 0; i < regionIdArray->GetNumberOfTuples (); i ++) 
+    // Exchange all boundaries between processes where block and neighbor are different procs
+    if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
       {
-      vtkIdType regionId = regionIdArray->GetTuple1 (i);
-      if (regionId > 0) 
+      return 0;
+      }
+
+    // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
+    this->Equivalence = vtkPEquivalenceSet::New ();
+    for (int i = 0; i < this->BoundaryArrays.size (); i ++) 
+      {
+      for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
         {
-        int setId = this->Equivalence->GetEquivalentSetId (regionId);
-        regionIdArray->SetTuple1 (i, setId + 1);
+        if (i == myProc)
+          {
+          this->ProcessBoundaryAtNeighbor (volume, this->BoundaryArrays[myProc][j]);
+          }
+        this->BoundaryArrays[i][j]->Delete ();
         }
-      else
+        this->BoundaryArrays[i].clear ();
+      }
+  
+    // Reduce all equivalence pairs into equivalence sets
+    this->Equivalence->ResolveEquivalences ();
+  
+    // Relabel all fragment IDs with the equivalence set number 
+    // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
+    int maxSet = 0;
+    for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
+      {
+      vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
+      vtkIdTypeArray* regionIdArray = vtkIdTypeArray::SafeDownCast (
+                                        grid->GetCellData ()->GetArray (this->RegionName.c_str()));
+      for (int i = 0; i < regionIdArray->GetNumberOfTuples (); i ++) 
         {
-        regionIdArray->SetTuple1 (i, 0);
+        vtkIdType regionId = regionIdArray->GetTuple1 (i);
+        if (regionId > 0) 
+          {
+          int setId = this->Equivalence->GetEquivalentSetId (regionId);
+          regionIdArray->SetTuple1 (i, setId + 1);
+          if ((setId + 1) > maxSet) 
+            {
+            maxSet = setId + 1;
+            }
+          }
+        else
+          {
+          regionIdArray->SetTuple1 (i, 0);
+          }
         }
       }
+    this->Equivalence->Delete ();
     }
 
-  this->Equivalence->Delete ();
 
   return 1;
 }
@@ -345,19 +361,21 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 int vtkAMRConnectivity::WavePropagation (vtkIdType cellIdStart, 
                                          vtkUniformGrid* grid, 
                                          vtkIdTypeArray* regionId,
-                                         vtkDataArray* volArray)
+                                         vtkDataArray* volArray,
+                                         vtkDataArray* ghostLevels)
 {
   vtkSmartPointer<vtkIdList> todoList = vtkIdList::New ();
   todoList->SetNumberOfIds (0);
   todoList->InsertNextId (cellIdStart);
+
+  vtkSmartPointer<vtkIdList> ptIds = vtkIdList::New ();
+  vtkSmartPointer<vtkIdList> cellIds = vtkIdList::New ();
 
   while (todoList->GetNumberOfIds () > 0)
     {
     vtkIdType cellId = todoList->GetId (0);
     todoList->DeleteId (cellId);
     regionId->SetTuple1 (cellId, this->NextRegionId);
-    vtkSmartPointer<vtkIdList> ptIds = vtkIdList::New ();
-    vtkSmartPointer<vtkIdList> cellIds = vtkIdList::New ();
 
     grid->GetCellPoints (cellId, ptIds);
     for (int i = 0; i < ptIds->GetNumberOfIds (); i ++)
@@ -367,8 +385,10 @@ int vtkAMRConnectivity::WavePropagation (vtkIdType cellIdStart,
       for (int j = 0; j < cellIds->GetNumberOfIds (); j ++)
         {
         vtkIdType neighbor = cellIds->GetId (j);
+        if (neighbor == cellId || todoList->IsId (neighbor) >= 0) { continue; }
         if (regionId->GetTuple1 (neighbor) == 0 
-            && volArray->GetTuple1 (neighbor) > this->VolumeFractionSurfaceValue)
+            && volArray->GetTuple1 (neighbor) > this->VolumeFractionSurfaceValue
+            && ghostLevels->GetTuple1 (neighbor) < 0.5)
           {
           todoList->InsertNextId (neighbor);
           }
@@ -444,7 +464,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
     grid->GetExtent (extent);
 
     // move inside the overlap areas.
-    // extent[dir*2+1] --; 
+    extent[dir*2+1] --; 
 
     // we only want the plane at the edge in the direction
     extent[dir*2] = extent[dir*2+1] - 1;

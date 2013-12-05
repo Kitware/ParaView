@@ -51,6 +51,11 @@ public:
   vtkGetMacro(VolumeFractionSurfaceValue, double);
   vtkSetMacro(VolumeFractionSurfaceValue, double);
 
+  // Description:
+  // Get / Set where to resolve the regions between blocks
+  vtkGetMacro(ResolveBlocks, bool);
+  vtkSetMacro(ResolveBlocks, bool);
+
 protected:
   vtkAMRConnectivity();
   ~vtkAMRConnectivity();
@@ -58,6 +63,8 @@ protected:
   double VolumeFractionSurfaceValue;
   vtkAMRDualGridHelper* Helper;
   vtkPEquivalenceSet* Equivalence;
+  
+  bool ResolveBlocks;
 
   std::string RegionName;
   vtkIdType NextRegionId;
@@ -78,7 +85,8 @@ protected:
   int WavePropagation (vtkIdType cellIdStart, 
                        vtkUniformGrid* grid, 
                        vtkIdTypeArray* regionId,
-                       vtkDataArray* volArray);
+                       vtkDataArray* volArray,
+                       vtkDataArray* ghostLevels);
 
   vtkAMRDualGridHelperBlock* GetBlockNeighbor (
                        vtkAMRDualGridHelperBlock* block, 

@@ -117,10 +117,16 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro ("No RegionID in volume.  Run Connectivity filter.");
       return 0;
       }
+    vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
+    if (!ghostLevels) 
+      {
+      vtkErrorMacro ("No vtkGhostLevels array attached to the CTH volume data");
+      return 0;
+      }
     for (int c = 0; c < grid->GetNumberOfCells (); c ++)
       {
       vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
-      if (fragId > maxRegion)
+      if (fragId > maxRegion &&  ghostLevels->GetTuple1 (c) < 0.5)
         {
         maxRegion = fragId;
         }
@@ -198,7 +204,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     double cellVol = spacing[0] * spacing[1] * spacing[2];
     for (int c = 0; c < grid->GetNumberOfCells (); c ++)
       {
-      if (regionId->GetTuple1 (c) >= 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
+      if (regionId->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
         {
         vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
         if (fragId > fragIdArray->GetNumberOfTuples ()) 
@@ -217,10 +223,13 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     {
     int myProc = controller->GetLocalProcessId ();
 
+    vtkIdTypeArray *copyFragId;
     vtkDoubleArray *copyFragVolume;
     vtkDoubleArray *copyFragMass;
     if (myProc == 0)
       {
+      copyFragId = vtkIdTypeArray::New ();
+      copyFragId->DeepCopy (fragIdArray);
       copyFragVolume = vtkDoubleArray::New ();
       copyFragVolume->DeepCopy (fragVolume);
       copyFragMass = vtkDoubleArray::New ();
@@ -228,15 +237,18 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       }
     else
       {
+      copyFragId = fragIdArray;
       copyFragVolume = fragVolume;
       copyFragMass = fragMass;
       }
     
+    controller->Reduce (copyFragId, fragIdArray, vtkCommunicator::MAX_OP, 0);
     controller->Reduce (copyFragVolume, fragVolume, vtkCommunicator::SUM_OP, 0);
     controller->Reduce (copyFragMass, fragMass, vtkCommunicator::SUM_OP, 0);
 
     if (myProc == 0)
       {
+      copyFragId->Delete ();
       copyFragVolume->Delete ();
       copyFragMass->Delete ();
       }

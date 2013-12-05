@@ -2832,6 +2832,13 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the values at which to compute
         the isosurface.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetResolveBlocks"
+                         default_values="1"
+                         name="Resolve Blocks"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Resolve the fragments between blocks.</Documentation>
+      </IntVectorProperty>
       <!-- End AMR Fragment Integration -->
     </SourceProxy>
     <!-- ==================================================================== -->

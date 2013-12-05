@@ -84,5 +84,6 @@ int vtkPEquivalenceSet::ResolveEquivalences ()
   controller->Broadcast (this->EquivalenceArray, 0);
 
   this->Superclass::ResolveEquivalences ();
+
   return 1;
 }
