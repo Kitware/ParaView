@@ -17,7 +17,7 @@ if cone.Center[0] != 3.1 or cone.Center[1] != 4.2 or cone.Center[2] != 5.5:
     raise smtesting.TestError('Test failed: Problem setting center of cone.')
 
 shrinkFilter = Shrink(cone)
-if shrinkFilter.Input != cone:
+if shrinkFilter.Input.GetAddressAsString('') != cone.GetAddressAsString(''):
     raise smtesting.TestError('Test failed: Pipeline not properly set.')
 
 shrinkFilter.UpdatePipeline()

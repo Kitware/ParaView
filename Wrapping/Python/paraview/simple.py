@@ -533,7 +533,7 @@ def Delete(proxy=None):
                     SetActiveSource(proxy.Input[0])
             else: SetActiveSource(None)
         for rep in GetRepresentations().values():
-            if rep.Input == proxy:
+            if rep.Input.GetAddressAsString('') == proxy.GetAddressAsString(''):
                 Delete(rep)
     # Change the active view if necessary
     elif proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
