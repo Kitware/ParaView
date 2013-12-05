@@ -262,6 +262,16 @@ vtkPVRenderView::vtkPVRenderView()
     this->ThreeDInteractorStyle->AddManipulator(manip3);
     manip3->Delete();
 
+    vtkTrackballPan* manip4 = vtkTrackballPan::New();
+    manip4->SetButton(1);
+    this->TwoDInteractorStyle->AddManipulator(manip4);
+    manip4->Delete();
+
+    vtkPVTrackballZoom* manip5 = vtkPVTrackballZoom::New();
+    manip5->SetButton(3);
+    this->TwoDInteractorStyle->AddManipulator(manip5);
+    manip5->Delete();
+
     this->RubberBandStyle = vtkInteractorStyleRubberBand3D::New();
     this->RubberBandStyle->RenderOnMouseMoveOff();
     vtkCommand* observer2 = vtkMakeMemberFunctionCommand(*this,
