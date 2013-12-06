@@ -22,6 +22,7 @@ Main modules
 
    The ParaView Python Package <paraview>
    simple <paraview.simple>
+   servermanager proxies <paraview.servermanager_proxies>
    servermanager <paraview.servermanager>
    algortihm <paraview.vtk.algorithms>
 

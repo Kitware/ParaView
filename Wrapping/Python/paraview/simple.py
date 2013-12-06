@@ -1273,9 +1273,6 @@ def _func_name_valid(name):
 # -----------------------------------------------------------------------------
 
 def _add_functions(g):
-    import os
-    if os.environ.has_key("PARAVIEW_DOCUMENTATION_SKIP_ADD_FUNCTIONS"):
-        return
     if not servermanager.ActiveConnection:
         return
 
@@ -1291,6 +1288,20 @@ def _add_functions(g):
                     g[key] = _create_func(key, m)
                     exec "g[key].__doc__ = _create_doc(m.%s.__doc__, g[key].__doc__)" % key
 
+# -----------------------------------------------------------------------------
+
+def _get_generated_proxies():
+    activeModule = servermanager.ActiveConnection.Modules
+    proxies = []
+    for m in [activeModule.filters, activeModule.sources,
+              activeModule.writers, activeModule.animation]:
+        dt = m.__dict__
+        for key in dt.keys():
+            cl = dt[key]
+            if not isinstance(cl, str):
+                if _func_name_valid(key):
+                    proxies.append(key)
+    return proxies
 # -----------------------------------------------------------------------------
 
 def _remove_functions(g):

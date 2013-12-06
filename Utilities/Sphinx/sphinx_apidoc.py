@@ -96,6 +96,58 @@ def format_directive(module, package=None):
         directive += '    :%s:\n' % option
     return directive
 
+def format_simple_directive(module, proxy_list, package=None, main_module=True):
+    """Create the automodule directive for the simple module."""
+    if main_module:
+        directive = '.. automodule:: %s\n' % makename(package, module)
+        directive += '    :members:\n'
+        directive += '    :exclude-members: %s\n' % ','.join(proxy_list)
+        for option in OPTIONS:
+            if option != 'members':
+                directive += '    :%s:\n' % option
+    else:
+        directive = '.. currentmodule:: %s\n\n' %makename(package, module)
+        directive += '.. toctree::\n'
+        directive += '    :hidden:\n\n'
+        for prx in proxy_list:
+            directive += '    %s.%s.%s\n' % (package, module, prx)
+        directive += '\n.. autosummary::\n'
+        directive += '    :nosignatures:\n\n'
+        for prx in proxy_list:
+            directive += '    %s\n' % prx
+    return directive
+
+def format_simple_proxy_directive(prx, package='paraview', module='simple'):
+    """Create the autoclass directive for proxy"""
+    directive = '.. currentmodule:: %s.%s\n\n' % (package, module)
+    directive += '.. autoclass:: %s\n\n' % prx
+    import inspect
+#    import pydoc
+    pac = __import__('%s' % package)
+    mod = getattr(pac, '%s' % module)
+    method = getattr(mod, '%s' % prx)
+    directive += inspect.getdoc(method())
+    members = inspect.getmembers(method())
+    proxy_data = {}
+    proxy_methods = {}
+    for member in members:
+        mem = member[0]
+        proxy_mem = getattr(method(), '%s' % mem)
+        if inspect.ismethod(proxy_mem):
+            proxy_methods[mem] = inspect.getdoc(proxy_mem)
+        else:
+            proxy_data[mem] = inspect.getdoc(proxy_mem)
+    directive += '\n\n``Data Descriptors``\n\n'
+    for data_mem in proxy_data:
+        directive += '*%s*\n' % data_mem
+        directive += '%s\n\n' % proxy_data[data_mem]
+    directive += '``Methods``\n\n'
+    for data_met in proxy_methods:
+        directive += '*%s*\n' % data_met
+        directive += '%s\n\n' % proxy_methods[data_met]
+#    directive += pydoc.getdoc(method())
+#    directive += '\n'
+    return directive
 
 def create_module_file(package, module, opts):
     """Build the text of the file and write the file."""
@@ -104,6 +156,34 @@ def create_module_file(package, module, opts):
     text += format_directive(module, package)
     write_file(makename(package, module), text, opts)
 
+def create_simple_module_files(package, module, proxy, opts):
+    """Build the text of the simple and proxy files and write them."""
+    import paraview.simple
+    gen_prx = sorted(paraview.simple._get_generated_proxies())
+    # Hack to prevent CTHSurface and LevelScalarsNonOverlappingAMR
+    gen_prx.remove('CTHSurface')
+    gen_prx.remove('LevelScalarsNonOverlappingAMR')
+
+    # Create file for simple module
+    text = format_heading(1, '%s Module' % module)
+    text += "For generated server-side proxies, refer to "\
+            ":doc:`paraview.servermanager_proxies`\n\n"
+    text += format_simple_directive(module, gen_prx, package)
+    write_file(makename(package, module), text, opts)
+
+    # Create a common summary page for all generated proxies
+    text = format_heading(1, 'servermanager proxies')
+    text += "Proxies generated for server side objects "\
+            "under :doc:`paraview.simple`\n\n"
+    text += format_simple_directive(module, gen_prx, package, False)
+    write_file(makename(package, proxy), text, opts)
+
+    # Create a separate file for each proxy
+    for prx in gen_prx:
+        text = format_heading(2, '%s.%s.%s' % (package, module, prx))
+        text += format_simple_proxy_directive(prx)
+        text += '\n:doc:`Return to list of proxies <paraview.servermanager_proxies>`'
+        write_file(makename('%s.%s' % (package, module), prx), text, opts)
 
 def create_package_file(root, master_package, subroot, py_files, opts, subs):
     """Build the text of the file and write the file."""
@@ -129,9 +209,16 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
                                      master_package)
             text += '\n'
         else:
-            # create a new file for the module.
-            create_module_file(master_package, py_path, opts)
-            modules.append(makename(master_package, py_path))
+            if master_package == 'paraview' and py_path == 'simple':
+                proxy_path = 'servermanager_proxies'
+                create_simple_module_files(master_package, py_path, proxy_path,
+                                           opts)
+                modules.append(makename(master_package, py_path))
+                modules.append(makename(master_package, proxy_path))
+            else:
+                # create a new file for the module.
+                create_module_file(master_package, py_path, opts)
+                modules.append(makename(master_package, py_path))
 
     if modules:
         text += format_heading(2, 'Modules')
