@@ -76,8 +76,7 @@ namespace
       return true;
       }
     // if array, only 32 bit ints work
-    else if (argType == vtkClientServerStream::int32_array ||
-      argType == vtkClientServerStream::uint32_array)
+    else if (argType == vtkClientServerStream::int32_array)
       {
       vtkTypeUInt32 length;
       stream.GetArgumentLength(0, 0, &length);
@@ -90,6 +89,39 @@ namespace
         }
       return true;
       }
+
+#define copy_to_vector(type)                                      \
+  do                                                              \
+    {                                                             \
+    vtkTypeUInt32 length;                                         \
+    stream.GetArgumentLength(0, 0, &length);                      \
+    std::vector<type> tmp_vec(length);                            \
+    int retVal = stream.GetArgument(0, 0, &tmp_vec[0], length);   \
+    if (!retVal)                                                  \
+      {                                                           \
+      return false;                                               \
+      }                                                           \
+    values.resize(cur_size + length);                             \
+    std::copy(tmp_vec.begin(), tmp_vec.end(), &values[cur_size]); \
+    return true;                                                  \
+    } while (0)
+
+    // match the type for uint32
+    else if (argType == vtkClientServerStream::uint32_array)
+      {
+      copy_to_vector(vtkTypeUInt32);
+      }
+    // if 64 bit array, squash into 32 bit
+    else if (argType == vtkClientServerStream::int64_array)
+      {
+      copy_to_vector(vtkTypeInt64);
+      }
+    else if (argType == vtkClientServerStream::uint64_array)
+      {
+      copy_to_vector(vtkTypeUInt64);
+      }
+
+#undef copy_to_vector
 
     return false;
     }
