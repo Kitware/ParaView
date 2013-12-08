@@ -158,7 +158,7 @@ protected:
       this->Valid[0] = this->Valid[1] = true;
       }
 
-    bool operator==(const vtkEntry& other)
+    bool operator==(const vtkEntry& other) const
       {
       return this->Valid == other.Valid && this->Value == other.Value;
       }
