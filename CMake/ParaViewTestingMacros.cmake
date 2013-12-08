@@ -187,6 +187,7 @@ FUNCTION(add_pvweb_tests prefix)
         endif()
 
         set(test_name "${prefix}-${browser}.${ACT_APP}-${short_script_name}")
+        set(test_image_file_name "${test_name}.png")
 
         add_test(NAME ${test_name}
           COMMAND ${ACT_COMMAND}
@@ -198,6 +199,8 @@ FUNCTION(add_pvweb_tests prefix)
                   ${BASELINE_IMG_DIR}
                   --run-test-script ${test_path}
                   --test-use-browser ${browser}
+                  --temporary-directory ${ParaView_BINARY_DIR}/Testing/Temporary
+                  --test-image-file-name ${test_image_file_name}
                   )
         set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
       endwhile()
