@@ -312,9 +312,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       {
       return 0;
       }
-#else
-    vtkErrorMacro ("vtkAMRConnectivity only works parallel in MPI environment");
-    return 0;
 #endif 
 
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
