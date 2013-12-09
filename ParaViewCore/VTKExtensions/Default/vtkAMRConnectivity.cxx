@@ -316,9 +316,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
     this->Equivalence = vtkPEquivalenceSet::New ();
-    for (int i = 0; i < this->BoundaryArrays.size (); i ++) 
+    for (size_t i = 0; i < this->BoundaryArrays.size (); i ++) 
       {
-      for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
+      for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
         {
         if (i == myProc)
           {
@@ -617,12 +617,12 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
   int numProcs = controller->GetNumberOfProcesses ();
 
   vtkAMRConnectivityCommRequestList receiveList;
-  for (int i = 0; i < this->ReceiveList.size (); i ++) 
+  for (size_t i = 0; i < this->ReceiveList.size (); i ++) 
     {
     if (i == myProc) { continue; }
 
     int messageLength = 0; 
-    for (int j = 0; j < this->ReceiveList[i].size (); j ++)
+    for (size_t j = 0; j < this->ReceiveList[i].size (); j ++)
       {
       messageLength += 1 + this->ReceiveList[i][j];
       }
@@ -649,13 +649,13 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     } 
 
   vtkAMRConnectivityCommRequestList sendList;
-  for (int i = 0; i < this->BoundaryArrays.size (); i ++)
+  for (size_t i = 0; i < this->BoundaryArrays.size (); i ++)
     {
     if (i == myProc) { continue; }
     vtkIntArray* array = vtkIntArray::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (0);
-    for (int j = 0; j < this->BoundaryArrays[i].size (); j ++)
+    for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
       {
       int tuples = this->BoundaryArrays[i][j]->GetNumberOfTuples ();
       array->InsertNextTuple1 (tuples);
