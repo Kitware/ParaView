@@ -11,6 +11,15 @@ if (SQTK_CUDA)
   find_package(CUDA)
 endif()
 if (SQTK_CUDA AND CUDA_FOUND)
+  mark_as_advanced(
+    CUDA_BUILD_CUBIN
+    CUDA_BUILD_EMULATION
+    CUDA_HOST_COMPILER
+    CUDA_SDK_ROOT_DIR
+    CUDA_SEPARABLE_COMPILATION
+    CUDA_TOOLKIT_ROOT_DIR
+    CUDA_VERBOSE_BUILD
+    )
   message(STATUS "SQTK Including CUDA accelerated filters.")
   message(STATUS "SQTK Cuda ${CUDA_VERSION_STRING} found.")
   #set(CUDA_NVCC_FLAGS "-arch=sm_20;--compiler-options;-fPIC" CACHE STRING "nvcc flags")
