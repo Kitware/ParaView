@@ -32,11 +32,14 @@
 #include "vtkIdTypeArray.h"
 #include "vtkIntArray.h"
 #include "vtkMultiProcessController.h"
-#include "vtkMPIController.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkSmartPointer.h"
 #include "vtkUniformGrid.h"
 #include "vtksys/SystemTools.hxx"
+
+#ifdef PARAVIEW_USE_MPI
+#include "vtkMPIController.h"
+#endif
 
 #include <list>
 
@@ -45,6 +48,7 @@ vtkStandardNewMacro (vtkAMRConnectivity);
 
 static const int BOUNDARY_TAG = 39857089;
 
+#ifdef PARAVIEW_USE_MPI
 //-----------------------------------------------------------------------------
 // Simple containers for managing asynchronous communication.
 struct vtkAMRConnectivityCommRequest
@@ -89,7 +93,7 @@ public:
     return value_type();
   }
 };
-
+#endif /* PARAVIEW_USE_MPI */
 
 
 //-----------------------------------------------------------------------------
@@ -191,7 +195,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
                                       const char* volumeName)
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
+#ifdef PARAVIEW_USE_MPI
   vtkMPIController *mpiController = vtkMPIController::SafeDownCast(controller);
+#endif
   int myProc = controller->GetLocalProcessId ();
   int numProcs = controller->GetNumberOfProcesses ();
 
@@ -300,11 +306,16 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         }
       }
   
+#ifdef PARAVIEW_USE_MPI
     // Exchange all boundaries between processes where block and neighbor are different procs
     if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
       {
       return 0;
       }
+#else
+    vtkErrorMacro ("vtkAMRConnectivity only works parallel in MPI environment");
+    return 0;
+#endif 
 
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
     this->Equivalence = vtkPEquivalenceSet::New ();
@@ -604,6 +615,7 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     return 0;
     }
 
+#ifdef PARAVIEW_USE_MPI
   int myProc = controller->GetLocalProcessId ();
   int numProcs = controller->GetNumberOfProcesses ();
 
@@ -701,6 +713,7 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     }
 
   sendList.WaitAll();
+#endif /* PARAVIEW_USE_MPI */
   return 1;
 }
 
