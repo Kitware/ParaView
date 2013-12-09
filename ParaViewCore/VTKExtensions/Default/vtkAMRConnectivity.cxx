@@ -455,7 +455,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
 
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
   int myProc = controller->GetLocalProcessId ();
-  int numProcs = controller->GetNumberOfProcesses ();
+  // int numProcs = controller->GetNumberOfProcesses ();
 
   if (block->ProcessId != myProc && neighbor->ProcessId != myProc)
     {
@@ -546,17 +546,17 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
               {
               int ijk_off[3];
               ijk_off[0] = ijk[0];
-              if (setting & 1 == 1 && extent[1] != extent[0]) 
+              if ((setting & 1) == 1 && extent[1] != extent[0]) 
                 {
                 ijk_off[0] ++;
                 } 
               ijk_off[1] = ijk[1];
-              if (setting & 2 == 1 && extent[3] != extent[2]) 
+              if ((setting & 2) == 1 && extent[3] != extent[2]) 
                 {
                 ijk_off[1] ++;
                 } 
               ijk_off[2] = ijk[2];
-              if (setting & 4 == 1 && extent[5] != extent[4]) 
+              if ((setting & 4) == 1 && extent[5] != extent[4]) 
                 {
                 ijk_off[2] ++;
                 } 
@@ -721,7 +721,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
 
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController ();
   int myProc = controller->GetLocalProcessId ();
-  int numProcs = controller->GetNumberOfProcesses ();
+  // int numProcs = controller->GetNumberOfProcesses ();
 
   int index = 0;
   int blockLevel = array->GetTuple1 (index);
@@ -809,17 +809,17 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
             {
             int ijk_off[3];
             ijk_off[0] = ijk[0];
-            if (setting & 1 == 1 && extent[1] != extent[0]) 
+            if ((setting & 1) == 1 && extent[1] != extent[0]) 
               {
               ijk_off[0] ++;
               } 
             ijk_off[1] = ijk[1];
-            if (setting & 2 == 1 && extent[3] != extent[2]) 
+            if ((setting & 2) == 1 && extent[3] != extent[2]) 
               {
               ijk_off[1] ++;
               } 
             ijk_off[2] = ijk[2];
-            if (setting & 4 == 1 && extent[5] != extent[4]) 
+            if ((setting & 4) == 1 && extent[5] != extent[4]) 
               {
               ijk_off[2] ++;
               } 
@@ -830,8 +830,6 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
           int blockRegion = array->GetTuple1 (index);
           if (neighborRegion != 0 && blockRegion != 0) 
             {
-	    int neighborRef = this->Equivalence->GetReference (neighborRegion);
-            int blockRef = this->Equivalence->GetReference (blockRegion);
             this->Equivalence->AddEquivalence (neighborRegion, blockRegion);
             }
           }
@@ -853,8 +851,6 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor (
           int blockRegion = array->GetTuple1 (index);
           if (neighborRegion != 0 && blockRegion != 0) 
             {
-	    int neighborRef = this->Equivalence->GetReference (neighborRegion);
-            int blockRef = this->Equivalence->GetReference (blockRegion);
             this->Equivalence->AddEquivalence (neighborRegion, blockRegion);
             }
           index ++;

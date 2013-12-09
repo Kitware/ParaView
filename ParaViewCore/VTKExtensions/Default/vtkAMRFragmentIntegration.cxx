@@ -83,8 +83,8 @@ int vtkAMRFragmentIntegration::FillOutputPortInformation(int port, vtkInformatio
 
 //----------------------------------------------------------------------------
 int vtkAMRFragmentIntegration::RequestData(vtkInformation* vtkNotUsed(request),
-                                        vtkInformationVector** inputVector,
-                                        vtkInformationVector* outputVector)
+                                        vtkInformationVector** vtkNotUsed(inputVector),
+                                        vtkInformationVector* vtkNotUsed(outputVector))
 {
   vtkErrorMacro ("Not yet implemented");
   return 0;
