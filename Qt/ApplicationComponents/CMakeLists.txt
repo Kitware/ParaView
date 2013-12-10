@@ -71,6 +71,8 @@ set (Module_SRCS
   pqColorOpacityEditorWidget.h
   pqColorSelectorPropertyWidget.cxx
   pqColorSelectorPropertyWidget.h
+  pqColorTableModel.cxx
+  pqColorTableModel.h
   pqColorToolbar.cxx
   pqColorToolbar.h
   pqCommandButtonPropertyWidget.cxx
@@ -139,6 +141,8 @@ set (Module_SRCS
   pqMasterOnlyReaction.h
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
+  pqOpacityTableModel.cxx
+  pqOpacityTableModel.h
   pqParaViewBehaviors.cxx
   pqParaViewBehaviors.h
   pqParaViewMenuBuilders.cxx
@@ -249,6 +253,7 @@ set (Module_MOC_HDRS
   pqColorSelectorPropertyWidget.h
   pqColorAnnotationsPropertyWidget.h
   pqColorEditorPropertyWidget.h
+  pqColorTableModel.h
   pqColorToolbar.h
   pqCommandButtonPropertyWidget.h
   pqCommandLineOptionsBehavior.h
@@ -283,6 +288,7 @@ set (Module_MOC_HDRS
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
   pqObjectPickingBehavior.h
+  pqOpacityTableModel.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
   pqPipelineContextMenuBehavior.h

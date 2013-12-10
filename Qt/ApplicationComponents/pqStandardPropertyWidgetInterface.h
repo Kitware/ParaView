@@ -48,7 +48,7 @@ public:
   pqStandardPropertyWidgetInterface(QObject *p = 0);
   virtual ~pqStandardPropertyWidgetInterface();
 
-  /// Given a proxy and its property, create a widget for the same, of possible.
+  /// Given a proxy and its property, create a widget for the same, if possible.
   /// For unsupported/unknown proxies/properties, implementations should simply
   /// return NULL without raising any errors (or messages).
   /// Supported types are:

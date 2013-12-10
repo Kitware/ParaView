@@ -144,6 +144,9 @@ protected slots:
   void opacityCurrentChanged(vtkIdType);
   void colorCurrentChanged(vtkIdType);
 
+  /// updates the panel to show/hide advanced settings
+  void updatePanel();
+
   /// updates the text shown in the "current data" input.
   void updateCurrentData();
 
