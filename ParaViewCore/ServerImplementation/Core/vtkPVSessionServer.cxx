@@ -344,8 +344,8 @@ bool vtkPVSessionServer::Connect(const char* url)
     return true;
     }
 
-  vtkNetworkAccessManager* nam =
-    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
+  vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
+  vtkPVOptions* options = pm->GetOptions();
 
   vtksys::RegularExpression pvserver("^cs://([^:]+)?(:([0-9]+))?");
   vtksys::RegularExpression pvserver_reverse ("^csrc://([^:]+)(:([0-9]+))?");
@@ -356,8 +356,12 @@ bool vtkPVSessionServer::Connect(const char* url)
 
   vtksys_ios::ostringstream handshake;
   handshake << "handshake=paraview." << PARAVIEW_VERSION;
-  // Add connect-id if needed (or maybe we extract that from url as well (just
-  // like vtkNetworkAccessManager).
+  // Add connect-id if needed. The connect-id is added to the handshake that
+  // must match on client and server processes.
+  if (options->GetConnectID() != 0)
+    {
+    handshake << ".connect_id." << options->GetConnectID();
+    }
 
   // for forward connections, port number 0 is acceptable, while for
   // reverse-connections it's not.

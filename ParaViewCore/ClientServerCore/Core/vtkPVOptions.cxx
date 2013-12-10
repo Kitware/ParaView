@@ -171,7 +171,8 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
 
   this->AddArgument("--connect-id", 0, &this->ConnectID,
-                    "Set the ID of the server and client to make sure they match.",
+                    "Set the ID of the server and client to make sure they "
+                    "match. 0 is reserved to imply none specified.",
                     vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER |
                     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER);
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
