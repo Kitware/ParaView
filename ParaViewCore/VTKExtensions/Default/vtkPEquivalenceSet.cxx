@@ -59,19 +59,15 @@ int vtkPEquivalenceSet::ResolveEquivalences ()
       controller->Receive (workingSet, myProc + pivot, tag + pivot + 1);
       while (workingSet->GetNumberOfTuples () > this->EquivalenceArray->GetNumberOfTuples ())
         {
-        this->EquivalenceArray->InsertNextTuple1 (-1);
+        this->EquivalenceArray->InsertNextTuple1 (this->EquivalenceArray->GetNumberOfTuples ());
         }
       for (int i = 0; i < workingSet->GetNumberOfTuples (); i ++)
         {
         int workingVal = workingSet->GetValue (i);
-        if (workingVal < 0)
-          {
-          continue;
-          }
         int existingVal = this->EquivalenceArray->GetValue (i);
-        if (existingVal < 0 || workingVal < existingVal)
+        if (workingVal < existingVal)
           {
-	  this->EquivalenceArray->SetTuple1 (i, workingVal);
+          this->EquivalenceArray->SetTuple1 (i, workingVal);
           }
         else 
           {
