@@ -108,7 +108,7 @@
         <Documentation>
           Specify the control points that form the color-transfer-function. These are
           a list of 4-tuples of the form (x, r, g, b) where x is the data value,
-          and r,g,b are there color components in the range [0,1].
+          and r,g,b are three color components in the range [0,1].
         </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetUseLogScale"
@@ -151,7 +151,7 @@
                             number_of_elements="3"
                             panel_widget="color_selector" >
         <Documentation>
-          Set the color to use when NaN (not-a-number) is encoundered.
+          Set the color to use when NaN (not-a-number) is encountered.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -260,6 +260,7 @@
         <Property name="NanColor" />
         <Property name="Discretize" />
         <Property name="NumberOfTableValues" />
+	<Property name="LockScalarRange" function="LockScalarRange" />
       </PropertyGroup>
 
       <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
