@@ -7,6 +7,11 @@
       "url": "guides/getting_started",
       "title": "Quick start",
       "description": "This quick start guide show how to test quicly ParaViewWeb locally."
+    },{
+      "name": "architecture",
+      "url": "guides/architecture",
+      "title": "Architecture",
+      "description": "This guide go through the design evolution while explaining why we made the choices that we made."
     }
   ]
   },{
@@ -62,6 +67,11 @@
         "url": "guides/configure_and_build_pvweb",
         "title": "Configure and build Paraview",
         "description": "This document explains how to configure and build ParaView from source."
+      },{
+        "name": "os_mesa",
+        "url": "guides/os_mesa",
+        "title": "Offscreen OSMesa ParaviewWeb",
+        "description": "This document explains how to build an headless server with ParaViewWeb and OSMesa."
       }
     ]
   },{
