@@ -21,19 +21,11 @@
 using namespace nektarTri;
 
 
-#ifndef BTYPE
-#if defined(i860) || defined (__alpha) || defined (__WIN32__) || defined(__linux__)
-#define BTYPE "ieee_little_endian"
-#endif
-#
 #if defined(_CRAY) && !defined (_CRAYMPP)
+#undefine BTYPE
 #define BTYPE "cray"
 #endif /* ........... Cray Y-MP ........... */
-#
-#ifndef BTYPE
-#define BTYPE "ieee_big_endian"
-#endif /* default case in the absence of any other TYPE */
-#endif /* ifndef TYPE */
+
 
 #define DESCRIP 25
 static char *hdr_fmt[] = {
@@ -225,11 +217,11 @@ int gettypes (char *t, char *s)
 
 
 /* Check binary format compatibility */
-#if defined(__sgi) || defined(cm5) || defined(_AIX) || defined(__bg__) || defined (__hpux) || defined (__sparc) || defined (_CRAYMPP) || defined(__APPLE__)
+#if defined(__sgi) || defined(cm5) || defined(_AIX) || defined(__bg__) || defined (__hpux) || defined (__sparc) || defined (_CRAYMPP)
 #define ieeeb
 #endif
 
-#if defined(i860) || defined (__alpha) || defined (__WIN32__) || defined (__linux__) || defined(__APPLE_INTEL__)
+#if defined(i860) || defined (__alpha) || defined (__WIN32__) || defined (__linux__) || defined(__APPLE_INTEL__) || defined(__APPLE__)
 #define ieeel
 #endif
 
