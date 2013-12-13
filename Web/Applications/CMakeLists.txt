@@ -17,7 +17,7 @@ file(MAKE_DIRECTORY "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview/web")
 
 if (BUILD_TESTING)
   list(APPEND WEB_APPLICATIONS TestApp)
-  file(MAKE_DIRECTORY "${pv_pymodule_build_dir}/paraview/web/test")
+  file(MAKE_DIRECTORY "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview/web/test")
 endif()
 
 set (WEB_APPS_DEPENDS)
@@ -44,7 +44,7 @@ foreach (_app ${WEB_APPLICATIONS})
 
   if (BUILD_TESTING)
     copy_files_recursive(${Apps_SOURCE_DIR}/${_app}/test
-      DESTINATION "${pv_pymodule_build_dir}/paraview/web/test"
+      DESTINATION "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview/web/test"
       OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/test-${_app}-complete"
       REGEX "^(.*\\.py)$"
       LABEL "Copying Testing files for ${_app}")
