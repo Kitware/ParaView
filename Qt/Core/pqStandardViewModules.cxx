@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiSliceView.h"
 #include "pqParallelCoordinatesChartView.h"
 #include "pqPlotMatrixView.h"
-#include "pqPythonView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
@@ -52,6 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
+
+#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
+#include "pqPythonView.h"
+#endif
 
 #include <QDebug>
 
@@ -133,10 +136,12 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqMultiSliceView::multiSliceViewTypeName();
     }
+#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
   else if (type == pqPythonView::pythonViewType())
     {
     return pqPythonView::pythonViewTypeName();
     }
+#endif
 
   return QString();
 }
@@ -191,10 +196,12 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "MultiSlice";
     }
+#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
   else if (viewtype == pqPythonView::pythonViewType())
     {
     root_xmlname = "PythonView";
     }
+#endif
 
   if (root_xmlname)
     {
@@ -230,10 +237,12 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
                                 server,
                                 p);
     }
+#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
   else if (viewtype == pqPythonView::pythonViewType())
     {
     return new pqPythonView(viewtype, group, viewname, viewmodule, server, p);
     }
+#endif
   else if (viewmodule->IsA("vtkSMRenderViewProxy"))
     {
     return new pqRenderView(group, viewname, viewmodule, server, p);
