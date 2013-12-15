@@ -49,7 +49,7 @@ public:
 
   // Equivalent set ids are reassinged to be sequential.
   // You cannot add anymore equivalences after this is called.
-  int ResolveEquivalences();
+  virtual int ResolveEquivalences();
 
   void DeepCopy(vtkEquivalenceSet* in);
 
@@ -67,7 +67,8 @@ public:
   // We should fix the pointer API and hide this ivar.
   int Resolved;
 
-private:
+  int GetReference(int memberId);
+protected:
   vtkEquivalenceSet();
   ~vtkEquivalenceSet();
 
@@ -78,7 +79,6 @@ private:
   vtkIntArray *EquivalenceArray;
 
   // Return the id of the equivalent set.
-  int GetReference(int memberId);
   void EquateInternal(int id1, int id2);
 
 private:
