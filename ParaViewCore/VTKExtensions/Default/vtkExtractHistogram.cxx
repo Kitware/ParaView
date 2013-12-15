@@ -315,7 +315,7 @@ void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
       for (int idx=0; idx<num_arrays; idx++)
         {
         vtkDataArray* array = field->GetArray(idx);
-        if (array != data_array && array->GetName())
+        if (array && array != data_array && array->GetName())
           {
           vtkEHInternals::ArrayValuesType& arrayValues =
             this->Internal->ArrayValues[array->GetName()];
