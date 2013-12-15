@@ -31,8 +31,47 @@ vtkStandardNewMacro(vtkClientServerInterpreter);
 class vtkClientServerInterpreterInternals
 {
 public:
-  typedef std::map<std::string, vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
-  typedef std::map<std::string, vtkClientServerCommandFunction> ClassToFunctionMapType;
+  struct ContextInformation
+    {
+    ContextInformation(void* ctx, vtkContextFreeFunction freeFunction)
+      {
+      this->Context = ctx;
+      this->FreeFunction = freeFunction;
+      }
+    ~ContextInformation()
+      {
+      if(this->FreeFunction)
+        {
+        this->FreeFunction(this->Context);
+        }
+      }
+
+    void* Context;
+    vtkContextFreeFunction FreeFunction;
+    };
+  template <typename FunctionType>
+  struct FunctionWithContext
+    {
+    FunctionWithContext(FunctionType function, ContextInformation* ctx)
+      {
+      this->Function = function;
+      this->Context = ctx;
+      }
+    ~FunctionWithContext()
+      {
+      delete this->Context;
+      }
+
+    FunctionType Function;
+    ContextInformation* Context;
+    private:
+      FunctionWithContext(const FunctionWithContext&);  // Not implemented.
+      FunctionWithContext& operator=(const FunctionWithContext&);  // Not implemented.
+    };
+  typedef FunctionWithContext<vtkClientServerNewInstanceFunction> NewInstanceFunction;
+  typedef FunctionWithContext<vtkClientServerCommandFunction> CommandFunction;
+  typedef std::map<std::string, const NewInstanceFunction*> NewInstanceFunctionsType;
+  typedef std::map<std::string, const CommandFunction*> ClassToFunctionMapType;
   typedef std::map<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
   NewInstanceFunctionsType NewInstanceFunctions;
   ClassToFunctionMapType ClassToFunctionMap;
@@ -52,6 +91,22 @@ vtkClientServerInterpreter::vtkClientServerInterpreter()
 //----------------------------------------------------------------------------
 vtkClientServerInterpreter::~vtkClientServerInterpreter()
 {
+  // Delete any remaining instance functions.
+  vtkClientServerInterpreterInternals::NewInstanceFunctionsType::iterator ni;
+  for(ni = this->Internal->NewInstanceFunctions.begin();
+      ni != this->Internal->NewInstanceFunctions.end(); ++ni)
+    {
+    delete ni->second;
+    }
+
+  // Delete any remaining command functions.
+  vtkClientServerInterpreterInternals::ClassToFunctionMapType::iterator ci;
+  for(ci = this->Internal->ClassToFunctionMap.begin();
+      ci != this->Internal->ClassToFunctionMap.end(); ++ci)
+    {
+    delete ci->second;
+    }
+
   // Delete any remaining messages.
   vtkClientServerInterpreterInternals::IDToMessageMapType::iterator hi;
   for(hi = this->Internal->IDToMessageMap.begin();
@@ -265,7 +320,7 @@ vtkClientServerInterpreter
   this->LastResultMessage->Reset();
 
   // Make sure we have some instance creation functions registered.
-  if(this->Internal->NewInstanceFunctions.size() == 0)
+  if(this->Internal->NewInstanceFunctions.empty())
     {
     *this->LastResultMessage
       << vtkClientServerStream::Error
@@ -304,9 +359,13 @@ vtkClientServerInterpreter
 
     // Find a NewInstance function that knows about the class.
     int created = 0;
-    if(vtkClientServerNewInstanceFunction n = this->Internal->NewInstanceFunctions[cname])
+    if(this->Internal->NewInstanceFunctions.count(cname))
       {
-      this->NewInstance(n(),id);
+      const vtkClientServerInterpreterInternals::NewInstanceFunction* n =
+        this->Internal->NewInstanceFunctions[cname];
+      vtkClientServerNewInstanceFunction function = n->Function;
+      void* ctx = n->Context ? n->Context->Context : 0;
+      this->NewInstance(function(ctx),id);
       created =1;
       }
     if(created)
@@ -372,11 +431,10 @@ vtkClientServerInterpreter
       }
 
     // Find the command function for this object's type.
-    if(vtkClientServerCommandFunction func = this->GetCommandFunction(obj))
+    if(obj && this->HasCommandFunction(obj->GetClassName()))
       {
-      // Try to invoke the method.  If it fails, LastResultMessage
-      // will have the error message.
-      if(func(this, obj, method, msg, *this->LastResultMessage))
+      if (this->CallCommandFunction(obj->GetClassName(), obj, method, msg,
+                                    *this->LastResultMessage))
         {
         return 1;
         }
@@ -728,67 +786,92 @@ int vtkClientServerInterpreter::NewObserver(vtkObject* obj, const char* event,
 //----------------------------------------------------------------------------
 void
 vtkClientServerInterpreter
-::AddCommandFunction(const char* cname, vtkClientServerCommandFunction func)
+::AddCommandFunction(const char* cname, vtkClientServerCommandFunction func,
+                     void* ctx, vtkContextFreeFunction freeFunction)
 {
-  this->Internal->ClassToFunctionMap[cname] = func;
+  if(this->Internal->ClassToFunctionMap.count(cname))
+    {
+    *this->LogStream << "Ignoring duplicate command function for " << cname << '\n';
+    }
+
+  vtkClientServerInterpreterInternals::ContextInformation* context = NULL;
+  if(ctx || freeFunction)
+    {
+    context = new vtkClientServerInterpreterInternals::ContextInformation(ctx, freeFunction);
+    }
+
+  this->Internal->ClassToFunctionMap[cname] =
+    new vtkClientServerInterpreterInternals::CommandFunction(func, context);
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerCommandFunction
-vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
+bool
+vtkClientServerInterpreter::HasCommandFunction(const char* cname)
 {
-  if(obj)
+  if (!cname)
     {
-    // Lookup the function for this object's class.
-    const char* cname = obj->GetClassName();
-    vtkClientServerInterpreterInternals::ClassToFunctionMapType::iterator res;
-    res = this->Internal->ClassToFunctionMap.find(cname);
-    if(res == this->Internal->ClassToFunctionMap.end())
-      {
-      vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
-      return 0;
-      }
-    return res->second;
+    return false;
     }
-  else
-    {
-    return 0;
-    }
+  return (this->Internal->ClassToFunctionMap.count(cname) > 0);
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerCommandFunction
-vtkClientServerInterpreter::GetCommandFunction(const char* cname)
+int
+vtkClientServerInterpreter::CallCommandFunction(const char* cname,
+                                                vtkObjectBase* ptr,
+                                                const char* method,
+                                                const vtkClientServerStream& msg,
+                                                vtkClientServerStream& result)
 {
-  if(cname)
+  vtkClientServerInterpreterInternals::ClassToFunctionMapType::const_iterator f =
+    this->Internal->ClassToFunctionMap.find(cname);
+
+  if (f == this->Internal->ClassToFunctionMap.end())
     {
-    // Lookup the function for this object's class.
-    vtkClientServerInterpreterInternals::ClassToFunctionMapType::iterator res;
-    res = this->Internal->ClassToFunctionMap.find(cname);
-    if(res == this->Internal->ClassToFunctionMap.end())
-      {
-      vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
-      return 0;
-      }
-    return res->second;
+    vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
+    return 1;
     }
-  else
-    {
-    return 0;
-    }
+
+  const vtkClientServerInterpreterInternals::CommandFunction* n = f->second;
+
+  vtkClientServerCommandFunction function = n->Function;
+  void* ctx = n->Context ? n->Context->Context : 0;
+
+  return function(this, ptr, method, msg, result, ctx);
 }
 
 void
 vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
-                                                   vtkClientServerNewInstanceFunction f)
+                                                   vtkClientServerNewInstanceFunction f,
+                                                   void* ctx,
+                                                   vtkContextFreeFunction freeFunction)
 {
-  this->Internal->NewInstanceFunctions[name]=f;
+  if(this->Internal->NewInstanceFunctions.count(name))
+    {
+    *this->LogStream << "Ignoring duplicate instance function for " << name << '\n';
+    }
+
+  vtkClientServerInterpreterInternals::ContextInformation* context = NULL;
+  if(ctx || freeFunction)
+    {
+    context = new vtkClientServerInterpreterInternals::ContextInformation(ctx, freeFunction);
+    }
+
+  this->Internal->NewInstanceFunctions[name] =
+    new vtkClientServerInterpreterInternals::NewInstanceFunction(f, context);
 }
 
 //----------------------------------------------------------------------------
 int vtkClientServerInterpreter::Load(const char* moduleName)
 {
-  return this->Load(moduleName, 0);
+  int ret = LoadImpl(moduleName);
+
+  if (ret)
+    {
+    ret = this->Load(moduleName, 0);
+    }
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------
@@ -955,12 +1038,18 @@ vtkClientServerID vtkClientServerInterpreter::GetNextAvailableId()
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkClientServerInterpreter::NewInstance(const char* classname)
 {
-  if (vtkClientServerNewInstanceFunction n =
-    this->Internal->NewInstanceFunctions[classname])
+  if(!this->Internal->NewInstanceFunctions.count(classname))
     {
-    return n();
+    return NULL;
     }
-  return NULL;
+
+  const vtkClientServerInterpreterInternals::NewInstanceFunction* n =
+    this->Internal->NewInstanceFunctions[classname];
+
+  vtkClientServerNewInstanceFunction function = n->Function;
+  void* ctx = n->Context ? n->Context->Context : 0;
+
+  return function(ctx);
 }
 
 //----------------------------------------------------------------------------

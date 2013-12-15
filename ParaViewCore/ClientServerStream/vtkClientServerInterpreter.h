@@ -29,7 +29,6 @@ class vtkClientServerInterpreter;
 class vtkClientServerInterpreterCommand;
 class vtkClientServerInterpreterInternals;
 class vtkClientServerStream;
-class vtkTimerLog;
 
 // Description:
 // The type of a command function.  One such function is generated per
@@ -39,11 +38,14 @@ typedef int (*vtkClientServerCommandFunction)(vtkClientServerInterpreter*,
                                               vtkObjectBase* ptr,
                                               const char* method,
                                               const vtkClientServerStream& msg,
-                                              vtkClientServerStream& result);
+                                              vtkClientServerStream& result,
+                                              void* ctx);
 
 // Description:
 // The type of a new-instance function.
-typedef vtkObjectBase* (*vtkClientServerNewInstanceFunction)();
+typedef vtkObjectBase* (*vtkClientServerNewInstanceFunction)(void* ctx);
+
+typedef void (*vtkContextFreeFunction)(void* ctx);
 
 // Description:
 // A pointer to this struct is sent as call data when an ErrorEvent is
@@ -119,20 +121,28 @@ public:
   // Description:
   // Add a command function for a class.
   void AddCommandFunction(const char* cname,
-                          vtkClientServerCommandFunction func);
+                          vtkClientServerCommandFunction func,
+                          void* ctx = NULL,
+                          vtkContextFreeFunction ctx_free = NULL);
 
   // Description:
-  // Get the command function for an object's class.
-  vtkClientServerCommandFunction GetCommandFunction(vtkObjectBase* obj);
+  // Return true if the classname has a command function, false otherwise.
+  bool HasCommandFunction(const char* cname);
 
   // Description:
-  // Get the command function for an object's class.
-  vtkClientServerCommandFunction GetCommandFunction(const char* classname);
+  // Call a command function.
+  int CallCommandFunction(const char* classname,
+                          vtkObjectBase* ptr,
+                          const char* method,
+                          const vtkClientServerStream& msg,
+                          vtkClientServerStream& result);
 
   // Description:
   // Add a function used to create new objects.
   void AddNewInstanceFunction(const char*cname,
-                              vtkClientServerNewInstanceFunction f);
+                              vtkClientServerNewInstanceFunction f,
+                              void* ctx = NULL,
+                              vtkContextFreeFunction ctx_free = NULL);
 
   // Description:
   // The callback data structure passed to observers looking for VTK
@@ -180,6 +190,8 @@ protected:
   int ExpandMessage(const vtkClientServerStream& in, int inIndex,
                     int startArgument, vtkClientServerStream& out);
 
+  // Load a module from an alternate backend implementation.
+  int LoadImpl(const char* moduleName);
   // Load a module dynamically given the full path to it.
   int LoadInternal(const char* moduleName, const char* fullPath);
 

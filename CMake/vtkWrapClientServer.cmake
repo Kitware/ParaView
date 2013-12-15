@@ -47,6 +47,12 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
                  ${_args_file} @ONLY)
 
+  set (CS_TARGET ${TARGET})
+  string(REGEX REPLACE "CS$" "" BARE_TARGET "${CS_TARGET}")
+
+  if (NOT TARGET ${BARE_TARGET}PythonD)
+    set(NO_PYTHON_BINDINGS_AVAILABLE TRUE)
+  endif ()
 
   # For each class
   foreach(FILE ${SOURCES})
@@ -55,7 +61,9 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     get_source_file_property(TMP_WRAP_EXCLUDE ${FILE} WRAP_EXCLUDE)
 
     # if we should wrap it
-    if (NOT TMP_WRAP_EXCLUDE)
+    if (NOT TMP_WRAP_EXCLUDE AND
+        (NOT PARAVIEW_USE_UNIFIED_BINDINGS OR
+         NO_PYTHON_BINDINGS_AVAILABLE))
 
       # what is the filename without the extension
       get_filename_component(TMP_FILENAME ${FILE} NAME_WE)
@@ -95,11 +103,10 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         COMMENT "CS Wrapping - generating ${TMP_FILENAME}ClientServer.cxx"
         )
 
-    endif (NOT TMP_WRAP_EXCLUDE)
+    endif ()
   endforeach(FILE)
 
   # Create the Init File
-  set (CS_TARGET ${TARGET})
   configure_file(
     ${ParaView_CMAKE_DIR}/vtkWrapClientServer.cxx.in
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
@@ -113,5 +120,7 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
     PROPERTIES GENERATED 1 WRAP_EXCLUDE 1 ABSTRACT 0
     )
+
+  unset(NO_PYTHON_BINDINGS_AVAILABLE)
 
 endmacro(VTK_WRAP_ClientServer)

@@ -29,9 +29,13 @@
 #include "vtkSMDomain.h"
 #include "vtkSMRangeDomainTemplate.h" // Read superclass
 
+#ifndef __WRAP__
 #define vtkSMDomain vtkSMRangeDomainTemplate<int>
+#endif
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIntRangeDomain : public vtkSMDomain
+#ifndef __WRAP__
 #undef vtkSMDomain
+#endif
 {
 public:
   static vtkSMIntRangeDomain* New();

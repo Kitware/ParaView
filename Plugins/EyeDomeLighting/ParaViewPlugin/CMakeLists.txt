@@ -22,6 +22,7 @@ add_paraview_plugin(
     ${iface_srcs}
     ${MOC_SRCS}
 )
+target_link_libraries(EyeDomeLightingView LINK_PUBLIC vtkEyeDomeLighting)
 
 # Add testing if necessary
 if (BUILD_TESTING)

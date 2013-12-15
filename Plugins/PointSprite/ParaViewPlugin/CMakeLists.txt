@@ -97,3 +97,4 @@ ELSE(PARAVIEW_BUILD_QT_GUI)
             ${SM_XMLS_Graphics}
     )
 ENDIF(PARAVIEW_BUILD_QT_GUI)
+target_link_libraries(${PLUGIN_NAME} LINK_PUBLIC vtkPointSpriteGraphics vtkPointSpriteRendering)
