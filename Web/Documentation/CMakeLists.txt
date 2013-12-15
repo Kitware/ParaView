@@ -9,6 +9,7 @@ set(docs_tmp_dir "${CMAKE_CURRENT_BINARY_DIR}/tmp")
 set(JAVASCRIPT_LIB_DIR "${CMAKE_SOURCE_DIR}/VTK/Web/JavaScript")
 set(JAVASCRIPT_WIDGETS_DIR "${CMAKE_SOURCE_DIR}/Web/Widgets")
 set(DOC_OUTPUT_DIR "${docs_binary_dir}")
+set(DOC_MERGE_GUIDES_DIR "${CMAKE_CURRENT_BINARY_DIR}/guide-merged")
 
 # favicon.ico"
 configure_file("${docs_source_dir}/images/logo/favicon.ico"
@@ -43,13 +44,13 @@ configure_file(${docs_source_dir}/config.json.in
    "${CMAKE_CURRENT_BINARY_DIR}/config.json")
 
 configure_file(${docs_source_dir}/guides.json
-   "${vtkWeb_WWW_DEST}/doc/guides.json" COPYONLY)
+   "${DOC_MERGE_GUIDES_DIR}/guides.json" COPYONLY)
 
 file (
   COPY
   "${CMAKE_CURRENT_SOURCE_DIR}/guides"
   DESTINATION
-  "${vtkWeb_WWW_DEST}/doc"
+  "${DOC_MERGE_GUIDES_DIR}"
 )
 
 # setup up dependencies ...
