@@ -9,6 +9,17 @@ include_directories(
   ${Nektar_SOURCE_DIR}/include
   )
 
+# check the endianness of the system and set the define macro accordingly.
+# this behavior should be repeated in the full Nektar code.
+include(TestBigEndian)
+TEST_BIG_ENDIAN(CMAKE_WORDS_BIGENDIAN)
+
+if(CMAKE_WORDS_BIGENDIAN)
+  add_definitions(-DBTYPE="ieee_big_endian")
+else()
+  add_definitions(-DBTYPE="ieee_little_endian")
+endif()
+
 if(WIN32)
   add_definitions(-D_USE_MATH_DEFINES)
 endif()
