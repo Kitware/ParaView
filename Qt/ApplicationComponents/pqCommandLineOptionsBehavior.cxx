@@ -116,6 +116,10 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
         << server_url << "\". Creating default builtin connection.";
       }
     }
+  if (pqActiveObjects::instance().activeServer() == NULL)
+    {
+    pqServerConnectReaction::connectToServer(pqServerResource("builtin:"));
+    }
 
   // Now we are assured that some default server connection has been made
   // (either the one requested by the user on the command line or simply the

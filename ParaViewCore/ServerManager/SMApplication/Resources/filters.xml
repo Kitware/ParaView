@@ -6820,14 +6820,14 @@ found and the point will be rejected.</Documentation>
                      short_help="Sample data values at the points of a dataset.">
                      Probe is a filter that computes point attributes at
                      specified point positions. The filter has two inputs: the
-                     Input and Source. The Input geometric structure is passed
+                     Input and Source.  The 'Source' geometric structure is passed
                      through the filter. The point attributes are computed at
-                     the Input point positions by interpolating into the source
-                     data. For example, we can compute data values on a plane
-                     (plane specified as Input) from a volume (Source). The
-                     cell data of the source data is copied to the output based
-                     on in which source cell each input point is. If an array
-                     of the same name exists both in source's point and cell
+                     the 'Source' point positions by interpolating into the
+                     'Input' data. For example, we can compute data values on a plane
+                     (plane specified as Source) from a volume (Input). The
+                     cell data of the Input data is copied to the output based
+                     on in which Input cell each Source point is. If an array
+                     of the same name exists both in Input's point and cell
                      data, only the one from the point data is
                      probed.</Documentation>
       <InputProperty command="SetSourceConnection"
@@ -6842,7 +6842,7 @@ found and the point will be rejected.</Documentation>
         </DataTypeDomain>
         <InputArrayDomain name="input_array" />
         <Documentation>This property specifies the dataset from which to obtain
-        probe values.</Documentation>
+        probe values. The data attributes come from this dataset.</Documentation>
       </InputProperty>
       <InputProperty command="SetInputConnection"
                      name="Source">
@@ -6854,7 +6854,8 @@ found and the point will be rejected.</Documentation>
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <Documentation>This property specifies the dataset whose geometry will
-        be used in determining positions to probe.</Documentation>
+        be used in determining positions to probe. The mesh comes from this
+        dataset.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetPassCellArrays"
                          default_values="0"

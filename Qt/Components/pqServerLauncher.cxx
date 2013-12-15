@@ -598,15 +598,17 @@ bool pqServerLauncher::promptOptions()
   // user-selected values so that we can pick the right case.
   handleSwitchCases(this->Internals->Configuration, options);
 
-  // if options contains PV_CONNECTION_ID. We need to update the pqOptions to
+  // if options contains PV_CONNECT_ID. We need to update the pqOptions to
   // give it the correct connection-id.
-  if (options.contains("PV_CONNECTION_ID"))
+  if (options.contains("PV_CONNECT_ID"))
     {
     vtkPVOptions* pvoptions =
       vtkProcessModule::GetProcessModule()->GetOptions();
     if (pvoptions)
       {
-      pvoptions->SetConnectID(options.value("PV_CONNECTION_ID").toInt());
+      pvoptions->SetConnectID(options.value("PV_CONNECT_ID").toInt());
+      cout << "Setting ConnectID: " << 
+        options.value("PV_CONNECT_ID").toInt() << endl;
       }
     }
 
