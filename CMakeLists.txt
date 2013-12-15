@@ -118,11 +118,11 @@ endif()
 # ParaView installs the vtk python modules specifically to appropriate locations.
 if(NOT VTK_INSTALL_PYTHON_MODULE_DIR)
   set (VTK_INSTALL_PYTHON_MODULE_DIR "${VTK_INSTALL_LIBRARY_DIR}/site-packages" CACHE
-       PATH "Directory where python modules will be installed")
+    INTERNAL "Directory where python modules will be installed")
 endif()
 if(NOT VTK_BUILD_PYTHON_MODULE_DIR)
   set (VTK_BUILD_PYTHON_MODULE_DIR "${CMAKE_BINARY_DIR}/lib/site-packages" CACHE
-       PATH "Directory where python modules will be installed")
+    INTERNAL "Directory where python modules will be installed")
 endif()
 if(NOT VTK_INSTALL_ARCHIVE_DIR)
   set(VTK_INSTALL_ARCHIVE_DIR lib/paraview-${PARAVIEW_VERSION})
