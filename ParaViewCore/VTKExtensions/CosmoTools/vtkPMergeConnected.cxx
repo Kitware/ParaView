@@ -288,7 +288,7 @@ vtkPMergeConnected::FaceWithKey* vtkPMergeConnected::IdsToKey(vtkIdList* ids)
 // Compare function in face_map
 struct vtkPMergeConnected::cmp_ids
 {
-  bool operator()(FaceWithKey const *a, FaceWithKey const *b)
+  bool operator()(FaceWithKey const *a, FaceWithKey const *b) const
   {
     int i, ret = 0;
 

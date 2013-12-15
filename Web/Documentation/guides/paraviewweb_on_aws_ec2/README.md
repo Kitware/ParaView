@@ -120,38 +120,35 @@ In this section, you will see how to download the source for Apache httpd, then 
 
 ### Download, build, and install Apache httpd
 
-In order to build and install Apache 2.4.6 on the ec2 machine, there are general instructions at the following url:
+In order to build and install Apache 2.4.7 on the ec2 machine, there are general instructions at the following url:
 
     http://httpd.apache.org/docs/2.4/install.html
 
 However, the following instructions give detailed steps to follow on the Amazon EC2 AMI instance.
 
-Get the necessary source tarballs.  You will need httpd source, as well as apr and apr-util sources.  You should also get an httpd source patch while you are downloading sources anyway.
+Get the necessary source tarballs.  You will need httpd source, as well as apr and apr-util sources.
 
     $ mkdir /home/ec2-user/downloads
     $ cd /home/ec2-user/downloads
-    $ wget http://mirrors.sonic.net/apache//httpd/httpd-2.4.6.tar.gz -O httpd.tgz
-    $ wget http://apache.petsads.us//apr/apr-1.4.8.tar.gz -O apr.tgz
-    $ wget http://apache.petsads.us//apr/apr-util-1.5.2.tar.gz -O apr-util.tgz
-    $ wget -O httpd-patch.txt https://issues.apache.org/bugzilla/attachment.cgi?id=30886&action=diff&context=patch&collapsed=&headers=1&format=raw
+    $ wget http://mirrors.sonic.net/apache/httpd/httpd-2.4.7.tar.gz -O httpd.tgz
+    $ wget http://apache.petsads.us/apr/apr-1.5.0.tar.gz -O apr.tgz
+    $ wget http://apache.petsads.us/apr/apr-util-1.5.3.tar.gz -O apr-util.tgz
 
-Now unpack everything in the right places, patching the httpd source in the process.
+Now unpack everything in the right places.
 
-    $ mkdir /home/ec2-user/apache-2.4.6-src
-    $ cd /home/ec2-user/apache-2.4.6-src
+    $ mkdir /home/ec2-user/apache-2.4.7-src
+    $ cd /home/ec2-user/apache-2.4.7-src
     $ tar zxvf /home/ec2-user/downloads/httpd.tgz
-    $ cd httpd-2.4.6/
-    $ patch -u -p1 < /home/ec2-user/downloads/httpd-patch.txt
-    $ cd srclib
+    $ cd httpd-2.4.7/srclib
     $ tar zxvf /home/ec2-user/downloads/apr.tgz
-    $ mv apr-1.4.8 apr
+    $ mv apr-1.5.0 apr
     $ tar zxvf /home/ec2-user/downloads/apr-util.tgz
-    $ mv apr-util-1.5.2 apr-util
+    $ mv apr-util-1.5.3 apr-util
 
 Now configure the Apache build.
 
-    $ cd /home/ec2-user/apache-2.4.6-src/httpd-2.4.6
-    $ ./configure --prefix /opt/apache-2.4.6 --with-included-apr --enable-proxy
+    $ cd /home/ec2-user/apache-2.4.7-src/httpd-2.4.7
+    $ ./configure --prefix /opt/apache-2.4.7 --with-included-apr --enable-proxy
 
 Check how many processors are available and use them all to build httpd.  The nproc command returns how many processors are available, use that number in the make command.  When the build is finished, install httpd.
 
@@ -163,16 +160,16 @@ Check how many processors are available and use them all to build httpd.  The np
 
 Create a directory for the mapping file that Jetty and Apache use to communicate about sessions and port locations.
 
-    $ sudo mkdir -p /opt/apache-2.4.6/pv-mapping-file
-    $ sudo touch /opt/apache-2.4.6/pv-mapping-file/mapping.txt
+    $ sudo mkdir -p /opt/apache-2.4.7/pv-mapping-file
+    $ sudo touch /opt/apache-2.4.7/pv-mapping-file/mapping.txt
     $ sudo groupadd mappingfileusers
     $ sudo usermod -a -G mappingfileusers ec2-user
     $ newgrp mappingfileusers
     $ sudo usermod -a -G mappingfileusers daemon
-    $ sudo chgrp mappingfileusers /opt/apache-2.4.6/pv-mapping-file/mapping.txt
-    $ sudo chmod 660 /opt/apache-2.4.6/pv-mapping-file/mapping.txt
+    $ sudo chgrp mappingfileusers /opt/apache-2.4.7/pv-mapping-file/mapping.txt
+    $ sudo chmod 660 /opt/apache-2.4.7/pv-mapping-file/mapping.txt
 
-Add a virtual host to the httpd-vhosts.conf file, which will be located in the directory /opt/apache-2.4.6/conf/extra/.  Make sure to replace the "ServerName" value with the correct EC2 instance DNS name.  It is probably a good idea to comment out or remove the existing example virtual host entries in this file at the same time, otherwise, you will see errors about them when starting Apache.
+Add a virtual host to the httpd-vhosts.conf file, which will be located in the directory /opt/apache-2.4.7/conf/extra/.  Make sure to replace the "ServerName" value with the correct EC2 instance DNS name.  It is probably a good idea to comment out or remove the existing example virtual host entries in this file at the same time, otherwise, you will see errors about them when starting Apache.
 
     <VirtualHost *:80>
         ServerName ec2-XXX-XXX-XXX-XXX.compute-1.amazonaws.com
@@ -187,7 +184,7 @@ Add a virtual host to the httpd-vhosts.conf file, which will be located in the d
         RewriteEngine On
 
         # This is the path the mapping file Jetty creates
-        RewriteMap session-to-port txt:/opt/apache-2.4.6/pv-mapping-file/mapping.txt
+        RewriteMap session-to-port txt:/opt/apache-2.4.7/pv-mapping-file/mapping.txt
 
         # This is rewrite condition, we are looking for anything with a sesssionId= in  the query part of the URL and we capture the value to use below.
         RewriteCond %{QUERY_STRING}     ^sessionId=(.*)$ [NC]
@@ -216,7 +213,7 @@ Find the following lines in the httpd.conf file, and uncomment them in order to 
 
 Start the httpd daemon.
 
-    $ sudo /opt/apache-2.4.6/bin/apachectl -k start
+    $ sudo /opt/apache-2.4.7/bin/apachectl -k start
 
 At this point, you can test out that at least the static content is available by pointing your browser at the instance.  As an example you can paste a url like the following one into your browser's location bar:
 
@@ -287,7 +284,7 @@ Create a jetty configuration file by using directly or modifying the following e
     pw.factory.session.manager=com.kitware.paraviewweb.external.MemorySessionManager
 
     # External configurations
-    pw.factory.proxy.adapter.file=/opt/apache-2.4.6/pv-mapping-file/mapping.txt
+    pw.factory.proxy.adapter.file=/opt/apache-2.4.7/pv-mapping-file/mapping.txt
 
     # CAUTION: The ws port should match the server port
     # For Jetty websocket forwarder use: ws://localhost:9000/paraview/SESSION_ID
