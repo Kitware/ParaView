@@ -96,6 +96,7 @@ set (Module_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
   vtkSMPythonTraceObserver.cxx
+  vtkSMRangeDomainTemplate.txx
   vtkSMReaderFactory.cxx
   vtkSMRemoteObject.cxx
   vtkSMRemoteObjectUpdateUndoElement.cxx
@@ -131,6 +132,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMLink
   vtkSMPropertyHelper
   vtkSMProxyManager  # since New() is protected.
+  vtkSMRangeDomainTemplate
   vtkSMRemoteObject
   vtkSMSession
   vtkSMSessionProxyManager # since New() is non-standard.
@@ -143,6 +145,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMPropertyHelper
+  vtkSMRangeDomainTemplate
   vtkSMUncheckedPropertyHelper
   WRAP_EXCLUDE)
 
