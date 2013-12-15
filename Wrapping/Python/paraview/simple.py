@@ -114,7 +114,9 @@ def CreateView(view_xml_name):
     active_objects.view = view
     _funcs_internals.view_counter += 1
 
-    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+    tk = _find_proxy("timekeeper", "misc", "TimeKeeper")
+    if not tk:
+        paraview.print_error("Error: Failed to locate TimeKeeper")
     views = tk.Views
     if not view in views:
         views.append(view)
@@ -497,7 +499,7 @@ def Delete(proxy=None):
                     pm.UnRegisterProxy(group, name, iproxy)
 
     # Remove source/view from time keeper
-    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+    tk = _find_proxy("timekeeper", "misc", "TimeKeeper")
     if isinstance(proxy, servermanager.SourceProxy):
         try:
             idx = tk.TimeSources.index(proxy)
@@ -855,12 +857,7 @@ def GetAnimationScene():
     global animation scene. This method provides access to that. Users are
     free to create additional animation scenes directly, but those scenes
     won't be shown in the ParaView GUI."""
-    animation_proxies = servermanager.ProxyManager().GetProxiesInGroup("animation")
-    scene = None
-    for aProxy in animation_proxies.values():
-        if aProxy.GetXMLName() == "AnimationScene":
-            scene = aProxy
-            break
+    scene = _find_proxy("animation", "animation", "AnimationScene")
     if not scene:
         raise servermanager.MissingProxy, "Could not locate global AnimationScene."
     return scene
@@ -1226,16 +1223,11 @@ def _create_func(key, module):
             # Register pipeline objects with the time keeper. This is used to extract time values
             # from sources. NOTE: This should really be in the servermanager controller layer.
             if group == "sources":
-                has_tk = True
-                try:
-                    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
-                except IndexError:
-                    has_tk = False
-                if has_tk:
+                tk = _find_proxy("timekeeper", "misc", "TimeKeeper")
+                if tk:
                     sources = tk.TimeSources
                     if not px in sources:
                         sources.append(px)
-
                 active_objects.source = px
         except servermanager.MissingRegistrationInformation:
             pass
@@ -1331,6 +1323,30 @@ def _find_writer(filename):
         raise RuntimeError, "Cannot infer filetype from extension:", extension
 
 # -----------------------------------------------------------------------------
+def _find_proxy(group, xmlgroup, xmltype):
+    """Find a proxy of the given type (xmlgroup, xmltype) in the registration
+       group (group). This is useful to locate proxies that should have only 1
+       instance in a typical ParaView application. Returns the first proxy that
+       matches the type in the registration group.
+
+       :param group: name of the registration group in which to search for the
+                     proxy.
+       :param xmlgroup: name of the group for the matched proxy's type. It
+                        should match the value returned by proxy.GetXMLGroup()
+       :param xmltype: name of the type for the proxy i.e. the value returned by
+                       proxy.GetXMLType()
+    """
+    pxm = servermanager.ProxyManager()
+    proxies = pxm.GetProxiesInGroup(group)
+    proxy = None
+    for aProxy in proxies.values():
+        if aProxy and \
+            aProxy.GetXMLGroup() == xmlgroup and \
+            aProxy.GetXMLName() == xmltype:
+            return aProxy
+    return None
+
+# -----------------------------------------------------------------------------
 
 def _CreateEssentialProxies():
     """Ensures that essetial proxies like TimeKeeper and AnimationScene are
@@ -1338,7 +1354,7 @@ def _CreateEssentialProxies():
 
     servermanager.ProxyManager().DisableStateUpdateNotification()
     servermanager.ProxyManager().UpdateFromRemote()
-    tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
+    tk = _find_proxy(group="timekeeper", xmlgroup="misc", xmltype="TimeKeeper")
     if not tk:
        try:
            tk = servermanager.misc.TimeKeeper()
@@ -1346,7 +1362,7 @@ def _CreateEssentialProxies():
        except AttributeError:
            paraview.print_error("Error: Could not create TimeKeeper")
 
-    scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
+    scene = _find_proxy(group="animation", xmlgroup="animation", xmltype="AnimationScene")
     if not scene:
        try:
            scene = AnimationScene()
