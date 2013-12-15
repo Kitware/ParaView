@@ -59,11 +59,6 @@ public:
   /// This view has no widget.
   virtual QWidget* getWidget();
 
-  /// This view does not support saving to image.
-  virtual bool saveImage(int /*width*/, int /*height*/, 
-    const QString& /*filename*/)
-    { return false; }
-
   /// This view does not support image capture, return 0;
   virtual vtkImageData* captureImage(int /*magnification*/)
     { return 0; }

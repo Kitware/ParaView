@@ -732,6 +732,22 @@ if(PARAVIEW_ENABLE_PYTHON)
     Resources/UI/pqImageOutputInfo.ui
     Resources/UI/pqExportStateWizard.ui
     )
+
+  if (PARAVIEW_ENABLE_MATPLOTLIB)
+    LIST(APPEND Module_SRCS
+      pqActivePythonViewOptions.cxx
+      pqActivePythonViewOptions.h
+      pqPythonViewOptions.cxx
+      pqPythonViewOptions.h
+      )
+    LIST(APPEND Module_MOC_HDRS
+      pqActivePythonViewOptions.h
+      pqPythonViewOptions.h
+      )
+    LIST(APPEND Module_UI_FILES
+      Resources/UI/pqPythonViewOptions.ui
+      )      
+  endif()
 endif()
 
 GENERATE_QT_RESOURCE_FROM_FILES(

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveMultiSliceViewOptions.h"
 #include "pqActiveObjects.h"
 #include "pqActivePlotMatrixViewOptions.h"
+#include "pqActivePythonViewOptions.h"
 #include "pqActiveRenderViewOptions.h"
 #include "pqActiveXYChartOptions.h"
 #include "pqApplicationCore.h"
@@ -46,6 +47,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewOptionsInterface.h"
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
+
+#include "vtkPVConfig.h"
+#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
+#include "pqPythonView.h"
+#endif
 
 //-----------------------------------------------------------------------------
 pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
@@ -73,6 +79,12 @@ pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   // register for multislice view
   pqActiveMultiSliceViewOptions *multiSliceOptions = new pqActiveMultiSliceViewOptions(this);
   this->registerOptions(pqMultiSliceView::multiSliceViewType(), multiSliceOptions);
+
+#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
+  // register for python view
+  pqActivePythonViewOptions *pythonViewOptions = new pqActivePythonViewOptions(this);
+  this->registerOptions(pqPythonView::pythonViewType(), pythonViewOptions);
+#endif
 
   /// Add panes as plugins are loaded.
   QObject::connect(pqApplicationCore::instance()->interfaceTracker(),

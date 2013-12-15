@@ -106,10 +106,6 @@ public:
   /// restore the default light parameters
   virtual void restoreDefaultLightSettings();
 
-  /// Save a screenshot for the render module. If width or height ==0,
-  /// the current window size is used.
-  virtual bool saveImage(int width, int height, const QString& filename);
-
   /// Convenience method to enable stereo rendering on all views that support
   /// stereo rendering. If mode==0, stereo rendering is disabled. mode is same
   /// that used for vtkRenderWindow::SetStereoType.

@@ -167,6 +167,9 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
   )
+  if (PARAVIEW_ENABLE_MATPLOTLIB AND PYTHON_MODULE_matplotlib_FOUND)
+    list(APPEND TESTS_WITH_BASELINES ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonView.xml)
+  endif()
 endif()
 
 #------------------------------------------------------------------------------

@@ -13,10 +13,22 @@ if (PARAVIEW_DATA_ROOT)
         --enable-bt
         --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
         ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilterNoMerge.py)
+
     set_tests_properties(
       pvpython.TestPythonAnnotationFilter
       pvpython.TestPythonAnnotationFilterNoMerge
       PROPERTIES LABELS "PARAVIEW")
+
+    if (PARAVIEW_ENABLE_MATPLOTLIB AND PYTHON_MODULE_matplotlib_FOUND)
+      add_test(NAME pvpython.TestPythonView
+          COMMAND pvpython
+          --enable-bt
+          ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonView.py)
+      set_tests_properties(
+        pvpython.TestPythonView
+        PROPERTIES LABELS "PARAVIEW")
+    endif()
+
   endif()
 
   # these tests could run safely in serial and

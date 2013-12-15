@@ -336,20 +336,14 @@ set (Module_RESOURCE_FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/Resources/pqCore.qrc"
 )
 
-
-if (PARAVIEW_ENABLE_PYTHON)
-# list (APPEND Module_SRCS
-#   pqPythonEventSourceImage.cxx
-#   pqPythonEventSourceImage.h)
-
-# list (APPEND Module_MOC_HDRS
-#   pqPythonEventSourceImage.h)
-
-# include_directories(
-#   "${VTK_SOURCE_DIR}/Wrapping/Python"
-#   "${VTK_BINARY_DIR}/Wrapping/Python"
-#   "${PYTHON_INCLUDE_PATH}"
-#   )
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_MATPLOTLIB)
+  list (APPEND Module_SRCS
+    pqPythonView.cxx
+    pqPythonView.h
+    )
+  list (APPEND Module_MOC_HDRS
+    pqPythonView.h
+    )
 endif()
 
 

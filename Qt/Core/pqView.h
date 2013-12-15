@@ -112,11 +112,6 @@ public:
   /// Returns true if redo can be done.
   virtual bool canRedo() const {return false;}
 
-  /// Save a screenshot for the render module. If width or height ==0,
-  /// the current window size is used.
-  /// TODO:  pqView should probably report file types it supports
-  virtual bool saveImage(int width, int height, const QString& filename) =0;
-
   /// Returns the current size of the rendering context.
   /// Default implementation returns the client size ofthe widget. Subclasses
   /// may override to change this behavior.

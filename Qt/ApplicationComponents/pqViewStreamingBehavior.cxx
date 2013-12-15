@@ -194,6 +194,11 @@ void pqViewStreamingBehavior::onTimeout()
       return;
       }
 
+    if (!rvProxy)
+      {
+      return;
+      }
+
     if (rvProxy->GetSession()->GetPendingProgress() ||
       view->getServer()->isProcessingPending() || this->DelayUpdate)
       {
