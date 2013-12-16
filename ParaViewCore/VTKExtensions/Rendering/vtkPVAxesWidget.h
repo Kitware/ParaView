@@ -39,6 +39,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Layer number to use for the internal renderer created by vtkPVAxesWidget.
+  static const int RendererLayer = 1;
+
+  // Description:
   // Set/get the axes actor to be displayed in this 3D widget.
   void SetAxesActor(vtkPVAxesActor *actor);
   vtkGetObjectMacro(AxesActor, vtkPVAxesActor);
@@ -52,6 +56,11 @@ public:
   // Set the renderer this 3D widget will be contained in.
   void SetParentRenderer(vtkRenderer *ren);
   vtkRenderer* GetParentRenderer();
+
+  // Description:
+  // Get the renderer.
+  vtkGetObjectMacro(Renderer, vtkRenderer);
+
   //ETX
 
   // Description:

@@ -391,6 +391,7 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderView->GetRenderWindow());
   this->SynchronizedWindows->AddRenderer(id, this->RenderView->GetRenderer());
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());
+  this->SynchronizedWindows->AddRenderer(id, this->OrientationWidget->GetRenderer());
 
   this->SynchronizedRenderers->Initialize(
     this->SynchronizedWindows->GetSession(), id);
