@@ -381,6 +381,7 @@
         icon: 'filter',
         category: 'filter'
     }],
+    busyStatus = 0,
     buffer = null;
 
 
@@ -430,12 +431,16 @@
 
             // Initialize file section
             $('.pipeline-files').fileBrowser({session: session}).bind('file-click file-group-click', function(e){
+                pipeline = getPipeline(me), toggleButton = $('.files.active', pipeline);
+                pipeline.removeClass(PIPELINE_VIEW_TYPES).addClass('view-pipeline');
+                toggleButton.removeClass('active');
+
+                fireBusy(pipeline, true);
                 session.call("vtk:openRelativeFile", e.relativePathList).then(function(newFile){
                     dataChanged(me);
                     addProxy(me, 0, newFile);
-                    pipeline = getPipeline(me), toggleButton = $('.files.active', pipeline);
-                    pipeline.removeClass(PIPELINE_VIEW_TYPES).addClass('view-pipeline');
-                    toggleButton.removeClass('active');
+                    fireAddSource(pipeline, newFile, 0);
+                    fireBusy(pipeline, false);
                 });
             });
 
@@ -613,6 +618,24 @@
 
     function dataChanged(uiWidget) {
         getPipeline(uiWidget).trigger('dataChanged');
+    }
+
+    /**
+     * Event triggered when the pipeline browser changes busy states
+     *
+     * @member jQuery.paraview.ui.PipelineBrowser
+     * @event busy
+     * @param {Boolean} status
+     * True when pipeline is busy, false otherwise
+     */
+
+    function fireBusy(uiWidget, isBusy) {
+        busyStatus += (isBusy ? 1 : -1);
+        console.log("Busy status: " + busyStatus);
+        getPipeline(uiWidget).trigger({
+            type: 'busy',
+            status: (busyStatus > 0)
+        });
     }
 
     // =======================================================================
@@ -1147,17 +1170,25 @@
             return;
         }
 
+        function idle() {
+            fireBusy(pipelineBrowser, false);
+        }
+
         // Attach filter creation
         pipelineBrowser.bind('addSource', function(e) {
             var parentId = (e.parent_id ? e.parent_id : 0);
+            fireBusy(pipelineBrowser, true);
             session.call('vtk:addSource', e.name, parentId).then(function(newNode) {
+                fireBusy(pipelineBrowser, false);
                 addProxy(pipelineBrowser, parentId, newNode);
-            });
+            }, idle);
         });
 
         // Attach pipeline reload
         pipelineBrowser.bind('reloadPipeline', function(e) {
+            fireBusy(pipelineBrowser, true);
             session.call('vtk:reloadPipeline').then(function(rootNode) {
+                fireBusy(pipelineBrowser, false);
                 var pipelineLineAfter, pipelineLineBefore;
 
                 // Update data model part
@@ -1184,7 +1215,7 @@
 
                 // Update proxy editor
                 setActiveProxyId(pipelineBrowser, 0);
-            });
+            }, idle);
         });
 
         // Attach representation change
@@ -1219,30 +1250,37 @@
                 }
 
                 // Update server
+                fireBusy(pipelineBrowser, true);
                 session.call('vtk:updateDisplayProperty', options).then(function(){
                     session.call('vtk:updateScalarbarVisibility').then(function(status){
                         pipelineBrowser.data('scalarbars', status);
                         updateUIPipeline(pipelineBrowser);
                         updateScalarBarUI(pipelineBrowser, status);
-                    });
-                });
+                        fireBusy(pipelineBrowser, false);
+                    }, idle);
+                }, idle);
             } else if(e.origin === 'scalarbar') {
+                fireBusy(pipelineBrowser, true);
                 session.call('vtk:updateScalarbarVisibility', changeSet).then(function(status){
+                    fireBusy(pipelineBrowser, false);
                     pipelineBrowser.data('scalarbars', status);
                     updateScalarBarUI(pipelineBrowser, status);
-                });
+                }, idle);
             } else if(e.origin === 'property') {
                 for(var key in changeSet) {
                     options[key] = changeSet[key];
                 }
+                fireBusy(pipelineBrowser, true);
                 session.call('vtk:pushState', options).then(function(newState){
+                    fireBusy(pipelineBrowser, false);
                     updateProxy(pipelineBrowser, newState);
-                });
+                }, idle);
             }
         });
 
         // Attach delete action
         pipelineBrowser.bind('deleteProxy', function(e) {
+            fireBusy(pipelineBrowser, true);
             session.call('vtk:deleteSource', e.proxy_id).then(function(){
                 removeProxy(pipelineBrowser, e.proxy_id);
 
@@ -1260,22 +1298,26 @@
                         needToUpdateServer = true;
                     }
                 }
-
+                fireBusy(pipelineBrowser, false);
                 if(needToUpdateServer) {
+                    fireBusy(pipelineBrowser, true);
                     session.call('vtk:updateScalarbarVisibility', lutToDelete).then(function(status){
                         updateScalarBarUI(pipelineBrowser, status);
-                    });
+                        fireBusy(pipelineBrowser, false);
+                    }, idle);
                 }
-            });
+            }, idle);
 
         });
 
         // Attach property editing
         pipelineBrowser.bind('apply', function() {
             var proxyState = getProxyPropertyPanelState(pipelineBrowser);
+            fireBusy(pipelineBrowser, true);
             session.call('vtk:pushState', proxyState).then(function(newState){
+                fireBusy(pipelineBrowser, false);
                 updateProxy(pipelineBrowser, newState);
-            });
+            }, idle);
         });
 
         pipelineBrowser.bind('reset', function() {
