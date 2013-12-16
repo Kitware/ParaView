@@ -34,6 +34,7 @@
 #include "GenericIOReader.h"
 
 // C/C++ includes
+#include <algorithm>
 #include <cassert>
 #include <string>
 
