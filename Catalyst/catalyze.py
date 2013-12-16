@@ -125,14 +125,26 @@ def run_patches(config, path_entry):
     error(err)
 
 def include_paths(config, src_base, dest_base, paths):
+  classes = []
   for inc in paths:
-    inc_src = os.path.join(src_base, inc['path'])
-    inc_des = os.path.join(dest_base, inc['path'])
-    copy_path(inc_src, inc_des, [])
+    if 'class' in inc:
+      inc_src = os.path.join(src_base, '%s.h' % inc['class'])
+      inc_des = os.path.join(dest_base, '%s.h' % inc['class'])
+      copy_path(inc_src, inc_des, [])
+      inc_src = os.path.join(src_base, '%s.cxx' % inc['class'])
+      inc_des = os.path.join(dest_base, '%s.cxx' % inc['class'])
+      copy_path(inc_src, inc_des, [])
+      classes.append(inc['class'])
+    else:
+      inc_src = os.path.join(src_base, inc['path'])
+      inc_des = os.path.join(dest_base, inc['path'])
+      copy_path(inc_src, inc_des, [])
+  return classes
 
 def copy_paths(config, paths):
   try:
     for path_entry in paths:
+      classes = []
       src = os.path.join(config.repo, path_entry['path'])
       dest = os.path.join(config.output_dir, path_entry['path'])
       dest_parent_dir = os.path.dirname(dest)
@@ -151,7 +163,7 @@ def copy_paths(config, paths):
 
       if 'include' in path_entry:
         exclude.append('*')
-        include_paths(config, src, dest, path_entry['include'])
+        classes += include_paths(config, src, dest, path_entry['include'])
 
       # do the actual copy
       copy_path(src, dest, exclude)
@@ -164,6 +176,14 @@ def copy_paths(config, paths):
 
       if 'patches' in path_entry:
         run_patches(config, path_entry)
+
+      if classes:
+        edition_name = os.path.basename(config.current_input_dir)
+        with open(os.path.join(dest, '%s.catalyst.cmake' % edition_name), 'w+') as fout:
+          fout.write('list(APPEND Module_SRCS\n')
+          for cls in classes:
+            fout.write('  %s.cxx\n' % cls)
+          fout.write('  )')
 
   except (IOError, os.error) as err:
     error(err)
