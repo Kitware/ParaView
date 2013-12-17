@@ -21,7 +21,11 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="pqLineEdit" name="Function"/>
+    <widget class="pqLineEdit" name="Function">
+     <property name="resetCursorPositionOnEditingFinished" stdset="0">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">

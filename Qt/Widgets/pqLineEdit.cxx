@@ -50,7 +50,8 @@ pqLineEdit::pqLineEdit(QWidget *_parent) :Superclass(_parent),
 //-----------------------------------------------------------------------------
 pqLineEdit::pqLineEdit(const QString &_contents, QWidget *_parent):
   Superclass(_contents, _parent),
-  EditingFinishedPending(false)
+  EditingFinishedPending(false),
+  ResetCursorPositionOnEditingFinished(true)
 {
   this->connect(this, SIGNAL(editingFinished()),
     this, SLOT(onEditingFinished()));
@@ -77,7 +78,10 @@ void pqLineEdit::onEditingFinished()
     emit this->textChangedAndEditingFinished();
     this->EditingFinishedPending = false;
     }
-  this->setCursorPosition(0);
+  if (this->ResetCursorPositionOnEditingFinished)
+    {
+    this->setCursorPosition(0);
+    }
 }
 
 //-----------------------------------------------------------------------------
