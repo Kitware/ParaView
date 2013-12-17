@@ -50,18 +50,14 @@ protected:
   vtkSMPythonTraceObserver();
   ~vtkSMPythonTraceObserver();
 
-  friend class vtkSMPythonTraceObserverCommandHelper;
-
   // Description:
   // Event handler
-  virtual void ExecuteEvent(vtkObject* called, unsigned long eventid, void* data);
+  void EventCallback(vtkObject* called, unsigned long eventid, void* data);
 
 private:
 
   class vtkInternal;
   vtkInternal* Internal;
-
-  vtkSMPythonTraceObserverCommandHelper* Observer;
 
   vtkSMPythonTraceObserver(const vtkSMPythonTraceObserver&); // Not implemented.
   void operator=(const vtkSMPythonTraceObserver&); // Not implemented.
