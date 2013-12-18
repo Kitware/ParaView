@@ -37,6 +37,7 @@
 #include "vtkUniformGrid.h"
 #include "vtksys/SystemTools.hxx"
 
+#include "vtkPVConfig.h"
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMPIController.h"
 #endif
@@ -316,6 +317,25 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
     this->Equivalence = vtkPEquivalenceSet::New ();
+
+    // Initialize equivalence with all regions independent
+    int myOffset = myProc + 1;
+    if (myOffset >= numProcs) 
+      {
+      myOffset = 0; 
+      }
+    for (int i = 1; i < this->NextRegionId; i ++) 
+      {
+      if ((i % numProcs) == myOffset) 
+        {
+        this->Equivalence->AddEquivalence (i, i);
+        }
+      else
+        {
+        this->Equivalence->AddEquivalence (i, 0);
+        }
+      }
+
     for (size_t i = 0; i < this->BoundaryArrays.size (); i ++) 
       {
       for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
@@ -328,7 +348,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         }
         this->BoundaryArrays[i].clear ();
       }
-  
     // Reduce all equivalence pairs into equivalence sets
     this->Equivalence->ResolveEquivalences ();
   
@@ -346,10 +365,10 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         if (regionId > 0) 
           {
           int setId = this->Equivalence->GetEquivalentSetId (regionId);
-          regionIdArray->SetTuple1 (i, setId + 1);
-          if ((setId + 1) > maxSet) 
+          regionIdArray->SetTuple1 (i, setId);
+          if ((setId) > maxSet) 
             {
-            maxSet = setId + 1;
+            maxSet = setId;
             }
           }
         else
