@@ -437,6 +437,26 @@ void pqPropertiesPanel::updatePanel(pqOutputPort* port)
   this->updatePropertiesPanel(port? port->getSource() : NULL);
   this->updateDisplayPanel(port? port->getRepresentation(this->view()) : NULL);
 
+  // Add property PV_MUST_BE_MASTER to all its children
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if(core->getActiveServer())
+    {
+    bool isMaster = core->getActiveServer()->isMaster();
+    QFrame* frames[2] = {
+      this->Internals->Ui.PropertiesFrame, this->Internals->Ui.DisplayFrame};
+    for(int fIdx=0; fIdx<2; ++fIdx)
+      {
+      foreach (QWidget* wdg, frames[fIdx]->findChildren<QWidget*>())
+        {
+        wdg->setProperty("PV_MUST_BE_MASTER", QVariant(true));
+        if(wdg->isEnabled() != isMaster)
+          {
+          wdg->setEnabled(isMaster);
+          }
+        }
+      }
+    }
+
   this->updateButtonState();
 }
 
