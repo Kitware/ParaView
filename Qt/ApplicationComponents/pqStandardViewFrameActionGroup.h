@@ -79,6 +79,8 @@ protected slots:
 
 protected:
   void setupEmptyFrame(QWidget* frame);
+  void connectTitleBar(pqViewFrame *frame, pqView *view);
+
 
 private:
   Q_DISABLE_COPY(pqStandardViewFrameActionGroup)
