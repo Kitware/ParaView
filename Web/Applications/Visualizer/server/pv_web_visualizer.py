@@ -76,13 +76,17 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
     fileToLoad = None
     groupRegex = "[0-9]+\\."
     excludeRegex = "^\\.|~$|^\\$"
+    plugins = None
+    filterFile = None
 
     def initialize(self):
         # Bring used components
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_PipelineManager.dsHost, _PipelineManager.dsPort, _PipelineManager.rsHost, _PipelineManager.rsPort))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupPluginLoader(_PipelineManager.plugins))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader(_PipelineManager.fileToLoad))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_PipelineManager.dataDir, "Home", _PipelineManager.excludeRegex, _PipelineManager.groupRegex))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager(_PipelineManager.dataDir, _PipelineManager.fileToLoad))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFilterList(_PipelineManager.filterFile))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortImageDelivery())
@@ -114,6 +118,8 @@ if __name__ == "__main__":
     parser.add_argument("--rs-port", default=11111, type=int, help="Port number to connect to for RenderServer", dest="rsPort")
     parser.add_argument("--exclude-regex", default="^\\.|~$|^\\$", help="Regular expression for file filtering", dest="exclude")
     parser.add_argument("--group-regex", default="[0-9]+\\.", help="Regular expression for grouping files", dest="group")
+    parser.add_argument("--plugins", default="", help="List of fully qualified path names to plugin objects to load", dest="plugins")
+    parser.add_argument("--filters", default=None, help="Path to a file with json text containing filters to load", dest="filters")
 
     # Exctract arguments
     args = parser.parse_args()
@@ -127,6 +133,8 @@ if __name__ == "__main__":
     _PipelineManager.rsPort       = args.rsPort
     _PipelineManager.excludeRegex = args.exclude
     _PipelineManager.groupRegex   = args.group
+    _PipelineManager.plugins      = args.plugins
+    _PipelineManager.filterFile   = args.filters
 
     if args.file:
         _PipelineManager.fileToLoad = args.path + '/' + args.file
