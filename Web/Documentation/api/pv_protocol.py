@@ -256,10 +256,25 @@
  * @param {String} proxyId
  */
 
+ // =====================================================================
+
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @class server.paraview.web.ParaViewWebFilterList
+ *
+ * This protocol handles listing supported filters, and can be configured
+ * with the file path to a filter list file containing json text giving
+ * the filters which should be supported.  By default, however, a static
+ * set of filters will be provided.
+ */
+
+/**
+ * @member server.paraview.web.ParaViewWebFilterList
  * @method listFilters
  * @return {Object} listOfFilters
+ *
+ * If a file path is given to the constructor of this protocol, then the
+ * available filters will be those defined in the file.  Otherwise, the
+ * following static list will be available:
  *
  *     [{
  *         'name': 'Cone',

@@ -45,6 +45,7 @@
                       "server.paraview.web.ParaViewWebViewPort",
                       "server.paraview.web.ParaViewWebTimeHandler",
                       "server.paraview.web.ParaViewWebPipelineManager",
+                      "server.paraview.web.ParaViewWebFilterList",
                       "server.paraview.web.ParaViewWebFileManager",
                       "server.paraview.web.ParaViewWebRemoteConnection",
                       "server.paraview.web.ParaViewWebStateLoader",
