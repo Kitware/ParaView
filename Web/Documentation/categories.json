@@ -38,18 +38,25 @@
               {
                   "name": "Protocols",
                   "classes": [
-                      "server.paraview.web.ParaViewWebProtocol",
-                      "server.paraview.web.ParaViewWebMouseHandler",
-                      "server.paraview.web.ParaViewWebViewPortImageDelivery",
-                      "server.paraview.web.ParaViewWebViewPortGeometryDelivery",
-                      "server.paraview.web.ParaViewWebViewPort",
-                      "server.paraview.web.ParaViewWebTimeHandler",
-                      "server.paraview.web.ParaViewWebPipelineManager",
-                      "server.paraview.web.ParaViewWebFilterList",
-                      "server.paraview.web.ParaViewWebFileManager",
-                      "server.paraview.web.ParaViewWebRemoteConnection",
-                      "server.paraview.web.ParaViewWebStateLoader",
-                      "server.paraview.web.ParaViewWebFileListing"
+                      "protocols.ParaViewWebProtocol",
+                      "protocols.ParaViewWebViewPort",
+                      "protocols.ParaViewWebStateLoader",
+                      "protocols.ParaViewWebFileListing",
+                      "protocols.ParaViewWebTimeHandler",
+                      "protocols.ParaViewWebFilterList",
+                      "protocols.ParaViewWebFileManager",
+                      "protocols.ParaViewWebMouseHandler",
+                      "protocols.ParaViewWebPipelineManager",
+                      "protocols.ParaViewWebRemoteConnection",
+                      "protocols.ParaViewWebViewPortImageDelivery",
+                      "protocols.ParaViewWebViewPortGeometryDelivery"
+                  ]
+              },
+              {
+                  "name": "Startup Protocols",
+                  "classes": [
+                      "protocols.ParaViewWebStartupRemoteConnection",
+                      "protocols.ParaViewWebStartupPluginLoader"
                   ]
               }
           ]
