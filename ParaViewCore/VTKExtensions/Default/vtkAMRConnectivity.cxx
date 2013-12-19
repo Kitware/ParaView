@@ -340,7 +340,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       {
       for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
         {
-        if (i == myProc)
+        if (i == static_cast<unsigned int> (myProc))
           {
           this->ProcessBoundaryAtNeighbor (volume, this->BoundaryArrays[myProc][j]);
           }
@@ -633,12 +633,11 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
 
 #ifdef PARAVIEW_USE_MPI
   int myProc = controller->GetLocalProcessId ();
-  int numProcs = controller->GetNumberOfProcesses ();
 
   vtkAMRConnectivityCommRequestList receiveList;
   for (size_t i = 0; i < this->ReceiveList.size (); i ++) 
     {
-    if (i == myProc) { continue; }
+    if (i == static_cast<unsigned int> (myProc)) { continue; }
 
     int messageLength = 0; 
     for (size_t j = 0; j < this->ReceiveList[i].size (); j ++)
@@ -670,7 +669,7 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
   vtkAMRConnectivityCommRequestList sendList;
   for (size_t i = 0; i < this->BoundaryArrays.size (); i ++)
     {
-    if (i == myProc) { continue; }
+    if (i == static_cast<unsigned int> (myProc)) { continue; }
     vtkIntArray* array = vtkIntArray::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (0);
