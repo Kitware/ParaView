@@ -973,7 +973,8 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
     int v = Value.toInt(&ok);
     if(ok)
       {
-      ivp->SetElement(0, v);
+      if (Type == CHECKED) { ivp->SetElement(0, v); }
+      else { ivp->SetUncheckedElement(0, v); }
       }
     }
   else if(EnumerationDomain && ivp)
