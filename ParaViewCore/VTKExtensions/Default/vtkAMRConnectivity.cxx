@@ -652,13 +652,14 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     array->SetNumberOfTuples (messageLength);
 
     vtkAMRConnectivityCommRequest request;
-    request.SendProcess = i;
+    request.SendProcess = static_cast<int>(i);
     request.ReceiveProcess = myProc;
     request.Buffer = array;
 
     controller->NoBlockReceive(array->GetPointer (0),
                                messageLength,
-                               i, BOUNDARY_TAG,
+                               static_cast<int>(i), 
+                               BOUNDARY_TAG,
                                request.Request);
 
     this->ReceiveList[i].clear ();
@@ -689,12 +690,13 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
 
     vtkAMRConnectivityCommRequest request;
     request.SendProcess = myProc;
-    request.ReceiveProcess = i;
+    request.ReceiveProcess = static_cast<int>(i);
     request.Buffer = array;
 
     controller->NoBlockSend(array->GetPointer(0),
                             array->GetNumberOfTuples (),
-                            i, BOUNDARY_TAG,
+                            static_cast<int>(i), 
+                            BOUNDARY_TAG,
                             request.Request);
 
     sendList.push_back(request);
