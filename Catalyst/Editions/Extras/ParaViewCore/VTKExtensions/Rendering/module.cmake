@@ -17,6 +17,18 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
   list(APPEND __dependencies vtkGUISupportQt)
 endif(PARAVIEW_ENABLE_QT_SUPPORT)
 
+if (Module_vtkRenderingCore)
+  list(APPEND __dependencies
+    vtkRenderingAnnotation
+    vtkRenderingCore
+    vtkRenderingParallel
+    vtkFiltersParallel
+    vtkChartsCore
+    vtkCommonComputationalGeometry
+    vtkicet
+    vtkParallelMPI)
+endif ()
+
 vtk_module(vtkPVVTKExtensionsRendering
   GROUPS
     Qt
