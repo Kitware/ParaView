@@ -107,6 +107,10 @@ def format_simple_directive(module, proxy_list, package=None, main_module=True):
                 directive += '    :%s:\n' % option
     else:
         directive = '.. currentmodule:: %s\n\n' %makename(package, module)
+        # Adding a hidden toctree to prevent warnings about document not
+        # included in any toc.
+        # This is also required instead of :toctree: argument of autosummary
+        # directive to prevent a clobbered top level index file.
         directive += '.. toctree::\n'
         directive += '    :hidden:\n\n'
         for prx in proxy_list:
@@ -120,33 +124,30 @@ def format_simple_directive(module, proxy_list, package=None, main_module=True):
 def format_simple_proxy_directive(prx, package='paraview', module='simple'):
     """Create the autoclass directive for proxy"""
     directive = '.. currentmodule:: %s.%s\n\n' % (package, module)
-    directive += '.. autoclass:: %s\n\n' % prx
-    import inspect
-#    import pydoc
-    pac = __import__('%s' % package)
-    mod = getattr(pac, '%s' % module)
-    method = getattr(mod, '%s' % prx)
-    directive += inspect.getdoc(method())
-    members = inspect.getmembers(method())
-    proxy_data = {}
-    proxy_methods = {}
-    for member in members:
-        mem = member[0]
-        proxy_mem = getattr(method(), '%s' % mem)
-        if inspect.ismethod(proxy_mem):
-            proxy_methods[mem] = inspect.getdoc(proxy_mem)
-        else:
-            proxy_data[mem] = inspect.getdoc(proxy_mem)
-    directive += '\n\n``Data Descriptors``\n\n'
-    for data_mem in proxy_data:
-        directive += '*%s*\n' % data_mem
-        directive += '%s\n\n' % proxy_data[data_mem]
-    directive += '``Methods``\n\n'
-    for data_met in proxy_methods:
-        directive += '*%s*\n' % data_met
-        directive += '%s\n\n' % proxy_methods[data_met]
-#    directive += pydoc.getdoc(method())
-#    directive += '\n'
+    directive += '.. autofunction:: %s\n\n' % prx
+
+    # Parse pydoc output for the proxy
+    import parse_pydoc_output
+    parser = parse_pydoc_output.ParsePyDocOutput('%s.%s' %(package, module),
+        ['servermanager'], prx)
+    directive += '\n\n``Data Descriptors``\n'
+    directive += '{:-^79}\n\n'.format('')
+    directive += '%s\n\n' % parser.data_mems.replace('*', '\\*')
+    inh_data_mems = parser.inh_data_mems
+    for inh_data_mem in inh_data_mems:
+        directive += '\n\n``Data Descriptors inherited from %s``\n'\
+            % inh_data_mem
+        directive += '{:~^79}\n\n'.format('')
+        directive += '%s\n\n' % inh_data_mems[inh_data_mem].replace('*', '\\*')
+    directive += '\n\n``Methods``\n'
+    directive += '{:-^79}\n\n'.format('')
+    directive += '%s\n\n' % parser.method_mems.replace('*', '\\*')
+    inh_method_mems = parser.inh_method_mems
+    for inh_method_mem in inh_method_mems:
+        directive += '\n\n``Methods inherited from %s``\n'\
+            % inh_method_mem
+        directive += '{:~^79}\n\n'.format('')
+        directive += '%s\n\n' % inh_method_mems[inh_method_mem].replace('*', '\\*')
     return directive
 
 def create_module_file(package, module, opts):
@@ -160,13 +161,10 @@ def create_simple_module_files(package, module, proxy, opts):
     """Build the text of the simple and proxy files and write them."""
     import paraview.simple
     gen_prx = sorted(paraview.simple._get_generated_proxies())
-    # Hack to prevent CTHSurface and LevelScalarsNonOverlappingAMR
-    gen_prx.remove('CTHSurface')
-    gen_prx.remove('LevelScalarsNonOverlappingAMR')
 
     # Create file for simple module
     text = format_heading(1, '%s Module' % module)
-    text += "For generated server-side proxies, refer to "\
+    text += "For generated server-side proxies, please refer to "\
             ":doc:`paraview.servermanager_proxies`\n\n"
     text += format_simple_directive(module, gen_prx, package)
     write_file(makename(package, module), text, opts)
@@ -182,7 +180,8 @@ def create_simple_module_files(package, module, proxy, opts):
     for prx in gen_prx:
         text = format_heading(2, '%s.%s.%s' % (package, module, prx))
         text += format_simple_proxy_directive(prx)
-        text += '\n:doc:`Return to list of proxies <paraview.servermanager_proxies>`'
+        text += '\n\nFor the full list of servermanager proxies, please refer to '\
+                ':doc:`serververmanager proxies <paraview.servermanager_proxies>`'
         write_file(makename('%s.%s' % (package, module), prx), text, opts)
 
 def create_package_file(root, master_package, subroot, py_files, opts, subs):
