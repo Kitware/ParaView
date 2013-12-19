@@ -90,10 +90,8 @@
           { "path": "VTK-Filters-Extraction-CMake.patch" }
       ],
       "exclude":[
-        {
-          "path":"Testing"
-        },
-        {"path": "vtkExtractArraysOverTime*"  }
+        { "path":"Testing" },
+        { "path": "vtkExtractArraysOverTime*"  }
       ]
     },
     { "name":"vtkCommonExecutionModel",
