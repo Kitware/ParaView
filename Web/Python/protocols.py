@@ -3,7 +3,7 @@ protocols that can be combined together to provide a flexible way to define
 very specific web application.
 """
 
-import os, sys, logging, types, inspect, traceback, logging, re
+import os, sys, logging, types, inspect, traceback, logging, re, json
 from time import time
 
 # import RPC annotation
@@ -432,48 +432,69 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         self.lutManager.registerFieldData(proxy.GetPointDataInformation())
         self.lutManager.registerFieldData(proxy.GetCellDataInformation())
 
+
+# =============================================================================
+#
+# Filter list
+#
+# =============================================================================
+
+class ParaViewWebFilterList(ParaViewWebProtocol):
+
+    def __init__(self, filtersFile=None):
+        super(ParaViewWebFilterList, self).__init__()
+        self.filterFile = filtersFile
+
     @exportRpc("listFilters")
     def listFilters(self):
-        filterSet = [{
-                    'name': 'Cone',
-                    'icon': 'dataset',
-                    'category': 'source'
-                },{
-                    'name': 'Sphere',
-                    'icon': 'dataset',
-                    'category': 'source'
-                },{
-                    'name': 'Wavelet',
-                    'icon': 'dataset',
-                    'category': 'source'
-                },{
-                    'name': 'Clip',
-                    'icon': 'clip',
-                    'category': 'filter'
-                },{
-                    'name': 'Slice',
-                    'icon': 'slice',
-                    'category': 'filter'
-                },{
-                    'name': 'Contour',
-                    'icon': 'contour',
-                    'category': 'filter'
-                },{
-                    'name': 'Threshold',
-                    'icon': 'threshold',
-                    'category': 'filter'
-                },{
-                    'name': 'StreamTracer',
-                    'icon': 'stream',
-                    'category': 'filter'
-                },{
-                    'name': 'WarpByScalar',
-                    'icon': 'filter',
-                    'category': 'filter'
-                }]
+        filterSet = []
+        if self.filterFile is None :
+            filterSet = [{
+                        'name': 'Cone',
+                        'icon': 'dataset',
+                        'category': 'source'
+                    },{
+                        'name': 'Sphere',
+                        'icon': 'dataset',
+                        'category': 'source'
+                    },{
+                        'name': 'Wavelet',
+                        'icon': 'dataset',
+                        'category': 'source'
+                    },{
+                        'name': 'Clip',
+                        'icon': 'clip',
+                        'category': 'filter'
+                    },{
+                        'name': 'Slice',
+                        'icon': 'slice',
+                        'category': 'filter'
+                    },{
+                        'name': 'Contour',
+                        'icon': 'contour',
+                        'category': 'filter'
+                    },{
+                        'name': 'Threshold',
+                        'icon': 'threshold',
+                        'category': 'filter'
+                    },{
+                        'name': 'StreamTracer',
+                        'icon': 'stream',
+                        'category': 'filter'
+                    },{
+                        'name': 'WarpByScalar',
+                        'icon': 'filter',
+                        'category': 'filter'
+                    }]
+        else :
+            with open(self.filterFile, 'r') as fd:
+                filterSet = json.loads(fd.read())
+
         if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
             filterSet.append({ 'name': 'D3', 'icon': 'filter', 'category': 'filter' })
+
         return filterSet
+
 
 # =============================================================================
 #
@@ -565,6 +586,24 @@ class ParaViewWebStartupRemoteConnection(ParaViewWebProtocol):
         if not ParaViewWebStartupRemoteConnection.connected and dsHost:
             ParaViewWebStartupRemoteConnection.connected = True
             simple.Connect(dsHost, dsPort, rsHost, rsPort)
+
+
+# =============================================================================
+#
+# Handle plugin loading at startup
+#
+# =============================================================================
+
+class ParaViewWebStartupPluginLoader(ParaViewWebProtocol):
+
+    loaded = False
+
+    def __init__(self, plugins=None, pathSeparator=':'):
+        super(ParaViewWebStartupPluginLoader, self).__init__()
+        if not ParaViewWebStartupPluginLoader.loaded and plugins:
+            ParaViewWebStartupPluginLoader.loaded = True
+            for path in plugins.split(pathSeparator):
+                simple.LoadPlugin(path, ns=globals())
 
 # =============================================================================
 #

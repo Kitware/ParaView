@@ -1,7 +1,7 @@
 // This file is used to generate online documentation for ParaView protocols.
 
 /**
- * @class server.paraview.web.ParaViewWebProtocol
+ * @class protocols.ParaViewWebProtocol
  *
  * Base protocol class on the server side for ParaViewWeb application.
  *
@@ -17,13 +17,13 @@
 // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebMouseHandler
+ * @class protocols.ParaViewWebMouseHandler
  *
  * This protocol handle mouse interaction requests.
  */
 
 /**
- * @member server.paraview.web.ParaViewWebMouseHandler
+ * @member protocols.ParaViewWebMouseHandler
  * @method mouseInteraction
  * @param {Object} event
  *
@@ -45,33 +45,33 @@
 // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebViewPort
+ * @class protocols.ParaViewWebViewPort
  *
  * This protocol handle view common methods.
  */
 
 /**
- * @member server.paraview.web.ParaViewWebViewPort
+ * @member protocols.ParaViewWebViewPort
  * @method resetCamera
  * @param {String} viewId
  */
 
 /**
- * @member server.paraview.web.ParaViewWebViewPort
+ * @member protocols.ParaViewWebViewPort
  * @method updateOrientationAxesVisibility
  * @param {String} viewId
  * @param {boolean} show
  */
 
 /**
- * @member server.paraview.web.ParaViewWebViewPort
+ * @member protocols.ParaViewWebViewPort
  * @method updateCenterAxesVisibility
  * @param {String} viewId
  * @param {boolean} show
  */
 
 /**
- * @member server.paraview.web.ParaViewWebViewPort
+ * @member protocols.ParaViewWebViewPort
  * @method updateCamera
  * @param {String} viewId
  * @param {Array} focalPoint
@@ -82,13 +82,13 @@
  // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebViewPortImageDelivery
+ * @class protocols.ParaViewWebViewPortImageDelivery
  *
  * This protocol handle image delivery
  */
 
 /**
- * @member server.paraview.web.ParaViewWebViewPortImageDelivery
+ * @member protocols.ParaViewWebViewPortImageDelivery
  * @method stillRender
  * @param {Object} option
  *
@@ -137,13 +137,13 @@
  // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebViewPortGeometryDelivery
+ * @class protocols.ParaViewWebViewPortGeometryDelivery
  *
  * This protocol handle geometry delivery for local rendering using WebGL
  */
 
 /**
- * @member server.paraview.web.ParaViewWebViewPortGeometryDelivery
+ * @member protocols.ParaViewWebViewPortGeometryDelivery
  * @method getSceneMetaData
  * @param {String} viewId
  * @return {Object} metadata
@@ -154,7 +154,7 @@
  */
 
 /**
- * @member server.paraview.web.ParaViewWebViewPortGeometryDelivery
+ * @member protocols.ParaViewWebViewPortGeometryDelivery
  * @method getWebGLData
  * @param {String} viewId
  * @param {String} objectId
@@ -169,13 +169,13 @@
  // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebTimeHandler
+ * @class protocols.ParaViewWebTimeHandler
  *
  * This protocol handle Time for time dependant Dataset
  */
 
 /**
- * @member server.paraview.web.ParaViewWebTimeHandler
+ * @member protocols.ParaViewWebTimeHandler
  * @method updateTime
  * @param {String} action
  * Action can be ['next', 'prev', 'first', 'last']
@@ -185,25 +185,25 @@
  // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebPipelineManager
+ * @class protocols.ParaViewWebPipelineManager
  *
  * This protocol handle PipelineBrowser interactions
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method reloadPipeline
  * @return {Object} rootNode
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method getPipeline
  * @return {Object} rootNode
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method addSource
  * @param {String} algo_name
  * @param {String} parentId
@@ -211,55 +211,70 @@
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method deleteSource
  * @param {String} proxyId
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method updateDisplayProperty
  * @param {Object} options
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method pushState
  * @param {Object} state
  * @return {Object} proxyInfo
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method openFile
  * @param {String} path
  * @return {Number} proxyInfo
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method openRelativeFile
  * @param {String} relativePath
  * @return {Number} proxyInfo
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method updateScalarbarVisibility
  * @param {Object} options
  * @return {Object} visibilityInfo
  */
 
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @member protocols.ParaViewWebPipelineManager
  * @method updateScalarRange
  * @param {String} proxyId
  */
 
+ // =====================================================================
+
 /**
- * @member server.paraview.web.ParaViewWebPipelineManager
+ * @class protocols.ParaViewWebFilterList
+ *
+ * This protocol handles listing supported filters, and can be configured
+ * with the file path to a filter list file containing json text giving
+ * the filters which should be supported.  By default, however, a static
+ * set of filters will be provided.
+ */
+
+/**
+ * @member protocols.ParaViewWebFilterList
  * @method listFilters
  * @return {Object} listOfFilters
+ *
+ * If a file path is given to the constructor of this protocol, then the
+ * available filters will be those defined in the file.  Otherwise, the
+ * following static list will be available:
  *
  *     [{
  *         'name': 'Cone',
@@ -303,14 +318,14 @@
  // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebFileManager
+ * @class protocols.ParaViewWebFileManager
  *
  * DEPRECATED
  * This protocol handle file listing.
  */
 
 /**
- * @member server.paraview.web.ParaViewWebFileManager
+ * @member protocols.ParaViewWebFileManager
  * @method listFiles
  * @return {Object} listOfFiles
  */
@@ -318,13 +333,13 @@
  // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebRemoteConnection
+ * @class protocols.ParaViewWebRemoteConnection
  *
  * This protocol handle remote connection to pvserver
  */
 
 /**
- * @member server.paraview.web.ParaViewWebRemoteConnection
+ * @member protocols.ParaViewWebRemoteConnection
  * @method connect
  * @param {Object} options
  *
@@ -337,26 +352,84 @@
  */
 
 /**
- * @member server.paraview.web.ParaViewWebRemoteConnection
+ * @member protocols.ParaViewWebRemoteConnection
  * @method reverseConnect
  * @param {Number} port
  */
 
 /**
- * @member server.paraview.web.ParaViewWebRemoteConnection
+ * @member protocols.ParaViewWebRemoteConnection
  * @method pvDisconnect
  */
 
  // =====================================================================
 
 /**
- * @class server.paraview.web.ParaViewWebStateLoader
+ * @class protocols.ParaViewWebStartupRemoteConnection
+ *
+ * This protocol handles a remote connection at startup.
+ */
+
+/**
+ * @member protocols.ParaViewWebStartupRemoteConnection
+ * @method __init__
+ *
+ *     The constructor takes four parameters and allows configuration
+ * of host names and port numbers for a data server or render server.
+ *
+ * @param {String} dsHost
+ *
+ *     The host name of the data server, defaults to None.
+ *
+ * @param {Number} dsPort
+ *
+ *     The port number of the data server, defaults to 11111.
+ *
+ * @param {String} rsHost
+ *
+ *     The host name of the render server, defaults to None.
+ *
+ * @param {Number} rsPort
+ *
+ *     The port number of the render server, defaults to 22222.
+ */
+
+ // =====================================================================
+
+/**
+ * @class protocols.ParaViewWebStartupPluginLoader
+ *
+ * This protocol handles loading a list of plugins at startup.
+ */
+
+/**
+ * @member protocols.ParaViewWebStartupPluginLoader
+ * @method __init__
+ *
+ *     The constructor allows parameters which control which plugins
+ * should be loaded by the application upon startup.
+ *
+ * @param {String} plugins
+ *
+ *     A string containing the paths to library files representing plugins
+ * to load.  The paths should be separated by ':' unless a different
+ * separator is given by the next parameter.
+ *
+ * @param {String} pathSeparator
+ *
+ *     A string containing the path separator for the previous parameter.
+ */
+
+ // =====================================================================
+
+/**
+ * @class protocols.ParaViewWebStateLoader
  *
  * This protocol handle state file loading at startup
  */
 
 /**
- * @member server.paraview.web.ParaViewWebStateLoader
+ * @member protocols.ParaViewWebStateLoader
  * @method loadState
  * @param {String} state_file
  */
@@ -364,13 +437,13 @@
  // =====================================================================
 
  /**
- * @class server.paraview.web.ParaViewWebFileListing
+ * @class protocols.ParaViewWebFileListing
  *
  * This protocol handle file listing for vtkWeb file browser widget.
  */
 
 /**
- * @member server.paraview.web.ParaViewWebFileListing
+ * @member protocols.ParaViewWebFileListing
  * @method listServerDirectory
  * @param {String} relativeDir
  * @return {Object} listOfFiles
