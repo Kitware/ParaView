@@ -71,7 +71,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
 
   // Since Layer==1, the renderer is treated as transparent and
   // vtkOpenGLRenderer::Clear() won't clear the color-buffer.
-  this->Renderer->SetLayer(1);
+  this->Renderer->SetLayer(vtkPVAxesWidget::RendererLayer);
   // Leaving Erase==1 ensures that the depth buffer is cleared. This ensures
   // that the orientation widget always stays on top of the rendered scene.
   this->Renderer->EraseOn();

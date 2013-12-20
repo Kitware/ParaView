@@ -20,6 +20,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVAxesWidget.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkRendererCollection.h"
@@ -98,7 +99,12 @@ public:
     VectorOfRenderers::iterator iter;
     for (iter = renderers.begin(); iter != renderers.end(); ++iter)
       {
-      (*iter)->SetViewport(viewport);
+      // HACK: This allows us to skip changing the viewport for orientation
+      // widget for now.
+      if ((*iter)->GetLayer() != vtkPVAxesWidget::RendererLayer)
+        {
+        (*iter)->SetViewport(viewport);
+        }
       }
     }
 
