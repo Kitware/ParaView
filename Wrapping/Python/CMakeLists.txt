@@ -63,6 +63,10 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
           "${VTK_BINARY_DIR}/Wrapping/Python/vtk"
           "${VTK_BUILD_PYTHON_MODULE_DIR}/vtk"
+
+  # Touch the OUTPUT file, otherwise this command will always be dirty.
+  COMMAND ${CMAKE_COMMAND} ARGS -E touch "${CMAKE_CURRENT_BINARY_DIR}/vtk_py_copy_completed"
+
   DEPENDS ${_vtkpy_modules}
 )
 
