@@ -495,6 +495,7 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
   
   server->initialize();
 
+  emit this->serverReady(server);
   emit this->itemAdded(server);
   emit this->serverAdded(server);
 }

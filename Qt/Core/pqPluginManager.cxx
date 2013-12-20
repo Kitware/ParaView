@@ -95,7 +95,7 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
   // we ensure that the auto-load plugins are loaded before the application
   // realizes that a new server connection has been made.
   // (BUG #12238).
-  QObject::connect(smmodel, SIGNAL(preServerAdded(pqServer*)),
+  QObject::connect(smmodel, SIGNAL(serverReady(pqServer*)),
     this, SLOT(loadPluginsFromSettings(pqServer*)));
   QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onServerDisconnected(pqServer*)));

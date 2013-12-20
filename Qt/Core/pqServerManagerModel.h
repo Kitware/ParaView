@@ -188,6 +188,7 @@ signals:
   /// Siganls emitted when a new pqServer object is created.
   void preServerAdded(pqServer*);
   void serverAdded(pqServer*);
+  void serverReady(pqServer*);
 
   /// Signals emitted when a pqServer instance is being destroyed.
   void preServerRemoved(pqServer*);
