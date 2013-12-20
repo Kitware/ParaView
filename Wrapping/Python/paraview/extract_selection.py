@@ -21,14 +21,16 @@ from numpy import *
 from paraview.vtk.algorithms import *
 
 def __vtk_in1d(a, b):
-    return array([item in b for item in a])
-
-try:
-    contains = in1d
-except NameError:
-    # older versions of numpy don't have in1d function.
-    # in1d was introduced in numpy 1.4.0.
-    contains = __vtk_in1d
+    try:
+        return in1d(a, b)
+    except (NameError, ValueError):
+        # older versions of numpy don't have in1d function.
+        # in1d was introduced in numpy 1.4.0.
+        # Additionally in1d could fail for data arrays (I am not entirely sure
+        # how to resolve that), so in that case too revert back to the slower
+        # path.
+        return array([item in b for item in a])
+contains = __vtk_in1d
 
 #class _array(object):
 #    """used to wrap numpy array to add support for == operator
