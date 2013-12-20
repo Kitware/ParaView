@@ -513,7 +513,9 @@ void vtkACosmoReader::ReadBlock(
     const int blockIdx, vtkMultiBlockDataSet *mbds)
 {
   assert("pre: blockIdx is out-of-bounds!" &&
-         (blockIdx >= 0) && (blockIdx < this->ParticleBlocks.size()));
+         (blockIdx >= 0) &&
+         (blockIdx < static_cast<int>(this->ParticleBlocks.size())));
+
   assert("pre: multiblock output dataset is NULL!" && (mbds != NULL) );
 
   // STEP 0: Get block and level/index information
@@ -625,7 +627,8 @@ void vtkACosmoReader::ReadBlockFromFile(
   std::cout.flush();
 #endif
 
-  assert("pre: end offset out of file bounds!" && (end <= fileLength) );
+  assert("pre: end offset out of file bounds!" &&
+         (end <= static_cast<int>(fileLength)) );
 
   // STEP 2: Compute number of particles to be read
   size_t tagSize = (this->TagSize==TAG_SIZE_32_BIT)?
@@ -675,7 +678,8 @@ void vtkACosmoReader::ReadBlockFromFile(
 
     size_t position = start + idx*(BYTES_PER_DATA_MINUS_TAG+tagSize);
     assert("pre: file position out of bounds!" &&
-            (position >= start) && (position < end) );
+            (static_cast<int>(position) >= start) &&
+            (static_cast<int>(position) < end) );
 
     ifs.seekg(position, ios::beg);
 

@@ -26,7 +26,7 @@
 #define VTK_NEW(type, name) \
   name = vtkSmartPointer<type>::New()
 
-vtkStandardNewMacro(vtkMinkowskiFilter); 
+vtkStandardNewMacro(vtkMinkowskiFilter);
 
 vtkMinkowskiFilter::vtkMinkowskiFilter()
 {
@@ -44,14 +44,14 @@ void vtkMinkowskiFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "vtkMinkowskiFilter\n";
 }
 
-int vtkMinkowskiFilter::RequestData(vtkInformation *vtkNotUsed(request), 
+int vtkMinkowskiFilter::RequestData(vtkInformation *vtkNotUsed(request),
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector)
 {
   // Get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
- 
+
   // Get the input and ouptut
   vtkUnstructuredGrid *input = vtkUnstructuredGrid::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -93,22 +93,22 @@ int vtkMinkowskiFilter::FillOutputPortInformation(int port, vtkInformation* info
   if ( port == 0 )
   {
     info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid" );
- 
+
     return 1;
   }
- 
+
   return 0;
 }
 
-void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid *ugrid, 
-    vtkDoubleArray *S, vtkDoubleArray *V, vtkDoubleArray *C, 
+void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid *ugrid,
+    vtkDoubleArray *S, vtkDoubleArray *V, vtkDoubleArray *C,
     vtkDoubleArray *X, vtkDoubleArray *G, vtkDoubleArray *T,
     vtkDoubleArray *B, vtkDoubleArray *L, vtkDoubleArray *P,
     vtkDoubleArray *F)
 {
   int i;
   int num_cells = ugrid->GetNumberOfCells();
-  double *S_array, *V_array, *C_array, *X_array, *G_array, 
+  double *S_array, *V_array, *C_array, *X_array, *G_array,
          *T_array, *B_array, *L_array, *P_array, *F_array;
 
   S_array = new double[num_cells];
@@ -121,11 +121,6 @@ void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid *ugrid,
   L_array = new double[num_cells];
   P_array = new double[num_cells];
   F_array = new double[num_cells];
-
-  vtkCellData *cell_data = ugrid->GetCellData();
-  vtkFloatArray *vol_array = vtkFloatArray::SafeDownCast(
-      cell_data->GetArray("Volumes"));
-  float *fvol = vol_array->GetPointer(0);
 
   for (i=0; i<num_cells; i++)
   {
@@ -182,7 +177,7 @@ void vtkMinkowskiFilter::compute_mf(vtkUnstructuredGrid *ugrid,
   L->SetNumberOfComponents(1);
   L->SetNumberOfTuples(num_cells);
   L->SetVoidArray(L_array, num_cells, 0);
-  
+
   P->SetName("P");
   P->SetNumberOfComponents(1);
   P->SetNumberOfTuples(num_cells);
@@ -199,7 +194,7 @@ double vtkMinkowskiFilter::compute_S(vtkPolyhedron *cell)
   int i;
   int num_faces = cell->GetNumberOfFaces();
   double area = 0.0;
-  
+
   vtkCell *face;
   for (i=0; i<num_faces; i++)
   {
@@ -210,7 +205,7 @@ double vtkMinkowskiFilter::compute_S(vtkPolyhedron *cell)
   return area;
 }
 
-double vtkMinkowskiFilter::compute_V(vtkPolyhedron *cell)
+double vtkMinkowskiFilter::compute_V(vtkPolyhedron* vtkNotUsed(cell))
 {
   // for manually compute polyhedron volume
   return 0; // doing nothing now
@@ -227,7 +222,7 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
   int i, j;
   int num_edges = cell->GetNumberOfEdges();
   int num_faces = cell->GetNumberOfFaces();
-  
+
   double face_normals[num_faces][3];
 
   int edge_faces[num_edges][2];
@@ -236,7 +231,7 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
     edge_faces[i][0] = -1;
     edge_faces[i][1] = -1;
   }
-  
+
   std::map<std::string,int> edge_map;
 
   char key[100];
@@ -253,11 +248,11 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
   {
     vtkCell *f = cell->GetFace(i);
     vtkIdList *verts = f->GetPointIds();
-    int num_verts = verts->GetNumberOfIds(); 
+    int num_verts = verts->GetNumberOfIds();
 
     for (j=0; j<num_verts; j++)
     {
-      sprintf(key, "%d_%d", (int)verts->GetId(j % num_verts), 
+      sprintf(key, "%d_%d", (int)verts->GetId(j % num_verts),
           (int)verts->GetId((j+1) % num_verts));
       std::string key_str = std::string(key);
       std::map<std::string, int>::iterator it = edge_map.find(key_str);
@@ -279,7 +274,7 @@ double vtkMinkowskiFilter::compute_C(vtkPolyhedron *cell)
       else
         std::cerr << "error: edge is accessed more than twice" << std::endl;
     }
-    
+
     compute_normal(f, face_normals[i]);
   }
 
@@ -311,7 +306,7 @@ double vtkMinkowskiFilter::compute_X(vtkPolyhedron *cell)
   int nverts = cell->GetNumberOfPoints();
 
   double X = nfaces - nedges + nverts;
-  
+
   return X;
 }
 
@@ -363,7 +358,7 @@ double vtkMinkowskiFilter::compute_face_area(vtkCell *face)
   coord = 3;
   if (ax > ay)
   {
-    if (ax > az) 
+    if (ax > az)
       coord = 1;
   }
   else if (ay > az)
@@ -455,7 +450,7 @@ int vtkMinkowskiFilter::compute_epsilon(vtkCell *f1, vtkCell *f2, vtkCell *e)
   vec[2] = vf[2] - ve[2];
   double N[3];
   compute_normal(f1, N);
-  
+
   double val = vtkMath::Dot(vec, N);
 
   if (val > 0)

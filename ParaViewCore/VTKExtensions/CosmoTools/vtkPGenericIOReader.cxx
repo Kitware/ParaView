@@ -38,6 +38,8 @@
 #include "vtkType.h"
 #include "vtkUnstructuredGrid.h"
 
+#include "vtkGenericIOUtilities.h"
+
 // GenericIO includes
 #include "GenericIOReader.h"
 #include "GenericIOMPIReader.h"
@@ -52,34 +54,8 @@
 #include <stdexcept>
 #include <vector>
 
-// MPI
-#include <mpi.h>
-
 // Uncomment the line below to get debugging information
 //#define DEBUG
-
-//------------------------------------------------------------------------------
-// Helper STL string manipulation methods
-
-namespace vtkPGenericIOInternals {
-// trim from start
-std::string &ltrim(std::string &s) {
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-  return s;
-}
-
-// trim from end
-std::string &rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-  return s;
-}
-
-// trim from both ends
-std::string &trim(std::string &s) {
-  return ltrim(rtrim(s));
-}
-
-} /* end vktPGenericIOInternals namespace */
 
 //------------------------------------------------------------------------------
 class vtkGenericIOMetaData
@@ -121,21 +97,8 @@ public:
   void InitCommunicator(vtkMultiProcessController *controller)
   {
      assert("pre: controller is NULL!" && (controller != NULL) );
-
-     // STEP 0: Get the communicator from the controller
-     vtkCommunicator *vtkComm =  controller->GetCommunicator();
-     assert("pre: VTK communicator is NULL" && (vtkComm != NULL) );
-
-     // STEP 1: Safe downcast to an vtkMPICommunicator
-     vtkMPICommunicator* vtkMPIComm = vtkMPICommunicator::SafeDownCast(vtkComm);
-     assert("pre: MPI communicator is NULL" && (vtkMPIComm != NULL) );
-
-     // STEP 2: Get the opaque VTK MPI communicator
-     vtkMPICommunicatorOpaqueComm* mpiComm = vtkMPIComm->GetMPIComm();
-     assert("pre: Opaque MPI communicator is NULL" && (mpiComm != NULL) );
-
-     // STEP 3: Finally, get the MPI comm
-     this->MPICommunicator = *(mpiComm->GetHandle());
+     this->MPICommunicator =
+         vtkGenericIOUtilities::GetMPICommunicator(controller);
   }
 
   /**
@@ -144,7 +107,7 @@ public:
    */
   bool SanityCheck()
   {
-  int N = this->Information.size();
+  size_t N = this->Information.size();
   return( ( (this->VariableGenericIOType.size()==N) &&
              (this->VariableStatus.size()==N) &&
              (this->RawCache.size()==N)
@@ -197,6 +160,7 @@ vtkPGenericIOReader::vtkPGenericIOReader()
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
+
   this->Controller        = vtkMultiProcessController::GetGlobalController();
   this->Reader            = NULL;
   this->FileName          = NULL;
@@ -235,25 +199,10 @@ vtkPGenericIOReader::~vtkPGenericIOReader()
    delete this->Reader;
    }
 
- if( this->FileName != NULL )
-   {
-   delete [] this->FileName;
-   }
-
- if( this->XAxisVariableName != NULL )
-   {
-   delete [] this->XAxisVariableName;
-   }
-
- if( this->YAxisVariableName != NULL )
-   {
-   delete [] this->YAxisVariableName;
-   }
-
- if( this->ZAxisVariableName != NULL )
-   {
-   delete [] this->ZAxisVariableName;
-   }
+ vtkGenericIOUtilities::SafeDeleteString(this->FileName);
+ vtkGenericIOUtilities::SafeDeleteString(this->XAxisVariableName);
+ vtkGenericIOUtilities::SafeDeleteString(this->YAxisVariableName);
+ vtkGenericIOUtilities::SafeDeleteString(this->ZAxisVariableName);
 
  if( this->MetaData != NULL )
    {
@@ -367,11 +316,13 @@ bool vtkPGenericIOReader::ReaderParametersChanged()
       break;
     case gio::GenericIOBase::FileIOPOSIX:
       status = (this->GenericIOType!=IOTYPEPOSIX)? true : false;
+#ifdef DEBUG
       if(status == true)
         {
         std::cout << "\t[INFO]: I/O strategy changed from POSIX\n";
         std::cout.flush();
         }
+#endif
       break;
     default:
       assert("pre: Code should not reach here!" && false);
@@ -439,57 +390,16 @@ gio::GenericIOReader* vtkPGenericIOReader::GetInternalReader()
 
   assert("pre: Reader should be NULL" && (this->Reader==NULL));
   gio::GenericIOReader *r = NULL;
-  switch( this->GenericIOType )
-    {
-    case IOTYPEMPI:
-#ifdef DEBUG
-      std::cout << "\t[INFO]: Creating MPI Reader instance...";
-#endif
-      r = new gio::GenericIOMPIReader();
-#ifdef DEBUG
-      std::cout << "[DONE]\n";
-      std::cout.flush();
-#endif
-      break;
-    case IOTYPEPOSIX:
-#ifdef DEBUG
-      std::cout << "\t[INFO]: Creating Posix Reader instance...";
-#endif
-      r = new gio::GenericIOPosixReader();
-#ifdef DEBUG
-      std::cout << "[DONE]\n";
-      std::cout.flush();
-#endif
-      break;
-    default:
-      r = NULL;
-    } // END switch
+  bool posix              = (this->GenericIOType==IOTYPEMPI)? false : true;
+  int distribution        = (this->BlockAssignment==RCB)?
+                                gio::RCB_BLOCK_ASSIGNMENT :
+                                gio::RR_BLOCK_ASSIGNMENT;
 
-  r->SetCommunicator( this->MetaData->MPICommunicator );
-  r->SetFileName(this->FileName);
+  r = vtkGenericIOUtilities::GetReader(
+        vtkGenericIOUtilities::GetMPICommunicator(this->Controller),
+        posix,distribution,std::string(this->FileName));
+  assert("post: Internal GenericIO reader should not be NULL!" && (r!=NULL) );
 
-  if( this->BlockAssignment == ROUND_ROBIN)
-    {
-#ifdef DEBUG
-      std::cout << "\t[INFO]: Using Round-Robin block assignment...";
-#endif
-    r->SetBlockAssignmentStrategy(gio::RR_BLOCK_ASSIGNMENT);
-#ifdef DEBUG
-      std::cout << "[DONE]\n";
-      std::cout.flush();
-#endif
-    }
-  else if( this->BlockAssignment == RCB )
-    {
-#ifdef DEBUG
-      std::cout << "\t[INFO]: Using RCB block assignment...";
-#endif
-    r->SetBlockAssignmentStrategy(gio::RCB_BLOCK_ASSIGNMENT);
-#ifdef DEBUG
-      std::cout << "[DONE]\n";
-      std::cout.flush();
-#endif
-    }
   return( r );
 }
 
@@ -588,13 +498,13 @@ void vtkPGenericIOReader::LoadRawData()
   assert("pre: metadata is corrupt!" && (this->MetaData->SanityCheck()));
 
   std::string xaxis = std::string(this->XAxisVariableName);
-  xaxis = vtkPGenericIOInternals::trim(xaxis);
+  xaxis = vtkGenericIOUtilities::trim(xaxis);
 
   std::string yaxis = std::string(this->YAxisVariableName);
-  yaxis = vtkPGenericIOInternals::trim(yaxis);
+  yaxis = vtkGenericIOUtilities::trim(yaxis);
 
   std::string zaxis = std::string(this->ZAxisVariableName);
-  zaxis = vtkPGenericIOInternals::trim(zaxis);
+  zaxis = vtkGenericIOUtilities::trim(zaxis);
 
   this->LoadRawVariableData( xaxis );
   this->LoadRawVariableData( yaxis );
@@ -661,48 +571,7 @@ void vtkPGenericIOReader::GetPointFromRawData(
     void *rawBuffer = this->MetaData->RawCache[ name[i] ];
     assert("pre: raw buffer is NULL!" && (rawBuffer != NULL) );
 
-    switch( type )
-      {
-      case gio::GENERIC_IO_INT32_TYPE:
-        {
-        int32_t *dataPtr = static_cast<int32_t*>(rawBuffer);
-        pnt[i] = static_cast<double>(dataPtr[idx]);
-        }
-        break;
-      case gio::GENERIC_IO_INT64_TYPE:
-        {
-        int64_t *dataPtr = static_cast<int64_t*>(rawBuffer);
-        pnt[i] = static_cast<double>(dataPtr[idx]);
-        }
-        break;
-      case gio::GENERIC_IO_UINT32_TYPE:
-        {
-        uint32_t *dataPtr = static_cast<uint32_t*>(rawBuffer);
-        pnt[i] = static_cast<double>(dataPtr[idx]);
-        }
-        break;
-      case gio::GENERIC_IO_UINT64_TYPE:
-        {
-        uint64_t *dataPtr = static_cast<uint64_t*>(rawBuffer);
-        pnt[i] = static_cast<double>(dataPtr[idx]);
-        }
-        break;
-      case gio::GENERIC_IO_DOUBLE_TYPE:
-        {
-        double *dataPtr = static_cast<double*>(rawBuffer);
-        pnt[i] = dataPtr[idx];
-        }
-        break;
-      case gio::GENERIC_IO_FLOAT_TYPE:
-        {
-        float *dataPtr = static_cast<float*>(rawBuffer);
-        pnt[i] = static_cast<double>(dataPtr[idx]);
-        }
-        break;
-      default:
-        assert("pre: Undefined GENERIC IO type: " && true);
-      } // END switch
-
+    pnt[i] = vtkGenericIOUtilities::GetDoubleFromRawBuffer(type,rawBuffer,idx);
     } // END for all dimensions
 }
 
@@ -718,13 +587,13 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
     }
 
   std::string xaxis = std::string(this->XAxisVariableName);
-  xaxis = vtkPGenericIOInternals::trim(xaxis);
+  xaxis = vtkGenericIOUtilities::trim(xaxis);
 
   std::string yaxis = std::string(this->YAxisVariableName);
-  yaxis = vtkPGenericIOInternals::trim(yaxis);
+  yaxis = vtkGenericIOUtilities::trim(yaxis);
 
   std::string zaxis = std::string(this->ZAxisVariableName);
-  zaxis = vtkPGenericIOInternals::trim(zaxis);
+  zaxis = vtkGenericIOUtilities::trim(zaxis);
 
   if( !this->MetaData->HasVariable(xaxis) ||
        !this->MetaData->HasVariable(yaxis) ||
@@ -762,96 +631,6 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
 }
 
 //------------------------------------------------------------------------------
-vtkDataArray* vtkPGenericIOReader::GetVtkDataArray(std::string name)
-{
-  if( !this->MetaData->HasVariable(name) )
-    {
-    vtkErrorMacro(<< "Invalid variable name: " << name );
-    return NULL;
-    }
-
-  vtkDataArray *dataArray = NULL;
-  size_t dataSize = 0;
-  void *rawBuffer = this->MetaData->RawCache[ name ];
-  assert("pre: rawBuffer should not be NULL!" && (rawBuffer != NULL) );
-  int type = this->MetaData->VariableGenericIOType[ name ];
-  switch( type )
-    {
-    case gio::GENERIC_IO_INT32_TYPE:
-        #ifdef DEBUG
-          std::cout << "\t[INFO]: Get VTK_INT array for " << name;
-          std::cout << std::endl;
-          std::cout.flush();
-        #endif
-       dataArray = vtkDataArray::CreateDataArray(VTK_INT);
-       dataSize = sizeof(int32_t);
-       break;
-     case gio::GENERIC_IO_INT64_TYPE:
-       #ifdef DEBUG
-        std::cout << "\t[INFO]: Get VTK_LONG_LONG array for " << name;
-        std::cout << std::endl;
-        std::cout.flush();
-       #endif
-       dataArray = vtkDataArray::CreateDataArray(VTK_LONG_LONG);
-       // i.e., don't run this on windows
-       assert(sizeof(long long)==sizeof(int64_t));
-       dataSize = sizeof(int64_t);
-       break;
-     case gio::GENERIC_IO_UINT32_TYPE:
-       #ifdef DEBUG
-        std::cout << "\t[INFO]: Get VTK_UNSIGNED_INT array for " << name;
-        std::cout << std::endl;
-        std::cout.flush();
-       #endif
-       dataArray = vtkDataArray::CreateDataArray(VTK_UNSIGNED_INT);
-       dataSize = sizeof(uint32_t);
-       break;
-     case gio::GENERIC_IO_UINT64_TYPE:
-       #ifdef DEBUG
-        std::cout << "\t[INFO]: Get VTK_UNSIGNED_LONG_LONG array for " << name;
-        std::cout << std::endl;
-        std::cout.flush();
-       #endif
-       dataArray = vtkDataArray::CreateDataArray(VTK_UNSIGNED_LONG_LONG);
-       // i.e., don't run this on windows
-       assert(sizeof(unsigned long long) == sizeof(uint64_t) );
-       dataSize = sizeof(uint64_t);
-       break;
-     case gio::GENERIC_IO_DOUBLE_TYPE:
-       #ifdef DEBUG
-        std::cout << "\t[INFO]: Get VTK_DOUBLE array for " << name;
-        std::cout << std::endl;
-        std::cout.flush();
-       #endif
-       dataArray = vtkDataArray::CreateDataArray(VTK_DOUBLE);
-       dataSize = sizeof(double);
-       break;
-     case gio::GENERIC_IO_FLOAT_TYPE:
-       #ifdef DEBUG
-        std::cout << "\t[INFO]: Get VTK_FLOAT array for " << name;
-        std::cout << std::endl;
-        std::cout.flush();
-       #endif
-       dataArray = vtkDataArray::CreateDataArray(VTK_FLOAT);
-       dataSize = sizeof(float);
-       break;
-     default:
-       vtkErrorMacro(<<"Undefined GENERIC_IO_TYPE");
-       dataSize = 0;
-       return NULL;
-    } // END switch
-
-  dataArray->SetNumberOfComponents(1);
-  dataArray->SetNumberOfTuples( this->MetaData->NumberOfElements );
-  dataArray->SetName(name.c_str());
-  void *dataBuffer = dataArray->GetVoidPointer(0);
-  assert("pre: Encountered NULL data buffer!" && (dataBuffer != NULL) );
-  memcpy(dataBuffer,rawBuffer,
-       this->MetaData->NumberOfElements*sizeof(int32_t));
-
-  return( dataArray );
-}
-//------------------------------------------------------------------------------
 void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
 {
   assert("pre: grid is NULL!" && (grid != NULL) );
@@ -870,7 +649,14 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
     if( this->PointDataArraySelection->ArrayIsEnabled(name) )
       {
       std::string varName = std::string( name );
-      vtkDataArray *dataArray = this->GetVtkDataArray( varName );
+      vtkDataArray *dataArray =
+          vtkGenericIOUtilities::GetVtkDataArray(
+              varName,
+              this->MetaData->VariableGenericIOType[ varName ],
+              this->MetaData->RawCache[ varName ],
+              this->MetaData->NumberOfElements
+              );
+
       PD->AddArray( dataArray );
       dataArray->Delete();
       } // END if the array is enabled
@@ -1010,19 +796,15 @@ int vtkPGenericIOReader::RequestData(
   // STEP 1: Load raw data
   this->LoadRawData();
 
-  // STEP 2: See if we should only show
-  this->FindRankNeighbors();
-  MPI_Barrier(this->MetaData->MPICommunicator);
-
-  // STEP 3: Load coordinates
+  // STEP 2: Load coordinates
   this->LoadCoordinates(output);
   MPI_Barrier(this->MetaData->MPICommunicator);
 
-  // STEP 4: Load data
+  // STEP 3: Load data
   this->LoadData(output);
   MPI_Barrier(this->MetaData->MPICommunicator);
 
-  // STEP 5: Clear variables
+  // STEP 4: Clear variables
   this->Reader->ClearVariables();
   return 1;
 }

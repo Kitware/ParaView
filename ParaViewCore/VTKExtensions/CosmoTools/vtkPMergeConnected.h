@@ -63,7 +63,7 @@ private:
   void SetController(vtkMultiProcessController *c);
 
   //filter
-  int LocalToGlobalRegionId(vtkMultiProcessController *contr, vtkMultiBlockDataSet *data);
+  void LocalToGlobalRegionId(vtkMultiProcessController *contr, vtkMultiBlockDataSet *data);
   void MergeCellsOnRegionId(vtkUnstructuredGrid *ugrid, int target, vtkIdList* facestream);
   float MergeCellDataOnRegionId(vtkFloatArray *data_array, vtkIdTypeArray *rid_array, vtkIdType target);
 
