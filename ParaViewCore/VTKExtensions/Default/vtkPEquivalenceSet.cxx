@@ -65,7 +65,7 @@ int vtkPEquivalenceSet::ResolveEquivalences ()
         {
         int workingVal = workingSet->GetValue (i);
         int existingVal = this->EquivalenceArray->GetValue (i);
-        if (workingVal < existingVal)
+        if (workingVal > 0 && workingVal < existingVal)
           {
           this->EquivalenceArray->SetTuple1 (i, workingVal);
           }
@@ -80,6 +80,5 @@ int vtkPEquivalenceSet::ResolveEquivalences ()
   controller->Broadcast (this->EquivalenceArray, 0);
 
   this->Superclass::ResolveEquivalences ();
-
   return 1;
 }

@@ -37,6 +37,7 @@
 #include "vtkUniformGrid.h"
 #include "vtksys/SystemTools.hxx"
 
+#include "vtkPVConfig.h"
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMPIController.h"
 #endif
@@ -316,11 +317,30 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
     this->Equivalence = vtkPEquivalenceSet::New ();
+
+    // Initialize equivalence with all regions independent
+    int myOffset = myProc + 1;
+    if (myOffset >= numProcs) 
+      {
+      myOffset = 0; 
+      }
+    for (int i = 1; i < this->NextRegionId; i ++) 
+      {
+      if ((i % numProcs) == myOffset) 
+        {
+        this->Equivalence->AddEquivalence (i, i);
+        }
+      else
+        {
+        this->Equivalence->AddEquivalence (i, 0);
+        }
+      }
+
     for (size_t i = 0; i < this->BoundaryArrays.size (); i ++) 
       {
       for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
         {
-        if (i == myProc)
+        if (i == static_cast<unsigned int> (myProc))
           {
           this->ProcessBoundaryAtNeighbor (volume, this->BoundaryArrays[myProc][j]);
           }
@@ -328,7 +348,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         }
         this->BoundaryArrays[i].clear ();
       }
-  
     // Reduce all equivalence pairs into equivalence sets
     this->Equivalence->ResolveEquivalences ();
   
@@ -346,10 +365,10 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         if (regionId > 0) 
           {
           int setId = this->Equivalence->GetEquivalentSetId (regionId);
-          regionIdArray->SetTuple1 (i, setId + 1);
-          if ((setId + 1) > maxSet) 
+          regionIdArray->SetTuple1 (i, setId);
+          if ((setId) > maxSet) 
             {
-            maxSet = setId + 1;
+            maxSet = setId;
             }
           }
         else
@@ -614,12 +633,11 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
 
 #ifdef PARAVIEW_USE_MPI
   int myProc = controller->GetLocalProcessId ();
-  int numProcs = controller->GetNumberOfProcesses ();
 
   vtkAMRConnectivityCommRequestList receiveList;
   for (size_t i = 0; i < this->ReceiveList.size (); i ++) 
     {
-    if (i == myProc) { continue; }
+    if (i == static_cast<unsigned int> (myProc)) { continue; }
 
     int messageLength = 0; 
     for (size_t j = 0; j < this->ReceiveList[i].size (); j ++)
@@ -634,13 +652,14 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     array->SetNumberOfTuples (messageLength);
 
     vtkAMRConnectivityCommRequest request;
-    request.SendProcess = i;
+    request.SendProcess = static_cast<int>(i);
     request.ReceiveProcess = myProc;
     request.Buffer = array;
 
     controller->NoBlockReceive(array->GetPointer (0),
                                messageLength,
-                               i, BOUNDARY_TAG,
+                               static_cast<int>(i), 
+                               BOUNDARY_TAG,
                                request.Request);
 
     this->ReceiveList[i].clear ();
@@ -651,7 +670,7 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
   vtkAMRConnectivityCommRequestList sendList;
   for (size_t i = 0; i < this->BoundaryArrays.size (); i ++)
     {
-    if (i == myProc) { continue; }
+    if (i == static_cast<unsigned int> (myProc)) { continue; }
     vtkIntArray* array = vtkIntArray::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (0);
@@ -671,12 +690,13 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
 
     vtkAMRConnectivityCommRequest request;
     request.SendProcess = myProc;
-    request.ReceiveProcess = i;
+    request.ReceiveProcess = static_cast<int>(i);
     request.Buffer = array;
 
     controller->NoBlockSend(array->GetPointer(0),
                             array->GetNumberOfTuples (),
-                            i, BOUNDARY_TAG,
+                            static_cast<int>(i), 
+                            BOUNDARY_TAG,
                             request.Request);
 
     sendList.push_back(request);
