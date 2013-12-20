@@ -266,6 +266,21 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   // its messing up with the scalar coloring.
   this->Superclass::setDefaultPropertyValues();
 
+  vtkSMRepresentationProxy* repr = this->getRepresentationProxy();
+  if (!repr)
+    {
+    return;
+    }
+
+  // Setup property defaults that are independent of data. Eventually,
+  // ServerManager will take care of these defaults.
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  if(repr->GetProperty("AllowSpecularHighlightingWithScalarColoring"))
+    {
+    vtkSMPropertyHelper(repr, "AllowSpecularHighlightingWithScalarColoring").Set(
+      settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
+    }
+
   if (!this->isVisible() &&
       !pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault()
       )
@@ -277,12 +292,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   // The HelperProxy is not needed any more since now the OpacityFunction is 
   // created from LookupTableManager (Bug# 0008876)
   // this->createHelperProxies();
-
-  vtkSMRepresentationProxy* repr = this->getRepresentationProxy();
-  if (!repr)
-    {
-    return;
-    }
 
   // For some view all the default representation names may not exist
   // therefore we need to filter them to match existing ones.
@@ -564,13 +573,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   // Color by property.
   this->colorByArray(NULL, 0);
-
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  if(repr->GetProperty("AllowSpecularHighlightingWithScalarColoring"))
-    {
-    vtkSMPropertyHelper(repr, "AllowSpecularHighlightingWithScalarColoring").Set(
-      settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
-    }
 }
 
 //-----------------------------------------------------------------------------
