@@ -185,9 +185,14 @@ public:
     const QMetaObject& mo, const QString& name);
 
 signals:
-  /// Siganls emitted when a new pqServer object is created.
+  /// Signals emitted when a new pqServer object is created.
   void preServerAdded(pqServer*);
   void serverAdded(pqServer*);
+
+  /// Signals emitted when a new pqServer object is properly initialized.
+  /// This happen just before serverAdded() but should not be used by user.
+  /// serverAdded() should be the signal to bind against unless you need to be
+  /// notified before the serverAdded() like the plugin loader do.
   void serverReady(pqServer*);
 
   /// Signals emitted when a pqServer instance is being destroyed.

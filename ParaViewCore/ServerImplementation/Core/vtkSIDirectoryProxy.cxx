@@ -84,20 +84,20 @@ void vtkSIDirectoryProxy::Pull(vtkSMMessage* message)
   std::vector<std::string> directoryList;
   for(vtkIdType idx = 0; idx < nbFiles; ++idx)
     {
-    vtkClientServerStream str;
-    str << vtkClientServerStream::Invoke
+    vtkClientServerStream css;
+    css << vtkClientServerStream::Invoke
         << this->GetVTKObject() << "GetFile" << idx
         << vtkClientServerStream::End;
-    this->GetInterpreter()->ProcessStream(str);
+    this->GetInterpreter()->ProcessStream(css);
     if (!this->GetInterpreter()->GetLastResult().GetArgument(0, 0, &fileName))
       {
       vtkErrorMacro( "Error getting return value of command: GetFile(" << idx << ")");
       return;
       }
-    str << vtkClientServerStream::Invoke
+    css << vtkClientServerStream::Invoke
         << this->GetVTKObject() << "FileIsDirectory" << fileName.c_str()
         << vtkClientServerStream::End;
-    this->GetInterpreter()->ProcessStream(str);
+    this->GetInterpreter()->ProcessStream(css);
     if (!this->GetInterpreter()->GetLastResult().GetArgument(0, 0, &isDirectory))
       {
       vtkErrorMacro( "Error getting return value of command: FileIsDirectory(" << fileName.c_str() << ")");
