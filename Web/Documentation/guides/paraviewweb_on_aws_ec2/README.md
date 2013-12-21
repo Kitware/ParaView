@@ -5,27 +5,27 @@
 This document describes how to set up a clean Amazon EC2 AMI instance to run ParaViewWeb with the following configuration:
 
 1. Deploy the latest nightly binary version of ParaView
-2. Use a recent version of Apache which now supports web sockets
+2. Use a recent version of Apache, which now supports web sockets
 3. Use the Jetty session manager to launch python processes
 
-In this document we will use the convention of referring to the DNS name of our EC2 host as
+In this document, we will refer to the DNS name of our EC2 host as
 
     ec2-XXX-XXX-XXX-XXX.compute-1.amazonaws.com
 
-In every case, this should be replaced with the actual hostname of a running instance.  Additionally, whenever you secure shell into your instance, you might get a message from the system about needing to install updates.  It's probably a good idea to do this, following the system instructions:
+You should replace this with the actual hostname of a running instance. Additionally, whenever you secure shell into your instance, it is possible that you will get a message from the system regarding the installation of updates.  It is most likely a good idea to install the updates. To do so, follow the system instructions:
 
     sudo yum update
 
 ## Package install and graphics environment setup
 
-Before proceeding with the installation specifics, you should install some required packages on the instance.  The patch package is required for patching the Apache httpd source, pcre-devel is required by the Apache compilation phase, mesa-libGLU is required to to ParaView rendering, and the xorg packages are required in order to have a proper X server environment.
+Before proceeding with the installation specifics, you should install some required packages on the instance.  The patch package is required for patching the Apache httpd source, pcre-devel is required by the Apache compilation phase, mesa-libGLU is required to perform ParaView rendering, and the xorg packages are required for a proper X server environment.
 
     $ sudo yum install patch.x86_64
     $ sudo yum install pcre-devel.x86_64
     $ sudo yum install mesa-libGLU.x86_64
     $ sudo yum install xorg*
 
-After running the above package installations, you should run nvidia-config, as shown below, so that it will generate for you a correctly formatted X configuration file.
+After running the above package installations, you should run nvidia-config, as shown below, so as to generate a correctly formatted X configuration file.
 
     $ sudo nvidia-config
 
@@ -90,11 +90,11 @@ After running the above nvidia-config command, there will be a new file generate
         EndSubSection
     EndSection
 
-Whatever you choose for the "Virtual" screen resolution near the bottom of the file, this resolution will be the maximum size image that ParaView can render.  You may want to increase the resolution accordingly.
+Your choice for the "Virtual" screen resolution, located near the bottom of the file, will become the maximum size image that ParaView can render. You may want to increase the resolution accordingly.
 
 ## ParaView
 
-This section of the document describes how to get all the pieces necessary to deploy ParaViewWeb on the instance, including getting ParaView, the documentation, as well as the ParaViewData repository.
+This section of the document describes how to acquire all of the pieces necessary to deploy ParaViewWeb on the instance, including ParaView, the documentation, and the ParaViewData repository.
 
     $ cd /home/ec2-user/
     $ mkdir ParaView
@@ -116,17 +116,17 @@ This section of the document describes how to get all the pieces necessary to de
 
 ## Apache
 
-In this section, you will see how to download the source for Apache httpd, then build, install, and configure it for use with ParaViewWeb.
+In this section, you will learn how to download the source for Apache httpd and then build, install, and configure it for use with ParaViewWeb.
 
 ### Download, build, and install Apache httpd
 
-In order to build and install Apache 2.4.7 on the ec2 machine, there are general instructions at the following url:
+General instructions for building and installing Apache 2.4.7 on the ec2 machine can be found at the following URL:
 
     http://httpd.apache.org/docs/2.4/install.html
 
-However, the following instructions give detailed steps to follow on the Amazon EC2 AMI instance.
+However, the instructions below give detailed steps that can be followed on the Amazon EC2 AMI instance.
 
-Get the necessary source tarballs.  You will need httpd source, as well as apr and apr-util sources.
+Obtain the necessary source tarballs. You will need httpd source, as well as apr and apr-util sources.
 
     $ mkdir /home/ec2-user/downloads
     $ cd /home/ec2-user/downloads
@@ -150,7 +150,7 @@ Now configure the Apache build.
     $ cd /home/ec2-user/apache-2.4.7-src/httpd-2.4.7
     $ ./configure --prefix /opt/apache-2.4.7 --with-included-apr --enable-proxy
 
-Check how many processors are available and use them all to build httpd.  The nproc command returns how many processors are available, use that number in the make command.  When the build is finished, install httpd.
+Check how many processors are available and use them all to build httpd.  The nproc command returns the number of processors that are available. Use this number in the make command.  When the build is finished, install httpd.
 
     $ nproc
     $ make -j<number>
@@ -169,7 +169,7 @@ Create a directory for the mapping file that Jetty and Apache use to communicate
     $ sudo chgrp mappingfileusers /opt/apache-2.4.7/pv-mapping-file/mapping.txt
     $ sudo chmod 660 /opt/apache-2.4.7/pv-mapping-file/mapping.txt
 
-Add a virtual host to the httpd-vhosts.conf file, which will be located in the directory /opt/apache-2.4.7/conf/extra/.  Make sure to replace the "ServerName" value with the correct EC2 instance DNS name.  It is probably a good idea to comment out or remove the existing example virtual host entries in this file at the same time, otherwise, you will see errors about them when starting Apache.
+Add a virtual host to the httpd-vhosts.conf file, which will be located in the directory /opt/apache-2.4.7/conf/extra/.  Make sure to replace the "ServerName" value with the correct EC2 instance DNS name.  It is probably a good idea to comment out or remove the existing example virtual host entries in this file at the same time. Otherwise, you will see errors when starting Apache.
 
     <VirtualHost *:80>
         ServerName ec2-XXX-XXX-XXX-XXX.compute-1.amazonaws.com
@@ -186,7 +186,7 @@ Add a virtual host to the httpd-vhosts.conf file, which will be located in the d
         # This is the path the mapping file Jetty creates
         RewriteMap session-to-port txt:/opt/apache-2.4.7/pv-mapping-file/mapping.txt
 
-        # This is rewrite condition, we are looking for anything with a sesssionId= in  the query part of the URL and we capture the value to use below.
+        # This is the rewrite condition. Look for anything with a sessionId= in the query part of the URL and capture the value to use below.
         RewriteCond %{QUERY_STRING}     ^sessionId=(.*)$ [NC]
 
         # This does the rewrite using the mapping file and the sessionId
@@ -206,7 +206,7 @@ Include this virtual host in the main httpd configuration file.  Find the follow
 
     Include conf/extra/httpd-vhosts.conf
 
-Find the following lines in the httpd.conf file, and uncomment them in order to load some necessary modules:
+Find the following lines in the httpd.conf file and uncomment them in order to load some necessary modules:
 
     LoadModule slotmem_shm_module modules/mod_slotmem_shm.so
     LoadModule rewrite_module modules/mod_rewrite.so
@@ -215,7 +215,7 @@ Start the httpd daemon.
 
     $ sudo /opt/apache-2.4.7/bin/apachectl -k start
 
-At this point, you can test out that at least the static content is available by pointing your browser at the instance.  As an example you can paste a url like the following one into your browser's location bar:
+At this point, you can check to make sure that at least the static content is available by pointing your browser at the instance.  As an example, you can paste a URL like the following one into your browser's location bar:
 
     http://ec2-XXX-XXX-XXX-XXX.compute-1.amazonaws.com
 
@@ -223,25 +223,25 @@ Just make sure to use the correct instance DNS name.
 
 ## Configuring the pvpython launcher
 
-The final step in this process is configuring the launcher for the pvpython visualization processes, and then starting up the launcher.  In this case, we will illustrate how to set up Jetty to handle this task.
+The final steps in this process are configuring the launcher for the pvpython visualization processes and starting the launcher.  We will illustrate how to set up Jetty to handle this task.
 
 Make a directory to hold the configuration file, the launcher jar, and the launcher logs.
 
     $ mkdir -p /home/ec2-user/ParaView/launcher/logs
     $ cd /home/ec2-user/ParaView/launcher
 q
-Download the launcher jar file from [here](http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.1.jar).  The launcher directory created in the previous step would be a good place to put it.  It might be more convenient to just do the following, as long as you are already in the "launcher" directory:
+Download the launcher jar file from [here](http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.1.jar).  The launcher directory created in the previous step would be a good place to put the launcher jar file.  It might be more convenient to just do the following, as long as you are already in the "launcher" directory:
 
     $ wget http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.1.jar
 
-Create a jetty configuration file by using directly or modifying the following example.  You will at least need to modify the hostname in the "pw.factory.session.url.generator.pattern" element.  The directory you created to hold the launcher logs would be a good place to put this configuration file, and you could call it "jetty-config.txt".
+Create a jetty configuration file by using directly or modifying the following example.  You will need to at least modify the hostname in the "pw.factory.session.url.generator.pattern" element.  The directory you created to hold the launcher logs would be a good place to put this configuration file, and you could call it "jetty-config.txt".
 
     # ===================================================
-    # Expect a configuration file as argument.
+    # Expect a configuration file as the argument
     #
     #  $ java -jar file.jar <config_file_path>.
     #
-    # The content of that file should look like that
+    # The content of that file should look like this
     # ===================================================
 
     # Web setup
@@ -302,7 +302,7 @@ Create a jetty configuration file by using directly or modifying the following e
 
     # ===================================================
 
-Once the launcher jar is downloaded and available, and once the config file is in place, it is almost time to start the launcher.  The final steps involve starting an X server (in the background), setting the DISPLAY environment variable, and finally running the launcher (also in the background).
+Once the launcher jar is downloaded and available, and once the config file is in place, it is almost time to start the launcher.  The final steps involve starting an X server (in the background), setting the DISPLAY environment variable, and running the launcher (also in the background).
 
     $ sudo X :0 &
     $ export DISPLAY=:0.0

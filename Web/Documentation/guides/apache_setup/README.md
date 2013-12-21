@@ -4,8 +4,10 @@
 
 Since Apache does not by default support web sockets, it is not the most
 straightforward approach for a ParaViewWeb deployment. However, many users
-require or employ such a front-end, so this document provides a step-by-step
+require or employ such a front-end application. Therefore, this document provides a step-by-step
 guide on how to setup such an environment.
+
+__Caution__: This installation focus on old Apache setup. The prefered setup should rely on Apache 2.4+ like described in the EC2 guide.
 
 ## Components overview
 
@@ -19,9 +21,9 @@ The two main components are:
 composes the web application that needs to be delivered via standard HTTP.
 
 In such a setup, the ParaView process acts as the web server and only a shared
-visualization can be achieved. In order to support multiple clients and
-therefore concurrent visualizations, a third component is needed that will act
-as a session manager by starting and stoping the ParaView sessions and
+visualization can be achieved. In order to support multiple clients and,
+therefore, concurrent visualizations, a third component is needed. This component will act
+as a session manager by starting and stopping the ParaView sessions and
 communication forwarder for the web socket.
 
 The following image illustrates what a multi-user deployment could look like
@@ -34,8 +36,8 @@ behind an Apache front-end, with a Java web server handling the ParaView process
 ### ParaView
 
 ParaView needs to be built from source in order to support the latest ParaViewWeb
-features. This section will assume a Unix-based environment and will go over the
-command lines needed for configuration, build, and installation of the ParaView
+features. This section will assume a Unix-based environment. It will detail the
+command lines needed for the configuration, build, and installation of the ParaView
 components for a ParaViewWeb deployment.
 
     $ cd ParaViewWeb
@@ -57,10 +59,9 @@ components for a ParaViewWeb deployment.
 
 ### ParaViewWeb
 
-In this example, ParaViewWeb is directly embedded inside the ParaView repository
-and building ParaView will create a web directory that should be served by apache.
+In this example, ParaViewWeb is directly embedded inside the ParaView repository. Building ParaView will create a web directory that should be served by Apache.
 In the Apache configuration, we use the following path '/home/pvw/ParaViewWeb/www'.
-Therefore, if you want to keep it that way you should execute the following command line.
+If you would like to continue using this path, you should execute the following command line.
 
     $ cp -r /home/pvw/ParaViewWeb/build/www /home/pvw/ParaViewWeb/www
 
@@ -71,11 +72,8 @@ One ParaViewWeb deployment involves a web front-end that accommodates concurrent
 ParaViewWeb visualization sessions.
 This session manager uses the Jetty libraries to provide a fully functional
 web server inside an embedded application. More information can be found on the
-[Jetty Sessions Manager](index.html#!/guide/jetty_session_manager) and developer
-team, and the executable can be downloaded
-[here](http://pvw.kitware.com/SessionManager/project-summary.html).
-
-The executable can be downloaded [here](http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.0.jar)
+[Jetty Sessions Manager](index.html#!/guide/jetty_session_manager) and from the developer
+team, and the executable can be downloaded [here](http://paraview.org/files/dependencies/ParaViewWeb/).
 
 Configuration file for the session manager executable: (pw-config.properties):
 
@@ -166,7 +164,7 @@ The following modules need to be installed and configured to enable the proxy co
 #### mod_python ####
 
 mod_pywebsocket is used by the websocket proxy to accept incoming websocket
-connections, it requires mod_python.
+connection. It requires mod_python.
 
     $ sudo apt-get install libapache2-mod-python
 
@@ -185,7 +183,7 @@ The following entries need to be added to the /etc/apache2/sites-available/pvw c
     AddHandler mod_python .py
     PythonHandler mod_python.publisher
 
-The configuration for the proxy is held in proxy.json, that looks like this:
+The configuration for the proxy is held in proxy.json. It looks like this:
 
     {
       "loggingConfiguration": "/home/pvw/proxy/logging.json",
@@ -197,13 +195,13 @@ The configuration for the proxy is held in proxy.json, that looks like this:
     }
 
 * *loggingConfigurations* - This is the path to the JSON file containing the Python logging configuration.
-* *connectionReaper.reapInterval* - This is the interval at which the connection reaper is run at in seconds.
+* *connectionReaper.reapInterval* - This is the interval, in seconds, at which the connection reaper is run.
 * *connectionReaper.connectionTimeout* - This is the length of time a connection can remain inactive before the connection will be cleaned up.
-* *sessionMappingFile* - This is the session mapping file produced by the session manager. It maps session IDs to connection endpoints,
-    the proxy uses this to know where to route sessions. See Session manager configuration for details
+* *sessionMappingFile* - This is the session mapping file produced by the session manager. It maps session IDs to connection endpoints.
+    The proxy uses this to know where to route sessions. See the Session manager configuration for details.
 
-Place the proxy.json configuration file in the home directory of the user used
-to run apache, usally /var/www
+Place the proxy.json configuration file in the home directory of the user utilized
+to run apache, which is usually /var/www
 
 #### Virtual host configuring ####
 

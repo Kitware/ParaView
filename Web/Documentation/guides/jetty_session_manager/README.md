@@ -2,10 +2,10 @@
 
 ## Introduction
 
-The Jetty session manager enables you easily deploy ParaViewWeb for multiple users
+The Jetty session manager enables you to easily deploy ParaViewWeb for multiple users
 with a very easy and less intrusive setup. This document covers the different
-steps to get the component, configure it, and run it to allow access to
-your ParaViewWeb backend.
+steps necessary to obtain the component, configure it, and run it to allow access to
+your ParaViewWeb back-end application.
 
 ## Role of that server/service
 
@@ -17,21 +17,21 @@ The following schema illustrates this setup:
 {@img images/ParaViewWeb-multiuser.png Standard Multi-user setup }
 
 The Jetty session manager, in its embedded version, does not provide any
-authentication or user-specific security, but such features can easily be added
+authentication or user-specific security. However, such features can easily be added
 in a custom environment.
 
 ## Download
 
-The first step is to to download the server, either through this
+The first step is to download the server by using this
 [link](http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.0.jar)
-or with the following command line.
+or by using the following command line.
 
     $ wget http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.0.jar
 
 ## Configuration
 
 In order to customize and configure the Jetty session manager web server, you
-will need to create a configuration file as follows, named pw-config.properties.
+will need to create a configuration file, named pw-config.properties, as follows:
 
     # Web setup
     pw.web.port=9000
@@ -84,7 +84,7 @@ will need to create a configuration file as follows, named pw-config.properties.
     pw.session.public.fields=id,sessionURL,name,description,sessionManagerURL,application,idleTimeout,startTime,file
     pw.session.max=10
 
-The following section of the configuration file will determine your setup and what
+The following section of the configuration file will determine your setup, as well as what
 type of application you will deploy.
 
     # Process commands
@@ -109,7 +109,7 @@ run the server.
 
     $ java -jar JettySessionManager-Server-1.0.jar /path_to_your_config_file/pw-config.properties
 
-To generate a default configuration file you can execute the following command line.
+To generate a default configuration file, you can execute the following command line.
 
     $ java -jar JettySessionManager-Server-1.0.jar > default-config.properties
 

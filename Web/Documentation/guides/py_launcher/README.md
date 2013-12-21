@@ -3,21 +3,21 @@
 ## Introduction
 
 When deploying ParaViewWeb for multiple users, you will need a launcher module that
-will start a new visualization process for each user that request one.
-This task could be achieved by the JettySessionManager, but we wanted to provide
-a simple answer without requirering any external component that is not already
+will start a new visualization process for each user that requests one.
+This task could be achieved by the JettySessionManager. However, we wanted to provide
+a simple answer that did not require the use of an external component that is not already
 available within the ParaView binaries.
-Hence we build a Python based process launcher that follow the ParaViewWeb RESTful API
-for launching new visualization process.
+Hence, we built a Python based process launcher that follows the ParaViewWeb RESTful API
+for launching a new visualization process.
 This document will first explain the expected RESTful API for launching a ParaViewWeb
-process and then will focus on how to customize the service for a real deployment.
+process. It will then focus on how to customize the service for a real deployment.
 
 ## Process launcher RESTful API
 
-VTKWeb/ParaViewWeb come with a JavaScript library which allow the user to
-trigger new process on the server side in a configurable manner.
+VTKWeb/ParaViewWeb come with a JavaScript library, which allows the user to
+trigger a new process on the server side in a configurable manner.
 
-The following code example illustrate what can be done on the client side and
+The following code example illustrates what can be done on the client side, and
 we will explain what should be expected by the server.
 
     var config = {
@@ -35,23 +35,23 @@ we will explain what should be expected by the server.
     });
 
 The following client will trigger a __POST__ request on __http://localhost:8080/paraview__
-with the given __config__ object as payload. As a response the server should return the
+with the given __config__ object as payload. As a response, the server should return the
 same __config__ object with additional keys such as:
 
 - __sessionURL__: contains the WebSocket URL where the client should connect to in order
 to connect to the newly started process. (ws://localhost:8080/proxy?id=2354623546)
 - __secret__: contains the password that should be used to authenticate the client on the WebSocket connection.
-- __id__: contains the session ID that can be used to query the launcher in order to retreive the full connection information.
+- __id__: contains the session ID that can be used to query the launcher in order to retrieve the full connection information.
 
-In case of a 2 step connection, a client may want to trigger a __GET__ request on
+In the case of a two-step connection, a client may want to trigger a __GET__ request on
 __http://localhost:8080/paraview/${sessionID}__ in order to get the full __config__
-object illustred earlier.
+object illustrated earlier.
 
-Then, the launcher should also be capable of stopping a running process by triggering
-a __DELETE__ request on __http://localhost:8080/paraview/${sessionID}__ which will also
-returned the same __config__ object illustred earlier.
+The launcher should now also be capable of stopping a running process by triggering
+a __DELETE__ request on __http://localhost:8080/paraview/${sessionID}__. This will
+return the same __config__ object illustrated earlier.
 
-### RESTful Cheatsheet
+### RESTful Cheat sheet
 
 | URL                       | HTTP Method | Upload content | Download content |
 |:-------------------------:|:-----------:|:--------------:|:----------------:|
@@ -63,8 +63,8 @@ returned the same __config__ object illustred earlier.
 
 ### Configuration
 
-The launcher server will rely on a configuration file that will provides all the required information
-for the service to run. The following listing illustrate what that file could contains.
+The launcher server will rely on a configuration file that will provide all of the information required
+for the service to run. The following listing illustrates what that file could contain.
 
 __launcher.config__
 
@@ -85,12 +85,6 @@ __launcher.config__
         "upload_dir" : "/.../uploadDirectory",        # Start file upload server on same port as launcher
         "fields" : ["file", "host", "port", "updir"]  # Fields not listed are filtered from response
       },
-
-      ## ===============================
-      ## Useful session vars for client
-      ## ===============================
-
-      "sessionData" : { "updir": "/Home" }         # Tells client which path to updateFileBrowser after uploads
 
       ## ===============================
       ## Resources list for applications
@@ -144,9 +138,9 @@ or inside VTK
     $ cd VTK/build
     $ ./bin/vtkpython Wrapping/Python/vtk/web/launcher.py launcher.config
 
-Then once the service receive a POST request it will trigger a new command line which will have its output redirected to __/tmp/pw-log/${session_id}.log__ where the __${session_id}__ will be a unique generated string that will ID the given process.
+Then, once the service receives a POST request, it will trigger a new command line, which will have its output redirected to __/tmp/pw-log/${session_id}.log__ where the __${session_id}__ will be a unique generated string that will ID the given process.
 
-For example, if the client send the given JSON payload
+For example, if the client sends the given JSON payload
 
     {
     'sessionManagerURL': 'http://localhost:8080/paraview',
