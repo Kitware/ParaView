@@ -8,10 +8,15 @@
       "title": "Quick start",
       "description": "This quick start guide show how to test quicly ParaViewWeb locally."
     },{
-      "name": "architecture",
-      "url": "guides/architecture",
-      "title": "Architecture",
-      "description": "This guide go through the design evolution while explaining why we made the choices that we made."
+          "name": "architecture",
+          "url": "guides/architecture",
+          "title": "Architecture",
+          "description": "This guide go through the design evolution while explaining why we made the choices that we made."
+    },{
+          "name": "ipython",
+          "url": "guides/ipython",
+          "title": "ParaViewWeb inside iPython",
+          "description": "This documentation explain how to setup iPython/notebook along ParaViewWeb with distributed MPI engines and live visualization."
     }
   ]
   },{
