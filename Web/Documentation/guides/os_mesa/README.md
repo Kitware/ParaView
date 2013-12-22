@@ -1,17 +1,17 @@
-# How to build an Offscreen ParaViewWeb server
+# How to build an Off-screen ParaViewWeb server
 
 ## Introduction
 
-Web server don't always comes with GPU, moreover small 3D model can easily be handle by software rendering.
-This documentation will focus on how to build ParaView so it can be used in a headless environemnt for ParaViewWeb. This only apply for a Linux base system.
+Web servers do not always come with a GPU. In addition, small 3D models can easily be handled by software rendering.
+This documentation will focus on how to build ParaView so that it can be used in a headless environment for ParaViewWeb. This only applies for a Linux base system.
 
 ## Building the application
 
 ### OSMesa
 
-More informations can be found in the [wiki](http://paraview.org/Wiki/ParaView/ParaView_And_Mesa_3D) but this page provide a nice and easy summary.
+More informations can be found in the [wiki](http://paraview.org/Wiki/ParaView/ParaView_And_Mesa_3D), but this page provides a nice and easy summary.
 
-The Mesa 9.2.2 OSMesa Gallium llvmpipe state-tracker is the preferred Mesa back-end renderer for ParaView and VTK. The following shows how to configure it with system installed LLVM. Our strategy is to configure Mesa with the minimal options needed for OSMesa. This greatly simplifies the build as many of the other drivers/renderers depend on X11 or other libraries. The following set of options are from Mesa v9.2.2 release, older or newer releases may require slightly different options, consult ./configure --help for the details.
+The Mesa 9.2.2 OSMesa Gallium llvmpipe state-tracker is the preferred Mesa back-end renderer for ParaView and VTK. The following shows how to configure it with system installed LLVM. Our strategy is to configure Mesa with the minimal number of options needed for OSMesa. This greatly simplifies the build, as many of the other drivers/renderers depend on X11 or other libraries. The following set of options are from the Mesa v9.2.2 release. Older or newer releases may require slightly different options. Consult ./configure --help for the details.
 
     #!/bin/bash
 
@@ -42,10 +42,10 @@ The Mesa 9.2.2 OSMesa Gallium llvmpipe state-tracker is the preferred Mesa back-
 Some explanation of these options:
 
 * DEFAULT_SOFTWARE_DEPTH_BITS=31
-This sets the internal depth buffer precision for the OSMesa rendering context. In our experrience this is necessary to avoid z-buffer fighting during parallel rendering. Note that we've used this in-place of --with-osmesa-bits=32, which sets both depthbuffer and colorbuffers to 32 bit precision. Because of a bug in Mesa this introduces over 80 ctest regression failures in VTK related to line drawing.
+This sets the internal depth buffer precision for the OSMesa rendering context. In our experience, this is necessary to avoid z-buffer fighting during parallel rendering. Note that we have used this in-place of --with-osmesa-bits=32, which sets both depth buffer and color buffers to 32 bit precision. Because of a bug in Mesa, this introduces over 80 ctest regression failures in VTK related to line drawing.
 
 * --enable-texture-float
-Floating point textures are disabled by default due to patent restrictions. This must be enabled for many advanced VTK algorithms.
+Floating point textures are disabled by default due to patent restrictions. They must be enabled for many advanced VTK algorithms.
 
 ### ParaView
 
@@ -82,7 +82,7 @@ __Only needed for real deployment.__
 
 ### Launcher
 
-We provide 2 implementation of the process launcher but one is already embeded inside ParaView, hence we will explain how to configure this one. More information can be read on the Java based implementation [here](index.html#!/guide/jetty_session_manager) or the python one
+We provide two implementations of the process launcher. One, however, is already embedded inside ParaView. Hence, we will explain how to configure this one. More information can be read on the Java-based implementation, which can be found [here](index.html#!/guide/jetty_session_manager) or on the python-based implementation, which can be found
 [here](index.html#!/guide/py_launcher).
 
 
@@ -95,7 +95,7 @@ Path to replace:
 - __properties.pvweb__: Path to the directory that contains all ParaViewWeb python files.
 - __properties.data__: Path to the directory to share.
 
-To configure your launcher, you will need to create a configuration file like follow (__config.json__):
+To configure your launcher, you will need to create a configuration file like the following (__config.json__):
 
     {
      "configuration": {
@@ -134,6 +134,6 @@ To configure your launcher, you will need to create a configuration file like fo
      }
     }
 
-Then in order to run the launcher just execute:
+Then, in order to run the launcher, just execute:
 
     $ ./bin/pvpython /.../vtk/web/launcher.py config.json

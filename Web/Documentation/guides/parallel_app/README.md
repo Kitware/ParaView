@@ -2,58 +2,55 @@
 
 ## Introduction
 
-As opposed to VTK-Web, ParaViewWeb can run on a distributed environment using MPI
-and use composite rendering for large dataset.
-In order to use ParaViewWeb in a distributed context, like regular ParaView,
+As opposed to VTK-Web, ParaViewWeb can run on a distributed environment using MPI.
+ParaViewWeb can also use composite rendering for a large dataset.
+In order to use ParaViewWeb in a distributed context, such as regular ParaView,
 you will need to start a remote server with several processes using MPI.
-Then you will need to provide the proper host and port information to the
+Then, you will need to provide the proper host and port information to the
 visualization application that you plan to use.
 
-In the set of applications provided within ParaView, one of them illustrate
-how to achieve it. The aims of tha documentation is to properly walk you
-through all the configuration and deployment steps that are required for it
-to work.
+In the set of applications provided within ParaView, one of them illustrates
+how to accomplish this. The aim of the documentation is to properly walk you
+through all the required configuration and deployment steps.
 
 ## The Parallel Web application
 
-The Parallel application let the user pick a setting that he wants to use
+The Parallel application allows the user to pick a setting that he or she wants to use
 for an existing Web application.
-This setting can be the number of processes that should be used to run
-the server on but also what file should be pre-loaded.
-But this can be extended to customize the way the server get launched and
-what the client should do onced loaded.
+Examples settings include the number of processes that should be used to run
+the server and the file that should be pre-loaded.
+In addition, the application can be extended to customize the way the server is launched, as well as
+what the client should do once the server is loaded.
 
-The following picture illustrate what the application looks like.
+The following picture illustrates what the application looks like.
 
 {@img images/Parallel-WebApp.png The ParaViewWeb parallel application }
 
 ## How it works
 
-The Parallel application is just using an intermediate launcher that will process
-extra informations such as the application name and the number on nodes.
-Based on those options, that intermediate launcher will start pvserver using
+The Parallel application simply uses an intermediate launcher to process
+extra information such as the application name and the number of nodes.
+Based on those options, the intermediate launcher will start pvserver using
 MPI and then connect the client to that distributed server using the appropriate
 python web server.
 
-Then on the client side, the page will reload the targetted web application
-using a new URL with additional parameters such as the file name to load and
-the session that should be use to connect to that was previously started.
+Then, on the client side, the page will reload the targeted web application using a new URL. This web application has additional parameters, such as the file name to load and the session that should be used to connect to the previously started pvserver instance.
 
 ## How to deploy
 
 ### Extend Multi-Session configuration
 
-In this example we will assume that you are using the JettySessionManager
-to achive the launch of the ParaViewWeb process.
-In that case, you will need to extend you existing configuration to register
-a "launcher" application which is simply the script that is provided later as a reference.
+In this example, we will assume that you are using the JettySessionManager
+to launch the ParaViewWeb process.
+In that case, you will need to extend your existing configuration to register
+a "launcher" application, which is simply the script that is provided later as a reference.
 
     pw.launcher.cmd=./launcher.sh PORT CLIENT RESOURCES FILE SECRET
     pw.launcher.cmd.run.dir=/path-that-contains-launcher-script
     pw.launcher.cmd.map=PORT:getPort|SECRET:secret|CLIENT:client|FILE:file|RESOURCES:resources
 
-But also, we need to make sure the extended key that we are using will be provided to
-the client. In order to do that you will need to extend the property __pw.session.public.fields__ with the following set of keys: [file, (any other that you may have added yourself) ]
+In addition, we need to make sure the extended key that we are using will be provided to
+the client. In order to do so, you will need to extend the property __pw.session.public.fields__ with the following set of keys: [file, (any other that you may have added yourself) ]
 
     pw.session.public.fields=id,sessionURL,name,description,sessionManagerURL,application,idleTimeout,startTime,secret,file
 
@@ -127,11 +124,11 @@ Here is the content of the launcher.sh bash script:
 
 ## Customize the values of the form
 
-The application automatically download a JSON file for each field.
+The application automatically downloads a JSON file for each field.
 In order to present other default options, you will need to edit
-the JSON files present in the www/apps/Parallel/ directory.
+the JSON files located in the www/apps/Parallel/ directory.
 
-Here is the current for those files:
+Here is the information for those files:
 
 __client.json__ provide the list of possible application that the user can choose from.
 
