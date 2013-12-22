@@ -1434,8 +1434,7 @@
                          default_values="1"
                          name="ModeShape"
                          number_of_elements="1">
-        <IntRangeDomain foo="1"
-                        name="range">
+        <IntRangeDomain name="range">
           <RequiredProperties>
             <Property function="Range"
                       name="TimeStepRangeInfo" />
@@ -1458,7 +1457,6 @@
                             element_types="2 0"
                             information_property="EdgeBlockArrayInfo"
                             name="EdgeBlocks"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1480,7 +1478,6 @@
                             element_types="2 0"
                             information_property="FaceBlockArrayInfo"
                             name="FaceBlocks"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1560,7 +1557,6 @@
                             element_types="2 0"
                             information_property="PointVariablesInfo"
                             name="PointVariables"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1580,7 +1576,6 @@
                             element_types="2 0"
                             information_property="EdgeVariablesInfo"
                             name="EdgeVariables"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1602,7 +1597,6 @@
                             element_types="2 0"
                             information_property="FaceVariablesInfo"
                             name="FaceVariables"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1624,7 +1618,6 @@
                             element_types="2 0"
                             information_property="ElementVariablesInfo"
                             name="ElementVariables"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1645,7 +1638,6 @@
                             element_types="2 0"
                             information_property="NodeMapInfo"
                             name="NodeMapArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1670,7 +1662,6 @@
                             element_types="2 0"
                             information_property="EdgeMapInfo"
                             name="EdgeMapArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1693,7 +1684,6 @@
                             element_types="2 0"
                             information_property="FaceMapInfo"
                             name="FaceMapArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1716,7 +1706,6 @@
                             element_types="2 0"
                             information_property="ElementMapInfo"
                             name="ElementMapArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1741,7 +1730,6 @@
                             element_types="2 0"
                             information_property="NodeSetInfo"
                             name="NodeSetArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1766,7 +1754,6 @@
                             element_types="2 0"
                             information_property="SideSetInfo"
                             name="SideSetArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1793,7 +1780,6 @@
                             element_types="2 0"
                             information_property="FaceSetInfo"
                             name="FaceSetArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1818,7 +1804,6 @@
                             element_types="2 0"
                             information_property="EdgeSetInfo"
                             name="EdgeSetArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1843,7 +1828,6 @@
                             element_types="2 0"
                             information_property="ElementSetInfo"
                             name="ElementSetArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1868,7 +1852,6 @@
                             element_types="2 0"
                             information_property="ElementSetResultArrayInfo"
                             name="ElementSetResultArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1893,7 +1876,6 @@
                             element_types="2 0"
                             information_property="SideSetResultArrayInfo"
                             name="SideSetResultArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1920,7 +1902,6 @@
                             element_types="2 0"
                             information_property="FaceSetResultArrayInfo"
                             name="FaceSetResultArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1945,7 +1926,6 @@
                             element_types="2 0"
                             information_property="EdgeSetResultArrayInfo"
                             name="EdgeSetResultArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">
@@ -1970,7 +1950,6 @@
                             element_types="2 0"
                             information_property="NodeSetResultArrayInfo"
                             name="NodeSetResultArrayStatus"
-                            number_of_elements="2"
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <ArraySelectionDomain name="array_list">

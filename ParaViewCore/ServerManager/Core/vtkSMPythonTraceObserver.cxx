@@ -22,46 +22,36 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkWeakPointer.h"
 
-//-----------------------------------------------------------------------------
-class vtkSMPythonTraceObserverCommandHelper : public vtkCommand
-{
-public:
-  static vtkSMPythonTraceObserverCommandHelper* New()
-    { 
-    return new vtkSMPythonTraceObserverCommandHelper; 
-    }
-  
-  void SetTarget(vtkSMPythonTraceObserver* t)
-    {
-    this->Target = t;
-    }
-
-  virtual void Execute(vtkObject* caller, unsigned long eventid, void* data)
-    {
-    if (this->Target)
-      {
-      this->Target->ExecuteEvent(caller, eventid, data);
-      }
-    }
-
-private:
-  vtkSMPythonTraceObserverCommandHelper()
-    {
-    this->Target = 0;
-    }
-
-  vtkSMPythonTraceObserver* Target;
-};
+#include <vector>
 
 //-----------------------------------------------------------------------------
 class vtkSMPythonTraceObserver::vtkInternal {
 public:
   vtkWeakPointer<vtkSMSessionProxyManager> SessionProxyManager;
+  vtkWeakPointer<vtkSMPluginManager> PluginManager;
+
   vtkSMProxyManager::RegisteredProxyInformation LastRegisterProxyInfo;
   vtkSMProxyManager::RegisteredProxyInformation LastUnRegisterProxyInfo;
   vtkSMProxyManager::ModifiedPropertyInformation LastModifiedPropertyInfo;
   const char* LastLocalPluginLoaded;
   const char* LastRemotePluginLoaded;
+
+  std::vector<unsigned long> PXMObserverIds;
+  std::vector<unsigned long> PMObserverIds;
+
+  ~vtkInternal()
+    {
+    for (size_t cc=0;
+      (this->SessionProxyManager != NULL) && (cc < this->PXMObserverIds.size()); cc++)
+      {
+      this->SessionProxyManager->RemoveObserver(this->PXMObserverIds[cc]);
+      }
+    for (size_t cc=0;
+      (this->PluginManager != NULL) && (cc < this->PMObserverIds.size()); cc++)
+      {
+      this->PluginManager->RemoveObserver(this->PMObserverIds[cc]);
+      }
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -71,34 +61,46 @@ vtkStandardNewMacro(vtkSMPythonTraceObserver);
 vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
 {
   this->Internal = new vtkInternal;
-
-  this->Observer = vtkSMPythonTraceObserverCommandHelper::New();
-  this->Observer->SetTarget(this);
-
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
   vtkSMPluginManager *pm =
     vtkSMProxyManager::GetProxyManager()->GetPluginManager();
 
-  if(!pxm)
+  if (!pxm)
     {
     vtkWarningMacro("No ProxyManager available. No Observation will be made");
     return;
     }
 
-  // Add observer for certain proxy manager events.
+  if (!pm)
+    {
+    vtkWarningMacro("No PluginManager available. Something must be incorrect.");
+    return;
+    }
+
+  // Add observers for certain proxy manager events.
   // Use a high priority for the RegisterEvent so that the trace
   // observer is notified before other observers.  Other observers
   // may modify properties on the newly registered proxy during their
   // RegisterEvent handlers.  We don't want the trace observer to see
   // the property modifications before it has seen the RegisterEvent.
-  pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer, 100);
-  pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer);
-  pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
-  pxm->AddObserver(vtkCommand::UpdateInformationEvent, this->Observer);
-  pm->AddObserver(vtkSMPluginManager::LocalPluginLoadedEvent, this->Observer);
-  pm->AddObserver(vtkSMPluginManager::RemotePluginLoadedEvent, this->Observer);
+  
+  std::vector<unsigned long> &pxmObserverIds = this->Internal->PXMObserverIds;
+  pxmObserverIds.push_back(pxm->AddObserver(vtkCommand::RegisterEvent,
+      this, &vtkSMPythonTraceObserver::EventCallback, 100));
+  pxmObserverIds.push_back(pxm->AddObserver(vtkCommand::UnRegisterEvent,
+      this, &vtkSMPythonTraceObserver::EventCallback));
+  pxmObserverIds.push_back(pxm->AddObserver(vtkCommand::PropertyModifiedEvent,
+      this, &vtkSMPythonTraceObserver::EventCallback));
+  pxmObserverIds.push_back(pxm->AddObserver(vtkCommand::UpdateInformationEvent,
+      this, &vtkSMPythonTraceObserver::EventCallback));
+
+  std::vector<unsigned long> &pmObserverIds = this->Internal->PMObserverIds;
+  pmObserverIds.push_back(pm->AddObserver(vtkSMPluginManager::LocalPluginLoadedEvent,
+      this, &vtkSMPythonTraceObserver::EventCallback));
+  pmObserverIds.push_back(pm->AddObserver(vtkSMPluginManager::RemotePluginLoadedEvent,
+      this, &vtkSMPythonTraceObserver::EventCallback));
 
   // Keep the session proxy manager around so we can unregiter observers
   // to the correct one.
@@ -108,19 +110,12 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
 //-----------------------------------------------------------------------------
 vtkSMPythonTraceObserver::~vtkSMPythonTraceObserver()
 {
-  vtkSMSessionProxyManager* pxm = this->Internal->SessionProxyManager.GetPointer();
-  if (pxm)
-    {
-    pxm->RemoveObserver(this->Observer);
-    }
-
-  this->Observer->SetTarget(NULL);
-  this->Observer->Delete();
   delete this->Internal;
+  this->Internal = NULL;
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPythonTraceObserver::ExecuteEvent(vtkObject* vtkNotUsed(caller), 
+void vtkSMPythonTraceObserver::EventCallback(vtkObject* vtkNotUsed(caller), 
   unsigned long eventid, void* data)
 {
   switch (eventid)

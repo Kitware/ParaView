@@ -159,7 +159,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
 
     # update trace globals.
     smtrace.trace_globals.proxy_ctor_hook = staticmethod(cp_hook)
-    smtrace.trace_globals.trace_output = []
+    smtrace.trace_globals.trace_output.clear()
 
     # Get list of proxy lists
     proxy_lists = smstate.get_proxy_lists_ordered_by_group(WithRendering=cpstate_globals.export_rendering)
@@ -198,7 +198,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
     pipelineClassDef += "    class Pipeline:\n";
 
     # add the traced code.
-    for original_line in smtrace.trace_globals.trace_output:
+    for original_line in smtrace.trace_globals.trace_output.raw_data():
         for line in original_line.split("\n"):
             pipelineClassDef += "      " + line + "\n";
     smtrace.clear_trace()
