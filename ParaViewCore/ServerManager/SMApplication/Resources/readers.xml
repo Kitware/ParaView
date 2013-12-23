@@ -5472,50 +5472,6 @@
       </Hints>
       <!-- End TIFFReader -->
     </SourceProxy>
-    <SourceProxy class="vtkSESAMEReader"
-                 label="SESAME Reader"
-                 name="SESAMEReader">
-      <Documentation long_help="Reads SESAME data files, producing rectilinear grids."
-                     short_help="Read SESAME data files.">The SESAME reader
-                     reads SESAME data files, and outputs rectilinear grids.
-                     The expected file extension is .sesame.</Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the file name for the SESAME
-        reader.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetTable"
-                         default_values="-1"
-                         name="TableId"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <RequiredProperties>
-            <Property function="Enumeration"
-                      name="TableIds" />
-          </RequiredProperties>
-        </EnumerationDomain>
-        <Documentation>This proeprty indicates which table to
-        read.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="GetTableIdsAsArray"
-                         information_only="1"
-                         name="TableIds">
-        <IntArrayInformationHelper />
-      </IntVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="TableArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Table" />
-      </StringVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="sesame"
-                       file_description="SESAME" />
-      </Hints>
-      <!-- End SESAMEReader -->
-    </SourceProxy>
     <!-- Beginning of OpenFOAM Reader -->
     <SourceProxy class="vtkPOpenFOAMReader"
                  name="OpenFOAMReader">
