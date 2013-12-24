@@ -712,3 +712,69 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
                 groups.remove(groupIdx[gName])
 
         return result
+
+# =============================================================================
+#
+# Handle Data Selection
+#
+# =============================================================================
+
+class ParaViewWebSelectionHandler(ParaViewWebProtocol):
+
+    def __init__(self):
+        self.active_view = None
+        self.previous_interaction = -1
+        self.selection_type = -1
+
+    @exportRpc("startSelection")
+    def startSelection(self, viewId, selectionType):
+        """
+        Method used to initialize an interactive selection
+        """
+        self.active_view = self.getView(viewId)
+        if self.active_view.IsSelectionAvailable():
+            self.previous_interaction = self.active_view.InteractionMode
+            self.active_view.InteractionMode = vtkPVRenderView.INTERACTION_MODE_SELECTION
+        else:
+            self.active_view = None
+
+    @exportRpc("endSelection")
+    def endSelection(self, area):
+        """
+        Method used to finalize an interactive selection by providing
+        the [ startPointX, startPointY, endPointX, endPointY ] area
+        where (0,0) match the lower left corner of the pixel screen.
+        """
+        if self.active_view:
+            representations = vtkCollection()
+            sources = vtkCollection()
+            self.active_view.SelectSurfacePoints(area, representations, sources, False)
+            print "representations..."
+            print representations
+            print "sources..."
+            print sources
+            self.active_view.InteractionMode = self.previous_interaction
+
+# =============================================================================
+#
+# Handle Data Export
+#
+# =============================================================================
+
+class ParaViewWebExportData(ParaViewWebProtocol):
+
+    def __init__(self, basePath):
+        self.base_export_path = basePath
+
+    @exportRpc("exportData")
+    def exportData(self, proxy_id, path):
+        proxy = self.mapIdToProxy(proxy_id)
+        fullpath = os.path.join(self.baseDirectory, path)
+        if fullpath.indexOf('.vtk') == -1:
+            fullpath += '.vtk'
+        parentDir = os.path.dirname(fullpath)
+        if not os.path.exists(parentDir):
+            os.makedirs(parentDir)
+        if proxy:
+            writer = simple.DataSetWriter(Input=proxy, FileName=fullpath)
+            del writer
