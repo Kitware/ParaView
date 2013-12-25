@@ -637,6 +637,7 @@
       <!-- End IntegrateFlowThroughSurface -->
     </SourceProxy>
     <!-- ==================================================================== -->
+#ifdef PARAVIEW_USE_MPI
     <SourceProxy class="vtkAllToNRedistributePolyData"
                  label="All to N"
                  multiprocess_support="multiple_processes"
@@ -693,6 +694,7 @@
       </InputProperty>
       <!-- End Balance -->
     </SourceProxy>
+#endif
     <!-- ==================================================================== -->
     <SourceProxy class="vtkMergeArrays"
                  label="Append Attributes"
@@ -1534,6 +1536,7 @@ found and the point will be rejected.</Documentation>
       <!-- End DecimatePro -->
     </SourceProxy>
     <!-- ==================================================================== -->
+#ifdef PARAVIEW_USE_MPI
     <SourceProxy class="vtkDistributedDataFilter"
                  label="D3"
                  multiprocess_support="multiple_processes"
@@ -1590,6 +1593,7 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
       <!-- End D3 -->
     </SourceProxy>
+#endif
     <!-- ==================================================================== -->
     <SourceProxy class="vtkElevationFilter"
                  label="Elevation"
