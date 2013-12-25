@@ -2,9 +2,6 @@ r"""
 smtrace module is used for tracing.
 """
 # BUG LIST:
-# - GetTimeTrack() needs to be called for time-track to be setup for readers to
-#   work correctly. Needs to be fixed. Fix for this maybe to fix
-#   simple.GetAnimationScene() to set up the time-track too.
 # - stepping through animation doesn't get traced properly.
 
 import simple

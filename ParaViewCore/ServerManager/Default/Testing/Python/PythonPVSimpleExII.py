@@ -47,3 +47,25 @@ if 'ACCL' in fields:
 
 reader.UpdatePipeline()
 
+# Now test that the default animation is setup correctly for the data.
+Show()
+
+RenderView1 = Render()
+RenderView1.CameraPosition = [0.21706008911132812, 55.74057374685633, -5.110947132110596]
+RenderView1.CameraViewUp = [0.0, 0.0, 1.0]
+RenderView1.CameraFocalPoint = [0.21706008911132812, 4.0, -5.110947132110596]
+ResetCamera()
+
+GetAnimationScene().GoToLast()
+GetAnimationScene().Play()
+GetAnimationScene().GoToFirst()
+GetAnimationScene().GoToLast()
+GetAnimationScene().GoToPrevious()
+GetAnimationScene().GoToPrevious()
+GetAnimationScene().GoToPrevious()
+GetAnimationScene().GoToPrevious()
+GetAnimationScene().GoToNext()
+
+if not smtesting.DoRegressionTesting(GetActiveView().SMProxy):
+  # This will lead to VTK object leaks.
+  sys.exit(1)
