@@ -130,23 +130,19 @@ def format_simple_proxy_directive(prx, package='paraview', module='simple'):
     import parse_pydoc_output
     parser = parse_pydoc_output.ParsePyDocOutput('%s.%s' %(package, module),
         ['servermanager'], prx)
-    directive += '\n\n``Data Descriptors``\n'
-    directive += '{:-^79}\n\n'.format('')
+    directive += format_heading(2, 'Data Descriptors')
     directive += '%s\n\n' % parser.data_mems.replace('*', '\\*')
     inh_data_mems = parser.inh_data_mems
     for inh_data_mem in inh_data_mems:
-        directive += '\n\n``Data Descriptors inherited from %s``\n'\
-            % inh_data_mem
-        directive += '{:~^79}\n\n'.format('')
+        directive += format_heading(3, 'Data Descriptors inherited from %s'\
+            % inh_data_mem)
         directive += '%s\n\n' % inh_data_mems[inh_data_mem].replace('*', '\\*')
-    directive += '\n\n``Methods``\n'
-    directive += '{:-^79}\n\n'.format('')
+    directive += format_heading(2, 'Methods')
     directive += '%s\n\n' % parser.method_mems.replace('*', '\\*')
     inh_method_mems = parser.inh_method_mems
     for inh_method_mem in inh_method_mems:
-        directive += '\n\n``Methods inherited from %s``\n'\
-            % inh_method_mem
-        directive += '{:~^79}\n\n'.format('')
+        directive += format_heading(3, 'Methods inherited from %s'\
+            % inh_method_mem)
         directive += '%s\n\n' % inh_method_mems[inh_method_mem].replace('*', '\\*')
     return directive
 
@@ -170,7 +166,7 @@ def create_simple_module_files(package, module, proxy, opts):
     write_file(makename(package, module), text, opts)
 
     # Create a common summary page for all generated proxies
-    text = format_heading(1, 'servermanager proxies')
+    text = format_heading(1, 'Available readers, sources, writers, filters and animation cues')
     text += "Proxies generated for server side objects "\
             "under :doc:`paraview.simple`\n\n"
     text += format_simple_directive(module, gen_prx, package, False)
@@ -178,10 +174,10 @@ def create_simple_module_files(package, module, proxy, opts):
 
     # Create a separate file for each proxy
     for prx in gen_prx:
-        text = format_heading(2, '%s.%s.%s' % (package, module, prx))
+        text = format_heading(1, '%s.%s.%s' % (package, module, prx))
         text += format_simple_proxy_directive(prx)
         text += '\n\nFor the full list of servermanager proxies, please refer to '\
-                ':doc:`serververmanager proxies <paraview.servermanager_proxies>`'
+                ':doc:`Available readers, sources, writers, filters and animation cues <paraview.servermanager_proxies>`'
         write_file(makename('%s.%s' % (package, module), prx), text, opts)
 
 def create_package_file(root, master_package, subroot, py_files, opts, subs):
