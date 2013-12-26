@@ -85,9 +85,13 @@ namespace
     paths_to_search.push_back(app_dir + "/../lib/");
     paths_to_search.push_back(app_dir + "/plugins/" + plugin);
 #if defined(__APPLE__)
+    // paths for app
     paths_to_search.push_back(app_dir + "/../Plugins");
     paths_to_search.push_back(app_dir + "/../../..");
     paths_to_search.push_back(app_dir + "/../../../../lib");
+
+    // paths when doing an unix style install.
+    paths_to_search.push_back(app_dir +"/../lib/paraview-" PARAVIEW_VERSION);
 #endif
     // On windows configuration files are in the parent directory
     paths_to_search.push_back(app_dir + "/../");

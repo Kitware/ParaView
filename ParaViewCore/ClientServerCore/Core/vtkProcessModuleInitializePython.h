@@ -170,13 +170,21 @@ namespace
   //      - LIB_DIR
   //    + ParaView Python modules
   //      - LIB_DIR/site-packages
-  //  + INSTALL_LOCATION
+  //  + INSTALL_LOCATION (APP)
   //    - APP_ROOT
   //      - SELF_DIR/../..        (this is same for paraview and pvpython)
   //    - ParaView C/C++ library location
   //      - APP_ROOT/Contents/Libraries/
   //    - ParaView Python modules
   //      - APP_ROOT/Contents/Python
+  //  + INSTALL_LOCATION (UNIX STYLE)
+  //    + SELF_DIR is "bin"
+  //    + ParaView C/C++ library location
+  //      - SELF_DIR/../lib/paraview-<major>.<minor>
+  //    + ParaView Python modules
+  //      - SELF_DIR/../lib/paraview-<major>.<minor>/site-packages
+  //    + VTK Python Module libraries
+  //      - SELF_DIR/../lib/paraview-<major>.<minor>/site-packages/vtk
   //===========================================================================
   void vtkPythonAppInitPrependPathOsX(const std::string &SELF_DIR)
     {
@@ -193,10 +201,25 @@ namespace
     lib_dir = vtksys::SystemTools::CollapseFullPath(lib_dir.c_str());
 
     bool is_build_dir = vtksys::SystemTools::FileExists(lib_dir.c_str());
-    if (is_build_dir)
+
+    // when we install on OsX using unix-style the test for is_build_dir is
+    // valid for install dir too. So we do an extra check.
+    bool is_unix_style_install = vtksys::SystemTools::FileExists(
+      (lib_dir + "/paraview-" PARAVIEW_VERSION).c_str());
+    if (is_build_dir && !is_unix_style_install)
       {
       vtkPythonAppInitPrependPythonPath(lib_dir);
       vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages");
+      }
+    else if (is_unix_style_install)
+      {
+      lib_dir = lib_dir + "/paraview-" PARAVIEW_VERSION;
+      vtkPythonAppInitPrependPythonPath(lib_dir);
+      vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages");
+      // site-packages/vtk needs to be added so the Python wrapped VTK modules
+      // can be loaded from paraview e.g. import vtkCommonCorePython can work
+      // (BUG #14263).
+      vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages/vtk");
       }
     else
       {

@@ -263,6 +263,34 @@ FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
   $ENV{PARAVIEW_DATA_ROOT})
 
 if (APPLE)
+  option(PARAVIEW_DO_UNIX_STYLE_INSTALLS
+    "When enabled, install will result in unix-style install rather than an OsX app"
+    OFF)
+  mark_as_advanced(PARAVIEW_DO_UNIX_STYLE_INSTALLS)
+endif()
+if (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
+  # We are doing a unix-style install i.e. everything will be installed in
+  # CMAKE_INSTALL_PREFIX/bin and CMAKE_INSTALL_PREFIX/lib etc. as on other unix
+  # platforms. We still need to setup CMAKE_INSTALL_NAME_DIR correctly so that
+  # the binaries point to appropriate location for the libraries.
+
+  # 1. Make CMAKE_INSTALL_PREFIX publicly accessible, if it was hidden in
+  #    previous pass
+  get_property(is_internal CACHE CMAKE_INSTALL_PREFIX PROPERTY TYPE)
+  if (is_internal STREQUAL "INTERNAL")
+    set (CMAKE_INSTALL_PREFIX ${CACHED_CMAKE_INSTALL_PREFIX} CACHE PATH "Install prefix" FORCE)
+  else()
+    set (CMAKE_INSTALL_PREFIX ${CACHED_CMAKE_INSTALL_PREFIX} CACHE PATH "Install prefix")
+  endif()
+  unset(MACOSX_APP_INSTALL_PREFIX CACHE)
+
+  # Set CMAKE_INSTALL_NAME_DIR to point to the libraries directory relative to
+  # the executable.
+  set(CMAKE_INSTALL_NAME_DIR "@executable_path/../${VTK_INSTALL_LIBRARY_DIR}")
+
+  # ensure that we don't build forwarding executables on apple.
+  set(VTK_BUILD_FORWARDING_EXECUTABLES FALSE)
+elseif (APPLE AND NOT PARAVIEW_DO_UNIX_STYLE_INSTALLS)
   # If building on apple, we will set cmake rules for ParaView such that "make
   # install" will result in creation of an application bundle by default.
   # The trick we play is as such:
@@ -289,6 +317,15 @@ if (APPLE)
   # distributable to others since it does not include Qt, or other external
   # dependencies. For a distributable pacakage, refer to ParaView Super-build
   # instructions.
+
+  # Try to preserve user-specified CMAKE_INSTALL_PREFIX if any.
+  get_property(is_internal CACHE CMAKE_INSTALL_PREFIX PROPERTY TYPE)
+  if (NOT is_internal STREQUAL "INTERNAL")
+    # CMAKE_INSTALL_PREFIX is not internal yet, so it must be avialable to the
+    # user, so save it.
+    set (CACHED_CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE INTERNAL "")
+  endif()
+
   set (CMAKE_INSTALL_PREFIX
     ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/__macos_install
     CACHE INTERNAL "" FORCE)

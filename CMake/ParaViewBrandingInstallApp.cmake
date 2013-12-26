@@ -63,3 +63,15 @@ macro(cleanup_bundle app app_root libdir pluginsdir datadir)
     endif()
   endforeach()
 endmacro()
+
+# When doing unix-style installs, we purge the "app" bundle, instead install the
+# executable as a command line executable.
+function(convert_bundle_to_executable app app_root bin_dir)
+  # copy the executable in the app bundle.
+  file(INSTALL ${app}
+       DESTINATION ${bin_dir}
+       USE_SOURCE_PERMISSIONS)
+
+  # now delete the app bundle.
+  file(REMOVE_RECURSE ${app_root})
+endfunction()
