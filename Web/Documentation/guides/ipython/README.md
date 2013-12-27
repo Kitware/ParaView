@@ -2,11 +2,11 @@
 
 ## Introduction
 
-The goal of that integration is to be able from iPython to create
-a PostProcessing notebook that will let the user create post-processing
-pipeline and visualization inside iPython. This will rely underneath on
-ParaViewWeb and therefore ParaView on the computational cluster. All the
-interactions will be achieved within iPython.
+The goal of the integration is to be able to create
+a PostProcessing notebook from iPython that allows the user to generate a post-processing
+pipeline and visualization inside iPython. To accomplish this,
+ParaViewWeb and, thus, ParaView are required on the computational cluster. All of the
+interactions will occur within iPython.
 
 ## iPython-notebook
 
@@ -15,13 +15,13 @@ interactions will be achieved within iPython.
 This documentation will create a virtual environment where we will install
 our iPython/notebook configuration.
 
-In order to create a Virtual Environment for Python you will need to have
-virtualenv which can be downloaded here:
+In order to create a Virtual Environment for Python, you will need to have
+virtualenv, which can be downloaded here:
 
 - https://pypi.python.org/pypi/virtualenv
 
-Virtualenv don't need to be installed and can simply be run from the command
-line in order to create a new virtual environment.
+Virtualenv does not need to be installed. In order to create a new virtual environment, Virtualenv can simply be run from the command
+line.
 
     $ wget https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.10.1.tar.gz
     $ tar xvzf virtualenv-1.10.1.tar.gz
@@ -33,28 +33,28 @@ command line:
 
     $ source ~/Work/python-base/bin/activate
 
-This command line can easily be added inside your ~/.profile or ~/.bash_profile.
+This command line can easily be added to your ~/.profile or ~/.bash_profile.
 
-Thanks to Virtualenv, pip will be naturally available to you and iPython/notebook
-can now be installed with the following command lines:
+Thanks to Virtualenv, pip will automatically be available to you. Meanwhile, iPython/notebook
+can be installed with the following command lines:
 
     (python-base)$ pip install ipython[all]
 
 ### Configuration
 
 In order to use ParaViewWeb inside iPython/notebook, you will need to create
-a profile which will provide convinient methods to start a Web visualization.
+a profile, which will provide convenient methods for starting a Web visualization.
 
-In order to create a new iPython profile, you will need to execute the following
+To create a new iPython profile, you will need to execute the following
 command line:
 
     (python-base)$ ipython profile create --parallel --profile=pvw
 
-This should have created a profile directory inside
+This should generate a profile directory inside
 __${user.home}/.ipython/profile_pvw__.
 
-Once that profile is created, you will need to add a ParaView script which will
-provide convinient methods inside your iPython environment.
+Once the profile is created, you will need to add a ParaView script. This will make the previously mentioned
+methods for starting a Web visualization accessible inside your iPython environment.
 
 Create the file __00-pvw-extension.py__ inside __${user.home}/.ipython/profile_pvw/startup/__ with the following content:
 
@@ -73,9 +73,9 @@ Create the file __00-pvw-extension.py__ inside __${user.home}/.ipython/profile_p
     # iPython import
     from IPython.display import HTML
     from IPython.parallel import Client
-    import paraview
+    import Paraview
     from paraview.web import ipython as pv_ipython
-    from vtk import *
+    from VTK import *
 
     iPythonClient = None
     paraviewHelper = pv_ipython.ParaViewIPython()
@@ -136,27 +136,27 @@ Create the file __00-pvw-extension.py__ inside __${user.home}/.ipython/profile_p
     def ComputeNextTimeStep(ds):
        iPythonClient[:].apply_sync(lambda:_push_new_timestep())
 
-Make sure the parallel mode is using MPI by uncommenting or writting the following
-line into the file __${user.home}/.ipython/profile_pvw/ipcluster_config.py__.
+Make sure that the parallel mode is using MPI. You can do this by uncommenting or writing the following
+line into the file __${user.home}/.ipython/profile_pvw/ipcluster_config.py__:
 
     c.IPClusterEngines.engine_launcher_class = 'MPIEngineSetLauncher'
     c.IPClusterStart.controller_launcher_class = 'MPIControllerLauncher'
 
 ## ParaViewWeb integration
 
-In order to run ParaViewWeb inside iPython/notebook, you will need to start your iPython/notebook environment by executing the following command in your Python virtual environment.
+In order to run ParaViewWeb inside iPython/notebook, you will need to start your iPython/notebook environment by executing the following command in your Python virtual environment:
 
                  $ source ~/Work/python-base/bin/activate
     (python-base)$ export LD_LIBRARY_PATH=/.../ParaView/build/lib
     (python-base)$ ipython notebook --profile=pvw
 
 This should open a web page with your iPython/notebook. In order to start remote cluster
-nodes, go to the __Clusters__ tab and choose how many node you want to start your engines
-on. Then start those engine inside that __pvw__ profile.
+nodes, go to the __Clusters__ tab and choose the number of nodes you want to use to start your engines.
+Then, start the engines inside the __pvw__ profile.
 
 Once started, go back to the __Notebooks__ tab and create a __New Notebook__.
 
-Once in the notebook, lets verify that you have a proper access to the engines you've
+Once in the notebook, verify that you have proper access to the engines you
 started in the __Clusters__ tab.
 
 Execute a cell with the following content:
@@ -166,21 +166,21 @@ Execute a cell with the following content:
     $ print nodes
     $ print len(nodes)
 
-If everything is good, you can start using ParaViewWeb as your iPython is properly setup.
-The following section list the cells that you want to execute in order to use ParaViewWeb
-inside iPython/notebook.
+If everything is good and your iPython is properly set up, you can start using ParaViewWeb.
+The following section lists the cells that you should execute in order to use ParaViewWeb
+inside iPython/notebook:
 
     In [1]: ComputeNextTimeStep()
 
-We need to push data on all the nodes for the Trivial producer before ParaView start.
+We need to push data on all of the nodes for the Trivial producer before ParaView starts.
 
     In [2]: ActivateDataSet()
 
-This wil activate all the previously pushed data inside the ParaView proxy framework
+This will activate all of the previously pushed data inside the ParaView proxy framework.
 
     In [3]: StartParaView()
 
-This will start a ParaViewWeb server and provide an interactive Window which will have
+This will start a ParaViewWeb server and provide an interactive Window, which will have
 the trivial producer pre-loaded.
 
-Then to dynamically update the dataset, just repeat step (1) and (2).
+Then, to dynamically update the dataset, repeat steps (1) and (2).
