@@ -221,8 +221,12 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
       vtkInformation* info = iter->GetCurrentMetaData();
       if (info->Has(vtkCompositeDataSet::NAME()))
         {
-        this->Internal->ChildrenInformation[index].Name =
-          info->Get(vtkCompositeDataSet::NAME());
+        const char* name = info->Get(vtkCompositeDataSet::NAME());
+        this->Internal->ChildrenInformation[index].Name = name;
+        if (childInfo)
+          {
+          childInfo->SetCompositeDataSetName(name);
+          }
         }
       }
     }

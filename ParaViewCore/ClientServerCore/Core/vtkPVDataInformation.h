@@ -192,6 +192,15 @@ public:
   int IsDataStructured();
 
   // Description:
+  // If this instance of vtkPVDataInformation summarizes a node in a
+  // composite-dataset, and if that node has been given a label in that
+  // composite dataset (using vtkCompositeDataSet::NAME meta-data), then this
+  // will return that name. Returns NULL if this instance doesn't represent a
+  // node in a composite dataset or doesn't have a label/name associated with
+  // it.
+  vtkGetStringMacro(CompositeDataSetName);
+
+  // Description:
   // Allows run time addition of information getters for new classes
   static void RegisterHelper(const char *classname,
                              const char *helperclassname);
@@ -244,6 +253,9 @@ protected:
 
   char*          CompositeDataClassName;
   vtkSetStringMacro(CompositeDataClassName);
+
+  char*          CompositeDataSetName;
+  vtkSetStringMacro(CompositeDataSetName);
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;
