@@ -310,9 +310,9 @@ vtkImageData* vtkMatplotlibUtilities::ImageFromCanvas(const char* canvasName)
     return NULL;
     }
 
-  if (PyObject_CheckBuffer(bufferObject) == 0)
+  if (PyBuffer_Check(bufferObject) == 0)
     {
-    vtkErrorMacro(<< "Not a buffer object");
+    vtkErrorMacro(<< "Unexpected non-buffer object from the buffer tuple");
     return NULL;
     }
 
@@ -370,6 +370,20 @@ vtkImageData* vtkMatplotlibUtilities::ImageFromCanvas(const char* canvasName)
     return NULL;
     }
 
+  if (!bufferObject->ob_type->tp_as_buffer)
+    {
+    vtkErrorMacro(<< "Object is not a buffer object");
+    return NULL;
+    }
+
+  void *buf;
+  Py_ssize_t bufSize = bufferObject->ob_type->tp_as_buffer->bf_getreadbuffer(bufferObject, 0, (void **)&buf);
+  if (bufSize == -1)
+    {
+    vtkErrorMacro(<< "Could not read matplotlib image buffer");
+    return NULL;
+    }
+
   vtkImageData* image = vtkImageData::New();
   image->SetDimensions(width, height, 1);
   image->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
@@ -385,18 +399,11 @@ vtkImageData* vtkMatplotlibUtilities::ImageFromCanvas(const char* canvasName)
       }
     }
 
-  Py_buffer bufferView;
-  if (PyObject_GetBuffer(bufferObject, &bufferView, PyBUF_C_CONTIGUOUS) == -1)
-    {
-    vtkErrorMacro(<< "Could not get view of buffer");
-    return image;
-    }
-
-  // Rows are flipped in the bufferView.buf
+  // Rows are flipped in the buffer object
   int rowWidth = 4*width*sizeof(unsigned char);
+  unsigned char* src = static_cast<unsigned char*>(buf);
   for (int row = 0; row < height; ++row)
     {
-    unsigned char* src = static_cast<unsigned char*>(bufferView.buf);
     memcpy(dst + (rowWidth*row), src + (rowWidth*(height-row-1)), rowWidth);
     }
 
