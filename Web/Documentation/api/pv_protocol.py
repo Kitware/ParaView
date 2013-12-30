@@ -256,6 +256,44 @@
  * @param {String} proxyId
  */
 
+/**
+ * @member protocols.ParaViewWebPipelineManager
+ * @method setLutDataRange
+ *
+ *     Set a new data range for the specified array.  Compression and
+ * expansion is allowed, and the new data range will be mapped into the
+ * the full range of colors.
+ *
+ * @param {String} name
+ *
+ *     The name of the data array for which change is to be applied
+ *
+ * @param {Number} number_of_components
+ *
+ *     The number of components per element for this data array
+ *
+ * @param {Number[]} customRange
+ *
+ *     The new data range ([min, max]) to map into the full range of colors
+ */
+
+/**
+ * @member protocols.ParaViewWebPipelineManager
+ * @method getLutDataRange
+ * @param {String} name
+ *
+ *     The name of the data array for which data range is to be returned
+ *
+ * @param {Number} number_of_components
+ *
+ *     The number of components per element for this data array
+ *
+ * @return {Number[]} currentDataRange
+ *
+ * An array containing the currently set data range ([min, max]) for the
+ * specified data array.
+ */
+
  // =====================================================================
 
 /**

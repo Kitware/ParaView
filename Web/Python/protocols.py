@@ -432,6 +432,13 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         self.lutManager.registerFieldData(proxy.GetPointDataInformation())
         self.lutManager.registerFieldData(proxy.GetCellDataInformation())
 
+    @exportRpc("setLutDataRange")
+    def setLutDataRange(self, name, number_of_components, customRange):
+        self.lutManager.setDataRange(name, number_of_components, customRange)
+
+    @exportRpc("getLutDataRange")
+    def getLutDataRange(self, name, number_of_components):
+        return self.lutManager.getDataRange(name, number_of_components)
 
 # =============================================================================
 #
