@@ -19,7 +19,6 @@
 #include "vtkPointData.h"
 #include "vtkGlyph3D.h"
 #include "vtkCellData.h"
-#include "vtkSESAMEReader.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <math.h>
