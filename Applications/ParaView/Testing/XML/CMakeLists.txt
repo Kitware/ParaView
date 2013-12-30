@@ -87,7 +87,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomSourceProbe.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DataOutlines.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/D3SmallCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DualSphereAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSight.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusModeShapes.xml
@@ -102,7 +101,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GlobalProperties.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
@@ -163,6 +161,15 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
 
+if (PARAVIEW_USE_MPI)
+  list(APPEND TESTS_WITH_BASELINES
+    # Test uses D3 which is available in MPI only builds.
+    ${CMAKE_CURRENT_SOURCE_DIR}/D3SmallCells.xml
+
+    # Test uses D3 which is available in MPI only builds.
+    ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
+  )
+endif()
 if(PARAVIEW_ENABLE_PYTHON)
   set(TESTS_WITH_BASELINES
     ${TESTS_WITH_BASELINES}
