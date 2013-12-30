@@ -1370,6 +1370,10 @@ def _CreateEssentialProxies():
        except NameError:
            paraview.print_error("Error: Could not create AnimationScene")
 
+    # Ensure that the time-track is setup so animations on readers work as
+    # expected (BUG #14452).
+    GetTimeTrack()
+
     servermanager.ProxyManager().EnableStateUpdateNotification()
     servermanager.ProxyManager().TriggerStateUpdate()
 
