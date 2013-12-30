@@ -79,6 +79,35 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
     plugins = None
     filterFile = None
 
+    @staticmethod
+    def add_arguments(parser):
+        parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list", dest="path")
+        parser.add_argument("--load-file", default=None, help="File to load if any based on data-dir base path", dest="file")
+        parser.add_argument("--ds-host", default=None, help="Hostname to connect to for DataServer", dest="dsHost")
+        parser.add_argument("--ds-port", default=11111, type=int, help="Port number to connect to for DataServer", dest="dsPort")
+        parser.add_argument("--rs-host", default=None, help="Hostname to connect to for RenderServer", dest="rsHost")
+        parser.add_argument("--rs-port", default=11111, type=int, help="Port number to connect to for RenderServer", dest="rsPort")
+        parser.add_argument("--exclude-regex", default="^\\.|~$|^\\$", help="Regular expression for file filtering", dest="exclude")
+        parser.add_argument("--group-regex", default="[0-9]+\\.", help="Regular expression for grouping files", dest="group")
+        parser.add_argument("--plugins", default="", help="List of fully qualified path names to plugin objects to load", dest="plugins")
+        parser.add_argument("--filters", default=None, help="Path to a file with json text containing filters to load", dest="filters")
+
+    @staticmethod
+    def configure(args):
+        _PipelineManager.authKey      = args.authKey
+        _PipelineManager.dataDir      = args.path
+        _PipelineManager.dsHost       = args.dsHost
+        _PipelineManager.dsPort       = args.dsPort
+        _PipelineManager.rsHost       = args.rsHost
+        _PipelineManager.rsPort       = args.rsPort
+        _PipelineManager.excludeRegex = args.exclude
+        _PipelineManager.groupRegex   = args.group
+        _PipelineManager.plugins      = args.plugins
+        _PipelineManager.filterFile   = args.filters
+
+        if args.file:
+            _PipelineManager.fileToLoad = args.path + '/' + args.file
+
     def initialize(self):
         # Bring used components
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_PipelineManager.dsHost, _PipelineManager.dsPort, _PipelineManager.rsHost, _PipelineManager.rsPort))
@@ -94,6 +123,7 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebTimeHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebRemoteConnection())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileManager(_PipelineManager.dataDir))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebSelectionHandler())
 
         # Update authentication key to use
         self.updateSecret(_PipelineManager.authKey)
@@ -106,38 +136,15 @@ if __name__ == "__main__":
     # Create argument parser
     parser = argparse.ArgumentParser(description="ParaView/Web Pipeline Manager web-application")
 
-    # Add default arguments
+    # Add arguments
     server.add_arguments(parser)
-
-    # Add local arguments
-    parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list", dest="path")
-    parser.add_argument("--load-file", default=None, help="File to load if any based on data-dir base path", dest="file")
-    parser.add_argument("--ds-host", default=None, help="Hostname to connect to for DataServer", dest="dsHost")
-    parser.add_argument("--ds-port", default=11111, type=int, help="Port number to connect to for DataServer", dest="dsPort")
-    parser.add_argument("--rs-host", default=None, help="Hostname to connect to for RenderServer", dest="rsHost")
-    parser.add_argument("--rs-port", default=11111, type=int, help="Port number to connect to for RenderServer", dest="rsPort")
-    parser.add_argument("--exclude-regex", default="^\\.|~$|^\\$", help="Regular expression for file filtering", dest="exclude")
-    parser.add_argument("--group-regex", default="[0-9]+\\.", help="Regular expression for grouping files", dest="group")
-    parser.add_argument("--plugins", default="", help="List of fully qualified path names to plugin objects to load", dest="plugins")
-    parser.add_argument("--filters", default=None, help="Path to a file with json text containing filters to load", dest="filters")
+    _PipelineManager.add_arguments(parser)
 
     # Exctract arguments
     args = parser.parse_args()
 
     # Configure our current application
-    _PipelineManager.authKey      = args.authKey
-    _PipelineManager.dataDir      = args.path
-    _PipelineManager.dsHost       = args.dsHost
-    _PipelineManager.dsPort       = args.dsPort
-    _PipelineManager.rsHost       = args.rsHost
-    _PipelineManager.rsPort       = args.rsPort
-    _PipelineManager.excludeRegex = args.exclude
-    _PipelineManager.groupRegex   = args.group
-    _PipelineManager.plugins      = args.plugins
-    _PipelineManager.filterFile   = args.filters
-
-    if args.file:
-        _PipelineManager.fileToLoad = args.path + '/' + args.file
+    _PipelineManager.configure(args)
 
     # Start server
     server.start_webserver(options=args, protocol=_PipelineManager)
