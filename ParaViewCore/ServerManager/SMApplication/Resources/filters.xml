@@ -7821,6 +7821,26 @@ found and the point will be rejected.</Documentation>
         vector field integration should begin. Usually a point/radius or a line
         with a given resolution.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetStaticSeeds"
+                         default_values="0"
+                         name="StaticSeeds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the input seeds are not changing, then this
+        can be set to 1 to avoid having to do a repeated grid search
+        that would return the exact same result.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStaticMesh"
+                         default_values="0"
+                         name="StaticMesh"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the input grid is not changing, then this
+        can be set to 1 to avoid having to create cell locators for
+        each update.
+        </Documentation>
+      </IntVectorProperty>
       <!--
      <DoubleVectorProperty
         name="TimeStepResolution"
@@ -7988,6 +8008,26 @@ found and the point will be rejected.</Documentation>
         will be redundant as the particles will be reinjected whenever the
         source changes anyway</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetStaticSeeds"
+                         default_values="0"
+                         name="StaticSeeds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the input seeds are not changing, then this
+        can be set to 1 to avoid having to do a repeated grid search
+        that would return the exact same result.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStaticMesh"
+                         default_values="0"
+                         name="StaticMesh"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the input grid is not changing, then this
+        can be set to 1 to avoid having to create cell locators for
+        each update.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -8061,6 +8101,26 @@ found and the point will be rejected.</Documentation>
         <Documentation>Specify which is the Input of the StreamTracer
         filter.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetStaticSeeds"
+                         default_values="0"
+                         name="StaticSeeds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the input seeds are not changing, then this
+        can be set to 1 to avoid having to do a repeated grid search
+        that would return the exact same result.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetStaticMesh"
+                         default_values="0"
+                         name="StaticMesh"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If the input grid is not changing, then this
+        can be set to 1 to avoid having to create cell locators for
+        each update.
+        </Documentation>
+      </IntVectorProperty>
       <InputProperty clean_command="RemoveAllSources"
                      command="AddSourceConnection"
                      label="Seed Source"
