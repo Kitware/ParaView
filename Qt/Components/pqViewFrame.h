@@ -42,6 +42,7 @@ class QDragEnterEvent;
 class QDragMoveEvent;
 class QDropEvent;
 class QMenu;
+class QToolBar;
 class QToolButton;
 
 /// pqViewFrame is used to represent a frame for any ParaView view shown in the
@@ -168,10 +169,10 @@ protected:
   StandardButtons Buttons;
   QPointer<QWidget> CentralWidget;
   QPointer<QWidget> TitleBar;
+  QPointer<QToolBar> ToolBar;
   QMenu* ContextMenu;
   QUuid UniqueID;
   QPoint DragStartPosition;
-  QList<QToolButton*> ToolButtons;
   QMap<StandardButton, QPointer<QToolButton> > StandardToolButtons;
 
 private:
