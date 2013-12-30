@@ -34,42 +34,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidget.h"
 #include "pq3DWidgetPropertyWidget.h"
 #include "pqApplicationCore.h"
+#include "pqApplicationCore.h"
 #include "pqCommandPropertyWidget.h"
 #include "pqDisplayPanel.h"
 #include "pqDisplayPanelInterface.h"
 #include "pqDisplayPanelPropertyWidget.h"
 #include "pqDoubleVectorPropertyWidget.h"
-#include "pqInterfaceTracker.h"
 #include "pqIntVectorPropertyWidget.h"
+#include "pqInterfaceTracker.h"
 #include "pqObjectPanel.h"
 #include "pqObjectPanelInterface.h"
 #include "pqObjectPanelPropertyWidget.h"
 #include "pqPropertiesPanel.h"
-#include "pqPropertyWidgetDecorator.h"
 #include "pqPropertyWidget.h"
+#include "pqPropertyWidgetDecorator.h"
 #include "pqPropertyWidgetInterface.h"
 #include "pqProxyPropertyWidget.h"
 #include "pqRepresentation.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqStandardLegacyCustomPanels.h"
 #include "pqStandardLegacyDisplayPanels.h"
 #include "pqStringVectorPropertyWidget.h"
+
 #include "vtkCollection.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSmartPointer.h"
 
 #include <QGridLayout>
 #include <QHideEvent>
@@ -529,6 +533,14 @@ pqProxyWidget::pqProxyWidget(
 
   this->setApplyChangesImmediately(false);
   this->hideEvent(NULL);
+
+  // In collaboration setup any pqProxyWidget should be disable
+  // when the user lose its MASTER role. And enable back when
+  // user became MASTER again.
+  // This is achieved by adding a PV_MUST_BE_MASTER property
+  // to the current container.
+  this->setProperty("PV_MUST_BE_MASTER", QVariant(true));
+  this->setEnabled(pqApplicationCore::instance()->getActiveServer()->isMaster());
 }
 
 //-----------------------------------------------------------------------------
