@@ -32,7 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExpandableTableView.h"
 
 #include <QAbstractItemDelegate>
+#include <QApplication>
+#include <QClipboard>
 #include <QItemSelectionModel>
+#include <QKeyEvent>
+#include <QRegExp>
 
 //-----------------------------------------------------------------------------
 pqExpandableTableView::pqExpandableTableView(QWidget* parentObject)
@@ -105,4 +109,41 @@ void pqExpandableTableView::closeEditor(
     {
     this->Superclass::closeEditor(editor, hint);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqExpandableTableView::keyPressEvent(QKeyEvent * event)
+{
+  if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_V)
+    {
+    // Get text from the clipboard. Text is expected to be tabular in form,
+    // delimited by arbitrary whitespace.
+    const QClipboard* clipboard = QApplication::clipboard();
+    const QMimeData* mimeData = clipboard->mimeData();
+
+    int numModelRows = this->model()->rowCount();
+    int numModelColumns = this->model()->columnCount();
+
+    if (mimeData->hasText())
+      {
+      // Split the lines in the text
+      QString text = mimeData->text();
+      QStringList lines = text.split("\n", QString::SkipEmptyParts);
+      for (int row = 0; row < std::min(lines.size(), numModelRows); ++row)
+        {
+        // Split within each line
+        QStringList items = lines[row].split(QRegExp("\\s+"));
+
+        // Set the data in the table
+        for (int column = 0; column < std::min(items.size(), numModelColumns); ++column)
+          {
+          QVariant value(items[column]);
+          QModelIndex index = this->model()->index(row, column);
+          this->model()->setData(index, value, Qt::EditRole);
+          }
+        }
+      }
+    }
+
+  this->Superclass::keyPressEvent(event);
 }

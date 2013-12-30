@@ -34,10 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqColorPresetManager.h"
+#include "pqColorTableModel.h"
 #include "pqDataRepresentation.h"
+#include "pqOpacityTableModel.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqRescaleRange.h"
+#include "pqSettings.h"
 #include "pqTransferFunctionWidget.h"
 #include "pqUndoStack.h"
 #include "vtkCommand.h"
@@ -92,13 +95,16 @@ public:
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidgetDecorator);
 };
-}
+
+} // end anonymous namespace
 
 //-----------------------------------------------------------------------------
 class pqColorOpacityEditorWidget::pqInternals
 {
 public:
   Ui::ColorOpacityEditorWidget Ui;
+  pqColorTableModel ColorTableModel;
+  pqOpacityTableModel OpacityTableModel;
   QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
   vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
 
@@ -107,7 +113,7 @@ public:
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
 
   pqInternals(pqColorOpacityEditorWidget* self, vtkSMPropertyGroup* group)
-    : PropertyGroup(group)
+    : ColorTableModel(self), OpacityTableModel(self), PropertyGroup(group)
     {
     this->Ui.setupUi(self);
     this->Ui.CurrentDataValue->setValidator(new QDoubleValidator(self));
@@ -116,6 +122,16 @@ public:
     //  pqPropertiesPanel::suggestedVerticalSpacing());
 
     this->Decorator = new pqColorOpacityEditorWidgetDecorator(NULL, self);
+
+    this->Ui.ColorTable->setModel(&this->ColorTableModel);
+    this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
+    this->Ui.ColorTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    this->Ui.ColorTable->horizontalHeader()->setStretchLastSection(true);
+
+    this->Ui.OpacityTable->setModel(&this->OpacityTableModel);
+    this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
+    this->Ui.OpacityTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
     }
 };
 
@@ -134,6 +150,10 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   if (pwf)
     {
     ui.OpacityEditor->initialize(stc, false, pwf, true);
+    QObject::connect(
+      &this->Internals->OpacityTableModel,
+      SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+      this, SIGNAL(xvmsPointsChanged()));
     }
   else
     {
@@ -142,6 +162,10 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   if (stc)
     {
     ui.ColorEditor->initialize(stc, true, NULL, false);
+    QObject::connect(
+      &this->Internals->ColorTableModel,
+      SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+      this, SIGNAL(xrgbPointsChanged()));
     }
 
   QObject::connect(
@@ -185,11 +209,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     this, SLOT(choosePreset()));
   QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()),
     this, SLOT(saveAsPreset()));
-
-  // TODO: at some point, I'd like to add a textual editor for users to simply
-  // enter the text for the transfer function control points for finer control
-  // of the LUT.
-  ui.Edit->hide();
+  QObject::connect(ui.AdvancedButton, SIGNAL(clicked()),
+    this, SLOT(updatePanel()));
 
   // if the user edits the "DataValue", we need to update the transfer function.
   QObject::connect(ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()),
@@ -282,12 +303,28 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     this->addDecorator(this->Internals->Decorator);
     }
 
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  if (settings)
+    {
+    this->Internals->Ui.AdvancedButton->setChecked(
+      settings->value("showAdvancedPropertiesColorOpacityEditorWidget", false).toBool());
+    }
+
   this->updateCurrentData();
+  this->updatePanel();
 }
 
 //-----------------------------------------------------------------------------
 pqColorOpacityEditorWidget::~pqColorOpacityEditorWidget()
 {
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  if (settings)
+    {
+    // save the state of the advanced button in the widget
+    settings->setValue("showAdvancedPropertiesColorOpacityEditorWidget",
+                       this->Internals->Ui.AdvancedButton->isChecked());
+    }
+
   delete this->Internals;
   this->Internals = NULL;
 }
@@ -322,6 +359,19 @@ void pqColorOpacityEditorWidget::colorCurrentChanged(vtkIdType index)
     ui.OpacityEditor->setCurrentPoint(-1);
     }
   this->updateCurrentData();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::updatePanel()
+{
+  if (this->Internals)
+    {
+    bool advancedVisible = this->Internals->Ui.AdvancedButton->isChecked();
+    this->Internals->Ui.ColorLabel->setVisible(advancedVisible);
+    this->Internals->Ui.ColorTable->setVisible(advancedVisible);
+    this->Internals->Ui.OpacityLabel->setVisible(advancedVisible);
+    this->Internals->Ui.OpacityTable->setVisible(advancedVisible);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -363,6 +413,9 @@ void pqColorOpacityEditorWidget::updateCurrentData()
     {
     ui.CurrentDataValue->setEnabled(false);
     }
+
+  this->Internals->ColorTableModel.refresh();
+  this->Internals->OpacityTableModel.refresh();
 }
 
 //-----------------------------------------------------------------------------
@@ -595,7 +648,7 @@ void pqColorOpacityEditorWidget::choosePreset(const pqColorMapModel* add_new/*=N
   QObject::connect(&preset, SIGNAL(currentChanged(const pqColorMapModel*)),
     this, SLOT(applyPreset(const pqColorMapModel*)));
   preset.exec();
-  preset.saveSettings(); 
+  preset.saveSettings();
 }
 
 //-----------------------------------------------------------------------------
@@ -610,6 +663,10 @@ void pqColorOpacityEditorWidget::applyPreset(const pqColorMapModel* preset)
     emit this->changeFinished();
     END_UNDO_SET();
     }
+
+  // Assume the color map and opacity have changed and refresh
+  this->Internals->ColorTableModel.refresh();
+  this->Internals->OpacityTableModel.refresh();
 }
 
 //-----------------------------------------------------------------------------

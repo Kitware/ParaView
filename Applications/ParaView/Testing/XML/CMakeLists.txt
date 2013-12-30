@@ -77,6 +77,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorControls.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorVolumeControls.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ColorOpacityTableEditing.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   # disabling overlay test for now. It has issues with Time 0.
@@ -309,6 +310,7 @@ SET (UnstructuredOutline_BREAK TRUE)
 
 set (ColorEditorControls_BREAK TRUE)
 set (ColorEditorVolumeControls_BREAK TRUE)
+set (ColorOpacityTableEditing_BREAK TRUE)
 set (UpdateTransferFunctionRanges_BREAK TRUE)
 set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)

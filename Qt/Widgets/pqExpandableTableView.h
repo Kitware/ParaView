@@ -70,6 +70,9 @@ protected:
   virtual void closeEditor(
     QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
 
+  /// Overridden to capture Ctrl-V for pasting table data into the table.
+  virtual void keyPressEvent(QKeyEvent * event);
+
 private:
   Q_DISABLE_COPY(pqExpandableTableView);
   bool MoveToNextEditableItem;
