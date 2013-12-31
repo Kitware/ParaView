@@ -725,6 +725,8 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
 # Handle Data Selection
 #
 # =============================================================================
+from vtkPVClientServerCoreRenderingPython import *
+from vtkCommonCorePython import *
 
 class ParaViewWebSelectionHandler(ParaViewWebProtocol):
 
@@ -753,14 +755,21 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
         where (0,0) match the lower left corner of the pixel screen.
         """
         if self.active_view:
+            self.active_view.InteractionMode = self.previous_interaction
             representations = vtkCollection()
             sources = vtkCollection()
-            self.active_view.SelectSurfacePoints(area, representations, sources, False)
-            print "representations..."
-            print representations
-            print "sources..."
-            print sources
-            self.active_view.InteractionMode = self.previous_interaction
+            if self.selection_type == 1:
+                self.active_view.SelectSurfaceCells(area, representations, sources, False)
+            else:
+                self.active_view.SelectSurfacePoints(area, representations, sources, False)
+            # Don't know what to do if more than one representation/source
+            if representations.GetNumberOfItems() == sources.GetNumberOfItems() and sources.GetNumberOfItems() == 1:
+                # We are good for selection
+                rep = servermanager._getPyProxy(representations.GetItemAsObject(0))
+                selection = servermanager._getPyProxy(sources.GetItemAsObject(0))
+                extract = simple.ExtractSelection(Input=rep.Input, Selection=selection)
+                simple.Show(extract)
+                simple.Render()
 
 # =============================================================================
 #
@@ -784,4 +793,5 @@ class ParaViewWebExportData(ParaViewWebProtocol):
             os.makedirs(parentDir)
         if proxy:
             writer = simple.DataSetWriter(Input=proxy, FileName=fullpath)
+            writer.Writealltimestepsasfileseries
             del writer
