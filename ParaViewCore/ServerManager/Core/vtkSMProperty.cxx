@@ -150,6 +150,17 @@ void vtkSMProperty::AddDomain(const char* name, vtkSMDomain* domain)
     }
 
   this->PInternals->Domains[name] = domain;
+  if (domain)
+    {
+    domain->AddObserver(vtkCommand::DomainModifiedEvent,
+      this, &vtkSMProperty::InvokeDomainModifiedEvent);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::InvokeDomainModifiedEvent()
+{
+  this->InvokeEvent(vtkCommand::DomainModifiedEvent);
 }
 
 //---------------------------------------------------------------------------

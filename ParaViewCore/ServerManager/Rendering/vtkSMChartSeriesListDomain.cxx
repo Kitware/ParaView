@@ -135,15 +135,22 @@ int vtkSMChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLE
 }
 
 //----------------------------------------------------------------------------
-int vtkSMChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop)
+const char** vtkSMChartSeriesListDomain::GetKnownSeriesNames()
 {
-  const char* strings_to_check[] =
+  static const char* strings_to_check[] =
     { "bin_extents",
       "Time",
       "time",
       "arc_length",
       NULL
     };
+  return strings_to_check;
+}
+//----------------------------------------------------------------------------
+int vtkSMChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop)
+{
+  const char** strings_to_check =
+    vtkSMChartSeriesListDomain::GetKnownSeriesNames();
 
   const std::vector<vtkStdString> domain_strings = this->GetStrings();
   for (int cc=0; strings_to_check[cc] != NULL; cc++)

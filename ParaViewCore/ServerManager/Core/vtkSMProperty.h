@@ -58,6 +58,9 @@
 //        vtkCommand::UncheckedPropertyModifiedEvent must be fired every time
 //        vtkCommand::ModifiedEvent is fired.
 //
+// \li \b vtkCommand::DomainModifiedEvent : fired when any of this properties
+//        domain's fire the same event.
+//
 // Properties are typically constructed from ServerManager XML configuration
 // files. Attributes available on a Property XML are as follows:
 //
@@ -509,6 +512,10 @@ protected:
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented
   void operator=(const vtkSMProperty&); // Not implemented
+
+  // Callback to fire vtkCommand::DomainModifiedEvent every time any of the
+  // domains change.
+  void InvokeDomainModifiedEvent();
 
   // Description:
   // Given the string, this method will create and set a well-formated

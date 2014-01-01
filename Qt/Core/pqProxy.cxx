@@ -318,56 +318,15 @@ void pqProxy::setModifiedState(ModifiedState modified)
 void pqProxy::setDefaultPropertyValues()
 {
   vtkSMProxy* proxy = this->getProxy();
-
-  // If this is a compound proxy, its property values will be set from XML
-  // This seems like a hack. Need some graceful solution.
-  if(proxy->IsA("vtkSMCompoundSourceProxy"))
+  if (proxy->IsA("vtkSMCompoundSourceProxy"))
     {
-    return;
+    // We don't reset properties on custom filter.
+    proxy->UpdateVTKObjects();
     }
-
-  // since some domains rely on information properties,
-  // it is essential that we update the property information 
-  // before resetting values.
-  proxy->UpdatePropertyInformation();
-
-  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  else
     {
-    vtkSMProperty* smproperty = iter->GetProperty();
-
-    if (!smproperty->GetInformationOnly())
-      {
-      vtkPVXMLElement* propHints = iter->GetProperty()->GetHints();
-      if (propHints && propHints->FindNestedElementByName("NoDefault"))
-        {
-        // Don't reset properties that request overriding of default mechanism.
-        continue;
-        }
-      iter->GetProperty()->ResetToDefault();
-      }
+    proxy->ResetPropertiesToDefault();
     }
-
-  // Since domains may depend on defaul values of other properties to be set,
-  // we iterate over the properties once more. We need a better mechanism for this.
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProperty* smproperty = iter->GetProperty();
-
-    if (!smproperty->GetInformationOnly())
-      {
-      vtkPVXMLElement* propHints = iter->GetProperty()->GetHints();
-      if (propHints && propHints->FindNestedElementByName("NoDefault"))
-        {
-        // Don't reset properties that request overriding of default mechanism.
-        continue;
-        }
-      iter->GetProperty()->ResetToDefault();
-      }
-    }
-
-  iter->Delete();
-  proxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
