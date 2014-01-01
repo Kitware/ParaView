@@ -115,8 +115,7 @@ public:
 
   virtual int rowCount(const QModelIndex& idx=QModelIndex()) const
     {
-    Q_UNUSED(idx);
-    return this->Visibilities.size();
+    return idx.isValid()? 0 : this->Visibilities.size();
     }
 
   virtual int columnCount(const QModelIndex& idx=QModelIndex()) const
@@ -477,9 +476,9 @@ public:
     this->Ui.SeriesTable->setDragEnabled(supportsReorder);
     this->Ui.SeriesTable->setDragDropMode(supportsReorder?
       QAbstractItemView::InternalMove : QAbstractItemView::NoDragDrop);
-    this->Ui.SeriesTable->horizontalHeader()->setHighlightSections(false);
-    this->Ui.SeriesTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-    this->Ui.SeriesTable->horizontalHeader()->setStretchLastSection(true);
+    this->Ui.SeriesTable->header()->setHighlightSections(false);
+    this->Ui.SeriesTable->header()->setResizeMode(QHeaderView::ResizeToContents);
+    this->Ui.SeriesTable->header()->setStretchLastSection(true);
 
     if (supportsReorder)
       {

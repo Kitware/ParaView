@@ -45,6 +45,14 @@ class PQWIDGETS_EXPORT pqTreeView : public QTreeView
 {
   Q_OBJECT
 
+  /// Set the maximum number of rows beyond which this view should show a
+  /// vertical scroll bar. The pqTreeView will keep on resizing until
+  /// maximumRowCountBeforeScrolling row to avoid vertical scrolling.
+  Q_PROPERTY(int maximumRowCountBeforeScrolling
+             READ maximumRowCountBeforeScrolling
+             WRITE setMaximumRowCountBeforeScrolling)
+
+  typedef QTreeView Superclass;
 public:
   pqTreeView(QWidget *parent=0);
   virtual ~pqTreeView() {}
@@ -57,6 +65,11 @@ public:
   virtual QSize sizeHint() const;
   virtual QSize minimumSizeHint() const;
 
+  void setMaximumRowCountBeforeScrolling(int val)  
+    { this->MaximumRowCountBeforeScrolling = val; }
+  int maximumRowCountBeforeScrolling() const
+    { return this->MaximumRowCountBeforeScrolling; }
+
 protected:
   // Support for customized drag-n-drop events
   virtual void dragEnterEvent( QDragEnterEvent * event );
@@ -67,6 +80,7 @@ private slots:
 
 private:
   int ScrollPadding;
+  int MaximumRowCountBeforeScrolling;
 };
 
 #endif
