@@ -748,7 +748,7 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
             self.active_view = None
 
     @exportRpc("endSelection")
-    def endSelection(self, area):
+    def endSelection(self, area, extract):
         """
         Method used to finalize an interactive selection by providing
         the [ startPointX, startPointY, endPointX, endPointY ] area
@@ -767,9 +767,12 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
                 # We are good for selection
                 rep = servermanager._getPyProxy(representations.GetItemAsObject(0))
                 selection = servermanager._getPyProxy(sources.GetItemAsObject(0))
-                extract = simple.ExtractSelection(Input=rep.Input, Selection=selection)
-                simple.Show(extract)
-                simple.Render()
+                if extract:
+                    extract = simple.ExtractSelection(Input=rep.Input, Selection=selection)
+                    simple.Show(extract)
+                    simple.Render()
+                else:
+                    rep.Input.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
 
 # =============================================================================
 #
@@ -785,13 +788,13 @@ class ParaViewWebExportData(ParaViewWebProtocol):
     @exportRpc("exportData")
     def exportData(self, proxy_id, path):
         proxy = self.mapIdToProxy(proxy_id)
-        fullpath = os.path.join(self.baseDirectory, path)
-        if fullpath.indexOf('.vtk') == -1:
+        fullpath = str(os.path.join(self.base_export_path, str(path)))
+        if fullpath.index('.vtk') == -1:
             fullpath += '.vtk'
         parentDir = os.path.dirname(fullpath)
         if not os.path.exists(parentDir):
             os.makedirs(parentDir)
         if proxy:
             writer = simple.DataSetWriter(Input=proxy, FileName=fullpath)
-            writer.Writealltimestepsasfileseries
+            writer.UpdatePipeline()
             del writer
