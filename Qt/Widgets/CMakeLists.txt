@@ -111,6 +111,8 @@ set(Module_SRCS
   pqSignalAdaptors.h
   pqSpinBox.cxx
   pqSpinBox.h
+  pqTableView.cxx
+  pqTableView.h
   pqTreeView.cxx
   pqTreeView.h
   pqTreeViewSelectionHelper.cxx
@@ -173,6 +175,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqSpinBox.h
+  pqTableView.h
   pqTreeView.h
   pqTreeWidget.h
   pqTreeWidgetCheckHelper.h
