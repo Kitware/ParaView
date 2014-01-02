@@ -39,6 +39,7 @@ if (NOT PARAVIEW_USE_MPI)
     -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
 else()
+  vtk_mpi_link(CoProcessingPythonScriptExample)
   add_test(NAME CoProcessingTestPythonScript
     COMMAND ${CMAKE_COMMAND}
     -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
