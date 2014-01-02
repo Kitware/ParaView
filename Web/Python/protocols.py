@@ -432,6 +432,13 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         self.lutManager.registerFieldData(proxy.GetPointDataInformation())
         self.lutManager.registerFieldData(proxy.GetCellDataInformation())
 
+    @exportRpc("setLutDataRange")
+    def setLutDataRange(self, name, number_of_components, customRange):
+        self.lutManager.setDataRange(name, number_of_components, customRange)
+
+    @exportRpc("getLutDataRange")
+    def getLutDataRange(self, name, number_of_components):
+        return self.lutManager.getDataRange(name, number_of_components)
 
 # =============================================================================
 #
@@ -718,6 +725,8 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
 # Handle Data Selection
 #
 # =============================================================================
+from vtkPVClientServerCoreRenderingPython import *
+from vtkCommonCorePython import *
 
 class ParaViewWebSelectionHandler(ParaViewWebProtocol):
 
@@ -739,21 +748,31 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
             self.active_view = None
 
     @exportRpc("endSelection")
-    def endSelection(self, area):
+    def endSelection(self, area, extract):
         """
         Method used to finalize an interactive selection by providing
         the [ startPointX, startPointY, endPointX, endPointY ] area
         where (0,0) match the lower left corner of the pixel screen.
         """
         if self.active_view:
+            self.active_view.InteractionMode = self.previous_interaction
             representations = vtkCollection()
             sources = vtkCollection()
-            self.active_view.SelectSurfacePoints(area, representations, sources, False)
-            print "representations..."
-            print representations
-            print "sources..."
-            print sources
-            self.active_view.InteractionMode = self.previous_interaction
+            if self.selection_type == 1:
+                self.active_view.SelectSurfaceCells(area, representations, sources, False)
+            else:
+                self.active_view.SelectSurfacePoints(area, representations, sources, False)
+            # Don't know what to do if more than one representation/source
+            if representations.GetNumberOfItems() == sources.GetNumberOfItems() and sources.GetNumberOfItems() == 1:
+                # We are good for selection
+                rep = servermanager._getPyProxy(representations.GetItemAsObject(0))
+                selection = servermanager._getPyProxy(sources.GetItemAsObject(0))
+                if extract:
+                    extract = simple.ExtractSelection(Input=rep.Input, Selection=selection)
+                    simple.Show(extract)
+                    simple.Render()
+                else:
+                    rep.Input.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
 
 # =============================================================================
 #
@@ -769,12 +788,13 @@ class ParaViewWebExportData(ParaViewWebProtocol):
     @exportRpc("exportData")
     def exportData(self, proxy_id, path):
         proxy = self.mapIdToProxy(proxy_id)
-        fullpath = os.path.join(self.baseDirectory, path)
-        if fullpath.indexOf('.vtk') == -1:
+        fullpath = str(os.path.join(self.base_export_path, str(path)))
+        if fullpath.index('.vtk') == -1:
             fullpath += '.vtk'
         parentDir = os.path.dirname(fullpath)
         if not os.path.exists(parentDir):
             os.makedirs(parentDir)
         if proxy:
             writer = simple.DataSetWriter(Input=proxy, FileName=fullpath)
+            writer.UpdatePipeline()
             del writer

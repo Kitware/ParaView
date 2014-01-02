@@ -150,6 +150,22 @@ class LookupTableManager:
 
     # --------------------------------------------------------------------------
 
+    def setDataRange(self, name, number_of_components, range):
+        self.registerArray(name, number_of_components, range)
+        key = self.getLutId(name, number_of_components)
+        self.range[key] = range
+        self.luts[key].RGBPoints = [range[0], 0, 0, 1, range[1], 1, 0, 0]
+
+    # --------------------------------------------------------------------------
+
+    def getDataRange(self, name, number_of_components):
+        key = self.getLutId(name, number_of_components)
+        if self.range.has_key(key):
+            return self.range[key]
+        return [0, 1]
+
+    # --------------------------------------------------------------------------
+
     def registerArray(self, name, number_of_components, range):
         key = self.getLutId(name, number_of_components)
         if self.range.has_key(key):

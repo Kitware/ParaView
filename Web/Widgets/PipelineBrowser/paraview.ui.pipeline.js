@@ -631,7 +631,6 @@
 
     function fireBusy(uiWidget, isBusy) {
         busyStatus += (isBusy ? 1 : -1);
-        console.log("Busy status: " + busyStatus);
         getPipeline(uiWidget).trigger({
             type: 'busy',
             status: (busyStatus > 0)
