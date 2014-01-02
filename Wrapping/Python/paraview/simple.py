@@ -1377,13 +1377,16 @@ def _CreateEssentialProxies():
     if not scene:
        try:
            scene = AnimationScene()
+           # no need to register, since we use the function to create the
+           # AnimationScene object, that automatically registers it.
            scene.TimeKeeper = tk
+
+           # Ensure that the time-track is setup so animations on readers work as
+           # expected (BUG #14452).
+           GetTimeTrack()
        except NameError:
            paraview.print_error("Error: Could not create AnimationScene")
 
-    # Ensure that the time-track is setup so animations on readers work as
-    # expected (BUG #14452).
-    GetTimeTrack()
 
     servermanager.ProxyManager().EnableStateUpdateNotification()
     servermanager.ProxyManager().TriggerStateUpdate()
