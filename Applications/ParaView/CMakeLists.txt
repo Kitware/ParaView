@@ -84,10 +84,11 @@ if (BUILD_TESTING)
 endif (BUILD_TESTING)
 
 #------------------------------------------------------------------------------
-# For Macs, we add install rule to package everything that's built into a single
-# App. Look at the explanation of MACOSX_APP_INSTALL_PREFIX in the top-level
-# CMakeLists.txt file for details.
-if (APPLE)
+if (APPLE AND NOT PARAVIEW_DO_UNIX_STYLE_INSTALLS)
+  # For Macs, we add install rule to package everything that's built into a single
+  # App. Look at the explanation of MACOSX_APP_INSTALL_PREFIX in the top-level
+  # CMakeLists.txt file for details.
+
   # add install rules to generate the App bundle.
   install(CODE "
    include(\"${ParaView_CMAKE_DIR}/ParaViewBrandingInstallApp.cmake\")
@@ -107,4 +108,15 @@ if (APPLE)
         USE_SOURCE_PERMISSIONS)
    "
    COMPONENT Runtime)
+elseif (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
+  # This is a unix style install on OsX. Purge the bundle.
+  install(CODE
+    "
+      include(\"${ParaView_CMAKE_DIR}/ParaViewBrandingInstallApp.cmake\")
+      convert_bundle_to_executable(
+          \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR}/paraview.app/Contents/MacOS/paraview
+          \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR}/paraview.app
+          \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR})
+    "
+    COMPONENT Runtime)
 endif()
