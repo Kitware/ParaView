@@ -41,12 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QByteArray>
 #include <QColorDialog>
 #include <QDataStream>
+#include <QFontMetrics>
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QMimeData>
 #include <QPair>
-#include <QVector>
+#include <QPointer>
 #include <QSortFilterProxyModel>
+#include <QVector>
 
 #include <assert.h>
 
@@ -59,6 +61,7 @@ class pqSeriesParametersModel : public QAbstractTableModel
   QVector<QPair<QString, bool> > Visibilities;
   QMap<QString, QString> Labels;
   QMap<QString, QColor> Colors;
+  QPointer<QWidget> Widget; // used to determine text size.
 
   QColor seriesColor(const QModelIndex& idx) const
     {
@@ -81,6 +84,7 @@ public:
   virtual ~pqSeriesParametersModel()
     {
     }
+  void setWidget(QWidget* wdg) { this->Widget = wdg; }
 
   enum ColumnRoles
     {
@@ -127,7 +131,19 @@ public:
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
     assert(idx.row() < this->Visibilities.size());
-
+#ifndef __APPLE__
+    // On OSX, the default row-size ends up being reasonable. Hence, don't override it on OsX.
+    if (role == Qt::SizeHintRole)
+      {
+      // this make the rows appear less crowded.
+      if (this->Widget && idx.column() != COLOR)
+        {
+        int height = this->Widget->fontMetrics().boundingRect("(").height();
+        return QSize(0, static_cast<int>(height * 1.30)); // pad each row
+        }
+      return QVariant();
+      }
+#endif
     if (idx.column() == VISIBILITY)
       {
       switch (role)
@@ -477,8 +493,9 @@ public:
     this->Ui.SeriesTable->setDragDropMode(supportsReorder?
       QAbstractItemView::InternalMove : QAbstractItemView::NoDragDrop);
     this->Ui.SeriesTable->header()->setHighlightSections(false);
-    this->Ui.SeriesTable->header()->setResizeMode(QHeaderView::ResizeToContents);
-    this->Ui.SeriesTable->header()->setStretchLastSection(true);
+
+    // give the model a widget so it can compute text sizes better.
+    this->Model.setWidget(this->Ui.SeriesTable);
 
     if (supportsReorder)
       {
@@ -491,6 +508,14 @@ public:
       this->Ui.SeriesTable->setModel(proxyModel);
       this->Ui.SeriesTable->setSortingEnabled(true);
       }
+
+    // this needs to be done after the columns exist.
+    this->Ui.SeriesTable->header()->setResizeMode(
+      pqSeriesParametersModel::VISIBILITY, QHeaderView::Stretch);
+    this->Ui.SeriesTable->header()->setResizeMode(
+      pqSeriesParametersModel::COLOR, QHeaderView::ResizeToContents);
+    this->Ui.SeriesTable->header()->setResizeMode(
+      pqSeriesParametersModel::LABEL, QHeaderView::Stretch);
     }
 
   //---------------------------------------------------------------------------
