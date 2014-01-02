@@ -354,6 +354,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
 
     return { 'proxy_id'  : proxy.GetGlobalID(),                               \
              'name'      : pxm.GetProxyName("sources", proxy),                \
+             'bounds'    : proxy.GetDataInformation().GetBounds(),            \
              'pointData' : pointData,                                         \
              'cellData'  : cellData,                                          \
              'activeData': rep.ColorAttributeType + ':' + rep.ColorArrayName, \
