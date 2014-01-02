@@ -28,6 +28,7 @@ Main modules
    coprocessing <paraview.coprocessing>
    benchmark <paraview.benchmark>
 
+   Available readers, sources, writers, filters and animation cues <paraview.servermanager_proxies>
 
 ParaViewWeb
 ==================

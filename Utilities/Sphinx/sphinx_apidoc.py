@@ -96,6 +96,55 @@ def format_directive(module, package=None):
         directive += '    :%s:\n' % option
     return directive
 
+def format_simple_directive(module, proxy_list, package=None, main_module=True):
+    """Create the automodule directive for the simple module."""
+    if main_module:
+        directive = '.. automodule:: %s\n' % makename(package, module)
+        directive += '    :members:\n'
+        directive += '    :exclude-members: %s\n' % ','.join(proxy_list)
+        for option in OPTIONS:
+            if option != 'members':
+                directive += '    :%s:\n' % option
+    else:
+        directive = '.. currentmodule:: %s\n\n' %makename(package, module)
+        # Adding a hidden toctree to prevent warnings about document not
+        # included in any toc.
+        # This is also required instead of :toctree: argument of autosummary
+        # directive to prevent a clobbered top level index file.
+        directive += '.. toctree::\n'
+        directive += '    :hidden:\n\n'
+        for prx in proxy_list:
+            directive += '    %s.%s.%s\n' % (package, module, prx)
+        directive += '\n.. autosummary::\n'
+        directive += '    :nosignatures:\n\n'
+        for prx in proxy_list:
+            directive += '    %s\n' % prx
+    return directive
+
+def format_simple_proxy_directive(prx, package='paraview', module='simple'):
+    """Create the autoclass directive for proxy"""
+    directive = '.. currentmodule:: %s.%s\n\n' % (package, module)
+    directive += '.. autofunction:: %s\n\n' % prx
+
+    # Parse pydoc output for the proxy
+    import parse_pydoc_output
+    parser = parse_pydoc_output.ParsePyDocOutput('%s.%s' %(package, module),
+        ['servermanager'], prx)
+    directive += format_heading(2, 'Data Descriptors')
+    directive += '%s\n\n' % parser.data_mems.replace('*', '\\*')
+    inh_data_mems = parser.inh_data_mems
+    for inh_data_mem in inh_data_mems:
+        directive += format_heading(3, 'Data Descriptors inherited from %s'\
+            % inh_data_mem)
+        directive += '%s\n\n' % inh_data_mems[inh_data_mem].replace('*', '\\*')
+    directive += format_heading(2, 'Methods')
+    directive += '%s\n\n' % parser.method_mems.replace('*', '\\*')
+    inh_method_mems = parser.inh_method_mems
+    for inh_method_mem in inh_method_mems:
+        directive += format_heading(3, 'Methods inherited from %s'\
+            % inh_method_mem)
+        directive += '%s\n\n' % inh_method_mems[inh_method_mem].replace('*', '\\*')
+    return directive
 
 def create_module_file(package, module, opts):
     """Build the text of the file and write the file."""
@@ -104,6 +153,32 @@ def create_module_file(package, module, opts):
     text += format_directive(module, package)
     write_file(makename(package, module), text, opts)
 
+def create_simple_module_files(package, module, proxy, opts):
+    """Build the text of the simple and proxy files and write them."""
+    import paraview.simple
+    gen_prx = sorted(paraview.simple._get_generated_proxies())
+
+    # Create file for simple module
+    text = format_heading(1, '%s Module' % module)
+    text += "For generated server-side proxies, please refer to "\
+            ":doc:`paraview.servermanager_proxies`\n\n"
+    text += format_simple_directive(module, gen_prx, package)
+    write_file(makename(package, module), text, opts)
+
+    # Create a common summary page for all generated proxies
+    text = format_heading(1, 'Available readers, sources, writers, filters and animation cues')
+    text += "Proxies generated for server side objects "\
+            "under :doc:`paraview.simple`\n\n"
+    text += format_simple_directive(module, gen_prx, package, False)
+    write_file(makename(package, proxy), text, opts)
+
+    # Create a separate file for each proxy
+    for prx in gen_prx:
+        text = format_heading(1, '%s.%s.%s' % (package, module, prx))
+        text += format_simple_proxy_directive(prx)
+        text += '\n\nFor the full list of servermanager proxies, please refer to '\
+                ':doc:`Available readers, sources, writers, filters and animation cues <paraview.servermanager_proxies>`'
+        write_file(makename('%s.%s' % (package, module), prx), text, opts)
 
 def create_package_file(root, master_package, subroot, py_files, opts, subs):
     """Build the text of the file and write the file."""
@@ -129,9 +204,16 @@ def create_package_file(root, master_package, subroot, py_files, opts, subs):
                                      master_package)
             text += '\n'
         else:
-            # create a new file for the module.
-            create_module_file(master_package, py_path, opts)
-            modules.append(makename(master_package, py_path))
+            if master_package == 'paraview' and py_path == 'simple':
+                proxy_path = 'servermanager_proxies'
+                create_simple_module_files(master_package, py_path, proxy_path,
+                                           opts)
+                modules.append(makename(master_package, py_path))
+                modules.append(makename(master_package, proxy_path))
+            else:
+                # create a new file for the module.
+                create_module_file(master_package, py_path, opts)
+                modules.append(makename(master_package, py_path))
 
     if modules:
         text += format_heading(2, 'Modules')
