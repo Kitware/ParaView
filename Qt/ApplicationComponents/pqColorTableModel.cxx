@@ -98,9 +98,9 @@ bool pqColorTableModel::setData(const QModelIndex &idx, const QVariant &value, i
 }
 
 //-----------------------------------------------------------------------------
- int pqColorTableModel::rowCount(const QModelIndex & parent) const
+ int pqColorTableModel::rowCount(const QModelIndex & parentIndex) const
  {
-   Q_UNUSED(parent);
+   Q_UNUSED(parentIndex);
 
    int size = 0;
    if (this->Widget && this->Widget->proxy())
@@ -119,9 +119,9 @@ bool pqColorTableModel::setData(const QModelIndex &idx, const QVariant &value, i
 
 
 //-----------------------------------------------------------------------------
-int pqColorTableModel::columnCount(const QModelIndex & parent) const
+int pqColorTableModel::columnCount(const QModelIndex & parentIndex) const
 {
-  Q_UNUSED(parent);
+  Q_UNUSED(parentIndex);
   return 4;
 }
 
