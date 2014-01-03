@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QString>
 
-
 class pqColorPresetModelItem
 {
 public:
@@ -154,7 +153,7 @@ QModelIndex pqColorPresetModel::parent(const QModelIndex &) const
 Qt::ItemFlags pqColorPresetModel::flags(const QModelIndex &idx) const
 {
   Qt::ItemFlags indexFlags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-  if(idx.isValid() && idx.model() == this && idx.column() == 0 &&
+  if(idx.isValid() && idx.model() == this &&
       this->Internal->Presets[idx.row()]->Id != -1)
     {
     // The default presets are not editable.
