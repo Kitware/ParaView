@@ -130,7 +130,7 @@ void vtkPythonRepresentation::SetAttributeArrayStatus(int attributeType,
                                                       int status)
 {
   std::string nameStr(name);
-  this->Internal->AttributeArrayEnabled[attributeType][name] = status;
+  this->Internal->AttributeArrayEnabled[attributeType][name] = (status != 0);
 }
 
 //----------------------------------------------------------------------------

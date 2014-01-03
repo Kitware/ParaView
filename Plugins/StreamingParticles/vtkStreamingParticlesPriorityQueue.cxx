@@ -64,7 +64,7 @@ public:
     }
   void ResetPreviousViewPlanes()
     {
-    memset(this->PreviousViewPlanes, sizeof(double)*24, 0);
+    memset(this->PreviousViewPlanes, 0, sizeof(double)*24);
     }
   bool PlanesChanged(const double view_planes[24])
     {
@@ -257,7 +257,7 @@ void vtkStreamingParticlesPriorityQueue::Update(const double view_planes[24])
 
 //----------------------------------------------------------------------------
 void vtkStreamingParticlesPriorityQueue::Update(const double view_planes[24],
-  const double clamp_bounds[6])
+  const double vtkNotUsed(clamp_bounds)[6])
 {
   this->Internals->BlocksToPurge.clear();
 
