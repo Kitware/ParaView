@@ -758,8 +758,14 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
             self.active_view.InteractionMode = self.previous_interaction
             representations = vtkCollection()
             sources = vtkCollection()
-            if self.selection_type == 1:
+            if self.selection_type == 0:
+                self.active_view.SelectSurfacePoints(area, representations, sources, False)
+            elif self.selection_type == 1:
                 self.active_view.SelectSurfaceCells(area, representations, sources, False)
+            elif self.selection_type == 2:
+                self.active_view.SelectFrustumPoints(area, representations, sources, False)
+            elif self.selection_type == 3:
+                self.active_view.SelectFrustumCells(area, representations, sources, False)
             else:
                 self.active_view.SelectSurfacePoints(area, representations, sources, False)
             # Don't know what to do if more than one representation/source
