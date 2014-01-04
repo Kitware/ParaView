@@ -42,14 +42,31 @@ class FileNameGenerator():
         Update active arguments and extend arguments range.
         """
         for key, value in kwargs.iteritems():
-            self.active_arguments[key] = value
+            value_str = "{value}".format(value=value)
+            self.active_arguments[key] = value_str
             if self.arguments.has_key(key):
                 try:
-                    self.arguments[key].index(value)
+                    self.arguments[key]["values"].index(value_str)
                 except ValueError:
-                    self.arguments[key].append(value)
+                    self.arguments[key]["values"].append(value_str)
             else:
-                self.arguments[key] = [value]
+                typeOfValues = "range"
+                if type(value) == type("String"):
+                    typeOfValues = "list"
+                self.arguments[key] = {
+                    "values" : [ value_str ],
+                    "default": value_str,
+                    "type": typeOfValues,
+                    "label": key
+                }
+
+    def update_label_arguments(self, **kwargs):
+        """
+        Update label arguments, but argument must exist first
+        """
+        for key, value in kwargs.iteritems():
+            if self.arguments.has_key(key):
+                self.arguments[key]["label"] = value
 
     def get_filename(self):
         """
@@ -198,6 +215,8 @@ class ContourExplorer():
         self.current_step = 0
         # Update file name pattern
         self.file_name_generator.update_active_arguments(contourBy=contourBy[1])
+        self.file_name_generator.update_active_arguments(contourValue=self.scalar_origin)
+        self.file_name_generator.update_label_arguments(contourValue=str(contourBy[1]))
 
     @staticmethod
     def list_arguments(self):
