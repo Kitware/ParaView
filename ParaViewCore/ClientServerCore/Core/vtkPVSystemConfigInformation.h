@@ -39,7 +39,6 @@ public:
         CPUDescriptor(""),
         MemDescriptor(""),
         HostName(""),
-        FullyQualifiedDomainName(""),
         ProcessType(-1),
         SystemType(-1),
         Rank(-1),
@@ -59,7 +58,6 @@ public:
       string CPUDescriptor;
       string MemDescriptor;
       string HostName;
-      string FullyQualifiedDomainName;
       int ProcessType;
       int SystemType;
       int Rank;
@@ -97,7 +95,6 @@ public:
   const char *GetCPUDescriptor(size_t i){ return this->Configs[i].CPUDescriptor.c_str(); }
   const char *GetMemoryDescriptor(size_t i){ return this->Configs[i].MemDescriptor.c_str(); }
   const char *GetHostName(size_t i){ return this->Configs[i].HostName.c_str(); }
-  const char *GetFullyQualifiedDomainName(size_t i){ return this->Configs[i].FullyQualifiedDomainName.c_str(); }
   int GetProcessType(size_t i){ return this->Configs[i].ProcessType; }
   int GetSystemType(size_t i){ return this->Configs[i].SystemType; }
   int GetRank(size_t i){ return this->Configs[i].Rank; }

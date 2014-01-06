@@ -323,6 +323,13 @@ pqRemoteCommandDialog::pqRemoteCommandDialog(
     this, SLOT(FindXTermExecutable()));
 
   QObject::connect(
+    this->Ui->pvHost, SIGNAL(textChanged(const QString &)),
+    this, SLOT(UpdateTokenValues()));
+  QObject::connect(
+    this->Ui->pvHost, SIGNAL(textChanged(const QString &)),
+    this, SLOT(UpdateCommandPreview()));
+
+  QObject::connect(
     this->Ui->xtOpts, SIGNAL(textChanged(const QString &)),
     this, SLOT(UpdateTokenValues()));
   QObject::connect(
@@ -407,6 +414,7 @@ void pqRemoteCommandDialog::Restore()
 void pqRemoteCommandDialog::SetActiveHost(string host)
 {
   this->TokenValues[PV_HOST]=host;
+  this->Ui->pvHost->setText (host.c_str());
   this->UpdateCommandPreview();
 }
 
@@ -488,6 +496,9 @@ void pqRemoteCommandDialog::UpdateTokenValues()
 
   this->TokenValues[SSH_EXEC]
     = (const char *)this->Ui->sshExec->text().toAscii();
+
+  this->TokenValues[PV_HOST]
+    = (const char *)this->Ui->pvHost->text().toAscii();
 
   this->TokenValues[FE_URL]
     = (const char *)this->Ui->feUrl->text().toAscii();
