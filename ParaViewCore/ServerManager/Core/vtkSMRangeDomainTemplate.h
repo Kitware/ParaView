@@ -171,7 +171,7 @@ protected:
   void SetEntries(const std::vector<vtkEntry>& new_value)
     {
     if (this->Entries.size() != new_value.size() ||
-      !std::equal(this->Entries.begin(), this->Entries.end(), new_value.begin()))
+      !std::equal(this->Entries.cbegin(), this->Entries.cend(), new_value.cbegin()))
       {
       this->Entries = new_value;
       this->DomainModified();
