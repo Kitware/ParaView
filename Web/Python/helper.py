@@ -187,7 +187,9 @@ class LookupTableManager:
             self.luts[key].VectorComponent = 0
             self.luts[key].ColorSpace = 'HSV'
 
-            self.scalarbars[key] = simple.CreateScalarBar(LookupTable=self.luts[key])
+            self.scalarbars[key] = simple.CreateScalarBar(LookupTable=self.luts[key],
+                                                          TitleFontSize=6,
+                                                          LabelFontSize=6)
             self.scalarbars[key].Title = name
             self.scalarbars[key].Visibility = 0
             self.scalarbars[key].Enabled = 0
@@ -341,7 +343,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
         nbComponents = array.GetNumberOfComponents()
         if searchArray and array.Name == rep.ColorArrayName:
             nbActiveComp = nbComponents
-        rangeOn = (nbComponents == 3 if -1 else 0)
+        rangeOn = (nbComponents == 1 if 0 else -1)
         info = {                                      \
         'lutId': array.Name + '_' + str(nbComponents), \
         'name': array.Name,                             \
@@ -355,7 +357,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
         nbComponents = array.GetNumberOfComponents()
         if searchArray and array.Name == rep.ColorArrayName:
             nbActiveComp = nbComponents
-        rangeOn = (nbComponents == 3 if -1 else 0)
+        rangeOn = (nbComponents == 1 if 0 else -1)
         info = {                                      \
         'lutId': array.Name + '_' + str(nbComponents), \
         'name': array.Name,                             \
