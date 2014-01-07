@@ -201,25 +201,77 @@ public:
     return this->index(row, 0);
     }
 
-  QModelIndex removeRow(const QModelIndex& toRemove=QModelIndex())
+  // Given a list of modelindexes, return a vector containing multiple sorted
+  // vectors of rows, split by their discontinuity
+  void splitSelectedIndexesToRowRanges(
+    const QModelIndexList& indexList,
+    QVector<QVector<QVariant> > &result)
     {
-    if (!toRemove.isValid()) { return QModelIndex(); }
-
-    int row = toRemove.row();
-    emit this->beginRemoveRows(QModelIndex(), row, row);
-    this->Values.remove(row*this->NumberOfColumns, this->NumberOfColumns);
-    emit this->endRemoveRows();
-
-    if (row < this->rowCount())
+    if (indexList.empty())
       {
-      // since toRemove is still a valid row.
-      return toRemove;
+      return;
       }
-    row -= 1;
-    if (row >=0 && row < this->rowCount())
+    result.clear();
+    QVector <int> rows;
+    QModelIndexList::const_iterator iter = indexList.begin();
+    for ( ; iter != indexList.end(); ++iter)
       {
-      return this->index(row, toRemove.column());
+      if ((*iter).isValid())
+        {
+        rows.push_back((*iter).row());
+        }
       }
+    qSort(rows.begin(), rows.end());
+    result.resize(1);
+    result[0].push_back(rows[0]);
+    for (int i = 1; i < rows.size(); ++i)
+      {
+      if (rows[i] == rows[i-1])
+        {
+        // avoid duplicate
+        continue;
+        }
+      if (rows[i] != rows[i-1] + 1)
+        {
+        result.push_back(QVector<QVariant>());
+        }
+      result.back().push_back(QVariant(rows[i]));
+      }
+    }
+
+  // Remove the given rows. Returns item before or after the removed
+  // item, if any.
+  QModelIndex removeRows(const QModelIndexList& toRemove=QModelIndexList())
+    {
+    QVector< QVector<QVariant> > rowRanges;
+    this->splitSelectedIndexesToRowRanges(toRemove, rowRanges);
+    size_t numGroups = rowRanges.size();
+    for (int g = numGroups-1; g > -1; --g)
+      {
+      int numRows = rowRanges.at(g).size();
+      int beginRow = rowRanges.at(g).at(0).toInt();
+      int endRow = rowRanges.at(g).at(numRows - 1).toInt();
+      emit this->beginRemoveRows(QModelIndex(), beginRow, endRow);
+      for (int r = endRow; r >= beginRow; --r)
+        {
+        this->Values.remove(r*this->NumberOfColumns, this->NumberOfColumns);
+        }
+      emit this->endRemoveRows();
+      }
+
+    int firstRow = rowRanges.at(0).at(0).toInt();
+    int rowsCount = this->rowCount();
+    if (firstRow < rowsCount)
+      {
+      // since firstRow is still a valid row.
+      return this->index(firstRow, toRemove.at(0).column());
+      }
+    else if (rowsCount > 0 && (firstRow > (rowsCount-1)))
+      {
+      // just return the index for last row.
+      return this->index(rowsCount-1, toRemove.at(0).column());
+      }
+
     return QModelIndex();
     }
 
@@ -339,8 +391,9 @@ void pqScalarValueListPropertyWidget::editPastLastRow()
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::remove()
 {
- QModelIndex idx = this->Internals->Model.removeRow(
-    this->Internals->Ui.Table->currentIndex());
+  QModelIndexList indexes =
+    this->Internals->Ui.Table->selectionModel()->selectedIndexes();
+  QModelIndex idx = this->Internals->Model.removeRows(indexes);
   this->Internals->Ui.Table->setCurrentIndex(idx);
   emit this->scalarsChanged();
 }
