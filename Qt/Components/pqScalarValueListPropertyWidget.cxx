@@ -241,7 +241,7 @@ public:
 
   // Remove the given rows. Returns item before or after the removed
   // item, if any.
-  QModelIndex removeRows(const QModelIndexList& toRemove=QModelIndexList())
+  QModelIndex removeListedRows(const QModelIndexList& toRemove=QModelIndexList())
     {
     QVector< QVector<QVariant> > rowRanges;
     this->splitSelectedIndexesToRowRanges(toRemove, rowRanges);
@@ -393,7 +393,7 @@ void pqScalarValueListPropertyWidget::remove()
 {
   QModelIndexList indexes =
     this->Internals->Ui.Table->selectionModel()->selectedIndexes();
-  QModelIndex idx = this->Internals->Model.removeRows(indexes);
+  QModelIndex idx = this->Internals->Model.removeListedRows(indexes);
   this->Internals->Ui.Table->setCurrentIndex(idx);
   emit this->scalarsChanged();
 }
