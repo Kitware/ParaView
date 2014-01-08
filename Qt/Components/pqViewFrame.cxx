@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #define PEN_WIDTH 2
-const int ICON_SIZE = 16;
+const int ICON_SIZE = 12;
 
 //-----------------------------------------------------------------------------
 pqViewFrame::pqViewFrame(QWidget* parentObject)
@@ -87,7 +87,6 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
     this, SLOT(contextMenuRequested(const QPoint&)));
 
 // limits the titlebar's height.
-  this->TitleBar->setMaximumSize(16777215, 18);
   this->TitleBar->installEventFilter(this);
 
   // Create standard buttons.

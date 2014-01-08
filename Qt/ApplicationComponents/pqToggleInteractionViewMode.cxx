@@ -79,13 +79,12 @@ void pqToggleInteractionViewMode::updateInteractionLabel(int mode)
   switch(mode)
     {
   case vtkPVRenderView::INTERACTION_MODE_2D:
-    this->parentAction()->setText("2D");
+    this->parentAction()->setIcon(
+      QIcon(":/pqWidgets/Icons/pqInteractionMode2D16.png"));
     break;
   case vtkPVRenderView::INTERACTION_MODE_3D:
-    this->parentAction()->setText("3D");
-    break;
-  default:
-    this->parentAction()->setText("-");
+    this->parentAction()->setIcon(
+      QIcon(":/pqWidgets/Icons/pqInteractionMode3D16.png"));
     break;
     }
 }
