@@ -42,14 +42,31 @@ class FileNameGenerator():
         Update active arguments and extend arguments range.
         """
         for key, value in kwargs.iteritems():
-            self.active_arguments[key] = value
+            value_str = "{value}".format(value=value)
+            self.active_arguments[key] = value_str
             if self.arguments.has_key(key):
                 try:
-                    self.arguments[key].index(value)
+                    self.arguments[key]["values"].index(value_str)
                 except ValueError:
-                    self.arguments[key].append(value)
+                    self.arguments[key]["values"].append(value_str)
             else:
-                self.arguments[key] = [value]
+                typeOfValues = "range"
+                if type(value) == type("String"):
+                    typeOfValues = "list"
+                self.arguments[key] = {
+                    "values" : [ value_str ],
+                    "default": value_str,
+                    "type": typeOfValues,
+                    "label": key
+                }
+
+    def update_label_arguments(self, **kwargs):
+        """
+        Update label arguments, but argument must exist first
+        """
+        for key, value in kwargs.iteritems():
+            if self.arguments.has_key(key):
+                self.arguments[key]["label"] = value
 
     def get_filename(self):
         """
@@ -89,25 +106,27 @@ class SliceExplorer():
     scaling.
     """
 
-    def __init__(self, file_name_generator, view, data, colorBy, lut, steps=10, normal=[0.0,0.0,1.0], bound_range=[0.0, 1.0]):
+    def __init__(self, file_name_generator, view, data, colorByArray, steps=10, normal=[0.0,0.0,1.0], viewup=[0.0,1.0,0.0], bound_range=[0.0, 1.0], parallelScaleRatio = 1.5):
         """
         file_name_generator: the file name generator to use. Need to have ['sliceColor', 'slicePosition'] as keys.
         view: View proxy to render in
         data: Input proxy to process
-        colorBy: ('POINT_DATA', 'RTData')
-        lut: Lookup table to use
+        colorByArray: { "RTData": { "lut": ... , "type": 'POINT_DATA'} }
         steps: Number of slice along the given axis. Default 10
         normal: Slice plane normal. Default [0,0,1]
+        viewup=[0.0,1.0,0.0]
         bound_range: Array of 2 percentage of the actual data bounds. Default full bounds [0.0, 1.0]
+        scaleParallelProj
         """
         self.view_proxy = view
         self.slice = simple.Slice( SliceType="Plane", Input=data, SliceOffsetValues=[0.0] )
         self.sliceRepresentation = simple.Show(self.slice)
-        self.sliceRepresentation.ColorArrayName = colorBy
-        self.sliceRepresentation.LookupTable = lut
+        self.colorByArray = colorByArray
+        self.parallelScaleRatio = parallelScaleRatio
         self.slice.SliceType.Normal = normal
         self.dataBounds = data.GetDataInformation().GetBounds()
         self.normal = normal
+        self.viewup = viewup
         self.origin = [ self.dataBounds[0] + bound_range[0] * (self.dataBounds[1] - self.dataBounds[0]),
                         self.dataBounds[2] + bound_range[0] * (self.dataBounds[3] - self.dataBounds[2]),
                         self.dataBounds[4] + bound_range[0] * (self.dataBounds[5] - self.dataBounds[4]) ]
@@ -119,7 +138,6 @@ class SliceExplorer():
 
         # Update file name pattern
         self.file_name_generator = file_name_generator
-        self.file_name_generator.update_active_arguments(sliceColor=colorBy[1])
 
     @staticmethod
     def list_arguments(self):
@@ -131,7 +149,7 @@ class SliceExplorer():
         """
         self.slice.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
         self.view_proxy.CameraParallelProjection = 1
-        self.view_proxy.CameraViewUp = [ self.normal[2], self.normal[0], self.normal[1] ]
+        self.view_proxy.CameraViewUp = self.viewup
         self.view_proxy.CameraFocalPoint = [ 0,0,0 ]
         self.view_proxy.CameraPosition = self.slice.SliceType.Normal
         self.slice.SliceType.Origin = [ (self.dataBounds[0] + self.dataBounds[1])/2,
@@ -139,18 +157,27 @@ class SliceExplorer():
                                         (self.dataBounds[4] + self.dataBounds[5])/2 ]
         simple.Render()
         simple.ResetCamera()
+        self.view_proxy.CameraParallelScale = self.view_proxy.CameraParallelScale / self.parallelScaleRatio
 
         for step in range(int(self.number_of_steps)):
             self.slice.SliceType.Origin = [ self.origin[0] + float(step) * self.origin_inc[0],
                                             self.origin[1] + float(step) * self.origin_inc[1],
                                             self.origin[2] + float(step) * self.origin_inc[2] ]
 
-            # Update file name pattern
-            self.file_name_generator.update_active_arguments(slicePosition=step)
-            simple.Render()
-            simple.WriteImage(self.file_name_generator.get_fullpath())
+            # Loop over each color withour changing geometry
+            for name in self.colorByArray:
+                # Choose color by
+                self.sliceRepresentation.ColorArrayName = (self.colorByArray[name]["type"], name)
+                self.sliceRepresentation.LookupTable = self.colorByArray[name]["lut"]
+                self.file_name_generator.update_active_arguments(sliceColor=name)
+
+                # Update file name pattern
+                self.file_name_generator.update_active_arguments(slicePosition=step)
+                simple.Render()
+                simple.WriteImage(self.file_name_generator.get_fullpath())
 
         # Generate metadata
+        self.file_name_generator.update_label_arguments(sliceColor="Color by:")
         self.file_name_generator.WriteMetaData()
         self.view_proxy.CameraParallelProjection = 0
 
@@ -198,6 +225,8 @@ class ContourExplorer():
         self.current_step = 0
         # Update file name pattern
         self.file_name_generator.update_active_arguments(contourBy=contourBy[1])
+        self.file_name_generator.update_active_arguments(contourValue=self.scalar_origin)
+        self.file_name_generator.update_label_arguments(contourValue=str(contourBy[1]))
 
     @staticmethod
     def list_arguments(self):
@@ -350,5 +379,5 @@ def test2():
     exp.WriteData()
     simple.ResetCamera()
     simple.Hide(c)
-    slice = SliceExplorer(FileNameGenerator('/tmp/slice', 'w_{sliceColor}_{slicePosition}.jpg'), view, w, ('POINT_DATA','RTData'), lut, 50, [0,1,0])
+    slice = SliceExplorer(FileNameGenerator('/tmp/slice', 'w_{sliceColor}_{slicePosition}.jpg'), view, w, { "RTData": { "lut": lut, "type": 'POINT_DATA'} }, 50, [0,1,0])
     slice.WriteData()
