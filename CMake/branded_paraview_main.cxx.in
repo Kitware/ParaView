@@ -1,5 +1,5 @@
 // ***************** DO NOT EDIT ***********************************
-// This is a generated file. 
+// This is a generated file.
 // It will be replaced next time you rebuild.
 /*=========================================================================
 
@@ -10,7 +10,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 // ***************** DO NOT EDIT ***********************************
-// This is a generated file. 
+// This is a generated file.
 // It will be replaced next time you rebuild.
 
 #include <QApplication>
@@ -46,6 +46,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include <clocale>
 
+namespace
+{
+// Return true when \a vname exists in the environment (empty or not).
+static bool checkenv(const char* vname)
+{
+#if !defined(_WIN32) || defined(__CYGWIN__)
+  return getenv(vname) ? true : false;
+#else
+  char* buf; //allocated or assigned by _dupenv_s
+  const bool valid = (_dupenv_s(&buf, NULL, vname) == 0) && (buf != NULL);
+  free(buf); //perfectly valid to free a NULL pointer
+  return valid;
+#endif
+}
+}
+
 int main(int argc, char* argv[])
 {
 #ifdef Q_WS_X11
@@ -56,8 +72,8 @@ int main(int argc, char* argv[])
 #endif
 
   // When playing tests, disable all effects.
-  if (getenv("DART_TEST_FROM_DART") ||
-    getenv("DASHBOARD_TEST_FROM_CTEST"))
+  if (checkenv("DART_TEST_FROM_DART") ||
+      checkenv("DASHBOARD_TEST_FROM_CTEST"))
     {
     QApplication::setDesktopSettingsAware(false);
     QApplication::setEffectEnabled(Qt::UI_AnimateMenu, false);
