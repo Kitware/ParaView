@@ -245,7 +245,7 @@ public:
     {
     QVector< QVector<QVariant> > rowRanges;
     this->splitSelectedIndexesToRowRanges(toRemove, rowRanges);
-    size_t numGroups = rowRanges.size();
+    int numGroups = static_cast<int>(rowRanges.size());
     for (int g = numGroups-1; g > -1; --g)
       {
       int numRows = rowRanges.at(g).size();
