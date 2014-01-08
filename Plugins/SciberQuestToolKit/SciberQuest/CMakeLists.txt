@@ -1,7 +1,7 @@
 #--------------------------------------------------
 # Configuration options
 #--------------------------------------------------
-find_package(CUDA)
+find_package(CUDA QUIET)
 include(CMakeDependentOption)
 cmake_dependent_option(SQTK_CUDA "Enable CUDA optimizations." ON
   CUDA_FOUND OFF)
