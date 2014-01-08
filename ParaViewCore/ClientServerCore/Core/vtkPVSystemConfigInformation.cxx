@@ -41,7 +41,6 @@ void vtkPVSystemConfigInformation::ConfigInfo::Print()
     << "CPUDescriptor=" << this->CPUDescriptor << endl
     << "MemDescriptor=" << this->MemDescriptor << endl
     << "HostName=" << this->HostName << endl
-    << "FullyQualifiedDomainName=" << this->FullyQualifiedDomainName << endl
     << "ProcessType=" << this->ProcessType << endl
     << "SystemType=" << this->SystemType << endl
     << "Rank=" << this->Rank << endl
@@ -93,7 +92,6 @@ void vtkPVSystemConfigInformation::CopyFromObject(vtkObject *obj)
   info.CPUDescriptor=sysInfo.GetCPUDescription();
   info.MemDescriptor=sysInfo.GetMemoryDescription();
   info.HostName=sysInfo.GetHostname();
-  info.FullyQualifiedDomainName=sysInfo.GetFullyQualifiedDomainName();
   info.ProcessType=vtkProcessModule::GetProcessType();
   info.SystemType=sysInfo.GetOSIsWindows();
   info.Rank=vtkProcessModule::GetProcessModule()->GetPartitionId();
@@ -155,7 +153,6 @@ void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream *css)
       << this->Configs[i].CPUDescriptor.c_str()
       << this->Configs[i].MemDescriptor.c_str()
       << this->Configs[i].HostName.c_str()
-      << this->Configs[i].FullyQualifiedDomainName.c_str()
       << this->Configs[i].ProcessType
       << this->Configs[i].SystemType
       << this->Configs[i].Rank
@@ -215,13 +212,6 @@ void vtkPVSystemConfigInformation::CopyFromStream(
         "HostName");
     ++offset;
     this->Configs[i].HostName=hostName;
-
-    char *fullyQualifiedDomainName;
-    vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&fullyQualifiedDomainName),
-        "FullyQualifiedDomainName");
-    ++offset;
-    this->Configs[i].FullyQualifiedDomainName=fullyQualifiedDomainName;
 
     vtkVerifyParseMacro(
         css->GetArgument(0,offset,&this->Configs[i].ProcessType),
