@@ -90,10 +90,8 @@
           { "path": "VTK-Filters-Extraction-CMake.patch" }
       ],
       "exclude":[
-        {
-          "path":"Testing"
-        },
-        {"path": "vtkExtractArraysOverTime*"  }
+        { "path":"Testing" },
+        { "path": "vtkExtractArraysOverTime*"  }
       ]
     },
     { "name":"vtkCommonExecutionModel",
@@ -142,30 +140,19 @@
       "path":"VTK/Filters/Core",
       "include":[
         { "path":"module.cmake" },
-        { "path":"vtkAppendCompositeDataLeaves.h" },
-        { "path":"vtkAppendCompositeDataLeaves.cxx" },
-        { "path":"vtkAppendFilter.h" },
-        { "path":"vtkAppendFilter.cxx" },
-        { "path":"vtkAppendPolyData.h" },
-        { "path":"vtkAppendPolyData.cxx" },
-        { "path":"vtkCellDataToPointData.cxx" },
-        { "path":"vtkCellDataToPointData.h" },
-        { "path":"vtkFeatureEdges.cxx" },
-        { "path":"vtkFeatureEdges.h" },
-        { "path":"vtkImageAppend.h" },
-        { "path":"vtkImageAppend.cxx" },
-        { "path":"vtkPointDataToCellData.cxx" },
-        { "path":"vtkPointDataToCellData.h" },
-        { "path":"vtkProbeFilter.cxx" },
-        { "path":"vtkProbeFilter.h" },
-        { "path":"vtkQuadricClustering.cxx" },
-        { "path":"vtkQuadricClustering.h" },
-        { "path":"vtkThreshold.cxx" },
-        { "path":"vtkThreshold.h" }
+        { "class":"vtkAppendCompositeDataLeaves" },
+        { "class":"vtkAppendFilter" },
+        { "class":"vtkAppendPolyData" },
+        { "class":"vtkCellDataToPointData" },
+        { "class":"vtkFeatureEdges" },
+        { "class":"vtkImageAppend" },
+        { "class":"vtkPointDataToCellData" },
+        { "class":"vtkProbeFilter" },
+        { "class":"vtkQuadricClustering" },
+        { "class":"vtkThreshold" }
       ],
       "replace":[
-        { "path":"VTK/Filters/Core/CMakeLists.txt" },
-        { "path":"VTK/Filters/Core/Base.catalyst.cmake" }
+        { "path":"VTK/Filters/Core/CMakeLists.txt" }
       ],
       "cswrap":true
     },
