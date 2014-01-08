@@ -112,9 +112,9 @@ void pqExpandableTableView::closeEditor(
 }
 
 //-----------------------------------------------------------------------------
-void pqExpandableTableView::keyPressEvent(QKeyEvent * event)
+void pqExpandableTableView::keyPressEvent(QKeyEvent * e)
 {
-  if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_V)
+  if (e->modifiers() == Qt::ControlModifier && e->key() == Qt::Key_V)
     {
     // Get text from the clipboard. Text is expected to be tabular in form,
     // delimited by arbitrary whitespace.
@@ -145,5 +145,5 @@ void pqExpandableTableView::keyPressEvent(QKeyEvent * event)
       }
     }
 
-  this->Superclass::keyPressEvent(event);
+  this->Superclass::keyPressEvent(e);
 }

@@ -103,9 +103,9 @@ bool pqOpacityTableModel::setData(const QModelIndex &idx, const QVariant &value,
 }
 
 //-----------------------------------------------------------------------------
-int pqOpacityTableModel::rowCount(const QModelIndex & parent) const
+int pqOpacityTableModel::rowCount(const QModelIndex & parentIndex) const
 {
-  Q_UNUSED(parent);
+  Q_UNUSED(parentIndex);
 
   int size = 0;
   if (this->Widget && this->Widget->proxy())
@@ -127,8 +127,10 @@ int pqOpacityTableModel::rowCount(const QModelIndex & parent) const
 }
 
 //-----------------------------------------------------------------------------
-int pqOpacityTableModel::columnCount(const QModelIndex & parent) const
+int pqOpacityTableModel::columnCount(const QModelIndex & parentIndex) const
 {
+  Q_UNUSED(parentIndex);
+
   return 2;
 }
 

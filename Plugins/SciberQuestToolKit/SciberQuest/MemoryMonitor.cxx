@@ -23,7 +23,7 @@ MemoryMonitor::MemoryMonitor()
   // get the total system memory
   int ok;
   std::vector<std::string> meminfo;
-  ok=LoadLines("/proc/meminfo",meminfo);
+  ok=(int)LoadLines("/proc/meminfo",meminfo);
   if (!ok)
     {
     sqErrorMacro(std::cerr,"Failed to open /proc/meminfo.");
@@ -116,7 +116,7 @@ unsigned long long MemoryMonitor::GetStatusField(const char *name)
   // value pairs there in
   int ok;
   std::vector<std::string> status;
-  ok=LoadLines("/proc/self/status",status);
+  ok=(int)LoadLines("/proc/self/status",status);
   if (!ok)
     {
     sqErrorMacro(std::cerr,"Failed to open /proc/self/status.");
