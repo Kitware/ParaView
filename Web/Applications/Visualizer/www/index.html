@@ -53,7 +53,8 @@
                     $('.control-panel').pipelineBrowser({
                         session: session,
                         pipeline: pipeline,
-                        sources: filters
+                        sources: filters,
+                        cacheFiles: false
                     }).bind('dataChanged', updateView);
 
                     // - vcr toolbar

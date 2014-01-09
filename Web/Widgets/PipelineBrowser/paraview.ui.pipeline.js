@@ -404,7 +404,8 @@
      *          pipeline: pipeline,
      *          sources: sourceList,
      *          files: fileList,
-     *          title: 'Kitware'
+     *          title: 'Kitware',
+     *          cacheFiles: false
      *      });
      */
     $.fn.pipelineBrowser = function(options) {
@@ -430,7 +431,7 @@
             me[0].innerHTML = buffer.toString();
 
             // Initialize file section
-            $('.pipeline-files').fileBrowser({session: session}).bind('file-click file-group-click', function(e){
+            $('.pipeline-files').fileBrowser({session: session, cacheFiles: opts.cacheFiles}).bind('file-click file-group-click', function(e){
                 pipeline = getPipeline(me), toggleButton = $('.files.active', pipeline);
                 pipeline.removeClass(PIPELINE_VIEW_TYPES).addClass('view-pipeline');
                 toggleButton.removeClass('active');
@@ -456,7 +457,8 @@
         session: null,
         pipeline: DEFAULT_PIPELINE,
         sources: DEFAULT_SOURCES,
-        title: 'Kitware'
+        title: 'Kitware',
+        cacheFiles: true
     };
 
     /**
