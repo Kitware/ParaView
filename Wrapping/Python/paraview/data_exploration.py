@@ -143,10 +143,14 @@ class SliceExplorer():
     def list_arguments(self):
         return ['sliceColor', 'slicePosition']
 
-    def WriteData(self):
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
+    def UpdatePipeline(self, time=0):
         """
         Probe dataset and dump images to the disk
         """
+        self.file_name_generator.update_active_arguments(time=time)
         self.slice.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
         self.view_proxy.CameraParallelProjection = 1
         self.view_proxy.CameraViewUp = self.viewup
@@ -192,7 +196,7 @@ class ContourExplorer():
 
         dataRange = [40.0, 270.0]
         arrayName = ('POINT_DATA', 'RTData')
-        fileGenerator = FileNameGenerator('/tmp/iso', '{contourBy}_{contourValue}_{theta}_{phi}.jpg')
+        fileGenerator = FileNameGenerator('/tmp/iso', '{time}_{contourBy}_{contourValue}_{theta}_{phi}.jpg')
 
         cExplorer = ContourExplorer(fileGenerator, w, arrayName, dataRange, 25)
         proxy = cExplorer.getContour()
@@ -203,9 +207,10 @@ class ContourExplorer():
         rep.ColorArrayName = arrayName
         view = simple.Render()
 
+        time = 0.0
         exp = ThreeSixtyImageStackExporter(fileGenerator, view, [0,0,0], 100, [0,0,1], [30, 45])
         for progress in cExplorer:
-            exp.WriteData()
+            exp.UpdatePipeline(time)
             print progress
     """
 
@@ -256,6 +261,9 @@ class ContourExplorer():
         """
         return self.contour
 
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
 #==============================================================================
 # Image exporter
 #==============================================================================
@@ -293,10 +301,14 @@ class ThreeSixtyImageStackExporter():
     def list_arguments(self):
         return ['phi', 'theta']
 
-    def WriteData(self):
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
+    def UpdatePipeline(self, time=0):
         """
         Change camera position and dump images to the disk
         """
+        self.file_name_generator.update_active_arguments(time=time)
         self.view_proxy.CameraFocalPoint = self.focal_point
         self.view_proxy.CameraViewUp     = self.phi_rotation_axis
         theta_offset = 90 % self.angular_steps[1]
@@ -355,7 +367,7 @@ def test():
 
     exp = ThreeSixtyImageStackExporter(fileGenerator, view, [0,0,0], 100, [0,0,1], [30, 45])
     for progress in cExplorer:
-        exp.WriteData()
+        exp.UpdatePipeline()
         print progress
 
 
@@ -372,12 +384,12 @@ def test2():
 
     view = simple.Render()
     exp = ThreeSixtyImageStackExporter(FileNameGenerator('/tmp/z', 'w_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,0,1], [10, 20])
-    exp.WriteData()
+    exp.UpdatePipeline()
     exp = ThreeSixtyImageStackExporter(FileNameGenerator('/tmp/y', 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,1,0], [10, 20])
-    exp.WriteData()
+    exp.UpdatePipeline()
     exp = ThreeSixtyImageStackExporter(FileNameGenerator('/tmp/x', 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [1,0,0], [10, 20])
-    exp.WriteData()
+    exp.UpdatePipeline()
     simple.ResetCamera()
     simple.Hide(c)
     slice = SliceExplorer(FileNameGenerator('/tmp/slice', 'w_{sliceColor}_{slicePosition}.jpg'), view, w, { "RTData": { "lut": lut, "type": 'POINT_DATA'} }, 50, [0,1,0])
-    slice.WriteData()
+    slice.UpdatePipeline()
