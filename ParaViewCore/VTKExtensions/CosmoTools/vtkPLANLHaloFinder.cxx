@@ -391,6 +391,9 @@ void vtkPLANLHaloFinder::ComputeSODHalos(
       vtkUnstructuredGrid *particles,
       vtkUnstructuredGrid *fofHaloCenters)
 {
+#ifdef NDEBUG
+  (void)(particles);
+#endif
   assert("pre: input particles should not be NULL" &&
          (particles != NULL) );
   assert("pre: FOF halo-centers should not be NULL" &&
