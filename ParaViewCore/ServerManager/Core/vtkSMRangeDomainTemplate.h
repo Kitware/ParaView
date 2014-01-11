@@ -170,8 +170,11 @@ protected:
     { return this->Entries; }
   void SetEntries(const std::vector<vtkEntry>& new_value)
     {
+    typedef typename std::vector<vtkEntry>::const_iterator cit;
+    cit b = this->Entries.begin();
+    cit e = this->Entries.end();
     if (this->Entries.size() != new_value.size() ||
-      !std::equal(this->Entries.begin(), this->Entries.end(), new_value.begin()))
+      !std::equal(b,e, new_value.begin()))
       {
       this->Entries = new_value;
       this->DomainModified();
