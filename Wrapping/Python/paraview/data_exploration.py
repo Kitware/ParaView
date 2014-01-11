@@ -265,6 +265,176 @@ class ContourExplorer():
         setattr(self, name, value)
 
 #==============================================================================
+# Chart generator
+#==============================================================================
+
+class DataProber():
+    def __init__(self, file_name_generator, data_to_probe, points_series, fields):
+        """
+        file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
+        data_to_probe: Input data proxy to probe.
+        points_series: Data structure providing the location to probe.
+            [ { name: "X_axis", probes: [ [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], ... [100.0, 0.0, 0.0] ] },
+              { name: "Y_axis", probes: [ [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], ... [0.0, 100.0, 0.0] ] },
+              { name: "Random", probes: [ [0.0, 0.0, 0.0], [0.0, 2.0, 1.0], ... [0.0, 50.0, 100.0] ] } ]
+        fields: Array containing the name of the scalar value to extract.
+            [ 'temperature', 'salinity' ]
+        """
+        self.file_name_generator = file_name_generator
+        self.data_proxy = data_to_probe
+        self.series = points_series
+        self.fields = fields
+        self.probe = simple.ProbeLocation( Input=data_to_probe, ProbeType="Fixed Radius Point Source" )
+        self.probe.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
+        self.location = self.probe.ProbeType
+        self.location.NumberOfPoints = 1
+        self.location.Radius = 0.0
+
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
+    @staticmethod
+    def list_arguments(self):
+        return ['time', 'field', 'serie']
+
+    def UpdatePipeline(self, time=0):
+        """
+        Write a file (x_{time}_{field}_{serie}.csv => x_134.0_temperature_X_Axis.csv) with the following format:
+
+        idx,X_axis
+        0,3.56
+        1,3.57
+        ...
+        100,5.76
+
+        ++++
+
+        idx,Y_axis
+        0,5.6
+        1,7.57
+        ...
+        100,10.76
+
+        """
+        self.file_name_generator.update_active_arguments(time=time)
+
+        # Explore the data
+        saved_data = {}
+        for serie in self.series:
+            serie_name = serie['name']
+            serie_points = serie['probes']
+
+            # Create empty container
+            saved_data[serie_name] = {}
+            for field in self.fields:
+                saved_data[serie_name][field] = []
+
+            # Fill container with values
+            for point in serie_points:
+                self.location.Center = point
+                dataInfo = self.probe.GetPointDataInformation()
+                for field in self.fields:
+                    array = dataInfo.GetArray(field)
+                    saved_data[serie_name][field].append(array.GetRange(-1)[0])
+
+
+        # Write data to disk
+        for field in self.fields:
+            self.file_name_generator.update_active_arguments(field=field)
+            for serie in self.series:
+                self.file_name_generator.update_active_arguments(serie=serie['name'])
+
+                with open(self.file_name_generator.get_fullpath(), "w") as data_file:
+                    data_file.write("idx,%s\n" % serie['name'])
+                    idx = 0
+                    for value in saved_data[serie['name']][field]:
+                        data_file.write("%f,%f\n" % (idx, value))
+                        idx += 1
+
+        # Generate metadata
+        self.file_name_generator.WriteMetaData()
+
+#==============================================================================
+
+class TimeSerieDataProber():
+    def __init__(self, file_name_generator, data_to_probe, point_series, fields, time_to_write):
+        """
+        file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
+        data_to_probe: Input data proxy to probe.
+        point_series: Data structure providing the location to probe.
+            [ { name: "Origin", probe: [ 0.0, 0.0, 0.0 ] },
+              { name: "Center", probe: [ 100.0, 100.0, 100.0 ]},
+              { name: "Random", probe: [ 3.0, 2.0, 1.0 ] } ]
+        fields: Array containing the name of the scalar value to extract.
+            [ 'temperature', 'salinity' ]
+        time_to_write: Give the time when the TimeSerieDataProber should dump the data to disk
+                       at a given UpdatePipeline(time=2345) call.
+        """
+        self.file_name_generator = file_name_generator
+        self.data_proxy = data_to_probe
+        self.fields = fields
+        self.probe = simple.ProbeLocation( Input=data_to_probe, ProbeType="Fixed Radius Point Source" )
+        self.probe.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
+        self.location = self.probe.ProbeType
+        self.location.NumberOfPoints = 1
+        self.location.Radius = 0.0
+        self.data_arrays = {}
+        self.time_to_write = time_to_write
+        self.serie_names = [ 'time' ]
+        self.points = []
+        for serie in point_series:
+            self.serie_names.append(serie['name'])
+            self.points.append(serie['probe'])
+        for field in self.fields:
+            self.data_arrays[field] = [ self.serie_names ]
+
+
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
+    @staticmethod
+    def list_arguments(self):
+        return ['field']
+
+    def WriteToDisk(self):
+        # Generate metadata
+        self.file_name_generator.WriteMetaData()
+
+        # Generate real data
+        for field in self.fields:
+            self.file_name_generator.update_active_arguments(field=field)
+            arrays = self.data_arrays[field]
+            with open(self.file_name_generator.get_fullpath(), "w") as data_file:
+                for line in arrays:
+                    data_file.write(",".join(line))
+                    data_file.write("\n")
+
+    def UpdatePipeline(self, time=0):
+        """
+        Write a file (x_{field}.csv => x_temperature.csv + x_salinity.csv) with the following format:
+
+        time, Origin, Center, Random
+        0.0, 3.56, 6.67, 2.4765
+        0.5, 3.57, 6.65, 2.4755
+        ...
+        100.5, 5.76, 10.45, 5.567
+
+        """
+        for field in self.fields:
+            self.data_arrays[field].append([ "%f" % time ])
+
+        for point in self.points:
+            self.location.Center = point
+            dataInfo = self.probe.GetPointDataInformation()
+            for field in self.fields:
+                array = dataInfo.GetArray(field)
+                self.data_arrays[field][-1].append("%f"% array.GetRange(-1)[0])
+
+        # Write to disk if need be
+        if time >= self.time_to_write:
+            self.WriteToDisk()
+
+#==============================================================================
 # Image exporter
 #==============================================================================
 
@@ -393,3 +563,19 @@ def test2():
     simple.Hide(c)
     slice = SliceExplorer(FileNameGenerator('/tmp/slice', 'w_{sliceColor}_{slicePosition}.jpg'), view, w, { "RTData": { "lut": lut, "type": 'POINT_DATA'} }, 50, [0,1,0])
     slice.UpdatePipeline()
+
+
+# -----------------------------------------------------------------------------
+
+def test3():
+    w = simple.Wavelet()
+    points_series = [ { "name": "Diagonal" , "probes": [ [ float(x), float(x), float(x) ] for x in range(-10, 10)] }, \
+                      { "name": "Slice", "probes": [ [ float(x), float(y), 0.0 ] for x in range(-10, 10) for y in range(-10, 10)] } ]
+    time_serie = [ {"name": "Origin", "probe": [0.0, 0.0, 0.0]}, {"name": "FaceCenter", "probe": [10.0, 0.0, 0.0]} ]
+
+    prober = DataProber( FileNameGenerator('/tmp/dataprober', 'data_{time}_{field}_{serie}.csv'), w, points_series, [ "RTData" ])
+    prober.UpdatePipeline(0.0)
+
+    timeProber = TimeSerieDataProber( FileNameGenerator('/tmp/dataprober_time', 'data_{field}.csv'), w, time_serie, [ "RTData"], 100)
+    for time in range(101):
+        timeProber.UpdatePipeline(time)
