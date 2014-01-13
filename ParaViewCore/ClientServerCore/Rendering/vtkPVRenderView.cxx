@@ -180,7 +180,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractionMode = -1;
   this->LastSelection = NULL;
   this->UseOffscreenRenderingForScreenshots = false;
-  this->UseInteractiveRenderingForSceenshots = false;
+  this->UseInteractiveRenderingForScreenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->Selector = vtkPVHardwareSelector::New();
   this->PreviousParallelProjectionStatus = 0;

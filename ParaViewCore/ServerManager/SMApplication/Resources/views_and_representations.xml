@@ -85,9 +85,9 @@
         <Documentation>Set whether offscreen rendering should be used during
         CaptureWindow calls.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetUseInteractiveRenderingForSceenshots"
+      <IntVectorProperty command="SetUseInteractiveRenderingForScreenshots"
                          default_values="0"
-                         name="UseInteractiveRenderingForSceenshots"
+                         name="UseInteractiveRenderingForScreenshots"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set whether InteractiveRender() should be used during

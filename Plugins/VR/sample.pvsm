@@ -359,9 +359,9 @@
         <Element index="0" value="0"/>
         <Domain name="bool" id="267.UseGradientBackground.bool"/>
       </Property>
-      <Property name="UseInteractiveRenderingForSceenshots" id="267.UseInteractiveRenderingForSceenshots" number_of_elements="1">
+      <Property name="UseInteractiveRenderingForScreenshots" id="267.UseInteractiveRenderingForScreenshots" number_of_elements="1">
         <Element index="0" value="0"/>
-        <Domain name="bool" id="267.UseInteractiveRenderingForSceenshots.bool"/>
+        <Domain name="bool" id="267.UseInteractiveRenderingForScreenshots.bool"/>
       </Property>
       <Property name="UseLight" id="267.UseLight" number_of_elements="1">
         <Element index="0" value="1"/>

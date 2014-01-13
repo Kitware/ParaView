@@ -278,9 +278,9 @@ public:
   // Description:
   // Set or get whether capture should be done as
   // StillRender or InteractiveRender when capturing screenshots.
-  vtkSetMacro(UseInteractiveRenderingForSceenshots, bool);
-  vtkBooleanMacro(UseInteractiveRenderingForSceenshots, bool);
-  vtkGetMacro(UseInteractiveRenderingForSceenshots, bool);
+  vtkSetMacro(UseInteractiveRenderingForScreenshots, bool);
+  vtkBooleanMacro(UseInteractiveRenderingForScreenshots, bool);
+  vtkGetMacro(UseInteractiveRenderingForScreenshots, bool);
 
   // Description:
   // Set or get whether offscreen rendering should be used during
@@ -658,7 +658,7 @@ protected:
 
   bool UseOffscreenRendering;
   bool UseOffscreenRenderingForScreenshots;
-  bool UseInteractiveRenderingForSceenshots;
+  bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
   bool RenderEmptyImages;
 

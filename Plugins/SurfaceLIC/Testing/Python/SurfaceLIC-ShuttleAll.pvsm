@@ -2638,9 +2638,9 @@
         <Element index="0" value="1"/>
         <Domain name="bool" id="5082.UseGradientBackground.bool"/>
       </Property>
-      <Property name="UseInteractiveRenderingForSceenshots" id="5082.UseInteractiveRenderingForSceenshots" number_of_elements="1">
+      <Property name="UseInteractiveRenderingForScreenshots" id="5082.UseInteractiveRenderingForScreenshots" number_of_elements="1">
         <Element index="0" value="0"/>
-        <Domain name="bool" id="5082.UseInteractiveRenderingForSceenshots.bool"/>
+        <Domain name="bool" id="5082.UseInteractiveRenderingForScreenshots.bool"/>
       </Property>
       <Property name="UseLight" id="5082.UseLight" number_of_elements="1">
         <Element index="0" value="1"/>
