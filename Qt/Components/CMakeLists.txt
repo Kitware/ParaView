@@ -751,9 +751,15 @@ add_custom_command(
   COMMENT "generating built-in color map xml"
 )
 
-qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt5_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+else ()
+  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+endif ()
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}

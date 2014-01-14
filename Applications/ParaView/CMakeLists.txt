@@ -1,13 +1,20 @@
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
-QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  ParaViewMainWindow.h)
-
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  ParaViewMainWindow.ui)
-
-set (QT_USE_QTNETWORK TRUE)
-include(${QT_USE_FILE})
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_CPP(MOC_BUILT_SOURCES
+    ParaViewMainWindow.h)
+  QT5_WRAP_UI(UI_BUILT_SOURCES
+    ParaViewMainWindow.ui)
+  list( APPEND Qt5_FIND_COMPONENTS Network )
+  include( ParaViewQt5 )
+else ()
+  QT4_WRAP_CPP(MOC_BUILT_SOURCES
+    ParaViewMainWindow.h)
+  QT4_WRAP_UI(UI_BUILT_SOURCES
+    ParaViewMainWindow.ui)
+  set (QT_USE_QTNETWORK TRUE)
+  include (${QT_USE_FILE})
+endif ()
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -49,7 +56,7 @@ build_paraview_client(paraview
     APPLICATION_NAME "ParaView"
     TITLE "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit"
     ORGANIZATION  "ParaView"
-    VERSION_MAJOR ${PARAVIEW_VERSION_MAJOR} 
+    VERSION_MAJOR ${PARAVIEW_VERSION_MAJOR}
     VERSION_MINOR ${PARAVIEW_VERSION_MINOR}
     VERSION_PATCH ${PARAVIEW_VERSION_PATCH}
     SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/PVSplashScreen.png"

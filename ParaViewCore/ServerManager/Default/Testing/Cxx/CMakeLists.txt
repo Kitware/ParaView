@@ -57,9 +57,14 @@ endif()
 ################################################################################
 # ParaView ServerManager Unit Tests
 if (PARAVIEW_ENABLE_QT_SUPPORT)
-  set(QT_DONT_USE_QTGUI TRUE)
-  set(QT_USE_QTTEST TRUE)
-  include(${QT_USE_FILE})
+  if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    set(Qt5_FIND_COMPONENTS Test)
+    include (ParaViewQt5)
+  else ()
+    set(QT_DONT_USE_QTGUI TRUE)
+    set(QT_USE_QTTEST TRUE)
+    include(${QT_USE_FILE})
+  endif ()
   set(UNITTESTS
     vtkSMProxyTest
     vtkSMProxyLinkTest
