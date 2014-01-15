@@ -18,13 +18,21 @@ SET (SOURCE_FILES
   SpreadSheetMainWindow.h
 )
 
-QT4_WRAP_CPP(MOC_SRCS
-  SpreadSheetMainWindow.h
-)
-
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  SpreadSheetMainWindow.ui
-)
+IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_CPP(MOC_SRCS
+    SpreadSheetMainWindow.h
+  )
+  QT5_WRAP_UI(UI_BUILT_SOURCES
+    SpreadSheetMainWindow.ui
+  )
+ELSE ()
+  QT4_WRAP_CPP(MOC_SRCS
+    SpreadSheetMainWindow.h
+  )
+  QT4_WRAP_UI(UI_BUILT_SOURCES
+    SpreadSheetMainWindow.ui
+  )
+ENDIF ()
 
 ##########################################################################
 ## Add resources (icons etc.)
@@ -32,9 +40,15 @@ SET (UI_RESOURCES
   SpreadSheet.qrc
 )
 
-QT4_ADD_RESOURCES(RCS_BUILT_SOURCES
-  ${UI_RESOURCES}
-)
+IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_ADD_RESOURCES(RCS_BUILT_SOURCES
+    ${UI_RESOURCES}
+    )
+ELSE ()
+  QT4_ADD_RESOURCES(RCS_BUILT_SOURCES
+    ${UI_RESOURCES}
+    )
+ENDIF ()
 
 SOURCE_GROUP("Resources" FILES
   ${UI_RESOURCES})

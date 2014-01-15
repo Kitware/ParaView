@@ -11,7 +11,11 @@ ENDIF(NOT ParaView_BINARY_DIR)
 
 IF(PARAVIEW_BUILD_QT_GUI)
   # moc the Qt based .h files
-  QT4_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h MyViewActiveOptions.h MyViewOptions.h)
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h MyViewActiveOptions.h MyViewOptions.h)
+  ELSE ()
+    QT4_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h MyViewActiveOptions.h MyViewOptions.h)
+  ENDIF ()
 
   # invoke macro to create sources for our custom view and display panel
   ADD_PARAVIEW_VIEW_MODULE(

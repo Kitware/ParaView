@@ -10,19 +10,27 @@ if (NOT PARAVIEW_BUILD_QT_GUI)
     "with PARAVIEW_BUILD_QT_GUI set to TRUE")
 endif()
 
-SET (SOURCE_FILES 
+SET (SOURCE_FILES
   DemoApp1.cxx
   myMainWindow.cxx
   myMainWindow.h
 )
 
-QT4_WRAP_CPP(MOC_SRCS
-  myMainWindow.h
-)
-
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  myMainWindow.ui
-)
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_CPP(MOC_SRCS
+    myMainWindow.h
+  )
+  QT5_WRAP_UI(UI_BUILT_SOURCES
+    myMainWindow.ui
+  )
+else ()
+  QT4_WRAP_CPP(MOC_SRCS
+    myMainWindow.h
+  )
+  QT4_WRAP_UI(UI_BUILT_SOURCES
+    myMainWindow.ui
+  )
+endif ()
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}

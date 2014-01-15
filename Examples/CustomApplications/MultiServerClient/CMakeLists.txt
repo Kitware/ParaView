@@ -47,13 +47,21 @@ SET (SOURCE_FILES
   MultiServerClientMainWindow.h
 )
 
-QT4_WRAP_CPP(MOC_SRCS
-  MultiServerClientMainWindow.h
-)
-
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  MultiServerClientMainWindow.ui
-)
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_CPP(MOC_SRCS
+    MultiServerClientMainWindow.h
+  )
+  QT5_WRAP_UI(UI_BUILT_SOURCES
+    MultiServerClientMainWindow.ui
+  )
+else ()
+  QT4_WRAP_CPP(MOC_SRCS
+    MultiServerClientMainWindow.h
+  )
+  QT4_WRAP_UI(UI_BUILT_SOURCES
+    MultiServerClientMainWindow.ui
+  )
+endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}

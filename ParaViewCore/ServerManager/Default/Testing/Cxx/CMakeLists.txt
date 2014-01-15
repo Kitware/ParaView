@@ -75,7 +75,11 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     vtkSMPropertyHelperTest
   )
   foreach(name ${UNITTESTS})
-    qt4_wrap_cpp(${name}_MOC_SOURCES ${name}.h)
+    if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+      qt5_wrap_cpp(${name}_MOC_SOURCES ${name}.h)
+    else ()
+      qt4_wrap_cpp(${name}_MOC_SOURCES ${name}.h)
+    endif ()
     vtk_module_test_executable(${name} ${name}.cxx ${${name}_MOC_SOURCES})
     add_test(NAME pvunit.${name}
              COMMAND ${name})

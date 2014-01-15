@@ -75,7 +75,7 @@ SET(CLIENT_SRCS
   pqNodePlotter.cxx
   pqPlotVariablesDialog.cxx
   pqPlotter.cxx
-  pqResizingScrollArea.cxx  
+  pqResizingScrollArea.cxx
   pqSierraPlotToolsActionGroup.cxx
   pqSierraPlotToolsDataLoadManager.cxx
   pqSierraPlotToolsManager.cxx
@@ -85,10 +85,16 @@ SET(CLIENT_SRCS
 
 IF (PARAVIEW_BUILD_QT_GUI)
 
-  INCLUDE(${QT_USE_FILE})
-
-  QT4_WRAP_CPP(MOC_SRCS ${MOC_HEADERS})
-  QT4_WRAP_UI(UI_SRCS ${UI_FILES})
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    SET (Qt5_FIND_COMPONENTS Widgets)
+    INCLUDE (ParaViewQt5)
+    QT5_WRAP_CPP(MOC_SRCS ${MOC_HEADERS})
+    QT5_WRAP_UI(UI_SRCS ${UI_FILES})
+  ELSE ()
+    INCLUDE (${QT_USE_FILE})
+    QT4_WRAP_CPP(MOC_SRCS ${MOC_HEADERS})
+    QT4_WRAP_UI(UI_SRCS ${UI_FILES})
+  ENDIF ()
 
   ADD_PARAVIEW_ACTION_GROUP(SIERRA_PLOT_TOOLS_TOOLBAR_IFACE SIERRA_PLOT_TOOLS_TOOLBAR_IFACE_SRCS
     CLASS_NAME pqSierraPlotToolsActionGroup

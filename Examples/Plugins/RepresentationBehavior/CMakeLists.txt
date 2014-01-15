@@ -9,9 +9,15 @@ IF(NOT ParaView_BINARY_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF(NOT ParaView_BINARY_DIR)
 
-QT4_WRAP_CPP(MOC_SRCS
-  pqRepresentationBehaviorStarter.h
-  pqSurfaceRepresentationBehavior.h)
+IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_CPP(MOC_SRCS
+    pqRepresentationBehaviorStarter.h
+    pqSurfaceRepresentationBehavior.h)
+ELSE ()
+  QT4_WRAP_CPP(MOC_SRCS
+    pqRepresentationBehaviorStarter.h
+    pqSurfaceRepresentationBehavior.h)
+ENDIF ()
 
 ADD_PARAVIEW_AUTO_START(
   IFACES

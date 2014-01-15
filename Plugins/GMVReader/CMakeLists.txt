@@ -14,9 +14,13 @@ ENDIF(GMVReader_SKIP_DATARANGE_CALCULATIONS_IN_REQUEST_INFORMATION_CALLS)
 #--------------------------------------------------
 INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
 IF(PARAVIEW_BUILD_QT_GUI)
-  INCLUDE(${QT_USE_FILE})
+  IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    SET (Qt5_FIND_COMPONENTS Widgets)
+    INCLUDE(ParaViewQt5)
+  ELSE()
+    INCLUDE(${QT_USE_FILE})
+  ENDIF()
 ENDIF(PARAVIEW_BUILD_QT_GUI)
-
 
 # -----------------------------------------------------------------------------
 # Where are gmvread.c, gmvread.h and gmvrayread.h stored?
@@ -64,7 +68,11 @@ ENDIF (WIN32)
 # -----------------------------------------------------------------------------
 IF (PARAVIEW_BUILD_QT_GUI)
   # Extend the auto-generated panel
-  QT4_WRAP_CPP(MOC_SRCS pqGMVReaderPanel.h)
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_WRAP_CPP (MOC_SRCS pqGMVReaderPanel.h)
+  ELSE ()
+    QT4_WRAP_CPP (MOC_SRCS pqGMVReaderPanel.h)
+  ENDIF ()
   ADD_PARAVIEW_OBJECT_PANEL(IFACES IFACE_SRCS
     CLASS_NAME pqGMVReaderPanel
     XML_NAME GMVSeriesReader

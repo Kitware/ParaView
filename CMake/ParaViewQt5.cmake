@@ -6,7 +6,7 @@
 #
 # This file sets the following variables:
 #
-# Qt5_FOUND (Indicating that Qt5 libraries found)
+# QT5_FOUND (Indicating that Qt5 libraries found)
 # QT_LIBRARIES (List of Qt5 libraries)
 # QT_QMAKE_EXECUTABLE
 # QT_RCC_EXECUTABLE

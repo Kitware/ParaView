@@ -9,9 +9,12 @@ SET( MOC_SRCS )
 SET( UI_SRCS )
 
 IF (PARAVIEW_BUILD_QT_GUI)
-  INCLUDE(${QT_USE_FILE})
 
-  QT4_WRAP_CPP(MOC_SRCS 
+  SET(UI_RESOURCES
+    Resources/Prism.qrc
+    )
+
+  SET(MOC_SOURCES
     PrismDisplayPanelDecorator.h
     PrismToolBarActions.h
     PrismCore.h
@@ -20,26 +23,44 @@ IF (PARAVIEW_BUILD_QT_GUI)
     PrismScaleViewDialog.h
     PrismSurfacePanel.h
     PrismPanel.h
-    PrismView.h  
+    PrismView.h
     )
-  
-  QT4_WRAP_UI(UI_BUILT_SOURCES
-      Resources/UI/PrismSurfacePanelWidget.ui
-      Resources/UI/PrismPanelWidget.ui
-      Resources/UI/PrismViewScalingWidget.ui
+
+  SET(UI_SOURCES
+    Resources/UI/PrismSurfacePanelWidget.ui
+    Resources/UI/PrismPanelWidget.ui
+    Resources/UI/PrismViewScalingWidget.ui
+    )
+
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    SET (Qt5_FIND_COMPONENTS Widgets)
+    INCLUDE (ParaViewQt5)
+
+    QT5_WRAP_CPP(MOC_SRCS
+      ${MOC_SOURCES})
+
+    QT5_WRAP_UI(UI_BUILT_SOURCES
+      ${UI_SOURCES})
+
+    QT5_ADD_RESOURCES(RCS_SOURCES
+      ${UI_RESOURCES}
       )
-  
-  SET(UI_RESOURCES
-    Resources/Prism.qrc
-  )
-  
-  QT4_ADD_RESOURCES(RCS_SOURCES
-    ${UI_RESOURCES}
-  )
+  ELSE ()
+    INCLUDE (${QT_USE_FILE})
+    QT4_WRAP_CPP(MOC_SRCS
+      ${MOC_SOURCES})
+
+    QT4_WRAP_UI(UI_BUILT_SOURCES
+      ${UI_SOURCES})
+
+    QT4_ADD_RESOURCES(RCS_SOURCES
+      ${UI_RESOURCES}
+      )
+  ENDIF ()
 
   SOURCE_GROUP("Resources" FILES ${UI_RESOURCES})
   SOURCE_GROUP("Generated" FILES ${RCS_SOURCES})
-  
+
 
 ADD_PARAVIEW_ACTION_GROUP(
   TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBarActions

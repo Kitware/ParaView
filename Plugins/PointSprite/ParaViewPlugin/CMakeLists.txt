@@ -25,20 +25,15 @@ set(SM_XMLS_Graphics
 set(PLUGIN_NAME PointSprite_Plugin)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-    include_directories(${QT_INCLUDES})
 
-    set(UI_FORMS
-      Resources/pqPointSpriteControls.ui
-      Resources/pqPointSpriteDisplayPanelDecorator.ui
-      Resources/pqTransferFunctionDialog.ui
-      Resources/pqTransferFunctionEditor.ui
-    )
+  set(UI_FORMS
+    Resources/pqPointSpriteControls.ui
+    Resources/pqPointSpriteDisplayPanelDecorator.ui
+    Resources/pqTransferFunctionDialog.ui
+    Resources/pqTransferFunctionEditor.ui
+  )
 
-    qt4_wrap_ui(UI_SRCS
-      ${UI_FORMS}
-    )
-
-    qt4_wrap_cpp(MOC_SRCS
+  set(PLUGIN_MOC_SRCS
       pqDoubleEdit.h
       pqPointSpriteControls.h
       pqPointSpriteDisplayPanelDecorator.h
@@ -46,6 +41,25 @@ IF(PARAVIEW_BUILD_QT_GUI)
       pqTransferFunctionDialog.h
       pqTransferFunctionEditor.h
       )
+  if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    include(ParaViewQt5)
+    include_directories(${Qt5Core_INCLUDE_DIRS})
+    qt5_wrap_ui(UI_SRCS
+      ${UI_FORMS}
+    )
+
+    qt5_wrap_cpp(MOC_SRCS
+      ${PLUGIN_MOC_SRCS})
+  else ()
+    include(${QT_USE_FILE})
+    include_directories(${QT_INCLUDES})
+    qt4_wrap_ui(UI_SRCS
+      ${UI_FORMS}
+    )
+
+    qt4_wrap_cpp(MOC_SRCS
+      ${PLUGIN_MOC_SRCS})
+  endif ()
 
     set(Plugin_SRCS
       pqDoubleEdit.cxx

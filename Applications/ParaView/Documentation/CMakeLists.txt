@@ -52,8 +52,13 @@ set_source_files_properties(
   PROPERTIES OBJECT_DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/paraview.qch")
 
-QT4_ADD_RESOURCES(rcs_sources
-  "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
+if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_ADD_RESOURCES(rcs_sources
+    "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
+else()
+  QT4_ADD_RESOURCES(rcs_sources
+    "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
+endif()
 
 add_library(vtkParaViewDocumentation STATIC
   ParaViewDocumentationInitializer.cxx

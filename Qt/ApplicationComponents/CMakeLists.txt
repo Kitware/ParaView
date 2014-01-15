@@ -383,16 +383,17 @@ set (Module_UI_FILES
 set (Module_RESOURCE_FILES
 )
 
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
-else ()
-  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
-endif()
-
 # not sure this is the best way, but "moc" is complaining about
 # interfaces defined under Components and this seems like the only way to fix
 # that issue.
-  OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
+    OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+else ()
+  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
+    OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+endif()
+
 
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})

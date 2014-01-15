@@ -14,7 +14,12 @@ ELSE (ParaView_SOURCE_DIR)
 ENDIF (ParaView_SOURCE_DIR)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  INCLUDE(${QT_USE_FILE})
+  IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    SET (Qt5_FIND_COMPONENTS Widgets)
+    INCLUDE (ParaViewQt5)
+  ELSE()
+    INCLUDE(${QT_USE_FILE})
+  ENDIF()
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 #------------------------------------------------------------------------------
