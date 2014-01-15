@@ -137,10 +137,6 @@ inline void setChartParameters(
       chart->SetSelectionMode(selectionModifier);
       }
     }
-  if (chartMatrix && update_modifier)
-    {
-    chart->SetSelectionMode(selectionModifier);
-    }
 }
 
 //-----------------------------------------------------------------------------
