@@ -1410,8 +1410,12 @@ vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
       }
     else
       {
-      group->AddProperty(
-        elem->GetAttribute("function"), property);
+      const char* functionAttribute = elem->GetAttribute("function");
+      if (functionAttribute == 0)
+        {
+        functionAttribute = elem->GetAttribute("name");
+        }
+      group->AddProperty(functionAttribute, property);
       }
     }
 
