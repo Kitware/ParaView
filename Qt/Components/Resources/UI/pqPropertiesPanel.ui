@@ -128,10 +128,10 @@
         <x>0</x>
         <y>0</y>
         <width>332</width>
-        <height>191</height>
+        <height>182</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,0,0,1">
+      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,0,0,0,0,1">
        <property name="margin">
         <number>0</number>
        </property>
@@ -188,6 +188,26 @@
         </widget>
        </item>
        <item>
+        <widget class="pqExpanderButton" name="ViewButton">
+         <property name="text" stdset="0">
+          <string>View</string>
+         </property>
+         <property name="checked" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="ViewFrame">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -210,7 +230,7 @@
   <customwidget>
    <class>pqExpanderButton</class>
    <extends>QFrame</extends>
-   <header>pqExpanderButton.h</header>
+   <header location="global">pqExpanderButton.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

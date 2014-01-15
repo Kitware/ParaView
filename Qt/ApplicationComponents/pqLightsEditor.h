@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqQuadViewOptions.h
+   Module:    pqLightsEditor.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+   under the terms of the ParaView license version 1.2. 
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,52 +28,34 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqLightsEditor_h 
+#define __pqLightsEditor_h
 
-#ifndef _pqQuadViewOptions_h
-#define _pqQuadViewOptions_h
+#include <QDialog>
+#include "pqComponentsModule.h"
 
-#include "pqOptionsContainer.h"
-#include <QPointer>
+class vtkSMProxy;
+class vtkSMPropertyGroup;
+class pqLightsPropertyGroup;
 
-class pqView;
-class pqQuadView;
-
-/// options container for pages of my view options
-class pqQuadViewOptions : public pqOptionsContainer
+class PQCOMPONENTS_EXPORT pqLightsEditor : public QDialog
 {
   Q_OBJECT
-
+  typedef QDialog Superclass;
 public:
-  pqQuadViewOptions(QWidget *parent=0);
-  virtual ~pqQuadViewOptions();
+  pqLightsEditor(pqLightsPropertyGroup* propertyWidget, 
+                 vtkSMPropertyGroup* smGroup,
+                 QWidget *parent=0, Qt::WindowFlags f=0);
+  ~pqLightsEditor();
 
-  // set the view to show options for
-  void setView(pqView* view);
+ protected slots:
+  void reset();
 
-  // set the current page
-  virtual void setPage(const QString &page);
-  // return a list of strings for pages we have
-  virtual QStringList getPageList();
-
-  // apply the changes
-  virtual void applyChanges();
-  // reset the changes
-  virtual void resetChanges();
-
-  // tell pqOptionsDialog that we want an apply button
-  virtual bool isApplyUsed() const { return true; }
-
-public slots:
-  void onSliceOriginChanged();
-
-protected:
-  QPointer<pqQuadView> View;
-
-private:
+ private:
   class pqInternal;
   pqInternal* Internal;
+  pqLightsPropertyGroup* PropertyWidget;
 };
-
 
 #endif

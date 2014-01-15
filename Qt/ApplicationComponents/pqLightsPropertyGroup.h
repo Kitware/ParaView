@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqRenderViewOptions.h
+   Module: pqLightsPropertyGroup.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2012 Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -30,55 +30,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqRenderViewOptions_h
-#define _pqRenderViewOptions_h
+#ifndef _pqLightsPropertyGroup_h
+#define _pqLightsPropertyGroup_h
 
-#include "pqComponentsModule.h"
-#include "pqOptionsContainer.h"
+#include "pqApplicationComponentsModule.h"
+#include "pqPropertyGroupWidget.h"
 
-class pqView;
+class pqLightsEditor;
 
-/// options container for pages of render view options
-class PQCOMPONENTS_EXPORT pqRenderViewOptions : public pqOptionsContainer
+class PQAPPLICATIONCOMPONENTS_EXPORT pqLightsPropertyGroup :
+  public pqPropertyGroupWidget
 {
   Q_OBJECT
 
-public:
-  pqRenderViewOptions(QWidget *parent=0);
-  virtual ~pqRenderViewOptions();
+ friend class pqLightsEditor;
 
-  // set the view to show options for
-  void setView(pqView* view);
+ public:
+  pqLightsPropertyGroup(vtkSMProxy *proxy, vtkSMPropertyGroup* smGroup,
+                        QWidget *parent = 0);
+  ~pqLightsPropertyGroup();
 
-  // set the current page
-  virtual void setPage(const QString &page);
-  // return a list of strings for pages we have
-  virtual QStringList getPageList();
+ private slots:
+  void showEditor();
 
-  // apply the changes
-  virtual void applyChanges();
-  // reset the changes
-  virtual void resetChanges();
-
-  // tell pqOptionsDialog that we want an apply button
-  virtual bool isApplyUsed() const { return true; }
-
-protected slots:
-  void connectGUI();
-  void disconnectGUI();
-  void restoreDefaultBackground();
-  void resetLights();
-  void resetAnnotation();
-
-  void selectSolidColor(bool flag);
-  void selectGradientColor(bool flag);
-  void selectBackgroundImage(bool flag);
-
-  void restoreDefaultGradientColor1();
-  void restoreDefaultGradientColor2();
-private:
-  class pqInternal;
-  pqInternal* Internal;
+ private:
+  pqLightsEditor* Editor;
 };
+
 
 #endif

@@ -39,14 +39,10 @@ set (Module_SRCS
   pqAboutDialog.h
   pqActionGroupInterface.cxx
   pqActionGroupInterface.h
-  pqActiveMultiSliceViewOptions.cxx
-  pqActiveMultiSliceViewOptions.h
   pqActiveObjects.cxx
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.cxx
   pqActivePlotMatrixViewOptions.h
-  pqActiveRenderViewOptions.cxx
-  pqActiveRenderViewOptions.h
   pqActiveServer.cxx
   pqActiveServer.h
   pqActiveView.cxx
@@ -232,8 +228,6 @@ set (Module_SRCS
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorPanel.cxx
   pqMultiBlockInspectorPanel.h
-  pqMultiSliceViewOptions.cxx
-  pqMultiSliceViewOptions.h
   pqMultiViewWidget.cxx
   pqMultiViewWidget.h
   pqNamedObjectPanel.cxx
@@ -295,6 +289,8 @@ set (Module_SRCS
   pqPQLookupTableManager.h
   pqPropertiesPanel.cxx
   pqPropertiesPanel.h
+  pqPropertyGroupWidget.cxx
+  pqPropertyGroupWidget.h
   pqPropertyWidget.cxx
   pqPropertyWidget.h
   pqPropertyWidgetDecorator.h
@@ -319,8 +315,6 @@ set (Module_SRCS
   pqQueryClauseWidget.h
   pqRecentFilesMenu.cxx
   pqRecentFilesMenu.h
-  pqRenderViewOptions.cxx
-  pqRenderViewOptions.h
   pqRemoteCommandDialog.cxx
   pqRemoteCommandDialog.h
   pqRemoteCommandTemplateDialog.cxx
@@ -436,10 +430,8 @@ set (Module_MOC_HDRS
   pq3DWidget.h
   pq3DWidgetPropertyWidget.h
   pqAboutDialog.h
-  pqActiveMultiSliceViewOptions.h
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.h
-  pqActiveRenderViewOptions.h
   pqActiveServer.h
   pqActiveView.h
   pqActiveViewOptions.h
@@ -525,7 +517,6 @@ set (Module_MOC_HDRS
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorPanel.h
-  pqMultiSliceViewOptions.h
   pqMultiViewWidget.h
   pqNamedObjectPanel.h
   pqNetCDFPanel.h
@@ -555,6 +546,7 @@ set (Module_MOC_HDRS
   pqPointSourceWidget.h
   pqPQLookupTableManager.h
   pqPropertiesPanel.h
+  pqPropertyGroupWidget.h
   pqPropertyWidget.h
   pqPropertyWidgetDecorator.h
   pqProxyInformationWidget.h
@@ -568,7 +560,6 @@ set (Module_MOC_HDRS
   pqRecentFilesMenu.h
   pqRemoteCommandDialog.h
   pqRemoteCommandTemplateDialog.h
-  pqRenderViewOptions.h
   pqRescaleRange.h
   pqSampleScalarAddRangeDialog.h
   pqSampleScalarWidget.h
@@ -669,7 +660,6 @@ set (Module_UI_FILES
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMemoryInspectorPanelForm.ui
-  Resources/UI/pqMultiSliceViewOptions.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
@@ -687,7 +677,6 @@ set (Module_UI_FILES
   Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqRemoteCommandDialogForm.ui
   Resources/UI/pqRemoteCommandTemplateDialogForm.ui
-  Resources/UI/pqRenderViewOptions.ui
   Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui

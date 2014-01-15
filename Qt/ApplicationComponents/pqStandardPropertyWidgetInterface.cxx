@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardPropertyWidgetInterface.h"
 
 #include "pqArrayStatusPropertyWidget.h"
+#include "pqBackgroundEditorWidget.h"
 #include "pqCalculatorWidget.h"
 #include "pqClipScalarsDecorator.h"
 #include "pqColorAnnotationsPropertyWidget.h"
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEnableWidgetDecorator.h"
 #include "pqFontPropertyWidget.h"
 #include "pqInputDataTypeDecorator.h"
+#include "pqLightsPropertyGroup.h"
 #include "pqListPropertyWidget.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
@@ -129,6 +131,14 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
   else if(QString(group->GetPanelWidget()) == "CubeAxes")
     {
     return new pqCubeAxesPropertyWidget(proxy);
+    }
+  else if(QString(group->GetPanelWidget()) == "BackgroundEditor")
+    {
+    return new pqBackgroundEditorWidget(proxy, group);
+    }
+  else if(QString(group->GetPanelWidget()) == "LightsEditor")
+    {
+    return new pqLightsPropertyGroup(proxy, group);
     }
   else if (QString(group->GetPanelWidget()) == "ArrayStatus")
     {

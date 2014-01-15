@@ -49,10 +49,5 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0/0/1/0|0" />
 
   <!-- hide orientation axes since on some dashboards it's not resized correctly -->
-  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditViewSettings" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,47,5,/2:0" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,47,5,/2:0" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mousePress" arguments="1,1,0,14,13" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mouseRelease" arguments="1,0,0,14,13" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/OrientationAxesVisibility/CheckBox" command="set_boolean" arguments="false" />
 </pqevents>

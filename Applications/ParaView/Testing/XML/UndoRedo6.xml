@@ -33,10 +33,8 @@ undo for changes in the "View Settings" dialog.
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
-  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditViewSettings" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/General/parallelProjection" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/CameraParallelProjection/CheckBox" command="set_boolean" arguments="true" />
+   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />

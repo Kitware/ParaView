@@ -43,6 +43,8 @@ set (Module_SRCS
   pqAutoLoadPluginXMLBehavior.h
   pqAxesToolbar.cxx
   pqAxesToolbar.h
+  pqBackgroundEditorWidget.cxx
+  pqBackgroundEditorWidget.h
   pqCameraLinkReaction.cxx
   pqCameraLinkReaction.h
   pqCameraReaction.cxx
@@ -123,6 +125,10 @@ set (Module_SRCS
   pqIgnoreSourceTimeReaction.h
   pqInputDataTypeDecorator.cxx
   pqInputDataTypeDecorator.h
+  pqLightsEditor.cxx
+  pqLightsEditor.h
+  pqLightsPropertyGroup.cxx
+  pqLightsPropertyGroup.h
   pqListPropertyWidget.cxx
   pqListPropertyWidget.h
   pqLoadDataReaction.cxx
@@ -239,6 +245,7 @@ set (Module_MOC_HDRS
   pqAutoApplyReaction.h
   pqAutoLoadPluginXMLBehavior.h
   pqAxesToolbar.h
+  pqBackgroundEditorWidget.h
   pqCameraLinkReaction.h
   pqCameraReaction.h
   pqCameraToolbar.h
@@ -279,6 +286,8 @@ set (Module_MOC_HDRS
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
   pqInputDataTypeDecorator.h
+  pqLightsEditor.h
+  pqLightsPropertyGroup.h
   pqListPropertyWidget.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
@@ -349,6 +358,7 @@ endif()
 
 set (Module_UI_FILES
   Resources/UI/pqAxesToolbar.ui
+  Resources/UI/pqBackgroundEditorWidget.ui
   Resources/UI/pqCameraToolbar.ui
   Resources/UI/pqColorAnnotationsPropertyWidget.ui
   Resources/UI/pqColorEditorPropertyWidget.ui
@@ -359,6 +369,7 @@ set (Module_UI_FILES
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqFontPropertyWidget.ui
+  Resources/UI/pqLightsEditor.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui

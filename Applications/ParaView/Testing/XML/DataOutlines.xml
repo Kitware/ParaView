@@ -16,9 +16,7 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,56,10,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/General/parallelProjection" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/CameraParallelProjection/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="cancelled" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />

@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqMultiSliceViewOptions.h
+   Module: pqLightsPropertyGroup.cxx
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2012 Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+   under the terms of the ParaView license version 1.2. 
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,47 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqMultiSliceViewOptions_h
-#define _pqMultiSliceViewOptions_h
+#include "pqLightsPropertyGroup.h"
 
-#include "pqOptionsContainer.h"
-#include <QPointer>
+#include <QVBoxLayout>
+#include <QPushButton>
 
-class pqView;
-class pqMultiSliceView;
+#include "pqLightsEditor.h"
+#include "pqPropertiesPanel.h"
+#include "pqProxy.h"
+#include "vtkSMProxy.h"
 
-/// options container for pages of multislice view options
-class PQCOMPONENTS_EXPORT pqMultiSliceViewOptions : public pqOptionsContainer
+pqLightsPropertyGroup::pqLightsPropertyGroup(
+  vtkSMProxy *smProxy, vtkSMPropertyGroup* smGroup,
+  QWidget*parentObject)
+  : pqPropertyGroupWidget(smProxy, smGroup, parentObject),
+    Editor (new pqLightsEditor(this, smGroup))
 {
-  Q_OBJECT
+  QVBoxLayout *layoutLocal = new QVBoxLayout(this);
+  layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
+  layoutLocal->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
-public:
-  pqMultiSliceViewOptions(QWidget *parent=0);
-  virtual ~pqMultiSliceViewOptions();
+  QPushButton *button = new QPushButton("Edit");
+  connect(button, SIGNAL(clicked()), SLOT(showEditor()));
+  layoutLocal->addWidget(button);
+}
 
-  // set the view to show options for
-  void setView(pqView* view);
+pqLightsPropertyGroup::~pqLightsPropertyGroup()
+{
+  delete this->Editor;
+}
 
-  // set the current page
-  virtual void setPage(const QString &page);
-  // return a list of strings for pages we have
-  virtual QStringList getPageList();
-
-  // apply the changes
-  virtual void applyChanges();
-  // reset the changes
-  virtual void resetChanges();
-
-  // tell pqOptionsDialog that we want an apply button
-  virtual bool isApplyUsed() const { return true; }
-
-protected:
-  QPointer<pqMultiSliceView> View;
-
-private:
-  class pqInternal;
-  pqInternal* Internal;
-};
-
-
-#endif
+void pqLightsPropertyGroup::showEditor()
+{
+  this->Editor->exec();
+}

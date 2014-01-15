@@ -12,6 +12,7 @@
          command="SetWorldScaleMode"
          number_of_elements="3"
          information_property="WorldScaleModeInfo"
+         panel_visibility="never"
          default_values="0 0 0">
          <DoubleRangeDomain name="range"/>
       </IntVectorProperty>
@@ -42,6 +43,7 @@
          command="SetCustomWorldBounds"
          number_of_elements="6"
          information_property="CustomBoundsInfo"
+         panel_visibility="never"
          default_values="0 1 0 1 0 1">
          <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>

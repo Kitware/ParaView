@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxy.h"
 
 #include <QKeyEvent>
 #include <QPointer>
@@ -222,6 +223,7 @@ public:
   QPointer<pqDataRepresentation> Representation;
   QMap<void*, QPointer<pqProxyWidgets> > SourceWidgets;
   QPointer<pqProxyWidgets> DisplayWidgets;
+  QPointer<pqProxyWidgets> ViewWidgets;
   bool ReceivedChangeAvailable;
 
   vtkNew<vtkEventQtSlotConnect> RepresentationEventConnect;
@@ -267,6 +269,7 @@ public:
       }
     this->SourceWidgets.clear();
     delete this->DisplayWidgets;
+    delete this->ViewWidgets;
     }
 
   //---------------------------------------------------------------------------
@@ -346,6 +349,9 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
                    this->Internals->Ui.PropertiesFrame, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->Ui.DisplayButton, SIGNAL(toggled(bool)),
                    this->Internals->Ui.DisplayFrame, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->Ui.ViewButton, SIGNAL(toggled(bool)),
+                   this->Internals->Ui.ViewFrame, SLOT(setVisible(bool)));
+
 
   this->setOutputPort(NULL);
 }
@@ -408,11 +414,7 @@ void pqPropertiesPanel::setRepresentation(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::setView(pqView* pqview)
 {
-  if (this->Internals->View != pqview)
-    {
-    this->Internals->View = pqview;
-    emit this->viewChanged(pqview);
-    }
+  this->updateViewPanel(pqview);
 }
 
 //-----------------------------------------------------------------------------
@@ -436,6 +438,7 @@ void pqPropertiesPanel::updatePanel(pqOutputPort* port)
   // entire panel, else we simply update the widgets.
   this->updatePropertiesPanel(port? port->getSource() : NULL);
   this->updateDisplayPanel(port? port->getRepresentation(this->view()) : NULL);
+  this->updateViewPanel(this->view());
   this->updateButtonState();
 }
 
@@ -549,6 +552,68 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
     {
     this->Internals->Ui.DisplayButton->setText("Display");
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::updateViewPanel (pqView* view)
+{
+  QString viewName;
+  bool propertiesInPanel = false;
+  if (view)
+    {
+    viewName = view->getViewProxy()->GetXMLName();
+    propertiesInPanel = (
+      viewName == "RenderView" ||
+      viewName == "ComparativeRenderView" ||
+      viewName == "MultiSlice" ||
+      /*Plugins*/
+      viewName == "QuadView" ||
+      viewName == "MantaView" ||
+      viewName == "PrismView" ||
+      /*StreamingView plugin*/
+      viewName == "IteratingView" ||
+      viewName == "PrioritizingView" ||
+      viewName == "RefiningView");
+    }
+
+  if (this->Internals->View != view)
+    {
+    // The view has changed.
+    if (this->Internals->View)
+      {
+      if (this->Internals->ViewWidgets)
+        {
+        this->Internals->ViewWidgets->hide();
+        delete this->Internals->ViewWidgets;
+        }
+      }
+    this->Internals->View = view;
+    emit this->viewChanged(view);
+    if (view && propertiesInPanel)
+      {
+      // create the widgets for this view
+      pqProxyWidgets* widgets = new pqProxyWidgets(view, this);
+      widgets->Panel->setApplyChangesImmediately(true);
+      QObject::connect(widgets->Panel, SIGNAL(changeFinished()),
+                       this, SLOT(renderActiveView()));
+      this->Internals->ViewWidgets = widgets;
+      this->Internals->ViewWidgets->show(this->Internals->Ui.ViewFrame);
+      }
+    }
+
+  if (view && propertiesInPanel)
+    {
+    // update the label and show the widgets
+    vtkSMViewProxy* proxy = view->getViewProxy();
+    const char* label = proxy->GetXMLLabel ();
+    this->Internals->Ui.ViewButton->setText(
+      QString ("View (%1)").arg (label != 0 ? label : view->getViewType ()));
+    this->Internals->ViewWidgets->showWidgets(
+      this->Internals->Ui.AdvancedButton->isChecked(),
+      this->Internals->Ui.SearchLineEdit->text());
+    }
+  else
+    this->Internals->Ui.ViewButton->setText("View");
 }
 
 //-----------------------------------------------------------------------------
