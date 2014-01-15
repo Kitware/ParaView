@@ -1,6 +1,6 @@
 #!/bin/sh
 
-usage="$0 <srcdir> <builddir> [--no-configure] [--no-build] [--no-test] --input <edition> [--input <edition>]... [<cmake arguments>...]"
+usage="$0 <srcdir> <builddir> [--install] [--no-configure] [--no-build] [--no-test] --input <edition> [--input <edition>]... [<cmake arguments>...]"
 
 # A handy function for handling errors.
 die () {
@@ -32,6 +32,7 @@ args=
 no_configure=
 no_build=
 no_test=
+install=
 while [ "$#" -gt 0 ]; do
     case "$1" in
     --input)
@@ -53,6 +54,9 @@ while [ "$#" -gt 0 ]; do
         ;;
     --no-test)
         no_test=y
+        ;;
+    --install)
+        install=y
         ;;
     *)
         break
@@ -107,11 +111,17 @@ cd "$bin_output"
 cmake --build . || \
     die "Failed to build"
 
-# Exit if tests are not wanted.
-[ -n "$no_test" ] && exit 0
+# Test if wanted.
+if [ -z "$no_test" ]; then
+    cd "$bin_output/Testing"
+    cmake --build . || \
+        die "Failed to build tests"
+    ctest -VV || \
+        die "Tests failed"
+fi
 
-cd "$bin_output/Testing"
-cmake --build . || \
-    die "Failed to build tests"
-ctest -VV || \
-    die "Tests failed"
+if [ -n "$install" ]; then
+    cd "$bin_output"
+    cmake --build . --target install || \
+        die "Failed to install"
+fi
