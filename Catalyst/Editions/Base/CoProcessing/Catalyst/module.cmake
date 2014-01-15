@@ -4,6 +4,8 @@ vtk_module(vtkPVCatalyst
   DEPENDS
     vtkPVServerManagerApplication
     vtkCommonCore
+  PRIVATE_DEPENDS
+    vtksys
 
   TEST_DEPENDS
     vtkPVCatalystTestDriver
