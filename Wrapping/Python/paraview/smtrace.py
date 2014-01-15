@@ -70,7 +70,7 @@ def reset_trace_globals():
                                        "lookup_tables", "scalar_bars",
                                        "selection_sources", "animation"]
   trace_globals.ignored_properties = {
-    "views" : ["ViewSize", "GUISize", "ViewPosition", "Representations", "ViewTime"],
+    "views" : ["ViewSize", "GUISize", "ViewPosition", "Representations", "ViewTime", "CameraClippingRange"],
     "representations" : ["Input"],
     "animation" : ["Cues"]}
   trace_globals.proxy_ctor_hook = None
@@ -244,6 +244,31 @@ def track_existing_animation_scene_proxy(proxy, proxy_name):
 def track_existing_animation_cue_proxy(proxy, proxy_name):
     return trace_proxy_registered(proxy, "animation", proxy_name)
 
+def track_existing_helper_proxy(helper_proxy, parent_proxy_info):
+    """Start tracking a helper proxy e.g. the implicit function for a Clip
+    filter. This will create a new proxy_trace_info object for the implicit
+    function so that any properties modified on it can be recorded."""
+    if not helper_proxy or not parent_proxy_info:
+        raise Exception('Missing (or invalid) required arguments')
+
+    # We need to create a proxy_trace_info object for the helper_proxy.
+    # For that, we need to determine which property this helper proxy was
+    # set to.
+    itr = servermanager.PropertyIterator(parent_proxy_info.Proxy)
+    for prop in itr:
+        if prop.IsA("vtkSMProxyProperty") and prop.GetDomain("proxy_list") \
+            and prop.IsProxyAdded(helper_proxy):
+            propInfo = prop_trace_info(parent_proxy_info, prop)
+
+            helper_proxy_info = proxy_trace_info(helper_proxy, "helpers", "NotUsed")
+            helper_proxy_info.ctor_traced = True
+            trace_globals.known_proxies.append(helper_proxy_info)
+
+            helper_proxy_info.PyVariable = propInfo.PyVariable
+            helper_proxy_info.ParentProxyInfo = parent_proxy_info
+            return helper_proxy_info
+    return None
+
 def track_existing_proxy(proxy):
   proxy_name = get_source_proxy_registration_name(proxy)
   if proxy_name:
@@ -263,6 +288,15 @@ def track_existing_proxy(proxy):
   proxy_name = get_animation_cue_proxy_registration_name(proxy)
   if proxy_name:
     return track_existing_animation_cue_proxy(proxy, proxy_name)
+
+  # it is possible that the proxy is a "helper" proxy list the "Plane" proxy for
+  # ClipType property on the Clip filter.
+  parent_proxy = get_parent_source_proxy(proxy)
+  if parent_proxy:
+    # this will start tracking the parent_proxy if it wasn't already.
+    parent_proxy_info = get_proxy_info(parent_proxy)
+    return track_existing_helper_proxy(proxy, parent_proxy_info)
+
   return None
 
 def get_proxy_info(p, search_existing=True):
@@ -366,6 +400,20 @@ def get_animation_cue_proxy_registration_name(proxy):
        proxy.GetXMLName() == "TimeAnimationCue":
         return servermanager.ProxyManager().GetProxyName("animation", proxy)
     return None
+
+def get_parent_source_proxy(proxy):
+    """This method returns the ParentProxy for a helper
+    proxy e.g. for a implicit plane proxy on the ClipType property of a the
+    Clip source proxy, this method will return the the Clip source proxy."""
+    if proxy and proxy.GetNumberOfConsumers() == 1 and proxy.GetConsumerProxy(0):
+        consumer = proxy.GetConsumerProxy(0)
+        # consumer must be a source proxy. If not the following method will
+        # return None. If it is a source proxy, it will return  the proxy name,
+        # so we are pretty much done here!
+        if get_source_proxy_registration_name(consumer):
+            return consumer
+    return None
+
 
 def make_comma_separated_string(values):
   ret = str()
