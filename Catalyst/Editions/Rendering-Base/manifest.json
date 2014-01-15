@@ -5,6 +5,10 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name": "Module_vtkPVServerManagerRendering",
+        "type": "BOOL",
+        "value": "ON"
+      },
       { "name": "Module_vtkCommonComputationalGeometry",
         "type": "BOOL",
         "value": "ON"
@@ -29,6 +33,10 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name": "Module_vtkInteractionStyle",
+        "type": "BOOL",
+        "value": "ON"
+      },
       { "name": "Module_vtkChartsCore",
         "type": "BOOL",
         "value": "ON"
@@ -41,6 +49,14 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name": "Module_vtkRenderingGL2PS",
+        "type": "BOOL",
+        "value": "ON"
+      },
+      { "name": "Module_vtkIOExport",
+        "type": "BOOL",
+        "value": "ON"
+      },
       { "name": "Module_vtkRenderingAnnotation",
         "type": "BOOL",
         "value": "ON"
@@ -50,6 +66,10 @@
         "value": "ON"
       },
       { "name": "Module_vtkFiltersParallel",
+        "type": "BOOL",
+        "value": "ON"
+      },
+      { "name": "Module_vtkFiltersGeneric",
         "type": "BOOL",
         "value": "ON"
       },
@@ -124,10 +144,58 @@
         { "class": "vtkTrackballPan" },
         { "class": "vtkUpdateSuppressorPipeline" },
         { "class": "vtkViewLayout" },
-        { "class": "vtkVolumeRepresentationPreprocessor" },
         { "class": "vtkWeightedRedistributePolyData" },
         { "class": "vtkXYChartNamedOptions" },
         { "class": "vtkZlibImageCompressor" }
+      ],
+      "replace": [
+        { "path": "ParaViewCore/VTKExtensions/Rendering/Rendering-Base-glsl.catalyst.cmake" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkFiltersHyperTree",
+      "path": "VTK/Filters/HyperTree",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkHyperOctreeSurfaceFilter" },
+        { "class": "vtkHyperTreeGridGeometry" }
+      ],
+      "replace": [
+        { "path": "VTK/Filters/HyperTree/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkRenderingLabel",
+      "path": "VTK/Rendering/Label",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkLabeledDataMapper" }
+      ],
+      "replace": [
+        { "path": "VTK/Rendering/Label/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkIOExport",
+      "path": "VTK/IO/Export",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkExporter" },
+        { "class": "vtkGL2PSExporter" }
+      ],
+      "replace": [
+        { "path": "VTK/IO/Export/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkRenderingGL2PS",
+      "path": "VTK/Rendering/GL2PS",
+      "exclude": [
+        { "path": "Testing" }
       ],
       "cswrap": true,
       "pythonwrap": true
@@ -144,15 +212,55 @@
       "cswrap": true,
       "pythonwrap": true
     },
+    { "name": "vtkFiltersGeneric",
+      "path": "VTK/Filters/Generic",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkGenericGeometryFilter" }
+      ],
+      "replace": [
+        { "path": "VTK/Filters/Generic/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkFiltersGeometry",
+      "path": "VTK/Filters/Geometry",
+      "include": [
+        { "class": "vtkGeometryFilter" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkFiltersExtraction",
+      "path": "VTK/Filters/Extraction",
+      "include": [
+        { "class": "vtkExtractBlock" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkFiltersCore",
+      "path": "VTK/Filters/Core",
+      "include": [
+        { "class": "vtkAppendSelection" },
+        { "class": "vtkStripper" },
+        { "class": "vtkStructuredGridOutlineFilter" },
+        { "class": "vtkTubeFilter" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
     { "name": "vtkFiltersParallel",
       "path": "VTK/Filters/Parallel",
       "include": [
-        { "path": "module.cmake" },
         { "class": "vtkExtractUnstructuredGridPiece" },
         { "class": "vtkExtractUserDefinedPiece" },
-        { "class": "vtkPKdTree" }
+        { "class": "vtkPKdTree" },
+        { "class": "vtkRectilinearGridOutlineFilter" }
       ],
       "replace": [
+        { "path": "VTK/Filters/Parallel/module.cmake" },
         { "path": "VTK/Filters/Parallel/CMakeLists.txt" }
       ],
       "cswrap": true,
@@ -162,11 +270,27 @@
       "path": "VTK/Filters/General",
       "include": [
         { "class": "vtkAnnotationLink" },
+        { "class": "vtkAxes" },
         { "class": "vtkBoxClipDataSet" },
         { "class": "vtkCellCenters" },
+        { "class": "vtkDataSetTriangleFilter" },
         { "class": "vtkMergeCells" },
+        { "class": "vtkMultiBlockDataGroupFilter" },
+        { "class": "vtkPassArrays" },
         { "class": "vtkSplitColumnComponents" },
         { "class": "vtkTransformPolyDataFilter" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkFiltersModeling",
+      "path": "VTK/Filters/Modeling",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkOutlineFilter" }
+      ],
+      "replace": [
+        { "path": "VTK/Filters/Modeling/CMakeLists.txt" }
       ],
       "cswrap": true,
       "pythonwrap": true
@@ -208,13 +332,16 @@
         { "class": "vtkColorTransferFunction" },
         { "class": "vtkCompositeDataDisplayAttributes" },
         { "class": "vtkCompositePainter" },
+        { "class": "vtkCompositePolyDataMapper2" },
         { "class": "vtkCoordinate" },
         { "class": "vtkCuller" },
         { "class": "vtkCullerCollection" },
         { "class": "vtkDefaultPainter" },
+        { "class": "vtkDiscretizableColorTransferFunction" },
         { "class": "vtkDisplayListPainter" },
         { "class": "vtkFollower" },
         { "class": "vtkFrustumCoverageCuller" },
+        { "class": "vtkGenericRenderWindowInteractor" },
         { "class": "vtkGenericVertexAttributeMapping" },
         { "class": "vtkGlyph3DMapper" },
         { "class": "vtkGPUInfo" },
@@ -234,6 +361,7 @@
         { "class": "vtkLight" },
         { "class": "vtkLightCollection" },
         { "class": "vtkLightingPainter" },
+        { "class": "vtkLightKit" },
         { "class": "vtkLinesPainter" },
         { "class": "vtkLODProp3D" },
         { "class": "vtkMapper" },
@@ -268,9 +396,11 @@
         { "class": "vtkScalarsToColorsPainter" },
         { "class": "vtkShaderDeviceAdapter2" },
         { "class": "vtkStandardPolyDataPainter" },
+        { "class": "vtkStringToImage" },
         { "class": "vtkTDxInteractorStyle" },
         { "class": "vtkTDxInteractorStyleCamera" },
         { "class": "vtkTDxInteractorStyleSettings" },
+        { "class": "vtkTextMapper" },
         { "class": "vtkTextProperty" },
         { "class": "vtkTextRenderer" },
         { "class": "vtkTexture" },
@@ -279,6 +409,7 @@
         { "class": "vtkVolume" },
         { "class": "vtkVolumeCollection" },
         { "class": "vtkVolumeProperty" },
+        { "class": "vtkWindowToImageFilter" },
         { "class": "vtkWorldPointPicker" }
       ],
       "replace": [
@@ -291,10 +422,12 @@
       "path": "VTK/Rendering/Annotation",
       "include": [
         { "path": "module.cmake" },
+        { "path": "vtkScalarBarActorInternal.h" },
         { "class": "vtkAxisActor" },
         { "class": "vtkAxisFollower" },
+        { "class": "vtkCubeAxesActor" },
         { "class": "vtkProp3DAxisFollower" },
-        { "class": "vtkCubeAxesActor" }
+        { "class": "vtkScalarBarActor" }
       ],
       "replace": [
         { "path": "VTK/Rendering/Annotation/CMakeLists.txt" }
@@ -306,11 +439,13 @@
       "path": "VTK/Rendering/Parallel",
       "include": [
         { "path": "module.cmake" },
+        { "class": "vtkCompositedSynchronizedRenderers" },
         { "class": "vtkCompositer" },
         { "class": "vtkCompositeRenderManager" },
         { "class": "vtkCompressCompositer" },
         { "class": "vtkParallelRenderManager" },
-        { "class": "vtkSynchronizedRenderers" }
+        { "class": "vtkSynchronizedRenderers" },
+        { "class": "vtkTreeCompositer" }
       ],
       "replace": [
         { "path": "VTK/Rendering/Parallel/CMakeLists.txt" }
@@ -359,15 +494,148 @@
         { "path": "fonts/face_times_bold.cxx" },
         { "path": "fonts/face_times_bold_italic.cxx" },
         { "path": "fonts/face_times_italic.cxx" },
+        { "class": "vtkFreeTypeTools" },
         { "class": "vtkFreeTypeUtilities" },
+        { "class": "vtkMathTextFreeTypeTextRenderer" },
         { "class": "vtkMathTextUtilities" },
         { "class": "vtkTextActor" },
         { "class": "vtkTextActor3D" },
+        { "class": "vtkTextRendererStringToImage" },
         { "class": "vtkVectorText" }
       ],
       "replace": [
         { "path": "VTK/Rendering/FreeType/CMakeLists.txt" },
         { "path": "VTK/Rendering/FreeType/Rendering-Base.fonts.catalyst.cmake" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkPVClientServerCoreRendering",
+      "path": "ParaViewCore/ClientServerCore/Rendering",
+      "include": [
+        { "path": "hints" },
+        { "class": "vtk3DWidgetRepresentation" },
+        { "class": "vtkCaveSynchronizedRenderers" },
+        { "class": "vtkIceTSynchronizedRenderers" },
+        { "class": "vtkMPIMoveData" },
+        { "class": "vtkChartRepresentation" },
+        { "class": "vtkChartSelectionRepresentation" },
+        { "class": "vtkClientServerMoveData" },
+        { "class": "vtkCompositeRepresentation" },
+        { "class": "vtkCubeAxesRepresentation" },
+        { "class": "vtkDataLabelRepresentation" },
+        { "class": "vtkGeometryRepresentation" },
+        { "class": "vtkGeometryRepresentationWithFaces" },
+        { "class": "vtkGlyph3DRepresentation" },
+        { "class": "vtkMatplotlibUtilities" },
+        { "class": "vtkOutlineRepresentation" },
+        { "class": "vtkPVCacheKeeper" },
+        { "class": "vtkPVCacheKeeperPipeline" },
+        { "class": "vtkPVClientServerSynchronizedRenderers" },
+        { "class": "vtkPVCompositeRepresentation" },
+        { "class": "vtkPVContextView" },
+        { "class": "vtkPVDataDeliveryManager" },
+        { "class": "vtkPVDataRepresentation" },
+        { "class": "vtkPVDataRepresentationPipeline" },
+        { "class": "vtkPVDisplayInformation" },
+        { "class": "vtkPVHardwareSelector" },
+        { "class": "vtkPVImplicitPlaneRepresentation" },
+        { "class": "vtkPVLastSelectionInformation" },
+        { "class": "vtkPVPlotMatrixView" },
+        { "class": "vtkPVProminentValuesInformation" },
+        { "class": "vtkPVRenderView" },
+        { "class": "vtkPVRepresentedDataInformation" },
+        { "class": "vtkPVSelectionInformation" },
+        { "class": "vtkPVStreamingPiecesInformation" },
+        { "class": "vtkPVSynchronizedRenderer" },
+        { "class": "vtkPVSynchronizedRenderWindows" },
+        { "class": "vtkPVView" },
+        { "class": "vtkPythonRepresentation" },
+        { "class": "vtkPythonView" },
+        { "class": "vtkSelectionDeliveryFilter" },
+        { "class": "vtkSelectionRepresentation" }
+      ],
+      "replace": [
+        { "path": "ParaViewCore/ClientServerCore/Rendering/module.cmake" },
+        { "path": "ParaViewCore/ClientServerCore/Rendering/CMakeLists.txt" }
+      ],
+      "exclude": [
+        { "path": "Testing" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkViewsCore",
+      "path": "VTK/Views/Core",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkConvertSelectionDomain" },
+        { "class": "vtkDataRepresentation" },
+        { "class": "vtkRenderViewBase" },
+        { "class": "vtkView" },
+        { "class": "vtkViewTheme" }
+      ],
+      "replace": [
+        { "path": "VTK/Views/Core/CMakeLists.txt" }
+      ],
+      "exclude": [
+        { "path": "Testing" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkViewsContext2D",
+      "path": "VTK/Views/Context2D",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkContextInteractorStyle" },
+        { "class": "vtkContextView" }
+      ],
+      "replace": [
+        { "path": "VTK/Views/Context2D/CMakeLists.txt" }
+      ],
+      "exclude": [
+        { "path": "Testing" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkInteractionWidgets",
+      "path": "VTK/Interaction/Widgets",
+      "include": [
+        { "class": "vtkAbstractWidget" },
+        { "class": "vtkBorderRepresentation" },
+        { "class": "vtkBoxRepresentation" },
+        { "class": "vtkEvent" },
+        { "class": "vtkImplicitPlaneRepresentation" },
+        { "class": "vtkScalarBarRepresentation" },
+        { "class": "vtkWidgetCallbackMapper" },
+        { "class": "vtkWidgetEvent" },
+        { "class": "vtkWidgetEventTranslator" },
+        { "class": "vtkWidgetRepresentation" }
+      ],
+      "replace": [
+        { "path": "VTK/Interaction/Widgets/module.cmake" },
+        { "path": "VTK/Interaction/Widgets/CMakeLists.txt" }
+      ],
+      "exclude": [
+        { "path": "Testing" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkPVServerImplementationRendering",
+      "path": "ParaViewCore/ServerImplementation/Rendering",
+      "exclude": [
+        { "path": "Testing" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkPVServerManagerRendering",
+      "path": "ParaViewCore/ServerManager/Rendering",
+      "exclude": [
+        { "path": "Testing" }
       ],
       "cswrap": true,
       "pythonwrap": true
@@ -390,11 +658,13 @@
       "include": [
         { "path": "module.cmake" },
         { "path": "vtkContextScenePrivate.h" },
+        { "path": "vtkOpenGLContextDevice2DPrivate.h" },
         { "class": "vtkAbstractContextBufferId" },
         { "class": "vtkAbstractContextItem" },
         { "class": "vtkBrush" },
         { "class": "vtkContext2D" },
         { "class": "vtkContext3D" },
+        { "class": "vtkContextActor" },
         { "class": "vtkContextBufferId" },
         { "class": "vtkContextClip" },
         { "class": "vtkContextDevice2D" },
@@ -405,7 +675,10 @@
         { "class": "vtkContextMouseEvent" },
         { "class": "vtkContextScene" },
         { "class": "vtkContextTransform" },
+        { "class": "vtkOpenGL2ContextDevice2D" },
         { "class": "vtkOpenGLContextBufferId" },
+        { "class": "vtkOpenGLContextDevice2D" },
+        { "class": "vtkOpenGLContextDevice3D" },
         { "class": "vtkPen" },
         { "class": "vtkTooltipItem" }
       ],
@@ -453,7 +726,9 @@
         { "class": "vtkContextPolygon" },
         { "class": "vtkPlot" },
         { "class": "vtkPlot3D" },
+        { "class": "vtkPlotBag" },
         { "class": "vtkPlotBar" },
+        { "class": "vtkPlotFunctionalBag" },
         { "class": "vtkPlotGrid" },
         { "class": "vtkPlotLine" },
         { "class": "vtkPlotParallelCoordinates",
@@ -478,11 +753,44 @@
       "path": "VTK/Imaging/Core",
       "include": [
         { "path": "module.cmake" },
+        { "class": "vtkExtractVOI" },
         { "class": "vtkImageExtractComponents" },
         { "class": "vtkImageShiftScale" }
       ],
       "replace": [
         { "path": "VTK/Imaging/Core/CMakeLists.txt" }
+      ],
+      "pythonwrap": true
+    },
+    { "name": "vtkIOXML",
+      "path": "VTK/IO/XML",
+      "include": [
+        { "path": "vtkXMLOffsetsManager.h" },
+        { "class": "vtkXMLImageDataWriter" },
+        { "class": "vtkXMLStructuredDataWriter" },
+        { "class": "vtkXMLWriter" }
+      ],
+      "replace": [
+        { "path": "VTK/IO/XML/module.cmake" },
+        { "path": "VTK/IO/XML/CMakeLists.txt" }
+      ],
+      "pythonwrap": true
+    },
+    { "name": "vtkInteractionStyle",
+      "path": "VTK/Interaction/Style",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkInteractorStyleDrawPolygon" },
+        { "class": "vtkInteractorStyleJoystickActor" },
+        { "class": "vtkInteractorStyleJoystickCamera" },
+        { "class": "vtkInteractorStyleRubberBand3D" },
+        { "class": "vtkInteractorStyleRubberBandZoom" },
+        { "class": "vtkInteractorStyleSwitch" },
+        { "class": "vtkInteractorStyleTrackballActor" },
+        { "class": "vtkInteractorStyleTrackballCamera" }
+      ],
+      "replace": [
+        { "path": "VTK/Interaction/Style/CMakeLists.txt" }
       ],
       "pythonwrap": true
     },
@@ -503,15 +811,28 @@
     { "name": "vtkIOImage",
       "path": "VTK/IO/Image",
       "include": [
+        { "class": "vtkBMPWriter" },
         { "class": "vtkImageExport" },
         { "class": "vtkImageImport" },
         { "class": "vtkImageImportExecutive" },
+        { "class": "vtkImageReader2" },
         { "class": "vtkImageWriter" },
-        { "class": "vtkPNGWriter" }
+        { "class": "vtkJPEGWriter" },
+        { "class": "vtkPNGReader" },
+        { "class": "vtkPNGWriter" },
+        { "class": "vtkPNMWriter" },
+        { "class": "vtkTIFFWriter" }
       ],
       "replace": [
         { "path": "VTK/IO/Image/CMakeLists.txt" },
         { "path": "VTK/IO/Image/module.cmake" }
+      ],
+      "pythonwrap": true
+    },
+    { "name": "vtkPVVTKExtensionsDefault",
+      "path": "ParaViewCore/VTKExtensions/Default",
+      "include": [
+        { "class": "vtkAppendRectilinearGrid" }
       ],
       "pythonwrap": true
     },
@@ -545,6 +866,70 @@
     },
     { "name": "vtkftgl",
       "path": "VTK/ThirdParty/ftgl"
+    },
+    { "name": "vtkgl2ps",
+      "path": "VTK/ThirdParty/gl2ps"
+    }
+  ],
+  "proxies":[
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
+      "proxies":[
+        "DataSetSurfaceFilter",
+        "ExtractHistogram",
+        "IntegrateAttributes",
+        "WarpScalar",
+        "WarpVector"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/rendering.xml",
+      "proxies":[
+        "Camera"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/rendering.xml",
+      "proxies":[
+        "DummyVolumeMapper",
+        "HAVSVolumeMapper",
+        "ProjectedTetrahedraMapper",
+        "UnstructuredGridVolumeRayCastMapper",
+        "UnstructuredGridVolumeZSweepMapper"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/views_and_representations.xml",
+      "proxies":[
+        "AMROutlineRepresentation",
+        "AMRRepresentation",
+        "AMRVolumeRepresentation",
+        "CubeAxesRepresentation",
+        "DataLabelRepresentation",
+        "GeometryRepresentation",
+        "Glyph3DRepresentation",
+        "ImageSliceRepresentation",
+        "MoleculeRepresentation",
+        "OutlineRepresentation",
+        "PVRepresentationBase",
+        "RenderView",
+        "SelectionRepresentation",
+        "StructuredGridBaseRepresentation",
+        "StructuredGridRepresentation",
+        "StructuredGridVolumeRepresentation",
+        "SurfaceRepresentation",
+        "SurfaceRepresentationBase",
+        "UniformGridBaseRepresentation",
+        "UniformGridRepresentation",
+        "UniformGridVolumeRepresentation",
+        "UnstructuredGridBaseRepresentation",
+        "UnstructuredGridRepresentation",
+        "UnstructuredGridVolumeRepresentation",
+        "ViewBase"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
+      "proxies":[
+        "PiecewiseFunction",
+        "PVLookupTable",
+        "TimeKeeper"
+      ]
     }
   ]
 }

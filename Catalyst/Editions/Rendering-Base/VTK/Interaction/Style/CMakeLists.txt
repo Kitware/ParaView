@@ -6,9 +6,9 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
-# Override some rendering classes. Create object factory:
-list(APPEND vtk_module_overrides "vtkTextRenderer")
-set(vtk_module_vtkTextRenderer_override "vtkMathTextFreeTypeTextRenderer")
+# Now to generate our object factory.
+set(vtk_module_overrides "vtkInteractorStyleSwitchBase")
+set(vtk_module_vtkInteractorStyleSwitchBase_override "vtkInteractorStyleSwitch")
 
 # Now we iterate and create that class file...
 foreach(_class ${vtk_module_overrides})
@@ -24,21 +24,19 @@ VTK_CREATE_CREATE_FUNCTION(${_override})")
                          vtkObjectFactoryCreate${_override});")
 endforeach()
 
-# Now let's create the object factory classes
+# Now lets create the object factory classes
 string(TOUPPER ${vtk-module} VTK-MODULE)
 configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.h)
 configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.cxx.in
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
 
+set_source_files_properties(
+  ${vtk-module}ObjectFactory.cxx
+  WRAP_EXCLUDE
+  )
 list(APPEND Module_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx
   )
 
-set_source_files_properties(
-  vtkFreeTypeTools.cxx
-  vtkFreeTypeUtilities.cxx
-  WRAP_EXCLUDE
-  )
-
-vtk_module_library(vtkRenderingFreeType ${Module_SRCS})
+vtk_module_library(vtkInteractionStyle ${Module_SRCS})
