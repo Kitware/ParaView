@@ -51,8 +51,6 @@ vtkPVCacheKeeper::vtkPVCacheKeeper()
   this->CachingEnabled = true; 
   this->CacheSizeKeeper = 0;
   this->SetCacheSizeKeeper(vtkCacheSizeKeeper::GetInstance());
-
-  this->GetInformation()->Set(vtkAlgorithm::PRESERVES_DATASET(), 1);
 }
 
 //----------------------------------------------------------------------------
