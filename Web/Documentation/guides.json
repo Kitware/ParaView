@@ -42,6 +42,11 @@
         "url": "guides/parallel_app",
         "title": "Parallel Visualization Setup",
         "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
+      },{
+        "name": "webtest_setup",
+        "url": "guides/webtest_setup",
+        "title": "Setting up a machine for Web-based Testing",
+        "description": "This document explains how to set up a computer to be able to run web-based tests."
       }
     ]
   },{
