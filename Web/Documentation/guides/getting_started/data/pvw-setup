@@ -1,0 +1,284 @@
+#!/usr/bin/python
+import urllib2, sys, os, zipfile, subprocess, json, shutil
+
+# ===================================================================
+# ParaView files / URLs
+# ===================================================================
+url = "http://paraview.org/files/v4.1/"
+application = {
+    'osx'    : "ParaView-4.1.0-Darwin-64bit-Lion-Python27.dmg",
+    'linux32': "ParaView-4.1.0-Linux-32bit-glibc-2.3.6.tar.gz",
+    'linux64': "ParaView-4.1.0-Linux-64bit-glibc-2.3.6.tar.gz",
+    'win32'  : "ParaView-4.1.0-Windows-32bit.zip",
+    'win64'  : "ParaView-4.1.0-Windows-64bit.zip"
+    }
+data = "ParaViewData-v4.1.zip"
+documentation = "ParaView-API-docs-v4.1.zip"
+
+# ===================================================================
+# Download helper
+# ===================================================================
+
+def download(url, file_name):
+    u = urllib2.urlopen(url)
+    f = open(file_name, 'wb')
+    meta = u.info()
+    file_size = int(meta.getheaders("Content-Length")[0])
+    print "\nDownloading: %s Bytes: %s" % (file_name, file_size)
+
+    file_size_dl = 0
+    block_sz = 8192
+    while True:
+        buffer = u.read(block_sz)
+        if not buffer:
+            break
+
+        file_size_dl += len(buffer)
+        f.write(buffer)
+        status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+        status = status + chr(8)*(len(status)+1)
+        print status,
+
+    f.close()
+
+# ===================================================================
+
+def unzip(file, destination):
+    zfile = zipfile.ZipFile(file)
+    for name in zfile.namelist():
+        fullPath = os.path.join(destination, name)
+        if name.endswith('/'):
+            os.makedirs(fullPath)
+        else:
+            if not os.path.exists(os.path.dirname(fullPath)):
+                os.makedirs(os.path.dirname(fullPath))
+            fd = open(fullPath,"w")
+            fd.write(zfile.read(name))
+            fd.close()
+        status = r"   Unzip "
+        if len(name) > 70:
+           status += "[..]" + name[-70:]
+        else:
+            status += name
+        status += " "*(80-len(status))
+        status = status + chr(8)*(len(status)+1)
+        print status,
+    print
+
+# ===================================================================
+# Get data locally
+# ===================================================================
+print
+
+install_path = os.getcwd()
+q = ''
+
+while q != 'y' and q != 'yes':
+    if q == 'n' or q == 'no':
+        install_path = raw_input("Enter ParaViewWeb install path: ")
+    if q == 'q' or q == 'quit':
+        sys.exit("We did nothing")
+    q = raw_input("Is ParaViewWeb install path correct? (%s) yes/no/quit: " % install_path)
+
+print "\nInstalling ParaViewWeb inside:", install_path
+if not os.path.exists(install_path):
+    os.makedirs(install_path)
+
+download_path = os.path.join(install_path, "download")
+if not os.path.exists(download_path):
+    os.makedirs(download_path)
+
+# Download data + doc
+data_file = os.path.join(download_path, data)
+documentation_file = os.path.join(download_path, documentation)
+if not os.path.exists(data_file):
+    download(url + data, data_file)
+
+if not os.path.exists(documentation_file):
+    download(url + documentation, documentation_file)
+
+# Download only for all OS for future setup
+app_type = raw_input("\nWhich system? [osx, linux32, linux64, win32, win64, all]: ")
+if app_type == 'all':
+    print "\nThis will only download all OS files for future install."
+    for app_type in application:
+        app_file = os.path.join(download_path, application[app_type])
+        if not os.path.exists(app_file):
+            download(url + application[app_type], app_file)
+    sys.exit("Downloading done")
+else:
+    # Check files and download them if needed
+    app_file = os.path.join(download_path, application[app_type])
+
+    if not os.path.exists(app_file):
+        download(url + application[app_type], app_file)
+print
+
+# ===================================================================
+# Unpack data
+# ===================================================================
+
+if app_type == 'osx':
+    if not os.path.exists(os.path.join(install_path, 'paraview.app')):
+        print " => Unpack ParaView"
+        # Mount DMG
+        retvalue = subprocess.check_output(['hdiutil', 'attach', app_file])
+        list = retvalue.split()
+        dir_path = list[-1]
+        dmg_mount = list[-3]
+
+        # Copy application
+        os.system("cp -r %s/paraview.app %s/paraview.app" % (dir_path, install_path))
+
+        # Unmount dmg
+        subprocess.check_output(["hdiutil", "detach", dmg_mount])
+elif not os.path.exists(os.path.join(install_path, 'paraview')):
+    print " => Unpack ParaView"
+    if app_type == 'linux32':
+        os.system("cd %s;tar xvzf %s" % (install_path, app_file))
+        os.rename(os.path.join(install_path, "ParaView-4.1.0-Linux-32bit"), os.path.join(install_path, "paraview"))
+    elif app_type == 'linux64':
+        os.system("cd %s;tar xvzf %s" % (install_path, app_file))
+        os.rename(os.path.join(install_path, "ParaView-4.1.0-Linux-64bit"), os.path.join(install_path, "paraview"))
+    else:
+        # Unzip app
+        unzip(app_file, install_path)
+        if app_type == 'win64':
+            os.rename(os.path.join(install_path, "ParaView-4.1.0-Windows-64bit"), os.path.join(install_path, "paraview"))
+        if app_type == 'win32':
+            os.rename(os.path.join(install_path, "ParaView-4.1.0-Windows-32bit"), os.path.join(install_path, "paraview"))
+
+# ===================================================================
+# Structure directories
+# ===================================================================
+# /data
+if not os.path.exists(os.path.join(install_path, 'data')):
+    print " => Unpack data"
+    unzip(data_file, install_path)
+    src = os.path.join(install_path, data[:-4], "Data")
+    dst = os.path.join(install_path, 'data')
+    os.rename(src, dst)
+    shutil.rmtree(os.path.join(install_path, data[:-4]))
+
+# /www
+if not os.path.exists(os.path.join(install_path, 'www')):
+    print " => Unpack Web"
+    unzip(documentation_file, install_path)
+    src = os.path.join(install_path, documentation[:-4], 'js-doc')
+    dst = os.path.join(install_path, 'www')
+    os.rename(src, dst)
+    src = os.path.join(install_path, documentation[:-4], 'lib')
+    dst = os.path.join(install_path, 'www/lib')
+    os.rename(src, dst)
+    src = os.path.join(install_path, documentation[:-4], 'ext')
+    dst = os.path.join(install_path, 'www/ext')
+    os.rename(src, dst)
+    src = os.path.join(install_path, documentation[:-4], 'apps')
+    dst = os.path.join(install_path, 'www/apps')
+    os.rename(src, dst)
+    print " => Clean web directory"
+    shutil.rmtree(os.path.join(install_path, documentation[:-4]))
+
+# /bin
+if not os.path.exists(os.path.join(install_path, 'bin')):
+    os.makedirs(os.path.join(install_path, 'bin'))
+
+# /conf
+if not os.path.exists(os.path.join(install_path, 'conf')):
+    os.makedirs(os.path.join(install_path, 'conf'))
+
+# /logs
+if not os.path.exists(os.path.join(install_path, 'logs')):
+    os.makedirs(os.path.join(install_path, 'logs'))
+
+# ===================================================================
+# Configure
+# ===================================================================
+print " => Configure local instance"
+
+python_exec = ''
+base_python_path = ''
+if app_type == 'osx':
+    python_exec = os.path.join(install_path, 'paraview.app/Contents/bin/pvpython')
+    base_python_path = os.path.join(install_path, 'paraview.app/Contents/Python/')
+elif app_type == 'linux32' or app_type == 'linux64':
+    python_exec = os.path.join(install_path, 'paraview/bin/pvpython')
+    base_python_path = os.path.join(install_path, 'paraview/lib/paraview-4.1/site-packages/')
+elif app_type == 'win32' or app_type == 'win64':
+    python_exec = os.path.join(install_path, 'paraview/bin/pvpython.exe')
+    base_python_path = os.path.join(install_path, 'paraview/lib/paraview-4.1/site-packages/')
+
+default_launcher_config = {
+    "sessionData" : {
+        "updir": "/Home"
+    },
+    "resources" : [ { "host" : "localhost", "port_range" : [9001, 9003] } ],
+    "properties" : {
+        "python_exec": python_exec,
+        "python_path": base_python_path,
+        "data": os.path.join(install_path, 'data'),
+    },
+    "configuration": {
+        "host": "localhost",
+        "port": 8080,
+        "endpoint": "paraview",
+        "content": os.path.join(install_path, 'www'),
+        "proxy_file": os.path.join(install_path, 'conf/proxy.conf'),
+        "sessionURL" : "ws://${host}:${port}/ws",
+        "timeout" : 5,
+        "log_dir" : os.path.join(install_path, 'logs'),
+        "upload_dir" : os.path.join(install_path, 'data'),
+        "fields" : ["file", "host", "port", "updir"]
+    },
+    "apps": {
+        "pipeline": {
+            "cmd": ["${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py", "--port", "${port}", "--data-dir", "${data}" ]
+        },
+        "loader": {
+            "cmd": ["${python_exec}", "${python_path}/paraview/web/pv_web_file_loader.py", "--port", "${port}", "--data-dir", "${data}"]
+        },
+        "data_prober": {
+            "cmd": ["${python_exec}", "${python_path}/paraview/web/pv_web_data_prober.py", "--port", "${port}", "--data-dir", "${data}"]
+        }
+    }
+}
+
+with open(os.path.join(install_path, 'conf/launch.json'), "w") as config_file:
+    config_file.write(json.dumps(default_launcher_config))
+
+web_exec = ''
+if app_type.startswith('win'):
+    web_exec = os.path.join(install_path, 'bin/start.bat')
+    with open(web_exec, "w") as run_file:
+        run_file.write("%s %s %s" % (python_exec, os.path.join(base_python_path, 'vtk/web/launcher.py'), os.path.join(install_path, 'conf/launch.json')))
+else:
+    web_exec = os.path.join(install_path, 'bin/start.sh')
+    with open(web_exec, "w") as run_file:
+        run_file.write("%s %s %s" % (python_exec, os.path.join(base_python_path, 'vtk/web/launcher.py'), os.path.join(install_path, 'conf/launch.json')))
+        os.chmod(web_exec, 0750)
+
+# ===================================================================
+# Enable ParaViewWeb application inside index.html
+# ===================================================================
+
+index_html = os.path.join(install_path,"www/index.html")
+index_origin = os.path.join(install_path,"www/index.origin")
+os.rename(index_html, index_origin)
+
+with open(index_origin, "r") as fr:
+    with open(index_html, "w") as fw:
+        for line in fr:
+            if not "DEMO-APPS" in line:
+                fw.write(line)
+
+# ===================================================================
+# Print help
+# ===================================================================
+print
+print "To start ParaViewWeb web server just run:"
+print " "*5, web_exec
+print
+print "And go in your Web browser (Safari, Chrome, Firefox) to:"
+print " "*5, "http://localhost:8080/"
+print
+print
