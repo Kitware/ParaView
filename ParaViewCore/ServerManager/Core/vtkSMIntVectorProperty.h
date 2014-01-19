@@ -135,6 +135,12 @@ public:
 
   virtual bool IsValueDefault();
 
+  // Description:
+  // For properties that support specifying defaults in XML configuration, this
+  // method will reset the property value to the default values specified in the
+  // XML.
+  virtual void ResetToXMLDefaults();
+
 //BTX
 protected:
   vtkSMIntVectorProperty();
@@ -162,10 +168,6 @@ protected:
   // the same as the number of elements but can be different
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
-
-  // Subclass may override this if ResetToDefault can reset to default
-  // value specified in the configuration file.
-  virtual void ResetToDefaultInternal();
 
   // Description:
   // Load the XML state.

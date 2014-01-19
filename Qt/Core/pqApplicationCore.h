@@ -40,7 +40,6 @@ class pq3DWidgetFactory;
 class pqDisplayPolicy;
 class pqInterfaceTracker;
 class pqLinksModel;
-class pqLookupTableManager;
 class pqObjectBuilder;
 class pqOptions;
 class pqOutputWindow;
@@ -190,13 +189,6 @@ public:
   /// Provides access to the test utility.
   virtual pqTestUtility* testUtility();
 
-  /// Set/Get the lookup table manager. Lookup table manager is used to manage
-  /// lookup tables used for coloring using data arrays.
-  /// policy. The pqApplicationCore takes over the ownership of the manager.
-  void setLookupTableManager(pqLookupTableManager*);
-  pqLookupTableManager* getLookupTableManager() const
-    { return this->LookupTableManager; }
-
   /// Returns the manager for the global properties such as ForegroundColor etc.
   vtkSMGlobalPropertiesManager* getGlobalPropertiesManager();
 
@@ -317,7 +309,6 @@ protected:
   pq3DWidgetFactory* WidgetFactory;
   pqDisplayPolicy* DisplayPolicy;
   pqLinksModel* LinksModel;
-  pqLookupTableManager* LookupTableManager;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;
   pqPluginManager* PluginManager;

@@ -178,6 +178,11 @@ public:
   void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
 
   // Description:
+  // This overload register the proxy using an unique name returned by
+  // GetUniqueProxyName() and returns the name used.
+  vtkStdString RegisterProxy(const char* groupname, vtkSMProxy* proxy);
+
+  // Description:
   // Given its name (and group) returns a proxy. If not a managed proxy,
   // returns 0.
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
@@ -219,6 +224,11 @@ public:
   // NOTE: This operation is slow.
   void GetProxyNames(const char* groupname, vtkSMProxy* proxy,
     vtkStringList* names);
+
+  // Description:
+  // Given a group, returns a name not already used for proxies registered in
+  // the given group. The prefix is used to come up with a new name.
+  vtkStdString GetUniqueProxyName(const char* groupname, const char* prefix);
 
   // Description:
   // Is the proxy is in the given group, return it's name, otherwise

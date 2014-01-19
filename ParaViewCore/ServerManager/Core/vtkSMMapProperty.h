@@ -47,7 +47,6 @@ protected:
 
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
   virtual int ReadXMLAttributes(vtkSMProxy *parent, vtkPVXMLElement *element);
-  virtual void ResetToDefaultInternal();
 
 private:
   vtkSMMapProperty(const vtkSMMapProperty&); // Not implemented

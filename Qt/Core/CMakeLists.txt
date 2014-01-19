@@ -105,8 +105,6 @@ set(Module_SRCS
   pqLinksModel.h
   pqLinkViewWidget.cxx
   pqLinkViewWidget.h
-  pqLookupTableManager.cxx
-  pqLookupTableManager.h
   pqMultiSliceAxisWidget.cxx
   pqMultiSliceAxisWidget.h
   pqMultiSliceView.cxx
@@ -169,8 +167,6 @@ set(Module_SRCS
   pqRubberBandHelper.h
   pqScalarBarRepresentation.cxx
   pqScalarBarRepresentation.h
-  pqScalarBarVisibilityAdaptor.cxx
-  pqScalarBarVisibilityAdaptor.h
   pqScalarOpacityFunction.cxx
   pqScalarOpacityFunction.h
   pqScalarsToColors.cxx
@@ -271,7 +267,6 @@ set (Module_MOC_HDRS
   pqInterfaceTracker.h
   pqLinksModel.h
   pqLinkViewWidget.h
-  pqLookupTableManager.h
   pqMultiSliceAxisWidget.h
   pqMultiSliceView.h
   pqNonEditableStyledItemDelegate.h
@@ -298,7 +293,6 @@ set (Module_MOC_HDRS
   pqRepresentation.h
   pqRubberBandHelper.h
   pqScalarBarRepresentation.h
-  pqScalarBarVisibilityAdaptor.h
   pqScalarOpacityFunction.h
   pqScalarsToColors.h
 #  pqScatterPlotRepresentation.h

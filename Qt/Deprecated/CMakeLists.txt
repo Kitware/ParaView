@@ -29,14 +29,11 @@
 #
 #==========================================================================
 set (Module_SRCS
-  pqColorScaleEditor.cxx
-  pqColorScaleEditor.h
   pqTransferFunctionChartViewWidget.cxx
   pqTransferFunctionChartViewWidget.h
 )
 
 set (Module_MOC_HDRS
-  pqColorScaleEditor.h
   pqTransferFunctionChartViewWidget.h
 )
 

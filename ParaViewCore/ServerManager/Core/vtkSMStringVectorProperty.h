@@ -129,6 +129,12 @@ public:
 
   virtual bool IsValueDefault();
 
+  // Description:
+  // For properties that support specifying defaults in XML configuration, this
+  // method will reset the property value to the default values specified in the
+  // XML.
+  virtual void ResetToXMLDefaults();
+
 protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();

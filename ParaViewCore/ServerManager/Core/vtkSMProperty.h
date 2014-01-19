@@ -289,17 +289,22 @@ public:
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 
   // Description:
-  // Iterates over all domains and calls SetDefaultValues() on each
-  // until one of then returns 1, implying that it updated
-  // the property value. This is used to reset the property
-  // to its default value. Currently default values that depend
-  // on domain are reset. This method can also be called
-  // to reset the property value to the default specified
-  // in the configuration XML. If none of the domains
-  // updates the property value, then some property subclassess
-  // (viz. IntVectorProperty, DoubleVectorProperty and IdTypeVectorProperty)
-  // update the current value to that specified in the configuration XML.
+  // Simply calls this->ResetToDomainDefaults() and if that returns false, calls
+  // this->ResetToXMLDefaults().
   void ResetToDefault();
+
+  // Description:
+  // For properties that support specifying defaults in XML configuration, this
+  // method will reset the property value to the default values specified in the
+  // XML. Default implementation does nothing.
+  virtual void ResetToXMLDefaults() {}
+
+  // Description:
+  // Iterates over all domains and call SetDefaultValues() on each domain until
+  // the first one returns true i.e. indicate that it can set a default value
+  // and did so. Returns true if any domain can setup a default value for this
+  // property. Otherwise false.
+  bool ResetToDomainDefaults();
 
   // Description:
   // The label assigned by the xml parser.
@@ -477,10 +482,6 @@ protected:
 
   vtkSMDocumentation* Documentation;
   void SetDocumentation(vtkSMDocumentation*);
-
-  // Subclass may override this if ResetToDefault can reset to default
-  // value specified in the configuration file.
-  virtual void ResetToDefaultInternal() {};
 
   int Repeatable;
 

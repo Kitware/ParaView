@@ -305,7 +305,7 @@ public:
     }
 
   //---------------------------------------------------------------------------
-  void ResetToDefaultInternal()
+  void ResetToXMLDefaults()
     {
     if (this->DefaultsValid && this->DefaultValues != this->Values)
       {

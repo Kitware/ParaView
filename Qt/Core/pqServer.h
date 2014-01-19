@@ -110,10 +110,6 @@ public:
   /// Returns the time keeper for this connection.
   pqTimeKeeper* getTimeKeeper() const;
 
-  /// Initializes the pqServer, must be called as soon as pqServer 
-  /// is created.
-  void initialize();
-
   /// Returns the PVOptions for this connection. These are client side options.
   vtkPVOptions* getOptions() const;
 
@@ -168,9 +164,6 @@ signals:
   void serverSideDisconnected();
 
 protected:
-  // Creates the TimeKeeper proxy for this connection.
-  void createTimeKeeper();
-
   /// Returns the string key used for the heart beat time interval.
   static const char* HEARBEAT_TIME_SETTING_KEY();
 
@@ -233,10 +226,7 @@ private:
 
   pqServerResource Resource;
   vtkIdType ConnectionID;
-  vtkWeakPointer<vtkSMProxy> GlobalMapperPropertiesProxy;
   vtkWeakPointer<vtkSMSession> Session;
-  vtkWeakPointer<vtkSMProxySelectionModel> ActiveSources;
-  vtkWeakPointer<vtkSMProxySelectionModel> ActiveView;
 
   // TODO:
   // Each connection will eventually have a PVOptions object. 

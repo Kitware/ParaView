@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqLookupTableManager.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqProxyWidget.h"
 #include "pqSettings.h"
@@ -83,7 +82,6 @@ public:
   QPointer<pqProxyWidget> ProxyWidget;
   QPointer<pqDataRepresentation> ActiveRepresentation;
   unsigned long ObserverId;
-  vtkWeakPointer<vtkSMProxy> ScalarBarProxy;
 
   pqInternals(pqColorMapEditor* self) : ObserverId(0)
     {
@@ -187,18 +185,7 @@ void pqColorMapEditor::updateActive()
     }
 
   // check if there's a scalar-bar to show/edit for the current state.
-  if (this->Internals->ProxyWidget && view)
-    {
-    vtkSMProxy* lutProxy = this->Internals->ProxyWidget->proxy();
-    vtkSMProxy* scalarBarProxy =
-      vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
-        lutProxy, view->getProxy());
-    this->setScalarBar(scalarBarProxy, view->getProxy());
-    }
-  else
-    {
-    this->setScalarBar(NULL, NULL);
-    }
+  this->updateScalarBarButtons();
 }
 
 //-----------------------------------------------------------------------------
@@ -272,22 +259,32 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
 }
 
 //-----------------------------------------------------------------------------
-void pqColorMapEditor::setScalarBar(vtkSMProxy* sb, vtkSMProxy* viewProxy)
+void pqColorMapEditor::updateScalarBarButtons()
 {
-  this->Internals->ScalarBarProxy = sb;
+  vtkSMProxy* lutProxy = NULL;
+  vtkSMProxy* viewProxy = NULL;
+  vtkSMProxy* sb = NULL;
+  if (this->Internals->ProxyWidget &&
+    this->Internals->ActiveRepresentation)
+    {
+    lutProxy = this->Internals->ProxyWidget->proxy();
+    viewProxy = this->Internals->ActiveRepresentation->getView()->getProxy();
+    sb = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, viewProxy);
+    }
 
   Ui::ColorMapEditor& ui = this->Internals->Ui;
   ui.ShowScalarBar->setEnabled(viewProxy != NULL);
-  ui.ShowScalarBar->setChecked(sb != NULL &&
-    vtkSMPropertyHelper(sb, "Visibility").GetAsInt() != 0);
-  ui.EditScalarBar->setEnabled(sb != NULL);
+  bool sb_visible = (sb != NULL && vtkSMPropertyHelper(sb, "Visibility").GetAsInt() != 0);
+  ui.ShowScalarBar->setChecked(sb_visible);
   // ^--- this won't trigger clicked(bool)
   //      and hence this->showScalarBar() won't be called.
+  ui.EditScalarBar->setEnabled(sb != NULL && sb_visible);
 }
 
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::showScalarBar(bool show_sb)
 {
+  Q_ASSERT(this->Internals->ActiveRepresentation);
   if (show_sb)
     {
     BEGIN_UNDO_SET("Show scalar bar");
@@ -297,27 +294,11 @@ void pqColorMapEditor::showScalarBar(bool show_sb)
     BEGIN_UNDO_SET("Hide scalar bar");
     }
 
-  if (this->Internals->ScalarBarProxy)
-    {
-    vtkSMPropertyHelper(this->Internals->ScalarBarProxy,
-      "Visibility").Set(0, show_sb? 1 : 0);
-    this->Internals->ScalarBarProxy->UpdateVTKObjects();
-    }
-  else
-    {
-    // need to create a new scalar bar repr.
-    // For now, we'll use pqLookupTableManager. This should be cleaned up to use
-    // some ServerManager logic instead.
-    pqApplicationCore* core = pqApplicationCore::instance();
-    pqLookupTableManager* lut_mgr = core->getLookupTableManager();
-    if (lut_mgr)
-      {
-      lut_mgr->setScalarBarVisibility(
-        this->Internals->ActiveRepresentation, show_sb);
-      // this will ensure we set the current scalar bar proxy correctly.
-      this->updateActive();
-      }
-    }
+  vtkSMProxy* viewProxy = this->Internals->ActiveRepresentation->getView()->getProxy();
+  vtkSMPVRepresentationProxy::SetScalarBarVisibility(
+    this->Internals->ActiveRepresentation->getProxy(),
+    viewProxy, show_sb);
+  this->updateScalarBarButtons();
   this->renderViews();
   END_UNDO_SET();
 }
@@ -325,12 +306,24 @@ void pqColorMapEditor::showScalarBar(bool show_sb)
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::editScalarBar()
 {
-  pqProxyWidgetDialog dialog(this->Internals->ScalarBarProxy);
-  QObject::connect(&dialog, SIGNAL(accepted()),
-    this, SLOT(renderViews()));
-  dialog.setWindowTitle("Edit Color Legend Parameters");
-  dialog.setObjectName("ColorLegendEditor");
-  dialog.exec();
+  Q_ASSERT(this->Internals->ProxyWidget && this->Internals->ActiveRepresentation);
+
+  vtkSMProxy* lutProxy = this->Internals->ProxyWidget->proxy();
+  vtkSMProxy* viewProxy = this->Internals->ActiveRepresentation->getView()->getProxy();
+  vtkSMProxy* sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, viewProxy);
+  if (sbProxy)
+    {
+    pqProxyWidgetDialog dialog(sbProxy);
+    QObject::connect(&dialog, SIGNAL(accepted()),
+      this, SLOT(renderViews()));
+    dialog.setWindowTitle("Edit Color Legend Parameters");
+    dialog.setObjectName("ColorLegendEditor");
+    dialog.exec();
+    }
+  else
+    {
+    qCritical("Failed to locate scalar bar proxy. Ignoring.");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -345,16 +338,18 @@ void pqColorMapEditor::renderViews()
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::saveAsDefault()
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqLookupTableManager* lut_mgr = core->getLookupTableManager();
-  if (lut_mgr && this->Internals->ProxyWidget &&
-    this->Internals->ProxyWidget->proxy())
-    {
-    lut_mgr->saveAsDefault(
-      this->Internals->ProxyWidget->proxy(),
-      pqActiveObjects::instance().activeView()?
-      pqActiveObjects::instance().activeView()->getProxy() : NULL);
-    }
+  // FIXME:
+  qCritical("FIXME");
+  //pqApplicationCore* core = pqApplicationCore::instance();
+  //pqLookupTableManager* lut_mgr = core->getLookupTableManager();
+  //if (lut_mgr && this->Internals->ProxyWidget &&
+  //  this->Internals->ProxyWidget->proxy())
+  //  {
+  //  lut_mgr->saveAsDefault(
+  //    this->Internals->ProxyWidget->proxy(),
+  //    pqActiveObjects::instance().activeView()?
+  //    pqActiveObjects::instance().activeView()->getProxy() : NULL);
+  //  }
 }
 
 //-----------------------------------------------------------------------------

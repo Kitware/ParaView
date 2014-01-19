@@ -286,9 +286,9 @@ void vtkSMDoubleVectorProperty::ClearUncheckedElements()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::ResetToDefaultInternal()
+void vtkSMDoubleVectorProperty::ResetToXMLDefaults()
 {
-  this->Internals->ResetToDefaultInternal();
+  this->Internals->ResetToXMLDefaults();
 }
 
 //---------------------------------------------------------------------------

@@ -61,10 +61,6 @@ public:
   /// Returns the scene on the server connection, if any.
   pqAnimationScene* getScene(pqServer* server) const;
 
-  /// Creates a new scene for the active server connection,
-  /// if possible, and returns it.
-  pqAnimationScene* createActiveScene();
-
   /// In the given \c scene, returns the cue that animates the given 
   /// \c index of the given \c property on the \c proxy.
   /// This method simply calls getCue() on the pqAnimationScene instance.

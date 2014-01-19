@@ -275,9 +275,9 @@ void vtkSMIntVectorProperty::Copy(vtkSMProperty* src)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::ResetToDefaultInternal()
+void vtkSMIntVectorProperty::ResetToXMLDefaults()
 {
-  this->Internals->ResetToDefaultInternal();
+  this->Internals->ResetToXMLDefaults();
 }
 
 //---------------------------------------------------------------------------

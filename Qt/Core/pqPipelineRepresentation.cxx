@@ -42,20 +42,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkGeometryRepresentation.h"
 #include "vtkMath.h"
+#include "vtkProcessModule.h"
+#include "vtkProperty.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVTemporalDataInformation.h"
-#include "vtkProcessModule.h"
-#include "vtkProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 // Qt includes.
 #include <QList>
@@ -67,7 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
-#include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -289,10 +289,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     return;
     }
 
-  // The HelperProxy is not needed any more since now the OpacityFunction is 
-  // created from LookupTableManager (Bug# 0008876)
-  // this->createHelperProxies();
-
   // For some view all the default representation names may not exist
   // therefore we need to filter them to match existing ones.
   vtkSMPropertyHelper availableTypes(repr, "RepresentationTypesInfo");
@@ -351,67 +347,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   dataInfo = this->getOutputPortFromInput()->getDataInformation();
 
-  // get data set type
-  // and set the default representation
-  if (dataInfo && repr->IsA("vtkSMPVRepresentationProxy"))
-    {
-    int dataSetType = dataInfo->GetDataSetType();
-    if(dataSetType == VTK_POLY_DATA ||
-       dataSetType == VTK_HYPER_OCTREE ||
-       dataSetType == VTK_GENERIC_DATA_SET)
-      {
-      pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-        DEFAULT_SURFACE);
-      }
-    else if (dataSetType == VTK_UNSTRUCTURED_GRID)
-      {
-      if (static_cast<double>(dataInfo->GetNumberOfCells()) >= 
-        pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()*1000000.0)
-        {
-        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          DEFAULT_OUTLINE);
-        }
-      }
-    else if (dataSetType == VTK_IMAGE_DATA)
-      {
-      // Use slice representation by default for 2D image data.
-      int* ext = dataInfo->GetExtent();
-      if (
-        (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5]) &&
-        /* slice not supported for composite datasets */
-        (dataInfo->GetCompositeDataSetType()==-1 ))
-        {
-
-        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          DEFAULT_SLICE);
-        }
-      else
-        {
-        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          DEFAULT_OUTLINE);
-        }
-      }
-    else if(dataSetType == VTK_RECTILINEAR_GRID ||
-       dataSetType == VTK_STRUCTURED_GRID)
-      {
-      int* ext = dataInfo->GetExtent();
-      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
-        {
-        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          DEFAULT_SURFACE);
-        }
-      else
-        {
-        pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          DEFAULT_OUTLINE);
-        }
-      }
-    else
-      {
-      pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-        DEFAULT_OUTLINE);
-      }
-    }
   // Locate input display.
   pqPipelineRepresentation* upstreamDisplay =
     qobject_cast<pqPipelineRepresentation*>(
@@ -429,31 +364,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       }
     }
 
-
-  if (repr->GetProperty("ScalarOpacityUnitDistance"))
-    {
-    double bounds[6];
-    dataInfo->GetBounds(bounds);
-    double unitDistance = 1.0;
-    if(vtkMath::AreBoundsInitialized(bounds))
-      {
-      double diameter =
-        sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
-          (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
-          (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
-
-      int numCells = dataInfo->GetNumberOfCells();
-      double linearNumCells = pow( (double) numCells, (1.0/3.0) );
-      unitDistance = diameter;
-      if (linearNumCells != 0.0)
-        {
-        unitDistance = diameter / linearNumCells;
-        }
-      }
-    pqSMAdaptor::setElementProperty(
-      repr->GetProperty("ScalarOpacityUnitDistance"),
-      unitDistance);
-    }
   repr->UpdateVTKObjects();
 
   if (pqSMAdaptor::getEnumerationProperty(repr->GetProperty("Representation"))
@@ -607,127 +517,30 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
     return;
     }
 
-  if(!arrayname || !arrayname[0])
+  // before changing coloring mode, get the visibility status of the scalar bar
+  // for current array, if any.
+  bool sb_visibility = false;
+  QPointer<pqScalarsToColors> lut = this->getLookupTable();
+  pqView* view = this->getView();
+  vtkSMProxy* sbProxy = NULL;
+  if (lut && view)
     {
-    pqSMAdaptor::setElementProperty(
-      repr->GetProperty("ColorArrayName"), "");
-    repr->UpdateVTKObjects();
-
-    // BUG #6818. If user switched to solid color, we need to update the lut
-    // visibility.
-    pqScalarsToColors* lut = this->getLookupTable();
-    if (lut)
+    sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
+      lut->getProxy(), this->getView()->getProxy());
+    if (sbProxy && vtkSMPropertyHelper(sbProxy, "Visibility").GetAsInt() == 1)
       {
-      lut->hideUnusedScalarBars();
+      sb_visibility = true;
       }
-    return;
     }
 
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqLookupTableManager* lut_mgr = core->getLookupTableManager();
-  vtkSMProxy* lut = 0;
-  vtkSMProxy* opf = 0;
-  if (lut_mgr)
+  vtkSMPVRepresentationProxy::SetScalarColoring(repr, arrayname, fieldtype);
+  if (arrayname && arrayname[0])
     {
-    int number_of_components = this->getNumberOfComponents(
-      arrayname, fieldtype);
-    pqScalarsToColors* pqlut = lut_mgr->getLookupTable(
-      this->getServer(), arrayname, number_of_components, 0);
-    lut = (pqlut)? pqlut->getProxy() : 0;
-    pqScalarOpacityFunction* pqOPF = lut_mgr->getScalarOpacityFunction(
-      this->getServer(), arrayname, number_of_components, 0);
-    opf = (pqOPF)? pqOPF->getProxy() : 0;
-    }
-  else
-    {
-    // When lookup table manager is not available,
-    // we simply create new lookup tables for each display.
-
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      repr->GetProperty("LookupTable"));
-    if (pp->GetNumberOfProxies() == 0)
+    this->resetLookupTableScalarRange();
+    if (sb_visibility && view)
       {
-      pqObjectBuilder* builder = core->getObjectBuilder();
-      lut = builder->createProxy("lookup_tables", "PVLookupTable", 
-        this->getServer(), "lookup_tables");
-      // Setup default LUT to go from Blue to Red.
-      QList<QVariant> values;
-      values << 0.0 << 0.0 << 0.0 << 1.0
-        << 1.0 << 1.0 << 0.0 << 0.0;
-      pqSMAdaptor::setMultipleElementProperty(
-        lut->GetProperty("RGBPoints"), values);
-      pqSMAdaptor::setEnumerationProperty(
-        lut->GetProperty("ColorSpace"), "HSV");
-      pqSMAdaptor::setEnumerationProperty(
-        lut->GetProperty("VectorMode"), "Magnitude");
-      lut->UpdateVTKObjects();
+      vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, view->getProxy(), true);
       }
-    else
-      {
-      lut = pp->GetProxy(0);
-      }
-      
-    opf = this->createOpacityFunctionProxy(repr);
-    }
-
-  if (!lut)
-    {
-    qDebug() << "Failed to create/locate Lookup Table.";
-    pqSMAdaptor::setElementProperty(
-      repr->GetProperty("ColorArrayName"), "");
-    repr->UpdateVTKObjects();
-    return;
-    }
-
-  // Locate pqScalarsToColors for the old LUT and update 
-  // it's scalar bar visibility.
-  pqScalarsToColors* old_stc = this->getLookupTable();
-  pqSMAdaptor::setProxyProperty(
-    repr->GetProperty("LookupTable"), lut);
-    
-  // set the opacity function
-  if(opf)
-    {
-    pqSMAdaptor::setProxyProperty(
-      repr->GetProperty("ScalarOpacityFunction"), opf);
-    repr->UpdateVTKObjects();
-    }
-
-  bool current_scalar_bar_visibility = false;
-  // If old LUT was present update the visibility of the scalar bars
-  if (old_stc && old_stc->getProxy() != lut)
-      {
-      pqScalarBarRepresentation* scalar_bar = old_stc->getScalarBar(
-        qobject_cast<pqRenderViewBase*>(this->getView()));
-      if (scalar_bar)
-        {
-        current_scalar_bar_visibility = scalar_bar->isVisible();
-        }
-      old_stc->hideUnusedScalarBars();
-      }
-
-  if(fieldtype == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    {
-    pqSMAdaptor::setEnumerationProperty(
-      repr->GetProperty("ColorAttributeType"), "CELL_DATA");
-    }
-  else
-    {
-    pqSMAdaptor::setEnumerationProperty(
-      repr->GetProperty("ColorAttributeType"), "POINT_DATA");
-    }
-  pqSMAdaptor::setElementProperty(
-    repr->GetProperty("ColorArrayName"), arrayname);
-  lut->UpdateVTKObjects();
-  repr->UpdateVTKObjects();
-
-  this->updateLookupTableScalarRange();
-
-  
-  if (current_scalar_bar_visibility && lut_mgr && this->getLookupTable())
-    {
-    lut_mgr->setScalarBarVisibility(this,
-      current_scalar_bar_visibility);
     }
 }
 

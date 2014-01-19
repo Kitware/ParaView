@@ -76,6 +76,7 @@ set (Module_SRCS
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutputPort.cxx
+  vtkSMParaViewPipelineController.cxx
   vtkSMPWriterProxy.cxx
   vtkSMPipelineState.cxx
   vtkSMPluginLoaderProxy.cxx

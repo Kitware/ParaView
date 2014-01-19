@@ -31,6 +31,7 @@
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyListDomainInternals;
+class vtkSMSessionProxyManager;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyListDomain : public vtkSMDomain
 {
@@ -80,6 +81,12 @@ public:
   // Removes the proxy at the given index.
   // Returns if the proxy was removed.
   int RemoveProxy(unsigned int index);
+
+  // Description:
+  // Creates and populates the domain with the proxy-types. This will remove any
+  // existing proxies in the domain. Note that the newly created proxies won't
+  // be registered with the proxy manager.
+  void CreateProxies(vtkSMSessionProxyManager* pxm);
 
   // Description:
   // A vtkSMProperty is often defined with a default value in the

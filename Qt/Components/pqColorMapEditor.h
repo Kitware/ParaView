@@ -78,7 +78,7 @@ protected slots:
 protected:
   void setDataRepresentation(pqDataRepresentation* repr);
   void setColorTransferFunction(vtkSMProxy* ctf);
-  void setScalarBar(vtkSMProxy* sb, vtkSMProxy* viewProxy);
+  void updateScalarBarButtons();
 
 private:
   Q_DISABLE_COPY(pqColorMapEditor)

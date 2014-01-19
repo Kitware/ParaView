@@ -90,6 +90,12 @@ public:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
 
+  // Description:
+  // For properties that support specifying defaults in XML configuration, this
+  // method will reset the property value to the default values specified in the
+  // XML.
+  virtual void ResetToXMLDefaults();
+
 protected:
   vtkSMDoubleMapProperty();
   ~vtkSMDoubleMapProperty();
@@ -105,7 +111,6 @@ protected:
 
   virtual void SaveStateValues(vtkPVXMLElement* propertyElement);
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
-  virtual void ResetToDefaultInternal();
 
 private:
   vtkSMDoubleMapProperty(const vtkSMDoubleMapProperty&); // Not implemented

@@ -179,38 +179,6 @@ void pqScalarBarRepresentation::setTitle(const QString& name, const QString& com
   this->getProxy()->UpdateVTKObjects();
 }
 
-//-----------------------------------------------------------------------------
-void pqScalarBarRepresentation::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-  if (!this->isVisible())
-    {
-    // For any non-visible display, we don't set its defaults.
-    return;
-    }
-
-  // Set default arrays and lookup table.
-  vtkSMProxy* proxy = this->getProxy();
-
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Selectable"), 0);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Enabled"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Resizable"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Repositionable"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("TitleFontSize"), 12);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LabelFontSize"), 12);
-
-  // setup global property link. By default, color is linked with
-  // TextAnnotationColor.
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "TextAnnotationColor", proxy, "TitleColor");
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "TextAnnotationColor", proxy, "LabelColor");
-
-  proxy->UpdateVTKObjects();
-}
-
 #define PUSH_PROPERTY(name) \
 {\
   vtkSMPropertyModificationUndoElement* elem =\

@@ -510,19 +510,28 @@ void vtkSMProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::ResetToDefault()
+bool vtkSMProperty::ResetToDomainDefaults()
 {
   this->DomainIterator->Begin();
-  while(!this->DomainIterator->IsAtEnd())
+  while (!this->DomainIterator->IsAtEnd())
     {
     if (this->DomainIterator->GetDomain()->SetDefaultValues(this))
       {
-      return;
+      return true;
       }
     this->DomainIterator->Next();
     }
 
-  this->ResetToDefaultInternal();
+  return false;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::ResetToDefault()
+{
+  if (!this->ResetToDomainDefaults())
+    {
+    this->ResetToXMLDefaults();
+    }
 }
 
 //---------------------------------------------------------------------------

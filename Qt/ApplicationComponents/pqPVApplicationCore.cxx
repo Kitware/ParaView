@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
 #include "pqOptions.h"
-#include "pqPQLookupTableManager.h"
 #include "pqQuickLaunchDialog.h"
 #include "pqSelectionManager.h"
 #include "pqSetName.h"
@@ -85,9 +84,6 @@ pqPVApplicationCore::pqPVApplicationCore(
   // that is being done from the GUI.
 #endif
   
-  // Lookuptable management will soon enough move to the server manager.
-  this->setLookupTableManager(new pqPQLookupTableManager(this));
-
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(serverChanged(pqServer*)),
     this->AnimationManager, SLOT(onActiveServerChanged(pqServer*)));

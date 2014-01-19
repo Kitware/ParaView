@@ -7,6 +7,8 @@ vtk_module(vtkPVServerManagerRendering
   PRIVATE_DEPENDS
     vtksys
     vtkCommonColor
+  TEST_DEPENDS
+    vtkPVServerManagerApplication
   TEST_LABELS
     PARAVIEW
 )

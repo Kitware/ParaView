@@ -27,6 +27,8 @@
 // Normal, and Origin is used.
 // li \c SCALED_EXTENT: the range is set to (0, maxbounds * this->ScaleFactor)
 // where maxbounds is the length of the longest axis for the bounding box.
+// li \c APPROXIMATE_CELL_LENGTH: approximation for cell length computed using the
+// expression (diameter/ (cube_root(numCells)) * this->ScaleFactor.
 //
 // To determine the input data bounds, this domain depends on a required
 // property with function \c Input. The data-information from the source-proxy
@@ -34,9 +36,9 @@
 //
 // Supported XML attributes:
 // \li \c mode : used to specify the Mode. Value can be "normal", "magnitude",
-// "oriented_magnitude", or "scaled_extent".
-// \li \c scale_factor : used in SCALED_EXTENT mode. Value is a floating point
-// number that is used as the scale factor.
+// "oriented_magnitude", "scaled_extent", or "approximate_cell_length".
+// \li \c scale_factor : used in SCALED_EXTENT and APPROXIMATE_CELL_LENGTH mode.
+// Value is a floating point number that is used as the scale factor.
 
 #ifndef __vtkSMBoundsDomain_h
 #define __vtkSMBoundsDomain_h
@@ -70,12 +72,15 @@ public:
     NORMAL,
     MAGNITUDE,
     ORIENTED_MAGNITUDE,
-    SCALED_EXTENT
+    SCALED_EXTENT,
+    APPROXIMATE_CELL_LENGTH
   };
 
   vtkGetMacro(ScaleFactor, double);
 
-  void SetDomainValues(double bounds[6]);
+  // Description:
+  //  Overridden to handle APPROXIMATE_CELL_LENGTH.
+  virtual int SetDefaultValues(vtkSMProperty* property);
 
 protected:
   vtkSMBoundsDomain();
@@ -90,10 +95,12 @@ protected:
   // function "Input", if any.
   vtkPVDataInformation* GetInputInformation();
 
+  void SetDomainValues(double bounds[6]);
+
   void UpdateOriented();
 
   int Mode;
-  double ScaleFactor; // Used only in SCALED_EXTENT mode.
+  double ScaleFactor; // Used only in SCALED_EXTENT and APPROXIMATE_CELL_LENGTH mode.
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented

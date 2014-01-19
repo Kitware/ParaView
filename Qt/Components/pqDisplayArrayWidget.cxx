@@ -42,7 +42,6 @@
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
-#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqSMAdaptor.h"
 #include "pqTimer.h"

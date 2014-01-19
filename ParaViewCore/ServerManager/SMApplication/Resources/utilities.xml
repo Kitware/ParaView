@@ -104,7 +104,9 @@
                             command="AddRGBPoint"
                             name="RGBPoints"
                             number_of_elements_per_command="4"
-                            repeat_command="1">
+                            repeat_command="1"
+                            number_of_elements="8"
+                            default_values="0 0 0 1 1 1 0 0" >
         <Documentation>
           Specify the control points that form the color-transfer-function. These are
           a list of 4-tuples of the form (x, r, g, b) where x is the data value,
@@ -1201,12 +1203,11 @@
     <TransferFunctionProxy class="vtkPiecewiseFunction"
            name="PiecewiseFunction"
            processes="client|renderserver|dataserver">
-      <DoubleVectorProperty animateable="0"
-                            clean_command="RemoveAllPoints"
+      <DoubleVectorProperty clean_command="RemoveAllPoints"
                             command="AddPoint"
-                            default_values="0.0 0.0 0.5 0.0"
+                            default_values="0.0 0.0 0.5 0.0 1.0 1.0 0.5 0.0"
                             name="Points"
-                            number_of_elements="4"
+                            number_of_elements="8"
                             number_of_elements_per_command="4"
                             repeat_command="1"></DoubleVectorProperty>
       <IntVectorProperty command="SetAllowDuplicateScalars"

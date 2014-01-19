@@ -5,14 +5,14 @@
                  processes="client">
       <!-- |dataserver|renderserver -->
       <DoubleVectorProperty command="GetPosition"
-                            default_values="0 0 1"
+                            default_values="0 0 6.69"
                             information_only="1"
                             name="CameraPositionInfo"
                             number_of_elements="3">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPosition"
-                            default_values="0 0 1"
+                            default_values="0 0 6.69"
                             ignore_synchronization="1"
                             immediate_update="1"
                             information_property="CameraPositionInfo"
@@ -59,27 +59,27 @@
                             name="CameraViewAngle"
                             number_of_elements="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="GetClippingRange"
-                            default_values="0.01 1000.01"
+                            default_values="4.63 0.30"
                             information_only="1"
                             name="CameraClippingRangeInfo"
                             number_of_elements="2">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetClippingRange"
-                            default_values="0.01 1000.01"
+                            default_values="4.63 0.30"
                             ignore_synchronization="1"
                             immediate_update="1"
                             information_property="CameraClippingRangeInfo"
                             name="CameraClippingRange"
                             number_of_elements="2"></DoubleVectorProperty>
       <DoubleVectorProperty command="SetParallelScale"
-                            default_values="1.0"
+                            default_values="1.73"
                             ignore_synchronization="1"
                             information_property="CameraParallelScaleInfo"
                             name="CameraParallelScale"
                             number_of_elements="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="GetParallelScale"
-                            default_values="1.0"
+                            default_values="1.73"
                             information_only="1"
                             name="CameraParallelScaleInfo"
                             number_of_elements="1">

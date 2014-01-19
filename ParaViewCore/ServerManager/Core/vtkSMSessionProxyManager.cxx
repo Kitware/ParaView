@@ -20,7 +20,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
 #include "vtkPVInstantiator.h"
 #include "vtkPVProxyDefinitionIterator.h"
@@ -29,6 +28,7 @@
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
@@ -539,6 +539,63 @@ void vtkSMSessionProxyManager::GetProxyNames(const char* groupname,
     }
 }
 
+//---------------------------------------------------------------------------
+vtkStdString vtkSMSessionProxyManager::RegisterProxy(const char* groupname, vtkSMProxy* proxy)
+{
+  assert(proxy != NULL);
+
+  vtkStdString label = vtkSMCoreUtilities::SanitizeName(proxy->GetXMLLabel());
+  vtkStdString name = this->GetUniqueProxyName(groupname, label.c_str());
+  this->RegisterProxy(groupname, name.c_str(), proxy);
+  return groupname;
+}
+
+//---------------------------------------------------------------------------
+vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(
+  const char* groupname, const char* prefix)
+{
+  if (!groupname || !prefix)
+    {
+    return vtkStdString();
+    }
+
+  vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(groupname);
+  if (it == this->Internals->RegisteredProxyMap.end())
+    {
+    int suffix = 0;
+    vtksys_ios::ostringstream name_stream;
+    name_stream << prefix << suffix;
+    return name_stream.str();
+    }
+
+  std::set<std::string> existingNames;
+
+  vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
+  for (; it2 != it->second.end(); it2++)
+    {
+    for (
+      vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
+      it2 != it->second.end(); it2++)
+      {
+      existingNames.insert(it2->first);
+      }
+    }
+
+  for (int suffix=0; suffix < VTK_INT_MAX; ++suffix)
+    {
+    vtksys_ios::ostringstream name_stream;
+    name_stream << prefix << suffix;
+    if (existingNames.find(name_stream.str()) == existingNames.end())
+      {
+      return name_stream.str();
+      }
+    }
+
+  vtkErrorMacro("Failed to come up with a unique name!");
+  abort();
+  return vtkStdString(prefix);
+}
 
 //---------------------------------------------------------------------------
 const char* vtkSMSessionProxyManager::GetProxyName(const char* groupname,

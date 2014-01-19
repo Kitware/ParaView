@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
 #include "pqLinksModel.h"
-#include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
 #include "pqOutputWindowAdapter.h"
@@ -139,7 +138,6 @@ void pqApplicationCore::constructor()
   Q_ASSERT(pqApplicationCore::Instance == NULL);
   pqApplicationCore::Instance = this;
 
-  this->LookupTableManager = NULL;
   this->UndoStack = NULL;
   this->RecentlyUsedResourcesList = NULL;
   this->ServerConfigurations = NULL;
@@ -247,7 +245,6 @@ pqApplicationCore::~pqApplicationCore()
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
   // on these explicitly in which case we end up with segfaults.
-  this->LookupTableManager = 0;
   this->DisplayPolicy = 0;
   this->UndoStack = 0;
 
@@ -294,16 +291,6 @@ void pqApplicationCore::createOutputWindow()
     SLOT(onDisplayErrorTextInWindow(const QString&)));
   vtkOutputWindow::SetInstance(owAdapter);
   this->OutputWindowAdapter = owAdapter;
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setLookupTableManager(pqLookupTableManager* mgr)
-{
-  this->LookupTableManager = mgr;
-  if (mgr)
-    {
-    mgr->setParent(this);
-    }
 }
 
 //-----------------------------------------------------------------------------

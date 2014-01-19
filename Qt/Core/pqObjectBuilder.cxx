@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqObjectBuilder.h"
 
+#include "vtkNew.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -38,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
@@ -45,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTransferFunctionManager.h"
 
 #include <QApplication>
 #include <QFileInfo>
@@ -83,11 +87,44 @@ inline QString pqObjectBuilderGetName(vtkSMProxy* proxy,
 
 namespace pqObjectBuilderNS
 {
+  vtkNew<vtkSMParaViewPipelineController> Controller;
+
   static bool ContinueWaiting = true;
   static bool processEvents()
     {
     QApplication::processEvents();
     return ContinueWaiting;
+    }
+
+  //-----------------------------------------------------------------------------
+  bool preCreatePipelineProxy(vtkSMProxy* proxy)
+    {
+    return (proxy != NULL && Controller->PreInitializePipelineProxy(proxy));
+    }
+
+  //-----------------------------------------------------------------------------
+  pqPipelineSource* postCreatePipelineProxy(vtkSMProxy* proxy, pqServer* server)
+    {
+
+    // since there are no properties to set, nothing to do here.
+    Controller->PostInitializePipelineProxy(proxy);
+
+    pqPipelineSource* source = pqApplicationCore::instance()->
+      getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
+    source->setModifiedState(pqProxy::UNINITIALIZED);
+
+    // Manage Modified state in Undo/Redo only if not a collaborative server
+    if (!server->session()->IsMultiClients())
+      {
+      pqProxyModifiedStateUndoElement* elem =
+        pqProxyModifiedStateUndoElement::New();
+      elem->SetSession(server->session());
+      elem->MadeUninitialized(source);
+      ADD_UNDO_ELEM(elem);
+      elem->Delete();
+      }
+
+    return source;
     }
 }
 
@@ -109,63 +146,34 @@ pqObjectBuilder::~pqObjectBuilder()
 pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
     const QString& sm_name, pqServer* server)
 {
-  vtkSMProxy* proxy = 
-    this->createProxyInternal(sm_group, sm_name, server, "sources", QString(), QMap<QString,QVariant>());
-  if (proxy)
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  vtkSmartPointer<vtkSMProxy> proxy;
+  proxy.TakeReference(
+    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
+  if (!pqObjectBuilderNS::preCreatePipelineProxy(proxy))
     {
-    pqPipelineSource* source = pqApplicationCore::instance()->
-      getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
-
-    // initialize the source.
-    source->setDefaultPropertyValues();
-    source->setModifiedState(pqProxy::UNINITIALIZED);
-
-    // Manage Modified state in Undo/Redo only if not a collaborative server
-    if(!server->session()->IsMultiClients())
-      {
-      pqProxyModifiedStateUndoElement* elem =
-          pqProxyModifiedStateUndoElement::New();
-      elem->SetSession(server->session());
-      elem->MadeUninitialized(source);
-      ADD_UNDO_ELEM(elem);
-      elem->Delete();
-      }
-    emit this->sourceCreated(source);
-    emit this->proxyCreated(source);
-    return source;
+    return NULL;
     }
-  return 0;
-}
 
-pqPipelineSource* pqObjectBuilder::createFilter(
-  const QString& group, const QString& name,
-  QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server)
-{
-  return this->createFilter(group, name, namedInputs, server, QMap<QString, QVariant>());
+  pqPipelineSource* source =
+    pqObjectBuilderNS::postCreatePipelineProxy(proxy, server);
+  emit this->sourceCreated(source);
+  emit this->proxyCreated(source);
+  return source;
 }
-
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createFilter(
-  const QString& group, const QString& name,
-  QMap<QString, QList<pqOutputPort*> > namedInputs,
-  pqServer* server,
-  const QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
+  const QString& sm_group, const QString& sm_name,
+  QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server)
 {
-  vtkSMProxy* proxy = 
-    this->createProxyInternal(group, name, server, "sources",QString(),properties);
-  if (!proxy)
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  vtkSmartPointer<vtkSMProxy> proxy;
+  proxy.TakeReference(
+    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
+  if (!pqObjectBuilderNS::preCreatePipelineProxy(proxy))
     {
-    return 0;
-    }
-
-  pqPipelineSource* filter = pqApplicationCore::instance()->getServerManagerModel()->
-    findItem<pqPipelineSource*>(proxy);
-  if (!filter)
-    {
-    qDebug() << "Failed to locate pqPipelineSource for the created proxy "
-      << group << ", " << name;
-    return 0;
+    return NULL;
     }
 
   // Now for every input port, connect the inputs.
@@ -182,30 +190,15 @@ pqPipelineSource* pqObjectBuilder::createFilter(
       continue;
       }
 
+    vtkSMPropertyHelper helper(prop);
     foreach (pqOutputPort* opPort, inputs)
       {
-      pqSMAdaptor::addInputProperty(prop, opPort->getSource()->getProxy(),
-        opPort->getPortNumber());
+      helper.Add(opPort->getSource()->getProxy(), opPort->getPortNumber());
       }
-
-    proxy->UpdateVTKObjects();
     }
 
-  // Set default property values.
-  filter->setDefaultPropertyValues();
-  filter->setModifiedState(pqProxy::UNINITIALIZED);
-
-  // Manage Modified state in Undo/Redo only if not a collaborative server
-  if(!server->session()->IsMultiClients())
-    {
-    pqProxyModifiedStateUndoElement* elem =
-        pqProxyModifiedStateUndoElement::New();
-    elem->SetSession(server->session());
-    elem->MadeUninitialized(filter);
-    ADD_UNDO_ELEM(elem);
-    elem->Delete();
-    }
-
+  pqPipelineSource* filter =
+    pqObjectBuilderNS::postCreatePipelineProxy(proxy, server);
   emit this->filterCreated(filter);
   emit this->proxyCreated(filter);
   return filter;
@@ -223,6 +216,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   return this->createFilter(group, name, namedInputs, input->getServer());
 }
 
+//-----------------------------------------------------------------------------
 inline QString pqObjectBuilderGetPath(const QString& filename, bool use_dir)
 {
   if (use_dir)
@@ -264,20 +258,13 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     reg_name += '*';
     }
 
-  vtkSMProxy* proxy = 
-    this->createProxyInternal(sm_group, sm_name, server, "sources", reg_name, QMap<QString,QVariant>());
-  if (!proxy)
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  vtkSmartPointer<vtkSMProxy> proxy;
+  proxy.TakeReference(
+    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
+  if (!pqObjectBuilderNS::preCreatePipelineProxy(proxy))
     {
-    return 0;
-    }
-
-  pqPipelineSource* reader = pqApplicationCore::instance()->
-    getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
-  if (!reader)
-    {
-    qDebug() << "Failed to locate pqPipelineSource for the created proxy "
-      << sm_group << ", " << sm_name;
-    return 0;
+    return NULL;
     }
 
   QString pname = this->getFileNamePropertyName(proxy);
@@ -315,20 +302,9 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
       }
     proxy->UpdateVTKObjects();
     }
-  reader->setDefaultPropertyValues();
-  reader->setModifiedState(pqProxy::UNINITIALIZED);
 
-  // Manage Modified state in Undo/Redo only if not a collaborative server
-  if(!server->session()->IsMultiClients())
-    {
-    pqProxyModifiedStateUndoElement* elem =
-        pqProxyModifiedStateUndoElement::New();
-    elem->SetSession(server->session());
-    elem->MadeUninitialized(reader);
-    ADD_UNDO_ELEM(elem);
-    elem->Delete();
-    }
-
+  pqPipelineSource* reader =
+    pqObjectBuilderNS::postCreatePipelineProxy(proxy, server);
   emit this->readerCreated(reader, files[0]);
   emit this->readerCreated(reader, files);
   emit this->sourceCreated(reader);
@@ -395,7 +371,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
     }
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
-  vtkSMProxy* proxy= 0;
+  vtkSmartPointer<vtkSMProxy> proxy;
 
   QList<pqViewModuleInterface*> ifaces =
     pqApplicationCore::instance()->interfaceTracker()->interfaces<pqViewModuleInterface*>();
@@ -403,7 +379,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
     {
     if (vmi && vmi->viewTypes().contains(type))
       {
-      proxy = vmi->createViewProxy(type, server);
+      proxy.TakeReference(vmi->createViewProxy(type, server));
       break;
       }
     }
@@ -419,28 +395,20 @@ pqView* pqObjectBuilder::createView(const QString& type,
   // this by setting up layouts, etc.
   emit this->aboutToCreateView(server);
 
-  proxy->UpdateVTKObjects();
-
-  QString name = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
-  pxm->RegisterProxy("views", name.toLatin1().data(), proxy);
-  proxy->Delete();
+  pqObjectBuilderNS::Controller->InitializeView(proxy);
 
   pqServerManagerModel* model = 
     pqApplicationCore::instance()->getServerManagerModel();
-
   pqView* view = model->findItem<pqView*>(proxy);
   if (view)
     {
-    view->setDefaultPropertyValues();
     emit this->viewCreated(view);
     emit this->proxyCreated(view);
     }
   else
     {
-    qDebug() << "Cannot locate the pqView for the view module proxy:"
-             << name << "of type" << type;
+    qDebug() << "Cannot locate the pqView for the view proxy of type" << type;
     }
-
   return view;
 }
 
@@ -490,7 +458,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     return NULL;
     }
 
-  vtkSMProxy* reprProxy = 0; 
+  vtkSmartPointer<vtkSMProxy> reprProxy;
 
   pqPipelineSource* source = opPort->getSource();
   vtkSMSessionProxyManager* pxm = source->proxyManager();
@@ -499,13 +467,13 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   QString srcProxyName = source->getProxy()->GetXMLName();
   if (representationType != "")
     {
-    reprProxy = pxm->NewProxy(
-      "representations", representationType.toLatin1().data());
+    reprProxy.TakeReference(pxm->NewProxy(
+      "representations", representationType.toLatin1().data()));
     }
   else
     {
-    reprProxy = view->getViewProxy()->CreateDefaultRepresentation(
-      source->getProxy(), opPort->getPortNumber());
+    reprProxy.TakeReference(view->getViewProxy()->CreateDefaultRepresentation(
+        source->getProxy(), opPort->getPortNumber()));
     }
 
   // Could not determine representation proxy to create.
@@ -514,20 +482,8 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     return NULL;
     }
 
-  // Make sure the associated selection proxy of the source get created before
-  // the representation get register.
-  // In some case, a collaborative client could trigger a render which will
-  // cause the source to create its selection proxy whithout waiting for the
-  // master to get the correct extract selection proxy ID.
-  vtkSMSourceProxy::SafeDownCast(source->getProxy())->CreateSelectionProxies();
+  pqObjectBuilderNS::Controller->PreInitializeRepresentation(reprProxy);
 
-  // (for undo/redo to work).
-  QString name = QString("DataRepresentation%1").arg(
-    this->NameGenerator->GetCountAndIncrement("DataRepresentation"));
-  pxm->RegisterProxy("representations", name.toLatin1().data(), reprProxy);
-  reprProxy->Delete();
-
-  vtkSMProxy* viewModuleProxy = view->getProxy();
 
   // Set the reprProxy's input.
   pqSMAdaptor::setInputProperty(reprProxy->GetProperty("Input"), 
@@ -538,9 +494,11 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     pqSMAdaptor::setElementProperty(reprProxy->GetProperty("Visibility"),
                                     0);
     }
-  reprProxy->UpdateVTKObjects();
+
+  pqObjectBuilderNS::Controller->PostInitializeRepresentation(reprProxy);
 
   // Add the reprProxy to render module.
+  vtkSMProxy* viewModuleProxy = view->getProxy();
   pqSMAdaptor::addProxyProperty(
     viewModuleProxy->GetProperty("Representations"), reprProxy);
   viewModuleProxy->UpdateVTKObjects();
@@ -556,12 +514,46 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
       // inherit properties from the representation for the input if applicable.
       this->initializeInheritedProperties(repr);
       }
-    repr->setDefaultPropertyValues();
-
     emit this->dataRepresentationCreated(repr);
     emit this->proxyCreated(repr);
     }
   return repr;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqObjectBuilder::createProxy(const QString& sm_group, 
+  const QString& sm_name, pqServer* server, 
+  const QString& reg_group)
+{
+  if (!server)
+    {
+    qDebug() << "server cannot be null";
+    return 0;
+    }
+  if (sm_group.isEmpty() || sm_name.isEmpty())
+    {
+    qCritical() << "Group name and proxy name must be non empty.";
+    return 0;
+    }
+
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+  vtkSmartPointer<vtkSMProxy> proxy;
+  proxy.TakeReference(
+    pxm->NewProxy(sm_group.toLatin1().data(), sm_name.toLatin1().data()));
+  if (!proxy.GetPointer())
+    {
+    qCritical() << "Failed to create proxy: " << sm_group << ", " << sm_name;
+    return NULL;
+    }
+  else if (reg_group.contains("prototypes"))
+    {
+    // Mark as prototype to prevent them from behing saved in undo stack and
+    // managed through the state
+    proxy->SetPrototype(true);
+    }
+
+  pxm->RegisterProxy(reg_group.toAscii().data(), proxy);
+  return proxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -601,87 +593,6 @@ void pqObjectBuilder::destroy(pqRepresentation* repr)
     // been deleted.
     stc->hideUnusedScalarBars();
     }
-}
-
-//-----------------------------------------------------------------------------
-pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
-    pqScalarsToColors* lookupTable, pqView* view)
-{
-  if (!lookupTable || !view)
-    {
-    return 0;
-    }
-
-  if (lookupTable->getServer() != view->getServer())
-    {
-    qCritical() << "LUT and View are on different servers!";
-    return 0;
-    }
-
-  pqServer* server = view->getServer();
-  vtkSMProxy* scalarBarProxy = this->createProxyInternal(
-    "representations", "ScalarBarWidgetRepresentation", server, "scalar_bars",
-    QString(), QMap<QString,QVariant>());
-
-  if (!scalarBarProxy)
-    {
-    return 0;
-    }
-  pqScalarBarRepresentation* scalarBar = 
-    pqApplicationCore::instance()->getServerManagerModel()->
-    findItem<pqScalarBarRepresentation*>(scalarBarProxy);
-  pqSMAdaptor::setProxyProperty(scalarBarProxy->GetProperty("LookupTable"),
-    lookupTable->getProxy());
-  scalarBarProxy->UpdateVTKObjects();
-
-  pqSMAdaptor::addProxyProperty(view->getProxy()->GetProperty("Representations"),
-    scalarBarProxy);
-  view->getProxy()->UpdateVTKObjects();
-  scalarBar->setDefaultPropertyValues();
-
-  emit this->scalarBarDisplayCreated(scalarBar);
-  emit this->proxyCreated(scalarBar);
-  return scalarBar;
-}
-
-//-----------------------------------------------------------------------------
-pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
-{
-  vtkSMSessionProxyManager* pxm = server->proxyManager();
-  vtkSMProxy* proxy = pxm->GetProxy("animation", "AnimationScene");
-
-  if(proxy == NULL)
-    {
-    proxy = this->createProxyInternal("animation", "AnimationScene", server,
-                                      "animation", QString(), QMap<QString,QVariant>());
-    }
-  pqAnimationScene* scene = pqApplicationCore::instance()->
-      getServerManagerModel()->findItem<pqAnimationScene*>(proxy);
-  if(proxy && scene)
-    {
-    proxy->UpdateVTKObjects();
-
-    // initialize the scene.
-    scene->setDefaultPropertyValues();
-    emit this->proxyCreated(scene);
-    return scene;
-    }
-
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqObjectBuilder::createProxy(const QString& sm_group, 
-    const QString& sm_name, pqServer* server, 
-    const QString& reg_group, const QString& reg_name/*=QString()*/)
-{
-  vtkSMProxy* proxy = this->createProxyInternal(
-    sm_group, sm_name, server, reg_group, reg_name, QMap<QString,QVariant>());
-  if (proxy)
-    {
-    emit this->proxyCreated(proxy);
-    }
-  return proxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -754,79 +665,6 @@ void pqObjectBuilder::destroyAllProxies(pqServer* server)
     }
 
   server->proxyManager()->UnRegisterProxies();
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group, 
-  const QString& sm_name, pqServer* server, 
-  const QString& reg_group, const QString& reg_name/*=QString()*/,
-  const QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
-{
-  if (!server)
-    {
-    qDebug() << "server cannot be null";
-    return 0;
-    }
-  if (sm_group.isEmpty() || sm_name.isEmpty())
-    {
-    qCritical() << "Group name and proxy name must be non empty.";
-    return 0;
-    }
-
-  vtkSMSessionProxyManager* pxm = server->proxyManager();
-  vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(
-    pxm->NewProxy(sm_group.toLatin1().data(), sm_name.toLatin1().data()));
-
-  if (!proxy.GetPointer())
-    {
-    qCritical() << "Failed to create proxy: " << sm_group << ", " << sm_name;
-    return 0;
-    }
-  else if (reg_group.contains("prototypes"))
-    {
-    // Mark as prototype to prevent them from behing saved in undo stack and
-    // managed through the state
-    proxy->SetPrototype(true);
-    }
-
-
-  QString actual_regname = reg_name;
-  if (reg_name.isEmpty())
-    {
-    actual_regname = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
-    }
-
-  pxm->RegisterProxy(reg_group.toLatin1().data(), 
-    actual_regname.toLatin1().data(), proxy);
-
-
-  QMap<QString, QVariant>::const_iterator mapIter;
-  for (mapIter = properties.begin(); mapIter != properties.end(); ++mapIter)
-    {
-    QString propertyName = mapIter.key();
-    QVariant propertyValue = mapIter.value();
-
-    vtkSMProperty *prop=proxy->GetProperty(propertyName.toLatin1().data());
-
-    if(prop)
-      {
-        switch (pqSMAdaptor::getPropertyType(prop))
-        {
-        case pqSMAdaptor::FILE_LIST:
-          {
-            pqSMAdaptor::setFileListProperty(prop, propertyValue.toStringList());
-          }
-          break;
-        default:
-          break;
-        }
-      }
-    }
-
-
-
-  return proxy;
 }
 
 //-----------------------------------------------------------------------------

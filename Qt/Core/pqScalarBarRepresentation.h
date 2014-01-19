@@ -74,8 +74,6 @@ public:
   bool getAutoHidden() const
     { return this->AutoHidden; }
 
-  virtual void setDefaultPropertyValues();
-
 signals:
   /// Fired just before the color is changed on the underlying proxy.
   /// This must be hooked to an undo stack to record the

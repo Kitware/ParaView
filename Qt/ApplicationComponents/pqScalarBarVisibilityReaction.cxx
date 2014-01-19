@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarVisibilityReaction.h"
 
 #include "pqActiveObjects.h"
-#include "pqLookupTableManager.h"
 #include "pqPipelineRepresentation.h"
 #include "pqRenderViewBase.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
+#include "vtkSMPVRepresentationProxy.h"
 
 #include <QDebug>
 
@@ -109,13 +109,6 @@ void pqScalarBarVisibilityReaction::updateEnableState()
 void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqLookupTableManager* lut_mgr = core->getLookupTableManager();
-  if (!lut_mgr)
-    {
-    qCritical() << "Cannot locate pqLookupTableManager.";
-    return;
-    }
-
   pqRenderViewBase* view = qobject_cast<pqRenderViewBase*>(
     pqActiveObjects::instance().activeView());
   pqDataRepresentation* repr =
@@ -125,14 +118,9 @@ void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
     qCritical() << "Required active objects are not available.";
     return;
     }
-
   BEGIN_UNDO_SET( "Toggle Color Legend Visibility");
-  pqScalarBarRepresentation* scalar_bar =
-    lut_mgr->setScalarBarVisibility(repr, visible);
+  vtkSMPVRepresentationProxy::SetScalarBarVisibility(
+    repr->getProxy(), view->getProxy(), visible);
   END_UNDO_SET();
-  
-  if (scalar_bar)
-    {
-    scalar_bar->renderViewEventually();
-    }
+  view->render();
 }

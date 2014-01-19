@@ -331,13 +331,17 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   // listen to server manager changes
   pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
   this->connect(smm, SIGNAL(sourceRemoved(pqPipelineSource*)),
-                this, SLOT(proxyDeleted(pqPipelineSource*)));
+    SLOT(proxyDeleted(pqPipelineSource*)));
+  // this connection ensures that the button state is updated everytime any
+  // item's state changes.
+  this->connect(smm, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+    SLOT(updateButtonState()));
   this->connect(pqApplicationCore::instance()->getServerManagerModel(),
-      SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
-      SLOT(updateButtonState()));
+    SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
+    SLOT(updateButtonState()));
   this->connect(pqApplicationCore::instance()->getServerManagerModel(),
-      SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
-      SLOT(updateButtonState()));
+    SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
+    SLOT(updateButtonState()));
 
   // Setup shortcut to clear search text.
   this->Internals->Ui.SearchLineEdit->installEventFilter(

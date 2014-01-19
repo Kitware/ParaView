@@ -15,6 +15,7 @@
 #include "vtkSMPVRepresentationProxy.h"
 
 #include "vtkCommand.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -24,6 +25,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <set>
@@ -331,6 +333,132 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int attribute_type)
+{
+  if (!this->GetUsingScalarColoring() && (arrayname==NULL ||arrayname[0]==0))
+    {
+    // scalar coloring already off. Nothing to do.
+    return true;
+    }
+
+  vtkSMProperty* colorArray = this->GetProperty("ColorArrayName");
+  vtkSMProperty* colorAttr = this->GetProperty("ColorAttributeType");
+  if (!colorArray || !colorAttr)
+    {
+    vtkWarningMacro("No 'ColorArrayName' or 'ColorAttributeType' property found.");
+    return false;
+    }
+
+  vtkSMPropertyHelper colorArrayHelper(colorArray);
+  vtkSMPropertyHelper colorAttrHelper(colorAttr);
+
+  if (arrayname && colorArrayHelper.GetAsString() &&
+    strcmp(arrayname, colorArrayHelper.GetAsString()) == 0 &&
+    colorArrayHelper.GetAsInt() == attribute_type)
+    {
+    // nothing to do since nothing changed.
+    return true;
+    }
+
+  colorArrayHelper.Set(arrayname? arrayname : "");
+  colorAttrHelper.Set(attribute_type);
+
+  if (arrayname == NULL || arrayname[0] == '\0')
+    {
+    vtkSMPropertyHelper(this, "LookupTable", true).RemoveAllValues();
+    vtkSMPropertyHelper(this, "ScalarOpacityFunction", true).RemoveAllValues();
+    this->UpdateVTKObjects();
+    return true;
+    }
+  
+  // Now, setup transfer functions.
+  vtkNew<vtkSMTransferFunctionManager> mgr;
+  if (vtkSMProperty* lutProperty = this->GetProperty("LookupTable"))
+    {
+    vtkSMProxy* lutProxy =
+      mgr->GetColorTransferFunction(arrayname, this->GetSessionProxyManager());
+    vtkSMPropertyHelper(lutProperty).Set(lutProxy);
+    }
+  
+  if (vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction"))
+    {
+    vtkSMProxy* sofProxy =
+      mgr->GetOpacityTransferFunction(arrayname, this->GetSessionProxyManager());
+    vtkSMPropertyHelper(sofProperty).Set(sofProxy);
+    }
+
+  this->UpdateVTKObjects();
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visibile)
+{
+  if (!view)
+    {
+    return false;
+    }
+
+  vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
+  if (!lutProperty)
+    {
+    vtkWarningMacro("Missing 'LookupTable' property.");
+    return false;
+    }
+
+  vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+  if (lutPropertyHelper.GetNumberOfElements() == 0 ||
+    lutPropertyHelper.GetAsProxy(0) == NULL)
+    {
+    vtkWarningMacro("Failed to determine the LookupTable being used.");
+    return false;
+    }
+
+  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+
+  // if hiding the Scalar Bar, just look if there's a LUT and then hide the
+  // corresponding scalar bar. We won't worry too much about whether scalar
+  // coloring is currently enabled for this.
+  if (!visibile)
+    {
+    if (vtkSMProxy* sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
+        lutPropertyHelper.GetAsProxy(), view))
+      {
+      vtkSMPropertyHelper(sbProxy, "Visibility").Set(0);
+      vtkSMPropertyHelper(sbProxy, "Enabled").Set(0);
+      sbProxy->UpdateVTKObjects();
+      }
+    return true;
+    }
+
+  if (!this->GetUsingScalarColoring())
+    {
+    return false;
+    }
+
+  vtkNew<vtkSMTransferFunctionManager> mgr;
+  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
+  if (!sbProxy)
+    {
+    vtkWarningMacro("Failed to locate/create ScalarBar representation.");
+    return false;
+    }
+
+  vtkSMPropertyHelper(sbProxy, "Enabled").Set(1);
+  vtkSMPropertyHelper(sbProxy, "Visibility").Set(1);
+
+  vtkSMPropertyHelper titleHelper (sbProxy, "Title");
+  if (strcmp(titleHelper.GetAsString(0),"") == 0)
+    {
+    // FIXME: set title properly.
+    titleHelper.Set(
+      vtkSMPropertyHelper(this->GetProperty("ColorArrayName")).GetAsString(0));
+    }
+  sbProxy->UpdateVTKObjects();
+  return true;
 }
 
 //----------------------------------------------------------------------------

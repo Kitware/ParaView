@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPropertiesPanel.h"
-#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
 

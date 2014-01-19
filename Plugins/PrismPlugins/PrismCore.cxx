@@ -419,15 +419,16 @@ void PrismCore::onCreatePrismView(const QStringList& files)
         stack->beginUndoSet("Create Prism Filter");
         }
 
-    QMap<QString,QVariant> defaultProperties;
-    defaultProperties["FileName"]=files;
+    // FIXME:
+    //QMap<QString,QVariant> defaultProperties;
+    //defaultProperties["FileName"]=files;
 
-    filter = builder->createFilter("filters", "PrismFilter", namedInputs, server,defaultProperties);
+    //filter = builder->createFilter("filters", "PrismFilter", namedInputs, server,defaultProperties);
 
-    //I believe that this is needs to be called twice because there are properties that depend on other properties.
-    //Calling it once doesn't set all the properties right.
-    filter->setDefaultPropertyValues();
-    filter->setDefaultPropertyValues();
+    ////I believe that this is needs to be called twice because there are properties that depend on other properties.
+    ////Calling it once doesn't set all the properties right.
+    //filter->setDefaultPropertyValues();
+    //filter->setDefaultPropertyValues();
     if(stack)
         {
         stack->endUndoSet();

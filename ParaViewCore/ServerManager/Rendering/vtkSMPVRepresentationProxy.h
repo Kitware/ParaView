@@ -57,6 +57,23 @@ public:
     }
 
   // Description:
+  // Enable/disable scalar coloring using the specified array. This will setup a
+  // color and opacity transfer functions using vtkSMTransferFunctionProxy
+  // instance. If arrayname is NULL, then scalar coloring is turned off.
+  // \c field_association must be one of vtkDataObject::AttributeTypes.
+  virtual bool SetScalarColoring(const char* arrayname, int attribute_type);
+
+  // Description:
+  // Safely call SetScalarColoring() after casting the proxy to the appropriate
+  // type.
+  static bool SetScalarColoring(vtkSMProxy* proxy, const char* arrayname, int attribute_type)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->SetScalarColoring(arrayname, attribute_type) : false;
+    }
+
+  // Description:
   // Rescales the color transfer function and opacity transfer function using the
   // current data range. Returns true if rescale was successful.
   // If \c extend is true (false by default), the transfer function range will
@@ -131,6 +148,18 @@ public:
     return self?
       self->RescaleTransferFunctionToDataRangeOverTime(arrayname, attribute_type) : false;
     }
+
+  // Description:
+  // Set the scalar bar visibility. This will create a new scalar bar as needed.
+  // Scalar bar is only shown if scalar coloring is indeed being used.
+  virtual bool SetScalarBarVisibility(vtkSMProxy* view, bool visibile);
+  static bool SetScalarBarVisibility(vtkSMProxy* proxy, vtkSMProxy* view, bool visibile)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->SetScalarBarVisibility(view, visibile) : false;
+    }
+
 
 protected:
   vtkSMPVRepresentationProxy();

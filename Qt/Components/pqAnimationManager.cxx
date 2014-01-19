@@ -193,11 +193,7 @@ void pqAnimationManager::onActiveServerChanged(pqServer* server)
     }
 
   this->Internals->ActiveServer = server;
-  if (server && !this->getActiveScene())
-    {
-    this->createActiveScene();
-    emit this->activeServerChanged(server);
-    }
+  emit this->activeServerChanged(server);
   emit this->activeSceneChanged(this->getActiveScene());
 }
 
@@ -216,29 +212,6 @@ pqAnimationScene* pqAnimationManager::getScene(pqServer* server) const
     }
   return 0;
 }
-
-//-----------------------------------------------------------------------------
-pqAnimationScene* pqAnimationManager::createActiveScene() 
-{
-  if (this->Internals->ActiveServer)
-    {
-    pqObjectBuilder* builder = 
-      pqApplicationCore::instance()->getObjectBuilder();
-    pqAnimationScene* scene = builder->createAnimationScene(
-      this->Internals->ActiveServer);
-    
-    // this will result in a call to onProxyAdded() and proper
-    // signals will be emitted.
-    if (!scene)
-      {
-      qDebug() << "Failed to create scene proxy.";
-      }
-    this->updateViewModules();
-    return this->getActiveScene();
-    }
-  return 0;
-}
-
 
 //-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationManager::getCue(
