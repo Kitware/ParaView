@@ -87,6 +87,11 @@
       "url": "guides/developer_style",
       "title": "Code Style Guidelines",
       "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
+      },{
+        "name": "webtest_setup",
+        "url": "guides/webtest_setup",
+        "title": "Setting up a machine for Web-based Testing",
+        "description": "This document explains how to set up a computer to be able to run web-based tests."
       }
     ]
   }
