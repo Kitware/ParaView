@@ -75,3 +75,40 @@ http://localhost:8080/apps/LiveArticles and http://localhost:8080/apps/Parallel 
 
 In order to play with the Web visualizer, you can either click on the __"+"__ icon of the pipeline browser to add a source or you can load a file by clicking on the __"folder"__ icon.
 Then, further interaction can be executed, as is shown in the video available [here](index.html#!/video/WebVisualizer).
+
+## Simple install
+
+We've developed a Python script that will download for you the binaries and some data so you can have a local setup of ParaViewWeb in no time.
+That script can be downloaded [here](guides/getting_started/data/pvw-setup).
+This will give you a start script that will use to launcher to serve the static web pages and will automatically start a new ParaView process
+for each user.
+
+Here is an example on how to use that script and its output:
+
+    $ cd /Users/seb/Desktop
+    $ mkdir pvw-osx
+    $ cd pvw-osx
+    $ curl http://www.paraview.org/ParaView3/Doc/Nightly/www/js-doc/guides/quick_start/data/pvw-setup -o pvw-setup.py 
+    $ python pvw-setup.py
+
+    Is ParaViewWeb install path correct? (/Users/seb/Desktop/pvw-osx) yes/no/quit: y
+
+    Installing ParaViewWeb inside: /Users/seb/Desktop/pvw-osx
+
+    Which system? [osx, linux32, linux64, win32, win64, all]: osx
+
+    Downloading: /Users/seb/Desktop/pvw-osx/download/ParaView-4.1.0-Darwin-64bit-Lion-Python27.dmg Bytes: 89125150
+      89125150  [100.00%]
+    => Unpack ParaView
+    => Unpack data
+       Unzip [..]ata-v4.1/Baseline/WebTesting/ParaView/image_sphere_part_known_good.jpg
+    => Unpack Web
+       Unzip [..]-doc/extjs/resources/themes/images/default/util/splitter/mini-left.gif
+    => Clean web directory
+    => Configure local instance
+
+    To start ParaViewWeb web server just run:
+          /Users/seb/Desktop/pvw-osx/bin/start.sh
+
+    And go in your Web browser (Safari, Chrome, Firefox) to:
+          http://localhost:8080/
