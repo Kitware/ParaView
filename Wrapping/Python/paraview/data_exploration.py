@@ -3,8 +3,130 @@ This module is made to provide a set of tools and helper classes for data
 exploration for Web deployment.
 """
 
-import math, os, json
+import math, os, json, datetime, time
 from paraview import simple
+
+#==============================================================================
+# Run management
+#==============================================================================
+
+class AnalysisManager():
+    """
+    This class provide mechanism to keep track of a full data analysis and
+    exploration so the generated analysis can be processed and viewed on
+    the web.
+    """
+    def __init__(self, work_dir, title, description, **kwargs):
+        """
+        Create an Analysis manager that will dump its data
+        within the provided work_dir.
+        Then additional information can be added to the associated metadata
+        in the form of keyword arguments.
+        """
+        self.file_name_generators = {}
+        self.work_dir = work_dir
+        self.timers = {}
+        self.analysis = {
+            "path": work_dir,
+            "title": title,
+            "description": description,
+            "analysis": []
+        }
+        for key, value in kwargs.iteritems():
+            self.analysis[key] = value
+        self.begin()
+
+
+    def register_analysis(self, key, title, description, file_pattern):
+        """
+        Register a managed analysis.
+        """
+        path = os.path.join(self.work_dir, key)
+        file_name_generator = FileNameGenerator(path, file_pattern)
+        metadata = { "title": title, "description": description, "path": path, "id": key }
+        for _key in metadata:
+            file_name_generator.add_meta_data(_key, metadata[_key])
+
+        self.analysis['analysis'].append(metadata)
+        self.file_name_generators[key] = file_name_generator
+
+    def get_file_name_generator(self, key):
+        """
+        Retreive an analysis FileNameGenerator based on the key of a registered analysis.
+        """
+        return self.file_name_generators[key]
+
+    def add_meta_data(self, key, value):
+        """
+        Update analysis metadata with additional information.
+        """
+        self.analysis[key] = value
+
+    def begin_work(self, key):
+        """
+        Record the time that a given work is taking.
+        If begin/end_work is called multiple time, a count
+        will be kept but the time will just sum itself.
+
+        If 2 begin_work with the same key, the second one will override the first one.
+        """
+        current_timer = None
+        if self.timers.has_key(key):
+            current_timer = self.timers[key]
+        else:
+            current_timer = { 'total_time': 0.0, 'work_count': 0 , 'last_begin': 0.0}
+            self.timers[key] = current_timer
+
+        # Update begin time
+        current_timer['last_begin'] = time.time()
+
+
+    def end_work(self, key):
+        """
+        Record the time that a given work is taking.
+        If begin/end_work is called multiple time, a count
+        will be kept but the time will just sum itself.
+
+        If 2 end_work with the same key, the second one will
+        be ignore as no begin_work will be done before.
+        """
+        if self.timers.has_key(key):
+            current_timer = self.timers[key]
+            if current_timer['last_begin'] != 0.0:
+                delta = time.time()
+                delta -= current_timer['last_begin']
+                current_timer['last_begin'] = 0.0
+                current_timer['total_time'] += delta
+                current_timer['work_count'] += 1
+
+    def begin(self):
+        """
+        Start the analysis time recording.
+        """
+        self.begin_work("full_analysis")
+
+    def end(self):
+        """
+        End the analysis time recording and write associated metadata
+        """
+        self.end_work("full_analysis")
+        self.write()
+
+    def write(self):
+        """
+        Write metadata file in the work directory that describe all the
+        analysis that have been performed.
+        """
+        # Update timer info first
+        self.analysis['timers'] = {}
+        for key in self.timers:
+            self.analysis['timers'][key] = {'total_time': self.timers[key]['total_time'], 'work_count': self.timers[key]['work_count'] }
+
+        # Write to disk
+        metadata_file_path = os.path.join(self.work_dir, "info.json")
+        with open(metadata_file_path, "w") as metadata_file:
+            metadata_file.write(json.dumps(self.analysis))
+
 
 #==============================================================================
 # File Name management
@@ -28,8 +150,15 @@ class FileNameGenerator():
         self.name_format = name_format
         self.arguments = {}
         self.active_arguments = {}
+        self.metadata = {}
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
+
+    def add_meta_data(self, key, value):
+        """
+        Add aditional metadata information for the analysis
+        """
+        self.metadata[key] = value
 
     def set_active_arguments(self, **kwargs):
         """
@@ -37,28 +166,29 @@ class FileNameGenerator():
         """
         self.active_arguments = kwargs
 
-    def update_active_arguments(self, **kwargs):
+    def update_active_arguments(self, store_value=True, **kwargs):
         """
         Update active arguments and extend arguments range.
         """
         for key, value in kwargs.iteritems():
             value_str = "{value}".format(value=value)
             self.active_arguments[key] = value_str
-            if self.arguments.has_key(key):
-                try:
-                    self.arguments[key]["values"].index(value_str)
-                except ValueError:
-                    self.arguments[key]["values"].append(value_str)
-            else:
-                typeOfValues = "range"
-                if type(value) == type("String"):
-                    typeOfValues = "list"
-                self.arguments[key] = {
-                    "values" : [ value_str ],
-                    "default": value_str,
-                    "type": typeOfValues,
-                    "label": key
-                }
+            if store_value:
+                if self.arguments.has_key(key):
+                    try:
+                        self.arguments[key]["values"].index(value_str)
+                    except ValueError:
+                        self.arguments[key]["values"].append(value_str)
+                else:
+                    typeOfValues = "range"
+                    if type(value) == type("String"):
+                        typeOfValues = "list"
+                    self.arguments[key] = {
+                        "values" : [ value_str ],
+                        "default": value_str,
+                        "type": typeOfValues,
+                        "label": key
+                    }
 
     def update_label_arguments(self, **kwargs):
         """
@@ -78,9 +208,12 @@ class FileNameGenerator():
         """
         Return the full path of the file based on the current active arguments
         """
-        return os.path.join(self.working_dir, self.get_filename())
+        fullpath = os.path.join(self.working_dir, self.get_filename())
+        if not os.path.exists(os.path.dirname(fullpath)):
+            os.makedirs(os.path.dirname(fullpath))
+        return fullpath
 
-    def WriteMetaData(self):
+    def write_metadata(self):
         """
         Write the info.json file in the working directory which contains
         the metadata of the current file usage with the arguments range.
@@ -88,7 +221,8 @@ class FileNameGenerator():
         jsonObj = {
             "working_dir": self.working_dir,
             "name_pattern": self.name_format,
-            "arguments": self.arguments
+            "arguments": self.arguments,
+            "metadata" : self.metadata
         }
         metadata_file_path = os.path.join(self.working_dir, "info.json")
         with open(metadata_file_path, "w") as metadata_file:
@@ -118,6 +252,7 @@ class SliceExplorer():
         bound_range: Array of 2 percentage of the actual data bounds. Default full bounds [0.0, 1.0]
         scaleParallelProj
         """
+        self.analysis = None
         self.view_proxy = view
         self.slice = simple.Slice( SliceType="Plane", Input=data, SliceOffsetValues=[0.0] )
         self.sliceRepresentation = simple.Show(self.slice)
@@ -146,10 +281,16 @@ class SliceExplorer():
     def add_attribute(self, name, value):
         setattr(self, name, value)
 
+    def set_analysis(self, analysis):
+        self.analysis = analysis
+
     def UpdatePipeline(self, time=0):
         """
         Probe dataset and dump images to the disk
         """
+        if self.analysis:
+            self.analysis.begin_work('SliceExplorer')
+
         self.file_name_generator.update_active_arguments(time=time)
         self.slice.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
         self.view_proxy.CameraParallelProjection = 1
@@ -182,8 +323,11 @@ class SliceExplorer():
 
         # Generate metadata
         self.file_name_generator.update_label_arguments(sliceColor="Color by:")
-        self.file_name_generator.WriteMetaData()
+        self.file_name_generator.write_metadata()
         self.view_proxy.CameraParallelProjection = 0
+
+        if self.analysis:
+            self.analysis.end_work('SliceExplorer')
 
 #==============================================================================
 
@@ -218,6 +362,7 @@ class ContourExplorer():
         """
         file_name_generator: the file name generator to use. Need to have ['contourBy', 'contourValue'] as keys.
         """
+        self.analysis = None
         self.file_name_generator = file_name_generator
         self.contour = simple.Contour(Input=data, ContourBy=contourBy[1], ComputeScalars=1)
         if contourBy[0] == 'POINT_DATA':
@@ -264,8 +409,148 @@ class ContourExplorer():
     def add_attribute(self, name, value):
         setattr(self, name, value)
 
+    def set_analysis(self, analysis):
+        self.analysis = analysis
+
+#==============================================================================
+# Data explorer
+#==============================================================================
+
+class ImageResampler():
+    def __init__(self, file_name_generator, data_to_probe, sampling_dimesions, array_colors, nanColor = [0,0,0,0], custom_probing_bounds = None):
+        self.analysis = None
+        self.file_name_generator = file_name_generator
+        self.data_to_probe = data_to_probe
+        self.array_colors = array_colors
+        self.custom_probing_bounds = custom_probing_bounds
+        self.number_of_slices = sampling_dimesions[2]
+        self.resampler = simple.ImageResampling(Input=data_to_probe, SamplingDimension=sampling_dimesions)
+        if custom_probing_bounds:
+            self.resampler.UseInputBounds = 0
+            self.resampler.CustomSamplingBounds = custom_probing_bounds
+        field = array_colors.keys()[0]
+        self.color = simple.ColorByArray(Input=self.resampler, LookupTable=array_colors[field]['lut'], RGBANaNColor=nanColor, ColorBy=field )
+
+    @staticmethod
+    def list_arguments(self):
+        return ['field', 'slice', 'format']
+
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
+    def set_analysis(self, analysis):
+        self.analysis = analysis
+
+    def UpdatePipeline(self, time=0):
+        """
+        Probe dataset and dump images + json files to the disk
+        """
+        if self.analysis:
+            self.analysis.begin_work('ImageResampler')
+        self.file_name_generator.update_active_arguments(time=time)
+        self.resampler.UpdatePipeline(time)
+
+        # Write resampled data as JSON files
+        self.file_name_generator.update_active_arguments(format='json')
+        writer = simple.JSONImageWriter(Input=self.resampler)
+        for field in self.array_colors:
+            self.file_name_generator.update_active_arguments(field=field)
+            for slice in range(self.number_of_slices):
+                self.file_name_generator.update_active_arguments(slice=slice)
+                writer.FileName = self.file_name_generator.get_fullpath()
+                writer.Slice = slice
+                writer.ArrayName = field
+                writer.UpdatePipeline(time)
+
+        # Write image stack
+        self.file_name_generator.update_active_arguments(format='jpg')
+        for field in self.array_colors:
+            self.file_name_generator.update_active_arguments(field=field)
+            self.file_name_generator.update_active_arguments(False, slice='%03d')
+            self.color.LookupTable = self.array_colors[field]['lut']
+            self.color.ColorBy = field
+            self.color.UpdatePipeline(time)
+            writer = simple.JPEGWriter(Input=self.color, FileName=self.file_name_generator.get_fullpath())
+            writer.UpdatePipeline(time)
+
+        # Generate metadata
+        self.file_name_generator.write_metadata()
+
+        if self.analysis:
+            self.analysis.end_work('ImageResampler')
+
 #==============================================================================
 # Chart generator
+#==============================================================================
+
+class LineProber():
+    def __init__(self, file_name_generator, data_to_probe, points_series, number_of_points):
+        """
+        file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
+        data_to_probe: Input data proxy to probe.
+        points_series: Data structure providing the location to probe.
+            [ { name: "X_axis", start_point: [0.0, 0.0, 0.0], end_point: [1.0, 0.0, 0.0] },
+              { name: "Y_axis", start_point: [0.0, 0.0, 0.0], end_point: [1.0, 0.0, 0.0] },
+              { name: "Random", start_point: [0.0, 0.0, 0.0], end_point: [1.0, 0.0, 0.0] } ]
+        fields: Array containing the name of the scalar value to extract.
+            [ 'temperature', 'salinity' ]
+        number_of_points: Number of points within the line
+        """
+        self.analysis = None
+        self.file_name_generator = file_name_generator
+        self.data_proxy = data_to_probe
+        self.series = points_series
+        self.probe = simple.PlotOverLine( Source="High Resolution Line Source", Input=data_to_probe )
+        self.probe.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
+        self.probe.Source.Resolution = number_of_points
+
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
+    def set_analysis(self, analysis):
+        self.analysis = analysis
+
+    @staticmethod
+    def list_arguments(self):
+        return ['time', 'serie', 'field']
+
+    def UpdatePipeline(self, time=0):
+        """
+        Write a file (x_{time}_{serie}.csv => x_134.0_X_Axis.csv) with the following format:
+
+        idx,fieldA,fieldB,fieldC,fieldD,point0, point1, point2
+        0,3.56,234,2565,5678,678,0,0,0
+        1,3.57,234,2565,5678,678,1,2,4
+        ...
+        100,5.76,234,2565,5678,678,5,7,8
+
+        """
+        if self.analysis:
+            self.analysis.begin_work('LineProber')
+
+        self.file_name_generator.update_active_arguments(time=time)
+
+        # Explore the data
+        for serie in self.series:
+            self.probe.Source.Point1 = serie['start_point']
+            self.probe.Source.Point2 = serie['end_point']
+            self.file_name_generator.update_active_arguments(serie=serie['name'])
+
+            # Write CSV file
+            writer = simple.DataSetCSVWriter(FileName=self.file_name_generator.get_fullpath(), Input=self.probe)
+            writer.UpdatePipeline(time)
+
+        # Get fields info
+        pdInfo = self.probe.GetPointDataInformation()
+        for array in pdInfo:
+            self.file_name_generator.update_active_arguments(field=array.Name)
+
+        # Generate metadata
+        self.file_name_generator.write_metadata()
+
+        if self.analysis:
+            self.analysis.end_work('LineProber')
+
 #==============================================================================
 
 class DataProber():
@@ -280,6 +565,7 @@ class DataProber():
         fields: Array containing the name of the scalar value to extract.
             [ 'temperature', 'salinity' ]
         """
+        self.analysis = None
         self.file_name_generator = file_name_generator
         self.data_proxy = data_to_probe
         self.series = points_series
@@ -292,6 +578,9 @@ class DataProber():
 
     def add_attribute(self, name, value):
         setattr(self, name, value)
+
+    def set_analysis(self, analysis):
+        self.analysis = analysis
 
     @staticmethod
     def list_arguments(self):
@@ -316,6 +605,9 @@ class DataProber():
         100,10.76
 
         """
+        if self.analysis:
+            self.analysis.begin_work('DataProber')
+
         self.file_name_generator.update_active_arguments(time=time)
 
         # Explore the data
@@ -331,11 +623,16 @@ class DataProber():
 
             # Fill container with values
             for point in serie_points:
-                self.location.Center = point
-                dataInfo = self.probe.GetPointDataInformation()
-                for field in self.fields:
-                    array = dataInfo.GetArray(field)
-                    saved_data[serie_name][field].append(array.GetRange(-1)[0])
+                if point:
+                    self.location.Center = point
+                    dataInfo = self.probe.GetPointDataInformation()
+                    for field in self.fields:
+                        array = dataInfo.GetArray(field)
+                        saved_data[serie_name][field].append(array.GetRange(-1)[0])
+                else:
+                    # Just a NaN value
+                    for field in self.fields:
+                        saved_data[serie_name][field].append(float('NaN'))
 
 
         # Write data to disk
@@ -352,7 +649,10 @@ class DataProber():
                         idx += 1
 
         # Generate metadata
-        self.file_name_generator.WriteMetaData()
+        self.file_name_generator.write_metadata()
+
+        if self.analysis:
+            self.analysis.end_work('DataProber')
 
 #==============================================================================
 
@@ -370,6 +670,7 @@ class TimeSerieDataProber():
         time_to_write: Give the time when the TimeSerieDataProber should dump the data to disk
                        at a given UpdatePipeline(time=2345) call.
         """
+        self.analysis = None
         self.file_name_generator = file_name_generator
         self.data_proxy = data_to_probe
         self.fields = fields
@@ -392,13 +693,16 @@ class TimeSerieDataProber():
     def add_attribute(self, name, value):
         setattr(self, name, value)
 
+    def set_analysis(self, analysis):
+        self.analysis = analysis
+
     @staticmethod
     def list_arguments(self):
         return ['field']
 
     def WriteToDisk(self):
         # Generate metadata
-        self.file_name_generator.WriteMetaData()
+        self.file_name_generator.write_metadata()
 
         # Generate real data
         for field in self.fields:
@@ -420,6 +724,9 @@ class TimeSerieDataProber():
         100.5, 5.76, 10.45, 5.567
 
         """
+        if self.analysis:
+            self.analysis.begin_work('TimeSerieDataProber')
+
         for field in self.fields:
             self.data_arrays[field].append([ "%f" % time ])
 
@@ -433,6 +740,9 @@ class TimeSerieDataProber():
         # Write to disk if need be
         if time >= self.time_to_write:
             self.WriteToDisk()
+
+        if self.analysis:
+            self.analysis.end_work('TimeSerieDataProber')
 
 #==============================================================================
 # Image exporter
@@ -455,6 +765,7 @@ class ThreeSixtyImageStackExporter():
                                the main axis of rotation while Theta is the angle the camera
                                is looking at this axis.
         """
+        self.analysis = None
         self.file_name_generator = file_name_generator
         self.angular_steps       = angular_steps
         self.focal_point         = focal_point
@@ -474,10 +785,16 @@ class ThreeSixtyImageStackExporter():
     def add_attribute(self, name, value):
         setattr(self, name, value)
 
+    def set_analysis(self, analysis):
+        self.analysis = analysis
+
     def UpdatePipeline(self, time=0):
         """
         Change camera position and dump images to the disk
         """
+        if self.analysis:
+            self.analysis.begin_work('ThreeSixtyImageStackExporter')
+
         self.file_name_generator.update_active_arguments(time=time)
         self.view_proxy.CameraFocalPoint = self.focal_point
         self.view_proxy.CameraViewUp     = self.phi_rotation_axis
@@ -515,7 +832,10 @@ class ThreeSixtyImageStackExporter():
                 simple.WriteImage(self.file_name_generator.get_fullpath())
 
         # Generate metadata
-        self.file_name_generator.WriteMetaData()
+        self.file_name_generator.write_metadata()
+
+        if self.analysis:
+            self.analysis.end_work('ThreeSixtyImageStackExporter')
 
 # -----------------------------------------------------------------------------
 
