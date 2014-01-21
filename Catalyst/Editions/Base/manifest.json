@@ -17,6 +17,10 @@
         "type":"BOOL",
         "value":"OFF"
       },
+      { "name":"PARAVIEW_ENABLE_WEB",
+        "type":"BOOL",
+        "value":"OFF"
+      },
       { "name":"PARAVIEW_USE_MPI",
         "type":"BOOL",
         "value":"ON"
