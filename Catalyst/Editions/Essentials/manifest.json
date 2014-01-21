@@ -1,10 +1,6 @@
 {
   "cmake":{
     "cache":[
-      { "name":"Module_vtkFiltersSources",
-        "type":"BOOL",
-        "value":"ON"
-      },
       { "name":"Module_vtkImagingCore",
         "type":"BOOL",
         "value":"ON"
@@ -72,6 +68,9 @@
       "replace":[
         { "path":"VTK/Filters/Extraction/module.cmake" },
         { "path":"VTK/Filters/Extraction/CMakeLists.txt" }
+      ],
+      "exclude":[
+        { "path":"Testing" }
       ],
       "cswrap":true,
       "pythonwrap":true

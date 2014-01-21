@@ -2,9 +2,9 @@ vtk_module(vtkFiltersExtraction
   GROUPS
     StandAlone
   DEPENDS
-    #vtkCommonExecutionModel
+    vtkCommonExecutionModel
     vtkFiltersCore
-    vtkFiltersGeneral
+    #vtkFiltersGeneral
     #vtkFiltersStatistics
   TEST_DEPENDS
     vtkIOLegacy

@@ -23,10 +23,10 @@ diff --git a/ParaViewCore/ClientServerCore/Core/module.cmake b/ParaViewCore/Clie
 index f17c4df..f0db074 100644
 --- a/ParaViewCore/ClientServerCore/Core/module.cmake
 +++ b/ParaViewCore/ClientServerCore/Core/module.cmake
-@@ -18,7 +18,6 @@ vtk_module(vtkPVClientServerCoreCore
+@@ -18,7 +18,5 @@ vtk_module(vtkPVClientServerCoreCore
      ParaViewCore
    DEPENDS
-     vtkFiltersExtraction
+-    vtkFiltersExtraction
 -    vtkFiltersParallel
      # Explicitely list (rather than transiently through
      # vtkPVVTKExtensionsCore) because it allows us to turn of wrapping

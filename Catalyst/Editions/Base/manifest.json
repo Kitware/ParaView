@@ -84,16 +84,6 @@
       "cswrap":true,
       "pythonwrap":true
     },
-    { "name":"vtkFiltersExtraction",
-      "path":"VTK/Filters/Extraction",
-      "patches": [
-          { "path": "VTK-Filters-Extraction-CMake.patch" }
-      ],
-      "exclude":[
-        { "path":"Testing" },
-        { "path": "vtkExtractArraysOverTime*"  }
-      ]
-    },
     { "name":"vtkCommonExecutionModel",
       "path":"VTK/Common/ExecutionModel",
       "exclude":[

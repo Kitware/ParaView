@@ -31,6 +31,7 @@
       "path":"VTK/Filters/Extraction",
       "include":[
         { "class":"vtkConvertSelection" },
+        { "class":"vtkExtractCells" },
         { "class":"vtkExtractSelectedBlock" },
         { "class":"vtkExtractSelectedIds" },
         { "class":"vtkExtractSelectedFrustum" },
