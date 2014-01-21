@@ -64,14 +64,17 @@ int vtkPEquivalenceSet::ResolveEquivalences ()
       for (int i = 0; i < workingSet->GetNumberOfTuples (); i ++)
         {
         int workingVal = workingSet->GetValue (i);
-        int existingVal = this->EquivalenceArray->GetValue (i);
-        if (workingVal > 0 && workingVal < existingVal)
+        if (workingVal == 0) {
+          continue;
+        }
+        int existingVal = this->GetReference (i); 
+        if (workingVal < existingVal)
           {
           this->EquivalenceArray->SetTuple1 (i, workingVal);
           }
-        else 
+        else if (existingVal != workingVal)
           {
-          this->EquateInternal (this->GetReference (existingVal), workingVal);
+          this->EquateInternal (existingVal, workingVal);
           }
         }
       }
