@@ -6,7 +6,6 @@ derived quantities.
 from paraview import vtk
 from paraview.vtk import dataset_adapter
 from paraview.vtk.algorithms import *
-from paraview import servermanager
 
 from numpy import *
 
@@ -45,9 +44,6 @@ def execute(self, expression):
     intended for use externally except from within
     vtkPythonCalculator::RequestData(...).
     """
-
-    if servermanager.progressObserverTag:
-        servermanager.ToggleProgressPrinting()
 
     # Add inputs.
     inputs = []
