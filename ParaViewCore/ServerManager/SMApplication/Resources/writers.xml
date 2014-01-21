@@ -820,7 +820,81 @@
                  name="PNGWriter">
       <Documentation short_help="Write image data as a PNG file.">Writer to
       write image data as a PNG file. It supports 1 to 4 component data of
-      unsigned char or unsigned short.</Documentation>
+      unsigned char or unsigned short.
+      This Writer can also generate a stack of images when the FileName is in
+      the form of /path/file_%03d.png and that the input data is a 3D image
+      data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFilePattern"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="png"
+                       file_description="PNG Image Files" />
+      </Hints>
+      <!-- End of PNGWriter -->
+    </WriterProxy>
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkJPEGWriter"
+                 name="JPEGWriter">
+      <Documentation short_help="Write image data as a JPEG file.">
+      Writer to write image data as a JPEG file. It supports 1 to 3 component
+      data of unsigned char or unsigned short.
+      This Writer can also generate a stack of images when the FileName is in
+      the form of /path/file_%03d.jpg and that the input data is a 3D image
+      data.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFilePattern"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="jpg"
+                       file_description="JPEG Image Files" />
+      </Hints>
+      <!-- End of JPEGWriter -->
+    </WriterProxy>
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkJSONImageWriter"
+                 name="JSONImageWriter">
+      <Documentation short_help="Write image data as a JSON file."/>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -839,15 +913,28 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty command="SetArrayName"
+                            name="ArrayName"
+                            number_of_elements="1">
+        <Documentation>The name of the field to export. If Empty all fields will be saved.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetSlice"
+                            name="Slice"
+                            default_values="-1"
+                            number_of_elements="1">
+        <Documentation>Write only one slice if slice >= 0</Documentation>
+        <IntRangeDomain min="-1"
+                        name="range" />
+      </IntVectorProperty>
       <Hints>
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
                   show="0" />
-        <WriterFactory extensions="png"
-                       file_description="PNG Image Files" />
+        <WriterFactory extensions="json"
+                       file_description="json Image Files" />
       </Hints>
-      <!-- End of PNGWriter -->
+      <!-- End of vtkJSONImageWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy class="vtkXdmfWriter"
