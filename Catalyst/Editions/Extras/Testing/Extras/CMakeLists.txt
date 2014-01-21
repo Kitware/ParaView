@@ -8,7 +8,7 @@ target_link_libraries(TestCatalystExtrasFilters
 add_test(NAME TestCatalystExtrasFilters
   COMMAND TestCatalystExtrasFilters)
 
-if (CATALYST_TEST_WITH_PYTHON)
+if (EXISTS ${PVPYTHON_EXE})
   add_test(NAME import-extras
     COMMAND ${PVPYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/use-extras.py)
   set_tests_properties(import-extras
