@@ -70,9 +70,20 @@ public:
   vtkWeakPointer<vtkSMViewLayoutProxy> LayoutManager;
   QPointer<pqViewFrame> ActiveFrame;
 
-  pqInternals() : ObserverId(0)
-    {
+  // Set to true to place views in a separate popout widget.
+  bool Popout;
+  QWidget PopoutFrame;
 
+  pqInternals(QWidget* self) :
+    ObserverId(0),
+    Popout(false),
+    PopoutFrame(self)
+    {
+    this->PopoutFrame.setWindowFlags(Qt::Window|
+      Qt::CustomizeWindowHint|
+      Qt::WindowTitleHint|
+      Qt::WindowMaximizeButtonHint|
+      Qt::WindowCloseButtonHint);
     }
 
   ~pqInternals()
@@ -173,7 +184,7 @@ public:
 //-----------------------------------------------------------------------------
 pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
 : Superclass(parentObject, f),
-  Internals( new pqInternals()),
+  Internals( new pqInternals(this)),
   DecorationsVisible(true)
 {
   qApp->installEventFilter(this);
@@ -261,7 +272,10 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
   if (evt->type() == QEvent::MouseButtonPress)
     {
     QWidget* wdg = qobject_cast<QWidget*>(caller);
-    if (wdg && this->isAncestorOf(wdg))
+    if (wdg &&
+      ( (!this->Internals->Popout && this->isAncestorOf(wdg)) ||
+        (this->Internals->Popout && this->Internals->PopoutFrame.isAncestorOf(wdg)))
+      )
       {
       // If the new widget that is getting the focus is a child widget of any of the
       // frames, then the frame should be made active.
@@ -275,6 +289,13 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
           }
         }
       }
+    }
+  else if (evt->type() == QEvent::Close &&
+    caller == &this->Internals->PopoutFrame)
+    {
+    // the popout-frame is being closed. We interpret that as "un-popping" the
+    // frame.
+    this->togglePopout();
     }
 
   return this->Superclass::eventFilter(caller, evt);
@@ -559,21 +580,43 @@ void pqMultiViewWidget::reload()
       widget->setParent(cleaner);
       }
     }
+
+  // if popout is true, we add the widgets to the PopoutFrame, rather that
+  // ourselves.
+  QWidget* parentWdg = this->Internals->Popout?
+    &this->Internals->PopoutFrame : this;
+
   int max_index=0;
-  QWidget* child = this->createWidget(0, vlayout, this, max_index);
+  QWidget* child = this->createWidget(0, vlayout, parentWdg, max_index);
   delete cleaner;
   cleaner = NULL;
-
-  delete this->layout();
 
   // resize Widgets to remove any obsolete indices. These indices weren't
   // touched at all during the last call to createWidget().
   this->Internals->Widgets.resize(max_index+1);
 
-  QVBoxLayout* vbox = new QVBoxLayout(this);
+  delete parentWdg->layout();
+  QVBoxLayout* vbox = new QVBoxLayout(parentWdg);
   vbox->setContentsMargins(0, 0, 0, 0);
   vbox->addWidget(child);
-  this->setLayout(vbox);
+
+  if (this->Internals->Popout)
+    {
+    // if the PopoutFrame is being shown for the first time, we resize it to
+    // match this widgets size so that it doesn't end up too small.
+    if (!this->Internals->PopoutFrame.property(
+        "pqMultiViewWidget::SizeInitialized").isValid())
+      {
+      this->Internals->PopoutFrame.setProperty(
+        "pqMultiViewWidget::SizeInitialized", true);
+      this->Internals->PopoutFrame.resize(this->size());
+      }
+    this->Internals->PopoutFrame.show();
+    }
+  else
+    {
+    this->Internals->PopoutFrame.hide();
+    }
 
   int maximized_cell = vlayout->GetMaximizedCell();
   this->Internals->setMaximizedWidget(NULL);
@@ -821,4 +864,12 @@ void pqMultiViewWidget::reset()
 QList<vtkSMViewProxy*> pqMultiViewWidget::viewProxies() const
 {
   return this->Internals->ViewFrames.keys();
+}
+
+//-----------------------------------------------------------------------------
+bool pqMultiViewWidget::togglePopout()
+{
+  this->Internals->Popout = this->Internals->Popout? false:  true;
+  this->reload();
+  return this->Internals->Popout;
 }

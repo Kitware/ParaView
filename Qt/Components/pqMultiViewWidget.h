@@ -82,6 +82,12 @@ public:
   /// Returns true if the view has been assigned to this layout.
   bool isViewAssigned(pqView*) const;
 
+  /// pqMultiViewWidget supports popout mode i.e. the views could be laid out
+  /// in separate popup widget rather than simply placing them  under this
+  /// pqMultiViewWidget frame. Use this method to toggle that. Returns true if
+  /// the view is popped out at the end of this call, false otherwise.
+  bool togglePopout();
+
 signals:
   /// fired when a frame in this widget becomes active.
   void frameActivated();
