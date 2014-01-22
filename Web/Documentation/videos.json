@@ -3,7 +3,7 @@
 	 {
      "name": "WebVisualizer",
      "title": "ParaViewWeb generic visualizer",
-     "description": "Generic web visualization and data processing with the WebVisualizer application that come with ParaView 4.",
+     "description": "Generic web visualization and data processing with the WebVisualizer application that comes with ParaView 4.",
      "id": "77824433",
      "thumb": "http://b.vimeocdn.com/ts/453/089/453089495_640.jpg"
    },{
