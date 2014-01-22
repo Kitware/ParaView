@@ -1,6 +1,6 @@
 #!/bin/sh
 
-usage="$0 <srcdir> <builddir> [--install] [--no-configure] [--no-build] [--no-test] --input <edition> [--input <edition>]... [<cmake arguments>...]"
+usage="$0 <srcdir> <builddir> [--install] [--no-configure] [--no-build] [--no-test] [--remove-dirs] --input <edition> [--input <edition>]... [<cmake arguments>...]"
 
 # A handy function for handling errors.
 die () {
@@ -29,6 +29,7 @@ shift
 # Parse out --input parameters.
 editions=
 args=
+remove=
 no_configure=
 no_build=
 no_test=
@@ -45,6 +46,9 @@ while [ "$#" -gt 0 ]; do
 
         editions="$editions $edition"
         args="$args -i $editiondir/$edition"
+        ;;
+    --remove-dirs)
+        remove=y
         ;;
     --no-configure)
         no_configure=y
@@ -68,6 +72,10 @@ done
 # We need at least one edition to catalyze.
 [ -z "$editions" ] && \
     die "Need at least one input"
+
+# Remove directories if requested
+[ -n "$remove" ] && \
+    rm -rf "$src_output" "$bin_output"
 
 # Catalyze.
 mkdir -p "$src_output"
