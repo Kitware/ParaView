@@ -82,17 +82,6 @@ mkdir -p "$src_output"
 python "$scriptdir/catalyze.py" -r "$scriptdir/.." $args -o "$src_output" || \
     die "Failed to catalyze"
 
-if [ -z "$no_test" ]; then
-    # Build the testing directory.
-    mkdir "$src_output/Testing"
-    for edition in $editions; do
-        [ -d "$editiondir/$edition/Testing" ] || continue
-
-        cp -rv "$editiondir/$edition/Testing/"* "$src_output/Testing" || \
-            die "Failed to copy tests for edition $edition"
-    done
-fi
-
 [ -n "$no_configure" ] && exit 0
 
 # Configure the catalyzed tree.
@@ -100,17 +89,6 @@ mkdir -p "$bin_output"
 cd "$bin_output"
 "$src_output/cmake.sh" "$@" "$src_output" || \
     die "Failed to configure the tree"
-
-if [ -z "$no_test" ]; then
-    # Configure the testing tree.
-    mkdir -p "$bin_output/Testing"
-    cd "$bin_output/Testing"
-    cmake "$@" \
-        "-DPVPYTHON_EXE=$bin_output/bin/pvpython" \
-        "-DParaView_DIR=$bin_output" \
-        "$src_output/Testing" || \
-        die "Failed to configure tests"
-fi
 
 # Exit if a build is not wanted.
 [ -n "$no_build" ] && exit 0
@@ -121,9 +99,30 @@ cmake --build . || \
 
 # Test if wanted.
 if [ -z "$no_test" ]; then
+    # Create the testing directory.
+    mkdir "$src_output/Testing"
+    for edition in $editions; do
+        [ -d "$editiondir/$edition/Testing" ] || continue
+
+        cp -rv "$editiondir/$edition/Testing/"* "$src_output/Testing" || \
+            die "Failed to copy tests for edition $edition"
+    done
+
+    # Configure the testing tree.
+    mkdir -p "$bin_output/Testing"
+    cd "$bin_output/Testing"
+    cmake "$@" \
+        "-DPVPYTHON_EXE=$bin_output/bin/pvpython" \
+        "-DParaView_DIR=$bin_output" \
+        "$src_output/Testing" || \
+        die "Failed to configure tests"
+
+    # Build the testing tree.
     cd "$bin_output/Testing"
     cmake --build . || \
         die "Failed to build tests"
+
+    # Run the tests.
     ctest -VV || \
         die "Tests failed"
 fi
