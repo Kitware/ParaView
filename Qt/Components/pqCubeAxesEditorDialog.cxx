@@ -215,6 +215,10 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
                              this->Internal->AxesOriginZ, this->Internal->AxesOriginZ);
       vtkSMPropertyHelper(repr,"UseAxesOrigin").Get(&axesOriginSelected, 1);
       this->onUseAxesOriginChange( (axesOriginSelected == 1) ? true : false );
+
+      // Link sticky axes option
+      PV_GROUPBOX_REGISTER(StickyAxes, "StickyAxes", 0);
+      PV_GROUPBOX_REGISTER(CenterStickyAxes, "CenterStickyAxes", 0);
       }
     }
 }

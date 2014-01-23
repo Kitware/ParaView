@@ -1362,6 +1362,8 @@
                       name="YLabelFormat" />
             <Property exposed_name="CubeAxesZLabelFormat"
                       name="ZLabelFormat" />
+	    <Property name="StickyAxes" />
+	    <Property name="CenterStickyAxes" />
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -3161,6 +3163,23 @@
         <Documentation>Specify the axis label format.</Documentation>
       </StringVectorProperty>
 
+      <IntVectorProperty command="SetStickyAxes"
+			 default_values="0"
+			 name="StickyAxes"
+			 number_of_elements="1">
+        <BooleanDomain name="bool" />
+	<Documentation>Adjust the axes to always be visible in the viewport unless the
+	original bounds of the axes are entirely outside the viewport.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetCenterStickyAxes"
+			 default_values="0"
+			 name="CenterStickyAxes"
+			 number_of_elements="1">
+	<BooleanDomain name="bool" />
+	<Documentation>Keep the sticky axes centered in the view window.</Documentation>
+      </IntVectorProperty>
+
       <!-- End of CubeAxesRepresentation -->
     </RepresentationProxy>
     <!-- ================================================================== -->
@@ -4627,6 +4646,8 @@
                     name="YLabelFormat" />
           <Property exposed_name="CubeAxesZLabelFormat"
                     name="ZLabelFormat" />
+	  <Property name="StickyAxes" />
+	  <Property name="CenterStickyAxes" />
         </PropertyGroup>
       </ExposedProperties>
       <ShareProperties subproxy="SurfaceRepresentation">
