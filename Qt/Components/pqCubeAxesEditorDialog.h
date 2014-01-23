@@ -54,6 +54,7 @@ public:
 
 protected slots:
   void onUseAxesOriginChange(bool);
+  void onStickyAxesChange(bool);
 
 private:
   pqCubeAxesEditorDialog(const pqCubeAxesEditorDialog&); // Not implemented.

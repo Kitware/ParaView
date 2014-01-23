@@ -218,6 +218,12 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
 
       // Link sticky axes option
       PV_GROUPBOX_REGISTER(StickyAxes, "StickyAxes", 0);
+      QObject::connect( this->Internal->StickyAxes, SIGNAL(toggled(bool)),
+                        this, SLOT( onStickyAxesChange(bool)));
+      int stickyAxesSelected = 0;
+      vtkSMPropertyHelper(repr,"StickyAxes").Get(&stickyAxesSelected, 1);
+      this->onStickyAxesChange( (stickyAxesSelected == 1) ? true : false );
+
       PV_GROUPBOX_REGISTER(CenterStickyAxes, "CenterStickyAxes", 0);
       }
     }
@@ -283,4 +289,10 @@ void pqCubeAxesEditorDialog::onUseAxesOriginChange(bool enableAxesOrigin)
     this->Internal->CubeAxesYGridLines->setEnabled(true);
     this->Internal->CubeAxesZGridLines->setEnabled(true);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqCubeAxesEditorDialog::onStickyAxesChange(bool enableStickyAxes)
+{
+  this->Internal->CenterStickyAxes->setEnabled(enableStickyAxes);
 }
