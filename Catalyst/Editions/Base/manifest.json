@@ -46,13 +46,13 @@
     },
     { "name":"vtkPVCatalyst",
       "path":"CoProcessing/Catalyst",
-      "pythonwrap":true,
       "exclude": [
         { "path":"Testing" }
       ],
       "replace":[
         { "path":"CoProcessing/Catalyst/module.cmake" }
-      ]
+      ],
+      "pythonwrap":true
     },
     { "name":"vtkCommonCore",
       "path":"VTK/Common/Core",
@@ -109,25 +109,31 @@
       "exclude":[
         { "path":"Testing" }
       ],
+      "cswrap":true,
       "pythonwrap":true
     },
     { "name":"vtkCommonMisc",
       "path":"VTK/Common/Misc",
       "exclude":[
         { "path":"Testing" }
-      ]
+      ],
+      "cswrap":true,
+      "pythonwrap":true
     },
     { "name":"vtkCommonSystem",
       "path":"VTK/Common/System",
       "exclude":[
         { "path":"Testing" }
-      ]
+      ],
+      "cswrap":true,
+      "pythonwrap":true
     },
     { "name":"vtkCommonTransforms",
       "path":"VTK/Common/Transforms",
       "exclude":[
         { "path":"Testing" }
       ],
+      "cswrap":true,
       "pythonwrap":true
     },
     { "name":"vtkFiltersCore",
@@ -148,13 +154,15 @@
       "replace":[
         { "path":"VTK/Filters/Core/CMakeLists.txt" }
       ],
-      "cswrap":true
+      "cswrap":true,
+      "pythonwrap":true
     },
     { "name":"vtkPVCommon",
       "path":"ParaViewCore/Common",
       "exclude":[
         { "path":"Testing" }
       ],
+      "cswrap":true,
       "pythonwrap":true
     },
     { "name":"vtkClientServer",
@@ -165,6 +173,7 @@
     },
     { "name":"vtkIOXMLParser",
       "path":"VTK/IO/XMLParser",
+      "cswrap":true,
       "pythonwrap":true
     },
     { "name":"vtkIOCore",
@@ -172,6 +181,7 @@
       "exclude":[
         { "path":"Testing" }
       ],
+      "cswrap":true,
       "pythonwrap":true
     },
     { "name":"vtkThirdPartyzlib",
@@ -190,6 +200,7 @@
       "exclude":[
         { "path":"Testing" }
       ],
+      "cswrap":true,
       "pythonwrap":true
     },
     { "name":"vtkIOLegacy",
@@ -205,7 +216,9 @@
       "path":"VTK/Parallel/MPI",
       "exclude":[
         { "path":"Testing" }
-      ]
+      ],
+      "cswrap":true,
+      "pythonwrap":true
     },
     { "name":"vtkUtilitiesWrapClientServer",
       "path":"Utilities/WrapClientServer"
@@ -230,7 +243,9 @@
       ],
       "replace":[
         { "path":"ParaViewCore/ServerManager/SMApplication/Resources/catalyst.xml" }
-      ]
+      ],
+      "cswrap":true,
+      "pythonwrap":true
     },
     { "path":"vtkPVConfig.h.in" },
     { "path":"CommandLineExecutables" },

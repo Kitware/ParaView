@@ -760,6 +760,7 @@
       "replace": [
         { "path": "VTK/Imaging/Core/CMakeLists.txt" }
       ],
+      "cswrap": true,
       "pythonwrap": true
     },
     { "name": "vtkIOXML",
@@ -774,6 +775,7 @@
         { "path": "VTK/IO/XML/module.cmake" },
         { "path": "VTK/IO/XML/CMakeLists.txt" }
       ],
+      "cswrap": true,
       "pythonwrap": true
     },
     { "name": "vtkInteractionStyle",
@@ -792,6 +794,7 @@
       "replace": [
         { "path": "VTK/Interaction/Style/CMakeLists.txt" }
       ],
+      "cswrap": true,
       "pythonwrap": true
     },
     { "name": "vtkInfovisCore",
@@ -806,6 +809,7 @@
       "replace": [
         { "path": "VTK/Infovis/Core/CMakeLists.txt" }
       ],
+      "cswrap": true,
       "pythonwrap": true
     },
     { "name": "vtkIOImage",
@@ -827,17 +831,18 @@
         { "path": "VTK/IO/Image/CMakeLists.txt" },
         { "path": "VTK/IO/Image/module.cmake" }
       ],
+      "cswrap": true,
       "pythonwrap": true
     },
     { "name": "vtkPVVTKExtensionsDefault",
       "path": "ParaViewCore/VTKExtensions/Default",
       "include": [
         { "class": "vtkAppendRectilinearGrid" }
-      ],
-      "pythonwrap": true
+      ]
     },
     { "name": "vtkParallelMPI",
       "path": "VTK/Parallel/MPI",
+      "cswrap": true,
       "pythonwrap": true
     },
     { "name": "vtkMetaIO",
