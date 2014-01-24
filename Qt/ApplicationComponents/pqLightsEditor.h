@@ -39,7 +39,7 @@ class vtkSMProxy;
 class vtkSMPropertyGroup;
 class pqLightsPropertyGroup;
 
-class PQCOMPONENTS_EXPORT pqLightsEditor : public QDialog
+class PQAPPLICATIONCOMPONENTS_EXPORT pqLightsEditor : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
