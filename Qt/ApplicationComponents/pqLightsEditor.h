@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqLightsEditor_h
 
 #include <QDialog>
-#include "pqComponentsModule.h"
+#include "pqApplicationComponentsModule.h"
 
 class vtkSMProxy;
 class vtkSMPropertyGroup;

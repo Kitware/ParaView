@@ -125,6 +125,8 @@ set (Module_SRCS
   pqIgnoreSourceTimeReaction.h
   pqInputDataTypeDecorator.cxx
   pqInputDataTypeDecorator.h
+  pqLightsEditor.cxx
+  pqLightsEditor.h
   pqLightsPropertyGroup.cxx
   pqLightsPropertyGroup.h
   pqListPropertyWidget.cxx
@@ -284,6 +286,7 @@ set (Module_MOC_HDRS
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
   pqInputDataTypeDecorator.h
+  pqLightsEditor.h
   pqLightsPropertyGroup.h
   pqListPropertyWidget.h
   pqLoadDataReaction.h
@@ -366,6 +369,7 @@ set (Module_UI_FILES
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqFontPropertyWidget.ui
+  Resources/UI/pqLightsEditor.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
