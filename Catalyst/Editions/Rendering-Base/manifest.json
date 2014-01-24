@@ -763,21 +763,6 @@
       "cswrap": true,
       "pythonwrap": true
     },
-    { "name": "vtkIOXML",
-      "path": "VTK/IO/XML",
-      "include": [
-        { "path": "vtkXMLOffsetsManager.h" },
-        { "class": "vtkXMLImageDataWriter" },
-        { "class": "vtkXMLStructuredDataWriter" },
-        { "class": "vtkXMLWriter" }
-      ],
-      "replace": [
-        { "path": "VTK/IO/XML/module.cmake" },
-        { "path": "VTK/IO/XML/CMakeLists.txt" }
-      ],
-      "cswrap": true,
-      "pythonwrap": true
-    },
     { "name": "vtkInteractionStyle",
       "path": "VTK/Interaction/Style",
       "include": [

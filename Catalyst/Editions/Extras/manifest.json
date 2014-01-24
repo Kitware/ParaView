@@ -5,6 +5,18 @@
         "type":"BOOL",
         "value":"ON"
       },
+      { "name":"Module_vtkIOParallel",
+        "type":"BOOL",
+        "value":"ON"
+      },
+      { "name":"Module_vtkIOLegacy",
+        "type":"BOOL",
+        "value":"ON"
+      },
+      { "name":"Module_vtkIOXML",
+        "type":"BOOL",
+        "value":"ON"
+      },
       { "name":"Module_vtkFiltersGeometry",
         "type":"BOOL",
         "value":"ON"
@@ -94,12 +106,92 @@
       "include":[
         { "class":"vtkAttributeDataReductionFilter" },
         { "class":"vtkExtractHistogram" },
+        { "class":"vtkFileSeriesWriter" },
         { "class":"vtkIntegrateAttributes" },
+        { "class":"vtkParallelSerialWriter" },
         { "class":"vtkPExtractHistogram" },
         { "class":"vtkPVTransform" }
       ],
       "cswrap":true,
       "pythonwrap":true
+    },
+    { "name": "vtkIOLegacy",
+      "path": "VTK/IO/Legacy",
+      "include": [
+        { "class": "vtkCompositeDataReader" },
+        { "class": "vtkCompositeDataWriter" },
+        { "class": "vtkDataReader" },
+        { "class": "vtkDataWriter" },
+        { "class": "vtkDataSetReader" },
+        { "class": "vtkDataSetWriter" },
+        { "class": "vtkGenericDataObjectReader" },
+        { "class": "vtkGenericDataObjectWriter" },
+        { "class": "vtkGraphReader" },
+        { "class": "vtkGraphWriter" },
+        { "class": "vtkPolyDataReader" },
+        { "class": "vtkPolyDataWriter" },
+        { "class": "vtkRectilinearGridReader" },
+        { "class": "vtkRectilinearGridWriter" },
+        { "class": "vtkStructuredGridReader" },
+        { "class": "vtkStructuredGridWriter" },
+        { "class": "vtkStructuredPointsReader" },
+        { "class": "vtkStructuredPointsWriter" },
+        { "class": "vtkTableReader" },
+        { "class": "vtkTableWriter" },
+        { "class": "vtkTreeReader" },
+        { "class": "vtkTreeWriter" },
+        { "class": "vtkUnstructuredGridReader" },
+        { "class": "vtkUnstructuredGridWriter" }
+      ],
+      "replace": [
+        { "path": "VTK/IO/Legacy/module.cmake" },
+        { "path": "VTK/IO/Legacy/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkIOParallel",
+      "path": "VTK/IO/Parallel",
+      "include": [
+        { "class": "vtkPDataSetWriter" },
+        { "class": "vtkXMLPMultiBlockDataWriter" }
+      ],
+      "replace": [
+        { "path": "VTK/IO/Parallel/module.cmake" },
+        { "path": "VTK/IO/Parallel/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkIOXML",
+      "path": "VTK/IO/XML",
+      "include": [
+        { "path": "vtkXMLOffsetsManager.h" },
+        { "class": "vtkXMLCompositeDataWriter" },
+        { "class": "vtkXMLImageDataWriter" },
+        { "class": "vtkXMLMultiBlockDataWriter" },
+        { "class": "vtkXMLPDataWriter" },
+        { "class": "vtkXMLPImageDataWriter" },
+        { "class": "vtkXMLPolyDataWriter" },
+        { "class": "vtkXMLPPolyDataWriter" },
+        { "class": "vtkXMLPRectilinearGridWriter" },
+        { "class": "vtkXMLPStructuredGridWriter" },
+        { "class": "vtkXMLPStructuredDataWriter" },
+        { "class": "vtkXMLPUnstructuredDataWriter" },
+        { "class": "vtkXMLPUnstructuredGridWriter" },
+        { "class": "vtkXMLRectilinearGridWriter" },
+        { "class": "vtkXMLStructuredDataWriter" },
+        { "class": "vtkXMLStructuredGridWriter" },
+        { "class": "vtkXMLUnstructuredDataWriter" },
+        { "class": "vtkXMLUnstructuredGridWriter" },
+        { "class": "vtkXMLWriter" }
+      ],
+      "replace": [
+        { "path": "VTK/IO/XML/module.cmake" },
+        { "path": "VTK/IO/XML/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
     },
     { "name":"vtkPVVTKExtensionsRendering",
       "path":"ParaViewCore/VTKExtensions/Rendering",
@@ -142,6 +234,31 @@
         "GlyphSource2D",
         "LineSource",
         "SphereSource"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/writers.xml",
+      "proxies":[
+        "XMLDataSetWriter",
+        "XMLMultiBlockDataWriter",
+        "XMLPImageDataWriter",
+        "XMLPPolyDataWriter",
+        "XMLPRectilinearGridWriter",
+        "XMLPStructuredGridWriter",
+        "XMLPUnstructuredGridWriter"
+      ]
+    },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/internal_writers.xml",
+      "proxies":[
+        "FileSeriesWriter",
+        "ParallelFileSeriesWriter",
+        "XMLDataSetWriterCore",
+        "XMLPDataSetWriterCore",
+        "XMLPImageDataWriterCore",
+        "XMLPMultiBlockDataWriterCore",
+        "XMLPPolyDataWriterCore",
+        "XMLPRectilinearGridWriterCore",
+        "XMLPStructuredGridWriterCore",
+        "XMLPUnstructuredGridWriterCore"
       ]
     }
   ]
