@@ -55,6 +55,7 @@ def filter_proxies(fin, fout, proxies):
     'PlotMatrixViewProxy',
     'Proxy',
     'PVRepresentationProxy',
+    'PSWriterProxy',
     'PWriterProxy',
     'PythonViewProxy',
     'RenderViewProxy',
