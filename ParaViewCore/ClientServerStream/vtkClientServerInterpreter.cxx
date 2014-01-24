@@ -789,9 +789,17 @@ vtkClientServerInterpreter
 ::AddCommandFunction(const char* cname, vtkClientServerCommandFunction func,
                      void* ctx, vtkContextFreeFunction freeFunction)
 {
-  if(this->Internal->ClassToFunctionMap.count(cname))
+  vtkClientServerInterpreterInternals::ClassToFunctionMapType::const_iterator it =
+    this->Internal->ClassToFunctionMap.find(cname);
+
+  if(it != this->Internal->ClassToFunctionMap.end())
     {
-    *this->LogStream << "Ignoring duplicate command function for " << cname << '\n';
+    if(it->second->Context == ctx && it->second->Function == func)
+      { // we already have this EXACT definition available so don't add
+      return;
+      }
+    vtkErrorMacro("Ignoring duplicate command function for " << cname);
+    return;
     }
 
   vtkClientServerInterpreterInternals::ContextInformation* context = NULL;
@@ -846,9 +854,17 @@ vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
                                                    void* ctx,
                                                    vtkContextFreeFunction freeFunction)
 {
-  if(this->Internal->NewInstanceFunctions.count(name))
+  vtkClientServerInterpreterInternals::NewInstanceFunctionsType::const_iterator it=
+    this->Internal->NewInstanceFunctions.find(name);
+
+  if(it != this->Internal->NewInstanceFunctions.end())
     {
-    *this->LogStream << "Ignoring duplicate instance function for " << name << '\n';
+    if(it->second->Context == ctx && it->second->Function == f)
+      { // we already have this EXACT definition available so don't add
+      return;
+      }
+    vtkErrorMacro("Ignoring duplicate instance function for " << name);
+    return;
     }
 
   vtkClientServerInterpreterInternals::ContextInformation* context = NULL;
