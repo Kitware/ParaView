@@ -147,9 +147,9 @@ void pqBackgroundEditorWidget::currentIndexChangedBackgroundType(int type)
   QWidget* controls[ROWS][COLS] = {{ui.Color, ui.RestoreDefaultColor},
                                    {ui.Color2, ui.RestoreDefaultColor2},
                                    {ui.Image, 0}};
-  for (size_t i = 0; i < ROWS; ++i)
+  for (int i = 0; i < ROWS; ++i)
     {
-    for (size_t j = 0; j < COLS; ++j)
+    for (int j = 0; j < COLS; ++j)
       {
       QWidget* control = controls[i][j];
       if (control)
@@ -218,9 +218,9 @@ void pqBackgroundEditorWidget::fireGradientAndImageChanged(
     }
 }
 
-void pqBackgroundEditorWidget::setView (pqView *view)
+void pqBackgroundEditorWidget::setView (pqView *_view)
 {
-  this->Internal->Image->setRenderView(qobject_cast<pqRenderView*>(view));
+  this->Internal->Image->setRenderView(qobject_cast<pqRenderView*>(_view));
 }
 
 void pqBackgroundEditorWidget::clickedRestoreDefaultColor()
@@ -236,10 +236,10 @@ void pqBackgroundEditorWidget::clickedRestoreDefaultColor2()
 
 void pqBackgroundEditorWidget::changeColor(const char* propertyName)
 {
-  vtkSMProperty* property =
+  vtkSMProperty* _property =
     this->getPropertyGroup ()->GetProperty(propertyName);
   BEGIN_UNDO_SET("Restore Default Color");
-  property->ResetToDefault();
+  _property->ResetToDefault();
   emit this->changeFinished();
   END_UNDO_SET();
 }

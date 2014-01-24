@@ -101,9 +101,9 @@ const int PROPERTY_COUNT = sizeof(PROPERTY_NAME) / sizeof(PROPERTY_NAME[0]);
 
 //-----------------------------------------------------------------------------
 pqLightsEditor::pqLightsEditor(
-  pqLightsPropertyGroup* propertyWidget, vtkSMPropertyGroup* smGroup,
-  QWidget *parent, Qt::WindowFlags flags):
-  Superclass(parent, flags),
+  pqLightsPropertyGroup* propertyWidget,
+  QWidget *_parent, Qt::WindowFlags flags):
+  Superclass(_parent, flags),
   Internal (new pqInternal (this)),
   PropertyWidget (propertyWidget)
 {
@@ -148,9 +148,9 @@ void pqLightsEditor::reset()
   BEGIN_UNDO_SET("Restore Default Lights");
   for (int i = 0; i < PROPERTY_COUNT; ++i)
     {
-    vtkSMProperty* property =
+    vtkSMProperty* _property =
       this->PropertyWidget->getPropertyGroup()->GetProperty(PROPERTY_NAME[i]);
-    property->ResetToDefault();
+    _property->ResetToDefault();
     }
   emit this->PropertyWidget->changeFinished();
   END_UNDO_SET();

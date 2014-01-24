@@ -45,8 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPropertyGroupWidget::pqPropertyGroupWidget(
-  vtkSMProxy *proxy, vtkSMPropertyGroup* smGroup, QWidget *parent):
-  Superclass(proxy, parent),
+  vtkSMProxy *_proxy, vtkSMPropertyGroup* smGroup, QWidget *_parent):
+  Superclass(_proxy, _parent),
   PropertyGroup (smGroup)
 {
 }

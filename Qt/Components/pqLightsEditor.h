@@ -44,8 +44,7 @@ class PQCOMPONENTS_EXPORT pqLightsEditor : public QDialog
   Q_OBJECT
   typedef QDialog Superclass;
 public:
-  pqLightsEditor(pqLightsPropertyGroup* propertyWidget, 
-                 vtkSMPropertyGroup* smGroup,
+  pqLightsEditor(pqLightsPropertyGroup* propertyWidget,
                  QWidget *parent=0, Qt::WindowFlags f=0);
   ~pqLightsEditor();
 

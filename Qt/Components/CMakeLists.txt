@@ -210,6 +210,8 @@ set (Module_SRCS
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.cxx
   pqKeyFrameTypeWidget.h
+  pqLightsEditor.cxx
+  pqLightsEditor.h
   pqLineSourceWidget.cxx
   pqLineSourceWidget.h
   pqLineWidget.cxx
@@ -508,6 +510,7 @@ set (Module_MOC_HDRS
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
+  pqLightsEditor.h
   pqLineSourceWidget.h
   pqLineWidget.h
   pqLinksEditor.h
@@ -654,6 +657,7 @@ set (Module_UI_FILES
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
+  Resources/UI/pqLightsEditor.ui
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqLineWidget.ui
   Resources/UI/pqLinksEditor.ui

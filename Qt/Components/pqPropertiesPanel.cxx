@@ -555,13 +555,13 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertiesPanel::updateViewPanel (pqView* view)
+void pqPropertiesPanel::updateViewPanel (pqView* _view)
 {
   QString viewName;
   bool propertiesInPanel = false;
-  if (view)
+  if (_view)
     {
-    viewName = view->getViewProxy()->GetXMLName();
+    viewName = _view->getViewProxy()->GetXMLName();
     propertiesInPanel = (
       viewName == "RenderView" ||
       viewName == "ComparativeRenderView" ||
@@ -576,7 +576,7 @@ void pqPropertiesPanel::updateViewPanel (pqView* view)
       viewName == "RefiningView");
     }
 
-  if (this->Internals->View != view)
+  if (this->Internals->View != _view)
     {
     // The view has changed.
     if (this->Internals->View)
@@ -587,12 +587,12 @@ void pqPropertiesPanel::updateViewPanel (pqView* view)
         delete this->Internals->ViewWidgets;
         }
       }
-    this->Internals->View = view;
-    emit this->viewChanged(view);
-    if (view && propertiesInPanel)
+    this->Internals->View = _view;
+    emit this->viewChanged(_view);
+    if (_view && propertiesInPanel)
       {
       // create the widgets for this view
-      pqProxyWidgets* widgets = new pqProxyWidgets(view, this);
+      pqProxyWidgets* widgets = new pqProxyWidgets(_view, this);
       widgets->Panel->setApplyChangesImmediately(true);
       QObject::connect(widgets->Panel, SIGNAL(changeFinished()),
                        this, SLOT(renderActiveView()));
@@ -601,13 +601,13 @@ void pqPropertiesPanel::updateViewPanel (pqView* view)
       }
     }
 
-  if (view && propertiesInPanel)
+  if (_view && propertiesInPanel)
     {
     // update the label and show the widgets
-    vtkSMViewProxy* proxy = view->getViewProxy();
+    vtkSMViewProxy* proxy = _view->getViewProxy();
     const char* label = proxy->GetXMLLabel ();
     this->Internals->Ui.ViewButton->setText(
-      QString ("View (%1)").arg (label != 0 ? label : view->getViewType ()));
+      QString ("View (%1)").arg (label != 0 ? label : _view->getViewType ()));
     this->Internals->ViewWidgets->showWidgets(
       this->Internals->Ui.AdvancedButton->isChecked(),
       this->Internals->Ui.SearchLineEdit->text());

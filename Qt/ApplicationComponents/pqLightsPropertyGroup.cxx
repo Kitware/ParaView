@@ -44,7 +44,7 @@ pqLightsPropertyGroup::pqLightsPropertyGroup(
   vtkSMProxy *smProxy, vtkSMPropertyGroup* smGroup,
   QWidget*parentObject)
   : pqPropertyGroupWidget(smProxy, smGroup, parentObject),
-    Editor (new pqLightsEditor(this, smGroup))
+    Editor (new pqLightsEditor(this))
 {
   QVBoxLayout *layoutLocal = new QVBoxLayout(this);
   layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
