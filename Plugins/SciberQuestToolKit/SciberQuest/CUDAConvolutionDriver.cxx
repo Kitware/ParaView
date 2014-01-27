@@ -6,9 +6,7 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-
 //#define CUDAConvolutionDriverDEBUG
-
 #include "CUDAConvolutionDriver.h"
 
 #include "SQVTKTemplateMacroWarningSupression.h"

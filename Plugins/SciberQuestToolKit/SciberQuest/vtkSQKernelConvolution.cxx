@@ -8,8 +8,7 @@ Copyright 2012 SciberQuest Inc.
 
 */
 #include "vtkSQKernelConvolution.h"
-
-// #define SQTK_DEBUG
+//#define SQTK_DEBUG
 
 #include "vtkSQLog.h"
 #include "Numerics.hxx"
