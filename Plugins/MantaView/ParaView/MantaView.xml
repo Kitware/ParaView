@@ -16,19 +16,21 @@
               override="1">
        </Proxy>
        <ExposedProperties>
-         <Property name="CameraPositionInfo" />
-         <Property name="CameraPosition" />
-         <Property name="CameraFocalPointInfo" />
-         <Property name="CameraFocalPoint" />
-         <Property name="CameraViewUpInfo" />
-         <Property name="CameraViewUp" />
-         <Property name="CameraViewAngle" />
-         <Property name="CameraClippingRangeInfo" />
-         <Property name="CameraClippingRange" />
-         <Property name="CameraParallelScale" />
-         <Property name="CameraParallelScaleInfo" />
-         <Property name="CameraParallelProjection" />
-         <Property name="EyeAngle" />
+         <Property name="CameraPositionInfo" panel_visibility="never"/>
+         <Property name="CameraPosition" panel_visibility="never"/>
+         <Property name="CameraFocalPointInfo" panel_visibility="never"/>
+         <Property name="CameraFocalPoint" panel_visibility="never"/>
+         <Property name="CameraViewUpInfo" panel_visibility="never"/>
+         <Property name="CameraViewUp" panel_visibility="never"/>
+         <Property name="CameraViewAngle" panel_visibility="never"/>
+         <Property name="CameraClippingRangeInfo" panel_visibility="never"/>
+         <Property name="CameraClippingRange" panel_visibility="never"/>
+         <Property name="CameraParallelScale" panel_visibility="never"/>
+         <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
+         <Property name="CameraParallelProjection" panel_visibility="advanced"/>
+         <Property name="EyeAngle" panel_visibility="never"/>
+         <Property name="EyeTransformMatrix" />
+         <Property name="ModelTransformMatrix" />
        </ExposedProperties>
      </SubProxy>
 
@@ -36,6 +38,7 @@
         command="SetThreads"
         immediate_update="1"
         number_of_elements="1"
+        panel_visibility="never"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
@@ -47,6 +50,7 @@
         command="SetEnableShadows"
         immediate_update="1"
         number_of_elements="1"
+        panel_visibility="never"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -58,6 +62,7 @@
         command="SetSamples"
         immediate_update="1"
         number_of_elements="1"
+        panel_visibility="never"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
@@ -69,6 +74,7 @@
         command="SetMaxDepth"
         immediate_update="1"
         number_of_elements="1"
+        panel_visibility="never"
         default_values="5">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
