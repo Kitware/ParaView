@@ -67,7 +67,8 @@ public:
   Return the file extension used by the format for brick files.
   The BOV reader will make use of this in its pattern matching logic.
   */
-  virtual const char *GetBrickFileExtension() const =0;
+  void SetBrickFileExtension(std::string &ext){ this->BrickFileExtension=ext; }
+  virtual const char *GetBrickFileExtension() const { return this->BrickFileExtension.c_str(); }
 
   /**
   Return the file extension used by metadata files.
@@ -154,6 +155,12 @@ public:
   void GetSpacing(double *spacing) const;
   double *GetSpacing(){ return this->Spacing; }
   const double *GetSpacing() const { return this->Spacing; }
+
+  /**
+  Set/Get the time step
+  */
+  void SetDt(double dt) { this->Dt=dt; }
+  double GetDt() const { return this->Dt; }
 
   /**
   Set/Get the qth domain coordinate array. Used only for vtkRectininearGrid.
@@ -307,12 +314,14 @@ protected:
   int IsOpen;
   std::string FileName;               // path and file name of metadata file.
   std::string PathToBricks;           // path to the brick files.
+  std::string BrickFileExtension;     // extension used for brick files
   CartesianExtent Domain;             // Dataset domain on disk.
   CartesianExtent Subset;             // Subset of interst to read.
   CartesianExtent Decomp;             // Part of the subset this process will read.
   std::map<std::string,int> Arrays;   // map of array names to a status flag.
   std::vector<int> TimeSteps;         // Time values.
   std::string DataSetType;            // vtk data set type string
+  double Dt;                          // time step value
   double Origin[3];                   // dataset origin for image
   double Spacing[3];                  // grid spacing for image
   SharedArray<float> *Coordinates[3]; // x,y,z coordinate arrays for rectilinear

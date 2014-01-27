@@ -23,7 +23,7 @@ Copyright 2012 SciberQuest Inc.
 
 void ToLower(std::string &in);
 int FileExists(const char *path);
-int Present(const char *path, const char *file);
+int Present(const char *path, const char *file, const char *ext);
 int Represented(const char *path, const char *prefix);
 int ScalarRepresented(const char *path, const char *prefix);
 int VectorRepresented(const char *path, const char *prefix);
