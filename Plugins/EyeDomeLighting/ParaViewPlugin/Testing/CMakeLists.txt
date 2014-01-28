@@ -25,4 +25,5 @@ if (PARAVIEW_ENABLE_PYTHON AND BUILD_SHARED_LIBS)
   get_property(plugin_lib_location TARGET EyeDomeLightingView PROPERTY LOCATION)
   add_test(NAME ReloadPlugin
     COMMAND $<TARGET_FILE:pvpython> ${CMAKE_CURRENT_SOURCE_DIR}/ReloadPlugin.py ${plugin_lib_location})
+  set_tests_properties(ReloadPlugin PROPERTIES LABELS PARAVIEW)
 endif()
