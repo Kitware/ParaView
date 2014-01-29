@@ -46,19 +46,19 @@ else()
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
 endif()
 
-if(Module_vtkIOXdmf2)
-  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
-    )
-endif()
+
+SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
+  )
+
 
 SET (TESTS_WITH_BASELINES
   ${TESTS_WITH_BASELINES}
@@ -70,6 +70,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHDerivedDensity2DClyinder.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundLights.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
@@ -311,6 +312,7 @@ SET (UndoRedo2_BREAK TRUE)
 SET (UndoRedo7_BREAK TRUE)
   # <-- since these are just long tests, they result in timeouts.
 
+SET (BackgroundLights_BREAK TRUE)
 SET (ViewSettingsDialog_BREAK TRUE)
 SET (UnstructuredOutline_BREAK TRUE)
   # <-- since this changes view settings.

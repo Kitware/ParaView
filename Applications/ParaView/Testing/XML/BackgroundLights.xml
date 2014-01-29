@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/icon" command="mousePress" arguments="1,1,0,10,9" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/icon" command="mouseRelease" arguments="1,0,0,10,9" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mousePress" arguments="1,1,0,9,5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mouseMove" arguments="1,0,0,8,5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mouseRelease" arguments="1,0,0,8,5" />
+  <!-- added manually -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color/1QColorDialog0" command="setChosenColor" arguments="255,255,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color/1QColorDialog0" command="done" arguments="1" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,5,136" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,3,171" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,3,171" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/BackgroundType" command="set_string" arguments="Gradient" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,9,138" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,-6,182" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,-6,182" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color2/StandardColorMenu" command="activate" arguments="EdgeColor" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/RestoreDefaultColor2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,4,56" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,-4,116" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,-4,116" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LightsEditor/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="LightsEditor/Reset" command="activate" arguments="" />
+  <pqevent object="LightsEditor/LightKit/KeyLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/KeyLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/FillLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/FillLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/FillLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/FillLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/FillLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/FillLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/BackLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/BackLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/LightKit/BackLightWarmth" command="spin" arguments="up" />
+  <pqevent object="LightsEditor/Close" command="activate" arguments="" />
+</pqevents>

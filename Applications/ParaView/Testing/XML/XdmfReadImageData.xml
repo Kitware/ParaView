@@ -11,10 +11,17 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.462051,0.482993,1,0,0)" />
 
   <!-- turn on light kit -->
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mousePress" arguments="1,1,0,15,10" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mouseRelease" arguments="1,0,0,15,10" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mousePress" arguments="1,1,0,13,8" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mouseRelease" arguments="1,0,0,13,8" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/icon" command="mousePress" arguments="1,1,0,5,4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/icon" command="mouseRelease" arguments="1,0,0,5,4" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mousePress" arguments="1,1,0,11,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mouseRelease" arguments="1,0,0,11,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,12,31" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,15,138" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,15,138" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LightsEditor/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="LightsEditor/Reset" command="activate" arguments="" />
+  <pqevent object="LightsEditor/Close" command="activate" arguments="" />
+
+
 </pqevents>
