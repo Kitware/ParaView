@@ -210,9 +210,6 @@ void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* modelToUse)
     QObject::connect(
       modelToUse, SIGNAL(modelReset()),
       this, SLOT(onHeaderDataChanged()));
-    QObject::connect(
-      modelToUse, SIGNAL(modelReset()),
-      this, SLOT(sortColumns()));
     }
 
   // ensure headers are properly displayed for the new data
@@ -319,26 +316,5 @@ void pqSpreadSheetViewWidget::onSortIndicatorChanged(int section, Qt::SortOrder 
   else
     {
     this->horizontalHeader()->setSortIndicatorShown(false);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqSpreadSheetViewWidget::sortColumns()
-{
-  int targetVisualIndex = 0;
-  const char* order[6] = {"Point ID", "Cell ID", "Block Number", "ObjectID", "Points", "Structured Coordinates"};
-
-  for(int k=0 ; k < 6; k++)
-    {
-    const char* columnSearched = order[k];
-    for(int i=0; i < this->model()->columnCount(); i++)
-      {
-      QString name = this->model()->headerData(i, Qt::Horizontal).toString();
-      if(name == columnSearched)
-        {
-        this->horizontalHeader()->moveSection(this->horizontalHeader()->visualIndex(i), targetVisualIndex++);
-        break;
-        }
-      }
     }
 }
