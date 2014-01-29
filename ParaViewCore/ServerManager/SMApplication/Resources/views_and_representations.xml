@@ -288,7 +288,7 @@
       </ProxyProperty>
 
       <IntVectorProperty command="SetUseLightKit"
-                         default_values="0"
+                         default_values="1"
                          name="UseLight"
                          number_of_elements="1">
         <Documentation>Enable/Disable the LightKit.</Documentation>
@@ -433,7 +433,7 @@
       </IntVectorProperty>
 
       <IntVectorProperty command="SetLightSwitch"
-                         default_values="1"
+                         default_values="0"
                          name="LightSwitch"
                          number_of_elements="1">
         <Documentation>Turn on/off the default light in the 3D
