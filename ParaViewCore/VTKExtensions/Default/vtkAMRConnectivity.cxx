@@ -324,18 +324,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       {
       myOffset = 0; 
       }
-    for (int i = 1; i < this->NextRegionId; i ++) 
-      {
-      if ((i % numProcs) == myOffset) 
-        {
-        this->Equivalence->AddEquivalence (i, i);
-        }
-      else
-        {
-        this->Equivalence->AddEquivalence (i, 0);
-        }
-      }
-
     for (size_t i = 0; i < this->BoundaryArrays.size (); i ++) 
       {
       for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
@@ -347,6 +335,15 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         this->BoundaryArrays[i][j]->Delete ();
         }
         this->BoundaryArrays[i].clear ();
+      }
+
+    // Reset all uninitialized remote regionIds to equivalence 0
+    for (int i = 1; i < (this->NextRegionId - numProcs); i ++) 
+      {
+      if ((i % numProcs) != myOffset && this->Equivalence->GetEquivalentSetId (i) == i) 
+        {
+        this->Equivalence->AddEquivalence (i, 0);
+        }
       }
     // Reduce all equivalence pairs into equivalence sets
     this->Equivalence->ResolveEquivalences ();
