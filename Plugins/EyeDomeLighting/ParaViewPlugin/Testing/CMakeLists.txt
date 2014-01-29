@@ -22,8 +22,7 @@ if (PARAVIEW_ENABLE_PYTHON AND BUILD_SHARED_LIBS)
   # to test that we can reload a plugin multiple times without a crash.
   # for complex Python scripts we may not know that a plugin has already
   # been loaded.
-  get_property(plugin_lib_location TARGET EyeDomeLightingView PROPERTY LOCATION)
   add_test(NAME ReloadPlugin
-    COMMAND $<TARGET_FILE:pvpython> ${CMAKE_CURRENT_SOURCE_DIR}/ReloadPlugin.py ${plugin_lib_location})
+    COMMAND $<TARGET_FILE:pvpython> ${CMAKE_CURRENT_SOURCE_DIR}/ReloadPlugin.py)
   set_tests_properties(ReloadPlugin PROPERTIES LABELS PARAVIEW)
 endif()

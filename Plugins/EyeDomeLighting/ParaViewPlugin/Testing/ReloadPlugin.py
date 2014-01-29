@@ -1,12 +1,10 @@
+# we should be able to load in a plugin multiple times without issues,
+# as long as it's the same plugin.
 import sys
-
-if len(sys.argv) != 2:
-    print 'need to pass in location of plugin library'
-    sys.exit(1)
 
 import paraview.simple
 
-paraview.simple.LoadPlugin(sys.argv[1], True, globals())
-print 'loaded ', sys.argv[1], ' the first time successfully'
-paraview.simple.LoadPlugin(sys.argv[1], True, globals())
-print 'loaded ', sys.argv[1], ' the second time successfully'
+paraview.simple.LoadDistributedPlugin("EyeDomeLightingView", True, globals())
+print 'loaded the first time successfully'
+paraview.simple.LoadDistributedPlugin("EyeDomeLightingView", True, globals())
+print 'loaded the second time successfully'
