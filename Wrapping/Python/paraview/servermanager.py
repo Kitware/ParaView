@@ -3045,8 +3045,11 @@ if not vtkProcessModule.GetProcessModule():
       pvoptions.SetProcessType(vtkPVOptions.PVBATCH)
       if paraview.options.symmetric:
         pvoptions.SetSymmetricMPIMode(True)
-    vtkInitializationHelper.Initialize(sys.executable,
-        vtkProcessModule.PROCESS_CLIENT, pvoptions)
+      vtkInitializationHelper.Initialize(sys.executable,
+          vtkProcessModule.PROCESS_BATCH, pvoptions)
+    else:
+      vtkInitializationHelper.Initialize(sys.executable,
+          vtkProcessModule.PROCESS_CLIENT, pvoptions)
 
 # Initialize progress printing. Can be turned off by calling
 # ToggleProgressPrinting() again.
