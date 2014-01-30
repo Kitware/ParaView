@@ -17,6 +17,10 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name":"Module_vtkImagingCore",
+        "type":"BOOL",
+        "value":"ON"
+      },
       { "name": "Module_vtkImagingHybrid",
         "type": "BOOL",
         "value": "ON"

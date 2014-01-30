@@ -1,10 +1,6 @@
 {
   "cmake":{
     "cache":[
-      { "name":"Module_vtkImagingCore",
-        "type":"BOOL",
-        "value":"ON"
-      },
       { "name":"Module_vtkPVVTKExtensionsDefault",
         "type":"BOOL",
         "value":"ON"
