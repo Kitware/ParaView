@@ -162,7 +162,7 @@ void pqGlyphPanel::updateScaleFactor()
 
   int valid;
   int scale_mode = enumDomain->GetEntryValue(
-    this->ScaleModeWidget->currentText().toAscii().data(), valid);
+    this->ScaleModeWidget->currentText().toLatin1().data(), valid);
   if (!valid)
     {
     return;
@@ -231,7 +231,7 @@ void pqGlyphPanel::updateScalarsVectorsEnable()
 
   int valid;
   int scale_mode = enumDomain->GetEntryValue(
-    this->ScaleModeWidget->currentText().toAscii().data(), valid);
+    this->ScaleModeWidget->currentText().toLatin1().data(), valid);
   if (!valid) return;
 
   bool orientGlyphs = this->OrientWidget->isChecked();

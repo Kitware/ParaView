@@ -427,7 +427,7 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
     "Client");
   texture->UpdateVTKObjects();
   pxm->RegisterProxy(TEXTURESGROUP,
-    vtksys::SystemTools::GetFilenameName(filename.toAscii().data()).c_str(),
+    vtksys::SystemTools::GetFilenameName(filename.toLatin1().data()).c_str(),
     texture);
   texture->Delete();
 

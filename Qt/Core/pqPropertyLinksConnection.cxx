@@ -50,7 +50,7 @@ QObject* qobject, const char* qproperty, const char* qsignal,
 
   if (this->ObjectQt && !this->SignalQt.isEmpty())
     {
-    QObject::connect(this->ObjectQt, this->SignalQt.toAscii().data(),
+    QObject::connect(this->ObjectQt, this->SignalQt.toLatin1().data(),
       this, SIGNAL(qtpropertyModified()));
     }
 }
@@ -110,7 +110,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
   pqSMAdaptor::PropertyValueType value_type =
     use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED;
 
-  QVariant currentQtValue = this->ObjectQt->property(this->PropertyQt.toAscii().data());
+  QVariant currentQtValue = this->ObjectQt->property(this->PropertyQt.toLatin1().data());
   QVariant currentSMValue;
 
   switch(pqSMAdaptor::getPropertyType(this->PropertySM))
@@ -122,7 +122,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
       currentSMValue.setValue(smproxy);
       if (currentSMValue != currentQtValue)
         {
-        this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+        this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
         }
       }
     break;
@@ -131,7 +131,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
     currentSMValue = pqSMAdaptor::getEnumerationProperty(this->PropertySM, value_type);
     if (currentSMValue != currentQtValue)
       {
-      this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+      this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
       }
     break;
 
@@ -139,7 +139,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
     currentSMValue = pqSMAdaptor::getElementProperty(this->PropertySM, value_type);
     if (currentSMValue != currentQtValue)
       {
-      this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+      this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
       }
     break;
 
@@ -147,7 +147,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
     currentSMValue = pqSMAdaptor::getFileListProperty(this->PropertySM, value_type);
     if (currentSMValue != currentQtValue)
       {
-      this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+      this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
       }
     break;
 
@@ -159,7 +159,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
       if (newVal != currentQtValue.value<QList<QList<QVariant> > >())
         {
         currentSMValue.setValue(newVal);
-        this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+        this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
         }
       }
     else
@@ -169,7 +169,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
         this->PropertySM, this->IndexSM, value_type);
       if (sel.size() == 2 && sel[1] != currentQtValue)
         {
-        this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), sel[1]);
+        this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), sel[1]);
         }
       }
     break;
@@ -183,7 +183,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
         this->PropertySM, value_type);
       if (currentSMValue != currentQtValue)
         {
-        this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+        this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
         }
       }
     else
@@ -192,7 +192,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
         this->PropertySM, this->IndexSM, value_type);
       if (currentSMValue != currentQtValue)
         {
-        this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+        this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
         }
       }
     break;
@@ -202,7 +202,7 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
       this->PropertySM, value_type);
     if (currentSMValue != currentQtValue)
       {
-      this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);
+      this->ObjectQt->setProperty(this->PropertyQt.toLatin1().data(), currentSMValue);
       }
 
   case pqSMAdaptor::UNKNOWN:
@@ -232,7 +232,7 @@ void pqPropertyLinksConnection::copyValuesFromQtToServerManager(bool use_uncheck
 
   // get the property of the object
   QVariant currentQtValue;
-  currentQtValue = this->ObjectQt->property(this->PropertyQt.toAscii().data());
+  currentQtValue = this->ObjectQt->property(this->PropertyQt.toLatin1().data());
 
   switch (pqSMAdaptor::getPropertyType(this->PropertySM))
     {

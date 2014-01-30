@@ -72,7 +72,7 @@ void pqStandardColorLinkAdaptor::onGlobalPropertiesChanged()
   vtkSMGlobalPropertiesManager* mgr =
     pqApplicationCore::instance()->getGlobalPropertiesManager();
   const char* name = mgr->GetGlobalPropertyName(this->Proxy,
-    this->PropertyName.toAscii().data());
+    this->PropertyName.toLatin1().data());
   qobject_cast<pqStandardColorButton*>(this->parent())->setStandardColor(name);
 }
 
@@ -97,7 +97,7 @@ void pqStandardColorLinkAdaptor::onStandardColorChanged(const QString& name)
   if (name.isEmpty())
     {
     pqStandardColorLinkAdaptor::breakLink(this->Proxy,
-      this->PropertyName.toAscii().data());
+      this->PropertyName.toLatin1().data());
     }
   else
     {

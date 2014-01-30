@@ -65,7 +65,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
   QListWidget* lw = this->Internal->listWidget;
 
   vtkStringList* readers = readerFactory->GetPossibleReaders(
-    file.toAscii().data(), s->session());
+    file.toLatin1().data(), s->session());
 
   for (int cc=0; (cc+2) < readers->GetNumberOfStrings(); cc+=3)
     {

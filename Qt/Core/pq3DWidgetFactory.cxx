@@ -103,7 +103,7 @@ vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(const QString&
   // is never saved in state
   vtkSMNewWidgetRepresentationProxy* proxy = vtkSMNewWidgetRepresentationProxy::SafeDownCast(
     builder->createProxy("representations", 
-      name.toAscii().data(), server,
+      name.toLatin1().data(), server,
       "3d_widgets_prototypes"));
   if (!proxy)
     {

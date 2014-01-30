@@ -108,7 +108,7 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     // Delete the file.
     fileString.replace("$PARAVIEW_DATA_ROOT", data_directory);
     fileString.replace("$PARAVIEW_TEST_ROOT", test_directory);
-    vtksys::SystemTools::RemoveFile(fileString.toAscii().data()); 
+    vtksys::SystemTools::RemoveFile(fileString.toLatin1().data());
     return true;
     }
 

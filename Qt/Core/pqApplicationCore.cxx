@@ -412,7 +412,7 @@ void pqApplicationCore::loadPalette(const QString& paletteName)
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
-    paletteName.toAscii().data());
+    paletteName.toLatin1().data());
   if (!prototype)
     {
     qCritical() << "No such palette " << paletteName;
@@ -489,7 +489,7 @@ void pqApplicationCore::saveState(const QString& filename)
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
 
-  pxm->SaveXMLState(filename.toAscii().data());
+  pxm->SaveXMLState(filename.toLatin1().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -599,7 +599,7 @@ void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
     // Change root element to match the application name.
     QString valid_name =
       QApplication::applicationName().replace(QRegExp("\\W"), "_");
-    root->SetName(valid_name.toAscii().data());
+    root->SetName(valid_name.toLatin1().data());
     }
   emit this->stateSaved(root);
 }

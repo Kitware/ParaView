@@ -93,7 +93,7 @@ class pqSeriesParametersModel : public QAbstractTableModel
     {
     unsigned int unused=0;
     if (this->Domain &&
-      this->Domain->IsInDomain(_seriesName.toAscii().data(), unused)!=0)
+      this->Domain->IsInDomain(_seriesName.toLatin1().data(), unused)!=0)
       {
       return true;
       }

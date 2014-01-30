@@ -146,10 +146,10 @@ void pqYoungsMaterialInterfacePanel::updateOptions()
   // check if there's a normal and ordering array already defined for this
   // volume-fraction array. If so, show it.
   const char* ordering_array = vtkSMUncheckedPropertyHelper(
-    this->proxy(), "OrderingArrays").GetStatus(label.toAscii().data(), "");
+    this->proxy(), "OrderingArrays").GetStatus(label.toLatin1().data(), "");
 
   const char* normal_array = vtkSMUncheckedPropertyHelper(
-    this->proxy(), "NormalArrays").GetStatus(label.toAscii().data(), "");
+    this->proxy(), "NormalArrays").GetStatus(label.toLatin1().data(), "");
 
   if (ordering_array == NULL || strlen(ordering_array) == 0)
     {
@@ -179,8 +179,8 @@ void pqYoungsMaterialInterfacePanel::orderingArraysChanged(const QString& text)
     {
     QString label = currentItem->text(0);
     vtkSMUncheckedPropertyHelper(this->proxy(), "OrderingArrays").SetStatus(
-      label.toAscii().data(),
-      text == "None"? "" : text.toAscii().data());
+      label.toLatin1().data(),
+      text == "None"? "" : text.toLatin1().data());
     this->setModified();
     }
 }
@@ -193,8 +193,8 @@ void pqYoungsMaterialInterfacePanel::normalArraysChanged(const QString& text)
     {
     QString label = currentItem->text(0);
     vtkSMUncheckedPropertyHelper(this->proxy(), "NormalArrays").SetStatus(
-      label.toAscii().data(),
-      text == "None"? "" : text.toAscii().data());
+      label.toLatin1().data(),
+      text == "None"? "" : text.toLatin1().data());
     this->setModified();
     }
 }

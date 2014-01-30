@@ -57,7 +57,7 @@ static void CreateEmptyFile(const QString& f)
   QFile file(f);
   file.open(QIODevice::WriteOnly);
   QString str = "can delete";
-  file.write(str.toAscii().data(), str.size());
+  file.write(str.toLatin1().data(), str.size());
   file.close();
 }
 

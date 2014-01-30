@@ -129,7 +129,7 @@ void QTestApp::keyUp(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
     off = 'A';
   if(key >= Qt::Key_A && key <= Qt::Key_Z)
     {
-    text.append(QChar::fromAscii(key - Qt::Key_A + off));
+    text.append(QLatin1Char(key - Qt::Key_A + off));
     }
   QKeyEvent e(QEvent::KeyRelease, key, mod, text);
   if(!simulateEvent(w, &e))
@@ -149,7 +149,7 @@ void QTestApp::keyDown(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int m
     off = 'A';
   if(key >= Qt::Key_A && key <= Qt::Key_Z)
     {
-    text.append(QChar::fromAscii(key - Qt::Key_A + off));
+    text.append(QLatin1Char(key - Qt::Key_A + off));
     }
   QKeyEvent e(QEvent::KeyPress, key, mod, text);
   if(!simulateEvent(w, &e))

@@ -727,7 +727,7 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
         {
         return QVariant(
             source->getProxy()->HasAnnotation(
-                this->FilterRoleAnnotationKey.toAscii().data()));
+                this->FilterRoleAnnotationKey.toLatin1().data()));
         }
       return QVariant(true);
       }

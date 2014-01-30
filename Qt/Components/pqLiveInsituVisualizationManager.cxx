@@ -143,8 +143,8 @@ bool pqLiveInsituVisualizationManager::hasExtracts(pqOutputPort* port) const
     }
 
   if (this->Internals->LiveInsituLinkProxy->HasExtract(
-      port->getSource()->getSMGroup().toAscii().data(),
-      port->getSource()->getSMName().toAscii().data(),
+      port->getSource()->getSMGroup().toLatin1().data(),
+      port->getSource()->getSMName().toLatin1().data(),
       port->getPortNumber()))
     {
     return true;
@@ -164,8 +164,8 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
   pqPipelineSource* source = port->getSource();
 
   vtkSMProxy* proxy = this->Internals->LiveInsituLinkProxy->CreateExtract(
-    source->getSMGroup().toAscii().data(),
-    source->getSMName().toAscii().data(),
+    source->getSMGroup().toLatin1().data(),
+    source->getSMName().toLatin1().data(),
     port->getPortNumber());
 
   QString name;
@@ -180,7 +180,7 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
     }
 
   this->Internals->Session->proxyManager()->RegisterProxy(
-    "sources", name.toAscii().data(), proxy);
+    "sources", name.toLatin1().data(), proxy);
 
   pqPipelineSource* pqproxy =
     pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(proxy);

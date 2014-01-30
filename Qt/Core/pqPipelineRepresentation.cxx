@@ -995,7 +995,7 @@ int pqPipelineRepresentation::getColorFieldNumberOfComponents(const QString& arr
     fieldType = vtkDataObject::FIELD_ASSOCIATION_POINTS;
     }
 
-  return this->getNumberOfComponents(field.toAscii().data(),
+  return this->getNumberOfComponents(field.toLatin1().data(),
     fieldType);
 }
 
@@ -1020,14 +1020,14 @@ QString pqPipelineRepresentation::getColorFieldComponentName( const QString& arr
     fieldType = vtkDataObject::FIELD_ASSOCIATION_POINTS;
     }
 
-   return this->getComponentName(field.toAscii().data(), fieldType, component );
+   return this->getComponentName(field.toLatin1().data(), fieldType, component );
 }
 
 //-----------------------------------------------------------------------------
 bool pqPipelineRepresentation::isPartial(const QString& array, int fieldType) const
 {
   vtkPVArrayInformation* info = pqInternal::getArrayInformation(this,
-    array.toAscii().data(), fieldType);
+    array.toLatin1().data(), fieldType);
   return (info? (info->GetIsPartial()==1) : false);
 }
 
@@ -1056,7 +1056,7 @@ pqPipelineRepresentation::getColorFieldRange(const QString& array, int component
     }
 
   vtkPVArrayInformation* arrayInfo = pqInternal::getArrayInformation(this,
-    field.toAscii().data(), fieldType);
+    field.toLatin1().data(), fieldType);
   if (arrayInfo)
     {
     if (component < arrayInfo->GetNumberOfComponents())
@@ -1112,13 +1112,13 @@ void pqPipelineRepresentation::setColorField(const QString& value)
     if(field.right((int)strlen(" (cell)")) == " (cell)")
       {
       field.chop((int)strlen(" (cell)"));
-      this->colorByArray(field.toAscii().data(), 
+      this->colorByArray(field.toLatin1().data(), 
                          vtkDataObject::FIELD_ASSOCIATION_CELLS);
       }
     else if(field.right((int)strlen(" (point)")) == " (point)")
       {
       field.chop((int)strlen(" (point)"));
-      this->colorByArray(field.toAscii().data(), 
+      this->colorByArray(field.toLatin1().data(), 
                          vtkDataObject::FIELD_ASSOCIATION_POINTS);
       }
     }
@@ -1163,7 +1163,7 @@ QString pqPipelineRepresentation::getColorField(bool raw)
 void pqPipelineRepresentation::setRepresentation(const QString& representation)
 {
   vtkSMRepresentationProxy* repr = this->getRepresentationProxy();
-  vtkSMPropertyHelper(repr, "Representation").Set(representation.toAscii().data());
+  vtkSMPropertyHelper(repr, "Representation").Set(representation.toLatin1().data());
   repr->UpdateVTKObjects();
   this->onRepresentationChanged();
 }

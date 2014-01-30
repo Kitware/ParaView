@@ -213,7 +213,7 @@ void pqCustomFilterManagerModel::importCustomFiltersFromSettings()
     }
 
   vtkPVXMLParser *parser = vtkPVXMLParser::New();
-  parser->Parse(state.toAscii().data());
+  parser->Parse(state.toLatin1().data());
 
   proxyManager->LoadCustomProxyDefinitions(parser->GetRootElement());
 

@@ -147,7 +147,7 @@ int pqImageUtil::saveImage(vtkImageData* vtkimage, const QString& filename,
     }
   else
     {
-    error_code = vtkSMUtilities::SaveImage(vtkimage, filename.toAscii().data(), 
+    error_code = vtkSMUtilities::SaveImage(vtkimage, filename.toLatin1().data(),
       quality);
     }
 

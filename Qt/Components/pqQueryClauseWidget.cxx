@@ -766,7 +766,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   switch (criteria_type)
     {
   case QUERY:
-      vtkSMPropertyHelper(selSource, "QueryString").Set(values[0].toString().toAscii().constData());
+      vtkSMPropertyHelper(selSource, "QueryString").Set(values[0].toString().toLatin1().constData());
       break;
 
   case BLOCK:
@@ -782,7 +782,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   case GLOBALID:
   case THRESHOLD:
     this->LastQuery = query;
-    vtkSMPropertyHelper(selSource, "QueryString").Set(query.toAscii().constData());
+    vtkSMPropertyHelper(selSource, "QueryString").Set(query.toLatin1().constData());
     break;
   case AMR_LEVEL:
       {

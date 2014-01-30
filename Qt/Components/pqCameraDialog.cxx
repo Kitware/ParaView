@@ -474,7 +474,7 @@ void pqCameraDialog::applyCustomView(int buttonId)
     {
     vtkSmartPointer<vtkPVXMLParser> parser=vtkSmartPointer<vtkPVXMLParser>::New();
     parser->InitializeParser();
-    parser->ParseChunk(config.toAscii().data(),static_cast<unsigned int>(config.size()));
+    parser->ParseChunk(config.toLatin1().data(),static_cast<unsigned int>(config.size()));
     parser->CleanupParser();
 
     vtkPVXMLElement *xmlStream=parser->GetRootElement();

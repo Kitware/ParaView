@@ -124,8 +124,8 @@ protected:
   virtual bool operator < ( const QTreeWidgetItem& other ) const
     {
     int column = this->treeWidget()->sortColumn();
-    vtkVariant x( this->data( column, Qt::DisplayRole ).toString().toAscii().data() );
-    vtkVariant y( other.data( column, Qt::DisplayRole ).toString().toAscii().data() );
+    vtkVariant x( this->data( column, Qt::DisplayRole ).toString().toLatin1().data() );
+    vtkVariant y( other.data( column, Qt::DisplayRole ).toString().toLatin1().data() );
     double dx, dy;
     bool vx, vy;
     dx = x.ToDouble( &vx );

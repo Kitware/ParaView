@@ -108,7 +108,7 @@ pqProxySelectionWidget::pqProxySelectionWidget(vtkSMProxy* ref_proxy,
   this->Internal->Property = prop;
 
   this->Internal->DomainObserver = new pqComboBoxDomain(this->Internal->Combo,
-    ref_proxy->GetProperty(prop.toAscii().data()), "proxy_list");
+    ref_proxy->GetProperty(prop.toLatin1().data()), "proxy_list");
 }
 
 //-----------------------------------------------------------------------------
@@ -127,7 +127,7 @@ pqSMProxy pqProxySelectionWidget::proxy() const
 {
   QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
     this->Internal->ReferenceProxy->GetProperty(
-      this->Internal->Property.toAscii().data()));
+      this->Internal->Property.toLatin1().data()));
 
   int index = this->Internal->Combo->currentIndex();
   if (index < 0 || index >= proxies.size())
@@ -143,7 +143,7 @@ void pqProxySelectionWidget::setProxy(pqSMProxy var)
 {
   QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
     this->Internal->ReferenceProxy->GetProperty(
-      this->Internal->Property.toAscii().data()));
+      this->Internal->Property.toLatin1().data()));
 
   int index = proxies.indexOf(var.GetPointer());
 

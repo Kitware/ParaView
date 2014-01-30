@@ -124,7 +124,7 @@ public:
       QString txt = "Full resolution render in: ";
       txt += QString::number(this->TimeLeftBeforeFullResolution);
       txt += " s";
-      this->writeToStatusBar( txt.toAscii().data() );
+      this->writeToStatusBar( txt.toLatin1().data() );
       this->TimeLeftBeforeFullResolution -= 0.1;
       }
     else
@@ -351,7 +351,7 @@ bool pqRenderViewBase::setCameraManipulators(const QString &cameraManipulatorNam
 QList<vtkSMProxy*> pqRenderViewBase::getCameraManipulators(const QString &cameraManipulatorName) const
 {
   QList<pqSMProxy> manips = pqSMAdaptor::getProxyListProperty(
-    this->getProxy()->GetProperty(cameraManipulatorName.toAscii().data()));
+    this->getProxy()->GetProperty(cameraManipulatorName.toLatin1().data()));
 
   QList<vtkSMProxy*> reply;
   foreach (vtkSMProxy* proxy, manips)
@@ -396,7 +396,7 @@ vtkSMProxy* pqRenderViewBase::createCameraManipulator(
 
   vtkSMSessionProxyManager* pxm = this->proxyManager();
   vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", 
-    strManipName.toAscii().data());
+    strManipName.toLatin1().data());
   if(!manip)
     {
     return NULL;
@@ -578,7 +578,7 @@ void pqRenderViewBase::restoreSettings(bool only_global)
       QList<pqSMProxy> smManipList;
       foreach(QString strManip, qStrManipList)
         {
-        sscanf(strManip.toAscii().data(), "Manipulator%dMouse%dShift%dControl%dName%s",
+        sscanf(strManip.toLatin1().data(), "Manipulator%dMouse%dShift%dControl%dName%s",
                &index, &mouse, &shift, &control, tmpName);
         name = tmpName;
         vtkSMProxy* localManip = this->createCameraManipulator(

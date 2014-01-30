@@ -174,7 +174,7 @@ bool pqLoadDataReaction::TestFileReadability(
   pqServer *server,
   vtkSMReaderFactory *vtkNotUsed(factory))
 {
-  return vtkSMReaderFactory::TestFileReadability(file.toAscii().data(), server->session());
+  return vtkSMReaderFactory::TestFileReadability(file.toLatin1().data(), server->session());
 }
 
 //-----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ bool pqLoadDataReaction::DetermineFileReader(
   QPair<QString,QString>& readerInfo)
 {
   QString readerType,readerGroup;
-  vtkStringList* list = factory->GetReaders(filename.toAscii().data(),
+  vtkStringList* list = factory->GetReaders(filename.toLatin1().data(),
     server->session());
   if(list->GetLength() > 3)
     {
@@ -203,7 +203,7 @@ bool pqLoadDataReaction::DetermineFileReader(
       return false;
       }
     }        
-  else if (factory->CanReadFile(filename.toAscii().data(),
+  else if (factory->CanReadFile(filename.toLatin1().data(),
     server->session()))
     {
     //reader knows the type

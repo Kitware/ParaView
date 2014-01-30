@@ -1038,11 +1038,11 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
         {
         if(Type == CHECKED)
           {
-          svp->SetElement(i, Value.toString().toAscii().data());
+          svp->SetElement(i, Value.toString().toLatin1().data());
           }
         else if(Type == UNCHECKED)
           {
-          svp->SetUncheckedElement(i, Value.toString().toAscii().data());
+          svp->SetUncheckedElement(i, Value.toString().toLatin1().data());
           }
         }
       }
@@ -1053,7 +1053,7 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProperty* Property,
   else if (ProxyGroupDomain && pp)
     {
     QString str = Value.toString();
-    vtkSMProxy* toadd = ProxyGroupDomain->GetProxy(str.toAscii().data());
+    vtkSMProxy* toadd = ProxyGroupDomain->GetProxy(str.toLatin1().data());
     if (pp->GetNumberOfProxies() < 1)
       {
       if(Type == CHECKED)
@@ -1307,7 +1307,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
     std::string *str_values= new std::string[num];
     for (int cc=0; cc < num; cc++)
       {
-      str_values[cc] = Value[cc].toString().toAscii().data();
+      str_values[cc] = Value[cc].toString().toLatin1().data();
       cvalues[cc] = str_values[cc].c_str();
       }
 
@@ -1537,11 +1537,11 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
       {
       if(Type == CHECKED)
         {
-        svp->SetElement(Index, v.toAscii().constData());
+        svp->SetElement(Index, v.toLatin1().constData());
         }
       else if(Type == UNCHECKED)
         {
-        svp->SetUncheckedElement(Index, v.toAscii().constData());
+        svp->SetUncheckedElement(Index, v.toLatin1().constData());
         }
       }
     }
@@ -1691,11 +1691,11 @@ void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
 
     if(Type == CHECKED)
       {
-      svp->SetElement(i, file.toAscii().data());
+      svp->SetElement(i, file.toLatin1().data());
       }
     else if(Type == UNCHECKED)
       {
-      svp->SetUncheckedElement(i, file.toAscii().data());
+      svp->SetUncheckedElement(i, file.toLatin1().data());
       }
 
     i++;
@@ -1779,12 +1779,12 @@ void pqSMAdaptor::setFieldSelection(vtkSMProperty *prop,
         if(Type == CHECKED)
           {
           Property->SetElement(3, text.c_str());
-          Property->SetElement(4, Value[1].toAscii().data());
+          Property->SetElement(4, Value[1].toLatin1().data());
           }
         else if(Type == UNCHECKED)
           {
           Property->SetUncheckedElement(3, text.c_str());
-          Property->SetUncheckedElement(4, Value[1].toAscii().data());
+          Property->SetUncheckedElement(4, Value[1].toLatin1().data());
           }
         break;
         }
@@ -1917,11 +1917,11 @@ void pqSMAdaptor::setFieldSelectionScalar(vtkSMProperty* prop,
     {
     if(Type == CHECKED)
       {
-      Property->SetElement(4, val.toAscii().data());
+      Property->SetElement(4, val.toLatin1().data());
       }
     else if(Type == UNCHECKED)
       {
-      Property->SetUncheckedElement(4, val.toAscii().data());
+      Property->SetUncheckedElement(4, val.toLatin1().data());
       }
     }
 }

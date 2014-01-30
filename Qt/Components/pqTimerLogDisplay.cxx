@@ -339,13 +339,13 @@ void pqTimerLogDisplay::save(const QString &filename)
   file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);
   if (file.error() != QFile::NoError)
     {
-    qWarning("Could not open %s for reading.", filename.toAscii().data());
+    qWarning("Could not open %s for reading.", filename.toLatin1().data());
     return;
     }
   QTextStream(&file) << this->ui->log->toPlainText();
   if (file.error() != QFile::NoError)
     {
-    qWarning("Error writing to %s.", filename.toAscii().data());
+    qWarning("Error writing to %s.", filename.toLatin1().data());
     }
   file.close();
 }

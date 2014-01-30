@@ -132,20 +132,20 @@ void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server)
   vtkSMSourceProxy::SafeDownCast(groupDS->getProxy())->UpdatePipeline();
 
   // Setup annotations:
-  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(1).toAscii().data(), "-");
-  clip1->getProxy()->SetAnnotation(this->FilterNames.at(1).toAscii().data(), "-");
-  clip2->getProxy()->SetAnnotation(this->FilterNames.at(1).toAscii().data(), "-");
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(1).toLatin1().data(), "-");
+  clip1->getProxy()->SetAnnotation(this->FilterNames.at(1).toLatin1().data(), "-");
+  clip2->getProxy()->SetAnnotation(this->FilterNames.at(1).toLatin1().data(), "-");
 
-  append->getProxy()->SetAnnotation(this->FilterNames.at(2).toAscii().data(), "-");
-  groupDS->getProxy()->SetAnnotation(this->FilterNames.at(2).toAscii().data(), "-");
+  append->getProxy()->SetAnnotation(this->FilterNames.at(2).toLatin1().data(), "-");
+  groupDS->getProxy()->SetAnnotation(this->FilterNames.at(2).toLatin1().data(), "-");
 
-  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
-  clip1->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
-  clip2->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
-  append->getProxy()->SetAnnotation(this->FilterNames.at(3).toAscii().data(), "-");
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
+  clip1->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
+  clip2->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
+  append->getProxy()->SetAnnotation(this->FilterNames.at(3).toLatin1().data(), "-");
 
-  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(4).toAscii().data(), "-");
-  cone->getProxy()->SetAnnotation(this->FilterNames.at(4).toAscii().data(), "-");
+  wavelet->getProxy()->SetAnnotation(this->FilterNames.at(4).toLatin1().data(), "-");
+  cone->getProxy()->SetAnnotation(this->FilterNames.at(4).toLatin1().data(), "-");
 
   // Tooltip
   wavelet->getProxy()->SetAnnotation("tooltip", "1+3+4");

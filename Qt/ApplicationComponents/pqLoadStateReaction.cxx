@@ -69,7 +69,7 @@ void pqLoadStateReaction::loadState(const QString& filename)
 
   // Read in the xml file to restore.
   vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
-  xmlParser->SetFileName(filename.toAscii().data());
+  xmlParser->SetFileName(filename.toLatin1().data());
   xmlParser->Parse();
 
   // Get the root element from the parser.

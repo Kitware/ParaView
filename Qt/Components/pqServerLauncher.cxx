@@ -89,11 +89,11 @@ namespace
 
     virtual QVariant get() const
       {
-      return this->Widget->property(this->PropertyName.toAscii().data());
+      return this->Widget->property(this->PropertyName.toLatin1().data());
       }
     virtual void set(const QVariant& value)
       {
-      this->Widget->setProperty(this->PropertyName.toAscii().data(), value);
+      this->Widget->setProperty(this->PropertyName.toLatin1().data(), value);
       }
   private:
     Q_DISABLE_COPY(pqWidget);
@@ -316,7 +316,7 @@ namespace
               {
               QString xml_value = child->GetAttribute("value");
               QString xml_label = child->GetAttributeOrDefault(
-                "label", xml_value.toAscii().data());
+                "label", xml_value.toLatin1().data());
               widget->addItem(xml_label, xml_value);
               }
             }
@@ -368,7 +368,7 @@ namespace
       {
       QString name = item->Widget->objectName();
       QVariant chosen_value = item->get();
-      cout << name.toAscii().data() << "=" << chosen_value.toString().toAscii().data() <<
+      cout << name.toLatin1().data() << "=" << chosen_value.toString().toLatin1().data() <<
         endl;
       if (item->ToSave)
         {
@@ -378,8 +378,8 @@ namespace
         settings->setValue(settingsKey, chosen_value);
         }
       options.insert(name, chosen_value.toString());
-      //cout << name.toAscii().data() << " = " <<
-      //  chosen_value.toString().toAscii().data() << endl;
+      //cout << name.toLatin1().data() << " = " <<
+      //  chosen_value.toString().toLatin1().data() << endl;
 
       // Some options can affect the server resource itself e.g. PV_SERVER_PORT etc.
       // So if those were changed using the config XML, we need to update the
@@ -666,7 +666,7 @@ bool pqServerLauncher::launchServer(bool show_status_dialog)
     command.replace(before, after);
     }
 
-  cout << "Server launch command is : " << command.toAscii().data() << endl;
+  cout << "Server launch command is : " << command.toLatin1().data() << endl;
   QProcess* process = new QProcess(pqApplicationCore::instance());
   process->setProcessEnvironment(this->Internals->Options);
 

@@ -507,7 +507,7 @@ void pqApplicationOptions::loadPalette(const QString& paletteName)
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
-    paletteName.toAscii().data());
+    paletteName.toLatin1().data());
   if (!prototype)
     {
     qCritical() << "No such palette " << paletteName;

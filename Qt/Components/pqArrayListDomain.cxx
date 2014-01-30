@@ -96,5 +96,5 @@ void pqArrayListDomain::domainChanged()
   variantVal.setValue(newVal);
 
   this->parent()->setProperty(
-    this->Internals->QProperty.toAscii().data(), variantVal);
+    this->Internals->QProperty.toLatin1().data(), variantVal);
 }

@@ -222,7 +222,7 @@ void pqPipelineSource::addInternalHelperProxy(const QString& key, vtkSMProxy* he
 {
   this->Superclass::addInternalHelperProxy(key, helper);
 
-  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
+  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toLatin1().data());
   if (prop)
     {
      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
@@ -239,7 +239,7 @@ void pqPipelineSource::removeInternalHelperProxy(const QString& key, vtkSMProxy*
 {
   this->Superclass::removeInternalHelperProxy(key, helper);
 
-  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
+  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toLatin1().data());
   if (prop)
     {
      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
@@ -453,7 +453,7 @@ pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
 pqOutputPort* pqPipelineSource::getOutputPort(const QString& name) const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getProxy());
-  unsigned int index = source->GetOutputPortIndex(name.toAscii().data());
+  unsigned int index = source->GetOutputPortIndex(name.toLatin1().data());
   if (index != VTK_UNSIGNED_INT_MAX)
     {
     return this->getOutputPort(static_cast<int>(index));

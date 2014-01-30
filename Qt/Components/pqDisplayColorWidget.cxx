@@ -257,11 +257,11 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
       display->colorByArray(NULL, 0);
       break;
     case VARIABLE_TYPE_NODE:
-      display->colorByArray(name.toAscii().data(),
+      display->colorByArray(name.toLatin1().data(),
         vtkDataObject::FIELD_ASSOCIATION_POINTS);
       break;
     case VARIABLE_TYPE_CELL:
-      display->colorByArray(name.toAscii().data(), 
+      display->colorByArray(name.toLatin1().data(),
         vtkDataObject::FIELD_ASSOCIATION_CELLS);
       break;
       }

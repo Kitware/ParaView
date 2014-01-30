@@ -280,7 +280,7 @@ void pqPythonManager::startTrace()
 {
   QString script = "from paraview import smtrace\n"
                    "smtrace.start_trace()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
+  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
 
   // Update internal state
   this->Internal->IsPythonTracing = true;
@@ -296,7 +296,7 @@ void pqPythonManager::stopTrace()
 {
   QString script = "from paraview import smtrace\n"
                    "smtrace.stop_trace()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
+  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
 
   // Update internal state
   this->Internal->IsPythonTracing = false;
@@ -312,7 +312,7 @@ QString pqPythonManager::getTraceString()
 {
   QString script = "from paraview import smtrace\n"
                    "__smtraceString = smtrace.get_trace_string()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toAscii().data());
+  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
 
   PyObject* main_module = PyImport_AddModule((char*)"__main__");
   PyObject* global_dict = PyModule_GetDict(main_module);

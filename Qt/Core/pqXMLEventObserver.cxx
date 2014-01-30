@@ -84,9 +84,9 @@ void pqXMLEventObserver::onRecordEvent(
     {
     *this->Stream
       << "  <pqevent "
-      << "object=\"" << textToXML(Widget).toAscii().data() << "\" "
-      << "command=\"" << textToXML(Command).toAscii().data() << "\" "
-      << "arguments=\"" << textToXML(Arguments).toAscii().data() << "\" "
+      << "object=\"" << textToXML(Widget).toLatin1().data() << "\" "
+      << "command=\"" << textToXML(Command).toLatin1().data() << "\" "
+      << "arguments=\"" << textToXML(Arguments).toLatin1().data() << "\" "
       << "/>\n";
     }
 }

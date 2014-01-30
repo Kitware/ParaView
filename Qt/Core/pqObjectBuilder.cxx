@@ -175,7 +175,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(
     QString input_port_name = mapIter.key();
     QList<pqOutputPort*> &inputs = mapIter.value();
 
-    vtkSMProperty* prop = proxy->GetProperty(input_port_name.toAscii().data());
+    vtkSMProperty* prop = proxy->GetProperty(input_port_name.toLatin1().data());
     if (!prop)
       {
       qCritical() << "Failed to locate input property "<< input_port_name;
@@ -285,7 +285,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     {
     vtkSMStringVectorProperty* prop = 
       vtkSMStringVectorProperty::SafeDownCast(
-        proxy->GetProperty(pname.toAscii().data()));
+        proxy->GetProperty(pname.toLatin1().data()));
     if (!prop)
       {
       return 0;
@@ -422,7 +422,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
   proxy->UpdateVTKObjects();
 
   QString name = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
-  pxm->RegisterProxy("views", name.toAscii().data(), proxy);
+  pxm->RegisterProxy("views", name.toLatin1().data(), proxy);
   proxy->Delete();
 
   pqServerManagerModel* model = 
@@ -500,7 +500,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   if (representationType != "")
     {
     reprProxy = pxm->NewProxy(
-      "representations", representationType.toAscii().data());
+      "representations", representationType.toLatin1().data());
     }
   else
     {
@@ -524,7 +524,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   // (for undo/redo to work).
   QString name = QString("DataRepresentation%1").arg(
     this->NameGenerator->GetCountAndIncrement("DataRepresentation"));
-  pxm->RegisterProxy("representations", name.toAscii().data(), reprProxy);
+  pxm->RegisterProxy("representations", name.toLatin1().data(), reprProxy);
   reprProxy->Delete();
 
   vtkSMProxy* viewModuleProxy = view->getProxy();
@@ -776,7 +776,7 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
-    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
+    pxm->NewProxy(sm_group.toLatin1().data(), sm_name.toLatin1().data()));
 
   if (!proxy.GetPointer())
     {
@@ -797,8 +797,8 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     actual_regname = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
     }
 
-  pxm->RegisterProxy(reg_group.toAscii().data(), 
-    actual_regname.toAscii().data(), proxy);
+  pxm->RegisterProxy(reg_group.toLatin1().data(), 
+    actual_regname.toLatin1().data(), proxy);
 
 
   QMap<QString, QVariant>::const_iterator mapIter;
@@ -807,7 +807,7 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     QString propertyName = mapIter.key();
     QVariant propertyValue = mapIter.value();
 
-    vtkSMProperty *prop=proxy->GetProperty(propertyName.toAscii().data());
+    vtkSMProperty *prop=proxy->GetProperty(propertyName.toLatin1().data());
 
     if(prop)
       {
@@ -835,8 +835,8 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
   if (proxy)
     {
     vtkSMSessionProxyManager* pxm = proxy->proxyManager();
-    pxm->UnRegisterProxy(proxy->getSMGroup().toAscii().data(), 
-      proxy->getSMName().toAscii().data(), proxy->getProxy());
+    pxm->UnRegisterProxy(proxy->getSMGroup().toLatin1().data(), 
+      proxy->getSMName().toLatin1().data(), proxy->getProxy());
     }
 }
 
@@ -902,7 +902,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
   else if(server_resource.scheme() == "cs")
     {
     id = vtkSMSession::ConnectToRemote(
-      resource.host().toAscii().data(),
+      resource.host().toLatin1().data(),
       resource.port(11111));
     }
   else if(server_resource.scheme() == "csrc")
@@ -914,9 +914,9 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
   else if(server_resource.scheme() == "cdsrs")
     {
     id = vtkSMSession::ConnectToRemote(
-      server_resource.dataServerHost().toAscii().data(),
+      server_resource.dataServerHost().toLatin1().data(),
       server_resource.dataServerPort(11111),
-      server_resource.renderServerHost().toAscii().data(),
+      server_resource.renderServerHost().toLatin1().data(),
       server_resource.renderServerPort(22221));
     }
   else if(server_resource.scheme() == "cdsrsrc")

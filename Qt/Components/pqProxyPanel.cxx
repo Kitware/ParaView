@@ -289,7 +289,7 @@ bool pqProxyPanel::event(QEvent* e)
           {
           name = name.left(trimIndex);
           }
-        smProperty = this->Implementation->Proxy->GetProperty(name.toAscii().data());
+        smProperty = this->Implementation->Proxy->GetProperty(name.toLatin1().data());
         }
 
       if(smProperty)

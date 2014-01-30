@@ -183,7 +183,7 @@ public:
           if(idx != -1)
             {
             vtkSMProperty* prop =
-              pqproxy->getProxy()->GetProperty(key.toAscii().data());
+              pqproxy->getProxy()->GetProperty(key.toLatin1().data());
             QString n = pqproxy->getSMName();
             if (prop)
               {
@@ -692,7 +692,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     if (dialog.exec() == QDialog::Accepted)
       {
       vtkSMPropertyHelper(cue->getProxy(), "Script").Set(
-        ui.script->toPlainText().toAscii().data());
+        ui.script->toPlainText().toLatin1().data());
       cue->getProxy()->UpdateVTKObjects();
       }
     return;
@@ -974,7 +974,7 @@ void pqAnimationViewWidget::createTrack()
 
   // This will create the cue and initialize it with default keyframes.
   pqAnimationCue* cue = this->Internal->Scene->createCue(curProxy,
-    pname.toAscii().data(), pindex, ren? "CameraAnimationCue" :
+    pname.toLatin1().data(), pindex, ren? "CameraAnimationCue" :
     "KeyFrameAnimationCue");
 
   if (ren)

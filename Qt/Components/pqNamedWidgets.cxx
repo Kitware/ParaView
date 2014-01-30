@@ -140,7 +140,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy,
 void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
                          const QString& property, pqPropertyManager* property_manager)
 {
-  vtkSMProperty* SMProperty = proxy->GetProperty(property.toAscii().data());
+  vtkSMProperty* SMProperty = proxy->GetProperty(property.toLatin1().data());
 
   pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
 
@@ -450,7 +450,7 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
                            const QString& property, pqPropertyManager* property_manager)
 {
 
-  vtkSMProperty* SMProperty = proxy->GetProperty(property.toAscii().data());
+  vtkSMProperty* SMProperty = proxy->GetProperty(property.toLatin1().data());
   
   pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
 
@@ -1469,8 +1469,8 @@ void pqNamedWidgets::linkObject(QObject* o, const QString& property,
                        vtkSMProperty* smProperty, int index,
                        pqPropertyManager* pm)
 {
-  pm->registerLink(o, property.toAscii().data(), 
-    signal.toAscii().data(), proxy, smProperty, index);
+  pm->registerLink(o, property.toLatin1().data(), 
+    signal.toLatin1().data(), proxy, smProperty, index);
 
   // if the widget has min or max property, hook it up too
   if(o->metaObject()->indexOfProperty("minimum") != -1 ||
@@ -1499,7 +1499,7 @@ void pqNamedWidgets::unlinkObject(QObject* o, const QString& property,
     delete d0;
     }
   
-  pm->unregisterLink(o, property.toAscii().data(), 
-    signal.toAscii().data(), proxy, smProperty, index);
+  pm->unregisterLink(o, property.toLatin1().data(), 
+    signal.toLatin1().data(), proxy, smProperty, index);
 }
 

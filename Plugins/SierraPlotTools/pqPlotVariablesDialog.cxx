@@ -387,11 +387,11 @@ public:
   //-----------------------------------------------------------------------------
   bool isSeparator(QChar ch)
   {
-    if (ch.toAscii() == ',')
+    if (ch.toLatin1() == ',')
       {
       return true;
       }
-    if (ch.toAscii() == '-')
+    if (ch.toLatin1() == '-')
       {
       return true;
       }
@@ -403,12 +403,12 @@ public:
   bool separator(QChar ch, separators_enum & sepType)
   {
     sepType = e_unknownSep;
-    if (ch.toAscii() == ',')
+    if (ch.toLatin1() == ',')
       {
       sepType = e_commaSep;
       return true;
       }
-    if (ch.toAscii() == '-')
+    if (ch.toLatin1() == '-')
       {
       sepType = e_dashSep;
       return true;
@@ -529,7 +529,7 @@ public:
     // pass 2 - look for invalid characters
     for (int i = 0; i < retString.length(); i++)
       {
-      if ( ! this->util.validChar(retString[i].toAscii()))
+      if ( ! this->util.validChar(retString[i].toLatin1()))
         {
         errFlag = true;
         break;

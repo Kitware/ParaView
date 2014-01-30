@@ -129,7 +129,7 @@ pqScalarBarRepresentation* pqLookupTableManager::setScalarBarVisibility(
     if ( this->getLookupTableProperties( stc, arrayName, numComponents, component ) )
       {  
       int field = repr->getProxyScalarMode( );
-      QString compName = repr->getComponentName( arrayName.toAscii(), field, component );
+      QString compName = repr->getComponentName( arrayName.toLatin1(), field, component );
       sb->setTitle( arrayName, compName );
       }
     }

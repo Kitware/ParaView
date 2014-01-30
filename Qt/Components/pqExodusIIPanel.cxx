@@ -295,8 +295,8 @@ void pqExodusIIPanel::linkServerManagerProperties()
   foreach (const QString& pname, variablesProperties)
     {
     this->propertyManager()->registerLink(
-      this->UI->Variables, pname.toAscii().data(), SIGNAL(widgetModified()),
-      readerProxy, readerProxy->GetProperty(pname.toAscii().data()));
+      this->UI->Variables, pname.toLatin1().data(), SIGNAL(widgetModified()),
+      readerProxy, readerProxy->GetProperty(pname.toLatin1().data()));
     }
 
   // Find if there's any variable named "DIS*" in the PointVariables.
