@@ -203,7 +203,9 @@ void pqStandardViewFrameActionGroup::connectTitleBar(
     //actionPickObject->setObjectName("actionPickObject");
     //actionPickObject->setCheckable (true);
     //actionPickObject->setShortcut(QString("n"));
-    QAction* interactionModeAction = frame->addTitleBarAction("3D");
+    QAction* interactionModeAction = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqInteractionMode3D16.png"),
+      "Change Interaction Mode");
     interactionModeAction->setObjectName("ToggleInteractionMode");
     new pqToggleInteractionViewMode(interactionModeAction, view);
 
