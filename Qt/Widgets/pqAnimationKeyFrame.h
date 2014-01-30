@@ -63,7 +63,7 @@ class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
 #endif
 public:
 
-  pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s);
+  pqAnimationKeyFrame(pqAnimationTrack* p);
   ~pqAnimationKeyFrame();
 
   double normalizedStartTime() const;
