@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRUIConnection.h"
 #endif
 
-#include <QtGui/QKeyEvent>
-#include <QtGui/QMessageBox>
-#include <QtGui/QRegExpValidator>
+#include <QKeyEvent>
+#include <QMessageBox>
+#include <QRegExpValidator>
 
 #include <QtCore/QDebug>
 #include <QtCore/QPair>

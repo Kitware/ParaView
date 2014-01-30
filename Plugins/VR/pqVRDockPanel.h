@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqVRDockPanel_h
 #define __pqVRDockPanel_h
 
-#include <QtGui/QDockWidget>
+#include <QDockWidget>
 
 class pqView;
 class QListWidgetItem;
