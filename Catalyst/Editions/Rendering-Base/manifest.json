@@ -302,6 +302,7 @@
     { "name": "vtkFiltersSources",
       "path": "VTK/Filters/Sources",
       "include": [
+        { "class": "vtkFrustumSource" },
         { "class": "vtkOutlineSource" }
       ],
       "cswrap": true,
