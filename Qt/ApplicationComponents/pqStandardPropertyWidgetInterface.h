@@ -69,10 +69,12 @@ public:
   /// Supported types are:
   /// \li \c AnnotationsEditor : pqColorAnnotationsPropertyWidget
   /// \li \c ArrayStatus : pqArrayStatusPropertyWidget
+  /// \li \c BackgroundEditor : pqBackgroundPropertyWidget
   /// \li \c ColorEditor : pqColorEditorPropertyWidget
   /// \li \c ColorOpacityEditor : pqColorOpacityEditorWidget
   /// \li \c CubeAxes : pqCubeAxesPropertyWidget
   /// \li \c FontEditor : pqFontPropertyWidget
+  /// \li \c LightsEditor : pqLightsPropertyGroup
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
 

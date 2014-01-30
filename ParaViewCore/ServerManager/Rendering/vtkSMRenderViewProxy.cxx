@@ -1183,7 +1183,7 @@ void vtkSMRenderViewProxy::CaptureWindowInternalRender()
 {
   vtkPVRenderView* view =
     vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  if (view->GetUseInteractiveRenderingForSceenshots())
+  if (view->GetUseInteractiveRenderingForScreenshots())
     {
     this->InteractiveRender();
     }

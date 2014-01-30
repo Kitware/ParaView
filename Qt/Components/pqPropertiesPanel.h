@@ -144,6 +144,7 @@ protected:
   void updatePanel(pqOutputPort* port);
   void updatePropertiesPanel(pqPipelineSource* source);
   void updateDisplayPanel(pqDataRepresentation* repr);
+  void updateViewPanel (pqView* view);
 
 private:
   static bool AutoApply;

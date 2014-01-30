@@ -271,10 +271,10 @@ void pqRenderView::initializeWidgets()
 void pqRenderView::setDefaultPropertyValues()
 {
   vtkSMProxy* proxy = this->getProxy();
-  if (!pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
+  if (pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 0);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 1);
     }
   this->Superclass::setDefaultPropertyValues();
   this->clearUndoStack();
@@ -284,11 +284,11 @@ void pqRenderView::setDefaultPropertyValues()
 void pqRenderView::restoreDefaultLightSettings()
 {
   this->Superclass::restoreDefaultLightSettings();
-  if (!pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
+  if (pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
     {
     vtkSMProxy* proxy = this->getProxy();
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 0);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 1);
     proxy->UpdateVTKObjects();
     }
 }

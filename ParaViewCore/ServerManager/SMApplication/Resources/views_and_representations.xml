@@ -9,6 +9,7 @@
                             default_values="none"
                             name="ViewTime"
                             number_of_elements="1"
+                            panel_visibility="never"
                             state_ignored="1">
         <DoubleRangeDomain name="range" />
         <Documentation>The pipeline update time for this view. This gets passed
@@ -18,6 +19,7 @@
                             default_values="none"
                             name="CacheKey"
                             number_of_elements="1"
+                            panel_visibility="never"
                             state_ignored="1">
         <DoubleRangeDomain name="range" />
         <Documentation>This is the cache key used to indentify which cache
@@ -26,6 +28,7 @@
       <IntVectorProperty command="SetUseCache"
                          default_values="0"
                          name="UseCache"
+                         panel_visibility="never"
                          number_of_elements="1"
                          state_ignored="1">
         <BooleanDomain name="bool" />
@@ -35,6 +38,7 @@
       <IntVectorProperty command="SetPosition"
                          default_values="0 0"
                          name="ViewPosition"
+                         panel_visibility="never"
                          number_of_elements="2">
         <Documentation>Set the position on this view in the multiview
         configuration.</Documentation>
@@ -47,6 +51,7 @@
                          ignore_synchronization="1"
                          name="ViewSize"
                          number_of_elements="2"
+                         panel_visibility="never"
                          state_ignored="1">
         <Hints>
           <NoDefault />
@@ -73,6 +78,7 @@
                          default_values="0"
                          ignore_synchronization="1"
                          name="UseOffscreenRendering"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
@@ -80,14 +86,16 @@
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
                          default_values="0"
                          name="UseOffscreenRenderingForScreenshots"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set whether offscreen rendering should be used during
         CaptureWindow calls.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetUseInteractiveRenderingForSceenshots"
+      <IntVectorProperty command="SetUseInteractiveRenderingForScreenshots"
                          default_values="0"
-                         name="UseInteractiveRenderingForSceenshots"
+                         name="UseInteractiveRenderingForScreenshots"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set whether InteractiveRender() should be used during
@@ -97,6 +105,7 @@
                          default_values="0"
                          name="InteractionMode"
                          number_of_elements="1"
+                         panel_visibility="never"
                          state_ignored="1">
         <EnumerationDomain name="enum">
           <Entry text="3D"
@@ -110,6 +119,7 @@
       <IntVectorProperty command="SetStillRenderImageReductionFactor"
                          default_values="1"
                          name="StillRenderImageReductionFactor"
+                         panel_visibility="never"
                          number_of_elements="1">
         <IntRangeDomain max="20"
                         min="1"
@@ -123,6 +133,7 @@
       </IntVectorProperty>
       <DoubleVectorProperty default_values="100.0"
                             name="CollectGeometryThreshold"
+                            panel_visibility="never"
                             number_of_elements="1">
         <Documentation>DEPRECATED: Simply set UseOutlineForLODRendering flag to
         true, and whenever LOD rendering is employed, we rendering outlines, is
@@ -131,6 +142,7 @@
       <IntVectorProperty command="SetInteractiveRenderImageReductionFactor"
                          default_values="2"
                          name="ImageReductionFactor"
+                         panel_visibility="never"
                          number_of_elements="1">
         <IntRangeDomain max="20"
                         min="1"
@@ -144,6 +156,7 @@
                             default_values="20.0"
                             ignore_synchronization="1"
                             name="RemoteRenderThreshold"
+                            panel_visibility="never"
                             number_of_elements="1">
         <DoubleRangeDomain min="0"
                            name="range" />
@@ -154,6 +167,7 @@
       <DoubleVectorProperty command="SetLODRenderingThreshold"
                             default_values="5"
                             name="LODThreshold"
+                            panel_visibility="never"
                             number_of_elements="1">
         <Documentation>Set the memory size threshold above which LOD will be
         used while rendering interactively. The value is rendering-geometry
@@ -164,6 +178,7 @@
       <DoubleVectorProperty command="SetLODResolution"
                             default_values="0.5"
                             name="LODResolution"
+                            panel_visibility="never"
                             number_of_elements="1">
         <DoubleRangeDomain max="1.0"
                            min="0"
@@ -174,6 +189,7 @@
       <IntVectorProperty command="SetUseOutlineForLODRendering"
                          default_values="0"
                          name="UseOutlineForLODRendering"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>When set to true, this overrides the LODResolution. In
@@ -183,26 +199,14 @@
       <StringVectorProperty command="ConfigureCompressor"
                             default_values="vtkSquirtCompressor 0 3"
                             name="CompressorConfig"
+                            panel_visibility="never"
                             number_of_elements="1">
         <Documentation>Used to configure the image compression used for
         client-server image transfer when doing interactive
         renders.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetUseLightKit"
-                         default_values="0"
-                         name="UseLight"
-                         number_of_elements="1">
-        <Documentation>Enable/Disable the LightKit.</Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetLightSwitch"
-                         default_values="1"
-                         name="LightSwitch"
-                         number_of_elements="1">
-        <Documentation>Turn on/off the default light in the 3D
-        renderer.</Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
+
+      <!-- Center and Orientation Axes -->
       <IntVectorProperty command="SetCenterAxesVisibility"
                          default_values="1"
                          name="CenterAxesVisibility"
@@ -211,35 +215,47 @@
         <Documentation>Toggle the visibility of the axes showing the center of
         rotation in the scene.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetOrientationAxesInteractivity"
-                         default_values="0"
-                         name="OrientationAxesInteractivity"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <IntVectorProperty command="SetOrientationAxesVisibility"
                          default_values="1"
                          name="OrientationAxesVisibility"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>Toggle the visibility of the axes showing the
+        viewing direction.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOrientationAxesInteractivity"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="OrientationAxesInteractivity"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Allows repositioning of the orientation
+        axes.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetOrientationAxesLabelColor"
                             default_values="1 1 1"
                             name="OrientationAxesLabelColor"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced"
                             number_of_elements="3"></DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientationAxesOutlineColor"
                             default_values="1 1 1"
                             name="OrientationAxesOutlineColor"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced"
                             number_of_elements="3"></DoubleVectorProperty>
+
       <DoubleVectorProperty command="SetCenterOfRotation"
                             default_values="0 0 0"
                             name="CenterOfRotation"
+                            panel_visibility="never"
                             number_of_elements="3">
         <Documentation>Center of rotation for the interactor.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetNonInteractiveRenderDelay"
                          default_values="0"
                          name="NonInteractiveRenderDelay"
+                         panel_visibility="never"
                          number_of_elements="1">
         <Documentation>Set the delay (in seconds) after an interactive render
         before switching to a full-rese render.</Documentation>
@@ -270,6 +286,14 @@
           <Group name="cameramanipulators" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <IntVectorProperty command="SetUseLightKit"
+                         default_values="1"
+                         name="UseLight"
+                         number_of_elements="1">
+        <Documentation>Enable/Disable the LightKit.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- Key Light -->
       <DoubleVectorProperty command="SetKeyLightWarmth"
                             default_values="0.60"
@@ -284,7 +308,7 @@
                             default_values="0.75"
                             name="KeyLightIntensity"
                             number_of_elements="1">
-        <DoubleRangeDomain max="2"
+        <DoubleRangeDomain max="1"
                            min="0"
                            name="range"
                            resolution="0.05" />
@@ -407,59 +431,19 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty command="SetUseDepthPeeling"
-                         default_values="1"
-                         name="DepthPeeling"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMaximumNumberOfPeels"
-                         default_values="4"
-                         name="MaximumNumberOfPeels"
-                         number_of_elements="1">
-        <Documentation>In case of depth peeling, define the maximum number of
-        peeling layers. Initial value is 4. A special value of 0 means no
-        maximum limit. It has to be a positive value.</Documentation>
-        <IntRangeDomain min="0"
-                        name="range" />
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetBackground"
-                            default_values="0 0 0"
-                            name="Background"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetBackground2"
-                            default_values="0 0 0.165"
-                            name="Background2"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <ProxyProperty command="SetBackgroundTexture"
-                     name="BackgroundTexture">
-        <ProxyGroupDomain name="groups">
-          <Group name="textures" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <IntVectorProperty command="SetGradientBackground"
+
+      <IntVectorProperty command="SetLightSwitch"
                          default_values="0"
-                         name="UseGradientBackground"
+                         name="LightSwitch"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetTexturedBackground"
-                         default_values="0"
-                         name="UseTexturedBackground"
-                         number_of_elements="1">
+        <Documentation>Turn on/off the default light in the 3D
+        renderer.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty command="SetAmbientColor"
                             default_values="1.0 1.0 1.0"
                             name="LightAmbientColor"
+                            panel_widget="color_selector"
                             number_of_elements="3">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
@@ -468,6 +452,7 @@
       <DoubleVectorProperty command="SetSpecularColor"
                             default_values="1.0 1.0 1.0"
                             name="LightSpecularColor"
+                            panel_widget="color_selector"
                             number_of_elements="3">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
@@ -476,6 +461,7 @@
       <DoubleVectorProperty command="SetDiffuseColor"
                             default_values="1.0 1.0 1.0"
                             name="LightDiffuseColor"
+                            panel_widget="color_selector"
                             number_of_elements="3">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
@@ -502,21 +488,44 @@
                  value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseDepthPeeling"
+                         default_values="1"
+                         name="DepthPeeling"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfPeels"
+                         default_values="4"
+                         name="MaximumNumberOfPeels"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <Documentation>In case of depth peeling, define the maximum number of
+        peeling layers. Initial value is 4. A special value of 0 means no
+        maximum limit. It has to be a positive value.</Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetStereoCapableWindow"
                          default_values="none"
                          name="StereoCapableWindow"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoRender"
                          default_values="none"
                          name="StereoRender"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
                          default_values="none"
                          name="StereoType"
+                         panel_visibility="never"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Crystal Eyes"
@@ -543,16 +552,19 @@
       <IntVectorProperty command="SetMultiSamples"
                          default_values="0"
                          name="MultiSamples"
+                         panel_visibility="never"
                          number_of_elements="1"></IntVectorProperty>
       <IntVectorProperty command="SetAlphaBitPlanes"
                          default_values="1"
                          name="AlphaBitPlanes"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStencilCapable"
                          default_values="1"
                          name="StencilCapable"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -575,29 +587,112 @@
         it recorded by undo-redo.</Documentation>
       </ProxyProperty>
       <Property command="ResetCamera"
+                panel_visibility="never"
                 name="ResetCamera" />
       <SubProxy>
         <Proxy name="ActiveCamera"
                proxygroup="camera"
                proxyname="Camera"></Proxy>
         <ExposedProperties>
-          <Property name="CameraPositionInfo" />
-          <Property name="CameraPosition" />
-          <Property name="CameraFocalPointInfo" />
-          <Property name="CameraFocalPoint" />
-          <Property name="CameraViewUpInfo" />
-          <Property name="CameraViewUp" />
-          <Property name="CameraViewAngle" />
-          <Property name="CameraClippingRangeInfo" />
-          <Property name="CameraClippingRange" />
-          <Property name="CameraParallelScale" />
-          <Property name="CameraParallelScaleInfo" />
-          <Property name="CameraParallelProjection" />
-          <Property name="EyeAngle" />
+          <Property name="CameraPositionInfo" panel_visibility="never"/>
+          <Property name="CameraPosition" panel_visibility="never"/>
+          <Property name="CameraFocalPointInfo" panel_visibility="never"/>
+          <Property name="CameraFocalPoint" panel_visibility="never"/>
+          <Property name="CameraViewUpInfo" panel_visibility="never"/>
+          <Property name="CameraViewUp" panel_visibility="never"/>
+          <Property name="CameraViewAngle" panel_visibility="never"/>
+          <Property name="CameraClippingRangeInfo" panel_visibility="never"/>
+          <Property name="CameraClippingRange" panel_visibility="never"/>
+          <Property name="CameraParallelScale" panel_visibility="never"/>
+          <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
+          <Property name="CameraParallelProjection"
+                    panel_visibility="advanced"/>
+          <Property name="EyeAngle" panel_visibility="never"/>
           <Property name="EyeTransformMatrix" />
           <Property name="ModelTransformMatrix" />
         </ExposedProperties>
       </SubProxy>
+      <DoubleVectorProperty command="SetBackground"
+                            default_values="0.329 0.349 0.427"
+                            name="Background"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBackground2"
+                            default_values="0 0 0.165"
+                            name="Background2"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGradientBackground"
+                         default_values="0"
+                         name="UseGradientBackground"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTexturedBackground"
+                         default_values="0"
+                         name="UseTexturedBackground"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <ProxyProperty command="SetBackgroundTexture"
+                     name="BackgroundTexture" panel_widget="texture_selector">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <PropertyGroup label="Orientation Axes">
+        <Property name="OrientationAxesVisibility"/>
+        <Property name="OrientationAxesInteractivity"/>
+        <Property name="OrientationAxesLabelColor"/>
+        <Property name="OrientationAxesOutlineColor"/>
+      </PropertyGroup>
+      <PropertyGroup label="Lights" panel_widget="LightsEditor"
+                     panel_visibility="advanced">
+        <!-- Light Kit -->
+        <Property name="UseLight"/>
+        <!-- Key Light -->
+        <Property name="KeyLightWarmth"/>
+        <Property name="KeyLightIntensity"/>
+        <Property name="KeyLightElevation"/>
+        <Property name="KeyLightAzimuth"/>
+        <!-- Fill Light -->
+        <Property name="FillLightWarmth"/>
+        <Property name="FillLightK:F Ratio"/>
+        <Property name="FillLightElevation"/>
+        <Property name="FillLightAzimuth"/>
+        <!-- Back Light -->
+        <Property name="BackLightWarmth"/>
+        <Property name="BackLightK:B Ratio"/>
+        <Property name="BackLightElevation"/>
+        <Property name="BackLightAzimuth"/>
+        <!-- Head Light -->
+        <Property name="HeadLightWarmth"/>
+        <Property name="HeadLightK:H Ratio"/>
+        <Property name="MaintainLuminance"/>
+
+        <!-- Light -->
+        <Property name="LightSwitch"/>
+        <Property name="LightAmbientColor"/>
+        <Property name="LightSpecularColor"/>
+        <Property name="LightDiffuseColor"/>
+        <Property name="LightIntensity"/>
+        <Property name="LightType"/>
+      </PropertyGroup>
+      <PropertyGroup label="Background" panel_widget="BackgroundEditor">
+        <Property name="Background"/>
+        <Property name="Background2"/>
+        <Property name="UseGradientBackground"/>
+        <Property name="UseTexturedBackground"/>
+        <Property name="BackgroundTexture"/>
+      </PropertyGroup>
     </RenderViewProxy>
     <!-- ================================================================== -->
     <RenderViewProxy base_proxygroup="views"
@@ -4711,6 +4806,7 @@
                             default_values="none"
                             name="ViewTime"
                             number_of_elements="1"
+                            panel_visibility="never"
                             state_ignored="1">
         <DoubleRangeDomain name="range" />
         <Documentation>The pipeline update time for this view. This gets passed
@@ -4719,6 +4815,7 @@
       <DoubleVectorProperty default_values="none"
                             name="CacheKey"
                             number_of_elements="1"
+                            panel_visibility="never"
                             state_ignored="1">
         <DoubleRangeDomain name="range" />
         <Documentation>This is the cache key used to indentify which cache
@@ -4727,6 +4824,7 @@
       <IntVectorProperty default_values="0"
                          name="UseCache"
                          number_of_elements="1"
+                         panel_visibility="never"
                          state_ignored="1">
         <BooleanDomain name="bool" />
         <Documentation>Indicates whether to use cache for subsequent
@@ -4735,6 +4833,7 @@
       <IntVectorProperty command="SetViewPosition"
                          default_values="0 0"
                          name="ViewPosition"
+                         panel_visibility="never"
                          number_of_elements="2">
         <Hints>
           <NoDefault />
@@ -4747,6 +4846,7 @@
                          ignore_synchronization="1"
                          name="ViewSize"
                          number_of_elements="2"
+                         panel_visibility="never"
                          state_ignored="1">
         <Hints>
           <NoDefault />
@@ -4757,6 +4857,7 @@
       <IntVectorProperty command="Build"
                          default_values="2 2"
                          name="Dimensions"
+                         panel_visibility="never"
                          number_of_elements="2">
         <IntRangeDomain max="10 10"
                         min="1 1"
@@ -4765,12 +4866,14 @@
       <IntVectorProperty command="SetOverlayAllComparisons"
                          default_values="0"
                          name="OverlayAllComparisons"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetSpacing"
                          default_values="1 1"
                          name="Spacing"
+                         panel_visibility="never"
                          number_of_elements="2">
         <IntRangeDomain max="10 10"
                         min="0 0"
@@ -4808,63 +4911,82 @@
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
           <Property name="ResetCamera" />
-          <Property name="UseLight" />
-          <!-- Light -->
-          <Property name="LightAmbientColor" />
-          <Property name="LightDiffuseColor" />
-          <Property name="LightSpecularColor" />
-          <Property name="LightIntensity" />
-          <Property name="LightSwitch" />
-          <!-- LightKit -->
-          <Property name="KeyLightWarmth" />
-          <Property name="KeyLightIntensity" />
-          <Property name="KeyLightElevation" />
-          <Property name="KeyLightAzimuth" />
-          <Property name="FillLightWarmth" />
-          <Property name="FillLightK:F Ratio" />
-          <Property name="FillLightElevation" />
-          <Property name="FillLightAzimuth" />
-          <Property name="BackLightWarmth" />
-          <Property name="BackLightK:B Ratio" />
-          <Property name="BackLightElevation" />
-          <Property name="BackLightAzimuth" />
-          <Property name="HeadLightWarmth" />
-          <Property name="HeadLightK:H Ratio" />
-          <Property name="MaintainLuminance" />
-          <!-- ActiveCamera -->
-          <Property name="CameraPositionInfo" />
-          <Property name="CameraPosition" />
-          <Property name="CameraFocalPointInfo" />
-          <Property name="CameraFocalPoint" />
-          <Property name="CameraViewUpInfo" />
-          <Property name="CameraViewUp" />
-          <Property name="CameraViewAngle" />
-          <Property name="CameraClippingRangeInfo" />
-          <Property name="CameraClippingRange" />
-          <Property name="CameraParallelScale" />
-          <Property name="CameraParallelScaleInfo" />
-          <Property name="CameraParallelProjection" />
-          <Property name="EyeAngle" />
-          <!-- Interactor -->
-          <Property name="InteractionMode" />
-          <Property name="Camera3DManipulators" />
-          <Property name="Camera2DManipulators" />
-          <Property name="CenterOfRotation" />
-          <!-- Annotations -->
+
           <Property name="CenterAxesVisibility" />
-          <Property name="OrientationAxesInteractivity" />
-          <Property name="OrientationAxesVisibility" />
-          <Property name="OrientationAxesLabelColor" />
-          <Property name="OrientationAxesOutlineColor" />
+          <PropertyGroup label="Orientation Axes">
+            <Property name="OrientationAxesVisibility" />
+            <Property name="OrientationAxesInteractivity"
+                      panel_visibility="advanced"/>
+            <Property name="OrientationAxesLabelColor"
+                      panel_visibility="advanced"/>
+            <Property name="OrientationAxesOutlineColor"
+                      panel_visibility="advanced"/>
+          </PropertyGroup>
+          <PropertyGroup label="Lights" panel_widget="LightsEditor"
+                         panel_visibility="advanced">
+            <!-- Light Kit -->
+            <Property name="UseLight"/>
+            <!-- Key Light -->
+            <Property name="KeyLightWarmth"/>
+            <Property name="KeyLightIntensity"/>
+            <Property name="KeyLightElevation"/>
+            <Property name="KeyLightAzimuth"/>
+            <!-- Fill Light -->
+            <Property name="FillLightWarmth"/>
+            <Property name="FillLightK:F Ratio"/>
+            <Property name="FillLightElevation"/>
+            <Property name="FillLightAzimuth"/>
+            <!-- Back Light -->
+            <Property name="BackLightWarmth"/>
+            <Property name="BackLightK:B Ratio"/>
+            <Property name="BackLightElevation"/>
+            <Property name="BackLightAzimuth"/>
+            <!-- Head Light -->
+            <Property name="HeadLightWarmth"/>
+            <Property name="HeadLightK:H Ratio"/>
+            <Property name="MaintainLuminance"/>
+
+            <!-- Light -->
+            <Property name="LightSwitch"/>
+            <Property name="LightAmbientColor"/>
+            <Property name="LightSpecularColor"/>
+            <Property name="LightDiffuseColor"/>
+            <Property name="LightIntensity"/>
+            <Property name="LightType"/>
+          </PropertyGroup>
+
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" panel_visibility="never"/>
+          <Property name="CameraPosition" panel_visibility="never"/>
+          <Property name="CameraFocalPointInfo" panel_visibility="never"/>
+          <Property name="CameraFocalPoint" panel_visibility="never"/>
+          <Property name="CameraViewUpInfo" panel_visibility="never"/>
+          <Property name="CameraViewUp" panel_visibility="never"/>
+          <Property name="CameraViewAngle" panel_visibility="never"/>
+          <Property name="CameraClippingRangeInfo" panel_visibility="never"/>
+          <Property name="CameraClippingRange" panel_visibility="never"/>
+          <Property name="CameraParallelScale" panel_visibility="never"/>
+          <Property name="CameraParallelScaleInfo" panel_visibility="never"/>
+          <Property name="CameraParallelProjection"
+                    panel_visibility="advanced"/>
+          <Property name="EyeAngle" panel_visibility="never"/>
+
+          <PropertyGroup label="Background" panel_widget="BackgroundEditor">
+            <Property name="Background"/>
+            <Property name="Background2"/>
+            <Property name="UseGradientBackground"/>
+            <Property name="UseTexturedBackground"/>
+            <Property name="BackgroundTexture"/>
+          </PropertyGroup>
+
+          <!-- Interactor -->
+          <Property name="InteractionMode" panel_visibility="never"/>
+          <Property name="Camera3DManipulators" panel_visibility="never"/>
+          <Property name="Camera2DManipulators" panel_visibility="never"/>
+          <Property name="CenterOfRotation" panel_visibility="never"/>
           <!-- Renderer -->
-          <Property name="Background" />
-          <Property name="Background2" />
-          <Property name="BackgroundTexture" />
-          <Property name="UseGradientBackground" />
-          <Property name="UseTexturedBackground" />
-          <Property name="StereoRender" />
-          <Property name="StereoType" />
-          <!-- RenderWindow -->
+          <Property name="StereoRender" panel_visibility="never"/>
+          <Property name="StereoType" panel_visibility="never"/>
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -4951,25 +5073,28 @@
     </ComparativeViewProxy>
      <!-- ================================================================== -->
      <MultiSliceViewProxy name="MultiSlice" class="vtkPVMultiSliceView"
-        processes="client|renderserver|dataserver"
-        base_proxygroup="views" base_proxyname="RenderView"
-        representation_name="CompositeMultiSliceRepresentation">
+         processes="client|renderserver|dataserver"
+         base_proxygroup="views" base_proxyname="RenderView"
+         representation_name="CompositeMultiSliceRepresentation">
 
         <DoubleVectorProperty name="XSlicesValues"
                               command="SetSliceX"
                               repeat_command="1"
                               set_number_command="SetNumberOfSliceX"
                               number_of_elements_per_command="1"
+                              panel_visibility="never"
                               use_index="1"/>
 
         <DoubleVectorProperty name="XSlicesNormal"
                               command="SetSliceXNormal"
                               number_of_elements="3"
+                              panel_visibility="never"
                               default_values="1 0 0"/>
 
         <DoubleVectorProperty name="XSlicesOrigin"
                               command="SetSliceXOrigin"
                               number_of_elements="3"
+                              panel_visibility="never"
                               default_values="0 0 0"/>
 
         <DoubleVectorProperty name="YSlicesValues"
@@ -4977,16 +5102,19 @@
                               repeat_command="1"
                               set_number_command="SetNumberOfSliceY"
                               number_of_elements_per_command="1"
+                              panel_visibility="never"
                               use_index="1"/>
 
         <DoubleVectorProperty name="YSlicesNormal"
                               command="SetSliceYNormal"
                               number_of_elements="3"
+                              panel_visibility="never"
                               default_values="0 1 0"/>
 
         <DoubleVectorProperty name="YSlicesOrigin"
                               command="SetSliceYOrigin"
                               number_of_elements="3"
+                              panel_visibility="never"
                               default_values="0 0 0"/>
 
         <DoubleVectorProperty name="ZSlicesValues"
@@ -4994,31 +5122,35 @@
                               repeat_command="1"
                               set_number_command="SetNumberOfSliceZ"
                               number_of_elements_per_command="1"
+                              panel_visibility="never"
                               use_index="1"/>
 
         <DoubleVectorProperty name="ZSlicesNormal"
                               command="SetSliceZNormal"
                               number_of_elements="3"
+                              panel_visibility="never"
                               default_values="0 0 1"/>
 
         <DoubleVectorProperty name="ZSlicesOrigin"
                               command="SetSliceZOrigin"
                               number_of_elements="3"
+                              panel_visibility="never"
                               default_values="0 0 0"/>
 
          <IntVectorProperty command="SetShowOutline"
                             default_values="1"
                             name="ShowOutline"
                             number_of_elements="1">
+           <BooleanDomain name="bool" />
          </IntVectorProperty>
 
      </MultiSliceViewProxy>
      <!-- ================================================================== -->
      <PythonViewProxy name="PythonView" class="vtkPythonView"
-        processes="client|dataserver|renderserver"
-	base_proxygroup="views"
-	base_proxyname="ViewBase"
-	representation_name="PythonRepresentation">
+                      processes="client|dataserver|renderserver"
+                      base_proxygroup="views"
+                      base_proxyname="ViewBase"
+                      representation_name="PythonRepresentation">
        <StringVectorProperty command="SetScript"
 			     name="Script"
 			     number_of_elements="1"

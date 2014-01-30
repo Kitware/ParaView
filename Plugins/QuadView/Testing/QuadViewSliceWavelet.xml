@@ -25,13 +25,17 @@
   <!-- Change view orientation for screen capture -->
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
 
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="setCurrent" arguments="3.0" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqQuadViewOptions/Origin/X" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqQuadViewOptions/Origin/Y" command="set_string" arguments="2" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqQuadViewOptions/Origin/Z" command="set_string" arguments="3" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,9,20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,0,205" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,0,205" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/SlicesCenter/LineEdit0" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/SlicesCenter/LineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/SlicesCenter/LineEdit1" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/SlicesCenter/LineEdit1" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/SlicesCenter/LineEdit2" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/SlicesCenter/LineEdit2" command="set_string" arguments="3" />
 
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 

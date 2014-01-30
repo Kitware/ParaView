@@ -31,11 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqViewSettingsManager.h"
 
-#include "pqActiveMultiSliceViewOptions.h"
 #include "pqActiveObjects.h"
 #include "pqActivePlotMatrixViewOptions.h"
 #include "pqActivePythonViewOptions.h"
-#include "pqActiveRenderViewOptions.h"
 #include "pqActiveXYChartOptions.h"
 #include "pqApplicationCore.h"
 #include "pqComparativeRenderView.h"
@@ -57,12 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   : Superclass(parentObject)
 {
-  pqActiveRenderViewOptions* renderViewOptions = new
-    pqActiveRenderViewOptions(this);
-  this->registerOptions(pqRenderView::renderViewType(), renderViewOptions);
-  this->registerOptions(pqComparativeRenderView::comparativeRenderViewType(),
-    renderViewOptions);
-
   pqActiveXYChartOptions *xyChartOptions = new pqActiveXYChartOptions(this);
   pqActiveXYChartOptions *xyBarChartOptions = new pqActiveXYChartOptions(this);
   this->registerOptions(pqXYChartView::XYChartViewType(), xyChartOptions);
@@ -75,10 +67,6 @@ pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   // register for plot matrix views.
   pqActivePlotMatrixViewOptions *plotMatrixOptions = new pqActivePlotMatrixViewOptions(this);
   this->registerOptions(pqPlotMatrixView::viewType(), plotMatrixOptions);
-
-  // register for multislice view
-  pqActiveMultiSliceViewOptions *multiSliceOptions = new pqActiveMultiSliceViewOptions(this);
-  this->registerOptions(pqMultiSliceView::multiSliceViewType(), multiSliceOptions);
 
 #if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
   // register for python view

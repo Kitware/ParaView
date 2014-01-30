@@ -1410,8 +1410,12 @@ vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
       }
     else
       {
-      group->AddProperty(
-        elem->GetAttribute("function"), property);
+      const char* functionAttribute = elem->GetAttribute("function");
+      if (functionAttribute == 0)
+        {
+        functionAttribute = elem->GetAttribute("name");
+        }
+      group->AddProperty(functionAttribute, property);
       }
     }
 
@@ -1560,9 +1564,14 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
                            << (pname?pname:"(none"));
             return 0;
             }
+          // Here, we turn on DoNotModifyProperty to ensure that we don't mark
+          // the properties modified as we are processing them e.g. setting
+          // panel-visibilities, etc.
+          subproxy->DoNotModifyProperty = 1;
           this->AddSubProxy(name, subproxy, override);
           this->SetupSharedProperties(subproxy, propElement);
           this->SetupExposedProperties(name, propElement);
+          subproxy->DoNotModifyProperty = 0;
           subproxy->Delete();
           }
         }
@@ -2090,9 +2099,8 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
        (subProxy->GlobalID != subProxyMsg->global_id() ||
        !this->Session->GetRemoteObject(subProxyMsg->global_id())))
       {
-      vtkErrorMacro("Invalid Proxy for message"
-                    << "Parent Proxy - Group: " << this->XMLGroup
-                    << " - Name: " << this->XMLName << endl
+      vtkErrorMacro("Invalid Proxy for message " << endl
+                    << "Parent Proxy : (" << this->XMLGroup << "," << this->XMLName << ")" << endl
                     << "SubProxy - XMLName: " << subProxy->GetXMLName()
                     << " - SubProxyName: " << subProxyMsg->name().c_str()
                     << " - Id: " << subProxy->GlobalID << endl

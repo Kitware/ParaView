@@ -17,12 +17,6 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
   QT4_WRAP_CPP(MOC_SRCS
     pqQuadView.h
-    pqQuadViewOptions.h
-    pqActiveQuadViewOptions.h
-  )
-
-  QT4_WRAP_UI(UI_SRCS
-    pqQuadViewOptions.ui
   )
 
   add_paraview_view_module(
@@ -31,12 +25,6 @@ IF(PARAVIEW_BUILD_QT_GUI)
     VIEW_NAME "Quad View"
     VIEW_XML_GROUP "views"
     VIEW_XML_NAME "QuadView")
-
-  ADD_PARAVIEW_VIEW_OPTIONS(
-    VIEW1_OPTIONS_IFACE VIEW1_OPTIONS_IFACE_SRCS
-    VIEW_TYPE pqQuadView
-    ACTIVE_VIEW_OPTIONS pqActiveQuadViewOptions
-  )
 
   ADD_PARAVIEW_PLUGIN(QuadView "1.0"
 
@@ -58,11 +46,8 @@ IF(PARAVIEW_BUILD_QT_GUI)
       ${UI_SRCS}
       ${VIEW1_IFACE_SRCS}
       ${VIEW1_OPTIONS_IFACE_SRCS}
-      pqActiveQuadViewOptions.cxx
 
       pqQuadView.cxx
-      pqQuadViewOptions.cxx
-      pqActiveQuadViewOptions.cxx
   )
 
 ENDIF(PARAVIEW_BUILD_QT_GUI)

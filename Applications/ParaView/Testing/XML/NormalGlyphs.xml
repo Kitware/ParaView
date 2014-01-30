@@ -2,13 +2,7 @@
 <pqevents>
   <!-- Turn off orientation axis annotation -->
   <pqevent object="pqClientMainWindow/axesToolbar/1QToolButton0" command="set_boolean" arguments="false" />
-
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,23,4,/2:0" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,23,4,/2:0" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mousePress" arguments="1,1,0,32,7" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mouseRelease" arguments="1,0,0,32,7" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/CenterAxesVisibility/CheckBox" command="set_boolean" arguments="false" />
 
   <!-- Create a simple multiblock source -->
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="CubeSource" />
