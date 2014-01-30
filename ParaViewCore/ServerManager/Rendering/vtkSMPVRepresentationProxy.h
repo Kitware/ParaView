@@ -117,7 +117,7 @@ public:
     {
     vtkSMPVRepresentationProxy* self =
       vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self? self->RescaleTransferFunctionToDataRange() : false;
+    return self? self->RescaleTransferFunctionToDataRangeOverTime() : false;
     }
 
   // Description:
@@ -129,7 +129,7 @@ public:
     vtkSMPVRepresentationProxy* self =
       vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self?
-      self->RescaleTransferFunctionToDataRange(arrayname, attribute_type) : false;
+      self->RescaleTransferFunctionToDataRangeOverTime(arrayname, attribute_type) : false;
     }
 
 protected:
