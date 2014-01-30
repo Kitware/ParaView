@@ -167,6 +167,9 @@ public:
   virtual void SetYLabelFormat(const char* format);
   virtual void SetZLabelFormat(const char* format);
 
+  virtual void SetStickyAxes(int val);
+
+  virtual void SetCenterStickyAxes(int val);
 //BTX
 protected:
   vtkCubeAxesRepresentation();

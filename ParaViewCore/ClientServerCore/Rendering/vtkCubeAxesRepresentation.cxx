@@ -511,6 +511,18 @@ void vtkCubeAxesRepresentation::SetZLabelFormat(const char* format)
 }
 
 //----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetStickyAxes(int val)
+{
+  this->CubeAxesActor->SetStickyAxes(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetCenterStickyAxes(int val)
+{
+  this->CubeAxesActor->SetCenterStickyAxes(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
 {
 
