@@ -1,6 +1,6 @@
 #!/bin/sh
 
-usage="$0 <srcdir> <builddir> [--install] [--no-configure] [--no-build] [--no-test] [--remove-dirs] --input <edition> [--input <edition>]... [<cmake arguments>...]"
+usage="$0 <srcdir> <builddir> [--install] [--no-configure] [--no-build] [--no-test] [--remove-dirs] --input <edition> [--input <edition>]... [--] [<cmake arguments>...]"
 
 # A handy function for handling errors.
 die () {
@@ -61,6 +61,9 @@ while [ "$#" -gt 0 ]; do
         ;;
     --install)
         install=y
+        ;;
+    --)
+        break
         ;;
     *)
         break
