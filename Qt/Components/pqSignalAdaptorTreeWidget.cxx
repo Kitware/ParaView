@@ -206,7 +206,11 @@ void pqSignalAdaptorTreeWidget::updateSortingLinks()
     QObject::connect(this->TreeWidget->header(),
       SIGNAL(sectionClicked(int)), 
       this, SLOT(sort(int)));
+#if QT_VERSION >= 0x050000
+    this->TreeWidget->header()->setSectionsClickable(true);
+#else
     this->TreeWidget->header()->setClickable(true);
+#endif
     }
   else
     {

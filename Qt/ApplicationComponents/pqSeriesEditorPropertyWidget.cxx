@@ -570,12 +570,21 @@ public:
     proxyModel->setDynamicSortFilter(true);
 
     // this needs to be done after the columns exist.
+#if QT_VERSION >= 0x050000
+    this->Ui.SeriesTable->header()->setSectionResizeMode(
+      pqSeriesParametersModel::VISIBILITY, QHeaderView::Stretch);
+    this->Ui.SeriesTable->header()->setSectionResizeMode(
+      pqSeriesParametersModel::COLOR, QHeaderView::ResizeToContents);
+    this->Ui.SeriesTable->header()->setSectionResizeMode(
+      pqSeriesParametersModel::LABEL, QHeaderView::Stretch);
+#else
     this->Ui.SeriesTable->header()->setResizeMode(
       pqSeriesParametersModel::VISIBILITY, QHeaderView::Stretch);
     this->Ui.SeriesTable->header()->setResizeMode(
       pqSeriesParametersModel::COLOR, QHeaderView::ResizeToContents);
     this->Ui.SeriesTable->header()->setResizeMode(
       pqSeriesParametersModel::LABEL, QHeaderView::Stretch);
+#endif
     }
 
   //---------------------------------------------------------------------------

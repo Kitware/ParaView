@@ -290,7 +290,11 @@ void pqPassArraysPanel::updateArrayList()
   this->SelectorWidget->reset();
   this->SelectorWidget->setHeaderLabel("Arrays");
   this->SelectorWidget->setColumnCount(1);
+#if QT_VERSION >= 0x050000
+  this->SelectorWidget->header()->setSectionsClickable(true);
+#else
   this->SelectorWidget->header()->setClickable(true);
+#endif
   QObject::connect(this->SelectorWidget->header(), SIGNAL(sectionClicked(int)),
                    this, SLOT(doToggle(int)), Qt::QueuedConnection);
 

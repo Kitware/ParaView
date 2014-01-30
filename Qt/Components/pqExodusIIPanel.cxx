@@ -147,7 +147,11 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   filterProxyModel->setSourceModel(proxyModel);
 
   this->UI->Blocks->setModel(filterProxyModel);
+#if QT_VERSION >= 0x050000
+  this->UI->Blocks->header()->setSectionsClickable(true);
+#else
   this->UI->Blocks->header()->setClickable(true);
+#endif
   this->UI->Blocks->header()->setSortIndicator(0, Qt::AscendingOrder);
   this->UI->Blocks->header()->setSortIndicatorShown(true);
   this->UI->Blocks->setSortingEnabled(true);
@@ -159,7 +163,11 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   proxyModel = new pqProxySILModel("Assemblies", &this->UI->SILModel);
   proxyModel->setSourceModel(&this->UI->SILModel);
   this->UI->Assemblies->setModel(proxyModel);
+#if QT_VERSION >= 0x050000
+  this->UI->Assemblies->header()->setSectionsClickable(true);
+#else
   this->UI->Assemblies->header()->setClickable(true);
+#endif
   QObject::connect(this->UI->Assemblies->header(), SIGNAL(sectionClicked(int)),
     proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
 
@@ -172,7 +180,11 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   filterProxyModel->setSourceModel(proxyModel);
 
   this->UI->Materials->setModel(filterProxyModel);
+#if QT_VERSION >= 0x050000
+  this->UI->Materials->header()->setSectionsClickable(true);
+#else
   this->UI->Materials->header()->setClickable(true);
+#endif
   this->UI->Materials->header()->setSortIndicator(0, Qt::AscendingOrder);
   this->UI->Materials->header()->setSortIndicatorShown(true);
   this->UI->Materials->setSortingEnabled(true);

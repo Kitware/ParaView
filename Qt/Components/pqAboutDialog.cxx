@@ -152,7 +152,11 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "Disable Registry", opts->GetDisableRegistry()? "On" : "Off");
   ::addItem(tree, "Test Directory", opts->GetTestDirectory());
   ::addItem(tree, "Data Directory", opts->GetDataDirectory());
+#if QT_VERSION >= 0x050000
+  tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#else
   tree->header()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +168,11 @@ void pqAboutDialog::AddServerInformation()
   if (servers.size() > 0)
     {
     this->AddServerInformation(servers[0], tree);
+#if QT_VERSION >= 0x050000
+    tree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#else
     tree->header()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
     }
 }
 
