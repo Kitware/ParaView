@@ -396,7 +396,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
             for file in relativePath:
                fileToLoad.append(os.path.join(self.baseDir, file))
         else:
-            fileToLoad.append(os.path.join(self.baseDir, files))
+            fileToLoad.append(os.path.join(self.baseDir, relativePath))
 
         reader = simple.OpenDataFile(fileToLoad)
         name = fileToLoad[0].split("/")[-1]
