@@ -36,7 +36,6 @@ set(Module_SRCS
   vtkCompositeMultiProcessController.cxx
   vtkDistributedTrivialProducer.cxx
   vtkMultiProcessControllerHelper.cxx
-  vtkPriorityHelper.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationScene.cxx
   vtkPVBooleanKeyFrame.cxx

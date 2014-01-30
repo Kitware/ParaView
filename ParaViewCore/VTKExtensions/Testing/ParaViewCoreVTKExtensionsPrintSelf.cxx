@@ -84,7 +84,6 @@
 #include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPolyLineToRectilinearGridFilter.h"
 #include "vtkPPhastaReader.h"
-#include "vtkPriorityHelper.h"
 #include "vtkPSciVizContingencyStats.h"
 #include "vtkPSciVizDescriptiveStats.h"
 #include "vtkPSciVizKMeans.h"
@@ -287,7 +286,6 @@ int main(int , char *[])
   PRINT_SELF(vtkPointHandleRepresentationSphere);
   PRINT_SELF(vtkPolyLineToRectilinearGridFilter);
   PRINT_SELF(vtkPPhastaReader);
-  PRINT_SELF(vtkPriorityHelper);
   PRINT_SELF(vtkPSciVizContingencyStats);
   PRINT_SELF(vtkPSciVizDescriptiveStats);
   PRINT_SELF(vtkPSciVizKMeans);

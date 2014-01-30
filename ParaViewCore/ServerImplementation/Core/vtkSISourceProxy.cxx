@@ -24,7 +24,6 @@
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPriorityHelper.h"
 #include "vtkProcessModule.h"
 #include "vtkPVExtentTranslator.h"
 #include "vtkPVInstantiator.h"
@@ -418,47 +417,6 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
     sddp->SetUpdateTimeStep(real_port, time);
     }
   sddp->Update(real_port);
-}
-
-//----------------------------------------------------------------------------
-void vtkSISourceProxy::UpdateStreamingPipeline(
-  int pass, int num_of_passes, double resolution,
-  int port, double time, bool doTime)
-{
-  if(this->DisablePipelineExecution)
-    {
-    return;
-    }
-
-  vtkAlgorithm* algo = this->GetOutputPort(port)->GetProducer();
-  assert(algo);
-  algo->UpdateInformation();
-
-  int processid =
-    vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
-  int numprocs =
-    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
-
-  vtkPriorityHelper* helper = vtkPriorityHelper::New();
-  helper->SetInputConnection(this->GetOutputPort(port));
-  helper->SetSplitUpdateExtent(
-    port,//algorithm's output port
-    processid, //processor
-    numprocs, //numprocessors
-    pass, //pass
-    num_of_passes, //number of passes
-    resolution //resolution
-  );
-
-  algo->UpdateInformation();
-  if (doTime)
-    {
-    vtkStreamingDemandDrivenPipeline* sddp =
-      vtkStreamingDemandDrivenPipeline::SafeDownCast(algo->GetExecutive());
-    sddp->SetUpdateTimeStep(port, time);
-    }
-  helper->Update();
-  helper->Delete();
 }
 
 //----------------------------------------------------------------------------
