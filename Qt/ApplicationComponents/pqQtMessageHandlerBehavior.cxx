@@ -33,6 +33,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkOutputWindow.h"
 
+#if QT_VERSION >= 0x050000
+
+static void QtMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+  QByteArray localMsg = msg.toLocal8Bit();
+  QString dispMsg = QString("%1 (%2:%3, %4)").arg(localMsg.constData()).
+    arg(context.file).arg(context.line).arg(context.function);
+  switch(type)
+    {
+  case QtDebugMsg:
+    vtkOutputWindow::GetInstance()->DisplayText(dispMsg.toLocal8Bit().constData());
+    break;
+  case QtWarningMsg:
+    vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
+    break;
+  case QtCriticalMsg:
+    vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
+    break;
+  case QtFatalMsg:
+    vtkOutputWindow::GetInstance()->DisplayErrorText(dispMsg.toLocal8Bit().constData());
+    break;
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqQtMessageHandlerBehavior::pqQtMessageHandlerBehavior(QObject* parentObject)
+  : Superclass(parentObject)
+{
+  qInstallMessageHandler(::QtMessageOutput);
+}
+pqQtMessageHandlerBehavior::~pqQtMessageHandlerBehavior()
+{
+  qInstallMessageHandler(0);
+}
+
+#else
+
 static void QtMessageOutput(QtMsgType type, const char *msg)
 {
   switch(type)
@@ -63,4 +100,4 @@ pqQtMessageHandlerBehavior::~pqQtMessageHandlerBehavior()
   qInstallMsgHandler(0);
 }
 
-
+#endif
