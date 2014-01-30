@@ -3037,7 +3037,12 @@ def SetActiveConnection(connection=None):
     return ActiveConnection
 
 # Needs to be called when paraview module is loaded from python instead
-# of pvpython, pvbatch or GUI.
+# of pvpython, pvbatch or GUI. If running in parallel this will
+# also set up the vtkMPIController automatically as well. Users
+# should specify paraview.options.{batch,symmetric} to be true
+# or false to set up ParaView properly. If MPI was initialized, calling
+# servermanager.Finalize() may also be needed to exit properly without
+# VTK_DEBUG_LEAKS reporting memory leaks.
 if not vtkProcessModule.GetProcessModule():
     pvoptions = None
     if paraview.options.batch:

@@ -240,3 +240,19 @@ if (PARAVIEW_BUILD_QT_GUI)
     set_tests_properties(SavePythonState PROPERTIES LABELS "PARAVIEW")
   endif()
 endif()
+
+if(PYTHON_EXECUTABLE AND PARAVIEW_USE_MPI)
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import mpi4py"
+    RESULT_VARIABLE has_mpi4py)
+  if(NOT has_mpi4py)
+    add_test(ParallelPythonImport
+        ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} ${VTK_MPI_MAX_NUMPROCS}
+        ${VTK_MPI_PREFLAGS}
+        ${PYTHON_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/ParallelPythonImport.py
+        ${VTK_MPI_POSTFLAGS}
+        )
+      set_tests_properties(ParallelPythonImport PROPERTIES LABELS PARAVIEW
+        ENVIRONMENT "PYTHONPATH=${VTK_PYTHONPATH}:${VTK_PYTHONPATH}/site-packages:${PYTHONPATH}" )
+  endif()
+endif()
