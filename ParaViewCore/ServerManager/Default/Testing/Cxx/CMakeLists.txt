@@ -84,6 +84,10 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     add_test(NAME pvunit.${name}
              COMMAND ${name})
     target_link_libraries(${name} LINK_PRIVATE ${QT_LIBRARIES})
+    if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+      set_target_properties(${name} PROPERTIES
+          COMPILE_FLAGS "${Qt5Test_EXECUTABLE_COMPILE_FLAGS}")
+    endif ()
     set_tests_properties(pvunit.${name} PROPERTIES LABELS "PARAVIEW")
   endforeach()
 endif()

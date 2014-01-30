@@ -5,6 +5,10 @@ else ()
 endif ()
 vtk_module_test_executable(pqFileDialogTest
   pqFileDialogTest.cxx pqFileDialogTest.h ${MOC_SRCS})
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set_target_properties(pqFileDialogTest PROPERTIES
+    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+endif ()
 
 add_test(
   NAME pqFileDialogTest

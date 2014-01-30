@@ -70,6 +70,12 @@ build_paraview_client(paraview
     INSTALL_BIN_DIR "${VTK_INSTALL_RUNTIME_DIR}"
     INSTALL_LIB_DIR "${VTK_INSTALL_LIBRARY_DIR}")
 
+# Set appropriate compile flags.
+if( PARAVIEW_QT_VERSION VERSION_GREATER "4" )
+  set_target_properties(paraview PROPERTIES
+    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+endif()
+
 # Link against the documentation module.
 target_link_libraries(paraview vtkParaViewDocumentation)
 

@@ -63,8 +63,11 @@ endif()
 add_library(vtkParaViewDocumentation STATIC
   ParaViewDocumentationInitializer.cxx
   ${rcs_sources})
-target_link_libraries(vtkParaViewDocumentation ${QT_LIBRARIES}) 
-
+target_link_libraries(vtkParaViewDocumentation ${QT_LIBRARIES})
+if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set_target_properties(vtkParaViewDocumentation PROPERTIES
+    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+endif()
 
 IF (NOT VTK_INSTALL_NO_DEVELOPMENT)
   # We install the qch file only when installing development files since the

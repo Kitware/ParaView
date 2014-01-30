@@ -7,6 +7,10 @@ if (PARAVIEW_DATA_ROOT)
     QT4_WRAP_CPP(MOC_SRCS BasicApp.h)
   endif ()
   vtk_module_test_executable(pqCoreBasicApp BasicApp.cxx BasicApp.h ${MOC_SRCS})
+  if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    set_target_properties(pqCoreBasicApp PROPERTIES
+      COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+  endif ()
   add_test(
     NAME pqCoreBasicApp
     COMMAND pqCoreBasicApp
