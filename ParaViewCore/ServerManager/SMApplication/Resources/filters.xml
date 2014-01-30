@@ -7008,6 +7008,56 @@ found and the point will be rejected.</Documentation>
       <!-- End Probe -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkPResampleFilter"
+                 name="ImageResampling">
+      <Documentation long_help="Sample data attributes using a 3D image as probing mesh."
+                     short_help="Sample data values using a 3D image."/>
+
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the dataset whose data will
+        be probed</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetSamplingDimension"
+                         default_values="10 10 10"
+                         name="SamplingDimension"
+                         number_of_elements="3"
+                         panel_visibility="default">
+                         <IntRangeDomain name="range" min="2 2 2" max="10000 10000 10000"/>
+        <Documentation>
+        How many linear resampling we want along each axis
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseInputBounds"
+                         default_values="1"
+                         name="UseInputBounds"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <Documentation>
+        Do we use input bounds or custom ones?
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomSamplingBounds"
+                         default_values="0 1 0 1 0 1"
+                         name="CustomSamplingBounds"
+                         number_of_elements="6"
+                         panel_visibility="default">
+        <Documentation>
+        Custom probing bounds if needed
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- End Probe -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkStreamTracer"
                  label="Stream Tracer"
                  name="StreamTracer">
@@ -9615,6 +9665,76 @@ found and the point will be rejected.</Documentation>
         extract.</Documentation>
       </IntVectorProperty>
       <!-- End ExtractDataSets -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageMapToColors"
+                 label="Color By Array"
+                 name="ColorByArray">
+      <Documentation long_help="This filter generate a color based image data based on a selected data scalar"
+                     short_help="This filter generate a color based image data based on a selected data scalar"/>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable">
+      </ProxyProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Color By"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property specifies the name of the scalar array
+        from which we will color by.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetNaNColor"
+                         name="NaNColor"
+                         label="RGBA NaN Color"
+                         default_values="0 0 0 255"
+                         number_of_elements="4">
+        <IntRangeDomain max="255 255 255 255"
+                        min="0 0 0 0"
+                        name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetOutputFormat"
+                         name="OutputFormat"
+                         default_values="3"
+                         number_of_elements="1">
+                         <EnumerationDomain name="enum">
+                           <Entry text="Luminance"
+                                  value="1" />
+                           <Entry text="Luminance Alpha"
+                                  value="2" />
+                           <Entry text="RGB"
+                                  value="3" />
+                           <Entry text="RGBA"
+                                  value="4" />
+                         </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- End vtkExtractColor -->
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPExtractHistogram"
