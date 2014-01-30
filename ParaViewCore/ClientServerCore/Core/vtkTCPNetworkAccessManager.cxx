@@ -327,10 +327,17 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
     !this->ParaViewHandshake(controller, false, handshake))
     {
     controller->Delete();
-    vtkErrorMacro("Failed to connect to " << hostname << ":" << port
-      << ". Client-Server Handshake failed. Please verify that the client and"
-      << " server versions are compatible with each other, and that 'connect-id'"
-      << ", if any, matches.");
+    vtkErrorMacro("Failed to connect to " << hostname << ":" << port);
+    vtkErrorMacro("\n"
+      "**********************************************************************\n"
+      "Connection failed during handshake. This can happen for the following reasons:\n"
+      " 1. Connection dropped during the handshake.\n"
+      " 2. vtkSocketCommunicator::GetVersion() returns different values on the\n"
+      "    two connecting processes (Current value: "
+      << vtkSocketCommunicator::GetVersion() << ").\n"
+      " 3. ParaView handshake strings are different on the two connecting\n"
+      "    processes (Current value: " << (handshake? handshake : "<empty>") << ").\n"
+      "**********************************************************************\n");
     return NULL;
     }
   this->Internals->Controllers.push_back(controller);
@@ -405,6 +412,16 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
       controller = NULL;
       // handshake failed, must be bogus client, continue waiting (unless
       // this->AbortPendingConnectionFlag == true).
+      vtkErrorMacro("\n"
+        "**********************************************************************\n"
+        "Connection failed during handshake. This can happen for the following reasons:\n"
+        " 1. Connection dropped during the handshake.\n"
+        " 2. vtkSocketCommunicator::GetVersion() returns different values on the\n"
+        "    two connecting processes (Current value: "
+        << vtkSocketCommunicator::GetVersion() << ").\n"
+        " 3. ParaView handshake strings are different on the two connecting\n"
+        "    processes (Current value: " << (handshake? handshake : "<empty>") << ").\n"
+        "**********************************************************************\n");
       }
     }
 
