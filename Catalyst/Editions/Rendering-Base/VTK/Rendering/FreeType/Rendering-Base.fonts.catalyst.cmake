@@ -1,4 +1,4 @@
-list(APPEND Module_SRCS
+set(font_files
   fonts/face_arial.cxx
   fonts/face_arial_bold.cxx
   fonts/face_arial_bold_italic.cxx
@@ -11,4 +11,12 @@ list(APPEND Module_SRCS
   fonts/face_times_bold.cxx
   fonts/face_times_bold_italic.cxx
   fonts/face_times_italic.cxx
+  )
+
+list(APPEND Module_SRCS
+  ${font_files}
+  )
+set_source_files_properties(
+  ${font_files}
+  WRAP_EXCLUDE
   )

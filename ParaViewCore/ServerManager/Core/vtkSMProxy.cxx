@@ -1625,6 +1625,13 @@ vtkSMProperty* vtkSMProxy::SetupExposedProperty(vtkPVXMLElement* propertyElement
   vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
   vtkSMProperty *prop = subproxy->GetProperty(name);
 
+  if (!prop)
+    {
+    vtkWarningMacro("Failed to locate property '" << name
+                    << "' on subproxy '" << subproxy_name << "': " << this->XMLName);
+    return 0;
+    }
+
   // override panel_visibility with that of the exposed property
   const char *panel_visibility = propertyElement->GetAttribute("panel_visibility");
   if(panel_visibility)

@@ -14,5 +14,14 @@ vtk_module(vtkIOImage
     vtkpng
     vtktiff
     vtkMetaIO
+    #vtkDICOMParser
     vtksys
+  #TEST_DEPENDS
+  #  vtkTestingCore
+  #  vtkImagingSources
+  #  vtkImagingMath
+  #  vtkRenderingContext2D
+  #  vtkRenderingCore
+  #  vtkTestingCore
+  #  vtkTestingRendering
   )
