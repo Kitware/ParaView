@@ -39,24 +39,29 @@ using Ui::pqMemoryInspectorPanelForm;
 #include "vtkPVInformation.h"
 #include "vtkClientServerStream.h"
 
-#include <QTreeWidgetItem>
-#include <QTreeWidgetItemIterator>
-#include <QString>
-#include <QStringList>
-#include <QSettings>
-#include <QMessageBox>
-#include <QProgressBar>
-#include <QFrame>
-#include <QLabel>
-#include <QPalette>
+#include <QDebug>
 #include <QFont>
 #include <QFontMetrics>
-#include <QPlastiqueStyle>
-#include <QPoint>
-#include <QMenu>
-#include <QProcess>
-#include <QDebug>
 #include <QFormLayout>
+#include <QFrame>
+#include <QLabel>
+#include <QMenu>
+#include <QMessageBox>
+#include <QPalette>
+#include <QPoint>
+#include <QProcess>
+#include <QProgressBar>
+#include <QProxyStyle>
+#include <QSettings>
+#include <QString>
+#include <QStringList>
+#include <QStyleFactory>
+#include <QTreeWidgetItem>
+#include <QTreeWidgetItemIterator>
+
+#if QT_VERSION < 0x050000
+#include <QPlastiqueStyle>
+#endif
 
 #include <map>
 using std::map;
@@ -125,6 +130,19 @@ enum {
 
 namespace
 {
+#if QT_VERSION >= 0x050000
+// ****************************************************************************
+QStyle *getMemoryUseWidgetStyle()
+{
+  // this sets the style for the progress bar used to
+  // display % memory usage. If we didn't do this the
+  // display will look different on each OS. The ownership
+  // of the style does not change hands when it's set to
+  // the widget thus a single static instance is convenient.
+  static QStyle* style = QStyleFactory::create("fusion");
+  return style;
+}
+#else
 // ****************************************************************************
 QPlastiqueStyle *getMemoryUseWidgetStyle()
 {
@@ -136,7 +154,7 @@ QPlastiqueStyle *getMemoryUseWidgetStyle()
   static QPlastiqueStyle style;
   return &style;
 }
-
+#endif
 // ****************************************************************************
 float getSystemWarningThreshold()
 {
