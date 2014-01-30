@@ -107,6 +107,14 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   // Parse
   //ToLower(metaData);
 
+  // get the brick file extension
+  std::string ext;
+  if (ParseValue(metaData,0,"ext=",ext)==std::string::npos)
+    {
+    ext="gda";
+    }
+  this->SetBrickFileExtension(ext);
+
   // We are expecting are nx,ny, and nz in the header for all
   // mesh types.
   int nx,ny,nz;
@@ -122,9 +130,9 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   CartesianExtent domain(0,nx-1,0,ny-1,0,nz-1);
   this->SetDomain(domain);
 
-  if (Present(path,"x.gda")
-    && Present(path,"y.gda")
-    && Present(path,"z.gda"))
+  if ( Present(path,"x", ext.c_str())
+    && Present(path,"y", ext.c_str())
+    && Present(path,"z", ext.c_str()))
     {
     // mark as stretched mesh
     this->SetDataSetType("vtkRectilinearGrid");
@@ -141,7 +149,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
       {
       // read coordinate array
       coordFn.str("");
-      coordFn << path << PATH_SEP << coordId[q] << ".gda";
+      coordFn << path << PATH_SEP << coordId[q] << "." << ext;
 
       SharedArray<float> *coord=this->GetCoordinate(q);
       coord->Resize(n[q]);
@@ -194,6 +202,14 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
     double dX[3]={dx,dy,dz};
     this->SetSpacing(dX);
     }
+
+  double dt;
+  if (ParseValue(metaData,0,"dt=",dt)==std::string::npos)
+    {
+    // no time step size provided assume 1
+    dt=1;
+    }
+  this->SetDt(dt);
 
   // TODO
   // the following meta data enhancments are disabled until
@@ -415,7 +431,7 @@ int GDAMetaData::Write()
     os
       << "#################################" << std::endl
       << "# SciberQuestToolKit" << std::endl
-      << "# Metadata version 1.0" << std::endl
+      << "# Metadata version 1.1" << std::endl
       << "#################################" << std::endl;
 
     if (this->DataSetTypeIsImage())
@@ -432,7 +448,9 @@ int GDAMetaData::Write()
       os
         << "nx=" << nCells[0] << ", ny=" << nCells[1] << ", nz=" << nCells[2] << std::endl
         << "x0=" << x0[0] << ", y0=" << x0[1] << ", z0=" << x0[2] << std::endl
-        << "dx=" << dx[0] << ", dy=" << dx[1] << ", dz=" << dx[2] << std::endl;
+        << "dx=" << dx[0] << ", dy=" << dx[1] << ", dz=" << dx[2] << std::endl
+        << "dt=" << this->GetDt() << std::endl
+        << "ext=" << this->GetBrickFileExtension() << std::endl;
       }
     else
       {

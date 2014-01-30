@@ -59,10 +59,10 @@ int FileExists(const char *path)
 }
 
 //******************************************************************************
-int Present(const char *path, const char *fileName)
+int Present(const char *path, const char *fileName, const char *ext)
 {
   std::ostringstream fn;
-  fn << path << PATH_SEP << fileName;
+  fn << path << PATH_SEP << fileName << "." << ext;
   FILE *fp=fopen(fn.str().c_str(),"r");
   if (fp==0)
     {
@@ -283,7 +283,7 @@ std::string StripExtensionFromFileName(const std::string fileName)
     // current directory
     return fileName;
     }
-  return fileName.substr(0,p); // TODO Why does this leak?
+  return fileName.substr(0,p);
 }
 
 // Returns the file name from the given path. If PATH_SEP isn't found

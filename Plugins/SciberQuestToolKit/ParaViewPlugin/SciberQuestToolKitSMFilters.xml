@@ -3063,7 +3063,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- TODO the cuda code needs to be fixed
     <IntVectorProperty
         name="RanksToUseCUDA"
         label="CUDA Ranks Per Host"
@@ -3144,7 +3143,6 @@ Copyright 2012 SciberQuest Inc.
         Control where the input array is placed in device memory.
       </Documentation>
     </IntVectorProperty>
-    -->
 
     <Hints>
       <View type="RenderView"/>

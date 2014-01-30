@@ -10,13 +10,14 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CUDAConvolutionDriver_h
 #define __CUDAConvolutionDriver_h
 
+#include "vtkSciberQuestModule.h" // for export
 #include <algorithm> // for min
 
 class vtkDataArray;
 class CartesianExtent;
 
 /// CUDAConvolutionDriver - Interface to the CUDA kernel
-class CUDAConvolutionDriver
+class VTKSCIBERQUEST_EXPORT CUDAConvolutionDriver
 {
 public:
   ///

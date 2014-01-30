@@ -484,10 +484,11 @@ int vtkSQBOVReaderBase::GetNumberOfTimeSteps()
 void vtkSQBOVReaderBase::GetTimeSteps(double *times)
 {
   size_t n=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
+  double dt=this->Reader->GetMetaData()->GetDt();
 
   for (size_t i=0; i<n; ++i)
     {
-    times[i]=this->Reader->GetMetaData()->GetTimeStep(i);
+    times[i]=dt*this->Reader->GetMetaData()->GetTimeStep(i);
     }
 }
 
@@ -602,10 +603,11 @@ int vtkSQBOVReaderBase::RequestInformation(
   // Determine which time steps are available.
   size_t nSteps=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
   const int *steps=this->Reader->GetMetaData()->GetTimeSteps();
+  double dt=this->Reader->GetMetaData()->GetDt();
   std::vector<double> times(nSteps,0.0);
   for (size_t i=0; i<nSteps; ++i)
     {
-    times[i]=(double)steps[i]; // use the index rather than the actual.
+    times[i]=dt*static_cast<double>(steps[i]);
     }
 
   #if defined SQTK_DEBUG

@@ -61,15 +61,6 @@ public:
   virtual int CloseDataset();
 
   /**
-  Return the file extension used by the format for brick files.
-  The BOV reader will make use of this in its pattern matching logic.
-  */
-  virtual const char *GetBrickFileExtension() const
-    {
-    return "gda";
-    }
-
-  /**
   Write the object state in the metadata format. return 0 on error.
   */
   virtual int Write();

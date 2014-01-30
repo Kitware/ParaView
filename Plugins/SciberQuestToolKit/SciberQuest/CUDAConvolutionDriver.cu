@@ -6,9 +6,7 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-
 //#define CUDAConvolutionDriverDEBUG
-
 #include "CUDAConvolutionDriver.h"
 
 #include "SQVTKTemplateMacroWarningSupression.h"
@@ -17,6 +15,7 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 #include "postream.h"
 
+#define SQTK_CUDA
 #if defined SQTK_CUDA
   #include "CUDAGlobalMemoryManager.hxx"
   #include "CUDAConstMemoryManager.hxx"
@@ -226,7 +225,7 @@ int CUDAConvolutionDriver::Convolution(
       std::vector<CUDAGlobalMemoryManager<float>*> devV(nComp,0);
       std::vector<CUDAGlobalMemoryManager<float>*> devW(nComp,0);
       std::vector<float*> sW(nComp,0);
-      for (int q=0; q<nComp; ++q)
+      for (unsigned long q=0; q<nComp; ++q)
         {
         // input arrays
         cudaHostAlloc(
@@ -279,7 +278,7 @@ int CUDAConvolutionDriver::Convolution(
       Split<float>(vnijk,hV,sV);
 
       // copy the input arrays to the device
-      for (int q=0; q<nComp; ++q)
+      for (unsigned long q=0; q<nComp; ++q)
         {
         // TODO-could this be streamed to overlap com w/ comp?
         devV[q]->Push(sV[q]);
@@ -373,7 +372,7 @@ int CUDAConvolutionDriver::Convolution(
       Interleave(wnijk,sW,hW);
 
       // clean up
-      for (int q=0; q<nComp; ++q)
+      for (unsigned long q=0; q<nComp; ++q)
         {
         delete devW[q];
         cudaFreeHost(sW[q]);

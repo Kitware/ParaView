@@ -9,12 +9,14 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __pOstream_h
 #define __pOstream_h
 
+#include "vtkSciberQuestModule.h" // for export macro
 #include <iostream> // for ostream
+
 
 /**
 Helper that prints rank of caller and returns cerr.
 */
-std::ostream &pCerr();
+VTKSCIBERQUEST_EXPORT std::ostream &pCerr();
 
 #endif
 

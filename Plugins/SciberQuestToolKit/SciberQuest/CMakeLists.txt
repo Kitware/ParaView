@@ -1,21 +1,12 @@
 #--------------------------------------------------
 # Configuration options
 #--------------------------------------------------
-find_package(CUDA QUIET)
-include(CMakeDependentOption)
-cmake_dependent_option(SQTK_CUDA "Enable CUDA optimizations." ON
-  CUDA_FOUND OFF)
-mark_as_advanced(SQTK_CUDA)
 
-option(SQTK_DEBUG "Enable debug output to stderr." OFF)
-mark_as_advanced(SQTK_DEBUG)
-if (SQTK_DEBUG)
-  add_definitions(-DSQTK_DEBUG)
-endif()
 
 include(EigenConfig.cmake)
+include(CUDAConfig.cmake)
 
-set(SCIBER_QUEST_SOURCES
+set(SQTK_CXX_SOURCES
   BOVMetaData.cxx
   BOVReader.cxx
   BOVScalarImage.cxx
@@ -65,12 +56,28 @@ set(SCIBER_QUEST_SOURCES
   XMLUtils.cxx
   )
 if (WIN32)
-  list(APPEND SCIBER_QUEST_SOURCES
+  list(APPEND SQTK_CXX_SOURCES
     win_windirent.cxx)
 endif()
 
+if (SQTK_CUDA AND CUDA_FOUND)
+  set(CU_SOURCES CUDAConvolutionDriver.cu)
+  set_property(
+    SOURCE ${CU_SOURCES}
+    APPEND PROPERTY COMPILE_DEFINITIONS SQTK_CUDA)
+  cuda_include_directories(${CMAKE_CURRENT_BINARY_DIR} ${VTK_INCLUDE_DIRS})
+  cuda_add_library(CUDAConvolutionDriver ${CU_SOURCES})
+  vtk_target_export(CUDAConvolutionDriver)
+  cuda_build_clean_target()
+  install(TARGETS CUDAConvolutionDriver
+    DESTINATION lib/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR})
+else()
+  # non-cuda version of CUDAConvolutionDriver.cu
+  set(SQTK_CXX_SOURCES ${SQTK_CXX_SOURCES} CUDAConvolutionDriver.cxx)
+endif()
+
 set(CXX_SOURCES
-  ${SCIBER_QUEST_SOURCES}
+  ${SQTK_CXX_SOURCES}
   vtkSQAgyrotropyFilter.cxx
   vtkSQBOVMetaReader.cxx
   vtkSQBOVReader.cxx
@@ -108,37 +115,6 @@ set(CXX_SOURCES
   vtkSQVortexFilter.cxx
   )
 
-if (CUDA_FOUND AND SQTK_CUDA)
-  #message(STATUS "SQTK Including CUDA accelerated filters.")
-  #message(STATUS "SQTK Cuda ${CUDA_VERSION_STRING} found.")
-  set(CUDA_NVCC_FLAGS "-arch=sm_20;--compiler-options;-fPIC" CACHE STRING "nvcc flags")
-  set(CUDA_NVCC_DEBUG_FLAGS "-g;-G;" CACHE STRING "nvcc debug flags")
-  set(CUDA_NVCC_RELEASE_FLAGS "-O3" CACHE STRING "nvcc release flags")
-  #message(STATUS "SQTK CUDA_NVCC_FLAGS=${CUDA_NVCC_FLAGS}")
-  #message(STATUS "SQTK CUDA_NVCC_DEBUG_FLAGS=${CUDA_NVCC_DEBUG_FLAGS}")
-  #message(STATUS "SQTK CUDA_NVCC_RELEASE_FLAGS=${CUDA_NVCC_FLAGS}")
-  set(CU_SOURCES CUDAConvolutionDriver.cu)
-  set_property(
-    SOURCE ${CU_SOURCES}
-    APPEND PROPERTY COMPILE_DEFINITIONS SQTK_CUDA
-    )
-  if(BUILD_SHARED_LIBS)
-    set(gpgpu_build_type SHARED)
-  else()
-    set(gpgpu_build_type STATIC)
-  endif()
-  vtk_module_load(vtkCommonCore)
-  cuda_include_directories(${vtkCommonCore_INCLUDE_DIRS})
-  cuda_compile(convolution_srcs ${CU_SOURCES} ${gpgpu_build_type})
-else()
-  set(convolution_srcs
-    CUDAConvolutionDriver.cxx
-    )
-endif()
-list(APPEND CXX_SOURCES
-  ${convolution_srcs}
-  )
-
 set_source_files_properties(
   vtkSQBOVReaderBase.cxx
   vtkSQOOCReader.cxx
@@ -150,19 +126,26 @@ set_source_files_properties(
   vtkSQOOCReader.cxx
   vtkSQOOCBOVReader.cxx
   vtkSQMetaDataKeys.cxx
-  ${SCIBER_QUEST_SOURCES}
-  ${convolution_srcs}
+  ${SQTK_CXX_SOURCES}
   WRAP_EXCLUDE
   )
+
+option(SQTK_DEBUG "Enable debug output to stderr." OFF)
+mark_as_advanced(SQTK_DEBUG)
+if (SQTK_DEBUG)
+  add_definitions(-DSQTK_DEBUG)
+endif()
 
 vtk_module_library(vtkSciberQuest ${CXX_SOURCES})
 
 if (SQTK_CUDA AND CUDA_FOUND)
   target_link_libraries(vtkSciberQuest
-  LINK_PRIVATE ${CUDA_LIBRARIES})
+    LINK_PRIVATE ${CUDA_LIBRARIES} CUDAConvolutionDriver
+    )
 endif()
 
-install(TARGETS vtkSciberQuest DESTINATION lib/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR})
+install(TARGETS vtkSciberQuest
+   DESTINATION lib/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR})
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)

@@ -17,20 +17,18 @@ Copyright 2012 SciberQuest Inc.
 BOVMetaData::BOVMetaData()
 {
   this->Mode = 'c';
-
   this->IsOpen=0;
-
+  this->BrickFileExtension="brick";
   this->Origin[0]=
   this->Origin[1]=
   this->Origin[2]=0.0;
-
   this->Spacing[0]=
   this->Spacing[1]=
   this->Spacing[2]=1.0;
-
   this->Coordinates[0]=SharedArray<float>::New();
   this->Coordinates[1]=SharedArray<float>::New();
   this->Coordinates[2]=SharedArray<float>::New();
+  this->Dt=1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -53,6 +51,7 @@ BOVMetaData &BOVMetaData::operator=(const BOVMetaData &other)
   this->IsOpen=other.IsOpen;
   this->FileName=other.FileName;
   this->PathToBricks=other.PathToBricks;
+  this->BrickFileExtension=other.BrickFileExtension;
   this->Arrays=other.Arrays;
   this->TimeSteps=other.TimeSteps;
   this->Domain=other.Domain;
@@ -61,6 +60,7 @@ BOVMetaData &BOVMetaData::operator=(const BOVMetaData &other)
   this->DataSetType=other.DataSetType;
   this->SetOrigin(other.GetOrigin());
   this->SetSpacing(other.GetSpacing());
+  this->SetDt(other.GetDt());
   this->Coordinates[0]->Assign(other.Coordinates[0]);
   this->Coordinates[1]->Assign(other.Coordinates[1]);
   this->Coordinates[2]->Assign(other.Coordinates[2]);
@@ -75,6 +75,7 @@ int BOVMetaData::CloseDataset()
   this->IsOpen=0;
   this->FileName="";
   this->PathToBricks="";
+  this->BrickFileExtension="";
   this->Domain.Clear();
   this->Subset.Clear();
   this->Decomp.Clear();
@@ -83,6 +84,7 @@ int BOVMetaData::CloseDataset()
   this->DataSetType="";
   this->SetOrigin(0.0,0.0,0.0);
   this->SetSpacing(1.0,1.0,1.0);
+  this->SetDt(1.0);
   this->Coordinates[0]->Clear();
   this->Coordinates[1]->Clear();
   this->Coordinates[2]->Clear();
@@ -249,6 +251,7 @@ void BOVMetaData::Pack(BinaryStream &os)
   os.Pack(this->IsOpen);
   os.Pack(this->FileName);
   os.Pack(this->PathToBricks);
+  os.Pack(this->BrickFileExtension);
   os.Pack(this->Domain.GetData(),6);
   os.Pack(this->Decomp.GetData(),6);
   os.Pack(this->Subset.GetData(),6);
@@ -257,6 +260,7 @@ void BOVMetaData::Pack(BinaryStream &os)
   os.Pack(this->DataSetType);
   os.Pack(this->Origin,3);
   os.Pack(this->Spacing,3);
+  os.Pack(this->Dt);
   os.Pack(*this->Coordinates[0]);
   os.Pack(*this->Coordinates[1]);
   os.Pack(*this->Coordinates[2]);
@@ -269,6 +273,7 @@ void BOVMetaData::UnPack(BinaryStream &is)
   is.UnPack(this->IsOpen);
   is.UnPack(this->FileName);
   is.UnPack(this->PathToBricks);
+  is.UnPack(this->BrickFileExtension);
   is.UnPack(this->Domain.GetData(),6);
   is.UnPack(this->Decomp.GetData(),6);
   is.UnPack(this->Subset.GetData(),6);
@@ -277,6 +282,7 @@ void BOVMetaData::UnPack(BinaryStream &is)
   is.UnPack(this->DataSetType);
   is.UnPack(this->Origin,3);
   is.UnPack(this->Spacing,3);
+  is.UnPack(this->Dt);
   is.UnPack(*this->Coordinates[0]);
   is.UnPack(*this->Coordinates[1]);
   is.UnPack(*this->Coordinates[2]);
@@ -291,6 +297,7 @@ void BOVMetaData::Print(std::ostream &os) const
     << "\tIsOpen: " << this->IsOpen << std::endl
     << "\tFileName: " << this->FileName << std::endl
     << "\tPathToBricks: " << this->PathToBricks << std::endl
+    << "\tBrickFileExtension: " << this->BrickFileExtension << std::endl
     << "\tDomain: " << this->Domain << std::endl
     << "\tSubset: " << this->Subset << std::endl
     << "\tDecomp: " << this->Decomp << std::endl
@@ -299,6 +306,7 @@ void BOVMetaData::Print(std::ostream &os) const
     << "\tDataSetType: " << this->DataSetType << std::endl
     << "\tOrigin: " << Tuple<double>(this->Origin,3) << std::endl
     << "\tSpacing: " << Tuple<double>(this->Spacing,3) << std::endl
+    << "\tDt: " << this->Dt << std::endl
     << "\tCoordinates: " << std::endl
     << "\t\t" << *this->Coordinates[0] << std::endl
     << "\t\t" << *this->Coordinates[1] << std::endl
