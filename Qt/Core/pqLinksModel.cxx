@@ -81,9 +81,10 @@ public:
 
     if(eid == vtkCommand::RegisterEvent)
       {
+      this->Model->beginResetModel();
       this->LinkObjects.append(
         new pqLinksModelObject(linkName, this->Model, this->Server));
-      this->Model->reset();
+      this->Model->endResetModel();
       }
     else if(eid == vtkCommand::UnRegisterEvent)
       {
@@ -94,9 +95,10 @@ public:
         {
         if((*iter)->name() == linkName)
           {
+          this->Model->beginResetModel();
           delete *iter;
           this->LinkObjects.erase(iter);
-          this->Model->reset();
+          this->Model->endResetModel();
           break;
           }
         }

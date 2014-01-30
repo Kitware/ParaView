@@ -80,6 +80,7 @@ pqSILModel::~pqSILModel()
 //-----------------------------------------------------------------------------
 void pqSILModel::update(vtkGraph* sil)
 {
+  this->beginResetModel();
   bool prev = this->blockSignals(true);
   this->SIL = sil;
   this->SILModel->Initialize(sil);
@@ -105,7 +106,7 @@ void pqSILModel::update(vtkGraph* sil)
     }
   iter->Delete();
   this->blockSignals(prev);
-  this->reset();
+  this->endResetModel();
 }
 
 //-----------------------------------------------------------------------------
@@ -177,7 +178,7 @@ QModelIndex pqSILModel::hierarchyIndex(const QString& hierarchyName) const
     }
 
   // Return a dummy index referring to an empty tree.
-  return this->createIndex(PQ_INVALID_INDEX, PQ_INVALID_INDEX, static_cast<quint32>(0));
+  return this->createIndex(PQ_INVALID_INDEX, PQ_INVALID_INDEX);
 }
 
 //-----------------------------------------------------------------------------

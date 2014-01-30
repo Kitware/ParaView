@@ -98,7 +98,7 @@ QModelIndex pqProxySILModel::mapToSource(const QModelIndex& proxyIndex) const
   pqSILModel* silModel = qobject_cast<pqSILModel*>(this->sourceModel());
   if (!silModel)
     {
-    return this->createIndex(PQ_INVALID_INDEX, PQ_INVALID_INDEX, static_cast<quint32>(0));
+    return this->createIndex(PQ_INVALID_INDEX, PQ_INVALID_INDEX);
     }
   else if (proxyIndex.isValid())
     {

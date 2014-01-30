@@ -514,11 +514,12 @@ pqServer* pqFileDialogModel::server() const
 
 void pqFileDialogModel::setCurrentPath(const QString& Path)
 {
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(Path);
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
-  this->reset();
+  this->endResetModel();
 }
 
 QString pqFileDialogModel::getCurrentPath()
@@ -610,12 +611,12 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
     ret = (vtkDirectory::MakeDirectory(dirPath.toAscii().data()) != 0);
     }
 
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
-
-  this->reset();
+  this->endResetModel();
 
   return ret;
 }
@@ -647,12 +648,13 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
     ret = (vtkDirectory::DeleteDirectory(dirPath.toAscii().data()) != 0);
     }
 
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
+  this->endResetModel();
 
-  this->reset();
 
   return ret;
 }
@@ -707,11 +709,11 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
                                 newPath.toAscii().data()) != 0);
     }
 
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
-
-  this->reset();
+  this->endResetModel();
 
   return ret;
 }

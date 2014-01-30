@@ -139,7 +139,7 @@ QModelIndex pqColorPresetModel::index(int row, int column,
   if(!parentIndex.isValid() && column >= 0 && column < 2 &&
       row >= 0 && row < this->Internal->Presets.size())
     {
-    return this->createIndex(row, column, 0);
+    return this->createIndex(row, column);
     }
 
   return QModelIndex();
