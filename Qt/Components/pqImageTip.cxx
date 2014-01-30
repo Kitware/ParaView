@@ -50,7 +50,7 @@ void pqImageTip::showTip(const QPixmap& image, const QPoint& pos)
 {
   static pqImageTip* instance = 0;
   
-  if(instance && instance->isVisible() && instance->pixmap() && instance->pixmap()->serialNumber() == image.serialNumber())
+  if(instance && instance->isVisible() && instance->pixmap() && instance->pixmap()->cacheKey() == image.cacheKey())
     return;
   
   QToolTip::showText(QPoint(), "");

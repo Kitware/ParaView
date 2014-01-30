@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDropEvent>
 #include <QEvent>
 #include <QLayout>
+#include <QMimeData>
 #include <QScrollBar>
 
 pqTreeView::pqTreeView(QWidget *widgetParent)

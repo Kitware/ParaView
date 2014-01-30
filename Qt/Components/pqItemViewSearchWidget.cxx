@@ -56,7 +56,7 @@ public:
   this->BaseWidget = parentW ? 
     qobject_cast<QAbstractItemView*>(parentW) : NULL;;
     this->RedPal.setColor(QPalette::Base, QColor(240,128,128));
-  this->WhitePal.setColor(QPalette::Base, Qt::white);
+  this->WhitePal.setColor(QPalette::Base, QColor(Qt::white));
   this->DlgBackPal.setColor(QPalette::Background, Qt::darkGray);
   }
   ~PIMPL() {}
@@ -95,7 +95,7 @@ pqItemViewSearchWidget::~pqItemViewSearchWidget()
     this->Private->BaseWidget)
     {
     this->Private->BaseWidget->model()->setData(
-      this->Private->CurrentFound, Qt::white, Qt::BackgroundColorRole);
+      this->Private->CurrentFound, QColor(Qt::white), Qt::BackgroundColorRole);
     }
   delete this->Private;
 }
@@ -188,7 +188,7 @@ void pqItemViewSearchWidget::updateSearch(QString searchText)
   if(this->Private->CurrentFound.isValid())
     {
     this->Private->BaseWidget->model()->setData(
-      this->Private->CurrentFound, Qt::white, Qt::BackgroundColorRole);
+      this->Private->CurrentFound, QColor(Qt::white), Qt::BackgroundColorRole);
     }
   this->Private->CurrentFound = current;
   QAbstractItemView* theView = this->Private->BaseWidget;
@@ -283,7 +283,7 @@ void pqItemViewSearchWidget::findNext()
   if(start.isValid())
     {
     this->Private->BaseWidget->model()->setData(
-      start, Qt::white, Qt::BackgroundColorRole);
+      start, QColor(Qt::white), Qt::BackgroundColorRole);
     // search the rest of this index -- horizontally
     int r = start.row();
     int numCols = viewModel->columnCount(start.parent());
@@ -388,7 +388,7 @@ void pqItemViewSearchWidget::findPrevious()
   if(start.isValid())
     {
     this->Private->BaseWidget->model()->setData(
-      start, Qt::white, Qt::BackgroundColorRole);
+      start, QColor(Qt::white), Qt::BackgroundColorRole);
     // search the rest of this index
     int r = start.row();
     for( int c = start.column()-1; c >=0; c-- )

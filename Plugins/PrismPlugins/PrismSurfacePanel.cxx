@@ -820,7 +820,7 @@ void PrismSurfacePanel::updateConversionsLabels()
 
         if(this->UI->CustomCheckbox->isChecked())
         {
-          this->UI->WasCustom=TRUE;
+          this->UI->WasCustom=true;
          // this->UI->ConversionTree->setColumnHidden(1,true);
           item = this->UI->ConversionTree->item(w,1);
           item->setText("");
@@ -833,7 +833,7 @@ void PrismSurfacePanel::updateConversionsLabels()
         }
         else if(this->UI->SICheckbox->isChecked())
         {
-          this->UI->WasCustom=FALSE;
+          this->UI->WasCustom=false;
          // this->UI->ConversionTree->setColumnHidden(1,false);
 
           item=this->UI->ConversionTree->item(w,1);
@@ -853,7 +853,7 @@ void PrismSurfacePanel::updateConversionsLabels()
         }
         else if(this->UI->cgsCheckbox->isChecked())
         {
-          this->UI->WasCustom=FALSE;
+          this->UI->WasCustom=false;
         //  this->UI->ConversionTree->setColumnHidden(1,false);
 
           item=this->UI->ConversionTree->item(w,1);
@@ -1167,17 +1167,17 @@ void PrismSurfacePanel::setupConversions()
 
   if(units=="SI")
   {
-    this->UI->WasCustom=FALSE;
+    this->UI->WasCustom=false;
       this->UI->SICheckbox->setChecked(true);
   }
   else if(units=="cgs")
   {
-    this->UI->WasCustom=FALSE;
+    this->UI->WasCustom=false;
       this->UI->cgsCheckbox->setChecked(true);
   }
   else
   {
-    this->UI->WasCustom=TRUE;
+    this->UI->WasCustom=true;
     this->UI->CustomCheckbox->setChecked(true);
 
 
@@ -1352,7 +1352,7 @@ void PrismSurfacePanel::setupConversions()
   }
   else
   {
-    this->UI->WasCustom=TRUE;
+    this->UI->WasCustom=true;
     QString tableIdLable="Table ";
     tableIdLable.append(this->UI->TableIdWidget->currentText());
     tableIdLable.append(" Could not be found.");

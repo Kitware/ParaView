@@ -53,7 +53,7 @@ pqRenderViewSelectionReaction::pqRenderViewSelectionReaction(
   Mode(mode),
   PreviousRenderViewMode(-1),
   ObserverId(0),
-  ZoomCursor(QCursor(zoom_xpm))
+  ZoomCursor(QCursor(QPixmap((const char **)zoom_xpm)))
 {
   QObject::connect(parentObject, SIGNAL(triggered(bool)),
     this, SLOT(actionTriggered(bool)));

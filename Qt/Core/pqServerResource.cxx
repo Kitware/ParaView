@@ -108,7 +108,7 @@ public:
     
   if(this->Path.size() > 1 && this->Path[1] == ':')
     {
-    this->Path = QDir::convertSeparators(this->Path);
+    this->Path = QDir::toNativeSeparators(this->Path);
     }
 
   strings.removeFirst();

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
+#include <QAbstractItemView>
 #include <QInputDialog>
 #include <QStringListModel>
 #include <QTextCharFormat>

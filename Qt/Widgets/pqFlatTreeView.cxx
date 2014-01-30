@@ -2854,7 +2854,7 @@ void pqFlatTreeView::changeCurrent(const QModelIndex &current,
       item = this->getItem(current);
       if(item && current.column() < item->Cells.size())
         {
-        region = region.unite(QRegion(0, item->ContentsY, this->ContentsWidth,
+        region = region.united(QRegion(0, item->ContentsY, this->ContentsWidth,
             item->Height));
         }
       }
@@ -2892,7 +2892,7 @@ void pqFlatTreeView::changeCurrentRow(const QModelIndex &current,
       item = this->getItem(current);
       if(item)
         {
-        region = region.unite(QRegion(0, item->ContentsY, this->ContentsWidth,
+        region = region.united(QRegion(0, item->ContentsY, this->ContentsWidth,
             item->Height));
         }
       }
@@ -2995,7 +2995,7 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
           }
 
         // Add the affected area to the repaint list.
-        region = region.unite(QRegion(0, cy, totalWidth, totalHeight));
+        region = region.united(QRegion(0, cy, totalWidth, totalHeight));
         }
       }
     }
@@ -3055,7 +3055,7 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
           }
 
         // Add the affected area to the repaint list.
-        region = region.unite(QRegion(0, cy, totalWidth, totalHeight));
+        region = region.united(QRegion(0, cy, totalWidth, totalHeight));
         }
       }
     }

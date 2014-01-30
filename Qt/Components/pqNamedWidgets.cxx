@@ -1426,7 +1426,11 @@ bool pqNamedWidgets::propertyInformation(QObject* object,
       {
       if(mo->method(i).methodType() == QMetaMethod::Signal)
         {
+#if QT_VERSION >= 0x050000
+        if(QString(mo->method(i).methodSignature().constData()).startsWith(signalName))
+#else
         if(QString(mo->method(i).signature()).startsWith(signalName))
+#endif
           {
           signalIndex = i;
           }
@@ -1435,7 +1439,11 @@ bool pqNamedWidgets::propertyInformation(QObject* object,
     if(signalIndex != -1)
       {
       QString theSignal = SIGNAL(%1);
+#if QT_VERSION >= 0x050000
+      signal = theSignal.arg(mo->method(signalIndex).methodSignature().constData());
+#else
       signal = theSignal.arg(mo->method(signalIndex).signature());
+#endif
       property = propertyName;
       return true;
       }

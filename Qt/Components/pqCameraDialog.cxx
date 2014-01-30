@@ -85,7 +85,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
-  Qt::WFlags f/*=0*/): pqDialog(_p, f)
+  Qt::WindowFlags f/*=0*/): pqDialog(_p, f)
 {
   this->Internal = new pqCameraDialogInternal;
   this->Internal->setupUi(this);

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QClipboard>
 #include <QItemSelectionModel>
 #include <QKeyEvent>
+#include <QMimeData>
 #include <QRegExp>
 
 //-----------------------------------------------------------------------------
