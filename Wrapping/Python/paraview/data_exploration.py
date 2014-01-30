@@ -37,13 +37,13 @@ class AnalysisManager():
         self.begin()
 
 
-    def register_analysis(self, key, title, description, file_pattern):
+    def register_analysis(self, key, title, description, file_pattern, data_type):
         """
         Register a managed analysis.
         """
         path = os.path.join(self.work_dir, key)
         file_name_generator = FileNameGenerator(path, file_pattern)
-        metadata = { "title": title, "description": description, "path": path, "id": key }
+        metadata = { "title": title, "description": description, "path": path, "id": key , "type": data_type }
         for _key in metadata:
             file_name_generator.add_meta_data(_key, metadata[_key])
 
@@ -275,8 +275,12 @@ class SliceExplorer():
         self.file_name_generator = file_name_generator
 
     @staticmethod
-    def list_arguments(self):
+    def list_arguments():
         return ['sliceColor', 'slicePosition']
+
+    @staticmethod
+    def get_data_type():
+        return "parametric-image-stack"
 
     def add_attribute(self, name, value):
         setattr(self, name, value)
@@ -379,8 +383,12 @@ class ContourExplorer():
         self.file_name_generator.update_label_arguments(contourValue=str(contourBy[1]))
 
     @staticmethod
-    def list_arguments(self):
+    def list_arguments():
         return ['contourBy', 'contourValue']
+
+    @staticmethod
+    def get_data_type():
+        return None
 
     def __iter__(self):
         return self
@@ -432,8 +440,12 @@ class ImageResampler():
         self.color = simple.ColorByArray(Input=self.resampler, LookupTable=array_colors[field]['lut'], RGBANaNColor=nanColor, ColorBy=field )
 
     @staticmethod
-    def list_arguments(self):
+    def list_arguments():
         return ['field', 'slice', 'format']
+
+    @staticmethod
+    def get_data_type():
+        return "image-data-stack"
 
     def add_attribute(self, name, value):
         setattr(self, name, value)
@@ -466,7 +478,7 @@ class ImageResampler():
         self.file_name_generator.update_active_arguments(format='jpg')
         for field in self.array_colors:
             self.file_name_generator.update_active_arguments(field=field)
-            self.file_name_generator.update_active_arguments(False, slice='%03d')
+            self.file_name_generator.update_active_arguments(False, slice='%d')
             self.color.LookupTable = self.array_colors[field]['lut']
             self.color.ColorBy = field
             self.color.UpdatePipeline(time)
@@ -511,8 +523,12 @@ class LineProber():
         self.analysis = analysis
 
     @staticmethod
-    def list_arguments(self):
+    def list_arguments():
         return ['time', 'serie', 'field']
+
+    @staticmethod
+    def get_data_type():
+        return "line-prober-csv-stack"
 
     def UpdatePipeline(self, time=0):
         """
@@ -583,8 +599,12 @@ class DataProber():
         self.analysis = analysis
 
     @staticmethod
-    def list_arguments(self):
+    def list_arguments():
         return ['time', 'field', 'serie']
+
+    @staticmethod
+    def get_data_type():
+        return "point-serie-prober-csv-stack"
 
     def UpdatePipeline(self, time=0):
         """
@@ -697,8 +717,12 @@ class TimeSerieDataProber():
         self.analysis = analysis
 
     @staticmethod
-    def list_arguments(self):
+    def list_arguments():
         return ['field']
+
+    @staticmethod
+    def get_data_type():
+        return "time-csv-stack"
 
     def WriteToDisk(self):
         # Generate metadata
@@ -779,8 +803,12 @@ class ThreeSixtyImageStackExporter():
             raise Exception("Rotation axis not supported", self.phi_rotation_axis)
 
     @staticmethod
-    def list_arguments(self):
+    def list_arguments():
         return ['phi', 'theta']
+
+    @staticmethod
+    def get_data_type():
+        return "parametric-image-stack"
 
     def add_attribute(self, name, value):
         setattr(self, name, value)
