@@ -79,7 +79,46 @@ public:
     {
     this->tabBar()->setTabButton(index, position, wdg);
     }
+
+  int addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self)
+    {
+    int tab_count = this->count();
+    int tab_index = this->insertTab(tab_count-1, wdg, QString("Layout #%1").arg(tab_count));
+
+    QLabel* label = new QLabel(this);
+    label->setObjectName("popout");
+    label->setToolTip(pqTabWidget::popoutLabelText(false));
+    label->setStatusTip(pqTabWidget::popoutLabelText(false));
+    label->setPixmap(this->style()->standardPixmap(
+        pqTabWidget::popoutLabelPixmap(false)));
+    this->setTabButton(tab_index, QTabBar::LeftSide, label);
+    label->installEventFilter(self);
+
+    label = new QLabel(this);
+    label->setObjectName("close");
+    label->setToolTip("Close layout");
+    label->setStatusTip("Close layout");
+    label->setPixmap(
+      this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
+    this->setTabButton(tab_index, QTabBar::RightSide, label);
+    label->installEventFilter(self);
+    return tab_index;
+    }
+
+  static const char* popoutLabelText(bool popped_out)
+    {
+    return popped_out?
+      "Bring popped out window back to the frame":
+      "Pop out layout in separate window";
+    }
+
+  static QStyle::StandardPixmap popoutLabelPixmap(bool popped_out)
+    {
+    return popped_out?
+      QStyle::SP_TitleBarNormalButton: QStyle::SP_TitleBarMaxButton;
+    }
   };
+
 }
 
 class pqTabbedMultiViewWidget::pqInternals
@@ -382,29 +421,11 @@ void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
     SLOT(frameActivated()));
 
   int count = this->Internals->TabWidget->count();
-
   widget->setObjectName(QString("MultiViewWidget%1").arg(count));
   widget->setLayoutManager(vlayout);
 
-  int tab_index = this->Internals->TabWidget->insertTab(count-1, widget,
-    QString("Layout #%1").arg(count));
+  int tab_index = this->Internals->TabWidget->addAsTab(widget, this);
   this->Internals->TabWidget->setCurrentIndex(tab_index);
-
-  //set the close button for all tabs that are closeable.
-  //if (tab_index != 0 || true)
-  //   initially, we wanted to not allow closing the first tab. However, that
-  //   becomes cumbersome with mutliple servers. So let's experiment with all
-  //   tabs closeable.
-    {
-    QLabel* label = new QLabel(this);
-    label->setObjectName("close");
-    label->setPixmap(
-      this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
-    this->Internals->TabWidget->setTabButton(tab_index,
-      QTabBar::RightSide, label);
-    label->installEventFilter(this);
-    }
-
   pqServer* server =
     pqApplicationCore::instance()->getServerManagerModel()->findServer(
       vlayout->GetSession());
@@ -416,7 +437,8 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject *obj, QEvent *evt)
 {
   // filtering events on the QLabel added as the tabButton to the tabbar to
   // close the tabs. If clicked, we close the tab.
-  if (evt->type() == QEvent::MouseButtonRelease)
+  if (evt->type() == QEvent::MouseButtonRelease &&
+    qobject_cast<QLabel*>(obj))
     {
     int index = this->Internals->TabWidget->tabButtonIndex(
       qobject_cast<QWidget*>(obj), QTabBar::RightSide);
@@ -429,6 +451,26 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject *obj, QEvent *evt)
         this->createTab();
         }
       END_UNDO_SET();
+      return true;
+      }
+
+    // user clicked on the popout label. We pop the frame out (or back in).
+    index = this->Internals->TabWidget->tabButtonIndex(
+      qobject_cast<QWidget*>(obj), QTabBar::LeftSide);
+    if (index != -1)
+      {
+      // Pop out tab in a separate window.
+      pqMultiViewWidget* tabPage = qobject_cast<pqMultiViewWidget*>(
+        this->Internals->TabWidget->widget(index));
+      if (tabPage)
+        {
+        QLabel* label = qobject_cast<QLabel*>(obj);
+        bool popped_out = tabPage->togglePopout();
+        label->setPixmap(this->style()->standardPixmap(
+            pqTabWidget::popoutLabelPixmap(popped_out)));
+        label->setToolTip(pqTabWidget::popoutLabelText(popped_out));
+        label->setStatusTip(pqTabWidget::popoutLabelText(popped_out));
+        }
       return true;
       }
     }

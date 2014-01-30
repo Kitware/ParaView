@@ -174,6 +174,9 @@ void pqViewFrame::updateLayout()
 
   delete this->layout();
   this->setLayout(vbox);
+
+  // ensure that the frame is repainted.
+  this->update();
 }
 
 //-----------------------------------------------------------------------------
