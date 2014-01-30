@@ -145,6 +145,13 @@ Now unpack everything in the right places.
     $ tar zxvf /home/ec2-user/downloads/apr-util.tgz
     $ mv apr-util-1.5.3 apr-util
 
+Note that for Apache version less than 2.4.7, you will need to patch
+the sources before building:
+
+    $ wget -O httpd-patch.txt https://issues.apache.org/bugzilla/attachment.cgi?id=30886&action=diff&context=patch&collapsed=&headers=1&format=raw
+    $ cd httpd-[version]
+    $ patch -u -p1 < /home/ec2-user/downloads/httpd-patch.txt
+
 Now configure the Apache build.
 
     $ cd /home/ec2-user/apache-2.4.7-src/httpd-2.4.7
