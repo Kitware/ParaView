@@ -80,16 +80,6 @@ foreach (vtk_module IN LISTS VTK_MODULES_ENABLED extra_modules)
       endif ()
     endforeach ()
 
-    if (TARGET ${vtk_module})
-      get_property(target_type TARGET "${vtk_module}" PROPERTY TYPE)
-      if (target_type MATCHES "_LIBRARY$")
-        set(vtk_module_library_name)
-        get_property(vtk_module_library_name TARGET "${vtk_module}" PROPERTY OUTPUT_NAME)
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
-"\"${vtk_module_library_name}\", ")
-      endif ()
-    endif ()
-
     file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
 "NULL };
 const char* ${vtk_module}Depends[] = { ")
