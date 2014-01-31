@@ -37,7 +37,7 @@ set (QtTesting_INSTALL_LIBRARY_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (QT_TESTING_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 set (QtTesting_INSTALL_INCLUDE_DIR ${VTK_INSTALL_INCLUDE_DIR})
 set (QtTesting_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
-
+set (QtTesting_QT_VERSION ${PARAVIEW_QT_VERSION})
 ##########################################################################
 # import Qt build settings
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
