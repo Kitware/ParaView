@@ -78,14 +78,14 @@ done
     rm -rf "$src_output" "$bin_output"
 
 # Catalyze.
-mkdir -p "$src_output"
+mkdir -v -p "$src_output"
 python "$scriptdir/catalyze.py" -r "$scriptdir/.." $args -o "$src_output" || \
     die "Failed to catalyze"
 
 [ -n "$no_configure" ] && exit 0
 
 # Configure the catalyzed tree.
-mkdir -p "$bin_output"
+mkdir -v -p "$bin_output"
 cd "$bin_output"
 "$src_output/cmake.sh" "$@" "$src_output" || \
     die "Failed to configure the tree"
@@ -100,7 +100,7 @@ cmake --build . || \
 # Test if wanted.
 if [ -z "$no_test" ]; then
     # Create the testing directory.
-    mkdir "$src_output/Testing"
+    mkdir -v "$src_output/Testing"
     for edition in $editions; do
         [ -d "$editiondir/$edition/Testing" ] || continue
 
@@ -109,7 +109,7 @@ if [ -z "$no_test" ]; then
     done
 
     # Configure the testing tree.
-    mkdir -p "$bin_output/Testing"
+    mkdir -v -p "$bin_output/Testing"
     cd "$bin_output/Testing"
     cmake "$@" \
         "-DPVPYTHON_EXE=$bin_output/bin/pvpython" \
