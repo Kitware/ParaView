@@ -43,17 +43,17 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLightsPropertyGroup :
 {
   Q_OBJECT
 
- friend class pqLightsEditor;
+friend class pqLightsEditor;
 
- public:
+public:
   pqLightsPropertyGroup(vtkSMProxy *proxy, vtkSMPropertyGroup* smGroup,
                         QWidget *parent = 0);
   ~pqLightsPropertyGroup();
 
- private slots:
+private slots:
   void showEditor();
 
- private:
+private:
   pqLightsEditor* Editor;
 };
 

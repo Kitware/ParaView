@@ -46,13 +46,15 @@ pqLightsPropertyGroup::pqLightsPropertyGroup(
   : pqPropertyGroupWidget(smProxy, smGroup, parentObject),
     Editor (new pqLightsEditor(this))
 {
-  QVBoxLayout *layoutLocal = new QVBoxLayout(this);
+  QHBoxLayout *layoutLocal = new QHBoxLayout(this);
   layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
   layoutLocal->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
 
   QPushButton *button = new QPushButton("Edit");
-  connect(button, SIGNAL(clicked()), SLOT(showEditor()));
   layoutLocal->addWidget(button);
+  layoutLocal->addStretch();
+
+  connect(button, SIGNAL(clicked()), SLOT(showEditor()));
 }
 
 pqLightsPropertyGroup::~pqLightsPropertyGroup()
