@@ -73,6 +73,10 @@ done
 [ -z "$editions" ] && \
     die "Need at least one input"
 
+if [ -n "$no_build" ] && [ -n "$install" ]; then
+    die "--install requires a build"
+fi
+
 # Remove directories if requested
 [ -n "$remove" ] && \
     rm -rf "$src_output" "$bin_output"
