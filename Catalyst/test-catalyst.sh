@@ -90,12 +90,11 @@ cd "$bin_output"
 "$src_output/cmake.sh" "$@" "$src_output" || \
     die "Failed to configure the tree"
 
-# Exit if a build is not wanted.
-[ -n "$no_build" ] && exit 0
-
-cd "$bin_output"
-cmake --build . || \
-    die "Failed to build"
+if [ -z "$no_build" ]; then
+    cd "$bin_output"
+    cmake --build . || \
+        die "Failed to build"
+fi
 
 # Test if wanted.
 if [ -z "$no_test" ]; then
@@ -117,14 +116,16 @@ if [ -z "$no_test" ]; then
         "$src_output/Testing" || \
         die "Failed to configure tests"
 
-    # Build the testing tree.
-    cd "$bin_output/Testing"
-    cmake --build . || \
-        die "Failed to build tests"
+    if [ -z "$no_build" ]; then
+        # Build the testing tree.
+        cd "$bin_output/Testing"
+        cmake --build . || \
+            die "Failed to build tests"
 
-    # Run the tests.
-    ctest -VV || \
-        die "Tests failed"
+        # Run the tests.
+        ctest -VV || \
+            die "Tests failed"
+    fi
 fi
 
 if [ -n "$install" ]; then
