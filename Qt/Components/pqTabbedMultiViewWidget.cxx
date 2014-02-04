@@ -54,77 +54,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QtDebug>
 
-namespace
+//-----------------------------------------------------------------------------
+// **************** pqTabbedMultiViewWidget::pqTabWidget **********************
+//-----------------------------------------------------------------------------
+pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject):
+  Superclass(parentObject)
 {
-  class pqTabWidget : public QTabWidget
-  {
-public:
-  pqTabWidget(QWidget* parentObject): QTabWidget(parentObject)
-  {
-  }
-
-  int tabButtonIndex(QWidget* wdg, QTabBar::ButtonPosition position) const
-    {
-    for (int cc=0; cc < this->count(); cc++)
-      {
-      if (this->tabBar()->tabButton(cc, position) == wdg)
-        {
-        return cc;
-        }
-      }
-    return -1;
-    }
-
-  void setTabButton(int index, QTabBar::ButtonPosition position, QWidget* wdg)
-    {
-    this->tabBar()->setTabButton(index, position, wdg);
-    }
-
-  int addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self)
-    {
-    int tab_count = this->count();
-    int tab_index = this->insertTab(tab_count-1, wdg, QString("Layout #%1").arg(tab_count));
-
-    QLabel* label = new QLabel(this);
-    label->setObjectName("popout");
-    label->setToolTip(pqTabWidget::popoutLabelText(false));
-    label->setStatusTip(pqTabWidget::popoutLabelText(false));
-    label->setPixmap(this->style()->standardPixmap(
-        pqTabWidget::popoutLabelPixmap(false)));
-    this->setTabButton(tab_index, QTabBar::LeftSide, label);
-    label->installEventFilter(self);
-
-    label = new QLabel(this);
-    label->setObjectName("close");
-    label->setToolTip("Close layout");
-    label->setStatusTip("Close layout");
-    label->setPixmap(
-      this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
-    this->setTabButton(tab_index, QTabBar::RightSide, label);
-    label->installEventFilter(self);
-    return tab_index;
-    }
-
-  static const char* popoutLabelText(bool popped_out)
-    {
-    return popped_out?
-      "Bring popped out window back to the frame":
-      "Pop out layout in separate window";
-    }
-
-  static QStyle::StandardPixmap popoutLabelPixmap(bool popped_out)
-    {
-    return popped_out?
-      QStyle::SP_TitleBarNormalButton: QStyle::SP_TitleBarMaxButton;
-    }
-  };
-
 }
 
+//-----------------------------------------------------------------------------
+pqTabbedMultiViewWidget::pqTabWidget::~pqTabWidget()
+{
+}
+
+//-----------------------------------------------------------------------------
+int pqTabbedMultiViewWidget::pqTabWidget::tabButtonIndex(
+  QWidget* wdg, QTabBar::ButtonPosition position) const
+{
+  for (int cc=0; cc < this->count(); cc++)
+    {
+    if (this->tabBar()->tabButton(cc, position) == wdg)
+      {
+      return cc;
+      }
+    }
+  return -1;
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::pqTabWidget::setTabButton(
+  int index, QTabBar::ButtonPosition position, QWidget* wdg)
+{
+  this->tabBar()->setTabButton(index, position, wdg);
+}
+
+//-----------------------------------------------------------------------------
+int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self)
+{
+  int tab_count = this->count();
+  int tab_index = this->insertTab(tab_count-1, wdg, QString("Layout #%1").arg(tab_count));
+
+  QLabel* label = new QLabel(this);
+  label->setObjectName("popout");
+  label->setToolTip(pqTabWidget::popoutLabelText(false));
+  label->setStatusTip(pqTabWidget::popoutLabelText(false));
+  label->setPixmap(this->style()->standardPixmap(
+      pqTabWidget::popoutLabelPixmap(false)));
+  this->setTabButton(tab_index, QTabBar::LeftSide, label);
+  label->installEventFilter(self);
+
+  label = new QLabel(this);
+  label->setObjectName("close");
+  label->setToolTip("Close layout");
+  label->setStatusTip("Close layout");
+  label->setPixmap(
+    this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
+  this->setTabButton(tab_index, QTabBar::RightSide, label);
+  label->installEventFilter(self);
+  return tab_index;
+}
+
+//-----------------------------------------------------------------------------
+const char* pqTabbedMultiViewWidget::pqTabWidget::popoutLabelText(bool popped_out)
+{
+  return popped_out?
+    "Bring popped out window back to the frame":
+    "Pop out layout in separate window";
+}
+
+//-----------------------------------------------------------------------------
+QStyle::StandardPixmap pqTabbedMultiViewWidget::pqTabWidget::popoutLabelPixmap(bool popped_out)
+{
+  return popped_out?
+    QStyle::SP_TitleBarNormalButton: QStyle::SP_TitleBarMaxButton;
+}
+
+//-----------------------------------------------------------------------------
+// ****************     pqTabbedMultiViewWidget   **********************
+//-----------------------------------------------------------------------------
 class pqTabbedMultiViewWidget::pqInternals
 {
 public:
-  QPointer<pqTabWidget> TabWidget;
+  QPointer<pqTabbedMultiViewWidget::pqTabWidget> TabWidget;
   QMultiMap<pqServer*, QPointer<pqMultiViewWidget> > TabWidgets;
   QPointer<QWidget> FullScreenWindow;
 
