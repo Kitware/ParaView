@@ -70,7 +70,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHDerivedDensity2DClyinder.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundLights.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
@@ -161,6 +160,14 @@ SET (TESTS_WITH_BASELINES
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
+
+# The color dialog is different on MacOS X which makes this test fail.
+if(NOT APPLE)
+  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/BackgroundLights.xml
+    )
+endif()
+
 
 if (PARAVIEW_USE_MPI)
   list(APPEND TESTS_WITH_BASELINES
