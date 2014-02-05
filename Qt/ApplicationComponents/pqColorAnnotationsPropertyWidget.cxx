@@ -617,6 +617,11 @@ void pqColorAnnotationsPropertyWidget::removeAnnotation()
 {
   QModelIndexList indexes =
     this->Internals->Ui.AnnotationsTable->selectionModel()->selectedIndexes();
+  if( indexes.size() == 0 )
+    {
+    // Nothing selected. Nothing to remove
+    return;
+    }
   QModelIndex idx = this->Internals->Model.removeAnnotations(indexes);
   this->Internals->Ui.AnnotationsTable->setCurrentIndex(idx);
   emit this->annotationsChanged();
