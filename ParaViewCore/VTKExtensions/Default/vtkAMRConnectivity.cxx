@@ -286,21 +286,31 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           if (neighbor != 0)
             {
             this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
-            if (neighbor->Level > block->Level) 
+            if (neighbor && neighbor->Level > block->Level) 
               {
+              int level = neighbor->Level;
               int index[3] = { neighbor->GridIndex[0], neighbor->GridIndex[1], neighbor->GridIndex[2] };
   
               index[(dir+1) % 3] ++;
-              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+              neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
+              if (neighbor != 0)
+                { 
+                this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+                }
   
               index[(dir+2) % 3] ++;
-              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+              neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
+              if (neighbor != 0)
+                { 
+                this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+                }
   
               index[(dir+1) % 3] --;
-              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+              neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
+              if (neighbor != 0)
+                { 
+                this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+                }
               }
             }
           }
