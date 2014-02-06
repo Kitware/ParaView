@@ -27,6 +27,7 @@
 #include "vtkCommand.h"
 #include <vtkPVXMLElement.h>
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include <typeinfo>
 #include <limits>
 

@@ -106,6 +106,7 @@ set (Module_SRCS
   vtkSMSession.cxx
   vtkSMSessionObject.cxx
   vtkSMSessionProxyManager.cxx
+  vtkSMSettings.cxx
   vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx

@@ -311,6 +311,13 @@ public:
   vtkGetStringMacro(XMLLabel);
 
   // Description:
+  // The name assigned by the xml parser. Used to get the property
+  // from a proxy. Note that the name used to obtain a property
+  // that is on a subproxy may be different from the XMLName of the property,
+  // see the note on ExposedProperties for vtkSMProxy.
+  vtkGetStringMacro(XMLName);
+
+  // Description:
   // If repeatable, a property can have 1 or more values of the same kind.
   // This ivar is configured when the xml file is read and is mainly useful
   // for information (for example from python).
@@ -396,13 +403,6 @@ protected:
   // see the note on ExposedProperties for vtkSMProxy.
   vtkSetStringMacro(XMLName);
   
-  // Description:
-  // The name assigned by the xml parser. Used to get the property
-  // from a proxy. Note that the name used to obtain a property
-  // that is on a subproxy may be different from the XMLName of the property,
-  // see the note on ExposedProperties for vtkSMProxy.
-  vtkGetStringMacro(XMLName);
-
   // Description:
   // Internal. Used during XML parsing to get a property with
   // given name. Used by the domains when setting required properties.

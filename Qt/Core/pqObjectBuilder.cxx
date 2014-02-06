@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTransferFunctionManager.h"
@@ -74,6 +75,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqViewModuleInterface.h"
 #include "vtkSMAnimationSceneProxy.h"
+
+inline QString pqObjectBuilderGetName(vtkSMProxy* proxy,
+  pqNameCount *nameGenerator)
+{
+  QString label =
+    proxy->GetXMLLabel()? proxy->GetXMLLabel() : proxy->GetXMLName();
+  label.remove(' ');
+  return QString("%1%2").arg(label).arg(
+    nameGenerator->GetCountAndIncrement(label));
+}
 
 namespace pqObjectBuilderNS
 {
@@ -117,6 +128,7 @@ namespace pqObjectBuilderNS
     // Update animation scene.
     vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps(
       Controller->GetAnimationScene(server->session()));
+
     return source;
     }
 }
@@ -263,7 +275,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   QString pname = this->getFileNamePropertyName(proxy);
   if (!pname.isEmpty())
     {
-    vtkSMStringVectorProperty* prop = 
+    vtkSMStringVectorProperty* prop =
       vtkSMStringVectorProperty::SafeDownCast(
         proxy->GetProperty(pname.toLatin1().data()));
     if (!prop)
@@ -281,7 +293,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
 
     if (numFiles == 1 || !prop->GetRepeatCommand())
       {
-      pqSMAdaptor::setElementProperty(prop, 
+      pqSMAdaptor::setElementProperty(prop,
         pqObjectBuilderGetPath(files[0], use_dir));
       }
     else
@@ -390,7 +402,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
 
   pqObjectBuilderNS::Controller->InitializeView(proxy);
 
-  pqServerManagerModel* model = 
+  pqServerManagerModel* model =
     pqApplicationCore::instance()->getServerManagerModel();
   pqView* view = model->findItem<pqView*>(proxy);
   if (view)
@@ -479,7 +491,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
 
 
   // Set the reprProxy's input.
-  pqSMAdaptor::setInputProperty(reprProxy->GetProperty("Input"), 
+  pqSMAdaptor::setInputProperty(reprProxy->GetProperty("Input"),
     source->getProxy(), opPort->getPortNumber());
   // Let application ignore default and hide display of filters if they must.
   if (pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault())
@@ -577,7 +589,7 @@ void pqObjectBuilder::destroy(pqRepresentation* repr)
   if (stc)
     {
     // this hides scalar bars only if the LUT is not used by
-    // any other repr. This must happen after the repr has 
+    // any other repr. This must happen after the repr has
     // been deleted.
     stc->hideUnusedScalarBars();
     }
@@ -594,7 +606,7 @@ void pqObjectBuilder::destroy(pqProxy* proxy)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::destroySources(pqServer* server)
 {
-  pqServerManagerModel* model = 
+  pqServerManagerModel* model =
     pqApplicationCore::instance()->getServerManagerModel();
   pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
@@ -617,7 +629,7 @@ void pqObjectBuilder::destroySources(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::destroyLookupTables(pqServer* server)
 {
-  pqServerManagerModel* model = 
+  pqServerManagerModel* model =
     pqApplicationCore::instance()->getServerManagerModel();
   pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
@@ -628,7 +640,7 @@ void pqObjectBuilder::destroyLookupTables(pqServer* server)
     builder->destroy(lut);
     }
 
-  QList<pqScalarBarRepresentation*> scalarbars = 
+  QList<pqScalarBarRepresentation*> scalarbars =
     model->findItems<pqScalarBarRepresentation*>(server);
   foreach (pqScalarBarRepresentation* sb, scalarbars)
     {
@@ -661,7 +673,7 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
   if (proxy)
     {
     vtkSMSessionProxyManager* pxm = proxy->proxyManager();
-    pxm->UnRegisterProxy(proxy->getSMGroup().toLatin1().data(), 
+    pxm->UnRegisterProxy(proxy->getSMGroup().toLatin1().data(),
       proxy->getSMName().toLatin1().data(), proxy->getProxy());
     }
 }
@@ -844,4 +856,14 @@ void pqObjectBuilder::initializeInheritedProperties(pqDataRepresentation* repr)
     }
   iter->Delete();
   reprProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqObjectBuilder::onProxyCreated(pqProxy* proxy)
+{
+  vtkSMProxy* smProxy = proxy->getProxy();
+  std::string jsonPrefix(".");
+  jsonPrefix.append(smProxy->GetXMLGroup());
+
+  vtkSMSettings::GetInstance()->SetProxySettings(smProxy, jsonPrefix.c_str());
 }

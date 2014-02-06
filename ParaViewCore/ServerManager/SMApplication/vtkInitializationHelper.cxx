@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkOutputWindow.h"
 #include "vtkProcessModule.h"
@@ -23,6 +24,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVInitializer.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
+#include "vtkPVSession.h"
+#include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
@@ -183,6 +186,71 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   // These are always loaded (not merely located).
   vtkNew<vtkPVPluginLoader> loader;
   loader->LoadPluginsFromPluginSearchPath();
+
+  // Load settings files. Only load settings on client or root data node
+  vtkSMSettings * settings = vtkSMSettings::GetInstance();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetProcessType() == vtkProcessModule::PROCESS_CLIENT ||
+      (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+       pm->GetPartitionId() == 0))
+    {
+    settings->LoadSiteSettings();
+    settings->LoadUserSettings();
+    }
+  if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+      pm->GetSymmetricMPIMode())
+    {
+    // Broadcast settings to satellite nodes
+    vtkMultiProcessController * controller = pm->GetGlobalController();
+    unsigned int stringSize;
+    if (controller->GetLocalProcessId() == 0)
+      {
+      char* siteSettingsString = settings->GetSiteSettingsString();
+      stringSize = siteSettingsString ? (strlen(siteSettingsString)+1) : 0;
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        controller->Broadcast(siteSettingsString, stringSize, 0);
+        }
+
+      char* userSettingsString = settings->GetUserSettingsString();
+      stringSize = userSettingsString ? (strlen(userSettingsString)+1) : 0;
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        controller->Broadcast(userSettingsString, stringSize, 0);
+        }
+      }
+    else // Satellites
+      {
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        char* siteSettingsString = new char[stringSize];
+        controller->Broadcast(siteSettingsString, stringSize, 0);
+        std::cout << "siteSettings: " << siteSettingsString << std::endl;
+        settings->SetSiteSettingsString(siteSettingsString);
+        delete[] siteSettingsString;
+        }
+      else
+        {
+        settings->SetSiteSettingsString(NULL);
+        }
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        char* userSettingsString = new char[stringSize];
+        controller->Broadcast(userSettingsString, stringSize, 0);
+        std::cout << "userSettings: " << userSettingsString << std::endl;
+        settings->SetUserSettingsString(userSettingsString);
+        delete[] userSettingsString;
+        }
+      else
+        {
+        settings->SetUserSettingsString(NULL);
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -569,7 +569,6 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
         stream);
       }
     break;
-
     }
 }
 
