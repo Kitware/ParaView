@@ -79,8 +79,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 
 #include <QStringList>
+#include <set>
 
 static const int metaId = qRegisterMetaType<QList<QList<QVariant> > >();
+
+namespace
+{
+  template <class T>
+  T* FindDomain(vtkSMProperty* prop)
+    {
+    Q_ASSERT(prop != NULL);
+
+    vtkSmartPointer<vtkSMDomainIterator> iter;
+    iter.TakeReference(prop->NewDomainIterator());
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      T* domain = T::SafeDownCast(iter->GetDomain());
+      if (domain)
+        {
+        return domain;
+        }
+      }
+    return NULL;
+    }
+}
 
 pqSMAdaptor::pqSMAdaptor()
 {
@@ -1169,24 +1191,43 @@ QList<QVariant> pqSMAdaptor::getMultipleElementProperty(vtkSMProperty* Property,
     return props;
     }
 
-  int num = 0;
+  vtkSMPropertyHelper* helper = (Type==CHECKED)?
+    new vtkSMPropertyHelper(Property) :
+    new vtkSMUncheckedPropertyHelper(Property);
 
-  if(Type == CHECKED)
+  if (VectorProperty->IsA("vtkSMDoubleVectorProperty"))
     {
-    num = VectorProperty->GetNumberOfElements();
+    std::vector<double> vals = helper->GetArray<double>();
+    foreach (const double& val, vals)
+      {
+      props.push_back(val);
+      }
     }
-  else if(Type == UNCHECKED)
+  else if (VectorProperty->IsA("vtkSMIntVectorProperty"))
     {
-    num = VectorProperty->GetNumberOfUncheckedElements();
+    std::vector<int> vals = helper->GetArray<int>();
+    foreach (const int& val, vals)
+      {
+      props.push_back(val);
+      }
     }
-
-  for(int i=0; i<num; i++)
+  else if (VectorProperty->IsA("vtkSMIdTypeVectorProperty"))
     {
-    props.push_back(pqSMAdaptor::getMultipleElementProperty(Property,
-                                                            i,
-                                                            Type));
+    std::vector<vtkIdType> vals = helper->GetArray<vtkIdType>();
+    foreach (const vtkIdType& val, vals)
+      {
+      props.push_back(val);
+      }
     }
-
+  else if (VectorProperty->IsA("vtkSMStringVectorProperty"))
+    {
+    unsigned int count = helper->GetNumberOfElements();
+    for (unsigned int cc=0; cc < count; cc++)
+      {
+      props.push_back(helper->GetAsString(cc));
+      }
+    }
+  delete helper;
   return props;
 }
 

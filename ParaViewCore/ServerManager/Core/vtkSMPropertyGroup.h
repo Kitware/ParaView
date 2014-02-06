@@ -80,6 +80,11 @@ public:
   vtkSMProperty* GetProperty(const char* function) const;
 
   // Description:
+  // Given property in the group, returns its function. Will return NULL if the
+  // property is not present in this group.
+  const char* GetFunction(vtkSMProperty* property) const;
+
+  // Description:
   // Returns the number of properties in the group.
   unsigned int GetNumberOfProperties() const;
 

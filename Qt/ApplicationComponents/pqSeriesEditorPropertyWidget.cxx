@@ -33,9 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqSeriesEditorPropertyWidget.h"
 
 #include "pqPropertiesPanel.h"
+#include "pqSMAdaptor.h"
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkNew.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMChartSeriesSelectionDomain.h"
 #include "vtkSMPropertyGroup.h"
-#include "vtkSMProperty.h"
+#include "vtkSMVectorProperty.h"
 
 #include <QAbstractTableModel>
 #include <QByteArray>
@@ -50,8 +56,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSortFilterProxyModel>
 #include <QVector>
 
-#include <assert.h>
-
+//=============================================================================
+// QAbstractTableModel for showing the series properties. Since series
+// properties are specified on several different vtkSMProperty instances on the
+// proxy, there could easily be a mismatch i.e. a series is specified in
+// "SeriesVisibility", but not in "SeriesColor". To overcome that issues, this
+// model uses the "SeriesVisibility" as the main driver for the model. There
+// will exactly as many rows as the number of series specified in
+// SeriesVisibility. For all other properties, extra values will not be shown
+// and default values will be made up for missing series.
 class pqSeriesParametersModel : public QAbstractTableModel
 {
   typedef QAbstractTableModel Superclass;
@@ -62,6 +75,7 @@ class pqSeriesParametersModel : public QAbstractTableModel
   QMap<QString, QString> Labels;
   QMap<QString, QColor> Colors;
   QPointer<QWidget> Widget; // used to determine text size.
+  vtkSmartPointer<vtkSMChartSeriesSelectionDomain> Domain;
 
   QColor seriesColor(const QModelIndex& idx) const
     {
@@ -72,6 +86,20 @@ class pqSeriesParametersModel : public QAbstractTableModel
       }
     return QColor();
     }
+
+  // returns true is the series is in Domain else false.
+  bool isSeriesInDomain(const QString& seriesName) const
+    {
+    unsigned int unused=0;
+    if (this->Domain &&
+      this->Domain->IsInDomain(seriesName.toAscii().data(), unused)!=0)
+      {
+      return true;
+      }
+    // if no domain is present, then the series is treated is always visible.
+    return (this->Domain.GetPointer() != NULL)? false : true;
+    }
+
 public:
   pqSeriesParametersModel(bool supportsReorder, QObject* parentObject=0):
     Superclass(parentObject),
@@ -85,6 +113,14 @@ public:
     {
     }
   void setWidget(QWidget* wdg) { this->Widget = wdg; }
+  void setVisibilityDomain(vtkSMChartSeriesSelectionDomain* domain)
+    { this->Domain = domain;}
+  void domainChanged()
+    {
+    // fire dataChanged signal so the filtering logic can kick in.
+    emit this->dataChanged(this->index(0, VISIBILITY),
+      this->index(this->rowCount()-1, VISIBILITY));
+    }
 
   enum ColumnRoles
     {
@@ -93,6 +129,8 @@ public:
     LABEL = 2
     };
 
+  /// Drag/drop of rows is enabled for cases were the series ordering is
+  /// relevant e.g. parallel coordinates/scatter plot matrix.
   virtual Qt::ItemFlags flags(const QModelIndex &idx) const
     {
     Qt::ItemFlags value = this->Superclass::flags(idx);
@@ -130,7 +168,7 @@ public:
 
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
-    assert(idx.row() < this->Visibilities.size());
+    Q_ASSERT(idx.row() < this->Visibilities.size());
 #ifndef __APPLE__
     // On OSX, the default row-size ends up being reasonable. Hence, don't override it on OsX.
     if (role == Qt::SizeHintRole)
@@ -152,6 +190,10 @@ public:
       case Qt::ToolTipRole:
       case Qt::StatusTipRole:
         return this->Visibilities[idx.row()].first;
+
+      case Qt::UserRole:
+        // check if the series is in domain and then show/hide it.
+        return this->isSeriesInDomain(this->Visibilities[idx.row()].first)? "1" : "0" ;
 
       case Qt::CheckStateRole:
         return this->Visibilities[idx.row()].second?
@@ -204,14 +246,14 @@ public:
     if (idx.column() == VISIBILITY && role == Qt::CheckStateRole)
       {
       bool checkState = (value.toInt() == Qt::Checked);
-      assert(idx.row() < this->Visibilities.size());
+      Q_ASSERT(idx.row() < this->Visibilities.size());
       this->Visibilities[idx.row()].second = checkState;
       emit this->dataChanged(idx, idx);
       return true;
       }
     else if (idx.column() == COLOR && role == Qt::EditRole)
       {
-      assert(idx.row() < this->Visibilities.size());
+      Q_ASSERT(idx.row() < this->Visibilities.size());
       if (value.canConvert(QVariant::Color))
         {
         this->Colors[this->Visibilities[idx.row()].first] =
@@ -222,7 +264,7 @@ public:
       }
     else if (idx.column() == LABEL && role == Qt::EditRole)
       {
-      assert(idx.row() < this->Visibilities.size());
+      Q_ASSERT(idx.row() < this->Visibilities.size());
       this->Labels[this->Visibilities[idx.row()].first] = value.toString();
       emit this->dataChanged(idx, idx);
       return true;
@@ -238,11 +280,14 @@ public:
       switch (section)
         {
       case VISIBILITY:
-        return "Variable";
+        return role == Qt::DisplayRole? "Variable" :
+          "Toggle series visibility";
       case COLOR:
-        return ""; 
+        return role == Qt::DisplayRole? "" :
+          "Set color to use for the series";
       case LABEL:
-        return "Legend Name";
+        return role == Qt::DisplayRole? "Legend Name":
+          "Set the text to use for the series in the legend";
         }
       }
     return this->Superclass::headerData(section, orientation, role);
@@ -469,10 +514,14 @@ private:
   Q_DISABLE_COPY(pqSeriesParametersModel);
 };
 
+//=============================================================================
+
 class pqSeriesEditorPropertyWidget::pqInternals
 {
 public:
   Ui::SeriesEditorPropertyWidget Ui;
+  vtkSmartPointer<vtkSMPropertyGroup> PropertyGroup;
+  vtkNew<vtkEventQtSlotConnect> VTKConnector;
   pqSeriesParametersModel Model;
   QMap<QString, int> Thickness;
   QMap<QString, int> Style;
@@ -497,17 +546,23 @@ public:
     // give the model a widget so it can compute text sizes better.
     this->Model.setWidget(this->Ui.SeriesTable);
 
-    if (supportsReorder)
-      {
-      this->Ui.SeriesTable->setModel(&this->Model);
-      }
-    else
-      {
-      QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(self);
-      proxyModel->setSourceModel(&this->Model);
-      this->Ui.SeriesTable->setModel(proxyModel);
-      this->Ui.SeriesTable->setSortingEnabled(true);
-      }
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(self);
+    proxyModel->setSourceModel(&this->Model);
+    this->Ui.SeriesTable->setModel(proxyModel);
+    // sorting is enabled only when re-ordering is not supported i.e. when the
+    // order of the series is irrelevant for the plot.
+    this->Ui.SeriesTable->setSortingEnabled(!supportsReorder);
+
+    // Add filtering capabilities.
+    // Conditionally hides rows that are no longer present in the domain.
+    // This keeps the view showing too many rows that are no longer applicable.
+    // The UI will (TODO) a mechanism to see all available values.
+    proxyModel->setFilterRole(Qt::UserRole);
+    proxyModel->setFilterRegExp("^1$");
+    proxyModel->setFilterKeyColumn(0);
+    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    // this is needed so that the filter is updated every time data changes.
+    proxyModel->setDynamicSortFilter(true);
 
     // this needs to be done after the columns exist.
     this->Ui.SeriesTable->header()->setResizeMode(
@@ -530,6 +585,7 @@ public:
     return proxyModel? proxyModel->mapToSource(idx) : idx;
     }
 };
+//=============================================================================
 
 //-----------------------------------------------------------------------------
 pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
@@ -553,12 +609,21 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
       " This widget is not going to work.");
     return;
     }
+  this->Internals->PropertyGroup = smgroup;
 
   Ui::SeriesEditorPropertyWidget &ui = this->Internals->Ui;
 
   this->addPropertyLink(
     this, "seriesVisibility", SIGNAL(seriesVisibilityChanged()),
     smgroup->GetProperty("SeriesVisibility"));
+  this->Internals->Model.setVisibilityDomain(
+    vtkSMChartSeriesSelectionDomain::SafeDownCast(
+      smgroup->GetProperty("SeriesVisibility")->FindDomain(
+        "vtkSMChartSeriesSelectionDomain")));
+
+  this->Internals->VTKConnector->Connect(
+    smgroup->GetProperty("SeriesVisibility"), vtkCommand::DomainModifiedEvent,
+    this, SLOT(domainModified(vtkObject*)));
 
   if (smgroup->GetProperty("SeriesLabel"))
     {
@@ -945,4 +1010,12 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
     this->Internals->PlotCorner[key] = ui.AxisList->currentIndex();
     emit this->seriesPlotCornerChanged();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSeriesEditorPropertyWidget::domainModified(vtkObject*)
+{
+  // Trigger dataChanged() signals on the model so that the list refreshes to
+  // hide series that are no longer in domain.
+  this->Internals->Model.domainChanged();
 }

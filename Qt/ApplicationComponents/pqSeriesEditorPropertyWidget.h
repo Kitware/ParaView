@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
-class vtkSMPropertyGroup;
 class QModelIndex;
-
+class vtkObject;
+class vtkSMPropertyGroup;
 
 /// pqSeriesEditorPropertyWidget is the pqPropertyWidget used to edit
 /// plot-options for a xy-series. It works with a property-group with properties
@@ -152,6 +152,9 @@ private slots:
 
   void refreshPropertiesWidgets();
   void savePropertiesWidgets();
+  
+  /// called when the vtkSMProperty fires a vtkCommand::DomainModifiedEvent.
+  void domainModified(vtkObject* sender);
 
 private:
   Q_DISABLE_COPY(pqSeriesEditorPropertyWidget);

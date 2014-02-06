@@ -16,6 +16,7 @@
 
 #include "vtkChartRepresentation.h"
 #include "vtkColorSeries.h"
+#include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
@@ -168,6 +169,9 @@ vtkSMChartSeriesSelectionDomain::vtkSMChartSeriesSelectionDomain() :
   this->DefaultMode = vtkSMChartSeriesSelectionDomain::UNDEFINED;
   this->DefaultValue = 0;
   this->SetDefaultValue("");
+
+  this->AddObserver(vtkCommand::DomainModifiedEvent,
+    this, &vtkSMChartSeriesSelectionDomain::OnDomainModified);
 }
 
 //----------------------------------------------------------------------------
@@ -258,7 +262,6 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
   // clear old component names.
   this->Internals->ComponentNames.clear();
 
-
   if (compositeIndex == NULL ||
     dataInfo->GetCompositeDataInformation()->GetDataIsComposite() == 0)
     {
@@ -306,6 +309,38 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
 }
 
 //----------------------------------------------------------------------------
+std::vector<vtkStdString> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const char* series)
+{
+  std::vector<vtkStdString> values;
+  if (this->DefaultMode == VISIBILITY)
+    {
+    values.push_back(
+      this->GetDefaultSeriesVisibility(series)?
+      "1" : "0");
+    }
+  else if (this->DefaultMode == LABEL)
+    {
+    // by default, label is same as the name of the series.
+    values.push_back(series);
+    }
+  else if (this->DefaultMode == COLOR)
+    {
+    vtkColor3ub color = this->Internals->GetNextColor();
+    for (int kk=0; kk < 3; kk++)
+      {
+      std::ostringstream stream;
+      stream << std::setprecision(2) << color.GetData()[kk]/255.0;
+      values.push_back(stream.str());
+      }
+    }
+  else if (this->DefaultMode == VALUE)
+    {
+    values.push_back(this->DefaultValue);
+    }
+  return values;
+}
+
+//----------------------------------------------------------------------------
 int vtkSMChartSeriesSelectionDomain::SetDefaultValues(vtkSMProperty* property)
 {
   vtkSMStringVectorProperty* vp = vtkSMStringVectorProperty::SafeDownCast(property);
@@ -315,63 +350,59 @@ int vtkSMChartSeriesSelectionDomain::SetDefaultValues(vtkSMProperty* property)
     return 0;
     }
 
-  const std::vector<vtkStdString>& domain_strings = this->GetStrings();
-  if (this->DefaultMode == VISIBILITY)
-    {
-    vtkNew<vtkStringList> value;
-    for (size_t cc=0; cc < domain_strings.size(); cc++)
-      {
-      value->AddString(domain_strings[cc].c_str());
-      value->AddString(
-        this->GetDefaultSeriesVisibility(domain_strings[cc].c_str())?
-        "1" : "0");
-      }
-    vp->SetElements(value.GetPointer());
-    }
-  else if (this->DefaultMode == LABEL)
-    {
-    vtkNew<vtkStringList> value;
-    for (size_t cc=0; cc < domain_strings.size(); cc++)
-      {
-      // by default, label is same as the name of the series.
-      value->AddString(domain_strings[cc].c_str());
-      value->AddString(domain_strings[cc].c_str());
-      }
-    vp->SetElements(value.GetPointer());
-    }
-  else if (this->DefaultMode == COLOR)
-    {
-    vtkNew<vtkStringList> value;
-    for (size_t cc=0; cc < domain_strings.size(); cc++)
-      {
-      // by default, label is same as the name of the series.
-      value->AddString(domain_strings[cc].c_str());
-      vtkColor3ub color = this->Internals->GetNextColor();
-      for (int kk=0; kk < 3; kk++)
-        {
-        std::ostringstream stream;
-        stream << std::setprecision(2) << color.GetData()[kk]/255.0;
-        value->AddString(stream.str().c_str());
-        }
-      }
-    vp->SetElements(value.GetPointer());
-    }
-  else if (this->DefaultMode == VALUE)
-    {
-    assert(vp->GetNumberOfElementsPerCommand() == 2);
-    vtkNew<vtkStringList> value;
-    for (size_t cc=0; cc < domain_strings.size(); cc++)
-      {
-      // by default, label is same as the name of the series.
-      value->AddString(domain_strings[cc].c_str());
-      value->AddString(this->DefaultValue);
-      }
-    vp->SetElements(value.GetPointer());
-    }
-
-  return 0;
+  this->UpdateDefaultValues(property, false);
 }
 
+//----------------------------------------------------------------------------
+void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
+  vtkSMProperty* property, bool preserve_previous_values)
+{
+  vtkSMStringVectorProperty* vp = vtkSMStringVectorProperty::SafeDownCast(property);
+  assert(vp != NULL);
+
+  vtkNew<vtkStringList> values;
+  std::set<std::string> seriesNames;
+  if (preserve_previous_values)
+    {
+    // capture old values.
+    unsigned int numElems = vp->GetNumberOfElements();
+    int stepSize = vp->GetNumberOfElementsPerCommand() > 0?
+      vp->GetNumberOfElementsPerCommand() : 1;
+
+    for (unsigned int cc=0; (cc+stepSize) <= numElems; cc+=stepSize)
+      {
+      seriesNames.insert(vp->GetElement(cc)? vp->GetElement(cc) : "");
+      for (unsigned int kk=0; kk < stepSize; kk++)
+        {
+        values->AddString(vp->GetElement(cc+kk));
+        }
+      }
+    }
+
+  const std::vector<vtkStdString>& domain_strings = this->GetStrings();
+  for (size_t cc=0; cc < domain_strings.size(); cc++)
+    {
+    if (preserve_previous_values &&
+      seriesNames.find(domain_strings[cc]) != seriesNames.end())
+      {
+      // skip this. This series had a value set already which we are requested
+      // to preserve.
+      continue;
+      }
+    std::vector<vtkStdString> cur_values =
+      this->GetDefaultValue(domain_strings[cc].c_str());
+    if (cur_values.size() > 0)
+      {
+      values->AddString(domain_strings[cc].c_str());
+      for (size_t kk=0; kk < cur_values.size(); kk++)
+        {
+        values->AddString(cur_values[kk].c_str());
+        }
+      } 
+    }
+
+  vp->SetElements(values.GetPointer());
+}
 
 //----------------------------------------------------------------------------
 void vtkSMChartSeriesSelectionDomain::AddSeriesVisibilityDefault(
@@ -399,6 +430,18 @@ bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* nam
   return true;
 }
 
+//----------------------------------------------------------------------------
+void vtkSMChartSeriesSelectionDomain::OnDomainModified()
+{
+  vtkSMProperty* prop = this->GetProperty();
+  this->UpdateDefaultValues(prop, true);
+  if (prop->GetParent())
+    {
+    // FIXME:
+    // prop->GetParent()->UpdateProperty(prop);
+    prop->GetParent()->UpdateVTKObjects();
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkSMChartSeriesSelectionDomain::PrintSelf(ostream& os, vtkIndent indent)

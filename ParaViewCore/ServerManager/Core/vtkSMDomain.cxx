@@ -34,6 +34,9 @@ struct vtkSMDomainInternals
   typedef 
   std::map<vtkStdString, vtkWeakPointer<vtkSMProperty> > PropertyMap;
   PropertyMap RequiredProperties;
+
+  // This is the property that has this domain.
+  vtkWeakPointer<vtkSMProperty> DomainProperty;
 };
 
 //---------------------------------------------------------------------------
@@ -187,10 +190,23 @@ void vtkSMDomain::SaveState(vtkPVXMLElement* parent, const char* uid)
 }
 
 //---------------------------------------------------------------------------
+vtkSMProperty* vtkSMDomain::GetProperty()
+{
+  return this->Internals->DomainProperty;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDomain::SetProperty(vtkSMProperty* prop)
+{
+  this->Internals->DomainProperty = prop;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(null)") 
      << endl;
   os << indent << "IsOptional: " << this->IsOptional << endl;
+  os << indent << "Property: " << this->Internals->DomainProperty.GetPointer() << endl;
 }
