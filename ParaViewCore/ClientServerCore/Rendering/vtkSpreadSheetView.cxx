@@ -37,6 +37,53 @@
 #include "vtkVariant.h"
 
 #include <map>
+#include <vector>
+#include <algorithm>
+#include <string>
+namespace
+{
+  struct OrderByNames :
+    std::binary_function<vtkAbstractArray*, vtkAbstractArray*, bool>
+  {
+  bool operator() (vtkAbstractArray *a1,  vtkAbstractArray *a2)
+    {
+    const char* order[] = {
+      "vtkOriginalProcessIds",
+      "vtkCompositeIndexArray",
+      "vtkOriginalIndices",
+      "vtkOriginalCellIds",
+      "vtkOriginalPointIds",
+      "Structured Coordinates",
+      NULL};
+    std::string a1Name = a1->GetName()? a1->GetName() : NULL;
+    std::string a2Name = a2->GetName()? a2->GetName() : NULL;
+    int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
+    for (int cc=0; order[cc] != NULL; cc++)
+      {
+      if (a1Index == VTK_INT_MAX && a1Name == order[cc])
+        {
+        a1Index = cc;
+        }
+      if (a2Index == VTK_INT_MAX && a2Name == order[cc])
+        {
+        a2Index = cc;
+        }
+      }
+    if (a1Index < a2Index)
+      {
+      return true;
+      }
+    if (a2Index < a1Index)
+      {
+      return false;
+      }
+    // we can reach here only when both array names are not in the "priority"
+    // set.
+    assert(a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX);
+    return (a1Name < a2Name);
+    }
+  };
+}
 
 class vtkSpreadSheetView::vtkInternals
 {
@@ -88,7 +135,22 @@ public:
 
     CacheInfo info;
     vtkTable* clone = vtkTable::New();
-    clone->ShallowCopy(data);
+
+    // sort columns for better usability.
+    std::vector<vtkAbstractArray*> arrays;
+    for (vtkIdType cc=0; cc < data->GetNumberOfColumns(); cc++)
+      {
+      if (data->GetColumn(cc))
+        {
+        arrays.push_back(data->GetColumn(cc));
+        }
+      }
+    std::sort(arrays.begin(), arrays.end(), OrderByNames());
+    for (std::vector<vtkAbstractArray*>::iterator viter = arrays.begin();
+      viter != arrays.end(); ++viter)
+      {
+      clone->AddColumn(*viter);
+      }
     info.Dataobject = clone;
     clone->FastDelete();
     info.RecentUseTime.Modified();
