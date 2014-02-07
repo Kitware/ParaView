@@ -17,6 +17,10 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name":"Module_vtkImagingCore",
+        "type":"BOOL",
+        "value":"ON"
+      },
       { "name": "Module_vtkImagingHybrid",
         "type": "BOOL",
         "value": "ON"
@@ -298,6 +302,7 @@
     { "name": "vtkFiltersSources",
       "path": "VTK/Filters/Sources",
       "include": [
+        { "class": "vtkFrustumSource" },
         { "class": "vtkOutlineSource" }
       ],
       "cswrap": true,
