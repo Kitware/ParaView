@@ -286,21 +286,31 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           if (neighbor != 0)
             {
             this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
-            if (neighbor->Level > block->Level) 
+            if (neighbor && neighbor->Level > block->Level) 
               {
+              int level = neighbor->Level;
               int index[3] = { neighbor->GridIndex[0], neighbor->GridIndex[1], neighbor->GridIndex[2] };
   
               index[(dir+1) % 3] ++;
-              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+              neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
+              if (neighbor != 0)
+                { 
+                this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+                }
   
               index[(dir+2) % 3] ++;
-              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+              neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
+              if (neighbor != 0)
+                { 
+                this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+                }
   
               index[(dir+1) % 3] --;
-              neighbor = this->Helper->GetBlock (neighbor->Level, index[0], index[1], index[2]);
-              this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+              neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
+              if (neighbor != 0)
+                { 
+                this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
+                }
               }
             }
           }
@@ -324,18 +334,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       {
       myOffset = 0; 
       }
-    for (int i = 1; i < this->NextRegionId; i ++) 
-      {
-      if ((i % numProcs) == myOffset) 
-        {
-        this->Equivalence->AddEquivalence (i, i);
-        }
-      else
-        {
-        this->Equivalence->AddEquivalence (i, 0);
-        }
-      }
-
     for (size_t i = 0; i < this->BoundaryArrays.size (); i ++) 
       {
       for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
@@ -347,6 +345,15 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         this->BoundaryArrays[i][j]->Delete ();
         }
         this->BoundaryArrays[i].clear ();
+      }
+
+    // Reset all uninitialized remote regionIds to equivalence 0
+    for (int i = 1; i < (this->NextRegionId - numProcs); i ++) 
+      {
+      if ((i % numProcs) != myOffset && this->Equivalence->GetEquivalentSetId (i) == i) 
+        {
+        this->Equivalence->AddEquivalence (i, 0);
+        }
       }
     // Reduce all equivalence pairs into equivalence sets
     this->Equivalence->ResolveEquivalences ();
