@@ -166,29 +166,3 @@ void pqTreeView::invalidateLayout()
   // QWidgetItemV2, so sizeHint() could be recomputed.
   this->updateGeometry();
 }
-
-//-----------------------------------------------------------------------------
-void pqTreeView::dropEvent(QDropEvent* dEvent)
-{
-  if(!this->acceptDrops() || dEvent->source() != this)
-    {
-    return;
-    }
-  dEvent->setDropAction( Qt::MoveAction );
-  this->QTreeView::dropEvent(dEvent);
-}
-
-//-----------------------------------------------------------------------------
-void pqTreeView::dragEnterEvent ( QDragEnterEvent * dEvent )
-{
-  QStringList mType = this->model()->mimeTypes();
-  const QMimeData* mData = dEvent->mimeData();
-  foreach(QString type, mType)
-    {
-    if ( mData->hasFormat( type ) )
-      {
-      dEvent->accept();
-      return;
-      }
-    }
-}

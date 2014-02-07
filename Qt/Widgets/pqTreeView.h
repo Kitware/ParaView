@@ -70,11 +70,6 @@ public:
   int maximumRowCountBeforeScrolling() const
     { return this->MaximumRowCountBeforeScrolling; }
 
-protected:
-  // Support for customized drag-n-drop events
-  virtual void dragEnterEvent( QDragEnterEvent * event );
-  virtual void dropEvent(QDropEvent *);
-
 private slots:
   void invalidateLayout();
 
