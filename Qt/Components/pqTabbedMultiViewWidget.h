@@ -32,10 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTabbedMultiViewWidget_h 
 #define __pqTabbedMultiViewWidget_h
 
-#include <QWidget>
+#include <QTabWidget> // needed for QTabWidget.
+#include <QTabBar> // needed for QTabBar::ButtonPosition
+#include <QStyle> // needed for QStyle:StandardPixmap
 #include "pqComponentsModule.h"
 #include "vtkType.h" // needed for vtkIdType
 
+class pqMultiViewWidget;
 class pqProxy;
 class pqServer;
 class pqView;
@@ -118,11 +121,45 @@ protected:
   /// assigns a frame to the view.
   void assignToFrame(pqView*, bool warnIfTabCreated);
 
+  /// Internal class used as the TabWidget.
+  class pqTabWidget : public QTabWidget
+  {
+  typedef QTabWidget Superclass;
+public:
+  pqTabWidget(QWidget* parentWdg=NULL);
+  virtual ~pqTabWidget();
+
+  /// Set a button to use on the tab bar.
+  virtual void setTabButton(int index, QTabBar::ButtonPosition position, QWidget* wdg);
+  
+  /// Given the QWidget pointer that points to the buttons (popout or close)
+  /// in the tabbar, this returns the index of that that the button corresponds
+  /// to. 
+  virtual int tabButtonIndex(QWidget* wdg, QTabBar::ButtonPosition position) const;
+
+
+  /// Add a pqTabbedMultiViewWidget instance as a new tab. This will setup the
+  /// appropriate tab-bar for this new tab (with 2 buttons for popout and
+  /// close).
+  virtual int addAsTab(pqMultiViewWidget* wdg, pqTabbedMultiViewWidget* self);
+
+  /// Returns the label/tooltip to use for the popout button given the
+  /// popped_out state.
+  static const char* popoutLabelText(bool popped_out);
+
+  /// Returns the icon to use for the popout button given the popped_out state.
+  static QStyle::StandardPixmap popoutLabelPixmap(bool popped_out);
+
+private:
+  Q_DISABLE_COPY(pqTabWidget);
+  };
+
 private:
   Q_DISABLE_COPY(pqTabbedMultiViewWidget);
 
   class pqInternals;
   pqInternals* Internals;
+  friend class pqInternals;
 };
 
 #endif
