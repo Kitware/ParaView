@@ -21,8 +21,8 @@ def IsInModulo(timestep, frequencyArray):
 
         isFM = (timestep % 2 == 0) or (timestep % 3 == 0) or (timestep % 7 == 0)
     """
-    for freqency in frequencyArray:
-        if (timestep % freqency == 0):
+    for frequency in frequencyArray:
+        if frequency > 0 and (timestep % frequency == 0):
             return True
     return False
 
