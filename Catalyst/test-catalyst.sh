@@ -76,34 +76,37 @@ done
 [ -z "$editions" ] && \
     die "Need at least one input"
 
+if [ -n "$no_build" ] && [ -n "$install" ]; then
+    die "--install requires a build"
+fi
+
 # Remove directories if requested
 [ -n "$remove" ] && \
     rm -rf "$src_output" "$bin_output"
 
 # Catalyze.
-mkdir -p "$src_output"
+mkdir -v -p "$src_output"
 python "$scriptdir/catalyze.py" -r "$scriptdir/.." $args -o "$src_output" || \
     die "Failed to catalyze"
 
 [ -n "$no_configure" ] && exit 0
 
 # Configure the catalyzed tree.
-mkdir -p "$bin_output"
+mkdir -v -p "$bin_output"
 cd "$bin_output"
 "$src_output/cmake.sh" "$@" "$src_output" || \
     die "Failed to configure the tree"
 
-# Exit if a build is not wanted.
-[ -n "$no_build" ] && exit 0
-
-cd "$bin_output"
-cmake --build . || \
-    die "Failed to build"
+if [ -z "$no_build" ]; then
+    cd "$bin_output"
+    cmake --build . || \
+        die "Failed to build"
+fi
 
 # Test if wanted.
 if [ -z "$no_test" ]; then
     # Create the testing directory.
-    mkdir "$src_output/Testing"
+    mkdir -v "$src_output/Testing"
     for edition in $editions; do
         [ -d "$editiondir/$edition/Testing" ] || continue
 
@@ -112,7 +115,7 @@ if [ -z "$no_test" ]; then
     done
 
     # Configure the testing tree.
-    mkdir -p "$bin_output/Testing"
+    mkdir -v -p "$bin_output/Testing"
     cd "$bin_output/Testing"
     cmake "$@" \
         "-DPVPYTHON_EXE=$bin_output/bin/pvpython" \
@@ -120,14 +123,16 @@ if [ -z "$no_test" ]; then
         "$src_output/Testing" || \
         die "Failed to configure tests"
 
-    # Build the testing tree.
-    cd "$bin_output/Testing"
-    cmake --build . || \
-        die "Failed to build tests"
+    if [ -z "$no_build" ]; then
+        # Build the testing tree.
+        cd "$bin_output/Testing"
+        cmake --build . || \
+            die "Failed to build tests"
 
-    # Run the tests.
-    ctest -VV || \
-        die "Tests failed"
+        # Run the tests.
+        ctest -VV || \
+            die "Tests failed"
+    fi
 fi
 
 if [ -n "$install" ]; then
