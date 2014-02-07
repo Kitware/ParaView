@@ -77,6 +77,7 @@
         { "path":"vtkTableBasedClipCases.h" },
         { "class":"vtkClipDataSet" },
         { "class":"vtkClipVolume" },
+        { "class":"vtkPassArrays" },
         { "class":"vtkTableBasedClipDataSet" }
       ],
       "replace":[
@@ -94,7 +95,8 @@
         "Contour",
         "Clip",
         "Cut",
-        "Glyph"
+        "Glyph",
+        "PassArrays"
       ]
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
