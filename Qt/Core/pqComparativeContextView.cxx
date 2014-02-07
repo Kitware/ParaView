@@ -94,10 +94,16 @@ void pqComparativeContextView::initialize()
 }
 
 //-----------------------------------------------------------------------------
-vtkContextView* pqComparativeContextView::getVTKChartView() const
+vtkContextView* pqComparativeContextView::getVTKContextView() const
 {
   return vtkSMContextViewProxy::SafeDownCast(this->getViewProxy())
       ->GetContextView();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMContextViewProxy* pqComparativeContextView::getContextViewProxy() const
+{
+ return vtkSMContextViewProxy::SafeDownCast(this->getViewProxy());
 }
 
 //-----------------------------------------------------------------------------
