@@ -150,7 +150,10 @@ private slots:
   /// 1st column, we show the color editor to allow editing of the series color.
   void onDoubleClicked(const QModelIndex& idx);
 
+  /// update all series-properties widgets using the "current" series.
   void refreshPropertiesWidgets();
+
+  /// update all selected series with the value from the sender widget.
   void savePropertiesWidgets();
   
   /// called when the vtkSMProperty fires a vtkCommand::DomainModifiedEvent.

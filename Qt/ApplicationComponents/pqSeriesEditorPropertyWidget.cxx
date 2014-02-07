@@ -979,36 +979,45 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
   Ui::SeriesEditorPropertyWidget &ui = this->Internals->Ui;
   pqSeriesParametersModel& model = this->Internals->Model;
 
-  QModelIndex idx = this->Internals->modelIndex(ui.SeriesTable->currentIndex());
-  QString key = model.seriesName(idx);
-  if (!idx.isValid() || key.isEmpty())
-    {
-    // nothing is selected
-    return;
-    }
+  QWidget* senderWidget = qobject_cast<QWidget*>(this->sender());
+  Q_ASSERT(senderWidget);
 
-  if (this->Internals->Thickness[key] != ui.Thickness->value())
+  QModelIndexList selectedIndexes =
+    ui.SeriesTable->selectionModel()->selectedIndexes();
+  foreach (QModelIndex selIdx, selectedIndexes)
     {
-    this->Internals->Thickness[key] = ui.Thickness->value();
-    emit this->seriesLineThicknessChanged();
-    }
+    QModelIndex idx = this->Internals->modelIndex(selIdx);
+    QString key = model.seriesName(idx);
+    if (!idx.isValid() || key.isEmpty())
+      {
+      continue;
+      }
 
-  if (this->Internals->Style[key] != ui.StyleList->currentIndex())
-    {
-    this->Internals->Style[key] = ui.StyleList->currentIndex();
-    emit this->seriesLineStyleChanged();
-    }
-
-  if (this->Internals->MarkerStyle[key] != ui.MarkerStyleList->currentIndex())
-    {
-    this->Internals->MarkerStyle[key] = ui.MarkerStyleList->currentIndex();
-    emit this->seriesMarkerStyleChanged();
-    }
-
-  if (this->Internals->PlotCorner[key] != ui.AxisList->currentIndex())
-    {
-    this->Internals->PlotCorner[key] = ui.AxisList->currentIndex();
-    emit this->seriesPlotCornerChanged();
+    // update the parameter corresponding to the modified widget.
+    if (ui.Thickness == senderWidget &&
+      this->Internals->Thickness[key] != ui.Thickness->value())
+      {
+      this->Internals->Thickness[key] = ui.Thickness->value();
+      emit this->seriesLineThicknessChanged();
+      }
+    else if (ui.StyleList == senderWidget &&
+      this->Internals->Style[key] != ui.StyleList->currentIndex())
+      {
+      this->Internals->Style[key] = ui.StyleList->currentIndex();
+      emit this->seriesLineStyleChanged();
+      }
+    else if (ui.MarkerStyleList == senderWidget &&
+      this->Internals->MarkerStyle[key] != ui.MarkerStyleList->currentIndex())
+      {
+      this->Internals->MarkerStyle[key] = ui.MarkerStyleList->currentIndex();
+      emit this->seriesMarkerStyleChanged();
+      }
+    else if (ui.AxisList == senderWidget &&
+      this->Internals->PlotCorner[key] != ui.AxisList->currentIndex())
+      {
+      this->Internals->PlotCorner[key] = ui.AxisList->currentIndex();
+      emit this->seriesPlotCornerChanged();
+      }
     }
 }
 
