@@ -627,6 +627,7 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif()
 
 if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
+  find_package(PythonLibs REQUIRED)
   vtk_add_module(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst
                 module.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/CoProcessing/PythonCatalyst

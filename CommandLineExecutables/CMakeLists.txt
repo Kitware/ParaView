@@ -28,6 +28,95 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
+
+# Needed to have the Python version numbers available in paraview-config.
+set(extra_modules)
+if (PARAVIEW_ENABLE_PYTHON)
+  find_package(PythonInterp REQUIRED)
+  set(extra_modules vtkUtilitiesPythonInitializer)
+endif ()
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/vtkModules.h"
+"#include \"vtkModuleDependencies.h\"
+
+struct vtkModuleDependency
+{
+  const char* ModuleName;
+  const char** LibraryNames;
+  const char** Depends;
+  bool Python;
+} vtkModules[] = {
+")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+"#include <cstdlib>
+
+")
+#dump(VARIABLES)
+foreach (vtk_module IN LISTS VTK_MODULES_ENABLED extra_modules)
+  if (NOT vtk_module STREQUAL last_module)
+    set(has_python "false")
+    if (TARGET ${vtk_module}PythonD)
+      set(has_python "true")
+    endif ()
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModules.h"
+"  { \"${vtk_module}\", ${vtk_module}Libraries, ${vtk_module}Depends, ${has_python} },
+")
+
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+"const char* ${vtk_module}Libraries[] = { ")
+    foreach (vtk_module_library IN LISTS "${vtk_module}_LIBRARIES")
+      if (IS_ABSOLUTE "${vtk_module_library}")
+        set(vtk_module_library_name "${vtk_module_library}")
+      elseif (vtk_module_library)
+        set(vtk_module_library_name)
+        get_property(vtk_module_library_name TARGET "${vtk_module_library}" PROPERTY OUTPUT_NAME)
+        if (NOT vtk_module_library_name)
+          set(vtk_module_library_name "${vtk_module_library}")
+        endif ()
+      endif ()
+      if (vtk_module_library_name)
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+"\"${vtk_module_library_name}\", ")
+      endif ()
+    endforeach ()
+
+    if (TARGET ${vtk_module})
+      get_property(target_type TARGET "${vtk_module}" PROPERTY TYPE)
+      if (target_type MATCHES "_LIBRARY$")
+        set(vtk_module_library_name)
+        get_property(vtk_module_library_name TARGET "${vtk_module}" PROPERTY OUTPUT_NAME)
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+"\"${vtk_module_library_name}\", ")
+      endif ()
+    endif ()
+
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+"NULL };
+const char* ${vtk_module}Depends[] = { ")
+    foreach (vtk_module_depends IN LISTS ${vtk_module}_DEPENDS)
+      file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+"\"${vtk_module_depends}\", ")
+    endforeach ()
+    file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+"NULL };
+")
+    set(last_module ${vtk_module})
+  endif ()
+endforeach ()
+file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModules.h"
+"  { NULL, NULL }
+};
+")
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/paraview-config.cxx.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview-config.cxx"
+  @ONLY)
+pv_add_executable(paraview-config
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview-config.cxx")
+target_link_libraries(paraview-config
+  vtksys)
+
 if (NOT TARGET vtkPVServerManagerApplication)
   message(STATUS "vtkPVServerManagerApplication module is not enabled. "
     "Command line executables will not be built.")
