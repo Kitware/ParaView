@@ -68,11 +68,11 @@ int vtkPEquivalenceSet::ResolveEquivalences ()
         if (workingVal == 0) {
           continue;
         }
-        int existingVal = this->GetReference (i); 
+        int existingVal = this->EquivalenceArray->GetValue (i); 
         this->EquivalenceArray->SetValue (i, workingVal);
         if (existingVal != 0 && existingVal < workingVal)
           {
-          this->EquivalenceArray->SetValue (workingVal, existingVal);
+          this->EquateInternal (existingVal, workingVal);
           }
         }
       }

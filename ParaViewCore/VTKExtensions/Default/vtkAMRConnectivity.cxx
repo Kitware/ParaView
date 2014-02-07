@@ -293,21 +293,21 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   
               index[(dir+1) % 3] ++;
               neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
-              if (neighbor != 0)
+              // if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
   
               index[(dir+2) % 3] ++;
               neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
-              if (neighbor != 0)
+              // if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
   
               index[(dir+1) % 3] --;
               neighbor = this->Helper->GetBlock (level, index[0], index[1], index[2]);
-              if (neighbor != 0)
+              // if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
@@ -360,7 +360,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   
     // Relabel all fragment IDs with the equivalence set number 
     // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
-    int maxSet = 0;
     for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
       {
       vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
@@ -373,10 +372,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           {
           int setId = this->Equivalence->GetEquivalentSetId (regionId);
           regionIdArray->SetTuple1 (i, setId);
-          if ((setId) > maxSet) 
-            {
-            maxSet = setId;
-            }
           }
         else
           {
