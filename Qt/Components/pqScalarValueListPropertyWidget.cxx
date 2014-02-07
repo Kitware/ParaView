@@ -393,6 +393,11 @@ void pqScalarValueListPropertyWidget::remove()
 {
   QModelIndexList indexes =
     this->Internals->Ui.Table->selectionModel()->selectedIndexes();
+  if( indexes.size() == 0 )
+    {
+    // Nothing selected. Nothing to remove
+    return;
+    }
   QModelIndex idx = this->Internals->Model.removeListedRows(indexes);
   this->Internals->Ui.Table->setCurrentIndex(idx);
   emit this->scalarsChanged();
