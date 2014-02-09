@@ -30,6 +30,9 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkSMChartSeriesSelectionDomain.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
@@ -541,36 +544,31 @@ void pqSLACManager::updatePlotField()
 
   if (fieldName == "Solid Color") fieldName = "efield";
 
-  // Get the information property that lists all the available series (as well
-  // as their current visibility).
-  QList<QVariant> visibilityInfo = pqSMAdaptor::getMultipleElementProperty(
-                                reprProxy->GetProperty("SeriesVisibilityInfo"));
-
   // Iterate over all the series.  Turn them all off except the one associated
   // with the viewed mesh.
+  vtkSMChartSeriesSelectionDomain* domain =
+    vtkSMChartSeriesSelectionDomain::SafeDownCast(
+    reprProxy->GetProperty("SeriesVisibility")->FindDomain("vtkSMChartSeriesSelectionDomain"));
+  if (domain == NULL) { return; }
+
   QList<QVariant> visibility;
-  for (int i = 0; i < visibilityInfo.size(); i += 2)
+  for (unsigned int i=0; i <  domain->GetNumberOfStrings(); i++)
     {
-    QString seriesName = visibilityInfo[i].toString();
-    if ((fieldName == seriesName) || (fieldName + " (Magnitude)" == seriesName))
+    QString seriesName = domain->GetString(i);
+    if ((fieldName == seriesName) || (fieldName + "_Magnitude" == seriesName))
       {
       fieldName = seriesName;
       visibility << seriesName << 1;
 
-      QList<QVariant> color;
-      color << seriesName << 0.0 << 0.0 << 0.0;
-      pqSMAdaptor::setMultipleElementProperty(
-                                  reprProxy->GetProperty("SeriesColor"), color);
+      double color[3] = {0.0, 0.0, 0.0};
+      vtkSMPropertyHelper(reprProxy, "SeriesColor").SetStatus(
+        seriesName.toAscii().data(), color, 3);
 
-      QList<QVariant> lineThickness;
-      lineThickness << seriesName << 1;
-      pqSMAdaptor::setMultipleElementProperty(
-                  reprProxy->GetProperty("SeriesLineThickness"), lineThickness);
+      vtkSMPropertyHelper(reprProxy, "SeriesLineThickness").SetStatus(
+        seriesName.toAscii().data(), 1);
 
-      QList<QVariant> lineStyle;
-      lineStyle << seriesName << 1;
-      pqSMAdaptor::setMultipleElementProperty(
-                          reprProxy->GetProperty("SeriesLineStyle"), lineStyle);
+      vtkSMPropertyHelper(reprProxy, "SeriesLineStyle").SetStatus(
+        seriesName.toAscii().data(), 1);
       }
     else
       {
@@ -725,13 +723,12 @@ void pqSLACManager::createPlotOverZ()
 {
   pqApplicationCore *core = pqApplicationCore::instance();
   pqObjectBuilder *builder = core->getObjectBuilder();
-  pqUndoStack *stack = core->getUndoStack();
   pqDisplayPolicy *displayPolicy = core->getDisplayPolicy();
 
   pqPipelineSource *meshReader = this->getMeshReader();
   if (!meshReader) return;
 
-  if (stack) stack->beginUndoSet("Plot Over Z");
+  BEGIN_UNDO_SET("Plot Over Z");
 
   // Determine view.  Do this before deleting existing pipeline objects.
   pqView *plotView = this->getPlotView();
@@ -785,6 +782,7 @@ void pqSLACManager::createPlotOverZ()
     pqSMAdaptor::setElementProperty(lineProxy->GetProperty("Resolution"), 1000);
     lineProxy->UpdateVTKObjects();
     }
+  plotFilter->updatePipeline();
 
   // Make representation
   pqDataRepresentation *repr;
@@ -799,7 +797,7 @@ void pqSLACManager::createPlotOverZ()
   meshReader->setModifiedState(pqProxy::UNMODIFIED);
   plotFilter->setModifiedState(pqProxy::UNMODIFIED);
 
-  if (stack) stack->endUndoSet();
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
