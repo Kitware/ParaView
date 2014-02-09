@@ -141,6 +141,6 @@ void vtkSMChartRepresentationProxy::ResetPropertiesToDefault()
       }
     }
 
-  vtkSMPropertyHelper(useIndex).Set(0);
+  vtkSMPropertyHelper(useIndex).Set(1);
   this->UpdateProperty("UseIndexForXAxis");
 }
