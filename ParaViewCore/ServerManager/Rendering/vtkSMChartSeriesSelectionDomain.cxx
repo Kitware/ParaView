@@ -98,14 +98,18 @@ namespace
 
 class vtkSMChartSeriesSelectionDomain::vtkInternals
 {
+  int ColorCounter;
+  vtkNew<vtkColorSeries> Colors;
 public:
   std::set<std::string> ComponentNames;
 
-  static vtkColor3ub GetNextColor()
+  vtkInternals() : ColorCounter(0)
     {
-    static vtkNew<vtkColorSeries> Colors;
-    static int counter = 0;
-    return Colors->GetColorRepeating(counter++);
+    }
+
+  vtkColor3ub GetNextColor()
+    {
+    return this->Colors->GetColorRepeating(this->ColorCounter++);
     }
 
   // Add arrays from dataInfo to strings. If blockName is non-empty, then it's
