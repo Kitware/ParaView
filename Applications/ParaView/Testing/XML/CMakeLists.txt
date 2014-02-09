@@ -24,6 +24,8 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UpdateTransferFunctionRanges.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -155,8 +157,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ViewSettingsDialog.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
@@ -359,8 +359,10 @@ SET (UndoRedo4_THRESHOLD 15)
 
 # Since often there are issues with fonts etc.
 SET (XYChart_THRESHOLD 150)
+# Since the test uses surface-selection, it cannot work in render-server mode.
+set(XYChart_DISABLE_CRS TRUE)
 
-SET (XYHistogram_THRESHOLD 60)
+SET (XYHistogram_THRESHOLD 150)
 set (ChartAxisRangeAndLabels_THRESHOLD 60)
 
 # The color and opacity are often different on different machines.
@@ -381,9 +383,6 @@ set (DisconnectAndSaveAnimation_BREAK TRUE)
 # Histogram filter produces different results when running in parallel, so
 # disable it.
 IF (PARAVIEW_USE_MPI)
-  SET (XYHistogram_DISABLE_CS TRUE)
-  SET (XYHistogram_DISABLE_CRS TRUE)
-
   SET (SpreadSheet1_DISABLE_CS TRUE)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
 
@@ -565,7 +564,6 @@ set (XdmfRead_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (XdmfReadStructuredGrid_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (XdmfReadStructuredGridCollection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (XdmfGridAttributes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-#set (XYChart_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ZLibXDMF_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 
 
