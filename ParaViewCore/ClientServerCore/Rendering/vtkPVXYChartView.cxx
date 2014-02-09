@@ -653,6 +653,18 @@ void vtkPVXYChartView::SelectionChanged()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::Update()
+{
+  this->Superclass::Update();
+  if (this->Chart)
+    {
+    // Note this will recompute the bounds only for those axes that are not
+    // FIXED.
+    this->Chart->RecalculateBounds();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

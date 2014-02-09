@@ -256,6 +256,10 @@ public:
   virtual void SetSelection(
     vtkChartRepresentation* repr, vtkSelection* selection);
 
+  // Description:
+  // Overridden to rescale axes range on every update.
+  virtual void Update();
+
 //BTX
 protected:
   vtkPVXYChartView();
