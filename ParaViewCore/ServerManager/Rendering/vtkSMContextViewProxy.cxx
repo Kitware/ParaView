@@ -221,11 +221,11 @@ void vtkSMContextViewProxy::OnInteractionEvent()
   vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
   if (chartXY)
     {
-    // On interaction, we ensure that the axis range properties reflect the
-    // values that the user ended up picking due to the interactions. Thus, even
-    // when user picks custom ranges for charts, he can still interact with the
-    // view, we just update the custom range that was specified.
+    // Charts by default update axes ranges as needed. On interaction, we force
+    // the chart to preserve the user-selected ranges.
     this->CopyAxisRangesFromChart();
+    int lock_ranges[] = {1,1,1,1};
+    vtkSMPropertyHelper(this, "AxisUseCustomRange").Set(lock_ranges, 4);
     this->UpdateVTKObjects();
     this->InvokeEvent(vtkCommand::InteractionEvent);
     }
@@ -234,34 +234,15 @@ void vtkSMContextViewProxy::OnInteractionEvent()
 //-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
 {
-  // To simulate reset display, we turn-off using of custom ranges temporarily,
-  // compute the bounds and then restore the state.
   vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
   if (chartXY)
     {
-    bool axis_behavior_fixed[4] = {false, false, false, false};
-    for (int cc=0; cc < 4; cc++)
-      {
-      vtkAxis* axis = chartXY->GetAxis(cc);
-      if (axis && axis->GetBehavior() == vtkAxis::FIXED)
-        {
-        axis_behavior_fixed[cc] = true;
-        axis->SetBehavior(vtkAxis::AUTO);
-        }
-      }
-    this->StillRender();
-    chartXY->RecalculateBounds();
-    this->CopyAxisRangesFromChart();
+    // simply unlock all the axes ranges. That results in the chart determine
+    // new ranges to use in the Update call.
+    int lock_ranges[] = {0, 0, 0, 0};
+    vtkSMPropertyHelper(this, "AxisUseCustomRange").Set(lock_ranges, 4);
     this->UpdateVTKObjects();
-    for (int cc=0; cc < 4; cc++)
-      {
-      vtkAxis* axis = chartXY->GetAxis(cc);
-      if (axis && axis_behavior_fixed[cc])
-        {
-        axis->SetBehavior(vtkAxis::FIXED);
-        }
-      }
-    }
+    } 
 }
 
 //----------------------------------------------------------------------------
