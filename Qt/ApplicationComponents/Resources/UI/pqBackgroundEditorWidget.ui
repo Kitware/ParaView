@@ -76,10 +76,7 @@
        </property>
        <item>
         <widget class="QWidget" name="widget_4" native="true">
-         <layout class="QFormLayout" name="formLayout_2">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-          </property>
+         <layout class="QGridLayout" name="gridLayout">
           <property name="margin">
            <number>0</number>
           </property>
@@ -226,18 +223,6 @@
        </item>
       </layout>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QFormLayout" name="formLayout">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
-     </layout>
     </widget>
    </item>
    <item>
