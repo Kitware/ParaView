@@ -372,7 +372,10 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
-set (SLACTools_THRESHOLD 40)
+set (SLACTools_THRESHOLD 70)
+
+# Plot image leeway.
+set (SpreadSheet2_THRESHOLD 50)
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
@@ -425,7 +428,11 @@ SET (SaveCSV_THRESHOLD 40)
 ## Disable ClientRenderServer tests for FFTOverTime. This is done since
 ## selection is not supported in render server mode esp. when number of render
 ## server processess is not same as the data server processes
-SET (FFTOverTime_DISABLE_CRS TRUE)
+set (FFTOverTime_DISABLE_CRS TRUE)
+set (FFTOverTime_THRESHOLD 70) # since there's a plot, account for minor
+                               # rendering differences.
+
+
 
 set (LoadStateMultiView_BREAK TRUE)
 set (RenderNan_BREAK TRUE)
