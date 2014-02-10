@@ -239,7 +239,7 @@ endif()
 
 # Probe picking does not work in render server mode
 set(ProbePicking_DISABLE_CRS TRUE)
-set(ProbePicking_THRESHOLD 40)
+set(ProbePicking_THRESHOLD 120)
 
 # only enable find data tests if numpy is available
 include("TestNumPy")

@@ -65,9 +65,9 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" command="mouseRelease" arguments="(0.52,0.0891473,2,0,0)" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/LineChartSelection5.png" width="200" height="200" threshold="40" />
 
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" command="mousePress" arguments="(0.43,0.689922,2,2,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" command="mouseMove" arguments="(1.26,0.771318,2,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" command="mouseRelease" arguments="(1.26,0.771318,2,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" command="mousePress" arguments="(0.476667,0.360784,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" command="mouseMove" arguments="(0.49,0.690196,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" command="mouseRelease" arguments="(0.49,0.690196,1,0,0)" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/LineChartSelection6.png" width="200" height="200" threshold="40" />
 
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
