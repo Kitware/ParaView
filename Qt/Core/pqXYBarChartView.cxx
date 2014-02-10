@@ -31,9 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqXYBarChartView.h"
 
-#include "vtkSMProperty.h"
 #include "vtkSMContextViewProxy.h"
-#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 pqXYBarChartView::pqXYBarChartView(const QString& group,
@@ -49,11 +47,3 @@ pqXYBarChartView::pqXYBarChartView(const QString& group,
 pqXYBarChartView::~pqXYBarChartView()
 {
 }
-
-//-----------------------------------------------------------------------------
-void pqXYBarChartView::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-}
-
-

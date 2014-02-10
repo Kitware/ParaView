@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// Bar chart view
+/// pqContextView subclass for "Line Chart View". Doesn't do much expect adds
+/// the API to get the chartview type and name.
 class PQCORE_EXPORT pqXYChartView : public pqContextView
 {
   Q_OBJECT
@@ -55,9 +56,6 @@ public:
                  QObject* parent=NULL);
 
   virtual ~pqXYChartView();
-
-  /// Set property values.
-  virtual void setDefaultPropertyValues();
 
 private:
   pqXYChartView(const pqXYChartView&); // Not implemented.

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertiesPanel.h"
 #include "pqSMAdaptor.h"
+#include "pqTreeViewSelectionHelper.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -552,6 +553,10 @@ public:
     // sorting is enabled only when re-ordering is not supported i.e. when the
     // order of the series is irrelevant for the plot.
     this->Ui.SeriesTable->setSortingEnabled(!supportsReorder);
+
+    // Adds support for "Check/UnCheck" context menu to toggle check state for
+    // selected items easily.
+    new pqTreeViewSelectionHelper(this->Ui.SeriesTable);
 
     // Add filtering capabilities.
     // Conditionally hides rows that are no longer present in the domain.
