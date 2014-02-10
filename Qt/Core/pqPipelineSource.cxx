@@ -370,7 +370,6 @@ void pqPipelineSource::setDefaultPropertyValues()
   // Create any internal proxies needed by any property
   // that has a vtkSMProxyListDomain.
   this->createProxiesForProxyListDomains();
-  vtkSMProxy* proxy = this->getProxy();
 
   this->Superclass::setDefaultPropertyValues();
 

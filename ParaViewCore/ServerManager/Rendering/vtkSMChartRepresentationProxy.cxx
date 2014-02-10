@@ -76,6 +76,7 @@ int vtkSMChartRepresentationProxy::ReadXMLAttributes(
         }
       }
     }
+  return 1;
 }
 
 //----------------------------------------------------------------------------

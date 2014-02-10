@@ -950,7 +950,7 @@ void pqSeriesEditorPropertyWidget::refreshPropertiesWidgets()
   pqSeriesParametersModel& model = this->Internals->Model;
 
   QModelIndex idx = this->Internals->modelIndex(ui.SeriesTable->currentIndex());
-  QString key = this->Internals->Model.seriesName(idx);
+  QString key = model.seriesName(idx);
   if (!idx.isValid() || key.isEmpty())
     {
     // nothing is selected, disable all properties widgets.

@@ -355,6 +355,7 @@ int vtkSMChartSeriesSelectionDomain::SetDefaultValues(vtkSMProperty* property)
     }
 
   this->UpdateDefaultValues(property, false);
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -376,7 +377,7 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
     for (unsigned int cc=0; (cc+stepSize) <= numElems; cc+=stepSize)
       {
       seriesNames.insert(vp->GetElement(cc)? vp->GetElement(cc) : "");
-      for (unsigned int kk=0; kk < stepSize; kk++)
+      for (int kk=0; kk < stepSize; kk++)
         {
         values->AddString(vp->GetElement(cc+kk));
         }
@@ -412,14 +413,14 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
 void vtkSMChartSeriesSelectionDomain::AddSeriesVisibilityDefault(
   const char* name, bool value)
 {
-  AddSeriesVisibilityDefault(name, value);
+  ::AddSeriesVisibilityDefault(name, value);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMChartSeriesSelectionDomain::GetDefaultSeriesVisibility(const char* name)
 {
   bool result;
-  if (GetSeriesVisibilityDefault(name, result))
+  if (::GetSeriesVisibilityDefault(name, result))
     {
     return result;
     }
