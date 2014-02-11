@@ -773,27 +773,27 @@ void pqSeriesEditorPropertyWidget::onDoubleClicked(const QModelIndex& idx)
 void pqSeriesEditorPropertyWidget::setSeriesVisibility(
   const QList<QVariant> & values)
 {
-  QVector<QPair<QString, bool> > data;
-  data.resize(values.size()/2);
+  QVector<QPair<QString, bool> > vdata;
+  vdata.resize(values.size()/2);
   for (int cc=0; (cc + 1) < values.size(); cc+=2)
     {
-    data[cc/2].first = values[cc].toString();
-    data[cc/2].second = values[cc+1].toString() == "1";
+    vdata[cc/2].first = values[cc].toString();
+    vdata[cc/2].second = values[cc+1].toString() == "1";
     }
-  this->Internals->Model.setVisibilities(data);
+  this->Internals->Model.setVisibilities(vdata);
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSeriesEditorPropertyWidget::seriesVisibility() const
 {
-  const QVector<QPair<QString, bool> > &data =
+  const QVector<QPair<QString, bool> > &vdata =
     this->Internals->Model.visibilities();
 
   QList<QVariant> reply;
-  for (int cc=0; cc < data.size(); cc++)
+  for (int cc=0; cc < vdata.size(); cc++)
     {
-    reply.push_back(data[cc].first);
-    reply.push_back(data[cc].second? "1" : "0");
+    reply.push_back(vdata[cc].first);
+    reply.push_back(vdata[cc].second? "1" : "0");
     }
   return reply;
 }
@@ -801,26 +801,26 @@ QList<QVariant> pqSeriesEditorPropertyWidget::seriesVisibility() const
 //-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::setSeriesLabel(const QList<QVariant> & values)
 {
-  QVector<QPair<QString, QString> > data;
-  data.resize(values.size()/2);
+  QVector<QPair<QString, QString> > vdata;
+  vdata.resize(values.size()/2);
   for (int cc=0; (cc + 1) < values.size(); cc+=2)
     {
-    data[cc/2].first = values[cc].toString();
-    data[cc/2].second = values[cc+1].toString();
+    vdata[cc/2].first = values[cc].toString();
+    vdata[cc/2].second = values[cc+1].toString();
     }
-  this->Internals->Model.setLabels(data);
+  this->Internals->Model.setLabels(vdata);
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSeriesEditorPropertyWidget::seriesLabel() const
 {
-  const QVector<QPair<QString, QString> > &data =
+  const QVector<QPair<QString, QString> > &vdata =
     this->Internals->Model.labels();
   QList<QVariant> reply;
-  for (int cc=0; cc < data.size(); cc++)
+  for (int cc=0; cc < vdata.size(); cc++)
     {
-    reply.push_back(data[cc].first);
-    reply.push_back(data[cc].second);
+    reply.push_back(vdata[cc].first);
+    reply.push_back(vdata[cc].second);
     }
   return reply;
 }
@@ -828,8 +828,8 @@ QList<QVariant> pqSeriesEditorPropertyWidget::seriesLabel() const
 //-----------------------------------------------------------------------------
 void pqSeriesEditorPropertyWidget::setSeriesColor(const QList<QVariant> & values)
 {
-  QVector<QPair<QString, QColor> > data;
-  data.resize(values.size()/4);
+  QVector<QPair<QString, QColor> > vdata;
+  vdata.resize(values.size()/4);
   for (int cc=0; (cc + 3) < values.size(); cc+=4)
     {
     QColor color;
@@ -837,24 +837,24 @@ void pqSeriesEditorPropertyWidget::setSeriesColor(const QList<QVariant> & values
     color.setGreenF(values[cc+2].toDouble());
     color.setBlueF(values[cc+3].toDouble());
 
-    data[cc/4].first = values[cc].toString();
-    data[cc/4].second = color;
+    vdata[cc/4].first = values[cc].toString();
+    vdata[cc/4].second = color;
     }
-  this->Internals->Model.setColors(data);
+  this->Internals->Model.setColors(vdata);
 }
 
 //-----------------------------------------------------------------------------
 QList<QVariant> pqSeriesEditorPropertyWidget::seriesColor() const
 {
-  const QVector<QPair<QString, QColor> > &data =
+  const QVector<QPair<QString, QColor> > &vdata =
     this->Internals->Model.colors();
   QList<QVariant> reply;
-  for (int cc=0; cc < data.size(); cc++)
+  for (int cc=0; cc < vdata.size(); cc++)
     {
-    reply.push_back(data[cc].first);
-    reply.push_back(QString::number(data[cc].second.redF()));
-    reply.push_back(QString::number(data[cc].second.greenF()));
-    reply.push_back(QString::number(data[cc].second.blueF()));
+    reply.push_back(vdata[cc].first);
+    reply.push_back(QString::number(vdata[cc].second.redF()));
+    reply.push_back(QString::number(vdata[cc].second.greenF()));
+    reply.push_back(QString::number(vdata[cc].second.blueF()));
     }
   return reply;
 }
