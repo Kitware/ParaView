@@ -89,11 +89,11 @@ class pqSeriesParametersModel : public QAbstractTableModel
     }
 
   // returns true is the series is in Domain else false.
-  bool isSeriesInDomain(const QString& seriesName) const
+  bool isSeriesInDomain(const QString& _seriesName) const
     {
     unsigned int unused=0;
     if (this->Domain &&
-      this->Domain->IsInDomain(seriesName.toAscii().data(), unused)!=0)
+      this->Domain->IsInDomain(_seriesName.toAscii().data(), unused)!=0)
       {
       return true;
       }
