@@ -65,6 +65,10 @@ public:
   vtkSetClampMacro(FixedBasisEnergy,double,0.,1.);
   vtkGetMacro(FixedBasisEnergy,double);
 
+  vtkSetMacro(RobustPCA,bool);
+  vtkGetMacro(RobustPCA,bool);
+  vtkBooleanMacro(RobustPCA,bool);
+
 protected:
   vtkPSciVizPCAStats();
   virtual ~vtkPSciVizPCAStats();
@@ -76,6 +80,7 @@ protected:
   int BasisScheme;
   int FixedBasisSize;
   double FixedBasisEnergy;
+  bool RobustPCA;
 
 private:
   vtkPSciVizPCAStats( const vtkPSciVizPCAStats& ); // Not implemented.
