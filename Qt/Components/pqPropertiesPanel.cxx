@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
+#include "pqTimer.h"
 #include "pqUndoStack.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
@@ -56,7 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QKeyEvent>
 #include <QPointer>
 #include <QStyleFactory>
-#include <QTimer>
 
 namespace
 {
@@ -225,6 +225,7 @@ public:
   QPointer<pqProxyWidgets> DisplayWidgets;
   QPointer<pqProxyWidgets> ViewWidgets;
   bool ReceivedChangeAvailable;
+  pqTimer AutoApplyTimer;
 
   vtkNew<vtkEventQtSlotConnect> RepresentationEventConnect;
 
@@ -259,6 +260,9 @@ public:
     applyPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
     applyPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
     this->Ui.Accept->setPalette(applyPalette);
+
+    this->AutoApplyTimer.setSingleShot(true);
+    panel->connect(&this->AutoApplyTimer, SIGNAL(timeout()), SLOT(apply()));
     }
 
   ~pqInternals()
@@ -271,6 +275,12 @@ public:
     delete this->DisplayWidgets;
     delete this->ViewWidgets;
     }
+
+  void triggerAutoApply()
+    {
+    this->AutoApplyTimer.start(pqPropertiesPanel::autoApplyDelay());
+    }
+
 
   //---------------------------------------------------------------------------
   void updateInformationAndDomains()
@@ -488,7 +498,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource *source)
     if (source->modifiedState() == pqProxy::UNINITIALIZED &&
         pqPropertiesPanel::AutoApply)
       {
-      QTimer::singleShot(pqPropertiesPanel::AutoApplyDelay, this, SLOT(apply()));
+      this->Internals->triggerAutoApply();
       }
     }
   else
@@ -665,7 +675,7 @@ void pqPropertiesPanel::sourcePropertyChanged(bool change_finished/*=true*/)
     }
   if (pqPropertiesPanel::AutoApply && change_finished)
     {
-    QTimer::singleShot(pqPropertiesPanel::AutoApplyDelay, this, SLOT(apply()));
+    this->Internals->triggerAutoApply();
     }
 
   this->updateButtonState();
@@ -729,6 +739,8 @@ void pqPropertiesPanel::updateButtonState()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::apply()
 {
+  this->Internals->AutoApplyTimer.stop();
+
   BEGIN_UNDO_SET("Apply");
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -762,6 +774,8 @@ void pqPropertiesPanel::apply()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::reset()
 {
+  this->Internals->AutoApplyTimer.stop();
+
   pqSettings* settings = pqApplicationCore::instance()->settings();
   bool onlyApplyCurrentPanel =
     settings->value("onlyApplyCurrentPanel", false).toBool();
