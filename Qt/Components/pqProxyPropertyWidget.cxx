@@ -57,12 +57,14 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
     pqSelectionInputWidget* siw = new pqSelectionInputWidget(this);
     siw->setObjectName(smProxy->GetPropertyName(smProperty));
     vbox->addWidget(siw);
-
     this->SelectionInputWidget = siw;
-
     this->addPropertyLink(siw, "selection",
       SIGNAL(selectionChanged(pqSMProxy)), smProperty);
     
+    // call this after the above property link is setup so that we don't
+    // override the default value.
+    siw->initializeDefaultValueIfNeeded();
+
     this->connect(siw, SIGNAL(selectionChanged(pqSMProxy)),
       this, SIGNAL(changeAvailable()));
     this->connect(siw, SIGNAL(selectionChanged(pqSMProxy)),

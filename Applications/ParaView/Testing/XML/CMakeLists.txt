@@ -114,8 +114,9 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlotOverTimeAutoApply.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ProbePicking.xml
@@ -376,6 +377,7 @@ set (SLACTools_THRESHOLD 70)
 
 # Plot image leeway.
 set (SpreadSheet2_THRESHOLD 50)
+set (PlotOverTimeAutoApply_THRESHOLD 50)
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
