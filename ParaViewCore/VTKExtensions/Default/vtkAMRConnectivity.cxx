@@ -118,10 +118,18 @@ public:
     else if (set1 >= 0)
       {
       id_to_set->SetValue (id2, set1);
+      if (id2 < set_to_min_id->GetValue (set1)) 
+        {
+        set_to_min_id->SetValue (set1, id2);
+        }
       }
     else if (set2 >= 0)
       {
       id_to_set->SetValue (id1, set2);
+      if (id1 < set_to_min_id->GetValue (set2)) 
+        {
+        set_to_min_id->SetValue (set2, id1);
+        }
       }
     else
       {
@@ -143,8 +151,8 @@ public:
       id_to_set->SetValue (id1, first_empty);
       id_to_set->SetValue (id2, first_empty);
       set_to_min_id->SetValue (first_empty, min_id);
+      // return zero here because its not values we've previously cared about.
       }
-    // report that something changed.
     return 1;
     }
 
