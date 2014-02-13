@@ -246,11 +246,26 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     controller->Reduce (copyFragVolume, fragVolume, vtkCommunicator::SUM_OP, 0);
     controller->Reduce (copyFragMass, fragMass, vtkCommunicator::SUM_OP, 0);
 
+
     if (myProc == 0)
       {
       copyFragId->Delete ();
       copyFragVolume->Delete ();
       copyFragMass->Delete ();
+
+      int row = 0;
+      while (row < fragments->GetNumberOfRows ())
+        {
+        if (fragIdArray->GetValue (row) == 0)
+          {
+          fragments->RemoveRow (row);
+          }
+        else
+          {
+          row ++;
+          }
+        }
+
       }
     else 
       {

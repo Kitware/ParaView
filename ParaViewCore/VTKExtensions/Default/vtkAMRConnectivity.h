@@ -31,7 +31,7 @@ class vtkUniformGrid;
 class vtkIdTypeArray;
 class vtkAMRDualGridHelper;
 class vtkAMRDualGridHelperBlock; 
-class vtkPEquivalenceSet;
+class vtkAMRConnectivityEquivalence;
 class vtkMPIController;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlockDataSetAlgorithm
@@ -62,7 +62,7 @@ protected:
 
   double VolumeFractionSurfaceValue;
   vtkAMRDualGridHelper* Helper;
-  vtkPEquivalenceSet* Equivalence;
+  vtkAMRConnectivityEquivalence* Equivalence;
   
   bool ResolveBlocks;
 

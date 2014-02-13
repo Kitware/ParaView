@@ -20,7 +20,6 @@
 #include "vtkInformationVector.h"
 
 #include "vtkAMRDualGridHelper.h"
-#include "vtkPEquivalenceSet.h"
 #include "vtkCellData.h"
 #include "vtkCell.h"
 #include "vtkCompositeDataIterator.h"
@@ -45,6 +44,120 @@
 #include <list>
 
 vtkStandardNewMacro (vtkAMRConnectivity);
+
+class vtkAMRConnectivityEquivalence
+{
+public:
+  vtkAMRConnectivityEquivalence () 
+    {
+    id_to_set = vtkIntArray::New ();
+    id_to_set->SetNumberOfComponents (1);
+    id_to_set->SetNumberOfTuples (0);
+    set_to_min_id = vtkIntArray::New ();
+    set_to_min_id->SetNumberOfComponents (1);
+    set_to_min_id->SetNumberOfTuples (0);
+    }
+
+  ~vtkAMRConnectivityEquivalence ()
+    {
+    id_to_set->Delete ();
+    set_to_min_id->Delete ();
+    }
+
+  int AddEquivalence (int id1, int id2) 
+    {
+    int min_id, max_id;
+    if (id1 < id2)
+      {
+      min_id = id1;
+      max_id = id2;
+      }
+    else
+      {
+      min_id = id2;
+      max_id = id1;
+      }
+    while (id_to_set->GetNumberOfTuples () <= max_id) 
+      {
+      id_to_set->InsertNextValue (-1);
+      }
+    int set1 = id_to_set->GetValue (id1);
+    int set2 = id_to_set->GetValue (id2);
+
+    if (set1 >= 0 && set2 >= 0 && set1 == set2) 
+      {
+      return 0;
+      }
+    else if (set1 >= 0 && set2 >= 0)
+      {
+      // merge sets
+      int min_set, max_set;
+      if (set1 < set2) 
+        {
+        min_set = set1;
+        max_set = set2;
+        }
+      else
+        {
+        min_set = set2;
+        max_set = set1;
+        }
+      for (int i = 0; i < id_to_set->GetNumberOfTuples (); i ++) 
+        {
+        if (id_to_set->GetValue (i) == max_set)
+          {
+          id_to_set->SetValue (i, min_set);
+          }
+        }
+      if (set_to_min_id->GetValue (max_set) < set_to_min_id->GetValue (min_set)) 
+        {
+        set_to_min_id->SetValue (min_set, set_to_min_id->GetValue (max_set));
+        }
+      set_to_min_id->SetValue (max_set, -1);
+      }
+    else if (set1 >= 0)
+      {
+      id_to_set->SetValue (id2, set1);
+      }
+    else if (set2 >= 0)
+      {
+      id_to_set->SetValue (id1, set2);
+      }
+    else
+      {
+      // find an empty set.
+      int first_empty = -1;
+      for (int i = 0; i < set_to_min_id->GetNumberOfTuples (); i ++)
+        {
+        if (set_to_min_id->GetValue (i) < 0)
+          {
+          first_empty = i;
+          break;
+          }
+        }
+      if (first_empty < 0)
+        {
+        first_empty = set_to_min_id->InsertNextValue (-1);
+        }
+
+      id_to_set->SetValue (id1, first_empty);
+      id_to_set->SetValue (id2, first_empty);
+      set_to_min_id->SetValue (first_empty, min_id);
+      }
+    // report that something changed.
+    return 1;
+    }
+
+  int GetMinimumSetId (int id)
+    {
+    int set = id_to_set->GetValue (id);
+    return (set >= 0 ? set_to_min_id->GetValue (set) : -1);
+    }
+    
+private:
+  vtkIntArray* id_to_set;
+  vtkIntArray* set_to_min_id;
+};
 
 
 static const int BOUNDARY_TAG = 39857089;
@@ -326,7 +439,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 #endif 
 
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
-    this->Equivalence = vtkPEquivalenceSet::New ();
+    this->Equivalence = new vtkAMRConnectivityEquivalence;
 
     // Initialize equivalence with all regions independent
     int myOffset = myProc + 1;
@@ -347,17 +460,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         this->BoundaryArrays[i].clear ();
       }
 
-    // Reset all uninitialized remote regionIds to equivalence 0
-    for (int i = 1; i < (this->NextRegionId - numProcs); i ++) 
-      {
-      if ((i % numProcs) != myOffset && this->Equivalence->GetEquivalentSetId (i) == i) 
-        {
-        this->Equivalence->AddEquivalence (i, 0);
-        }
-      }
-    // Reduce all equivalence pairs into equivalence sets
-    this->Equivalence->ResolveEquivalences ();
-  
     // Relabel all fragment IDs with the equivalence set number 
     // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
     for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
@@ -370,7 +472,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         vtkIdType regionId = regionIdArray->GetTuple1 (i);
         if (regionId > 0) 
           {
-          int setId = this->Equivalence->GetEquivalentSetId (regionId);
+          int setId = this->Equivalence->GetMinimumSetId (regionId);
           regionIdArray->SetTuple1 (i, setId);
           }
         else
@@ -379,7 +481,8 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           }
         }
       }
-    this->Equivalence->Delete ();
+    delete this->Equivalence;
+    this->Equivalence = 0;
     }
 
 
