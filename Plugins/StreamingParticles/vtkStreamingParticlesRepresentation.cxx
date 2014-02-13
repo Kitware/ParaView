@@ -408,7 +408,7 @@ bool vtkStreamingParticlesRepresentation::DetermineBlocksToStream()
 int vtkStreamingParticlesRepresentation::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
 
   // Saying INPUT_IS_OPTIONAL() is essential, since representations don't have
