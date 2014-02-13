@@ -378,6 +378,8 @@ set (SLACTools_THRESHOLD 70)
 # Plot image leeway.
 set (SpreadSheet2_THRESHOLD 50)
 set (PlotOverTimeAutoApply_THRESHOLD 50)
+set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection.
+
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
