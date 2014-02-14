@@ -215,17 +215,23 @@ void vtkAssemblyGenerator::Write()
                   jsonFileName.str().c_str());
     return;
     }
+  vtkIdType xSize = zOrder->GetDimensions()[0];
+  vtkIdType ySize = zOrder->GetDimensions()[1];
   file << "{"
-       << "\n\"dimensions\": [" << zOrder->GetDimensions()[0] << ", " << zOrder->GetDimensions()[1] << ", " << zOrder->GetDimensions()[2] << "]"
+       << "\n\"dimensions\": [" << xSize << ", " << ySize << ", " << zOrder->GetDimensions()[2] << "]"
        << ",\n\"composite-size\": " << count
        << ",\n\"pixel-order\": \"";
 
   // Fill with string encoded ordering
+  // But need to revert Y ordering
   char buffer[32];
-  for(vtkIdType idx = 0; idx < size; ++idx)
+  for(vtkIdType lineIdx = ySize; lineIdx; --lineIdx)
     {
-    encode1(buffer, order->GetPointer(idx*count), count);
-    file << buffer;
+    for(vtkIdType idx = 0; idx < xSize; ++idx)
+      {
+      encode1(buffer, order->GetPointer(((lineIdx-1)*xSize + idx)*count), count);
+      file << buffer;
+      }
     }
 
   // Close file
