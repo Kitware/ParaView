@@ -2,12 +2,6 @@
 ## CSCS - Swiss National Supercomputing Centre for creating and contributing
 ## this plugin.
 
-IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  SET(Qt5_FIND_COMPONENTS Widgets)
-  INCLUDE(ParaViewQt5)
-ELSE()
-  INCLUDE(${QT_USE_FILE})
-ENDIF()
 vtk_module_load(vtkhdf5)
 
 INCLUDE_DIRECTORIES(
