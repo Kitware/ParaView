@@ -84,20 +84,37 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
          && this->FileName && strlen(this->FileName) > 0)
       {
       // update buffers
-      this->GetRGBData();
+      this->GetRGBAData();
       this->GetZBufferData();
 
       // Combined array into a single ImageData
       vtkNew<vtkUnsignedCharArray> rgbArray;
-      rgbArray->DeepCopy(this->RGBData->GetPointData()->GetScalars());
       rgbArray->SetName("rgb");
       vtkNew<vtkFloatArray> zArray;
       zArray->DeepCopy(this->ZBufferData->GetPointData()->GetScalars());
       zArray->SetName("z");
+
+      // Fill RGB array and set Z to 0 if Alpha == 0
+      vtkUnsignedCharArray* rgbaArraySrc =
+          vtkUnsignedCharArray::SafeDownCast(
+            this->RGBAData->GetPointData()->GetScalars());
+      rgbArray->SetNumberOfComponents(3);
+      rgbArray->SetNumberOfTuples(rgbaArraySrc->GetNumberOfTuples());
+      for(vtkIdType idx = 0, count = rgbaArraySrc->GetNumberOfTuples(); idx < count; ++idx)
+        {
+        rgbArray->SetValue(idx*3 + 0, rgbaArraySrc->GetValue(idx*4 + 0));
+        rgbArray->SetValue(idx*3 + 1, rgbaArraySrc->GetValue(idx*4 + 1));
+        rgbArray->SetValue(idx*3 + 2, rgbaArraySrc->GetValue(idx*4 + 2));
+        if(rgbaArraySrc->GetValue(idx*4 + 3) == 0)
+          {
+          zArray->SetValue(idx, 2.0f);
+          }
+        }
+
       vtkNew<vtkImageData> combinedData;
-      combinedData->SetDimensions(this->RGBData->GetDimensions());
-      combinedData->SetSpacing(this->RGBData->GetSpacing());
-      combinedData->SetOrigin(this->RGBData->GetOrigin());
+      combinedData->SetDimensions(this->RGBAData->GetDimensions());
+      combinedData->SetSpacing(this->RGBAData->GetSpacing());
+      combinedData->SetOrigin(this->RGBAData->GetOrigin());
       combinedData->GetPointData()->SetScalars(rgbArray.GetPointer());
       combinedData->GetPointData()->AddArray(zArray.GetPointer());
 
@@ -138,7 +155,7 @@ void vtkPVRenderViewForAssembly::ResetCameraClippingRange()
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkPVRenderViewForAssembly::GetRGBData()
+vtkImageData* vtkPVRenderViewForAssembly::GetRGBAData()
 {
   vtkNew<vtkWindowToImageFilter> w2i;
   w2i->SetInput(this->GetRenderWindow());
@@ -146,10 +163,10 @@ vtkImageData* vtkPVRenderViewForAssembly::GetRGBData()
   w2i->FixBoundaryOff();
   w2i->ShouldRerenderOff();
   w2i->SetMagnification(1);
-  w2i->SetInputBufferTypeToRGB();
+  w2i->SetInputBufferTypeToRGBA();
   w2i->Update();
-  this->RGBData = w2i->GetOutput();
-  return this->RGBData;
+  this->RGBAData = w2i->GetOutput();
+  return this->RGBAData;
 }
 
 //----------------------------------------------------------------------------

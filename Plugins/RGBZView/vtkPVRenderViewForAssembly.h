@@ -63,7 +63,7 @@ public:
   void ResetClippingBounds();
   void FreezeGeometryBounds();
 
-  vtkImageData* GetRGBData();
+  vtkImageData* GetRGBAData();
   vtkImageData* GetZBufferData();
 
   // Description:
@@ -86,7 +86,7 @@ private:
 
   bool InRender;
   vtkBoundingBox ClippingBounds;
-  vtkSmartPointer<vtkImageData> RGBData;
+  vtkSmartPointer<vtkImageData> RGBAData;
   vtkSmartPointer<vtkImageData> ZBufferData;
   char* FileName;
 //ETX

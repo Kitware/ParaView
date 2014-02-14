@@ -57,15 +57,15 @@ namespace {
     buffer[1] = '\0';
     for(vtkIdType idx = 0; idx < count; ++idx)
       {
-      if(order[idx] == 0)
-        {
-        --offest;
-        }
-      else
+      if(order[idx] > 0)
         {
         buffer[idx+offest] = CODING_TABLE[order[idx]-1];
         buffer[idx+offest+1] = '+';
         buffer[idx+offest+2] = '\0';
+        }
+      else
+        {
+        return;
         }
       }
   }
