@@ -18,7 +18,7 @@
 #include "vtkDataSetWriter.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
-#include "vtkJpegWriter.h"
+#include "vtkJPEGWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
