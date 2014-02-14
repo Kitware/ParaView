@@ -49,7 +49,7 @@ namespace {
     }
   };
 
-  const char* encode1(char* buffer, unsigned char* order, vtkIdType count)
+  void encode1(char* buffer, unsigned char* order, vtkIdType count)
   {
     const char* CODING_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/";
     vtkIdType offest = 0;
