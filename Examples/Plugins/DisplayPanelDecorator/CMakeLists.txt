@@ -10,8 +10,13 @@ IF(NOT ParaView_BINARY_DIR)
 ENDIF(NOT ParaView_BINARY_DIR)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  QT4_WRAP_CPP(MOC_SRCS pqMyPanelDecorator.h)
-  QT4_WRAP_UI(UI_SRCS pqMyPanelDecorator.ui)
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_WRAP_CPP(MOC_SRCS pqMyPanelDecorator.h)
+    QT5_WRAP_UI(UI_SRCS pqMyPanelDecorator.ui)
+  ELSE ()
+    QT4_WRAP_CPP(MOC_SRCS pqMyPanelDecorator.h)
+    QT4_WRAP_UI(UI_SRCS pqMyPanelDecorator.ui)
+  ENDIF ()
 
   ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(
     IFACES IFACE_SRCS

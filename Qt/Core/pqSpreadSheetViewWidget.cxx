@@ -175,7 +175,11 @@ pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
   this->setAlternatingRowColors(true);
   this->setCornerButtonEnabled(false);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
+#if QT_VERSION >= 0x050000
+  this->horizontalHeader()->setSectionsMovable(true);
+#else
   this->horizontalHeader()->setMovable(true);
+#endif
   this->horizontalHeader()->setHighlightSections(false);
   this->SingleColumnMode = false;
 
@@ -288,11 +292,19 @@ void pqSpreadSheetViewWidget::onSectionDoubleClicked(int logicalindex)
       }
     if (this->SingleColumnMode && cc == logicalindex)
       {
+#if QT_VERSION >= 0x050000
+      header->setSectionResizeMode(cc, QHeaderView::Stretch);
+#else
       header->setResizeMode(cc, QHeaderView::Stretch);
+#endif
       }
     else if (!this->SingleColumnMode)
       {
+#if QT_VERSION >= 0x050000
+      header->setSectionResizeMode(cc, QHeaderView::Interactive);
+#else
       header->setResizeMode(cc, QHeaderView::Interactive);
+#endif
       }
     }
 

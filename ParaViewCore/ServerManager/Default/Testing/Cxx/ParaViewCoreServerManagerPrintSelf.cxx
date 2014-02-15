@@ -41,7 +41,6 @@
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMCompoundSourceProxyDefinitionBuilder.h"
-#include "vtkSMContextNamedOptionsProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMCSVExporterProxy.h"
 #include "vtkSMDataTypeDomain.h"
@@ -169,7 +168,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMCompoundProxyDefinitionLoader);
   PRINT_SELF(vtkSMCompoundSourceProxy);
   PRINT_SELF(vtkSMCompoundSourceProxyDefinitionBuilder);
-  PRINT_SELF(vtkSMContextNamedOptionsProxy);
   PRINT_SELF(vtkSMContextViewProxy);
   PRINT_SELF(vtkSMCSVExporterProxy);
   PRINT_SELF(vtkSMDataTypeDomain);

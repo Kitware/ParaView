@@ -98,13 +98,9 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
-  vtkSmartPointer<vtkDataObject> clone;
-  clone.TakeReference(inputDO->NewInstance());
-  clone->ShallowCopy(inputDO);
-
   vtkSmartPointer<vtkAttributeDataToTableFilter> adtf =
     vtkSmartPointer<vtkAttributeDataToTableFilter>::New();
-  adtf->SetInputData(clone);
+  adtf->SetInputData(inputDO);
   adtf->SetAddMetaData(true);
   adtf->SetGenerateCellConnectivity(this->GenerateCellConnectivity);
   adtf->SetFieldAssociation(this->FieldAssociation);
@@ -124,6 +120,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
     pipeline->Delete();
     filter = split;
     split->SetInputConnection(adtf->GetOutputPort());
+    split->SetNamingModeToNamesWithUnderscores();
     split->Update();
     }
 

@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKInteractorAdapter.h"
 
 //----------------------------------------------------------------------------
-pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
+pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f), SizePropertyName("ViewSize")
 {
   this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST")==NULL);
@@ -90,9 +90,9 @@ void pqQVTKWidget::updateSizeProperties()
     view_size[0] = this->size().width();
     view_size[1] = this->size().height();
     vtkSMPropertyHelper(
-      this->ViewProxy, this->SizePropertyName.toAscii().data()).Set(view_size, 2);
+      this->ViewProxy, this->SizePropertyName.toLatin1().data()).Set(view_size, 2);
     this->ViewProxy->UpdateProperty(
-      this->SizePropertyName.toAscii().data());
+      this->SizePropertyName.toLatin1().data());
     END_UNDO_EXCLUDE();
     }
 

@@ -52,14 +52,22 @@ set_source_files_properties(
   PROPERTIES OBJECT_DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/paraview.qch")
 
-QT4_ADD_RESOURCES(rcs_sources
-  "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
+if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_ADD_RESOURCES(rcs_sources
+    "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
+else()
+  QT4_ADD_RESOURCES(rcs_sources
+    "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
+endif()
 
 add_library(vtkParaViewDocumentation STATIC
   ParaViewDocumentationInitializer.cxx
   ${rcs_sources})
-target_link_libraries(vtkParaViewDocumentation ${QT_LIBRARIES}) 
-
+target_link_libraries(vtkParaViewDocumentation ${QT_LIBRARIES})
+if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set_target_properties(vtkParaViewDocumentation PROPERTIES
+    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+endif()
 
 IF (NOT VTK_INSTALL_NO_DEVELOPMENT)
   # We install the qch file only when installing development files since the

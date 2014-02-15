@@ -24,6 +24,8 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UpdateTransferFunctionRanges.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
 )
 
 SET (TESTS_WITH_BASELINES)
@@ -112,8 +114,9 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlotOverTimeAutoApply.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ProbePicking.xml
@@ -155,8 +158,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ViewSettingsDialog.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
@@ -239,7 +240,7 @@ endif()
 
 # Probe picking does not work in render server mode
 set(ProbePicking_DISABLE_CRS TRUE)
-set(ProbePicking_THRESHOLD 40)
+set(ProbePicking_THRESHOLD 120)
 
 # only enable find data tests if numpy is available
 include("TestNumPy")
@@ -359,8 +360,10 @@ SET (UndoRedo4_THRESHOLD 15)
 
 # Since often there are issues with fonts etc.
 SET (XYChart_THRESHOLD 150)
+# Since the test uses surface-selection, it cannot work in render-server mode.
+set(XYChart_DISABLE_CRS TRUE)
 
-SET (XYHistogram_THRESHOLD 60)
+SET (XYHistogram_THRESHOLD 150)
 set (ChartAxisRangeAndLabels_THRESHOLD 60)
 
 # The color and opacity are often different on different machines.
@@ -370,7 +373,13 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
-set (SLACTools_THRESHOLD 40)
+set (SLACTools_THRESHOLD 70)
+
+# Plot image leeway.
+set (SpreadSheet2_THRESHOLD 50)
+set (PlotOverTimeAutoApply_THRESHOLD 50)
+set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection.
+
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
@@ -381,9 +390,6 @@ set (DisconnectAndSaveAnimation_BREAK TRUE)
 # Histogram filter produces different results when running in parallel, so
 # disable it.
 IF (PARAVIEW_USE_MPI)
-  SET (XYHistogram_DISABLE_CS TRUE)
-  SET (XYHistogram_DISABLE_CRS TRUE)
-
   SET (SpreadSheet1_DISABLE_CS TRUE)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
 
@@ -426,7 +432,11 @@ SET (SaveCSV_THRESHOLD 40)
 ## Disable ClientRenderServer tests for FFTOverTime. This is done since
 ## selection is not supported in render server mode esp. when number of render
 ## server processess is not same as the data server processes
-SET (FFTOverTime_DISABLE_CRS TRUE)
+set (FFTOverTime_DISABLE_CRS TRUE)
+set (FFTOverTime_THRESHOLD 70) # since there's a plot, account for minor
+                               # rendering differences.
+
+
 
 set (LoadStateMultiView_BREAK TRUE)
 set (RenderNan_BREAK TRUE)
@@ -565,7 +575,6 @@ set (XdmfRead_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (XdmfReadStructuredGrid_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (XdmfReadStructuredGridCollection_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (XdmfGridAttributes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-#set (XYChart_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ZLibXDMF_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 
 

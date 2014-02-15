@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkMatrix4x4.h"
+#include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMRenderViewProxy.h"
@@ -63,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRInteractorStyleFactory.h"
 #include "vtkWeakPointer.h"
 
-#include <QtGui/QListWidgetItem>
+#include <QListWidgetItem>
 
 #include <QtCore/QDebug>
 #include <QtCore/QMap>

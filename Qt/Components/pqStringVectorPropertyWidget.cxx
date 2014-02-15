@@ -325,12 +325,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     comboBox->setObjectName("ComboBox");
 
     pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
-
-    for(unsigned int i = 0; i < stringListDomain->GetNumberOfStrings(); i++)
-      {
-      comboBox->addItem(stringListDomain->GetString(i));
-      }
-
+    new pqComboBoxDomain(comboBox, smProperty);
     this->addPropertyLink(adaptor,
                           "currentText",
                           SIGNAL(currentTextChanged(QString)),

@@ -195,6 +195,8 @@ set (Module_SRCS
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
+  pqSeriesEditorPropertyWidget.cxx
+  pqSeriesEditorPropertyWidget.h
   pqServerConnectReaction.cxx
   pqServerConnectReaction.h
   pqServerDisconnectReaction.cxx
@@ -320,6 +322,7 @@ set (Module_MOC_HDRS
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.h
+  pqSeriesEditorPropertyWidget.h
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.h
@@ -372,6 +375,7 @@ set (Module_UI_FILES
   Resources/UI/pqLightsEditor.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
+  Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
   Resources/UI/pqVCRToolbar.ui
 )
@@ -379,15 +383,25 @@ set (Module_UI_FILES
 set (Module_RESOURCE_FILES
 )
 
-qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
-
 # not sure this is the best way, but "moc" is complaining about
 # interfaces defined under Components and this seems like the only way to fix
 # that issue.
-  OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
+    OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+else ()
+  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
+    OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+endif()
 
-qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt5_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+else ()
+  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+endif()
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}

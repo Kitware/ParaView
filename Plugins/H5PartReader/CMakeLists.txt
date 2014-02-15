@@ -2,10 +2,6 @@
 ## CSCS - Swiss National Supercomputing Centre for creating and contributing
 ## this plugin.
 
-IF (QT_USE_FILE)
-  INCLUDE(${QT_USE_FILE})
-ENDIF (QT_USE_FILE)
-
 vtk_module_load(vtkhdf5)
 
 INCLUDE_DIRECTORIES(

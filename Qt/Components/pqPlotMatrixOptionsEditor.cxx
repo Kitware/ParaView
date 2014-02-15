@@ -566,14 +566,14 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
 
   // title
   this->Internal->Form->Title = this->Internal->Form->ChartTitle->text();
-  proxy->SetTitle(this->Internal->Form->Title.toAscii().constData());
+  proxy->SetTitle(this->Internal->Form->Title.toLatin1().constData());
   this->Internal->Form->TitleAlignment =
     this->Internal->Form->ChartTitleAlignment->currentIndex();
   vtkTextProperty *prop = proxy->GetTitleProperties();
   prop->SetJustification(this->Internal->Form->TitleAlignment);
   // Apply the Title font type info
   QString fontFamily = this->Internal->Form->TitleFont.family();
-  prop->SetFontFamilyAsString(fontFamily.toAscii().constData());
+  prop->SetFontFamilyAsString(fontFamily.toLatin1().constData());
   prop->SetFontSize(this->Internal->Form->TitleFont.pointSize());
   prop->SetBold(this->Internal->Form->TitleFont.bold() ? 1 : 0);
   prop->SetItalic(this->Internal->Form->TitleFont.italic() ? 1 : 0);
@@ -657,7 +657,7 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
     prop->SetOpacity(static_cast<double>(color.alphaF()));
     // Axis label font
     QFont plotfont = this->Internal->Form->PlotData[plotType]->LabelFont;
-    prop->SetFontFamilyAsString(plotfont.family().toAscii().constData());
+    prop->SetFontFamilyAsString(plotfont.family().toLatin1().constData());
     prop->SetFontSize(plotfont.pointSize());
     prop->SetBold(plotfont.bold() ? 1 : 0);
     prop->SetItalic(plotfont.italic() ? 1 : 0);

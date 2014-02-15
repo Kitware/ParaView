@@ -252,7 +252,7 @@ void pqCommandLineOptionsBehavior::playTests()
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
     options->SetCurrentImageThreshold(options->GetTestImageThreshold(cc));
-    cout << "Playing: " << options->GetTestScript(cc).toAscii().data() << endl;
+    cout << "Playing: " << options->GetTestScript(cc).toLatin1().data() << endl;
     success = testUtility->playTests(options->GetTestScript(cc));
 
     if (success && !options->GetTestBaseline(cc).isEmpty())

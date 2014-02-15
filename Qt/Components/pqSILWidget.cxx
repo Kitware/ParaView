@@ -133,7 +133,11 @@ void pqSILWidget::onModelReset()
   activeTree->setHeader(new QHeaderView(Qt::Horizontal, activeTree));
   activeTree->header()->setStretchLastSection(true);
   activeTree->setRootIsDecorated(false);
+#if QT_VERSION >= 0x050000
+  activeTree->header()->setSectionsClickable(true);
+#else
   activeTree->header()->setClickable(true);
+#endif
   QObject::connect(activeTree->header(), SIGNAL(sectionClicked(int)),
     this->ActiveModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
   activeTree->setModel(this->ActiveModel);
@@ -161,7 +165,11 @@ void pqSILWidget::onModelReset()
       this->Model->data(this->Model->index(cc, 0)).toString(), tree);
     proxyModel->setSourceModel(this->Model);
 
+#if QT_VERSION >= 0x050000
+    tree->header()->setSectionsClickable(true);
+#else
     tree->header()->setClickable(true);
+#endif
     QObject::connect(tree->header(), SIGNAL(sectionClicked(int)),
       proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
     tree->setModel(proxyModel);

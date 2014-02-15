@@ -99,16 +99,20 @@ pqTreeWidget::pqTreeWidget(QWidget* p)
     this->CheckPixmaps[i]->fill(QColor(0,0,0,0));
     QPainter painter(this->CheckPixmaps[i]);
     option.state = pqTreeWidgetPixmapStyle[i];
-    
+
     this->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
                          &painter, this);
     }
-  
+
   QObject::connect(this->header(), SIGNAL(sectionClicked(int)),
                    this, SLOT(doToggle(int)),
                    Qt::QueuedConnection);
-  
+
+#if QT_VERSION >= 0x050000
+  this->header()->setSectionsClickable(true);
+#else
   this->header()->setClickable(true);
+#endif
 
   QObject::connect(this->model(), SIGNAL(dataChanged(QModelIndex, QModelIndex)),
                    this, SLOT(updateCheckState()));

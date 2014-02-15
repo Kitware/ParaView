@@ -113,7 +113,7 @@ void vtkVRVectorPropertyStyle::setValue(double x, double y, double z)
     {
     double values[3] = {x, y, z};
     vtkSMPropertyHelper(smproxy,
-      this->getSMPropertyName().toAscii().data()).Set(values, 3);
+      this->getSMPropertyName().toLatin1().data()).Set(values, 3);
     smproxy->UpdateVTKObjects();
     }
 }

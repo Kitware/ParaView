@@ -25,8 +25,9 @@
 class vtkSMPropertyGroupInternals
 {
 public:
-  std::vector<vtkSMProperty *> Properties;
-  std::map<std::string, vtkWeakPointer<vtkSMProperty> > PropertiesMap;
+  std::vector<vtkWeakPointer<vtkSMProperty> > Properties;
+  typedef std::map<std::string, vtkWeakPointer<vtkSMProperty> > PropertiesMapType;
+  PropertiesMapType PropertiesMap;
 };
 
 vtkStandardNewMacro(vtkSMPropertyGroup)
@@ -98,4 +99,23 @@ vtkSMProperty* vtkSMPropertyGroup::GetProperty(const char* function) const
 unsigned int vtkSMPropertyGroup::GetNumberOfProperties() const
 {
   return static_cast<unsigned int>(this->Internals->Properties.size());
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMPropertyGroup::GetFunction(vtkSMProperty* property) const
+{
+  if (property)
+    {
+    for (vtkSMPropertyGroupInternals::PropertiesMapType::iterator iter = 
+      this->Internals->PropertiesMap.begin();
+      iter != this->Internals->PropertiesMap.end();
+      ++iter)
+      {
+      if (iter->second.GetPointer() == property)
+        {
+        return iter->first.c_str();
+        }
+      }
+    }
+  return NULL;
 }

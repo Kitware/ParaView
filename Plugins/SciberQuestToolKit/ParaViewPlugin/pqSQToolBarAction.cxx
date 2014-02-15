@@ -72,7 +72,7 @@ void pqSQToolbarActions::onAction(QAction* a)
       {
       stack->beginUndoSet(QString("Create %1").arg(source_type));
       }
-    builder->createFilter("sources", source_type.toAscii().data(), s);
+    builder->createFilter("sources", source_type.toLatin1().data(), s);
     if(stack)
       {
       stack->endUndoSet();

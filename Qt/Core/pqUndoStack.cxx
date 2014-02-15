@@ -176,7 +176,7 @@ void pqUndoStack::beginUndoSet(QString label)
 {
   if(this->Implementation->NestedCount == 0)
     {
-    this->Implementation->UndoStackBuilder->Begin(label.toAscii().data());
+    this->Implementation->UndoStackBuilder->Begin(label.toLatin1().data());
     }
 
   this->Implementation->NestedCount++;

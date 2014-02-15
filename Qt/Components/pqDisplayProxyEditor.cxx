@@ -850,7 +850,7 @@ void pqDisplayProxyEditor::updateEnableState()
       attrInfo = geomInfo->GetCellDataInformation();
       }
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
-      this->Internal->Representation->getColorField(true).toAscii().data());
+      this->Internal->Representation->getColorField(true).toLatin1().data());
 
     if (arrayInfo && arrayInfo->GetDataType() == VTK_UNSIGNED_CHAR)
       {
@@ -1058,7 +1058,7 @@ void pqDisplayProxyEditor::setBackfaceSolidColor(const QColor& color)
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::beginUndoSet(const QString& str)
 {
-  BEGIN_UNDO_SET(str.toAscii().data());
+  BEGIN_UNDO_SET(str.toLatin1().data());
 }
 
 //-----------------------------------------------------------------------------

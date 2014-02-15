@@ -10,8 +10,13 @@ IF(NOT ParaView_BINARY_DIR)
 ENDIF(NOT ParaView_BINARY_DIR)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  QT4_WRAP_CPP(MOC_SRCS ExampleDockPanel.h)
-  QT4_WRAP_UI(UI_SRCS ExampleDockPanel.ui)
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_WRAP_CPP(MOC_SRCS ExampleDockPanel.h)
+    QT5_WRAP_UI(UI_SRCS ExampleDockPanel.ui)
+  ELSE ()
+    QT4_WRAP_CPP(MOC_SRCS ExampleDockPanel.h)
+    QT4_WRAP_UI(UI_SRCS ExampleDockPanel.ui)
+  ENDIF ()
 
   ADD_PARAVIEW_DOCK_WINDOW(
     OUTIFACES

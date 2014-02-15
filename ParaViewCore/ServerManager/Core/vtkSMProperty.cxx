@@ -147,9 +147,22 @@ void vtkSMProperty::AddDomain(const char* name, vtkSMDomain* domain)
   if (it != this->PInternals->Domains.end())
     {
     vtkWarningMacro("Domain " << name  << " already exists. Replacing");
+    it->second->SetProperty(NULL);
     }
 
   this->PInternals->Domains[name] = domain;
+  if (domain)
+    {
+    domain->SetProperty(this); // doesn't change reference count.
+    domain->AddObserver(vtkCommand::DomainModifiedEvent,
+      this, &vtkSMProperty::InvokeDomainModifiedEvent);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::InvokeDomainModifiedEvent()
+{
+  this->InvokeEvent(vtkCommand::DomainModifiedEvent);
 }
 
 //---------------------------------------------------------------------------

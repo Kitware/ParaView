@@ -92,6 +92,10 @@ public:
   // values.
   vtkGetMacro(IsOptional, bool);
 
+  // Description:
+  // Provides access to the vtkSMProperty on which this domain is hooked up.
+  vtkSMProperty* GetProperty();
+
 protected:
   vtkSMDomain();
   ~vtkSMDomain();
@@ -159,6 +163,11 @@ protected:
   // Description:
   // Gets the number of required properties added.
   unsigned int GetNumberOfRequiredProperties();
+
+  // Description:
+  // Set the domain's property. This is called by vtkSMProperty when the domain
+  // is created.
+  void SetProperty(vtkSMProperty*);
 
   char* XMLName;
   bool IsOptional;

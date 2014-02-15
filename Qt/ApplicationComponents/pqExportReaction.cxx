@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMExporterProxy.h"
 #include "vtkSMProperty.h"
 
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QToolButton>
-#include <QtGui/QVBoxLayout>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QToolButton>
+#include <QVBoxLayout>
 
 //-----------------------------------------------------------------------------
 pqExportReaction::pqExportReaction(QAction* parentObject)

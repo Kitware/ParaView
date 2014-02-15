@@ -85,7 +85,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
-  Qt::WFlags f/*=0*/): pqDialog(_p, f)
+  Qt::WindowFlags f/*=0*/): pqDialog(_p, f)
 {
   this->Internal = new pqCameraDialogInternal;
   this->Internal->setupUi(this);
@@ -474,7 +474,7 @@ void pqCameraDialog::applyCustomView(int buttonId)
     {
     vtkSmartPointer<vtkPVXMLParser> parser=vtkSmartPointer<vtkPVXMLParser>::New();
     parser->InitializeParser();
-    parser->ParseChunk(config.toAscii().data(),static_cast<unsigned int>(config.size()));
+    parser->ParseChunk(config.toLatin1().data(),static_cast<unsigned int>(config.size()));
     parser->CleanupParser();
 
     vtkPVXMLElement *xmlStream=parser->GetRootElement();

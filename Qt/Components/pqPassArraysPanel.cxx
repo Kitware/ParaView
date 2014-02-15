@@ -139,19 +139,19 @@ void pqPassArraysPanel::accept()
       if(this->ArrayTypes[i] == POINT)
         {
         pqSMAdaptor::setMultipleElementProperty(pointArraysProperty, pointCounter,
-                                                item->text(0).toAscii());
+                                                item->text(0).toLatin1());
         pointCounter++;
         }
       else if(this->ArrayTypes[i] == CELL)
         {
         pqSMAdaptor::setMultipleElementProperty(cellArraysProperty, cellCounter,
-                                                item->text(0).toAscii());
+                                                item->text(0).toLatin1());
         cellCounter++;
         }
       else if(this->ArrayTypes[i] == FIELD)
         {
         pqSMAdaptor::setMultipleElementProperty(fieldArraysProperty, fieldCounter,
-                                                item->text(0).toAscii());
+                                                item->text(0).toLatin1());
         fieldCounter++;
         }
       }
@@ -290,7 +290,11 @@ void pqPassArraysPanel::updateArrayList()
   this->SelectorWidget->reset();
   this->SelectorWidget->setHeaderLabel("Arrays");
   this->SelectorWidget->setColumnCount(1);
+#if QT_VERSION >= 0x050000
+  this->SelectorWidget->header()->setSectionsClickable(true);
+#else
   this->SelectorWidget->header()->setClickable(true);
+#endif
   QObject::connect(this->SelectorWidget->header(), SIGNAL(sectionClicked(int)),
                    this, SLOT(doToggle(int)), Qt::QueuedConnection);
 

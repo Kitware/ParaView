@@ -9,7 +9,11 @@ IF(NOT ParaView_BINARY_DIR)
 ENDIF(NOT ParaView_BINARY_DIR)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  QT4_WRAP_CPP(MOC_SRCS MyToolBarActions.h)
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_WRAP_CPP(MOC_SRCS MyToolBarActions.h)
+  ELSE ()
+    QT4_WRAP_CPP(MOC_SRCS MyToolBarActions.h)
+  ENDIF ()
 
   # we implement a pqConePanel.h for the ConeSource
   ADD_PARAVIEW_ACTION_GROUP(IFACES IFACE_SRCS CLASS_NAME MyToolBarActions

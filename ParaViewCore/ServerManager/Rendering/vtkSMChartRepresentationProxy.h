@@ -35,6 +35,17 @@ public:
   // Returns client side representation object.
   vtkChartRepresentation* GetRepresentation();
 
+  // Description:
+  // Overridden to handle links with subproxy properties.
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+
+  // Description:
+  // Overridden to handle the default value for "UseIndexForXAxis" property, if
+  // any. UseIndexForXAxis needs to be OFF by default, if the required property
+  // i.e. XArrayName property has one of the known types of arrays, otherwise it
+  // must be ON.
+  virtual void ResetPropertiesToDefault();
+
 //BTX
 protected:
   vtkSMChartRepresentationProxy();

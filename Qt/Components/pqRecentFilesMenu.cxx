@@ -293,7 +293,7 @@ bool pqRecentFilesMenu::open(
 
       // Read in the xml file to restore.
       vtkSmartPointer<vtkPVXMLParser> xmlParser = vtkSmartPointer<vtkPVXMLParser>::New();
-      xmlParser->SetFileName(sessionFile.toAscii().data());
+      xmlParser->SetFileName(sessionFile.toLatin1().data());
       xmlParser->Parse();
 
       // Get the root element from the parser.

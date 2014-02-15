@@ -215,7 +215,7 @@ bool pqPVApplicationCore::eventFilter ( QObject * obj, QEvent * event_ )
       files.append(fileEvent->file());
 
       // By default we always update the options
-      this->Options->SetParaViewDataName(files[0].toAscii().data());
+      this->Options->SetParaViewDataName(files[0].toLatin1().data());
 
       // If the application is already started just load the data
       if(vtkProcessModule::GetProcessModule()->GetSession())

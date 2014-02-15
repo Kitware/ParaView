@@ -52,7 +52,10 @@ public:
 
   /// \returns the internal vtkContextView which provides the implementation for
   /// the chart rendering.
-  virtual vtkContextView* getVTKChartView() const;
+  virtual vtkContextView* getVTKContextView() const;
+
+  /// Returns the context view proxy associated with this object.
+  virtual vtkSMContextViewProxy* getContextViewProxy() const;
 
   /// \returns the comparative view proxy.
   vtkSMComparativeViewProxy* getComparativeViewProxy() const;

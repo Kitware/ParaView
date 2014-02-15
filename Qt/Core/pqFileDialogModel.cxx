@@ -258,7 +258,7 @@ public:
       helper->UpdatePropertyInformation();
       QString separator = pqSMAdaptor::getElementProperty(
         helper->GetProperty("PathSeparator")).toString();
-      this->Separator = separator.toAscii().data()[0];
+      this->Separator = separator.toLatin1().data()[0];
       }
     else
       {
@@ -310,7 +310,7 @@ public:
       pqSMAdaptor::setElementProperty(
         helper->GetProperty("DirectoryListing"), dirListing);
       pqSMAdaptor::setElementProperty(
-        helper->GetProperty("Path"), path.toAscii().data());
+        helper->GetProperty("Path"), path.toLatin1().data());
       pqSMAdaptor::setElementProperty(
         helper->GetProperty("SpecialDirectories"), specialDirs);
       helper->UpdateVTKObjects();
@@ -324,9 +324,9 @@ public:
       {
       vtkPVFileInformationHelper* helper = this->FileInformationHelper;
       helper->SetDirectoryListing(dirListing);
-      helper->SetPath(path.toAscii().data());
+      helper->SetPath(path.toLatin1().data());
       helper->SetSpecialDirectories(specialDirs);
-      helper->SetWorkingDirectory(workingDir.toAscii().data());
+      helper->SetWorkingDirectory(workingDir.toLatin1().data());
       this->FileInformation->CopyFromObject(helper);
       }
     return this->FileInformation;
@@ -514,11 +514,12 @@ pqServer* pqFileDialogModel::server() const
 
 void pqFileDialogModel::setCurrentPath(const QString& Path)
 {
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(Path);
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
-  this->reset();
+  this->endResetModel();
 }
 
 QString pqFileDialogModel::getCurrentPath()
@@ -600,22 +601,22 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
         vtkSMDirectoryProxy::SafeDownCast(
             this->Implementation->getServer()->proxyManager()->NewProxy(
                 "misc", "Directory"));
-    ret = dirProxy->MakeDirectory(dirPath.toAscii().data(),
+    ret = dirProxy->MakeDirectory(dirPath.toLatin1().data(),
       vtkProcessModule::DATA_SERVER);
     dirProxy->Delete();
     }
   else
     {
     // File system is local.
-    ret = (vtkDirectory::MakeDirectory(dirPath.toAscii().data()) != 0);
+    ret = (vtkDirectory::MakeDirectory(dirPath.toLatin1().data()) != 0);
     }
 
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
-
-  this->reset();
+  this->endResetModel();
 
   return ret;
 }
@@ -637,22 +638,23 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
         vtkSMDirectoryProxy::SafeDownCast(
             this->Implementation->getServer()->proxyManager()->NewProxy(
                 "misc", "Directory"));
-    ret = dirProxy->DeleteDirectory(dirPath.toAscii().data(),
+    ret = dirProxy->DeleteDirectory(dirPath.toLatin1().data(),
       vtkProcessModule::DATA_SERVER);
     dirProxy->Delete();
     }
   else
     {
     // File system is local.
-    ret = (vtkDirectory::DeleteDirectory(dirPath.toAscii().data()) != 0);
+    ret = (vtkDirectory::DeleteDirectory(dirPath.toLatin1().data()) != 0);
     }
 
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
+  this->endResetModel();
 
-  this->reset();
 
   return ret;
 }
@@ -697,21 +699,21 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
             this->Implementation->getServer()->proxyManager()->NewProxy(
                 "misc", "Directory"));
     ret = dirProxy->Rename(
-      oldPath.toAscii().data(), newPath.toAscii().data(),
+      oldPath.toLatin1().data(), newPath.toLatin1().data(),
       vtkProcessModule::DATA_SERVER);
     dirProxy->Delete();
     }
   else
     {
-    ret = (vtkDirectory::Rename(oldPath.toAscii().data(),
-                                newPath.toAscii().data()) != 0);
+    ret = (vtkDirectory::Rename(oldPath.toLatin1().data(),
+                                newPath.toLatin1().data()) != 0);
     }
 
+  this->beginResetModel();
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   info = this->Implementation->GetData(true, cPath, false);
   this->Implementation->Update(cPath, info);
-
-  this->reset();
+  this->endResetModel();
 
   return ret;
 }

@@ -200,8 +200,13 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
 
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+#if QT_VERSION >= 0x050000
+  this->Internal->activeParameters->horizontalHeader()->setSectionResizeMode(
+    QHeaderView::ResizeToContents);
+#else
   this->Internal->activeParameters->horizontalHeader()->setResizeMode(
     QHeaderView::ResizeToContents);
+#endif
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
@@ -371,7 +376,7 @@ void pqComparativeVisPanel::addParameter()
     {
     BEGIN_UNDO_SET(QString("Add parameter %1 : %2").arg(
         pqComparativeVisPanelNS::getName(curProxy)).arg(
-        pqComparativeVisPanelNS::getName(curProxy, pname.toAscii().data(), pindex)));
+        pqComparativeVisPanelNS::getName(curProxy, pname.toLatin1().data(), pindex)));
     }
   else
     {
@@ -380,7 +385,7 @@ void pqComparativeVisPanel::addParameter()
 
   // Add new cue.
   vtkSMProxy* cueProxy = pqComparativeVisPanelNS::newCue(curProxy,
-    pname.toAscii().data(), pindex);
+    pname.toLatin1().data(), pindex);
   vtkSMPropertyHelper(this->view()->getProxy(), "Cues").Add(cueProxy);
   cueProxy->Delete();
   this->view()->getProxy()->UpdateVTKObjects();

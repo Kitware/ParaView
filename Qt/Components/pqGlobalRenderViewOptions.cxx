@@ -486,7 +486,7 @@ void pqGlobalRenderViewOptions::applyChanges()
     {
     manips[i] = default3DManips[i];
     manips[i].Name =
-      this->Internal->CameraControl3DComboBoxList[i]->currentText().toAscii();
+      this->Internal->CameraControl3DComboBoxList[i]->currentText().toLatin1();
     }
   
   QStringList strs;
@@ -510,7 +510,7 @@ void pqGlobalRenderViewOptions::applyChanges()
     {
     manips[i] = default2DManips[i];
     manips[i].Name =
-      this->Internal->CameraControl2DComboBoxList[i]->currentText().toAscii();
+      this->Internal->CameraControl2DComboBoxList[i]->currentText().toLatin1();
     }
   
   strs.clear();
@@ -702,7 +702,7 @@ void pqGlobalRenderViewOptions::resetChanges()
       Manip tmp;
       tmp.Name.resize(strs[i].size());
       int manip_index;
-      if(5 == sscanf(strs[i].toAscii().data(),
+      if(5 == sscanf(strs[i].toLatin1().data(),
         "Manipulator%dMouse%dShift%dControl%dName%s",
         &manip_index, &tmp.Mouse, &tmp.Shift, &tmp.Control, tmp.Name.data()))
         {
@@ -746,7 +746,7 @@ void pqGlobalRenderViewOptions::resetChanges()
       Manip tmp;
       tmp.Name.resize(strs[i].size());
       int manip_index;
-      if(5 == sscanf(strs[i].toAscii().data(),
+      if(5 == sscanf(strs[i].toLatin1().data(),
         "Manipulator%dMouse%dShift%dControl%dName%s",
         &manip_index, &tmp.Mouse, &tmp.Shift, &tmp.Control, tmp.Name.data()))
         {

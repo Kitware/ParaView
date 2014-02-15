@@ -51,7 +51,7 @@ class vtkSMProxy;
 class PQCOMPONENTS_EXPORT pqPropertyWidget : public QWidget
 {
   Q_OBJECT
-
+  typedef QWidget Superclass;
 public:
   pqPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
   virtual ~pqPropertyWidget();
@@ -96,6 +96,10 @@ public:
     return this->Decorators;
     }
 
+  /// unhide superclass method. Note this is not virtual in QObject so don't add
+  /// any other logic here.
+  bool setProperty (const char *name, const QVariant &value)
+    { return this->Superclass::setProperty(name, value); }
 signals:
   /// This signal is emitted when the current view changes.
   void viewChanged(pqView *view);

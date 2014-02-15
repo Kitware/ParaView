@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTrack.h"
 
 //-----------------------------------------------------------------------------
-pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s)
-  : QObject(p), QGraphicsItem(p,s),
+pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p)
+  : QObject(p), QGraphicsItem(p),
   NormalizedStartTime(0), NormalizedEndTime(1),
   Rect(0,0,1,1)
 {

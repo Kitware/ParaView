@@ -20,16 +20,30 @@ SET (CP_SOURCES
   pqCPPluginManager.h
 )
 
-INCLUDE(${QT_USE_FILE})
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set (Qt5_FIND_COMPONENTS Widgets)
+  include (ParaViewQt5)
 
-QT4_WRAP_CPP(MOC_SRCS
-  pqCPExportStateWizard.h
-  pqCPActionsGroup.h
-  pqCPPluginManager.h
-)
+  QT5_WRAP_CPP(MOC_SRCS
+    pqCPExportStateWizard.h
+    pqCPActionsGroup.h
+    pqCPPluginManager.h
+  )
 
-QT4_WRAP_UI(UI_SRCS
-  ${UI_RESOURCES})
+  QT5_WRAP_UI(UI_SRCS
+    ${UI_RESOURCES})
+else ()
+  include (${QT_USE_FILE})
+
+  QT4_WRAP_CPP(MOC_SRCS
+    pqCPExportStateWizard.h
+    pqCPActionsGroup.h
+    pqCPPluginManager.h
+  )
+
+  QT4_WRAP_UI(UI_SRCS
+    ${UI_RESOURCES})
+endif ()
 
 #------------------------------------------------------------------------------
 SET (PARAVIEW_PLUGIN_IFACES)

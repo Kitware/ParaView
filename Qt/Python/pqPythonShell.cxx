@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 
+#include <QAbstractItemView>
 #include <QInputDialog>
 #include <QStringListModel>
 #include <QTextCharFormat>
@@ -332,7 +333,7 @@ void pqPythonShell::clear()
 void pqPythonShell::executeScript(const QString& script)
 {
   emit this->executing(true);  
-  this->Interpreter->RunStringWithConsoleLocals(script.toAscii().data());
+  this->Interpreter->RunStringWithConsoleLocals(script.toLatin1().data());
   emit this->executing(false);
   CLEAR_UNDO_STACK();
 
@@ -352,7 +353,7 @@ void pqPythonShell::pushScript(const QString& script)
   emit this->executing(true);
   foreach (QString line, lines)
     {
-    bool isMultilineStatement = this->Interpreter->Push(line.toAscii().data());
+    bool isMultilineStatement = this->Interpreter->Push(line.toLatin1().data());
     this->Prompt = isMultilineStatement ? pqPythonShell::PS2() : pqPythonShell::PS1();
     }
   emit this->executing(false);

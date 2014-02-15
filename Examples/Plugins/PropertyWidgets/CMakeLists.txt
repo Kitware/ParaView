@@ -9,10 +9,17 @@ endif()
 
 
 if (PARAVIEW_BUILD_QT_GUI)
-  qt4_wrap_cpp(moc_srcs
-    pqMyPropertyWidgetForProperty.h
-    pqMyPropertyWidgetForGroup.h
-    pqMyPropertyWidgetDecorator.h)
+  if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    qt5_wrap_cpp(moc_srcs
+      pqMyPropertyWidgetForProperty.h
+      pqMyPropertyWidgetForGroup.h
+      pqMyPropertyWidgetDecorator.h)
+  else ()
+    qt4_wrap_cpp(moc_srcs
+      pqMyPropertyWidgetForProperty.h
+      pqMyPropertyWidgetForGroup.h
+      pqMyPropertyWidgetDecorator.h)
+  endif ()
 
   set (outifaces0)
   set (outsrcs0)

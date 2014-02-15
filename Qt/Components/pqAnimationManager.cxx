@@ -653,7 +653,7 @@ bool pqAnimationManager::saveAnimation()
 
     vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
     pxm->RegisterProxy("animation", "writer", writer);
-    vtkSMPropertyHelper(writer, "FileName").Set(filename.toAscii().data());
+    vtkSMPropertyHelper(writer, "FileName").Set(filename.toLatin1().data());
     vtkSMPropertyHelper(writer, "Magnification").Set(magnification);
     vtkSMPropertyHelper(writer, "FrameRate").Set(dialogUI.frameRate->value());
     vtkSMPropertyHelper(writer, "Compression").Set(compression);
@@ -710,7 +710,7 @@ bool pqAnimationManager::saveAnimation()
   emit this->writeAnimation(filename, magnification, dialogUI.frameRate->value());
 
   vtkSMAnimationSceneImageWriter* writer = pqAnimationSceneImageWriter::New();
-  writer->SetFileName(filename.toAscii().data());
+  writer->SetFileName(filename.toLatin1().data());
   writer->SetMagnification(magnification);
   writer->SetAnimationScene(sceneProxy);
   writer->SetFrameRate(dialogUI.frameRate->value());
@@ -787,7 +787,7 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
     }
   vtkSMProxy* sceneProxy = scene->getProxy();
   vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
-  writer->SetFileName(filename.toAscii().data());
+  writer->SetFileName(filename.toLatin1().data());
   writer->SetAnimationScene(sceneProxy);
   writer->SetViewModule(view->getProxy());
   bool status = writer->Save();

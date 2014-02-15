@@ -116,6 +116,7 @@ int vtkPVMergeTablesMultiBlock::ProcessRequest(
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkTable** inputs = new vtkTable*[num_connections];
+    bool has_input = false;
     for (int idx = 0; idx < num_connections; ++idx)
       {
       vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inputVector[0], idx);
@@ -134,12 +135,17 @@ int vtkPVMergeTablesMultiBlock::ProcessRequest(
       else
         {
         inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
+        has_input |= (inputs[idx] != NULL);
         }
       }
-    vtkTable* outputTable = vtkTable::New();
-    ::vtkPVMergeTablesMultiBlockMerge(outputTable, inputs, num_connections);
-    outputTables->SetDataSet(iter,outputTable);
-    outputTable->Delete();
+    // don't add an empty vtkTable is all inputs are NULL.
+    if (has_input)
+      {
+      vtkTable* outputTable = vtkTable::New();
+      ::vtkPVMergeTablesMultiBlockMerge(outputTable, inputs, num_connections);
+      outputTables->SetDataSet(iter,outputTable);
+      outputTable->Delete();
+      }
     delete [] inputs;
     }
   iter->Delete();

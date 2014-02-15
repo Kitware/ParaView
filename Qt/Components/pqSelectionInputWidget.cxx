@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqSelectionManager.h"
 #include "pqSMAdaptor.h"
-#include "pqTimer.h"
 
 #include <string>
 
@@ -74,8 +73,6 @@ pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
     QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
                      this, SLOT(onActiveSelectionChanged()));
     }
-
-  pqTimer::singleShot(10, this, SLOT(initializeWidget()));
 }
 
 //-----------------------------------------------------------------------------
@@ -243,7 +240,7 @@ void pqSelectionInputWidget::updateLabels()
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInputWidget::initializeWidget()
+void pqSelectionInputWidget::initializeDefaultValueIfNeeded()
 {
   if (!this->SelectionSource)
     {

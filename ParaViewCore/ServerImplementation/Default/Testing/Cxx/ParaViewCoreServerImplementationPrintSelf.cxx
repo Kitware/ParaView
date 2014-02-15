@@ -10,7 +10,6 @@
 #include "vtkPVSessionServer.h"
 #include "vtkSIChartRepresentationProxy.h"
 #include "vtkSICompoundSourceProxy.h"
-#include "vtkSIContextArraysProperty.h"
 #include "vtkSIDataArrayProperty.h"
 #include "vtkSIDoubleVectorProperty.h"
 #include "vtkSIFileSeriesReaderProxy.h"
@@ -46,7 +45,6 @@ int main(int, char**)
   PRINT_SELF(vtkSIArraySelectionProperty);
   PRINT_SELF(vtkSIChartRepresentationProxy);
   PRINT_SELF(vtkSICompoundSourceProxy);
-  PRINT_SELF(vtkSIContextArraysProperty);
   PRINT_SELF(vtkSIDataArrayProperty);
   PRINT_SELF(vtkSIDoubleVectorProperty);
   PRINT_SELF(vtkSIFileSeriesReaderProxy);

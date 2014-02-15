@@ -137,7 +137,7 @@ void pqPluginManager::loadPluginsFromSettings()
     {
     vtkSMProxyManager::GetProxyManager()->GetPluginManager()->
       LoadPluginConfigurationXMLFromString(
-        local_plugin_config.toAscii().data(), NULL, false);
+        local_plugin_config.toLatin1().data(), NULL, false);
     }
 }
 
@@ -160,7 +160,7 @@ void pqPluginManager::loadPluginsFromSettings(pqServer* server)
       {
       vtkSMProxyManager::GetProxyManager()->GetPluginManager()->
         LoadPluginConfigurationXMLFromString(
-          remote_plugin_config.toAscii().data(), server->session(), true);
+          remote_plugin_config.toLatin1().data(), server->session(), true);
       }
     }
 }
@@ -228,11 +228,11 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   bool ret_val = false;
   if (remote && server && server->isRemote())
     {
-    ret_val = mgr->LoadRemotePlugin(lib.toAscii().data(), server->session());
+    ret_val = mgr->LoadRemotePlugin(lib.toLatin1().data(), server->session());
     }
   else
     {
-    ret_val = mgr->LoadLocalPlugin(lib.toAscii().data());
+    ret_val = mgr->LoadLocalPlugin(lib.toLatin1().data());
     }
 
   return ret_val? LOADED : NOTLOADED;

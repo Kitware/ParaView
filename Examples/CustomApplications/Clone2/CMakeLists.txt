@@ -16,12 +16,17 @@ include(ParaViewBranding)
 
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
-QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  myMainWindow.h)
-
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  myMainWindow.ui
-)
+IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_CPP(MOC_BUILT_SOURCES
+    myMainWindow.h)
+  QT5_WRAP_UI(UI_BUILT_SOURCES
+    myMainWindow.ui)
+ELSE ()
+  QT4_WRAP_CPP(MOC_BUILT_SOURCES
+    myMainWindow.h)
+  QT4_WRAP_UI(UI_BUILT_SOURCES
+    myMainWindow.ui)
+ENDIF ()
 
 SOURCE_GROUP("Generated" FILES
   ${MOC_BUILT_SOURCES}

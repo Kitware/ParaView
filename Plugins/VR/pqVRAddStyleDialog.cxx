@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkVRInteractorStyle.h"
 
-#include <QtGui/QComboBox>
+#include <QComboBox>
 
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>

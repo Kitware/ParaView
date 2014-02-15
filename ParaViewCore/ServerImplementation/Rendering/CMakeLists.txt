@@ -30,7 +30,6 @@
 #==========================================================================
 set (Module_SRCS
   vtkSIChartRepresentationProxy.cxx
-  vtkSIContextArraysProperty.cxx
   vtkSIImageTextureProxy.cxx
   vtkSIPVRepresentationProxy.cxx
   vtkSIScalarBarActorProxy.cxx

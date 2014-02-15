@@ -76,9 +76,10 @@ void pqPipelineAnnotationFilterModel::enableAnnotationFilter(const QString &anno
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
+    this->beginResetModel();
     this->FilterAnnotation = true;
     model->enableFilterAnnotationKey(annotationKey);
-    reset();
+    this->endResetModel();
     }
   else
     {
@@ -93,8 +94,9 @@ void pqPipelineAnnotationFilterModel::disableAnnotationFilter()
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
+    this->beginResetModel();
     model->disableFilterAnnotationKey();
-    reset();
+    this->endResetModel();
     }
 }
 //-----------------------------------------------------------------------------
@@ -104,9 +106,10 @@ void pqPipelineAnnotationFilterModel::enableSessionFilter(vtkSession *session)
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
+    this->beginResetModel();
     this->FilterSession = true;
     model->enableFilterSession(session);
-    reset();
+    this->endResetModel();
     }
   else
     {
@@ -121,7 +124,8 @@ void pqPipelineAnnotationFilterModel::disableSessionFilter()
   pqPipelineModel* model = qobject_cast<pqPipelineModel*>(this->sourceModel());
   if(model)
     {
+    this->beginResetModel();
     model->disableFilterSession();
-    reset();
+    this->endResetModel();
     }
 }

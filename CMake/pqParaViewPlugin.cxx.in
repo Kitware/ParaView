@@ -166,5 +166,10 @@ PV_PLUGIN_EXPORT(@PLUGIN_NAME@, @PLUGIN_NAME@_Plugin)
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_gui
 // Required to mark this as a Qt plugin.
+#if QT_VERSION >= 0x050000
+Q_DECLARE_INTERFACE(@PLUGIN_NAME@_Plugin, "com.kitware/paraview/@PLUGIN_NAME@")
+Q_PLUGIN_METADATA(IID "com.kitware/paraview/@PLUGIN_NAME@")
+#else
 Q_EXPORT_PLUGIN2(@PLUGIN_NAME@,  @PLUGIN_NAME@_Plugin)
+#endif
 #endif

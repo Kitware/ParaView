@@ -15,6 +15,7 @@
 #include "pqMultiSliceView.h"
 
 #include <QtCore>
+#include <QGridLayout>
 #include <QtGui>
 
 #include "QVTKWidget.h"

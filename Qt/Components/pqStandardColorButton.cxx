@@ -147,7 +147,7 @@ void pqStandardColorButton::actionTriggered(QAction* action)
   pqApplicationCore* core = pqApplicationCore::instance();
   vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    globalProps->GetProperty(prop_name.toAscii().data()));
+    globalProps->GetProperty(prop_name.toLatin1().data()));
   QColor color;
   color.setRgbF(dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
   emit this->beginUndo(this->UndoLabel);

@@ -440,7 +440,7 @@ bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
     }
 
   //First check to make sure file is valid
-  QFile file(fileName.toAscii().constData());
+  QFile file(fileName.toLatin1().constData());
   if (!file.open(QFile::ReadOnly))
     {
     qCritical() << "Failed to open file : " << fileName;
@@ -461,7 +461,7 @@ bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
     }
 
   vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromString(
-    fileContent.toAscii().constData());
+    fileContent.toLatin1().constData());
   if (!rootElement)
     {
     return false;
@@ -791,7 +791,7 @@ void PrismPanel::updateConversionsLabels()
 
         if(this->UI->CustomCheckbox->isChecked())
         {
-          this->UI->WasCustom=TRUE;
+          this->UI->WasCustom=true;
          // this->UI->ConversionTree->setColumnHidden(1,true);
           item = this->UI->ConversionTree->item(w,1);
           item->setText("");
@@ -804,7 +804,7 @@ void PrismPanel::updateConversionsLabels()
         }
         else if(this->UI->SICheckbox->isChecked())
         {
-          this->UI->WasCustom=FALSE;
+          this->UI->WasCustom=false;
          // this->UI->ConversionTree->setColumnHidden(1,false);
 
           item=this->UI->ConversionTree->item(w,1);
@@ -824,7 +824,7 @@ void PrismPanel::updateConversionsLabels()
         }
         else if(this->UI->cgsCheckbox->isChecked())
         {
-          this->UI->WasCustom=FALSE;
+          this->UI->WasCustom=false;
         //  this->UI->ConversionTree->setColumnHidden(1,false);
 
           item=this->UI->ConversionTree->item(w,1);
@@ -1013,7 +1013,7 @@ void PrismPanel::accept()
       for(int i = 0; i< this->UI->ConversionTree->rowCount(); ++i)
       {
         QTableWidgetItem* item= this->UI->ConversionTree->item(i,1);
-        conversionNameVP->SetElement(i, item->text().toAscii().data());
+        conversionNameVP->SetElement(i, item->text().toLatin1().data());
       }
     }
 
@@ -1236,7 +1236,7 @@ void PrismPanel::updateConversions()
     for(int i = 0; i< this->UI->ConversionTree->rowCount(); ++i)
     {
       QTableWidgetItem* item= this->UI->ConversionTree->item(i,1);
-      conversionNamesVP->SetElement(i, item->text().toAscii());
+      conversionNamesVP->SetElement(i, item->text().toLatin1());
     }
 
 
@@ -1316,17 +1316,17 @@ void PrismPanel::setupConversions()
 
   if(units=="SI")
   {
-    this->UI->WasCustom=FALSE;
+    this->UI->WasCustom=false;
       this->UI->SICheckbox->setChecked(true);
   }
   else if(units=="cgs")
   {
-    this->UI->WasCustom=FALSE;
+    this->UI->WasCustom=false;
       this->UI->cgsCheckbox->setChecked(true);
   }
   else
   {
-    this->UI->WasCustom=TRUE;
+    this->UI->WasCustom=true;
     this->UI->CustomCheckbox->setChecked(true);
 
 
@@ -1495,7 +1495,7 @@ void PrismPanel::setupConversions()
   }
   else
   {
-    this->UI->WasCustom=TRUE;
+    this->UI->WasCustom=true;
     QString tableIdLable="Table ";
     tableIdLable.append(this->UI->TableIdWidget->currentText());
     tableIdLable.append(" Could not be found.");

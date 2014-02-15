@@ -192,16 +192,16 @@ pqProxyGroupMenuManager::~pqProxyGroupMenuManager()
 void pqProxyGroupMenuManager::addProxy(
   const QString& xmlgroup, const QString& xmlname)
 {
-  this->Internal->addProxy(xmlgroup.toAscii().data(),
-    xmlname.toAscii().data(), QString());
+  this->Internal->addProxy(xmlgroup.toLatin1().data(),
+    xmlname.toLatin1().data(), QString());
 }
 
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::removeProxy(
   const QString& xmlgroup, const QString& xmlname)
 {
-  this->Internal->removeProxy(xmlgroup.toAscii().data(),
-    xmlname.toAscii().data());
+  this->Internal->removeProxy(xmlgroup.toLatin1().data(),
+    xmlname.toLatin1().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
   if (this->ResourceTagName != root->GetName())
     {
     this->loadConfiguration(root->FindNestedElementByName(
-        this->ResourceTagName.toAscii().data()));
+        this->ResourceTagName.toLatin1().data()));
     return;
     }
 
@@ -505,7 +505,7 @@ QAction* pqProxyGroupMenuManager::getAction(
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
-    pgroup.toAscii().data(), pname.toAscii().data());
+    pgroup.toLatin1().data(), pname.toLatin1().data());
   if (prototype)
     {
     QString label = prototype->GetXMLLabel()? prototype->GetXMLLabel() : pname;
@@ -629,7 +629,7 @@ vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   return pxm->GetPrototypeProxy(
-    key.first.toAscii().data(), key.second.toAscii().data());
+    key.first.toLatin1().data(), key.second.toLatin1().data());
 }
 
 //-----------------------------------------------------------------------------
@@ -755,7 +755,7 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
   iter.TakeReference(pxdm->NewIterator());
   foreach(QString groupName, this->Internal->ProxyDefinitionGroupToListen)
     {
-    iter->AddTraversalGroupName(groupName.toAscii().data());
+    iter->AddTraversalGroupName(groupName.toLatin1().data());
     }
 
   // Loop over proxy that should be inserted inside the UI
@@ -817,8 +817,8 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
     {
     // This extra test should be removed once the main definition has been updated
     // with the Hints/ShowInMenu...
-    if(!pxdm->HasDefinition( key.first.toAscii().data(),
-                             key.second.toAscii().data()))
+    if(!pxdm->HasDefinition( key.first.toLatin1().data(),
+                             key.second.toLatin1().data()))
       {
       this->Internal->removeProxy(key.first, key.second);
       }

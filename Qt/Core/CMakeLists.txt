@@ -41,10 +41,6 @@ set(Module_SRCS
   pqApplicationCore.h
   pqAutoStartInterface.cxx
   pqAutoStartInterface.h
-  pqChartRepresentation.cxx
-  pqChartRepresentation.h
-  pqChartSeriesSettingsModel.cxx
-  pqChartSeriesSettingsModel.h
   pqCollaborationEventPlayer.cxx
   pqCollaborationEventPlayer.h
   pqCollaborationManager.cxx
@@ -137,8 +133,6 @@ set(Module_SRCS
   pqPipelineSource.h
   pqPlotMatrixView.cxx
   pqPlotMatrixView.h
-  pqPlotSettingsModel.cxx
-  pqPlotSettingsModel.h
   pqPluginManager.cxx
   pqPluginManager.h
   pqProgressManager.cxx
@@ -246,8 +240,6 @@ set (Module_MOC_HDRS
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
-  pqChartRepresentation.h
-  pqChartSeriesSettingsModel.h
   pqCollaborationEventPlayer.h
   pqCollaborationManager.h
   pqComparativeContextView.h
@@ -285,7 +277,6 @@ set (Module_MOC_HDRS
   pqPipelineRepresentation.h
   pqPipelineSource.h
   pqPlotMatrixView.h
-  pqPlotSettingsModel.h
   pqPluginManager.h
   pqProgressManager.h
   pqPropertyLinksConnection.h
@@ -348,21 +339,42 @@ endif()
 
 
 #-------------------------------------------------------------------------
-# import Qt4 build settings
-SET (QT_USE_QTUITOOLS 1)
-SET (QT_USE_QTXML 1)  # uitools depends on xml
-find_package(Qt4 REQUIRED QUIET)
-include(${QT_USE_FILE})
-# Setting this variable ensures that any module depending on pqWidgets
-# automatically inherits the Qt include dirs.
-set (${vtk-module}_INCLUDE_DIRS
-  ${QT_INCLUDES})
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  # import Qt5 build settings
+  set(Qt5_FIND_COMPONENTS
+      Widgets
+      UiTools
+      Xml)
+  include (ParaViewQt5)
+  # Setting this variable ensures that any module depending on pqWidgets
+  # automatically inherits the Qt include dirs.
+  set (${vtk-module}_INCLUDE_DIRS
+    ${Qt5Widgets_INCLUDE_DIRS}
+    ${Qt5UiTools_INCLUDE_DIRS}
+    ${Qt5Xml_INCLUDE_DIRS})
+else ()
+  # import Qt4 build settings
+  set (QT_USE_QTUITOOLS 1)
+  set (QT_USE_QTXML 1) # uitools depends on xml
+  find_package (Qt4 REQUIRED QUIET)
+  include (${QT_USE_FILE})
+  # Setting this variable ensures that any module depending on pqWidgets
+  # automatically inherits the Qt include dirs.
+  set (${vtk-module}_INCLUDE_DIRS
+    ${QT_INCLUDES})
+endif()
 #-------------------------------------------------------------------------
 set(${vtk-module}_NO_HeaderTest 1)
 
-qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt5_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+else ()
+  qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
+  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+endif ()
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}

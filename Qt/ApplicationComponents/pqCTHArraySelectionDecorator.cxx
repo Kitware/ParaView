@@ -76,7 +76,7 @@ void pqCTHArraySelectionDecorator::updateSelection()
 
   foreach (const QString& pname, this->PropertyNames)
     {
-    vtkSMProperty* prop = proxy->GetProperty(pname.toAscii().data());
+    vtkSMProperty* prop = proxy->GetProperty(pname.toLatin1().data());
     if (prop && prop != curProperty)
       {
       vtkSMUncheckedPropertyHelper(prop).SetNumberOfElements(0);

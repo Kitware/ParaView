@@ -12,12 +12,21 @@ ELSE (ParaView_SOURCE_DIR)
 ENDIF (ParaView_SOURCE_DIR)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  INCLUDE(${QT_USE_FILE})
   INCLUDE_DIRECTORIES(${PARAVIEW_GUI_INCLUDE_DIRS})
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    SET (Qt5_FIND_COMPONENTS Widgets)
+    INCLUDE (ParaViewQt5)
 
-  QT4_WRAP_CPP(MOC_SRCS
-    pqQuadView.h
-  )
+    QT5_WRAP_CPP(MOC_SRCS
+      pqQuadView.h
+      )
+  ELSE ()
+    INCLUDE (${QT_USE_FILE})
+
+    QT4_WRAP_CPP(MOC_SRCS
+      pqQuadView.h
+      )
+  ENDIF ()
 
   add_paraview_view_module(
     VIEW1_IFACE VIEW1_IFACE_SRCS

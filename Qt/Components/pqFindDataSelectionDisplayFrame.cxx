@@ -197,10 +197,10 @@ public:
       "SelectionCellLabelVisibility" : "SelectionPointLabelVisibility";
 
     QString cur_array;
-    if (vtkSMPropertyHelper(repr->getProxy(), vname.toAscii().data(), true).GetAsInt() != 0)
+    if (vtkSMPropertyHelper(repr->getProxy(), vname.toLatin1().data(), true).GetAsInt() != 0)
       {
       cur_array= vtkSMPropertyHelper(repr->getProxy(),
-        pname.toAscii().data(), /*quiet=*/true).GetAsString();
+        pname.toLatin1().data(), /*quiet=*/true).GetAsString();
       }
 
     foreach (QAction* action, menu.actions())
@@ -231,7 +231,7 @@ public:
     if (action->isChecked())
       {
       vtkSMPropertyHelper(proxy, vname, true).Set(1);
-      vtkSMPropertyHelper(proxy, pname, true).Set(action->data().toString().toAscii().data());
+      vtkSMPropertyHelper(proxy, pname, true).Set(action->data().toString().toLatin1().data());
       }
     else
       {

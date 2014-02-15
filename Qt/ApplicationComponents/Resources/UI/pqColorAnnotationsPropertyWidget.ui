@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>358</width>
-    <height>338</height>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -128,6 +128,9 @@
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="maximumRowCountBeforeScrolling" stdset="0">
+      <number>10</number>
      </property>
     </widget>
    </item>

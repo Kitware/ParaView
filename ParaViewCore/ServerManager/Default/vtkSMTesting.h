@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSMTesting - vtkTesting adaptor for Server Manager.
 // .DESCRIPTION
-// This provides helper methods to use render module proxy for testing.
+// This provides helper methods to use view proxy for testing.
 // This is also required for python testing, since when SM is python wrapped,
 // VTK need not by python wrapped, hence we cannot use vtkTesting in python 
 // testing.
@@ -25,8 +25,8 @@
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"
 
+class vtkSMViewProxy;
 class vtkTesting;
-class vtkSMRenderViewProxy;
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTesting : public vtkSMObject
 {
@@ -37,8 +37,12 @@ public:
 
   // Description:
   // Set/get the render module proxy.
-  void SetRenderViewProxy(vtkSMRenderViewProxy* );
-  vtkGetObjectMacro(RenderViewProxy, vtkSMRenderViewProxy);
+  void SetViewProxy(vtkSMViewProxy* view);
+
+  // Description:
+  // API for backwards compatibility. Simply calls SetViewProxy(..).
+  void SetRenderViewProxy(vtkSMViewProxy* proxy)
+    { this->SetViewProxy(proxy); }
 
   // Description:
   // Add argument
@@ -52,14 +56,11 @@ protected:
   vtkSMTesting();
   ~vtkSMTesting();
 
+  vtkSMViewProxy* ViewProxy;
   vtkTesting* Testing;
-  vtkSMRenderViewProxy* RenderViewProxy;
 
 private:
   vtkSMTesting(const vtkSMTesting&); // Not implemented.
   void operator=(const vtkSMTesting&); // Not implemented.
 };
-
-
 #endif
-

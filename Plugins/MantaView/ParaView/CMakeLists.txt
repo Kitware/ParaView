@@ -8,16 +8,27 @@ IF(PARAVIEW_BUILD_QT_GUI)
   INCLUDE_DIRECTORIES(
     ${PARAVIEW_GUI_INCLUDE_DIRS}
     )
-  INCLUDE(${QT_USE_FILE})
-  QT4_WRAP_CPP(MOC_SRCS
+  SET (MantaView_SRCS
     MantaView.h
     MantaDisplay.h
     MantaViewOptions.h)
-
-  QT4_WRAP_UI(UI_SRCS
+  SET (MantaView_UI_SRCS
     MantaDisplay.ui
-    MantaViewOptions.ui
-    )
+    MantaViewOptions.ui)
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    INCLUDE (ParaViewQt5)
+    QT5_WRAP_CPP(MOC_SRCS
+      ${MantaView_SRCS})
+    QT5_WRAP_UI(UI_SRCS
+      ${MantaView_UI_SRCS})
+  ELSE ()
+    INCLUDE (${QT_USE_FILE})
+    QT4_WRAP_CPP(MOC_SRCS
+      ${MantaView_SRCS})
+    QT4_WRAP_UI(UI_SRCS
+      ${MantaView_UI_SRCS})
+  ENDIF ()
+
 
   ADD_PARAVIEW_VIEW_MODULE(
     VIEW_IFACE VIEW_IFACE_SRCS

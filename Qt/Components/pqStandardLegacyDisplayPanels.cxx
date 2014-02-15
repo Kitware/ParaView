@@ -31,13 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqStandardLegacyDisplayPanels.h"
 
-#include "pqParallelCoordinatesChartDisplayPanel.h"
-#include "pqPlotMatrixDisplayPanel.h"
 #include "pqRepresentation.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
-#include "pqXYChartDisplayPanel.h"
 #include "vtkSMProxy.h"
 #include <QDebug>
 #include <QWidget>
@@ -64,15 +61,11 @@ bool pqStandardLegacyDisplayPanels::canCreatePanel(pqRepresentation* proxy) cons
 
   QString type = proxy->getProxy()->GetXMLName();
 
-  if (type == "XYPlotRepresentation" ||
-    type == "XYChartRepresentation" ||
-    type == "XYBarChartRepresentation" ||
-    type == "BarChartRepresentation" ||
+  if (
     type == "SpreadSheetRepresentation" ||
     qobject_cast<pqTextRepresentation*>(proxy)||
-    type == "ScatterPlotRepresentation" ||
-    type == "ParallelCoordinatesRepresentation" ||
-    type == "PlotMatrixRepresentation")
+    false
+    )
     {
     return true;
     }
@@ -90,14 +83,6 @@ pqDisplayPanel* pqStandardLegacyDisplayPanels::createPanel(pqRepresentation* pro
     }
 
   QString type = proxy->getProxy()->GetXMLName();
-  if (type == QString("XYChartRepresentation"))
-    {
-    return new pqXYChartDisplayPanel(proxy, p);
-    }
-  if (type == QString("XYBarChartRepresentation"))
-    {
-    return new pqXYChartDisplayPanel(proxy, p);
-    }
   if (type == "SpreadSheetRepresentation")
     {
     return new pqSpreadSheetDisplayEditor(proxy, p);
@@ -107,20 +92,5 @@ pqDisplayPanel* pqStandardLegacyDisplayPanels::createPanel(pqRepresentation* pro
     {
     return new pqTextDisplayPropertiesWidget(proxy, p);
     }
-#ifdef FIXME
-  if (type == "ScatterPlotRepresentation")
-    {
-    return new pqScatterPlotDisplayPanel(proxy, p);
-    }
-#endif
-  if (type == QString("ParallelCoordinatesRepresentation"))
-    {
-    return new pqParallelCoordinatesChartDisplayPanel(proxy, p);
-    }
-  else if (type == "PlotMatrixRepresentation")
-    {
-    return new pqPlotMatrixDisplayPanel(proxy, p);
-    }
-
   return NULL;
 }

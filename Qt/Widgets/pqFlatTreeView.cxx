@@ -515,9 +515,14 @@ void pqFlatTreeView::setHeader(QHeaderView *headerView)
     {
     // Set up the default header view.
     this->HeaderView = new QHeaderView(Qt::Horizontal, this->viewport());
-    this->HeaderView->setClickable(false);
     this->HeaderView->setSortIndicatorShown(false);
+#if QT_VERSION >= 0x050000
+    this->HeaderView->setSectionsClickable(false);
+    this->HeaderView->setSectionResizeMode(QHeaderView::Interactive);
+#else
+    this->HeaderView->setClickable(false);
     this->HeaderView->setResizeMode(QHeaderView::Interactive);
+#endif
     this->HeaderOwned = true;
     }
 
@@ -2849,7 +2854,7 @@ void pqFlatTreeView::changeCurrent(const QModelIndex &current,
       item = this->getItem(current);
       if(item && current.column() < item->Cells.size())
         {
-        region = region.unite(QRegion(0, item->ContentsY, this->ContentsWidth,
+        region = region.united(QRegion(0, item->ContentsY, this->ContentsWidth,
             item->Height));
         }
       }
@@ -2887,7 +2892,7 @@ void pqFlatTreeView::changeCurrentRow(const QModelIndex &current,
       item = this->getItem(current);
       if(item)
         {
-        region = region.unite(QRegion(0, item->ContentsY, this->ContentsWidth,
+        region = region.united(QRegion(0, item->ContentsY, this->ContentsWidth,
             item->Height));
         }
       }
@@ -2990,7 +2995,7 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
           }
 
         // Add the affected area to the repaint list.
-        region = region.unite(QRegion(0, cy, totalWidth, totalHeight));
+        region = region.united(QRegion(0, cy, totalWidth, totalHeight));
         }
       }
     }
@@ -3050,7 +3055,7 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
           }
 
         // Add the affected area to the repaint list.
-        region = region.unite(QRegion(0, cy, totalWidth, totalHeight));
+        region = region.united(QRegion(0, cy, totalWidth, totalHeight));
         }
       }
     }

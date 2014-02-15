@@ -297,7 +297,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
-    xmlgroup.toAscii().data(), xmlname.toAscii().data());
+    xmlgroup.toLatin1().data(), xmlname.toLatin1().data());
   if (!prototype)
     {
     qCritical() << "Unknown proxy type: " << xmlname;
@@ -338,7 +338,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   if (pqPipelineFilter::getRequiredInputPorts(prototype).size() > 1)
     {
     vtkSMProxy* filterProxy = pxm->GetPrototypeProxy("filters",
-      xmlname.toAscii().data());
+      xmlname.toLatin1().data());
     vtkSMPropertyHelper helper(filterProxy, inputPortNames[0]);
     helper.RemoveAllValues();
 

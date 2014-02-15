@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInputDataTypeDecorator.h"
 #include "pqLightsPropertyGroup.h"
 #include "pqListPropertyWidget.h"
+#include "pqSeriesEditorPropertyWidget.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
@@ -155,6 +156,10 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
   else if (QString(group->GetPanelWidget()) == "FontEditor")
     {
     return new pqFontPropertyWidget(proxy, group);
+    }
+  else if (QString(group->GetPanelWidget()) == "SeriesEditor")
+    {
+    return new pqSeriesEditorPropertyWidget(proxy, group);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
 

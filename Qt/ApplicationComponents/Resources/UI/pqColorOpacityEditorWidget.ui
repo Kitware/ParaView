@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <property name="spacing">
-    <number>-1</number>
+    <number>6</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
@@ -253,18 +253,6 @@
    </item>
    <item>
     <widget class="pqExpandableTableView" name="ColorTable">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::DoubleClicked</set>
      </property>
@@ -273,6 +261,9 @@
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="maximumRowCountBeforeScrolling" stdset="0">
+      <number>10</number>
      </property>
     </widget>
    </item>
@@ -285,18 +276,6 @@
    </item>
    <item>
     <widget class="pqExpandableTableView" name="OpacityTable">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::DoubleClicked</set>
      </property>
@@ -306,11 +285,19 @@
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
+     <property name="maximumRowCountBeforeScrolling" stdset="0">
+      <number>10</number>
+     </property>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>pqExpandableTableView</class>
+   <extends>QTableView</extends>
+   <header>pqExpandableTableView.h</header>
+  </customwidget>
   <customwidget>
    <class>pqTransferFunctionWidget</class>
    <extends>QWidget</extends>
@@ -321,11 +308,6 @@
    <class>pqLineEdit</class>
    <extends>QLineEdit</extends>
    <header>pqLineEdit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>pqExpandableTableView</class>
-   <extends>QTableView</extends>
-   <header>pqExpandableTableView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -110,7 +110,7 @@ pqAnimationCue::~pqAnimationCue()
 void pqAnimationCue::addKeyFrameInternal(vtkSMProxy* keyframe)
 {
   this->proxyManager()->RegisterProxy("animation",
-    QString("KeyFrame%1").arg(keyframe->GetGlobalIDAsString()).toAscii().data(),
+    QString("KeyFrame%1").arg(keyframe->GetGlobalIDAsString()).toLatin1().data(),
     keyframe);
 }
 
@@ -148,7 +148,7 @@ vtkSMProperty* pqAnimationCue::getAnimatedProperty() const
       selfProxy->GetProperty("AnimatedPropertyName")).toString();
     if (pname != "")
       {
-      return proxy->GetProperty(pname.toAscii().data());
+      return proxy->GetProperty(pname.toLatin1().data());
       }
     }
 
@@ -173,7 +173,7 @@ void pqAnimationCue::setDefaultPropertyValues()
     vtkSMSessionProxyManager* pxm = this->proxyManager();
     vtkSMProxy* manip = 
       pxm->NewProxy("animation_manipulators", 
-        this->ManipulatorType.toAscii().data());
+        this->ManipulatorType.toLatin1().data());
     this->addHelperProxy("Manipulator", manip);
     manip->Delete();
     pqSMAdaptor::setProxyProperty(proxy->GetProperty("Manipulator"),
@@ -336,7 +336,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
   QList<vtkSMProxy*> keyframes = this->getKeyFrames();
   
   vtkSMProxy* kf = pxm->NewProxy("animation_keyframes", 
-    this->KeyFrameType.toAscii().data());
+    this->KeyFrameType.toLatin1().data());
   if (!kf)
     {
     qDebug() << "Could not create new proxy " << this->KeyFrameType;

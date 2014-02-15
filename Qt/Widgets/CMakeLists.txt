@@ -111,6 +111,8 @@ set(Module_SRCS
   pqSignalAdaptors.h
   pqSpinBox.cxx
   pqSpinBox.h
+  pqTableView.cxx
+  pqTableView.h
   pqTreeView.cxx
   pqTreeView.h
   pqTreeViewSelectionHelper.cxx
@@ -133,8 +135,7 @@ set(Module_SRCS
 
 ##########################################################################
 ## Add the header files that need to moc processed.
-
-QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
+set (QtWidgets_SRCS
 #  QtWidgetsPlugin.h
 
   ctkRangeSlider.h
@@ -173,6 +174,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqSpinBox.h
+  pqTableView.h
   pqTreeView.h
   pqTreeWidget.h
   pqTreeWidgetCheckHelper.h
@@ -182,6 +184,13 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqHelpWindow.h
 )
 
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_CPP(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
+else ()
+  QT4_WRAP_CPP(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
+endif ()
+
+
 ##########################################################################
 ## Add *.ui files to be uic processed.
 SET(QtWidgets_UI_FORMS
@@ -190,9 +199,15 @@ SET(QtWidgets_UI_FORMS
   Resources/UI/pqQuickLaunchDialog.ui
 )
 
-QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES
-  ${QtWidgets_UI_FORMS}
-)
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_WRAP_UI(QtWidgets_UI_BUILT_SOURCES
+    ${QtWidgets_UI_FORMS}
+  )
+else ()
+  QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES
+    ${QtWidgets_UI_FORMS}
+  )
+endif ()
 
 ##########################################################################
 ## Add resources.
@@ -200,9 +215,15 @@ SET(UI_RESOURCES
   Resources/QtWidgets.qrc
 )
 
-QT4_ADD_RESOURCES(RCS_SOURCES
-  ${UI_RESOURCES}
-)
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  QT5_ADD_RESOURCES(RCS_SOURCES
+    ${UI_RESOURCES}
+  )
+else ()
+  QT4_ADD_RESOURCES(RCS_SOURCES
+    ${UI_RESOURCES}
+  )
+endif ()
 
 SOURCE_GROUP("Resources" FILES
   ${UI_RESOURCES}
@@ -219,28 +240,51 @@ SET(QT_WIDGETS_ALL_SRCS ${Module_SRCS} ${QtWidgets_MOC_SOURCES}
   ${RCS_SOURCES} ${QtWidgets_UI_BUILT_SOURCES})
 
 ##########################################################################
-# import Qt4 build settings
+# import Qt build settings
 
 # Option to disable WebKit since QtWebkit has build issues on certain platforms.
 option(PQWIDGETS_DISABLE_QTWEBKIT "Disable use of QtWebKit." OFF)
 mark_as_advanced(PQWIDGETS_DISABLE_QTWEBKIT)
 
-set(QT_USE_QTNETWORK 1)
-set(QT_USE_QTHELP 1)
+if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set (Qt5_FIND_COMPONENTS
+    Widgets
+    Network
+    Help
+    PrintSupport
+    )
+  if (NOT PQWIDGETS_DISABLE_QTWEBKIT)
+    list (APPEND Qt5_FIND_COMPONENTS
+      WebKitWidgets)
+  endif()
+  include (ParaViewQt5)
 
-if (PQWIDGETS_DISABLE_QTWEBKIT)
-  set (QT_USE_QTWEBKIT 0)
-else()
-  set(QT_USE_QTWEBKIT 1)
-endif()
+  # Setting this variable ensures that any module depending on pqWidgets
+  # automatically inherits the Qt include dirs.
+  set (${vtk-module}_INCLUDE_DIRS
+    ${Qt5Widgets_INCLUDE_DIRS}
+    ${Qt5Network_INCLUDE_DIRS}
+    ${Qt5Help_INCLUDE_DIRS}
+    ${Qt5PrintSupport_INCLUDE_DIRS}
+    ${Qt5WebKitWidgets_INCLUDE_DIRS})
+  
+else (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set (QT_USE_QTNETWORK 1)
+  set (QT_USE_QTHELP 1)
+  if (PQWIDGETS_DISABLE_QTWEBKIT)
+    set (QT_USE_QTWEBKIT 0)
+  else ()
+    set (QT_USE_QTWEBKIT 1)
+  endif ()
 
-find_package(Qt4 REQUIRED QUIET)
-include(${QT_USE_FILE})
+  find_package (Qt4 REQUIRED QUIET)
+  include (${QT_USE_FILE})
 
-# Setting this variable ensures that any module depending on pqWidgets
-# automatically inherits the Qt include dirs.
-set (${vtk-module}_INCLUDE_DIRS
-  ${QT_INCLUDES})
+  # Setting this variable ensures that any module depending on pqWidgets
+  # automatically inherits the Qt include dirs.
+  set (${vtk-module}_INCLUDE_DIRS
+    ${QT_INCLUDES})
+endif (PARAVIEW_QT_VERSION VERSION_GREATER "4")
 
 set(${vtk-module}_NO_HeaderTest 1)
 

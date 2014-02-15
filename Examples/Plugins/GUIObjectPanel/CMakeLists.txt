@@ -9,8 +9,13 @@ IF(NOT ParaView_BINARY_DIR)
 ENDIF(NOT ParaView_BINARY_DIR)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  QT4_WRAP_CPP(MOC_SRCS pqConePanel.h)
-  QT4_ADD_RESOURCES(RCS_SRCS pqConePanel.qrc)
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_WRAP_CPP(MOC_SRCS pqConePanel.h)
+    QT5_ADD_RESOURCES(RCS_SRCS pqConePanel.qrc)
+  ELSE ()
+    QT4_WRAP_CPP(MOC_SRCS pqConePanel.h)
+    QT4_ADD_RESOURCES(RCS_SRCS pqConePanel.qrc)
+  ENDIF ()
 
   # we implement a pqConePanel.h for the ConeSource
   ADD_PARAVIEW_OBJECT_PANEL(IFACES IFACE_SRCS CLASS_NAME pqConePanel

@@ -51,7 +51,7 @@ bool @ARG_CLASS_NAME@Implementation::canDecorate(pqDisplayPanel* panel) const
     {
     foreach (QString name, creatableClassNames)
       {
-      if (panel->inherits(name.toAscii().data()))
+      if (panel->inherits(name.toLatin1().data()))
         {
         return true;
         }

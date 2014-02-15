@@ -204,11 +204,11 @@ void pqProxyInformationWidget::updateInformation()
           QString filename = 
             pqSMAdaptor::getElementProperty(smprop).toString();
           QString path = vtksys::SystemTools::GetFilenamePath(
-            filename.toAscii().data()).c_str();
+            filename.toLatin1().data()).c_str();
 
           this->Ui->properties->show();
           this->Ui->filename->setText(vtksys::SystemTools::GetFilenameName(
-              filename.toAscii().data()).c_str());
+              filename.toLatin1().data()).c_str());
           this->Ui->filename->setToolTip(filename);
           this->Ui->filename->setStatusTip(filename);
           this->Ui->path->setText(path);

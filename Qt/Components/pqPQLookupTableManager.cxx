@@ -145,7 +145,7 @@ pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
       {
       vtkNew<vtkPVXMLParser> parser;
       if (parser->Parse(
-          settings->value(DEFAULT_LOOKUPTABLE_SETTING_KEY()).toString().toAscii().data()))
+          settings->value(DEFAULT_LOOKUPTABLE_SETTING_KEY()).toString().toLatin1().data()))
         {
         this->Internal->DefaultLUTElement = parser->GetRootElement();
         }
@@ -155,7 +155,7 @@ pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
       {
       vtkNew<vtkPVXMLParser> parser;
       if (parser->Parse(
-          settings->value(DEFAULT_OPACITYFUNCTION_SETTING_KEY()).toString().toAscii().data()))
+          settings->value(DEFAULT_OPACITYFUNCTION_SETTING_KEY()).toString().toLatin1().data()))
         {
         this->Internal->DefaultOpacityElement = parser->GetRootElement();
         }
@@ -164,7 +164,7 @@ pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
       {
       vtkNew<vtkPVXMLParser> parser;
       if (parser->Parse(
-          settings->value(DEFAULT_SCALARBAR_SETTING_KEY()).toString().toAscii().data()))
+          settings->value(DEFAULT_SCALARBAR_SETTING_KEY()).toString().toLatin1().data()))
         {
         this->Internal->DefaultScalarBarElement = parser->GetRootElement();
         }
@@ -409,7 +409,7 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   // This will lead to the creation of pqScalarsToColors object
   // which this class will be intimated of (onAddLookupTable)
   // and our internal DS will be updated.
-  pxm->RegisterProxy("lookup_tables", name.toAscii().data(), lutProxy);
+  pxm->RegisterProxy("lookup_tables", name.toLatin1().data(), lutProxy);
   lutProxy->Delete();
   this->setLUTDefaultState(lutProxy);
 
@@ -485,7 +485,7 @@ pqScalarOpacityFunction* pqPQLookupTableManager::createOpacityFunction(
   // This will lead to the creation of pqScalarOpacityFunction object
   // which this class will be intimated of (onAddOpacityFunction)
   // and our internal DS will be updated.
-  pxm->RegisterProxy("piecewise_functions", name.toAscii().data(), opacityFunction);
+  pxm->RegisterProxy("piecewise_functions", name.toLatin1().data(), opacityFunction);
   opacityFunction->Delete();
   this->setOpacityFunctionDefaultState(opacityFunction);
 

@@ -166,7 +166,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     treeWidget->setHeaderLabel(smproperty->GetXMLLabel());
 
     pqSignalAdaptorCompositeTreeWidget *adaptor =
-      new pqSignalAdaptorCompositeTreeWidget(treeWidget, ivp);
+      new pqSignalAdaptorCompositeTreeWidget(treeWidget, ivp,
+        /*autoUpdateVisibility=*/true);
     adaptor->setObjectName("CompositeTreeAdaptor");
 
     pqTreeWidgetSelectionHelper* helper =

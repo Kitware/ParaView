@@ -329,9 +329,10 @@ void pqSpreadSheetViewModel::forceUpdate()
   // clicks on the view or apply a filter change etc.
   if (this->rowCount() != rows || this->columnCount() != columns)
     {
+    this->beginResetModel();
     rows = this->rowCount();
     columns = this->columnCount();
-    this->reset();
+    this->endResetModel();
     }
   else
     {
@@ -520,6 +521,7 @@ void pqSpreadSheetViewModel::sortSection (int section, Qt::SortOrder order)
   vtkSpreadSheetView* view = this->GetView();
   if (view->GetNumberOfColumns() > section)
     {
+    this->beginResetModel();
     vtkSMPropertyHelper(this->ViewProxy, "ColumnToSort").Set(
       view->GetColumnName(section));
     switch(order)
@@ -532,7 +534,7 @@ void pqSpreadSheetViewModel::sortSection (int section, Qt::SortOrder order)
       break;
       }
     this->ViewProxy->UpdateVTKObjects();
-    this->reset();
+    this->endResetModel();
     }
 }
 

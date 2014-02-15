@@ -143,7 +143,7 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
         if (filenameProperties.contains(propName))
           {
           vtkSMProperty* smproperty = tempClone->GetProperty(
-            propName.toAscii().data());
+            propName.toLatin1().data());
           PropertyInfo info;
           info.XMLElement = propXML;
           // Is the property has repeat_command, then it's repeatable.
@@ -372,7 +372,7 @@ void pqFixStateFilenamesDialog::accept()
         vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
         elementElement->SetName("Element");
         elementElement->AddAttribute("index", index++);
-        elementElement->AddAttribute("value", filename.toAscii().data());
+        elementElement->AddAttribute("value", filename.toLatin1().data());
         info.XMLElement->AddNestedElement(elementElement);
         elementElement->Delete();
         }
@@ -398,7 +398,7 @@ void pqFixStateFilenamesDialog::accept()
 
 
           newItemXML->AddAttribute("name",
-            this->ConstructPipelineName(info.Values).toAscii().data());
+            this->ConstructPipelineName(info.Values).toLatin1().data());
           proxyCollectionXML->AddNestedElement(newItemXML);
           newItemXML->Delete();
           break;
@@ -416,7 +416,7 @@ QString pqFixStateFilenamesDialog::ConstructPipelineName(QStringList files)
 {
   QFileInfo qFileInfo(files[0]);
 
-  if(this->SequenceParser->ParseFileSequence(qFileInfo.fileName().toAscii().data()))
+  if(this->SequenceParser->ParseFileSequence(qFileInfo.fileName().toLatin1().data()))
     {
     return this->SequenceParser->GetSequenceName();
     }

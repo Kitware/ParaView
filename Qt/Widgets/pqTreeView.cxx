@@ -40,10 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDropEvent>
 #include <QEvent>
 #include <QLayout>
+#include <QMimeData>
 #include <QScrollBar>
 
 pqTreeView::pqTreeView(QWidget *widgetParent)
-  : QTreeView(widgetParent)
+  : QTreeView(widgetParent),
+  ScrollPadding(0),
+  MaximumRowCountBeforeScrolling(10)
 {
   this->ScrollPadding = 0;
 
@@ -52,7 +55,11 @@ pqTreeView::pqTreeView(QWidget *widgetParent)
     new pqCheckableHeaderView(Qt::Horizontal,this);
   this->setHeader(checkable);
   this->installEventFilter(checkable);
+#if QT_VERSION >= 0x050000
+  checkable->setSectionsClickable(true);
+#else
   checkable->setClickable(true);
+#endif
 
   // Listen for the show/hide events of the horizontal scroll bar.
   this->horizontalScrollBar()->installEventFilter(this);
@@ -111,7 +118,7 @@ QSize pqTreeView::sizeHint() const
   // lets show X items before we get a scrollbar
   // probably want to make this a member variable
   // that a caller has access to
-  int maxItemHint = 10;
+  int maxItemHint = this->MaximumRowCountBeforeScrolling;
   // for no items, let's give a space of X pixels
   int minItemHeight = 20;
   // add padding for the scrollbar
@@ -132,15 +139,17 @@ QSize pqTreeView::sizeHint() const
   
   int pix = minItemHeight;
 
-  if(num)
+  if (num)
     {
+    num++; // leave an extra row padding.
+           // the widget ends up appearing too crowded otherwise.
     pix = qMax(pix, this->sizeHintForRow(0) * num);
     }
 
   int margin[4];
   this->getContentsMargins(margin, margin+1, margin+2, margin+3);
   int h = pix + margin[1] + margin[3] + this->header()->frameSize().height();
-  return QSize(156, h + extra);
+  return QSize(this->Superclass::sizeHint().width(), h + extra);
 }
 
 QSize pqTreeView::minimumSizeHint() const
@@ -161,30 +170,4 @@ void pqTreeView::invalidateLayout()
   // invalidate() is not enough, we need to reset the cache of the 
   // QWidgetItemV2, so sizeHint() could be recomputed.
   this->updateGeometry();
-}
-
-//-----------------------------------------------------------------------------
-void pqTreeView::dropEvent(QDropEvent* dEvent)
-{
-  if(!this->acceptDrops() || dEvent->source() != this)
-    {
-    return;
-    }
-  dEvent->setDropAction( Qt::MoveAction );
-  this->QTreeView::dropEvent(dEvent);
-}
-
-//-----------------------------------------------------------------------------
-void pqTreeView::dragEnterEvent ( QDragEnterEvent * dEvent )
-{
-  QStringList mType = this->model()->mimeTypes();
-  const QMimeData* mData = dEvent->mimeData();
-  foreach(QString type, mType)
-    {
-    if ( mData->hasFormat( type ) )
-      {
-      dEvent->accept();
-      return;
-      }
-    }
 }

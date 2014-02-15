@@ -75,6 +75,7 @@ public:
   /// \li \c CubeAxes : pqCubeAxesPropertyWidget
   /// \li \c FontEditor : pqFontPropertyWidget
   /// \li \c LightsEditor : pqLightsPropertyGroup
+  /// \li \c SeriesEditor : pqSeriesEditorPropertyWidget
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
 

@@ -109,7 +109,7 @@ vtkPVXMLElement* vtkVRPropertyStyle::saveConfiguration() const
   //   element->AddAttribute(
   //     "proxy", this->Proxy? this->Proxy->GetGlobalIDAsString() : "0");
   //   element->AddAttribute(
-  //     "property", this->PropertyName.toAscii().data());
+  //     "property", this->PropertyName.toLatin1().data());
   //   }
   return child;
 }
@@ -126,7 +126,7 @@ void vtkVRPropertyStyle::setSMProperty(
 vtkSMProperty* vtkVRPropertyStyle::getSMProperty() const
 {
   return this->Proxy? this->Proxy->GetProperty(
-    this->PropertyName.toAscii().data()) : NULL;
+    this->PropertyName.toLatin1().data()) : NULL;
 }
 
 //-----------------------------------------------------------------------public

@@ -130,7 +130,7 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
     }
   plugin_xml.append("</Plugins>\n");
   vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
-    plugin_xml.toAscii().data());
+    plugin_xml.toLatin1().data());
 
   // Load optional plugins.
   plugin_string = "@BPC_OPTIONAL_PLUGINS@";
@@ -143,7 +143,7 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
     }
   plugin_xml.append("</Plugins>\n");
   vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
-    plugin_xml.toAscii().data());
+    plugin_xml.toLatin1().data());
 
 #if @BPC_HAS_GUI_CONFIGURATION_XMLS@
   // Load configuration xmls after all components have been instantiated.

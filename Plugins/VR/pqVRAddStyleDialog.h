@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqVRAddStyleDialog_h
 #define __pqVRAddStyleDialog_h
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 class vtkVRInteractorStyle;
 

@@ -264,7 +264,7 @@ void pqColorPresetManager::restoreSettings()
     // Parse the xml.
     vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
     xmlParser->InitializeParser();
-    xmlParser->ParseChunk(text.toAscii().data(), static_cast<unsigned int>(
+    xmlParser->ParseChunk(text.toLatin1().data(), static_cast<unsigned int>(
         text.size()));
     xmlParser->CleanupParser();
 
@@ -306,7 +306,7 @@ void pqColorPresetManager::importColorMap(const QStringList &files)
   for( ; fileName != files.end(); ++fileName)
     {
     vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
-    xmlParser->SetFileName(fileName->toAscii().data());
+    xmlParser->SetFileName(fileName->toLatin1().data());
     xmlParser->Parse();
     vtkPVXMLElement *root = xmlParser->GetRootElement();
     if(colorMap == root->GetName())
@@ -369,7 +369,7 @@ void pqColorPresetManager::exportColorMap(const QStringList &files)
   QStringList::ConstIterator fileName = files.begin();
   for( ; fileName != files.end(); ++fileName)
     {
-    ofstream os(fileName->toAscii().data(), ios::out);
+    ofstream os(fileName->toLatin1().data(), ios::out);
     root->PrintXML(os, vtkIndent());
     }
 
@@ -584,15 +584,15 @@ bool pqColorPresetManager::saveColorMapToXML(const pqColorMapModel* colorMap,
     vtkPVXMLElement *point = vtkPVXMLElement::New();
     point->SetName("Point");
     point->SetAttribute("x",
-      QString::number(value.getDoubleValue()).toAscii().data());
+      QString::number(value.getDoubleValue()).toLatin1().data());
     point->SetAttribute("o",
-      QString::number(opacity.getDoubleValue()).toAscii().data());
+      QString::number(opacity.getDoubleValue()).toLatin1().data());
     point->SetAttribute("r",
-      QString::number(color.redF()).toAscii().data());
+      QString::number(color.redF()).toLatin1().data());
     point->SetAttribute("g",
-      QString::number(color.greenF()).toAscii().data());
+      QString::number(color.greenF()).toLatin1().data());
     point->SetAttribute("b",
-      QString::number(color.blueF()).toAscii().data());
+      QString::number(color.blueF()).toLatin1().data());
     element->AddNestedElement(point);
     point->Delete();
     }
@@ -602,11 +602,11 @@ bool pqColorPresetManager::saveColorMapToXML(const pqColorMapModel* colorMap,
   vtkPVXMLElement *nanElement = vtkPVXMLElement::New();
   nanElement->SetName("NaN");
   nanElement->SetAttribute("r",
-    QString::number(color.redF()).toAscii().data());
+    QString::number(color.redF()).toLatin1().data());
   nanElement->SetAttribute("g",
-    QString::number(color.greenF()).toAscii().data());
+    QString::number(color.greenF()).toLatin1().data());
   nanElement->SetAttribute("b",
-    QString::number(color.blueF()).toAscii().data());
+    QString::number(color.blueF()).toLatin1().data());
   element->AddNestedElement(nanElement);
   nanElement->Delete();
 
@@ -614,8 +614,8 @@ bool pqColorPresetManager::saveColorMapToXML(const pqColorMapModel* colorMap,
     {
     vtkPVXMLElement* note = vtkPVXMLElement::New();
     note->SetName( "Annotation" );
-    note->SetAttribute( "v", colorMap->getAnnotatedValue( i ).toAscii().data() );
-    note->SetAttribute( "t", colorMap->getAnnotation( i ).toAscii().data() );
+    note->SetAttribute( "v", colorMap->getAnnotatedValue( i ).toLatin1().data() );
+    note->SetAttribute( "t", colorMap->getAnnotation( i ).toLatin1().data() );
     element->AddNestedElement( note );
     note->Delete();
     }
@@ -657,7 +657,7 @@ pqColorMapModel pqColorPresetManager::createColorMapFromXML(vtkPVXMLElement *ele
     ilkup == "on" ||
     ilkup == "On" ||
     ilkup == "ON" );
-  //cout << element->GetAttribute( "name" ) << " indexedLookup is " << ilkup.toAscii().data() << " (" << ( indexedLookup ? "T" : "F" ) << ")\n";
+  //cout << element->GetAttribute( "name" ) << " indexedLookup is " << ilkup.toLatin1().data() << " (" << ( indexedLookup ? "T" : "F" ) << ")\n";
   colorMap.setIndexedLookup( indexedLookup );
 
   // Loop through the point elements.
@@ -781,7 +781,7 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
     QString name = this->Model->data(index, Qt::DisplayRole).toString();
     if(!name.isEmpty())
       {
-      element->SetAttribute("name", name.toAscii().data());
+      element->SetAttribute("name", name.toLatin1().data());
       }
     }
 }

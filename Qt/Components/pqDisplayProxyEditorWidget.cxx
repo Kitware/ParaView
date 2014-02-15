@@ -46,10 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
 #include "pqOutputPort.h"
-#include "pqParallelCoordinatesChartDisplayPanel.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
-#include "pqPlotMatrixDisplayPanel.h"
 #include "pqInterfaceTracker.h"
 #include "pqPropertyLinks.h"
 #include "pqServer.h"
@@ -58,7 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextRepresentation.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
-#include "pqXYChartDisplayPanel.h"
 
 /// standard display panels
 class pqStandardDisplayPanels : public QObject,
@@ -107,11 +104,13 @@ public:
     QString type = proxy->getProxy()->GetXMLName();
     if (type == QString("XYChartRepresentation"))
       {
-      return new pqXYChartDisplayPanel(proxy, p);
+      qCritical("Not supported anymore");
+      abort();
       }
     if (type == QString("XYBarChartRepresentation"))
       {
-      return new pqXYChartDisplayPanel(proxy, p);
+      qCritical("Not supported anymore");
+      abort();
       }
     if (type == "SpreadSheetRepresentation")
       {
@@ -124,11 +123,13 @@ public:
       }
     if (type == QString("ParallelCoordinatesRepresentation"))
       {
-      return new pqParallelCoordinatesChartDisplayPanel(proxy, p);
+      qCritical("Not supported anymore");
+      abort();
       }
     else if (type == "PlotMatrixRepresentation")
       {
-      return new pqPlotMatrixDisplayPanel(proxy, p);
+      qCritical("Not supported anymore");
+      abort();
       }
 
     return NULL;

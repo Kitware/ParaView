@@ -371,7 +371,7 @@ void pqPipelineFilter::inputChanged(const QString& portname)
     }
 
   vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
-    this->getProxy()->GetProperty(portname.toAscii().data()));
+    this->getProxy()->GetProperty(portname.toLatin1().data()));
   if (!ivp)
     {
     qCritical() << "Failed to locate input property " << portname;

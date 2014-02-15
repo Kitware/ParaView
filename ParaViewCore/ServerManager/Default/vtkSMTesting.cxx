@@ -17,24 +17,23 @@
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMRenderViewProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkTesting.h"
 #include "vtkTrivialProducer.h"
 
 vtkStandardNewMacro(vtkSMTesting);
-vtkCxxSetObjectMacro(vtkSMTesting, RenderViewProxy, vtkSMRenderViewProxy);
+vtkCxxSetObjectMacro(vtkSMTesting, ViewProxy, vtkSMViewProxy);
 //-----------------------------------------------------------------------------
 vtkSMTesting::vtkSMTesting()
 {
-  this->RenderViewProxy = 0;
+  this->ViewProxy = NULL;
   this->Testing = vtkTesting::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMTesting::~vtkSMTesting()
 {
-  this->SetRenderViewProxy(0);
+  this->SetViewProxy(NULL);
   this->Testing->Delete();
 }
 
@@ -49,9 +48,9 @@ int vtkSMTesting::RegressionTest(float thresh)
 {
   int res = vtkTesting::FAILED;
 
-  if (this->RenderViewProxy)
+  if (this->ViewProxy)
     {
-    vtkImageData* image = this->RenderViewProxy->CaptureWindow(1);
+    vtkImageData* image = this->ViewProxy->CaptureWindow(1);
 
     // We do the local partition id checks to make sure that testing works with
     // pvsynchronousbatch. The image comparison are done only on root node.
@@ -76,5 +75,5 @@ int vtkSMTesting::RegressionTest(float thresh)
 void vtkSMTesting::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "RenderViewProxy: " << this->RenderViewProxy << endl;
+  os << "ViewProxy: " << this->ViewProxy << endl;
 }

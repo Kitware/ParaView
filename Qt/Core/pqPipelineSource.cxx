@@ -222,7 +222,7 @@ void pqPipelineSource::addInternalHelperProxy(const QString& key, vtkSMProxy* he
 {
   this->Superclass::addInternalHelperProxy(key, helper);
 
-  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
+  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toLatin1().data());
   if (prop)
     {
      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
@@ -239,7 +239,7 @@ void pqPipelineSource::removeInternalHelperProxy(const QString& key, vtkSMProxy*
 {
   this->Superclass::removeInternalHelperProxy(key, helper);
 
-  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toAscii().data());
+  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toLatin1().data());
   if (prop)
     {
      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
@@ -266,7 +266,7 @@ void pqPipelineSource::createProxiesForProxyListDomains()
       continue;
       }
     vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      prop->GetDomain("proxy_list"));
+      prop->FindDomain("vtkSMProxyListDomain"));
     if (!pld)
       {
       continue;
@@ -320,6 +320,9 @@ void pqPipelineSource::createProxiesForProxyListDomains()
     // in the domains.
     // NOTE: This method is called only in setDefaultPropertyValues()
     // ensure that we are not changing any user set values.
+    // Another HACK: this seems to be needed to deal with the fact that we do
+    // need to reset some properties on a vtkSMCompoundSourceProxy (which is
+    // skipped by pqProxy::setDefaultPropertyValues).
     prop->ResetToDefault();
     }
   iter->Delete();
@@ -367,33 +370,12 @@ void pqPipelineSource::setDefaultPropertyValues()
   // Create any internal proxies needed by any property
   // that has a vtkSMProxyListDomain.
   this->createProxiesForProxyListDomains();
-  vtkSMProxy* proxy = this->getProxy();
-
-  if (proxy)
-    {
-    // if any properties were changed e.g. by
-    // createProxiesForProxyListDomains(), this will ensure that they are pushed
-    // correctly.
-    proxy->UpdateVTKObjects();
-    }
-
-  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(this->getProxy());
-  if (sp)
-    {
-    // this updates the information which may be required to determine
-    // defaults of some property values (typically in case of readers).
-    // For this call to not produce VTK pipeline errors, it is 
-    // essential that necessary properties on the proxy are already
-    // initialized correctly eg. FileName in case of readers,
-    // all Input/Source properties in case filters etc.
-    sp->UpdatePipelineInformation();
-
-    sp->CreateOutputPorts();
-    }
 
   this->Superclass::setDefaultPropertyValues();
 
-  // Now initialize the proxies in the proxy list domains as well. 
+  // Now initialize the proxies in the proxy list domains as well.
+  // This is a HACK. vtkSMProxy::ResetPropertiesToDefault() must handle this
+  // too, but it's too weird to move to servermanager right now.
   foreach(vtkSMProxy* dproxy, this->Internal->ProxyListDomainProxies)
     {
     vtkSMPropertyIterator* diter = dproxy->NewPropertyIterator();
@@ -471,7 +453,7 @@ pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
 pqOutputPort* pqPipelineSource::getOutputPort(const QString& name) const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->getProxy());
-  unsigned int index = source->GetOutputPortIndex(name.toAscii().data());
+  unsigned int index = source->GetOutputPortIndex(name.toLatin1().data());
   if (index != VTK_UNSIGNED_INT_MAX)
     {
     return this->getOutputPort(static_cast<int>(index));

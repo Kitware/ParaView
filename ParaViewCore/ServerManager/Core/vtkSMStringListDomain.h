@@ -28,7 +28,8 @@
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
-
+#include <vector> //  needed for vector.
+class vtkStdString;
 //BTX
 struct vtkSMStringListDomainInternals;
 //ETX
@@ -108,11 +109,17 @@ protected:
   virtual int LoadState(vtkPVXMLElement* domainElement, 
     vtkSMProxyLocator* loader);
 
-  vtkSMStringListDomainInternals* SLInternals;
+  // Description:
+  // Call to set the strings. Will fire DomainModifiedEvent is domain has
+  // changed.
+  void SetStrings(const std::vector<vtkStdString>& strings);
+  const std::vector<vtkStdString>& GetStrings();
 
 private:
   vtkSMStringListDomain(const vtkSMStringListDomain&); // Not implemented
   void operator=(const vtkSMStringListDomain&); // Not implemented
+  
+  vtkSMStringListDomainInternals* SLInternals;
 };
 
 #endif

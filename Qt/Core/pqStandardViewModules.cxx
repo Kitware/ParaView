@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStandardViewModules.h"
 
-#include "pqChartRepresentation.h"
 #include "pqComparativeRenderView.h"
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
@@ -87,11 +86,7 @@ QStringList pqStandardViewModules::viewTypes() const
 
 QStringList pqStandardViewModules::displayTypes() const
 {
-  return QStringList()
-    << "XYChartRepresentation"
-    << "XYBarChartRepresentation"
-    << "TextSourceRepresentation"
-    << "PlotMatrixRepresentation";
+  return QStringList() << "TextSourceRepresentation";
 }
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
@@ -267,11 +262,6 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqComparativeRenderView(
       group, viewname, viewmodule, server, p);
     }
-//  else if (viewmodule->IsA("vtkSMScatterPlotViewProxy"))
-//    {
-//    return new pqScatterPlotView(
-//      group, viewname, viewmodule, server, p);
-//    }
   else if (viewtype == "XYChartView")
     {
     return new pqXYChartView(group, viewname,
@@ -310,14 +300,7 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   pqServer* server,
   QObject* p)
 {
-  if (display_type == "XYChartRepresentation" ||
-      display_type == "XYBarChartRepresentation" ||
-      display_type == "PlotMatrixRepresentation")
-    {
-    // new chart representations.
-    return new pqChartRepresentation(group, n, proxy, server, p);
-    }
-  else if (display_type == "TextSourceRepresentation")
+  if (display_type == "TextSourceRepresentation")
     {
     return new pqTextRepresentation(group, n, proxy, server, p);
     }

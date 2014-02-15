@@ -221,10 +221,16 @@ FUNCTION(build_paraview_client BPC_NAME)
     set (ui_resource_init
       "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_help);\n")
   ENDIF (BPC_COMPRESSED_HELP_FILE)
-  
-  QT4_ADD_RESOURCES(rcs_sources
-    ${ui_resources}
-    )
+
+  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    QT5_ADD_RESOURCES(rcs_sources
+      ${ui_resources}
+      )
+  ELSE ()
+    QT4_ADD_RESOURCES(rcs_sources
+      ${ui_resources}
+      )
+  ENDIF ()
 
   SOURCE_GROUP("Resources" FILES
     ${ui_resources}

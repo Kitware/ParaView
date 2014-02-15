@@ -54,7 +54,7 @@ class PQCORE_EXPORT pqQVTKWidget : public QVTKWidget
   Q_OBJECT
   typedef QVTKWidget Superclass;
 public:
-  pqQVTKWidget(QWidget* parent = NULL, Qt::WFlags f = 0);
+  pqQVTKWidget(QWidget* parent = NULL, Qt::WindowFlags f = 0);
   virtual ~pqQVTKWidget();
 
   /// Set the view proxy.

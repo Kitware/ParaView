@@ -59,19 +59,29 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->CreateDeleteHeader = new QHeaderView(Qt::Vertical, this);
   this->CreateDeleteHeader->viewport()->setBackgroundRole(QPalette::Window);
 
-  this->CreateDeleteHeader->setClickable(true);
   this->CreateDeleteHeader->setSizePolicy(QSizePolicy::Minimum,
                               QSizePolicy::MinimumExpanding);
+#if QT_VERSION >= 0x050000
+  this->CreateDeleteHeader->setSectionResizeMode(QHeaderView::Fixed);
+  this->CreateDeleteHeader->setSectionsClickable(true);
+#else
   this->CreateDeleteHeader->setResizeMode(QHeaderView::Fixed);
+  this->CreateDeleteHeader->setClickable(true);
+#endif
   this->CreateDeleteHeader->setModel(&this->CreateDeleteModel);
 
   this->EnabledHeader = new QHeaderView(Qt::Vertical, this);
   this->EnabledHeader->setObjectName("EnabledHeader");
   this->EnabledHeader->viewport()->setBackgroundRole(QPalette::Window);
-  this->EnabledHeader->setClickable(true);
   this->EnabledHeader->setSizePolicy(QSizePolicy::Preferred,
     QSizePolicy::MinimumExpanding);
+#if QT_VERSION >= 0x050000
+  this->EnabledHeader->setSectionResizeMode(QHeaderView::Fixed);
+  this->EnabledHeader->setSectionsClickable(true);
+#else
   this->EnabledHeader->setResizeMode(QHeaderView::Fixed);
+  this->EnabledHeader->setClickable(true);
+#endif
   this->EnabledHeader->setModel(this->Model->enabledHeader());
 
   this->Header = new QHeaderView(Qt::Vertical, this);
@@ -81,11 +91,15 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
                               QSizePolicy::MinimumExpanding);
   this->View->setSizePolicy(QSizePolicy::Preferred,
                               QSizePolicy::MinimumExpanding);
+#if QT_VERSION >= 0x050000
+  this->Header->setSectionResizeMode(QHeaderView::Fixed);
+#else
   this->Header->setResizeMode(QHeaderView::Fixed);
+#endif
   this->Header->setMinimumSectionSize(0);
   this->Header->setModel(this->Model->header());
   this->Model->setRowHeight(this->Header->defaultSectionSize());
-  
+
   this->CreateDeleteWidget = new QWidget(this);
   this->CreateDeleteWidget->setObjectName("CreateDeleteWidget");
 

@@ -17,6 +17,9 @@
 #include "vtkChartRepresentation.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMChartSeriesListDomain.h"
+#include "vtkSMDomain.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMChartRepresentationProxy);
@@ -43,6 +46,37 @@ vtkChartRepresentation* vtkSMChartRepresentationProxy::GetRepresentation()
 void vtkSMChartRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMChartRepresentationProxy::ReadXMLAttributes(
+  vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
+
+  vtkSMProxy* optionsProxy = this->GetSubProxy("PlotOptions");
+  if (optionsProxy)
+    {
+    const char* names[] = {
+      "Input",
+      "CompositeDataSetIndex",
+      "AttributeType",
+      NULL
+    };
+    for (int cc=0; names[cc] != NULL; cc++)
+      {
+      vtkSMProperty* src = this->GetProperty(names[cc]);
+      vtkSMProperty* dest = optionsProxy->GetProperty(names[cc]);
+      if (src && dest)
+        {
+        this->LinkProperty(src, dest);
+        }
+      }
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -81,4 +115,33 @@ void vtkSMChartRepresentationProxy::SetPropertyModifiedFlag(
       }
     }
   this->Superclass::SetPropertyModifiedFlag(name, flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartRepresentationProxy::ResetPropertiesToDefault()
+{
+  this->Superclass::ResetPropertiesToDefault();
+
+  vtkSMProperty* useIndex = this->GetProperty("UseIndexForXAxis");
+  vtkSMProperty* xarrayName = this->GetProperty("XArrayName");
+
+  if (useIndex && xarrayName)
+    {
+    vtkSMPropertyHelper helper(xarrayName);
+    const char* value = helper.GetAsString();
+    const char** known_names =
+      vtkSMChartSeriesListDomain::GetKnownSeriesNames();
+    for (int cc=0; known_names[cc] != NULL && value != NULL; cc++)
+      {
+      if (strcmp(known_names[cc], value) == 0)
+        {
+        vtkSMPropertyHelper(useIndex).Set(0);
+        this->UpdateProperty("UseIndexForXAxis");
+        return;
+        }
+      }
+    }
+
+  vtkSMPropertyHelper(useIndex).Set(1);
+  this->UpdateProperty("UseIndexForXAxis");
 }

@@ -314,11 +314,12 @@ Qt::ItemFlags pqCustomFilterDefinitionModel::flags(const QModelIndex &) const
 void pqCustomFilterDefinitionModel::setContents(
   const pqProxySelection& items)
 {
+  this->beginResetModel();
   delete this->Root;
   this->Root = new pqCustomFilterDefinitionModelItem();
   if (items.size() == 0)
     {
-    this->reset();
+    this->endResetModel();
     return;
     }
 
@@ -403,7 +404,7 @@ void pqCustomFilterDefinitionModel::setContents(
       }
     }
 
-  this->reset();
+  this->endResetModel();
 }
 
 QModelIndex pqCustomFilterDefinitionModel::getNextIndex(

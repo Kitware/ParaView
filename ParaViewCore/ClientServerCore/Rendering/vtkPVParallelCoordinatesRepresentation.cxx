@@ -22,38 +22,39 @@
 #include "vtkTable.h"
 #include "vtkStdString.h"
 
+#include <map>
+#include <string>
+
+class vtkPVParallelCoordinatesRepresentation::vtkInternals
+{
+public:
+  // Refer to vtkPVPlotMatrixRepresentation when time comes to update this
+  // representation to respect the order in which the series are listed.
+  std::map<std::string, bool> SeriesVisibilities;
+};
+
 vtkStandardNewMacro(vtkPVParallelCoordinatesRepresentation);
 //----------------------------------------------------------------------------
 vtkPVParallelCoordinatesRepresentation::vtkPVParallelCoordinatesRepresentation()
-  : NumberOfColumns(0)
+: LineThickness(1),
+  LineStyle(0),
+  Opacity(0.1)
 {
+  this->Internals = new vtkInternals();
+  this->Color[0] = this->Color[1] = this->Color[2] = 0.0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVParallelCoordinatesRepresentation::~vtkPVParallelCoordinatesRepresentation()
 {
+  delete this->Internals;
+  this->Internals = NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVParallelCoordinatesRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVParallelCoordinatesRepresentation::NumberOfColumnsChanged()
-{
-  // I don't think this function should stay around long, column visibility
-  // should be set according to the properties ParaView stores and shows in the
-  // display panel.
-  vtkIdType n = GetNumberOfSeries();
-  bool changed = n != this->NumberOfColumns;
-  this->NumberOfColumns = n;
-  if (this->GetChart() && changed)
-    {
-    this->GetChart()->SetColumnVisibilityAll(true);
-    }
-  return changed;
 }
 
 //----------------------------------------------------------------------------
@@ -66,15 +67,7 @@ bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
 
   if (this->GetChart())
     {
-    std::vector<vtkTable*> tables;
-    if(this->GetLocalOutput(tables))
-      {
-      assert(tables.size()==1); //Quick fix: we will need to move sure multiple tables are
-                                // properly handled
-      this->GetChart()->GetPlot(0)->SetInputData(tables[0]);
-      this->GetChart()->SetVisible(this->GetVisibility());
-      this->NumberOfColumnsChanged();
-      }
+    this->GetChart()->SetVisible(this->GetVisibility());
     }
 
   return true;
@@ -87,8 +80,8 @@ bool vtkPVParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
     {
     this->GetChart()->GetPlot(0)->SetInputData(0);
     this->GetChart()->SetVisible(false);
-    this->NumberOfColumns = 0;
     }
+
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -108,71 +101,67 @@ vtkChartParallelCoordinates* vtkPVParallelCoordinatesRepresentation::GetChart()
 void vtkPVParallelCoordinatesRepresentation::SetVisibility(bool visible)
 {
   this->Superclass::SetVisibility(visible);
-  if (this->GetChart())
+
+  vtkChartParallelCoordinates* chart = this->GetChart();
+  if (chart && !visible)
     {
-    this->GetChart()->SetVisible(visible);
+    // Refer to vtkChartRepresentation::PrepareForRendering() documentation to
+    // know why this is cannot be done in PrepareForRendering();
+    chart->SetVisible(false);
     }
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetLineThickness(int value)
+void vtkPVParallelCoordinatesRepresentation::SetSeriesVisibility(
+  const char* series, bool visibility)
 {
-  if (this->GetChart())
-    {
-    this->GetChart()->GetPlot(0)->GetPen()->SetWidth(value);
-    }
+  assert(series != NULL);
+  this->Internals->SeriesVisibilities[series] = visibility;
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetLineStyle(int value)
+void vtkPVParallelCoordinatesRepresentation::ClearSeriesVisibilities()
 {
-  if (this->GetChart())
-    {
-    this->GetChart()->GetPlot(0)->GetPen()->SetLineType(value);
-    }
+  this->Internals->SeriesVisibilities.clear();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetColor(double r, double g,
-                                                           double b)
+void vtkPVParallelCoordinatesRepresentation::PrepareForRendering()
 {
-  if (this->GetChart())
-    {
-    this->GetChart()->GetPlot(0)->GetPen()->SetColorF(r, g, b);
-    }
-}
+  this->Superclass::PrepareForRendering();
 
-//----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetOpacity(double opacity)
-{
-  if (this->GetChart())
-    {
-    this->GetChart()->GetPlot(0)->GetPen()->SetOpacityF(opacity);
-    }
-}
+  vtkChartParallelCoordinates* chart = this->GetChart();
+  vtkTable* plotInput = this->GetLocalOutput();
+  chart->SetVisible(plotInput != NULL && this->GetVisibility());
+  chart->GetPlot(0)->GetPen()->SetWidth(this->LineThickness);
+  chart->GetPlot(0)->GetPen()->SetLineType(this->LineStyle);
+  chart->GetPlot(0)->GetPen()->SetColorF(this->Color[0], this->Color[1], this->Color[2]);
+  chart->GetPlot(0)->GetPen()->SetOpacityF(this->Opacity);
 
-//----------------------------------------------------------------------------
-int vtkPVParallelCoordinatesRepresentation::RequestData(vtkInformation* request,
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  if (!this->Superclass::RequestData(request, inputVector, outputVector))
+  if (plotInput)
     {
-    return 0;
-    }
-
-  if (this->GetChart())
-    {
-    // Set the table, in case it has changed.
-    // FIXME: This causes us to do more work that we should here.
-    std::vector<vtkTable*> tables;
-    if(this->GetLocalOutput(tables))
+    // only consider the first vtkTable.
+    chart->GetPlot(0)->SetInputData(plotInput);
+    vtkIdType numCols = plotInput->GetNumberOfColumns();
+    for (vtkIdType cc=0; cc < numCols; cc++)
       {
-      assert(tables.size()==1); //Quick fix: we will need to move sure multiple tables are
-                                // properly handled
-      this->GetChart()->GetPlot(0)->SetInputData(tables[0]);
-      this->NumberOfColumnsChanged();
+      std::string name = plotInput->GetColumnName(cc);
+      std::map<std::string, bool>::iterator iter =
+        this->Internals->SeriesVisibilities.find(name);
+
+      if (iter != this->Internals->SeriesVisibilities.end() &&
+        iter->second == true)
+        {
+        chart->SetColumnVisibility(name, true);
+        }
+      else
+        {
+        chart->SetColumnVisibility(name, false);
+        }
       }
     }
-
-  return 1;
 }

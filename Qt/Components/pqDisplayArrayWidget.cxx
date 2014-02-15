@@ -292,7 +292,7 @@ void pqDisplayArrayWidget::updateComponents()
     {
 
     comp = pqSMAdaptor::getElementProperty(repr->GetProperty(
-        this->Internal->PropertyArrayComponent.toAscii().data())).toInt();
+        this->Internal->PropertyArrayComponent.toLatin1().data())).toInt();
 
     int numComponents = display->getColorFieldNumberOfComponents(
         this->getArrayName() + " (point)");
@@ -359,28 +359,28 @@ void pqDisplayArrayWidget::setRepresentation(pqPipelineRepresentation* display)
     vtkSMProxy* repr = this->Internal->Representation->getProxy();
 
     // if the domain has been modified, we need to reload the combo boxes
-    if(repr->GetProperty(this->Internal->PropertyArrayName.toAscii()) != NULL)
+    if(repr->GetProperty(this->Internal->PropertyArrayName.toLatin1()) != NULL)
       {
       this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayName.toAscii()),
+        this->Internal->PropertyArrayName.toLatin1()),
         vtkCommand::DomainModifiedEvent, this, SLOT(needReloadGUI()), NULL, 0.0,
         Qt::QueuedConnection);
 
       this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayName.toAscii()),
+        this->Internal->PropertyArrayName.toLatin1()),
         vtkCommand::ModifiedEvent, this, SLOT(updateGUI()), NULL, 0.0,
         Qt::QueuedConnection);
       }
 
-    if(repr->GetProperty(this->Internal->PropertyArrayComponent.toAscii()) != NULL)
+    if(repr->GetProperty(this->Internal->PropertyArrayComponent.toLatin1()) != NULL)
       {
       this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayComponent.toAscii()),
+        this->Internal->PropertyArrayComponent.toLatin1()),
         vtkCommand::DomainModifiedEvent, this, SLOT(needReloadGUI()), NULL, 0.0,
         Qt::QueuedConnection);
 
       this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayComponent.toAscii()),
+        this->Internal->PropertyArrayComponent.toLatin1()),
         vtkCommand::ModifiedEvent, this, SLOT(updateGUI()), NULL, 0.0,
         Qt::QueuedConnection);
       }
@@ -506,7 +506,7 @@ const QString pqDisplayArrayWidget::getArrayName() const
     }
 
   QList<QVariant> list = pqSMAdaptor::getMultipleElementProperty(repr->GetProperty(
-      this->Internal->PropertyArrayName.toAscii().data()));
+      this->Internal->PropertyArrayName.toLatin1().data()));
 
   if(list.size() < 4)
     {

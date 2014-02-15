@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqExpandableTableView_h
 #define __pqExpandableTableView_h
 
-#include <QTableView>
+#include "pqTableView.h"
 #include "pqWidgetsModule.h" // for export macro
 
-/// pqExpandableTableView extends QTableView to add support for the following
+/// pqExpandableTableView extends pqTableView to add support for the following
 /// features:
 /// \li Expand/Grow table: If the user edits past the last item
 ///     the view will fire a signal (editPastLastRow()) 
@@ -44,10 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///     to edit the next item. However, if the next item is not editable, the
 ///     editing is stopped. pqExpandableTableView makes it possible to skip
 ///     non-editable items and continue with the editing.
-class PQWIDGETS_EXPORT pqExpandableTableView : public QTableView
+class PQWIDGETS_EXPORT pqExpandableTableView : public pqTableView
 {
   Q_OBJECT
-  typedef QTableView Superclass;
+  typedef pqTableView Superclass;
 public:
   pqExpandableTableView(QWidget* parent=0);
   virtual ~pqExpandableTableView();

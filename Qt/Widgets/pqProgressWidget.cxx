@@ -56,7 +56,7 @@ pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
     QIcon(QString::fromUtf8(":/QtWidgets/Icons/pqDelete16.png")));
   this->AbortButton->setIconSize(QSize(12, 12));
   this->AbortButton->setToolTip(
-    QApplication::translate("Form", "Abort", 0, QApplication::UnicodeUTF8));
+    QApplication::translate("Form", "Abort", 0));
 
   this->AbortButton->setEnabled(false);
   QObject::connect(this->AbortButton, SIGNAL(pressed()),

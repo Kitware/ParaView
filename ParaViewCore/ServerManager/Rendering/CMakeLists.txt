@@ -35,10 +35,11 @@ set (Module_SRCS
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
   vtkSMChartRepresentationProxy.cxx
+  vtkSMChartSeriesListDomain.cxx
+  vtkSMChartSeriesSelectionDomain.cxx
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeAnimationCueUndoElement.cxx
   vtkSMComparativeViewProxy.cxx
-  vtkSMContextNamedOptionsProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMDataDeliveryManager.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx

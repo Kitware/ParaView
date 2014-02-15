@@ -84,7 +84,7 @@ void pqAnimationTrack::adjustKeyFrameRects()
 
 pqAnimationKeyFrame* pqAnimationTrack::addKeyFrame()
 {
-  pqAnimationKeyFrame* frame = new pqAnimationKeyFrame(this, this->scene());
+  pqAnimationKeyFrame* frame = new pqAnimationKeyFrame(this);
   this->Frames.append(frame);
   this->update();
   return frame;
