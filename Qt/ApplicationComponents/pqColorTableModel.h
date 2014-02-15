@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:    pqColorTableModel.h
 
    Copyright (c) 2013 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqColorTableModel_h
 
 #include <QAbstractTableModel>
+#include "pqApplicationComponentsModule.h"
 
 class pqColorOpacityEditorWidget;
 
@@ -40,7 +41,7 @@ class pqColorOpacityEditorWidget;
 // function control points through a table interface.
 // First column is control point scalar value and the second through fourth
 // columns are r,g,b colors, respectively.
-class pqColorTableModel : public QAbstractTableModel
+class PQAPPLICATIONCOMPONENTS_EXPORT pqColorTableModel : public QAbstractTableModel
 {
 Q_OBJECT
   typedef QAbstractTableModel Superclass;
