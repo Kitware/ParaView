@@ -12096,6 +12096,13 @@ found and the point will be rejected.</Documentation>
         dimensionality of the new space into which the assessment will project
         tuples.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetRobustPCA"
+                         default_values="0"
+                         name="RobustPCA"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Compute robust PCA with medians instead of means.</Documentation>
+      </IntVectorProperty>
       <OutputPort index="0"
                   name="Statistical Model" />
       <OutputPort index="1"

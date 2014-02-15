@@ -19,6 +19,7 @@ vtkPSciVizPCAStats::vtkPSciVizPCAStats()
   this->BasisScheme = vtkPCAStatistics::FULL_BASIS;
   this->FixedBasisSize = 10;
   this->FixedBasisEnergy = 1.;
+  this->RobustPCA = false;
 }
 
 vtkPSciVizPCAStats::~vtkPSciVizPCAStats()
@@ -32,6 +33,7 @@ void vtkPSciVizPCAStats::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "BasisScheme: " << this->BasisScheme << "\n";
   os << indent << "FixedBasisSize: " << this->FixedBasisSize << "\n";
   os << indent << "FixedBasisEnergy: " << this->FixedBasisEnergy << "\n";
+  os << indent << "RobustPCA:" << this->RobustPCA << "\n";
 }
 
 int vtkPSciVizPCAStats::LearnAndDerive( vtkMultiBlockDataSet* modelDO, vtkTable* inData )
@@ -45,6 +47,7 @@ int vtkPSciVizPCAStats::LearnAndDerive( vtkMultiBlockDataSet* modelDO, vtkTable*
     stats->SetColumnStatus( inData->GetColumnName( i ), 1 );
     }
   stats->SetNormalizationScheme( this->NormalizationScheme );
+  stats->SetMedianAbsoluteDeviation( this->RobustPCA );
 
   stats->SetLearnOption( true );
   stats->SetDeriveOption( true );
@@ -92,6 +95,7 @@ int vtkPSciVizPCAStats::AssessData( vtkTable* observations, vtkDataObject* asses
   stats->SetBasisScheme( this->BasisScheme );
   stats->SetFixedBasisSize( this->FixedBasisSize );
   stats->SetFixedBasisEnergy( this->FixedBasisEnergy );
+  stats->SetMedianAbsoluteDeviation( this->RobustPCA );
 
   stats->SetLearnOption( false );
   stats->SetDeriveOption( true );
