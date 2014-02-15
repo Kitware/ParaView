@@ -7,3 +7,4 @@ foreach (cmake_file IN LISTS cmake_files)
 endforeach ()
 
 vtk_module_library(vtkPVVTKExtensionsRendering ${Module_SRCS})
+vtk_mpi_link(vtkPVVTKExtensionsRendering)
