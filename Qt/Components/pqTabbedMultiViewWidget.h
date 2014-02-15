@@ -58,68 +58,68 @@ public:
   virtual ~pqTabbedMultiViewWidget();
 
   /// Returns the size for the tabs in the widget.
-  QSize clientSize() const;
+  virtual QSize clientSize() const;
 
   /// Captures an image for the views in the layout. Note that there must be
   /// at least one valid view in the widget, otherwise returns NULL.
-  vtkImageData* captureImage(int width, int height);
+  virtual vtkImageData* captureImage(int width, int height);
 
   /// setups up the environment for capture. Returns the magnification that can
   /// be used to capture the image for required size.
-  int prepareForCapture(int width, int height);
+  virtual int prepareForCapture(int width, int height);
 
   /// cleans up the environment after image capture.
-  void cleanupAfterCapture();
+  virtual void cleanupAfterCapture();
 
 signals:
   /// fired when lockViewSize() is called.
   void viewSizeLocked(bool);
 
 public slots:
-  void createTab();
-  void createTab(pqServer*);
-  void createTab(vtkSMViewLayoutProxy*);
-  void closeTab(int);
+  virtual void createTab();
+  virtual void createTab(pqServer*);
+  virtual void createTab(vtkSMViewLayoutProxy*);
+  virtual void closeTab(int);
 
   /// toggles fullscreen state.
-  void toggleFullScreen();
+  virtual void toggleFullScreen();
 
   /// Locks the maximum size for each view-frame to the given size.
   /// Use empty QSize() instance to indicate no limits.
-  void lockViewSize(const QSize&);
+  virtual void lockViewSize(const QSize&);
 
   /// cleans up the layout.
-  void reset();
+  virtual void reset();
 
 protected slots:
   /// slots connects to corresponding signals on pqServerManagerObserver.
-  void proxyAdded(pqProxy*);
-  void proxyRemoved(pqProxy*);
-  void serverRemoved(pqServer*);
+  virtual void proxyAdded(pqProxy*);
+  virtual void proxyRemoved(pqProxy*);
+  virtual void serverRemoved(pqServer*);
 
   /// called when the active tab changes. If the active tab is the "+" tab, then
   /// add a new tab to the widget.
-  void currentTabChanged(int);
+  virtual void currentTabChanged(int);
 
   /// called when a frame in pqMultiViewWidget is activated. Ensures that that
   /// widget is visible.
-  void frameActivated();
+  virtual void frameActivated();
 
   /// verifies that all views loaded from state are indeed assigned to some view
   /// layout, or we just assign them to one.
-  void onStateLoaded();
+  virtual void onStateLoaded();
 
   /// called when pqObjectBuilder is about to create a new view. We ensure that
   /// a layout exists to accept that view. This is essential for collaborative
   /// mode to work correctly without ending up multiple layouts on the two
   /// processes.
-  void aboutToCreateView(pqServer*);
+  virtual void aboutToCreateView(pqServer*);
 
 protected:
-  bool eventFilter(QObject *obj, QEvent *event);
+  virtual bool eventFilter(QObject *obj, QEvent *event);
 
   /// assigns a frame to the view.
-  void assignToFrame(pqView*, bool warnIfTabCreated);
+  virtual void assignToFrame(pqView*, bool warnIfTabCreated);
 
   /// Internal class used as the TabWidget.
   class pqTabWidget : public QTabWidget
