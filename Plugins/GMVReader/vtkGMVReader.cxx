@@ -52,7 +52,8 @@ namespace GMVRead {
 // include GMV's I/O utility provided by GMV's author, Frank Ortega (LANL).
 // import it from VisItBridge's include directories
   extern "C" {
-#   include "gmvread.c"
+#include "gmvread.c"
+#include "snprintf.c"
   }
 
   template <class C> void minmax(C * pointer, size_t len, C& min_out, C& max_out)
