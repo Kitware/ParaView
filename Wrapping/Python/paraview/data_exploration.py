@@ -213,6 +213,12 @@ class FileNameGenerator():
             os.makedirs(os.path.dirname(fullpath))
         return fullpath
 
+    def get_directory(self):
+        fullpath = os.path.join(self.working_dir, self.get_filename())
+        if not os.path.exists(os.path.dirname(fullpath)):
+            os.makedirs(os.path.dirname(fullpath))
+        return os.path.dirname(fullpath)
+
     def write_metadata(self):
         """
         Write the info.json file in the working directory which contains
@@ -767,6 +773,104 @@ class TimeSerieDataProber():
 
         if self.analysis:
             self.analysis.end_work('TimeSerieDataProber')
+
+#==============================================================================
+# Image composite
+#==============================================================================
+
+class CompositeImageExporter():
+    """
+    Class use to dump an image stack for a given view position so it can be
+    recomposed later on in the web.
+    We assume the RGBZView plugin is loaded.
+    """
+    def __init__(self, file_name_generator, data_list, colorBy_list, luts, camera_info, view_size):
+        """
+        camera_info: {
+           focal_point: [0,0,0],
+           view_up: [0,0,1],
+           position: [100,300,50]
+        }
+        """
+        self.file_name_generator = file_name_generator
+        self.datasets = data_list
+        self.camera = camera_info
+        self.analysis = None
+
+        # Create view and assembly manager
+        self.view = simple.CreateView("RGBZView")
+        self.view.ViewSize = view_size
+        index = 0
+        for data in self.datasets:
+            rep = simple.Show(data, self.view)
+            rep.ColorArrayName = colorBy_list[index]
+            rep.LookupTable = luts[colorBy_list[index][1]]
+            index += 1
+        self.view.CameraPosition = camera_info['position']
+        self.view.CameraFocalPoint = camera_info['focal_point']
+        self.view.CameraViewUp = camera_info['view_up']
+
+        pxm = simple.servermanager.ProxyManager()
+        self.assembly = simple.servermanager._getPyProxy(pxm.NewProxy('misc', 'AssemblyGenerator'))
+
+    @staticmethod
+    def list_arguments():
+        """
+        '/path/{layer}.vtk' + '/path/{layer}.jpg' + '/path/info.json'
+        """
+        return ['layer']
+
+    @staticmethod
+    def get_data_type():
+        return "composite-image-stack"
+
+    def add_attribute(self, name, value):
+        setattr(self, name, value)
+
+    def set_analysis(self, analysis):
+        self.analysis = analysis
+
+    def UpdatePipeline(self, time=0):
+        """
+        Change camera position and dump images to the disk
+        """
+        if self.analysis:
+            self.analysis.begin_work('CompositeImageExporter')
+        self.file_name_generator.update_active_arguments(time=time)
+        self.file_name_generator.update_active_arguments(layer=0)
+        self.assembly.DestinationDirectory = self.file_name_generator.get_directory()
+
+        # Update current bounds for the z-Buffer
+        representation_list = self.view.Representations
+        for representation in representation_list:
+            representation.Visibility = 1
+        self.view.FileName = ''
+        simple.Render(self.view)
+        self.view.ResetClippingBounds()
+        self.view.FreezeGeometryBounds()
+
+        # Toggle each layer individually
+        vtk_files_to_process = []
+        number_of_layers = 1 + len(representation_list)
+        for layer_idx in range(number_of_layers):
+            self.file_name_generator.update_active_arguments(layer=layer_idx)
+            for rep in representation_list:
+                rep.Visibility = 0
+            if layer_idx > 0:
+                representation_list[layer_idx - 1].Visibility = 1
+            self.view.FileName = self.file_name_generator.get_fullpath()
+            simple.Render(self.view)
+            vtk_files_to_process.append(self.file_name_generator.get_fullpath())
+
+        # Generate JPG files and composite data
+        self.assembly.FileNames = vtk_files_to_process
+        self.assembly.Write()
+
+        # Generate metadata
+        # => Well the assembly is generating that JSON file
+
+        if self.analysis:
+            self.analysis.end_work('CompositeImageExporter')
 
 #==============================================================================
 # Image exporter

@@ -1,0 +1,57 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+    <RenderViewProxy name="RGBZView" class="vtkPVRenderViewForAssembly"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views" base_proxyname="RenderView">
+        <StringVectorProperty
+            name="FileName"
+            animateable="0"
+            command="SetFileName"
+            number_of_elements="1">
+            <Documentation>
+              This property specifies the file name for saving the image buffer.
+            </Documentation>
+        </StringVectorProperty>
+        <DoubleVectorProperty
+            name="ClippingBounds"
+            animateable="0"
+            command="SetClippingBounds"
+            default_values="+1 -1 +1 -1 +1 -1"
+            number_of_elements="6">
+        </DoubleVectorProperty>
+        <Property
+            name="ResetClippingBounds"
+            animateable="0"
+            command="ResetClippingBounds">
+        </Property>
+        <Property
+            name="FreezeGeometryBounds"
+            animateable="0"
+            command="FreezeGeometryBounds">
+        </Property>
+    </RenderViewProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="misc">
+    <Proxy name="AssemblyGenerator" class="vtkAssemblyGenerator" processes="client">
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="1"
+                            repeat_command="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty animateable="0"
+                            command="SetDestinationDirectory"
+                            name="DestinationDirectory"
+                            number_of_elements="1">
+      </StringVectorProperty>
+      <Property
+          name="Write"
+          animateable="0"
+          command="Write">
+      </Property>
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
