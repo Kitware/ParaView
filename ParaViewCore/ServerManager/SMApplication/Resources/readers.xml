@@ -2042,14 +2042,6 @@
         identifying the file it came from? If turned on, a cell variable named
         "FileId" should be present.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetExodusModelMetadata"
-                         default_values="0"
-                         name="ExodusModelMetadata"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Should metadata for the mesh be stored in the field data
-        of the reader's output?</Documentation>
-      </IntVectorProperty>
       <StringVectorProperty command="GetFilePrefix"
                             information_only="1"
                             name="FilePrefixInfo">
@@ -5194,7 +5186,6 @@
           <Property name="ElementSetInfo" />
           <Property name="ElementSetResultArrayInfo" />
           <Property name="ElementVariablesInfo" />
-          <Property name="ExodusModelMetadata" />
           <Property name="FaceBlocks" />
           <Property name="FaceBlocksInfo" />
           <Property name="FaceMapInfo" />
@@ -5336,7 +5327,6 @@
           <Property name="ElementSetInfo" />
           <Property name="ElementSetResultArrayInfo" />
           <Property name="ElementVariablesInfo" />
-          <Property name="ExodusModelMetadata" />
           <Property name="FaceBlocks" />
           <Property name="FaceBlocksInfo" />
           <Property name="FaceMapInfo" />
