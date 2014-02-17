@@ -98,7 +98,6 @@
         { "class": "vtkCameraInterpolator2" },
         { "class": "vtkCameraManipulator" },
         { "class": "vtkCameraManipulatorGUIHelper" },
-        { "class": "vtkChartNamedOptions" },
         { "class": "vtkCleanArrays" },
         { "class": "vtkCompositeDataToUnstructuredGridFilter" },
         { "class": "vtkCSVExporter" },
@@ -149,7 +148,6 @@
         { "class": "vtkUpdateSuppressorPipeline" },
         { "class": "vtkViewLayout" },
         { "class": "vtkWeightedRedistributePolyData" },
-        { "class": "vtkXYChartNamedOptions" },
         { "class": "vtkZlibImageCompressor" }
       ],
       "replace": [
