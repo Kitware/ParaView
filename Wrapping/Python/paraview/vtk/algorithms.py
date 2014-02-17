@@ -317,6 +317,8 @@ def global_mean (narray) :
     S = narray.sum(0).astype(numpy.float64)
     if len(S.shape) == 2 and S.shape[0] == 3 and S.shape[1] == 3:
        S = numpy.reshape(S, 9)
+    elif len(S.shape) == 3 and S.shape[0] == 1 and S.shape[1] == 3 and S.shape[2] == 3:
+       S = numpy.reshape(S, 9)
 
     if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
@@ -397,10 +399,52 @@ def log10 (narray) :
     "Returns the base 10 logarithm of an array of scalars/vectors/tensors."
     return numpy.log10(narray)
 
+# Functions marked with this decorator will check all leaves of a composite
+# dataset.
+def composite_function(func):
+    def new_function(array):
+        if hasattr(array, 'composite_iterator'):
+            return func(array.composite_iterator)
+        else:
+            return func(array)
+    new_function.__name__ = func.__name__
+    return new_function
+
+# This decorator will strip single-entry sequences from returned values.
+def strip_sequence_from_result(func):
+    def new_function(array):
+        res = func(array)
+        try:
+            while len(res) == 1:
+                # matrices have weird slice behaviors, slice them as a ndarray.
+                if isinstance(res, numpy.matrix):
+                    res = res.view(numpy.ndarray)
+                res = res[0]
+        except TypeError:
+            pass
+        return res
+    new_function.__name__ = func.__name__
+    return new_function
+
+# This decorator fallsback to the provided builtin function when the input is
+# not an instance of numpy ndarray.
+def use_builtin_function_if_not_numpy_array(builtin_func):
+    def inner_decorator(func):
+        def new_function(array):
+            if isinstance(array, numpy.ndarray):
+                return func(array)
+            return builtin_func(array)
+        new_function.__name__ = func.__name__
+        return new_function
+    return inner_decorator
+
+@strip_sequence_from_result
+@composite_function
+@use_builtin_function_if_not_numpy_array(max)
 def max (narray):
     "Returns the maximum value of an array of scalars/vectors/tensors."
     ans = numpy.max(numpy.array(narray), axis=0)
-    if len(ans.shape) == 2 and ans.shape[0] == 3 and ans.shape[1] == 3: ans.shape = 9
+    if len(ans.shape) == 2 and ans.shape[0] == 3 and ans.shape[1] == 3: ans.reshape(9)
     return ans
 
 def max_angle (dataset) :
@@ -411,16 +455,28 @@ def mag (a) :
     "Returns the magnigude of an array of scalars/vectors."
     return numpy.sqrt(dot(a, a))
 
+def mean(iter):
+    """Fallback mean implementation, since there is no builtin."""
+    s = sum(iter)
+    l = len(iter)
+    return s / l
+
+@strip_sequence_from_result
+@composite_function
+@use_builtin_function_if_not_numpy_array(mean)
 def mean (narray) :
     "Returns the mean value of an array of scalars/vectors/tensors."
     ans = numpy.mean(numpy.array(narray), axis=0)
-    if len(ans.shape) == 2 and ans.shape[0] == 3 and ans.shape[1] == 3: ans.shape = 9
+    if len(ans.shape) == 2 and ans.shape[0] == 3 and ans.shape[1] == 3: ans.reshape(9)
     return ans
 
+@strip_sequence_from_result
+@composite_function
+@use_builtin_function_if_not_numpy_array(min)
 def min (narray):
     "Returns the min value of an array of scalars/vectors/tensors."
     ans = numpy.min(numpy.array(narray), axis=0)
-    if len(ans.shape) == 2 and ans.shape[0] == 3 and ans.shape[1] == 3: ans.shape = 9
+    if len(ans.shape) == 2 and ans.shape[0] == 3 and ans.shape[1] == 3: ans.reshape(9)
     return ans
 
 def min_angle (dataset) :

@@ -95,13 +95,12 @@ void vtkPythonCalculator::ExecuteScript(void *arg)
     static_cast<vtkPythonCalculator*>(arg);
   if (self)
     {
-    self->Exec(self->GetExpression(), "RequestData");
+    self->Exec(self->GetExpression());
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonCalculator::Exec(const char* expression,
-                               const char* funcname)
+void vtkPythonCalculator::Exec(const char* expression)
 {
   if (!expression)
     {
@@ -166,6 +165,7 @@ int vtkPythonCalculator::FillInputPortInformation(
   if(port==0)
     {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     }

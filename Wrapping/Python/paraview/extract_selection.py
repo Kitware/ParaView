@@ -82,8 +82,41 @@ def ExtractElements(self, inputDS, selection, mask):
             return retVal
     return None
 
-def ExecData(self, inputDS, selection):
-    """inputDS is either a non-composite data object"""
+class CompositeDataArrayIterable(object):
+    """ An iterable that will traverse all data arrays in leaves of a composite
+    dataset with a given name."""
+    def __init__(self, dataSet, arrayName, assoc):
+        if not dataSet.IsA("vtkCompositeDataSet"):
+            raise TypeError("Input DataSet is not a vtkCompositeDataSet!")
+        self.Arrays = []
+        iterCD = dataSet.NewIterator()
+        while not iterCD.IsDoneWithTraversal():
+            dataObj = iterCD.GetCurrentDataObject()
+            pyDataObj = dataset_adapter.WrapDataObject(dataObj)
+
+            dsa = dataset_adapter.DataSetAttributes(
+                dataObj.GetAttributes(assoc), pyDataObj, assoc)
+
+            if arrayName in dsa.keys():
+                self.Arrays.append(dsa[arrayName])
+
+            iterCD.GoToNextItem()
+        iterCD.UnRegister(None)
+        del iterCD
+
+    def __len__(self):
+        result = 0
+        for array in self.Arrays:
+            result += len(array)
+        return result
+
+    def __iter__(self):
+        import itertools
+        return itertools.chain.from_iterable(self.Arrays)
+
+def ExecData(self, inputDS, selection, compositeDataSet = None):
+    """inputDS is a non-composite data object. If it is a leaf of a composite
+    data set, pass the entire data set as compositeDataSet."""
 
     selection_node = selection.GetNode(0)
     array_association = 1
@@ -104,8 +137,13 @@ def ExecData(self, inputDS, selection):
     # define global variables for all the arrays.
     for arrayname in dsa.keys():
         name = paraview.make_name_valid(arrayname)
-        new_locals[name] = dsa[arrayname]
-
+        array = dsa[arrayname]
+        if compositeDataSet:
+            compIter = CompositeDataArrayIterable(
+                compositeDataSet, arrayname, array_association)
+            new_locals[name + "_composite"] = compIter
+            array.composite_iterator = compIter
+        new_locals[name] = array
     new_locals["cell"] = do
     new_locals["dataset"] = do
     new_locals["input"] = do
@@ -144,7 +182,7 @@ def Exec(self, inputDO, selection, outputDO):
         iterCD.UnRegister(None)
         while not iterCD.IsDoneWithTraversal():
             if PassBlock(self, iterCD, selection_node):
-                ds = ExecData(self, iterCD.GetCurrentDataObject(), selection)
+                ds = ExecData(self, iterCD.GetCurrentDataObject(), selection, inputDO)
                 outputDO.SetDataSet(iterCD, ds)
                 del ds
             iterCD.GoToNextItem()

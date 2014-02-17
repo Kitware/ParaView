@@ -6,8 +6,7 @@ derived quantities.
 from paraview import vtk
 from paraview.vtk import dataset_adapter
 from paraview.vtk.algorithms import *
-
-from numpy import *
+import numpy
 
 def compute(inputs, association, expression):
     import paraview
@@ -18,7 +17,7 @@ def compute(inputs, association, expression):
     arrays = {}
     for key in fd0.keys():
         name = paraview.make_name_valid(key)
-        arrays[name] = fd0[name]
+        arrays[name] = fd0[key]
 
     #  build the locals environment used to eval the expression.
     mylocals = dict(arrays.items())
@@ -28,13 +27,11 @@ def compute(inputs, association, expression):
         mylocals["points"] = inputs[0].Points
     except: pass
     retVal = eval(expression, globals(), mylocals)
-    if not isinstance(retVal, ndarray):
-        # FIXME: This logic needs evaluation since it cannot work with composite
-        # datasets
-        if association == ArrayAssociation.POINT:
-            retVal = retVal * ones((input[0].GetNumberOfPoints(), 1))
-        elif association == ArrayAssociation.CELL:
-            retVal = retVal * ones((input[0].GetNumberOfCells(), 1))
+    if not isinstance(retVal, numpy.ndarray):
+        if association == dataset_adapter.ArrayAssociation.POINT:
+            retVal = retVal * numpy.ones((inputs[0].GetNumberOfPoints(), 1))
+        elif association == dataset_adapter.ArrayAssociation.CELL:
+            retVal = retVal * numpy.ones((inputs[0].GetNumberOfCells(), 1))
     return retVal
 
 def execute(self, expression):
@@ -56,8 +53,8 @@ def execute(self, expression):
     output = dataset_adapter.WrapDataObject(self.GetOutputDataObject(0))
 
     if self.GetCopyArrays():
-        output.GetPointData().PassData(inputs[0].GetPointData().VTKObject)
-        output.GetCellData().PassData(inputs[0].GetCellData().VTKObject)
+        output.GetPointData().PassData(inputs[0].GetPointData())
+        output.GetCellData().PassData(inputs[0].GetCellData())
 
     retVal = compute(inputs, self.GetArrayAssociation(), expression)
     if retVal is not None:
