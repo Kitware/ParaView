@@ -128,6 +128,8 @@ private:
   bool Updating;
   vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqPipelineRepresentation> Representation;
+  // This is maintained to detect when the representation has changed.
+  void* CachedRepresentation;
   QList<QString> AvailableArrays;
 };
 

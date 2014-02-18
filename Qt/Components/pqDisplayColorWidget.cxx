@@ -55,7 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   QWidget( p ),
   BlockEmission(0),
-  Updating(false)
+  Updating(false),
+  CachedRepresentation(NULL)
 {
   this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
   this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData16.png");
@@ -344,13 +345,12 @@ void pqDisplayColorWidget::updateComponents()
 }
 
 //-----------------------------------------------------------------------------
-void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display) 
+void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
 {
-  if(display == this->Representation)
+  if(display == this->CachedRepresentation)
     {
     return;
     }
-
   if (this->Representation)
     {
     QObject::disconnect(this->Representation, 0, this, 0);
@@ -358,6 +358,7 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
 
   this->VTKConnect->Disconnect();
   this->Representation = qobject_cast<pqPipelineRepresentation*>(display);
+  this->CachedRepresentation = display;
   if(this->Representation)
     {
     vtkSMProxy* repr = this->Representation->getProxy();
@@ -371,12 +372,12 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
     if (repr->GetProperty("Representation"))
       {
       this->VTKConnect->Connect(
-        repr->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
+        repr->GetProperty("Representation"), vtkCommand::ModifiedEvent,
         this, SLOT(updateGUI()),
         NULL, 0.0);
       }
 
-    // Every time the display updates, it is possible that the arrays available for 
+    // Every time the display updates, it is possible that the arrays available for
     // coloring have changed, hence we reload the list.
     QObject::connect(this->Representation, SIGNAL(dataUpdated()),
       this, SLOT(reloadGUI()));
