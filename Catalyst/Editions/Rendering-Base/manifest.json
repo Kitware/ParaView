@@ -530,7 +530,6 @@
         { "class": "vtkGeometryRepresentation" },
         { "class": "vtkGeometryRepresentationWithFaces" },
         { "class": "vtkGlyph3DRepresentation" },
-        { "class": "vtkMatplotlibUtilities" },
         { "class": "vtkOutlineRepresentation" },
         { "class": "vtkPVCacheKeeper" },
         { "class": "vtkPVCacheKeeperPipeline" },
@@ -553,8 +552,6 @@
         { "class": "vtkPVSynchronizedRenderer" },
         { "class": "vtkPVSynchronizedRenderWindows" },
         { "class": "vtkPVView" },
-        { "class": "vtkPythonRepresentation" },
-        { "class": "vtkPythonView" },
         { "class": "vtkSelectionDeliveryFilter" },
         { "class": "vtkSelectionRepresentation" }
       ],
