@@ -222,17 +222,15 @@ class VTKCompositeDataArray():
     def set_numpy_array(self, arr):
         """Distribute the data in arr to the leaves of the composite dataset's
         leaves. The data is expected to be in the same order as __iter__."""
+        assert len(arr) == self._tuples, \
+            "Array size (%d) does not match dataset size (%d)"%(len(arr), self._tuples)
         startInd = 0;
         self._arrayIndices = []
         self._arrays = []
         for dataset in self.DataSet():
             datasetLength = dataset.GetNumberOfElements(self.Association)
             dsa = dataset.GetAttributes(self.Association)
-            try:
-                dsa.append(arr[startInd:startInd + datasetLength], self.ArrayName)
-            except IndexError: # arr is likely a scalar
-                newArr = numpy.ones(datasetLength) * arr
-                dsa.append(newArr, self.ArrayName)
+            dsa.append(arr[startInd:startInd + datasetLength], self.ArrayName)
             startInd += datasetLength
             self._arrayIndices.append(len(self._arrays))
             newArray = dsa.GetArray(self.ArrayName)
@@ -437,6 +435,18 @@ class DataSetAttributes(VTKObjectWrapper):
     def append(self, narray, name):
         """Appends a new array to the dataset attributes."""
 
+        if self.Association == ArrayAssociation.POINT:
+            arrLength = self.DataSet().GetNumberOfPoints()
+        elif self.Association == ArrayAssociation.CELL:
+            arrLength = self.DataSet().GetNumberOfCells()
+
+        # Fixup input array length:
+        if not isinstance(narray, numpy.ndarray): # Scalar input
+            narray = narray * numpy.ones((arrLength, 1))
+        elif narray.shape[0] != arrLength: # Vector input
+            components = reduce(operator.mul, narray.shape)
+            narray = narray.flatten() * numpy.ones((arrLength, components))
+
         shape = narray.shape
 
         if len(shape) == 3:
@@ -503,6 +513,15 @@ class CompositeDataSetAttributes():
     def append(self, narray, name):
         """Appends a new array to the composite dataset attributes."""
         comparray = VTKCompositeDataArray(name, self.DataSet(), self.Association)
+
+        # Fixup input array length:
+        arrLength = comparray._tuples
+        if not isinstance(narray, numpy.ndarray): # Scalar input
+            narray = narray * numpy.ones((arrLength, 1))
+        elif narray.shape[0] != arrLength: # Vector input
+            components = reduce(operator.mul, narray.shape)
+            narray = narray.flatten() * numpy.ones((arrLength, components))
+
         comparray.set_numpy_array(narray)
 
     def GetArray(self, idx):

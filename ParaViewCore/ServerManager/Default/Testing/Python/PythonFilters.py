@@ -50,7 +50,7 @@ def print_array (vtkarray, verbose=0) :
 def test0 (query, types=[], noperands=1, associations=[], debug=1, testComposite=False) :
     if debug :
        print ''
-       print query, associations, types
+       print query, associations, types, "Composite=%s"%testComposite
        sys.stdout.flush()
 
     # Validity checks

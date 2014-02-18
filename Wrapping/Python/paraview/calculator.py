@@ -27,11 +27,7 @@ def compute(inputs, association, expression):
         mylocals["points"] = inputs[0].Points
     except: pass
     retVal = eval(expression, globals(), mylocals)
-    if not isinstance(retVal, numpy.ndarray):
-        if association == dataset_adapter.ArrayAssociation.POINT:
-            retVal = retVal * numpy.ones((inputs[0].GetNumberOfPoints(), 1))
-        elif association == dataset_adapter.ArrayAssociation.CELL:
-            retVal = retVal * numpy.ones((inputs[0].GetNumberOfCells(), 1))
+
     return retVal
 
 def execute(self, expression):
