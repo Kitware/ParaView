@@ -490,10 +490,18 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
           {
           vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock (level, blockId);
-          vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (block->Image);
-
+          if (block->ProcessId != myProc) 
+            {
+            continue;
+            }
+          vtkUniformGrid* grid = volume->GetDataSet (block->Level, block->BlockId);
           vtkIdTypeArray* regionIdArray = vtkIdTypeArray::SafeDownCast (
                                             grid->GetCellData ()->GetArray (this->RegionName.c_str()));
+          if (regionIdArray == 0)
+            {
+            vtkErrorMacro ("block Image doesn't not contain the regionId just added");
+            return 0;
+            }
           for (int i = 0; i < regionIdArray->GetNumberOfTuples (); i ++) 
             {
             vtkIdType regionId = regionIdArray->GetTuple1 (i);
@@ -503,6 +511,10 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
               if (setId != regionId) 
                 {
                 regionIdArray->SetTuple1 (i, setId);
+                if (sets_changed == 0)
+                  {
+                  std::cerr << "Changing because " << regionId << " != " << setId << endl;
+                  }
                 sets_changed = 1;
                 for (int p = 0; p < this->NeighborList[level][blockId].size (); p ++)
                   {
@@ -545,8 +557,11 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 
     for (int i = 0; i < numProcs; i ++) 
       {
-      this->EquivPairs[i]->Delete ();
-      this->EquivPairs[i] = 0;
+      if (this->EquivPairs[i] != 0)
+        {
+        this->EquivPairs[i]->Delete ();
+        this->EquivPairs[i] = 0;
+        }
       }
     this->EquivPairs.clear ();
     ValidNeighbor.clear ();
