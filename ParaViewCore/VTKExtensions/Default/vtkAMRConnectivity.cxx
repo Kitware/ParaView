@@ -489,6 +489,48 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           }
         }
       }
+
+    // Propagate the region IDs out to the ghosts
+    vtkSmartPointer<vtkIdList> ptIds = vtkIdList::New ();
+    vtkSmartPointer<vtkIdList> cellIds = vtkIdList::New ();
+    for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
+      {
+      vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
+      vtkIdTypeArray* regionIdArray = vtkIdTypeArray::SafeDownCast (
+                                        grid->GetCellData ()->GetArray (this->RegionName.c_str()));
+      vtkDataArray* volArray = grid->GetCellData ()->GetArray (volumeName);
+      vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
+      for (int cellId = 0; cellId < regionIdArray->GetNumberOfTuples (); cellId ++) 
+        {
+        if (ghostLevels->GetTuple1 (cellId) < 0.5
+            || volArray->GetTuple1 (cellId) < this->VolumeFractionSurfaceValue)
+          {
+          continue;
+          }
+        grid->GetCellPoints (cellId, ptIds);
+        bool isSet = false;
+        for (int i = 0; i < ptIds->GetNumberOfIds (); i ++)
+          {
+          grid->GetPointCells (ptIds->GetId (i), cellIds);
+          for (int j = 0; j < cellIds->GetNumberOfIds (); j ++)
+            {
+            vtkIdType neighbor = cellIds->GetId (j);
+            if (neighbor != cellId
+                && volArray->GetTuple1 (neighbor) > this->VolumeFractionSurfaceValue
+                && ghostLevels->GetTuple1 (neighbor) < 0.5)
+              {
+              regionIdArray->SetTuple1 (cellId, regionIdArray->GetTuple1 (neighbor));
+              isSet = true;
+              break;
+              }
+            }
+          if (isSet) 
+            {
+            break;
+            }
+          }
+        }
+      }
     delete this->Equivalence;
     this->Equivalence = 0;
     }
