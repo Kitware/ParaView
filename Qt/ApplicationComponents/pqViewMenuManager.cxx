@@ -85,7 +85,12 @@ void pqViewMenuManager::buildMenu()
 
   foreach (QToolBar* toolbar, all_toolbars)
     {
-    toolbars->addAction(toolbar->toggleViewAction());
+    // Toolbars with empty names are added to views and we don't want
+    // to show those in the menu.
+    if (toolbar->toggleViewAction()->text() != "")
+      {
+      toolbars->addAction(toolbar->toggleViewAction());
+      }
     }
   this->Menu->addSeparator();
 
