@@ -57,7 +57,8 @@ namespace
     "   screenshot_info={%3},\n"
     "   rescale_data_range=%4,\n"
     "   enable_live_viz=%5,\n"
-    "   filename='%6')\n";
+    "   live_viz_frequency=%6,\n"
+    "   filename='%7')\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -193,11 +194,14 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
                                 "True" : "False");
 
   command = cp_python_export_code;
+  // may be set by the user in the future
+  const int live_visualization_frequency = 1;
   command = command.arg(export_rendering)
                    .arg(sim_inputs_map)
                    .arg(rendering_info)
                    .arg(rescale_data_range)
                    .arg(live_visualization)
+                   .arg(live_visualization_frequency)
                    .arg(filename);
 
   return true;
