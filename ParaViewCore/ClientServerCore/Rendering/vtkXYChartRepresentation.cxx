@@ -124,8 +124,8 @@ public:
   bool PreviousUseIndexForXAxis;
   std::string PreviousXAxisSeriesName;
 
-  vtkInternals() 
-    : PreviousUseIndexForXAxis(false) 
+  vtkInternals()
+    : PreviousUseIndexForXAxis(false)
     {
     }
 
@@ -173,7 +173,7 @@ public:
       }
     this->Plots = newPlots;
     }
-  
+
   //---------------------------------------------------------------------------
   // This method will add vtkPlot instance (create new ones if neeed) for each
   // of the columns in each of the "tables" for which we have a visibility flag

@@ -81,6 +81,7 @@ public:
        type == "XYChartRepresentation" ||
        type == "XYBarChartRepresentation" ||
        type == "BarChartRepresentation" ||
+       type == "BoxRepresentation" ||
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy)||
        type == "ScatterPlotRepresentation" ||

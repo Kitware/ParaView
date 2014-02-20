@@ -22,7 +22,9 @@
 #include "vtkOutlineRepresentation.h"
 #include "vtkPVAlgorithmPortsInformation.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVBagChartView.h"
 #include "vtkPVBarChartView.h"
+#include "vtkPVBoxChartView.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVCacheKeeperPipeline.h"
 #include "vtkPVCacheSizeInformation.h"
@@ -43,6 +45,7 @@
 #include "vtkPVExtractSelection.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVFileInformationHelper.h"
+#include "vtkPVFunctionalBagChartView.h"
 #include "vtkPVGenericAttributeInformation.h"
 #include "vtkPVImplicitPlaneRepresentation.h"
 #include "vtkPVInformation.h"
@@ -130,7 +133,9 @@ int main(int, char**)
   PRINT_SELF(vtkOutlineRepresentation);
   PRINT_SELF(vtkPVAlgorithmPortsInformation);
   PRINT_SELF(vtkPVArrayInformation);
+  //PRINT_SELF(vtkPVBagChartView);
   //PRINT_SELF(vtkPVBarChartView);
+  //PRINT_SELF(vtkPVBoxChartView);
   PRINT_SELF(vtkPVCacheKeeper);
   PRINT_SELF(vtkPVCacheKeeperPipeline);
   PRINT_SELF(vtkPVCacheSizeInformation);
@@ -151,6 +156,7 @@ int main(int, char**)
   PRINT_SELF(vtkPVExtractSelection);
   PRINT_SELF(vtkPVFileInformation);
   PRINT_SELF(vtkPVFileInformationHelper);
+  //PRINT_SELF(vtkPVFunctionalBagChartView);
   PRINT_SELF(vtkPVGenericAttributeInformation);
   PRINT_SELF(vtkPVImplicitPlaneRepresentation);
   PRINT_SELF(vtkPVInformation);
