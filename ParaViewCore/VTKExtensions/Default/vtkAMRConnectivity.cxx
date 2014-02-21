@@ -196,7 +196,7 @@ public:
     for (iterator i = this->begin(); i != this->end(); i++) 
       {
       i->Request.Wait();
-      this->erase (i);
+      // this->erase (i);
       }
   }
   // Description:
@@ -982,6 +982,7 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     }
 
   sendList.WaitAll();
+  sendList.clear ();
 #endif /* PARAVIEW_USE_MPI */
   return 1;
 }
@@ -1068,6 +1069,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
     }
 
   sendList.WaitAll();
+  sendList.clear ();
 
   for (size_t i = 0; i < numProcs; i ++) 
     {
@@ -1132,6 +1134,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
     }
 
   sendList.WaitAll();
+  sendList.clear ();
 #endif /* PARAVIEW_USE_MPI */
   return 1;
 }
