@@ -358,18 +358,14 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
       }
     }
 
+  // Add hook for post_push and post_creation. This is processed before
+  // ReadXMLAttributes() is even called.
+  this->SetPostPush(element->GetAttribute("post_push"));
+  this->SetPostCreation(element->GetAttribute("post_creation"));
+
   // Allow subclasses to do some initialization if needed. Note this is called
   // before properties are created.
   this->OnCreateVTKObjects();
-
-  // Process the XML and update properties etc.
-  if (!this->ReadXMLAttributes(element))
-    {
-    this->DeleteVTKObjects();
-    return false;
-    }
-
-  this->ObjectsCreated = true;
 
   // Execute post-creation if any
   if(this->PostCreation != NULL)
@@ -381,6 +377,15 @@ bool vtkSIProxy::CreateVTKObjects(vtkSMMessage* message)
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
     }
+
+  // Process the XML and update properties etc.
+  if (!this->ReadXMLAttributes(element))
+    {
+    this->DeleteVTKObjects();
+    return false;
+    }
+
+  this->ObjectsCreated = true;
   return true;
 }
 
@@ -404,10 +409,6 @@ vtkObjectBase* vtkSIProxy::GetVTKObject()
 //----------------------------------------------------------------------------
 bool vtkSIProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
-  // Add hook for post_push and post_creation
-  this->SetPostPush(element->GetAttribute("post_push"));
-  this->SetPostCreation(element->GetAttribute("post_creation"));
-
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* propElement = element->GetNestedElement(i);

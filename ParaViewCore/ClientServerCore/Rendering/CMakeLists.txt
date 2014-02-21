@@ -50,11 +50,8 @@ set (Module_SRCS
   vtkMoleculeRepresentation.cxx
   vtkMPIMoveData.cxx
   vtkOutlineRepresentation.cxx
-  vtkPVBagChartView.cxx
   vtkPVBagChartRepresentation.cxx
-  vtkPVBarChartView.cxx
   vtkPVBoxChartRepresentation.cxx
-  vtkPVBoxChartView.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
   vtkPVCacheSizeInformation.cxx
@@ -65,15 +62,12 @@ set (Module_SRCS
   vtkPVDataRepresentation.cxx
   vtkPVDataRepresentationPipeline.cxx
   vtkPVDisplayInformation.cxx
-  vtkPVFunctionalBagChartView.cxx
   vtkPVHardwareSelector.cxx
   vtkPVImageSliceMapper.cxx
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
-  vtkPVLineChartView.cxx
   vtkPVMultiSliceView.cxx
   vtkPVOpenGLExtensionsInformation.cxx
-  vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlotMatrixView.cxx

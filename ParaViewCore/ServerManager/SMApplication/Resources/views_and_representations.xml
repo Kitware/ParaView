@@ -1011,47 +1011,52 @@
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="XYChartViewBase"
-                      class="vtkPVLineChartView"
+                      class="vtkPVXYChartView"
                       name="XYChartView"
                       processes="client|renderserver|dataserver"
-                      representation_name="XYChartRepresentation">
+                      representation_name="XYChartRepresentation"
+                      post_creation="SetChartTypeToLine" >
       <Documentation>This is the proxy for the XY line chart
       view.</Documentation>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="XYChartViewBase"
-                      class="vtkPVBarChartView"
+                      class="vtkPVXYChartView"
                       name="XYBarChartView"
                       processes="client|renderserver|dataserver"
-                      representation_name="XYBarChartRepresentation">
+                      representation_name="XYBarChartRepresentation"
+                      post_creation="SetChartTypeToBar" >
       <Documentation>This is the proxy for bar chart view.</Documentation>
     </ContextViewProxy>
   <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="XYChartViewBase"
-                      class="vtkPVBagChartView"
+                      class="vtkPVXYChartView"
                       name="XYBagChartView"
                       processes="client|renderserver|dataserver"
-                      representation_name="XYBagChartRepresentation">
+                      representation_name="XYBagChartRepresentation"
+                      post_creation="SetChartTypeToBag" >
       <Documentation>This is the proxy for bag chart view.</Documentation>
     </ContextViewProxy>
   <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="XYChartViewBase"
-                      class="vtkPVFunctionalBagChartView"
+                      class="vtkPVXYChartView"
                       name="XYFunctionalBagChartView"
                       processes="client|renderserver|dataserver"
-                      representation_name="XYFunctionalBagChartRepresentation">
+                      representation_name="XYFunctionalBagChartRepresentation"
+                      post_creation="SetChartTypeToFunctionalBag" >
       <Documentation>This is the proxy for functional bag chart view.</Documentation>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="ViewBase"
-                      class="vtkPVBoxChartView"
+                      class="vtkPVXYChartView"
                       name="BoxChartView"
                       processes="client|renderserver|dataserver"
-                      representation_name="BoxChartRepresentation">
+                      representation_name="BoxChartRepresentation"
+                      post_creation="SetChartTypeToBox" >
       <Documentation>This is the proxy for box chart view.</Documentation>
       <StringVectorProperty command="SetTitle"
                             name="ChartTitle"
@@ -1108,10 +1113,11 @@
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="ViewBase"
-                      class="vtkPVParallelCoordinatesChartView"
+                      class="vtkPVXYChartView"
                       name="ParallelCoordinatesChartView"
                       processes="client|renderserver|dataserver"
-                      representation_name="ParallelCoordinatesRepresentation">
+                      representation_name="ParallelCoordinatesRepresentation"
+                      post_creation="SetChartTypeToParallelCoordinates" >
       <Documentation>This is the proxy for parallel coordinates chart
       view.</Documentation>
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
