@@ -85,6 +85,8 @@ set(Module_SRCS
   pqFlatTreeView.h
   pqHelpWindow.cxx
   pqHelpWindow.h
+  pqHighlightItemDelegate.cxx
+  pqHighlightItemDelegate.h
   pqLineEdit.cxx
   pqLineEdit.h
   pqListWidgetCheckHelper.cxx
@@ -160,6 +162,7 @@ set (QtWidgets_SRCS
   pqExpandableTableView.h
   pqExpanderButton.h
   pqFlatTreeView.h
+  pqHighlightItemDelegate.h
   pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
