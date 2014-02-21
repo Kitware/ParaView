@@ -99,6 +99,12 @@ class AnalysisManager():
                 current_timer['total_time'] += delta
                 current_timer['work_count'] += 1
 
+    def get_time(self, key):
+        """
+        Return the number of second for a given task
+        """
+        return self.timers[key]['total_time']
+
     def begin(self):
         """
         Start the analysis time recording.
@@ -121,6 +127,12 @@ class AnalysisManager():
         self.analysis['timers'] = {}
         for key in self.timers:
             self.analysis['timers'][key] = {'total_time': self.timers[key]['total_time'], 'work_count': self.timers[key]['work_count'] }
+
+        # Update costs
+        for key in self.file_name_generators:
+            for analysis in self.analysis['analysis']:
+                if analysis['id'] == key:
+                    analysis['cost'] = self.file_name_generators[key].get_cost()
 
         # Write to disk
         metadata_file_path = os.path.join(self.work_dir, "info.json")
@@ -151,6 +163,7 @@ class FileNameGenerator():
         self.arguments = {}
         self.active_arguments = {}
         self.metadata = {}
+        self.cost = { "time": 0, "space": 0, "image": 0}
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 
@@ -219,6 +232,22 @@ class FileNameGenerator():
             os.makedirs(os.path.dirname(fullpath))
         return os.path.dirname(fullpath)
 
+    def _is_image(self, name):
+        return name.split('.')[-1].lower() in ['jpg', 'png', 'gif', 'jpeg', 'tiff']
+
+    def add_file_cost(self):
+        filePath = self.get_fullpath()
+        if os.path.exists(filePath):
+            if self._is_image(filePath):
+                self.cost['image'] = self.cost['image'] + 1
+            self.cost['space'] += os.stat(filePath).st_size
+
+    def add_time_cost(self, ts):
+        self.cost['time'] += ts
+
+    def get_cost(self):
+        return self.cost
+
     def write_metadata(self):
         """
         Write the info.json file in the working directory which contains
@@ -228,7 +257,8 @@ class FileNameGenerator():
             "working_dir": self.working_dir,
             "name_pattern": self.name_format,
             "arguments": self.arguments,
-            "metadata" : self.metadata
+            "metadata" : self.metadata,
+            "cost": self.cost
         }
         metadata_file_path = os.path.join(self.working_dir, "info.json")
         with open(metadata_file_path, "w") as metadata_file:
@@ -330,6 +360,7 @@ class SliceExplorer():
                 self.file_name_generator.update_active_arguments(slicePosition=step)
                 simple.Render()
                 simple.WriteImage(self.file_name_generator.get_fullpath())
+                self.file_name_generator.add_file_cost()
 
         # Generate metadata
         self.file_name_generator.update_label_arguments(sliceColor="Color by:")
@@ -338,6 +369,7 @@ class SliceExplorer():
 
         if self.analysis:
             self.analysis.end_work('SliceExplorer')
+            self.file_name_generator.add_time_cost(self.analysis.get_time('SliceExplorer'))
 
 #==============================================================================
 
@@ -479,6 +511,7 @@ class ImageResampler():
                 writer.Slice = slice
                 writer.ArrayName = field
                 writer.UpdatePipeline(time)
+                self.file_name_generator.add_file_cost()
 
         # Write image stack
         self.file_name_generator.update_active_arguments(format='jpg')
@@ -490,12 +523,16 @@ class ImageResampler():
             self.color.UpdatePipeline(time)
             writer = simple.JPEGWriter(Input=self.color, FileName=self.file_name_generator.get_fullpath())
             writer.UpdatePipeline(time)
+            for slice in range(self.number_of_slices):
+                self.file_name_generator.update_active_arguments(slice=slice)
+                self.file_name_generator.add_file_cost()
 
         # Generate metadata
         self.file_name_generator.write_metadata()
 
         if self.analysis:
             self.analysis.end_work('ImageResampler')
+            self.file_name_generator.add_time_cost(self.analysis.get_time('ImageResampler'))
 
 #==============================================================================
 # Chart generator
@@ -561,6 +598,7 @@ class LineProber():
             # Write CSV file
             writer = simple.DataSetCSVWriter(FileName=self.file_name_generator.get_fullpath(), Input=self.probe)
             writer.UpdatePipeline(time)
+            self.file_name_generator.add_file_cost()
 
         # Get fields info
         pdInfo = self.probe.GetPointDataInformation()
@@ -572,6 +610,7 @@ class LineProber():
 
         if self.analysis:
             self.analysis.end_work('LineProber')
+            self.file_name_generator.add_time_cost(self.analysis.get_time('LineProber'))
 
 #==============================================================================
 
@@ -673,12 +712,14 @@ class DataProber():
                     for value in saved_data[serie['name']][field]:
                         data_file.write("%f,%f\n" % (idx, value))
                         idx += 1
+                    self.file_name_generator.add_file_cost()
 
         # Generate metadata
         self.file_name_generator.write_metadata()
 
         if self.analysis:
             self.analysis.end_work('DataProber')
+            self.file_name_generator.add_time_cost(self.analysis.get_time('DataProber'))
 
 #==============================================================================
 
@@ -742,6 +783,7 @@ class TimeSerieDataProber():
                 for line in arrays:
                     data_file.write(",".join(line))
                     data_file.write("\n")
+                self.file_name_generator.add_file_cost()
 
     def UpdatePipeline(self, time=0):
         """
@@ -773,6 +815,7 @@ class TimeSerieDataProber():
 
         if self.analysis:
             self.analysis.end_work('TimeSerieDataProber')
+            self.file_name_generator.add_time_cost(self.analysis.get_time('TimeSerieDataProber'))
 
 #==============================================================================
 # Image composite
@@ -862,15 +905,22 @@ class CompositeImageExporter():
             simple.Render(self.view)
             vtk_files_to_process.append(self.file_name_generator.get_fullpath())
 
+
         # Generate JPG files and composite data
         self.assembly.FileNames = vtk_files_to_process
         self.assembly.Write()
+
+        # Compute file size
+        for layer_idx in range(number_of_layers):
+            self.file_name_generator.update_active_arguments(layer=layer_idx)
+            self.file_name_generator.add_file_cost()
 
         # Generate metadata
         # => Well the assembly is generating that JSON file
 
         if self.analysis:
             self.analysis.end_work('CompositeImageExporter')
+            self.file_name_generator.add_time_cost(self.analysis.get_time('CompositeImageExporter'))
 
 #==============================================================================
 # Image exporter
@@ -962,12 +1012,14 @@ class ThreeSixtyImageStackExporter():
                 # Update file name pattern
                 self.file_name_generator.update_active_arguments(phi=phi, theta=(90+theta))
                 simple.WriteImage(self.file_name_generator.get_fullpath())
+                self.file_name_generator.add_file_cost()
 
         # Generate metadata
         self.file_name_generator.write_metadata()
 
         if self.analysis:
             self.analysis.end_work('ThreeSixtyImageStackExporter')
+            self.file_name_generator.add_time_cost(self.analysis.get_time('ThreeSixtyImageStackExporter'))
 
 # -----------------------------------------------------------------------------
 
