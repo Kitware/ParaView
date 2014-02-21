@@ -361,7 +361,7 @@ mark_as_advanced(Module_vtkParaViewWebDocumentation)
 
 option(PARAVIEW_ENABLE_CATALYST "Enable Catalyst CoProcessing modules" ON)
 cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
-  "Build Adaptors for various simulation codes" ON
+  "Build Adaptors for various simulation codes" OFF
   "PARAVIEW_ENABLE_CATALYST" OFF)
 mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
 
