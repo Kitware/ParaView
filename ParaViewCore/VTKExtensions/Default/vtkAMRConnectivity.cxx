@@ -540,7 +540,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 #ifdef PARAVIEW_USE_MPI
       if (numProcs > 1)
         {
-        controller->AllReduce (&numProcs, &numProcs, 1, vtkCommunicator::MAX_OP);
+        controller->AllReduce (&sets_changed, &sets_changed, 1, vtkCommunicator::MAX_OP);
         }
 #endif
       if (sets_changed == 0)
