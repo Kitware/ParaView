@@ -12,24 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBagChartSeriesListDomain - list of strings corresponding to the names
-// of the arrays in the required input dataset that can be used as a series in a
-// chart.
+// .NAME vtkSMBagChartSeriesListDomain - extends vtkSMChartSeriesListDomain to
+// setup defaults specific for bag plot representations.
 // .SECTION Description
-// vtkSMBagChartSeriesListDomain is designed to be used for the X-axis array name
-// property on chart representations. This is similar to vtkSMArrayListDomain,
-// however, it simplifies the logic that is uses to determine the available
-// arrays and at the same time, uses custom logic to pick the default array for
-// based on priorities for arrays.
-//
-// Supported Required-Property functions:
-// \li \c Input : (required) refers to a property that provides the data-producer.
-// \li \c FieldDataSelection : (required) refers to a field-selection property
-// used to select the data-association i.e. cell-data, point-data etc.
-//
-// Supported XML attributes
-// \li hide_partial_arrays : when set to 1, partial arrays will not be shown in
-// the domain (default).
+// vtkSMBagChartSeriesListDomain extends vtkSMChartSeriesListDomain to
+// setup defaults specific for bag plot representations.
 #ifndef __vtkSMBagChartSeriesListDomain_h
 #define __vtkSMBagChartSeriesListDomain_h
 

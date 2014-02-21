@@ -32,7 +32,6 @@ set (Module_SRCS
   vtkPVComparativeAnimationCue.cxx
   vtkPVComparativeView.cxx
   vtkSMBagChartSeriesListDomain.cxx
-  vtkSMBoxChartRepresentationProxy.cxx
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
@@ -47,7 +46,6 @@ set (Module_SRCS
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
-  vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMPlotMatrixViewProxy.cxx
   vtkSMPVRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx

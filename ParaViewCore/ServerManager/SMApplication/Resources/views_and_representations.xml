@@ -3990,7 +3990,7 @@
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
-    <ParallelCoordinatesRepresentationProxy class="vtkPVParallelCoordinatesRepresentation"
+    <ChartRepresentationProxy class="vtkPVParallelCoordinatesRepresentation"
                                             name="ParallelCoordinatesRepresentation"
                                             processes="client|dataserver|renderserver">
       <Documentation>Representation used by
@@ -4156,10 +4156,10 @@
                          name="SelectionInput"/>
         </RepresentationProxy>
       </SubProxy>
-    </ParallelCoordinatesRepresentationProxy>
+    </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
-    <BoxChartRepresentationProxy class="vtkPVBoxChartRepresentation"
+    <ChartRepresentationProxy class="vtkPVBoxChartRepresentation"
                                  name="BoxChartRepresentation"
                                  processes="client|dataserver|renderserver">
       <Documentation>Representation used by BoxChartView.</Documentation>
@@ -4343,7 +4343,7 @@
                          name="SelectionInput"/>
         </RepresentationProxy>
       </SubProxy>
-    </BoxChartRepresentationProxy>
+    </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
     <ChartRepresentationProxy base_proxygroup="representations"
