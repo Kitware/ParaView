@@ -241,7 +241,7 @@ if (PARAVIEW_BUILD_QT_GUI)
   endif()
 endif()
 
-if(PYTHON_EXECUTABLE AND PARAVIEW_USE_MPI)
+if(PYTHON_EXECUTABLE AND PARAVIEW_USE_MPI AND BUILD_SHARED_LIBS AND UNIX AND NOT APPLE)
   # if we are building with MPI and Python enabled then we should
   # also be building mpi4py and can import that for this test
   add_test(ParallelPythonImport
