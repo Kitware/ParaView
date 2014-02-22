@@ -40,6 +40,7 @@
 #include "vtkPVDataInformationHelper.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVInformationKeys.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSelection.h"
 #include "vtkStructuredGrid.h"
@@ -395,8 +396,8 @@ void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data, vtkInformatio
     }
 
   this->SetTimeLabel(
-        (pinfo && pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION()))
-        ? pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION())
+        (pinfo && pinfo->Has(vtkPVInformationKeys::TIME_LABEL_ANNOTATION()))
+        ? pinfo->Get(vtkPVInformationKeys::TIME_LABEL_ANNOTATION())
         : NULL);
 
   vtkInformation *dinfo = data->GetInformation();

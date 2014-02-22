@@ -232,8 +232,6 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     return 0;
     }
 
-  vtkInformation *info=outputVector->GetInformationObject(0);
-  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
 
   struct stat fs;
   if(stat(this->FileName,&fs)!=0)
@@ -252,17 +250,20 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
   vtkInformation* outInfo0 = outputVector->GetInformationObject(0);
   outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+  outInfo0->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
   vtkInformation* outInfo1 = outputVector->GetInformationObject(1);
   outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+  outInfo1->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 #ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
-    vtkInformation* outInfo2 = 0;
-    if ( this->GenerateMarkers )
+  vtkInformation* outInfo2 = 0;
+  if ( this->GenerateMarkers )
     {
     outInfo2 = outputVector->GetInformationObject(2);
     outInfo2->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     outInfo2->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    outInfo2->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
     }
 #endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
   if (this->TimeSteps->size() > 0)

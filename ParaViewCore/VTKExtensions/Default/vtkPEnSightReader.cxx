@@ -502,8 +502,10 @@ int vtkPEnSightReader::RequestInformation(
                    timeRange, 2);
       }
     }
+
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set( vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1 );
+  outInfo->Set( CAN_HANDLE_PIECE_REQUEST(), 1 );
+
   return this->CaseFileRead;
 }
 

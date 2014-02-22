@@ -128,8 +128,8 @@ void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
     vtkAlgorithm* inputAlgo = connection->GetProducer();
     vtkStreamingDemandDrivenPipeline* sddp =
       vtkStreamingDemandDrivenPipeline::SafeDownCast(inputAlgo->GetExecutive());
-    vtkExtentTranslator* translator =
-      sddp->GetExtentTranslator(connection->GetIndex());
+//    vtkExtentTranslator* translator =
+//      sddp->GetExtentTranslator(connection->GetIndex());
 
     int extent[6] = {1, -1, 1, -1, 1, -1};
     sddp->GetWholeExtent(sddp->GetOutputInformation(connection->GetIndex()),
@@ -140,8 +140,8 @@ void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
       inputAlgo->GetOutputDataObject(connection->GetIndex()));
     image->GetOrigin(origin);
     image->GetSpacing(spacing);
-    vtkPVRenderView::SetOrderedCompositingInformation(
-      inInfo, self, translator, extent, origin, spacing);
+//    vtkPVRenderView::SetOrderedCompositingInformation(
+//      inInfo, self, translator, extent, origin, spacing);
     }
 }
 

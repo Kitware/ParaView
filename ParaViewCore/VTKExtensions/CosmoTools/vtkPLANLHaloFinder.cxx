@@ -270,43 +270,6 @@ vtkMultiProcessController* vtkPLANLHaloFinder::GetController()
 }
 
 //------------------------------------------------------------------------------
-int vtkPLANLHaloFinder::RequestInformation
-(vtkInformation* vtkNotUsed(request),
- vtkInformationVector** inputVector,
- vtkInformationVector* outputVector)
-{
-  assert("pre: controller should not be NULL!" && (this->Controller != NULL));
-
-  // set the other outputs to have the same number of pieces
-  if((*inputVector)->GetInformationObject(0)->Has(
-        vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()))
-    {
-    if(outputVector->GetInformationObject(1)->Has(
-          vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()))
-      {
-      if(outputVector->GetInformationObject(0)->Get
-         (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()) !=
-         outputVector->GetInformationObject(1)->Get
-         (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()))
-        {
-        outputVector->GetInformationObject(1)->Set
-          (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-           outputVector->GetInformationObject(0)->Get
-           (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()));
-        }
-      }
-    else
-      {
-      outputVector->GetInformationObject(1)->Set
-        (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-         outputVector->GetInformationObject(0)->Get
-         (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()));
-      }
-    }
-  return 1;
-}
-
-//------------------------------------------------------------------------------
 int vtkPLANLHaloFinder::RequestData(
           vtkInformation* vtkNotUsed(request),
           vtkInformationVector** inputVector,

@@ -67,15 +67,6 @@ int vtkCellPointsFilter::FillInputPortInformation(int port,
 }
 
 //---------------------------------------------------------------------------
-int vtkCellPointsFilter::RequestInformation(vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector* outputVector)
-{
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
-  return 1;
-}
-//---------------------------------------------------------------------------
 void vtkCellPointsFilter::ExecuteSimple(vtkDataSet *input, vtkPolyData *output)
 {
   vtkPoints *pts = NULL;

@@ -23,6 +23,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVInformationKeys.h"
 
 #include "vtkSQLog.h"
 #include "vtkSQOOCReader.h"
@@ -564,6 +565,8 @@ int vtkSQBOVMetaReader::RequestInformation(
   //     vtkExecutive::KEYS_TO_COPY(),
   //     vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
 
+  info->Set(CAN_PRODUCE_SUB_EXTENT(), 1);
+
   if (this->Reader->DataSetTypeIsImage())
     {
     // Adjust PV's keys for the false subsetting extents.
@@ -732,10 +735,10 @@ int vtkSQBOVMetaReader::RequestData(
     subsetBounds[3]=X0[1]+dX[1];
     subsetBounds[4]=X0[2];
     subsetBounds[5]=X0[2]+dX[2];
-    info->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),subsetBounds,6);
+    info->Set(vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),subsetBounds,6);
     req->Append(
         vtkExecutive::KEYS_TO_COPY(),
-        vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX());
+        vtkPVInformationKeys::WHOLE_BOUNDING_BOX());
 
     // Setup the user defined domain decomposition over the subset. This
     // decomposition is used to fine tune the I/O performance of out-of-core
@@ -774,10 +777,10 @@ int vtkSQBOVMetaReader::RequestData(
       md->GetCoordinate(1)->GetPointer()[subset[3]+1],
       md->GetCoordinate(2)->GetPointer()[subset[4]],
       md->GetCoordinate(2)->GetPointer()[subset[5]+1]};
-    info->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),subsetBounds,6);
+    info->Set(vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),subsetBounds,6);
     req->Append(
         vtkExecutive::KEYS_TO_COPY(),
-        vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX());
+        vtkPVInformationKeys::WHOLE_BOUNDING_BOX());
 
     // Store the bounds of the requested subset.
     int nCells[3];

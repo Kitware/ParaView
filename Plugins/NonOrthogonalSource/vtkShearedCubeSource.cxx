@@ -29,6 +29,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkPVInformationKeys.h"
 
 #include <vtkNew.h>
 
@@ -352,7 +353,7 @@ int vtkShearedCubeSource::RequestInformation(
   if(this->EnableTimeLabel != 0 && this->TimeLabel)
     {
     // Get information object to fill
-    infoOutput->Set(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION(), this->TimeLabel);
+    infoOutput->Set(vtkPVInformationKeys::TIME_LABEL_ANNOTATION(), this->TimeLabel);
 
     // Also pretend that we have some time dependant data
     double timeRange[2] = {0,1};
@@ -362,7 +363,7 @@ int vtkShearedCubeSource::RequestInformation(
     }
   else
     {
-    infoOutput->Remove(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION());
+    infoOutput->Remove(vtkPVInformationKeys::TIME_LABEL_ANNOTATION());
     infoOutput->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     infoOutput->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
     }

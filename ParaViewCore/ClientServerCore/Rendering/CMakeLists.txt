@@ -89,6 +89,7 @@ set (Module_SRCS
   vtkSpreadSheetRepresentation.cxx
   vtkSpreadSheetView.cxx
   vtkStructuredGridVolumeRepresentation.cxx
+  vtkTableExtentTranslator.cxx
   vtkTextSourceRepresentation.cxx
   vtkThreeSliceFilter.cxx
   vtkUnstructuredGridVolumeRepresentation.cxx

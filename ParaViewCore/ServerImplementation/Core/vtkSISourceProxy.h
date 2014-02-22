@@ -54,11 +54,6 @@ public:
   virtual void SetupSelectionProxy(int port, vtkSIProxy* extractSelection);
 
   // Description:
-  // Disables the creation of an extents translator.
-  static void SetDisableExtentsTranslator(bool value);
-  static bool GetDisableExtentsTranslator();
-
-  // Description:
   // Allow to shut down pipeline execution. This is particulary useful for
   // a Catalyst session that does not contains any real data.
   virtual void SetDisablePipelineExecution(bool value)
@@ -90,17 +85,6 @@ protected:
   virtual bool InitializeOutputPort(vtkAlgorithm* alo, int port);
 
   // Description:
-  // Create the extent translator (sources with no inputs only).
-  // Needs to be before "ExtractPieces" because translator propagates.
-  // Returns true if the translator was created.
-  bool CreateTranslatorIfNecessary(vtkAlgorithm* algo, int port);
-
-  // Description:
-  // Insert a filter to extract (and redistribute) unstructured
-  // pieces if the source cannot generate pieces.
-  void InsertExtractPiecesIfNecessary(vtkAlgorithm* algo, int port);
-
-  // Description:
   // Insert a filter to create the Post Filter
   // so that filters can request data conversions
   void InsertPostFilterIfNecessary(vtkAlgorithm* algo, int port);
@@ -122,7 +106,6 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   bool PortsCreated;
-  static bool DisableExtentsTranslator;
   //ETX
 };
 

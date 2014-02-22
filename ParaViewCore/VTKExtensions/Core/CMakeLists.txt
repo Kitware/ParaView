@@ -34,10 +34,11 @@ set(Module_SRCS
   vtkDistributedTrivialProducer.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkPVCompositeDataPipeline.cxx
-  vtkPVExtentTranslator.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
-  vtkPVTrivialExtentTranslator.cxx
+  vtkPVInformationKeys.cxx
+  vtkPVPostFilter.cxx
+  vtkPVPostFilterExecutive.cxx
   vtkPVTrivialProducer.cxx
   vtkUndoElement.cxx
   vtkUndoSet.cxx
@@ -47,6 +48,7 @@ set(Module_SRCS
 set_source_files_properties(
   vtkCommunicationErrorCatcher
   vtkMultiProcessControllerHelper
+  vtkPVInformationKeys
   WRAP_EXCLUDE
   )
 

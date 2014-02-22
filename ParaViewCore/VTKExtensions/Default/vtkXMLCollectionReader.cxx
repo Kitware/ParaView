@@ -441,6 +441,12 @@ int vtkXMLCollectionReader::RequestInformation(
   vtkInformationVector *outputVector)
 {
   vtkInformation* info = outputVector->GetInformationObject(0);
+  vtkInformation* dataInfo = info->Get(
+    vtkDataObject::DATA_OBJECT())->GetInformation();
+  if(dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == VTK_3D_EXTENT)
+    {
+    info->Set(CAN_PRODUCE_SUB_EXTENT(), 1);
+    }
 
   size_t nBlocks = this->Internal->Readers.size();
   if (nBlocks == 1 && !this->ForceOutputTypeToMultiBlock)
@@ -451,8 +457,9 @@ int vtkXMLCollectionReader::RequestInformation(
   else
     {
     info->Set(
-      vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+      CAN_HANDLE_PIECE_REQUEST(), 1);
     }
+
   this->Superclass::RequestInformation(request, inputVector, outputVector);
 
   return 1;

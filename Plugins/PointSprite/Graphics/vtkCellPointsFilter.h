@@ -69,9 +69,6 @@ class VTKPOINTSPRITEGRAPHICS_EXPORT vtkCellPointsFilter : public vtkPolyDataAlgo
     ~vtkCellPointsFilter();
     //
     virtual int FillInputPortInformation(int port, vtkInformation* info);
-    virtual int RequestInformation(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector);
     virtual int RequestCompositeData(vtkInformation* request,
                                      vtkInformationVector** inputVector,
                                      vtkInformationVector* outputVector);

@@ -19,6 +19,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVInformationKeys.h"
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
@@ -69,10 +70,10 @@ bool vtkSITimeLabelProperty::Pull(vtkSMMessage* msgToFill)
   var->set_type(Variant::STRING);
 
   // Else find out
-  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION()))
+  if (outInfo->Has(vtkPVInformationKeys::TIME_LABEL_ANNOTATION()))
     {
     const char* label =
-        outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION());
+        outInfo->Get(vtkPVInformationKeys::TIME_LABEL_ANNOTATION());
     var->add_txt(label);
     return true;
     }

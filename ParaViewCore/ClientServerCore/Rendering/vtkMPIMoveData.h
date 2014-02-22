@@ -127,9 +127,6 @@ protected:
   virtual int RequestDataObject(vtkInformation* request, 
                            vtkInformationVector** inputVector, 
                            vtkInformationVector* outputVector);
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);

@@ -193,14 +193,9 @@ int vtkPVMultiServerDataSource::RequestDataObject(
 
 //---------------------------------------------------------------------------
 int vtkPVMultiServerDataSource::RequestInformation(
-    vtkInformation *, vtkInformationVector **, vtkInformationVector *outputVector)
+    vtkInformation *, vtkInformationVector **, vtkInformationVector *)
 {
-  // Provide the time informations if any
-  vtkInformation *info = outputVector->GetInformationObject(0);
-
-  // Deal with Number of pieces
-  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), 1);
-
+  //We don't want this to operate in parallel so we do not set CAN_HANDLE_PIECE_REQUEST
   return 1;
 }
 

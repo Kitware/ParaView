@@ -4,6 +4,7 @@ vtk_module(vtkSciberQuest
     vtkIOLegacy
     vtkPVCommon
     vtkParallelCore
+    vtkPVVTKExtensionsCore
     vtksys
   COMPILE_DEPENDS
     vtkFiltersFlowPaths

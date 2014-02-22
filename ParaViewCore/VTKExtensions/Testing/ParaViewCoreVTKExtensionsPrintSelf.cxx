@@ -104,7 +104,7 @@
 #include "vtkPVEnSightMasterServerReader.h"
 #include "vtkPVEnSightMasterServerReader2.h"
 #include "vtkPVEnSightMasterServerTranslator.h"
-#include "vtkPVExtentTranslator.h"
+#include "vtkPVExponentialKeyFrame.h"
 #include "vtkPVExtractVOI.h"
 #include "vtkPVFrustumActor.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -134,7 +134,6 @@
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVTransform.h"
-#include "vtkPVTrivialExtentTranslator.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkQuerySelectionSource.h"
@@ -290,7 +289,7 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVEnSightMasterServerReader);
   PRINT_SELF(vtkPVEnSightMasterServerReader2);
   PRINT_SELF(vtkPVEnSightMasterServerTranslator);
-  PRINT_SELF(vtkPVExtentTranslator);
+  PRINT_SELF(vtkPVExponentialKeyFrame);
   PRINT_SELF(vtkPVExtractVOI);
   PRINT_SELF(vtkPVFrustumActor);
   PRINT_SELF(vtkPVGenericRenderWindowInteractor);
@@ -320,7 +319,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVTrackballRotate);
   PRINT_SELF(vtkPVTrackballZoom);
   PRINT_SELF(vtkPVTransform);
-  PRINT_SELF(vtkPVTrivialExtentTranslator);
   PRINT_SELF(vtkPVTrivialProducer);
   PRINT_SELF(vtkPVUpdateSuppressor);
   PRINT_SELF(vtkQuerySelectionSource);

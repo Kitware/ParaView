@@ -556,7 +556,7 @@ int vtkSQBOVWriter::RequestUpdateExtent(
   inInfo->Get(
         vtkSDDPipeline::WHOLE_EXTENT(),
         wholeExt.GetData());
-
+/*
   vtkExtentTranslator *translator
     = dynamic_cast<vtkExtentTranslator*>(inInfo->Get(vtkSDDPipeline::EXTENT_TRANSLATOR()));
 
@@ -580,7 +580,7 @@ int vtkSQBOVWriter::RequestUpdateExtent(
     << "UPDATE_TIME_STEPS=" << time << std::endl;
   pCerr() << oss.str() << std::endl;
   #endif
-
+*/
   return 1;
 }
 

@@ -541,7 +541,8 @@ int vtkHierarchicalFractal::RequestInformation(
     }
 
   vtkInformation *info=outputVector->GetInformationObject(0);
-  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
+  info->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
+
   return 1;
 }
 

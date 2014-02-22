@@ -162,9 +162,6 @@ protected:
   virtual int RequestDataObject(vtkInformation*,
                                 vtkInformationVector**,
                                 vtkInformationVector*);
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
   virtual int RequestAMRData(vtkInformation*  request,
                              vtkInformationVector** inputVector,
                              vtkInformationVector* outputVector );

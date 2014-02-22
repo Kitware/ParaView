@@ -160,7 +160,7 @@ int vtkSQVolumeSource::RequestInformation(
 
   // tell the excutive that we are handling our own paralelization.
   vtkInformation *outInfo=outInfos->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
   // TODO extract bounds and set if the input data set is present.
 

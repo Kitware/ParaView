@@ -34,6 +34,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkPolyData.h"
 #include "vtkType.h"
 #include "Tuple.hxx"
+#include "vtkPVInformationKeys.h"
 
 // #define SQTK_DEBUG
 
@@ -259,10 +260,9 @@ int vtkSQSeedPointLatice::RequestInformation(
     std::cerr << "=====vtkSQSeedPointLatice::RequestInformation" << std::endl;
   #endif
 
-
   // tell the excutive that we are handling our own paralelization.
   vtkInformation *outInfo=outInfos->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
   // TODO extract bounds and set if the input data set is present.
 
@@ -322,13 +322,13 @@ int vtkSQSeedPointLatice::RequestData(
       = dynamic_cast<vtkDataSet*>(inInfo->Get(vtkDataObject::DATA_OBJECT()));
     if (input)
       {
-      if (!inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()))
+      if (!inInfo->Has(vtkPVInformationKeys::WHOLE_BOUNDING_BOX()))
         {
         vtkErrorMacro("Input must have WHOLE_BOUNDING_BOX set.");
         return 1;
         }
       double bounds[6];
-      inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),bounds);
+      inInfo->Get(vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),bounds);
 
       double dX[3];
       dX[0]=(this->Bounds[1]-this->Bounds[0])/((double)this->NX[0]);

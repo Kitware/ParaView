@@ -972,15 +972,6 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
         vtkSDDPipeline::UPDATE_EXTENT(),
         outputExt.GetData(),
         6);
-
-  int piece
-    = outInfo->Get(vtkSDDPipeline::UPDATE_PIECE_NUMBER());
-
-  int numPieces
-    = outInfo->Get(vtkSDDPipeline::UPDATE_NUMBER_OF_PIECES());
-
-  inInfo->Set(vtkSDDPipeline::UPDATE_PIECE_NUMBER(), piece);
-  inInfo->Set(vtkSDDPipeline::UPDATE_NUMBER_OF_PIECES(), numPieces);
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
   #ifdef SQTK_DEBUG
@@ -1013,10 +1004,10 @@ int vtkSQKernelConvolution::RequestData(
     }
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
-  vtkDataObject *inData=inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataSet *inData=vtkDataSet::GetData(inInfo);
 
   vtkInformation *outInfo=outInfoVec->GetInformationObject(0);
-  vtkDataObject *outData=outInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataSet *outData=vtkDataSet::GetData(outInfo);
 
   // Guard against empty input.
   if (!inData || !outData)
@@ -1038,41 +1029,40 @@ int vtkSQKernelConvolution::RequestData(
 
   // Get the input and output extents.
   CartesianExtent inputExt;
-  inInfo->Get(
-        vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
-        inputExt.GetData());
+  inData->GetInformation()->Get(vtkDataObject::DATA_EXTENT(),
+                                inputExt.GetData());
 
   CartesianExtent inputDom;
-  inInfo->Get(
-        vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
-        inputDom.GetData());
-
-  CartesianExtent outputExt;
-  outInfo->Get(
-        vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
-        outputExt.GetData());
-
-  CartesianExtent domainExt;
-  outInfo->Get(
-        vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
-        domainExt.GetData());
+  inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
+              inputDom.GetData());
 
   // Check that we have the ghost cells that we need (more is OK).
   int nGhost = this->KernelWidth/2;
 
-  CartesianExtent inputBox(inputExt);
-  CartesianExtent outputBox
-    = CartesianExtent::Grow(outputExt, nGhost, this->Mode);
+  CartesianExtent outputExt = CartesianExtent::Grow(
+          inputExt,
+          -nGhost,
+          this->Mode);
 
-  if (!inputBox.Contains(outputBox))
+  if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)
     {
-    vtkErrorMacro(
-      << "This filter requires ghost cells to function correctly. "
-      << "The input must conatin the output plus " << nGhost
-      << " layers of ghosts. The input is " << inputBox
-      << ", but it must be at least "
-      << outputBox << ".");
-    return 1;
+    vtkDataArray* gl = inData->GetCellData()->GetArray("vtkGhostLevels");
+    if (gl)
+      {
+      double range[2];
+      gl->GetRange(range);
+      if (range[1] < nGhost)
+        {
+        vtkErrorMacro("Did not receive " << nGhost << " ghost levels as requested."
+          " Received " << range[1] << " instead. Cannot execute.")
+        return 0;
+        }
+      }
+    else
+      {
+      vtkErrorMacro("Did not receive ghost levels. Cannot execute.");
+      return 0;
+      }
     }
 
   // generate the requested kernel, if needed.

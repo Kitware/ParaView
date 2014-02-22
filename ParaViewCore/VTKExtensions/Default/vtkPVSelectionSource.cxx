@@ -384,6 +384,17 @@ void vtkPVSelectionSource::RemoveAllLocations()
 }
 
 //----------------------------------------------------------------------------
+int vtkPVSelectionSource::RequestInformation(
+  vtkInformation*,
+  vtkInformationVector**,
+  vtkInformationVector* outputVector)
+{
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector),
   vtkInformationVector* outputVector)
