@@ -77,7 +77,8 @@ public:
   pqInternals(QWidget* self) :
     ObserverId(0),
     Popout(false),
-    PopoutFrame(self)
+    PopoutFrame(self),
+    SavedButtons(pqViewFrame::NoButton)
     {
     this->PopoutFrame.setWindowFlags(Qt::Window|
       Qt::CustomizeWindowHint|
@@ -99,21 +100,21 @@ public:
     pqViewFrame* frame = qobject_cast<pqViewFrame*>(wdg);
     if (frame)
       {
+      this->SavedButtons = frame->standardButtons();
       frame->setStandardButtons(pqViewFrame::Restore);
       }
     if (this->MaximizedWidget)
       {
       this->MaximizedWidget->setStandardButtons(
-        pqViewFrame::SplitVertical |
-        pqViewFrame::SplitHorizontal |
-        pqViewFrame::Maximize |
-        pqViewFrame::Close);
+        this->SavedButtons);
+      this->SavedButtons = pqViewFrame::NoButton;
       }
     this->MaximizedWidget = frame;
     }
 
 private:
   QPointer<pqViewFrame> MaximizedWidget;
+  pqViewFrame::StandardButtons SavedButtons;
 };
 
 //-----------------------------------------------------------------------------
