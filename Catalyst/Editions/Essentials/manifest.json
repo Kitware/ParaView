@@ -99,6 +99,12 @@
         "PassArrays"
       ]
     },
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/sources.xml",
+      "proxies":[
+        "TrivialProducer",
+        "PVTrivialProducer"
+      ]
+    },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
       "proxies":[
         "MergePoints",

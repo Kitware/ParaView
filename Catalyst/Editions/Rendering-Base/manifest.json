@@ -98,7 +98,6 @@
         { "class": "vtkCameraInterpolator2" },
         { "class": "vtkCameraManipulator" },
         { "class": "vtkCameraManipulatorGUIHelper" },
-        { "class": "vtkChartNamedOptions" },
         { "class": "vtkCleanArrays" },
         { "class": "vtkCompositeDataToUnstructuredGridFilter" },
         { "class": "vtkCSVExporter" },
@@ -149,7 +148,6 @@
         { "class": "vtkUpdateSuppressorPipeline" },
         { "class": "vtkViewLayout" },
         { "class": "vtkWeightedRedistributePolyData" },
-        { "class": "vtkXYChartNamedOptions" },
         { "class": "vtkZlibImageCompressor" }
       ],
       "replace": [
@@ -532,7 +530,6 @@
         { "class": "vtkGeometryRepresentation" },
         { "class": "vtkGeometryRepresentationWithFaces" },
         { "class": "vtkGlyph3DRepresentation" },
-        { "class": "vtkMatplotlibUtilities" },
         { "class": "vtkOutlineRepresentation" },
         { "class": "vtkPVCacheKeeper" },
         { "class": "vtkPVCacheKeeperPipeline" },
@@ -555,8 +552,6 @@
         { "class": "vtkPVSynchronizedRenderer" },
         { "class": "vtkPVSynchronizedRenderWindows" },
         { "class": "vtkPVView" },
-        { "class": "vtkPythonRepresentation" },
-        { "class": "vtkPythonView" },
         { "class": "vtkSelectionDeliveryFilter" },
         { "class": "vtkSelectionRepresentation" }
       ],
