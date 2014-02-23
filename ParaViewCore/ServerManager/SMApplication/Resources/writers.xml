@@ -23,7 +23,7 @@
         written to the files.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetHeaderType"
-                         default_values="32"
+                         default_values="64"
                          name="HeaderType"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -76,6 +76,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="pvd"
                        file_description="ParaView Data Files" />
       </Hints>
@@ -94,7 +96,6 @@
         <ExposedProperties>
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
-            <Property name="HeaderType" />
             <Property name="EncodeAppendedData" />
             <Property name="CompressorType" />
           </PropertyGroup>
@@ -125,6 +126,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="vtp"
                        file_description="VTK PolyData Files" />
       </Hints>
@@ -153,10 +156,12 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="vto"
                        file_description="VTK Octree Files" />
       </Hints>
-      <!-- End of XMLUnstructuredGridWriter -->
+      <!-- End of XMLHyperOctreeWriter -->
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
@@ -180,6 +185,8 @@
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
                   show="0" />
         <WriterFactory extensions="vtu"
                        file_description="VTK UnstructuredGrid Files" />
@@ -209,6 +216,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="vts"
                        file_description="VTK StructuredGrid Files" />
       </Hints>
@@ -237,6 +246,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="vtr"
                        file_description="VTK RectilinearGrid Files" />
       </Hints>
@@ -264,6 +275,8 @@
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
                   show="0" />
         <WriterFactory extensions="vti"
                        file_description="VTK ImageData Files" />
@@ -307,6 +320,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="pvtp"
                        file_description="PVTK PolyData Files" />
       </Hints>
@@ -348,6 +363,8 @@
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
                   show="0" />
         <WriterFactory extensions="pvtu"
                        file_description="PVTK UnstructuredGrid Files" />
@@ -391,6 +408,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="pvts"
                        file_description="PVTK StructuredGrid Files" />
       </Hints>
@@ -432,6 +451,8 @@
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
                   show="0" />
         <WriterFactory extensions="pvtr"
                        file_description="PVTK RectilinearGrid Files" />
@@ -475,6 +496,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="HeaderType"
+                  show="0" />
         <WriterFactory extensions="pvti"
                        file_description="PVTK ImageData Files" />
       </Hints>
@@ -516,6 +539,8 @@
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
                   show="0" />
         <WriterFactory extensions="vtm"
                        file_description="VTK Multi Block Files" />
@@ -559,6 +584,7 @@
       <Hints>
         <Property name="Input" show="0" />
         <Property name="FileName" show="0" />
+        <Property name="HeaderType" show="0" />
         <WriterFactory extensions="vthb"
                        file_description="VTK AMR Files" />
       </Hints>

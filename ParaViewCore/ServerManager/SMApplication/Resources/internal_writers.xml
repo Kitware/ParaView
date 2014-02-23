@@ -153,7 +153,7 @@
         binary, appended binary.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetHeaderType"
-                         default_values="32"
+                         default_values="64"
                          name="HeaderType"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
