@@ -70,7 +70,8 @@ if (SQTK_CUDA AND CUDA_FOUND)
   vtk_target_export(CUDAConvolutionDriver)
   cuda_build_clean_target()
   install(TARGETS CUDAConvolutionDriver
-    DESTINATION lib/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR})
+    ARCHIVE DESTINATION ${VTK_INSTALL_ARCHIVE_DIR}
+    LIBRARY DESTINATION ${VTK_INSTALL_LIBRARY_DIR})
 else()
   # non-cuda version of CUDAConvolutionDriver.cu
   set(SQTK_CXX_SOURCES ${SQTK_CXX_SOURCES} CUDAConvolutionDriver.cxx)
@@ -145,7 +146,8 @@ if (SQTK_CUDA AND CUDA_FOUND)
 endif()
 
 install(TARGETS vtkSciberQuest
-   DESTINATION lib/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR})
+   ARCHIVE DESTINATION ${VTK_INSTALL_ARCHIVE_DIR}
+   LIBRARY DESTINATION ${VTK_INSTALL_LIBRARY_DIR})
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
