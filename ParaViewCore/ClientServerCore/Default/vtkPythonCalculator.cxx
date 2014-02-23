@@ -31,6 +31,7 @@
 #include <map>
 #include <string>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPythonCalculator);
 
@@ -94,40 +95,15 @@ void vtkPythonCalculator::ExecuteScript(void *arg)
     static_cast<vtkPythonCalculator*>(arg);
   if (self)
     {
-    self->Exec(self->GetExpression(), "RequestData");
+    self->Exec(self->GetExpression());
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonCalculator::Exec(const char* expression,
-                               const char* funcname)
+void vtkPythonCalculator::Exec(const char* expression)
 {
   if (!expression)
     {
-    return;
-    }
-
-  vtkDataObject* firstInput = this->GetInputDataObject(0, 0);
-  vtkFieldData* fd = 0;
-  if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(firstInput);
-    if (ds)
-      {
-      fd = ds->GetPointData();
-      }    
-    }
-  else if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    {
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(firstInput);
-    if (ds)
-      {
-      fd = ds->GetCellData();
-      }        
-    }
-  if (!fd)
-    {
-    vtkErrorMacro("Unexpected association value.");
     return;
     }
 
@@ -145,91 +121,6 @@ void vtkPythonCalculator::Exec(const char* expression,
       orgscript.push_back(expression[i]);
       }
     }
-    
-  //size_t pos = orgscript.rfind("\n");
-    
-  // Construct a script that defines a function
-  std::string fscript;
-  fscript  = "def ";
-  fscript += funcname;
-
-  fscript += "(self, inputs):\n";
-  fscript += "  arrays = {}\n";
-  int narrays = fd->GetNumberOfArrays();
-  for (int i=0; i<narrays; i++)
-    {
-    const char* aname = fd->GetArray(i)->GetName();
-    if (aname)
-      {
-      fscript += "  import paraview\n";
-      fscript += "  name = paraview.make_name_valid(\"";
-      fscript += aname;
-      fscript += "\")\n";
-      fscript += "  if name:\n";
-      fscript += "    try:\n";
-      fscript += "      exec \"%s = inputs[0].";
-      if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-        {
-        fscript += "PointData['";
-        }
-      else if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-        {
-        fscript += "CellData['";
-        }
-      fscript += aname;
-      fscript += "']\" % (name)\n";
-      fscript += "    except: pass\n";
-      fscript += "  arrays['";
-      fscript += aname;
-      fscript += "'] = inputs[0].";
-      if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-        {
-        fscript += "PointData['";
-        }
-      else if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-        {
-        fscript += "CellData['";
-        }
-      fscript += aname;
-      fscript += "']\n";
-      }
-    }
-  fscript += "  try:\n";
-  fscript += "    points = inputs[0].Points\n";
-  fscript += "  except: pass\n";
-  
-  if (expression && strlen(expression) > 0)  
-    {
-    fscript += "  retVal = ";
-    fscript += orgscript;
-    fscript += "\n";
-    fscript += "  if not isinstance(retVal, ndarray):\n";
-    fscript += "    retVal = retVal * ones((inputs[0].GetNumberOf";
-    if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-      {
-      fscript += "Points(), 1))\n";
-      }
-    else if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-      {
-      fscript += "Cells(), 1))\n";
-      }
-    fscript += "  return retVal\n";
-    }
-  else
-    {
-    fscript += "  return None\n";
-    }
- 
-  // ensure Python is initialized.
-  vtkPythonInterpreter::Initialize();
-  vtkPythonInterpreter::RunSimpleString(fscript.c_str());
-
-  std::string runscript;
-  runscript += "import paraview\n";
-  runscript += "from paraview import vtk\n";
-  runscript += "from paraview.vtk import dataset_adapter\n";
-  runscript += "from numpy import *\n";
-  runscript += "from paraview.vtk.algorithms import *\n";
 
   // Set self to point to this
   char addrofthis[1024];
@@ -240,51 +131,18 @@ void vtkPythonCalculator::Exec(const char* expression,
     {
     aplus += 2; //skip over "0x"
     }
-  
-  // Call the function
-  runscript += "myarg = ";
-  runscript += "vtk.vtkProgrammableFilter('";
-  runscript += aplus;
-  runscript += "')\n";
-  runscript += "inputs = []\n";
-  runscript += "index = 0\n";
-  int numinps = this->GetNumberOfInputConnections(0);
-  for (int i=0; i<numinps; i++)
-    {
-    runscript += 
-      "inputs.append(dataset_adapter.WrapDataObject(myarg.GetInputDataObject(0, index)))\n";
-    runscript += "index += 1\n";
-    }
-  runscript += "output = dataset_adapter.WrapDataObject(myarg.GetOutputDataObject(0))\n";
-  if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    runscript +=  "fd = output.PointData\n";
-    }
-  else if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    {
-    runscript += "fd = output.CellData\n";
-    }
-  if (this->CopyArrays)
-    {
-    runscript += "output.GetPointData().PassData(inputs[0].GetPointData().VTKObject)\n";
-    runscript += "output.GetCellData().PassData(inputs[0].GetCellData().VTKObject)\n";
-    }
-  runscript += "retVal = ";
-  runscript += funcname;
-  runscript += "(vtk.vtkProgrammableFilter('";
-  runscript += aplus;
-  runscript += "'), inputs)\n";
-  runscript += "if retVal is not None:\n";
-  runscript += "  fd.append(retVal, '";
-  runscript += this->GetArrayName();
-  runscript += "')\n";
-  runscript += "del myarg\n";
-  runscript += "del inputs\n";
-  runscript += "del fd\n";
-  runscript += "del retVal\n";
-  runscript += "del output\n";
-  
-  vtkPythonInterpreter::RunSimpleString(runscript.c_str());
+
+  vtksys_ios::ostringstream python_stream;
+  python_stream
+    << "import paraview\n"
+    << "paraview.fromFilter = True\n"
+    << "from paraview import calculator\n"
+    << "from vtkPVClientServerCoreDefaultPython import vtkPythonCalculator\n"
+    << "calculator.execute(vtkPythonCalculator('" << aplus << "'), '"
+    << orgscript.c_str() << "')\n";
+
+  vtkPythonInterpreter::Initialize();
+  vtkPythonInterpreter::RunSimpleString(python_stream.str().c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -307,6 +165,7 @@ int vtkPythonCalculator::FillInputPortInformation(
   if(port==0)
     {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
     info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     }

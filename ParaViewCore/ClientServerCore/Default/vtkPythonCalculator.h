@@ -76,7 +76,7 @@ protected:
 
   // Description:
   // For internal use only.
-  void Exec(const char*, const char*);
+  void Exec(const char*);
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 

@@ -2,6 +2,7 @@ import os.path
 from paraview.simple import *
 import sys
 from paraview import smtesting
+from paraview.vtk import dataset_adapter
 
 servermanager.ToggleProgressPrinting()
 
@@ -46,10 +47,10 @@ def print_array (vtkarray, verbose=0) :
 #      1 - output query, association and types
 #      2 - output 1 and a brief display of the result array
 #      3 - output 2 and a complete display of the result array
-def test0 (query, types=[], noperands=1, associations=[], debug=1) :
+def test0 (query, types=[], noperands=1, associations=[], debug=1, testComposite=False) :
     if debug :
        print ''
-       print query, associations, types
+       print query, associations, types, "Composite=%s"%testComposite
        sys.stdout.flush()
 
     # Validity checks
@@ -65,12 +66,16 @@ def test0 (query, types=[], noperands=1, associations=[], debug=1) :
     for any in associations :
         if any not in ['point', 'cell'] : return
 
+    compositeOptions = [ False ]
+    if testComposite:
+        compositeOptions.append(True)
+
     # Python Calculator test
     for association in associations :
         for type in types :
             if   'scalar' == type : operand = 'Normals[:,0]'
             elif 'vector' == type : operand = 'Normals'
-            elif 'tensor' == type : operand = 'gradient(Normals)'
+            elif 'tensor' == type : operand = 'VectorGradient'
             else : continue # Ideally, we should never come to here
 
             if 2 == noperands : operand = operand + ', ' + operand
@@ -78,52 +83,96 @@ def test0 (query, types=[], noperands=1, associations=[], debug=1) :
             # Actual expression of the query
             expr = "%s(%s)" % (query, operand)
             if debug :
-               print '  PC', association.capitalize()[0], type.capitalize()[0], expr
                sys.stdout.flush()
 
-            Sphere()
-            if 'cell' == association : PointDatatoCellData()
-            filter = PythonCalculator(Expression=expr, ArrayAssociation=('cell'==association))
-            filter.UpdatePipeline()
+            datasource = Sphere()
+            if 'tensor' == type :
+                datasource = ComputeDerivatives()
+                datasource.Vectors = ['Normals']
 
-            if debug > 1 :
-                output = servermanager.Fetch(filter)
-                if   'point' == association :
-                    print_array(output.GetPointData().GetArray("result"), debug>2)
-                elif 'cell'  == association :
-                    print_array(output.GetCellData().GetArray("result"), debug>2)
+            if 'cell' == association :
+                datasource = PointDatatoCellData()
+            else:
+                datasource = CellDatatoPointData()
+
+            for composite in compositeOptions:
+                if debug :
+                    print '  PC', association.capitalize()[0], type.capitalize()[0], "Composite" if composite else "Sphere", expr
+                    sys.stdout.flush()
+                if composite:
+                    otherSphere = Sphere()
+                    if 'tensor' == type :
+                        otherSphere = ComputeDerivatives()
+                    if 'cell' == association :
+                        otherSphere = PointDatatoCellData()
+                    else :
+                        otherSphere = CellDatatoPointData()
+                    datasource = GroupDatasets( Input=[ datasource, otherSphere ] )
+
+                SetActiveSource(datasource)
+
+                filter = PythonCalculator(Expression=expr, ArrayAssociation=('cell'==association))
+                filter.UpdatePipeline()
+
+                if debug > 1 :
+                    output = servermanager.Fetch(filter)
+                    if   'point' == association :
+                        print_array(output.GetPointData().GetArray("result"), debug>2)
+                    elif 'cell'  == association :
+                        print_array(output.GetCellData().GetArray("result"), debug>2)
 
     # Programmable Filter test
     for association in associations :
         for type in types :
             datasource = association.capitalize()
-            base = "inputs[0].%sData['Normals']" % datasource
-            if   'scalar' == type : operand = base + "[:,0]"
-            elif 'vector' == type : operand = base
-            elif 'tensor' == type : operand = "gradient(%s)" % base
+            base = "inputs[0].%sData['%%s']" % datasource
+            if   'scalar' == type : operand = (base%"Normals") + "[:,0]"
+            elif 'vector' == type : operand = base%"Normals"
+            elif 'tensor' == type : operand = base%"VectorGradient"
             else : continue # Ideally, we should never come to here
 
             if 2 == noperands : operand = operand + ',' + operand
 
             # Actual expression of the query
             expr = "output.%sData.append(%s(%s), 'result')" % (datasource, query, operand)
-            if debug :
-               print '  PF', association.capitalize()[0], type.capitalize()[0], expr
-               sys.stdout.flush()
 
-            Sphere()
-            if 'cell' == association : PointDatatoCellData()
-            # Unlike Python Calculator, the data association has been clarified
-            # directly in the expression.
-            filter = ProgrammableFilter(Script=expr)
-            filter.UpdatePipeline()
+            datasource = Sphere()
+            if 'tensor' == type :
+                datasource = ComputeDerivatives()
+                datasource.Vectors = ['Normals']
 
-            if debug > 1 :
-                output = servermanager.Fetch(filter)
-                if   'point' == association :
-                    print_array(output.GetPointData().GetArray("result"), debug>2)
-                elif 'cell'  == association :
-                    print_array(output.GetCellData().GetArray("result"), debug>2)
+            if 'cell' == association :
+                datasource = PointDatatoCellData()
+            else :
+                datasource = CellDatatoPointData()
+
+            for composite in compositeOptions:
+                if debug :
+                    print '  PF', association.capitalize()[0], type.capitalize()[0], "Composite" if composite else "Sphere", expr
+                    sys.stdout.flush()
+                if composite:
+                    otherSphere = Sphere()
+                    if 'tensor' == type :
+                        otherSphere = ComputeDerivatives()
+                    if 'cell' == association :
+                        otherSphere = PointDatatoCellData()
+                    else :
+                        otherSphere = CellDatatoPointData()
+                    datasource = GroupDatasets( Input=[ datasource, otherSphere ] )
+
+                    SetActiveSource(datasource)
+
+                # Unlike Python Calculator, the data association has been clarified
+                # directly in the expression.
+                filter = ProgrammableFilter(Script=expr)
+                filter.UpdatePipeline()
+
+                if debug > 1 :
+                    output = servermanager.Fetch(filter)
+                    if   'point' == association :
+                        print_array(output.GetPointData().GetArray("result"), debug>2)
+                    elif 'cell'  == association :
+                        print_array(output.GetCellData().GetArray("result"), debug>2)
 
 # test1 tests all python programmable filters that work with datasets directly.
 #
@@ -236,6 +285,9 @@ def main () :
     test0('global_mean', ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
     test0('global_max',  ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
     test0('global_min',  ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
+    test0('global_mean', ['scalar'], 1, ['point', 'cell'], testComposite=True)
+    test0('global_max',  ['scalar'], 1, ['point', 'cell'], testComposite=True)
+    test0('global_min',  ['scalar'], 1, ['point', 'cell'], testComposite=True)
 
     test0('gradient',       ['scalar', 'vector'], 1, ['point', 'cell'])
     test0('inverse' ,       ['tensor'], 1, ['point', 'cell'])
@@ -244,6 +296,9 @@ def main () :
     test0('max',            ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
     test0('min',            ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
     test0('mean',           ['scalar', 'vector', 'tensor'], 1, ['point', 'cell'])
+    test0('max',            ['scalar'], 1, ['point', 'cell'], testComposite=True)
+    test0('min',            ['scalar'], 1, ['point', 'cell'], testComposite=True)
+    test0('mean',           ['scalar'], 1, ['point', 'cell'], testComposite=True)
     test1('max_angle',      ['trig', 'quad'], ['cell'])
     test1('min_angle',      ['trig', 'quad'], ['cell'])
     test0('mag',            ['scalar', 'vector'], 1, ['point', 'cell'])
