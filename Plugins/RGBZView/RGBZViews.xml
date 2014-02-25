@@ -4,13 +4,25 @@
         processes="client|renderserver|dataserver"
         base_proxygroup="views" base_proxyname="RenderView">
         <StringVectorProperty
-            name="FileName"
+            name="ZOrdering"
             animateable="0"
-            command="SetFileName"
+            command="GetZOrdering"
+            number_of_elements="1"
+            information_only="1">
+        </StringVectorProperty>
+        <StringVectorProperty
+        name="RepresentationCodes"
+        animateable="0"
+        command="GetRepresentationCodes"
+        number_of_elements="1"
+        information_only="1">
+        </StringVectorProperty>
+
+        <StringVectorProperty
+            name="CompositeDirectory"
+            animateable="0"
+            command="SetCompositeDirectory"
             number_of_elements="1">
-            <Documentation>
-              This property specifies the file name for saving the image buffer.
-            </Documentation>
         </StringVectorProperty>
         <DoubleVectorProperty
             name="ClippingBounds"
@@ -29,29 +41,28 @@
             animateable="0"
             command="FreezeGeometryBounds">
         </Property>
+        <Property
+            name="ComputeZOrdering"
+            animateable="0"
+            command="ComputeZOrdering">
+        </Property>
+        <Property
+            name="WriteImages"
+            animateable="0"
+            command="WriteImages">
+        </Property>
+        <Property
+            name="WriteComposite"
+            animateable="0"
+            command="WriteComposite">
+        </Property>
+        <ProxyProperty command="AddRepresentationForComposite"
+                       name="Representations"
+                       remove_command="RemoveRepresentationForComposite"
+                       override="1"
+                       repeatable="1">
+          <Documentation>Representations in this view.</Documentation>
+        </ProxyProperty>
     </RenderViewProxy>
-  </ProxyGroup>
-
-  <ProxyGroup name="misc">
-    <Proxy name="AssemblyGenerator" class="vtkAssemblyGenerator" processes="client">
-      <StringVectorProperty animateable="0"
-                            clean_command="RemoveAllFileNames"
-                            command="AddFileName"
-                            name="FileNames"
-                            number_of_elements="1"
-                            repeat_command="1">
-      </StringVectorProperty>
-
-      <StringVectorProperty animateable="0"
-                            command="SetDestinationDirectory"
-                            name="DestinationDirectory"
-                            number_of_elements="1">
-      </StringVectorProperty>
-      <Property
-          name="Write"
-          animateable="0"
-          command="Write">
-      </Property>
-    </Proxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -32,7 +32,7 @@ add_paraview_plugin(
   REQUIRED_ON_SERVER
   REQUIRED_ON_CLIENT
   SERVER_MANAGER_SOURCES
-    vtkPVRenderViewForAssembly.cxx vtkAssemblyGenerator.cxx
+    vtkPVRenderViewForAssembly.cxx
   SERVER_MANAGER_XML
     RGBZViews.xml
 )
