@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActivePythonViewOptions.h"
 #include "pqActiveXYChartOptions.h"
 #include "pqApplicationCore.h"
+#include "pqBoxChartView.h"
 #include "pqComparativeRenderView.h"
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
@@ -43,8 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiSliceView.h"
 #include "pqPlotMatrixView.h"
 #include "pqViewOptionsInterface.h"
+#include "pqXYBagChartView.h"
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
+#include "pqXYFunctionalBagChartView.h"
 
 #include "vtkPVConfig.h"
 #if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
@@ -59,6 +62,18 @@ pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   pqActiveXYChartOptions *xyBarChartOptions = new pqActiveXYChartOptions(this);
   this->registerOptions(pqXYChartView::XYChartViewType(), xyChartOptions);
   this->registerOptions(pqXYBarChartView::XYBarChartViewType(), xyBarChartOptions);
+
+  // register for bag & functional chart views.
+  pqActiveXYChartOptions *bagChartOptions = new pqActiveXYChartOptions(this);
+  this->registerOptions(pqXYBagChartView::XYBagChartViewType(),
+    bagChartOptions);
+  pqActiveXYChartOptions *functionalBagChartOptions = new pqActiveXYChartOptions(this);
+  this->registerOptions(pqXYFunctionalBagChartView::XYFunctionalBagChartViewType(),
+    functionalBagChartOptions);
+
+  // register for box chart views.
+  //pqActiveXYChartOptions *boxChartOptions = new pqActiveXYChartOptions(this);
+  //this->registerOptions(pqBoxChartView::chartViewType(), boxChartOptions);
 
   // register for comparative views.
   this->registerOptions(pqComparativeXYChartView::chartViewType(), xyChartOptions);

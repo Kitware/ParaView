@@ -97,6 +97,10 @@ protected:
   char* DefaultValue;
   vtkSetStringMacro(DefaultValue);
 
+  // Description:
+  // Specify if table components should be split.
+  bool FlattenTable;
+
 private:
   vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&); // Not implemented
   void operator=(const vtkSMChartSeriesSelectionDomain&); // Not implemented

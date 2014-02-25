@@ -9852,6 +9852,175 @@ found and the point will be rejected.</Documentation>
       <!-- End ExtractHistogram -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkComputeQuartiles"
+                 label="Compute Quartiles"
+                 name="ComputeQuartiles">
+      <Documentation long_help="Compute the quartiles table from a dataset or table."
+                     short_help="Compute the quartiles table from a dataset or table.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the
+        filter.</Documentation>
+      </InputProperty>
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <Hints>
+        <View type="BoxChartView" />
+        <Plotable />
+      </Hints>
+      <!-- End ComputeQuartiles -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVTransposeTable"
+                 label="Transpose Table"
+                 name="TransposeTable">
+      <Documentation long_help="Transpose a table."
+                     short_help="Transpose a table.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_aray"
+                          number_of_components="1"/>
+        <Documentation>This property specifies the input to the
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearAttributeArrays"
+                            command="EnableAttributeArray"
+                            label="Variables of Interest"
+                            name="SelectArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose arrays whose entries will be used to form
+        observations for statistical analysis.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetAddIdColumn"
+                         default_values="1"
+                         name="AddIdColumn"
+                         label="Add a column with original columns name"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if a column must be inserted
+          at index 0 with the names (ids) of the input columns.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseIdColumn"
+                         default_values="0"
+                         name="UseIdColumn"
+                         label="Use the column with original columns name"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if the output column must be
+          named using the names listed in the index 0 column.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDoNotTranspose"
+                         default_values="0"
+                         name="DoNotTranspose"
+                         label="Only extract selected columns"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if the sub-table must be
+        effectively transposed or not.</Documentation>
+      </IntVectorProperty>
+      <!-- End TransposeTable -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVExtractBagPlots"
+                 label="Extract Bag Plots"
+                 name="ExtractBagPlots">
+      <Documentation long_help="Extract Bag Plots."
+                     short_help="Extract tables used to display Bag Plots
+                     views.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_aray"
+                          number_of_components="1"/>
+        <Documentation>This property specifies the input to the
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearAttributeArrays"
+                            command="EnableAttributeArray"
+                            label="Variables of Interest"
+                            name="SelectArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose arrays whose entries will be used to form
+        observations for statistical analysis.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetTransposeTable"
+                         default_values="1"
+                         name="TransposeTable"
+                         label="Process the transposed of the input table"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if the input table must
+        be transposed first.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRobustPCA"
+                         default_values="0"
+                         name="RobustPCA"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if the PCA should be run
+        in robust mode or not.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetSigma"
+                         default_values="1"
+                         name="Sigma"
+                         label="HDR smoothing parameter"
+                         number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Specify the smoothing parameter of the
+        HDR.</Documentation>
+      </DoubleVectorProperty>
+      <OutputPort index="0"
+                  name="Functional Bag Plot Data" />
+      <OutputPort index="1"
+                  name="Bag Plot Data" />
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <Hints>
+        <Visibility replace_input="0" />
+        <View type="XYFunctionalBagChartView" port="0" />
+        <View type="XYBagChartView" port="1" />
+        <Plotable />
+      </Hints>
+      <!-- End ExtractBagPlots -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPassThrough"
                  label="Scatter Plot"
                  name="ScatterPlot">

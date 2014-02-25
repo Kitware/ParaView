@@ -98,6 +98,12 @@ public:
   static vtkStdString GetDefaultSeriesLabel(
     const vtkStdString& tableName, const vtkStdString& columnName);
 
+  // Description:
+  // Flatten the table, i.e. split any multicomponent columns into separate
+  // components.
+  vtkSetMacro(FlattenTable, int);
+  vtkGetMacro(FlattenTable, int);
+
 //BTX
 protected:
   vtkChartRepresentation();
@@ -160,6 +166,7 @@ protected:
   vtkPVCacheKeeper* CacheKeeper;
   vtkWeakPointer<vtkPVContextView> ContextView;
   bool EnableServerSideRendering;
+  int FlattenTable;
 
   vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
   std::set<unsigned int> CompositeIndices; //the selected blocks

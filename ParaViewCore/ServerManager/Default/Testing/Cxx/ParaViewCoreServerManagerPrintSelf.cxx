@@ -74,7 +74,6 @@
 #include "vtkSMObject.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMParallelCoordinatesRepresentationProxy.h"
 #include "vtkSMPipelineState.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPluginManager.h"
@@ -201,7 +200,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMObject);
   PRINT_SELF(vtkSMOrderedPropertyIterator);
   PRINT_SELF(vtkSMOutputPort);
-  PRINT_SELF(vtkSMParallelCoordinatesRepresentationProxy);
   PRINT_SELF(vtkSMPipelineState);
   PRINT_SELF(vtkSMPluginLoaderProxy);
   PRINT_SELF(vtkSMPluginManager);

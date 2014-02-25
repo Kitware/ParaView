@@ -39,6 +39,13 @@ public:
   // Description:
   // Set the chart type, defaults to line chart
   void SetChartType(const char *type);
+  void SetChartTypeToLine() { this->SetChartType("Line"); }
+  void SetChartTypeToBar() { this->SetChartType("Bar"); }
+  void SetChartTypeToBag() { this->SetChartType("Bag"); }
+  void SetChartTypeToBox() { this->SetChartType("Box"); }
+  void SetChartTypeToFunctionalBag() { this->SetChartType("FunctionalBag"); }
+  void SetChartTypeToParallelCoordinates()
+    { this->SetChartType("ParallelCoordinates"); }
 
   // Description:
   // Set the title of the chart.

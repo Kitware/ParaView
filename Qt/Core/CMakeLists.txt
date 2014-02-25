@@ -41,6 +41,8 @@ set(Module_SRCS
   pqApplicationCore.h
   pqAutoStartInterface.cxx
   pqAutoStartInterface.h
+  pqBoxChartView.cxx
+  pqBoxChartView.h
   pqCollaborationEventPlayer.cxx
   pqCollaborationEventPlayer.h
   pqCollaborationManager.cxx
@@ -227,8 +229,12 @@ set(Module_SRCS
   pqXMLEventSource.h
   pqXMLUtil.cxx
   pqXMLUtil.h
+  pqXYBagChartView.cxx
+  pqXYBagChartView.h
   pqXYBarChartView.cxx
   pqXYBarChartView.h
+  pqXYFunctionalBagChartView.cxx
+  pqXYFunctionalBagChartView.h
   pqXYChartView.cxx
   pqXYChartView.h
   vtkPVGUIPluginInterface.cxx
@@ -240,6 +246,7 @@ set (Module_MOC_HDRS
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
+  pqBoxChartView.h
   pqCollaborationEventPlayer.h
   pqCollaborationManager.h
   pqComparativeContextView.h
@@ -314,7 +321,9 @@ set (Module_MOC_HDRS
   pqView.h
   pqXMLEventObserver.h
   pqXMLEventSource.h
+  pqXYBagChartView.h
   pqXYBarChartView.h
+  pqXYFunctionalBagChartView.h
   pqXYChartView.h
 )
 

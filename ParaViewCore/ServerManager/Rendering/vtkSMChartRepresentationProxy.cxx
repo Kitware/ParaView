@@ -17,6 +17,7 @@
 #include "vtkChartRepresentation.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMChartSeriesListDomain.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
@@ -27,6 +28,7 @@ vtkStandardNewMacro(vtkSMChartRepresentationProxy);
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {
   this->SetSIClassName("vtkSIChartRepresentationProxy");
+  this->SetDefaults = true;
 }
 
 //----------------------------------------------------------------------------
@@ -76,6 +78,12 @@ int vtkSMChartRepresentationProxy::ReadXMLAttributes(
         }
       }
     }
+
+  const char* setDefaults = element->GetAttribute("set_defaults");
+  if (setDefaults)
+    {
+    this->SetDefaults = strcmp(setDefaults, "false") == 0 ? false : true;
+    }
   return 1;
 }
 
@@ -122,26 +130,29 @@ void vtkSMChartRepresentationProxy::ResetPropertiesToDefault()
 {
   this->Superclass::ResetPropertiesToDefault();
 
-  vtkSMProperty* useIndex = this->GetProperty("UseIndexForXAxis");
-  vtkSMProperty* xarrayName = this->GetProperty("XArrayName");
-
-  if (useIndex && xarrayName)
+  if (this->SetDefaults)
     {
-    vtkSMPropertyHelper helper(xarrayName);
-    const char* value = helper.GetAsString();
-    const char** known_names =
-      vtkSMChartSeriesListDomain::GetKnownSeriesNames();
-    for (int cc=0; known_names[cc] != NULL && value != NULL; cc++)
+    vtkSMProperty* useIndex = this->GetProperty("UseIndexForXAxis");
+    vtkSMProperty* xarrayName = this->GetProperty("XArrayName");
+
+    if (useIndex && xarrayName)
       {
-      if (strcmp(known_names[cc], value) == 0)
+      vtkSMPropertyHelper helper(xarrayName);
+      const char* value = helper.GetAsString();
+      const char** known_names =
+        vtkSMChartSeriesListDomain::GetKnownSeriesNames();
+      for (int cc=0; known_names[cc] != NULL && value != NULL; cc++)
         {
-        vtkSMPropertyHelper(useIndex).Set(0);
-        this->UpdateProperty("UseIndexForXAxis");
-        return;
+        if (strcmp(known_names[cc], value) == 0)
+          {
+          vtkSMPropertyHelper(useIndex).Set(0);
+          this->UpdateProperty("UseIndexForXAxis");
+          return;
+          }
         }
       }
-    }
 
-  vtkSMPropertyHelper(useIndex).Set(1);
-  this->UpdateProperty("UseIndexForXAxis");
+    vtkSMPropertyHelper(useIndex).Set(1);
+    this->UpdateProperty("UseIndexForXAxis");
+    }
 }

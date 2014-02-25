@@ -22,7 +22,6 @@
 #include "vtkOutlineRepresentation.h"
 #include "vtkPVAlgorithmPortsInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVBarChartView.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVCacheKeeperPipeline.h"
 #include "vtkPVCacheSizeInformation.h"
@@ -47,11 +46,9 @@
 #include "vtkPVImplicitPlaneRepresentation.h"
 #include "vtkPVInformation.h"
 #include "vtkPVLastSelectionInformation.h"
-#include "vtkPVLineChartView.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVOptionsXMLParser.h"
-#include "vtkPVParallelCoordinatesChartView.h"
 #include "vtkPVParallelCoordinatesRepresentation.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginLoader.h"
@@ -130,7 +127,6 @@ int main(int, char**)
   PRINT_SELF(vtkOutlineRepresentation);
   PRINT_SELF(vtkPVAlgorithmPortsInformation);
   PRINT_SELF(vtkPVArrayInformation);
-  //PRINT_SELF(vtkPVBarChartView);
   PRINT_SELF(vtkPVCacheKeeper);
   PRINT_SELF(vtkPVCacheKeeperPipeline);
   PRINT_SELF(vtkPVCacheSizeInformation);
@@ -155,11 +151,9 @@ int main(int, char**)
   PRINT_SELF(vtkPVImplicitPlaneRepresentation);
   PRINT_SELF(vtkPVInformation);
   PRINT_SELF(vtkPVLastSelectionInformation);
-  //PRINT_SELF(vtkPVLineChartView);
   PRINT_SELF(vtkPVOpenGLExtensionsInformation);
   PRINT_SELF(vtkPVOptions);
   PRINT_SELF(vtkPVOptionsXMLParser);
-  //PRINT_SELF(vtkPVParallelCoordinatesChartView);
   PRINT_SELF(vtkPVParallelCoordinatesRepresentation);
   //PRINT_SELF(vtkPVPlugin);
   PRINT_SELF(vtkPVPluginLoader);
