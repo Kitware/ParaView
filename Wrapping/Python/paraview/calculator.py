@@ -6,7 +6,7 @@ derived quantities.
 from paraview import vtk
 from paraview.vtk import dataset_adapter
 from paraview.vtk.algorithms import *
-import numpy
+from numpy import *
 
 def compute(inputs, association, expression):
     import paraview
