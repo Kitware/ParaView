@@ -565,6 +565,7 @@ void pqColorOpacityEditorWidget::resetRangeToData()
     }
   BEGIN_UNDO_SET("Reset transfer function ranges using data range");
   vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(repr->getProxy());
+  repr->renderViewEventually();
   emit this->changeFinished();
   END_UNDO_SET();
 }
@@ -592,6 +593,7 @@ void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
     // disable auto-rescale of transfer function since the user has set on
     // explicitly (BUG #14371).
     this->setLockScalarRange(true);
+    repr->renderViewEventually();
     emit this->changeFinished();
     END_UNDO_SET();
     }
