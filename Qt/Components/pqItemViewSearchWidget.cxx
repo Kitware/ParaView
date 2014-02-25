@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqItemViewSearchWidget.h"
 
+//-----------------------------------------------------------------------------
 class pqItemViewSearchWidget::PIMPL : public Ui::pqItemViewSearchWidget
 {
 public:
@@ -59,7 +60,7 @@ public:
     qobject_cast<QAbstractItemView*>(parentW) : NULL;;
     this->RedPal.setColor(QPalette::Base, QColor(240,128,128));
   this->WhitePal.setColor(QPalette::Base, QColor(Qt::white));
-  this->Highlighter = new pqHighlightItemDelegate(QColor(210,210,231));
+  this->Highlighter = new pqHighlightItemDelegate(QColor(175,166,238));
   this->UnHighlighter = new pqHighlightItemDelegate(QColor(Qt::white));
   }
   ~PIMPL() {}
