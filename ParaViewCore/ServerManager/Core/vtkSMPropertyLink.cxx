@@ -17,7 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
@@ -79,12 +79,12 @@ public:
 
     ~LinkedProperty()
       {
-      if (this->Observer && this->Proxy.GetPointer())
+      if (this->Observer && this->Proxy && this->Proxy.GetPointer())
         {
         this->Proxy.GetPointer()->RemoveObserver(this->Observer);
         }
 
-      if (this->Observer && this->Property.GetPointer())
+      if (this->Observer && this->Property && this->Property.GetPointer())
         {
         this->Property->RemoveObserver(this->Observer);
         }
@@ -94,12 +94,12 @@ public:
 
     // Either (Proxy, PropertyName) pair is valid or (Property) is valid,
     // depending on the API used to add the link.
-    vtkSmartPointer<vtkSMProxy> Proxy;
+    vtkWeakPointer<vtkSMProxy> Proxy;
     vtkStdString PropertyName;
-    vtkSmartPointer<vtkSMProperty> Property;
+    vtkWeakPointer<vtkSMProperty> Property;
 
     int UpdateDirection;
-    vtkCommand* Observer;
+    vtkWeakPointer<vtkCommand> Observer;
     };
 
   typedef std::list<LinkedProperty> LinkedPropertyType;
@@ -622,6 +622,10 @@ void vtkSMPropertyLink::UpdateState()
     this->Internals->LinkedProperties.begin();
   for(; iter != this->Internals->LinkedProperties.end(); ++iter)
     {
+    if (!iter->Proxy.GetPointer())
+      {
+      continue;
+      }
     LinkState_LinkDescription* link = this->State->AddExtension(LinkState::link);
     link->set_proxy(iter->Proxy.GetPointer()->GetGlobalID());
     switch(iter->UpdateDirection)

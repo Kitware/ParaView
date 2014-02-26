@@ -179,6 +179,8 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
       
       vtkSMPropertyLink* link = vtkSMPropertyLink::New();
 
+      // NOTE: vtkSMPropertyLink no longer affect proxy reference. We're now
+      // only using vtkWeakPointer in vtkSMPropertyLink.
       link->AddLinkedProperty(this,
                               piter->GetKey(), 
                               vtkSMLink::OUTPUT);
@@ -250,32 +252,7 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMNewWidgetRepresentationProxy::UnRegister(vtkObjectBase* obj)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  // If the object is not being deleted by the interpreter and it
-  // has a reference count of 2 (SelfID and the reference that is
-  // being released), delete the internals so that the links
-  // release their references to the proxy
-  if ( pm && this->Internal )
-    {
-    int size = static_cast<int>(this->Internal->Links.size());
-    if (size > 0 && this->ReferenceCount == (2 + 2*size))
-      {
-      vtkSMNewWidgetRepresentationInternals* aInternal = this->Internal;
-      this->Internal = 0;
-      delete aInternal;
-      aInternal = 0;
-      }
-    }
-
-  this->Superclass::UnRegister(obj);
-}
-
-//----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

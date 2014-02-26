@@ -19,7 +19,6 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSmartPointer.h"
 #include "vtkPVSession.h"
 
 #include <list>
