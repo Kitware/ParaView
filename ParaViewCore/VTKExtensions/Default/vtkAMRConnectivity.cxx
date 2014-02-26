@@ -109,9 +109,12 @@ public:
           id_to_set->SetValue (i, min_set);
           }
         }
-      if (set_to_min_id->GetValue (max_set) < set_to_min_id->GetValue (min_set)) 
+      int max_set_min = set_to_min_id->GetValue (max_set);
+      int min_set_min = set_to_min_id->GetValue (min_set);
+      // pick the smallest of the two mins to represent the set.
+      if (min_set_min < 0 || (max_set_min >= 0 && max_set_min < min_set_min)) 
         {
-        set_to_min_id->SetValue (min_set, set_to_min_id->GetValue (max_set));
+        set_to_min_id->SetValue (min_set, max_set_min);
         }
       set_to_min_id->SetValue (max_set, -1);
       }
@@ -410,6 +413,13 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
         {
         this->NeighborList[level][blockId].resize (0);
+        }
+      }
+
+    for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
+      {
+      for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
+        {
         vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock (level, blockId);
         for (int dir = 0; dir < 3; dir ++)
           {
@@ -478,10 +488,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         this->BoundaryArrays[i].clear ();
       }
 
+    this->EquivPairs.resize (numProcs);
     while (true)
       {
-      this->EquivPairs.resize (numProcs);
-
       int sets_changed = 0;
       // Relabel all fragment IDs with the equivalence set number 
       // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
@@ -508,17 +517,14 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
             if (regionId > 0) 
               {
               int setId = this->Equivalence->GetMinimumSetId (regionId);
-              if (setId != regionId) 
+              if (setId >= 0 && setId != regionId) 
                 {
                 regionIdArray->SetTuple1 (i, setId);
-                if (sets_changed == 0)
-                  {
-                  std::cerr << "Changing because " << regionId << " != " << setId << endl;
-                  }
                 sets_changed = 1;
                 for (int p = 0; p < this->NeighborList[level][blockId].size (); p ++)
                   {
                   int n = this->NeighborList[level][blockId][p];
+
                   if (this->EquivPairs[n] == 0)
                     {
                     this->EquivPairs[n] = vtkIntArray::New ();
@@ -714,13 +720,27 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
     return;
     }
 
-  if (neighbor->ProcessId != myProc) 
+  if (block->ProcessId != neighbor->ProcessId) 
     {
+    int levelId, blockId, processId;
+    if (neighbor->ProcessId != myProc) 
+      {
+      levelId = block->Level;
+      blockId = block->BlockId;
+      processId = neighbor->ProcessId;
+      }
+    else if (block->ProcessId != myProc)
+      {
+      levelId = neighbor->Level;
+      blockId = neighbor->BlockId;
+      processId = block->ProcessId;
+      }
+
     // Add this neighbor to this block's neighbor list.
     bool contained = false;
-    for (int i = 0; i < this->NeighborList[block->Level][block->BlockId].size (); i ++)
+    for (int i = 0; i < this->NeighborList[levelId][blockId].size (); i ++)
       {
-      if (this->NeighborList[block->Level][block->BlockId][i] == neighbor->ProcessId)
+      if (this->NeighborList[levelId][blockId][i] == processId)
         {
         contained = true;
         break;
@@ -728,8 +748,8 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
       }
     if (!contained)
       {
-      this->NeighborList[block->Level][block->BlockId].push_back (neighbor->ProcessId);
-      this->ValidNeighbor[neighbor->ProcessId] = true;
+      this->NeighborList[levelId][blockId].push_back (processId);
+      this->ValidNeighbor[processId] = true;
       }
     }
 
