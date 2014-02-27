@@ -3,10 +3,11 @@ implemented by the vtkPythonCalculator to operate on datasets to compute
 derived quantities.
 """
 
+from numpy import *
+
 from paraview import vtk
 from paraview.vtk import dataset_adapter
 from paraview.vtk.algorithms import *
-import numpy
 
 def compute(inputs, association, expression):
     import paraview
