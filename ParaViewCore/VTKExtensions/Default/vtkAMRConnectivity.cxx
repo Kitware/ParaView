@@ -83,6 +83,14 @@ public:
       }
     int set1 = id_to_set->GetValue (id1);
     int set2 = id_to_set->GetValue (id2);
+    if (set1 >= 0 && set_to_min_id->GetValue (set1) < 0)  
+      {
+      set1 = -1;
+      }
+    if (set2 >= 0 && set_to_min_id->GetValue (set2) < 0)
+      {
+      set2 = -1;
+      }
 
     if (set1 >= 0 && set2 >= 0 && set1 == set2) 
       {
@@ -112,7 +120,7 @@ public:
       int max_set_min = set_to_min_id->GetValue (max_set);
       int min_set_min = set_to_min_id->GetValue (min_set);
       // pick the smallest of the two mins to represent the set.
-      if (min_set_min < 0 || (max_set_min >= 0 && max_set_min < min_set_min)) 
+      if (max_set_min < min_set_min) 
         {
         set_to_min_id->SetValue (min_set, max_set_min);
         }
@@ -409,8 +417,17 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
     this->NeighborList.resize (this->Helper->GetNumberOfLevels ());
     for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
       {
-      this->NeighborList[level].resize (this->Helper->GetNumberOfBlocksInLevel (level));
+      int maxId = 0;
       for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
+        {
+        vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock (level, blockId);
+        if (block->BlockId > maxId)
+          {
+          maxId = block->BlockId;
+          }
+        }
+      this->NeighborList[level].resize (maxId + 1);
+      for (int blockId = 0; blockId < maxId; blockId ++) 
         {
         this->NeighborList[level][blockId].resize (0);
         }
@@ -470,11 +487,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
     this->Equivalence = new vtkAMRConnectivityEquivalence;
 
     // Initialize equivalence with all regions independent
-    int myOffset = myProc + 1;
-    if (myOffset >= numProcs) 
-      {
-      myOffset = 0; 
-      }
     for (size_t i = 0; i < this->BoundaryArrays.size (); i ++) 
       {
       for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
@@ -517,22 +529,35 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
             if (regionId > 0) 
               {
               int setId = this->Equivalence->GetMinimumSetId (regionId);
-              if (setId >= 0 && setId != regionId) 
+              if (setId > 0 && setId != regionId) 
                 {
                 regionIdArray->SetTuple1 (i, setId);
                 sets_changed = 1;
-                for (int p = 0; p < this->NeighborList[level][blockId].size (); p ++)
+                for (int p = 0; p < this->NeighborList[block->Level][block->BlockId].size (); p ++)
                   {
-                  int n = this->NeighborList[level][blockId][p];
-
+                  int n = this->NeighborList[block->Level][block->BlockId][p];
                   if (this->EquivPairs[n] == 0)
                     {
                     this->EquivPairs[n] = vtkIntArray::New ();
                     this->EquivPairs[n]->SetNumberOfComponents (1);
                     this->EquivPairs[n]->SetNumberOfTuples (0);
                     }
-                  this->EquivPairs[n]->InsertNextValue (i);
-                  this->EquivPairs[n]->InsertNextValue (setId);
+                  int contained = 0;
+                  for (int e = 0; e < this->EquivPairs[n]->GetNumberOfTuples (); e += 2)
+                    {
+                    int v1 = this->EquivPairs[n]->GetValue (e);
+                    int v2 = this->EquivPairs[n]->GetValue (e+1);
+                    if ((v1 == regionId && v2 == setId) ||
+                        (v2 == regionId && v1 == setId))
+                      {
+                      contained = 1;
+                      }
+                    }
+                  if (contained == 0) 
+                    {
+                    this->EquivPairs[n]->InsertNextValue (regionId);
+                    this->EquivPairs[n]->InsertNextValue (setId);
+                    }
                   }
                 }
               }
@@ -546,7 +571,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 #ifdef PARAVIEW_USE_MPI
       if (numProcs > 1)
         {
-        controller->AllReduce (&sets_changed, &sets_changed, 1, vtkCommunicator::MAX_OP);
+        int out;
+        controller->AllReduce (&sets_changed, &out, 1, vtkCommunicator::MAX_OP);
+        sets_changed = out;
         }
 #endif
       if (sets_changed == 0)
