@@ -40,10 +40,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description:
-  // Break reference loop that are due to links.
-  virtual void UnRegister(vtkObjectBase* o);
-
-  // Description:
   // Get the widget for the representation.
   vtkGetObjectMacro(Widget, vtkAbstractWidget);
 
