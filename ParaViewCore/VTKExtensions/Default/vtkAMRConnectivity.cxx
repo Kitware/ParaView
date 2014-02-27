@@ -83,6 +83,7 @@ public:
       }
     int set1 = id_to_set->GetValue (id1);
     int set2 = id_to_set->GetValue (id2);
+
     if (set1 >= 0 && set_to_min_id->GetValue (set1) < 0)  
       {
       set1 = -1;
@@ -169,6 +170,11 @@ public:
 
   int GetMinimumSetId (int id)
     {
+    if (id < 0 || id >= id_to_set->GetNumberOfTuples ()) 
+      {
+      vtkErrorWithObjectMacro (id_to_set, << "ID out of range " << id << " (expected 0 <= x < " << id_to_set->GetNumberOfTuples () << ")");
+      return -1;
+      }
     int set = id_to_set->GetValue (id);
     return (set >= 0 ? set_to_min_id->GetValue (set) : -1);
     }
@@ -451,21 +457,21 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   
               index[(dir+1) % 3] ++;
               neighbor = this->Helper->GetBlock (n_level, index[0], index[1], index[2]);
-              // if (neighbor != 0)
+              if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
   
               index[(dir+2) % 3] ++;
               neighbor = this->Helper->GetBlock (n_level, index[0], index[1], index[2]);
-              // if (neighbor != 0)
+              if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
   
               index[(dir+1) % 3] --;
               neighbor = this->Helper->GetBlock (n_level, index[0], index[1], index[2]);
-              // if (neighbor != 0)
+              if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
