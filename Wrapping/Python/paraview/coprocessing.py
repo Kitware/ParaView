@@ -38,6 +38,7 @@ class CoProcessor(object):
         self.__WritersList = []
         self.__ViewsList = []
         self.__EnableLiveVisualization = False
+        self.__LiveVisualizationFrequency = 1;
         self.__LiveVisualizationLink = None
         pass
 
@@ -54,11 +55,17 @@ class CoProcessor(object):
         self.__Frequencies = frequencies
 
 
-    def EnableLiveVisualization(self, enable):
+    def EnableLiveVisualization(self, enable, frequency):
         """Call this method to enable live-visualization. When enabled,
         DoLiveVisualization() will communicate with ParaView server if possible
         for live visualization"""
         self.__EnableLiveVisualization = enable
+        self.__LiveVisualizationFrequency = frequency
+        if (enable):
+            for currentFrequencies in self.__Frequencies.itervalues():
+                if not frequency in currentFrequencies:
+                    currentFrequencies.append(frequency)
+                    currentFrequencies.sort()
 
     def CreatePipeline(self, datadescription):
         """This methods must be overridden by subclasses to create the
@@ -146,8 +153,10 @@ class CoProcessor(object):
            for live-visualization. Call this method only if you want to support
            live-visualization with your co-processing module."""
 
-        if not self.__EnableLiveVisualization:
-           return
+        if (not self.__EnableLiveVisualization or
+            (datadescription.GetTimeStep() %
+             self.__LiveVisualizationFrequency) != 0):
+            return
 
         # make sure the live insitu is initialized
         if not self.__LiveVisualizationLink:

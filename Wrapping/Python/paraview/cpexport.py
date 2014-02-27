@@ -33,7 +33,7 @@ coprocessor = CreateCoProcessor()
 
 #--------------------------------------------------------------
 # Enable Live-Visualizaton with ParaView
-coprocessor.EnableLiveVisualization(%s)
+coprocessor.EnableLiveVisualization(%s, %s)
 
 
 # ---------------------- Data Selection method ----------------------
@@ -76,7 +76,7 @@ def DoCoProcessing(datadescription):
 from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
-    rescale_data_range, enable_live_viz, filename=None):
+    rescale_data_range, enable_live_viz, live_viz_frequency, filename=None):
     """Returns a string with the generated CoProcessing script based on the
         options specified.
 
@@ -87,11 +87,15 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
                               each timestep
         enable_live_viz    :- boolean set to true if the generated script should
                               handle live-visualization.
+        live_viz_frequency :- integer specifying how often should
+                              the coprocessor send the live data
         filename           :- if specified, the script is written to the file.
     """
     pipeline_script = cpstate.DumpPipeline(\
         export_rendering, simulation_input_map, screenshot_info)
-    script = __output_contents % (pipeline_script, enable_live_viz, rescale_data_range)
+    script = __output_contents % (pipeline_script,
+                                  enable_live_viz, live_viz_frequency,
+                                  rescale_data_range)
     if filename:
         outFile = open(filename, "w")
         outFile.write(script)
@@ -110,6 +114,7 @@ def run(filename=None):
         screenshot_info={},
         rescale_data_range=True,
         enable_live_viz=True,
+        live_viz_frequency=1,
         filename=filename)
     if not filename:
         print "# *** Generated Script Begin ***"
