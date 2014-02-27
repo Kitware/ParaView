@@ -248,6 +248,8 @@ vtkAMRConnectivity::vtkAMRConnectivity ()
   this->VolumeFractionSurfaceValue = 0.5;
   this->Helper = 0;
   this->Equivalence = 0;
+  this->ResolveBlocks = 1;
+  this->PropagateGhosts = 0;
 }
 
 vtkAMRConnectivity::~vtkAMRConnectivity ()
@@ -620,7 +622,10 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
     NeighborList.clear ();
 
     vtkTimerLog::MarkEndEvent ("Transferring equivalence");
+    }
 
+  if (PropagateGhosts) 
+    {
     vtkTimerLog::MarkStartEvent ("Propagating ghosts");
     // Propagate the region IDs out to the ghosts
     vtkSmartPointer<vtkIdList> ptIds = vtkIdList::New ();
@@ -1070,7 +1075,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
   int numProcs = controller->GetNumberOfProcesses ();
 
   vtkAMRConnectivityCommRequestList receiveList;
-  for (size_t i = 0; i < numProcs; i ++) 
+  for (size_t i = 0; i < static_cast<unsigned int> (numProcs); i ++) 
     {
     if (i == static_cast<unsigned int> (myProc) || !this->ValidNeighbor[i]) 
       {
@@ -1098,7 +1103,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
     }
 
   vtkAMRConnectivityCommRequestList sendList;
-  for (size_t i = 0; i < numProcs; i ++)
+  for (size_t i = 0; i < static_cast<unsigned int> (numProcs); i ++)
     {
     if (i == static_cast<unsigned int> (myProc) || !this->ValidNeighbor[i])  
       { 
@@ -1142,7 +1147,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
   sendList.WaitAll();
   sendList.clear ();
 
-  for (size_t i = 0; i < numProcs; i ++) 
+  for (size_t i = 0; i < static_cast<unsigned int>(numProcs); i ++) 
     {
     if (i == static_cast<unsigned int> (myProc) || receive_sizes[i] == 0) 
       {
@@ -1169,7 +1174,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
     array->Delete ();
     }
 
-  for (size_t i = 0; i < numProcs; i ++)
+  for (size_t i = 0; i < static_cast<unsigned int>(numProcs); i ++)
     {
     if (i == static_cast<unsigned int> (myProc) 
         || this->EquivPairs[i] == 0

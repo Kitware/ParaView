@@ -57,6 +57,11 @@ public:
   vtkGetMacro(ResolveBlocks, bool);
   vtkSetMacro(ResolveBlocks, bool);
 
+  // Description:
+  // Get / Set where to resolve the regions between blocks
+  vtkGetMacro(PropagateGhosts, bool);
+  vtkSetMacro(PropagateGhosts, bool);
+
 protected:
   vtkAMRConnectivity();
   ~vtkAMRConnectivity();
@@ -66,6 +71,7 @@ protected:
   vtkAMRConnectivityEquivalence* Equivalence;
   
   bool ResolveBlocks;
+  bool PropagateGhosts;
 
   std::string RegionName;
   vtkIdType NextRegionId;

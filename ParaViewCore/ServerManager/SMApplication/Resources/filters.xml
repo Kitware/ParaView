@@ -2865,6 +2865,13 @@ found and the point will be rejected.</Documentation>
         <BooleanDomain name="bool" />
         <Documentation>Resolve the fragments between blocks.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetPropagateGhosts"
+                         default_values="0"
+                         name="Propagate Ghosts"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Propagate regionIds into the ghosts.</Documentation>
+      </IntVectorProperty>
       <!-- End AMR Fragment Integration -->
     </SourceProxy>
     <!-- ==================================================================== -->
