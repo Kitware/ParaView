@@ -33,6 +33,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
 #include "vtksys/SystemTools.hxx"
 
@@ -172,7 +173,7 @@ public:
     {
     if (id < 0 || id >= id_to_set->GetNumberOfTuples ()) 
       {
-      vtkErrorWithObjectMacro (id_to_set, << "ID out of range " << id << " (expected 0 <= x < " << id_to_set->GetNumberOfTuples () << ")");
+      // vtkErrorWithObjectMacro (id_to_set, << "ID out of range " << id << " (expected 0 <= x < " << id_to_set->GetNumberOfTuples () << ")");
       return -1;
       }
     int set = id_to_set->GetValue (id);
@@ -352,6 +353,8 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   // initialize with a global unique region id
   this->NextRegionId = myProc+1;
 
+  vtkTimerLog::MarkStartEvent ("Initial fragment seeding");
+
   // Find the block local fragments
   vtkCompositeDataIterator* iter = volume->NewIterator ();
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
@@ -414,8 +417,13 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       }
     }
 
+  vtkTimerLog::MarkEndEvent ("Initial fragment seeding");
+
   if (this->ResolveBlocks)
     {
+             
+    vtkTimerLog::MarkStartEvent ("Computing boundary regions");
+
     // Determine boundaries at the block that need to be sent to neighbors
     this->BoundaryArrays.resize (numProcs);
     this->ReceiveList.resize (numProcs);
@@ -480,15 +488,20 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           }
         }
       }
+
+    vtkTimerLog::MarkEndEvent ("Computing boundary regions");
   
 #ifdef PARAVIEW_USE_MPI
     // Exchange all boundaries between processes where block and neighbor are different procs
+    vtkTimerLog::MarkStartEvent ("Exchanging boundaries");
     if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
       {
       return 0;
       }
+    vtkTimerLog::MarkEndEvent ("Exchanging boundaries");
 #endif 
 
+    vtkTimerLog::MarkStartEvent ("Transferring equivalence");
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
     this->Equivalence = new vtkAMRConnectivityEquivalence;
 
@@ -606,6 +619,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
     ValidNeighbor.clear ();
     NeighborList.clear ();
 
+    vtkTimerLog::MarkEndEvent ("Transferring equivalence");
+
+    vtkTimerLog::MarkStartEvent ("Propagating ghosts");
     // Propagate the region IDs out to the ghosts
     vtkSmartPointer<vtkIdList> ptIds = vtkIdList::New ();
     vtkSmartPointer<vtkIdList> cellIds = vtkIdList::New ();
@@ -647,6 +663,8 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           }
         }
       }
+
+    vtkTimerLog::MarkEndEvent ("Propagating ghosts");
 
     delete this->Equivalence;
     this->Equivalence = 0;
