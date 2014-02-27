@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqHighlightRowItemDelegate_h
 #define _pqHighlightRowItemDelegate_h
 
-#include "pqWidgetsModule.h"
+#include "pqComponentsModule.h"
 #include <QStyledItemDelegate>
 
 /// pqHighlightItemDelegate is a delegate used to highlight item views
@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// pqItemViewSearchWidget. It works by repainting the item with a
 /// colored background.
 
-class PQWIDGETS_EXPORT pqHighlightItemDelegate : public QStyledItemDelegate
+class PQCOMPONENTS_EXPORT pqHighlightItemDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 
