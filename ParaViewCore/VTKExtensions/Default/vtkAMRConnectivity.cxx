@@ -552,7 +552,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
                 {
                 regionIdArray->SetTuple1 (i, setId);
                 sets_changed = 1;
-                for (int p = 0; p < this->NeighborList[block->Level][block->BlockId].size (); p ++)
+                for (size_t p = 0; p < this->NeighborList[block->Level][block->BlockId].size (); p ++)
                   {
                   int n = this->NeighborList[block->Level][block->BlockId][p];
                   if (this->EquivPairs[n] == 0)
@@ -780,7 +780,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
       blockId = block->BlockId;
       processId = neighbor->ProcessId;
       }
-    else if (block->ProcessId != myProc)
+    else /* if (block->ProcessId != myProc) */
       {
       levelId = neighbor->Level;
       blockId = neighbor->BlockId;
@@ -789,7 +789,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
 
     // Add this neighbor to this block's neighbor list.
     bool contained = false;
-    for (int i = 0; i < this->NeighborList[levelId][blockId].size (); i ++)
+    for (size_t i = 0; i < this->NeighborList[levelId][blockId].size (); i ++)
       {
       if (this->NeighborList[levelId][blockId][i] == processId)
         {
