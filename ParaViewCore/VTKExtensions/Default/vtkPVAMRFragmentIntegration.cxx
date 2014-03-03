@@ -35,6 +35,8 @@ class vtkPVAMRFragmentIntegrationInternal
 public:
   std::vector<std::string> VolumeArrays;
   std::vector<std::string> MassArrays;
+  std::vector<std::string> VolumeWeightedArrays;
+  std::vector<std::string> MassWeightedArrays;
 };
 
 //-----------------------------------------------------------------------------
@@ -80,7 +82,9 @@ int vtkPVAMRFragmentIntegration::RequestData(vtkInformation* vtkNotUsed(request)
     vtkTable* out = this->DoRequestData(
       amrInput, 
       this->Implementation->VolumeArrays[i].c_str(),
-      this->Implementation->MassArrays[i].c_str());
+      this->Implementation->MassArrays[i].c_str(),
+      this->Implementation->VolumeWeightedArrays,
+      this->Implementation->MassWeightedArrays);
 
     if(out)
       {
@@ -118,6 +122,34 @@ void vtkPVAMRFragmentIntegration::AddInputMassArrayToProcess(const char* name)
 void vtkPVAMRFragmentIntegration::ClearInputMassArrayToProcess()
 {
   this->Implementation->MassArrays.clear();
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAMRFragmentIntegration::AddInputVolumeWeightedArrayToProcess(const char* name)
+{
+  this->Implementation->VolumeWeightedArrays.push_back(std::string(name));
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAMRFragmentIntegration::ClearInputVolumeWeightedArrayToProcess()
+{
+  this->Implementation->VolumeWeightedArrays.clear();
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAMRFragmentIntegration::AddInputMassWeightedArrayToProcess(const char* name)
+{
+  this->Implementation->MassWeightedArrays.push_back(std::string(name));
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAMRFragmentIntegration::ClearInputMassWeightedArrayToProcess()
+{
+  this->Implementation->MassWeightedArrays.clear();
   this->Modified();
 }
 

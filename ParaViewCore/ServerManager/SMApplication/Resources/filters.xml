@@ -2802,6 +2802,42 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the cell arrays from which the
         analysis will determine fragment mass</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeWeightedArrayToProcess"
+                            command="AddInputVolumeWeightedArrayToProcess"
+                            name="SelectVolumeWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine volume weighted average values</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputMassWeightedArrayToProcess"
+                            command="AddInputMassWeightedArrayToProcess"
+                            name="SelectMassWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine mass weighted average values</Documentation>
+      </StringVectorProperty>
       <!-- End AMR Fragment Integration -->
     </SourceProxy>
     <!-- ==================================================================== -->
