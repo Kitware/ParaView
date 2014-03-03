@@ -171,13 +171,17 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->Decimator->SetCopyCellData(1);
   this->Decimator->SetUseInternalTriangles(0);
   this->Decimator->SetNumberOfDivisions(10, 10, 10);
-  
+
   this->LODOutlineFilter->SetUseOutline(1);
 
-  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
-  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(1);
-  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughCellIds(1);
-  vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughPointIds(1);
+  vtkPVGeometryFilter *geomFilter = vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter);
+  if (geomFilter)
+    {
+    geomFilter->SetUseOutline(0);
+    geomFilter->SetNonlinearSubdivisionLevel(1);
+    geomFilter->SetPassThroughCellIds(1);
+    geomFilter->SetPassThroughPointIds(1);
+    }
 
   this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
   this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
@@ -404,8 +408,7 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
   else
     {
     vtkNew<vtkMultiBlockDataSet> placeholder;
-    vtkPVGeometryFilter::SafeDownCast(
-      this->GeometryFilter)->SetInputData(0, placeholder.GetPointer());
+    this->GeometryFilter->SetInputDataObject(0, placeholder.GetPointer());
     }
   this->CacheKeeper->Update();
 
