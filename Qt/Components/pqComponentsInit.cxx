@@ -42,7 +42,6 @@ void pqComponentsInit()
 
   // init resources
   Q_INIT_RESOURCE(pqComponents);
-  Q_INIT_RESOURCE(pqExtraResources);
 
 #endif
 
