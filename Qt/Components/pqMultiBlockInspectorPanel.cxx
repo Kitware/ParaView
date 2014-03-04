@@ -223,6 +223,10 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
         this->buildTree(compositeChildInfo, item, flatIndex);
         }
       }
+    else
+      {
+      item->setDisabled(true);
+      }
     }
 }
 
