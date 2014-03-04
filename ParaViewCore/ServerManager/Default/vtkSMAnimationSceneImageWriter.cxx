@@ -336,6 +336,17 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     mwriter = vtkMPEG2Writer::New();
     }
 #endif
+# ifdef PARAVIEW_ENABLE_FFMPEG
+  else if (extension == ".avi")
+    {
+    vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
+    aviwriter->SetQuality(this->Quality);
+    aviwriter->SetCompression(this->Compression);
+    aviwriter->SetRate(
+      static_cast<int>(this->GetFrameRate()));
+    mwriter = aviwriter;
+    }
+# endif
 #ifdef _WIN32
   else if (extension == ".avi")
     {
@@ -351,17 +362,6 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     mwriter = avi;
     }
 #else
-# ifdef PARAVIEW_ENABLE_FFMPEG
-  else if (extension == ".avi")
-    {
-    vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
-    aviwriter->SetQuality(this->Quality);
-    aviwriter->SetCompression(this->Compression);
-    aviwriter->SetRate(
-      static_cast<int>(this->GetFrameRate()));
-    mwriter = aviwriter;
-    }
-# endif
 #endif
 #ifdef VTK_HAS_OGGTHEORA_SUPPORT
   else if (extension == ".ogv" || extension == ".ogg")
