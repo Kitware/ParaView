@@ -282,8 +282,11 @@ p, li { white-space: pre-wrap; }
   <tabstop>spinBoxNumberOfFrames</tabstop>
   <tabstop>width</tabstop>
   <tabstop>height</tabstop>
+  <tabstop>startTime</tabstop>
+  <tabstop>endTime</tabstop>
   <tabstop>lockAspect</tabstop>
   <tabstop>stereoMode</tabstop>
+  <tabstop>compression</tabstop>
   <tabstop>checkBoxDisconnect</tabstop>
  </tabstops>
  <resources>
