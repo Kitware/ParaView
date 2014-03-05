@@ -265,6 +265,8 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
           lineStartPointer[offset++] = vtkPVRenderViewForAssembly::vtkInternals::NUMBER_TABLE[numberToWrite%10];
           numberToWrite /= 10;
           }
+        this->ReverseNumber(&lineStartPointer[offset - 1], offset - 2);
+
         lineStartPointer[offset++] = '+';
         nextLineStartPointer = lineStartPointer + count;
         lineStartPointer += offset;
@@ -287,6 +289,23 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
 
   //----------------------------------------------------------------------------
 
+  void ReverseNumber(char* buffer, int size)
+  {
+    char* left = buffer - size;
+    char* right = buffer;
+    char tmp;
+    while(left < right)
+      {
+      tmp = left[0];
+      left[0] = right[0];
+      right[0] = tmp;
+      right--;
+      left++;
+      }
+  }
+
+  //----------------------------------------------------------------------------
+
   void ShiftBuffer(char* left, char* right)
   {
     while(right[0] != '\0')
@@ -296,6 +315,24 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
       right++;
       }
     left[0] = '\0';
+  }
+
+  //----------------------------------------------------------------------------
+
+  int GetRepresentationIdx(vtkPVDataRepresentation* r)
+  {
+    int index = 0;
+    std::vector<vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter;
+    for(iter = this->CompositeRepresentations.begin(); iter != this->CompositeRepresentations.end(); ++iter)
+      {
+      vtkPVDataRepresentation* rep = vtkPVDataRepresentation::SafeDownCast(*iter);
+      if(rep == r)
+        {
+        return index;
+        }
+      index++;
+      }
+    return -1;
   }
 
   //----------------------------------------------------------------------------
@@ -327,6 +364,7 @@ vtkPVRenderViewForAssembly::vtkPVRenderViewForAssembly()
   this->OrderingBuffer = NULL;
   this->CompositeDirectory = NULL;
   this->InsideRGBDump = false;
+  this->RepresentationToRender = -1;
 
   this->Internal = new vtkInternals(this);
 }
@@ -458,13 +496,25 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     // Disable all representation and start rendering each one independantly
     // to capture the RGB Buffer and save a JPEG file.
     int nbReps = this->Internal->GetNumberOfRepresentations();
-    for(int idx = 0; idx < nbReps; ++idx)
+    if(this->RepresentationToRender == -1)
       {
-      this->Internal->UpdateVisibleRepresentation(idx);
+      for(int idx = 0; idx < nbReps; ++idx)
+        {
+        this->Internal->UpdateVisibleRepresentation(idx);
+        this->StillRender();
+        if(this->SynchronizedWindows->GetLocalProcessIsDriver())
+          {
+          this->Internal->WriteImage(idx  + 1);
+          }
+        }
+      }
+    else
+      {
+      this->Internal->UpdateVisibleRepresentation(this->RepresentationToRender);
       this->StillRender();
       if(this->SynchronizedWindows->GetLocalProcessIsDriver())
         {
-        this->Internal->WriteImage(idx  + 1);
+        this->Internal->WriteImage(this->RepresentationToRender  + 1);
         }
       }
 
@@ -601,4 +651,17 @@ void vtkPVRenderViewForAssembly::RemoveRepresentationForComposite(vtkPVDataRepre
 {
   this->RemoveRepresentation(r);
   this->Internal->RemoveRepresentation(r);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::SetActiveRepresentationForComposite(vtkPVDataRepresentation* r)
+{
+  if(r == NULL)
+    {
+    this->RepresentationToRender = -1;
+    }
+  else
+    {
+    this->RepresentationToRender = this->Internal->GetRepresentationIdx(r);
+    }
 }

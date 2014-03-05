@@ -63,6 +63,8 @@
                        repeatable="1">
           <Documentation>Representations in this view.</Documentation>
         </ProxyProperty>
+        <ProxyProperty command="SetActiveRepresentationForComposite"
+                       name="ActiveRepresentation"/>
     </RenderViewProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -96,6 +96,8 @@ public:
   // for the background, hence the corresponding char is shifted by 1.
   const char* GetRepresentationCodes();
 
+  void SetActiveRepresentationForComposite(vtkPVDataRepresentation* r);
+
 //BTX
 protected:
   vtkPVRenderViewForAssembly();
@@ -115,6 +117,7 @@ private:
   char* CompositeDirectory;
   int OrderingBufferSize;
   char* OrderingBuffer;
+  int RepresentationToRender;
 
   vtkBoundingBox ClippingBounds;
 
