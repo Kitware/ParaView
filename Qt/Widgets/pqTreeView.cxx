@@ -51,7 +51,7 @@ pqTreeView::pqTreeView(QWidget *widgetParent)
   this->ScrollPadding = 0;
 
   // Change the default header view to a checkable one.
-  pqCheckableHeaderView *checkable = 
+  pqCheckableHeaderView *checkable =
     new pqCheckableHeaderView(Qt::Horizontal,this);
   this->setHeader(checkable);
   this->installEventFilter(checkable);

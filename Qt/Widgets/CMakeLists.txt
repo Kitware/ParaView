@@ -43,10 +43,9 @@ set(Module_SRCS
   pqAnimationWidget.h
   pqChartPrintSave.cxx
   pqChartPrintSave.h
-  pqCheckableHeaderModel.cxx
-  pqCheckableHeaderModel.h
   pqCheckableHeaderView.cxx
   pqCheckableHeaderView.h
+  pqCheckBoxPixMaps.cxx
   pqCheckBoxPixMaps.cxx
   pqCheckBoxPixMaps.h
   pqCollapsedGroup.cxx
@@ -141,7 +140,6 @@ set (QtWidgets_SRCS
   pqAnimationTrack.h
   pqAnimationWidget.h
   pqChartPrintSave.h
-  pqCheckableHeaderModel.h
   pqCheckableHeaderView.h
   pqCheckBoxPixMaps.h
   pqCollapsedGroup.h
