@@ -278,6 +278,7 @@ protected:
 
 private slots:
   void onProxyCreated(pqProxy * proxy);
+  void onProxyCreated(vtkSMProxy * proxy);
 
 private:
   pqObjectBuilder(const pqObjectBuilder&); // Not implemented.

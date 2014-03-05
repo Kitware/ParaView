@@ -867,3 +867,10 @@ void pqObjectBuilder::onProxyCreated(pqProxy* proxy)
 
   vtkSMSettings::GetInstance()->SetProxySettings(smProxy, jsonPrefix.c_str());
 }
+
+//-----------------------------------------------------------------------------
+void pqObjectBuilder::onProxyCreated(vtkSMProxy* proxy)
+{
+  std::cout << "Unhandled vtkSMProxy " << proxy->GetXMLGroup() << "." << proxy->GetXMLName()
+            << std::endl;
+}
