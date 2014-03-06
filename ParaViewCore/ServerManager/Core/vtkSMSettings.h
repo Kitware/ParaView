@@ -74,6 +74,10 @@ public:
   vtkGetStringMacro(SiteSettingsString);
 
   // Description:
+  // Save non-default settings in the current user settings.
+  void SaveProxySettings(vtkSMProxy* proxy);
+
+  // Description:
   // Check whether a setting is defined for the requested names.
   bool HasSetting(const char* settingName);
 

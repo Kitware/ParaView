@@ -40,16 +40,42 @@ public:
   Json::Value UserSettingsJSONRoot;
   Json::Value SiteSettingsJSONRoot;
 
+  //----------------------------------------------------------------------------
   // Description:
   // See if given setting is defined
   bool HasSetting(const char* settingName)
   {
-    Json::Value value = this->GetValue(settingName);
+    Json::Value value = this->GetSetting(settingName);
+
     return !value.isNull();
   }
 
+  //----------------------------------------------------------------------------
   // Description:
-  // Get a Json::Value type given a string
+  // See if given setting is defined in user settings
+  bool HasUserSetting(const char* settingName)
+  {
+    Json::Value value = this->GetUserSetting(settingName);
+
+    return !value.isNull();
+  }
+
+  //----------------------------------------------------------------------------
+  // Description:
+  // See if given setting is defined in user settings
+  bool HasSiteSetting(const char* settingName)
+  {
+    Json::Value value = this->GetSiteSetting(settingName);
+
+    return !value.isNull();
+  }  
+
+  //----------------------------------------------------------------------------
+  // Description:
+  // Get a Json::Value given a string. Returns the setting defined in the user
+  // settings file if it is defined, falls back to the setting defined in the
+  // site settings file if it is defined, and null if it isn't defined in
+  // either the user or settings file.
   //
   // String format is:
   // "." => root node
@@ -57,26 +83,39 @@ public:
   // ".name" => member named 'name' of root node (an object value)
   // ".name1.name2.name3"
   // ".[0][1][2].name1[3]"
-  Json::Value GetValue(const char* settingName)
+  const Json::Value & GetSetting(const char* settingName)
+  {
+    // Try user-specific settings first
+    const Json::Value & userSetting = this->GetUserSetting(settingName);
+    if (!userSetting)
+      {
+      const Json::Value & siteSetting = this->GetSiteSetting(settingName);
+      return siteSetting;
+      }
+
+    return userSetting;
+  }
+
+  //----------------------------------------------------------------------------
+  const Json::Value & GetUserSetting(const char* settingName)
   {
     // Convert setting string to path
     const std::string settingString(settingName);
     Json::Path userSettingsPath(settingString);
 
-    // Try user-specific settings first
-    Json::Value setting = userSettingsPath.make(this->UserSettingsJSONRoot);
-    if (!setting)
-      {
-      Json::Path siteSettingsPath(settingString);
-      setting = siteSettingsPath.make(this->SiteSettingsJSONRoot);
-      }
+    const Json::Value & userSetting = userSettingsPath.resolve(this->UserSettingsJSONRoot);
 
-    if (!setting)
-      {
-      return Json::Value::null;
-      }
+    return userSetting;
+  }
 
-    return setting;
+  //----------------------------------------------------------------------------
+  const Json::Value & GetSiteSetting(const char* settingName)
+  {
+    // Convert setting string to path
+    Json::Path siteSettingsPath(settingName);
+    const Json::Value & siteSetting = siteSettingsPath.resolve(this->SiteSettingsJSONRoot);
+
+    return siteSetting;
   }
 
   //----------------------------------------------------------------------------
@@ -104,7 +143,7 @@ public:
   {
     values.clear();
 
-    Json::Value setting = this->GetValue(settingName);
+    Json::Value setting = this->GetSetting(settingName);
     if (!setting)
       {
       return false;
@@ -119,14 +158,14 @@ public:
       for (Json::Value::ArrayIndex i = 0; i < setting.size(); ++i)
         {
         T value;
-        this->GetSettingAs(setting[i], value);
+        this->GetScalarSetting(setting[i], value);
         values.push_back(value);
         }
       }
     else
       {
       T value;
-      bool success = this->GetSettingAs(setting, value);
+      bool success = this->GetScalarSetting(setting, value);
       if (success)
         {
         values.push_back(value);
@@ -138,7 +177,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetSettingAs(const Json::Value & jsonValue, int & value)
+  bool GetScalarSetting(const Json::Value & jsonValue, int & value)
   {
     if (!jsonValue.isNumeric())
       {
@@ -150,7 +189,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetSettingAs(const Json::Value & jsonValue, long long int & value)
+  bool GetScalarSetting(const Json::Value & jsonValue, long long int & value)
   {
     if (!jsonValue.isNumeric())
       {
@@ -162,7 +201,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetSettingAs(const Json::Value & jsonValue, double & value)
+  bool GetScalarSetting(const Json::Value & jsonValue, double & value)
   {
     if (!jsonValue.isNumeric())
       {
@@ -182,7 +221,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetSettingAs(const Json::Value & jsonValue, vtkStdString & value)
+  bool GetScalarSetting(const Json::Value & jsonValue, vtkStdString & value)
   {
     if (!jsonValue.isString())
       {
@@ -200,6 +239,74 @@ public:
 
     return true;
   }
+
+  //----------------------------------------------------------------------------
+  // Description:
+  // Save a property setting to a Json::Value
+  void SavePropertySetting(vtkSMProperty* property, Json::Value & jsonValue)
+  {
+    vtkSMIntVectorProperty*    intVectorProperty    = NULL;
+    vtkSMDoubleVectorProperty* doubleVectorProperty = NULL;
+    vtkSMStringVectorProperty* stringVectorProperty = NULL;
+    vtkSMInputProperty*        inputProperty        = NULL;
+
+    if (intVectorProperty = vtkSMIntVectorProperty::SafeDownCast(property))
+      {
+      if (intVectorProperty->GetNumberOfElements() == 1)
+        {
+        jsonValue = intVectorProperty->GetElement(0);
+        }
+      else
+        {
+        jsonValue.resize(intVectorProperty->GetNumberOfElements());
+        for (unsigned int i = 0; i < intVectorProperty->GetNumberOfElements(); ++i)
+          {
+          jsonValue[i] = intVectorProperty->GetElement(i);
+          }
+        }
+      }
+    else if (doubleVectorProperty = vtkSMDoubleVectorProperty::SafeDownCast(property))
+      {
+      if (doubleVectorProperty->GetNumberOfElements() == 1)
+        {
+        jsonValue = doubleVectorProperty->GetElement(0);
+        }
+      else
+        {
+        jsonValue.resize(doubleVectorProperty->GetNumberOfElements());
+        for (unsigned int i = 0; i < doubleVectorProperty->GetNumberOfElements(); ++i)
+          {
+          jsonValue[i] = doubleVectorProperty->GetElement(i);
+          }
+        }
+      }
+    else if (stringVectorProperty = vtkSMStringVectorProperty::SafeDownCast(property))
+      {
+      if (stringVectorProperty->GetNumberOfElements() == 1)
+        {
+        jsonValue = stringVectorProperty->GetElement(0);
+        }
+      else
+        {
+        jsonValue.resize(stringVectorProperty->GetNumberOfElements());
+        for (unsigned int i = 0; i < stringVectorProperty->GetNumberOfElements(); ++i)
+          {
+          jsonValue[i] = stringVectorProperty->GetElement(i);
+          }
+        }
+      }
+    else if (inputProperty = vtkSMInputProperty::SafeDownCast(property))
+      {
+      std::cerr << "Unhandled property '" << property->GetXMLName() << "' of type '"
+                << property->GetClassName() << "'\n";
+      }
+    else
+      {
+      std::cerr << "Unhandled property '" << property->GetXMLName() << "' of type '"
+                << property->GetClassName() << "'\n";
+      }
+  }
+
 };
 
 //----------------------------------------------------------------------------
@@ -429,6 +536,89 @@ bool vtkSMSettings::HasSetting(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSettings::SaveProxySettings(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return;
+    }
+
+  const char* proxyGroup = proxy->GetXMLGroup();
+  const char* proxyName = proxy->GetXMLName();
+
+  if (!proxyGroup || !proxyName)
+    {
+    return;
+    }
+
+  // Create group node if it doesn't exist
+  vtksys_ios::ostringstream settingStringStream;
+  settingStringStream << "." << proxyGroup;
+  std::string settingString(settingStringStream.str());
+  const char* settingCString = settingString.c_str();
+
+  if (!this->Internal->HasSetting(settingCString))
+    {
+    Json::Value newValue;
+    this->Internal->UserSettingsJSONRoot[proxyGroup] = newValue;
+    }
+
+  // Create proxy node if it doesn't exist
+  settingStringStream << "." << proxyName;
+  std::cout << settingStringStream.str() << std::endl;
+  settingString = settingStringStream.str();
+  settingCString = settingString.c_str();
+
+  if (!this->Internal->HasSetting(settingCString))
+    {
+    Json::Value newValue;
+    this->Internal->UserSettingsJSONRoot[proxyGroup][proxyName] = newValue;
+    }
+
+  Json::Value proxyValue = this->Internal->GetSetting(settingCString);
+  vtkSMPropertyIterator * iter = proxy->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* property = iter->GetProperty();
+    if (!property) continue;
+
+    vtksys_ios::ostringstream propertySettingStringStream;
+    propertySettingStringStream << settingStringStream.str() << "."
+                                << property->GetXMLName();
+    std::string propertySettingString(propertySettingStringStream.str());
+    const char* propertySettingCString = propertySettingString.c_str();
+
+    if (strcmp(property->GetPanelVisibility(), "never") == 0 ||
+        property->GetInformationOnly() ||
+        property->GetIsInternal())
+      {
+      continue;
+      }
+    else if (property->IsValueDefault())
+      {
+      // Remove existing JSON entry only if there is no site setting
+      if (!this->Internal->HasSiteSetting(propertySettingCString))
+        {
+        std::cout << "Removing member " << property->GetXMLName() << std::endl;
+        this->Internal->
+          UserSettingsJSONRoot[proxyGroup][proxyName].removeMember(property->GetXMLName());
+        continue;
+        }
+      }
+
+    Json::Value propertyValue;
+    this->Internal->SavePropertySetting(property, propertyValue);
+    if (!propertyValue.isNull())
+      {
+      this->Internal->
+        UserSettingsJSONRoot[proxyGroup][proxyName][property->GetXMLName()] = propertyValue;
+      }
+    }
+
+  std::cout << this->Internal->UserSettingsJSONRoot.toStyledString();
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSettings::GetScalarSetting(const char* settingName, int & value)
 {
   return this->Internal->GetScalarSetting(settingName, value);
@@ -490,7 +680,7 @@ bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
   vtkSMPropertyIterator * iter = proxy->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    vtkSMProperty * property = iter->GetProperty();
+    vtkSMProperty* property = iter->GetProperty();
     if (!property)
       {
       continue;
@@ -504,8 +694,9 @@ bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
                           << "." << proxy->GetXMLName()
                           << "." << property->GetXMLName();
 
-      vtkStdString settingString(settingStringStream.str());
-      if (this->HasSetting(settingString.c_str()))
+      const std::string settingString = settingStringStream.str();
+      const char* settingCString = settingString.c_str();
+      if (this->HasSetting(settingCString))
         {
         vtkSMIntVectorProperty*    intVectorProperty = NULL;
         vtkSMDoubleVectorProperty* doubleVectorProperty = NULL;
@@ -515,19 +706,19 @@ bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
         bool success = false;
         if (intVectorProperty = vtkSMIntVectorProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(intVectorProperty, settingString.c_str());
+          success = this->SetPropertySetting(intVectorProperty, settingCString);
           }
         else if (doubleVectorProperty = vtkSMDoubleVectorProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(doubleVectorProperty, settingString.c_str());
+          success = this->SetPropertySetting(doubleVectorProperty, settingCString);
           }
         else if (stringVectorProperty = vtkSMStringVectorProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(stringVectorProperty, settingString.c_str());
+          success = this->SetPropertySetting(stringVectorProperty, settingCString);
           }
         else if (inputProperty = vtkSMInputProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(inputProperty, settingString.c_str());
+          success = this->SetPropertySetting(inputProperty, settingCString);
           }
         else
           {
@@ -537,8 +728,7 @@ bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
 
         if (!success)
           {
-          vtkErrorMacro(<< "Setting property " << settingStringStream.str()
-                        << (success ? " succeeded" : " failed"));
+          vtkErrorMacro(<< "Setting property " << settingStringStream.str() << " failed");
           overallSuccess = false;
           }
         }
