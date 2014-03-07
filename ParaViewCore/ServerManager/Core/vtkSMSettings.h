@@ -74,17 +74,26 @@ public:
   vtkGetStringMacro(SiteSettingsString);
 
   // Description:
-  // Save non-default settings in the current user settings.
-  void SetProxySettings(vtkSMProxy* proxy);
-
-  // Description:
-  // Set setting pointed to by jsonPath
-  bool SetScalarSetting(const char* jsonPath, int value);
-  bool SetScalarSetting(const char* jsonPath, const char* value);
-
-  // Description:
   // Check whether a setting is defined for the requested names.
   bool HasSetting(const char* settingName);
+
+  // Description:
+  // Set setting of a given name
+  bool SetScalarSetting(const char* settingName, int value);
+  bool SetScalarSetting(const char* settingName, double value);
+  bool SetScalarSetting(const char* settingName, long long int value);
+  bool SetScalarSetting(const char* settingName, const vtkStdString & value);
+
+  // Description:
+  // Set vector setting at a location given by the jsonPath
+  bool SetVectorSetting(const char* settingName, const std::vector<int> & values);
+  bool SetVectorSetting(const char* settingName, const std::vector<long long int> & values);
+  bool SetVectorSetting(const char* settingName, const std::vector<double> & values);
+  bool SetVectorSetting(const char* settingName, const std::vector<vtkStdString> & values);
+
+  // Description:
+  // Save non-default settings in the current user settings.
+  void SetProxySettings(vtkSMProxy* proxy);
 
   // Description:
   // Get setting as a scalar value
@@ -94,17 +103,12 @@ public:
   bool GetScalarSetting(const char* settingName, vtkStdString & value);
 
   // Description:
-  // Get setting as a vector of various numerical types. Returns true on
+  // Get setting as a vector of a certain type. Returns true on
   // success, false on failure. These methods work on values given as
   // JSON arrays of numbers as well as singular JSON numbers.
   bool GetVectorSetting(const char* settingName, std::vector<int> & values);
   bool GetVectorSetting(const char* settingName, std::vector<long long int> & values);
   bool GetVectorSetting(const char* settingName, std::vector<double> & values);
-
-  // Description:
-  // Get setting as a vector of string types. Returns true on
-  // success, false on failure. This method works on values given as
-  // JSON arrays of strings as well as singular JSON strings.
   bool GetVectorSetting(const char* settingName, std::vector<vtkStdString> & values);
 
   // Description:
@@ -113,22 +117,6 @@ public:
   // should look for settings. The group and name of the proxy are
   // appended to the jsonPrefix automatically.
   bool GetProxySettings(vtkSMProxy* proxy, const char* jsonPrefix);
-
-  // Description:
-  // Get int vector from JSON path and set it in the property.
-  bool GetPropertySetting(vtkSMIntVectorProperty* property, const char* jsonPath);
-
-  // Description:
-  // Get double vector from JSON path and set it in the property.
-  bool GetPropertySetting(vtkSMDoubleVectorProperty* property, const char* jsonPath);
-
-  // Description:
-  // Get string vector from JSON path and set it in the property.
-  bool GetPropertySetting(vtkSMStringVectorProperty* property, const char* jsonPath);
-
-  // Description:
-  // Get input property from JSON path and set it in the property.
-  bool GetPropertySetting(vtkSMInputProperty* property, const char* jsonPath);
 
 protected:
   vtkSMSettings();
