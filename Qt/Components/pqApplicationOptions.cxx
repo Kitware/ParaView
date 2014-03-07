@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkMultiThreader.h"
 
 #include <QMenu>
@@ -301,6 +302,10 @@ void pqApplicationOptions::applyChanges()
       this->Internal->DefaultViewType->currentIndex()));
   pqServer::setHeartBeatTimeoutSetting(static_cast<int>(
       this->Internal->HeartBeatTimeout->text().toDouble()*60*1000));
+  vtkSMSettings::GetInstance()->
+    SetScalarSetting(".paraview.defaultViewType",
+                     this->Internal->DefaultViewType->itemData(
+                       this->Internal->DefaultViewType->currentIndex()).toString().toStdString().c_str());
 
   pqScalarsToColors::setColorRangeScalingMode(
     this->Internal->RescaleDataRangeMode->currentIndex());

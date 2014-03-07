@@ -106,6 +106,10 @@ public slots:
   /// recent call to filterWidgets().
   void updatePanel();
 
+  /// Signal fired when user sets defaults from a proxy's current
+  /// property settings.
+  void saveProxySettingsAsDefault();
+
 protected:
   void showEvent(QShowEvent *event);
   void hideEvent(QHideEvent *event);

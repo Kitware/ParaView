@@ -242,8 +242,8 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Save a property setting to a Json::Value
-  void SavePropertySetting(vtkSMProperty* property, Json::Value & jsonValue)
+  // Set a property setting to a Json::Value
+  void SetPropertySetting(vtkSMProperty* property, Json::Value & jsonValue)
   {
     vtkSMIntVectorProperty*    intVectorProperty    = NULL;
     vtkSMDoubleVectorProperty* doubleVectorProperty = NULL;
@@ -536,7 +536,7 @@ bool vtkSMSettings::HasSetting(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SaveProxySettings(vtkSMProxy* proxy)
+void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
 {
   if (!proxy)
     {
@@ -607,7 +607,7 @@ void vtkSMSettings::SaveProxySettings(vtkSMProxy* proxy)
       }
 
     Json::Value propertyValue;
-    this->Internal->SavePropertySetting(property, propertyValue);
+    this->Internal->SetPropertySetting(property, propertyValue);
     if (!propertyValue.isNull())
       {
       this->Internal->
@@ -616,6 +616,44 @@ void vtkSMSettings::SaveProxySettings(vtkSMProxy* proxy)
     }
 
   std::cout << this->Internal->UserSettingsJSONRoot.toStyledString();
+}
+
+//----------------------------------------------------------------------------
+// Description:
+// Splits a JSON path into branch and leaf components. This is needed
+// to build trees with the JsonCpp library.
+static void SeparateBranchFromLeaf(const char* jsonPath, std::string & root, std::string & leaf)
+{
+  root.clear();
+  leaf.clear();
+
+  // Chop off leaf setting
+  std::string jsonPathString(jsonPath);
+  size_t lastPeriod = jsonPathString.find_last_of('.');
+  root = jsonPathString.substr(0, lastPeriod);
+  leaf = jsonPathString.substr(lastPeriod+1);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::SetScalarSetting(const char* jsonPath, int value)
+{
+  std::string root, leaf;
+  SeparateBranchFromLeaf(jsonPath, root, leaf);
+
+  Json::Path settingPath(root.c_str());
+  Json::Value & jsonValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
+  jsonValue[leaf] = value;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::SetScalarSetting(const char* jsonPath, const char* value)
+{
+  std::string root, leaf;
+  SeparateBranchFromLeaf(jsonPath, root, leaf);
+
+  Json::Path settingPath(root.c_str());
+  Json::Value & jsonValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
+  jsonValue[leaf] = value;
 }
 
 //----------------------------------------------------------------------------
@@ -667,45 +705,7 @@ bool vtkSMSettings::GetVectorSetting(const char* settingName, std::vector<vtkStd
 }
 
 //----------------------------------------------------------------------------
-// Description:
-// Splits a JSON path into branch and leaf components. This is needed
-// to build trees with the JsonCpp library.
-static void SeparateBranchFromLeaf(const char* jsonPath, std::string & root, std::string & leaf)
-{
-  root.clear();
-  leaf.clear();
-
-  // Chop off leaf setting
-  std::string jsonPathString(jsonPath);
-  size_t lastPeriod = jsonPathString.find_last_of('.');
-  root = jsonPathString.substr(0, lastPeriod);
-  leaf = jsonPathString.substr(lastPeriod+1);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::SetScalarSetting(const char* jsonPath, int value)
-{
-  std::string root, leaf;
-  SeparateBranchFromLeaf(jsonPath, root, leaf);
-
-  Json::Path settingPath(root.c_str());
-  Json::Value & jsonValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
-  jsonValue[leaf] = value;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::SetScalarSetting(const char* jsonPath, const char* value)
-{
-  std::string root, leaf;
-  SeparateBranchFromLeaf(jsonPath, root, leaf);
-
-  Json::Path settingPath(root.c_str());
-  Json::Value & jsonValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
-  jsonValue[leaf] = value;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
+bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy, const char* jsonPrefix)
 {
   if (!proxy)
     {
@@ -728,7 +728,7 @@ bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
       {
       // Build the JSON reference string
       vtksys_ios::ostringstream settingStringStream;
-      settingStringStream << jsonPath
+      settingStringStream << jsonPrefix
                           << "." << proxy->GetXMLName()
                           << "." << property->GetXMLName();
 
@@ -744,19 +744,19 @@ bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
         bool success = false;
         if (intVectorProperty = vtkSMIntVectorProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(intVectorProperty, settingCString);
+          success = this->GetPropertySetting(intVectorProperty, settingCString);
           }
         else if (doubleVectorProperty = vtkSMDoubleVectorProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(doubleVectorProperty, settingCString);
+          success = this->GetPropertySetting(doubleVectorProperty, settingCString);
           }
         else if (stringVectorProperty = vtkSMStringVectorProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(stringVectorProperty, settingCString);
+          success = this->GetPropertySetting(stringVectorProperty, settingCString);
           }
         else if (inputProperty = vtkSMInputProperty::SafeDownCast(property))
           {
-          success = this->SetPropertySetting(inputProperty, settingCString);
+          success = this->GetPropertySetting(inputProperty, settingCString);
           }
         else
           {
@@ -779,7 +779,7 @@ bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetPropertySetting(vtkSMIntVectorProperty* property,
+bool vtkSMSettings::GetPropertySetting(vtkSMIntVectorProperty* property,
                                        const char* jsonPath)
 {
   vtkSMDomain* domain = property->FindDomain("vtkSMEnumerationDomain");
@@ -819,7 +819,7 @@ bool vtkSMSettings::SetPropertySetting(vtkSMIntVectorProperty* property,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetPropertySetting(vtkSMDoubleVectorProperty* property,
+bool vtkSMSettings::GetPropertySetting(vtkSMDoubleVectorProperty* property,
                                        const char* jsonPath)
 {
   std::vector<double> vector;
@@ -833,7 +833,7 @@ bool vtkSMSettings::SetPropertySetting(vtkSMDoubleVectorProperty* property,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetPropertySetting(vtkSMStringVectorProperty* property,
+bool vtkSMSettings::GetPropertySetting(vtkSMStringVectorProperty* property,
                                        const char* jsonPath)
 {
   std::vector<vtkStdString> vector;
@@ -854,7 +854,7 @@ bool vtkSMSettings::SetPropertySetting(vtkSMStringVectorProperty* property,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetPropertySetting(vtkSMInputProperty* property,
+bool vtkSMSettings::GetPropertySetting(vtkSMInputProperty* property,
                                        const char* jsonPath)
 {
   std::vector<vtkStdString> vector;
@@ -892,7 +892,7 @@ bool vtkSMSettings::SetPropertySetting(vtkSMInputProperty* property,
       if (listProxy)
         {
         // Recurse on the proxy
-        bool success = this->SetProxySettings(listProxy, jsonPath);
+        bool success = this->GetProxySettings(listProxy, jsonPath);
         if (!success)
           {
           return false;

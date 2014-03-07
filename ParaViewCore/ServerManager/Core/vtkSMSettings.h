@@ -75,7 +75,12 @@ public:
 
   // Description:
   // Save non-default settings in the current user settings.
-  void SaveProxySettings(vtkSMProxy* proxy);
+  void SetProxySettings(vtkSMProxy* proxy);
+
+  // Description:
+  // Set setting pointed to by jsonPath
+  bool SetScalarSetting(const char* jsonPath, int value);
+  bool SetScalarSetting(const char* jsonPath, const char* value);
 
   // Description:
   // Check whether a setting is defined for the requested names.
@@ -103,30 +108,27 @@ public:
   bool GetVectorSetting(const char* settingName, std::vector<vtkStdString> & values);
 
   // Description:
-  // Set setting pointed to by jsonPath
-  bool SetScalarSetting(const char* jsonPath, int value);
-  bool SetScalarSetting(const char* jsonPath, const char* value);
+  // Set the property values in a vtkSMProxy from a Json path.
+  // The jsonPrefix specifies the root level of the Json tree where this method
+  // should look for settings. The group and name of the proxy are
+  // appended to the jsonPrefix automatically.
+  bool GetProxySettings(vtkSMProxy* proxy, const char* jsonPrefix);
 
   // Description:
-  // Process a vtkSMProxy so that property values in the proxy may
-  // take on values in the settings.
-  bool SetProxySettings(vtkSMProxy* proxy, const char* jsonPath);
+  // Get int vector from JSON path and set it in the property.
+  bool GetPropertySetting(vtkSMIntVectorProperty* property, const char* jsonPath);
 
   // Description:
-  // Set int vector property from JSON path.
-  bool SetPropertySetting(vtkSMIntVectorProperty* property, const char* jsonPath);
+  // Get double vector from JSON path and set it in the property.
+  bool GetPropertySetting(vtkSMDoubleVectorProperty* property, const char* jsonPath);
 
   // Description:
-  // Set double vector property from JSON path.
-  bool SetPropertySetting(vtkSMDoubleVectorProperty* property, const char* jsonPath);
+  // Get string vector from JSON path and set it in the property.
+  bool GetPropertySetting(vtkSMStringVectorProperty* property, const char* jsonPath);
 
   // Description:
-  // Set string vector property from JSON path.
-  bool SetPropertySetting(vtkSMStringVectorProperty* property, const char* jsonPath);
-
-  // Description:
-  // Set input property from JSON path.
-  bool SetPropertySetting(vtkSMInputProperty* property, const char* jsonPath);
+  // Get input property from JSON path and set it in the property.
+  bool GetPropertySetting(vtkSMInputProperty* property, const char* jsonPath);
 
 protected:
   vtkSMSettings();

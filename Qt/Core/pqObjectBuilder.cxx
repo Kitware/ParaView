@@ -865,7 +865,7 @@ void pqObjectBuilder::onProxyCreated(pqProxy* proxy)
   std::string jsonPrefix(".");
   jsonPrefix.append(smProxy->GetXMLGroup());
 
-  vtkSMSettings::GetInstance()->SetProxySettings(smProxy, jsonPrefix.c_str());
+  vtkSMSettings::GetInstance()->GetProxySettings(smProxy, jsonPrefix.c_str());
 }
 
 //-----------------------------------------------------------------------------
