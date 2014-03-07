@@ -103,6 +103,11 @@ public:
   bool GetVectorSetting(const char* settingName, std::vector<vtkStdString> & values);
 
   // Description:
+  // Set setting pointed to by jsonPath
+  bool SetScalarSetting(const char* jsonPath, int value);
+  bool SetScalarSetting(const char* jsonPath, const char* value);
+
+  // Description:
   // Process a vtkSMProxy so that property values in the proxy may
   // take on values in the settings.
   bool SetProxySettings(vtkSMProxy* proxy, const char* jsonPath);

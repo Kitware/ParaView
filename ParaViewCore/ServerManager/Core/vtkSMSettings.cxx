@@ -667,6 +667,44 @@ bool vtkSMSettings::GetVectorSetting(const char* settingName, std::vector<vtkStd
 }
 
 //----------------------------------------------------------------------------
+// Description:
+// Splits a JSON path into branch and leaf components. This is needed
+// to build trees with the JsonCpp library.
+static void SeparateBranchFromLeaf(const char* jsonPath, std::string & root, std::string & leaf)
+{
+  root.clear();
+  leaf.clear();
+
+  // Chop off leaf setting
+  std::string jsonPathString(jsonPath);
+  size_t lastPeriod = jsonPathString.find_last_of('.');
+  root = jsonPathString.substr(0, lastPeriod);
+  leaf = jsonPathString.substr(lastPeriod+1);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::SetScalarSetting(const char* jsonPath, int value)
+{
+  std::string root, leaf;
+  SeparateBranchFromLeaf(jsonPath, root, leaf);
+
+  Json::Path settingPath(root.c_str());
+  Json::Value & jsonValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
+  jsonValue[leaf] = value;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::SetScalarSetting(const char* jsonPath, const char* value)
+{
+  std::string root, leaf;
+  SeparateBranchFromLeaf(jsonPath, root, leaf);
+
+  Json::Path settingPath(root.c_str());
+  Json::Value & jsonValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
+  jsonValue[leaf] = value;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSettings::SetProxySettings(vtkSMProxy* proxy, const char* jsonPath)
 {
   if (!proxy)
