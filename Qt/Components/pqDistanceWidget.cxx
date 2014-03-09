@@ -78,7 +78,11 @@ void pqDistanceWidget::updateDistance()
     wproxy->GetProperty("Point1WorldPosition"));
   vtkSMDoubleVectorProperty* dvp2 = vtkSMDoubleVectorProperty::SafeDownCast(
     wproxy->GetProperty("Point2WorldPosition"));
-  double distance =  sqrt(vtkMath::Distance2BetweenPoints(
-      dvp1->GetElements(), dvp2->GetElements()));
+  double distance = 0.0;
+  if (dvp1 && dvp1->GetElements() && dvp2 && dvp2->GetElements())
+    {
+    distance = sqrt(vtkMath::Distance2BetweenPoints(
+                      dvp1->GetElements(), dvp2->GetElements()));
+    }
   this->Label->setText(QString("<b>Distance:</b> <i>%1</i> ").arg(distance));
 }
