@@ -260,7 +260,8 @@ public:
 //-----------------------------------------------------------------------------
 pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   : Superclass(parentObject),
-  Internals(new pqInternals(this))
+  Internals(new pqInternals(this)),
+  PanelMode(pqPropertiesPanel::ALL_PROPERTIES)
 {
   // Setup configuration defaults using settings.
   pqSettings *settings = pqApplicationCore::instance()->settings();
@@ -349,11 +350,46 @@ pqPropertiesPanel::~pqPropertiesPanel()
 }
 
 //-----------------------------------------------------------------------------
+void pqPropertiesPanel::setPanelMode(int val)
+{
+  if (this->PanelMode == val)
+    {
+    return;
+    }
+
+  this->PanelMode = val;
+
+  // show buttons only when showing source properties.
+  bool has_source = (this->PanelMode & pqPropertiesPanel::SOURCE_PROPERTIES) != 0;
+  bool has_display = (this->PanelMode & pqPropertiesPanel::DISPLAY_PROPERTIES) != 0;
+  bool has_view = (this->PanelMode & pqPropertiesPanel::VIEW_PROPERTIES) != 0;
+
+  this->Internals->Ui.Accept->setVisible(has_source);
+  this->Internals->Ui.Delete->setVisible(has_source);
+  this->Internals->Ui.Help->setVisible(has_source);
+  this->Internals->Ui.Reset->setVisible(has_source);
+
+  this->Internals->Ui.PropertiesFrame->setVisible(has_source);
+  this->Internals->Ui.ViewFrame->setVisible(has_view);
+  this->Internals->Ui.DisplayFrame->setVisible(has_display);
+
+  // the buttons need not be shown if there's only 1 type in the panel.
+  bool has_multiples_types =
+    ((has_source? 1 : 0) + (has_display? 1 : 0) + (has_view? 1 : 0)) > 1;
+  this->Internals->Ui.PropertiesButton->setVisible(has_multiples_types && has_source);
+  this->Internals->Ui.DisplayButton->setVisible(has_multiples_types && has_display);
+  this->Internals->Ui.ViewButton->setVisible(has_multiples_types && has_view);
+
+  this->updatePanel();
+}
+
+//-----------------------------------------------------------------------------
 void pqPropertiesPanel::generalSettingsChanged()
 {
   vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
   pqPropertiesPanel::AutoApply = generalSettings->GetAutoApply();
 }
+
 
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::setAutoApply(bool enabled)
@@ -429,6 +465,11 @@ void pqPropertiesPanel::updatePanel(pqOutputPort* port)
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource *source)
 {
+  if ( (this->PanelMode & SOURCE_PROPERTIES) == 0)
+    {
+    source = NULL;
+    }
+
   if (this->Internals->Source != source)
     {
     // Panel has changed.
@@ -489,6 +530,11 @@ void pqPropertiesPanel::updateDisplayPanel()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
 {
+  if ( (this->PanelMode & pqPropertiesPanel::DISPLAY_PROPERTIES) == 0)
+    {
+    repr = NULL;
+    }
+
   // since this->Internals->Representation is QPointer, it can go NULL (e.g. during
   // disconnect) before we get the chance to clear the panel's widgets. Hence we
   // do the block of code if (repr==NULL) event if nothing has changed.
@@ -540,6 +586,11 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updateViewPanel (pqView* _view)
 {
+  if ( (this->PanelMode & pqPropertiesPanel::VIEW_PROPERTIES) == 0)
+    {
+    _view = NULL;
+    }
+
   if (this->Internals->View != _view)
     {
     // The view has changed.
@@ -577,7 +628,9 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
       this->Internals->Ui.SearchLineEdit->text());
     }
   else
+    {
     this->Internals->Ui.ViewButton->setText("View");
+    }
 }
 
 //-----------------------------------------------------------------------------

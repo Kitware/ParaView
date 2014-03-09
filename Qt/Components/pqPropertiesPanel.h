@@ -50,9 +50,14 @@ class vtkSMProxy;
 /// mechanism to provide custom widgets/panels for the proxy or its
 /// representations. pqPropertiesPanel uses pqProxyWidget to create and manage
 /// the widgets for the source and representation proxies.
+///
+/// pqPropertiesPanel comprises of 3 separate parts for showing the source
+/// properties, display properties and view properties. One can control which
+/// parts are shown by setting the panelMode property.
 class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
 {
   Q_OBJECT
+  Q_PROPERTY(int panelMode READ panelMode WRITE setPanelMode);
   typedef QWidget Superclass;
 public:
   pqPropertiesPanel(QWidget *parent = 0);
@@ -78,6 +83,18 @@ public:
   static int suggestedMargin() { return 0; }
   static int suggestedHorizontalSpacing() { return 4; }
   static int suggestedVerticalSpacing() { return 4; }
+
+  enum
+    {
+    SOURCE_PROPERTIES=0x01,
+    DISPLAY_PROPERTIES=0x02,
+    VIEW_PROPERTIES=0x04,
+    ALL_PROPERTIES=SOURCE_PROPERTIES|DISPLAY_PROPERTIES|VIEW_PROPERTIES
+    };
+
+  /// Get/Set the panel mode.
+  void setPanelMode(int val);
+  int panelMode() const { return this->PanelMode; }
 
 public slots:
   /// Apply the changes properties to the proxies.
@@ -164,6 +181,7 @@ private:
   friend class pqInternals;
 
   pqInternals* Internals;
+  int PanelMode;
 
   Q_DISABLE_COPY(pqPropertiesPanel)
 };
