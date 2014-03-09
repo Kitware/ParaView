@@ -318,6 +318,9 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         # Add node to pipeline
         self.pipeline.addNode(pid, newProxy.GetGlobalIDAsString())
 
+        # Handle domains
+        helper.apply_domains(parentProxy, newProxy.GetGlobalIDAsString())
+
         # Create LUT if need be
         if pid == '0':
             self.lutManager.registerFieldData(newProxy.GetPointDataInformation())

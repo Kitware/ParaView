@@ -603,6 +603,10 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     margin-left: 0px;
 }
 
+.pipeline-editor .pv-widget-slider  input {
+    width: 95%;
+}
+
 .pipeline-editor .pipeline-editor-content > table {
     margin-left: 5px;
     margin-top: 10px;
@@ -669,4 +673,30 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 .pipeline-editor .label {
     top: 0.5em;
     margin-left: 0.5em;
+}
+
+/* ==========================  Representation Property editor  ============================ */
+
+/*.pipeline-editor-representation {
+    border-top: solid 0.5px black;
+    margin-top: 5px;
+    padding: 0 5px 0 5px;
+}*/
+
+.pipeline-editor-representation > table {
+    margin-left: 5px;
+    margin-top: 10px;
+}
+
+.pipeline-editor-representation td.pv-widget {
+    width: 100%;
+}
+
+.pipeline-editor-representation td.pv-widget input {
+    width: 90%;
+}
+
+.pipeline-editor-representation td.title {
+    font-weight: bold;
+    font-size: 0.8em;
 }

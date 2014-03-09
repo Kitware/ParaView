@@ -53,7 +53,7 @@ public:
   static vtkSMBoundsDomain* New();
   vtkTypeMacro(vtkSMBoundsDomain, vtkSMDoubleRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   // Description:
   // Update self checking the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
@@ -75,6 +75,8 @@ public:
 
   vtkGetMacro(ScaleFactor, double);
 
+  void SetDomainValues(double bounds[6]);
+
 protected:
   vtkSMBoundsDomain();
   ~vtkSMBoundsDomain();
@@ -89,14 +91,12 @@ protected:
   vtkPVDataInformation* GetInputInformation();
 
   void UpdateOriented();
-  
+
   int Mode;
   double ScaleFactor; // Used only in SCALED_EXTENT mode.
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented
-
-  void SetDomainValues(double bounds[6]);
 };
 
 #endif

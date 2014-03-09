@@ -11,6 +11,8 @@ import traceback
 from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 
+from vtkPVServerManagerCorePython import *
+
 # =============================================================================
 # Pipeline management
 # =============================================================================
@@ -370,6 +372,10 @@ def getProxyAsPipelineNode(id, lutManager = None):
     if lutManager and (len(rep.ColorArrayName) > 0):
         showScalarbar = lutManager.isScalarBarVisible(rep.ColorArrayName + '_' + str(nbActiveComp))
 
+    repName = 'Hide'
+    if rep.Visibility == 1:
+        repName = rep.Representation
+
     return { 'proxy_id'  : proxy.GetGlobalID(),                               \
              'name'      : pxm.GetProxyName("sources", proxy),                \
              'bounds'    : proxy.GetDataInformation().GetBounds(),            \
@@ -378,7 +384,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
              'activeData': rep.ColorAttributeType + ':' + rep.ColorArrayName, \
              'diffuseColor'  : str(rep.DiffuseColor),                         \
              'showScalarBar' : showScalarbar,                                 \
-             'representation': rep.Representation,                            \
+             'representation': repName,                                       \
              'state'         : state,                                         \
              'children'      : [] }
 
@@ -405,43 +411,43 @@ def getProxyAsState(id):
     properties = {}
     allowedTypes = [int, float, list, str]
     if proxy:
-       for property in proxy.ListProperties():
-          propertyName = proxy.GetProperty(property).Name
-          if propertyName in ["Refresh", "Input"] or propertyName.__contains__("Info"):
-             continue
+        for property in proxy.ListProperties():
+            propertyName = proxy.GetProperty(property).Name
+            if propertyName in ["Refresh", "Input"] or propertyName.__contains__("Info"):
+                continue
 
-          data = proxy.GetProperty(property).GetData()
-          if type(data) in allowedTypes:
-              properties[propertyName] = data
-              continue
+            data = proxy.GetProperty(property).GetData()
+            if type(data) in allowedTypes:
+                properties[propertyName] = data
+                continue
 
-          # Not a simple property
-          # Need more investigation
-          prop = proxy.GetProperty(property)
-          pythonProp = servermanager._wrap_property(proxy, prop)
-          proxyList = []
-          try:
-            proxyList = pythonProp.Available
-          except:
-              pass
-          if len(proxyList) and prop.GetNumberOfProxies() == 1:
-            listdomain = prop.GetDomain('proxy_list')
-            if listdomain:
-              proxyPropertyValue = prop.GetProxy(0)
-              for i in xrange(listdomain.GetNumberOfProxies()):
-                if listdomain.GetProxy(i) == proxyPropertyValue:
-                    properties[propertyName] = proxyList[i]
-                    # Add selected proxy in list of prop to edit
-                    properties[propertyName + '_internal'] = getProxyAsState(listdomain.GetProxy(i).GetGlobalID())
+            # Not a simple property
+            # Need more investigation
+            prop = proxy.GetProperty(property)
+            pythonProp = servermanager._wrap_property(proxy, prop)
+            proxyList = []
+            try:
+                proxyList = pythonProp.Available
+            except:
+                pass
+            if len(proxyList) and prop.GetNumberOfProxies() == 1:
+                listdomain = prop.GetDomain('proxy_list')
+                if listdomain:
+                    proxyPropertyValue = prop.GetProxy(0)
+                    for i in xrange(listdomain.GetNumberOfProxies()):
+                        if listdomain.GetProxy(i) == proxyPropertyValue:
+                            properties[propertyName] = proxyList[i]
+                            # Add selected proxy in list of prop to edit
+                            properties[propertyName + '_internal'] = getProxyAsState(listdomain.GetProxy(i).GetGlobalID())
 
-          elif type(prop) == ProxyProperty:
-              try:
-                  subProxyId = proxy.GetProperty(property).GetData().GetGlobalID()
-                  properties[propertyName] = getProxyAsState(subProxyId)
-              except:
-                  print "Error on", property, propertyName
-                  print "Skip property: ", str(type(data))
-                  print data
+            elif type(prop) == ProxyProperty:
+                try:
+                    subProxyId = proxy.GetProperty(property).GetData().GetGlobalID()
+                    properties[propertyName] = getProxyAsState(subProxyId)
+                except:
+                    print "Error on", property, propertyName
+                    print "Skip property: ", str(type(data))
+                    print data
     state['properties'] = properties;
     return state
 
@@ -578,6 +584,16 @@ def extractDomain(proxy, propertyName, xmlDomainElement):
     if name.__contains__('ProxyListDomain'):
         domainObj['list'] = proxy.GetProperty(propertyName).Available
 
+    # Handle Bounds
+    if name.__contains__('BoundsDomain'):
+        for attrName in ['default_mode', 'mode', 'scale_factor']:
+            try:
+                attrValue = xmlDomainElement.GetAttribute(attrName)
+                if attrValue:
+                    domainObj[attrName] = attrValue
+            except:
+                pass
+
     return domainObj
 
 # =============================================================================
@@ -614,3 +630,52 @@ def listFiles(pathToList):
             parent['children'].append(child)
     fileList = nodeTree[pathToList]['children']
     return fileList
+
+
+# =============================================================================
+# Apply domains
+# =============================================================================
+
+def apply_domains(parentProxy, proxy_id):
+    """
+    Handle bounds domain
+    """
+    proxy = idToProxy(proxy_id)
+
+    # Call recursively on each sub-proxy if any
+    for property_name in proxy.ListProperties():
+        prop = proxy.GetProperty(property_name)
+        if prop.IsA('vtkSMProxyProperty'):
+            try:
+                if len(prop.Available) and prop.GetNumberOfProxies() == 1:
+                    listdomain = prop.GetDomain('proxy_list')
+                    if listdomain:
+                        for i in xrange(listdomain.GetNumberOfProxies()):
+                            internal_proxy = listdomain.GetProxy(i)
+                            apply_domains(parentProxy, internal_proxy.GetGlobalIDAsString())
+            except:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+
+    # Reset all properties to leverage domain capabilities
+    for prop_name in proxy.ListProperties():
+        try:
+            prop = proxy.GetProperty(prop_name)
+            iter = prop.NewDomainIterator()
+            iter.Begin()
+            while not iter.IsAtEnd():
+                domain = iter.GetDomain()
+                iter.Next()
+
+                if domain.IsA('vtkSMBoundsDomain'):
+                    domain.SetDomainValues(parentProxy.GetDataInformation().GetBounds())
+
+            prop.ResetToDefault()
+
+            # Need to UnRegister to handle the ref count from the NewDomainIterator
+            iter.UnRegister(None)
+        except:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+
+    proxy.UpdateVTKObjects()
