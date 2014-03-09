@@ -20,7 +20,6 @@
 #include "vtkInformationVector.h"
 
 #include "vtkAMRDualGridHelper.h"
-#include "vtkPEquivalenceSet.h"
 #include "vtkCellData.h"
 #include "vtkCell.h"
 #include "vtkCompositeDataIterator.h"
@@ -34,6 +33,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNonOverlappingAMR.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
 #include "vtksys/SystemTools.hxx"
 
@@ -46,8 +46,149 @@
 
 vtkStandardNewMacro (vtkAMRConnectivity);
 
+class vtkAMRConnectivityEquivalence
+{
+public:
+  vtkAMRConnectivityEquivalence () 
+    {
+    id_to_set = vtkIntArray::New ();
+    id_to_set->SetNumberOfComponents (1);
+    id_to_set->SetNumberOfTuples (0);
+    set_to_min_id = vtkIntArray::New ();
+    set_to_min_id->SetNumberOfComponents (1);
+    set_to_min_id->SetNumberOfTuples (0);
+    }
+
+  ~vtkAMRConnectivityEquivalence ()
+    {
+    id_to_set->Delete ();
+    set_to_min_id->Delete ();
+    }
+
+  int AddEquivalence (int id1, int id2) 
+    {
+    int min_id, max_id;
+    if (id1 < id2)
+      {
+      min_id = id1;
+      max_id = id2;
+      }
+    else
+      {
+      min_id = id2;
+      max_id = id1;
+      }
+    while (id_to_set->GetNumberOfTuples () <= max_id) 
+      {
+      id_to_set->InsertNextValue (-1);
+      }
+    int set1 = id_to_set->GetValue (id1);
+    int set2 = id_to_set->GetValue (id2);
+
+    if (set1 >= 0 && set_to_min_id->GetValue (set1) < 0)  
+      {
+      set1 = -1;
+      }
+    if (set2 >= 0 && set_to_min_id->GetValue (set2) < 0)
+      {
+      set2 = -1;
+      }
+
+    if (set1 >= 0 && set2 >= 0 && set1 == set2) 
+      {
+      return 0;
+      }
+    else if (set1 >= 0 && set2 >= 0)
+      {
+      // merge sets
+      int min_set, max_set;
+      if (set1 < set2) 
+        {
+        min_set = set1;
+        max_set = set2;
+        }
+      else
+        {
+        min_set = set2;
+        max_set = set1;
+        }
+      for (int i = 0; i < id_to_set->GetNumberOfTuples (); i ++) 
+        {
+        if (id_to_set->GetValue (i) == max_set)
+          {
+          id_to_set->SetValue (i, min_set);
+          }
+        }
+      int max_set_min = set_to_min_id->GetValue (max_set);
+      int min_set_min = set_to_min_id->GetValue (min_set);
+      // pick the smallest of the two mins to represent the set.
+      if (max_set_min < min_set_min) 
+        {
+        set_to_min_id->SetValue (min_set, max_set_min);
+        }
+      set_to_min_id->SetValue (max_set, -1);
+      }
+    else if (set1 >= 0)
+      {
+      id_to_set->SetValue (id2, set1);
+      if (id2 < set_to_min_id->GetValue (set1)) 
+        {
+        set_to_min_id->SetValue (set1, id2);
+        }
+      }
+    else if (set2 >= 0)
+      {
+      id_to_set->SetValue (id1, set2);
+      if (id1 < set_to_min_id->GetValue (set2)) 
+        {
+        set_to_min_id->SetValue (set2, id1);
+        }
+      }
+    else
+      {
+      // find an empty set.
+      int first_empty = -1;
+      for (int i = 0; i < set_to_min_id->GetNumberOfTuples (); i ++)
+        {
+        if (set_to_min_id->GetValue (i) < 0)
+          {
+          first_empty = i;
+          break;
+          }
+        }
+      if (first_empty < 0)
+        {
+        first_empty = set_to_min_id->InsertNextValue (-1);
+        }
+
+      id_to_set->SetValue (id1, first_empty);
+      id_to_set->SetValue (id2, first_empty);
+      set_to_min_id->SetValue (first_empty, min_id);
+      // return zero here because its not values we've previously cared about.
+      }
+    return 1;
+    }
+
+  int GetMinimumSetId (int id)
+    {
+    if (id < 0 || id >= id_to_set->GetNumberOfTuples ()) 
+      {
+      // vtkErrorWithObjectMacro (id_to_set, << "ID out of range " << id << " (expected 0 <= x < " << id_to_set->GetNumberOfTuples () << ")");
+      return -1;
+      }
+    int set = id_to_set->GetValue (id);
+    return (set >= 0 ? set_to_min_id->GetValue (set) : -1);
+    }
+    
+private:
+  vtkIntArray* id_to_set;
+  vtkIntArray* set_to_min_id;
+};
+
 
 static const int BOUNDARY_TAG = 39857089;
+static const int EQUIV_SIZE_TAG = 23748957;
+static const int EQUIV_TAG = 984357345;
 
 #ifdef PARAVIEW_USE_MPI
 //-----------------------------------------------------------------------------
@@ -70,7 +211,11 @@ public:
   // Waits for all of the communication to complete.
   void WaitAll()
   {
-    for (iterator i = this->begin(); i != this->end(); i++) i->Request.Wait();
+    for (iterator i = this->begin(); i != this->end(); i++) 
+      {
+      i->Request.Wait();
+      // this->erase (i);
+      }
   }
   // Description:
   // Waits for one of the communications to complete, removes it from the list,
@@ -103,6 +248,8 @@ vtkAMRConnectivity::vtkAMRConnectivity ()
   this->VolumeFractionSurfaceValue = 0.5;
   this->Helper = 0;
   this->Equivalence = 0;
+  this->ResolveBlocks = 1;
+  this->PropagateGhosts = 0;
 }
 
 vtkAMRConnectivity::~vtkAMRConnectivity ()
@@ -208,6 +355,8 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   // initialize with a global unique region id
   this->NextRegionId = myProc+1;
 
+  vtkTimerLog::MarkStartEvent ("Initial fragment seeding");
+
   // Find the block local fragments
   vtkCompositeDataIterator* iter = volume->NewIterator ();
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
@@ -270,11 +419,36 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       }
     }
 
+  vtkTimerLog::MarkEndEvent ("Initial fragment seeding");
+
   if (this->ResolveBlocks)
     {
+             
+    vtkTimerLog::MarkStartEvent ("Computing boundary regions");
+
     // Determine boundaries at the block that need to be sent to neighbors
     this->BoundaryArrays.resize (numProcs);
     this->ReceiveList.resize (numProcs);
+    this->ValidNeighbor.resize (numProcs);
+    this->NeighborList.resize (this->Helper->GetNumberOfLevels ());
+    for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
+      {
+      int maxId = 0;
+      for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
+        {
+        vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock (level, blockId);
+        if (block->BlockId > maxId)
+          {
+          maxId = block->BlockId;
+          }
+        }
+      this->NeighborList[level].resize (maxId + 1);
+      for (int blockId = 0; blockId < maxId; blockId ++) 
+        {
+        this->NeighborList[level][blockId].resize (0);
+        }
+      }
+
     for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
       {
       for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
@@ -293,21 +467,21 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
   
               index[(dir+1) % 3] ++;
               neighbor = this->Helper->GetBlock (n_level, index[0], index[1], index[2]);
-              // if (neighbor != 0)
+              if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
   
               index[(dir+2) % 3] ++;
               neighbor = this->Helper->GetBlock (n_level, index[0], index[1], index[2]);
-              // if (neighbor != 0)
+              if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
   
               index[(dir+1) % 3] --;
               neighbor = this->Helper->GetBlock (n_level, index[0], index[1], index[2]);
-              // if (neighbor != 0)
+              if (neighbor != 0)
                 { 
                 this->ProcessBoundaryAtBlock (volume, block, neighbor, dir);
                 }
@@ -316,24 +490,24 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           }
         }
       }
+
+    vtkTimerLog::MarkEndEvent ("Computing boundary regions");
   
 #ifdef PARAVIEW_USE_MPI
     // Exchange all boundaries between processes where block and neighbor are different procs
+    vtkTimerLog::MarkStartEvent ("Exchanging boundaries");
     if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
       {
       return 0;
       }
+    vtkTimerLog::MarkEndEvent ("Exchanging boundaries");
 #endif 
 
+    vtkTimerLog::MarkStartEvent ("Transferring equivalence");
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
-    this->Equivalence = vtkPEquivalenceSet::New ();
+    this->Equivalence = new vtkAMRConnectivityEquivalence;
 
     // Initialize equivalence with all regions independent
-    int myOffset = myProc + 1;
-    if (myOffset >= numProcs) 
-      {
-      myOffset = 0; 
-      }
     for (size_t i = 0; i < this->BoundaryArrays.size (); i ++) 
       {
       for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
@@ -347,39 +521,158 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         this->BoundaryArrays[i].clear ();
       }
 
-    // Reset all uninitialized remote regionIds to equivalence 0
-    for (int i = 1; i < (this->NextRegionId - numProcs); i ++) 
+    this->EquivPairs.resize (numProcs);
+    while (true)
       {
-      if ((i % numProcs) != myOffset && this->Equivalence->GetEquivalentSetId (i) == i) 
+      int sets_changed = 0;
+      // Relabel all fragment IDs with the equivalence set number 
+      // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
+      for (int level = 0; level < this->Helper->GetNumberOfLevels (); level ++)
         {
-        this->Equivalence->AddEquivalence (i, 0);
+        for (int blockId = 0; blockId < this->Helper->GetNumberOfBlocksInLevel (level); blockId ++) 
+          {
+          vtkAMRDualGridHelperBlock* block = this->Helper->GetBlock (level, blockId);
+          if (block->ProcessId != myProc) 
+            {
+            continue;
+            }
+          vtkUniformGrid* grid = volume->GetDataSet (block->Level, block->BlockId);
+          vtkIdTypeArray* regionIdArray = vtkIdTypeArray::SafeDownCast (
+                                            grid->GetCellData ()->GetArray (this->RegionName.c_str()));
+          if (regionIdArray == 0)
+            {
+            vtkErrorMacro ("block Image doesn't not contain the regionId just added");
+            return 0;
+            }
+          for (int i = 0; i < regionIdArray->GetNumberOfTuples (); i ++) 
+            {
+            vtkIdType regionId = regionIdArray->GetTuple1 (i);
+            if (regionId > 0) 
+              {
+              int setId = this->Equivalence->GetMinimumSetId (regionId);
+              if (setId > 0 && setId != regionId) 
+                {
+                regionIdArray->SetTuple1 (i, setId);
+                sets_changed = 1;
+                for (size_t p = 0; p < this->NeighborList[block->Level][block->BlockId].size (); p ++)
+                  {
+                  int n = this->NeighborList[block->Level][block->BlockId][p];
+                  if (this->EquivPairs[n] == 0)
+                    {
+                    this->EquivPairs[n] = vtkIntArray::New ();
+                    this->EquivPairs[n]->SetNumberOfComponents (1);
+                    this->EquivPairs[n]->SetNumberOfTuples (0);
+                    }
+                  int contained = 0;
+                  for (int e = 0; e < this->EquivPairs[n]->GetNumberOfTuples (); e += 2)
+                    {
+                    int v1 = this->EquivPairs[n]->GetValue (e);
+                    int v2 = this->EquivPairs[n]->GetValue (e+1);
+                    if ((v1 == regionId && v2 == setId) ||
+                        (v2 == regionId && v1 == setId))
+                      {
+                      contained = 1;
+                      }
+                    }
+                  if (contained == 0) 
+                    {
+                    this->EquivPairs[n]->InsertNextValue (regionId);
+                    this->EquivPairs[n]->InsertNextValue (setId);
+                    }
+                  }
+                }
+              }
+            else
+              {
+              regionIdArray->SetTuple1 (i, 0);
+              }
+            }
+          }
+        }
+#ifdef PARAVIEW_USE_MPI
+      if (numProcs > 1)
+        {
+        int out;
+        controller->AllReduce (&sets_changed, &out, 1, vtkCommunicator::MAX_OP);
+        sets_changed = out;
+        }
+#endif
+      if (sets_changed == 0)
+        {
+        break;
+        }
+#ifdef PARAVIEW_USE_MPI
+      if (numProcs > 1 && !this->ExchangeEquivPairs (mpiController)) 
+        {
+        return 0;
+        }
+#endif
+      }
+
+    for (int i = 0; i < numProcs; i ++) 
+      {
+      if (this->EquivPairs[i] != 0)
+        {
+        this->EquivPairs[i]->Delete ();
+        this->EquivPairs[i] = 0;
         }
       }
-    // Reduce all equivalence pairs into equivalence sets
-    this->Equivalence->ResolveEquivalences ();
-  
-    // Relabel all fragment IDs with the equivalence set number 
-    // (set numbers start with 1 and 0 is considered "no set" or "no fragment")
+    this->EquivPairs.clear ();
+    ValidNeighbor.clear ();
+    NeighborList.clear ();
+
+    vtkTimerLog::MarkEndEvent ("Transferring equivalence");
+    }
+
+  if (PropagateGhosts) 
+    {
+    vtkTimerLog::MarkStartEvent ("Propagating ghosts");
+    // Propagate the region IDs out to the ghosts
+    vtkSmartPointer<vtkIdList> ptIds = vtkIdList::New ();
+    vtkSmartPointer<vtkIdList> cellIds = vtkIdList::New ();
     for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
       {
       vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
       vtkIdTypeArray* regionIdArray = vtkIdTypeArray::SafeDownCast (
                                         grid->GetCellData ()->GetArray (this->RegionName.c_str()));
-      for (int i = 0; i < regionIdArray->GetNumberOfTuples (); i ++) 
+      vtkDataArray* volArray = grid->GetCellData ()->GetArray (volumeName);
+      vtkDataArray* ghostLevels = grid->GetCellData ()->GetArray ("vtkGhostLevels");
+      for (int cellId = 0; cellId < regionIdArray->GetNumberOfTuples (); cellId ++) 
         {
-        vtkIdType regionId = regionIdArray->GetTuple1 (i);
-        if (regionId > 0) 
+        if (ghostLevels->GetTuple1 (cellId) < 0.5
+            || volArray->GetTuple1 (cellId) < this->VolumeFractionSurfaceValue)
           {
-          int setId = this->Equivalence->GetEquivalentSetId (regionId);
-          regionIdArray->SetTuple1 (i, setId);
+          continue;
           }
-        else
+        grid->GetCellPoints (cellId, ptIds);
+        bool isSet = false;
+        for (int i = 0; i < ptIds->GetNumberOfIds (); i ++)
           {
-          regionIdArray->SetTuple1 (i, 0);
+          grid->GetPointCells (ptIds->GetId (i), cellIds);
+          for (int j = 0; j < cellIds->GetNumberOfIds (); j ++)
+            {
+            vtkIdType neighbor = cellIds->GetId (j);
+            if (neighbor != cellId
+                && volArray->GetTuple1 (neighbor) > this->VolumeFractionSurfaceValue
+                && ghostLevels->GetTuple1 (neighbor) < 0.5)
+              {
+              regionIdArray->SetTuple1 (cellId, regionIdArray->GetTuple1 (neighbor));
+              isSet = true;
+              break;
+              }
+            }
+          if (isSet) 
+            {
+            break;
+            }
           }
         }
       }
-    this->Equivalence->Delete ();
+
+    vtkTimerLog::MarkEndEvent ("Propagating ghosts");
+
+    delete this->Equivalence;
+    this->Equivalence = 0;
     }
 
 
@@ -481,6 +774,39 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
   if (block->ProcessId != myProc && neighbor->ProcessId != myProc)
     {
     return;
+    }
+
+  if (block->ProcessId != neighbor->ProcessId) 
+    {
+    int levelId, blockId, processId;
+    if (neighbor->ProcessId != myProc) 
+      {
+      levelId = block->Level;
+      blockId = block->BlockId;
+      processId = neighbor->ProcessId;
+      }
+    else /* if (block->ProcessId != myProc) */
+      {
+      levelId = neighbor->Level;
+      blockId = neighbor->BlockId;
+      processId = block->ProcessId;
+      }
+
+    // Add this neighbor to this block's neighbor list.
+    bool contained = false;
+    for (size_t i = 0; i < this->NeighborList[levelId][blockId].size (); i ++)
+      {
+      if (this->NeighborList[levelId][blockId][i] == processId)
+        {
+        contained = true;
+        break;
+        }
+      }
+    if (!contained)
+      {
+      this->NeighborList[levelId][blockId].push_back (processId);
+      this->ValidNeighbor[processId] = true;
+      }
     }
 
   if (block->ProcessId == myProc) 
@@ -732,6 +1058,159 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     }
 
   sendList.WaitAll();
+  sendList.clear ();
+#endif /* PARAVIEW_USE_MPI */
+  return 1;
+}
+
+int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
+{
+  if (controller == 0)
+    {
+    vtkErrorMacro ("vtkAMRConnectivity only works parallel in MPI environment");
+    return 0;
+    }
+#ifdef PARAVIEW_USE_MPI
+  int myProc = controller->GetLocalProcessId ();
+  int numProcs = controller->GetNumberOfProcesses ();
+
+  vtkAMRConnectivityCommRequestList receiveList;
+  for (size_t i = 0; i < static_cast<unsigned int> (numProcs); i ++) 
+    {
+    if (i == static_cast<unsigned int> (myProc) || !this->ValidNeighbor[i]) 
+      {
+      continue; 
+      }
+
+    vtkIntArray* array = vtkIntArray::New ();
+    array->SetNumberOfComponents (1);
+    array->SetNumberOfTuples (1);
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = static_cast<int>(i);
+    request.ReceiveProcess = myProc;
+    request.Buffer = array;
+
+    controller->NoBlockReceive(array->GetPointer (0),
+                               1,
+                               static_cast<int>(i), 
+                               EQUIV_SIZE_TAG,
+                               request.Request);
+
+    this->ReceiveList[i].clear ();
+    receiveList.push_back(request);
+    array->Delete ();
+    }
+
+  vtkAMRConnectivityCommRequestList sendList;
+  for (size_t i = 0; i < static_cast<unsigned int> (numProcs); i ++)
+    {
+    if (i == static_cast<unsigned int> (myProc) || !this->ValidNeighbor[i])  
+      { 
+      continue; 
+      }
+
+    vtkIntArray* array = vtkIntArray::New ();
+    array->SetNumberOfComponents (1);
+    array->SetNumberOfTuples (1);
+    int size = this->EquivPairs[i] == 0 ? 0 : this->EquivPairs[i]->GetNumberOfTuples ();
+    array->SetTuple1 (0, size);
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = myProc;
+    request.ReceiveProcess = static_cast<int>(i);
+    request.Buffer = array;
+
+    controller->NoBlockSend(array->GetPointer (0),
+                            1,
+                            static_cast<int>(i), 
+                            EQUIV_SIZE_TAG,
+                            request.Request);
+
+    sendList.push_back(request);
+    array->Delete ();
+    }
+
+  std::vector<int> receive_sizes (numProcs);
+  for (int i = 0; i < numProcs; i ++)
+    {
+    receive_sizes[i] = 0;
+    }
+
+  while (!receiveList.empty())
+    {
+    vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
+    vtkIntArray* array = request.Buffer;
+    receive_sizes[request.SendProcess] = array->GetTuple1 (0);
+    }
+
+  sendList.WaitAll();
+  sendList.clear ();
+
+  for (size_t i = 0; i < static_cast<unsigned int>(numProcs); i ++) 
+    {
+    if (i == static_cast<unsigned int> (myProc) || receive_sizes[i] == 0) 
+      {
+      continue; 
+      }
+
+    vtkIntArray* array = vtkIntArray::New ();
+    array->SetNumberOfComponents (1);
+    array->SetNumberOfTuples (receive_sizes[i]);
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = static_cast<int>(i);
+    request.ReceiveProcess = myProc;
+    request.Buffer = array;
+
+    controller->NoBlockReceive(array->GetPointer (0),
+                               receive_sizes[i],
+                               static_cast<int>(i), 
+                               EQUIV_TAG,
+                               request.Request);
+
+    this->ReceiveList[i].clear ();
+    receiveList.push_back(request);
+    array->Delete ();
+    }
+
+  for (size_t i = 0; i < static_cast<unsigned int>(numProcs); i ++)
+    {
+    if (i == static_cast<unsigned int> (myProc) 
+        || this->EquivPairs[i] == 0
+        || this->EquivPairs[i]->GetNumberOfTuples () == 0)  
+      { 
+      continue; 
+      }
+
+    vtkAMRConnectivityCommRequest request;
+    request.SendProcess = myProc;
+    request.ReceiveProcess = static_cast<int>(i);
+    request.Buffer = this->EquivPairs[i];
+
+    controller->NoBlockSend(this->EquivPairs[i]->GetPointer (0),
+                            this->EquivPairs[i]->GetNumberOfTuples (),
+                            static_cast<int>(i), 
+                            EQUIV_TAG,
+                            request.Request);
+
+    sendList.push_back(request);
+    }
+
+  while (!receiveList.empty())
+    {
+    vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
+    vtkIntArray* array = request.Buffer;
+    for (int i = 0; i < array->GetNumberOfTuples (); i += 2)  
+      {
+      int v1 = array->GetValue (i);
+      int v2 = array->GetValue (i+1);
+      this->Equivalence->AddEquivalence (v1, v2);
+      }
+    }
+
+  sendList.WaitAll();
+  sendList.clear ();
 #endif /* PARAVIEW_USE_MPI */
   return 1;
 }

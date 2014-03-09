@@ -29,9 +29,10 @@
 class vtkNonOverlappingAMR;
 class vtkUniformGrid;
 class vtkIdTypeArray;
+class vtkIntArray;
 class vtkAMRDualGridHelper;
 class vtkAMRDualGridHelperBlock; 
-class vtkPEquivalenceSet;
+class vtkAMRConnectivityEquivalence;
 class vtkMPIController;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlockDataSetAlgorithm
@@ -56,15 +57,21 @@ public:
   vtkGetMacro(ResolveBlocks, bool);
   vtkSetMacro(ResolveBlocks, bool);
 
+  // Description:
+  // Get / Set where to resolve the regions between blocks
+  vtkGetMacro(PropagateGhosts, bool);
+  vtkSetMacro(PropagateGhosts, bool);
+
 protected:
   vtkAMRConnectivity();
   ~vtkAMRConnectivity();
 
   double VolumeFractionSurfaceValue;
   vtkAMRDualGridHelper* Helper;
-  vtkPEquivalenceSet* Equivalence;
+  vtkAMRConnectivityEquivalence* Equivalence;
   
   bool ResolveBlocks;
+  bool PropagateGhosts;
 
   std::string RegionName;
   vtkIdType NextRegionId;
@@ -74,6 +81,10 @@ protected:
 
   std::vector<std::vector <vtkIdTypeArray*> > BoundaryArrays;
   std::vector<std::vector <int> > ReceiveList;
+
+  std::vector<bool> ValidNeighbor;
+  std::vector<std::vector <std::vector <int> > > NeighborList;
+  std::vector<vtkIntArray*> EquivPairs;
 
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
@@ -96,6 +107,7 @@ protected:
                                vtkAMRDualGridHelperBlock* neighbor, 
                                int dir);
   int ExchangeBoundaries (vtkMPIController* controller);
+  int ExchangeEquivPairs (vtkMPIController* controller);
   void ProcessBoundaryAtNeighbor (vtkNonOverlappingAMR* volume,
                                   vtkIdTypeArray *array);
 
