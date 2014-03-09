@@ -301,7 +301,9 @@ def global_max(narray):
     M = max(narray).astype(numpy.float64)
     if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
-       MPI.COMM_WORLD.Allreduce(None, [M, MPI.DOUBLE], MPI.MAX)
+       M_recv = numpy.array(M)
+       MPI.COMM_WORLD.Allreduce([M, MPI.DOUBLE], [M_recv, MPI.DOUBLE], MPI.MAX)
+       M = M_recv
     return M
 
 def global_mean (narray) :
@@ -323,9 +325,12 @@ def global_mean (narray) :
     if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
        comm = MPI.COMM_WORLD
-       comm.Allreduce(None, [S, MPI.DOUBLE], MPI.SUM)
-       comm.Allreduce(None, [N, MPI.DOUBLE], MPI.SUM)
-
+       S_recv = numpy.array(S)
+       N_recv = numpy.array(N)
+       comm.Allreduce([S, MPI.DOUBLE], [S_recv, MPI.DOUBLE],MPI.SUM)
+       comm.Allreduce([N, MPI.DOUBLE], [N_recv, MPI.DOUBLE],MPI.SUM)
+       S = S_recv
+       N = N_recv
     return S / N
 
 def global_min(narray):
@@ -333,7 +338,9 @@ def global_min(narray):
     m = min(narray).astype(numpy.float64)
     if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
-       MPI.COMM_WORLD.Allreduce(None, [m, MPI.DOUBLE], MPI.MIN)
+       m_recv = numpy.array(m)
+       MPI.COMM_WORLD.Allreduce([m, MPI.DOUBLE], [m_recv, MPI.DOUBLE], MPI.MIN)
+       m = m_recv
     return m
 
 def gradient(narray, dataset=None):
