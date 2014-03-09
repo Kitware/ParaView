@@ -1005,6 +1005,14 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
 
   IF(PARAVIEW_BUILD_QT_GUI)
 
+    IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+      SET (Qt5_FIND_COMPONENTS Widgets)
+      INCLUDE (ParaViewQt5)
+    ELSE (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+      FIND_PACKAGE (Qt4)
+      INCLUDE (${QT_USE_FILE})
+    ENDIF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+
     # if server-manager xmls are specified, we can generate documentation from
     # them, if Qt is enabled.
     if (ARG_SERVER_MANAGER_XML)
