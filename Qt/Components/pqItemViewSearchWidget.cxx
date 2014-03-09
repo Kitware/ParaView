@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqItemViewSearchWidget.h"
 
+#include "pqHighlightItemDelegate.h"
 #include "pqWaitCursor.h"
+
 #include <QAbstractItemModel>
 #include <QAbstractItemView>
 #include <QApplication>
@@ -48,24 +50,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqItemViewSearchWidget.h"
 
+//-----------------------------------------------------------------------------
 class pqItemViewSearchWidget::PIMPL : public Ui::pqItemViewSearchWidget
 {
 public:
-  PIMPL(QWidget* parentW) 
+  PIMPL(QWidget* parentW)
   {
-  this->BaseWidget = parentW ? 
+  this->BaseWidget = parentW ?
     qobject_cast<QAbstractItemView*>(parentW) : NULL;;
     this->RedPal.setColor(QPalette::Base, QColor(240,128,128));
   this->WhitePal.setColor(QPalette::Base, QColor(Qt::white));
-  this->DlgBackPal.setColor(QPalette::Background, Qt::darkGray);
+  this->Highlighter = new pqHighlightItemDelegate(QColor(175,166,238));
+  this->UnHighlighter = new pqHighlightItemDelegate(QColor(Qt::white));
   }
   ~PIMPL() {}
+
   QString SearchString;
   QModelIndex CurrentFound;
   QPointer<QAbstractItemView> BaseWidget;
   QPalette RedPal;
   QPalette WhitePal;
-  QPalette DlgBackPal;
+  QPointer<pqHighlightItemDelegate> Highlighter;
+  QPointer<QStyledItemDelegate> UnHighlighter;
 };
 
 pqItemViewSearchWidget::pqItemViewSearchWidget(QWidget* parentW):
@@ -94,8 +100,8 @@ pqItemViewSearchWidget::~pqItemViewSearchWidget()
   if(this->Private->CurrentFound.isValid() &&
     this->Private->BaseWidget)
     {
-    this->Private->BaseWidget->model()->setData(
-      this->Private->CurrentFound, QColor(Qt::white), Qt::BackgroundColorRole);
+    this->Private->BaseWidget->setItemDelegateForRow(
+      this->Private->CurrentFound.row(), this->Private->UnHighlighter);
     }
   delete this->Private;
 }
@@ -103,7 +109,7 @@ pqItemViewSearchWidget::~pqItemViewSearchWidget()
 // -------------------------------------------------------------------------
 void pqItemViewSearchWidget::setBaseWidget(QWidget* widget)
 {
-  this->Private->BaseWidget = widget ? 
+  this->Private->BaseWidget = widget ?
     qobject_cast<QAbstractItemView*>(widget) : NULL;;
 }
 
@@ -114,7 +120,6 @@ void pqItemViewSearchWidget::showSearchWidget()
     {
     return;
     }
-  this->setPalette(this->Private->DlgBackPal);
   QPoint mappedPoint = this->Private->BaseWidget->parentWidget()->childrenRect().topLeft();
   mappedPoint.setX(0);
   mappedPoint = this->Private->BaseWidget->mapToGlobal(mappedPoint);
@@ -129,7 +134,7 @@ void pqItemViewSearchWidget::showSearchWidget()
 
 //-----------------------------------------------------------------------------
 bool pqItemViewSearchWidget::eventFilter(QObject* obj, QEvent* anyevent)
-{ 
+{
  if(anyevent->type()== QEvent::KeyPress)
    {
    QKeyEvent *e = dynamic_cast<QKeyEvent*>(anyevent);
@@ -184,11 +189,11 @@ void pqItemViewSearchWidget::showEvent(QShowEvent* e)
 void pqItemViewSearchWidget::updateSearch(QString searchText)
 {
   this->Private->SearchString = searchText;
-  QModelIndex current;  
+  QModelIndex current;
   if(this->Private->CurrentFound.isValid())
     {
-    this->Private->BaseWidget->model()->setData(
-      this->Private->CurrentFound, QColor(Qt::white), Qt::BackgroundColorRole);
+    this->Private->BaseWidget->setItemDelegateForRow(
+      this->Private->CurrentFound.row(), this->Private->UnHighlighter);
     }
   this->Private->CurrentFound = current;
   QAbstractItemView* theView = this->Private->BaseWidget;
@@ -282,8 +287,8 @@ void pqItemViewSearchWidget::findNext()
   QModelIndex current, firstmactch, start=this->Private->CurrentFound;
   if(start.isValid())
     {
-    this->Private->BaseWidget->model()->setData(
-      start, QColor(Qt::white), Qt::BackgroundColorRole);
+    this->Private->BaseWidget->setItemDelegateForRow(
+      start.row(), this->Private->UnHighlighter);
     // search the rest of this index -- horizontally
     int r = start.row();
     int numCols = viewModel->columnCount(start.parent());
@@ -346,7 +351,7 @@ void pqItemViewSearchWidget::findNext()
           }
         }
       }
-    
+
     // If still not found, start from (0,0)
     for( r = 0; r <= start.row(); r++ )
       {
@@ -387,8 +392,8 @@ void pqItemViewSearchWidget::findPrevious()
   QModelIndex current, firstmactch, start=this->Private->CurrentFound;
   if(start.isValid())
     {
-    this->Private->BaseWidget->model()->setData(
-      start, QColor(Qt::white), Qt::BackgroundColorRole);
+    this->Private->BaseWidget->setItemDelegateForRow(
+      start.row(), this->Private->UnHighlighter);
     // search the rest of this index
     int r = start.row();
     for( int c = start.column()-1; c >=0; c-- )
@@ -399,7 +404,7 @@ void pqItemViewSearchWidget::findPrevious()
         return;
         }
       }
-      
+
     // search the siblings of this index
     // need to recursive up parents until root
     QModelIndex pidx = start.parent();
@@ -461,7 +466,7 @@ void pqItemViewSearchWidget::findPrevious()
 
 //-----------------------------------------------------------------------------
 bool pqItemViewSearchWidget::matchString( const QAbstractItemModel * M,
-                                         const QModelIndex & curIdx, 
+                                         const QModelIndex & curIdx,
                                          const QString & searchString) const
 {// Try to match the curIdx index itself
   QString strText = M->data(curIdx, Qt::DisplayRole).toString();
@@ -470,8 +475,8 @@ bool pqItemViewSearchWidget::matchString( const QAbstractItemModel * M,
   if(strText.contains(searchString, cs))
     {
     this->Private->CurrentFound = curIdx;
-    this->Private->BaseWidget->model()->setData(
-      this->Private->CurrentFound, QVariant(QColor(152,251,152)), Qt::BackgroundColorRole);
+    this->Private->BaseWidget->setItemDelegateForRow(
+      this->Private->CurrentFound.row(), this->Private->Highlighter);
     this->Private->BaseWidget->scrollTo(this->Private->CurrentFound);
     this->Private->lineEditSearch->setPalette(this->Private->WhitePal);
     return true;

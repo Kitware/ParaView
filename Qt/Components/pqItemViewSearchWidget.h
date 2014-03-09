@@ -83,7 +83,7 @@ protected:
   void showEvent(QShowEvent *);
   /// match the input string with the index's text
   virtual bool matchString( const QAbstractItemModel * M,
-    const QModelIndex & curIdx, 
+    const QModelIndex & curIdx,
     const QString & searchString) const;
 private:
   pqItemViewSearchWidget(const pqItemViewSearchWidget&); // Not implemented.

@@ -31,14 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqComponentsTestUtility.h"
 
-#include "pqPluginTreeWidgetEventPlayer.h"
-#include "pqPluginTreeWidgetEventTranslator.h"
-
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "vtkImageData.h"
-#include "pqView.h"
+#include "pqItemViewSearchWidgetEventPlayer.h"
+#include "pqPluginTreeWidgetEventPlayer.h"
+#include "pqPluginTreeWidgetEventTranslator.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "pqView.h"
+#include "vtkImageData.h"
 
 #include <QApplication>
 #include <QWidget>
@@ -52,6 +52,8 @@ pqComponentsTestUtility::pqComponentsTestUtility(QObject* parentObj) :
 
   this->eventPlayer()->addWidgetEventPlayer(
     new pqPluginTreeWidgetEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(
+    new pqItemViewSearchWidgetEventPlayer(this));
 }
 
 //-----------------------------------------------------------------------------

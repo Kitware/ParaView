@@ -192,6 +192,8 @@ set (Module_SRCS
   pqGlyphPanel.h
   pqHandleWidget.cxx
   pqHandleWidget.h
+  pqHighlightItemDelegate.cxx
+  pqHighlightItemDelegate.h
   pqImageTip.cxx
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
@@ -204,6 +206,8 @@ set (Module_SRCS
   pqIsoVolumePanel.h
   pqItemViewSearchWidget.cxx
   pqItemViewSearchWidget.h
+  pqItemViewSearchWidgetEventPlayer.cxx
+  pqItemViewSearchWidgetEventPlayer.h
   pqKeyFrameEditor.cxx
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx
@@ -487,17 +491,19 @@ set (Module_MOC_HDRS
   pqFileChooserWidget.h
   pqFindDataCreateSelectionFrame.h
   pqFindDataCurrentSelectionFrame.h
-  pqFindDataSelectionDisplayFrame.h
   pqFindDataDialog.h
+  pqFindDataSelectionDisplayFrame.h
   pqFixStateFilenamesDialog.h
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
   pqHandleWidget.h
+  pqHighlightItemDelegate.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.h
   pqIsoVolumePanel.h
+  pqItemViewSearchWidgetEventPlayer.h
   pqItemViewSearchWidget.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
@@ -539,15 +545,15 @@ set (Module_MOC_HDRS
   pqPQLookupTableManager.h
   pqPropertiesPanel.h
   pqPropertyGroupWidget.h
-  pqPropertyWidget.h
   pqPropertyWidgetDecorator.h
+  pqPropertyWidget.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
   pqProxyPropertyWidget.h
   pqProxySelectionWidget.h
   pqProxySILModel.h
-  pqProxyWidget.h
   pqProxyWidgetDialog.h
+  pqProxyWidget.h
   pqQueryClauseWidget.h
   pqRecentFilesMenu.h
   pqRemoteCommandDialog.h
@@ -618,8 +624,8 @@ set (Module_UI_FILES
   Resources/UI/pqChangeInputDialog.ui
   Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqCollaborationPanel.ui
-  Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorMapEditor.ui
+  Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqComparativeParameterRangeDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
   Resources/UI/pqContourControls.ui
@@ -635,8 +641,8 @@ set (Module_UI_FILES
   Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqFindDataCreateSelectionFrame.ui
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
-  Resources/UI/pqFindDataSelectionDisplayFrame.ui
   Resources/UI/pqFindDataDialog.ui
+  Resources/UI/pqFindDataSelectionDisplayFrame.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
   Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
