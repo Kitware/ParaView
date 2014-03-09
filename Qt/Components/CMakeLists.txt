@@ -733,15 +733,8 @@ if(PARAVIEW_ENABLE_PYTHON)
   endif()
 endif()
 
-GENERATE_QT_RESOURCE_FROM_FILES(
-  "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
-  "/ParaViewResources"
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/Placeholder.xml
-)
-
 set (Module_RESOURCE_FILES
   Resources/pqComponents.qrc
-  "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
 )
 
 add_custom_command(
