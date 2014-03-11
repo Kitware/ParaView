@@ -53,27 +53,13 @@ public:
   int IsInDomain(const char* string, unsigned int& idx);
 
   // Description:
-  // Returns the number of strings in the domain.
-  unsigned int GetNumberOfStrings();
-
-  // Description:
   // Returns a string in the domain. The pointer may become
   // invalid once the domain has been modified.
   const char* GetString(unsigned int idx);
 
   // Description:
-  // Adds a new string to the domain.
-  unsigned int AddString(const char* string);
-
-  // Description:
-  // Removes a string from the domain.
-  // Returns the index of the removed string. Will return -1, if the string was
-  // not found.
-  virtual int RemoveString(const char* string);
-
-  // Description:
-  // Removes all strings from the domain.
-  virtual void RemoveAllStrings();
+  // Returns the number of strings in the domain.
+  unsigned int GetNumberOfStrings();
 
   // Description:
   // Update self checking the "unchecked" values of all required
@@ -110,8 +96,8 @@ protected:
     vtkSMProxyLocator* loader);
 
   // Description:
-  // Call to set the strings. Will fire DomainModifiedEvent is domain has
-  // changed.
+  // Call to set the strings. Will fire DomainModifiedEvent if the domain values
+  // have indeed changed.
   void SetStrings(const std::vector<vtkStdString>& strings);
   const std::vector<vtkStdString>& GetStrings();
 

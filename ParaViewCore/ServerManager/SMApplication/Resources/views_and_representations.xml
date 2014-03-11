@@ -2739,7 +2739,6 @@
             <Property name="Ambient" />
             <Property name="AmbientColor" />
             <Property name="ColorArrayName" />
-            <Property name="ColorAttributeType" />
             <Property name="Diffuse" />
             <Property name="DiffuseColor" />
             <Property name="LookupTable" />
@@ -3314,6 +3313,9 @@
                         name="input_type">
           <DataType value="vtkUnstructuredGridBase" />
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array_any">
+        </InputArrayDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
@@ -3350,29 +3352,19 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetColorAttributeType"
-                         default_values="0"
-                         name="ColorAttributeType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="POINT_DATA"
-                 value="0" />
-          <Entry text="CELL_DATA"
-                 value="1" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetColorArrayName"
-                            default_values=""
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
                             name="ColorArrayName"
-                            number_of_elements="1">
-        <Documentation>Set the array name to color by. Set it to empty string
-        to use solid color.</Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array_any"
-                         name="array_list">
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
@@ -3537,6 +3529,9 @@
                         name="input_type">
           <DataType value="vtkImageData" />
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array_any">
+        </InputArrayDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
@@ -3573,29 +3568,19 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetColorAttributeType"
-                         default_values="0"
-                         name="ColorAttributeType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="POINT_DATA"
-                 value="0" />
-          <Entry text="CELL_DATA"
-                 value="1" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetColorArrayName"
-                            default_values=""
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
                             name="ColorArrayName"
-                            number_of_elements="1">
-        <Documentation>Set the array name to color by. Set it to empty string
-        to use solid color.</Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array_any"
-                         name="array_list">
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
@@ -3800,34 +3785,19 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetColorAttributeType"
-                         default_values="0"
-                         name="ColorAttributeType"
-                         number_of_elements="1">
-        <Documentation>Select the attribute type from where the scalars array
-        is used. The scalar array name is specified using ColorArrayName. Note
-        that if the indicated scalar array is not available, then the image
-        data scalars are used.</Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="POINT_DATA"
-                 value="0" />
-          <Entry text="CELL_DATA"
-                 value="1" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetColorArrayName"
-                            default_values=""
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
                             name="ColorArrayName"
-                            number_of_elements="1">
-        <Documentation>Set the array name to color by. If no array name is set,
-        or choosen array is not available, then the image scalars are used by
-        default.</Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array_any"
-                         name="array_list">
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
@@ -3974,28 +3944,20 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetColorAttributeType"
-                         default_values="0"
-                         name="ColorAttributeType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="POINT_DATA"
-                 value="0" />
-          <Entry text="CELL_DATA"
-                 value="1" />
-          <Entry text="FIELD_DATA"
-                 value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetColorArrayName"
-                            default_values=""
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
                             name="ColorArrayName"
-                            number_of_elements="1">
-        <Documentation>Set the array name to color by. Set it to empty string
-        to use solid color.</Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array_any"
-                         name="array_list"></ArrayListDomain>
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
       </StringVectorProperty>
       <StringVectorProperty command="SetRepresentation"
                             default_values="Surface"
@@ -6804,7 +6766,6 @@
               <Property name="BackfaceDiffuseColor" />
               <Property name="BackfaceOpacity" />
               <Property name="ColorArrayName" />
-              <Property name="ColorAttributeType" />
               <Property name="Diffuse" />
               <Property name="DiffuseColor" />
               <Property name="EdgeColor" />
@@ -7760,35 +7721,24 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkOverlappingAMR" />
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array_any">
+        </InputArrayDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
-
-      <IntVectorProperty command="SetColorAttributeType"
-                         default_values="0"
-                         name="ColorAttributeType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="POINT_DATA"
-                 value="0" />
-          <Entry text="CELL_DATA"
-                 value="1" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <StringVectorProperty command="SetColorArrayName"
-                            default_values=""
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
                             name="ColorArrayName"
-                            number_of_elements="1">
+                            number_of_elements="5">
         <Documentation>
-          Set the array name to color by. Set it to empty string
-          to use solid color.
-          </Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array_any"
-                         name="array_list">
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <ArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
