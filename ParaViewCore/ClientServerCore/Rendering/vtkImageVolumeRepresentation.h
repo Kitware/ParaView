@@ -45,25 +45,6 @@ public:
   vtkTypeMacro(vtkImageVolumeRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // This is same a vtkDataObject::FieldAssociation types so you can use those
-  // as well.
-  enum AttributeTypes
-    {
-    POINT_DATA=0,
-    CELL_DATA=1
-    };
-
-  // Description:
-  // Methods to control scalar coloring. ColorAttributeType defines the
-  // attribute type.
-  vtkSetMacro(ColorAttributeType, int);
-  vtkGetMacro(ColorAttributeType, int);
-
-  // Description:
-  // Pick the array to color with.
-  vtkSetStringMacro(ColorArrayName);
-  vtkGetStringMacro(ColorArrayName);
-
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
   // typically called by the vtkView to request meta-data from the
@@ -161,8 +142,6 @@ protected:
   vtkOutlineSource* OutlineSource;
   vtkPolyDataMapper* OutlineMapper;;
 
-  int ColorAttributeType;
-  char* ColorArrayName;
   double DataBounds[6];
 
 private:

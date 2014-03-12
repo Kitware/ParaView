@@ -57,24 +57,6 @@ vtkImageSliceRepresentation::~vtkImageSliceRepresentation()
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceRepresentation::SetColorAttributeType(int type)
-{
-  switch (type)
-    {
-  case POINT_DATA:
-    this->SliceMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    break;
-
-  case CELL_DATA:
-    this->SliceMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
-    break;
-
-  default:
-    vtkErrorMacro("Attribute type not supported: " << type);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkImageSliceRepresentation::SetSliceMode(int mode)
 {
   if (this->SliceMode != mode)
@@ -95,15 +77,22 @@ void vtkImageSliceRepresentation::SetSlice(unsigned int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageSliceRepresentation::SetColorArrayName(const char* name)
+void vtkImageSliceRepresentation::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, const char *name)
 {
-  if (name && name[0])
+  this->Superclass::SetInputArrayToProcess(
+    idx, port, connection, fieldAssociation, name);
+  this->SliceMapper->SelectColorArray(name);
+  switch (fieldAssociation)
     {
-    this->SliceMapper->SelectColorArray(name);
-    }
-  else
-    {
-    this->SliceMapper->SelectColorArray(static_cast<const char*>(NULL));
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+    this->SliceMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+  default:
+    this->SliceMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+    break;
     }
 }
 

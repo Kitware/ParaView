@@ -60,14 +60,6 @@ public:
   // requests.
   virtual void MarkModified();
 
-  // This is same a vtkDataObject::FieldAssociation types so you can use those
-  // as well.
-  enum AttributeTypes
-    {
-    POINT_DATA=0,
-    CELL_DATA=1
-    };
-
   // Description:
   // Get/Set the visibility for this representation. When the visibility of
   // representation of false, all view passes are ignored.
@@ -77,17 +69,6 @@ public:
   // Enable/Disable LOD;
   virtual void SetSuppressLOD(bool suppress)
     { this->SuppressLOD = suppress; }
-
-  // Description:
-  // Methods to control scalar coloring. ColorAttributeType defines the
-  // attribute type.
-  vtkSetMacro(ColorAttributeType, int);
-  vtkGetMacro(ColorAttributeType, int);
-
-  // Description:
-  // Pick the array to color with.
-  vtkSetStringMacro(ColorArrayName);
-  vtkGetStringMacro(ColorArrayName);
 
   // Description:
   // Set the lighting properties of the object. vtkGeometryRepresentation
@@ -274,8 +255,6 @@ protected:
   vtkPVLODActor* Actor;
   vtkProperty* Property;
 
-  int ColorAttributeType;
-  char* ColorArrayName;
   double Ambient;
   double Specular;
   double Diffuse;

@@ -167,9 +167,9 @@ bool vtkSMPVRepresentationProxy::GetUsingScalarColoring()
   if (this->GetProperty("ColorArrayName"))
     {
     vtkSMPropertyHelper helper(this->GetProperty("ColorArrayName"));
-    return (helper.GetNumberOfElements() == 1 &&
-            helper.GetAsString(0) != NULL &&
-            strcmp(helper.GetAsString(0), "") != 0);
+    return (helper.GetNumberOfElements() == 5 &&
+            helper.GetAsString(4) != NULL &&
+            strcmp(helper.GetAsString(4), "") != 0);
     }
   else
     {
@@ -188,17 +188,10 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     return false;
     }
 
-  if (!this->GetProperty("ColorAttributeType"))
-    {
-    vtkWarningMacro("Missing 'ColorAttributeType' property.");
-    return false;
-    }
-
+  vtkSMPropertyHelper helper(this->GetProperty("ColorArrayName"));
 
   return this->RescaleTransferFunctionToDataRange(
-    vtkSMPropertyHelper(this->GetProperty("ColorArrayName")).GetAsString(0),
-    vtkSMPropertyHelper(this->GetProperty("ColorAttributeType")).GetAsInt(0),
-    extend);
+    helper.GetAsString(4), helper.GetAsInt(3), extend);
 }
 
 //----------------------------------------------------------------------------
@@ -238,16 +231,10 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime()
     return false;
     }
 
-  if (!this->GetProperty("ColorAttributeType"))
-    {
-    vtkWarningMacro("Missing 'ColorAttributeType' property.");
-    return false;
-    }
-
+  vtkSMPropertyHelper helper(this->GetProperty("ColorArrayName"));
 
   return this->RescaleTransferFunctionToDataRangeOverTime(
-    vtkSMPropertyHelper(this->GetProperty("ColorArrayName")).GetAsString(0),
-    vtkSMPropertyHelper(this->GetProperty("ColorAttributeType")).GetAsInt(0));
+    helper.GetAsString(4), helper.GetAsInt(3));
 }
 
 //----------------------------------------------------------------------------
@@ -345,26 +332,24 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
     }
 
   vtkSMProperty* colorArray = this->GetProperty("ColorArrayName");
-  vtkSMProperty* colorAttr = this->GetProperty("ColorAttributeType");
-  if (!colorArray || !colorAttr)
+  if (!colorArray)
     {
-    vtkWarningMacro("No 'ColorArrayName' or 'ColorAttributeType' property found.");
+    vtkWarningMacro("No 'ColorArrayName' property found.");
     return false;
     }
 
   vtkSMPropertyHelper colorArrayHelper(colorArray);
-  vtkSMPropertyHelper colorAttrHelper(colorAttr);
 
-  if (arrayname && colorArrayHelper.GetAsString() &&
-    strcmp(arrayname, colorArrayHelper.GetAsString()) == 0 &&
-    colorArrayHelper.GetAsInt() == attribute_type)
+  if (arrayname && colorArrayHelper.GetAsString(4) &&
+    strcmp(arrayname, colorArrayHelper.GetAsString(4)) == 0 &&
+    colorArrayHelper.GetAsInt(3) == attribute_type)
     {
     // nothing to do since nothing changed.
     return true;
     }
 
-  colorArrayHelper.Set(arrayname? arrayname : "");
-  colorAttrHelper.Set(attribute_type);
+  colorArrayHelper.Set(3, attribute_type);
+  colorArrayHelper.Set(4, arrayname? arrayname : "");
 
   if (arrayname == NULL || arrayname[0] == '\0')
     {

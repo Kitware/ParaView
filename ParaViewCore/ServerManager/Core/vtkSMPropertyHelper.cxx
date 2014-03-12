@@ -53,8 +53,9 @@
 
 #include <vtksys/ios/sstream>
 
-#include <assert.h>
 #include <algorithm>
+#include <cassert>
+#include <cstdlib>
 
 #define vtkSMPropertyHelperWarningMacro(blah)\
   if (this->Quiet == false) \
@@ -86,6 +87,11 @@ inline int vtkSMPropertyHelper::GetProperty(unsigned int index) const
     case IDTYPE:
       return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
                                   this->IdTypeVectorProperty->GetElement(index);
+    case STRING:
+      return this->UseUnchecked?
+        std::atoi(this->StringVectorProperty->GetUncheckedElement(index)) :
+        std::atoi(this->StringVectorProperty->GetElement(index));
+
     default:
       return 0;
     }
@@ -106,6 +112,12 @@ inline double vtkSMPropertyHelper::GetProperty(unsigned int index) const
     case IDTYPE:
       return this->UseUnchecked ? this->IdTypeVectorProperty->GetUncheckedElement(index) :
                                   this->IdTypeVectorProperty->GetElement(index);
+
+    case STRING:
+      return this->UseUnchecked?
+        std::atof(this->StringVectorProperty->GetUncheckedElement(index)) :
+        std::atof(this->StringVectorProperty->GetElement(index));
+
     default:
       return 0;
     }
@@ -271,6 +283,20 @@ inline void vtkSMPropertyHelper::SetProperty(unsigned int index, int value)
       else
         {
         this->IdTypeVectorProperty->SetElement(index, value);
+        }
+      break;
+    case STRING:
+        {
+        vtksys_ios::ostringstream str;
+        str << value;
+        if (this->UseUnchecked)
+          {
+          this->StringVectorProperty->SetUncheckedElement(index, str.str().c_str());
+          }
+        else
+          {
+          this->StringVectorProperty->SetElement(index, str.str().c_str());
+          }
         }
       break;
     default:
@@ -865,7 +891,7 @@ int vtkSMPropertyHelper::GetStatus(const char* key, int default_value/*=0*/)
   vtksys_ios::ostringstream str;
   str << default_value;
   const char* value = vtkSMPropertyHelper::GetStatus(key, str.str().c_str());
-  return atoi(value);
+  return std::atoi(value);
 }
 
 //----------------------------------------------------------------------------
