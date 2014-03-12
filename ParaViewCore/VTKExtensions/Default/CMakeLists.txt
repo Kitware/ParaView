@@ -43,6 +43,7 @@ set(Module_SRCS
   vtkCleanUnstructuredGridCells.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx
+  vtkEnsembleReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
@@ -69,6 +70,7 @@ set(Module_SRCS
   vtkMaterialInterfaceToProcMap.cxx
   vtkMergeArrays.cxx
   vtkMergeCompositeDataSet.cxx
+  vtkMetaReader.cxx
   vtkMinMax.cxx
   vtkParallelSerialWriter.cxx
   vtkPEnSightGoldBinaryReader.cxx
@@ -175,9 +177,14 @@ set_source_files_properties(
   vtkTransferFunctionEditorWidget1D
   ABSTRACT)
 
+vtk_module_load(vtkIOInfovis)
+include_directories(${vtkIOInfovis_INCLUDE_DIRS})
+
 # Use a custom hints file for this module.
 set(${vtk-module}_WRAP_HINTS "${CMAKE_CURRENT_SOURCE_DIR}/hints")
 vtk_module_library(vtkPVVTKExtensionsDefault ${Module_SRCS})
+target_link_libraries(vtkPVVTKExtensionsDefault LINK_PRIVATE
+  ${vtkIOInfovis_LIBRARIES})
 
 OPTION(PARAVIEW_ENABLE_SPYPLOT_MARKERS
        "Enables markers in the spyplot reader"

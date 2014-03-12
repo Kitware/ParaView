@@ -3402,6 +3402,7 @@
                        file_description="VTK PolyData Files" />
       </Hints>
     </SourceProxy>
+
     <!-- XMLPolyDataReader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
@@ -7166,6 +7167,246 @@
       <Hints>
         <ReaderFactory extensions="cml"
                        file_description="CML" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- ExodusII Simulation Ensemble -->
+    <SourceProxy class="vtkEnsembleReader"
+                 file_name_method="SetFileName"
+                 label="Exodus II Simulation Ensemble"
+                 name="ExodusIISimulationEnsemble"
+                 si_class="vtkSIFileSeriesReaderProxy">
+      <Documentation long_help="Reads a Exodus II Simulation Ensemble"
+                     short_help="Exodus II Simulation Ensemble">
+        Reads an ensemble of Exodus II simulations. These are
+      simulations run with slightly different parameters.</Documentation>
+
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ExodusIIReaderCore" />
+        <ExposedProperties>
+          <PropertyGroup label="Variables"
+                         name="Variables"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="GenerateObjectIdCellArray" />
+            <Property name="GenerateGlobalElementIdArray" />
+            <Property name="ElementVariables" />
+            <Property name="FaceVariables" />
+            <Property name="EdgeVariables" />
+            <Property name="SideSetResultArrayStatus" />
+            <Property name="NodeSetResultArrayStatus" />
+            <Property name="FaceSetResultArrayStatus" />
+            <Property name="EdgeSetResultArrayStatus" />
+            <Property name="GenerateGlobalNodeIdArray" />
+            <Property name="ElementSetResultArrayStatus" />
+            <Property name="PointVariables" />
+            <Property name="GlobalVariables" />
+          </PropertyGroup>
+          <!-- fixme - need to group these two properties -->
+          <Property name="ApplyDisplacements" />
+          <Property name="DisplacementMagnitude" />
+          <Property name="EdgeBlocks" />
+          <Property name="EdgeBlocksInfo" />
+          <PropertyGroup label="Sets"
+                         name="Sets"
+                         panel_visibility="advanced"
+                         panel_widget="ArrayStatus">
+            <Property name="NodeSetArrayStatus" />
+            <Property name="SideSetArrayStatus" />
+            <Property name="FaceSetArrayStatus" />
+            <Property name="EdgeSetArrayStatus" />
+            <Property name="ElementSetArrayStatus" />
+          </PropertyGroup>
+          <PropertyGroup label="Maps"
+                         name="Maps"
+                         panel_visibility="advanced"
+                         panel_widget="ArrayStatus">
+            <Property name="NodeMapArrayStatus" />
+            <Property name="EdgeMapArrayStatus" />
+            <Property name="FaceMapArrayStatus" />
+            <Property name="ElementMapArrayStatus" />
+          </PropertyGroup>
+          <Property name="EdgeMapInfo" />
+          <Property name="EdgeSetInfo" />
+          <Property name="EdgeSetResultArrayInfo" />
+          <Property name="EdgeVariablesInfo" />
+          <Property name="ElementBlocks" />
+          <Property name="ElementMapInfo" />
+          <Property name="ElementSetInfo" />
+          <Property name="ElementSetResultArrayInfo" />
+          <Property name="ElementVariablesInfo" />
+
+          <Property name="FaceBlocks" />
+          <Property name="FaceBlocksInfo" />
+          <Property name="FaceMapInfo" />
+          <Property name="FaceSetInfo" />
+          <Property name="FaceSetResultArrayInfo" />
+          <Property name="FaceVariablesInfo" />
+          <Property name="GlobalVariablesInfo" />
+          <Property name="NodeMapInfo" />
+          <Property name="NodeSetInfo" />
+          <Property name="NodeSetResultArrayInfo" />
+          <Property name="PointVariablesInfo" />
+          <Property name="SideSetInfo" />
+          <Property name="SideSetResultArrayInfo" />
+          <Property name="SILUpdateStamp" />
+          <Property name="TimeStepRangeInfo" />
+
+          <PropertyGroup label="Mode Shapes">
+            <Property name="HasModeShapes" panel_visibility="advanced" />
+            <Property name="ModeShape" panel_visibility="advanced" />
+            <Property name="AnimateVibrations" panel_visibility="advanced" />
+          </PropertyGroup>
+          <PropertyGroup label="File Pattern">
+            <Property name="FilePrefix" panel_visibility="advanced" />
+            <Property name="FilePrefixInfo" />
+            <Property name="FilePattern" panel_visibility="advanced"/>
+            <Property name="FilePatternInfo" />
+            <Property name="FileRange" panel_visibility="advanced" />
+            <Property name="FileRangeInfo" />
+            <Property name="XMLFileName" panel_visibility="advanced"/>
+            <Property name="XMLFileNameInfo" />
+          </PropertyGroup>
+          <Property name="Refresh" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The meta-file for the reader</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFileNameMethod"
+                            name="FileNameMethod"
+                            default_values="SetFileName"
+                            number_of_elements="1"
+                            panel_visibility="never"/>
+      <IntVectorProperty command="GetFileIndexRange"
+                         information_only="1"
+                         name="FileIndexRange"
+                         number_of_elements="2"
+                         default_values="0 0">
+      </IntVectorProperty>
+      <IntVectorProperty name="FileIndex"
+                         command="SetFileIndex"
+                         animateable="1"
+                         default_values="0"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" default_mode="min">
+          <RequiredProperties>
+            <Property name="FileIndexRange" function="Range"/>
+          </RequiredProperties>
+        </IntRangeDomain>
+      </IntVectorProperty>
+      <!-- magic property to send time information to the animation panel -->
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="NumberOfParameters"
+                            command="GetNumberOfParameters"
+                            information_only="1"
+                            default_values="0"
+                            number_of_elements="1"/>
+      <Hints>
+        <ReaderFactory extensions="ex2_ensemble"
+                       file_description="Exodus II Simulation Ensemble" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- we need to set UseMetaFile property -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML PolyData Reader"
+                 name="XMLPolyDataReaderUseMetaFile"
+                 si_class="vtkSIFileSeriesReaderProxy"
+                 base_proxygroup="sources"
+                 base_proxyname="XMLPolyDataReader">
+      <IntVectorProperty command="SetUseMetaFile"
+                         default_values="1"
+                         name="UseMetaFile"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy class="vtkEnsembleReader"
+                 file_name_method="SetMetaFileName"
+                 label="XML PolyData Ensemble Reader"
+                 name="XMLPolyDataEnsembleReader"
+                 si_class="vtkSIFileSeriesReaderProxy">
+      <Documentation long_help="Reads ensembles of VTK XML polydata files."
+                     short_help="Reads ensembles of polydata files">The XML
+      Polydata reader reads ensembles of VTK XML polydata files. The
+      standard extension is .evtp.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="sources"
+               proxyname="XMLPolyDataReaderUseMetaFile"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
+          <Property name="UseMetaFile"/>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The meta-file for the reader</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetFileIndexRange"
+                         information_only="1"
+                         name="FileIndexRange"
+                         number_of_elements="2"
+                         default_values="0 0">
+        <Documentation>Smallest and largest index for the list of
+        simulations files. For instance, if we have 10 simulations the
+        FileIndexRange is [0,9].
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="FileIndex"
+                         command="SetFileIndex"
+                         animateable="1"
+                         default_values="0"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" default_mode="min">
+          <RequiredProperties>
+            <Property name="FileIndexRange" function="Range"/>
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>
+          The index of the simulation file in the ensemble.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- magic property to send time information to the animation panel -->
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="evtp"
+                       file_description="VTK PolyData Ensembles" />
       </Hints>
     </SourceProxy>
   </ProxyGroup>
