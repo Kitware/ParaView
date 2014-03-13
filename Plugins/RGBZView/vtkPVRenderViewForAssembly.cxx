@@ -189,7 +189,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
 
   //----------------------------------------------------------------------------
 
-  vtkFloatArray* CaptureZBuffer(bool isBG = false)
+  vtkFloatArray* CaptureZBuffer()
   {
     this->ArrayHolder = vtkSmartPointer<vtkFloatArray>::New();
     this->ZGrabber->Modified();
@@ -293,7 +293,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
 
   //----------------------------------------------------------------------------
 
-  void LineCompressor(char* buffer, int width)
+  void LineCompressor(char* buffer)
   {
     char* lineStartPointer = buffer;
     char* nextLineStartPointer;
@@ -524,7 +524,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     this->StillRender();
     if(this->SynchronizedWindows->GetLocalProcessIsDriver())
       {
-      zBuffers[0] = this->Internal->CaptureZBuffer(true);
+      zBuffers[0] = this->Internal->CaptureZBuffer();
       }
 
     // Change orientation + center visibility
@@ -747,7 +747,7 @@ void vtkPVRenderViewForAssembly::WriteComposite()
        << "\n\"dimensions\": [" << xSize << ", " << ySize << "]"
        << ",\n\"pixel-order\": \"";
 
-  this->Internal->LineCompressor(this->OrderingBuffer, xSize);
+  this->Internal->LineCompressor(this->OrderingBuffer);
   file << this->GetZOrdering();
 
   // Close file
