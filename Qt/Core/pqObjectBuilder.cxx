@@ -508,13 +508,9 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     findItem<pqDataRepresentation*>(reprProxy);
   if (repr )
     {
-    //hack for text representations
-    if (strcmp(repr->metaObject()->className(),"pqTextRepresentation") != 0 )
-      {
-      // inherit properties from the representation for the input if applicable.
-      // FIXME
-      // this->initializeInheritedProperties(repr);
-      }
+    // inherit properties from the representation for the input if applicable.
+    // FIXME
+    // this->initializeInheritedProperties(repr);
     emit this->dataRepresentationCreated(repr);
     emit this->proxyCreated(repr);
     }

@@ -46,8 +46,8 @@ set (Module_SRCS
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
-  vtkSMPlotMatrixViewProxy.cxx
   vtkSMPVRepresentationProxy.cxx
+  vtkSMPlotMatrixViewProxy.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationTypeDomain.cxx
@@ -67,5 +67,40 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_MATPLOTLIB)
   list(APPEND Module_SRCS vtkSMPythonViewProxy.cxx)
 endif()
 
-vtk_module_library(vtkPVServerManagerRendering
-  ${Module_SRCS})
+
+#-----------------------------------------------------------------------------
+# Stuff for ObjectFactory override for vtkSMParaViewPipelineControllerWithRendering.
+list(APPEND Module_SRCS
+  vtkSMParaViewPipelineControllerWithRendering.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
+
+set_source_files_properties(${vtk-module}ObjectFactory WRAP_EXCLUDE)
+
+# Override some rendering classes. Create object factory:
+set(vtk_module_overrides "vtkSMParaViewPipelineController")
+set(vtk_module_vtkSMParaViewPipelineController_override
+  "vtkSMParaViewPipelineControllerWithRendering")
+
+# Now we iterate and create that class file...
+foreach(_class ${vtk_module_overrides})
+  set(_override ${vtk_module_${_class}_override})
+  set(_vtk_override_includes "${_vtk_override_includes}
+#include \"${_override}.h\"")
+  set(_vtk_override_creates "${_vtk_override_creates}
+VTK_CREATE_CREATE_FUNCTION(${_override})")
+  set(_vtk_override_do "${_vtk_override_do}
+  this->RegisterOverride(\"${_class}\",
+                         \"${_override}\",
+                         \"Override for ${vtk-module} module\", 1,
+                         vtkObjectFactoryCreate${_override});")
+endforeach()
+
+# Now lets create the object factory classes
+string(TOUPPER ${vtk-module} VTK-MODULE)
+configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.h)
+configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.cxx.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
+#-----------------------------------------------------------------------------
+
+vtk_module_library(vtkPVServerManagerRendering ${Module_SRCS})

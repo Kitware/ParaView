@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
-#include "pqTextRepresentation.h"
 #include "vtkSMProxy.h"
 #include <QDebug>
 #include <QWidget>
@@ -63,7 +62,7 @@ bool pqStandardLegacyDisplayPanels::canCreatePanel(pqRepresentation* proxy) cons
 
   if (
     type == "SpreadSheetRepresentation" ||
-    qobject_cast<pqTextRepresentation*>(proxy)||
+    type == "TextSourceRepresentation" ||
     false
     )
     {
@@ -88,7 +87,7 @@ pqDisplayPanel* pqStandardLegacyDisplayPanels::createPanel(pqRepresentation* pro
     return new pqSpreadSheetDisplayEditor(proxy, p);
     }
 
-  if (qobject_cast<pqTextRepresentation*>(proxy))
+  if (type == "TextSourceRepresentation")
     {
     return new pqTextDisplayPropertiesWidget(proxy, p);
     }

@@ -1,6 +1,8 @@
 vtk_module(vtkPVServerManagerRendering
   GROUPS
     ParaViewRendering
+  IMPLEMENTS
+    vtkPVServerManagerCore
   DEPENDS
     vtkPVServerManagerCore
     vtkPVServerImplementationRendering

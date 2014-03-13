@@ -48,12 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
 {
 public:
-  QList<QPointer<pqScalarBarRepresentation> > ScalarBars;
   vtkEventQtSlotConnect* VTKConnect;
 
   pqScalarsToColorsInternal()
@@ -88,35 +88,13 @@ pqScalarsToColors::~pqScalarsToColors()
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarsToColors::addScalarBar(pqScalarBarRepresentation* sb)
-{
-  if (this->Internal->ScalarBars.indexOf(sb) == -1)
-    {
-    this->Internal->ScalarBars.push_back(sb);
-    emit this->scalarBarsChanged();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarsToColors::removeScalarBar(pqScalarBarRepresentation* sb)
-{
-  if (this->Internal->ScalarBars.removeAll(sb) > 0)
-    {
-    emit this->scalarBarsChanged();
-    }
-}
-
-//-----------------------------------------------------------------------------
 pqScalarBarRepresentation* pqScalarsToColors::getScalarBar(pqRenderViewBase* ren) const
 {
-  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
-    {
-    if (sb && (sb->getView() == ren))
-      {
-      return sb;
-      }
-    }
-  return 0;
+  vtkSMProxy* proxy =
+    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
+      this->getProxy(), ren->getProxy());
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  return proxy? smmodel->findItem<pqScalarBarRepresentation*>(proxy) : NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -145,31 +123,32 @@ bool pqScalarsToColors::getScalarRangeLock() const
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::hideUnusedScalarBars()
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel* smmodel = core->getServerManagerModel();
+  // FIXME:
+  //pqApplicationCore* core = pqApplicationCore::instance();
+  //pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  QList<pqPipelineRepresentation*> displays =
-    smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
+  //QList<pqPipelineRepresentation*> displays =
+  //  smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
 
-  bool used_at_all = false;
-  foreach(pqPipelineRepresentation* display, displays)
-    {
-    if (display->isVisible() &&
-      display->getColorField(true) != pqPipelineRepresentation::solidColor() &&
-      display->getLookupTableProxy() == this->getProxy())
-      {
-      used_at_all = true;
-      break;
-      }
-    }
-  if (!used_at_all)
-    {
-    foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
-      {
-      sb->setVisible(false);
-      sb->renderViewEventually();
-      }
-    }
+  //bool used_at_all = false;
+  //foreach(pqPipelineRepresentation* display, displays)
+  //  {
+  //  if (display->isVisible() &&
+  //    display->getColorField(true) != pqPipelineRepresentation::solidColor() &&
+  //    display->getLookupTableProxy() == this->getProxy())
+  //    {
+  //    used_at_all = true;
+  //    break;
+  //    }
+  //  }
+  //if (!used_at_all)
+  //  {
+  //  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+  //    {
+  //    sb->setVisible(false);
+  //    sb->renderViewEventually();
+  //    }
+  //  }
 }
 
 //-----------------------------------------------------------------------------
@@ -350,10 +329,11 @@ void pqScalarsToColors::setAnnotations( const QList<QVariant>& annotations )
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 {
-  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
-    {
-    sb->setTitle(sb->getTitle().first, component);
-    }
+  // FIXME:
+  //foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+  //  {
+  //  sb->setTitle(sb->getTitle().first, component);
+  //  }
 }
 
 //-----------------------------------------------------------------------------

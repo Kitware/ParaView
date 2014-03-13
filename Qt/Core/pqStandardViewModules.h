@@ -49,7 +49,6 @@ public:
   ~pqStandardViewModules();
 
   virtual QStringList viewTypes() const;
-  QStringList displayTypes() const;
   QString viewTypeName(const QString&) const;
 
   bool canCreateView(const QString& viewtype) const;
@@ -63,14 +62,6 @@ public:
     vtkSMViewProxy* viewmodule,
     pqServer* server,
     QObject* parent);
-  
-  pqDataRepresentation* createDisplay(const QString& display_type, 
-    const QString& group,
-    const QString& name,
-    vtkSMProxy* proxy,
-    pqServer* server,
-    QObject* parent);
-
 };
 
 #endif

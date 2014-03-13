@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QVariant>
 
-class pqScalarsToColorsInternal;
-class pqScalarBarRepresentation;
 class pqRenderViewBase;
+class pqScalarBarRepresentation;
+class pqScalarsToColorsInternal;
 
 /// pqScalarsToColors is a represents a vtkScalarsToColors proxy.
 class PQCORE_EXPORT pqScalarsToColors : public pqProxy
@@ -132,15 +132,6 @@ public slots:
 
   /// Triggers a build on the lookup table.
   void build();
-signals:
-  /// Fired after a new scalar bar is added or removed from this LUT.
-  void scalarBarsChanged();
-
-protected:
-  friend class pqScalarBarRepresentation;
-
-  void addScalarBar(pqScalarBarRepresentation*);
-  void removeScalarBar(pqScalarBarRepresentation*);
 
 protected slots:
   /// Checks to make sure that the range is compatible with the log flag
@@ -152,4 +143,3 @@ private:
 };
 
 #endif
-

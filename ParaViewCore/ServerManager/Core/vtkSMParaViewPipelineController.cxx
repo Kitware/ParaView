@@ -87,7 +87,7 @@ namespace
     };
 }
 
-vtkStandardNewMacro(vtkSMParaViewPipelineController);
+vtkObjectFactoryNewMacro(vtkSMParaViewPipelineController);
 //----------------------------------------------------------------------------
 vtkSMParaViewPipelineController::vtkSMParaViewPipelineController()
   : Internals(new vtkSMParaViewPipelineController::vtkInternals())
@@ -242,7 +242,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     pxm->RegisterSelectionModel("ActiveView", selmodel);
     selmodel->FastDelete();
     }
-  
+
   //---------------------------------------------------------------------------
   // Create the timekeeper if none exists.
   vtkSmartPointer<vtkSMProxy> timeKeeper = this->FindTimeKeeper(session);
@@ -549,7 +549,7 @@ bool vtkSMParaViewPipelineController::InitializeView(vtkSMProxy* proxy)
     proxy->GetSessionProxyManager()->GetSelectionModel("ActiveView");
   assert(selmodel != NULL);
   selmodel->SetCurrentProxy(proxy, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
-  return true;  
+  return true;
 }
 
 //----------------------------------------------------------------------------

@@ -167,8 +167,6 @@ set(Module_SRCS
   pqRubberBandHelper.h
   pqScalarBarRepresentation.cxx
   pqScalarBarRepresentation.h
-  pqScalarOpacityFunction.cxx
-  pqScalarOpacityFunction.h
   pqScalarsToColors.cxx
   pqScalarsToColors.h
   pqServer.cxx
@@ -205,8 +203,6 @@ set(Module_SRCS
   pqStandardServerManagerModelInterface.h
   pqStandardViewModules.cxx
   pqStandardViewModules.h
-  pqTextRepresentation.cxx
-  pqTextRepresentation.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
   pqTreeLayoutStrategyInterface.cxx
@@ -293,7 +289,6 @@ set (Module_MOC_HDRS
   pqRepresentation.h
   pqRubberBandHelper.h
   pqScalarBarRepresentation.h
-  pqScalarOpacityFunction.h
   pqScalarsToColors.h
 #  pqScatterPlotRepresentation.h
   pqServerConfigurationCollection.h
@@ -308,7 +303,6 @@ set (Module_MOC_HDRS
   pqSpreadSheetViewWidget.h
   pqStandardServerManagerModelInterface.h
   pqStandardViewModules.h
-  pqTextRepresentation.h
   pqTimeKeeper.h
   pqUndoStack.h
   pqViewExporterManager.h

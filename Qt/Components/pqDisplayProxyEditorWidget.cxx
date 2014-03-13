@@ -53,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
-#include "pqTextRepresentation.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 
@@ -82,7 +81,7 @@ public:
        type == "XYBarChartRepresentation" ||
        type == "BarChartRepresentation" ||
        type == "SpreadSheetRepresentation" ||
-       qobject_cast<pqTextRepresentation*>(proxy)||
+       type == "TextSourceRepresentation" ||
        type == "ScatterPlotRepresentation" ||
        type == "ParallelCoordinatesRepresentation" ||
        type == "PlotMatrixRepresentation")
@@ -117,7 +116,7 @@ public:
       return new pqSpreadSheetDisplayEditor(proxy, p);
       }
 
-    if (qobject_cast<pqTextRepresentation*>(proxy))
+    if (type == "TextSourceRepresentation")
       {
       return new pqTextDisplayPropertiesWidget(proxy, p);
       }

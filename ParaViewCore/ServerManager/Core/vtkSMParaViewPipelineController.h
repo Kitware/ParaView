@@ -74,7 +74,6 @@ public:
   virtual bool PreInitializeRepresentation(vtkSMProxy* proxy);
   virtual bool PostInitializeRepresentation(vtkSMProxy* proxy);
 
-
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
 

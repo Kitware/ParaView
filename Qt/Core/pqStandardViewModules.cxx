@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
-#include "pqTextRepresentation.h"
 #include "pqXYBagChartView.h"
 #include "pqXYBarChartView.h"
 #include "pqXYFunctionalBagChartView.h"
@@ -88,11 +87,6 @@ QStringList pqStandardViewModules::viewTypes() const
     pqPythonView::pythonViewType() <<
 #endif
     pqPlotMatrixView::viewType();
-}
-
-QStringList pqStandardViewModules::displayTypes() const
-{
-  return QStringList() << "TextSourceRepresentation";
 }
 
 QString pqStandardViewModules::viewTypeName(const QString& type) const
@@ -338,20 +332,5 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     }
 
   qDebug() << "Failed to create a proxy" << viewmodule->GetClassName();
-  return NULL;
-}
-
-pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& display_type,
-  const QString& group,
-  const QString& n,
-  vtkSMProxy* proxy,
-  pqServer* server,
-  QObject* p)
-{
-  if (display_type == "TextSourceRepresentation")
-    {
-    return new pqTextRepresentation(group, n, proxy, server, p);
-    }
-
   return NULL;
 }

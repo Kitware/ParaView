@@ -17,9 +17,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkProcessModule.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMViewProxy.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
@@ -58,18 +60,38 @@ int main(int argc, char* argv[])
     }
 
 
-  vtkSMProxy* exodusReader = pxm->NewProxy("sources", "ExodusIIReader");
-  controller->PreInitializePipelineProxy(exodusReader);
-  vtkSMPropertyHelper(exodusReader, "FileName").Set(
-    "/home/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
-  vtkSMPropertyHelper(exodusReader, "ApplyDisplacements").Set(0);
-  exodusReader->UpdateVTKObjects();
+    {
+    // Create reader.
+    vtkSmartPointer<vtkSMProxy> exodusReader;
+    exodusReader.TakeReference(pxm->NewProxy("sources", "ExodusIIReader"));
 
-  controller->PostInitializePipelineProxy(exodusReader);
-  exodusReader->Delete();
+    controller->PreInitializePipelineProxy(exodusReader);
+    vtkSMPropertyHelper(exodusReader, "FileName").Set(
+      //"/home/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
+      "/Users/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
+    vtkSMPropertyHelper(exodusReader, "ApplyDisplacements").Set(0);
+    exodusReader->UpdateVTKObjects();
 
-  //pxm->SaveXMLState("/tmp/state.pvsm");
+    controller->PostInitializePipelineProxy(exodusReader);
 
+    // Create view
+    vtkSmartPointer<vtkSMProxy> view;
+    view.TakeReference(pxm->NewProxy("views", "RenderView"));
+    controller->InitializeView(view);
+
+    // Create display.
+    vtkSmartPointer<vtkSMProxy> repr;
+    repr.TakeReference(vtkSMViewProxy::SafeDownCast(view)->CreateDefaultRepresentation(
+        exodusReader, 0));
+    controller->PreInitializeRepresentation(repr);
+    vtkSMPropertyHelper(repr, "Input").Set(exodusReader);
+    controller->PostInitializeRepresentation(repr);
+
+    vtkSMPropertyHelper(view, "Representations").Add(repr);
+    view->UpdateVTKObjects();
+    }
+
+  pxm->SaveXMLState("/tmp/state.pvsm");
   session->Delete();
   vtkInitializationHelper::Finalize();
   return EXIT_SUCCESS;

@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRepresentation.h"
 #include "pqSignalAdaptors.h"
 #include "pqStandardColorLinkAdaptor.h"
-#include "pqTextRepresentation.h"
 #include "pqUndoStack.h"
 
 class pqTextDisplayPropertiesWidget::pqInternal : 
@@ -141,7 +140,7 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
     QObject::disconnect(this->Internal->Display, 0, this, 0);
     }
 
-  this->Internal->Display = qobject_cast<pqTextRepresentation*>(display);
+  this->Internal->Display = display;
   if (!this->Internal->Display)
     {
     return;

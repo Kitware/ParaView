@@ -78,14 +78,6 @@ public:
   // Get the internal display proxy.
   vtkSMRepresentationProxy* getRepresentationProxy() const;
 
-  // Sets the default color mapping for the display.
-  // The rules are:
-  // If the source created a NEW point scalar array, use it.
-  // Else if the source created a NEW cell scalar array, use it.
-  // Else if the input color by array exists in this source, use it.
-  // Else color by property.
-  virtual void setDefaultPropertyValues();
-
   // Call to select the coloring array. 
   void colorByArray(const char* arrayname, int fieldtype);
 
@@ -129,10 +121,6 @@ public:
   /// Returns the proxy for the piecewise function used to
   /// map scalars to opacity.
   virtual vtkSMProxy* getScalarOpacityFunctionProxy();
-
-  /// Returns the pqScalarOpacityFunction object for the piecewise
-  /// function used to map scalars to opacity.
-  virtual pqScalarOpacityFunction* getScalarOpacityFunction();
 
   /// Set representation on the proxy.
   /// If representation is changed to volume, this method ensures that the

@@ -339,17 +339,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
     }
 
   vtkSMPropertyHelper colorArrayHelper(colorArray);
-
-  if (arrayname && colorArrayHelper.GetAsString(4) &&
-    strcmp(arrayname, colorArrayHelper.GetAsString(4)) == 0 &&
-    colorArrayHelper.GetAsInt(3) == attribute_type)
-    {
-    // nothing to do since nothing changed.
-    return true;
-    }
-
-  colorArrayHelper.Set(3, attribute_type);
-  colorArrayHelper.Set(4, arrayname? arrayname : "");
+  colorArrayHelper.SetInputArrayToProcess(attribute_type, arrayname);
 
   if (arrayname == NULL || arrayname[0] == '\0')
     {
@@ -358,7 +348,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
     this->UpdateVTKObjects();
     return true;
     }
-  
+
   // Now, setup transfer functions.
   vtkNew<vtkSMTransferFunctionManager> mgr;
   if (vtkSMProperty* lutProperty = this->GetProperty("LookupTable"))
@@ -367,7 +357,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
       mgr->GetColorTransferFunction(arrayname, this->GetSessionProxyManager());
     vtkSMPropertyHelper(lutProperty).Set(lutProxy);
     }
-  
+
   if (vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction"))
     {
     vtkSMProxy* sofProxy =

@@ -73,8 +73,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
-#include "pqScalarBarRepresentation.h"
-#include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -88,12 +86,10 @@ class pqPipelineRepresentation::pqInternal
 public:
   vtkSmartPointer<vtkSMRepresentationProxy> RepresentationProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-//  pqScalarOpacityFunction *Opacity;
 
   pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-//    this->Opacity = 0;
     }
 
   static vtkPVArrayInformation* getArrayInformation(const pqPipelineRepresentation* repr,
@@ -200,21 +196,6 @@ vtkSMProxy* pqPipelineRepresentation::getScalarOpacityFunctionProxy()
 }
 
 //-----------------------------------------------------------------------------
-pqScalarOpacityFunction* pqPipelineRepresentation::getScalarOpacityFunction()
-{
-  if (this->getRepresentationType().compare("Volume", Qt::CaseInsensitive) == 0)
-    {
-    pqServerManagerModel* smmodel =
-        pqApplicationCore::instance()->getServerManagerModel();
-    vtkSMProxy* opf = this->getScalarOpacityFunctionProxy();
-
-    return (opf? smmodel->findItem<pqScalarOpacityFunction*>(opf): 0);
-    }
-
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
 void pqPipelineRepresentation::createHelperProxies()
 {
   vtkSMProxy* proxy = this->getProxy();
@@ -257,232 +238,6 @@ void pqPipelineRepresentation::onInputChanged()
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SLOT(onInputAccepted()));
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::setDefaultPropertyValues()
-{
-  // We deliberately don;t call superclass. For somereason,
-  // its messing up with the scalar coloring.
-  this->Superclass::setDefaultPropertyValues();
-
-  vtkSMRepresentationProxy* repr = this->getRepresentationProxy();
-  if (!repr)
-    {
-    return;
-    }
-
-  // Setup property defaults that are independent of data. Eventually,
-  // ServerManager will take care of these defaults.
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  if(repr->GetProperty("AllowSpecularHighlightingWithScalarColoring"))
-    {
-    vtkSMPropertyHelper(repr, "AllowSpecularHighlightingWithScalarColoring").Set(
-      settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
-    }
-
-  if (!this->isVisible() &&
-      !pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault()
-      )
-    {
-    // don't worry about invisible displays.
-    return;
-    }
-
-  // For some view all the default representation names may not exist
-  // therefore we need to filter them to match existing ones.
-  vtkSMPropertyHelper availableTypes(repr, "RepresentationTypesInfo");
-  const char* DEFAULT_OUTLINE = "Outline";
-  const char* DEFAULT_SURFACE = "Surface";
-  const char* DEFAULT_SLICE = "Slice";
-  if(availableTypes.GetNumberOfElements() == 1)
-    {
-    // All default value should be that UNIQUE possible choice
-    DEFAULT_OUTLINE = DEFAULT_SURFACE = DEFAULT_SLICE
-        = availableTypes.GetAsString(0);
-    }
-  else
-    {
-    // TODO if the issue arise
-    // We need to filter possible defaults with allowed value and if one of
-    // the default does not exist replace it with some allowed value
-    }
-
-  pqSMAdaptor::setEnumerationProperty(repr->GetProperty("SelectionRepresentation"),
-    "Wireframe");
-  pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionLineWidth"), 2);
-  pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionPointSize"), 5);
-
-  // Set up some global property links by default.
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-      pqApplicationCore::instance()->getGlobalPropertiesManager();
-  // Note that the representation created for the 2D view doesn't even have
-  // these properties.
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "SelectionColor", repr, "SelectionColor");
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "SurfaceColor", repr, "DiffuseColor");
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "ForegroundColor", repr, "AmbientColor");
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "EdgeColor", repr, "EdgeColor");
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "SurfaceColor", repr, "BackfaceDiffuseColor");
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "ForegroundColor", repr, "CubeAxesColor");
-
-  // if the source created a new point scalar, use it
-  // else if the source created a new cell scalar, use it
-  // else if the input color by array exists in this source, use it
-  // else color by property
-  
-  vtkPVDataInformation* inGeomInfo = 0;
-  vtkPVDataInformation* geomInfo = 0;
-  vtkPVDataSetAttributesInformation* inAttrInfo = 0;
-  vtkPVDataSetAttributesInformation* attrInfo;
-  vtkPVArrayInformation* arrayInfo;
-
-  // Get the time that this representation is going to use.
-  vtkPVDataInformation* dataInfo = 0;
-
-  dataInfo = this->getOutputPortFromInput()->getDataInformation();
-
-  // Locate input display.
-  pqPipelineRepresentation* upstreamDisplay =
-    qobject_cast<pqPipelineRepresentation*>(
-      this->getRepresentationForUpstreamSource());
-  if (upstreamDisplay &&
-    this->getRepresentationType().compare("Outline", Qt::CaseInsensitive) == 0)
-    {
-    // try to preserve the upstream representation type (except for volume
-    // rendering).
-    if (upstreamDisplay->getRepresentationType().compare("Volume",
-        Qt::CaseInsensitive) != 0)
-      {
-      pqSMAdaptor::setElementProperty(repr->GetProperty("Representation"),
-        upstreamDisplay->getRepresentationType());
-      }
-    }
-
-  repr->UpdateVTKObjects();
-
-  if (pqSMAdaptor::getEnumerationProperty(repr->GetProperty("Representation"))
-    == "Outline")
-    {
-    // no need to determine scalar coloring for outline representation.
-    // just ensure that the color is empty (BUG #12180).
-    vtkSMPropertyHelper(repr, "ColorArrayName", true).Set((char*)NULL);
-    return;
-    }
-
-  // update the input using the current application time.
-  this->getInput()->updatePipeline();
-  geomInfo = this->getInputDataInformation();
-  if (upstreamDisplay)
-    {
-    inGeomInfo = upstreamDisplay->getInputDataInformation();
-    }
-
-  vtkPVArrayInformation* chosenArrayInfo = 0;
-  int chosenFieldType = 0;
-
-  // Look for a new point array.
-  // I do not think the logic is exactly as describerd in this methods
-  // comment.  I believe this method only looks at "Scalars".
-  if (geomInfo)
-    {
-    attrInfo = geomInfo->GetPointDataInformation();
-    inAttrInfo = inGeomInfo? inGeomInfo->GetPointDataInformation() : 0;
-    pqPipelineRepresentation::getColorArray(attrInfo, inAttrInfo, arrayInfo);
-    if (arrayInfo)
-      {
-      chosenFieldType = vtkDataObject::FIELD_ASSOCIATION_POINTS;
-      chosenArrayInfo = arrayInfo;
-      }
-    }
-
-  // Check for new cell scalars.
-  if (!chosenArrayInfo && geomInfo)
-    {
-    attrInfo = geomInfo->GetCellDataInformation();
-    inAttrInfo = inGeomInfo? inGeomInfo->GetCellDataInformation() : 0;
-    pqPipelineRepresentation::getColorArray(attrInfo, inAttrInfo, arrayInfo);
-    if (arrayInfo)
-      {
-      chosenFieldType = vtkDataObject::FIELD_ASSOCIATION_CELLS;
-      chosenArrayInfo = arrayInfo;
-      }
-    }
-
-  if (!chosenArrayInfo && geomInfo)
-    {
-    // Check for scalars in geometry
-    attrInfo = geomInfo->GetPointDataInformation();
-    this->getColorArray(attrInfo, inAttrInfo, arrayInfo);
-    if (arrayInfo)
-      {
-      chosenArrayInfo = arrayInfo;
-      chosenFieldType = vtkDataObject::FIELD_ASSOCIATION_POINTS;
-      }
-    }
-
-  if (!chosenArrayInfo && geomInfo)
-    {
-    // Check for scalars in geometry
-    attrInfo = geomInfo->GetCellDataInformation();
-    this->getColorArray(attrInfo, inAttrInfo, arrayInfo);
-    if(arrayInfo)
-      {
-      chosenArrayInfo = arrayInfo;
-      chosenFieldType = vtkDataObject::FIELD_ASSOCIATION_CELLS;
-      }
-    }
-
-  if (chosenArrayInfo)
-    {
-    if (chosenArrayInfo->GetDataType() == VTK_UNSIGNED_CHAR &&
-        chosenArrayInfo->GetNumberOfComponents() <= 4)
-        {
-        pqSMAdaptor::setElementProperty(repr->GetProperty("MapScalars"), 0);
-        }
-    this->colorByArray(chosenArrayInfo->GetName(), chosenFieldType);
-    return;
-    }
-
-  // Try to inherit the same array selected by the input.
-  if (upstreamDisplay)
-    {
-    vtkSMPropertyHelper colorAttrType(upstreamDisplay->getProxy(),
-      "ColorAttributeType");
-    vtkSMPropertyHelper colorArrayName(upstreamDisplay->getProxy(),
-      "ColorArrayName");
-    if (pqInternal::getArrayInformation(
-        this, colorArrayName.GetAsString(), colorAttrType.GetAsInt()))
-      {
-      this->colorByArray(
-        colorArrayName.GetAsString(), colorAttrType.GetAsInt());
-      return;
-      }
-    }
-
-  QList<QString> myColorFields = this->getColorFields();
-
-  // We are going to set the default color mode to use solid color i.e. not use
-  // scalar coloring at all. However, for some representations (eg. slice/volume)
-  // this is an error, we have to color by some array. Since no active scalar
-  // were choosen, we simply use the first color array available. (If no arrays
-  // are available, then error will be raised anyways).
-  if (!myColorFields.contains(pqPipelineRepresentation::solidColor()))
-    {
-    if (myColorFields.size() > 0)
-      {
-      this->setColorField(myColorFields[0]);
-      return;
-      }
-    }
-
-  // Color by property.
-  this->colorByArray(NULL, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -1022,48 +777,8 @@ void pqPipelineRepresentation::onRepresentationChanged()
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::updateScalarBarVisibility(bool visible)
 {
-  pqView* view = this->getView();
-  if (!view)
-    {
-    return;
-    }
-
-  pqScalarsToColors* lut = this->getLookupTable();
-  if (!lut)
-    {
-    return;
-    }
-
-  // Is this lut used by any other visible repr in this view?
-  QList<pqRepresentation*> reprs = view->getRepresentations();
-  foreach (pqRepresentation* repr, reprs)
-    {
-    pqDataRepresentation* dataRepr=qobject_cast<pqDataRepresentation*>(repr);
-    if (dataRepr && dataRepr != this &&
-      dataRepr->isVisible() && dataRepr->getLookupTable() == lut)
-      {
-      // lut is used by another visible repr. Don't change lut visibility.
-      return;
-      }
-    }
-
-  pqScalarBarRepresentation* sbRepr = lut->getScalarBar(
-    qobject_cast<pqRenderView*>(view));
-  if (sbRepr)
-    {
-    if (!visible && sbRepr->isVisible())
-      {
-      sbRepr->setVisible(false);
-      sbRepr->setAutoHidden(true);
-      }
-    else if (visible && sbRepr->getAutoHidden() && !sbRepr->isVisible())
-      {
-      sbRepr->setAutoHidden(false);
-      sbRepr->setVisible(true);
-      }
-    }
+  qDebug("FIXME");
 }
-
 //-----------------------------------------------------------------------------
 const char* pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()
 {
