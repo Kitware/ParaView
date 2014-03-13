@@ -48,7 +48,7 @@
 #define __vtkFileSeriesReader_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
-#include "vtkDataObjectAlgorithm.h"
+#include "vtkMetaReader.h"
 
 class vtkStringArray;
 
@@ -56,17 +56,12 @@ class vtkStringArray;
 struct vtkFileSeriesReaderInternals;
 //ETX
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesReader : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesReader : public vtkMetaReader
 {
 public:
   static vtkFileSeriesReader* New();
-  vtkTypeMacro(vtkFileSeriesReader, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkFileSeriesReader, vtkMetaReader);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set/get the internal reader.
-  virtual void SetReader(vtkAlgorithm*);
-  vtkGetObjectMacro(Reader, vtkAlgorithm);
 
   // Description:
   // All pipeline passes are forwarded to the internal reader. The
@@ -80,7 +75,6 @@ public:
   // Description:
   // CanReadFile is forwarded to the internal reader if it supports it.
   virtual int CanReadFile(const char* filename);
-  static int CanReadFile(vtkAlgorithm *reader, const char *filename);
 
   // Description:
   // Adds names of files to be read. The files are read in the order
@@ -99,31 +93,13 @@ public:
   // Returns the name of a file with index idx.
   virtual const char* GetFileName(unsigned int idx);
 
-  // Description:
-  // Returns the most recent filename used.
-  vtkGetStringMacro(CurrentFileName);
-
-  // Description:
-  // Get/set the filename for the meta-file.  Has no effect unless UseMetaFile
-  // is true.
-  vtkGetStringMacro(MetaFileName);
-  vtkSetStringMacro(MetaFileName);
+  const char* GetCurrentFileName();
 
   // Description:
   // If true, then use the meta file.  False by default.
   vtkGetMacro(UseMetaFile, int);
   vtkSetMacro(UseMetaFile, int);
   vtkBooleanMacro(UseMetaFile, int);
-
-  // Description:
-  // Return the MTime also considering the internal reader.
-  virtual unsigned long GetMTime();
-
-  // Description:
-  // Name of the method used to set the file name of the internal
-  // reader. By default, this is SetFileName.
-  vtkSetStringMacro(FileNameMethod);
-  vtkGetStringMacro(FileNameMethod);
 
   // Description:
   // If true, then treat file series like it does not contain any time step
@@ -164,29 +140,15 @@ protected:
                                      vtkInformationVector *outputVector = NULL);
 
   // Description:
-  // The last file index for which RequestInformationForInput was run.
-  int LastRequestInformationIndex;
-
-  // Description:
   // Reads a metadata file and returns a list of filenames (in filesToRead).  If
   // the file could not be read correctly, 0 is returned.
   virtual int ReadMetaDataFile(const char *metafilename,
                                vtkStringArray *filesToRead,
                                int maxFilesToRead = VTK_INT_MAX);
 
-  virtual void SetReaderFileName(const char* fname);
-  vtkAlgorithm* Reader;
-
-  unsigned long HiddenReaderModification;
-  unsigned long SavedReaderModification;
-
-  virtual void SetCurrentFileName(const char *fname);
-  char* CurrentFileName;
-  char* FileNameMethod;
-
-  char *MetaFileName;
+  // Description:
+  // True if use a meta-file, false otherwise
   int UseMetaFile;
-  vtkTimeStamp MetaFileReadTime;
 
   // Description:
   // Re-reads information from the metadata file, if necessary.
@@ -207,4 +169,3 @@ private:
 };
 
 #endif
-

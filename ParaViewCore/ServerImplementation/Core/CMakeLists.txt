@@ -42,7 +42,7 @@ set (Module_SRCS
   vtkSIDirectoryProxy.cxx
   vtkSIDoubleMapProperty.cxx
   vtkSIDoubleVectorProperty.cxx
-  vtkSIFileSeriesReaderProxy.cxx
+  vtkSIMetaReaderProxy.cxx
   vtkSIIdTypeVectorProperty.cxx
   vtkSIInputProperty.cxx
   vtkSIIntVectorProperty.cxx

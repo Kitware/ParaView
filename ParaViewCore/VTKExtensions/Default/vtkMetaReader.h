@@ -13,11 +13,11 @@
 
 =========================================================================*/
 
-// .NAME vtkMetaReader - Common functionality for a meta-reader.
+// .NAME vtkMetaReader - Common functionality for meta-readers.
 //
-// .SECTION Description:
-//
-//
+// .SECTION Description: A meta-reader redirect most pipeline requests
+// to another Reader.  The Reader reads from a file selected from a
+// list of files using a FileIndex.
 
 #ifndef __vtkMetaReader_h
 #define __vtkMetaReader_h
@@ -45,14 +45,14 @@ public:
   // Get/set the filename for the meta-file.
   // Description:
   // Get/Set the meta-file name
-  void SetFileName (const char* name)
+  void SetMetaFileName (const char* name)
   {
-    Set_FileName (name);
-    this->FileNameMTime = this->GetMTime ();
+    Set_MetaFileName (name);
+    this->MetaFileNameMTime = this->GetMTime ();
   }
-  char* GetFileName ()
+  char* GetMetaFileName ()
   {
-    return Get_FileName();
+    return Get_MetaFileName();
   }
 
   // Description:
@@ -73,7 +73,7 @@ public:
   }
 
   // Description:
-  // Return the MTime also considering the internal reader.
+  // Return the MTime when also considering the internal reader.
   virtual unsigned long GetMTime();
 
   // Description:
@@ -85,8 +85,8 @@ public:
 protected:
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  vtkSetStringMacro(_FileName);
-  vtkGetStringMacro(_FileName);
+  vtkSetStringMacro(_MetaFileName);
+  vtkGetStringMacro(_MetaFileName);
 
   vtkSetMacro(_FileIndex, vtkIdType);
   vtkGetMacro(_FileIndex, vtkIdType);
@@ -97,22 +97,28 @@ protected:
 protected:
   // Reader that handles requests for the meta-reader
   vtkAlgorithm* Reader;
-  // Modification time for the file name for the reader
-  unsigned long ReaderFileNameMTime;
-  // Modification time before the file name for the reader was changed.
-  unsigned long ReaderBeforeFileNameMTime;
+  // Reader modification time after changing the Reader's FileName
+  // Used to ignore changing the FileName for the reader when reporting MTime
+  unsigned long FileNameMTime;
+  // Reader modification time before changing the Reader's FileName
+  // Used to ignore changing the FileName for the reader when reporting MTime
+  unsigned long BeforeFileNameMTime;
   // Method name used to set the file name for the Reader
   char* FileNameMethod;
-
-  // File name for the meta-reader
-  char *_FileName;
-  // File name modification time
-  unsigned long FileNameMTime;
   // The index of the file to read.
   vtkIdType _FileIndex;
   unsigned long FileIndexMTime;
   // Range for the file index
   vtkIdType FileIndexRange[2];
+
+
+  // File name for the meta-reader
+  char *_MetaFileName;
+  // File name modification time
+  unsigned long MetaFileNameMTime;
+  // Description:
+  // Records the time when the meta-file was read.
+  vtkTimeStamp MetaFileReadTime;
 };
 
 #endif

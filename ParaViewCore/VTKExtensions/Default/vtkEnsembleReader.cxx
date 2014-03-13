@@ -46,8 +46,6 @@ int vtkEnsembleReader::ProcessRequest(vtkInformation* request,
                                       vtkInformationVector** inputVector,
                                       vtkInformationVector* outputVector)
 {
-  request->PrintSelf (std::cout, vtkIndent(2));
-  cout << endl;
   // the first pipeline request
   if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
     {
@@ -88,11 +86,13 @@ void vtkEnsembleReader::AddCurrentTableRow(vtkInformationVector* outputVector)
 //----------------------------------------------------------------------------
 void vtkEnsembleReader::UpdateReader()
 {
-  if (this->Table == NULL ||
-      this->FileNameMTime > this->Table->GetMTime())
-    this->Table = ReadMetaFile(this->GetFileName());
+  if (this->MetaFileNameMTime > this->MetaFileReadTime)
+    {
+    this->Table = ReadMetaFile(this->_MetaFileName);
+    this->MetaFileReadTime.Modified();
+    }
 
-  if (this->FileIndexMTime >= this->ReaderFileNameMTime)
+  if (this->FileIndexMTime >= this->FileNameMTime)
     {
     if(this->_FileIndex >= this->GetNumberOfFiles() ||
        this->_FileIndex < 0)
@@ -101,9 +101,9 @@ void vtkEnsembleReader::UpdateReader()
       this->_FileIndex = 0;
       }
     string fileName = this->GetReaderFileName(this->Table, this->_FileIndex);
-    this->ReaderBeforeFileNameMTime = this->Reader->GetMTime();
+    this->BeforeFileNameMTime = this->Reader->GetMTime();
     this->ReaderSetFileName(fileName.c_str());
-    this->ReaderFileNameMTime = this->Reader->GetMTime();
+    this->FileNameMTime = this->Reader->GetMTime();
     }
 }
 
@@ -113,7 +113,7 @@ void vtkEnsembleReader::PrintSelf( ostream&  os, vtkIndent indent )
 {
     this->Superclass::PrintSelf(os, indent);
     os << indent << "FileName: "
-       << (this->GetFileName () != NULL ? this->GetFileName() : "(null)")
+       << (this->_MetaFileName != NULL ? this->_MetaFileName : "(null)")
        << endl;
     os << indent << "FileIndex: " << this->_FileIndex << endl;
 }

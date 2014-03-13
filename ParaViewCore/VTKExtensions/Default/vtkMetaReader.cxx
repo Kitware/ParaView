@@ -27,10 +27,9 @@ vtkStandardNewMacro(vtkMetaReader);
 
 //----------------------------------------------------------------------------
 vtkMetaReader::vtkMetaReader() :
-  Reader (NULL), ReaderFileNameMTime(0), ReaderBeforeFileNameMTime(0),
-  FileNameMethod(NULL),
-  _FileName(NULL), FileNameMTime (0),
-  _FileIndex(0), FileIndexMTime(0)
+  Reader (NULL), FileNameMTime(0), BeforeFileNameMTime(0),
+  FileNameMethod(NULL), _FileIndex(0), FileIndexMTime(0),
+  _MetaFileName(NULL), MetaFileNameMTime (0)
 {
   this->FileIndexRange[0] = 0;
   this->FileIndexRange[1] = 0;
@@ -39,7 +38,7 @@ vtkMetaReader::vtkMetaReader() :
 
 vtkMetaReader::~vtkMetaReader()
 {
-  this->SetFileName(NULL);
+  this->SetMetaFileName(NULL);
   if(this->Reader)
     {
     this->Reader->Delete();
@@ -103,13 +102,13 @@ unsigned long vtkMetaReader::GetMTime()
     // MTime.  However, we will also be making modifications to the Reader (such
     // as changing the filename) that we want to suppress from the reporting.
     // When this happens, we save the timestamp before our modification into
-    // this->ReaderBeforeFileNameMTime and capture the resulting MTime in
-    // this->ReaderFileNameMTime.  If we run into that modification,
+    // this->BeforeFileNameMTime and capture the resulting MTime in
+    // this->FileNameMTime.  If we run into that modification,
     // suppress it by reporting the saved modification.
     unsigned long readerMTime;
-    if (this->Reader->GetMTime() == this->ReaderFileNameMTime)
+    if (this->Reader->GetMTime() == this->FileNameMTime)
       {
-      readerMTime = this->ReaderBeforeFileNameMTime;
+      readerMTime = this->BeforeFileNameMTime;
       }
     else
       {

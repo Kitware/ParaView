@@ -181,7 +181,7 @@ int vtkExodusFileSeriesReader::RequestInformationForInput(
                                              vtkInformation *request,
                                              vtkInformationVector *outputVector)
 {
-  if (index != this->LastRequestInformationIndex)
+  if (index != this->_FileIndex)
     {
     vtkExodusIIReader *reader = vtkExodusIIReader::SafeDownCast(this->Reader);
     if (!reader)

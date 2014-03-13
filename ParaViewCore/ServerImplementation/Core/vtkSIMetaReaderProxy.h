@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSIFileSeriesReaderProxy.h
+  Module:    vtkSIMetaReaderProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSIFileSeriesReaderProxy
+// .NAME vtkSIMetaReaderProxy
 // .SECTION Description
 // vtkSISourceProxy is the server-side helper for a vtkSMSourceProxy.
 // It adds support to handle various vtkAlgorithm specific Invoke requests
@@ -20,26 +20,26 @@
 // for each output port from the vtkAlgorithm. These post-processing filters
 // deal with things like parallelizing the data etc.
 
-#ifndef __vtkSIFileSeriesReaderProxy_h
-#define __vtkSIFileSeriesReaderProxy_h
+#ifndef __vtkSIMetaReaderProxy_h
+#define __vtkSIMetaReaderProxy_h
 
 #include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSISourceProxy.h"
 
 class vtkAlgorithm;
 
-class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIFileSeriesReaderProxy : public vtkSISourceProxy
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIMetaReaderProxy : public vtkSISourceProxy
 {
 public:
-  static vtkSIFileSeriesReaderProxy* New();
-  vtkTypeMacro(vtkSIFileSeriesReaderProxy, vtkSISourceProxy);
+  static vtkSIMetaReaderProxy* New();
+  vtkTypeMacro(vtkSIMetaReaderProxy, vtkSISourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
 
 protected:
-  vtkSIFileSeriesReaderProxy();
-  ~vtkSIFileSeriesReaderProxy();
+  vtkSIMetaReaderProxy();
+  ~vtkSIMetaReaderProxy();
 
   // Description:
   // Creates the VTKObjects. Overridden to add post-filters to the pipeline.
@@ -57,8 +57,8 @@ protected:
   char* FileNameMethod;
 
 private:
-  vtkSIFileSeriesReaderProxy(const vtkSIFileSeriesReaderProxy&); // Not implemented
-  void operator=(const vtkSIFileSeriesReaderProxy&); // Not implemented
+  vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&); // Not implemented
+  void operator=(const vtkSIMetaReaderProxy&); // Not implemented
 
 //ETX
 };

@@ -70,7 +70,7 @@
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  name="CosmoReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a cosmology file into a vtkUnstructuredGrid."
                      short_help="Read a cosmology file.">
                      The Cosmology reader

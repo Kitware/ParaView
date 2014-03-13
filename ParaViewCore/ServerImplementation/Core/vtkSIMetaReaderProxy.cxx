@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSIFileSeriesReaderProxy.cxx
+  Module:    vtkSIMetaReaderProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSIFileSeriesReaderProxy.h"
+#include "vtkSIMetaReaderProxy.h"
 
 #include "vtkAlgorithm.h"
 #include "vtkClientServerInterpreter.h"
@@ -29,21 +29,21 @@
 
 #include <assert.h>
 
-vtkStandardNewMacro(vtkSIFileSeriesReaderProxy);
+vtkStandardNewMacro(vtkSIMetaReaderProxy);
 //----------------------------------------------------------------------------
-vtkSIFileSeriesReaderProxy::vtkSIFileSeriesReaderProxy()
+vtkSIMetaReaderProxy::vtkSIMetaReaderProxy()
 {
   this->FileNameMethod = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkSIFileSeriesReaderProxy::~vtkSIFileSeriesReaderProxy()
+vtkSIMetaReaderProxy::~vtkSIMetaReaderProxy()
 {
   this->SetFileNameMethod(0);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIFileSeriesReaderProxy::CreateVTKObjects(vtkSMMessage* message)
+bool vtkSIMetaReaderProxy::CreateVTKObjects(vtkSMMessage* message)
 {
   if(!this->Superclass::CreateVTKObjects(message))
     {
@@ -78,7 +78,7 @@ bool vtkSIFileSeriesReaderProxy::CreateVTKObjects(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIFileSeriesReaderProxy::ReadXMLAttributes(vtkPVXMLElement* element)
+bool vtkSIMetaReaderProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
   bool ret = this->Superclass::ReadXMLAttributes(element);
   const char* fileNameMethod = element->GetAttribute("file_name_method");
@@ -90,7 +90,7 @@ bool vtkSIFileSeriesReaderProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-void vtkSIFileSeriesReaderProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSIMetaReaderProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
