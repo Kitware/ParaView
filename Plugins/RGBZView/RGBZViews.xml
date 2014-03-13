@@ -24,6 +24,13 @@
             command="SetCompositeDirectory"
             number_of_elements="1">
         </StringVectorProperty>
+        <IntVectorProperty
+            name="RGBStackSize"
+            animateable="0"
+            command="SetRGBStackSize"
+            default_values="-1"
+            number_of_elements="1">
+        </IntVectorProperty>
         <DoubleVectorProperty
             name="ClippingBounds"
             animateable="0"
@@ -47,9 +54,19 @@
             command="ComputeZOrdering">
         </Property>
         <Property
-            name="WriteImages"
+            name="WriteImage"
             animateable="0"
-            command="WriteImages">
+            command="WriteImage">
+        </Property>
+        <Property
+            name="CaptureActiveRepresentation"
+            animateable="0"
+            command="CaptureActiveRepresentation">
+        </Property>
+        <Property
+            name="ResetActiveImageStack"
+            animateable="0"
+            command="ResetActiveImageStack">
         </Property>
         <Property
             name="WriteComposite"

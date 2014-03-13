@@ -21,10 +21,11 @@ include_directories(${VTK_INCLUDE_DIRS})
 
 # Process the plugin.
 add_paraview_view_module(
+  VIEW_IFACE VIEW_IFACE_SRCS
   VIEW_TYPE pqRenderView
+  VIEW_NAME "RGB+Z Exporter"
   VIEW_XML_GROUP "views"
   VIEW_XML_NAME "RGBZView"
-  VIEW_NAME "RGB+Z Exporter"
 )
 
 add_paraview_plugin(

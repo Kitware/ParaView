@@ -80,11 +80,27 @@ public:
   vtkGetStringMacro(CompositeDirectory)
 
   // Description:
-  // Dump RGB buffer to the disk using the CompositeDirectory
-  void WriteImages();
+  // Dump RGB buffer to the disk using the CompositeDirectory (rgb.jpg)
+  void WriteImage();
+
+  // Description:
+  // Set/Get RGB image stack size
+  vtkGetMacro(RGBStackSize,int);
+  vtkSetMacro(RGBStackSize,int);
+
+  // Description:
+  // Reset active image stack to 0 so we can start capturing again
+  // from the beginning the RGB buffers into our unique RGB generated image.
+  void ResetActiveImageStack();
+
+  // Description:
+  // Capture RGB buffer in the proper RGB stack position
+  // and increase current active stack position.
+  void CaptureActiveRepresentation();
 
   // Description:
   // Dump composite information as JSON file into CompositeDirectory
+  // (composite.json)
   void WriteComposite();
 
   void AddRepresentationForComposite(vtkPVDataRepresentation* r);
@@ -112,6 +128,8 @@ private:
 
   bool InRender;
 
+  int ActiveStack;
+  int RGBStackSize;
   bool InsideComputeZOrdering;
   bool InsideRGBDump;
   char* CompositeDirectory;

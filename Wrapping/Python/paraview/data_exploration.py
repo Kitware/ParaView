@@ -163,7 +163,7 @@ class FileNameGenerator():
         self.arguments = {}
         self.active_arguments = {}
         self.metadata = {}
-        self.cost = { "time": 0, "space": 0, "image": 0}
+        self.cost = { "time": 0, "space": 0, "images": 0}
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 
@@ -239,7 +239,7 @@ class FileNameGenerator():
         filePath = self.get_fullpath()
         if os.path.exists(filePath):
             if self._is_image(filePath):
-                self.cost['image'] = self.cost['image'] + 1
+                self.cost['images'] = self.cost['images'] + 1
             self.cost['space'] += os.stat(filePath).st_size
 
     def add_time_cost(self, ts):
@@ -291,13 +291,13 @@ class CameraHandler(object):
         self.callback = callback
 
     def reset(self):
-        self.active_index = 0
+        self.active_index = -1
 
     def __iter__(self):
         return self
 
     def next(self):
-        if self.active_index < self.number_of_index:
+        if self.active_index + 1 < self.number_of_index:
             self.active_index += 1
 
             return self.active_index * 100 / self.number_of_index
@@ -1018,13 +1018,14 @@ class CompositeImageExporter():
     recomposed later on in the web.
     We assume the RGBZView plugin is loaded.
     """
-    def __init__(self, file_name_generator, data_list, colorBy_list, luts, camera_handler, view_size):
+    def __init__(self, file_name_generator, data_list, colorBy_list, luts, camera_handler, view_size, data_list_pipeline, axisVisibility=1, orientationVisibility=1):
         '''
         data_list = [ds1, ds2, ds3]
         colorBy_list = [ [('POINT_DATA', 'temperature'), ('POINT_DATA', 'pressure'), ('POINT_DATA', 'salinity')],
                          [('CELL_DATA', 'temperature'), ('CELL_DATA', 'salinity')],
                          [('SOLID_COLOR', [0.1,0.1,0.1])] ]
         luts = { 'temperature': vtkLookupTable(...),  'salinity': vtkLookupTable(...),  'pressure': vtkLookupTable(...), }
+        data_list_pipeline = [ { 'name': 'Earth core'}, {'name': 'Slice'}, {'name': 'T=0', 'parent': 'Contour by temperature'}, ...]
 
         '''
         self.file_name_generator = file_name_generator
@@ -1037,6 +1038,8 @@ class CompositeImageExporter():
         # Create view and assembly manager
         self.view = simple.CreateView("RGBZView")
         self.view.ViewSize = view_size
+        self.view.CenterAxesVisibility = axisVisibility
+        self.view.OrientationAxesVisibility = orientationVisibility
         self.view.UpdatePropertyInformation()
         self.codes = self.view.GetProperty('RepresentationCodes').GetData()
         self.camera_handler.set_view(self.view)
@@ -1048,15 +1051,44 @@ class CompositeImageExporter():
             self.file_name_generator.update_active_arguments(layer=self.codes[index])
             index += 1
 
-        self.view.UpdatePropertyInformation()
-        self.codes = self.view.GetProperty('RepresentationCodes')
+        # Create pipeline metadata
+        pipeline = []
+        parentTree = {}
+        index = 1
+        for node in data_list_pipeline:
+            entry = { 'name': node['name'], 'ids': [self.codes[index]], 'type': 'layer' }
+
+            if node.has_key('parent'):
+                if parentTree.has_key(node['parent']):
+                    # add node as child
+                    parentTree[node['parent']]['children'].append(entry)
+                    parentTree[node['parent']]['ids'].append(entry['ids'][0])
+                else:
+                    # register parent and add it to pipeline
+                    directory = { 'name': node['parent'], 'type': 'directory', 'ids': [ entry['ids'][0] ], 'children': [ entry ]}
+                    pipeline.append(directory)
+                    parentTree[node['parent']] = directory
+            else:
+                # Add it to pipeline
+                pipeline.append(entry)
+
+            index += 1
+
+        self.file_name_generator.add_meta_data('pipeline', pipeline)
+        self.file_name_generator.add_meta_data('dimensions', view_size)
+
+        # Add the name of both generated files
+        self.file_name_generator.update_active_arguments(filename='rgb.jpg')
+        self.file_name_generator.update_active_arguments(filename='composite.json')
 
     @staticmethod
     def list_arguments():
         """
-        '/path/{camera_handlers}/{field}/{layer}.jpg' + '/path/{camera_handlers}/composite.json' + '/path/info.json'
+
+        '/path/{camera_handlers}/{filename}' + '/path/info.json'
+        Where filename = ['composite.json', 'rgb.jpg']
         """
-        return ['field', 'layer']
+        return ['filename']
 
     @staticmethod
     def get_data_type():
@@ -1080,18 +1112,55 @@ class CompositeImageExporter():
         simple.Render(self.view)
         self.view.ResetClippingBounds()
         self.view.FreezeGeometryBounds()
+        self.view.UpdatePropertyInformation()
 
+        # Compute the number of images by stack
+        fieldset = set()
+        nbImages = 1
+        composite_size = len(self.representations)
+        metadata_layers = ""
+        for compositeIdx in range(composite_size):
+            metadata_layers += self.codes[compositeIdx + 1]
+            for field in self.color_by[compositeIdx]:
+                fieldset.add(str(field[1]))
+                nbImages += 1
+
+        # Generate fields metadata
+        index = 1
+        metadata_fields = {}
+        reverse_field_map = {}
+        for field in fieldset:
+            metadata_fields[self.codes[index]] = field
+            reverse_field_map[field] = self.codes[index]
+            index += 1
+
+        # Generate layer_fields metadata
+        metadata_layer_fields = {}
+        for compositeIdx in range(composite_size):
+            key = self.codes[compositeIdx + 1]
+            array = []
+            for field in self.color_by[compositeIdx]:
+                array.append(reverse_field_map[str(field[1])])
+            metadata_layer_fields[key] = array
+
+        # Generate the heavy data
+        metadata_offset = {}
         self.camera_handler.reset()
         for progress in self.camera_handler:
             self.camera_handler.apply_position()
+            self.view.CompositeDirectory = self.file_name_generator.get_directory()
 
             # Extract images for each fields
-            composite_size = len(self.representations)
+            self.view.ResetActiveImageStack()
+            self.view.RGBStackSize = nbImages
+            offset_value = 1
             for compositeIdx in range(composite_size):
                 rep = self.representations[compositeIdx]
+                offset_composite_name = self.codes[compositeIdx + 1]
                 index = 0
                 for field in self.color_by[compositeIdx]:
                     index += 1
+                    offset_field_name = reverse_field_map[str(field[1])]
                     if field[0] == 'SOLID_COLOR':
                         self.file_name_generator.update_active_arguments(field= "solid_" + str(index))
                         rep.DiffuseColor = field[1]
@@ -1103,19 +1172,27 @@ class CompositeImageExporter():
 
                     self.view.ActiveRepresentation = rep
                     self.view.CompositeDirectory = self.file_name_generator.get_directory()
-                    self.view.WriteImages()
+                    self.view.CaptureActiveRepresentation()
 
-            # Extract Z-buffer
-            self.view.CompositeDirectory = self.file_name_generator.get_nth_directory(1)
+                    metadata_offset[offset_composite_name + offset_field_name] = offset_value
+                    offset_value += 1
+
+            # Extract RGB + Z-buffer
+            self.view.WriteImage()
             self.view.ComputeZOrdering()
             self.view.WriteComposite()
 
-        # Compute file size
-        for layer_idx in range(number_of_layers):
-            self.file_name_generator.update_active_arguments(layer=layer_idx)
+            # Add missing files in size computation
+            self.file_name_generator.update_active_arguments(filename='composite.json')
+            self.file_name_generator.add_file_cost()
+            self.file_name_generator.update_active_arguments(filename='rgb.jpg')
             self.file_name_generator.add_file_cost()
 
         # Generate metadata
+        self.file_name_generator.add_meta_data('fields', metadata_fields)
+        self.file_name_generator.add_meta_data('layers', metadata_layers)
+        self.file_name_generator.add_meta_data('layer_fields', metadata_layer_fields)
+        self.file_name_generator.add_meta_data('offset', metadata_offset)
         self.file_name_generator.write_metadata()
 
         if self.analysis:
