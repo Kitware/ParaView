@@ -96,9 +96,10 @@ public:
     return *this;
     }
 
+  // note this only check this->Value. this->Self is not checked at all.
   bool operator==(const vtkProxyPointer& other) const
     {
-    return (this->Self == other.Self && this->Value == other.Value);
+    return (this->Value == other.Value);
     }
 };
 //***************************************************************************
@@ -549,35 +550,38 @@ void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src,
 void vtkSMProxyProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);
-
-  bool prev = this->SetBlockModifiedEvents(true);
-
-  this->RemoveAllProxies();
-  this->RemoveAllUncheckedProxies();
-
-  vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(
-    src);
-  if (dsrc)
+  vtkSMProxyProperty* psrc = vtkSMProxyProperty::SafeDownCast(src);
+  if (psrc)
     {
-    int imUpdate = this->ImmediateUpdate;
-    this->ImmediateUpdate = 0;
-    unsigned int i;
-    unsigned int numElems = dsrc->GetNumberOfProxies();
-    for(i=0; i<numElems; i++)
-      {
-      this->AddProxy(dsrc->GetProxy(i));
-      }
-    numElems = dsrc->GetNumberOfUncheckedProxies();
-    for(i=0; i<numElems; i++)
-      {
-      this->AddUncheckedProxy(dsrc->GetUncheckedProxy(i));
-      }
-    this->ImmediateUpdate = imUpdate;
+    return;
     }
 
-  this->SetBlockModifiedEvents(prev);
-  this->Modified();
-  this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+  bool modified =  (this->PPInternals->Proxies != psrc->PPInternals->Proxies);
+  bool unchecked_modified = modified ||
+    (this->PPInternals->UncheckedProxies != psrc->PPInternals->UncheckedProxies);
+
+  if (modified)
+    {
+    this->PPInternals->Proxies.clear();
+    for (size_t cc=0; cc< psrc->PPInternals->Proxies.size(); cc++)
+      {
+      vtkSMProxy* target = psrc->PPInternals->Proxies[cc].Value.GetPointer();
+      this->PPInternals->Proxies.push_back(
+        vtkSMProxyProperty::vtkProxyPointer(this, target));
+      }
+    }
+  if (unchecked_modified)
+    {
+    this->PPInternals->UncheckedProxies = psrc->PPInternals->UncheckedProxies;
+    }
+  if (modified)
+    {
+    this->Modified();
+    }
+  if (unchecked_modified)
+    {
+    this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+    }
 }
 
 //---------------------------------------------------------------------------

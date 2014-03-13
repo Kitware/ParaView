@@ -15,6 +15,7 @@
 #include "vtkSMInputProperty.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
@@ -481,21 +482,23 @@ int vtkSMInputProperty::LoadState(vtkPVXMLElement* element,
 //---------------------------------------------------------------------------
 void vtkSMInputProperty::Copy(vtkSMProperty* src)
 {
-  int imUpdate = this->ImmediateUpdate;
-  this->ImmediateUpdate = 0;
-
-  this->Superclass::Copy(src);
-
   vtkSMInputProperty* dsrc = vtkSMInputProperty::SafeDownCast(src);
+  bool modified = false;
+  unsigned long tstamp = this->GetMTime();
   if (dsrc)
     {
+    modified = (this->IPInternals->OutputPorts !=
+      dsrc->IPInternals->OutputPorts);
     this->IPInternals->OutputPorts = dsrc->IPInternals->OutputPorts;
     this->IPInternals->UncheckedOutputPorts =
       dsrc->IPInternals->UncheckedOutputPorts;
     }
-
-  this->ImmediateUpdate = imUpdate;
-  this->Modified();
+  this->Superclass::Copy(src);
+  if (modified && this->GetMTime() <= tstamp)
+    {
+    this->Modified();
+    this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
+    }
 }
 
 //---------------------------------------------------------------------------
