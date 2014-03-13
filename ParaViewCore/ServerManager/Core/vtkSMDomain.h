@@ -145,7 +145,7 @@ protected:
   // Description:
   // Helper method to get vtkPVDataInformation from input proxy connected to the
   // required property with the given function.
-  vtkPVDataInformation* GetInputDataInformation(
+  virtual vtkPVDataInformation* GetInputDataInformation(
     const char* function, int index=0);
 
   // Description:

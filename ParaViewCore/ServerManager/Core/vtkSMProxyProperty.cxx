@@ -551,7 +551,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);
   vtkSMProxyProperty* psrc = vtkSMProxyProperty::SafeDownCast(src);
-  if (psrc)
+  if (!psrc)
     {
     return;
     }

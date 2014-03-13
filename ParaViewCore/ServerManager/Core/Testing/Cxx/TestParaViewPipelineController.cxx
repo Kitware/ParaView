@@ -67,8 +67,8 @@ int main(int argc, char* argv[])
 
     controller->PreInitializePipelineProxy(exodusReader);
     vtkSMPropertyHelper(exodusReader, "FileName").Set(
-      //"/home/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
-      "/Users/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
+      "/home/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
+     // "/Users/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
     vtkSMPropertyHelper(exodusReader, "ApplyDisplacements").Set(0);
     exodusReader->UpdateVTKObjects();
 

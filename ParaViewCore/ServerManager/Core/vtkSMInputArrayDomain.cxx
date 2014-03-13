@@ -134,7 +134,11 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
 
   if (required_type == ANY)
     {
-    return true;
+    return attribute_type == POINT||
+      attribute_type == CELL||
+      attribute_type == EDGE||
+      attribute_type == VERTEX||
+      attribute_type == ROW;
     }
 
   switch (attribute_type)
@@ -169,7 +173,7 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
 
   default:
     return required_type == attribute_type;
-    }  
+    }
 }
 //----------------------------------------------------------------------------
 bool vtkSMInputArrayDomain::IsArrayAcceptable(

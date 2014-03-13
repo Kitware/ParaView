@@ -32,7 +32,9 @@
 // \li \c attribute_type : (optional) value can be 'point', 'cell', 'any',
 //                         'vertex', 'edge', 'row', 'none'. If no specified,
 //                         'any' is assumed. This indicates the attribute type
-//                         for acceptable arrays.
+//                         for acceptable arrays. Note "any" implies all types
+//                         of attribute data (thus doesn't include field data
+//                         since it's not attribute data).
 // \li \c number_of_components : (optional) 0 by default. If non-zero, indicates
 //                         the component count for acceptable arrays.
 //

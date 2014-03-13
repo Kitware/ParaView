@@ -30,7 +30,9 @@
 #include "vtkStringList.h"
 
 #include <cassert>
+#include <set>
 #include <vector>
+#include <algorithm>
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
@@ -71,6 +73,28 @@ struct vtkSMArrayListDomainArrayInformation
       this->DomainAssociation == other.DomainAssociation &&
       this->ArrayAttributeType == other.ArrayAttributeType;
     }
+
+  // helps keep the set sorted in preferred order.
+  bool operator < (const vtkSMArrayListDomainArrayInformation& other) const
+    {
+    if (this->DomainAssociation == other.DomainAssociation)
+      {
+      if (this->FieldAssociation == other.FieldAssociation)
+        {
+        if (this->ArrayName == other.ArrayName)
+          {
+          if (this->IsPartial == other.IsPartial)
+            {
+            return this->ArrayAttributeType < other.ArrayAttributeType;
+            }
+          return this->IsPartial < other.IsPartial;
+          }
+        return this->ArrayName < other.ArrayName;
+        }
+      return this->FieldAssociation < other.FieldAssociation;
+      }
+    return this->DomainAssociation < other.DomainAssociation;
+    }
 };
 
 struct vtkSMArrayListDomainInternals
@@ -80,14 +104,15 @@ public:
 
   std::vector<int> DataTypes;
 
-  typedef std::vector<vtkSMArrayListDomainArrayInformation>
-    DomainValuesType;
-  DomainValuesType DomainValues;
+  typedef std::vector<vtkSMArrayListDomainArrayInformation> DomainValuesVector;
+  DomainValuesVector DomainValues;
+
+  typedef std::set<vtkSMArrayListDomainArrayInformation> DomainValuesSet;
 
   // Builds the list of acceptable arrays in result.
   // association is the association requested by the domain
   // required_number_of_components is the num-of-comps
-  void BuildArrayList(DomainValuesType& result,
+  void BuildArrayList(DomainValuesSet & result,
     vtkSMArrayListDomain* self,
     int association,
     int required_number_of_components,
@@ -96,7 +121,7 @@ public:
   std::vector<vtkStdString> GetDomainValueStrings()
     {
     std::vector<vtkStdString> values;
-    for (DomainValuesType::iterator iter = this->DomainValues.begin(),
+    for (DomainValuesVector::const_iterator iter = this->DomainValues.begin(),
       end = this->DomainValues.end(); iter != end; ++iter)
       {
       values.push_back(iter->ArrayName);
@@ -106,7 +131,7 @@ public:
 
   const vtkSMArrayListDomainArrayInformation* FindAttribute(int array_attribute)
     {
-    for (DomainValuesType::iterator iter = this->DomainValues.begin(),
+    for (DomainValuesVector::const_iterator iter = this->DomainValues.begin(),
       end = this->DomainValues.end(); iter != end; ++iter)
       {
       if (iter->ArrayAttributeType == array_attribute)
@@ -151,20 +176,20 @@ private:
 
 //---------------------------------------------------------------------------
 void vtkSMArrayListDomainInternals::BuildArrayList(
-  vtkSMArrayListDomainInternals::DomainValuesType& result,
+  vtkSMArrayListDomainInternals::DomainValuesSet & result,
   vtkSMArrayListDomain* self,
   int association,
   int required_number_of_components,
   vtkPVDataInformation* dataInfo)
 {
-  if (self->GetNoneString())
+  if (self->GetNoneString() && result.size() == 0)
     {
     vtkSMArrayListDomainArrayInformation info;
     info.ArrayName = self->GetNoneString();
     info.IsPartial = false;
     info.FieldAssociation = 0;
     info.DomainAssociation = 0;
-    result.push_back(info);
+    result.insert(info);
     }
 
   // iterate over attributes arrays in dataInfo and add acceptable arrays to the
@@ -223,7 +248,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
         info.FieldAssociation = acceptable_as;
         info.DomainAssociation = association;
         info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);
-        result.push_back(info);
+        result.insert(info);
         }
       else
         {
@@ -248,7 +273,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
           info.FieldAssociation = acceptable_as;
           info.DomainAssociation = association;
           info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);
-          result.push_back(info); 
+          result.insert(info);
           }
         }
       } // end of for each array
@@ -368,9 +393,21 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
     required_number_of_components = 0;
     }
 
-  vtkSMArrayListDomainInternals::DomainValuesType values;
-  this->ALDInternals->BuildArrayList(values, this,
+  // we use a set so that the list gets sorted as well as helps us
+  // avoid duplicates esp. when processing two datainformation objects.
+  vtkSMArrayListDomainInternals::DomainValuesSet set;
+  this->ALDInternals->BuildArrayList(set, this,
     association, required_number_of_components, dataInfo);
+
+  vtkPVDataInformation* extraInfo = this->GetExtraDataInformation();
+  if (extraInfo)
+    {
+    this->ALDInternals->BuildArrayList(set, this,
+      association, required_number_of_components, extraInfo);
+    }
+
+  vtkSMArrayListDomainInternals::DomainValuesVector values;
+  values.insert(values.end(), set.begin(), set.end());
   if (values != this->ALDInternals->DomainValues)
     {
     this->ALDInternals->DomainValues = values;

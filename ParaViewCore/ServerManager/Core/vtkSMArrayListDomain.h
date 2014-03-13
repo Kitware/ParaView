@@ -192,6 +192,12 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   // Description:
+  // HACK: Provides a temporary mechanism for subclasses to provide an
+  // "additional" vtkPVDataInformation instance to get available arrays list
+  // from.
+  virtual vtkPVDataInformation* GetExtraDataInformation() { return NULL; }
+
+  // Description:
   // Set to an attribute type defined in vtkDataSetAttributes.
   vtkSetMacro(AttributeType, int);
   int AttributeType;
