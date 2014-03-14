@@ -33,7 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPropertyLinks_h
 
 #include <QObject>
+#include <QtDebug>
+
 #include "pqCoreModule.h"
+#include "pqPropertyLinksConnection.h" // needed for pqPropertyLinksConnection.
 
 class vtkSMProperty;
 class vtkSMProxy;
@@ -83,7 +86,17 @@ public:
   /// Returns false if link adding fails for some reason.
   bool addPropertyLink(
     QObject* qobject, const char* qproperty, const char* qsignal,
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex=-1);
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex=-1)
+    {
+    return this->addPropertyLink<pqPropertyLinksConnection>(
+      qobject, qproperty, qsignal, smproxy, smproperty, smindex);
+    }
+
+  template <class ConnectionType>
+  bool addPropertyLink(
+    QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex=-1,
+    ConnectionType* notused=NULL);
 
   /// Remove a particular link.
   bool removePropertyLink(
@@ -130,12 +143,39 @@ private slots:
   void onSMPropertyModified();
 
 private:
-  Q_DISABLE_COPY(pqPropertyLinks)
-  class pqInternals;
+  bool addNewConnection(pqPropertyLinksConnection*);
 
+private:
+  Q_DISABLE_COPY(pqPropertyLinks);
+
+  class pqInternals;
   pqInternals* Internals;
   bool UseUncheckedProperties;
   bool AutoUpdateVTKObjects;
 };
+
+//-----------------------------------------------------------------------------
+template <class ConnectionType>
+bool pqPropertyLinks::addPropertyLink(
+  QObject* qobject, const char* qproperty, const char* qsignal,
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
+  ConnectionType*)
+{
+  if (!qobject || !qproperty || !qsignal || !smproxy || !smproperty)
+    {
+    qCritical() << "Invalid parameters to pqPropertyLinks::addPropertyLink";
+    qDebug() << "(" << qobject << ", " << qproperty << ", " << qsignal
+      << ") <==> ("
+      << (smproxy? smproxy->GetXMLName() : "(none)")
+      << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
+      << smindex << ")";
+    return false;
+    }
+  pqPropertyLinksConnection* connection = new ConnectionType(
+    qobject, qproperty, qsignal, smproxy, smproperty, smindex,
+    this->useUncheckedProperties(), this);
+  return this->addNewConnection(connection);
+}
+
 
 #endif
