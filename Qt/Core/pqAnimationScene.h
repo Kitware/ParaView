@@ -82,10 +82,6 @@ public:
   /// Get all the cues in this scene
   QSet<pqAnimationCue*> getCues() const;
 
-  /// set default property values.
-  /// Overridden to create the default pipeline time animation cue.
-  virtual void setDefaultPropertyValues();
-
   /// Returns the current animation time.
   double getAnimationTime() const;
 
@@ -169,10 +165,6 @@ private slots:
   /// state of the scene.
   void onCuesChanged();
 
-  /// Called when timekeeper's timesteps are changed. We determine the play mode
-  /// based on the availability of timesteps.
-  void updateTimeSteps();  
-
   /// Called on animation tick.
   void onTick(vtkObject* caller, unsigned long, void*, void* info);
 
@@ -192,7 +184,6 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  void setupTimeTrack();
   pqAnimationCue* createCueInternal(const QString& cuetype,
     vtkSMProxy* proxy, const char* propertyname, int index);
 };

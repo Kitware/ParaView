@@ -15,7 +15,9 @@
 #include "vtkSMAnimationSceneProxy.h"
 
 #include "vtkCommand.h"
+#include "vtkCompositeAnimationPlayer.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
@@ -41,6 +43,50 @@ void vtkSMAnimationSceneProxy::CreateVTKObjects()
     object->AddObserver(vtkCommand::ModifiedEvent,
       this, &vtkSMAnimationSceneProxy::UpdatePropertyInformation);
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
+{
+  vtkSMProxy* timeKeeper = vtkSMPropertyHelper(this, "TimeKeeper").GetAsProxy();
+  if (!timeKeeper)
+    {
+    vtkWarningMacro("Failed to locate TimeKeeper proxy.");
+    return false;
+    }
+
+  vtkSMPropertyHelper timestepsHelper(timeKeeper, "TimestepValues");
+  if (timestepsHelper.GetNumberOfElements() > 1)
+    {
+    vtkSMPropertyHelper(this, "PlayMode").Set(vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS);
+    }
+  else
+    {
+    if (timestepsHelper.GetAsInt() == vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS)
+      {
+      vtkSMPropertyHelper(this, "PlayMode").Set(vtkCompositeAnimationPlayer::SEQUENCE);
+      }
+    }
+
+  this->UpdateVTKObjects();
+  // This will internally adjust the Start and End times for the animation scene
+  // based of the Locks for the times. We not simply need to copy the info
+  // property values.
+
+  /// If the animation time is not in the scene time range, set it to the min
+  /// value.
+  double minTime = vtkSMPropertyHelper(this, "StartTimeInfo").GetAsDouble();
+  double maxTime = vtkSMPropertyHelper(this, "EndTimeInfo").GetAsDouble();
+  double animationTime = vtkSMPropertyHelper(this, "AnimationTime").GetAsDouble();
+
+  vtkSMPropertyHelper(this, "StartTime").Set(minTime);
+  vtkSMPropertyHelper(this, "EndTime").Set(maxTime);
+  if (animationTime < minTime || animationTime > maxTime)
+    {
+    vtkSMPropertyHelper(this, "AnimationTime").Set(minTime);
+    }
+  this->UpdateVTKObjects();
+  return true;
 }
 
 //----------------------------------------------------------------------------

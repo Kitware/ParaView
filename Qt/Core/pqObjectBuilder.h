@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 
 class pqAnimationCue;
-class pqAnimationScene;
 class pqDataRepresentation;
 class pqNameCount;
 class pqOutputPort;

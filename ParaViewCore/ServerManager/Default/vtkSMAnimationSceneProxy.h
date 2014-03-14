@@ -31,6 +31,16 @@ public:
   vtkTypeMacro(vtkSMAnimationSceneProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Setups the animation scene's playback mode and time-ranges based on the
+  // timesteps available on the time-keeper proxy set on the animation scene.
+  virtual bool UpdateAnimationUsingDataTimeSteps();
+  static bool UpdateAnimationUsingDataTimeSteps(vtkSMProxy* scene)
+    {
+    vtkSMAnimationSceneProxy* self = vtkSMAnimationSceneProxy::SafeDownCast(scene);
+    return self? self->UpdateAnimationUsingDataTimeSteps() : false;
+    }
+
 //BTX
 protected:
   vtkSMAnimationSceneProxy();

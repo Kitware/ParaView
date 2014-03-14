@@ -126,110 +126,12 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
         timekeeper->getProxy()->GetProperty("TimeLabel"),
         vtkCommand::ModifiedEvent,
         this, SIGNAL(timeLabelChanged()));
-
-  // Initialize the time keeper.
-  this->setupTimeTrack();
 }
 
 //-----------------------------------------------------------------------------
 pqAnimationScene::~pqAnimationScene()
 {
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void  pqAnimationScene::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-
-  // Create an animation cue for the pipeline time.
-  this->createCueInternal("TimeAnimationCue",
-    this->getServer()->getTimeKeeper()->getProxy(),
-    "Time", 0);
-  this->setAnimationTime(0.0);
-
-  // Sync to application settings.
-  this->updateApplicationSettings();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::setupTimeTrack()
-{
-  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("TimeKeeper"));
-  if (pp)
-    {
-    pp->RemoveAllProxies();
-    pp->AddProxy(timekeeper->getProxy());
-    this->getProxy()->UpdateVTKObjects();
-    }
-
-  QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
-    this, SLOT(updateTimeSteps()));
-  QObject::connect(timekeeper, SIGNAL(timeRangeChanged()),
-    this, SLOT(updateTimeSteps()));
-  this->updateTimeSteps();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::updateTimeSteps()
-{
-  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-  if (pqApplicationCore::instance()->isLoadingState() ||
-    this->getServer()->session()->IsProcessingRemoteNotification())
-    {
-    // If we are currently loading state then we don't want to change
-    // the currently set start/end times.
-
-    // however we still do need to relay the timeStepsChanged signal to ensure
-    // that GUI components are updated correctly.
-    emit this->timeStepsChanged();
-    return;
-    }
-
-  vtkSMProxy* sceneProxy = this->getProxy();
-
-  // Adjust the play mode based on whether or not we have time steps.
-  vtkSMProperty *playModeProperty = sceneProxy->GetProperty("PlayMode");
-  if (timekeeper->getNumberOfTimeStepValues() <= 1)
-    {
-    if (pqSMAdaptor::getEnumerationProperty(playModeProperty)
-      == "Snap To TimeSteps" )
-      {
-      pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
-      }
-    }
-  else
-    {
-    pqSMAdaptor::setEnumerationProperty(playModeProperty, "Snap To TimeSteps");
-    }
-
-  sceneProxy->UpdateVTKObjects();
-  // This will internally adjust the Start and End times for the animation scene
-  // based of the Locks for the times. We not simply need to copy the info
-  // property values.
-
-
-  /// If the animation time is not in the scene time range, set it to the min
-  /// value.
-  double min = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("StartTimeInfo")).toDouble();
-  double max = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("EndTimeInfo")).toDouble();
-  double cur = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("AnimationTime")).toDouble();
-
-  // Ensure that the values of the properties match the times used.
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("StartTime"), min);
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("EndTime"), max);
-  sceneProxy->UpdateVTKObjects();
-  if (cur < min || cur > max)
-    {
-    this->setAnimationTime(min);
-    }
-  emit this->timeStepsChanged();
 }
 
 //-----------------------------------------------------------------------------

@@ -55,25 +55,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "pqAnimationCue.h"
-#include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
+#include "pqInterfaceTracker.h"
 #include "pqNameCount.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqInterfaceTracker.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqRenderView.h"
+#include "pqSMAdaptor.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "pqViewModuleInterface.h"
+#include "vtkSMAnimationSceneProxy.h"
 
 inline QString pqObjectBuilderGetName(vtkSMProxy* proxy,
   pqNameCount *nameGenerator)
@@ -124,6 +124,9 @@ namespace pqObjectBuilderNS
       elem->Delete();
       }
 
+    // Update animation scene.
+    vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps(
+      Controller->GetAnimationScene(server->session()));
     return source;
     }
 }
