@@ -75,16 +75,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewModuleInterface.h"
 #include "vtkSMAnimationSceneProxy.h"
 
-inline QString pqObjectBuilderGetName(vtkSMProxy* proxy,
-  pqNameCount *nameGenerator)
-{
-  QString label = 
-    proxy->GetXMLLabel()? proxy->GetXMLLabel() : proxy->GetXMLName();
-  label.remove(' ');
-  return QString("%1%2").arg(label).arg(
-    nameGenerator->GetCountAndIncrement(label));
-}
-
 namespace pqObjectBuilderNS
 {
   vtkNew<vtkSMParaViewPipelineController> Controller;

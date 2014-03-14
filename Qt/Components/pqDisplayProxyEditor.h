@@ -32,73 +32,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqDisplayProxyEditor_h
 #define _pqDisplayProxyEditor_h
 
-#include <QWidget>
-#include <QList>
-#include <QVariant>
 #include "pqDisplayPanel.h"
 
-class pqDisplayProxyEditorInternal;
 class pqPipelineRepresentation;
 
-/// Widget which provides an editor for the properties of a display.
+/// DEPRECATED: No longer supported.
 class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public pqDisplayPanel
 {
   Q_OBJECT
-
-  // property adaptor for specular lighting
-  Q_PROPERTY(QVariant specularColor READ specularColor
-                                    WRITE setSpecularColor)
 public:
   /// constructor
   pqDisplayProxyEditor(pqPipelineRepresentation* display, QWidget* p = NULL);
   /// destructor
   ~pqDisplayProxyEditor();
 
-  /// TODO: get rid of this function once the server manager can
-  /// inform us of display property changes
-  void reloadGUI();
-
-  /// When set to true (default) scalar coloring will result in disabling of the
-  /// specular GUI.
-  void setDisableSpecularOnScalarColoring(bool flag)
-    { this->DisableSpecularOnScalarColoring = flag; }
+  void reloadGUI() {}
+  void setDisableSpecularOnScalarColoring(bool) {}
 
 signals:
   void specularColorChanged();
-
-protected slots:
-  /// internally used to update the graphics window when a property changes
-  void openColorMapEditor();
-  void rescaleToDataRange();
-  void zoomToData();
-  void updateEnableState();
-  virtual void editCubeAxes();
-  virtual void cubeAxesVisibilityChanged();
-  void volumeBlockSelected();
-  void setSolidColor(const QColor& color);
-  void setBackfaceSolidColor(const QColor& color);
-
-  void beginUndoSet(const QString&);
-  void endUndoSet();
-protected:
-
-  /// Set the display whose properties we want to edit.
-  virtual void setRepresentation(pqPipelineRepresentation* display);
-  void updateSelectionLabelModes();
-
-  pqDisplayProxyEditorInternal* Internal;
-  void setupGUIConnections();
-
-  QVariant specularColor() const;
-  void setSpecularColor(QVariant);
-
-  bool isCubeAxesVisible();
-
-
-  bool DisableSpecularOnScalarColoring;
 private:
-  bool DisableSlots;
+  Q_DISABLE_COPY(pqDisplayProxyEditor);
 };
 
 #endif
-

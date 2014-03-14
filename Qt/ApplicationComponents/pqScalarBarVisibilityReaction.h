@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 #include <QPointer>
 
+class pqTimer;
+
 /// @ingroup Reactions
 /// Reaction to toggle scalar bar visibility
 class PQAPPLICATIONCOMPONENTS_EXPORT pqScalarBarVisibilityReaction : public pqReaction
@@ -66,6 +68,7 @@ private:
   QPointer<QObject> CachedRepresentation;
   QPointer<QObject> CachedLUT;
   QPointer<QObject> CachedScalarBar;
+  pqTimer* Timer;
 };
 
 #endif

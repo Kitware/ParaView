@@ -114,13 +114,10 @@ public:
   static void setColorRangeScalingMode(int);
   static int colorRangeScalingMode(int default_value=GROW_ON_MODIFIED);
 
-  /// Set/get whether the colormap domain should be indices of entries in
-  /// the list of annotations (when true) or values in the ScalarRange (when false).
-  bool getIndexedLookup();
-  void setIndexedLookup( bool );
-
-  QList<QVariant> getAnnotations();
-  virtual void setAnnotations( const QList<QVariant>& annotations );
+signals:
+  /// signal fired when the "VectorMode" or "VectorComponent" properties are
+  /// modified.
+  void componentOrModeChanged();
 
 public slots:
   // This method checks if this LUT is used by any display,

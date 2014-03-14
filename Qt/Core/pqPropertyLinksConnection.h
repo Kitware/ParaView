@@ -77,7 +77,7 @@ public:
   /// Provides access to the ServerManager proxy/property/index.
   vtkSMProxy* proxy() const { return this->ProxySM; }
   vtkSMProxy* proxySM() const { return this->ProxySM; }
-  vtkSMProperty* propertySM() { return this->PropertySM; }
+  vtkSMProperty* propertySM() const { return this->PropertySM; }
   int indexSM() const { return this->IndexSM; }
 
 public slots:

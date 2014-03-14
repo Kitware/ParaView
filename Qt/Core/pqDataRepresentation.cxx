@@ -57,19 +57,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataRepresentationInternal
 {
 public:
-  vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqOutputPort> InputPort;
-
-  pqDataRepresentationInternal()
-    {
-    this->VTKConnect = vtkEventQtSlotConnect::New();;
-    }
-  ~pqDataRepresentationInternal()
-    {
-    this->VTKConnect->Delete();
-    }
 };
-
 
 //-----------------------------------------------------------------------------
 pqDataRepresentation::pqDataRepresentation(const QString& group,
@@ -78,10 +67,24 @@ pqDataRepresentation::pqDataRepresentation(const QString& group,
 : pqRepresentation(group, name, repr, server, _p)
 {
   this->Internal = new pqDataRepresentationInternal;
-  this->Internal->VTKConnect->Connect(repr->GetProperty("Input"),
+  vtkEventQtSlotConnect* vtkconnector = this->getConnector();
+
+  vtkconnector->Connect(repr->GetProperty("Input"),
     vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
-  this->Internal->VTKConnect->Connect(repr, vtkCommand::UpdateDataEvent,
+  vtkconnector->Connect(repr, vtkCommand::UpdateDataEvent,
     this, SIGNAL(dataUpdated()));
+
+  // fire signals when LUT changes.
+  if (vtkSMProperty* prop = repr->GetProperty("LookupTable"))
+    {
+    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent,
+      this, SIGNAL(colorTransferFunctionModified()));
+    }
+  if (vtkSMProperty* prop = repr->GetProperty("ColorArrayName"))
+    {
+    vtkconnector->Connect(prop, vtkCommand::ModifiedEvent,
+      this, SIGNAL(colorArrayNameModified()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -159,21 +162,6 @@ void pqDataRepresentation::onInputChanged()
       this->Internal->InputPort->addRepresentation(this);
       }
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqDataRepresentation::setDefaultPropertyValues()
-{
-  if (!this->isVisible())
-    {
-    // For any non-visible representation, we don't set its defaults.
-    return;
-    }
-
-  // this used to call proxy->UpdatePipeline(), however that's totally
-  // unnecessary. It gets called already e.g. by pqDisplayPolicy or by
-  // vtkSMRenderViewProxy::CreateDefaultRepresentation etc.
-  this->Superclass::setDefaultPropertyValues();
 }
 
 //-----------------------------------------------------------------------------

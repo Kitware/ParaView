@@ -209,6 +209,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
       {
       continue;
       }
+    assert(acceptable_as != vtkSMInputArrayDomain::ANY);
 
     // iterate over all arrays and add them to the list, if acceptable.
     for (int idx=0, maxIdx=attrInfo->GetNumberOfArrays(); idx < maxIdx; ++idx)
@@ -246,7 +247,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
         info.ArrayName = arrayInfo->GetName();
         info.IsPartial = arrayInfo->GetIsPartial();
         info.FieldAssociation = acceptable_as;
-        info.DomainAssociation = association;
+        info.DomainAssociation = type;
         info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);
         result.insert(info);
         }
@@ -271,7 +272,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
           info.ArrayName = vtkSMArrayListDomain::CreateMangledName(arrayInfo, cc);
           info.IsPartial = arrayInfo->GetIsPartial();
           info.FieldAssociation = acceptable_as;
-          info.DomainAssociation = association;
+          info.DomainAssociation = type;
           info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);
           result.insert(info);
           }

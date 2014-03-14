@@ -93,19 +93,6 @@ public:
   /// provides access to the Lookup table, if one exists.
   virtual pqScalarsToColors* getLookupTable();
 
-  /// Returns the proxy for the piecewise function used to
-  /// map scalars to opacity.
-  virtual vtkSMProxy* getScalarOpacityFunctionProxy() {return 0;}
-
-  /// Sets default values for the underlying proxy.
-  /// This is during the initialization stage of the pqProxy
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called.
-  /// The default implementation iterates over all properties
-  /// of the proxy and sets them to default values.
-  virtual void setDefaultPropertyValues();
-
   /// Returns the data size for the full-res data.
   /// This may trigger a pipeline update to obtain correct data sizes.
   unsigned long getFullResMemorySize();
@@ -132,6 +119,15 @@ public:
 signals:
   /// Fired when the representation proxy fires the vtkCommand::UpdateDataEvent.
   void dataUpdated();
+
+  /// Fired to indicate that the "LookupTable" property (if any) on the
+  /// representation was modified.
+  void colorTransferFunctionModified();
+
+  /// Signal fired to indicate that the "ColorArrayName" property (if any) on
+  /// the representation was modified. This property controls the scalar
+  /// coloring settings on the representation.
+  void colorArrayNameModified();
 
 protected slots:
   /// called when input property on display changes. We must detect if

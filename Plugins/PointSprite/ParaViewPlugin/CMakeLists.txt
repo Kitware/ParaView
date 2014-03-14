@@ -34,6 +34,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
   )
 
   set(PLUGIN_MOC_SRCS
+      pqDisplayArrayWidget.h
       pqDoubleEdit.h
       pqPointSpriteControls.h
       pqPointSpriteDisplayPanelDecorator.h
@@ -62,6 +63,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
   endif ()
 
     set(Plugin_SRCS
+      pqDisplayArrayWidget.cxx
       pqDoubleEdit.cxx
       pqPointSpriteControls.cxx
       pqPointSpriteDisplayPanelDecorator.cxx

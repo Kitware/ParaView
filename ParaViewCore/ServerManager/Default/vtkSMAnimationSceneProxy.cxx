@@ -62,9 +62,10 @@ bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
     }
   else
     {
-    if (timestepsHelper.GetAsInt() == vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS)
+    vtkSMPropertyHelper playmodeHelper(this, "PlayMode");
+    if (playmodeHelper.GetAsInt() == vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS)
       {
-      vtkSMPropertyHelper(this, "PlayMode").Set(vtkCompositeAnimationPlayer::SEQUENCE);
+      playmodeHelper.Set(vtkCompositeAnimationPlayer::SEQUENCE);
       }
     }
 

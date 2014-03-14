@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,13 +38,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "pqTimer.h"
 
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
 pqScalarBarVisibilityReaction::pqScalarBarVisibilityReaction(QAction* parentObject)
-  : Superclass(parentObject)
+  : Superclass(parentObject),
+  Timer(new pqTimer(this))
+
 {
+  this->Timer->setSingleShot(true);
+  this->Timer->setInterval(0);
+  this->connect(this->Timer, SIGNAL(timeout()), SLOT(updateEnableState()));
+
   parentObject->setCheckable(true);
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(representationChanged(pqDataRepresentation*)),
@@ -57,45 +64,45 @@ void pqScalarBarVisibilityReaction::updateEnableState()
 {
   if (this->CachedRepresentation)
     {
-    QObject::disconnect(this->CachedRepresentation, 0, this, 0);
+    this->CachedRepresentation->disconnect(this->Timer);
+    this->Timer->disconnect(this->CachedRepresentation);
     this->CachedRepresentation = 0;
     }
   if (this->CachedLUT)
     {
-    QObject::disconnect(this->CachedLUT, 0, this, 0);
+    this->CachedLUT->disconnect(this->Timer);
+    this->Timer->disconnect(this->CachedLUT);
     this->CachedLUT = 0;
     }
 
-  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
+  pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+  vtkSMProxy* reprProxy = repr? repr->getProxy() : NULL;
 
-  bool can_show_sb = repr && repr->getColorField() !=
-    pqPipelineRepresentation::solidColor();
+  bool can_show_sb = repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy);
   bool is_shown = false;
 
   this->CachedRepresentation = repr;
   if (repr)
     {
-    QObject::connect(repr, SIGNAL(colorChanged()), this,
-      SLOT(updateEnableState()), Qt::QueuedConnection);
+    this->Timer->connect(repr, SIGNAL(colorTransferFunctionModified()), SLOT(start()));
+    this->Timer->connect(repr, SIGNAL(colorArrayNameModified()), SLOT(start()));
+    //pqScalarsToColors* lut = repr->getLookupTable();
+    //this->CachedLUT = lut;
+    //if (lut)
+    //  {
+    //  QObject::connect(lut, SIGNAL(scalarBarsChanged()), this,
+    //    SLOT(updateEnableState()), Qt::QueuedConnection);
 
-    pqScalarsToColors* lut = repr->getLookupTable();
-    this->CachedLUT = lut;
-    if (lut)
-      {
-      QObject::connect(lut, SIGNAL(scalarBarsChanged()), this,
-        SLOT(updateEnableState()), Qt::QueuedConnection);
-
-      pqScalarBarRepresentation* sb = lut->getScalarBar(
-        qobject_cast<pqRenderViewBase*>(repr->getView()));
-      this->CachedScalarBar = sb;
-      if (sb)
-        {
-        QObject::connect(sb, SIGNAL(visibilityChanged(bool)),
-          this, SLOT(updateEnableState()), Qt::QueuedConnection);
-        is_shown = sb->isVisible();
-        }
-      }
+    //  pqScalarBarRepresentation* sb = lut->getScalarBar(
+    //    qobject_cast<pqRenderViewBase*>(repr->getView()));
+    //  this->CachedScalarBar = sb;
+    //  if (sb)
+    //    {
+    //    QObject::connect(sb, SIGNAL(visibilityChanged(bool)),
+    //      this, SLOT(updateEnableState()), Qt::QueuedConnection);
+    //    is_shown = sb->isVisible();
+    //    }
+    //  }
     }
 
   QAction* parent_action = this->parentAction();

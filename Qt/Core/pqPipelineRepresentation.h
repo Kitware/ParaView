@@ -71,84 +71,14 @@ public:
                             QObject* parent=NULL);
   virtual ~pqPipelineRepresentation();
 
-  /// The field name used to indicate solid color.
-  static const char* solidColor() { return "Solid Color"; }
-
-
   // Get the internal display proxy.
   vtkSMRepresentationProxy* getRepresentationProxy() const;
-
-  // Call to select the coloring array. 
-  void colorByArray(const char* arrayname, int fieldtype);
-
-  /// Get the names of the arrays that a part may be colored by.
-  /// This information may change based on the current reprentation
-  /// of the display, eg. when showing Outline, only "Solid Color" is
-  /// available; when rendering as Volume, can be colored only by 
-  /// point data.
-  QList<QString> getColorFields();
-
-  /// get the data range for a particular component. if component == -1,
-  /// range for the vector magnitude is returned.
-  QPair<double, double> getColorFieldRange(const QString& array, int component);
-
-  /// Returns the range for the currently selected color field i.e.
-  /// the range for the array component (or magnitude) of the array by which
-  /// this display is being colored, if at all.
-  QPair<double, double> getColorFieldRange();
-
-  /// Returns if the array (non-qualified array name) is a partial array in the
-  /// indicated fieldType.
-  /// fieldType=vtkSMDataRepresentationProxy::POINT_DATA|CELL_DATA etc.
-  bool isPartial(const QString& array, int fieldType) const;
-
-  /// set the array to color the part by
-  void setColorField(const QString& field);
-
-  /// get the array the part is colored by
-  /// if raw is true, it will not add (point) or (cell) but simply
-  /// return the array name
-  QString getColorField(bool raw=false);
-
-  /// Returns the number of components for the given field.
-  /// field is a string of format "<arrayname> (cell|point)".
-  int getColorFieldNumberOfComponents(const QString& field);
-
-  /// Returns the name of a component for the given field.
-  /// field is a string of format "<arrayname> (cell|point)".  
-  QString getColorFieldComponentName( const QString& array, const int &component );
-
-  /// Returns the proxy for the piecewise function used to
-  /// map scalars to opacity.
-  virtual vtkSMProxy* getScalarOpacityFunctionProxy();
-
-  /// Set representation on the proxy.
-  /// If representation is changed to volume, this method ensures that the
-  /// scalar array is initialized.
-  void setRepresentation(const QString& repr);
-
-  /// Returns the type of representation currently used. Representation type is
-  /// a string as defined by the string-list for the domain for the property
-  /// 'Representation' e.g. Surface, Volume etc.
-  QString getRepresentationType() const;
-
-  /// Returns the opacity.
-  double getOpacity() const;
-
-
-  void setColor(double R,double G,double B);
-
-
 
   /// Get/Set the application wide setting for unstructured grid outline
   /// threshold. If the unstructured grid number of cells exceeds this limit, it
   /// will be rendered as outline by default. The value is in million cells.
   static void setUnstructuredGridOutlineThreshold(double millioncells);
   static double getUnstructuredGridOutlineThreshold();
-signals:
-  /// This is fire when any property that affects the color
-  /// mode for the display changes.
-  void colorChanged();
 
 public slots:
   // If lookuptable is set up and is used for coloring,
@@ -171,12 +101,6 @@ public slots:
   void updateLookupTableScalarRange();
 
 protected slots:
-  /// Called when the "Representation" property changes. If
-  /// representation changes to "Volume", we have to ensure that
-  /// the color field is initialized to something other than
-  /// "Solid Color" otherwise the volume mapper segfaults.
-  void onRepresentationChanged();
-
   /// called when this representations visibility changes. We check if the LUT
   /// used to color this repr is being used by any other repr. If not, we turn off
   /// the scalar bar.
@@ -191,33 +115,14 @@ protected slots:
   /// finally updates, we can reset the LUT ranges.
   void onInputAccepted();
 
-  virtual int getNumberOfComponents(const char* arrayname, int fieldType);
-  virtual QString getComponentName( const char* arrayname, int fieldtype, int component);
-
 protected:
-  /// Creates helper proxies such as as the proxy
-  /// for volume opacity function.
-  void createHelperProxies();
-  
   /// Overridden to capture the input's modified signal.
   virtual void onInputChanged();
 
-  /// Creates a default proxy for volume opacity function.
-  vtkSMProxy* createOpacityFunctionProxy(
-    vtkSMRepresentationProxy* repr);
- 
   bool UpdateLUTRangesOnDataUpdate;
-
-  
-
 private:
   class pqInternal;
   pqInternal* Internal; 
-  static void getColorArray(
-    vtkPVDataSetAttributesInformation* attrInfo,
-    vtkPVDataSetAttributesInformation* inAttrInfo,
-    vtkPVArrayInformation*& arrayInfo);
-  
   /// Returns the settings key.
   static const char* UNSTRUCTURED_GRID_OUTLINE_THRESHOLD();
 };

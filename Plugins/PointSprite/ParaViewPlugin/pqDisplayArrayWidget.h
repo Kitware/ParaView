@@ -32,7 +32,6 @@
 #define _pqDisplayArrayWidget_h
 
 #include "pqVariableType.h"
-#include "pqComponentsModule.h"
 
 #include <QWidget>
 #include <QPointer>
@@ -47,7 +46,7 @@ class pqScalarsToColors;
 
 /// Provides a standard user interface for selecting among a collection
 /// of dataset variables and .
-class PQCOMPONENTS_EXPORT pqDisplayArrayWidget: public QWidget
+class pqDisplayArrayWidget: public QWidget
 {
   Q_OBJECT
 

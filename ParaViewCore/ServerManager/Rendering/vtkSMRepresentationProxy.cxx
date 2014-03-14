@@ -202,6 +202,25 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
       }
     }
 
+  if (modifiedProxy == this)
+    {
+    // propagate the modification to all sub-representations. If modifiedProxy
+    // != this, then the sub-representations are marked modified by input proxy
+    // dependencies properly.
+    // This ensures that when "Representation" property on
+    // composite-representations is changed, for example, the
+    // sub-representations that actually re-execute are noticed and
+    // data-information, among other things, gets updated.
+    for (unsigned int cc=0, max=this->GetNumberOfSubProxies(); cc < max; ++cc)
+      {
+      vtkSMProxy* subRepr = this->GetSubProxy(cc);
+      if (subRepr)
+        {
+        subRepr->MarkDirty(modifiedProxy);
+        }
+      }
+    }
+
   // vtkSMProxy::MarkDirty does not call MarkConsumersAsDirty unless
   // this->NeedsUpdate is false. Generally, that's indeed correct since we we
   // have marked the consumer dirty previously, we don't need to do it again.
