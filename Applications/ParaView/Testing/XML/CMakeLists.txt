@@ -360,6 +360,7 @@ SET (UndoRedo4_THRESHOLD 15)
 
 # Since often there are issues with fonts etc.
 SET (XYChart_THRESHOLD 150)
+SET (CheckableHeader_THRESHOLD 150)
 # Since the test uses surface-selection, it cannot work in render-server mode.
 set(XYChart_DISABLE_CRS TRUE)
 
