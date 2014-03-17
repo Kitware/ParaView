@@ -719,25 +719,59 @@
         </EnumerationDomain>
       </IntVectorProperty>
     </RenderViewProxy>
-    <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="ViewBase"
                       class="vtkPVXYChartView"
-                      name="XYChartViewBase"
+                      name="XYChartViewTitle"
                       processes="client|renderserver|dataserver">
       <Documentation>This is the base proxy for XY chart views.</Documentation>
       <StringVectorProperty command="SetTitle"
                             name="ChartTitle"
                             number_of_elements="1"></StringVectorProperty>
-      <StringVectorProperty command="SetTitleFont"
-                            default_values="Arial;14;0;0"
-                            default_values_delimiter=";"
-                            element_types="2 0 0 0"
-                            name="ChartTitleFont"
-                            number_of_elements="4">
-        <Documentation>Set the chart title font (familyname, size, bold,
-        italics).</Documentation>
+      <IntVectorProperty command="SetTitleAlignment"
+                         default_values="1"
+                         name="ChartTitleAlignment"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Left"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Right"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetTitleFontFamily"
+                            default_values="Arial"
+                            name="ChartTitleFontFamily"
+                            number_of_elements="1">
+        <Documentation>Set the chart title font family.</Documentation>
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
       </StringVectorProperty>
+      <IntVectorProperty command="SetTitleFontSize"
+                            default_values="14"
+                            name="ChartTitleFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the chart title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTitleBold"
+                            default_values="0"
+                            name="ChartTitleBold"
+                            number_of_elements="1">
+        <Documentation>Set the chart title bold.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTitleItalic"
+                            default_values="0"
+                            name="ChartTitleItalic"
+                            number_of_elements="1">
+        <Documentation>Set the chart title bold.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetTitleColor"
                             default_values="0 0 0"
                             name="ChartTitleColor"
@@ -746,14 +780,40 @@
                            min="0"
                            name="range" />
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetTitleAlignment"
-                         default_values="1"
-                         name="ChartTitleAlignment"
-                         number_of_elements="1">
-        <IntRangeDomain max="2"
-                        min="0"
-                        name="range" />
-      </IntVectorProperty>
+      <PropertyGroup label="Title">
+        <Property name="ChartTitle"/>
+        <Property name="ChartTitleAlignment"/>
+      </PropertyGroup>
+      <PropertyGroup label="Chart Title Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="ChartTitleColor" function="Color"/>
+        <Property name="ChartTitleFontFamily" function="Family"/>
+        <Property name="ChartTitleBold" function="Bold" />
+        <Property name="ChartTitleItalic" function="Italics"/>
+        <Property name="ChartTitleFontSize" function="Size" />
+      </PropertyGroup>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <!--
+        TODO: Address compatibility for the following XML Changes
+        - TitleFont  to   TitleFontFamily
+                          TitleFontSize
+                          TitleBold
+                          TitleItalic
+        - Axis...    to   LeftAxis...
+                          BottomAxis...
+                          RightAxis...
+                          TopAxis...
+         - AxisRange    to   AxisRangeMinimum
+                             AxisRangeMaximum
+    -->
+    <ContextViewProxy base_proxygroup="views"
+                      base_proxyname="XYChartViewTitle"
+                      class="vtkPVXYChartView"
+                      name="XYChartViewBase"
+                      processes="client|renderserver|dataserver">
+      <Documentation>This is the base proxy for XY chart views.</Documentation>
       <IntVectorProperty command="SetLegendVisibility"
                          default_values="1"
                          name="ShowLegend"
@@ -764,237 +824,51 @@
                          default_values="1"
                          name="LegendLocation"
                          number_of_elements="1">
-        <IntRangeDomain max="4"
-                        min="0"
-                        name="range" />
+        <EnumerationDomain name="enum">
+          <Entry text="TopLeft"
+                 value="0" />
+          <Entry text="TopRight"
+                 value="1" />
+          <Entry text="BottomRight"
+                 value="2" />
+          <Entry text="BottomLeft"
+                 value="3" />
+          <Entry text="Left"
+                 value="4" />
+          <Entry text="Top"
+                 value="5" />
+          <Entry text="Right"
+                 value="6" />
+          <Entry text="Bottom"
+                 value="7" />
+        </EnumerationDomain>
       </IntVectorProperty>
-      <IntVectorProperty command="SetAxisLogScale"
-                         default_values="0 0 0 0"
-                         name="AxisLogScale"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetGridVisibility"
-                         default_values="1 1 0 0"
-                         name="ShowAxisGrid"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetAxisColor"
-                            default_values="0.0 0.0 0.0   0.0 0.0 0.0   0.0 0.0 0.0   0.0 0.0 0.0"
-                            name="AxisColor"
-                            number_of_elements="12"
-                            number_of_elements_per_command="3"
-                            repeat_command="1"
-                            use_index="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetGridColor"
-                            default_values="0.95 0.95 0.95   0.95 0.95 0.95   0.95 0.95 0.95   0.95 0.95 0.95"
-                            name="AxisGridColor"
-                            number_of_elements="12"
-                            number_of_elements_per_command="3"
-                            repeat_command="1"
-                            use_index="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetAxisLabelVisibility"
-                         default_values="1 1 1 1"
-                         name="ShowAxisLabels"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <StringVectorProperty command="SetAxisLabelFont"
-                            default_values="Arial;12;0;0;Arial;12;0;0;Arial;12;0;0;Arial;12;0;0"
-                            default_values_delimiter=";"
-                            element_types="2 0 0 0"
-                            name="AxisLabelFont"
-                            number_of_elements="16"
-                            number_of_elements_per_command="4"
-                            repeat_command="1"
-                            use_index="1">
-        <Documentation>Set the axis title font (familyname, size, bold,
-        italics).</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty command="SetAxisLabelColor"
-                            default_values="0 0 0   0 0 0   0 0 0   0 0 0"
-                            name="AxisLabelColor"
-                            number_of_elements="12"
-                            number_of_elements_per_command="3"
-                            repeat_command="1"
-                            use_index="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetAxisLabelNotation"
-                         default_values="0 0 0 0"
-                         name="AxisLabelNotation"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <IntRangeDomain max="2"
-                        min="0"
-                        name="range" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetAxisLabelPrecision"
-                         default_values="2 2 2 2"
-                         name="AxisLabelPrecision"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <IntRangeDomain max="6"
-                        min="0"
-                        name="range" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetAxisUseCustomRange"
-                         default_values="0 0 0 0"
-                         name="AxisUseCustomRange"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Specify whether to use the axis range specified or whether the view
-          should compute the ranges automatically based on the data being shown.
-          The ranges specified by LeftAxisRange, RightAxisRange,
-          BottomAxisRange, TopAxisRange are only respected when the
-          corresponding flag in this property is set to 1.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetLeftAxisRange"
-                            default_values="0 1"
-                            ignore_synchronization="1"
-                            name="LeftAxisRange"
-                            number_of_elements="2">
-        <Documentation>Set the axis range for the Left axis. Set to empty to
-        let the chart determine the range automatically.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetRightAxisRange"
-                            default_values="0 1"
-                            ignore_synchronization="1"
-                            name="RightAxisRange"
-                            number_of_elements="2">
-        <Documentation>Set the axis range for the Right axis. Set to empty to
-        let the chart determine the range automatically.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetTopAxisRange"
-                            default_values="0 1"
-                            ignore_synchronization="1"
-                            name="TopAxisRange"
-                            number_of_elements="2">
-        <Documentation>Set the axis range for the Top axis. Set to empty to let
-        the chart determine the range automatically.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetBottomAxisRange"
-                            default_values="0 1"
-                            ignore_synchronization="1"
-                            name="BottomAxisRange"
-                            number_of_elements="2">
-        <Documentation>Set the axis range for the Bottom axis. Set to empty to
-        let the chart determine the range automatically.</Documentation>
-      </DoubleVectorProperty>
-      <StringVectorProperty command="SetAxisTitle"
-                            name="AxisTitle"
-                            number_of_elements="4"
-                            number_of_elements_per_command="1"
-                            repeat_command="1"
-                            use_index="1"></StringVectorProperty>
-      <StringVectorProperty command="SetAxisTitleFont"
-                            default_values="Arial;12;1;0;Arial;12;1;0;Arial;12;1;0;Arial;12;1;0"
-                            default_values_delimiter=";"
-                            element_types="2 0 0 0"
-                            name="AxisTitleFont"
-                            number_of_elements="16"
-                            number_of_elements_per_command="4"
-                            repeat_command="1"
-                            use_index="1">
-        <Documentation>Set the axis title font (familyname, size, bold,
-        italics).</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty command="SetAxisTitleColor"
-                            default_values="0 0 0   0 0 0   0 0 0.5   0 0 0.5"
-                            name="AxisTitleColor"
-                            number_of_elements="12"
-                            number_of_elements_per_command="3"
-                            repeat_command="1"
-                            use_index="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty command="SetAxisUseCustomLabels"
-                            default_values="0 0 0 0"
-                            name="AxisUseCustomLabels"
-                            number_of_elements="4"
-                            number_of_elements_per_command="1"
-                            repeat_command="1"
-                            use_index="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Specify whether to use custom labels for each of the axis. Labels
-          specified by LeftAxisLabels, RightAxisLabels, etc. are used only when
-          the corresponding AxisUseCustomLabels flag is set to 1.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty command="SetAxisLabelsLeft"
-                            name="LeftAxisLabels"
-                            repeat_command="1"
-                            set_number_command="SetAxisLabelsLeftNumber"
-                            use_index="1"></DoubleVectorProperty>
-      <DoubleVectorProperty command="SetAxisLabelsBottom"
-                            name="BottomAxisLabels"
-                            repeat_command="1"
-                            set_number_command="SetAxisLabelsBottomNumber"
-                            use_index="1"></DoubleVectorProperty>
-      <DoubleVectorProperty command="SetAxisLabelsRight"
-                            name="RightAxisLabels"
-                            repeat_command="1"
-                            set_number_command="SetAxisLabelsRightNumber"
-                            use_index="1"></DoubleVectorProperty>
-      <DoubleVectorProperty command="SetAxisLabelsTop"
-                            name="TopAxisLabels"
-                            repeat_command="1"
-                            set_number_command="SetAxisLabelsTopNumber"
-                            use_index="1"></DoubleVectorProperty>
       <IntVectorProperty command="SetTooltipNotation"
                          default_values="0"
                          name="TooltipNotation"
-                         number_of_elements="1">
-        <IntRangeDomain max="2"
-                        min="0"
-                        name="range" />
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetTooltipPrecision"
                          default_values="6"
                          name="TooltipPrecision"
-                         number_of_elements="1">
-        <IntRangeDomain max="12"
-                        min="0"
-                        name="range" />
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
       </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
                          default_values="0"
                          name="UseOffscreenRenderingForScreenshots"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Set whether offscreen rendering should be used during
         CaptureWindow calls.</Documentation>
@@ -1003,14 +877,1105 @@
                          default_values="0"
                          ignore_synchronization="1"
                          name="UseOffscreenRendering"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
       </IntVectorProperty>
+
+      <PropertyGroup label="Legend">
+        <Property name="ShowLegend"/>
+        <Property name="LegendLocation"/>
+      </PropertyGroup>
+      <PropertyGroup label="Tooltip"
+                     panel_visibility="advanced">
+        <Property name="TooltipNotation"/>
+        <Property name="TooltipPrecision"/>
+      </PropertyGroup>
+
+
+      <!-- left axis -->
+      <!-- title -->
+      <StringVectorProperty command="SetLeftAxisTitle"
+                            name="LeftAxisTitle"
+                            number_of_elements="1"/>
+      <IntVectorProperty command="SetLeftGridVisibility"
+                         default_values="1"
+                         panel_visibility="advanced"
+                         name="ShowLeftAxisGrid"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetLeftGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="LeftAxisGridColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLeftAxisColor"
+                            default_values="0 0 0"
+                            name="LeftAxisColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetLeftAxisTitleFontFamily"
+                            default_values="Arial"
+                            name="LeftAxisTitleFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetLeftAxisTitleFontSize"
+                            default_values="12"
+                            name="LeftAxisTitleFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisTitleBold"
+                            default_values="1"
+                            name="LeftAxisTitleBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisTitleItalic"
+                            default_values="0"
+                            name="LeftAxisTitleItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetLeftAxisTitleColor"
+                            default_values="0 0 0"
+                            name="LeftAxisTitleColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <!-- range -->
+      <IntVectorProperty command="SetLeftAxisLogScale"
+                         default_values="0"
+                         name="LeftAxisLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisUseCustomRange"
+                         default_values="0"
+                         name="LeftAxisUseCustomRange"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use the axis range specified or whether the view
+          should compute the ranges automatically based on the data being shown.
+          The ranges specified by ...AxisRange are only respected when the
+          corresponding flag in this property is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetLeftAxisRangeMinimum"
+                            default_values="0"
+                            name="LeftAxisRangeMinimum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range minimum for the Left axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="LeftAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLeftAxisRangeMaximum"
+                            default_values="1"
+                            name="LeftAxisRangeMaximum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range maximum for the Left axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="LeftAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- labels -->
+      <IntVectorProperty command="SetLeftAxisLabelVisibility"
+                         default_values="1"
+                         name="ShowLeftAxisLabels"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="LeftAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="LeftAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisUseCustomLabels"
+                            default_values="0"
+                            panel_visibility="advanced"
+                            name="LeftAxisUseCustomLabels"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for each of the axis. Labels
+          specified by ...AxisLabels etc. are used only when
+          the corresponding AxisUseCustomLabels flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetLeftAxisLabels"
+                            name="LeftAxisLabels"
+                            panel_visibility="advanced"
+                            animateable="1"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            set_number_command="SetLeftAxisLabelsNumber">
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="LeftAxisUseCustomLabels"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetLeftAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="LeftAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetLeftAxisLabelFontSize"
+                            default_values="12"
+                            name="LeftAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisLabelBold"
+                            default_values="0"
+                            name="LeftAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLeftAxisLabelItalic"
+                            default_values="0"
+                            name="LeftAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetLeftAxisLabelColor"
+                            default_values="0 0 0"
+                            name="LeftAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Left Axis">
+        <Property name="LeftAxisTitle"/>
+        <Property name="ShowLeftAxisGrid"/>
+        <Property name="LeftAxisGridColor"/>
+        <Property name="LeftAxisColor"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Left Axis Title Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="LeftAxisTitleColor" function="Color"/>
+        <Property name="LeftAxisTitleFontFamily" function="Family"/>
+        <Property name="LeftAxisTitleBold" function="Bold" />
+        <Property name="LeftAxisTitleItalic" function="Italics"/>
+        <Property name="LeftAxisTitleFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="LeftAxisTitleOpacity" function="Opacity"/> -->
+        <!-- <Property name="LeftAxisTitleShadow" function="Shadow" /> -->
+      </PropertyGroup>
+
+     <PropertyGroup label="Left Axis Range">
+       <Property name="LeftAxisLogScale"/>
+       <Property name="LeftAxisUseCustomRange"/>
+       <Property name="LeftAxisRangeMinimum"/>
+       <Property name="LeftAxisRangeMaximum"/>
+     </PropertyGroup>
+
+      <PropertyGroup label="Left Axis Labels">
+        <Property name="ShowLeftAxisLabels"/>
+        <Property name="LeftAxisLabelNotation"/>
+        <Property name="LeftAxisLabelPrecision"/>
+        <Property name="LeftAxisUseCustomLabels"/>
+        <Property name="LeftAxisLabels"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Left Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="LeftAxisLabelColor" function="Color"/>
+        <Property name="LeftAxisLabelFontFamily" function="Family"/>
+        <Property name="LeftAxisLabelBold" function="Bold" />
+        <Property name="LeftAxisLabelItalic" function="Italics"/>
+        <Property name="LeftAxisLabelFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="LeftAxisLabelOpacity" function="Opacity"/> -->
+        <!-- <Property name="LeftAxisLabelShadow" function="Shadow" /> -->
+      </PropertyGroup>
+      <!-- end left axis -->
+
+      <!-- bottom axis -->
+      <!-- title -->
+      <StringVectorProperty command="SetBottomAxisTitle"
+                            name="BottomAxisTitle"
+                            number_of_elements="1"/>
+      <IntVectorProperty command="SetBottomGridVisibility"
+                         default_values="1"
+                         panel_visibility="advanced"
+                         name="ShowBottomAxisGrid"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBottomGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="BottomAxisGridColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBottomAxisColor"
+                            default_values="0 0 0"
+                            name="BottomAxisColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetBottomAxisTitleFontFamily"
+                            default_values="Arial"
+                            name="BottomAxisTitleFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetBottomAxisTitleFontSize"
+                            default_values="12"
+                            name="BottomAxisTitleFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisTitleBold"
+                            default_values="1"
+                            name="BottomAxisTitleBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisTitleItalic"
+                            default_values="0"
+                            name="BottomAxisTitleItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBottomAxisTitleColor"
+                            default_values="0 0 0"
+                            name="BottomAxisTitleColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <!-- range -->
+      <IntVectorProperty command="SetBottomAxisLogScale"
+                         default_values="0"
+                         name="BottomAxisLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisUseCustomRange"
+                         default_values="0"
+                         name="BottomAxisUseCustomRange"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use the axis range specified or whether the view
+          should compute the ranges automatically based on the data being shown.
+          The ranges specified by ...AxisRange are only respected when the
+          corresponding flag in this property is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBottomAxisRangeMinimum"
+                            default_values="0"
+                            name="BottomAxisRangeMinimum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range minimum for the Bottom axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="BottomAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetBottomAxisRangeMaximum"
+                            default_values="1"
+                            name="BottomAxisRangeMaximum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range maximum for the Bottom axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="BottomAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- labels -->
+      <IntVectorProperty command="SetBottomAxisLabelVisibility"
+                         default_values="1"
+                         name="ShowBottomAxisLabels"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="BottomAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="BottomAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisUseCustomLabels"
+                            default_values="0"
+                            panel_visibility="advanced"
+                            name="BottomAxisUseCustomLabels"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for each of the axis. Labels
+          specified by ...AxisLabels etc. are used only when
+          the corresponding AxisUseCustomLabels flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBottomAxisLabels"
+                            name="BottomAxisLabels"
+                            panel_visibility="advanced"
+                            animateable="1"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            set_number_command="SetBottomAxisLabelsNumber">
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="BottomAxisUseCustomLabels"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetBottomAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="BottomAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetBottomAxisLabelFontSize"
+                            default_values="12"
+                            name="BottomAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisLabelBold"
+                            default_values="0"
+                            name="BottomAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBottomAxisLabelItalic"
+                            default_values="0"
+                            name="BottomAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBottomAxisLabelColor"
+                            default_values="0 0 0"
+                            name="BottomAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Bottom Axis">
+        <Property name="BottomAxisTitle"/>
+        <Property name="ShowBottomAxisGrid"/>
+        <Property name="BottomAxisGridColor"/>
+        <Property name="BottomAxisColor"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Bottom Axis Title Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="BottomAxisTitleColor" function="Color"/>
+        <Property name="BottomAxisTitleFontFamily" function="Family"/>
+        <Property name="BottomAxisTitleBold" function="Bold" />
+        <Property name="BottomAxisTitleItalic" function="Italics"/>
+        <Property name="BottomAxisTitleFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="BottomAxisTitleOpacity" function="Opacity"/> -->
+        <!-- <Property name="BottomAxisTitleShadow" function="Shadow" /> -->
+      </PropertyGroup>
+
+     <PropertyGroup label="Bottom Axis Range">
+       <Property name="BottomAxisLogScale"/>
+       <Property name="BottomAxisUseCustomRange"/>
+       <Property name="BottomAxisRangeMinimum"/>
+       <Property name="BottomAxisRangeMaximum"/>
+     </PropertyGroup>
+
+      <PropertyGroup label="Bottom Axis Labels">
+        <Property name="ShowBottomAxisLabels"/>
+        <Property name="BottomAxisLabelNotation"/>
+        <Property name="BottomAxisLabelPrecision"/>
+        <Property name="BottomAxisUseCustomLabels"/>
+        <Property name="BottomAxisLabels"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Bottom Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="BottomAxisLabelColor" function="Color"/>
+        <Property name="BottomAxisLabelFontFamily" function="Family"/>
+        <Property name="BottomAxisLabelBold" function="Bold" />
+        <Property name="BottomAxisLabelItalic" function="Italics"/>
+        <Property name="BottomAxisLabelFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="BottomAxisLabelOpacity" function="Opacity"/> -->
+        <!-- <Property name="BottomAxisLabelShadow" function="Shadow" /> -->
+      </PropertyGroup>
+      <!-- end bottom axis -->
+
     </ContextViewProxy>
-    <!-- ================================================================== -->
+
+
     <ContextViewProxy base_proxygroup="views"
                       base_proxyname="XYChartViewBase"
+                      class="vtkPVXYChartView"
+                      name="XYChartViewBase4Axes"
+                      processes="client|renderserver|dataserver">
+
+      <Documentation>This is the base proxy for XY chart views with
+      four axis: left, bottom, right and top</Documentation>
+
+
+      <!-- right axis -->
+      <!-- title -->
+      <StringVectorProperty command="SetRightAxisTitle"
+                            name="RightAxisTitle"
+                            number_of_elements="1"/>
+      <IntVectorProperty command="SetRightGridVisibility"
+                         default_values="1"
+                         panel_visibility="advanced"
+                         name="ShowRightAxisGrid"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRightGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="RightAxisGridColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRightAxisColor"
+                            default_values="0 0 0"
+                            name="RightAxisColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetRightAxisTitleFontFamily"
+                            default_values="Arial"
+                            name="RightAxisTitleFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetRightAxisTitleFontSize"
+                            default_values="12"
+                            name="RightAxisTitleFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisTitleBold"
+                            default_values="1"
+                            name="RightAxisTitleBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisTitleItalic"
+                            default_values="0"
+                            name="RightAxisTitleItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRightAxisTitleColor"
+                            default_values="0 0 0"
+                            name="RightAxisTitleColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <!-- range -->
+      <IntVectorProperty command="SetRightAxisLogScale"
+                         default_values="0"
+                         name="RightAxisLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisUseCustomRange"
+                         default_values="0"
+                         name="RightAxisUseCustomRange"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use the axis range specified or whether the view
+          should compute the ranges automatically based on the data being shown.
+          The ranges specified by ...AxisRange are only respected when the
+          corresponding flag in this property is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRightAxisRangeMinimum"
+                            default_values="0"
+                            name="RightAxisRangeMinimum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range minimum for the Right axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="RightAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRightAxisRangeMaximum"
+                            default_values="1"
+                            name="RightAxisRangeMaximum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range maximum for the Right axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="RightAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- labels -->
+      <IntVectorProperty command="SetRightAxisLabelVisibility"
+                         default_values="1"
+                         name="ShowRightAxisLabels"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="RightAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="RightAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisUseCustomLabels"
+                            default_values="0"
+                            panel_visibility="advanced"
+                            name="RightAxisUseCustomLabels"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for each of the axis. Labels
+          specified by ...AxisLabels etc. are used only when
+          the corresponding AxisUseCustomLabels flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRightAxisLabels"
+                            name="RightAxisLabels"
+                            panel_visibility="advanced"
+                            animateable="1"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            set_number_command="SetRightAxisLabelsNumber">
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="RightAxisUseCustomLabels"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetRightAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="RightAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetRightAxisLabelFontSize"
+                            default_values="12"
+                            name="RightAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisLabelBold"
+                            default_values="0"
+                            name="RightAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRightAxisLabelItalic"
+                            default_values="0"
+                            name="RightAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetRightAxisLabelColor"
+                            default_values="0 0 0"
+                            name="RightAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Right Axis">
+        <Property name="RightAxisTitle"/>
+        <Property name="ShowRightAxisGrid"/>
+        <Property name="RightAxisGridColor"/>
+        <Property name="RightAxisColor"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Right Axis Title Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="RightAxisTitleColor" function="Color"/>
+        <Property name="RightAxisTitleFontFamily" function="Family"/>
+        <Property name="RightAxisTitleBold" function="Bold" />
+        <Property name="RightAxisTitleItalic" function="Italics"/>
+        <Property name="RightAxisTitleFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="RightAxisTitleOpacity" function="Opacity"/> -->
+        <!-- <Property name="RightAxisTitleShadow" function="Shadow" /> -->
+      </PropertyGroup>
+
+     <PropertyGroup label="Right Axis Range">
+       <Property name="RightAxisLogScale"/>
+       <Property name="RightAxisUseCustomRange"/>
+       <Property name="RightAxisRangeMinimum"/>
+       <Property name="RightAxisRangeMaximum"/>
+     </PropertyGroup>
+
+      <PropertyGroup label="Right Axis Labels">
+        <Property name="ShowRightAxisLabels"/>
+        <Property name="RightAxisLabelNotation"/>
+        <Property name="RightAxisLabelPrecision"/>
+        <Property name="RightAxisUseCustomLabels"/>
+        <Property name="RightAxisLabels"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Right Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="RightAxisLabelColor" function="Color"/>
+        <Property name="RightAxisLabelFontFamily" function="Family"/>
+        <Property name="RightAxisLabelBold" function="Bold" />
+        <Property name="RightAxisLabelItalic" function="Italics"/>
+        <Property name="RightAxisLabelFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="RightAxisLabelOpacity" function="Opacity"/> -->
+        <!-- <Property name="RightAxisLabelShadow" function="Shadow" /> -->
+      </PropertyGroup>
+      <!-- end right axis -->
+
+      <!-- top axis -->
+      <!-- title -->
+      <StringVectorProperty command="SetTopAxisTitle"
+                            name="TopAxisTitle"
+                            number_of_elements="1"/>
+      <IntVectorProperty command="SetTopGridVisibility"
+                         default_values="1"
+                         panel_visibility="advanced"
+                         name="ShowTopAxisGrid"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTopGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="TopAxisGridColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetTopAxisColor"
+                            default_values="0 0 0"
+                            name="TopAxisColor"
+                            panel_visibility="advanced"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetTopAxisTitleFontFamily"
+                            default_values="Arial"
+                            name="TopAxisTitleFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetTopAxisTitleFontSize"
+                            default_values="12"
+                            name="TopAxisTitleFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisTitleBold"
+                            default_values="1"
+                            name="TopAxisTitleBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisTitleItalic"
+                            default_values="0"
+                            name="TopAxisTitleItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title font italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTopAxisTitleColor"
+                            default_values="0 0 0"
+                            name="TopAxisTitleColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <!-- range -->
+      <IntVectorProperty command="SetTopAxisLogScale"
+                         default_values="0"
+                         name="TopAxisLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisUseCustomRange"
+                         default_values="0"
+                         name="TopAxisUseCustomRange"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use the axis range specified or whether the view
+          should compute the ranges automatically based on the data being shown.
+          The ranges specified by ...AxisRange, are only respected when the
+          corresponding flag in this property is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTopAxisRangeMinimum"
+                            default_values="0"
+                            name="TopAxisRangeMinimum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range minimum for the Top axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="TopAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetTopAxisRangeMaximum"
+                            default_values="1"
+                            name="TopAxisRangeMaximum"
+                            number_of_elements="1">
+        <Documentation>Set the axis range maximum for the Top axis.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="TopAxisUseCustomRange"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <!-- labels -->
+      <IntVectorProperty command="SetTopAxisLabelVisibility"
+                         default_values="1"
+                         name="ShowTopAxisLabels"
+                         panel_visibility="advanced"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="TopAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="TopAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisUseCustomLabels"
+                            default_values="0"
+                            panel_visibility="advanced"
+                            name="TopAxisUseCustomLabels"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for each of the axis. Labels
+          specified by ...AxisLabels are used only when
+          the corresponding AxisUseCustomLabels flag is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTopAxisLabels"
+                            name="TopAxisLabels"
+                            panel_visibility="advanced"
+                            animateable="1"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            set_number_command="SetTopAxisLabelsNumber">
+        <!-- used to trigger the display pqScalarValueListPropertyWidget -->
+        <ArrayRangeDomain name="scalar_range"/>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="TopAxisUseCustomLabels"
+                      function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetTopAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="TopAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetTopAxisLabelFontSize"
+                            default_values="12"
+                            name="TopAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisLabelBold"
+                            default_values="0"
+                            name="TopAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTopAxisLabelItalic"
+                            default_values="0"
+                            name="TopAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTopAxisLabelColor"
+                            default_values="0 0 0"
+                            name="TopAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Top Axis">
+        <Property name="TopAxisTitle"/>
+        <Property name="ShowTopAxisGrid"/>
+        <Property name="TopAxisGridColor"/>
+        <Property name="TopAxisColor"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Top Axis Title Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="TopAxisTitleColor" function="Color"/>
+        <Property name="TopAxisTitleFontFamily" function="Family"/>
+        <Property name="TopAxisTitleBold" function="Bold" />
+        <Property name="TopAxisTitleItalic" function="Italics"/>
+        <Property name="TopAxisTitleFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="TopAxisTitleOpacity" function="Opacity"/> -->
+        <!-- <Property name="TopAxisTitleShadow" function="Shadow" /> -->
+      </PropertyGroup>
+
+     <PropertyGroup label="Top Axis Range">
+       <Property name="TopAxisLogScale"/>
+       <Property name="TopAxisUseCustomRange"/>
+       <Property name="TopAxisRangeMinimum"/>
+       <Property name="TopAxisRangeMaximum"/>
+     </PropertyGroup>
+
+      <PropertyGroup label="Top Axis Labels">
+        <Property name="ShowTopAxisLabels"/>
+        <Property name="TopAxisLabelNotation"/>
+        <Property name="TopAxisLabelPrecision"/>
+        <Property name="TopAxisUseCustomLabels"/>
+        <Property name="TopAxisLabels"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Top Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="TopAxisLabelColor" function="Color"/>
+        <Property name="TopAxisLabelFontFamily" function="Family"/>
+        <Property name="TopAxisLabelBold" function="Bold" />
+        <Property name="TopAxisLabelItalic" function="Italics"/>
+        <Property name="TopAxisLabelFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="TopAxisLabelOpacity" function="Opacity"/> -->
+        <!-- <Property name="TopAxisLabelShadow" function="Shadow" /> -->
+      </PropertyGroup>
+      <!-- end top axis -->
+
+    </ContextViewProxy>
+
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="views"
+                      base_proxyname="XYChartViewBase4Axes"
                       class="vtkPVXYChartView"
                       name="XYChartView"
                       processes="client|renderserver|dataserver"
@@ -1051,50 +2016,23 @@
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="views"
-                      base_proxyname="ViewBase"
+                      base_proxyname="XYChartViewTitle"
                       class="vtkPVXYChartView"
                       name="BoxChartView"
                       processes="client|renderserver|dataserver"
                       representation_name="BoxChartRepresentation"
                       post_creation="SetChartTypeToBox" >
       <Documentation>This is the proxy for box chart view.</Documentation>
-      <StringVectorProperty command="SetTitle"
-                            name="ChartTitle"
-                            number_of_elements="1">
-      </StringVectorProperty>
-      <StringVectorProperty command="SetTitleFont"
-                            default_values="Arial;14;0;0"
-                            default_values_delimiter=";"
-                            element_types="2 0 0 0"
-                            name="ChartTitleFont"
-                            number_of_elements="4">
-        <Documentation>Set the chart title font (familyname, size, bold,
-        italics).</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty command="SetTitleColor"
-                            default_values="0 0 0"
-                            name="ChartTitleColor"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetTitleAlignment"
-                         default_values="1"
-                         name="ChartTitleAlignment"
-                         number_of_elements="1">
-        <IntRangeDomain max="2"
-                        min="0"
-                        name="range" />
-      </IntVectorProperty>
       <IntVectorProperty command="SetLegendVisibility"
                          default_values="1"
+                         panel_visibility="never"
                          name="ShowLegend"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
                          default_values="0"
+                         panel_visibility="never"
                          name="UseOffscreenRenderingForScreenshots"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -1104,6 +2042,7 @@
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"
+                         panel_visibility="never"
                          name="UseOffscreenRendering"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -1138,17 +2077,476 @@
       </IntVectorProperty>
     </ContextViewProxy>
     <!-- ================================================================== -->
+    <!--TODO: Address renames in vtkPVPlotMatrixView
+        ScatterPlotTitle -> Title
+        TitleFont -> TitleFontFamily, FontSize, Bold, Italic
+        SetGutter -> SetGutterX, SetGutterY
+        SetBorders -> SetBorderLeft, Bottom, Right, Top
+        LabelFont -> LabelFontFamily, FontSize, Bold, Italic
+
+    -->
     <PlotMatrixViewProxy base_proxygroup="views"
-                         base_proxyname="ViewBase"
+                         base_proxyname="XYChartViewTitle"
                          class="vtkPVPlotMatrixView"
                          name="PlotMatrixView"
                          processes="client|renderserver|dataserver"
                          representation_name="PlotMatrixRepresentation">
       <Documentation>This is the proxy for the plot matrix
       view.</Documentation>
+      <IntVectorProperty command="SetBorderLeft"
+                         default_values="50"
+                         name="BorderLeft"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBorderBottom"
+                         default_values="40"
+                         name="BorderBottom"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBorderRight"
+                         default_values="50"
+                         name="BorderRight"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBorderTop"
+                         default_values="40"
+                         name="BorderTop"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGutterX"
+                         default_values="15"
+                         name="GutterX"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGutterY"
+                         default_values="15"
+                         name="GutterY"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfAnimationFrames"
+                         default_values="25"
+                         name="NumberOfAnimationFrames"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" name="range" />
+      </IntVectorProperty>
+
+      <PropertyGroup label="Border">
+        <Property name="BorderLeft"/>
+        <Property name="BorderBottom"/>
+        <Property name="BorderRight"/>
+        <Property name="BorderTop"/>
+      </PropertyGroup>
+
+      <PropertyGroup label="Spacing (Gutter)">
+        <Property name="GutterX"/>
+        <Property name="GutterY"/>
+      </PropertyGroup>
+
+      <DoubleVectorProperty command="SetScatterPlotSelectedRowColumnColor"
+                            default_values="0.8 0 0 0.4"
+                            name="ScatterPlotSelectedRowColumnColor"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetScatterPlotSelectedActiveColor"
+                            default_values="0 0.8 0 0.4"
+                            name="ScatterPlotSelectedActiveColor"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+
+
+      <!-- activeplot -->
+      <DoubleVectorProperty command="SetActivePlotBackgroundColor"
+                            default_values="1 1 1 0"
+                            name="ActivePlotBackgroundColor"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotAxisColor"
+                            default_values="0 0 0"
+                            name="ActivePlotAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="ActivePlotGridColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetActivePlotGridVisibility"
+                         default_values="1"
+                         name="ActivePlotGridVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelVisibility"
+                         default_values="1"
+                         name="ActivePlotAxisLabelVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="ActivePlotAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="ActivePlotAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetActivePlotAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="ActivePlotAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelFontSize"
+                            default_values="12"
+                            name="ActivePlotAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelBold"
+                            default_values="0"
+                            name="ActivePlotAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetActivePlotAxisLabelItalic"
+                            default_values="0"
+                            name="ActivePlotAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetActivePlotAxisLabelColor"
+                            default_values="0 0 0"
+                            name="ActivePlotAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="ActivePlot"
+                     panel_visibility="advanced">
+        <Property name="ActivePlotBackgroundColor"/>
+        <Property name="ActivePlotAxisColor"/>
+        <Property name="ActivePlotGridColor"/>
+        <Property name="ActivePlotGridVisibility"/>
+        <Property name="ActivePlotAxisLabelVisibility"/>
+        <Property name="ActivePlotAxisLabelNotation"/>
+        <Property name="ActivePlotAxisLabelPrecision"/>
+      </PropertyGroup>
+      <PropertyGroup label="ActivePlot Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="ActivePlotAxisLabelColor" function="Color"/>
+        <Property name="ActivePlotAxisLabelFontFamily" function="Family"/>
+        <Property name="ActivePlotAxisLabelBold" function="Bold" />
+        <Property name="ActivePlotAxisLabelItalic" function="Italics"/>
+        <Property name="ActivePlotAxisLabelFontSize" function="Size" />
+      </PropertyGroup>
+
+      <!-- scatterplot -->
+      <DoubleVectorProperty command="SetScatterPlotBackgroundColor"
+                            default_values="1 1 1 0"
+                            name="ScatterPlotBackgroundColor"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScatterPlotAxisColor"
+                            default_values="0 0 0"
+                            name="ScatterPlotAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetScatterPlotGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="ScatterPlotGridColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetScatterPlotGridVisibility"
+                         default_values="1"
+                         name="ScatterPlotGridVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelVisibility"
+                         default_values="1"
+                         name="ScatterPlotAxisLabelVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="ScatterPlotAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="ScatterPlotAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScatterPlotAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="ScatterPlotAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelFontSize"
+                            default_values="12"
+                            name="ScatterPlotAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelBold"
+                            default_values="0"
+                            name="ScatterPlotAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetScatterPlotAxisLabelItalic"
+                            default_values="0"
+                            name="ScatterPlotAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetScatterPlotAxisLabelColor"
+                            default_values="0 0 0"
+                            name="ScatterPlotAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="ScatterPlot"
+                     panel_visibility="advanced">
+        <Property name="ScatterPlotBackgroundColor"/>
+        <Property name="ScatterPlotAxisColor"/>
+        <Property name="ScatterPlotGridColor"/>
+        <Property name="ScatterPlotGridVisibility"/>
+        <Property name="ScatterPlotAxisLabelVisibility"/>
+        <Property name="ScatterPlotAxisLabelNotation"/>
+        <Property name="ScatterPlotAxisLabelPrecision"/>
+      </PropertyGroup>
+      <PropertyGroup label="ScatterPlot Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="ScatterPlotAxisLabelColor" function="Color"/>
+        <Property name="ScatterPlotAxisLabelFontFamily" function="Family"/>
+        <Property name="ScatterPlotAxisLabelBold" function="Bold" />
+        <Property name="ScatterPlotAxisLabelItalic" function="Italics"/>
+        <Property name="ScatterPlotAxisLabelFontSize" function="Size" />
+      </PropertyGroup>
+
+
+
+
+      <!-- histogram -->
+      <DoubleVectorProperty command="SetHistogramBackgroundColor"
+                            default_values="0.5 0.5 0.5 0.4"
+                            name="HistogramBackgroundColor"
+                            number_of_elements="4">
+        <DoubleRangeDomain max="1 1 1 1"
+                           min="0 0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHistogramAxisColor"
+                            default_values="0 0 0"
+                            name="HistogramAxisColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHistogramGridColor"
+                            default_values="0.95 0.95 0.95"
+                            name="HistogramGridColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetHistogramGridVisibility"
+                         default_values="1"
+                         name="HistogramGridVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelVisibility"
+                         default_values="1"
+                         name="HistogramAxisLabelVisibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelNotation"
+                         default_values="0"
+                         panel_visibility="advanced"
+                         name="HistogramAxisLabelNotation"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed"
+                 value="0" />
+          <Entry text="Scientific"
+                 value="1" />
+          <Entry text="Fixed"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelPrecision"
+                         default_values="2"
+                         panel_visibility="advanced"
+                         name="HistogramAxisLabelPrecision"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetHistogramAxisLabelFontFamily"
+                            default_values="Arial"
+                            name="HistogramAxisLabelFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelFontSize"
+                            default_values="12"
+                            name="HistogramAxisLabelFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelBold"
+                            default_values="0"
+                            name="HistogramAxisLabelBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHistogramAxisLabelItalic"
+                            default_values="0"
+                            name="HistogramAxisLabelItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the axis title italic.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetHistogramAxisLabelColor"
+                            default_values="0 0 0"
+                            name="HistogramAxisLabelColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+
+      <PropertyGroup label="Histogram"
+                     panel_visibility="advanced">
+        <Property name="HistogramBackgroundColor"/>
+        <Property name="HistogramAxisColor"/>
+        <Property name="HistogramGridColor"/>
+        <Property name="HistogramGridVisibility"/>
+        <Property name="HistogramAxisLabelVisibility"/>
+        <Property name="HistogramAxisLabelNotation"/>
+        <Property name="HistogramAxisLabelPrecision"/>
+      </PropertyGroup>
+      <PropertyGroup label="Histogram Axis Label Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="HistogramAxisLabelColor" function="Color"/>
+        <Property name="HistogramAxisLabelFontFamily" function="Family"/>
+        <Property name="HistogramAxisLabelBold" function="Bold" />
+        <Property name="HistogramAxisLabelItalic" function="Italics"/>
+        <Property name="HistogramAxisLabelFontSize" function="Size" />
+      </PropertyGroup>
+
+
+
+
+
+
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
                          default_values="0"
                          name="UseOffscreenRenderingForScreenshots"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Set whether offscreen rendering should be used during
@@ -1157,6 +2555,7 @@
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"
+                         panel_visibility="never"
                          name="UseOffscreenRendering"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -5863,28 +7262,185 @@
                proxygroup="views"
                proxyname="XYChartView"></Proxy>
         <ExposedProperties>
-          <Property name="AxisColor" />
-          <Property name="AxisGridColor" />
-          <Property name="AxisLabelColor" />
-          <Property name="AxisLabelFont" />
-          <Property name="AxisLabelNotation" />
-          <Property name="AxisLabelPrecision" />
-          <Property name="AxisLogScale" />
-          <Property name="AxisTitle" />
-          <Property name="AxisTitleColor" />
-          <Property name="AxisTitleFont" />
-          <Property name="BottomAxisRange" />
-          <Property name="ChartTitle" />
-          <Property name="ChartTitleAlignment" />
-          <Property name="ChartTitleColor" />
-          <Property name="ChartTitleFont" />
-          <Property name="LeftAxisRange" />
-          <Property name="LegendLocation" />
-          <Property name="RightAxisRange" />
-          <Property name="ShowAxisGrid" />
-          <Property name="ShowAxisLabels" />
-          <Property name="ShowLegend" />
-          <Property name="TopAxisRange" />
+          <PropertyGroup label="Title">
+            <Property name="ChartTitle"/>
+            <Property name="ChartTitleAlignment"/>
+          </PropertyGroup>
+          <PropertyGroup label="Chart Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="ChartTitleColor" function="Color"/>
+            <Property name="ChartTitleFontFamily" function="Family"/>
+            <Property name="ChartTitleBold" function="Bold" />
+            <Property name="ChartTitleItalic" function="Italics"/>
+            <Property name="ChartTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Legend">
+            <Property name="ShowLegend"/>
+            <Property name="LegendLocation"/>
+          </PropertyGroup>
+          <PropertyGroup label="Tooltip"
+                         panel_visibility="advanced">
+            <Property name="TooltipNotation"/>
+            <Property name="TooltipPrecision"/>
+          </PropertyGroup>
+
+          <!-- left axis -->
+          <PropertyGroup label="Left Axis">
+            <Property name="LeftAxisTitle"/>
+            <Property name="ShowLeftAxisGrid"/>
+            <Property name="LeftAxisGridColor"/>
+            <Property name="LeftAxisColor"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisTitleColor" function="Color"/>
+            <Property name="LeftAxisTitleFontFamily" function="Family"/>
+            <Property name="LeftAxisTitleBold" function="Bold" />
+            <Property name="LeftAxisTitleItalic" function="Italics"/>
+            <Property name="LeftAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Range">
+            <Property name="LeftAxisLogScale"/>
+            <Property name="LeftAxisUseCustomRange"/>
+            <Property name="LeftAxisRangeMinimum"/>
+            <Property name="LeftAxisRangeMaximum"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Labels">
+            <Property name="ShowLeftAxisLabels"/>
+            <Property name="LeftAxisLabelNotation"/>
+            <Property name="LeftAxisLabelPrecision"/>
+            <Property name="LeftAxisUseCustomLabels"/>
+            <Property name="LeftAxisLabels"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisLabelColor" function="Color"/>
+            <Property name="LeftAxisLabelFontFamily" function="Family"/>
+            <Property name="LeftAxisLabelBold" function="Bold" />
+            <Property name="LeftAxisLabelItalic" function="Italics"/>
+            <Property name="LeftAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- bottom axis -->
+          <PropertyGroup label="Bottom Axis">
+            <Property name="BottomAxisTitle"/>
+            <Property name="ShowBottomAxisGrid"/>
+            <Property name="BottomAxisGridColor"/>
+            <Property name="BottomAxisColor"/>
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisTitleColor" function="Color"/>
+            <Property name="BottomAxisTitleFontFamily" function="Family"/>
+            <Property name="BottomAxisTitleBold" function="Bold" />
+            <Property name="BottomAxisTitleItalic" function="Italics"/>
+            <Property name="BottomAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Range">
+            <Property name="BottomAxisLogScale"/>
+            <Property name="BottomAxisUseCustomRange"/>
+            <Property name="BottomAxisRangeMinimum"/>
+            <Property name="BottomAxisRangeMaximum"/>
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Labels">
+            <Property name="ShowBottomAxisLabels"/>
+            <Property name="BottomAxisLabelNotation"/>
+            <Property name="BottomAxisLabelPrecision"/>
+            <Property name="BottomAxisUseCustomLabels"/>
+            <Property name="BottomAxisLabels"/>
+          </PropertyGroup>
+          <PropertyGroup label="Bottom Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisLabelColor" function="Color"/>
+            <Property name="BottomAxisLabelFontFamily" function="Family"/>
+            <Property name="BottomAxisLabelBold" function="Bold" />
+            <Property name="BottomAxisLabelItalic" function="Italics"/>
+            <Property name="BottomAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- right axis -->
+          <PropertyGroup label="Right Axis">
+            <Property name="RightAxisTitle"/>
+            <Property name="ShowRightAxisGrid"/>
+            <Property name="RightAxisGridColor"/>
+            <Property name="RightAxisColor"/>
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="RightAxisTitleColor" function="Color"/>
+            <Property name="RightAxisTitleFontFamily" function="Family"/>
+            <Property name="RightAxisTitleBold" function="Bold" />
+            <Property name="RightAxisTitleItalic" function="Italics"/>
+            <Property name="RightAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Range">
+            <Property name="RightAxisLogScale"/>
+            <Property name="RightAxisUseCustomRange"/>
+            <Property name="RightAxisRangeMinimum"/>
+            <Property name="RightAxisRangeMaximum"/>
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Labels">
+            <Property name="ShowRightAxisLabels"/>
+            <Property name="RightAxisLabelNotation"/>
+            <Property name="RightAxisLabelPrecision"/>
+            <Property name="RightAxisUseCustomLabels"/>
+            <Property name="RightAxisLabels"/>
+          </PropertyGroup>
+          <PropertyGroup label="Right Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="RightAxisLabelColor" function="Color"/>
+            <Property name="RightAxisLabelFontFamily" function="Family"/>
+            <Property name="RightAxisLabelBold" function="Bold" />
+            <Property name="RightAxisLabelItalic" function="Italics"/>
+            <Property name="RightAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- top axis -->
+          <PropertyGroup label="Top Axis">
+            <Property name="TopAxisTitle"/>
+            <Property name="ShowTopAxisGrid"/>
+            <Property name="TopAxisGridColor"/>
+            <Property name="TopAxisColor"/>
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="TopAxisTitleColor" function="Color"/>
+            <Property name="TopAxisTitleFontFamily" function="Family"/>
+            <Property name="TopAxisTitleBold" function="Bold" />
+            <Property name="TopAxisTitleItalic" function="Italics"/>
+            <Property name="TopAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Range">
+            <Property name="TopAxisLogScale"/>
+            <Property name="TopAxisUseCustomRange"/>
+            <Property name="TopAxisRangeMinimum"/>
+            <Property name="TopAxisRangeMaximum"/>
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Labels">
+            <Property name="ShowTopAxisLabels"/>
+            <Property name="TopAxisLabelNotation"/>
+            <Property name="TopAxisLabelPrecision"/>
+            <Property name="TopAxisUseCustomLabels"/>
+            <Property name="TopAxisLabels"/>
+          </PropertyGroup>
+          <PropertyGroup label="Top Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="TopAxisLabelColor" function="Color"/>
+            <Property name="TopAxisLabelFontFamily" function="Family"/>
+            <Property name="TopAxisLabelBold" function="Bold" />
+            <Property name="TopAxisLabelItalic" function="Italics"/>
+            <Property name="TopAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -5898,35 +7454,122 @@
       <Documentation>The is comparative view comprising of individual
       "XYBarChartView" proxies for each panel in the comparative view
       grid.</Documentation>
+
       <SubProxy>
         <Proxy name="RootView"
                proxygroup="views"
                proxyname="XYBarChartView"></Proxy>
         <ExposedProperties>
-          <Property name="AxisColor" />
-          <Property name="AxisGridColor" />
-          <Property name="AxisLabelColor" />
-          <Property name="AxisLabelFont" />
-          <Property name="AxisLabelNotation" />
-          <Property name="AxisLabelPrecision" />
-          <Property name="AxisLogScale" />
-          <Property name="AxisTitle" />
-          <Property name="AxisTitleColor" />
-          <Property name="AxisTitleFont" />
-          <Property name="BottomAxisRange" />
-          <Property name="ChartTitle" />
-          <Property name="ChartTitleAlignment" />
-          <Property name="ChartTitleColor" />
-          <Property name="ChartTitleFont" />
-          <Property name="LeftAxisRange" />
-          <Property name="RightAxisRange" />
-          <Property name="ShowAxisGrid" />
-          <Property name="ShowAxisLabels" />
-          <Property name="ShowLegend" />
-          <Property name="TopAxisRange" />
+          <PropertyGroup label="Title">
+            <Property name="ChartTitle"/>
+            <Property name="ChartTitleAlignment"/>
+          </PropertyGroup>
+          <PropertyGroup label="Chart Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="ChartTitleColor" function="Color"/>
+            <Property name="ChartTitleFontFamily" function="Family"/>
+            <Property name="ChartTitleBold" function="Bold" />
+            <Property name="ChartTitleItalic" function="Italics"/>
+            <Property name="ChartTitleFontSize" function="Size" />
+          </PropertyGroup>
+          <PropertyGroup label="Legend">
+            <Property name="ShowLegend"/>
+            <Property name="LegendLocation"/>
+          </PropertyGroup>
+          <PropertyGroup label="Tooltip"
+                         panel_visibility="advanced">
+            <Property name="TooltipNotation"/>
+            <Property name="TooltipPrecision"/>
+          </PropertyGroup>
+
+          <!-- left axis -->
+          <PropertyGroup label="Left Axis">
+            <Property name="LeftAxisTitle"/>
+            <Property name="ShowLeftAxisGrid"/>
+            <Property name="LeftAxisGridColor"/>
+            <Property name="LeftAxisColor"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisTitleColor" function="Color"/>
+            <Property name="LeftAxisTitleFontFamily" function="Family"/>
+            <Property name="LeftAxisTitleBold" function="Bold" />
+            <Property name="LeftAxisTitleItalic" function="Italics"/>
+            <Property name="LeftAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Range">
+            <Property name="LeftAxisLogScale"/>
+            <Property name="LeftAxisUseCustomRange"/>
+            <Property name="LeftAxisRangeMinimum"/>
+            <Property name="LeftAxisRangeMaximum"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Labels">
+            <Property name="ShowLeftAxisLabels"/>
+            <Property name="LeftAxisLabelNotation"/>
+            <Property name="LeftAxisLabelPrecision"/>
+            <Property name="LeftAxisUseCustomLabels"/>
+            <Property name="LeftAxisLabels"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Left Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="LeftAxisLabelColor" function="Color"/>
+            <Property name="LeftAxisLabelFontFamily" function="Family"/>
+            <Property name="LeftAxisLabelBold" function="Bold" />
+            <Property name="LeftAxisLabelItalic" function="Italics"/>
+            <Property name="LeftAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
+          <!-- bottom axis -->
+          <PropertyGroup label="Bottom Axis">
+            <Property name="BottomAxisTitle"/>
+            <Property name="ShowBottomAxisGrid"/>
+            <Property name="BottomAxisGridColor"/>
+            <Property name="BottomAxisColor"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Title Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisTitleColor" function="Color"/>
+            <Property name="BottomAxisTitleFontFamily" function="Family"/>
+            <Property name="BottomAxisTitleBold" function="Bold" />
+            <Property name="BottomAxisTitleItalic" function="Italics"/>
+            <Property name="BottomAxisTitleFontSize" function="Size" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Range">
+            <Property name="BottomAxisLogScale"/>
+            <Property name="BottomAxisUseCustomRange"/>
+            <Property name="BottomAxisRangeMinimum"/>
+            <Property name="BottomAxisRangeMaximum"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Labels">
+            <Property name="ShowBottomAxisLabels"/>
+            <Property name="BottomAxisLabelNotation"/>
+            <Property name="BottomAxisLabelPrecision"/>
+            <Property name="BottomAxisUseCustomLabels"/>
+            <Property name="BottomAxisLabels"/>
+          </PropertyGroup>
+
+          <PropertyGroup label="Bottom Axis Label Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+            <Property name="BottomAxisLabelColor" function="Color"/>
+            <Property name="BottomAxisLabelFontFamily" function="Family"/>
+            <Property name="BottomAxisLabelBold" function="Bold" />
+            <Property name="BottomAxisLabelItalic" function="Italics"/>
+            <Property name="BottomAxisLabelFontSize" function="Size" />
+          </PropertyGroup>
         </ExposedProperties>
-        <!-- End of "RootView" subproxy -->
       </SubProxy>
+
       <!-- End of ComparativeXYBarChartView -->
     </ComparativeViewProxy>
      <!-- ================================================================== -->
@@ -6011,13 +7654,13 @@
                       representation_name="PythonRepresentation">
        <StringVectorProperty command="SetScript"
                              name="Script"
-                             number_of_elements="1"
-                             panel_visibility="default">
-   <Hints>
-     <Widget type="multi_line" />
-   </Hints>
-   <Documentation>This property contains the text of a Python program used
-   to generate a plot.</Documentation>
+                             number_of_elements="1">
+         <Hints>
+           <Widget type="multi_line" />
+         </Hints>
+         <Documentation>This property contains the text of a Python program used
+         to generate a plot. Use the TAB key to end editing and generate the
+         plot.</Documentation>
        </StringVectorProperty>
        <IntVectorProperty command="GetNumberOfVisibleDataObjects"
                           name="NumberOfVisibleDataObjects"

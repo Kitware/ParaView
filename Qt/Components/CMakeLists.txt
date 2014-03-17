@@ -41,8 +41,6 @@ set (Module_SRCS
   pqActionGroupInterface.h
   pqActiveObjects.cxx
   pqActiveObjects.h
-  pqActivePlotMatrixViewOptions.cxx
-  pqActivePlotMatrixViewOptions.h
   pqActiveServer.cxx
   pqActiveServer.h
   pqActiveView.cxx
@@ -51,8 +49,6 @@ set (Module_SRCS
   pqActiveViewOptions.h
   pqActiveViewOptionsManager.cxx
   pqActiveViewOptionsManager.h
-  pqActiveXYChartOptions.cxx
-  pqActiveXYChartOptions.h
   #pqAddSourceDialog.cxx
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.cxx
@@ -274,8 +270,6 @@ set (Module_SRCS
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.cxx
   pqPipelineTimeKeyFrameEditor.h
-  pqPlotMatrixOptionsEditor.cxx
-  pqPlotMatrixOptionsEditor.h
   pqPluginDialog.cxx
   pqPluginDialog.h
   pqPluginTreeWidgetEventPlayer.cxx
@@ -381,6 +375,8 @@ set (Module_SRCS
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.cxx
   pqTabbedMultiViewWidget.h
+  pqTextEditSignalEndOfEdit.h
+  pqTextEditSignalEndOfEdit.cxx
   pqTextDisplayPropertiesWidget.cxx
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.cxx
@@ -418,8 +414,6 @@ set (Module_SRCS
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx
   pqWriterDialog.h
-  pqXYChartOptionsEditor.cxx
-  pqXYChartOptionsEditor.h
   pqYoungsMaterialInterfacePanel.cxx
   pqYoungsMaterialInterfacePanel.h
 )
@@ -429,12 +423,10 @@ set (Module_MOC_HDRS
   pq3DWidgetPropertyWidget.h
   pqAboutDialog.h
   pqActiveObjects.h
-  pqActivePlotMatrixViewOptions.h
   pqActiveServer.h
   pqActiveView.h
   pqActiveViewOptions.h
   pqActiveViewOptionsManager.h
-  pqActiveXYChartOptions.h
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.h
@@ -536,7 +528,6 @@ set (Module_MOC_HDRS
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.h
-  pqPlotMatrixOptionsEditor.h
   pqPluginDialog.h
   pqPluginTreeWidgetEventPlayer.h
   pqPluginTreeWidgetEventTranslator.h
@@ -589,6 +580,7 @@ set (Module_MOC_HDRS
   pqStreamTracerPanel.h
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.h
+  pqTextEditSignalEndOfEdit.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.h
@@ -605,7 +597,6 @@ set (Module_MOC_HDRS
   pqViewManager.h
   pqWidgetRangeDomain.h
   pqWriterDialog.h
-  pqXYChartOptionsEditor.h
   pqYoungsMaterialInterfacePanel.h
 )
 
@@ -622,7 +613,6 @@ set (Module_UI_FILES
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChangeInputDialog.ui
-  Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqCollaborationPanel.ui
   Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqColorPresetDialog.ui
@@ -661,7 +651,6 @@ set (Module_UI_FILES
   Resources/UI/pqOrbitCreatorDialog.ui
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
-  Resources/UI/pqPlotMatrixOptionsWidget.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqPropertiesPanel.ui
@@ -715,22 +704,6 @@ if(PARAVIEW_ENABLE_PYTHON)
     Resources/UI/pqImageOutputInfo.ui
     Resources/UI/pqExportStateWizard.ui
     )
-
-  if (PARAVIEW_ENABLE_MATPLOTLIB)
-    LIST(APPEND Module_SRCS
-      pqActivePythonViewOptions.cxx
-      pqActivePythonViewOptions.h
-      pqPythonViewOptions.cxx
-      pqPythonViewOptions.h
-      )
-    LIST(APPEND Module_MOC_HDRS
-      pqActivePythonViewOptions.h
-      pqPythonViewOptions.h
-      )
-    LIST(APPEND Module_UI_FILES
-      Resources/UI/pqPythonViewOptions.ui
-      )      
-  endif()
 endif()
 
 set (Module_RESOURCE_FILES

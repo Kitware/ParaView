@@ -237,7 +237,7 @@ void pqBackgroundEditorWidget::clickedRestoreDefaultColor2()
 void pqBackgroundEditorWidget::changeColor(const char* propertyName)
 {
   vtkSMProperty* _property =
-    this->getPropertyGroup ()->GetProperty(propertyName);
+    this->GetPropertyGroup ()->GetProperty(propertyName);
   BEGIN_UNDO_SET("Restore Default Color");
   _property->ResetToDefault();
   emit this->changeFinished();

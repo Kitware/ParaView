@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqLightsPropertyGroup.cxx
+   Module: pqStringVectorPropertyWidget.cxx
 
-   Copyright (c) 2005-2012 Kitware Inc.
+   Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -30,39 +30,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqLightsPropertyGroup.h"
+#include "pqTextEditSignalEndOfEdit.h"
 
-#include <QVBoxLayout>
-#include <QPushButton>
+#include <QKeyEvent>
 
-#include "pqLightsEditor.h"
-#include "pqPropertiesPanel.h"
-#include "pqProxy.h"
-#include "vtkSMProxy.h"
-
-pqLightsPropertyGroup::pqLightsPropertyGroup(
-  vtkSMProxy *smProxy, vtkSMPropertyGroup* smGroup,
-  QWidget*parentObject)
-  : pqPropertyGroupWidget(smProxy, smGroup, parentObject),
-    Editor (new pqLightsEditor(this))
+void  pqTextEditSignalEndOfEdit::keyPressEvent(QKeyEvent* e)
 {
-  QHBoxLayout *layoutLocal = new QHBoxLayout(this);
-  layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
-  layoutLocal->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
-
-  QPushButton *button = new QPushButton("Edit");
-  layoutLocal->addWidget(button);
-  layoutLocal->addStretch();
-
-  connect(button, SIGNAL(clicked()), SLOT(showEditor()));
-}
-
-pqLightsPropertyGroup::~pqLightsPropertyGroup()
-{
-  delete this->Editor;
-}
-
-void pqLightsPropertyGroup::showEditor()
-{
-  this->Editor->exec();
+  if (e->key() == Qt::Key_Tab)
+    {
+    emit endOfEdit();
+    }
+  else
+    {
+    QTextEdit::keyPressEvent(e);
+    }
 }

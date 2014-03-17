@@ -223,6 +223,43 @@ void vtkPVXYChartView::SetTitleFont(const char* family, int pointSize,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTitleFontFamily(const char* family)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetTitleProperties()->SetFontFamilyAsString(family);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTitleFontSize(int pointSize)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetTitleProperties()->SetFontSize(pointSize);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTitleBold(bool bold)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetTitleProperties()->SetBold(static_cast<int>(bold));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTitleItalic(bool italic)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetTitleProperties()->SetItalic(static_cast<int>(italic));
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetTitleColor(double red, double green, double blue)
 {
   if (this->Chart)
@@ -334,8 +371,8 @@ void vtkPVXYChartView::SetAxisLabelVisibility(int index, bool visible)
 
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisLabelFont(int index, const char* family,
-                                             int pointSize, bool bold,
-                                             bool italic)
+                                        int pointSize, bool bold,
+                                        bool italic)
 {
   if (this->Chart)
     {
@@ -343,6 +380,46 @@ void vtkPVXYChartView::SetAxisLabelFont(int index, const char* family,
     prop->SetFontFamilyAsString(family);
     prop->SetFontSize(pointSize);
     prop->SetBold(static_cast<int>(bold));
+    prop->SetItalic(static_cast<int>(italic));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelFontFamily(int index, const char* family)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetLabelProperties();
+    prop->SetFontFamilyAsString(family);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelFontSize(int index, int pointSize)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetLabelProperties();
+    prop->SetFontSize(pointSize);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelBold(int index, bool bold)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetLabelProperties();
+    prop->SetBold(static_cast<int>(bold));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelItalic(int index, bool italic)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetLabelProperties();
     prop->SetItalic(static_cast<int>(italic));
     }
 }
@@ -377,10 +454,31 @@ void vtkPVXYChartView::SetAxisLabelPrecision(int index, int precision)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisRange(int index, double min, double max)
+void vtkPVXYChartView::SetAxisRangeMinimum(int index, double min)
 {
   // cache for later use.
   this->Internals->AxisRanges[index][0] = min;
+
+  if (this->Chart)
+    {
+    vtkAxis* axis = this->Chart->GetAxis(index);
+    if (axis->GetBehavior() == vtkAxis::FIXED)
+      {
+      // change only if axes behavior is indeed "FIXED" i.e.
+      // SetAxisUseCustomRange(...) was set to true for this axis.
+      if (axis->GetUnscaledMinimum() != min)
+        {
+        axis->SetUnscaledMinimum(min);
+        this->Chart->RecalculateBounds();
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisRangeMaximum(int index, double max)
+{
+  // cache for later use.
   this->Internals->AxisRanges[index][1] = max;
 
   if (this->Chart)
@@ -390,15 +488,15 @@ void vtkPVXYChartView::SetAxisRange(int index, double min, double max)
       {
       // change only if axes behavior is indeed "FIXED" i.e.
       // SetAxisUseCustomRange(...) was set to true for this axis.
-      if (axis->GetUnscaledMinimum() != min || axis->GetUnscaledMaximum() != max)
+      if (axis->GetUnscaledMaximum() != max)
         {
-        axis->SetUnscaledMinimum(min);
         axis->SetUnscaledMaximum(max);
         this->Chart->RecalculateBounds();
         }
       }
     }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisUseCustomRange(int index, bool useCustomRange)
@@ -460,6 +558,47 @@ void vtkPVXYChartView::SetAxisTitleFont(int index, const char* family,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisTitleFontFamily(int index, const char* family)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetTitleProperties();
+    prop->SetFontFamilyAsString(family);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisTitleFontSize(int index, int pointSize)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetTitleProperties();
+    prop->SetFontSize(pointSize);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisTitleBold(int index, bool bold)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetTitleProperties();
+    prop->SetBold(static_cast<int>(bold));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisTitleItalic(int index, bool italic)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetTitleProperties();
+    prop->SetItalic(static_cast<int>(italic));
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisTitleColor(int index, double red,
                                               double green, double blue)
 {
@@ -496,54 +635,6 @@ void vtkPVXYChartView::SetAxisLabels(int axis, int i, double value)
     {
     this->Internals->CustomLabelPositions[axis]->SetValue(i, value);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsLeftNumber(int n)
-{
-  this->SetAxisLabelsNumber(vtkAxis::LEFT, n);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsLeft(int i, double value)
-{
-  this->SetAxisLabels(vtkAxis::LEFT, i, value);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsBottomNumber(int n)
-{
-  this->SetAxisLabelsNumber(vtkAxis::BOTTOM, n);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsBottom(int i, double value)
-{
-  this->SetAxisLabels(vtkAxis::BOTTOM, i, value);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsRightNumber(int n)
-{
-  this->SetAxisLabelsNumber(vtkAxis::RIGHT, n);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsRight(int i, double value)
-{
-  this->SetAxisLabels(vtkAxis::RIGHT, i, value);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsTopNumber(int n)
-{
-  this->SetAxisLabelsNumber(vtkAxis::TOP, n);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabelsTop(int i, double value)
-{
-  this->SetAxisLabels(vtkAxis::TOP, i, value);
 }
 
 //----------------------------------------------------------------------------

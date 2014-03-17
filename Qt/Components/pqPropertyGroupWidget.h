@@ -35,41 +35,64 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 class QCheckBox;
+class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
 class QLineEdit;
 class QSpinBox;
+class QToolButton;
 class QWidget;
 class pqColorChooserButton;
 class vtkSMProxy;
 class vtkSMPropertyGroup;
 
 
-
+/// pqPropertyGroupWidget is a (custom) widget created for a PropertyGroup.
+///
+/// It provides functions for linking standard controls with Server Manager
+/// properties as well as storing the property group.
+/// @see vtkSMPropertyGroup
 class PQCOMPONENTS_EXPORT pqPropertyGroupWidget : public pqPropertyWidget
 {
   Q_OBJECT
     typedef pqPropertyWidget Superclass;
- public:
+public:
   pqPropertyGroupWidget(vtkSMProxy *proxy,
                         vtkSMPropertyGroup* smGroup, QWidget *parent=0);
-  vtkSMPropertyGroup* getPropertyGroup () const
+  vtkSMPropertyGroup* GetPropertyGroup () const
   {
     return this->PropertyGroup;
   }
+  // make this function accessible without class prefix
+  using Superclass::addPropertyLink;
+  void addPropertyLink(QComboBox* cb, const char* propertyName,
+                       int smindex = -1);
+  void addPropertyLink(QLineEdit* edit, const char* propertyName,
+                       int smindex = -1);
+  void addPropertyLink(QCheckBox* button, const char* propertyName,
+                       int smindex = -1);
+  void addPropertyLink(QToolButton* button, const char* propertyName,
+                       int smindex = -1);
+  void addPropertyLink(QGroupBox* groupBox, const char* propertyName,
+                       int smindex = -1);
+  void addPropertyLink(QDoubleSpinBox* spinBox, const char* propertyName,
+                       int smindex = -1);
+  void addPropertyLink(QSpinBox* spinBox, const char* propertyName,
+                       int smindex = -1);
+  void addPropertyLink(pqColorChooserButton* color, const char* propertyName,
+                       int smindex = -1);
+  // make this signal public
+  using Superclass::changeFinished;
 
- protected:
-  using pqPropertyWidget::addPropertyLink;
-  void addPropertyLink(QCheckBox* button, const char* propertyName);
-  void addPropertyLink(QGroupBox* groupBox, const char* propertyName);
-  void addPropertyLink(QDoubleSpinBox* spinBox, const char* propertyName);
-  void addPropertyLink(QSpinBox* spinBox, const char* propertyName);
-  void addPropertyLink(pqColorChooserButton* color, const char* propertyName);
-
- private:
-  void addCheckedPropertyLink(QWidget* button, const char* propertyName);
-  void addDoubleValuePropertyLink(QWidget* widget, const char* propertyName);
-  void addIntValuePropertyLink(QWidget* widget, const char* propertyName);
+private:
+  void addCheckedPropertyLink(QWidget* button, const char* propertyName,
+                              int smindex = -1);
+  void addDoubleValuePropertyLink(QWidget* widget, const char* propertyName,
+                                  int smindex = -1);
+  void addIntValuePropertyLink(QWidget* widget, const char* propertyName,
+                               int smindex = -1);
+  void addStringPropertyLink(
+    QWidget* widget, const char* propertyName, int smindex);
 
  private:
   vtkSMPropertyGroup* PropertyGroup;

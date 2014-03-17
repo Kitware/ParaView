@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module: pqPropertyGroupButton.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2012 Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,14 +28,40 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#include "pqEnableWidgetDecorator.h"
+=========================================================================*/
 
-//-----------------------------------------------------------------------------
-pqEnableWidgetDecorator::pqEnableWidgetDecorator(
-  vtkPVXMLElement* config, pqPropertyWidget* parentObject)
-  : Superclass(config, parentObject)
+#ifndef _pqPropertyGroupButton_h
+#define _pqPropertyGroupButton_h
+
+#include "pqApplicationComponentsModule.h"
+#include "pqPropertyGroupWidget.h"
+
+class QDialog;
+
+class PQAPPLICATIONCOMPONENTS_EXPORT pqPropertyGroupButton :
+  public pqPropertyGroupWidget
 {
-  QObject::connect(this, SIGNAL(boolPropertyChanged()),
-                   this, SIGNAL(enableStateChanged()));
-}
+  Q_OBJECT
+
+public:
+  pqPropertyGroupButton(vtkSMProxy *proxy, vtkSMPropertyGroup* smGroup,
+                        QWidget *parent = 0);
+
+  // This object takes ownership of the 'dialog' parameter and deletes it when
+  // the object is deleted. Note QDialog destructor is virtual so memory is
+  // property deleted.
+  void SetEditor (QDialog* dialog)
+  {
+    this->Editor = dialog;
+  }
+  ~pqPropertyGroupButton();
+
+private slots:
+  void showEditor();
+
+private:
+  QDialog* Editor;
+};
+
+
+#endif

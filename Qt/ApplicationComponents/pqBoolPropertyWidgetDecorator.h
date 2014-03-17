@@ -29,13 +29,49 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqEnableWidgetDecorator.h"
+#ifndef __pqBoolPropertyWidgetDecorator_h
+#define __pqBoolPropertyWidgetDecorator_h
 
-//-----------------------------------------------------------------------------
-pqEnableWidgetDecorator::pqEnableWidgetDecorator(
-  vtkPVXMLElement* config, pqPropertyWidget* parentObject)
-  : Superclass(config, parentObject)
+#include "pqApplicationComponentsModule.h"
+#include "pqPropertyWidgetDecorator.h"
+#include "vtkWeakPointer.h"
+
+
+/// pqBoolPropertyWidgetDecorator is a base class for enable/disable
+/// or show/hide widgets based on the status of another property not
+/// directly controlled by the widget.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqBoolPropertyWidgetDecorator :
+  public pqPropertyWidgetDecorator
 {
-  QObject::connect(this, SIGNAL(boolPropertyChanged()),
-                   this, SIGNAL(enableStateChanged()));
-}
+  Q_OBJECT
+  typedef pqPropertyWidgetDecorator Superclass;
+public:
+  pqBoolPropertyWidgetDecorator(
+    vtkPVXMLElement* config, pqPropertyWidget* parent);
+  virtual ~pqBoolPropertyWidgetDecorator();
+
+  bool isBoolProperty() const
+  {
+    return this->BoolProperty;
+  }
+
+signals:
+  void boolPropertyChanged();
+
+protected:
+  vtkWeakPointer<vtkSMProperty> Property;
+  QString Function;
+  int Index;
+  unsigned long ObserverId;
+  bool BoolProperty;
+
+private:
+  Q_DISABLE_COPY(pqBoolPropertyWidgetDecorator);
+
+  /// updates the enabled state.
+  void updateBoolPropertyState();
+  /// update this->BoolProperty and fires boolPropertyChanged
+  void setBoolProperty(bool val);
+};
+
+#endif

@@ -137,11 +137,6 @@
     <string>Disregard this source/filter's time from animations</string>
    </property>
   </action>
-  <action name="actionEditViewSettings">
-   <property name="text">
-    <string>View Settings...</string>
-   </property>
-  </action>
   <action name="actionEditSettings">
    <property name="text">
     <string>Settings...</string>
@@ -182,7 +177,6 @@
   <addaction name="actionDelete_All"/>
   <addaction name="separator"/>
   <addaction name="actionEditSettings"/>
-  <addaction name="actionEditViewSettings"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

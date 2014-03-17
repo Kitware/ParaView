@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module: pqStringVectorPropertyWidget.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+   under the terms of the ParaView license version 1.2. 
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,14 +28,29 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#include "pqEnableWidgetDecorator.h"
+=========================================================================*/
 
-//-----------------------------------------------------------------------------
-pqEnableWidgetDecorator::pqEnableWidgetDecorator(
-  vtkPVXMLElement* config, pqPropertyWidget* parentObject)
-  : Superclass(config, parentObject)
+#ifndef _pqTextEditSignalEndOfEdit_h
+#define _pqTextEditSignalEndOfEdit_h
+
+#include "pqComponentsModule.h"
+#include <QTextEdit>
+
+/// QTextEdit that send an endOfEdit signal when the TAB key is pressed.
+class PQCOMPONENTS_EXPORT pqTextEditSignalEndOfEdit : public QTextEdit
 {
-  QObject::connect(this, SIGNAL(boolPropertyChanged()),
-                   this, SIGNAL(enableStateChanged()));
-}
+  Q_OBJECT
+public:
+  pqTextEditSignalEndOfEdit(QWidget *parent = 0) :
+    QTextEdit (parent)
+    {
+    }
+
+signals:
+  void endOfEdit();
+
+protected:
+  virtual void  keyPressEvent(QKeyEvent * e);
+};
+
+#endif // _pqTextEditEndOfEdit_h

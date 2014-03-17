@@ -29,13 +29,13 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqEnableWidgetDecorator.h"
+#include "pqShowWidgetDecorator.h"
 
 //-----------------------------------------------------------------------------
-pqEnableWidgetDecorator::pqEnableWidgetDecorator(
+pqShowWidgetDecorator::pqShowWidgetDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
   : Superclass(config, parentObject)
 {
   QObject::connect(this, SIGNAL(boolPropertyChanged()),
-                   this, SIGNAL(enableStateChanged()));
+                   this, SIGNAL(visibilityChanged()));
 }

@@ -584,10 +584,8 @@ void pqSLACManager::updatePlotField()
 
   pqSMAdaptor::setElementProperty(viewProxy->GetProperty("ShowLegend"), 0);
 
-  QList<QVariant> axisTitles;
-  axisTitles << fieldName << "" << "" << "";
-  pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("AxisTitle"),
-                                          axisTitles);
+  pqSMAdaptor::setElementProperty(viewProxy->GetProperty("LeftAxisTitle"),
+                                  fieldName);
 
   if (this->CurrentFieldRangeKnown)
     {

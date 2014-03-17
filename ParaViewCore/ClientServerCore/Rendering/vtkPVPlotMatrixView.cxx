@@ -26,6 +26,80 @@
 
 vtkStandardNewMacro(vtkPVPlotMatrixView);
 
+// macros are split so that we pass HeaderTesting.py
+//----------------------------------------------------------------------------
+#define GENERATE_PLOT_TYPE_DEFINITION(name, type)        \
+void vtkPVPlotMatrixView::SetScatterPlot ## name (type value) \
+{\
+  Set ## name(vtkScatterPlotMatrix::SCATTERPLOT, value);\
+}\
+void vtkPVPlotMatrixView::SetHistogram ## name(type value)                   \
+{\
+  Set ## name(vtkScatterPlotMatrix::HISTOGRAM, value);  \
+}\
+void vtkPVPlotMatrixView::SetActivePlot ## name(type value)                  \
+{\
+  Set ## name(vtkScatterPlotMatrix::ACTIVEPLOT, value); \
+}\
+
+#define GENERATE_PLOT_TYPE_DEFINITION2(name, type1, type2)         \
+void vtkPVPlotMatrixView::SetScatterPlot ## name (type1 value1, type2 value2)          \
+{\
+  Set ## name(vtkScatterPlotMatrix::SCATTERPLOT, value1, value2); \
+}\
+void vtkPVPlotMatrixView::SetHistogram ## name(type1 value1, type2 value2)             \
+{\
+  Set ## name(vtkScatterPlotMatrix::HISTOGRAM, value1, value2);   \
+}\
+void vtkPVPlotMatrixView::SetActivePlot ## name(type1 value1, type2 value2)            \
+{\
+  Set ## name(vtkScatterPlotMatrix::ACTIVEPLOT, value1, value2);  \
+}\
+
+#define GENERATE_PLOT_TYPE_DEFINITION3(name, type1, type2, type3)          \
+void vtkPVPlotMatrixView::SetScatterPlot ## name (type1 value1, type2 value2, type3 value3)    \
+{\
+  Set ## name(vtkScatterPlotMatrix::SCATTERPLOT, value1, value2, value3); \
+}\
+void vtkPVPlotMatrixView::SetHistogram ## name(type1 value1, type2 value2, type3 value3)       \
+{\
+  Set ## name(vtkScatterPlotMatrix::HISTOGRAM, value1, value2, value3);   \
+}\
+void vtkPVPlotMatrixView::SetActivePlot ## name(type1 value1, type2 value2, type3 value3)      \
+{\
+  Set ## name(vtkScatterPlotMatrix::ACTIVEPLOT, value1, value2, value3);  \
+}\
+
+#define GENERATE_PLOT_TYPE_DEFINITION4(name, type1, type2, type3, type4)   \
+void vtkPVPlotMatrixView::SetScatterPlot ## name (type1 value1, type2 value2, type3 value3, type4 value4)    \
+{\
+  Set ## name(vtkScatterPlotMatrix::SCATTERPLOT, value1, value2, value3, value4); \
+}\
+void vtkPVPlotMatrixView::SetHistogram ## name(type1 value1, type2 value2, type3 value3, type4 value4)       \
+{\
+  Set ## name(vtkScatterPlotMatrix::HISTOGRAM, value1, value2, value3, value4);   \
+}\
+void vtkPVPlotMatrixView::SetActivePlot ## name(type1 value1, type2 value2, type3 value3, type4 value4)      \
+{\
+  Set ## name(vtkScatterPlotMatrix::ACTIVEPLOT, value1, value2, value3, value4);  \
+}\
+
+GENERATE_PLOT_TYPE_DEFINITION(GridVisibility,bool);
+GENERATE_PLOT_TYPE_DEFINITION4(BackgroundColor,double,double,double,double);
+GENERATE_PLOT_TYPE_DEFINITION3(AxisColor,double,double,double);
+GENERATE_PLOT_TYPE_DEFINITION3(GridColor,double,double,double);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelVisibility,bool);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelFontFamily,const char*);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelFontSize,int);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelBold,bool);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelItalic,bool);
+GENERATE_PLOT_TYPE_DEFINITION3(AxisLabelColor,double,double,double);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelNotation,int);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelPrecision,int);
+GENERATE_PLOT_TYPE_DEFINITION(TooltipNotation,int);
+GENERATE_PLOT_TYPE_DEFINITION(TooltipPrecision,int);
+
+
 //----------------------------------------------------------------------------
 vtkPVPlotMatrixView::vtkPVPlotMatrixView()
 {
@@ -132,7 +206,7 @@ void vtkPVPlotMatrixView::AdvanceAnimationPath()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlotMatrixView::SetScatterPlotTitle(const char* title)
+void vtkPVPlotMatrixView::SetTitle(const char* title)
 {
   if (this->PlotMatrix)
     {
@@ -141,7 +215,7 @@ void vtkPVPlotMatrixView::SetScatterPlotTitle(const char* title)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlotMatrixView::SetScatterPlotTitleFont(const char* family, 
+void vtkPVPlotMatrixView::SetTitleFont(const char* family, 
   int pointSize, bool bold, bool italic)
 {
   if (this->PlotMatrix)
@@ -155,7 +229,48 @@ void vtkPVPlotMatrixView::SetScatterPlotTitleFont(const char* family,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlotMatrixView::SetScatterPlotTitleColor(
+void vtkPVPlotMatrixView::SetTitleFontFamily(const char* family)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetFontFamilyAsString(family);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetTitleFontSize(int pointSize)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetFontSize(pointSize);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetTitleBold(bool bold)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetBold(bold);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetTitleItalic(bool italic)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetItalic(italic);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetTitleColor(
   double red, double green, double blue)
 {
   if (this->PlotMatrix)
@@ -166,7 +281,7 @@ void vtkPVPlotMatrixView::SetScatterPlotTitleColor(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlotMatrixView::SetScatterPlotTitleAlignment(int alignment)
+void vtkPVPlotMatrixView::SetTitleAlignment(int alignment)
 {
   if (this->PlotMatrix)
     {
@@ -181,6 +296,16 @@ void vtkPVPlotMatrixView::SetGridVisibility(int plotType, bool visible)
   if (this->PlotMatrix)
     {
     this->PlotMatrix->SetGridVisibility(plotType, visible);
+    this->PlotMatrix->UpdateChartSettings(plotType);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetNumberOfAnimationFrames(int value)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetNumberOfFrames(value);
     }
 }
 
@@ -194,6 +319,24 @@ void vtkPVPlotMatrixView::SetGutter(float x, float y)
     }
 }
 //----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetGutterX(float value)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetGutterX(value);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetGutterY(float value)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetGutterY(value);
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetBorders(int left, int bottom, int right, int top)
 {
   if (this->PlotMatrix)
@@ -201,6 +344,40 @@ void vtkPVPlotMatrixView::SetBorders(int left, int bottom, int right, int top)
     this->PlotMatrix->SetBorders(left, bottom, right, top);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetBorderLeft(int value)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetBorderLeft(value);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetBorderBottom(int value)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetBorderBottom(value);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetBorderRight(int value)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetBorderRight(value);
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetBorderTop(int value)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetBorderTop(value);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetBackgroundColor(int plotType,
    double red, double green, double blue, double alpha)
@@ -212,6 +389,7 @@ void vtkPVPlotMatrixView::SetBackgroundColor(int plotType,
                       static_cast<unsigned char>(blue * 255),
                       static_cast<unsigned char>(alpha * 255));
     this->PlotMatrix->SetBackgroundColor(plotType, color);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -226,6 +404,7 @@ void vtkPVPlotMatrixView::SetAxisColor(int plotType, double red, double green,
                       static_cast<unsigned char>(blue * 255),
                       255);
     this->PlotMatrix->SetAxisColor(plotType, color);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -240,6 +419,7 @@ void vtkPVPlotMatrixView::SetGridColor(int plotType, double red, double green,
                       static_cast<unsigned char>(blue * 255),
                       255);
     this->PlotMatrix->SetGridColor(plotType, color);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -249,8 +429,10 @@ void vtkPVPlotMatrixView::SetAxisLabelVisibility(int plotType, bool visible)
   if (this->PlotMatrix)
     {
     this->PlotMatrix->SetAxisLabelVisibility(plotType, visible);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetAxisLabelFont(int plotType, const char* family,
@@ -264,8 +446,56 @@ void vtkPVPlotMatrixView::SetAxisLabelFont(int plotType, const char* family,
     prop->SetFontSize(pointSize);
     prop->SetBold(bold);
     prop->SetItalic(italic);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetAxisLabelFontFamily(
+  int plotType, const char* family)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
+    prop->SetFontFamilyAsString(family);
+    this->PlotMatrix->UpdateChartSettings(plotType);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetAxisLabelFontSize(int plotType, int pointSize)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
+    prop->SetFontSize(pointSize);
+    this->PlotMatrix->UpdateChartSettings(plotType);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetAxisLabelBold(int plotType, bool bold)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
+    prop->SetBold(bold);
+    this->PlotMatrix->UpdateChartSettings(plotType);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetAxisLabelItalic(int plotType, bool italic)
+{
+  if (this->PlotMatrix)
+    {
+    vtkTextProperty *prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
+    prop->SetItalic(italic);
+    this->PlotMatrix->UpdateChartSettings(plotType);
+    }
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetAxisLabelColor(
@@ -275,6 +505,7 @@ void vtkPVPlotMatrixView::SetAxisLabelColor(
     {
     vtkTextProperty *prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
     prop->SetColor(red, green, blue);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -284,6 +515,7 @@ void vtkPVPlotMatrixView::SetAxisLabelNotation(int plotType, int notation)
   if (this->PlotMatrix)
     {
     this->PlotMatrix->SetAxisLabelNotation(plotType, notation);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -293,6 +525,7 @@ void vtkPVPlotMatrixView::SetAxisLabelPrecision(int plotType, int precision)
   if (this->PlotMatrix)
     {
     this->PlotMatrix->SetAxisLabelPrecision(plotType, precision);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -302,6 +535,7 @@ void vtkPVPlotMatrixView::SetTooltipNotation(int plotType, int notation)
   if (this->PlotMatrix)
     {
     this->PlotMatrix->SetTooltipNotation(plotType, notation);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -311,6 +545,7 @@ void vtkPVPlotMatrixView::SetTooltipPrecision(int plotType, int precision)
   if (this->PlotMatrix)
     {
     this->PlotMatrix->SetTooltipPrecision(plotType, precision);
+    this->PlotMatrix->UpdateChartSettings(plotType);
     }
 }
 
@@ -361,29 +596,29 @@ void vtkPVPlotMatrixView::UpdateSettings()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVPlotMatrixView::GetScatterPlotTitleFontFamily()
+const char* vtkPVPlotMatrixView::GetTitleFontFamily()
 {
   return this->PlotMatrix ? 
     this->PlotMatrix->GetTitleProperties()->GetFontFamilyAsString() : NULL;
 }
-int vtkPVPlotMatrixView::GetScatterPlotTitleFontSize()
+int vtkPVPlotMatrixView::GetTitleFontSize()
 {
   return this->PlotMatrix ? 
     this->PlotMatrix->GetTitleProperties()->GetFontSize() : -1;
 }
-int vtkPVPlotMatrixView::GetScatterPlotTitleFontBold()
+int vtkPVPlotMatrixView::GetTitleFontBold()
 {
   return this->PlotMatrix ? 
     this->PlotMatrix->GetTitleProperties()->GetBold() : 0;
 }
-int vtkPVPlotMatrixView::GetScatterPlotTitleFontItalic()
+int vtkPVPlotMatrixView::GetTitleFontItalic()
 {
   return this->PlotMatrix ? 
     this->PlotMatrix->GetTitleProperties()->GetItalic() : 0;
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVPlotMatrixView::GetScatterPlotTitleColor()
+double* vtkPVPlotMatrixView::GetTitleColor()
 {
   // FIXME: Do we need this style of API? It means keeping around a double[3]
   // in order to support it. I don't like it, and would rather avoid it.
@@ -392,13 +627,13 @@ double* vtkPVPlotMatrixView::GetScatterPlotTitleColor()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVPlotMatrixView::GetScatterPlotTitle()
+const char* vtkPVPlotMatrixView::GetTitle()
 {
   return this->PlotMatrix ? this->PlotMatrix->GetTitle() : NULL;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVPlotMatrixView::GetScatterPlotTitleAlignment()
+int vtkPVPlotMatrixView::GetTitleAlignment()
 {
   return this->PlotMatrix ? 
     this->PlotMatrix->GetTitleProperties()->GetJustification() : 0;

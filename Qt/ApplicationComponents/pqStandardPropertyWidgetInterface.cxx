@@ -47,9 +47,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEnableWidgetDecorator.h"
 #include "pqFontPropertyWidget.h"
 #include "pqInputDataTypeDecorator.h"
-#include "pqLightsPropertyGroup.h"
+#include "pqLightsEditor.h"
 #include "pqListPropertyWidget.h"
+#include "pqPropertyGroupButton.h"
 #include "pqSeriesEditorPropertyWidget.h"
+#include "pqShowWidgetDecorator.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
@@ -121,8 +123,9 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget*
-pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *proxy,
-                                                                vtkSMPropertyGroup *group)
+pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
+  vtkSMProxy *proxy,
+  vtkSMPropertyGroup *group)
 {
   // *** NOTE: When adding new types, please update the header documentation ***
   if(QString(group->GetPanelWidget()) == "ColorEditor")
@@ -139,7 +142,9 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
     }
   else if(QString(group->GetPanelWidget()) == "LightsEditor")
     {
-    return new pqLightsPropertyGroup(proxy, group);
+    pqPropertyGroupButton * pgb = new pqPropertyGroupButton(proxy, group);
+    pgb->SetEditor (new pqLightsEditor(pgb));
+    return pgb;
     }
   else if (QString(group->GetPanelWidget()) == "ArrayStatus")
     {
@@ -188,6 +193,11 @@ pqStandardPropertyWidgetInterface::createWidgetDecorator(
     {
     return new pqEnableWidgetDecorator(config, widget);
     }
+  if (type == "ShowWidgetDecorator")
+    {
+    return new pqShowWidgetDecorator(config, widget);
+    }
+
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
 }

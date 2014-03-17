@@ -33,10 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyGroupWidget.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
+#include <QLineEdit>
 #include <QSpinBox>
+#include <QToolButton>
 #include "pqColorChooserButton.h"
+#include "pqComboBoxDomain.h"
 #include "pqSignalAdaptors.h"
 #include "pqStandardColorLinkAdaptor.h"
 #include "vtkSMProperty.h"
@@ -53,7 +57,7 @@ pqPropertyGroupWidget::pqPropertyGroupWidget(
 
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addPropertyLink(
-  pqColorChooserButton* color, const char* propertyName)
+  pqColorChooserButton* color, const char* propertyName, int smindex)
 {
   vtkSMProperty* smProperty = this->PropertyGroup->GetProperty(propertyName);
   if (smProperty)
@@ -62,7 +66,8 @@ void pqPropertyGroupWidget::addPropertyLink(
       new pqSignalAdaptorColor(
         color, "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
     this->addPropertyLink(
-      adaptor, "color", SIGNAL(colorChanged(const QVariant&)), smProperty);
+      adaptor, "color", SIGNAL(colorChanged(const QVariant&)),
+      smProperty, smindex);
     }
   else
     {
@@ -70,44 +75,77 @@ void pqPropertyGroupWidget::addPropertyLink(
     }
 }
 
-//-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addPropertyLink(
-  QCheckBox* button, const char* propertyName)
+  QComboBox* cb, const char* propertyName, int smindex)
 {
-  addCheckedPropertyLink (button, propertyName);
+  vtkSMProperty* smproperty = this->PropertyGroup->GetProperty(propertyName);
+  if (smproperty)
+    {
+    new pqComboBoxDomain(cb, smproperty);
+    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(cb);
+    this->addPropertyLink(
+      adaptor, "currentText", SIGNAL(currentTextChanged(QString)),
+      smproperty);
+    }
+  else
+    {
+    cb->hide();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addPropertyLink(
-  QGroupBox* groupBox, const char* propertyName)
+  QLineEdit* widget, const char* propertyName, int smindex)
 {
-  addCheckedPropertyLink (groupBox, propertyName);
+  addStringPropertyLink (widget, propertyName, smindex);
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addPropertyLink(
-  QDoubleSpinBox* spinBox, const char* propertyName)
+  QCheckBox* button, const char* propertyName, int smindex)
 {
-  addDoubleValuePropertyLink (spinBox, propertyName);
+  addCheckedPropertyLink (button, propertyName, smindex);
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addPropertyLink(
-  QSpinBox* spinBox, const char* propertyName)
+  QToolButton* button, const char* propertyName, int smindex)
 {
-  addIntValuePropertyLink (spinBox, propertyName);
+  addCheckedPropertyLink (button, propertyName, smindex);
+}
+
+
+//-----------------------------------------------------------------------------
+void pqPropertyGroupWidget::addPropertyLink(
+  QGroupBox* groupBox, const char* propertyName, int smindex)
+{
+  addCheckedPropertyLink (groupBox, propertyName, smindex);
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyGroupWidget::addPropertyLink(
+  QDoubleSpinBox* spinBox, const char* propertyName, int smindex)
+{
+  addDoubleValuePropertyLink (spinBox, propertyName, smindex);
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyGroupWidget::addPropertyLink(
+  QSpinBox* spinBox, const char* propertyName, int smindex)
+{
+  addIntValuePropertyLink (spinBox, propertyName, smindex);
 }
 
 
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addDoubleValuePropertyLink(
-  QWidget* widget, const char* propertyName)
+  QWidget* widget, const char* propertyName, int smindex)
 {
   vtkSMProperty* smProperty = this->PropertyGroup->GetProperty(propertyName);
   if (smProperty)
     {
     this->addPropertyLink(
-      widget, "value", SIGNAL(valueChanged(double)), smProperty);
+      widget, "value", SIGNAL(valueChanged(double)), smProperty, smindex);
     }
   else
     {
@@ -117,13 +155,29 @@ void pqPropertyGroupWidget::addDoubleValuePropertyLink(
 
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addIntValuePropertyLink(
-  QWidget* widget, const char* propertyName)
+  QWidget* widget, const char* propertyName, int smindex)
 {
   vtkSMProperty* smProperty = this->PropertyGroup->GetProperty(propertyName);
   if (smProperty)
     {
     this->addPropertyLink(
-      widget, "value", SIGNAL(valueChanged(int)), smProperty);
+      widget, "value", SIGNAL(valueChanged(int)), smProperty, smindex);
+    }
+  else
+    {
+    widget->hide();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyGroupWidget::addStringPropertyLink(
+  QWidget* widget, const char* propertyName, int smindex)
+{
+  vtkSMProperty* smProperty = this->PropertyGroup->GetProperty(propertyName);
+  if (smProperty)
+    {
+    this->addPropertyLink(
+      widget, "text", SIGNAL(editingFinished()), smProperty, smindex);
     }
   else
     {
@@ -134,13 +188,13 @@ void pqPropertyGroupWidget::addIntValuePropertyLink(
 
 //-----------------------------------------------------------------------------
 void pqPropertyGroupWidget::addCheckedPropertyLink(
-  QWidget* widget, const char* propertyName)
+  QWidget* widget, const char* propertyName, int smindex)
 {
   vtkSMProperty* smProperty = this->PropertyGroup->GetProperty(propertyName);
   if (smProperty)
     {
     this->addPropertyLink(
-      widget, "checked", SIGNAL(toggled(bool)), smProperty);
+      widget, "checked", SIGNAL(toggled(bool)), smProperty, smindex);
     }
   else
     {
