@@ -25,6 +25,8 @@
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
+#include <string>
+
 class vtkClientServerStream;
 class vtkPVServerOptionsInternals;
 
@@ -159,6 +161,24 @@ public:
   // Get the id that correspond to the current client
   vtkGetMacro(ClientId, int);
 
+  // Description:
+  // Whether the server was compiled with python support.
+  vtkSetMacro(PythonSupport, bool)
+  vtkGetMacro(PythonSupport, bool)
+  vtkBooleanMacro(PythonSupport, bool)
+
+  // Description:
+  // Whether the numpy module is available on the server.
+  vtkSetMacro(NumpySupport, bool)
+  vtkGetMacro(NumpySupport, bool)
+  vtkBooleanMacro(NumpySupport, bool)
+
+  // Description:
+  // If GetNumpySupport() is true, returns the version of numpy detected on the
+  // server.
+  void SetNumpyVersion(const std::string &_arg);
+  std::string GetNumpyVersion();
+
 protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation();
@@ -175,11 +195,28 @@ protected:
   int UseOffscreenRendering;
   int MultiClientsEnable;
   int ClientId;
+  bool PythonSupport;
+  bool NumpySupport;
+  std::string NumpyVersion;
 
   vtkPVServerOptionsInternals* MachinesInternals;
 
   vtkPVServerInformation(const vtkPVServerInformation&); // Not implemented
   void operator=(const vtkPVServerInformation&); // Not implemented
 };
+
+inline void vtkPVServerInformation::SetNumpyVersion(const std::string &_arg)
+{
+  if (_arg != this->NumpyVersion)
+    {
+    this->NumpyVersion = _arg;
+    this->Modified();
+    }
+}
+
+inline std::string vtkPVServerInformation::GetNumpyVersion()
+{
+  return this->NumpyVersion;
+}
 
 #endif
