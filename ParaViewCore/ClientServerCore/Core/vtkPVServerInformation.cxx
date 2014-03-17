@@ -13,19 +13,13 @@
 
 =========================================================================*/
 
-// Include vtkPython.h first to avoid warnings:
-#include "vtkPVConfig.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include "vtkPython.h"
-#include "vtkPythonInterpreter.h"
-#endif // PARAVIEW_ENABLE_PYTHON
-
 #include "vtkPVServerInformation.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVServerOptionsInternals.h"
 #include "vtkPVConfig.h"
@@ -80,10 +74,6 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->OGVSupport = 1;
 
   this->MachinesInternals = new vtkPVServerOptionsInternals;
-
-  this->PythonSupport = false;
-  this->NumpySupport = false;
-  this->NumpyVersion = "(no python support)";
 }
 
 //----------------------------------------------------------------------------
@@ -110,15 +100,6 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MPIInitialized: " << this->MPIInitialized << endl;
   os << indent << "MultiClientsEnable: " << this->MultiClientsEnable << endl;
   os << indent << "ClientId: " << this->ClientId << endl;
-  os << indent << "PythonSupport: " << this->PythonSupport << endl;
-  if (this->PythonSupport)
-    {
-    os << indent << "NumpySupport: " << this->NumpySupport << endl;
-    if (this->NumpySupport)
-      {
-      os << indent << "NumpyVersion: " << this->NumpyVersion << endl;
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -148,9 +129,6 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
   this->SetEyeSeparation(info->GetEyeSeparation());
   this->NumberOfProcesses = info->NumberOfProcesses;
   this->MPIInitialized = info->MPIInitialized;
-  this->SetPythonSupport(info->GetPythonSupport());
-  this->SetNumpySupport(info->GetNumpySupport());
-  this->SetNumpyVersion(info->GetNumpyVersion());
 }
 
 //----------------------------------------------------------------------------
@@ -206,31 +184,6 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
     {
     this->ClientId = 0;
     }
-
-  // Python support:
-  this->SetPythonSupport(false);
-  this->SetNumpySupport(false);
-  this->SetNumpyVersion("(no python support)");
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-  this->SetPythonSupport(true);
-
-  vtkPythonInterpreter::Initialize();
-  PyObject *numpyMod = PyImport_ImportModule("numpy");
-  this->SetNumpySupport(numpyMod != NULL);
-  if (numpyMod)
-    {
-    PyObject *numpyVersion = PyObject_GetAttrString(numpyMod, "__version__");
-    std::string version = "(numpy found, no version information)";
-    if (numpyVersion)
-      {
-      version = PyBytes_AsString(numpyVersion);
-      Py_XDECREF(numpyVersion);
-      }
-    this->SetNumpyVersion(version);
-    Py_XDECREF(numpyMod);
-    }
-#endif // PARAVIEW_ENABLE_PYTHON
 }
 
 //----------------------------------------------------------------------------
@@ -306,10 +259,6 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->ClientId = serverInfo->ClientId;
       }
     }
-
-  this->SetPythonSupport(serverInfo->GetPythonSupport());
-  this->SetNumpySupport(serverInfo->GetNumpySupport());
-  this->SetNumpyVersion(serverInfo->GetNumpyVersion());
 }
 
 //----------------------------------------------------------------------------
@@ -348,9 +297,6 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->GetEyeSeparation();
   *css << this->MultiClientsEnable;
   *css << this->ClientId;
-  *css << this->PythonSupport;
-  *css << this->NumpySupport;
-  *css << this->NumpyVersion;
   *css << vtkClientServerStream::End;
 }
 
@@ -525,23 +471,6 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing ClientId from message.");
     return;
     }
-  if(!css->GetArgument(0, epilogueOffset + 3, &this->PythonSupport))
-    {
-    vtkErrorMacro("Error parsing PythonSupport from message.");
-    return;
-    }
-  if(!css->GetArgument(0, epilogueOffset + 4, &this->NumpySupport))
-    {
-    vtkErrorMacro("Error parsing NumpySupport from message.");
-    return;
-    }
-  vtkStdString str;
-  if(!css->GetArgument(0, epilogueOffset + 5, &str))
-    {
-    vtkErrorMacro("Error parsing NumpyVersion from message.");
-    return;
-    }
-  this->SetNumpyVersion(str);
 }
 
 //----------------------------------------------------------------------------

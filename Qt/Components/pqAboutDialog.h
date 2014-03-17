@@ -56,8 +56,6 @@ protected:
   void AddServerInformation();
   void AddServerInformation(pqServer* server, QTreeWidget* tree);
 
-  std::string GetNumpyVersion();
-  
 private:
   Q_DISABLE_COPY(pqAboutDialog)
   Ui::pqAboutDialog* const Ui;

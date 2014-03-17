@@ -30,13 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// Include vtkPython.h first to avoid warnings:
-#include "vtkPVConfig.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include "vtkPython.h"
-#include "vtkPythonInterpreter.h"
-#endif // PARAVIEW_ENABLE_PYTHON
-
 #include "pqAboutDialog.h"
 #include "ui_pqAboutDialog.h"
 
@@ -46,9 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerResource.h"
 #include "QtTestingConfigure.h"
+#include "vtkNew.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
+#include "vtkPVPythonInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
 
 #include <QHeaderView>
@@ -137,13 +134,38 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "Architecture", PARAVIEW_BUILD_ARCHITECTURE);
 #endif
 
-#if defined(PARAVIEW_ENABLE_PYTHON)
-  ::addItem(tree, "Embedded Python", "On");
-  ::addItem(tree, "Numpy Version",
-            QString::fromStdString(this->GetNumpyVersion()));
-#else
-  ::addItem(tree, "Embedded Python", "Off");
-#endif
+  vtkNew<vtkPVPythonInformation> pythonInfo;
+  pythonInfo->CopyFromObject(NULL);
+
+  ::addItem(tree, "Embedded Python",
+            pythonInfo->GetPythonSupport() ? "On" : "Off");
+  if (pythonInfo->GetPythonSupport())
+    {
+    ::addItem(tree, "Python Library Path",
+              QString::fromStdString(pythonInfo->GetPythonPath()));
+    ::addItem(tree, "Python Library Version",
+              QString::fromStdString(pythonInfo->GetPythonVersion()));
+
+    ::addItem(tree, "Python Numpy Support",
+              pythonInfo->GetNumpySupport() ? "On" : "Off");
+    if (pythonInfo->GetNumpySupport())
+      {
+      ::addItem(tree, "Python Numpy Path",
+                QString::fromStdString(pythonInfo->GetNumpyPath()));
+      ::addItem(tree, "Python Numpy Version",
+                QString::fromStdString(pythonInfo->GetNumpyVersion()));
+      }
+
+    ::addItem(tree, "Python Matplotlib Support",
+              pythonInfo->GetMatplotlibSupport() ? "On" : "Off");
+    if (pythonInfo->GetMatplotlibSupport())
+      {
+      ::addItem(tree, "Python Matplotlib Path",
+                QString::fromStdString(pythonInfo->GetMatplotlibPath()));
+      ::addItem(tree, "Python Matplotlib Version",
+                QString::fromStdString(pythonInfo->GetMatplotlibVersion()));
+      }
+    }
 
 #if defined(QT_TESTING_WITH_PYTHON)
   ::addItem(tree, "Python Testing", "On");
@@ -229,41 +251,37 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     serverInfo->GetOGVSupport()? "On": "Off");
   ::addItem(tree, "Write AVI Animations",
     serverInfo->GetAVISupport()? "On": "Off");
-  ::addItem(tree, "Python Support",
-    serverInfo->GetPythonSupport() ? "On" : "Off");
-  ::addItem(tree, "Numpy Support",
-    serverInfo->GetNumpySupport() ? "On" : "Off");
-  ::addItem(tree, "Numpy Version",
-    QString::fromStdString(serverInfo->GetNumpyVersion()));
-}
 
-//-----------------------------------------------------------------------------
-std::string pqAboutDialog::GetNumpyVersion()
-{
-#ifdef PARAVIEW_ENABLE_PYTHON
-  vtkPythonInterpreter::Initialize();
-
-  PyObject *numpyMod = PyImport_ImportModule("numpy");
-  if (!numpyMod)
+  vtkSMSession *session = server->session();
+  vtkNew<vtkPVPythonInformation> pythonInfo;
+  session->GatherInformation(vtkPVSession::SERVERS, pythonInfo.GetPointer(), 0);
+  ::addItem(tree, "Embedded Python",
+            pythonInfo->GetPythonSupport() ? "On" : "Off");
+  if (pythonInfo->GetPythonSupport())
     {
-    return "(not found)";
+    ::addItem(tree, "Python Library Path",
+              QString::fromStdString(pythonInfo->GetPythonPath()));
+    ::addItem(tree, "Python Library Version",
+              QString::fromStdString(pythonInfo->GetPythonVersion()));
+
+    ::addItem(tree, "Python Numpy Support",
+              pythonInfo->GetNumpySupport() ? "On" : "Off");
+    if (pythonInfo->GetNumpySupport())
+      {
+      ::addItem(tree, "Python Numpy Path",
+                QString::fromStdString(pythonInfo->GetNumpyPath()));
+      ::addItem(tree, "Python Numpy Version",
+                QString::fromStdString(pythonInfo->GetNumpyVersion()));
+      }
+
+    ::addItem(tree, "Python Matplotlib Support",
+              pythonInfo->GetMatplotlibSupport() ? "On" : "Off");
+    if (pythonInfo->GetMatplotlibSupport())
+      {
+      ::addItem(tree, "Python Matplotlib Path",
+                QString::fromStdString(pythonInfo->GetMatplotlibPath()));
+      ::addItem(tree, "Python Matplotlib Version",
+                QString::fromStdString(pythonInfo->GetMatplotlibVersion()));
+      }
     }
-
-  PyObject *numpyVersion = PyObject_GetAttrString(numpyMod, "__version__");
-  if (!numpyVersion)
-    {
-    Py_XDECREF(numpyMod);
-    return "(numpy found, no version information)";
-    }
-
-  std::string result = PyBytes_AsString(numpyVersion);
-
-  Py_XDECREF(numpyMod);
-  Py_XDECREF(numpyVersion);
-  return result;
-#else
-  return "(no python support)";
-#endif // PARAVIEW_ENABLE_PYTHON
-
 }
-
