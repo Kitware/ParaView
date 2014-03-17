@@ -597,7 +597,7 @@ bool vtkSMParaViewPipelineController::PostInitializeProxyInternal(vtkSMProxy* pr
     this->Internals->InitializationTimeStamps.find(proxy);
   assert(titer != this->Internals->InitializationTimeStamps.end());
 
-  vtkTimeStamp& ts = titer->second;
+  vtkTimeStamp ts = titer->second;
   this->Internals->InitializationTimeStamps.erase(titer);
 
   // ensure everything is up-to-date.
