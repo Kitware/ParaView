@@ -284,7 +284,7 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
     info->Has(vtkDataObject::FIELD_NAME()))
     {
     colorArrayName = info->Get(vtkDataObject::FIELD_NAME());
-    int fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
+    fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
     }
 
   activeMapper->SelectScalarArray(colorArrayName);
@@ -314,7 +314,6 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
     }
   this->Actor->SetMapper(activeMapper);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkUnstructuredGridVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)

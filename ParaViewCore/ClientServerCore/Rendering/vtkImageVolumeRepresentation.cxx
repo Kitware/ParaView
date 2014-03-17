@@ -239,7 +239,7 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     info->Has(vtkDataObject::FIELD_NAME()))
     {
     colorArrayName = info->Get(vtkDataObject::FIELD_NAME());
-    int fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
+    fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
     }
 
   this->VolumeMapper->SelectScalarArray(colorArrayName);
@@ -256,6 +256,8 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
     }
 
   this->Actor->SetMapper(this->VolumeMapper);
+  // this is necessary since volume mappers don't like empty arrays.
+  this->Actor->SetVisibility(colorArrayName != NULL && colorArrayName[0] != 0);
 }
 
 //----------------------------------------------------------------------------

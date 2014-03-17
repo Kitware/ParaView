@@ -47,7 +47,7 @@ public:
   // Description:
   // Does this prop have some translucent polygonal geometry?
   virtual int HasTranslucentPolygonalGeometry();
-  
+
   // Description:
   // Release any graphics resources that are being consumed by this actor.
   // The parameter window could be used to determine which graphic
@@ -88,23 +88,23 @@ protected:
   vtkPVLODVolume();
   ~vtkPVLODVolume();
 
+  // Description:
+  // Since volume mapper are notorious for segfaulting when the scalar array is
+  // missing we use this method to validate that we can actually render the
+  // data.
+  bool CanRender();
+
   vtkLODProp3D *LODProp;
   int HighLODId;
   int LowLODId;
   int EnableLOD;
-
   int SelectLOD();
-
   double MapperBounds[6];
   vtkTimeStamp BoundsMTime;
-
   virtual void UpdateLODProperty();
-
 private:
   vtkPVLODVolume(const vtkPVLODVolume&); // Not implemented.
   void operator=(const vtkPVLODVolume&); // Not implemented.
 };
 
 #endif
-
-

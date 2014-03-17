@@ -210,7 +210,7 @@
         <IntRangeDomain name="range" />
       </IntVectorProperty>
       <IntVectorProperty command="SetVectorMode"
-                         default_values="1"
+                         default_values="0"
                          name="VectorMode"
                          number_of_elements="1"
                          panel_visibility="never" >

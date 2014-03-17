@@ -14,21 +14,18 @@
 =========================================================================*/
 #include "vtkPVLODVolume.h"
 
-#include "vtkAbstractVolumeMapper.h"
+#include "vtkDataSet.h"
+#include "vtkImageData.h"
 #include "vtkLODProp3D.h"
 #include "vtkMapper.h"
-#include "vtkProperty.h"
-#include "vtkVolumeProperty.h"
-#include "vtkColorTransferFunction.h"
 #include "vtkMath.h"
-#include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkTexture.h"
-#include "vtkTimerLog.h"
 #include "vtkTransform.h"
+#include "vtkUnstructuredGridBase.h"
+#include "vtkUnstructuredGridVolumeMapper.h"
+#include "vtkVolumeMapper.h"
+#include "vtkVolumeProperty.h"
 
 #include <math.h>
 
@@ -78,10 +75,47 @@ int vtkPVLODVolume::SelectLOD()
 }
 
 
+//-----------------------------------------------------------------------------
+bool vtkPVLODVolume::CanRender()
+{
+  int lodid =this->LODProp->GetSelectedLODID();
+  if (lodid >= 0)
+    {
+    vtkAbstractMapper3D* mapper = this->LODProp->GetLODMapper(lodid);
+    if (vtkVolumeMapper* imageVolumeMapper = vtkVolumeMapper::SafeDownCast(mapper))
+      {
+      int unused = 0;
+      vtkDataSet* input = imageVolumeMapper->GetInput();
+      vtkDataArray* scalars = input == NULL? NULL :
+        vtkAbstractMapper::GetScalars(input,
+          imageVolumeMapper->GetScalarMode(),
+          imageVolumeMapper->GetArrayAccessMode(),
+          imageVolumeMapper->GetArrayId(),
+          imageVolumeMapper->GetArrayName(),
+          unused);
+      return scalars != NULL;
+      }
+    else if (vtkUnstructuredGridVolumeMapper* ugMapper = vtkUnstructuredGridVolumeMapper::SafeDownCast(mapper))
+      {
+      int unused = 0;
+      vtkDataSet* input = ugMapper->GetInput();
+      vtkDataArray* scalars = input == NULL? NULL :
+        vtkAbstractMapper::GetScalars(input,
+          ugMapper->GetScalarMode(),
+          ugMapper->GetArrayAccessMode(),
+          ugMapper->GetArrayId(),
+          ugMapper->GetArrayName(),
+          unused);
+      return scalars != NULL;
+      }
+    }
+  return true;
+}
 
 //-----------------------------------------------------------------------------
 int vtkPVLODVolume::RenderOpaqueGeometry(vtkViewport *vp)
 {
+  if (!this->CanRender()) { return 1; }
   int retval = this->LODProp->RenderOpaqueGeometry(vp);
 
   this->EstimatedRenderTime = this->LODProp->GetEstimatedRenderTime();
@@ -92,6 +126,7 @@ int vtkPVLODVolume::RenderOpaqueGeometry(vtkViewport *vp)
 //-----------------------------------------------------------------------------
 int vtkPVLODVolume::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
 {
+  if (!this->CanRender()) { return 1; }
   int retval = this->LODProp->RenderTranslucentPolygonalGeometry(vp);
 
   this->EstimatedRenderTime = this->LODProp->GetEstimatedRenderTime();
@@ -103,6 +138,7 @@ int vtkPVLODVolume::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
 //-----------------------------------------------------------------------------
 int vtkPVLODVolume::RenderVolumetricGeometry(vtkViewport *vp)
 {
+  if (!this->CanRender()) { return 1; }
   int retval = this->LODProp->RenderVolumetricGeometry(vp);
 
   this->EstimatedRenderTime = this->LODProp->GetEstimatedRenderTime();
@@ -269,6 +305,7 @@ void vtkPVLODVolume::SetMapper(vtkAbstractVolumeMapper *mapper)
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVLODVolume::SetLODMapper(vtkAbstractVolumeMapper *mapper)
 {
   if (this->LowLODId >= 0)
@@ -285,6 +322,7 @@ void vtkPVLODVolume::SetLODMapper(vtkAbstractVolumeMapper *mapper)
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVLODVolume::SetLODMapper(vtkMapper *mapper)
 {
   if (this->LowLODId >= 0)
