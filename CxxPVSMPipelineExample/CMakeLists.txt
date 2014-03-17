@@ -5,7 +5,7 @@ set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
 if(USE_CATALYST)
   # We have a C++ pipeline so we don't need to link with Python
   # or vtkPVPythonCatalyst since vtkPVCatalyst is sufficient.
-  find_package(ParaView 3.98 REQUIRED COMPONENTS vtkPVCatalyst vtkPVVTKExtensionsDefault)
+  find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVCatalyst vtkPVVTKExtensionsDefault vtkParallelMPI)
   include("${PARAVIEW_USE_FILE}")
   set(Adaptor_SRCS
     FEAdaptor.cxx
@@ -22,11 +22,16 @@ else()
   include_directories(${MPI_CXX_INCLUDE_PATH})
 endif()
 
-
 add_executable(FEDriver FEDriver.cxx FEDataStructures.cxx)
 if(USE_CATALYST)
-  target_link_libraries(FEDriver Adaptor)
+  target_link_libraries(FEDriver Adaptor ${VTK_LIBRARIES})
 else()
   target_link_libraries(FEDriver ${MPI_LIBRARIES})
 endif()
 
+option(BUILD_TESTING "Build Testing" OFF)
+# Setup testing.
+if (BUILD_TESTING)
+  include(CTest)
+  add_test(CxxPVSMPipelineExampleTest FEDriver 5 output)
+endif()
