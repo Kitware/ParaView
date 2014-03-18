@@ -95,7 +95,7 @@ public:
   // be created. This may returns NULL if animation scene proxy is not available
   // in the session.
   virtual vtkSMProxy* GetAnimationScene(vtkSMSession* session);
- 
+
   // Description:
   // Return the animation track for time, if any. Returns NULL if none exists.
   virtual vtkSMProxy* FindTimeAnimationTrack(vtkSMProxy* scene);
@@ -128,7 +128,7 @@ protected:
   // particular group (reggroup). Returns the first proxy found, if any.
   vtkSMProxy* FindProxy(vtkSMSessionProxyManager* pxm,
     const char* reggroup, const char* xmlgroup, const char* xmltype);
- 
+
   // Description:
   // Creates new proxies for proxies referred in vtkSMProxyListDomain for any of
   // the properties for the given proxy.
@@ -142,6 +142,11 @@ protected:
 
   virtual bool PreInitializeProxyInternal(vtkSMProxy*);
   virtual bool PostInitializeProxyInternal(vtkSMProxy*);
+
+  // Description:
+  // Proxies in proxy-list domains can have hints that are used to setup
+  // property-links to ensure that those proxies get appropriate domains.
+  virtual void ProcessProxyListProxyHints(vtkSMProxy* parent, vtkSMProxy* proxyFromDomain);
 
 private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&); // Not implemented
