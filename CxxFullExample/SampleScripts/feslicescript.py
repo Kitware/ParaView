@@ -15,17 +15,17 @@ def CreateCoProcessor():
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
       filename_3_pvtu = coprocessor.CreateProducer( datadescription, "input" )
-      
+
       Slice1 = Slice( guiName="Slice1", Crinkleslice=0, SliceOffsetValues=[0.0], Triangulatetheslice=1, SliceType="Plane" )
       Slice1.SliceType.Offset = 0.0
       Slice1.SliceType.Origin = [34.5, 32.45, 27.95]
       Slice1.SliceType.Normal = [1.0, 0.0, 0.0]
-      
+
       ParallelPolyDataWriter1 = coprocessor.CreateWriter( XMLPPolyDataWriter, "slice_%t.pvtp", 10 )
-      
+
       SetActiveSource(filename_3_pvtu)
       ParallelUnstructuredGridWriter1 = coprocessor.CreateWriter( XMLPUnstructuredGridWriter, "fullgrid_%t.pvtu", 100 )
-      
+
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):
