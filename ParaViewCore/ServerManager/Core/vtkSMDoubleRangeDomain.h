@@ -23,7 +23,7 @@
 
 // Tell the template header how to give our superclass a DLL interface.
 #if !defined(__vtkSMDoubleRangeDomain_cxx)
-# define VTK_DATA_ARRAY_TEMPLATE_TYPE int
+# define VTK_DATA_ARRAY_TEMPLATE_TYPE double
 #endif
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
@@ -84,5 +84,9 @@ private:
 
   typedef vtkSMRangeDomainTemplate<double> RealSuperclass;
 };
+
+#if !defined(__vtkSMDoubleRangeDomain_cxx)
+# undef VTK_DATA_ARRAY_TEMPLATE_TYPE
+#endif
 
 #endif
