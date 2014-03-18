@@ -6,8 +6,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkTable.h"
 
-#include <set>
 #include <string>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // Internal class that holds selected columns
@@ -26,7 +26,15 @@ public:
 
   bool Has(const std::string& v)
   {
-    return this->Columns.find(v) != this->Columns.end();
+    std::size_t len = this->Columns.size();
+    for (std::size_t i = 0; i < len; i++)
+      {
+      if (this->Columns[i] == v)
+        {
+        return true;
+        }
+      }
+    return false;
   }
 
   bool Set(const std::string& v)
@@ -35,11 +43,11 @@ public:
     {
     return false;
     }
-  this->Columns.insert(v);
+  this->Columns.push_back(v);
   return true;
   }
 
-  std::set<std::string> Columns;
+  std::vector<std::string> Columns;
 };
 
 //----------------------------------------------------------------------------
@@ -100,7 +108,7 @@ int vtkPVTransposeTable::RequestData(vtkInformation*,
 
   // Construct a table that holds only the selected columns
   vtkNew<vtkTable> subTable;
-  std::set<std::string>::iterator iter = this->Internal->Columns.begin();
+  std::vector<std::string>::iterator iter = this->Internal->Columns.begin();
   if (this->GetUseIdColumn())
     {
     if (vtkAbstractArray* arr = inTable->GetColumnByName(this->GetIdColumnName()))
