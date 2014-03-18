@@ -92,8 +92,6 @@ set (Module_SRCS
   pqClipPanel.h
   pqCollaborationPanel.cxx
   pqCollaborationPanel.h
-  pqColorMapEditor.cxx
-  pqColorMapEditor.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorPresetManager.cxx
@@ -442,7 +440,6 @@ set (Module_MOC_HDRS
   pqChangeInputDialog.h
   pqClipPanel.h
   pqCollaborationPanel.h
-  pqColorMapEditor.h
   pqColorMapModel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
@@ -608,7 +605,6 @@ set (Module_UI_FILES
   Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChangeInputDialog.ui
   Resources/UI/pqCollaborationPanel.ui
-  Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqComparativeParameterRangeDialog.ui
   Resources/UI/pqComparativeVisPanel.ui

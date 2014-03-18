@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkWeakPointer.h"
+#include "pqScalarBarVisibilityReaction.h"
 
 #include <QDialog>
 #include <QKeyEvent>
@@ -81,6 +82,7 @@ public:
   Ui::ColorMapEditor Ui;
   QPointer<pqProxyWidget> ProxyWidget;
   QPointer<pqDataRepresentation> ActiveRepresentation;
+  QPointer<QAction> ScalarBarVisibilityAction;
   unsigned long ObserverId;
 
   pqInternals(pqColorMapEditor* self) : ObserverId(0)
@@ -109,8 +111,6 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
                    this, SLOT(updatePanel()));
   QObject::connect(this->Internals->Ui.SearchLineEdit, SIGNAL(textChanged(QString)),
                    this, SLOT(updatePanel()));
-  QObject::connect(this->Internals->Ui.ShowScalarBar, SIGNAL(clicked(bool)),
-                   this, SLOT(showScalarBar(bool)));
   QObject::connect(this->Internals->Ui.EditScalarBar, SIGNAL(clicked()),
                    this, SLOT(editScalarBar()));
   QObject::connect(this->Internals->Ui.SaveAsDefault, SIGNAL(clicked()),
@@ -119,7 +119,18 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
                    this, SLOT(setAutoUpdate(bool)));
   QObject::connect(this->Internals->Ui.Update, SIGNAL(clicked()),
                    this, SLOT(renderViews()));
- 
+
+  // Let pqScalarBarVisibilityReaction do the heavy lifting for managing the
+  // show-scalar bar button.
+  QAction* showSBAction = new QAction(this);
+  this->Internals->ScalarBarVisibilityAction = showSBAction;
+  this->Internals->Ui.ShowScalarBar->connect(
+    showSBAction, SIGNAL(toggled(bool)), SLOT(setChecked(bool)));
+  showSBAction->connect(
+    this->Internals->Ui.ShowScalarBar, SIGNAL(clicked(bool)), SLOT(trigger()));
+  this->connect(showSBAction, SIGNAL(changed()), SLOT(updateScalarBarButtons()));
+  new pqScalarBarVisibilityReaction(showSBAction);
+
   pqActiveObjects *activeObjects = &pqActiveObjects::instance();
   this->connect(activeObjects, SIGNAL(representationChanged(pqDataRepresentation*)),
     this, SLOT(updateActive()));
@@ -129,10 +140,9 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
     {
     this->Internals->Ui.AdvancedButton->setChecked(
       settings->value("showAdvancedPropertiesColorMapEditor", false).toBool());
-    this->Internals->Ui.AutoUpdate->setChecked( 
+    this->Internals->Ui.AutoUpdate->setChecked(
       settings->value("autoUpdateColorMapEditor", false).toBool());
     }
-
   this->updateActive();
 }
 
@@ -183,9 +193,6 @@ void pqColorMapEditor::updateActive()
     {
     this->setColorTransferFunction(NULL);
     }
-
-  // check if there's a scalar-bar to show/edit for the current state.
-  this->updateScalarBarButtons();
 }
 
 //-----------------------------------------------------------------------------
@@ -261,46 +268,10 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::updateScalarBarButtons()
 {
-  vtkSMProxy* lutProxy = NULL;
-  vtkSMProxy* viewProxy = NULL;
-  vtkSMProxy* sb = NULL;
-  if (this->Internals->ProxyWidget &&
-    this->Internals->ActiveRepresentation)
-    {
-    lutProxy = this->Internals->ProxyWidget->proxy();
-    viewProxy = this->Internals->ActiveRepresentation->getView()->getProxy();
-    sb = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(lutProxy, viewProxy);
-    }
-
   Ui::ColorMapEditor& ui = this->Internals->Ui;
-  ui.ShowScalarBar->setEnabled(viewProxy != NULL);
-  bool sb_visible = (sb != NULL && vtkSMPropertyHelper(sb, "Visibility").GetAsInt() != 0);
-  ui.ShowScalarBar->setChecked(sb_visible);
-  // ^--- this won't trigger clicked(bool)
-  //      and hence this->showScalarBar() won't be called.
-  ui.EditScalarBar->setEnabled(sb != NULL && sb_visible);
-}
-
-//-----------------------------------------------------------------------------
-void pqColorMapEditor::showScalarBar(bool show_sb)
-{
-  Q_ASSERT(this->Internals->ActiveRepresentation);
-  if (show_sb)
-    {
-    BEGIN_UNDO_SET("Show scalar bar");
-    }
-  else
-    {
-    BEGIN_UNDO_SET("Hide scalar bar");
-    }
-
-  vtkSMProxy* viewProxy = this->Internals->ActiveRepresentation->getView()->getProxy();
-  vtkSMPVRepresentationProxy::SetScalarBarVisibility(
-    this->Internals->ActiveRepresentation->getProxy(),
-    viewProxy, show_sb);
-  this->updateScalarBarButtons();
-  this->renderViews();
-  END_UNDO_SET();
+  bool can_show_sb = this->Internals->ScalarBarVisibilityAction->isEnabled();
+  ui.ShowScalarBar->setEnabled(can_show_sb);
+  ui.EditScalarBar->setEnabled(can_show_sb);
 }
 
 //-----------------------------------------------------------------------------

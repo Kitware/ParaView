@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqColorMapEditor_h
 #define __pqColorMapEditor_h
 
-#include "pqComponentsModule.h"
+#include "pqApplicationComponentsModule.h"
 #include <QWidget>
 
 class vtkSMProxy;
@@ -44,7 +44,7 @@ class pqDataRepresentation;
 /// Custom widgets such as pqColorOpacityEditorWidget,
 /// pqColorAnnotationsPropertyWidget, and others are used to
 /// control certain properties on the proxy.
-class PQCOMPONENTS_EXPORT pqColorMapEditor : public QWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqColorMapEditor : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
@@ -62,9 +62,6 @@ protected slots:
   /// render's view when transfer function is modified.
   void renderViews();
 
-  /// called when the "ShowScalarBar"  button is clicked.
-  void showScalarBar(bool);
-
   /// Pops up the scalar bar edit widget.
   void editScalarBar();
 
@@ -78,6 +75,8 @@ protected slots:
 protected:
   void setDataRepresentation(pqDataRepresentation* repr);
   void setColorTransferFunction(vtkSMProxy* ctf);
+protected slots:
+  /// update the enabled state for show/edit scalar bar buttons.
   void updateScalarBarButtons();
 
 private:

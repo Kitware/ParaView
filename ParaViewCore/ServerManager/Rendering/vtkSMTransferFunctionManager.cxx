@@ -102,7 +102,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
       }
     }
   controller->PostInitializeProxy(proxy);
-  pxm->RegisterProxy("lookup_tables", proxy);
+  pxm->RegisterProxy("lookup_tables", proxyName.str().c_str(), proxy);
   proxy->FastDelete();
   return proxy;
 }

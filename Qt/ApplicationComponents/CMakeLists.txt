@@ -69,6 +69,8 @@ set (Module_SRCS
   pqColorAnnotationsPropertyWidget.h
   pqColorEditorPropertyWidget.cxx
   pqColorEditorPropertyWidget.h
+  pqColorMapEditor.cxx
+  pqColorMapEditor.h
   pqColorOpacityEditorWidget.cxx
   pqColorOpacityEditorWidget.h
   pqColorSelectorPropertyWidget.cxx
@@ -260,10 +262,11 @@ set (Module_MOC_HDRS
   pqChartSelectionReaction.h
   pqClipScalarsDecorator.h
   pqCollaborationBehavior.h
-  pqColorOpacityEditorWidget.h
-  pqColorSelectorPropertyWidget.h
   pqColorAnnotationsPropertyWidget.h
   pqColorEditorPropertyWidget.h
+  pqColorMapEditor.h
+  pqColorOpacityEditorWidget.h
+  pqColorSelectorPropertyWidget.h
   pqColorTableModel.h
   pqColorToolbar.h
   pqCommandButtonPropertyWidget.h
@@ -368,6 +371,7 @@ set (Module_UI_FILES
   Resources/UI/pqCameraToolbar.ui
   Resources/UI/pqColorAnnotationsPropertyWidget.ui
   Resources/UI/pqColorEditorPropertyWidget.ui
+  Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqColorOpacityEditorWidget.ui
   Resources/UI/pqColorToolbar.ui
   Resources/UI/pqDefaultMainWindow.ui
