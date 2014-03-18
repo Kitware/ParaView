@@ -18,16 +18,17 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <cassert>
 #include <map>
@@ -472,6 +473,77 @@ bool vtkSMParaViewPipelineController::PostInitializeRepresentation(vtkSMProxy* p
 
   // Now register the proxy itself.
   proxy->GetSessionProxyManager()->RegisterProxy("representations", proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::AddRepresentationToView(
+  vtkSMProxy* view, vtkSMProxy* repr)
+{
+  if (!view || !repr)
+    {
+    return false;
+    }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(view->GetProperty("Representations"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to locate \"Representations\" property on the view");
+    return false;
+    }
+  if (!pp->IsProxyAdded(repr))
+    {
+    pp->AddProxy(repr);
+    view->UpdateVTKObjects();
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RemoveRepresentationFromView(vtkSMProxy* view, vtkSMProxy* repr)
+{
+  if (!view || !repr)
+    {
+    return false;
+    }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(view->GetProperty("Representations"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to locate \"Representations\" property on the view");
+    return false;
+    }
+  if (pp->IsProxyAdded(repr))
+    {
+    pp->RemoveProxy(repr);
+    view->UpdateVTKObjects();
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::Show(vtkSMProxy* view, vtkSMProxy* repr)
+{
+  if (this->AddRepresentationToView(view, repr))
+    {
+    vtkSMPropertyHelper(repr, "Visibility").Set(1);
+    repr->UpdateVTKObjects();
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::Hide(vtkSMProxy* view, vtkSMProxy* repr)
+{
+  if (!repr)
+    {
+    return false;
+    }
+
+  (void)view;
+  vtkSMPropertyHelper(repr, "Visibility").Set(0);
+  repr->UpdateVTKObjects();
   return true;
 }
 

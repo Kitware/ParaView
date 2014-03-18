@@ -74,6 +74,15 @@ public:
   virtual bool PreInitializeRepresentation(vtkSMProxy* proxy);
   virtual bool PostInitializeRepresentation(vtkSMProxy* proxy);
 
+  // Description:
+  // Use these methods to add/remove or show/hide representations in a view
+  // (instead of directly updating the properties). This makes it possible to
+  // add application logic around those actions.
+  virtual bool AddRepresentationToView(vtkSMProxy* view, vtkSMProxy* repr);
+  virtual bool RemoveRepresentationFromView(vtkSMProxy* view, vtkSMProxy* repr);
+  virtual bool Show(vtkSMProxy* view, vtkSMProxy* repr);
+  virtual bool Hide(vtkSMProxy* view, vtkSMProxy* repr);
+
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
 

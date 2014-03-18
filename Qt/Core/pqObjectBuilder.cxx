@@ -492,9 +492,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
 
   // Add the reprProxy to render module.
   vtkSMProxy* viewModuleProxy = view->getProxy();
-  pqSMAdaptor::addProxyProperty(
-    viewModuleProxy->GetProperty("Representations"), reprProxy);
-  viewModuleProxy->UpdateVTKObjects();
+  pqObjectBuilderNS::Controller->Show(viewModuleProxy, reprProxy);
 
   pqApplicationCore* core= pqApplicationCore::instance();
   pqDataRepresentation* repr = core->getServerManagerModel()->
