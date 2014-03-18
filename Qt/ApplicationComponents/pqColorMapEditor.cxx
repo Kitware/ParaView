@@ -37,17 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqProxyWidget.h"
+#include "pqScalarBarVisibilityReaction.h"
 #include "pqSettings.h"
-#include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkWeakPointer.h"
-#include "pqScalarBarVisibilityReaction.h"
 
-#include <QDialog>
 #include <QKeyEvent>
 #include <QPointer>
 #include <QVBoxLayout>

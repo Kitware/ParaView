@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include "pqApplicationCore.h"
-#include "pqHelperProxyStateLoader.h"
 #include "pqInterfaceTracker.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -533,8 +532,8 @@ void pqServerManagerModel::onConnectionClosed(vtkIdType id)
 void pqServerManagerModel::onStateLoaded(vtkPVXMLElement* root,
   vtkSMProxyLocator* locator)
 {
-  pqHelperProxyStateLoader loader;
-  loader.loadState(root, locator);
+  Q_UNUSED(root);
+  Q_UNUSED(locator);
 }
 
 //-----------------------------------------------------------------------------

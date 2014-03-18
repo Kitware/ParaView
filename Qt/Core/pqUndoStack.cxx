@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 #include "pqApplicationCore.h"
-#include "pqHelperProxyRegisterUndoElement.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqServer.h"
 #include "vtkEventQtSlotConnect.h"

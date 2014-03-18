@@ -127,9 +127,6 @@ public:
   virtual void addHelperProxy(const QString& key, vtkSMProxy*);
   void removeHelperProxy(const QString& key, vtkSMProxy*);
 
-  /// Unregisters all helper proxies.
-  void clearHelperProxies();
-
   /// Updates the internal datastructures using the proxies currently registered
   /// under the group that would be used for helper proxies. This makes it
   /// possible to locate helper proxies created from Python.

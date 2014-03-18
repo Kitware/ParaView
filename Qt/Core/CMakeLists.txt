@@ -91,10 +91,6 @@ set(Module_SRCS
   pqFormBuilder.h
   pqGraphLayoutStrategyInterface.cxx
   pqGraphLayoutStrategyInterface.h
-  pqHelperProxyRegisterUndoElement.cxx
-  pqHelperProxyRegisterUndoElement.h
-  pqHelperProxyStateLoader.cxx
-  pqHelperProxyStateLoader.h
   pqHistogramTableModel.cxx
   pqHistogramTableModel.h
   pqImageUtil.cxx
@@ -258,7 +254,6 @@ set (Module_MOC_HDRS
   pqFileDialogRecentDirsModel.h
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.h
-  pqHelperProxyStateLoader.h
   pqHistogramTableModel.h
   pqInterfaceTracker.h
   pqLinksModel.h
