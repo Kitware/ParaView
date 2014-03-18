@@ -1331,12 +1331,12 @@
       </DoubleVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetTitle"
-                            default_values=""
+                            default_values="Name"
                             name="Title"
                             number_of_elements="1"></StringVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetComponentTitle"
-                            default_values=""
+                            default_values="Component"
                             name="ComponentTitle"
                             number_of_elements="1"></StringVectorProperty>
       <IntVectorProperty command="SetAutomaticLabelFormat"

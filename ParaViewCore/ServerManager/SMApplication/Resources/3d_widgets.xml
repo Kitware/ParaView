@@ -356,7 +356,7 @@
       scalar bar including a widget to control the position and orientation of
       the scalar bar.</Documentation>
       <IntVectorProperty command="SetEnabled"
-                         default_values="0"
+                         default_values="1"
                          name="Enabled"
                          number_of_elements="1"
                          panel_visibility="never" >

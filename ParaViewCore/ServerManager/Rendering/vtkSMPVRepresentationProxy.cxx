@@ -425,12 +425,15 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
   vtkSMPropertyHelper(sbProxy, "Enabled").Set(1);
   vtkSMPropertyHelper(sbProxy, "Visibility").Set(1);
 
-  vtkSMPropertyHelper titleHelper (sbProxy, "Title");
-  if (strcmp(titleHelper.GetAsString(0),"") == 0)
+  vtkSMProperty* titleProp = sbProxy->GetProperty("Title");
+  vtkSMProperty* compProp = sbProxy->GetProperty("ComponentTitle");
+  if (titleProp && compProp &&
+      titleProp->IsValueDefault() &&
+      compProp->IsValueDefault())
     {
-    // FIXME: set title properly.
-    titleHelper.Set(
-      vtkSMPropertyHelper(this->GetProperty("ColorArrayName")).GetAsString(0));
+    vtkSMPropertyHelper(titleProp).Set(
+      vtkSMPropertyHelper(this, "ColorArrayName").GetInputArrayNameToProcess());
+    vtkSMPropertyHelper(compProp).Set("FIXME");
     }
   sbProxy->UpdateVTKObjects();
   return true;

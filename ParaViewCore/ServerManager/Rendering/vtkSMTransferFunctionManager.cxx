@@ -175,6 +175,10 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(scalarBarProxy);
   vtkSMPropertyHelper(scalarBarProxy, "LookupTable").Set(colorTransferFunction);
+  // FIXME:
+  vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(12);
+  vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(12);
+
   controller->PostInitializeProxy(scalarBarProxy);
 
   pxm->RegisterProxy("scalar_bars", scalarBarProxy);
