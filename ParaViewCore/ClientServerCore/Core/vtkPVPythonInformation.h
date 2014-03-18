@@ -59,14 +59,34 @@ public:
   // Description:
   // If GetPythonSupport() is true, returns the version of python detected on
   // the server.
-  vtkSetMacro(PythonVersion, std::string)
-  vtkGetMacro(PythonVersion, std::string)
+  void SetPythonVersion(const std::string &arg)
+  {
+    if (arg != this->PythonVersion)
+      {
+      this->PythonVersion = arg;
+      this->Modified();
+      }
+  }
+  const std::string& GetPythonVersion()
+  {
+    return this->PythonVersion;
+  }
 
   // Description:
   // If GetPythonSupport() is true, returns the path to the python libraries
   // detected on the server.
-  vtkSetMacro(PythonPath, std::string)
-  vtkGetMacro(PythonPath, std::string)
+  void SetPythonPath(const std::string &arg)
+  {
+    if (arg != this->PythonPath)
+      {
+      this->PythonPath = arg;
+      this->Modified();
+      }
+  }
+  const std::string& GetPythonPath()
+  {
+    return this->PythonPath;
+  }
 
   // Description:
   // Whether the numpy module is available on the server.
@@ -77,14 +97,34 @@ public:
   // Description:
   // If GetNumpySupport() is true, returns the version of numpy detected on the
   // server.
-  vtkSetMacro(NumpyVersion, std::string)
-  vtkGetMacro(NumpyVersion, std::string)
+  void SetNumpyVersion(const std::string &arg)
+  {
+    if (arg != this->NumpyVersion)
+      {
+      this->NumpyVersion = arg;
+      this->Modified();
+      }
+  }
+  const std::string& GetNumpyVersion()
+  {
+    return this->NumpyVersion;
+  }
 
   // Description:
   // If GetNumpySupport() is true, returns the path to numpy detected on the
   // server.
-  vtkSetMacro(NumpyPath, std::string)
-  vtkGetMacro(NumpyPath, std::string)
+  void SetNumpyPath(const std::string &arg)
+  {
+    if (arg != this->NumpyPath)
+      {
+      this->NumpyPath = arg;
+      this->Modified();
+      }
+  }
+  const std::string& GetNumpyPath()
+  {
+    return this->NumpyPath;
+  }
 
   // Description:
   // Whether the matplotlib module is available on the server.
@@ -95,14 +135,34 @@ public:
   // Description:
   // If GetMatplotlibSupport() is true, returns the version of matplotlib
   // detected on the server.
-  vtkSetMacro(MatplotlibVersion, std::string)
-  vtkGetMacro(MatplotlibVersion, std::string)
+  void SetMatplotlibVersion(const std::string &arg)
+  {
+    if (arg != this->MatplotlibVersion)
+      {
+      this->MatplotlibVersion = arg;
+      this->Modified();
+      }
+  }
+  const std::string& GetMatplotlibVersion()
+  {
+    return this->MatplotlibVersion;
+  }
 
   // Description:
   // If GetMatplotlibSupport() is true, returns the path to matplotlib detected
   // on the server.
-  vtkSetMacro(MatplotlibPath, std::string)
-  vtkGetMacro(MatplotlibPath, std::string)
+  void SetMatplotlibPath(const std::string &arg)
+  {
+    if (arg != this->MatplotlibPath)
+      {
+      this->MatplotlibPath = arg;
+      this->Modified();
+      }
+  }
+  const std::string& GetMatplotlibPath()
+  {
+    return this->MatplotlibPath;
+  }
 
 protected:
   vtkPVPythonInformation();
