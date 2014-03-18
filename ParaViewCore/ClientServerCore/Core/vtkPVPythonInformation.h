@@ -23,7 +23,7 @@
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-#include <string>
+#include <string> // for string type
 
 class vtkClientServerStream;
 
