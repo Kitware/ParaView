@@ -20,26 +20,27 @@
 
 FIND_PACKAGE( Qt5Core QUIET )
 
-IF( NOT DEFINED Qt5_FIND_COMPONENTS )
+IF( NOT Qt5_FIND_COMPONENTS )
   SET (Qt5_FIND_COMPONENTS
+    Concurrent
     Core
-    Gui
     DBus
-    Designer
     Declarative
+    Designer
+    Gui
+    Help
+    Network
+    OpenGL
+    PrintSupport
     Script
     ScriptTools
-    Network
-    Test
-    Xml
     Svg
-    Widgets
-    PrintSupport
-    Concurrent
+    Test
     UiTools
     WebKit
     WebKitWidgets
-    OpenGL
+    Widgets
+    Xml
     )
 ENDIF()
 
@@ -72,4 +73,10 @@ IF( Qt5Core_FOUND )
   IF( TARGET Qt5::qdbusxml2cpp )
     GET_TARGET_PROPERTY(QT_QDBUSXML2CPP_EXECUTABLE Qt5::qdbusxml2cpp LOCATION )
   ENDIF()
+ELSE()
+  MESSAGE(SEND_ERROR "Error: Could not find Qt5.\nIf Qt5 is not installed in"
+  " a standard location, a custom prefix for 'find_package' should be passed."
+  "\nFor example, -DCMAKE_PREFIX_PATH:STRING=/path/to/qt5/build"
+  "\nOr the prefix environment variable must be set."
+  "\nFor example, export CMAKE_PREFIX_PATH=/path/to/qt5/build\n")
 ENDIF()

@@ -46,6 +46,7 @@ add_custom_command(
        --build-generator ${CMAKE_GENERATOR}
        --build-makeprogram ${CMAKE_MAKE_PROGRAM}
        --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
+                       -DPARAVIEW_QT_VERSION:STRING=${PARAVIEW_QT_VERSION}
                        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
                        -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
                        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
