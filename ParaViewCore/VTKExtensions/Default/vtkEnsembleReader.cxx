@@ -100,7 +100,8 @@ void vtkEnsembleReader::UpdateReader()
       vtkWarningMacro("Invalid FileIndex for vtkEnsembleReader");
       this->_FileIndex = 0;
       }
-    string fileName = this->GetReaderFileName(this->Table, this->_FileIndex);
+    string fileName = this->GetReaderFileName(this->_MetaFileName,
+                                              this->Table, this->_FileIndex);
     this->BeforeFileNameMTime = this->Reader->GetMTime();
     this->ReaderSetFileName(fileName.c_str());
     this->FileNameMTime = this->Reader->GetMTime();
@@ -132,7 +133,8 @@ vtkIdType vtkEnsembleReader::GetNumberOfParameters() const
 
 
 //----------------------------------------------------------------------------
-string vtkEnsembleReader::GetReaderFileName(vtkTable* table, vtkIdType i)
+string vtkEnsembleReader::GetReaderFileName(
+  const char* metaFileName, vtkTable* table, vtkIdType i)
 {
   vtkIdType lastColumn = table->GetNumberOfColumns() - 1;
   vtkVariant fileName = table->GetValue(i, lastColumn);
@@ -141,7 +143,7 @@ string vtkEnsembleReader::GetReaderFileName(vtkTable* table, vtkIdType i)
     vtkErrorMacro(<< "File name is not string: " << fileName);
     return "";
     }
-  return fileName.ToString();
+  return FromRelativeToMetaFile(metaFileName, fileName.ToString().c_str());
 }
 
 
@@ -160,7 +162,7 @@ int vtkEnsembleReader::CanReadFile(const char* metaFileName)
     }
   for (vtkIdType i = 0; i < nRows; ++i)
     {
-    string fileName = this->GetReaderFileName(ensemble, i);
+    string fileName = this->GetReaderFileName(metaFileName, ensemble, i);
     if (! this->ReaderCanReadFile (fileName.c_str()))
       {
       vtkWarningMacro(<< "Cannot read ensemble member: "

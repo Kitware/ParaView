@@ -22,6 +22,8 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 
+#include <vtksys/SystemTools.hxx>
+
 //=============================================================================
 vtkStandardNewMacro(vtkMetaReader);
 
@@ -127,4 +129,27 @@ int vtkMetaReader::FillOutputPortInformation(int port,
   vtkInformation* rinfo = this->Reader->GetOutputPortInformation(port);
   info->CopyEntry(rinfo, vtkDataObject::DATA_TYPE_NAME());
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+std::string vtkMetaReader::FromRelativeToMetaFile(const char* metaFileName,
+                                                  const char* filePath)
+{
+  std::string root;
+  vtksys::SystemTools::SplitPathRootComponent (filePath, &root);
+  if (root.empty())
+    {
+    // relative filePath, considered relative to the metafile.
+    std::string metaFileDir =
+      vtksys::SystemTools::GetFilenamePath (metaFileName);
+    if (! metaFileDir.empty())
+      {
+      metaFileDir += "/";
+      }
+    return metaFileDir + filePath;
+    }
+  else
+    {
+    return filePath;
+    }
 }

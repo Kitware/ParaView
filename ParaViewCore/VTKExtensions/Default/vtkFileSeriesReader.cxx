@@ -735,17 +735,6 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
     {
     return 0;
     }
-  // Get the path of the metafile for relative paths within.
-  std::string filePath = metafilename;
-  std::string::size_type pos = filePath.find_last_of("/\\");
-  if(pos != filePath.npos)
-    {
-    filePath = filePath.substr(0, pos+1);
-    }
-  else
-    {
-    filePath = "";
-    }
 
   // Iterate over all files pointed to by the metafile.
   filesToRead->SetNumberOfTuples(0);
@@ -764,11 +753,7 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
         return 0;
         }
       }
-    if ((fname.at(0) != '/') && ((fname.size() < 2) || (fname.at(1) != ':')))
-      {
-      fname = filePath + fname;
-      }
-    filesToRead->InsertNextValue(fname);
+    filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, fname));
     }
   return 1;
 }

@@ -25,6 +25,8 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
+#include <string>
+
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMetaReader :
   public vtkDataObjectAlgorithm
 {
@@ -93,6 +95,15 @@ protected:
 
   void ReaderSetFileName(const char* filename);
   int ReaderCanReadFile(const char *filename);
+
+  // Description: Convert 'fileName' that is relative to the
+  // 'metaFileName' to either a file path that is relative to the
+  // current working directory (CWD) or to an absolute file path.
+  // The choice is made based on if 'metaFileName' is relative or absolute.
+  // Return the original if 'fileName' is already absolute.
+  std::string FromRelativeToMetaFile(
+    const char* metaFileName, const char* fileName);
+
 
 protected:
   // Reader that handles requests for the meta-reader

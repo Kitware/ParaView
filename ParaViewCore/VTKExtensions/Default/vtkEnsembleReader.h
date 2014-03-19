@@ -16,7 +16,7 @@
  .NAME vtkEnsembleReader - Meta-reader for an ensemble of simulations
 
  .SECTION Description:
- The file that describes the simulation ensemble has the following format:
+ The meta-file that describes the simulation ensemble has the following format:
 <pre>
   parameterName_1, parameterName_2, ..., parameterName_p,
   v_11,            v_12,            ..., v_1p,            fileName_1
@@ -28,7 +28,8 @@
         p is the number of parameters
         v_ij is the value of parameter_j for simulation i, i = 1..n
         n is the number of data files (simulations)
-        fileName_i is the data file i
+        fileName_i is the data file i, specified as either an absolute file or
+        a file relative to the meta-file location.
 </pre>
 */
 
@@ -77,7 +78,8 @@ protected:
 
   void UpdateReader();
   vtkSmartPointer<vtkTable> ReadMetaFile(const char* metaFileName);
-  std::string GetReaderFileName(vtkTable* table, vtkIdType i);
+  std::string GetReaderFileName(const char* metaFileName,
+                                vtkTable* table, vtkIdType i);
   void AddCurrentTableRow(vtkInformationVector* outputVector);
 
 
