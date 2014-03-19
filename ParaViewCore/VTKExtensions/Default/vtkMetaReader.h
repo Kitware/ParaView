@@ -50,7 +50,7 @@ public:
   void SetMetaFileName (const char* name)
   {
     Set_MetaFileName (name);
-    this->MetaFileNameMTime = this->GetMTime ();
+    this->MetaFileNameMTime = this->vtkDataObjectAlgorithm::GetMTime ();
   }
   char* GetMetaFileName ()
   {
@@ -71,7 +71,7 @@ public:
   void SetFileIndex (vtkIdType i)
   {
     this->Set_FileIndex (i);
-    this->FileIndexMTime = this->GetMTime();
+    this->FileIndexMTime = this->vtkDataObjectAlgorithm::GetMTime();
   }
 
   // Description:

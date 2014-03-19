@@ -72,13 +72,13 @@ void vtkEnsembleReader::AddCurrentTableRow(vtkInformationVector* outputVector)
   for (vtkIdType column = 0;
        column < this->Table->GetNumberOfColumns() - 1; ++column)
     {
-    vtkDoubleArray* a = vtkDoubleArray::New();
+    vtkNew<vtkDoubleArray> a;
     a->SetName (this->Table->GetColumnName(column));
     a->SetNumberOfComponents(0);
     a->SetNumberOfValues(1);
     a->SetValue(0, this->Table->GetValue(
                   this->_FileIndex, column).ToDouble());
-    fieldData->AddArray(a);
+    fieldData->AddArray(a.GetPointer());
     }
 }
 
