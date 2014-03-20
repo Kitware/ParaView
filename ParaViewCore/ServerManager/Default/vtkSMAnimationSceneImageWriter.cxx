@@ -336,16 +336,6 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     mwriter = vtkMPEG2Writer::New();
     }
 #endif
-#ifdef _WIN32
-  else if (extension == ".avi")
-    {
-    vtkAVIWriter* avi = vtkAVIWriter::New();
-    avi->SetQuality(this->Quality);
-    avi->SetRate(
-      static_cast<int>(this->GetFrameRate()));
-    mwriter = avi;
-    }
-#else
 # ifdef PARAVIEW_ENABLE_FFMPEG
   else if (extension == ".avi")
     {
@@ -357,6 +347,21 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     mwriter = aviwriter;
     }
 # endif
+#ifdef _WIN32
+  else if (extension == ".avi")
+    {
+    vtkAVIWriter* avi = vtkAVIWriter::New();
+    avi->SetQuality(this->Quality);
+    avi->SetRate(
+      static_cast<int>(this->GetFrameRate()));
+    // Use the "Microsoft MPEG-4 Video Codec v3" codec by default. This should
+    // get us better results than "MSVC", an old, outdated codec. MSDN states
+    // that it is supported in XP (http://support.microsoft.com/kb/291948) and
+    // it seems to be the same as http://www.fourcc.org/mp43/.
+    avi->SetCompressorFourCC("MP43");
+    mwriter = avi;
+    }
+#else
 #endif
 #ifdef VTK_HAS_OGGTHEORA_SUPPORT
   else if (extension == ".ogv" || extension == ".ogg")
