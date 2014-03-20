@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVRenderView.h"
 #include "vtkSmartPointer.h"
+#include <sstream>
 
-class vtkImageData;
+class vtkPVDataRepresentation;
 
 class vtkPVRenderViewForAssembly : public vtkPVRenderView
 {
@@ -63,14 +64,55 @@ public:
   void ResetClippingBounds();
   void FreezeGeometryBounds();
 
-  vtkImageData* GetRGBAData();
-  vtkImageData* GetZBufferData();
+  // Description:
+  // This will trigger multiple renders based on the current scene composition
+  // and will create a single string which will encode the ordering.
+  void ComputeZOrdering();
 
   // Description:
-  // Set/Get the name that should be used to save the ImageData that will contains
-  // RGB and Z buffer information. If Null, the data won't be written to disk.
-  vtkSetStringMacro(FileName);
-  vtkGetStringMacro(FileName);
+  // Return an encoded string that represent the objects ordering for each pixel.
+  // And NULL if no ComputeZOrdering() was done before.
+  const char* GetZOrdering();
+
+  // Description:
+  // Set/Get directory used when dumping the RGB buffer as image on disk
+  vtkSetStringMacro(CompositeDirectory)
+  vtkGetStringMacro(CompositeDirectory)
+
+  // Description:
+  // Dump RGB buffer to the disk using the CompositeDirectory (rgb.jpg)
+  void WriteImage();
+
+  // Description:
+  // Set/Get RGB image stack size
+  vtkGetMacro(RGBStackSize,int);
+  vtkSetMacro(RGBStackSize,int);
+
+  // Description:
+  // Reset active image stack to 0 so we can start capturing again
+  // from the beginning the RGB buffers into our unique RGB generated image.
+  void ResetActiveImageStack();
+
+  // Description:
+  // Capture RGB buffer in the proper RGB stack position
+  // and increase current active stack position.
+  void CaptureActiveRepresentation();
+
+  // Description:
+  // Dump composite information as JSON file into CompositeDirectory
+  // (composite.json)
+  void WriteComposite();
+
+  void AddRepresentationForComposite(vtkPVDataRepresentation* r);
+  void RemoveRepresentationForComposite(vtkPVDataRepresentation* r);
+
+  // Description:
+  // Return representation encoding code inside the ZOrdering string.
+  // Each char map a single Representation index, while 0 is reserved
+  // for the background, hence the corresponding char is shifted by 1.
+  const char* GetRepresentationCodes();
+
+  void SetActiveRepresentationForComposite(vtkPVDataRepresentation* r);
 
 //BTX
 protected:
@@ -85,10 +127,20 @@ private:
   void operator=(const vtkPVRenderViewForAssembly&); // Not implemented
 
   bool InRender;
+
+  int ActiveStack;
+  int RGBStackSize;
+  bool InsideComputeZOrdering;
+  bool InsideRGBDump;
+  char* CompositeDirectory;
+  int OrderingBufferSize;
+  char* OrderingBuffer;
+  int RepresentationToRender;
+
   vtkBoundingBox ClippingBounds;
-  vtkSmartPointer<vtkImageData> RGBAData;
-  vtkSmartPointer<vtkImageData> ZBufferData;
-  char* FileName;
+
+  struct vtkInternals;
+  vtkInternals* Internal;
 //ETX
 };
 

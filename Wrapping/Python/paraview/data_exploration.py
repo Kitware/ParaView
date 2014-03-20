@@ -163,7 +163,7 @@ class FileNameGenerator():
         self.arguments = {}
         self.active_arguments = {}
         self.metadata = {}
-        self.cost = { "time": 0, "space": 0, "image": 0}
+        self.cost = { "time": 0, "space": 0, "images": 0}
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
 
@@ -239,7 +239,7 @@ class FileNameGenerator():
         filePath = self.get_fullpath()
         if os.path.exists(filePath):
             if self._is_image(filePath):
-                self.cost['image'] = self.cost['image'] + 1
+                self.cost['images'] = self.cost['images'] + 1
             self.cost['space'] += os.stat(filePath).st_size
 
     def add_time_cost(self, ts):
@@ -247,6 +247,16 @@ class FileNameGenerator():
 
     def get_cost(self):
         return self.cost
+
+    def get_nth_directory(self, n):
+        fullpath = os.path.join(self.working_dir, self.get_filename())
+        dirname = os.path.dirname(fullpath)
+        while n:
+            n -= 1
+            dirname = os.path.dirname(dirname)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        return dirname
 
     def write_metadata(self):
         """
@@ -263,6 +273,187 @@ class FileNameGenerator():
         metadata_file_path = os.path.join(self.working_dir, "info.json")
         with open(metadata_file_path, "w") as metadata_file:
             metadata_file.write(json.dumps(jsonObj))
+
+#==============================================================================
+# Camera management
+#==============================================================================
+
+class CameraHandler(object):
+
+    def __init__(self, file_name_generator, view):
+        self.file_name_generator = file_name_generator
+        self.view = view
+        self.active_index = 0
+        self.number_of_index = 0
+        self.callback = None
+
+    def set_callback(self, callback):
+        self.callback = callback
+
+    def reset(self):
+        self.active_index = -1
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.active_index + 1 < self.number_of_index:
+            self.active_index += 1
+
+            return self.active_index * 100 / self.number_of_index
+
+        raise StopIteration()
+
+    def apply_position(self):
+        if self.callback:
+            self.callback(self.view.CameraPosition, self.view.CameraFocalPoint, self.view.CameraViewUp)
+
+    def get_camera_keys(self):
+        return []
+
+    def set_view(self, view):
+        self.view = view
+
+    def get_camera_position(self):
+        return self.view.CameraPosition
+
+    def get_camera_view_up(self):
+        return self.view.CameraViewUp
+
+    def get_camera_focal_point(self):
+        return self.view.CameraFocalPoint
+
+
+# ==============================================================================
+
+class ThreeSixtyCameraHandler(CameraHandler):
+    def __init__(self, file_name_generator, view, phis, thetas, center, axis, distance):
+        CameraHandler.__init__(self, file_name_generator, view)
+        self.camera_positions = []
+        self.camera_ups = []
+        self.phi = []
+        self.theta = []
+        self.active_index = 0
+        self.focal_point = center
+
+        try:
+            # Z => 0 | Y => 2 | X => 1
+            self.offset = (axis.index(1) + 1 ) % 3
+        except ValueError:
+            raise Exception("Rotation axis not supported", axis)
+
+        for theta in thetas:
+            theta_rad = float(theta) / 180.0 * math.pi
+            for phi in phis:
+                phi_rad = float(phi) / 180.0 * math.pi
+
+                pos = [
+                    float(center[0]) - math.cos(phi_rad)   * distance * math.cos(theta_rad),
+                    float(center[1]) + math.sin(phi_rad)   * distance * math.cos(theta_rad),
+                    float(center[2]) + math.sin(theta_rad) * distance
+                    ]
+                up = [
+                    + math.cos(phi_rad) * math.sin(theta_rad),
+                    - math.sin(phi_rad) * math.sin(theta_rad),
+                    + math.cos(theta_rad)
+                    ]
+
+                # Handle rotation around Z => 0 | Y => 2 | X => 1
+                for i in range(self.offset):
+                    pos.insert(0, pos.pop())
+                    up.insert(0, up.pop())
+
+                # Save informations
+                self.camera_positions.append(pos)
+                self.camera_ups.append(up)
+                self.phi.append(phi)
+                self.theta.append(theta + 90)
+
+        self.number_of_index = len(self.phi)
+
+    def get_camera_keys(self):
+        return ['phi', 'theta']
+
+    def apply_position(self):
+        self.file_name_generator.update_active_arguments(phi=self.phi[self.active_index])
+        self.file_name_generator.update_active_arguments(theta=self.theta[self.active_index])
+        self.view.CameraPosition = self.camera_positions[self.active_index]
+        self.view.CameraViewUp = self.camera_ups[self.active_index]
+        self.view.CameraFocalPoint = self.focal_point
+
+        super(ThreeSixtyCameraHandler, self).apply_position()
+
+# ==============================================================================
+
+class WobbleCameraHandler(CameraHandler):
+    def __init__(self, file_name_generator, view, focal_point, view_up, camera_position, wobble_angle = 5.0):
+        super(WobbleCameraHandler, self).__init__(file_name_generator, view)
+        self.focal_point = focal_point
+        self.view_up = view_up
+        self.positions = []
+        self.phi = []
+        self.theta = []
+
+        distance = math.sqrt(math.pow(camera_position[0] - focal_point[0], 2) + math.pow(camera_position[1] - focal_point[1], 2) + math.pow(camera_position[2] - focal_point[2], 2))
+        delta = distance * math.sin(woble_angle / 180.0 * math.pi)
+
+        delta_theta = [ view_up[0], view_up[1], view_up[2] ]
+        theta_norm = math.sqrt(delta_theta[0]*delta_theta[0] + delta_theta[1]*delta_theta[1] + delta_theta[2]*delta_theta[2])
+        delta_theta[0] *= delta / theta_norm
+        delta_theta[1] *= delta / theta_norm
+        delta_theta[2] *= delta / theta_norm
+
+        a = camera_position[0] - focal_point[0]
+        b = camera_position[1] - focal_point[1]
+        c = camera_position[2] - focal_point[2]
+        delta_phi = [b*view_up[2] - c*view_up[1], c*view_up[0] - a*view_up[2], a*view_up[1] - b*view_up[0]]
+        phi_norm = math.sqrt(delta_phi[0]*delta_phi[0] + delta_phi[1]*delta_phi[1] + delta_phi[2]*delta_phi[2])
+        delta_phi[0] *= delta / phi_norm
+        delta_phi[1] *= delta / phi_norm
+        delta_phi[2] *= delta / phi_norm
+
+        for theta in [-1, 0, 1]:
+            for phi in [-1, 0, 1]:
+                pos = [ camera_position[0] + (float(theta) * delta_theta[0]) + (float(phi) * delta_phi[0]),
+                        camera_position[1] + (float(theta) * delta_theta[1]) + (float(phi) * delta_phi[1]),
+                        camera_position[2] + (float(theta) * delta_theta[2]) + (float(phi) * delta_phi[2])]
+
+                # Save informations
+                self.positions.append(pos)
+                self.phi.append(phi*woble_angle)
+                self.theta.append(theta*woble_angle)
+
+        self.number_of_index = len(self.phi)
+
+    def get_camera_keys(self):
+        return ['phi', 'theta']
+
+    def apply_position(self):
+        self.file_name_generator.update_active_arguments(phi=self.phi[self.active_index])
+        self.file_name_generator.update_active_arguments(theta=self.theta[self.active_index])
+        self.view.CameraPosition = self.positions[self.active_index]
+        self.view.CameraViewUp = self.view_up
+        self.view.CameraFocalPoint = self.focal_point
+
+        super(WobbleCameraHandler, self).apply_position()
+
+# ==============================================================================
+
+class FixCameraHandler(CameraHandler):
+    def __init__(self, file_name_generator, view, focal_point, view_up, camera_position):
+        super(WobbleCameraHandler, self).__init__(file_name_generator, view)
+        self.focal_point = focal_point
+        self.view_up = view_up
+        self.camera_position = camera_position
+        self.number_of_index = 1
+
+    def apply_position(self):
+        self.view.CameraPosition = self.camera_position
+        self.view.CameraViewUp = self.view_up
+        self.view.CameraFocalPoint = self.focal_point
+
+        super(FixCameraHandler, self).apply_position()
+
 
 #==============================================================================
 # Data explorer
@@ -827,41 +1018,77 @@ class CompositeImageExporter():
     recomposed later on in the web.
     We assume the RGBZView plugin is loaded.
     """
-    def __init__(self, file_name_generator, data_list, colorBy_list, luts, camera_info, view_size):
-        """
-        camera_info: {
-           focal_point: [0,0,0],
-           view_up: [0,0,1],
-           position: [100,300,50]
-        }
-        """
+    def __init__(self, file_name_generator, data_list, colorBy_list, luts, camera_handler, view_size, data_list_pipeline, axisVisibility=1, orientationVisibility=1):
+        '''
+        data_list = [ds1, ds2, ds3]
+        colorBy_list = [ [('POINT_DATA', 'temperature'), ('POINT_DATA', 'pressure'), ('POINT_DATA', 'salinity')],
+                         [('CELL_DATA', 'temperature'), ('CELL_DATA', 'salinity')],
+                         [('SOLID_COLOR', [0.1,0.1,0.1])] ]
+        luts = { 'temperature': vtkLookupTable(...),  'salinity': vtkLookupTable(...),  'pressure': vtkLookupTable(...), }
+        data_list_pipeline = [ { 'name': 'Earth core'}, {'name': 'Slice'}, {'name': 'T=0', 'parent': 'Contour by temperature'}, ...]
+
+        '''
         self.file_name_generator = file_name_generator
         self.datasets = data_list
-        self.camera = camera_info
+        self.camera_handler = camera_handler
         self.analysis = None
+        self.color_by = colorBy_list
+        self.luts = luts
 
         # Create view and assembly manager
         self.view = simple.CreateView("RGBZView")
         self.view.ViewSize = view_size
+        self.view.CenterAxesVisibility = axisVisibility
+        self.view.OrientationAxesVisibility = orientationVisibility
+        self.view.UpdatePropertyInformation()
+        self.codes = self.view.GetProperty('RepresentationCodes').GetData()
+        self.camera_handler.set_view(self.view)
+        self.representations = []
         index = 0
         for data in self.datasets:
             rep = simple.Show(data, self.view)
-            rep.ColorArrayName = colorBy_list[index]
-            rep.LookupTable = luts[colorBy_list[index][1]]
+            self.representations.append(rep)
+            self.file_name_generator.update_active_arguments(layer=self.codes[index])
             index += 1
-        self.view.CameraPosition = camera_info['position']
-        self.view.CameraFocalPoint = camera_info['focal_point']
-        self.view.CameraViewUp = camera_info['view_up']
 
-        pxm = simple.servermanager.ProxyManager()
-        self.assembly = simple.servermanager._getPyProxy(pxm.NewProxy('misc', 'AssemblyGenerator'))
+        # Create pipeline metadata
+        pipeline = []
+        parentTree = {}
+        index = 1
+        for node in data_list_pipeline:
+            entry = { 'name': node['name'], 'ids': [self.codes[index]], 'type': 'layer' }
+
+            if node.has_key('parent'):
+                if parentTree.has_key(node['parent']):
+                    # add node as child
+                    parentTree[node['parent']]['children'].append(entry)
+                    parentTree[node['parent']]['ids'].append(entry['ids'][0])
+                else:
+                    # register parent and add it to pipeline
+                    directory = { 'name': node['parent'], 'type': 'directory', 'ids': [ entry['ids'][0] ], 'children': [ entry ]}
+                    pipeline.append(directory)
+                    parentTree[node['parent']] = directory
+            else:
+                # Add it to pipeline
+                pipeline.append(entry)
+
+            index += 1
+
+        self.file_name_generator.add_meta_data('pipeline', pipeline)
+        self.file_name_generator.add_meta_data('dimensions', view_size)
+
+        # Add the name of both generated files
+        self.file_name_generator.update_active_arguments(filename='rgb.jpg')
+        self.file_name_generator.update_active_arguments(filename='composite.json')
 
     @staticmethod
     def list_arguments():
         """
-        '/path/{layer}.vtk' + '/path/{layer}.jpg' + '/path/info.json'
+
+        '/path/{camera_handlers}/{filename}' + '/path/info.json'
+        Where filename = ['composite.json', 'rgb.jpg']
         """
-        return ['layer']
+        return ['filename']
 
     @staticmethod
     def get_data_type():
@@ -880,43 +1107,93 @@ class CompositeImageExporter():
         if self.analysis:
             self.analysis.begin_work('CompositeImageExporter')
         self.file_name_generator.update_active_arguments(time=time)
-        self.file_name_generator.update_active_arguments(layer=0)
-        self.assembly.DestinationDirectory = self.file_name_generator.get_directory()
 
-        # Update current bounds for the z-Buffer
-        representation_list = self.view.Representations
-        for representation in representation_list:
-            representation.Visibility = 1
-        self.view.FileName = ''
+        # Fix camera bounds
         simple.Render(self.view)
         self.view.ResetClippingBounds()
         self.view.FreezeGeometryBounds()
+        self.view.UpdatePropertyInformation()
 
-        # Toggle each layer individually
-        vtk_files_to_process = []
-        number_of_layers = 1 + len(representation_list)
-        for layer_idx in range(number_of_layers):
-            self.file_name_generator.update_active_arguments(layer=layer_idx)
-            for rep in representation_list:
-                rep.Visibility = 0
-            if layer_idx > 0:
-                representation_list[layer_idx - 1].Visibility = 1
-            self.view.FileName = self.file_name_generator.get_fullpath()
-            simple.Render(self.view)
-            vtk_files_to_process.append(self.file_name_generator.get_fullpath())
+        # Compute the number of images by stack
+        fieldset = set()
+        nbImages = 1
+        composite_size = len(self.representations)
+        metadata_layers = ""
+        for compositeIdx in range(composite_size):
+            metadata_layers += self.codes[compositeIdx + 1]
+            for field in self.color_by[compositeIdx]:
+                fieldset.add(str(field[1]))
+                nbImages += 1
 
+        # Generate fields metadata
+        index = 1
+        metadata_fields = {}
+        reverse_field_map = {}
+        for field in fieldset:
+            metadata_fields[self.codes[index]] = field
+            reverse_field_map[field] = self.codes[index]
+            index += 1
 
-        # Generate JPG files and composite data
-        self.assembly.FileNames = vtk_files_to_process
-        self.assembly.Write()
+        # Generate layer_fields metadata
+        metadata_layer_fields = {}
+        for compositeIdx in range(composite_size):
+            key = self.codes[compositeIdx + 1]
+            array = []
+            for field in self.color_by[compositeIdx]:
+                array.append(reverse_field_map[str(field[1])])
+            metadata_layer_fields[key] = array
 
-        # Compute file size
-        for layer_idx in range(number_of_layers):
-            self.file_name_generator.update_active_arguments(layer=layer_idx)
+        # Generate the heavy data
+        metadata_offset = {}
+        self.camera_handler.reset()
+        for progress in self.camera_handler:
+            self.camera_handler.apply_position()
+            self.view.CompositeDirectory = self.file_name_generator.get_directory()
+
+            # Extract images for each fields
+            self.view.ResetActiveImageStack()
+            self.view.RGBStackSize = nbImages
+            offset_value = 1
+            for compositeIdx in range(composite_size):
+                rep = self.representations[compositeIdx]
+                offset_composite_name = self.codes[compositeIdx + 1]
+                index = 0
+                for field in self.color_by[compositeIdx]:
+                    index += 1
+                    offset_field_name = reverse_field_map[str(field[1])]
+                    if field[0] == 'SOLID_COLOR':
+                        self.file_name_generator.update_active_arguments(field= "solid_" + str(index))
+                        rep.DiffuseColor = field[1]
+                    else:
+                        self.file_name_generator.update_active_arguments(field=field[1])
+                        rep.LookupTable = self.luts[field[1]]
+                        rep.ColorArrayName = field[1]
+                        rep.ColorAttributeType = field[0]
+
+                    self.view.ActiveRepresentation = rep
+                    self.view.CompositeDirectory = self.file_name_generator.get_directory()
+                    self.view.CaptureActiveRepresentation()
+
+                    metadata_offset[offset_composite_name + offset_field_name] = offset_value
+                    offset_value += 1
+
+            # Extract RGB + Z-buffer
+            self.view.WriteImage()
+            self.view.ComputeZOrdering()
+            self.view.WriteComposite()
+
+            # Add missing files in size computation
+            self.file_name_generator.update_active_arguments(filename='composite.json')
+            self.file_name_generator.add_file_cost()
+            self.file_name_generator.update_active_arguments(filename='rgb.jpg')
             self.file_name_generator.add_file_cost()
 
         # Generate metadata
-        # => Well the assembly is generating that JSON file
+        self.file_name_generator.add_meta_data('fields', metadata_fields)
+        self.file_name_generator.add_meta_data('layers', metadata_layers)
+        self.file_name_generator.add_meta_data('layer_fields', metadata_layer_fields)
+        self.file_name_generator.add_meta_data('offset', metadata_offset)
+        self.file_name_generator.write_metadata()
 
         if self.analysis:
             self.analysis.end_work('CompositeImageExporter')
@@ -984,9 +1261,9 @@ class ThreeSixtyImageStackExporter():
         if theta_offset == 0:
             theta_offset += self.angular_steps[1]
         for theta in range(-90 + theta_offset, 90 - theta_offset + 1, self.angular_steps[1]):
-            theta_rad = float(theta) / 180 * math.pi
+            theta_rad = float(theta) / 180.0 * math.pi
             for phi in range(0, 360, self.angular_steps[0]):
-                phi_rad = float(phi) / 180 * math.pi
+                phi_rad = float(phi) / 180.0 * math.pi
 
                 pos = [
                     float(self.focal_point[0]) - math.cos(phi_rad)   * self.distance * math.cos(theta_rad),
