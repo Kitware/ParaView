@@ -276,10 +276,6 @@ protected:
   /// Used to create names for registering proxies.
   pqNameCount* NameGenerator;
 
-private slots:
-  void onProxyCreated(pqProxy * proxy);
-  void onProxyCreated(vtkSMProxy * proxy);
-
 private:
   pqObjectBuilder(const pqObjectBuilder&); // Not implemented.
   void operator=(const pqObjectBuilder&); // Not implemented.

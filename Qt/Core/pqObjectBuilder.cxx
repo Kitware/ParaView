@@ -139,10 +139,6 @@ pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :
   NameGenerator(new pqNameCount()),
   WaitingForConnection(false)
 {
-  this->connect(this, SIGNAL(proxyCreated(pqProxy*)),
-                this, SLOT(onProxyCreated(pqProxy*)));
-  this->connect(this, SIGNAL(proxyCreated(vtkSMProxy*)),
-                this, SLOT(onProxyCreated(vtkSMProxy*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -860,21 +856,4 @@ void pqObjectBuilder::initializeInheritedProperties(pqDataRepresentation* repr)
     }
   iter->Delete();
   reprProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectBuilder::onProxyCreated(pqProxy* proxy)
-{
-  vtkSMProxy* smProxy = proxy->getProxy();
-  std::string jsonPrefix(".");
-  jsonPrefix.append(smProxy->GetXMLGroup());
-
-  vtkSMSettings::GetInstance()->GetProxySettings(smProxy, jsonPrefix.c_str());
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectBuilder::onProxyCreated(vtkSMProxy* proxy)
-{
-  std::cout << "Unhandled vtkSMProxy " << proxy->GetXMLGroup() << "." << proxy->GetXMLName()
-            << std::endl;
 }
