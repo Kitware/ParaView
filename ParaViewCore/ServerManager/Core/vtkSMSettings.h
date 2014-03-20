@@ -79,17 +79,17 @@ public:
 
   // Description:
   // Set setting of a given name
-  bool SetScalarSetting(const char* settingName, int value);
-  bool SetScalarSetting(const char* settingName, double value);
-  bool SetScalarSetting(const char* settingName, long long int value);
-  bool SetScalarSetting(const char* settingName, const vtkStdString & value);
+  void SetScalarSetting(const char* settingName, int value);
+  void SetScalarSetting(const char* settingName, double value);
+  void SetScalarSetting(const char* settingName, long long int value);
+  void SetScalarSetting(const char* settingName, const vtkStdString & value);
 
   // Description:
   // Set vector setting at a location given by the jsonPath
-  bool SetVectorSetting(const char* settingName, const std::vector<int> & values);
-  bool SetVectorSetting(const char* settingName, const std::vector<long long int> & values);
-  bool SetVectorSetting(const char* settingName, const std::vector<double> & values);
-  bool SetVectorSetting(const char* settingName, const std::vector<vtkStdString> & values);
+  void SetVectorSetting(const char* settingName, const std::vector<int> & values);
+  void SetVectorSetting(const char* settingName, const std::vector<long long int> & values);
+  void SetVectorSetting(const char* settingName, const std::vector<double> & values);
+  void SetVectorSetting(const char* settingName, const std::vector<vtkStdString> & values);
 
   // Description:
   // Save non-default settings in the current user settings.
@@ -97,10 +97,10 @@ public:
 
   // Description:
   // Get setting as a scalar value
-  bool GetScalarSetting(const char* settingName, int & value);
-  bool GetScalarSetting(const char* settingName, double & value);
-  bool GetScalarSetting(const char* settingName, long long int & value);
-  bool GetScalarSetting(const char* settingName, vtkStdString & value);
+  int           GetScalarSettingAsInt(const char* settingName);
+  double        GetScalarSettingAsDouble(const char* settingName);
+  long long int GetScalarSettingAsLongLongInt(const char* settingName);
+  vtkStdString  GetScalarSettingAsString(const char* settingName);
 
   // Description:
   // Get setting as a vector of a certain type. Returns true on

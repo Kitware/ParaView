@@ -136,7 +136,7 @@ public:
 
   //----------------------------------------------------------------------------
   template< typename T >
-  bool SetScalarSetting(const char* settingName, const T & value)
+  void SetScalarSetting(const char* settingName, const T & value)
   {
     std::string root, leaf;
     SeparateBranchFromLeaf(settingName, root, leaf);
@@ -144,13 +144,11 @@ public:
     Json::Path settingPath(root.c_str());
     Json::Value & jsonValue = settingPath.make(this->UserSettingsJSONRoot);
     jsonValue[leaf] = value;
- 
-    return true;
   }
 
   //----------------------------------------------------------------------------
   template< typename T >
-  bool SetVectorSetting(const char* settingName, const std::vector< T > & values)
+  void SetVectorSetting(const char* settingName, const std::vector< T > & values)
   {
     std::string root, leaf;
     SeparateBranchFromLeaf(settingName, root, leaf);
@@ -163,8 +161,6 @@ public:
       {
       jsonValue[leaf][(unsigned int)i] = values[i];
       }
-
-    return true;
   }
 
   //----------------------------------------------------------------------------
@@ -441,12 +437,6 @@ public:
   bool GetPropertySetting(vtkSMInputProperty* property,
                           const char* jsonPath)
   {
-    std::vector<vtkStdString> vector;
-    if (!this->GetVectorSetting(jsonPath, vector))
-      {
-      return false;
-      }
-    
     vtkSMDomain * domain = property->GetDomain( "proxy_list" );
     vtkSMProxyListDomain * proxyListDomain = NULL;
     if (proxyListDomain = vtkSMProxyListDomain::SafeDownCast(domain))
@@ -791,55 +781,55 @@ bool vtkSMSettings::HasSetting(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetScalarSetting(const char* settingName, int value)
+void vtkSMSettings::SetScalarSetting(const char* settingName, int value)
 {
-  return this->Internal->SetScalarSetting(settingName, value);
+  this->Internal->SetScalarSetting(settingName, value);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetScalarSetting(const char* settingName, double value)
+void vtkSMSettings::SetScalarSetting(const char* settingName, double value)
 {
-  return this->Internal->SetScalarSetting(settingName, value);
+  this->Internal->SetScalarSetting(settingName, value);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetScalarSetting(const char* settingName, long long int value)
+void vtkSMSettings::SetScalarSetting(const char* settingName, long long int value)
 {
-  return this->Internal->SetScalarSetting(settingName, value);
+  this->Internal->SetScalarSetting(settingName, value);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetScalarSetting(const char* settingName, const vtkStdString & value)
+void vtkSMSettings::SetScalarSetting(const char* settingName, const vtkStdString & value)
 {
-  return this->Internal->SetScalarSetting(settingName, value);
+  this->Internal->SetScalarSetting(settingName, value);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetVectorSetting(const char* settingName,
+void vtkSMSettings::SetVectorSetting(const char* settingName,
                                      const std::vector<int> & values)
 {
-  return this->Internal->SetVectorSetting(settingName, values);
+  this->Internal->SetVectorSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetVectorSetting(const char* settingName,
+void vtkSMSettings::SetVectorSetting(const char* settingName,
                                      const std::vector<double> & values)
 {
-  return this->Internal->SetVectorSetting(settingName, values);
+  this->Internal->SetVectorSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetVectorSetting(const char* settingName,
+void vtkSMSettings::SetVectorSetting(const char* settingName,
                                      const std::vector<long long int> & values)
 {
-  return this->Internal->SetVectorSetting(settingName, values);
+  this->Internal->SetVectorSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SetVectorSetting(const char* settingName,
+void vtkSMSettings::SetVectorSetting(const char* settingName,
                                      const std::vector<vtkStdString> & values)
 {
-  return this->Internal->SetVectorSetting(settingName, values);
+  this->Internal->SetVectorSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
@@ -872,7 +862,6 @@ void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
 
   // Create proxy node if it doesn't exist
   settingStringStream << "." << proxyName;
-  std::cout << settingStringStream.str() << std::endl;
   settingString = settingStringStream.str();
   settingCString = settingString.c_str();
 
@@ -926,27 +915,39 @@ void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetScalarSetting(const char* settingName, int & value)
+int vtkSMSettings::GetScalarSettingAsInt(const char* settingName)
 {
-  return this->Internal->GetScalarSetting(settingName, value);
+  int value;
+  this->Internal->GetScalarSetting(settingName, value);
+
+  return value;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetScalarSetting(const char* settingName, long long int & value)
+double vtkSMSettings::GetScalarSettingAsDouble(const char* settingName)
 {
-  return this->Internal->GetScalarSetting(settingName, value);
+  double value;
+  this->Internal->GetScalarSetting(settingName, value);
+
+  return value;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetScalarSetting(const char* settingName, double & value)
+long long int vtkSMSettings::GetScalarSettingAsLongLongInt(const char* settingName)
 {
-  return this->Internal->GetScalarSetting(settingName, value);
+  long long int value;
+  this->Internal->GetScalarSetting(settingName, value);
+
+  return value;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetScalarSetting(const char* settingName, vtkStdString & value)
+vtkStdString vtkSMSettings::GetScalarSettingAsString(const char* settingName)
 {
-  return this->Internal->GetScalarSetting(settingName, value);
+  vtkStdString value;
+  this->Internal->GetScalarSetting(settingName, value);
+
+  return value;
 }
 
 //----------------------------------------------------------------------------
