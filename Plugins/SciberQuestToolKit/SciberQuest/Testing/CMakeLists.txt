@@ -112,6 +112,8 @@ if (PARAVIEW_DATA_ROOT)
     # Increase timeout for long tests (600 = 10m)
     set_tests_properties(SciberQuestToolKit-TestVortexFilter-Parallel PROPERTIES TIMEOUT 600)
     set_tests_properties(SciberQuestToolKit-TestVortexFilter-Parallel PROPERTIES RUN_SERIAL ON)
+    set_tests_properties(SciberQuestToolKit-TestPoincareMapper-Parallel PROPERTIES TIMEOUT 600)
+    set_tests_properties(SciberQuestToolKit-TestPoincareMapper-Parallel PROPERTIES RUN_SERIAL ON)
   else()
     # serial invocations, our reader needs mpi these tests use
     # an alternate reader when invoked serially.
