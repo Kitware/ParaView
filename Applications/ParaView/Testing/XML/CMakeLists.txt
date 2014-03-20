@@ -62,7 +62,6 @@ SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
   ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
   )
 
-
 SET (TESTS_WITH_BASELINES
   ${TESTS_WITH_BASELINES}
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseline.xml
@@ -77,6 +76,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartAxisRangeAndLabels.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CheckableHeader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorControls.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorVolumeControls.xml
@@ -361,6 +361,7 @@ SET (UndoRedo4_THRESHOLD 15)
 
 # Since often there are issues with fonts etc.
 SET (XYChart_THRESHOLD 150)
+SET (CheckableHeader_THRESHOLD 150)
 # Since the test uses surface-selection, it cannot work in render-server mode.
 set(XYChart_DISABLE_CRS TRUE)
 
