@@ -238,7 +238,7 @@ pqHelpWindow::pqHelpWindow(
   this->Browser = NULL;
   QLabel* label = new QLabel(this);
   label->setText(
-    "<html><center><b>QtWebKit support was not enabled. Hence help is not avialable.</b></center></html>");
+    "<html><center><b>QtWebKit support was not enabled. Hence help is not available.</b></center></html>");
   this->setCentralWidget(label);
 #endif
 }

@@ -52,8 +52,6 @@
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
 
-vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
-
 //=============================================================================
 // Internal class for holding time ranges.
 class vtkFileSeriesReaderTimeRanges
@@ -383,68 +381,22 @@ vtkFileSeriesReader::vtkFileSeriesReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 
-  this->Reader = 0;
-
-  this->HiddenReaderModification = 0;
-  this->SavedReaderModification = 0;
-
   this->Internal = new vtkFileSeriesReaderInternals;
   this->Internal->FileNameIsSet = false;
   this->Internal->TimeRanges = new vtkFileSeriesReaderTimeRanges;
 
-  this->FileNameMethod = NULL;
-  //this->SetFileNameMethod("SetFileName");
-
-  this->MetaFileName = NULL;
   this->UseMetaFile = 0;
-  this->CurrentFileName = 0;
 
   this->IgnoreReaderTime = 0;
-
-  this->LastRequestInformationIndex = -1;
 }
 
 //-----------------------------------------------------------------------------
 vtkFileSeriesReader::~vtkFileSeriesReader()
 {
-  this->SetCurrentFileName(NULL);
-  this->SetMetaFileName(NULL);
-  this->SetReader(NULL);
   delete this->Internal->TimeRanges;
   delete this->Internal;
-  this->SetFileNameMethod(0);
 }
 
-//----------------------------------------------------------------------------
-// Overload standard modified time function. If the internal reader is
-// modified, then this object is modified as well.
-unsigned long vtkFileSeriesReader::GetMTime()
-{
-  unsigned long mTime=this->vtkObject::GetMTime();
-
-  if ( this->Reader )
-    {
-    // In general, we want Modifieds in Reader to be reflected in this object's
-    // MTime.  However, we will also be making modifications to the Reader (such
-    // as changing the filename) that we want to suppress from the reporting.
-    // When this happens, we save the timestamp before our modification into
-    // this->SavedReaderModification and capture the resulting MTime in
-    // this->HiddenReaderModification.  If we run into that modification,
-    // suppress it by reporting the saved modification.
-    unsigned long readerMTime;
-    if (this->Reader->GetMTime() == this->HiddenReaderModification)
-      {
-      readerMTime = this->SavedReaderModification;
-      }
-    else
-      {
-      readerMTime = this->Reader->GetMTime();
-      }
-    mTime = ( readerMTime > mTime ? readerMTime : mTime );
-    }
-
-  return mTime;
-}
 
 //----------------------------------------------------------------------------
 void vtkFileSeriesReader::AddFileName(const char* name)
@@ -504,41 +456,15 @@ int vtkFileSeriesReader::CanReadFile(const char* filename)
       {
       if (dataFiles->GetNumberOfValues() > 0)
         {
-        return vtkFileSeriesReader::CanReadFile(this->Reader,
-                                                dataFiles->GetValue(0).c_str());
+        return ReaderCanReadFile(dataFiles->GetValue(0).c_str());
         }
       }
     return 0;
     }
   else
     {
-    return vtkFileSeriesReader::CanReadFile(this->Reader, filename);
+    return ReaderCanReadFile(filename);
     }
-}
-
-//-----------------------------------------------------------------------------
-int vtkFileSeriesReader::CanReadFile(vtkAlgorithm *reader, const char *filename)
-{
-  if(reader)
-    {
-    int canRead = 1;
-    vtkClientServerInterpreter *interpreter =
-        vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
-
-    // Build stream request
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << reader
-           << "CanReadFile"
-           << filename
-           << vtkClientServerStream::End;
-
-    // Process stream and get result
-    interpreter->ProcessStream(stream);
-    interpreter->GetLastResult().GetArgument(0, 0, &canRead);
-    return canRead;
-    }
-  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -554,15 +480,16 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
     {
     // We want to suppress the modification time change in the Reader.  See
     // vtkFileSeriesReader::GetMTime() for details on how this works.
-    this->SavedReaderModification = this->GetMTime();
-    vtkRecordMTime record_time(this->Reader, this->HiddenReaderModification);
+    this->BeforeFileNameMTime = this->GetMTime();
+    vtkRecordMTime record_time(this->Reader, this->FileNameMTime);
 
     // Make sure that there is a file to get information from.
     if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
       {
       if (!this->Internal->FileNameIsSet && (this->GetNumberOfFileNames() > 0))
         {
-        this->SetReaderFileName(this->GetFileName(0));
+        this->ReaderSetFileName(this->GetFileName(0));
+        this->_FileIndex = 0;
         this->Internal->FileNameIsSet = true;
         }
       }
@@ -623,7 +550,7 @@ int vtkFileSeriesReader::RequestInformation(
     // the reader.
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-    this->RequestInformationForInput(-1, request, outputVector);
+    this->RequestInformationForInput(0, request, outputVector);
 
     //vtkErrorMacro("Expecting at least 1 file.  Cannot proceed.");
     return 1;
@@ -722,7 +649,7 @@ int vtkFileSeriesReader::RequestData(vtkInformation *request,
   // Just in case, restore the vector.
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   this->Internal->TimeRanges->GetInputTimeInfo(
-                                     this->LastRequestInformationIndex,outInfo);
+    this->_FileIndex,outInfo);
 
   int retVal = this->Reader->ProcessRequest(request, inputVector, outputVector);
 
@@ -741,18 +668,18 @@ int vtkFileSeriesReader::RequestInformationForInput(
                                              vtkInformation *request,
                                              vtkInformationVector *outputVector)
 {
-  if (index == -1 || (index != this->LastRequestInformationIndex) || (outputVector != NULL))
+  if ((index != this->_FileIndex) || (outputVector != NULL))
     {
-    if (index >= 0)
+    if (this->GetNumberOfFileNames () > 0)
       {
-      this->SetReaderFileName(this->GetFileName(index));
+      this->ReaderSetFileName(this->GetFileName(index));
       }
     else
       {
-      this->SetReaderFileName(0);
+      this->ReaderSetFileName(0);
       }
 
-    this->LastRequestInformationIndex = index;
+    this->_FileIndex = index;
     // Need to call RequestInformation on reader to refresh any metadata for the
     // new filename.
     vtkSmartPointer<vtkInformation> tempRequest;
@@ -784,51 +711,6 @@ int vtkFileSeriesReader::RequestInformationForInput(
 }
 
 //-----------------------------------------------------------------------------
-void vtkFileSeriesReader::SetReaderFileName(const char* fname)
-{
-  if (this->Reader && this->FileNameMethod)
-    {
-    vtkClientServerInterpreter *interpreter =
-        vtkClientServerInterpreterInitializer::GetGlobalInterpreter();
-
-    // Build stream request
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->Reader
-           << this->FileNameMethod
-           << fname
-           << vtkClientServerStream::End;
-
-    // Process stream and delete interpreter
-    interpreter->ProcessStream(stream);
-    }
-  this->SetCurrentFileName(fname);
-}
-
-//-----------------------------------------------------------------------------
-void vtkFileSeriesReader::SetCurrentFileName(const char *fname)
-{
-  // Basically operates the same as the code created by the vtkSetStringMacro
-  // except that it does NOT call Modified.  This method is only called
-  // internally and just manages the state of the actuall reader, usually
-  // while in ProcessRequest.
-  if (this->CurrentFileName == fname) return;
-  if (this->CurrentFileName)
-    {
-    delete[] this->CurrentFileName;
-    }
-  if (fname)
-    {
-    this->CurrentFileName = new char[strlen(fname) + 1];
-    strcpy(this->CurrentFileName, fname);
-    }
-  else
-    {
-    this->CurrentFileName = NULL;
-    }
-}
-
-//-----------------------------------------------------------------------------
 int vtkFileSeriesReader::FillOutputPortInformation(int port,
                                                    vtkInformation* info)
 {
@@ -853,17 +735,6 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
     {
     return 0;
     }
-  // Get the path of the metafile for relative paths within.
-  std::string filePath = metafilename;
-  std::string::size_type pos = filePath.find_last_of("/\\");
-  if(pos != filePath.npos)
-    {
-    filePath = filePath.substr(0, pos+1);
-    }
-  else
-    {
-    filePath = "";
-    }
 
   // Iterate over all files pointed to by the metafile.
   filesToRead->SetNumberOfTuples(0);
@@ -882,11 +753,7 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
         return 0;
         }
       }
-    if ((fname.at(0) != '/') && ((fname.size() < 2) || (fname.at(1) != ':')))
-      {
-      fname = filePath + fname;
-      }
-    filesToRead->InsertNextValue(fname);
+    filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, fname));
     }
   return 1;
 }
@@ -894,12 +761,12 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
 //-----------------------------------------------------------------------------
 void vtkFileSeriesReader::UpdateMetaData()
 {
-  if (this->UseMetaFile && (this->MetaFileReadTime < this->MTime))
+  if (this->UseMetaFile && (this->MetaFileReadTime < this->MetaFileNameMTime))
     {
     VTK_CREATE(vtkStringArray, dataFiles);
-    if (!this->ReadMetaDataFile(this->MetaFileName, dataFiles))
+    if (!this->ReadMetaDataFile(this->_MetaFileName, dataFiles))
       {
-      vtkErrorMacro(<< "Could not open metafile " << this->MetaFileName);
+      vtkErrorMacro(<< "Could not open metafile " << this->_MetaFileName);
       return;
       }
 
@@ -917,16 +784,23 @@ void vtkFileSeriesReader::UpdateMetaData()
 }
 
 //-----------------------------------------------------------------------------
+const char* vtkFileSeriesReader::GetCurrentFileName()
+{
+  return this->GetFileName (this->_FileIndex);
+}
+
+//-----------------------------------------------------------------------------
 void vtkFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "MetaFileName: "
-     << (this->MetaFileName?this->MetaFileName:"(none)") << endl;
+     << (this->_MetaFileName?this->_MetaFileName:"(none)") << endl;
   os << indent << "UseMetaFile: " << this->UseMetaFile << endl;
   os << indent << "IgnoreReaderTime: " << this->IgnoreReaderTime << endl;
 }
 
+//-----------------------------------------------------------------------------
 int vtkFileSeriesReader::ChooseInput(vtkInformation* outInfo)
 {
   return this->Internal->TimeRanges->ChooseInput(outInfo);

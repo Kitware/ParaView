@@ -141,8 +141,16 @@ public:
 
   // Description:
   // Get/Set the view time.
-  vtkSetMacro(ViewTime, double);
   vtkGetMacro(ViewTime, double);
+  void SetViewTime (double time)
+  {
+    if (this->ViewTime != time)
+      {
+      this->ViewTime = time;
+      this->Modified();
+      this->MarkOutdated();
+      }
+  }
 
   // Description:
   // Marks the view dirty i.e. on next Update() it needs to regenerate the

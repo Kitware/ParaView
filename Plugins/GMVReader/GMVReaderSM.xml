@@ -137,7 +137,7 @@
     <SourceProxy name="GMVSeriesReader"
                            class="vtkFileSeriesReader"
                            label="GMV Reader"
-                           si_class="vtkSIFileSeriesReaderProxy"
+                           si_class="vtkSIMetaReaderProxy"
                            file_name_method="SetFileName">
       <Documentation
          short_help="Read a dataset in GMV format."

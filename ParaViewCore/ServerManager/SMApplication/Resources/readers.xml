@@ -2872,6 +2872,23 @@
       </IntVectorProperty>
       <!-- End of XdmfReaderCore -->
     </SourceProxy>
+
+    <!-- we need to set UseMetaFile property -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 name="XMLPolyDataReaderUseMetaFile"
+                 si_class="vtkSIMetaReaderProxy"
+                 base_proxygroup="sources"
+                 base_proxyname="XMLPolyDataReader">
+      <IntVectorProperty command="SetUseMetaFile"
+                         default_values="1"
+                         name="UseMetaFile"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </SourceProxy>
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -2881,7 +2898,7 @@
                  file_name_method="SetFileName"
                  label="FLASH AMR Particles Reader"
                  name="FlashParticlesReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads AMR particles from FLASH dataset"
                      short_help="Reads AMR particles from FLASH dataset">The
                      Flash particles reader loads particle simulation data
@@ -2934,7 +2951,7 @@
                  file_name_method="SetFileName"
                  label="ENZO AMR Particles Reader"
                  name="EnzoParticlesReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads AMR particles from an ENZO dataset"
                      short_help="Reads AMR particles from an ENZO dataset">The
                      Enzo particles reader loads particle simulation data
@@ -2988,7 +3005,7 @@
                  file_name_method="SetFileName"
                  label="Flash Reader"
                  name="FlashReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Read hierarchical box dataset from a Flash dataset."
                      short_help="Read hierarchical box dataset from a Flash dataset.">
                      This Flash reader loads data stored in Enzo format. The
@@ -3045,7 +3062,7 @@
                  file_name_method="SetFileName"
                  label="Enzo Reader"
                  name="EnzoReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Read hierarchical box dataset from an Enzo file."
                      short_help="Read hierarchical box dataset from an Enzo file.">
                      This Enzo reader loads data stored in Enzo format. The
@@ -3149,7 +3166,7 @@
                  file_name_method="SetFileName"
                  label="Meta File Series Reader"
                  name="MetaImageReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a series of meta images."
                      short_help="Read a series of meta images.">Read a series
                      of meta images. The file extension is .mhd</Documentation>
@@ -3193,7 +3210,7 @@
                  file_name_method="SetFileName"
                  label="XML MultiBlock Data Reader"
                  name="XMLMultiBlockDataReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a VTK XML multi-block data file and the serial VTK XML data files to which it points."
                      short_help="Read VTK XML multi-block datasets.">The XML
                      Multi-Block Data reader reads the VTK XML multi-block data
@@ -3244,7 +3261,7 @@
                  file_name_method="SetFileName"
                  label="XML UniformGrid AMR Reader"
                  name="XMLUniformGridAMRReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a VTK XML-based data file containing a AMR datasets ."
                      short_help="Read a VTK data file containing AMR dataset.">
                      This reader reads Overlapping and Non-Overlapping AMR
@@ -3298,7 +3315,7 @@
                  file_name_method="SetFileName"
                  label="XML Hierarchical Box Data reader"
                  name="XMLHierarchicalBoxDataReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids."
                      short_help="Read a VTK data file containing a hierarchical box dataset.">
                      The XML Hierarchical Box Data reader reads VTK's XML-based
@@ -3349,7 +3366,7 @@
                  file_name_method="SetFileName"
                  label="XML PolyData Reader"
                  name="XMLPolyDataReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads serial VTK XML polydata files."
                      short_help="Read VTK XML polydata files.">The XML Polydata
                      reader reads the VTK XML polydata file format. The
@@ -3402,12 +3419,13 @@
                        file_description="VTK PolyData Files" />
       </Hints>
     </SourceProxy>
+
     <!-- XMLPolyDataReader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="XML Unstructured Grid Reader"
                  name="XMLUnstructuredGridReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads serial VTK XML unstructured grid data files."
                      short_help="Read VTK XML unstructured grid data files.">
                      The XML Unstructured Grid reader reads the VTK XML
@@ -3466,7 +3484,7 @@
                  file_name_method="SetFileName"
                  label="XML Image Data Reader"
                  name="XMLImageDataReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads serial VTK XML image data files."
                      short_help="Read VTK XML image data files.">The XML Image
                      Data reader reads the VTK XML image data file format. The
@@ -3524,7 +3542,7 @@
                  file_name_method="SetFileName"
                  label="XML Structured Grid Reader"
                  name="XMLStructuredGridReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads serial VTK XML structured grid data files."
                      short_help="Read VTK XML structured grid data files.">The
                      XML Structured Grid reader reads the VTK XML structured
@@ -3582,7 +3600,7 @@
                  file_name_method="SetFileName"
                  label="XML Rectilinear Grid Reader"
                  name="XMLRectilinearGridReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads serial VTK XML rectilinear grid data files."
                      short_help="Read VTK XML rectilinear grid data files.">The
                      XML Rectilinear Grid reader reads the VTK XML rectilinear
@@ -3640,7 +3658,7 @@
                  file_name_method="SetFileName"
                  label="XML Partitioned Polydata Reader"
                  name="XMLPPolyDataReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads the summary file and the assicoated VTK XML polydata files."
                      short_help="Read partitioned VTK XML polydata files.">The
                      XML Partitioned Polydata reader reads the partitioned VTK
@@ -3700,7 +3718,7 @@
                  file_name_method="SetFileName"
                  label="XML Partitioned Unstructured Grid Reader"
                  name="XMLPUnstructuredGridReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads the summary file and the associated VTK XML unstructured grid data files."
                      short_help="Read partitioned VTK XML unstructured grid data files.">
                      The XML Partitioned Unstructured Grid reader reads the
@@ -3762,7 +3780,7 @@
                  file_name_method="SetFileName"
                  label="XML Partitioned Image Data Reader"
                  name="XMLPImageDataReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads the summary file and the associated VTK XML image data files."
                      short_help="Read partitioned VTK XML image data files.">
                      The XML Partitioned Image Data reader reads the
@@ -3823,7 +3841,7 @@
                  file_name_method="SetFileName"
                  label="XML Partitioned Structured Grid Reader"
                  name="XMLPStructuredGridReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads the summary file and the associated VTK XML structured grid data files."
                      short_help="Read partitioned VTK XML structured grid data files.">
                      The XML Partitioned Structured Grid reader reads the
@@ -3885,7 +3903,7 @@
                  file_name_method="SetFileName"
                  label="XML Partitioned Rectilinear Grid Reader"
                  name="XMLPRectilinearGridReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads the summary file and the associated VTK XML rectilinear grid data files."
                      short_help="Read partitioned VTK XML rectilinear grid data files.">
                      The XML Partitioned Rectilinear Grid reader reads the
@@ -3983,7 +4001,7 @@
                  file_name_method="SetFileName"
                  label="Legacy VTK Reader"
                  name="LegacyVTKFileReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads files stored in VTK's legacy file format."
                      short_help="Read legacy VTK files.">The Legacy VTK reader
                      loads files stored in VTK's legacy file format (before VTK
@@ -4270,7 +4288,7 @@
                  file_name_method="SetFileName"
                  label="Restarted Sim Spy Plot Reader"
                  name="SPCTHRestartReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads collections of SPCTH files from simulations that were restarted."
                      short_help="Read SPCTH files from simulation restarts.">
                      When a CTH simulation is restarted, typically you get a
@@ -4504,7 +4522,7 @@
                  file_name_method="SetFileName"
                  label="STL Reader"
                  name="stlreader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads ASCII or binary stereo lithography (STL) files."
                      short_help="Read STL files.">The STL reader reads ASCII or
                      binary stereo lithography (STL) files. The expected file
@@ -4920,7 +4938,7 @@
                  file_name_method="SetFileName"
                  label="PNG Series Reader"
                  name="PNGSeriesReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a PNG file into an image data."
                      short_help="Read a PNG file.">The PNG reader reads PNG
                      (Portable Network Graphics) files, and the output is a
@@ -4960,7 +4978,7 @@
                  file_name_method="SetFileName"
                  label="JPEG Series Reader"
                  name="JPEGSeriesReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a series of JPEG files into an time sequence of image datas."
                      short_help="Read a series of JPEG files.">The JPEG series
                      reader reads JPEG files. The output is a time sequence of
@@ -5000,7 +5018,7 @@
                  file_name_method="SetFileName"
                  label="TIFF Series Reader"
                  name="TIFFSeriesReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a series of TIFF files into an time sequence of image datas."
                      short_help="Read a series of TIFF files.">The TIFF series
                      reader reads TIFF files. The output is a time sequence of
@@ -5040,7 +5058,7 @@
                  file_name_method="SetFileName"
                  label="XDMF Reader"
                  name="XdmfReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads XDMF (eXtensible Data Model and Format) files."
                      short_help="Read XDMF data files.">The XDMF reader reads
                      files in XDMF format. The expected file extension is .xmf.
@@ -5097,7 +5115,7 @@
     <SourceProxy class="vtkExodusFileSeriesReader"
                  file_name_method="SetFileName"
                  name="ExodusIIReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads an Exodus II file to produce an unstructured grid."
                      short_help="Read Exodus II files.">The Exodus reader loads
                      Exodus II files and produces an unstructured grid output.
@@ -5261,7 +5279,7 @@
                  file_name_method="SetFileName"
                  label="Restarted Sim Exodus Reader"
                  name="ExodusRestartReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads collections of Exodus output files from simulations that were restarted."
                      short_help="Read Exodus files from simulation restarts.">
                      When a simulation that outputs exodus files is restarted,
@@ -5400,7 +5418,7 @@
                  file_name_method="SetFileName"
                  label="AVS UCD Reader"
                  name="AVSucdSeriesReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads binary or ASCII files stored in AVS UCD format."
                      short_help="Read a dataset in AVS UCD format.">The AVS UCD
                      reader reads binary or ASCII files stored in AVS UCD
@@ -5751,7 +5769,7 @@
                  file_name_method="SetFileName"
                  label="Fluent Case Reader"
                  name="FLUENTReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a dataset in Fluent file format."
                      short_help="Reads a dataset in Fluent file format.">
                      FLUENTReader creates an unstructured grid dataset. It
@@ -6041,7 +6059,7 @@
                  file_name_method="SetFileName"
                  label="NetCDF Reader"
                  name="netCDFReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads regular arrays from netCDF files. Will also read any topological information specified by the COARDS and CF conventions."
                      short_help="Read regular arrays from netCDF files.">Reads
                      arrays from netCDF files into structured VTK data sets. In
@@ -6244,7 +6262,7 @@
                  file_name_method="SetFileName"
                  label="SLAC Particle Data Reader"
                  name="SLACParticleReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation>The SLAC Particle data reader.</Documentation>
       <SubProxy>
         <Proxy name="Reader"
@@ -6278,7 +6296,7 @@
                  file_name_method="SetFileName"
                  label="CSV Reader"
                  name="CSVReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads a Delimited Text values file into a 1D rectilinear grid."
                      short_help="Read a Delimited Text values file.">The CSV
                      reader reads a Delimited Text values file into a 1D
@@ -6337,7 +6355,7 @@
                  file_name_method="SetFileName"
                  label="Particles Reader"
                  name="ParticleReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads particle data."
                      short_help="Read particle data.">vtkParticleReader reads
                      either a binary or a text file of particles. Each particle
@@ -6393,7 +6411,7 @@
                  file_name_method="SetFileName"
                  label="Tecplot Reader"
                  name="TecplotReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads files in the Tecplot ASCII file format."
                      short_help="Read files in the Tecplot ASCII file format.">
                      The Tecplot reader extracts multiple zones (blocks) of
@@ -6677,7 +6695,7 @@
                  file_name_method="SetFileName"
                  label="NetCDF CAM reader"
                  name="NetCDFCAMReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads unstructured grid data from NetCDF files. There are 2 files, a points+fields file which is set as FileName and a cell connectivity file set as ConnectivityFileName."
                      short_help="Read unstructured grid NetCDF files in CAM format.">
                      This reader reads in unstructured grid data from a NetCDF
@@ -6727,7 +6745,7 @@
                  file_name_method="SetFileName"
                  label="NetCDF POP reader"
                  name="NetCDFPOPReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file."
                      short_help="Read rectilinear grid data from a NetCDF file in the POP format.">
       The reader reads regular rectilinear grid (image/volume) data from a
@@ -6775,7 +6793,7 @@
                  file_name_method="SetFileName"
                  label="Unstructured NetCDF POP reader"
                  name="UnstructuredPOPReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file and converts it into unstructured data."
                      short_help="Read rectlinear grid data from a NetCDF file in the POP format and converts it into unstructured data.">
       The reader reads regular rectilinear grid (image/volume) data from a
@@ -6826,7 +6844,7 @@
                  label="Parallel NetCDF POP reader"
                  mpi_required="true"
                  name="PNetCDFPOPReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file in parallel."
                      short_help="Read rectilinear grid data from a NetCDF file in the POP format in parallel.">
       The reader reads regular rectilinear grid (image/volume) data from a
@@ -7064,7 +7082,7 @@
                  file_name_method="SetQFileName"
                  label="PLOT3D Reader"
                  name="P3DReader"
-                 si_class="vtkSIFileSeriesReaderProxy">
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation long_help="Reads ASCII or binary PLOT3D files."
                      short_help="Read PLOT3D files.">PLOT3D is a plotting
                      package developed at NASA. The PLOT3D reader can read both
@@ -7166,6 +7184,80 @@
       <Hints>
         <ReaderFactory extensions="cml"
                        file_description="CML" />
+      </Hints>
+    </SourceProxy>
+    <!-- End CML Reader -->
+
+    <SourceProxy class="vtkEnsembleReader"
+                 file_name_method="SetMetaFileName"
+                 label="XML PolyData Ensemble Reader"
+                 name="XMLPolyDataEnsembleReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads ensembles of VTK XML polydata files."
+                     short_help="Reads ensembles of polydata files">The XML
+      Polydata reader reads ensembles of VTK XML polydata files. The
+      standard extension is .evtp.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLPolyDataReaderUseMetaFile"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Cell/Point Array Status"
+                         name="CellPointArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="CellArrayInfo" />
+            <Property name="CellArrayStatus" />
+            <Property name="PointArrayInfo" />
+            <Property name="PointArrayStatus" />
+          </PropertyGroup>
+          <Property name="UseMetaFile"/>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty animateable="0"
+                            command="SetMetaFileName"
+                            name="MetaFileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>The meta-file for the reader</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetFileIndexRange"
+                         information_only="1"
+                         name="FileIndexRange"
+                         number_of_elements="2"
+                         default_values="0 0">
+        <Documentation>Smallest and largest index for the list of
+        simulations files. For instance, if we have 10 simulations the
+        FileIndexRange is [0,9].
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="FileIndex"
+                         command="SetFileIndex"
+                         animateable="1"
+                         default_values="0"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" default_mode="min">
+          <RequiredProperties>
+            <Property name="FileIndexRange" function="Range"/>
+          </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>
+          The index of the simulation file in the ensemble.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- magic property to send time information to the animation panel -->
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Reports time values to the GUI.
+        </Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="evtp"
+                       file_description="VTK PolyData Ensembles" />
       </Hints>
     </SourceProxy>
   </ProxyGroup>

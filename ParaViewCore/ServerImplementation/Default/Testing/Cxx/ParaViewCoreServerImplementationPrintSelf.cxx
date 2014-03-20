@@ -12,7 +12,7 @@
 #include "vtkSICompoundSourceProxy.h"
 #include "vtkSIDataArrayProperty.h"
 #include "vtkSIDoubleVectorProperty.h"
-#include "vtkSIFileSeriesReaderProxy.h"
+#include "vtkSIMetaReaderProxy.h"
 #include "vtkSIIdTypeVectorProperty.h"
 #include "vtkSIImageTextureProxy.h"
 #include "vtkSIInputProperty.h"
@@ -47,7 +47,7 @@ int main(int, char**)
   PRINT_SELF(vtkSICompoundSourceProxy);
   PRINT_SELF(vtkSIDataArrayProperty);
   PRINT_SELF(vtkSIDoubleVectorProperty);
-  PRINT_SELF(vtkSIFileSeriesReaderProxy);
+  PRINT_SELF(vtkSIMetaReaderProxy);
   PRINT_SELF(vtkSIIdTypeVectorProperty);
   PRINT_SELF(vtkSIImageTextureProxy);
   PRINT_SELF(vtkSIInputProperty);
