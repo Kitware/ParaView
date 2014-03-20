@@ -80,7 +80,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHideEvent>
 #include <QLabel>
 #include <QPointer>
-#include <QPushButton>
 #include <QShowEvent>
 
 //-----------------------------------------------------------------------------------
@@ -1079,12 +1078,6 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
       }
     }
 
-  // \todo - might not be best place to do this
-  QPushButton* saveDefaultsButton = new QPushButton();
-  saveDefaultsButton->setText("Save properties as defaults");
-  gridLayout->addWidget(saveDefaultsButton);
-  this->connect(saveDefaultsButton, SIGNAL(released()), this, SLOT(saveProxySettingsAsDefault()));
-
   // this->Panel->show();
   return (prevItem != NULL);
 }
@@ -1094,14 +1087,4 @@ void pqProxyWidget::updatePanel()
 {
   this->filterWidgets(this->Internals->CachedShowAdvanced,
     this->Internals->CachedFilterText);
-}
-
-//-----------------------------------------------------------------------------
-void pqProxyWidget::saveProxySettingsAsDefault()
-{
-  vtkSMProxy* proxy = this->proxy();
-  if (proxy)
-    {
-    vtkSMSettings::GetInstance()->SetProxySettings(proxy);
-    }
 }
