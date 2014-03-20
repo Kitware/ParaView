@@ -12,3 +12,7 @@ endif()
 
 add_executable(DemoApp0 DemoApp0.cxx)
 target_link_libraries(DemoApp0 pqCore)
+if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set_target_properties(DemoApp0 PROPERTIES
+    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+endif()
