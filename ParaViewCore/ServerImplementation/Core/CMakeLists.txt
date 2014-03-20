@@ -89,7 +89,7 @@ add_custom_command(
     
     COMMAND protoc_compiler
            "--cpp_out=dllexport_decl=VTKPVSERVERIMPLEMENTATIONCORE_EXPORT:${CMAKE_CURRENT_BINARY_DIR}"
-           --proto_path "@CMAKE_CURRENT_SOURCE_DIR@"
+           --proto_path "${CMAKE_CURRENT_SOURCE_DIR}"
            "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto"
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto protoc_compiler
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
