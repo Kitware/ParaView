@@ -139,6 +139,10 @@ pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :
   NameGenerator(new pqNameCount()),
   WaitingForConnection(false)
 {
+  this->connect(this, SIGNAL(proxyCreated(pqProxy*)),
+                this, SLOT(onProxyCreated(pqProxy*)));
+  this->connect(this, SIGNAL(proxyCreated(vtkSMProxy*)),
+                this, SLOT(onProxyCreated(vtkSMProxy*)));
 }
 
 //-----------------------------------------------------------------------------
