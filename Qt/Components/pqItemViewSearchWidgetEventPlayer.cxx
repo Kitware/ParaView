@@ -51,6 +51,7 @@ bool pqItemViewSearchWidgetEventPlayer::playEvent(
   QObject* w, const QString& command,
     const QString& arguments, bool& error)
 {
+  Q_UNUSED(error);
   if (command == pqItemViewSearchWidgetEventPlayer::EVENT_NAME())
     {
     if (arguments == "ctrlF")
