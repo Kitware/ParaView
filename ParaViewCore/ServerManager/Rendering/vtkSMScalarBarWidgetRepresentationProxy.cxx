@@ -16,10 +16,14 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkProcessModule.h"
-#include "vtkScalarBarRepresentation.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMViewProxy.h"
+#include "vtkScalarBarRepresentation.h"
+
+#include <vtksys/ios/sstream>
+#include <string>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
 
@@ -115,4 +119,49 @@ void vtkSMScalarBarWidgetRepresentationProxy::PrintSelf(ostream& os, vtkIndent i
   this->Superclass::PrintSelf(os, indent);
 }
 
+//----------------------------------------------------------------------------
+bool vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(
+  vtkPVArrayInformation* arrayInfo)
+{
+  vtkSMProperty* compProp = this->GetProperty("ComponentTitle");
+  if (compProp == NULL)
+    {
+    vtkErrorMacro("Failed to locate ComponentTitle property.");
+    return false;
+    }
 
+  vtkSMProxy* lutProxy = vtkSMPropertyHelper(this, "LookupTable").GetAsProxy();
+
+  std::string componentName;
+  int component = -1;
+  if (lutProxy && vtkSMPropertyHelper(lutProxy, "VectorMode").GetAsInt() != 0)
+    {
+    component = vtkSMPropertyHelper(lutProxy, "VectorComponent").GetAsInt();
+    }
+
+  if (arrayInfo == NULL || arrayInfo->GetNumberOfComponents() > 1)
+    {
+    const char* componentNameFromData = arrayInfo? arrayInfo->GetComponentName(component): NULL;
+    if (componentNameFromData == NULL)
+      {
+      // just use the component number directly.
+      if (component >= 0)
+        {
+        vtksys_ios::ostringstream cname;
+        cname << component;
+        componentName = cname.str();
+        }
+      else
+        {
+        componentName = "Magnitude";
+        }
+      }
+    else
+      {
+      componentName = componentNameFromData;
+      }
+    }
+  vtkSMPropertyHelper(compProp).Set(componentName.c_str());
+  this->UpdateVTKObjects();
+  return true;
+}

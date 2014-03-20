@@ -430,7 +430,12 @@ public:
   // Description:
   // A proxy instance can be a sub-proxy for some other proxy. In that case,
   // this method returns true.
-  bool GetIsSubProxy() { return (this->ParentProxyCount > 0); }
+  bool GetIsSubProxy();
+
+  // Description:
+  // If this instance is a sub-proxy, this method will return the proxy of which
+  // this instance is an immediate sub-proxy.
+  vtkSMProxy* GetParentProxy();
 
   // Description:
   // Allow to switch off any push of state change to the server for that
@@ -752,6 +757,7 @@ protected:
   // Flag used to break consumer loops.
   int InMarkModified;
 
+  vtkWeakPointer<vtkSMProxy> ParentProxy;
 protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
@@ -762,8 +768,6 @@ private:
   vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement,
                                       const char* subproxy_name);
 
-  // Used to keep track of proxies to which this proxy is a subproxy.
-  int ParentProxyCount;
 //ETX
 };
 

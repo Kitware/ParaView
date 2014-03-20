@@ -33,6 +33,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 
+class vtkPVArrayInformation;
+
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPVRepresentationProxy : public vtkSMRepresentationProxy
 {
 public:
@@ -160,11 +162,21 @@ public:
     return self? self->SetScalarBarVisibility(view, visibile) : false;
     }
 
+  // Description:
+  // Returns the array information for the data array used for scalar coloring,
+  // if any. Otherwise returns NULL.
+  virtual vtkPVArrayInformation* GetArrayInformationForColorArray();
+  static vtkPVArrayInformation* GetArrayInformationForColorArray(vtkSMProxy* proxy)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->GetArrayInformationForColorArray() : NULL;
+    }
 
 protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy();
-  
+
   // Description:
   // Rescales transfer function ranges using the array information provided.
   virtual bool RescaleTransferFunctionToDataRange(

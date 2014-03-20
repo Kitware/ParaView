@@ -130,8 +130,6 @@ vtkSMProxy::vtkSMProxy()
   this->Deprecated = 0;
 
   this->State = new vtkSMMessage();
-
-  this->ParentProxyCount = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -995,6 +993,18 @@ vtkSMProxy* vtkSMProxy::GetSubProxy(const char* name)
 }
 
 //---------------------------------------------------------------------------
+bool vtkSMProxy::GetIsSubProxy()
+{
+  return this->ParentProxy == NULL;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxy::GetParentProxy()
+{
+  return this->ParentProxy.GetPointer();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::AddSubProxy( const char* name, vtkSMProxy* proxy,
                               int override)
 {
@@ -1013,7 +1023,7 @@ void vtkSMProxy::AddSubProxy( const char* name, vtkSMProxy* proxy,
     }
 
   this->Internals->SubProxies[name] = proxy;
-  proxy->ParentProxyCount++; 
+  proxy->ParentProxy = this;
 
   proxy->AddObserver(vtkCommand::PropertyModifiedEvent,this->SubProxyObserver);
   proxy->AddObserver(vtkCommand::UpdatePropertyEvent,  this->SubProxyObserver);
@@ -1059,7 +1069,7 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
 
   if (subProxy.GetPointer())
     {
-    subProxy->ParentProxyCount--;
+    subProxy->ParentProxy = NULL;
     // Now, remove any shared property links for the subproxy.
     vtkSMProxyInternals::SubProxyLinksType::iterator iter2 =
       this->Internals->SubProxyLinks.begin();

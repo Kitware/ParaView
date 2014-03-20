@@ -25,6 +25,8 @@
 #include "vtkSMProxy.h"
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro
 
+class vtkPVArrayInformation;
+
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionProxy : public vtkSMProxy
 {
 public:
@@ -147,6 +149,19 @@ public:
     vtkSMTransferFunctionProxy* self =
       vtkSMTransferFunctionProxy::SafeDownCast(proxy);
     return self? self->FindScalarBarRepresentation(view) : NULL;
+    }
+
+  // Description:
+  // Update component titles for all scalar bars connected to this transfer
+  // function proxy. The arrayInfo is used to determine component names, if
+  // possible.
+  virtual bool UpdateScalarBarsComponentTitle(vtkPVArrayInformation* arrayInfo);
+  static bool UpdateScalarBarsComponentTitle(vtkSMProxy* proxy,
+    vtkPVArrayInformation* arrayInfo)
+    {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self? self->UpdateScalarBarsComponentTitle(arrayInfo) : false;
     }
 
 //BTX

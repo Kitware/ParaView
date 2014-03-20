@@ -24,12 +24,14 @@
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <set>
 #include <string>
+#include <vtksys/ios/sstream>
 
 class vtkSMPVRepresentationProxy::vtkStringSet :
   public std::set<std::string> {};
@@ -431,12 +433,46 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
       titleProp->IsValueDefault() &&
       compProp->IsValueDefault())
     {
+    vtkSMPropertyHelper colorArrayHelper(this, "ColorArrayName");
     vtkSMPropertyHelper(titleProp).Set(
-      vtkSMPropertyHelper(this, "ColorArrayName").GetInputArrayNameToProcess());
-    vtkSMPropertyHelper(compProp).Set("FIXME");
+      colorArrayHelper.GetInputArrayNameToProcess());
+    // now, determine a name for it if possible.
+    vtkPVArrayInformation* arrayInfo = this->GetArrayInformationForColorArray();
+    vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(sbProxy, arrayInfo);
     }
   sbProxy->UpdateVTKObjects();
   return true;
+}
+
+//----------------------------------------------------------------------------
+vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorArray()
+{
+  if (!this->GetUsingScalarColoring())
+    {
+    return NULL;
+    }
+
+  // now, determine a name for it if possible.
+  vtkSMPropertyHelper colorArrayHelper(this, "ColorArrayName");
+  vtkPVArrayInformation* arrayInfo =
+    this->GetRepresentedDataInformation()->GetArrayInformation(
+      colorArrayHelper.GetInputArrayNameToProcess(),
+      colorArrayHelper.GetInputArrayAssociation());
+  if (arrayInfo)
+    {
+    return arrayInfo;
+    }
+
+  vtkSMPropertyHelper inputHelper(this, "Input");
+  vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+  unsigned int port = inputHelper.GetOutputPort();
+  if (input)
+    {
+    return input->GetDataInformation(port)->GetArrayInformation(
+      colorArrayHelper.GetInputArrayNameToProcess(),
+      colorArrayHelper.GetInputArrayAssociation());
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

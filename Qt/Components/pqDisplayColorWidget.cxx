@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMTransferFunctionProxy.h"
 #include "vtkWeakPointer.h"
 
 #include <QComboBox>
@@ -432,13 +433,18 @@ void pqDisplayColorWidget::componentNumberChanged()
 
     // we could now respect some application setting to determine if the LUT is
     // to be reset.
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
-      this->Representation? this->Representation->getProxy() : NULL);
+    vtkSMProxy* reprProxy = this->Representation?
+      this->Representation->getProxy() : NULL;
+    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy);
 
+    // Update scalar bars.
+    vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
+      this->ColorTransferFunction->getProxy(),
+      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(reprProxy));
     END_UNDO_SET();
-    // FIXME: when LUT changes, the LUT may be shown in multiple views, so
-    // we really need to render all the affected views.
-    this->renderActiveView();
+
+    // render all views since this could affect multiple views.
+    pqApplicationCore::instance()->render();
     }
 }
 

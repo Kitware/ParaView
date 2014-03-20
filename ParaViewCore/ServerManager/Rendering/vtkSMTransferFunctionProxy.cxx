@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTuple.h"
 
@@ -613,6 +614,29 @@ vtkSMProxy* vtkSMTransferFunctionProxy::FindScalarBarRepresentation(vtkSMProxy* 
       }
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
+  vtkPVArrayInformation* info)
+{
+  // find all scalar bars for this transfer function and update their titles.
+  for (unsigned int cc=0, max = this->GetNumberOfConsumers(); cc < max; ++cc)
+    {
+    vtkSMProxy* consumer = this->GetConsumerProxy(cc);
+    while (consumer && consumer->GetParentProxy())
+      {
+      consumer = consumer->GetParentProxy();
+      }
+
+    vtkSMScalarBarWidgetRepresentationProxy* sb =
+      vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(consumer);
+    if (sb)
+      {
+      sb->UpdateComponentTitle(info);
+      }
+    }
+  return true;
 }
 
 //----------------------------------------------------------------------------
