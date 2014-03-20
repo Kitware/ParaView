@@ -55,10 +55,11 @@ class CoProcessor(object):
         self.__Frequencies = frequencies
 
 
-    def EnableLiveVisualization(self, enable, frequency):
+    def EnableLiveVisualization(self, enable, frequency = 1):
         """Call this method to enable live-visualization. When enabled,
         DoLiveVisualization() will communicate with ParaView server if possible
-        for live visualization"""
+        for live visualization. Frequency specifies how often the
+        communication happens (default is every second)."""
         self.__EnableLiveVisualization = enable
         self.__LiveVisualizationFrequency = frequency
         if (enable):
