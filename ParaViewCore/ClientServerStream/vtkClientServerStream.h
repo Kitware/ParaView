@@ -156,6 +156,7 @@ public:
   int GetArgument(int message, int argument, const char** value) const;
   int GetArgument(int message, int argument, char** value) const;
   int GetArgument(int message, int argument, vtkStdString* value) const;
+  int GetArgument(int message, int argument, std::string* value) const;
   int GetArgument(int message, int argument, vtkClientServerStream* value) const;
   int GetArgument(int message, int argument, vtkClientServerID* value) const;
   int GetArgument(int message, int argument, vtkObjectBase** value) const;

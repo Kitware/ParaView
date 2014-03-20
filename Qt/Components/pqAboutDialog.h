@@ -55,7 +55,7 @@ protected:
   void AddClientInformation();
   void AddServerInformation();
   void AddServerInformation(pqServer* server, QTreeWidget* tree);
-  
+
 private:
   Q_DISABLE_COPY(pqAboutDialog)
   Ui::pqAboutDialog* const Ui;
