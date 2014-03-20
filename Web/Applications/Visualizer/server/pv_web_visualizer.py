@@ -26,6 +26,12 @@ r"""
         --group-regex "^\\.|~$|^\\$"
               Regular expression used to group files into a single loadable entity.
 
+        --plugins
+            List of fully qualified path names to plugin objects to load
+
+        --filters
+            Path to a file with json text containing filters to load
+
     Any ParaViewWeb executable script come with a set of standard arguments that
     can be overriden if need be::
 
