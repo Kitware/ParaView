@@ -27,7 +27,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QComboBox" name="criteria"/>
+      <widget class="QComboBox" name="criteria">
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QComboBox" name="condition">
