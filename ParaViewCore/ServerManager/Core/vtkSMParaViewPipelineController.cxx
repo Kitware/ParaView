@@ -27,6 +27,7 @@
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 
@@ -730,9 +731,12 @@ bool vtkSMParaViewPipelineController::PreInitializeProxyInternal(vtkSMProxy* pro
     return false;
     }
 
-  // 3. Load property values from Settings (FIXME)
+  // 3. Load property values from Settings
+  std::string jsonPrefix(".");
+  jsonPrefix.append(proxy->GetXMLGroup());
 
-  // proxy->LoadPropertyValuesFromSettings();
+  vtkSMSettings * settings = vtkSMSettings::GetInstance();
+  settings->GetProxySettings(proxy, jsonPrefix.c_str());
 
   // Now, update the initialization time.
   this->Internals->InitializationTimeStamps[proxy].Modified();
