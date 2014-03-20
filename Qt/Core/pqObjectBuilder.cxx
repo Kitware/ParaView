@@ -332,37 +332,7 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
     }
 
   emit this->destroying(source);
-
-  // * remove inputs.
-  // TODO: this step should not be necessary, but it currently
-  // is :(. Needs some looking into.
-  vtkSmartPointer<vtkSMPropertyIterator> piter;
-  piter.TakeReference(source->getProxy()->NewPropertyIterator());
-  for(piter->Begin(); !piter->IsAtEnd(); piter->Next())
-    {
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      piter->GetProperty());
-    if (pp)
-      {
-      pp->RemoveAllProxies();
-      }
-    }
-
-  // * remove all representations.
-  for (int cc=0; cc < source->getNumberOfOutputPorts(); cc++)
-    {
-    QList<pqDataRepresentation*> reprs = source->getRepresentations(cc, NULL);
-    foreach (pqDataRepresentation* repr, reprs)
-      {
-      if (repr)
-        {
-        this->destroy(repr);
-        }
-      }
-    }
-
-  // * Unregister proxy.
-  this->destroyProxyInternal(source);
+  pqObjectBuilderNS::Controller->Finalize(source->getProxy());
 }
 
 //-----------------------------------------------------------------------------
@@ -426,24 +396,7 @@ void pqObjectBuilder::destroy(pqView* view)
     }
 
   emit this->destroying(view);
-
-  // Get a list of all reprs belonging to this render module. We delete
-  // all the reprs that belong only to this render module.
-  QList<pqRepresentation*> reprs = view->getRepresentations();
-
-  // Unregister the proxy....the rest of the GUI will(rather should) manage itself!
-  QString name = view->getSMName();
-
-  this->destroyProxyInternal(view);
-
-  // Now clean up any orphan reprs.
-  foreach (pqRepresentation* repr, reprs)
-    {
-    if (repr)
-      {
-      this->destroyProxyInternal(repr);
-      }
-    }
+  pqObjectBuilderNS::Controller->Finalize(view->getProxy());
 }
 
 //-----------------------------------------------------------------------------

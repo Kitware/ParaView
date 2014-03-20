@@ -30,6 +30,7 @@
 #include "vtkSMSettings.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 
 #include <cassert>
 #include <map>
@@ -156,7 +157,8 @@ bool vtkSMParaViewPipelineController::CreateProxiesForProxyListDomains(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains(vtkSMProxy* proxy)
+void vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains(
+  vtkSMProxy* proxy)
 {
   assert(proxy != NULL);
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
@@ -179,6 +181,7 @@ void vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains(vtkSMPr
     for (unsigned int cc=0, max=pld->GetNumberOfProxies(); cc < max; cc++)
       {
       vtkSMProxy* plproxy = pld->GetProxy(cc);
+
       // Handle proxy-list hinks.
       this->ProcessProxyListProxyHints(proxy, plproxy);
 
@@ -558,6 +561,60 @@ bool vtkSMParaViewPipelineController::PostInitializeRepresentation(vtkSMProxy* p
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::FinalizeRepresentation(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  std::string groupname("representations");
+  const char* _proxyname = pxm->GetProxyName(groupname.c_str(), proxy);
+  if (_proxyname == NULL)
+    {
+    groupname = "scalar_bars";
+    _proxyname = pxm->GetProxyName(groupname.c_str(), proxy);
+    if (_proxyname == NULL)
+      {
+      return false;
+      }
+    }
+  const std::string proxyname(_proxyname);
+
+  //---------------------------------------------------------------------------
+  // remove the representation from any views.
+  typedef std::vector<std::pair<vtkSMProxy*, vtkSMProperty*> > viewsvector;
+  viewsvector views;
+  for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc < max; cc++)
+    {
+    vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
+    while (consumer && consumer->GetParentProxy())
+      {
+      consumer = consumer->GetParentProxy();
+      }
+    if (consumer && consumer->IsA("vtkSMViewProxy") && proxy->GetConsumerProperty(cc))
+      {
+      views.push_back(
+        std::pair<vtkSMProxy*, vtkSMProperty*>(
+          consumer, proxy->GetConsumerProperty(cc)));
+      }
+    }
+  for (viewsvector::iterator iter=views.begin(), max=views.end(); iter != max; ++iter)
+    {
+    if (iter->first && iter->second)
+      {
+      vtkSMPropertyHelper(iter->second).Remove(proxy);
+      iter->first->UpdateVTKObjects();
+      }
+    }
+
+  this->FinalizeProxy(proxy);
+  proxy->GetSessionProxyManager()->UnRegisterProxy(
+    groupname.c_str(), proxyname.c_str(), proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::AddRepresentationToView(
   vtkSMProxy* view, vtkSMProxy* repr)
 {
@@ -674,6 +731,41 @@ bool vtkSMParaViewPipelineController::PostInitializePipelineProxy(vtkSMProxy* pr
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::FinalizePipelineProxy(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  const char* _proxyname = pxm->GetProxyName("sources", proxy);
+  if (_proxyname == NULL)
+    {
+    return false;
+    }
+  const std::string proxyname(_proxyname);
+
+  // ensure proxy is no longer active.
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
+  assert(selmodel != NULL);
+  if (selmodel->GetCurrentProxy() == proxy)
+    {
+    selmodel->SetCurrentProxy(NULL, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+    }
+
+  // remove proxy from TimeKeeper.
+  vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
+  vtkSMPropertyHelper(timeKeeper, "TimeSources").Remove(proxy);
+  timeKeeper->UpdateVTKObjects();
+
+  // this will remove both proxy-list-domain helpers and animation helpers.
+  this->FinalizeProxy(proxy);
+
+  pxm->UnRegisterProxy("sources", proxyname.c_str(), proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::InitializeView(vtkSMProxy* proxy)
 {
   if (!this->InitializeProxy(proxy))
@@ -702,6 +794,78 @@ bool vtkSMParaViewPipelineController::InitializeView(vtkSMProxy* proxy)
     proxy->GetSessionProxyManager()->GetSelectionModel("ActiveView");
   assert(selmodel != NULL);
   selmodel->SetCurrentProxy(proxy, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::FinalizeView(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  const char* _proxyname = pxm->GetProxyName("views", proxy);
+  if (_proxyname == NULL)
+    {
+    return false;
+    }
+  const std::string proxyname(_proxyname);
+
+  // ensure proxy is no longer active.
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveView");
+  assert(selmodel != NULL);
+  if (selmodel->GetCurrentProxy() == proxy)
+    {
+    selmodel->SetCurrentProxy(NULL, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+    }
+
+  // remove proxy from AnimationScene (optional)
+  vtkSMProxy* scene = this->GetAnimationScene(proxy->GetSession());
+  if (scene)
+    {
+    vtkSMPropertyHelper(scene, "ViewModules").Remove(proxy);
+    scene->UpdateVTKObjects();
+    }
+
+  // remove proxy from TimeKeeper.
+  vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
+  vtkSMPropertyHelper(timeKeeper, "Views").Remove(proxy);
+  timeKeeper->UpdateVTKObjects();
+
+  // remove all representation proxies.
+  const char* pnames[]={"Representations", "HiddenRepresentations",
+    "Props", "HiddenProps", NULL};
+  for (int index=0; pnames[index] != NULL; ++index)
+    {
+    vtkSMProperty* prop = proxy->GetProperty(pnames[index]);
+    if (prop == NULL)
+      {
+      continue;
+      }
+
+    typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
+    proxyvectortype reprs;
+
+    vtkSMPropertyHelper helper(prop);
+    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max ; ++cc)
+      {
+      reprs.push_back(helper.GetAsProxy(cc));
+      }
+
+    for (proxyvectortype::iterator iter=reprs.begin(), end=reprs.end(); iter!=end; ++iter)
+      {
+      if (iter->GetPointer())
+        {
+        this->Finalize(iter->GetPointer());
+        }
+      }
+    }
+
+  // this will remove both proxy-list-domain helpers and animation helpers.
+  this->FinalizeProxy(proxy);
+
+  pxm->UnRegisterProxy("views", proxyname.c_str(), proxy);
   return true;
 }
 
@@ -813,6 +977,117 @@ bool vtkSMParaViewPipelineController::PostInitializeProxyInternal(vtkSMProxy* pr
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
   return true;
+}
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::FinalizeProxyInternal(vtkSMProxy* proxy)
+{
+  assert(proxy != NULL);
+
+  //---------------------------------------------------------------------------
+  // Unregister all helper proxies. This will "finalize" all the helper
+  // proxies which ensures that any "dependent" proxies for those helpers
+  // also get removed.
+  vtksys_ios::ostringstream groupnamestr;
+  groupnamestr << "pq_helper_proxies." << proxy->GetGlobalIDAsString();
+  std::string groupname = groupnamestr.str();
+
+  typedef std::pair<std::string, vtkWeakPointer<vtkSMProxy> > proxymapitemtype;
+  typedef std::vector<proxymapitemtype> proxymaptype;
+  proxymaptype proxymap;
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+    {
+    vtkNew<vtkSMProxyIterator> iter;
+    iter->SetSessionProxyManager(pxm);
+    iter->SetModeToOneGroup();
+    for (iter->Begin(groupnamestr.str().c_str()); !iter->IsAtEnd(); iter->Next())
+      {
+      proxymap.push_back(proxymapitemtype(
+          iter->GetKey(), iter->GetProxy()));
+      }
+    }
+  for (proxymaptype::iterator iter = proxymap.begin(), end = proxymap.end();
+    iter != end; ++iter)
+    {
+    if (iter->second)
+      {
+      this->FinalizeProxy(iter->second);
+      pxm->UnRegisterProxy(
+        groupnamestr.str().c_str(), iter->first.c_str(), iter->second);
+      }
+    }
+
+  //---------------------------------------------------------------------------
+  // Before going any further build a list of all consumer proxies
+  // (not pointing to internal/sub-proxies).
+
+  typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
+  proxyvectortype consumers;
+
+  for (unsigned int cc=0, max = proxy->GetNumberOfConsumers(); cc < max; ++cc)
+    {
+    vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
+    while (consumer && consumer->GetParentProxy())
+      {
+      consumer = consumer->GetParentProxy();
+      }
+    if (consumer)
+      {
+      consumers.push_back(consumer);
+      }
+    }
+
+  //---------------------------------------------------------------------------
+  // Remove representations connected to this proxy, if any.
+  for (proxyvectortype::iterator iter = consumers.begin(), max = consumers.end();
+    iter != max; ++iter)
+    {
+    vtkSMProxy* consumer = iter->GetPointer();
+    if (consumer &&
+        consumer->IsA("vtkSMRepresentationProxy"))
+      {
+      this->Finalize(consumer);
+      }
+    }
+
+  //---------------------------------------------------------------------------
+  // TODO: remove any animation cues for this proxy
+  // TODO: remove any property links/proxy link setup for this proxy.
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
+{
+  return proxy? this->FinalizeProxyInternal(proxy) : false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::Finalize(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  // determine what type of proxy is this, based on that, we can finalize it.
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  if (pxm->GetProxyName("sources", proxy))
+    {
+    return this->FinalizePipelineProxy(proxy);
+    }
+  else if (pxm->GetProxyName("representations", proxy) ||
+           pxm->GetProxyName("scalar_bars", proxy))
+    {
+    return this->FinalizeRepresentation(proxy);
+    }
+  else if (pxm->GetProxyName("views", proxy))
+    {
+    return this->FinalizeView(proxy);
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

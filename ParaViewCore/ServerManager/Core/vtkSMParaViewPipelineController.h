@@ -108,8 +108,19 @@ public:
 
   //---------------------------------------------------------------------------
   // ****** Methods for arbitrary proxies ******
+
+  // Description:
+  // These methods don't register/unregister the \c proxy. They perform
+  // standard initialization/finaization tasks common for all types of proxies
+  // in a ParaView application, except the actual registration/unregistration of
+  // the \c proxy, since which group a proxy is registered to depends on its
+  // type. Note these methods may register other proxies that are created as
+  // part of the initialization process e.g. proxies for proxy list domains,
+  // etc.
   virtual bool PreInitializeProxy(vtkSMProxy* proxy);
   virtual bool PostInitializeProxy(vtkSMProxy* proxy);
+  virtual bool FinalizeProxy(vtkSMProxy*);
+
   // Description:
   // Convenience method, simply class PreInitializeProxy() and
   // PostInitializeProxy().
@@ -117,6 +128,28 @@ public:
     {
     return this->PreInitializeProxy(proxy) && this->PostInitializeProxy(proxy);
     }
+
+  //---------------------------------------------------------------------------
+  // ****** Methods for cleanup/finalization/deleting ******
+  //
+  // Description:
+  // Method to finalize a proxy. This is same as requesting the proxy be
+  // deleted. Based on the type of the proxy, this may result in other proxies
+  // be finalized as well, e.g.
+  // \li for a pipeline-proxy, this will finalize all representations that use
+  // this proxy;
+  // \li for a view-proxy, this will finalize all representations shown in that
+  // view;
+  // \li for an animation-scene, this will finalize all animation cues known
+  // to the scene.
+  virtual bool Finalize(vtkSMProxy*);
+
+  // Description:
+  // These methods are provided for completeness. Finalize() calls the
+  // appropriate method based on the type of proxy pass in.
+  virtual bool FinalizePipelineProxy(vtkSMProxy* proxy);
+  virtual bool FinalizeRepresentation(vtkSMProxy* proxy);
+  virtual bool FinalizeView(vtkSMProxy* proxy);
 
 //BTX
 protected:
@@ -142,6 +175,7 @@ protected:
 
   virtual bool PreInitializeProxyInternal(vtkSMProxy*);
   virtual bool PostInitializeProxyInternal(vtkSMProxy*);
+  virtual bool FinalizeProxyInternal(vtkSMProxy*);
 
   // Description:
   // Proxies in proxy-list domains can have hints that are used to setup

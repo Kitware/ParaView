@@ -56,7 +56,7 @@ namespace
     }
 }
 
-vtkStandardNewMacro(vtkSMTransferFunctionManager);
+vtkObjectFactoryNewMacro(vtkSMTransferFunctionManager);
 //----------------------------------------------------------------------------
 vtkSMTransferFunctionManager::vtkSMTransferFunctionManager()
 {
