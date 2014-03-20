@@ -26,6 +26,8 @@
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include <string>  // STL required.
+#include <vector>  // STL required.
 
 class vtkTable;
 class vtkNonOverlappingAMR;
@@ -52,7 +54,9 @@ protected:
   //   Pipeline helper.  Run on each material independently.
   vtkTable* DoRequestData(vtkNonOverlappingAMR* volume, 
                           const char* volumeArray,
-                          const char* massArray);
+                          const char* massArray,
+                          std::vector<std::string> volumeWeightedNames,
+                          std::vector<std::string> massWeightedNames);
 
 private:
   vtkAMRFragmentIntegration(const vtkAMRFragmentIntegration&);  // Not implemented.

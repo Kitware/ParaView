@@ -49,6 +49,16 @@ public:
   void AddInputMassArrayToProcess(const char* name);
   void ClearInputMassArrayToProcess();
 
+  // Description:
+  // Add to list of volume weighted arrays 
+  void AddInputVolumeWeightedArrayToProcess(const char* name);
+  void ClearInputVolumeWeightedArrayToProcess();
+
+  // Description:
+  // Add to list of mass weighted arrays 
+  void AddInputMassWeightedArrayToProcess(const char* name);
+  void ClearInputMassWeightedArrayToProcess();
+
   void SetContourConnection (vtkAlgorithmOutput*);
 
   //BTX
