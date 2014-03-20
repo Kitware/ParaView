@@ -144,6 +144,11 @@ bool vtkSMParaViewPipelineController::CreateProxiesForProxyListDomains(
         {
         this->PreInitializeProxy(pld->GetProxy(cc));
         }
+      // this is unnecessary here. only done for CompoundSourceProxy instances.
+      // those proxies, we generally skip calling "reset" on in
+      // PostInitializeProxyInternal(). However, for properties that have proxy
+      // list domains, we need to reset them (e.g ProbeLine filter).
+      iter->GetProperty()->ResetToDomainDefaults();
       }
     }
   return true;
