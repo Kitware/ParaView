@@ -900,12 +900,9 @@ bool vtkSMParaViewPipelineController::PreInitializeProxyInternal(vtkSMProxy* pro
     return false;
     }
 
-  // 3. Load property values from Settings
-  std::string jsonPrefix(".");
-  jsonPrefix.append(proxy->GetXMLGroup());
-
+  // 3. Load property values from Settings.
   vtkSMSettings * settings = vtkSMSettings::GetInstance();
-  settings->GetProxySettings(proxy, jsonPrefix.c_str());
+  settings->GetProxySettings(proxy);
 
   // Now, update the initialization time.
   this->Internals->InitializationTimeStamps[proxy].Modified();

@@ -891,30 +891,57 @@ void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMSettings::GetScalarSettingAsInt(const char* settingName)
+int vtkSMSettings::GetScalarSettingAsInt(const char* settingName, int defaultValue)
 {
   int value;
-  this->Internal->GetScalarSetting(settingName, value);
+  bool success = this->Internal->GetScalarSetting(settingName, value);
+
+  if (!success)
+    {
+    return defaultValue;
+    }
 
   return value;
 }
 
 //----------------------------------------------------------------------------
-double vtkSMSettings::GetScalarSettingAsDouble(const char* settingName)
+double vtkSMSettings::GetScalarSettingAsDouble(const char* settingName, double defaultValue)
 {
   double value;
-  this->Internal->GetScalarSetting(settingName, value);
+  bool success = this->Internal->GetScalarSetting(settingName, value);
+
+  if (!success)
+    {
+    return defaultValue;
+    }
 
   return value;
 }
 
 //----------------------------------------------------------------------------
-std::string vtkSMSettings::GetScalarSettingAsString(const char* settingName)
+std::string vtkSMSettings::GetScalarSettingAsString(const char* settingName, const std::string & defaultValue)
 {
   std::string value;
-  this->Internal->GetScalarSetting(settingName, value);
+  bool success = this->Internal->GetScalarSetting(settingName, value);
+
+  if (!success)
+    {
+    return defaultValue;
+    }
 
   return value;
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMSettings::GetNumberOfElements(const char* settingName)
+{
+  Json::Value value = this->Internal->GetSetting(settingName);
+  if (value.isArray())
+    {
+    return value.size();
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -945,8 +972,75 @@ std::vector<std::string> vtkSMSettings::GetVectorSettingAsStrings(const char* se
 }
 
 //----------------------------------------------------------------------------
+int vtkSMSettings::GetVectorSettingAsInt(const char* settingName,
+                                         unsigned int index,
+                                         int defaultValue)
+{
+  std::vector<int> values;
+  bool success = this->Internal->GetVectorSetting(settingName, values);
+
+  if (success && index < values.size())
+    {
+    return values[index];
+    }
+
+  return defaultValue;
+}
+
+//----------------------------------------------------------------------------
+double vtkSMSettings::GetVectorSettingAsDouble(const char* settingName,
+                                               unsigned int index,
+                                               double defaultValue)
+{
+  std::vector<double> values;
+  bool success = this->Internal->GetVectorSetting(settingName, values);
+
+  if (success && index < values.size())
+    {
+    return values[index];
+    }
+
+  return defaultValue;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSettings::GetVectorSettingAsString(const char* settingName,
+                                                    unsigned int index,
+                                                    const std::string & defaultValue)
+{
+  std::vector<std::string> values;
+  bool success = this->Internal->GetVectorSetting(settingName, values);
+
+  if (success && index < values.size())
+    {
+    return values[index];
+    }
+
+  return defaultValue;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  std::string jsonPrefix(".");
+  jsonPrefix.append(proxy->GetXMLGroup());
+
+  return this->GetProxySettings(proxy, jsonPrefix.c_str());
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy, const char* jsonPrefix)
 {
+  if (!proxy)
+    {
+    return false;
+    }
+
   return this->Internal->GetProxySettings(proxy, jsonPrefix);
 }
 

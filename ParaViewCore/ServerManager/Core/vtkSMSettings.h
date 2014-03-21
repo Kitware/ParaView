@@ -95,21 +95,39 @@ public:
 
   // Description:
   // Get setting as a scalar value
-  int         GetScalarSettingAsInt(const char* settingName);
-  double      GetScalarSettingAsDouble(const char* settingName);
-  std::string GetScalarSettingAsString(const char* settingName);
+  int         GetScalarSettingAsInt(const char* settingName, int defaultValue);
+  double      GetScalarSettingAsDouble(const char* settingName, double defaultValue);
+  std::string GetScalarSettingAsString(const char* settingName, const std::string & defaultValue);
 
   // Description:
-  // Get setting as a vector of a certain type. Returns true on
-  // success, false on failure. These methods work on values given as
-  // JSON arrays of numbers as well as singular JSON numbers.
+  // Get the number of elements in a vector setting.
+  unsigned int GetNumberOfElements(const char* settingName);
+
+  // Description:
+  // Get setting as a vector of a certain type.
+  // These methods work on values specified as JSON arrays of numbers
+  // as well as singular JSON numbers.
   std::vector<int>         GetVectorSettingAsInts(const char* settingName);
   std::vector<double>      GetVectorSettingAsDoubles(const char* settingName);
   std::vector<std::string> GetVectorSettingAsStrings(const char* settingName);
 
   // Description:
-  // Set the property values in a vtkSMProxy from a Json path.
-  // The jsonPrefix specifies the root level of the Json tree where this method
+  // Get a single element of a vector setting.
+  int         GetVectorSettingAsInt(const char* settingName, unsigned int index,
+                                    int defaultValue);
+  double      GetVectorSettingAsDouble(const char* settingName, unsigned int index,
+                                       double defaultValue);
+  std::string GetVectorSettingAsString(const char* settingName, unsigned int index,
+                                       const std::string & defaultValue);
+
+  // Description:
+  // Set the property values in a vtkSMProxy from the settings file.
+  // Searches settings from the settings root.
+  bool GetProxySettings(vtkSMProxy* proxy);
+
+  // Description:
+  // Set the property values in a vtkSMProxy from a JSON prefix.
+  // The jsonPrefix specifies the root level of the JSON tree where this method
   // should look for settings. The group and name of the proxy are
   // appended to the jsonPrefix automatically.
   bool GetProxySettings(vtkSMProxy* proxy, const char* jsonPrefix);
