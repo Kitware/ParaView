@@ -39,6 +39,11 @@ if settingValue != trueRadius:
   print "Direct access of setting value", settingPath, "failed"
   sys.exit(-1)
 
+settingValue = settings.GetVectorSettingAsDouble(settingPath, 0, 0.0)
+if settingValue != trueRadius:
+  print "Direct access of setting value", settingPath, "as vector element failed"
+  sys.exit(-1)
+
 settingPath = ".sources.SphereSource.ThetaResolution"
 settingValue = settings.GetScalarSettingAsInt(settingPath, 0)
 if settingValue != trueThetaResolution:
