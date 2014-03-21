@@ -195,18 +195,6 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetScalarSetting(const Json::Value & jsonValue, long long int & value)
-  {
-    if (!jsonValue.isNumeric())
-      {
-      return false;
-      }
-    value = jsonValue.asLargestInt();
-
-    return true;
-  }
-
-  //----------------------------------------------------------------------------
   bool GetScalarSetting(const Json::Value & jsonValue, double & value)
   {
     if (!jsonValue.isNumeric())
@@ -227,7 +215,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetScalarSetting(const Json::Value & jsonValue, vtkStdString & value)
+  bool GetScalarSetting(const Json::Value & jsonValue, std::string & value)
   {
     if (!jsonValue.isString())
       {
@@ -375,7 +363,7 @@ public:
         }
       else
         {
-        vtkStdString stringValue;
+        std::string stringValue;
         bool hasString = this->GetScalarSetting(jsonPath, stringValue);
         if (hasString && enumDomain->HasEntryText(stringValue.c_str()))
           {
@@ -416,7 +404,7 @@ public:
   bool GetPropertySetting(vtkSMStringVectorProperty* property,
                           const char* jsonPath)
   {
-    std::vector<vtkStdString> vector;
+    std::vector<std::string> vector;
     if (!this->GetVectorSetting(jsonPath, vector))
       {
       return false;
@@ -425,7 +413,8 @@ public:
     vtkSmartPointer<vtkStringList> stringList = vtkSmartPointer<vtkStringList>::New();
     for (size_t i = 0; i < vector.size(); ++i)
       {
-      stringList->AddString(vector[i]);
+      vtkStdString vtk_string(vector[i]);
+      stringList->AddString(vtk_string);
       }
     
     property->SetElements(stringList);
@@ -442,13 +431,13 @@ public:
     if (proxyListDomain = vtkSMProxyListDomain::SafeDownCast(domain))
       {
       // Now check whether this proxy is the one we want
-      vtkStdString sourceSettingString(jsonPath);
+      std::string sourceSettingString(jsonPath);
       sourceSettingString.append(".Selected");
 
-      vtkStdString sourceName;
+      std::string sourceName;
       if (this->HasSetting(sourceSettingString.c_str()))
         {
-        std::vector<vtkStdString> selectedString;
+        std::vector<std::string> selectedString;
         this->GetVectorSetting(sourceSettingString.c_str(), selectedString);
         if (selectedString.size() > 0)
           {
@@ -793,13 +782,7 @@ void vtkSMSettings::SetScalarSetting(const char* settingName, double value)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetScalarSetting(const char* settingName, long long int value)
-{
-  this->Internal->SetScalarSetting(settingName, value);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSettings::SetScalarSetting(const char* settingName, const vtkStdString & value)
+void vtkSMSettings::SetScalarSetting(const char* settingName, const std::string & value)
 {
   this->Internal->SetScalarSetting(settingName, value);
 }
@@ -820,14 +803,7 @@ void vtkSMSettings::SetVectorSetting(const char* settingName,
 
 //----------------------------------------------------------------------------
 void vtkSMSettings::SetVectorSetting(const char* settingName,
-                                     const std::vector<long long int> & values)
-{
-  this->Internal->SetVectorSetting(settingName, values);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSettings::SetVectorSetting(const char* settingName,
-                                     const std::vector<vtkStdString> & values)
+                                     const std::vector<std::string> & values)
 {
   this->Internal->SetVectorSetting(settingName, values);
 }
@@ -933,18 +909,9 @@ double vtkSMSettings::GetScalarSettingAsDouble(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
-long long int vtkSMSettings::GetScalarSettingAsLongLongInt(const char* settingName)
+std::string vtkSMSettings::GetScalarSettingAsString(const char* settingName)
 {
-  long long int value;
-  this->Internal->GetScalarSetting(settingName, value);
-
-  return value;
-}
-
-//----------------------------------------------------------------------------
-vtkStdString vtkSMSettings::GetScalarSettingAsString(const char* settingName)
-{
-  vtkStdString value;
+  std::string value;
   this->Internal->GetScalarSetting(settingName, value);
 
   return value;
@@ -960,15 +927,6 @@ std::vector<int> vtkSMSettings::GetVectorSettingAsInts(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
-std::vector<long long int> vtkSMSettings::GetVectorSettingAsLongLongInts(const char* settingName)
-{
-  std::vector<long long int> values;
-  this->Internal->GetVectorSetting(settingName, values);
-
-  return values;
-}
-
-//----------------------------------------------------------------------------
 std::vector<double> vtkSMSettings::GetVectorSettingAsDoubles(const char* settingName)
 {
   std::vector<double> values;
@@ -978,9 +936,9 @@ std::vector<double> vtkSMSettings::GetVectorSettingAsDoubles(const char* setting
 }
 
 //----------------------------------------------------------------------------
-std::vector<vtkStdString> vtkSMSettings::GetVectorSettingAsStrings(const char* settingName)
+std::vector<std::string> vtkSMSettings::GetVectorSettingAsStrings(const char* settingName)
 {
-  std::vector<vtkStdString> values;
+  std::vector<std::string> values;
   this->Internal->GetVectorSetting(settingName, values);
 
   return values;
