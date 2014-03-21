@@ -104,6 +104,7 @@ public:
   // Return the animation track for time. If none exists, a new one will be
   // created. Returns NULL if the proxy is not available in the session.
   virtual vtkSMProxy* GetTimeAnimationTrack(vtkSMProxy* scene);
+
   //---------------------------------------------------------------------------
 
   //---------------------------------------------------------------------------
@@ -150,6 +151,7 @@ public:
   virtual bool FinalizePipelineProxy(vtkSMProxy* proxy);
   virtual bool FinalizeRepresentation(vtkSMProxy* proxy);
   virtual bool FinalizeView(vtkSMProxy* proxy);
+  virtual bool FinalizeAnimationProxy(vtkSMProxy* proxy);
 
   // Description:
   // Resets the session to its initial state by cleaning all pipeline

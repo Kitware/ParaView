@@ -1067,6 +1067,79 @@ bool vtkSMParaViewPipelineController::FinalizeProxyInternal(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::FinalizeAnimationProxy(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  const char* _proxyname = pxm->GetProxyName("animation", proxy);
+  if (_proxyname == NULL)
+    {
+    return false;
+    }
+  const std::string proxyname(_proxyname);
+
+  //---------------------------------------------------------------------------
+  // Animation proxies are typically added to some other animation proxy. We
+  // need to remove it from that proxy.
+  typedef std::pair<vtkWeakPointer<vtkSMProxy>, vtkWeakPointer<vtkSMProperty> > proxypairitemtype;
+  typedef std::vector<proxypairitemtype> proxypairvectortype;
+  proxypairvectortype consumers;
+  for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc<max; ++cc)
+    {
+    vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
+    while (consumer && consumer->GetParentProxy())
+      {
+      consumer = consumer->GetParentProxy();
+      }
+    if (proxy->GetConsumerProperty(cc) &&
+      consumer && consumer->GetXMLGroup() &&
+      strcmp(consumer->GetXMLGroup(), "animation") ==0)
+      {
+      consumers.push_back(proxypairitemtype(consumer, proxy->GetConsumerProperty(cc)));
+      }
+    }
+  for (proxypairvectortype::iterator iter=consumers.begin(), max=consumers.end();
+    iter != max; ++iter)
+    {
+    if (iter->first && iter->second)
+      {
+      vtkSMPropertyHelper(iter->second).Remove(proxy);
+      iter->first->UpdateVTKObjects();
+      }
+    }
+
+  //---------------------------------------------------------------------------
+  // destroy keyframes, if there are any.
+  typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
+  proxyvectortype keyframes;
+  if (vtkSMProperty* kfProperty = proxy->GetProperty("KeyFrames"))
+    {
+    vtkSMPropertyHelper helper(kfProperty);
+    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc<max;++cc)
+      {
+      keyframes.push_back(helper.GetAsProxy(cc));
+      }
+    }
+  this->FinalizeProxy(proxy);
+  pxm->UnRegisterProxy("animation", proxyname.c_str(), proxy);
+
+  // now destroy all keyframe proxies.
+  for (proxyvectortype::iterator iter=keyframes.begin(), max=keyframes.end();
+    iter != max;++iter)
+    {
+    if (iter->GetPointer())
+      {
+      this->Finalize(iter->GetPointer());
+      }
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
 {
   return proxy? this->FinalizeProxyInternal(proxy) : false;
@@ -1095,10 +1168,17 @@ bool vtkSMParaViewPipelineController::Finalize(vtkSMProxy* proxy)
     {
     return this->FinalizeView(proxy);
     }
+  else if (pxm->GetProxyName("animation", proxy))
+    {
+    if (proxy != this->GetAnimationScene(proxy->GetSession()))
+      {
+      return this->FinalizeAnimationProxy(proxy);
+      }
+    }
   else
     {
     const char* known_groups[] = {
-      "animation", "lookup_tables", "piecewise_functions", "layouts", NULL };
+      "lookup_tables", "piecewise_functions", "layouts", NULL };
     for (int cc=0; known_groups[cc] != NULL; ++cc)
       {
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))
