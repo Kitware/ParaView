@@ -2766,7 +2766,7 @@
             <Property name="Interpolation"
                       panel_visibility="advanced" />
             <Property name="Specular"
-                      panel_visibility="advanced" />
+                      panel_visibility="default" />
             <Property name="SpecularColor"
                       panel_widget="color_selector"
                       panel_visibility="advanced" />
@@ -2814,8 +2814,6 @@
                       panel_visibility="never" />
             <Property name="Texture"
                       panel_visibility="advanced" />
-            <Property name="AllowSpecularHighlightingWithScalarColoring"
-                      panel_visibility="never" />
             <Property name="UserTransform"
                       panel_visibility="never" />
             <Property name="NonlinearSubdivisionLevel"
@@ -3667,7 +3665,7 @@
                            name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSpecular"
-                            default_values="0.1"
+                            default_values="0.0"
                             name="Specular"
                             number_of_elements="1">
         <DoubleRangeDomain max="1"
@@ -4016,7 +4014,7 @@
                            name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSpecular"
-                            default_values="0.1"
+                            default_values="0.0"
                             name="Specular"
                             number_of_elements="1">
         <DoubleRangeDomain max="1"
@@ -4204,12 +4202,6 @@
       <IntVectorProperty command="SetStatic"
                          default_values="0"
                          name="StaticMode"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetAllowSpecularHighlightingWithScalarColoring"
-                         default_values="0"
-                         name="AllowSpecularHighlightingWithScalarColoring"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -6787,7 +6779,6 @@
             <PropertyGroup panel_visibility="default"
                            label="Color"
                            panel_widget="ColorEditor">
-              <Property name="AllowSpecularHighlightingWithScalarColoring" />
               <Property name="Ambient" />
               <Property name="AmbientColor" />
               <Property name="BackfaceAmbientColor" />
@@ -7843,7 +7834,7 @@
                            name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetSpecular"
-                            default_values="0.1"
+                            default_values="0.0"
                             name="Specular"
                             number_of_elements="1">
         <DoubleRangeDomain max="1"

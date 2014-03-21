@@ -138,8 +138,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->DebugString = 0;
   this->SetDebugString(this->GetClassName());
 
-  this->AllowSpecularHighlightingWithScalarColoring = false;
-
   vtkMath::UninitializeBounds(this->DataBounds);
 
   this->SetupDefaults();
@@ -573,12 +571,6 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
     {
     diffuse = 0.0;
     ambient = 1.0;
-    specular = 0.0;
-    }
-  else if (using_scalar_coloring && !this->AllowSpecularHighlightingWithScalarColoring)
-    {
-    // Disable specular highlighting if coloring by scalars.
-    specular = 0.0;
     }
 
   this->Property->SetAmbient(ambient);
@@ -610,12 +602,6 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
     this->Actor->GetPropertyKeys()->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
     this->Actor->GetPropertyKeys()->Remove(vtkShadowMapBakerPass::RECEIVER());
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetAllowSpecularHighlightingWithScalarColoring(int allow)
-{
-  this->AllowSpecularHighlightingWithScalarColoring = allow > 0 ? true : false;
 }
 
 //----------------------------------------------------------------------------

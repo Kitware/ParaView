@@ -139,9 +139,6 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->StrictLoadBalancing,
                    SIGNAL(toggled(bool)),
                    this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->SpecularHighlighting,
-                   SIGNAL(toggled(bool)),
-                   this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->DisableSplashScreen,
                    SIGNAL(toggled(bool)),
                    this, SIGNAL(changesAvailable()));
@@ -332,9 +329,6 @@ void pqApplicationOptions::applyChanges()
   vtkProcessModuleAutoMPI::SetNumberOfCores(autoMPI_NumberOfCores);
 #endif
 
-  bool specularHighlighting = this->Internal->SpecularHighlighting->isChecked();
-  settings->setValue("allowSpecularHighlightingWithScalarColoring", specularHighlighting);
-
   bool strictLoadBalancing = this->Internal->StrictLoadBalancing->isChecked();
   settings->setValue("strictLoadBalancing", strictLoadBalancing);
 
@@ -374,21 +368,6 @@ void pqApplicationOptions::applyChanges()
   //pqChartRepresentation::setHiddenSeriesSetting(hidden);
 
   pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
-
-  pqServerManagerModel *serverManagerModel = pqApplicationCore::instance()->
-    getServerManagerModel();
-
-  foreach(pqPipelineRepresentation *representation, serverManagerModel->findItems<pqPipelineRepresentation*>())
-    {
-    vtkSMProxy *proxy = representation->getProxy();
-    if(proxy->GetProperty("AllowSpecularHighlightingWithScalarColoring"))
-      {
-      vtkSMPropertyHelper(representation->getProxy(), "AllowSpecularHighlightingWithScalarColoring").Set(
-        settings->value("allowSpecularHighlightingWithScalarColoring").toBool());
-
-      proxy->UpdateVTKObjects();
-      }
-    }
 
   // render all views.
   pqApplicationCore::instance()->render();
@@ -430,9 +409,6 @@ void pqApplicationOptions::resetChanges()
         settings->value("autoMPI_NumberOfCores",
                         vtkMultiThreader::GetGlobalMaximumNumberOfThreads ()).toInt());
 #endif
-
-  this->Internal->SpecularHighlighting->setChecked(
-    settings->value("allowSpecularHighlightingWithScalarColoring", false).toBool());
 
   this->Internal->StrictLoadBalancing->setChecked(
     settings->value("strictLoadBalancing", false).toBool());

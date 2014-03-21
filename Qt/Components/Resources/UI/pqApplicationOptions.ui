@@ -42,13 +42,6 @@
         </widget>
        </item>
        <item row="12" column="0">
-        <widget class="QLabel" name="SpecularHighlightingLabel">
-         <property name="text">
-          <string>Specular Highlighting with Scalar Coloring</string>
-         </property>
-        </widget>
-       </item>
-       <item row="13" column="0">
         <widget class="QLabel" name="DisableSplashScreenLabel">
          <property name="text">
           <string>Disable Splash Screen</string>
@@ -92,7 +85,7 @@
          </item>
         </widget>
        </item>
-       <item row="15" column="1">
+       <item row="14" column="1">
         <widget class="QCheckBox" name="SaveFullState">
          <property name="toolTip">
           <string>&lt;p&gt;When saving Python state files, check this box to save state of all parameters in the state file, otherwise only the modified parameters will be saved making the file more readable&lt;/p&gt;</string>
@@ -102,7 +95,7 @@
          </property>
         </widget>
        </item>
-       <item row="15" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_6">
          <property name="toolTip">
           <string/>
@@ -112,7 +105,7 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="OnlyApplyCurrentPanelLabel">
          <property name="text">
           <string>Only Apply Current Panel</string>
@@ -140,10 +133,10 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_5">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Crash recovery</string>
+          <string>Rescale Data Range Mode</string>
          </property>
         </widget>
        </item>
@@ -160,10 +153,10 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_8">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Rescale Data Range Mode</string>
+          <string>Crash recovery</string>
          </property>
         </widget>
        </item>
@@ -174,7 +167,7 @@
          </property>
         </widget>
        </item>
-       <item row="16" column="0">
+       <item row="15" column="0">
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -245,7 +238,7 @@
          </item>
         </layout>
        </item>
-       <item row="14" column="1" colspan="2">
+       <item row="13" column="1" colspan="2">
         <widget class="QCheckBox" name="OnlyApplyCurrentPanel">
          <property name="toolTip">
           <string>&lt;p&gt;On the Properties panel, when one hits 'Apply', the modified panels for all modified sources and filters are 'applied'. Check this to only apply the changes for the active panel&lt;p&gt;</string>
@@ -255,7 +248,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="1" colspan="2">
+       <item row="12" column="1" colspan="2">
         <widget class="QCheckBox" name="DisableSplashScreen">
          <property name="toolTip">
           <string>&lt;p&gt;Controls whenther the splash screen is shown at the launch of the application&lt;/p&gt;</string>
@@ -268,18 +261,18 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="1" colspan="2">
-        <widget class="QCheckBox" name="SpecularHighlighting">
-         <property name="toolTip">
-          <string>&lt;p&gt;When checked, ParaView will leave specular highlighting enabled even when scalar coloring is used. Note that specular highlights can lead to misinterpretation of color &lt;/p&gt;</string>
-         </property>
+       <item row="10" column="1" colspan="2">
+        <widget class="QCheckBox" name="StrictLoadBalancing">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="10" column="1" colspan="2">
-        <widget class="QCheckBox" name="StrictLoadBalancing">
+       <item row="4" column="1" colspan="2">
+        <widget class="QCheckBox" name="AutoAccept">
+         <property name="toolTip">
+          <string>&lt;p&gt;When checked, all changes to the Properties panel will be immediately applied without the need for manually hitting 'Apply'&lt;/p&gt;</string>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -305,16 +298,6 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1" colspan="2">
-        <widget class="QCheckBox" name="AutoAccept">
-         <property name="toolTip">
-          <string>&lt;p&gt;When checked, all changes to the Properties panel will be immediately applied without the need for manually hitting 'Apply'&lt;/p&gt;</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="Colors">
@@ -331,7 +314,7 @@
           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt;&quot;&gt;These are color categories. When assigning colors to objects, one can select one of these catergories. In that case if color is changed in this dialog, then all colors assigned to the same category are updated automatically.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="acceptRichText">
@@ -650,6 +633,12 @@ p, li { white-space: pre-wrap; }
   <tabstop>AutoAccept</tabstop>
   <tabstop>AutoConvertProperties</tabstop>
   <tabstop>CrashRecovery</tabstop>
+  <tabstop>AutoMPI</tabstop>
+  <tabstop>AutoMPI_NumberOfCores</tabstop>
+  <tabstop>StrictLoadBalancing</tabstop>
+  <tabstop>DisableSplashScreen</tabstop>
+  <tabstop>OnlyApplyCurrentPanel</tabstop>
+  <tabstop>SaveFullState</tabstop>
   <tabstop>textEdit</tabstop>
   <tabstop>ForegroundColor</tabstop>
   <tabstop>BackgroundColor</tabstop>
@@ -659,10 +648,11 @@ p, li { white-space: pre-wrap; }
   <tabstop>EdgeColor</tabstop>
   <tabstop>Palette</tabstop>
   <tabstop>ResetColorsToDefault</tabstop>
+  <tabstop>AnimationCacheGeometry</tabstop>
   <tabstop>AnimationCacheLimit</tabstop>
+  <tabstop>ChartHiddenSeries</tabstop>
   <tabstop>ChartNewHiddenSeries</tabstop>
   <tabstop>ChartDeleteHiddenSeries</tabstop>
-  <tabstop>ChartHiddenSeries</tabstop>
   <tabstop>ChartResetHiddenSeries</tabstop>
  </tabstops>
  <resources/>
