@@ -1304,26 +1304,8 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <DoubleVectorProperty animateable="0"
-                            command="SetPosition"
-                            default_values="0.87 0.25"
-                            name="Position"
-                            number_of_elements="2">
-        <DoubleRangeDomain max="1 1"
-                           min="0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty animateable="0"
-                            command="SetPosition2"
-                            default_values="0.13 0.5"
-                            name="Position2"
-                            number_of_elements="2">
-        <DoubleRangeDomain max="1 1"
-                           min="0 0"
-                           name="range" />
-      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetAspectRatio"
-                            default_values="20"
+                            default_values="15"
                             name="AspectRatio"
                             number_of_elements="1">
         <DoubleRangeDomain min="0.001"

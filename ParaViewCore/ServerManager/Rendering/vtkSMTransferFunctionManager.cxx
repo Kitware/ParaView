@@ -176,8 +176,8 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
   controller->PreInitializeProxy(scalarBarProxy);
   vtkSMPropertyHelper(scalarBarProxy, "LookupTable").Set(colorTransferFunction);
   // FIXME:
-  vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(12);
-  vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(12);
+  vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(8);
+  vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(8);
 
   controller->PostInitializeProxy(scalarBarProxy);
 
