@@ -8,6 +8,14 @@ This document describes how to set up a clean Amazon EC2 AMI instance to run Par
 2. Use a recent version of Apache, which now supports web sockets
 3. Use the Jetty session manager to launch python processes
 
+AMI used:
+
+    Amazon Linux AMI with NVIDIA GRID GPU Driver
+
+Instance type used:
+
+    GPU G2 2XL (g2.2xlarge)
+
 In this document, we will refer to the DNS name of our EC2 host as
 
     ec2-XXX-XXX-XXX-XXX.compute-1.amazonaws.com
@@ -27,7 +35,7 @@ Before proceeding with the installation specifics, you should install some requi
 
 After running the above package installations, you should run nvidia-config, as shown below, so as to generate a correctly formatted X configuration file.
 
-    $ sudo nvidia-config
+    $ sudo nvidia-xconfig
 
 After running the above nvidia-config command, there will be a new file generated: /etc/X11/xorg.conf.  This file needs to be edited to include the BusID in the "Device" section, as well as a couple of items in the "Screen" section (an "Option" line within "Screen", as well as a "Virtual" line within "Screen"->"Subsection").  The entire contents of the file (from a recent installation) are included below for reference.
 
@@ -104,7 +112,7 @@ This section of the document describes how to acquire all of the pieces necessar
     $ wget http://www.paraview.org/files/nightly/ParaView-doc.tar.gz -O pv-doc.tgz
     $ tar xvzf pv-doc.tgz
     $ sudo mkdir -p /var/www/pvweb-deploy/www
-    $ sudo cp -r ParaView-4.1.0-RC1-Linux-64bit/share/paraview-4.1/www/* /var/www/pvweb-deploy/www
+    $ sudo cp -r ParaView-4.1.0-Linux-64bit/share/paraview-4.1/www/* /var/www/pvweb-deploy/www
     $ sudo cp -r www/js-doc/* /var/www/pvweb-deploy/www
     $ cd /var/www/pvweb-deploy/www
     $ sudo mv index.html index.origin
@@ -241,7 +249,7 @@ Download the launcher jar file from [here](http://paraview.org/files/dependencie
 
     $ wget http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.1.jar
 
-Create a jetty configuration file by using directly or modifying the following example.  You will need to at least modify the hostname in the "pw.factory.session.url.generator.pattern" element.  The directory you created to hold the launcher logs would be a good place to put this configuration file, and you could call it "jetty-config.txt".
+Create a jetty configuration file by using directly or modifying the following example.  You will need to at least modify the hostname in the "pw.factory.session.url.generator.pattern" element.  The directory you created to hold the launcher jar would be a good place to put this configuration file, and you could call it "jetty-config.txt".
 
     # ===================================================
     # Expect a configuration file as the argument
@@ -262,21 +270,21 @@ Create a jetty configuration file by using directly or modifying the following e
     # Process command: data_prober.py      | data_prober
     # ==================================================
     pw.data_prober.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_data_prober.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
-    pw.data_prober.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-RC1-Linux-64bit
+    pw.data_prober.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-Linux-64bit
     pw.data_prober.cmd.map=PORT:getPort|SECRET:secret
 
     # ==================================================
     # Process command: file_loader.py      | loader
     # ==================================================
     pw.loader.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_file_loader.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
-    pw.loader.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-RC1-Linux-64bit
+    pw.loader.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-Linux-64bit
     pw.loader.cmd.map=PORT:getPort|SECRET:secret
 
     # ==================================================
     # Process command: pipeline_manager.py | pipeline
     # ==================================================
     pw.pipeline.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
-    pw.pipeline.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-RC1-Linux-64bit
+    pw.pipeline.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-Linux-64bit
     pw.pipeline.cmd.map=PORT:getPort|SECRET:secret
 
     # Resources informations
