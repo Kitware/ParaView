@@ -44,7 +44,7 @@ class pqColorEditorPropertyWidget::pqInternals
 {
 public:
   Ui::ColorEditorPropertyWidget Ui;
-  QPointer<pqScalarBarVisibilityReaction> ScalarBarVisibilityReaction;
+  QPointer<QAction> ScalarBarVisibilityAction;
 };
 
 //-----------------------------------------------------------------------------
@@ -69,16 +69,14 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
 
   // show scalar bar button
   QAction *scalarBarAction = new QAction(this);
+  this->Internals->ScalarBarVisibilityAction = scalarBarAction;
   QObject::connect(Ui.ShowScalarBar, SIGNAL(clicked(bool)), scalarBarAction, SLOT(trigger()));
-  pqScalarBarVisibilityReaction *scalarBarReaction =
-    new pqScalarBarVisibilityReaction(scalarBarAction);
   QObject::connect(scalarBarAction, SIGNAL(changed()),
                    this, SLOT(updateEnableState()));
-  // FIXME: this isn't working as expected. We need to ensure that the button's
-  // check state matches action's check state.
   QObject::connect(scalarBarAction, SIGNAL(toggled(bool)),
                    Ui.ShowScalarBar, SLOT(setChecked(bool)));
-  this->Internals->ScalarBarVisibilityReaction = scalarBarReaction;
+  new pqScalarBarVisibilityReaction(scalarBarAction);
+
 
   // edit color map button
   QAction *editColorMapAction = new QAction(this);
@@ -104,5 +102,5 @@ pqColorEditorPropertyWidget::~pqColorEditorPropertyWidget()
 void pqColorEditorPropertyWidget::updateEnableState()
 {
   this->Internals->Ui.ShowScalarBar->setEnabled(
-    this->Internals->ScalarBarVisibilityReaction->parentAction()->isEnabled());
+    this->Internals->ScalarBarVisibilityAction->isEnabled());
 }
