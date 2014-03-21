@@ -627,6 +627,9 @@ void pqColorOpacityEditorWidget::resetRangeToCustom(double min, double max)
   // disable auto-rescale of transfer function since the user has set on
   // explicitly (BUG #14371).
   this->setLockScalarRange(true);
+  pqDataRepresentation* repr =
+    pqActiveObjects::instance().activeRepresentation();
+  repr->renderViewEventually();
   emit this->changeFinished();
   END_UNDO_SET();
 }
