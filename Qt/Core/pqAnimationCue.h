@@ -76,26 +76,10 @@ public:
   // Returns the index of the property being animated.
   int getAnimatedPropertyIndex() const;
 
-  // Set the type of manipulator to create by default.
-  void setManipulatorType(const QString& type)
-    { this->ManipulatorType = type; }
-
   /// Set the type of the keyframe created by default.
   /// default is CompositeKeyFrame.
   void setKeyFrameType(const QString& type)
     { this->KeyFrameType = type; }
-
-  // returns the manipulator proxy.
-  vtkSMProxy* getManipulatorProxy() const;
-
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  /// The default implementation iterates over all properties
-  /// of the proxy and sets them to default values. 
-  void setDefaultPropertyValues();
 
   /// Used by editors to trigger keyframesModified() signal after bulk of
   /// modifications have been made to the cue/key frames.
@@ -118,9 +102,6 @@ signals:
   void enabled(bool);
 
 private slots:
-  /// Called when the "Manipulator" property is changed.
-  void onManipulatorModified();
-
   /// Called when the "Enabled" property is changed.
   void onEnabledModified();
 
@@ -131,13 +112,6 @@ private:
   /// Methods used to register/unregister keyframe proxies.
   void addKeyFrameInternal(vtkSMProxy*);
   void removeKeyFrameInternal(vtkSMProxy*);
-
   QString KeyFrameType;
-  QString ManipulatorType;
-  class pqInternals;
-  pqInternals* Internal;
 };
-
-
 #endif
-

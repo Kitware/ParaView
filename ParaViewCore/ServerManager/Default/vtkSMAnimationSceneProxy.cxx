@@ -16,8 +16,11 @@
 
 #include "vtkCommand.h"
 #include "vtkCompositeAnimationPlayer.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyIterator.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
@@ -88,6 +91,52 @@ bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
     }
   this->UpdateVTKObjects();
   return true;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMAnimationSceneProxy::FindAnimationCue(
+  vtkSMProxy* animatedProxy, const char* animatedPropertyName)
+{
+  if (!animatedProxy || !animatedPropertyName)
+    {
+    return NULL;
+    }
+
+  vtkSMPropertyHelper cuesHelper(this, "Cues");
+  for (unsigned int cc=0, max = cuesHelper.GetNumberOfElements(); cc<max; ++cc)
+    {
+    vtkSMProxy* cueProxy = cuesHelper.GetAsProxy(cc);
+    if (cueProxy)
+      {
+      vtkSMPropertyHelper proxyHelper(cueProxy, "AnimatedProxy");
+      if (proxyHelper.GetAsProxy() == animatedProxy)
+        {
+        vtkSMPropertyHelper pnameHelper(cueProxy, "AnimatedPropertyName");
+        if (pnameHelper.GetAsString() &&
+          strcmp(animatedPropertyName, pnameHelper.GetAsString()) == 0)
+          {
+          return cueProxy;
+          }
+        }
+      }
+    }
+
+  // Check if we're animating a helper proxy on the proxy.
+  std::string groupname =
+    vtkSMParaViewPipelineController::GetHelperProxyGroupName(animatedProxy);
+
+  vtkNew<vtkSMProxyIterator> iter;
+  iter->SetSessionProxyManager(animatedProxy->GetSessionProxyManager());
+  iter->SetModeToOneGroup();
+  for (iter->Begin(groupname.c_str()); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxy* cue = this->FindAnimationCue(iter->GetProxy(), animatedPropertyName);
+    if (cue)
+      {
+      return cue;
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

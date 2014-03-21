@@ -151,6 +151,15 @@ public:
   virtual bool FinalizeRepresentation(vtkSMProxy* proxy);
   virtual bool FinalizeView(vtkSMProxy* proxy);
 
+  // Description:
+  // Resets the session to its initial state by cleaning all pipeline
+  // proxies and other non-essential proxies.
+  virtual bool ResetSession(vtkSMSession* session);
+
+  // Description:
+  // For a given proxy returns the name of the group used for helper proxies.
+  static vtkStdString GetHelperProxyGroupName(vtkSMProxy*);
+
 //BTX
 protected:
   vtkSMParaViewPipelineController();

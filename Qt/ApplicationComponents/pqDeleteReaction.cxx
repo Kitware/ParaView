@@ -137,12 +137,20 @@ bool pqDeleteReaction::canDeleteSelected()
 }
 
 //-----------------------------------------------------------------------------
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineController.h"
 void pqDeleteReaction::deleteAll()
 {
-  BEGIN_UNDO_SET("Delete All");
-  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-  builder->destroyPipelineProxies();
-  END_UNDO_SET();
+  BEGIN_UNDO_EXCLUDE();
+//  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+//  builder->destroyPipelineProxies();
+  if (pqServer* server = pqActiveObjects::instance().activeServer())
+    {
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    controller->ResetSession(server->session());
+    }
+  END_UNDO_EXCLUDE();
+  CLEAR_UNDO_STACK();
   pqApplicationCore::instance()->render();
 }
 
