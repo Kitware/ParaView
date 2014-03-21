@@ -106,6 +106,13 @@ void pqViewMenuManager::buildMenu()
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)
     {
+    QAction* toggleDecoration = this->Menu->addAction("Toggle Borders");
+    toggleDecoration->setObjectName("actionToggleWindowBorders");
+    toggleDecoration->setShortcut(QKeySequence("Ctrl+D"));
+    toggleDecoration->setToolTip("Hide window borders/decoration\
+      to stage the scene for a screenshot");
+    QObject::connect(toggleDecoration, SIGNAL(triggered()),
+      viewManager, SLOT(toggleWidgetDecoration()));
     QAction* fullscreen = this->Menu->addAction("Full Screen");
     fullscreen->setObjectName("actionFullScreen");
     fullscreen->setShortcut(QKeySequence("F11"));

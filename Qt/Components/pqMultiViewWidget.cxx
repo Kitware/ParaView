@@ -73,6 +73,7 @@ public:
   // Set to true to place views in a separate popout widget.
   bool Popout;
   QWidget PopoutFrame;
+  bool DecorationsVisibleBeforeCapture;
 
   pqInternals(QWidget* self) :
     ObserverId(0),
@@ -85,6 +86,7 @@ public:
       Qt::WindowTitleHint|
       Qt::WindowMaximizeButtonHint|
       Qt::WindowCloseButtonHint);
+    this->DecorationsVisibleBeforeCapture = false;
     }
 
   ~pqInternals()
@@ -790,6 +792,7 @@ int pqMultiViewWidget::prepareForCapture(int dx, int dy)
   int magnification =  pqView::computeMagnification(requestedSize, mySize);
   this->setMaximumSize(mySize);
   this->resize(mySize);
+  this->Internals->DecorationsVisibleBeforeCapture = this->isDecorationsVisible();
   this->setDecorationsVisible(false);
   pqEventDispatcher::processEventsAndWait(1);
   return magnification;
@@ -799,7 +802,7 @@ int pqMultiViewWidget::prepareForCapture(int dx, int dy)
 void pqMultiViewWidget::cleanupAfterCapture()
 {
   this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-  this->setDecorationsVisible(true);
+  this->setDecorationsVisible(this->Internals->DecorationsVisibleBeforeCapture);
 }
 
 //-----------------------------------------------------------------------------
