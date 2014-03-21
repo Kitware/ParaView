@@ -951,27 +951,39 @@ vtkStdString vtkSMSettings::GetScalarSettingAsString(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetVectorSetting(const char* settingName, std::vector<int> & values)
+std::vector<int> vtkSMSettings::GetVectorSettingAsInts(const char* settingName)
 {
-  return this->Internal->GetVectorSetting(settingName, values);
+  std::vector<int> values;
+  this->Internal->GetVectorSetting(settingName, values);
+
+  return values;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetVectorSetting(const char* settingName, std::vector<long long int> & values)
+std::vector<long long int> vtkSMSettings::GetVectorSettingAsLongLongInts(const char* settingName)
 {
-  return this->Internal->GetVectorSetting(settingName, values);
+  std::vector<long long int> values;
+  this->Internal->GetVectorSetting(settingName, values);
+
+  return values;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetVectorSetting(const char* settingName, std::vector<double> & values)
+std::vector<double> vtkSMSettings::GetVectorSettingAsDoubles(const char* settingName)
 {
-  return this->Internal->GetVectorSetting(settingName, values);
+  std::vector<double> values;
+  this->Internal->GetVectorSetting(settingName, values);
+
+  return values;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::GetVectorSetting(const char* settingName, std::vector<vtkStdString> & values)
+std::vector<vtkStdString> vtkSMSettings::GetVectorSettingAsStrings(const char* settingName)
 {
-  return this->Internal->GetVectorSetting(settingName, values);
+  std::vector<vtkStdString> values;
+  this->Internal->GetVectorSetting(settingName, values);
+
+  return values;
 }
 
 //----------------------------------------------------------------------------

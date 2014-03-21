@@ -106,10 +106,10 @@ public:
   // Get setting as a vector of a certain type. Returns true on
   // success, false on failure. These methods work on values given as
   // JSON arrays of numbers as well as singular JSON numbers.
-  bool GetVectorSetting(const char* settingName, std::vector<int> & values);
-  bool GetVectorSetting(const char* settingName, std::vector<long long int> & values);
-  bool GetVectorSetting(const char* settingName, std::vector<double> & values);
-  bool GetVectorSetting(const char* settingName, std::vector<vtkStdString> & values);
+  std::vector<int> GetVectorSettingAsInts(const char* settingName);
+  std::vector<long long int> GetVectorSettingAsLongLongInts(const char* settingName);
+  std::vector<double> GetVectorSettingAsDoubles(const char* settingName);
+  std::vector<vtkStdString> GetVectorSettingAsStrings(const char* settingName);
 
   // Description:
   // Set the property values in a vtkSMProxy from a Json path.
