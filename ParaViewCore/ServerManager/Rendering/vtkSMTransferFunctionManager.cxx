@@ -18,7 +18,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionProxy.h"
@@ -167,7 +166,6 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
     return NULL;
     }
 
-  
   // this for some reason destroys the scalar bar properties all together.
   // What's going on ???
   //scalarBarProxy->ResetPropertiesToDefault();
@@ -176,8 +174,8 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
   controller->PreInitializeProxy(scalarBarProxy);
   vtkSMPropertyHelper(scalarBarProxy, "LookupTable").Set(colorTransferFunction);
   // FIXME:
-  vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(8);
-  vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(8);
+  vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(6);
+  vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(6);
 
   controller->PostInitializeProxy(scalarBarProxy);
 
@@ -186,6 +184,8 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
 
   vtkSMPropertyHelper(view, "Representations").Add(scalarBarProxy);
   view->UpdateVTKObjects();
+
+  // Place the scalar bar in the view.
   return scalarBarProxy;
 }
 

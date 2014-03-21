@@ -440,6 +440,7 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
     vtkPVArrayInformation* arrayInfo = this->GetArrayInformationForColorArray();
     vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(sbProxy, arrayInfo);
     }
+  vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(sbProxy, view);
   sbProxy->UpdateVTKObjects();
   return true;
 }

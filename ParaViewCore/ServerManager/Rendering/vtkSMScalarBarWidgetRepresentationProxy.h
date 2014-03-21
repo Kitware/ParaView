@@ -44,6 +44,17 @@ public:
     return self? self->UpdateComponentTitle(dataInfo) : false;
     }
 
+  // Description:
+  // Attempt to place the scalar bar in the view based on the placement of other
+  // currently shown and visible scalar bars.
+  virtual bool PlaceInView(vtkSMProxy* view);
+  static bool PlaceInView(vtkSMProxy* proxy, vtkSMProxy* view)
+    {
+    vtkSMScalarBarWidgetRepresentationProxy* self =
+      vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy);
+    return self? self->PlaceInView(view) : false;
+    }
+
 //BTX
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
