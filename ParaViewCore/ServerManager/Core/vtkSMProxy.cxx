@@ -995,7 +995,7 @@ vtkSMProxy* vtkSMProxy::GetSubProxy(const char* name)
 //---------------------------------------------------------------------------
 bool vtkSMProxy::GetIsSubProxy()
 {
-  return this->ParentProxy == NULL;
+  return this->ParentProxy != NULL;
 }
 
 //---------------------------------------------------------------------------
