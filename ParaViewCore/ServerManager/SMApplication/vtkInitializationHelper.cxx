@@ -205,20 +205,20 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
     unsigned int stringSize;
     if (controller->GetLocalProcessId() == 0)
       {
-      char* siteSettingsString = settings->GetSiteSettingsString();
-      stringSize = siteSettingsString ? (strlen(siteSettingsString)+1) : 0;
+      std::string siteSettingsString = settings->GetSiteSettingsAsString().c_str();
+      stringSize = static_cast<unsigned int>(siteSettingsString.size())+1;
       controller->Broadcast(&stringSize, 1, 0);
       if (stringSize > 0)
         {
-        controller->Broadcast(siteSettingsString, stringSize, 0);
+        controller->Broadcast(const_cast<char*>(siteSettingsString.c_str()), stringSize, 0);
         }
 
-      char* userSettingsString = settings->GetUserSettingsString();
-      stringSize = userSettingsString ? (strlen(userSettingsString)+1) : 0;
+      std::string userSettingsString = settings->GetUserSettingsAsString();
+      stringSize = static_cast<unsigned int>(userSettingsString.size())+1;
       controller->Broadcast(&stringSize, 1, 0);
       if (stringSize > 0)
         {
-        controller->Broadcast(userSettingsString, stringSize, 0);
+        controller->Broadcast(const_cast<char*>(userSettingsString.c_str()), stringSize, 0);
         }
       }
     else // Satellites
@@ -228,26 +228,24 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
         {
         char* siteSettingsString = new char[stringSize];
         controller->Broadcast(siteSettingsString, stringSize, 0);
-        std::cout << "siteSettings: " << siteSettingsString << std::endl;
-        settings->SetSiteSettingsString(siteSettingsString);
+        settings->SetSiteSettingsFromString(siteSettingsString);
         delete[] siteSettingsString;
         }
       else
         {
-        settings->SetSiteSettingsString(NULL);
+        settings->SetSiteSettingsFromString(NULL);
         }
       controller->Broadcast(&stringSize, 1, 0);
       if (stringSize > 0)
         {
         char* userSettingsString = new char[stringSize];
         controller->Broadcast(userSettingsString, stringSize, 0);
-        std::cout << "userSettings: " << userSettingsString << std::endl;
-        settings->SetUserSettingsString(userSettingsString);
+        settings->SetUserSettingsFromString(userSettingsString);
         delete[] userSettingsString;
         }
       else
         {
-        settings->SetUserSettingsString(NULL);
+        settings->SetUserSettingsFromString(NULL);
         }
       }
     }

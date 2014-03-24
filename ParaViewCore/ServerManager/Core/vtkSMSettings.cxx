@@ -529,8 +529,6 @@ vtkStandardNewMacro(vtkSMSettings);
 //----------------------------------------------------------------------------
 vtkSMSettings::vtkSMSettings()
 {
-  this->UserSettingsString = NULL;
-  this->SiteSettingsString = NULL;
   this->Internal = new vtkSMSettingsInternal();
 }
 
@@ -599,7 +597,7 @@ bool vtkSMSettings::LoadUserSettings(const char* fileName)
     userSettingsString[stringSize] = '\0';
     userSettingsFile.close();
 
-    this->SetUserSettingsString( userSettingsString );
+    this->SetUserSettingsFromString( userSettingsString );
     delete[] userSettingsString;
     }
   else
@@ -611,41 +609,30 @@ bool vtkSMSettings::LoadUserSettings(const char* fileName)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetUserSettingsString(const char* settings)
+void vtkSMSettings::SetUserSettingsFromString(const char* settings)
 {
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting UserSettingsString to "
-                << (settings ? settings :"(null)") );
-  if ( this->UserSettingsString == NULL && settings == NULL) { return;}
-  if ( this->UserSettingsString && settings && (!strcmp(this->UserSettingsString,settings))) { return;}
-  delete [] this->UserSettingsString;
+  // Blank out the settings
+  this->Internal->UserSettingsJSONRoot.clear();
 
-  if (settings)
-    {
-    size_t n = strlen(settings) + 1;
-    char *cp1 =  new char[n];
-    const char *cp2 = settings;
-    this->UserSettingsString = cp1;
-    do { *cp1++ = *cp2++; } while ( --n );
-    }
-   else
-    {
-    this->UserSettingsString = NULL;
-    }
-  this->Modified();
-
-  if (!this->UserSettingsString)
+  if (settings == NULL || strcmp(settings, "") == 0)
     {
     return;
     }
 
   // Parse the user settings
   Json::Reader reader;
-  bool success = reader.parse(std::string( settings ), this->Internal->UserSettingsJSONRoot, false);
+  bool success = reader.parse(std::string(settings), this->Internal->UserSettingsJSONRoot, false);
   if (!success)
     {
     vtkErrorMacro(<< "Could not parse user settings JSON");
     this->Internal->UserSettingsJSONRoot = Json::Value::null;
     }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSettings::GetUserSettingsAsString()
+{
+  return this->Internal->UserSettingsJSONRoot.toStyledString();
 }
 
 //----------------------------------------------------------------------------
@@ -694,7 +681,7 @@ bool vtkSMSettings::LoadSiteSettings(const char* fileName)
     siteSettingsString[stringSize] = '\0';
     siteSettingsFile.close();
 
-    this->SetSiteSettingsString( siteSettingsString );
+    this->SetSiteSettingsFromString( siteSettingsString );
     delete[] siteSettingsString;
     }
   else
@@ -706,41 +693,30 @@ bool vtkSMSettings::LoadSiteSettings(const char* fileName)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetSiteSettingsString(const char* settings)
+void vtkSMSettings::SetSiteSettingsFromString(const char* settings)
 {
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting SiteSettingsString to "
-                << (settings ? settings :"(null)") );
-  if ( this->SiteSettingsString == NULL && settings == NULL) { return;}
-  if ( this->SiteSettingsString && settings && (!strcmp(this->SiteSettingsString,settings))) { return;}
-  delete [] this->SiteSettingsString;
+  // Blank out the settings
+  this->Internal->SiteSettingsJSONRoot.clear();
 
-  if (settings)
-    {
-    size_t n = strlen(settings) + 1;
-    char *cp1 =  new char[n];
-    const char *cp2 = settings;
-    this->SiteSettingsString = cp1;
-    do { *cp1++ = *cp2++; } while ( --n );
-    }
-   else
-    {
-    this->SiteSettingsString = NULL;
-    }
-  this->Modified();
-
-  if ( !this->SiteSettingsString )
+  if (settings == NULL || strcmp(settings, "") == 0)
     {
     return;
     }
 
   // Parse the user settings
   Json::Reader reader;
-  bool success = reader.parse(std::string( settings ), this->Internal->SiteSettingsJSONRoot, false);
+  bool success = reader.parse(std::string(settings), this->Internal->SiteSettingsJSONRoot, false);
   if (!success)
     {
     vtkErrorMacro(<< "Could not parse site settings JSON");
     this->Internal->SiteSettingsJSONRoot = Json::Value::null;
     }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSettings::GetSiteSettingsAsString()
+{
+  return this->Internal->SiteSettingsJSONRoot.toStyledString();
 }
 
 //----------------------------------------------------------------------------
@@ -977,28 +953,8 @@ bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy, const char* jsonPrefix)
 //----------------------------------------------------------------------------
 void vtkSMSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
-  os << indent << "UserSettingsString: ";
-  if ( this->UserSettingsString )
-    {
-    os << "\n" << this->UserSettingsString << "\n";
-    }
-  else
-    {
-    os << "(null)";
-    }
-
   os << indent << "UserSettings:\n";
   os << this->Internal->UserSettingsJSONRoot.toStyledString();
-
-  os << indent << "SiteSettingsString: ";
-  if ( this->SiteSettingsString )
-    {
-    os << "\n" << this->SiteSettingsString << "\n";
-    }
-  else
-    {
-    os << "(null)";
-    }
 
   os << indent << "SiteSettings:\n";
   os << this->Internal->SiteSettingsJSONRoot.toStyledString();

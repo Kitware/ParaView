@@ -29,8 +29,8 @@ settingsString = """
 """ % (trueRadius, trueThetaResolution, trueCenter[0], trueCenter[1], trueCenter[2])
 
 settings = paraview.servermanager.vtkSMSettings.GetInstance()
-settings.SetUserSettingsString(settingsString)
-settings.SetSiteSettingsString("{}")
+settings.SetUserSettingsFromString(settingsString)
+settings.SetSiteSettingsFromString("{}")
 
 # Check the setting directly
 settingPath = ".sources.SphereSource.Radius"
@@ -76,8 +76,38 @@ if radius != trueRadius:
 # Now clear out the settings and test setting values
 #
 #
-settings.SetUserSettingsString("{}")
-settings.SetSiteSettingsString("{}")
+settings.SetUserSettingsFromString(None)
+settingsString = settings.GetUserSettingsAsString()
+if settingsString != "{}\n":
+  print "User settings set from None should be {}"
+  sys.exit(-1)
+settings.SetSiteSettingsFromString(None)
+settingsString = settings.GetSiteSettingsAsString()
+if settingsString != "{}\n":
+  print "Site settings set from None should be {}"
+  sys.exit(-1)
+
+settings.SetUserSettingsFromString("")
+settingsString = settings.GetUserSettingsAsString()
+if settingsString != "{}\n":
+  print "User settings set from empty string should be {}"
+  sys.exit(-1)
+settings.SetSiteSettingsFromString("")
+settingsString = settings.GetSiteSettingsAsString()
+if settingsString != "{}\n":
+  print "Site settings set from empty string should be {}"
+  sys.exit(-1)
+
+settings.SetUserSettingsFromString("{}")
+settingsString = settings.GetUserSettingsAsString()
+if settingsString != "{}\n":
+  print "User settings set from {} should be {}"
+  sys.exit(-1)
+settings.SetSiteSettingsFromString("{}")
+settingsString = settings.GetSiteSettingsAsString()
+if settingsString != "{}\n":
+  print "Site settings set from {} should be {}"
+  sys.exit(-1)
 
 if settings.HasSetting(".sources.SphereSource"):
   print "Setting '.sources.SphereSource' should have been cleared"

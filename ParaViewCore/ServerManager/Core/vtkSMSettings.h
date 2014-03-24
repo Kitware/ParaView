@@ -55,8 +55,8 @@ public:
 
   // Description:
   // Set user-specific settings. These are stored in a home directory.
-  virtual void SetUserSettingsString(const char* settings);
-  vtkGetStringMacro(UserSettingsString);;
+  virtual void SetUserSettingsFromString(const char* settings);
+  virtual std::string GetUserSettingsAsString();
 
   // Description:
   // Load site settings from default location TBD. Returns true on success,
@@ -70,8 +70,8 @@ public:
 
   // Description:
   // Set site-specific settings. These are stored in a location TBD.
-  virtual void SetSiteSettingsString(const char* settings);
-  vtkGetStringMacro(SiteSettingsString);
+  virtual void SetSiteSettingsFromString(const char* settings);
+  virtual std::string GetSiteSettingsAsString();
 
   // Description:
   // Check whether a setting is defined for the requested names.
@@ -129,12 +129,6 @@ protected:
 private:
   vtkSMSettings(const vtkSMSettings&); // Purposely not implemented
   void operator=(const vtkSMSettings&); // Purposely not implemented
-
-  // User-specified settings
-  char* UserSettingsString;
-
-  // Site-specific settings
-  char* SiteSettingsString;
 
   class vtkSMSettingsInternal;
   vtkSMSettingsInternal * Internal;
