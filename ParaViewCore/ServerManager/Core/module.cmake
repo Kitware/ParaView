@@ -10,6 +10,7 @@ vtk_module(vtkPVServerManagerCore
   PRIVATE_DEPENDS
     vtksys
     vtkjsoncpp
+    vtkpugixml
   TEST_LABELS
     PARAVIEW
   TEST_DEPENDS

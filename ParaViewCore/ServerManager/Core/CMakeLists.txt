@@ -112,7 +112,6 @@ set (Module_SRCS
   vtkSMSourceProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateLocator.cxx
-  vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringVectorProperty.cxx
@@ -138,7 +137,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMRemoteObject
   vtkSMSession
   vtkSMSessionProxyManager # since New() is non-standard.
-  vtkSMStateVersionControllerBase
   vtkSMUncheckedPropertyHelper
   vtkSMUndoElement
   vtkSMVectorProperty

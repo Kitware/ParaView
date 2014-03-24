@@ -114,7 +114,6 @@
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMStateVersionController.h"
-#include "vtkSMStateVersionControllerBase.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTesting.h"
@@ -240,7 +239,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMStateLoader);
   PRINT_SELF(vtkSMStateLocator);
   PRINT_SELF(vtkSMStateVersionController);
-  PRINT_SELF(vtkSMStateVersionControllerBase);
   PRINT_SELF(vtkSMStringListDomain);
   PRINT_SELF(vtkSMStringVectorProperty);
   PRINT_SELF(vtkSMTesting);
