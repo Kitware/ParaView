@@ -78,47 +78,37 @@ public:
   bool HasSetting(const char* settingName);
 
   // Description:
-  // Set setting of a given name
-  void SetScalarSetting(const char* settingName, int value);
-  void SetScalarSetting(const char* settingName, double value);
-  void SetScalarSetting(const char* settingName, const std::string & value);
+  // Set setting of a given name.
+  // Shortcut for SetSetting(settingName, 0, value). Useful for setting scalar values.
+  void SetSetting(const char* settingName, int value);
+  void SetSetting(const char* settingName, double value);
+  void SetSetting(const char* settingName, const std::string & value);
 
   // Description:
-  // Set vector setting at a location given by the jsonPath
-  void SetVectorSetting(const char* settingName, const std::vector<int> & values);
-  void SetVectorSetting(const char* settingName, const std::vector<double> & values);
-  void SetVectorSetting(const char* settingName, const std::vector<std::string> & values);
+  // Set element of a vector setting at a location given by the jsonPath.
+  void SetSetting(const char* settingName, unsigned int index, int value);
+  void SetSetting(const char* settingName, unsigned int index, double value);
+  void SetSetting(const char* settingName, unsigned int index, const std::string & value);
 
   // Description:
   // Save non-default settings in the current user settings.
   void SetProxySettings(vtkSMProxy* proxy);
 
   // Description:
-  // Get setting as a scalar value
-  int         GetScalarSettingAsInt(const char* settingName, int defaultValue);
-  double      GetScalarSettingAsDouble(const char* settingName, double defaultValue);
-  std::string GetScalarSettingAsString(const char* settingName, const std::string & defaultValue);
-
-  // Description:
-  // Get the number of elements in a vector setting.
-  unsigned int GetNumberOfElements(const char* settingName);
-
-  // Description:
-  // Get setting as a vector of a certain type.
-  // These methods work on values specified as JSON arrays of numbers
-  // as well as singular JSON numbers.
-  std::vector<int>         GetVectorSettingAsInts(const char* settingName);
-  std::vector<double>      GetVectorSettingAsDoubles(const char* settingName);
-  std::vector<std::string> GetVectorSettingAsStrings(const char* settingName);
+  // Get the number of elements in a setting.
+  unsigned int GetSettingNumberOfElements(const char* settingName);
 
   // Description:
   // Get a single element of a vector setting.
-  int         GetVectorSettingAsInt(const char* settingName, unsigned int index,
-                                    int defaultValue);
-  double      GetVectorSettingAsDouble(const char* settingName, unsigned int index,
-                                       double defaultValue);
-  std::string GetVectorSettingAsString(const char* settingName, unsigned int index,
-                                       const std::string & defaultValue);
+  int         GetSettingAsInt(const char* settingName,
+                              unsigned int index,
+                              int defaultValue);
+  double      GetSettingAsDouble(const char* settingName,
+                                 unsigned int index,
+                                 double defaultValue);
+  std::string GetSettingAsString(const char* settingName,
+                                 unsigned int index,
+                                 const std::string & defaultValue);
 
   // Description:
   // Set the property values in a vtkSMProxy from the settings file.

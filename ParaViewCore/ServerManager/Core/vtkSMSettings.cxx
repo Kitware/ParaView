@@ -35,26 +35,26 @@
 #include <algorithm>
 
 //----------------------------------------------------------------------------
-// Description:
-// Splits a JSON path into branch and leaf components. This is needed
-// to build trees with the JsonCpp library.
-static void SeparateBranchFromLeaf(const char* jsonPath, std::string & root, std::string & leaf)
-{
-  root.clear();
-  leaf.clear();
-
-  // Chop off leaf setting
-  std::string jsonPathString(jsonPath);
-  size_t lastPeriod = jsonPathString.find_last_of('.');
-  root = jsonPathString.substr(0, lastPeriod);
-  leaf = jsonPathString.substr(lastPeriod+1);
-}
-
-//----------------------------------------------------------------------------
 class vtkSMSettings::vtkSMSettingsInternal {
 public:
   Json::Value UserSettingsJSONRoot;
   Json::Value SiteSettingsJSONRoot;
+
+  //----------------------------------------------------------------------------
+  // Description:
+  // Splits a JSON path into branch and leaf components. This is needed
+  // to build trees with the JsonCpp library.
+  static void SeparateBranchFromLeaf(const char* jsonPath, std::string & root, std::string & leaf)
+  {
+    root.clear();
+    leaf.clear();
+
+    // Chop off leaf setting
+    std::string jsonPathString(jsonPath);
+    size_t lastPeriod = jsonPathString.find_last_of('.');
+    root = jsonPathString.substr(0, lastPeriod);
+    leaf = jsonPathString.substr(lastPeriod+1);
+  }
 
   //----------------------------------------------------------------------------
   // Description:
@@ -84,7 +84,7 @@ public:
     Json::Value value = this->GetSiteSetting(settingName);
 
     return !value.isNull();
-  }  
+  }
 
   //----------------------------------------------------------------------------
   // Description:
@@ -136,54 +136,32 @@ public:
 
   //----------------------------------------------------------------------------
   template< typename T >
-  void SetScalarSetting(const char* settingName, const T & value)
-  {
-    std::string root, leaf;
-    SeparateBranchFromLeaf(settingName, root, leaf);
-
-    Json::Path settingPath(root.c_str());
-    Json::Value & jsonValue = settingPath.make(this->UserSettingsJSONRoot);
-    jsonValue[leaf] = value;
-  }
-
-  //----------------------------------------------------------------------------
-  template< typename T >
   void SetVectorSetting(const char* settingName, const std::vector< T > & values)
   {
     std::string root, leaf;
-    SeparateBranchFromLeaf(settingName, root, leaf);
-    
+    this->SeparateBranchFromLeaf(settingName, root, leaf);
+
     Json::Path settingPath(root.c_str());
     Json::Value & jsonValue = settingPath.make(this->UserSettingsJSONRoot);
-    jsonValue[leaf].resize(values.size());
+    jsonValue[leaf] = Json::Value::null;
 
-    for (size_t i = 0; i < values.size(); ++i)
+    if (values.size() > 1)
       {
-      jsonValue[leaf][(unsigned int)i] = values[i];
+      jsonValue[leaf].resize(values.size());
+
+      for (size_t i = 0; i < values.size(); ++i)
+        {
+        jsonValue[leaf][(unsigned int)i] = values[i];
+        }
+      }
+    else
+      {
+      jsonValue[leaf] = values[0];
       }
   }
 
   //----------------------------------------------------------------------------
-  template< typename T >
-  bool GetScalarSetting(const char* settingName, T & value)
-  {
-    std::vector<T> vector;
-    if (!this->GetVectorSetting(settingName, vector))
-      {
-      return false;
-      }
-
-    // Set the value to be the first element in the retrieved vector.
-    if (vector.size() >= 1 )
-      {
-      value = vector[0];
-      }
-
-    return true;
-  }
-
-  //----------------------------------------------------------------------------
-  bool GetScalarSetting(const Json::Value & jsonValue, int & value)
+  bool ConvertJsonValue(const Json::Value & jsonValue, int & value)
   {
     if (!jsonValue.isNumeric())
       {
@@ -195,7 +173,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetScalarSetting(const Json::Value & jsonValue, double & value)
+  bool ConvertJsonValue(const Json::Value & jsonValue, double & value)
   {
     if (!jsonValue.isNumeric())
       {
@@ -215,7 +193,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool GetScalarSetting(const Json::Value & jsonValue, std::string & value)
+  bool ConvertJsonValue(const Json::Value & jsonValue, std::string & value)
   {
     if (!jsonValue.isString())
       {
@@ -237,7 +215,7 @@ public:
 
   //----------------------------------------------------------------------------
   template< typename T >
-  bool GetVectorSetting(const char* settingName, std::vector<T> & values)
+  bool GetSetting(const char* settingName, std::vector<T> & values)
   {
     values.clear();
 
@@ -256,14 +234,14 @@ public:
       for (Json::Value::ArrayIndex i = 0; i < setting.size(); ++i)
         {
         T value;
-        this->GetScalarSetting(setting[i], value);
+        this->ConvertJsonValue(setting[i], value);
         values.push_back(value);
         }
       }
     else
       {
       T value;
-      bool success = this->GetScalarSetting(setting, value);
+      bool success = this->ConvertJsonValue(setting, value);
       if (success)
         {
         values.push_back(value);
@@ -355,8 +333,9 @@ public:
     if (enumDomain)
       {
       // The enumeration property could be either text or value
+      const Json::Value & jsonValue = this->GetSetting(jsonPath);
       int enumValue;
-      bool hasInt = this->GetScalarSetting(jsonPath, enumValue);
+      bool hasInt = this->ConvertJsonValue(jsonValue, enumValue);
       if (hasInt)
         {
         property->SetElement(0, enumValue);
@@ -364,7 +343,7 @@ public:
       else
         {
         std::string stringValue;
-        bool hasString = this->GetScalarSetting(jsonPath, stringValue);
+        bool hasString = this->ConvertJsonValue(jsonValue, stringValue);
         if (hasString && enumDomain->HasEntryText(stringValue.c_str()))
           {
           enumValue = enumDomain->GetEntryValueForText(stringValue.c_str());
@@ -375,7 +354,7 @@ public:
     else
       {
       std::vector<int> vector;
-      if (!this->GetVectorSetting(jsonPath, vector) ||
+      if (!this->GetSetting(jsonPath, vector) ||
           vector.size() != property->GetNumberOfElements())
         {
         return false;
@@ -391,12 +370,13 @@ public:
                           const char* jsonPath)
   {
     std::vector<double> vector;
-    if (!this->GetVectorSetting(jsonPath, vector))
+    if (!this->GetSetting(jsonPath, vector) ||
+        vector.size() != property->GetNumberOfElements())
       {
       return false;
       }
     property->SetElements(&vector[0]);
-    
+
     return true;
   }
 
@@ -405,20 +385,20 @@ public:
                           const char* jsonPath)
   {
     std::vector<std::string> vector;
-    if (!this->GetVectorSetting(jsonPath, vector))
+    if (!this->GetSetting(jsonPath, vector))
       {
       return false;
       }
-    
+
     vtkSmartPointer<vtkStringList> stringList = vtkSmartPointer<vtkStringList>::New();
     for (size_t i = 0; i < vector.size(); ++i)
       {
       vtkStdString vtk_string(vector[i]);
       stringList->AddString(vtk_string);
       }
-    
+
     property->SetElements(stringList);
-    
+
     return true;
   }
 
@@ -438,7 +418,7 @@ public:
       if (this->HasSetting(sourceSettingString.c_str()))
         {
         std::vector<std::string> selectedString;
-        this->GetVectorSetting(sourceSettingString.c_str(), selectedString);
+        this->GetSetting(sourceSettingString.c_str(), selectedString);
         if (selectedString.size() > 0)
           {
           sourceName = selectedString[0];
@@ -770,41 +750,62 @@ bool vtkSMSettings::HasSetting(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetScalarSetting(const char* settingName, int value)
+void vtkSMSettings::SetSetting(const char* settingName, int value)
 {
-  this->Internal->SetScalarSetting(settingName, value);
+  this->SetSetting(settingName, 0, value);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetScalarSetting(const char* settingName, double value)
+void vtkSMSettings::SetSetting(const char* settingName, double value)
 {
-  this->Internal->SetScalarSetting(settingName, value);
+  this->SetSetting(settingName, 0, value);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetScalarSetting(const char* settingName, const std::string & value)
+void vtkSMSettings::SetSetting(const char* settingName, const std::string & value)
 {
-  this->Internal->SetScalarSetting(settingName, value);
+  this->SetSetting(settingName, 0, value);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetVectorSetting(const char* settingName,
-                                     const std::vector<int> & values)
+void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, int value)
 {
+  std::vector<int> values;
+  this->Internal->GetSetting(settingName, values);
+  if (values.size() <= index)
+    {
+    values.resize(index+1, 0);
+    }
+
+  values[index] = value;
   this->Internal->SetVectorSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetVectorSetting(const char* settingName,
-                                     const std::vector<double> & values)
+void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, double value)
 {
+  std::vector<double> values;
+  this->Internal->GetSetting(settingName, values);
+  if (values.size() <= index)
+    {
+    values.resize(index+1, 0);
+    }
+
+  values[index] = value;
   this->Internal->SetVectorSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetVectorSetting(const char* settingName,
-                                     const std::vector<std::string> & values)
+void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, const std::string & value)
 {
+  std::vector<std::string> values;
+  this->Internal->GetSetting(settingName, values);
+  if (values.size() <= index)
+    {
+    values.resize(index+1, "");
+    }
+
+  values[index] = value;
   this->Internal->SetVectorSetting(settingName, values);
 }
 
@@ -886,54 +887,10 @@ void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
         UserSettingsJSONRoot[proxyGroup][proxyName][property->GetXMLName()] = propertyValue;
       }
     }
-
-  std::cout << this->Internal->UserSettingsJSONRoot.toStyledString();
 }
 
 //----------------------------------------------------------------------------
-int vtkSMSettings::GetScalarSettingAsInt(const char* settingName, int defaultValue)
-{
-  int value;
-  bool success = this->Internal->GetScalarSetting(settingName, value);
-
-  if (!success)
-    {
-    return defaultValue;
-    }
-
-  return value;
-}
-
-//----------------------------------------------------------------------------
-double vtkSMSettings::GetScalarSettingAsDouble(const char* settingName, double defaultValue)
-{
-  double value;
-  bool success = this->Internal->GetScalarSetting(settingName, value);
-
-  if (!success)
-    {
-    return defaultValue;
-    }
-
-  return value;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMSettings::GetScalarSettingAsString(const char* settingName, const std::string & defaultValue)
-{
-  std::string value;
-  bool success = this->Internal->GetScalarSetting(settingName, value);
-
-  if (!success)
-    {
-    return defaultValue;
-    }
-
-  return value;
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkSMSettings::GetNumberOfElements(const char* settingName)
+unsigned int vtkSMSettings::GetSettingNumberOfElements(const char* settingName)
 {
   Json::Value value = this->Internal->GetSetting(settingName);
   if (value.isArray())
@@ -945,39 +902,12 @@ unsigned int vtkSMSettings::GetNumberOfElements(const char* settingName)
 }
 
 //----------------------------------------------------------------------------
-std::vector<int> vtkSMSettings::GetVectorSettingAsInts(const char* settingName)
-{
-  std::vector<int> values;
-  this->Internal->GetVectorSetting(settingName, values);
-
-  return values;
-}
-
-//----------------------------------------------------------------------------
-std::vector<double> vtkSMSettings::GetVectorSettingAsDoubles(const char* settingName)
-{
-  std::vector<double> values;
-  this->Internal->GetVectorSetting(settingName, values);
-
-  return values;
-}
-
-//----------------------------------------------------------------------------
-std::vector<std::string> vtkSMSettings::GetVectorSettingAsStrings(const char* settingName)
-{
-  std::vector<std::string> values;
-  this->Internal->GetVectorSetting(settingName, values);
-
-  return values;
-}
-
-//----------------------------------------------------------------------------
-int vtkSMSettings::GetVectorSettingAsInt(const char* settingName,
+int vtkSMSettings::GetSettingAsInt(const char* settingName,
                                          unsigned int index,
                                          int defaultValue)
 {
   std::vector<int> values;
-  bool success = this->Internal->GetVectorSetting(settingName, values);
+  bool success = this->Internal->GetSetting(settingName, values);
 
   if (success && index < values.size())
     {
@@ -988,12 +918,12 @@ int vtkSMSettings::GetVectorSettingAsInt(const char* settingName,
 }
 
 //----------------------------------------------------------------------------
-double vtkSMSettings::GetVectorSettingAsDouble(const char* settingName,
-                                               unsigned int index,
-                                               double defaultValue)
+double vtkSMSettings::GetSettingAsDouble(const char* settingName,
+                                         unsigned int index,
+                                         double defaultValue)
 {
   std::vector<double> values;
-  bool success = this->Internal->GetVectorSetting(settingName, values);
+  bool success = this->Internal->GetSetting(settingName, values);
 
   if (success && index < values.size())
     {
@@ -1004,12 +934,12 @@ double vtkSMSettings::GetVectorSettingAsDouble(const char* settingName,
 }
 
 //----------------------------------------------------------------------------
-std::string vtkSMSettings::GetVectorSettingAsString(const char* settingName,
-                                                    unsigned int index,
-                                                    const std::string & defaultValue)
+std::string vtkSMSettings::GetSettingAsString(const char* settingName,
+                                              unsigned int index,
+                                              const std::string & defaultValue)
 {
   std::vector<std::string> values;
-  bool success = this->Internal->GetVectorSetting(settingName, values);
+  bool success = this->Internal->GetSetting(settingName, values);
 
   if (success && index < values.size())
     {
@@ -1057,6 +987,9 @@ void vtkSMSettings::PrintSelf(ostream& os, vtkIndent indent)
     os << "(null)";
     }
 
+  os << indent << "UserSettings:\n";
+  os << this->Internal->UserSettingsJSONRoot.toStyledString();
+
   os << indent << "SiteSettingsString: ";
   if ( this->SiteSettingsString )
     {
@@ -1066,4 +999,7 @@ void vtkSMSettings::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(null)";
     }
+
+  os << indent << "SiteSettings:\n";
+  os << this->Internal->SiteSettingsJSONRoot.toStyledString();
 }
