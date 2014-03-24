@@ -516,6 +516,19 @@ void vtkGeometryRepresentation::SetRepresentation(const char* type)
 }
 
 //----------------------------------------------------------------------------
+const char* vtkGeometryRepresentation::GetColorArrayName()
+{
+  vtkInformation *info = this->GetInputArrayInformation(0);
+  if (info &&
+    info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
+    info->Has(vtkDataObject::FIELD_NAME()))
+    {
+    return info->Get(vtkDataObject::FIELD_NAME());
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::UpdateColoringParameters()
 {
   bool using_scalar_coloring = false;

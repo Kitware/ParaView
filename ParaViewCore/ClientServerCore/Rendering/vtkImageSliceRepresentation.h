@@ -40,8 +40,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the input data arrays that this algorithm will
-  // process.
+  // Set the input data arrays that this algorithm will process. Overridden to
+  // pass the array selection to the mapper.
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
     int fieldAssociation, const char *name);
   virtual void SetInputArrayToProcess(int idx, int port, int connection,

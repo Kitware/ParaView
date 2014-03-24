@@ -180,6 +180,10 @@ public:
   virtual double GetBlockOpacity(unsigned int index);
   virtual void RemoveBlockOpacity(unsigned int index);
   virtual void RemoveBlockOpacities();
+
+  // Description:
+  // Convenience method to get the array name used to scalar color with.
+  const char* GetColorArrayName();
 //BTX
 protected:
   vtkGeometryRepresentation();

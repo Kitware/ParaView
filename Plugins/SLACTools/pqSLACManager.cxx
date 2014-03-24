@@ -34,6 +34,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 
 #include "pqActiveView.h"
@@ -426,7 +427,8 @@ void pqSLACManager::showField(const char *name)
   this->CurrentFieldName = name;
 
   // Set the field to color by.
-  repr->setColorField(QString("%1 (point)").arg(name));
+  vtkSMPVRepresentationProxy::SetScalarColoring(
+    repr->getProxy(), name, vtkDataObject::POINT);
 
   // Adjust the color map to be rainbow.
   pqScalarsToColors *lut = repr->getLookupTable();

@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPointSpriteControls_h
 
 #include "pqPropertyWidget.h"
-#include "pqVariableType.h"
 #include <QPointer>
 
 class pqPipelineRepresentation;
@@ -63,12 +62,10 @@ private slots:
   void updateEnableState();
 
   // slots called when the radius array settings change
-  void  onRadiusArrayChanged(pqVariableType type, const QString& name);
-  void  onRadiusComponentChanged(int vectorMode, int comp);
+  void updateRadiusArray();
 
   // slots called when the alpha array settings change
-  void  onOpacityArrayChanged(pqVariableType type, const QString& name);
-  void  onOpacityComponentChanged(int vectorMode, int comp);
+  void updateOpacityArray();
 
   void  showRadiusDialog();
   void  showOpacityDialog();

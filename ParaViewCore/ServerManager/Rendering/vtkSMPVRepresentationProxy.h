@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPVRepresentationProxy - a composite representation proxy suitable
-// for showing data in ParaView.
+// .NAME vtkSMPVRepresentationProxy - representation for "Render View" like
+// views in ParaView.
 // .SECTION Description
 // vtkSMPVRepresentationProxy combines surface representation and volume
 // representation proxies typically used for displaying data.

@@ -12,7 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 // .NAME pqDisplayArrayWidget
 // .SECTION Thanks
 // <verbatim>
@@ -31,8 +30,6 @@
 #ifndef _pqDisplayArrayWidget_h
 #define _pqDisplayArrayWidget_h
 
-#include "pqVariableType.h"
-
 #include <QWidget>
 #include <QPointer>
 
@@ -43,6 +40,7 @@ class pqDataRepresentation;
 class pqPipelineRepresentation;
 class vtkEventQtSlotConnect;
 class pqScalarsToColors;
+class vtkPVArrayInformation;
 
 /// Provides a standard user interface for selecting among a collection
 /// of dataset variables and .
@@ -57,12 +55,9 @@ public:
   /// Removes all variables from the collection.
   void clear();
 
-  /// Adds a variable to the collection.
-  void addVariable(pqVariableType type, const QString& name, bool is_partial);
-
   /// Makes the given variable the "current" selection.  Emits the
   /// variableChanged() signal.
-  void chooseVariable(pqVariableType type, const QString& name);
+  void chooseVariable(const QString& name);
 
   /// Returns the display whose color this widget is currently
   /// editing.
@@ -70,6 +65,8 @@ public:
 
   /// Returns the current text in the combo box.
   QString getCurrentText() const;
+  QString currentVariableName() const;
+  int currentComponent() const;
 
   /// Set/Get the name to associate to non varying value.
   void setConstantVariableName(const QString& name);
@@ -83,8 +80,6 @@ public:
   void  setPropertyArrayComponent(const QString&);
   const QString& propertyArrayComponent();
 
-  QString currentVariableName();
-  pqVariableType currentVariableType();
 
   void  setToolTip(const QString&);
 
@@ -97,14 +92,13 @@ public slots:
   void reloadGUI();
   void reloadComponents();
 
-  signals:
-
+signals:
   /// Signal emitted whenever the user chooses a variable,
   /// or chooseVariable() is called.
   /// This signal is fired only when the change is triggered by the wiget
   /// i.e. if the ServerManager property changes, this signal won't be fired,
   /// use \c modified() instead.
-  void variableChanged(pqVariableType type, const QString& name);
+  void variableChanged(const QString& name);
 
   /// Fired when ever the color mode on the display changes
   /// either thorough this widget itself, of when the underlying SMObject
@@ -130,12 +124,11 @@ protected slots:
   virtual void updateComponents();
 
 protected:
-  /// Converts a variable type and name into a packed string representation
-  /// that can be used with a combo box.
-  static const QStringList variableData(pqVariableType, const QString& name);
-
   const QString getArrayName() const;
 
+  /// Returns the array information for the selected array from the
+  /// representation (or its input) if possible.
+  vtkPVArrayInformation* getArrayInformation();
 private:
   class pqInternal;
   pqInternal* Internal;

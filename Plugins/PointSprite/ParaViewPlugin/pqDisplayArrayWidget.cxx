@@ -31,6 +31,9 @@
 
 #include "vtkDataObject.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 
@@ -81,7 +84,6 @@ public:
   bool Updating;
   vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqPipelineRepresentation> Representation;
-  QList<QString> AvailableArrays;
 
   QString PropertyArrayName;
   QString PropertyArrayComponent;
@@ -129,7 +131,7 @@ pqDisplayArrayWidget::~pqDisplayArrayWidget()
   delete this->Internal;
 }
 
-void    pqDisplayArrayWidget::setToolTip(const QString& tooltip)
+void pqDisplayArrayWidget::setToolTip(const QString& tooltip)
 {
   this->Internal->ToolTip = tooltip;
   this->Internal->Variables->setToolTip(tooltip);
@@ -143,49 +145,31 @@ QString pqDisplayArrayWidget::getCurrentText() const
 }
 
 //-----------------------------------------------------------------------------
+QString pqDisplayArrayWidget::currentVariableName() const
+{
+  QString txt = this->getCurrentText();
+  if (txt != this->Internal->ConstantVariableName)
+    {
+    return txt;
+    }
+  return QString();
+}
+
+//-----------------------------------------------------------------------------
+int pqDisplayArrayWidget::currentComponent() const
+{
+  if (this->Internal->Components->count() > 1)
+    {
+    return this->Internal->Components->currentIndex()-1;
+    }
+  return -1;
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayArrayWidget::clear()
 {
   this->Internal->BlockEmission++;
   this->Internal->Variables->clear();
-  this->Internal->BlockEmission--;
-}
-
-//-----------------------------------------------------------------------------
-void pqDisplayArrayWidget::addVariable(pqVariableType type,
-    const QString& arg_name,
-    bool is_partial)
-{
-  QString name = arg_name;
-  if (is_partial)
-    {
-    name += " (partial)";
-    }
-
-  // Don't allow duplicates to creep in ...
-  if (this->Internal->Variables->findData(this->variableData(type, arg_name))
-      != -1)
-    {
-    return;
-    }
-
-  this->Internal->BlockEmission++;
-  switch (type)
-    {
-    case VARIABLE_TYPE_NONE:
-      this->Internal->Variables->addItem(*this->Internal->SolidColorIcon,
-          this->Internal->ConstantVariableName, this->variableData(type, arg_name));
-      break;
-
-    case VARIABLE_TYPE_NODE:
-      this->Internal->Variables->addItem(*this->Internal->PointDataIcon, name,
-          this->variableData(type, arg_name));
-      break;
-
-    case VARIABLE_TYPE_CELL:
-      this->Internal->Variables->addItem(*this->Internal->CellDataIcon, name,
-          this->variableData(type, arg_name));
-      break;
-    }
   this->Internal->BlockEmission--;
 }
 
@@ -216,48 +200,8 @@ void pqDisplayArrayWidget::onVariableActivated(int row)
     return;
     }
 
-  const QStringList d = this->Internal->Variables->itemData(row).toStringList();
-  if (d.size() != 2)
-    {
-    return;
-    }
-
-  pqVariableType type = VARIABLE_TYPE_NONE;
-  if (d[1] == "cell")
-    {
-    type = VARIABLE_TYPE_CELL;
-    }
-  else if (d[1] == "point")
-    {
-    type = VARIABLE_TYPE_NODE;
-    }
-
-  const QString name = d[0];
-
-  emit
-  this->variableChanged(type, name);
+  emit this->variableChanged(this->Internal->Variables->currentText());
   emit this->modified();
-}
-
-//-----------------------------------------------------------------------------
-const QStringList pqDisplayArrayWidget::variableData(pqVariableType type,
-    const QString& name)
-{
-  QStringList list;
-  list.append(name);
-  switch (type)
-    {
-    case VARIABLE_TYPE_NODE:
-      list.append("point");
-      break;
-    case VARIABLE_TYPE_CELL:
-      list.append("cell");
-      break;
-    default:
-      list.append("none");
-    }
-
-  return list;
 }
 
 //-----------------------------------------------------------------------------
@@ -267,8 +211,8 @@ void pqDisplayArrayWidget::updateGUI()
   pqPipelineRepresentation* display = this->getRepresentation();
   if (display)
     {
-    QString name = this->getArrayName() + " (point)";
-    int index = this->Internal->AvailableArrays.indexOf(name);
+    QString name = this->getArrayName();
+    int index = this->Internal->Variables->findText(name);
     if (index < 0)
       {
       index = 0;
@@ -289,22 +233,35 @@ void pqDisplayArrayWidget::updateComponents()
   int comp = -1;
   if (display != NULL && repr != NULL)
     {
-
     comp = pqSMAdaptor::getElementProperty(repr->GetProperty(
         this->Internal->PropertyArrayComponent.toLatin1().data())).toInt();
-
-    int numComponents = display->getColorFieldNumberOfComponents(
-        this->getArrayName() + " (point)");
-
+    vtkPVArrayInformation* ai = this->getArrayInformation();
+    int numComponents = ai? ai->GetNumberOfComponents() : 1;
     if (numComponents == 1 || comp >= numComponents)
       {
       comp = -1;
       }
     }
-
   this->Internal->Components->setCurrentIndex(comp + 1);
-
   this->Internal->BlockEmission--;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVArrayInformation* pqDisplayArrayWidget::getArrayInformation()
+{
+  pqPipelineRepresentation* display = this->getRepresentation();
+  vtkSMProxy * repr = (display ? display->getProxy() : NULL);
+  QString arrayName = this->getArrayName();
+  if (repr != NULL &&
+    arrayName.isEmpty() == false &&
+    arrayName != this->Internal->ConstantVariableName)
+    {
+    vtkPVDataInformation* dataInfo = display->getInputDataInformation();
+    vtkPVArrayInformation* ai = dataInfo->GetArrayInformation(
+      arrayName.toAscii().data(), vtkDataObject::POINT);
+    return ai;
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -316,23 +273,21 @@ void pqDisplayArrayWidget::reloadComponents()
   pqPipelineRepresentation* display = this->getRepresentation();
   if (display)
     {
-    int numComponents = display->getColorFieldNumberOfComponents(
-        this->getArrayName() + " (point)");
-
+    vtkPVArrayInformation* ai = this->getArrayInformation();
+    int numComponents = ai? ai->GetNumberOfComponents() : 1;
     if (numComponents > 1)
       {
+      Q_ASSERT(ai);
       this->Internal->Components->addItem("Magnitude");
       QString componentName;
       for (int i = 0; i < numComponents; i++)
-        {        
-        componentName =  display->getColorFieldComponentName(
-          this->getArrayName() + " (point)", i);        
+        {
+        componentName =  ai->GetComponentName(i);
         this->Internal->Components->addItem( componentName );
         }
       }
     }
   this->Internal->BlockEmission--;
-
   this->updateComponents();
 }
 
@@ -416,51 +371,37 @@ void pqDisplayArrayWidget::reloadGUI()
   this->Internal->BlockEmission++;
   this->clear();
   pqPipelineRepresentation* display = this->getRepresentation();
-  if (display)
+  vtkPVDataInformation* dataInfo = display? display->getInputDataInformation() : NULL;
+  vtkPVDataSetAttributesInformation* dsaInfo = dataInfo?
+    dataInfo->GetAttributeInformation(vtkDataObject::POINT) : NULL;
+
+  QStringList items;
+  if (!this->Internal->ConstantVariableName.isEmpty())
     {
-    this->Internal->AvailableArrays = display->getColorFields();
-    if (this->Internal->AvailableArrays[0] == "Solid Color")
+    items << this->Internal->ConstantVariableName;
+    }
+
+  if (dsaInfo)
+    {
+    for (int cc=0, max=dsaInfo->GetNumberOfArrays(); cc < max; ++cc)
       {
-      this->Internal->AvailableArrays[0] = this->Internal->ConstantVariableName;
-      }
-    QRegExp regExpCell(" \\(cell\\)\\w*$");
-    QRegExp regExpPoint(" \\(point\\)\\w*$");
-    foreach(QString arrayName, this->Internal->AvailableArrays)
+      vtkPVArrayInformation* ai = dsaInfo->GetArrayInformation(cc);
+      if (ai && ai->GetName())
         {
-        if (arrayName == this->Internal->ConstantVariableName)
-          {
-          this->addVariable(VARIABLE_TYPE_NONE, arrayName, false);
-          }
-        else if (regExpCell.indexIn(arrayName) != -1)
-          {
-          arrayName = arrayName.replace(regExpCell, "");
-          this->addVariable(VARIABLE_TYPE_CELL, arrayName, display->isPartial(
-              arrayName, vtkDataObject::FIELD_ASSOCIATION_CELLS));
-          }
-        else if (regExpPoint.indexIn(arrayName) != -1)
-          {
-          arrayName = arrayName.replace(regExpPoint, "");
-          this->addVariable(VARIABLE_TYPE_NODE, arrayName, display->isPartial(
-              arrayName, vtkDataObject::FIELD_ASSOCIATION_POINTS));
-          }
+        items << ai->GetName();
         }
+      }
     this->setEnabled(true);
     }
   else
     {
-    this->addVariable(VARIABLE_TYPE_NONE, this->Internal->ConstantVariableName,
-        false);
     this->setEnabled(false);
     }
-
+  this->Internal->Variables->insertItems(0, items);
   this->reloadComponents();
-
   this->updateGUI();
-
   this->Internal->BlockEmission--;
-
-  emit
-  this->modified();
+  emit this->modified();
 }
 
 void pqDisplayArrayWidget::setConstantVariableName(const QString& name)
