@@ -325,18 +325,6 @@ void pqRenderView::resetCenterOfRotation()
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* pqRenderView::captureImage(int magnification)
-{
-  if (this->getWidget()->isVisible())
-    {
-    return this->getRenderViewProxy()->CaptureWindow(magnification);
-    }
-
-  // Don't return any image when the view is not visible.
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
 const int* pqRenderView::defaultBackgroundColor() const
 {
   static int defaultBackground[3] = { 84, 89, 109 };

@@ -118,8 +118,17 @@ public:
   virtual QSize getSize();
 
   /// Capture the view image into a new vtkImageData with the given magnification
-  /// and returns it.
-  virtual vtkImageData* captureImage(int magnification) =0;
+  /// and returns it. Default implementation forwards to
+  /// vtkSMViewProxy::CaptureWindow(). Generally, it's not necessary to override
+  /// this method. If you need to override it, be aware that the capture code
+  /// will no work on other non-Qt based ParaView clients and hence it's not
+  /// recommended. You should instead subclass vtkSMViewProxy and override the
+  /// appropriate image capture method(s).
+  virtual vtkImageData* captureImage(int magnification);
+
+  /// Capture an image with the given size. This will internally resize the
+  /// widget to come up with a valid magnification factor and then simply calls
+  /// captureImage(int).
   virtual vtkImageData* captureImage(const QSize& size);
 
   /// This method checks if the representation is shown in this view.

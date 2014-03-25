@@ -86,12 +86,6 @@ public:
   /// Resets the center of rotation to the focal point.
   void resetCenterOfRotation();
 
-  /// Capture the view image into a new vtkImageData with the given magnification
-  /// and returns it.
-  virtual vtkImageData* captureImage(int magnification);
-  virtual vtkImageData* captureImage(const QSize& asize)
-    { return this->Superclass::captureImage(asize); }
-
   /// Sets default values for the underlying proxy.
   /// This is during the initialization stage of the pqProxy
   /// for proxies created by the GUI itself i.e.

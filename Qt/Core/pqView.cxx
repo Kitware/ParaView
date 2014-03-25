@@ -388,6 +388,11 @@ int pqView::computeMagnification(const QSize& fullsize, QSize& viewsize)
 //-----------------------------------------------------------------------------
 vtkImageData* pqView::captureImage(const QSize& fullsize)
 {
+  if (!this->getWidget()->isVisible())
+    {
+    return NULL;
+    }
+
   QWidget* vtkwidget = this->getWidget();
   QSize cursize = vtkwidget->size();
   QSize newsize = cursize;
@@ -407,6 +412,18 @@ vtkImageData* pqView::captureImage(const QSize& fullsize)
     this->render();
     }
   return vtkimage;
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* pqView::captureImage(int magnification)
+{
+  if (this->getWidget() && this->getWidget()->isVisible())
+    {
+    vtkSMViewProxy *view = this->getViewProxy();
+    Q_ASSERT(view);
+      return view->CaptureWindow(magnification);
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

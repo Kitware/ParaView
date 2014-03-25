@@ -59,12 +59,6 @@ public:
   /// Returns the context view proxy associated with this object.
   virtual vtkSMContextViewProxy* getContextViewProxy() const;
 
-  /// Capture the view image into a new vtkImageData with the given magnification
-  /// and returns it. The caller is responsible for freeing the returned image.
-  virtual vtkImageData* captureImage(int magnification);
-  virtual vtkImageData* captureImage(const QSize& asize)
-    { return this->Superclass::captureImage(asize); }
-
   /// Returns true if selection can be done.
   virtual bool supportsSelection() const;
 

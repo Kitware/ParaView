@@ -226,20 +226,6 @@ vtkSMContextViewProxy* pqContextView::getContextViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-/// Capture the view image into a new vtkImageData with the given magnification
-/// and returns it. The caller is responsible for freeing the returned image.
-vtkImageData* pqContextView::captureImage(int magnification)
-{
-  if (this->getWidget()->isVisible())
-    {
-    return this->getContextViewProxy()->CaptureWindow(magnification);
-    }
-
-  // Don't return any image when the view is not visible.
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
 bool pqContextView::supportsSelection() const
 {
   return true;

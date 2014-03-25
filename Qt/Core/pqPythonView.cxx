@@ -338,15 +338,3 @@ bool pqPythonView::canDisplay(pqOutputPort* opPort) const
 
   return true;
 }
-
-//-----------------------------------------------------------------------------
-vtkImageData* pqPythonView::captureImage(int magnification)
-{
-  if (this->getWidget()->isVisible())
-    {
-    return this->getPythonViewProxy()->CaptureWindow(magnification);
-    }
-
-  // Don't return any image when the view is not visible.
-  return NULL;
-}
