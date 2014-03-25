@@ -98,8 +98,6 @@ def _wrap_property(proxy, smproperty):
             iter.UnRegister(None)
             if isFileName:
                 property = FileNameProperty(proxy, smproperty)
-            elif _make_name_valid(smproperty.GetXMLLabel()) == 'ColorArrayName':
-                property = ColorArrayProperty(proxy, smproperty)
             else:
                 property = VectorProperty(proxy, smproperty)
     elif smproperty.IsA("vtkSMVectorProperty"):
@@ -794,73 +792,6 @@ class DoubleMapProperty(Property):
         self.SMProperty.ClearElements()
         self._UpdateProperty()
 
-class ColorArrayProperty(VectorProperty):
-    """This subclass of VectorProperty handles setting of the array to
-    color by. It handles attribute type as well as well array name."""
-
-    def GetAvailable(self):
-        """Returns the list of available arrays as (attribute type, array name
-        tuples."""
-        arrays = []
-        for a in self.Proxy.Input.PointData:
-            arrays.append(('POINT_DATA', a.GetName()))
-        for a in self.Proxy.Input.CellData:
-            arrays.append(('CELL_DATA', a.GetName()))
-        return arrays
-
-    def SetData(self, value):
-        """Overwritten to enable setting attribute type (the ColorAttributeType
-        property and the array name. The argument should be the array name
-        (in which case the first appropriate attribute type is picked) or
-        a tuple of attribute type and array name."""
-        if isinstance(value, tuple) and len(value) == 2:
-            att = value[0]
-            arr = value[1]
-        elif isinstance(value, str):
-            att = None
-            arr = value
-        else:
-            raise ValueError("Expected a tuple of 2 values or a string.")
-
-        if not arr:
-            self.SMProperty.SetElement(0, '')
-            self._UpdateProperty()
-            return
-
-        # if the attribute type was not specified, then we need to determine the
-        # attribute type. Thus co-processing scripts and scripts where
-        # data may not be up-to-date should always specify the attribute type to
-        # overcome this check (BUG #13933).
-        if att == None:
-            for a in self.Available:
-                if a[1] == arr:
-                    att = a[0]
-                    break
-
-        if att == None:
-            pvoptions = vtkProcessModule.GetProcessModule().GetOptions()
-            if pvoptions.GetSymmetricMPIMode() == False:
-                raise ValueError("Could not locate array %s in the input." % arr)
-        else:
-            catt = self.Proxy.GetProperty("ColorAttributeType")
-            catt.SetData(att)
-        self.SMProperty.SetElement(0, arr)
-        self._UpdateProperty()
-
-    def __str__(self):
-        """Returns a user-friendly representation string."""
-        catt = self.Proxy.GetProperty("ColorAttributeType")
-        if catt:
-            if not type(catt) is Property:
-                catt = _wrap_property(self.Proxy, catt)
-            return str((catt.GetData(), self.GetData()))
-        else:
-            return str(self.GetData())
-
-    Available = property(GetAvailable, None, None, \
-        "This read-only property returns the list of arrays that can be colored by.")
-
-
 class EnumerationProperty(VectorProperty):
     """Subclass of VectorProperty that is applicable for enumeration type
     properties."""
@@ -961,7 +892,10 @@ class ArraySelectionProperty(VectorProperty):
             self.SMProperty.SetElement(4, values[0])
         elif len(values) == 2:
             if isinstance(values[0], str):
-                val = str(ASSOCIATIONS[values[0]])
+                try:
+                    val = str(ASSOCIATIONS[values[0]])
+                except KeyError:
+                    val = str(_LEGACY_ASSOCIATIONS[values[0]])
             else:
                 # In case user didn't specify valid association,
                 # just pick POINTS.
@@ -2998,6 +2932,7 @@ def demo5():
     return scene
 
 ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' : 6}
+_LEGACY_ASSOCIATIONS = { 'POINT_DATA' : 0, 'CELL_DATA' : 1 }
 
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.

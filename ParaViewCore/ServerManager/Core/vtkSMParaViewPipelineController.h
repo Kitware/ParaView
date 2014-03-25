@@ -118,7 +118,7 @@ public:
   virtual bool UnRegisterViewProxy(vtkSMProxy* proxy);
 
   // Description:
-  // Registeration method for representations to be used after
+  // Registration method for representations to be used after
   // PreInitializeProxy() and PostInitializeProxy(). Register the proxy under
   // the appropriate group.
   virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy);
@@ -129,6 +129,22 @@ public:
   // vtkSMParaViewPipelineController::UnRegisterProxy() method which
   // determines the type of the proxy and then calls the appropriate method.
   virtual bool UnRegisterRepresentationProxy(vtkSMProxy* proxy);
+
+  //---------------------------------------------------------------------------
+  // *******  Methods for Transfer functions *********
+
+  // Description:
+  // Registration method for color transfer function proxies to be used after
+  // PreInitializeProxy() and PostInitializeProxy() calls.
+  virtual bool RegisterColorTransferFunctionProxy(vtkSMProxy* proxy, const char* proxyname);
+  virtual bool RegisterColorTransferFunctionProxy(vtkSMProxy* proxy)
+    { return this->RegisterColorTransferFunctionProxy(proxy, NULL); }
+
+  // Description:
+  // Registration method for opacity transfer function proxies.
+  virtual bool RegisterOpacityTransferFunction(vtkSMProxy* proxy, const char* proxyname);
+  virtual bool RegisterOpacityTransferFunction(vtkSMProxy* proxy)
+    { return this->RegisterOpacityTransferFunction(proxy, NULL); }
 
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********

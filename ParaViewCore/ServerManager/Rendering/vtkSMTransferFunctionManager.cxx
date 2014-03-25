@@ -101,7 +101,7 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
       }
     }
   controller->PostInitializeProxy(proxy);
-  pxm->RegisterProxy("lookup_tables", proxyName.str().c_str(), proxy);
+  controller->RegisterColorTransferFunctionProxy(proxy, proxyName.str().c_str());
   proxy->FastDelete();
   return proxy;
 }
@@ -125,14 +125,14 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
     vtkErrorMacro("Failed to create PVLookupTable proxy.");
     return NULL;
     }
-  
+
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
   controller->PostInitializeProxy(proxy);
 
   vtksys_ios::ostringstream proxyName;
   proxyName << arrayName << ".PiecewiseFunction";
-  pxm->RegisterProxy("piecewise_functions", proxyName.str().c_str(), proxy);
+  controller->RegisterOpacityTransferFunction(proxy, proxyName.str().c_str());
   proxy->FastDelete();
   proxy->UpdateVTKObjects();
   return proxy;

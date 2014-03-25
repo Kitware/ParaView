@@ -770,6 +770,34 @@ bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* 
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterColorTransferFunctionProxy(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  proxy->GetSessionProxyManager()->RegisterProxy(
+    "lookup_tables", proxyname, proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterOpacityTransferFunction(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  proxy->GetSessionProxyManager()->RegisterProxy(
+    "piecewise_functions", proxyname, proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::RegisterAnimationProxy(vtkSMProxy* proxy)
 {
   if (!proxy)
