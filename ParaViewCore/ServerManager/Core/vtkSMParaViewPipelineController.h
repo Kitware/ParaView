@@ -42,46 +42,93 @@ public:
   virtual vtkSMProxy* FindTimeKeeper(vtkSMSession* session);
 
   //---------------------------------------------------------------------------
+  // Description:
+  // Pre-initializes a proxy i.e. prepares the proxy for initialization.
+  // One should call this before changing any properties on the proxy. We load
+  // the property values from XML defaults as well as user-preferences here.
+  virtual bool PreInitializeProxy(vtkSMProxy* proxy);
+
+  // Description:
+  // Final step in proxy initialization. When this method is called, all
+  // essential properties on the proxy (such as inputs for filters, or filename
+  // on readers) are assumed to be set up so that domains can be updated. This
+  // method setups up property values for those properties that weren't modified
+  // since the PreInitializeProxy() using the domains, if possible. This enables
+  // the application to select data-specific default values.
+  // NOTE: This method does not register the proxy with the proxy manager. It
+  // may, however register any helper proxies created for this proxy.
+  virtual bool PostInitializeProxy(vtkSMProxy* proxy);
+
+
+  // Description:
+  // Convenience method to call PreInitializeProxy and PostInitializeProxy.
+  bool InitializeProxy(vtkSMProxy* proxy)
+    { return this->PreInitializeProxy(proxy) && this->PostInitializeProxy(proxy); }
+
+  // Description:
+  // Cleans up any helper proxies registered for the proxy in
+  // PreInitializeProxy/PostInitializeProxy. Similar to
+  // PreInitializeProxy/PostInitializeProxy methods, this doesn't affect the
+  // proxy manager registration state for the proxy itself.
+  virtual bool FinalizeProxy(vtkSMProxy* proxy);
+
+  //---------------------------------------------------------------------------
   // ******* Methods for Pipeline objects like sources/filters/readers ********
 
   // Description:
-  // Initialize the property values using application settings.
-  virtual bool PreInitializePipelineProxy(vtkSMProxy* proxy);
+  // Use this method after PreInitializeProxy() and PostInitializeProxy() to
+  // register a pipeline proxy with the proxy manager. This method does
+  // additional updates required for pipeline proxies such as registering the
+  // proxy with the TimeKeeper, creating additional helper proxies for enabling
+  // representation animations, and updating the active-source. This method will
+  // register the proxy in an appropriate group so that the application
+  // becomes aware of it. One can optionally pass in the registration name to
+  // use. Otherwise, this code will come up with a unique name.
+  // Caveat: while pipeline proxies are generally registered under the "sources"
+  // group, there's one exception: sources that produce vtkSelection. ParaView
+  // treats them specially and registers them under "selection_sources".
+  virtual bool RegisterPipelineProxy(vtkSMProxy* proxy, const char* proxyname);
+  virtual bool RegisterPipelineProxy(vtkSMProxy* proxy)
+    { return this->RegisterPipelineProxy(proxy, NULL); }
 
   // Description:
-  // Safely update property values for properties whose domain may have changed
-  // during the initialization process. If the property's value was manually
-  // changed by the user during the initialization process, it won't be changed
-  // based on the domain, even if the domain was updated.
-  // This method will also register the proxy in appropriate group.
-  virtual bool PostInitializePipelineProxy(vtkSMProxy* proxy);
+  // Unregisters a pipeline proxy. This is the inverse of RegisterPipelineProxy()
+  // and hence unsets the active source if the active source if this proxy,
+  // unregisters the proxy with the TimeKeeper etc.
+  // Users can use either this method or the catch-all
+  // vtkSMParaViewPipelineController::UnRegisterProxy() method which
+  // determines the type of the proxy and then calls the appropriate method.
+  virtual bool UnRegisterPipelineProxy(vtkSMProxy* proxy);
 
   //---------------------------------------------------------------------------
   // *******  Methods for Views/Displays *********
 
   // Description:
-  // Creates a new view of the given type and calls InitializeView() on it.
-  virtual vtkSMProxy* CreateView(
-    vtkSMSession* session, const char* xmlgroup, const char* xmltype);
+  // Use this method after PreInitializeProxy() and PostInitializeProxy() to
+  // register a view proxy with the proxy manager. This will also perform any
+  // additional setups as needed e.g. registering the view with the
+  // animation scene and the timer keeper.
+  virtual bool RegisterViewProxy(vtkSMProxy* proxy);
 
   // Description:
-  // Initialize a new view of the given type. Will register the newly created view
-  // with the animation scene and timekeeper.
-  virtual bool InitializeView(vtkSMProxy* proxy);
+  // Inverse of RegisterViewProxy.
+  // Users can use either this method or the catch-all
+  // vtkSMParaViewPipelineController::UnRegisterProxy() method which
+  // determines the type of the proxy and then calls the appropriate method.
+  virtual bool UnRegisterViewProxy(vtkSMProxy* proxy);
 
   // Description:
-  // Pre/Post initialize a new representation proxy.
-  virtual bool PreInitializeRepresentation(vtkSMProxy* proxy);
-  virtual bool PostInitializeRepresentation(vtkSMProxy* proxy);
+  // Registeration method for representations to be used after
+  // PreInitializeProxy() and PostInitializeProxy(). Register the proxy under
+  // the appropriate group.
+  virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy);
 
   // Description:
-  // Use these methods to add/remove or show/hide representations in a view
-  // (instead of directly updating the properties). This makes it possible to
-  // add application logic around those actions.
-  virtual bool AddRepresentationToView(vtkSMProxy* view, vtkSMProxy* repr);
-  virtual bool RemoveRepresentationFromView(vtkSMProxy* view, vtkSMProxy* repr);
-  virtual bool Show(vtkSMProxy* view, vtkSMProxy* repr);
-  virtual bool Hide(vtkSMProxy* view, vtkSMProxy* repr);
+  // Unregisters a representation proxy.
+  // Users can use either this method or the catch-all
+  // vtkSMParaViewPipelineController::UnRegisterProxy() method which
+  // determines the type of the proxy and then calls the appropriate method.
+  virtual bool UnRegisterRepresentationProxy(vtkSMProxy* proxy);
 
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
@@ -105,53 +152,35 @@ public:
   // created. Returns NULL if the proxy is not available in the session.
   virtual vtkSMProxy* GetTimeAnimationTrack(vtkSMProxy* scene);
 
-  //---------------------------------------------------------------------------
-
-  //---------------------------------------------------------------------------
-  // ****** Methods for arbitrary proxies ******
+  // Description:
+  // Use this method after PreInitializeProxy() and PostInitializeProxy() to
+  // register an animation proxy with the proxy manager.
+  virtual bool RegisterAnimationProxy(vtkSMProxy* proxy);
 
   // Description:
-  // These methods don't register/unregister the \c proxy. They perform
-  // standard initialization/finaization tasks common for all types of proxies
-  // in a ParaView application, except the actual registration/unregistration of
-  // the \c proxy, since which group a proxy is registered to depends on its
-  // type. Note these methods may register other proxies that are created as
-  // part of the initialization process e.g. proxies for proxy list domains,
-  // etc.
-  virtual bool PreInitializeProxy(vtkSMProxy* proxy);
-  virtual bool PostInitializeProxy(vtkSMProxy* proxy);
-  virtual bool FinalizeProxy(vtkSMProxy*);
-
-  // Description:
-  // Convenience method, simply class PreInitializeProxy() and
-  // PostInitializeProxy().
-  bool InitializeProxy(vtkSMProxy* proxy)
-    {
-    return this->PreInitializeProxy(proxy) && this->PostInitializeProxy(proxy);
-    }
+  // Inverse of RegisterAnimationProxy. Also unregisters cues if proxy is scene,
+  // keyframes if proxy is a cue, etc.
+  // Users can use either this method or the catch-all
+  // vtkSMParaViewPipelineController::UnRegisterProxy() method which
+  // determines the type of the proxy and then calls the appropriate method.
+  virtual bool UnRegisterAnimationProxy(vtkSMProxy* proxy);
 
   //---------------------------------------------------------------------------
   // ****** Methods for cleanup/finalization/deleting ******
   //
   // Description:
-  // Method to finalize a proxy. This is same as requesting the proxy be
-  // deleted. Based on the type of the proxy, this may result in other proxies
-  // be finalized as well, e.g.
+  // A catch-all method do cleanup and unregister any proxies that were
+  // registered using Register..Proxy() APIs on this class. This method will not
+  // not unregister the proxy, but remove relevant dependecies for the proxy
+  // e.g. when unregistering a pipeline proxy, it will unregister its
+  // representations, any animation cues connected to the proxy e.g.
   // \li for a pipeline-proxy, this will finalize all representations that use
-  // this proxy;
+  // this proxy, any animation cue referring to it;
   // \li for a view-proxy, this will finalize all representations shown in that
   // view;
   // \li for an animation-scene, this will finalize all animation cues known
   // to the scene.
-  virtual bool Finalize(vtkSMProxy*);
-
-  // Description:
-  // These methods are provided for completeness. Finalize() calls the
-  // appropriate method based on the type of proxy pass in.
-  virtual bool FinalizePipelineProxy(vtkSMProxy* proxy);
-  virtual bool FinalizeRepresentation(vtkSMProxy* proxy);
-  virtual bool FinalizeView(vtkSMProxy* proxy);
-  virtual bool FinalizeAnimationProxy(vtkSMProxy* proxy);
+  virtual bool UnRegisterProxy(vtkSMProxy* proxy);
 
   // Description:
   // Resets the session to its initial state by cleaning all pipeline
@@ -184,9 +213,10 @@ protected:
   // create animation helpers.
   virtual bool CreateAnimationHelpers(vtkSMProxy* proxy);
 
-  virtual bool PreInitializeProxyInternal(vtkSMProxy*);
-  virtual bool PostInitializeProxyInternal(vtkSMProxy*);
-  virtual bool FinalizeProxyInternal(vtkSMProxy*);
+  // Description:
+  // Unregisters know proxy dependencies that must be removed when the proxy is
+  // to be deleted e.g animation cues, representations, etc.
+  virtual bool UnRegisterDepencies(vtkSMProxy* proxy);
 
   // Description:
   // Proxies in proxy-list domains can have hints that are used to setup

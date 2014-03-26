@@ -157,7 +157,7 @@ bool vtkSMParaViewPipelineController::CreateProxiesForProxyListDomains(
         }
       // this is unnecessary here. only done for CompoundSourceProxy instances.
       // those proxies, we generally skip calling "reset" on in
-      // PostInitializeProxyInternal(). However, for properties that have proxy
+      // PostInitializeProxy(). However, for properties that have proxy
       // list domains, we need to reset them (e.g ProbeLine filter).
       iter->GetProperty()->ResetToDomainDefaults();
       }
@@ -520,207 +520,20 @@ vtkSMProxy* vtkSMParaViewPipelineController::GetTimeAnimationTrack(vtkSMProxy* s
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMParaViewPipelineController::CreateView(
-    vtkSMSession* session, const char* xmlgroup, const char* xmltype)
-{
-  if (!session)
-    {
-    return NULL;
-    }
-
-  vtkSmartPointer<vtkSMProxy> view;
-  view.TakeReference(session->GetSessionProxyManager()->NewProxy(xmlgroup, xmltype));
-  return this->InitializeView(view)? view : NULL;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::PreInitializeRepresentation(
-  vtkSMProxy* proxy)
-{
-  return proxy? this->PreInitializeProxyInternal(proxy) : false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::PostInitializeRepresentation(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
+  vtkSMProxy* proxy, const char* proxyname)
 {
   if (!proxy)
     {
     return false;
     }
-
-  vtkInternals::TimeStampsMap::iterator titer =
-    this->Internals->InitializationTimeStamps.find(proxy);
-  if (titer == this->Internals->InitializationTimeStamps.end())
-    {
-    vtkErrorMacro(
-      "PostInitializePipelineProxy must only be called after "
-      "PreInitializePipelineProxy");
-    return false;
-    }
-
-  this->PostInitializeProxyInternal(proxy);
-
-  // Now register the proxy itself.
-  proxy->GetSessionProxyManager()->RegisterProxy("representations", proxy);
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::FinalizeRepresentation(vtkSMProxy* proxy)
-{
-  if (!proxy)
-    {
-    return false;
-    }
-  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
-  std::string groupname("representations");
-  const char* _proxyname = pxm->GetProxyName(groupname.c_str(), proxy);
-  if (_proxyname == NULL)
-    {
-    groupname = "scalar_bars";
-    _proxyname = pxm->GetProxyName(groupname.c_str(), proxy);
-    if (_proxyname == NULL)
-      {
-      return false;
-      }
-    }
-  const std::string proxyname(_proxyname);
-
-  //---------------------------------------------------------------------------
-  // remove the representation from any views.
-  typedef std::vector<std::pair<vtkSMProxy*, vtkSMProperty*> > viewsvector;
-  viewsvector views;
-  for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc < max; cc++)
-    {
-    vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
-    while (consumer && consumer->GetParentProxy())
-      {
-      consumer = consumer->GetParentProxy();
-      }
-    if (consumer && consumer->IsA("vtkSMViewProxy") && proxy->GetConsumerProperty(cc))
-      {
-      views.push_back(
-        std::pair<vtkSMProxy*, vtkSMProperty*>(
-          consumer, proxy->GetConsumerProperty(cc)));
-      }
-    }
-  for (viewsvector::iterator iter=views.begin(), max=views.end(); iter != max; ++iter)
-    {
-    if (iter->first && iter->second)
-      {
-      vtkSMPropertyHelper(iter->second).Remove(proxy);
-      iter->first->UpdateVTKObjects();
-      }
-    }
-
-  this->FinalizeProxy(proxy);
-  proxy->GetSessionProxyManager()->UnRegisterProxy(
-    groupname.c_str(), proxyname.c_str(), proxy);
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::AddRepresentationToView(
-  vtkSMProxy* view, vtkSMProxy* repr)
-{
-  if (!view || !repr)
-    {
-    return false;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(view->GetProperty("Representations"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to locate \"Representations\" property on the view");
-    return false;
-    }
-  if (!pp->IsProxyAdded(repr))
-    {
-    pp->AddProxy(repr);
-    view->UpdateVTKObjects();
-    }
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::RemoveRepresentationFromView(vtkSMProxy* view, vtkSMProxy* repr)
-{
-  if (!view || !repr)
-    {
-    return false;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(view->GetProperty("Representations"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to locate \"Representations\" property on the view");
-    return false;
-    }
-  if (pp->IsProxyAdded(repr))
-    {
-    pp->RemoveProxy(repr);
-    view->UpdateVTKObjects();
-    }
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::Show(vtkSMProxy* view, vtkSMProxy* repr)
-{
-  if (this->AddRepresentationToView(view, repr))
-    {
-    vtkSMPropertyHelper(repr, "Visibility").Set(1);
-    repr->UpdateVTKObjects();
-    return true;
-    }
-  return false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::Hide(vtkSMProxy* view, vtkSMProxy* repr)
-{
-  if (!repr)
-    {
-    return false;
-    }
-
-  (void)view;
-  vtkSMPropertyHelper(repr, "Visibility").Set(0);
-  repr->UpdateVTKObjects();
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::PreInitializePipelineProxy(vtkSMProxy* proxy)
-{
-  return proxy? this->PreInitializeProxyInternal(proxy) : false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::PostInitializePipelineProxy(vtkSMProxy* proxy)
-{
-  if (!proxy)
-    {
-    return false;
-    }
-
-  vtkInternals::TimeStampsMap::iterator titer =
-    this->Internals->InitializationTimeStamps.find(proxy);
-  if (titer == this->Internals->InitializationTimeStamps.end())
-    {
-    vtkErrorMacro(
-      "PostInitializePipelineProxy must only be called after "
-      "PreInitializePipelineProxy");
-    return false;
-    }
-
-  this->PostInitializeProxyInternal(proxy);
 
   // Create animation helpers for this proxy.
   this->CreateAnimationHelpers(proxy);
 
   // Now register the proxy itself.
-  proxy->GetSessionProxyManager()->RegisterProxy("sources", proxy);
+  // If proxyname is NULL, the proxy manager makes up a name.
+  proxy->GetSessionProxyManager()->RegisterProxy("sources", proxyname, proxy);
 
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
@@ -736,12 +549,13 @@ bool vtkSMParaViewPipelineController::PostInitializePipelineProxy(vtkSMProxy* pr
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::FinalizePipelineProxy(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
 {
   if (!proxy)
     {
     return false;
     }
+
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   const char* _proxyname = pxm->GetProxyName("sources", proxy);
   if (_proxyname == NULL)
@@ -763,17 +577,21 @@ bool vtkSMParaViewPipelineController::FinalizePipelineProxy(vtkSMProxy* proxy)
   vtkSMPropertyHelper(timeKeeper, "TimeSources").Remove(proxy);
   timeKeeper->UpdateVTKObjects();
 
+  // unregister dependencies.
+  this->UnRegisterDepencies(proxy);
+
   // this will remove both proxy-list-domain helpers and animation helpers.
   this->FinalizeProxy(proxy);
 
+  // unregister the proxy.
   pxm->UnRegisterProxy("sources", proxyname.c_str(), proxy);
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::InitializeView(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy)
 {
-  if (!this->InitializeProxy(proxy))
+  if (!proxy)
     {
     return false;
     }
@@ -803,12 +621,13 @@ bool vtkSMParaViewPipelineController::InitializeView(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::FinalizeView(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::UnRegisterViewProxy(vtkSMProxy* proxy)
 {
   if (!proxy)
     {
     return false;
     }
+
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   const char* _proxyname = pxm->GetProxyName("views", proxy);
   if (_proxyname == NULL)
@@ -862,10 +681,13 @@ bool vtkSMParaViewPipelineController::FinalizeView(vtkSMProxy* proxy)
       {
       if (iter->GetPointer())
         {
-        this->Finalize(iter->GetPointer());
+        this->UnRegisterProxy(iter->GetPointer());
         }
       }
     }
+
+  // unregister dependencies.
+  this->UnRegisterDepencies(proxy);
 
   // this will remove both proxy-list-domain helpers and animation helpers.
   this->FinalizeProxy(proxy);
@@ -875,21 +697,176 @@ bool vtkSMParaViewPipelineController::FinalizeView(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterRepresentationProxy(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  // Register the proxy itself.
+  proxy->GetSessionProxyManager()->RegisterProxy("representations", proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  std::string groupname("representations");
+  const char* _proxyname = pxm->GetProxyName(groupname.c_str(), proxy);
+  if (_proxyname == NULL)
+    {
+    groupname = "scalar_bars";
+    _proxyname = pxm->GetProxyName(groupname.c_str(), proxy);
+    if (_proxyname == NULL)
+      {
+      return false;
+      }
+    }
+  const std::string proxyname(_proxyname);
+
+  //---------------------------------------------------------------------------
+  // remove the representation from any views.
+  typedef std::vector<std::pair<vtkSMProxy*, vtkSMProperty*> > viewsvector;
+  viewsvector views;
+  for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc < max; cc++)
+    {
+    vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
+    while (consumer && consumer->GetParentProxy())
+      {
+      consumer = consumer->GetParentProxy();
+      }
+    if (consumer && consumer->IsA("vtkSMViewProxy") && proxy->GetConsumerProperty(cc))
+      {
+      views.push_back(
+        std::pair<vtkSMProxy*, vtkSMProperty*>(
+          consumer, proxy->GetConsumerProperty(cc)));
+      }
+    }
+  for (viewsvector::iterator iter=views.begin(), max=views.end(); iter != max; ++iter)
+    {
+    if (iter->first && iter->second)
+      {
+      vtkSMPropertyHelper(iter->second).Remove(proxy);
+      iter->first->UpdateVTKObjects();
+      }
+    }
+
+  // unregister dependencies.
+  this->UnRegisterDepencies(proxy);
+
+  // this will remove both proxy-list-domain helpers and animation helpers.
+  this->FinalizeProxy(proxy);
+
+  proxy->GetSessionProxyManager()->UnRegisterProxy(
+    groupname.c_str(), proxyname.c_str(), proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterAnimationProxy(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  proxy->GetSessionProxyManager()->RegisterProxy("animation", proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  const char* _proxyname = pxm->GetProxyName("animation", proxy);
+  if (_proxyname == NULL)
+    {
+    return false;
+    }
+  const std::string proxyname(_proxyname);
+
+  //---------------------------------------------------------------------------
+  // Animation proxies are typically added to some other animation proxy. We
+  // need to remove it from that proxy.
+  typedef std::pair<vtkWeakPointer<vtkSMProxy>, vtkWeakPointer<vtkSMProperty> > proxypairitemtype;
+  typedef std::vector<proxypairitemtype> proxypairvectortype;
+  proxypairvectortype consumers;
+  for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc<max; ++cc)
+    {
+    vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
+    while (consumer && consumer->GetParentProxy())
+      {
+      consumer = consumer->GetParentProxy();
+      }
+    if (proxy->GetConsumerProperty(cc) &&
+      consumer && consumer->GetXMLGroup() &&
+      strcmp(consumer->GetXMLGroup(), "animation") ==0)
+      {
+      consumers.push_back(proxypairitemtype(consumer, proxy->GetConsumerProperty(cc)));
+      }
+    }
+  for (proxypairvectortype::iterator iter=consumers.begin(), max=consumers.end();
+    iter != max; ++iter)
+    {
+    if (iter->first && iter->second)
+      {
+      vtkSMPropertyHelper(iter->second).Remove(proxy);
+      iter->first->UpdateVTKObjects();
+      }
+    }
+
+  //---------------------------------------------------------------------------
+  // destroy keyframes, if there are any.
+  typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
+  proxyvectortype keyframes;
+  if (vtkSMProperty* kfProperty = proxy->GetProperty("KeyFrames"))
+    {
+    vtkSMPropertyHelper helper(kfProperty);
+    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc<max;++cc)
+      {
+      keyframes.push_back(helper.GetAsProxy(cc));
+      }
+    }
+
+  // unregister dependencies.
+  this->UnRegisterDepencies(proxy);
+
+  // this will remove both proxy-list-domain helpers and animation helpers.
+  this->FinalizeProxy(proxy);
+
+  pxm->UnRegisterProxy("animation", proxyname.c_str(), proxy);
+
+  // now destroy all keyframe proxies.
+  for (proxyvectortype::iterator iter=keyframes.begin(), max=keyframes.end();
+    iter != max;++iter)
+    {
+    if (iter->GetPointer())
+      {
+      this->UnRegisterProxy(iter->GetPointer());
+      }
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::PreInitializeProxy(vtkSMProxy* proxy)
 {
-  return proxy? this->PreInitializeProxyInternal(proxy) : false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
-{
-  return proxy? this->PostInitializeProxyInternal(proxy) : false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::PreInitializeProxyInternal(vtkSMProxy* proxy)
-{
-  assert(proxy != NULL);
+  if (!proxy)
+    {
+    return false;
+    }
 
   // 1. Load XML defaults
   //    (already done by NewProxy() call).
@@ -912,11 +889,22 @@ bool vtkSMParaViewPipelineController::PreInitializeProxyInternal(vtkSMProxy* pro
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::PostInitializeProxyInternal(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
 {
-  assert(proxy != NULL);
+  if (!proxy)
+    {
+    return false;
+    }
+
   vtkInternals::TimeStampsMap::iterator titer =
     this->Internals->InitializationTimeStamps.find(proxy);
+  if (titer == this->Internals->InitializationTimeStamps.end())
+    {
+    vtkErrorMacro(
+      "PostInitializeProxy must only be called after PreInitializeProxy");
+    return false;
+    }
+
   assert(titer != this->Internals->InitializationTimeStamps.end());
 
   vtkTimeStamp ts = titer->second;
@@ -980,13 +968,17 @@ bool vtkSMParaViewPipelineController::PostInitializeProxyInternal(vtkSMProxy* pr
   this->RegisterProxiesForProxyListDomains(proxy);
   return true;
 }
+
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::FinalizeProxyInternal(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
 {
-  assert(proxy != NULL);
+  if (!proxy)
+    {
+    return false;
+    }
 
   //---------------------------------------------------------------------------
-  // Unregister all helper proxies. This will "finalize" all the helper
+  // Unregister all helper proxies. This will "unregister" all the helper
   // proxies which ensures that any "dependent" proxies for those helpers
   // also get removed.
   std::string groupname = this->GetHelperProxyGroupName(proxy);
@@ -1006,16 +998,29 @@ bool vtkSMParaViewPipelineController::FinalizeProxyInternal(vtkSMProxy* proxy)
           iter->GetKey(), iter->GetProxy()));
       }
     }
+
   for (proxymaptype::iterator iter = proxymap.begin(), end = proxymap.end();
     iter != end; ++iter)
     {
     if (iter->second)
       {
+      // remove any dependencies for this proxy.
+      this->UnRegisterDepencies(iter->second);
+      // remove any helpers for this proxy.
       this->FinalizeProxy(iter->second);
+      // unregister the proxy.
       pxm->UnRegisterProxy(
         groupname.c_str(), iter->first.c_str(), iter->second);
       }
     }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::UnRegisterDepencies(vtkSMProxy* proxy)
+{
+  assert(proxy != NULL);
 
   //---------------------------------------------------------------------------
   // Before going any further build a list of all consumer proxies
@@ -1056,7 +1061,7 @@ bool vtkSMParaViewPipelineController::FinalizeProxyInternal(vtkSMProxy* proxy)
 
       false)
       {
-      this->Finalize(consumer);
+      this->UnRegisterProxy(consumer);
       }
     }
   //---------------------------------------------------------------------------
@@ -1067,86 +1072,7 @@ bool vtkSMParaViewPipelineController::FinalizeProxyInternal(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::FinalizeAnimationProxy(vtkSMProxy* proxy)
-{
-  if (!proxy)
-    {
-    return false;
-    }
-
-  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
-  const char* _proxyname = pxm->GetProxyName("animation", proxy);
-  if (_proxyname == NULL)
-    {
-    return false;
-    }
-  const std::string proxyname(_proxyname);
-
-  //---------------------------------------------------------------------------
-  // Animation proxies are typically added to some other animation proxy. We
-  // need to remove it from that proxy.
-  typedef std::pair<vtkWeakPointer<vtkSMProxy>, vtkWeakPointer<vtkSMProperty> > proxypairitemtype;
-  typedef std::vector<proxypairitemtype> proxypairvectortype;
-  proxypairvectortype consumers;
-  for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc<max; ++cc)
-    {
-    vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
-    while (consumer && consumer->GetParentProxy())
-      {
-      consumer = consumer->GetParentProxy();
-      }
-    if (proxy->GetConsumerProperty(cc) &&
-      consumer && consumer->GetXMLGroup() &&
-      strcmp(consumer->GetXMLGroup(), "animation") ==0)
-      {
-      consumers.push_back(proxypairitemtype(consumer, proxy->GetConsumerProperty(cc)));
-      }
-    }
-  for (proxypairvectortype::iterator iter=consumers.begin(), max=consumers.end();
-    iter != max; ++iter)
-    {
-    if (iter->first && iter->second)
-      {
-      vtkSMPropertyHelper(iter->second).Remove(proxy);
-      iter->first->UpdateVTKObjects();
-      }
-    }
-
-  //---------------------------------------------------------------------------
-  // destroy keyframes, if there are any.
-  typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
-  proxyvectortype keyframes;
-  if (vtkSMProperty* kfProperty = proxy->GetProperty("KeyFrames"))
-    {
-    vtkSMPropertyHelper helper(kfProperty);
-    for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc<max;++cc)
-      {
-      keyframes.push_back(helper.GetAsProxy(cc));
-      }
-    }
-  this->FinalizeProxy(proxy);
-  pxm->UnRegisterProxy("animation", proxyname.c_str(), proxy);
-
-  // now destroy all keyframe proxies.
-  for (proxyvectortype::iterator iter=keyframes.begin(), max=keyframes.end();
-    iter != max;++iter)
-    {
-    if (iter->GetPointer())
-      {
-      this->Finalize(iter->GetPointer());
-      }
-    }
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
-{
-  return proxy? this->FinalizeProxyInternal(proxy) : false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::Finalize(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
 {
   if (!proxy)
     {
@@ -1157,22 +1083,22 @@ bool vtkSMParaViewPipelineController::Finalize(vtkSMProxy* proxy)
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   if (pxm->GetProxyName("sources", proxy))
     {
-    return this->FinalizePipelineProxy(proxy);
+    return this->UnRegisterPipelineProxy(proxy);
     }
   else if (pxm->GetProxyName("representations", proxy) ||
            pxm->GetProxyName("scalar_bars", proxy))
     {
-    return this->FinalizeRepresentation(proxy);
+    return this->UnRegisterRepresentationProxy(proxy);
     }
   else if (pxm->GetProxyName("views", proxy))
     {
-    return this->FinalizeView(proxy);
+    return this->UnRegisterViewProxy(proxy);
     }
   else if (pxm->GetProxyName("animation", proxy))
     {
     if (proxy != this->GetAnimationScene(proxy->GetSession()))
       {
-      return this->FinalizeAnimationProxy(proxy);
+      return this->UnRegisterAnimationProxy(proxy);
       }
     }
   else
@@ -1183,6 +1109,13 @@ bool vtkSMParaViewPipelineController::Finalize(vtkSMProxy* proxy)
       {
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))
         {
+        // unregister dependencies.
+        if (!this->UnRegisterDepencies(proxy))
+          {
+          return false;
+          }
+
+        // this will remove both proxy-list-domain helpers and animation helpers.
         if (!this->FinalizeProxy(proxy))
           {
           return false;
@@ -1192,7 +1125,6 @@ bool vtkSMParaViewPipelineController::Finalize(vtkSMProxy* proxy)
         }
       }
     }
-
   return false;
 }
 
@@ -1225,7 +1157,7 @@ bool vtkSMParaViewPipelineController::ResetSession(vtkSMSession* session)
     {
     if (iter->GetPointer())
       {
-      this->Finalize(iter->GetPointer());
+      this->UnRegisterProxy(iter->GetPointer());
       }
     }
 

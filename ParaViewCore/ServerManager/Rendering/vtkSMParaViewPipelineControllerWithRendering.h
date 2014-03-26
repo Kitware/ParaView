@@ -42,7 +42,7 @@ public:
   // While it is tempting to add any default property setup logic in such
   // overrides, we must keep such overrides to a minimal and opting for domains
   // that set appropriate defaults where as much as possible.
-  virtual bool PostInitializeRepresentation(vtkSMProxy* proxy);
+  virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy);
 //BTX
 protected:
   vtkSMParaViewPipelineControllerWithRendering();

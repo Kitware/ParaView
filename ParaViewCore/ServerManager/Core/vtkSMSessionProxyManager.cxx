@@ -823,6 +823,18 @@ void vtkSMSessionProxyManager::RegisterProxy(const char* groupname,
     return;
     }
 
+  if (groupname == NULL)
+    {
+    vtkErrorMacro("'groupname' cannot be NULL.");
+    return;
+    }
+  if (name == NULL || name[0] == 0)
+    {
+    // come up with a new name and register the proxy.
+    this->RegisterProxy(groupname, proxy);
+    return;
+    }
+
   vtkSMProxyManagerProxyListType &proxy_list =
     this->Internals->RegisteredProxyMap[groupname][name];
   if (proxy_list.Contains(proxy))

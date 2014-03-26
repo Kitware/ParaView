@@ -65,27 +65,31 @@ int main(int argc, char* argv[])
     vtkSmartPointer<vtkSMProxy> exodusReader;
     exodusReader.TakeReference(pxm->NewProxy("sources", "ExodusIIReader"));
 
-    controller->PreInitializePipelineProxy(exodusReader);
+    controller->PreInitializeProxy(exodusReader);
     vtkSMPropertyHelper(exodusReader, "FileName").Set(
       "/home/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
      // "/Users/utkarsh/Kitware/ParaView3/ParaViewData/Data/can.ex2");
     vtkSMPropertyHelper(exodusReader, "ApplyDisplacements").Set(0);
     exodusReader->UpdateVTKObjects();
 
-    controller->PostInitializePipelineProxy(exodusReader);
+    controller->PostInitializeProxy(exodusReader);
+    controller->RegisterPipelineProxy(exodusReader);
 
     // Create view
     vtkSmartPointer<vtkSMProxy> view;
     view.TakeReference(pxm->NewProxy("views", "RenderView"));
-    controller->InitializeView(view);
+    controller->PreInitializeProxy(view);
+    controller->PostInitializeProxy(view);
+    controller->RegisterViewProxy(view);
 
     // Create display.
     vtkSmartPointer<vtkSMProxy> repr;
     repr.TakeReference(vtkSMViewProxy::SafeDownCast(view)->CreateDefaultRepresentation(
         exodusReader, 0));
-    controller->PreInitializeRepresentation(repr);
+    controller->PreInitializeProxy(repr);
     vtkSMPropertyHelper(repr, "Input").Set(exodusReader);
-    controller->PostInitializeRepresentation(repr);
+    controller->PostInitializeProxy(repr);
+    controller->RegisterRepresentationProxy(repr);
 
     vtkSMPropertyHelper(view, "Representations").Add(repr);
     view->UpdateVTKObjects();

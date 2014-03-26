@@ -32,9 +32,9 @@ vtkSMParaViewPipelineControllerWithRendering::~vtkSMParaViewPipelineControllerWi
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineControllerWithRendering::PostInitializeRepresentation(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(vtkSMProxy* proxy)
 {
-  if (!this->Superclass::PostInitializeRepresentation(proxy))
+  if (!this->Superclass::RegisterRepresentationProxy(proxy))
     {
     return false;
     }

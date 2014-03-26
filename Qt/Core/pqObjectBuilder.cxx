@@ -100,15 +100,15 @@ namespace pqObjectBuilderNS
   //-----------------------------------------------------------------------------
   bool preCreatePipelineProxy(vtkSMProxy* proxy)
     {
-    return (proxy != NULL && Controller->PreInitializePipelineProxy(proxy));
+    return Controller->PreInitializeProxy(proxy);
     }
 
   //-----------------------------------------------------------------------------
   pqPipelineSource* postCreatePipelineProxy(vtkSMProxy* proxy, pqServer* server)
     {
-
     // since there are no properties to set, nothing to do here.
-    Controller->PostInitializePipelineProxy(proxy);
+    Controller->PostInitializeProxy(proxy);
+    Controller->RegisterPipelineProxy(proxy);
 
     pqPipelineSource* source = pqApplicationCore::instance()->
       getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
@@ -332,7 +332,7 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
     }
 
   emit this->destroying(source);
-  pqObjectBuilderNS::Controller->Finalize(source->getProxy());
+  pqObjectBuilderNS::Controller->UnRegisterProxy(source->getProxy());
 }
 
 //-----------------------------------------------------------------------------
@@ -370,7 +370,9 @@ pqView* pqObjectBuilder::createView(const QString& type,
   // this by setting up layouts, etc.
   emit this->aboutToCreateView(server);
 
-  pqObjectBuilderNS::Controller->InitializeView(proxy);
+  pqObjectBuilderNS::Controller->PreInitializeProxy(proxy);
+  pqObjectBuilderNS::Controller->PostInitializeProxy(proxy);
+  pqObjectBuilderNS::Controller->RegisterViewProxy(proxy);
 
   pqServerManagerModel* model =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -396,7 +398,7 @@ void pqObjectBuilder::destroy(pqView* view)
     }
 
   emit this->destroying(view);
-  pqObjectBuilderNS::Controller->Finalize(view->getProxy());
+  pqObjectBuilderNS::Controller->UnRegisterProxy(view->getProxy());
 }
 
 //-----------------------------------------------------------------------------
@@ -440,7 +442,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     return NULL;
     }
 
-  pqObjectBuilderNS::Controller->PreInitializeRepresentation(reprProxy);
+  pqObjectBuilderNS::Controller->PreInitializeProxy(reprProxy);
 
 
   // Set the reprProxy's input.
@@ -453,11 +455,13 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
                                     0);
     }
 
-  pqObjectBuilderNS::Controller->PostInitializeRepresentation(reprProxy);
+  pqObjectBuilderNS::Controller->PostInitializeProxy(reprProxy);
+  pqObjectBuilderNS::Controller->RegisterRepresentationProxy(reprProxy);
 
   // Add the reprProxy to render module.
   vtkSMProxy* viewModuleProxy = view->getProxy();
-  pqObjectBuilderNS::Controller->Show(viewModuleProxy, reprProxy);
+  vtkSMPropertyHelper(viewModuleProxy, "Representations").Add(reprProxy);
+  viewModuleProxy->UpdateVTKObjects();
 
   pqApplicationCore* core= pqApplicationCore::instance();
   pqDataRepresentation* repr = core->getServerManagerModel()->
