@@ -71,6 +71,20 @@ copy_files_recursive(${paraview_toolbars_source_dir}
   LABEL "Copying ParaView Toolbars CSS files")
 
 # =================================================================
+# Logos
+# =================================================================
+
+set(paraview_logo_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Cinema")
+set(paraview_logo_binary_dir "${CMAKE_BINARY_DIR}/www/ext/pv")
+
+copy_files_recursive(${paraview_logo_source_dir}
+  DESTINATION ${paraview_logo_binary_dir}
+  REGEX "^(.*\\.png)$"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/paraview_logo-copy-complete"
+  LABEL "Copying ParaView Logos files")
+
+
+# =================================================================
 # Dependency
 # =================================================================
 
@@ -81,4 +95,5 @@ add_custom_target(ParaViewWebWidgets ALL DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-css-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_toolbars-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_toolbars-css-copy-complete"
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_logo-copy-complete"
   )

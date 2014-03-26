@@ -1166,9 +1166,13 @@ class CompositeImageExporter():
                         rep.DiffuseColor = field[1]
                     else:
                         self.file_name_generator.update_active_arguments(field=field[1])
-                        rep.LookupTable = self.luts[field[1]]
-                        rep.ColorArrayName = field[1]
-                        rep.ColorAttributeType = field[0]
+                        data_bounds = self.datasets[compositeIdx].GetDataInformation().GetBounds()
+                        if data_bounds[0] > data_bounds[1]:
+                            rep.ColorArrayName = ''
+                        else:
+                            rep.LookupTable = self.luts[field[1]]
+                            rep.ColorArrayName = field[1]
+                            rep.ColorAttributeType = field[0]
 
                     self.view.ActiveRepresentation = rep
                     self.view.CompositeDirectory = self.file_name_generator.get_directory()
