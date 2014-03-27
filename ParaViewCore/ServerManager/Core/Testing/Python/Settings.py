@@ -18,10 +18,19 @@ trueThetaResolution = 32
 trueCenter = (1.0, 2.0, 4.0)
 settingsString = """
 {
+  // Default settings for sources.
   "sources" : {
+    // A sphere source is awesome
     "SphereSource" : {
+      /* New comment
+         New comment 2 */
       "Radius" : %4.2f,
+      // Theta resolution
+
+
+      // Theta resolution 2
       "ThetaResolution" : %d,
+      // Center comment
       "Center" : [%3.1f, %3.1f, %3.1f]
     }
   }
@@ -31,6 +40,31 @@ settingsString = """
 settings = paraview.servermanager.vtkSMSettings.GetInstance()
 settings.SetUserSettingsFromString(settingsString)
 settings.SetSiteSettingsFromString("{}")
+
+sourcesComment = settings.GetSettingDescription(".sources")
+if sourcesComment != "// Default settings for sources.":
+  print "Comment for .sources was not what was expected"
+  sys.exit(-1)
+
+sourcesSphereSourceComment = settings.GetSettingDescription(".sources.SphereSource")
+if sourcesSphereSourceComment != "// A sphere source is awesome":
+  print "Comment for .sources.SphereSource was not what was expected"
+  sys.exit(-1)
+
+sourcesSphereSourceRadiusComment = settings.GetSettingDescription(".sources.SphereSource.Radius")
+if sourcesSphereSourceRadiusComment != "/* New comment\n         New comment 2 */":
+  print "Comment for .sources.SphereSource.Radius was not what was expected"
+  sys.exit(-1)
+
+sourcesSphereSourceThetaResolution = settings.GetSettingDescription(".sources.SphereSource.ThetaResolution")
+if sourcesSphereSourceThetaResolution != "// Theta resolution\n// Theta resolution 2":
+  print "Comment for .sources.SphereSource.ThetaResolution was not what was expected"
+  sys.exit(-1)
+
+sourcesSphereSourceCenter = settings.GetSettingDescription(".sources.SphereSource.Center")
+if sourcesSphereSourceCenter != "// Center comment":
+  print "Comment for .sources.SphereSource.Center was not what was expected"
+  sys.exit(-1)
 
 # Check the setting directly
 settingPath = ".sources.SphereSource.Radius"
@@ -120,7 +154,6 @@ settings.SetSetting(".sources.SphereSource.strings", "five")
 settings.SetSetting(".sources.SphereSource.strings", "one")
 settings.SetSetting(".sources.SphereSource.strings", 1, "two")
 settings.SetSetting(".sources.SphereSource.strings", 1, "three")
-print settings
 
 if settings.GetSettingAsInt(".sources.SphereSource.ints", 0, 0) != 5:
   print "Setting '.sources.SphereSource.ints[0]' should have value 5"
