@@ -15,6 +15,7 @@
 #include "vtkSMBoundsDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkMath.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -172,6 +173,12 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
     }
   else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
     {
+    // first check if the bounds have valid values before setting them
+    if(vtkMath::AreBoundsInitialized(bounds) == 0)
+      {
+      return;
+      }
+
     double magn = sqrt((bounds[1]-bounds[0]) * (bounds[1]-bounds[0]) +
                        (bounds[3]-bounds[2]) * (bounds[3]-bounds[2]) +
                        (bounds[5]-bounds[4]) * (bounds[5]-bounds[4]));
