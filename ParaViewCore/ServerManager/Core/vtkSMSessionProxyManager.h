@@ -99,7 +99,6 @@ class vtkEventForwarderCommand;
 class vtkPVXMLElement;
 class vtkSMCompoundSourceProxy;
 class vtkSMDocumentation;
-class vtkSMGlobalPropertiesManager;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
@@ -390,21 +389,6 @@ public:
   vtkGetMacro(UpdateInputProxies, int);
 
   // Description:
-  // ParaView has notion of "global properties". These are application wide
-  // properties such as foreground color, text color etc. Changing values of
-  // these properties affects all objects that are linked to these properties.
-  // This class provides convenient API to setup/remove such links.
-  void SetGlobalPropertiesManager(const char* name, vtkSMGlobalPropertiesManager*);
-  void RemoveGlobalPropertiesManager(const char* name);
-
-  // Description:
-  // Accessors for global properties managers.
-  unsigned int GetNumberOfGlobalPropertiesManagers();
-  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(unsigned int index);
-  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(const char* name);
-  const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
-
-  // Description:
   // Loads server-manager configuration xml.
   bool LoadConfigurationXML(const char* xmlcontents);
 
@@ -469,7 +453,6 @@ protected:
   vtkSMSessionProxyManager(vtkSMSession*);
   ~vtkSMSessionProxyManager();
 
-  friend class vtkSMGlobalPropertiesManager;
   friend class vtkSMProxy;
   friend class vtkPVProxyDefinitionIterator;
   friend class vtkSMProxyIterator;
@@ -504,10 +487,6 @@ protected:
   // Description:
   // Save/Load registered link states.
   void SaveRegisteredLinks(vtkPVXMLElement* root);
-
-  // Description:
-  // Save global property managers.
-  void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
 
   // Description:
   // Internal method to save server manager state in an XML

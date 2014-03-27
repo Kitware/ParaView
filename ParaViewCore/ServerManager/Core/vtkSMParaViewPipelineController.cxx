@@ -18,6 +18,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMGlobalPropertiesProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -189,13 +190,56 @@ void vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains(
       {
       vtkSMProxy* plproxy = pld->GetProxy(cc);
 
-      // Handle proxy-list hinks.
+      // Handle proxy-list hints.
       this->ProcessProxyListProxyHints(proxy, plproxy);
 
       this->PostInitializeProxy(plproxy);
       pxm->RegisterProxy(groupname.c_str(), iter->GetKey(), plproxy);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::SetupGlobalPropertiesLinks(vtkSMProxy* proxy)
+{
+  assert(proxy != NULL);
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+
+  vtkSmartPointer<vtkSMPropertyIterator> iter;
+  iter.TakeReference(proxy->NewPropertyIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* prop = iter->GetProperty();
+    assert(prop);
+
+    vtkPVXMLElement* linkHint = prop->GetHints()?
+      prop->GetHints()->FindNestedElementByName("GlobalPropertyLink") : NULL;
+    if (!linkHint)
+      {
+      continue;
+      }
+
+    std::string type = linkHint->GetAttributeOrEmpty("type");
+    std::string property = linkHint->GetAttributeOrEmpty("property");
+    if (type.empty() || property.empty())
+      {
+      vtkWarningMacro("Invalid GlobalPropertyLink hint.");
+      continue;
+      }
+
+    vtkSMGlobalPropertiesProxy* gpproxy = vtkSMGlobalPropertiesProxy::SafeDownCast(
+      pxm->GetProxy("global_properties", type.c_str()));
+    if (!gpproxy)
+      {
+      continue;
+      }
+    if (!gpproxy->Link(property.c_str(), proxy, iter->GetKey()))
+      {
+      vtkWarningMacro("Failed to setup GlobalPropertyLink.");
+      }
+    }
+  return true;
 }
 
 namespace
@@ -391,6 +435,20 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     proxy->Delete();
     }
 
+  //---------------------------------------------------------------------------
+  // Setup color palette and proxies for other global property groups (optional)
+  proxy = pxm->GetProxy("global_properties", "ColorPalette");
+  if (!proxy)
+    {
+    proxy = pxm->NewProxy("misc", "ColorPalette");
+    if (proxy)
+      {
+      this->InitializeProxy(proxy);
+      pxm->RegisterProxy("global_properties", "ColorPalette", proxy);
+      proxy->UpdateVTKObjects();
+      proxy->Delete();
+      }
+    }
   return true;
 }
 
@@ -905,7 +963,13 @@ bool vtkSMParaViewPipelineController::PreInitializeProxy(vtkSMProxy* proxy)
     return false;
     }
 
-  // 3. Load property values from Settings.
+  // 3. Process global properties hints.
+  if (!this->SetupGlobalPropertiesLinks(proxy))
+    {
+    return false;
+    }
+
+  // 4. Load property values from Settings.
   vtkSMSettings * settings = vtkSMSettings::GetInstance();
   settings->GetProxySettings(proxy);
 

@@ -81,7 +81,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -98,7 +97,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqApplicationCore::pqInternals
 {
 public:
-  vtkSmartPointer<vtkSMGlobalPropertiesManager> GlobalPropertiesManager;
   QMap<QString, QPointer<QObject> > RegisteredManagers;
 };
 
@@ -319,126 +317,6 @@ void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMGlobalPropertiesManager* pqApplicationCore::getGlobalPropertiesManager()
-{
-  // FIXME: Global properties can not properly handle accross several ProxyManager
-  if (!this->Internal->GlobalPropertiesManager)
-    {
-    // Setup the application's "GlobalProperties" proxy.
-    // This is used to keep track of foreground color etc.
-    this->Internal->GlobalPropertiesManager =
-      vtkSmartPointer<vtkSMGlobalPropertiesManager>::New();
-
-    // Need to attach to a session
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    vtkSMSessionProxyManager* spxm = pxm->GetActiveSessionProxyManager();
-    this->Internal->GlobalPropertiesManager->SetSession(spxm->GetSession());
-
-    this->Internal->GlobalPropertiesManager->InitializeProperties(
-        "misc", "GlobalProperties");
-    spxm->SetGlobalPropertiesManager("ParaViewProperties",
-                                     this->Internal->GlobalPropertiesManager);
-
-    // load settings.
-    this->loadGlobalPropertiesFromSettings();
-
-    this->Internal->GlobalPropertiesManager->Modified();
-    }
-  return this->Internal->GlobalPropertiesManager;
-}
-
-#define SET_COLOR_MACRO(settingkey, defaultvalue, propertyname)\
-  color = _settings->value(settingkey, defaultvalue).value<QColor>();\
-  rgb[0] = color.redF();\
-  rgb[1] = color.greenF();\
-  rgb[2] = color.blueF();\
-  vtkSMPropertyHelper(mgr, propertyname).Set(rgb, 3);
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::loadGlobalPropertiesFromSettings()
-{
-  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
-  QColor color;
-  double rgb[3];
-  pqSettings* _settings = this->settings();
-  SET_COLOR_MACRO(
-    "GlobalProperties/ForegroundColor",
-    QColor::fromRgbF(1, 1, 1),
-    "ForegroundColor");
-  SET_COLOR_MACRO(
-    "GlobalProperties/SurfaceColor",
-    QColor::fromRgbF(1, 1, 1),
-    "SurfaceColor");
-  SET_COLOR_MACRO(
-    "GlobalProperties/BackgroundColor",
-    QColor::fromRgbF(0.32, 0.34, 0.43),
-    "BackgroundColor");
-  SET_COLOR_MACRO(
-    "GlobalProperties/TextAnnotationColor",
-    QColor::fromRgbF(1, 1, 1),
-    "TextAnnotationColor");
-  SET_COLOR_MACRO(
-    "GlobalProperties/SelectionColor",
-    QColor::fromRgbF(1, 0, 1),
-    "SelectionColor");
-  SET_COLOR_MACRO(
-    "GlobalProperties/EdgeColor",
-    QColor::fromRgbF(0.0, 0, 0.5),
-    "EdgeColor");
-
-  bool convert =_settings->value(
-    "GlobalProperties/AutoConvertProperties",false).toBool();
-  vtkSMInputArrayDomain::SetAutomaticPropertyConversion(convert);
-  emit this->forceFilterMenuRefresh();
-}
-
-//-----------------------------------------------------------------------------
-/// loads palette i.e. global property values given the name of the palette.
-void pqApplicationCore::loadPalette(const QString& paletteName)
-{
-  vtkSMSessionProxyManager* pxm =
-      vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
-    paletteName.toLatin1().data());
-  if (!prototype)
-    {
-    qCritical() << "No such palette " << paletteName;
-    return;
-    }
-
-  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
-  vtkSMPropertyIterator * iter = mgr->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    if (prototype->GetProperty(iter->GetKey()))
-      {
-      iter->GetProperty()->Copy(
-        prototype->GetProperty(iter->GetKey()));
-      }
-    }
-  iter->Delete();
-}
-
-//-----------------------------------------------------------------------------
-/// loads palette i.e. global property values given the name XML state for a
-/// palette.
-void pqApplicationCore::loadPalette(vtkPVXMLElement* xml)
-{
-  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
-  mgr->LoadXMLState(xml, NULL);
-}
-
-//-----------------------------------------------------------------------------
-/// save the current palette as XML. A new reference is returned, so the
-/// caller is responsible for releasing memory i.e. call Delete() on the
-/// returned value.
-vtkPVXMLElement* pqApplicationCore::getCurrrentPalette()
-{
-  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
-  return mgr->SaveXMLState(NULL);
-}
-
-//-----------------------------------------------------------------------------
 void pqApplicationCore::registerManager(const QString& function,
   QObject* _manager)
 {
@@ -636,6 +514,8 @@ pqSettings* pqApplicationCore::settings()
       }
     vtkProcessModuleAutoMPI::SetEnableAutoMPI(this->Settings->value("autoMPI").toBool());
     vtkProcessModuleAutoMPI::SetNumberOfCores(this->Settings->value("autoMPI_NumberOfCores").toInt());
+    vtkSMInputArrayDomain::SetAutomaticPropertyConversion(
+      this->Settings->value("GlobalProperties/AutoConvertProperties",false).toBool());
     }
   return this->Settings;
 }

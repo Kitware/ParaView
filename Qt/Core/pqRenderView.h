@@ -277,10 +277,6 @@ private slots:
   /// undo signals as required by pqView.
   void onUndoStackChanged();
 
-  /// When the default text annotation color changes, we need to update the
-  /// orientation text actor.
-  void textAnnotationColorChanged();
-
   /// Called when VTK event get trigger to notify that the interaction mode has changed
   void onInteractionModeChange();
 

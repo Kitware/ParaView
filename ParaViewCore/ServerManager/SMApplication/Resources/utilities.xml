@@ -2039,7 +2039,7 @@
       </DoubleVectorProperty>
       <!-- End of RepresentationAnimationHelper -->
     </Proxy>
-    <Proxy name="GlobalProperties">
+    <GlobalPropertiesProxy name="ColorPalette">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             label="Foreground"
                             name="ForegroundColor"
@@ -2096,8 +2096,8 @@
         <Documentation>Color used for showing selected
         cells/points.</Documentation>
       </DoubleVectorProperty>
-      <!-- End of GlobalProperties -->
-    </Proxy>
+      <!-- End of ColorPalette -->
+    </GlobalPropertiesProxy>
     <Proxy class="vtkPolyDataMapper"
            name="GlobalMapperProperties"
            processes="client|renderserver">

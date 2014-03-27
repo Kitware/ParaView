@@ -362,7 +362,8 @@ void pqApplicationOptions::applyChanges()
   //  }
   //pqChartRepresentation::setHiddenSeriesSetting(hidden);
 
-  pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
+  // FIXME:
+  //pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
 
   // render all views.
   pqApplicationCore::instance()->render();

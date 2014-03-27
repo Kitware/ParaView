@@ -81,7 +81,7 @@
            <number>0</number>
           </property>
           <item row="0" column="0">
-           <widget class="pqStandardColorButton" name="Color">
+           <widget class="pqColorChooserButtonWithPalettes" name="Color">
             <property name="text">
              <string>Color</string>
             </property>
@@ -107,7 +107,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="pqStandardColorButton" name="Color2">
+           <widget class="pqColorChooserButtonWithPalettes" name="Color2">
             <property name="maximumSize">
              <size>
               <width>16777215</width>
@@ -242,9 +242,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqStandardColorButton</class>
+   <class>pqColorChooserButtonWithPalettes</class>
    <extends>QToolButton</extends>
-   <header>pqStandardColorButton.h</header>
+   <header>pqColorChooserButtonWithPalettes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

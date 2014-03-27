@@ -28,7 +28,6 @@
 #include "vtkSmartPointer.h" // Needed for the singleton
 
 class vtkPVXMLElement;
-class vtkSMGlobalPropertiesManager;
 class vtkSMPluginManager;
 class vtkSMProxy;
 class vtkSMProxyLocator;
@@ -116,21 +115,6 @@ public:
   const char* GetProxyName(const char* groupname, vtkSMProxy* proxy);
 
   // Description:
-  // ParaView has notion of "global properties". These are application wide
-  // properties such as foreground color, text color etc. Changing values of
-  // these properties affects all objects that are linked to these properties.
-  // This class provides convenient API to setup/remove such links.
-  void SetGlobalPropertiesManager(const char* name, vtkSMGlobalPropertiesManager*);
-  void RemoveGlobalPropertiesManager(const char* name);
-
-  // Description:
-  // Accessors for global properties managers.
-  unsigned int GetNumberOfGlobalPropertiesManagers();
-  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(unsigned int index);
-  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(const char* name);
-  const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
-
-  // Description:
   // Get/Set the undo-stack builder if the application is using undo-redo
   // mechanism to track changes.
   void SetUndoStackBuilder(vtkSMUndoStackBuilder* builder);
@@ -171,7 +155,6 @@ public:
       PROXY =0x1,
       COMPOUND_PROXY_DEFINITION = 0x2,
       LINK = 0x3,
-      GLOBAL_PROPERTIES_MANAGER = 0x4
       };
   };
 
@@ -202,10 +185,6 @@ protected:
 #endif
 
   friend class vtkSMSessionProxyManager;
-
-  // Description:
-  // Save global property managers.
-  void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
 
   // Description:
   // Connections updated. Update the active session accordingly.

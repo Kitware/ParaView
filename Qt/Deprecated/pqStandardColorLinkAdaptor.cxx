@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTextDisplayPropertiesWidget.h
+   Module:    pqStandardColorLinkAdaptor.cxx
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,36 +28,19 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __pqTextDisplayPropertiesWidget_h
-#define __pqTextDisplayPropertiesWidget_h
+========================================================================*/
+#include "pqStandardColorLinkAdaptor.h"
 
-#include "pqDisplayPanel.h"
+#include "pqStandardColorButton.h"
 
-/// This is a display editor widget for Text displays. 
-/// Can only work with pqTextDisplay objects.
-class PQCOMPONENTS_EXPORT pqTextDisplayPropertiesWidget : public pqDisplayPanel
+//-----------------------------------------------------------------------------
+pqStandardColorLinkAdaptor::pqStandardColorLinkAdaptor(
+  pqStandardColorButton* button, vtkSMProxy* proxy, const char* propname)
+:Superclass(button)
 {
-  Q_OBJECT
-public:
-  pqTextDisplayPropertiesWidget(pqRepresentation* display, QWidget* parent=0);
-  virtual ~pqTextDisplayPropertiesWidget();
+}
 
-protected slots:
-  void onTextLocationChanged(bool);
-
-private:
-  /// Set the display whose properties this editor will edit.
-  void setDisplay(pqRepresentation* display);
-
-  class pqInternal;
-  pqInternal* Internal;
-
-private:
-  pqTextDisplayPropertiesWidget(const pqTextDisplayPropertiesWidget&); // Not implemented.
-  void operator=(const pqTextDisplayPropertiesWidget&); // Not implemented.
-};
-
-#endif
-
-
+//-----------------------------------------------------------------------------
+pqStandardColorLinkAdaptor::~pqStandardColorLinkAdaptor()
+{
+}

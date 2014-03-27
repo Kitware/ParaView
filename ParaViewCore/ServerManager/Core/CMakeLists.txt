@@ -61,7 +61,7 @@ set (Module_SRCS
   vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMGlobalPropertiesLinkUndoElement.cxx
-  vtkSMGlobalPropertiesManager.cxx
+  vtkSMGlobalPropertiesProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx

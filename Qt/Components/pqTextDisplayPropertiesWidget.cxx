@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
 #include "pqSignalAdaptors.h"
-#include "pqStandardColorLinkAdaptor.h"
 #include "pqUndoStack.h"
 
 class pqTextDisplayPropertiesWidget::pqInternal : 
@@ -56,16 +55,15 @@ public:
   QPointer<pqRepresentation> Display;
   pqPropertyLinks Links;
 
-  pqSignalAdaptorColor *ColorAdaptor;
   pqSignalAdaptorComboBox *FontFamilyAdaptor;
   pqSignalAdaptorComboBox *TextAlignAdaptor;
+  QPointer<pqColorPaletteLinkHelper> ColorPaletteHelper;
 };
 
 //----------------------------------------------------------------------------
 pqTextDisplayPropertiesWidget::pqInternal::pqInternal() : 
 Ui::pqTextDisplayPropertiesWidget()
 {
-  this->ColorAdaptor = 0;
   this->FontFamilyAdaptor = 0;
   this->TextAlignAdaptor = 0;
 }
@@ -73,7 +71,6 @@ Ui::pqTextDisplayPropertiesWidget()
 //----------------------------------------------------------------------------
 pqTextDisplayPropertiesWidget::pqInternal::~pqInternal() 
 {
-  delete this->ColorAdaptor;
   delete this->FontFamilyAdaptor;
   delete this->TextAlignAdaptor;
 }
@@ -86,10 +83,6 @@ pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqRepresentation* d
   this->Internal->setupUi(this);
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
-  
-  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
-      this->Internal->buttonColor, "chosenColor", 
-      SIGNAL(chosenColorChanged(const QColor&)), false);
 
   this->Internal->FontFamilyAdaptor = new pqSignalAdaptorComboBox(
       this->Internal->comboFontFamily);
@@ -98,31 +91,12 @@ pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqRepresentation* d
       this->Internal->comboTextAlign);
 
   this->setDisplay(display);
-
-  this->Internal->buttonColor->setUndoLabel("Change Color");
-  QObject::connect(this->Internal->buttonColor,
-    SIGNAL(beginUndo(const QString&)),
-    this, SLOT(beginUndoSet(const QString&)));
-  QObject::connect(this->Internal->buttonColor,
-    SIGNAL(endUndo()), this, SLOT(endUndoSet()));
 }
 
 //-----------------------------------------------------------------------------
 pqTextDisplayPropertiesWidget::~pqTextDisplayPropertiesWidget()
 {
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-void pqTextDisplayPropertiesWidget::beginUndoSet(const QString& str)
-{
-  BEGIN_UNDO_SET(str);
-}
-
-//-----------------------------------------------------------------------------
-void pqTextDisplayPropertiesWidget::endUndoSet()
-{
-  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
@@ -135,6 +109,8 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
 
   this->setEnabled(false);
   this->Internal->Links.removeAllPropertyLinks();
+  delete this->Internal->ColorPaletteHelper;
+
   if (this->Internal->Display)
     {
     QObject::disconnect(this->Internal->Display, 0, this, 0);
@@ -172,12 +148,15 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
     this->Internal->toolButtonShadow, "checked", SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("Shadow"), 1);
 
-  this->Internal->Links.addPropertyLink(this->Internal->ColorAdaptor, 
-      "color", SIGNAL(colorChanged(const QVariant&)),
-      proxy, proxy->GetProperty("Color"));
+  this->Internal->Links.addPropertyLink(
+    this->Internal->buttonColor, "chosenColorRgbF",
+    SIGNAL(chosenColorChanged(const QColor&)),
+    proxy, proxy->GetProperty("Color"));
+
   // This manages the global property linking.
-  new pqStandardColorLinkAdaptor(this->Internal->buttonColor,
-    proxy, "Color");
+  this->Internal->ColorPaletteHelper = new pqColorPaletteLinkHelper(
+    this->Internal->buttonColor, proxy, "Color");
+
   this->Internal->Links.addPropertyLink(this->Internal->FontFamilyAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       proxy, proxy->GetProperty("FontFamily"));

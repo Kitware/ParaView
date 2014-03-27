@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -247,14 +246,6 @@ void pqRenderView::initializeWidgets()
     {
     vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
     }
-
-  // Set up some global property links by default.
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-  this->getConnector()->Connect(
-    globalPropertiesManager->GetProperty("TextAnnotationColor"),
-    vtkCommand::ModifiedEvent, this, SLOT(textAnnotationColorChanged()));
-  this->textAnnotationColorChanged();
 
   // ensure that center axis visibility etc. is updated as per user's
   // preferences.
@@ -963,19 +954,6 @@ void pqRenderView::selectBlock(int rectangle[4], bool expand)
   this->emitSelectionSignal(opPorts);
 }
 
-//-----------------------------------------------------------------------------
-void pqRenderView::textAnnotationColorChanged()
-{
-  // Set up some global property links by default.
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-  double value[3];
-  vtkSMPropertyHelper(globalPropertiesManager, "TextAnnotationColor").Get(
-    value, 3);
-  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor", true).Set(
-    value, 3);
-  this->getProxy()->UpdateProperty("OrientationAxesLabelColor");
-}
 //-----------------------------------------------------------------------------
 pqRenderViewBase::ManipulatorType* pqRenderView::getManipulatorTypes(int &numberOfManipulatorType)
 {

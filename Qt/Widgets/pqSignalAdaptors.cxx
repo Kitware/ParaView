@@ -110,6 +110,9 @@ pqSignalAdaptorColor::pqSignalAdaptorColor(QObject* p,
   // assumes signal named after property 
   QObject::connect(p, signal,
                    this, SLOT(handleColorChanged()));
+  qDebug(
+    "Changes in pqColorChooserButton API have made pqSignalAdaptorColor unnecessary. "
+    "Please update the code. pqSignalAdaptorColor will soon be deprecated.");
 }
 
 //----------------------------------------------------------------------------

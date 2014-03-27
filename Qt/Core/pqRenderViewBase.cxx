@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -289,10 +288,6 @@ void pqRenderViewBase::setDefaultPropertyValues()
       proxy->GetProperty("UseOffscreenRenderingForScreenshots"), 0);
     }
 
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "BackgroundColor", proxy, "Background");
   proxy->UpdateVTKObjects();
 
   this->restoreSettings(false);

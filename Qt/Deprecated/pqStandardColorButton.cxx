@@ -31,94 +31,78 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqStandardColorButton.h"
 
-// Server Manager Includes.
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMPropertyIterator.h"
+#include "pqActiveObjects.h"
+#include "pqServer.h"
+#include "pqSetName.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkEventQtSlotConnect.h"
+#include "vtkSMGlobalPropertiesProxy.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMSessionProxyManager.h"
 
 // Qt Includes.
-#include <QMenu>
 #include <QAction>
-#include <QIcon>
 #include <QActionGroup>
 #include <QColorDialog>
-
-// ParaView Includes.
-#include "pqApplicationCore.h"
-#include "pqSetName.h"
+#include <QIcon>
+#include <QMenu>
 
 //-----------------------------------------------------------------------------
 pqStandardColorButton::pqStandardColorButton(QWidget* _parent) :
   Superclass(_parent)
 {
-  this->VTKConnect = vtkEventQtSlotConnect::New();
+  // Setup a popup menu.
+  QMenu *popupMenu = new QMenu(this);
+  popupMenu << pqSetName("StandardColorMenu");
+  this->setMenu(popupMenu);
+  this->connect(popupMenu, SIGNAL(aboutToShow()), SLOT(updateMenu()));
+
   this->setPopupMode(QToolButton::MenuButtonPopup);
-  this->updateMenu();
-
-  pqApplicationCore* core = pqApplicationCore::instance();
-  vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
-
-  this->VTKConnect->Connect(
-    globalProps, vtkCommand::PropertyModifiedEvent,
-    this, SLOT(updateMenu()));
 }
 
 //-----------------------------------------------------------------------------
 pqStandardColorButton::~pqStandardColorButton()
 {
-  this->VTKConnect->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void pqStandardColorButton::setStandardColor(const QString& name)
 {
   // user manually changed the color, unset the "standard color" link.
-  foreach (QAction* action, this->menu()->actions())
-    {
-    if (action->isCheckable())
-      {
-      action->setChecked(
-        action->data().toString() == name);
-      }
-    }
+  this->StandardColor = name;
 }
 
 //-----------------------------------------------------------------------------
 QString pqStandardColorButton::standardColor()
 {
-  // user manually changed the color, unset the "standard color" link.
-  foreach (QAction* action, this->menu()->actions())
-    {
-    if (action->isCheckable() && action->isChecked())
-      {
-      return action->data().toString();
-      }
-    }
-  return QString();
+  this->StandardColor;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqStandardColorButton::colorPalette() const
+{
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  vtkSMSessionProxyManager* pxm = server? server->proxyManager() : NULL;
+  return (pxm? pxm->GetProxy("global_properties", "ColorPalette") : NULL);
 }
 
 //-----------------------------------------------------------------------------
 void pqStandardColorButton::updateMenu()
 {
-  QString current_standard_color = this->menu()? this->standardColor() :
-    QString();
+  QMenu* popupMenu = this->menu();
+  Q_ASSERT(popupMenu);
 
-  // destroy the old one.
-  delete this->menu();
+  popupMenu->clear();
 
-  QMenu *popupMenu = new QMenu(this);
-  popupMenu << pqSetName("StandardColorMenu");
-  this->setMenu(popupMenu);
+  delete this->ActionGroup;
+  this->ActionGroup = new QActionGroup(this);
 
-  QActionGroup * action_group = new QActionGroup(popupMenu);
+  vtkSMProxy* cp = this->colorPalette();
+  if (!cp)
+    {
+    return;
+    }
 
-  QObject::connect(popupMenu, SIGNAL(triggered(QAction*)),
-    this, SLOT(actionTriggered(QAction*)));
-
-  pqApplicationCore* core = pqApplicationCore::instance();
-  vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
-  vtkSMPropertyIterator* iter = globalProps->NewPropertyIterator();
+  vtkSMPropertyIterator* iter = cp->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -133,27 +117,28 @@ void pqStandardColorButton::updateMenu()
       action << pqSetName(iter->GetKey());
       action->setData(QVariant(iter->GetKey()));
       action->setCheckable(true);
-      action_group->addAction(action);
+      action->setChecked(this->StandardColor == iter->GetKey());
+      this->ActionGroup->addAction(action);
       }
     }
   iter->Delete();
-  this->setStandardColor(current_standard_color);
 }
 
 //-----------------------------------------------------------------------------
 void pqStandardColorButton::actionTriggered(QAction* action)
 {
   QString prop_name = action->data().toString();
-  pqApplicationCore* core = pqApplicationCore::instance();
-  vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
+  vtkSMProxy* globalProps = this->colorPalette();
+  Q_ASSERT(globalProps);
+
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     globalProps->GetProperty(prop_name.toLatin1().data()));
   QColor color;
   color.setRgbF(dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
-  emit this->beginUndo(this->UndoLabel);
+//  emit this->beginUndo(this->UndoLabel);
   this->setChosenColor(color);
   emit this->standardColorChanged(this->standardColor());
-  emit this->endUndo();
+//  emit this->endUndo();
 }
 
 //-----------------------------------------------------------------------------
@@ -162,18 +147,9 @@ void pqStandardColorButton::chooseColor()
   QColor newColor = QColorDialog::getColor(this->Color, this);
   if (newColor != this->Color)
     {
-    emit this->beginUndo(this->UndoLabel);
+  //  emit this->beginUndo(this->UndoLabel);
     this->setChosenColor(newColor);
-
-    // user manually changed the color, unset the "standard color" link.
-    foreach (QAction* action, this->menu()->actions())
-      {
-      if (action->isCheckable())
-        {
-        action->setChecked(false);
-        }
-      }
     emit this->standardColorChanged(this->standardColor());
-    emit this->endUndo();
+  //  emit this->endUndo();
     }
 }

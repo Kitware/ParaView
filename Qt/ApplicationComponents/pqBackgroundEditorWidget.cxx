@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 #include "pqRenderView.h"
-#include "pqSignalAdaptors.h"
-#include "pqStandardColorLinkAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"

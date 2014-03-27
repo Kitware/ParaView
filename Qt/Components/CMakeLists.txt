@@ -92,6 +92,8 @@ set (Module_SRCS
   pqClipPanel.h
   pqCollaborationPanel.cxx
   pqCollaborationPanel.h
+  pqColorChooserButtonWithPalettes.cxx
+  pqColorChooserButtonWithPalettes.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorPresetManager.cxx
@@ -355,10 +357,6 @@ set (Module_SRCS
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.cxx
   pqSpreadSheetViewDecorator.h
-  pqStandardColorButton.cxx
-  pqStandardColorButton.h
-  pqStandardColorLinkAdaptor.cxx
-  pqStandardColorLinkAdaptor.h
   pqStandardLegacyCustomPanels.cxx
   pqStandardLegacyCustomPanels.h
   pqStandardLegacyDisplayPanels.cxx
@@ -439,6 +437,7 @@ set (Module_MOC_HDRS
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.h
   pqClipPanel.h
+  pqColorChooserButtonWithPalettes.h
   pqCollaborationPanel.h
   pqColorMapModel.h
   pqColorPresetManager.h
@@ -564,8 +563,6 @@ set (Module_MOC_HDRS
   pqSplineWidget.h
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.h
-  pqStandardColorButton.h
-  pqStandardColorLinkAdaptor.h
   pqStandardLegacyCustomPanels.h
   pqStandardLegacyDisplayPanels.h
   pqStreamTracerPanel.h

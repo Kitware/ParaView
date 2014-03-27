@@ -225,6 +225,10 @@ protected:
   virtual void RegisterProxiesForProxyListDomains(vtkSMProxy* proxy);
 
   // Description:
+  // Setup global properties links based on hints for properties in the XML.
+  virtual bool SetupGlobalPropertiesLinks(vtkSMProxy* proxy);
+
+  // Description:
   // To help animation representation properties such as visibility, opacity, we
   // create animation helpers.
   virtual bool CreateAnimationHelpers(vtkSMProxy* proxy);

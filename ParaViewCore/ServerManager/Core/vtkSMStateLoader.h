@@ -93,10 +93,6 @@ protected:
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
 
   // Description:
-  // Process the <GlobalPropertiesManagers /> element.
-  int HandleGlobalPropertiesManagers(vtkPVXMLElement*);
-
-  // Description:
   // This method scans through the internal data structure built 
   // during BuildProxyCollectionInformation() and registers the proxy. 
   // The DS keeps info

@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqSMAdaptor.h"
-#include "pqStandardColorLinkAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -111,10 +110,6 @@ void pqEditColorMapReaction::editColorMap()
         pqSMAdaptor::setMultipleElementProperty(
           use_ambient? ambient : diffuse, rgb);
         proxy->UpdateVTKObjects();
-        // need to break any global-property link that might have existed
-        // with this property.
-        pqStandardColorLinkAdaptor::breakLink(proxy, 
-          use_ambient? "AmbientColor" : "DiffuseColor");
         repr->renderViewEventually();
         END_UNDO_SET();
         }

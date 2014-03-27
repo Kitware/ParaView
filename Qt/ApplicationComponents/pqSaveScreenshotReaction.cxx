@@ -141,30 +141,31 @@ void pqSaveScreenshotReaction::saveScreenshot()
   QSize size = ssDialog.viewSize();
   QString palette = ssDialog.palette();
 
-  // temporarily load the color palette chosen by the user.
-  vtkSmartPointer<vtkPVXMLElement> currentPalette;
+//FIXME:
+//  // temporarily load the color palette chosen by the user.
+//  vtkSmartPointer<vtkPVXMLElement> currentPalette;
   pqApplicationCore* core = pqApplicationCore::instance();
-  if (!palette.isEmpty())
-    {
-    currentPalette.TakeReference(core->getCurrrentPalette());
-    core->loadPalette(palette);
-    }
-
+//  if (!palette.isEmpty())
+//    {
+//    currentPalette.TakeReference(core->getCurrrentPalette());
+//    core->loadPalette(palette);
+//    }
+//
   int stereo = ssDialog.getStereoMode();
   if (stereo)
     {
     pqRenderViewBase::setStereo(stereo);
     }
-
-  pqSaveScreenshotReaction::saveScreenshot(file,
-    size, ssDialog.quality(), ssDialog.saveAllViews());
-
-  // restore palette.
-  if (!palette.isEmpty())
-    {
-    core->loadPalette(currentPalette);
-    }
-
+//
+//  pqSaveScreenshotReaction::saveScreenshot(file,
+//    size, ssDialog.quality(), ssDialog.saveAllViews());
+//
+//  // restore palette.
+//  if (!palette.isEmpty())
+//    {
+//    core->loadPalette(currentPalette);
+//    }
+//
   if (stereo)
     {
     pqRenderViewBase::setStereo(0);

@@ -29,19 +29,19 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStandardColorButton_h 
+#ifndef __pqStandardColorButton_h
 #define __pqStandardColorButton_h
 
 #include "pqColorChooserButton.h"
-#include "pqComponentsModule.h"
+#include "pqDeprecatedModule.h"
 
-class vtkEventQtSlotConnect;
 
-/// Color chooser button that adds a menu allowing the user to choose on the
-/// standard application-wide colors such as foreground/background etc.
-/// Use pqStandardColorButton is conjunction with pqStandardColorLinkAdaptor to
-/// manage setting up the standard color link.
-class PQCOMPONENTS_EXPORT pqStandardColorButton : public pqColorChooserButton
+#include <QPointer>
+class QActionGroup;
+class vtkSMProxy;
+
+/// DEPRECATED: Use pqColorChooserButtonWithPalettes instead.
+class PQDEPRECATED_EXPORT pqStandardColorButton : public pqColorChooserButton
 {
   Q_OBJECT
   typedef pqColorChooserButton Superclass;
@@ -53,10 +53,6 @@ public:
   QString standardColor();
 
 public slots:
-  /// Called to rebuild the menu. This needs to be called when the colors
-  /// change.
-  void updateMenu();
-
   /// show a dialog to choose the color
   virtual void chooseColor();
 
@@ -64,6 +60,11 @@ public slots:
   /// color, that can be changed using setChosenColor(). This only affect the
   /// check state for the colors in the standard colors menu.
   void setStandardColor(const QString&);
+
+private slots:
+  /// Called to rebuild the menu. This is called everytime the popup menu is
+  /// going to be shown.
+  void updateMenu();
 
 signals:
   /// Fired in conjunction with chosenColorChanged(). The standardColorName is
@@ -77,9 +78,11 @@ private:
   pqStandardColorButton(const pqStandardColorButton&); // Not implemented.
   void operator=(const pqStandardColorButton&); // Not implemented.
 
-  vtkEventQtSlotConnect* VTKConnect;
+
+  vtkSMProxy* colorPalette() const;
+
+  QPointer<QActionGroup> ActionGroup;
+  QString StandardColor;
 };
 
 #endif
-
-

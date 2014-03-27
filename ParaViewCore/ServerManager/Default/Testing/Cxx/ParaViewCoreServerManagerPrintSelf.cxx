@@ -58,7 +58,7 @@
 #include "vtkSMFileListDomain.h"
 #include "vtkSMFixedTypeDomain.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
-#include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMGlobalPropertiesProxy.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMImplicitPlaneRepresentationProxy.h"
 #include "vtkSMInputArrayDomain.h"
@@ -183,7 +183,7 @@ int main(int , char *[])
   PRINT_SELF(vtkSMFileListDomain);
   PRINT_SELF(vtkSMFixedTypeDomain);
   PRINT_SELF(vtkSMGlobalPropertiesLinkUndoElement);
-  PRINT_SELF(vtkSMGlobalPropertiesManager);
+  PRINT_SELF(vtkSMGlobalPropertiesProxy);
   PRINT_SELF(vtkSMIdTypeVectorProperty);
   PRINT_SELF(vtkSMImplicitPlaneRepresentationProxy);
   PRINT_SELF(vtkSMInputArrayDomain);

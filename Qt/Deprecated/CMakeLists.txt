@@ -29,11 +29,17 @@
 #
 #==========================================================================
 set (Module_SRCS
+  pqStandardColorButton.cxx
+  pqStandardColorButton.h
+  pqStandardColorLinkAdaptor.cxx
+  pqStandardColorLinkAdaptor.h
   pqTransferFunctionChartViewWidget.cxx
   pqTransferFunctionChartViewWidget.h
 )
 
 set (Module_MOC_HDRS
+  pqStandardColorButton.h
+  pqStandardColorLinkAdaptor.h
   pqTransferFunctionChartViewWidget.h
 )
 

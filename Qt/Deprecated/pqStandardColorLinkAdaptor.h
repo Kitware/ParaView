@@ -29,20 +29,19 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqStandardColorLinkAdaptor_h 
+#ifndef __pqStandardColorLinkAdaptor_h
 #define __pqStandardColorLinkAdaptor_h
 
 #include <QObject>
-#include "pqComponentsModule.h"
+#include "pqDeprecatedModule.h"
 
 class vtkEventQtSlotConnect;
 class pqStandardColorButton;
 class vtkSMProxy;
 
-/// pqStandardColorLinkAdaptor is an adaptor used to connect the
-/// pqStandardColorButton with the property ensuring links with global
-/// properties are made and broken as and when needed.
-class PQCOMPONENTS_EXPORT pqStandardColorLinkAdaptor : public QObject
+/// DEPRECATED: Refer to pqColorChooserButtonWithPalettes and
+/// pqColorPaletteLinkHelper.
+class PQDEPRECATED_EXPORT pqStandardColorLinkAdaptor : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
@@ -52,28 +51,9 @@ public:
   ~pqStandardColorLinkAdaptor();
 
   /// Break a global-property link.
-  static void breakLink(vtkSMProxy* proxy, const char* pname);
-
-protected slots:
-  /// called when pqStandardColorButton fires standardColorChanged() signal.
-  /// We update the property link between the standard color and the
-  /// colorProperty.
-  void onStandardColorChanged(const QString&);
-
-  /// called when vtkSMGlobalPropertiesManager fires the modified event
-  /// indicating that some links have been made or broken.
-  void onGlobalPropertiesChanged();
-
+  static void breakLink(vtkSMProxy*, const char*) {}
 private:
-  pqStandardColorLinkAdaptor(const pqStandardColorLinkAdaptor&); // Not implemented.
-  void operator=(const pqStandardColorLinkAdaptor&); // Not implemented.
-
-  vtkSMProxy* Proxy;
-  QString PropertyName;
-  vtkEventQtSlotConnect* VTKConnect;
-  bool IgnoreModifiedEvents;
+  Q_DISABLE_COPY(pqStandardColorLinkAdaptor);
 };
 
 #endif
-
-

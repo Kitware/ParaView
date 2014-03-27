@@ -329,6 +329,9 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="0"
                             command="SetOpacity"

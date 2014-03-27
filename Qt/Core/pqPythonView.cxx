@@ -15,52 +15,27 @@
 #include "pqPythonView.h"
 
 // Server Manager Includes.
-#include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
-#include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
-#include "vtkRenderWindow.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMInteractionUndoStackBuilder.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPythonViewProxy.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMUndoStack.h"
 
 // Qt Includes.
 #include <QList>
-#include <QMainWindow>
-#include <QMap>
-#include <QMapIterator>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPoint>
 #include <QPointer>
-#include <QStatusBar>
 #include <QtDebug>
 
 // ParaView Includes.
-#include "pqApplicationCore.h"
-#include "pqCoreUtilities.h"
-#include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqQVTKWidget.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqSettings.h"
-#include "pqSMAdaptor.h"
-#include "pqTimer.h"
-#include "pqRenderView.h"
 
 #include <string>
 

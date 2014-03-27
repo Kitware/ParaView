@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
@@ -67,7 +66,6 @@ public:
   QPointer<pqOutputPort> Port;
   Ui::FindDataSelectionDisplayFrame Ui;
   pqPropertyLinks Links;
-  QPointer<pqSignalAdaptorColor> ColorAdaptor;
   QMenu CellLabelsMenu;
   QMenu PointLabelsMenu;
 
@@ -82,9 +80,6 @@ public:
     this->Ui.setupUi(self);
     this->Ui.horizontalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->Ui.horizontalLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
-
-    this->ColorAdaptor = new pqSignalAdaptorColor(this->Ui.selectionColor,
-      "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
 
     this->Ui.cellLabelsButton->setMenu(&this->CellLabelsMenu);
     this->Ui.pointLabelsButton->setMenu(&this->PointLabelsMenu);
@@ -130,14 +125,19 @@ public:
 
     self->setEnabled(true);
 
+
     // Link the selection color to the global selection color so that it will
     // affect all views, otherwise the user may be get confused.
-    vtkSMGlobalPropertiesManager* globalPropertiesManager =
-      pqApplicationCore::instance()->getGlobalPropertiesManager();
-    this->Links.addPropertyLink(
-      this->ColorAdaptor, "color", SIGNAL(colorChanged(const QVariant&)),
-      globalPropertiesManager, globalPropertiesManager->GetProperty("SelectionColor"));
-
+    vtkSMProxy* colorPalette =
+      this->Port->getServer()->proxyManager()->GetProxy(
+        "global_properties", "ColorPalette");
+    if (colorPalette)
+      {
+      this->Links.addPropertyLink(
+        this->Ui.selectionColor, "chosenColorRgbF",
+        SIGNAL(chosenColorChanged(const QColor&)),
+        colorPalette, colorPalette->GetProperty("SelectionColor"));
+      }
     this->showFrustum(this->Ui.showFrustumButton->isChecked());
     }
 

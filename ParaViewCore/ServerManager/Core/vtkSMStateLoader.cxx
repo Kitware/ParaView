@@ -18,7 +18,6 @@
 #include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyIterator.h"
@@ -376,48 +375,6 @@ void vtkSMStateLoader::HandleCustomProxyDefinitions(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
-{
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  assert(pxm != NULL);
-
-  unsigned int numElems = element->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < numElems; cc++)
-    {
-    vtkPVXMLElement* currentElement= element->GetNestedElement(cc);
-    const char* name = currentElement->GetName();
-    const char* mgrname = currentElement->GetAttribute("name");
-    if (!name || !mgrname || strcmp(name, "GlobalPropertiesManager") != 0)
-      {
-      continue;
-      }
-    std::string group = currentElement->GetAttribute("group");
-    std::string type = currentElement->GetAttribute("type");
-    vtkSMGlobalPropertiesManager* mgr =
-      pxm->GetGlobalPropertiesManager(mgrname);
-    if (mgr && (group != mgr->GetXMLGroup() || type != mgr->GetXMLName()))
-      {
-      vtkErrorMacro("GlobalPropertiesManager with name " << mgrname
-        << " exists, however is of different type.");
-      return 0;
-      }
-    if (!mgr)
-      {
-      mgr = vtkSMGlobalPropertiesManager::New();
-      mgr->SetSession(this->GetSession());
-      mgr->InitializeProperties(group.c_str(), type.c_str());
-      pxm->SetGlobalPropertiesManager(mgrname, mgr);
-      mgr->Delete();
-      }
-    if (!mgr->LoadLinkState(currentElement, this->ProxyLocator))
-      {
-      return 0;
-      }
-    }
-  return 1;
-}
-
-//---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
@@ -593,10 +550,6 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
       else if (strcmp(name, "Links") == 0)
         {
         this->HandleLinks(currentElement);
-        }
-      else if (strcmp(name, "GlobalPropertiesManagers") == 0)
-        {
-        this->HandleGlobalPropertiesManagers(currentElement);
         }
       }
     }

@@ -1392,13 +1392,7 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
   rootElement->AddNestedElement(links);
   links->Delete();
 
-  vtkPVXMLElement* globalProps = vtkPVXMLElement::New();
-  globalProps->SetName("GlobalPropertiesManagers");
-  this->SaveGlobalPropertiesManagers(globalProps);
-  rootElement->AddNestedElement(globalProps);
-  globalProps->Delete();
-
-  if(parentElem)
+  if (parentElem)
     {
     parentElem->AddNestedElement(rootElement);
     rootElement->FastDelete();
@@ -1487,12 +1481,6 @@ void vtkSMSessionProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMSessionProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
-{
-  vtkSMProxyManager::GetProxyManager()->SaveGlobalPropertiesManagers(root);
-}
-
-//---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMSessionProxyManager::GetProxyHints(
   const char* groupName, const char* proxyName)
 {
@@ -1524,46 +1512,6 @@ vtkPVXMLElement* vtkSMSessionProxyManager::GetPropertyHints(
       }
     }
   return 0;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSessionProxyManager::SetGlobalPropertiesManager(const char* name,
-    vtkSMGlobalPropertiesManager* mgr)
-{
-  vtkSMProxyManager::GetProxyManager()->SetGlobalPropertiesManager(name, mgr);
-}
-
-//---------------------------------------------------------------------------
-const char* vtkSMSessionProxyManager::GetGlobalPropertiesManagerName(
-  vtkSMGlobalPropertiesManager* mgr)
-{
-  return vtkSMProxyManager::GetProxyManager()->GetGlobalPropertiesManagerName(mgr);
-}
-
-//---------------------------------------------------------------------------
-vtkSMGlobalPropertiesManager* vtkSMSessionProxyManager::GetGlobalPropertiesManager(
-  const char* name)
-{
-  return vtkSMProxyManager::GetProxyManager()->GetGlobalPropertiesManager(name);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSessionProxyManager::RemoveGlobalPropertiesManager(const char* name)
-{
-  vtkSMProxyManager::GetProxyManager()->RemoveGlobalPropertiesManager(name);
-}
-
-//---------------------------------------------------------------------------
-unsigned int vtkSMSessionProxyManager::GetNumberOfGlobalPropertiesManagers()
-{
-  return vtkSMProxyManager::GetProxyManager()->GetNumberOfGlobalPropertiesManagers();
-}
-
-//---------------------------------------------------------------------------
-vtkSMGlobalPropertiesManager* vtkSMSessionProxyManager::GetGlobalPropertiesManager(
-  unsigned int index)
-{
-  return vtkSMProxyManager::GetProxyManager()->GetGlobalPropertiesManager(index);
 }
 
 //---------------------------------------------------------------------------
