@@ -91,6 +91,10 @@ public:
   void SetSetting(const char* settingName, unsigned int index, const std::string & value);
 
   // Description:
+  // Set the description of a setting.
+  void SetSettingDescription(const char* settingName, const char* description);
+
+  // Description:
   // Save non-default settings in the current user settings.
   void SetProxySettings(vtkSMProxy* proxy);
 
@@ -109,6 +113,10 @@ public:
   std::string GetSettingAsString(const char* settingName,
                                  unsigned int index,
                                  const std::string & defaultValue);
+
+  // Description:
+  // Get setting description
+  std::string GetSettingDescription(const char* settingName);
 
   // Description:
   // Set the property values in a vtkSMProxy from the settings file.

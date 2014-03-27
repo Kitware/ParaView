@@ -136,7 +136,7 @@ public:
 
   //----------------------------------------------------------------------------
   template< typename T >
-  void SetVectorSetting(const char* settingName, const std::vector< T > & values)
+  void SetSetting(const char* settingName, const std::vector< T > & values)
   {
     std::string root, leaf;
     this->SeparateBranchFromLeaf(settingName, root, leaf);
@@ -158,6 +158,27 @@ public:
       {
       jsonValue[leaf] = values[0];
       }
+  }
+
+  //----------------------------------------------------------------------------
+  void SetSettingDescription(const char* settingName, const char* description)
+  {
+    Json::Value value = this->GetSetting(settingName);
+
+    std::string root, leaf;
+    this->SeparateBranchFromLeaf(settingName, root, leaf);
+
+    //Json::Path settingPath(root.c_str());
+    Json::Path settingPath(settingName);
+    const Json::Value & testValue = settingPath.resolve(this->UserSettingsJSONRoot);
+    if (!testValue)
+      {
+      return;
+      }
+
+    // Setting exists, now set the description.
+    Json::Value & settingValue = settingPath.make(this->UserSettingsJSONRoot);
+    settingValue.setComment(description, Json::commentBefore);
   }
 
   //----------------------------------------------------------------------------
@@ -621,7 +642,7 @@ void vtkSMSettings::SetUserSettingsFromString(const char* settings)
 
   // Parse the user settings
   Json::Reader reader;
-  bool success = reader.parse(std::string(settings), this->Internal->UserSettingsJSONRoot, false);
+  bool success = reader.parse(std::string(settings), this->Internal->UserSettingsJSONRoot, true);
   if (!success)
     {
     vtkErrorMacro(<< "Could not parse user settings JSON");
@@ -705,7 +726,7 @@ void vtkSMSettings::SetSiteSettingsFromString(const char* settings)
 
   // Parse the user settings
   Json::Reader reader;
-  bool success = reader.parse(std::string(settings), this->Internal->SiteSettingsJSONRoot, false);
+  bool success = reader.parse(std::string(settings), this->Internal->SiteSettingsJSONRoot);
   if (!success)
     {
     vtkErrorMacro(<< "Could not parse site settings JSON");
@@ -754,7 +775,7 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, int 
     }
 
   values[index] = value;
-  this->Internal->SetVectorSetting(settingName, values);
+  this->Internal->SetSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
@@ -768,7 +789,7 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, doub
     }
 
   values[index] = value;
-  this->Internal->SetVectorSetting(settingName, values);
+  this->Internal->SetSetting(settingName, values);
 }
 
 //----------------------------------------------------------------------------
@@ -782,7 +803,13 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, cons
     }
 
   values[index] = value;
-  this->Internal->SetVectorSetting(settingName, values);
+  this->Internal->SetSetting(settingName, values);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSettings::SetSettingDescription(const char* settingName, const char* description)
+{
+  this->Internal->SetSettingDescription(settingName, description);
 }
 
 //----------------------------------------------------------------------------
@@ -923,6 +950,22 @@ std::string vtkSMSettings::GetSettingAsString(const char* settingName,
     }
 
   return defaultValue;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSettings::GetSettingDescription(const char *settingName)
+{
+  Json::Value value = this->Internal->GetSetting(settingName);
+  if (value.hasComment(Json::commentBefore))
+    {
+    return value.getComment(Json::commentBefore);
+    }
+  else if (value.hasComment(Json::commentAfterOnSameLine))
+    {
+    return value.getComment(Json::commentAfterOnSameLine);
+    }
+
+  return std::string();
 }
 
 //----------------------------------------------------------------------------
