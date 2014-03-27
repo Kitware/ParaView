@@ -269,7 +269,8 @@ void pqColorMapEditor::updateScalarBarButtons()
   Ui::ColorMapEditor& ui = this->Internals->Ui;
   bool can_show_sb = this->Internals->ScalarBarVisibilityAction->isEnabled();
   ui.ShowScalarBar->setEnabled(can_show_sb);
-  ui.EditScalarBar->setEnabled(can_show_sb);
+  ui.EditScalarBar->setEnabled(can_show_sb &&
+    this->Internals->ScalarBarVisibilityAction->isChecked());
 }
 
 //-----------------------------------------------------------------------------
