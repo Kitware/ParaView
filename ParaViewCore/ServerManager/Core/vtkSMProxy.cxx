@@ -1463,67 +1463,13 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
 vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
 {
   vtkSMPropertyGroup *group = vtkSMPropertyGroup::New();
+  if (!group->ReadXMLAttributes(this, groupElem))
+    {
+    group->Delete();
+    return NULL;
+    }
 
   // FIXME: should we use group-name as the "key" for the property groups?
-  const char *groupName = groupElem->GetAttribute("name");
-  if(groupName)
-    {
-    group->SetName(groupName);
-    }
-
-  const char *groupLabel = groupElem->GetAttribute("label");
-  if(groupLabel)
-    {
-    group->SetXMLLabel(groupLabel);
-    }
-
-  // this is deprecated attribute that's replaced by "panel_widget". We still
-  // process it for backwards compatibility.
-  const char *groupType = groupElem->GetAttribute("type");
-  if(groupType)
-    {
-    vtkWarningMacro("Found deprecated attribute 'type' of PropertyGroup. "
-      "Please use 'panel_widget' instead.");
-    group->SetPanelWidget(groupType);
-    }
-
-  groupType = groupElem->GetAttribute("panel_widget");
-  if(groupType)
-    {
-    group->SetPanelWidget(groupType);
-    }
-
-  const char *panelVisibility = groupElem->GetAttribute("panel_visibility");
-  if(panelVisibility)
-    {
-    group->SetPanelVisibility(panelVisibility);
-    }
-
-  for (unsigned int k = 0; k < groupElem->GetNumberOfNestedElements(); k++)
-    {
-    vtkPVXMLElement* elem = groupElem->GetNestedElement(k);
-
-    // if elem has "exposed_name", use that to locate the property, else use the
-    // "name".
-    const char* propname = elem->GetAttribute("exposed_name")?
-      elem->GetAttribute("exposed_name") : elem->GetAttribute("name");
-    vtkSMProperty* property = propname? this->GetProperty(propname) : NULL;
-    if (!property)
-      {
-      vtkWarningMacro("Failed to locate property '" <<
-        (propname? propname : "(none)") << "' for PropertyGroup. Skipping.");
-      }
-    else
-      {
-      const char* functionAttribute = elem->GetAttribute("function");
-      if (functionAttribute == 0)
-        {
-        functionAttribute = elem->GetAttribute("name");
-        }
-      group->AddProperty(functionAttribute, property);
-      }
-    }
-
   this->Internals->PropertyGroups.push_back(group);
   group->Delete();
 

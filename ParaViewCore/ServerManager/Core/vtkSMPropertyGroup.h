@@ -19,8 +19,11 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
+class vtkPVXMLElement;
+class vtkSMDocumentation;
 class vtkSMProperty;
 class vtkSMPropertyGroupInternals;
+class vtkSMProxy;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyGroup : public vtkSMObject
 {
@@ -88,10 +91,18 @@ public:
   // Returns the number of properties in the group.
   unsigned int GetNumberOfProperties() const;
 
+  // Description:
+  // Returns the documentation for this proxy.
+  vtkGetObjectMacro(Documentation, vtkSMDocumentation);
+
 protected:
   vtkSMPropertyGroup();
   ~vtkSMPropertyGroup();
 
+  friend class vtkSMProxy;
+  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
+
+  vtkSMDocumentation* Documentation;
 private:
   vtkSMPropertyGroup(const vtkSMPropertyGroup&); // Not implemented
   void operator=(const vtkSMPropertyGroup&); // Not implemented

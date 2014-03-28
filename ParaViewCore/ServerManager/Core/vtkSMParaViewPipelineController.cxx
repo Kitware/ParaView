@@ -435,6 +435,18 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     proxy->Delete();
     }
 
+  proxy = pxm->GetProxy("options", "GeneralSettings");
+  if (!proxy)
+    {
+    proxy = pxm->NewProxy("options", "GeneralSettings");
+    if (proxy)
+      {
+      this->InitializeProxy(proxy);
+      pxm->RegisterProxy("options", "GeneralSettings", proxy);
+      proxy->UpdateVTKObjects();
+      proxy->Delete();
+      }
+    }
   //---------------------------------------------------------------------------
   // Setup color palette and proxies for other global property groups (optional)
   proxy = pxm->GetProxy("global_properties", "ColorPalette");
@@ -1255,6 +1267,7 @@ bool vtkSMParaViewPipelineController::ResetSession(vtkSMSession* session)
 
   // Now create new time-animation track.
   this->InitializeSession(session);
+  return true;
 }
 
 //----------------------------------------------------------------------------

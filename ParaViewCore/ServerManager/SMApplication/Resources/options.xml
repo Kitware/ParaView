@@ -1,0 +1,146 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="options">
+    <Proxy name="GeneralSettings" label="General Settings">
+      <Documentation>
+        Collection of general setting for ParaView.
+      </Documentation>
+
+      <IntVectorProperty name="ShowSplashScreen"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Show splash screen at startup.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CrashRecovery"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          On a crash, attempt to save a state file to potentially restore
+          the application state to that before the crash.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="DefaultViewType"
+        number_of_elements="1"
+        default_values="Render View">
+        <Documentation>
+          Set the view to create when ParaView starts up.
+        </Documentation>
+        <StringListDomain name="list">
+          <String value="Render View" />
+          <String value="Line Chart View" />
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="AutoApply"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Automatically apply changes in the 'Properties' panel.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoApplyActiveOnly"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Limit automatic accepting of changes on the 'Properties'
+          panel to the active panel alone.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoConvertProperties"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Automatically convert data arrays as needed by filters including converting
+          cell arrays to point arrays, or vice versa, and extracting single components
+          from multi-component arrays.
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="StrictLoadBalancing"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Use strict load balancing for structured datasets (fixme: need to
+          figure out what this one does).
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DefaultTimeStep"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Any time a new dataset with timesteps is opened,
+          set the timestep the application should go to
+          by default.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Leave current time unchanged, if possible" value="0" />
+          <Entry text="Go to first timestep" value="1" />
+          <Entry text="Go to last timestep" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableAutoMPI"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Enable multicore support for data processing.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AutoMPILimit"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Limit maximum number of cores to
+        </Documentation>
+        <IntRangeDomain min="1" max="64" />
+      </IntVectorProperty>
+
+      <PropertyGroup label="General Options">
+        <Property name="ShowSplashScreen" />
+        <Property name="CrashRecovery" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Properties Panel Options">
+        <Property name="AutoApply" />
+        <Property name="AutoApplyActiveOnly" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Data Processing Options">
+        <Property name="AutoConvertProperties" />
+        <Property name="StrictLoadBalancing" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Multicore Support">
+        <Documentation>
+          On multicore systems, ParaView can run parallel pvserver processes automatically,
+          without you having to launch them manually for processing data in parallel.
+        </Documentation>
+        <Property name="EnableAutoMPI" />
+        <Property name="AutoMPILimit" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

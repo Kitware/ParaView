@@ -335,6 +335,8 @@ set (Module_SRCS
   pqServerConnectDialog.h
   pqServerLauncher.cxx
   pqServerLauncher.h
+  pqSettingsDialog.cxx
+  pqSettingsDialog.h
   pqSignalAdaptorCompositeTreeWidget.cxx
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.cxx
@@ -552,6 +554,7 @@ set (Module_MOC_HDRS
   pqServerConfigurationImporter.h
   pqServerConnectDialog.h
   pqServerLauncher.h
+  pqSettingsDialog.h
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
@@ -656,6 +659,7 @@ set (Module_UI_FILES
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerConnectDialog.ui
   Resources/UI/pqServerLauncherDialog.ui
+  Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSplineWidget.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui

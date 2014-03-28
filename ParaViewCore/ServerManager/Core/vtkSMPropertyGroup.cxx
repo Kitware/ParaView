@@ -15,7 +15,10 @@
 #include "vtkSMPropertyGroup.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkWeakPointer.h"
 
 #include <map>
@@ -42,6 +45,8 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
 
   // by default, properties are set to always shown
   this->SetPanelVisibility("default");
+
+  this->Documentation = vtkSMDocumentation::New();
 }
 
 //---------------------------------------------------------------------------
@@ -52,6 +57,8 @@ vtkSMPropertyGroup::~vtkSMPropertyGroup()
   this->SetPanelWidget(0);
   this->SetPanelVisibility(0);
   delete this->Internals;
+  this->Documentation->Delete();
+  this->Documentation = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -118,4 +125,80 @@ const char* vtkSMPropertyGroup::GetFunction(vtkSMProperty* property) const
       }
     }
   return NULL;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMPropertyGroup::ReadXMLAttributes(
+  vtkSMProxy* proxy, vtkPVXMLElement* groupElem)
+{
+  if (!proxy || !groupElem)
+    {
+    return 0;
+    }
+
+  // FIXME: should we use group-name as the "key" for the property groups?
+  const char *groupName = groupElem->GetAttribute("name");
+  if(groupName)
+    {
+    this->SetName(groupName);
+    }
+
+  const char *groupLabel = groupElem->GetAttribute("label");
+  if(groupLabel)
+    {
+    this->SetXMLLabel(groupLabel);
+    }
+
+  // this is deprecated attribute that's replaced by "panel_widget". We still
+  // process it for backwards compatibility.
+  const char *groupType = groupElem->GetAttribute("type");
+  if(groupType)
+    {
+    vtkWarningMacro("Found deprecated attribute 'type' of PropertyGroup. "
+      "Please use 'panel_widget' instead.");
+    this->SetPanelWidget(groupType);
+    }
+
+  groupType = groupElem->GetAttribute("panel_widget");
+  if(groupType)
+    {
+    this->SetPanelWidget(groupType);
+    }
+
+  const char *panelVisibility = groupElem->GetAttribute("panel_visibility");
+  if(panelVisibility)
+    {
+    this->SetPanelVisibility(panelVisibility);
+    }
+
+  for (unsigned int k = 0; k < groupElem->GetNumberOfNestedElements(); k++)
+    {
+    vtkPVXMLElement* elem = groupElem->GetNestedElement(k);
+    if (elem->GetName() && strcmp(elem->GetName(), "Documentation") == 0)
+      {
+      this->Documentation->SetDocumentationElement(elem);
+      continue;
+      }
+
+    // if elem has "exposed_name", use that to locate the property, else use the
+    // "name".
+    const char* propname = elem->GetAttribute("exposed_name")?
+      elem->GetAttribute("exposed_name") : elem->GetAttribute("name");
+    vtkSMProperty* property = propname? proxy->GetProperty(propname) : NULL;
+    if (!property)
+      {
+      vtkWarningMacro("Failed to locate property '" <<
+        (propname? propname : "(none)") << "' for PropertyGroup. Skipping.");
+      }
+    else
+      {
+      const char* functionAttribute = elem->GetAttribute("function");
+      if (functionAttribute == 0)
+        {
+        functionAttribute = elem->GetAttribute("name");
+        }
+      this->AddProperty(functionAttribute, property);
+      }
+    }
+  return 1;
 }

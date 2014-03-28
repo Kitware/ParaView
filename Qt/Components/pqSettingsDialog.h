@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqApplicationSettingsReaction.h
+   Module:  pqSettingsDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,40 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqApplicationSettingsReaction_h 
-#define __pqApplicationSettingsReaction_h
+#ifndef __pqSettingsDialog_h
+#define __pqSettingsDialog_h
 
-#include "pqReaction.h"
-#include <QPointer>
+#include <QDialog>
+#include "pqComponentsModule.h"
 
-class pqSettingsDialog;
+class QAbstractButton;
+class vtkSMProperty;
 
-/// @ingroup Reactions
-/// pqApplicationSettingsReaction is a reaction to popup the application
-/// settings dialog. It creates pqSettingsDialog when required.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqApplicationSettingsReaction : public pqReaction
+/// pqSettingsDialog provides a dialog for controlling application settings
+/// for a ParaView application. It's designed to look show all proxies
+/// registered under the "options" group by default. For each proxy, it creates
+/// a pqProxyWidget and adds that to a tab-widget contained in the dialog.
+class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
 {
-  Q_OBJECT
-  typedef pqReaction Superclass;
+  Q_OBJECT;
+  typedef QDialog Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
-  pqApplicationSettingsReaction(QAction* parent);
-  virtual ~pqApplicationSettingsReaction();
+  pqSettingsDialog(QWidget* parent=0, Qt::WindowFlags flags=0);
+  virtual ~pqSettingsDialog();
 
-  /// Show the application settings dialog.
-  static void showApplicationSettingsDialog();
+private slots:
+  void clicked(QAbstractButton*);
+  void onAccept();
 
-protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqApplicationSettingsReaction::showApplicationSettingsDialog(); }
+  void onTabIndexChanged(int index);
 
 private:
-  Q_DISABLE_COPY(pqApplicationSettingsReaction)
+  void saveInQSettings(const char* key, vtkSMProperty* smproperty);
 
-  static QPointer<pqSettingsDialog> Dialog;
+private:
+  Q_DISABLE_COPY(pqSettingsDialog);
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif
-
-

@@ -24,6 +24,9 @@
 #include "pqStandardViewModules.h"
 #include "vtkProcessModule.h"
 
+#include <QToolBar>
+#include <QAction>
+
 MainPipelineWindow::MainPipelineWindow()
 {
   // Init ParaView
@@ -64,6 +67,12 @@ MainPipelineWindow::MainPipelineWindow()
   createPipelineWithAnnotation(server);
 
   QTimer::singleShot(100, this, SLOT(processTest()));
+
+  QToolBar *tb = new QToolBar("Options", this);
+  this->addToolBar(tb);
+
+  QAction* actn = tb->addAction("Settings");
+  this->connect(actn, SIGNAL(triggered()), SLOT(showSettings()));
 }
 
 //-----------------------------------------------------------------------------
@@ -155,6 +164,23 @@ void MainPipelineWindow::createPipelineWithAnnotation(pqServer* server)
   append->getProxy()->SetAnnotation("tooltip", "2+3");
   groupDS->getProxy()->SetAnnotation("tooltip", "2");
 }
+
+#include "pqActiveObjects.h"
+#include "pqProxyWidgetDialog.h"
+#include "vtkSMSessionProxyManager.h"
+
+//-----------------------------------------------------------------------------
+void MainPipelineWindow::showSettings()
+{
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+
+  vtkSMProxy* optionsProxy = pxm->NewProxy("options", "GeneralSettings");
+  pqProxyWidgetDialog dialog(optionsProxy, this);
+  dialog.exec();
+  optionsProxy->Delete();
+}
+
 //-----------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
