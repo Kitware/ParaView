@@ -38,3 +38,7 @@ include_directories(
 
 add_executable(DemoApp1 ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES})
 target_link_libraries(DemoApp1 pqApplicationComponents)
+if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
+  set_target_properties(DemoApp1 PROPERTIES
+    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+endif()
