@@ -90,6 +90,7 @@ class AnalysisManager():
         If 2 end_work with the same key, the second one will
         be ignore as no begin_work will be done before.
         """
+        delta = 0
         if self.timers.has_key(key):
             current_timer = self.timers[key]
             if current_timer['last_begin'] != 0.0:
@@ -98,6 +99,7 @@ class AnalysisManager():
                 current_timer['last_begin'] = 0.0
                 current_timer['total_time'] += delta
                 current_timer['work_count'] += 1
+        return delta
 
     def get_time(self, key):
         """
@@ -559,8 +561,8 @@ class SliceExplorer():
         self.view_proxy.CameraParallelProjection = 0
 
         if self.analysis:
-            self.analysis.end_work('SliceExplorer')
-            self.file_name_generator.add_time_cost(self.analysis.get_time('SliceExplorer'))
+            delta_t = self.analysis.end_work('SliceExplorer')
+            self.file_name_generator.add_time_cost(delta_t)
 
 #==============================================================================
 
@@ -722,8 +724,8 @@ class ImageResampler():
         self.file_name_generator.write_metadata()
 
         if self.analysis:
-            self.analysis.end_work('ImageResampler')
-            self.file_name_generator.add_time_cost(self.analysis.get_time('ImageResampler'))
+            delta_t = self.analysis.end_work('ImageResampler')
+            self.file_name_generator.add_time_cost(delta_t)
 
 #==============================================================================
 # Chart generator
@@ -800,8 +802,8 @@ class LineProber():
         self.file_name_generator.write_metadata()
 
         if self.analysis:
-            self.analysis.end_work('LineProber')
-            self.file_name_generator.add_time_cost(self.analysis.get_time('LineProber'))
+            delta_t = self.analysis.end_work('LineProber')
+            self.file_name_generator.add_time_cost(delta_t)
 
 #==============================================================================
 
@@ -909,8 +911,8 @@ class DataProber():
         self.file_name_generator.write_metadata()
 
         if self.analysis:
-            self.analysis.end_work('DataProber')
-            self.file_name_generator.add_time_cost(self.analysis.get_time('DataProber'))
+            delta_t = self.analysis.end_work('DataProber')
+            self.file_name_generator.add_time_cost(delta_t)
 
 #==============================================================================
 
@@ -1005,8 +1007,8 @@ class TimeSerieDataProber():
             self.WriteToDisk()
 
         if self.analysis:
-            self.analysis.end_work('TimeSerieDataProber')
-            self.file_name_generator.add_time_cost(self.analysis.get_time('TimeSerieDataProber'))
+            delta_t = self.analysis.end_work('TimeSerieDataProber')
+            self.file_name_generator.add_time_cost(delta_t)
 
 #==============================================================================
 # Image composite
@@ -1166,9 +1168,13 @@ class CompositeImageExporter():
                         rep.DiffuseColor = field[1]
                     else:
                         self.file_name_generator.update_active_arguments(field=field[1])
-                        rep.LookupTable = self.luts[field[1]]
-                        rep.ColorArrayName = field[1]
-                        rep.ColorAttributeType = field[0]
+                        data_bounds = self.datasets[compositeIdx].GetDataInformation().GetBounds()
+                        if data_bounds[0] > data_bounds[1]:
+                            rep.ColorArrayName = ''
+                        else:
+                            rep.LookupTable = self.luts[field[1]]
+                            rep.ColorArrayName = field[1]
+                            rep.ColorAttributeType = field[0]
 
                     self.view.ActiveRepresentation = rep
                     self.view.CompositeDirectory = self.file_name_generator.get_directory()
@@ -1196,8 +1202,8 @@ class CompositeImageExporter():
         self.file_name_generator.write_metadata()
 
         if self.analysis:
-            self.analysis.end_work('CompositeImageExporter')
-            self.file_name_generator.add_time_cost(self.analysis.get_time('CompositeImageExporter'))
+            delta_t = self.analysis.end_work('CompositeImageExporter')
+            self.file_name_generator.add_time_cost(delta_t)
 
 #==============================================================================
 # Image exporter
@@ -1295,8 +1301,8 @@ class ThreeSixtyImageStackExporter():
         self.file_name_generator.write_metadata()
 
         if self.analysis:
-            self.analysis.end_work('ThreeSixtyImageStackExporter')
-            self.file_name_generator.add_time_cost(self.analysis.get_time('ThreeSixtyImageStackExporter'))
+            delta_t = self.analysis.end_work('ThreeSixtyImageStackExporter')
+            self.file_name_generator.add_time_cost(delta_t)
 
 # -----------------------------------------------------------------------------
 
