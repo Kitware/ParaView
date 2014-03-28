@@ -78,29 +78,18 @@ public:
   bool HasSetting(const char* settingName);
 
   // Description:
-  // Set setting of a given name.
-  // Shortcut for SetSetting(settingName, 0, value). Useful for setting scalar values.
-  void SetSetting(const char* settingName, int value);
-  void SetSetting(const char* settingName, double value);
-  void SetSetting(const char* settingName, const std::string & value);
-
-  // Description:
-  // Set element of a vector setting at a location given by the jsonPath.
-  void SetSetting(const char* settingName, unsigned int index, int value);
-  void SetSetting(const char* settingName, unsigned int index, double value);
-  void SetSetting(const char* settingName, unsigned int index, const std::string & value);
-
-  // Description:
-  // Set the description of a setting.
-  void SetSettingDescription(const char* settingName, const char* description);
-
-  // Description:
-  // Save non-default settings in the current user settings.
-  void SetProxySettings(vtkSMProxy* proxy);
-
-  // Description:
   // Get the number of elements in a setting.
   unsigned int GetSettingNumberOfElements(const char* settingName);
+
+  // Description:
+  // Get a vector setting as a scalar value.
+  // Shortcut for GetSettingAs...
+  int         GetSettingAsInt(const char* settingName,
+                              int defaultValue);
+  double      GetSettingAsDouble(const char* settingName,
+                                 double defaultValue);
+  std::string GetSettingAsString(const char* settingName,
+                                 const std::string & defaultValue);
 
   // Description:
   // Get a single element of a vector setting.
@@ -115,20 +104,34 @@ public:
                                  const std::string & defaultValue);
 
   // Description:
-  // Get setting description
-  std::string GetSettingDescription(const char* settingName);
-
-  // Description:
-  // Set the property values in a vtkSMProxy from the settings file.
+  // Set the property values in a vtkSMProxy from the settings file(s).
   // Searches settings from the settings root.
   bool GetProxySettings(vtkSMProxy* proxy);
 
   // Description:
-  // Set the property values in a vtkSMProxy from a JSON prefix.
-  // The jsonPrefix specifies the root level of the JSON tree where this method
-  // should look for settings. The group and name of the proxy are
-  // appended to the jsonPrefix automatically.
-  bool GetProxySettings(vtkSMProxy* proxy, const char* jsonPrefix);
+  // Get setting description
+  std::string GetSettingDescription(const char* settingName);
+
+  // Description:
+  // Set setting of a given name.
+  // Shortcut for SetSetting(settingName, 0, value). Useful for setting scalar values.
+  void SetSetting(const char* settingName, int value);
+  void SetSetting(const char* settingName, double value);
+  void SetSetting(const char* settingName, const std::string & value);
+
+  // Description:
+  // Set element of a vector setting at a location given by the jsonPath.
+  void SetSetting(const char* settingName, unsigned int index, int value);
+  void SetSetting(const char* settingName, unsigned int index, double value);
+  void SetSetting(const char* settingName, unsigned int index, const std::string & value);
+
+  // Description:
+  // Save non-default settings in the current user settings.
+  void SetProxySettings(vtkSMProxy* proxy);
+
+  // Description:
+  // Set the description of a setting.
+  void SetSettingDescription(const char* settingName, const char* description);
 
 protected:
   vtkSMSettings();
