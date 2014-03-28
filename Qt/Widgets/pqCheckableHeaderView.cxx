@@ -51,34 +51,44 @@ public:
     {
     }
 
-  /// Returns the placeholder rect for a checkbox in the section header
+  /// \brief
+  ///   Returns the placeholder rect for a checkbox in the section header.
   QRect checkBoxRect(const QRect &sourceRect,
     const QAbstractItemView *view) const;
 
-  /// Draw the checkbox control
-  /// Based on two scenarios:
-  /// 1. If any of the item checkboxes are changed, the section header checkbox
-  /// needs to be updated.
-  /// 2. If the section header checkbox is clicked and its state needs to be
-  /// toggled.
-  /// It returns the new checkbox state
-  /// \arg checkState: State to force the header checkbox to. Used when clicked on
-  /// the checkbox.
+  /// \brief
+  ///   Draw the checkbox control
+  ///   Based on two scenarios:
+  ///   1. If any of the item checkboxes are changed, the section header
+  ///   checkbox needs to be updated.
+  ///   2. If the section header checkbox is clicked and its state needs
+  ///   to be toggled.
+  ///   It returns the new checkbox state
+  ///   \arg checkState: State to force the header checkbox to. Used when
+  ///   clicked on the checkbox.
   QVariant drawCheckboxControl(QPainter *painter, const QRect &rect,
-    int numItemsChecked, int totalItems, QVariant checkState,
+    QRect &chbRect, int numItemsChecked, int totalItems, QVariant checkState,
     const QAbstractItemView *view);
 
   QStyle *Style;
 
-  /// Map of (section,checkable) values indicating whether
-  /// the section is checkable
+  /// \brief
+  ///   Map of (section,checkable) values indicating whether
+  ///   the section is checkable
   QHash<int, bool> isCheckable;
 
-  /// Map of (section,checkstate) values indicating whether
-  /// the section checkbox is checked/partially checked/unchecked
+  /// \brief
+  ///   Map of (section,checkstate) values indicating whether
+  ///   the section checkbox is checked/partially checked/unchecked
   QHash<int, QVariant> checkState;
 
-  /// Boolean to force check/uncheck state of header checkbox
+  /// \brief
+  ///   Map of (section,checkBoxRect) values indicating the top-left corner
+  ///   position and size of the section checkbox
+  QHash<int, QRect> checkBoxRectHash;
+
+  /// \brief
+  ///   Boolean to force check/uncheck state of header checkbox
   bool forceCheck;
 };
 
@@ -92,16 +102,66 @@ QRect pqCheckableHeaderViewInternal::checkBoxRect(
     &checkBoxStyleOption);
   int buttonMargin = this->Style->pixelMetric(
     QStyle::PM_ButtonMargin, NULL, view);
+
+  int ch = checkBoxRect.height();
+  int cw = checkBoxRect.width();
+  int sh = sourceRect.height();
+  int sw = sourceRect.width();
+  int bh = buttonMargin;
+  int bw = buttonMargin;
+
+  // Logic to make sure the checkbox is contained in the viewable area of the
+  // section header rect.
+  if((ch + 2*bh) > sh)
+    {
+    if(ch > sh)
+      {
+      bh = 0;
+      checkBoxRect.setHeight(sh);
+      }
+    else if(ch < sh)
+      {
+      bh = static_cast<int> ((sh - ch)/2.0);
+      }
+    else
+      {
+      // ch == sh
+      bh = 0;
+      }
+    }
+
+  if((cw + 2*bw) > sw)
+    {
+    if(cw > sw)
+      {
+      bw = 0;
+      checkBoxRect.setWidth(sw);
+      }
+    else if(cw < sw)
+      {
+      bw = static_cast<int> ((sw - cw)/2.0);
+      }
+    else
+      {
+      // cw == sw
+      bw = 0;
+      }
+    }
+
+  QSize chbSize = QSize(cw, ch);
+  chbSize.scale(checkBoxRect.size(), Qt::KeepAspectRatio);
+
   QPoint checkBoxPoint(
-    sourceRect.x() + buttonMargin,
-    sourceRect.y() + buttonMargin);
-  return QRect(checkBoxPoint, checkBoxRect.size());
+    sourceRect.x() + bw,
+    sourceRect.y() + bh);
+  return QRect(checkBoxPoint, chbSize);
 }
 
 //----------------------------------------------------------------------------
 QVariant pqCheckableHeaderViewInternal::drawCheckboxControl(
   QPainter *painter,
   const QRect &rect,
+  QRect &chbRect,
   int numItemsChecked,
   int totalItems,
   QVariant checkState,
@@ -111,6 +171,7 @@ QVariant pqCheckableHeaderViewInternal::drawCheckboxControl(
 
   QStyleOptionButton option;
   option.rect = this->checkBoxRect(rect, view);
+  chbRect = option.rect;
   option.state |= QStyle::State_Enabled;
 
   if (this->forceCheck)
@@ -148,7 +209,7 @@ QVariant pqCheckableHeaderViewInternal::drawCheckboxControl(
       option.state |= QStyle::State_None;
       }
     }
-  this->Style->drawControl(QStyle::CE_CheckBox, &option, painter);
+  this->Style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, painter);
 
   // Reset the forceCheck boolean once the checkbox is drawn
   this->forceCheck = false;
@@ -238,9 +299,11 @@ void pqCheckableHeaderView::paintSection(QPainter *painter,
       {
       checkstate = this->Internal->checkState[logicalIndex];
       }
+    QRect chbRect;
     QVariant newCheckstate = this->Internal->drawCheckboxControl(
-      painter, rect, numItemsChecked, totalItems, checkstate, this);
+      painter, rect, chbRect, numItemsChecked, totalItems, checkstate, this);
     this->Internal->isCheckable[logicalIndex] = true;
+    this->Internal->checkBoxRectHash[logicalIndex] = chbRect;
     if (checkstate != newCheckstate)
       {
       this->Internal->checkState[logicalIndex] = newCheckstate;
@@ -270,21 +333,16 @@ void pqCheckableHeaderView::mousePressEvent(QMouseEvent *event)
     if (this->Internal->isCheckable.contains(logicalIndexPressed) &&
       this->Internal->isCheckable[logicalIndexPressed])
       {
-      QStyleOptionButton checkBoxStyleOption;
-      QRect checkBoxRect = this->style()->subElementRect(
-        QStyle::SE_CheckBoxIndicator,
-        &checkBoxStyleOption);
-      int buttonMargin = this->style()->pixelMetric(
-        QStyle::PM_ButtonMargin, NULL, this);
       int secPos = this->sectionViewportPosition(logicalIndexPressed);
       int secPosX = this->orientation() == Qt::Horizontal ?
         secPos : 0;
       int secPosY = this->orientation() == Qt::Horizontal ?
         0 : secPos;
-      if (event->x() <= (secPosX + buttonMargin + checkBoxRect.width()) &&
-          event->x() >= (secPosX + buttonMargin) &&
-          event->y() <= (secPosY + buttonMargin + checkBoxRect.height()) &&
-          event->y() >= (secPosY + buttonMargin))
+      QRect chbRect = this->Internal->checkBoxRectHash[logicalIndexPressed];
+      if (event->x() <= (secPosX + chbRect.right()) &&
+          event->x() >= (secPosX + chbRect.left()) &&
+          event->y() <= (secPosY + chbRect.bottom()) &&
+          event->y() >= (secPosY + chbRect.top()))
         {
         if (this->Internal->checkState.contains(logicalIndexPressed))
           {

@@ -44,54 +44,65 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// stores states of the checkboxes
 class pqCheckableHeaderViewInternal;
 
-/**
- * A convenience QHeaderView painted with a QCheckBox
- * This allows for providing a global checkbox when the model items are user
- * checkable.
- * The checkbox is painted per section, one of the three states (checked,
- * partially checked, unchecked) depending on the check state of individual
- * items.
- * Currently used in pqTreeView
- **/
+/// \class pqCheckableHeaderView
+/// \brief
+///   A convenience QHeaderView painted with a QCheckBox.
+///   This allows for providing a global checkbox when the model items are
+///   user checkable.
+///   The checkbox is painted per section with one of the three states
+///   (checked, partially checked, unchecked) depending on the check state
+///   of individual items.
+///   Currently used in pqTreeView.
 class PQWIDGETS_EXPORT pqCheckableHeaderView : public QHeaderView
 {
   Q_OBJECT
 
 public:
-    /// Constructor that creates the header view
+    /// \brief
+    ///   Constructs the pqCheckableHeaderView class.
+    /// \param parent The parent object
     pqCheckableHeaderView(Qt::Orientation orientation, QWidget *parent=0);
     virtual ~pqCheckableHeaderView();
 
-    /// Get the checkstate of the header checkbox for the \em section
+    /// \brief
+    ///   Get the checkstate of the header checkbox for the \em section.
+    /// \param section The section to get the checkstate of
     QVariant getCheckState(int section);
 
 signals:
-    /// This signal is emitted whenever the state of the \em section header
-    /// checkbox changes. The new state can be obtained using the \em
-    /// getCheckState method.
+    /// \brief
+    ///   This signal is emitted whenever the state of the \em section header
+    ///   checkbox changes. The new state can be obtained using the \em
+    ///   getCheckState method.
+    /// \param section The section whose checkstate changed
     /// \sa getCheckState
     void checkStateChanged(int section) const;
 
 protected:
-    /// Paint the header section
-    /// Depending on whether the top-level items in the model are checkable a
-    /// checkbox is painted left-aligned on the header section.
-    /// The checkbox is tristate and the state is decided based on the initial
-    /// checkstates of model items.
-    /// Reimplemented form QHeaderView::paintSection()
+    /// \brief
+    ///   Paint the header section.
+    ///   Depending on whether the top-level items in the model are checkable
+    ///   a checkbox is painted left-aligned on the header section.
+    ///   The checkbox is tristate and the state is decided based on the
+    ///   initial checkstates of model items.
+    ///   Reimplemented form QHeaderView::paintSection()
+    /// \sa QHeaderView::paintSection
     virtual void paintSection(QPainter *painter, const QRect &rect,
       int logicalIndex) const;
 
-    /// Handle mouse press event on the header.
-    /// Checks whether the mouse press was in the checkbox.
-    /// Clicking on the checkbox triggers the \em checkStateChanged signal
-    /// alongwith a boolean to force repaint the checkbox with the new state.
-    /// Reimplemented from QWidget::mousePressEvent()
+    /// \brief
+    ///   Handle mouse press event on the header.
+    ///   Checks whether the mouse press was in the checkbox.
+    ///   Clicking on the checkbox triggers the \em checkStateChanged signal.
+    ///   Reimplemented from QWidget::mousePressEvent()
+    /// \sa QHeaderView::mousePressEvent
     void mousePressEvent(QMouseEvent *event);
 
-    /// Update the checkstate of all checkable items in the model based on the
-    /// checkstate of the header checkbox.
-    /// This will undo any individual item checkstate modifications.
+    /// \brief
+    ///   Update the checkstate of all checkable items in the model based
+    ///   on the checkstate of the header checkbox.
+    ///   This will undo any individual item checkstate modifications.
+    /// \param section The section whose model checkstate is updated.
     void updateModelCheckState(int section);
 
 private:
