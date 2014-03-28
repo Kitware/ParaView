@@ -1325,6 +1325,46 @@ found and the point will be rejected.</Documentation>
         are introduced as an initial triangulation to begin the triangulation
         process. This feature is nice for debugging output.)</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaTets"
+                         default_values="1"
+                         name="AlphaTets"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether tetrahedrons which satisfy
+        the alpha criterion output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaTris"
+                         default_values="1"
+                         name="AlphaTris"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether triangles which satisfy
+        the alpha criterion output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaLines"
+                         default_values="0"
+                         name="AlphaLines"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether lines which satisfy the
+        alpha criterion output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetAlphaVerts"
+                         default_values="0"
+                         name="AlphaVerts"
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>This boolean controls whether vertices which satisfy the
+        alpha criterion are output when alpha is non-zero.</Documentation>
+      </IntVectorProperty>
       <!-- End Delaunay3d -->
     </SourceProxy>
     <!-- ==================================================================== -->
