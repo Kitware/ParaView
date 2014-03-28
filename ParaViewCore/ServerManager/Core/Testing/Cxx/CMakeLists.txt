@@ -1,5 +1,6 @@
 set (tests
   TestParaViewPipelineController
+  TestSettings
 )
 
 foreach (test ${tests})
