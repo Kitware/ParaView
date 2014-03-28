@@ -1110,44 +1110,6 @@
                             name="Position2Info">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetShowVerticalBorder"
-                         default_values="0"
-                         information_property="ShowVerticalBorderInfo"
-                         name="ShowVerticalBorder"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="BORDER_OFF"
-                 value="0" />
-          <Entry text="BORDER_ON"
-                 value="1" />
-          <Entry text="BORDER_ACTIVE"
-                 value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <IntVectorProperty command="GetShowVerticalBorder"
-                         information_only="1"
-                         name="ShowVerticalBorderInfo">
-        <SimpleIntInformationHelper />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetShowHorizontalBorder"
-                         default_values="2"
-                         information_property="ShowHorizontalBorderInfo"
-                         name="ShowHorizontalBorder"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="BORDER_OFF"
-                 value="0" />
-          <Entry text="BORDER_ON"
-                 value="1" />
-          <Entry text="BORDER_ACTIVE"
-                 value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <IntVectorProperty command="GetShowHorizontalBorder"
-                         information_only="1"
-                         name="ShowHorizontalBorderInfo">
-        <SimpleIntInformationHelper />
-      </IntVectorProperty>
       <IntVectorProperty command="SetOrientation"
                          default_values="1"
                          information_property="OrientationInfo"
