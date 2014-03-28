@@ -15,19 +15,21 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProxy.h"
 
+#include "vtkMultiProcessController.h"
+#include "vtkPVSession.h"
+#include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkStringList.h"
-#include "vtkPVSession.h"
 
 #include <vtksys/ios/sstream>
 #include "vtk_jsoncpp.h"
@@ -363,29 +365,29 @@ public:
                             << "." << property->GetXMLName();
 
         const std::string settingString = settingStringStream.str();
-        const char* settingCString = settingString.c_str();
-        if (this->HasSetting(settingCString))
+        const char* settingName = settingString.c_str();
+        if (this->HasSetting(settingName))
           {
           bool success = false;
           if (vtkSMIntVectorProperty* intVectorProperty =
               vtkSMIntVectorProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingCString, intVectorProperty);
+            success = this->GetPropertySetting(settingName, intVectorProperty);
             }
           else if (vtkSMDoubleVectorProperty* doubleVectorProperty =
                    vtkSMDoubleVectorProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingCString, doubleVectorProperty);
+            success = this->GetPropertySetting(settingName, doubleVectorProperty);
             }
           else if (vtkSMStringVectorProperty* stringVectorProperty =
                    vtkSMStringVectorProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingCString, stringVectorProperty);
+            success = this->GetPropertySetting(settingName, stringVectorProperty);
             }
           else if (vtkSMInputProperty* inputProperty =
                    vtkSMInputProperty::SafeDownCast(property))
             {
-            success = this->GetPropertySetting(settingCString, inputProperty);
+            success = this->GetPropertySetting(settingName, inputProperty);
             }
           else
             {
@@ -497,7 +499,7 @@ public:
         jsonValue[i] = property->GetElement(i);
         }
       }
-  }                          
+  }
 
   //----------------------------------------------------------------------------
   void SetPropertySetting(const char* settingName,
@@ -713,6 +715,80 @@ bool vtkSMSettings::LoadUserSettings()
   fileName.append(".pvsettings.js");
 
   return this->LoadUserSettings(fileName.c_str());
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::LoadSettings()
+{
+  vtkSMSettings * settings = vtkSMSettings::GetInstance();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetProcessType() == vtkProcessModule::PROCESS_CLIENT ||
+      (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+       pm->GetPartitionId() == 0))
+    {
+    if (!settings->LoadSiteSettings())
+      {
+      return false;
+      }
+    if (!settings->LoadUserSettings())
+      {
+      return false;
+      }
+    }
+  if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+      pm->GetSymmetricMPIMode())
+    {
+    // Broadcast settings to satellite nodes
+    vtkMultiProcessController * controller = pm->GetGlobalController();
+    unsigned int stringSize;
+    if (controller->GetLocalProcessId() == 0)
+      {
+      std::string siteSettingsString = settings->GetSiteSettingsAsString().c_str();
+      stringSize = static_cast<unsigned int>(siteSettingsString.size())+1;
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        controller->Broadcast(const_cast<char*>(siteSettingsString.c_str()), stringSize, 0);
+        }
+
+      std::string userSettingsString = settings->GetUserSettingsAsString();
+      stringSize = static_cast<unsigned int>(userSettingsString.size())+1;
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        controller->Broadcast(const_cast<char*>(userSettingsString.c_str()), stringSize, 0);
+        }
+      }
+    else // Satellites
+      {
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        char* siteSettingsString = new char[stringSize];
+        controller->Broadcast(siteSettingsString, stringSize, 0);
+        settings->SetSiteSettingsFromString(siteSettingsString);
+        delete[] siteSettingsString;
+        }
+      else
+        {
+        settings->SetSiteSettingsFromString(NULL);
+        }
+      controller->Broadcast(&stringSize, 1, 0);
+      if (stringSize > 0)
+        {
+        char* userSettingsString = new char[stringSize];
+        controller->Broadcast(userSettingsString, stringSize, 0);
+        settings->SetUserSettingsFromString(userSettingsString);
+        delete[] userSettingsString;
+        }
+      else
+        {
+        settings->SetUserSettingsFromString(NULL);
+        }
+      }
+    }
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1032,6 +1108,12 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, cons
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
+{
+  this->Internal->SetProxySettings(proxy);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSettings::SetSettingDescription(const char* settingName, const char* description)
 {
   if (!this->Internal->HasUserSetting(settingName))
@@ -1042,12 +1124,6 @@ void vtkSMSettings::SetSettingDescription(const char* settingName, const char* d
   Json::Path settingPath(settingName);
   Json::Value & settingValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
   settingValue.setComment(description, Json::commentBefore);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
-{
-  this->Internal->SetProxySettings(proxy);
 }
 
 //----------------------------------------------------------------------------

@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
-#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkOutputWindow.h"
 #include "vtkProcessModule.h"
@@ -187,68 +186,8 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   vtkNew<vtkPVPluginLoader> loader;
   loader->LoadPluginsFromPluginSearchPath();
 
-  // Load settings files. Only load settings on client or root data node
-  vtkSMSettings * settings = vtkSMSettings::GetInstance();
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetProcessType() == vtkProcessModule::PROCESS_CLIENT ||
-      (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
-       pm->GetPartitionId() == 0))
-    {
-    settings->LoadSiteSettings();
-    settings->LoadUserSettings();
-    }
-  if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
-      pm->GetSymmetricMPIMode())
-    {
-    // Broadcast settings to satellite nodes
-    vtkMultiProcessController * controller = pm->GetGlobalController();
-    unsigned int stringSize;
-    if (controller->GetLocalProcessId() == 0)
-      {
-      std::string siteSettingsString = settings->GetSiteSettingsAsString().c_str();
-      stringSize = static_cast<unsigned int>(siteSettingsString.size())+1;
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        controller->Broadcast(const_cast<char*>(siteSettingsString.c_str()), stringSize, 0);
-        }
-
-      std::string userSettingsString = settings->GetUserSettingsAsString();
-      stringSize = static_cast<unsigned int>(userSettingsString.size())+1;
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        controller->Broadcast(const_cast<char*>(userSettingsString.c_str()), stringSize, 0);
-        }
-      }
-    else // Satellites
-      {
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        char* siteSettingsString = new char[stringSize];
-        controller->Broadcast(siteSettingsString, stringSize, 0);
-        settings->SetSiteSettingsFromString(siteSettingsString);
-        delete[] siteSettingsString;
-        }
-      else
-        {
-        settings->SetSiteSettingsFromString(NULL);
-        }
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        char* userSettingsString = new char[stringSize];
-        controller->Broadcast(userSettingsString, stringSize, 0);
-        settings->SetUserSettingsFromString(userSettingsString);
-        delete[] userSettingsString;
-        }
-      else
-        {
-        settings->SetUserSettingsFromString(NULL);
-        }
-      }
-    }
+  // Load settings files.
+  vtkSMSettings::LoadSettings();
 }
 
 //----------------------------------------------------------------------------

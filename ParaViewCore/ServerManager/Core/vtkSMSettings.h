@@ -42,6 +42,10 @@ public:
   static vtkSMSettings* GetInstance();
 
   // Description:
+  // Load settings and distribute to all processes if in batch symmetric mode.
+  static bool LoadSettings();
+
+  // Description:
   // Load user settings from default location. On linux/unix, this is
   // $HOME/.pvsettings.user.js. On Windows, this is under
   // %USERPROFILE%/.pvsettings.js. Returns true on success, false
