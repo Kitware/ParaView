@@ -688,36 +688,6 @@ vtkSMSettings* vtkSMSettings::GetInstance()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::LoadUserSettings()
-{
-#if defined(WIN32)
-  std::string fileName(getenv("USERPROFILE"));
-  std::string separator("\\");
-#else
-  std::string fileName(getenv("HOME"));
-  std::string separator("/");
-#endif
-
-  if (fileName.size() > 0)
-    {
-    if (fileName[fileName.size()-1] != separator[0])
-      {
-      fileName.append(separator);
-      }
-    }
-  else
-    {
-    // Might want to return false here instead of trying the root
-    // directory.
-    fileName.append(separator);
-    }
-
-  fileName.append(".pvsettings.js");
-
-  return this->LoadUserSettings(fileName.c_str());
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMSettings::LoadSettings()
 {
   vtkSMSettings * settings = vtkSMSettings::GetInstance();
@@ -792,11 +762,18 @@ bool vtkSMSettings::LoadSettings()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSettings::LoadUserSettings()
+{
+  std::string fileName = GetUserSettingsFilePath();
+  return this->LoadUserSettings(fileName.c_str());
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSettings::LoadUserSettings(const char* fileName)
 {
   std::string userSettingsFileName(fileName);
-  std::ifstream userSettingsFile(userSettingsFileName.c_str(), ios::in | ios::binary | ios::ate );
-  if ( userSettingsFile.is_open() )
+  std::ifstream userSettingsFile(userSettingsFileName.c_str(), ios::in | ios::binary | ios::ate);
+  if (userSettingsFile.is_open())
     {
     std::streampos size = userSettingsFile.tellg();
     userSettingsFile.seekg(0, ios::beg);
@@ -847,31 +824,7 @@ std::string vtkSMSettings::GetUserSettingsAsString()
 //----------------------------------------------------------------------------
 bool vtkSMSettings::LoadSiteSettings()
 {
-  // Not sure where this should go. For now, read a file from user directory
-#if defined(WIN32)
-  std::string fileName(getenv("USERPROFILE"));
-  std::string separator("\\");
-#else
-  std::string fileName(getenv("HOME"));
-  std::string separator("/");
-#endif
-
-  if (fileName.size() > 0)
-    {
-    if (fileName[fileName.size()-1] != separator[0])
-      {
-      fileName.append(separator);
-      }
-    }
-  else
-    {
-    // Might want to return false here instead of trying the root
-    // directory.
-    fileName.append(separator);
-    }
-
-  fileName.append(".pvsitesettings.js");
-
+  std::string fileName = this->GetSiteSettingsFilePath();
   return this->LoadSiteSettings(fileName.c_str());
 }
 
@@ -879,8 +832,8 @@ bool vtkSMSettings::LoadSiteSettings()
 bool vtkSMSettings::LoadSiteSettings(const char* fileName)
 {
   std::string siteSettingsFileName(fileName);
-  std::ifstream siteSettingsFile(siteSettingsFileName.c_str(), ios::in | ios::binary | ios::ate );
-  if ( siteSettingsFile.is_open() )
+  std::ifstream siteSettingsFile(siteSettingsFileName.c_str(), ios::in | ios::binary | ios::ate);
+  if (siteSettingsFile.is_open())
     {
     std::streampos size = siteSettingsFile.tellg();
     siteSettingsFile.seekg(0, ios::beg);
@@ -899,6 +852,17 @@ bool vtkSMSettings::LoadSiteSettings(const char* fileName)
     }
 
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::SaveSettings()
+{
+  std::ofstream userSettingsFile(this->GetUserSettingsFilePath().c_str(), ios::out | ios::binary );
+  if (userSettingsFile.is_open())
+    {
+    std::string userOutput = this->GetUserSettingsAsString();
+    userSettingsFile << userOutput;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1124,6 +1088,68 @@ void vtkSMSettings::SetSettingDescription(const char* settingName, const char* d
   Json::Path settingPath(settingName);
   Json::Value & settingValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
   settingValue.setComment(description, Json::commentBefore);
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSettings::GetUserSettingsFilePath()
+{
+  // Not sure where this should go. For now, read a file from user directory
+#if defined(WIN32)
+  std::string fileName(getenv("USERPROFILE"));
+  std::string separator("\\");
+#else
+  std::string fileName(getenv("HOME"));
+  std::string separator("/");
+#endif
+
+  if (fileName.size() > 0)
+    {
+    if (fileName[fileName.size()-1] != separator[0])
+      {
+      fileName.append(separator);
+      }
+    }
+  else
+    {
+    // Might want to return false here instead of trying the root
+    // directory.
+    fileName.append(separator);
+    }
+
+  fileName.append(".pvsettings.js");
+
+  return fileName;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSettings::GetSiteSettingsFilePath()
+{
+  // Not sure where this should go. For now, read a file from user directory
+#if defined(WIN32)
+  std::string fileName(getenv("USERPROFILE"));
+  std::string separator("\\");
+#else
+  std::string fileName(getenv("HOME"));
+  std::string separator("/");
+#endif
+
+  if (fileName.size() > 0)
+    {
+    if (fileName[fileName.size()-1] != separator[0])
+      {
+      fileName.append(separator);
+      }
+    }
+  else
+    {
+    // Might want to return false here instead of trying the root
+    // directory.
+    fileName.append(separator);
+    }
+
+  fileName.append(".pvsitesettings.js");
+
+  return fileName;
 }
 
 //----------------------------------------------------------------------------

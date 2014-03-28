@@ -43,7 +43,7 @@ public:
 
   // Description:
   // Load settings and distribute to all processes if in batch symmetric mode.
-  static bool LoadSettings();
+  bool LoadSettings();
 
   // Description:
   // Load user settings from default location. On linux/unix, this is
@@ -76,6 +76,10 @@ public:
   // Set site-specific settings. These are stored in a location TBD.
   virtual void SetSiteSettingsFromString(const char* settings);
   virtual std::string GetSiteSettingsAsString();
+
+  // Description:
+  // Save settings to file(s)
+  bool SaveSettings();
 
   // Description:
   // Check whether a setting is defined for the requested names.
@@ -140,6 +144,14 @@ public:
 protected:
   vtkSMSettings();
   virtual ~vtkSMSettings();
+
+  // Description:
+  // Get the path to the user settings file
+  std::string GetUserSettingsFilePath();
+
+  // Description:
+  // Get the path to the site settings file
+  std::string GetSiteSettingsFilePath();
 
 private:
   vtkSMSettings(const vtkSMSettings&); // Purposely not implemented
