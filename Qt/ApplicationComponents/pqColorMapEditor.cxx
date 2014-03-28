@@ -39,13 +39,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidget.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqSettings.h"
+#include "pqSMAdaptor.h"
+
 #include "vtkCommand.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMSettings.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkWeakPointer.h"
 
+#include <QDebug>
 #include <QKeyEvent>
 #include <QPointer>
 #include <QVBoxLayout>
@@ -308,18 +312,31 @@ void pqColorMapEditor::renderViews()
 //-----------------------------------------------------------------------------
 void pqColorMapEditor::saveAsDefault()
 {
-  // FIXME:
-  qCritical("FIXME");
-  //pqApplicationCore* core = pqApplicationCore::instance();
-  //pqLookupTableManager* lut_mgr = core->getLookupTableManager();
-  //if (lut_mgr && this->Internals->ProxyWidget &&
-  //  this->Internals->ProxyWidget->proxy())
-  //  {
-  //  lut_mgr->saveAsDefault(
-  //    this->Internals->ProxyWidget->proxy(),
-  //    pqActiveObjects::instance().activeView()?
-  //    pqActiveObjects::instance().activeView()->getProxy() : NULL);
-  //  }
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+  vtkSMProxy* proxy = this->Internals->ActiveRepresentation->getProxy();
+
+  vtkSMProxy* lutProxy =
+    pqSMAdaptor::getProxyProperty(proxy->GetProperty("LookupTable"));
+  if (lutProxy)
+    {
+    settings->SetProxySettings(lutProxy);
+    }
+  else
+    {
+    qCritical() << "No LookupTable property found.";
+    }
+
+  vtkSMProxy* scalarOpacityFunctionProxy =
+    pqSMAdaptor::getProxyProperty(proxy->GetProperty("ScalarOpacityFunction"));
+  if (scalarOpacityFunctionProxy)
+    {
+    settings->SetProxySettings(scalarOpacityFunctionProxy);
+    }
+  else
+    {
+    qCritical("No ScalarOpacityFunction property found");
+    }
 }
 
 //-----------------------------------------------------------------------------
