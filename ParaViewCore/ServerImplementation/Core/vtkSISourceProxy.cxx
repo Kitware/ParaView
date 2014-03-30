@@ -458,7 +458,13 @@ void vtkSISourceProxy::SetupSelectionProxy(int port, vtkSIProxy* extractSelectio
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::SetDisableExtentsTranslator(bool value)
 {
-  DisableExtentsTranslator = value;
+  vtkSISourceProxy::DisableExtentsTranslator = value;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSISourceProxy::GetDisableExtentsTranslator()
+{
+  return vtkSISourceProxy::DisableExtentsTranslator;
 }
 
 //----------------------------------------------------------------------------

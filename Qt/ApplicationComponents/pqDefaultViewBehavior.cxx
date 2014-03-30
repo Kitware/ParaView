@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "vtkPVDisplayInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
@@ -91,9 +91,7 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
       (void)vlayout;
       }
 
-    pqSettings* settings = core->settings();
-    QString curView = settings->value("/defaultViewType",
-                                      pqRenderView::renderViewType()).toString();
+    QString curView = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
     if (curView != "None" && !curView.isEmpty())
       {
       // When a server is created, we create a new render view for it.

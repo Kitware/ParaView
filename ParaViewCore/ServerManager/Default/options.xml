@@ -1,6 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="options">
-    <Proxy name="GeneralSettings" label="General Settings">
+    <Proxy name="GeneralSettings" label="General Settings"
+      processes="client|dataserver|renderserver"
+      class="vtkPVGeneralSettings">
       <Documentation>
         Collection of general setting for ParaView.
       </Documentation>
@@ -32,19 +34,21 @@
 
       <StringVectorProperty name="DefaultViewType"
         number_of_elements="1"
-        default_values="Render View">
+        default_values="RenderView"
+        command="SetDefaultViewType">
         <Documentation>
           Set the view to create when ParaView starts up.
         </Documentation>
         <StringListDomain name="list">
-          <String value="Render View" />
-          <String value="Line Chart View" />
+          <String value="None" />
+          <String value="RenderView" />
         </StringListDomain>
       </StringVectorProperty>
 
       <IntVectorProperty name="AutoApply"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        command="SetAutoApply">
         <Documentation>
           Automatically apply changes in the 'Properties' panel.
         </Documentation>
@@ -53,7 +57,8 @@
 
       <IntVectorProperty name="AutoApplyActiveOnly"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        command="SetAutoApplyActiveOnly">
         <Documentation>
           Limit automatic accepting of changes on the 'Properties'
           panel to the active panel alone.
@@ -63,7 +68,8 @@
 
       <IntVectorProperty name="AutoConvertProperties"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        command="SetAutoConvertProperties">
         <Documentation>
           Automatically convert data arrays as needed by filters including converting
           cell arrays to point arrays, or vice versa, and extracting single components
@@ -74,7 +80,8 @@
 
       <IntVectorProperty name="StrictLoadBalancing"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        command="SetStrictLoadBalancing">
         <Documentation>
           Use strict load balancing for structured datasets (fixme: need to
           figure out what this one does).
@@ -99,7 +106,8 @@
 
       <IntVectorProperty name="EnableAutoMPI"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        command="SetEnableAutoMPI">
         <Documentation>
           Enable multicore support for data processing.
         </Documentation>
@@ -108,7 +116,8 @@
 
       <IntVectorProperty name="AutoMPILimit"
         number_of_elements="1"
-        default_values="2">
+        default_values="2"
+        command="SetAutoMPILimit">
         <Documentation>
           Limit maximum number of cores to
         </Documentation>

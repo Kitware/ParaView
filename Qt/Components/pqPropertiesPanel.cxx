@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqDebug.h"
 #include "pqDisplayPolicy.h"
@@ -48,8 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h"
 #include "pqUndoStack.h"
 #include "vtkCollection.h"
+#include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
@@ -312,10 +315,17 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   pqSettings *settings = pqApplicationCore::instance()->settings();
   if (settings)
     {
-    pqPropertiesPanel::AutoApply = settings->value("autoAccept", false).toBool();
     this->Internals->Ui.AdvancedButton->setChecked(
       settings->value("showAdvancedProperties", false).toBool());
     }
+
+  // Get AutoApply setting from GeneralSettings object.
+  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
+  pqPropertiesPanel::AutoApply = generalSettings->GetAutoApply();
+
+  // every time the settings change, we need to update our auto-apply status.
+  pqCoreUtilities::connect(generalSettings, vtkCommand::ModifiedEvent,
+    this, SLOT(generalSettingsChanged()));
 
   //---------------------------------------------------------------------------
   // Listen to various signals from the application indicating changes in active
@@ -385,6 +395,13 @@ pqPropertiesPanel::~pqPropertiesPanel()
 
   delete this->Internals;
   this->Internals = 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::generalSettingsChanged()
+{
+  vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
+  pqPropertiesPanel::AutoApply = generalSettings->GetAutoApply();
 }
 
 //-----------------------------------------------------------------------------
@@ -763,9 +780,8 @@ void pqPropertiesPanel::apply()
 
   BEGIN_UNDO_SET("Apply");
 
-  pqSettings* settings = pqApplicationCore::instance()->settings();
   bool onlyApplyCurrentPanel =
-    settings->value("onlyApplyCurrentPanel", false).toBool();
+    vtkPVGeneralSettings::GetInstance()->GetAutoApplyActiveOnly();
 
   if (onlyApplyCurrentPanel)
     {
@@ -796,10 +812,8 @@ void pqPropertiesPanel::reset()
 {
   this->Internals->AutoApplyTimer.stop();
 
-  pqSettings* settings = pqApplicationCore::instance()->settings();
   bool onlyApplyCurrentPanel =
-    settings->value("onlyApplyCurrentPanel", false).toBool();
-
+    vtkPVGeneralSettings::GetInstance()->GetAutoApplyActiveOnly();
   if (onlyApplyCurrentPanel)
     {
     pqProxyWidgets* widgets = this->Internals->Source?

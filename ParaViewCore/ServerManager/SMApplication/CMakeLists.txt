@@ -103,7 +103,6 @@ SET(requestedResourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/catalyst.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/options.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml

@@ -81,7 +81,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMInputArrayDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -514,8 +513,6 @@ pqSettings* pqApplicationCore::settings()
       }
     vtkProcessModuleAutoMPI::SetEnableAutoMPI(this->Settings->value("autoMPI").toBool());
     vtkProcessModuleAutoMPI::SetNumberOfCores(this->Settings->value("autoMPI_NumberOfCores").toInt());
-    vtkSMInputArrayDomain::SetAutomaticPropertyConversion(
-      this->Settings->value("GlobalProperties/AutoConvertProperties",false).toBool());
     }
   return this->Settings;
 }

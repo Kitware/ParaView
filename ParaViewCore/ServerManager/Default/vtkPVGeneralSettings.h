@@ -1,0 +1,96 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVGeneralSettings.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkPVGeneralSettings - object for general options.
+// .SECTION Description
+// vtkPVGeneralSettings keeps track of general options in a ParaView
+// application.
+// This is a singleton. All calls to vtkPVGeneralSettings::New() return a
+// pointer to the same global instance (with reference count incremented as
+// expected).
+#ifndef __vtkPVGeneralSettings_h
+#define __vtkPVGeneralSettings_h
+
+#include "vtkObject.h"
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
+#include "vtkSmartPointer.h"
+
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVGeneralSettings : public vtkObject
+{
+public:
+  static vtkPVGeneralSettings* New();
+  vtkTypeMacro(vtkPVGeneralSettings, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Access the singleton.
+  static vtkPVGeneralSettings* GetInstance();
+
+  // Description:
+  // Automatically convert data arrays as needed by filters including converting
+  // cell arrays to point arrays, or vice versa, and extracting single components
+  // from multi-component arrays.
+  // Forwards the call to vtkSMInputArrayDomain::SetAutomaticPropertyConversion.
+  void SetAutoConvertProperties(bool val);
+  bool GetAutoConvertProperties();
+
+  // Description:
+  // Enable/disable strict load balancing. Forwards the call to
+  // vtkSISourceProxy::SetDisablePipelineExecution().
+  void SetStrictLoadBalancing(bool);
+  bool GetStrictLoadBalancing();
+
+  // Description:
+  // Automatically apply changes in the 'Properties' panel.
+  vtkGetMacro(AutoApply, bool);
+  vtkSetMacro(AutoApply, bool);
+
+  // Description:
+  // Automatically apply changes in the 'Properties' panel.
+  vtkGetMacro(AutoApplyActiveOnly, bool);
+  vtkSetMacro(AutoApplyActiveOnly, bool);
+
+  // Description:
+  // Enable auto-mpi. Forwarded to vtkProcessModuleAutoMPI.
+  void SetEnableAutoMPI(bool);
+  bool GetEnableAutoMPI();
+
+  // Description:
+  // Set the core limit for auto-mpi.
+  void SetAutoMPILimit(int val);
+  int GetAutoMPILimit();
+
+  // Description:
+  // Get/Set the default view type.
+  vtkGetStringMacro(DefaultViewType);
+  vtkSetStringMacro(DefaultViewType);
+
+//BTX
+protected:
+  vtkPVGeneralSettings();
+  ~vtkPVGeneralSettings();
+
+  bool AutoApply;
+  bool AutoApplyActiveOnly;
+  char* DefaultViewType;
+
+private:
+  vtkPVGeneralSettings(const vtkPVGeneralSettings&); // Not implemented
+  void operator=(const vtkPVGeneralSettings&); // Not implemented
+
+  static vtkSmartPointer<vtkPVGeneralSettings> Instance;
+//ETX
+};
+
+#endif

@@ -31,9 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAutoApplyReaction.h"
 
-#include "pqApplicationCore.h"
-#include "pqSettings.h"
-#include "pqPropertiesPanel.h"
+#include "pqCoreUtilities.h"
+#include "vtkCommand.h"
+#include "vtkPVGeneralSettings.h"
 
 //-----------------------------------------------------------------------------
 pqAutoApplyReaction::pqAutoApplyReaction(QAction* parentObject)
@@ -42,6 +42,10 @@ pqAutoApplyReaction::pqAutoApplyReaction(QAction* parentObject)
   parentObject->setChecked(this->autoApply());
   QObject::connect(parentObject, SIGNAL(triggered(bool)),
     this, SLOT(checkStateChanged(bool)));
+
+  vtkPVGeneralSettings* gs = vtkPVGeneralSettings::GetInstance();
+  pqCoreUtilities::connect(gs, vtkCommand::ModifiedEvent,
+    this, SLOT(updateState()));
 }
 
 //-----------------------------------------------------------------------------
@@ -53,22 +57,19 @@ void pqAutoApplyReaction::checkStateChanged(bool autoAccept)
 //-----------------------------------------------------------------------------
 bool pqAutoApplyReaction::autoApply()
 {
-  return pqPropertiesPanel::autoApply();
+  return vtkPVGeneralSettings::GetInstance()->GetAutoApply();
 }
 
 //-----------------------------------------------------------------------------
 void pqAutoApplyReaction::setAutoApply(bool autoAccept)
 {
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if ( settings )
-    {
-    settings->setValue("autoAccept", autoAccept);
-    }
-  pqPropertiesPanel::setAutoApply(autoAccept);
+  vtkPVGeneralSettings::GetInstance()->SetAutoApply(autoAccept);
+  // FIXME: How should this change be saved in vtkSMSettings?
 }
 
 //-----------------------------------------------------------------------------
 void pqAutoApplyReaction::updateState()
 {
-  // Doh! I have no way of knowing when the auto-accept state changes :(.
+  vtkPVGeneralSettings* gs = vtkPVGeneralSettings::GetInstance();
+  this->parentAction()->setChecked(gs->GetAutoApply());
 }
