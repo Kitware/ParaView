@@ -136,13 +136,6 @@ pqPipelineRepresentation::pqPipelineRepresentation(
 
   QObject::connect(this, SIGNAL(visibilityChanged(bool)),
     this, SLOT(updateScalarBarVisibility(bool)));
-
-  // Whenever the pipeline gets be updated, it's possible that the scalar ranges
-  // change. If that happens, we try to ensure that the lookuptable range is big
-  // enough to show the entire data (unless of course, the user locked the
-  // lookuptable ranges).
-  this->connect(this, SIGNAL(dataUpdated()), SLOT(onDataUpdated()));
-  this->UpdateLUTRangesOnDataUpdate = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -155,30 +148,6 @@ pqPipelineRepresentation::~pqPipelineRepresentation()
 vtkSMRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy() const
 {
   return this->Internal->RepresentationProxy;
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::onInputChanged()
-{
-  if (this->getInput())
-    {
-    QObject::disconnect(this->getInput(),
-      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-      this, SLOT(onInputAccepted()));
-    }
-
-  this->Superclass::onInputChanged();
-
-  if (this->getInput())
-    {
-    /// We need to try to update the LUT ranges only when the user manually
-    /// changed the input source object (not necessarily ever pipeline update
-    /// which can happen when time changes -- for example). So we listen to this
-    /// signal. BUG #10062.
-    QObject::connect(this->getInput(),
-      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
-      this, SLOT(onInputAccepted()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -198,60 +167,6 @@ void pqPipelineRepresentation::resetLookupTableScalarRangeOverTime()
   if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
     {
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(proxy);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::onInputAccepted()
-{
-  // BUG #10062
-  // This slot gets called when the input to the representation is "accepted".
-  // We mark this representation's LUT ranges dirty so that when the pipeline
-  // finally updates, we can reset the LUT ranges.
-  if (this->getInput()->modifiedState() == pqProxy::MODIFIED)
-    {
-    this->UpdateLUTRangesOnDataUpdate = true;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::onDataUpdated()
-{
-  if (this->UpdateLUTRangesOnDataUpdate ||
-    pqScalarsToColors::colorRangeScalingMode() ==
-    pqScalarsToColors::GROW_ON_UPDATED)
-    {
-    // BUG #10062
-    // Since this part of the code happens every time the pipeline is updated, we
-    // don't need to record it on the undo stack. It will happen automatically
-    // each time.
-    BEGIN_UNDO_EXCLUDE();
-    this->UpdateLUTRangesOnDataUpdate = false;
-    this->updateLookupTableScalarRange();
-    END_UNDO_EXCLUDE();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::updateLookupTableScalarRange()
-{
-  pqScalarsToColors* lut = this->getLookupTable();
-  if (!lut || lut->getScalarRangeLock())
-    {
-    return;
-    }
-
-  vtkSMProxy* proxy = this->getProxy();
-  if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
-    {
-    // if scale range was initialized, we extend it, other we simply reset it.
-    vtkSMPropertyHelper helper(lut->getProxy(), "ScalarRangeInitialized", true);
-    bool extend_lut = helper.GetAsInt() == 1;
-    vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(proxy,
-      extend_lut);
-    // mark the scalar range as initialized.
-    helper.Set(0, 1);
-    lut->getProxy()->UpdateVTKObjects();
     }
 }
 

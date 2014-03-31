@@ -39,6 +39,7 @@ class pqDataRepresentation;
 class pqOutputPort;
 class pqPipelineSource;
 class pqPropertyWidget;
+class pqProxy;
 class pqView;
 class vtkSMProperty;
 class vtkSMProxy;
@@ -106,6 +107,9 @@ public slots:
 signals:
   /// This signal is emitted after the user clicks the apply button.
   void applied();
+
+  /// This signal is emitted after a panel for a proxy is applied.
+  void applied(pqProxy*);
 
   /// This signal is emitted when the current view changes.
   void viewChanged(pqView*);

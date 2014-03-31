@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqApplicationCore.h"
+#include "pqApplyBehavior.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
 #include "pqCollaborationBehavior.h"
 #include "pqCommandLineOptionsBehavior.h"
@@ -43,18 +44,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFixPathsInStateFilesBehavior.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectPickingBehavior.h"
-#include "pqPVNewSourceBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPipelineContextMenuBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
+#include "pqPropertiesPanel.h"
+#include "pqPVNewSourceBehavior.h"
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
+#include "pqStandardPropertyWidgetInterface.h"
 #include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqVerifyRequiredPluginBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
-#include "pqStandardPropertyWidgetInterface.h"
 #include "pqViewStreamingBehavior.h"
 
 #include <QShortcut>
@@ -98,6 +100,12 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqCollaborationBehavior(this);
   new pqViewStreamingBehavior(this);
+
+  pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
+  foreach (pqPropertiesPanel* ppanel, mainWindow->findChildren<pqPropertiesPanel*>())
+    {
+    applyBehavior->registerPanel(ppanel);
+    }
 
   // Setup quick-launch shortcuts.
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,

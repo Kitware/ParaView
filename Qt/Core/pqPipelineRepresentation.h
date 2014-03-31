@@ -92,34 +92,12 @@ public slots:
   // processes hence use with caution!!!
   void resetLookupTableScalarRangeOverTime();
 
-  /// If color lookuptable is set up and coloring is enabled, the this
-  /// ensure that the lookuptable scalar range is greater than than the
-  /// color array's scalar range. It also updates the scalar range on
-  /// the scalar-opacity function, if any. Both the ColorLUT and the 
-  /// ScalarOpacityFunction may choose to ignore the set scalar range
-  /// based on value ScalePointsWithRange.
-  void updateLookupTableScalarRange();
-
 protected slots:
   /// called when this representations visibility changes. We check if the LUT
   /// used to color this repr is being used by any other repr. If not, we turn off
   /// the scalar bar.
   void updateScalarBarVisibility(bool visible);
 
-  /// Called when the data is updated. We call updateLookupTableScalarRange() to
-  /// ensure that the lookuptable has correct ranges.
-  void onDataUpdated();
-
-  /// This slot gets called when the input to the representation is "accepted".
-  /// We mark this representation's LUT ranges dirty so that when the pipeline
-  /// finally updates, we can reset the LUT ranges.
-  void onInputAccepted();
-
-protected:
-  /// Overridden to capture the input's modified signal.
-  virtual void onInputChanged();
-
-  bool UpdateLUTRangesOnDataUpdate;
 private:
   class pqInternal;
   pqInternal* Internal; 

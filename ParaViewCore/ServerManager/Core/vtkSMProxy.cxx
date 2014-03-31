@@ -1005,6 +1005,17 @@ vtkSMProxy* vtkSMProxy::GetParentProxy()
 }
 
 //---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxy::GetTrueParentProxy()
+{
+  vtkSMProxy* self = this;
+  while (self->GetParentProxy())
+    {
+    self = self->GetParentProxy();
+    }
+  return self;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::AddSubProxy( const char* name, vtkSMProxy* proxy,
                               int override)
 {

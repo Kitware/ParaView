@@ -46,7 +46,7 @@ public:
   // Returns a color transfer function proxy instance for mapping a data array
   // with the given name. If none exists in the given
   // session, a new instance will be created and returned.
-  vtkSMProxy* GetColorTransferFunction(const char* arrayName, 
+  vtkSMProxy* GetColorTransferFunction(const char* arrayName,
     vtkSMSessionProxyManager* pxm);
 
   // Description:
@@ -64,6 +64,14 @@ public:
   // if possible.
   vtkSMProxy* GetScalarBarRepresentation(
     vtkSMProxy* colorTransferFunctionProxy, vtkSMProxy* view);
+
+  // Description:
+  // Iterates over all "known" transfer function proxies and request each one of
+  // them to update its range using data information currently available.
+  // If \c extend is true, the transfer function is expanded to accommodate
+  // current data range rather then resetting it to the range.
+  void ResetAllTransferFunctionRangesUsingCurrentData(
+    vtkSMSessionProxyManager* pxm, bool extend=false);
 
 //BTX
 protected:

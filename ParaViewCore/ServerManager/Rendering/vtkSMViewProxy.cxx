@@ -136,6 +136,7 @@ void vtkSMViewProxy::StillRender()
 
   int interactive = 0;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
+  this->GetSession()->PrepareProgress();
   // We call update separately from the render. This is done so that we don't
   // get any synchronization issues with GUI responding to the data-updated
   // event by making some data information requests(for example). If those
@@ -156,6 +157,7 @@ void vtkSMViewProxy::StillRender()
     }
 
   this->PostRender(interactive==1);
+  this->GetSession()->CleanupPendingProgress();
   this->InvokeEvent(vtkCommand::EndEvent, &interactive);
 }
 
@@ -164,6 +166,7 @@ void vtkSMViewProxy::InteractiveRender()
 {
   int interactive = 1;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
+  this->GetSession()->PrepareProgress();
 
   // Interactive render will not call Update() at all. It's expected that you
   // must have either called a StillRender() or an Update() before triggering an
@@ -184,6 +187,7 @@ void vtkSMViewProxy::InteractiveRender()
     }
 
   this->PostRender(interactive==1);
+  this->GetSession()->CleanupPendingProgress();
   this->InvokeEvent(vtkCommand::EndEvent, &interactive);
 }
 
@@ -339,11 +343,7 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-//----------------------------------------------------------------------------
-bool vtkSMViewProxy::HasDirtyRepresentation()
-{
-  return this->NeedsUpdate;
-}
+
 //----------------------------------------------------------------------------
 vtkRenderWindow* vtkSMViewProxy::GetRenderWindow()
 {

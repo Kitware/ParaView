@@ -190,6 +190,25 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
 }
 
 //----------------------------------------------------------------------------
+void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentData(
+  vtkSMSessionProxyManager* pxm, bool extend)
+{
+  vtkNew<vtkSMProxyIterator> iter;
+  iter->SetSessionProxyManager(pxm);
+  iter->SetModeToOneGroup();
+  for (iter->Begin("lookup_tables"); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxy* lutProxy = iter->GetProxy();
+    assert(lutProxy != NULL);
+    if (vtkSMPropertyHelper(lutProxy, "LockScalarRange", true).GetAsInt() == 0)
+      {
+      vtkSMTransferFunctionProxy::RescaleTransferFunctionToDataRange(
+        lutProxy, extend);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTransferFunctionManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

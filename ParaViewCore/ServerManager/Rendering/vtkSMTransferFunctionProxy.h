@@ -56,6 +56,18 @@ public:
     }
 
   // Description:
+  // Locates all representations that are currently using this transfer function
+  // and then rescales the transfer function scalar range to exactly match the
+  // combined valid scalar ranges obtained from them all.
+  virtual bool RescaleTransferFunctionToDataRange(bool extend=false);
+  static bool RescaleTransferFunctionToDataRange(vtkSMProxy* proxy, bool extend=false)
+    {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self? self->RescaleTransferFunctionToDataRange(extend) : false;
+    }
+
+  // Description:
   // Invert the transfer function. Returns true if successful.
   virtual bool InvertTransferFunction();
 

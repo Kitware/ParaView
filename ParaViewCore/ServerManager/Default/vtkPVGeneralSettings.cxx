@@ -30,7 +30,6 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::New()
   vtkPVGeneralSettings* instance = vtkPVGeneralSettings::GetInstance();
   assert(instance);
   instance->Register(NULL);
-  vtkObjectFactory::ConstructInstance(instance->GetClassName());
   return instance;
 }
 
@@ -38,7 +37,8 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::New()
 vtkPVGeneralSettings::vtkPVGeneralSettings()
   : AutoApply(false),
   AutoApplyActiveOnly(false),
-  DefaultViewType(NULL)
+  DefaultViewType(NULL),
+  TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -55,6 +55,7 @@ vtkPVGeneralSettings* vtkPVGeneralSettings::GetInstance()
   if (!vtkPVGeneralSettings::Instance)
     {
     vtkPVGeneralSettings* instance = new vtkPVGeneralSettings();
+    vtkObjectFactory::ConstructInstance(instance->GetClassName());
     vtkPVGeneralSettings::Instance.TakeReference(instance);
     }
   return vtkPVGeneralSettings::Instance;

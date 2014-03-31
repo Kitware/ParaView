@@ -76,6 +76,21 @@ public:
   vtkGetStringMacro(DefaultViewType);
   vtkSetStringMacro(DefaultViewType);
 
+
+  enum
+    {
+    GROW_ON_APPLY=0,
+    GROW_ON_APPLY_AND_TIMESTEP=1,
+    RESET_ON_APPLY=2,
+    RESET_ON_APPLY_AND_TIMESTEP=3
+    };
+
+
+  // Description:
+  // Get/Set the transfer function reset mode.
+  vtkGetMacro(TransferFunctionResetMode, int);
+  vtkSetMacro(TransferFunctionResetMode, int);
+
 //BTX
 protected:
   vtkPVGeneralSettings();
@@ -84,6 +99,7 @@ protected:
   bool AutoApply;
   bool AutoApplyActiveOnly;
   char* DefaultViewType;
+  int TransferFunctionResetMode;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&); // Not implemented

@@ -37,6 +37,8 @@ set (Module_SRCS
   pqAnimationTimeToolbar.h
   pqApplicationSettingsReaction.cxx
   pqApplicationSettingsReaction.h
+  pqApplyBehavior.cxx
+  pqApplyBehavior.h
   pqAutoApplyReaction.cxx
   pqAutoApplyReaction.h
   pqAutoLoadPluginXMLBehavior.cxx
@@ -248,6 +250,7 @@ set (Module_MOC_HDRS
   pqAlwaysConnectedBehavior.h
   pqAnimationTimeToolbar.h
   pqApplicationSettingsReaction.h
+  pqApplyBehavior.h
   pqAutoApplyReaction.h
   pqAutoLoadPluginXMLBehavior.h
   pqAxesToolbar.h

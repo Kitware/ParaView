@@ -78,6 +78,24 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <IntVectorProperty name="TransferFunctionResetMode"
+        number_of_elements="1"
+        default_values="0"
+        command="SetTransferFunctionResetMode">
+        <Documentation>
+          Color transfer functions (or color maps) are used map data values to colors
+          for pseudo coloring. Set when and how should ParaView update the data
+          range used for this mapping.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Grow on each 'Apply' to include current data range" value="0" />
+          <Entry text="Grow on each 'Apply' and change in timestep" value="1" />
+          <Entry text="Clamp to available data range on each 'Apply'" value="2" />
+          <Entry text="Clamp on each 'Apply' and change in timestep"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="StrictLoadBalancing"
         number_of_elements="1"
         default_values="0"
@@ -129,9 +147,17 @@
         <Property name="CrashRecovery" />
       </PropertyGroup>
 
+      <PropertyGroup label="Default View">
+        <Property name="DefaultViewType" />
+      </PropertyGroup>
+
       <PropertyGroup label="Properties Panel Options">
         <Property name="AutoApply" />
         <Property name="AutoApplyActiveOnly" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Transfer Function Options">
+        <Property name="TransferFunctionResetMode" />
       </PropertyGroup>
 
       <PropertyGroup label="Data Processing Options">

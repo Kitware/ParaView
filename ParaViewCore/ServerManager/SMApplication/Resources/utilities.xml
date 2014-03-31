@@ -122,10 +122,12 @@
       <IntVectorProperty default_values="0"
                          name="LockScalarRange"
                          number_of_elements="1">
-        <!-- This is a data-property allowing us to save state of
-          scalar range lock in state. SM does not use this at all
-          hence the absence of "command" -->
         <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true (1), the application will not try to automatically
+          change scalar range whenever the application may usually update the lookup table
+          scalar ranges.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetColorSpace"
                          default_values="3"
@@ -189,8 +191,9 @@
                             name="ScalarRangeInitialized"
                             number_of_elements="1"
                             panel_visibility="never" >
-        <!-- This is used to keep track of whether the
-        user initialized the scalar range -->
+        <Documentation>
+         Set to 1 to indicate that the scalar range has been initialized.
+        </Documentation>
         <BooleanDomain name="bool" />
       </DoubleVectorProperty>
       <IntVectorProperty command="SetHSVWrap"

@@ -86,7 +86,14 @@ public:
   // Description:
   // Return true any internal representation is dirty. This can be usefull to
   // know if the internal geometry has changed.
-  virtual bool HasDirtyRepresentation();
+  // DEPRECATED: Use GetNeedsUpdate() instead.
+  virtual bool HasDirtyRepresentation() { return this->GetNeedsUpdate(); }
+
+  // Description:
+  // Returns true if the subsequent call to Update() will result in an actual
+  // update. If returned true, it means that the view thinks its rendering is
+  // obsolete and needs to be re-generated.
+  vtkGetMacro(NeedsUpdate, bool);
 
   // Description:
   // Return the render window from which offscreen rendering and interactor can

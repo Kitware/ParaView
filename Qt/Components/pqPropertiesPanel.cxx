@@ -37,12 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqDebug.h"
-#include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
-#include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqProxyModifiedStateUndoElement.h"
 #include "pqProxyWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -146,25 +143,6 @@ protected:
     void apply(pqView* view)
       {
       this->Panel->apply();
-      pqPipelineSource *source = qobject_cast<pqPipelineSource*>(this->Proxy);
-      if (source)
-        {
-        if (source->modifiedState() == pqProxy::UNINITIALIZED)
-          {
-          this->showData(source, view);
-
-          // add undo-element to ensure this state change happens when
-          // undoing/redoing.
-          pqProxyModifiedStateUndoElement* undoElement =
-            pqProxyModifiedStateUndoElement::New();
-          undoElement->SetSession(source->getServer()->session());
-          undoElement->MadeUnmodified(source);
-          ADD_UNDO_ELEM(undoElement);
-          undoElement->Delete();
-          }
-        source->setModifiedState(pqProxy::UNMODIFIED);
-        source->renderAllViews();
-        }
       }
 
     void reset()
@@ -175,34 +153,6 @@ protected:
       if (this->Proxy->modifiedState() == pqProxy::MODIFIED)
         {
         this->Proxy->setModifiedState(pqProxy::UNMODIFIED);
-        }
-      }
-
-    void showData(pqPipelineSource* source, pqView* view)
-      {
-      pqDisplayPolicy *displayPolicy = pqApplicationCore::instance()->getDisplayPolicy();
-      if (!displayPolicy)
-        {
-        qCritical() << "No display policy defined. Cannot create pending displays.";
-        return;
-        }
-
-      // create representations for all output ports.
-      for (int i = 0; i < source->getNumberOfOutputPorts(); i++)
-        {
-        pqDataRepresentation *repr = displayPolicy->createPreferredRepresentation(
-          source->getOutputPort(i), view, false);
-        if (!repr || !repr->getView())
-          {
-          continue;
-          }
-
-        pqView *reprView = repr->getView();
-        pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source);
-        if (filter)
-          {
-          filter->hideInputIfRequired(reprView);
-          }
         }
       }
   private:
@@ -790,6 +740,7 @@ void pqPropertiesPanel::apply()
     if (widgets)
       {
       widgets->apply(this->view());
+      emit this->applied(widgets->Proxy);
       }
     }
   else
@@ -797,6 +748,7 @@ void pqPropertiesPanel::apply()
     foreach (pqProxyWidgets* widgets, this->Internals->SourceWidgets)
       {
       widgets->apply(this->view());
+      emit this->applied(widgets->Proxy);
       }
     }
 

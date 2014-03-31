@@ -808,10 +808,7 @@ bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* 
   for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc < max; cc++)
     {
     vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
-    while (consumer && consumer->GetParentProxy())
-      {
-      consumer = consumer->GetParentProxy();
-      }
+    consumer = consumer? consumer->GetTrueParentProxy() : NULL;
     if (consumer && consumer->IsA("vtkSMViewProxy") && proxy->GetConsumerProperty(cc))
       {
       views.push_back(
@@ -904,10 +901,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
   for (unsigned int cc=0, max=proxy->GetNumberOfConsumers(); cc<max; ++cc)
     {
     vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
-    while (consumer && consumer->GetParentProxy())
-      {
-      consumer = consumer->GetParentProxy();
-      }
+    consumer = consumer? consumer->GetTrueParentProxy() : NULL;
     if (proxy->GetConsumerProperty(cc) &&
       consumer && consumer->GetXMLGroup() &&
       strcmp(consumer->GetXMLGroup(), "animation") ==0)
@@ -1136,10 +1130,7 @@ bool vtkSMParaViewPipelineController::UnRegisterDepencies(vtkSMProxy* proxy)
   for (unsigned int cc=0, max = proxy->GetNumberOfConsumers(); cc < max; ++cc)
     {
     vtkSMProxy* consumer = proxy->GetConsumerProxy(cc);
-    while (consumer && consumer->GetParentProxy())
-      {
-      consumer = consumer->GetParentProxy();
-      }
+    consumer = consumer? consumer->GetTrueParentProxy() : NULL;
     if (consumer)
       {
       consumers.push_back(consumer);

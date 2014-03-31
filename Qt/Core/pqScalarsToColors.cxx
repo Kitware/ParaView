@@ -164,15 +164,14 @@ void pqScalarsToColors::hideUnusedScalarBars()
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::setScalarRange(double min, double max)
 {
+  pqSMAdaptor::setElementProperty(
+    this->getProxy()->GetProperty("ScalarRangeInitialized"), 1);
   if (min > max)
     {
     double t = min;
     min = max;
     max = t;
     }
-
-  pqSMAdaptor::setElementProperty(
-    this->getProxy()->GetProperty("ScalarRangeInitialized"), 1);
 
   QPair <double, double> current_range = this->getScalarRange();
   if (current_range.first == min && current_range.second == max)
@@ -234,25 +233,6 @@ QPair<double, double> pqScalarsToColors::getScalarRange() const
     (controlPoints.size()-1)/ dvp->GetNumberOfElementsPerCommand());
   return QPair<double, double>(controlPoints[0].toDouble(),
     controlPoints[max_index].toDouble());
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarsToColors::setWholeScalarRange(double min, double max)
-{
-  if (this->getScalarRangeLock())
-    {
-    return;
-    }
-
-  if (pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("ScalarRangeInitialized")).toBool())
-    {
-    QPair<double, double> curRange = this->getScalarRange();
-    min = (min < curRange.first)?  min :  curRange.first;
-    max = (max > curRange.second)?  max :  curRange.second;
-    }
-
-  this->setScalarRange(min, max);
 }
 
 //-----------------------------------------------------------------------------

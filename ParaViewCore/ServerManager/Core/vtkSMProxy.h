@@ -438,6 +438,12 @@ public:
   vtkSMProxy* GetParentProxy();
 
   // Description:
+  // Call GetParentProxy() recursively till a proxy that is not a subproxy of
+  // any other proxy is found. May return this instance, if this is not a
+  // subproxy of any other proxy.
+  vtkSMProxy* GetTrueParentProxy();
+
+  // Description:
   // Allow to switch off any push of state change to the server for that
   // particular object.
   // This is used when we load a state based on a server notification. In that
