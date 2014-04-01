@@ -79,6 +79,18 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <IntVectorProperty name="StrictLoadBalancing"
+        number_of_elements="1"
+        default_values="0"
+        command="SetStrictLoadBalancing"
+        panel_visibility="advanced">
+        <Documentation>
+          Use strict load balancing for structured datasets (fixme: need to
+          figure out what this one does).
+        </Documentation>
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
       <IntVectorProperty name="TransferFunctionResetMode"
         number_of_elements="1"
         default_values="0"
@@ -95,17 +107,6 @@
           <Entry text="Clamp on each 'Apply' and change in timestep"
                  value="3" />
         </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="StrictLoadBalancing"
-        number_of_elements="1"
-        default_values="0"
-        command="SetStrictLoadBalancing">
-        <Documentation>
-          Use strict load balancing for structured datasets (fixme: need to
-          figure out what this one does).
-        </Documentation>
-        <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <IntVectorProperty name="DefaultTimeStep"
@@ -126,7 +127,8 @@
       <IntVectorProperty name="EnableAutoMPI"
         number_of_elements="1"
         default_values="0"
-        command="SetEnableAutoMPI">
+        command="SetEnableAutoMPI"
+        panel_visibility="advanced">
         <Documentation>
           Enable multicore support for data processing.
         </Documentation>
@@ -136,7 +138,8 @@
       <IntVectorProperty name="AutoMPILimit"
         number_of_elements="1"
         default_values="2"
-        command="SetAutoMPILimit">
+        command="SetAutoMPILimit"
+        panel_visibility="advanced">
         <Documentation>
           Limit maximum number of cores to
         </Documentation>
@@ -146,7 +149,8 @@
       <IntVectorProperty name="CacheGeometryForAnimation"
         command="SetCacheGeometryForAnimation"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           <!--
@@ -161,7 +165,8 @@
       <IntVectorProperty name="AnimationGeometryCacheLimit"
         command="SetAnimationGeometryCacheLimit"
         number_of_elements="1"
-        default_values="102400">
+        default_values="102400"
+        panel_visibility="advanced">
         <IntRangeDomain name="range" min="0" />
         <Documentation>
           When caching of geometry for animations is enabled, limit the maximum cache size
@@ -237,7 +242,8 @@
       <IntVectorProperty name="ResolveCoincidentTopology"
         command="SetResolveCoincidentTopology"
         number_of_elements="1"
-        default_values="3">
+        default_values="3"
+        panel_visibility="advanced">
         <Documentation>
           Set the mode to use to overcome the OpenGL rendering issue when faces
           coincide with lines and points.
@@ -253,7 +259,8 @@
       <DoubleVectorProperty name="PolygonOffsetParameters"
         command="SetPolygonOffsetParameters"
         number_of_elements="2"
-        default_values="1.0 1.0">
+        default_values="1.0 1.0"
+        panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>
           Set the polygon offset parameters. Refer to the OpenGL manual,
@@ -264,7 +271,8 @@
       <DoubleVectorProperty name="ZShift"
         command="SetZShift"
         number_of_elements="1"
-        default_values="0.002">
+        default_values="0.002"
+        panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>
           Set the fraction by which to shift the z-buffer range when rendering
@@ -274,7 +282,8 @@
 
       <IntVectorProperty name="DepthPeeling"
         default_values="1"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Enable depth-peeling to correctly render translucent polygons. May slow down
@@ -284,7 +293,8 @@
 
       <IntVectorProperty name="MaximumNumberOfPeels"
         default_values="4"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="advanced">
         <IntRangeDomain name="range" min="0" max="10" />
         <Documentation>
           Set the maximum number of peels to use when depth peeling is employed.
@@ -309,7 +319,8 @@
 
       <DoubleVectorProperty name="LODResolution"
         default_values="0.5"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="advanced">
         <DoubleRangeDomain name="range" min="0.0" max="1.0" />
         <Documentation>
           Set the factor used to compute the decimated geometry when employed.
@@ -324,7 +335,8 @@
 
       <DoubleVectorProperty name="NonInteractiveRenderDelay"
         default_values="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="advanced">
         <DoubleRangeDomain name="range" min="0" max="10" />
         <Documentation>
           If decimated geometry was used for rendering during interaction, set the delay
@@ -343,8 +355,8 @@
       </IntVectorProperty>
 
       <DoubleVectorProperty name="RemoteRenderThreshold"
-                            default_values="20.0"
-                            number_of_elements="1">
+        default_values="20.0"
+        number_of_elements="1">
         <DoubleRangeDomain min="0" max="102400" name="range" />
         <Documentation>
           Set the data size (in megabytes) beyond which to render data remotely
@@ -355,8 +367,9 @@
       </DoubleVectorProperty>
 
       <IntVectorProperty name="StillRenderImageReductionFactor"
-                         default_values="1"
-                         number_of_elements="1">
+        default_values="1"
+        number_of_elements="1"
+        panel_visibility="advanced" >
         <IntRangeDomain max="20" min="1" name="range" />
         <Documentation>
           Set the sub-sampling factor to use for non-interactive rendering.
@@ -367,8 +380,9 @@
       </IntVectorProperty>
 
       <IntVectorProperty name="ImageReductionFactor"
-                         default_values="2"
-                         number_of_elements="1">
+        default_values="2"
+        number_of_elements="1"
+        panel_visibility="advanced">
         <IntRangeDomain max="20" min="1" name="range" />
         <Documentation>
           To reduce image compositing costs during interactions, set the
@@ -378,7 +392,8 @@
 
       <StringVectorProperty name="CompressorConfig"
         default_values="vtkSquirtCompressor 0 3"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="advanced">
         <Documentation>
           Set the compression method used when transferring rendered images from
           the server to the client.
@@ -397,11 +412,14 @@
       </IntVectorProperty>
 
       <IntVectorProperty name="UseOffscreenRenderingForScreenshots"
-                         default_values="0"
-                         number_of_elements="1">
+        default_values="0"
+        number_of_elements="1"
+        panel_visibility="advanced">
         <BooleanDomain name="bool" />
-        <Documentation>Set whether offscreen rendering should be used
-        when saving screenshots or animations.</Documentation>
+        <Documentation>
+          Set whether offscreen rendering should be used
+          when saving screenshots or animations.
+        </Documentation>
       </IntVectorProperty>
 
       <PropertyGroup label="Geometry Mapper Options">

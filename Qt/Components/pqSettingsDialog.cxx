@@ -47,11 +47,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkPVXMLElement.h"
 
+
+#include <QKeyEvent>
 #include <QMap>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpacerItem>
 #include <QVBoxLayout>
+
+namespace
+{
+  class pqClearTextOnEsc : public QObject
+  {
+public:
+  pqClearTextOnEsc(QLineEdit* parentObject) : QObject(parentObject)
+    {
+    }
+protected:
+  virtual bool eventFilter(QObject *obj, QEvent *evt)
+    {
+    if (evt->type() == QEvent::KeyPress)
+      {
+      QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
+      if (keyEvent->key() == Qt::Key_Escape)
+        {
+        qobject_cast<QLineEdit*>(this->parent())->clear();
+        return true;
+        }
+      }
+    return false;
+    }
+  };
+}
 
 class pqSettingsDialog::pqInternals
 {
@@ -71,6 +98,17 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.setupUi(this);
 
+  // Setup configuration defaults using settings.
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  if (settings)
+    {
+    ui.AdvancedButton->setChecked(
+      settings->value("pqSettingsDialog/showAdvancedProperties", false).toBool());
+    }
+
+  // Setup shortcut to clear search text.
+  ui.SearchLineEdit->installEventFilter(new pqClearTextOnEsc(ui.SearchLineEdit));
+
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(
     pqActiveObjects::instance().activeServer()->session());
@@ -88,7 +126,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 
       QWidget* container = new QWidget(scrollArea);
       container->setObjectName("Container");
-      container->setContentsMargins(0, 3, 6, 0);
+      container->setContentsMargins(6, 0, 6, 0);
 
       QVBoxLayout* vbox = new QVBoxLayout(container);
       vbox->setMargin(0);
@@ -116,8 +154,9 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
       this->Internals->TabToStackedWidgets[tabIndex] = stackIndex;
 
       this->connect(widget, SIGNAL(changeAvailable()), SLOT(onChangeAvailable()));
+      widget->connect(this, SIGNAL(filterWidgets(bool, QString)), SLOT(filterWidgets(bool, QString)));
       }
-    }    
+    }
 
   // Disable some buttons to start
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
@@ -130,13 +169,26 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   this->connect(this, SIGNAL(rejected()), SLOT(onRejected()));
   this->connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabIndexChanged(int)));
 
+  this->connect(ui.AdvancedButton, SIGNAL(toggled(bool)), SLOT(filterPanelWidgets()));
+  this->connect(ui.SearchLineEdit, SIGNAL(textChanged(QString)), SLOT(filterPanelWidgets()));
+
   // After all the tabs are set up, select the first
   this->onTabIndexChanged(0);
+
+  this->filterPanelWidgets();
 }
 
 //-----------------------------------------------------------------------------
 pqSettingsDialog::~pqSettingsDialog()
 {
+  Ui::SettingsDialog &ui = this->Internals->Ui;
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  if (settings)
+    {
+    // save the state of advanced button in the user config.
+    settings->setValue("pqSettingsDialog/showAdvancedProperties",
+      ui.AdvancedButton->isChecked());
+    }
   delete this->Internals;
   this->Internals = NULL;
 }
@@ -202,7 +254,7 @@ void pqSettingsDialog::onRejected()
   // Disable buttons
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
-  ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);    
+  ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -229,6 +281,13 @@ void pqSettingsDialog::onTabIndexChanged(int index)
   int stackWidgetIndex = this->Internals->TabToStackedWidgets[index];
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.stackedWidget->setCurrentIndex(stackWidgetIndex);
+}
+
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::filterPanelWidgets()
+{
+  Ui::SettingsDialog &ui = this->Internals->Ui;
+  emit this->filterWidgets(ui.AdvancedButton->isChecked(), ui.SearchLineEdit->text());
 }
 
 //-----------------------------------------------------------------------------

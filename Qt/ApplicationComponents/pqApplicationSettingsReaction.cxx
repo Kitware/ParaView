@@ -57,7 +57,7 @@ void pqApplicationSettingsReaction::showApplicationSettingsDialog()
     pqApplicationSettingsReaction::Dialog = new pqSettingsDialog(
       pqCoreUtilities::mainWidget());
     pqApplicationSettingsReaction::Dialog->setObjectName("ApplicationSettings");
-    pqApplicationSettingsReaction::Dialog->setAttribute(Qt::WA_QuitOnClose, true);
+    pqApplicationSettingsReaction::Dialog->setAttribute(Qt::WA_DeleteOnClose, true);
     }
   pqApplicationSettingsReaction::Dialog->show();
   pqApplicationSettingsReaction::Dialog->raise();

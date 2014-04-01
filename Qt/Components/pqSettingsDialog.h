@@ -59,6 +59,11 @@ private slots:
   void onTabIndexChanged(int index);
   void onChangeAvailable();
 
+  void filterPanelWidgets();
+
+signals:
+  void filterWidgets(bool showAdvanced, const QString& text);
+
 private:
   void saveInQSettings(const char* key, vtkSMProperty* smproperty);
 
