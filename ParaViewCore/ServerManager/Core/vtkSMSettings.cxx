@@ -290,7 +290,7 @@ public:
   {
     vtkSMDomain * domain = property->GetDomain( "proxy_list" );
     vtkSMProxyListDomain * proxyListDomain = NULL;
-    if (proxyListDomain = vtkSMProxyListDomain::SafeDownCast(domain))
+    if ((proxyListDomain = vtkSMProxyListDomain::SafeDownCast(domain)))
       {
       // Now check whether this proxy is the one we want
       std::string sourceSettingString(settingName);
