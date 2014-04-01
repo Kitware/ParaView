@@ -1283,9 +1283,17 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
     vtkSMProxyManagerProxyMapType::iterator it2 =
       it->second.begin();
 
+    const char* colname = it->first.c_str();
+
+    // Do not save the state of options.
+    const char* options = "options";
+    if (strcmp(options, colname) == 0)
+      {
+      continue;
+      }
+
     // Do not save the state of prototypes.
     const char* protstr = "_prototypes";
-    const char* colname = it->first.c_str();
     int do_group = 1;
     if (strlen(colname) > strlen(protstr))
       {
@@ -1324,11 +1332,18 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
       }
     }
 
-  // Save the proxy collections. This is done seprately because
+  // Save the proxy collections. This is done separately because
   // one proxy can be in more than one group.
   it = this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
+    // Do not save the state of options
+    const char* options = "options";
+    if (strcmp(options, it->first.c_str()) == 0)
+      {
+      continue;
+      }
+
     // Do not save the state of prototypes.
     const char* protstr = "_prototypes";
     int do_group = 1;

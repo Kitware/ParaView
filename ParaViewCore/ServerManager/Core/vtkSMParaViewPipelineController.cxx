@@ -355,7 +355,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
 
   //---------------------------------------------------------------------------
   // If the session is a collaborative session, we need to fetch the state from
-  // server before we start creating "essential" proxies. This is a no-op if no
+  // server before we start creating "essential" proxies. This is a no-op if not
   // a collaborative session.
   pxm->UpdateFromRemote();
 

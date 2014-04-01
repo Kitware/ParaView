@@ -511,8 +511,6 @@ namespace
 //---------------------------------------------------------------------------
 void vtkSMProxy::ResetPropertiesToDefault()
 {
-  // FIXME: remove this.
-  return;
   this->UpdateVTKObjects();
 
   // Since domains depend on information properties, it's essential we update

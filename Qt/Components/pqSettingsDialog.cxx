@@ -42,11 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkPVXMLElement.h"
 
 #include <QMap>
+#include <QPushButton>
 #include <QScrollArea>
 #include <QSpacerItem>
 #include <QVBoxLayout>
@@ -66,14 +68,8 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f),
   Internals (new pqSettingsDialog::pqInternals())
 {
-  this->Internals->Ui.setupUi(this);
-
   Ui::SettingsDialog &ui = this->Internals->Ui;
-  this->connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(clicked(QAbstractButton*)));
-  this->connect(this, SIGNAL(accepted()), SLOT(onAccept()));
-
-  this->connect(ui.tabWidget, SIGNAL(currentChanged(int)),
-                this, SLOT(onTabIndexChanged(int)));
+  ui.setupUi(this);
 
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(
@@ -115,12 +111,24 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
       // show panel widgets
       widget->updatePanel();
 
-      // FIXME: add ability to enable/disable buttons if changes are available.
       int tabIndex = ui.tabWidget->addTab(proxy->GetXMLLabel());
       int stackIndex = ui.stackedWidget->addWidget(scrollArea);
       this->Internals->TabToStackedWidgets[tabIndex] = stackIndex;
+
+      this->connect(widget, SIGNAL(changeAvailable()), SLOT(onChangeAvailable()));
       }
     }    
+
+  // Disable some buttons to start
+  ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
+  ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+
+  this->connect(ui.buttonBox->button(QDialogButtonBox::RestoreDefaults), SIGNAL(clicked()),
+                SLOT(onRestoreDefaults()));
+  this->connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(clicked(QAbstractButton*)));
+  this->connect(this, SIGNAL(accepted()), SLOT(onAccepted()));
+  this->connect(this, SIGNAL(rejected()), SLOT(onRejected()));
+  this->connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabIndexChanged(int)));
 
   // After all the tabs are set up, select the first
   this->onTabIndexChanged(0);
@@ -155,10 +163,11 @@ void pqSettingsDialog::clicked(QAbstractButton *button)
 }
 
 //-----------------------------------------------------------------------------
-void pqSettingsDialog::onAccept()
+void pqSettingsDialog::onAccepted()
 {
-  // if there are any properties that needed to save their values in QSettings,
-  // do that.
+  // If there are any properties that needed to save their values in QSettings,
+  // do that. Otherwise, save to the vtkSMSettings singleton.
+  vtkSMSettings * settings = vtkSMSettings::GetInstance();
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(
     pqActiveObjects::instance().activeServer()->session());
@@ -166,6 +175,7 @@ void pqSettingsDialog::onAccept()
   for (iter->Begin("options"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProxy* proxy = iter->GetProxy();
+    settings->SetProxySettings(proxy);
     vtkSmartPointer<vtkSMPropertyIterator> iter2;
     iter2.TakeReference(proxy->NewPropertyIterator());
     for (iter2->Begin(); !iter2->IsAtEnd(); iter2->Next())
@@ -179,6 +189,38 @@ void pqSettingsDialog::onAccept()
         }
       }
     }
+
+  // Disable buttons
+  Ui::SettingsDialog &ui = this->Internals->Ui;
+  ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
+  ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::onRejected()
+{
+  // Disable buttons
+  Ui::SettingsDialog &ui = this->Internals->Ui;
+  ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
+  ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);    
+}
+
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::onRestoreDefaults()
+{
+  vtkSMSession * session = pqActiveObjects::instance().activeServer()->session();
+
+  vtkNew<vtkSMProxyIterator> iter;
+  iter->SetSession(session);
+  iter->SetModeToOneGroup();
+  for (iter->Begin("options"); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxy* proxy = iter->GetProxy();
+    if (proxy)
+      {
+      proxy->ResetPropertiesToDefault();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -187,6 +229,14 @@ void pqSettingsDialog::onTabIndexChanged(int index)
   int stackWidgetIndex = this->Internals->TabToStackedWidgets[index];
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.stackedWidget->setCurrentIndex(stackWidgetIndex);
+}
+
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::onChangeAvailable()
+{
+  Ui::SettingsDialog &ui = this->Internals->Ui;
+  ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(true);
+  ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------------
