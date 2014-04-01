@@ -856,7 +856,10 @@ bool vtkSMSettings::SaveSettings()
     {
     std::string userOutput = this->GetUserSettingsAsString();
     userSettingsFile << userOutput;
+    return true;
     }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
