@@ -219,7 +219,11 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunctionToDataRange(bool extend)
     // proxy for a proxy.
     proxy = proxy? proxy->GetTrueParentProxy() : NULL;
     vtkSMPVRepresentationProxy* consumer = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    if (consumer && consumer->GetUsingScalarColoring())
+    if (consumer &&
+      // consumer is visible.
+      vtkSMPropertyHelper(consumer, "Visibility", true).GetAsInt() == 1 &&
+      // consumer is using scalar coloring.
+      consumer->GetUsingScalarColoring())
       {
       vtkPVArrayInformation* arrayInfo = consumer->GetArrayInformationForColorArray();
       if (!arrayInfo || (component >= 0 && arrayInfo->GetNumberOfComponents() <= component))

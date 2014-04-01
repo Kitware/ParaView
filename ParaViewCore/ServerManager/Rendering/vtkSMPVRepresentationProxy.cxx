@@ -190,10 +190,8 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     return false;
     }
 
-  vtkSMPropertyHelper helper(this->GetProperty("ColorArrayName"));
-
   return this->RescaleTransferFunctionToDataRange(
-    helper.GetAsString(4), helper.GetAsInt(3), extend);
+    this->GetArrayInformationForColorArray(), extend);
 }
 
 //----------------------------------------------------------------------------
