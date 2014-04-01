@@ -187,7 +187,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   loader->LoadPluginsFromPluginSearchPath();
 
   // Load settings files.
-  vtkSMSettings::LoadSettings();
+  vtkSMSettings::GetInstance()->LoadSettings();
 }
 
 //----------------------------------------------------------------------------
@@ -201,6 +201,13 @@ void vtkInitializationHelper::StandaloneInitialize()
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
+  // Write out settings file(s)
+  bool savingSucceeded = vtkSMSettings::GetInstance()->SaveSettings();
+  if (!savingSucceeded)
+    {
+    cerr << "Saving settings file failed\n";
+    }
+
   vtkSMProxyManager::Finalize();
   vtkProcessModule::Finalize();
 
