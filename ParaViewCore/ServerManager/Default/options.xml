@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="options">
     <!-- ================================================================== -->
-    <Proxy name="GeneralSettings" label="General Settings"
+    <Proxy name="GeneralSettings" label="General"
       processes="client|dataserver|renderserver"
       class="vtkPVGeneralSettings">
       <Documentation>

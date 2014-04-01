@@ -32,10 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorSelectorPropertyWidget.h"
 
 #include "pqColorChooserButtonWithPalettes.h"
+#include "pqProxyWidget.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
 #include <QVBoxLayout>
+#include <QLabel>
 
 //-----------------------------------------------------------------------------
 pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
@@ -45,13 +47,27 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
   PV_DEBUG_PANELS() << "pqColorSelectorPropertyWidget for a property with "
                     << "the panel_widget=\"color_chooser\" attribute";
 
+  this->setShowLabel(false);
+
+  bool useDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smProxy);
+
   QVBoxLayout *vbox = new QVBoxLayout(this);
   vbox->setSpacing(0);
   vbox->setMargin(0);
 
-  pqColorChooserButtonWithPalettes *button =
-    new pqColorChooserButtonWithPalettes(this);
+  if (useDocumentationForLabels)
+    {
+    QLabel* label = new QLabel(
+      QString("<p>%1</p>").arg(pqProxyWidget::documentationText(smProperty)));
+    label->setWordWrap(true);
+    label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    vbox->addWidget(label, /*stretch=*/1);
+    }
+
+  pqColorChooserButtonWithPalettes *button = new pqColorChooserButtonWithPalettes(this);
   button->setObjectName("ColorButton");
+  button->setText(smProperty->GetXMLLabel());
+  button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
   if (vtkSMPropertyHelper(smProperty).GetNumberOfElements() == 3)
     {
@@ -74,7 +90,7 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
   // the colors in the application palette..
   new pqColorPaletteLinkHelper(
     button, smProxy, smProxy->GetPropertyName(smProperty));
-  vbox->addWidget(button);
+  vbox->addWidget(button, 1);
 }
 
 //-----------------------------------------------------------------------------

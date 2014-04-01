@@ -2042,63 +2042,73 @@
       </DoubleVectorProperty>
       <!-- End of RepresentationAnimationHelper -->
     </Proxy>
-    <GlobalPropertiesProxy name="ColorPalette">
-      <DoubleVectorProperty default_values="1.0 1.0 1.0"
-                            label="Foreground"
-                            name="ForegroundColor"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Foreground color.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="0.32 0.34 0.43"
-                            label="Background"
-                            name="BackgroundColor"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Background color.</Documentation>
-      </DoubleVectorProperty>
+    <GlobalPropertiesProxy name="ColorPalette" label="Color Palette">
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
                             label="Surface"
                             name="SurfaceColor"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
-        <Documentation>Surface color.</Documentation>
+        <Documentation>Color used when solid coloring surfaces and faces.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty default_values="1.0 1.0 1.0"
-                            label="Text"
-                            name="TextAnnotationColor"
-                            number_of_elements="3">
+                            label="Foreground"
+                            name="ForegroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
-        <Documentation>Color used for text annotations.</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty default_values="1.0 0.0 1.0"
-                            label="Selection"
-                            name="SelectionColor"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-        <Documentation>Color used for showing selected
-        cells/points.</Documentation>
+        <Documentation>Color used for rendering elements like wireframes, points.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty default_values="0.0 0.0 0.5"
                             label="Edges"
                             name="EdgeColor"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>
+          Color used for the edges when using 'Surface With Wireframe' representation.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="0.32 0.34 0.43"
+                            label="Background"
+                            name="BackgroundColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used as background for the view.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 1.0 1.0"
+                            label="Text"
+                            name="TextAnnotationColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Documentation>Color used for text and other annotations.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty default_values="1.0 0.0 1.0"
+                            label="Selection"
+                            name="SelectionColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
         <Documentation>Color used for showing selected
         cells/points.</Documentation>
       </DoubleVectorProperty>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
       <!-- End of ColorPalette -->
     </GlobalPropertiesProxy>
     <Proxy class="vtkPolyDataMapper"

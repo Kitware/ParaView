@@ -38,15 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "vtkNew.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProperty.h"
-#include "vtkPVXMLElement.h"
-
 
 #include <QKeyEvent>
 #include <QMap>
@@ -97,6 +97,9 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 {
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.setupUi(this);
+  ui.tabWidget->setDocumentMode(true);
+  ui.tabWidget->setDrawBase(true);
+  ui.tabWidget->setExpanding(false);
 
   // Setup configuration defaults using settings.
   pqSettings *settings = pqApplicationCore::instance()->settings();
@@ -109,53 +112,66 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   // Setup shortcut to clear search text.
   ui.SearchLineEdit->installEventFilter(new pqClearTextOnEsc(ui.SearchLineEdit));
 
+  QList<vtkSMProxy*> proxies_to_show;
+
+  pqServer* server = pqActiveObjects::instance().activeServer();
   vtkNew<vtkSMProxyIterator> iter;
-  iter->SetSession(
-    pqActiveObjects::instance().activeServer()->session());
+  iter->SetSession(server->session());
   iter->SetModeToOneGroup();
   for (iter->Begin("options"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy)
       {
-      QScrollArea *scrollArea = new QScrollArea(this);
-      scrollArea->setObjectName("ScrollArea");
-      scrollArea->setWidgetResizable(true);
-      scrollArea->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-      scrollArea->setFrameShape(QFrame::NoFrame);
-
-      QWidget* container = new QWidget(scrollArea);
-      container->setObjectName("Container");
-      container->setContentsMargins(6, 0, 6, 0);
-
-      QVBoxLayout* vbox = new QVBoxLayout(container);
-      vbox->setMargin(0);
-      vbox->setSpacing(0);
-
-      pqProxyWidget* widget = new pqProxyWidget(proxy, container);
-      widget->setObjectName(iter->GetKey());
-      widget->setApplyChangesImmediately(false);
-      widget->setView(NULL);
-
-      widget->connect(this, SIGNAL(accepted()), SLOT(apply()));
-      widget->connect(this, SIGNAL(rejected()), SLOT(reset()));
-      vbox->addWidget(widget);
-
-      QSpacerItem* spacer = new QSpacerItem(0, 0,QSizePolicy::Fixed,
-        QSizePolicy::MinimumExpanding);
-      vbox->addItem(spacer);
-
-      scrollArea->setWidget(container);
-      // show panel widgets
-      widget->updatePanel();
-
-      int tabIndex = ui.tabWidget->addTab(proxy->GetXMLLabel());
-      int stackIndex = ui.stackedWidget->addWidget(scrollArea);
-      this->Internals->TabToStackedWidgets[tabIndex] = stackIndex;
-
-      this->connect(widget, SIGNAL(changeAvailable()), SLOT(onChangeAvailable()));
-      widget->connect(this, SIGNAL(filterWidgets(bool, QString)), SLOT(filterWidgets(bool, QString)));
+      proxies_to_show.push_back(proxy);
       }
+    }
+
+  // Add color palette.
+  if (vtkSMProxy* proxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette"))
+    {
+    proxies_to_show.push_back(proxy);
+    }
+
+  foreach (vtkSMProxy* proxy, proxies_to_show)
+    {
+    QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea->setObjectName("ScrollArea");
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+
+    QWidget* container = new QWidget(scrollArea);
+    container->setObjectName("Container");
+    container->setContentsMargins(6, 0, 6, 0);
+
+    QVBoxLayout* vbox = new QVBoxLayout(container);
+    vbox->setMargin(0);
+    vbox->setSpacing(0);
+
+    pqProxyWidget* widget = new pqProxyWidget(proxy, container);
+    widget->setObjectName(iter->GetKey());
+    widget->setApplyChangesImmediately(false);
+    widget->setView(NULL);
+
+    widget->connect(this, SIGNAL(accepted()), SLOT(apply()));
+    widget->connect(this, SIGNAL(rejected()), SLOT(reset()));
+    vbox->addWidget(widget);
+
+    QSpacerItem* spacer = new QSpacerItem(0, 0,QSizePolicy::Fixed,
+      QSizePolicy::MinimumExpanding);
+    vbox->addItem(spacer);
+
+    scrollArea->setWidget(container);
+    // show panel widgets
+    widget->updatePanel();
+
+    int tabIndex = ui.tabWidget->addTab(proxy->GetXMLLabel());
+    int stackIndex = ui.stackedWidget->addWidget(scrollArea);
+    this->Internals->TabToStackedWidgets[tabIndex] = stackIndex;
+
+    this->connect(widget, SIGNAL(changeAvailable()), SLOT(onChangeAvailable()));
+    widget->connect(this, SIGNAL(filterWidgets(bool, QString)), SLOT(filterWidgets(bool, QString)));
     }
 
   // Disable some buttons to start
