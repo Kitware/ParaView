@@ -59,10 +59,6 @@ public:
   vtkGetMacro(Caching, bool);
 
   // Description:
-  // Set the cache limit in KBs.
-  void SetCacheLimit(unsigned long kbs);
-
-  // Description:
   // Set the time keeper. Time keeper is used to obtain the information about
   // timesteps. This is required to play animation in "Snap To Timesteps" mode.
   void SetTimeKeeper(vtkSMProxy*);

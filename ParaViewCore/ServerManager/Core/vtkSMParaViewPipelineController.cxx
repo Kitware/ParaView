@@ -426,15 +426,6 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     proxy->Delete();
     }
 
-  // Animation properties.
-  proxy = pxm->NewProxy("misc", "GlobalAnimationProperties");
-  if (proxy)
-    {
-    this->InitializeProxy(proxy);
-    proxy->UpdateVTKObjects();
-    proxy->Delete();
-    }
-
   proxy = pxm->GetProxy("options", "GeneralSettings");
   if (!proxy)
     {
@@ -443,6 +434,19 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
       {
       this->InitializeProxy(proxy);
       pxm->RegisterProxy("options", "GeneralSettings", proxy);
+      proxy->UpdateVTKObjects();
+      proxy->Delete();
+      }
+    }
+
+  proxy = pxm->GetProxy("options", "RenderViewSettings");
+  if (!proxy)
+    {
+    proxy = pxm->NewProxy("options", "RenderViewSettings");
+    if (proxy)
+      {
+      this->InitializeProxy(proxy);
+      pxm->RegisterProxy("options", "RenderViewSettings", proxy);
       proxy->UpdateVTKObjects();
       proxy->Delete();
       }

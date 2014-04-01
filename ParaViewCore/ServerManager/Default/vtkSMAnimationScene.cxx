@@ -323,13 +323,3 @@ void vtkSMAnimationScene::SetFramesPerTimestep(int val)
 {
   this->AnimationPlayer->SetFramesPerTimestep(val);
 }
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationScene::SetCacheLimit(unsigned long kbs)
-{
-  // Note since vtkSMAnimationScene is created on the client alone this will
-  // affect only the client-side setting. To get around this problem, we create
-  // a special "GlobalAnimationProperties" that we use to change this setting on
-  // all processes.
-  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(kbs);
-}

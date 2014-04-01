@@ -74,6 +74,7 @@ set (Module_SRCS
   vtkPVProminentValuesInformation.cxx
   vtkPVRayCastPickingHelper.cxx
   vtkPVRenderView.cxx
+  vtkPVRenderViewSettings.cxx
   vtkPVRepresentedDataInformation.cxx
   vtkPVSelectionInformation.cxx
   vtkPVStreamingPiecesInformation.cxx

@@ -793,15 +793,6 @@ void pqAnimationManager::saveSettings()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationManager::updateApplicationSettings()
-{
-  foreach (QPointer<pqAnimationScene> scene, this->Internals->Scenes.values())
-    {
-    scene->updateApplicationSettings();
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqAnimationManager::onTick(int progress)
 {
   emit this->saveProgress("Saving Animation", progress);

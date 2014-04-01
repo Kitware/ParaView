@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqTimeKeeper.h"
@@ -529,62 +528,4 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
 
   this->setAnimationTime(cueInfo->AnimationTime);
   emit this->tick(progress);
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::updateApplicationSettings()
-{
-  vtkSMSessionProxyManager* pxm = this->getServer()->proxyManager();
-  vtkSMProxy* globalAnimationProperties =
-    pxm->NewProxy("misc", "GlobalAnimationProperties");
-  pqSMAdaptor::setElementProperty(globalAnimationProperties->GetProperty("CacheLimit"),
-    this->getCacheLimitSetting());
-  vtkSMProxy* sceneProxy = this->getProxy();
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Caching"),
-                                  this->getCacheGeometrySetting());
-  sceneProxy->UpdateVTKObjects();
-  globalAnimationProperties->UpdateVTKObjects();
-  globalAnimationProperties->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::setCacheGeometrySetting(bool flag)
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  settings->setValue("Animation/CacheGeometryForAnimations", flag);
-
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  foreach (pqAnimationScene* scene, smmodel->findItems<pqAnimationScene*>())
-    {
-    scene->updateApplicationSettings();
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool pqAnimationScene::getCacheGeometrySetting()
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  return settings->value("Animation/CacheGeometryForAnimations", false).toBool();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::setCacheLimitSetting(int kilobytes)
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  settings->setValue("Animation/CacheLimit", kilobytes);
-
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  foreach (pqAnimationScene* scene, smmodel->findItems<pqAnimationScene*>())
-    {
-    scene->updateApplicationSettings();
-    }
-}
-
-//-----------------------------------------------------------------------------
-int pqAnimationScene::getCacheLimitSetting()
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  return settings->value("Animation/CacheLimit", 100*1024).toInt();
 }

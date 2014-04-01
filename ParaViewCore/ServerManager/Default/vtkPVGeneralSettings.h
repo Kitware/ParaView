@@ -76,7 +76,8 @@ public:
   vtkGetStringMacro(DefaultViewType);
   vtkSetStringMacro(DefaultViewType);
 
-
+  // Description:
+  // Enum for TransferFunctionResetMode
   enum
     {
     GROW_ON_APPLY=0,
@@ -85,11 +86,20 @@ public:
     RESET_ON_APPLY_AND_TIMESTEP=3
     };
 
-
   // Description:
   // Get/Set the transfer function reset mode.
   vtkGetMacro(TransferFunctionResetMode, int);
   vtkSetMacro(TransferFunctionResetMode, int);
+
+  // Description:
+  // Set when animation geometry caching is enabled.
+  void SetCacheGeometryForAnimation(bool val);
+  vtkGetMacro(CacheGeometryForAnimation, bool);
+
+  // Description:
+  // Set the animation cache limit in KBs.
+  void SetAnimationGeometryCacheLimit(unsigned long val);
+  vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
 
 //BTX
 protected:
@@ -100,6 +110,8 @@ protected:
   bool AutoApplyActiveOnly;
   char* DefaultViewType;
   int TransferFunctionResetMode;
+  bool CacheGeometryForAnimation;
+  unsigned long AnimationGeometryCacheLimit;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&); // Not implemented

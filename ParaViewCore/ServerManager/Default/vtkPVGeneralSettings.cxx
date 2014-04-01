@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVGeneralSettings.h"
 
+#include "vtkCacheSizeKeeper.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
@@ -38,7 +39,9 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   : AutoApply(false),
   AutoApplyActiveOnly(false),
   DefaultViewType(NULL),
-  TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY)
+  TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY),
+  CacheGeometryForAnimation(false),
+  AnimationGeometryCacheLimit(0)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -122,6 +125,30 @@ void vtkPVGeneralSettings::SetAutoMPILimit(int val)
 int vtkPVGeneralSettings::GetAutoMPILimit()
 {
   return vtkProcessModuleAutoMPI::NumberOfCores;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetCacheGeometryForAnimation(bool val)
+{
+  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(
+    val? this->AnimationGeometryCacheLimit : 0);
+  if (this->CacheGeometryForAnimation != val)
+    {
+    this->CacheGeometryForAnimation = val;
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
+{
+  vtkCacheSizeKeeper::GetInstance()->SetCacheLimit(
+    this->CacheGeometryForAnimation? val : 0);
+  if (this->AnimationGeometryCacheLimit != val)
+    {
+    this->AnimationGeometryCacheLimit = val;
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------

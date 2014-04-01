@@ -1,5 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="options">
+    <!-- ================================================================== -->
     <Proxy name="GeneralSettings" label="General Settings"
       processes="client|dataserver|renderserver"
       class="vtkPVGeneralSettings">
@@ -142,6 +143,38 @@
         <IntRangeDomain min="1" max="64" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="CacheGeometryForAnimation"
+        command="SetCacheGeometryForAnimation"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          <!--
+          When playing an animation, ParaView can attempt to cache processed geometries
+          to attempt to speed up animation play back in a loop by avoiding I/O and data
+          processing. Set whether caching should be use, when possible.
+          -->
+          Enable caching of geometry in an attempt to speed up animation playback in a loop.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AnimationGeometryCacheLimit"
+        command="SetAnimationGeometryCacheLimit"
+        number_of_elements="1"
+        default_values="102400">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          When caching of geometry for animations is enabled, limit the maximum cache size
+          for the geometry on any rank. Caching will automatically be disabled if the cache
+          exceed this limit on any rank, specified in kilobytes (KB).
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="CacheGeometryForAnimation" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
       <PropertyGroup label="General Options">
         <Property name="ShowSplashScreen" />
         <Property name="CrashRecovery" />
@@ -172,6 +205,237 @@
         </Documentation>
         <Property name="EnableAutoMPI" />
         <Property name="AutoMPILimit" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Animation">
+        <Property name="CacheGeometryForAnimation" />
+        <Property name="AnimationGeometryCacheLimit" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="RenderViewSettings" label="Render View"
+      processes="client|dataserver|renderserver"
+      class="vtkPVRenderViewSettings">
+      <Documentation>
+        Application settings for render views.
+      </Documentation>
+
+      <IntVectorProperty name="UseDisplayLists"
+        command="SetUseDisplayLists"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable use of display lists when rendering surface meshes.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ResolveCoincidentTopology"
+        command="SetResolveCoincidentTopology"
+        number_of_elements="1"
+        default_values="3">
+        <Documentation>
+          Set the mode to use to overcome the OpenGL rendering issue when faces
+          coincide with lines and points.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Do nothing" value="0" />
+          <Entry text="Offset faces relative to lines and points" value="1" />
+          <Entry text="Offset lines and points relative to faces" value="2" />
+          <Entry text="Shift z-buffer when rendering lines and points" value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="PolygonOffsetParameters"
+        command="SetPolygonOffsetParameters"
+        number_of_elements="2"
+        default_values="1.0 1.0">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the polygon offset parameters. Refer to the OpenGL manual,
+          glPolygonOffset for details on how to use these parameters.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ZShift"
+        command="SetZShift"
+        number_of_elements="1"
+        default_values="0.002">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the fraction by which to shift the z-buffer range when rendering
+          lines and points.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="DepthPeeling"
+        default_values="1"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable depth-peeling to correctly render translucent polygons. May slow down
+          rendering performance.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaximumNumberOfPeels"
+        default_values="4"
+        number_of_elements="1">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Set the maximum number of peels to use when depth peeling is employed.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DepthPeeling" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="LODThreshold"
+        default_values="5.0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0.0" max="102400.0" />
+        <Documentation>
+          Set the data size (in megabytes) beyond which to employ decimation,
+          if possible, to speed renders when interacting. 0 implies the use of
+          decimation for all interactive renders.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="LODResolution"
+        default_values="0.5"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+        <Documentation>
+          Set the factor used to compute the decimated geometry when employed.
+          0 implies minimal decimation (highest detail, hence more polygons that 1.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseOutlineForLODRendering" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="NonInteractiveRenderDelay"
+        default_values="0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          If decimated geometry was used for rendering during interaction, set the delay
+          (in seconds) before doing a full resolution render when the interaction
+          is finished.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseOutlineForLODRendering"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use outline, instead of decimated geometry when interacting, if applicable.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="RemoteRenderThreshold"
+                            default_values="20.0"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0" max="102400" name="range" />
+        <Documentation>
+          Set the data size (in megabytes) beyond which to render data remotely
+          (or in parallel) when connected to parallel rendering capable server. In that case
+          the rendered images are delivered to the client. Otherwise, the geometry is delivered
+          to the client and rendering happens locally.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="StillRenderImageReductionFactor"
+                         default_values="1"
+                         number_of_elements="1">
+        <IntRangeDomain max="20" min="1" name="range" />
+        <Documentation>
+          Set the sub-sampling factor to use for non-interactive rendering.
+          When rendering on large tiles (or multiple tiles),
+          sub-sampling will help improve image compositing performance. This has no effect
+          if remote/parallel rendering is not being used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ImageReductionFactor"
+                         default_values="2"
+                         number_of_elements="1">
+        <IntRangeDomain max="20" min="1" name="range" />
+        <Documentation>
+          To reduce image compositing costs during interactions, set the
+          image sub-sampling factor. Set to 1 to not use any subsampling.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CompressorConfig"
+        default_values="vtkSquirtCompressor 0 3"
+        number_of_elements="1">
+        <Documentation>
+          Set the compression method used when transferring rendered images from
+          the server to the client.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="OutlineThreshold"
+        default_values="250"
+        number_of_elements="1">
+        <IntRangeDomain name="range" min="0" max="500" />
+        <Documentation>
+          When opening a dataset or creating a new filters, use Outline representation,
+          if possible, when showing datasets with number of cells greater than thus
+          threshold (in millions).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseOffscreenRenderingForScreenshots"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether offscreen rendering should be used
+        when saving screenshots or animations.</Documentation>
+      </IntVectorProperty>
+
+      <PropertyGroup label="Geometry Mapper Options">
+        <Property name="UseDisplayLists" />
+        <Property name="ResolveCoincidentTopology" />
+        <Property name="PolygonOffsetParameters" />
+        <Property name="ZShift" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Translucent Rendering Options">
+        <Property name="DepthPeeling" />
+        <Property name="MaximumNumberOfPeels" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Interactive Rendering Options">
+        <Property name="LODThreshold" />
+        <Property name="LODResolution" />
+        <Property name="NonInteractiveRenderDelay" />
+        <Property name="UseOutlineForLODRendering" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Remote/Parallel Rendering Options">
+        <Property name="RemoteRenderThreshold" />
+        <Property name="StillRenderImageReductionFactor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Client/Server Rendering Options">
+        <PropertyGroup name="ImageReductionFactor" />
+        <PropertyGroup name="CompressorConfig" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Miscellaneous">
+        <PropertyGroup name="OutlineThreshold" />
+        <PropertyGroup name="UseOffscreenRenderingForScreenshots" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />

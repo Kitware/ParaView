@@ -349,10 +349,10 @@ void pqApplicationOptions::applyChanges()
   settings->setValue("GlobalProperties/EdgeColor",
     this->Internal->EdgeColor->chosenColor());
 
-  pqAnimationScene::setCacheGeometrySetting(
-                           this->Internal->AnimationCacheGeometry->isChecked());
-  pqAnimationScene::setCacheLimitSetting(
-                                  this->Internal->AnimationCacheLimit->value());
+  //pqAnimationScene::setCacheGeometrySetting(
+  //                         this->Internal->AnimationCacheGeometry->isChecked());
+  //pqAnimationScene::setCacheLimitSetting(
+  //                                this->Internal->AnimationCacheLimit->value());
 
   // FIXME: pqChartRepresentation is being deprecated.
   //QStringList hidden;
@@ -437,10 +437,10 @@ void pqApplicationOptions::resetChanges()
     settings->value("GlobalProperties/EdgeColor",
       QColor::fromRgbF(0, 0, 0.5)).value<QColor>());
 
-  this->Internal->AnimationCacheGeometry->setChecked(
-                                   pqAnimationScene::getCacheGeometrySetting());
-  this->Internal->AnimationCacheLimit->setValue(
-                                      pqAnimationScene::getCacheLimitSetting());
+//  this->Internal->AnimationCacheGeometry->setChecked(
+//                                   pqAnimationScene::getCacheGeometrySetting());
+//  this->Internal->AnimationCacheLimit->setValue(
+//                                      pqAnimationScene::getCacheLimitSetting());
 
   while (this->Internal->ChartHiddenSeries->count() > 0)
     {
