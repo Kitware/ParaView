@@ -78,6 +78,14 @@ class pqBackgroundEditorWidget::pqInternal : public Ui::BackgroundEditorWidget
     this->mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->mainLayout->setSpacing(
       pqPropertiesPanel::suggestedVerticalSpacing());
+    this->page1Layout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->page1Layout->setHorizontalSpacing(
+      pqPropertiesPanel::suggestedHorizontalSpacing());
+    this->page1Layout->setVerticalSpacing(
+      pqPropertiesPanel::suggestedVerticalSpacing());
+    this->page3Layout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->page3Layout->setSpacing(
+      pqPropertiesPanel::suggestedVerticalSpacing());
   }
 };
 
