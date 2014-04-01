@@ -696,14 +696,8 @@ bool vtkSMSettings::LoadSettings()
       (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
        pm->GetPartitionId() == 0))
     {
-    if (!settings->LoadSiteSettings())
-      {
-      return false;
-      }
-    if (!settings->LoadUserSettings())
-      {
-      return false;
-      }
+    settings->LoadSiteSettings();
+    settings->LoadUserSettings();
     }
   if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
       pm->GetSymmetricMPIMode())
@@ -1091,32 +1085,45 @@ void vtkSMSettings::SetSettingDescription(const char* settingName, const char* d
 }
 
 //----------------------------------------------------------------------------
-std::string vtkSMSettings::GetUserSettingsFilePath()
+std::string vtkSMSettings::GetSettingsFilePathRoot()
 {
   // Not sure where this should go. For now, read a file from user directory
 #if defined(WIN32)
-  std::string fileName(getenv("USERPROFILE"));
-  std::string separator("\\");
-#else
-  std::string fileName(getenv("HOME"));
-  std::string separator("/");
-#endif
-
-  if (fileName.size() > 0)
+  const char* appData = getenv("APPDATA");
+  if (!appData)
     {
-    if (fileName[fileName.size()-1] != separator[0])
-      {
-      fileName.append(separator);
-      }
+    return std::string();
     }
-  else
+  std::string separator("\\");
+  std::string fileName(appData);
+  if (fileName[fileName.size()-1] != separator[0])
     {
-    // Might want to return false here instead of trying the root
-    // directory.
     fileName.append(separator);
     }
+  fileName += "ParaView" + separator;
+#else
+  const char* home = getenv("HOME");
+  if (!home)
+    {
+    return std::string();
+    }
+  std::string separator("/");
+  std::string fileName(home);
+  if (fileName[fileName.size()-1] != separator[0])
+    {
+    fileName.append(separator);
+    }
+  fileName += ".config" + separator + "ParaView" + separator;
+#endif
 
-  fileName.append(".pvsettings.js");
+  return fileName;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSettings::GetUserSettingsFilePath()
+{
+  std::string fileName(this->GetSettingsFilePathRoot());
+  fileName.append("Settings.json");
 
   return fileName;
 }
@@ -1124,30 +1131,9 @@ std::string vtkSMSettings::GetUserSettingsFilePath()
 //----------------------------------------------------------------------------
 std::string vtkSMSettings::GetSiteSettingsFilePath()
 {
-  // Not sure where this should go. For now, read a file from user directory
-#if defined(WIN32)
-  std::string fileName(getenv("USERPROFILE"));
-  std::string separator("\\");
-#else
-  std::string fileName(getenv("HOME"));
-  std::string separator("/");
-#endif
-
-  if (fileName.size() > 0)
-    {
-    if (fileName[fileName.size()-1] != separator[0])
-      {
-      fileName.append(separator);
-      }
-    }
-  else
-    {
-    // Might want to return false here instead of trying the root
-    // directory.
-    fileName.append(separator);
-    }
-
-  fileName.append(".pvsitesettings.js");
+  // FIXME - hmm, site settings will probably be somewhere else
+  std::string fileName(this->GetSettingsFilePathRoot());
+  fileName.append("SiteSettings.json");
 
   return fileName;
 }

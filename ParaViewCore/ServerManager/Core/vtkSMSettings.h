@@ -146,6 +146,10 @@ protected:
   virtual ~vtkSMSettings();
 
   // Description:
+  // Get the path to the root of the settings files
+  std::string GetSettingsFilePathRoot();
+
+  // Description:
   // Get the path to the user settings file
   std::string GetUserSettingsFilePath();
 
