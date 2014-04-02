@@ -97,8 +97,8 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 {
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.setupUi(this);
-  ui.tabWidget->setDocumentMode(true);
-  ui.tabWidget->setDrawBase(true);
+  ui.tabWidget->setDocumentMode(false);
+  ui.tabWidget->setDrawBase(false);
   ui.tabWidget->setExpanding(false);
 
   // Setup configuration defaults using settings.
