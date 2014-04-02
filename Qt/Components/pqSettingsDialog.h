@@ -72,6 +72,11 @@ private:
   Q_DISABLE_COPY(pqSettingsDialog);
   class pqInternals;
   pqInternals* Internals;
+
+  /// Set to true if a setting that requires a restart to take effect
+  /// is modified. Made static to persist across instantiations of
+  /// this class.
+  static bool ShowRestartRequired;
 };
 
 #endif

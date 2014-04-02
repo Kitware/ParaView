@@ -90,6 +90,8 @@ public:
   QMap<int, int> TabToStackedWidgets;
 };
 
+bool pqSettingsDialog::ShowRestartRequired = false;
+
 //-----------------------------------------------------------------------------
 pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f),
@@ -102,7 +104,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   ui.tabWidget->setExpanding(false);
 
   // Hide restart message
-  ui.restartRequiredLabel->setVisible(false);
+  ui.restartRequiredLabel->setVisible(pqSettingsDialog::ShowRestartRequired);
 
   // Setup configuration defaults using settings.
   pqSettings *settings = pqApplicationCore::instance()->settings();
@@ -323,6 +325,7 @@ void pqSettingsDialog::showRestartRequiredMessage()
 {
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.restartRequiredLabel->setVisible(true);
+  pqSettingsDialog::ShowRestartRequired = true;
 }
 
 //-----------------------------------------------------------------------------
