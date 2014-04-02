@@ -95,6 +95,10 @@ signals:
   /// change. changeAvailable() is always fired before changeFinished().
   void changeFinished();
 
+  /// Indicates that a restart of the program is required for the setting
+  /// to take effect.
+  void restartRequired();
+
 public slots:
   /// Updates the property widgets shown based on the filterText or
   /// show_advanced flag. Calling filterWidgets() without any arguments will

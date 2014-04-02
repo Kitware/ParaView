@@ -58,6 +58,7 @@ private slots:
 
   void onTabIndexChanged(int index);
   void onChangeAvailable();
+  void showRestartRequiredMessage();
 
   void filterPanelWidgets();
 

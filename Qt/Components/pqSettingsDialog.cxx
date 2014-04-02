@@ -101,6 +101,9 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   ui.tabWidget->setDrawBase(false);
   ui.tabWidget->setExpanding(false);
 
+  // Hide restart message
+  ui.restartRequiredLabel->setVisible(false);
+
   // Setup configuration defaults using settings.
   pqSettings *settings = pqApplicationCore::instance()->settings();
   if (settings)
@@ -156,6 +159,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 
     widget->connect(this, SIGNAL(accepted()), SLOT(apply()));
     widget->connect(this, SIGNAL(rejected()), SLOT(reset()));
+    this->connect(widget, SIGNAL(restartRequired()), SLOT(showRestartRequiredMessage()));
     vbox->addWidget(widget);
 
     QSpacerItem* spacer = new QSpacerItem(0, 0,QSizePolicy::Fixed,
@@ -312,6 +316,13 @@ void pqSettingsDialog::onChangeAvailable()
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(true);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+void pqSettingsDialog::showRestartRequiredMessage()
+{
+  Ui::SettingsDialog &ui = this->Internals->Ui;
+  ui.restartRequiredLabel->setVisible(true);
 }
 
 //-----------------------------------------------------------------------------

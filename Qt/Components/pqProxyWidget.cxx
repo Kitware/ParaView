@@ -784,6 +784,8 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
       this, SIGNAL(changeAvailable()));
     QObject::connect(item->propertyWidget(), SIGNAL(changeFinished()),
       this, SIGNAL(changeFinished()));
+    QObject::connect(item->propertyWidget(), SIGNAL(restartRequired()),
+      this, SIGNAL(restartRequired()));
     }
 }
 

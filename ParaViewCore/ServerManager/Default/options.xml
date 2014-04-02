@@ -17,6 +17,7 @@
         <BooleanDomain name="bool" />
         <Hints>
           <SaveInQSettings />
+	  <RestartRequired />
         </Hints>
       </IntVectorProperty>
 
@@ -44,6 +45,9 @@
           <String value="None" />
           <String value="RenderView" />
         </StringListDomain>
+	<Hints>
+	  <RestartRequired />
+	</Hints>
       </StringVectorProperty>
 
       <IntVectorProperty name="AutoApply"
@@ -133,6 +137,9 @@
           Enable multicore support for data processing.
         </Documentation>
         <BooleanDomain name="bool" />
+	<Hints>
+	  <RestartRequired />
+	</Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="AutoMPILimit"
@@ -144,6 +151,9 @@
           Limit maximum number of cores to
         </Documentation>
         <IntRangeDomain min="1" max="64" />
+	<Hints>
+	  <RestartRequired />
+	</Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="CacheGeometryForAnimation"

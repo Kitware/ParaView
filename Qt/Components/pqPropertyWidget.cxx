@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
@@ -125,6 +126,12 @@ void pqPropertyWidget::setProperty(vtkSMProperty *smproperty)
     doc = doc.replace(QRegExp("\\s+")," ");
     this->setToolTip(
       QString("<html><head/><body><p align=\"justify\">%1</p></body></html>").arg(doc));
+    }
+
+  if ((smproperty->GetHints() &&
+       smproperty->GetHints()->FindNestedElementByName("RestartRequired")))
+    {
+    this->connect(this, SIGNAL(changeAvailable()), SIGNAL(restartRequired()));
     }
 }
 
