@@ -13,12 +13,11 @@
 =========================================================================*/
 #include "vtkSMSettings.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-
 #include "vtkMultiProcessController.h"
-#include "vtkPVSession.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVSession.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
@@ -572,7 +571,8 @@ public:
     Json::Path valuePath(settingCString);
     Json::Value & proxyValue = valuePath.make(this->UserSettingsJSONRoot);
 
-    vtkSMPropertyIterator * iter = proxy->NewPropertyIterator();
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(proxy->NewPropertyIterator());
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
       vtkSMProperty* property = iter->GetProperty();
