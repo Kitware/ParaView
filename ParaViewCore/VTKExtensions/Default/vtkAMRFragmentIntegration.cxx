@@ -266,7 +266,8 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       if (regionId->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
         {
         vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
-        if (fragId > fragIdArray->GetNumberOfTuples ()) 
+        std::map<vtkIdType, int>::iterator loc = fragIndices.find (fragId);
+        if (loc == fragIndices.end ())
           {
           vtkErrorMacro (<< "Invalid Region Id " << fragId);
           }
@@ -303,84 +304,157 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     myProc = controller->GetLocalProcessId ();
     numProcs = controller->GetNumberOfProcesses ();
 
-/*
-    vtkIdTypeArray *copyFragId;
-    vtkDoubleArray *copyFragVolume;
-    vtkDoubleArray *copyFragMass;
-    if (myProc == 0)
-      {
-      copyFragId = vtkIdTypeArray::New ();
-      copyFragId->DeepCopy (fragIdArray);
-      copyFragVolume = vtkDoubleArray::New ();
-      copyFragVolume->DeepCopy (fragVolume);
-      copyFragMass = vtkDoubleArray::New ();
-      copyFragMass->DeepCopy (fragMass);
-      }
-    else
-      {
-      copyFragId = fragIdArray;
-      copyFragVolume = fragVolume;
-      copyFragMass = fragMass;
-      }
-    
-    controller->Reduce (copyFragId, fragIdArray, vtkCommunicator::MAX_OP, 0);
-    controller->Reduce (copyFragVolume, fragVolume, vtkCommunicator::SUM_OP, 0);
-    controller->Reduce (copyFragMass, fragMass, vtkCommunicator::SUM_OP, 0);
+std::cerr << "a\n";
+    vtkIdTypeArray *fragIndicesReceive = vtkIdTypeArray::New ();
+    fragIndicesReceive->SetNumberOfComponents (2);
 
-    if (myProc == 0)
+    vtkDoubleArray *fragVolumeReceive = vtkDoubleArray::New ();
+    fragVolumeReceive->SetNumberOfComponents (1);
+    fragVolumeReceive->SetNumberOfTuples (totalFragments + 1);
+
+    vtkDoubleArray *fragMassReceive = vtkDoubleArray::New ();
+    fragMassReceive->SetNumberOfComponents (1);
+    fragMassReceive->SetNumberOfTuples (totalFragments + 1);
+
+std::cerr << "b\n";
+    vtkDoubleArray** volWeightReceive = new vtkDoubleArray*[volumeWeightedNames.size ()];
+    for (int v = 0; v < volumeWeightedNames.size (); v ++)
       {
-      copyFragId->Delete ();
-      copyFragVolume->Delete ();
-      copyFragMass->Delete ();
+      volWeightReceive[v] = vtkDoubleArray::New ();
+      volWeightReceive[v]->SetNumberOfComponents (1);
+      volWeightReceive[v]->SetNumberOfTuples (totalFragments + 1);
       }
 
-    for (int v = 0; v < volumeWeightedNames.size (); v ++) 
+    vtkDoubleArray** massWeightReceive = new vtkDoubleArray*[massWeightedNames.size ()];
+    for (int m = 0; m < massWeightedNames.size (); m ++)
       {
-      vtkDoubleArray *copyVolWeight;
-      if (myProc == 0)
-        {
-        copyVolWeight = vtkDoubleArray::New ();
-        copyVolWeight->DeepCopy (volWeightArrays[v]);
-        }
-      else
-        {
-        copyVolWeight = volWeightArrays[v];
-        }
-      controller->Reduce (copyVolWeight, volWeightArrays[v], vtkCommunicator::SUM_OP, 0);
-
-      if (myProc == 0)
-        {
-        copyVolWeight->Delete ();
-        }
+      massWeightReceive[m] = vtkDoubleArray::New ();
+      massWeightReceive[m]->SetNumberOfComponents (1);
+      massWeightReceive[m]->SetNumberOfTuples (totalFragments + 1);
       }
 
-    for (int m = 0; m < massWeightedNames.size (); m ++) 
+    int tag = 398728574;
+    int pivot = (numProcs > 1 ? (numProcs + 1) / 2 : 0);
+    while (pivot > 0 && myProc < (pivot * 2))
       {
-      vtkDoubleArray *copyMassWeight;
-      if (myProc == 0)
+      if (myProc >= pivot) 
         {
-        copyMassWeight = vtkDoubleArray::New ();
-        copyMassWeight->DeepCopy (massWeightArrays[m]);
+std::cerr << "c.1\n";
+        int tuples = fragIndices.size ();
+        vtkIdTypeArray *fragIndicesArray = vtkIdTypeArray::New ();
+        fragIndicesArray->SetNumberOfComponents (2);
+        fragIndicesArray->SetNumberOfTuples (tuples);
+
+        std::map<vtkIdType, int>::iterator iter;
+        int ind = 0;
+        for (iter = fragIndices.begin (); iter != fragIndices.end (); iter ++)
+          {
+          fragIndicesArray->SetComponent (ind, 0, iter->first);
+          fragIndicesArray->SetComponent (ind, 1, iter->second);
+          ind ++;
         }
-      else
+
+        cerr << "myProc " << myProc << " sending to " << (myProc - pivot) << " tag " << (tag + pivot) << endl;
+
+        controller->Send (&tuples, 1, myProc - pivot, tag + pivot + 0);
+        controller->Send (fragIndicesArray, myProc - pivot, tag + pivot + 1);
+        controller->Send (fragVolume, myProc - pivot, tag + pivot + 2);
+        controller->Send (fragMass, myProc - pivot, tag + pivot + 3);
+
+        int off = 4;
+        for (int v = 0; v < volumeWeightedNames.size (); v ++)
+          {
+          controller->Send (volWeightArrays[v], myProc - pivot, tag + pivot + off);
+          off ++;
+          } 
+
+        for (int m = 0; m < massWeightedNames.size (); m ++)
+          {
+          controller->Send (massWeightArrays[m], myProc - pivot, tag + pivot + off);
+          off ++;
+          }
+
+        fragIndicesArray->Delete ();
+        }
+      else /* if ((myProc + pivot) < numProcs) */
         {
-        copyMassWeight = massWeightArrays[m];
+std::cerr << "c.2\n";
+        cerr << "myProc " << myProc << " receiving from " << (myProc + pivot) << " tag " << (tag + pivot) << endl;
+
+        int tuples = 0;
+        controller->Receive (&tuples, 1, myProc + pivot, tag + pivot + 0);
+        fragIndicesReceive->SetNumberOfTuples (tuples);
+        controller->Receive (fragIndicesReceive, myProc + pivot, tag + pivot + 1);
+        controller->Receive (fragVolumeReceive, myProc + pivot, tag + pivot + 2);
+        controller->Receive (fragMassReceive, myProc + pivot, tag + pivot + 3);
+
+        int off = 4;
+        for (int v = 0; v < volumeWeightedNames.size (); v ++)
+          {
+          controller->Receive (volWeightReceive[v], myProc + pivot, tag + pivot + off);
+          off ++;
+          } 
+
+        for (int m = 0; m < massWeightedNames.size (); m ++)
+          {
+          controller->Receive (massWeightReceive[m], myProc + pivot, tag + pivot + off);
+          off ++;
+          }
+
+        for (int i = 0; i < fragIndicesReceive->GetNumberOfTuples (); i ++) 
+          {
+          int fragId = fragIndicesReceive->GetComponent (i, 0);
+          int remoteIndex = fragIndicesReceive->GetComponent (i, 1);
+          std::map<vtkIdType, int>::iterator loc = fragIndices.find (fragId);
+          if (loc == fragIndices.end ())
+            {
+            int index = fragIndices.size ();
+            fragIndices[fragId] = index;
+            }
+          int index = fragIndices[fragId];
+          fragIdArray->SetTuple1 (index, fragId);
+          fragVolume->SetTuple1 (index, 
+            fragVolume->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
+          fragMass->SetTuple1 (index, 
+            fragMass->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
+          for (int v = 0; v < volumeWeightedNames.size (); v ++)
+            {
+            double value = volWeightArrays[v]->GetTuple1 (index);
+            volWeightArrays[v]->SetTuple1 (index, 
+              volWeightArrays[v]->GetTuple1 (index) + volWeightReceive[v]->GetTuple1 (remoteIndex));
+            }
+          for (int m = 0; m < massWeightedNames.size (); m ++)
+            {
+            massWeightArrays[m]->SetTuple1 (index, 
+              massWeightArrays[m]->GetTuple1 (index) + massWeightReceive[m]->GetTuple1 (remoteIndex));
+            }
+          }
         }
-      controller->Reduce (copyMassWeight, massWeightArrays[m], vtkCommunicator::SUM_OP, 0);
-      if (myProc == 0)
-        {
-        copyMassWeight->Delete ();
-        }
+      pivot /= 2;
       }
 
-    else 
+std::cerr << "d\n";
+    fragIndicesReceive->Delete ();
+    fragVolumeReceive->Delete ();
+    fragMassReceive->Delete ();
+
+std::cerr << "e\n";
+    for (int v = 0; v < volumeWeightedNames.size (); v ++)
       {
-      // it's all on process 0 now.
-      fragments->SetNumberOfRows (0);
+      volWeightReceive[v]->Delete ();
       }
-*/
+
+    for (int m = 0; m < massWeightedNames.size (); m ++)
+      {
+      massWeightReceive[m]->Delete ();
+      }
+
+std::cerr << "f\n";
+    delete [] volWeightReceive;
+    delete [] massWeightReceive;
     }
 
+std::cerr << "f\n";
   if (myProc == 0)
     {
     int row = 0;
@@ -406,6 +480,10 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
         row ++;
         }
       }
+    }
+  else
+    {
+    fragments->SetNumberOfRows (0);
     }
   vtkTimerLog::MarkEndEvent ("Combining integration");
 
