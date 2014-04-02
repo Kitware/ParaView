@@ -57,6 +57,7 @@ public:
   /// \li \c command_button : pqCommandButtonPropertyWidget
   /// \li \c display_representation_selector : pqDisplayRepresentationPropertyWidget
   /// \li \c double_range : pqDoubleRangeSliderPropertyWidget
+  /// \li \c image_compressor_config : pqImageCompressorWidget
   /// \li \c list : pqListPropertyWidget
   /// \li \c texture_selector : pqTextureSelectorPropertyWidget
   /// \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget

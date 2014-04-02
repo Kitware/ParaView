@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
 #include "pqFontPropertyWidget.h"
+#include "pqImageCompressorWidget.h"
 #include "pqInputDataTypeDecorator.h"
 #include "pqLightsEditor.h"
 #include "pqListPropertyWidget.h"
@@ -116,6 +117,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   else if (name == "double_range")
     {
     return new pqDoubleRangeSliderPropertyWidget(smProxy, smProperty);
+    }
+  else if (name == "image_compressor_config")
+    {
+    return new pqImageCompressorWidget(smProxy, smProperty);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;

@@ -403,7 +403,8 @@
       <StringVectorProperty name="CompressorConfig"
         default_values="vtkSquirtCompressor 0 3"
         number_of_elements="1"
-        panel_visibility="advanced">
+        panel_visibility="advanced"
+        panel_widget="image_compressor_config">
         <Documentation>
           Set the compression method used when transferring rendered images from
           the server to the client.

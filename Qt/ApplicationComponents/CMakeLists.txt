@@ -131,6 +131,8 @@ set (Module_SRCS
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
+  pqImageCompressorWidget.cxx
+  pqImageCompressorWidget.h
   pqInputDataTypeDecorator.cxx
   pqInputDataTypeDecorator.h
   pqLightsEditor.cxx
@@ -297,6 +299,7 @@ set (Module_MOC_HDRS
   pqFontPropertyWidget.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
+  pqImageCompressorWidget.h
   pqInputDataTypeDecorator.h
   pqLightsEditor.h
   pqListPropertyWidget.h
@@ -382,6 +385,7 @@ set (Module_UI_FILES
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqFontPropertyWidget.ui
+  Resources/UI/pqImageCompressorWidget.ui
   Resources/UI/pqLightsEditor.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
