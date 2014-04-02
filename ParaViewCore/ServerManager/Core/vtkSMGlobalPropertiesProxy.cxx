@@ -305,6 +305,11 @@ int vtkSMGlobalPropertiesProxy::LoadXMLState(
     return 0;
     }
 
+  if (!locator)
+    {
+    return 1;
+    }
+
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
