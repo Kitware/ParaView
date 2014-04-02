@@ -719,13 +719,17 @@ const char* vtkPVRenderViewForAssembly::GetRepresentationCodes()
 //----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::WriteImage()
 {
+  if(this->CompositeDirectory == NULL || !this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
+    return;
+    }
   this->Internal->WriteImage();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderViewForAssembly::WriteComposite()
 {
-  if(this->CompositeDirectory == NULL)
+  if(this->CompositeDirectory == NULL || !this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
     return;
     }
