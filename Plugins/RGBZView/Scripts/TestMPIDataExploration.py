@@ -44,7 +44,7 @@ description = "contour set"
 analysis.register_analysis(id, title, description, '{theta}/{phi}/{filename}', wx.CompositeImageExporter.get_data_type())
 fng = analysis.get_file_name_generator(id)
 
-camera_handler = wx.ThreeSixtyCameraHandler(fng, None, [ float(r) for r in range(0, 360, 15)], [ float(r) for r in range(-60, 61, 15)], center_of_rotation, rotation_axis, distance)
+camera_handler = wx.ThreeSixtyCameraHandler(fng, None, [ float(r) for r in range(0, 360, 45)], [ float(r) for r in range(-60, 61, 45)], center_of_rotation, rotation_axis, distance)
 
 # Data exploration ------------------------------------------------------------
 

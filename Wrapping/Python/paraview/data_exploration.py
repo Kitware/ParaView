@@ -249,6 +249,9 @@ class FileNameGenerator():
                 self.cost['images'] = self.cost['images'] + 1
             self.cost['space'] += os.stat(filePath).st_size
 
+    def add_image_width(self, width):
+        self.cost['image-width'] = width
+
     def add_time_cost(self, ts):
         self.cost['time'] += ts
 
@@ -510,6 +513,7 @@ class SliceExplorer():
 
         # Update file name pattern
         self.file_name_generator = file_name_generator
+        self.file_name_generator.add_image_width(view.ViewSize[0])
 
     @staticmethod
     def list_arguments():
@@ -677,6 +681,8 @@ class ImageResampler():
             self.resampler.CustomSamplingBounds = custom_probing_bounds
         field = array_colors.keys()[0]
         self.color = simple.ColorByArray(Input=self.resampler, LookupTable=array_colors[field]['lut'], RGBANaNColor=nanColor, ColorBy=field )
+
+        self.file_name_generator.add_image_width(sampling_dimesions[0])
 
     @staticmethod
     def list_arguments():
@@ -1086,6 +1092,7 @@ class CompositeImageExporter():
 
         self.file_name_generator.add_meta_data('pipeline', pipeline)
         self.file_name_generator.add_meta_data('dimensions', view_size)
+        self.file_name_generator.add_image_width(view_size[0])
 
         # Add the name of both generated files
         self.file_name_generator.update_active_arguments(filename='rgb.jpg')
@@ -1246,6 +1253,8 @@ class ThreeSixtyImageStackExporter():
             self.offset = (self.phi_rotation_axis.index(1) + 1 ) % 3
         except ValueError:
             raise Exception("Rotation axis not supported", self.phi_rotation_axis)
+
+        self.file_name_generator.add_image_width(view_proxy.ViewSize[0])
 
     @staticmethod
     def list_arguments():
