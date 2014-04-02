@@ -16,8 +16,9 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkPVRenderViewSettings.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMRepresentationTypeDomain);
 //----------------------------------------------------------------------------
@@ -64,7 +65,8 @@ int vtkSMRepresentationTypeDomain::SetDefaultValues(vtkSMProperty* property)
 
   // if number of cells > user-specified threshold, render as outline by
   // default.
-  int numCells = 1e6; // FIXME: use settings.
+  vtkIdType numCells =
+    vtkPVRenderViewSettings::GetInstance()->GetOutlineThreshold() * 1e6;
   if (info->GetNumberOfCells() >= numCells &&
       this->IsInDomain("Outline", temp))
     {

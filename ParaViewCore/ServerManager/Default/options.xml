@@ -428,7 +428,8 @@
 
       <IntVectorProperty name="OutlineThreshold"
         default_values="250"
-        number_of_elements="1">
+        number_of_elements="1"
+        command="SetOutlineThreshold">
         <IntRangeDomain name="range" min="0" max="500" />
         <Documentation>
           When opening a dataset or creating a new filters, use Outline representation,

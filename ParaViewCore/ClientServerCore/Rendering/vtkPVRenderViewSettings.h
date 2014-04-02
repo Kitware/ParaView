@@ -56,11 +56,18 @@ public:
   void SetPolygonOffsetParameters(double factor, double units);
   void SetZShift(double a);
 
+  // Description:
+  // Set the number of cells (in millions) when the representations show try to
+  // use outline by default.
+  vtkSetMacro(OutlineThreshold, vtkIdType);
+  vtkGetMacro(OutlineThreshold, vtkIdType);
+
 //BTX
 protected:
   vtkPVRenderViewSettings();
   ~vtkPVRenderViewSettings();
 
+  vtkIdType OutlineThreshold;
 private:
   vtkPVRenderViewSettings(const vtkPVRenderViewSettings&); // Not implemented
   void operator=(const vtkPVRenderViewSettings&); // Not implemented

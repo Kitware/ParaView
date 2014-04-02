@@ -29,93 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqPipelineRepresentation.cxx
-/// \date 4/24/2006
-
 #include "pqPipelineRepresentation.h"
 
-
-// ParaView Server Manager includes.
-#include "vtkCommand.h"
-#include "vtkDataObject.h"
-#include "vtkGeometryRepresentation.h"
-#include "vtkMath.h"
-#include "vtkProcessModule.h"
-#include "vtkProperty.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVTemporalDataInformation.h"
-#include "vtkScalarsToColors.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMTransferFunctionProxy.h"
-
-// Qt includes.
-#include <QList>
-#include <QPair>
-#include <QPointer>
-#include <QRegExp>
-#include <QtDebug>
-
-// ParaView includes.
-#include "pqApplicationCore.h"
-#include "pqDisplayPolicy.h"
-#include "pqObjectBuilder.h"
-#include "pqOutputPort.h"
-#include "pqPipelineFilter.h"
-#include "pqPipelineSource.h"
-#include "pqRenderView.h"
-#include "pqScalarsToColors.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqSettings.h"
-#include "pqSMAdaptor.h"
-#include "pqUndoStack.h"
-
-//-----------------------------------------------------------------------------
-class pqPipelineRepresentation::pqInternal
-{
-public:
-  vtkSmartPointer<vtkSMRepresentationProxy> RepresentationProxy;
-
-  pqInternal()
-    {
-    }
-
-  static vtkPVArrayInformation* getArrayInformation(const pqPipelineRepresentation* repr,
-    const char* arrayname, int fieldType)
-    {
-    if (!arrayname || !arrayname[0] || !repr)
-      {
-      return NULL;
-      }
-
-    vtkPVDataInformation* dataInformation = repr->getInputDataInformation();
-    vtkPVArrayInformation* arrayInfo = NULL;
-    if (dataInformation)
-      {
-      arrayInfo = dataInformation->GetAttributeInformation(fieldType)->
-        GetArrayInformation(arrayname);
-      }
-    if (!arrayInfo)
-      {
-      dataInformation = repr->getRepresentedDataInformation();
-      if (dataInformation)
-        {
-        arrayInfo = dataInformation->GetAttributeInformation(fieldType)->
-          GetArrayInformation(arrayname);
-        }
-      }
-    return arrayInfo;
-    }
-
-};
 
 //-----------------------------------------------------------------------------
 pqPipelineRepresentation::pqPipelineRepresentation(
@@ -125,29 +41,17 @@ pqPipelineRepresentation::pqPipelineRepresentation(
   pqServer* server, QObject* p/*=null*/):
   Superclass(group, name, display, server, p)
 {
-  this->Internal = new pqPipelineRepresentation::pqInternal();
-  this->Internal->RepresentationProxy
-    = vtkSMRepresentationProxy::SafeDownCast(display);
-
-  if (!this->Internal->RepresentationProxy)
-    {
-    qFatal("Display given is not a vtkSMRepresentationProxy.");
-    }
-
-  QObject::connect(this, SIGNAL(visibilityChanged(bool)),
-    this, SLOT(updateScalarBarVisibility(bool)));
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineRepresentation::~pqPipelineRepresentation()
 {
-  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy() const
 {
-  return this->Internal->RepresentationProxy;
+  return vtkSMRepresentationProxy::SafeDownCast(this->getProxy());
 }
 
 //-----------------------------------------------------------------------------
@@ -168,51 +72,4 @@ void pqPipelineRepresentation::resetLookupTableScalarRangeOverTime()
     {
     vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRangeOverTime(proxy);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::updateScalarBarVisibility(bool visible)
-{
-  qDebug("FIXME");
-}
-//-----------------------------------------------------------------------------
-const char* pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()
-{
-  // BUG #13564. I am renaming this key since we want to change the default
-  // value for this key. Renaming the key makes it possible to override the
-  // value without forcing users to reset their .config files.
-  return "/representation/UnstructuredGridOutlineThreshold2";
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::setUnstructuredGridOutlineThreshold(double numcells)
-{
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqSettings* settings = core->settings();
-  if (settings)
-    {
-    settings->setValue(
-      pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD(), 
-      QVariant(numcells));
-    }
-}
-
-//-----------------------------------------------------------------------------
-double pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()
-{
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqSettings* settings = core->settings();
-  if (settings && settings->contains(
-      pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()))
-    {
-    bool ok;
-    double numcells = settings->value(
-      pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()).toDouble(&ok);
-    if (ok)
-      {
-      return numcells;
-      }
-    }
-
-  return 250; //  250 million cells.
 }

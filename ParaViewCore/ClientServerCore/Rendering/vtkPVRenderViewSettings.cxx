@@ -45,6 +45,7 @@ vtkPVRenderViewSettings* vtkPVRenderViewSettings::GetInstance()
 
 //----------------------------------------------------------------------------
 vtkPVRenderViewSettings::vtkPVRenderViewSettings()
+  : OutlineThreshold(250)
 {
 }
 

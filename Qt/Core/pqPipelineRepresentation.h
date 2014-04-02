@@ -74,12 +74,6 @@ public:
   // Get the internal display proxy.
   vtkSMRepresentationProxy* getRepresentationProxy() const;
 
-  /// Get/Set the application wide setting for unstructured grid outline
-  /// threshold. If the unstructured grid number of cells exceeds this limit, it
-  /// will be rendered as outline by default. The value is in million cells.
-  static void setUnstructuredGridOutlineThreshold(double millioncells);
-  static double getUnstructuredGridOutlineThreshold();
-
 public slots:
   // If lookuptable is set up and is used for coloring,
   // then calling this method resets the table ranges to match the current 
@@ -92,17 +86,9 @@ public slots:
   // processes hence use with caution!!!
   void resetLookupTableScalarRangeOverTime();
 
-protected slots:
-  /// called when this representations visibility changes. We check if the LUT
-  /// used to color this repr is being used by any other repr. If not, we turn off
-  /// the scalar bar.
-  void updateScalarBarVisibility(bool visible);
-
 private:
   class pqInternal;
   pqInternal* Internal; 
-  /// Returns the settings key.
-  static const char* UNSTRUCTURED_GRID_OUTLINE_THRESHOLD();
 };
 
 #endif
