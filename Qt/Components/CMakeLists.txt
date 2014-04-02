@@ -180,8 +180,6 @@ set (Module_SRCS
   pqFindDataDialog.h
   pqFixStateFilenamesDialog.cxx
   pqFixStateFilenamesDialog.h
-  pqGlobalRenderViewOptions.cxx
-  pqGlobalRenderViewOptions.h
   pqGlyphPanel.cxx
   pqGlyphPanel.h
   pqHandleWidget.cxx
@@ -479,7 +477,6 @@ set (Module_MOC_HDRS
   pqFindDataDialog.h
   pqFindDataSelectionDisplayFrame.h
   pqFixStateFilenamesDialog.h
-  pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
   pqHandleWidget.h
   pqHighlightItemDelegate.h
@@ -623,7 +620,6 @@ set (Module_UI_FILES
   Resources/UI/pqFindDataDialog.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
-  Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
   Resources/UI/pqIsoVolumePanel.ui

@@ -185,19 +185,19 @@ void pqImageCompressorWidget::setConfigurationDefault(int index)
   switch (index)
     {
   case CONSUMER_DSL:
-    this->setCompressorConfig("vtkZlibImageCompressor 0 9 15 1");
+    this->setCompressorConfig("vtkZlibImageCompressor 0 9 3 1");
     break;
 
   case ETHERNET_1_MEG:
-    this->setCompressorConfig("vtkZlibImageCompressor 0 6 18 0");
+    this->setCompressorConfig("vtkZlibImageCompressor 0 6 2 0");
     break;
 
   case ETHERNET_1_GIG:
-    this->setCompressorConfig("vtkZlibImageCompressor 0 1 24 0");
+    this->setCompressorConfig("vtkZlibImageCompressor 0 1 0 0");
     break;
 
   case ETHERNET_10_GIG:
-    this->setCompressorConfig("vtkSquirtCompressor 0 16");
+    this->setCompressorConfig("vtkSquirtCompressor 0 3");
     break;
 
   case SHARED_MEMORY:

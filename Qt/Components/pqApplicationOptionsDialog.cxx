@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqApplicationOptions.h"
-#include "pqGlobalRenderViewOptions.h"
 #include "pqInterfaceTracker.h"
 #include "pqViewOptionsInterface.h"
   
@@ -46,9 +45,6 @@ pqApplicationOptionsDialog::pqApplicationOptionsDialog(QWidget* p)
 
   pqApplicationOptions* appOptions = new pqApplicationOptions;
   this->addOptions(appOptions);
-  
-  pqGlobalRenderViewOptions* renOptions = new pqGlobalRenderViewOptions;
-  this->addOptions(renOptions);
   
   QStringList pages = appOptions->getPageList();
   if(pages.size())

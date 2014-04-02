@@ -49,7 +49,7 @@
    <item>
     <widget class="QLabel" name="squirtLabel">
      <property name="text">
-      <string>Set the number of bits to use for Squirt compression. Move to right for better compression ratio at the cost of reduced image quality.</string>
+      <string>Set the Squirt compression level. Move to right for better compression ratio at the cost of reduced image quality.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -59,13 +59,13 @@
    <item>
     <widget class="pqIntRangeWidget" name="squirtColorSpace" native="true">
      <property name="minimum" stdset="0">
-      <number>10</number>
+      <number>0</number>
      </property>
      <property name="maximum" stdset="0">
-      <number>24</number>
+      <number>5</number>
      </property>
      <property name="value" stdset="0">
-      <number>16</number>
+      <number>3</number>
      </property>
      <property name="strictRange" stdset="0">
       <bool>true</bool>
@@ -101,7 +101,7 @@
    <item>
     <widget class="QLabel" name="zlibLabel2">
      <property name="text">
-      <string>Set the compressor parameters for Zlib compression, including the color sampling space in bits. Move to right for better compression ratio at the cost of image quality.</string>
+      <string>Set the Zlib the color sampling space width factor. Move to right for better compression ratio at the cost of image quality.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -111,13 +111,13 @@
    <item>
     <widget class="pqIntRangeWidget" name="zlibColorSpace" native="true">
      <property name="minimum" stdset="0">
-      <number>9</number>
+      <number>0</number>
      </property>
      <property name="maximum" stdset="0">
-      <number>24</number>
+      <number>5</number>
      </property>
      <property name="value" stdset="0">
-      <number>24</number>
+      <number>3</number>
      </property>
      <property name="strictRange" stdset="0">
       <bool>true</bool>
