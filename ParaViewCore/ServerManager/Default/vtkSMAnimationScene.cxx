@@ -17,24 +17,68 @@
 #include "vtkCacheSizeKeeper.h"
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkEventForwarderCommand.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
 #include <vector>
+#include <cassert>
 
 //----------------------------------------------------------------------------
 class vtkSMAnimationScene::vtkInternals
 {
+  vtkNew<vtkSMTransferFunctionManager> TransferFunctionManager;
 public:
   typedef std::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
   VectorOfViews ViewModules;
+
   void StillRenderAllViews()
     {
-    VectorOfViews::iterator iter = this->ViewModules.begin();
-    for (; iter != this->ViewModules.end(); ++iter)
+    vtkSMSessionProxyManager* pxm = NULL;
+    for (VectorOfViews::iterator iter=this->ViewModules.begin();
+      iter != this->ViewModules.end(); ++iter)
+      {
+      // save the proxy manager for later.
+      if (pxm)
+        {
+        assert(iter->GetPointer()->GetSessionProxyManager() == pxm);
+        }
+      else
+        {
+        pxm = iter->GetPointer()->GetSessionProxyManager();
+        }
+      iter->GetPointer()->Update();
+      }
+
+    // To ensure that LUTs are reset using proper ranges, we need to update all
+    // views first, then reset/grow the LUTs and subsequently render all the views.
+    switch(vtkPVGeneralSettings::GetInstance()->GetTransferFunctionResetMode())
+      {
+    case vtkPVGeneralSettings::GROW_ON_APPLY_AND_TIMESTEP:
+      this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(
+        pxm, true);
+      break;
+
+    case vtkPVGeneralSettings::RESET_ON_APPLY_AND_TIMESTEP:
+      this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(
+        pxm, false);
+      // FIXME: Maybe we should warn the user if animation caching is ON and
+      // RESET_ON_APPLY_AND_TIMESTEP is enabled since the ranges will definitely
+      // be wrong if caching gets used.
+      break;
+
+    default:
+      // nothing to do.
+      break;
+      }
+
+    for (VectorOfViews::iterator iter=this->ViewModules.begin();
+      iter != this->ViewModules.end(); ++iter)
       {
       iter->GetPointer()->StillRender();
       }
