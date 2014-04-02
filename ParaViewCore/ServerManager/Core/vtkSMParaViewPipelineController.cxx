@@ -1042,19 +1042,22 @@ bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
       {
       vtkSMProperty* smproperty = iter->GetProperty();
 
-      if ((smproperty->GetMTime() > ts) ||
-        !smproperty->GetInformationOnly())
+      if ((smproperty->GetMTime() > ts) || smproperty->GetInformationOnly())
         {
-        vtkPVXMLElement* propHints = iter->GetProperty()->GetHints();
-        if (propHints && propHints->FindNestedElementByName("NoDefault"))
-          {
-          // Don't reset properties that request overriding of the default mechanism.
-          continue;
-          }
-
-        observer.Monitor(iter->GetProperty());
-        iter->GetProperty()->ResetToDomainDefaults();
+        // Property was modified between since the PreInitializeProxy() call. We
+        // leave it untouched.
+        continue;
         }
+
+      vtkPVXMLElement* propHints = smproperty->GetHints();
+      if (propHints && propHints->FindNestedElementByName("NoDefault"))
+        {
+        // Don't reset properties that request overriding of the default mechanism.
+        continue;
+        }
+
+      observer.Monitor(iter->GetProperty());
+      iter->GetProperty()->ResetToDomainDefaults();
       }
 
     const std::set<vtkSMProperty*> &props =
