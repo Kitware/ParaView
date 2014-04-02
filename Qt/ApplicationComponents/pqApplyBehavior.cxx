@@ -207,4 +207,19 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
       filter->hideInputIfRequired(reprView);
       }
     }
+
+  vtkNew<vtkSMTransferFunctionManager> tmgr;
+  switch (vtkPVGeneralSettings::GetInstance()->GetScalarBarMode())
+    {
+  case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
+    tmgr->UpdateScalarBars(view->getProxy(),
+      (vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS |
+       vtkSMTransferFunctionManager::SHOW_USED_SCALAR_BARS));
+    break;
+
+  case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
+    tmgr->UpdateScalarBars(view->getProxy(),
+      vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+    break;
+    }
 }

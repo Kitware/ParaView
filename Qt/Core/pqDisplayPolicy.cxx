@@ -31,16 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqDisplayPolicy.h"
 
+#include "vtkNew.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkStructuredData.h"
-#include "vtkSMPropertyHelper.h"
 
 #include <QtDebug>
 #include <QString>
@@ -297,6 +300,20 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
     view->resetDisplay();
     }
 
+  vtkNew<vtkSMTransferFunctionManager> tmgr;
+  switch (vtkPVGeneralSettings::GetInstance()->GetScalarBarMode())
+    {
+  case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
+    tmgr->UpdateScalarBars(view->getProxy(),
+      (vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS |
+       vtkSMTransferFunctionManager::SHOW_USED_SCALAR_BARS));
+    break;
+
+  case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
+    tmgr->UpdateScalarBars(view->getProxy(),
+      vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+    break;
+    }
   return repr;
 }
 

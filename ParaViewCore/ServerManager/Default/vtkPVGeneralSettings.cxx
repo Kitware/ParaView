@@ -40,6 +40,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   AutoApplyActiveOnly(false),
   DefaultViewType(NULL),
   TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY),
+  ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS),
   CacheGeometryForAnimation(false),
   AnimationGeometryCacheLimit(0)
 {

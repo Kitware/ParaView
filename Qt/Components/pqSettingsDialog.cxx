@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidget.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqUndoStack.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -268,6 +269,10 @@ void pqSettingsDialog::onAccepted()
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.buttonBox->button(QDialogButtonBox::Reset)->setEnabled(false);
   ui.buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
+
+  // In theory, the above changes are undo-redo able, the only things that's not
+  // undo-able is the "serialized" values. Hence we just clear the undo stack.
+  CLEAR_UNDO_STACK();
 }
 
 //-----------------------------------------------------------------------------

@@ -46,7 +46,7 @@ public:
   // Returns a color transfer function proxy instance for mapping a data array
   // with the given name. If none exists in the given
   // session, a new instance will be created and returned.
-  vtkSMProxy* GetColorTransferFunction(const char* arrayName,
+  virtual vtkSMProxy* GetColorTransferFunction(const char* arrayName,
     vtkSMSessionProxyManager* pxm);
 
   // Description:
@@ -54,7 +54,7 @@ public:
   // for mapping a data array with the given name. If
   // none exists in the given session, a new instance will be created and
   // returned.
-  vtkSMProxy* GetOpacityTransferFunction(const char* arrayName,
+  virtual vtkSMProxy* GetOpacityTransferFunction(const char* arrayName,
     vtkSMSessionProxyManager* pxm);
 
   // Description:
@@ -62,7 +62,7 @@ public:
   // transfer function for the view (currently only render-views are supported).
   // Thus returns an existing proxy, if present, otherwise a new one is created,
   // if possible.
-  vtkSMProxy* GetScalarBarRepresentation(
+  virtual vtkSMProxy* GetScalarBarRepresentation(
     vtkSMProxy* colorTransferFunctionProxy, vtkSMProxy* view);
 
   // Description:
@@ -72,6 +72,18 @@ public:
   // current data range rather then resetting it to the range.
   void ResetAllTransferFunctionRangesUsingCurrentData(
     vtkSMSessionProxyManager* pxm, bool extend=false);
+
+  enum UpdateScalarBarsMode
+    {
+    HIDE_UNUSED_SCALAR_BARS = 0x01,
+    SHOW_USED_SCALAR_BARS = 0x02
+    };
+
+  // Description:
+  // Updates the scalar bar visibility in the view. Based on the specified mode,
+  // scalars bars representing non-represented arrays can be automatically hidden;
+  // and those corresponding to arrays used for coloring can be automatically shown.
+  virtual bool UpdateScalarBars(vtkSMProxy* viewProxy, unsigned int mode);
 
 //BTX
 protected:

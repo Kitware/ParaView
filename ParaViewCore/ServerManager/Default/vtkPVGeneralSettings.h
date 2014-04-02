@@ -92,6 +92,17 @@ public:
   vtkSetMacro(TransferFunctionResetMode, int);
 
   // Description:
+  // Enum for ScalarBarMode.
+  enum
+    {
+    AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS=0,
+    AUTOMATICALLY_HIDE_SCALAR_BARS=1,
+    MANUAL_SCALAR_BARS=2
+    };
+  vtkGetMacro(ScalarBarMode, int);
+  vtkSetMacro(ScalarBarMode, int);
+
+  // Description:
   // Set when animation geometry caching is enabled.
   void SetCacheGeometryForAnimation(bool val);
   vtkGetMacro(CacheGeometryForAnimation, bool);
@@ -100,6 +111,7 @@ public:
   // Set the animation cache limit in KBs.
   void SetAnimationGeometryCacheLimit(unsigned long val);
   vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
+
 
 //BTX
 protected:
@@ -110,6 +122,7 @@ protected:
   bool AutoApplyActiveOnly;
   char* DefaultViewType;
   int TransferFunctionResetMode;
+  int ScalarBarMode;
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;
 

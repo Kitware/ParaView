@@ -19,12 +19,15 @@
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <assert.h>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
+#include <set>
 
 namespace
 {
@@ -206,6 +209,80 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
         lutProxy, extend);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionManager::UpdateScalarBars(
+  vtkSMProxy* viewProxy, unsigned int mode)
+{
+  typedef std::set<vtkSMProxy*> proxysettype;
+  proxysettype currently_shown_scalar_bars;
+  proxysettype luts;
+
+  // colored_reprs are only those reprs that are uniquely colored with a LUT.
+  // i.e. if two repr have the same lut, we only add the first one to this set.
+  proxysettype colored_reprs;
+
+  // build a list of all transfer functions used for scalar coloring in this
+  // view and build a list of scalar bars currently shown in this view.
+  vtkSMPropertyHelper reprHelper(viewProxy, "Representations");
+  for (unsigned int cc=0, max=reprHelper.GetNumberOfElements(); cc < max; ++cc)
+    {
+    vtkSMProxy* proxy = reprHelper.GetAsProxy(cc);
+    if (vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(proxy) &&
+      (vtkSMPropertyHelper(proxy, "Visibility").GetAsInt() == 1))
+      {
+      currently_shown_scalar_bars.insert(proxy);
+      }
+    else if (vtkSMPropertyHelper(proxy, "Visibility", true).GetAsInt() == 1 &&
+      vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
+      {
+      vtkSMProxy* lut = vtkSMPropertyHelper(proxy, "LookupTable", true).GetAsProxy();
+      if (lut && luts.find(lut) == luts.end())
+        {
+        colored_reprs.insert(proxy);
+        luts.insert(lut);
+        }
+      }
+    }
+
+  bool modified = false;
+
+  if ((mode & HIDE_UNUSED_SCALAR_BARS) == HIDE_UNUSED_SCALAR_BARS)
+    {
+    // hide scalar-bars that point to lookup tables not in the luts set.
+    for (proxysettype::const_iterator iter=currently_shown_scalar_bars.begin();
+      iter != currently_shown_scalar_bars.end(); ++iter)
+      {
+      vtkSMProxy* sbProxy = (*iter);
+      if (sbProxy &&
+        (luts.find(vtkSMPropertyHelper(sbProxy, "LookupTable").GetAsProxy()) == luts.end()))
+        {
+        vtkSMPropertyHelper(sbProxy, "Visibility").Set(0);
+        vtkSMPropertyHelper(sbProxy, "Enabled").Set(0);
+        sbProxy->UpdateVTKObjects();
+        modified = true;
+        }
+      }
+    }
+
+  // NOTE: currently_shown_scalar_bars at this point also include scalar bars
+  // that we just hid.
+
+  if ((mode & SHOW_USED_SCALAR_BARS) == SHOW_USED_SCALAR_BARS)
+    {
+    // create and show scalar-bar for LUTs if they don't already exist.
+    // To do that, we iterate over reprs and turn on scalar bar. This is needed
+    // to ensure that a new scalar bar is created, it gets the right title.
+    for (proxysettype::const_iterator iter=colored_reprs.begin();
+      iter != colored_reprs.end(); ++iter)
+      {
+      vtkSMPVRepresentationProxy::SetScalarBarVisibility(
+        *iter, viewProxy, true);
+      modified = true; // not really truthful here.
+      }
+    }
+  return modified;
 }
 
 //----------------------------------------------------------------------------
