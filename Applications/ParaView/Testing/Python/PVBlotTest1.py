@@ -37,7 +37,7 @@ if sys.platform == 'win32':
 if sys.platform == 'darwin':
     pluginFile = 'libpvblot.dylib'
 
-dataFile = '$PARAVIEW_DATA_ROOT/Data/can.ex2'
+dataFile = '$PARAVIEW_DATA_ROOT/can.ex2'
 
 object1 = 'pqClientMainWindow/menubar/menuTools'
 object2 = 'pqClientMainWindow/pqPluginDialog/localGroup/loadLocal'

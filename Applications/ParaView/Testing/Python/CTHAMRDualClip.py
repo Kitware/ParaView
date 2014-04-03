@@ -4,7 +4,7 @@ import QtTesting
 import QtTestingImage
 
 QtTesting.playCommand(object1, 'activate', '')
-QtTesting.playCommand(object2, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/SPCTH/Dave_Karelitz_Small/spcth_a')
+QtTesting.playCommand(object2, 'filesSelected', '$PARAVIEW_DATA_ROOT/SPCTH/Dave_Karelitz_Small/spcth_a')
 QtTesting.playCommand(object3, 'mousePress', '1,1,0,0,0,0')
 QtTesting.playCommand(object3, 'mouseRelease', '1,0,0,0,0,0')
 QtTesting.playCommand(object4, 'activate', '')

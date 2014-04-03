@@ -37,7 +37,7 @@ object9 = 'pqClientMainWindow/menubar/menu_File'
 QtTesting.playCommand(object9, 'activate', 'actionFileOpen')
 QtTesting.playCommand(object6, 'set_tab_with_text', 'Properties')
 object10 = 'pqClientMainWindow/FileOpenDialog'
-QtTesting.playCommand(object10, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd')
+QtTesting.playCommand(object10, 'filesSelected', '$PARAVIEW_DATA_ROOT/dualSphereAnimation.pvd')
 QtTesting.playCommand(object2, 'activate', '')
 object11 = 'pqClientMainWindow/menubar/menuView'
 QtTesting.playCommand(object11, 'activate', 'Animation View')
