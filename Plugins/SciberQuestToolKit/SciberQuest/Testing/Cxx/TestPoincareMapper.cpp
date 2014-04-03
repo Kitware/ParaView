@@ -46,7 +46,7 @@ Copyright 2012 SciberQuest Inc.
 #include <iostream>
 #include <string>
 
-int main(int argc, char **argv)
+int TestPoincareMapper(int argc, char *argv[])
 {
   vtkMultiProcessController *controller=Initialize(&argc,&argv);
   int worldRank=controller->GetLocalProcessId();
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
   std::string inputFileName;
-  inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov");
+  inputFileName=NativePath(dataRoot+"/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov");
 
   std::string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestPoincareMapper.log");
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
     // Perform the regression test.
     std::string base;
     base+=baseline;
-    base+=".png";
+    base+="/SciberQuestToolKit-TestPoincareMapper.png";
 
     vtkTesting *testHelper = vtkTesting::New();
     testHelper->AddArgument("-T");

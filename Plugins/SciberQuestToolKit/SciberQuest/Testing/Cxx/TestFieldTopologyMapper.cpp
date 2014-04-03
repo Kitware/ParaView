@@ -35,7 +35,7 @@ Copyright 2012 SciberQuest Inc.
 #include <iostream>
 #include <string>
 
-int main(int argc, char **argv)
+int TestFieldTopologyMapper(int argc, char *argv[])
 {
   vtkMultiProcessController *controller=Initialize(&argc,&argv);
   int worldRank=controller->GetLocalProcessId();
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
   std::string inputFileName;
-  inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/SmallVector/SmallVector.bovm");
+  inputFileName=NativePath(dataRoot+"/SciberQuestToolKit/SmallVector/SmallVector.bovm");
 
   std::string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestFieldTopologyMapper.log");

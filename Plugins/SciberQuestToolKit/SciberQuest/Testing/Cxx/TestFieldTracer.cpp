@@ -30,7 +30,7 @@ Copyright 2012 SciberQuest Inc.
 #include <iostream>
 #include <string>
 
-int main(int argc, char **argv)
+int TestFieldTracer(int argc, char *argv[])
 {
   vtkMultiProcessController *controller=Initialize(&argc,&argv);
   int worldRank=controller->GetLocalProcessId();
@@ -43,7 +43,7 @@ int main(int argc, char **argv)
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
   std::string inputFileName;
-  inputFileName=dataRoot+"/Data/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov";
+  inputFileName=dataRoot+"/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov";
 
   std::string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestFieldTracer.log");

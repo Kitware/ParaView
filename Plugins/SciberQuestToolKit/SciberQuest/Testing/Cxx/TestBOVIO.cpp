@@ -23,7 +23,7 @@ Copyright 2012 SciberQuest Inc.
 #include <iostream>
 #include <string>
 
-int main(int argc, char **argv)
+int TestBOVIO(int argc, char *argv[])
 {
   int aTestFailed=0;
   int result=vtkTesting::FAILED;
@@ -39,7 +39,7 @@ int main(int argc, char **argv)
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
   std::string inputFileName;
-  inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/Asym2D/Asym2D.bov");
+  inputFileName=NativePath(dataRoot+"/SciberQuestToolKit/Asym2D/Asym2D.bov");
 
   std::string tempOutputFileName;
   tempOutputFileName=NativePath(tempDir+"/SciberQuestToolKit-Asym2D.bov");

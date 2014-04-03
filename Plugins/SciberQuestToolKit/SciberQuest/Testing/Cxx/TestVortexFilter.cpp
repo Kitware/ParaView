@@ -6,15 +6,15 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#include "vtkMultiProcessController.h"
 #include "vtkSQLog.h"
+#include "vtkMultiProcessController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkAppendPolyData.h"
 #include "vtkXMLImageDataReader.h"
 #include "vtkSQBOVReader.h"
 #include "vtkSQImageGhosts.h"
 #include "vtkSQKernelConvolution.h"
+#include "vtkSQVortexFilter.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkProcessIdScalars.h"
 #include "vtkPointData.h"
@@ -26,7 +26,7 @@ Copyright 2012 SciberQuest Inc.
 #include <iostream>
 #include <string>
 
-int main(int argc, char **argv)
+int TestVortexFilter(int argc, char *argv[])
 {
   vtkMultiProcessController *controller=Initialize(&argc,&argv);
   int worldRank=controller->GetLocalProcessId();
@@ -41,15 +41,15 @@ int main(int argc, char **argv)
   std::string inputFileName;
   if (worldSize==1)
     {
-    inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/Asym2D/Asym2D.vti");
+    inputFileName=NativePath(dataRoot+"/SciberQuestToolKit/Asym2D/Asym2D.vti");
     }
   else
     {
-    inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/Asym2D/Asym2D.bov");
+    inputFileName=NativePath(dataRoot+"/SciberQuestToolKit/Asym2D/Asym2D.bov");
     }
 
   std::string logFileName;
-  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestKernelConvolution.log");
+  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestVortexFilter.log");
   vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
   vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
 
@@ -82,54 +82,61 @@ int main(int argc, char **argv)
   vtkSQKernelConvolution *c1=vtkSQKernelConvolution::New();
   c1->SetKernelWidth(kernelWidth);
   c1->AddInputArray("ue");
-  c1->SetComputeResidual(1);
+  c1->AddArrayToCopy("ue");
+  c1->SetKernelType(vtkSQKernelConvolution::KERNEL_TYPE_GAUSSIAN);
   c1->SetInputConnection(0,ig->GetOutputPort(0));
+  ig->Delete();
+
+  // ghost cell
+  ig=vtkSQImageGhosts::New();
+  ig->SetInputConnection(0,c1->GetOutputPort(0));
+  c1->Delete();
+
+  // vortex
+  vtkSQVortexFilter *v1=vtkSQVortexFilter::New();
+  v1->AddInputArray("ue-gauss-19");
+  v1->AddArrayToCopy("ue");
+  v1->SetSplitComponents(1);
+  v1->SetResultMagnitude(1);
+  v1->SetComputeRotation(1);
+  v1->SetComputeHelicity(1);
+  v1->SetComputeNormalizedHelicity(1);
+  v1->SetComputeQ(1);
+  v1->SetComputeLambda2(1);
+  v1->SetComputeGradient(1);
+  v1->SetComputeDivergence(1);
+  v1->SetComputeEigenvalueDiagnostic(1);
+  v1->SetInputConnection(0,ig->GetOutputPort(0));
   ig->Delete();
 
   // process id
   vtkProcessIdScalars *p1=vtkProcessIdScalars::New();
-  p1->SetInputConnection(0,c1->GetOutputPort(0));
-  c1->Delete();
+  p1->SetInputConnection(0,v1->GetOutputPort(0));
+  v1->Delete();
 
   // image to polydata
   vtkDataSetSurfaceFilter *s1=vtkDataSetSurfaceFilter::New();
   s1->SetInputConnection(0,p1->GetOutputPort(0));
   p1->Delete();
 
-  // execute the pipline for each kernel type
-  int kernelType[3]={
-      vtkSQKernelConvolution::KERNEL_TYPE_GAUSSIAN,
-      vtkSQKernelConvolution::KERNEL_TYPE_CONSTANT,
-      vtkSQKernelConvolution::KERNEL_TYPE_LOG};
-
+  // execute
   GetParallelExec(worldRank, worldSize, s1, 0.0);
+  s1->Update();
 
-  int aTestFailed=0;
-
-  for (int i=0; i<3; ++i)
-    {
-    c1->SetKernelType(kernelType[i]);
-    s1->Update();
-
-    int testStatus = SerialRender(
-          controller,
-          s1->GetOutput(),
-          false,
-          tempDir,
-          baseline,
-          "SciberQuestToolKit-TestKernelConvolution",
-          700,300,
-          0,1,0,
-          0,0,0,
-          0,0,1,
-          2.25);
-    if (testStatus==vtkTesting::FAILED)
-      {
-      aTestFailed=1;
-      }
-    }
+  int testStatus = SerialRender(
+        controller,
+        s1->GetOutput(),
+        false,
+        tempDir,
+        baseline,
+        "SciberQuestToolKit-TestVortexFilter",
+        700,300,
+        0,1,0,
+        0,0,0,
+        0,0,1,
+        2.25);
 
   s1->Delete();
 
-  return Finalize(controller,aTestFailed);
+  return Finalize(controller,testStatus==vtkTesting::PASSED?0:1);
 }

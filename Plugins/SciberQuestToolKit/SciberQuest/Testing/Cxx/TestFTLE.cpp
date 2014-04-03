@@ -36,7 +36,7 @@ Copyright 2012 SciberQuest Inc.
 #include <iostream>
 #include <string>
 
-int main(int argc, char **argv)
+int TestFTLE(int argc, char *argv[])
 {
   vtkMultiProcessController *controller=Initialize(&argc,&argv);
   int worldRank=controller->GetLocalProcessId();
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
   std::string inputFileName;
-  inputFileName=dataRoot+"/Data/SciberQuestToolKit/Gyres/Gyres.bov";
+  inputFileName=dataRoot+"/SciberQuestToolKit/Gyres/Gyres.bov";
 
   std::string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestFTLE.log");

@@ -12,7 +12,7 @@
 #include "CartesianDataBlock.h"
 #include "PriorityQueue.hxx"
 
-int main(int argc, char **argv)
+int TestCartesianDecomp(int argc, char *argv[])
 {
   MPI_Init(&argc,&argv);
 

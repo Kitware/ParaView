@@ -616,6 +616,8 @@ int SerialRender(
 
         std::string base;
         base+=baseline;
+        base+="/";
+        base+=testName;
         base+="-";
         base+=arrayName;
         base+=".png";
