@@ -76,6 +76,9 @@ pqParaViewBehaviors::pqParaViewBehaviors(
 
   pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
 
+  // Load plugins distributed with application.
+  pqApplicationCore::instance()->loadDistributedPlugins();
+
   // Define application behaviors.
   new pqQtMessageHandlerBehavior(this);
   new pqDataTimeStepBehavior(this);

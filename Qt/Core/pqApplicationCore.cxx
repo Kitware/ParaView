@@ -189,6 +189,7 @@ void pqApplicationCore::constructor()
   // the plugin initialization code itself may request access to  the interface
   // tracker.
   this->InterfaceTracker->initialize();
+  this->PluginManager->loadPluginsFromSettings();
 }
 
 //-----------------------------------------------------------------------------
