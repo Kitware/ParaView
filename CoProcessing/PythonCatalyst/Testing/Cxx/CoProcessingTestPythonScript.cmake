@@ -57,14 +57,14 @@ if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CPPressure0.png")
 endif()
 
 execute_process(COMMAND "${COPROCESSING_IMAGE_TESTER}"
-    "${COPROCESSING_TEST_DIR}/CPGrid0.png" 20 -V "${COPROCESSING_DATA_DIR}/Baseline/CPGrid0.png" -T "${COPROCESSING_TEST_DIR}"
+    "${COPROCESSING_TEST_DIR}/CPGrid0.png" 20 -V "${COPROCESSING_DATA_DIR}/CPGrid0.png" -T "${COPROCESSING_TEST_DIR}"
     RESULT_VARIABLE failed)
 if(failed)
   message(FATAL_ERROR "CPGrid0 image compare failed.")
 endif()
 
 execute_process(COMMAND "${COPROCESSING_IMAGE_TESTER}"
-    "${COPROCESSING_TEST_DIR}/CPPressure0.png" 20 -V "${COPROCESSING_DATA_DIR}/Baseline/CPPressure0.png" -T "${COPROCESSING_TEST_DIR}"
+    "${COPROCESSING_TEST_DIR}/CPPressure0.png" 20 -V "${COPROCESSING_DATA_DIR}/CPPressure0.png" -T "${COPROCESSING_TEST_DIR}"
     RESULT_VARIABLE failed)
 
 if(failed)
