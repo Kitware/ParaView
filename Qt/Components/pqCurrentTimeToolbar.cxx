@@ -36,8 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 
 // Qt Includes.
-#include <QLineEdit>
+#include <QAction>
 #include <QLabel>
+#include <QLineEdit>
 
 // ParaView Includes.
 #include "pqSpinBox.h"
@@ -94,11 +95,35 @@ void pqCurrentTimeToolbar::constructor()
   this->addWidget(label);
   this->addWidget(timeedit);
   this->addWidget(sbtimeedit);
+
+  QLabel* countLabel = new QLabel(this);
+  countLabel->setText(" of 100");
+  this->CountLabelAction = this->addWidget(countLabel);
+  this->CountLabel = countLabel;
+
+  // need to use CountLabelAction to show/hide label.
+  this->CountLabelAction->setVisible(false);
+
+  this->ShowFrameCount = true;
 }
 
 //-----------------------------------------------------------------------------
 pqCurrentTimeToolbar::~pqCurrentTimeToolbar()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqCurrentTimeToolbar::setShowFrameCount(bool val)
+{
+  this->ShowFrameCount = val;
+  if (this->TimeSpinBox->isEnabled() && val)
+    {
+    this->CountLabelAction->setVisible(true);
+    }
+  else
+    {
+    this->CountLabelAction->setVisible(false);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -142,10 +167,12 @@ void pqCurrentTimeToolbar::onTimeStepsChanged()
   if (time_steps > 0)
     {
     this->TimeSpinBox->setMaximum(time_steps -1);
+    this->CountLabel->setText(QString(" of %1").arg(time_steps));
     }
   else
     {
     this->TimeSpinBox->setMaximum(0);
+    this->CountLabel->setText("");
     }
   this->TimeSpinBox->blockSignals(prev);
 }
@@ -209,11 +236,16 @@ void pqCurrentTimeToolbar::sceneTimeChanged(double time)
     int index = timekeeper->getTimeStepValueIndex(time);
     this->TimeSpinBox->setValue(index);
     this->TimeSpinBox->setEnabled(true);
+    if (this->ShowFrameCount)
+      {
+      this->CountLabelAction->setVisible(true);
+      }
     this->TimeLineEdit->setEnabled(false);
     }
   else
     {
     this->TimeSpinBox->setEnabled(false);
+    this->CountLabelAction->setVisible(false);
     this->TimeLineEdit->setEnabled(true);
     }
 
