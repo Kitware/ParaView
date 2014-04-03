@@ -266,6 +266,8 @@ protected:
   // The array selections.
   vtkDataArraySelection *CellDataArraySelection;
 
+  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+
   // Create either vtkNonOverlappingAMR or vtkMultiBlockDataSet based on
   // whether the dataset is AMR.
   virtual int RequestDataObject(vtkInformation *req,

@@ -4155,6 +4155,8 @@
       <OutputPort index="0"
                   name="Volume Data" />
       <OutputPort index="1"
+                  name="Tracers" />
+      <OutputPort index="2"
                   name="Markers" />
       <StringVectorProperty command="SetCellArrayStatus"
                             element_types="2 0"
@@ -4238,7 +4240,7 @@
       </IntVectorProperty>
       <IntVectorProperty command="SetGenerateTracerArray"
                          default_values="0"
-                         name="GenerateTracerArray"
+                         name="GenerateTracers"
                          number_of_elements="1"
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
