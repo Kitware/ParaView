@@ -145,7 +145,7 @@ void ClientManager::RunTests()
   server->ProcessMessage(data, len);
 }
 
-int main()
+int TestSimple(int, char**)
 {
   Server server;
   ClientManager cmgr;
