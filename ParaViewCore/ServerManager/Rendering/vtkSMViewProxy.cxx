@@ -22,18 +22,67 @@
 #include "vtkPVOptions.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVView.h"
-#include "vtkRenderWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkRenderWindow.h"
+#include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMUtilities.h"
 #include "vtkSmartPointer.h"
 
 #include <assert.h>
+
+namespace
+{
+  const char* vtkGetRepresentationNameFromHints(
+    const char* viewType, vtkPVXMLElement* hints, int port)
+    {
+    if (!hints)
+      {
+      return NULL;
+      }
+
+    for (unsigned int cc=0, max=hints->GetNumberOfNestedElements(); cc<max; ++cc)
+      {
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      if (child == NULL || child->GetName() == NULL)
+        {
+        continue;
+        }
+
+      // LEGACY: support DefaultRepresentations hint.
+      // <Hints>
+      //    <DefaultRepresentations representation="Foo" />
+      // </Hints>
+      if (strcmp(child->GetName(), "DefaultRepresentations") == 0)
+        {
+        return child->GetAttribute("representation");
+        }
+
+      // <Hints>
+      //    <Representation port="outputPort" view="ViewName" type="ReprName" />
+      // </Hints>
+      else if (strcmp(child->GetName(), "Representation") == 0 &&
+        // has an attribute "view" that matches the viewType.
+        child->GetAttribute("view") &&
+        strcmp(child->GetAttribute("view"), viewType) == 0)
+        {
+        // if port is present, it must match "port".
+        int xmlPort;
+        if (!child->GetScalarAttribute("port", &xmlPort) == 0 ||
+          xmlPort == port)
+          {
+          return child->GetAttribute("type");
+          }
+        }
+      }
+    return NULL;
+    }
+};
 
 vtkStandardNewMacro(vtkSMViewProxy);
 //----------------------------------------------------------------------------
@@ -242,22 +291,125 @@ void vtkSMViewProxy::Update()
 
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
-  vtkSMProxy* vtkNotUsed(proxy), int vtkNotUsed(opport))
+  vtkSMProxy* proxy, int outputPort)
 {
+  assert("The session should be valid" && this->Session);
+
+  vtkSMSourceProxy* producer = vtkSMSourceProxy::SafeDownCast(proxy);
+  if (
+    (producer == NULL) ||
+    (outputPort < 0) ||
+    (producer->GetNumberOfOutputPorts() <= outputPort) ||
+    (producer->GetSession() != this->GetSession()))
+    {
+    return NULL;
+    }
+
+  const char* representationType =
+    this->GetRepresentationType(producer, outputPort);
+  if (!representationType)
+    {
+    return NULL;
+    }
+
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  vtkSmartPointer<vtkSMProxy> p;
+  p.TakeReference(pxm->NewProxy("representations", representationType));
+  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(p);
+  if (repr)
+    {
+    repr->Register(this);
+    return repr;
+    }
+  vtkWarningMacro("Failed to create representation (representations,"
+    << representationType <<").");
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMViewProxy::GetRepresentationType(
+  vtkSMSourceProxy* producer, int outputPort)
+{
+  assert(producer && producer->GetNumberOfOutputPorts() > outputPort);
+
+  // Process producer hints to see if indicates what type of representation
+  // to create for this view.
+  if (const char* reprName = vtkGetRepresentationNameFromHints(
+      this->GetXMLName(), producer->GetHints(), outputPort))
+    {
+    return reprName;
+    }
+
+  // We no longer update the pipeline. The application should update the
+  // pipeline manually before attempting to the show the data.
+  //  // Update with time to avoid domains updating without time later.
+  //  double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
+  //  producer->UpdatePipeline(view_time);
+
+  // check if we have default representation name specified in XML.
   if (this->DefaultRepresentationName)
     {
-    assert("The session should be valid" && this->Session);
     vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-    vtkSmartPointer<vtkSMProxy> p;
-    p.TakeReference(pxm->NewProxy("representations", this->DefaultRepresentationName));
-    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(p);
-    if (repr)
+    vtkSMProxy* prototype = pxm->GetPrototypeProxy(
+      "representations", this->DefaultRepresentationName);
+    if (prototype)
       {
-      repr->Register(this);
-      return repr;
+      vtkSMProperty* inputProp = prototype->GetProperty("Input");
+      vtkSMUncheckedPropertyHelper helper(inputProp);
+      helper.Set(producer, outputPort);
+      bool acceptable = (inputProp->IsInDomains() > 0);
+      helper.SetNumberOfElements(0);
+
+      if (acceptable)
+        {
+        return this->DefaultRepresentationName;
+        }
       }
     }
-  return 0;
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outputPort)
+{
+  if (producer == NULL || outputPort < 0 ||
+    producer->GetNumberOfOutputPorts() <= outputPort ||
+    producer->GetSession() != this->GetSession())
+    {
+    return false;
+    }
+
+  const char* type = this->GetRepresentationType(producer, outputPort);
+  if (type != NULL)
+    {
+    vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+    return (pxm->GetPrototypeProxy("representations", type) != NULL);
+    }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMViewProxy::FindRepresentation(
+  vtkSMSourceProxy* producer, int outputPort)
+{
+  vtkSMPropertyHelper helper (this, "Representations");
+  for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; ++cc)
+    {
+    vtkSMRepresentationProxy* repr =
+      vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
+    if (repr &&
+      repr->GetProperty("Input"))
+      {
+      vtkSMPropertyHelper helper2(repr, "Input");
+      if (helper2.GetAsProxy() == producer && helper2.GetOutputPort() == outputPort)
+        {
+        return repr;
+        }
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

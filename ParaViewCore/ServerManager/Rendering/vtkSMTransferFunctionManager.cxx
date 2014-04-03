@@ -169,17 +169,14 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
     return NULL;
     }
 
-  // this for some reason destroys the scalar bar properties all together.
-  // What's going on ???
-  //scalarBarProxy->ResetPropertiesToDefault();
-
   vtkNew<vtkSMParaViewPipelineController> controller;
-  controller->PreInitializeProxy(scalarBarProxy);
-  vtkSMPropertyHelper(scalarBarProxy, "LookupTable").Set(colorTransferFunction);
-  // FIXME:
+  // we set these values before PreInitializeProxy() so that can be overridden
+  // by user settings, if needed.
   vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(6);
   vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(6);
 
+  controller->PreInitializeProxy(scalarBarProxy);
+  vtkSMPropertyHelper(scalarBarProxy, "LookupTable").Set(colorTransferFunction);
   controller->PostInitializeProxy(scalarBarProxy);
 
   pxm->RegisterProxy("scalar_bars", scalarBarProxy);

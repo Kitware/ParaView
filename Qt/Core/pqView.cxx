@@ -51,10 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProgressManager.h"
-#include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
@@ -254,6 +254,23 @@ int pqView::getNumberOfVisibleRepresentations() const
 }
 
 //-----------------------------------------------------------------------------
+int pqView::getNumberOfVisibleDataRepresentations() const
+{
+  int count = 0;
+  for (int i=0; i<this->Internal->Representations.size(); i++)
+    {
+    pqDataRepresentation* repr=qobject_cast<pqDataRepresentation*>(
+      this->Internal->Representations[i]);
+    if (repr && repr->isVisible())
+      {
+      count++;
+      }
+    }
+
+  return count;
+}
+
+//-----------------------------------------------------------------------------
 pqRepresentation* pqView::getRepresentation(int index) const
 {
   if(index >= 0 && index < this->Internal->Representations.size())
@@ -431,43 +448,13 @@ bool pqView::canDisplay(pqOutputPort* opPort) const
 {
   pqPipelineSource* source = opPort ? opPort->getSource() : 0;
   vtkSMSourceProxy* sourceProxy = source ? vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
-  if(!opPort||
-     !source ||
-     opPort->getServer()->GetConnectionID() != this->getServer()->GetConnectionID() ||
-     !sourceProxy ||
-     sourceProxy->GetOutputPortsCreated() == 0)
+  if (!opPort|| !sourceProxy ||
+    opPort->getServer()->getResource().scheme() == "catalyst")
     {
     return false;
     }
 
-  vtkPVXMLElement* hints = sourceProxy->GetHints();
-  if (hints)
-    {
-    unsigned int elementCount = hints->GetNumberOfNestedElements();
-    for(unsigned int i = 0; i < elementCount; i++)
-      {
-      vtkPVXMLElement* child = hints->GetNestedElement(i);
-      const char *childName = child->GetName();
-
-      if(childName && strcmp(childName, "DefaultRepresentations") == 0)
-        {
-        unsigned int defaultRepsCount = child->GetNumberOfNestedElements();
-        for(unsigned int j = 0; j < defaultRepsCount; j++)
-          {
-          vtkPVXMLElement *defaultRep = child->GetNestedElement(j);
-
-          const char *defaultRepViewType = defaultRep->GetAttribute("view");
-          if(defaultRepViewType &&
-             this->ViewType == defaultRepViewType)
-            {
-            return true;
-            }
-          }
-        }
-      }
-    }
-
-  return false;
+  return this->getViewProxy()->CanDisplayData(sourceProxy, opPort->getPortNumber());
 }
 
 //-----------------------------------------------------------------------------

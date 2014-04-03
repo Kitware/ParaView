@@ -71,9 +71,6 @@ public:
   /// Resets the zoom level to 100%.
   virtual void resetDisplay();
 
-  /// Returns true if data on the given output port can be displayed by this view.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
-
 protected slots:
   virtual void initializeAfterObjectsCreated();
 

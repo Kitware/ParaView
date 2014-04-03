@@ -25,13 +25,17 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMUtilities.h"
+#include "vtkStructuredData.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkProcessModule.h"
 
 //****************************************************************************
 // vtkSMContextViewInteractorStyle makes it possible for us to call
@@ -269,6 +273,42 @@ void vtkSMContextViewProxy::ResetDisplay()
       }
     this->UpdateVTKObjects();
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMContextViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outputPort)
+{
+  if (!this->Superclass::CanDisplayData(producer, outputPort))
+    {
+    return false;
+    }
+
+  if (producer->GetHints() &&
+    producer->GetHints()->FindNestedElementByName("Plotable"))
+    {
+    return true;
+    }
+
+  vtkPVDataInformation* dataInfo = producer->GetDataInformation(outputPort);
+  if (dataInfo->DataSetTypeIsA("vtkTable"))
+    {
+    return true;
+    }
+  // also accept 1D structured datasets.
+  if (dataInfo->DataSetTypeIsA("vtkImageData") ||
+    dataInfo->DataSetTypeIsA("vtkRectilinearGrid"))
+    {
+    int extent[6];
+    dataInfo->GetExtent(extent);
+    int temp[6]={0, 0, 0, 0, 0, 0};
+    int dimensionality = vtkStructuredData::GetDataDimension(
+      vtkStructuredData::SetExtent(extent, temp));
+    if (dimensionality == 1)
+      {
+      return true;
+      }
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------

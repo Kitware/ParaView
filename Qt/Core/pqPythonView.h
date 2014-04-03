@@ -56,11 +56,6 @@ public:
   /// Get the view proxy as a vtkSMPythonViewProxy
   vtkSMPythonViewProxy* getPythonViewProxy();
 
-  /// Returns whether a source can be displayed in this view module.
-  /// The default implementation returns true is the connection ID for the port
-  /// and the view are the same.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
-
 protected slots:
   virtual void initializeAfterObjectsCreated();
 

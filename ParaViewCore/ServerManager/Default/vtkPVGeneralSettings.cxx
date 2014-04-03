@@ -19,6 +19,7 @@
 #include "vtkProcessModuleAutoMPI.h"
 #include "vtkSISourceProxy.h"
 #include "vtkSMInputArrayDomain.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 
 #include <cassert>
 
@@ -40,7 +41,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   AutoApplyActiveOnly(false),
   DefaultViewType(NULL),
   TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY),
-  ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS),
+  ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS),
   CacheGeometryForAnimation(false),
   AnimationGeometryCacheLimit(0)
 {
@@ -148,6 +149,33 @@ void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
   if (this->AnimationGeometryCacheLimit != val)
     {
     this->AnimationGeometryCacheLimit = val;
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetScalarBarMode(int val)
+{
+  switch (val)
+    {
+  case AUTOMATICALLY_HIDE_SCALAR_BARS:
+    vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(false);
+    vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
+    break;
+
+  case AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
+    vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(true);
+    vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
+    break;
+
+  default:
+    vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(false);
+    vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(false);
+    }
+
+  if (val != this->ScalarBarMode)
+    {
+    this->ScalarBarMode = val;
     this->Modified();
     }
 }

@@ -100,7 +100,7 @@ public:
     MANUAL_SCALAR_BARS=2
     };
   vtkGetMacro(ScalarBarMode, int);
-  vtkSetMacro(ScalarBarMode, int);
+  void SetScalarBarMode(int);
 
   // Description:
   // Set when animation geometry caching is enabled.

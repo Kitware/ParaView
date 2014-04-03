@@ -119,12 +119,6 @@ public:
   vtkCamera* GetActiveCamera();
 
   // Description:
-  // Create a default representation for the given source proxy.
-  // Returns a new proxy.
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
-    vtkSMProxy*, int);
-
-  // Description:
   // This method calls UpdateInformation on the Camera Proxy
   // and sets the Camera properties according to the info
   // properties.
@@ -151,10 +145,17 @@ public:
   // geometry.
   bool StreamingUpdate(bool render_if_needed);
 
+  // Description:
+  // Overridden to check through the various representations that this view can
+  // create.
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort);
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy();
+
 
   // Description:
   // Calls UpdateLOD() on the vtkPVRenderView.

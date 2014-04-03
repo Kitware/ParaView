@@ -58,7 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationCue.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqDisplayPolicy.h"
 #include "pqInterfaceTracker.h"
 #include "pqNameCount.h"
 #include "pqOutputPort.h"
@@ -448,13 +447,6 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   // Set the reprProxy's input.
   pqSMAdaptor::setInputProperty(reprProxy->GetProperty("Input"),
     source->getProxy(), opPort->getPortNumber());
-  // Let application ignore default and hide display of filters if they must.
-  if (pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault())
-    {
-    pqSMAdaptor::setElementProperty(reprProxy->GetProperty("Visibility"),
-                                    0);
-    }
-
   pqObjectBuilderNS::Controller->PostInitializeProxy(reprProxy);
   pqObjectBuilderNS::Controller->RegisterRepresentationProxy(reprProxy);
 

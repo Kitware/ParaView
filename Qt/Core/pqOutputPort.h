@@ -67,6 +67,10 @@ public:
   pqPipelineSource* getSource() const
     { return this->Source; }
 
+  /// Return the vtkSMSourceProxy for the source.
+  vtkSMSourceProxy* getSourceProxy() const;
+
+
   /// Returns the server connection on which this output port exists.
   pqServer* getServer() const;
 

@@ -59,9 +59,6 @@ public:
   /// This view has no widget.
   virtual QWidget* getWidget();
 
-  /// Currently, this view can show only Extraction filters.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
-  
   /// Get the internal model for the view
   pqSpreadSheetViewModel* getViewModel();
 

@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqDisplayPolicy.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineAnnotationFilterModel.h"
@@ -44,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -140,7 +141,7 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index_)
   // we make sure we are only clicking on an eye
   if (index_.column() == 1)
     {
-    pqDisplayPolicy* display_policy = pqApplicationCore::instance()->getDisplayPolicy();
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
     // Get object relative to pqPipelineModel
     const pqPipelineModel* model = this->getPipelineModel(index_);
@@ -153,9 +154,13 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index_)
       qobject_cast<pqOutputPort*>(smModelItem);
     if (port)
       {
-      bool new_visibility_state = ! (display_policy->getVisibility(
-          pqActiveObjects::instance().activeView(), port) == pqDisplayPolicy::Visible);
+      pqView* activeView = pqActiveObjects::instance().activeView();
+      vtkSMViewProxy* viewProxy = activeView? activeView->getViewProxy() : NULL;
+      bool cur_state = (viewProxy == NULL? false :
+        (controller->GetVisibility(port->getSourceProxy(), port->getPortNumber(),
+                                   viewProxy)));
 
+      bool new_visibility_state = !cur_state;
       bool is_selected = false;
       QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
       foreach (QModelIndex selIndex_, indexes)
@@ -205,7 +210,9 @@ void pqPipelineBrowserWidget::setSelectionVisibility(bool visible)
 void pqPipelineBrowserWidget::setVisibility(bool visible,
   const QModelIndexList& indexes)
 {
-  pqDisplayPolicy* display_policy = pqApplicationCore::instance()->getDisplayPolicy();
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  vtkSMViewProxy* viewProxy = activeView? activeView->getViewProxy() : NULL;
 
   bool begun_undo_set = false;
 
@@ -255,8 +262,9 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
           // multi-server / catalyst configuration type
           pqActiveObjects::instance().setActivePort(port);
           }
-        display_policy->setRepresentationVisibility(
-          port, pqActiveObjects::instance().activeView(), visible);
+        controller->SetVisibility(
+          port->getSourceProxy(), port->getPortNumber(),
+          viewProxy, visible);
         }
       }
     }

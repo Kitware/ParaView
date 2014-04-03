@@ -33,19 +33,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqDisplayPolicy.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyModifiedStateUndoElement.h"
+#include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
-#include "pqView.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
 #include <QtDebug>
+#include <QSet>
 
 //-----------------------------------------------------------------------------
 pqApplyBehavior::pqApplyBehavior(QObject* parentObject)
@@ -183,43 +185,63 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
 //-----------------------------------------------------------------------------
 void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
 {
-  pqDisplayPolicy *displayPolicy = pqApplicationCore::instance()->getDisplayPolicy();
-  if (!displayPolicy)
+  // HACK: Skip catalyst proxies.
+  if (source->getServer()->getResource().scheme() == "catalyst")
     {
-    qCritical() << "No display policy defined. Cannot create pending displays.";
     return;
     }
 
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+
+  vtkSMViewProxy* currentViewProxy = view? view->getViewProxy() : NULL;
+
+  QSet<vtkSMProxy*> updated_views;
+
   // create representations for all output ports.
-  for (int i = 0; i < source->getNumberOfOutputPorts(); i++)
+  for (int outputPort = 0; outputPort < source->getNumberOfOutputPorts(); outputPort++)
     {
-    pqDataRepresentation *repr = displayPolicy->createPreferredRepresentation(
-      source->getOutputPort(i), view, false);
-    if (!repr || !repr->getView())
+    vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
+    vtkSMViewProxy* preferredView = controller->ShowInPreferredView(
+      vtkSMSourceProxy::SafeDownCast(source->getProxy()), outputPort, currentViewProxy);
+    if (!preferredView)
       {
       continue;
       }
 
-    pqView *reprView = repr->getView();
-    pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source);
-    if (filter)
+    updated_views.insert(preferredView);
+
+    if (preferredView == currentViewProxy)
       {
-      filter->hideInputIfRequired(reprView);
+      // Hide input, since the data wasn't shown in a new view, but an existing
+      // view.
+      pqDataRepresentation *repr = source->getRepresentation(outputPort, view);
+      Q_ASSERT(repr);
+      if (pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source))
+        {
+        filter->hideInputIfRequired(view);
+        }
       }
-    }
 
-  vtkNew<vtkSMTransferFunctionManager> tmgr;
-  switch (vtkPVGeneralSettings::GetInstance()->GetScalarBarMode())
-    {
-  case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
-    tmgr->UpdateScalarBars(view->getProxy(),
-      (vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS |
-       vtkSMTransferFunctionManager::SHOW_USED_SCALAR_BARS));
-    break;
+    // reset camera if this is the only visible dataset.
+    pqView* pqPreferredView = smmodel->findItem<pqView*>(preferredView);
+    Q_ASSERT(pqPreferredView);
+    if (preferredView != currentViewProxy)
+      {
+      // implying a new view was created, always reset that.
+      pqPreferredView->resetDisplay();
+      }
+    else if (view->getNumberOfVisibleDataRepresentations() == 1)
+      {
+      // old view is being used, reset only if this is the only representation.
+      view->resetDisplay();
+      }
 
-  case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
-    tmgr->UpdateScalarBars(view->getProxy(),
-      vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
-    break;
+    // reset interaction mode for render views. Not a huge fan, but we'll fix
+    // this some other time.
+    if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqPreferredView))
+      {
+      rview->updateInteractionMode(source->getOutputPort(outputPort));
+      }
     }
 }

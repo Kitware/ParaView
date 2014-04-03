@@ -33,9 +33,10 @@
 #include "vtkSMProxy.h"
 
 class vtkImageData;
-class vtkSMRepresentationProxy;
-class vtkView;
 class vtkRenderWindow;
+class vtkSMRepresentationProxy;
+class vtkSMSourceProxy;
+class vtkView;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewProxy : public vtkSMProxy
 {
@@ -63,10 +64,36 @@ public:
   virtual void Update();
 
   // Description:
+  // Returns true if the view can display the data produced by the producer's
+  // port. Internally calls GetRepresentationType() and returns true only if the
+  // type is valid a representation proxy of that type can be created.
+  virtual bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort);
+
+  // Description:
   // Create a default representation for the given source proxy.
   // Returns a new proxy.
+  // In version 4.1 and earlier, subclasses overrode this method. Since 4.2, the
+  // preferred way is to simply override GetRepresentationType(). That
+  // ensures that CreateDefaultRepresentation() and CanDisplayData() both
+  // work as expected.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
     vtkSMProxy*, int);
+
+  // Description:
+  // Returns the xml name of the representation proxy to create to show the data
+  // produced in this view, if any. Default implementation checks if the
+  // producer has any "Hints" that define the representation to create in this
+  // view and if so, returns that.
+  // Or if this->DefaultRepresentationName is set and its Input property
+  // can accept the data produced, returns this->DefaultRepresentationName.
+  // Subclasses should override this method.
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort);
+
+  // Description:
+  // Finds the representation proxy showing the data produced by the provided
+  // producer, if any. Note the representation may not necessarily be visible.
+  virtual vtkSMRepresentationProxy* FindRepresentation(vtkSMSourceProxy* producer, int outputPort);
 
   // Description:
   // Captures a image from this view. Default implementation returns NULL.
@@ -105,6 +132,7 @@ protected:
   vtkSMViewProxy();
   ~vtkSMViewProxy();
 
+  //
   // Description:
   // Subclasses should override this method to do the actual image capture.
   virtual vtkImageData* CaptureWindowInternal(int vtkNotUsed(magnification))

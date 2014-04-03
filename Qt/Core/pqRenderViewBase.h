@@ -93,11 +93,6 @@ public:
   /// Apply the settings from QSettings to this render module
   virtual void restoreSettings(bool only_global);
 
-  /// Returns whether a source can be displayed in this view module.
-  /// The default implementation returns true is the connection ID for the port
-  /// and the view are the same.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
-
   /// restore the default light parameters
   virtual void restoreDefaultLightSettings();
 

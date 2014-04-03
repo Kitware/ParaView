@@ -33,19 +33,27 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a default representation for the given source proxy.
-  // Returns a new proxy.
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
-
-  // Description:
   // Similar to IsSelectionAvailable(), however, on failure returns the
   // error message otherwise 0.
   virtual const char* IsSelectVisiblePointsAvailable();
+
+  // Description:
+  // Overridden to set initial default slices when a representation is created.
+  // Not sure that's the best way to do this, but leaving the logic unchanged in
+  // this pass.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy* proxy, int outputPort);
+
+  // Description:
+  // Overridden to forward the call to the internal root view proxy.
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort);
 
 //BTX
 protected:
   vtkSMMultiSliceViewProxy();
   ~vtkSMMultiSliceViewProxy();
+
 
   // Description:
   // Use the center of the source to initialize the view with three orthogonal

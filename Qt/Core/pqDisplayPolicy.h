@@ -120,18 +120,8 @@ public:
   /// Returns the visibility state for port in the given view (view may be null
   /// for an empty view).
   virtual VisibilityState getVisibility(pqView* view, pqOutputPort* port) const;
-
-protected:
-  /// Determines the type of view that's preferred by the \c source. If \c view
-  /// is of the preferred type, returns it. Otherwise a new view of the preferred 
-  /// type may be created and returned. A new 3D view will be created if the
-  /// view has no preferred view type and the active view cannot show the data.
-  virtual pqView* getPreferredView(pqOutputPort* opPort, pqView* view) const;
-
-  /// Create a new representation. port and view cannot be null at this point.
-  virtual pqDataRepresentation* newRepresentation(pqOutputPort* port, 
-    pqView* view) const;
+private:
+  Q_DISABLE_COPY(pqDisplayPolicy);
 };
 
 #endif
-

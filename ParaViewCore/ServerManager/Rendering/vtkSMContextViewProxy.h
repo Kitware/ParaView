@@ -54,6 +54,15 @@ public:
   // be accessed
   virtual vtkRenderWindow* GetRenderWindow();
 
+  // Description:
+  // Overridden to report to applications that producers producing non-table
+  // datasets are only viewable if they have the "Plottable" hint. This avoid
+  // applications from inadvertently showing large data in charts.
+  // CreateDefaultRepresentation() will still work without regard for this
+  // Plottable hint.
+  virtual bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort);
+
+
 //BTX
 protected:
   vtkSMContextViewProxy();

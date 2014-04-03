@@ -139,6 +139,7 @@ public:
 
   // Returns the number of representations currently visible in the view.
   int getNumberOfVisibleRepresentations() const;
+  int getNumberOfVisibleDataRepresentations() const;
 
   /// Returns the representation for the specified index where
   /// (index < getNumberOfRepresentations()).
@@ -148,10 +149,9 @@ public:
   QList<pqRepresentation*> getRepresentations() const;
 
   /// This method returns is any pqPipelineSource can be dislayed in this
-  /// view. This is a convenience method, it gets
-  /// the pqDisplayPolicy object from the pqApplicationCore
-  /// are queries it.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
+  /// view. NOTE: This is no longer virtual. Simply forwards to
+  //vtkSMViewProxy::CanDisplayData().
+  bool canDisplay(pqOutputPort* opPort) const;
 
   /// The annotation link used on representations to share the selection
   /// and annotations. This is only used in views aware of this link.
