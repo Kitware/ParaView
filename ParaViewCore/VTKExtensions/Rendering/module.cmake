@@ -52,6 +52,7 @@ PRIVATE_DEPENDS
     vtkIOXML
     vtkRenderingOpenGL
     vtkRenderingLIC
+    vtkTestingCore
     vtkTestingRendering
 
   TEST_LABELS
