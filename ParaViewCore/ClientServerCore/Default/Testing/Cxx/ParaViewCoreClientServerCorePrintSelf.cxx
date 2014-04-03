@@ -102,7 +102,7 @@
   c = classname::New(); c->Print(cout); c->Delete();
 
 
-int main(int, char**)
+int ParaViewCoreClientServerCorePrintSelf(int, char*[])
 {
   vtkObject* c;
   PRINT_SELF(vtk3DWidgetRepresentation);

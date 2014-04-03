@@ -1,33 +1,35 @@
-SET(TestNames
-  ParaViewCoreClientServerCorePrintSelf
-  TestMPI
-  TestSystemCaps
+include(ParaViewTestingMacros)
+
+paraview_add_test_cxx(${vtk-module}CxxTests tests
+  NO_DATA NO_VALID NO_OUTPUT
+  ParaViewCoreClientServerCorePrintSelf.cxx
+  TestSystemCaps.cxx
   )
 
-vtk_module_test_executable(${vtk-module}PrintSelf
-  ParaViewCoreClientServerCorePrintSelf.cxx)
-add_test(NAME ${vtk-module}PrintSelf
-  COMMAND ${vtk-module}PrintSelf)
-
-vtk_module_test_executable(TestMPI TestMPI.cxx)
-add_test(NAME TestMPI COMMAND TestMPI)
-
-vtk_module_test_executable(TestSystemCaps TestSystemCaps.cxx)
-add_test(NAME TestSystemCaps COMMAND TestSystemCaps)
-
 if (PARAVIEW_USE_MPI)
+  vtk_add_test_mpi(${vtk-module}CxxTests mpi_tests
+    NO_DATA NO_VALID NO_OUTPUT
+    TestMPI.cxx)
+  list(APPEND tests
+    ${mpi_tests})
+
   set_property(SOURCE TestSystemCaps.cxx
     APPEND PROPERTY COMPILE_DEFINITIONS TEST_MPI_CAPS)
-  vtk_mpi_link(TestSystemCaps)
+else ()
+  vtk_add_test_cxx(${vtk-module}CxxTests no_mpi_tests
+    NO_DATA NO_VALID NO_OUTPUT
+    TestMPI.cxx)
+  list(APPEND tests
+    ${no_mpi_tests})
 endif()
+
 if (PARAVIEW_ENABLE_PYTHON)
   set_property(SOURCE TestSystemCaps.cxx
     APPEND PROPERTY COMPILE_DEFINITIONS TEST_PY_CAPS)
 endif()
 
-set_tests_properties(
-  ${vtk-module}PrintSelf
-  TestMPI
-  TestSystemCaps
-  PROPERTIES LABELS "PARAVIEW"
-  )
+vtk_test_cxx_executable(${vtk-module}CxxTests tests)
+
+if (PARAVIEW_USE_MPI)
+  vtk_mpi_link(${vtk-module}CxxTests)
+endif()

@@ -91,7 +91,7 @@ string GetMPILibraryVersion()
 }
 #endif
 
-int main(int argc, char **argv)
+int TestSystemCaps(int argc, char *argv[])
 {
   (void)argc;
   (void)argv;
