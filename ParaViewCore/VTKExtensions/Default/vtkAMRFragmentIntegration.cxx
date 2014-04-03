@@ -304,7 +304,6 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     myProc = controller->GetLocalProcessId ();
     numProcs = controller->GetNumberOfProcesses ();
 
-std::cerr << "a\n";
     vtkIdTypeArray *fragIndicesReceive = vtkIdTypeArray::New ();
     fragIndicesReceive->SetNumberOfComponents (2);
 
@@ -316,7 +315,6 @@ std::cerr << "a\n";
     fragMassReceive->SetNumberOfComponents (1);
     fragMassReceive->SetNumberOfTuples (totalFragments + 1);
 
-std::cerr << "b\n";
     vtkDoubleArray** volWeightReceive = new vtkDoubleArray*[volumeWeightedNames.size ()];
     for (int v = 0; v < volumeWeightedNames.size (); v ++)
       {
@@ -339,7 +337,6 @@ std::cerr << "b\n";
       {
       if (myProc >= pivot) 
         {
-std::cerr << "c.1\n";
         int tuples = fragIndices.size ();
         vtkIdTypeArray *fragIndicesArray = vtkIdTypeArray::New ();
         fragIndicesArray->SetNumberOfComponents (2);
@@ -353,8 +350,6 @@ std::cerr << "c.1\n";
           fragIndicesArray->SetComponent (ind, 1, iter->second);
           ind ++;
         }
-
-        cerr << "myProc " << myProc << " sending to " << (myProc - pivot) << " tag " << (tag + pivot) << endl;
 
         controller->Send (&tuples, 1, myProc - pivot, tag + pivot + 0);
         controller->Send (fragIndicesArray, myProc - pivot, tag + pivot + 1);
@@ -378,9 +373,6 @@ std::cerr << "c.1\n";
         }
       else /* if ((myProc + pivot) < numProcs) */
         {
-std::cerr << "c.2\n";
-        cerr << "myProc " << myProc << " receiving from " << (myProc + pivot) << " tag " << (tag + pivot) << endl;
-
         int tuples = 0;
         controller->Receive (&tuples, 1, myProc + pivot, tag + pivot + 0);
         fragIndicesReceive->SetNumberOfTuples (tuples);
@@ -433,12 +425,10 @@ std::cerr << "c.2\n";
       pivot /= 2;
       }
 
-std::cerr << "d\n";
     fragIndicesReceive->Delete ();
     fragVolumeReceive->Delete ();
     fragMassReceive->Delete ();
 
-std::cerr << "e\n";
     for (int v = 0; v < volumeWeightedNames.size (); v ++)
       {
       volWeightReceive[v]->Delete ();
@@ -449,12 +439,10 @@ std::cerr << "e\n";
       massWeightReceive[m]->Delete ();
       }
 
-std::cerr << "f\n";
     delete [] volWeightReceive;
     delete [] massWeightReceive;
     }
 
-std::cerr << "f\n";
   if (myProc == 0)
     {
     int row = 0;
