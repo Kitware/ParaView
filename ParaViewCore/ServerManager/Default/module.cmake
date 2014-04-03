@@ -25,4 +25,4 @@ unset(__extra_dependencies)
 # Add XML resources.
 set_property(GLOBAL PROPERTY
   vtkPVServerManagerDefault_SERVERMANAGER_XMLS
-  ${CMAKE_CURRENT_LIST_DIR}/options.xml)
+  ${CMAKE_CURRENT_LIST_DIR}/settings.xml)

@@ -1,5 +1,5 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="options">
+  <ProxyGroup name="settings">
     <!-- ================================================================== -->
     <Proxy name="GeneralSettings" label="General"
       processes="client|dataserver|renderserver"

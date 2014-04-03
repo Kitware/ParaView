@@ -426,39 +426,39 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     proxy->Delete();
     }
 
-  proxy = pxm->GetProxy("options", "GeneralSettings");
+  proxy = pxm->GetProxy("settings", "GeneralSettings");
   if (!proxy)
     {
-    proxy = pxm->NewProxy("options", "GeneralSettings");
+    proxy = pxm->NewProxy("settings", "GeneralSettings");
     if (proxy)
       {
       this->InitializeProxy(proxy);
-      pxm->RegisterProxy("options", "GeneralSettings", proxy);
+      pxm->RegisterProxy("settings", "GeneralSettings", proxy);
       proxy->UpdateVTKObjects();
       proxy->Delete();
       }
     }
 
-  proxy = pxm->GetProxy("options", "RenderViewSettings");
+  proxy = pxm->GetProxy("settings", "RenderViewSettings");
   if (!proxy)
     {
-    proxy = pxm->NewProxy("options", "RenderViewSettings");
+    proxy = pxm->NewProxy("settings", "RenderViewSettings");
     if (proxy)
       {
       this->InitializeProxy(proxy);
-      pxm->RegisterProxy("options", "RenderViewSettings", proxy);
+      pxm->RegisterProxy("settings", "RenderViewSettings", proxy);
       proxy->UpdateVTKObjects();
       proxy->Delete();
       }
     }
-  proxy = pxm->GetProxy("options", "RenderViewInteractionSettings");
+  proxy = pxm->GetProxy("settings", "RenderViewInteractionSettings");
   if (!proxy)
     {
-    proxy = pxm->NewProxy("options", "RenderViewInteractionSettings");
+    proxy = pxm->NewProxy("settings", "RenderViewInteractionSettings");
     if (proxy)
       {
       this->InitializeProxy(proxy);
-      pxm->RegisterProxy("options", "RenderViewInteractionSettings", proxy);
+      pxm->RegisterProxy("settings", "RenderViewInteractionSettings", proxy);
       proxy->UpdateVTKObjects();
       proxy->Delete();
       }

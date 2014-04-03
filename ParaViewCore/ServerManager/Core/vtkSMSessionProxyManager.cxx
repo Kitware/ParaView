@@ -1286,7 +1286,7 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
     const char* colname = it->first.c_str();
 
     // Do not save the state of options.
-    const char* options = "options";
+    const char* options = "settings";
     if (strcmp(options, colname) == 0)
       {
       continue;
@@ -1338,7 +1338,7 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
     // Do not save the state of options
-    const char* options = "options";
+    const char* options = "settings";
     if (strcmp(options, it->first.c_str()) == 0)
       {
       continue;

@@ -1,5 +1,5 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="options">
+  <ProxyGroup name="settings">
 
     <Proxy name="PacManSettings" label="PacMan"
       processes="client|dataserver|renderserver">

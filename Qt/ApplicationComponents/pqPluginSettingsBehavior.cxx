@@ -61,7 +61,7 @@ void pqPluginSettingsBehavior::updateSettings()
 
   vtkNew<vtkSMParaViewPipelineController> controller;
 
-  vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator( "options" );
+  vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator( "settings" );
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMProxy* proxy = pxm->GetProxy(iter->GetGroupName(), iter->GetProxyName());

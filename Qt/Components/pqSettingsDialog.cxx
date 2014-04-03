@@ -124,7 +124,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(server->session());
   iter->SetModeToOneGroup();
-  for (iter->Begin("options"); !iter->IsAtEnd(); iter->Next())
+  for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy)
@@ -247,7 +247,7 @@ void pqSettingsDialog::onAccepted()
   iter->SetSession(
     pqActiveObjects::instance().activeServer()->session());
   iter->SetModeToOneGroup();
-  for (iter->Begin("options"); !iter->IsAtEnd(); iter->Next())
+  for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProxy* proxy = iter->GetProxy();
     settings->SetProxySettings(proxy);
@@ -292,7 +292,7 @@ void pqSettingsDialog::onRestoreDefaults()
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(session);
   iter->SetModeToOneGroup();
-  for (iter->Begin("options"); !iter->IsAtEnd(); iter->Next())
+  for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy)

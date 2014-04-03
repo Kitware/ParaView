@@ -175,7 +175,7 @@ void MainPipelineWindow::showSettings()
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMSessionProxyManager* pxm = server->proxyManager();
 
-  vtkSMProxy* optionsProxy = pxm->NewProxy("options", "GeneralSettings");
+  vtkSMProxy* optionsProxy = pxm->NewProxy("settings", "GeneralSettings");
   pqProxyWidgetDialog dialog(optionsProxy, this);
   dialog.exec();
   optionsProxy->Delete();
