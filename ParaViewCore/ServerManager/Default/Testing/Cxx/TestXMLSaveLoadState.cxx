@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-int main(int argc, char* argv[])
+int TestXMLSaveLoadState(int argc, char* argv[])
 {
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize( argc, argv,

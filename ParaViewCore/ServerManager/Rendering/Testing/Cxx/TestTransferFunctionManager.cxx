@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
-int main(int argc, char* argv[])
+int TestTransferFunctionManager(int argc, char* argv[])
 {
   (void) argc;
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);

@@ -17,6 +17,7 @@ vtk_module(vtkPVServerManagerDefault
     vtksys
   TEST_DEPENDS
     vtkPVServerManagerApplication
+    vtkTestingCore
   TEST_LABELS
     PARAVIEW
 )

@@ -1,8 +1,5 @@
-#--------------------------------------------------------------------------------
-vtk_module_test_executable(
-  TestTransferFunctionManager
-  TestTransferFunctionManager.cxx)
-add_test(NAME TestTransferFunctionManager COMMAND TestTransferFunctionManager)
-set_tests_properties(TestTransferFunctionManager PROPERTIES LABELS "PARAVIEW")
-
-#--------------------------------------------------------------------------------
+paraview_add_test_cxx(${vtk-module}CxxTests tests
+  NO_DATA NO_OUTPUT NO_VALID
+  TestTransferFunctionManager.cxx
+  )
+vtk_test_cxx_executable(${vtk-module}CxxTests tests)

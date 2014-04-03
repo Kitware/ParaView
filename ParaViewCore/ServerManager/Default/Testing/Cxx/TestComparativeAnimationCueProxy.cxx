@@ -33,7 +33,7 @@
   return 1;
 
 
-int main(int argc, char* argv[])
+int TestComparativeAnimationCueProxy(int argc, char* argv[])
 {
   // Initialization
   vtkPVServerOptions* options = vtkPVServerOptions::New();

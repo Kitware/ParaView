@@ -15,10 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMDoubleVectorPropertyTest.h"
 
-#include "vtkInitializationHelper.h"
-#include "vtkPVServerOptions.h"
 #include "vtkSMProxyManager.h"
-#include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 void vtkSMDoubleVectorPropertyTest::SetNumberOfElements()
@@ -95,20 +92,4 @@ void vtkSMDoubleVectorPropertyTest::Copy()
 
   property1->Delete();
   property2->Delete();
-}
-
-int main(int argc, char *argv[])
-{
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_CLIENT,
-                                      options);
-
-  vtkSMDoubleVectorPropertyTest test;
-  int ret = QTest::qExec(&test, argc, argv);
-
-  vtkInitializationHelper::Finalize();
-  options->Delete();
-
-  return ret;
 }

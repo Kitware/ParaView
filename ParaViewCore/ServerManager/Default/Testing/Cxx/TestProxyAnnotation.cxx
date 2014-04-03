@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtksys/ios/sstream"
 
 //----------------------------------------------------------------------------
-int main(int argc, char* argv[])
+int TestProxyAnnotation(int argc, char* argv[])
 {
   int ret_val = EXIT_SUCCESS;
   vtkPVServerOptions* options = vtkPVServerOptions::New();
