@@ -264,9 +264,8 @@
         command="SetCamera3DManipulators"
         argument_is_array="1"
         number_of_elements="9"
-        default_values="4 1 2 3 4 1 2 4 2" >
-        <!-- For now, we are marking this property is_internal so that it won't
-        get saved in state files. -->
+        default_values="4 1 2 3 4 1 2 4 2"
+        panel_visibility="never">
         <Documentation>
           Set the interactions mode for 3D interaction. The values are specified
           in order as (left button, middle button, right button), and repeated for
@@ -285,9 +284,8 @@
         command="SetCamera2DManipulators"
         argument_is_array="1"
         number_of_elements="9"
-        default_values="1 3 2 2 2 2 3 1 4" >
-        <!-- For now, we are marking this property is_internal so that it won't
-        get saved in state files. -->
+        default_values="1 3 2 2 2 2 3 1 4"
+        panel_visibility="never">
         <Documentation>
           Set the interactions mode for 2D interaction. The values are specified
           in order as (left button, middle button, right button), and repeated for
