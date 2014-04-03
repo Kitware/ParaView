@@ -17,7 +17,7 @@
 
 vtkClientServerID GetUniqueID()
 {
-  static vtkClientServerID id = {3};
+  static vtkClientServerID id(3);
   ++id.ID;
   return id;
 }
