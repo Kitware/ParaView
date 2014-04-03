@@ -39,7 +39,7 @@
 #include "vtkSMMessage.h"
 
 
-int main(int, char**)
+int ParaViewCoreServerImplementationPrintSelf(int, char*[])
 {
   vtkObject* c;
   PRINT_SELF(vtkSIArraySelectionProperty);

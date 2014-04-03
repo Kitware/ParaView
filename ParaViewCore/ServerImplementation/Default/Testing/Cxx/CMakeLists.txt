@@ -1,5 +1,7 @@
-vtk_module_test_executable(${vtk-module}PrintSelf
-  ParaViewCoreServerImplementationPrintSelf.cxx)
-add_test(NAME ${vtk-module}PrintSelf
-  COMMAND ${vtk-module}PrintSelf)
-set_tests_properties(${vtk-module}PrintSelf PROPERTIES LABELS "PARAVIEW")
+include(ParaViewTestingMacros)
+
+paraview_add_test_cxx(${vtk-module}CxxTests tests
+  NO_DATA NO_VALID NO_OUTPUT
+  ParaViewCoreServerImplementationPrintSelf.cxx
+  )
+vtk_test_cxx_executable(${vtk-module}CxxTests tests)
