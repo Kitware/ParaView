@@ -315,7 +315,7 @@ FUNCTION(add_pvweb_tests prefix)
                   ${BASELINE_IMG_DIR}
                   --run-test-script ${test_path}
                   --test-use-browser ${browser}
-                  --temporary-directory ${ParaView_BINARY_DIR}/Testing/Temporary
+                  --temporary-directory ${PARAVIEW_TEST_OUTPUT_DIR}
                   --test-image-file-name ${test_image_file_name}
                   )
         set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
