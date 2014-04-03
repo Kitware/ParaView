@@ -257,10 +257,27 @@ else()
   set(PARAVIEW_BUILD_ARCHITECTURE "32")
 endif()
 
-FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
-  ${ParaView_SOURCE_DIR}/../ParaViewData
-  ${ParaView_BINARY_DIR}/../ParaViewData
-  $ENV{PARAVIEW_DATA_ROOT})
+# setup external data. this will automatically download the test
+# data and baseline files to the build tree and set PARAVIEW_DATA_ROOT.
+list(APPEND ExternalData_URL_TEMPLATES
+  "http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=%(hash)&algorithm=%(algo)"
+
+  # Data published by developers using git-gerrit-push.
+  "http://www.paraview.org/files/ExternalData/%(algo)/%(hash)"
+)
+list(APPEND ExternalData_OBJECT_STORES
+  # Local data store populated by the ParaView pre-commit hook
+  "${CMAKE_SOURCE_DIR}/.ExternalData"
+)
+include(ExternalData)
+set(ExternalData_LINK_CONTENT MD5)
+set(ExternalData_BINARY_ROOT          "${CMAKE_BINARY_DIR}/ExternalData")
+set(PARAVIEW_TEST_DATA_DIR            "${CMAKE_CURRENT_SOURCE_DIR}/Testing/Data")
+set(PARAVIEW_TEST_BASELINE_DIR        "${PARAVIEW_TEST_DATA_DIR}/Baseline")
+set(PARAVIEW_TEST_OUTPUT_DATA_DIR     "${ExternalData_BINARY_ROOT}/Testing/Data")
+set(PARAVIEW_TEST_OUTPUT_BASELINE_DIR "${PARAVIEW_TEST_OUTPUT_DATA_DIR}/Baseline")
+set(PARAVIEW_TEST_OUTPUT_DIR          "${CMAKE_BINARY_DIR}/Testing/Temporary")
+set(PARAVIEW_DATA_ROOT "${PARAVIEW_TEST_OUTPUT_DATA_DIR}")
 
 if (APPLE)
   option(PARAVIEW_DO_UNIX_STYLE_INSTALLS
@@ -795,3 +812,8 @@ if (BUILD_TESTING)
   configure_file("${ParaView_CMAKE_DIR}/CTestCustom.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake" @ONLY)
 endif()
+
+#-----------------------------------------------------------------------------
+# Create target to download data from the ParaViewData group.  This must come
+# after all tests have been added that reference the group, so we put it last.
+ExternalData_Add_Target(ParaViewData)
