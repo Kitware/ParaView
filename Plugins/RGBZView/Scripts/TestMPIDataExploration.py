@@ -12,7 +12,7 @@ if not os.path.exists(output_dir):
 from paraview.simple import *
 from paraview import data_exploration as wx
 
-LoadPlugin(pv_path + '/lib/libRGBZView.dylib')
+# LoadPlugin(pv_path + '/lib/libRGBZView.dylib')
 
 resolution = 500
 center_of_rotation = [0.0, 0.0, 0.0]
