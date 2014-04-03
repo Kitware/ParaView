@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineContextMenuBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
+#include "pqPluginSettingsBehavior.h"
 #include "pqPropertiesPanel.h"
 #include "pqPVNewSourceBehavior.h"
 #include "pqQtMessageHandlerBehavior.h"
@@ -75,9 +76,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
 
   pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
 
-  // Load plugins distributed with application.
-  pqApplicationCore::instance()->loadDistributedPlugins();
-
   // Define application behaviors.
   new pqQtMessageHandlerBehavior(this);
   new pqDataTimeStepBehavior(this);
@@ -100,6 +98,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqCollaborationBehavior(this);
   new pqViewStreamingBehavior(this);
+  new pqPluginSettingsBehavior(this);
 
   pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
   foreach (pqPropertiesPanel* ppanel, mainWindow->findChildren<pqPropertiesPanel*>())

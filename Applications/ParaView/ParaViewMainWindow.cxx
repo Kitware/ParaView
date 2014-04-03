@@ -46,6 +46,7 @@ extern "C" {
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
+#include "pqPluginManager.h"
 #include "pqPropertiesPanel.h"
 #include "vtkProcessModule.h"
 #include "vtkPVPlugin.h"
@@ -194,6 +195,13 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
   new pqParaViewBehaviors(this, this);
+
+  // Load plugins.
+  // These are distributed with the application.
+  pqApplicationCore::instance()->loadDistributedPlugins();
+
+  // These are selected through the plugin manager UI.
+  pqApplicationCore::instance()->getPluginManager()->loadPluginsFromSettings();
 
   // load static plugins
 #ifndef BUILD_SHARED_LIBS

@@ -173,6 +173,8 @@ set (Module_SRCS
   pqPluginDockWidgetsBehavior.h
   pqPluginDocumentationBehavior.cxx
   pqPluginDocumentationBehavior.h
+  pqPluginSettingsBehavior.cxx
+  pqPluginSettingsBehavior.h
   pqPropertyGroupButton.cxx
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.cxx
@@ -321,6 +323,7 @@ set (Module_MOC_HDRS
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.h
   pqPluginDocumentationBehavior.h
+  pqPluginSettingsBehavior.h
   pqPropertyGroupButton.h
   pqProxyGroupMenuManager.h
   pqPVAnimationWidget.h
