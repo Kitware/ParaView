@@ -72,7 +72,7 @@ private:
 vtkStandardNewMacro(vtkCPImplementedTestDriver);
 
 
-int main()
+int SimpleDriver2(int, char*[])
 {
   vtkCPImplementedTestDriver* testDriver = vtkCPImplementedTestDriver::New();
   testDriver->SetNumberOfTimeSteps(100);
