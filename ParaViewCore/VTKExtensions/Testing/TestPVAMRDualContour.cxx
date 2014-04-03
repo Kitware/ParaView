@@ -26,7 +26,7 @@ typedef vtkSmartPointer<vtkSpyPlotReader> vtkSpyPlotReaderRefPtr;
 typedef vtkSmartPointer<vtkPVAMRDualContour> vtkPVAMRDualContourRefPtr;
 
 
-int main( int argc, char* argv[] )
+int TestPVAMRDualContour( int argc, char* argv[] )
 {
   vtkDummyControllerRefPtr controller (vtkDummyControllerRefPtr::New());
   vtkMultiProcessController::SetGlobalController(controller);

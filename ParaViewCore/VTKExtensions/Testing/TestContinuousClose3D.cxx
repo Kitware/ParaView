@@ -23,7 +23,7 @@
 #include "vtkTestUtilities.h"
 #include "vtkTesting.h"
 
-int main(int argc, char* argv[])
+int TestContinuousClose3D(int argc, char* argv[])
 {
   char* fname = 
     vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/headsq/quarter");

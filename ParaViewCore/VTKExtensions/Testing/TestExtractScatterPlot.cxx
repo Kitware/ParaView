@@ -22,7 +22,7 @@
 #include "vtkUnsignedLongArray.h"
 
 /// Test the output of the vtkExtractHistogram filter in a simple serial case
-int main(int, char*[])
+int TestExtractScatterPlot(int, char*[])
 {
   vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
   

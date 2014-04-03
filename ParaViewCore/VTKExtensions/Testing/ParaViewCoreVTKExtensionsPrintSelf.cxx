@@ -212,7 +212,7 @@
 #define PRINT_SELF(classname)\
   c = classname::New(); c->Print(cout); c->Delete();
 
-int main(int , char *[])
+int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
 {
   vtkObject *c;
 

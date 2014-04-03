@@ -36,7 +36,7 @@
 #include "vtkWarpScalar.h"
 #include "vtkDataSetMapper.h"
 
-int main(int argc, char* argv[])
+int TestPVFilters(int argc, char* argv[])
 {
   char* fname = 
     vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/blow.vtk");

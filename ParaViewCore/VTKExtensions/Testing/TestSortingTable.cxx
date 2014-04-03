@@ -157,7 +157,7 @@ int sortMagnitudeOnUnsignedCharVector()
 }
 
 // ----------------------------------------------------------------------------
-int main(int vtkNotUsed(argc), char **vtkNotUsed(argv))
+int TestSortingTable(int vtkNotUsed(argc), char **vtkNotUsed(argv))
 {
   // Create Fake MPI controller
   vtkDummyController* ctrl = vtkDummyController::New();
