@@ -176,10 +176,8 @@ public:
 
   //*****************************************************************
   // Forwarded accross all the views
-  virtual void Add2DManipulator(vtkCameraManipulator* val);
-  virtual void RemoveAll2DManipulators();
-  virtual void Add3DManipulator(vtkCameraManipulator* val);
-  virtual void RemoveAll3DManipulators();
+  virtual void SetCamera3DManipulators(const int types[9]);
+  virtual void SetCamera2DManipulators(const int types[9]);
   virtual void SetBackground(double r, double g, double b);
   virtual void SetBackground2(double r, double g, double b);
   virtual void SetBackgroundTexture(vtkTexture* val);

@@ -33,14 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
+#include "pqCTHArraySelectionDecorator.h"
 #include "pqCalculatorWidget.h"
+#include "pqCameraManipulatorWidget.h"
 #include "pqClipScalarsDecorator.h"
 #include "pqColorAnnotationsPropertyWidget.h"
 #include "pqColorEditorPropertyWidget.h"
 #include "pqColorOpacityEditorWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
-#include "pqCTHArraySelectionDecorator.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
@@ -55,8 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqShowWidgetDecorator.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
-#include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
 
 #include <QtDebug>
 
@@ -121,6 +122,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   else if (name == "image_compressor_config")
     {
     return new pqImageCompressorWidget(smProxy, smProperty);
+    }
+  else if (name == "camera_manipulator")
+    {
+    return new pqCameraManipulatorWidget(smProxy, smProperty);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;

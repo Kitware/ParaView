@@ -49,6 +49,8 @@ set (Module_SRCS
   pqBackgroundEditorWidget.h
   pqCameraLinkReaction.cxx
   pqCameraLinkReaction.h
+  pqCameraManipulatorWidget.cxx
+  pqCameraManipulatorWidget.h
   pqCameraReaction.cxx
   pqCameraReaction.h
   pqCameraToolbar.cxx
@@ -258,6 +260,7 @@ set (Module_MOC_HDRS
   pqAxesToolbar.h
   pqBackgroundEditorWidget.h
   pqCameraLinkReaction.h
+  pqCameraManipulatorWidget.h
   pqCameraReaction.h
   pqCameraToolbar.h
   pqCameraUndoRedoReaction.h
@@ -374,6 +377,7 @@ endif()
 set (Module_UI_FILES
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqBackgroundEditorWidget.ui
+  Resources/UI/pqCameraManipulatorWidget.ui
   Resources/UI/pqCameraToolbar.ui
   Resources/UI/pqColorAnnotationsPropertyWidget.ui
   Resources/UI/pqColorEditorPropertyWidget.ui

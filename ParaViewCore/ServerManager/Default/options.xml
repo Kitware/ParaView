@@ -486,5 +486,54 @@
         <UseDocumentationForLabels />
       </Hints>
     </Proxy>
+
+    <!-- ================================================================== -->
+    <Proxy name="RenderViewInteractionSettings" label="Camera"
+      processes="client|dataserver|renderserver">
+      <IntVectorProperty name="Camera3DManipulators"
+        number_of_elements="9"
+        default_values="4 1 2 3 4 1 2 4 2"
+        panel_widget="camera_manipulator">
+        <!-- For now, we are marking this property is_internal so that it won't
+        get saved in state files. -->
+        <Documentation>
+          Select how interactions are mapped to camera movements when in 3D interaction mode.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+          <Entry text="Multi-Rotate" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty name="Camera2DManipulators"
+        number_of_elements="9"
+        default_values="1 3 2 2 2 2 3 1 4"
+        panel_widget="camera_manipulator">
+        <!-- For now, we are marking this property is_internal so that it won't
+        get saved in state files. -->
+        <Documentation>
+          Select how interactions are mapped to camera movements when in 2D interaction mode.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <PropertyGroup label="2D Interaction Options">
+        <Property name="Camera2DManipulators" />
+      </PropertyGroup>
+      <PropertyGroup label="3D Interaction Options">
+        <Property name="Camera3DManipulators" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </Proxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

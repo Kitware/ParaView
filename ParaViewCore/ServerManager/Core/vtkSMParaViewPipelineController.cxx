@@ -451,6 +451,18 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
       proxy->Delete();
       }
     }
+  proxy = pxm->GetProxy("options", "RenderViewInteractionSettings");
+  if (!proxy)
+    {
+    proxy = pxm->NewProxy("options", "RenderViewInteractionSettings");
+    if (proxy)
+      {
+      this->InitializeProxy(proxy);
+      pxm->RegisterProxy("options", "RenderViewInteractionSettings", proxy);
+      proxy->UpdateVTKObjects();
+      proxy->Delete();
+      }
+    }
   //---------------------------------------------------------------------------
   // Setup color palette and proxies for other global property groups (optional)
   proxy = pxm->GetProxy("global_properties", "ColorPalette");

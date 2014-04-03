@@ -17,7 +17,6 @@
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractWidget.h"
 #include "vtkCamera.h"
-#include "vtkCameraManipulator.h"
 #include "vtkCommand.h"
 #include "vtkHandleRepresentation.h"
 #include "vtkHandleWidget.h"
@@ -487,42 +486,22 @@ void vtkPVQuadRenderView::SetViewUpBottomLeft(double x, double y, double z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVQuadRenderView::Add2DManipulator(vtkCameraManipulator* val)
+void vtkPVQuadRenderView::SetCamera3DManipulators(const int types[9])
 {
-  this->Superclass::Add2DManipulator(val);
+  this->Superclass::SetCamera3DManipulators(types);
   for (int cc=0; cc < 3; cc++)
     {
-    this->OrthoViews[cc].RenderView->Add2DManipulator(val);
+    this->OrthoViews[cc].RenderView->SetCamera3DManipulators(types);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVQuadRenderView::RemoveAll2DManipulators()
+void vtkPVQuadRenderView::SetCamera2DManipulators(const int types[9])
 {
-  this->Superclass::RemoveAll2DManipulators();
+  this->Superclass::SetCamera2DManipulators(types);
   for (int cc=0; cc < 3; cc++)
     {
-    this->OrthoViews[cc].RenderView->RemoveAll2DManipulators();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVQuadRenderView::Add3DManipulator(vtkCameraManipulator* val)
-{
-  this->Superclass::Add3DManipulator(val);
-  for (int cc=0; cc < 3; cc++)
-    {
-    this->OrthoViews[cc].RenderView->Add3DManipulator(val);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVQuadRenderView::RemoveAll3DManipulators()
-{
-  this->Superclass::RemoveAll3DManipulators();
-  for (int cc=0; cc < 3; cc++)
-    {
-    this->OrthoViews[cc].RenderView->RemoveAll3DManipulators();
+    this->OrthoViews[cc].RenderView->SetCamera2DManipulators(types);
     }
 }
 

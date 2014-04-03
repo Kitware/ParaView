@@ -53,6 +53,7 @@ public:
   /// return NULL without raising any errors (or messages).
   /// Supported types are:
   /// \li \c calculator : pqCalculatorWidget
+  /// \li \c camera_manipulator : pqCameraManipulatorWidget
   /// \li \c color_selector : pqColorSelectorPropertyWidget
   /// \li \c command_button : pqCommandButtonPropertyWidget
   /// \li \c display_representation_selector : pqDisplayRepresentationPropertyWidget

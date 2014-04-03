@@ -20,9 +20,9 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkDataRepresentation.h"
+#include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
-#include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
@@ -33,16 +33,15 @@
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLight.h"
 #include "vtkLightKit.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMemberFunctionCommand.h"
-#include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
-#include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVConfig.h"
@@ -55,19 +54,25 @@
 #include "vtkPVOptions.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
-#include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPVSynchronizedRenderer.h"
+#include "vtkPVTrackballMultiRotate.h"
+#include "vtkPVTrackballRoll.h"
+#include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
-#include "vtkRenderer.h"
+#include "vtkPVTrackballZoom.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
+#include "vtkTrackballPan.h"
 #include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
 #include "vtkVector.h"
@@ -1914,36 +1919,74 @@ void vtkPVRenderView::SetStencilCapable(int val)
 //*****************************************************************
 // Forwarded to vtkPVInteractorStyle if present on local processes.
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Add2DManipulator(vtkCameraManipulator* val)
+void vtkPVRenderView::SetCamera2DManipulators(const int manipulators[9])
 {
-  if (this->TwoDInteractorStyle)
-    {
-    this->TwoDInteractorStyle->AddManipulator(val);
-    }
+  this->SetCameraManipulators(this->TwoDInteractorStyle, manipulators);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::RemoveAll2DManipulators()
+void vtkPVRenderView::SetCamera3DManipulators(const int manipulators[9])
 {
-  if (this->TwoDInteractorStyle)
-    {
-    this->TwoDInteractorStyle->RemoveAllManipulators();
-    }
-}
-//----------------------------------------------------------------------------
-void vtkPVRenderView::Add3DManipulator(vtkCameraManipulator* val)
-{
-  if (this->ThreeDInteractorStyle)
-    {
-    this->ThreeDInteractorStyle->AddManipulator(val);
-    }
+  this->SetCameraManipulators(this->ThreeDInteractorStyle, manipulators);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::RemoveAll3DManipulators()
+void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const int manipulators[9])
 {
-  if (this->ThreeDInteractorStyle)
+  if (!style)
     {
-    this->ThreeDInteractorStyle->RemoveAllManipulators();
+    return;
+    }
+
+  style->RemoveAllManipulators();
+  enum
+    {
+    NONE=0,
+    SHIFT=1,
+    CTRL=2
+    };
+
+  enum
+    {
+    PAN=1,
+    ZOOM=2,
+    ROLL=3,
+    ROTATE=4,
+    MULTI_ROTATE=5
+    };
+
+
+  for (int manip=NONE; manip <=CTRL; manip++)
+    {
+    for (int button=0; button<3; button++)
+      {
+      int manipType = manipulators[3*manip + button];
+      vtkSmartPointer<vtkCameraManipulator> cameraManipulator;
+      switch (manipType)
+        {
+      case PAN:
+        cameraManipulator = vtkSmartPointer<vtkTrackballPan>::New();
+        break;
+      case ZOOM:
+        cameraManipulator = vtkSmartPointer<vtkPVTrackballZoom>::New();
+        break;
+      case ROLL:
+        cameraManipulator = vtkSmartPointer<vtkPVTrackballRoll>::New();
+        break;
+      case ROTATE:
+        cameraManipulator = vtkSmartPointer<vtkPVTrackballRotate>::New();
+        break;
+      case MULTI_ROTATE:
+        cameraManipulator = vtkSmartPointer<vtkPVTrackballMultiRotate>::New();
+        break;
+        }
+      if (cameraManipulator)
+        {
+        cameraManipulator->SetButton(button + 1); // since button starts with 1.
+        cameraManipulator->SetControl(manip == CTRL? 1 : 0);
+        cameraManipulator->SetShift(manip == SHIFT? 1 : 0);
+        style->AddManipulator(cameraManipulator);
+        }
+      }
     }
 }

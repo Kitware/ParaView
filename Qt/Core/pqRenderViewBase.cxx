@@ -232,10 +232,6 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
     {
     this->Internal->InitializedAfterObjectsCreated = true;
     this->initializeWidgets();
-
-    // Initialize the interactors and all global settings. global-settings
-    // override the values specified in state files or through python client.
-    this->initializeInteractors();
     this->restoreSettings(/*only_global=*/true);
     }
 
@@ -292,116 +288,6 @@ void pqRenderViewBase::setDefaultPropertyValues()
 
   this->restoreSettings(false);
   proxy->InvokeCommand("ResetCamera");
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderViewBase::initializeInteractors()
-{
-  // Local vars
-  QMap<QString, QList<pqSMProxy> > manipulators;
-  int numberOfManipulators = 0;
-  const ManipulatorType* defaultManipTypes;
-
-  // Get specific manipulators definitions (cf: concreate class)
-  defaultManipTypes = this->getManipulatorTypes(numberOfManipulators);
-
-  // Fill internal structure
-  for(int index = 0; index < numberOfManipulators; index++)
-    {
-    const ManipulatorType &manipType = defaultManipTypes[index];
-    vtkSMProxy *manip = this->createCameraManipulator(
-          manipType.Mouse, manipType.Shift, manipType.Control, manipType.Name);
-    manipulators[manipType.CameraManipulatorName].push_back(manip);
-    manip->Delete();
-    }
-
-  // For each camera manipulator set the manipulators
-  QMapIterator<QString, QList<pqSMProxy> > iter(manipulators);
-  while (iter.hasNext())
-    {
-      iter.next();
-      this->setCameraManipulators(iter.key(), iter.value());
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool pqRenderViewBase::setCameraManipulators(const QString &cameraManipulatorName, const QList<pqSMProxy>& manipulators)
-{
-  if (manipulators.size()<=0)
-    {
-    return false;
-    }
-
-  vtkSMProxy* viewproxy = this->getProxy();
-  std::string propertyName = cameraManipulatorName.toStdString();
-
-  pqSMAdaptor::setProxyListProperty(
-    viewproxy->GetProperty(propertyName.c_str()),
-    manipulators);
-  viewproxy->UpdateProperty(propertyName.c_str(), 1);
-  return true;
-}
-
-//-----------------------------------------------------------------------------
-QList<vtkSMProxy*> pqRenderViewBase::getCameraManipulators(const QString &cameraManipulatorName) const
-{
-  QList<pqSMProxy> manips = pqSMAdaptor::getProxyListProperty(
-    this->getProxy()->GetProperty(cameraManipulatorName.toLatin1().data()));
-
-  QList<vtkSMProxy*> reply;
-  foreach (vtkSMProxy* proxy, manips)
-    {
-    reply.push_back(proxy);
-    }
-  return reply;
-}
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqRenderViewBase::createCameraManipulator(
-  int mouse, int shift, int control, QString name)
-{
-  QString strManipName;
-  if(name.compare("Rotate")==0)
-    {
-    strManipName = "TrackballRotate";
-    }
-  else if(name.compare("Roll")==0)
-    {
-    strManipName = "TrackballRoll";
-    }
-  else if(name.compare("Move")==0)
-    {
-    strManipName = "TrackballMoveActor";
-    }
-  else if(name.compare("Zoom")==0)
-    {
-    strManipName = "TrackballZoom";
-    }
-  else if(name.compare("Pan")==0)
-    {
-    strManipName = "TrackballPan1";
-    }
-  else if (name.compare("Multi-Rotate") == 0)
-    {
-    strManipName = "TrackballMultiRotate";
-    }
-  else
-    {
-    strManipName = "None";
-    }
-
-  vtkSMSessionProxyManager* pxm = this->proxyManager();
-  vtkSMProxy *manip = pxm->NewProxy("cameramanipulators", 
-    strManipName.toLatin1().data());
-  if(!manip)
-    {
-    return NULL;
-    }
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), mouse);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), shift);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), control);
-  pqSMAdaptor::setElementProperty(manip->GetProperty("ManipulatorName"), name);
-  manip->UpdateVTKObjects();
-  return manip;
 }
 
 //-----------------------------------------------------------------------------
@@ -555,40 +441,6 @@ void pqRenderViewBase::restoreSettings(bool only_global)
       }
     }
   settings->endGroup();
-
-  // Loop over all interactor styles
-  QMapIterator<QString, QString> manipIter(this->interactorStyleSettingsGroupToCameraManipulatorName());
-  while(manipIter.hasNext())
-    {
-    manipIter.next();
-    settings->beginGroup(manipIter.key());
-    // Active Camera Manipulators
-    if (settings->contains("CameraManipulators"))
-      {
-      QStringList qStrManipList =
-          settings->value("CameraManipulators").toStringList();
-      int index, mouse, shift, control;
-      QString name;
-      char tmpName[20];
-      QList<pqSMProxy> smManipList;
-      foreach(QString strManip, qStrManipList)
-        {
-        sscanf(strManip.toLatin1().data(), "Manipulator%dMouse%dShift%dControl%dName%s",
-               &index, &mouse, &shift, &control, tmpName);
-        name = tmpName;
-        vtkSMProxy* localManip = this->createCameraManipulator(
-              mouse, shift, control, name);
-        if(!localManip)
-          {
-          continue;
-          }
-        smManipList.push_back(localManip);
-        localManip->Delete();
-        }
-      this->setCameraManipulators(manipIter.value(), smManipList);
-      }
-    settings->endGroup();
-    }
 }
 
 //-----------------------------------------------------------------------------

@@ -148,6 +148,10 @@ protected:
   /// destroyed.
   void addDecorator(pqPropertyWidgetDecorator*);
 
+  /// Provides access to the pqPropertyLinks instance.
+  pqPropertyLinks& links()
+    { return this->Links; }
+
 private:
   /// setAutoUpdateVTKObjects no longer simply passes the flag to
   /// pqPropertyLinks. Instead we set a flag so that when this->changeFinished()

@@ -168,17 +168,6 @@ public:
   virtual void setCursor(const QCursor &);
 
 public:
-  /// Return 9 default 3D manipulators (Used inside settings)
-  static ManipulatorType* getDefault3DManipulatorTypes()
-  { return & pqRenderView::DefaultManipulatorTypes[0]; }
-
-  /// Return 9 default 2D manipulators (Used inside settings)
-  static ManipulatorType* getDefault2DManipulatorTypes()
-  { return & pqRenderView::DefaultManipulatorTypes[9]; }
-
-  /// Return all possible manipulators
-  virtual ManipulatorType* getManipulatorTypes(int &numberOfManipulatorType);
-
   /// Creates a new surface selection given the rectangle in display
   /// coordinates.
   void selectOnSurface(int rectangle[4], bool expand=false);
@@ -314,10 +303,6 @@ protected:
   virtual const char* viewSettingsGroup() const
     { return "renderModule"; }
 
-  /// Returns the name of the group in which to save the interactor style
-  /// settings with the corresponding CameraManipulator name.
-  virtual QMap<QString, QString> interactorStyleSettingsGroupToCameraManipulatorName() const;
-
   /// Setups up RenderModule and QVTKWidget binding.
   /// This method is called for all pqRenderView objects irrespective
   /// of whether it is created from state/undo-redo/python or by the GUI. Hence
@@ -335,8 +320,6 @@ private:
   void collectSelectionPorts(vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts,
     bool expand, bool select_blocks);
-
-  static ManipulatorType DefaultManipulatorTypes[18];
 
   void InternalConstructor(vtkSMViewProxy *renModule);
 };

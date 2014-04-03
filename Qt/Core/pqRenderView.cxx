@@ -41,9 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVTrackballRoll.h"
-#include "vtkPVTrackballRotate.h"
-#include "vtkPVTrackballZoom.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
@@ -58,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUndoStack.h"
 #include "vtkStructuredData.h"
-#include "vtkTrackballPan.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -86,29 +82,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
-pqRenderView::ManipulatorType pqRenderView::DefaultManipulatorTypes[] =
-{
-  { 1, 0, 0, "Rotate", "Camera3DManipulators"},
-  { 2, 0, 0, "Pan",    "Camera3DManipulators"},
-  { 3, 0, 0, "Zoom",   "Camera3DManipulators"},
-  { 1, 1, 0, "Roll",   "Camera3DManipulators"},
-  { 2, 1, 0, "Rotate", "Camera3DManipulators"},
-  { 3, 1, 0, "Pan",    "Camera3DManipulators"},
-  { 1, 0, 1, "Zoom",   "Camera3DManipulators"},
-  { 2, 0, 1, "Rotate", "Camera3DManipulators"},
-  { 3, 0, 1, "Zoom",   "Camera3DManipulators"},
-  // ------------- 3D / 2D -------------
-  { 1, 0, 0, "Pan",  "Camera2DManipulators"},
-  { 2, 0, 0, "Roll",  "Camera2DManipulators"},
-  { 3, 0, 0, "Zoom", "Camera2DManipulators"},
-  { 1, 1, 0, "Zoom", "Camera2DManipulators"},
-  { 2, 1, 0, "Zoom", "Camera2DManipulators"},
-  { 3, 1, 0, "Zoom", "Camera2DManipulators"},
-  { 1, 0, 1, "Roll", "Camera2DManipulators"},
-  { 2, 0, 1, "Pan", "Camera2DManipulators"},
-  { 3, 0, 1, "Rotate" , "Camera2DManipulators"},
-};
-
 namespace {
 
 // converts a vtkSMRepresentationProxy to its corresponding pqDataRepresentation
@@ -129,7 +102,6 @@ pqDataRepresentation* findRepresentationFromProxy(vtkSMRepresentationProxy *prox
 class pqRenderView::pqInternal
 {
 public:
-  QMap<QString, QString> SettingsGroupToManipulatorName;
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
   QList<pqRenderView* > LinkedUndoStacks;
@@ -148,12 +120,6 @@ public:
       vtkSmartPointer<vtkSMInteractionUndoStackBuilder>::New();
     this->UndoStackBuilder->SetUndoStack(
       this->InteractionUndoStack);
-
-    // Fill the mapping table
-    this->SettingsGroupToManipulatorName["renderModule/InteractorStyle"] =
-        "Camera3DManipulators";
-    this->SettingsGroupToManipulatorName["renderModule2D/InteractorStyle"] =
-        "Camera2DManipulators";
     }
 
   ~pqInternal()
@@ -954,17 +920,6 @@ void pqRenderView::selectBlock(int rectangle[4], bool expand)
   this->emitSelectionSignal(opPorts);
 }
 
-//-----------------------------------------------------------------------------
-pqRenderViewBase::ManipulatorType* pqRenderView::getManipulatorTypes(int &numberOfManipulatorType)
-{
-  numberOfManipulatorType = 18; // 9 + 9
-  return pqRenderView::DefaultManipulatorTypes;
-}
-//-----------------------------------------------------------------------------
-QMap<QString, QString> pqRenderView::interactorStyleSettingsGroupToCameraManipulatorName() const
-{
-  return this->Internal->SettingsGroupToManipulatorName;
-}
 //-----------------------------------------------------------------------------
 void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
 {

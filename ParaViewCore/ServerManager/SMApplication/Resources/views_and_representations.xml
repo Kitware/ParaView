@@ -260,33 +260,47 @@
         <Documentation>Set the delay (in seconds) after an interactive render
         before switching to a full-rese render.</Documentation>
       </DoubleVectorProperty>
-      <ProxyProperty clean_command="RemoveAll2DManipulators"
-                     command="Add2DManipulator"
-                     is_internal="1"
-                     name="Camera2DManipulators"
-                     repeatable="1">
+      <IntVectorProperty name="Camera3DManipulators"
+        command="SetCamera3DManipulators"
+        argument_is_array="1"
+        number_of_elements="9"
+        default_values="4 1 2 3 4 1 2 4 2" >
         <!-- For now, we are marking this property is_internal so that it won't
-        get saved in state files.
-        Eventually, we need to take out all the interaction related code from
-        the server manager -->
-        <ProxyGroupDomain name="groups">
-          <Group name="cameramanipulators" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <ProxyProperty clean_command="RemoveAll3DManipulators"
-                     command="Add3DManipulator"
-                     is_internal="1"
-                     name="Camera3DManipulators"
-                     repeatable="1">
+        get saved in state files. -->
+        <Documentation>
+          Set the interactions mode for 3D interaction. The values are specified
+          in order as (left button, middle button, right button), and repeated for
+          shift key and control key modifiers.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+          <Entry text="Multi-Rotate" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty name="Camera2DManipulators"
+        command="SetCamera2DManipulators"
+        argument_is_array="1"
+        number_of_elements="9"
+        default_values="1 3 2 2 2 2 3 1 4" >
         <!-- For now, we are marking this property is_internal so that it won't
-        get saved in state files.
-        Eventually, we need to take out all the interaction related code from
-        the server manager -->
-        <ProxyGroupDomain name="groups">
-          <Group name="cameramanipulators" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-
+        get saved in state files. -->
+        <Documentation>
+          Set the interactions mode for 2D interaction. The values are specified
+          in order as (left button, middle button, right button), and repeated for
+          shift key and control key modifiers.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Pan" value="1" />
+          <Entry text="Zoom" value="2" />
+          <Entry text="Roll" value="3" />
+          <Entry text="Rotate" value="4" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseLightKit"
                          default_values="1"
                          name="UseLight"
