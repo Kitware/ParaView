@@ -19,7 +19,6 @@ add_paraview_plugin(StreamingParticles "1.0"
 
 if(PARAVIEW_ENABLE_COSMOTOOLS 
     AND BUILD_TESTING
-    AND PARAVIEW_DATA_ROOT
     AND PARAVIEW_BUILD_QT_GUI)
     include(ParaViewTestingMacros)
     paraview_test_load_data_dirs(StreamingParticles

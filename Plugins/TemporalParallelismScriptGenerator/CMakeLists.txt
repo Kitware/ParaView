@@ -85,7 +85,7 @@ ADD_PARAVIEW_PLUGIN(
     tp_export_py.cxx
 )
 
-IF (BUILD_TESTING AND BUILD_SHARED_LIBS AND PARAVIEW_DATA_ROOT)
+IF (BUILD_TESTING AND BUILD_SHARED_LIBS)
   include(ParaViewTestingMacros)
   add_client_tests("pv"
     LOAD_PLUGIN "TemporalParallelismScriptGenerator"

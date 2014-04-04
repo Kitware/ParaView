@@ -1,4 +1,4 @@
-if(PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_QT_GUI)
+if(PARAVIEW_BUILD_QT_GUI)
 
   include(ParaViewTestingMacros)
 
