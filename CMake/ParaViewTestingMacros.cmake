@@ -121,7 +121,7 @@ SET (CLIENT_EXECUTABLE  "\$<TARGET_FILE:paraview>")
 MACRO (process_args out_extra_args)
   SET (temp_args)
   IF (ACT_BASELINE_DIR)
-    SET (temp_args "--test-baseline=${ACT_BASELINE_DIR}/${test_name}.png")
+    SET (temp_args "--test-baseline=DATA{${ACT_BASELINE_DIR}/${test_name}.png}")
   ENDIF (ACT_BASELINE_DIR)
   IF (${test_name}_THRESHOLD)
     SET (temp_args ${temp_args} "--test-threshold=${${test_name}_THRESHOLD}")
@@ -180,13 +180,13 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)
-      ADD_TEST(NAME "${prefix}${full_test_name}"
+      ExternalData_add_test(ParaViewData
+        NAME "${prefix}${full_test_name}"
         COMMAND smTestDriver
-        --enable-bt
-        ${ACT_COMMAND}
-        ${extra_args}
-        --exit
-        )
+                --enable-bt
+                ${ACT_COMMAND}
+                ${extra_args}
+                --exit)
       if (force_serial)
         set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
         message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
@@ -304,11 +304,12 @@ FUNCTION(add_pvweb_tests prefix)
         set(test_name "${prefix}-${browser}.${ACT_APP}-${short_script_name}")
         set(test_image_file_name "${test_name}.png")
 
-        add_test(NAME ${test_name}
+        ExternalData_add_test(ParaViewData
+          NAME ${test_name}
           COMMAND ${ACT_COMMAND}
                   ${ACT_SERVER}
                   --content ${ParaView_BINARY_DIR}/www
-                  --data-dir ${PARAVIEW_DATA_ROOT}/Data
+                  --data-dir ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
                   --port 8080
                   ${ARGS}
                   ${BASELINE_IMG_DIR}
@@ -385,7 +386,8 @@ FUNCTION(add_multi_client_tests prefix)
         set (use_old_panels "--use-old-panels")
       endif ()
 
-      add_test(NAME "${prefix}.${test_name}"
+      ExternalData_add_test(ParaViewData
+        NAME "${prefix}.${test_name}"
         COMMAND smTestDriver
         --test-multi-clients
         --server $<TARGET_FILE:pvserver>
@@ -425,7 +427,8 @@ FUNCTION(add_multi_server_tests prefix nbServers)
     get_filename_component(test_name ${test_script} NAME_WE)
       set (extra_args)
       process_args(extra_args)
-      add_test(NAME "${prefix}.${test_name}"
+      ExternalData_add_test(ParaViewData
+        NAME "${prefix}.${test_name}"
         COMMAND smTestDriver
         --test-multi-servers ${nbServers}
         --server $<TARGET_FILE:pvserver>
@@ -458,7 +461,8 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
         get_filename_component(test_name ${test_script} NAME_WE)
         set (extra_args)
         process_args(extra_args)
-        add_test(NAME "${prefix}-${tdx}x${tdy}.${test_name}"
+        ExternalData_add_test(ParaViewData
+            NAME "${prefix}-${tdx}x${tdy}.${test_name}"
             COMMAND smTestDriver
             --test-tiled ${tdx} ${tdy}
             --server $<TARGET_FILE:pvserver>

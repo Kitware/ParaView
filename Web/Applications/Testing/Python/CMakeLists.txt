@@ -45,6 +45,11 @@ set(WEB_TESTS_WITH_CHROME
   ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_visualizer_can_test.py
   )
 
+paraview_test_load_baselines_dirs(WebTesting
+  WebTesting/ParaView
+  )
+paraview_test_data_target(WebTesting)
+
 add_pvweb_tests("pvweb"
   APP          Visualizer
   COMMAND      $<TARGET_FILE:pvpython>
@@ -55,7 +60,7 @@ add_pvweb_tests("pvweb"
                firefox
                internet_explorer
                safari
-  BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline/WebTesting/ParaView
+  BASELINE_DIR ${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}/WebTesting/ParaView
   TEST_SCRIPTS ${WEB_TESTS_WITH_CHROME}
   )
 

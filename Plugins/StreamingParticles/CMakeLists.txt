@@ -29,7 +29,7 @@ if(PARAVIEW_ENABLE_COSMOTOOLS
               --enable-streaming
               --test-directory=${PARAVIEW_TEST_DIR}
               --test-plugin=StreamingParticles
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/StreamingParticles.xml
       )
 endif()
