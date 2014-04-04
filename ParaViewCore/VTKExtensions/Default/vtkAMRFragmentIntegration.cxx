@@ -104,7 +104,6 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
 
   vtkTable* fragments = vtkTable::New ();
 
-  
   std::map<vtkIdType, vtkIdType> fragIndices;
 
   vtkTimerLog::MarkStartEvent ("Finding max region");
@@ -145,7 +144,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
   vtkIdType totalFragments = fragIndices.size ();
   if (controller != 0)
     {
-    controller->AllReduce (&totalFragments, &totalFragments, 1, vtkCommunicator::MAX_OP);
+    controller->AllReduce (&totalFragments, &totalFragments, 1, vtkCommunicator::SUM_OP);
     }
   vtkTimerLog::MarkEndEvent ("Finding max region");
 
@@ -371,7 +370,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
 
         fragIndicesArray->Delete ();
         }
-      else /* if ((myProc + pivot) < numProcs) */
+      else if ((myProc + pivot) < numProcs)
         {
         int tuples = 0;
         controller->Receive (&tuples, 1, myProc + pivot, tag + pivot + 0);
@@ -402,13 +401,17 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
             {
             size_t index = fragIndices.size ();
             fragIndices[fragId] = index;
+            if (index >= static_cast<size_t>(totalFragments)) 
+              {
+              vtkErrorMacro ("The number of indices is inconsistent with initial reduce");
+              }
             }
           int index = fragIndices[fragId];
           fragIdArray->SetTuple1 (index, fragId);
           fragVolume->SetTuple1 (index, 
             fragVolume->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
           fragMass->SetTuple1 (index, 
-            fragMass->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
+            fragMass->GetTuple1 (index) + fragMassReceive->GetTuple1 (remoteIndex));
           for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
             {
             volWeightArrays[v]->SetTuple1 (index, 
