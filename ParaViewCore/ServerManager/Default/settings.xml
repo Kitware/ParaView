@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="settings">
     <!-- ================================================================== -->
-    <Proxy name="GeneralSettings" label="General"
+    <SettingsProxy name="GeneralSettings" label="General"
       processes="client|dataserver|renderserver"
       class="vtkPVGeneralSettings">
       <Documentation>
@@ -53,10 +53,16 @@
       <IntVectorProperty name="AutoApply"
         number_of_elements="1"
         default_values="0"
-        command="SetAutoApply">
+        command="SetAutoApply"
+        information_property="AutoApplyInfo">
         <Documentation>
           Automatically apply changes in the 'Properties' panel.
         </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty name="AutoApplyInfo"
+                         command="GetAutoApply"
+                         information_only="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -244,10 +250,10 @@
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
-    </Proxy>
+    </SettingsProxy>
 
     <!-- ================================================================== -->
-    <Proxy name="RenderViewSettings" label="Render View"
+    <SettingsProxy name="RenderViewSettings" label="Render View"
       processes="client|dataserver|renderserver"
       class="vtkPVRenderViewSettings">
       <Documentation>
@@ -485,10 +491,10 @@
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
-    </Proxy>
+    </SettingsProxy>
 
     <!-- ================================================================== -->
-    <Proxy name="RenderViewInteractionSettings" label="Camera"
+    <SettingsProxy name="RenderViewInteractionSettings" label="Camera"
       processes="client|dataserver|renderserver">
       <IntVectorProperty name="Camera3DManipulators"
         number_of_elements="9"
@@ -534,6 +540,6 @@
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
-    </Proxy>
+    </SettingsProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

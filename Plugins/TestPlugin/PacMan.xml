@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="settings">
 
-    <Proxy name="PacManSettings" label="PacMan"
+    <SettingsProxy name="PacManSettings" label="PacMan"
       processes="client|dataserver|renderserver">
       <Documentation>
         Settings for the PacMan plugin.
@@ -18,7 +18,7 @@
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
-    </Proxy>
+    </SettingsProxy>
 
   </ProxyGroup>
   <ProxyGroup name="sources">

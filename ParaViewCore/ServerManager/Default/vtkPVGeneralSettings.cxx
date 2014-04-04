@@ -156,4 +156,12 @@ void vtkPVGeneralSettings::SetAnimationGeometryCacheLimit(unsigned long val)
 void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "AutoApply: " << this->AutoApply << "\n";
+  os << indent << "AutoApplyActiveOnly: " << this->AutoApplyActiveOnly << "\n";
+  os << indent << "DefaultViewType: " << this->DefaultViewType << "\n";
+  os << indent << "TransferFunctionResetMode: " << this->TransferFunctionResetMode << "\n";
+  os << indent << "ScalarBarMode: " << this->ScalarBarMode << "\n";
+  os << indent << "CacheGeometryForAnimation: " << this->CacheGeometryForAnimation << "\n";
+  os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";
 }
