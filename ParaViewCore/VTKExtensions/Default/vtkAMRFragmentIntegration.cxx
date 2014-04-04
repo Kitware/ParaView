@@ -336,7 +336,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       {
       if (myProc >= pivot) 
         {
-        size_t tuples = fragIndices.size ();
+        int tuples = static_cast<int>(fragIndices.size ());
         vtkIdTypeArray *fragIndicesArray = vtkIdTypeArray::New ();
         fragIndicesArray->SetNumberOfComponents (2);
         fragIndicesArray->SetNumberOfTuples (tuples);
