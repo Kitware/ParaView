@@ -1468,6 +1468,48 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
   return property;
 }
 
+
+//---------------------------------------------------------------------------
+class vtkSMProxyPropertyLinkObserver : public vtkCommand
+{
+public:
+  vtkWeakPointer<vtkSMProperty> Output;
+  typedef vtkCommand Superclass;
+  virtual const char* GetClassNameInternal() const
+    { return "vtkSMProxyPropertyLinkObserver"; }
+  static vtkSMProxyPropertyLinkObserver* New()
+    {
+      return new vtkSMProxyPropertyLinkObserver();
+    }
+  virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
+    {
+    (void)event;
+    (void)calldata;
+    vtkSMProperty* input = vtkSMProperty::SafeDownCast(caller);
+     if (input && this->Output)
+      {
+      // this will copy both checked and unchecked property values.
+      this->Output->Copy(input);
+      }
+    }
+};
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::LinkProperty(vtkSMProperty* input, vtkSMProperty* output)
+{
+  if (input == output || input == NULL || output == NULL)
+    {
+    vtkErrorMacro("Invalid call to vtkSMProxy::LinkProperty. Check arguments.");
+    return;
+    }
+
+  vtkSMProxyPropertyLinkObserver* observer = vtkSMProxyPropertyLinkObserver::New();
+  observer->Output = output;
+  input->AddObserver(vtkCommand::PropertyModifiedEvent, observer);
+  input->AddObserver(vtkCommand::UncheckedPropertyModifiedEvent, observer);
+  observer->FastDelete();
+}
+
 //---------------------------------------------------------------------------
 vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
 {

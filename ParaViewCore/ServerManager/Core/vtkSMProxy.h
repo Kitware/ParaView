@@ -682,6 +682,11 @@ protected:
   vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
 
   // Description:
+  // Links properties such that when inputProperty's checked or unchecked values
+  // are changed, the outputProperty's corresponding values are also changed.
+  void LinkProperty(vtkSMProperty* inputProperty, vtkSMProperty* outputProperty);
+
+  // Description:
   // Parses the XML to create a new property group. This can handle
   // <PropertyGroup /> elements defined in both regular Proxy section or when
   // exposing properties from sub-proxies.
