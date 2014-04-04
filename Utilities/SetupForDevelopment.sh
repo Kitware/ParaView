@@ -50,6 +50,10 @@ echo "Setting up git aliases..."
 ./SetupGitAliases.sh || exit 1
 echo
 
+echo "Setting up external data..."
+./SetupExternalData.sh || exit 1
+echo
+
 echo "Setting up Gerrit..."
 ./SetupGerrit.sh || exit 1
 echo

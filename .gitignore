@@ -2,3 +2,4 @@
 # script in the source directory.  There is no way to suppress their
 # creation short of copying the file somewhere.
 *.pyc
+.ExternalData*
