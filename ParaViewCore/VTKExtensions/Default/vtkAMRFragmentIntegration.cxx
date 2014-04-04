@@ -105,7 +105,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
   vtkTable* fragments = vtkTable::New ();
 
   
-  std::map<vtkIdType, int> fragIndices;
+  std::map<vtkIdType, vtkIdType> fragIndices;
 
   vtkTimerLog::MarkStartEvent ("Finding max region");
 
@@ -137,12 +137,12 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
       if (ghostLevels->GetTuple1 (c) < 0.5)
         {
-        int index = fragIndices.size ();
+        vtkIdType index = fragIndices.size ();
         fragIndices[fragId] = index;
         }
       }
     }
-  int totalFragments = fragIndices.size ();
+  vtkIdType totalFragments = fragIndices.size ();
   if (controller != 0)
     {
     controller->AllReduce (&totalFragments, &totalFragments, 1, vtkCommunicator::MAX_OP);
@@ -172,7 +172,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
   fragMass->Delete ();
 
   vtkDoubleArray** volWeightArrays = new vtkDoubleArray*[volumeWeightedNames.size ()];
-  for (int v = 0; v < volumeWeightedNames.size (); v ++)
+  for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
     {
     volWeightArrays[v] = vtkDoubleArray::New ();
     std::string name ("Volume Weighted ");
@@ -185,7 +185,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     }
 
   vtkDoubleArray** massWeightArrays = new vtkDoubleArray*[massWeightedNames.size ()];
-  for (int m = 0; m < massWeightedNames.size (); m ++)
+  for (size_t m = 0; m < massWeightedNames.size (); m ++)
     {
     massWeightArrays[m] = vtkDoubleArray::New ();
     std::string name ("Mass Weighted ");
@@ -202,11 +202,11 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     fragIdArray->SetTuple1 (i, 0);
     fragVolume->SetTuple1 (i, 0);
     fragMass->SetTuple1 (i, 0);
-    for (int v = 0; v < volumeWeightedNames.size (); v ++)
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
       {
       volWeightArrays[v]->SetTuple1 (i, 0);
       }
-    for (int m = 0; m < massWeightedNames.size (); m ++)
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
       {
       massWeightArrays[m]->SetTuple1 (i, 0);
       }
@@ -251,11 +251,11 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro (<< "There is no " << massName << " in cell field");
       return 0;
       }
-    for (int v = 0; v < volumeWeightedNames.size (); v ++)
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
       {
       preVolWeightArrays[v] = grid->GetCellData ()->GetArray (volumeWeightedNames[v].c_str ());
       }
-    for (int m = 0; m < massWeightedNames.size (); m ++)
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
       {
       preMassWeightArrays[m] = grid->GetCellData ()->GetArray (massWeightedNames[m].c_str ());
       }
@@ -266,7 +266,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       if (regionId->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
         {
         vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
-        std::map<vtkIdType, int>::iterator loc = fragIndices.find (fragId);
+        std::map<vtkIdType, vtkIdType>::iterator loc = fragIndices.find (fragId);
         if (loc == fragIndices.end ())
           {
           vtkErrorMacro (<< "Invalid Region Id " << fragId);
@@ -278,13 +278,13 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
         double mass = massArray->GetTuple1 (c);
         fragMass->SetTuple1 (index, fragMass->GetTuple1 (index) + mass);
 
-        for (int v = 0; v < volumeWeightedNames.size (); v ++)
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
           {
           double value = volWeightArrays[v]->GetTuple1 (index);
           value += preVolWeightArrays[v]->GetTuple1 (c) * vol;
           volWeightArrays[v]->SetTuple1 (index, value);
           }
-        for (int m = 0; m < massWeightedNames.size (); m ++)
+        for (size_t m = 0; m < massWeightedNames.size (); m ++)
           {
           double value = massWeightArrays[m]->GetTuple1 (index);
           value += preMassWeightArrays[m]->GetTuple1 (c) * mass;
@@ -316,7 +316,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     fragMassReceive->SetNumberOfTuples (totalFragments + 1);
 
     vtkDoubleArray** volWeightReceive = new vtkDoubleArray*[volumeWeightedNames.size ()];
-    for (int v = 0; v < volumeWeightedNames.size (); v ++)
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
       {
       volWeightReceive[v] = vtkDoubleArray::New ();
       volWeightReceive[v]->SetNumberOfComponents (1);
@@ -324,7 +324,7 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       }
 
     vtkDoubleArray** massWeightReceive = new vtkDoubleArray*[massWeightedNames.size ()];
-    for (int m = 0; m < massWeightedNames.size (); m ++)
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
       {
       massWeightReceive[m] = vtkDoubleArray::New ();
       massWeightReceive[m]->SetNumberOfComponents (1);
@@ -337,17 +337,17 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       {
       if (myProc >= pivot) 
         {
-        int tuples = fragIndices.size ();
+        size_t tuples = fragIndices.size ();
         vtkIdTypeArray *fragIndicesArray = vtkIdTypeArray::New ();
         fragIndicesArray->SetNumberOfComponents (2);
         fragIndicesArray->SetNumberOfTuples (tuples);
 
-        std::map<vtkIdType, int>::iterator iter;
+        std::map<vtkIdType, vtkIdType>::iterator mapiter;
         int ind = 0;
-        for (iter = fragIndices.begin (); iter != fragIndices.end (); iter ++)
+        for (mapiter = fragIndices.begin (); mapiter != fragIndices.end (); mapiter ++)
           {
-          fragIndicesArray->SetComponent (ind, 0, iter->first);
-          fragIndicesArray->SetComponent (ind, 1, iter->second);
+          fragIndicesArray->SetComponent (ind, 0, mapiter->first);
+          fragIndicesArray->SetComponent (ind, 1, mapiter->second);
           ind ++;
         }
 
@@ -357,13 +357,13 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
         controller->Send (fragMass, myProc - pivot, tag + pivot + 3);
 
         int off = 4;
-        for (int v = 0; v < volumeWeightedNames.size (); v ++)
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
           {
           controller->Send (volWeightArrays[v], myProc - pivot, tag + pivot + off);
           off ++;
           } 
 
-        for (int m = 0; m < massWeightedNames.size (); m ++)
+        for (size_t m = 0; m < massWeightedNames.size (); m ++)
           {
           controller->Send (massWeightArrays[m], myProc - pivot, tag + pivot + off);
           off ++;
@@ -381,13 +381,13 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
         controller->Receive (fragMassReceive, myProc + pivot, tag + pivot + 3);
 
         int off = 4;
-        for (int v = 0; v < volumeWeightedNames.size (); v ++)
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
           {
           controller->Receive (volWeightReceive[v], myProc + pivot, tag + pivot + off);
           off ++;
           } 
 
-        for (int m = 0; m < massWeightedNames.size (); m ++)
+        for (size_t m = 0; m < massWeightedNames.size (); m ++)
           {
           controller->Receive (massWeightReceive[m], myProc + pivot, tag + pivot + off);
           off ++;
@@ -395,12 +395,12 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
 
         for (int i = 0; i < fragIndicesReceive->GetNumberOfTuples (); i ++) 
           {
-          int fragId = fragIndicesReceive->GetComponent (i, 0);
-          int remoteIndex = fragIndicesReceive->GetComponent (i, 1);
-          std::map<vtkIdType, int>::iterator loc = fragIndices.find (fragId);
+          vtkIdType fragId = fragIndicesReceive->GetComponent (i, 0);
+          vtkIdType remoteIndex = fragIndicesReceive->GetComponent (i, 1);
+          std::map<vtkIdType, vtkIdType>::iterator loc = fragIndices.find (fragId);
           if (loc == fragIndices.end ())
             {
-            int index = fragIndices.size ();
+            size_t index = fragIndices.size ();
             fragIndices[fragId] = index;
             }
           int index = fragIndices[fragId];
@@ -409,13 +409,12 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
             fragVolume->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
           fragMass->SetTuple1 (index, 
             fragMass->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
-          for (int v = 0; v < volumeWeightedNames.size (); v ++)
+          for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
             {
-            double value = volWeightArrays[v]->GetTuple1 (index);
             volWeightArrays[v]->SetTuple1 (index, 
               volWeightArrays[v]->GetTuple1 (index) + volWeightReceive[v]->GetTuple1 (remoteIndex));
             }
-          for (int m = 0; m < massWeightedNames.size (); m ++)
+          for (size_t m = 0; m < massWeightedNames.size (); m ++)
             {
             massWeightArrays[m]->SetTuple1 (index, 
               massWeightArrays[m]->GetTuple1 (index) + massWeightReceive[m]->GetTuple1 (remoteIndex));
@@ -429,12 +428,12 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     fragVolumeReceive->Delete ();
     fragMassReceive->Delete ();
 
-    for (int v = 0; v < volumeWeightedNames.size (); v ++)
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
       {
       volWeightReceive[v]->Delete ();
       }
 
-    for (int m = 0; m < massWeightedNames.size (); m ++)
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
       {
       massWeightReceive[m]->Delete ();
       }
@@ -454,12 +453,12 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
         }
       else
         {
-        for (int v = 0; v < volumeWeightedNames.size (); v ++) 
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++) 
           {
           double weightAvg = volWeightArrays[v]->GetTuple1 (row) / fragVolume->GetTuple1 (row);
           volWeightArrays[v]->SetTuple1 (row, weightAvg);
           }
-        for (int m = 0; m < massWeightedNames.size (); m ++) 
+        for (size_t m = 0; m < massWeightedNames.size (); m ++) 
           {
           double weightAvg = massWeightArrays[m]->GetTuple1 (row) / fragMass->GetTuple1 (row);
           massWeightArrays[m]->SetTuple1 (row, weightAvg);
