@@ -58,10 +58,12 @@ vtkSMFieldDataDomain::~vtkSMFieldDataDomain()
 //---------------------------------------------------------------------------
 void vtkSMFieldDataDomain::Update(vtkSMProperty*)
 {
-  if (this->DisableUpdateDomainEntries)
-    {
-    return;
-    }
+  // We don't return here, since even if updating the domain values may be
+  // disbaled, we still would want to pick a good default for this domain.
+  //if (this->DisableUpdateDomainEntries)
+  //  {
+  //  return;
+  //  }
 
   vtkPVDataInformation* dataInfo = this->GetInputDataInformation("Input");
   vtkSMProperty* pp = this->GetRequiredProperty("Input");
@@ -80,6 +82,8 @@ void vtkSMFieldDataDomain::UpdateDomainEntries(
 {
   std::set<int> accepted_associations;
 
+  // iterate over all attribute types and add the "acceptable" attribute types
+  // to this domain.
   for (int idx=vtkSMInputArrayDomain::POINT;
     idx < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES;
     idx++)
@@ -124,7 +128,19 @@ void vtkSMFieldDataDomain::UpdateDomainEntries(
 
   if (accepted_associations.size() > 0)
     {
+    // to pick a good default, find the first non-empty acceptable attribute.
     this->DefaultValue = (*accepted_associations.begin());
+    for (std::set<int>::const_iterator iter = accepted_associations.begin();
+      iter != accepted_associations.end(); ++iter)
+      {
+      vtkPVDataSetAttributesInformation* attrInfo = dataInfo?
+        dataInfo->GetAttributeInformation(*iter) : NULL;
+      if (attrInfo && attrInfo->GetNumberOfArrays() > 0)
+        {
+        this->DefaultValue = *iter;
+        break;
+        }
+      }
     }
   else
     {
