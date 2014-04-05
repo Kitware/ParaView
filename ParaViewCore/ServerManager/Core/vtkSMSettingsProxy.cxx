@@ -77,7 +77,8 @@ int vtkSMSettingsProxy::ReadXMLAttributes(
 
   // Now link information properties that provide the current value of the VTK
   // object with the corresponding proxy property
-  vtkSmartPointer<vtkSMPropertyIterator> iter = this->NewPropertyIterator();
+  vtkSmartPointer<vtkSMPropertyIterator> iter;
+  iter.TakeReference(this->NewPropertyIterator());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next() )
     {
     vtkSMProperty* property = iter->GetProperty();
@@ -90,6 +91,7 @@ int vtkSMSettingsProxy::ReadXMLAttributes(
         }
       }
     }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
