@@ -105,8 +105,6 @@ set(Module_SRCS
   pqMultiSliceAxisWidget.h
   pqMultiSliceView.cxx
   pqMultiSliceView.h
-  pqNameCount.cxx
-  pqNameCount.h
   pqNonEditableStyledItemDelegate.cxx
   pqNonEditableStyledItemDelegate.h
   pqObjectBuilder.cxx

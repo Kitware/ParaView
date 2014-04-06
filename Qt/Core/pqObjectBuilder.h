@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqAnimationCue;
 class pqDataRepresentation;
-class pqNameCount;
 class pqOutputPort;
 class pqPipelineSource;
 class pqProxy;
@@ -272,9 +271,6 @@ protected:
   /// This use the <InheritRepresentationProperties /> hints to inherit
   /// properties from input representation is possible.
   virtual void initializeInheritedProperties(pqDataRepresentation* repr);
-
-  /// Used to create names for registering proxies.
-  pqNameCount* NameGenerator;
 
 private:
   pqObjectBuilder(const pqObjectBuilder&); // Not implemented.

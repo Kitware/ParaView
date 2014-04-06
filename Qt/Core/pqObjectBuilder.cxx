@@ -59,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqInterfaceTracker.h"
-#include "pqNameCount.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
@@ -74,16 +73,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqViewModuleInterface.h"
 #include "vtkSMAnimationSceneProxy.h"
-
-inline QString pqObjectBuilderGetName(vtkSMProxy* proxy,
-  pqNameCount *nameGenerator)
-{
-  QString label =
-    proxy->GetXMLLabel()? proxy->GetXMLLabel() : proxy->GetXMLName();
-  label.remove(' ');
-  return QString("%1%2").arg(label).arg(
-    nameGenerator->GetCountAndIncrement(label));
-}
 
 namespace pqObjectBuilderNS
 {
@@ -135,7 +124,6 @@ namespace pqObjectBuilderNS
 //-----------------------------------------------------------------------------
 pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :
   QObject(_parent),
-  NameGenerator(new pqNameCount()),
   WaitingForConnection(false)
 {
 }
@@ -143,7 +131,6 @@ pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :
 //-----------------------------------------------------------------------------
 pqObjectBuilder::~pqObjectBuilder()
 {
-  delete this->NameGenerator;
 }
 
 //-----------------------------------------------------------------------------
