@@ -62,6 +62,7 @@ public:
   /// \li \c list : pqListPropertyWidget
   /// \li \c texture_selector : pqTextureSelectorPropertyWidget
   /// \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
+  /// \li \c viewtype_selector: pqViewTypePropertyWidget
   virtual pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy *proxy, vtkSMProperty *property);
 

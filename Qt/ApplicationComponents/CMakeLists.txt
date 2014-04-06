@@ -249,6 +249,8 @@ set (Module_SRCS
   pqViewSettingsManager.h
   pqViewStreamingBehavior.cxx
   pqViewStreamingBehavior.h
+  pqViewTypePropertyWidget.cxx
+  pqViewTypePropertyWidget.h
 )
 
 set (Module_MOC_HDRS
@@ -361,6 +363,7 @@ set (Module_MOC_HDRS
   pqViewMenuManager.h
   pqViewSettingsManager.h
   pqViewStreamingBehavior.h
+  pqViewTypePropertyWidget.h
 )
 
 if (PARAVIEW_ENABLE_PYTHON)

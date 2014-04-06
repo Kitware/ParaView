@@ -17,7 +17,6 @@
         <BooleanDomain name="bool" />
         <Hints>
           <SaveInQSettings />
-          <RestartRequired />
         </Hints>
       </IntVectorProperty>
 
@@ -37,17 +36,11 @@
       <StringVectorProperty name="DefaultViewType"
         number_of_elements="1"
         default_values="RenderView"
-        command="SetDefaultViewType">
+        command="SetDefaultViewType"
+        panel_widget="viewtype_selector">
         <Documentation>
           Set the view to create when ParaView starts up.
         </Documentation>
-        <StringListDomain name="list">
-          <String value="None" />
-          <String value="RenderView" />
-        </StringListDomain>
-        <Hints>
-          <RestartRequired />
-        </Hints>
       </StringVectorProperty>
 
       <IntVectorProperty name="AutoApply"
@@ -268,6 +261,9 @@
         <Documentation>
           Enable use of display lists when rendering surface meshes.
         </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="ResolveCoincidentTopology"
@@ -285,6 +281,9 @@
           <Entry text="Offset lines and points relative to faces" value="2" />
           <Entry text="Shift z-buffer when rendering lines and points" value="3" />
         </EnumerationDomain>
+        <Hints>
+          <RestartRequired />
+        </Hints>
       </IntVectorProperty>
 
       <DoubleVectorProperty name="PolygonOffsetParameters"
@@ -297,6 +296,9 @@
           Set the polygon offset parameters. Refer to the OpenGL manual,
           glPolygonOffset for details on how to use these parameters.
         </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="ZShift"
@@ -309,6 +311,9 @@
           Set the fraction by which to shift the z-buffer range when rendering
           lines and points.
         </Documentation>
+        <Hints>
+          <RestartRequired />
+        </Hints>
       </DoubleVectorProperty>
 
       <IntVectorProperty name="DepthPeeling"

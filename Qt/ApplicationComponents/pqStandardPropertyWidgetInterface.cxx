@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqShowWidgetDecorator.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
+#include "pqViewTypePropertyWidget.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 
@@ -126,6 +127,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   else if (name == "camera_manipulator")
     {
     return new pqCameraManipulatorWidget(smProxy, smProperty);
+    }
+  else if (name == "viewtype_selector")
+    {
+    return new pqViewTypePropertyWidget(smProxy, smProperty);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
