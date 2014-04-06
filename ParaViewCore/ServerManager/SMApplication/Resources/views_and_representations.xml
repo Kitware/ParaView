@@ -237,13 +237,21 @@
                             name="OrientationAxesLabelColor"
                             panel_widget="color_selector"
                             panel_visibility="advanced"
-                            number_of_elements="3"></DoubleVectorProperty>
+                            number_of_elements="3">
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+        </Hints>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientationAxesOutlineColor"
                             default_values="1 1 1"
                             name="OrientationAxesOutlineColor"
                             panel_widget="color_selector"
                             panel_visibility="advanced"
-                            number_of_elements="3"></DoubleVectorProperty>
+                            number_of_elements="3">
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="ForegroundColor" />
+        </Hints>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetCenterOfRotation"
                             default_values="0 0 0"
