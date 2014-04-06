@@ -39,18 +39,6 @@ public:
   // Overridden to handle links with subproxy properties.
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
 
-  // Description:
-  // Overridden to handle the default value for "UseIndexForXAxis" property, if
-  // any. UseIndexForXAxis needs to be OFF by default, if the required property
-  // i.e. XArrayName property has one of the known types of arrays, otherwise it
-  // must be ON. Done if SetDefaults is TRUE.
-  virtual void ResetPropertiesToDefault();
-
-  // Description:
-  // Set/get if the UseIndexForXAxis should be set by ResetPropertiesToDefault.
-  vtkSetMacro(SetDefaults, bool);
-  vtkGetMacro(SetDefaults, bool);
-
 //BTX
 protected:
   vtkSMChartRepresentationProxy();
@@ -61,8 +49,6 @@ protected:
   // "Input" properties for all internal representations (including setting up
   // of the link to the extract-selection representation).
   virtual void SetPropertyModifiedFlag(const char* name, int flag);
-
-  bool SetDefaults;
 
 private:
   vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&); // Not implemented

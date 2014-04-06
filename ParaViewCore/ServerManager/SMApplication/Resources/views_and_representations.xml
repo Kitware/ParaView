@@ -4990,7 +4990,11 @@
                          default_values="1"
                          name="UseIndexForXAxis"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <ChartUseIndexForAxisDomain name="bool">
+          <RequiredProperties>
+            <Property function="ArraySelection" name="XArrayName" />
+          </RequiredProperties>
+        </ChartUseIndexForAxisDomain>
         <Documentation>When set, the array index will be used for X axis,
         otherwise the array identified by XArrayName will be
         used.</Documentation>
@@ -5798,8 +5802,7 @@
     <!-- =================================================================== -->
     <ChartRepresentationProxy class="vtkPVBagChartRepresentation"
                               name="XYBagChartRepresentation"
-                              processes="client|dataserver|renderserver"
-                              set_defaults="false">
+                              processes="client|dataserver|renderserver" >
       <Documentation>Representation used by XYBagChartView.</Documentation>
 
       <InputProperty command="SetInputConnection"
@@ -5872,11 +5875,14 @@
           </RequiredProperties>
         </FieldDataDomain>
       </IntVectorProperty>
-
       <IntVectorProperty command="SetUseIndexForXAxis"
                          default_values="0"
                          name="UseIndexForXAxis"
                          number_of_elements="1">
+        <!-- We deliberately don't use ChartUseIndexForAxisDomain domain here
+             since we don't want the property's default to be updated at runtime
+             using the value for XArrayName.
+        -->
         <BooleanDomain name="bool" />
         <Documentation>When set, the array index will be used for X axis,
         otherwise the array identified by XAxisSeriesName will be
@@ -6090,7 +6096,11 @@
                          default_values="1"
                          name="UseIndexForXAxis"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <ChartUseIndexForAxisDomain name="bool">
+          <RequiredProperties>
+            <Property function="ArraySelection" name="XArrayName" />
+          </RequiredProperties>
+        </ChartUseIndexForAxisDomain>
         <Documentation>When set, the array index will be used for X axis,
         otherwise the array identified by XArrayName will be
         used.</Documentation>

@@ -38,6 +38,7 @@ set (Module_SRCS
   vtkSMChartRepresentationProxy.cxx
   vtkSMChartSeriesListDomain.cxx
   vtkSMChartSeriesSelectionDomain.cxx
+  vtkSMChartUseIndexForAxisDomain.cxx
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeAnimationCueUndoElement.cxx
   vtkSMComparativeViewProxy.cxx
@@ -46,8 +47,8 @@ set (Module_SRCS
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
-  vtkSMPVRepresentationProxy.cxx
   vtkSMPlotMatrixViewProxy.cxx
+  vtkSMPVRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationTypeDomain.cxx
