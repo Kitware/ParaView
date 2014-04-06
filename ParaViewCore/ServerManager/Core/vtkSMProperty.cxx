@@ -15,7 +15,9 @@
 #include "vtkSMProperty.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -25,7 +27,6 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkCommand.h"
 
 #include <vector>
 #include <vtksys/ios/sstream>
@@ -512,6 +513,14 @@ void vtkSMProperty::WriteTo(vtkSMMessage* msg)
 //---------------------------------------------------------------------------
 bool vtkSMProperty::ResetToDomainDefaults()
 {
+  if (vtkProcessModule::GetProcessModule() &&
+    vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
+    {
+    // when using symmetric mpi, we disable domains since they don't always have
+    // the most updated information.
+    return false;
+    }
+
   this->DomainIterator->Begin();
   while (!this->DomainIterator->IsAtEnd())
     {
