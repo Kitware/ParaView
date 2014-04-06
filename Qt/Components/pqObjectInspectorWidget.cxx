@@ -783,11 +783,12 @@ void pqObjectInspectorWidget::show(pqPipelineSource* source)
       }
 
     pqView* cur_view = repr->getView();
-    pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
-    if (filter)
-      {
-      filter->hideInputIfRequired(cur_view);
-      }
+    //FIXME
+    //pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
+    //if (filter)
+    //  {
+    //  filter->hideInputIfRequired(cur_view);
+    //  }
     cur_view->render(); // these renders are collapsed.
     }
 }

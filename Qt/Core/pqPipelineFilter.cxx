@@ -455,37 +455,3 @@ int pqPipelineFilter::replaceInput() const
     }
   return 1; // default value.
 }
-
-//-----------------------------------------------------------------------------
-void pqPipelineFilter::hideInputIfRequired(pqView* view)
-{
-  int replace_input = this->replaceInput();
-  if (replace_input > 0)
-    {
-    // hide input source.
-    QList<pqOutputPort*> inputs = this->getAllInputs();
-    for(int kk=0; kk < inputs.size(); ++kk)
-      {
-      pqOutputPort* input = inputs[kk];
-      pqDataRepresentation* inputRepr = input->getRepresentation(view);
-      if (inputRepr)
-        {
-        if (replace_input == 2)
-          {
-          // Conditionally turn off the input. The input should be turned
-          // off if the representation is surface and the opacity is 1.
-          QString reprType = vtkSMPropertyHelper(
-            inputRepr->getProxy(), "Representation", /*quiet=*/ true).GetAsString();
-          double opacity = vtkSMPropertyHelper(
-            inputRepr->getProxy(), "Opacity", /*quiet=*/ true).GetAsDouble();
-          if ((reprType != "Surface" && reprType != "Surface With Edges") ||
-            (opacity != 0.0 && opacity < 1.0))
-            {
-            continue;
-            }
-          }
-        inputRepr->setVisible(false);
-        }
-      }
-    }
-}

@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqApplicationComponentsModule.h"
 
+class pqPipelineFilter;
+class pqPipelineSource;
 class pqPropertiesPanel;
 class pqProxy;
-class pqPipelineSource;
 class pqView;
 
 /// @ingroup Behaviors
@@ -70,6 +71,7 @@ private slots:
 
 protected:
   virtual void showData(pqPipelineSource* source, pqView* view);
+  void hideInputIfRequired(pqPipelineFilter* filter, pqView* view);
 
 private:
   Q_DISABLE_COPY(pqApplyBehavior)

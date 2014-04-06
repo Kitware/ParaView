@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyModifiedStateUndoElement.h"
@@ -42,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
@@ -219,7 +221,7 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
       Q_ASSERT(repr);
       if (pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source))
         {
-        filter->hideInputIfRequired(view);
+        this->hideInputIfRequired(filter, view);
         }
       }
 
@@ -242,6 +244,44 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
     if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqPreferredView))
       {
       rview->updateInteractionMode(source->getOutputPort(outputPort));
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqApplyBehavior::hideInputIfRequired(pqPipelineFilter* filter, pqView* view)
+{
+  int replace_input = filter->replaceInput();
+  if (replace_input > 0)
+    {
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+
+    // hide input source.
+    QList<pqOutputPort*> inputs = filter->getAllInputs();
+    foreach (pqOutputPort* input, inputs)
+      {
+      pqDataRepresentation* inputRepr = input->getRepresentation(view);
+      if (inputRepr)
+        {
+        if (replace_input == 2)
+          {
+          // Conditionally turn off the input. The input should be turned
+          // off if the representation is surface and the opacity is 1.
+          QString reprType = vtkSMPropertyHelper(
+            inputRepr->getProxy(), "Representation", /*quiet=*/ true).GetAsString();
+          double opacity = vtkSMPropertyHelper(
+            inputRepr->getProxy(), "Opacity", /*quiet=*/ true).GetAsDouble();
+          if ((reprType != "Surface" && reprType != "Surface With Edges") ||
+            (opacity != 0.0 && opacity < 1.0))
+            {
+            continue;
+            }
+          }
+        // we use the controller API so that the scalar bars are updated as
+        // needed.
+        controller->SetVisibility(input->getSourceProxy(),
+          input->getPortNumber(), view->getViewProxy(), false);
+        }
       }
     }
 }
