@@ -59,10 +59,6 @@ set (Module_SRCS
   pqAnimationManager.h
   pqAnimationViewWidget.cxx
   pqAnimationViewWidget.h
-  pqApplicationOptions.cxx
-  pqApplicationOptionsDialog.cxx
-  pqApplicationOptionsDialog.h
-  pqApplicationOptions.h
   pqApplyPropertiesManager.cxx
   pqApplyPropertiesManager.h
   pqArrayListDomain.cxx
@@ -424,8 +420,6 @@ set (Module_MOC_HDRS
   pqAnimatableProxyComboBox.h
   pqAnimationManager.h
   pqAnimationViewWidget.h
-  pqApplicationOptionsDialog.h
-  pqApplicationOptions.h
   pqApplyPropertiesManager.h
   pqArrayListDomain.h
   pqArrayStatusPropertyWidget.h
@@ -593,7 +587,6 @@ set (Module_UI_FILES
   Resources/UI/pqAboutDialog.ui
   #Resources/UI/pqAddSourceDialog.ui
   Resources/UI/pqAnimationSettings.ui
-  Resources/UI/pqApplicationOptions.ui
   Resources/UI/pqBarChartOptionsWidget.ui
   Resources/UI/pqBoxWidget.ui
   Resources/UI/pqCalculatorPanel.ui
