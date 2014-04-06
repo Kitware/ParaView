@@ -98,6 +98,13 @@ public:
   static void SetShowScalarBarOnShow(bool);
   static void SetHideScalarBarOnHide(bool);
 
+  // Description:
+  // Control whether representations try to maintain properties from an input
+  // representation, if present. e.g. if you "Transform" the representation for
+  // a source, then any filter that you connect to it should be transformed as
+  // well.
+  static void SetInheritRepresentationProperties(bool);
+
 //BTX
 protected:
   vtkSMParaViewPipelineControllerWithRendering();
@@ -108,6 +115,7 @@ private:
   void operator=(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
   static bool ShowScalarBarOnShow;
   static bool HideScalarBarOnHide;
+  static bool InheritRepresentationProperties;
 //ETX
 };
 

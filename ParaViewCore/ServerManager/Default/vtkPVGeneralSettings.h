@@ -112,6 +112,9 @@ public:
   void SetAnimationGeometryCacheLimit(unsigned long val);
   vtkGetMacro(AnimationGeometryCacheLimit, unsigned long);
 
+  // Description:
+  // Forwarded for vtkSMParaViewPipelineControllerWithRendering.
+  void SetInheritRepresentationProperties(bool val);
 
 //BTX
 protected:

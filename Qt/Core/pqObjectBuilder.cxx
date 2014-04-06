@@ -447,9 +447,6 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     findItem<pqDataRepresentation*>(reprProxy);
   if (repr )
     {
-    // inherit properties from the representation for the input if applicable.
-    // FIXME
-    // this->initializeInheritedProperties(repr);
     emit this->dataRepresentationCreated(repr);
     emit this->proxyCreated(repr);
     }
@@ -754,42 +751,4 @@ void pqObjectBuilder::destroy(pqAnimationCue* cue)
       pxm->GetProxyName("animation", kf), kf);
     }
   this->destroy(static_cast<pqProxy*>(cue));
-}
-
-//-----------------------------------------------------------------------------
-void pqObjectBuilder::initializeInheritedProperties(pqDataRepresentation* repr)
-{
-  pqDataRepresentation* input_repr =
-    repr->getRepresentationForUpstreamSource();
-  if (!input_repr)
-    {
-    return;
-    }
-
-  QSet<QString> exceptions;
-  exceptions.insert("Representation");
-  exceptions.insert("Visibility");
-
-  vtkSMProxy* reprProxy = repr->getProxy();
-  vtkSMProxy* inputReprProxy = input_repr->getProxy();
-  vtkSMPropertyIterator* iter = inputReprProxy->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    const char* pname = iter->GetKey();
-    if (exceptions.contains(pname))
-      {
-      continue;
-      }
-    vtkSMProperty* dest = reprProxy->GetProperty(pname);
-    vtkSMProperty* source = iter->GetProperty();
-    if (dest && source &&
-      strcmp(dest->GetClassName(), source->GetClassName())==0 &&
-      !dest->IsA("vtkSMProxyProperty")
-      )
-      {
-      dest->Copy(source);
-      }
-    }
-  iter->Delete();
-  reprProxy->UpdateVTKObjects();
 }

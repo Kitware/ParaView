@@ -1003,6 +1003,14 @@ bool vtkSMParaViewPipelineController::PreInitializeProxy(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
+unsigned long vtkSMParaViewPipelineController::GetInitializationTime(vtkSMProxy* proxy)
+{
+  vtkInternals::TimeStampsMap::iterator titer =
+    this->Internals->InitializationTimeStamps.find(proxy);
+  return (titer == this->Internals->InitializationTimeStamps.end()? 0: titer->second);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
 {
   if (!proxy)

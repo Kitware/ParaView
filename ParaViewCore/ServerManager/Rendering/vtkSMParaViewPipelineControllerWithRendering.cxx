@@ -19,7 +19,9 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -83,10 +85,53 @@ namespace
       }
     return false;
     }
+
+  //---------------------------------------------------------------------------
+  void vtkInheritRepresentationProperties(
+    vtkSMProxy* repr,
+    vtkSMSourceProxy* producer, vtkSMViewProxy* view, const unsigned long initTimeStamp)
+    {
+    if (producer->GetProperty("Input") == NULL)
+      {
+      // if producer is not a filter, nothing to do.
+      return;
+      }
+
+    vtkSMPropertyHelper inputHelper(producer, "Input", true);
+    vtkSMProxy* inputRepr = view->FindRepresentation(
+      vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy()),
+      inputHelper.GetOutputPort());
+    if (inputRepr == NULL)
+      {
+      // if producer's input has no representation in the view, nothing to do.
+      return;
+      }
+
+    // copy properties from inputRepr to repr is they weren't modified.
+    vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      const char* pname = iter->GetKey();
+      vtkSMProperty* dest = repr->GetProperty(pname);
+      vtkSMProperty* source = iter->GetProperty();
+      if (dest && source &&
+        // the property wasn't modified since initialization
+        dest->GetMTime() < initTimeStamp &&
+        // the property types match.
+        strcmp(dest->GetClassName(), source->GetClassName())==0 )
+        {
+        dest->Copy(source);
+        }
+      }
+    iter->Delete();
+    repr->UpdateVTKObjects();
+    }
+
 }
 
 bool vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow = false;
 bool vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide = true;
+bool vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties = false;
 
 vtkObjectFactoryNewMacro(vtkSMParaViewPipelineControllerWithRendering);
 //----------------------------------------------------------------------------
@@ -109,6 +154,12 @@ void vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(bool v
 void vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(bool val)
 {
   vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide = val;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(bool val)
+{
+  vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties = val;
 }
 
 //----------------------------------------------------------------------------
@@ -182,9 +233,20 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   if (vtkSMProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
     {
     this->PreInitializeProxy(repr);
+
+    vtkTimeStamp ts;
+    ts.Modified();
+
     vtkSMPropertyHelper(repr, "Visibility").Set(1);
     vtkSMPropertyHelper(repr, "Input").Set(producer, outputPort);
     this->PostInitializeProxy(repr);
+
+    // check some setting and then inherit properties.
+    if (vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties)
+      {
+      vtkInheritRepresentationProperties(repr, producer, view, ts);
+      }
+
     this->RegisterRepresentationProxy(repr);
     repr->UpdateVTKObjects();
 

@@ -203,6 +203,20 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="InheritRepresentationProperties"
+        command="SetInheritRepresentationProperties"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+           Set whether representations try to maintain properties from an input
+           representation, if present. e.g. if you "Transform" the representation for
+           a source, then any filter that you connect to it and show in the same view
+           should be transformed using the same transformation as well.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="General Options">
         <Property name="ShowSplashScreen" />
         <Property name="CrashRecovery" />
@@ -239,6 +253,10 @@
       <PropertyGroup label="Animation">
         <Property name="CacheGeometryForAnimation" />
         <Property name="AnimationGeometryCacheLimit" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Miscellaneous">
+        <Property name="InheritRepresentationProperties" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />

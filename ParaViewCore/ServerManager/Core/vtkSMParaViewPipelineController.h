@@ -243,6 +243,11 @@ protected:
   // property-links to ensure that those proxies get appropriate domains.
   virtual void ProcessProxyListProxyHints(vtkSMProxy* parent, vtkSMProxy* proxyFromDomain);
 
+  // Description:
+  // Returns the initialization timestamp for the proxy, if available. Useful
+  // for subclasses to determine which properties were modified since
+  // initialization.
+  unsigned long GetInitializationTime(vtkSMProxy*);
 private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&); // Not implemented
   void operator=(const vtkSMParaViewPipelineController&); // Not implemented

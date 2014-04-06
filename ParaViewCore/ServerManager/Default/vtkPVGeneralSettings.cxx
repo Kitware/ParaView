@@ -181,6 +181,12 @@ void vtkPVGeneralSettings::SetScalarBarMode(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
+{
+  vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
