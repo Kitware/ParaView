@@ -120,6 +120,7 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
   this->setLayout(vbox);
 }
 
+//-----------------------------------------------------------------------------
 void pqProxyPropertyWidget::apply()
 {
   if (this->SelectionInputWidget)
@@ -140,6 +141,17 @@ void pqProxyPropertyWidget::apply()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqProxyPropertyWidget::reset()
+{
+  if (this->ProxySelectionWidget)
+    {
+    this->ProxySelectionWidget->reset();
+    }
+  this->Superclass::reset();
+}
+
+//-----------------------------------------------------------------------------
 void pqProxyPropertyWidget::select()
 {
   if (this->ProxySelectionWidget)
@@ -148,6 +160,7 @@ void pqProxyPropertyWidget::select()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqProxyPropertyWidget::deselect()
 {
   if (this->ProxySelectionWidget)
