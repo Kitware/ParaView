@@ -100,9 +100,10 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 {
   Ui::SettingsDialog &ui = this->Internals->Ui;
   ui.setupUi(this);
-  ui.tabWidget->setDocumentMode(false);
-  ui.tabWidget->setDrawBase(false);
-  ui.tabWidget->setExpanding(false);
+  ui.tabBar->setDocumentMode(false);
+  ui.tabBar->setDrawBase(false);
+  ui.tabBar->setExpanding(false);
+  ui.tabBar->setUsesScrollButtons(true);
 
   // Hide restart message
   ui.restartRequiredLabel->setVisible(pqSettingsDialog::ShowRestartRequired);
@@ -173,7 +174,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
     // show panel widgets
     widget->updatePanel();
 
-    int tabIndex = ui.tabWidget->addTab(proxy->GetXMLLabel());
+    int tabIndex = ui.tabBar->addTab(proxy->GetXMLLabel());
     int stackIndex = ui.stackedWidget->addWidget(scrollArea);
     this->Internals->TabToStackedWidgets[tabIndex] = stackIndex;
 
@@ -190,7 +191,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   this->connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), SLOT(clicked(QAbstractButton*)));
   this->connect(this, SIGNAL(accepted()), SLOT(onAccepted()));
   this->connect(this, SIGNAL(rejected()), SLOT(onRejected()));
-  this->connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabIndexChanged(int)));
+  this->connect(ui.tabBar, SIGNAL(currentChanged(int)), this, SLOT(onTabIndexChanged(int)));
 
   this->connect(ui.AdvancedButton, SIGNAL(toggled(bool)), SLOT(filterPanelWidgets()));
   this->connect(ui.SearchLineEdit, SIGNAL(textChanged(QString)), SLOT(filterPanelWidgets()));
