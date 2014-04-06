@@ -270,21 +270,6 @@ void pqProxy::setModifiedState(ModifiedState modified)
 }
 
 //-----------------------------------------------------------------------------
-void pqProxy::setDefaultPropertyValues()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  if (proxy->IsA("vtkSMCompoundSourceProxy"))
-    {
-    // We don't reset properties on custom filter.
-    proxy->UpdateVTKObjects();
-    }
-  else
-    {
-    proxy->ResetPropertiesToDefault();
-    }
-}
-
-//-----------------------------------------------------------------------------
 vtkSMSessionProxyManager* pqProxy::proxyManager() const
 {
   return this->Internal->Proxy ?

@@ -314,11 +314,8 @@ public:
   // Use this method to set all properties on this proxy to their default
   // values. This iterates over all properties on this proxy, thus if this proxy
   // had subproxies, this method will iterate over only the exposed properties
-  // and call vtkSMProperty::ResetToDefault(). vtkSMProperty::ResetToDefault()
-  // defines what it means to "reset a property to its default value" which
-  // doesn't always correspond to the default_values specified in the XML
-  // configurations for the proxy.
-  virtual void ResetPropertiesToDefault();
+  // and call vtkSMProperty::ResetToXMLDefaults().
+  virtual void ResetPropertiesToXMLDefaults();
 
 //BTX
   // Description:

@@ -142,26 +142,6 @@ void pqComparativePlotView::initialize()
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativePlotView::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-
-  vtkPVServerInformation* serverInfo = this->getServer()->getServerInformation();
-  if (serverInfo && serverInfo->GetTileDimensions()[0])
-    {
-    // change default layout to match the tile displays.
-    pqSMAdaptor::setMultipleElementProperty(
-      this->getProxy()->GetProperty("Dimensions"), 0, 
-      serverInfo->GetTileDimensions()[0]);
-    pqSMAdaptor::setMultipleElementProperty(
-      this->getProxy()->GetProperty("Dimensions"), 1, 
-      serverInfo->GetTileDimensions()[1]);
-    this->getProxy()->UpdateVTKObjects();
-    }
-
-}
-
-//-----------------------------------------------------------------------------
 vtkSMComparativeViewProxy* pqComparativePlotView::getComparativeViewProxy() const
 {
   return vtkSMComparativeViewProxy::SafeDownCast(this->getProxy());

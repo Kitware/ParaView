@@ -113,21 +113,6 @@ QWidget* pqComparativeContextView::getWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeContextView::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-
-  vtkPVServerInformation* serverInfo = this->getServer()->getServerInformation();
-  if (serverInfo && serverInfo->GetTileDimensions()[0])
-    {
-    // change default layout to match the tile displays.
-    vtkSMPropertyHelper(this->getProxy(),"Dimensions")
-        .Set(serverInfo->GetTileDimensions(), 2);
-    this->getProxy()->UpdateVTKObjects();
-    }
-}
-
-//-----------------------------------------------------------------------------
 vtkSMComparativeViewProxy* pqComparativeContextView::getComparativeViewProxy() const
 {
   return vtkSMComparativeViewProxy::SafeDownCast(this->getProxy());

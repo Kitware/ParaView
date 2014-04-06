@@ -78,7 +78,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
@@ -212,42 +211,7 @@ void pqRenderView::initializeWidgets()
     {
     vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
     }
-
-  // ensure that center axis visibility etc. is updated as per user's
-  // preferences.
-  this->restoreAnnotationSettings();
-
   this->Internal->UndoStackBuilder->SetRenderView(renModule);
-}
-
-//-----------------------------------------------------------------------------
-// Sets default values for the underlying proxy.  This is during the 
-// initialization stage of the pqProxy for proxies created by the GUI itself 
-// i.e. for proxies loaded through state or created by python client or 
-// undo/redo, this method won't be called. 
-void pqRenderView::setDefaultPropertyValues()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  if (pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
-    {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 0);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 1);
-    }
-  this->Superclass::setDefaultPropertyValues();
-  this->clearUndoStack();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::restoreDefaultLightSettings()
-{
-  this->Superclass::restoreDefaultLightSettings();
-  if (pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
-    {
-    vtkSMProxy* proxy = this->getProxy();
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 0);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 1);
-    proxy->UpdateVTKObjects();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -279,13 +243,6 @@ void pqRenderView::resetCenterOfRotation()
       viewproxy->GetProperty("CameraFocalPointInfo"));
   this->setCenterOfRotation(
     values[0].toDouble(), values[1].toDouble(), values[2].toDouble());
-}
-
-//-----------------------------------------------------------------------------
-const int* pqRenderView::defaultBackgroundColor() const
-{
-  static int defaultBackground[3] = { 84, 89, 109 };
-  return defaultBackground;
 }
 
 //-----------------------------------------------------------------------------
@@ -401,51 +358,6 @@ bool pqRenderView::getCenterAxesVisibility() const
 {
   return pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("CenterAxesVisibility")).toBool();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::restoreAnnotationSettings()
-{
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString sgroup = this->viewSettingsGroup();
-  settings->beginGroup(sgroup);
-  // Center Axes settings.
-  settings->beginGroup("CenterAxes");
-  if (settings->contains("ResetCenterWithCamera"))
-    {
-    this->ResetCenterWithCamera =
-      settings->value("ResetCenterWithCamera").toBool();
-    }
-  settings->endGroup();
-  settings->endGroup();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::restoreSettings(bool only_global)
-{
-  this->Superclass::restoreSettings(only_global);
-  if (!only_global)
-    {
-    this->restoreAnnotationSettings();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::saveSettings()
-{
-  this->Superclass::saveSettings();
-
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString sgroup = this->viewSettingsGroup();
-  settings->beginGroup(sgroup);
-
-  // Center Axes settings.
-  settings->beginGroup("CenterAxes");
-  settings->setValue("ResetCenterWithCamera",
-    this->ResetCenterWithCamera);
-  settings->endGroup();
-
-  settings->endGroup();
 }
 
 //-----------------------------------------------------------------------------

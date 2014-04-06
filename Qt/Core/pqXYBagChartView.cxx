@@ -49,9 +49,3 @@ pqXYBagChartView::pqXYBagChartView(const QString& group,
 pqXYBagChartView::~pqXYBagChartView()
 {
 }
-
-//-----------------------------------------------------------------------------
-void pqXYBagChartView::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-}

@@ -69,13 +69,6 @@ public:
   virtual vtkImageData* captureImage(int magnification);
   using Superclass::captureImage;
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  virtual void setDefaultPropertyValues();
-
 protected slots:
   /// Called when the layout on the comparative vis changes.
   void onComparativeVisLayoutChanged();
@@ -99,5 +92,3 @@ private:
 };
 
 #endif
-
-

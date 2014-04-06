@@ -86,16 +86,6 @@ public:
   /// Resets the center of rotation to the focal point.
   void resetCenterOfRotation();
 
-  /// Sets default values for the underlying proxy.
-  /// This is during the initialization stage of the pqProxy
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called.
-  virtual void setDefaultPropertyValues();
-
-  /// restore the default background color
-  virtual const int* defaultBackgroundColor() const;
-
   /// Get if the orientation axes is visible.
   bool getOrientationAxesVisibility() const;
 
@@ -147,19 +137,6 @@ public:
   void resetViewDirection(
     double look_x, double look_y, double look_z,
     double up_x, double up_y, double up_z);
-
-  /// Save the settings of this render module with QSettings.
-  /// We  only save non-global settings in this method.
-  /// Global settings are saved by the dialog itself.
-  /// Overridden to save axes specific settings.
-  virtual void saveSettings();
-
-  /// Apply the settings from QSettings to this render module
-  /// Overridden to load axes specific settings.
-  virtual void restoreSettings(bool only_global);
-
-  /// restore the default light parameters
-  virtual void restoreDefaultLightSettings();
 
   /// Let internal class handle which internal widget should change its cursor
   /// This is usually used for selection and in case of QuadView/SliceView
@@ -270,10 +247,6 @@ private slots:
   void onInteractionModeChange();
 
 protected:
-  /// Restores the visibility etc. for the annotations added by this view such
-  /// as center axis, orientation axis.
-  void restoreAnnotationSettings();
-
   // When true, the camera center of rotation will be reset when the
   // user reset the camera.
   bool ResetCenterWithCamera;
@@ -292,16 +265,6 @@ protected:
   /// Creates a new instance of the QWidget subclass to be used to show this
   /// view. Default implementation creates a QVTKWidget.
   virtual QWidget* createWidget();
-
-  /// Return the name of the group used for global settings (except interactor
-  /// style).
-  virtual const char* globalSettingsGroup() const
-    { return "renderModule"; }
-
-  /// Return the name of the group used for view-sepecific settings such as
-  /// background color, lighting.
-  virtual const char* viewSettingsGroup() const
-    { return "renderModule"; }
 
   /// Setups up RenderModule and QVTKWidget binding.
   /// This method is called for all pqRenderView objects irrespective

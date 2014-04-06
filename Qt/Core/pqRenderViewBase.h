@@ -75,27 +75,6 @@ public:
   /// Called to reset the view's display.  This method calls resetCamera().
   virtual void resetDisplay();
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  virtual void setDefaultPropertyValues();
-
-  /// restore the default background color
-  virtual const int* defaultBackgroundColor() const;
-  
-  /// Save the settings of this render module with QSettings.
-  /// We  only save non-global settings in this method.
-  /// Global settings are saved by the dialog itself.
-  virtual void saveSettings();
-
-  /// Apply the settings from QSettings to this render module
-  virtual void restoreSettings(bool only_global);
-
-  /// restore the default light parameters
-  virtual void restoreDefaultLightSettings();
-
   /// Convenience method to enable stereo rendering on all views that support
   /// stereo rendering. If mode==0, stereo rendering is disabled. mode is same
   /// that used for vtkRenderWindow::SetStereoType.
@@ -133,14 +112,6 @@ protected:
   /// after the object has been created. 
   virtual void initialize();
 
-  /// Return the name of the group used for global settings (except interactor
-  /// style).
-  virtual const char* globalSettingsGroup() const=0;
-
-  /// Return the name of the group used for view-sepecific settings such as
-  /// background color, lighting.
-  virtual const char* viewSettingsGroup() const=0;
-
   /// On Mac, we usually try to cache the front buffer to avoid unecessary
   //  updates.
   bool AllowCaching;
@@ -155,5 +126,3 @@ private:
 };
 
 #endif
-
-

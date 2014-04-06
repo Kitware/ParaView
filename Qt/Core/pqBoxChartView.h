@@ -55,9 +55,6 @@ public:
 
   virtual ~pqBoxChartView();
 
-  /// Set property values.
-  virtual void setDefaultPropertyValues();
-
 signals:
   /// Fired when the currently shown representation changes. \c repr may be
   /// NULL.

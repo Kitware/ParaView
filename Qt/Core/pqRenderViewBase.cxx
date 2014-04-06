@@ -232,7 +232,6 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
     {
     this->Internal->InitializedAfterObjectsCreated = true;
     this->initializeWidgets();
-    this->restoreSettings(/*only_global=*/true);
     }
 
   // Attach Qt Signal to VTK interactor Delay event
@@ -260,41 +259,16 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
                       this,
                       SLOT(updateStatusMessage()));
     }
-}
-//-----------------------------------------------------------------------------
-// Sets default values for the underlying proxy.  This is during the 
-// initialization stage of the pqProxy for proxies created by the GUI itself 
-// i.e. for proxies loaded through state or created by python client or 
-// undo/redo, this method won't be called. 
-void pqRenderViewBase::setDefaultPropertyValues()
-{
-  vtkSMProxy* proxy = this->getProxy();
-
-  // Compressor setting to pull from application wide settings cache.
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressorConfig"),"NULL");
-  // pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressionEnabled"),-1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressorConfig"),"vtkSquirtCompressor 0 3");
-  // pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressionEnabled"),1);
 
   // when PV_NO_OFFSCREEN_SCREENSHOTS is set, by default, we disable offscreen
   // screenshots.
+  vtkSMProxy* proxy = this->getProxy();
   if (getenv("PV_NO_OFFSCREEN_SCREENSHOTS"))
     {
     pqSMAdaptor::setElementProperty(
       proxy->GetProperty("UseOffscreenRenderingForScreenshots"), 0);
     }
-
   proxy->UpdateVTKObjects();
-
-  this->restoreSettings(false);
-  proxy->InvokeCommand("ResetCamera");
-}
-
-//-----------------------------------------------------------------------------
-const int* pqRenderViewBase::defaultBackgroundColor() const
-{
-  static int defaultBackground[3] = {0, 0, 0};
-  return defaultBackground;
 }
 
 //-----------------------------------------------------------------------------
@@ -303,208 +277,6 @@ void pqRenderViewBase::resetDisplay()
   this->resetCamera();
 }
 
-//-----------------------------------------------------------------------------
-static const char* pqRenderViewModuleLightSettings [] = {
-  "BackLightAzimuth",
-  "BackLightElevation",
-  "BackLightK:B Ratio",
-  "BackLightWarmth",
-  "FillLightAzimuth",
-  "FillLightElevation",
-  "FillLightK:F Ratio",
-  "FillLightWarmth",
-  "HeadLightK:H Ratio",
-  "HeadLightWarmth",
-  "KeyLightAzimuth",
-  "KeyLightElevation",
-  "KeyLightIntensity",
-  "KeyLightWarmth",
-  "LightIntensity",
-  "LightSwitch",
-  "MaintainLuminance",
-  "UseLight",
-  NULL
-  };
-
-static const char* pqGlobalRenderViewModuleMiscSettings [] = {
-  "CompressionEnabled",
-  "CompressorConfig",
-  "DepthPeeling",
-  "ImageReductionFactor",
-  "LODResolution",
-  "LODThreshold",
-  "MaximumNumberOfPeels",
-  "NonInteractiveRenderDelay",
-  "OrderedCompositing",
-  "RemoteRenderThreshold",
-  "RenderInterruptsEnabled",
-  "StillRenderImageReductionFactor",
-  "UseOffscreenRenderingForScreenshots",
-  "UseOutlineForLODRendering",
-  NULL
-  };
-
-static const char* pqRenderViewModuleMiscSettings [] = {
-  "CameraParallelProjection",
-  "CenterAxesVisibility",
-  "OrientationAxesInteractivity",
-  "OrientationAxesVisibility",
-  "OrientationAxesLabelColor",
-  "OrientationAxesOutlineColor",
-  NULL
-  };
-
-
-static const char** pqRenderViewModuleSettings[] = {
-  pqRenderViewModuleLightSettings,
-  pqRenderViewModuleMiscSettings,
-  NULL
-  };
-
-static const char** pqGlobalRenderViewModuleSettings[] = {
-  pqGlobalRenderViewModuleMiscSettings,
-  NULL
-  };
-
-static const char* pqRenderViewModuleLightSettingsMulti[] = {
-  "LightDiffuseColor",
-  NULL  // keep last
-  };
-
-static const char* pqRenderViewModuleMiscSettingsMulti[] = {
-  NULL  // keep last
-  };
-
-static const char** pqRenderViewModuleSettingsMulti[] = {
-  pqRenderViewModuleLightSettingsMulti,
-  pqRenderViewModuleMiscSettingsMulti,
-  NULL  // keep last
-};
-
-//-----------------------------------------------------------------------------
-void pqRenderViewBase::restoreSettings(bool only_global)
-{
-  vtkSMProxy* proxy = this->getProxy();
-
-  // Now load default values from the QSettings, if available.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  
-  const char*** str;
-  if (!only_global)
-    {
-    settings->beginGroup(this->viewSettingsGroup());
-    for (str=pqRenderViewModuleSettings; *str != NULL; str++)
-      {
-      const char** substr;
-      for(substr = str[0]; *substr != NULL; substr++)
-        {
-        QString key = *substr;
-        vtkSMProperty* prop = proxy->GetProperty(*substr);
-        if (prop && settings->contains(key))
-          {
-          pqSMAdaptor::setElementProperty(prop, settings->value(key));
-          proxy->UpdateProperty(*substr);
-          }
-        }
-      }
-    for (str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
-      {
-      const char** substr;
-      for(substr = str[0]; *substr != NULL; substr++)
-        {
-        QString key = *substr;
-        vtkSMProperty* prop = proxy->GetProperty(*substr);
-        if (prop && settings->contains(key))
-          {
-          QList<QVariant> value = settings->value(key).value<QList<QVariant> >();
-          pqSMAdaptor::setMultipleElementProperty(prop, value);
-          proxy->UpdateProperty(*substr);
-          }
-        }
-      }
-    settings->endGroup();
-    }
-  
-  settings->beginGroup(this->globalSettingsGroup());
-  for (str=pqGlobalRenderViewModuleSettings; *str != NULL; str++)
-    {
-    const char** substr;
-    for(substr = str[0]; *substr != NULL; substr++)
-      {
-      QString key = *substr;
-      vtkSMProperty* prop = proxy->GetProperty(*substr);
-      if (prop && settings->contains(key))
-        {
-        pqSMAdaptor::setElementProperty(prop, settings->value(key));
-        proxy->UpdateProperty(*substr);
-        }
-      }
-    }
-  settings->endGroup();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderViewBase::saveSettings()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-
-  settings->beginGroup(this->viewSettingsGroup());
-  const char*** str;
-  for(str=pqRenderViewModuleSettings; *str != NULL; str++)
-    {
-    const char** substr;
-    for(substr = str[0]; *substr != NULL; substr++)
-      {
-      QString key = *substr;
-      vtkSMProperty* prop = proxy->GetProperty(*substr);
-      if (prop)
-        {
-        settings->setValue(key, pqSMAdaptor::getElementProperty(prop));
-        }
-      }
-    }
-  for(str=pqRenderViewModuleSettingsMulti; *str != NULL; str++)
-    {
-    const char** substr;
-    for(substr = str[0]; *substr != NULL; substr++)
-      {
-      QString key = *substr;
-      vtkSMProperty* prop = proxy->GetProperty(*substr);
-      if (prop)
-        {
-        settings->setValue(key, pqSMAdaptor::getMultipleElementProperty(prop));
-        }
-      }
-    }
-
-  settings->endGroup();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderViewBase::restoreDefaultLightSettings()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  const char** str;
-
-  for (str=pqRenderViewModuleLightSettings; *str != NULL; str++)
-    {
-    vtkSMProperty* prop = proxy->GetProperty(*str);
-    if(prop)
-      {
-      prop->ResetToDefault();
-      }
-    }
-  for (str=pqRenderViewModuleLightSettingsMulti; *str != NULL; str++)
-    {
-    vtkSMProperty* prop = proxy->GetProperty(*str);
-    prop->ResetToDefault();
-    }
-  proxy->UpdateVTKObjects();
-
-}
-  
 //-----------------------------------------------------------------------------
 bool pqRenderViewBase::eventFilter(QObject* caller, QEvent* e)
 {

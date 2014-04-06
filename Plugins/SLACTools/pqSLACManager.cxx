@@ -805,36 +805,36 @@ void pqSLACManager::toggleBackgroundBW()
 {
   pqRenderView *view = this->getMeshRenderView();
   if (!view) return;
+
   vtkSMProxy *viewProxy = view->getProxy();
-
-  QList<QVariant> oldBackground;
-  QList<QVariant> newBackground;
-
-  oldBackground = pqSMAdaptor::getMultipleElementProperty(
-                                          viewProxy->GetProperty("Background"));
-  if (   (oldBackground[0].toDouble() == 0.0)
-      && (oldBackground[1].toDouble() == 0.0)
-      && (oldBackground[2].toDouble() == 0.0) )
+  vtkSMProperty* smProperty = viewProxy->GetProperty("Background");
+  if (!smProperty)
     {
-    newBackground << 1.0 << 1.0 << 1.0;
+    return;
     }
-  else if (   (oldBackground[0].toDouble() == 1.0)
-           && (oldBackground[1].toDouble() == 1.0)
-           && (oldBackground[2].toDouble() == 1.0) )
+
+  double color[3];
+  vtkSMPropertyHelper helper(smProperty);
+  helper.Get(color, 3);
+
+  if (   (color[0] == 0.0)
+      && (color[1] == 0.0)
+      && (color[2] == 0.0) )
     {
-    const int *defaultBackground = view->defaultBackgroundColor();
-    newBackground << defaultBackground[0]/255.0
-                  << defaultBackground[1]/255.0
-                  << defaultBackground[2]/255.0;
+    color[0] = color[1] = color[2] = 1.0;
+    helper.Set(color, 3);
+    }
+  else if (   (color[0] == 1.0)
+           && (color[1] == 1.0)
+           && (color[2] == 1.0) )
+    {
+    smProperty->ResetToXMLDefaults();
     }
   else
     {
-    newBackground << 0.0 << 0.0 << 0.0;
+    color[0] = color[1] = color[2] = 0.0;
+    helper.Set(color, 3);
     }
-
-  pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("Background"),
-                                          newBackground);
-
   viewProxy->UpdateVTKObjects();
   view->render();
 }

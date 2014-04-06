@@ -462,75 +462,16 @@ void vtkSMProxy::MarkAllPropertiesAsModified()
     }
 }
 
-namespace
-{
-  // Used by ResetPropertiesToDefault() to monitor properties whose domains
-  // change.
-  class vtkDomainObserver
-    {
-    std::vector<std::pair<vtkSMProperty*, unsigned long> > MonitoredProperties;
-    std::set<vtkSMProperty*> PropertiesWithModifiedDomains;
-
-    void DomainModified(vtkObject* sender, unsigned long, void*)
-      {
-      vtkSMProperty* prop = vtkSMProperty::SafeDownCast(sender);
-      if (prop)
-        {
-        this->PropertiesWithModifiedDomains.insert(prop);
-        }
-      }
-
-  public:
-    vtkDomainObserver()
-      {
-      }
-    ~vtkDomainObserver()
-      {
-      for (size_t cc=0; cc < this->MonitoredProperties.size(); cc++)
-        {
-        this->MonitoredProperties[cc].first->RemoveObserver(
-          this->MonitoredProperties[cc].second);
-        }
-      }
-    void Monitor(vtkSMProperty* prop)
-      {
-      assert(prop != NULL);
-      unsigned long oid = prop->AddObserver(vtkCommand::DomainModifiedEvent,
-        this, &vtkDomainObserver::DomainModified);
-      this->MonitoredProperties.push_back(
-        std::pair<vtkSMProperty*, unsigned long>(prop, oid));
-      }
-
-    const std::set<vtkSMProperty*>& GetPropertiesWithModifiedDomains() const
-      {
-      return this->PropertiesWithModifiedDomains;
-      }
-    };
-}
-
 //---------------------------------------------------------------------------
-void vtkSMProxy::ResetPropertiesToDefault()
+void vtkSMProxy::ResetPropertiesToXMLDefaults()
 {
-  this->UpdateVTKObjects();
-
-  // Since domains depend on information properties, it's essential we update
-  // property information first.
-  this->UpdatePipelineInformation();
-
-  // In general, we don't reset properties on vtkSMCompoundProxy
-
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(this->NewPropertyIterator());
 
-  // iterate over properties and reset them to default. if any property says its
-  // domain is modified after we reset it, we need to reset it again since its
-  // default may have changed.
-  vtkDomainObserver observer;
-
+  // iterate over properties and reset them to default.
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* smproperty = iter->GetProperty();
-
     if (!smproperty->GetInformationOnly())
       {
       vtkPVXMLElement* propHints = iter->GetProperty()->GetHints();
@@ -539,18 +480,9 @@ void vtkSMProxy::ResetPropertiesToDefault()
         // Don't reset properties that request overriding of the default mechanism.
         continue;
         }
-      observer.Monitor(iter->GetProperty());
-      iter->GetProperty()->ResetToDefault();
+      iter->GetProperty()->ResetToXMLDefaults();
       }
     }
-
-  const std::set<vtkSMProperty*> &props =
-    observer.GetPropertiesWithModifiedDomains();
-  for (std::set<vtkSMProperty*>::const_iterator iter = props.begin(); iter != props.end(); ++iter)
-    {
-    (*iter)->ResetToDefault();
-    }
-
   this->UpdateVTKObjects();
 }
 

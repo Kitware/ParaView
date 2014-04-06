@@ -297,7 +297,7 @@ void pqSettingsDialog::onRestoreDefaults()
     vtkSMProxy* proxy = iter->GetProxy();
     if (proxy)
       {
-      proxy->ResetPropertiesToDefault();
+      proxy->ResetPropertiesToXMLDefaults();
       }
     }
 }

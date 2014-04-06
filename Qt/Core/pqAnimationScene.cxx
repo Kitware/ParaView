@@ -393,7 +393,6 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& cuetype,
     qDebug() << "Failed to create AnimationCue.";
     return 0;
     }
-  cue->setDefaultPropertyValues();
 
   if (proxy)
     {
