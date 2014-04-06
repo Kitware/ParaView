@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+class pqPipelineSource;
+
 /// @ingroup Reactions
 /// Reaction for delete sources (all or selected only).
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDeleteReaction : public pqReaction
@@ -53,6 +55,9 @@ public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
   void updateEnableState();
+
+  /// Request deletion of a particular source.
+  void deleteSource(pqPipelineSource* source);
 
 protected:
   /// Called when the action is triggered.

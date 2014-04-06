@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDeleteBehavior : public QObject
 public:
   pqDeleteBehavior(QObject* parentObject=0);
  
-protected slots:
+public slots:
   /// Called when the GUI initiates a source's removal.
   void removeSource(pqPipelineSource* source);
 

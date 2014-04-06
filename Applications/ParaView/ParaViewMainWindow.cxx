@@ -41,12 +41,12 @@ extern "C" {
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqDeleteReaction.h"
 #include "pqHelpReaction.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-#include "pqPropertiesPanel.h"
 #include "vtkProcessModule.h"
 #include "vtkPVPlugin.h"
 
@@ -141,6 +141,13 @@ ParaViewMainWindow::ParaViewMainWindow()
     QObject::connect(this->Internals->propertiesPanel,
                      SIGNAL(helpRequested(const QString&, const QString&)),
                      this, SLOT(showHelpForProxy(const QString&, const QString&)));
+
+    /// hook delete to pqDeleteReaction.
+    QAction* tempDeleteAction = new QAction(this);
+    pqDeleteReaction* handler = new pqDeleteReaction(tempDeleteAction);
+    handler->connect(this->Internals->propertiesPanel,
+      SIGNAL(deleteRequested(pqPipelineSource*)),
+      SLOT(deleteSource(pqPipelineSource*)));
     }
   else
     {

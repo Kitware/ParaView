@@ -92,12 +92,6 @@ public slots:
   /// properties panel.
   void reset();
 
-  /// Deletes the current proxy.
-  ///
-  /// This is triggered when the user clicks the "Delete" button on the
-  /// properties panel.
-  void deleteProxy();
-
   /// Shows the help dialog.
   ///
   /// This is triggered when the user clicks the "?" button on the
@@ -117,10 +111,18 @@ signals:
   /// This signal is emitted when the user clicks the help button.
   void helpRequested(const QString &groupname, const QString &proxyType);
 
+  /// This signal is emitted when the user clicks the delete button.
+  void deleteRequested(pqPipelineSource* source);
+
 private slots:
   void setView(pqView*);
   void setOutputPort(pqOutputPort*);
   void setRepresentation(pqDataRepresentation*);
+
+  /// This is called when the user clicks the "Delete" button on the
+  /// properties panel. This triggers the deleteRequested() signal with proper
+  /// arguments.
+  void deleteProxy();
 
   /// slot gets called when a proxy is deleted.
   void proxyDeleted(pqPipelineSource*);

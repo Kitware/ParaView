@@ -33,14 +33,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
+#include "pqDeleteBehavior.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
+#include "vtkNew.h"
+#include "vtkPVGeneralSettings.h"
+#include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMTransferFunctionManager.h"
 
 #include <QDebug>
 #include <QSet>
@@ -137,13 +142,9 @@ bool pqDeleteReaction::canDeleteSelected()
 }
 
 //-----------------------------------------------------------------------------
-#include "vtkNew.h"
-#include "vtkSMParaViewPipelineController.h"
 void pqDeleteReaction::deleteAll()
 {
   BEGIN_UNDO_EXCLUDE();
-//  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-//  builder->destroyPipelineProxies();
   if (pqServer* server = pqActiveObjects::instance().activeServer())
     {
     vtkNew<vtkSMParaViewPipelineController> controller;
@@ -152,6 +153,55 @@ void pqDeleteReaction::deleteAll()
   END_UNDO_EXCLUDE();
   CLEAR_UNDO_STACK();
   pqApplicationCore::instance()->render();
+}
+
+//=============================================================================
+namespace
+{
+  void pqDeleteSources(QSet<pqPipelineSource*> selectedSources)
+    {
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    if (selectedSources.size() == 1)
+      {
+      pqPipelineSource* source = (*selectedSources.begin());
+      BEGIN_UNDO_SET(QString("Delete %1").arg(source->getSMName()));
+      }
+    else
+      {
+      BEGIN_UNDO_SET("Delete Selection");
+      }
+
+    while (selectedSources.size() > 0)
+      {
+      foreach (pqPipelineSource* source, selectedSources)
+        {
+        if (source && source->getNumberOfConsumers() == 0)
+          {
+          selectedSources.remove(source);
+          controller->UnRegisterProxy(source->getProxy());
+          break;
+          }
+        }
+      }
+
+    // update scalar bars, if needed.
+    int sbMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
+    if (sbMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS ||
+      sbMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
+      {
+      vtkNew<vtkSMTransferFunctionManager> tmgr;
+      pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
+      QList<pqView*> views = smmodel->findItems<pqView*>();
+      foreach (pqView* view, views)
+        {
+        tmgr->UpdateScalarBars(view->getProxy(),
+          vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+        }
+      }
+    END_UNDO_SET();
+    pqApplicationCore::instance()->render();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -163,34 +213,24 @@ void pqDeleteReaction::deleteSelected()
     return;
     }
 
-
   vtkSMProxySelectionModel* selModel =
     pqActiveObjects::instance().activeSourcesSelectionModel();
 
   QSet<pqPipelineSource*> selectedSources;
   ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
+  pqDeleteSources(selectedSources);
+}
 
-  if (selectedSources.size() == 1)
+//-----------------------------------------------------------------------------
+void pqDeleteReaction::deleteSource(pqPipelineSource* source)
+{
+  if (source)
     {
-    pqPipelineSource* source = (*selectedSources.begin());
-    BEGIN_UNDO_SET(QString("Delete %1").arg(source->getSMName()));
+    // not entirely sure if this is where we should put this logic.
+    pqDeleteBehavior temp;
+    temp.removeSource(source);
+    QSet<pqPipelineSource*> sources;
+    sources.insert(source);
+    pqDeleteSources(sources);
     }
-  else
-    {
-    BEGIN_UNDO_SET("Delete Selection");
-    }
-  while (selectedSources.size() > 0)
-    {
-    foreach (pqPipelineSource* source, selectedSources)
-      {
-      if (source && source->getNumberOfConsumers() == 0)
-        {
-        selectedSources.remove(source);
-        pqApplicationCore::instance()->getObjectBuilder()->destroy(source);
-        break;
-        }
-      }
-    }
-  END_UNDO_SET();
-  pqApplicationCore::instance()->render();
 }

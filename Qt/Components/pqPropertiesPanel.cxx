@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqDebug.h"
-#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxyWidget.h"
@@ -791,10 +790,9 @@ void pqPropertiesPanel::deleteProxy()
 {
   if (this->Internals->Source)
     {
-    pqApplicationCore *core = pqApplicationCore::instance();
     BEGIN_UNDO_SET(QString("Delete %1").arg(
         this->Internals->Source->getSMName()));
-    core->getObjectBuilder()->destroy(this->Internals->Source);
+    emit this->deleteRequested(this->Internals->Source);
     END_UNDO_SET();
     }
 }
