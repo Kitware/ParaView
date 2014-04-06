@@ -565,7 +565,6 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
       /*Plugins*/
       viewName == "QuadView" ||
       viewName == "MantaView" ||
-      viewName == "PrismView" ||
       /*StreamingView plugin*/
       viewName == "IteratingView" ||
       viewName == "PrioritizingView" ||
