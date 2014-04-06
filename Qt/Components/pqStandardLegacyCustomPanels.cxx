@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqStandardLegacyCustomPanels.h"
 
-#include "pqContourPanel.h"
 #include "pqGlyphPanel.h"
 #include "pqPassArraysPanel.h"
 #include "pqProxy.h"

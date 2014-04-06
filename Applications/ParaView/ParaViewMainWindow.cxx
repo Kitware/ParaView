@@ -43,7 +43,6 @@ extern "C" {
 #include "pqApplicationCore.h"
 #include "pqDeleteReaction.h"
 #include "pqHelpReaction.h"
-#include "pqObjectInspectorWidget.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
@@ -121,50 +120,24 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);
 
-  pqOptions* options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
+  // setup properties dock
+  this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->informationDock);
+  this->Internals->propertiesDock->show();
+  this->Internals->propertiesDock->raise();
 
-  if(!options->GetUseOldPanels())
-    {
-    this->removeDockWidget(this->Internals->objectInspectorDock);
-    this->removeDockWidget(this->Internals->displayDock);
-    delete this->Internals->objectInspectorDock;
-    delete this->Internals->displayDock;
-    this->Internals->objectInspectorDock = 0;
-    this->Internals->displayDock = 0;
+  // Enable help from the properties panel.
+  QObject::connect(this->Internals->propertiesPanel,
+    SIGNAL(helpRequested(const QString&, const QString&)),
+    this, SLOT(showHelpForProxy(const QString&, const QString&)));
 
-    this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->informationDock);
-    this->Internals->propertiesDock->show();
-    this->Internals->propertiesDock->raise();
+  /// hook delete to pqDeleteReaction.
+  QAction* tempDeleteAction = new QAction(this);
+  pqDeleteReaction* handler = new pqDeleteReaction(tempDeleteAction);
+  handler->connect(this->Internals->propertiesPanel,
+    SIGNAL(deleteRequested(pqPipelineSource*)),
+    SLOT(deleteSource(pqPipelineSource*)));
 
-    // Enable help from the properties panel.
-    QObject::connect(this->Internals->propertiesPanel,
-                     SIGNAL(helpRequested(const QString&, const QString&)),
-                     this, SLOT(showHelpForProxy(const QString&, const QString&)));
-
-    /// hook delete to pqDeleteReaction.
-    QAction* tempDeleteAction = new QAction(this);
-    pqDeleteReaction* handler = new pqDeleteReaction(tempDeleteAction);
-    handler->connect(this->Internals->propertiesPanel,
-      SIGNAL(deleteRequested(pqPipelineSource*)),
-      SLOT(deleteSource(pqPipelineSource*)));
-    }
-  else
-    {
-    this->removeDockWidget(this->Internals->propertiesDock);
-    delete this->Internals->propertiesDock;
-    this->Internals->propertiesDock = 0;
-
-    this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->displayDock);
-    this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->informationDock);
-    this->Internals->objectInspectorDock->raise();
-
-    // Enable help from the object inspector.
-    QObject::connect(this->Internals->objectInspector,
-      SIGNAL(helpRequested(const QString&, const QString&)),
-      this, SLOT(showHelpForProxy(const QString&, const QString&)));
-    }
- 
+  // setup color editor
   /// Provide access to the color-editor panel for the application.
   pqApplicationCore::instance()->registerManager(
     "COLOR_EDITOR_PANEL", this->Internals->colorMapEditorDock);

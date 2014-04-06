@@ -141,50 +141,6 @@
    </attribute>
    <widget class="pqCollaborationPanel" name="collaborationPanel"/>
   </widget>
-  <widget class="QDockWidget" name="objectInspectorDock">
-   <property name="windowTitle">
-    <string>Properties</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="pqObjectInspectorWidget" name="objectInspector"/>
-  </widget>
-  <widget class="QDockWidget" name="displayDock">
-   <property name="windowTitle">
-    <string>Display</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="displayWidgetFrame">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QScrollArea" name="displayScrollArea">
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="pqDisplayProxyEditorWidget" name="displayWidget">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>77</width>
-          <height>152</height>
-         </rect>
-        </property>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="informationDock">
    <property name="windowTitle">
     <string>Information</string>
@@ -211,7 +167,7 @@
           <x>0</x>
           <y>0</y>
           <width>77</width>
-          <height>152</height>
+          <height>271</height>
          </rect>
         </property>
        </widget>
@@ -316,18 +272,6 @@
    <class>pqCollaborationPanel</class>
    <extends>QWidget</extends>
    <header>pqCollaborationPanel.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqObjectInspectorWidget</class>
-   <extends>QWidget</extends>
-   <header>pqObjectInspectorWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqDisplayProxyEditorWidget</class>
-   <extends>QWidget</extends>
-   <header>pqDisplayProxyEditorWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
