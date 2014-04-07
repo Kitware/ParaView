@@ -60,18 +60,18 @@ int vtkSpyPlotFileSeriesReader::RequestInformationForInput(
                                              vtkInformation *request,
                                              vtkInformationVector *outputVector)
 {
-  if (index == -1 || (index != this->LastRequestInformationIndex) || (outputVector != NULL))
+  if (index == -1 || (index != this->Superclass::LastRequestInformationIndex) || (outputVector != NULL))
     {
     if (index >= 0)
       {
-      this->SetReaderFileName(this->GetFileName(index));
+      this->Superclass::SetReaderFileName(this->GetFileName(index));
       }
     else
       {
-      this->SetReaderFileName(0);
+      this->Superclass::SetReaderFileName(0);
       }
 
-    this->LastRequestInformationIndex = index;
+    this->Superclass::LastRequestInformationIndex = index;
     // Need to call RequestInformation on reader to refresh any metadata for the
     // new filename.
     vtkSmartPointer<vtkInformation> tempRequest;
