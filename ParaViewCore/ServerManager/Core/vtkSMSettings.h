@@ -42,44 +42,30 @@ public:
   static vtkSMSettings* GetInstance();
 
   // Description:
-  // Load settings and distribute to all processes if in batch symmetric mode.
-  bool LoadSettings();
+  // Add settings from a string. The string should contain valid JSON-formatted
+  // text. The "priority" indicates how to treat a setting that has definitions
+  // in more than one string passed to this class in multiple calls to this
+  // function. If two settings strings contain values for the same
+  // setting, then the setting from the string with higher priority will be
+  // used.
+  bool AddSettingsFromString(const std::string & settings, double priority);
 
   // Description:
-  // Load user settings from default location. On linux/unix, this is
-  // $HOME/.pvsettings.user.js. On Windows, this is under
-  // %USERPROFILE%/.pvsettings.js. Returns true on success, false
-  // otherwise.
-  bool LoadUserSettings();
+  // The same as AddSettingsFromString, but this method reads the settings
+  // string from the named file. The fileName should be a full path.
+  bool AddSettingsFromFile(const std::string & fileName, double priority);
 
   // Description:
-  // Load user settings from a specified file. Returns true on
-  // success, false otherwise.
-  bool LoadUserSettings(const char* fileName);
+  // Clear out all settings.
+  void ClearAllSettings();
 
   // Description:
-  // Set user-specific settings. These are stored in a home directory.
-  virtual void SetUserSettingsFromString(const char* settings);
-  virtual std::string GetUserSettingsAsString();
+  // Distribute settings to all processes if in batch symmetric mode.
+  bool DistributeSettings();
 
   // Description:
-  // Load site settings from default location TBD. Returns true on success,
-  // false otherwise.
-  bool LoadSiteSettings();
-
-  // Description:
-  // Load site settings from a file. Returns true on success, false
-  // otherwise.
-  bool LoadSiteSettings(const char* fileName);
-
-  // Description:
-  // Set site-specific settings. These are stored in a location TBD.
-  virtual void SetSiteSettingsFromString(const char* settings);
-  virtual std::string GetSiteSettingsAsString();
-
-  // Description:
-  // Save settings to file(s)
-  bool SaveSettings();
+  // Save highest priority settings to file
+  bool SaveSettings(const std::string & filePath);
 
   // Description:
   // Check whether a setting is defined for the requested names.
@@ -144,18 +130,6 @@ public:
 protected:
   vtkSMSettings();
   virtual ~vtkSMSettings();
-
-  // Description:
-  // Get the path to the root of the settings files
-  std::string GetSettingsFilePathRoot();
-
-  // Description:
-  // Get the path to the user settings file
-  std::string GetUserSettingsFilePath();
-
-  // Description:
-  // Get the path to the site settings file
-  std::string GetSiteSettingsFilePath();
 
 private:
   vtkSMSettings(const vtkSMSettings&); // Not implemented

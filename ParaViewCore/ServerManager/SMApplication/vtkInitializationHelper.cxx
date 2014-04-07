@@ -187,7 +187,10 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   loader->LoadPluginsFromPluginSearchPath();
 
   // Load settings files.
-  vtkSMSettings::GetInstance()->LoadSettings();
+  if (!options->GetDisableRegistry())
+    {
+    vtkInitializationHelper::LoadSettings();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -202,7 +205,11 @@ void vtkInitializationHelper::StandaloneInitialize()
 void vtkInitializationHelper::Finalize()
 {
   // Write out settings file(s)
-  bool savingSucceeded = vtkSMSettings::GetInstance()->SaveSettings();
+  std::string userSettingsFile =
+    vtkInitializationHelper::GetUserSettingsDirectory();
+  userSettingsFile.append("UserSettings.json");
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  bool savingSucceeded = settings->SaveSettings(userSettingsFile.c_str());
   if (!savingSucceeded)
     {
     cerr << "Saving settings file failed\n";
@@ -220,6 +227,63 @@ void vtkInitializationHelper::StandaloneFinalize()
 {
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::LoadSettings()
+{
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+  bool success = true;
+
+  // Load user-level settings
+  std::string userSettingsFileName = vtkInitializationHelper::GetUserSettingsDirectory();
+  userSettingsFileName.append("UserSettings.json");
+  success = success && settings->AddSettingsFromFile(userSettingsFileName, 2.0);
+
+  // Load site-level settings
+  // FIXME - site settings will likely live elsewhere
+  std::string siteSettingsFile = vtkInitializationHelper::GetUserSettingsDirectory();
+  siteSettingsFile.append("SiteSettings.json");
+  success = success && settings->AddSettingsFromFile(siteSettingsFile, 1.0);
+
+  settings->DistributeSettings();
+
+  return success;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkInitializationHelper::GetUserSettingsDirectory()
+{
+#if defined(WIN32)
+  const char* appData = getenv("APPDATA");
+  if (!appData)
+    {
+    return std::string();
+    }
+  std::string separator("\\");
+  std::string fileName(appData);
+  if (fileName[fileName.size()-1] != separator[0])
+    {
+    fileName.append(separator);
+    }
+  fileName += "ParaView" + separator;
+#else
+  const char* home = getenv("HOME");
+  if (!home)
+    {
+    return std::string();
+    }
+  std::string separator("/");
+  std::string fileName(home);
+  if (fileName[fileName.size()-1] != separator[0])
+    {
+    fileName.append(separator);
+    }
+  fileName += ".config" + separator + "ParaView" + separator;
+#endif
+
+  return fileName;
 }
 
 //----------------------------------------------------------------------------

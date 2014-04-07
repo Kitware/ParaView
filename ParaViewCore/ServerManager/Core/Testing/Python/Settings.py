@@ -20,7 +20,7 @@ settingsString = """
 {
   // Default settings for sources.
   "sources" : {
-    // A sphere source is awesome
+    // A sphere source
     "SphereSource" : {
       /* New comment
          New comment 2 */
@@ -38,8 +38,9 @@ settingsString = """
 """ % (trueRadius, trueThetaResolution, trueCenter[0], trueCenter[1], trueCenter[2])
 
 settings = paraview.servermanager.vtkSMSettings.GetInstance()
-settings.SetUserSettingsFromString(settingsString)
-settings.SetSiteSettingsFromString("{}")
+settings.ClearAllSettings()
+settings.AddSettingsFromString(settingsString, 2000000.0)
+settings.AddSettingsFromString("{}", 1500000.0)
 
 sourcesComment = settings.GetSettingDescription(".sources")
 if sourcesComment != "// Default settings for sources.":
@@ -47,7 +48,7 @@ if sourcesComment != "// Default settings for sources.":
   sys.exit(-1)
 
 sourcesSphereSourceComment = settings.GetSettingDescription(".sources.SphereSource")
-if sourcesSphereSourceComment != "// A sphere source is awesome":
+if sourcesSphereSourceComment != "// A sphere source":
   print "Comment for .sources.SphereSource was not what was expected"
   sys.exit(-1)
 
@@ -103,46 +104,16 @@ radiusProperty = s.GetProperty("Radius")
 radius = radiusProperty.GetElement(0)
 if radius != trueRadius:
   print "Radius property does not match setting value"
+  s.FastDelete()
   sys.exit(-1)
+s.FastDelete()
 
 #
 #
 # Now clear out the settings and test setting values
 #
 #
-settings.SetUserSettingsFromString(None)
-settingsString = settings.GetUserSettingsAsString()
-if settingsString != "{}\n":
-  print "User settings set from None should be {}"
-  sys.exit(-1)
-settings.SetSiteSettingsFromString(None)
-settingsString = settings.GetSiteSettingsAsString()
-if settingsString != "{}\n":
-  print "Site settings set from None should be {}"
-  sys.exit(-1)
-
-settings.SetUserSettingsFromString("")
-settingsString = settings.GetUserSettingsAsString()
-if settingsString != "{}\n":
-  print "User settings set from empty string should be {}"
-  sys.exit(-1)
-settings.SetSiteSettingsFromString("")
-settingsString = settings.GetSiteSettingsAsString()
-if settingsString != "{}\n":
-  print "Site settings set from empty string should be {}"
-  sys.exit(-1)
-
-settings.SetUserSettingsFromString("{}")
-settingsString = settings.GetUserSettingsAsString()
-if settingsString != "{}\n":
-  print "User settings set from {} should be {}"
-  sys.exit(-1)
-settings.SetSiteSettingsFromString("{}")
-settingsString = settings.GetSiteSettingsAsString()
-if settingsString != "{}\n":
-  print "Site settings set from {} should be {}"
-  sys.exit(-1)
-
+settings.ClearAllSettings()
 if settings.HasSetting(".sources.SphereSource"):
   print "Setting '.sources.SphereSource' should have been cleared"
   sys.exit(-1)

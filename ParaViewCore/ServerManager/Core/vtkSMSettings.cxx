@@ -34,12 +34,38 @@
 #include "vtk_jsoncpp.h"
 
 #include <algorithm>
+#include <cfloat>
 
 //----------------------------------------------------------------------------
+namespace {
+class PrioritizedJSONRoot {
+public:
+  Json::Value Value;
+  double      Priority;
+};
+
+bool SortByPriority(const PrioritizedJSONRoot & r1,
+                    const PrioritizedJSONRoot & r2)
+{
+  return (r1.Priority > r2.Priority);
+}
+
+} // end anonymous namespace
+
 class vtkSMSettings::vtkSMSettingsInternal {
 public:
-  Json::Value UserSettingsJSONRoot;
-  Json::Value SiteSettingsJSONRoot;
+  std::vector< PrioritizedJSONRoot > JSONRoots;
+  bool JSONRootsAreSorted;
+
+  //----------------------------------------------------------------------------
+  // Description:
+  // Sort JSON roots by priority, from highest to lowest
+  void SortJSONRoots()
+  {
+    // Sort the settings roots by priority (highest to lowest)
+    std::stable_sort(this->JSONRoots.begin(), this->JSONRoots.end(), SortByPriority);
+    this->JSONRootsAreSorted = true;
+  }
 
   //----------------------------------------------------------------------------
   // Description:
@@ -69,26 +95,6 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // See if given setting is defined in user settings
-  bool HasUserSetting(const char* settingName)
-  {
-    Json::Value value = this->GetUserSetting(settingName);
-
-    return !value.isNull();
-  }
-
-  //----------------------------------------------------------------------------
-  // Description:
-  // See if given setting is defined in user settings
-  bool HasSiteSetting(const char* settingName)
-  {
-    Json::Value value = this->GetSiteSetting(settingName);
-
-    return !value.isNull();
-  }
-
-  //----------------------------------------------------------------------------
-  // Description:
   // Get a Json::Value given a string. Returns the setting defined in the user
   // settings file if it is defined, falls back to the setting defined in the
   // site settings file if it is defined, and null if it isn't defined in
@@ -102,39 +108,36 @@ public:
   // ".[0][1][2].name1[3]"
   const Json::Value & GetSetting(const char* settingName)
   {
-    // Try user-specific settings first
-    const Json::Value & userSetting = this->GetUserSetting(settingName);
-    if (!userSetting)
+    return this->GetSettingAtOrBelowPriority(settingName, DBL_MAX);
+  }
+
+  //----------------------------------------------------------------------------
+  const Json::Value & GetSettingAtOrBelowPriority(const char* settingName,
+                                                  double priority)
+  {
+    if (!this->JSONRootsAreSorted)
       {
-      const Json::Value & siteSetting = this->GetSiteSetting(settingName);
-      return siteSetting;
+      this->SortJSONRoots();
       }
 
-    return userSetting;
+    // Iterate over settings, checking higher priority settings first
+    for (size_t i = 0; i < this->JSONRoots.size(); ++i)
+      {
+      if (this->JSONRoots[i].Priority > priority)
+        {
+        continue;
+        }
+
+      Json::Path settingPath(settingName);
+      const Json::Value & setting = settingPath.resolve(this->JSONRoots[i].Value);
+      if (!setting.isNull())
+        {
+        return setting;
+        }
+      }
+
+    return Json::Value::null;
   }
-
-  //----------------------------------------------------------------------------
-  const Json::Value & GetUserSetting(const char* settingName)
-  {
-    // Convert setting string to path
-    const std::string settingString(settingName);
-    Json::Path userSettingsPath(settingString);
-
-    const Json::Value & userSetting = userSettingsPath.resolve(this->UserSettingsJSONRoot);
-
-    return userSetting;
-  }
-
-  //----------------------------------------------------------------------------
-  const Json::Value & GetSiteSetting(const char* settingName)
-  {
-    // Convert setting string to path
-    Json::Path siteSettingsPath(settingName);
-    const Json::Value & siteSetting = siteSettingsPath.resolve(this->SiteSettingsJSONRoot);
-
-    return siteSetting;
-  }
-
 
   //----------------------------------------------------------------------------
   template< typename T >
@@ -410,19 +413,19 @@ public:
   template< typename T >
   void SetSetting(const char* settingName, const std::vector< T > & values)
   {
-    // Just set user settings for now.
-    this->SetUserSetting(settingName, values);
-  }
+    if (this->JSONRoots.size() == 0)
+      {
+      PrioritizedJSONRoot newRoot;
+      newRoot.Priority = DBL_MAX;
+      this->JSONRoots.push_back(newRoot);
+      }
 
-  //----------------------------------------------------------------------------
-  template< typename T >
-  void SetUserSetting(const char* settingName, const std::vector< T > & values)
-  {
+    // Just set settings in the highest-priority settings group for now.
     std::string root, leaf;
     this->SeparateBranchFromLeaf(settingName, root, leaf);
 
     Json::Path settingPath(root.c_str());
-    Json::Value & jsonValue = settingPath.make(this->UserSettingsJSONRoot);
+    Json::Value & jsonValue = settingPath.make(this->JSONRoots[0].Value);
     jsonValue[leaf] = Json::Value::null;
 
     if (values.size() > 1)
@@ -445,7 +448,7 @@ public:
                           vtkSMIntVectorProperty* property)
   {
     Json::Path valuePath(settingName);
-    Json::Value & jsonValue = valuePath.make(this->UserSettingsJSONRoot);
+    Json::Value & jsonValue = valuePath.make(this->JSONRoots[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
       jsonValue = property->GetElement(0);
@@ -465,7 +468,7 @@ public:
                           vtkSMDoubleVectorProperty* property)
   {
     Json::Path valuePath(settingName);
-    Json::Value & jsonValue = valuePath.make(this->UserSettingsJSONRoot);
+    Json::Value & jsonValue = valuePath.make(this->JSONRoots[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
       jsonValue = property->GetElement(0);
@@ -485,7 +488,7 @@ public:
                           vtkSMStringVectorProperty* property)
   {
     Json::Path valuePath(settingName);
-    Json::Value & jsonValue = valuePath.make(this->UserSettingsJSONRoot);
+    Json::Value & jsonValue = valuePath.make(this->JSONRoots[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
       jsonValue = property->GetElement(0);
@@ -514,6 +517,13 @@ public:
   // Set a property setting to a Json::Value
   void SetPropertySetting(const char* settingName, vtkSMProperty* property)
   {
+    if (this->JSONRoots.size() == 0)
+      {
+      PrioritizedJSONRoot newRoot;
+      newRoot.Priority = DBL_MAX;
+      this->JSONRoots.push_back(newRoot);
+      }
+
     if (vtkSMIntVectorProperty* intVectorProperty =
         vtkSMIntVectorProperty::SafeDownCast(property))
       {
@@ -562,6 +572,15 @@ public:
       return;
       }
 
+    if (this->JSONRoots.size() == 0)
+      {
+      PrioritizedJSONRoot newRoot;
+      newRoot.Priority = DBL_MAX;
+      this->JSONRoots.push_back(newRoot);
+      }
+
+    double highestPriority = this->JSONRoots[0].Priority;
+
     // Get reference to JSON value
     vtksys_ios::ostringstream settingStringStream;
     settingStringStream << settingPrefix << "." << proxy->GetXMLName();
@@ -569,8 +588,9 @@ public:
     const char* settingCString = settingString.c_str();
 
     Json::Path valuePath(settingCString);
-    Json::Value & proxyValue = valuePath.make(this->UserSettingsJSONRoot);
+    Json::Value & proxyValue = valuePath.make(this->JSONRoots[0].Value);
 
+    bool propertySet = false;
     vtkSmartPointer<vtkSMPropertyIterator> iter;
     iter.TakeReference(proxy->NewPropertyIterator());
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -592,8 +612,9 @@ public:
         }
       else if (property->IsValueDefault())
         {
-        // Remove existing JSON entry only if there is no site setting
-        if (!this->HasSiteSetting(propertySettingCString))
+        // Remove existing JSON entry only if there is no lower-priority setting
+        if (this->GetSettingAtOrBelowPriority(propertySettingCString,
+                                              highestPriority).isNull())
           {
           proxyValue.removeMember(property->GetXMLName());
           continue;
@@ -601,6 +622,15 @@ public:
         }
 
       this->SetPropertySetting(propertySettingCString, property);
+      propertySet = true;
+      }
+
+    // Check if the proxy Json::Value is empty. If so, remove it.
+    if (!propertySet)
+      {
+      Json::Path parentPath(settingPrefix);
+      Json::Value & parentValue = parentPath.make(this->JSONRoots[0].Value);
+      parentValue.removeMember(proxy->GetXMLName());
       }
   }
 
@@ -665,6 +695,7 @@ vtkStandardNewMacro(vtkSMSettings);
 vtkSMSettings::vtkSMSettings()
 {
   this->Internal = new vtkSMSettingsInternal();
+  this->Internal->JSONRootsAreSorted = false;
 }
 
 //----------------------------------------------------------------------------
@@ -688,174 +719,27 @@ vtkSMSettings* vtkSMSettings::GetInstance()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::LoadSettings()
+bool vtkSMSettings::AddSettingsFromString(const std::string & settings,
+                                          double priority)
 {
-  vtkSMSettings * settings = vtkSMSettings::GetInstance();
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetProcessType() == vtkProcessModule::PROCESS_CLIENT ||
-      (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
-       pm->GetPartitionId() == 0))
+  PrioritizedJSONRoot prioritizedRoot;
+  prioritizedRoot.Priority = priority;
+
+  // If the settings string is empty, the JSON parser can't handle it.
+  // Replace the empty string with {}
+  std::string processedSettings(settings);
+  if (processedSettings == "")
     {
-    settings->LoadSiteSettings();
-    settings->LoadUserSettings();
-    }
-  if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
-      pm->GetSymmetricMPIMode())
-    {
-    // Broadcast settings to satellite nodes
-    vtkMultiProcessController * controller = pm->GetGlobalController();
-    unsigned int stringSize;
-    if (controller->GetLocalProcessId() == 0)
-      {
-      std::string siteSettingsString = settings->GetSiteSettingsAsString().c_str();
-      stringSize = static_cast<unsigned int>(siteSettingsString.size())+1;
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        controller->Broadcast(const_cast<char*>(siteSettingsString.c_str()), stringSize, 0);
-        }
-
-      std::string userSettingsString = settings->GetUserSettingsAsString();
-      stringSize = static_cast<unsigned int>(userSettingsString.size())+1;
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        controller->Broadcast(const_cast<char*>(userSettingsString.c_str()), stringSize, 0);
-        }
-      }
-    else // Satellites
-      {
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        char* siteSettingsString = new char[stringSize];
-        controller->Broadcast(siteSettingsString, stringSize, 0);
-        settings->SetSiteSettingsFromString(siteSettingsString);
-        delete[] siteSettingsString;
-        }
-      else
-        {
-        settings->SetSiteSettingsFromString(NULL);
-        }
-      controller->Broadcast(&stringSize, 1, 0);
-      if (stringSize > 0)
-        {
-        char* userSettingsString = new char[stringSize];
-        controller->Broadcast(userSettingsString, stringSize, 0);
-        settings->SetUserSettingsFromString(userSettingsString);
-        delete[] userSettingsString;
-        }
-      else
-        {
-        settings->SetUserSettingsFromString(NULL);
-        }
-      }
-    }
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::LoadUserSettings()
-{
-  std::string fileName = GetUserSettingsFilePath();
-  return this->LoadUserSettings(fileName.c_str());
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::LoadUserSettings(const char* fileName)
-{
-  std::string userSettingsFileName(fileName);
-  std::ifstream userSettingsFile(userSettingsFileName.c_str(), ios::in | ios::binary | ios::ate);
-  if (userSettingsFile.is_open())
-    {
-    std::streampos size = userSettingsFile.tellg();
-    userSettingsFile.seekg(0, ios::beg);
-    int stringSize = size;
-    char * userSettingsString = new char[stringSize+1];
-    userSettingsFile.read(userSettingsString, stringSize);
-    userSettingsString[stringSize] = '\0';
-    userSettingsFile.close();
-
-    this->SetUserSettingsFromString( userSettingsString );
-    delete[] userSettingsString;
-    }
-  else
-    {
-    return false;
-    }
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSettings::SetUserSettingsFromString(const char* settings)
-{
-  // Blank out the settings
-  this->Internal->UserSettingsJSONRoot.clear();
-
-  if (settings == NULL || strcmp(settings, "") == 0)
-    {
-    return;
+    processedSettings.append("{}");
     }
 
   // Parse the user settings
   Json::Reader reader;
-  bool success = reader.parse(std::string(settings), this->Internal->UserSettingsJSONRoot, true);
-  if (!success)
+  bool success = reader.parse(processedSettings, prioritizedRoot.Value, true);
+  if (success)
     {
-    vtkErrorMacro(<< "Could not parse user settings JSON");
-    this->Internal->UserSettingsJSONRoot = Json::Value::null;
-    }
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMSettings::GetUserSettingsAsString()
-{
-  return this->Internal->UserSettingsJSONRoot.toStyledString();
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::LoadSiteSettings()
-{
-  std::string fileName = this->GetSiteSettingsFilePath();
-  return this->LoadSiteSettings(fileName.c_str());
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::LoadSiteSettings(const char* fileName)
-{
-  std::string siteSettingsFileName(fileName);
-  std::ifstream siteSettingsFile(siteSettingsFileName.c_str(), ios::in | ios::binary | ios::ate);
-  if (siteSettingsFile.is_open())
-    {
-    std::streampos size = siteSettingsFile.tellg();
-    siteSettingsFile.seekg(0, ios::beg);
-    int stringSize = size;
-    char * siteSettingsString = new char[stringSize+1];
-    siteSettingsFile.read(siteSettingsString, stringSize);
-    siteSettingsString[stringSize] = '\0';
-    siteSettingsFile.close();
-
-    this->SetSiteSettingsFromString( siteSettingsString );
-    delete[] siteSettingsString;
-    }
-  else
-    {
-    return false;
-    }
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSettings::SaveSettings()
-{
-  std::ofstream userSettingsFile(this->GetUserSettingsFilePath().c_str(), ios::out | ios::binary );
-  if (userSettingsFile.is_open())
-    {
-    std::string userOutput = this->GetUserSettingsAsString();
-    userSettingsFile << userOutput;
+    this->Internal->JSONRoots.push_back(prioritizedRoot);
+    this->Internal->JSONRootsAreSorted = false;
     return true;
     }
 
@@ -863,30 +747,115 @@ bool vtkSMSettings::SaveSettings()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSettings::SetSiteSettingsFromString(const char* settings)
+bool vtkSMSettings::AddSettingsFromFile(const std::string & fileName,
+                                        double priority)
 {
-  // Blank out the settings
-  this->Internal->SiteSettingsJSONRoot.clear();
-
-  if (settings == NULL || strcmp(settings, "") == 0)
+  std::string settingsFileName(fileName);
+  std::ifstream settingsFile(settingsFileName.c_str(), ios::in | ios::binary | ios::ate);
+  if (settingsFile.is_open())
     {
-    return;
+    std::streampos size = settingsFile.tellg();
+    settingsFile.seekg(0, ios::beg);
+    int stringSize = size;
+    char * settingsString = new char[stringSize+1];
+    settingsFile.read(settingsString, stringSize);
+    settingsString[stringSize] = '\0';
+    settingsFile.close();
+
+    bool success = this->AddSettingsFromString(std::string(settingsString),
+                                               priority);
+    delete[] settingsString;
+
+    return success;
+    }
+  else
+    {
+    std::string emptyString;
+    return this->AddSettingsFromString(emptyString, priority);
     }
 
-  // Parse the user settings
-  Json::Reader reader;
-  bool success = reader.parse(std::string(settings), this->Internal->SiteSettingsJSONRoot);
-  if (!success)
-    {
-    vtkErrorMacro(<< "Could not parse site settings JSON");
-    this->Internal->SiteSettingsJSONRoot = Json::Value::null;
-    }
+  return false;
 }
 
 //----------------------------------------------------------------------------
-std::string vtkSMSettings::GetSiteSettingsAsString()
+void vtkSMSettings::ClearAllSettings()
 {
-  return this->Internal->SiteSettingsJSONRoot.toStyledString();
+  this->Internal->JSONRoots.clear();
+  this->Internal->JSONRootsAreSorted = false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::DistributeSettings()
+{
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+      pm->GetSymmetricMPIMode())
+    {
+    // Broadcast settings to satellite nodes
+    vtkMultiProcessController * controller = pm->GetGlobalController();
+
+    unsigned int numberOfJSONRoots;
+    if (controller->GetLocalProcessId() == 0)
+      {
+      // Send the number of JSON settings roots
+      numberOfJSONRoots = static_cast<unsigned int>(this->Internal->JSONRoots.size());
+      controller->Broadcast(&numberOfJSONRoots, 1, 0);
+
+      for (size_t i = 0; i < numberOfJSONRoots; ++i)
+        {
+        std::string settingsString = this->Internal->JSONRoots[i].Value.toStyledString();
+        unsigned int stringSize = static_cast<unsigned int>(settingsString.size())+1;
+        controller->Broadcast(&stringSize, 1, 0);
+        if (stringSize > 0)
+          {
+          controller->Broadcast(const_cast<char*>(settingsString.c_str()), stringSize, 0);
+          controller->Broadcast(&this->Internal->JSONRoots[i].Priority, 1, 0);
+          }
+        }
+      }
+    else // Satellites
+      {
+      // Get the number of JSON settings roots
+      controller->Broadcast(&numberOfJSONRoots, 1, 0);
+
+      for (unsigned int i = 0; i < numberOfJSONRoots; ++i)
+        {
+        unsigned int stringSize = 0;
+        controller->Broadcast(&stringSize, 1, 0);
+        if (stringSize > 0)
+          {
+          char* settingsString = new char[stringSize];
+          controller->Broadcast(settingsString, stringSize, 0);
+          double priority = 0.0;
+          controller->Broadcast(&priority, 1, 0);
+          this->AddSettingsFromString(std::string(settingsString), priority);
+          delete[] settingsString;
+          }
+        }
+      }
+    }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::SaveSettings(const std::string & filePath)
+{
+  if (this->Internal->JSONRoots.size() == 0)
+    {
+    // No settings to save, so we'll always succeed.
+    return true;
+    }
+
+  std::ofstream settingsFile(filePath.c_str(), ios::out | ios::binary );
+  if (settingsFile.is_open())
+    {
+    std::string output = this->Internal->JSONRoots[0].Value.toStyledString();
+    settingsFile << output;
+    return true;
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -894,7 +863,6 @@ bool vtkSMSettings::HasSetting(const char* settingName)
 {
   return this->Internal->HasSetting(settingName);
 }
-
 
 //----------------------------------------------------------------------------
 unsigned int vtkSMSettings::GetSettingNumberOfElements(const char* settingName)
@@ -912,21 +880,21 @@ unsigned int vtkSMSettings::GetSettingNumberOfElements(const char* settingName)
 int vtkSMSettings::GetSettingAsInt(const char* settingName,
                                    int defaultValue)
 {
-  return this->GetSettingAsInt(settingName, defaultValue);
+  return this->GetSettingAsInt(settingName, 0, defaultValue);
 }
 
 //----------------------------------------------------------------------------
 double vtkSMSettings::GetSettingAsDouble(const char* settingName,
                                          double defaultValue)
 {
-  return this->GetSettingAsDouble(settingName, defaultValue);
+  return this->GetSettingAsDouble(settingName, 0, defaultValue);
 }
 
 //----------------------------------------------------------------------------
 std::string vtkSMSettings::GetSettingAsString(const char* settingName,
                                               const std::string & defaultValue)
 {
-  return this->GetSettingAsString(settingName, defaultValue);
+  return this->GetSettingAsString(settingName, 0, defaultValue);
 }
 
 //----------------------------------------------------------------------------
@@ -1077,76 +1045,25 @@ void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
 //----------------------------------------------------------------------------
 void vtkSMSettings::SetSettingDescription(const char* settingName, const char* description)
 {
-  if (!this->Internal->HasUserSetting(settingName))
-    {
-    return;
-    }
-
   Json::Path settingPath(settingName);
-  Json::Value & settingValue = settingPath.make(this->Internal->UserSettingsJSONRoot);
+  Json::Value & settingValue = settingPath.make(this->Internal->JSONRoots[0].Value);
   settingValue.setComment(description, Json::commentBefore);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMSettings::GetSettingsFilePathRoot()
-{
-  // Not sure where this should go. For now, read a file from user directory
-#if defined(WIN32)
-  const char* appData = getenv("APPDATA");
-  if (!appData)
-    {
-    return std::string();
-    }
-  std::string separator("\\");
-  std::string fileName(appData);
-  if (fileName[fileName.size()-1] != separator[0])
-    {
-    fileName.append(separator);
-    }
-  fileName += "ParaView" + separator;
-#else
-  const char* home = getenv("HOME");
-  if (!home)
-    {
-    return std::string();
-    }
-  std::string separator("/");
-  std::string fileName(home);
-  if (fileName[fileName.size()-1] != separator[0])
-    {
-    fileName.append(separator);
-    }
-  fileName += ".config" + separator + "ParaView" + separator;
-#endif
-
-  return fileName;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMSettings::GetUserSettingsFilePath()
-{
-  std::string fileName(this->GetSettingsFilePathRoot());
-  fileName.append("Settings.json");
-
-  return fileName;
-}
-
-//----------------------------------------------------------------------------
-std::string vtkSMSettings::GetSiteSettingsFilePath()
-{
-  // FIXME - hmm, site settings will probably be somewhere else
-  std::string fileName(this->GetSettingsFilePathRoot());
-  fileName.append("SiteSettings.json");
-
-  return fileName;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
-  os << indent << "UserSettings:\n";
-  os << this->Internal->UserSettingsJSONRoot.toStyledString();
-
-  os << indent << "SiteSettings:\n";
-  os << this->Internal->SiteSettingsJSONRoot.toStyledString();
+  os << indent << "JSONRoots:\n";
+  for (size_t i = 0; i < this->Internal->JSONRoots.size(); ++i)
+    {
+    os << indent << indent << "Root " << i << ":\n";
+    os << indent << indent << indent << "Priority: "
+       << this->Internal->JSONRoots[i].Priority << "\n";
+    std::stringstream ss(this->Internal->JSONRoots[i].Value.toStyledString());
+    std::string line;
+    while (std::getline(ss, line))
+      {
+      os << indent << indent << indent << line << "\n";
+      }
+    }
 }

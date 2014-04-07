@@ -54,7 +54,6 @@ public:
   vtkGetStringMacro(DataDirectory);
 
   vtkGetMacro(ExitAppWhenTestsDone, int);
-  vtkGetMacro(DisableRegistry, int);
  
   // Returns the test scripts as a list.
   QStringList GetTestScripts();

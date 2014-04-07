@@ -44,9 +44,18 @@ int main(int argc, char* argv[])
   cout << settingString;
 
   vtkSMSettings * settings = vtkSMSettings::GetInstance();
-  settings->SetUserSettingsFromString(settingString);
-  // Overwrite site settings in case the site settings file exists on the test machine
-  settings->SetSiteSettingsFromString(NULL);
+  settings->AddSettingsFromString(settingString, 1.0);
+
+  const char * higherPrioritySettingsString =
+    "{\n"
+    "  \"sources\" : {\n"
+    "    \"SphereSource\" : {\n"
+    "      \"Radius\" : 1.0\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  settings->AddSettingsFromString(higherPrioritySettingsString, 2.0);
 
   vtkNew<vtkSMParaViewPipelineController> controller;
 
@@ -70,7 +79,7 @@ int main(int argc, char* argv[])
     vtkSMDoubleVectorProperty::SafeDownCast(sphere->GetProperty("Radius"));
   if (radiusProperty)
     {
-    if (radiusProperty->GetElement(0) != 4.25)
+    if (radiusProperty->GetElement(0) != 1.0)
       {
       cerr << "Failed at " << __LINE__ << endl;
       return EXIT_FAILURE;
@@ -89,7 +98,7 @@ int main(int argc, char* argv[])
     }
   else
     {
-    cerr << "Could no get Radius property\n";
+    cerr << "Could not get Radius property\n";
     }
 
   session->Delete();

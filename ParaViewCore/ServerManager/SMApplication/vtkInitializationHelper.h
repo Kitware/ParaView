@@ -61,6 +61,15 @@ protected:
   vtkInitializationHelper() {};
   virtual ~vtkInitializationHelper() {};
 
+  // Description:
+  // Load settings
+  static bool LoadSettings();
+
+  // Description:
+  // Get directory for user settings file. The last character is always the
+  // file path separator appropriate for the system.
+  static std::string GetUserSettingsDirectory();
+
 private:
   vtkInitializationHelper(const vtkInitializationHelper&); // Not implemented
   void operator=(const vtkInitializationHelper&); // Not implemented
