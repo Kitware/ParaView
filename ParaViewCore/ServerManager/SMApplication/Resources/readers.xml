@@ -4286,7 +4286,7 @@
       </Hints>
       <!-- End spcthreader-->
     </SourceProxy>
-    <SourceProxy class="vtkFileSeriesReader"
+    <SourceProxy class="vtkSpyPlotFileSeriesReader"
                  file_name_method="SetFileName"
                  label="Restarted Sim Spy Plot Reader"
                  name="SPCTHRestartReader"
@@ -4299,6 +4299,12 @@
                      together as if it was one continuous dump of files. This
                      reader allows you to specify a metadata file that will
                      implicitly string the files together.</Documentation>
+      <OutputPort index="0"
+                  name="Volume Data" />
+      <OutputPort index="1"
+                  name="Tracers" />
+      <OutputPort index="2"
+                  name="Markers" />
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="sources"
@@ -4309,6 +4315,8 @@
           <Property name="GenerateLevelArray" />
           <Property name="GenerateActiveBlockArray" />
           <Property name="GenerateBlockIdArray" />
+          <Property name="GenerateTracers" />
+          <Property name="GenerateMarkers" />
           <Property name="CellArrayInfo" />
           <Property name="CellArrayStatus" />
         </ExposedProperties>
