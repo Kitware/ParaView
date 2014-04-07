@@ -276,14 +276,21 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
       timeRange, 2);
 
+    outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
+      &(*this->TimeSteps)[0],
+      static_cast<int>(this->TimeSteps->size()));
+
+    outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
+      timeRange, 2);
+
 #ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
     if ( this->GenerateMarkers) 
       {
-      outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
+      outInfo2->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
         &(*this->TimeSteps)[0],
         static_cast<int>(this->TimeSteps->size()));
 
-      outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
+      outInfo2->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
         timeRange, 2);
       }
 #endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
@@ -906,7 +913,7 @@ int vtkSpyPlotReader::RequestData(
   if (this->GenerateMarkers)
     {
     info=outputVector->GetInformationObject(2);
-    vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
+    doOutput=info->Get(vtkDataObject::DATA_OBJECT());
     vtkMultiBlockDataSet *mbds=vtkMultiBlockDataSet::SafeDownCast(doOutput);
 
     mbds->SetNumberOfBlocks (0);
