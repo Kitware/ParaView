@@ -331,7 +331,6 @@ pqView* pqObjectBuilder::createView(const QString& type,
     return NULL;
     }
 
-  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
 
   QList<pqViewModuleInterface*> ifaces =

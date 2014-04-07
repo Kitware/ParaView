@@ -299,7 +299,7 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
   if (
     (producer == NULL) ||
     (outputPort < 0) ||
-    (producer->GetNumberOfOutputPorts() <= outputPort) ||
+    (static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort) ||
     (producer->GetSession() != this->GetSession()))
     {
     return NULL;
@@ -330,7 +330,8 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
 const char* vtkSMViewProxy::GetRepresentationType(
   vtkSMSourceProxy* producer, int outputPort)
 {
-  assert(producer && producer->GetNumberOfOutputPorts() > outputPort);
+  assert(producer &&
+         static_cast<int>(producer->GetNumberOfOutputPorts()) > outputPort);
 
   // Process producer hints to see if indicates what type of representation
   // to create for this view.
@@ -374,8 +375,8 @@ const char* vtkSMViewProxy::GetRepresentationType(
 bool vtkSMViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outputPort)
 {
   if (producer == NULL || outputPort < 0 ||
-    producer->GetNumberOfOutputPorts() <= outputPort ||
-    producer->GetSession() != this->GetSession())
+      static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort ||
+      producer->GetSession() != this->GetSession())
     {
     return false;
     }
@@ -403,7 +404,8 @@ vtkSMRepresentationProxy* vtkSMViewProxy::FindRepresentation(
       repr->GetProperty("Input"))
       {
       vtkSMPropertyHelper helper2(repr, "Input");
-      if (helper2.GetAsProxy() == producer && helper2.GetOutputPort() == outputPort)
+      if (helper2.GetAsProxy() == producer &&
+          static_cast<int>(helper2.GetOutputPort()) == outputPort)
         {
         return repr;
         }

@@ -141,6 +141,7 @@ protected:
 
     void apply(pqView* view)
       {
+      (void) view;
       this->Panel->apply();
       }
 

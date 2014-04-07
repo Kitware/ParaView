@@ -66,6 +66,7 @@ int vtkSMGlobalPropertiesLinkUndoElement::Redo()
 //----------------------------------------------------------------------------
 int vtkSMGlobalPropertiesLinkUndoElement::UndoRedoInternal(bool undo)
 {
+  (void) undo;
 // FIXME:
 //  if (this->ProxyGlobalID == 0)
 //    {

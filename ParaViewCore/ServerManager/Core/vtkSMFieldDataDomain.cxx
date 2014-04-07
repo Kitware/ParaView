@@ -94,7 +94,6 @@ void vtkSMFieldDataDomain::UpdateDomainEntries(
       continue;
       }
 
-    bool accepted = false;
     // Add field-data if ...
     if (
       // ... domain updates are disabled

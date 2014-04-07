@@ -289,6 +289,7 @@ void pqScalarsToColors::setVectorMode(Mode mode, int comp)
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 {
+  (void) component;
   // FIXME:
   //foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
   //  {

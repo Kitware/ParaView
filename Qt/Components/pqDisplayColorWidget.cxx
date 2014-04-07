@@ -407,7 +407,7 @@ void pqDisplayColorWidget::setComponentNumber(int val)
     int index = this->Components->findData(val);
     if (index == -1)
       {
-      bool prev = this->Components->blockSignals(true);
+      this->Components->blockSignals(true);
       this->Components->addItem(QString("%1").arg(val), val);
       this->Components->blockSignals(false);
 

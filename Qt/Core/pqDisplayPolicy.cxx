@@ -60,6 +60,9 @@ pqDisplayPolicy::~pqDisplayPolicy()
 pqDataRepresentation* pqDisplayPolicy::createPreferredRepresentation(
   pqOutputPort* opPort, pqView* view, bool dont_create_view) const
 {
+  (void) opPort;
+  (void) view;
+  (void) dont_create_view;
   abort();
   return NULL;
 }
@@ -94,6 +97,7 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
 //-----------------------------------------------------------------------------
 QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* port, bool update_pipeline) const
 {
+  (void) update_pipeline;
   if (port)
     {
     vtkSMSourceProxy* source =

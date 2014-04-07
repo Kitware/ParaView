@@ -588,6 +588,8 @@ void pqProxyWidget::constructor(
   vtkSMProxy* smproxy, const QStringList& properties, QWidget *parentObject, Qt::WindowFlags wflags)
 {
   Q_ASSERT(smproxy);
+  (void) parentObject;
+  (void) wflags;
 
   this->ApplyChangesImmediately = false;
   // if the proxy wants a more descriptive layout for the panel, use it.

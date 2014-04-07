@@ -142,7 +142,7 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
 
 //---------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(
-  const char* function, int index/*=0*/)
+  const char* function, int /*index=0*/)
 {
   vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
   if (!inputProperty)

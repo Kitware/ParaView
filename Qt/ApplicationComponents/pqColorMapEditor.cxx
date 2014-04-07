@@ -181,7 +181,6 @@ void pqColorMapEditor::updateActive()
 {
   pqDataRepresentation* repr =
     pqActiveObjects::instance().activeRepresentation();
-  pqView* view = pqActiveObjects::instance().activeView();
 
   this->setDataRepresentation(repr);
 

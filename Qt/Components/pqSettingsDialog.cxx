@@ -67,6 +67,7 @@ public:
 protected:
   virtual bool eventFilter(QObject *obj, QEvent *evt)
     {
+    (void) obj;
     if (evt->type() == QEvent::KeyPress)
       {
       QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);

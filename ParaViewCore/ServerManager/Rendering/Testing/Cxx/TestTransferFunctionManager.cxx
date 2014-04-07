@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 int main(int argc, char* argv[])
 {
+  (void) argc;
   vtkInitializationHelper::Initialize(argv[0], vtkProcessModule::PROCESS_CLIENT);
 
   // Create a new session.

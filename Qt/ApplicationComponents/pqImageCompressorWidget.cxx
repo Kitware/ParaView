@@ -172,8 +172,6 @@ void pqImageCompressorWidget::currentIndexChanged(int index)
 //-----------------------------------------------------------------------------
 void pqImageCompressorWidget::setConfigurationDefault(int index)
 {
-  Ui::ImageCompressorWidget& ui = this->Internals->Ui;
-
   enum {
     CONSUMER_DSL=1,
     ETHERNET_1_MEG,

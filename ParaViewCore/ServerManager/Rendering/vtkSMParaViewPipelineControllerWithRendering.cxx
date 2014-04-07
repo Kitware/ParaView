@@ -200,7 +200,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
 vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
-  if (producer == NULL || producer->GetNumberOfOutputPorts() <= outputPort)
+  if (producer == NULL || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
     {
     vtkErrorMacro("Invalid producer (" << producer << ") or outputPort ("
       << outputPort << ")");
@@ -269,7 +269,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
 vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
-  if (producer == NULL || producer->GetNumberOfOutputPorts() <= outputPort)
+  if (producer == NULL || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
     {
     vtkErrorMacro("Invalid producer (" << producer << ") or outputPort ("
       << outputPort << ")");
@@ -302,7 +302,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
 bool vtkSMParaViewPipelineControllerWithRendering::GetVisibility(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
-  if (producer == NULL || producer->GetNumberOfOutputPorts() <= outputPort)
+  if (producer == NULL || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
     {
     return false;
     }
@@ -321,7 +321,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::GetVisibility(
 vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredView(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
-  if (producer == NULL || producer->GetNumberOfOutputPorts() <= outputPort)
+  if (producer == NULL || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
     {
     vtkErrorMacro("Invalid producer (" << producer << ") or outputPort ("
       << outputPort << ")");
