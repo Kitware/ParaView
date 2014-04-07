@@ -305,6 +305,10 @@ vtkSMRepresentationProxy* vtkSMViewProxy::CreateDefaultRepresentation(
     return NULL;
     }
 
+  // Update with time from the view to ensure we have up-to-date data.
+  double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
+  producer->UpdatePipeline(view_time);
+
   const char* representationType =
     this->GetRepresentationType(producer, outputPort);
   if (!representationType)
@@ -340,12 +344,6 @@ const char* vtkSMViewProxy::GetRepresentationType(
     {
     return reprName;
     }
-
-  // We no longer update the pipeline. The application should update the
-  // pipeline manually before attempting to the show the data.
-  //  // Update with time to avoid domains updating without time later.
-  //  double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
-  //  producer->UpdatePipeline(view_time);
 
   // check if we have default representation name specified in XML.
   if (this->DefaultRepresentationName)
