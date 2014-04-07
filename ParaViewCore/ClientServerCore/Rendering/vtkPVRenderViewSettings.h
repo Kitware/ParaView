@@ -25,7 +25,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderViewSettings : public vtkObject
 {
