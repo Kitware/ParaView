@@ -1,47 +1,4 @@
 ###############################################################################
-# For python test that simply load the SM state.
-#
-# To load state files in python and perform regression testing
-# add them here.
-set (SMSTATE_FILES
-  Arrow
-  Axes
-  CalcInput
-  ExtractGrid
-  TestPHT
-  SPCTH2)
-set (SMSTATE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../SMStates")
-
-IF (PARAVIEW_DATA_ROOT)
-  FOREACH (tfile ${SMSTATE_FILES})
-    ADD_TEST(NAME "${tfile}-ServerManagerPython"
-      COMMAND $<TARGET_FILE:pvpython>
-        --enable-bt
-        "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview/smtesting.py"
-        -D ${PARAVIEW_DATA_ROOT}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PARAVIEW_DATA_ROOT}/Baseline/${tfile}.png
-        --state ${CMAKE_CURRENT_SOURCE_DIR}/../SMStates/${tfile}.pvsm
-        )
-    set_tests_properties(${tfile}-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
-  ENDFOREACH (tfile)
-
-  # This is a test that saves a temporary SM state and uses that saved
-  # state for regression testing.
-  ADD_TEST(NAME "LoadSave-ServerManagerPython"
-      COMMAND $<TARGET_FILE:pvpython>
-        --enable-bt
-        "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview/smtesting.py"
-        -D ${PARAVIEW_DATA_ROOT}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PARAVIEW_DATA_ROOT}/Baseline/Arrow.png
-        --state ${CMAKE_CURRENT_SOURCE_DIR}/../SMStates/Arrow.pvsm
-        --use_saved_state
-        )
-  set_tests_properties(LoadSave-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
-ENDIF ()
-
-###############################################################################
 # For python scripts for testing.
 #
 include (TestNumPy)
@@ -58,9 +15,6 @@ SET (PY_TESTS
   PythonSMTraceTest2
   PythonAnimationTrack
   GhostCellsInMergeBlocks
-#  Python2DRendering =======> REAL Scalar Bar Rendering bug
-#  SMUndoRedo
-#  SMCompoundProxyUndoRedo
   )
 if (FOUND_NUMPY)
   list(APPEND PY_TESTS PythonSelection)
@@ -75,7 +29,7 @@ IF (PARAVIEW_DATA_ROOT)
         -D ${PARAVIEW_DATA_ROOT}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -V ${PARAVIEW_DATA_ROOT}/Baseline/${tfile}.png
-        -S ${SMSTATE_FILE_DIR}
+        -S ${CMAKE_CURRENT_SOURCE_DIR}
         )
     set_tests_properties(${tfile}-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH(tfile)
@@ -114,7 +68,7 @@ IF (PARAVIEW_DATA_ROOT)
         ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
         -D ${PARAVIEW_DATA_ROOT}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -S ${SMSTATE_FILE_DIR}
+        -S ${CMAKE_CURRENT_SOURCE_DIR}
         )
     set_tests_properties(${tfile}-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH(tfile)

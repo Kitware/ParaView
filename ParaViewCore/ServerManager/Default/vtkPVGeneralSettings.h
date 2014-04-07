@@ -24,7 +24,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
-#include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVGeneralSettings : public vtkObject
 {

@@ -18,9 +18,10 @@
 #ifndef __vtkSMSettings_h
 #define __vtkSMSettings_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkStdString.h"
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkStdString.h" // needed for vtkStdString.
+#include <vector> // needed for vector.
 
 class vtkSMDoubleVectorProperty;
 class vtkSMInputProperty;
@@ -28,9 +29,8 @@ class vtkSMIntVectorProperty;
 class vtkSMStringVectorProperty;
 class vtkSMProxy;
 
-#include <vector>
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkSMSettings : public vtkObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSettings : public vtkObject
 {
 public:
   static vtkSMSettings* New();
@@ -158,8 +158,8 @@ protected:
   std::string GetSiteSettingsFilePath();
 
 private:
-  vtkSMSettings(const vtkSMSettings&); // Purposely not implemented
-  void operator=(const vtkSMSettings&); // Purposely not implemented
+  vtkSMSettings(const vtkSMSettings&); // Not implemented
+  void operator=(const vtkSMSettings&); // Not implemented
 
   class vtkSMSettingsInternal;
   vtkSMSettingsInternal * Internal;

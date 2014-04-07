@@ -4,7 +4,7 @@
   <ProxyGroup name="representations">
 
       <PointSpriteRepresentationProxy name="PointSpriteRepresentation"
-        base_proxygroup="representations"
+        base_proxygroup="internal_representations"
         base_proxyname="SurfaceRepresentationBase"
         class="vtkPointSpriteRepresentation"
         processes="client|dataserver|renderserver" >

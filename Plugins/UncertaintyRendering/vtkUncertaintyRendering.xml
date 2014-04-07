@@ -3,7 +3,7 @@
     <UncertaintySurfaceRepresentationProxy name="UncertaintySurfaceRepresentation"
                                            class="vtkUncertaintySurfaceRepresentation"
                                            processes="client|dataserver|renderserver"
-                                           base_proxygroup="representations"
+                                           base_proxygroup="internal_representations"
                                            base_proxyname="SurfaceRepresentationBase" >
       <Documentation>
         Representation proxy for uncertainty surface rendering.

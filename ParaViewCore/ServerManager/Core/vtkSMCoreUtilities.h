@@ -21,7 +21,7 @@
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkStdString.h"
+#include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkSMProxy;
 

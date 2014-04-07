@@ -121,7 +121,8 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     vtkSMProxy* scene = 0;
     for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
       {
-      if (strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
+      if (iter->GetProxy() &&
+        strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
         strcmp(iter->GetProxy()->GetXMLName(), xml_name) == 0)
         {
         scene = iter->GetProxy();
@@ -144,8 +145,9 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     vtkSMProxy* cue = 0;
     for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
       {
-      if (strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
-          strcmp(iter->GetProxy()->GetXMLName(), xml_name) == 0)
+      if (iter->GetProxy() &&
+        strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
+        strcmp(iter->GetProxy()->GetXMLName(), xml_name) == 0)
         {
         cue = iter->GetProxy();
         break;

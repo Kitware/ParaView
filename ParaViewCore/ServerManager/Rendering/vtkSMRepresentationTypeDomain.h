@@ -28,7 +28,7 @@
 #define __vtkSMRepresentationTypeDomain_h
 
 #include "vtkSMStringListDomain.h"
-#include "vtkPVServerManagerRenderingModule.h"
+#include "vtkPVServerManagerRenderingModule.h" // needed for export macro.
 
 class vtkPVDataInformation;
 
