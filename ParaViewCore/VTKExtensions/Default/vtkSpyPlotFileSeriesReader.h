@@ -39,9 +39,9 @@ protected:
   vtkSpyPlotFileSeriesReader ();
   ~vtkSpyPlotFileSeriesReader ();
 
-  int RequestInformationForInput(int index,
-                                 vtkInformation *request,
-                                 vtkInformationVector *outputVector);
+  virtual int RequestInformationForInput(int index,
+                                         vtkInformation *request = NULL,
+                                         vtkInformationVector *outputVector = NULL);
 private:
   vtkSpyPlotFileSeriesReader(const vtkSpyPlotFileSeriesReader&); // Not implemented.
   void operator=(const vtkSpyPlotFileSeriesReader&); // Not implemented.
