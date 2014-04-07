@@ -116,6 +116,45 @@ def _wrap_property(proxy, smproperty):
         property = Property(proxy, smproperty)
     return property
 
+class ParaViewPipelineController(object):
+    """ParaViewPipelineController wraps vtkSMParaViewPipelineController class
+    to manage conversion of arguments passed around from Pyhton Proxy objects to
+    vtkSMProxy instances are vice-versa."""
+    def __init__(self):
+        """Constructor. Creates a new instance of
+        vtkSMParaViewPipelineController."""
+        self.SMController = vtkSMParaViewPipelineController()
+
+    def __ConvertArgumentsAndCall(self, *args):
+        newArgs = []
+        for arg in args:
+            # convert Proxy and ProxyManager to vtkSMProxy and
+            # vtkSMSessionProxyManager instances.
+            # FIXME: should handle session as well?
+            if issubclass(type(arg), Proxy) or isinstance(arg, Proxy):
+                newArgs.append(arg.SMProxy)
+            elif issubclass(type(arg), ProxyManager) or isinstance(arg, ProxyManager):
+                newArgs.append(arg.SMProxyManager)
+            else:
+                newArgs.append(arg)
+        func = getattr(self.SMController, self.__LastAttrName)
+        retVal = func(*newArgs)
+        if type(retVal) is type(self.SMController) and retVal.IsA("vtkSMProxy"):
+            # if this is a vtkObject and is a "vtkSMProxy", return a Proxy().
+            return _getPyProxy(retVal)
+        else:
+            return retVal
+
+    def __getattr__(self, name):
+        """Returns attribute from the ParaViewPipelineController."""
+        try:
+            pmAttr = getattr(self.SMController, name)
+            self.__LastAttrName = name
+            return self.__ConvertArgumentsAndCall
+        except:
+            pass
+        return getattr(self.SMController, name)
+
 class Proxy(object):
     """Proxy for a server side object. A proxy manages the lifetime of
     one or more server manager objects. It also provides an interface
@@ -885,6 +924,12 @@ class ArraySelectionProperty(VectorProperty):
     def SetData(self, values):
         """Allows setting of all values at once. Requires a single value,
         a tuple or list."""
+        if not values:
+            # if values is None or empty list, we are resetting the selection.
+            self.SMProperty.SetElement(4, "")
+            self._UpdateProperty()
+            return
+
         if not isinstance(values, tuple) and \
            not isinstance(values, list):
             values = (values,)
@@ -2078,10 +2123,8 @@ def _create_view(view_xml_name, session=None, **extraArgs):
     return proxy
 
 def GetRepresentation(aProxy, view):
-    for rep in view.Representations:
-        try: isRep = rep.Input == aProxy
-        except: isRep = False
-        if isRep: return rep
+    if view:
+      return view.FindRepresentation(aProxy.SMProxy, aProxy.Port)
     return None
 
 def CreateRepresentation(aProxy, view, **extraArgs):

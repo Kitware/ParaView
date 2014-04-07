@@ -112,11 +112,11 @@ def CreateView(view_xml_name, **params):
     if not view:
         raise RuntimeError, "Failed to create requested view", view_xml_name
 
-    controller = servermanager.vtkSMParaViewPipelineController()
-    controller.PreInitializeProxy(view.SMProxy)
+    controller = servermanager.ParaViewPipelineController()
+    controller.PreInitializeProxy(view)
     SetProperties(view, **params)
-    controller.PostInitializeProxy(view.SMProxy)
-    controller.RegisterViewProxy(view.SMProxy)
+    controller.PostInitializeProxy(view)
+    controller.RegisterViewProxy(view)
     return view
 
 # -----------------------------------------------------------------------------
@@ -299,28 +299,17 @@ def GetRepresentation(proxy=None, view=None):
         raise ValueError, "proxy argument cannot be None."
     rep = servermanager.GetRepresentation(proxy, view)
     if not rep:
-        rep = view.CreateDefaultRepresentation(proxy.SMProxy, proxy.Port)
-        if not rep :
-            return None
-        rep.UnRegister(None)
-
-        controller = servermanager.vtkSMParaViewPipelineController()
-        controller.PreInitializeProxy(rep.SMProxy)
-        rep.Input = proxy
-        controller.PostInitializeProxy(rep.SMProxy)
-        controller.RegisterRepresentationProxy(rep.SMProxy)
-        view.Representations.append(rep)
+        controller = servermanager.ParaViewPipelineController()
+        return controller.Show(proxy, proxy.Port, view)
     return rep
 
 # -----------------------------------------------------------------------------
-
 def GetDisplayProperties(proxy=None, view=None):
     """"Given a pipeline object and view, returns the corresponding representation object.
     If pipeline object and/or view are not specified, active objects are used."""
     return GetRepresentation(proxy, view)
 
 # -----------------------------------------------------------------------------
-
 def Show(proxy=None, view=None, **params):
     """Turns the visibility of a given pipeline object on in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
@@ -328,26 +317,30 @@ def Show(proxy=None, view=None, **params):
         proxy = GetActiveSource()
     if proxy == None:
         raise RuntimeError, "Show() needs a proxy argument or that an active source is set."
-    if not view and not active_objects.view:
-        CreateRenderView()
-    rep = GetDisplayProperties(proxy, view)
+    if not view:
+        # it here's now active view, controller.Show() will create a new preferred view.
+        # if possible.
+        view = active_objects.view
+    controller = servermanager.ParaViewPipelineController()
+    rep = controller.Show(proxy, proxy.Port, view)
     if rep == None:
         raise RuntimeError, "Could not create a representation object for proxy %s" % proxy.GetXMLLabel()
     for param in params.keys():
         setattr(rep, param, params[param])
-    rep.Visibility = 1
     return rep
 
 # -----------------------------------------------------------------------------
-
 def Hide(proxy=None, view=None):
     """Turns the visibility of a given pipeline object off in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
-    rep = GetDisplayProperties(proxy, view)
-    rep.Visibility = 0
+    if not proxy:
+      proxy = active_objects.source
+    if not proxy:
+        raise ValueError, "proxy argument cannot be None when no active source is present."
+    controller = servermanager.ParaViewPipelineController()
+    controller.Hide(proxy, proxy.Port, view)
 
 # -----------------------------------------------------------------------------
-
 def SetDisplayProperties(proxy=None, view=None, **params):
     """Sets one or more display properties of the given pipeline object. If an argument
     is not provided, the active source is used. Pass a list of property_name=value
@@ -359,7 +352,6 @@ def SetDisplayProperties(proxy=None, view=None, **params):
     SetProperties(rep, **params)
 
 # -----------------------------------------------------------------------------
-
 def _DisableFirstRenderCameraReset():
     """Disable the first render camera reset.  Normally a ResetCamera is called
     automatically when Render is called for the first time after importing
@@ -488,8 +480,8 @@ def Delete(proxy=None):
         proxy = active_objects.source
     if not proxy:
         raise RuntimeError, "Could not locate proxy to 'Delete'"
-    controller = servermanager.vtkSMParaViewPipelineController()
-    controller.UnRegisterProxy(proxy.SMProxy)
+    controller = servermanager.ParaViewPipelineController()
+    controller.UnRegisterProxy(proxy)
 
 
 #==============================================================================
@@ -653,6 +645,28 @@ def WriteAnimation(filename, **params):
 #==============================================================================
 # Lookup Table / Scalarbar methods
 #==============================================================================
+# -----------------------------------------------------------------------------
+def HideUnusedScalarBars(view=None):
+    """Hides all unused scalar bars from the view. A scalar bar is used if some
+    data is shown in that view that is coloring using the transfer function
+    shown by the scalar bar."""
+    if not view:
+        view = active_objects.view
+    if not view:
+        raise ValueError, "'view' argument cannot be None with no active is present."
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS)
+
+def UpdateScalarBars(view=None):
+    """Hides all unused scalar bar and shows used scalar bars. A scalar bar is used
+    if some data is shown in that view that is coloring using the transfer function
+    shown by the scalar bar."""
+    if not view:
+        view = active_objects.view
+    if not view:
+        raise ValueError, "'view' argument cannot be None with no active is present."
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS | tfmgr.SHOW_USED_SCALAR_BARS)
 
 # -----------------------------------------------------------------------------
 def GetColorTransferFunction(arrayname, **params):
@@ -674,10 +688,10 @@ def CreateLookupTable(**params):
     to assign to the lookup table.
     """
     lt = servermanager.rendering.PVLookupTable()
-    controller = servermanager.vtkSMParaViewPipelineController()
-    controller.InitializeProxy(lt.SMProxy)
+    controller = servermanager.ParaViewPipelineController()
+    controller.InitializeProxy(lt)
     SetProperties(lt, **params)
-    controller.RegisterColorTransferFunctionProxy(lt.SMProxy)
+    controller.RegisterColorTransferFunctionProxy(lt)
     return lt
 
 # -----------------------------------------------------------------------------
@@ -687,10 +701,10 @@ def CreatePiecewiseFunction(**params):
     given to assign to the piecewise function.
     """
     pfunc = servermanager.piecewise_functions.PiecewiseFunction()
-    controller = servermanager.vtkSMParaViewPipelineController()
-    controller.InitializeProxy(pfunc.SMProxy)
+    controller = servermanager.ParaViewPipelineController()
+    controller.InitializeProxy(pfunc)
     SetProperties(pfunc, **params)
-    controller.RegisterOpacityTransferFunction(pfunc.SMProxy)
+    controller.RegisterOpacityTransferFunction(pfunc)
     return pfunc
 
 # -----------------------------------------------------------------------------
@@ -816,8 +830,8 @@ def GetAnimationScene():
     if not servermanager.ActiveConnection:
         raise RuntimeError, "Missing active session"
     session = servermanager.ActiveConnection.Session
-    controller = servermanager.vtkSMParaViewPipelineController()
-    return servermanager._getPyProxy(controller.GetAnimationScene(session))
+    controller = servermanager.ParaViewPipelineController()
+    return controller.GetAnimationScene(session)
 
 # -----------------------------------------------------------------------------
 
@@ -938,8 +952,8 @@ def GetTimeTrack():
     scene = GetAnimationScene()
     if not scene:
         raise RuntimeError, "Missing animation scene"
-    controller = servermanager.vtkSMParaViewPipelineController()
-    return servermanager._getPyProxy(controller.GetTimeAnimationTrack(scene.SMProxy))
+    controller = servermanager.ParaViewPipelineController()
+    return controller.GetTimeAnimationTrack(scene)
 
 #==============================================================================
 # Plugin Management
@@ -1119,7 +1133,7 @@ def _initializeSession(connection):
     by API in this module."""
     if not connection:
       raise RuntimeError, "'connection' cannot be empty."
-    controller = servermanager.vtkSMParaViewPipelineController()
+    controller = servermanager.ParaViewPipelineController()
     controller.InitializeSession(connection.Session)
 
 def _create_func(key, module):
@@ -1131,14 +1145,14 @@ def _create_func(key, module):
         assumed to be property,value pairs and are passed to the new proxy."""
 
         # Create a controller instance.
-        controller = servermanager.vtkSMParaViewPipelineController()
+        controller = servermanager.ParaViewPipelineController()
 
 
         # Instantiate the actual object from the given module.
         px = module.__dict__[key]()
 
         # preinitialize the proxy.
-        controller.PreInitializeProxy(px.SMProxy)
+        controller.PreInitializeProxy(px)
 
         # Make sure non-keyword arguments are valid
         for inp in input:
@@ -1172,12 +1186,12 @@ def _create_func(key, module):
         SetProperties(px, **params)
 
         # post initialize
-        controller.PostInitializeProxy(px.SMProxy)
+        controller.PostInitializeProxy(px)
 
         # Register the proxy with the proxy manager (assuming we are only using
         # these functions for pipeline proxies or animation proxies.
         if isinstance(px, servermanager.SourceProxy):
-            controller.RegisterPipelineProxy(px.SMProxy, registrationName)
+            controller.RegisterPipelineProxy(px, registrationName)
         return px
 
     return CreateObject

@@ -219,7 +219,8 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     vtkSMPropertyHelper(repr, "Visibility").Set(1);
     repr->UpdateVTKObjects();
 
-    if (vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow)
+    if (vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow &&
+      vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
       {
       vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, view, true);
       }
@@ -254,7 +255,8 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     view->UpdateVTKObjects();
     repr->FastDelete();
 
-    if (vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow)
+    if (vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow &&
+      vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
       {
       vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, view, true);
       }

@@ -3376,7 +3376,7 @@
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
-                            number_of_elements="5">
+                            number_of_elements="5" >
         <Documentation>
           Set the array to color with. One must specify the field association and
           the array name of the array. If the array is missing, scalar coloring will
