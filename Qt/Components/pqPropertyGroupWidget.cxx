@@ -85,7 +85,7 @@ void pqPropertyGroupWidget::addPropertyLink(
     pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(cb);
     this->addPropertyLink(
       adaptor, "currentText", SIGNAL(currentTextChanged(QString)),
-      smproperty);
+      smproperty, smindex);
     }
   else
     {

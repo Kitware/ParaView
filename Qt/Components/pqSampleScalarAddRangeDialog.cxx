@@ -192,37 +192,36 @@ void pqSampleScalarAddRangeDialog::onRangeChanged()
 QVariantList pqSampleScalarAddRangeDialog::getRange() const
 {
   QVariantList value;
-  const double from = this->from();
-  const double to = this->to();
-  const int steps = this->steps();
-  const bool logarithmic = this->logarithmic();
+  const double _from = this->from();
+  const double _to = this->to();
+  const int _steps = this->steps();
 
-  if (steps < 2 || from == to)
+  if (_steps < 2 || _from == _to)
     {
     return value;
     }
 
-  if (logarithmic)
+  if (this->logarithmic())
     {
-    const double sign = from < 0 ? -1.0 : 1.0;
+    const double sign = _from < 0 ? -1.0 : 1.0;
     const double log_from =
-      std::log10(std::abs(from ? from : 1.0e-6 * (from - to)));
-    const double log_to = std::log10(std::abs(to ? to : 1.0e-6 * (to - from)));
+      std::log10(std::abs(_from ? _from : 1.0e-6 * (_from - _to)));
+    const double log_to = std::log10(std::abs(_to ? _to : 1.0e-6 * (_to - _from)));
 
-    for (int i = 0; i != steps; i++)
+    for (int i = 0; i != _steps; i++)
       {
-      const double mix = static_cast<double>(i) / static_cast<double>(steps - 1);
+      const double mix = static_cast<double>(i) / static_cast<double>(_steps - 1);
       value.push_back(
         sign * pow(10.0, (1.0 - mix) * log_from + (mix) * log_to));
       }
     }
   else
     {
-    for (int i = 0; i != steps; i++)
+    for (int i = 0; i != _steps; i++)
       {
       const double mix = 
-        static_cast<double>(i) / static_cast<double>(steps - 1);
-      value.push_back((1.0 - mix) * from + (mix) * to);
+        static_cast<double>(i) / static_cast<double>(_steps - 1);
+      value.push_back((1.0 - mix) * _from + (mix) * _to);
       }
     }
   return value;
