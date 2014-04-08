@@ -60,6 +60,10 @@ pqColorChooserButtonWithPalettes::pqColorChooserButtonWithPalettes(
     SLOT(actionTriggered(QAction*)));
 
   this->setPopupMode(QToolButton::MenuButtonPopup);
+
+  // although unnecessary, fillup the menu here so that test playback
+  // can work correctly.
+  this->updateMenu();
 }
 
 //-----------------------------------------------------------------------------

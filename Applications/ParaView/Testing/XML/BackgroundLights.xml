@@ -10,17 +10,17 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mouseRelease" arguments="1,0,0,8,5" />
   <!-- set color1 to yellow -->
   <!-- added manually -->
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/widget_4/Color" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/widget_4/Color/1QColorDialog0" command="setChosenColor" arguments="255,255,0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/widget_4/Color/1QColorDialog0" command="done" arguments="1" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/widget_4/RestoreDefaultColor" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color/1QColorDialog0" command="setChosenColor" arguments="255,255,0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color/1QColorDialog0" command="done" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/RestoreDefaultColor" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditUndo" />
 
 
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/widget_3/BackgroundType" command="set_string" arguments="Gradient" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/widget_4/Color2/StandardColorMenu" command="activate" arguments="EdgeColor" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/widget_4/RestoreDefaultColor2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/BackgroundType" command="set_string" arguments="Gradient" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/Color2/ColorPaletteMenu" command="activate" arguments="EdgeColor" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_1/RestoreDefaultColor2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LightsEditor/1QPushButton0" command="activate" arguments="" />
   <pqevent object="LightsEditor/Reset" command="activate" arguments="" />
