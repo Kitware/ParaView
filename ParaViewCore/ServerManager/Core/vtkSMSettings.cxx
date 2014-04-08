@@ -413,12 +413,7 @@ public:
   template< typename T >
   void SetSetting(const char* settingName, const std::vector< T > & values)
   {
-    if (this->JSONRoots.size() == 0)
-      {
-      PrioritizedJSONRoot newRoot;
-      newRoot.Priority = DBL_MAX;
-      this->JSONRoots.push_back(newRoot);
-      }
+    this->CreateJSONRootIfNeeded();
 
     // Just set settings in the highest-priority settings group for now.
     std::string root, leaf;
@@ -517,12 +512,7 @@ public:
   // Set a property setting to a Json::Value
   void SetPropertySetting(const char* settingName, vtkSMProperty* property)
   {
-    if (this->JSONRoots.size() == 0)
-      {
-      PrioritizedJSONRoot newRoot;
-      newRoot.Priority = DBL_MAX;
-      this->JSONRoots.push_back(newRoot);
-      }
+    this->CreateJSONRootIfNeeded();
 
     if (vtkSMIntVectorProperty* intVectorProperty =
         vtkSMIntVectorProperty::SafeDownCast(property))
@@ -572,12 +562,7 @@ public:
       return;
       }
 
-    if (this->JSONRoots.size() == 0)
-      {
-      PrioritizedJSONRoot newRoot;
-      newRoot.Priority = DBL_MAX;
-      this->JSONRoots.push_back(newRoot);
-      }
+    this->CreateJSONRootIfNeeded();
 
     double highestPriority = this->JSONRoots[0].Priority;
 
@@ -685,6 +670,22 @@ public:
 
     return true;
   }
+
+  //----------------------------------------------------------------------------
+  // Description:
+  // Ensure that at least one JSON root value exists so that when settings are set,
+  // there is a place to store them. If a JSON root value needs to be created, its
+  // priority is set to DOUBLE_MAX.
+  void CreateJSONRootIfNeeded()
+  {
+    if (this->JSONRoots.size() == 0)
+      {
+      PrioritizedJSONRoot newRoot;
+      newRoot.Priority = DBL_MAX;
+      this->JSONRoots.push_back(newRoot);
+      }
+  }
+
 
 };
 
