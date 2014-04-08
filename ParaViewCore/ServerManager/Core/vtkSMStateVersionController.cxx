@@ -188,6 +188,13 @@ namespace
           }
         }
       }
+
+    //-------------------------------------------------------------------------
+    // remove camera manipulator proxies and interactorstyles proxies.
+    //-------------------------------------------------------------------------
+    PurgeElements(document.select_nodes(
+      "//ServerManagerState/Proxy[@group='interactorstyles' or @group='cameramanipulators']"));
+
     //-------------------------------------------------------------------------
     return true;
     }
