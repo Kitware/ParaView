@@ -272,8 +272,12 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
     {
     END_UNDO_SET();
     }
-  if (pqActiveObjects::instance().activeView())
+  if (pqView* view = pqActiveObjects::instance().activeView())
     {
+    if (view->getNumberOfVisibleDataRepresentations() == 1 && visible)
+      {
+      view->resetDisplay();
+      }
     pqActiveObjects::instance().activeView()->render();
     }
 }
