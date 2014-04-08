@@ -20,6 +20,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMSettings.h"
 
 class vtkSMSettingsObserver : public vtkCommand
 {
@@ -117,6 +118,9 @@ void vtkSMSettingsProxy::ExecuteEvent(unsigned long eventId)
   this->UpdatePropertyInformation();
 
   this->InvokeEvent(eventId);
+
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  settings->SetProxySettings(this);
 }
 
 //----------------------------------------------------------------------------
