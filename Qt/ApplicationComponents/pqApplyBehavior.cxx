@@ -227,22 +227,28 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
     // reset camera if this is the only visible dataset.
     pqView* pqPreferredView = smmodel->findItem<pqView*>(preferredView);
     Q_ASSERT(pqPreferredView);
+    bool view_reset = false;
     if (preferredView != currentViewProxy)
       {
       // implying a new view was created, always reset that.
       pqPreferredView->resetDisplay();
+      view_reset = true;
       }
     else if (view->getNumberOfVisibleDataRepresentations() == 1)
       {
       // old view is being used, reset only if this is the only representation.
       view->resetDisplay();
+      view_reset = true;
       }
 
     // reset interaction mode for render views. Not a huge fan, but we'll fix
     // this some other time.
     if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqPreferredView))
       {
-      rview->updateInteractionMode(source->getOutputPort(outputPort));
+      if (view_reset)
+        {
+        rview->updateInteractionMode(source->getOutputPort(outputPort));
+        }
       }
     }
 }
