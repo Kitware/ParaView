@@ -92,11 +92,19 @@ namespace pqObjectBuilderNS
     }
 
   //-----------------------------------------------------------------------------
-  pqPipelineSource* postCreatePipelineProxy(vtkSMProxy* proxy, pqServer* server)
+  pqPipelineSource* postCreatePipelineProxy(
+    vtkSMProxy* proxy, pqServer* server, const QString& regName=QString())
     {
     // since there are no properties to set, nothing to do here.
     Controller->PostInitializeProxy(proxy);
-    Controller->RegisterPipelineProxy(proxy);
+    if (regName.isEmpty())
+      {
+      Controller->RegisterPipelineProxy(proxy);
+      }
+    else
+      {
+      Controller->RegisterPipelineProxy(proxy, regName.toAscii().data());
+      }
 
     pqPipelineSource* source = pqApplicationCore::instance()->
       getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
@@ -295,7 +303,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     }
 
   pqPipelineSource* reader =
-    pqObjectBuilderNS::postCreatePipelineProxy(proxy, server);
+    pqObjectBuilderNS::postCreatePipelineProxy(proxy, server, reg_name);
   emit this->readerCreated(reader, files[0]);
   emit this->readerCreated(reader, files);
   emit this->sourceCreated(reader);
