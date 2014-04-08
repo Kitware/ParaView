@@ -221,6 +221,30 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
 
     updated_views.insert(preferredView);
 
+    // reset camera if this is the only visible dataset.
+    pqView* pqPreferredView = smmodel->findItem<pqView*>(preferredView);
+    Q_ASSERT(pqPreferredView);
+    if (preferredView != currentViewProxy)
+      {
+      // implying a new view was created, always reset that.
+      pqPreferredView->resetDisplay();
+      }
+    else if (view->getNumberOfVisibleDataRepresentations() == 1)
+      {
+      // old view is being used, reset only if this is the only representation.
+      view->resetDisplay();
+      }
+
+    // reset interaction mode for render views. Not a huge fan, but we'll fix
+    // this some other time.
+    if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqPreferredView))
+      {
+      if (view->getNumberOfVisibleDataRepresentations() == 1)
+        {
+        rview->updateInteractionMode(source->getOutputPort(outputPort));
+        }
+      }
+
     if (preferredView == currentViewProxy)
       {
       // Hide input, since the data wasn't shown in a new view, but an existing
@@ -230,33 +254,6 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
       if (pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source))
         {
         this->hideInputIfRequired(filter, view);
-        }
-      }
-
-    // reset camera if this is the only visible dataset.
-    pqView* pqPreferredView = smmodel->findItem<pqView*>(preferredView);
-    Q_ASSERT(pqPreferredView);
-    bool view_reset = false;
-    if (preferredView != currentViewProxy)
-      {
-      // implying a new view was created, always reset that.
-      pqPreferredView->resetDisplay();
-      view_reset = true;
-      }
-    else if (view->getNumberOfVisibleDataRepresentations() == 1)
-      {
-      // old view is being used, reset only if this is the only representation.
-      view->resetDisplay();
-      view_reset = true;
-      }
-
-    // reset interaction mode for render views. Not a huge fan, but we'll fix
-    // this some other time.
-    if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqPreferredView))
-      {
-      if (view_reset)
-        {
-        rview->updateInteractionMode(source->getOutputPort(outputPort));
         }
       }
     }
