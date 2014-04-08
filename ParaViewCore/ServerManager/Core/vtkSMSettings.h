@@ -62,14 +62,14 @@
 // access to non-leaf nodes in the JSON format is not provided.
 //
 // This class supports setting setting values. Settings modified through the
-// "Set*" methods modify a single mutable setting collection that has priority
+// "Set*" methods modify thet setting collection that has priority
 // over all other collections. This collection can be saved to a text file in
 // JSON format using the SaveSettings() method.
 //
 // Some convenience methods for getting and setting proxy property values are
 // provided. GetProxySettings() sets the values of proxy properties that are
 // defined in the setting collections. SetProxySettings() saves the non-default
-// proxy properties in the mutable collection.
+// proxy properties in the highest-priority collection.
 
 #ifndef __vtkSMSettings_h
 #define __vtkSMSettings_h
@@ -79,10 +79,6 @@
 #include "vtkStdString.h" // needed for vtkStdString.
 #include <vector> // needed for vector.
 
-class vtkSMDoubleVectorProperty;
-class vtkSMInputProperty;
-class vtkSMIntVectorProperty;
-class vtkSMStringVectorProperty;
 class vtkSMProxy;
 
 
@@ -100,27 +96,26 @@ public:
   // Description:
   // Add settings from a string. The string should contain valid JSON-formatted
   // text. The "priority" indicates how to treat a setting that has definitions
-  // in more than one string passed to this class in multiple calls to this
-  // function. If two settings strings contain values for the same
-  // setting, then the setting from the string with higher priority will be
-  // used.
-  bool AddSettingsFromString(const std::string & settings, double priority);
+  // in more than one setting collections. If two setting collections
+  // contain values for the same setting, then the setting from the
+  // collection with higher priority will be used.
+  bool AddCollectionFromString(const std::string & settings, double priority);
 
   // Description:
-  // The same as AddSettingsFromString, but this method reads the settings
+  // The same as AddCollectionFromString, but this method reads the settings
   // string from the named file. The fileName should be a full path.
-  bool AddSettingsFromFile(const std::string & fileName, double priority);
+  bool AddCollectionFromFile(const std::string & fileName, double priority);
 
   // Description:
-  // Clear out all settings.
+  // Clear out all settings, deleting all collections.
   void ClearAllSettings();
 
   // Description:
-  // Distribute settings to all processes if in batch symmetric mode.
+  // Distribute setting collections to all processes if in batch symmetric mode.
   bool DistributeSettings();
 
   // Description:
-  // Save highest priority settings to file
+  // Save highest priority setting collection to file
   bool SaveSettings(const std::string & filePath);
 
   // Description:
@@ -133,44 +128,43 @@ public:
 
   // Description:
   // Get a vector setting as a scalar value.
-  // Shortcut for GetSettingAs...
-  int         GetSettingAsInt(const char* settingName,
-                              int defaultValue);
-  double      GetSettingAsDouble(const char* settingName,
-                                 double defaultValue);
+  // Shortcut for GetSettingAs...(settingName, 0, defaultValue)
+  int GetSettingAsInt(const char* settingName,
+                      int defaultValue);
+  double GetSettingAsDouble(const char* settingName,
+                            double defaultValue);
   std::string GetSettingAsString(const char* settingName,
                                  const std::string & defaultValue);
 
   // Description:
   // Get a single element of a vector setting.
-  int         GetSettingAsInt(const char* settingName,
-                              unsigned int index,
-                              int defaultValue);
-  double      GetSettingAsDouble(const char* settingName,
-                                 unsigned int index,
-                                 double defaultValue);
+  int GetSettingAsInt(const char* settingName,
+                      unsigned int index,
+                      int defaultValue);
+  double GetSettingAsDouble(const char* settingName,
+                            unsigned int index,
+                            double defaultValue);
   std::string GetSettingAsString(const char* settingName,
                                  unsigned int index,
                                  const std::string & defaultValue);
 
   // Description:
-  // Set the property values in a vtkSMProxy from the settings file(s).
-  // Searches settings from the settings root.
+  // Set the property values in a vtkSMProxy from the setting collections.
   bool GetProxySettings(vtkSMProxy* proxy);
 
   // Description:
-  // Get setting description
+  // Get description for a setting.
   std::string GetSettingDescription(const char* settingName);
 
   // Description:
-  // Set setting of a given name.
+  // Set setting of a given name in the highest priority collection.
   // Shortcut for SetSetting(settingName, 0, value). Useful for setting scalar values.
   void SetSetting(const char* settingName, int value);
   void SetSetting(const char* settingName, double value);
   void SetSetting(const char* settingName, const std::string & value);
 
   // Description:
-  // Set element of a vector setting at a location given by the jsonPath.
+  // Set element of a vector setting at a location given by the setting name.
   void SetSetting(const char* settingName, unsigned int index, int value);
   void SetSetting(const char* settingName, unsigned int index, double value);
   void SetSetting(const char* settingName, unsigned int index, const std::string & value);

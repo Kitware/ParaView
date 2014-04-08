@@ -16,11 +16,9 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
-#include "vtkSMInputProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProperty.h"
@@ -38,14 +36,14 @@
 
 //----------------------------------------------------------------------------
 namespace {
-class PrioritizedJSONRoot {
+class SettingsCollection {
 public:
   Json::Value Value;
   double      Priority;
 };
 
-bool SortByPriority(const PrioritizedJSONRoot & r1,
-                    const PrioritizedJSONRoot & r2)
+bool SortByPriority(const SettingsCollection & r1,
+                    const SettingsCollection & r2)
 {
   return (r1.Priority > r2.Priority);
 }
@@ -54,17 +52,17 @@ bool SortByPriority(const PrioritizedJSONRoot & r1,
 
 class vtkSMSettings::vtkSMSettingsInternal {
 public:
-  std::vector< PrioritizedJSONRoot > JSONRoots;
-  bool JSONRootsAreSorted;
+  std::vector< SettingsCollection > SettingCollections;
+  bool SettingCollectionsAreSorted;
 
   //----------------------------------------------------------------------------
   // Description:
-  // Sort JSON roots by priority, from highest to lowest
-  void SortJSONRoots()
+  // Sort setting collections by priority, from highest to lowest
+  void SortSettingCollections()
   {
     // Sort the settings roots by priority (highest to lowest)
-    std::stable_sort(this->JSONRoots.begin(), this->JSONRoots.end(), SortByPriority);
-    this->JSONRootsAreSorted = true;
+    std::stable_sort(this->SettingCollections.begin(), this->SettingCollections.end(), SortByPriority);
+    this->SettingCollectionsAreSorted = true;
   }
 
   //----------------------------------------------------------------------------
@@ -94,11 +92,9 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  // Description:
-  // Get a Json::Value given a string. Returns the setting defined in the user
-  // settings file if it is defined, falls back to the setting defined in the
-  // site settings file if it is defined, and null if it isn't defined in
-  // either the user or settings file.
+  // Description: Get a Json::Value given a setting name. Returns the
+  // highest-priority setting defined in the setting collections, and
+  // null if it isn't defined in any of the collections.
   //
   // String format is:
   // "." => root node
@@ -115,21 +111,21 @@ public:
   const Json::Value & GetSettingAtOrBelowPriority(const char* settingName,
                                                   double priority)
   {
-    if (!this->JSONRootsAreSorted)
+    if (!this->SettingCollectionsAreSorted)
       {
-      this->SortJSONRoots();
+      this->SortSettingCollections();
       }
 
     // Iterate over settings, checking higher priority settings first
-    for (size_t i = 0; i < this->JSONRoots.size(); ++i)
+    for (size_t i = 0; i < this->SettingCollections.size(); ++i)
       {
-      if (this->JSONRoots[i].Priority > priority)
+      if (this->SettingCollections[i].Priority > priority)
         {
         continue;
         }
 
       Json::Path settingPath(settingName);
-      const Json::Value & setting = settingPath.resolve(this->JSONRoots[i].Value);
+      const Json::Value & setting = settingPath.resolve(this->SettingCollections[i].Value);
       if (!setting.isNull())
         {
         return setting;
@@ -413,14 +409,14 @@ public:
   template< typename T >
   void SetSetting(const char* settingName, const std::vector< T > & values)
   {
-    this->CreateJSONRootIfNeeded();
+    this->CreateCollectionIfNeeded();
 
     // Just set settings in the highest-priority settings group for now.
     std::string root, leaf;
     this->SeparateBranchFromLeaf(settingName, root, leaf);
 
     Json::Path settingPath(root.c_str());
-    Json::Value & jsonValue = settingPath.make(this->JSONRoots[0].Value);
+    Json::Value & jsonValue = settingPath.make(this->SettingCollections[0].Value);
     jsonValue[leaf] = Json::Value::null;
 
     if (values.size() > 1)
@@ -443,7 +439,7 @@ public:
                           vtkSMIntVectorProperty* property)
   {
     Json::Path valuePath(settingName);
-    Json::Value & jsonValue = valuePath.make(this->JSONRoots[0].Value);
+    Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
       jsonValue = property->GetElement(0);
@@ -463,7 +459,7 @@ public:
                           vtkSMDoubleVectorProperty* property)
   {
     Json::Path valuePath(settingName);
-    Json::Value & jsonValue = valuePath.make(this->JSONRoots[0].Value);
+    Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
       jsonValue = property->GetElement(0);
@@ -483,7 +479,7 @@ public:
                           vtkSMStringVectorProperty* property)
   {
     Json::Path valuePath(settingName);
-    Json::Value & jsonValue = valuePath.make(this->JSONRoots[0].Value);
+    Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
       jsonValue = property->GetElement(0);
@@ -509,10 +505,10 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Set a property setting to a Json::Value
+  // Save a property setting to the highest-priority collection.
   void SetPropertySetting(const char* settingName, vtkSMProperty* property)
   {
-    this->CreateJSONRootIfNeeded();
+    this->CreateCollectionIfNeeded();
 
     if (vtkSMIntVectorProperty* intVectorProperty =
         vtkSMIntVectorProperty::SafeDownCast(property))
@@ -538,7 +534,7 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Save proxy settings
+  // Save proxy settings to the highest-priority collection.
   void SetProxySettings(vtkSMProxy* proxy)
   {
     if (!proxy)
@@ -554,7 +550,8 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Save proxy settings at a given JSON path
+  // Save proxy settings in the highest-priority collection under
+  // the setting prefix.
   void SetProxySettings(const char* settingPrefix, vtkSMProxy* proxy)
   {
     if (!proxy)
@@ -562,9 +559,9 @@ public:
       return;
       }
 
-    this->CreateJSONRootIfNeeded();
+    this->CreateCollectionIfNeeded();
 
-    double highestPriority = this->JSONRoots[0].Priority;
+    double highestPriority = this->SettingCollections[0].Priority;
 
     // Get reference to JSON value
     vtksys_ios::ostringstream settingStringStream;
@@ -573,7 +570,7 @@ public:
     const char* settingCString = settingString.c_str();
 
     Json::Path valuePath(settingCString);
-    Json::Value & proxyValue = valuePath.make(this->JSONRoots[0].Value);
+    Json::Value & proxyValue = valuePath.make(this->SettingCollections[0].Value);
 
     bool propertySet = false;
     vtkSmartPointer<vtkSMPropertyIterator> iter;
@@ -614,7 +611,7 @@ public:
     if (!propertySet)
       {
       Json::Path parentPath(settingPrefix);
-      Json::Value & parentValue = parentPath.make(this->JSONRoots[0].Value);
+      Json::Value & parentValue = parentPath.make(this->SettingCollections[0].Value);
       parentValue.removeMember(proxy->GetXMLName());
       }
   }
@@ -673,16 +670,16 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Ensure that at least one JSON root value exists so that when settings are set,
-  // there is a place to store them. If a JSON root value needs to be created, its
+  // Ensure that at least one collection exists so that when settings are set,
+  // there is a place to store them. If a collection needs to be created, its
   // priority is set to DOUBLE_MAX.
-  void CreateJSONRootIfNeeded()
+  void CreateCollectionIfNeeded()
   {
-    if (this->JSONRoots.size() == 0)
+    if (this->SettingCollections.size() == 0)
       {
-      PrioritizedJSONRoot newRoot;
-      newRoot.Priority = VTK_DOUBLE_MAX;
-      this->JSONRoots.push_back(newRoot);
+      SettingsCollection newCollection;
+      newCollection.Priority = VTK_DOUBLE_MAX;
+      this->SettingCollections.push_back(newCollection);
       }
   }
 
@@ -696,7 +693,7 @@ vtkStandardNewMacro(vtkSMSettings);
 vtkSMSettings::vtkSMSettings()
 {
   this->Internal = new vtkSMSettingsInternal();
-  this->Internal->JSONRootsAreSorted = false;
+  this->Internal->SettingCollectionsAreSorted = false;
 }
 
 //----------------------------------------------------------------------------
@@ -720,11 +717,11 @@ vtkSMSettings* vtkSMSettings::GetInstance()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::AddSettingsFromString(const std::string & settings,
-                                          double priority)
+bool vtkSMSettings::AddCollectionFromString(const std::string & settings,
+                                            double priority)
 {
-  PrioritizedJSONRoot prioritizedRoot;
-  prioritizedRoot.Priority = priority;
+  SettingsCollection collection;
+  collection.Priority = priority;
 
   // If the settings string is empty, the JSON parser can't handle it.
   // Replace the empty string with {}
@@ -736,11 +733,11 @@ bool vtkSMSettings::AddSettingsFromString(const std::string & settings,
 
   // Parse the user settings
   Json::Reader reader;
-  bool success = reader.parse(processedSettings, prioritizedRoot.Value, true);
+  bool success = reader.parse(processedSettings, collection.Value, true);
   if (success)
     {
-    this->Internal->JSONRoots.push_back(prioritizedRoot);
-    this->Internal->JSONRootsAreSorted = false;
+    this->Internal->SettingCollections.push_back(collection);
+    this->Internal->SettingCollectionsAreSorted = false;
     return true;
     }
 
@@ -748,8 +745,8 @@ bool vtkSMSettings::AddSettingsFromString(const std::string & settings,
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::AddSettingsFromFile(const std::string & fileName,
-                                        double priority)
+bool vtkSMSettings::AddCollectionFromFile(const std::string & fileName,
+                                          double priority)
 {
   std::string settingsFileName(fileName);
   std::ifstream settingsFile(settingsFileName.c_str(), ios::in | ios::binary | ios::ate);
@@ -763,7 +760,7 @@ bool vtkSMSettings::AddSettingsFromFile(const std::string & fileName,
     settingsString[stringSize] = '\0';
     settingsFile.close();
 
-    bool success = this->AddSettingsFromString(std::string(settingsString),
+    bool success = this->AddCollectionFromString(std::string(settingsString),
                                                priority);
     delete[] settingsString;
 
@@ -772,7 +769,7 @@ bool vtkSMSettings::AddSettingsFromFile(const std::string & fileName,
   else
     {
     std::string emptyString;
-    return this->AddSettingsFromString(emptyString, priority);
+    return this->AddCollectionFromString(emptyString, priority);
     }
 
   return false;
@@ -781,8 +778,8 @@ bool vtkSMSettings::AddSettingsFromFile(const std::string & fileName,
 //----------------------------------------------------------------------------
 void vtkSMSettings::ClearAllSettings()
 {
-  this->Internal->JSONRoots.clear();
-  this->Internal->JSONRootsAreSorted = false;
+  this->Internal->SettingCollections.clear();
+  this->Internal->SettingCollectionsAreSorted = false;
 }
 
 //----------------------------------------------------------------------------
@@ -795,31 +792,31 @@ bool vtkSMSettings::DistributeSettings()
     // Broadcast settings to satellite nodes
     vtkMultiProcessController * controller = pm->GetGlobalController();
 
-    unsigned int numberOfJSONRoots;
+    unsigned int numberOfSettingCollections;
     if (controller->GetLocalProcessId() == 0)
       {
       // Send the number of JSON settings roots
-      numberOfJSONRoots = static_cast<unsigned int>(this->Internal->JSONRoots.size());
-      controller->Broadcast(&numberOfJSONRoots, 1, 0);
+      numberOfSettingCollections = static_cast<unsigned int>(this->Internal->SettingCollections.size());
+      controller->Broadcast(&numberOfSettingCollections, 1, 0);
 
-      for (size_t i = 0; i < numberOfJSONRoots; ++i)
+      for (size_t i = 0; i < numberOfSettingCollections; ++i)
         {
-        std::string settingsString = this->Internal->JSONRoots[i].Value.toStyledString();
+        std::string settingsString = this->Internal->SettingCollections[i].Value.toStyledString();
         unsigned int stringSize = static_cast<unsigned int>(settingsString.size())+1;
         controller->Broadcast(&stringSize, 1, 0);
         if (stringSize > 0)
           {
           controller->Broadcast(const_cast<char*>(settingsString.c_str()), stringSize, 0);
-          controller->Broadcast(&this->Internal->JSONRoots[i].Priority, 1, 0);
+          controller->Broadcast(&this->Internal->SettingCollections[i].Priority, 1, 0);
           }
         }
       }
     else // Satellites
       {
       // Get the number of JSON settings roots
-      controller->Broadcast(&numberOfJSONRoots, 1, 0);
+      controller->Broadcast(&numberOfSettingCollections, 1, 0);
 
-      for (unsigned int i = 0; i < numberOfJSONRoots; ++i)
+      for (unsigned int i = 0; i < numberOfSettingCollections; ++i)
         {
         unsigned int stringSize = 0;
         controller->Broadcast(&stringSize, 1, 0);
@@ -829,7 +826,7 @@ bool vtkSMSettings::DistributeSettings()
           controller->Broadcast(settingsString, stringSize, 0);
           double priority = 0.0;
           controller->Broadcast(&priority, 1, 0);
-          this->AddSettingsFromString(std::string(settingsString), priority);
+          this->AddCollectionFromString(std::string(settingsString), priority);
           delete[] settingsString;
           }
         }
@@ -842,7 +839,7 @@ bool vtkSMSettings::DistributeSettings()
 //----------------------------------------------------------------------------
 bool vtkSMSettings::SaveSettings(const std::string & filePath)
 {
-  if (this->Internal->JSONRoots.size() == 0)
+  if (this->Internal->SettingCollections.size() == 0)
     {
     // No settings to save, so we'll always succeed.
     return true;
@@ -851,7 +848,7 @@ bool vtkSMSettings::SaveSettings(const std::string & filePath)
   std::ofstream settingsFile(filePath.c_str(), ios::out | ios::binary );
   if (settingsFile.is_open())
     {
-    std::string output = this->Internal->JSONRoots[0].Value.toStyledString();
+    std::string output = this->Internal->SettingCollections[0].Value.toStyledString();
     settingsFile << output;
     return true;
     }
@@ -1047,20 +1044,20 @@ void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
 void vtkSMSettings::SetSettingDescription(const char* settingName, const char* description)
 {
   Json::Path settingPath(settingName);
-  Json::Value & settingValue = settingPath.make(this->Internal->JSONRoots[0].Value);
+  Json::Value & settingValue = settingPath.make(this->Internal->SettingCollections[0].Value);
   settingValue.setComment(description, Json::commentBefore);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSettings::PrintSelf(ostream& os, vtkIndent indent)
 {
-  os << indent << "JSONRoots:\n";
-  for (size_t i = 0; i < this->Internal->JSONRoots.size(); ++i)
+  os << indent << "SettingCollections:\n";
+  for (size_t i = 0; i < this->Internal->SettingCollections.size(); ++i)
     {
     os << indent << indent << "Root " << i << ":\n";
     os << indent << indent << indent << "Priority: "
-       << this->Internal->JSONRoots[i].Priority << "\n";
-    std::stringstream ss(this->Internal->JSONRoots[i].Value.toStyledString());
+       << this->Internal->SettingCollections[i].Priority << "\n";
+    std::stringstream ss(this->Internal->SettingCollections[i].Value.toStyledString());
     std::string line;
     while (std::getline(ss, line))
       {

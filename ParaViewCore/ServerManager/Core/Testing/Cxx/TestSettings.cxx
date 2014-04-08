@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   cout << settingString;
 
   vtkSMSettings * settings = vtkSMSettings::GetInstance();
-  settings->AddSettingsFromString(settingString, 1.0);
+  settings->AddCollectionFromString(settingString, 1.0);
 
   const char * higherPrioritySettingsString =
     "{\n"
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     "  }\n"
     "}\n";
 
-  settings->AddSettingsFromString(higherPrioritySettingsString, 2.0);
+  settings->AddCollectionFromString(higherPrioritySettingsString, 2.0);
 
   vtkNew<vtkSMParaViewPipelineController> controller;
 

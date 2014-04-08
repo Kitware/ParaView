@@ -39,8 +39,8 @@ settingsString = """
 
 settings = paraview.servermanager.vtkSMSettings.GetInstance()
 settings.ClearAllSettings()
-settings.AddSettingsFromString(settingsString, 2000000.0)
-settings.AddSettingsFromString("{}", 1500000.0)
+settings.AddCollectionFromString(settingsString, 2000000.0)
+settings.AddCollectionFromString("{}", 1500000.0)
 
 sourcesComment = settings.GetSettingDescription(".sources")
 if sourcesComment != "// Default settings for sources.":
