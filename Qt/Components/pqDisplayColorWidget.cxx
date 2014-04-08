@@ -371,10 +371,14 @@ void pqDisplayColorWidget::refreshColorArrayNames()
     int icon_association = domain->GetFieldAssociation(cc);
     int association = domain->GetDomainAssociation(cc);
     QString name = domain->GetString(cc);
-
+    QString label = name;
+    if (domain->IsArrayPartial(cc))
+      {
+      label += " (partial)";
+      }
     QIcon* icon = this->itemIcon(icon_association, name);
     QVariant data = this->itemData(association, name);
-    this->Variables->addItem(*icon, name, data);
+    this->Variables->addItem(*icon, label, data);
     }
   // doing this here, instead of in the construtor ensures that the
   // popup menu shows resonably on OsX.

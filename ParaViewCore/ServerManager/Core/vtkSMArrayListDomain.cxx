@@ -83,10 +83,11 @@ struct vtkSMArrayListDomainArrayInformation
         {
         if (this->ArrayName == other.ArrayName)
           {
-          if (this->IsPartial == other.IsPartial)
-            {
+          // don't treat partial and non-partial arrays as different.
+          //if (this->IsPartial == other.IsPartial)
+          //  {
             return this->ArrayAttributeType < other.ArrayAttributeType;
-            }
+          //  }
           return this->IsPartial < other.IsPartial;
           }
         return this->ArrayName < other.ArrayName;
