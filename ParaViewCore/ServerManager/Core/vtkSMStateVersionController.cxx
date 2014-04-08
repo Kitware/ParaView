@@ -271,14 +271,20 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
     document.save(stream2, "  ");
 
     vtkNew<vtkPVXMLParser> parser;
-    parser->Parse(stream2.str().c_str());
-
-    root->RemoveAllNestedElements();
-    vtkPVXMLElement* newRoot = parser->GetRootElement();
-    newRoot->CopyAttributesTo(root);
-    for (unsigned int cc=0, max=newRoot->GetNumberOfNestedElements(); cc <max;cc++)
+    if (parser->Parse(stream2.str().c_str()))
       {
-      root->AddNestedElement(newRoot->GetNestedElement(cc));
+      root->RemoveAllNestedElements();
+      vtkPVXMLElement* newRoot = parser->GetRootElement();
+
+      newRoot->CopyAttributesTo(root);
+      for (unsigned int cc=0, max=newRoot->GetNumberOfNestedElements(); cc <max;cc++)
+        {
+        root->AddNestedElement(newRoot->GetNestedElement(cc));
+        }
+      }
+    else
+      {
+      vtkErrorMacro("Internal error: Error parsing converted XML state file.");
       }
     }
   return status;
