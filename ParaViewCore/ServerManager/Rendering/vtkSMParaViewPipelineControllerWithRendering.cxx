@@ -373,6 +373,11 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
     {
     // If there's no preferred view, check if active view can show the data. If
     // so, show it in that view.
+
+    // ensure that data is up-to-date.
+    double time = vtkSMPropertyHelper(view, "ViewTime").GetAsDouble();
+    producer->UpdatePipeline(time);
+
     if (view->CanDisplayData(producer, outputPort))
       {
       if (this->Show(producer, outputPort, view))
