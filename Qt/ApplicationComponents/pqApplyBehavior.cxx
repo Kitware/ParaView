@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -129,6 +130,14 @@ void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
 //-----------------------------------------------------------------------------
 void pqApplyBehavior::applied(pqPropertiesPanel*)
 {
+  //---------------------------------------------------------------------------
+  // Update animation timesteps.
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps(
+    controller->GetAnimationScene(
+      pqActiveObjects::instance().activeServer()->session()));
+
+
   QList<pqView*> dirty_views;
 
   //---------------------------------------------------------------------------
