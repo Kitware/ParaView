@@ -1277,7 +1277,7 @@ int pqMemoryInspectorPanel::Initialize()
       << right << setw(1)  << setfill(' ');
     #endif
     QTreeWidgetItem *group=NULL;
-    group = new QTreeWidgetItem;
+    group = new QTreeWidgetItem(this->Ui->configView);
     group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     group->setExpanded(true);
     group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
@@ -1302,7 +1302,7 @@ int pqMemoryInspectorPanel::Initialize()
       << left << setw(56) << setfill('=') << "data server" << endl
       << right << setw(1)  << setfill(' ');
     #endif
-    group = new QTreeWidgetItem;
+    group = new QTreeWidgetItem(this->Ui->configView);
     group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     group->setExpanded(true);
     group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
@@ -1327,7 +1327,7 @@ int pqMemoryInspectorPanel::Initialize()
       << left << setw(56) << setfill('=') << "render server" << endl
       << right << setw(1)  << setfill(' ');
     #endif
-    group = new QTreeWidgetItem;
+    group = new QTreeWidgetItem(this->Ui->configView);
     group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     group->setExpanded(true);
     group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));

@@ -356,6 +356,7 @@ void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property,
       proxies[cc] = Value[cc].GetPointer();
       }
     proxyProp->SetProxies(Value.size(), proxies);
+    delete[] proxies;
     }
 }
 
