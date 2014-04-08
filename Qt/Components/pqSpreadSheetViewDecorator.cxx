@@ -81,7 +81,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
-  Superclass(view)
+  Superclass(view->getWidget()) // we make our parent the view's widget.
 {
   this->Spreadsheet = view;
   QWidget* container = view->getWidget();

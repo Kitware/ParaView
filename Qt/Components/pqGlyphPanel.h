@@ -59,6 +59,7 @@ protected slots:
   /// scalars and vectors fields to reflect which one will have an effect
   /// on the output.
   void updateScalarsVectorsEnable();
+  void updateScaleFactorIfNeeded();
 
 protected:
   QAbstractButton *LockScaleFactor;

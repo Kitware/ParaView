@@ -50,4 +50,11 @@
 
   <!-- hide orientation axes since on some dashboards it's not resized correctly -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/OrientationAxesVisibility/CheckBox" command="set_boolean" arguments="false" />
+
+  <!-- hide scalar bars -->
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,55,7,/0:0/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,55,7,/0:0/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+
 </pqevents>
