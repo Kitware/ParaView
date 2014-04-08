@@ -475,6 +475,29 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
 }
 
 //----------------------------------------------------------------------------
+vtkPVProminentValuesInformation*
+vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
+  double uncertaintyAllowed, double fraction)
+{
+  if (!this->GetUsingScalarColoring())
+    {
+    return NULL;
+    }
+
+  vtkPVArrayInformation* arrayInfo = this->GetArrayInformationForColorArray();
+  if (!arrayInfo)
+    {
+    return NULL;
+    }
+
+  vtkSMPropertyHelper colorArrayHelper(this, "ColorArrayName");
+  return this->GetProminentValuesInformation(
+    arrayInfo->GetName(), colorArrayHelper.GetInputArrayAssociation(),
+    arrayInfo->GetNumberOfComponents(),
+    uncertaintyAllowed, fraction);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

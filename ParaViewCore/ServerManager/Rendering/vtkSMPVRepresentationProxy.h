@@ -173,6 +173,20 @@ public:
     return self? self->GetArrayInformationForColorArray() : NULL;
     }
 
+  // Description:
+  // Call vtkSMRepresentationProxy::GetProminentValuesInformation() for the
+  // array used for scalar color, if any. Otherwise returns NULL.
+  virtual vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
+    double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
+  static vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
+    vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->GetProminentValuesInformationForColorArray(
+      uncertaintyAllowed, fraction) : NULL;
+    }
+
 protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy();

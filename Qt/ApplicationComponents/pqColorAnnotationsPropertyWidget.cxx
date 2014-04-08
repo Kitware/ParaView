@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkTuple.h"
 #include "vtkVariant.h"
@@ -645,7 +646,8 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
       }
 
     vtkPVProminentValuesInformation* info =
-      repr->getProxyColorProminentValuesInfo();
+      vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
+        repr->getProxy());
     if (!info)
       {
       throw 0;

@@ -103,19 +103,6 @@ public:
   /// data-filter which has a valid input.
   pqDataRepresentation* getRepresentationForUpstreamSource() const;
 
-  /// Convenience method to return the name of the active scalar array.
-  virtual QString getProxyColorArrayName();
-  /// Convenience method to return the active scalar array field association.
-  virtual int getProxyScalarMode();
-  /// Convenience method to return the array information associated with the active scalars.
-  virtual vtkPVArrayInformation* getProxyColorArrayInfo();
-  /// Convenience method to return prominent value list associated with the active scalars.
-  virtual vtkPVProminentValuesInformation* getProxyColorProminentValuesInfo(
-    double uncertainty = 1e-6, double minFrequency = 5e-4);
-
-  virtual int getNumberOfComponents(const char* arrayname, int fieldType);
-  virtual QString getComponentName( const char* arrayname, int fieldtype, int component);
-
 signals:
   /// Fired when the representation proxy fires the vtkCommand::UpdateDataEvent.
   void dataUpdated();
@@ -143,11 +130,6 @@ protected:
     this->Superclass::initialize();
     this->onInputChanged();
     }
-
-  virtual vtkPVArrayInformation* getArrayInformation( const char* arrayname, const int &fieldType );
-  virtual vtkPVProminentValuesInformation* getProminentValuesInformation(
-    const char* arrayname, const int &fieldType, double uncertainty, double minFrequency );
-
 private:
   pqDataRepresentation(const pqDataRepresentation&); // Not implemented.
   void operator=(const pqDataRepresentation&); // Not implemented.
