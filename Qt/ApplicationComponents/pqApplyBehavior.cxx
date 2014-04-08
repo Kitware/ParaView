@@ -229,7 +229,7 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
       // implying a new view was created, always reset that.
       pqPreferredView->resetDisplay();
       }
-    else if (view->getNumberOfVisibleDataRepresentations() == 1)
+    else if (view && view->getNumberOfVisibleDataRepresentations() == 1)
       {
       // old view is being used, reset only if this is the only representation.
       view->resetDisplay();
@@ -239,7 +239,7 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
     // this some other time.
     if (pqRenderView* rview = qobject_cast<pqRenderView*>(pqPreferredView))
       {
-      if (view->getNumberOfVisibleDataRepresentations() == 1)
+      if (rview->getNumberOfVisibleDataRepresentations() == 1)
         {
         rview->updateInteractionMode(source->getOutputPort(outputPort));
         }
