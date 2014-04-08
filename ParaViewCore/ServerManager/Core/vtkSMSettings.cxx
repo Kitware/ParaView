@@ -108,7 +108,7 @@ public:
   // ".[0][1][2].name1[3]"
   const Json::Value & GetSetting(const char* settingName)
   {
-    return this->GetSettingAtOrBelowPriority(settingName, DBL_MAX);
+    return this->GetSettingAtOrBelowPriority(settingName, VTK_DOUBLE_MAX);
   }
 
   //----------------------------------------------------------------------------
@@ -681,7 +681,7 @@ public:
     if (this->JSONRoots.size() == 0)
       {
       PrioritizedJSONRoot newRoot;
-      newRoot.Priority = DBL_MAX;
+      newRoot.Priority = VTK_DOUBLE_MAX;
       this->JSONRoots.push_back(newRoot);
       }
   }

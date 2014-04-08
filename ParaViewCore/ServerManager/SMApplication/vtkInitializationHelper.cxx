@@ -239,7 +239,7 @@ bool vtkInitializationHelper::LoadSettings()
   // Load user-level settings
   std::string userSettingsFileName = vtkInitializationHelper::GetUserSettingsDirectory();
   userSettingsFileName.append("UserSettings.json");
-  success = success && settings->AddSettingsFromFile(userSettingsFileName, 2.0);
+  success = success && settings->AddSettingsFromFile(userSettingsFileName, VTK_DOUBLE_MAX);
 
   // Load site-level settings
   // FIXME - site settings will likely live elsewhere
