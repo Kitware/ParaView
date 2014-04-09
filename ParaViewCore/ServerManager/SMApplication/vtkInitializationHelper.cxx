@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <string>
 #include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
 
 // Windows-only helper functionality:
 #ifdef _WIN32
@@ -242,9 +243,37 @@ bool vtkInitializationHelper::LoadSettings()
   success = success && settings->AddCollectionFromFile(userSettingsFileName, VTK_DOUBLE_MAX);
 
   // Load site-level settings
-  // FIXME - site settings will likely live elsewhere
-  std::string siteSettingsFile = vtkInitializationHelper::GetUserSettingsDirectory();
-  siteSettingsFile.append("SiteSettings.json");
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  std::string app_dir = options->GetApplicationPath();
+  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
+
+  std::vector<std::string> pathsToSearch;
+  pathsToSearch.push_back(app_dir);
+  pathsToSearch.push_back(app_dir + "/../lib/");
+#if defined(__APPLE__)
+  // paths for app
+  pathsToSearch.push_back(app_dir + "/../../..");
+  pathsToSearch.push_back(app_dir + "/../../../../lib");
+  
+  // paths when doing an unix style install.
+  pathsToSearch.push_back(app_dir +"/../lib/paraview-" PARAVIEW_VERSION);
+#endif
+  // On windows configuration files are in the parent directory
+  pathsToSearch.push_back(app_dir + "/../");
+
+  std::string filename = "SiteSettings.json";
+  std::string siteSettingsFile;
+
+  for (size_t cc = 0; cc < pathsToSearch.size(); cc++)
+    {
+    std::string path = pathsToSearch[cc];
+    if (vtksys::SystemTools::FileExists((path + "/" + filename).c_str(), true))
+      {
+      siteSettingsFile = path + "/" + filename;
+      break;
+      }
+    }
+
   success = success && settings->AddCollectionFromFile(siteSettingsFile, 1.0);
 
   settings->DistributeSettings();
