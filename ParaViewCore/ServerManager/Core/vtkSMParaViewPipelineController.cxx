@@ -1043,7 +1043,11 @@ bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
       {
       // Since domains depend on information properties, it's essential we update
       // property information first.
-      sourceProxy->UpdatePipelineInformation();
+      if (sourceProxy->GetNumberOfOutputPorts() > 0)
+        {
+        // This is only done for non-writers, or non-sinks.
+        sourceProxy->UpdatePipelineInformation();
+        }
       }
 
     // Reset property values using domains. However, this should only be done for
