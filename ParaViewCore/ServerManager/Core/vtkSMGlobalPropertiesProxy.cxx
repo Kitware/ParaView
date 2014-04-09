@@ -121,7 +121,6 @@ bool vtkSMGlobalPropertiesProxy::Link(
       {
       return true;
       }
-    vtkWarningMacro("Duplicate link. Removing previous link.");
     this->Unlink(oldname, proxy, propname);
     }
 
