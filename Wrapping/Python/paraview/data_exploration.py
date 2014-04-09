@@ -1034,7 +1034,7 @@ class CompositeImageExporter():
     recomposed later on in the web.
     We assume the RGBZView plugin is loaded.
     """
-    def __init__(self, file_name_generator, data_list, colorBy_list, luts, camera_handler, view_size, data_list_pipeline, axisVisibility=1, orientationVisibility=1):
+    def __init__(self, file_name_generator, data_list, colorBy_list, luts, camera_handler, view_size, data_list_pipeline, axisVisibility=1, orientationVisibility=1, format='jpg'):
         '''
         data_list = [ds1, ds2, ds3]
         colorBy_list = [ [('POINT_DATA', 'temperature'), ('POINT_DATA', 'pressure'), ('POINT_DATA', 'salinity')],
@@ -1042,7 +1042,7 @@ class CompositeImageExporter():
                          [('SOLID_COLOR', [0.1,0.1,0.1])] ]
         luts = { 'temperature': vtkLookupTable(...),  'salinity': vtkLookupTable(...),  'pressure': vtkLookupTable(...), }
         data_list_pipeline = [ { 'name': 'Earth core'}, {'name': 'Slice'}, {'name': 'T=0', 'parent': 'Contour by temperature'}, ...]
-
+        format = ['jpg', 'tiff', 'png']
         '''
         self.file_name_generator = file_name_generator
         self.datasets = data_list
@@ -1053,6 +1053,7 @@ class CompositeImageExporter():
 
         # Create view and assembly manager
         self.view = simple.CreateView("RGBZView")
+        self.view.ImageFormatExtension = format
         self.view.ViewSize = view_size
         self.view.CenterAxesVisibility = axisVisibility
         self.view.OrientationAxesVisibility = orientationVisibility
@@ -1095,7 +1096,7 @@ class CompositeImageExporter():
         self.file_name_generator.add_image_width(view_size[0])
 
         # Add the name of both generated files
-        self.file_name_generator.update_active_arguments(filename='rgb.jpg')
+        self.file_name_generator.update_active_arguments(filename='rgb.%s' % format)
         self.file_name_generator.update_active_arguments(filename='composite.json')
 
     @staticmethod
