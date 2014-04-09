@@ -50,6 +50,8 @@ class PQCOMPONENTS_EXPORT pqCurrentTimeToolbar : public QToolBar
 {
   Q_OBJECT
   typedef QToolBar Superclass;
+  Q_PROPERTY(bool showFrameCount READ showFrameCount WRITE setShowFrameCount);
+
 public:
   pqCurrentTimeToolbar(const QString &title, QWidget *parent = 0);
   pqCurrentTimeToolbar(QWidget *parent = 0);
@@ -58,9 +60,16 @@ public:
   /// Returns the current animation scene to which this toolbar is linked.
   pqAnimationScene* animationScene() const;
 
+  /// Returns whether frame count is shown in the toolbar, if applicable.
+  bool showFrameCount() const
+    { return this->ShowFrameCount; }
+
 public slots:
   /// Set the animation scene.
   void setAnimationScene(pqAnimationScene*);
+
+  /// Set whether frame count is shown in the toolbar, if applicable.
+  void setShowFrameCount(bool val);
 
 protected slots:
   /// Called when animation scene reports that it's time has changed.
@@ -87,6 +96,9 @@ protected:
   QLineEdit* TimeLineEdit;
   QSpinBox* TimeSpinBox;
   QLabel* TimeLabel;
+  QLabel* CountLabel;
+  QAction* CountLabelAction;
+  bool ShowFrameCount;
 
 private:
   pqCurrentTimeToolbar(const pqCurrentTimeToolbar&); // Not implemented.
