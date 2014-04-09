@@ -468,8 +468,7 @@ void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource *source)
       this->Internals->Ui.AdvancedButton->isChecked(),
       this->Internals->Ui.SearchLineEdit->text());
 
-    if (source->modifiedState() == pqProxy::UNINITIALIZED &&
-        pqPropertiesPanel::AutoApply)
+    if (pqPropertiesPanel::AutoApply)
       {
       this->Internals->triggerAutoApply();
       }
