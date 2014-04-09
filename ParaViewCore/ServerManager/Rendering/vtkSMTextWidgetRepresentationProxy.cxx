@@ -78,10 +78,7 @@ void vtkSMTextWidgetRepresentationProxy::CreateVTKObjects()
     vtkErrorMacro("Failed to find property TextProperty on TextActorProxy.");
     return;
     }
-  if(!tppp->AddProxy(this->TextPropertyProxy))
-    {
-    return;
-    }
+  tppp->AddProxy(this->TextPropertyProxy);
 
   vtkSMProxyProperty* tapp = vtkSMProxyProperty::SafeDownCast(
     this->RepresentationProxy->GetProperty("TextActor"));
@@ -90,10 +87,8 @@ void vtkSMTextWidgetRepresentationProxy::CreateVTKObjects()
     vtkErrorMacro("Failed to find property TextActor on TextRepresentationProxy.");
     return;
     }
-  if(!tapp->AddProxy(this->TextActorProxy))
-    {
-    return;
-    }
+  tapp->AddProxy(this->TextActorProxy);
+
 
   // Mark TextActor properties modified so the default value will be pushed at
   // the UpdateVTKObject call. This prevent them from behing overriden by some

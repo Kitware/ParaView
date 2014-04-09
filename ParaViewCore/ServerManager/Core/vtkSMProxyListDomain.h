@@ -116,7 +116,10 @@ protected:
 
   // Load the state of the domain from the XML.
   virtual int LoadState(vtkPVXMLElement* domainElement, 
-    vtkSMProxyLocator* loader); 
+    vtkSMProxyLocator* loader);
+
+  friend class vtkSMProxyProperty;
+  void SetProxies(vtkSMProxy** proxies, unsigned int count);
 
 private:
   vtkSMProxyListDomain(const vtkSMProxyListDomain&); // Not implemented.

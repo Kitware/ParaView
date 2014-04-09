@@ -1998,7 +1998,7 @@ void pqSMAdaptor::clearUncheckedProperties(vtkSMProperty *property)
     }
   else if(vtkSMProxyProperty *ProxyProperty = vtkSMProxyProperty::SafeDownCast(property))
     {
-    ProxyProperty->ClearUncheckedProxies();
+    ProxyProperty->RemoveAllUncheckedProxies();
     }
 }
 

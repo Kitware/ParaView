@@ -74,10 +74,7 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
     vtkErrorMacro("Failed to find property ScalarBarActor on ScalarBarRepresentation proxy.");
     return;
     }
-  if(!tapp->AddProxy(this->ActorProxy))
-    {
-    return;
-    }
+  tapp->AddProxy(this->ActorProxy);
 }
 
 //----------------------------------------------------------------------------

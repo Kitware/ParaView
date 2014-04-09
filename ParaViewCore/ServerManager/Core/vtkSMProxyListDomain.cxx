@@ -300,6 +300,17 @@ int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* element,
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMProxyListDomain::SetProxies(vtkSMProxy** proxies, unsigned int count)
+{
+  vtkSMProxyListDomainInternals::VectorOfProxies newValues(proxies, proxies+count);
+  if (this->Internals->ProxyList != newValues)
+    {
+    this->Internals->ProxyList = newValues;
+    this->DomainModified();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
