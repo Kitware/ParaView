@@ -24,13 +24,13 @@
 
   <!-- Specify an explicit range for Y-axis (40, 300). Now verify that over time
   the axis range remains fixed to (40, 300) -->
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="1.0.0.0" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/widget_2/UseFixedRange" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/widget_2/AxisRangePages/MinMaxPage/RangeMin" command="set_string" arguments="40" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/widget_2/AxisRangePages/MinMaxPage/RangeMax" command="set_string" arguments="300" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisUseCustomRange/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisRangeMinimum/LineEdit0" command="set_string" arguments="40" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisRangeMinimum/LineEdit0" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisRangeMaximum/LineEdit0" command="set_string" arguments="300" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisRangeMaximum/LineEdit0" command="key" arguments="16777220" />
+
+
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/ChartAxisRangeAndLabelsC.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPlay" command="activate" arguments="" />
@@ -39,62 +39,140 @@
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
 
   <!-- With fixed Y-axis range, now lets specify custom labels. They should
-  remain fixed over time as well. -->
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="1.0.0.0" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/UseFixedLabels" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/AddButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="5" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,53,0,5,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,53,0,5,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="50" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/AddButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="6" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,54,0,6,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,54,0,6,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="60" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/AddButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,49,0,1,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,49,0,1,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="10" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="100" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/AddButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="30" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,51,0,3,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,51,0,3,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="30" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="300" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,48,0,0,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="mousePress" arguments="1,1,0,26,7,/1:0" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="mouseRelease" arguments="1,0,0,26,7,/1:0" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/RemoveButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="mousePress" arguments="1,1,0,93,10,/0:0" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="mouseRelease" arguments="1,0,0,93,10,/0:0" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/AddButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="75" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,55,0,7,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,55,0,7,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="75" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,53,0,5,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,53,0,5,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="6,16777220,0,,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="6,16777220,0,,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/LabelList" command="keyEvent" arguments="7,16777220,0,,0,1" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/CloseButton" command="activate" arguments="" />
+  remain fixed over time as well.
+  Labels are: 5, 50, 6, 60, 1, 10, 100, 30, 300, 75, 75
+  -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchLineEdit" command="set_string" arguments="Left" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,4,37" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,20,180" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,20,180" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisUseCustomLabels/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="6" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,54,0,6,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,54,0,6,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="60" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,54,0,6,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,54,0,6,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="60" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,13,148" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,12,170" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,12,170" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="100" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,51,0,3,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,51,0,3,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,51,0,3,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,51,0,3,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="300" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,48,0,0,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,8,161" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,8,186" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,8,186" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,12,194" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,8,172" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,8,172" />
+  <pqevent object="pqClientMainWindow" command="mousePress" arguments="1,1,0,178,351" />
+  <pqevent object="pqClientMainWindow" command="mouseMove" arguments="1,0,0,191,242" />
+  <pqevent object="pqClientMainWindow" command="mouseRelease" arguments="1,0,0,191,242" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,12,14" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,12,14" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="7" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,55,0,7,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,55,0,7,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="75" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="7" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,55,0,7,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,55,0,7,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="75" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,53,0,5,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="6,16777220,0,,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/Table" command="keyEvent" arguments="7,16777220,0,,0,1" />
+
+
+
+
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/ChartAxisRangeAndLabelsE.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
@@ -103,11 +181,9 @@
   <!-- With custom labels, we now let the chart compute axis range
   automatically. The axis range should scale with time, but the labels should
   sitll stay fixed at those we specified.-->
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="1.0.0.0" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/widget_2/ComputeRangeAutomatically" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisUseCustomRange/CheckBox" command="set_boolean" arguments="false" />
+
+
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/ChartAxisRangeAndLabelsG.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />

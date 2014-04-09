@@ -21,6 +21,28 @@
 
 class vtkScatterPlotMatrix;
 
+#define GENERATE_PLOT_TYPE_DECLARATION(name, type)     \
+  void SetScatterPlot ## name (type value);            \
+  void SetHistogram ## name(type value);               \
+  void SetActivePlot ## name(type value);              \
+
+#define GENERATE_PLOT_TYPE_DECLARATION2(name, type1, type2)         \
+  void SetScatterPlot ## name (type1 value1, type2 value2);         \
+  void SetHistogram ## name(type1 value1, type2 value2);            \
+  void SetActivePlot ## name(type1 value1, type2 value2);           \
+
+#define GENERATE_PLOT_TYPE_DECLARATION3(name, type1, type2, type3)        \
+  void SetScatterPlot ## name (type1 value1, type2 value2, type3 value3); \
+  void SetHistogram ## name(type1 value1, type2 value2, type3 value3);    \
+  void SetActivePlot ## name(type1 value1, type2 value2, type3 value3);   \
+
+#define GENERATE_PLOT_TYPE_DECLARATION4(name, type1, type2, type3, type4)   \
+  void SetScatterPlot ## name (type1 value1, type2 value2, type3 value3, type4 value4); \
+  void SetHistogram ## name(type1 value1, type2 value2, type3 value3, type4 value4);    \
+  void SetActivePlot ## name(type1 value1, type2 value2, type3 value3, type4 value4);   \
+
+
+
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVPlotMatrixView : public vtkPVContextView
 {
 public:
@@ -66,35 +88,44 @@ public:
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
-  void SetScatterPlotTitle(const char* title);
-  const char* GetScatterPlotTitle();
+  void SetTitle(const char* title);
+  const char* GetTitle();
 
   // Description:
   // Set the active plot title's font.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
-  void SetScatterPlotTitleFont(const char* family, int pointSize, bool bold, bool italic);
-  const char* GetScatterPlotTitleFontFamily();
-  int GetScatterPlotTitleFontSize();
-  int GetScatterPlotTitleFontBold();
-  int GetScatterPlotTitleFontItalic();
+  void SetTitleFont(const char* family, int pointSize, bool bold, bool italic);
+  void SetTitleFontFamily(const char* family);
+  void SetTitleFontSize(int pointSize);
+  void SetTitleBold(bool bold);
+  void SetTitleItalic(bool italic);
+  const char* GetTitleFontFamily();
+  int GetTitleFontSize();
+  int GetTitleFontBold();
+  int GetTitleFontItalic();
 
   // Description:
   // Set the active plot title's color.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
-  void SetScatterPlotTitleColor(double red, double green, double blue);
-  double* GetScatterPlotTitleColor();
+  void SetTitleColor(double red, double green, double blue);
+  double* GetTitleColor();
 
   // Description:
   // Set the active plot title's alignment.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
-  void SetScatterPlotTitleAlignment(int alignment);
-  int GetScatterPlotTitleAlignment();
+  void SetTitleAlignment(int alignment);
+  int GetTitleAlignment();
+
+  // Description:
+  // Set the number of animation frames used when changing the active
+  // scatterplot.
+  void SetNumberOfAnimationFrames(int value);
 
   // Description:
   // Set the gutter that should be left between the charts in the matrix.
@@ -102,6 +133,8 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   virtual void SetGutter(float x, float y);
+  void SetGutterX(float value);
+  void SetGutterY(float value);
 
   // Description:
   // Set/get the borders of the chart matrix (space in pixels around each chart).
@@ -109,6 +142,10 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   virtual void SetBorders(int left, int bottom, int right, int top);
+  virtual void SetBorderLeft(int value);
+  virtual void SetBorderBottom(int value);
+  virtual void SetBorderRight(int value);
+  virtual void SetBorderTop(int value);
 
   // Description:
   // Sets whether or not the grid for the given axis is visible given a plot type, which refers to
@@ -117,6 +154,7 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetGridVisibility(int plotType, bool visible);
+  GENERATE_PLOT_TYPE_DECLARATION(GridVisibility,bool);
   int GetGridVisibility(int plotType);
 
   // Description:
@@ -126,8 +164,9 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetBackgroundColor(int plotType,
-    double red, double green, double blue, double alpha=0.0);
+    double red, double green, double blue, double alpha);
   double* GetBackgroundColor(int plotType);
+  GENERATE_PLOT_TYPE_DECLARATION4(BackgroundColor,double,double,double,double);
 
   // Description:
   // Sets the color for the axes given a plot type, which refers to
@@ -137,6 +176,7 @@ public:
   // corresponding properties to change these values.
   void SetAxisColor(int plotType, double red, double green, double blue);
   double* GetAxisColor(int plotType);
+  GENERATE_PLOT_TYPE_DECLARATION3(AxisColor,double,double,double);
 
   // Description:
   // Sets the color for the axes given a plot type, which refers to
@@ -146,6 +186,7 @@ public:
   // corresponding properties to change these values.
   void SetGridColor(int plotType, double red, double green, double blue);
   double* GetGridColor(int plotType);
+  GENERATE_PLOT_TYPE_DECLARATION3(GridColor,double,double,double);
 
   // Description:
   // Sets whether or not the labels for the axes are visible, given a plot type, which refers to
@@ -155,6 +196,7 @@ public:
   // corresponding properties to change these values.
   void SetAxisLabelVisibility(int plotType, bool visible);
   int GetAxisLabelVisibility(int plotType);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelVisibility,bool);
 
   // Description:
   // Set the axis label font for the axes given a plot type, which refers to
@@ -162,8 +204,16 @@ public:
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
-  void SetAxisLabelFont(int plotType, const char* family, int pointSize, bool bold,
-    bool italic);
+  void SetAxisLabelFont(int plotType, const char* family, int pointSize,
+                        bool bold, bool italic);
+  void SetAxisLabelFontFamily(int plotType, const char* family);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelFontFamily,const char*);
+  void SetAxisLabelFontSize(int plotType, int pointSize);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelFontSize,int);
+  void SetAxisLabelBold(int plotType, bool bold);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelBold,bool);
+  void SetAxisLabelItalic(int plotType, bool italic);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelItalic,bool);
   const char* GetAxisLabelFontFamily(int plotType);
   int GetAxisLabelFontSize(int plotType);
   int GetAxisLabelFontBold(int plotType);
@@ -176,6 +226,7 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetAxisLabelColor(int plotType, double red, double green, double blue);
+  GENERATE_PLOT_TYPE_DECLARATION3(AxisLabelColor,double,double,double);
   double* GetAxisLabelColor(int plotType);
 
   // Description:
@@ -185,6 +236,7 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetAxisLabelNotation(int plotType, int notation);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelNotation,int);
   int GetAxisLabelNotation(int plotType);
 
   // Description:
@@ -194,6 +246,7 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetAxisLabelPrecision(int plotType, int precision);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelPrecision,int);
   int GetAxisLabelPrecision(int plotType);
 
   // Description:
@@ -203,7 +256,9 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetTooltipNotation(int plotType, int notation);
+  GENERATE_PLOT_TYPE_DECLARATION(TooltipNotation,int);
   void SetTooltipPrecision(int plotType, int precision);
+  GENERATE_PLOT_TYPE_DECLARATION(TooltipPrecision,int);
   int GetTooltipNotation(int plotType);
   int GetTooltipPrecision(int plotType);
 

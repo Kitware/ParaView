@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 #include "pqApplicationCore.h"
 #include "pqNamedWidgets.h"
-#include "pqLightsPropertyGroup.h"
+#include "pqPropertyGroupWidget.h"
 #include "pqUndoStack.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
@@ -53,6 +53,7 @@ public:
   }
 };
 
+namespace {
 const char* LIGHT_KIT = "UseLight";
 const char* KEY_LIGHT_WARMTH = "KeyLightWarmth";
 const char* KEY_LIGHT_INTENSITY = "KeyLightIntensity";
@@ -98,17 +99,18 @@ const char* PROPERTY_NAME[] =
   LIGHT_COLOR
 };
 const int PROPERTY_COUNT = sizeof(PROPERTY_NAME) / sizeof(PROPERTY_NAME[0]);
+}
 
 //-----------------------------------------------------------------------------
 pqLightsEditor::pqLightsEditor(
-  pqLightsPropertyGroup* propertyWidget,
+  pqPropertyGroupWidget* propertyWidget,
   QWidget *_parent, Qt::WindowFlags flags):
   Superclass(_parent, flags),
   Internal (new pqInternal (this)),
   PropertyWidget (propertyWidget)
 {
   Ui::LightsEditor& ui = *this->Internal;
-  pqLightsPropertyGroup& pg = *PropertyWidget;
+  pqPropertyGroupWidget& pg = *PropertyWidget;
 
   pg.addPropertyLink(ui.LightKit,           LIGHT_KIT);
   pg.addPropertyLink(ui.KeyLightWarmth,     KEY_LIGHT_WARMTH);
@@ -149,7 +151,7 @@ void pqLightsEditor::reset()
   for (int i = 0; i < PROPERTY_COUNT; ++i)
     {
     vtkSMProperty* _property =
-      this->PropertyWidget->getPropertyGroup()->GetProperty(PROPERTY_NAME[i]);
+      this->PropertyWidget->GetPropertyGroup()->GetProperty(PROPERTY_NAME[i]);
     _property->ResetToDefault();
     }
   emit this->PropertyWidget->changeFinished();

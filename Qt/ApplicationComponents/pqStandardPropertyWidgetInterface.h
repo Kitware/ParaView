@@ -87,6 +87,7 @@ public:
   /// \li \c ClipScalarsDecorator : pqClipScalarsDecorator
   /// \li \c CTHArraySelectionDecorator : pqCTHArraySelectionDecorator
   /// \li \c EnableWidgetDecorator : pqEnableWidgetDecorator
+  /// \li \c ShowWidgetDecorator : pqShowWidgetDecorator
   /// \li \c InputDataTypeDecorator : pqInputDataTypeDecorator
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);

@@ -109,8 +109,12 @@ set (Module_SRCS
   pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
   pqEditColorMapReaction.h
+  pqBoolPropertyWidgetDecorator.cxx
+  pqBoolPropertyWidgetDecorator.h
   pqEnableWidgetDecorator.cxx
   pqEnableWidgetDecorator.h
+  pqShowWidgetDecorator.cxx
+  pqShowWidgetDecorator.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFiltersMenuReaction.cxx
@@ -127,8 +131,6 @@ set (Module_SRCS
   pqInputDataTypeDecorator.h
   pqLightsEditor.cxx
   pqLightsEditor.h
-  pqLightsPropertyGroup.cxx
-  pqLightsPropertyGroup.h
   pqListPropertyWidget.cxx
   pqListPropertyWidget.h
   pqLoadDataReaction.cxx
@@ -163,6 +165,8 @@ set (Module_SRCS
   pqPluginDockWidgetsBehavior.h
   pqPluginDocumentationBehavior.cxx
   pqPluginDocumentationBehavior.h
+  pqPropertyGroupButton.cxx
+  pqPropertyGroupButton.h
   pqProxyGroupMenuManager.cxx
   pqProxyGroupMenuManager.h
   pqPVAnimationWidget.cxx
@@ -233,8 +237,6 @@ set (Module_SRCS
   pqViewMenuManager.h
   pqViewSettingsManager.cxx
   pqViewSettingsManager.h
-  pqViewSettingsReaction.cxx
-  pqViewSettingsReaction.h
   pqViewStreamingBehavior.cxx
   pqViewStreamingBehavior.h
 )
@@ -280,7 +282,9 @@ set (Module_MOC_HDRS
   pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
+  pqBoolPropertyWidgetDecorator.h
   pqEnableWidgetDecorator.h
+  pqShowWidgetDecorator.h
   pqExportReaction.h
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
@@ -289,7 +293,6 @@ set (Module_MOC_HDRS
   pqIgnoreSourceTimeReaction.h
   pqInputDataTypeDecorator.h
   pqLightsEditor.h
-  pqLightsPropertyGroup.h
   pqListPropertyWidget.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
@@ -306,6 +309,7 @@ set (Module_MOC_HDRS
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.h
   pqPluginDocumentationBehavior.h
+  pqPropertyGroupButton.h
   pqProxyGroupMenuManager.h
   pqPVAnimationWidget.h
   pqPVApplicationCore.h
@@ -341,7 +345,6 @@ set (Module_MOC_HDRS
   pqViewFrameActionsBehavior.h
   pqViewMenuManager.h
   pqViewSettingsManager.h
-  pqViewSettingsReaction.h
   pqViewStreamingBehavior.h
 )
 

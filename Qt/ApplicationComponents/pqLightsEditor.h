@@ -37,14 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProxy;
 class vtkSMPropertyGroup;
-class pqLightsPropertyGroup;
+class pqPropertyGroupWidget;
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqLightsEditor : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
 public:
-  pqLightsEditor(pqLightsPropertyGroup* propertyWidget,
+  pqLightsEditor(pqPropertyGroupWidget* propertyWidget,
                  QWidget *parent=0, Qt::WindowFlags f=0);
   ~pqLightsEditor();
 
@@ -54,7 +54,7 @@ public:
  private:
   class pqInternal;
   pqInternal* Internal;
-  pqLightsPropertyGroup* PropertyWidget;
+  pqPropertyGroupWidget* PropertyWidget;
 };
 
 #endif

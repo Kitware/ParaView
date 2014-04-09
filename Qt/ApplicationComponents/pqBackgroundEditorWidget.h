@@ -43,15 +43,7 @@ class vtkSMPropertyGroup;
 class PQAPPLICATIONCOMPONENTS_EXPORT pqBackgroundEditorWidget :
   public pqPropertyGroupWidget
 {
-  Q_OBJECT
-  Q_PROPERTY(bool gradientBackground READ gradientBackground
-             WRITE setGradientBackground)
-  Q_PROPERTY(bool imageBackground READ imageBackground
-             WRITE setImageBackground)
-
-  typedef pqPropertyGroupWidget Superclass;
-
- public:
+public:
   pqBackgroundEditorWidget(
     vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup,
     QWidget* parentObject = 0);
@@ -63,23 +55,32 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBackgroundEditorWidget :
   void setImageBackground(bool imageBackground);
 
 
- signals:
+signals:
   void gradientBackgroundChanged();
   void imageBackgroundChanged();
 
- public slots:
+public slots:
   void setView (pqView *newView);
 
- protected slots:
+protected slots:
   void currentIndexChangedBackgroundType(int type);
   void clickedRestoreDefaultColor();
   void clickedRestoreDefaultColor2();
 
- private:
+private:
+  typedef pqPropertyGroupWidget Superclass;
+
+private:
   void changeColor(const char* propertyName);
   void fireGradientAndImageChanged(int oldType, int newType);
 
- private:
+private:
+  Q_OBJECT
+  Q_PROPERTY(bool gradientBackground READ gradientBackground
+             WRITE setGradientBackground)
+  Q_PROPERTY(bool imageBackground READ imageBackground
+             WRITE setImageBackground)
+
   class pqInternal;
   pqInternal* Internal;
 };

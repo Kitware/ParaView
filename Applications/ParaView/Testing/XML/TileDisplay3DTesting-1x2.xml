@@ -10,22 +10,33 @@
 <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ProbeLine" />
 <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
-<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/OptionsButton" command="activate" arguments="" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="expand" arguments="1.0" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="1.0.0.0" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/UseFixedLabels" command="set_boolean" arguments="true" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/GenerateButton" command="activate" arguments="" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/from" command="set_string" arguments="5" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/from" command="set_string" arguments="50" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/to" command="key" arguments="16777217" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/to" command="set_string" arguments="3" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/to" command="set_string" arguments="30" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/to" command="set_string" arguments="300" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/steps" command="key" arguments="16777217" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="3" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-<pqevent object="pqClientMainWindow/ActiveChartOptions/CloseButton" command="activate" arguments="" />
+<!-- Use fixed labels, generate, from:50, to:300, steps:3 -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/icon" command="mousePress" arguments="1,1,0,7,5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/icon" command="mouseRelease" arguments="1,0,0,7,5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mousePress" arguments="1,1,0,4,8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mouseMove" arguments="1,0,0,5,8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayButton/icon" command="mouseRelease" arguments="1,0,0,5,8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,9,30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,8,86" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,8,86" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisUseCustomLabels/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,10,82" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,11,89" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,11,89" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LeftAxisLabels/ScalarValueList/AddRange" command="activate" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/from" command="key" arguments="16777219" />
+  <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments="5" />
+  <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments="50" />
+  <pqevent object="pqSampleScalarAddRangeDialog/to" command="key" arguments="16777217" />
+  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="3" />
+  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="30" />
+  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="300" />
+  <pqevent object="pqSampleScalarAddRangeDialog/steps" command="key" arguments="16777217" />
+  <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="3" />
+  <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
+
+
 
 <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Viewport" command="mousePress" arguments="(0.633333,0.0786517,1,1,0)" />

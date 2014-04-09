@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 
 #include <QDialog>
+#include <QVariant>
 
 /// Provides a dialog for specifying a range of scalar samples, used
 /// by pqSampleScalarWidget
@@ -66,6 +67,7 @@ public:
 
   void setLogRangeStrict(bool on);
   bool isLogRangeStrict() const;
+  QVariantList getRange() const;
 
 private slots:
   void onRangeChanged();

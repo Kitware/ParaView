@@ -58,6 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QStyleFactory>
 
+#include <iostream>
+
 namespace
 {
   class pqClearTextOnEsc : public QObject
@@ -314,7 +316,7 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
     this->Internals->Ui.AdvancedButton->setChecked(
       settings->value("showAdvancedProperties", false).toBool());
     }
-  
+
   //---------------------------------------------------------------------------
   // Listen to various signals from the application indicating changes in active
   // source/view/representation, etc.
@@ -576,6 +578,19 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
       viewName == "RenderView" ||
       viewName == "ComparativeRenderView" ||
       viewName == "MultiSlice" ||
+      /*XY Charts*/
+      viewName == "XYBagChartView" ||              // 2
+      viewName == "XYBarChartView" ||              // 2
+      viewName == "ComparativeXYBarChartView" ||   // 2
+      viewName == "XYFunctionalBagChartView" ||    // 2
+      viewName == "XYChartView" ||                 // 4
+      viewName == "ComparativeXYChartView" ||      // 4
+
+      /*1D Chart*/
+      viewName == "BoxChartView" ||                // 1?
+      viewName == "PythonView" ||
+      viewName == "PlotMatrixView" ||
+
       /*Plugins*/
       viewName == "QuadView" ||
       viewName == "MantaView" ||
@@ -584,6 +599,7 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
       viewName == "IteratingView" ||
       viewName == "PrioritizingView" ||
       viewName == "RefiningView");
+    std::cout << viewName.toStdString() << std::endl;
     }
 
   if (this->Internals->View != _view)
@@ -824,7 +840,7 @@ void pqPropertiesPanel::showHelp()
       this->Internals->Source->getProxy()->GetXMLName());
     }
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::proxyDeleted(pqPipelineSource* source)
 {

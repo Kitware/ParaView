@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module: pqLightsPropertyGroup.cxx
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2012 Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,14 +28,41 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#include "pqEnableWidgetDecorator.h"
+=========================================================================*/
 
-//-----------------------------------------------------------------------------
-pqEnableWidgetDecorator::pqEnableWidgetDecorator(
-  vtkPVXMLElement* config, pqPropertyWidget* parentObject)
-  : Superclass(config, parentObject)
+#include "pqPropertyGroupButton.h"
+
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QPushButton>
+
+#include "pqPropertiesPanel.h"
+#include "pqProxy.h"
+#include "vtkSMProxy.h"
+
+pqPropertyGroupButton::pqPropertyGroupButton(
+  vtkSMProxy *smProxy, vtkSMPropertyGroup* smGroup,
+  QWidget*parentObject)
+  : pqPropertyGroupWidget(smProxy, smGroup, parentObject),
+    Editor (NULL)
 {
-  QObject::connect(this, SIGNAL(boolPropertyChanged()),
-                   this, SIGNAL(enableStateChanged()));
+  QHBoxLayout *layoutLocal = new QHBoxLayout(this);
+  layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
+  layoutLocal->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+
+  QPushButton *button = new QPushButton("Edit");
+  layoutLocal->addWidget(button);
+  layoutLocal->addStretch();
+
+  connect(button, SIGNAL(clicked()), SLOT(showEditor()));
+}
+
+pqPropertyGroupButton::~pqPropertyGroupButton()
+{
+  delete this->Editor;
+}
+
+void pqPropertyGroupButton::showEditor()
+{
+  this->Editor->exec();
 }

@@ -65,6 +65,9 @@ private:
 vtkStandardNewMacro(vtkSMContextViewInteractorStyle);
 //****************************************************************************
 
+namespace {
+const char* XY_CHART_VIEW = "XYChartView";
+}
 
 vtkStandardNewMacro(vtkSMContextViewProxy);
 //----------------------------------------------------------------------------
@@ -187,13 +190,15 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   return capture;
 }
 
-static void update_property(vtkAxis* axis, vtkSMProperty* prop)
+static void update_property(vtkAxis* axis, vtkSMProperty* propMin,
+                            vtkSMProperty* propMax)
 {
-  if (axis && prop)
+  if (axis && propMin && propMax)
     {
     double range[2];
     axis->GetUnscaledRange(range);
-    vtkSMPropertyHelper(prop).Set(range, 2);
+    vtkSMPropertyHelper(propMin).Set(range[0]);
+    vtkSMPropertyHelper(propMax).Set(range[1]);
     }
 }
 
@@ -204,13 +209,24 @@ void vtkSMContextViewProxy::CopyAxisRangesFromChart()
   if (chartXY)
     {
     update_property(
-      chartXY->GetAxis(vtkAxis::LEFT), this->GetProperty("LeftAxisRange"));
+      chartXY->GetAxis(vtkAxis::LEFT),
+      this->GetProperty("LeftAxisRangeMinimum"),
+      this->GetProperty("LeftAxisRangeMaximum"));
     update_property(
-      chartXY->GetAxis(vtkAxis::RIGHT), this->GetProperty("RightAxisRange"));
-    update_property(
-      chartXY->GetAxis(vtkAxis::TOP), this->GetProperty("TopAxisRange"));
-    update_property(
-      chartXY->GetAxis(vtkAxis::BOTTOM), this->GetProperty("BottomAxisRange"));
+      chartXY->GetAxis(vtkAxis::BOTTOM),
+      this->GetProperty("BottomAxisRangeMinimum"),
+      this->GetProperty("BottomAxisRangeMaximum"));
+    if (this->GetXMLName() == XY_CHART_VIEW)
+      {
+      update_property(
+        chartXY->GetAxis(vtkAxis::RIGHT),
+        this->GetProperty("RightAxisRangeMinimum"),
+        this->GetProperty("RightAxisRangeMaximum"));
+      update_property(
+        chartXY->GetAxis(vtkAxis::TOP),
+        this->GetProperty("TopAxisRangeMinimum"),
+        this->GetProperty("TopAxisRangeMaximum"));
+      }
     this->UpdateVTKObjects();
     }
 }
@@ -224,8 +240,13 @@ void vtkSMContextViewProxy::OnInteractionEvent()
     // Charts by default update axes ranges as needed. On interaction, we force
     // the chart to preserve the user-selected ranges.
     this->CopyAxisRangesFromChart();
-    int lock_ranges[] = {1,1,1,1};
-    vtkSMPropertyHelper(this, "AxisUseCustomRange").Set(lock_ranges, 4);
+    vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(1);
+    vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(1);
+    if (this->GetXMLName() == XY_CHART_VIEW)
+      {
+      vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(1);
+      vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(1);
+      }
     this->UpdateVTKObjects();
     this->InvokeEvent(vtkCommand::InteractionEvent);
     }
@@ -239,10 +260,15 @@ void vtkSMContextViewProxy::ResetDisplay()
     {
     // simply unlock all the axes ranges. That results in the chart determine
     // new ranges to use in the Update call.
-    int lock_ranges[] = {0, 0, 0, 0};
-    vtkSMPropertyHelper(this, "AxisUseCustomRange").Set(lock_ranges, 4);
+    vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(0);
+    vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(0);
+    if (this->GetXMLName() == XY_CHART_VIEW)
+      {
+      vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(0);
+      vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(0);
+      }
     this->UpdateVTKObjects();
-    } 
+    }
 }
 
 //----------------------------------------------------------------------------

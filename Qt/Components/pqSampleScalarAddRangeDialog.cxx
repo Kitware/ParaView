@@ -33,9 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSampleScalarAddRangeDialog.h"
 #include "ui_pqSampleScalarAddRangeDialog.h"
 
+#include <algorithm>
+#include <cmath>
 #include <QDoubleValidator>
 
-#include <algorithm>
+
 
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarAddRangeDialog::pqImplementation
@@ -185,4 +187,42 @@ void pqSampleScalarAddRangeDialog::onRangeChanged()
     
   this->Implementation->Ui.log->setEnabled(logOk);
   this->Implementation->Ui.logWarning->setVisible(!logOk);
+}
+
+QVariantList pqSampleScalarAddRangeDialog::getRange() const
+{
+  QVariantList value;
+  const double _from = this->from();
+  const double _to = this->to();
+  const int _steps = this->steps();
+
+  if (_steps < 2 || _from == _to)
+    {
+    return value;
+    }
+
+  if (this->logarithmic())
+    {
+    const double sign = _from < 0 ? -1.0 : 1.0;
+    const double log_from =
+      std::log10(std::abs(_from ? _from : 1.0e-6 * (_from - _to)));
+    const double log_to = std::log10(std::abs(_to ? _to : 1.0e-6 * (_to - _from)));
+
+    for (int i = 0; i != _steps; i++)
+      {
+      const double mix = static_cast<double>(i) / static_cast<double>(_steps - 1);
+      value.push_back(
+        sign * pow(10.0, (1.0 - mix) * log_from + (mix) * log_to));
+      }
+    }
+  else
+    {
+    for (int i = 0; i != _steps; i++)
+      {
+      const double mix = 
+        static_cast<double>(i) / static_cast<double>(_steps - 1);
+      value.push_back((1.0 - mix) * _from + (mix) * _to);
+      }
+    }
+  return value;
 }

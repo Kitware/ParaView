@@ -32,9 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewSettingsManager.h"
 
 #include "pqActiveObjects.h"
-#include "pqActivePlotMatrixViewOptions.h"
-#include "pqActivePythonViewOptions.h"
-#include "pqActiveXYChartOptions.h"
 #include "pqApplicationCore.h"
 #include "pqBoxChartView.h"
 #include "pqComparativeRenderView.h"
@@ -58,37 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   : Superclass(parentObject)
 {
-  pqActiveXYChartOptions *xyChartOptions = new pqActiveXYChartOptions(this);
-  pqActiveXYChartOptions *xyBarChartOptions = new pqActiveXYChartOptions(this);
-  this->registerOptions(pqXYChartView::XYChartViewType(), xyChartOptions);
-  this->registerOptions(pqXYBarChartView::XYBarChartViewType(), xyBarChartOptions);
-
-  // register for bag & functional chart views.
-  pqActiveXYChartOptions *bagChartOptions = new pqActiveXYChartOptions(this);
-  this->registerOptions(pqXYBagChartView::XYBagChartViewType(),
-    bagChartOptions);
-  pqActiveXYChartOptions *functionalBagChartOptions = new pqActiveXYChartOptions(this);
-  this->registerOptions(pqXYFunctionalBagChartView::XYFunctionalBagChartViewType(),
-    functionalBagChartOptions);
-
-  // register for box chart views.
-  //pqActiveXYChartOptions *boxChartOptions = new pqActiveXYChartOptions(this);
-  //this->registerOptions(pqBoxChartView::chartViewType(), boxChartOptions);
-
-  // register for comparative views.
-  this->registerOptions(pqComparativeXYChartView::chartViewType(), xyChartOptions);
-  this->registerOptions(pqComparativeXYBarChartView::chartViewType(), xyBarChartOptions);
-
-  // register for plot matrix views.
-  pqActivePlotMatrixViewOptions *plotMatrixOptions = new pqActivePlotMatrixViewOptions(this);
-  this->registerOptions(pqPlotMatrixView::viewType(), plotMatrixOptions);
-
-#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
-  // register for python view
-  pqActivePythonViewOptions *pythonViewOptions = new pqActivePythonViewOptions(this);
-  this->registerOptions(pqPythonView::pythonViewType(), pythonViewOptions);
-#endif
-
   /// Add panes as plugins are loaded.
   QObject::connect(pqApplicationCore::instance()->interfaceTracker(),
     SIGNAL(interfaceRegistered(QObject*)),

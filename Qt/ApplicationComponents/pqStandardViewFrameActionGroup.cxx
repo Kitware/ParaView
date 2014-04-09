@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqViewFrame.h"
 #include "pqViewModuleInterface.h"
-#include "pqViewSettingsReaction.h"
 #include "vtkChart.h"
 #include "vtkContextScene.h"
 
@@ -268,11 +267,6 @@ void pqStandardViewFrameActionGroup::connectTitleBar(
       pqRenderViewSelectionReaction::SELECT_BLOCKS);
 
     }
-
-  QAction* optionsAction = frame->addTitleBarAction(
-    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options");
-  optionsAction->setObjectName("OptionsButton");
-  new pqViewSettingsReaction(optionsAction, view);
 }
 
 
