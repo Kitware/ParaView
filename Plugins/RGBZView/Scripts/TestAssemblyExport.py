@@ -9,7 +9,7 @@ pv_path = '/Users/seb/work/code/ParaView/build-ninja'
 
 from paraview.simple import *
 
-LoadPlugin(pv_path + '/lib/libRGBZView.dylib')
+# LoadPlugin(pv_path + '/lib/libRGBZView.dylib')
 
 s = Sphere()
 c = Cone()
