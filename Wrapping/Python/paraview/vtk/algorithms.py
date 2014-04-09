@@ -298,7 +298,11 @@ def eigenvector (narray) :
 
 def global_max(narray):
     "Returns the maximum value of an array of scalars/vectors/tensors among all process."
-    M = max(narray).astype(numpy.float64)
+    if len(narray) > 0:
+        M = max(narray).astype(numpy.float64)
+    else:
+        M = numpy.finfo(numpy.float64).min
+
     if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
        M_recv = numpy.array(M)
@@ -335,7 +339,11 @@ def global_mean (narray) :
 
 def global_min(narray):
     "Returns the minimum value of an array of scalars/vectors/tensors among all process."
-    m = min(narray).astype(numpy.float64)
+    if len(narray) > 0:
+        m = min(narray).astype(numpy.float64)
+    else:
+        m = numpy.finfo(numpy.float64).max
+
     if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI
        m_recv = numpy.array(m)

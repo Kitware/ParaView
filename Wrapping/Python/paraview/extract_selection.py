@@ -133,7 +133,22 @@ def ExecData(self, inputDS, selection, compositeDataSet = None):
       inputDS.GetAttributes(array_association),
       do, array_association)
 
+    # Global operations like global_max, etc require that all processes have
+    # all array names available on all processors.
+    # Sync all of the array names if using multiple processes.
+    # Use empty array by default, then override them with the data from this
+    # node.
     new_locals = {}
+    if vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1:
+        from mpi4py import MPI
+        allArrayNames = set([paraview.make_name_valid(name) for name in dsa.keys()])
+        arrayNames = MPI.COMM_WORLD.allgather(list(allArrayNames))
+        for rankNames in arrayNames:
+            for arrayName in rankNames:
+                allArrayNames.add(arrayName)
+        for arrayName in allArrayNames:
+            new_locals[arrayName] = []
+
     # define global variables for all the arrays.
     for arrayname in dsa.keys():
         name = paraview.make_name_valid(arrayname)
