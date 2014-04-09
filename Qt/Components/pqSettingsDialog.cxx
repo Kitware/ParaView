@@ -248,9 +248,9 @@ void pqSettingsDialog::onAccepted()
   // If there are any properties that needed to save their values in QSettings,
   // do that. Otherwise, save to the vtkSMSettings singleton.
   vtkSMSettings * settings = vtkSMSettings::GetInstance();
+  pqServer* server = pqActiveObjects::instance().activeServer();
   vtkNew<vtkSMProxyIterator> iter;
-  iter->SetSession(
-    pqActiveObjects::instance().activeServer()->session());
+  iter->SetSession(server->session());
   iter->SetModeToOneGroup();
   for (iter->Begin("settings"); !iter->IsAtEnd(); iter->Next())
     {
@@ -268,6 +268,13 @@ void pqSettingsDialog::onAccepted()
         this->saveInQSettings(key.toAscii().data(), smproperty);
         }
       }
+    }
+
+  // Save color palette settings
+  vtkSMProxy* paletteProxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette");
+  if (paletteProxy)
+    {
+    settings->SetProxySettings(paletteProxy);
     }
 
   // Disable buttons
@@ -292,7 +299,8 @@ void pqSettingsDialog::onRejected()
 //-----------------------------------------------------------------------------
 void pqSettingsDialog::onRestoreDefaults()
 {
-  vtkSMSession * session = pqActiveObjects::instance().activeServer()->session();
+  pqServer* server = pqActiveObjects::instance().activeServer();  
+  vtkSMSession * session = server->session();
 
   vtkNew<vtkSMProxyIterator> iter;
   iter->SetSession(session);
@@ -304,6 +312,12 @@ void pqSettingsDialog::onRestoreDefaults()
       {
       proxy->ResetPropertiesToXMLDefaults();
       }
+    }
+
+  vtkSMProxy* paletteProxy = server->proxyManager()->GetProxy("global_properties", "ColorPalette");
+  if (paletteProxy)
+    {
+    paletteProxy->ResetPropertiesToXMLDefaults();
     }
 }
 
