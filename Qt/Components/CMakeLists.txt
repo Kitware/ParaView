@@ -190,6 +190,8 @@ set (Module_SRCS
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.cxx
   pqKeyFrameTypeWidget.h
+  pqLabel.cxx
+  pqLabel.h
   pqLineSourceWidget.cxx
   pqLineSourceWidget.h
   pqLineWidget.cxx
@@ -456,6 +458,7 @@ set (Module_MOC_HDRS
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
+  pqLabel.h
   pqLineSourceWidget.h
   pqLineWidget.h
   pqLinksEditor.h

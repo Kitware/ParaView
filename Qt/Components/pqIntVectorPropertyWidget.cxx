@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 
 #include "pqIntRangeWidget.h"
+#include "pqLabel.h"
 #include "pqLineEdit.h"
 #include "pqProxyWidget.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
@@ -56,7 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QIntValidator>
-#include <QLabel>
 
 pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                                                      vtkSMProxy *smProxy,
@@ -101,10 +101,11 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
     if (useDocumentationForLabels)
       {
-      QLabel* label = new QLabel(
+      pqLabel* label = new pqLabel(
         QString("<p>%1</p>").arg(pqProxyWidget::documentationText(smproperty)));
       label->setWordWrap(true);
       label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+      label->connect(label, SIGNAL(clicked()), checkBox, SLOT(click()));
       layoutLocal->addWidget(label, /*stretch=*/1);
       }
     this->setShowLabel(false);
