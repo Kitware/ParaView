@@ -235,7 +235,7 @@
       <DoubleVectorProperty command="SetOrientationAxesLabelColor"
                             default_values="1 1 1"
                             name="OrientationAxesLabelColor"
-                            panel_widget="color_selector"
+                            panel_widget="color_selector_with_palette"
                             panel_visibility="advanced"
                             number_of_elements="3">
         <Hints>
@@ -245,7 +245,7 @@
       <DoubleVectorProperty command="SetOrientationAxesOutlineColor"
                             default_values="1 1 1"
                             name="OrientationAxesOutlineColor"
-                            panel_widget="color_selector"
+                            panel_widget="color_selector_with_palette"
                             panel_visibility="advanced"
                             number_of_elements="3">
         <Hints>
@@ -635,7 +635,7 @@
       <DoubleVectorProperty command="SetBackground"
                             default_values="0.329 0.349 0.427"
                             name="Background"
-                            panel_widget="color_selector"
+                            panel_widget="color_selector_with_palette"
                             number_of_elements="3">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
@@ -2799,7 +2799,7 @@
 
           <PropertyGroup label="Edge Styling">
             <Property name="EdgeColor"
-                      panel_widget="color_selector"
+                      panel_widget="color_selector_with_palette"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="Surface With Edges" />
           </PropertyGroup>

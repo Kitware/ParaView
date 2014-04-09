@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
-  vtkSMProxy *smProxy, vtkSMProperty *smProperty, QWidget *pWidget)
+  vtkSMProxy *smProxy, vtkSMProperty *smProperty, bool withPalette, QWidget *pWidget)
 : pqPropertyWidget(smProxy, pWidget)
 {
   PV_DEBUG_PANELS() << "pqColorSelectorPropertyWidget for a property with "
@@ -64,7 +64,17 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
     vbox->addWidget(label, /*stretch=*/1);
     }
 
-  pqColorChooserButtonWithPalettes *button = new pqColorChooserButtonWithPalettes(this);
+  pqColorChooserButton* button = NULL;
+  pqColorChooserButtonWithPalettes* paletteButton = NULL;
+  if (withPalette)
+    {
+    paletteButton = new pqColorChooserButtonWithPalettes(this);
+    button = paletteButton;
+    }
+  else
+    {
+    button = new pqColorChooserButton(this);
+    }
   button->setObjectName("ColorButton");
   button->setText(smProperty->GetXMLLabel());
   button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -86,10 +96,13 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
     qDebug("Currently, only SMProperty with 3 or 4 elements is supported.");
     }
 
-  // pqColorPaletteLinkHelper makes it possible to set this color to one of
-  // the colors in the application palette..
-  new pqColorPaletteLinkHelper(
-    button, smProxy, smProxy->GetPropertyName(smProperty));
+  if (withPalette)
+    {
+    // pqColorPaletteLinkHelper makes it possible to set this color to one of
+    // the colors in the application palette..
+    new pqColorPaletteLinkHelper(
+      paletteButton, smProxy, smProxy->GetPropertyName(smProperty));
+    }
   vbox->addWidget(button, 1);
 }
 

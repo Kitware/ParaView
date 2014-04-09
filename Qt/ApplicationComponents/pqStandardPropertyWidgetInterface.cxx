@@ -90,7 +90,13 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   // *** NOTE: When adding new types, please update the header documentation ***
   if(name == "color_selector")
     {
-    return new pqColorSelectorPropertyWidget(smProxy, smProperty);
+    bool withPalette = false;
+    return new pqColorSelectorPropertyWidget(smProxy, smProperty, withPalette);
+    }
+  else if(name == "color_selector_with_palette")
+    {
+    bool withPalette = true;
+    return new pqColorSelectorPropertyWidget(smProxy, smProperty, withPalette);
     }
   else if(name == "display_representation_selector")
     {

@@ -55,6 +55,7 @@ public:
   /// \li \c calculator : pqCalculatorWidget
   /// \li \c camera_manipulator : pqCameraManipulatorWidget
   /// \li \c color_selector : pqColorSelectorPropertyWidget
+  /// \li \c color_selector_with_palette : pqColorSelectorPropertyWidget with palette menu
   /// \li \c command_button : pqCommandButtonPropertyWidget
   /// \li \c display_representation_selector : pqDisplayRepresentationPropertyWidget
   /// \li \c double_range : pqDoubleRangeSliderPropertyWidget
