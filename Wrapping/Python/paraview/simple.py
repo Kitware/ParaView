@@ -1119,8 +1119,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     # Map min (0.00678) to blue, max (0.0288) to red
     SetDisplayProperties(LookupTable = MakeBlueToRedLT(0.00678, 0.0288))
     # Color by point array called Pres
-    SetDisplayProperties(ColorAttributeType = "POINT_DATA")
-    SetDisplayProperties(ColorArrayName = "Pres")
+    SetDisplayProperties(ColorArrayName = ("POINTS", "Pres"))
     Render()
 
 #==============================================================================

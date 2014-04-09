@@ -441,6 +441,10 @@ class Proxy(object):
             return self.__GetActiveCamera
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
+        # if ColorAttributeType is being used, warn.
+        if name == "ColorAttributeType":
+            paraview.print_error(\
+                "'ColorAttributeType' is deprecated. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
         # If not a property, see if SMProxy has the method
         try:
             proxyAttr = getattr(self.SMProxy, name)
@@ -2826,8 +2830,7 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     # Assign it to the representation
     rep.LookupTable = lt
     # Color by point array called Pres
-    rep.ColorAttributeType = 0 # point data
-    rep.ColorArrayName = "Pres"
+    rep.ColorArrayName = ("POINTS", "Pres")
     # Add to RGB points. These are tuples of 4 values. First one is
     # the scalar values, the other 3 the RGB values. This list has
     # 2 points: Pres: 0.00678, color: blue, Pres: 0.0288, color: red
