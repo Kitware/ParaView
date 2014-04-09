@@ -568,7 +568,6 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
       viewName == "IteratingView" ||
       viewName == "PrioritizingView" ||
       viewName == "RefiningView");
-    std::cout << viewName.toStdString() << std::endl;
     }
 
   if (this->Internals->View != _view)
