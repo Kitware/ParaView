@@ -227,8 +227,8 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     return repr;
     }
 
-  double time = vtkSMPropertyHelper(view, "ViewTime").GetAsDouble();
-  producer->UpdatePipeline(time);
+  // update pipeline to create correct representation type.
+  this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
 
   // Since no repr exists, create a new one if possible.
   if (vtkSMProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
@@ -330,6 +330,8 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
     return NULL;
     }
 
+  this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
+
   vtkSMSessionProxyManager* pxm = producer->GetSessionProxyManager();
   if (const char* preferredViewType = this->GetPreferredViewType(producer, outputPort))
     {
@@ -373,11 +375,6 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
     {
     // If there's no preferred view, check if active view can show the data. If
     // so, show it in that view.
-
-    // ensure that data is up-to-date.
-    double time = vtkSMPropertyHelper(view, "ViewTime").GetAsDouble();
-    producer->UpdatePipeline(time);
-
     if (view->CanDisplayData(producer, outputPort))
       {
       if (this->Show(producer, outputPort, view))
@@ -391,20 +388,24 @@ vtkSMViewProxy* vtkSMParaViewPipelineControllerWithRendering::ShowInPreferredVie
       }
     }
 
-  // No preferred view is found and active view cannot show the data,
-  // ParaView's default behavior is to create a render view, in that case.
-  vtkSmartPointer<vtkSMProxy> renderView;
-  renderView.TakeReference(pxm->NewProxy("views", "RenderView"));
-  if (vtkSMViewProxy* preferredView = vtkSMViewProxy::SafeDownCast(renderView))
+  // No preferred view is found and "view" is NULL or cannot show the data.
+  // ParaView's default behavior is to create a render view, in that case, if the
+  // render view can show the data.
+  if (view == NULL || strcmp(view->GetXMLName(), "RenderView") != 0)
     {
-    this->InitializeProxy(preferredView);
-    this->RegisterViewProxy(preferredView);
-    if (this->Show(producer, outputPort, preferredView) == NULL)
+    vtkSmartPointer<vtkSMProxy> renderView;
+    renderView.TakeReference(pxm->NewProxy("views", "RenderView"));
+    if (vtkSMViewProxy* preferredView = vtkSMViewProxy::SafeDownCast(renderView))
       {
-      vtkErrorMacro("Data cannot be shown in the defaulted render view!!");
-      return NULL;
+      this->InitializeProxy(preferredView);
+      this->RegisterViewProxy(preferredView);
+      if (this->Show(producer, outputPort, preferredView) == NULL)
+        {
+        vtkErrorMacro("Data cannot be shown in the defaulted render view!!");
+        return NULL;
+        }
+      return preferredView;
       }
-    return preferredView;
     }
 
   return NULL;
@@ -428,6 +429,21 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
     }
 
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
+    vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
+{
+  if (!producer)
+    {
+    return;
+    }
+
+  // Update using view time, or timekeeper time.
+  double time = view? vtkSMPropertyHelper(view, "ViewTime").GetAsDouble() :
+    vtkSMPropertyHelper(this->FindTimeKeeper(producer->GetSession()), "Time").GetAsDouble();
+  producer->UpdatePipeline(time);
 }
 
 //----------------------------------------------------------------------------

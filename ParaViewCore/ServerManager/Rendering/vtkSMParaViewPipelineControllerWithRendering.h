@@ -110,6 +110,9 @@ protected:
   vtkSMParaViewPipelineControllerWithRendering();
   ~vtkSMParaViewPipelineControllerWithRendering();
 
+  virtual void UpdatePipelineBeforeDisplay(
+    vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
+
 private:
   vtkSMParaViewPipelineControllerWithRendering(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
   void operator=(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
