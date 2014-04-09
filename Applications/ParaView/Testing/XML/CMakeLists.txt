@@ -217,7 +217,6 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
               --enable-bt
               -dr
               --enable-streaming
-              --disable-light-kit
               --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${tname})
@@ -231,7 +230,6 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
          --enable-bt
          -dr
          --enable-streaming
-         --disable-light-kit
          --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${tname})

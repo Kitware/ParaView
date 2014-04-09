@@ -81,12 +81,6 @@ public:
   vtkSetMacro(CurrentImageThreshold, int);
   vtkGetMacro(CurrentImageThreshold, int);
 
-  // Description
-  // Get/Set whether lightkit is disabled by default. This is useful for
-  // testing.
-  vtkGetMacro(DisableLightKit, int);
-  vtkSetMacro(DisableLightKit, int);
-
   // Description:
   // These flags are used for testing multi-clients configurations.
   vtkGetMacro(TestMaster, int);
@@ -117,7 +111,6 @@ protected:
 
   int ExitAppWhenTestsDone;
   int DisableRegistry;
-  int DisableLightKit;
   int CurrentImageThreshold;
   int TestMaster;
   int TestSlave;

@@ -75,7 +75,6 @@ pqOptions::pqOptions()
   this->DataDirectory = 0;
   this->ExitAppWhenTestsDone = 0;
   this->ServerResourceName = 0;
-  this->DisableLightKit = 0;
   this->CurrentImageThreshold = 12;
   this->PythonScript = 0;
   this->TestMaster = 0;
@@ -116,10 +115,6 @@ void pqOptions::Initialize()
   this->AddArgument("--server", "-s",
     &this->ServerResourceName,
     "Set the name of the server resource to connect with when the client starts.");
-
-  this->AddBooleanArgument("--disable-light-kit", 0,
-    &this->DisableLightKit,
-    "When present, disables light kit by default. Useful for dashboard tests.");
 
   this->AddCallback("--test-script", NULL,
     &::AddTestScript, this, "Add test script. Can be used multiple times to "
