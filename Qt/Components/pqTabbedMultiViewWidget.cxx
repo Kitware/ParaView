@@ -526,6 +526,17 @@ void pqTabbedMultiViewWidget::cleanupAfterCapture()
 }
 
 //-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::toggleWidgetDecoration()
+{
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
+    this->Internals->TabWidget->currentWidget());
+  if (widget)
+    {
+    widget->setDecorationsVisible(!widget->isDecorationsVisible());
+    }
+}
+
+//-----------------------------------------------------------------------------
 QSize pqTabbedMultiViewWidget::clientSize() const
 {
   if (this->Internals->TabWidget->currentWidget())

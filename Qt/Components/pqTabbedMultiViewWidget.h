@@ -84,6 +84,9 @@ public slots:
   /// toggles fullscreen state.
   virtual void toggleFullScreen();
 
+  /// toggles decoration visibility on the current widget
+  virtual void toggleWidgetDecoration();
+
   /// Locks the maximum size for each view-frame to the given size.
   /// Use empty QSize() instance to indicate no limits.
   virtual void lockViewSize(const QSize&);

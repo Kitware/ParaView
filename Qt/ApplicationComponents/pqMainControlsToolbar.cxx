@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMainControlsToolbar.h"
 #include "ui_pqMainControlsToolbar.h"
 
+#include "pqAutoApplyReaction.h"
+#include "pqDataQueryReaction.h"
 #include "pqHelpReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqSaveDataReaction.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
 #include "pqUndoRedoReaction.h"
-#include "pqAutoApplyReaction.h"
-#include "pqDataQueryReaction.h"
 
 //-----------------------------------------------------------------------------
 void pqMainControlsToolbar::constructor()
@@ -56,6 +56,3 @@ void pqMainControlsToolbar::constructor()
   new pqAutoApplyReaction(ui.actionAutoApply);
   new pqDataQueryReaction(ui.actionQuery);
 }
-
-
-
