@@ -98,7 +98,8 @@ void pqEditColorMapReaction::editColorMap()
         }
 
       // Let the user pick a new color.
-      color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget());
+      color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget(),
+        "Pick Solid Color", QColorDialog::DontUseNativeDialog);
       if(color.isValid())
         {
         // Set the properties to the new color.

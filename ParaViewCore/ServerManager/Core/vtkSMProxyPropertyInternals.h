@@ -400,3 +400,4 @@ public:
     }
 };
 #endif
+// VTK-HeaderTest-Exclude: vtkSMProxyPropertyInternals.h

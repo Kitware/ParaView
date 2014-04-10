@@ -113,7 +113,7 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     QAction* toggle = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqSelectChartToggle16.png"),
       "Toggle selection");
-    toggle->setObjectName("actionChartMinus");
+    toggle->setObjectName("actionChartToggle");
     toggle->setCheckable(true);
     toggle->setData(QVariant(vtkContextScene::SELECTION_TOGGLE));
 

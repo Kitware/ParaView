@@ -104,8 +104,4 @@
   <!-- Make sure the clip filter is selected so the widget is visible -->
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,54,11,/0:0/1:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,54,11,/0:0/1:0/0:0" />
-
-  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QColorDialog0" command="setChosenColor" arguments="170,0,0" />
-  <pqevent object="pqClientMainWindow/1QColorDialog0" command="done" arguments="1" />
 </pqevents>
