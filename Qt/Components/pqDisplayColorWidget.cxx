@@ -398,8 +398,8 @@ void pqDisplayColorWidget::refreshColorArrayNames()
 
   for (unsigned int cc=0, max = domain->GetNumberOfStrings(); cc < max; cc++)
     {
-    int icon_association = domain->GetFieldAssociation(cc);
-    int association = domain->GetDomainAssociation(cc);
+    int icon_association = domain->GetDomainAssociation(cc);
+    int association = domain->GetFieldAssociation(cc);
     QString name = domain->GetString(cc);
     QString label = name;
     if (domain->IsArrayPartial(cc))

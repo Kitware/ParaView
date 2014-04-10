@@ -289,6 +289,7 @@ vtkSMArrayListDomain::vtkSMArrayListDomain()
   this->InputDomainName = 0;
   this->NoneString = 0;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
+  this->PickFirstAvailableArrayByDefault = true;
 }
 
 //---------------------------------------------------------------------------
@@ -653,14 +654,12 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
 
   const vtkSMArrayListDomainArrayInformation* info =
     this->ALDInternals->FindAttribute(this->AttributeType);
-  // The question is whether to just pick the first available array when the
-  // "chosen" attribute is not available or not. Opting for not. This keeps us
-  // from ending up scalar coloring random data arrays by default. This logic
-  // may need to be reconsidered.
-  //if (!info && this->ALDInternals->DomainValues.size() > 0)
-  //  {
-  //  info = &this->ALDInternals->DomainValues[0];
-  //  }
+  if (info == NULL &&
+    this->ALDInternals->DomainValues.size() > 0 &&
+    this->PickFirstAvailableArrayByDefault == true)
+    {
+    info = &this->ALDInternals->DomainValues[0];
+    }
   if (info)
     {
     if (svp->GetNumberOfElements() == 5)

@@ -150,9 +150,13 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
       }
     if (required_type == CELL && vtkSMInputArrayDomain::AutomaticPropertyConversion)
       {
+      // this a POINT array, however since AutomaticPropertyConversion is ON,
+      // this array can is acceptable as a CELL array. In other words, caller
+      // can pretend this array is a CELL array and VTK pipeline will take care
+      // of it.
       if (acceptable_as_type)
         {
-        *acceptable_as_type = POINT;
+        *acceptable_as_type = CELL;
         }
       return true;
       }
@@ -164,9 +168,13 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
       }
     if (required_type == POINT && vtkSMInputArrayDomain::AutomaticPropertyConversion)
       {
+      // this a CELL array, however since AutomaticPropertyConversion is ON,
+      // this array can is acceptable as a POINT array. In other words, caller
+      // can pretend this array is a POINT array and VTK pipeline will take care
+      // of it.
       if (acceptable_as_type)
         {
-        *acceptable_as_type = CELL;
+        *acceptable_as_type = POINT;
         }
       return true;
       }

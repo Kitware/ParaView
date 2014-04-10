@@ -369,8 +369,8 @@ void pqPipelineContextMenuBehavior::buildColorFieldsMenu(
   // keeps the menu simple and code even simpler :).
   for (unsigned int cc=0, max = domain->GetNumberOfStrings(); cc < max; cc++)
     {
-    int icon_association = domain->GetFieldAssociation(cc);
-    int association = domain->GetDomainAssociation(cc);
+    int association = domain->GetFieldAssociation(cc);
+    int icon_association = domain->GetDomainAssociation(cc);
     QString name = domain->GetString(cc);
 
     QIcon& icon = (icon_association == vtkDataObject::CELL)?

@@ -101,11 +101,29 @@ public:
   int IsArrayPartial(unsigned int idx);
 
   // Description:
-  // Get field association for the array.
+  // Get field association for the array. When
+  // vtkSMInputArrayDomain::AutomaticPropertyConversion is ON, this is not the
+  // true association for a particular array, but what the target filter is
+  // expecting. Thus use this to set the value on the property.
+  // To correctly show icons in UI, use GetDomainAssociation().
   int GetFieldAssociation(unsigned int idx);
 
   // Description:
-  // Get desired association of the current domain
+  // Get the true field association for the array. This is same as
+  // GetFieldAssociation() except when
+  // vtkSMInputArrayDomain::AutomaticPropertyConversion is ON. In that case,
+  // this may be different. e.g. let's say Pressure is a point array on the
+  // input, however this filter only works with cell array. In that case, since
+  // AutomaticPropertyConversion is ON, vtkPVPostFilter is going to
+  // automatically convert the point array Pressure to a cell array for the
+  // filter. Now in this case, the SetInputArrayToProcess property on the filter
+  // must be set to ask a "cell" array named Pressure, despite the fact that
+  // there's no such cell array. And the UI needs to show the "Pressure" as a
+  // point array, since that's what the user is expecting. In this case,
+  // GetFieldAssociation() is going to return "CELL" for the "Pressure", while
+  // GetDomainAssociation() is going to return "POINT". Thus, use
+  // GetFieldAssociation() for setting the property value, but use
+  // GetDomainAssociation() for the icon.
   int GetDomainAssociation(unsigned int idx);
 
   // Description:
@@ -212,6 +230,11 @@ protected:
 
   char* InputDomainName;
   char* NoneString;
+
+  // Currently, used by vtkSMRepresentedArrayListDomain to avoid picking just an
+  // arbitrary array for scalar coloring. Need to rethink how this should be
+  // done cleanly.
+  bool PickFirstAvailableArrayByDefault;
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented
   void operator=(const vtkSMArrayListDomain&); // Not implemented

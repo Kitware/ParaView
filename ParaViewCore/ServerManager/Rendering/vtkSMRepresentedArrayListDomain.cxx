@@ -25,6 +25,11 @@ vtkStandardNewMacro(vtkSMRepresentedArrayListDomain);
 vtkSMRepresentedArrayListDomain::vtkSMRepresentedArrayListDomain()
 {
   this->ObserverId = 0;
+  // The question is whether to just pick the first available array when the
+  // "chosen" attribute is not available or not. Opting for not. This keeps us
+  // from ending up scalar coloring random data arrays by default. This logic
+  // may need to be reconsidered.
+  this->PickFirstAvailableArrayByDefault = false;
 }
 
 //----------------------------------------------------------------------------
