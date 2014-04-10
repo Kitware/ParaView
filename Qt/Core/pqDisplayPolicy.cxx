@@ -57,17 +57,6 @@ pqDisplayPolicy::~pqDisplayPolicy()
 }
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqDisplayPolicy::createPreferredRepresentation(
-  pqOutputPort* opPort, pqView* view, bool dont_create_view) const
-{
-  (void) opPort;
-  (void) view;
-  (void) dont_create_view;
-  abort();
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
 pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
   pqOutputPort* opPort, pqView* view, bool visible) const
 {

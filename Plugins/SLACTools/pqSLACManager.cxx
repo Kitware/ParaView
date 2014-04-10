@@ -785,10 +785,7 @@ void pqSLACManager::createPlotOverZ()
   plotFilter->updatePipeline();
 
   // Make representation
-  pqDataRepresentation *repr;
-  repr = displayPolicy->createPreferredRepresentation(
-                                 plotFilter->getOutputPort(0), plotView, false);
-  repr->setVisible(true);
+  displayPolicy->setRepresentationVisibility(plotFilter->getOutputPort(0), plotView, true);
 
   this->updatePlotField();
 

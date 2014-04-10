@@ -129,10 +129,8 @@ void pqSierraPlotToolsDataLoadManager::setupPipeline()
     meshReaderProxy->UpdateVTKObjects();
 
     // Make representations.
-    pqDataRepresentation *repr;
-    repr = displayPolicy->createPreferredRepresentation(
-                          meshReader->getOutputPort(0), meshView, false);
-    repr->setVisible(true);
+    displayPolicy->setRepresentationVisibility(
+      meshReader->getOutputPort(0), meshView, true);
 
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.

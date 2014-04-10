@@ -57,36 +57,6 @@ public:
   pqDisplayPolicy(QObject* p);
   virtual ~pqDisplayPolicy();
 
-  /// Returns a new display for the given (source,view) pair, or NULL 
-  /// on failure. If the \c view is not a preferred view to display the source
-  /// this method will attempt to create a new view of the preferred type
-  /// and create a display for that view. In other words, the argument \c view
-  /// is merely a suggestion, it's not necessary that the new display will
-  /// be added to the same view. 
-  /// In the current implementation the rules as as under:
-  /// <ul>
-  /// <li>If \c dont_create_view is true and \c view is non-null, then a display
-  ///     is created for the given view and returned. If \c view is null, then
-  ///     NULL is returned, since we can't create a new view. </li>
-  /// <li> If \c dont_create_view is false and \c view is non-null:
-  ///     <ul>
-  ///     <li>If \c view is of preferred type, we added display to \c view itself.
-  ///     </li>
-  ///     <li>If \c view is not of preferred type, 
-  ///         we create a a new view of the preferred type.
-  ///     </li>
-  ///     </ul>
-  /// </li>
-  /// <li> If \c dont_create_view is false and view is null, then a new view of 
-  ///      the preferred type is created and the display added to that view.
-  /// </li>
-  /// </ul>
-  /// or not of the type preferred by the source, it may create a new view and 
-  /// add the displayto new view. \c dont_create_view can be used to 
-  /// override this behavior.
-  virtual pqDataRepresentation* createPreferredRepresentation(
-    pqOutputPort* port, pqView* view, bool dont_create_view) const;
-
   /// Set the visibility of the source in the given view. 
   /// Current implementation creates a new display for the source, if possible, 
   /// if none exists. If view is NULL, then a new view of "suitable" type will 
