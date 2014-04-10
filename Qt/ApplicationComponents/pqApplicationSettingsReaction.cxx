@@ -62,4 +62,3 @@ void pqApplicationSettingsReaction::showApplicationSettingsDialog()
   pqApplicationSettingsReaction::Dialog->show();
   pqApplicationSettingsReaction::Dialog->raise();
 }
-

@@ -103,6 +103,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       {
       pqLabel* label = new pqLabel(
         QString("<p>%1</p>").arg(pqProxyWidget::documentationText(smproperty)));
+      label->setObjectName("CheckBoxLabel");
       label->setWordWrap(true);
       label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
       label->connect(label, SIGNAL(clicked()), checkBox, SLOT(click()));
