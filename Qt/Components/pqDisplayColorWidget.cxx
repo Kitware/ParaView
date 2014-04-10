@@ -41,11 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMArrayListDomain.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
 #include <QComboBox>
@@ -120,6 +123,22 @@ protected:
       // we could now respect some application setting to determine if the LUT is
       // to be reset.
       vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy, true);
+      }
+
+    // Update scalar bars.
+    vtkNew<vtkSMTransferFunctionManager> tmgr;
+    pqDisplayColorWidget* widget = qobject_cast<pqDisplayColorWidget*>(this->objectQt());
+    vtkSMViewProxy* view = widget->viewProxy();
+    switch (vtkPVGeneralSettings::GetInstance()->GetScalarBarMode())
+      {
+    case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
+      tmgr->UpdateScalarBars(view, vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+      break;
+    case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
+      tmgr->UpdateScalarBars(view, vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+      vtkSMPVRepresentationProxy::SetScalarBarVisibility(
+        reprProxy, view, true);
+      break;
       }
     END_UNDO_SET();
     }
@@ -223,6 +242,17 @@ void pqDisplayColorWidget::renderActiveView()
     this->Representation->renderViewEventually();
     }
 }
+
+//-----------------------------------------------------------------------------
+vtkSMViewProxy* pqDisplayColorWidget::viewProxy() const
+{
+  if (this->Representation)
+    {
+    return this->Representation->getViewProxy();
+    }
+  return NULL;
+}
+
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
 {

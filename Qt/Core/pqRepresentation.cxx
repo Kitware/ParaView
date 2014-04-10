@@ -95,6 +95,13 @@ pqView* pqRepresentation::getView() const
 }
 
 //-----------------------------------------------------------------------------
+vtkSMViewProxy* pqRepresentation::getViewProxy() const
+{
+  return (this->Internal->View?
+    this->Internal->View->getViewProxy() : NULL);
+}
+
+//-----------------------------------------------------------------------------
 void pqRepresentation::renderView(bool force)
 {
   if (this->Internal->View)

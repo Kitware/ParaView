@@ -38,10 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QWidget>
 
-class QComboBox;
 class pqDataRepresentation;
 class pqScalarsToColors;
+class QComboBox;
 class vtkEventQtSlotConnect;
+class vtkSMViewProxy;
 
 /// pqDisplayColorWidget is a widget that can be used to select the array to
 /// with for representations (also known as displays). It comprises of two
@@ -70,6 +71,9 @@ public:
   /// Get/Set the component number (-1 == magnitude).
   int componentNumber() const;
   void setComponentNumber(int);
+
+  /// Returns the view proxy corresponding to the set representation, if any.
+  vtkSMViewProxy* viewProxy() const;
 
 signals:
   /// fired to indicate the array-name changed.
