@@ -76,7 +76,7 @@ pqChangeInputDialog::pqChangeInputDialog(
 
   pqServerManagerModel *smModel =
     pqApplicationCore::instance()->getServerManagerModel();
-  this->Internals->PipelineModel = new pqPipelineModel(*smModel);
+  this->Internals->PipelineModel = new pqPipelineModel(*smModel, this);
   this->Internals->PipelineModel->setEditable(false);
   this->Internals->pipelineView->setModel(this->Internals->PipelineModel);
 

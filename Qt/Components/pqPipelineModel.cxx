@@ -81,7 +81,7 @@ public:
     LAST
     };
 
-  vtkNew<vtkSMParaViewPipelineControllerWithRendering> Controller;
+  static vtkNew<vtkSMParaViewPipelineControllerWithRendering> Controller;
 public:
   pqPipelineModel* Model;
   pqPipelineModelDataItem* Parent;
@@ -364,6 +364,8 @@ private:
     return GEOMETRY;
     }
 };
+
+vtkNew<vtkSMParaViewPipelineControllerWithRendering> pqPipelineModelDataItem::Controller;
 
 //-----------------------------------------------------------------------------
 class pqPipelineModelInternal
