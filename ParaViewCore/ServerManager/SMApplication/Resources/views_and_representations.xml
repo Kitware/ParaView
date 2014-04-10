@@ -2175,14 +2175,6 @@
       </IntVectorProperty>
     </ContextViewProxy>
     <!-- ================================================================== -->
-    <!--TODO: Address renames in vtkPVPlotMatrixView
-        ScatterPlotTitle -> Title
-        TitleFont -> TitleFontFamily, FontSize, Bold, Italic
-        SetGutter -> SetGutterX, SetGutterY
-        SetBorders -> SetBorderLeft, Bottom, Right, Top
-        LabelFont -> LabelFontFamily, FontSize, Bold, Italic
-
-    -->
     <PlotMatrixViewProxy base_proxygroup="views"
                          base_proxyname="XYChartViewTitle"
                          class="vtkPVPlotMatrixView"
@@ -5764,18 +5756,9 @@
                               base_proxyname="XYChartRepresentationBase"
                               class="vtkXYChartRepresentation"
                               name="XYChartRepresentation"
-                              processes="client|dataserver|renderserver">
+                              processes="client|dataserver|renderserver"
+                              post_creation="SetChartTypeToLine">
       <Documentation>Representation used by XYChartView.</Documentation>
-      <IntVectorProperty command="SetChartType"
-                         default_values="0"
-                         name="ChartType"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <EnumerationDomain name="enum">
-          <Entry text="Line" value="0" />
-          <Entry text="Bar" value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
       <StringVectorProperty command="SetLineStyle"
                             clean_command="ClearLineStyles"
                             element_types="2 0"
@@ -5853,21 +5836,9 @@
                               base_proxyname="XYChartRepresentationBase"
                               class="vtkXYChartRepresentation"
                               name="XYBarChartRepresentation"
-                              processes="client|dataserver|renderserver">
+                              processes="client|dataserver|renderserver"
+                              post_creation="SetChartTypeToBar">
       <Documentation>Representation used by XYBarChartView.</Documentation>
-      <IntVectorProperty command="SetChartType"
-                         default_values="2"
-                         name="ChartType"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <EnumerationDomain name="enum">
-          <Entry text="Line" value="0" />
-          <Entry text="Bar" value="2" />
-          <Entry text="Bag" value="4" />
-          <Entry text="FunctionalBag" value="5" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
       <PropertyGroup label="Series Parameters"
                      panel_widget="SeriesEditor"
                      panel_visibility="default" >
@@ -6103,7 +6074,8 @@
     <!-- =================================================================== -->
     <ChartRepresentationProxy class="vtkXYChartRepresentation"
                               name="XYFunctionalBagChartRepresentation"
-                              processes="client|dataserver|renderserver">
+                              processes="client|dataserver|renderserver"
+                              post_creation="SetChartTypeToFunctionalBag">
       <Documentation>Representation used by XYFunctionalBagChartView.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">

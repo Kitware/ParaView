@@ -52,6 +52,12 @@ public:
   // Default is vtkChart::LINE.
   vtkSetMacro(ChartType, int);
   vtkGetMacro(ChartType, int);
+  void SetChartTypeToLine() {SetChartType(0);}
+  void SetChartTypeToPoints() {SetChartType(1);}
+  void SetChartTypeToBar() {SetChartType(2);}
+  void SetChartTypeToStacked() {SetChartType(3);}
+  void SetChartTypeToBag() {SetChartType(4);}
+  void SetChartTypeToFunctionalBag() {SetChartType(5);}
 
   // Description:
   // Returns the vtkChartXY instance from the view to which this representation

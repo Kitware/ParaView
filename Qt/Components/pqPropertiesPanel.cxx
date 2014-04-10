@@ -539,37 +539,6 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updateViewPanel (pqView* _view)
 {
-  QString viewName;
-  bool propertiesInPanel = false;
-  if (_view)
-    {
-    viewName = _view->getViewProxy()->GetXMLName();
-    propertiesInPanel = (
-      viewName == "RenderView" ||
-      viewName == "ComparativeRenderView" ||
-      viewName == "MultiSlice" ||
-      /*XY Charts*/
-      viewName == "XYBagChartView" ||              // 2
-      viewName == "XYBarChartView" ||              // 2
-      viewName == "ComparativeXYBarChartView" ||   // 2
-      viewName == "XYFunctionalBagChartView" ||    // 2
-      viewName == "XYChartView" ||                 // 4
-      viewName == "ComparativeXYChartView" ||      // 4
-
-      /*1D Chart*/
-      viewName == "BoxChartView" ||                // 1?
-      viewName == "PythonView" ||
-      viewName == "PlotMatrixView" ||
-
-      /*Plugins*/
-      viewName == "QuadView" ||
-      viewName == "MantaView" ||
-      /*StreamingView plugin*/
-      viewName == "IteratingView" ||
-      viewName == "PrioritizingView" ||
-      viewName == "RefiningView");
-    }
-
   if (this->Internals->View != _view)
     {
     // The view has changed.
@@ -583,7 +552,7 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
       }
     this->Internals->View = _view;
     emit this->viewChanged(_view);
-    if (_view && propertiesInPanel)
+    if (_view)
       {
       // create the widgets for this view
       pqProxyWidgets* widgets = new pqProxyWidgets(_view, this);
@@ -595,7 +564,7 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
       }
     }
 
-  if (_view && propertiesInPanel)
+  if (_view)
     {
     // update the label and show the widgets
     vtkSMViewProxy* proxy = _view->getViewProxy();

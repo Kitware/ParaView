@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMStateVersionController.h"
 
+#include "vtkAxis.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -21,12 +22,31 @@
 
 #include <set>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <vtk_pugixml.h>
 #include <vtksys/ios/sstream>
 
+using namespace pugi;
+using namespace std;
+
 namespace
 {
+  string toString(int i)
+  {
+    ostringstream ostr;
+    ostr << i;
+    return ostr.str();
+  }
+
+  string toString(double d)
+  {
+    ostringstream ostr;
+    ostr << d;
+    return ostr.str();
+  }
+
+
   class vtkSMVersion
     {
     public:
@@ -134,9 +154,22 @@ namespace
     return true;
     }
 
-  //===========================================================================
-  bool Process_4_1_to_4_2(pugi::xml_document &document)
-    {
+//===========================================================================
+struct Process_4_1_to_4_2
+{
+  static const char* const NAME;
+  static const char* const VALUE;
+
+  bool operator()(xml_document &document)
+  {
+    bool ret =
+      ConvertRepresentationColorArrayName(document) &&
+      ConvertChartNodes(document);
+    return ret;
+  }
+
+  static bool ConvertRepresentationColorArrayName(xml_document &document)
+  {
     //-------------------------------------------------------------------------
     // Convert ColorArrayName and ColorAttributeType properties to new style.
     // Since of separate properties, we now have just 1 ColorArrayName property
@@ -146,14 +179,14 @@ namespace
     pugi::xpath_node_set representation_elements =
       document.select_nodes("//ServerManagerState/Proxy[@group='representations']");
     for (pugi::xpath_node_set::const_iterator iter = representation_elements.begin();
-      iter != representation_elements.end(); ++iter)
+         iter != representation_elements.end(); ++iter)
       {
       // select ColorAttributeType and ColorArrayName properties for each
       // representation.
       std::string colorArrayName;
       if (pugi::xpath_node nameElement = iter->node().select_single_node(
-          "//Property[@name='ColorArrayName' and @number_of_elements='1']"
-          "/Element[@index='0' and @value]"))
+            "//Property[@name='ColorArrayName' and @number_of_elements='1']"
+            "/Element[@index='0' and @value]"))
         {
         colorArrayName = nameElement.node().attribute("value").value();
 
@@ -163,8 +196,8 @@ namespace
 
       std::string attributeType("");
       if (pugi::xpath_node typeElement = iter->node().select_single_node(
-          "//Property[@name='ColorAttributeType' and @number_of_elements='1']"
-          "/Element[@index='0' and @value]"))
+            "//Property[@name='ColorAttributeType' and @number_of_elements='1']"
+            "/Element[@index='0' and @value]"))
         {
         attributeType = typeElement.node().attribute("value").value();
 
@@ -175,12 +208,12 @@ namespace
         {
         vtksys_ios::ostringstream stream;
         stream << "<Property name=\"ColorArrayName\" number_of_elements=\"5\">\n"
-          << "   <Element index=\"0\" value=\"\" />\n"
-          << "   <Element index=\"1\" value=\"\" />\n"
-          << "   <Element index=\"2\" value=\"\" />\n"
-          << "   <Element index=\"3\" value=\"" << attributeType.c_str() << "\" />\n"
-          << "   <Element index=\"4\" value=\"" << colorArrayName.c_str()<< "\" />\n"
-          << "</Property>\n";
+               << "   <Element index=\"0\" value=\"\" />\n"
+               << "   <Element index=\"1\" value=\"\" />\n"
+               << "   <Element index=\"2\" value=\"\" />\n"
+               << "   <Element index=\"3\" value=\"" << attributeType.c_str() << "\" />\n"
+               << "   <Element index=\"4\" value=\"" << colorArrayName.c_str()<< "\" />\n"
+               << "</Property>\n";
         std::string buffer = stream.str();
         if (!iter->node().append_buffer(buffer.c_str(), buffer.size()))
           {
@@ -219,7 +252,264 @@ namespace
 
     //-------------------------------------------------------------------------
     return true;
-    }
+  }
+
+  static bool ConvertChartNodes(xml_document &document)
+  {
+    const char* axisProperties3[] = {"AxisColor",
+                                     "AxisGridColor",
+                                     "AxisLabelColor",
+                                     "AxisTitleColor"};
+    const char* rangeProperties1[] = {"LeftAxisRange",
+                                      "BottomAxisRange",
+                                      "RightAxisRange",
+                                      "TopAxisRange"};
+    const char* axisProperties4[] = {"AxisLabelFont",
+                                     "AxisTitleFont"};
+    const char* fontProperties1[] = {"ChartTitleFont",
+                                     // next properties are generated from the
+                                     // previous array axisProperties4[]
+                                     "LeftAxisLabelFont",
+                                     "BottomAxisLabelFont",
+                                     "RightAxisLabelFont",
+                                     "TopAxisLabelFont",
+                                     "LeftAxisTitleFont",
+                                     "BottomAxisTitleFont",
+                                     "RightAxisTitleFont",
+                                     "TopAxisTitleFont"};
+    const char* axisProperties1[] = {"AxisLabelNotation",
+                                     "AxisLabelPrecision",
+                                     "AxisLogScale",
+                                     "AxisTitle",
+                                     "AxisUseCustomLabels",
+                                     "AxisUseCustomRange",
+                                     "ShowAxisGrid",
+                                     "ShowAxisLabels"};
+    return
+      ConvertChartNode(document, axisProperties3,
+                       sizeof(axisProperties3)/sizeof(axisProperties3[0]), 3,
+                       4, validOutputForXYChart, axisNodeName) &&
+      ConvertChartNode(document, rangeProperties1,
+                       sizeof(rangeProperties1)/sizeof(rangeProperties1[0]), 1,
+                       2, validOutputTrue, rangeNodeName) &&
+      // the order of execution of the next two functions is important
+      ConvertChartNode(document, axisProperties4,
+                       sizeof(axisProperties4)/sizeof(axisProperties4[0]), 4,
+                       4, validOutputForXYChart, axisNodeName) &&
+      ConvertChartNode(document, fontProperties1,
+                       sizeof(fontProperties1)/sizeof(fontProperties1[0]), 1,
+                       4, validOutputTrue, fontNodeName) &&
+      ConvertChartNode(document, axisProperties1,
+                       sizeof(axisProperties1)/sizeof(axisProperties1[0]), 1,
+                       4, validOutputForXYChart, axisNodeName);
+  }
+
+
+  //---------------------------------------------------------------------------
+  static bool ConvertChartNode(
+    xml_document &document, const char* property[], int numberOfProperties,
+    int numberOfComponents,
+    int numberOfOutputs,
+    bool (*validOutput)(xml_node viewNode, int outputIndex),
+    string (*nodeName) (xml_node oldNode, int outputIndex))
+  {
+    if (numberOfProperties <= 0)
+      {
+      return true;
+      }
+    string query("//ServerManagerState/Proxy[@group='views']/"
+                 "Property[@name='");
+    query = query + property[0] + "'";;
+    for (int i = 1; i < numberOfProperties; ++i)
+      {
+      query = query + "or @name='" + property[i] + "'";
+      }
+    query += "]";
+    xpath_node_set nodes =
+      document.select_nodes(query.c_str());
+    for (xpath_node_set::const_iterator it = nodes.begin();
+         it != nodes.end(); ++it)
+      {
+      xml_node oldNode = it->node();
+      xml_node viewNode = oldNode.parent();
+      for (int i = 0; i < numberOfOutputs; ++i)
+        {
+        if (validOutput (viewNode, i))
+          {
+          CreateChartPropertyNode(viewNode, oldNode, numberOfComponents, i,
+                                  nodeName);
+          }
+        }
+      viewNode.remove_child(oldNode);
+      }
+    return true;
+  }
+
+  static void CreateChartPropertyNode(
+    xml_node& viewNode, const xml_node& oldNode,
+    int numberOfComponents, int outputIndex,
+    string (*nodeName) (xml_node oldNode, int outputIndex))
+  {
+    string newNameAttr = nodeName(oldNode, outputIndex);
+    xml_node newNode = CreatePropertyNode (
+      viewNode, oldNode, newNameAttr, numberOfComponents);
+    for (int i = 0; i < numberOfComponents; ++i)
+      {
+      CreateChartElementNode(newNode, oldNode,
+                            numberOfComponents, outputIndex, i);
+      }
+  }
+
+  static void CreateChartElementNode(
+    xml_node& newNode,
+    const xml_node& oldNode, int numberOfComponents,
+    int outputIndex, int componentIndex)
+  {
+    xml_node oldElement = oldNode.select_single_node(
+      (string("Element[@index='") +
+       toString(outputIndex * numberOfComponents + componentIndex) +
+       "']").c_str()).node();
+    const char* value = oldElement.attribute(VALUE).value();
+    CreateElementNode(newNode, componentIndex, value);
+  }
+
+  //---------------------------------------------------------------------------
+
+  static string rangeNodeName(xml_node oldNode, int i)
+  {
+    return string(oldNode.attribute(NAME).value()) + rangeString(i);
+  }
+
+  static string axisNodeName(xml_node oldNode, int i)
+  {
+    return string(axisString(i)) + oldNode.attribute(NAME).value();
+  }
+
+  static string fontNodeName(xml_node oldNode, int i)
+  {
+    string oldNodeName = oldNode.attribute(NAME).value();
+    switch (i)
+      {
+      case 0:
+        return oldNodeName + "Family";
+      case 1:
+        return oldNodeName + "Size";
+      case 2:
+        return replaceFont(&oldNodeName, "Bold");
+      case 3:
+        return replaceFont(&oldNodeName, "Italic");
+      default:
+        return oldNodeName;
+      }
+  }
+
+  static string replaceFont(string* oldNodeName, const char*modifier)
+  {
+    const char* FONT = "Font";
+    const size_t FONT_LENGTH = 4;
+    size_t pos = oldNodeName->find(FONT);
+    if (pos != string::npos)
+      {
+      return oldNodeName->replace(pos, FONT_LENGTH, modifier);
+      }
+    else
+      return *oldNodeName;
+  }
+
+  static const char* rangeString (int index)
+  {
+    switch (index)
+      {
+      case 0:
+        return "Minimum";
+      case 1:
+        return "Maximum";
+      }
+    return "";
+  }
+
+
+  static const char* axisString (int axis)
+  {
+    switch (axis)
+      {
+      case vtkAxis::LEFT:
+        return "Left";
+      case vtkAxis::BOTTOM:
+        return "Bottom";
+      case vtkAxis::RIGHT:
+        return "Right";
+      case vtkAxis::TOP:
+        return "Top";
+      }
+    return "";
+  }
+
+  static bool validOutputTrue(xml_node viewNode, int i)
+  {
+    return true;
+  }
+
+  static bool validOutputForXYChart(xml_node viewNode, int i)
+  {
+    const char* const TYPE = "type";
+    const char* const XY_CHART_VIEW = "XYChartView";
+    if (i < 0 || i >= 4)
+      {
+      return false;
+      }
+    if (i < 2)
+      {
+      // left, bottom
+      return true;
+      }
+    else if (string(viewNode.attribute(TYPE).value()) == string(XY_CHART_VIEW))
+      {
+      //
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+  }
+
+  static void CreateElementNode(xml_node& node, int index, const string& value)
+  {
+    const char* const ELEMENT = "Element";
+    const char* const INDEX = "index";
+    xml_node newElement = node.append_child();
+    newElement.set_name(ELEMENT);
+    xml_attribute a = newElement.append_attribute(INDEX);
+    a.set_value (index);
+    a = newElement.append_attribute(VALUE);
+    a.set_value(value.c_str());
+  }
+
+  static xml_node CreatePropertyNode(xml_node& viewNode,
+                                     const xml_node& oldNode,
+                                     const string& name, int numberOfElements)
+  {
+    const char* const PROPERTY = "Property";
+    const char* const NUMBER_OF_ELEMENTS = "number_of_elements";
+    const char* const ID = "id";
+    xml_node newNode = viewNode.insert_child_before(node_element, oldNode);
+    newNode.set_name (PROPERTY);
+    xml_attribute a = newNode.append_attribute(NAME);
+    a.set_value(name.c_str());
+    string newNodeId = string(viewNode.attribute(ID).value()) +
+      "." + name;
+    a = newNode.append_attribute(ID);
+    a.set_value(newNodeId.c_str());
+    a = newNode.append_attribute(NUMBER_OF_ELEMENTS);
+    a.set_value(numberOfElements);
+    return newNode;
+  }
+};
+const char* const Process_4_1_to_4_2::NAME = "name";
+const char* const Process_4_1_to_4_2::VALUE = "value";
+
+
 };
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -290,7 +580,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
 
   if (status && version < vtkSMVersion(4, 2, 0))
     {
-    status = Process_4_1_to_4_2(document);
+    status = Process_4_1_to_4_2()(document);
     version = vtkSMVersion(4, 2, 0);
     }
 

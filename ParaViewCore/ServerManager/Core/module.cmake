@@ -7,6 +7,7 @@ vtk_module(vtkPVServerManagerCore
     # of vtkPVServerImplementationCore off but still satisfy API dependcy.
     vtkCommonCore
     vtkPVServerImplementationCore
+    vtkChartsCore
   PRIVATE_DEPENDS
     vtksys
     vtkjsoncpp
