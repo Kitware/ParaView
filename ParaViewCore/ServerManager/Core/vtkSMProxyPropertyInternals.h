@@ -80,15 +80,16 @@ private:
     for (proxy_set::iterator iter = removed.begin(); iter != removed.end(); ++iter)
       {
       vtkSMProxy* producer = (*iter);
+      if (producer)
+        {
+        // remove observer.
+        producer->RemoveObserver(this->ObserverIds[producer]);
+        this->ObserverIds.erase(producer);
 
-      // remove observer.
-      producer->RemoveObserver(this->ObserverIds[producer]);
-      this->ObserverIds.erase(producer);
-
-      // break producer/consumer link.
-      producer->RemoveConsumer(self, self->GetParent());
-      self->GetParent()->RemoveProducer(self, producer);
-
+        // break producer/consumer link.
+        producer->RemoveConsumer(self, self->GetParent());
+        self->GetParent()->RemoveProducer(self, producer);
+        }
       }
     removed.clear();
 
@@ -99,15 +100,17 @@ private:
     for (proxy_set::iterator iter = added.begin(); iter != added.end(); ++iter)
       {
       vtkSMProxy* producer = (*iter);
+      if (producer)
+        {
+        // observe UpdateDataEvent, so we can update dependent domains when the
+        // data changes.
+        this->ObserverIds[producer] = producer->AddObserver(
+          vtkCommand::UpdateDataEvent, self, &vtkSMProxyProperty::OnUpdateDataEvent);
 
-      // observe UpdateDataEvent, so we can update dependent domains when the
-      // data changes.
-      this->ObserverIds[producer] = producer->AddObserver(
-        vtkCommand::UpdateDataEvent, self, &vtkSMProxyProperty::OnUpdateDataEvent);
-
-      // add producer/consumer link.
-      producer->AddConsumer(self, self->GetParent());
-      self->GetParent()->AddProducer(self, producer);
+        // add producer/consumer link.
+        producer->AddConsumer(self, self->GetParent());
+        self->GetParent()->AddProducer(self, producer);
+        }
       }
     this->PreviousProxies = this->Proxies;
     }
