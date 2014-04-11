@@ -21,6 +21,7 @@
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
@@ -383,6 +384,7 @@ void vtkSMRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
 //---------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMRepresentationProxy::GetGlobalID()
 {
@@ -397,4 +399,17 @@ vtkTypeUInt32 vtkSMRepresentationProxy::GetGlobalID()
         MAX_NUMBER_OF_INTERNAL_REPRESENTATIONS));
     }
   return this->GlobalID;
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMRepresentationProxy::SetRepresentationType(const char* type)
+{
+  if (this->GetProperty("Representation"))
+    {
+    vtkSMPropertyHelper(this, "Representation").Set(type? type : "");
+    this->UpdateVTKObjects();
+    return true;
+    }
+
+  return false;
 }

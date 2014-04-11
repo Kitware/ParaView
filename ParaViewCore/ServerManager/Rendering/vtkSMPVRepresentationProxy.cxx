@@ -15,12 +15,14 @@
 #include "vtkSMPVRepresentationProxy.h"
 
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMArrayListDomain.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -495,6 +497,68 @@ vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
     arrayInfo->GetName(), colorArrayHelper.GetInputArrayAssociation(),
     arrayInfo->GetNumberOfComponents(),
     uncertaintyAllowed, fraction);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::SetRepresentationType(const char* type)
+{
+  const int CALL_SUPERCLASS = 0;
+  try
+    {
+    if (type == 0)
+      {
+      throw CALL_SUPERCLASS;
+      }
+
+    if (strcmp(type, "Volume") != 0 && strcmp(type, "Slice") != 0)
+      {
+      throw CALL_SUPERCLASS;
+      }
+
+    // we are changing to volume or slice representation.
+    if (this->GetUsingScalarColoring())
+      {
+      throw CALL_SUPERCLASS;
+      }
+
+    // pick a color array and then accept or fail as applicable.
+    vtkSMProperty* colorArrayName = this->GetProperty("ColorArrayName");
+    if (colorArrayName)
+      {
+      vtkSMArrayListDomain* ald = vtkSMArrayListDomain::SafeDownCast(
+        colorArrayName->FindDomain("vtkSMArrayListDomain"));
+
+      if (ald && ald->GetNumberOfStrings() > 0)
+        {
+        unsigned int index=0;
+        // if possible, pick a "point" array since that works better with some
+        // crappy volume renderers. We need to fixed all volume mapper to not
+        // segfault when cell data is picked.
+        for (unsigned int cc=0, max=ald->GetNumberOfStrings(); cc < max; cc++)
+          {
+          if (ald->GetFieldAssociation(cc) == vtkDataObject::POINT)
+            {
+            index = cc;
+            break;
+            }
+          }
+        if (this->SetScalarColoring(ald->GetString(index), ald->GetFieldAssociation(index)))
+          {
+          throw CALL_SUPERCLASS;
+          }
+        }
+      }
+    }
+  catch (int val)
+    {
+    if (val == CALL_SUPERCLASS)
+      {
+      return this->Superclass::SetRepresentationType(type);
+      }
+    }
+  // It's not sure if the we should error out or still do the change. Opting for
+  // going further with the change in representation type for now.
+  return this->Superclass::SetRepresentationType(type);
 }
 
 //----------------------------------------------------------------------------

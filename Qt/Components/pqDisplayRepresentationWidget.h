@@ -39,7 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataRepresentation;
 class vtkSMProxy;
 
-/// A widget for representation of a display proxy.
+/// A widget for representation type for a vtkSMRepresentationProxy. It works
+/// with a vtkSMRepresentationProxy, calling
+/// vtkSMRepresentationProxy::SetRepresentationType() to change the
+/// representation type to the one chosen by the user.
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
 {
   Q_OBJECT;
@@ -71,6 +74,8 @@ private:
 
   class pqInternals;
   pqInternals* Internal;
+
+  class PropertyLinksConnection;
 };
 
 /// A property widget for selecting the display representation.

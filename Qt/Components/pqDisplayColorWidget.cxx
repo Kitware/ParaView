@@ -117,29 +117,37 @@ protected:
 
     BEGIN_UNDO_SET("Change coloring");
     vtkSMProxy* reprProxy = this->proxySM();
-    if (vtkSMPVRepresentationProxy::SetScalarColoring(
-        reprProxy, arrayName.toAscii().data(), association))
+    vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy, arrayName.toAscii().data(), association);
+
+    vtkNew<vtkSMTransferFunctionManager> tmgr;
+    pqDisplayColorWidget* widget = qobject_cast<pqDisplayColorWidget*>(this->objectQt());
+    vtkSMViewProxy* view = widget->viewProxy();
+
+    // Hide unused scalar bars, if applicable.
+    vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
+    switch (gsettings->GetScalarBarMode())
+      {
+    case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
+    case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
+      tmgr->UpdateScalarBars(view, vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+      break;
+      break;
+      }
+
+    if (!arrayName.isEmpty())
       {
       // we could now respect some application setting to determine if the LUT is
       // to be reset.
       vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy, true);
+
+      // now show used scalar bars if applicable.
+      if (gsettings->GetScalarBarMode() ==
+        vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+        {
+        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
+        }
       }
 
-    // Update scalar bars.
-    vtkNew<vtkSMTransferFunctionManager> tmgr;
-    pqDisplayColorWidget* widget = qobject_cast<pqDisplayColorWidget*>(this->objectQt());
-    vtkSMViewProxy* view = widget->viewProxy();
-    switch (vtkPVGeneralSettings::GetInstance()->GetScalarBarMode())
-      {
-    case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
-      tmgr->UpdateScalarBars(view, vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
-      break;
-    case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
-      tmgr->UpdateScalarBars(view, vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
-      vtkSMPVRepresentationProxy::SetScalarBarVisibility(
-        reprProxy, view, true);
-      break;
-      }
     END_UNDO_SET();
     }
 

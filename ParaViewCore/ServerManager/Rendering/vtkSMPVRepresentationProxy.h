@@ -187,6 +187,12 @@ public:
       uncertaintyAllowed, fraction) : NULL;
     }
 
+  // Description:
+  // Overridden to ensure when picking representation types that require scalar
+  // colors, scalar coloring it setup properly. Currently this is hard-coded for
+  // Volume and Slice representation types.
+  virtual bool SetRepresentationType(const char* type);
+
 protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy();

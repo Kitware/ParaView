@@ -35,9 +35,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqDataRepresentation.h"
 #include "pqPropertyLinks.h"
-#include "vtkSMProxy.h"
+#include "pqUndoStack.h"
+#include "vtkSMRepresentationProxy.h"
 
 #include <QPointer>
+
+//=============================================================================
+class pqDisplayRepresentationWidget::PropertyLinksConnection : public pqPropertyLinksConnection
+{
+  typedef pqPropertyLinksConnection Superclass;
+public:
+  PropertyLinksConnection(
+    QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex,
+    bool use_unchecked_modified_event,
+    QObject* parentObject=0)
+    : Superclass(qobject, qproperty, qsignal,
+      smproxy, smproperty, smindex, use_unchecked_modified_event,
+      parentObject)
+    {
+    }
+  virtual ~PropertyLinksConnection()
+    {
+    }
+
+protected:
+  /// Called to update the ServerManager Property due to UI change.
+  virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
+    {
+    Q_ASSERT(use_unchecked == false);
+
+    BEGIN_UNDO_SET("Change representation type");
+    vtkSMProxy* reprProxy = this->proxySM();
+    vtkSMRepresentationProxy::SetRepresentationType(
+      reprProxy, value.toString().toAscii().data());
+    END_UNDO_SET();
+    }
+private:
+  Q_DISABLE_COPY(PropertyLinksConnection);
+};
+
 
 //=============================================================================
 class pqDisplayRepresentationWidget::pqInternals :
@@ -101,7 +138,7 @@ void pqDisplayRepresentationWidget::setRepresentation(vtkSMProxy* proxy)
     }
 
   this->Internal->Domain = new pqComboBoxDomain(this->Internal->comboBox, smproperty);
-  this->Internal->Links.addPropertyLink(
+  this->Internal->Links.addPropertyLink<PropertyLinksConnection>(
     this, "representationText", SIGNAL(representationTextChanged(const QString&)),
     proxy, smproperty);
   this->Internal->comboBox->blockSignals(prev);

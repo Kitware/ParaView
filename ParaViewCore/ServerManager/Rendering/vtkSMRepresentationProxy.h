@@ -79,6 +79,21 @@ public:
   // Description:
   // Overridden to reserve additional IDs for use by internal composite representation
   virtual vtkTypeUInt32 GetGlobalID();
+
+  // Description:
+  // Set the representation type. Default implementation simply updates the
+  // "Representation" property, if present with the value provided. Subclasses
+  // can override this method to add custom logic to manage the representation
+  // state to support the change e.g. pick a scalar color array when switching
+  // to Volume or Slice representation, for example. Returns true, if the change
+  // was successful, otherwise returns false.
+  virtual bool SetRepresentationType(const char* type);
+  static bool SetRepresentationType(vtkSMProxy* repr, const char* type)
+    {
+    vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
+    return self? self->SetRepresentationType(type) : false;
+    }
+
 //BTX
 protected:
   vtkSMRepresentationProxy();

@@ -152,6 +152,20 @@ namespace
     repr->UpdateVTKObjects();
     }
 
+  //---------------------------------------------------------------------------
+  void vtkPickRepresentationType(
+    vtkSMRepresentationProxy* repr, vtkSMSourceProxy* producer, unsigned int outputPort)
+    {
+    // currently, this just ensures that the "Representation" type chosen has
+    // proper color type etc. setup. At some point, we could deprecate
+    // vtkSMRepresentationTypeDomain and let this logic pick the default
+    // representation type.
+    if (vtkSMProperty* smproperty = repr->GetProperty("Representation"))
+      {
+      repr->SetRepresentationType(vtkSMPropertyHelper(smproperty).GetAsString());
+      }
+    }
+
 }
 
 bool vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow = false;
@@ -275,6 +289,9 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
 
     // check some setting and then inherit properties.
     vtkInheritRepresentationProperties(repr, producer, outputPort, view, ts);
+
+    // pick good representation type.
+    vtkPickRepresentationType(repr, producer, outputPort);
 
     this->RegisterRepresentationProxy(repr);
     repr->UpdateVTKObjects();
