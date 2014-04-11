@@ -16,6 +16,7 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
@@ -75,6 +76,11 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
 {
   assert(arrayName != NULL && pxm != NULL);
 
+  // sanitize the arrayName. This is necessary since sometimes array names have
+  // characters that can mess up regular expressions.
+  std::string sanitizedArrayName = vtkSMCoreUtilities::SanitizeName(arrayName);
+  arrayName = sanitizedArrayName.c_str();
+
   vtkSMProxy* proxy = FindProxy("lookup_tables", arrayName, pxm);
   if (proxy)
     {
@@ -114,6 +120,11 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetOpacityTransferFunction(
   const char* arrayName, vtkSMSessionProxyManager* pxm)
 {
   assert(arrayName != NULL && pxm != NULL);
+
+  // sanitize the arrayName. This is necessary since sometimes array names have
+  // characters that can mess up regular expressions.
+  std::string sanitizedArrayName = vtkSMCoreUtilities::SanitizeName(arrayName);
+  arrayName = sanitizedArrayName.c_str();
 
   vtkSMProxy* proxy = FindProxy("piecewise_functions", arrayName, pxm);
   if (proxy)
