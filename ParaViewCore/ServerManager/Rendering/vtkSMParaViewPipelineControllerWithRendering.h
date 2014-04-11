@@ -104,7 +104,7 @@ public:
   // a source, then any filter that you connect to it should be transformed as
   // well.
   static void SetInheritRepresentationProperties(bool);
-
+  static bool GetInheritRepresentationProperties();
 //BTX
 protected:
   vtkSMParaViewPipelineControllerWithRendering();

@@ -88,8 +88,10 @@ namespace
 
   //---------------------------------------------------------------------------
   void vtkInheritRepresentationProperties(
-    vtkSMProxy* repr,
-    vtkSMSourceProxy* producer, vtkSMViewProxy* view, const unsigned long initTimeStamp)
+    vtkSMRepresentationProxy* repr,
+    vtkSMSourceProxy* producer,
+    unsigned int producerPort,
+    vtkSMViewProxy* view, const unsigned long initTimeStamp)
     {
     if (producer->GetProperty("Input") == NULL)
       {
@@ -107,6 +109,28 @@ namespace
       return;
       }
 
+    // Irrespective of other properties, scalar coloring is inherited if
+    // possible.
+    if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(inputRepr) &&
+      !vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+      {
+      vtkSMPropertyHelper colorArrayHelper(inputRepr, "ColorArrayName");
+      const char* arrayName = colorArrayHelper.GetInputArrayNameToProcess();
+      int arrayAssociation = colorArrayHelper.GetInputArrayAssociation();
+
+      if (producer->GetDataInformation(producerPort)->GetArrayInformation(
+          arrayName, arrayAssociation))
+        {
+        vtkSMPVRepresentationProxy::SetScalarColoring(
+          repr, colorArrayHelper.GetInputArrayNameToProcess(),
+          colorArrayHelper.GetInputArrayAssociation());
+        }
+      }
+
+    if (!vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
+      {
+      return;
+      }
     // copy properties from inputRepr to repr is they weren't modified.
     vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -115,8 +139,9 @@ namespace
       vtkSMProperty* dest = repr->GetProperty(pname);
       vtkSMProperty* source = iter->GetProperty();
       if (dest && source &&
-        // the property wasn't modified since initialization
-        dest->GetMTime() < initTimeStamp &&
+        // the property wasn't modified since initialization or if it is
+        // "Representation" property -- (HACK)
+        (dest->GetMTime() < initTimeStamp || strcmp("Representation", pname) == 0) &&
         // the property types match.
         strcmp(dest->GetClassName(), source->GetClassName())==0 )
         {
@@ -160,6 +185,12 @@ void vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(bool v
 void vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(bool val)
 {
   vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties = val;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties()
+{
+  return vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties;
 }
 
 //----------------------------------------------------------------------------
@@ -231,7 +262,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   this->UpdatePipelineBeforeDisplay(producer, outputPort, view);
 
   // Since no repr exists, create a new one if possible.
-  if (vtkSMProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
+  if (vtkSMRepresentationProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
     {
     this->PreInitializeProxy(repr);
 
@@ -243,10 +274,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     this->PostInitializeProxy(repr);
 
     // check some setting and then inherit properties.
-    if (vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties)
-      {
-      vtkInheritRepresentationProperties(repr, producer, view, ts);
-      }
+    vtkInheritRepresentationProperties(repr, producer, outputPort, view, ts);
 
     this->RegisterRepresentationProxy(repr);
     repr->UpdateVTKObjects();
