@@ -480,6 +480,7 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
 void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
+  (void) outputPort;
   if (!producer)
     {
     return;

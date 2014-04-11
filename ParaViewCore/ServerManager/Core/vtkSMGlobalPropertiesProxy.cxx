@@ -124,10 +124,10 @@ bool vtkSMGlobalPropertiesProxy::Link(
     this->Unlink(oldname, proxy, propname);
     }
 
-
   // Copy current value.
   vtkSMProperty* targetProp = proxy->GetProperty(propname);
-  targetProp->Copy(this->GetProperty(globalPropertyName));
+  vtkSMProperty* globalProperty = this->GetProperty(globalPropertyName);
+  targetProp->Copy(globalProperty);
   proxy->UpdateVTKObjects();
 
   vtkInternals::vtkValue value;
@@ -263,8 +263,9 @@ void vtkSMGlobalPropertiesProxy::TargetPropertyModified(
 vtkPVXMLElement* vtkSMGlobalPropertiesProxy::SaveXMLState(
   vtkPVXMLElement* root, vtkSMPropertyIterator* iter)
 {
-  vtkPVXMLElement* element = this->Superclass::SaveXMLState(root, iter);
-  if (!element)
+  (void) iter;
+
+  if (!root)
     {
     return NULL;
     }
@@ -281,29 +282,24 @@ vtkPVXMLElement* vtkSMGlobalPropertiesProxy::SaveXMLState(
       if (listIter->Proxy)
         {
         vtkPVXMLElement* linkElem = vtkPVXMLElement::New();
-        linkElem->SetName("Link");
+        linkElem->SetName("GlobalPropertyLink");
         linkElem->AddAttribute("global_name", mapIter->first.c_str());
         linkElem->AddAttribute(
           "proxy", listIter->Proxy->GetGlobalIDAsString());
         linkElem->AddAttribute("property", listIter->PropertyName.c_str());
-        element->AddNestedElement(linkElem);
+        root->AddNestedElement(linkElem);
         linkElem->Delete();
         }
       }
     }
 
-  return element;
+  return root;
 }
 
 //----------------------------------------------------------------------------
 int vtkSMGlobalPropertiesProxy::LoadXMLState(
   vtkPVXMLElement* element, vtkSMProxyLocator* locator)
 {
-  if (!this->Superclass::LoadXMLState(element, locator))
-    {
-    return 0;
-    }
-
   if (!locator)
     {
     return 1;
@@ -313,7 +309,7 @@ int vtkSMGlobalPropertiesProxy::LoadXMLState(
   for (unsigned int cc=0; cc < numElems; cc++)
     {
     vtkPVXMLElement* child = element->GetNestedElement(cc);
-    if (!child->GetName() || strcmp(child->GetName(), "Link") != 0)
+    if (!child->GetName() || strcmp(child->GetName(), "GlobalPropertyLink") != 0)
       {
       continue;
       }

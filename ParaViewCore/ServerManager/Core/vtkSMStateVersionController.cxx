@@ -196,6 +196,28 @@ namespace
       "//ServerManagerState/Proxy[@group='interactorstyles' or @group='cameramanipulators']"));
 
     //-------------------------------------------------------------------------
+    // convert global property links
+    //-------------------------------------------------------------------------
+    pugi::xml_node smstate = document.root().child("ServerManagerState");
+    pugi::xml_node links = smstate.child("Links");
+
+    if (!links)
+      {
+      links = smstate.append_child("Links");
+      }
+
+    pugi::xpath_node_set global_property_links =
+      document.select_nodes("//ServerManagerState/GlobalPropertiesManagers/GlobalPropertiesManager/Link");
+    for (pugi::xpath_node_set::const_iterator iter = global_property_links.begin();
+      iter != global_property_links.end(); ++iter)
+      {
+      pugi::xml_node linkNode = iter->node();
+      linkNode.set_name("GlobalPropertyLink");
+
+      links.append_copy(linkNode);
+      }
+
+    //-------------------------------------------------------------------------
     return true;
     }
 };

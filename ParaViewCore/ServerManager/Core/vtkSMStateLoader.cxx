@@ -388,6 +388,7 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
     vtkPVXMLElement* currentElement= element->GetNestedElement(cc);
     const char* name = currentElement->GetName();
     const char* linkname = currentElement->GetAttribute("name");
+
     if (name && linkname)
       {
       vtkSMLink* link = pxm->GetRegisteredLink(linkname);
@@ -401,9 +402,9 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         if (link == NULL)
           {
           vtkWarningMacro("Failed to create object for link (name="
-            << name
-            << "). Expected type was " << classname.c_str()
-            << ". Skipping.");
+                          << name
+                          << "). Expected type was " << classname.c_str()
+                          << ". Skipping.");
           continue;
           }
         pxm->RegisterLink(linkname, link);
@@ -415,6 +416,11 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         }
       }
     }
+
+  // Load the global_properties
+  vtkSMProxy* globalPropertiesProxy = pxm->GetProxy("global_properties", "ColorPalette");
+  globalPropertiesProxy->LoadXMLState(element, this->ProxyLocator);
+
   return 1;
 }
 

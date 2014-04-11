@@ -1285,9 +1285,11 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
 
     const char* colname = it->first.c_str();
 
-    // Do not save the state of options.
-    const char* options = "settings";
-    if (strcmp(options, colname) == 0)
+    // Do not save the state of global_properties nor settings.
+    const char* global_properties = "global_properties";
+    const char* settings = "settings";
+    if (strcmp(global_properties, colname) == 0 ||
+        strcmp(settings, colname) == 0)
       {
       continue;
       }
@@ -1405,6 +1407,13 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
   links->SetName("Links");
   this->SaveRegisteredLinks(links);
   rootElement->AddNestedElement(links);
+  
+  vtkSMProxy* globalPropertiesProxy = this->GetProxy("global_properties", "ColorPalette");
+  if (globalPropertiesProxy)
+    {
+    globalPropertiesProxy->SaveXMLState(links);
+    }
+
   links->Delete();
 
   if (parentElem)
