@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCrashRecoveryBehavior.h"
 #include "pqDataTimeStepBehavior.h"
 #include "pqDefaultViewBehavior.h"
-#include "pqDeleteBehavior.h"
 #include "pqFixPathsInStateFilesBehavior.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectPickingBehavior.h"
@@ -50,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginDockWidgetsBehavior.h"
 #include "pqPluginSettingsBehavior.h"
 #include "pqPropertiesPanel.h"
-#include "pqPVNewSourceBehavior.h"
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
@@ -88,8 +86,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqObjectPickingBehavior(this);
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
-  new pqPVNewSourceBehavior(this);
-  new pqDeleteBehavior(this);
   new pqUndoRedoBehavior(this);
   new pqCrashRecoveryBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);

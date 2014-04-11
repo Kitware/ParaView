@@ -32,13 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIgnoreSourceTimeReaction.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplicationCore.h"
-#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
+#include "vtkSMTimeKeeperProxy.h"
 
 //-----------------------------------------------------------------------------
 pqIgnoreSourceTimeReaction::pqIgnoreSourceTimeReaction(QAction* parentObject)
@@ -75,8 +73,10 @@ void pqIgnoreSourceTimeReaction::updateEnableState()
     }
   else
     {
-    pqTimeKeeper* timekeeper = source->getServer()->getTimeKeeper();
-    checked = checked || !timekeeper->isSourceAdded(source);
+    pqTimeKeeper* timeKeeper = source->getServer()->getTimeKeeper();
+    checked = checked ||
+      // "checked" when the source proxy is not being tracked.
+      !vtkSMTimeKeeperProxy::IsTimeSourceTracked(timeKeeper->getProxy(), source->getProxy());
     }
   action->setChecked(checked);
   action->blockSignals(prev);
@@ -104,13 +104,7 @@ void pqIgnoreSourceTimeReaction::ignoreSourceTime(
     return;
     }
 
-  pqTimeKeeper* timekeeper = source->getServer()->getTimeKeeper();
-  if (ignore)
-    {
-    timekeeper->removeSource(source);
-    }
-  else
-    {
-    timekeeper->addSource(source);
-    }
+  pqTimeKeeper* timeKeeper = source->getServer()->getTimeKeeper();
+  vtkSMTimeKeeperProxy::SetSuppressTimeSource(
+    timeKeeper->getProxy(), source->getProxy(), ignore);
 }

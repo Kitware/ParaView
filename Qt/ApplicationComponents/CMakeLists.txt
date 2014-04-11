@@ -105,8 +105,6 @@ set (Module_SRCS
   pqDefaultMainWindow.h
   pqDefaultViewBehavior.cxx
   pqDefaultViewBehavior.h
-  pqDeleteBehavior.cxx
-  pqDeleteBehavior.h
   pqDeleteReaction.cxx
   pqDeleteReaction.h
   pqDoubleRangeSliderPropertyWidget.cxx
@@ -183,8 +181,6 @@ set (Module_SRCS
   pqPVAnimationWidget.h
   pqPVApplicationCore.cxx
   pqPVApplicationCore.h
-  pqPVNewSourceBehavior.cxx
-  pqPVNewSourceBehavior.h
   pqPythonShellReaction.cxx
   pqPythonShellReaction.h
   pqQtMessageHandlerBehavior.cxx
@@ -292,7 +288,6 @@ set (Module_MOC_HDRS
   pqDataTimeStepBehavior.h
   pqDefaultMainWindow.h
   pqDefaultViewBehavior.h
-  pqDeleteBehavior.h
   pqDeleteReaction.h
   pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.h
@@ -330,7 +325,6 @@ set (Module_MOC_HDRS
   pqProxyGroupMenuManager.h
   pqPVAnimationWidget.h
   pqPVApplicationCore.h
-  pqPVNewSourceBehavior.h
   pqPythonShellReaction.h
   pqQtMessageHandlerBehavior.h
   pqReaction.h

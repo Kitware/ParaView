@@ -51,6 +51,14 @@ public:
   static void deleteSelected();
   static bool canDeleteSelected();
 
+  /// Deletes all sources in the set, if possible.
+  /// All variants of public methods on this class basically call this method
+  /// with the sources set built up appropriately.
+  /// The sources set is
+  /// modified to remove all deleted sources. Any undeleted sources will remain
+  /// in the set.
+  static void deleteSources(QSet<pqPipelineSource*> &sources);
+
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
@@ -76,6 +84,10 @@ protected:
 private:
   Q_DISABLE_COPY(pqDeleteReaction)
   bool DeleteAll;
+
+  /// Method called just before deleting a source.
+  /// Updates to the UI before deletion are done here.
+  static void aboutToDelete(pqPipelineSource* source);
 };
 
 #endif

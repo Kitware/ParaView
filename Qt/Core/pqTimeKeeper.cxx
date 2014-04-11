@@ -31,30 +31,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqTimeKeeper.h"
 
+#include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkNew.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyProperty.h"
 
 #include <QList>
-#include <QMap>
-#include <QPointer>
 #include <QtDebug>
-#include <QVector>
 
-#include "pqApplicationCore.h"
-#include "pqPipelineSource.h"
-#include "pqServerManagerModel.h"
-#include "pqView.h"
 
 #include <vector>
 //-----------------------------------------------------------------------------
 class pqTimeKeeper::pqInternals
 {
 public:
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkNew<vtkEventQtSlotConnect> VTKConnect;
 };
 
 //-----------------------------------------------------------------------------
@@ -63,7 +56,6 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   : pqProxy(group, name, timekeeper, server, _parent)
 {
   this->Internals = new pqInternals();
-  this->Internals->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("Time"),
     vtkCommand::ModifiedEvent, this, SIGNAL(timeChanged()));
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimestepValues"),
@@ -72,46 +64,6 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
     vtkCommand::ModifiedEvent, this, SIGNAL(timeRangeChanged()));
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimeRange"),
     vtkCommand::ModifiedEvent, this, SIGNAL(timeRangeChanged()));
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-
-  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
-    this, SLOT(sourceAdded(pqPipelineSource*)));
-  QObject::connect(smmodel, SIGNAL(sourceRemoved(pqPipelineSource*)),
-    this, SLOT(sourceRemoved(pqPipelineSource*)));
-
-  QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)),
-    this, SLOT(viewAdded(pqView*)));
-  QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)),
-    this, SLOT(viewRemoved(pqView*)));
-
-  this->blockSignals(true);
-  // ServerManagerModel may already have some registered sources
-  // (happens when loading state).
-  // So we pretend that every one of the sources is getting
-  // newly added.
-  QList<pqPipelineSource*> sources = smmodel->findItems<pqPipelineSource*>(
-    this->getServer());
-  foreach(pqPipelineSource* src, sources)
-    {
-    this->sourceAdded(src);
-    }
-
-  QList<pqView*> views = smmodel->findItems<pqView*>(this->getServer());
-  foreach (pqView* view, views)
-    {
-    this->viewAdded(view);
-    }
-  this->blockSignals(false);
-
-  if (sources.size() > 0)
-    {
-    emit this->timeStepsChanged();
-    emit this->timeRangeChanged();
-    }
-
-  emit this->timeChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -191,88 +143,4 @@ void pqTimeKeeper::setTime(double time)
 {
   vtkSMPropertyHelper(this->getProxy(), "Time").Set(time);
   this->getProxy()->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
-{
-  if (!source
-      || source->getServer() != this->getServer()
-      || pqApplicationCore::instance ()->isLoadingState ())
-    {
-    return;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("TimeSources"));
-  if (!pp->IsProxyAdded(source->getProxy()))
-    {
-    pp->AddProxy(source->getProxy());
-    this->getProxy()->UpdateVTKObjects();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
-{
-  if (!source
-      || source->getServer() != this->getServer()
-      || pqApplicationCore::instance ()->isLoadingState ())
-    {
-    return;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("TimeSources"));
-  pp->RemoveProxy(source->getProxy());
-  this->getProxy()->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-bool pqTimeKeeper::isSourceAdded(pqPipelineSource* source)
-{
-  if (!source || source->getServer() != this->getServer())
-    {
-    return false;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("TimeSources"));
-  return (source && pp->IsProxyAdded(source->getProxy()));
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::viewAdded(pqView* view)
-{
-  if (view->getServer() != this->getServer()
-      || pqApplicationCore::instance ()->isLoadingState ())
-    {
-    return;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("Views"));
-  if (!pp->IsProxyAdded(view->getProxy()))
-    {
-    pp->AddProxy(view->getProxy());
-    this->getProxy()->UpdateProperty("Views");
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::viewRemoved(pqView* view)
-{
-  if (view->getServer() != this->getServer()
-      || pqApplicationCore::instance ()->isLoadingState ())
-    {
-    return;
-    }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("Views"));
-  while (pp->IsProxyAdded(view->getProxy()))
-    {
-    pp->RemoveProxy(view->getProxy());
-    this->getProxy()->UpdateProperty("Views");
-    }
 }

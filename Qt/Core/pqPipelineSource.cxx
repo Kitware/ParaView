@@ -148,6 +148,12 @@ pqPipelineSource::~pqPipelineSource()
 }
 
 //-----------------------------------------------------------------------------
+vtkSMSourceProxy* pqPipelineSource::getSourceProxy()
+{
+  return vtkSMSourceProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineSource::updatePipeline()
 {
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();

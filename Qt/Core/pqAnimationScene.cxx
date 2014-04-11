@@ -125,6 +125,7 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
         timekeeper->getProxy()->GetProperty("TimeLabel"),
         vtkCommand::ModifiedEvent,
         this, SIGNAL(timeLabelChanged()));
+  this->connect(timekeeper, SIGNAL(timeStepsChanged()), SIGNAL(timeStepsChanged()));
 }
 
 //-----------------------------------------------------------------------------

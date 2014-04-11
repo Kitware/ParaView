@@ -45,6 +45,7 @@ class pqPipelineSourceInternal;
 class pqView;
 class vtkObject;
 class vtkPVDataInformation;
+class vtkSMSourceProxy;
 
 /// PQ representation for a vtkSMProxy that can be involved in a pipeline.
 /// i.e that can have input and/or output. The public API is to observe
@@ -115,6 +116,10 @@ public:
 
   /// Update the pipeline with the current time
   void updatePipeline();
+
+  /// Return the vtkSMSourceProxy instance corresponding to this
+  /// pqPipelineSource.
+  vtkSMSourceProxy* getSourceProxy();
 
 signals:
   /// fired when a connection is created between two pqPipelineSources.

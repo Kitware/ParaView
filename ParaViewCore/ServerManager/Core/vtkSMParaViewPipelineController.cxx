@@ -18,6 +18,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -30,7 +31,7 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSettings.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMTimeKeeperProxy.h"
 #include "vtkWeakPointer.h"
 
 #include <cassert>
@@ -623,8 +624,10 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
 
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
-  vtkSMPropertyHelper(timeKeeper, "TimeSources").Add(proxy);
-  timeKeeper->UpdateVTKObjects();
+  vtkSMTimeKeeperProxy::AddTimeSource(timeKeeper, proxy,
+    /*suppress_input*/ (
+      proxy->GetProperty("TimestepValues") != NULL ||
+      proxy->GetProperty("TimeRange") != NULL));
 
   // Make the proxy active.
   vtkSMProxySelectionModel* selmodel =
@@ -660,8 +663,10 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
 
   // remove proxy from TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
-  vtkSMPropertyHelper(timeKeeper, "TimeSources").Remove(proxy);
-  timeKeeper->UpdateVTKObjects();
+  vtkSMTimeKeeperProxy::RemoveTimeSource(timeKeeper, proxy,
+    /*unsuppress_input*/ (
+      proxy->GetProperty("TimestepValues") != NULL ||
+      proxy->GetProperty("TimeRange") != NULL));
 
   // unregister dependencies.
   this->UnRegisterDepencies(proxy);

@@ -37,6 +37,8 @@ public:
   typedef std::set<vtkSmartPointer<vtkSMSourceProxy> > SourcesType;
   SourcesType Sources;
 
+  std::set<void*> SuppressedSources;
+
   typedef std::map<void*, unsigned long> ObserverIdsMap;
   ObserverIdsMap ObserverIds;
 
@@ -160,6 +162,20 @@ void vtkSMTimeKeeper::RemoveAllTimeSources()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMTimeKeeper::AddSuppressedTimeSource(vtkSMSourceProxy* src)
+{
+  this->Internal->SuppressedSources.insert(src);
+  this->UpdateTimeSteps();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTimeKeeper::RemoveSuppressedTimeSource(vtkSMSourceProxy* src)
+{
+  this->Internal->SuppressedSources.erase(src);
+  this->UpdateTimeSteps();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTimeKeeper::SetTime(double time)
 {
   if (this->Time != time)
@@ -194,6 +210,12 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
   for (iter = this->Internal->Sources.begin();
     iter != this->Internal->Sources.end(); ++iter)
     {
+    if (this->Internal->SuppressedSources.find(iter->GetPointer()) !=
+      this->Internal->SuppressedSources.end())
+      {
+      // source has been suppressed.
+      continue;
+      }
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       iter->GetPointer()->GetProperty("TimestepValues"));
     if (dvp)

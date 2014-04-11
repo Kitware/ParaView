@@ -1963,6 +1963,15 @@
         property has a set of timesteps provided by all the sources added to
         this property alone.</Documentation>
       </ProxyProperty>
+      <ProxyProperty argument_type="SMProxy"
+                     command="AddSuppressedTimeSource"
+                     name="SuppressedTimeSources"
+                     remove_command="RemoveSuppressedTimeSource"
+                     repeatable="1">
+        <Documentation>List of proxies that are to supressed i.e their times
+          to be ignored.
+        </Documentation>
+      </ProxyProperty>
       <!-- End of TimeKeeper -->
     </TimeKeeperProxy>
     <Proxy class="vtkSISourceProxy"
