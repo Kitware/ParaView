@@ -669,7 +669,7 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
       proxy->GetProperty("TimeRange") != NULL));
 
   // unregister dependencies.
-  this->UnRegisterDepencies(proxy);
+  this->UnRegisterDependencies(proxy);
 
   // this will remove both proxy-list-domain helpers and animation helpers.
   this->FinalizeProxy(proxy);
@@ -778,7 +778,7 @@ bool vtkSMParaViewPipelineController::UnRegisterViewProxy(vtkSMProxy* proxy)
     }
 
   // unregister dependencies.
-  this->UnRegisterDepencies(proxy);
+  this->UnRegisterDependencies(proxy);
 
   // this will remove both proxy-list-domain helpers and animation helpers.
   this->FinalizeProxy(proxy);
@@ -847,7 +847,7 @@ bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* 
     }
 
   // unregister dependencies.
-  this->UnRegisterDepencies(proxy);
+  this->UnRegisterDependencies(proxy);
 
   // this will remove both proxy-list-domain helpers and animation helpers.
   this->FinalizeProxy(proxy);
@@ -954,7 +954,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
     }
 
   // unregister dependencies.
-  this->UnRegisterDepencies(proxy);
+  this->UnRegisterDependencies(proxy);
 
   // this will remove both proxy-list-domain helpers and animation helpers.
   this->FinalizeProxy(proxy);
@@ -1139,7 +1139,7 @@ bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
     if (iter->second)
       {
       // remove any dependencies for this proxy.
-      this->UnRegisterDepencies(iter->second);
+      this->UnRegisterDependencies(iter->second);
       // remove any helpers for this proxy.
       this->FinalizeProxy(iter->second);
       // unregister the proxy.
@@ -1152,7 +1152,7 @@ bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::UnRegisterDepencies(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::UnRegisterDependencies(vtkSMProxy* proxy)
 {
   assert(proxy != NULL);
 
@@ -1241,7 +1241,7 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))
         {
         // unregister dependencies.
-        if (!this->UnRegisterDepencies(proxy))
+        if (!this->UnRegisterDependencies(proxy))
           {
           return false;
           }

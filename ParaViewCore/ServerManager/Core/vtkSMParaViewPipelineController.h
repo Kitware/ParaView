@@ -236,7 +236,7 @@ protected:
   // Description:
   // Unregisters know proxy dependencies that must be removed when the proxy is
   // to be deleted e.g animation cues, representations, etc.
-  virtual bool UnRegisterDepencies(vtkSMProxy* proxy);
+  virtual bool UnRegisterDependencies(vtkSMProxy* proxy);
 
   // Description:
   // Proxies in proxy-list domains can have hints that are used to setup
