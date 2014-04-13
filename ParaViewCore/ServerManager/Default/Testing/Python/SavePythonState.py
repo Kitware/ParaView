@@ -4,14 +4,16 @@
 
 import sys
 from paraview import smtesting
-
+print sys.argv
 smtesting.ProcessCommandLineArguments()
 
 execfile(sys.argv[1])
 
-RenderView1.ViewSize = [300, 300]
-RenderView1.SMProxy.UpdateVTKObjects()
 
-if not smtesting.DoRegressionTesting(RenderView1.SMProxy):
+_view = GetActiveView()
+_view.ViewSize = [300, 300]
+_view.SMProxy.UpdateVTKObjects()
+
+if not smtesting.DoRegressionTesting(_view.SMProxy):
   # This will lead to VTK object leaks.
   sys.exit(1)

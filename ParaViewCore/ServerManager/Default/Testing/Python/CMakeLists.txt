@@ -190,6 +190,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DPARAVIEW_DATA_ROOT:PATH=${PARAVIEW_DATA_ROOT}
       -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.py
       -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.xml
+      -DTEMPORARY_DIR:PATH=${ParaView_BINARY_DIR}/Testing/Temporary
       -P ${CMAKE_CURRENT_SOURCE_DIR}/SavePythonState.cmake)
     set_tests_properties(SavePythonState PROPERTIES LABELS "PARAVIEW")
   endif()

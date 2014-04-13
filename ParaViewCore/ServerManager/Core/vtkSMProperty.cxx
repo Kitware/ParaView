@@ -597,8 +597,15 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  os << indent << "Links: " << endl;
-  this->Links->PrintSelf(os, indent.GetNextIndent());
+  if (this->Links)
+    {
+    os << indent << "Links: " << endl;
+    this->Links->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "Links: none" << endl;
+    }
 }
 
 //---------------------------------------------------------------------------
