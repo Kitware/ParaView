@@ -91,6 +91,11 @@
         <BooleanDomain name="bool" />
         <Documentation>Set whether offscreen rendering should be used during
         CaptureWindow calls.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseOffscreenRenderingForScreenshots"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseInteractiveRenderingForScreenshots"
                          default_values="0"
@@ -130,6 +135,11 @@
         sub-sampled image even for StillRender(). This is set it number of
         pixels to be sub-sampled by. Note that image reduction factors have no
         effect when in built-in mode.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="StillRenderImageReductionFactor"/>
+        </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty default_values="100.0"
                             name="CollectGeometryThreshold"
@@ -151,6 +161,11 @@
         InteractiveRender(). This is set it number of pixels to be sub-sampled
         by. Note that image reduction factors have no effect when in built-in
         mode.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="ImageReductionFactor"/>
+        </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetRemoteRenderingThreshold"
                             default_values="20.0"
@@ -163,6 +178,11 @@
         <Documentation>The threshold used to determine if the compositing
         should be used for rendering. The value is rendering-geometry size in
         MBs.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="RemoteRenderThreshold"/>
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLODRenderingThreshold"
                             default_values="5"
@@ -174,6 +194,11 @@
         size in MBs.</Documentation>
         <DoubleRangeDomain min="0"
                            name="range" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="LODThreshold"/>
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetLODResolution"
                             default_values="0.5"
@@ -185,6 +210,11 @@
                            name="range" />
         <Documentation>Set the LOD resolution. 0 implies lowest level or
         detail, while 1 implies maximum level of detail.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="LODResolution"/>
+        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetUseOutlineForLODRendering"
                          default_values="0"
@@ -195,6 +225,11 @@
         <Documentation>When set to true, this overrides the LODResolution. In
         that case, when using LOD for rendering, if possible, the data is
         rendered as outlines.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseOutlineForLODRendering"/>
+        </Hints>
       </IntVectorProperty>
       <StringVectorProperty command="ConfigureCompressor"
                             default_values="vtkSquirtCompressor 0 3"
@@ -204,6 +239,11 @@
         <Documentation>Used to configure the image compression used for
         client-server image transfer when doing interactive
         renders.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="CompressorConfig"/>
+        </Hints>
       </StringVectorProperty>
 
       <!-- Center and Orientation Axes -->
@@ -267,6 +307,11 @@
                          number_of_elements="1">
         <Documentation>Set the delay (in seconds) after an interactive render
         before switching to a full-rese render.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="NonInteractiveRenderDelay"/>
+        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty name="Camera3DManipulators"
         command="SetCamera3DManipulators"
@@ -279,6 +324,11 @@
           in order as (left button, middle button, right button), and repeated for
           shift key and control key modifiers.
         </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera3DManipulators"/>
+        </Hints>
         <EnumerationDomain name="enum">
           <Entry text="None" value="0" />
           <Entry text="Pan" value="1" />
@@ -299,6 +349,11 @@
           in order as (left button, middle button, right button), and repeated for
           shift key and control key modifiers.
         </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewInteractionSettings"
+                        property="Camera2DManipulators"/>
+        </Hints>
         <EnumerationDomain name="enum">
           <Entry text="None" value="0" />
           <Entry text="Pan" value="1" />
@@ -515,6 +570,11 @@
                          panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="DepthPeeling"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfPeels"
                          default_values="4"
@@ -526,6 +586,11 @@
         maximum limit. It has to be a positive value.</Documentation>
         <IntRangeDomain min="0"
                         name="range" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="MaximumNumberOfPeels"/>
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetStereoCapableWindow"
@@ -895,6 +960,11 @@
         <BooleanDomain name="bool" />
         <Documentation>Set whether offscreen rendering should be used during
         CaptureWindow calls.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseOffscreenRenderingForScreenshots"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
@@ -2061,6 +2131,11 @@
         <BooleanDomain name="bool" />
         <Documentation>Set whether offscreen rendering should be used during
         CaptureWindow calls.</Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="UseOffscreenRenderingForScreenshots"/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"

@@ -132,6 +132,7 @@ class vtkSMDocumentation;
 class vtkSMDomain;
 class vtkSMDomainIterator;
 class vtkSMInformationHelper;
+class vtkSMPropertyLink;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 //BTX
@@ -231,6 +232,11 @@ public:
   // the proxy manager and can be used to obtain information other
   // than given by the type of the propery and its values.
   void AddDomain(const char* name, vtkSMDomain* dom);
+
+  // Description:
+  // Add a link to a property whose value should be synchronized
+  // with this property value.
+  virtual void AddLinkedProperty(vtkSMProperty* targetProperty);
 
   // Description: 
   // Get/Set if the property is animateable. Non-animateable
@@ -509,6 +515,9 @@ protected:
   bool StateIgnored;
   vtkSetMacro(StateIgnored, bool);
   vtkBooleanMacro(StateIgnored, bool);
+
+  // Links for properties
+  vtkSMPropertyLink* Links;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

@@ -23,6 +23,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
@@ -216,28 +217,59 @@ bool vtkSMParaViewPipelineController::SetupGlobalPropertiesLinks(vtkSMProxy* pro
 
     vtkPVXMLElement* linkHint = prop->GetHints()?
       prop->GetHints()->FindNestedElementByName("GlobalPropertyLink") : NULL;
-    if (!linkHint)
+    if (linkHint)
       {
-      continue;
+      std::string type = linkHint->GetAttributeOrEmpty("type");
+      std::string property = linkHint->GetAttributeOrEmpty("property");
+      if (type.empty() || property.empty())
+        {
+        vtkWarningMacro("Invalid GlobalPropertyLink hint.");
+        continue;
+        }
+
+      vtkSMGlobalPropertiesProxy* gpproxy = vtkSMGlobalPropertiesProxy::SafeDownCast(
+        pxm->GetProxy("global_properties", type.c_str()));
+      if (!gpproxy)
+        {
+        continue;
+        }
+      if (!gpproxy->Link(property.c_str(), proxy, iter->GetKey()))
+        {
+        vtkWarningMacro("Failed to setup GlobalPropertyLink.");
+        }
       }
 
-    std::string type = linkHint->GetAttributeOrEmpty("type");
-    std::string property = linkHint->GetAttributeOrEmpty("property");
-    if (type.empty() || property.empty())
+    // Check for SettingsLinks
+    linkHint = prop->GetHints()?
+      prop->GetHints()->FindNestedElementByName("PropertyLink") : NULL;
+    if (linkHint)
       {
-      vtkWarningMacro("Invalid GlobalPropertyLink hint.");
-      continue;
-      }
+      const char* sourceGroupName = linkHint->GetAttributeOrEmpty("group");
+      const char* sourceProxyName = linkHint->GetAttributeOrEmpty("proxy");
+      const char* sourcePropertyName = linkHint->GetAttributeOrEmpty("property");
+      if (!sourceGroupName || !sourceProxyName || !sourcePropertyName)
+        {
+        continue;
+        }
 
-    vtkSMGlobalPropertiesProxy* gpproxy = vtkSMGlobalPropertiesProxy::SafeDownCast(
-      pxm->GetProxy("global_properties", type.c_str()));
-    if (!gpproxy)
-      {
-      continue;
-      }
-    if (!gpproxy->Link(property.c_str(), proxy, iter->GetKey()))
-      {
-      vtkWarningMacro("Failed to setup GlobalPropertyLink.");
+      vtkSMProxy* sourceProxy = pxm->GetProxy(sourceGroupName, sourceProxyName);
+      if (!sourceProxy)
+        {
+        continue;
+        }
+
+      vtkSMProperty* sourceProperty =  sourceProxy->GetProperty(sourcePropertyName);
+      if (sourceProperty)
+        {
+        sourceProperty->AddLinkedProperty(prop);
+        }
+      else
+        {
+        vtkWarningMacro(<< "No source property with group \"" << sourceGroupName
+                        << "\", proxy \"" << sourceProxyName
+                        << "\", property \"" << sourcePropertyName
+                        << "\" exists. Linking not performed.")
+        }
       }
     }
   return true;
@@ -1100,6 +1132,7 @@ bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
 
   // Register proxies created for proxy list domains.
   this->RegisterProxiesForProxyListDomains(proxy);
+
   return true;
 }
 

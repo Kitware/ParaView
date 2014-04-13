@@ -26,6 +26,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
 
 #include <vector>
@@ -61,6 +62,7 @@ vtkSMProperty::vtkSMProperty()
   this->Documentation = 0;
   this->Repeatable = 0;
   this->IgnoreSynchronization = 0;
+  this->Links = NULL;
 
   this->Hints = 0;
   this->BlockModifiedEvents = false;
@@ -92,6 +94,11 @@ vtkSMProperty::~vtkSMProperty()
   this->SetPanelVisibility(0);
   this->SetPanelVisibilityDefaultForRepresentation(0);
   this->SetPanelWidget(0);
+  if (this->Links)
+    {
+    this->Links->Delete();
+    this->Links = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -158,6 +165,26 @@ void vtkSMProperty::AddDomain(const char* name, vtkSMDomain* domain)
     domain->AddObserver(vtkCommand::DomainModifiedEvent,
       this, &vtkSMProperty::InvokeDomainModifiedEvent);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::AddLinkedProperty(vtkSMProperty* targetProperty)
+{
+  if (!targetProperty)
+    {
+    return;
+    }
+
+  // This sets up the target property to take on the value of this property
+  // whenever it is updated.
+  if (!this->Links)
+    {
+    this->Links = vtkSMPropertyLink::New();
+    this->Links->AddLinkedProperty(this->GetParent(), this->GetXMLName(), vtkSMLink::INPUT);
+    }
+
+  this->Links->AddLinkedProperty(targetProperty->GetParent(), targetProperty->GetXMLName(),
+                                 vtkSMLink::OUTPUT);
 }
 
 //---------------------------------------------------------------------------
@@ -570,6 +597,8 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "Links: " << endl;
+  this->Links->PrintSelf(os, indent.GetNextIndent());
 }
 
 //---------------------------------------------------------------------------
