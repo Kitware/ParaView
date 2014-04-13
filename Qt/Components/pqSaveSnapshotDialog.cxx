@@ -84,11 +84,6 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
       settings->value(SETTINGS_KEY).toBool());
     }
 
-  QObject::connect(this->Internal->ok, SIGNAL(pressed()),
-    this, SLOT(accept()), Qt::QueuedConnection);
-  QObject::connect(this->Internal->cancel, SIGNAL(pressed()),
-    this, SLOT(reject()), Qt::QueuedConnection);
-
   QObject::connect(this->Internal->width, SIGNAL(editingFinished()),
     this, SLOT(onWidthEdited()));
   QObject::connect(this->Internal->height, SIGNAL(editingFinished()),
