@@ -35,11 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMath.h"
 #include "vtkNew.h"
+#include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
@@ -49,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 
 #include <QIntValidator>
 #include <QFileInfo>
@@ -652,7 +654,8 @@ bool pqAnimationManager::saveAnimation()
     // Make sure we delete all the view before disconnecting
     vtkNew<vtkSMProxyIterator> proxyIter;
     proxyIter->SetSession(server->session());
-    std::vector<vtkSMViewProxy*> viewToDelete;
+    typedef std::vector<vtkWeakPointer<vtkSMViewProxy> > VectorOfViews;
+    VectorOfViews viewToDelete;
     for (proxyIter->Begin(); !proxyIter->IsAtEnd(); proxyIter->Next())
       {
       vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(proxyIter->GetProxy());
@@ -662,10 +665,11 @@ bool pqAnimationManager::saveAnimation()
         viewToDelete.push_back(view);
         }
       }
-    for(std::vector<vtkSMViewProxy*>::iterator it = viewToDelete.begin();
-        it != viewToDelete.end(); it++)
+
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    foreach (vtkSMViewProxy* view, viewToDelete)
       {
-      pxm->UnRegisterProxy(*it);
+      controller->UnRegisterViewProxy(view, /*unregister_representations*/ false);
       }
 
     // Disconnect from the server

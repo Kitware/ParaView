@@ -744,7 +744,8 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::UnRegisterViewProxy(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::UnRegisterViewProxy(
+  vtkSMProxy* proxy, bool unregister_representations/*=true*/)
 {
   if (!proxy)
     {
@@ -783,7 +784,7 @@ bool vtkSMParaViewPipelineController::UnRegisterViewProxy(vtkSMProxy* proxy)
   // remove all representation proxies.
   const char* pnames[]={"Representations", "HiddenRepresentations",
     "Props", "HiddenProps", NULL};
-  for (int index=0; pnames[index] != NULL; ++index)
+  for (int index=0; unregister_representations && (pnames[index] != NULL); ++index)
     {
     vtkSMProperty* prop = proxy->GetProperty(pnames[index]);
     if (prop == NULL)

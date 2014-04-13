@@ -81,11 +81,6 @@ vtkPVSessionBase::~vtkPVSessionBase()
     controller->RemoveObserver(this->DesactivateObserverTag);
     }
 
-  if(vtkProcessModule::GetProcessModule())
-    {
-    vtkProcessModule::GetProcessModule()->InvokeEvent(vtkCommand::ExitEvent);
-    }
-
   if (this->SessionCore)
     {
     this->SessionCore->Delete();

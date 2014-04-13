@@ -418,8 +418,10 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
     }
 
   // Load the global_properties
-  vtkSMProxy* globalPropertiesProxy = pxm->GetProxy("global_properties", "ColorPalette");
-  globalPropertiesProxy->LoadXMLState(element, this->ProxyLocator);
+  if (vtkSMProxy* globalPropertiesProxy = pxm->GetProxy("global_properties", "ColorPalette"))
+    {
+    globalPropertiesProxy->LoadXMLState(element, this->ProxyLocator);
+    }
 
   return 1;
 }

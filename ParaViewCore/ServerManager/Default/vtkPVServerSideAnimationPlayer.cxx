@@ -43,8 +43,9 @@ class vtkPVServerSideAnimationPlayer::vtkInternals
 {
 public:
   vtkInternals(vtkPVServerSideAnimationPlayer* parent)
+    : ObserverId(0),
+    WatchSessionID(0)
   {
-    this->ObserverId = 0;
     this->Owner = parent;
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     if(pm->GetPartitionId() == 0)
@@ -53,7 +54,9 @@ public:
       // Grab SessionServer and attach the session core to our vtkObject which
       // is a SMSession.
       vtkPVSessionBase* serverSession =
-          vtkPVSessionBase::SafeDownCast(pm->GetSession());
+          vtkPVSessionBase::SafeDownCast(pm->GetActiveSession());
+      this->WatchSessionID = pm->GetSessionID(serverSession);
+
       assert("Server session were find" && serverSession);
       this->Session.TakeReference(vtkSMSession::New(serverSession));
 
@@ -66,10 +69,10 @@ public:
         definitionManager->SetSession(NULL); // This will force the session to be properly set later on
         definitionManager->SetSession(this->Session.GetPointer());
 
-        // Attach callback to the vtkCommand::ExitEvent to trigger the animation saving
-        this->ObserverId = pm->AddObserver(vtkCommand::ExitEvent,
-                                           this->Owner.GetPointer(),
-                                           &vtkPVServerSideAnimationPlayer::TriggerExecution);
+        // Attach to unregister event, so that when the "active" session is unregistered, we can
+        // do the cleanup.
+        this->ObserverId = pm->AddObserver(vtkCommand::ConnectionClosedEvent,
+          this, &vtkPVServerSideAnimationPlayer::vtkInternals::OnUnRegisterSession);
         }
       }
     else
@@ -90,11 +93,32 @@ public:
   }
 
 public:
-  unsigned long ObserverId;
   vtkWeakPointer<vtkPVServerSideAnimationPlayer> Owner;
   vtkSmartPointer<vtkSMSession> Session;
   vtkSmartPointer<vtkSMAnimationSceneImageWriter> Writer;
   vtkSmartPointer<vtkPVXMLElement> XMLState;
+private:
+  unsigned long ObserverId;
+  vtkIdType WatchSessionID;
+
+  void OnUnRegisterSession(vtkObject* caller, unsigned long eventid, void* calldata)
+    {
+    assert(vtkProcessModule::SafeDownCast(caller) != NULL &&
+      eventid == vtkCommand::ConnectionClosedEvent);
+    vtkIdType sessionId = *(reinterpret_cast<vtkIdType*>(calldata));
+    if (sessionId <= 0 || sessionId != this->WatchSessionID)
+      {
+      return;
+      }
+
+    caller->RemoveObserver(this->ObserverId);
+    this->ObserverId = 0;
+    this->WatchSessionID = 0;
+    if (this->Owner)
+      {
+      this->Owner->TriggerExecution();
+      }
+    }
 };
 
 //****************************************************************************
@@ -140,7 +164,7 @@ void vtkPVServerSideAnimationPlayer::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerSideAnimationPlayer::TriggerExecution(vtkObject*, unsigned long, void*)
+void vtkPVServerSideAnimationPlayer::TriggerExecution()
 {
  // Ensure only one execution
   if(this->Internals->Session)

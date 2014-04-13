@@ -115,7 +115,10 @@ public:
   // Users can use either this method or the catch-all
   // vtkSMParaViewPipelineController::UnRegisterProxy() method which
   // determines the type of the proxy and then calls the appropriate method.
-  virtual bool UnRegisterViewProxy(vtkSMProxy* proxy);
+  // If the optional argument, \c unregister_representations, is false (default
+  // is true), then this method will skip the unregistering of representations.
+  // Default behaviour is to unregister all representations too.
+  virtual bool UnRegisterViewProxy(vtkSMProxy* proxy, bool unregister_representations=true);
 
   // Description:
   // Registration method for representations to be used after
@@ -186,16 +189,10 @@ public:
   //
   // Description:
   // A catch-all method do cleanup and unregister any proxies that were
-  // registered using Register..Proxy() APIs on this class. This method will not
-  // not unregister the proxy, but remove relevant dependecies for the proxy
-  // e.g. when unregistering a pipeline proxy, it will unregister its
-  // representations, any animation cues connected to the proxy e.g.
-  // \li for a pipeline-proxy, this will finalize all representations that use
-  // this proxy, any animation cue referring to it;
-  // \li for a view-proxy, this will finalize all representations shown in that
-  // view;
-  // \li for an animation-scene, this will finalize all animation cues known
-  // to the scene.
+  // registered using Register..Proxy() APIs on this class. It determines what
+  // known types the "proxy" is, i.e. is it a view, or pipeline, or
+  // representation etc., and then calls the appropriate UnRegister...Proxy()
+  // method.
   virtual bool UnRegisterProxy(vtkSMProxy* proxy);
 
   // Description:
