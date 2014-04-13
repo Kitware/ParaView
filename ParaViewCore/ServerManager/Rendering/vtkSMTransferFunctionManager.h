@@ -85,6 +85,11 @@ public:
   // and those corresponding to arrays used for coloring can be automatically shown.
   virtual bool UpdateScalarBars(vtkSMProxy* viewProxy, unsigned int mode);
 
+  // Description:
+  // Hides the scalar bar, if any, for the lutProxy in the view if it's not
+  // being used. Returns true if the scalar bar visibility was changed.
+  virtual bool HideScalarBarIfNotNeeded(vtkSMProxy* lutProxy, vtkSMProxy* view);
+
 //BTX
 protected:
   vtkSMTransferFunctionManager();

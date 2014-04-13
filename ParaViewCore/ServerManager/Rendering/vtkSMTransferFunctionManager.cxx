@@ -294,6 +294,53 @@ bool vtkSMTransferFunctionManager::UpdateScalarBars(
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMTransferFunctionManager::HideScalarBarIfNotNeeded(
+  vtkSMProxy* lutProxy, vtkSMProxy* view)
+{
+  if (!lutProxy || !view)
+    {
+    return false;
+    }
+
+  vtkSMProxy* sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
+    lutProxy, view);
+  if (!sbProxy)
+    {
+    // sb hidden.
+    return false;
+    }
+
+  vtkSMPropertyHelper visibilityHelper(sbProxy, "Visibility");
+  if (visibilityHelper.GetAsInt() == 0)
+    {
+    // sb hidden.
+    return false;
+    }
+
+  // build a list of all transfer functions used for scalar coloring in this
+  // view and build a list of scalar bars currently shown in this view.
+  vtkSMPropertyHelper reprHelper(view, "Representations");
+  for (unsigned int cc=0, max=reprHelper.GetNumberOfElements(); cc < max; ++cc)
+    {
+    vtkSMProxy* proxy = reprHelper.GetAsProxy(cc);
+    if (vtkSMPropertyHelper(proxy, "Visibility", true).GetAsInt() == 1 &&
+      vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
+      {
+      vtkSMProxy* lut = vtkSMPropertyHelper(proxy, "LookupTable", true).GetAsProxy();
+      if (lut == lutProxy)
+        {
+        // lut is being used. Don't hide the scalar bar.
+        return false;
+        }
+      }
+    }
+
+  vtkSMPropertyHelper(sbProxy, "Visibility").Set(0);
+  sbProxy->UpdateVTKObjects();
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTransferFunctionManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

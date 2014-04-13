@@ -168,7 +168,6 @@ namespace
 
 }
 
-bool vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow = false;
 bool vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide = true;
 bool vtkSMParaViewPipelineControllerWithRendering::InheritRepresentationProperties = false;
 
@@ -181,12 +180,6 @@ vtkSMParaViewPipelineControllerWithRendering::vtkSMParaViewPipelineControllerWit
 //----------------------------------------------------------------------------
 vtkSMParaViewPipelineControllerWithRendering::~vtkSMParaViewPipelineControllerWithRendering()
 {
-}
-
-//----------------------------------------------------------------------------
-void vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(bool val)
-{
-  vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow = val;
 }
 
 //----------------------------------------------------------------------------
@@ -217,7 +210,8 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
 
   if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(proxy))
     {
-    // setup transfer functions if none are set.
+    // If representation has been initialized to use scalar coloring and no
+    // transfer functions are setup, we setup the transfer functions.
     vtkSMPropertyHelper helper(proxy, "ColorArrayName");
     const char* arrayName = helper.GetInputArrayNameToProcess();
     if (arrayName != NULL && arrayName[0] != '\0')
@@ -263,12 +257,6 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     {
     vtkSMPropertyHelper(repr, "Visibility").Set(1);
     repr->UpdateVTKObjects();
-
-    if (vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow &&
-      vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
-      {
-      vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, view, true);
-      }
     return repr;
     }
 
@@ -299,12 +287,6 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     vtkSMPropertyHelper(view, "Representations").Add(repr);
     view->UpdateVTKObjects();
     repr->FastDelete();
-
-    if (vtkSMParaViewPipelineControllerWithRendering::ShowScalarBarOnShow &&
-      vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
-      {
-      vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, view, true);
-      }
     return repr;
     }
 
@@ -336,8 +318,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
 
     if (vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide)
       {
-      vtkNew<vtkSMTransferFunctionManager> tmgr;
-      tmgr->UpdateScalarBars(view, vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+      vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(repr, view);
       }
     return repr;
     }

@@ -163,6 +163,20 @@ public:
     }
 
   // Description:
+  // While SetScalarBarVisibility can be used to hide a scalar bar, it will
+  // always simply hide the scalar bar even if its being used by some other
+  // representation. Use this method instead to only hide the scalar/color bar
+  // if no other visible representation in the view is mapping data using the
+  // scalar bar.
+  virtual bool HideScalarBarIfNotNeeded(vtkSMProxy* view);
+  static bool HideScalarBarIfNotNeeded(vtkSMProxy* repr, vtkSMProxy* view)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(repr);
+    return self? self->HideScalarBarIfNotNeeded(view) : false;
+    }
+
+  // Description:
   // Returns the array information for the data array used for scalar coloring,
   // if any. Otherwise returns NULL.
   virtual vtkPVArrayInformation* GetArrayInformationForColorArray();

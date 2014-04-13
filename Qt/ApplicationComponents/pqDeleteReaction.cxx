@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
@@ -273,14 +274,26 @@ void pqDeleteReaction::aboutToDelete(pqPipelineSource* source)
     vtkSMViewProxy* viewProxy = view->getViewProxy();
     if (controller->GetVisibility(source->getSourceProxy(), 0, viewProxy))
       {
+      // this will also hide scalar bars if needed.
+      controller->Hide(source->getSourceProxy(), 0, viewProxy);
+
       // if firstInput had a representation in this view that was hidden, show
       // it. We don't want to create a new representation, however.
       if (viewProxy->FindRepresentation(
           firstInput->getSourceProxy(), firstInput->getPortNumber()))
         {
-        controller->SetVisibility(
+        vtkSMProxy* repr = controller->SetVisibility(
           firstInput->getSourceProxy(), firstInput->getPortNumber(),
           viewProxy, true);
+        // since we turned on input representation, show scalar bar, if the user
+        // preference is such.
+        if (repr &&
+          vtkPVGeneralSettings::GetInstance()->GetScalarBarMode() ==
+          vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
+          vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+          {
+          vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, viewProxy, true);
+          }
         view->render();
         }
       }

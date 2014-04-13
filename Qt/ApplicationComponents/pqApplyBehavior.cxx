@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
@@ -254,6 +255,19 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
       if (pqPipelineFilter *filter = qobject_cast<pqPipelineFilter *>(source))
         {
         this->hideInputIfRequired(filter, view);
+        }
+      }
+
+    // show scalar bar, if applicable.
+    vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
+    if (gsettings->GetScalarBarMode() ==
+      vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+      {
+      vtkSMProxy* reprProxy = preferredView->FindRepresentation(
+        source->getSourceProxy(), outputPort);
+      if (vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy))
+        {
+        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, preferredView, true);
         }
       }
     }

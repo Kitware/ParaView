@@ -446,6 +446,27 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(vtkSMProxy* view)
+{
+  vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
+  if (!lutProperty)
+    {
+    return false;
+    }
+
+  vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+  if (lutPropertyHelper.GetNumberOfElements() == 0 ||
+    lutPropertyHelper.GetAsProxy(0) == NULL)
+    {
+    return false;
+    }
+
+  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+  vtkNew<vtkSMTransferFunctionManager> tmgr;
+  return tmgr->HideScalarBarIfNotNeeded(lutProxy, view);
+}
+
+//----------------------------------------------------------------------------
 vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorArray()
 {
   if (!this->GetUsingScalarColoring())

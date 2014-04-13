@@ -159,17 +159,14 @@ void vtkPVGeneralSettings::SetScalarBarMode(int val)
   switch (val)
     {
   case AUTOMATICALLY_HIDE_SCALAR_BARS:
-    vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(false);
     vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
     break;
 
   case AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
-    vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(true);
     vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(true);
     break;
 
   default:
-    vtkSMParaViewPipelineControllerWithRendering::SetShowScalarBarOnShow(false);
     vtkSMParaViewPipelineControllerWithRendering::SetHideScalarBarOnHide(false);
     }
 

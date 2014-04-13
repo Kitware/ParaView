@@ -168,19 +168,29 @@ bool vtkSMScalarBarWidgetRepresentationProxy::UpdateComponentTitle(
 namespace
 {
   inline bool IsAvailable(
-    double x, double y, const std::vector<vtkBoundingBox>& boxes)
+    const vtkBoundingBox& bbox, const std::vector<vtkBoundingBox>& boxes)
     {
     for (std::vector<vtkBoundingBox>::const_iterator iter=boxes.begin();
       iter != boxes.end(); ++iter)
       {
-      if (iter->ContainsPoint(x, y, 0.0) == 1)
+      if (iter->Intersects(bbox) == 1)
         {
         return false;
         }
       }
     return true;
     }
+
+  inline vtkBoundingBox GetBox(
+    const double anchor[2], const double position[2])
+    {
+    return vtkBoundingBox(
+      anchor[0], anchor[0] + position[0],
+      anchor[1], anchor[1] + position[1],
+      0, 0);
+    }
 };
+
 //----------------------------------------------------------------------------
 bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
 {
@@ -189,7 +199,7 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
     return false;
     }
 
-  // locate all other visible scalar bar in the view and determine their
+  // locate all *other* visible scalar bar in the view and determine their
   // positions.
   std::vector<vtkBoundingBox> occupiedBoxes;
 
@@ -215,53 +225,50 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
   double mysize[2];
   vtkSMPropertyHelper pos2Helper(this, "Position2");
   pos2Helper.Get(mysize, 2);
+  // if size is invalid, fix it.
   if (mysize[0] <= 0.0) { mysize[0] = 0.23; }
   if (mysize[1] <= 0.0) { mysize[1] = 0.13; }
   pos2Helper.Set(mysize, 2);
 
+  double myanchor[2];
+  vtkSMPropertyHelper posHelper(this, "Position");
+  posHelper.Get(myanchor, 2);
+
+  // if this scalar bar's current position is available, we don't bother moving
+  // it at all.
+  if (IsAvailable(GetBox(myanchor, mysize), occupiedBoxes))
+    {
+    // scalar bar doesn't need to be moved at all.
+    this->UpdateVTKObjects();
+    return true;
+    }
+
   // FIXME: to respect mysize. Right now I'm just ignoring it.
   // We try the 4 corners first starting with the lower-right corner.
-  if (IsAvailable(0.75, 0.05, occupiedBoxes))
+  const double anchorPositions[8][2] =
     {
-    double pos[]= {0.75, 0.05};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
-    }
-  else if (IsAvailable(0.75, 0.9, occupiedBoxes))
+      // four corners first, starting with lower right.
+      {0.75, 0.05},
+      {0.75, 0.90},
+      {0.02, 0.90},
+      {0.02, 0.05},
+      // 4 centers next.
+      {0.30, 0.05},
+      {0.75, 0.40},
+      {0.30, 0.90},
+      {0.02, 0.40}
+    };
+
+  for (int kk=0; kk < 8; ++kk)
     {
-    double pos[]= {0.75, 0.9};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
+    vtkBoundingBox mybox = GetBox(anchorPositions[kk], mysize);
+    if (IsAvailable(mybox, occupiedBoxes))
+      {
+      posHelper.Set(anchorPositions[kk], 2);
+      break;
+      }
     }
-  else if (IsAvailable(0.02, 0.9, occupiedBoxes))
-    {
-    double pos[]= {0.02, 0.9};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
-    }
-  else if (IsAvailable(0.02, 0.05, occupiedBoxes))
-    {
-    double pos[]= {0.02, 0.05};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
-    }
-  // Next try the 4 centers.
-  else if (IsAvailable(0.3, 0.05, occupiedBoxes))
-    {
-    double pos[]= {0.3, 0.05};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
-    }
-  else if (IsAvailable(0.75, 0.4, occupiedBoxes))
-    {
-    double pos[]= {0.75, 0.4};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
-    }
-  else if (IsAvailable(0.3, 0.9, occupiedBoxes))
-    {
-    double pos[]= {0.3, 0.9};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
-    }
-  else if (IsAvailable(0.02, 0.4, occupiedBoxes))
-    {
-    double pos[]= {0.02, 0.4};
-    vtkSMPropertyHelper(this, "Position").Set(pos, 2);
-    }
+
   // otherwise just leave the positions unchanged.
   this->UpdateVTKObjects();
   return true;

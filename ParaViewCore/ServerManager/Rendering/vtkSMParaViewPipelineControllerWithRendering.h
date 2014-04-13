@@ -94,8 +94,7 @@ public:
   virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy);
 
   // Description:
-  // Control how scalar bar visibility is updated by Show/Hide calls.
-  static void SetShowScalarBarOnShow(bool);
+  // Control how scalar bar visibility is updated by the Hide call.
   static void SetHideScalarBarOnHide(bool);
 
   // Description:
@@ -116,7 +115,6 @@ protected:
 private:
   vtkSMParaViewPipelineControllerWithRendering(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
   void operator=(const vtkSMParaViewPipelineControllerWithRendering&); // Not implemented
-  static bool ShowScalarBarOnShow;
   static bool HideScalarBarOnHide;
   static bool InheritRepresentationProperties;
 //ETX

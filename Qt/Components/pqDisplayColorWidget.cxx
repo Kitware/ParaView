@@ -117,6 +117,11 @@ protected:
 
     BEGIN_UNDO_SET("Change coloring");
     vtkSMProxy* reprProxy = this->proxySM();
+
+    // before changing scalar color, save the LUT being used so we can hide the
+    // scalar bar later, if needed.
+    vtkSMProxy* oldLutProxy = vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
+
     vtkSMPVRepresentationProxy::SetScalarColoring(reprProxy, arrayName.toAscii().data(), association);
 
     vtkNew<vtkSMTransferFunctionManager> tmgr;
@@ -129,8 +134,7 @@ protected:
       {
     case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
     case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
-      tmgr->UpdateScalarBars(view, vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
-      break;
+      tmgr->HideScalarBarIfNotNeeded(oldLutProxy, view);
       break;
       }
 
@@ -147,7 +151,6 @@ protected:
         vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
         }
       }
-
     END_UNDO_SET();
     }
 
