@@ -45,12 +45,6 @@ set (Module_SRCS
   pqActiveServer.h
   pqActiveView.cxx
   pqActiveView.h
-  pqActiveViewOptions.cxx
-  pqActiveViewOptions.h
-  pqActiveViewOptionsManager.cxx
-  pqActiveViewOptionsManager.h
-  #pqAddSourceDialog.cxx
-  #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.cxx
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.cxx
@@ -134,8 +128,6 @@ set (Module_SRCS
   pqDisplayColorWidget.h
   pqDisplayPanel.cxx
   pqDisplayPanel.h
-  pqDisplayPanelDecoratorInterface.cxx
-  pqDisplayPanelDecoratorInterface.h
   pqDisplayPanelInterface.cxx
   pqDisplayPanelInterface.h
   pqDisplayPanelPropertyWidget.cxx
@@ -222,12 +214,7 @@ set (Module_SRCS
   pqObjectPanelInterface.h
   pqObjectPanelPropertyWidget.cxx
   pqObjectPanelPropertyWidget.h
-  pqOptionsContainer.cxx
-  pqOptionsContainer.h
-  pqOptionsDialog.cxx
-  pqOptionsDialog.h
-  pqOptionsPage.cxx
-  pqOptionsPage.h
+
   pqOrbitCreatorDialog.cxx
   pqOrbitCreatorDialog.h
   pqOrbitWidget.cxx
@@ -376,8 +363,6 @@ set (Module_SRCS
   pqViewFrame.h
   pqViewManager.cxx
   pqViewManager.h
-  pqViewOptionsInterface.cxx
-  pqViewOptionsInterface.h
   pqWidgetRangeDomain.cxx
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx
@@ -393,8 +378,6 @@ set (Module_MOC_HDRS
   pqActiveObjects.h
   pqActiveServer.h
   pqActiveView.h
-  pqActiveViewOptions.h
-  pqActiveViewOptionsManager.h
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.h
@@ -472,9 +455,6 @@ set (Module_MOC_HDRS
   pqNetCDFPanel.h
   pqObjectPanel.h
   pqObjectPanelPropertyWidget.h
-  pqOptionsContainer.h
-  pqOptionsDialog.h
-  pqOptionsPage.h
   pqOrbitCreatorDialog.h
   pqOrbitWidget.h
   pqOutputPortComboBox.h
@@ -557,7 +537,6 @@ set (Module_UI_FILES
   Resources/UI/pqAboutDialog.ui
   #Resources/UI/pqAddSourceDialog.ui
   Resources/UI/pqAnimationSettings.ui
-  Resources/UI/pqBarChartOptionsWidget.ui
   Resources/UI/pqBoxWidget.ui
   Resources/UI/pqCalculatorWidget.ui
   Resources/UI/pqCameraDialog.ui
@@ -591,7 +570,6 @@ set (Module_UI_FILES
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMemoryInspectorPanelForm.ui
-  Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPluginDialog.ui

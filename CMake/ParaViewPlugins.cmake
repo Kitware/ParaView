@@ -485,63 +485,16 @@ MACRO(ADD_PARAVIEW_VIEW_MODULE OUTIFACES OUTSRCS)
 
 ENDMACRO(ADD_PARAVIEW_VIEW_MODULE)
 
-# create implementation for a custom view options interface
-# ADD_PARAVIEW_VIEW_OPTIONS(
-#    OUTIFACES
-#    OUTSRCS
-#    VIEW_TYPE type
-#    [ACTIVE_VIEW_OPTIONS classname]
-#    [GLOBAL_VIEW_OPTIONS classname]
-#
-#  VIEW_TYPE: the type of view the options panels are associated with
-#  ACTIVE_VIEW_OPTIONS: optional name for the class that implements pqActiveViewOptions
-#                       this is to add options that are specific to a view instance
-#  GLOBAL_VIEW_OPTIONS: optional name for the class that implements pqOptionsContainer
-#                       this is to add options that apply to all view instances
-MACRO(ADD_PARAVIEW_VIEW_OPTIONS OUTIFACES OUTSRCS)
-
-  PV_PLUGIN_PARSE_ARGUMENTS(ARG "VIEW_TYPE;ACTIVE_VIEW_OPTIONS;GLOBAL_VIEW_OPTIONS" "" ${ARGN} )
-
-  IF(NOT ARG_VIEW_TYPE)
-    MESSAGE(ERROR " ADD_PARAVIEW_VIEW_OPTIONS called without VIEW_TYPE")
-  ENDIF(NOT ARG_VIEW_TYPE)
-
-  IF(NOT ARG_ACTIVE_VIEW_OPTIONS AND NOT ARG_GLOBAL_VIEW_OPTIONS)
-    MESSAGE(ERROR " ADD_PARAVIEW_VIEW_OPTIONS called without ACTIVE_VIEW_OPTIONS or GLOBAL_VIEW_OPTIONS")
-  ENDIF(NOT ARG_ACTIVE_VIEW_OPTIONS AND NOT ARG_GLOBAL_VIEW_OPTIONS)
-
-  SET(HAVE_ACTIVE_VIEW_OPTIONS 0)
-  SET(HAVE_GLOBAL_VIEW_OPTIONS 0)
-
-  IF(ARG_ACTIVE_VIEW_OPTIONS)
-    SET(HAVE_ACTIVE_VIEW_OPTIONS 1)
-  ENDIF(ARG_ACTIVE_VIEW_OPTIONS)
-
-  IF(ARG_GLOBAL_VIEW_OPTIONS)
-    SET(HAVE_GLOBAL_VIEW_OPTIONS 1)
-  ENDIF(ARG_GLOBAL_VIEW_OPTIONS)
-
-  SET(${OUTIFACES} ${ARG_VIEW_TYPE}Options)
-
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.cxx @ONLY)
-
-  SET(PANEL_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(PANEL_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(PANEL_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.h)
-  ENDIF ()
-
- SET(${OUTSRCS}
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.h
-      ${PANEL_MOC_SRCS}
-      )
-
+#------------------------------------------------------------------------
+# DEPRECATED: create implementation for a custom view options interface
+MACRO(ADD_PARAVIEW_VIEW_OPTIONS)
+  message(FATAL_ERROR
+"'ADD_PARAVIEW_VIEW_OPTIONS' macro is no longer supported.
+ParaView's settings/view settings infrastructure has been refactored.
+These old options panel no longer make sense and hence cannot be supported
+anymore.")
 ENDMACRO(ADD_PARAVIEW_VIEW_OPTIONS)
+#------------------------------------------------------------------------
 
 # create implementation for a custom menu or toolbar
 # ADD_PARAVIEW_ACTION_GROUP(
@@ -698,39 +651,14 @@ MACRO(ADD_PARAVIEW_AUTO_START OUTIFACES OUTSRCS)
       )
 ENDMACRO(ADD_PARAVIEW_AUTO_START)
 
-# Create implementation for a custom display panel decorator interface.
+#--------------------------------------------------------------------------------------
+# DEPRECATED: Create implementation for a custom display panel decorator interface.
 # Decorators are used to add additional decorations to display panels.
-# ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(
-#    OUTIFACES
-#    OUTSRCS
-#    CLASS_NAME classname
-#    PANEL_TYPES type1 type2 ..)
-# CLASS_NAME   : The class name for the decorator. The decorator must be a
-#                QObject subclass. The display panel is passed as the parent for
-#                the object.
-# PANEL_TYPES  : list of classnames for the display panel which this decorator
-#                can decorate.
-MACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR OUTIFACES OUTSRCS)
-  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;PANEL_TYPES" "" ${ARGN})
-
-  SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
-
-  SET(ACTION_MOC_SRCS)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ELSE ()
-    QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
-  ENDIF ()
-
-  SET(${OUTSRCS}
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h
-      ${ACTION_MOC_SRCS}
-      )
+MACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR)
+  message(FATAL_ERROR
+"'ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR' macro is no longer supported.
+ParaView's Properties panel has been refactored in 3.98.
+Display Panel Decorators are no longer applicaple.")
 ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR)
 
 

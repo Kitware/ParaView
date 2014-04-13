@@ -44,16 +44,15 @@ set (Module_MOC_HDRS
 )
 
 set (Module_UI_FILES
-  pqColorScaleDialog.ui
 )
 
 #-----------------------------------------------------------------------------------
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   qt5_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  #  qt5_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 else ()
   qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-  qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+  #qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 endif ()
 set(${vtk-module}_NO_HeaderTest 1)
 vtk_module_library(${vtk-module}

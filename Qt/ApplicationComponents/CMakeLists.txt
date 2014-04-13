@@ -241,8 +241,6 @@ set (Module_SRCS
   pqViewFrameActionsBehavior.h
   pqViewMenuManager.cxx
   pqViewMenuManager.h
-  pqViewSettingsManager.cxx
-  pqViewSettingsManager.h
   pqViewStreamingBehavior.cxx
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.cxx
@@ -355,7 +353,6 @@ set (Module_MOC_HDRS
   pqVerifyRequiredPluginBehavior.h
   pqViewFrameActionsBehavior.h
   pqViewMenuManager.h
-  pqViewSettingsManager.h
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.h
 )
