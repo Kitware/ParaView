@@ -1918,7 +1918,9 @@
                             default_values="0"
                             name="Time"
                             number_of_elements="1"
-                            precision="16">
+                            precision="16"
+                            state_ignored="1">
+        <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
@@ -1932,7 +1934,9 @@
                             information_only="1"
                             name="TimeRange"
                             number_of_elements="2"
-                            precision="16">
+                            precision="16"
+                            state_ignored="1">
+        <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
         <Documentation>This is the time range. It's possible that there are no
         TimestepValues but there is a valid TimeRange since some sources may
         provide continuous time.</Documentation>
@@ -1940,7 +1944,9 @@
       <StringVectorProperty default_values="Time"
                             information_only="1"
                             name="TimeLabel"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            state_ignored="1">
+        <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
         <Documentation>This is the string that is used as label to eventually
         replace "time" by something else such as "frequency" or any user
         specific label that the user want to set to use a 4th dimension that is

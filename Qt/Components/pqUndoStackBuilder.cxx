@@ -80,7 +80,11 @@ bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
   // XML Flag: state_ignored="1"
   if( !remoteObj || (proxy && (
       proxy->IsA("vtkSMCameraProxy") ||
-      proxy->IsA("vtkSMTimeKeeperProxy") ||
+
+      // we no longer skip TimeKeeper. We need to record the changes to
+      // TimeSources, SuppressedTimeSources properties.
+      // proxy->IsA("vtkSMTimeKeeperProxy") ||
+      //
       proxy->IsA("vtkSMAnimationScene") ||
       proxy->IsA("vtkSMAnimationSceneProxy") ||
       proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||

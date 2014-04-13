@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardPropertyWidgetInterface.h"
 #include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
+#include "pqUndoStack.h"
 #include "pqVerifyRequiredPluginBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
 #include "pqViewStreamingBehavior.h"
@@ -85,8 +86,8 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqPipelineContextMenuBehavior(this);
   new pqObjectPickingBehavior(this);
   new pqDefaultViewBehavior(this);
-  new pqAlwaysConnectedBehavior(this);
   new pqUndoRedoBehavior(this);
+  new pqAlwaysConnectedBehavior(this);
   new pqCrashRecoveryBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
   new pqPluginDockWidgetsBehavior(mainWindow);
@@ -118,5 +119,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
     mainWindow);
   QObject::connect(ctrlF, SIGNAL(activated()),
     pqApplicationCore::instance(), SLOT(startSearch()));
+
+  CLEAR_UNDO_STACK();
 }
 
