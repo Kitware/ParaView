@@ -238,6 +238,10 @@ public:
   // with this property value.
   virtual void AddLinkedProperty(vtkSMProperty* targetProperty);
 
+  // Description:
+  // Remove a link to a property added with AddLinkedProperty()
+  virtual void RemoveLinkedProperty(vtkSMProperty* targetProperty);
+
   // Description: 
   // Get/Set if the property is animateable. Non-animateable
   // properties are shown in the GUI only in advanced mode.

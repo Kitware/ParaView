@@ -239,7 +239,7 @@ bool vtkSMParaViewPipelineController::SetupGlobalPropertiesLinks(vtkSMProxy* pro
         }
       }
 
-    // Check for SettingsLinks
+    // Check for PropertyLinks
     linkHint = prop->GetHints()?
       prop->GetHints()->FindNestedElementByName("PropertyLink") : NULL;
     if (linkHint)
@@ -1179,6 +1179,40 @@ bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
       // unregister the proxy.
       pxm->UnRegisterProxy(
         groupname.c_str(), iter->first.c_str(), iter->second);
+      }
+    }
+
+  // Remove property links
+  vtkSmartPointer<vtkSMPropertyIterator> iter;
+  iter.TakeReference(proxy->NewPropertyIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* prop = iter->GetProperty();
+    assert(prop);
+
+    vtkPVXMLElement* linkHint = prop->GetHints()?
+      prop->GetHints()->FindNestedElementByName("PropertyLink") : NULL;
+    if (linkHint)
+      {
+      const char* sourceGroupName = linkHint->GetAttributeOrEmpty("group");
+      const char* sourceProxyName = linkHint->GetAttributeOrEmpty("proxy");
+      const char* sourcePropertyName = linkHint->GetAttributeOrEmpty("property");
+      if (!sourceGroupName || !sourceProxyName || !sourcePropertyName)
+        {
+        continue;
+        }
+
+      vtkSMProxy* sourceProxy = pxm->GetProxy(sourceGroupName, sourceProxyName);
+      if (!sourceProxy)
+        {
+        continue;
+        }
+
+      vtkSMProperty* sourceProperty =  sourceProxy->GetProperty(sourcePropertyName);
+      if (sourceProperty)
+        {
+        sourceProperty->RemoveLinkedProperty(prop);
+        }
       }
     }
 

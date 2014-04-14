@@ -188,6 +188,17 @@ void vtkSMProperty::AddLinkedProperty(vtkSMProperty* targetProperty)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProperty::RemoveLinkedProperty(vtkSMProperty* targetProperty)
+{
+  if (!targetProperty || !this->Links)
+    {
+    return;
+    }
+
+  this->Links->RemoveLinkedProperty(targetProperty->GetParent(), targetProperty->GetXMLName());
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProperty::InvokeDomainModifiedEvent()
 {
   this->InvokeEvent(vtkCommand::DomainModifiedEvent);
