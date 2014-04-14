@@ -26,7 +26,7 @@
 
 //BTX
 class vtkSMProperty;
-struct vtkSMPropertyLinkInternals;
+class vtkSMPropertyLinkInternals;
 class vtkSMPropertyLinkObserver;
 //ETX
 
@@ -93,7 +93,7 @@ protected:
   // Synchronize the value of all output properties with the input property.
   void Synchronize();
 
-  friend struct vtkSMPropertyLinkInternals;
+  friend class vtkSMPropertyLinkInternals;
   friend class vtkSMPropertyLinkObserver;
 
   // Description:
