@@ -275,7 +275,7 @@ bool vtkSMParaViewPipelineController::SetupGlobalPropertiesLinks(vtkSMProxy* pro
   return true;
 }
 
-namespace
+namespace vtkSMParaViewPipelineControllerNS
 {
   //---------------------------------------------------------------------------
   class vtkSMLinkObserver : public vtkCommand
@@ -338,7 +338,7 @@ void vtkSMParaViewPipelineController::ProcessProxyListProxyHints(
       const char* linked_with = child->GetAttribute("with_property");
       if (name && linked_with)
         {
-        vtkSMLinkObserver::LinkProperty(
+        vtkSMParaViewPipelineControllerNS::vtkSMLinkObserver::LinkProperty(
           parent->GetProperty(linked_with), plproxy->GetProperty(name));
         }
       }

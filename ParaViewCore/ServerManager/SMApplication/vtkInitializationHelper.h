@@ -24,6 +24,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerApplicationModule.h" // needed for exports
+#include <string> // needed for std::string
 class vtkPVOptions;
 
 class VTKPVSERVERMANAGERAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject

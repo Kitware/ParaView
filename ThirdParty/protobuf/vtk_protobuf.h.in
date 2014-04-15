@@ -21,6 +21,12 @@
 # error "Using System protobuf is not supported by ParaView"
 #else
 # include "vtkConfigure.h"
+# if defined(_MSC_VER) && defined(VTK_BUILD_SHARED_LIBS)
+// When building on Windows with shared libraries enabled, any VTK/ParaView code
+// that imports the protobuf headers needs to have this definitions otherwise
+// the export signatures will not match and we get tons of warnings.
+# define PROTOBUF_USE_DLLS
+# endif
 #endif
 
 /* Include the top-level header here.  */
