@@ -147,7 +147,7 @@ def ExecData(self, inputDS, selection, compositeDataSet = None):
             for arrayName in rankNames:
                 allArrayNames.add(arrayName)
         for arrayName in allArrayNames:
-            new_locals[arrayName] = []
+            new_locals[arrayName] = dataset_adapter.VTKArray([])
 
     # define global variables for all the arrays.
     for arrayname in dsa.keys():
