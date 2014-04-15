@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkJPEGWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVDataRepresentation.h"
@@ -46,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkTIFFWriter.h"
+#include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
@@ -96,6 +99,8 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
     this->ImageGrabber->SetInputBufferTypeToRGB();
 
     this->JPEGWriter->SetInputData(this->ImageStack.GetPointer());
+    this->TIFFWriter->SetInputData(this->ImageStack.GetPointer());
+    this->PNGWriter->SetInputData(this->ImageStack.GetPointer());
   }
 
   //----------------------------------------------------------------------------
@@ -250,12 +255,36 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
 
   void WriteImage()
   {
-    // Write JPEG image
+    if(this->ActiveWriter == NULL)
+      {
+      if(this->Owner->ImageFormatExtension == NULL || !strcmp("jpg", this->Owner->ImageFormatExtension))
+        {
+        this->Owner->SetImageFormatExtension("jpg");
+        this->ActiveWriter = this->JPEGWriter.GetPointer();
+        }
+      else if(!strcmp("png", this->Owner->ImageFormatExtension))
+        {
+        this->ActiveWriter = this->PNGWriter.GetPointer();
+        }
+      else if(!strcmp("tiff", this->Owner->ImageFormatExtension))
+        {
+        this->ActiveWriter = this->TIFFWriter.GetPointer();
+        }
+      else
+        {
+        this->Owner->SetImageFormatExtension("jpg");
+        this->ActiveWriter = this->JPEGWriter.GetPointer();
+        }
+      }
+
+    vtkTimerLog::MarkStartEvent( "WriteRGBImageToDisk" );
+    // Write image
     std::stringstream ss;
-    ss << this->Owner->GetCompositeDirectory() << "/rgb.jpg";
-    this->JPEGWriter->SetFileName(ss.str().c_str());
-    this->JPEGWriter->Modified();
-    this->JPEGWriter->Write();
+    ss << this->Owner->GetCompositeDirectory() << "/rgb." << this->Owner->ImageFormatExtension;
+    this->ActiveWriter->SetFileName(ss.str().c_str());
+    this->ActiveWriter->Modified();
+    this->ActiveWriter->Write();
+    vtkTimerLog::MarkEndEvent( "WriteRGBImageToDisk" );
   }
 
   //----------------------------------------------------------------------------
@@ -418,6 +447,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
 
   void WriteOrderMap(ostream& out)
   {
+    vtkTimerLog::MarkStartEvent( "WriteOrderMapToDisk" );
     std::map<std::string, int>::iterator entry;
     for( entry = this->PixelOrderCount.begin();
          entry != this->PixelOrderCount.end();
@@ -433,11 +463,14 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
         }
       out << entry->first.c_str() << "\" : " << entry->second;
       }
+    vtkTimerLog::MarkEndEvent("WriteOrderMapToDisk" );
   }
 
   //----------------------------------------------------------------------------
 
   vtkNew<vtkJPEGWriter> JPEGWriter;
+  vtkNew<vtkPNGWriter> PNGWriter;
+  vtkNew<vtkTIFFWriter> TIFFWriter;
   vtkNew<vtkWindowToImageFilter> ImageGrabber;
   vtkNew<vtkImageData> ImageStack;
   // --
@@ -445,6 +478,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   vtkNew<vtkWindowToImageFilter> ZGrabber;
   vtkWeakPointer<vtkPVRenderViewForAssembly> Owner;
   vtkWeakPointer<vtkUnsignedCharArray> RGBBuffer;
+  vtkWeakPointer<vtkImageWriter> ActiveWriter;
   bool VisibilityState[255];
   std::vector<vtkWeakPointer<vtkPVDataRepresentation> > CompositeRepresentations;
   static const char* CODING_TABLE;
@@ -470,6 +504,8 @@ vtkPVRenderViewForAssembly::vtkPVRenderViewForAssembly()
   this->RepresentationToRender = -1;
   this->ActiveStack = 0;
   this->RGBStackSize = -1;
+  this->ImageFormatExtension = NULL;
+  this->SetImageFormatExtension("jpg");
 
   this->Internal = new vtkInternals(this);
 }
@@ -485,6 +521,7 @@ vtkPVRenderViewForAssembly::~vtkPVRenderViewForAssembly()
     this->OrderingBufferSize = -1;
     }
   delete this->Internal;
+  this->SetImageFormatExtension(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -507,6 +544,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
 
   if(this->InsideComputeZOrdering)
     {
+    vtkTimerLog::MarkStartEvent("CaptureZBuffer" );
     this->Internal->StoreVisibilityState();
     bool orientationVisibilityOrigin = this->OrientationWidget->GetEnabled();
     bool centerOfRotationOrigin = (this->CenterAxes->GetVisibility() != 0);
@@ -521,7 +559,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
 
     // Get Background Z buffer
     this->Internal->ClearVisibility();
-    this->StillRender();
+    this->Superclass::Render(interactive, skip_rendering);
     if(this->SynchronizedWindows->GetLocalProcessIsDriver())
       {
       zBuffers[0] = this->Internal->CaptureZBuffer();
@@ -537,7 +575,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
       this->Internal->UpdateVisibleRepresentation(i);
 
       // Lets render
-      this->StillRender();
+      this->Superclass::Render(interactive, skip_rendering);
 
       // Grab Z-buffer
       if(this->SynchronizedWindows->GetLocalProcessIsDriver())
@@ -545,6 +583,8 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
         zBuffers[i+1] = this->Internal->CaptureZBuffer();
         }
       }
+    vtkTimerLog::MarkEndEvent("CaptureZBuffer" );
+    vtkTimerLog::MarkStartEvent("ComputeZOrdering" );
 
     // Do the ordering computation only on ROOT node
     if(this->SynchronizedWindows->GetLocalProcessIsDriver())
@@ -594,9 +634,12 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     this->Internal->RestoreVisibilityState();
     this->SetCenterAxesVisibility(centerOfRotationOrigin);
     this->SetOrientationAxesVisibility(orientationVisibilityOrigin);
+
+    vtkTimerLog::MarkEndEvent("ComputeZOrdering" );
     }
   else if(this->InsideRGBDump)
     {
+    vtkTimerLog::MarkStartEvent("CaptureRGB" );
     this->Internal->StoreVisibilityState();
     bool orientationVisibilityOrigin = this->OrientationWidget->GetEnabled();
     bool centerOfRotationOrigin = (this->CenterAxes->GetVisibility() != 0);
@@ -604,7 +647,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     // Capture Background
     this->Internal->ClearVisibility();
 
-    this->StillRender();
+    this->Superclass::Render(interactive, skip_rendering);
     if(this->SynchronizedWindows->GetLocalProcessIsDriver() && this->ActiveStack == 0)
       {
       this->Internal->CaptureImage(0);
@@ -623,7 +666,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
       for(int idx = 0; idx < nbReps; ++idx)
         {
         this->Internal->UpdateVisibleRepresentation(idx);
-        this->StillRender();
+        this->Superclass::Render(interactive, skip_rendering);
         if(this->SynchronizedWindows->GetLocalProcessIsDriver())
           {
           this->Internal->CaptureImage(this->ActiveStack++);
@@ -633,7 +676,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     else
       {
       this->Internal->UpdateVisibleRepresentation(this->RepresentationToRender);
-      this->StillRender();
+      this->Superclass::Render(interactive, skip_rendering);
       if(this->SynchronizedWindows->GetLocalProcessIsDriver())
         {
         this->Internal->CaptureImage(this->ActiveStack++);
@@ -644,10 +687,11 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     this->Internal->RestoreVisibilityState();
     this->SetCenterAxesVisibility(centerOfRotationOrigin);
     this->SetOrientationAxesVisibility(orientationVisibilityOrigin);
+    vtkTimerLog::MarkEndEvent("CaptureRGB" );
     }
   else
     {
-    this->StillRender();
+    this->Superclass::Render(interactive, skip_rendering);
     }
   this->InRender = false;
 }
@@ -735,6 +779,7 @@ void vtkPVRenderViewForAssembly::WriteComposite()
     }
 
   // Write order as info.json
+  vtkTimerLog::MarkStartEvent("WriteJSONData");
   std::stringstream jsonFileName;
   jsonFileName << this->CompositeDirectory << "/composite.json";
   ofstream file(jsonFileName.str().c_str(), ios::out);
@@ -751,15 +796,21 @@ void vtkPVRenderViewForAssembly::WriteComposite()
        << "\n\"dimensions\": [" << xSize << ", " << ySize << "]"
        << ",\n\"pixel-order\": \"";
 
+  vtkTimerLog::MarkEndEvent("WriteJSONData");
+  vtkTimerLog::MarkStartEvent("CompressCompositeJSON");
   this->Internal->LineCompressor(this->OrderingBuffer);
+  vtkTimerLog::MarkEndEvent("CompressCompositeJSON");
+  vtkTimerLog::MarkStartEvent("WriteJSONData");
   file << this->GetZOrdering();
 
   // Close file
   file << "\"\n}" << endl;
   file.close();
+  vtkTimerLog::MarkEndEvent("WriteJSONData");
 
 
   // Write collapsed order for image query
+  vtkTimerLog::MarkStartEvent("WriteJSONData");
   std::stringstream queryFileName;
   queryFileName << this->CompositeDirectory << "/query.json";
   ofstream queryFile(queryFileName.str().c_str(), ios::out);
@@ -780,6 +831,7 @@ void vtkPVRenderViewForAssembly::WriteComposite()
   // Close file
   queryFile << "\n}\n}" << endl;
   queryFile.close();
+  vtkTimerLog::MarkEndEvent("WriteJSONData");
 }
 
 //----------------------------------------------------------------------------

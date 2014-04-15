@@ -82,6 +82,11 @@ public:
   // Description:
   // Dump RGB buffer to the disk using the CompositeDirectory (rgb.jpg)
   void WriteImage();
+  // Description:
+  // Set image format type. Can only be 'jpg', 'png', 'tiff' where 'jpg' is
+  // the default format.
+  vtkGetStringMacro(ImageFormatExtension);
+  vtkSetStringMacro(ImageFormatExtension);
 
   // Description:
   // Set/Get RGB image stack size
@@ -136,6 +141,7 @@ private:
   int OrderingBufferSize;
   char* OrderingBuffer;
   int RepresentationToRender;
+  char* ImageFormatExtension;
 
   vtkBoundingBox ClippingBounds;
 

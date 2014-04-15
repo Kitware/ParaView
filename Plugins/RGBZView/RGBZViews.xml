@@ -24,6 +24,13 @@
             command="SetCompositeDirectory"
             number_of_elements="1">
         </StringVectorProperty>
+        <StringVectorProperty
+            name="ImageFormatExtension"
+            animateable="0"
+            default_values="jpg"
+            command="SetImageFormatExtension"
+            number_of_elements="1">
+        </StringVectorProperty>
         <IntVectorProperty
             name="RGBStackSize"
             animateable="0"

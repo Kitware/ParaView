@@ -27,6 +27,7 @@
 #include "vtkPoints.h"
 #include "vtkPVInstantiator.h"
 #include "vtkTIFFWriter.h"
+#include "vtkTimerLog.h"
 #include "vtkTransform.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -39,8 +40,10 @@ vtkStandardNewMacro(vtkSMUtilities);
 int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
   int quality /*=-1*/)
 {
+  vtkTimerLog::MarkStartEvent("vtkSMUtilities::SaveImage");
   if (!filename || !filename[0])
     {
+    vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImage");
     return vtkErrorCode::NoFileNameError;
     }
 
@@ -73,8 +76,9 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
       }
     writer = jpegWriter;
     }
-  else 
+  else
     {
+    vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImage");
     return vtkErrorCode::UnrecognizedFileTypeError;
     }
 
@@ -84,6 +88,7 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
   int error_code = writer->GetErrorCode();
 
   writer->Delete();
+  vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImage");
   return error_code;
 }
 
@@ -91,20 +96,25 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
 int vtkSMUtilities::
 SaveImage(vtkImageData* image, const char* filename, const char* writerName)
 {
+  vtkTimerLog::MarkStartEvent("vtkSMUtilities::SaveImage");
+
   if (!filename || !writerName)
     {
+    vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImage");
     return vtkErrorCode::UnknownError;
     }
 
   vtkObject* object = vtkPVInstantiator::CreateInstance(writerName);
   if (!object)
     {
+    vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImage");
     vtkGenericWarningMacro("Failed to create Writer " << writerName);
     return vtkErrorCode::UnknownError;
     }
   vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
   if (!writer)
     {
+    vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImage");
     vtkGenericWarningMacro("Object is not a vtkImageWriter: "
                                      << object->GetClassName());
     object->Delete();
@@ -116,6 +126,8 @@ SaveImage(vtkImageData* image, const char* filename, const char* writerName)
   writer->Write();
   int error_code = writer->GetErrorCode();
   writer->Delete();
+
+  vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImage");
   return error_code;
 }
 
@@ -126,6 +138,7 @@ SaveImage(vtkImageData* image, const char* filename, const char* writerName)
 int vtkSMUtilities::SaveImageOnProcessZero(vtkImageData* image,
                    const char* filename, const char* writerName)
 {
+  vtkTimerLog::MarkStartEvent("vtkSMUtilities::SaveImageOnProcessZero");
   int error_code;
   vtkMultiProcessController *controller =
     vtkMultiProcessController::GetGlobalController();
@@ -143,6 +156,7 @@ int vtkSMUtilities::SaveImageOnProcessZero(vtkImageData* image,
     error_code = SaveImage(image, filename, writerName);
     }
 
+  vtkTimerLog::MarkEndEvent("vtkSMUtilities::SaveImageOnProcessZero");
   return error_code;
 }
 
