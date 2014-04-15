@@ -105,20 +105,6 @@ public:
   typedef std::list<LinkedProperty> LinkedPropertyType;
   LinkedPropertyType LinkedProperties;
   vtkSMPropertyLinkObserver* PropertyObserver;
-
-  static bool LinkedPropertyIsNull(const vtkSMPropertyLinkInternals::LinkedProperty & linkedProperty)
-  {
-    return (linkedProperty.Proxy.GetPointer() == NULL &&
-            linkedProperty.Property.GetPointer() == NULL);
-  }
-
-  // Remove NULL properties from the LinkedProperties list
-  void RemoveNullLinks()
-  {
-    // Proxies may have been deleted, so remove links to NULL proxies
-    this->LinkedProperties.remove_if(vtkSMPropertyLinkInternals::LinkedPropertyIsNull);
-  }
-
 };
 
 //-----------------------------------------------------------------------------
@@ -145,7 +131,7 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
   int addToList = 1;
   int addObserver = updateDir & INPUT;
   bool input_exists = false;
-  
+
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
   for (; iter != this->Internals->LinkedProperties.end(); ++iter)
@@ -469,7 +455,6 @@ void vtkSMPropertyLink::UpdateProperty(vtkSMProxy* caller, const char* pname)
   // Update all output properties.
   if (is_input)
     {
-    this->Internals->RemoveNullLinks();
     iter = this->Internals->LinkedProperties.begin();
     for(; iter != this->Internals->LinkedProperties.end(); ++iter)
       {
@@ -486,8 +471,6 @@ void vtkSMPropertyLink::UpdateProperty(vtkSMProxy* caller, const char* pname)
 //-----------------------------------------------------------------------------
 void vtkSMPropertyLink::UpdateVTKObjects(vtkSMProxy* caller)
 {
-  this->Internals->RemoveNullLinks();
-
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
   for(; iter != this->Internals->LinkedProperties.end(); ++iter)

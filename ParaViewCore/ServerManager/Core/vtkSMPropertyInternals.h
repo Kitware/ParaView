@@ -19,6 +19,7 @@
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 
 #include <map>
 #include <vector>
@@ -31,6 +32,9 @@ struct vtkSMPropertyInternals
 
   typedef std::vector<vtkSmartPointer<vtkSMDomain> > DependentsVector;
   DependentsVector Dependents;
+
+  // Only one source allowed for links
+  vtkWeakPointer<vtkSMProperty> LinkSourceProperty;
 };
 
 #endif

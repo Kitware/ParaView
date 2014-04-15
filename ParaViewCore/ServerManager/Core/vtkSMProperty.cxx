@@ -82,6 +82,7 @@ vtkSMProperty::vtkSMProperty()
 //---------------------------------------------------------------------------
 vtkSMProperty::~vtkSMProperty()
 {
+  this->RemoveFromSourceLink();
   this->SetCommand(0);
   delete this->PInternals;
   this->SetXMLName(0);
@@ -185,6 +186,7 @@ void vtkSMProperty::AddLinkedProperty(vtkSMProperty* targetProperty)
 
   this->Links->AddLinkedProperty(targetProperty->GetParent(), targetProperty->GetXMLName(),
                                  vtkSMLink::OUTPUT);
+  targetProperty->PInternals->LinkSourceProperty = this;
 }
 
 //---------------------------------------------------------------------------
@@ -196,6 +198,17 @@ void vtkSMProperty::RemoveLinkedProperty(vtkSMProperty* targetProperty)
     }
 
   this->Links->RemoveLinkedProperty(targetProperty->GetParent(), targetProperty->GetXMLName());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::RemoveFromSourceLink()
+{
+  if (this->PInternals->LinkSourceProperty)
+    {
+    // Remove this instance as a subscriber to the source proxy
+    this->PInternals->LinkSourceProperty->RemoveLinkedProperty(this);
+    this->PInternals->LinkSourceProperty = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------

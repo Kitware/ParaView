@@ -1182,40 +1182,6 @@ bool vtkSMParaViewPipelineController::FinalizeProxy(vtkSMProxy* proxy)
       }
     }
 
-  // Remove property links
-  vtkSmartPointer<vtkSMPropertyIterator> iter;
-  iter.TakeReference(proxy->NewPropertyIterator());
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProperty* prop = iter->GetProperty();
-    assert(prop);
-
-    vtkPVXMLElement* linkHint = prop->GetHints()?
-      prop->GetHints()->FindNestedElementByName("PropertyLink") : NULL;
-    if (linkHint)
-      {
-      const char* sourceGroupName = linkHint->GetAttributeOrEmpty("group");
-      const char* sourceProxyName = linkHint->GetAttributeOrEmpty("proxy");
-      const char* sourcePropertyName = linkHint->GetAttributeOrEmpty("property");
-      if (!sourceGroupName || !sourceProxyName || !sourcePropertyName)
-        {
-        continue;
-        }
-
-      vtkSMProxy* sourceProxy = pxm->GetProxy(sourceGroupName, sourceProxyName);
-      if (!sourceProxy)
-        {
-        continue;
-        }
-
-      vtkSMProperty* sourceProperty =  sourceProxy->GetProperty(sourcePropertyName);
-      if (sourceProperty)
-        {
-        sourceProperty->RemoveLinkedProperty(prop);
-        }
-      }
-    }
-
   return true;
 }
 

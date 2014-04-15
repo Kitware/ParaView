@@ -28,7 +28,7 @@
 //
 // Each non-information property can have one or more domains. A domain represents a
 // set of acceptable values the property can have. Domains provide applications
-// mechanisms to extract semantic inform a property.
+// mechanisms to extract semantic information from a property.
 //
 // A property has two kinds of values: regular (or checked) values and unchecked
 // values. Regular values are the ones that are pushed to the VTK object when
@@ -73,7 +73,7 @@
 //        case.
 //
 // \li \b command: \c string: This is the name of the method to call on the VTK
-//        update for to property.
+//        update for the property.
 //
 // \li \b repeatable or \b repeat_command: \c{0, 1}: This used to indicate that
 //        the command can be called repeatedly to update the VTK object. e.g.
@@ -82,7 +82,7 @@
 //
 // \li \b information_only: \c{0, 1}: When set, it implies that this property
 //        is used to obtain values from the VTK object, rather than the default
-//        which is set values on the VTK object.
+//        behavior which is to set values on the VTK object.
 //
 // \li \b information_property: \c string: Value is the name of the property on the
 //        proxy to which this property belongs that can is information_only
@@ -241,6 +241,15 @@ public:
   // Description:
   // Remove a link to a property added with AddLinkedProperty()
   virtual void RemoveLinkedProperty(vtkSMProperty* targetProperty);
+
+  // Description:
+  // Remove a link from the source property. This is a useful way for
+  // target properties to unlink themselves from a source property prior to,
+  // for instance, the deletion of the target property instance. This
+  // method only does any work if this instance was passed as the
+  // argument to AddLinkedProperty() on a different property instance
+  // at some point. Otherwise, it is a no-op.
+  virtual void RemoveFromSourceLink();
 
   // Description: 
   // Get/Set if the property is animateable. Non-animateable
@@ -520,7 +529,7 @@ protected:
   vtkSetMacro(StateIgnored, bool);
   vtkBooleanMacro(StateIgnored, bool);
 
-  // Links for properties
+  // Links for properties that "subscribe" to changes to this property.
   vtkSMPropertyLink* Links;
 
 private:
