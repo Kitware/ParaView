@@ -90,6 +90,11 @@ protected:
   // Returns the default visibility for a series given its name.
   virtual bool GetDefaultSeriesVisibility(const char*);
 
+  // Description:
+  // Get the default value that will be used for the series with the given name
+  // by this domain.
+  virtual std::vector<vtkStdString> GetDefaultValue(const char* series);
+
   int DefaultMode;
 
   // Description:
@@ -112,11 +117,6 @@ private:
   // property's value.
   void OnDomainModified();
   void UpdateDefaultValues(vtkSMProperty*, bool preserve_previous_values);
-
-  // Description:
-  // Get the default value that will be used for the series with the given name
-  // by this domain.
-  std::vector<vtkStdString> GetDefaultValue(const char* series);
 
 //ETX
 };

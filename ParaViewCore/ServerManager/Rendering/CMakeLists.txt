@@ -44,6 +44,7 @@ set (Module_SRCS
   vtkSMComparativeViewProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMDataDeliveryManager.cxx
+  vtkSMFunctionalBagChartSeriesSelectionDomain.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx

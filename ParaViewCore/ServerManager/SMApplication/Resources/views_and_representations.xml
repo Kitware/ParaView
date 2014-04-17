@@ -6194,7 +6194,7 @@
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <Documentation>Set the series labels.</Documentation>
-        <ChartSeriesSelectionDomain name="array_list"
+        <FunctionalBagChartSeriesSelectionDomain name="array_list"
                                     default_mode="label"
                                     flatten_table="false">
           <RequiredProperties>
@@ -6202,7 +6202,7 @@
             <Property function="FieldDataSelection" name="AttributeType" />
             <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
-        </ChartSeriesSelectionDomain>
+        </FunctionalBagChartSeriesSelectionDomain>
       </StringVectorProperty>
       <StringVectorProperty command="SetColor"
                             clean_command="ClearColors"
@@ -6211,7 +6211,7 @@
                             number_of_elements_per_command="4"
                             repeat_command="1">
         <Documentation>Set the series line/bar color.</Documentation>
-        <ChartSeriesSelectionDomain name="array_list"
+        <FunctionalBagChartSeriesSelectionDomain name="array_list"
                                     default_mode="color"
                                     flatten_table="false">
           <RequiredProperties>
@@ -6219,7 +6219,7 @@
             <Property function="FieldDataSelection" name="AttributeType" />
             <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
-        </ChartSeriesSelectionDomain>
+        </FunctionalBagChartSeriesSelectionDomain>
       </StringVectorProperty>
       <IntVectorProperty command="SetChartType"
                          default_values="5"
@@ -6250,7 +6250,7 @@
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <Documentation>Set the series visibility.</Documentation>
-        <ChartSeriesSelectionDomain name="array_list"
+        <FunctionalBagChartSeriesSelectionDomain name="array_list"
                                     default_mode="visibility"
                                     flatten_table="false">
           <RequiredProperties>
@@ -6258,7 +6258,7 @@
             <Property function="FieldDataSelection" name="AttributeType" />
             <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
-        </ChartSeriesSelectionDomain>
+        </FunctionalBagChartSeriesSelectionDomain>
       </StringVectorProperty>
 
       <PropertyGroup label="Series Parameters"
