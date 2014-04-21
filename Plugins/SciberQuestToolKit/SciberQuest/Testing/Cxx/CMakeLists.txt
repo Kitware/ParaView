@@ -18,16 +18,6 @@ if (PARAVIEW_USE_MPI AND (NOT WIN32))
   add_definitions(-DPARAVIEW_USE_MPI)
 endif ()
 
-paraview_test_load_baselines(SciberQuestToolKit
-  ,REGEX:SciberQuestToolKit-TestBOVIO-.*\\.png
-  ,REGEX:SciberQuestToolKit-TestFieldTopologyMapper-.*\\.png
-  ,REGEX:SciberQuestToolKit-TestFieldTracer-.*\\.png
-  ,REGEX:SciberQuestToolKit-TestFTLE-.*\\.png
-  ,REGEX:SciberQuestToolKit-TestKernelConvolution-.*\\.png
-  ,REGEX:SciberQuestToolKit-TestPlaneSource-.*\\.png
-  ,REGEX:SciberQuestToolKit-TestVortexFilter-.*\\.png
-  SciberQuestToolKit-TestPoincareMapper.png
-  )
 paraview_test_load_data_dirs(SciberQuestToolKit
   SciberQuestToolKit
   SciberQuestToolKit/Asym2D

@@ -25,10 +25,6 @@ if(PARAVIEW_ENABLE_COSMOTOOLS
     paraview_test_load_data_dirs(StreamingParticles
       adaptive-cosmo
       )
-    paraview_test_load_baselines(StreamingParticles
-      StreamingParticles1.png
-      StreamingParticles2.png
-      )
     paraview_test_data_target(StreamingParticles)
 
     add_pv_test("pv" "_DISABLE_C"

@@ -1,8 +1,3 @@
-paraview_test_load_baselines(""
-  CPGrid0.png
-  CPPressure0.png
-  )
-
 include_directories(
   ${TestDriver_SOURCE_DIR})
 

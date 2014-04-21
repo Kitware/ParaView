@@ -55,28 +55,6 @@ paraview_test_load_data(""
   tube.exo
   vehicle_data.csv
   )
-paraview_test_load_baselines(""
-  ,REGEX:ChartAxisRangeAndLabels.*\\.png
-  ,REGEX:Contour.*\\.png
-  ,REGEX:FileSeries.*\\.png
-  ,REGEX:FindDataDialog.*\\.png
-  ,REGEX:LineChartSelection.*\\.png
-  ,REGEX:LogColorMap.*\\.png
-  ,REGEX:NonlinearSubdivision.*Display\\.png
-  ,REGEX:RenderNan.*\\.png
-  ,REGEX:SLACTools.*\\.png
-  ,REGEX:TestIsoVolume.*\\.png
-  ,REGEX:TestMultiServer.*\\.png
-  ,REGEX:TileDisplay3DTesting-.*\\.png
-  ,REGEX:TileDisplayScatterPlot-.*\\.png
-  ,REGEX:UpdateTransferFunctionRanges.*\\.png
-  ,REGEX:XYChart_.*\\.png
-  ,REGEX:XYHistogram_.*\\.png
-  DisconnectAndSaveAnimation.png
-  LoadStateMultiView.png
-  SaveLargeScreenshot.png
-  filters.xml
-  )
 
 SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml

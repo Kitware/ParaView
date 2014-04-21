@@ -76,10 +76,6 @@ endif ("1" STREQUAL ${HAS_NUMPY})
 ###############################################################################
 # Add tests for pvbatch.
 
-paraview_test_load_baselines(""
-  MultiView_render_view.png
-  MultiView_chart_view.png
-  )
 set(PVBATCH_TESTS
   MultiView.py
   ParallelImageWriter.py,NO_VALID
