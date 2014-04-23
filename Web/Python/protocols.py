@@ -367,13 +367,19 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
     @exportRpc("pushState")
     def pushState(self, state):
+        proxy_type = None
         for proxy_id in state:
-            if proxy_id == 'proxy':
+            if proxy_id in ['proxy', 'widget_source']:
+                proxy_type = proxy_id
                 continue
             proxy = helper.idToProxy(proxy_id);
             helper.updateProxyProperties(proxy, state[proxy_id])
             simple.Render()
-        return helper.getProxyAsPipelineNode(state['proxy'], self.lutManager)
+
+        if proxy_type == 'proxy':
+            return helper.getProxyAsPipelineNode(state['proxy'], self.lutManager)
+        elif proxy_type == 'widget_source':
+            proxy.UpdateWidget(proxy.Observed)
 
     @exportRpc("openFile")
     def openFile(self, path):
@@ -807,3 +813,107 @@ class ParaViewWebExportData(ParaViewWebProtocol):
             writer = simple.DataSetWriter(Input=proxy, FileName=fullpath)
             writer.UpdatePipeline()
             del writer
+
+# =============================================================================
+#
+# Handle Widget Representation
+#
+# =============================================================================
+
+def _line_update_widget(self, widget):
+    widget.Point1WorldPosition = self.Point1;
+    widget.Point2WorldPosition = self.Point2;
+
+def _line_widget_update(self, obj, event):
+    self.GetProperty('Point1').Copy(obj.GetProperty('Point1WorldPositionInfo'))
+    self.GetProperty('Point2').Copy(obj.GetProperty('Point2WorldPositionInfo'))
+    self.UpdateVTKObjects()
+
+def _plane_update_widget(self, widget):
+    widget.GetProperty('OriginInfo').SetData(self.Origin)
+    widget.Origin = self.Origin
+    widget.Normal = self.Normal
+    widget.UpdateVTKObjects()
+
+def _plane_widget_update(self, obj, event):
+    self.GetProperty('Origin').Copy(obj.GetProperty('OriginInfo'))
+    self.GetProperty('Normal').Copy(obj.GetProperty('NormalInfo'))
+    self.UpdateVTKObjects()
+    _hide_plane(obj)
+
+def _draw_plane(obj,event):
+    obj.GetProperty('DrawPlane').SetElement(0,1)
+    obj.UpdateVTKObjects()
+
+def _hide_plane(obj):
+    obj.GetProperty('DrawPlane').SetElement(0,0)
+    obj.UpdateVTKObjects()
+
+class ParaViewWebWidgetManager(ParaViewWebProtocol):
+
+    @exportRpc("addRuler")
+    def addRuler(self, view_id=-1):
+        proxy = simple.Ruler(Point1=[-1.0, -1.0, -1.0], Point2=[1.0, 1.0, 1.0])
+        self.createWidgetRepresentation(proxy.GetGlobalID(), view_id)
+        return proxy.GetGlobalIDAsString()
+
+    @exportRpc("createWidgetRepresentation")
+    def createWidgetRepresentation(self, proxy_id, view_id):
+        proxy = self.mapIdToProxy(proxy_id)
+        view = self.getView(view_id)
+        widgetProxy = None
+        # Find the corresponding widget representation
+        if proxy.__class__.__name__ == 'Plane':
+            widgetProxy = self.CreateWidgetRepresentation(view, 'ImplicitPlaneWidgetRepresentation')
+            setattr(proxy.__class__, 'UpdateWidget', _plane_update_widget)
+            setattr(proxy.__class__, 'WidgetUpdate', _plane_widget_update)
+            widgetProxy.GetProperty('DrawPlane').SetElement(0, 0)
+            widgetProxy.GetProperty('PlaceFactor').SetElement(0, 1.0)
+            proxy.UpdateWidget(widgetProxy)
+            widgetProxy.AddObserver("StartInteractionEvent", _draw_plane)
+            proxy.Observed = widgetProxy
+            proxy.ObserverTag = widgetProxy.AddObserver("EndInteractionEvent", proxy.WidgetUpdate)
+        elif proxy.__class__.__name__ == 'Box':
+            widgetProxy = self.CreateWidgetRepresentation(view, 'BoxWidgetRepresentation')
+        elif proxy.__class__.__name__ == 'Handle':
+            widgetProxy = self.CreateWidgetRepresentation(view, 'HandleWidgetRepresentation')
+        elif proxy.__class__.__name__ == 'PointSource':
+            widgetProxy = self.CreateWidgetRepresentation(view, 'PointSourceWidgetRepresentation')
+        elif proxy.__class__.__name__ == 'LineSource' or proxy.__class__.__name__ == 'HighResolutionLineSource' :
+            widgetProxy = self.CreateWidgetRepresentation(view, 'LineSourceWidgetRepresentation')
+            setattr(proxy.__class__, 'UpdateWidget', _line_update_widget)
+            setattr(proxy.__class__, 'WidgetUpdate', _line_widget_update)
+            proxy.UpdateWidget(widgetProxy)
+            proxy.Observed = widgetProxy
+            proxy.ObserverTag = widgetProxy.AddObserver("EndInteractionEvent", proxy.WidgetUpdate)
+        elif proxy.__class__.__name__ == 'Line':
+            widgetProxy = self.CreateWidgetRepresentation(view, 'LineWidgetRepresentation')
+            setattr(proxy.__class__, 'UpdateWidget', _line_update_widget)
+            setattr(proxy.__class__, 'WidgetUpdate', _line_widget_update)
+            proxy.UpdateWidget(widgetProxy)
+            proxy.Observed = widgetProxy
+            proxy.ObserverTag = widgetProxy.AddObserver("EndInteractionEvent", proxy.WidgetUpdate)
+        elif proxy.__class__.__name__ in ['Distance', 'Ruler'] :
+            widgetProxy = self.CreateWidgetRepresentation(view, 'DistanceWidgetRepresentation')
+            setattr(proxy.__class__, 'UpdateWidget', _line_update_widget)
+            setattr(proxy.__class__, 'WidgetUpdate', _line_widget_update)
+            proxy.UpdateWidget(widgetProxy)
+            proxy.Observed = widgetProxy
+            proxy.ObserverTag = widgetProxy.AddObserver("EndInteractionEvent", proxy.WidgetUpdate)
+        elif proxy.__class__.__name__ == 'Sphere':
+            widgetProxy = self.CreateWidgetRepresentation(view, 'SphereWidgetRepresentation')
+        elif proxy.__class__.__name__ == 'Spline':
+            widgetProxy = self.CreateWidgetRepresentation(view, 'SplineWidgetRepresentation')
+        else:
+            print "No widget representation for %s" % proxy.__class__.__name__
+
+        return widgetProxy.GetGlobalIDAsString()
+
+    def CreateWidgetRepresentation(self, view, name):
+        proxy = simple.servermanager.CreateProxy("representations", name, None)
+        pythonWrap = simple.servermanager.rendering.__dict__[proxy.GetXMLName()]()
+        pythonWrap.UpdateVTKObjects()
+        view.Representations.append(pythonWrap)
+        pythonWrap.Visibility = 1
+        pythonWrap.Enabled = 1
+        return pythonWrap

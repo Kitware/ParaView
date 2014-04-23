@@ -130,6 +130,7 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebRemoteConnection())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileManager(_PipelineManager.dataDir))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebSelectionHandler())
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebWidgetManager())
 
         # Update authentication key to use
         self.updateSecret(_PipelineManager.authKey)
