@@ -8,13 +8,11 @@ vtk_module_test_executable(AdaptorDriver
 # the executable was built with MPI because certain machines only
 # allow running MPI programs with the proper ${MPIEXEC}
 if (NOT PARAVIEW_USE_MPI)
-  vtk_module_test_executable(CoProcessingTestOutputs CoProcessingTestOutputs.cxx)
-  add_test(NAME vtkPVCatalystCxx-CoProcessingTestOutputs
-    COMMAND CoProcessingTestOutputs)
-  set_tests_properties(vtkPVCatalystCxx-CoProcessingTestOutputs
-    PROPERTIES LABELS "PARAVIEW;CATALYST")
+  vtk_add_test_cxx(${vtk-module}CxxTests tests
+    CoProcessingTestOutputs.cxx)
+  vtk_test_cxx_executable(${vtk-module}CxxTests tests)
 else()
-  vtk_add_test_mpi(CoProcessingTestOutputs)
-  set_tests_properties(vtkPVCatalystCxx-MPI-CoProcessingTestOutputs
-    PROPERTIES LABELS "PARAVIEW;CATALYST")
+  vtk_add_test_mpi(${vtk-module}CxxTests-MPI tests
+    CoProcessingTestOutputs.cxx)
+  vtk_test_mpi_executable(${vtk-module}CxxTests-MPI tests)
 endif()

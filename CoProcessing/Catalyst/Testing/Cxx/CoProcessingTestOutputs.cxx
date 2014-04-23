@@ -106,7 +106,7 @@ namespace
   vtkStandardNewMacro(vtkCPTestPipeline);
 }
 
-int main()
+int CoProcessingTestOutputs(int, char*[])
 {
   vtkSmartPointer<vtkCPProcessor> processor =
     vtkSmartPointer<vtkCPProcessor>::New();
