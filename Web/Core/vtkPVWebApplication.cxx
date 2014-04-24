@@ -17,14 +17,14 @@
 #include "vtkBase64Utilities.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkDataEncoder.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
-#include "vtkDataEncoder.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkWebInteractionEvent.h"
+#include "vtkPVRenderView.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
@@ -37,6 +37,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkWebGLExporter.h"
 #include "vtkWebGLObject.h"
+#include "vtkWebInteractionEvent.h"
 
 #include <assert.h>
 #include <cmath>
@@ -299,23 +300,20 @@ const char* vtkPVWebApplication::GetWebGLSceneMetaData(vtkSMViewProxy* view)
     }
 
   vtkRenderWindow* renWin = view->GetRenderWindow();
+  vtkPVRenderView* pvRenderView =
+      vtkPVRenderView::SafeDownCast(view->GetClientSideView());
 
-  if(renWin == NULL)
+  if(renWin == NULL || pvRenderView == NULL)
     {
     vtkErrorMacro("The view is supported for WebGL export: " << view);
     return NULL;
     }
-/*
+
   // We use the camera focal point to be the center of rotation
   double centerOfRotation[3];
-  vtkRenderer *ren = renWin->GetRenderers()->GetFirstRenderer();
-  vtkCamera *cam = ren->GetActiveCamera();
+  vtkCamera *cam = pvRenderView->GetActiveCamera();
   cam->GetFocalPoint(centerOfRotation);
-  this->Internals->WebGLExporter->SetCenterOfRotation(
-                                 static_cast<float>(centerOfRotation[0]),
-                                 static_cast<float>(centerOfRotation[1]),
-                                 static_cast<float>(centerOfRotation[2]));
-*/
+
   if(this->Internals->ViewWebGLMap.find(view) ==
     this->Internals->ViewWebGLMap.end())
     {
@@ -343,6 +341,10 @@ const char* vtkPVWebApplication::GetWebGLSceneMetaData(vtkSMViewProxy* view)
       }
     }
   this->Internals->WebGLExporterObjIdMap[webglExporter] = webglMap;
+  webglExporter->SetCenterOfRotation(
+        static_cast<float>(centerOfRotation[0]),
+      static_cast<float>(centerOfRotation[1]),
+      static_cast<float>(centerOfRotation[2]));
   return webglExporter->GenerateMetadata();
 }
 
