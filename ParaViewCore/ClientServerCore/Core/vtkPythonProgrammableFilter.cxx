@@ -212,7 +212,7 @@ void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
                                                const char *value)
 {
   std::ostringstream buf;
-  buf << "'" << value << "'";
+  buf << "r'" << value << "'";
   this->SetParameterInternal(raw_name, buf.str().c_str() );
 }
 
