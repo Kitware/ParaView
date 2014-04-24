@@ -124,6 +124,7 @@ set(Module_SRCS
   vtkSciVizStatistics.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
+  vtkSpyPlotFileSeriesReader.cxx
   vtkSpyPlotHistoryReader.cxx
   vtkSpyPlotIStream.cxx
   vtkSpyPlotReader.cxx
