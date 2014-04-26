@@ -23,6 +23,11 @@
    "title": "Deployment Guide",
    "items": [
       {
+        "name": "ubuntu_14_04",
+        "url": "guides/ubuntu_14_04",
+        "title": "ParaViewWeb on Ubuntu 14.04 LTS",
+        "description": "This document explains how to setup a ParaViewWeb server on Ubuntu 14.04 LTS Desktop."
+      },{
         "name": "paraviewweb_on_aws_ec2",
         "url": "guides/paraviewweb_on_aws_ec2",
         "title": "ParaViewWeb on an Amazon EC2 AMI Instance",
