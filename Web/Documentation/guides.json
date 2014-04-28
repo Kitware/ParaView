@@ -25,27 +25,27 @@
       {
         "name": "ubuntu_14_04",
         "url": "guides/ubuntu_14_04",
-        "title": "ParaViewWeb on Ubuntu 14.04 LTS",
+        "title": "Ubuntu 14.04 LTS",
         "description": "This document explains how to setup a ParaViewWeb server on Ubuntu 14.04 LTS Desktop."
       },{
         "name": "paraviewweb_on_aws_ec2",
         "url": "guides/paraviewweb_on_aws_ec2",
-        "title": "ParaViewWeb on an Amazon EC2 AMI Instance",
+        "title": "Amazon EC2 AMI Instance",
         "description": "This document explains how to set up an Amazon EC2 AMI instance with Apache, Jetty and ParaViewWeb using Apache 2.4+."
       },{
         "name": "apache_setup",
         "url": "guides/apache_setup",
-        "title": "Using Apache as a front-end (version < 2.4)",
+        "title": "Using Apache < 2.4 (Deprecated)",
         "description": "This document explains how to use Apache as the front-end for ParaViewWeb."
       },{
         "name": "virtualgl_turbovnc_howto",
         "url": "guides/virtualgl_turbovnc_howto",
-        "title": "Using VirtualGL and TurboVNC",
+        "title": "VirtualGL and TurboVNC",
         "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
       },{
         "name": "parallel_app",
         "url": "guides/parallel_app",
-        "title": "Parallel Visualization Setup",
+        "title": "Parallel Visualization",
         "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
       }
     ]

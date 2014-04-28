@@ -1,22 +1,23 @@
-# Setting up ParaViewWeb on Ubuntu 14.04
+# ParaViewWeb on Ubuntu 14.04 LTS
 
 ## Introduction
 
-This document describes how to set up a ParaViewWeb server instance on a freshly installed Ubuntu Desktop 14.04.
+This document describes how to set up a ParaViewWeb server instance on a freshly installed Ubuntu Desktop 14.04 LTS.
 The server version can also be used, but to properly leverage the GPU, you will need to install and run X or build ParaView with OSMesa.
 
 This document is split in 4 sections:
-1. Configure the Linux distribution so all the needed component are available
+
+1. Configuring the Linux distribution so all the needed component are available
 2. Installing ParaViewWeb
 3. Configuring the ParaViewWeb launcher
 4. Configuring Apache to serve the standard ParaViewWeb example application and documentation
-5. Structure the Web Site content with the ParaViewWeb sample application
+5. Structuring the Web Site content with the ParaViewWeb sample application
 
-# Installation of Ubuntu 14.04
+## Installation of Ubuntu 14.04
 
-## Package installation
+### Package installation
 
-Onced you've properly installed your new Unbuntu Desktop you may want to add all the missing libraries and dependencies.
+Once you've properly installed your new Unbuntu Desktop you may want to add all the missing libraries and dependencies.
 
     $ sudo apt-get update
     $ sudo apt-get upgrade
@@ -26,7 +27,7 @@ Onced you've properly installed your new Unbuntu Desktop you may want to add all
         build-essential python2.7-dev cmake-curses-gui       # (Optional) Needed if you want to build ParaView
         ssh wget emacs                                       # (Optional) Useful tools
 
-In order to properly install the NVidia drivers, you will need to execute the following command line and restart.
+In order to properly install the NVidia drivers, you will need to execute the following command line and restart:
 
     $ sudo nvidia-xconfig
 
@@ -34,13 +35,13 @@ In order to properly install the NVidia drivers, you will need to execute the fo
 
     $ sudo nvidia-settings
 
-    # => Make sure your screen and GPU has been properly discovered.
+    # => Make sure your screen and GPU has been properly detected.
 
-## ParaViewWeb user creation
+### ParaViewWeb user creation
 
 Unless you have your own launcher application that will take care of who is running
 the visualization process based on your SSO system, you may want to simply use
-the process launcher that come with ParaView. And if you do so, you might not want that
+the process launcher that comes with ParaView. And if you do so, you might not want that
 process to run under your 'powerful' user.
 
     # Create a new user
@@ -49,28 +50,30 @@ process to run under your 'powerful' user.
     # Add that user to the apache user group
     $ usermod -a -G www-data pvw-user
 
-Then you should make sure that user will auto login in the graphical environment.
+Then you should make sure that this user will auto login in the graphical environment.
+This will allow ParaViewWeb to properly use your GPU.
 
-## Setting up the directory structure for later
+### Setting up the directory structure for later
 
 The path provided below are just an example on how to structure the different pieces that will
-be needed for your web server. But by defining them here, it is easier to reference them later on.
+be needed for your web server. But by defining them here it is easier to reference them later on.
 In the proposed structure, everything will be nested underneath the /data directory.
 So let's create those directories.
 
     $ sudo mkdir -p /data/pvw /data/pv /data/logs /data/www
 
 Directory structure:
-- /data/www will contains the html/js/css files that compose your web site that will leverage ParaViewWeb.
-- /data/pv will contains the ParaView installation binaries.
-- /data/pvw will contains the ParaView process launcher that will dynamically trigger a new process for each visualization session.
-- /data/logs will contains the Apache logs that will serve your ParaViewWeb virtual host.
 
-# Installation of ParaViewWeb
+* /data/www will contains the html/js/css files that compose your web site that will leverage ParaViewWeb.
+* /data/pv will contains the ParaView installation binaries.
+* /data/pvw will contains the ParaView process launcher that will dynamically trigger a new process for each visualization session.
+* /data/logs will contains the Apache logs that will serve your ParaViewWeb virtual host.
 
-ParaView which contains ParaViewWeb is available for download here: http://www.paraview.org/paraview/resources/software.php
+## Installation of ParaViewWeb
+
+ParaView which contains ParaViewWeb is available for download (here)[http://www.paraview.org/paraview/resources/software.php]
 And you can even take the latest version that was build on the master branch of ParaView which is supposed to be stable.
-If you want to build ParaView yourself, you can refer to the Wiki here: http://paraview.org/Wiki/ParaView
+If you want to build ParaView yourself, you can refer to the Wiki (here)[http://paraview.org/Wiki/ParaView]
 
 In anycase, you should have a directory structure that looks like that:
 
@@ -100,7 +103,7 @@ Let's copy it in our global directory structure and assign it to our ParaViewWeb
     $ sudo chown -R pvw-user /data/pv
     $ sudo chgrp -R pvw-user /data/pv
 
-# Configuration of ParaViewWeb launcher
+## Configuration of ParaViewWeb launcher
 
 We've already created the /data/pvw directory to embed the ParaView Process Launcher with its configuration.
 Let's structure the content of that directory.
@@ -169,21 +172,21 @@ Add ParaView Data as sample data to visualize
     $ tar zxvf ParaViewData-v4.0.1.tar.gz
     $ sudo cp -r ParaViewData-v4.0.1/Data/* /data/pvw/data
 
-Change the security right to the directory content
+Change the security rights to the directory content
 
     $ sudo chown -R pvw-user /data/pvw
     $ sudo chgrp -R pvw-user /data/pvw
     $ sudo chmod u+x /data/pvw/bin/start.sh
 
-Then, you need the user pvw-user to execute /data/pvw/bin/start.sh when it is properly logged in with its display setup.
+Then, you need the user pvw-user to execute /data/pvw/bin/start.sh when it is properly logged in with its display setup...
 
-# Configuring Apache
+## Configuring Apache
 
-## Introduction
+### Introduction
 
-Apache will act as our front-end webserver. This mean that both the HTML content and the WebSocket forwarding will be handle by it.
+Apache will act as our front-end webserver. This means that both the HTML content and the WebSocket forwarding will be handled by Apache.
 
-## Configuration
+### Configuration
 
 First of all, you will need to enable the modules that will be used by our ParaViewWeb virtual host.
 
@@ -215,16 +218,17 @@ Then lets create our virtual host.
           RewriteRule ^/proxy.*$       ws://${session-to-port:%1}/ws  [P]
         </VirtualHost>
 
-Then restart Apache
+Then enable that virtual host and restart Apache
 
+    $ sudo a2ensite 001-pvw.conf
     $ sudo service apache2 restart
 
-# Setting up the ParaViewWeb Web Site
+## Setting up the ParaViewWeb Web Site
 
 You can download the documentation of ParaView here: http://paraview.org/paraview/resources/software.php
 And download the ParaView-API-docs-v4.1.zip file or any newer version.
 
-By uncompression that file, you should get something like that:
+By uncompressing that file, you should get something like that:
 
      -> ParaView-API-docs-v4.1
         + js-doc
@@ -242,4 +246,4 @@ Fix the home page to allow the access to the sample applications
 
 Add the ParaViewWeb code
 
-  $ sudo cp -r /data/pv/pv-current/share/paraview-4.1/www/* /data/www/
+    $ sudo cp -r /data/pv/pv-current/share/paraview-4.1/www/* /data/www/
