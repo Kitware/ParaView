@@ -186,9 +186,9 @@ private:
 };
 
 
-static const int BOUNDARY_TAG = 39857089;
-static const int EQUIV_SIZE_TAG = 23748957;
-static const int EQUIV_TAG = 984357345;
+static const int BOUNDARY_TAG = 857089;
+static const int EQUIV_SIZE_TAG = 748957;
+static const int EQUIV_TAG = 357345;
 
 #ifdef PARAVIEW_USE_MPI
 //-----------------------------------------------------------------------------

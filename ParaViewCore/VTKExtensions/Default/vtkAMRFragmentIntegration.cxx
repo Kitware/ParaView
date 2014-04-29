@@ -144,7 +144,9 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
   vtkIdType totalFragments = fragIndices.size ();
   if (controller != 0)
     {
-    controller->AllReduce (&totalFragments, &totalFragments, 1, vtkCommunicator::SUM_OP);
+    vtkIdType outTotal;
+    controller->AllReduce (&totalFragments, &outTotal, 1, vtkCommunicator::SUM_OP);
+    totalFragments = outTotal;
     }
   vtkTimerLog::MarkEndEvent ("Finding max region");
 
