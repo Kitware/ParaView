@@ -409,26 +409,36 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
             {
             size_t index = fragIndices.size ();
             fragIndices[fragId] = index;
-            if (index >= static_cast<size_t>(totalFragments)) 
+            fragIdArray->InsertNextTuple1 (fragId);
+            fragVolume->InsertNextTuple (remoteIndex, fragVolumeReceive);
+            fragMass->InsertNextTuple (remoteIndex,  fragMassReceive);
+            for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
               {
-              vtkErrorMacro ("The number of indices is inconsistent with initial reduce");
+              volWeightArrays[v]->InsertNextTuple (remoteIndex, volWeightReceive[v]);
+              }
+            for (size_t m = 0; m < massWeightedNames.size (); m ++)
+              {
+              massWeightArrays[m]->InsertNextTuple (remoteIndex, massWeightReceive[m]);
               }
             }
-          int index = fragIndices[fragId];
-          fragIdArray->SetTuple1 (index, fragId);
-          fragVolume->SetTuple1 (index, 
-            fragVolume->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
-          fragMass->SetTuple1 (index, 
-            fragMass->GetTuple1 (index) + fragMassReceive->GetTuple1 (remoteIndex));
-          for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
+          else 
             {
-            volWeightArrays[v]->SetTuple1 (index, 
-              volWeightArrays[v]->GetTuple1 (index) + volWeightReceive[v]->GetTuple1 (remoteIndex));
-            }
-          for (size_t m = 0; m < massWeightedNames.size (); m ++)
-            {
-            massWeightArrays[m]->SetTuple1 (index, 
-              massWeightArrays[m]->GetTuple1 (index) + massWeightReceive[m]->GetTuple1 (remoteIndex));
+            int index = fragIndices[fragId];
+            fragIdArray->SetTuple1 (index, fragId);
+            fragVolume->SetTuple1 (index, 
+              fragVolume->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
+            fragMass->SetTuple1 (index, 
+              fragMass->GetTuple1 (index) + fragMassReceive->GetTuple1 (remoteIndex));
+            for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
+              {
+              volWeightArrays[v]->SetTuple1 (index, 
+                volWeightArrays[v]->GetTuple1 (index) + volWeightReceive[v]->GetTuple1 (remoteIndex));
+              }
+            for (size_t m = 0; m < massWeightedNames.size (); m ++)
+              {
+              massWeightArrays[m]->SetTuple1 (index, 
+                massWeightArrays[m]->GetTuple1 (index) + massWeightReceive[m]->GetTuple1 (remoteIndex));
+              }
             }
           }
         }
