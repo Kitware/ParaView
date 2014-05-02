@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>295</width>
-    <height>45</height>
+    <height>51</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="mainLayout" stretch="1,0,0,0,0,0">
+  <layout class="QHBoxLayout" name="mainLayout" stretch="1,0,0,0,0,0,0">
    <item>
     <widget class="QComboBox" name="FontFamily">
      <property name="toolTip">
@@ -95,6 +95,16 @@
      </property>
      <property name="checkable">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="Justification">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="popupMode">
+      <enum>QToolButton::InstantPopup</enum>
      </property>
     </widget>
    </item>

@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardLegacyDisplayPanels.h"
 
 #include "pqRepresentation.h"
-#include "pqSpreadSheetDisplayEditor.h"
-#include "pqTextDisplayPropertiesWidget.h"
+//#include "pqSpreadSheetDisplayEditor.h"
+//#include "pqTextDisplayPropertiesWidget.h"
+//#include "pqTextRepresentation.h"
 #include "vtkSMProxy.h"
 #include <QDebug>
 #include <QWidget>
@@ -60,14 +61,14 @@ bool pqStandardLegacyDisplayPanels::canCreatePanel(pqRepresentation* proxy) cons
 
   QString type = proxy->getProxy()->GetXMLName();
 
-  if (
-    type == "SpreadSheetRepresentation" ||
-    type == "TextSourceRepresentation" ||
-    false
-    )
-    {
-    return true;
-    }
+//  if (
+//    type == "SpreadSheetRepresentation" ||
+//    qobject_cast<pqTextRepresentation*>(proxy)||
+//    false
+//    )
+//    {
+//    return true;
+//    }
 
   return false;
 }
@@ -81,15 +82,15 @@ pqDisplayPanel* pqStandardLegacyDisplayPanels::createPanel(pqRepresentation* pro
     return NULL;
     }
 
-  QString type = proxy->getProxy()->GetXMLName();
-  if (type == "SpreadSheetRepresentation")
-    {
-    return new pqSpreadSheetDisplayEditor(proxy, p);
-    }
-
-  if (type == "TextSourceRepresentation")
-    {
-    return new pqTextDisplayPropertiesWidget(proxy, p);
-    }
+//  QString type = proxy->getProxy()->GetXMLName();
+//  if (type == "SpreadSheetRepresentation")
+//    {
+//    return new pqSpreadSheetDisplayEditor(proxy, p);
+//    }
+//
+//  if (qobject_cast<pqTextRepresentation*>(proxy))
+//    {
+//    return new pqTextDisplayPropertiesWidget(proxy, p);
+//    }
   return NULL;
 }

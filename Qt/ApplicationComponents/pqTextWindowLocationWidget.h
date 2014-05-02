@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqTextWindowLocationWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,46 +29,52 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqFontPropertyWidget_h
-#define __pqFontPropertyWidget_h
+#ifndef __pqTextWindowLocationWidget_h
+#define __pqTextWindowLocationWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqPropertyWidget.h"
 
 class vtkSMPropertyGroup;
 
-/// pqFontPropertyWidget is a pqPropertyWidget that can be used to set
-/// properties relating to fonts. The widget expects the property-group to have
-/// properties with functions set to "Color", "Opacity", "Family", "Size",
-/// "Bold", "Italics" and "Shadow". If any property is missing, the
-/// corresponding widget will be hidden.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget :
+/// pqTextWindowLocationWidget is a pqPropertyWidget that can be used to set
+/// the location of the a text representation relative to the viewport.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqTextWindowLocationWidget :
   public pqPropertyWidget
 {
   Q_OBJECT
-  Q_PROPERTY(QString justification READ justification WRITE setJustification)
-
+  Q_PROPERTY(QString windowLocation READ windowLocation WRITE setWindowLocation)
+//  Q_PROPERTY(QString position1X READ position1X WRITE setPosition1X)
+//  Q_PROPERTY(QString position1Y READ position1Y WRITE setPosition1Y)
+  
   typedef pqPropertyWidget Superclass;
-public:
-  pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
-  virtual ~pqFontPropertyWidget();
 
-  QString justification() const;
+public:
+  pqTextWindowLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  virtual ~pqTextWindowLocationWidget();
+
+  QString windowLocation() const;
+//  double position1X() const;
+//  double position1Y() const;
+
 signals:
-  void justificationChanged(QString&);
+  void windowLocationChanged(QString&);
+  void position1Changed(double, double);
 
 protected:
-  void setJustification(QString&);
-  void setupJustificationButton();
+  void setWindowLocation(QString&);
+//  void setPosition1X(double);
+//  void setPosition1Y(double);
 
 protected slots:
-  void changeJustificationIcon(QAction*);
+  void emitWindowLocationChangedSignal();
+  void groupBoxLocationToggled(bool);
+  void groupBoxPositionToggled(bool);
 
 private:
-  Q_DISABLE_COPY(pqFontPropertyWidget)
-
+  Q_DISABLE_COPY(pqTextWindowLocationWidget)
   class pqInternals;
   pqInternals* Internals;
 };
 
-#endif
+#endif //__pqTextWindowLocationWidget_h

@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSeriesEditorPropertyWidget.h"
 #include "pqShowWidgetDecorator.h"
 #include "pqTextureSelectorPropertyWidget.h"
+#include "pqTextWindowLocationWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
@@ -191,6 +192,10 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
   else if (QString(group->GetPanelWidget()) == "SeriesEditor")
     {
     return new pqSeriesEditorPropertyWidget(proxy, group);
+    }
+  else if (QString(group->GetPanelWidget()) == "TextWindowLocation")
+    {
+    return new pqTextWindowLocationWidget(proxy, group);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
 
