@@ -85,13 +85,6 @@ class CoProcessor(object):
 
         timestep = datadescription.GetTimeStep()
         num_inputs = datadescription.GetNumberOfInputDescriptions()
-        # first set all inputs to be off and set to on as needed.
-        # we don't use vtkCPInputDataDescription::Reset() because
-        # that will reset any field names that were added in.
-        for cc in range(num_inputs):
-            datadescription.GetInputDescription(cc).AllFieldsOff()
-            datadescription.GetInputDescription(cc).GenerateMeshOff()
-
         for cc in range(num_inputs):
             input_name = datadescription.GetInputDescriptionName(cc)
 
