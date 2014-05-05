@@ -241,7 +241,7 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
 
   find_program(QT_XMLPATTERNS_EXECUTABLE
     xmlpatterns
-    PATHS "${QT_BINARY_DIR}"
+    HINTS "${QT_BINARY_DIR}"
     DOC "xmlpatterns used to generate html from Proxy documentation.")
   mark_as_advanced(QT_XMLPATTERNS_EXECUTABLE)
 
@@ -323,7 +323,7 @@ function(build_help_project name)
 
   find_program(QT_HELP_GENERATOR
     qhelpgenerator
-    PATHS "${QT_BINARY_DIR}"
+    HINTS "${QT_BINARY_DIR}"
     DOC "qhelpgenerator used to compile Qt help project files")
   mark_as_advanced(QT_HELP_GENERATOR)
 
