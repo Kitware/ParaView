@@ -33,7 +33,10 @@
 #include "vtkNonOverlappingAMR.h"
 #include "vtkPointData.h"
 #include "vtkTable.h"
+#include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
+
+#include <map>
 
 vtkStandardNewMacro(vtkAMRFragmentIntegration);
 
@@ -101,7 +104,10 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
 
   vtkTable* fragments = vtkTable::New ();
 
-  vtkIdType maxRegion = 0;
+  std::map<vtkIdType, vtkIdType> fragIndices;
+
+  vtkTimerLog::MarkStartEvent ("Finding max region");
+
   vtkCompositeDataIterator* iter = volume->NewIterator ();
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
@@ -128,61 +134,68 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     for (int c = 0; c < grid->GetNumberOfCells (); c ++)
       {
       vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
-      if (fragId > maxRegion &&  ghostLevels->GetTuple1 (c) < 0.5)
+      if (ghostLevels->GetTuple1 (c) < 0.5)
         {
-        maxRegion = fragId;
+        vtkIdType index = fragIndices.size ();
+        fragIndices[fragId] = index;
         }
       }
     }
-
+  vtkIdType totalFragments = fragIndices.size ();
+  /*
   if (controller != 0)
     {
-    controller->AllReduce (&maxRegion, &maxRegion, 1, vtkCommunicator::MAX_OP);
+    vtkIdType outTotal;
+    controller->AllReduce (&totalFragments, &outTotal, 1, vtkCommunicator::SUM_OP);
+    totalFragments = outTotal;
     }
+    */
+  vtkTimerLog::MarkEndEvent ("Finding max region");
 
+  vtkTimerLog::MarkStartEvent ("Initializing arrays");
   vtkIdTypeArray* fragIdArray = vtkIdTypeArray::New ();
   fragIdArray->SetName ("Fragment ID");
   fragIdArray->SetNumberOfComponents (1);
-  fragIdArray->SetNumberOfTuples (maxRegion + 1);
+  fragIdArray->SetNumberOfTuples (totalFragments + 1);
   fragments->AddColumn (fragIdArray);
   fragIdArray->Delete ();
 
   vtkDoubleArray* fragVolume = vtkDoubleArray::New ();
   fragVolume->SetName ("Fragment Volume");
   fragVolume->SetNumberOfComponents (1);
-  fragVolume->SetNumberOfTuples (maxRegion + 1);
+  fragVolume->SetNumberOfTuples (totalFragments + 1);
   fragments->AddColumn (fragVolume);
   fragVolume->Delete ();
 
   vtkDoubleArray* fragMass = vtkDoubleArray::New ();
   fragMass->SetName ("Fragment Mass");
   fragMass->SetNumberOfComponents (1);
-  fragMass->SetNumberOfTuples (maxRegion + 1);
+  fragMass->SetNumberOfTuples (totalFragments + 1);
   fragments->AddColumn (fragMass);
   fragMass->Delete ();
 
   vtkDoubleArray** volWeightArrays = new vtkDoubleArray*[volumeWeightedNames.size ()];
-  for (int v = 0; v < volumeWeightedNames.size (); v ++)
+  for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
     {
     volWeightArrays[v] = vtkDoubleArray::New ();
     std::string name ("Volume Weighted ");
     name += volumeWeightedNames[v];
     volWeightArrays[v]->SetName (name.c_str ());
     volWeightArrays[v]->SetNumberOfComponents (1);
-    volWeightArrays[v]->SetNumberOfTuples (maxRegion + 1);
+    volWeightArrays[v]->SetNumberOfTuples (totalFragments + 1);
     fragments->AddColumn (volWeightArrays[v]);
     volWeightArrays[v]->Delete ();
     }
 
   vtkDoubleArray** massWeightArrays = new vtkDoubleArray*[massWeightedNames.size ()];
-  for (int m = 0; m < massWeightedNames.size (); m ++)
+  for (size_t m = 0; m < massWeightedNames.size (); m ++)
     {
     massWeightArrays[m] = vtkDoubleArray::New ();
     std::string name ("Mass Weighted ");
     name += massWeightedNames[m];
     massWeightArrays[m]->SetName (name.c_str ());
     massWeightArrays[m]->SetNumberOfComponents (1);
-    massWeightArrays[m]->SetNumberOfTuples (maxRegion + 1);
+    massWeightArrays[m]->SetNumberOfTuples (totalFragments + 1);
     fragments->AddColumn (massWeightArrays[m]);
     massWeightArrays[m]->Delete ();
     }
@@ -192,19 +205,21 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
     fragIdArray->SetTuple1 (i, 0);
     fragVolume->SetTuple1 (i, 0);
     fragMass->SetTuple1 (i, 0);
-    for (int v = 0; v < volumeWeightedNames.size (); v ++)
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
       {
       volWeightArrays[v]->SetTuple1 (i, 0);
       }
-    for (int m = 0; m < massWeightedNames.size (); m ++)
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
       {
       massWeightArrays[m]->SetTuple1 (i, 0);
       }
     }
+  vtkTimerLog::MarkEndEvent ("Initializing arrays");
 
   vtkDataArray** preVolWeightArrays = new vtkDataArray*[volumeWeightedNames.size ()];
   vtkDataArray** preMassWeightArrays = new vtkDataArray*[massWeightedNames.size ()];
 
+  vtkTimerLog::MarkStartEvent ("Independent integration");
   for (iter->InitTraversal (); !iter->IsDoneWithTraversal (); iter->GoToNextItem ())
     {
     vtkUniformGrid* grid = vtkUniformGrid::SafeDownCast (iter->GetCurrentDataObject ());
@@ -239,11 +254,11 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       vtkErrorMacro (<< "There is no " << massName << " in cell field");
       return 0;
       }
-    for (int v = 0; v < volumeWeightedNames.size (); v ++)
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
       {
       preVolWeightArrays[v] = grid->GetCellData ()->GetArray (volumeWeightedNames[v].c_str ());
       }
-    for (int m = 0; m < massWeightedNames.size (); m ++)
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
       {
       preMassWeightArrays[m] = grid->GetCellData ()->GetArray (massWeightedNames[m].c_str ());
       }
@@ -254,138 +269,231 @@ vtkTable* vtkAMRFragmentIntegration::DoRequestData(vtkNonOverlappingAMR* volume,
       if (regionId->GetTuple1 (c) > 0.0 && ghostLevels->GetTuple1 (c) < 0.5) 
         {
         vtkIdType fragId = static_cast<vtkIdType> (regionId->GetTuple1 (c));
-        if (fragId > fragIdArray->GetNumberOfTuples ()) 
+        std::map<vtkIdType, vtkIdType>::iterator loc = fragIndices.find (fragId);
+        if (loc == fragIndices.end ())
           {
           vtkErrorMacro (<< "Invalid Region Id " << fragId);
           }
-        fragIdArray->SetTuple1 (fragId, fragId);
+        int index = fragIndices[fragId];
+        fragIdArray->SetTuple1 (index, fragId);
         double vol = volArray->GetTuple1 (c) * cellVol / 255.0;
-        fragVolume->SetTuple1 (fragId, fragVolume->GetTuple1 (fragId) + vol);
+        fragVolume->SetTuple1 (index, fragVolume->GetTuple1 (index) + vol);
         double mass = massArray->GetTuple1 (c);
-        fragMass->SetTuple1 (fragId, fragMass->GetTuple1 (fragId) + mass);
+        fragMass->SetTuple1 (index, fragMass->GetTuple1 (index) + mass);
 
-        for (int v = 0; v < volumeWeightedNames.size (); v ++)
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
           {
-          double value = volWeightArrays[v]->GetTuple1 (fragId);
+          double value = volWeightArrays[v]->GetTuple1 (index);
           value += preVolWeightArrays[v]->GetTuple1 (c) * vol;
-          volWeightArrays[v]->SetTuple1 (fragId, value);
+          volWeightArrays[v]->SetTuple1 (index, value);
           }
-        for (int m = 0; m < massWeightedNames.size (); m ++)
+        for (size_t m = 0; m < massWeightedNames.size (); m ++)
           {
-          double value = massWeightArrays[m]->GetTuple1 (fragId);
+          double value = massWeightArrays[m]->GetTuple1 (index);
           value += preMassWeightArrays[m]->GetTuple1 (c) * mass;
-          massWeightArrays[m]->SetTuple1 (fragId, value);
+          massWeightArrays[m]->SetTuple1 (index, value);
           }
         }
       }
     }
+  vtkTimerLog::MarkEndEvent ("Independent integration");
 
+  vtkTimerLog::MarkStartEvent ("Combining integration");
+
+  int myProc = 0;
+  int numProcs = 1;
   if (controller != 0)
     {
-    int myProc = controller->GetLocalProcessId ();
+    myProc = controller->GetLocalProcessId ();
+    numProcs = controller->GetNumberOfProcesses ();
 
-    vtkIdTypeArray *copyFragId;
-    vtkDoubleArray *copyFragVolume;
-    vtkDoubleArray *copyFragMass;
-    if (myProc == 0)
-      {
-      copyFragId = vtkIdTypeArray::New ();
-      copyFragId->DeepCopy (fragIdArray);
-      copyFragVolume = vtkDoubleArray::New ();
-      copyFragVolume->DeepCopy (fragVolume);
-      copyFragMass = vtkDoubleArray::New ();
-      copyFragMass->DeepCopy (fragMass);
-      }
-    else
-      {
-      copyFragId = fragIdArray;
-      copyFragVolume = fragVolume;
-      copyFragMass = fragMass;
-      }
-    
-    controller->Reduce (copyFragId, fragIdArray, vtkCommunicator::MAX_OP, 0);
-    controller->Reduce (copyFragVolume, fragVolume, vtkCommunicator::SUM_OP, 0);
-    controller->Reduce (copyFragMass, fragMass, vtkCommunicator::SUM_OP, 0);
+    vtkIdTypeArray *fragIndicesReceive = vtkIdTypeArray::New ();
+    fragIndicesReceive->SetNumberOfComponents (2);
 
-    if (myProc == 0)
+    vtkDoubleArray *fragVolumeReceive = vtkDoubleArray::New ();
+    fragVolumeReceive->SetNumberOfComponents (1);
+    // fragVolumeReceive->SetNumberOfTuples (totalFragments + 1);
+
+    vtkDoubleArray *fragMassReceive = vtkDoubleArray::New ();
+    fragMassReceive->SetNumberOfComponents (1);
+    // fragMassReceive->SetNumberOfTuples (totalFragments + 1);
+
+    vtkDoubleArray** volWeightReceive = new vtkDoubleArray*[volumeWeightedNames.size ()];
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
       {
-      copyFragId->Delete ();
-      copyFragVolume->Delete ();
-      copyFragMass->Delete ();
+      volWeightReceive[v] = vtkDoubleArray::New ();
+      volWeightReceive[v]->SetNumberOfComponents (1);
+      // volWeightReceive[v]->SetNumberOfTuples (totalFragments + 1);
       }
 
-    for (int v = 0; v < volumeWeightedNames.size (); v ++) 
+    vtkDoubleArray** massWeightReceive = new vtkDoubleArray*[massWeightedNames.size ()];
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
       {
-      vtkDoubleArray *copyVolWeight;
-      if (myProc == 0)
+      massWeightReceive[m] = vtkDoubleArray::New ();
+      massWeightReceive[m]->SetNumberOfComponents (1);
+      // massWeightReceive[m]->SetNumberOfTuples (totalFragments + 1);
+      }
+
+    int tag = 728574;
+    int pivot = (numProcs > 1 ? (numProcs + 1) / 2 : 0);
+    while (pivot > 0 && myProc < (pivot * 2))
+      {
+      if (myProc >= pivot) 
         {
-        copyVolWeight = vtkDoubleArray::New ();
-        copyVolWeight->DeepCopy (volWeightArrays[v]);
+        int tuples = static_cast<int>(fragIndices.size ());
+        vtkIdTypeArray *fragIndicesArray = vtkIdTypeArray::New ();
+        fragIndicesArray->SetNumberOfComponents (2);
+        fragIndicesArray->SetNumberOfTuples (tuples);
+
+        std::map<vtkIdType, vtkIdType>::iterator mapiter;
+        int ind = 0;
+        for (mapiter = fragIndices.begin (); mapiter != fragIndices.end (); mapiter ++)
+          {
+          fragIndicesArray->SetComponent (ind, 0, mapiter->first);
+          fragIndicesArray->SetComponent (ind, 1, mapiter->second);
+          ind ++;
+        }
+
+        controller->Send (&tuples, 1, myProc - pivot, tag + pivot + 0);
+        controller->Send (fragIndicesArray, myProc - pivot, tag + pivot + 1);
+        controller->Send (fragVolume, myProc - pivot, tag + pivot + 2);
+        controller->Send (fragMass, myProc - pivot, tag + pivot + 3);
+
+        int off = 4;
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
+          {
+          controller->Send (volWeightArrays[v], myProc - pivot, tag + pivot + off);
+          off ++;
+          } 
+
+        for (size_t m = 0; m < massWeightedNames.size (); m ++)
+          {
+          controller->Send (massWeightArrays[m], myProc - pivot, tag + pivot + off);
+          off ++;
+          }
+
+        fragIndicesArray->Delete ();
+        }
+      else if ((myProc + pivot) < numProcs)
+        {
+        int tuples = 0;
+        controller->Receive (&tuples, 1, myProc + pivot, tag + pivot + 0);
+        fragIndicesReceive->SetNumberOfTuples (tuples);
+        controller->Receive (fragIndicesReceive, myProc + pivot, tag + pivot + 1);
+        fragVolumeReceive->SetNumberOfTuples (tuples + 1);
+        controller->Receive (fragVolumeReceive, myProc + pivot, tag + pivot + 2);
+        fragMassReceive->SetNumberOfTuples (tuples + 1);
+        controller->Receive (fragMassReceive, myProc + pivot, tag + pivot + 3);
+
+        int off = 4;
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
+          {
+          volWeightReceive[v]->SetNumberOfTuples (tuples + 1);
+          controller->Receive (volWeightReceive[v], myProc + pivot, tag + pivot + off);
+          off ++;
+          } 
+
+        for (size_t m = 0; m < massWeightedNames.size (); m ++)
+          {
+          massWeightReceive[m]->SetNumberOfTuples (tuples + 1);
+          controller->Receive (massWeightReceive[m], myProc + pivot, tag + pivot + off);
+          off ++;
+          }
+
+        for (int i = 0; i < fragIndicesReceive->GetNumberOfTuples (); i ++) 
+          {
+          vtkIdType fragId = fragIndicesReceive->GetComponent (i, 0);
+          vtkIdType remoteIndex = fragIndicesReceive->GetComponent (i, 1);
+          std::map<vtkIdType, vtkIdType>::iterator loc = fragIndices.find (fragId);
+          if (loc == fragIndices.end ())
+            {
+            size_t index = fragIndices.size ();
+            fragIndices[fragId] = index;
+            fragIdArray->InsertNextTuple1 (fragId);
+            fragVolume->InsertNextTuple (remoteIndex, fragVolumeReceive);
+            fragMass->InsertNextTuple (remoteIndex,  fragMassReceive);
+            for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
+              {
+              volWeightArrays[v]->InsertNextTuple (remoteIndex, volWeightReceive[v]);
+              }
+            for (size_t m = 0; m < massWeightedNames.size (); m ++)
+              {
+              massWeightArrays[m]->InsertNextTuple (remoteIndex, massWeightReceive[m]);
+              }
+            }
+          else 
+            {
+            int index = fragIndices[fragId];
+            fragIdArray->SetTuple1 (index, fragId);
+            fragVolume->SetTuple1 (index, 
+              fragVolume->GetTuple1 (index) + fragVolumeReceive->GetTuple1 (remoteIndex));
+            fragMass->SetTuple1 (index, 
+              fragMass->GetTuple1 (index) + fragMassReceive->GetTuple1 (remoteIndex));
+            for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
+              {
+              volWeightArrays[v]->SetTuple1 (index, 
+                volWeightArrays[v]->GetTuple1 (index) + volWeightReceive[v]->GetTuple1 (remoteIndex));
+              }
+            for (size_t m = 0; m < massWeightedNames.size (); m ++)
+              {
+              massWeightArrays[m]->SetTuple1 (index, 
+                massWeightArrays[m]->GetTuple1 (index) + massWeightReceive[m]->GetTuple1 (remoteIndex));
+              }
+            }
+          }
+        }
+      pivot /= 2;
+      }
+
+    fragIndicesReceive->Delete ();
+    fragVolumeReceive->Delete ();
+    fragMassReceive->Delete ();
+
+    for (size_t v = 0; v < volumeWeightedNames.size (); v ++)
+      {
+      volWeightReceive[v]->Delete ();
+      }
+
+    for (size_t m = 0; m < massWeightedNames.size (); m ++)
+      {
+      massWeightReceive[m]->Delete ();
+      }
+
+    delete [] volWeightReceive;
+    delete [] massWeightReceive;
+    }
+
+  if (myProc == 0)
+    {
+    int row = 0;
+    while (row < fragments->GetNumberOfRows ())
+      {
+      if (fragIdArray->GetValue (row) == 0)
+        {
+        fragments->RemoveRow (row);
         }
       else
         {
-        copyVolWeight = volWeightArrays[v];
-        }
-      controller->Reduce (copyVolWeight, volWeightArrays[v], vtkCommunicator::SUM_OP, 0);
-
-      if (myProc == 0)
-        {
-        copyVolWeight->Delete ();
-        }
-      }
-
-    for (int m = 0; m < massWeightedNames.size (); m ++) 
-      {
-      vtkDoubleArray *copyMassWeight;
-      if (myProc == 0)
-        {
-        copyMassWeight = vtkDoubleArray::New ();
-        copyMassWeight->DeepCopy (massWeightArrays[m]);
-        }
-      else
-        {
-        copyMassWeight = massWeightArrays[m];
-        }
-      controller->Reduce (copyMassWeight, massWeightArrays[m], vtkCommunicator::SUM_OP, 0);
-      if (myProc == 0)
-        {
-        copyMassWeight->Delete ();
-        }
-      }
-
-    if (myProc == 0)
-      {
-      int row = 0;
-      while (row < fragments->GetNumberOfRows ())
-        {
-        if (fragIdArray->GetValue (row) == 0)
+        for (size_t v = 0; v < volumeWeightedNames.size (); v ++) 
           {
-          fragments->RemoveRow (row);
+          double weightAvg = volWeightArrays[v]->GetTuple1 (row) / fragVolume->GetTuple1 (row);
+          volWeightArrays[v]->SetTuple1 (row, weightAvg);
           }
-        else
+        for (size_t m = 0; m < massWeightedNames.size (); m ++) 
           {
-          for (int v = 0; v < volumeWeightedNames.size (); v ++) 
-            {
-            double weightAvg = volWeightArrays[v]->GetTuple1 (row) / fragVolume->GetTuple1 (row);
-            volWeightArrays[v]->SetTuple1 (row, weightAvg);
-            }
-          for (int m = 0; m < massWeightedNames.size (); m ++) 
-            {
-            double weightAvg = massWeightArrays[m]->GetTuple1 (row) / fragMass->GetTuple1 (row);
-            massWeightArrays[m]->SetTuple1 (row, weightAvg);
-            }
-          
-          row ++;
+          double weightAvg = massWeightArrays[m]->GetTuple1 (row) / fragMass->GetTuple1 (row);
+          massWeightArrays[m]->SetTuple1 (row, weightAvg);
           }
+        
+        row ++;
         }
-
-      }
-    else 
-      {
-      // it's all on process 0 now.
-      fragments->SetNumberOfRows (0);
       }
     }
+  else
+    {
+    fragments->SetNumberOfRows (0);
+    }
+  vtkTimerLog::MarkEndEvent ("Combining integration");
 
   delete [] volWeightArrays;
   delete [] massWeightArrays;
