@@ -16,6 +16,7 @@
 
 #include "vtkCPCxxHelper.h"
 #include "vtkCPDataDescription.h"
+#include "vtkCPInputDataDescription.h"
 #include "vtkCPPipeline.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
@@ -159,6 +160,15 @@ int vtkCPProcessor::RequestDataDescription(
   if(dataDescription->GetForceOutput() == true)
     {
     return 1;
+    }
+
+  // first set all inputs to be off and set to on as needed.
+  // we don't use vtkCPInputDataDescription::Reset() because
+  // that will reset any field names that were added in.
+  for(unsigned int i=0;i<dataDescription->GetNumberOfInputDescriptions();i++)
+    {
+    dataDescription->GetInputDescription(i)->GenerateMeshOff();
+    dataDescription->GetInputDescription(i)->AllFieldsOff();
     }
 
   dataDescription->ResetInputDescriptions();
