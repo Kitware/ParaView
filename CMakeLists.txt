@@ -208,7 +208,7 @@ if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 endif()
 
-if (UNIX AND NOT APPLE)
+if (UNIX)
   # Since development installs are currently being tested only on linuxes. We
   # can support these for other platforms if time permits.
   option(PARAVIEW_INSTALL_DEVELOPMENT_FILES
@@ -725,6 +725,17 @@ if (NOT VTK_INSTALL_NO_DEVELOPMENT)
     DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
     COMPONENT Development
   )
+
+  #we depend on a couple VTK CMake files that aren't installed but we need
+  #installed
+  install(
+    FILES ${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/TopologicalSort.cmake
+          ${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.h.in
+          ${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cxx.in
+    DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
+    COMPONENT Development
+  )
+
 endif()
 
 #-----------------------------------------------------------------------------
