@@ -67,8 +67,10 @@ build_paraview_client(paraview
     GUI_CONFIGURATION_XMLS
       ${application_gui_xmls} # Add any compiled in GUI configuration xmls
     SOURCES ${ParaView_SOURCE_FILES}
-    INSTALL_BIN_DIR "${VTK_INSTALL_RUNTIME_DIR}"
-    INSTALL_LIB_DIR "${VTK_INSTALL_LIBRARY_DIR}")
+    INSTALL_RUNTIME_DIR "${VTK_INSTALL_RUNTIME_DIR}"
+    INSTALL_LIBRARY_DIR "${VTK_INSTALL_LIBRARY_DIR}"
+    INSTALL_ARCHIVE_DIR "${VTK_INSTALL_ARCHIVE_DIR}"
+    )
 
 # Set appropriate compile flags.
 if( PARAVIEW_QT_VERSION VERSION_GREATER "4" )
