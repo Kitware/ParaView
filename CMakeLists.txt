@@ -259,17 +259,7 @@ endif()
 
 # setup external data. this will automatically download the test
 # data and baseline files to the build tree and set PARAVIEW_DATA_ROOT.
-list(APPEND ExternalData_URL_TEMPLATES
-  "http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=%(hash)&algorithm=%(algo)"
-
-  # Data published by developers using git-gerrit-push.
-  "http://www.paraview.org/files/ExternalData/%(algo)/%(hash)"
-)
-list(APPEND ExternalData_OBJECT_STORES
-  # Local data store populated by the ParaView pre-commit hook
-  "${CMAKE_SOURCE_DIR}/.ExternalData"
-)
-include(ExternalData)
+include(ParaViewExternalData)
 set(ExternalData_LINK_CONTENT MD5)
 set(ExternalData_BINARY_ROOT          "${CMAKE_BINARY_DIR}/ExternalData")
 set(PARAVIEW_TEST_DATA_DIR            "${CMAKE_CURRENT_SOURCE_DIR}/Testing/Data")

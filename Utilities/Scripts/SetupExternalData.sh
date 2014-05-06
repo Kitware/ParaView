@@ -36,12 +36,12 @@ esac
 
 say_store() {
   if test -f "$config_store"; then
-    echo 'A default for VTK_DATA_STORE is configured as:' &&
+    echo 'A default for PARAVIEW_DATA_STORE is configured as:' &&
     echo &&
     sed 's/^/  /' < "$config_store" &&
     echo
   else
-    echo 'No default for VTK_DATA_STORE is configured.' &&
+    echo 'No default for PARAVIEW_DATA_STORE is configured.' &&
     echo
   fi
 }
@@ -57,7 +57,7 @@ ask_store() {
  s,sibling   = Use '"$store_sibling"'
  <full-path> = Use specified <full-path>
 
-select a default for VTK_DATA_STORE [n/h/s]: ' ans &&
+select a default for PARAVIEW_DATA_STORE [n/h/s]: ' ans &&
     case "$ans" in
       n|N|no) ans='no' ;;
       h|H|home) ans="$store_home" ;;
@@ -78,7 +78,7 @@ store_sibling="$(native_path "${PWD%/*}/ParaViewExternalData")" &&
 echo 'ParaView may download data objects into a local "store" using
 the CMake ExternalData module.  The store is content-addressed
 and can be shared across multiple projects and build trees.
-ParaView build trees have a VTK_DATA_STORE CMake cache entry
+ParaView build trees have a PARAVIEW_DATA_STORE CMake cache entry
 to set their store location.  A default for this value to be used
 in build trees created with this source tree may now be chosen.
 ' &&
