@@ -69,10 +69,13 @@
    </attribute>
   </widget>
   <widget class="QDockWidget" name="dockWidget_3">
+   <property name="windowTitle">
+    <string>Properties</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="pqObjectInspectorWidget" name="objectInspector"/>
+   <widget class="pqPropertiesPanel" name="objectInspector"/>
   </widget>
   <action name="action_Open_Dataset">
    <property name="text">
@@ -107,9 +110,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqObjectInspectorWidget</class>
+   <class>pqPropertiesPanel</class>
    <extends>QWidget</extends>
-   <header>pqObjectInspectorWidget.h</header>
+   <header>pqPropertiesPanel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
