@@ -59,7 +59,6 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
   Ui::MultiServerClientMainWindow ui;
   ui.setupUi(this);
 
-  this->tabifyDockWidget(ui.objectInspectorDock, ui.displayDock);
   this->tabifyDockWidget(ui.objectInspectorDock, ui.informationDock);
   ui.objectInspectorDock->raise();
 

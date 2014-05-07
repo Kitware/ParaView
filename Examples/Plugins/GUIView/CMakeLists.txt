@@ -12,9 +12,9 @@ ENDIF(NOT ParaView_BINARY_DIR)
 IF(PARAVIEW_BUILD_QT_GUI)
   # moc the Qt based .h files
   IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h MyViewActiveOptions.h MyViewOptions.h)
+    QT5_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h)
   ELSE ()
-    QT4_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h MyViewActiveOptions.h MyViewOptions.h)
+    QT4_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h)
   ENDIF ()
 
   # invoke macro to create sources for our custom view and display panel
@@ -38,14 +38,11 @@ IF(PARAVIEW_BUILD_QT_GUI)
                            DISPLAY_PANEL MyDisplay)
 
 
-  ADD_PARAVIEW_VIEW_OPTIONS(OPTIONS_IFACE OPTIONS_IFACE_SRCS
-                            VIEW_TYPE MyView ACTIVE_VIEW_OPTIONS MyViewActiveOptions)
-
   # Create a plugin with the new view and its options.
   ADD_PARAVIEW_PLUGIN(MyView "1.0"
     SERVER_MANAGER_XML MyViewSM.xml
-    GUI_INTERFACES ${IFACES} ${OPTIONS_IFACE}
-    GUI_SOURCES MyView.cxx MyDisplay.cxx MyViewActiveOptions.cxx MyViewOptions.cxx
-    ${MOC_SRCS} ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS}
+    GUI_INTERFACES ${IFACES}
+    GUI_SOURCES MyView.cxx MyDisplay.cxx
+    ${MOC_SRCS} ${IFACE_SRCS}
     )
 ENDIF(PARAVIEW_BUILD_QT_GUI)

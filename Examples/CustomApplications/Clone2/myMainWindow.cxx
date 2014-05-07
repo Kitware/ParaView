@@ -33,17 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_myMainWindow.h"
 
 #include "pqHelpReaction.h"
-#include "pqObjectInspectorWidget.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
 #include "pqInterfaceTracker.h"
 #include "pqDefaultViewBehavior.h"
 #include "pqAlwaysConnectedBehavior.h"
-#include "pqDeleteBehavior.h"
+//#include "pqDeleteBehavior.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
 #include "pqApplicationCore.h"
 #include "pqStandardViewModules.h"
-#include "pqPVNewSourceBehavior.h"
+//#include "pqPVNewSourceBehavior.h"
 
 #include <QToolBar>
 #include <QList>
@@ -71,9 +70,6 @@ myMainWindow::myMainWindow()
   // Set up the dock window corners to give the vertical docks more room.
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-
-  // Enable automatic creation of representation on accept.
-  this->Internals->proxyTabWidget->setShowOnAccept(true);
 
   // Enable help for from the object inspector.
   QObject::connect(this->Internals->proxyTabWidget,
@@ -137,8 +133,8 @@ myMainWindow::myMainWindow()
   pgm->addInterface(new pqStandardViewModules(pgm));
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
-  new pqPVNewSourceBehavior(this);
-  new pqDeleteBehavior(this);
+//  new pqPVNewSourceBehavior(this);
+//  new pqDeleteBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
 #endif
 }

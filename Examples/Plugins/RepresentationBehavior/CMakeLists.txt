@@ -1,3 +1,4 @@
+# TODO: update this plugin to use the pipeline controller instead.
 # Create an auto-start plugin that will add custom representation behavior.
 # Typicialy when a representation will be created, the behavior will
 # try to set it representation to Surface and pick on of the scalar data array

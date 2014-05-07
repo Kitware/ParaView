@@ -14,7 +14,6 @@
    <string>MainWindow</string>
   </property>
   <widget class="pqViewManager" name="centralwidget"/>
-
   <widget class="QDockWidget" name="pipelineBrowserDock2">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -39,7 +38,6 @@
     </layout>
    </widget>
   </widget>
-
   <widget class="QDockWidget" name="pipelineBrowserDock">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -71,42 +69,7 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="pqObjectInspectorWidget" name="objectInspector"/>
-  </widget>
-  <widget class="QDockWidget" name="displayDock">
-   <property name="windowTitle">
-    <string>Display</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="displayWidgetFrame">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QScrollArea" name="displayScrollArea">
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="pqDisplayProxyEditorWidget" name="displayWidget">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>90</width>
-          <height>196</height>
-         </rect>
-        </property>
-       </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+   <widget class="pqPropertiesPanel" name="objectInspector"/>
   </widget>
   <widget class="QDockWidget" name="informationDock">
    <property name="windowTitle">
@@ -133,8 +96,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>90</width>
-          <height>196</height>
+          <width>101</width>
+          <height>165</height>
          </rect>
         </property>
        </widget>
@@ -149,7 +112,7 @@
      <x>0</x>
      <y>0</y>
      <width>781</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -196,15 +159,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqObjectInspectorWidget</class>
+   <class>pqPropertiesPanel</class>
    <extends>QWidget</extends>
-   <header>pqObjectInspectorWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqDisplayProxyEditorWidget</class>
-   <extends>QWidget</extends>
-   <header>pqDisplayProxyEditorWidget.h</header>
+   <header>pqPropertiesPanel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
