@@ -59,7 +59,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-struct vtkSMPropertyLinkInternals
+class vtkSMPropertyLinkInternals
 {
 public:
   struct LinkedProperty

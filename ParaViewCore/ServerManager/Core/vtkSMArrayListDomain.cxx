@@ -88,7 +88,7 @@ struct vtkSMArrayListDomainArrayInformation
           //  {
             return this->ArrayAttributeType < other.ArrayAttributeType;
           //  }
-          return this->IsPartial < other.IsPartial;
+          // return this->IsPartial < other.IsPartial;
           }
         return this->ArrayName < other.ArrayName;
         }
@@ -246,7 +246,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
         // the array is directly acceptable (no need to split out components)
         vtkSMArrayListDomainArrayInformation info;
         info.ArrayName = arrayInfo->GetName();
-        info.IsPartial = arrayInfo->GetIsPartial();
+        info.IsPartial = (arrayInfo->GetIsPartial() != 0);
         info.FieldAssociation = acceptable_as;
         info.DomainAssociation = type;
         info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);
@@ -271,7 +271,7 @@ void vtkSMArrayListDomainInternals::BuildArrayList(
             }
           vtkSMArrayListDomainArrayInformation info;
           info.ArrayName = vtkSMArrayListDomain::CreateMangledName(arrayInfo, cc);
-          info.IsPartial = arrayInfo->GetIsPartial();
+          info.IsPartial = (arrayInfo->GetIsPartial() != 0);
           info.FieldAssociation = acceptable_as;
           info.DomainAssociation = type;
           info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);

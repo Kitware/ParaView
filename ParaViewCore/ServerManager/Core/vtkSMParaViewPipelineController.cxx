@@ -579,9 +579,6 @@ vtkSMProxy* vtkSMParaViewPipelineController::FindTimeAnimationTrack(vtkSMProxy* 
     return NULL;
     }
 
-  vtkSMSessionProxyManager* pxm = scene->GetSessionProxyManager();
-  assert(pxm);
-
   vtkSMPropertyHelper helper(scene, "Cues", /*quiet*/ true);
   for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; cc++)
     {

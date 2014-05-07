@@ -105,6 +105,8 @@ private:
     {
     assert(vtkProcessModule::SafeDownCast(caller) != NULL &&
       eventid == vtkCommand::ConnectionClosedEvent);
+    (void)caller;
+    (void)eventid;
     vtkIdType sessionId = *(reinterpret_cast<vtkIdType*>(calldata));
     if (sessionId <= 0 || sessionId != this->WatchSessionID)
       {

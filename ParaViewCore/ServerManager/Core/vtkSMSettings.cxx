@@ -216,7 +216,7 @@ public:
         }
       else if (property->GetRepeatable())
         {
-        property->SetNumberOfElements(vector.size());
+        property->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
         }
       else if (vector.size() != property->GetNumberOfElements())
         {
@@ -240,7 +240,7 @@ public:
       }
     else if (property->GetRepeatable())
       {
-      property->SetNumberOfElements(vector.size());
+      property->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
       }
     else if (vector.size() != property->GetNumberOfElements())
       {
@@ -271,7 +271,7 @@ public:
 
     if (property->GetRepeatable())
       {
-      property->SetNumberOfElements(vector.size());
+      property->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
       }
     else if (vector.size() != property->GetNumberOfElements())
       {
@@ -421,11 +421,12 @@ public:
 
     if (values.size() > 1)
       {
-      jsonValue[leaf].resize(values.size());
+      jsonValue[leaf].resize(
+        static_cast<Json::Value::ArrayIndex>(values.size()));
 
       for (size_t i = 0; i < values.size(); ++i)
         {
-        jsonValue[leaf][(unsigned int)i] = values[i];
+        jsonValue[leaf][static_cast<Json::Value::ArrayIndex>(i)] = values[i];
         }
       }
     else
