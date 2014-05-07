@@ -323,7 +323,8 @@ public:
   enum
     {
     COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE=0,
-    COPY_PROXY_PROPERTY_VALUES_BY_CLONING
+
+    COPY_PROXY_PROPERTY_VALUES_BY_CLONING // < No longer supported!!!
     };
 //ETX
 
@@ -337,7 +338,8 @@ public:
   // proxyPropertyCopyFlag specifies how the values for vtkSMProxyProperty
   // and its subclasses are copied over: by reference or by 
   // cloning (ie. creating new instances of the value proxies and 
-  // synchronizing their values).
+  // synchronizing their values). This is no longer relevant since we don't
+  // support COPY_PROXY_PROPERTY_VALUES_BY_CLONING anymore.
   void Copy(vtkSMProxy* src);
   void Copy(vtkSMProxy* src, const char* exceptionClass);
   virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 

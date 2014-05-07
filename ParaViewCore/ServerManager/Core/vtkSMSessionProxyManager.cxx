@@ -571,15 +571,10 @@ vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(
 
   std::set<std::string> existingNames;
 
-  vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
-  for (; it2 != it->second.end(); it2++)
+  for (vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
+    it2 != it->second.end(); it2++)
     {
-    for (
-      vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
-      it2 != it->second.end(); it2++)
-      {
-      existingNames.insert(it2->first);
-      }
+    existingNames.insert(it2->first);
     }
 
   for (int suffix=0; suffix < VTK_INT_MAX; ++suffix)

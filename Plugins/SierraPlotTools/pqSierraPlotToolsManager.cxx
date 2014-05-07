@@ -1415,6 +1415,7 @@ bool pqSierraPlotToolsManager::createPlotOverTime()
   pqDataRepresentation *repr;
   repr = displayPolicy->setRepresentationVisibility(
     plotFilter->getOutputPort(0), plotView, true);
+  (void)repr;
 
   // UpdateSelfAndAllInputs--
   // Calls UpdateVTKObjects() on self and all proxies that depend on this proxy

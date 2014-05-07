@@ -353,17 +353,17 @@ void pqDisplayColorWidget::setArraySelection(
     association = vtkDataObject::POINT;
     }
 
-  QVariant data = this->itemData(association, arrayName);
+  QVariant idata = this->itemData(association, arrayName);
   QIcon* icon = this->itemIcon(association, arrayName);
 
-  int index = this->Variables->findData(data);
+  int index = this->Variables->findData(idata);
   if (index == -1)
     {
     bool prev = this->Variables->blockSignals(true);
-    this->Variables->addItem(*icon, arrayName, data);
+    this->Variables->addItem(*icon, arrayName, idata);
     this->Variables->blockSignals(prev);
 
-    index = this->Variables->findData(data);
+    index = this->Variables->findData(idata);
     qDebug() << "(" << association << ", " << arrayName << " ) "
       "is not an array shown in the pqDisplayColorWidget currently. "
       "Will add a new entry for it";
@@ -382,8 +382,8 @@ QVariant pqDisplayColorWidget::itemData(int association, const QString& arrayNam
 //-----------------------------------------------------------------------------
 QIcon* pqDisplayColorWidget::itemIcon(int association, const QString& arrayName) const
 {
-  QVariant data = this->itemData(association, arrayName);
-  if (!data.isValid())
+  QVariant idata = this->itemData(association, arrayName);
+  if (!idata.isValid())
     {
     return this->SolidColorIcon;
     }
@@ -418,8 +418,8 @@ void pqDisplayColorWidget::refreshColorArrayNames()
       label += " (partial)";
       }
     QIcon* icon = this->itemIcon(icon_association, name);
-    QVariant data = this->itemData(association, name);
-    this->Variables->addItem(*icon, label, data);
+    QVariant idata = this->itemData(association, name);
+    this->Variables->addItem(*icon, label, idata);
     }
   // doing this here, instead of in the construtor ensures that the
   // popup menu shows resonably on OsX.

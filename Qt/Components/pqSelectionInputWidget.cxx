@@ -278,8 +278,7 @@ void pqSelectionInputWidget::copyActiveSelection()
   vtkSMSessionProxyManager* pxm = activeSelection->GetSessionProxyManager();
   vtkSMProxy* newSource = pxm->NewProxy(activeSelection->GetXMLGroup(),
                                         activeSelection->GetXMLName());
-  newSource->Copy(activeSelection, 0,
-                  vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
+  newSource->Copy(activeSelection);
   newSource->UpdateVTKObjects();
   this->setSelection(newSource);
   newSource->Delete();

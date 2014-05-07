@@ -141,14 +141,6 @@ public:
   virtual void Copy(vtkSMProperty* src);
 
   // Description:
-  // Copy all proxies added to the src over to this by creating new 
-  // instances for the proxies and inturn calling Copy to copy 
-  // the proxies. exceptionClass and proxyPropertyCopyFlag are
-  // used while copying over the values from the two proxy properties.
-  virtual void DeepCopy(vtkSMProperty* src, const char* exceptionClass, 
-    int proxyPropertyCopyFlag);
-
-  // Description:
   // Returns whether the "skip_dependency" attribute is set.
   vtkGetMacro(SkipDependency, bool);
 

@@ -195,6 +195,8 @@ void pqDisplayArrayWidget::onComponentActivated(int row)
 //-----------------------------------------------------------------------------
 void pqDisplayArrayWidget::onVariableActivated(int row)
 {
+  Q_UNUSED(row);
+
   if (this->Internal->BlockEmission)
     {
     return;

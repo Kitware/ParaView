@@ -75,10 +75,10 @@ pqViewTypePropertyWidget::pqViewTypePropertyWidget(
       }
     iter->Delete();
 
-    for (QMap<QString, QString>::iterator iter = valuesMap.begin();
-      iter != valuesMap.end(); ++iter)
+    for (QMap<QString, QString>::iterator viter = valuesMap.begin();
+      viter != valuesMap.end(); ++viter)
       {
-      this->ComboBox->addItem(iter.key(), QVariant(iter.value()));
+      this->ComboBox->addItem(viter.key(), QVariant(viter.value()));
       }
 
     this->connect(this->ComboBox, SIGNAL(currentIndexChanged(int)),

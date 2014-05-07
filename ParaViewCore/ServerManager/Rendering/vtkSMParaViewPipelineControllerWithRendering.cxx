@@ -156,6 +156,8 @@ namespace
   void vtkPickRepresentationType(
     vtkSMRepresentationProxy* repr, vtkSMSourceProxy* producer, unsigned int outputPort)
     {
+    (void)producer;
+    (void)outputPort;
     // currently, this just ensures that the "Representation" type chosen has
     // proper color type etc. setup. At some point, we could deprecate
     // vtkSMRepresentationTypeDomain and let this logic pick the default

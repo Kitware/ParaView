@@ -1124,9 +1124,9 @@ bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
 
     const std::set<vtkSMProperty*> &props =
       observer.GetPropertiesWithModifiedDomains();
-    for (std::set<vtkSMProperty*>::const_iterator iter = props.begin(); iter != props.end(); ++iter)
+    for (std::set<vtkSMProperty*>::const_iterator siter = props.begin(); siter != props.end(); ++siter)
       {
-      (*iter)->ResetToDomainDefaults();
+      (*siter)->ResetToDomainDefaults();
       }
     proxy->UpdateVTKObjects();
     }
@@ -1318,11 +1318,11 @@ bool vtkSMParaViewPipelineController::ResetSession(vtkSMSession* session)
       proxies.push_back(proxy);
       }
     }
-  for (proxyvectortype::iterator iter = proxies.begin(), max=proxies.end(); iter != max; ++iter)
+  for (proxyvectortype::iterator piter = proxies.begin(), max=proxies.end(); piter != max; ++piter)
     {
-    if (iter->GetPointer())
+    if (piter->GetPointer())
       {
-      this->UnRegisterProxy(iter->GetPointer());
+      this->UnRegisterProxy(piter->GetPointer());
       }
     }
 

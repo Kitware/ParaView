@@ -298,58 +298,6 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src,
-  const char* exceptionClass, int proxyPropertyCopyFlag)
-{
-  abort();
-// FIXME:
-//  vtkSMSessionProxyManager* pxm =
-//      vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(
-//          this->GetParent()->GetSession());
-//  vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(src);
-//
-//  this->RemoveAllProxies();
-//  this->RemoveAllUncheckedProxies();
-//  
-//  if (dsrc)
-//    {
-//    int imUpdate = this->ImmediateUpdate;
-//    this->ImmediateUpdate = 0;
-//    unsigned int i;
-//    unsigned int numElems = dsrc->GetNumberOfProxies();
-//
-//    for(i=0; i<numElems; i++)
-//      {
-//      vtkSMProxy* psrc = dsrc->GetProxy(i);
-//      vtkSMProxy* pdest = pxm->NewProxy(psrc->GetXMLGroup(), 
-//        psrc->GetXMLName());
-//      pdest->SetSession(psrc->GetSession());
-//      pdest->Copy(psrc, exceptionClass, proxyPropertyCopyFlag);
-//      this->AddProxy(pdest);
-//      pdest->Delete();
-//      }
-//    
-//    numElems = dsrc->GetNumberOfUncheckedProxies();
-//    for(i=0; i<numElems; i++)
-//      {
-//      vtkSMProxy* psrc = dsrc->GetUncheckedProxy(i);
-//      vtkSMProxy* pdest = pxm->NewProxy(psrc->GetXMLGroup(), 
-//        psrc->GetXMLName());
-//      pdest->SetSession(psrc->GetSession());
-//      pdest->Copy(psrc, exceptionClass, proxyPropertyCopyFlag);
-//      this->AddUncheckedProxy(pdest);
-//      pdest->Delete();
-//      }
-//    this->ImmediateUpdate = imUpdate;
-//    }
-//  if (this->ImmediateUpdate)
-//    {
-//    this->Modified();
-//    this->InvokeEvent(vtkCommand::UncheckedPropertyModifiedEvent);
-//    }
-}
-
-//---------------------------------------------------------------------------
 void vtkSMProxyProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);

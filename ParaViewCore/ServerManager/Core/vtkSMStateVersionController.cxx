@@ -447,6 +447,8 @@ struct Process_4_1_to_4_2
 
   static bool validOutputTrue(xml_node viewNode, int i)
   {
+    (void)viewNode;
+    (void)i;
     return true;
   }
 

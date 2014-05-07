@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqLabel.h"
 
-pqLabel::pqLabel(const QString & text, QWidget * parent, Qt::WindowFlags f) :
-  QLabel(text, parent, f)
+pqLabel::pqLabel(const QString & txt, QWidget * parentObject, Qt::WindowFlags f) :
+  QLabel(txt, parentObject, f)
 {
 }
 

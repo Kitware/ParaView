@@ -1837,6 +1837,13 @@ void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass,
     return;
     }
 
+  if (proxyPropertyCopyFlag != COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE)
+    {
+    vtkWarningMacro("COPY_PROXY_PROPERTY_VALUES_BY_CLONING is no longer supported."
+      " Using COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE instead.");
+    proxyPropertyCopyFlag = COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE;
+    }
+
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
@@ -1854,11 +1861,6 @@ void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass,
             vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE)
             {
             dest->Copy(source);
-            }
-          else
-            {
-            pp->DeepCopy(source, exceptionClass, 
-              vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
             }
           }
         }
