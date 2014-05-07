@@ -1263,7 +1263,7 @@ class ThreeSixtyImageStackExporter():
 
     @staticmethod
     def get_data_type():
-        return "parametric-image-stack"
+        return "catalyst-viewer"
 
     def add_attribute(self, name, value):
         setattr(self, name, value)
