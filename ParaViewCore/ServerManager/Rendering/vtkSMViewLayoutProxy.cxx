@@ -920,6 +920,8 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
     return NULL;
     }
 
+  this->UpdateState();
+
   int extent[6] = {VTK_INT_MAX, VTK_INT_MIN,
     VTK_INT_MAX, VTK_INT_MIN, VTK_INT_MAX, VTK_INT_MIN};
 
