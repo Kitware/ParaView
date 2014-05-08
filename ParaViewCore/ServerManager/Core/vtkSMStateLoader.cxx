@@ -118,6 +118,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     // If an animation scene already exists, we use that.
     vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
     iter->SetSessionProxyManager(pxm);
+    iter->SetModeToOneGroup();
     vtkSMProxy* scene = 0;
     for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
       {
@@ -142,6 +143,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     // If an animation cue already exists, we use that.
     vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
     iter->SetSessionProxyManager(pxm);
+    iter->SetModeToOneGroup();
     vtkSMProxy* cue = 0;
     for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
       {
