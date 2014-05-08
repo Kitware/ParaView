@@ -22,7 +22,7 @@ if (FOUND_NUMPY)
     )
   set(PARAVIEW_PYTHON_ARGS)
 
-  if (PARAVIEW_ENABLE_MATPLOTLIB AND PYTHON_MODULE_matplotlib_FOUND)
+  if (PARAVIEW_ENABLE_MATPLOTLIB)
     paraview_add_test_python(
       NO_DATA NO_VALID NO_OUTPUT NO_RT
       TestPythonView.py

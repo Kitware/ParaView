@@ -237,7 +237,8 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 cmake_dependent_option(PARAVIEW_USE_UNIFIED_BINDINGS "If enabled, Python bindings will back the ClientServer wrapping implementation" OFF
   PARAVIEW_ENABLE_PYTHON OFF)
-option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON)
+cmake_dependent_option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON
+  "PARAVIEW_ENABLE_PYTHON;PYTHON_MODULE_matplotlib_FOUND" OFF)
 mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
 
 # If building on Unix with MPI enabled, we will present another option to
