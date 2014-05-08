@@ -276,7 +276,7 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
 {
   vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
   const char* colorArrayName = NULL;
-  int fieldAssociation;
+  int fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 
   vtkInformation *info = this->GetInputArrayInformation(0);
   if (info &&
