@@ -217,6 +217,8 @@ void pqView::tryRender()
 //-----------------------------------------------------------------------------
 void pqView::forceRender()
 {
+  // cancel any pending renders, if this method is called directly.
+  this->cancelPendingRenders();
   vtkSMViewProxy* view = this->getViewProxy();
   if (view)
     {

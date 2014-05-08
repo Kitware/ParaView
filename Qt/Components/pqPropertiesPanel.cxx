@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkTimerLog.h"
 
 #include <QKeyEvent>
 #include <QPointer>
@@ -692,6 +693,7 @@ void pqPropertiesPanel::updateButtonState()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::apply()
 {
+  vtkTimerLog::MarkStartEvent("PropertiesPanel::Apply");
   this->Internals->AutoApplyTimer.stop();
 
   BEGIN_UNDO_SET("Apply");
@@ -723,6 +725,7 @@ void pqPropertiesPanel::apply()
 
   emit this->applied();
   END_UNDO_SET();
+  vtkTimerLog::MarkEndEvent("PropertiesPanel::Apply");
 }
 
 //-----------------------------------------------------------------------------

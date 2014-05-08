@@ -189,7 +189,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
     {
     if (view->getWidget()->isVisible())
       {
-      view->getViewProxy()->StillRender();
+      view->forceRender();
       }
     }
 }
