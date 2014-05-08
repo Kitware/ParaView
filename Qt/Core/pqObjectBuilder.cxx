@@ -103,7 +103,7 @@ namespace pqObjectBuilderNS
       }
     else
       {
-      Controller->RegisterPipelineProxy(proxy, regName.toAscii().data());
+      Controller->RegisterPipelineProxy(proxy, regName.toLatin1().data());
       }
 
     pqPipelineSource* source = pqApplicationCore::instance()->
@@ -148,7 +148,7 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
-    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
+    pxm->NewProxy(sm_group.toLatin1().data(), sm_name.toLatin1().data()));
   if (!pqObjectBuilderNS::preCreatePipelineProxy(proxy))
     {
     return NULL;
@@ -169,7 +169,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
-    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
+    pxm->NewProxy(sm_group.toLatin1().data(), sm_name.toLatin1().data()));
   if (!pqObjectBuilderNS::preCreatePipelineProxy(proxy))
     {
     return NULL;
@@ -260,7 +260,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
-    pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
+    pxm->NewProxy(sm_group.toLatin1().data(), sm_name.toLatin1().data()));
   if (!pqObjectBuilderNS::preCreatePipelineProxy(proxy))
     {
     return NULL;
@@ -492,7 +492,7 @@ vtkSMProxy* pqObjectBuilder::createProxy(const QString& sm_group,
     proxy->SetPrototype(true);
     }
 
-  pxm->RegisterProxy(reg_group.toAscii().data(), proxy);
+  pxm->RegisterProxy(reg_group.toLatin1().data(), proxy);
   return proxy;
 }
 

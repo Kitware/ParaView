@@ -183,8 +183,8 @@ void pqColorPaletteLinkHelper::setSelectedPaletteColor(const QString& colorName)
   vtkSMGlobalPropertiesProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)
     {
-    palette->Link(colorName.toAscii().data(),
-      this->SMProxy, this->SMPropertyName.toAscii().data());
+    palette->Link(colorName.toLatin1().data(),
+      this->SMProxy, this->SMPropertyName.toLatin1().data());
     }
 }
 
@@ -199,7 +199,7 @@ QString pqColorPaletteLinkHelper::selectedPaletteColor() const
   if (palette && this->SMProxy)
     {
     return palette->GetLinkedPropertyName(
-        this->SMProxy, this->SMPropertyName.toAscii().data());
+        this->SMProxy, this->SMPropertyName.toLatin1().data());
     }
 
   return QString();

@@ -370,7 +370,7 @@ void pqPointSpriteControls::updateRadiusArray()
   svp->SetElement(1, "0"); //port
   svp->SetElement(2, "0"); //connection
   svp->SetElement(3, "0" /* vtkDataObject::FIELD_ASSOCIATION_POINTS */); //type
-  svp->SetElement(4, array.toAscii().data()); //name
+  svp->SetElement(4, array.toLatin1().data()); //name
   reprProxy->UpdateVTKObjects();
 
   pqSMAdaptor::setElementProperty(reprProxy->GetProperty(
@@ -425,7 +425,7 @@ void pqPointSpriteControls::updateOpacityArray()
   svp->SetElement(1, "0"); //port
   svp->SetElement(2, "0"); //connection
   svp->SetElement(3, "0" /* vtkDataObject::FIELD_ASSOCIATION_POINTS */); //type
-  svp->SetElement(4, array.toAscii().data()); //name
+  svp->SetElement(4, array.toLatin1().data()); //name
 
   pqSMAdaptor::setElementProperty(
     reprProxy->GetProperty("OpacityVectorComponent"),

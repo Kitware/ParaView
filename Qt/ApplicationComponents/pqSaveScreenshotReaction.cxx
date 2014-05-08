@@ -152,7 +152,7 @@ void pqSaveScreenshotReaction::saveScreenshot()
     state.TakeReference(colorPalette->SaveXMLState(NULL));
 
     vtkSMProxy* chosenPalette =
-      pxm->NewProxy("palettes", palette.toAscii().data());
+      pxm->NewProxy("palettes", palette.toLatin1().data());
     colorPalette->Copy(chosenPalette);
     chosenPalette->Delete();
     }

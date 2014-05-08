@@ -390,7 +390,7 @@ void pqPipelineContextMenuBehavior::colorMenuTriggered(QAction* action)
     BEGIN_UNDO_SET("Change coloring");
     vtkSMProxy* reprProxy = this->PickedRepresentation->getProxy();
     if (vtkSMPVRepresentationProxy::SetScalarColoring(
-        reprProxy, array.second.toAscii().data(), array.first))
+        reprProxy, array.second.toLatin1().data(), array.first))
       {
       // we could now respect some application setting to determine if the LUT is
       // to be reset.

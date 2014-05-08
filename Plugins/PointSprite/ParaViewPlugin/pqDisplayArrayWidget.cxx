@@ -260,7 +260,7 @@ vtkPVArrayInformation* pqDisplayArrayWidget::getArrayInformation()
     {
     vtkPVDataInformation* dataInfo = display->getInputDataInformation();
     vtkPVArrayInformation* ai = dataInfo->GetArrayInformation(
-      arrayName.toAscii().data(), vtkDataObject::POINT);
+      arrayName.toLatin1().data(), vtkDataObject::POINT);
     return ai;
     }
   return NULL;
