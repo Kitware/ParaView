@@ -281,6 +281,10 @@ class Proxy(object):
             setter = getattr(self.__class__, name)
             setter = setter.__set__
         except AttributeError:
+            if name == "ColorAttributeType":
+                # if ColorAttributeType is being used, warn.
+                raise AttributeError(\
+                    "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
             if not hasattr(self, name):
                 raise AttributeError("Attribute %s does not exist. " % name +
                   " This class does not allow addition of new attributes to avoid " +
@@ -441,10 +445,11 @@ class Proxy(object):
             return self.__GetActiveCamera
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
-        # if ColorAttributeType is being used, warn.
         if name == "ColorAttributeType":
-            paraview.print_error(\
-                "'ColorAttributeType' is deprecated. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
+            # if ColorAttributeType is being used, warn.
+            raise AttributeError(\
+                "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
+            return None
         # If not a property, see if SMProxy has the method
         try:
             proxyAttr = getattr(self.SMProxy, name)
