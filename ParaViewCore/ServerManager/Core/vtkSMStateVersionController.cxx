@@ -14,7 +14,9 @@
 =========================================================================*/
 #include "vtkSMStateVersionController.h"
 
-#include "vtkAxis.h"
+// Don't include vtkAxis. Cannot add dependency on vtkChartsCore in
+// vtkPVServerManagerCore.
+// #include "vtkAxis.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -433,14 +435,14 @@ struct Process_4_1_to_4_2
   {
     switch (axis)
       {
-      case vtkAxis::LEFT:
-        return "Left";
-      case vtkAxis::BOTTOM:
-        return "Bottom";
-      case vtkAxis::RIGHT:
-        return "Right";
-      case vtkAxis::TOP:
-        return "Top";
+    case 0:  // case vtkAxis::LEFT:
+      return "Left";
+    case 1: // case vtkAxis::BOTTOM:
+      return "Bottom";
+    case 2: // case vtkAxis::RIGHT:
+      return "Right";
+    case 3: // case vtkAxis::TOP:
+      return "Top";
       }
     return "";
   }
