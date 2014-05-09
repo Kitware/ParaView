@@ -74,6 +74,8 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
     //1 the list looks nicer
     //2 the list case sensitive sort works "better"
     desc.replace(0,1,desc.at(0).toUpper());
+
+    desc = QString("%1 (%2)").arg(desc).arg(readers->GetString(cc+1));
     QListWidgetItem* item = new QListWidgetItem(desc, lw);
     item->setData(Qt::UserRole, readers->GetString(cc+0));
     item->setData(Qt::UserRole+1, readers->GetString(cc+1));
@@ -105,6 +107,8 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
     //1 the list looks nicer
     //2 the list case sensitive sort works "better"
     desc.replace(0,1,desc.at(0).toUpper());
+
+    desc = QString("%1 (%2)").arg(desc).arg(list->GetString(cc+1));
     QListWidgetItem* item = new QListWidgetItem(desc, lw);
     item->setData(Qt::UserRole, list->GetString(cc+0));
     item->setData(Qt::UserRole+1, list->GetString(cc+1));
