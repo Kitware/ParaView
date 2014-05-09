@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
+class pqPipelineSource;
 class pqServer;
 class pqServerResource;
 class QAction;
@@ -57,6 +58,13 @@ public:
   /// Open a resource on the given server
   virtual bool open(
     pqServer* server, const pqServerResource& resource) const;
+
+protected:
+  virtual pqPipelineSource* createReader(
+    const QString& readerGroup,
+    const QString& readerName,
+    const QStringList& files,
+    pqServer* server) const;
 
 private slots:
   void onResourcesChanged();

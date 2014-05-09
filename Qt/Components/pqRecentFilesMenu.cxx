@@ -309,57 +309,61 @@ bool pqRecentFilesMenu::open(
         }
       }
     }
-  else
+  else if (!resource.path().isEmpty())
     {
-    if (!resource.path().isEmpty())
+    QString readerGroup = resource.data("readergroup");
+    QString readerName = resource.data("reader");
+    if (readerName.isEmpty() || readerGroup.isEmpty())
       {
-      QString readerGroup = resource.data("readergroup");
-      QString readerName = resource.data("reader");
-      pqPipelineSource* reader = 0;
+      qDebug() << "Recent changes to the settings code have "
+        << "made these old entries unusable.";
+      return false;
+      }
 
-      if (!readerName.isEmpty() && !readerGroup.isEmpty())
+    QStringList files;
+    // make sure the file exists
+    QString filename = resource.path();
+    if (filename.isEmpty() || !fileModel.fileExists(filename, filename))
+      {
+      qCritical() << "File does not exist: " << filename << "\n";
+      return false;
+      }
+    files.push_back(filename);
+    QString extrafilesCount = resource.data("extrafilesCount");
+    if (!extrafilesCount.isEmpty() && extrafilesCount.toInt() > 0)
+      {
+      for (int cc=0; cc < extrafilesCount.toInt(); cc++)
         {
-        QStringList files;
-        // make sure the file exists
-        QString filename = resource.path();
-        if (filename.isEmpty() || !fileModel.fileExists(filename, filename))
+        QString extrafile = resource.data(QString("file.%1").arg(cc));
+        if (!extrafile.isEmpty() &&
+          fileModel.fileExists(extrafile, extrafile))
           {
-          qCritical() << "File does not exist: " << filename << "\n";
-          return false;
+          files.push_back(extrafile);
           }
-        files.push_back(filename);
-        QString extrafilesCount = resource.data("extrafilesCount");
-        if (!extrafilesCount.isEmpty() && extrafilesCount.toInt() > 0)
-          {
-          for (int cc=0; cc < extrafilesCount.toInt(); cc++)
-            {
-            QString extrafile = resource.data(QString("file.%1").arg(cc));
-            if (!extrafile.isEmpty() &&
-              fileModel.fileExists(extrafile, extrafile))
-              {
-              files.push_back(extrafile);
-              }
-            }
-          }
-        pqApplicationCore* core = pqApplicationCore::instance();
-        pqObjectBuilder* builder = core->getObjectBuilder();
-        BEGIN_UNDO_SET("Create Reader");
-        reader = builder->createReader(
-          readerGroup, readerName, files, server);
-        END_UNDO_SET();
-        return true;
-        }
-      else
-        {
-        qDebug() << "Recent changes to the settings code have "
-          << "made these old entries unusable.";
-        }
-  
-      if (!reader)
-        {
-        qCritical() << "Error opening file " << resource.path() << "\n";
         }
       }
+    if (this->createReader(readerGroup, readerName, files, server) != NULL)
+      {
+      return true;
+      }
+    qCritical() << "Error opening file " << resource.path() << "\n";
     }
+
   return false;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqRecentFilesMenu::createReader(
+  const QString& readerGroup,
+  const QString& readerName,
+  const QStringList& files,
+  pqServer* server) const
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* builder = core->getObjectBuilder();
+  BEGIN_UNDO_SET("Create Reader");
+  pqPipelineSource* reader = builder->createReader(
+    readerGroup, readerName, files, server);
+  END_UNDO_SET();
+  return reader;
 }
