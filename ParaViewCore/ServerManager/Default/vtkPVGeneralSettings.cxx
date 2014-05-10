@@ -43,7 +43,8 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY),
   ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS),
   CacheGeometryForAnimation(false),
-  AnimationGeometryCacheLimit(0)
+  AnimationGeometryCacheLimit(0),
+  PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
 {
   this->SetDefaultViewType("RenderView");
 }
@@ -195,4 +196,5 @@ void vtkPVGeneralSettings::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBarMode: " << this->ScalarBarMode << "\n";
   os << indent << "CacheGeometryForAnimation: " << this->CacheGeometryForAnimation << "\n";
   os << indent << "AnimationGeometryCacheLimit: " << this->AnimationGeometryCacheLimit << "\n";
+  os << indent << "PropertiesPanelMode: " << this->PropertiesPanelMode << "\n";
 }

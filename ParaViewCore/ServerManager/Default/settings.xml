@@ -10,7 +10,8 @@
 
       <IntVectorProperty name="ShowSplashScreen"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        panel_visibility="advanced">
         <Documentation>
           Show splash screen at startup.
         </Documentation>
@@ -22,7 +23,8 @@
 
       <IntVectorProperty name="CrashRecovery"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        panel_visibility="advanced">
         <Documentation>
           On a crash, attempt to save a state file to potentially restore
           the application state to that before the crash.
@@ -37,7 +39,8 @@
         number_of_elements="1"
         default_values="RenderView"
         command="SetDefaultViewType"
-        panel_widget="viewtype_selector">
+        panel_widget="viewtype_selector"
+        panel_visibility="advanced">
         <Documentation>
           Set the view to create when ParaView starts up.
         </Documentation>
@@ -62,12 +65,34 @@
       <IntVectorProperty name="AutoApplyActiveOnly"
         number_of_elements="1"
         default_values="0"
-        command="SetAutoApplyActiveOnly">
+        command="SetAutoApplyActiveOnly"
+        panel_visibility="advanced">
         <Documentation>
           Limit automatic accepting of changes on the 'Properties'
           panel to the active panel alone.
         </Documentation>
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PropertiesPanelMode"
+        command="SetPropertiesPanelMode"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          You can choose to show source, display and view properties in a single
+          'Properties' panel, or place them in separate dock panels.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Combined Properties panel" value="0" />
+          <Entry text="Display Properties in a separate panel" value="1" />
+          <Entry text="View Properties in a separate panel" value="2" />
+          <Entry text="Separate panels for each type of properties" value="3" />
+        </EnumerationDomain>
+        <Hints>
+          <RestartRequired />
+          <SaveInQSettings />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="AutoConvertProperties"

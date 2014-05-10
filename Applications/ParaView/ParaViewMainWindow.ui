@@ -166,8 +166,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>77</width>
-          <height>271</height>
+          <width>204</width>
+          <height>229</height>
          </rect>
         </property>
        </widget>
@@ -228,6 +228,32 @@
    <widget class="pqFindDataSelectionDisplayFrame" name="selectionDisplayWidget">
     <property name="useVerticalLayout" stdset="0">
      <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="displayPropertiesDock">
+   <property name="windowTitle">
+    <string>Display</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqPropertiesPanel" name="displayPropertiesPanel">
+    <property name="panelMode" stdset="0">
+     <number>2</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="viewPropertiesDock">
+   <property name="windowTitle">
+    <string>View</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqPropertiesPanel" name="viewPropertiesPanel">
+    <property name="panelMode" stdset="0">
+     <number>4</number>
     </property>
    </widget>
   </widget>

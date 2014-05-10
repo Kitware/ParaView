@@ -116,6 +116,18 @@ public:
   // Forwarded for vtkSMParaViewPipelineControllerWithRendering.
   void SetInheritRepresentationProperties(bool val);
 
+  enum
+    {
+    ALL_IN_ONE=0,
+    SEPARATE_DISPLAY_PROPERTIES=1,
+    SEPARATE_VIEW_PROPERTIES=2,
+    ALL_SEPARATE=3
+    };
+  // Description:
+  // Properties panel configuration.
+  vtkSetMacro(PropertiesPanelMode, int);
+  vtkGetMacro(PropertiesPanelMode, int);
+
 //BTX
 protected:
   vtkPVGeneralSettings();
@@ -128,6 +140,7 @@ protected:
   int ScalarBarMode;
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;
+  int PropertiesPanelMode;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&); // Not implemented

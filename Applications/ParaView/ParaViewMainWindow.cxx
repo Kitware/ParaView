@@ -46,7 +46,9 @@ extern "C" {
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
+#include "pqSettings.h"
 #include "vtkProcessModule.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVPlugin.h"
 
 #ifndef BUILD_SHARED_LIBS
@@ -98,6 +100,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
+
   this->tabifyDockWidget(
     this->Internals->colorMapEditorDock,
     this->Internals->memoryInspectorDock);
@@ -121,7 +124,59 @@ ParaViewMainWindow::ParaViewMainWindow()
     this->Internals->statisticsDock);
 
   // setup properties dock
-  this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->informationDock);
+  this->tabifyDockWidget(
+    this->Internals->propertiesDock,
+    this->Internals->viewPropertiesDock);
+  this->tabifyDockWidget(
+    this->Internals->propertiesDock,
+    this->Internals->displayPropertiesDock);
+  this->tabifyDockWidget(this->Internals->propertiesDock,
+    this->Internals->informationDock);
+
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  int propertiesPanelMode = settings->value(
+    "GeneralSettings.PropertiesPanelMode", vtkPVGeneralSettings::ALL_IN_ONE).toInt();
+  switch (propertiesPanelMode)
+    {
+  case vtkPVGeneralSettings::SEPARATE_DISPLAY_PROPERTIES:
+    delete this->Internals->viewPropertiesPanel;
+    delete this->Internals->viewPropertiesDock;
+    this->Internals->viewPropertiesPanel = NULL;
+    this->Internals->viewPropertiesDock = NULL;
+
+    this->Internals->propertiesPanel->setPanelMode(
+      pqPropertiesPanel::SOURCE_PROPERTIES|pqPropertiesPanel::VIEW_PROPERTIES);
+    break;
+
+  case vtkPVGeneralSettings::SEPARATE_VIEW_PROPERTIES:
+    delete this->Internals->displayPropertiesPanel;
+    delete this->Internals->displayPropertiesDock;
+    this->Internals->displayPropertiesPanel = NULL;
+    this->Internals->displayPropertiesDock = NULL;
+
+    this->Internals->propertiesPanel->setPanelMode(
+      pqPropertiesPanel::SOURCE_PROPERTIES|pqPropertiesPanel::DISPLAY_PROPERTIES);
+    break;
+
+  case vtkPVGeneralSettings::ALL_SEPARATE:
+    this->Internals->propertiesPanel->setPanelMode(
+      pqPropertiesPanel::SOURCE_PROPERTIES);
+    break;
+
+  case vtkPVGeneralSettings::ALL_IN_ONE:
+  default:
+    delete this->Internals->viewPropertiesPanel;
+    delete this->Internals->viewPropertiesDock;
+    this->Internals->viewPropertiesPanel = NULL;
+    this->Internals->viewPropertiesDock = NULL;
+
+    delete this->Internals->displayPropertiesPanel;
+    delete this->Internals->displayPropertiesDock;
+    this->Internals->displayPropertiesPanel = NULL;
+    this->Internals->displayPropertiesDock = NULL;
+    break;
+    }
+
   this->Internals->propertiesDock->show();
   this->Internals->propertiesDock->raise();
 
