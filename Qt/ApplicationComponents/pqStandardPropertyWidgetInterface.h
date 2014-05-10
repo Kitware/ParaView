@@ -54,6 +54,7 @@ public:
   /// Supported types are:
   /// \li \c calculator : pqCalculatorWidget
   /// \li \c camera_manipulator : pqCameraManipulatorWidget
+  /// \li \c color_palette_selector : pqColorPaletteSelectorWidget
   /// \li \c color_selector : pqColorSelectorPropertyWidget
   /// \li \c color_selector_with_palette : pqColorSelectorPropertyWidget with palette menu
   /// \li \c command_button : pqCommandButtonPropertyWidget

@@ -77,6 +77,8 @@ set (Module_SRCS
   pqColorMapEditor.h
   pqColorOpacityEditorWidget.cxx
   pqColorOpacityEditorWidget.h
+  pqColorPaletteSelectorWidget.cxx
+  pqColorPaletteSelectorWidget.h
   pqColorSelectorPropertyWidget.cxx
   pqColorSelectorPropertyWidget.h
   pqColorTableModel.cxx
@@ -272,6 +274,7 @@ set (Module_MOC_HDRS
   pqColorEditorPropertyWidget.h
   pqColorMapEditor.h
   pqColorOpacityEditorWidget.h
+  pqColorPaletteSelectorWidget.h
   pqColorSelectorPropertyWidget.h
   pqColorTableModel.h
   pqColorToolbar.h

@@ -33,15 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqBackgroundEditorWidget.h"
-#include "pqCTHArraySelectionDecorator.h"
 #include "pqCalculatorWidget.h"
 #include "pqCameraManipulatorWidget.h"
 #include "pqClipScalarsDecorator.h"
 #include "pqColorAnnotationsPropertyWidget.h"
 #include "pqColorEditorPropertyWidget.h"
 #include "pqColorOpacityEditorWidget.h"
+#include "pqColorPaletteSelectorWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
+#include "pqCTHArraySelectionDecorator.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
@@ -57,8 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
+#include "vtkSMProperty.h"
 
 #include <QtDebug>
 
@@ -88,7 +89,11 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   std::string name = custom_widget;
 
   // *** NOTE: When adding new types, please update the header documentation ***
-  if(name == "color_selector")
+  if (name == "color_palette_selector")
+    {
+    return new pqColorPaletteSelectorWidget(smProxy, smProperty);
+    }
+  else if(name == "color_selector")
     {
     bool withPalette = false;
     return new pqColorSelectorPropertyWidget(smProxy, smProperty, withPalette);

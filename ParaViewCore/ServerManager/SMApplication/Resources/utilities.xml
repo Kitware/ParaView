@@ -2121,6 +2121,14 @@
         <Documentation>Color used for showing selected
         cells/points.</Documentation>
       </DoubleVectorProperty>
+      <Property name="LoadPalette"
+        panel_widget="color_palette_selector">
+        <Documentation>
+          You can explicitly set the colors in the application's color palette
+          above or you can load one of the predefined color palettes to
+          initialize the active palette.
+        </Documentation>
+      </Property>
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
