@@ -170,8 +170,7 @@ public:
 
   ~pqInternal()
     {
-    if (this->EventInvoker && this->EventID > 0 &&
-      this->EventInvoker->HasObserver(this->EventID))
+    if (this->EventInvoker && this->EventID > 0)
       {
       this->EventInvoker->RemoveObserver(this->EventID);
       }
