@@ -209,7 +209,6 @@ int vtkPVScalarBarActor::CreateLabel(
     }
 
   // Set the txt label
-  //cout << "Value: " << value << " converted to " << string << endl;
   textActor->SetInput(string);
 
   // Size the font to fit in the targetHeight, which we are using
@@ -223,7 +222,6 @@ int vtkPVScalarBarActor::CreateLabel(
     }
 
   // Make sure that the string fits in the allotted space.
-  //
   double tsize[2];
   textActor->GetSize(viewport, tsize);
   if (tsize[0] > targetWidth)
@@ -655,6 +653,9 @@ void vtkPVScalarBarActor::ConfigureTicks()
     ticks = this->LinearTickMarks(range, this->NumberOfLabels, minDigits);
     }
 
+  // Map from tick to label ID for tick
+  std::vector<int> tickToLabelId(ticks.size(), -1);
+
   this->P->TextActors.reserve(ticks.size());
 
   vtkNew<vtkCellArray> tickCells;
@@ -664,21 +665,10 @@ void vtkPVScalarBarActor::ConfigureTicks()
   tickPoints->Allocate(ticks.size() * 20);
 
   bool precede = this->TextPosition == vtkScalarBarActor::PrecedeScalarBar;
+  int minimumFontSize = VTK_INT_MAX;
   for (int i = 0; i < static_cast<int>(ticks.size()); i++)
     {
     double val = ticks[i];
-    double normVal;
-    if (isLogTable)
-      {
-      normVal = ((log10(val) - log10(range[0])) /
-        (log10(range[1]) - log10(range[0])));
-      }
-    else
-      {
-      normVal = (val - range[0])/(range[1] - range[0]);
-      }
-
-    int labelIdx;
 
     // Do not create the label if it is already represented in the min or max
     // label.
@@ -692,11 +682,52 @@ void vtkPVScalarBarActor::ConfigureTicks()
     double targetWidth = this->P->TickBox.Size[this->P->TL[0]];
     double targetHeight = this->P->TickBox.Size[this->P->TL[1]];
     if (this->Orientation == VTK_ORIENT_HORIZONTAL)
+      {
       targetWidth = (targetWidth - (ticks.size() - 1) * this->TextPad) / (ticks.size() + 1.);
+      }
     else // VTK_ORIENT_VERTICAL
+      {
       targetHeight = (targetHeight - (ticks.size() - 1) * this->TextPad) / (ticks.size() + 1.);
-    labelIdx = this->CreateLabel(val, minDigits, targetWidth, targetHeight, this->P->Viewport);
+      }
+    int labelIdx = this->CreateLabel(val, minDigits, targetWidth, targetHeight, this->P->Viewport);
+    tickToLabelId[i] = labelIdx;
     vtkTextActor* textActor = this->P->TextActors[labelIdx];
+
+    int labelFontSize = textActor->GetTextProperty()->GetFontSize();
+    if (labelFontSize < minimumFontSize)
+      {
+      minimumFontSize = labelFontSize;
+      }
+    }
+
+  // Now change the font size of all the text actors to the minimum
+  // font size of all the text actors.
+  for (size_t i = 0; i < ticks.size(); i++)
+    {
+    int labelIdx = tickToLabelId[i];
+    if (labelIdx == -1)
+      {
+      // No label
+      continue;
+      }
+    vtkTextActor* textActor = this->P->TextActors[labelIdx];
+
+    // Make sure every text actor gets the smallest text size to fit
+    // the constraints.
+    textActor->GetTextProperty()->SetFontSize(minimumFontSize);
+
+    double val = ticks[i];
+
+    double normVal;
+    if (isLogTable)
+      {
+      normVal = ((log10(val) - log10(range[0])) /
+        (log10(range[1]) - log10(range[0])));
+      }
+    else
+      {
+      normVal = (val - range[0])/(range[1] - range[0]);
+      }
 
     if (this->Orientation == VTK_ORIENT_VERTICAL)
       {
