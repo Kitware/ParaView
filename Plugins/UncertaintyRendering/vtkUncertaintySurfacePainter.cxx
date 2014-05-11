@@ -40,6 +40,7 @@
 #include "vtkScalarsToColors.h"
 #include "vtkScalarsToColorsPainter.h"
 #include "vtkOpenGLExtensionManager.h"
+#include "vtkOpenGLError.h"
 
 // vertex and fragment shader source code for the uncertainty surface
 extern const char* vtkUncertaintySurfacePainter_fs;
@@ -381,6 +382,19 @@ void vtkUncertaintySurfacePainter::PrepareForRendering(vtkRenderer *renderer,
     // setup lighting helper
     this->LightingHelper->Initialize(this->Shader, VTK_SHADER_TYPE_VERTEX);
     this->LightingHelper->PrepareForRendering();
+
+    // build and use the shader
+    this->Shader->Build();
+    if(this->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
+      {
+      vtkErrorMacro("Shader building failed.");
+      abort();
+      }
+    this->Shader->GetUniformVariables()->SetUniformf("uncertaintyScaleFactor", 1, &this->UncertaintyScaleFactor);
+    this->Shader->GetUniformVariables()->SetUniformf("scalarValueRange", 1, &this->ScalarValueRange);
+    this->Shader->GetUniformVariables()->SetUniformi("permTexture", 1, reinterpret_cast<int *>(&this->PermTextureId));
+    this->Shader->GetUniformVariables()->SetUniformi("simplexTexture", 1, reinterpret_cast<int *>(&this->SimplexTextureId));
+    this->Shader->GetUniformVariables()->SetUniformi("gradTexture", 1, reinterpret_cast<int *>(&this->GradTextureId));
     }
 
   // superclass prepare for rendering
@@ -404,23 +418,12 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
     return;
     }
 
+  vtkOpenGLClearErrorMacro();
+
   vtkOpenGLRenderWindow *renWin =
     vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
 
   glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-  // build and use the shader
-  this->Shader->Build();
-  if(this->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
-    {
-    vtkErrorMacro("Shader building failed.");
-    abort();
-    }
-  this->Shader->GetUniformVariables()->SetUniformf("uncertaintyScaleFactor", 1, &this->UncertaintyScaleFactor);
-  this->Shader->GetUniformVariables()->SetUniformf("scalarValueRange", 1, &this->ScalarValueRange);
-  this->Shader->GetUniformVariables()->SetUniformi("permTexture", 1, reinterpret_cast<int *>(&this->PermTextureId));
-  this->Shader->GetUniformVariables()->SetUniformi("simplexTexture", 1, reinterpret_cast<int *>(&this->SimplexTextureId));
-  this->Shader->GetUniformVariables()->SetUniformi("gradTexture", 1, reinterpret_cast<int *>(&this->GradTextureId));
 
   this->Shader->Use();
   if(!this->Shader->IsValid())
@@ -429,18 +432,24 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
                   << this->Shader->GetLastValidateLog());
     }
 
+  vtkOpenGLCheckErrorMacro("failed in vtkUncertaintySurfacePainter::RenderInternal (Step 1)");
+  vtkOpenGLClearErrorMacro();
+
   // superclass render
   this->Superclass::RenderInternal(renderer,
                                    actor,
                                    typeFlags,
                                    forceCompileOnly);
+
+  vtkOpenGLCheckErrorMacro("failed in vtkUncertaintySurfacePainter::RenderInternal (Step 2)");
   glFinish();
   this->Shader->Restore();
 
-  renWin->MakeCurrent();
+//  renWin->MakeCurrent();
   glFinish();
 
   glPopAttrib();
+  vtkOpenGLCheckErrorMacro("failed after vtkUncertaintySurfacePainter::RenderInternal");
 }
 
 //----------------------------------------------------------------------------
