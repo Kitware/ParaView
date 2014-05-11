@@ -141,19 +141,18 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
     proxies_to_show.push_back(proxy);
     }
 
-  int counter = 0;
   foreach (vtkSMProxy* proxy, proxies_to_show)
     {
-    counter++;
+    QString proxyName = proxy->GetXMLName();
 
     QScrollArea *scrollArea = new QScrollArea(this);
-    scrollArea->setObjectName(QString("ScrollArea%1").arg(counter));
+    scrollArea->setObjectName(QString("ScrollArea%1").arg(proxyName));
     scrollArea->setWidgetResizable(true);
     scrollArea->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
     QWidget* container = new QWidget(scrollArea);
-    container->setObjectName(QString("Container%1").arg(counter));
+    container->setObjectName("Container");
     container->setContentsMargins(6, 0, 6, 0);
 
     QVBoxLayout* vbox = new QVBoxLayout(container);
@@ -161,7 +160,7 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
     vbox->setSpacing(0);
 
     pqProxyWidget* widget = new pqProxyWidget(proxy, container);
-    widget->setObjectName(QString("%1%2").arg(proxy->GetXMLName()).arg(counter));
+    widget->setObjectName("ProxyWidget");
     widget->setApplyChangesImmediately(false);
     widget->setView(NULL);
 
