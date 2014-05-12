@@ -6371,14 +6371,16 @@
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Visibility of the representation.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetGenerateCellConnectivity"
                          default_values="0"
                          name="GenerateCellConnectivity"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Generation of the cell connectivity.</Documentation>
       </IntVectorProperty>
