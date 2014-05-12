@@ -126,8 +126,8 @@ class CoProcessor(object):
         timestep = datadescription.GetTimeStep()
 
         for view in self.__ViewsList:
-            if timestep % view.cpFrequency == 0 or \
-                                            datadescription.GetForceOutput() == True:
+            if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
+               datadescription.GetForceOutput() == True:
                 fname = view.cpFileName
                 fname = fname.replace("%t", str(timestep))
                 if view.cpFitToScreen != 0:
