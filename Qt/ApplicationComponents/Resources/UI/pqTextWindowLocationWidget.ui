@@ -267,10 +267,24 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_Pos1Y"/>
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_Pos1Y">
+        <property name="decimals">
+         <number>6</number>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_Pos1X"/>
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_Pos1X">
+        <property name="decimals">
+         <number>6</number>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

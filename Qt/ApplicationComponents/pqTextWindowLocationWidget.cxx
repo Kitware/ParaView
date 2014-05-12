@@ -47,6 +47,7 @@ public:
   Ui::TextWindowLocationWidget Ui;
 
   pqInternals(pqTextWindowLocationWidget* self)
+    : windowLocation(QString("AnyLocation"))
     {
     this->Ui.setupUi(self);
     this->Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -70,16 +71,30 @@ pqTextWindowLocationWidget::pqTextWindowLocationWidget(
     this->addPropertyLink(this, "windowLocation",
       SIGNAL(windowLocationChanged(QString&)), smproperty);
     QObject::connect(ui.groupBoxLocation, SIGNAL(clicked(bool)),
-      this, SLOT(groupBoxLocationToggled(bool)));
+      this, SLOT(groupBoxLocationClicked(bool)));
     QObject::connect(ui.buttonGroupLocation, SIGNAL(
         buttonClicked(QAbstractButton*)),
       this, SLOT(emitWindowLocationChangedSignal()));
-    QObject::connect(ui.groupBoxPosition, SIGNAL(clicked(bool)),
-      this, SLOT(groupBoxPositionToggled(bool)));
     }
   else
     {
     ui.groupBoxLocation->hide();
+    ui.groupBoxPosition->setCheckable(false);
+    }
+  
+  smproperty = smgroup->GetProperty("Position");
+  if(smproperty)
+    {
+    QObject::connect(ui.groupBoxPosition, SIGNAL(clicked(bool)),
+      this, SLOT(groupBoxPositionClicked(bool)));
+    this->addPropertyLink(ui.doubleSpinBox_Pos1X, "value",
+      SIGNAL(valueChanged(double)), smproperty, 0);
+    this->addPropertyLink(ui.doubleSpinBox_Pos1Y, "value",
+      SIGNAL(valueChanged(double)), smproperty, 1);
+    }
+  else
+    {
+    ui.groupBoxPosition->hide();
     }
 }
 
@@ -108,7 +123,7 @@ QString pqTextWindowLocationWidget::windowLocation() const
 }
 
 //-----------------------------------------------------------------------------
-void pqTextWindowLocationWidget::groupBoxLocationToggled(bool enable)
+void pqTextWindowLocationWidget::groupBoxLocationClicked(bool enable)
 {
   this->Internals->Ui.groupBoxPosition->setChecked(!enable);
   if(!enable)
@@ -123,11 +138,18 @@ void pqTextWindowLocationWidget::groupBoxLocationToggled(bool enable)
 }
 
 //-----------------------------------------------------------------------------
-void pqTextWindowLocationWidget::groupBoxPositionToggled(bool enable)
+void pqTextWindowLocationWidget::groupBoxPositionClicked(bool enable)
 {
   this->Internals->Ui.groupBoxLocation->setChecked(!enable);
-  QString str("AnyLocation");
-  this->setWindowLocation(str);
+  if(enable)
+    {
+    QString str("AnyLocation");
+    this->setWindowLocation(str);
+    }
+  else
+    {
+    this->emitWindowLocationChangedSignal();
+    }
 }
 
 //-----------------------------------------------------------------------------

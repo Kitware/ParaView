@@ -44,8 +44,6 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTextWindowLocationWidget :
 {
   Q_OBJECT
   Q_PROPERTY(QString windowLocation READ windowLocation WRITE setWindowLocation)
-//  Q_PROPERTY(QString position1X READ position1X WRITE setPosition1X)
-//  Q_PROPERTY(QString position1Y READ position1Y WRITE setPosition1Y)
   
   typedef pqPropertyWidget Superclass;
 
@@ -54,22 +52,17 @@ public:
   virtual ~pqTextWindowLocationWidget();
 
   QString windowLocation() const;
-//  double position1X() const;
-//  double position1Y() const;
 
 signals:
   void windowLocationChanged(QString&);
-  void position1Changed(double, double);
 
 protected:
   void setWindowLocation(QString&);
-//  void setPosition1X(double);
-//  void setPosition1Y(double);
 
 protected slots:
   void emitWindowLocationChangedSignal();
-  void groupBoxLocationToggled(bool);
-  void groupBoxPositionToggled(bool);
+  void groupBoxLocationClicked(bool);
+  void groupBoxPositionClicked(bool);
 
 private:
   Q_DISABLE_COPY(pqTextWindowLocationWidget)
