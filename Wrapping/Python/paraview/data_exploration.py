@@ -536,6 +536,7 @@ class SliceExplorer(object):
         if self.analysis:
             self.analysis.begin_work('SliceExplorer')
 
+        simple.SetActiveView(self.view_proxy)
         self.file_name_generator.update_active_arguments(time=time)
         self.slice.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
         self.view_proxy.CameraParallelProjection = 1
@@ -707,6 +708,7 @@ class ImageResampler(object):
         self.file_name_generator.update_active_arguments(time=time)
         self.resampler.UpdatePipeline(time)
 
+        simple.SetActiveView(self.view_proxy)
         # Write resampled data as JSON files
         self.file_name_generator.update_active_arguments(format='json')
         writer = simple.JSONImageWriter(Input=self.resampler)
@@ -796,6 +798,7 @@ class LineProber(object):
 
         self.file_name_generator.update_active_arguments(time=time)
 
+        simple.SetActiveView(self.view_proxy)
         # Explore the data
         for serie in self.series:
             self.probe.Source.Point1 = serie['start_point']
@@ -882,6 +885,7 @@ class DataProber(object):
 
         self.file_name_generator.update_active_arguments(time=time)
 
+        simple.SetActiveView(self.view_proxy)
         # Explore the data
         saved_data = {}
         for serie in self.series:
@@ -1006,6 +1010,7 @@ class TimeSerieDataProber(object):
         if self.analysis:
             self.analysis.begin_work('TimeSerieDataProber')
 
+        simple.SetActiveView(self.view_proxy)
         for field in self.fields:
             self.data_arrays[field].append([ "%f" % time ])
 
@@ -1126,6 +1131,7 @@ class CompositeImageExporter(object):
             self.analysis.begin_work('CompositeImageExporter')
         self.file_name_generator.update_active_arguments(time=time)
 
+        simple.SetActiveView(self.view_proxy)
         # Fix camera bounds
         simple.Render(self.view)
         self.view.ResetClippingBounds()
@@ -1278,6 +1284,7 @@ class ThreeSixtyImageStackExporter(object):
         if self.analysis:
             self.analysis.begin_work('ThreeSixtyImageStackExporter')
 
+        simple.SetActiveView(self.view_proxy)
         self.file_name_generator.update_active_arguments(time=time)
         self.view_proxy.CameraFocalPoint = self.focal_point
         self.view_proxy.CameraViewUp     = self.phi_rotation_axis
