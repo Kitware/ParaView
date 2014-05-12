@@ -417,6 +417,14 @@
             <Property name="LabelFontSize" function="Size" />
           </PropertyGroup>
 
+          <PropertyGroup label="Labels">
+            <Property name="AutomaticLabelFormat" />
+            <Property name="LabelFormat" />
+            <Property name="NumberOfLabels" />
+            <Property name="DrawTickMarks" />
+            <Property name="DrawTickLabels" />
+          </PropertyGroup>
+
           <PropertyGroup label="Annotations">
             <Property name="DrawAnnotations" />
             <Property name="DrawNanAnnotation" />
@@ -425,9 +433,6 @@
           </PropertyGroup>
 
           <PropertyGroup label="Miscellaneous">
-            <Property name="AutomaticLabelFormat" />
-            <Property name="LabelFormat" />
-            <Property name="NumberOfLabels" />
             <Property name="AspectRatio" />
           </PropertyGroup>
         </ExposedProperties>

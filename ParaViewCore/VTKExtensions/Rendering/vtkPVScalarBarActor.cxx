@@ -69,6 +69,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
 {
   this->AspectRatio = 20.0;
   this->AutomaticLabelFormat = 1;
+  this->DrawTickMarks = 1;
   this->AnnotationTextScaling = 1;
 
   this->ScalarBarTexture = vtkTexture::New();
@@ -128,7 +129,10 @@ int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
     return renderedSomething;
     }
 
-  renderedSomething += this->TickMarksActor->RenderOverlay(viewport);
+  if (this->DrawTickMarks)
+    {
+    renderedSomething += this->TickMarksActor->RenderOverlay(viewport);
+    }
 
   return renderedSomething;
 }
