@@ -322,22 +322,16 @@ set (Module_SRCS
   pqSphereWidget.h
   pqSplineWidget.cxx
   pqSplineWidget.h
-  pqSpreadSheetDisplayEditor.cxx
-  pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.cxx
   pqSpreadSheetViewDecorator.h
   pqStandardLegacyCustomPanels.cxx
   pqStandardLegacyCustomPanels.h
-  pqStandardLegacyDisplayPanels.cxx
-  pqStandardLegacyDisplayPanels.h
   pqStringVectorPropertyWidget.cxx
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.cxx
   pqTabbedMultiViewWidget.h
   pqTextEditSignalEndOfEdit.h
   pqTextEditSignalEndOfEdit.cxx
-  pqTextDisplayPropertiesWidget.cxx
-  pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.cxx
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.cxx
@@ -510,14 +504,11 @@ set (Module_MOC_HDRS
   pqSMSignalAdaptors.h
   pqSphereWidget.h
   pqSplineWidget.h
-  pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.h
   pqStandardLegacyCustomPanels.h
-  pqStandardLegacyDisplayPanels.h
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.h
   pqTextEditSignalEndOfEdit.h
-  pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.h
   pqTimerLogDisplay.h
@@ -596,9 +587,7 @@ set (Module_UI_FILES
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSplineWidget.ui
-  Resources/UI/pqSpreadSheetDisplayEditor.ui
   Resources/UI/pqSpreadSheetViewDecorator.ui
-  Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqWriterDialog.ui
 )

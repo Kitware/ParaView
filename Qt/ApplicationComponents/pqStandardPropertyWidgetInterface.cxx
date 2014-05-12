@@ -193,7 +193,7 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(
     {
     return new pqSeriesEditorPropertyWidget(proxy, group);
     }
-  else if (QString(group->GetPanelWidget()) == "TextLocation")
+  else if (QString(group->GetPanelWidget()) == "TextLocationEditor")
     {
     return new pqTextLocationWidget(proxy, group);
     }

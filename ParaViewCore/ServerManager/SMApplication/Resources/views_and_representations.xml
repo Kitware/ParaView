@@ -6523,7 +6523,7 @@
             <Property name="Justification" function="Justification"/>
           </PropertyGroup>
           <!-- properties for Text Position-->
-          <PropertyGroup label="Text Position" panel_widget="TextLocation">
+          <PropertyGroup label="Text Position" panel_widget="TextLocationEditor">
             <Property name="WindowLocation" />
             <Property name="Position" />
             <Property name="Position2" panel_visibility="never"/>

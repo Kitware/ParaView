@@ -54,7 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqStandardLegacyCustomPanels.h"
-#include "pqStandardLegacyDisplayPanels.h"
 #include "pqStringVectorPropertyWidget.h"
 
 #include "vtkCollection.h"
@@ -469,12 +468,6 @@ namespace
         {
         return iface->createPanel(repr, NULL);
         }
-      }
-    // try using the standard custom display panels
-    pqStandardLegacyDisplayPanels standardCustomPanels;
-    if (standardCustomPanels.canCreatePanel(repr))
-      {
-      return standardCustomPanels.createPanel(repr, 0);
       }
     return NULL;
     }
