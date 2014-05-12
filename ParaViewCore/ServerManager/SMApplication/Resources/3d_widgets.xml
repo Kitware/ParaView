@@ -429,7 +429,7 @@
             <Property name="DrawAnnotations" />
             <Property name="DrawNanAnnotation" />
             <Property name="NanAnnotation" />
-            <Property name="TextPosition" panel_visibility="never" />
+            <Property name="TextPosition" />
           </PropertyGroup>
 
           <PropertyGroup label="Miscellaneous">

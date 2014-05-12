@@ -1381,6 +1381,7 @@
                          name="DrawTickMarks"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>Enable/disable drawing the color legend tick marks.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetDrawTickLabels"
@@ -1388,13 +1389,21 @@
                          name="DrawTickLabels"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>Enable/disable drawing the color legend labels for tick marks.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetTextPosition"
                          default_values="1"
                          name="TextPosition"
+                         label="Tick and Annotation Positions"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <EnumerationDomain name="enum">
+          <Entry text="Ticks right/top, annotations left/bottom"
+                 value="1" />
+          <Entry text="Ticks left/bottom, annotations right/top"
+                 value="0" />
+        </EnumerationDomain>
+        <Documentation>Determines where the tick labels are drawn.</Documentation>
       </IntVectorProperty>
       <!--label text property -->
       <SubProxy>
