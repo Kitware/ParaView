@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqTextWindowLocationWidget.h
+   Module:  pqTextLocationWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -37,19 +37,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMPropertyGroup;
 
-/// pqTextWindowLocationWidget is a pqPropertyWidget that can be used to set
+/// pqTextLocationWidget is a pqPropertyWidget that can be used to set
 /// the location of the a text representation relative to the viewport.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqTextWindowLocationWidget :
+class PQAPPLICATIONCOMPONENTS_EXPORT pqTextLocationWidget :
   public pqPropertyWidget
 {
   Q_OBJECT
   Q_PROPERTY(QString windowLocation READ windowLocation WRITE setWindowLocation)
-  
+
   typedef pqPropertyWidget Superclass;
 
 public:
-  pqTextWindowLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
-  virtual ~pqTextWindowLocationWidget();
+  pqTextLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  virtual ~pqTextLocationWidget();
 
   QString windowLocation() const;
 
@@ -65,7 +65,7 @@ protected slots:
   void groupBoxPositionClicked(bool);
 
 private:
-  Q_DISABLE_COPY(pqTextWindowLocationWidget)
+  Q_DISABLE_COPY(pqTextLocationWidget)
   class pqInternals;
   pqInternals* Internals;
 };

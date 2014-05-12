@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqTextWindowLocationWidget.cxx
+   Module:  pqTextLocationWidget.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#include "pqTextWindowLocationWidget.h"
-#include "ui_pqTextWindowLocationWidget.h"
+#include "pqTextLocationWidget.h"
+#include "ui_pqTextLocationWidget.h"
 
 #include "pqPropertiesPanel.h"
 #include "vtkSMPropertyGroup.h"
@@ -41,12 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 //-----------------------------------------------------------------------------
-class pqTextWindowLocationWidget::pqInternals
+class pqTextLocationWidget::pqInternals
 {
 public:
-  Ui::TextWindowLocationWidget Ui;
+  Ui::TextLocationWidget Ui;
 
-  pqInternals(pqTextWindowLocationWidget* self)
+  pqInternals(pqTextLocationWidget* self)
     : windowLocation(QString("AnyLocation"))
     {
     this->Ui.setupUi(self);
@@ -58,12 +58,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqTextWindowLocationWidget::pqTextWindowLocationWidget(
+pqTextLocationWidget::pqTextLocationWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
   : Superclass(smproxy, parentObject),
   Internals(new pqInternals(this))
 {
-  Ui::TextWindowLocationWidget &ui = this->Internals->Ui;
+  Ui::TextLocationWidget &ui = this->Internals->Ui;
 
   vtkSMProperty* smproperty = smgroup->GetProperty("WindowLocation");
   if(smproperty)
@@ -81,7 +81,7 @@ pqTextWindowLocationWidget::pqTextWindowLocationWidget(
     ui.groupBoxLocation->hide();
     ui.groupBoxPosition->setCheckable(false);
     }
-  
+
   smproperty = smgroup->GetProperty("Position");
   if(smproperty)
     {
@@ -99,14 +99,14 @@ pqTextWindowLocationWidget::pqTextWindowLocationWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqTextWindowLocationWidget::~pqTextWindowLocationWidget()
+pqTextLocationWidget::~pqTextLocationWidget()
 {
   delete this->Internals;
   this->Internals = NULL;
 }
 
 //-----------------------------------------------------------------------------
-void pqTextWindowLocationWidget::setWindowLocation(QString& str)
+void pqTextLocationWidget::setWindowLocation(QString& str)
 {
   if(this->Internals->windowLocation == str)
     {
@@ -117,13 +117,13 @@ void pqTextWindowLocationWidget::setWindowLocation(QString& str)
 }
 
 //-----------------------------------------------------------------------------
-QString pqTextWindowLocationWidget::windowLocation() const
+QString pqTextLocationWidget::windowLocation() const
 {
   return this->Internals->windowLocation;
 }
 
 //-----------------------------------------------------------------------------
-void pqTextWindowLocationWidget::groupBoxLocationClicked(bool enable)
+void pqTextLocationWidget::groupBoxLocationClicked(bool enable)
 {
   this->Internals->Ui.groupBoxPosition->setChecked(!enable);
   if(!enable)
@@ -138,7 +138,7 @@ void pqTextWindowLocationWidget::groupBoxLocationClicked(bool enable)
 }
 
 //-----------------------------------------------------------------------------
-void pqTextWindowLocationWidget::groupBoxPositionClicked(bool enable)
+void pqTextLocationWidget::groupBoxPositionClicked(bool enable)
 {
   this->Internals->Ui.groupBoxLocation->setChecked(!enable);
   if(enable)
@@ -153,9 +153,9 @@ void pqTextWindowLocationWidget::groupBoxPositionClicked(bool enable)
 }
 
 //-----------------------------------------------------------------------------
-void pqTextWindowLocationWidget::emitWindowLocationChangedSignal()
+void pqTextLocationWidget::emitWindowLocationChangedSignal()
 {
-  Ui::TextWindowLocationWidget &ui = this->Internals->Ui;
+  Ui::TextLocationWidget &ui = this->Internals->Ui;
   if(ui.toolButtonLL->isChecked())
     {
     QString str("LowerLeftCorner");
