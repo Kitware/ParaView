@@ -72,7 +72,7 @@ class AnalysisManager(object):
         If 2 begin_work with the same key, the second one will override the first one.
         """
         current_timer = None
-        if self.timers.has_key(key):
+        if key in self.timers:
             current_timer = self.timers[key]
         else:
             current_timer = { 'total_time': 0.0, 'work_count': 0 , 'last_begin': 0.0}
@@ -92,7 +92,7 @@ class AnalysisManager(object):
         be ignore as no begin_work will be done before.
         """
         delta = 0
-        if self.timers.has_key(key):
+        if key in self.timers:
             current_timer = self.timers[key]
             if current_timer['last_begin'] != 0.0:
                 delta = time.time()
@@ -194,7 +194,7 @@ class FileNameGenerator(object):
             value_str = "{value}".format(value=value)
             self.active_arguments[key] = value_str
             if store_value:
-                if self.arguments.has_key(key):
+                if key in self.arguments:
                     try:
                         self.arguments[key]["values"].index(value_str)
                     except ValueError:
@@ -215,7 +215,7 @@ class FileNameGenerator(object):
         Update label arguments, but argument must exist first
         """
         for key, value in kwargs.iteritems():
-            if self.arguments.has_key(key):
+            if key in self.arguments:
                 self.arguments[key]["label"] = value
 
     def get_filename(self):
@@ -1075,8 +1075,8 @@ class CompositeImageExporter(object):
         for node in data_list_pipeline:
             entry = { 'name': node['name'], 'ids': [self.codes[index]], 'type': 'layer' }
 
-            if node.has_key('parent'):
-                if parentTree.has_key(node['parent']):
+            if 'parent' in node:
+                if node['parent'] in parentTree:
                     # add node as child
                     parentTree[node['parent']]['children'].append(entry)
                     parentTree[node['parent']]['ids'].append(entry['ids'][0])
