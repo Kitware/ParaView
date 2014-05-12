@@ -10,7 +10,7 @@ from paraview import simple, servermanager
 # Run management
 #==============================================================================
 
-class AnalysisManager():
+class AnalysisManager(object):
     """
     This class provide mechanism to keep track of a full data analysis and
     exploration so the generated analysis can be processed and viewed on
@@ -150,7 +150,7 @@ class AnalysisManager():
 # File Name management
 #==============================================================================
 
-class FileNameGenerator():
+class FileNameGenerator(object):
     """
     This class provide some methods to help build a unique file name
     which map to a given simulation state.
@@ -472,7 +472,7 @@ class FixCameraHandler(CameraHandler):
 # Data explorer
 #==============================================================================
 
-class SliceExplorer():
+class SliceExplorer(object):
     """
     Class use to dump image stack of a data exploration. This data exploration
     is slicing the input data along an axis and save each slice as a new image
@@ -578,7 +578,7 @@ class SliceExplorer():
 
 #==============================================================================
 
-class ContourExplorer():
+class ContourExplorer(object):
     """
     Class used to explore data. This Explorer won't dump any images but can be used
     along with the ThreeSixtyImageStackExporter() like in the following example.
@@ -667,7 +667,7 @@ class ContourExplorer():
 # Data explorer
 #==============================================================================
 
-class ImageResampler():
+class ImageResampler(object):
     def __init__(self, file_name_generator, data_to_probe, sampling_dimesions, array_colors, nanColor = [0,0,0,0], custom_probing_bounds = None):
         self.analysis = None
         self.file_name_generator = file_name_generator
@@ -745,7 +745,7 @@ class ImageResampler():
 # Chart generator
 #==============================================================================
 
-class LineProber():
+class LineProber(object):
     def __init__(self, file_name_generator, data_to_probe, points_series, number_of_points):
         """
         file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
@@ -821,7 +821,7 @@ class LineProber():
 
 #==============================================================================
 
-class DataProber():
+class DataProber(object):
     def __init__(self, file_name_generator, data_to_probe, points_series, fields):
         """
         file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
@@ -930,7 +930,7 @@ class DataProber():
 
 #==============================================================================
 
-class TimeSerieDataProber():
+class TimeSerieDataProber(object):
     def __init__(self, file_name_generator, data_to_probe, point_series, fields, time_to_write):
         """
         file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
@@ -1028,7 +1028,7 @@ class TimeSerieDataProber():
 # Image composite
 #==============================================================================
 
-class CompositeImageExporter():
+class CompositeImageExporter(object):
     """
     Class use to dump an image stack for a given view position so it can be
     recomposed later on in the web.
@@ -1225,7 +1225,7 @@ class CompositeImageExporter():
 # Image exporter
 #==============================================================================
 
-class ThreeSixtyImageStackExporter():
+class ThreeSixtyImageStackExporter(object):
     """
     Class use to dump image stack of geometry exploration.
     This exporter will use the provided view to create a 360 view of the visible data.
