@@ -29,39 +29,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCatalystConnectReaction_h 
-#define __pqCatalystConnectReaction_h
+#ifndef __pqCatalystPauseSimulationReaction_h 
+#define __pqCatalystPauseSimulationReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>
 
 class pqLiveInsituVisualizationManager;
+class vtkSMLiveInsituLinkProxy;
 
 /// @ingroup Reactions
-/// Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
-/// Visualization.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReaction
+/// Reaction for setting a breakpoint to Catalyst CoProcessing Engine
+/// for Live-Data Visualization.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction :
+  public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqCatalystConnectReaction(QAction* parent=0);
-  virtual ~pqCatalystConnectReaction();
+  pqCatalystPauseSimulationReaction(QAction* parent=0);
 
-  /// Connect to Catalyst 
-  bool connect();
+public slots:
+  void updateEnableState()
+  {
+    updateEnableState(PAUSE);
+  }
 
 protected:
+  enum Type
+  {
+    CONTINUE,
+    PAUSE
+  };
+
   /// Called when the action is triggered.
   virtual void onTriggered()
-    { this->connect(); }
+  { this->setPauseSimulation(true); }
 
-  /// reaction disabled when already connected to a catalyst server or in
-  /// collaboration mode.
-  virtual void updateEnableState();
+  void setPauseSimulation (bool pause);
+  void updateEnableState (Type type);
 
 private:
-  Q_DISABLE_COPY(pqCatalystConnectReaction)
+  Q_DISABLE_COPY(pqCatalystPauseSimulationReaction)
 };
 
 #endif

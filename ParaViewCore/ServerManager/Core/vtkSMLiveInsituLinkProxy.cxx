@@ -25,6 +25,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMMessage.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -32,7 +33,7 @@
 #include "vtkSMStateLoader.h"
 
 #include <vtksys/ios/sstream>
-// #define vtkSMLiveInsituLinkProxyDebugMacro(x) cout << __LINE__ << " " x << endl;
+//#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr << __LINE__ << " " x << endl;
 #define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
 class vtkSMLiveInsituLinkProxy::vtkInternals
@@ -49,6 +50,7 @@ vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy() :
   Internals(new vtkInternals())
 {
   this->StateDirty = false;
+  this->LiveChangedCalled = false;
 }
 
 //----------------------------------------------------------------------------
@@ -86,6 +88,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
   if(msg->HasExtension(ProxyState::xml_group) &&
       msg->GetExtension(ProxyState::xml_group) == "Catalyst_Communication")
     {
+    this->LiveChangedCalled = false;
     int numberOfUserData = msg->ExtensionSize(ProxyState::user_data);
     for(int i = 0; i < numberOfUserData; ++i)
       {
@@ -96,7 +99,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
       if (user_data.key() == "LiveAction")
         {
         const Variant& value = user_data.variant(0);
-        vtkSMLiveInsituLinkProxyDebugMacro("Received message");
+        vtkSMLiveInsituLinkProxyDebugMacro(<< "Received message");
         switch (value.integer(0))
           {
         case vtkLiveInsituLink::CONNECTED:
@@ -109,7 +112,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
           break;
 
         case vtkLiveInsituLink::DISCONNECTED:
-          vtkSMLiveInsituLinkProxyDebugMacro("Catalyst disconnected!!!");
+          vtkSMLiveInsituLinkProxyDebugMacro(<< "Catalyst disconnected!!!");
           this->InvokeEvent(vtkCommand::ConnectionClosedEvent);
           break;
           }
@@ -233,7 +236,7 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
 {
   if (this->StateDirty)
     {
-    vtkSMLiveInsituLinkProxyDebugMacro("Push new state to server.");
+    vtkSMLiveInsituLinkProxyDebugMacro(<< "Push new state to server.");
     // push new state.
     vtkPVXMLElement* root = this->InsituProxyManager->SaveXMLState();
     vtksys_ios::ostringstream data;
@@ -246,10 +249,32 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
            << "UpdateInsituXMLState"
            << data.str().c_str()
            << vtkClientServerStream::End;
-    vtkSMLiveInsituLinkProxyDebugMacro("Push new state to server--done");
+    vtkSMLiveInsituLinkProxyDebugMacro(<< "Push new state to server--done");
     this->ExecuteStream(stream);
 
     this->StateDirty = false;
+    }
+}
+
+void vtkSMLiveInsituLinkProxy::MarkStateDirty()
+{
+  this->StateDirty = true;
+  vtkSMLiveInsituLinkProxyDebugMacro(<< "MarkStateDirty");
+  this->PushUpdatedState();
+  this->LiveChanged();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkSMLiveInsituLinkProxy::LiveChanged()
+{
+  int simulationPaused =
+    vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt();
+  if (! this->LiveChangedCalled && simulationPaused)
+    {
+    vtkSMLiveInsituLinkProxyDebugMacro(<< "LiveChanged");
+    this->InvokeCommand("LiveChanged");
+    this->LiveChangedCalled = true;
     }
 }
 
@@ -267,8 +292,6 @@ bool vtkSMLiveInsituLinkProxy::HasExtract(
 vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
   const char* reg_group, const char* reg_name, int port_number)
 {
-  this->PushUpdatedState();
-
   vtkSMProxy* proxy = this->GetSessionProxyManager()->NewProxy("sources",
     "PVTrivialProducer");
   proxy->UpdateVTKObjects();
@@ -286,6 +309,7 @@ vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
   key << reg_group << ":" << reg_name << ":" << port_number;
   this->Internals->ExtractProxies[key.str()] = proxy;
   proxy->Delete();
+  this->LiveChanged();
 
   return proxy;
 }
@@ -312,6 +336,7 @@ void vtkSMLiveInsituLinkProxy::RemoveExtract(vtkSMProxy* proxy)
       break;
       }
     }
+  this->LiveChanged();
 }
 
 //----------------------------------------------------------------------------

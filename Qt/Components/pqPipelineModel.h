@@ -38,9 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqComponentsModule.h"
+
 #include <QAbstractItemModel>
 #include <QPointer>
 #include "pqView.h"
+#include "vtkSmartPointer.h"
+
+
 
 class pqDataRepresentation;
 class pqPipelineModelFilter;
@@ -55,7 +59,7 @@ class pqServerManagerModel;
 class pqServerManagerModelItem;
 class QFont;
 class QPixmap;
-
+class ModifiedLiveInsituLink;
 
 /// \class pqPipelineModel
 /// \brief
@@ -316,6 +320,8 @@ signals:
   void firstChildAdded(const QModelIndex &index);
 
 private slots:
+  void onCatalystConnected(pqServer* server);
+
   void serverDataChanged();
 
   /// called when visibility of the source may have changed.
@@ -353,8 +359,6 @@ private:
   // called by pqPipelineModelDataItem to indicate that the data for the item
   // may have changed.
   void itemDataChanged(pqPipelineModelDataItem*);
-  
-  
   /// used by the variant of setSubtreeSelectable() for recursion.
   void setSubtreeSelectable(pqPipelineModelDataItem *item, bool selectable);
 
@@ -366,7 +370,10 @@ private:
   bool Editable;
   QString FilterRoleAnnotationKey;
   vtkSession* FilterRoleSession;
+  ModifiedLiveInsituLink* LinkCallback;
   void constructor();
+
+  friend class ModifiedLiveInsituLink;
 };
 
 #endif

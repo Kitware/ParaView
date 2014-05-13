@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCatalystConnectReaction.h"
+#include "pqCatalystPauseSimulationReaction.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -37,56 +37,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "vtkProcessModule.h"
+#include "vtkSMLiveInsituLinkProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
+
 
 #include <QInputDialog>
 #include <QMessageBox>
 
 //-----------------------------------------------------------------------------
-pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
+pqCatalystPauseSimulationReaction::pqCatalystPauseSimulationReaction(
+  QAction* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
-    this, SLOT(updateEnableState()));
-  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
-pqCatalystConnectReaction::~pqCatalystConnectReaction()
+void pqCatalystPauseSimulationReaction::setPauseSimulation(bool pause)
 {
+  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy();
+  if (proxy)
+    {
+    vtkSMPropertyHelper(proxy, "SimulationPaused").Set(pause);
+    proxy->UpdateVTKObjects();
+    if (! pause)
+      {
+      proxy->InvokeCommand("LiveChanged");
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
-bool pqCatalystConnectReaction::connect()
+void pqCatalystPauseSimulationReaction::updateEnableState(Type type)
 {
-  pqInsituServer* cs = pqInsituServer::instance();
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  pqLiveInsituVisualizationManager* mgr = cs->connect(server);
-  if (mgr)
+  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy();
+  if (proxy)
     {
-    this->updateEnableState();
-    QObject::connect(mgr, SIGNAL(catalystDisconnected()),
-                     this, SLOT(updateEnableState()));
+    if ((type == PAUSE) !=
+        vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)
+      {
+      this->parentAction()->setEnabled(true);
+      return;
+      }
     }
-  return mgr;
-}
-
-
-//-----------------------------------------------------------------------------
-void pqCatalystConnectReaction::updateEnableState()
-{
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  if (server && 
-      ! pqInsituServer::isInsitu(server) &&
-      ! server->session()->IsMultiClients() &&
-      ! pqInsituServer::instance()->hasInsitu(server))
-    {
-    this->parentAction()->setEnabled(true);
-    }
-  else
-    {
-    this->parentAction()->setEnabled(false);
-    }
+  this->parentAction()->setEnabled(false);
 }

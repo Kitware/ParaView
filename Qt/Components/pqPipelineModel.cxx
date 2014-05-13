@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 
 #include "pqBoxChartView.h"
+#include "pqInsituServer.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -45,16 +46,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
 #include "pqXYFunctionalBagChartView.h"
+
+#include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMViewProxy.h"
 
 #include <QApplication>
 #include <QFont>
 #include <QString>
 #include <QStyle>
+#include <QSignalMapper>
 #include <QtDebug>
+
+class ModifiedLiveInsituLink : public vtkCommand
+{
+public:
+  ModifiedLiveInsituLink(pqServer* insituServer,
+                         pqPipelineModel* pipelineModel) :
+    InsituServer(insituServer), PipelineModel(pipelineModel)
+  {
+  }
+  virtual void Execute(
+    vtkObject* vtkNotUsed(caller), unsigned long, void* vtkNotUsed(data))
+  {
+    this->PipelineModel->updateData(this->InsituServer);
+  }
+
+private:
+  pqServer* InsituServer;
+  pqPipelineModel* PipelineModel;
+};
 
 
 //-----------------------------------------------------------------------------
@@ -78,6 +103,8 @@ public:
     EYEBALL_GRAY,
     CATALYST_EXTRACT,
     CATALYST_EXTRACT_GRAY,
+    CATALYST_SERVER_RUNNING,
+    CATALYST_SERVER_PAUSED,
     LAST
     };
 
@@ -184,7 +211,14 @@ public:
     switch (this->Type)
       {
     case pqPipelineModel::Server:
-      return SERVER;
+      {
+      pqServer* server = qobject_cast<pqServer*>(this->Object);
+      vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy(server);
+      return proxy ?
+        ((vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)?
+         CATALYST_SERVER_PAUSED : CATALYST_SERVER_RUNNING):
+        SERVER;
+      }
 
     case pqPipelineModel::Proxy:
         {
@@ -395,6 +429,11 @@ void pqPipelineModel::constructor()
   this->Editable = true;
   this->View = NULL;
 
+  QObject::connect(pqInsituServer::instance(),
+                   SIGNAL(catalystConnected(pqServer*)),
+                   this,
+                   SLOT(onCatalystConnected(pqServer*)));
+
   // Initialize the pixmap list.
   this->PixmapList = new QPixmap[pqPipelineModelDataItem::LAST+1];
 
@@ -426,11 +465,16 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqLinkIn16.png");
   this->PixmapList[pqPipelineModelDataItem::CATALYST_EXTRACT_GRAY].load(
     ":/pqWidgets/Icons/pqLinkIn16d.png");
+  this->PixmapList[pqPipelineModelDataItem::CATALYST_SERVER_RUNNING].load(
+    ":/pqWidgets/Icons/pqInsituServerRunning16.png");
+  this->PixmapList[pqPipelineModelDataItem::CATALYST_SERVER_PAUSED].load(
+    ":/pqWidgets/Icons/pqInsituServerPaused16.png");
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineModel::pqPipelineModel(QObject *p)
-  : QAbstractItemModel(p)
+  : QAbstractItemModel(p),
+    LinkCallback(NULL)
 {
   this->constructor();
 }
@@ -439,7 +483,8 @@ pqPipelineModel::pqPipelineModel(QObject *p)
 pqPipelineModel::pqPipelineModel(
   const pqPipelineModel &other,
   QObject *parentObject)
-: QAbstractItemModel(parentObject)
+  : QAbstractItemModel(parentObject),
+    LinkCallback(NULL)
 {
   this->constructor();
   this->Internal->Root = other.Internal->Root;
@@ -449,7 +494,8 @@ pqPipelineModel::pqPipelineModel(
 //-----------------------------------------------------------------------------
 pqPipelineModel::pqPipelineModel(const pqServerManagerModel &other,
     QObject *parentObject)
-  : QAbstractItemModel(parentObject)
+  : QAbstractItemModel(parentObject),
+    LinkCallback(NULL)
 {
   this->constructor();
 
@@ -498,6 +544,29 @@ pqPipelineModel::~pqPipelineModel()
   if (this->PixmapList)
     {
     delete [] this->PixmapList;
+    }
+  if (this->LinkCallback)
+    {
+    this->LinkCallback->Delete();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::onCatalystConnected(pqServer* server)
+{
+  pqLiveInsituVisualizationManager* manager =
+    pqInsituServer::instance()->manager(server);
+  vtkSMLiveInsituLinkProxy* proxy =
+    pqInsituServer::linkProxy(manager->insituServer());
+  if (manager && proxy)
+    {
+    if (this->LinkCallback)
+      {
+      this->LinkCallback->Delete();
+      }
+    this->LinkCallback =
+      new ModifiedLiveInsituLink(manager->insituServer(), this);
+    proxy->AddObserver (vtkCommand::ModifiedEvent, this->LinkCallback);
     }
 }
 

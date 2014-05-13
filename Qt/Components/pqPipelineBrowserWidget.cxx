@@ -72,7 +72,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   // Connect the model to the ServerManager model.
   pqServerManagerModel *smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smModel, SIGNAL(preServerAdded(pqServer*)),
+  QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
     this->PipelineModel, SLOT(addServer(pqServer*)));
   QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
     this->PipelineModel, SLOT(removeServer(pqServer*)));

@@ -106,6 +106,12 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
 }
 
 //-----------------------------------------------------------------------------
+pqServer* pqLiveInsituVisualizationManager::insituServer() const
+{
+  return this->Internals->CatalystSession;
+}
+
+//-----------------------------------------------------------------------------
 pqLiveInsituVisualizationManager::~pqLiveInsituVisualizationManager()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -131,6 +137,12 @@ pqLiveInsituVisualizationManager::~pqLiveInsituVisualizationManager()
     }
 
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMLiveInsituLinkProxy* pqLiveInsituVisualizationManager::getProxy() const
+{
+  return this->Internals->LiveInsituLinkProxy;
 }
 
 //-----------------------------------------------------------------------------

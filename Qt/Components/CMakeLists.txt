@@ -70,6 +70,8 @@ set (Module_SRCS
   pqCameraDialog.h
   pqCameraKeyFrameWidget.cxx
   pqCameraKeyFrameWidget.h
+  pqInsituServer.h
+  pqInsituServer.cxx
   pqChangeInputDialog.cxx
   pqChangeInputDialog.h
   pqChartPixelScale.cxx
@@ -387,6 +389,7 @@ set (Module_MOC_HDRS
   pqCalculatorWidget.h
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
+  pqInsituServer.h
   pqChangeInputDialog.h
   pqClipPanel.h
   pqColorChooserButtonWithPalettes.h

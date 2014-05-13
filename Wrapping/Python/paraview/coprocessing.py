@@ -163,22 +163,36 @@ class CoProcessor(object):
            self.__LiveVisualizationLink.SetInsituPort(int(port))
 
            # Initialize the "link"
-           self.__LiveVisualizationLink.SimulationInitialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
+           self.__LiveVisualizationLink.InsituInitialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
 
-        time = datadescription.GetTime()
+        currentTime = datadescription.GetTime()
 
-        # For every new timestep, update the simulation state before proceeding.
-        self.__LiveVisualizationLink.SimulationUpdate(time)
+        # stay in the loop while the simulation is paused
+        while True:
+            # Update the simulation state, extracts and simulationPaused
+            # from ParaView Live
+            self.__LiveVisualizationLink.InsituUpdate(currentTime)
 
-        # sources need to be updated by insitu code. vtkLiveInsituLink never updates
-        # the pipeline, it simply uses the data available at the end of the pipeline,
-        # if any.
-        from paraview import simple
-        for source in simple.GetSources().values():
-           source.UpdatePipeline(time)
+            # sources need to be updated by insitu
+            # code. vtkLiveInsituLink never updates the pipeline, it
+            # simply uses the data available at the end of the
+            # pipeline, if any.
+            from paraview import simple
+            for source in simple.GetSources().values():
+                source.UpdatePipeline(currentTime)
 
-        # push extracts to the visualization process.
-        self.__LiveVisualizationLink.SimulationPostProcess(time)
+            # push extracts to the visualization process.
+            self.__LiveVisualizationLink.InsituPostProcess(currentTime)
+
+            if (self.__LiveVisualizationLink.GetSimulationPaused()):
+                # This blocks until something changes on ParaView Live
+                # and then it continues the loop. Returns != 0 if LIVE side
+                # disconnects
+                if (self.__LiveVisualizationLink.WaitForLiveChange()):
+                    break;
+            else:
+                break
+
 
     def CreateProducer(self, datadescription, inputname):
         """Creates a producer proxy for the grid. This method is generally used in

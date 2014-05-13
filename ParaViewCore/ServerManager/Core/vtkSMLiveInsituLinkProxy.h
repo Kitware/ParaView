@@ -34,7 +34,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Provides access to the a dummy proxy manager representing the 
+  // Provides access to the a dummy proxy manager representing the
   // insitu visualization pipeline.
   vtkSMSessionProxyManager* GetInsituProxyManager();
   void SetInsituProxyManager(vtkSMSessionProxyManager*);
@@ -47,6 +47,10 @@ public:
   vtkSMProxy* CreateExtract(
     const char* reg_group, const char* reg_name, int port_number);
   void RemoveExtract(vtkSMProxy*);
+  // Description:
+  // Wakes up Insitu side if simulation is paused. Handles corectly many calls
+  // on the LIVE side.
+  void LiveChanged();
 
 //BTX
   // Description:
@@ -61,7 +65,7 @@ protected:
   // that the server-side can send messages to this proxy.
   virtual void CreateVTKObjects();
 
-  void MarkStateDirty() { this->StateDirty = true; }
+  void MarkStateDirty();
 
   // Description:
   // Pushes XML state to the server if needed.
@@ -74,6 +78,7 @@ protected:
   vtkWeakPointer<vtkPVCatalystSessionCore> CatalystSessionCore;
 
   bool StateDirty;
+  bool LiveChangedCalled;
 private:
   vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&); // Not implemented
   void operator=(const vtkSMLiveInsituLinkProxy&); // Not implemented

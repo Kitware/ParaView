@@ -46,7 +46,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-// #define vtkLiveInsituLinkDebugMacro(x) cout << __LINE__ << " " x << endl;
+//#define vtkLiveInsituLinkDebugMacro(x) cerr << __LINE__ << " " x << endl;
 #define vtkLiveInsituLinkDebugMacro(x)
 
 namespace
@@ -60,45 +60,42 @@ namespace
     self->InsituProcessConnected(NULL);
     }
 
-  void DropCatalystParaViewConnectionRMI(void *localArg,
+  void DropLiveInsituConnectionRMI(void *localArg,
     void *vtkNotUsed(remoteArg),
     int vtkNotUsed(remoteArgLength),
     int vtkNotUsed(remoteProcessId))
     {
     vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
-    self->DropCatalystParaViewConnection();
+    self->DropLiveInsituConnection();
     }
 
   void UpdateRMI(void *localArg,
     void *remoteArg, int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
     {
-    vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
-    double time = *(reinterpret_cast<double*>(remoteArg));
-    if (self->GetProcessType() == vtkLiveInsituLink::VISUALIZATION)
-      {
-      self->OnSimulationUpdate(time);
-      }
-    else
-      {
-      self->SimulationUpdate(time);
-      }
+      vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
+      double time = *(reinterpret_cast<double*>(remoteArg));
+      assert (self->GetProcessType() == vtkLiveInsituLink::LIVE);
+      self->OnInsituUpdate(time);
     }
 
   void PostProcessRMI(void *localArg,
     void *remoteArg, int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
     {
-    vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
-    double time = *(reinterpret_cast<double*>(remoteArg));
- 
-    if (self->GetProcessType() == vtkLiveInsituLink::VISUALIZATION)
-      {
-      self->OnSimulationPostProcess(time);
-      }
-    else
-      {
-      self->SimulationPostProcess(time);
-      }
+      vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
+      double time = *(reinterpret_cast<double*>(remoteArg));
+
+      assert (self->GetProcessType() == vtkLiveInsituLink::LIVE);
+      self->OnInsituPostProcess(time);
     }
+
+  void LiveChangedRMI(
+    void *localArg, void* vtkNotUsed(remoteArg),
+    int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
+  {
+    vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
+    assert (self->GetProcessType() == vtkLiveInsituLink::INSITU);
+    self->OnLiveChanged();
+  }
 }
 
 class vtkLiveInsituLink::vtkInternals
@@ -161,10 +158,11 @@ vtkStandardNewMacro(vtkLiveInsituLink);
 vtkLiveInsituLink::vtkLiveInsituLink():
   Hostname(0),
   InsituPort(0),
-  ProcessType(SIMULATION),
+  ProcessType(INSITU),
   ProxyId(0),
   InsituXMLStateChanged(false),
   ExtractsChanged(false),
+  SimulationPaused(0),
   InsituXMLState(0),
   URL(0),
   Internals(new vtkInternals())
@@ -200,22 +198,22 @@ void vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
     return;
     }
 
-  this->CoprocessorProxyManager = pxm;
+  this->InsituProxyManager = pxm;
 
   switch (this->ProcessType)
     {
-  case VISUALIZATION:
-    this->InitializeVisualization();
+  case LIVE:
+    this->InitializeLive();
     break;
 
-  case SIMULATION:
-    this->InitializeSimulation();
+  case INSITU:
+    this->InitializeInsitu();
     break;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::InitializeVisualization()
+void vtkLiveInsituLink::InitializeLive()
 {
   // This method gets called on the DataServer nodes.
   // On the root-node, we need to setup the server-socket to accept connections
@@ -226,18 +224,18 @@ void vtkLiveInsituLink::InitializeVisualization()
   int myId = pm->GetPartitionId();
   // int numProcs = pm->GetNumberOfLocalPartitions();
 
-  vtkLiveInsituLinkDebugMacro(<<myId << ": InitializeVisualization");
+  vtkLiveInsituLinkDebugMacro(<<myId << ": InitializeLive");
   if (myId == 0)
     {
     // save the visualization session reference so that we can communicate back to
     // the client.
-    this->VisualizationSession =
+    this->LiveSession =
       vtkPVSessionBase::SafeDownCast(pm->GetActiveSession());
 
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
 
-    // if the Catalyst connection ever drops, we need to communicate to the
-    // client on the VisualizationSession that the catalyst server no longer
+    // if the Insitu connection ever drops, we need to communicate to the
+    // client on the LiveSession that the catalyst server no longer
     // exists.
     nam->AddObserver(vtkCommand::ConnectionClosedEvent,
       this, &vtkLiveInsituLink::OnConnectionClosedEvent);
@@ -276,13 +274,13 @@ void vtkLiveInsituLink::InitializeVisualization()
     parallelController->AddRMICallback(&UpdateRMI, this, UPDATE_RMI_TAG);
     parallelController->AddRMICallback(&PostProcessRMI, this,
       POSTPROCESS_RMI_TAG);
-    parallelController->AddRMICallback(&DropCatalystParaViewConnectionRMI, this,
+    parallelController->AddRMICallback(&DropLiveInsituConnectionRMI, this,
       DROP_CAT2PV_CONNECTION);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::InitializeSimulation()
+void vtkLiveInsituLink::InitializeInsitu()
 {
   // vtkLiveInsituLink::Initialize() should not call this method unless
   // Controller==NULL.
@@ -344,7 +342,7 @@ void vtkLiveInsituLink::InitializeSimulation()
 // Callback on Visualization process when a simulation connects to it.
 void vtkLiveInsituLink::OnConnectionCreatedEvent()
 {
-  assert(this->ProcessType == VISUALIZATION);
+  assert(this->ProcessType == LIVE);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
@@ -380,10 +378,10 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(
       assert(parallelController->GetLocalProcessId() == 0);
       parallelController->TriggerRMIOnAllChildren(DROP_CAT2PV_CONNECTION);
       }
-    this->DropCatalystParaViewConnection();
+    this->DropLiveInsituConnection();
 
     // notify client.
-    if (this->VisualizationSession)
+    if (this->LiveSession)
       {
       assert(parallelController->GetLocalProcessId() == 0);
       vtkSMMessage message;
@@ -400,16 +398,17 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(
       variant->add_integer(DISCONNECTED);
 
       // Send message
-      this->VisualizationSession->NotifyAllClients(&message);
+      this->LiveSession->NotifyAllClients(&message);
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::DropCatalystParaViewConnection()
+void vtkLiveInsituLink::DropLiveInsituConnection()
 {
   this->Controller = 0;
   this->ExtractsDeliveryHelper = 0;
+  this->SimulationPaused = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -423,7 +422,7 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
   this->ExtractsDeliveryHelper =
     vtkSmartPointer<vtkExtractsDeliveryHelper>::New();
   this->ExtractsDeliveryHelper->SetProcessIsProducer(
-    this->ProcessType == VISUALIZATION? false : true);
+    this->ProcessType == LIVE? false : true);
 
   vtkMultiProcessController* parallelController =
     vtkMultiProcessController::GetGlobalController();
@@ -441,9 +440,10 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
 
   switch (this->ProcessType)
     {
-  case VISUALIZATION:
-    // Visualization side is the "slave" side in this relationship. We listen to
-    // commands from SIMULATION.
+  case LIVE:
+    {
+    // LIVE side is the "slave" side in this relationship. We listen to
+    // commands from INSITU.
     if (myId == 0)
       {
       unsigned int size=0;
@@ -497,7 +497,7 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       }
 
     // notify client.
-    if (this->VisualizationSession)
+    if (this->LiveSession)
       {
       assert(myId == 0);
       vtkSMMessage message;
@@ -515,15 +515,16 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       variant->add_txt(this->InsituXMLState);
 
       // Send message
-      this->VisualizationSession->NotifyAllClients(&message);
+      this->LiveSession->NotifyAllClients(&message);
       }
     break;
-
-  case SIMULATION:
+    }
+  case INSITU:
+    {
     if (myId ==0)
       {
       // send startup state to the visualization process.
-      vtkPVXMLElement* xml = this->CoprocessorProxyManager->SaveXMLState();
+      vtkPVXMLElement* xml = this->InsituProxyManager->SaveXMLState();
 
       // Filter XML to remove any view/representation/timeKeeper/animation proxy
       vtkLiveInsituLink::FilterXMLState(xml);
@@ -536,6 +537,9 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       controller->Send(&size, 1, 1, 8000);
       controller->Send(xml_string.str().c_str(),
         static_cast<vtkIdType>(xml_string.str().size()), 1, 8001);
+
+      controller->AddRMICallback(
+        &LiveChangedRMI, this, LIVE_CHANGED);
 
       // setup M2N connection.
       int otherProcs;
@@ -573,45 +577,46 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       }
     break;
     }
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::SimulationInitialize(vtkSMSessionProxyManager* pxm)
+void vtkLiveInsituLink::InsituInitialize(vtkSMSessionProxyManager* pxm)
 {
-  assert(this->ProcessType == SIMULATION);
+  assert(this->ProcessType == INSITU);
 
   this->Initialize(pxm);
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::SimulationUpdate(double time)
+void vtkLiveInsituLink::InsituUpdate(double time)
 {
-  assert(this->ProcessType == SIMULATION);
+  assert(this->ProcessType == INSITU);
 
-  if (!this->CoprocessorProxyManager)
+  if (!this->InsituProxyManager)
     {
     vtkErrorMacro(
       "Please call vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager*) "
-      "before using vtkLiveInsituLink::SimulationUpdate().");
+      "before using vtkLiveInsituLink::InsituUpdate().");
     return;
     }
 
   if (!this->ExtractsDeliveryHelper.GetPointer())
     {
-    // We are not connected to ParaView Vis Engine. That can happen if the
-    // ParaView Vis Engine was not ready the last time we attempted to connect
-    // to it, or ParaView Vis Engine disconnected. We make a fresh attempt to
+    // We are not connected to ParaView LIVE. That can happen if the
+    // ParaView LIVE was not ready the last time we attempted to connect
+    // to it, or ParaView LIVE disconnected. We make a fresh attempt to
     // connect to it.
-    this->SimulationInitialize(this->CoprocessorProxyManager);
+    this->InsituInitialize(this->InsituProxyManager);
     }
 
   if (!this->ExtractsDeliveryHelper.GetPointer())
     {
-    // ParaView is still not ready. Another time.
+    // ParaView LIVE is still not ready. Another time.
     return;
     }
 
-  // Okay, ParaView Visualization connection is currently valid, but it may
+  // Okay, ParaView LIVE connection is currently valid, but it may
   // break, so add error interceptor.
   vtkCommunicationErrorCatcher catcher(this->Controller);
 
@@ -623,19 +628,18 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
   int buffer_size = 0;
 
   vtkMultiProcessStream extractsMessage;
-  extractsMessage << 0; // indicating nothing changed.
   std::vector<vtkTypeUInt32> idMappingInStateLoading;
 
   if (myId == 0)
     {
     // steps to perform:
-    // 1. Check with visualization root-node to see if it has new coprocessing
+    // 1. Check with LIVE root-node to see if it has new INSITU
     //    state updates. If so receive them and broadcast to all satellites.
-    // 2. Update the CoprocessorProxyManager using the most recent XML state we
+    // 2. Update the InsituProxyManager using the most recent XML state we
     //    have.
     if (this->Controller)
       {
-      // Notify the vis root-node.
+      // Notify LIVE root-node.
       this->Controller->TriggerRMI(1, &time, static_cast<int>(sizeof(double)),
         UPDATE_RMI_TAG);
 
@@ -699,7 +703,7 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
 
   if (drop_connection)
     {
-    this->DropCatalystParaViewConnection();
+    this->DropLiveInsituConnection();
     return;
     }
 
@@ -708,8 +712,8 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
     {
     vtkNew<vtkSMInsituStateLoader> loader;
     loader->KeepIdMappingOn();
-    loader->SetSessionProxyManager(this->CoprocessorProxyManager);
-    this->CoprocessorProxyManager->LoadXMLState(this->XMLState, loader.GetPointer());
+    loader->SetSessionProxyManager(this->InsituProxyManager);
+    this->InsituProxyManager->LoadXMLState(this->XMLState, loader.GetPointer());
     int mappingSize = 0;
     vtkTypeUInt32* inSituMapping = loader->GetMappingArray(mappingSize);
     // Save mapping outside that scope
@@ -719,7 +723,9 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
       }
     }
 
-  // Process information about extracts.
+  // Read if the simulation should be paused on INSITU side
+  extractsMessage >> this->SimulationPaused;
+  // Process information about extracts
   int extracts_valid = 0;
   extractsMessage >> extracts_valid;
   if (extracts_valid)
@@ -734,7 +740,7 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
       int port;
       extractsMessage >> group >> name >> port;
 
-      vtkSMProxy* proxy = this->CoprocessorProxyManager->GetProxy(
+      vtkSMProxy* proxy = this->InsituProxyManager->GetProxy(
         group.c_str(), name.c_str());
       if (proxy)
         {
@@ -758,7 +764,7 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
       }
     }
 
-  // Share the id mapping between inSitu and Viz root node
+  // Share the id mapping between INSITU and LIVE root node
   if(this->Controller)
     {
     int mappingSize = static_cast<int>(idMappingInStateLoading.size());
@@ -771,9 +777,9 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::SimulationPostProcess(double time)
+void vtkLiveInsituLink::InsituPostProcess(double time)
 {
-  assert(this->ProcessType == SIMULATION);
+  assert(this->ProcessType == INSITU);
 
   if (!this->ExtractsDeliveryHelper)
     {
@@ -801,8 +807,8 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
 
   if (drop_connection)
     {
-    // ParaView has disconnected. Clean up the connection.
-    this->DropCatalystParaViewConnection();
+    // ParaView Live has disconnected. Clean up the connection.
+    this->DropLiveInsituConnection();
     return;
     }
 
@@ -817,7 +823,7 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
     {
     vtkClientServerStream stream;
     vtkNew<vtkSMProxyIterator> proxyIterator;
-    proxyIterator->SetSessionProxyManager(this->CoprocessorProxyManager);
+    proxyIterator->SetSessionProxyManager(this->InsituProxyManager);
     proxyIterator->SetModeToOneGroup();
     proxyIterator->Begin("sources");
 
@@ -855,15 +861,15 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::OnSimulationUpdate(double time)
+void vtkLiveInsituLink::OnInsituUpdate(double time)
 {
-  assert(this->ProcessType == VISUALIZATION);
+  assert(this->ProcessType == LIVE);
 
   // this method get called on:
   // - root node when "sim" notifies the root viz node.
   // - satellizes when "root" viz node notifies the satellizes.
   vtkLiveInsituLinkDebugMacro(
-    "vtkLiveInsituLink::OnSimulationUpdate: " << time);
+    "vtkLiveInsituLink::OnInsituUpdate: " << time);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
@@ -876,7 +882,7 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
   if (myId == 0)
     {
     // The steps to perform are:
-    // 1. Send coprocessing pipeline state to the simulation root node, if the
+    // 1. Send coprocessing pipeline state to the INSITU root node, if the
     //    state has changed since the last time we sent it.
     // 2. Send information about extracts to the simulation root, if the
     //    requested extracts has changed.
@@ -896,6 +902,7 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
       }
 
     vtkMultiProcessStream extractsMessage;
+    extractsMessage << this->SimulationPaused;
     if (this->ExtractsChanged)
       {
       extractsMessage << 1;
@@ -921,7 +928,7 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
       this->Controller->Receive(idMapTable, numberOfIds, 1, 8014);
 
       // notify the client with the updated ID mapping.
-      if (this->VisualizationSession)
+      if (this->LiveSession)
         {
         // here we may let the client know exactly what extracts were updated, if
         // all were not updated. Currently we just assume all extracts are
@@ -944,7 +951,7 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
           }
 
         // Send message
-        this->VisualizationSession->NotifyAllClients(&message);
+        this->LiveSession->NotifyAllClients(&message);
         delete[] idMapTable;
         }
       }
@@ -959,9 +966,9 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::OnSimulationPostProcess(double time)
+void vtkLiveInsituLink::OnInsituPostProcess(double time)
 {
-  assert(this->ProcessType == VISUALIZATION);
+  assert(this->ProcessType == LIVE);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
@@ -972,7 +979,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
     }
   
   vtkLiveInsituLinkDebugMacro(
-    "vtkLiveInsituLink::OnSimulationPostProcess: " << time);
+    "vtkLiveInsituLink::OnInsituPostProcess: " << time);
 
   // Obtains extracts from the simulations processes.
   bool dataAvailable = this->ExtractsDeliveryHelper->Update();
@@ -1009,7 +1016,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
     }
 
   // notify the client that updated data is available.
-  if (this->VisualizationSession && dataAvailable)
+  if (this->LiveSession && dataAvailable)
     {
     assert (myId == 0);
 
@@ -1048,7 +1055,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
       }
 
     // Send message
-    this->VisualizationSession->NotifyAllClients(&message);
+    this->LiveSession->NotifyAllClients(&message);
     }
 }
 
@@ -1056,7 +1063,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
 void vtkLiveInsituLink::RegisterExtract(vtkTrivialProducer* producer,
     const char* groupname, const char* proxyname, int portnumber)
 {
-  assert(this->ProcessType == VISUALIZATION);
+  assert(this->ProcessType == LIVE);
 
   if (!this->ExtractsDeliveryHelper)
     {
@@ -1077,7 +1084,7 @@ void vtkLiveInsituLink::RegisterExtract(vtkTrivialProducer* producer,
 //----------------------------------------------------------------------------
 void vtkLiveInsituLink::UnRegisterExtract(vtkTrivialProducer* producer)
 {
-  assert(this->ProcessType == VISUALIZATION);
+  assert(this->ProcessType == LIVE);
 
   if (!this->ExtractsDeliveryHelper)
     {
@@ -1161,4 +1168,78 @@ bool vtkLiveInsituLink::FilterXMLState(vtkPVXMLElement* xmlState)
       }
     }
   return changed;
+}
+
+//----------------------------------------------------------------------------
+int vtkLiveInsituLink::WaitForLiveChange()
+{
+  assert(this->ProcessType == INSITU);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int myId = pm->GetPartitionId();
+  int numProcs = pm->GetNumberOfLocalPartitions();
+  vtkLiveInsituLinkDebugMacro(<< "WaitForLiveChange " << myId);
+
+  int error = 0;
+  int processRMIError = vtkMultiProcessController::RMI_NO_ERROR;
+  if (myId == 0)
+    {
+    processRMIError = this->Controller->ProcessRMIs(1, 1);
+    }
+  if (numProcs > 1)
+    {
+    pm->GetGlobalController()->Broadcast(&processRMIError, 1, 0);
+    }
+  if (processRMIError != vtkMultiProcessController::RMI_NO_ERROR)
+    {
+    // catalyst paraview live connection was dropped.
+    vtkLiveInsituLinkDebugMacro(
+      << "LIVE connection was dropped: " << processRMIError);
+    this->DropLiveInsituConnection();
+    error = 1;
+    }
+  vtkLiveInsituLinkDebugMacro(<< "Exit WaitForLiveChange " << myId);
+  return error;
+}
+
+//----------------------------------------------------------------------------
+void vtkLiveInsituLink::OnLiveChanged()
+{
+  assert(this->ProcessType == INSITU);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int myId = pm->GetPartitionId();
+  vtkLiveInsituLinkDebugMacro(<< "OnLiveChanged " << myId);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkLiveInsituLink::LiveChanged()
+{
+  assert(this->ProcessType == LIVE);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  int myId = pm->GetPartitionId();
+  if (myId == 0 && this->Controller != NULL)
+    {
+    vtkLiveInsituLinkDebugMacro(<< "LiveChanged " << myId);
+    this->Controller->TriggerRMI(1, LIVE_CHANGED);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkLiveInsituLink::SetSimulationPaused (int paused)
+{
+  assert(this->ProcessType == LIVE);
+  if (this->SimulationPaused != paused)
+    {
+    this->SimulationPaused = paused;
+    this->Modified();
+    vtkLiveInsituLinkDebugMacro(<< "SetSimulationPaused: " << paused);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkLiveInsituLink::UpdateInsituXMLState(const char* txt)
+{
+  this->InsituXMLStateChanged = true;
+  this->SetInsituXMLState(txt);
+  vtkLiveInsituLinkDebugMacro(<< "UpdateInsituXMLState");
 }

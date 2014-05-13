@@ -64,6 +64,9 @@ public:
   /// Builds the "Tools" menu.
   static void buildToolsMenu(QMenu& menu);
 
+  /// Builds the "Catalyst" menu
+  static void buildCatalystMenu(QMenu& menu);
+
   /// Builds the "View" menu. 
   static void buildViewMenu(QMenu& menu, QMainWindow& window);
 

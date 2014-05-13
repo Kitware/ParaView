@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraToolbar.h"
 #include "pqCameraUndoRedoReaction.h"
 #include "pqCatalystConnectReaction.h"
+#include "pqCatalystContinueReaction.h"
+#include "pqCatalystPauseSimulationReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
@@ -221,12 +223,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     pqApplicationCore::instance(),
     SLOT(showOutputWindow()));
 
-
-  menu.addSeparator(); // --------------------------------------------------
-
-  new pqCatalystConnectReaction(menu.addAction("Connect To Catalyst")
-    << pqSetName("actionConnectCatalyst"));
-
   menu.addSeparator(); // --------------------------------------------------
 
   new pqPythonShellReaction(menu.addAction("Python Shell")
@@ -363,4 +359,22 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
     }
 #endif
+}
+
+//-----------------------------------------------------------------------------
+void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
+{
+  new pqCatalystConnectReaction(menu.addAction("Connect...")
+                                << pqSetName("actionCatalystConnect"));
+  pqCatalystPauseSimulationReaction* pauseReaction =
+    new pqCatalystPauseSimulationReaction(
+      menu.addAction("Pause Simulation")
+      << pqSetName("actionCatalystPauseSimulation"));
+  QObject::connect(&menu, SIGNAL(aboutToShow()),
+                   pauseReaction, SLOT(updateEnableState()));
+
+  pqCatalystContinueReaction* continueReaction = new pqCatalystContinueReaction(
+    menu.addAction("Continue") << pqSetName("actionCatalystContinue"));
+  QObject::connect(&menu, SIGNAL(aboutToShow()),
+                   continueReaction, SLOT(updateEnableState()));
 }
