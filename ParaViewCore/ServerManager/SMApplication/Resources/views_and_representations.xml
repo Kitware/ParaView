@@ -2248,7 +2248,8 @@
       <DoubleVectorProperty command="SetScatterPlotSelectedRowColumnColor"
                             default_values="0.8 0 0 0.4"
                             name="ScatterPlotSelectedRowColumnColor"
-                            number_of_elements="4">
+                            number_of_elements="4"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2257,7 +2258,8 @@
       <DoubleVectorProperty command="SetScatterPlotSelectedActiveColor"
                             default_values="0 0.8 0 0.4"
                             name="ScatterPlotSelectedActiveColor"
-                            number_of_elements="4">
+                            number_of_elements="4"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2269,7 +2271,8 @@
       <DoubleVectorProperty command="SetActivePlotBackgroundColor"
                             default_values="1 1 1 0"
                             name="ActivePlotBackgroundColor"
-                            number_of_elements="4">
+                            number_of_elements="4"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2389,7 +2392,8 @@
       <DoubleVectorProperty command="SetScatterPlotBackgroundColor"
                             default_values="1 1 1 0"
                             name="ScatterPlotBackgroundColor"
-                            number_of_elements="4">
+                            number_of_elements="4"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2512,7 +2516,8 @@
       <DoubleVectorProperty command="SetHistogramBackgroundColor"
                             default_values="0.5 0.5 0.5 0.4"
                             name="HistogramBackgroundColor"
-                            number_of_elements="4">
+                            number_of_elements="4"
+                            panel_widget="color_selector">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -5645,8 +5650,7 @@
       <DoubleVectorProperty command="SetColor"
                             default_values="0 0 0"
                             name="ScatterPlotsColor"
-                            number_of_elements_per_command="3"
-                            repeat_command="1"
+                            number_of_elements="3"
                             panel_widget="color_selector"
                             panel_visibility="advanced">
         <Documentation>Sets the color.</Documentation>
@@ -5654,8 +5658,7 @@
       <DoubleVectorProperty command="SetHistogramColor"
                             default_values="0 0 0"
                             name="HistogramColor"
-                            number_of_elements_per_command="3"
-                            repeat_command="1"
+                            number_of_elements="3"
                             panel_widget="color_selector"
                             panel_visibility="advanced">
         <Documentation>Sets the color for the histograms.</Documentation>
@@ -5689,8 +5692,7 @@
       <DoubleVectorProperty command="SetActivePlotColor"
                             default_values="0 0 0"
                             name="ActivePlotColor"
-                            number_of_elements_per_command="3"
-                            repeat_command="1"
+                            number_of_elements="3"
                             panel_widget="color_selector"
                             panel_visibility="advanced">
         <Documentation>Sets the color for the active plot.</Documentation>
