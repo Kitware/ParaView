@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QPointer>
 #include "pqComponentsModule.h"
-#include "ui_pqPluginDialog.h"
+
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -45,8 +45,10 @@ class pqServer;
 class vtkPVPluginInformation;
 class vtkPVPluginsInformation;
 
+namespace Ui { class pqPluginDialog; }
+
 class PQCOMPONENTS_EXPORT pqPluginDialog :
-  public QDialog, private Ui::pqPluginDialog
+  public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
@@ -59,7 +61,7 @@ public:
 public slots:
   void loadLocalPlugin();
   void loadRemotePlugin();
-  
+
 protected slots:
   void onPluginItemChanged(QTreeWidgetItem*, int);
   void onRefresh();
@@ -71,14 +73,14 @@ protected slots:
   void onRemoteSelectionChanged();
   void onLocalSelectionChanged();
   void resizeColumn(QTreeWidgetItem*);
- 
+
 protected:
   void refreshLocal();
   void refreshRemote();
   void loadPlugin(pqServer* server, bool remote);
   void loadPlugin(pqServer* server, const QString& file, bool remote);
   void removePlugin(pqServer* server, const QString& file, bool remote);
-  
+
   void setupTreeWidget(QTreeWidget* pluginTree);
   void populatePluginTree(QTreeWidget* pluginTree,
     vtkPVPluginsInformation* pluginList, bool remote);
@@ -94,8 +96,8 @@ protected:
     pqServer* server, bool remote);
   QString getStatusText(vtkPVPluginsInformation* plInfo, unsigned int cc);
 
-private:      
-  
+private:
+  QScopedPointer<Ui::pqPluginDialog> Ui;
   pqServer* Server;
   bool LoadingMultiplePlugins;
 };

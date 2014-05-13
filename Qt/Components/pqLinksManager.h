@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,12 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqLinksManager_h
 
 #include <QDialog>
-#include "pqComponentsModule.h"
-#include "ui_pqLinksManager.h"
+#include <QScopedPointer>
+#include <QModelIndex>
 
+#include "pqComponentsModule.h"
+
+
+namespace Ui { class pqLinksManager; }
 /// dialog for viewing, creating, editing, removing proxy/property/camera links
 class PQCOMPONENTS_EXPORT pqLinksManager :
-  public QDialog, private Ui::pqLinksManager
+  public QDialog
 {
   Q_OBJECT
   typedef QDialog base;
@@ -59,6 +63,8 @@ public slots:
 
 private slots:
   void selectionChanged(const QModelIndex& idx);
+private:
+  QScopedPointer<Ui::pqLinksManager> Ui;
 
 };
 

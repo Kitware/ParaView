@@ -40,30 +40,94 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
+#include "ui_pqImageOutputInfo.h"
+
+
 //-----------------------------------------------------------------------------
 pqImageOutputInfo::pqImageOutputInfo(
   QWidget *parentObject, Qt::WindowFlags parentFlags,
-  pqView* view, QString& viewName)
-  : QWidget(parentObject, parentFlags), View(view)
+  pqView* view, QString& viewName):
+  QWidget(parentObject, parentFlags),
+  Info(new Ui::ImageOutputInfo()),
+  View(view)
 {
-  this->Info.setupUi(this);
+  this->Info->setupUi(this);
 
-  this->Info.imageFileName->setText(viewName);
+  this->Info->imageFileName->setText(viewName);
   QObject::connect(
-    this->Info.imageFileName, SIGNAL(editingFinished()),
+    this->Info->imageFileName, SIGNAL(editingFinished()),
     this, SLOT(updateImageFileName()));
 
   QObject::connect(
-    this->Info.imageType, SIGNAL(currentIndexChanged(const QString&)),
+    this->Info->imageType, SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateImageFileNameExtension(const QString&)));
 
   this->setupScreenshotInfo();
 };
 
 //-----------------------------------------------------------------------------
+pqImageOutputInfo::~pqImageOutputInfo()
+{
+
+}
+
+//-----------------------------------------------------------------------------
+pqView* pqImageOutputInfo::getView()
+{
+  return this->View;
+}
+
+//-----------------------------------------------------------------------------
+QString pqImageOutputInfo::getImageFileName()
+{
+  return this->Info->imageFileName->displayText();
+}
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::hideFrequencyInput()
+{
+  this->Info->imageWriteFrequency->hide();
+  this->Info->imageWriteFrequencyLabel->hide();
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::showFrequencyInput()
+{
+  this->Info->imageWriteFrequency->show();
+    this->Info->imageWriteFrequencyLabel->show();
+}
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::hideFitToScreen()
+{
+  this->Info->fitToScreen->hide();
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::showFitToScreen()
+{
+  this->Info->fitToScreen->show();
+}
+//-----------------------------------------------------------------------------
+int pqImageOutputInfo::getWriteFrequency()
+{
+  return this->Info->imageWriteFrequency->value();
+}
+
+//-----------------------------------------------------------------------------
+bool pqImageOutputInfo::fitToScreen()
+{
+  return this->Info->fitToScreen->isChecked();
+}
+
+//-----------------------------------------------------------------------------
+int pqImageOutputInfo::getMagnification()
+{
+  return this->Info->imageMagnification->value();
+}
+
+//-----------------------------------------------------------------------------
 void pqImageOutputInfo::updateImageFileName()
 {
-  QString fileName = this->Info.imageFileName->displayText();
+  QString fileName = this->Info->imageFileName->displayText();
   if(fileName.isNull() || fileName.isEmpty())
     {
     fileName = "image";
@@ -72,15 +136,15 @@ void pqImageOutputInfo::updateImageFileName()
   if(fileName.contains(regExp) == 0)
     {
     fileName.append(".");
-    fileName.append(this->Info.imageType->currentText());
+    fileName.append(this->Info->imageType->currentText());
     }
   else
     {  // update imageType if it is different
     int extensionIndex = fileName.lastIndexOf(".");
     QString anExtension = fileName.right(fileName.size()-extensionIndex-1);
-    int index = this->Info.imageType->findText(anExtension);
-    this->Info.imageType->setCurrentIndex(index);
-    fileName = this->Info.imageFileName->displayText();
+    int index = this->Info->imageType->findText(anExtension);
+    this->Info->imageType->setCurrentIndex(index);
+    fileName = this->Info->imageFileName->displayText();
     }
 
   if(fileName.contains("%t") == 0)
@@ -88,26 +152,26 @@ void pqImageOutputInfo::updateImageFileName()
     fileName.insert(fileName.lastIndexOf("."), "_%t");
     }
 
-  this->Info.imageFileName->setText(fileName);
+  this->Info->imageFileName->setText(fileName);
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::updateImageFileNameExtension(
   const QString& fileExtension)
 {
-  QString displayText = this->Info.imageFileName->text();
+  QString displayText = this->Info->imageFileName->text();
   std::string newFileName = vtksys::SystemTools::GetFilenameWithoutExtension(
     displayText.toLocal8Bit().constData());
 
   newFileName.append(".");
   newFileName.append(fileExtension.toLocal8Bit().constData());
-  this->Info.imageFileName->setText(QString::fromStdString(newFileName));
+  this->Info->imageFileName->setText(QString::fromStdString(newFileName));
 }
 
 //-----------------------------------------------------------------------------
 void pqImageOutputInfo::setupScreenshotInfo()
 {
-  this->Info.thumbnailLabel->setVisible(true);
+  this->Info->thumbnailLabel->setVisible(true);
   if(!this->View)
     {
     cerr << "no view available which seems really weird\n";
@@ -139,5 +203,5 @@ void pqImageOutputInfo::setupScreenshotInfo()
     result->GetPointer(0),
     result->GetNumberOfTuples()*result->GetNumberOfComponents(), "PNG");
 
-  this->Info.thumbnailLabel->setPixmap(thumbnail);
+  this->Info->thumbnailLabel->setPixmap(thumbnail);
 }

@@ -36,9 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 #include <QWidget>
-#include "ui_pqImageOutputInfo.h"
+#include <QScopedPointer>
 
 class pqView;
+namespace Ui { class ImageOutputInfo; }
 
 class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
 {
@@ -47,55 +48,19 @@ class PQCOMPONENTS_EXPORT pqImageOutputInfo : public QWidget
 public:
   pqImageOutputInfo(
     QWidget *parentObject, Qt::WindowFlags parentFlags, pqView* view, QString& viewName);
+  ~pqImageOutputInfo();
 
   void setupScreenshotInfo();
 
-  pqView* getView()
-  {
-    return this->View;
-  }
-
-  QString getImageFileName()
-  {
-    return this->Info.imageFileName->displayText();
-  }
-
-  void hideFrequencyInput()
-  {
-    this->Info.imageWriteFrequency->hide();
-    this->Info.imageWriteFrequencyLabel->hide();
-  }
-
-  void showFrequencyInput()
-  {
-    this->Info.imageWriteFrequency->show();
-    this->Info.imageWriteFrequencyLabel->show();
-  }
-
-  void hideFitToScreen()
-  {
-    this->Info.fitToScreen->hide();
-  }
-
-  void showFitToScreen()
-  {
-    this->Info.fitToScreen->show();
-  }
-
-  int getWriteFrequency()
-  {
-    return this->Info.imageWriteFrequency->value();
-  }
-
-  bool fitToScreen()
-  {
-    return this->Info.fitToScreen->isChecked();
-  }
-
-  int getMagnification()
-  {
-    return this->Info.imageMagnification->value();
-  }
+  pqView* getView();
+  QString getImageFileName();
+  void hideFrequencyInput();
+  void showFrequencyInput();
+  void hideFitToScreen();
+  void showFitToScreen();
+  int getWriteFrequency();
+  bool fitToScreen();
+  int getMagnification();
 
 public slots:
   void updateImageFileName();
@@ -103,7 +68,7 @@ public slots:
 
 private:
   Q_DISABLE_COPY(pqImageOutputInfo)
-  Ui::ImageOutputInfo Info;
+  QScopedPointer<Ui::ImageOutputInfo> Info;
   pqView* View;
 };
 #endif

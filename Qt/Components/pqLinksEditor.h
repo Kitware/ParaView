@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,18 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqLinksEditor_h
 
 #include <QDialog>
+#include <QScopedPointer>
+#include <QListWidgetItem>
+#include <QModelIndex>
+
 #include "pqComponentsModule.h"
-#include "ui_pqLinksEditor.h"
 #include "pqLinksModel.h"
 
-class pqLinksEditorProxyModel;
-
+namespace Ui { class pqLinksEditor; }
 
 /// a Qt dialog for editing a property/proxy/camera link
 /// two proxies can be selected, and if property type is
 /// selected, then two properties can be selected as well.
 class PQCOMPONENTS_EXPORT pqLinksEditor :
-  public QDialog, private Ui::pqLinksEditor
+  public QDialog
 {
   Q_OBJECT
   typedef QDialog base;
@@ -67,7 +69,7 @@ public:
   vtkSMProxy* selectedProxy1();
   /// get the second selected proxy;
   vtkSMProxy* selectedProxy2();
-  
+
   /// get the first selected property
   QString selectedProperty1();
   /// get the second selected property
@@ -76,19 +78,22 @@ public:
 private slots:
   void currentProxy1Changed(const QModelIndex& cur, const QModelIndex&);
   void currentProxy2Changed(const QModelIndex& cur, const QModelIndex&);
-  
+
   void currentProperty1Changed(QListWidgetItem* item);
   void currentProperty2Changed(QListWidgetItem* item);
-  
+
   void updateEnabledState();
 
 private:
 
+  class pqLinksEditorProxyModel;
   void updatePropertyList(QListWidget* tw, vtkSMProxy* proxy);
+
+  QScopedPointer<Ui::pqLinksEditor> Ui;
 
   pqLinksEditorProxyModel* Proxy1Model;
   pqLinksEditorProxyModel* Proxy2Model;
-  
+
   vtkSMProxy* SelectedProxy1;
   vtkSMProxy* SelectedProxy2;
   QString SelectedProperty1;
