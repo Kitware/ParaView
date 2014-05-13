@@ -49,6 +49,10 @@ public:
   /// Execute the pipeline. Returns 1 for success and 0 for failure.
   virtual int CoProcess(vtkCPDataDescription* dataDescription);
 
+  /// Finalize the pipeline before deleting it. A default no-op implementation
+  /// is given. Returns 1 for success and 0 for failure.
+  virtual int Finalize();
+
 protected:
   vtkCPPythonScriptPipeline();
   virtual ~vtkCPPythonScriptPipeline();

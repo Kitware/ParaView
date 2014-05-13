@@ -247,6 +247,14 @@ class CoProcessor(object):
         view = proxy_ctor()
         return self.RegisterView(view, filename, freq, fittoscreen, magnification, width, height)
 
+    def Finalize(self):
+        for writer in self.__WritersList:
+            if hasattr(writer, 'Finalize'):
+                writer.Finalize()
+        for view in self.__ViewsList:
+            if hasattr(view, 'Finalize'):
+                view.Finalize()
+
     def RescaleDataRange(self, view, time):
         """DataRange can change across time, sometime we want to rescale the
            color map to match to the closer actual data range."""
