@@ -35,9 +35,6 @@ A simple example::
 #
 #==============================================================================
 
-import paraview
-paraview.compatibility.major = 3
-paraview.compatibility.minor = 5
 import servermanager
 import lookuptable
 

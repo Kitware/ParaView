@@ -47,11 +47,6 @@ A simple example::
 #==============================================================================
 import paraview, re, os, os.path, new, sys, atexit, vtk
 
-if not paraview.compatibility.major:
-    paraview.compatibility.major = 3
-if not paraview.compatibility.minor:
-    paraview.compatibility.minor = 5
-
 from vtkPVServerImplementationCorePython import *
 from vtkPVClientServerCoreCorePython import *
 from vtkPVServerManagerCorePython import *
@@ -281,10 +276,18 @@ class Proxy(object):
             setter = getattr(self.__class__, name)
             setter = setter.__set__
         except AttributeError:
-            if name == "ColorAttributeType":
-                # if ColorAttributeType is being used, warn.
-                raise AttributeError(\
-                    "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
+            if name == "ColorAttributeType" and self.SMProxy.GetProperty("ColorArrayName"):
+                if paraview.compatibility.GetVersion() <= 4.1:
+                    # set ColorAttributeType on ColorArrayName property instead.
+                    caProp = self.GetProperty("ColorArrayName")
+
+                    self.GetProperty("ColorArrayName").SetData((value, caProp[1]))
+                    return
+                else:
+                    # if ColorAttributeType is being used, print debug information.
+                    paraview.print_debug_info(\
+                        "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
+                    # we let the exception be raised as well, hence don't return here.
             if not hasattr(self, name):
                 raise AttributeError("Attribute %s does not exist. " % name +
                   " This class does not allow addition of new attributes to avoid " +
@@ -354,7 +357,10 @@ class Proxy(object):
         itself for vectors."""
         p = self.GetProperty(name)
         if isinstance(p, VectorProperty):
-            if p.GetNumberOfElements() == 1 and not p.GetRepeatable():
+            if paraview.compatibility.GetVersion() <= 4.1 and name == "ColorArrayName":
+              # Return ColorArrayName as just the array name for backwards compatibility.
+              return p[1]
+            elif p.GetNumberOfElements() == 1 and not p.GetRepeatable():
                 if p.SMProperty.IsA("vtkSMStringVectorProperty") or not p.GetArgumentIsArray():
                     return p[0]
         elif isinstance(p, InputProperty):
@@ -445,11 +451,16 @@ class Proxy(object):
             return self.__GetActiveCamera
         if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
             return self.__SaveDefinition
-        if name == "ColorAttributeType":
-            # if ColorAttributeType is being used, warn.
-            raise AttributeError(\
-                "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
-            return None
+        if name == "ColorAttributeType" and self.SMProxy.GetProperty("ColorArrayName"):
+            if paraview.compatibility.GetVersion() <= 4.1:
+                if self.GetProperty("ColorArrayName")[0] == "CELLS":
+                    return "CELL_DATA"
+                else:
+                    return "POINT_DATA"
+            else:
+                # if ColorAttributeType is being used, warn.
+                paraview.print_debug_info(\
+                    "'ColorAttributeType' is obsolete. Simply use 'ColorArrayName' instead.  Refer to ParaView Python API changes documentation online.")
         # If not a property, see if SMProxy has the method
         try:
             proxyAttr = getattr(self.SMProxy, name)
@@ -925,7 +936,7 @@ class ArraySelectionProperty(VectorProperty):
         elif idx >= 2 or idx < 0:
             raise IndexError
 
-        if i == 0:
+        if idx == 0:
             return self.GetAssociation()
         else:
             return self.GetArrayName()

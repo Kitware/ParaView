@@ -46,6 +46,7 @@ SET(PY_TESTS_NO_BASELINE
   VRMLSource
   MultiServer
   ValidateSources
+  ColorAttributeTypeBackwardsCompatibility
 )
 
 if(BUILD_SHARED_LIBS

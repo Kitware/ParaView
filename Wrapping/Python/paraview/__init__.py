@@ -1,12 +1,20 @@
 r"""
-This module is not meant to be used directly. Please look at one of the modules
-it provides:
-  servermanager
-  pvfilters
-  vtk
-  numeric
-  util
-  simple
+The paraview package provides modules used to script ParaView. Generally, users
+should import the modules of interest directly e.g.::
+
+  from paraview.simple import *
+
+However, one may want to import paraview package before importing any of the
+ParaView modules to force backwards compatibility to an older version::
+
+  # To run scripts written for ParaView 4.0 in newer versions, you can use the
+  # following.
+  import paraview
+  paraview.compatibility.major = 4
+  paraview.compatibility.minor = 0
+
+  # Now, import the modules of interest.
+  from paraview.simple import *
 """
 
 #==============================================================================
@@ -24,19 +32,72 @@ it provides:
 #
 #==============================================================================
 
+class _version(object):
+    def __init__(self, major, minor):
+      self.major = major
+      self.minor = minor
+    def GetVersion(self):
+        """Return version as a float. Will return None is no version is
+        specified."""
+        if self.minor != None and self.major != None:
+            version = float(self.minor)
+            while version >= 1.0:
+                version = version / 10.0
+            version += float(self.major)
+            return version
+        return None
+    def __lt__(self, other):
+        """This will always return False if compatibility is not being forced
+        to a particular version."""
+        myversion = self.GetVersion()
+        if not myversion:
+            return False
+        else:
+            return myversion < other
+    def __le__(self, other):
+        """This will always return False if compatibility is not forced to a
+        particular version."""
+        myversion = self.GetVersion()
+        if not myversion:
+            return False
+        else:
+            return myversion <= other
+    def __eq__(self, other):
+        raise RuntimeError("Equal operation not supported.")
+    def __ne__(self, other):
+        raise RuntimeError("NotEqual operation not supported.")
+    def __gt__(self, other):
+        """This will always return True if compatibility is not being forced to
+        a particular version"""
+        myversion = self.GetVersion()
+        if not myversion:
+            return True
+        else:
+            return myversion > other
+    def __ge__(self, other):
+        """This will always return True if compatibility is not being forced to
+        a particular version"""
+        myversion = self.GetVersion()
+        if not myversion:
+            return True
+        else:
+            return myversion >= other
+    def __repr__(self):
+        myversion = self.GetVersion()
+        if not myversion:
+          return "(none)"
+        return str(myversion)
+
 class compatibility:
-    """Class used to check version number and compatibility"""
+    """Class used to check version number and compatibility. Users should only
+    set the compatibility explicitly to force backwards compatibility to and
+    older versions.
+    """
     minor = None
     major = None
 
     def GetVersion(cls):
-        if compatibility.minor and compatibility.major:
-            version = float(compatibility.minor)
-            while version > 1.0:
-                version = version / 10.0
-            version += float(compatibility.major)
-            return version
-        return None
+        return _version(cls.major, cls.minor)
     GetVersion = classmethod(GetVersion)
 
 def make_name_valid(name):
