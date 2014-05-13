@@ -194,7 +194,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
 
   if (options->GetNumberOfTestScripts() > 0)
     {
-    QTimer::singleShot(1000, this, SLOT(playTests()));
+    this->playTests();
     }
 }
 
