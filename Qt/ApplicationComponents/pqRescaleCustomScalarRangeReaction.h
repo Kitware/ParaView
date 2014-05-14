@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorToolbar.cxx
+   Module:    pqRescaleCustomScalarRangeReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +29,38 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqColorToolbar.h"
-#include "ui_pqColorToolbar.h"
+#ifndef __pqSetCustomScalarRangeReaction_h
+#define __pqSetCustomScalarRangeReaction_h
 
-#include "pqActiveObjects.h"
-#include "pqDisplayColorWidget.h"
-#include "pqEditColorMapReaction.h"
-#include "pqRescaleCustomScalarRangeReaction.h"
-#include "pqResetScalarRangeReaction.h"
-#include "pqScalarBarVisibilityReaction.h"
-#include "pqSetName.h"
+#include "pqReaction.h"
 
-//-----------------------------------------------------------------------------
-void pqColorToolbar::constructor()
+class pqPipelineRepresentation;
+
+/// @ingroup Reactions
+/// Reaction to customize the active lookup table's range.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqRescaleCustomScalarRangeReaction : public pqReaction
 {
-  Ui::pqColorToolbar ui;
-  ui.setupUi(this);
+  Q_OBJECT
+  typedef pqReaction Superclass;
+public:
+  pqRescaleCustomScalarRangeReaction(QAction* parent);
 
-  new pqScalarBarVisibilityReaction(ui.actionScalarBarVisibility);
-  new pqEditColorMapReaction(ui.actionEditColorMap);
-  new pqResetScalarRangeReaction(ui.actionResetRange);
-  new pqRescaleCustomScalarRangeReaction(ui.actionRescaleCustomRange);
+  void rescaleCustomScalarRange();
 
-  pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this)
-    << pqSetName("displayColor");
-  this->addWidget(display_color);
+public slots:
+  /// Updates the enabled state. Applications need not explicitly call
+  /// this.
+  void updateEnableState();
 
-  QObject::connect(&pqActiveObjects::instance(),
-    SIGNAL(representationChanged(pqDataRepresentation*)),
-    display_color,
-    SLOT(setRepresentation(pqDataRepresentation*)));
-}
+protected:
+  /// Called when the action is triggered.
+  virtual void onTriggered()
+    {
+    pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange();
+    }
 
+private:
+  Q_DISABLE_COPY(pqRescaleCustomScalarRangeReaction)
+};
 
+#endif

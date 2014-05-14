@@ -65,9 +65,27 @@
      <string>Rescale to Data Range</string>
     </property>
    </action>
+   <action name="actionRescaleCustomRange" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetRangeCustom24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>Rescale Custom Range</string>
+    </property>
+    <property name="toolTip" >
+     <string>Rescale to Custom Data Range</string>
+    </property>
+    <property name="statusTip" >
+     <string>Rescale to Custom Data Range</string>
+    </property>
+   </action>
    <addaction name="actionScalarBarVisibility" />
    <addaction name="actionEditColorMap" />
    <addaction name="actionResetRange" />
+   <addaction name="actionRescaleCustomRange" />
   </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
