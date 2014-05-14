@@ -66,6 +66,12 @@ public:
   vtkBooleanMacro(DrawTickMarks, int);
 
   // Description:
+  // Set the title justification. Valid values are VTK_TEXT_LEFT,
+  // VTK_TEXT_CENTERED, and VTK_TEXT_RIGHT.
+  vtkGetMacro(TitleJustification, int);
+  vtkSetClampMacro(TitleJustification, int, VTK_TEXT_LEFT, VTK_TEXT_RIGHT);
+
+  // Description:
   // Release any graphics resources that are being consumed by this actor.
   // The parameter window could be used to determine which graphic
   // resources to release.
@@ -137,6 +143,10 @@ protected:
   // Space, in pixels, between the labels and the bar itself.  Currently set in
   // PositionTitle.
   int LabelSpace;
+
+  // Description:
+  // The justification/alignment of the title.
+  int TitleJustification;
 
 private:
   vtkPVScalarBarActor(const vtkPVScalarBarActor &);     // Not implemented.

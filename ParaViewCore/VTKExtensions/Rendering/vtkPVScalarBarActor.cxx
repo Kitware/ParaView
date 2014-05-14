@@ -83,6 +83,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
     ->SetReferenceCoordinate(this->PositionCoordinate);
 }
 
+//-----------------------------------------------------------------------------
 vtkPVScalarBarActor::~vtkPVScalarBarActor()
 {
   this->ScalarBarTexture->Delete();
@@ -98,6 +99,7 @@ vtkPVScalarBarActor::~vtkPVScalarBarActor()
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVScalarBarActor::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -441,11 +443,7 @@ void vtkPVScalarBarActor::LayoutTitle()
 
   // Reset the text size and justification
   this->TitleActor->GetTextProperty()->ShallowCopy(this->TitleTextProperty);
-  this->TitleActor->GetTextProperty()->SetJustification(
-    this->Orientation == VTK_ORIENT_HORIZONTAL ?
-      VTK_TEXT_CENTERED :
-      (this->TextPosition == vtkScalarBarActor::PrecedeScalarBar ?
-        VTK_TEXT_RIGHT : VTK_TEXT_LEFT));
+  this->TitleActor->GetTextProperty()->SetJustification(this->TitleJustification);
   this->TitleActor->GetTextProperty()->SetVerticalJustification(
     this->Orientation == VTK_ORIENT_VERTICAL ?
       VTK_TEXT_BOTTOM :
@@ -605,17 +603,34 @@ void vtkPVScalarBarActor::ConfigureAnnotations()
 
 void vtkPVScalarBarActor::ConfigureTitle()
 {
+  // This adjustment is necessary because this->TitleActor adjusts
+  // where the text is rendered relative to the position of the
+  // TitleActor based on the justification set on the TitleActor's
+  // TextProperty.
+  double texturePolyDataBounds[6];
+  this->TexturePolyData->GetBounds(texturePolyDataBounds);
+
+  double scalarBarMinX = texturePolyDataBounds[0];
+  double scalarBarMaxX = texturePolyDataBounds[1];
   double x;
   switch(this->TitleActor->GetTextProperty()->GetJustification())
     {
   case VTK_TEXT_LEFT:
-    x = this->P->TitleBox.Posn[0];
+    x = scalarBarMaxX;
+    if (this->Orientation == VTK_ORIENT_VERTICAL)
+      {
+      x -= this->P->TitleBox.Size[this->P->TL[0]];
+      }
     break;
   case VTK_TEXT_RIGHT:
-    x = this->P->TitleBox.Posn[0] + this->P->TitleBox.Size[this->P->TL[0]];
+    x = scalarBarMinX;
+    if (this->Orientation == VTK_ORIENT_VERTICAL)
+      {
+      x += this->P->TitleBox.Size[this->P->TL[0]];
+      }
     break;
   case VTK_TEXT_CENTERED:
-    x = this->P->TitleBox.Posn[0] + this->P->TitleBox.Size[this->P->TL[0]] / 2;
+    x = 0.5 * (scalarBarMinX + scalarBarMaxX);
     break;
   default:
     x = 0.;
@@ -629,7 +644,7 @@ void vtkPVScalarBarActor::ConfigureTitle()
   double y =
     this->TitleActor->GetTextProperty()->GetVerticalJustification() ==
     VTK_TEXT_BOTTOM ?
-    this->P->TitleBox.Posn[1]:
+      this->P->TitleBox.Posn[1] :
       this->P->TitleBox.Posn[1] + this->P->TitleBox.Size[this->P->TL[1]];
 
   this->TitleActor->SetPosition(x, y);

@@ -391,6 +391,7 @@
           <PropertyGroup label="Title Texts">
             <Property name="Title" />
             <Property name="ComponentTitle" />
+            <Property name="TitleJustification" />
           </PropertyGroup>
 
           <!-- properties for Title -->

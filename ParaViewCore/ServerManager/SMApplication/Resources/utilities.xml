@@ -1325,6 +1325,21 @@
                             default_values="Component"
                             name="ComponentTitle"
                             number_of_elements="1"></StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetTitleJustification"
+                         default_values="1"
+                         name="TitleJustification"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Left"
+                 value="0" />
+          <Entry text="Centered"
+                 value="1" />
+          <Entry text="Right"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>Sets the justification of the title text with respect to the scalar color bar.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetAutomaticLabelFormat"
                          default_values="1"
                          name="AutomaticLabelFormat"
