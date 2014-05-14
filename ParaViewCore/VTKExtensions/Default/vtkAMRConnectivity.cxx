@@ -75,9 +75,13 @@ public:
       min_id = id2;
       max_id = id1;
       }
-    
-    int set1 = id_to_set[id1];
-    int set2 = id_to_set[id2];
+
+    std::map<int, int>::iterator iter;
+
+    iter = id_to_set.find (id1);
+    int set1 = (iter == id_to_set.end () ? -1 : iter->second);
+    iter = id_to_set.find (id2);
+    int set2 = (iter == id_to_set.end () ? -1 : iter->second);
 
     if (set1 >= 0 && set_to_min_id->GetValue (set1) < 0)  
       {
@@ -106,12 +110,11 @@ public:
         min_set = set2;
         max_set = set1;
         }
-      std::map<int,int>::iterator iter;
       for (iter = id_to_set.begin (); iter != id_to_set.end (); iter ++) 
         {
         if (iter->second == max_set)
           {
-          iter->second = min_set;
+          id_to_set[iter->first] = min_set;
           }
         }
       int max_set_min = set_to_min_id->GetValue (max_set);
