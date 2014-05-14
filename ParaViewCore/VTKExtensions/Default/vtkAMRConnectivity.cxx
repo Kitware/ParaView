@@ -42,6 +42,7 @@
 #include "vtkMPIController.h"
 #endif
 
+#include <map>
 #include <list>
 
 vtkStandardNewMacro (vtkAMRConnectivity);
@@ -51,9 +52,6 @@ class vtkAMRConnectivityEquivalence
 public:
   vtkAMRConnectivityEquivalence () 
     {
-    id_to_set = vtkIntArray::New ();
-    id_to_set->SetNumberOfComponents (1);
-    id_to_set->SetNumberOfTuples (0);
     set_to_min_id = vtkIntArray::New ();
     set_to_min_id->SetNumberOfComponents (1);
     set_to_min_id->SetNumberOfTuples (0);
@@ -61,7 +59,6 @@ public:
 
   ~vtkAMRConnectivityEquivalence ()
     {
-    id_to_set->Delete ();
     set_to_min_id->Delete ();
     }
 
@@ -78,12 +75,9 @@ public:
       min_id = id2;
       max_id = id1;
       }
-    while (id_to_set->GetNumberOfTuples () <= max_id) 
-      {
-      id_to_set->InsertNextValue (-1);
-      }
-    int set1 = id_to_set->GetValue (id1);
-    int set2 = id_to_set->GetValue (id2);
+    
+    int set1 = id_to_set[id1];
+    int set2 = id_to_set[id2];
 
     if (set1 >= 0 && set_to_min_id->GetValue (set1) < 0)  
       {
@@ -112,11 +106,12 @@ public:
         min_set = set2;
         max_set = set1;
         }
-      for (int i = 0; i < id_to_set->GetNumberOfTuples (); i ++) 
+      std::map<int,int>::iterator iter;
+      for (iter = id_to_set.begin (); iter != id_to_set.end (); iter ++) 
         {
-        if (id_to_set->GetValue (i) == max_set)
+        if (iter->second == max_set)
           {
-          id_to_set->SetValue (i, min_set);
+          iter->second = min_set;
           }
         }
       int max_set_min = set_to_min_id->GetValue (max_set);
@@ -130,7 +125,7 @@ public:
       }
     else if (set1 >= 0)
       {
-      id_to_set->SetValue (id2, set1);
+      id_to_set[id2] = set1;
       if (id2 < set_to_min_id->GetValue (set1)) 
         {
         set_to_min_id->SetValue (set1, id2);
@@ -138,7 +133,7 @@ public:
       }
     else if (set2 >= 0)
       {
-      id_to_set->SetValue (id1, set2);
+      id_to_set[id1] = set2;
       if (id1 < set_to_min_id->GetValue (set2)) 
         {
         set_to_min_id->SetValue (set2, id1);
@@ -161,8 +156,8 @@ public:
         first_empty = set_to_min_id->InsertNextValue (-1);
         }
 
-      id_to_set->SetValue (id1, first_empty);
-      id_to_set->SetValue (id2, first_empty);
+      id_to_set[id1] = first_empty;
+      id_to_set[id2] = first_empty;
       set_to_min_id->SetValue (first_empty, min_id);
       // return zero here because its not values we've previously cared about.
       }
@@ -171,17 +166,18 @@ public:
 
   int GetMinimumSetId (int id)
     {
-    if (id < 0 || id >= id_to_set->GetNumberOfTuples ()) 
+    std::map<int, int>::iterator iter = id_to_set.find (id);
+    if (iter == id_to_set.end ())
       {
       // vtkErrorWithObjectMacro (id_to_set, << "ID out of range " << id << " (expected 0 <= x < " << id_to_set->GetNumberOfTuples () << ")");
       return -1;
       }
-    int set = id_to_set->GetValue (id);
+    int set = id_to_set[id];
     return (set >= 0 ? set_to_min_id->GetValue (set) : -1);
     }
     
 private:
-  vtkIntArray* id_to_set;
+  std::map<int,int> id_to_set;
   vtkIntArray* set_to_min_id;
 };
 
