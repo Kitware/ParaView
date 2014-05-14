@@ -23,7 +23,7 @@ Main modules
    The ParaView Python Package <paraview>
    simple <paraview.simple>
    servermanager <paraview.servermanager>
-   algortihm <paraview.vtk.algorithms>
+   algorithm <paraview.vtk.algorithms>
 
    coprocessing <paraview.coprocessing>
    benchmark <paraview.benchmark>
