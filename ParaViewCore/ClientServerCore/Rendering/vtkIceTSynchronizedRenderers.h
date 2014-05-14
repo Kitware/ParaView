@@ -126,6 +126,10 @@ public:
   void SetRenderPass(vtkRenderPass*);
   vtkGetObjectMacro(RenderPass, vtkRenderPass);
 
+  // Description:
+  // Provides access to the internal vtkIceTCompositePass. Only use this if you
+  // know what you're doing.
+  vtkGetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
 //BTX
 protected:
   vtkIceTSynchronizedRenderers();
