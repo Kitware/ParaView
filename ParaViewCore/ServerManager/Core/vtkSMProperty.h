@@ -117,6 +117,11 @@
 //
 // \li \b panel_widget: \c string: provides a hint to the UI to determine which
 //        what widget to create to edit this property.
+//
+// \li \b no_custom_default: \c{0, 1}: When set, vtkSMSettings will neither
+//        change the value of a property upon creation nor save the property
+//        value as a default.
+//
 
 #ifndef __vtkSMProperty_h
 #define __vtkSMProperty_h
@@ -263,6 +268,14 @@ public:
   // displayed in the user interface.
   vtkSetMacro(IsInternal, int);
   vtkGetMacro(IsInternal, int);
+
+  // Description:
+  // Sets whether the property should ignore custom default settings.
+  vtkSetMacro(NoCustomDefault, int);
+
+  // Description:
+  // Gets whether the property should ignore custom default settings.
+  vtkGetMacro(NoCustomDefault, int);
 
   // Description:
   // Sets the panel visibility for the property. The value can be
@@ -477,6 +490,7 @@ protected:
   int ImmediateUpdate;
   int Animateable;
   int IsInternal;
+  int NoCustomDefault;
 
   char* XMLName;
   char* XMLLabel;

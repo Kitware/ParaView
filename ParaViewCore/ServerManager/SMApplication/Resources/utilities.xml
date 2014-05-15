@@ -1318,11 +1318,13 @@
       <StringVectorProperty animateable="0"
                             command="SetTitle"
                             default_values="Name"
+                            no_custom_default="1"
                             name="Title"
                             number_of_elements="1"></StringVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetComponentTitle"
                             default_values="Component"
+                            no_custom_default="1"
                             name="ComponentTitle"
                             number_of_elements="1"></StringVectorProperty>
       <IntVectorProperty animateable="0"

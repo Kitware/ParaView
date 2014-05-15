@@ -59,6 +59,7 @@ vtkSMProperty::vtkSMProperty()
   this->InformationOnly = 0;
   this->InformationProperty = 0;
   this->IsInternal = 0;
+  this->NoCustomDefault = 0;
   this->Documentation = 0;
   this->Repeatable = 0;
   this->IgnoreSynchronization = 0;
@@ -443,6 +444,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if (element->GetScalarAttribute("is_internal", &is_internal))
     {
     this->SetIsInternal(is_internal);
+    }
+
+  int no_custom_default;
+  if (element->GetScalarAttribute("no_custom_default", &no_custom_default))
+    {
+    this->SetNoCustomDefault(no_custom_default);
     }
 
   const char *panel_visibility = element->GetAttribute("panel_visibility");
