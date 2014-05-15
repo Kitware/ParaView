@@ -1381,6 +1381,13 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetAddRangeAnnotations"
+                         default_values="1"
+                         name="AddRangeAnnotations"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetNanAnnotation"
                             default_values="NaN"

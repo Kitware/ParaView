@@ -70,6 +70,8 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
   this->AspectRatio = 20.0;
   this->AutomaticLabelFormat = 1;
   this->DrawTickMarks = 1;
+  this->TitleJustification = VTK_TEXT_CENTERED;
+  this->AddRangeAnnotations = 1;
   this->AnnotationTextScaling = 1;
 
   this->ScalarBarTexture = vtkTexture::New();
@@ -955,7 +957,7 @@ static void AddLabelIfUnoccluded(
 void vtkPVScalarBarActor::EditAnnotations()
 {
   vtkScalarsToColors* lut = this->LookupTable;
-  if (lut && !lut->GetIndexedLookup())
+  if (lut && !lut->GetIndexedLookup() && this->AddRangeAnnotations)
     {
     const double* range = lut->GetRange();
     double minX, maxX;

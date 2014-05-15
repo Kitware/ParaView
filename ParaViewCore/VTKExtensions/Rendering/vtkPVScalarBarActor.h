@@ -72,6 +72,13 @@ public:
   vtkSetClampMacro(TitleJustification, int, VTK_TEXT_LEFT, VTK_TEXT_RIGHT);
 
   // Description:
+  // Set whether the scalar data range endpoints (minimum and maximum)
+  // are used as annotations.
+  vtkGetMacro(AddRangeAnnotations, int);
+  vtkSetMacro(AddRangeAnnotations, int);
+  vtkBooleanMacro(AddRangeAnnotations, int);
+
+  // Description:
   // Release any graphics resources that are being consumed by this actor.
   // The parameter window could be used to determine which graphic
   // resources to release.
@@ -147,6 +154,10 @@ protected:
   // Description:
   // The justification/alignment of the title.
   int TitleJustification;
+
+  // Description:
+  // Flag to add minimum and maximum as annotations
+  int AddRangeAnnotations;
 
 private:
   vtkPVScalarBarActor(const vtkPVScalarBarActor &);     // Not implemented.
