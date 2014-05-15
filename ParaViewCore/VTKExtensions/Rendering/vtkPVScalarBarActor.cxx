@@ -616,17 +616,25 @@ void vtkPVScalarBarActor::ConfigureTitle()
   switch(this->TitleActor->GetTextProperty()->GetJustification())
     {
   case VTK_TEXT_LEFT:
-    x = scalarBarMaxX;
     if (this->Orientation == VTK_ORIENT_VERTICAL)
       {
+      x = scalarBarMaxX;
       x -= this->P->TitleBox.Size[this->P->TL[0]];
+      }
+    else
+      {
+      x = scalarBarMinX;
       }
     break;
   case VTK_TEXT_RIGHT:
-    x = scalarBarMinX;
     if (this->Orientation == VTK_ORIENT_VERTICAL)
       {
+      x = scalarBarMinX;
       x += this->P->TitleBox.Size[this->P->TL[0]];
+      }
+    else
+      {
+      x = scalarBarMaxX;
       }
     break;
   case VTK_TEXT_CENTERED:
