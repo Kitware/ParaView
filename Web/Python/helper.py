@@ -8,6 +8,11 @@ import os
 import traceback
 
 # import paraview modules.
+import paraview
+# for 4.1 compatibility till we fix ColorArrayName and ColorAttributeType usage.
+paraview.compatibility.major = 4
+paraview.compatibility.minor = 1
+
 from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 

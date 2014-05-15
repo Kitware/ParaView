@@ -30,6 +30,10 @@ import os
 import math
 
 # import paraview modules.
+import paraview
+# for 4.1 compatibility till we fix ColorArrayName and ColorAttributeType usage.
+paraview.compatibility.major = 4
+paraview.compatibility.minor = 1
 from paraview import simple
 from paraview.web import wamp      as pv_wamp
 from paraview.web import protocols as pv_protocols
