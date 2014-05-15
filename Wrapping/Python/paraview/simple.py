@@ -35,6 +35,7 @@ A simple example::
 #
 #==============================================================================
 
+import paraview
 import servermanager
 import lookuptable
 
