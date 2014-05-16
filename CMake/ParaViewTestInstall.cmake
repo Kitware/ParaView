@@ -42,7 +42,7 @@
 
 message (STATUS "Building Examples against ParaView install tree")
 set (ParaView_DIR
-  ${PARAVIEW_INSTALL_DIR}/lib/cmake/paraview-${PARAVIEW_VERSION})
+  $ENV{DESTDIR}${PARAVIEW_INSTALL_DIR}/lib/cmake/paraview-${PARAVIEW_VERSION})
 
 # Build target "INSTALL" for paraview
 if (MSVC)

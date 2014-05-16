@@ -472,7 +472,9 @@ if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     -DPARAVIEW_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
     -DPARAVIEW_VERSION:STRING=${PARAVIEW_VERSION}
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ParaViewTestInstall.cmake)
-  set_tests_properties(pv.TestDevelopmentInstall PROPERTIES LABELS "PARAVIEW")
+  set_tests_properties(pv.TestDevelopmentInstall PROPERTIES
+    LABELS "PARAVIEW"
+    ENVIRONMENT "DESTDIR=${CMAKE_BINARY_DIR}/test-install")
 endif()
 #------------------------------------------------------------------------------
 
