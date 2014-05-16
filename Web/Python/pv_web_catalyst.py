@@ -210,6 +210,12 @@ class _PVCatalystManager(pv_wamp.PVServerProtocol):
         if _PVCatalystManager.pipeline_handler:
             _PVCatalystManager.pipeline_handler.apply_pipeline(reader, self.time_steps)
 
+    @exportRpc("initializePipeline")
+    def initializePipeline(self, conf):
+        if _PVCatalystManager.pipeline_handler and "initialize_pipeline" in dir(_PVCatalystManager.pipeline_handler):
+            _PVCatalystManager.pipeline_handler.initialize_pipeline(conf)
+
+
     @exportRpc("updateActiveArgument")
     def updateActiveArgument(self, key, value):
         if key == "time":
