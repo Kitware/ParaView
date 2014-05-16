@@ -15,6 +15,7 @@ This module is intended for use with by simple.py."""
 #
 #==============================================================================
 
+import paraview.simple
 import servermanager
 import os
 from math import sqrt
