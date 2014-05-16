@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // self
 #include "pqLinksManager.h"
+#include "ui_pqLinksManager.h"
 
 // Qt
 #include <QLineEdit>
@@ -53,23 +54,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksEditor.h"
 
 pqLinksManager::pqLinksManager(QWidget* p)
-  : QDialog(p)
+  : QDialog(p),
+    Ui(new Ui::pqLinksManager())
 {
-  this->setupUi(this);
+  this->Ui->setupUi(this);
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
-  this->treeView->setModel(model);
-  QObject::connect(this->treeView, SIGNAL(clicked(const QModelIndex&)),
+  this->Ui->treeView->setModel(model);
+  QObject::connect(this->Ui->treeView, SIGNAL(clicked(const QModelIndex&)),
                    this, SLOT(selectionChanged(const QModelIndex&)));
-  QObject::connect(this->treeView, SIGNAL(activated(const QModelIndex&)),
+  QObject::connect(this->Ui->treeView, SIGNAL(activated(const QModelIndex&)),
                    this, SLOT(editLink()));
-  QObject::connect(this->addButton, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->addButton, SIGNAL(clicked(bool)),
                    this, SLOT(addLink()));
-  QObject::connect(this->editButton, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->editButton, SIGNAL(clicked(bool)),
                    this, SLOT(editLink()));
-  QObject::connect(this->removeButton, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->removeButton, SIGNAL(clicked(bool)),
                    this, SLOT(removeLink()));
-  this->editButton->setEnabled(false);
-  this->removeButton->setEnabled(false);
+  this->Ui->editButton->setEnabled(false);
+  this->Ui->removeButton->setEnabled(false);
 }
 
 pqLinksManager::~pqLinksManager()
@@ -111,14 +113,14 @@ void pqLinksManager::addLink()
 void pqLinksManager::editLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
-  QModelIndex idx = this->treeView->selectionModel()->currentIndex();
+  QModelIndex idx = this->Ui->treeView->selectionModel()->currentIndex();
   vtkSMLink* link = model->getLink(idx);
   pqLinksEditor editor(link, this);
   editor.setWindowTitle("Edit Link");
   if(editor.exec() == QDialog::Accepted)
     {
     model->removeLink(idx);
-    
+
     if(editor.linkType() == pqLinksModel::Proxy)
       {
       vtkSMProxy* inP = editor.selectedProxy1();
@@ -129,7 +131,7 @@ void pqLinksManager::editLink()
         model->addCameraLink(editor.linkName(), inP, outP);
         }
       else
-        {      
+        {
         model->addProxyLink(editor.linkName(), inP, outP);
         }
       }
@@ -147,7 +149,7 @@ void pqLinksManager::editLink()
 void pqLinksManager::removeLink()
 {
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
-  QModelIndexList idxs = this->treeView->selectionModel()->selectedIndexes();
+  QModelIndexList idxs = this->Ui->treeView->selectionModel()->selectedIndexes();
   QStringList names;
   // convert indexes to names so our indexes don't become invalid during removal
   foreach(QModelIndex idx, idxs)
@@ -169,13 +171,13 @@ void pqLinksManager::selectionChanged(const QModelIndex& idx)
 {
   if(!idx.isValid())
     {
-    this->editButton->setEnabled(false);
-    this->removeButton->setEnabled(false);
+    this->Ui->editButton->setEnabled(false);
+    this->Ui->removeButton->setEnabled(false);
     }
   else
     {
-    this->editButton->setEnabled(true);
-    this->removeButton->setEnabled(true);
+    this->Ui->editButton->setEnabled(true);
+    this->Ui->removeButton->setEnabled(true);
     }
 }
 

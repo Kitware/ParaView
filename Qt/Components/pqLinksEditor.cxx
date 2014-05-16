@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // self
 #include "pqLinksEditor.h"
+#include "ui_pqLinksEditor.h"
 
 // Qt
 #include <QPushButton>
@@ -91,7 +92,7 @@ static QString propertyType(vtkSMProperty* p)
   return "Unknown";
 }
 
-class pqLinksEditorProxyModel : public QAbstractItemModel
+class pqLinksEditor::pqLinksEditorProxyModel : public QAbstractItemModel
 {
 public:
   pqLinksEditorProxyModel(QObject* p) : QAbstractItemModel(p)
@@ -109,14 +110,14 @@ public:
     size_t hasIndex : 1;
     size_t index : 8 * (sizeof(size_t) - sizeof(char));
     };
-    
+
   void* encodeIndex(const RowIndex& row) const
     {
     RowIndex ri = row;
     ri.type++;
     return *reinterpret_cast<void**>(&ri);
     }
-  
+
   RowIndex decodeIndex(void* p) const
     {
     RowIndex ri = *reinterpret_cast<RowIndex*>(&p);
@@ -130,7 +131,7 @@ public:
       {
       return QModelIndex();
       }
-    
+
     if(!pidx.isValid())
       {
       return this->createIndex(row, column);
@@ -145,7 +146,7 @@ public:
       }
     return this->createIndex(row, column, this->encodeIndex(ri));
     }
-  
+
   QModelIndex parent(const QModelIndex& idx) const
     {
     if(!idx.isValid() || idx.internalPointer() == NULL)
@@ -170,7 +171,7 @@ public:
     vtkSMProxy* pxy = this->getProxy(idx);
     return pqLinksModel::proxyListDomain(pxy);
     }
-  
+
   int rowCount(const QModelIndex& idx) const
     {
     if(!idx.isValid())
@@ -202,17 +203,17 @@ public:
       }
     return 0;
     }
-  
+
   int columnCount(const QModelIndex& /*idx*/) const
     {
     return 1;
     }
-  
+
   QVariant headerData(int, Qt::Orientation, int) const
     {
     return QVariant();
     }
-  
+
   QVariant data(const QModelIndex& idx, int role) const
     {
     if(!idx.isValid())
@@ -232,7 +233,7 @@ public:
           return "Objects";
           }
         }
-      
+
       RowIndex ri = this->decodeIndex(idx.internalPointer());
       if(!ri.hasIndex)
         {
@@ -310,7 +311,7 @@ public:
           }
         }
       }
-    
+
     // never found it
     return QModelIndex();
     }
@@ -321,7 +322,7 @@ public:
       {
       return NULL;
       }
-    
+
     QModelIndex pidx = this->parent(idx);
     if(pidx.isValid())
       {
@@ -354,128 +355,128 @@ public:
 };
 
 pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
-  : QDialog(p)
+  : QDialog(p), Ui( new Ui::pqLinksEditor )
 {
-  this->setupUi(this);
+  this->Ui->setupUi(this);
 
   this->SelectedProxy1 = NULL;
   this->SelectedProxy2 = NULL;
-  
+
   this->Proxy1Model = new pqLinksEditorProxyModel(this);
   this->Proxy2Model = new pqLinksEditorProxyModel(this);
-  this->ObjectTreeProxy1->setModel(this->Proxy1Model);
-  this->ObjectTreeProxy2->setModel(this->Proxy2Model);
-  this->ObjectTreeProperty1->setModel(this->Proxy1Model);
-  this->ObjectTreeProperty2->setModel(this->Proxy2Model);
+  this->Ui->ObjectTreeProxy1->setModel(this->Proxy1Model);
+  this->Ui->ObjectTreeProxy2->setModel(this->Proxy2Model);
+  this->Ui->ObjectTreeProperty1->setModel(this->Proxy1Model);
+  this->Ui->ObjectTreeProperty2->setModel(this->Proxy2Model);
 
-  QObject::connect(this->ObjectTreeProxy1->selectionModel(),
-     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
-     this,
-     SLOT(currentProxy1Changed(const QModelIndex&, const QModelIndex&)));
-  
-  QObject::connect(this->ObjectTreeProperty1->selectionModel(),
+  QObject::connect(this->Ui->ObjectTreeProxy1->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
      SLOT(currentProxy1Changed(const QModelIndex&, const QModelIndex&)));
 
-  QObject::connect(this->ObjectTreeProxy2->selectionModel(),
+  QObject::connect(this->Ui->ObjectTreeProperty1->selectionModel(),
+     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+     this,
+     SLOT(currentProxy1Changed(const QModelIndex&, const QModelIndex&)));
+
+  QObject::connect(this->Ui->ObjectTreeProxy2->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
      SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
-  
-  QObject::connect(this->ObjectTreeProperty2->selectionModel(),
+
+  QObject::connect(this->Ui->ObjectTreeProperty2->selectionModel(),
      SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
      this,
      SLOT(currentProxy2Changed(const QModelIndex&, const QModelIndex&)));
-  
-  QObject::connect(this->Property1List,
+
+  QObject::connect(this->Ui->Property1List,
      SIGNAL(itemPressed(QListWidgetItem* )),
      this,
      SLOT(currentProperty1Changed(QListWidgetItem* )));
-  
-  QObject::connect(this->Property2List,
+
+  QObject::connect(this->Ui->Property2List,
      SIGNAL(itemPressed(QListWidgetItem* )),
      this,
      SLOT(currentProperty2Changed(QListWidgetItem* )));
-  
-  QObject::connect(this->lineEdit,
+
+  QObject::connect(this->Ui->lineEdit,
      SIGNAL(textChanged(const QString&)),
      this,
      SLOT(updateEnabledState()), Qt::QueuedConnection);
-  
-  QObject::connect(this->comboBox,
+
+  QObject::connect(this->Ui->comboBox,
      SIGNAL(currentIndexChanged(const QString&)),
      this,
      SLOT(updateEnabledState()), Qt::QueuedConnection);
 
   pqLinksModel* model = pqApplicationCore::instance()->getLinksModel();
-  
+
   if(link)
     {
     QModelIndex idx = model->findLink(link);
     QItemSelectionModel::SelectionFlags selFlags =
       QItemSelectionModel::ClearAndSelect;
-    
+
     // set the input/output proxies
     if(idx.isValid())
       {
-      this->lineEdit->setText(model->getLinkName(idx));
+      this->Ui->lineEdit->setText(model->getLinkName(idx));
 
       if(model->getLinkType(idx) == pqLinksModel::Property)
         {
-        this->comboBox->setCurrentIndex(1);
+        this->Ui->comboBox->setCurrentIndex(1);
         }
       else
         {
-        this->comboBox->setCurrentIndex(0);
+        this->Ui->comboBox->setCurrentIndex(0);
         }
-      
+
       vtkSMProxy* inputProxy = model->getProxy1(idx);
       QModelIndex viewIdx = this->Proxy1Model->findProxy(inputProxy);
       if(viewIdx.isValid())
         {
-        this->ObjectTreeProxy1->selectionModel()->
+        this->Ui->ObjectTreeProxy1->selectionModel()->
           setCurrentIndex(viewIdx, selFlags);
-        this->ObjectTreeProperty1->selectionModel()->
+        this->Ui->ObjectTreeProperty1->selectionModel()->
           setCurrentIndex(viewIdx, selFlags);
         }
-      
+
       vtkSMProxy* outputProxy = model->getProxy2(idx);
       viewIdx = this->Proxy2Model->findProxy(outputProxy);
       if(viewIdx.isValid())
         {
-        this->ObjectTreeProxy2->selectionModel()->
+        this->Ui->ObjectTreeProxy2->selectionModel()->
           setCurrentIndex(viewIdx, selFlags);
-        this->ObjectTreeProperty2->selectionModel()->
+        this->Ui->ObjectTreeProperty2->selectionModel()->
           setCurrentIndex(viewIdx, selFlags);
         }
-      
+
       // if this is a property link, make the properties current
       if(model->getLinkType(idx) == pqLinksModel::Property)
         {
         QString prop1 = model->getProperty1(idx);
-        int count = this->Property1List->count();
+        int count = this->Ui->Property1List->count();
         int i;
         for(i=0; i<count; i++)
           {
-          QListWidgetItem* item = this->Property1List->item(i);
+          QListWidgetItem* item = this->Ui->Property1List->item(i);
           QString d = item->data(Qt::UserRole).toString();
           if(d == prop1)
             {
-            this->Property1List->setCurrentItem(item);
+            this->Ui->Property1List->setCurrentItem(item);
             break;
             }
           }
 
         QString prop2 = model->getProperty2(idx);
-        count = this->Property2List->count();
+        count = this->Ui->Property2List->count();
         for(i=0; i<count; i++)
           {
-          QListWidgetItem* item = this->Property2List->item(i);
+          QListWidgetItem* item = this->Ui->Property2List->item(i);
           QString d = item->data(Qt::UserRole).toString();
           if(d == prop2)
             {
-            this->Property2List->setCurrentItem(item);
+            this->Ui->Property2List->setCurrentItem(item);
             break;
             }
           }
@@ -496,7 +497,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
         newLinkName = tryName;
         }
       }
-    this->lineEdit->setText(newLinkName);
+    this->Ui->lineEdit->setText(newLinkName);
     }
 
   this->updateEnabledState();
@@ -509,12 +510,12 @@ pqLinksEditor::~pqLinksEditor()
 
 QString pqLinksEditor::linkName()
 {
-  return this->lineEdit->text();
+  return this->Ui->lineEdit->text();
 }
 
 pqLinksModel::ItemType pqLinksEditor::linkType()
 {
-  return this->comboBox->currentIndex() == 0 ? 
+  return this->Ui->comboBox->currentIndex() == 0 ?
     pqLinksModel::Proxy : pqLinksModel::Property ;
 }
 
@@ -546,7 +547,7 @@ void pqLinksEditor::currentProxy1Changed(const QModelIndex& cur,
   this->SelectedProxy1 = this->Proxy1Model->getProxy(cur);
   if(this->linkType() == pqLinksModel::Property)
     {
-    this->updatePropertyList(this->Property1List, this->SelectedProxy1);
+    this->updatePropertyList(this->Ui->Property1List, this->SelectedProxy1);
     }
   this->updateEnabledState();
 }
@@ -557,7 +558,7 @@ void pqLinksEditor::currentProxy2Changed(const QModelIndex& cur,
   this->SelectedProxy2 = this->Proxy2Model->getProxy(cur);
   if(this->linkType() == pqLinksModel::Property)
     {
-    this->updatePropertyList(this->Property2List, this->SelectedProxy2);
+    this->updatePropertyList(this->Ui->Property2List, this->SelectedProxy2);
     }
   this->updateEnabledState();
 }
@@ -624,6 +625,6 @@ void pqLinksEditor::updateEnabledState()
         }
       }
     }
-  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
+  this->Ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 }
 

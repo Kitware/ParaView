@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // self
 #include "pqPluginDialog.h"
+#include "ui_pqPluginDialog.h"
 
 // Qt
 #include <QHeaderView>
@@ -59,29 +60,31 @@ enum PluginTreeCol
 };
 
 //----------------------------------------------------------------------------
-pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
-  : Superclass(p), Server(server)
+pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p):
+  Superclass(p),
+  Ui(new Ui::pqPluginDialog()),
+  Server(server)
 {
-  this->setupUi(this);
-  this->setupTreeWidget(this->remotePlugins);
-  this->setupTreeWidget(this->localPlugins);
-  
-  QObject::connect(this->remotePlugins, SIGNAL(itemSelectionChanged()),
+  this->Ui->setupUi(this);
+  this->setupTreeWidget(this->Ui->remotePlugins);
+  this->setupTreeWidget(this->Ui->localPlugins);
+
+  QObject::connect(this->Ui->remotePlugins, SIGNAL(itemSelectionChanged()),
     this, SLOT(onRemoteSelectionChanged()), Qt::QueuedConnection);
-  QObject::connect(this->localPlugins, SIGNAL(itemSelectionChanged()),
+  QObject::connect(this->Ui->localPlugins, SIGNAL(itemSelectionChanged()),
     this, SLOT(onLocalSelectionChanged()), Qt::QueuedConnection);
 
   QString helpText;
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
 
-  QObject::connect(this->loadRemote, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->loadRemote, SIGNAL(clicked(bool)),
                    this, SLOT(loadRemotePlugin()));
-  QObject::connect(this->loadLocal, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->loadLocal, SIGNAL(clicked(bool)),
                    this, SLOT(loadLocalPlugin()));
 
   if (!this->Server || !this->Server->isRemote())
     {
-    this->remoteGroup->setEnabled(false);
+    this->Ui->remoteGroup->setEnabled(false);
     helpText = "Local plugins are automatically searched for in %1.";
     QStringList serverPaths = pm->pluginPaths(NULL, false);
     helpText = helpText.arg(serverPaths.join(", "));
@@ -96,20 +99,20 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     helpText = helpText.arg(localPaths.join(", "));
     }
 
-  this->HelpText->setText(helpText);
-  
+  this->Ui->HelpText->setText(helpText);
+
   QObject::connect(pm, SIGNAL(pluginsUpdated()),
     this, SLOT(onRefresh()));
   //QObject::connect(pm, SIGNAL(pluginInfoUpdated()),
   //  this, SLOT(refresh()));
 
-  QObject::connect(this->loadSelected_Remote, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->loadSelected_Remote, SIGNAL(clicked(bool)),
     this, SLOT(onLoadSelectedRemotePlugin()));
-  QObject::connect(this->loadSelected_Local, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->loadSelected_Local, SIGNAL(clicked(bool)),
     this, SLOT(onLoadSelectedLocalPlugin()));
-  QObject::connect(this->removeRemote, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->removeRemote, SIGNAL(clicked(bool)),
     this, SLOT(onRemoveSelectedRemotePlugin()));
-  QObject::connect(this->removeLocal, SIGNAL(clicked(bool)),
+  QObject::connect(this->Ui->removeLocal, SIGNAL(clicked(bool)),
     this, SLOT(onRemoveSelectedLocalPlugin()));
 
   this->LoadingMultiplePlugins = false;
@@ -137,7 +140,7 @@ void pqPluginDialog::loadLocalPlugin()
 void pqPluginDialog::loadPlugin(pqServer* server, bool remote)
 {
   pqFileDialog fd(remote? server: NULL,
-                  this, "Load Plugin", QString(), 
+                  this, "Load Plugin", QString(),
                   "Plugins (*.so;*.dylib;*.dll;*.sl)\n"
                   "Client Resource Files (*.bqrc)\n"
                   "Server Manager XML (*.xml)\n"
@@ -154,7 +157,7 @@ void pqPluginDialog::loadPlugin(
   pqServer* server, const QString& plugin, bool remote)
 {
   QString error;
-  // now pass it off to the plugin manager to load everything that this 
+  // now pass it off to the plugin manager to load everything that this
   // shared library has
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   pm->loadExtension(server, plugin, &error, remote);
@@ -193,8 +196,8 @@ void pqPluginDialog::refreshLocal()
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   vtkPVPluginsInformation* extensions = pm->loadedExtensions(
     this->Server, false);
-  this->populatePluginTree(this->localPlugins, extensions, false);
-  this->localPlugins->resizeColumnToContents(ValueCol);  
+  this->populatePluginTree(this->Ui->localPlugins, extensions, false);
+  this->Ui->localPlugins->resizeColumnToContents(ValueCol);
 }
 
 //----------------------------------------------------------------------------
@@ -204,8 +207,8 @@ void pqPluginDialog::refreshRemote()
     {
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
     vtkPVPluginsInformation* extensions = pm->loadedExtensions(this->Server, true);
-    this->populatePluginTree(this->remotePlugins, extensions, true);
-    this->remotePlugins->resizeColumnToContents(ValueCol);  
+    this->populatePluginTree(this->Ui->remotePlugins, extensions, true);
+    this->Ui->remotePlugins->resizeColumnToContents(ValueCol);
     }
 }
 
@@ -271,7 +274,7 @@ vtkPVPluginsInformation* pqPluginDialog::getPluginInfo(
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   vtkPVPluginsInformation* info = pm->loadedExtensions(this->Server,
-    (pluginNode->treeWidget() == this->remotePlugins)?
+    (pluginNode->treeWidget() == this->Ui->remotePlugins)?
     true : false);
 
   index = (pluginNode && pluginNode->type() == QTreeWidgetItem::UserType) ?
@@ -291,7 +294,7 @@ void pqPluginDialog::addInfoNodes(
   unsigned int index, bool vtkNotUsed(remote))
 {
   Qt::ItemFlags infoFlags(Qt::ItemIsEnabled);
-  
+
   // set icon hint
   if (plInfo->GetPluginLoaded(index))
     {
@@ -301,7 +304,7 @@ void pqPluginDialog::addInfoNodes(
       pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/warning.png"));
       }
     }
-  else 
+  else
     {
     pluginNode->setText(ValueCol, "Not Loaded");
     }
@@ -395,14 +398,14 @@ void pqPluginDialog::loadSelectedPlugins(QList<QTreeWidgetItem*> selItems,
 //----------------------------------------------------------------------------
 void pqPluginDialog::onLoadSelectedRemotePlugin()
 {
-  this->loadSelectedPlugins(this->remotePlugins->selectedItems(), 
+  this->loadSelectedPlugins(this->Ui->remotePlugins->selectedItems(),
     this->Server, true);
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onLoadSelectedLocalPlugin()
 {
-  this->loadSelectedPlugins(this->localPlugins->selectedItems(), 
+  this->loadSelectedPlugins(this->Ui->localPlugins->selectedItems(),
     this->Server, false);
 }
 
@@ -427,7 +430,7 @@ void pqPluginDialog::removeSelectedPlugins(QList<QTreeWidgetItem*> selItems,
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoveSelectedRemotePlugin()
 {
-  this->removeSelectedPlugins(this->remotePlugins->selectedItems(), 
+  this->removeSelectedPlugins(this->Ui->remotePlugins->selectedItems(),
     this->Server, true);
   this->onRemoteSelectionChanged();
 }
@@ -435,22 +438,22 @@ void pqPluginDialog::onRemoveSelectedRemotePlugin()
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoveSelectedLocalPlugin()
 {
-  this->removeSelectedPlugins(this->localPlugins->selectedItems(), 
+  this->removeSelectedPlugins(this->Ui->localPlugins->selectedItems(),
     this->Server, false);
   this->onLocalSelectionChanged();
 }
-  
+
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoteSelectionChanged()
 {
-  this->updateEnableState(this->remotePlugins,
-    this->removeRemote, this->loadSelected_Remote);
+  this->updateEnableState(this->Ui->remotePlugins,
+    this->Ui->removeRemote, this->Ui->loadSelected_Remote);
 }
 //----------------------------------------------------------------------------
 void pqPluginDialog::onLocalSelectionChanged()
 {
-  this->updateEnableState(this->localPlugins, 
-    this->removeLocal, this->loadSelected_Local);
+  this->updateEnableState(this->Ui->localPlugins,
+    this->Ui->removeLocal, this->Ui->loadSelected_Local);
 }
 //----------------------------------------------------------------------------
 void pqPluginDialog::updateEnableState(
@@ -467,10 +470,10 @@ void pqPluginDialog::updateEnableState(
       {
       shouldEnableLoad = true;
       break;
-      }     
-    }   
+      }
+    }
 
-  loadButton->setEnabled(shouldEnableLoad); 
+  loadButton->setEnabled(shouldEnableLoad);
   removeButton->setEnabled(num>0 ? 1 : 0);
 }
 

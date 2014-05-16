@@ -751,6 +751,14 @@ vtk_module_library(${vtk-module}
   ${__Module_MOC_SRCS}
   ${__Module_UI_SRCS})
 
+#the pqSGExportStateWizard has subclasses that directly access
+#the UI file, and currently we don't have a clean way to break this hard
+#dependency, so for no we install this ui file.
+if(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ui_pqExportStateWizard.h"
+          DESTINATION "${VTK_INSTALL_INCLUDE_DIR}")
+endif()
+
 #IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 #  # Headers
 #  GLOB_INSTALL_DEVELOPMENT(
