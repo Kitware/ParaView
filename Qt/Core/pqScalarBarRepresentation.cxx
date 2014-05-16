@@ -31,34 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqScalarBarRepresentation.h"
 
+#include "pqUndoStack.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMUndoElement.h"
 #include "vtkSMPropertyModificationUndoElement.h"
-
-#include <QtDebug>
-#include <QPointer>
-#include <QRegExp>
-
-#include "pqApplicationCore.h"
-#include "pqPipelineRepresentation.h"
-#include "pqProxy.h"
-#include "pqScalarsToColors.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqSMAdaptor.h"
-#include "pqUndoStack.h"
-
-//-----------------------------------------------------------------------------
-class pqScalarBarRepresentation::pqInternal
-{
-public:
-  QPointer<pqScalarsToColors> LookupTable;
-  vtkEventQtSlotConnect* VTKConnect;
-};
+#include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
 pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
@@ -68,162 +45,35 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
                                                      QObject* _parent)
   : Superclass(group, name, scalarbar, server, _parent)
 {
-  this->AutoHidden = false;
-  this->Internal = new pqScalarBarRepresentation::pqInternal();
-
-  this->Internal->VTKConnect = vtkEventQtSlotConnect::New();
-  this->Internal->VTKConnect->Connect(scalarbar->GetProperty("LookupTable"),
-    vtkCommand::ModifiedEvent, this, SLOT(onLookupTableModified()));
+  vtkEventQtSlotConnect* connector = this->getConnector();
 
   // Listen to start/end interactions to update the application undo-redo stack
   // correctly.
-  this->Internal->VTKConnect->Connect(scalarbar, vtkCommand::StartInteractionEvent,
+  connector->Connect(scalarbar, vtkCommand::StartInteractionEvent,
     this, SLOT(startInteraction()));
-  this->Internal->VTKConnect->Connect(scalarbar, vtkCommand::EndInteractionEvent,
+  connector->Connect(scalarbar, vtkCommand::EndInteractionEvent,
     this, SLOT(endInteraction()));
-
-  // load default values.
-  this->onLookupTableModified();
-
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
-    {
-    QObject::connect(this, SIGNAL(begin(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this, SIGNAL(addToActiveUndoSet(vtkUndoElement*)),
-      stack, SLOT(addToActiveUndoSet(vtkUndoElement*)));
-    QObject::connect(this, SIGNAL(end()),
-      stack, SLOT(endUndoSet()));
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarBarRepresentation::setVisible(bool visible)
-{
-  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Enabled"),
-    (visible? 1 : 0));
-  this->Superclass::setVisible(visible);
 }
 
 //-----------------------------------------------------------------------------
 pqScalarBarRepresentation::~pqScalarBarRepresentation()
 {
-  if (this->Internal->LookupTable)
-    {
-    this->Internal->LookupTable->removeScalarBar(this);
-    this->Internal->LookupTable = 0;
-    }
-
-  this->Internal->VTKConnect->Disconnect();
-  this->Internal->VTKConnect->Delete();
-  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-pqScalarsToColors* pqScalarBarRepresentation::getLookupTable() const
-{
-  return this->Internal->LookupTable;
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarBarRepresentation::onLookupTableModified()
-{
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-
-  vtkSMProxy* curLUTProxy =
-    pqSMAdaptor::getProxyProperty(this->getProxy()->GetProperty("LookupTable"));
-  pqScalarsToColors* curLUT = smmodel->findItem<pqScalarsToColors*>(curLUTProxy);
-
-  if (curLUT == this->Internal->LookupTable)
-    {
-    return;
-    }
-
-  if (this->Internal->LookupTable)
-    {
-    this->Internal->LookupTable->removeScalarBar(this);
-    }
-
-  this->Internal->LookupTable = curLUT;
-  if (this->Internal->LookupTable)
-    {
-    this->Internal->LookupTable->addScalarBar(this);
-    }
-}
-
-//-----------------------------------------------------------------------------
-QPair<QString, QString> pqScalarBarRepresentation::getTitle() const
-{
-  QString title = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("Title")).toString();
-
-  QString compTitle = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("ComponentTitle")).toString();
-
-  return QPair<QString, QString>(title.trimmed(), compTitle.trimmed());
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarBarRepresentation::setTitle(const QString& name, const QString& comp)
-{
-  if (QPair<QString, QString>(name, comp) == this->getTitle())
-    {
-    return;
-    }
-
-  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Title"),
-    name.trimmed());
-  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("ComponentTitle"),
-    comp.trimmed());
-  this->getProxy()->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarBarRepresentation::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-  if (!this->isVisible())
-    {
-    // For any non-visible display, we don't set its defaults.
-    return;
-    }
-
-  // Set default arrays and lookup table.
-  vtkSMProxy* proxy = this->getProxy();
-
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Selectable"), 0);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Enabled"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Resizable"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("Repositionable"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("TitleFontSize"), 12);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LabelFontSize"), 12);
-
-  // setup global property link. By default, color is linked with
-  // TextAnnotationColor.
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "TextAnnotationColor", proxy, "TitleColor");
-  globalPropertiesManager->SetGlobalPropertyLink(
-    "TextAnnotationColor", proxy, "LabelColor");
-
-  proxy->UpdateVTKObjects();
-}
-
 #define PUSH_PROPERTY(name) \
 {\
   vtkSMPropertyModificationUndoElement* elem =\
   vtkSMPropertyModificationUndoElement::New();\
   elem->ModifiedProperty(proxy, name);\
-  emit this->addToActiveUndoSet(elem);\
+  ADD_UNDO_ELEM(elem);\
   elem->Delete();\
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarBarRepresentation::startInteraction()
 {
-  emit this->begin("Move Color Legend");
+  BEGIN_UNDO_SET("Move Color Legend");
 
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
@@ -238,6 +88,6 @@ void pqScalarBarRepresentation::endInteraction()
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
   PUSH_PROPERTY("Orientation");
-  emit this->end();
+  END_UNDO_SET();
 }
 

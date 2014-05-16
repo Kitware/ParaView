@@ -302,7 +302,7 @@
        </widget>
       </item>
       <item row="3" column="2" >
-       <widget class="pqStandardColorButton" name="buttonColor" >
+       <widget class="pqColorChooserButtonWithPalettes" name="buttonColor" >
         <property name="sizePolicy" >
          <sizepolicy>
           <hsizetype>1</hsizetype>
@@ -650,9 +650,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqStandardColorButton</class>
+   <class>pqColorChooserButtonWithPalettes</class>
    <extends>QToolButton</extends>
-   <header>pqStandardColorButton.h</header>
+   <header>pqColorChooserButtonWithPalettes.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

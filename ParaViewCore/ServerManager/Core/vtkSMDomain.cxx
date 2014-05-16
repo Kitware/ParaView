@@ -17,12 +17,13 @@
 #include "vtkCommand.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkWeakPointer.h"
 #include "vtkSMSession.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStdString.h"
+#include "vtkWeakPointer.h"
 
 #include <map>
-#include "vtkStdString.h"
 #include <assert.h>
 
 struct vtkSMDomainInternals
@@ -137,6 +138,29 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
       }
     }
   return 1;
+}
+
+//---------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(
+  const char* function, int /*index=0*/)
+{
+  vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
+  if (!inputProperty)
+    {
+    return NULL;
+    }
+
+  vtkSMUncheckedPropertyHelper helper(inputProperty);
+  if (helper.GetNumberOfElements() > 0)
+    {
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
+    if (sp)
+      {
+      return sp->GetDataInformation(helper.GetOutputPort());
+      }
+    }
+
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

@@ -71,10 +71,20 @@ public:
   bool applyChangesImmediately() const
     { return this->ApplyChangesImmediately; }
 
+  /// When this is true, the panel uses a descriptive layout where the
+  /// documentation for properties is used instead of their labels. pqProxyWidget
+  /// automatically adopts this style of layout if <UseDocumentationForLabels />
+  /// hint is present in the proxy.
+  bool useDocumentationForLabels() const
+    { return this->UseDocumentationForLabels; }
+
   /// Returns a new widget that has the label and a h-line separator. This is
   /// used on the pqProxyWidget to separate groups. Other widgets can use it for
   /// the same purpose, as needed.
   static QWidget* newGroupLabelWidget(const QString& label, QWidget* parentWidget);
+
+  static bool useDocumentationForLabels(vtkSMProxy* proxy);
+  static const char* documentationText(vtkSMProperty* property);
 
 signals:
   /// This signal is fired as soon as the user starts editing in the widget. The
@@ -84,6 +94,10 @@ signals:
   /// This signal is fired as soon as the user is done with making an atomic
   /// change. changeAvailable() is always fired before changeFinished().
   void changeFinished();
+
+  /// Indicates that a restart of the program is required for the setting
+  /// to take effect.
+  void restartRequired();
 
 public slots:
   /// Updates the property widgets shown based on the filterText or
@@ -111,6 +125,10 @@ protected:
   void hideEvent(QHideEvent *event);
 
 private:
+  /// the actual constructor implementation.
+  void constructor(
+    vtkSMProxy* proxy, const QStringList &properties, QWidget *parent, Qt::WindowFlags flags);
+
   /// create all widgets
   void createWidgets(const QStringList &properties = QStringList());
 
@@ -128,6 +146,7 @@ private:
   Q_DISABLE_COPY(pqProxyWidget);
 
   bool ApplyChangesImmediately;
+  bool UseDocumentationForLabels;
   class pqInternals;
   pqInternals* Internals;
 };

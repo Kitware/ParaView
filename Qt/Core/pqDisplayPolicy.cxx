@@ -31,30 +31,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqDisplayPolicy.h"
 
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMRepresentationProxy.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMViewProxy.h"
-#include "vtkStructuredData.h"
-#include "vtkSMPropertyHelper.h"
-
 #include <QtDebug>
 #include <QString>
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqRenderView.h"
 #include "pqServer.h"
-#include "pqSpreadSheetView.h"
-#include "pqXYBarChartView.h"
-#include "pqXYChartView.h"
+#include "pqServerManagerModel.h"
+#include "pqView.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxy.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
@@ -64,178 +54,6 @@ pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
 //-----------------------------------------------------------------------------
 pqDisplayPolicy::~pqDisplayPolicy()
 {
-}
-
-//-----------------------------------------------------------------------------
-QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
-  bool update_pipeline) const
-{
-  QString view_type = QString::null;
-
-  if (!opPort ||
-    opPort->getServer()->getResource().scheme() == "catalyst")
-    {
-    return view_type;
-    }
-
-  pqPipelineSource* source = opPort->getSource();
-  if (update_pipeline)
-    {
-    source->updatePipeline();
-    }
-
-  // Some sources have hints that say that the output is to be treated as raw
-  // text. We flag such sources.
-  bool is_text = false;
-
-  vtkPVXMLElement* hints = source->getHints();
-  if (hints)
-    {
-    for (unsigned int cc=0; cc < hints->GetNumberOfNestedElements(); cc++)
-      {
-      vtkPVXMLElement* child = hints->GetNestedElement(cc);
-      if (child && child->GetName())
-        {
-        if (strcmp(child->GetName(), "View") == 0)
-          {
-          int port;
-          // If port exists, then it must match the port number for this port.
-          if (child->GetScalarAttribute("port", &port))
-            {
-            if (opPort->getPortNumber() != port)
-              {
-              continue;
-              }
-            }
-          if (child->GetAttribute("type"))
-            {
-            return child->GetAttribute("type");
-            }
-          }
-        else if (strcmp(child->GetName(), "OutputPort") == 0 &&
-          child->GetAttribute("type") &&
-          strcmp(child->GetAttribute("type"), "text") ==  0)
-          {
-          is_text = true;
-          }
-        }
-      }
-    }
-
-  // HACK: for now, when update_pipeline is false, we don't do any gather
-  // information as that can result in progress events which may case Qt paint
-  // issues.
-  vtkSMSourceProxy* spProxy = vtkSMSourceProxy::SafeDownCast(
-    source->getProxy());
-  if (!spProxy || (!update_pipeline && !spProxy->GetOutputPortsCreated()))
-    {
-    // If parts aren't created, don't update the information at all.
-    // Typically means that the filter hasn't been "Applied" even once and
-    // updating information on it may raise errors.
-    return view_type;
-    }
-
-  vtkPVDataInformation* datainfo = opPort->getDataInformation();
-  QString className = datainfo?  datainfo->GetDataClassName() : QString();
-
-  // Show table in spreadsheet view by default (unless the table is to be
-  // treated as a "string" source).
-  if (className == "vtkTable" && !is_text)
-    {
-    return pqSpreadSheetView::spreadsheetViewType(); 
-    }
-
-   // The proxy gives us no hint. In that case we try to determine the
-  // preferred view by looking at the output from the source.
-  return view_type;
-}
-
-//-----------------------------------------------------------------------------
-pqView* pqDisplayPolicy::getPreferredView(
-  pqOutputPort* opPort, pqView* currentView) const
-{
-  if (opPort && opPort->getServer() &&
-    opPort->getServer()->getResource().scheme() == "catalyst")
-    {
-    return 0;
-    }
-
-  pqObjectBuilder* builder =
-    pqApplicationCore::instance()->getObjectBuilder();
-  QString view_type = this->getPreferredViewType(opPort, true);
-
-  if (!view_type.isNull())
-    {
-    if (currentView && currentView->getViewType() == view_type)
-      {
-      // nothing to do, active view is preferred view.
-      }
-    else
-      {
-      // if the currentView is empty (no visible representations), destroy it
-      if(currentView && !currentView->getNumberOfVisibleRepresentations())
-        {
-        builder->destroy(currentView);
-        }
-      // Create the preferred view only if the current one is not of the same type
-      // as the preferred view.
-      currentView = builder->createView(view_type, opPort->getServer());
-      }
-    }
-
-  if (!currentView || (currentView && !currentView->canDisplay(opPort)))
-    {
-    vtkPVDataInformation* info = opPort->getDataInformation();
-    // GetDataSetType() == -1 signifies that there's no data to show.
-    if (info->GetDataSetType() != -1)
-      {
-      // The user has selected a frame that is empty or the current view cannot
-      // show the data and the the source does not
-      // recommend any view type. Hence we create a render view.
-      currentView = builder->createView(pqRenderView::renderViewType(),
-        opPort->getServer());
-      }
-    }
-
-  // Try to provide the best interaction mode to it if possible
-  pqRenderView* view = qobject_cast<pqRenderView*>(currentView);
-  if(view && 0 == vtkSMPropertyHelper(view->getProxy(), "Representations").GetNumberOfElements())
-    {
-    view->updateInteractionMode(opPort);
-    }
-
-  // No hints. We don't know what type of view is suitable
-  // for this proxy. Just check if it can be shown in current view.
-  return  currentView;
-}
-
-//-----------------------------------------------------------------------------
-pqDataRepresentation* pqDisplayPolicy::createPreferredRepresentation(
-  pqOutputPort* opPort, pqView* view, bool dont_create_view) const
-{
-
-  if (!view && dont_create_view)
-    {
-    return NULL;
-    }
-
-  if (dont_create_view && (view && !view->canDisplay(opPort)))
-    {
-    return NULL;
-    }
-
-  if (!dont_create_view)
-    {
-    view = this->getPreferredView(opPort, view);
-    if (!view)
-      {
-      // Could not create a view suitable for this source.
-      // Creation of the display can no longer proceed.
-      return NULL;
-      }
-    }
-
-  return this->setRepresentationVisibility(opPort, view, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -254,50 +72,29 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
     return 0;
     }
 
-  pqDataRepresentation* repr = opPort->getRepresentation(view);
+  vtkSMSourceProxy* source =
+    vtkSMSourceProxy::SafeDownCast(opPort->getSource()->getProxy());
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  vtkSMProxy* reprProxy = controller->SetVisibility(
+    source, opPort->getPortNumber(),
+    (view? view->getViewProxy() : NULL), visible);
 
-  if (!repr && !visible)
-    {
-    // isn't visible already, nothing to change.
-    return 0;
-    }
-  else if(!repr)
-    {
-    // FIXME:UDA -- can't we simply use createPreferredRepresentation?
-    // No repr exists for this view.
-    // First check if the view exists. If not, we will create a "suitable" view.
-    if (!view)
-      {
-      view = this->getPreferredView(opPort, view);
-      }
-    if (view)
-      {
-      repr = this->newRepresentation(opPort, view);
-      }
-    }
-  if (!repr)
-    {
-    if (view && view->canDisplay(opPort))
-      {
-      qDebug() << "Cannot show the data in the current view although "
-        "the view reported that it can show the data.";
-      }
-    return 0;
-    }
+  return pqApplicationCore::instance()->getServerManagerModel()->findItem
+    <pqDataRepresentation*>(reprProxy);
+}
 
-  repr->setVisible(visible);
-
-  // If this is the only source displayed in the view, reset the camera to make
-  // sure its visible. Only do so if a source is being turned ON. Otherwise when
-  // the next to last source is turned off, the camera would be reset to fit the
-  // last remaining one which would be unexpected to the user
-  // (hence the conditional on "visible")
-  if(view->getNumberOfVisibleRepresentations()==1 && visible)
+//-----------------------------------------------------------------------------
+QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* port, bool update_pipeline) const
+{
+  (void) update_pipeline;
+  if (port)
     {
-    view->resetDisplay();
+    vtkSMSourceProxy* source =
+      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+    return QString(controller->GetPreferredViewType(source, port->getPortNumber()));
     }
-
-  return repr;
+  return QString();
 }
 
 //-----------------------------------------------------------------------------
@@ -306,13 +103,16 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
 {
   if (view && port)
     {
-    pqDataRepresentation *repr = port->getRepresentation(view);
-    if (repr && repr->isVisible())
+    vtkSMSourceProxy* source =
+      vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+    if (controller->GetVisibility(source, port->getPortNumber(), view->getViewProxy()))
       {
-      // If repr for the view exists and is visible
       return Visible;
       }
-    else if (repr || view->canDisplay(port))
+
+    if (view->getViewProxy()->CanDisplayData(source, port->getPortNumber()))
       {
       // If repr exists, or a new repr can be created for the port (since port
       // is show-able in the view)
@@ -325,29 +125,19 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
       }
     }
 
-
-  // If the port is on a CatalystSession or it hasn't been initialized yet,
-  // it has "no visiblily", so to speak.
-  if (port && port->getServer() &&
-    port->getServer()->getResource().scheme() == "catalyst")
-    {
-    return NotApplicable;
-    }
-  if (port && port->getSource() &&
-    port->getSource()->modifiedState() == pqProxy::UNINITIALIZED)
-    {
-    return NotApplicable;
-    }
+  //// If the port is on a CatalystSession or it hasn't been initialized yet,
+  //// it has "no visiblily", so to speak.
+  //if (port && port->getServer() &&
+  //  port->getServer()->getResource().scheme() == "catalyst")
+  //  {
+  //  return NotApplicable;
+  //  }
+  //if (port && port->getSource() &&
+  //  port->getSource()->modifiedState() == pqProxy::UNINITIALIZED)
+  //  {
+  //  return NotApplicable;
+  //  }
 
   // Default behavior if no view is present
   return Hidden;
-}
-
-
-//-----------------------------------------------------------------------------
-pqDataRepresentation* pqDisplayPolicy::newRepresentation(pqOutputPort* port,
-  pqView* view) const
-{
-  return pqApplicationCore::instance()->getObjectBuilder()->
-    createDataRepresentation(port, view);
 }

@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include "pqApplicationCore.h"
-#include "pqHelperProxyRegisterUndoElement.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -97,7 +96,6 @@ pqProxy::~pqProxy()
                       this,
                       SLOT(onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*)));
 
-  this->clearHelperProxies();
   delete this->Internal;
 }
 
@@ -169,49 +167,6 @@ void pqProxy::updateHelperProxies() const
     }
   iter->Delete();
 }
-
-//-----------------------------------------------------------------------------
-void pqProxy::clearHelperProxies()
-{
-  if ( this->getServer() && this->getServer()->session() &&
-       !this->getServer()->session()->IsMultiClients())
-    {
-    // This is sort-of-a-hack to ensure that when this operation (delete)
-    // is undo, all the helper proxies are discovered correctly. This needs to
-    // happen only when all helper proxies are still around.
-    pqHelperProxyRegisterUndoElement* elem =
-        pqHelperProxyRegisterUndoElement::New();
-    elem->SetOperationTypeToUndo(); // Undo deletion
-    elem->RegisterHelperProxies(this);
-    ADD_UNDO_ELEM(elem);
-    elem->Delete();
-    }
-
-  vtkSMSessionProxyManager* pxm = this->proxyManager();
-  if (pxm)
-    {
-    QString groupname = QString("pq_helper_proxies.%1").arg(
-      this->getProxy()->GetGlobalIDAsString());
-
-    pqProxyInternal::ProxyListsType::iterator iter
-      = this->Internal->ProxyLists.begin();
-    for (;iter != this->Internal->ProxyLists.end(); ++iter)
-      {
-      foreach(vtkSMProxy* proxy, iter.value())
-        {
-        const char* name = pxm->GetProxyName(
-          groupname.toLatin1().data(), proxy);
-        if (name)
-          {
-          pxm->UnRegisterProxy(groupname.toLatin1().data(), name, proxy);
-          }
-        }
-      }
-    }
-
-  this->Internal->ProxyLists.clear();
-}
-
 
 //-----------------------------------------------------------------------------
 QList<QString> pqProxy::getHelperKeys() const
@@ -311,21 +266,6 @@ void pqProxy::setModifiedState(ModifiedState modified)
     {
     this->Modified = modified;
     emit this->modifiedStateChanged(this);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqProxy::setDefaultPropertyValues()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  if (proxy->IsA("vtkSMCompoundSourceProxy"))
-    {
-    // We don't reset properties on custom filter.
-    proxy->UpdateVTKObjects();
-    }
-  else
-    {
-    proxy->ResetPropertiesToDefault();
     }
 }
 

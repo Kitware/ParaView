@@ -66,9 +66,3 @@ void vtkSMMapProperty::Copy(vtkSMProperty* src)
 {
   this->Superclass::Copy(src);
 }
-
-//---------------------------------------------------------------------------
-void vtkSMMapProperty::ResetToDefaultInternal()
-{
-  this->Superclass::ResetToDefaultInternal();
-}

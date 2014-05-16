@@ -81,7 +81,7 @@ public:
     REPLY_GATHER_INFORMATION_TAG    = 55627,
     REPLY_PULL                      = 55628,
     REPLY_LAST_RESULT               = 55629,
-    EXECUTE_STREAM_TAG              = 55630,
+    EXECUTE_STREAM_TAG              = 55630
   };
 
   // Description:

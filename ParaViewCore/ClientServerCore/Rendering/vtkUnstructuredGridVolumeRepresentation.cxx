@@ -76,10 +76,6 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
   this->Actor->SetProperty(this->Property);
   this->Actor->SetMapper(this->DefaultMapper);
   this->Actor->SetLODMapper(this->LODMapper);
-
-  this->ColorArrayName = 0;
-  this->ColorAttributeType = POINT_DATA;
-
   vtkMath::UninitializeBounds(this->DataBounds);
 }
 
@@ -94,8 +90,6 @@ vtkUnstructuredGridVolumeRepresentation::~vtkUnstructuredGridVolumeRepresentatio
 
   this->LODGeometryFilter->Delete();
   this->LODMapper->Delete();
-
-  this->SetColorArrayName(0);
 
   delete this->Internals;
   this->Internals = 0;
@@ -281,12 +275,23 @@ bool vtkUnstructuredGridVolumeRepresentation::RemoveFromView(vtkView* view)
 void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
 {
   vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
-  activeMapper->SelectScalarArray(this->ColorArrayName);
+  const char* colorArrayName = NULL;
+  int fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 
-  if (this->ColorArrayName && this->ColorArrayName[0])
+  vtkInformation *info = this->GetInputArrayInformation(0);
+  if (info &&
+    info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
+    info->Has(vtkDataObject::FIELD_NAME()))
+    {
+    colorArrayName = info->Get(vtkDataObject::FIELD_NAME());
+    fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
+    }
+
+  activeMapper->SelectScalarArray(colorArrayName);
+  if (colorArrayName && colorArrayName[0])
     {
     this->LODMapper->SetScalarVisibility(1);
-    this->LODMapper->SelectColorArray(this->ColorArrayName);
+    this->LODMapper->SelectColorArray(colorArrayName);
     }
   else
     {
@@ -294,23 +299,21 @@ void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
     this->LODMapper->SelectColorArray(static_cast<const char*>(NULL));
     }
 
-  switch (this->ColorAttributeType)
+  switch (fieldAssociation)
     {
-  case CELL_DATA:
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
     activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     break;
 
-  case POINT_DATA:
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
   default:
     activeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
     this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
     break;
     }
-
   this->Actor->SetMapper(activeMapper);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkUnstructuredGridVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)

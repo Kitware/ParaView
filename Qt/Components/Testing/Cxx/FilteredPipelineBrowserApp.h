@@ -25,5 +25,5 @@ protected:
 public slots:
   void processTest();
   void updateSelectedFilter(int);
-
+  void showSettings();
 };

@@ -35,9 +35,10 @@
 #include "vtkSMSessionObject.h"
 #include "vtkClientServerID.h" // needed for saving animation in batch script
 
+class vtkPVDataInformation;
+class vtkPVXMLElement;
 class vtkSMProperty;
 class vtkSMProxyLocator;
-class vtkPVXMLElement;
 //BTX
 struct vtkSMDomainInternals;
 //ETX
@@ -140,6 +141,12 @@ protected:
   // the vtkCommand::UpdateDataEvent is fired by the proxies contained in that
   // required property.
   void AddRequiredProperty(vtkSMProperty *prop, const char *function);
+
+  // Description:
+  // Helper method to get vtkPVDataInformation from input proxy connected to the
+  // required property with the given function.
+  virtual vtkPVDataInformation* GetInputDataInformation(
+    const char* function, int index=0);
 
   // Description:
   // When the IsOptional flag is set, IsInDomain() always returns true.

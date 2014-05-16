@@ -15,52 +15,27 @@
 #include "pqPythonView.h"
 
 // Server Manager Includes.
-#include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
-#include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
-#include "vtkRenderWindow.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMInteractionUndoStackBuilder.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPythonViewProxy.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMUndoStack.h"
 
 // Qt Includes.
 #include <QList>
-#include <QMainWindow>
-#include <QMap>
-#include <QMapIterator>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPoint>
 #include <QPointer>
-#include <QStatusBar>
 #include <QtDebug>
 
 // ParaView Includes.
-#include "pqApplicationCore.h"
-#include "pqCoreUtilities.h"
-#include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqQVTKWidget.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqSettings.h"
-#include "pqSMAdaptor.h"
-#include "pqTimer.h"
-#include "pqRenderView.h"
 
 #include <string>
 
@@ -282,71 +257,4 @@ bool pqPythonView::eventFilter(QObject* caller, QEvent* e)
     }
   
   return Superclass::eventFilter(caller, e);
-}
-
-//-----------------------------------------------------------------------------
-bool pqPythonView::canDisplay(pqOutputPort* opPort) const
-{
-  if(this->Superclass::canDisplay(opPort))
-    {
-    return true;
-    }
-
-  pqPipelineSource* source = opPort? opPort->getSource() :0;
-  vtkSMSourceProxy* sourceProxy = source? 
-    vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
-  if(!opPort|| !source ||
-    opPort->getServer()->GetConnectionID() !=
-    this->getServer()->GetConnectionID() || !sourceProxy ||
-    sourceProxy->GetOutputPortsCreated()==0)
-    {
-    return false;
-    }
-
-  vtkPVXMLElement* hints = sourceProxy->GetHints();
-  if (hints)
-    {
-    // If the source has an hint as follows, then it's a text producer and must
-    // be is display-able.
-    //  <Hints>
-    //    <OutputPort name="..." index="..." type="text" />
-    //  </Hints>
-
-    unsigned int numElems = hints->GetNumberOfNestedElements(); 
-    for (unsigned int cc=0; cc < numElems; cc++)
-      {
-      int index;
-      vtkPVXMLElement* child = hints->GetNestedElement(cc);
-      if (child->GetName() &&
-        strcmp(child->GetName(), "OutputPort") == 0 &&
-        child->GetScalarAttribute("index", &index) &&
-        index == opPort->getPortNumber() &&
-        child->GetAttribute("type") &&
-        strcmp(child->GetAttribute("type"), "text") == 0)
-        {
-        return true;
-        }
-      }
-    }
-  
-  vtkPVDataInformation* dinfo = opPort->getDataInformation();
-  if (dinfo->GetDataSetType() == -1)
-    {
-    return false;
-    }
-
-
-  return true;
-}
-
-//-----------------------------------------------------------------------------
-vtkImageData* pqPythonView::captureImage(int magnification)
-{
-  if (this->getWidget()->isVisible())
-    {
-    return this->getPythonViewProxy()->CaptureWindow(magnification);
-    }
-
-  // Don't return any image when the view is not visible.
-  return NULL;
 }

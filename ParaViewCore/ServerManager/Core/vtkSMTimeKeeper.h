@@ -70,6 +70,12 @@ public:
   void RemoveTimeSource(vtkSMSourceProxy*);
   void RemoveAllTimeSources();
 
+  // Description:
+  // List of proxies that provide time. TimestepValues property has a set of
+  // timesteps provided by all the sources added to this property alone.
+  void AddSuppressedTimeSource(vtkSMSourceProxy*);
+  void RemoveSuppressedTimeSource(vtkSMSourceProxy*);
+
 //BTX
 protected:
   vtkSMTimeKeeper();

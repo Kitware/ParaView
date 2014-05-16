@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPVRepresentationProxy - a composite representation proxy suitable
-// for showing data in ParaView.
+// .NAME vtkSMPVRepresentationProxy - representation for "Render View" like
+// views in ParaView.
 // .SECTION Description
 // vtkSMPVRepresentationProxy combines surface representation and volume
 // representation proxies typically used for displaying data.
@@ -32,6 +32,8 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
+
+class vtkPVArrayInformation;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPVRepresentationProxy : public vtkSMRepresentationProxy
 {
@@ -54,6 +56,23 @@ public:
     vtkSMPVRepresentationProxy* self =
       vtkSMPVRepresentationProxy::SafeDownCast(proxy);
     return self? self->GetUsingScalarColoring() : false;
+    }
+
+  // Description:
+  // Enable/disable scalar coloring using the specified array. This will setup a
+  // color and opacity transfer functions using vtkSMTransferFunctionProxy
+  // instance. If arrayname is NULL, then scalar coloring is turned off.
+  // \c field_association must be one of vtkDataObject::AttributeTypes.
+  virtual bool SetScalarColoring(const char* arrayname, int attribute_type);
+
+  // Description:
+  // Safely call SetScalarColoring() after casting the proxy to the appropriate
+  // type.
+  static bool SetScalarColoring(vtkSMProxy* proxy, const char* arrayname, int attribute_type)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->SetScalarColoring(arrayname, attribute_type) : false;
     }
 
   // Description:
@@ -132,10 +151,66 @@ public:
       self->RescaleTransferFunctionToDataRangeOverTime(arrayname, attribute_type) : false;
     }
 
+  // Description:
+  // Set the scalar bar visibility. This will create a new scalar bar as needed.
+  // Scalar bar is only shown if scalar coloring is indeed being used.
+  virtual bool SetScalarBarVisibility(vtkSMProxy* view, bool visibile);
+  static bool SetScalarBarVisibility(vtkSMProxy* proxy, vtkSMProxy* view, bool visibile)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->SetScalarBarVisibility(view, visibile) : false;
+    }
+
+  // Description:
+  // While SetScalarBarVisibility can be used to hide a scalar bar, it will
+  // always simply hide the scalar bar even if its being used by some other
+  // representation. Use this method instead to only hide the scalar/color bar
+  // if no other visible representation in the view is mapping data using the
+  // scalar bar.
+  virtual bool HideScalarBarIfNotNeeded(vtkSMProxy* view);
+  static bool HideScalarBarIfNotNeeded(vtkSMProxy* repr, vtkSMProxy* view)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(repr);
+    return self? self->HideScalarBarIfNotNeeded(view) : false;
+    }
+
+  // Description:
+  // Returns the array information for the data array used for scalar coloring,
+  // if any. Otherwise returns NULL.
+  virtual vtkPVArrayInformation* GetArrayInformationForColorArray();
+  static vtkPVArrayInformation* GetArrayInformationForColorArray(vtkSMProxy* proxy)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->GetArrayInformationForColorArray() : NULL;
+    }
+
+  // Description:
+  // Call vtkSMRepresentationProxy::GetProminentValuesInformation() for the
+  // array used for scalar color, if any. Otherwise returns NULL.
+  virtual vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
+    double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
+  static vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
+    vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->GetProminentValuesInformationForColorArray(
+      uncertaintyAllowed, fraction) : NULL;
+    }
+
+  // Description:
+  // Overridden to ensure when picking representation types that require scalar
+  // colors, scalar coloring it setup properly. Currently this is hard-coded for
+  // Volume and Slice representation types.
+  virtual bool SetRepresentationType(const char* type);
+
 protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy();
-  
+
   // Description:
   // Rescales transfer function ranges using the array information provided.
   virtual bool RescaleTransferFunctionToDataRange(

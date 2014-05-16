@@ -58,7 +58,7 @@
 #include "vtkSMFileListDomain.h"
 #include "vtkSMFixedTypeDomain.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
-#include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMGlobalPropertiesProxy.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMImplicitPlaneRepresentationProxy.h"
 #include "vtkSMInputArrayDomain.h"
@@ -114,7 +114,6 @@
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMStateVersionController.h"
-#include "vtkSMStateVersionControllerBase.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTesting.h"
@@ -184,7 +183,7 @@ int main(int , char *[])
   PRINT_SELF(vtkSMFileListDomain);
   PRINT_SELF(vtkSMFixedTypeDomain);
   PRINT_SELF(vtkSMGlobalPropertiesLinkUndoElement);
-  PRINT_SELF(vtkSMGlobalPropertiesManager);
+  PRINT_SELF(vtkSMGlobalPropertiesProxy);
   PRINT_SELF(vtkSMIdTypeVectorProperty);
   PRINT_SELF(vtkSMImplicitPlaneRepresentationProxy);
   PRINT_SELF(vtkSMInputArrayDomain);
@@ -240,7 +239,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMStateLoader);
   PRINT_SELF(vtkSMStateLocator);
   PRINT_SELF(vtkSMStateVersionController);
-  PRINT_SELF(vtkSMStateVersionControllerBase);
   PRINT_SELF(vtkSMStringListDomain);
   PRINT_SELF(vtkSMStringVectorProperty);
   PRINT_SELF(vtkSMTesting);

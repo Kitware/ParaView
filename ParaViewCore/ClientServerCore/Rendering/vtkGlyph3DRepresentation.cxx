@@ -175,13 +175,13 @@ void vtkGlyph3DRepresentation::UpdateColoringParameters()
     }
 
   this->GlyphMapper->SetScalarVisibility(1);
-  this->GlyphMapper->SelectColorArray(this->ColorArrayName);
+  this->GlyphMapper->SelectColorArray(this->Mapper->GetArrayName());
   this->GlyphMapper->SetUseLookupTableScalarRange(1);
   this->GlyphMapper->SetScalarMode(
     VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 
   this->LODGlyphMapper->SetScalarVisibility(1);
-  this->LODGlyphMapper->SelectColorArray(this->ColorArrayName);
+  this->LODGlyphMapper->SelectColorArray(this->Mapper->GetArrayName());
   this->LODGlyphMapper->SetUseLookupTableScalarRange(1);
   this->LODGlyphMapper->SetScalarMode(
     VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);

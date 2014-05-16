@@ -15,9 +15,7 @@ This module is intended for use with by simple.py."""
 #
 #==============================================================================
 
-import paraview
-paraview.compatibility.major = 3
-paraview.compatibility.minor = 5
+import paraview.simple
 import servermanager
 import os
 from math import sqrt

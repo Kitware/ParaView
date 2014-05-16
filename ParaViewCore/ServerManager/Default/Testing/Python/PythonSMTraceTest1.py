@@ -15,6 +15,9 @@ from paraview import smtrace
 from paraview import smtesting
 import sys
 
+settings = servermanager.vtkPVGeneralSettings()
+settings.SetScalarBarMode(settings.MANUAL_SCALAR_BARS)
+
 # Process command line args and get temp dir
 smtesting.ProcessCommandLineArguments()
 tempDir = smtesting.TempDir
@@ -79,7 +82,7 @@ clip.ClipType.Normal = [0.0, 0.0, 1.0]
 
 APPLY()
 
-bar = CreateScalarBar( Orientation='Horizontal', Title='RTData', Position2=[0.6, 0.2], Enabled=1, LabelFontSize=12, LookupTable=a1_RTData_PVLookupTable, TitleFontSize=20, Position=[0.2, 0.0] )
+bar = CreateScalarBar( Orientation='Horizontal', Title='RTData', ComponentTitle="", Position2=[0.6, 0.2], Enabled=1, LabelFontSize=12, LookupTable=a1_RTData_PVLookupTable, TitleFontSize=20, Position=[0.2, 0.0] )
 GetRenderView().Representations.append(bar)
 
 APPLY()

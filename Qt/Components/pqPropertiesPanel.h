@@ -39,6 +39,7 @@ class pqDataRepresentation;
 class pqOutputPort;
 class pqPipelineSource;
 class pqPropertyWidget;
+class pqProxy;
 class pqView;
 class vtkSMProperty;
 class vtkSMProxy;
@@ -49,9 +50,14 @@ class vtkSMProxy;
 /// mechanism to provide custom widgets/panels for the proxy or its
 /// representations. pqPropertiesPanel uses pqProxyWidget to create and manage
 /// the widgets for the source and representation proxies.
+///
+/// pqPropertiesPanel comprises of 3 separate parts for showing the source
+/// properties, display properties and view properties. One can control which
+/// parts are shown by setting the panelMode property.
 class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
 {
   Q_OBJECT
+  Q_PROPERTY(int panelMode READ panelMode WRITE setPanelMode);
   typedef QWidget Superclass;
 public:
   pqPropertiesPanel(QWidget *parent = 0);
@@ -78,6 +84,18 @@ public:
   static int suggestedHorizontalSpacing() { return 4; }
   static int suggestedVerticalSpacing() { return 4; }
 
+  enum
+    {
+    SOURCE_PROPERTIES=0x01,
+    DISPLAY_PROPERTIES=0x02,
+    VIEW_PROPERTIES=0x04,
+    ALL_PROPERTIES=SOURCE_PROPERTIES|DISPLAY_PROPERTIES|VIEW_PROPERTIES
+    };
+
+  /// Get/Set the panel mode.
+  void setPanelMode(int val);
+  int panelMode() const { return this->PanelMode; }
+
 public slots:
   /// Apply the changes properties to the proxies.
   ///
@@ -91,12 +109,6 @@ public slots:
   /// properties panel.
   void reset();
 
-  /// Deletes the current proxy.
-  ///
-  /// This is triggered when the user clicks the "Delete" button on the
-  /// properties panel.
-  void deleteProxy();
-
   /// Shows the help dialog.
   ///
   /// This is triggered when the user clicks the "?" button on the
@@ -107,16 +119,27 @@ signals:
   /// This signal is emitted after the user clicks the apply button.
   void applied();
 
+  /// This signal is emitted after a panel for a proxy is applied.
+  void applied(pqProxy*);
+
   /// This signal is emitted when the current view changes.
   void viewChanged(pqView*);
 
   /// This signal is emitted when the user clicks the help button.
   void helpRequested(const QString &groupname, const QString &proxyType);
 
+  /// This signal is emitted when the user clicks the delete button.
+  void deleteRequested(pqPipelineSource* source);
+
 private slots:
   void setView(pqView*);
   void setOutputPort(pqOutputPort*);
   void setRepresentation(pqDataRepresentation*);
+
+  /// This is called when the user clicks the "Delete" button on the
+  /// properties panel. This triggers the deleteRequested() signal with proper
+  /// arguments.
+  void deleteProxy();
 
   /// slot gets called when a proxy is deleted.
   void proxyDeleted(pqPipelineSource*);
@@ -139,6 +162,10 @@ private slots:
   /// Updates the state of all the buttons, apply/reset/delete.
   void updateButtonState();
 
+  /// called when vtkPVGeneralSettings instance is modified. We update the
+  /// auto-apply status.
+  void generalSettingsChanged();
+
 protected:
   /// Update the panel to show the widgets for the given pair.
   void updatePanel(pqOutputPort* port);
@@ -154,6 +181,7 @@ private:
   friend class pqInternals;
 
   pqInternals* Internals;
+  int PanelMode;
 
   Q_DISABLE_COPY(pqPropertiesPanel)
 };

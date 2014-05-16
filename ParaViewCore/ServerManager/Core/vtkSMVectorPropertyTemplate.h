@@ -27,6 +27,7 @@
 #include "vtkCommand.h"
 #include <vtkPVXMLElement.h>
 #include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include <typeinfo>
 #include <limits>
 
@@ -305,7 +306,7 @@ public:
     }
 
   //---------------------------------------------------------------------------
-  void ResetToDefaultInternal()
+  void ResetToXMLDefaults()
     {
     if (this->DefaultsValid && this->DefaultValues != this->Values)
       {

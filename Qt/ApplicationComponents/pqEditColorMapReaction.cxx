@@ -31,13 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqEditColorMapReaction.h"
 
-#include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqSMAdaptor.h"
-#include "pqStandardColorLinkAdaptor.h"
 #include "pqUndoStack.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 
@@ -74,13 +74,14 @@ void pqEditColorMapReaction::editColorMap()
     return;
     }
 
-  if (repr->getColorField() == pqPipelineRepresentation::solidColor())
+  if (!vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
     {
     // Get the color property.
     vtkSMProxy *proxy = repr->getProxy();
     vtkSMProperty *diffuse = proxy->GetProperty("DiffuseColor");
     vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
-    QString reprType = repr->getRepresentationType();
+    QString reprType = vtkSMPropertyHelper(
+      proxy, "Representation", /*quiet=*/true).GetAsString();
     bool use_ambient = (reprType == "Wireframe" ||
       reprType == "Points"||
       reprType == "Outline");
@@ -97,7 +98,8 @@ void pqEditColorMapReaction::editColorMap()
         }
 
       // Let the user pick a new color.
-      color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget());
+      color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget(),
+        "Pick Solid Color", QColorDialog::DontUseNativeDialog);
       if(color.isValid())
         {
         // Set the properties to the new color.
@@ -109,10 +111,7 @@ void pqEditColorMapReaction::editColorMap()
         pqSMAdaptor::setMultipleElementProperty(
           use_ambient? ambient : diffuse, rgb);
         proxy->UpdateVTKObjects();
-        // need to break any global-property link that might have existed
-        // with this property.
-        pqStandardColorLinkAdaptor::breakLink(proxy, 
-          use_ambient? "AmbientColor" : "DiffuseColor");
+        repr->renderViewEventually();
         END_UNDO_SET();
         }
       }
@@ -134,6 +133,5 @@ void pqEditColorMapReaction::editColorMap()
       }
     }
 
-  repr->renderViewEventually();
 }
 

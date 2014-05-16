@@ -265,6 +265,12 @@ unsigned int vtkSMStringVectorProperty::GetElementIndex(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::ResetToXMLDefaults()
+{
+  this->Internals->ResetToXMLDefaults();
+}
+
+//---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
                                                  vtkPVXMLElement* element)
 {

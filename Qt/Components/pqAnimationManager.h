@@ -61,10 +61,6 @@ public:
   /// Returns the scene on the server connection, if any.
   pqAnimationScene* getScene(pqServer* server) const;
 
-  /// Creates a new scene for the active server connection,
-  /// if possible, and returns it.
-  pqAnimationScene* createActiveScene();
-
   /// In the given \c scene, returns the cue that animates the given 
   /// \c index of the given \c property on the \c proxy.
   /// This method simply calls getCue() on the pqAnimationScene instance.
@@ -115,9 +111,6 @@ signals:
 public slots:
   // Called when the active server changes.
   void onActiveServerChanged(pqServer*);
-  /// Refreshes state of scenes to the current application settings.  Should be
-  /// called when the application settings change.
-  void updateApplicationSettings();
 
 protected slots:
   void onProxyAdded(pqProxy*);

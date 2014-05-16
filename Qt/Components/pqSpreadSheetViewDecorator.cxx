@@ -46,17 +46,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 
 // ParaView Includes.
-#include "vtkSpreadSheetView.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMViewProxy.h"
-#include "pqApplicationCore.h"
 #include "pqComboBoxDomain.h"
 #include "pqDataRepresentation.h"
-#include "pqDisplayPolicy.h"
+#include "pqOutputPort.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
 #include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewModel.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMViewProxy.h"
+#include "vtkSpreadSheetView.h"
 
 class pqSpreadSheetViewDecorator::pqInternal : public Ui::pqSpreadSheetViewDecorator
 {
@@ -80,7 +81,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
-  Superclass(view)
+  Superclass(view->getWidget()) // we make our parent the view's widget.
 {
   this->Spreadsheet = view;
   QWidget* container = view->getWidget();
@@ -164,11 +165,9 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
 {
   if (port)
     {
-    pqDisplayPolicy* dpolicy = 
-      pqApplicationCore::instance()->getDisplayPolicy();
-    // Will create new display if needed. May also create new view 
-    // as defined by the policy.
-    if (dpolicy->setRepresentationVisibility(port, this->Spreadsheet, true))
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+    if (controller->Show(port->getSourceProxy(), port->getPortNumber(),
+        this->Spreadsheet->getViewProxy()))
       {
       this->Spreadsheet->render();
       }

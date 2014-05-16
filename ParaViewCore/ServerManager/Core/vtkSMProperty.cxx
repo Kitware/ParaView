@@ -15,7 +15,9 @@
 #include "vtkSMProperty.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -24,8 +26,8 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
-#include "vtkCommand.h"
 
 #include <vector>
 #include <vtksys/ios/sstream>
@@ -60,6 +62,7 @@ vtkSMProperty::vtkSMProperty()
   this->Documentation = 0;
   this->Repeatable = 0;
   this->IgnoreSynchronization = 0;
+  this->Links = NULL;
 
   this->Hints = 0;
   this->BlockModifiedEvents = false;
@@ -79,6 +82,7 @@ vtkSMProperty::vtkSMProperty()
 //---------------------------------------------------------------------------
 vtkSMProperty::~vtkSMProperty()
 {
+  this->RemoveFromSourceLink();
   this->SetCommand(0);
   delete this->PInternals;
   this->SetXMLName(0);
@@ -91,6 +95,11 @@ vtkSMProperty::~vtkSMProperty()
   this->SetPanelVisibility(0);
   this->SetPanelVisibilityDefaultForRepresentation(0);
   this->SetPanelWidget(0);
+  if (this->Links)
+    {
+    this->Links->Delete();
+    this->Links = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -156,6 +165,49 @@ void vtkSMProperty::AddDomain(const char* name, vtkSMDomain* domain)
     domain->SetProperty(this); // doesn't change reference count.
     domain->AddObserver(vtkCommand::DomainModifiedEvent,
       this, &vtkSMProperty::InvokeDomainModifiedEvent);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::AddLinkedProperty(vtkSMProperty* targetProperty)
+{
+  if (!targetProperty)
+    {
+    return;
+    }
+
+  // This sets up the target property to take on the value of this property
+  // whenever it is updated.
+  if (!this->Links)
+    {
+    this->Links = vtkSMPropertyLink::New();
+    this->Links->AddLinkedProperty(this->GetParent(), this->GetXMLName(), vtkSMLink::INPUT);
+    }
+
+  this->Links->AddLinkedProperty(targetProperty->GetParent(), targetProperty->GetXMLName(),
+                                 vtkSMLink::OUTPUT);
+  targetProperty->PInternals->LinkSourceProperty = this;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::RemoveLinkedProperty(vtkSMProperty* targetProperty)
+{
+  if (!targetProperty || !this->Links)
+    {
+    return;
+    }
+
+  this->Links->RemoveLinkedProperty(targetProperty->GetParent(), targetProperty->GetXMLName());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::RemoveFromSourceLink()
+{
+  if (this->PInternals->LinkSourceProperty)
+    {
+    // Remove this instance as a subscriber to the source proxy
+    this->PInternals->LinkSourceProperty->RemoveLinkedProperty(this);
+    this->PInternals->LinkSourceProperty = NULL;
     }
 }
 
@@ -510,19 +562,36 @@ void vtkSMProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::ResetToDefault()
+bool vtkSMProperty::ResetToDomainDefaults()
 {
+  if (vtkProcessModule::GetProcessModule() &&
+    vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
+    {
+    // when using symmetric mpi, we disable domains since they don't always have
+    // the most updated information.
+    return false;
+    }
+
   this->DomainIterator->Begin();
-  while(!this->DomainIterator->IsAtEnd())
+  while (!this->DomainIterator->IsAtEnd())
     {
     if (this->DomainIterator->GetDomain()->SetDefaultValues(this))
       {
-      return;
+      return true;
       }
     this->DomainIterator->Next();
     }
 
-  this->ResetToDefaultInternal();
+  return false;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::ResetToDefault()
+{
+  if (!this->ResetToDomainDefaults())
+    {
+    this->ResetToXMLDefaults();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -551,6 +620,15 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   else
     {
     os << "(none)" << endl;
+    }
+  if (this->Links)
+    {
+    os << indent << "Links: " << endl;
+    this->Links->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "Links: none" << endl;
     }
 }
 

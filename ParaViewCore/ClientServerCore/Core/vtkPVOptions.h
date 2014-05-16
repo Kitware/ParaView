@@ -145,6 +145,11 @@ public:
   vtkGetMacro(EnableStackTrace, int);
   vtkSetMacro(EnableStackTrace, int);
 
+  // Description:
+  // Flag for disabling loading of options and settings stored by the
+  // application. Often used for testing.
+  vtkGetMacro(DisableRegistry, int);
+
   enum ProcessTypeEnum
     {
     PARAVIEW = 0x2,
@@ -223,6 +228,7 @@ private:
   int SatelliteMessageIds;
   int PrintMonitors;
   int EnableStackTrace;
+  int DisableRegistry;
   int ForceMPIInitOnClient;
   int ForceNoMPIInitOnClient;
 

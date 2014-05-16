@@ -33,14 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
-#include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
+#include "vtkNew.h"
+#include "vtkPVGeneralSettings.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMTransferFunctionManager.h"
+#include "vtkSMViewProxy.h"
 
 #include <QDebug>
 #include <QSet>
@@ -139,10 +145,14 @@ bool pqDeleteReaction::canDeleteSelected()
 //-----------------------------------------------------------------------------
 void pqDeleteReaction::deleteAll()
 {
-  BEGIN_UNDO_SET("Delete All");
-  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-  builder->destroyPipelineProxies();
-  END_UNDO_SET();
+  BEGIN_UNDO_EXCLUDE();
+  if (pqServer* server = pqActiveObjects::instance().activeServer())
+    {
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    controller->ResetSession(server->session());
+    }
+  END_UNDO_EXCLUDE();
+  CLEAR_UNDO_STACK();
   pqApplicationCore::instance()->render();
 }
 
@@ -155,34 +165,138 @@ void pqDeleteReaction::deleteSelected()
     return;
     }
 
-
   vtkSMProxySelectionModel* selModel =
     pqActiveObjects::instance().activeSourcesSelectionModel();
 
   QSet<pqPipelineSource*> selectedSources;
   ::pqDeleteReactionGetSelectedSet(selModel, selectedSources);
+  pqDeleteReaction::deleteSources(selectedSources);
+}
 
-  if (selectedSources.size() == 1)
+//-----------------------------------------------------------------------------
+void pqDeleteReaction::deleteSource(pqPipelineSource* source)
+{
+  if (source)
     {
-    pqPipelineSource* source = (*selectedSources.begin());
+    QSet<pqPipelineSource*> sources;
+    sources.insert(source);
+    pqDeleteReaction::deleteSources(sources);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqDeleteReaction::deleteSources(QSet<pqPipelineSource*>& sources)
+{
+  if (sources.size() == 0) { return; }
+
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  if (sources.size() == 1)
+    {
+    pqPipelineSource* source = (*sources.begin());
     BEGIN_UNDO_SET(QString("Delete %1").arg(source->getSMName()));
     }
   else
     {
     BEGIN_UNDO_SET("Delete Selection");
     }
-  while (selectedSources.size() > 0)
+
+  /// loop attempting to delete each source.
+  bool something_deleted = false;
+  bool something_deleted_in_current_iteration = false;
+  do
     {
-    foreach (pqPipelineSource* source, selectedSources)
+    something_deleted_in_current_iteration = false;
+    foreach (pqPipelineSource* source, sources)
       {
       if (source && source->getNumberOfConsumers() == 0)
         {
-        selectedSources.remove(source);
-        pqApplicationCore::instance()->getObjectBuilder()->destroy(source);
+        pqDeleteReaction::aboutToDelete(source);
+
+        sources.remove(source);
+        controller->UnRegisterProxy(source->getProxy());
+        something_deleted = true;
+        something_deleted_in_current_iteration = true;
         break;
         }
       }
     }
+  while (something_deleted_in_current_iteration && (sources.size() > 0));
+
+  // update scalar bars, if needed
+  int sbMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
+  if (something_deleted &&
+    (sbMode == vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS ||
+     sbMode == vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS))
+    {
+    vtkNew<vtkSMTransferFunctionManager> tmgr;
+    pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+    QList<pqView*> views = smmodel->findItems<pqView*>();
+    foreach (pqView* view, views)
+      {
+      tmgr->UpdateScalarBars(view->getProxy(),
+        vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
+      }
+    }
+
   END_UNDO_SET();
   pqApplicationCore::instance()->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqDeleteReaction::aboutToDelete(pqPipelineSource* source)
+{
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
+  if (!filter)
+    {
+    return;
+    }
+
+  pqOutputPort* firstInput = filter->getInput(filter->getInputPortName(0), 0);
+  if (!firstInput)
+    {
+    return;
+    }
+
+  //---------------------------------------------------------------------------
+  // Make input the active source is "source" was currently active.
+  pqActiveObjects& activeObjects = pqActiveObjects::instance();
+  if (activeObjects.activeSource() == source)
+    {
+    activeObjects.setActivePort(firstInput);
+    }
+
+  //---------------------------------------------------------------------------
+  // Make input visible if it was hidden in views this source was displayed.
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  QList<pqView*> views = filter->getViews();
+  foreach (pqView* view, views)
+    {
+    vtkSMViewProxy* viewProxy = view->getViewProxy();
+    if (controller->GetVisibility(source->getSourceProxy(), 0, viewProxy))
+      {
+      // this will also hide scalar bars if needed.
+      controller->Hide(source->getSourceProxy(), 0, viewProxy);
+
+      // if firstInput had a representation in this view that was hidden, show
+      // it. We don't want to create a new representation, however.
+      if (viewProxy->FindRepresentation(
+          firstInput->getSourceProxy(), firstInput->getPortNumber()))
+        {
+        vtkSMProxy* repr = controller->SetVisibility(
+          firstInput->getSourceProxy(), firstInput->getPortNumber(),
+          viewProxy, true);
+        // since we turned on input representation, show scalar bar, if the user
+        // preference is such.
+        if (repr &&
+          vtkPVGeneralSettings::GetInstance()->GetScalarBarMode() ==
+          vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS &&
+          vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr))
+          {
+          vtkSMPVRepresentationProxy::SetScalarBarVisibility(repr, viewProxy, true);
+          }
+        view->render();
+        }
+      }
+    }
+  //---------------------------------------------------------------------------
 }

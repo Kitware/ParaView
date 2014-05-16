@@ -453,37 +453,35 @@ void vtkStreamingParticlesRepresentation::PrintSelf(ostream& os, vtkIndent inden
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamingParticlesRepresentation::SetColorAttributeType(int type)
+void vtkStreamingParticlesRepresentation::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, const char *name)
 {
-  switch (type)
-    {
-  case vtkGeometryRepresentation::CELL_DATA:
-    this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
-    break;
+  this->Superclass::SetInputArrayToProcess(
+    idx, port, connection, fieldAssociation, name);
 
-  case vtkGeometryRepresentation::POINT_DATA:
-  default:
-    this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    break;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkStreamingParticlesRepresentation::SetColorArrayName(const char* arrayname)
-{
-  if (arrayname && arrayname[0])
+  if (name && name[0])
     {
     this->Mapper->SetScalarVisibility(1);
-    this->Mapper->SelectColorArray(arrayname);
+    this->Mapper->SelectColorArray(name);
     this->Mapper->SetUseLookupTableScalarRange(1);
     }
   else
     {
     this->Mapper->SetScalarVisibility(0);
-    const char* null = NULL;
-    this->Mapper->SelectColorArray(null);
+    this->Mapper->SelectColorArray(static_cast<const char*>(NULL));
     }
 
+  switch (fieldAssociation)
+    {
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+    this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+  default:
+    this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+    break;
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>294</width>
-    <height>284</height>
+    <height>298</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -225,5 +225,38 @@ p, li { white-space: pre-wrap; }
  <resources>
   <include location="../pqComponents.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>ok</sender>
+   <signal>clicked()</signal>
+   <receiver>SaveSnapshotDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>150</x>
+     <y>274</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>146</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>SaveSnapshotDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>241</x>
+     <y>274</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>146</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -136,15 +136,25 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
                    this, SLOT(updateScalarsVectorsEnable()),
                    Qt::QueuedConnection);
 
-  if (object_proxy->modifiedState() == pqProxy::UNINITIALIZED)
-    {
-    this->updateScaleFactor();
-    }
+
+  // HACK: Oh we need to get rid of this panel!!!
+  this->connect(object_proxy, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+    SLOT(updateScaleFactorIfNeeded()));
+  this->updateScaleFactorIfNeeded();
 }
 
 //-----------------------------------------------------------------------------
 pqGlyphPanel::~pqGlyphPanel()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqGlyphPanel::updateScaleFactorIfNeeded()
+{
+  if (this->referenceProxy()->modifiedState() == pqProxy::UNINITIALIZED)
+    {
+    this->updateScaleFactor();
+    }
 }
 
 //-----------------------------------------------------------------------------

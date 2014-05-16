@@ -171,12 +171,13 @@ protected:
   vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
   std::set<unsigned int> CompositeIndices; //the selected blocks
 
-  vtkChartSelectionRepresentation* SelectionRepresentation;
+  vtkWeakPointer<vtkChartSelectionRepresentation> SelectionRepresentation;
 private:
   vtkChartRepresentation(const vtkChartRepresentation&); // Not implemented
   void operator=(const vtkChartRepresentation&); // Not implemented
 
   vtkTimeStamp PrepareForRenderingTime;
+  vtkSmartPointer<vtkChartSelectionRepresentation> DummyRepresentation;
 //ETX
 };
 

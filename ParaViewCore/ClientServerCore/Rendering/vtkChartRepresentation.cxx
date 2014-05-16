@@ -49,9 +49,10 @@ vtkStandardNewMacro(vtkChartRepresentation);
 //----------------------------------------------------------------------------
 vtkChartRepresentation::vtkChartRepresentation()
 {
+  this->DummyRepresentation = vtkSmartPointer<vtkChartSelectionRepresentation>::New();
+
   this->SelectionRepresentation = 0;
-  vtkNew<vtkChartSelectionRepresentation> selectionRepr;
-  this->SetSelectionRepresentation(selectionRepr.GetPointer());
+  this->SetSelectionRepresentation(this->DummyRepresentation);
 
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->EnableServerSideRendering = false;
@@ -69,12 +70,11 @@ vtkChartRepresentation::~vtkChartRepresentation()
 void vtkChartRepresentation::SetSelectionRepresentation(
   vtkChartSelectionRepresentation* repr)
 {
-  if (this->SelectionRepresentation && (repr != this->SelectionRepresentation))
+  if (this->SelectionRepresentation)
     {
     this->SelectionRepresentation->SetChartRepresentation(NULL);
     }
-  vtkSetObjectBodyMacro(SelectionRepresentation,
-    vtkChartSelectionRepresentation, repr);
+  this->SelectionRepresentation = repr;
   if (repr)
     {
     repr->SetChartRepresentation(this);

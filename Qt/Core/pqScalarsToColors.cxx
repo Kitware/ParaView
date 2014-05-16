@@ -48,12 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
 {
 public:
-  QList<QPointer<pqScalarBarRepresentation> > ScalarBars;
   vtkEventQtSlotConnect* VTKConnect;
 
   pqScalarsToColorsInternal()
@@ -79,6 +79,16 @@ pqScalarsToColors::pqScalarsToColors(const QString& group, const QString& name,
   this->Internal->VTKConnect->Connect(proxy->GetProperty("UseLogScale"),
                                       vtkCommand::ModifiedEvent,
                                       this, SLOT(checkRange()));
+  if (vtkSMProperty* prop = proxy->GetProperty("VectorComponent"))
+    {
+    this->Internal->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent,
+      this, SIGNAL(componentOrModeChanged()));
+    }
+  if (vtkSMProperty* prop = proxy->GetProperty("VectorMode"))
+    {
+    this->Internal->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent,
+      this, SIGNAL(componentOrModeChanged()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -88,35 +98,13 @@ pqScalarsToColors::~pqScalarsToColors()
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarsToColors::addScalarBar(pqScalarBarRepresentation* sb)
-{
-  if (this->Internal->ScalarBars.indexOf(sb) == -1)
-    {
-    this->Internal->ScalarBars.push_back(sb);
-    emit this->scalarBarsChanged();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarsToColors::removeScalarBar(pqScalarBarRepresentation* sb)
-{
-  if (this->Internal->ScalarBars.removeAll(sb) > 0)
-    {
-    emit this->scalarBarsChanged();
-    }
-}
-
-//-----------------------------------------------------------------------------
 pqScalarBarRepresentation* pqScalarsToColors::getScalarBar(pqRenderViewBase* ren) const
 {
-  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
-    {
-    if (sb && (sb->getView() == ren))
-      {
-      return sb;
-      }
-    }
-  return 0;
+  vtkSMProxy* proxy =
+    vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
+      this->getProxy(), ren->getProxy());
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  return proxy? smmodel->findItem<pqScalarBarRepresentation*>(proxy) : NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -145,45 +133,45 @@ bool pqScalarsToColors::getScalarRangeLock() const
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::hideUnusedScalarBars()
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel* smmodel = core->getServerManagerModel();
+  // FIXME:
+  //pqApplicationCore* core = pqApplicationCore::instance();
+  //pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  QList<pqPipelineRepresentation*> displays =
-    smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
+  //QList<pqPipelineRepresentation*> displays =
+  //  smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
 
-  bool used_at_all = false;
-  foreach(pqPipelineRepresentation* display, displays)
-    {
-    if (display->isVisible() &&
-      display->getColorField(true) != pqPipelineRepresentation::solidColor() &&
-      display->getLookupTableProxy() == this->getProxy())
-      {
-      used_at_all = true;
-      break;
-      }
-    }
-  if (!used_at_all)
-    {
-    foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
-      {
-      sb->setVisible(false);
-      sb->renderViewEventually();
-      }
-    }
+  //bool used_at_all = false;
+  //foreach(pqPipelineRepresentation* display, displays)
+  //  {
+  //  if (display->isVisible() &&
+  //    display->getColorField(true) != pqPipelineRepresentation::solidColor() &&
+  //    display->getLookupTableProxy() == this->getProxy())
+  //    {
+  //    used_at_all = true;
+  //    break;
+  //    }
+  //  }
+  //if (!used_at_all)
+  //  {
+  //  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+  //    {
+  //    sb->setVisible(false);
+  //    sb->renderViewEventually();
+  //    }
+  //  }
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::setScalarRange(double min, double max)
 {
+  pqSMAdaptor::setElementProperty(
+    this->getProxy()->GetProperty("ScalarRangeInitialized"), 1);
   if (min > max)
     {
     double t = min;
     min = max;
     max = t;
     }
-
-  pqSMAdaptor::setElementProperty(
-    this->getProxy()->GetProperty("ScalarRangeInitialized"), 1);
 
   QPair <double, double> current_range = this->getScalarRange();
   if (current_range.first == min && current_range.second == max)
@@ -248,25 +236,6 @@ QPair<double, double> pqScalarsToColors::getScalarRange() const
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarsToColors::setWholeScalarRange(double min, double max)
-{
-  if (this->getScalarRangeLock())
-    {
-    return;
-    }
-
-  if (pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("ScalarRangeInitialized")).toBool())
-    {
-    QPair<double, double> curRange = this->getScalarRange();
-    min = (min < curRange.first)?  min :  curRange.first;
-    max = (max > curRange.second)?  max :  curRange.second;
-    }
-
-  this->setScalarRange(min, max);
-}
-
-//-----------------------------------------------------------------------------
 bool pqScalarsToColors::getUseLogScale() const
 {
   vtkSMProxy *proxy = this->getProxy();
@@ -318,42 +287,14 @@ void pqScalarsToColors::setVectorMode(Mode mode, int comp)
 }
 
 //-----------------------------------------------------------------------------
-bool pqScalarsToColors::getIndexedLookup()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  return pqSMAdaptor::getElementProperty( proxy->GetProperty( "IndexedLookup" ) ).toBool();
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarsToColors::setIndexedLookup( bool indexedLookup )
-{
-  vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setElementProperty( proxy->GetProperty( "IndexedLookup" ), indexedLookup );
-  proxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-QList<QVariant> pqScalarsToColors::getAnnotations()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  return pqSMAdaptor::getMultipleElementProperty( proxy->GetProperty( "Annotations" ) );
-}
-
-//-----------------------------------------------------------------------------
-void pqScalarsToColors::setAnnotations( const QList<QVariant>& annotations )
-{
-  vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setMultipleElementProperty( proxy->GetProperty( "Annotations" ), annotations );
-  proxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
 void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 {
-  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
-    {
-    sb->setTitle(sb->getTitle().first, component);
-    }
+  (void) component;
+  // FIXME:
+  //foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+  //  {
+  //  sb->setTitle(sb->getTitle().first, component);
+  //  }
 }
 
 //-----------------------------------------------------------------------------

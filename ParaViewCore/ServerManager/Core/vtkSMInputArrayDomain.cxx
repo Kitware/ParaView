@@ -14,16 +14,13 @@
 =========================================================================*/
 #include "vtkSMInputArrayDomain.h"
 
-#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMStringVectorProperty.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
 
@@ -33,11 +30,12 @@ bool vtkSMInputArrayDomain::AutomaticPropertyConversion = false;
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
   "point",
   "cell",
+  "field",
   "any",
   "vertex",
   "edge",
   "row",
-  "none"
+  NULL
 };
 
 //---------------------------------------------------------------------------
@@ -65,31 +63,23 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMProperty* property)
     return 0;
     }
 
-  unsigned int i;
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(property);
-  if (pp)
+  vtkSMUncheckedPropertyHelper helper(property);
+  for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; cc++)
     {
-    unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
-    for (i=0; i<numProxs; i++)
+    if (!this->IsInDomain(
+        vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(cc)),
+        helper.GetOutputPort(cc)))
       {
-      if (!this->IsInDomain(
-            vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i)),
-            (ip? ip->GetUncheckedOutputPortForConnection(i):0)) )
-        {
-        return 0;
-        }
+      return 0;
       }
-    return 1;
     }
 
-  return 0;
+  return (helper.GetNumberOfElements() > 0);
 }
 
 //---------------------------------------------------------------------------
 int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy,
-                                      int outputport/*=0*/)
+                                      unsigned int outputport/*=0*/)
 {
   if (!proxy)
     {
@@ -104,279 +94,148 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy,
     return 0;
     }
 
-  if (this->AttributeType == vtkSMInputArrayDomain::POINT ||
-      this->AttributeType == vtkSMInputArrayDomain::ANY ||
-      (this->AutomaticPropertyConversion &&
-      this->AttributeType == vtkSMInputArrayDomain::CELL))
+  int attribute_types_to_try[] =
     {
-    if (this->AttributeInfoContainsArray(proxy, outputport,
-        info->GetPointDataInformation()))
+    vtkDataObject::POINT,
+    vtkDataObject::CELL,
+    vtkDataObject::FIELD,
+    vtkDataObject::VERTEX,
+    vtkDataObject::EDGE,
+    vtkDataObject::ROW,
+    -1
+    };
+
+  for (int kk=0; attribute_types_to_try[kk] != -1; kk++)
+    {
+    int attribute_type = attribute_types_to_try[kk];
+    
+    // check if attribute_type is acceptable.
+    if (this->IsAttributeTypeAcceptable(attribute_type))
       {
-      return 1;
+      vtkPVDataSetAttributesInformation* dsaInfo =
+        info->GetAttributeInformation(attribute_types_to_try[kk]);
+      if (this->HasAcceptableArray(dsaInfo))
+        {
+        return 1;
+        }
       }
     }
-
-  if (this->AttributeType == vtkSMInputArrayDomain::CELL||
-      this->AttributeType == vtkSMInputArrayDomain::ANY ||
-      (this->AutomaticPropertyConversion &&
-      this->AttributeType == vtkSMInputArrayDomain::POINT))
-    {
-    if (this->AttributeInfoContainsArray(proxy, outputport,
-        info->GetCellDataInformation()))
-      {
-      return 1;
-      }
-    }
-
-  if (this->AttributeType == vtkSMInputArrayDomain::VERTEX||
-      this->AttributeType == vtkSMInputArrayDomain::ANY)
-    {
-    if (this->AttributeInfoContainsArray(proxy, outputport,
-        info->GetVertexDataInformation()))
-      {
-      return 1;
-      }
-    }
-
-  if (this->AttributeType == vtkSMInputArrayDomain::EDGE||
-      this->AttributeType == vtkSMInputArrayDomain::ANY)
-    {
-    if (this->AttributeInfoContainsArray(proxy, outputport,
-        info->GetEdgeDataInformation()))
-      {
-      return 1;
-      }
-    }
-
-  if (this->AttributeType == vtkSMInputArrayDomain::ROW||
-      this->AttributeType == vtkSMInputArrayDomain::ANY)
-    {
-    if (this->AttributeInfoContainsArray(proxy, outputport,
-        info->GetRowDataInformation()))
-      {
-      return 1;
-      }
-    }
-
-  if (this->AttributeType == vtkSMInputArrayDomain::NONE||
-      this->AttributeType == vtkSMInputArrayDomain::ANY)
-    {
-    if (this->AttributeInfoContainsArray(proxy, outputport,
-                                         info->GetFieldDataInformation()))
-      {
-      return 1;
-      }
-    }
-
-
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkSMInputArrayDomain::CheckForArray(
-  vtkPVArrayInformation* arrayInfo, vtkPVDataSetAttributesInformation* attrInfo)
+bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
+  int required_type, int attribute_type, int *acceptable_as_type/*=NULL*/)
 {
-  if (!attrInfo || !arrayInfo)
+  if (acceptable_as_type)
     {
-    return 0;
+    *acceptable_as_type = attribute_type;
     }
 
-  int num = attrInfo->GetNumberOfArrays();
-  for (int idx = 0; idx < num; ++idx)
+  if (required_type == ANY)
     {
-    vtkPVArrayInformation* curInfo = attrInfo->GetArrayInformation(idx);
-    if (curInfo == arrayInfo)
+    return attribute_type == POINT||
+      attribute_type == CELL||
+      attribute_type == EDGE||
+      attribute_type == VERTEX||
+      attribute_type == ROW;
+    }
+
+  switch (attribute_type)
+    {
+  case vtkDataObject::POINT:
+    if (required_type == POINT)
       {
-      return 1;
+      return true;
       }
+    if (required_type == CELL && vtkSMInputArrayDomain::AutomaticPropertyConversion)
+      {
+      // this a POINT array, however since AutomaticPropertyConversion is ON,
+      // this array can is acceptable as a CELL array. In other words, caller
+      // can pretend this array is a CELL array and VTK pipeline will take care
+      // of it.
+      if (acceptable_as_type)
+        {
+        *acceptable_as_type = CELL;
+        }
+      return true;
+      }
+
+  case vtkDataObject::CELL:
+    if (required_type == CELL)
+      {
+      return true;
+      }
+    if (required_type == POINT && vtkSMInputArrayDomain::AutomaticPropertyConversion)
+      {
+      // this a CELL array, however since AutomaticPropertyConversion is ON,
+      // this array can is acceptable as a POINT array. In other words, caller
+      // can pretend this array is a POINT array and VTK pipeline will take care
+      // of it.
+      if (acceptable_as_type)
+        {
+        *acceptable_as_type = POINT;
+        }
+      return true;
+      }
+
+  default:
+    return required_type == attribute_type;
+    }
+}
+//----------------------------------------------------------------------------
+bool vtkSMInputArrayDomain::IsArrayAcceptable(
+    int required_number_of_components, vtkPVArrayInformation* arrayInfo)
+{
+  if (arrayInfo == NULL)
+    {
+    return false;
     }
 
-  return 0;
+  if (
+      // acceptable if the domain doesn't dictate any component requirements.
+      required_number_of_components <= 0 ||
+
+      // acceptable if the components match those in array
+      arrayInfo->GetNumberOfComponents() == required_number_of_components ||
+
+      // when using automatic property conversion, we support automatic extraction
+      // of a single component from multi-component arrays. However, we still
+      // don't support automatic extraction of multiple components, so if the
+      // filter needs more than 1 component, then the number of components must
+      // match.
+      (vtkSMInputArrayDomain::AutomaticPropertyConversion &&
+       required_number_of_components == 1 &&
+       arrayInfo->GetNumberOfComponents() > 1))
+      {
+      return true;
+      }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
-int vtkSMInputArrayDomain::IsFieldValid(
-  vtkSMSourceProxy* proxy, int outputport, vtkPVArrayInformation* arrayInfo)
+bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(int attributeType)
 {
-  return this->IsFieldValid(proxy, outputport, arrayInfo, 0);
+  return vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
+    this->AttributeType, attributeType, NULL);
 }
 
 //----------------------------------------------------------------------------
-int vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(
-  int dsaAssociation)
-{
-  switch (dsaAssociation)
-    {
-     case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-        return vtkSMInputArrayDomain::POINT;
-     case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-        return vtkSMInputArrayDomain::CELL;
-     case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
-        // TODO: Handle this case.
-        return vtkSMInputArrayDomain::POINT;
-     case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-        return vtkSMInputArrayDomain::VERTEX;
-     case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-        return vtkSMInputArrayDomain::EDGE;
-     case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-        return vtkSMInputArrayDomain::ROW;
-     case vtkDataObject::FIELD_ASSOCIATION_NONE:
-        return vtkSMInputArrayDomain::NONE;
-      }
-  return vtkDataObject::FIELD_ASSOCIATION_POINTS;
-}
-
-//----------------------------------------------------------------------------
-int vtkSMInputArrayDomain::IsFieldValid(
-  vtkSMSourceProxy* proxy, int outputport,
-  vtkPVArrayInformation* arrayInfo, int bypass)
-{
-  vtkPVDataInformation* info = proxy->GetDataInformation(outputport);
-  if (!info)
-    {
-    return 0;
-    }
-
-  int attributeType = this->AttributeType;
-  if (!bypass)
-    {
-    // FieldDataSelection typically is a SelectInputScalars kind of property
-    // in which case the attribute type is at index 3 or is a simple
-    // type choosing property in which case it's a vtkSMIntVectorProperty.
-    vtkSMProperty* pfds = this->GetRequiredProperty("FieldDataSelection");
-    vtkSMStringVectorProperty* fds = vtkSMStringVectorProperty::SafeDownCast(
-      pfds);
-    vtkSMIntVectorProperty* ifds = vtkSMIntVectorProperty::SafeDownCast(pfds);
-    if (fds || ifds)
-      {
-      int val = (fds)? atoi(fds->GetUncheckedElement(3)) :
-        ifds->GetUncheckedElement(0);
-      attributeType =
-        vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(val);
-      }
-    }
-
-  int isField = 0;
-  if ( this->AutomaticPropertyConversion &&
-      (attributeType == vtkSMInputArrayDomain::POINT ||
-       attributeType == vtkSMInputArrayDomain::CELL ||
-       attributeType == vtkSMInputArrayDomain::ANY) )
-    {
-    isField = this->CheckForArray(arrayInfo, info->GetPointDataInformation());
-    if (!isField)
-      {
-      isField = this->CheckForArray(arrayInfo, info->GetCellDataInformation());
-      }
-    }
-  if (!isField &&
-      (attributeType == vtkSMInputArrayDomain::POINT ||
-       attributeType == vtkSMInputArrayDomain::ANY) )
-    {
-    isField = this->CheckForArray(arrayInfo, info->GetPointDataInformation());
-    }
-
-   if (!isField &&
-     (attributeType == vtkSMInputArrayDomain::CELL ||
-      attributeType == vtkSMInputArrayDomain::ANY) )
-    {
-    isField = this->CheckForArray(arrayInfo, info->GetCellDataInformation());
-    }
-
-  if (!isField &&
-      (attributeType == vtkSMInputArrayDomain::VERTEX||
-       attributeType == vtkSMInputArrayDomain::ANY) )
-    {
-    isField = this->CheckForArray(arrayInfo, info->GetVertexDataInformation());
-    }
-
-  if (!isField &&
-      (attributeType == vtkSMInputArrayDomain::EDGE||
-       attributeType == vtkSMInputArrayDomain::ANY) )
-    {
-    isField = this->CheckForArray(arrayInfo, info->GetEdgeDataInformation());
-    }
-
-  if (!isField &&
-      (attributeType == vtkSMInputArrayDomain::ROW||
-       attributeType == vtkSMInputArrayDomain::ANY) )
-    {
-    isField = this->CheckForArray(arrayInfo, info->GetRowDataInformation());
-    }
-
-  if (!isField &&
-      (attributeType == vtkSMInputArrayDomain::NONE||
-       attributeType == vtkSMInputArrayDomain::ANY) )
-    {
-    isField = this->CheckForArray(arrayInfo, info->GetFieldDataInformation());
-    }
-
-  if (!isField)
-    {
-    return 0;
-    }
-
-  if (this->AutomaticPropertyConversion)
-    {
-    // when using automatic property conversion, we support automatic extraction
-    // of a single component from multi-component arrays. However, we still
-    // don't support automatic extraction of multiple components, so if the
-    // filter needs more than 1 component, then the number of components must
-    // match.
-    if (this->NumberOfComponents > 1 &&
-      this->NumberOfComponents != arrayInfo->GetNumberOfComponents())
-      {
-      return 0;
-      }
-    }
-  else
-    {
-    if (this->NumberOfComponents > 0 &&
-      this->NumberOfComponents != arrayInfo->GetNumberOfComponents())
-      {
-      return 0;
-      }
-    }
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkSMInputArrayDomain::AttributeInfoContainsArray(
-  vtkSMSourceProxy* proxy,
-  int outputport,
+bool vtkSMInputArrayDomain::HasAcceptableArray(
   vtkPVDataSetAttributesInformation* attrInfo)
 {
-  if (!attrInfo)
-    {
-    return 0;
-    }
-
-  int num = attrInfo->GetNumberOfArrays();
-  for (int idx = 0; idx < num; ++idx)
+  for (int idx=0, num = attrInfo->GetNumberOfArrays(); idx < num; ++idx)
     {
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(idx);
-    if (this->IsFieldValid(proxy, outputport, arrayInfo, 1))
+    if (vtkSMInputArrayDomain::IsArrayAcceptable(
+      this->NumberOfComponents, arrayInfo))
       {
-      return 1;
+      return true;
       }
     }
 
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMInputArrayDomain::ChildSaveState(vtkPVXMLElement* domainElement)
-{
-  this->Superclass::ChildSaveState(domainElement);
-
-  vtkPVXMLElement* inputArrayElem = vtkPVXMLElement::New();
-  inputArrayElem->SetName("InputArray");
-  inputArrayElem->AddAttribute("attribute_type",
-                               this->GetAttributeTypeAsString());
-  inputArrayElem->AddAttribute("number_of_components",
-                               this->GetNumberOfComponents());
-  domainElement->AddNestedElement(inputArrayElem);
-  inputArrayElem->Delete();
-
+  return false;
 }
 
 //---------------------------------------------------------------------------
@@ -384,6 +243,13 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
   vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);
+
+  if (this->GetRequiredProperty("FieldDataSelection"))
+    {
+    vtkWarningMacro(
+      "vtkSMInputArrayDomain no longer supports required property "
+      "'FieldDataSelection'. Please update the domain definition.");
+    }
 
   const char* attribute_type = element->GetAttribute("attribute_type");
   if (attribute_type)
@@ -394,6 +260,7 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
   int numComponents;
   if (element->GetScalarAttribute("number_of_components", &numComponents))
     {
+    numComponents = numComponents < 0? 0 : numComponents;
     this->SetNumberOfComponents(numComponents);
     }
 
@@ -403,7 +270,7 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
 //---------------------------------------------------------------------------
 const char* vtkSMInputArrayDomain::GetAttributeTypeAsString()
 {
-  if (this->AttributeType < vtkSMInputArrayDomain::LAST_ATTRIBUTE_TYPE)
+  if (this->AttributeType < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES)
     {
     return vtkSMInputArrayDomainAttributeTypes[this->AttributeType];
     }
@@ -414,19 +281,25 @@ const char* vtkSMInputArrayDomain::GetAttributeTypeAsString()
 //---------------------------------------------------------------------------
 void vtkSMInputArrayDomain::SetAttributeType(const char* type)
 {
-  if ( ! type )
+  if (type == NULL)
     {
     vtkErrorMacro("No type specified");
     return;
     }
-  unsigned char cc;
-  for ( cc = 0; cc < vtkSMInputArrayDomain::LAST_ATTRIBUTE_TYPE; cc ++ )
+
+  for (int cc=0; cc < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES; ++cc)
     {
-    if ( strcmp(type, vtkSMInputArrayDomainAttributeTypes[cc]) == 0 )
+    if (strcmp(type, vtkSMInputArrayDomainAttributeTypes[cc]) == 0)
       {
       this->SetAttributeType(cc);
       return;
       }
+    }
+  // for old code where none==field.
+  if (strcmp(type, "none") == 0)
+    {
+    this->SetAttributeType(vtkSMInputArrayDomain::FIELD);
+    return;
     }
   vtkErrorMacro("Unrecognized attribute type: " << type);
 }
@@ -450,7 +323,6 @@ bool vtkSMInputArrayDomain::GetAutomaticPropertyConversion()
 void vtkSMInputArrayDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
   os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
   os << indent << "AttributeType: " << this->AttributeType
     << " (" << this->GetAttributeTypeAsString() << ")" << endl;

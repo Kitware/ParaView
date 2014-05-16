@@ -15,13 +15,14 @@
 #include "vtkSMProxyListDomain.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkPVXMLElement.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMSessionProxyManager.h"
 
+#include <cassert>
 #include <string>
 #include <vector>
 
@@ -55,6 +56,26 @@ vtkSMProxyListDomain::vtkSMProxyListDomain()
 vtkSMProxyListDomain::~vtkSMProxyListDomain()
 {
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxyListDomain::CreateProxies(vtkSMSessionProxyManager* pxm)
+{
+  assert(pxm);
+
+  this->Internals->ProxyList.clear();
+  for (vtkSMProxyListDomainInternals::VectorOfProxyInfo::iterator iter =
+    this->Internals->ProxyTypeList.begin();
+    iter != this->Internals->ProxyTypeList.end(); ++iter)
+    {
+    vtkSMProxy* proxy = pxm->NewProxy(
+      iter->GroupName.c_str(), iter->ProxyName.c_str());
+    if (proxy)
+      {
+      this->Internals->ProxyList.push_back(proxy);
+      proxy->FastDelete();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -276,6 +297,17 @@ int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* element,
       }
     }
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMProxyListDomain::SetProxies(vtkSMProxy** proxies, unsigned int count)
+{
+  vtkSMProxyListDomainInternals::VectorOfProxies newValues(proxies, proxies+count);
+  if (this->Internals->ProxyList != newValues)
+    {
+    this->Internals->ProxyList = newValues;
+    this->DomainModified();
+    }
 }
 
 //-----------------------------------------------------------------------------

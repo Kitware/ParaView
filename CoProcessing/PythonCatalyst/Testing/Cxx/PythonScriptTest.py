@@ -45,8 +45,7 @@ def DoCoProcessing(datadescription):
 
   DataRepresentation2 = Show(trivialproducer)
   DataRepresentation2.LookupTable = MakeBlueToRedLT(2702, 3202)
-  DataRepresentation2.ColorArrayName = 'Pressure'
-  DataRepresentation2.ColorAttributeType = 'POINT_DATA'
+  DataRepresentation2.ColorArrayName = ('POINTS', 'Pressure')
   DataRepresentation2.Representation="Surface"
   DataRepresentation2 = Show(Contour1)
   RenderView1 = Render()
@@ -59,28 +58,10 @@ def DoCoProcessing(datadescription):
   fname = 'CPPressure' + str(timestep) + '.png'
   WriteImage(fname)
 
+  # explicitly delete the proxies -- simple reset the session.
+  controller = servermanager.ParaViewPipelineController()
+  controller.ResetSession(servermanager.ActiveConnection.Session)
 
-  # explicitly delete the proxies -- may have to do this multiple times
-  tobedeleted = GetNextProxyToDelete()
-  while tobedeleted != None:
-      Delete(tobedeleted)
-      tobedeleted = GetNextProxyToDelete()
-
-def GetNextProxyToDelete():
-  iter = servermanager.vtkSMProxyIterator()
-  iter.SetSession(servermanager.ActiveConnection.Session)
-  iter.Begin()
-  while not iter.IsAtEnd():
-    if iter.GetGroup().find("prototypes") != -1:
-       iter.Next()
-       continue
-    proxy = servermanager._getPyProxy(iter.GetProxy())
-    proxygroup = iter.GetGroup()
-    iter.Next()
-    if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
-        return proxy
-
-  return None
 
 def RequestDataDescription(datadescription):
   time = datadescription.GetTime()

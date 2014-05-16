@@ -84,35 +84,21 @@ void pqPropertyLinks::setUseUncheckedProperties(bool val)
 }
 
 //-----------------------------------------------------------------------------
-bool pqPropertyLinks::addPropertyLink(
-  QObject* qobject, const char* qproperty, const char* qsignal,
-  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
+bool pqPropertyLinks::addNewConnection(pqPropertyLinksConnection* connection)
 {
-  if (!qobject || !qproperty || !qsignal || !smproxy || !smproperty)
-    {
-    qCritical() << "Invalid parameters to pqPropertyLinks::addPropertyLink";
-    qDebug() << "(" << qobject << ", " << qproperty << ", " << qsignal
-      << ") <==> ("
-      << (smproxy? smproxy->GetXMLName() : "(none)")
-      << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
-      << smindex << ")";
-    return false;
-    }
-
-  pqPropertyLinksConnection* connection = new pqPropertyLinksConnection(
-    qobject, qproperty, qsignal, smproxy, smproperty, smindex,
-    this->useUncheckedProperties(), this);
+  Q_ASSERT(connection);
 
   // Avoid adding duplicates.
   foreach (pqPropertyLinksConnection* existing, this->Internals->Connections)
     {
     if (*existing == *connection)
       {
+      vtkSMProperty* smproperty = connection->propertySM();
       qDebug() << "Skipping duplicate connection: "
-        << "(" << qobject << ", " << qproperty << ", " << qsignal
+        << "(" << connection->objectQt() << ", " << connection->propertyQt()
         << ") <==> ("
-        << smproxy << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
-        << smindex;
+        << connection->proxySM() << "," << (smproperty? smproperty->GetXMLLabel() : "(none)")
+        << connection->indexSM();
       delete connection;
       return true;
       }

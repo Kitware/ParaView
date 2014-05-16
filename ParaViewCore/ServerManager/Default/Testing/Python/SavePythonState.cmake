@@ -16,7 +16,7 @@ execute_process(
   COMMAND ${PVPYTHON_EXECUTABLE}
   ${TEST_DRIVER}
   StateFile.py
-  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -T ${TEMPORARY_DIR}
   -V ${PARAVIEW_DATA_ROOT}/Baseline/SavePythonState.png
   RESULT_VARIABLE rv)
 if(NOT rv EQUAL 0)

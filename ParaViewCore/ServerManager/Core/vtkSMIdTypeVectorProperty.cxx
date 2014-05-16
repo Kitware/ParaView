@@ -264,9 +264,9 @@ void vtkSMIdTypeVectorProperty::ClearUncheckedElements()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIdTypeVectorProperty::ResetToDefaultInternal()
+void vtkSMIdTypeVectorProperty::ResetToXMLDefaults()
 {
-  this->Internals->ResetToDefaultInternal();
+  this->Internals->ResetToXMLDefaults();
 }
 
 //---------------------------------------------------------------------------

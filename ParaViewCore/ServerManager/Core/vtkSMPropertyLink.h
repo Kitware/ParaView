@@ -26,7 +26,7 @@
 
 //BTX
 class vtkSMProperty;
-struct vtkSMPropertyLinkInternals;
+class vtkSMPropertyLinkInternals;
 class vtkSMPropertyLinkObserver;
 //ETX
 
@@ -41,7 +41,7 @@ public:
   // Add a property to the link. updateDir determines whether a property of
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
-  // A propterty can be set to be both input and output by adding 2 link, one
+  // A property can be set to be both input and output by adding 2 links, one
   // to INPUT and the other to OUTPUT
   // When a link is added, all output property values are
   // synchronized with that of the input.
@@ -78,11 +78,11 @@ public:
 //BTX
 
   // Description:
-  // This method is used to initialise the object to the given state
+  // This method is used to initialize the object to the given state
   // If the definitionOnly Flag is set to True the proxy won't load the
   // properties values and just setup the new proxy hierarchy with all subproxy
-  // globalID set. This allow to split the load process in 2 step to prevent
-  // invalid state when property refere to a sub-proxy that does not exist yet.
+  // globalIDs set. This enables splitting the load process in 2 step to prevent
+  // invalid state when a property refers to a sub-proxy that does not exist yet.
   virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
 protected:
@@ -90,11 +90,10 @@ protected:
   ~vtkSMPropertyLink();
 
   // Description:
-  // Synchornize the value of all output properties
-  // with the input property.
+  // Synchronize the value of all output properties with the input property.
   void Synchronize();
 
-  friend struct vtkSMPropertyLinkInternals;
+  friend class vtkSMPropertyLinkInternals;
   friend class vtkSMPropertyLinkObserver;
 
   // Description:
@@ -107,12 +106,13 @@ protected:
   
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void PropertyModified(vtkSMProxy* caller, const char* pname);
+  virtual void PropertyModified(vtkSMProperty* property);
   virtual void UpdateProperty(vtkSMProxy* caller, const char* pname);
-  void PropertyModified(vtkSMProperty* property);
 
   // Description:
   // Update the internal protobuf state
   virtual void UpdateState();
+
 private:
   vtkSMPropertyLinkInternals* Internals;
   bool ModifyingProperty;

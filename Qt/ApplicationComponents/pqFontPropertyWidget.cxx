@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqPropertiesPanel.h"
 #include "pqSignalAdaptors.h"
-#include "pqStandardColorLinkAdaptor.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProxy.h"
 
@@ -88,14 +87,13 @@ pqFontPropertyWidget::pqFontPropertyWidget(
   smproperty = smgroup->GetProperty("Color");
   if (smproperty)
     {
-    pqSignalAdaptorColor *adaptor = new pqSignalAdaptorColor(ui.FontColor, "chosenColor",
-      SIGNAL(chosenColorChanged(const QColor&)), false);
-    this->addPropertyLink(adaptor, "color",
-      SIGNAL(colorChanged(const QVariant&)), smproperty);
+    this->addPropertyLink(
+      ui.FontColor, "chosenColorRgbF", SIGNAL(chosenColorChanged(const QColor&)),
+      smproperty);
 
-    // pqStandardColorLinkAdaptor makes it possible to set this color to one of
-    // the standard colors.
-    new pqStandardColorLinkAdaptor(ui.FontColor, smproxy, smproxy->GetPropertyName(smproperty));
+    // pqColorPaletteLinkHelper makes it possible to set this color to one of
+    // the color palette colors.
+    new pqColorPaletteLinkHelper(ui.FontColor, smproxy, smproxy->GetPropertyName(smproperty));
     }
   else
     {

@@ -60,12 +60,6 @@ pqParallelCoordinatesChartView::~pqParallelCoordinatesChartView()
 }
 
 //-----------------------------------------------------------------------------
-void pqParallelCoordinatesChartView::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-}
-
-//-----------------------------------------------------------------------------
 void pqParallelCoordinatesChartView::onAddRepresentation(pqRepresentation* repr)
 {
   this->updateRepresentationVisibility(repr, repr->isVisible());

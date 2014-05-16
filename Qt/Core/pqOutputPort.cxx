@@ -315,3 +315,9 @@ void pqOutputPort::renderAllViews(bool force /*=false*/)
     }
 }
 
+//-----------------------------------------------------------------------------
+vtkSMSourceProxy* pqOutputPort::getSourceProxy() const
+{
+  return this->getSource()?
+    vtkSMSourceProxy::SafeDownCast(this->getSource()->getProxy()) : NULL;
+}

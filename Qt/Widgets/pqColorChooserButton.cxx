@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorChooserButton.cxx
+   Module:  pqColorChooserButton.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,21 +54,58 @@ QColor pqColorChooserButton::chosenColor() const
 }
 
 //-----------------------------------------------------------------------------
+QVariantList pqColorChooserButton::chosenColorRgbF() const
+{
+  QVariantList val;
+  val << this->Color.redF() << this->Color.greenF() << this->Color.blueF();
+  return val;
+}
+
+//-----------------------------------------------------------------------------
+QVariantList pqColorChooserButton::chosenColorRgbaF() const
+{
+  QVariantList val;
+  val << this->Color.redF() << this->Color.greenF()
+    << this->Color.blueF() << this->Color.alphaF();
+  return val;
+}
+
+//-----------------------------------------------------------------------------
 void pqColorChooserButton::setChosenColor(const QColor& color)
 {
-  if(color.isValid())
+  if (color.isValid())
     {
     if(color != this->Color)
       {
       this->Color = color;
       this->setIcon(this->renderColorSwatch(color));
-      
-      emit this->beginUndo(this->UndoLabel);
       emit this->chosenColorChanged(this->Color);
-      emit this->endUndo();
       }
     emit this->validColorChosen(this->Color);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorChooserButton::setChosenColorRgbF(const QVariantList& val)
+{
+  Q_ASSERT(val.size() == 3);
+  QColor newColor = this->chosenColor();
+  newColor.setRedF(val[0].toDouble());
+  newColor.setGreenF(val[1].toDouble());
+  newColor.setBlueF(val[2].toDouble());
+  this->setChosenColor(newColor);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
+{
+  Q_ASSERT(val.size() == 4);
+  QColor newColor;
+  newColor.setRedF(val[0].toDouble());
+  newColor.setGreenF(val[1].toDouble());
+  newColor.setBlueF(val[2].toDouble());
+  newColor.setAlphaF(val[2].toDouble());
+  this->setChosenColor(newColor);
 }
 
 //-----------------------------------------------------------------------------
@@ -88,7 +125,6 @@ QIcon pqColorChooserButton::renderColorSwatch(const QColor& color)
   painter.setBrush(QBrush(color));
   painter.drawEllipse(1, 1, radius-2, radius-2);
   painter.end();
-
   return QIcon(pix);
 }
 

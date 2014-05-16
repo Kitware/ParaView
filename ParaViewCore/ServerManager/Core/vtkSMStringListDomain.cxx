@@ -70,45 +70,6 @@ const char* vtkSMStringListDomain::GetString(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMStringListDomain::AddString(const char* string)
-{
-  this->SLInternals->Strings.push_back(string);
-  this->Modified();
-  return static_cast<unsigned int>(this->SLInternals->Strings.size() - 1);
-}
-
-//---------------------------------------------------------------------------
-int vtkSMStringListDomain::RemoveString(const char* string)
-{
-  if (!string)
-    {
-    return -1;
-    }
-  int index=0;
-  std::vector<vtkStdString>::iterator iter =
-    this->SLInternals->Strings.begin();
-  for(; iter != this->SLInternals->Strings.end(); iter++, index++)
-    {
-    if (strcmp(string, iter->c_str()) == 0)
-      {
-      this->SLInternals->Strings.erase(iter);
-      this->Modified();
-      return index;
-      }
-    }
-
-  return -1;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMStringListDomain::RemoveAllStrings()
-{
-  this->SLInternals->Strings.erase(
-    this->SLInternals->Strings.begin(), this->SLInternals->Strings.end());
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
 int vtkSMStringListDomain::IsInDomain(vtkSMProperty* property)
 {
   if (this->IsOptional)
@@ -165,7 +126,7 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (svp && svp->GetInformationOnly())
     {
-    this->RemoveAllStrings();
+    std::vector<vtkStdString> values;
     unsigned int numStrings = svp->GetNumberOfElements();
     if (svp->GetNumberOfElementsPerCommand()==2)
       {
@@ -174,20 +135,19 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
       // second is it's status.
       for (unsigned int i=0; i<numStrings; i+=2)
         {
-        this->AddString(svp->GetElement(i));
+        values.push_back(svp->GetElement(i));
         }
       }
     else
       {
       for (unsigned int i=0; i<numStrings; i++)
         {
-        this->AddString(svp->GetElement(i));
+        values.push_back(svp->GetElement(i));
         }
       }
-    this->InvokeModified();
+    this->SetStrings(values);
     }
 }
-
 
 //---------------------------------------------------------------------------
 int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
@@ -198,6 +158,7 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
     return 0;
     }
 
+  std::vector<vtkStdString> values; 
   // Loop over the top-level elements.
   unsigned int i;
   for(i=0; i < element->GetNumberOfNestedElements(); ++i)
@@ -215,8 +176,9 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
       return 0;
       }
 
-    this->AddString(value);
+    values.push_back(value);
     }
+  this->SetStrings(values);
   return 1;
 }
 
@@ -243,8 +205,7 @@ int vtkSMStringListDomain::LoadState(vtkPVXMLElement* domainElement,
 {
   this->Superclass::LoadState(domainElement, loader);
   
-  this->RemoveAllStrings();
-  
+  std::vector<vtkStdString> values; 
   unsigned int numElems = domainElement->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -254,11 +215,13 @@ int vtkSMStringListDomain::LoadState(vtkPVXMLElement* domainElement,
       const char* text = child->GetAttribute("text");
       if (text)
         {
-        this->AddString(text);
+        values.push_back(text);
         }
       }
     }
-  return 0;
+
+  this->SetStrings(values);
+  return 1;
 }
 
 //---------------------------------------------------------------------------

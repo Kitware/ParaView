@@ -156,11 +156,11 @@ void pqSLACDataLoadManager::setupPipeline()
 
     // Make representations.
     pqDataRepresentation *repr;
-    repr = displayPolicy->createPreferredRepresentation(
-                                 meshReader->getOutputPort(0), meshView, false);
+    repr = displayPolicy->setRepresentationVisibility(
+      meshReader->getOutputPort(0), meshView, true);
     repr->setVisible(true);
-    repr = displayPolicy->createPreferredRepresentation(
-                                 meshReader->getOutputPort(1), meshView, false);
+    repr = displayPolicy->setRepresentationVisibility(
+      meshReader->getOutputPort(1), meshView, true);
     repr->setVisible(false);
 
     // We have already made the representations and pushed everything to the
@@ -176,9 +176,8 @@ void pqSLACDataLoadManager::setupPipeline()
                               particlesFiles, this->Server);
 
     // Make representations.
-    pqDataRepresentation *repr
-      = displayPolicy->createPreferredRepresentation(
-                            particlesReader->getOutputPort(0), meshView, false);
+    pqDataRepresentation *repr = displayPolicy->setRepresentationVisibility(
+        particlesReader->getOutputPort(0), meshView, true);
     repr->setVisible(manager->actionShowParticles()->isChecked());
 
     // We have already made the representations and pushed everything to the

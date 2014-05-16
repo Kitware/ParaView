@@ -40,9 +40,8 @@ protected:
   virtual ~vtkPVServerSideAnimationPlayer();
 
   // Description:
-  // Callback that is used to trigger the execution of the animation writing
-  // Attach on vtkProcessModule when vtkCommand::ExitEvent is triggered
-  void TriggerExecution(vtkObject*, unsigned long, void*);
+  // Callback that is used to trigger the execution of the animation writing.
+  void TriggerExecution();
 
 private:
   vtkPVServerSideAnimationPlayer(const vtkPVServerSideAnimationPlayer&); // Not implemented
@@ -50,6 +49,7 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+  friend class vtkInternals;
 };
 
 #endif

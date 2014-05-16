@@ -32,6 +32,7 @@ set (Module_SRCS
   vtkPVCameraAnimationCue.cxx
   vtkPVCameraCueManipulator.cxx
   vtkPVCameraKeyFrame.cxx
+  vtkPVGeneralSettings.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
   vtkPVMultiServerDataSource.cxx
   vtkPVRepresentationAnimationHelper.cxx
@@ -41,18 +42,18 @@ set (Module_SRCS
   vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
+  vtkSMCSVExporterProxy.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
-  vtkSMCSVExporterProxy.cxx
   vtkSMDirectoryProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMGL2PSExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMMultiServerSourceProxy.cxx
+  vtkSMPSWriterProxy.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
-  vtkSMPSWriterProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMTesting.cxx
 )

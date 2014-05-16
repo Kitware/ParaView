@@ -27,6 +27,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDoubleMapPropertyIterator : public vtkS
 public:
   static vtkSMDoubleMapPropertyIterator* New();
   vtkTypeMacro(vtkSMDoubleMapPropertyIterator, vtkSMObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set/get the property to iterate over.

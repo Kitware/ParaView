@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_myMainWindow.h"
 
 #include "pqHelpReaction.h"
-#include "pqObjectInspectorWidget.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
 
@@ -58,9 +57,6 @@ myMainWindow::myMainWindow()
   this->Internals->comparativePanelDock->hide();
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);
-
-  // Enable automatic creation of representation on accept.
-  this->Internals->proxyTabWidget->setShowOnAccept(true);
 
   // Enable help for from the object inspector.
   QObject::connect(this->Internals->proxyTabWidget,

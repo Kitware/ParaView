@@ -29,7 +29,6 @@
 
 class vtkAlgorithmOutput;
 class vtkCamera;
-class vtkCameraManipulator;
 class vtkExtentTranslator;
 class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
@@ -447,10 +446,9 @@ public:
 
   //*****************************************************************
   // Forwarded to vtkPVInteractorStyle if present on local processes.
-  virtual void Add2DManipulator(vtkCameraManipulator* val);
-  virtual void RemoveAll2DManipulators();
-  virtual void Add3DManipulator(vtkCameraManipulator* val);
-  virtual void RemoveAll3DManipulators();
+  virtual void SetCamera2DManipulators(const int manipulators[9]);
+  virtual void SetCamera3DManipulators(const int manipulators[9]);
+  void SetCameraManipulators(vtkPVInteractorStyle* style, const int manipulators[9]);
 
   // Description:
   // Overridden to synchronize information among processes whenever data

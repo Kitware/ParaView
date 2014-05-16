@@ -188,7 +188,7 @@ void vtkQuadRepresentation::UpdateDataEventCallBack(vtkObject*, unsigned long, v
 
     // Update scalar information if possible
     vtkGeometryRepresentation* geoRep = vtkGeometryRepresentation::SafeDownCast(this->GetActiveRepresentation());
-    if(geoRep && strlen(geoRep->GetColorArrayName()))
+    if (geoRep && geoRep->GetColorArrayName() && strlen(geoRep->GetColorArrayName()) > 0)
       {
       double value = 0.0;
       const char* arrayName = geoRep->GetColorArrayName();

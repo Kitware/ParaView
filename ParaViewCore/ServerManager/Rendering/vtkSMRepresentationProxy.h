@@ -79,6 +79,21 @@ public:
   // Description:
   // Overridden to reserve additional IDs for use by internal composite representation
   virtual vtkTypeUInt32 GetGlobalID();
+
+  // Description:
+  // Set the representation type. Default implementation simply updates the
+  // "Representation" property, if present with the value provided. Subclasses
+  // can override this method to add custom logic to manage the representation
+  // state to support the change e.g. pick a scalar color array when switching
+  // to Volume or Slice representation, for example. Returns true, if the change
+  // was successful, otherwise returns false.
+  virtual bool SetRepresentationType(const char* type);
+  static bool SetRepresentationType(vtkSMProxy* repr, const char* type)
+    {
+    vtkSMRepresentationProxy* self = vtkSMRepresentationProxy::SafeDownCast(repr);
+    return self? self->SetRepresentationType(type) : false;
+    }
+
 //BTX
 protected:
   vtkSMRepresentationProxy();
@@ -105,14 +120,6 @@ protected:
   // Description:
   // Overridden to restore this->Servers flag state.
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
-
-  // Description:
-  // Links properties such that when inputProperty's checked or unchecked values
-  // are changed, the outputProperty's corresponding values are also changed.
-  // Since this is commonly needed for representations, I'm adding this here. We
-  // may move this API to vtkSMProxy is it seems appropriate.
-  void LinkProperty(
-    vtkSMProperty* inputProperty, vtkSMProperty* outputProperty);
 
 private:
   vtkSMRepresentationProxy(const vtkSMRepresentationProxy&); // Not implemented

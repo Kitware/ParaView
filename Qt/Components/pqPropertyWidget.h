@@ -112,6 +112,10 @@ signals:
   /// change. changeAvailable() is always fired before changeFinished().
   void changeFinished();
 
+  /// Indicates that a restart of the program is required for the setting
+  /// to take effect.
+  void restartRequired();
+
 public slots:
   /// called to set the active view. This will fire the viewChanged() signal.
   virtual void setView(pqView*);
@@ -143,6 +147,10 @@ protected:
   /// decorator. The decorator will be deleted when the pqPropertyWidget is
   /// destroyed.
   void addDecorator(pqPropertyWidgetDecorator*);
+
+  /// Provides access to the pqPropertyLinks instance.
+  pqPropertyLinks& links()
+    { return this->Links; }
 
 private:
   /// setAutoUpdateVTKObjects no longer simply passes the flag to

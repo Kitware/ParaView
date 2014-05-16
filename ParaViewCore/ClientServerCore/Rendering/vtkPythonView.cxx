@@ -39,7 +39,7 @@ vtkPythonView::vtkPythonView()
   this->RenderTexture = vtkSmartPointer<vtkTexture>::New();
   this->Renderer = vtkSmartPointer<vtkRenderer>::New();
   this->Renderer->SetBackgroundTexture(this->RenderTexture);
-  this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
+  this->RenderWindow.TakeReference(this->SynchronizedWindows->NewRenderWindow());
   this->RenderWindow->AddRenderer(this->Renderer);
   this->Magnification = 1;
   this->MatplotlibUtilities = vtkSmartPointer<vtkMatplotlibUtilities>::New();
@@ -50,6 +50,7 @@ vtkPythonView::vtkPythonView()
 //----------------------------------------------------------------------------
 vtkPythonView::~vtkPythonView()
 {
+  this->SetScript(NULL);
 }
 
 //----------------------------------------------------------------------------

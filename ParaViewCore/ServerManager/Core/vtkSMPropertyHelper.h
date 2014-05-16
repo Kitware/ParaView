@@ -209,6 +209,14 @@ public:
   void SetStatus(const char* key, const char* value);
   const char* GetStatus(const char* key, const char* default_value);
 
+  // Description:
+  // For vtkSMStringVectorProperty that is used to setting input array to
+  // process on algorithms, this provides a convenient API to get/set the
+  // values.
+  void SetInputArrayToProcess(int fieldAssociation, const char* arrayName);
+  int GetInputArrayAssociation();
+  const char* GetInputArrayNameToProcess();
+
 protected:
   void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
 

@@ -29,12 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqPipelineModel.h"
 
-#include "pqApplicationCore.h"
 #include "pqBoxChartView.h"
-#include "pqDisplayPolicy.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -48,15 +45,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
 #include "pqXYFunctionalBagChartView.h"
+#include "vtkNew.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMViewProxy.h"
 
 #include <QApplication>
+#include <QFont>
 #include <QString>
 #include <QStyle>
 #include <QtDebug>
-#include "QVTKWidget.h"
 
-#include "vtkPVXMLElement.h"
-#include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineModelDataItem : public QObject
@@ -81,6 +80,8 @@ public:
     CATALYST_EXTRACT_GRAY,
     LAST
     };
+
+  static vtkNew<vtkSMParaViewPipelineControllerWithRendering> Controller;
 public:
   pqPipelineModel* Model;
   pqPipelineModelDataItem* Parent;
@@ -294,10 +295,12 @@ public:
 private:
   IconType getVisibilityIcon(pqOutputPort* port, pqView* view) const
     {
+    if (!port) { return LAST; }
+
     // I'm not a huge fan of this hacky way we are dealing with catalyst. We'll
     // have to come back and cleanly address how the pqPipelineModel deals with
     // "visibility" in a more generic, session-centric way.
-    if (port && port->getServer() &&
+    if (port->getServer() &&
         port->getServer()->getResource().scheme() == "catalyst")
       {
       pqLiveInsituVisualizationManager* mgr=
@@ -308,28 +311,22 @@ private:
         {
         return mgr->hasExtracts(port)? CATALYST_EXTRACT :CATALYST_EXTRACT_GRAY;
         }
+      return LAST;
       }
 
-    // If no view is present, it implies that a suitable type of view
-    // will be created.
-    pqApplicationCore* core = pqApplicationCore::instance();
-    pqDisplayPolicy* policy = core->getDisplayPolicy();
-    if (policy)
+    if (!view)
       {
-      switch (policy->getVisibility(view, port))
-        {
-      case pqDisplayPolicy::Visible:
-        return EYEBALL;
-
-      case pqDisplayPolicy::Hidden:
-        return EYEBALL_GRAY;
-
-      case pqDisplayPolicy::NotApplicable:
-      default:
-        break;
-        }
+      // If no view is present, it implies that a suitable type of view
+      // will be created.
+      return EYEBALL_GRAY;
       }
-    return LAST;
+    if (this->Controller->GetVisibility(port->getSourceProxy(),
+        port->getPortNumber(), view->getViewProxy()))
+      {
+      return EYEBALL;
+      }
+    return view->getViewProxy()->CanDisplayData(port->getSourceProxy(),
+      port->getPortNumber())? EYEBALL_GRAY : LAST;
     }
   IconType getIconType(pqOutputPort* port) const
     {
@@ -338,40 +335,37 @@ private:
       return CATALYST_EXTRACT;
       }
 
-    pqApplicationCore* core = pqApplicationCore::instance();
-    pqDisplayPolicy* policy = core->getDisplayPolicy();
-    if (policy)
+    QString type = this->Controller->GetPreferredViewType(
+      port->getSourceProxy(), port->getPortNumber());
+    if (type == pqXYBagChartView::XYBagChartViewType())
       {
-      QString type = policy->getPreferredViewType(
-        port, false);
-      if (type == pqXYBagChartView::XYBagChartViewType())
-        {
-        return BAGCHART;
-        }
-      if (type == pqXYBarChartView::XYBarChartViewType())
-        {
-        return BARCHART;
-        }
-      if (type == pqBoxChartView::chartViewType())
-        {
-        return BOXCHART;
-        }
-      if (type == pqXYFunctionalBagChartView::XYFunctionalBagChartViewType())
-        {
-        return FUNCTIONALBAGCHART;
-        }
-      if (type == pqXYChartView::XYChartViewType())
-        {
-        return LINECHART;
-        }
-      if (type == pqSpreadSheetView::spreadsheetViewType())
-        {
-        return TABLE;
-        }
+      return BAGCHART;
+      }
+    if (type == pqXYBarChartView::XYBarChartViewType())
+      {
+      return BARCHART;
+      }
+    if (type == pqBoxChartView::chartViewType())
+      {
+      return BOXCHART;
+      }
+    if (type == pqXYFunctionalBagChartView::XYFunctionalBagChartViewType())
+      {
+      return FUNCTIONALBAGCHART;
+      }
+    if (type == pqXYChartView::XYChartViewType())
+      {
+      return LINECHART;
+      }
+    if (type == pqSpreadSheetView::spreadsheetViewType())
+      {
+      return TABLE;
       }
     return GEOMETRY;
     }
 };
+
+vtkNew<vtkSMParaViewPipelineControllerWithRendering> pqPipelineModelDataItem::Controller;
 
 //-----------------------------------------------------------------------------
 class pqPipelineModelInternal

@@ -1,4 +1,26 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="settings">
+
+    <SettingsProxy name="PacManSettings" label="PacMan"
+      processes="client|dataserver|renderserver">
+      <Documentation>
+        Settings for the PacMan plugin.
+      </Documentation>
+
+      <IntVectorProperty name="TestOption"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          This is a simple boolean test option.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+
+  </ProxyGroup>
   <ProxyGroup name="sources">
    <SourceProxy name="PacMan" class="vtkSphereSource" label="PacMan">
       <DoubleVectorProperty

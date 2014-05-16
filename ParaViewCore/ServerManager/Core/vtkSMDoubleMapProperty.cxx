@@ -364,7 +364,7 @@ void vtkSMDoubleMapProperty::Copy(vtkSMProperty* src)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleMapProperty::ResetToDefaultInternal()
+void vtkSMDoubleMapProperty::ResetToXMLDefaults()
 {
   // map properties are always empty by default
   this->ClearElements();

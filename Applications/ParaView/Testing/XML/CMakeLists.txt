@@ -104,7 +104,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/GlobalProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
@@ -217,7 +216,6 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
               --enable-bt
               -dr
               --enable-streaming
-              --disable-light-kit
               --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${tname})
@@ -231,7 +229,6 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
          --enable-bt
          -dr
          --enable-streaming
-         --disable-light-kit
          --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${tname})
@@ -251,13 +248,6 @@ IF ("1" STREQUAL ${HAS_NUMPY})
   SET(TESTS_WITH_INLINE_COMPARES ${TESTS_WITH_INLINE_COMPARES}
     ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
 ENDIF ("1" STREQUAL ${HAS_NUMPY})
-
-#------------------------------------------------------------------------------
-# These tests run using the old panels.
-
-# GlobalProperties test uses global colors which are not currently supported by
-# the new panels.
-set (GlobalProperties_USE_OLD_PANELS TRUE)
 
 #------------------------------------------------------------------------------
 set (TestPythonConsole_BREAK TRUE)
@@ -310,8 +300,6 @@ set (SelectionLabels_DISABLE_CRS TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
-SET (GlobalProperties_BREAK TRUE)
-  # <-- since this changes global colors.
 SET (XdmfReadImageData_BREAK TRUE)
   # <-- since this changes light kit.
 SET (UndoRedo3_BREAK TRUE)
@@ -485,7 +473,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 # List of known incompatible tests for Collaboration
 #
 #   Contains Undo/Redo actions:
-#     - Clip, GlobalProperties, UndoRedo, UndoRedo[1-8]
+#     - Clip, UndoRedo, UndoRedo[1-8]
 #
 #   Contains Plugin Loading actions:
 #     - LoadPlugins, NiftiReaderWriterPlugin, H5PartReaderPlugin

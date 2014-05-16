@@ -22,38 +22,6 @@ foreach (name ${test_srcs})
   set_tests_properties(${name} PROPERTIES LABELS "PARAVIEW")
 endforeach()
 
-#------------------------------------------------------------------------------
-if (PARAVIEW_DATA_ROOT)
-  # This is the executable that can load any Server Manager state (*.pvsm) file
-  # and test the rendered image.
-  vtk_module_test_executable(ServerManagerStateLoader
-    ServerManagerStateLoader.cxx
-    vtkTestingProcessModuleGUIHelper.cxx
-    vtkTestingProcessModuleGUIHelper.h
-    vtkTestingOptions.cxx
-    vtkTestingOptions.h)
-
-  # Add the *.pvsm file names to load and test.
-  set (TEST_STATES
-    Arrow
-    Axes
-    CalcInput
-    ExtractGrid
-    TestPHT
-    SPCTH2)
-
-  foreach (tfile ${TEST_STATES})
-    add_test(NAME ${tfile}-ServerManager
-      COMMAND ServerManagerStateLoader
-        --enable-bt
-        -D=${PARAVIEW_DATA_ROOT}
-        -T=${ParaView_BINARY_DIR}/Testing/Temporary
-        -V=${PARAVIEW_DATA_ROOT}/Baseline/${tfile}.png
-        ${CMAKE_CURRENT_SOURCE_DIR}/../SMStates/${tfile}.pvsm)
-    set_tests_properties(${tfile}-ServerManager PROPERTIES LABELS "PARAVIEW")
-  endforeach()
-endif()
-
 ################################################################################
 # ParaView ServerManager Unit Tests
 if (PARAVIEW_ENABLE_QT_SUPPORT)

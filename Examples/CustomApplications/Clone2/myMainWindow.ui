@@ -88,12 +88,12 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Object Inspector</string>
+    <string>Properties</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="pqObjectInspectorWidget" name="proxyTabWidget"/>
+   <widget class="pqPropertiesPanel" name="proxyTabWidget"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
@@ -114,9 +114,9 @@
    <header>pqStatusBar.h</header>
   </customwidget>
   <customwidget>
-   <class>pqObjectInspectorWidget</class>
+   <class>pqPropertiesPanel</class>
    <extends>QWidget</extends>
-   <header>pqObjectInspectorWidget.h</header>
+   <header>pqPropertiesPanel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

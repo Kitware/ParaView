@@ -11,9 +11,7 @@ public:
   MainWindow();
   bool compareView(const QString& referenceImage, double threshold,
     ostream& output, const QString& tempDirectory);
-
   QPointer<pqRenderView> RenderView;
-
 public slots:
   void processTest();
 

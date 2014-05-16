@@ -73,11 +73,6 @@ message DefinitionHeader
 
 message ProxyState
 {
-  message Property
-    {
-    required string  name  = 1;
-    optional Variant value = 2;
-    }
 
   message SubProxy
     {
@@ -95,6 +90,13 @@ message ProxyState
     {
     required string key   = 1;
     repeated Variant variant = 2;
+    }
+
+  message Property
+    {
+    required string  name  = 1;
+    optional Variant value = 2;
+    repeated UserData user_data = 3;
     }
 
   extend Message {

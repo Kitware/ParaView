@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -141,13 +142,19 @@ void pqSaveScreenshotReaction::saveScreenshot()
   QSize size = ssDialog.viewSize();
   QString palette = ssDialog.palette();
 
-  // temporarily load the color palette chosen by the user.
-  vtkSmartPointer<vtkPVXMLElement> currentPalette;
-  pqApplicationCore* core = pqApplicationCore::instance();
-  if (!palette.isEmpty())
+  vtkSMSessionProxyManager* pxm =
+    pqActiveObjects::instance().activeServer()->proxyManager();
+  vtkSMProxy* colorPalette = pxm->GetProxy(
+    "global_properties", "ColorPalette");
+  vtkSmartPointer<vtkPVXMLElement> state;
+  if (colorPalette && !palette.isEmpty())
     {
-    currentPalette.TakeReference(core->getCurrrentPalette());
-    core->loadPalette(palette);
+    state.TakeReference(colorPalette->SaveXMLState(NULL));
+
+    vtkSMProxy* chosenPalette =
+      pxm->NewProxy("palettes", palette.toLatin1().data());
+    colorPalette->Copy(chosenPalette);
+    chosenPalette->Delete();
     }
 
   int stereo = ssDialog.getStereoMode();
@@ -159,16 +166,23 @@ void pqSaveScreenshotReaction::saveScreenshot()
   pqSaveScreenshotReaction::saveScreenshot(file,
     size, ssDialog.quality(), ssDialog.saveAllViews());
 
-  // restore palette.
-  if (!palette.isEmpty())
+  // restore color palette.
+  if (state)
     {
-    core->loadPalette(currentPalette);
+    colorPalette->LoadXMLState(state, NULL);
     }
 
+  // restore stereo
   if (stereo)
     {
     pqRenderViewBase::setStereo(0);
-    core->render();
+    }
+
+  // check if need to render to clear the changes we did
+  // while saving the screenshot.
+  if (state || stereo)
+    {
+    pqApplicationCore::instance()->render();
     }
 }
 

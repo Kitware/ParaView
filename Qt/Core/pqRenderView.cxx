@@ -41,13 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVTrackballRoll.h"
-#include "vtkPVTrackballRotate.h"
-#include "vtkPVTrackballZoom.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -59,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUndoStack.h"
 #include "vtkStructuredData.h"
-#include "vtkTrackballPan.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -83,32 +78,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
-
-pqRenderView::ManipulatorType pqRenderView::DefaultManipulatorTypes[] =
-{
-  { 1, 0, 0, "Rotate", "Camera3DManipulators"},
-  { 2, 0, 0, "Pan",    "Camera3DManipulators"},
-  { 3, 0, 0, "Zoom",   "Camera3DManipulators"},
-  { 1, 1, 0, "Roll",   "Camera3DManipulators"},
-  { 2, 1, 0, "Rotate", "Camera3DManipulators"},
-  { 3, 1, 0, "Pan",    "Camera3DManipulators"},
-  { 1, 0, 1, "Zoom",   "Camera3DManipulators"},
-  { 2, 0, 1, "Rotate", "Camera3DManipulators"},
-  { 3, 0, 1, "Zoom",   "Camera3DManipulators"},
-  // ------------- 3D / 2D -------------
-  { 1, 0, 0, "Pan",  "Camera2DManipulators"},
-  { 2, 0, 0, "Roll",  "Camera2DManipulators"},
-  { 3, 0, 0, "Zoom", "Camera2DManipulators"},
-  { 1, 1, 0, "Zoom", "Camera2DManipulators"},
-  { 2, 1, 0, "Zoom", "Camera2DManipulators"},
-  { 3, 1, 0, "Zoom", "Camera2DManipulators"},
-  { 1, 0, 1, "Roll", "Camera2DManipulators"},
-  { 2, 0, 1, "Pan", "Camera2DManipulators"},
-  { 3, 0, 1, "Rotate" , "Camera2DManipulators"},
-};
 
 namespace {
 
@@ -130,7 +101,6 @@ pqDataRepresentation* findRepresentationFromProxy(vtkSMRepresentationProxy *prox
 class pqRenderView::pqInternal
 {
 public:
-  QMap<QString, QString> SettingsGroupToManipulatorName;
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
   QList<pqRenderView* > LinkedUndoStacks;
@@ -149,12 +119,6 @@ public:
       vtkSmartPointer<vtkSMInteractionUndoStackBuilder>::New();
     this->UndoStackBuilder->SetUndoStack(
       this->InteractionUndoStack);
-
-    // Fill the mapping table
-    this->SettingsGroupToManipulatorName["renderModule/InteractorStyle"] =
-        "Camera3DManipulators";
-    this->SettingsGroupToManipulatorName["renderModule2D/InteractorStyle"] =
-        "Camera2DManipulators";
     }
 
   ~pqInternal()
@@ -247,50 +211,7 @@ void pqRenderView::initializeWidgets()
     {
     vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
     }
-
-  // Set up some global property links by default.
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-  this->getConnector()->Connect(
-    globalPropertiesManager->GetProperty("TextAnnotationColor"),
-    vtkCommand::ModifiedEvent, this, SLOT(textAnnotationColorChanged()));
-  this->textAnnotationColorChanged();
-
-  // ensure that center axis visibility etc. is updated as per user's
-  // preferences.
-  this->restoreAnnotationSettings();
-
   this->Internal->UndoStackBuilder->SetRenderView(renModule);
-}
-
-//-----------------------------------------------------------------------------
-// Sets default values for the underlying proxy.  This is during the 
-// initialization stage of the pqProxy for proxies created by the GUI itself 
-// i.e. for proxies loaded through state or created by python client or 
-// undo/redo, this method won't be called. 
-void pqRenderView::setDefaultPropertyValues()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  if (pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
-    {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 0);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 1);
-    }
-  this->Superclass::setDefaultPropertyValues();
-  this->clearUndoStack();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::restoreDefaultLightSettings()
-{
-  this->Superclass::restoreDefaultLightSettings();
-  if (pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
-    {
-    vtkSMProxy* proxy = this->getProxy();
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 0);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 1);
-    proxy->UpdateVTKObjects();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -322,25 +243,6 @@ void pqRenderView::resetCenterOfRotation()
       viewproxy->GetProperty("CameraFocalPointInfo"));
   this->setCenterOfRotation(
     values[0].toDouble(), values[1].toDouble(), values[2].toDouble());
-}
-
-//-----------------------------------------------------------------------------
-vtkImageData* pqRenderView::captureImage(int magnification)
-{
-  if (this->getWidget()->isVisible())
-    {
-    return this->getRenderViewProxy()->CaptureWindow(magnification);
-    }
-
-  // Don't return any image when the view is not visible.
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
-const int* pqRenderView::defaultBackgroundColor() const
-{
-  static int defaultBackground[3] = { 84, 89, 109 };
-  return defaultBackground;
 }
 
 //-----------------------------------------------------------------------------
@@ -456,51 +358,6 @@ bool pqRenderView::getCenterAxesVisibility() const
 {
   return pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("CenterAxesVisibility")).toBool();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::restoreAnnotationSettings()
-{
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString sgroup = this->viewSettingsGroup();
-  settings->beginGroup(sgroup);
-  // Center Axes settings.
-  settings->beginGroup("CenterAxes");
-  if (settings->contains("ResetCenterWithCamera"))
-    {
-    this->ResetCenterWithCamera =
-      settings->value("ResetCenterWithCamera").toBool();
-    }
-  settings->endGroup();
-  settings->endGroup();
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::restoreSettings(bool only_global)
-{
-  this->Superclass::restoreSettings(only_global);
-  if (!only_global)
-    {
-    this->restoreAnnotationSettings();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqRenderView::saveSettings()
-{
-  this->Superclass::saveSettings();
-
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString sgroup = this->viewSettingsGroup();
-  settings->beginGroup(sgroup);
-
-  // Center Axes settings.
-  settings->beginGroup("CenterAxes");
-  settings->setValue("ResetCenterWithCamera",
-    this->ResetCenterWithCamera);
-  settings->endGroup();
-
-  settings->endGroup();
 }
 
 //-----------------------------------------------------------------------------
@@ -975,30 +832,6 @@ void pqRenderView::selectBlock(int rectangle[4], bool expand)
   this->emitSelectionSignal(opPorts);
 }
 
-//-----------------------------------------------------------------------------
-void pqRenderView::textAnnotationColorChanged()
-{
-  // Set up some global property links by default.
-  vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
-  double value[3];
-  vtkSMPropertyHelper(globalPropertiesManager, "TextAnnotationColor").Get(
-    value, 3);
-  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor", true).Set(
-    value, 3);
-  this->getProxy()->UpdateProperty("OrientationAxesLabelColor");
-}
-//-----------------------------------------------------------------------------
-pqRenderViewBase::ManipulatorType* pqRenderView::getManipulatorTypes(int &numberOfManipulatorType)
-{
-  numberOfManipulatorType = 18; // 9 + 9
-  return pqRenderView::DefaultManipulatorTypes;
-}
-//-----------------------------------------------------------------------------
-QMap<QString, QString> pqRenderView::interactorStyleSettingsGroupToCameraManipulatorName() const
-{
-  return this->Internal->SettingsGroupToManipulatorName;
-}
 //-----------------------------------------------------------------------------
 void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
 {

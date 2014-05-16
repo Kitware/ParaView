@@ -314,11 +314,8 @@ public:
   // Use this method to set all properties on this proxy to their default
   // values. This iterates over all properties on this proxy, thus if this proxy
   // had subproxies, this method will iterate over only the exposed properties
-  // and call vtkSMProperty::ResetToDefault(). vtkSMProperty::ResetToDefault()
-  // defines what it means to "reset a property to its default value" which
-  // doesn't always correspond to the default_values specified in the XML
-  // configurations for the proxy.
-  virtual void ResetPropertiesToDefault();
+  // and call vtkSMProperty::ResetToXMLDefaults().
+  virtual void ResetPropertiesToXMLDefaults();
 
 //BTX
   // Description:
@@ -326,7 +323,8 @@ public:
   enum
     {
     COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE=0,
-    COPY_PROXY_PROPERTY_VALUES_BY_CLONING
+
+    COPY_PROXY_PROPERTY_VALUES_BY_CLONING // < No longer supported!!!
     };
 //ETX
 
@@ -340,7 +338,8 @@ public:
   // proxyPropertyCopyFlag specifies how the values for vtkSMProxyProperty
   // and its subclasses are copied over: by reference or by 
   // cloning (ie. creating new instances of the value proxies and 
-  // synchronizing their values).
+  // synchronizing their values). This is no longer relevant since we don't
+  // support COPY_PROXY_PROPERTY_VALUES_BY_CLONING anymore.
   void Copy(vtkSMProxy* src);
   void Copy(vtkSMProxy* src, const char* exceptionClass);
   virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
@@ -430,7 +429,18 @@ public:
   // Description:
   // A proxy instance can be a sub-proxy for some other proxy. In that case,
   // this method returns true.
-  bool GetIsSubProxy() { return (this->ParentProxyCount > 0); }
+  bool GetIsSubProxy();
+
+  // Description:
+  // If this instance is a sub-proxy, this method will return the proxy of which
+  // this instance is an immediate sub-proxy.
+  vtkSMProxy* GetParentProxy();
+
+  // Description:
+  // Call GetParentProxy() recursively till a proxy that is not a subproxy of
+  // any other proxy is found. May return this instance, if this is not a
+  // subproxy of any other proxy.
+  vtkSMProxy* GetTrueParentProxy();
 
   // Description:
   // Allow to switch off any push of state change to the server for that
@@ -671,6 +681,11 @@ protected:
   vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
 
   // Description:
+  // Links properties such that when inputProperty's checked or unchecked values
+  // are changed, the outputProperty's corresponding values are also changed.
+  void LinkProperty(vtkSMProperty* inputProperty, vtkSMProperty* outputProperty);
+
+  // Description:
   // Parses the XML to create a new property group. This can handle
   // <PropertyGroup /> elements defined in both regular Proxy section or when
   // exposing properties from sub-proxies.
@@ -752,6 +767,7 @@ protected:
   // Flag used to break consumer loops.
   int InMarkModified;
 
+  vtkWeakPointer<vtkSMProxy> ParentProxy;
 protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
@@ -762,8 +778,6 @@ private:
   vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement,
                                       const char* subproxy_name);
 
-  // Used to keep track of proxies to which this proxy is a subproxy.
-  int ParentProxyCount;
 //ETX
 };
 

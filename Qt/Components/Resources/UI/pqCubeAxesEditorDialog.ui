@@ -630,7 +630,7 @@
     </layout>
    </item>
    <item>
-    <widget class="pqStandardColorButton" name="Color">
+    <widget class="pqColorChooserButtonWithPalettes" name="Color">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -699,9 +699,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqStandardColorButton</class>
+   <class>pqColorChooserButtonWithPalettes</class>
    <extends>QPushButton</extends>
-   <header>pqStandardColorButton.h</header>
+   <header>pqColorChooserButtonWithPalettes.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

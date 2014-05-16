@@ -17,10 +17,12 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSIProxy.h"
 #include "vtkSMMessage.h"
 
 #include <vector>
 #include <assert.h>
+#include <vtksys/ios/sstream>
 
 namespace
 {

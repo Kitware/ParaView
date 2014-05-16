@@ -159,14 +159,17 @@ QWidget* pqMultiSliceView::createWidget()
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::updateAxisBounds(double bounds[6])
 {
-  this->AxisX->setRange(bounds[0], bounds[1]);
-  this->AxisY->setRange(bounds[2], bounds[3]);
-  this->AxisZ->setRange(bounds[4], bounds[5]);
+  if (this->AxisX && this->AxisY && this->AxisZ)
+    {
+    this->AxisX->setRange(bounds[0], bounds[1]);
+    this->AxisY->setRange(bounds[2], bounds[3]);
+    this->AxisZ->setRange(bounds[4], bounds[5]);
 
-  // Make sure we render the new range
-  this->AxisX->renderView();
-  this->AxisY->renderView();
-  this->AxisZ->renderView();
+    // Make sure we render the new range
+    this->AxisX->renderView();
+    this->AxisY->renderView();
+    this->AxisZ->renderView();
+    }
 }
 
 //-----------------------------------------------------------------------------

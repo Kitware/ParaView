@@ -39,22 +39,28 @@ public:
   vtkTypeMacro(vtkImageSliceRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // This is same a vtkDataObject::FieldAssociation types so you can use those
-  // as well.
-  enum AttributeTypes
+  // Description:
+  // Set the input data arrays that this algorithm will process. Overridden to
+  // pass the array selection to the mapper.
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+    int fieldAssociation, const char *name);
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+    int fieldAssociation, int fieldAttributeType)
     {
-    POINT_DATA=0,
-    CELL_DATA=1
-    };
-
-  // Description:
-  // Methods to control scalar coloring. ColorAttributeType defines the
-  // attribute type.
-  void SetColorAttributeType(int type);
-
-  // Description:
-  // Pick the array to color with.
-  void SetColorArrayName(const char* name);
+    this->Superclass::SetInputArrayToProcess(
+      idx, port, connection, fieldAssociation, fieldAttributeType);
+    }
+  virtual void SetInputArrayToProcess(int idx, vtkInformation *info)
+    {
+    this->Superclass::SetInputArrayToProcess(idx, info);
+    }
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+                              const char* fieldAssociation,
+                              const char* attributeTypeorName)
+    {
+    this->Superclass::SetInputArrayToProcess(idx, port, connection,
+      fieldAssociation, attributeTypeorName);
+    }
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is

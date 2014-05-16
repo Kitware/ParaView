@@ -1048,7 +1048,15 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
       return 1;
       }
     }
-
+  if (strcmp(type, "vtkImageData") == 0)
+    {
+    if (this->DataSetType == VTK_IMAGE_DATA ||
+      this->DataSetType == VTK_UNIFORM_GRID ||
+      this->DataSetType == VTK_STRUCTURED_POINTS)
+      {
+      return 1;
+      }
+    }
   return 0;
 }
 

@@ -24,6 +24,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVServerManagerApplicationModule.h" // needed for exports
+#include <string> // needed for std::string
 class vtkPVOptions;
 
 class VTKPVSERVERMANAGERAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject
@@ -60,6 +61,15 @@ public:
 protected:
   vtkInitializationHelper() {};
   virtual ~vtkInitializationHelper() {};
+
+  // Description:
+  // Load settings
+  static bool LoadSettings();
+
+  // Description:
+  // Get directory for user settings file. The last character is always the
+  // file path separator appropriate for the system.
+  static std::string GetUserSettingsDirectory();
 
 private:
   vtkInitializationHelper(const vtkInitializationHelper&); // Not implemented

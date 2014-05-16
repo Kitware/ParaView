@@ -82,23 +82,11 @@ public:
   /// Get all the cues in this scene
   QSet<pqAnimationCue*> getCues() const;
 
-  /// set default property values.
-  /// Overridden to create the default pipeline time animation cue.
-  virtual void setDefaultPropertyValues();
-
   /// Returns the current animation time.
   double getAnimationTime() const;
 
   /// Returns the timesteps from the timekeeper for the animation scene.
   QList<double> getTimeSteps() const;
-
-  /// Application settings for caching.  When caching is on, polygonal geometry
-  /// will be saved at every time step up to the given limit.  The limit is
-  /// given in kilobytes.
-  static void setCacheGeometrySetting(bool flag);
-  static bool getCacheGeometrySetting();
-  static void setCacheLimitSetting(int kilobytes);
-  static int getCacheLimitSetting();
 
 signals:
   /// Fired before a new cue is added to the scene.
@@ -159,19 +147,11 @@ public slots:
   /// Set the animation time.
   void setAnimationTime(double time);
 
-  /// Refreshes state of the scene to the current application settings.  Should
-  /// be called when the application settings change.
-  void updateApplicationSettings();
-
 private slots:
   /// Called when the "Cues" property on the AnimationScene proxy
   /// is changed. Updates the internal datastructure to reflect the current
   /// state of the scene.
   void onCuesChanged();
-
-  /// Called when timekeeper's timesteps are changed. We determine the play mode
-  /// based on the availability of timesteps.
-  void updateTimeSteps();  
 
   /// Called on animation tick.
   void onTick(vtkObject* caller, unsigned long, void*, void* info);
@@ -192,7 +172,6 @@ private:
   class pqInternals;
   pqInternals* Internals;
 
-  void setupTimeTrack();
   pqAnimationCue* createCueInternal(const QString& cuetype,
     vtkSMProxy* proxy, const char* propertyname, int index);
 };

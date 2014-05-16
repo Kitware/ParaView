@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,9 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 
 class pqAnimationCue;
-class pqAnimationScene;
 class pqDataRepresentation;
-class pqNameCount;
 class pqOutputPort;
 class pqPipelineSource;
 class pqProxy;
@@ -53,13 +51,13 @@ class pqView;
 class vtkSMProxy;
 
 /// pqObjectBuilder is loosely based on the \c Builder design pattern.
-/// It is used to create as well as destroy complex objects such as 
-/// views, displays, sources etc. Since most of the public API is 
+/// It is used to create as well as destroy complex objects such as
+/// views, displays, sources etc. Since most of the public API is
 /// virtual, it is possible for custom applications to subclass
 /// pqObjectBuilder to provide their own implementation for creation/
 /// destroying these objects. The application layer accesses the
 /// ObjectBuilder through the pqApplicationCore singleton.
-/// NOTE: pqObjectBuilder replaces the previously supported 
+/// NOTE: pqObjectBuilder replaces the previously supported
 /// pqPipelineBuilder. Unlink, pqPipelineBuilder, this class
 /// no longer deals with undo/redo stack. The application layer
 /// components that use the ObjectBuilder are supposed to bother
@@ -73,7 +71,7 @@ class PQCORE_EXPORT pqObjectBuilder : public QObject
 public:
   pqObjectBuilder(QObject* parent=0);
   virtual ~pqObjectBuilder();
-  
+
   /// Create a server connection give a server resource.
   /// By default, this method does not create a new connection if one already
   /// exists. Also it disconnects from any existing server connection before
@@ -81,15 +79,15 @@ public:
   /// MultipleConnectionsSupport to true. In that case
   /// this will always try to connect the server using the details specified in
   /// the resource irrespective if the server is already connected or any other
-  /// server connections exists. 
+  /// server connections exists.
   /// Calling this method while waiting for a previous server connection to be
   /// established raises errors.
   pqServer* createServer(const pqServerResource& resource);
- 
-  /// Destroy a server connection 
+
+  /// Destroy a server connection
   void removeServer(pqServer *server);
 
-  /// Creates a source of the given server manager group (\c sm_group) and 
+  /// Creates a source of the given server manager group (\c sm_group) and
   /// name (\c sm_name) on the given \c server. On success, returns the
   /// pqPipelineSource for the created proxy.
   virtual pqPipelineSource* createSource(const QString& sm_group,
@@ -102,31 +100,20 @@ public:
   virtual pqPipelineSource* createFilter(
     const QString& group, const QString& name,
     QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server);
-  /// Creates a filter with the given Server Manager group (\c sm_group) and
-  /// name (\c sm_name). If the filter accepts multiple inputs, all the inputs
-  /// provided in the list are set as input, instead only the first one
-  /// is set as the input. All inputs must be on the same server.
-  /// This also takes properties to initialize the filter with.
-  /// Note: a separate function was added as opposed to making the last
-  /// parameter with a default value due to bug in gcc < 4.4
-  virtual pqPipelineSource* createFilter(
-    const QString& group, const QString& name,
-    QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server,
-    const QMap<QString, QVariant>& properties);
 
   /// Convenience method that takes a single input source.
   virtual pqPipelineSource* createFilter(
     const QString& group, const QString& name,
     pqPipelineSource* input, int output_port = 0);
 
-  /// Creates a reader of the given server manager group (\c sm_group) and 
+  /// Creates a reader of the given server manager group (\c sm_group) and
   /// name (\c sm_name) on the given \c server. On success, returns the
   /// pqPipelineSource for the created proxy.
   virtual pqPipelineSource* createReader(const QString& sm_group,
     const QString& sm_name, const QStringList& files, pqServer* server);
 
   /// Creates a new view module of the given type on the given server.
-  virtual pqView* createView(const QString& type, 
+  virtual pqView* createView(const QString& type,
     pqServer* server);
 
   /// Destroys the view module. This destroys the view module
@@ -138,26 +125,17 @@ public:
   virtual pqDataRepresentation* createDataRepresentation(
     pqOutputPort* source, pqView* view, const QString &representationType="");
 
-  /// Destroys the data display. It will remove the display from any 
-  /// view modules it is added to and then unregister it.
-  virtual void destroy(pqRepresentation* repr);
-
-  /// Creates a scalar bar display to show a lookup table
-  /// in the view.
-  virtual pqScalarBarRepresentation* createScalarBarDisplay(
-    pqScalarsToColors* lookupTable, pqView* view);
-
-
-  /// Creates an animation scene on the given server connection.
-  virtual pqAnimationScene* createAnimationScene(pqServer* server);
-
   /// Convenience method to create a proxy of any type on the given server.
-  /// One can alternatively use the vtkSMProxyManager to create new proxies 
+  /// One can alternatively use the vtkSMProxyManager to create new proxies
   /// directly. This method additionally set the connection ID on
   /// the new proxy. If reg_name is empty, then a new name is assigned.
   virtual vtkSMProxy* createProxy(const QString& sm_group, 
     const QString& sm_name, pqServer* server, 
-    const QString& reg_group, const QString& reg_name=QString());
+    const QString& reg_group);
+
+  /// Destroys the data display. It will remove the display from any 
+  /// view modules it is added to and then unregister it.
+  virtual void destroy(pqRepresentation* repr);
 
   /// Destroys a source/filter. Removing a source involves the following:
   // \li removing all displays belonging to the source,
@@ -170,7 +148,7 @@ public:
   /// Destroys an animation cue and all keyframe objects, if any in that cue.
   virtual void destroy(pqAnimationCue* cue);
 
-  /// Convenience method, simply unregisters the Server Manager proxy 
+  /// Convenience method, simply unregisters the Server Manager proxy
   /// which the pqProxy represents.
   virtual void destroy(pqProxy* proxy);
 
@@ -184,7 +162,7 @@ public:
   /// destroySources(), destroyLookupTables().
   virtual void destroyPipelineProxies(pqServer* server=0);
 
-  /// This method unregisters all proxies on the given server. 
+  /// This method unregisters all proxies on the given server.
   /// This is usually done in anticipate of a disconnect
   /// or starting afresh.
   virtual void destroyAllProxies(pqServer* server);
@@ -207,26 +185,26 @@ public slots:
   void abortPendingConnections();
 
 signals:
-  
+
   /// Emitted after a new server connection is created
   void finishedAddingServer(pqServer *server);
 
   /// Fired on successful completion of createSource().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
+  /// creates the source or when state is loaded or on undo/redo.
   void sourceCreated(pqPipelineSource*);
 
   /// Fired on successful completion of createFilter().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
+  /// creates the source or when state is loaded or on undo/redo.
   void filterCreated(pqPipelineSource*);
 
   /// Fired on successful completion of createReader().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
+  /// creates the source or when state is loaded or on undo/redo.
   void readerCreated(pqPipelineSource*, const QString& filename);
   void readerCreated(pqPipelineSource*, const QStringList& filename);
 
@@ -236,23 +214,17 @@ signals:
   /// Fired on successful completion of createView().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
+  /// creates the source or when state is loaded or on undo/redo.
   void viewCreated(pqView*);
 
   /// Fired on successful completion of createDataRepresentation().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
+  /// creates the source or when state is loaded or on undo/redo.
   void dataRepresentationCreated(pqDataRepresentation*);
 
-  /// Fired on successful completion of createScalarBarDisplay().
-  /// Remember that this signal is fired only when the creation of the object
-  /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
-  void scalarBarDisplayCreated(pqScalarBarRepresentation*);
-
   /// Fired on successful completion of any method that creates a pqProxy
-  /// or subclass including createScalarBarDisplay, createDataRepresentation,
+  /// or subclass including createDataRepresentation,
   /// createView, createFilter, createSource,
   /// createReader etc.
   void proxyCreated(pqProxy*);
@@ -260,63 +232,47 @@ signals:
   /// Fired on successful completion of createProxy().
   /// Remember that this signal is fired only when the creation of the object
   /// is requested by the GUI. It wont be triggered when the python client
-  /// creates the source or when state is loaded or on undo/redo. 
+  /// creates the source or when state is loaded or on undo/redo.
   void proxyCreated(vtkSMProxy*);
 
-  /// Fired when destroy(pqView*) is called. 
-  /// This signal is fired before the process for destruction of the object 
-  /// begins. Remember that this signal is fired only when the destruction of 
-  /// the object is requested by the GUI. It wont be triggered when the python 
-  /// client unregisters the source or when state is loaded or on undo/redo. 
+  /// Fired when destroy(pqView*) is called.
+  /// This signal is fired before the process for destruction of the object
+  /// begins. Remember that this signal is fired only when the destruction of
+  /// the object is requested by the GUI. It wont be triggered when the python
+  /// client unregisters the source or when state is loaded or on undo/redo.
   void destroying(pqView* view);
- 
-  /// Fired when destroy(pqRepresentation*) is called. 
-  /// This signal is fired before the process for destruction of the object 
-  /// begins. Remember that this signal is fired only when the destruction of 
-  /// the object is requested by the GUI. It wont be triggered when the python 
-  /// client unregisters the source or when state is loaded or on undo/redo. 
+
+  /// Fired when destroy(pqRepresentation*) is called.
+  /// This signal is fired before the process for destruction of the object
+  /// begins. Remember that this signal is fired only when the destruction of
+  /// the object is requested by the GUI. It wont be triggered when the python
+  /// client unregisters the source or when state is loaded or on undo/redo.
   void destroying(pqRepresentation* display);
 
-  /// Fired when destroy(pqPipelineSource*) is called. 
-  /// This signal is fired before the process for destruction of the object 
-  /// begins. Remember that this signal is fired only when the destruction of 
-  /// the object is requested by the GUI. It wont be triggered when the python 
-  /// client unregisters the source or when state is loaded or on undo/redo. 
+  /// Fired when destroy(pqPipelineSource*) is called.
+  /// This signal is fired before the process for destruction of the object
+  /// begins. Remember that this signal is fired only when the destruction of
+  /// the object is requested by the GUI. It wont be triggered when the python
+  /// client unregisters the source or when state is loaded or on undo/redo.
   void destroying(pqPipelineSource* source);
 
-  /// Fired when destroy(pqProxy*) is called. 
-  /// This signal is fired before the process for destruction of the object 
-  /// begins. Remember that this signal is fired only when the destruction of 
-  /// the object is requested by the GUI. It wont be triggered when the python 
-  /// client unregisters the source or when state is loaded or on undo/redo. 
+  /// Fired when destroy(pqProxy*) is called.
+  /// This signal is fired before the process for destruction of the object
+  /// begins. Remember that this signal is fired only when the destruction of
+  /// the object is requested by the GUI. It wont be triggered when the python
+  /// client unregisters the source or when state is loaded or on undo/redo.
   void destroying(pqProxy* proxy);
 
 protected:
-  /// Create a proxy of the given type. If reg_name=QString(),
-  /// a new name will be assigned to it.
-  virtual vtkSMProxy* createProxyInternal(const QString& sm_group, 
-    const QString& sm_name, pqServer* server, 
-    const QString& reg_group, const QString& reg_name,
-    const QMap<QString, QVariant>& properties);
-
   /// Unregisters a proxy.
   virtual void destroyProxyInternal(pqProxy* proxy);
-
-  /// Called after a data representation to created. 
-  /// This use the <InheritRepresentationProperties /> hints to inherit
-  /// properties from input representation is possible.
-  virtual void initializeInheritedProperties(pqDataRepresentation* repr);
-
-  /// Used to create names for registering proxies.
-  pqNameCount* NameGenerator;
 
 private:
   pqObjectBuilder(const pqObjectBuilder&); // Not implemented.
   void operator=(const pqObjectBuilder&); // Not implemented.
 
   bool WaitingForConnection;
+
 };
 
 #endif
-
-

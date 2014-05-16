@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqView;
 class pqServer;
+class vtkSMViewProxy;
 
 /// This is PQ representation for a single representation.
 /// This class provides API for the Qt layer to access representations.
@@ -72,6 +73,10 @@ public:
 
   /// Returns the view to which this representation has been added, if any.
   pqView* getView() const;
+
+  /// Returns the view proxy to which this representation has been added, if
+  /// any.
+  vtkSMViewProxy* getViewProxy() const;
 
 public slots:
 

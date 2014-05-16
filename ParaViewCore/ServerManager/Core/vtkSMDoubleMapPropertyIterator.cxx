@@ -94,6 +94,12 @@ vtkIdType vtkSMDoubleMapPropertyIterator::GetKey()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMDoubleMapPropertyIterator::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//---------------------------------------------------------------------------
 double vtkSMDoubleMapPropertyIterator::GetElementComponent(unsigned int component)
 {
   return this->Internals->MapIterator->second[component];

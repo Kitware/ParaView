@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
-#include "pqVariableType.h"
 #include "pqWidgetRangeDomain.h"
 #include "vtkDataObject.h"
 #include "vtkEventQtSlotConnect.h"
@@ -212,22 +211,20 @@ void pqPointSpriteControls::setupGUIConnections()
       vtkCommand::ModifiedEvent, this, SLOT(representationTypeChanged()));
 
   this->connect(this->Internals->ScaleBy,
-      SIGNAL(variableChanged(pqVariableType, const QString&)), this,
-      SLOT(onRadiusArrayChanged(pqVariableType, const QString&)));
-
-  this->connect(this->Internals->ScaleBy, SIGNAL(componentChanged(int, int)),
-      this, SLOT(onRadiusComponentChanged(int, int)));
-
-  this->connect(this->Internals->OpacityBy,
-      SIGNAL(variableChanged(pqVariableType, const QString&)), this,
-      SLOT(onOpacityArrayChanged(pqVariableType, const QString&)));
-
-  this->connect(this->Internals->OpacityBy, SIGNAL(componentChanged(int, int)),
-      this, SLOT(onOpacityComponentChanged(int, int)));
+      SIGNAL(variableChanged(const QString&)),
+      SLOT(updateRadiusArray()));
+  this->connect(
+    this->Internals->ScaleBy, SIGNAL(componentChanged(int, int)),
+    SLOT(updateRadiusArray()));
+  this->connect(
+    this->Internals->OpacityBy, SIGNAL(variableChanged(const QString&)),
+    SLOT(updateOpacityArray()));
+  this->connect(
+    this->Internals->OpacityBy, SIGNAL(componentChanged(int, int)),
+    SLOT(updateOpacityArray()));
 
   this->connect(this->Internals->RenderMode, SIGNAL(activated(int)),
       this->Internals->TextureCombo, SLOT(setRenderMode(int)));
-
 }
 
 //-----------------------------------------------------------------------------
@@ -340,8 +337,7 @@ void pqPointSpriteControls::reloadGUI()
 }
 
 //-----------------------------------------------------------------------------
-void pqPointSpriteControls::onRadiusArrayChanged(
-    pqVariableType type, const QString& name)
+void pqPointSpriteControls::updateRadiusArray()
 {
   pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
@@ -350,10 +346,11 @@ void pqPointSpriteControls::onRadiusArrayChanged(
     return;
     }
 
-  if (type == VARIABLE_TYPE_NONE)
+  QString array = this->Internals->ScaleBy->currentVariableName();
+  if (array.isEmpty())
     {
     pqSMAdaptor::setEnumerationProperty(reprProxy->GetProperty("RadiusMode"),
-        "Constant");// this is to set the vtkPointSpriteProperty radius mode to constant
+      "Constant");// this is to set the vtkPointSpriteProperty radius mode to constant
     // disable the transfer function filter
     pqSMAdaptor::setElementProperty(reprProxy->GetProperty(
         "RadiusTransferFunctionEnabled"), 0);
@@ -366,34 +363,39 @@ void pqPointSpriteControls::onRadiusArrayChanged(
     pqSMAdaptor::setElementProperty(reprProxy->GetProperty(
         "RadiusTransferFunctionEnabled"), 1);
     }
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-      reprProxy->GetProperty("RadiusArray"));
-  svp->SetElement(0, 0); // idx
-  svp->SetElement(1, 0); //port
-  svp->SetElement(2, 0); //connection
-  svp->SetElement(3, "0" /* vtkDataObject::FIELD_ASSOCIATION_POINTS */); //type
-  svp->SetElement(4, name.toLatin1().data()); //name
 
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    reprProxy->GetProperty("RadiusArray"));
+  svp->SetElement(0, "0"); // idx
+  svp->SetElement(1, "0"); //port
+  svp->SetElement(2, "0"); //connection
+  svp->SetElement(3, "0" /* vtkDataObject::FIELD_ASSOCIATION_POINTS */); //type
+  svp->SetElement(4, array.toLatin1().data()); //name
+  reprProxy->UpdateVTKObjects();
+
+  pqSMAdaptor::setElementProperty(reprProxy->GetProperty(
+      "RadiusVectorComponent"),
+    this->Internals->ScaleBy->currentComponent());
   this->Internals->TransferFunctionDialog->radiusEditor()->needReloadGUI();
   this->Internals->ScaleBy->reloadGUI();
-
-  reprProxy->UpdateVTKObjects();
   emit this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------
-void pqPointSpriteControls::onOpacityArrayChanged(
-    pqVariableType type, const QString& name)
+void pqPointSpriteControls::updateOpacityArray()
 {
   pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
   if (!reprProxy)
+    {
     return;
+    }
 
-  double opacity = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-      "Opacity")).toDouble();
+  double opacity = pqSMAdaptor::getElementProperty(
+    reprProxy->GetProperty("Opacity")).toDouble();
+  QString array = this->Internals->OpacityBy->currentVariableName();
 
-  if (type == VARIABLE_TYPE_NONE)
+  if (array.isEmpty())
     {
     // disable the transfer function filter
     pqSMAdaptor::setElementProperty(reprProxy->GetProperty(
@@ -419,68 +421,27 @@ void pqPointSpriteControls::onOpacityArrayChanged(
     }
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       reprProxy->GetProperty("OpacityArray"));
-  svp->SetElement(0, 0); // idx
-  svp->SetElement(1, 0); //port
-  svp->SetElement(2, 0); //connection
+  svp->SetElement(0, "0"); // idx
+  svp->SetElement(1, "0"); //port
+  svp->SetElement(2, "0"); //connection
   svp->SetElement(3, "0" /* vtkDataObject::FIELD_ASSOCIATION_POINTS */); //type
-  svp->SetElement(4, name.toLatin1().data()); //name
+  svp->SetElement(4, array.toLatin1().data()); //name
+
+  pqSMAdaptor::setElementProperty(
+    reprProxy->GetProperty("OpacityVectorComponent"),
+    this->Internals->OpacityBy->currentComponent());
+  reprProxy->UpdateVTKObjects();
 
   this->Internals->TransferFunctionDialog->opacityEditor()->needReloadGUI();
   this->Internals->OpacityBy->reloadGUI();
 
-  reprProxy->UpdateVTKObjects();
-  emit this->changeFinished();
-}
-
-//-----------------------------------------------------------------------------
-void pqPointSpriteControls::onRadiusComponentChanged(int vectorMode, int comp)
-{
-  pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
-  vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
-  if (!reprProxy)
-    return;
-
-  if (vectorMode == pqScalarsToColors::MAGNITUDE)
-    {
-    comp = -1;
-    }
-
-  pqSMAdaptor::setElementProperty(reprProxy->GetProperty(
-      "RadiusVectorComponent"), comp);
-
-  this->Internals->TransferFunctionDialog->radiusEditor()->needReloadGUI();
-
-  reprProxy->UpdateVTKObjects();
-  emit this->changeFinished();
-}
-
-//-----------------------------------------------------------------------------
-void pqPointSpriteControls::onOpacityComponentChanged(
-    int vectorMode, int comp)
-{
-  pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
-  vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
-  if (!reprProxy)
-    return;
-
-  if (vectorMode == pqScalarsToColors::MAGNITUDE)
-    {
-    comp = -1;
-    }
-
-  pqSMAdaptor::setElementProperty(reprProxy->GetProperty(
-      "OpacityVectorComponent"), comp);
-
-  this->Internals->TransferFunctionDialog->opacityEditor()->needReloadGUI();
-
-  reprProxy->UpdateVTKObjects();
   emit this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------
 void pqPointSpriteControls::updateEnableState()
 {
-  if (this->Internals->ScaleBy->getCurrentText() == "Constant Radius")
+  if (this->Internals->ScaleBy->currentVariableName().isEmpty())
     {
     this->Internals->RadiusStack->setCurrentWidget(
         this->Internals->ConstantRadiusPage);
@@ -493,7 +454,7 @@ void pqPointSpriteControls::updateEnableState()
     this->Internals->TransferFunctionDialog->radiusEditor()->setEnabled(true);
     }
 
-  if (this->Internals->OpacityBy->getCurrentText() == "Constant Opacity")
+  if (this->Internals->OpacityBy->currentVariableName().isEmpty())
     {
     this->Internals->OpacityStack->setCurrentWidget(
         this->Internals->ConstantOpacityPage);

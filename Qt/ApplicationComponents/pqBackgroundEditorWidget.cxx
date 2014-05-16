@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 #include "pqRenderView.h"
-#include "pqSignalAdaptors.h"
-#include "pqStandardColorLinkAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -79,6 +77,14 @@ class pqBackgroundEditorWidget::pqInternal : public Ui::BackgroundEditorWidget
     this->setupUi (self);
     this->mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     this->mainLayout->setSpacing(
+      pqPropertiesPanel::suggestedVerticalSpacing());
+    this->page1Layout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->page1Layout->setHorizontalSpacing(
+      pqPropertiesPanel::suggestedHorizontalSpacing());
+    this->page1Layout->setVerticalSpacing(
+      pqPropertiesPanel::suggestedVerticalSpacing());
+    this->page3Layout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->page3Layout->setSpacing(
       pqPropertiesPanel::suggestedVerticalSpacing());
   }
 };

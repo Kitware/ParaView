@@ -51,7 +51,8 @@ pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
 {
   // Look for a crash recovery state file, nag user and load if desired.
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  bool recoveryEnabled = settings->value("crashRecovery", false).toBool();
+  bool recoveryEnabled = settings->value(
+    "GeneralSettings.CrashRecovery", false).toBool();
   if (recoveryEnabled && QFile::exists(CrashRecoveryStateFile))
     {
     int recover = QMessageBox::question(
@@ -117,7 +118,8 @@ void pqCrashRecoveryBehavior::delayedSaveRecoveryState()
 void pqCrashRecoveryBehavior::saveRecoveryState()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  bool recoveryEnabled = settings->value("crashRecovery", false).toBool();
+  bool recoveryEnabled = settings->value(
+    "GeneralSettings.CrashRecovery", false).toBool();
   if (recoveryEnabled)
     {
     pqApplicationCore::instance()->saveState(CrashRecoveryStateFile);

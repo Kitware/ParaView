@@ -54,7 +54,6 @@ public:
   vtkGetStringMacro(DataDirectory);
 
   vtkGetMacro(ExitAppWhenTestsDone, int);
-  vtkGetMacro(DisableRegistry, int);
  
   // Returns the test scripts as a list.
   QStringList GetTestScripts();
@@ -82,12 +81,6 @@ public:
   vtkSetMacro(CurrentImageThreshold, int);
   vtkGetMacro(CurrentImageThreshold, int);
 
-  // Description
-  // Get/Set whether lightkit is disabled by default. This is useful for
-  // testing.
-  vtkGetMacro(DisableLightKit, int);
-  vtkSetMacro(DisableLightKit, int);
-
   // Description:
   // These flags are used for testing multi-clients configurations.
   vtkGetMacro(TestMaster, int);
@@ -98,10 +91,6 @@ public:
   // startup. This have any effect only when ParaView is built with Python
   // support.
   vtkGetStringMacro(PythonScript);
-
-  // Description:
-  // Returns true if the new panels are enabled.
-  vtkGetMacro(UseOldPanels, int);
 
   // DO NOT CALL. Public for internal callbacks.
   int AddTestScript(const char*);
@@ -122,11 +111,9 @@ protected:
 
   int ExitAppWhenTestsDone;
   int DisableRegistry;
-  int DisableLightKit;
   int CurrentImageThreshold;
   int TestMaster;
   int TestSlave;
-  int UseOldPanels;
   char* PythonScript;
 
   vtkSetStringMacro(PythonScript);

@@ -58,7 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView
 #include "pqDataRepresentation.h"
-#include "pqHelperProxyRegisterUndoElement.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqSMAdaptor.h"
@@ -149,6 +148,12 @@ pqPipelineSource::~pqPipelineSource()
 }
 
 //-----------------------------------------------------------------------------
+vtkSMSourceProxy* pqPipelineSource::getSourceProxy()
+{
+  return vtkSMSourceProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineSource::updatePipeline()
 {
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
@@ -214,213 +219,6 @@ void pqPipelineSource::portVisibilityChanged(
 int pqPipelineSource::getNumberOfOutputPorts() const
 {
   return this->Internal->OutputPorts.size();
-}
-
-//-----------------------------------------------------------------------------
-// Overridden to add the proxies to the domain as well.
-void pqPipelineSource::addInternalHelperProxy(const QString& key, vtkSMProxy* helper) const
-{
-  this->Superclass::addInternalHelperProxy(key, helper);
-
-  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toLatin1().data());
-  if (prop)
-    {
-     vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      prop->GetDomain("proxy_list"));
-    if (pld && !pld->HasProxy(helper))
-      {
-      pld->AddProxy(helper);
-      }
-    }
-}
-//-----------------------------------------------------------------------------
-// Overridden to add the proxies to the domain as well.
-void pqPipelineSource::removeInternalHelperProxy(const QString& key, vtkSMProxy* helper) const
-{
-  this->Superclass::removeInternalHelperProxy(key, helper);
-
-  vtkSMProperty* prop = this->getProxy()->GetProperty(key.toLatin1().data());
-  if (prop)
-    {
-     vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      prop->GetDomain("proxy_list"));
-    if (pld && pld->HasProxy(helper))
-      {
-      pld->RemoveProxy(helper);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::createProxiesForProxyListDomains()
-{
-  vtkSMProxy* proxy = this->getProxy();
-  vtkSMSessionProxyManager* pxm = this->proxyManager();
-  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
-      iter->GetProperty());
-    if (!prop)
-      {
-      continue;
-      }
-    vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      prop->FindDomain("vtkSMProxyListDomain"));
-    if (!pld)
-      {
-      continue;
-      }
-
-    QList<vtkSmartPointer<vtkSMProxy> > domainProxies;
-    for (unsigned int cc=0; cc < pld->GetNumberOfProxies(); cc++)
-      {
-      domainProxies.push_back(pld->GetProxy(cc));
-      }
-
-    unsigned int max = pld->GetNumberOfProxyTypes();
-    for (unsigned int cc=0; cc < max; cc++)
-      {
-      QString proxy_group = pld->GetProxyGroup(cc);
-      QString proxy_type = pld->GetProxyName(cc);
-
-
-      // check if a proxy of the indicated type already exists in the domain,
-      // we use it, if present.
-      foreach(vtkSMProxy* temp_proxy, domainProxies)
-        {
-        if (temp_proxy && proxy_group == temp_proxy->GetXMLGroup() 
-          && proxy_type == temp_proxy->GetXMLName())
-          {
-          continue;
-          }
-        }
-
-      vtkSmartPointer<vtkSMProxy> new_proxy;
-      new_proxy.TakeReference(pxm->NewProxy(pld->GetProxyGroup(cc),
-          pld->GetProxyName(cc)));
-      if (!new_proxy.GetPointer())
-        {
-        qDebug() << "Could not create a proxy of type " 
-          << proxy_group << "." << proxy_type <<
-          " indicated the proxy list domain.";
-        continue;
-        }
-      domainProxies.push_back(new_proxy);
-      }
-
-    foreach (vtkSMProxy* domainProxy, domainProxies)
-      {
-      this->addHelperProxy(iter->GetKey(), domainProxy);
-
-      this->processProxyListHints(domainProxy);
-      this->Internal->ProxyListDomainProxies.push_back(domainProxy);
-      }
-    // This ensures that the property is initialized using one of the proxies
-    // in the domains.
-    // NOTE: This method is called only in setDefaultPropertyValues()
-    // ensure that we are not changing any user set values.
-    // Another HACK: this seems to be needed to deal with the fact that we do
-    // need to reset some properties on a vtkSMCompoundSourceProxy (which is
-    // skipped by pqProxy::setDefaultPropertyValues).
-    prop->ResetToDefault();
-    }
-  iter->Delete();
-}
-
-
-//-----------------------------------------------------------------------------
-// ProxyList hints are processed for any proxy, when it becomes a part of a 
-// proxy list domain. It provides mechanism to link certain properties
-// of the proxy (which is added in the proxy list domain) with properties of 
-// the proxy which has the property with the proxy list domain.
-void pqPipelineSource::processProxyListHints(vtkSMProxy *proxy_list_proxy)
-{
-  vtkPVXMLElement* proxy_list_hint = pqXMLUtil::FindNestedElementByName(
-    proxy_list_proxy->GetHints(), "ProxyList");
-  if (proxy_list_hint)
-    {
-    for (unsigned int cc=0; 
-      cc < proxy_list_hint->GetNumberOfNestedElements(); cc++)
-      {
-      vtkPVXMLElement* child = proxy_list_hint->GetNestedElement(cc);
-      if (child && QString("Link") == child->GetName())
-        {
-        const char* name = child->GetAttribute("name");
-        const char* linked_with = child->GetAttribute("with_property");
-        if (name && linked_with)
-          {
-          vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-          link->AddLinkedProperty(
-            this->getProxy(), linked_with,
-            vtkSMPropertyLink::INPUT);
-          link->AddLinkedProperty(
-            proxy_list_proxy, name, vtkSMPropertyLink::OUTPUT);
-          this->Internal->Links.push_back(link);
-          link->Delete();
-          }
-        }
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::setDefaultPropertyValues()
-{
-  // Create any internal proxies needed by any property
-  // that has a vtkSMProxyListDomain.
-  this->createProxiesForProxyListDomains();
-
-  this->Superclass::setDefaultPropertyValues();
-
-  // Now initialize the proxies in the proxy list domains as well.
-  // This is a HACK. vtkSMProxy::ResetPropertiesToDefault() must handle this
-  // too, but it's too weird to move to servermanager right now.
-  foreach(vtkSMProxy* dproxy, this->Internal->ProxyListDomainProxies)
-    {
-    vtkSMPropertyIterator* diter = dproxy->NewPropertyIterator();
-    for (diter->Begin(); !diter->IsAtEnd(); diter->Next())
-      {
-      diter->GetProperty()->ResetToDefault();
-      }
-    diter->Delete();
-    }
-
-  this->createAnimationHelpersIfNeeded();
-
-  if ( this->getServer() && this->getServer()->session() &&
-       !this->getServer()->session()->IsMultiClients())
-    {
-    // This is sort-of-a-hack to ensure that when this operation is redo, all the
-    // helper proxies are discovered correctly. This needs to happen only after
-    // all helper proxies have been created.
-    pqHelperProxyRegisterUndoElement* elem =
-        pqHelperProxyRegisterUndoElement::New();
-    elem->SetOperationTypeToRedo(); // Redo creation
-    elem->RegisterHelperProxies(this);
-    ADD_UNDO_ELEM(elem);
-    elem->Delete();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::createAnimationHelpersIfNeeded()
-{
-  QList<vtkSMProxy*> helpers = this->getHelperProxies("RepresentationAnimationHelper");
-  if (helpers.size() == 0)
-    {
-    // Create animation helper which assists in animating display properties.
-    vtkSMSessionProxyManager* pxm = this->proxyManager();
-    int numPorts = this->getNumberOfOutputPorts();
-    for (int cc=0; cc < numPorts; cc++)
-      {
-      vtkSMProxy* helper = pxm->NewProxy("misc", "RepresentationAnimationHelper");
-      vtkSMPropertyHelper(helper, "Source").Add(this->getProxy());
-      helper->UpdateVTKObjects();
-      this->addHelperProxy("RepresentationAnimationHelper", helper);
-      helper->Delete();
-      }
-    }
 }
 
 //-----------------------------------------------------------------------------

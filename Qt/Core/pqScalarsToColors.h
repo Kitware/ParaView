@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QVariant>
 
-class pqScalarsToColorsInternal;
-class pqScalarBarRepresentation;
 class pqRenderViewBase;
+class pqScalarBarRepresentation;
+class pqScalarsToColorsInternal;
 
 /// pqScalarsToColors is a represents a vtkScalarsToColors proxy.
 class PQCORE_EXPORT pqScalarsToColors : public pqProxy
@@ -56,13 +56,6 @@ public:
 
   /// Returns if the lookup table's scalar range is locked.
   bool getScalarRangeLock() const;
-
-  /// Set the scalar range if the range specified is greater than
-  /// the current scalar range. This call respects the ScalarRangeLock.
-  /// If the lock is set, then this call has no effect.
-  /// If ScalarRangeLock is false, then this call will
-  /// move all control points uniformly to fit the new range.
-  void setWholeScalarRange(double min, double max);
 
   /// Sets the scalar range.
   /// Does not consider the ScalarRangeLock. Moves all control points
@@ -114,13 +107,10 @@ public:
   static void setColorRangeScalingMode(int);
   static int colorRangeScalingMode(int default_value=GROW_ON_MODIFIED);
 
-  /// Set/get whether the colormap domain should be indices of entries in
-  /// the list of annotations (when true) or values in the ScalarRange (when false).
-  bool getIndexedLookup();
-  void setIndexedLookup( bool );
-
-  QList<QVariant> getAnnotations();
-  virtual void setAnnotations( const QList<QVariant>& annotations );
+signals:
+  /// signal fired when the "VectorMode" or "VectorComponent" properties are
+  /// modified.
+  void componentOrModeChanged();
 
 public slots:
   // This method checks if this LUT is used by any display,
@@ -132,15 +122,6 @@ public slots:
 
   /// Triggers a build on the lookup table.
   void build();
-signals:
-  /// Fired after a new scalar bar is added or removed from this LUT.
-  void scalarBarsChanged();
-
-protected:
-  friend class pqScalarBarRepresentation;
-
-  void addScalarBar(pqScalarBarRepresentation*);
-  void removeScalarBar(pqScalarBarRepresentation*);
 
 protected slots:
   /// Checks to make sure that the range is compatible with the log flag
@@ -152,4 +133,3 @@ private:
 };
 
 #endif
-

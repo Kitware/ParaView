@@ -53,13 +53,18 @@ public:
   /// return NULL without raising any errors (or messages).
   /// Supported types are:
   /// \li \c calculator : pqCalculatorWidget
+  /// \li \c camera_manipulator : pqCameraManipulatorWidget
+  /// \li \c color_palette_selector : pqColorPaletteSelectorWidget
   /// \li \c color_selector : pqColorSelectorPropertyWidget
+  /// \li \c color_selector_with_palette : pqColorSelectorPropertyWidget with palette menu
   /// \li \c command_button : pqCommandButtonPropertyWidget
   /// \li \c display_representation_selector : pqDisplayRepresentationPropertyWidget
   /// \li \c double_range : pqDoubleRangeSliderPropertyWidget
+  /// \li \c image_compressor_config : pqImageCompressorWidget
   /// \li \c list : pqListPropertyWidget
   /// \li \c texture_selector : pqTextureSelectorPropertyWidget
   /// \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
+  /// \li \c viewtype_selector: pqViewTypePropertyWidget
   virtual pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy *proxy, vtkSMProperty *property);
 

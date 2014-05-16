@@ -28,15 +28,14 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
   set(UI_FORMS
     Resources/pqPointSpriteControls.ui
-    Resources/pqPointSpriteDisplayPanelDecorator.ui
     Resources/pqTransferFunctionDialog.ui
     Resources/pqTransferFunctionEditor.ui
   )
 
   set(PLUGIN_MOC_SRCS
+      pqDisplayArrayWidget.h
       pqDoubleEdit.h
       pqPointSpriteControls.h
-      pqPointSpriteDisplayPanelDecorator.h
       pqPointSpriteTextureComboBox.h
       pqTransferFunctionDialog.h
       pqTransferFunctionEditor.h
@@ -62,21 +61,13 @@ IF(PARAVIEW_BUILD_QT_GUI)
   endif ()
 
     set(Plugin_SRCS
+      pqDisplayArrayWidget.cxx
       pqDoubleEdit.cxx
       pqPointSpriteControls.cxx
-      pqPointSpriteDisplayPanelDecorator.cxx
       pqPointSpriteTextureComboBox.cxx
       pqTransferFunctionDialog.cxx
       pqTransferFunctionEditor.cxx
       )
-
-    # for legacy panels (in Object Inspector).
-    add_paraview_display_panel_decorator(
-      IFACES
-      IFACE_SRCS
-      CLASS_NAME pqPointSpriteDisplayPanelDecorator
-      PANEL_TYPES pqDisplayProxyEditor)
-
 
     # for the new Properties Panel
     add_paraview_property_group_widget(

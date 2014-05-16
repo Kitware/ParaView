@@ -75,59 +75,12 @@ public:
   /// Called to reset the view's display.  This method calls resetCamera().
   virtual void resetDisplay();
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  virtual void setDefaultPropertyValues();
-
-  /// restore the default background color
-  virtual const int* defaultBackgroundColor() const;
-  
-  /// Save the settings of this render module with QSettings.
-  /// We  only save non-global settings in this method.
-  /// Global settings are saved by the dialog itself.
-  virtual void saveSettings();
-
-  /// Apply the settings from QSettings to this render module
-  virtual void restoreSettings(bool only_global);
-
-  /// Returns whether a source can be displayed in this view module.
-  /// The default implementation returns true is the connection ID for the port
-  /// and the view are the same.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
-
-  /// Get/set the camera manipulators: ["Camera2DManipulator", "Camera3DManipulator"]
-  QList<vtkSMProxy*> getCameraManipulators(const QString &cameraManipulatorName) const;
-  virtual bool setCameraManipulators(const QString &cameraManipulatorName,
-                                     const QList<pqSMProxy> &manipulators);
-
-  /// restore the default light parameters
-  virtual void restoreDefaultLightSettings();
-
   /// Convenience method to enable stereo rendering on all views that support
   /// stereo rendering. If mode==0, stereo rendering is disabled. mode is same
   /// that used for vtkRenderWindow::SetStereoType.
   /// This does not request a render, the caller must explicitly call render on
   /// the views.
   static void setStereo(int mode);
-
-public:
-
-  struct ManipulatorType
-    {
-    int Mouse;
-    int Shift;
-    int Control;
-    QByteArray Name;
-    QByteArray CameraManipulatorName;
-    };
-
-  /// Subclass must fill some static structure and provide an implementation
-  /// of that method which should returns a set of camera manipulators used
-  /// by this type of view.
-  virtual ManipulatorType* getManipulatorTypes(int &numberOfManipulatorType) = 0;
 
 protected slots:
   virtual void initializeAfterObjectsCreated();
@@ -150,18 +103,6 @@ protected:
   /// using addMenuAction.
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
-  /// This method is called during initialize() to initialize the interactors.
-  /// Interactor (interactor style, manipulators etc). Eventually, all the code
-  /// that deals with interactor/interactor styles must be removed from the
-  /// server manager (rather vtkSMRenderViewProxy). It's the application's
-  /// responsibility to set up the interaction capabilities as per the domain.
-  virtual void initializeInteractors(); 
-
-  /// Create a CameraManipulatorProxy given the mouse, key and name.
-  /// Whoever calling this is reponsible for deleting the new proxy.
-  virtual vtkSMProxy* createCameraManipulator(
-    int mouse, int shift, int control, QString name);
-  
   /// Creates a new instance of the QWidget subclass to be used to show this
   /// view. Default implementation creates a QVTKWidget.
   virtual QWidget* createWidget();
@@ -170,18 +111,6 @@ protected:
   /// underlying vtkSMProxy. This needs to be done only once,
   /// after the object has been created. 
   virtual void initialize();
-
-  /// Return the name of the group used for global settings (except interactor
-  /// style).
-  virtual const char* globalSettingsGroup() const=0;
-
-  /// Return the name of the group used for view-sepecific settings such as
-  /// background color, lighting.
-  virtual const char* viewSettingsGroup() const=0;
-
-  /// Returns the name of the group in which to save the interactor style
-  /// settings that map to a given CameraManipulator name.
-  virtual QMap<QString, QString> interactorStyleSettingsGroupToCameraManipulatorName() const=0;
 
   /// On Mac, we usually try to cache the front buffer to avoid unecessary
   //  updates.
@@ -197,5 +126,3 @@ private:
 };
 
 #endif
-
-

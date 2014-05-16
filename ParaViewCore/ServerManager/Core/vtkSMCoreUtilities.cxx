@@ -23,6 +23,9 @@
 #include "vtkSMProxy.h"
 #include "vtkSMDomain.h"
 
+#include <vtksys/ios/sstream>
+#include <ctype.h>
+
 vtkStandardNewMacro(vtkSMCoreUtilities);
 //----------------------------------------------------------------------------
 vtkSMCoreUtilities::vtkSMCoreUtilities()
@@ -83,6 +86,33 @@ const char* vtkSMCoreUtilities::GetFileNameProperty(vtkSMProxy* proxy)
     piter->Next();
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkStdString vtkSMCoreUtilities::SanitizeName(const char* name)
+{
+  if (!name || name[0] == '\0')
+    {
+    return vtkStdString();
+    }
+
+  vtksys_ios::ostringstream cname;
+  for (size_t cc=0; name[cc]; cc++)
+    {
+    if (isalnum(name[cc]))
+      {
+      cname << name[cc];
+      }
+    }
+  // if first character is not an alphabet, add an 'a' to it.
+  if (isalpha(cname.str()[0]))
+    {
+    return cname.str();
+    }
+  else
+    {
+    return "a" + cname.str();
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -97,7 +97,7 @@ void pqCurrentTimeToolbar::constructor()
   this->addWidget(sbtimeedit);
 
   QLabel* countLabel = new QLabel(this);
-  countLabel->setText(" of 100");
+  countLabel->setText(" of (TBD)");
   this->CountLabelAction = this->addWidget(countLabel);
   this->CountLabel = countLabel;
 

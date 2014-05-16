@@ -505,33 +505,26 @@ void vtkAMRStreamingVolumeRepresentation::SetIndependantComponents(bool val)
 {
   this->Property->SetIndependentComponents(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkAMRStreamingVolumeRepresentation::SetInputArrayToProcess(
+  int idx, int port, int connection, int fieldAssociation, const char *name)
+{
+  this->Superclass::SetInputArrayToProcess(
+    idx, port, connection, fieldAssociation, name);
+  this->VolumeMapper->SelectScalarArray(name);
+
+  // since input in AMR, all cell data on AMR becomes point field on the
+  // resampled data.
+  this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+}
+
 //***************************************************************************
 // Forwarded to vtkSmartVolumeMapper.
 //----------------------------------------------------------------------------
 void vtkAMRStreamingVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
   this->VolumeMapper->SetRequestedRenderMode(mode);
-}
-
-//----------------------------------------------------------------------------
-void vtkAMRStreamingVolumeRepresentation::SetColorArrayName(const char* arrayname)
-{
-  this->VolumeMapper->SelectScalarArray(arrayname);
-}
-
-//----------------------------------------------------------------------------
-void vtkAMRStreamingVolumeRepresentation::SetColorAttributeType(int type)
-{
-  switch (type)
-    {
-  case CELL_DATA:
-  case POINT_DATA:
-  default:
-    // since input in AMR, all cell data on AMR becomes point field on the
-    // resampled data.
-    this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    break;
-    }
 }
 
 //----------------------------------------------------------------------------

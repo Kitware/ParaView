@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,45 +29,56 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqScalarBarVisibilityReaction_h 
+#ifndef __pqScalarBarVisibilityReaction_h
 #define __pqScalarBarVisibilityReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>
 
+class pqTimer;
+class pqDataRepresentation;
+
 /// @ingroup Reactions
-/// Reaction to toggle scalar bar visibility
+/// Reaction to toggle scalar bar visibility.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqScalarBarVisibilityReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqScalarBarVisibilityReaction(QAction* parent);
-
-  /// Set the scalar bar visibility for the active representation.
-  static void setScalarBarVisibility(bool visible);
+  /// if \c track_active_objects is false, then the reaction will not track
+  /// pqActiveObjects automatically.
+  pqScalarBarVisibilityReaction(QAction* parent, bool track_active_objects=true);
+  virtual ~pqScalarBarVisibilityReaction();
 
 public slots:
+  /// Set the active representation.
+  void setRepresentation(pqDataRepresentation*);
+
+  /// set scalar bar visibility.
+  void setScalarBarVisibility(bool visible);
+
+protected slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
-  void updateEnableState();
+  virtual void updateEnableState();
 
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered()
-    { 
-    pqScalarBarVisibilityReaction::setScalarBarVisibility(
+    {
+    this->setScalarBarVisibility(
       this->parentAction()->isChecked());
     }
 
 private:
   Q_DISABLE_COPY(pqScalarBarVisibilityReaction)
 
-  QPointer<QObject> CachedRepresentation;
-  QPointer<QObject> CachedLUT;
+  bool BlockSignals;
+  bool TrackActiveObjects;
+  QPointer<pqDataRepresentation> CachedRepresentation;
   QPointer<QObject> CachedScalarBar;
+  QPointer<QObject> CachedView;
+  pqTimer* Timer;
 };
 
 #endif
-
-

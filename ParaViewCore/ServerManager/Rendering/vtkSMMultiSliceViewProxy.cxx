@@ -39,10 +39,10 @@ vtkSMMultiSliceViewProxy::~vtkSMMultiSliceViewProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
-  vtkSMProxy* source, int opport)
+const char* vtkSMMultiSliceViewProxy::GetRepresentationType(
+  vtkSMSourceProxy* producer, int outputPort)
 {
-  if (!source)
+  if (!producer)
     {
     return 0;
     }
@@ -50,33 +50,33 @@ vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
   assert("Session should be valid" && this->GetSession());
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
 
-  // Update with time to avoid domains updating without time later.
-  vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
-  if (sproxy)
-    {
-    double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
-    sproxy->UpdatePipeline(view_time);
-    }
-
   // Choose which type of representation proxy to create.
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations",
     "CompositeMultiSliceRepresentation");
   vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
   pp->RemoveAllUncheckedProxies();
-  pp->AddUncheckedInputConnection(source, opport);
+  pp->AddUncheckedInputConnection(producer, outputPort);
   bool sg = (pp->IsInDomains()>0);
   pp->RemoveAllUncheckedProxies();
-  if (sg)
+  return sg? "CompositeMultiSliceRepresentation" : NULL;
+}
+
+
+//----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
+  vtkSMProxy* proxy, int outputPort)
+{
+  vtkSMRepresentationProxy* repr = this->Superclass::CreateDefaultRepresentation(
+    proxy,outputPort);
+  if (repr)
     {
-    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-      pxm->NewProxy("representations", "CompositeMultiSliceRepresentation"));
-    this->InitDefaultSlices(sproxy, opport);
+    this->InitDefaultSlices(vtkSMSourceProxy::SafeDownCast(proxy), outputPort);
     return repr;
     }
 
   // Currently only images can be shown
-  vtkErrorMacro("This view only supports Multi-Slice representation.");
+  // vtkErrorMacro("This view only supports Multi-Slice representation.");
   return 0;
 }
 

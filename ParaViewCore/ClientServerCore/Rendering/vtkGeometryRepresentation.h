@@ -60,14 +60,6 @@ public:
   // requests.
   virtual void MarkModified();
 
-  // This is same a vtkDataObject::FieldAssociation types so you can use those
-  // as well.
-  enum AttributeTypes
-    {
-    POINT_DATA=0,
-    CELL_DATA=1
-    };
-
   // Description:
   // Get/Set the visibility for this representation. When the visibility of
   // representation of false, all view passes are ignored.
@@ -77,17 +69,6 @@ public:
   // Enable/Disable LOD;
   virtual void SetSuppressLOD(bool suppress)
     { this->SuppressLOD = suppress; }
-
-  // Description:
-  // Methods to control scalar coloring. ColorAttributeType defines the
-  // attribute type.
-  vtkSetMacro(ColorAttributeType, int);
-  vtkGetMacro(ColorAttributeType, int);
-
-  // Description:
-  // Pick the array to color with.
-  vtkSetStringMacro(ColorArrayName);
-  vtkGetStringMacro(ColorArrayName);
 
   // Description:
   // Set the lighting properties of the object. vtkGeometryRepresentation
@@ -173,8 +154,6 @@ public:
   virtual void SetMapScalars(int val);
   virtual void SetStatic(int val);
 
-  virtual void SetAllowSpecularHighlightingWithScalarColoring(int allow);
-
   // Description:
   // Provides access to the actor used by this representation.
   vtkPVLODActor* GetActor() { return this->GetRenderedProp(); }
@@ -201,6 +180,10 @@ public:
   virtual double GetBlockOpacity(unsigned int index);
   virtual void RemoveBlockOpacity(unsigned int index);
   virtual void RemoveBlockOpacities();
+
+  // Description:
+  // Convenience method to get the array name used to scalar color with.
+  const char* GetColorArrayName();
 //BTX
 protected:
   vtkGeometryRepresentation();
@@ -274,14 +257,11 @@ protected:
   vtkPVLODActor* Actor;
   vtkProperty* Property;
 
-  int ColorAttributeType;
-  char* ColorArrayName;
   double Ambient;
   double Specular;
   double Diffuse;
   int Representation;
   bool SuppressLOD;
-  bool AllowSpecularHighlightingWithScalarColoring;
   bool RequestGhostCellsIfNeeded;
   double DataBounds[6];
 

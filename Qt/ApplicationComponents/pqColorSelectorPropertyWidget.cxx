@@ -29,47 +29,84 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqColorSelectorPropertyWidget.h"
 
-#include <QVBoxLayout>
-
-#include "pqSignalAdaptors.h"
-#include "pqStandardColorButton.h"
-#include "pqStandardColorLinkAdaptor.h"
+#include "pqColorChooserButtonWithPalettes.h"
+#include "pqProxyWidget.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
-pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *smProxy,
-                                                           vtkSMProperty *smProperty,
-                                                           QWidget *pWidget)
-  : pqPropertyWidget(smProxy, pWidget)
+#include <QVBoxLayout>
+#include <QLabel>
+
+//-----------------------------------------------------------------------------
+pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
+  vtkSMProxy *smProxy, vtkSMProperty *smProperty, bool withPalette, QWidget *pWidget)
+: pqPropertyWidget(smProxy, pWidget)
 {
   PV_DEBUG_PANELS() << "pqColorSelectorPropertyWidget for a property with "
                     << "the panel_widget=\"color_chooser\" attribute";
+
+  this->setShowLabel(false);
+
+  bool useDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smProxy);
 
   QVBoxLayout *vbox = new QVBoxLayout(this);
   vbox->setSpacing(0);
   vbox->setMargin(0);
 
-  pqStandardColorButton *button = new pqStandardColorButton(this);
+  if (useDocumentationForLabels)
+    {
+    QLabel* label = new QLabel(
+      QString("<p>%1</p>").arg(pqProxyWidget::documentationText(smProperty)));
+    label->setWordWrap(true);
+    label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    vbox->addWidget(label, /*stretch=*/1);
+    }
+
+  pqColorChooserButton* button = NULL;
+  pqColorChooserButtonWithPalettes* paletteButton = NULL;
+  if (withPalette)
+    {
+    paletteButton = new pqColorChooserButtonWithPalettes(this);
+    button = paletteButton;
+    }
+  else
+    {
+    button = new pqColorChooserButton(this);
+    }
   button->setObjectName("ColorButton");
-  pqSignalAdaptorColor *adaptor =
-    new pqSignalAdaptorColor(button,
-                             "chosenColor",
-                             SIGNAL(chosenColorChanged(const QColor&)),
-                             false);
+  button->setText(smProperty->GetXMLLabel());
+  button->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-  this->addPropertyLink(adaptor,
-                        "color",
-                        SIGNAL(colorChanged(const QVariant&)),
-                        smProperty);
-  // pqStandardColorLinkAdaptor makes it possible to set this color to one of
-  // the standard colors.
-  new pqStandardColorLinkAdaptor(button, smProxy, smProxy->GetPropertyName(smProperty));
+  if (vtkSMPropertyHelper(smProperty).GetNumberOfElements() == 3)
+    {
+    this->addPropertyLink(
+      button, "chosenColorRgbF", SIGNAL(chosenColorChanged(const QColor&)),
+      smProperty);
+    }
+  else if (vtkSMPropertyHelper(smProperty).GetNumberOfElements() == 4)
+    {
+    this->addPropertyLink(
+      button, "chosenColorRgbaF", SIGNAL(chosenColorChanged(const QColor&)),
+      smProperty);
+    }
+  else
+    {
+    qDebug("Currently, only SMProperty with 3 or 4 elements is supported.");
+    }
 
-  vbox->addWidget(button);
+  if (withPalette)
+    {
+    // pqColorPaletteLinkHelper makes it possible to set this color to one of
+    // the colors in the application palette..
+    new pqColorPaletteLinkHelper(
+      paletteButton, smProxy, smProxy->GetPropertyName(smProperty));
+    }
+  vbox->addWidget(button, 1);
 }
 
+//-----------------------------------------------------------------------------
 pqColorSelectorPropertyWidget::~pqColorSelectorPropertyWidget()
 {
 }

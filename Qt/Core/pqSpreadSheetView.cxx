@@ -220,20 +220,6 @@ void pqSpreadSheetView::onEndRender()
 }
 
 //-----------------------------------------------------------------------------
-bool pqSpreadSheetView::canDisplay(pqOutputPort* opPort) const
-{
-  if(this->Superclass::canDisplay(opPort))
-    {
-    return true;
-    }
-  else
-    {
-    return (opPort && opPort->getServer()->GetConnectionID() ==
-            this->getServer()->GetConnectionID());
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqSpreadSheetView::onCreateSelection(vtkSMSourceProxy* selSource)
 {
   if(this->Internal->Table->selectionMode() == QAbstractItemView::NoSelection)

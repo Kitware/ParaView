@@ -5,8 +5,8 @@
     <RepresentationProxy name="SurfaceLICRepresentation"
       class="vtkSurfaceLICRepresentation"
       processes="client|dataserver|renderserver"
-      base_proxygroup="representations"
-      base_proxyname="SurfaceRepresentationBase" >
+      base_proxygroup="internal_representations"
+      base_proxyname="SurfaceRepresentationBase">
       <Documentation>
         Representation proxy for Surface LIC.
       </Documentation>
@@ -14,10 +14,6 @@
       <InputProperty name="Input" command="SetInputConnection">
         <InputArrayDomain name="input_vectors"
           number_of_components="3">
-          <RequiredProperties>
-            <Property name="SelectInputVectors"
-              function="FieldDataSelection"/>
-          </RequiredProperties>
         </InputArrayDomain>
       </InputProperty>
 

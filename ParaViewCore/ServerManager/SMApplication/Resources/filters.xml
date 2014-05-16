@@ -121,6 +121,20 @@
     <!-- End of internal_filters -->
   </ProxyGroup>
   <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPassThrough" label="Pass Through" name="PassThrough">
+      <Documentation>
+        A simple pass-through filter that doesn't transform data in any way.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the filter.</Documentation>
+      </InputProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkAMRToMultiBlockFilter"
                  label="Convert AMR dataset to Multi-block"
                  name="AMRToMultiBlock">
@@ -2236,12 +2250,7 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <InputArrayDomain name="input_array">
-          <RequiredProperties>
-            <Property function="FieldDataSelection"
-                      name="SelectInputScalars" />
-          </RequiredProperties>
-        </InputArrayDomain>
+        <InputArrayDomain name="input_array" />
         <Documentation>This property specifies the input to the Gradient
         (Unstructured) filter.</Documentation>
       </InputProperty>
@@ -6088,10 +6097,6 @@ found and the point will be rejected.</Documentation>
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           number_of_components="1">
-          <RequiredProperties>
-            <Property function="FieldDataSelection"
-                      name="SelectInputScalars" />
-          </RequiredProperties>
         </InputArrayDomain>
         <Documentation>This property specifies the input to the Threshold
         filter.</Documentation>
@@ -6184,10 +6189,6 @@ found and the point will be rejected.</Documentation>
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           number_of_components="1">
-          <RequiredProperties>
-            <Property function="FieldDataSelection"
-                      name="SelectInputScalars" />
-          </RequiredProperties>
         </InputArrayDomain>
         <Documentation>This property specifies the input to the Threshold
         filter.</Documentation>
@@ -9873,10 +9874,6 @@ found and the point will be rejected.</Documentation>
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <InputArrayDomain name="input_array">
-          <RequiredProperties>
-            <Property function="FieldDataSelection"
-                      name="SelectInputArray" />
-          </RequiredProperties>
         </InputArrayDomain>
         <Documentation>This property specifies the input to the Histogram
         filter.</Documentation>

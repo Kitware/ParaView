@@ -72,13 +72,6 @@ public:
   /// Returns the proxy of the root plot view in the comparative view.
   virtual vtkSMViewProxy* getViewProxy() const;
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  virtual void setDefaultPropertyValues();
-
 public slots:
 
   void representationsChanged();

@@ -21,6 +21,7 @@
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
+#include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkSMProxy;
 
@@ -36,6 +37,10 @@ public:
   // ParaView application will be use as the default FileName property.
   // Returns the name of the property or NULL when no such property is found.
   static const char* GetFileNameProperty(vtkSMProxy*);
+
+  // Description:
+  // Sanitize a label/name to be remove spaces, delimiters etc.
+  static vtkStdString SanitizeName(const char*);
 
 //BTX
 protected:

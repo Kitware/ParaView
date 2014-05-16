@@ -52,8 +52,6 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->OutlineSource = vtkOutlineSource::New();
   this->OutlineMapper = vtkPolyDataMapper::New();
 
-  this->ColorArrayName = 0;
-  this->ColorAttributeType = POINT_DATA;
   this->Cache = vtkImageData::New();
 
   this->CacheKeeper->SetInputData(this->Cache);
@@ -71,8 +69,6 @@ vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
   this->OutlineSource->Delete();
   this->OutlineMapper->Delete();
   this->CacheKeeper->Delete();
-
-  this->SetColorArrayName(0);
 
   this->Cache->Delete();
 }
@@ -234,19 +230,34 @@ bool vtkImageVolumeRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::UpdateMapperParameters()
 {
-  this->VolumeMapper->SelectScalarArray(this->ColorArrayName);
-  switch (this->ColorAttributeType)
+  const char* colorArrayName = NULL;
+  int fieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+
+  vtkInformation *info = this->GetInputArrayInformation(0);
+  if (info &&
+    info->Has(vtkDataObject::FIELD_ASSOCIATION()) &&
+    info->Has(vtkDataObject::FIELD_NAME()))
     {
-  case CELL_DATA:
+    colorArrayName = info->Get(vtkDataObject::FIELD_NAME());
+    fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
+    }
+
+  this->VolumeMapper->SelectScalarArray(colorArrayName);
+  switch (fieldAssociation)
+    {
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
     this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     break;
 
-  case POINT_DATA:
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
   default:
     this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
     break;
     }
+
   this->Actor->SetMapper(this->VolumeMapper);
+  // this is necessary since volume mappers don't like empty arrays.
+  this->Actor->SetVisibility(colorArrayName != NULL && colorArrayName[0] != 0);
 }
 
 //----------------------------------------------------------------------------

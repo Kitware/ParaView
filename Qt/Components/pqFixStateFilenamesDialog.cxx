@@ -356,7 +356,8 @@ void pqFixStateFilenamesDialog::accept()
         }
 
       // Update XML Element using new values.
-      info.XMLElement->AddAttribute("number_of_elements", info.Values.size());
+      info.XMLElement->SetAttribute("number_of_elements",
+        QString::number(info.Values.size()).toLatin1().data());
       for (int cc = info.XMLElement->GetNumberOfNestedElements()-1; cc >= 0; cc--)
         {
         // remove old "Element" elements.

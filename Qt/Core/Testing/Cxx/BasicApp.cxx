@@ -5,55 +5,78 @@
 #include <QTimer>
 #include <QApplication>
 
-#include "QVTKWidget.h"
-#include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMSourceProxy.h"
-
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqPipelineSource.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqStandardViewModules.h"
+#include "QVTKWidget.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxy.h"
 
 MainWindow::MainWindow()
 {
   // automatically make a server connection
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* ob = core->getObjectBuilder();
-  pqServer* server = ob->createServer(pqServerResource("builtin:"));
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+  pqServer* server = core->getObjectBuilder()->createServer(pqServerResource("builtin:"));
 
   // Register ParaView interfaces.
   pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
-
   // * adds support for standard paraview views.
   pgm->addInterface(new pqStandardViewModules(pgm));
 
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
+
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+
   // create a graphics window and put it in our main window
-  this->RenderView = qobject_cast<pqRenderView*>(
-    ob->createView(pqRenderView::renderViewType(), server));
+  vtkSmartPointer<vtkSMProxy> viewProxy;
+  viewProxy.TakeReference(pxm->NewProxy("views", "RenderView"));
+  Q_ASSERT(viewProxy);
+
+  controller->InitializeProxy(viewProxy);
+  controller->RegisterViewProxy(viewProxy);
+
+  this->RenderView = smmodel->findItem<pqRenderView*>(viewProxy);
+  Q_ASSERT(this->RenderView);
   this->setCentralWidget(this->RenderView->getWidget());
 
   // create source and elevation filter
-  pqPipelineSource* source;
-  pqPipelineSource* elevation;
+  vtkSmartPointer<vtkSMProxy> source;
+  source.TakeReference(pxm->NewProxy("sources", "SphereSource"));
+  controller->InitializeProxy(source);
+  controller->RegisterPipelineProxy(source);
 
-  source = ob->createSource("sources", "SphereSource", server);
   // updating source so that when elevation filter is created, the defaults
   // are setup correctly using the correct data bounds etc.
-  vtkSMSourceProxy::SafeDownCast(source->getProxy())->UpdatePipeline();
+  vtkSMSourceProxy::SafeDownCast(source)->UpdatePipeline();
 
-  elevation = ob->createFilter("filters", "ElevationFilter", source);
+  vtkSmartPointer<vtkSMProxy> elevation;
+  elevation.TakeReference(pxm->NewProxy("filters", "ElevationFilter"));
+  controller->PreInitializeProxy(elevation);
+  vtkSMPropertyHelper(elevation, "Input").Set(source);
+  controller->PostInitializeProxy(elevation);
+  controller->RegisterPipelineProxy(elevation);
 
-  // put the elevation in the window
-  ob->createDataRepresentation(elevation->getOutputPort(0), this->RenderView);
+  // Show the result.
+  controller->Show(vtkSMSourceProxy::SafeDownCast(elevation), 0,
+    vtkSMViewProxy::SafeDownCast(viewProxy));
 
   // zoom to sphere
-  this->RenderView->resetCamera();
+  this->RenderView->resetDisplay();
+
   // make sure we update
   this->RenderView->render();
   QTimer::singleShot(100, this, SLOT(processTest()));

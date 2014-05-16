@@ -112,8 +112,9 @@ def DoRegressionTesting(rmProxy=None):
   testing.AddArgument(BaselineImage)
 
   if not rmProxy:
-    pxm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
-    rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
+    rmProxy = servermanager.GetRenderView()
+    if rmProxy:
+      rmProxy = rmProxy.SMProxy
   if not rmProxy:
     raise "Failed to locate view to perform regression testing."
   #pyProxy(rmProxy).SetRenderWindowSize(300, 300);

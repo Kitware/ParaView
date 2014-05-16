@@ -64,18 +64,10 @@ public:
   /// Returns the root render view in the comparative view.
   virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
 
-  /// Capture the view image into a new vtkImageData with the given magnification
-  /// and return it.
+  /// This method is temporarily overridden to handle image capture.
+  /// Eventually, we need to move this logic to vtkSMComparativeViewProxy.
   virtual vtkImageData* captureImage(int magnification);
-  virtual vtkImageData* captureImage(const QSize& size)
-    { return this->Superclass::captureImage(size); }
-
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  virtual void setDefaultPropertyValues();
+  using Superclass::captureImage;
 
 protected slots:
   /// Called when the layout on the comparative vis changes.
@@ -100,5 +92,3 @@ private:
 };
 
 #endif
-
-

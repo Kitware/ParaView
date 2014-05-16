@@ -101,9 +101,6 @@ public:
   /// returns false, otherwise true.
   int replaceInput() const;
 
-  /// Hides the representations for the input if required, in the given view.
-  void hideInputIfRequired(pqView* view);
-
 signals:
   /// fired whenever an input connection changes.
   void producerChanged(const QString& inputportname);

@@ -98,15 +98,6 @@ public:
   /// if no hints are defined.
   vtkPVXMLElement* getHints() const;
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  /// The default implementation iterates over all properties
-  /// of the proxy and sets them to default values. 
-  virtual void setDefaultPropertyValues();
-
   /// Returns a list of all helper proxies.
   QList<vtkSMProxy*> getHelperProxies() const;
 
@@ -126,9 +117,6 @@ public:
   /// the helper proxies are unregistered when the main proxy is unregistered.
   virtual void addHelperProxy(const QString& key, vtkSMProxy*);
   void removeHelperProxy(const QString& key, vtkSMProxy*);
-
-  /// Unregisters all helper proxies.
-  void clearHelperProxies();
 
   /// Updates the internal datastructures using the proxies currently registered
   /// under the group that would be used for helper proxies. This makes it

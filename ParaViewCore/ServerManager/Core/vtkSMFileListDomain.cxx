@@ -30,20 +30,6 @@ vtkSMFileListDomain::~vtkSMFileListDomain()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMFileListDomain::SetDefaultValues(vtkSMProperty* property)
-{
-  vtkSMStringVectorProperty* svp = 
-    vtkSMStringVectorProperty::SafeDownCast(property);
-  if (svp && this->GetNumberOfStrings() > 0)
-    {
-    svp->SetElement(0, this->GetString(0));
-    return 1;
-    }
-
-  return this->Superclass::SetDefaultValues(property);
-}
-
-//---------------------------------------------------------------------------
 void vtkSMFileListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

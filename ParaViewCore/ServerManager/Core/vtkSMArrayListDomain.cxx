@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkSMArrayListDomain.h"
 
-#include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -22,19 +21,19 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMDomainIterator.h"
 #include "vtkSMInputArrayDomain.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkStdString.h"
 #include "vtkStringList.h"
 
-#include <map>
+#include <cassert>
+#include <set>
 #include <vector>
-#include <string>
+#include <algorithm>
 #include "vtksys/ios/sstream"
-#include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
 
@@ -45,30 +44,252 @@ struct vtkSMArrayListDomainInformationKey
   int Strategy;
 };
 
-struct vtkSMArrayListDomainInternals
+struct vtkSMArrayListDomainArrayInformation
 {
-  std::map<vtkStdString, int> PartialMap;
-  std::vector<int> DataTypes;
-  std::vector<int> FieldAssociation;
-  std::map<int,int> DomainAssociation;
-  std::vector<vtkSMArrayListDomainInformationKey> InformationKeys;
+  vtkStdString ArrayName;
+  bool IsPartial;
 
-  void SetAssociations(int index, int field, int domain)
+  // data association for this array on input.
+  int FieldAssociation;
+
+  // desired association for this array.
+  int DomainAssociation;
+
+  int ArrayAttributeType;
+
+  vtkSMArrayListDomainArrayInformation():
+    IsPartial(false),
+    FieldAssociation(vtkDataObject::POINT),
+    DomainAssociation(vtkDataObject::POINT),
+    ArrayAttributeType(-1)
     {
-    this->FieldAssociation[index] = field;
-    this->DomainAssociation[index] =  domain == -1 ? field : domain;
+    }
+
+  bool operator==(const vtkSMArrayListDomainArrayInformation& other) const
+    {
+    return this->ArrayName == other.ArrayName &&
+      this->IsPartial == other.IsPartial &&
+      this->FieldAssociation == other.FieldAssociation &&
+      this->DomainAssociation == other.DomainAssociation &&
+      this->ArrayAttributeType == other.ArrayAttributeType;
+    }
+
+  // helps keep the set sorted in preferred order.
+  bool operator < (const vtkSMArrayListDomainArrayInformation& other) const
+    {
+    if (this->DomainAssociation == other.DomainAssociation)
+      {
+      if (this->FieldAssociation == other.FieldAssociation)
+        {
+        if (this->ArrayName == other.ArrayName)
+          {
+          // don't treat partial and non-partial arrays as different.
+          //if (this->IsPartial == other.IsPartial)
+          //  {
+            return this->ArrayAttributeType < other.ArrayAttributeType;
+          //  }
+          // return this->IsPartial < other.IsPartial;
+          }
+        return this->ArrayName < other.ArrayName;
+        }
+      return this->FieldAssociation < other.FieldAssociation;
+      }
+    return this->DomainAssociation < other.DomainAssociation;
     }
 };
+
+struct vtkSMArrayListDomainInternals
+{
+public:
+  std::vector<vtkSMArrayListDomainInformationKey> InformationKeys;
+
+  std::vector<int> DataTypes;
+
+  typedef std::vector<vtkSMArrayListDomainArrayInformation> DomainValuesVector;
+  DomainValuesVector DomainValues;
+
+  typedef std::set<vtkSMArrayListDomainArrayInformation> DomainValuesSet;
+
+  // Builds the list of acceptable arrays in result.
+  // association is the association requested by the domain
+  // required_number_of_components is the num-of-comps
+  void BuildArrayList(DomainValuesSet & result,
+    vtkSMArrayListDomain* self,
+    int association,
+    int required_number_of_components,
+    vtkPVDataInformation* dataInfo);
+
+  std::vector<vtkStdString> GetDomainValueStrings()
+    {
+    std::vector<vtkStdString> values;
+    for (DomainValuesVector::const_iterator iter = this->DomainValues.begin(),
+      end = this->DomainValues.end(); iter != end; ++iter)
+      {
+      values.push_back(iter->ArrayName);
+      }
+    return values;
+    }
+
+  const vtkSMArrayListDomainArrayInformation* FindAttribute(int array_attribute)
+    {
+    for (DomainValuesVector::const_iterator iter = this->DomainValues.begin(),
+      end = this->DomainValues.end(); iter != end; ++iter)
+      {
+      if (iter->ArrayAttributeType == array_attribute)
+        {
+        return &(*iter);
+        }
+      }
+    return NULL;
+    }
+private:
+  bool IsArrayDataTypeAcceptable(vtkPVArrayInformation* arrayInfo) const
+    {
+    for (size_t cc=0, max=this->DataTypes.size(); cc < max; ++cc)
+      {
+      if (this->DataTypes[cc] == VTK_VOID ||
+          this->DataTypes[cc] == arrayInfo->GetDataType())
+        {
+        return true;
+        }
+      }
+    return (this->DataTypes.size() == 0);
+    }
+
+  bool AreArrayInformationKeysAcceptable(vtkPVArrayInformation* arrayInfo)
+    {
+    for (size_t cc=0, max=this->InformationKeys.size(); cc < max; ++cc)
+      {
+      vtkSMArrayListDomainInformationKey& key = this->InformationKeys[cc];
+      int hasInfo = arrayInfo->HasInformationKey(key.Location, key.Name);
+      if (hasInfo && key.Strategy == vtkSMArrayListDomain::REJECT_KEY)
+        {
+        return false;
+        }
+      if (!hasInfo && key.Strategy == vtkSMArrayListDomain::NEED_KEY)
+        {
+        return false;
+        }
+      }
+    return true;
+    }
+};
+
+//---------------------------------------------------------------------------
+void vtkSMArrayListDomainInternals::BuildArrayList(
+  vtkSMArrayListDomainInternals::DomainValuesSet & result,
+  vtkSMArrayListDomain* self,
+  int association,
+  int required_number_of_components,
+  vtkPVDataInformation* dataInfo)
+{
+  if (self->GetNoneString() && result.size() == 0)
+    {
+    vtkSMArrayListDomainArrayInformation info;
+    info.ArrayName = self->GetNoneString();
+    info.IsPartial = false;
+    info.FieldAssociation = 0;
+    info.DomainAssociation = 0;
+    result.insert(info);
+    }
+
+  // iterate over attributes arrays in dataInfo and add acceptable arrays to the
+  // domain.
+  for (int type=vtkSMInputArrayDomain::POINT;
+    type < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES;
+    type++)
+    {
+    if (type == vtkSMInputArrayDomain::ANY)
+      {
+      continue;
+      }
+    vtkPVDataSetAttributesInformation* attrInfo = dataInfo->GetAttributeInformation(type);
+    int acceptable_as = type;
+    if (attrInfo == NULL ||
+      !vtkSMInputArrayDomain::IsAttributeTypeAcceptable(association, type, &acceptable_as))
+      {
+      continue;
+      }
+    assert(acceptable_as != vtkSMInputArrayDomain::ANY);
+
+    // iterate over all arrays and add them to the list, if acceptable.
+    for (int idx=0, maxIdx=attrInfo->GetNumberOfArrays(); idx < maxIdx; ++idx)
+      {
+      vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(idx);
+
+      // First check if the array is acceptable based on the component requirements.
+      if (arrayInfo == NULL||
+        !vtkSMInputArrayDomain::IsArrayAcceptable(required_number_of_components, arrayInfo))
+        {
+        continue;
+        }
+
+      // Next, check if the array is acceptable based on the data-type
+      // limitations specified on self.
+      if (!this->IsArrayDataTypeAcceptable(arrayInfo))
+        {
+        continue;
+        }
+
+      // Next, check if the array is acceptable based on the information-key
+      // magic.
+      if (!this->AreArrayInformationKeysAcceptable(arrayInfo))
+        {
+        continue;
+        }
+
+      // ACCEPTABLE ARRAY FOUND!!!
+      // Add it to the list.
+      if (required_number_of_components == 0 ||
+          required_number_of_components == arrayInfo->GetNumberOfComponents())
+        {
+        // the array is directly acceptable (no need to split out components)
+        vtkSMArrayListDomainArrayInformation info;
+        info.ArrayName = arrayInfo->GetName();
+        info.IsPartial = (arrayInfo->GetIsPartial() != 0);
+        info.FieldAssociation = acceptable_as;
+        info.DomainAssociation = type;
+        info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);
+        result.insert(info);
+        }
+      else
+        {
+        // array has number of components that doesn't directly match the required
+        // component count. The array is being accepted due to automatic property
+        // conversion. So we need to split up components and add them individually.
+        assert(required_number_of_components == 1 &&
+               vtkSMInputArrayDomain::GetAutomaticPropertyConversion() == true &&
+               arrayInfo->GetNumberOfComponents() > 1);
+
+        for (int cc=0, maxCC=arrayInfo->GetNumberOfComponents();
+            cc <= maxCC; ++cc)
+          {
+          if (cc == maxCC && arrayInfo->GetDataType() == VTK_STRING)
+            {
+            // magnitude is added only for numeric arrays.
+            continue;
+            }
+          vtkSMArrayListDomainArrayInformation info;
+          info.ArrayName = vtkSMArrayListDomain::CreateMangledName(arrayInfo, cc);
+          info.IsPartial = (arrayInfo->GetIsPartial() != 0);
+          info.FieldAssociation = acceptable_as;
+          info.DomainAssociation = type;
+          info.ArrayAttributeType = attrInfo->IsArrayAnAttribute(idx);
+          result.insert(info);
+          }
+        }
+      } // end of for each array
+    } // end of for each attribute type
+}
 
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::vtkSMArrayListDomain()
 {
   this->AttributeType = vtkDataSetAttributes::SCALARS;
-  this->DefaultElement = 0;
-  this->Association = 0;
   this->InputDomainName = 0;
   this->NoneString = 0;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
+  this->PickFirstAvailableArrayByDefault = true;
 }
 
 //---------------------------------------------------------------------------
@@ -77,354 +298,126 @@ vtkSMArrayListDomain::~vtkSMArrayListDomain()
   this->SetInputDomainName(0);
   this->SetNoneString(0);
   delete this->ALDInternals;
+  this->ALDInternals = NULL;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMArrayListDomain::IsArrayPartial(unsigned int idx)
 {
-  const char* name = this->GetString(idx);
-  return this->ALDInternals->PartialMap[name];
+  if (static_cast<size_t>(idx) < this->ALDInternals->DomainValues.size())
+    {
+    return this->ALDInternals->DomainValues[idx].IsPartial? 1 : 0;
+    }
+
+  vtkErrorMacro("Index out of range: " << idx);
+  return 0;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMArrayListDomain::GetDomainAssociation(unsigned int idx )
 {
-if ( this->ALDInternals->DomainAssociation.find(idx) ==
-  this->ALDInternals->DomainAssociation.end() )
-  {
-  return this->GetFieldAssociation(idx);
-  }
-  return this->ALDInternals->DomainAssociation.find(idx)->second;
+  if (static_cast<size_t>(idx) < this->ALDInternals->DomainValues.size())
+    {
+    return this->ALDInternals->DomainValues[idx].DomainAssociation;
+    }
+
+  vtkErrorMacro("Index out of range: " << idx);
+  return -1;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMArrayListDomain::GetFieldAssociation(unsigned int idx)
 {
-  if (this->ALDInternals->FieldAssociation.size() > idx)
+  if (static_cast<size_t>(idx) < this->ALDInternals->DomainValues.size())
     {
-    return this->ALDInternals->FieldAssociation[idx];
+    return this->ALDInternals->DomainValues[idx].FieldAssociation;
     }
 
+  vtkErrorMacro("Index out of range: " << idx);
   return -1;
-}
-//---------------------------------------------------------------------------
-unsigned int vtkSMArrayListDomain::AddString(const char* string)
-{
-  // by default we don't assume any association.
-  this->ALDInternals->FieldAssociation.push_back(
-    vtkDataObject::NUMBER_OF_ASSOCIATIONS);
-
-  return this->Superclass::AddString(string);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMArrayListDomain::RemoveAllStrings()
-{
-  this->ALDInternals->FieldAssociation.clear();
-  this->ALDInternals->PartialMap.clear();
-  this->Superclass::RemoveAllStrings();
-}
-
-//---------------------------------------------------------------------------
-int vtkSMArrayListDomain::RemoveString(const char* string)
-{
-  int index = this->Superclass::RemoveString(string);
-  if (index != -1)
-    {
-    int cc=0;
-    std::vector<int>::iterator iter;
-    for (iter=this->ALDInternals->FieldAssociation.begin();
-      iter != this->ALDInternals->FieldAssociation.end();
-      iter++, cc++)
-      {
-      if (cc==index)
-        {
-        this->ALDInternals->FieldAssociation.erase(iter);
-        break;
-        }
-      }
-    }
-  return index;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
-                                     int outputport,
-                                     vtkPVDataSetAttributesInformation* info,
-                                     vtkSMInputArrayDomain* iad,
-                                     int association, int domainAssociation)
-{
-  this->DefaultElement = 0;
-
-  int attrIdx=-1;
-  vtkPVArrayInformation* attrInfo = info->GetAttributeInformation(
-    this->AttributeType);
-  int num = info->GetNumberOfArrays();
-  for (int idx = 0; idx < num; ++idx)
-    {
-    vtkPVArrayInformation* arrayInfo = info->GetArrayInformation(idx);
-    if ( iad->IsFieldValid(sp, outputport, info->GetArrayInformation(idx), 1) )
-      {
-      this->ALDInternals->PartialMap[arrayInfo->GetName()] = arrayInfo->GetIsPartial();
-      int nAcceptedTypes=static_cast<int>(this->ALDInternals->DataTypes.size());
-      if ( nAcceptedTypes==0 )
-        {
-        if(this->CheckInformationKeys(arrayInfo))
-        {
-          unsigned int newidx = this->AddArray(arrayInfo, association,
-            domainAssociation, iad);
-          if (arrayInfo == attrInfo)
-            {
-            attrIdx = newidx;
-            }
-          }
-        }
-      for (int i=0; i<nAcceptedTypes; ++i)
-        {
-        int thisDataType=this->ALDInternals->DataTypes[i];
-        if (!thisDataType || (arrayInfo->GetDataType() == thisDataType))
-          {
-          if(this->CheckInformationKeys(arrayInfo))
-            {
-            unsigned int newidx = this->AddArray(arrayInfo, association,
-              domainAssociation, iad);
-            if (arrayInfo == attrInfo)
-              {
-              attrIdx = newidx;
-              }
-            }
-          }
-        }
-      }
-    }
-  if (attrIdx >= 0)
-    {
-    this->SetDefaultElement(attrIdx);
-    this->Association = association;
-    }
-}
-
-//---------------------------------------------------------------------------
-unsigned int vtkSMArrayListDomain::AddArray(
-  vtkPVArrayInformation* arrayInfo, int association,int domainAssociation,
-  vtkSMInputArrayDomain* iad)
-{
-  if (iad->GetAutomaticPropertyConversion() &&
-    iad->GetNumberOfComponents() == 1 &&
-    arrayInfo->GetNumberOfComponents() > 1)
-    {
-    // add magnitude only for numeric arrays.
-    unsigned int first_index = VTK_UNSIGNED_INT_MAX;
-    if (arrayInfo->GetDataType() != VTK_STRING)
-      {
-      vtkStdString name = this->CreateMangledName(arrayInfo,
-        arrayInfo->GetNumberOfComponents());
-      first_index = this->AddString(name.c_str());
-      this->ALDInternals->SetAssociations(first_index,association,domainAssociation);
-      }
-    for (int cc=0; cc < arrayInfo->GetNumberOfComponents(); cc++)
-      {
-      vtkStdString name = this->CreateMangledName(arrayInfo,cc);
-      unsigned int newidx = this->AddString(name.c_str());
-      if (first_index == VTK_UNSIGNED_INT_MAX)
-        {
-        first_index = newidx;
-        }
-      this->ALDInternals->SetAssociations(newidx,association,domainAssociation);
-      }
-    return first_index;
-    }
-  else
-    {
-    unsigned int newidx = this->AddString(arrayInfo->GetName());
-    this->ALDInternals->SetAssociations(newidx,association,domainAssociation);
-    return  newidx;
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
-                                  vtkSMInputArrayDomain* iad,
-                                  int outputport)
-{
-  // Make sure the outputs are created.
-  sp->CreateOutputPorts();
-  vtkPVDataInformation* info = sp->GetDataInformation(outputport);
-
-  if (!info)
-    {
-    return;
-    }
-
-  int attribute_type = iad->GetAttributeType();
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetRequiredProperty("FieldDataSelection"));
-  if (ivp && ivp->GetNumberOfElements() == 1)
-    {
-    if (ivp->GetNumberOfUncheckedElements() == 1)
-      {
-      attribute_type =
-        vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(
-          ivp->GetUncheckedElement(0));
-      }
-    else
-      {
-      attribute_type =
-        vtkSMInputArrayDomain::GetAttributeTypeFromFieldAssociation(
-          ivp->GetElement(0));
-      }
-    }
-
-  switch (attribute_type)
-    {
-  case vtkSMInputArrayDomain::ANY:
-    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_POINTS);
-    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_CELLS);
-    this->AddArrays(sp, outputport, info->GetVertexDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_VERTICES);
-    this->AddArrays(sp, outputport, info->GetEdgeDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_EDGES);
-    this->AddArrays(sp, outputport, info->GetRowDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_ROWS);
-    break;
-
-  case vtkSMInputArrayDomain::POINT:
-    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
-      vtkDataObject:: FIELD_ASSOCIATION_POINTS);
-    if(vtkSMInputArrayDomain::GetAutomaticPropertyConversion())
-     {
-     this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
-       vtkDataObject::FIELD_ASSOCIATION_CELLS, vtkDataObject::FIELD_ASSOCIATION_POINTS);
-     }
-    this->Association = vtkDataObject:: FIELD_ASSOCIATION_POINTS;
-    break;
-
-  case vtkSMInputArrayDomain::CELL:
-    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_CELLS);
-    if(vtkSMInputArrayDomain::GetAutomaticPropertyConversion())
-     {
-     this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
-       vtkDataObject::FIELD_ASSOCIATION_POINTS, vtkDataObject::FIELD_ASSOCIATION_CELLS);
-     }
-    this->Association = vtkDataObject:: FIELD_ASSOCIATION_CELLS;
-    break;
-
-  case vtkSMInputArrayDomain::VERTEX:
-    this->AddArrays(sp, outputport, info->GetVertexDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_VERTICES);
-    this->Association = vtkDataObject:: FIELD_ASSOCIATION_VERTICES;
-    break;
-
-  case vtkSMInputArrayDomain::EDGE:
-    this->AddArrays(sp, outputport, info->GetEdgeDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_EDGES);
-    this->Association = vtkDataObject:: FIELD_ASSOCIATION_EDGES;
-    break;
-
-  case vtkSMInputArrayDomain::ROW:
-    this->AddArrays(sp, outputport, info->GetRowDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_ROWS);
-    this->Association = vtkDataObject:: FIELD_ASSOCIATION_ROWS;
-    break;
-
-  case  vtkSMInputArrayDomain::NONE:
-    this->AddArrays(sp, outputport, info->GetFieldDataInformation(), iad,
-      vtkDataObject::FIELD_ASSOCIATION_NONE);
-    this->Association = vtkDataObject::FIELD_ASSOCIATION_NONE;
-    break;
-    }
-
-  this->InvokeModified();
-}
-
-//---------------------------------------------------------------------------
-void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp,
-                                  vtkSMSourceProxy* sp,
-                                  int outputport)
-{
-  vtkSMInputArrayDomain* iad = 0;
-  if (this->InputDomainName)
-    {
-    iad = vtkSMInputArrayDomain::SafeDownCast(
-      pp->GetDomain(this->InputDomainName));
-    }
-  else
-    {
-    vtkSMDomainIterator* di = pp->NewDomainIterator();
-    di->Begin();
-    while (!di->IsAtEnd())
-      {
-      iad = vtkSMInputArrayDomain::SafeDownCast(di->GetDomain());
-      if (iad)
-        {
-        break;
-        }
-      di->Next();
-      }
-    di->Delete();
-    }
-
-  if (iad)
-    {
-    this->Update(sp, iad, outputport);
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
-{
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
-
-  unsigned int i;
-  unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
-  for (i=0; i<numProxs; i++)
-    {
-    vtkSMSourceProxy* sp =
-      vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
-    if (sp)
-      {
-      this->Update(pp, sp,
-        (ip? ip->GetUncheckedOutputPortForConnection(i) : 0));
-      return;
-      }
-    }
-
-  // In case there is no valid unchecked proxy, use the actual
-  // proxy values
-  numProxs = pp->GetNumberOfProxies();
-  for (i=0; i<numProxs; i++)
-    {
-    vtkSMSourceProxy* sp =
-      vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
-    if (sp)
-      {
-      this->Update(pp, sp,
-        (ip? ip->GetOutputPortForConnection(i) : 0));
-      return;
-      }
-    }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMArrayListDomain::Update(vtkSMProperty*)
 {
-  this->RemoveAllStrings();
-  if (this->NoneString)
+  vtkSMProperty* input = this->GetRequiredProperty("Input");
+  if (!input)
     {
-    this->AddString(this->NoneString);
-    this->ALDInternals->FieldAssociation[0] =
-      vtkDataObject::NUMBER_OF_ASSOCIATIONS;
+    vtkErrorMacro("Missing require property 'Input'. Update failed.");
+    return;
     }
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->GetRequiredProperty("Input"));
-  if (pp)
+  vtkPVDataInformation* dataInfo = this->GetInputDataInformation("Input");
+  if (!dataInfo)
     {
-    this->Update(pp);
+    return;
+    }
+
+  vtkSMProperty* fieldDataSelection = this->GetRequiredProperty("FieldDataSelection");
+  vtkSMInputArrayDomain* iad = this->InputDomainName?
+    vtkSMInputArrayDomain::SafeDownCast(input->GetDomain(this->InputDomainName)):
+    vtkSMInputArrayDomain::SafeDownCast(input->FindDomain("vtkSMInputArrayDomain"));
+
+  int association = vtkSMInputArrayDomain::ANY;
+  int required_number_of_components = 0;
+  if (iad)
+    {
+    association = iad->GetAttributeType();
+    required_number_of_components = iad->GetNumberOfComponents();
+    }
+
+  if (fieldDataSelection)
+    {
+    vtkSMUncheckedPropertyHelper helper(fieldDataSelection);
+    if (helper.GetNumberOfElements()==1)
+      {
+      association = helper.GetAsInt(0);
+      }
+    else if (helper.GetNumberOfElements() == 5)
+      {
+      association = helper.GetAsInt(3);
+      }
+    else
+      {
+      vtkWarningMacro("FieldDataSelection property not supported, will be ignored.");
+      }
+    }
+
+  // validate association.
+  if (association < vtkSMInputArrayDomain::POINT ||
+    association >= vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES)
+    {
+    vtkWarningMacro("Invalid association. Ignoring.");
+    association = vtkSMInputArrayDomain::ANY;
+    }
+
+  if (required_number_of_components <0)
+    {
+    required_number_of_components = 0;
+    }
+
+  // we use a set so that the list gets sorted as well as helps us
+  // avoid duplicates esp. when processing two datainformation objects.
+  vtkSMArrayListDomainInternals::DomainValuesSet set;
+  this->ALDInternals->BuildArrayList(set, this,
+    association, required_number_of_components, dataInfo);
+
+  vtkPVDataInformation* extraInfo = this->GetExtraDataInformation();
+  if (extraInfo)
+    {
+    this->ALDInternals->BuildArrayList(set, this,
+      association, required_number_of_components, extraInfo);
+    }
+
+  vtkSMArrayListDomainInternals::DomainValuesVector values;
+  values.insert(values.end(), set.begin(), set.end());
+  if (values != this->ALDInternals->DomainValues)
+    {
+    this->ALDInternals->DomainValues = values;
+    this->SetStrings(this->ALDInternals->GetDomainValueStrings());
+    // FIXME: there is still a possibility that the above may not trigger
+    // DomainModified(). How do we handle that without unnecessarily
+    // firing the signal twice?
     }
 }
 
@@ -432,7 +425,10 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
 int vtkSMArrayListDomain::ReadXMLAttributes(
   vtkSMProperty* prop, vtkPVXMLElement* element)
 {
-  this->Superclass::ReadXMLAttributes(prop, element);
+  if (!this->Superclass::ReadXMLAttributes(prop, element))
+    {
+    return 0;
+    }
 
   const char* input_domain_name =
     element->GetAttribute("input_domain_name");
@@ -495,12 +491,11 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
       }
     }
 
-  // Search for attribute type with matching name.
+  // Search for attribute type to use when picking a default.
   const char* attribute_type = element->GetAttribute("attribute_type");
-  unsigned int i = vtkDataSetAttributes::NUM_ATTRIBUTES;
-  if(attribute_type)
+  if (attribute_type)
     {
-    for(i=0; i<vtkDataSetAttributes::NUM_ATTRIBUTES; ++i)
+    for(unsigned int i=0; i<vtkDataSetAttributes::NUM_ATTRIBUTES; ++i)
       {
       if(strcmp(vtkDataSetAttributes::GetAttributeTypeAsString(i),
                 attribute_type) == 0)
@@ -511,14 +506,8 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
       }
     }
 
-  if(i == vtkDataSetAttributes::NUM_ATTRIBUTES)
-    {
-    this->SetAttributeType(vtkDataSetAttributes::SCALARS);
-    }
-
   const char* data_type = element->GetAttribute("data_type");
-
-  if(data_type)
+  if (data_type)
     {
     // data_type can be a space delimited list of types
     // vlaid for the domain
@@ -632,74 +621,67 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
         }
       }
     }
+
   return 1;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
 {
-  vtkSMStringVectorProperty* svp =
-    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (!svp)
     {
     return 0;
     }
 
-  std::string array;
-  if (this->GetNumberOfStrings() > 0)
+  // If vtkSMStringVectorProperty has a default value which is in domain, just
+  // use it.
+  const char* defaultValue = svp->GetDefaultValue(0);
+  unsigned int temp;
+  if (defaultValue && this->IsInDomain(defaultValue, temp))
     {
-    array = this->GetString(this->DefaultElement)?
-      this->GetString(this->DefaultElement): "";
-    const char* defaultValue = svp->GetDefaultValue(0);
-    unsigned int temp;
-    if (defaultValue && this->IsInDomain(defaultValue, temp))
+    if (svp->GetNumberOfElements() == 5)
       {
-      array = defaultValue;
+      svp->SetElement(4, defaultValue);
+      return 1;
+      }
+    else if (svp->GetNumberOfElements() == 1)
+      {
+      svp->SetElement(0, defaultValue);
+      return 1;
       }
     }
 
+  const vtkSMArrayListDomainArrayInformation* info =
+    this->ALDInternals->FindAttribute(this->AttributeType);
+  if (info == NULL &&
+    this->ALDInternals->DomainValues.size() > 0 &&
+    this->PickFirstAvailableArrayByDefault == true)
+    {
+    info = &this->ALDInternals->DomainValues[0];
+    }
+  if (info)
+    {
     if (svp->GetNumberOfElements() == 5)
       {
-
       vtkNew<vtkStringList> values;
       svp->GetElements(values.GetPointer());
 
       vtksys_ios::ostringstream ass;
-      ass << this->Association;
+      ass << info->FieldAssociation;
       values->SetString(3, ass.str().c_str());
-      if (array.size() > 0)
-        {
-        values->SetString(4, array.c_str());
-        svp->SetElements(values.GetPointer());
-        return 1;
-        }
-      }
-    else if (svp->GetNumberOfElements() == 1 && array.size() > 0)
-      {
-      svp->SetElement(0, array.c_str());
+      values->SetString(4, info->ArrayName.c_str());
+      svp->SetElements(values.GetPointer());
       return 1;
       }
-
-  return this->Superclass::SetDefaultValues(prop);
-}
-
-//---------------------------------------------------------------------------
-int vtkSMArrayListDomain::CheckInformationKeys(vtkPVArrayInformation* arrayInfo)
-{
-  for (unsigned int i=0; i< this->GetNumberOfInformationKeys(); i++)
-    {
-    vtkSMArrayListDomainInformationKey& key = this->ALDInternals->InformationKeys[i];
-    int hasInfo = arrayInfo->HasInformationKey(key.Location, key.Name);
-    if(hasInfo && key.Strategy == vtkSMArrayListDomain::REJECT_KEY)
+    else if (svp->GetNumberOfElements() == 1)
       {
-      return 0;
-      }
-    if(!hasInfo && key.Strategy == vtkSMArrayListDomain::NEED_KEY)
-      {
-      return 0;
+      svp->SetElement(0, info->ArrayName.c_str());
+      return 1;
       }
     }
-  return 1;
+
+  return this->Superclass::SetDefaultValues(prop);
 }
 
 //---------------------------------------------------------------------------
@@ -779,7 +761,6 @@ int vtkSMArrayListDomain::GetInformationKeyStrategy(unsigned int index)
 void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "DefaultElement: " << this->DefaultElement << endl;
   os << indent << "AttributeType: " << this->AttributeType << endl;
   int nDataTypes=static_cast<int>(this->ALDInternals->DataTypes.size());
   for (int i=0; i<nDataTypes; ++i)

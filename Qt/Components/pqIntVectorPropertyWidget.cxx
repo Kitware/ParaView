@@ -44,7 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 
 #include "pqIntRangeWidget.h"
+#include "pqLabel.h"
 #include "pqLineEdit.h"
+#include "pqProxyWidget.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
@@ -68,7 +70,9 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     {
     return;
     }
-  
+
+  bool useDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smProxy);
+
   // find the domain
   vtkSmartPointer<vtkSMDomain> domain;
   vtkSMDomainIterator *domainIter = ivp->NewDomainIterator();
@@ -88,12 +92,23 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
   if(vtkSMBooleanDomain::SafeDownCast(domain))
     {
-    QCheckBox *checkBox = new QCheckBox(smproperty->GetXMLLabel(), this);
+    QCheckBox *checkBox = new QCheckBox(
+      useDocumentationForLabels? "" : smproperty->GetXMLLabel(), this);
     checkBox->setObjectName("CheckBox");
     this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), ivp);
     this->setChangeAvailableAsChangeFinished(true);
     layoutLocal->addWidget(checkBox);
 
+    if (useDocumentationForLabels)
+      {
+      pqLabel* label = new pqLabel(
+        QString("<p>%1</p>").arg(pqProxyWidget::documentationText(smproperty)));
+      label->setObjectName("CheckBoxLabel");
+      label->setWordWrap(true);
+      label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+      label->connect(label, SIGNAL(clicked()), checkBox, SLOT(click()));
+      layoutLocal->addWidget(label, /*stretch=*/1);
+      }
     this->setShowLabel(false);
 
     PV_DEBUG_PANELS() << "QCheckBox for an IntVectorProperty with a BooleanDomain";

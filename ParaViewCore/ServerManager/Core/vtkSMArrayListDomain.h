@@ -14,27 +14,48 @@
 =========================================================================*/
 // .NAME vtkSMArrayListDomain - list of arrays obtained from input
 // .SECTION Description
-// vtkSMArrayListDomain represents a domain consisting of array names
-// obtained from an input. vtkSMArrayListDomain requires
-// a property of class vtkSMProxyProperty which points to a
-// vtkSMSourceProxy and contains a vtkSMInputArrayDomain. Only
-// the first proxy and domain are used.
-// Valid XML attributes are:
-// @verbatim
-// * attribute_type - one of:
-//    - scalars
-//    - vectors
-//    - normals
-//    - tcoords
-//    - tensors
-// * data_type - one or more of:
-//    - VTK_BIT, VTK_CHAR, VTK_INT, VTK_FLOAT, VTK_DOUBLE,... etc etc or the equivalent integers
-//      from vtkType.h
-//    - VTK_VOID, and 0 are equivalent to not specifying, meaning any data type
-//      is allowed
-// * none_string - when specified, this string appears as the first entry in
-//      the list and can be used to show "None", or "Not available" etc.
-// * key_location / key_name / key_strategy:
+// vtkSMArrayListDomain is used on vtkSMStringVectorProperty when the values
+// on the property correspond to data arrays in the input.
+//
+// Supported Required Property Functions:
+// \li \c Input : (required) this point to a vtkSMInputProperty on the parent
+//                proxy. The value of this property provides the source that
+//                provides the data information to determine the available
+//                arrays.
+// \li \c FieldDataSelection : (optional) this points a vtkSMIntVectorProperty
+//                that provide the array association for accepted arrays as
+//                defined by vtkDataObject::FieldAssociations. If
+//                FieldDataSelection is missing, then the array association is
+//                determined using the vtkSMInputArrayDomain on the
+//                vtkSMInputProperty pointed by the required function \c Input.
+//                If the input property has multiple vtkSMInputArrayDomain
+//                types, you can identify the domain to use by using the
+//                \li input_domain_name XML attribute. If neither the
+//                FieldDataSelection is specified and no vtkSMInputArrayDomain
+//                is found, then this domain assumes that all array associations
+//                are valid.
+//
+// Supported XML attributes:
+// \li \c attribute_type : (optional) when specified, this is used to pick the
+//                default value in SetDefaultValues. This specifies the
+//                array-attribute type to pick as the default, if available e.g.
+//                if value is "Scalars", then by default the active scalar array
+//                will be picked, if available. Not to be confused with
+//                vtkDataObject::AttributeTypes, this corresponds to
+//                vtkDataSetAttributes::AttributeTypes.
+//                Accepted values are "Scalars", "Vectors", etc., as defined by
+//                vtkDataSetAttributes::AttributeNames.
+// \li \c data_type: (optional) when specified qualifies the acceptable arrays
+//                list to the types specified. Value can be one or more of
+//                VTK_BIT, VTK_CHAR, VTK_INT, VTK_FLOAT, VTK_DOUBLE,... etc.
+//                or the equivalent integers from vtkType.h.  VTK_VOID, and 0
+//                are equivalent to not specifying, meaning any data type.
+//                VTK_DATA_ARRAY can be used to limit to vtkDataArray
+//                subclasses.
+// \li \c none_string: (optional) when specified, this string appears as the
+//                first entry in the domain the list and can be used to show
+//                "None", or "Not available" etc.
+// \li \c key_location / \c key_name / \c key_strategy: (optional)
 //      those tree attributes are related to InformationKey of the array.
 //      key_location/key_name are the location and name of the given InformationKey
 //      key_strategy specifies if this specific key is needed to be in the domain
@@ -42,19 +63,6 @@
 //      if nothing is specified, the default is to add a vtkAbstractArray::GUI_HIDE
 //      key, with the reject_key strategy, so that arrays that have this InformationKey
 //      are not visible in the user interface.
-// @endverbatim
-// Additionally, vtkSMArrayListDomain support 'default_values' attribute which
-// specifies a string (only 1 string value is supported). When
-// SetDefaultValues() is called, if the array name specified as 'default_values'
-// is present in the domain, then that will be used, otherwise, it simply uses
-// the first available array (which is default).
-//
-// Additionally, vtkSMArrayListDomain takes an  option required property with
-// function "FieldDataSelection" which can be a vtkSMIntVectorProperty with a
-// single value. If preset, this property's value is used to determine what type
-// of field-data i.e. point-data, cell-data etc. is currently available.
-// .SECTION See Also
-// vtkSMDomain vtkSMProxyProperty vtkSMInputArrayDomain
 
 #ifndef __vtkSMArrayListDomain_h
 #define __vtkSMArrayListDomain_h
@@ -88,30 +96,44 @@ public:
   virtual void Update(vtkSMProperty* prop);
 
   // Description:
-  // The DefaultElement is set during Update() using the "active
-  // attribute" of the assigned AttributeType. For example,
-  // if the AttributeType is set to SCALARS, DefaultElement is
-  // set to the index of the array that is the active scalars
-  // in the dataset.
-  vtkGetMacro(DefaultElement, unsigned int);
-
-  // Description:
   // Returns true if the array with the given idx is partial
   // false otherwise. See vtkPVArrayInformation for more information.
   int IsArrayPartial(unsigned int idx);
 
   // Description:
-  // Get field association for the array.
+  // Get field association for the array. When
+  // vtkSMInputArrayDomain::AutomaticPropertyConversion is ON, this is not the
+  // true association for a particular array, but what the target filter is
+  // expecting. Thus use this to set the value on the property.
+  // To correctly show icons in UI, use GetDomainAssociation().
   int GetFieldAssociation(unsigned int idx);
 
   // Description:
-  // Get desired association of the current domain
+  // Get the true field association for the array. This is same as
+  // GetFieldAssociation() except when
+  // vtkSMInputArrayDomain::AutomaticPropertyConversion is ON. In that case,
+  // this may be different. e.g. let's say Pressure is a point array on the
+  // input, however this filter only works with cell array. In that case, since
+  // AutomaticPropertyConversion is ON, vtkPVPostFilter is going to
+  // automatically convert the point array Pressure to a cell array for the
+  // filter. Now in this case, the SetInputArrayToProcess property on the filter
+  // must be set to ask a "cell" array named Pressure, despite the fact that
+  // there's no such cell array. And the UI needs to show the "Pressure" as a
+  // point array, since that's what the user is expecting. In this case,
+  // GetFieldAssociation() is going to return "CELL" for the "Pressure", while
+  // GetDomainAssociation() is going to return "POINT". Thus, use
+  // GetFieldAssociation() for setting the property value, but use
+  // GetDomainAssociation() for the icon.
   int GetDomainAssociation(unsigned int idx);
 
   // Description:
   // Return the attribute type. The values are listed in
   // vtkDataSetAttributes.h.
   vtkGetMacro(AttributeType, int);
+  
+  // Description:
+  // Return the string that is used as "none_string" in XML configuration.
+  vtkGetStringMacro(NoneString);
 
   // Description:
   // A vtkSMProperty is often defined with a default value in the
@@ -123,18 +145,6 @@ public:
   // property.
   // Returns 1 if the domain updated the property.
   virtual int SetDefaultValues(vtkSMProperty*);
-
-  // Description:
-  // Adds a new string to the domain.
-  unsigned int AddString(const char* string);
-
-  // Description:
-  // Removes a string from the domain.
-  virtual int RemoveString(const char* string);
-
-  // Description:
-  // Removes all strings from the domain.
-  virtual void RemoveAllStrings();
 
   //BTX
   // This enum represents the possible strategies associated
@@ -180,13 +190,6 @@ public:
   int GetInformationKeyStrategy(unsigned int);
 
   // Description:
-  // return 1 if the InformationKeys of this vtkPVArrayInformation
-  // fullfill the requirements of the InformationKey in this Domain.
-  // returns 0 on failure.
-  int CheckInformationKeys(vtkPVArrayInformation* arrayInfo);
-
-
-  // Description:
   // returns the mangled name for the component index that is passed in.
   //
   static vtkStdString CreateMangledName(vtkPVArrayInformation *arrayInfo, int component);
@@ -196,8 +199,6 @@ public:
   //
   static vtkStdString ArrayNameFromMangledName(const char* name);
   static int ComponentIndexFromMangledName(vtkPVArrayInformation *info, const char* name);
-
-
 
 protected:
   vtkSMArrayListDomain();
@@ -209,39 +210,15 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   // Description:
-  // Utility functions called by Update()
-  void AddArrays(vtkSMSourceProxy* sp,
-                 int outputport,
-                 vtkPVDataSetAttributesInformation* info,
-                 vtkSMInputArrayDomain* iad,
-                 int association, int domainAssociation=-1);
-
-  // Description:
-  // Adds a new array to the domain. This internally calls add string. If the \c
-  // iad tells us that the number of components required==1 and the array has
-  // more than 1 component and
-  // vtkSMInputArrayDomain::GetAutomaticPropertyConversion() is true, then the
-  // array is spilt into individual component and added (with name mangled using
-  // the component names).
-  // Returns the index for the array. If the array was split into components,
-  // then returns the index of the string for the array magnitude.
-  unsigned int AddArray(vtkPVArrayInformation* arrayinfo, int association, int domainAssociation,
-    vtkSMInputArrayDomain* iad);
-
-  void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
-  void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp, int outputport);
-  void Update(vtkSMProxyProperty* pp);
+  // HACK: Provides a temporary mechanism for subclasses to provide an
+  // "additional" vtkPVDataInformation instance to get available arrays list
+  // from.
+  virtual vtkPVDataInformation* GetExtraDataInformation() { return NULL; }
 
   // Description:
   // Set to an attribute type defined in vtkDataSetAttributes.
   vtkSetMacro(AttributeType, int);
-
-  vtkSetMacro(DefaultElement, unsigned int);
-
   int AttributeType;
-  int Attribute;
-  int Association;
-  unsigned int DefaultElement;
 
   // Description:
   // InputDomainName refers to a input property domain that describes
@@ -250,10 +227,14 @@ protected:
   vtkSetStringMacro(InputDomainName);
 
   vtkSetStringMacro(NoneString);
-  vtkGetStringMacro(NoneString);
 
   char* InputDomainName;
   char* NoneString;
+
+  // Currently, used by vtkSMRepresentedArrayListDomain to avoid picking just an
+  // arbitrary array for scalar coloring. Need to rethink how this should be
+  // done cleanly.
+  bool PickFirstAvailableArrayByDefault;
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented
   void operator=(const vtkSMArrayListDomain&); // Not implemented

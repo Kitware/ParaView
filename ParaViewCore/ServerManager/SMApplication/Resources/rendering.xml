@@ -5,14 +5,14 @@
                  processes="client">
       <!-- |dataserver|renderserver -->
       <DoubleVectorProperty command="GetPosition"
-                            default_values="0 0 1"
+                            default_values="0 0 6.69"
                             information_only="1"
                             name="CameraPositionInfo"
                             number_of_elements="3">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPosition"
-                            default_values="0 0 1"
+                            default_values="0 0 6.69"
                             ignore_synchronization="1"
                             immediate_update="1"
                             information_property="CameraPositionInfo"
@@ -59,27 +59,27 @@
                             name="CameraViewAngle"
                             number_of_elements="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="GetClippingRange"
-                            default_values="0.01 1000.01"
+                            default_values="4.63 0.30"
                             information_only="1"
                             name="CameraClippingRangeInfo"
                             number_of_elements="2">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetClippingRange"
-                            default_values="0.01 1000.01"
+                            default_values="4.63 0.30"
                             ignore_synchronization="1"
                             immediate_update="1"
                             information_property="CameraClippingRangeInfo"
                             name="CameraClippingRange"
                             number_of_elements="2"></DoubleVectorProperty>
       <DoubleVectorProperty command="SetParallelScale"
-                            default_values="1.0"
+                            default_values="1.73"
                             ignore_synchronization="1"
                             information_property="CameraParallelScaleInfo"
                             name="CameraParallelScale"
                             number_of_elements="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="GetParallelScale"
-                            default_values="1.0"
+                            default_values="1.73"
                             information_only="1"
                             name="CameraParallelScaleInfo"
                             number_of_elements="1">
@@ -329,6 +329,9 @@
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="TextAnnotationColor" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="0"
                             command="SetOpacity"
@@ -423,142 +426,6 @@
       <!-- End of TextProperty -->
     </Proxy>
   </ProxyGroup>
-  <ProxyGroup name="interactors">
-    <Proxy class="vtkPVGenericRenderWindowInteractor"
-           name="GenericRenderWindowInteractor">
-      <ProxyProperty command="SetRenderer"
-                     name="Renderer">
-        <ProxyGroupDomain name="groups">
-          <Group name="renderers" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <ProxyProperty command="SetInteractorStyle"
-                     name="InteractorStyle">
-        <ProxyGroupDomain name="groups">
-          <Group name="interactorstyles" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <DoubleVectorProperty command="SetCenterOfRotation"
-                            default_values="0 0 0"
-                            name="CenterOfRotation"
-                            number_of_elements="3"></DoubleVectorProperty>
-    </Proxy>
-  </ProxyGroup>
-  <ProxyGroup name="interactorstyles">
-    <Proxy class="vtkPVInteractorStyle"
-           name="InteractorStyle">
-      <ProxyProperty clean_command="RemoveAllManipulators"
-                     command="AddManipulator"
-                     is_internal="1"
-                     name="CameraManipulators"
-                     repeatable="1">
-        <!-- For now, we are marking this property is_internal so that it won't
-        get saved in state files.
-        Eventually, we need to take out all the interaction related code from
-        the server manager -->
-        <ProxyGroupDomain name="groups">
-          <Group name="cameramanipulators" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-    </Proxy>
-  </ProxyGroup>
-  <ProxyGroup name="cameramanipulators">
-    <Proxy class="vtkCameraManipulator"
-           name="CameraManipulator"
-           processes="client|renderserver|dataserver">
-      <IntVectorProperty command="SetButton"
-                         default_values="1"
-                         name="Button"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Left Button"
-                 value="1" />
-          <Entry text="Center Button"
-                 value="2" />
-          <Entry text="Right Button"
-                 value="3" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetShift"
-                         default_values="0"
-                         name="Shift"
-                         number_of_elements="1">
-        <BooleanDomain name="IsShiftPressed" />
-      </IntVectorProperty>
-      <IntVectorProperty command="SetControl"
-                         default_values="0"
-                         name="Control"
-                         number_of_elements="1">
-        <BooleanDomain name="IsControlPressed" />
-      </IntVectorProperty>
-      <StringVectorProperty command="SetManipulatorName"
-                            name="ManipulatorName"
-                            number_of_elements="1"></StringVectorProperty>
-    </Proxy>
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVJoystickFlyIn"
-           name="JoystickFlyIn"
-           processes="client|renderserver|dataserver">
-      <DoubleVectorProperty command="SetFlySpeed"
-                            default_values="15"
-                            name="FlySpeed"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="30"
-                           min="1"
-                           name="range" />
-      </DoubleVectorProperty>
-    </Proxy>
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVJoystickFlyOut"
-           name="JoystickFlyOut"
-           processes="client|renderserver|dataserver">
-      <DoubleVectorProperty command="SetFlySpeed"
-                            default_values="15"
-                            name="FlySpeed"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="30"
-                           min="1"
-                           name="range" />
-      </DoubleVectorProperty>
-    </Proxy>
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVTrackballMoveActor"
-           name="TrackballMoveActor"
-           processes="client|renderserver|dataserver" />
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkTrackballPan"
-           name="TrackballPan1"
-           processes="client|renderserver|dataserver" />
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVTrackballPan"
-           name="TrackballPan2"
-           processes="client|renderserver|dataserver" />
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVTrackballRoll"
-           name="TrackballRoll"
-           processes="client|renderserver|dataserver" />
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVTrackballRotate"
-           name="TrackballRotate"
-           processes="client|renderserver|dataserver" />
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVTrackballZoom"
-           name="TrackballZoom"
-           processes="client|renderserver|dataserver" />
-    <Proxy base_proxygroup="cameramanipulators"
-           base_proxyname="CameraManipulator"
-           class="vtkPVTrackballMultiRotate"
-           name="TrackballMultiRotate"
-           processes="client|renderserver|dataserver" />
-  </ProxyGroup>
   <ProxyGroup name="PropPickers">
     <Proxy class="vtkRenderedAreaPicker"
            name="AreaPicker">
@@ -580,23 +447,5 @@
                 name="Pick"></Property>
     </Proxy>
     <!-- End of PropPickers -->
-  </ProxyGroup>
-  <ProxyGroup name="views">
-    <!--
-    <CaveRenderViewProxy name="CaveRenderView"
-          base_proxygroup="views" base_proxyname="IceTMultiDisplayRenderView">
-      <Documentation>
-        Cave Render View for tile displays.
-      </Documentation>
-      <SubProxy>
-        <Proxy  name="ParallelRenderManager"
-                proxygroup="composite_managers"
-                proxyname="CaveRenderManager"
-                override="1">
-        </Proxy>
-      </SubProxy>
-    </CaveRenderViewProxy>
-    -->
-    <!-- End of group "views" -->
   </ProxyGroup>
 </ServerManagerConfiguration>

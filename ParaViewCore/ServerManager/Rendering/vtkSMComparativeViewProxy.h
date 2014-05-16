@@ -41,12 +41,6 @@ public:
   virtual void Update();
 
   // Description:
-  // Create a default representation for the given source proxy.
-  // Returns a new proxy.
-  // Overridden to forward the call to the internal root view proxy.
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
-
-  // Description:
   // Get all the internal views. The views should only be used to be layed out
   // by the GUI. It's not recommended to directly change the properties of the
   // views.
@@ -70,12 +64,17 @@ public:
   // This all marks all consumers as dirty.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
+  // Description:
+  // Overridden to forward the call to the internal root view proxy.
+  virtual const char* GetRepresentationType(
+    vtkSMSourceProxy* producer, int outputPort);
+
 protected:
   vtkSMComparativeViewProxy();
   ~vtkSMComparativeViewProxy();
 
-  void InvokeConfigureEvent();
 
+  void InvokeConfigureEvent();
 
   // Description:
   virtual void CreateVTKObjects();

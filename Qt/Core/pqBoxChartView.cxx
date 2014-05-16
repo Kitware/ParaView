@@ -60,12 +60,6 @@ pqBoxChartView::~pqBoxChartView()
 }
 
 //-----------------------------------------------------------------------------
-void pqBoxChartView::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-}
-
-//-----------------------------------------------------------------------------
 void pqBoxChartView::onAddRepresentation(pqRepresentation* repr)
 {
   this->updateRepresentationVisibility(repr, repr->isVisible());

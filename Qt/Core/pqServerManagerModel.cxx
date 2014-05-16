@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include "pqApplicationCore.h"
-#include "pqHelperProxyStateLoader.h"
 #include "pqInterfaceTracker.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -42,12 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModelInterface.h"
 #include "pqServerManagerObserver.h"
 #include "pqView.h"
+#include "vtkNew.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMSession.h"
+#include "vtkSMParaViewPipelineController.h"
 #include "vtkSMSessionClient.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
 
@@ -492,9 +493,15 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
   // Lets the world know when the server name changes.
   this->connect(server, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
     this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
-  
-  server->initialize();
 
+  // The session must be initialized here as ParaView expects that the essential
+  // proxies are created when following signals are fired. Also, registering
+  // those proxies before pqServer is setup can result in those pqProxy classes
+  // not being setup properly. Hence the need for doing this initialization
+  // here.
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  controller->InitializeSession(server->session());
+  
   emit this->serverReady(server);
   emit this->itemAdded(server);
   emit this->serverAdded(server);
@@ -525,8 +532,8 @@ void pqServerManagerModel::onConnectionClosed(vtkIdType id)
 void pqServerManagerModel::onStateLoaded(vtkPVXMLElement* root,
   vtkSMProxyLocator* locator)
 {
-  pqHelperProxyStateLoader loader;
-  loader.loadState(root, locator);
+  Q_UNUSED(root);
+  Q_UNUSED(locator);
 }
 
 //-----------------------------------------------------------------------------

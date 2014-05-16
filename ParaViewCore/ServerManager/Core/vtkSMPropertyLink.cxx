@@ -59,7 +59,7 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-struct vtkSMPropertyLinkInternals
+class vtkSMPropertyLinkInternals
 {
 public:
   struct LinkedProperty
@@ -131,7 +131,7 @@ void vtkSMPropertyLink::AddLinkedProperty(vtkSMProxy* proxy, const char* pname,
   int addToList = 1;
   int addObserver = updateDir & INPUT;
   bool input_exists = false;
-  
+
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
     this->Internals->LinkedProperties.begin();
   for (; iter != this->Internals->LinkedProperties.end(); ++iter)

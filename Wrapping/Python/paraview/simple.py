@@ -36,8 +36,6 @@ A simple example::
 #==============================================================================
 
 import paraview
-paraview.compatibility.major = 3
-paraview.compatibility.minor = 5
 import servermanager
 import lookuptable
 
@@ -72,8 +70,8 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
     Disconnect(globals(), False)
     connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    _initializeSession(connection)
     _add_functions(globals())
-    _CreateEssentialProxies()
     return connection
 
 # -----------------------------------------------------------------------------
@@ -83,8 +81,8 @@ def ReverseConnect(port=11111):
     an incoming connection from the server."""
     Disconnect(globals(), False)
     connection = servermanager.ReverseConnect(port)
+    _initializeSession(connection)
     _add_functions(globals())
-    _CreateEssentialProxies()
     return connection
 
 #==============================================================================
@@ -106,75 +104,66 @@ def SetActiveConnection(connection=None, ns=None):
 # Views and Layout methods
 #==============================================================================
 
-def CreateView(view_xml_name):
+def CreateView(view_xml_name, **params):
     "Creates and returns the specified proxy view based on its name/label."
     view = servermanager._create_view(view_xml_name)
-    servermanager.ProxyManager().RegisterProxy("views", \
-      "my_view%d" % _funcs_internals.view_counter, view)
-    active_objects.view = view
-    _funcs_internals.view_counter += 1
+    if not view:
+        raise RuntimeError, "Failed to create requested view", view_xml_name
 
-    tk = _find_proxy("timekeeper", "misc", "TimeKeeper")
-    if not tk:
-        paraview.print_error("Error: Failed to locate TimeKeeper")
-    views = tk.Views
-    if not view in views:
-        views.append(view)
-    try:
-        scene = GetAnimationScene()
-        if not view in scene.ViewModules:
-            scene.ViewModules.append(view)
-    except servermanager.MissingProxy:
-        pass
+    controller = servermanager.ParaViewPipelineController()
+    controller.PreInitializeProxy(view)
+    SetProperties(view, **params)
+    controller.PostInitializeProxy(view)
+    controller.RegisterViewProxy(view)
     return view
 
 # -----------------------------------------------------------------------------
 
-def CreateRenderView():
+def CreateRenderView(**params):
     """"Create standard 3D render view"""
-    return CreateView("RenderView")
+    return CreateView("RenderView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateXYPlotView():
+def CreateXYPlotView(**params):
     """Create XY plot Chart view"""
-    return CreateView("XYChartView")
+    return CreateView("XYChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateBarChartView():
+def CreateBarChartView(**params):
     """"Create Bar Chart view"""
-    return CreateView("XYBarChartView")
+    return CreateView("XYBarChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeRenderView():
+def CreateComparativeRenderView(**params):
     """"Create Comparative view"""
-    return CreateView("ComparativeRenderView")
+    return CreateView("ComparativeRenderView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeXYPlotView():
+def CreateComparativeXYPlotView(**params):
     """"Create comparative XY plot Chart view"""
-    return CreateView("ComparativeXYPlotView")
+    return CreateView("ComparativeXYPlotView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateComparativeBarChartView():
+def CreateComparativeBarChartView(**params):
     """"Create comparative Bar Chart view"""
-    return CreateView("ComparativeBarChartView")
+    return CreateView("ComparativeBarChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def CreateParallelCoordinatesChartView():
+def CreateParallelCoordinatesChartView(**params):
     """"Create Parallele coordinate Chart view"""
-    return CreateView("ParallelCoordinatesChartView")
+    return CreateView("ParallelCoordinatesChartView", **params)
 
 # -----------------------------------------------------------------------------
 
-def Create2DRenderView():
+def Create2DRenderView(**params):
     """"Create the standard 3D render view with the 2D interaction mode turned ON"""
-    return CreateView("2DRenderView")
+    return CreateView("2DRenderView", **params)
 
 # -----------------------------------------------------------------------------
 
@@ -300,25 +289,25 @@ def GetRepresentation(proxy=None, view=None):
     If pipeline object and view are not specified, active objects are used."""
     if not view:
         view = active_objects.view
+    if not view:
+        raise ValueError, "view argument cannot be None."
     if not proxy:
         proxy = active_objects.source
+    if not proxy:
+        raise ValueError, "proxy argument cannot be None."
     rep = servermanager.GetRepresentation(proxy, view)
     if not rep:
-        rep = servermanager.CreateRepresentation(proxy, view)
-        servermanager.ProxyManager().RegisterProxy("representations", \
-          "my_representation%d" % _funcs_internals.rep_counter, rep)
-        _funcs_internals.rep_counter += 1
+        controller = servermanager.ParaViewPipelineController()
+        return controller.Show(proxy, proxy.Port, view)
     return rep
 
 # -----------------------------------------------------------------------------
-
 def GetDisplayProperties(proxy=None, view=None):
     """"Given a pipeline object and view, returns the corresponding representation object.
     If pipeline object and/or view are not specified, active objects are used."""
     return GetRepresentation(proxy, view)
 
 # -----------------------------------------------------------------------------
-
 def Show(proxy=None, view=None, **params):
     """Turns the visibility of a given pipeline object on in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
@@ -326,26 +315,30 @@ def Show(proxy=None, view=None, **params):
         proxy = GetActiveSource()
     if proxy == None:
         raise RuntimeError, "Show() needs a proxy argument or that an active source is set."
-    if not view and not active_objects.view:
-        CreateRenderView()
-    rep = GetDisplayProperties(proxy, view)
+    if not view:
+        # it here's now active view, controller.Show() will create a new preferred view.
+        # if possible.
+        view = active_objects.view
+    controller = servermanager.ParaViewPipelineController()
+    rep = controller.Show(proxy, proxy.Port, view)
     if rep == None:
         raise RuntimeError, "Could not create a representation object for proxy %s" % proxy.GetXMLLabel()
     for param in params.keys():
         setattr(rep, param, params[param])
-    rep.Visibility = 1
     return rep
 
 # -----------------------------------------------------------------------------
-
 def Hide(proxy=None, view=None):
     """Turns the visibility of a given pipeline object off in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
-    rep = GetDisplayProperties(proxy, view)
-    rep.Visibility = 0
+    if not proxy:
+      proxy = active_objects.source
+    if not proxy:
+        raise ValueError, "proxy argument cannot be None when no active source is present."
+    controller = servermanager.ParaViewPipelineController()
+    controller.Hide(proxy, proxy.Port, view)
 
 # -----------------------------------------------------------------------------
-
 def SetDisplayProperties(proxy=None, view=None, **params):
     """Sets one or more display properties of the given pipeline object. If an argument
     is not provided, the active source is used. Pass a list of property_name=value
@@ -357,7 +350,6 @@ def SetDisplayProperties(proxy=None, view=None, **params):
     SetProperties(rep, **params)
 
 # -----------------------------------------------------------------------------
-
 def _DisableFirstRenderCameraReset():
     """Disable the first render camera reset.  Normally a ResetCamera is called
     automatically when Render is called for the first time after importing
@@ -484,66 +476,11 @@ def Delete(proxy=None):
     is specified."""
     if not proxy:
         proxy = active_objects.source
-    # Unregister any helper proxies stored by a vtkSMProxyListDomain
-    for prop in proxy:
-        listdomain = prop.GetDomain('proxy_list')
-        if listdomain:
-            if listdomain.GetClassName() != 'vtkSMProxyListDomain':
-                continue
-            group = "pq_helper_proxies." + proxy.GetGlobalIDAsString()
-            pm = servermanager.ProxyManager()
-            iproxies = [listdomain.GetProxy(i) for i in xrange(listdomain.GetNumberOfProxies())]
-            names = [pm.GetProxyName(group, iproxy) for iproxy in iproxies]
-            for name, iproxy in zip(names, iproxies):
-                if iproxy and name:
-                    pm.UnRegisterProxy(group, name, iproxy)
+    if not proxy:
+        raise RuntimeError, "Could not locate proxy to 'Delete'"
+    controller = servermanager.ParaViewPipelineController()
+    controller.UnRegisterProxy(proxy)
 
-    # Remove source/view from time keeper
-    tk = _find_proxy("timekeeper", "misc", "TimeKeeper")
-    if isinstance(proxy, servermanager.SourceProxy):
-        try:
-            idx = tk.TimeSources.index(proxy)
-            del tk.TimeSources[idx]
-        except ValueError:
-            pass
-    else:
-        try:
-            idx = tk.Views.index(proxy)
-            del tk.Views[idx]
-        except ValueError:
-            pass
-    servermanager.UnRegister(proxy)
-
-    # If this is a representation, remove it from all views.
-    if proxy.SMProxy.IsA("vtkSMRepresentationProxy") or \
-        proxy.SMProxy.IsA("vtkSMNewWidgetRepresentationProxy"):
-        for view in GetRenderViews():
-            view.Representations.remove(proxy)
-    # If this is a source, remove the representation iff it has no consumers
-    # Also change the active source if necessary
-    elif proxy.SMProxy.IsA("vtkSMSourceProxy"):
-        sources = servermanager.ProxyManager().GetProxiesInGroup("sources")
-        for i in range(proxy.GetNumberOfConsumers()):
-            if proxy.GetConsumerProxy(i) in sources:
-                raise RuntimeError("Source has consumers. It cannot be deleted " +
-                  "until all consumers are deleted.")
-        if proxy == GetActiveSource():
-            if hasattr(proxy, "Input") and proxy.Input:
-                if isinstance(proxy.Input, servermanager.Proxy):
-                    SetActiveSource(proxy.Input)
-                else:
-                    SetActiveSource(proxy.Input[0])
-            else: SetActiveSource(None)
-        for rep in GetRepresentations().values():
-            if rep.Input.GetAddressAsString('') == proxy.GetAddressAsString(''):
-                Delete(rep)
-    # Change the active view if necessary
-    elif proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
-        if proxy == GetActiveView():
-            if len(GetRenderViews()) > 0:
-                SetActiveView(GetRenderViews()[0])
-            else:
-                SetActiveView(None)
 
 #==============================================================================
 # Active Source / View / Camera / AnimationScene
@@ -706,14 +643,53 @@ def WriteAnimation(filename, **params):
 #==============================================================================
 # Lookup Table / Scalarbar methods
 #==============================================================================
+# -----------------------------------------------------------------------------
+def HideUnusedScalarBars(view=None):
+    """Hides all unused scalar bars from the view. A scalar bar is used if some
+    data is shown in that view that is coloring using the transfer function
+    shown by the scalar bar."""
+    if not view:
+        view = active_objects.view
+    if not view:
+        raise ValueError, "'view' argument cannot be None with no active is present."
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS)
 
+def UpdateScalarBars(view=None):
+    """Hides all unused scalar bar and shows used scalar bars. A scalar bar is used
+    if some data is shown in that view that is coloring using the transfer function
+    shown by the scalar bar."""
+    if not view:
+        view = active_objects.view
+    if not view:
+        raise ValueError, "'view' argument cannot be None with no active is present."
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS | tfmgr.SHOW_USED_SCALAR_BARS)
+
+# -----------------------------------------------------------------------------
+def GetColorTransferFunction(arrayname, **params):
+    """Get the color transfer function used to mapping a data array with the
+    given name to colors. This may create a new color transfer function
+    if none exists, for return an existing one"""
+    if not servermanager.ActiveConnection:
+        raise RuntimeError, "Missing active session"
+    session = servermanager.ActiveConnection.Session
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    lut = servermanager._getPyProxy(\
+            tfmgr.GetColorTransferFunction(arrayname, session.GetSessionProxyManager()))
+    SetProperties(lut, **params)
+    return lut
+
+# -----------------------------------------------------------------------------
 def CreateLookupTable(**params):
     """Create and return a lookup table.  Optionally, parameters can be given
     to assign to the lookup table.
     """
     lt = servermanager.rendering.PVLookupTable()
-    servermanager.Register(lt)
+    controller = servermanager.ParaViewPipelineController()
+    controller.InitializeProxy(lt)
     SetProperties(lt, **params)
+    controller.RegisterColorTransferFunctionProxy(lt)
     return lt
 
 # -----------------------------------------------------------------------------
@@ -723,8 +699,10 @@ def CreatePiecewiseFunction(**params):
     given to assign to the piecewise function.
     """
     pfunc = servermanager.piecewise_functions.PiecewiseFunction()
-    servermanager.Register(pfunc)
+    controller = servermanager.ParaViewPipelineController()
+    controller.InitializeProxy(pfunc)
     SetProperties(pfunc, **params)
+    controller.RegisterOpacityTransferFunction(pfunc)
     return pfunc
 
 # -----------------------------------------------------------------------------
@@ -732,20 +710,10 @@ def CreatePiecewiseFunction(**params):
 def GetLookupTableForArray(arrayname, num_components, **params):
     """Used to get an existing lookuptable for a array or to create one if none
     exists. Keyword arguments can be passed in to initialize the LUT if a new
-    one is created."""
-    proxyName = "%d.%s.PVLookupTable" % (int(num_components), arrayname)
-    lut = servermanager.ProxyManager().GetProxy("lookup_tables", proxyName)
-    if lut:
-        return lut
-    # No LUT exists for this array, create a new one.
-    # TODO: Change this to go a LookupTableManager that is shared with the GUI,
-    # so that the GUI and python end up create same type of LUTs. For now,
-    # python will create a Blue-Red LUT, unless overridden by params.
-    lut = servermanager.rendering.PVLookupTable(
-            ColorSpace="HSV", RGBPoints=[0, 0, 0, 1, 1, 1, 0, 0])
-    SetProperties(lut, **params)
-    servermanager.Register(lut, registrationName=proxyName)
-    return lut
+    one is created.
+    *** DEPRECATED ***: Use GetColorTransferFunction instead"""
+    return GetColorTransferFunction(arrayname, **params)
+
 
 # global lookup table reader instance
 # the user can use the simple api below
@@ -857,10 +825,11 @@ def GetAnimationScene():
     global animation scene. This method provides access to that. Users are
     free to create additional animation scenes directly, but those scenes
     won't be shown in the ParaView GUI."""
-    scene = _find_proxy("animation", "animation", "AnimationScene")
-    if not scene:
-        raise servermanager.MissingProxy, "Could not locate global AnimationScene."
-    return scene
+    if not servermanager.ActiveConnection:
+        raise RuntimeError, "Missing active session"
+    session = servermanager.ActiveConnection.Session
+    controller = servermanager.ParaViewPipelineController()
+    return controller.GetAnimationScene(session)
 
 # -----------------------------------------------------------------------------
 
@@ -888,13 +857,8 @@ def _GetRepresentationAnimationHelper(sourceproxy):
         if proxy.GetXMLName() == "RepresentationAnimationHelper" and\
            proxy.GetProperty("Source").IsProxyAdded(sourceproxy.SMProxy):
              return proxy
-    # create a new helper
-    proxy = servermanager.misc.RepresentationAnimationHelper(
-      Source=sourceproxy)
-    servermanager.ProxyManager().RegisterProxy(
-      "pq_helper_proxies.%s" % sourceproxy.GetGlobalIDAsString(),
-      "RepresentationAnimationHelper", proxy)
-    return proxy
+    # helper must have been created during RegisterPipelineProxy().
+    return None
 
 # -----------------------------------------------------------------------------
 
@@ -982,20 +946,12 @@ def GetCameraTrack(view=None):
 def GetTimeTrack():
     """Returns the animation track used to control the time requested from all
     readers/filters during playback.
-    This is the "TimeKeeper - Time" track shown in ParaView's 'Animation View'.
-    If none exists, a new one will be created."""
+    This is the "TimeKeeper - Time" track shown in ParaView's 'Animation View'."""
     scene = GetAnimationScene()
-    tk = scene.TimeKeeper
-    for cue in scene.Cues:
-        if cue.GetXMLName() == "TimeAnimationCue" and cue.AnimatedProxy == tk\
-            and cue.AnimatedPropertyName == "Time":
-            return cue
-    # no cue was found, create a new one.
-    cue = TimeAnimationCue()
-    cue.AnimatedProxy = tk
-    cue.AnimatedPropertyName = "Time"
-    scene.Cues.append(cue)
-    return cue
+    if not scene:
+        raise RuntimeError, "Missing animation scene"
+    controller = servermanager.ParaViewPipelineController()
+    return controller.GetTimeAnimationTrack(scene)
 
 #==============================================================================
 # Plugin Management
@@ -1161,13 +1117,21 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     # Map min (0.00678) to blue, max (0.0288) to red
     SetDisplayProperties(LookupTable = MakeBlueToRedLT(0.00678, 0.0288))
     # Color by point array called Pres
-    SetDisplayProperties(ColorAttributeType = "POINT_DATA")
-    SetDisplayProperties(ColorArrayName = "Pres")
+    SetDisplayProperties(ColorArrayName = ("POINTS", "Pres"))
     Render()
 
 #==============================================================================
 # Set of Internal functions
 #==============================================================================
+
+def _initializeSession(connection):
+    """Internal method used to initialize a session. Users don't need to
+    call this directly. Whenever a new session is created this method is called
+    by API in this module."""
+    if not connection:
+      raise RuntimeError, "'connection' cannot be empty."
+    controller = servermanager.ParaViewPipelineController()
+    controller.InitializeSession(connection.Session)
 
 def _create_func(key, module):
     "Internal function."
@@ -1177,8 +1141,15 @@ def _create_func(key, module):
         all non-keyword arguments are assumed to be inputs. All keyword arguments are
         assumed to be property,value pairs and are passed to the new proxy."""
 
+        # Create a controller instance.
+        controller = servermanager.ParaViewPipelineController()
+
+
         # Instantiate the actual object from the given module.
         px = module.__dict__[key]()
+
+        # preinitialize the proxy.
+        controller.PreInitializeProxy(px)
 
         # Make sure non-keyword arguments are valid
         for inp in input:
@@ -1209,29 +1180,15 @@ def _create_func(key, module):
               del params[nameParam]
 
         # Pass all the named arguments as property,value pairs
-        for param in params.keys():
-            setattr(px, param, params[param])
+        SetProperties(px, **params)
 
-        try:
-            # Register the proxy with the proxy manager.
-            if registrationName:
-                group, name = servermanager.Register(px, registrationName=registrationName)
-            else:
-                group, name = servermanager.Register(px)
+        # post initialize
+        controller.PostInitializeProxy(px)
 
-
-            # Register pipeline objects with the time keeper. This is used to extract time values
-            # from sources. NOTE: This should really be in the servermanager controller layer.
-            if group == "sources":
-                tk = _find_proxy("timekeeper", "misc", "TimeKeeper")
-                if tk:
-                    sources = tk.TimeSources
-                    if not px in sources:
-                        sources.append(px)
-                active_objects.source = px
-        except servermanager.MissingRegistrationInformation:
-            pass
-
+        # Register the proxy with the proxy manager (assuming we are only using
+        # these functions for pipeline proxies or animation proxies.
+        if isinstance(px, servermanager.SourceProxy):
+            controller.RegisterPipelineProxy(px, registrationName)
         return px
 
     return CreateObject
@@ -1334,64 +1291,6 @@ def _find_writer(filename):
         raise RuntimeError, "Cannot infer filetype from extension:", extension
 
 # -----------------------------------------------------------------------------
-def _find_proxy(group, xmlgroup, xmltype):
-    """Find a proxy of the given type (xmlgroup, xmltype) in the registration
-       group (group). This is useful to locate proxies that should have only 1
-       instance in a typical ParaView application. Returns the first proxy that
-       matches the type in the registration group.
-
-       :param group: name of the registration group in which to search for the
-                     proxy.
-       :param xmlgroup: name of the group for the matched proxy's type. It
-                        should match the value returned by proxy.GetXMLGroup()
-       :param xmltype: name of the type for the proxy i.e. the value returned by
-                       proxy.GetXMLType()
-    """
-    pxm = servermanager.ProxyManager()
-    proxies = pxm.GetProxiesInGroup(group)
-    proxy = None
-    for aProxy in proxies.values():
-        if aProxy and \
-            aProxy.GetXMLGroup() == xmlgroup and \
-            aProxy.GetXMLName() == xmltype:
-            return aProxy
-    return None
-
-# -----------------------------------------------------------------------------
-
-def _CreateEssentialProxies():
-    """Ensures that essetial proxies like TimeKeeper and AnimationScene are
-       present and are created if not"""
-
-    servermanager.ProxyManager().DisableStateUpdateNotification()
-    servermanager.ProxyManager().UpdateFromRemote()
-    tk = _find_proxy(group="timekeeper", xmlgroup="misc", xmltype="TimeKeeper")
-    if not tk:
-       try:
-           tk = servermanager.misc.TimeKeeper()
-           servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
-       except AttributeError:
-           paraview.print_error("Error: Could not create TimeKeeper")
-
-    scene = _find_proxy(group="animation", xmlgroup="animation", xmltype="AnimationScene")
-    if not scene:
-       try:
-           scene = AnimationScene()
-           # no need to register, since we use the function to create the
-           # AnimationScene object, that automatically registers it.
-           scene.TimeKeeper = tk
-
-           # Ensure that the time-track is setup so animations on readers work as
-           # expected (BUG #14452).
-           GetTimeTrack()
-       except NameError:
-           paraview.print_error("Error: Could not create AnimationScene")
-
-
-    servermanager.ProxyManager().EnableStateUpdateNotification()
-    servermanager.ProxyManager().TriggerStateUpdate()
-
-# -----------------------------------------------------------------------------
 
 def _switchToActiveConnectionCallback(caller, event):
     """Callback called when the active session/connection changes in the
@@ -1492,8 +1391,6 @@ class _active_objects(object):
 class _funcs_internals:
     "Internal class."
     first_render = True
-    view_counter = 0
-    rep_counter = 0
 
 #==============================================================================
 # Start the session and initialize the ServerManager
@@ -1505,6 +1402,5 @@ if not servermanager.ActiveConnection:
     Connect()
 else:
     _add_functions(globals())
-    _CreateEssentialProxies()
 
 active_objects = _active_objects()

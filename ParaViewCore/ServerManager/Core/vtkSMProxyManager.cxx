@@ -22,8 +22,6 @@
 #include "vtkSessionIterator.h"
 #include "vtkSIProxyDefinitionManager.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMGlobalPropertiesLinkUndoElement.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMSession.h"
@@ -39,86 +37,16 @@
 class vtkSMProxyManager::vtkPXMInternal
 {
 public:
-  // Properly detach observer of GlobalPropertiesManagers
+  vtkPXMInternal()
+    : ActiveSessionID(0)
+    {
+    }
   ~vtkPXMInternal()
-  {
-  GlobalPropertiesManagersType::iterator globalPropMapIter;
-  GlobalPropertiesManagersCallBackIDType::iterator callbackMapIter;
-
-  for( globalPropMapIter = this->GlobalPropertiesManagers.begin();
-       globalPropMapIter != this->GlobalPropertiesManagers.end();
-       ++globalPropMapIter)
     {
-    callbackMapIter =
-        this->GlobalPropertiesManagersCallBackID.find(globalPropMapIter->first);
-    globalPropMapIter->second->RemoveObserver(callbackMapIter->second);
     }
-  }
-
-  vtkPXMInternal() : ActiveSessionID(0)
-  {
-  }
-  
   vtkIdType ActiveSessionID;
-
-  // Data structure for storing GlobalPropertiesManagers.
-  typedef std::map<std::string,
-          vtkSmartPointer<vtkSMGlobalPropertiesManager> >
-            GlobalPropertiesManagersType;
-  typedef std::map<std::string,
-          unsigned long >
-            GlobalPropertiesManagersCallBackIDType;
-  GlobalPropertiesManagersType GlobalPropertiesManagers;
-  GlobalPropertiesManagersCallBackIDType GlobalPropertiesManagersCallBackID;
-
-  // GlobalPropertiesManagerObserver
-  void GlobalPropertyEvent(vtkObject* src, unsigned long event, void* data)
-    {
-    vtkSMGlobalPropertiesManager* globalPropertiesManager =
-        vtkSMGlobalPropertiesManager::SafeDownCast(src);
-
-    vtkSMSession* session = NULL;
-    vtkSmartPointer<vtkSessionIterator> iter;
-    iter.TakeReference(
-          vtkProcessModule::GetProcessModule()->NewSessionIterator());
-    for ( iter->InitTraversal(); !iter->IsDoneWithTraversal();
-          iter->GoToNextItem())
-      {
-      vtkSMSession* temp = vtkSMSession::SafeDownCast(iter->GetCurrentSession());
-      if (temp && session)
-        {
-        // We are only managing UndoElements on GlobalPropertyManager when only one
-        // server is involved !!!
-        return;
-        }
-      session = temp;
-      }
-
-    if(globalPropertiesManager)
-      {
-      vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
-      const char* globalPropertiesManagerName =
-          pxm->GetGlobalPropertiesManagerName(globalPropertiesManager);
-      if( globalPropertiesManagerName &&
-          pxm->GetUndoStackBuilder() &&
-          event == vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified)
-        {
-        vtkSMGlobalPropertiesManager::ModifiedInfo* modifiedInfo;
-        modifiedInfo = reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
-
-        vtkSMGlobalPropertiesLinkUndoElement* undoElem = vtkSMGlobalPropertiesLinkUndoElement::New();
-        undoElem->SetSession(session);
-        undoElem->SetLinkState( globalPropertiesManagerName,
-                                modifiedInfo->GlobalPropertyName,
-                                modifiedInfo->Proxy,
-                                modifiedInfo->PropertyName,
-                                modifiedInfo->AddLink);
-        pxm->GetUndoStackBuilder()->Add(undoElem);
-        undoElem->Delete();
-        }
-      }
-    }
 };
+
 //***************************************************************************
 // Statics...
 vtkSmartPointer<vtkSMProxyManager> vtkSMProxyManager::Singleton;
@@ -323,108 +251,6 @@ void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UndoStackBuilder: " << this->UndoStackBuilder << endl;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
-    vtkSMGlobalPropertiesManager* mgr)
-{
-  vtkSMGlobalPropertiesManager* old_mgr = this->GetGlobalPropertiesManager(name);
-  if (old_mgr == mgr)
-    {
-    return;
-    }
-  this->RemoveGlobalPropertiesManager(name);
-  this->PXMStorage->GlobalPropertiesManagers[name] = mgr;
-  this->PXMStorage->GlobalPropertiesManagersCallBackID[name] =
-      mgr->AddObserver(vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified,
-                       this->PXMStorage, &vtkSMProxyManager::vtkPXMInternal::GlobalPropertyEvent);
-
-  vtkSMProxyManager::RegisteredProxyInformation info;
-  info.Proxy = mgr;
-  info.GroupName = NULL;
-  info.ProxyName = name;
-  info.Type = vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
-  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-}
-
-//---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetGlobalPropertiesManagerName(
-  vtkSMGlobalPropertiesManager* mgr)
-{
-  vtkSMProxyManager::vtkPXMInternal::GlobalPropertiesManagersType::iterator iter;
-  for (iter = this->PXMStorage->GlobalPropertiesManagers.begin();
-    iter != this->PXMStorage->GlobalPropertiesManagers.end(); ++iter)
-    {
-    if (iter->second == mgr)
-      {
-      return iter->first.c_str();
-      }
-    }
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
-  const char* name)
-{
-  return this->PXMStorage->GlobalPropertiesManagers[name].GetPointer();
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::RemoveGlobalPropertiesManager(const char* name)
-{
-  vtkSMGlobalPropertiesManager* gm = this->GetGlobalPropertiesManager(name);
-  if (gm)
-    {
-    gm->RemoveObserver(this->PXMStorage->GlobalPropertiesManagersCallBackID[name]);
-    vtkSMProxyManager::RegisteredProxyInformation info;
-    info.Proxy = gm;
-    info.GroupName = NULL;
-    info.ProxyName = name;
-    info.Type = vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
-    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-    }
-  this->PXMStorage->GlobalPropertiesManagers.erase(name);
-}
-
-//---------------------------------------------------------------------------
-unsigned int vtkSMProxyManager::GetNumberOfGlobalPropertiesManagers()
-{
-  return static_cast<unsigned int>(
-    this->PXMStorage->GlobalPropertiesManagers.size());
-}
-
-//---------------------------------------------------------------------------
-vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
-  unsigned int index)
-{
-  unsigned int cur =0;
-  vtkSMProxyManager::vtkPXMInternal::GlobalPropertiesManagersType::iterator iter;
-  for (iter = this->PXMStorage->GlobalPropertiesManagers.begin();
-    iter != this->PXMStorage->GlobalPropertiesManagers.end(); ++iter, ++cur)
-    {
-    if (cur == index)
-      {
-      return iter->second;
-      }
-    }
-
-  return NULL;
-}
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
-{
-  vtkPXMInternal::GlobalPropertiesManagersType::iterator iter;
-  for (iter = this->PXMStorage->GlobalPropertiesManagers.begin();
-    iter != this->PXMStorage->GlobalPropertiesManagers.end(); ++iter)
-    {
-    vtkPVXMLElement* elem = iter->second->SaveLinkState(root);
-    if (elem)
-      {
-      elem->AddAttribute("name", iter->first.c_str());
-      }
-    }
 }
 
 //---------------------------------------------------------------------------

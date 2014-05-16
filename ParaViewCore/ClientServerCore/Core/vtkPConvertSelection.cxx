@@ -91,7 +91,7 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkSelection* input = vtkSelection::GetData(inInfo);
 
-  vtkDataObject* data = vtkDataObject::GetData(inputVector[1], 0);
+  // vtkDataObject* data = vtkDataObject::GetData(inputVector[1], 0);
 
   vtkSelection* output = vtkSelection::GetData(outputVector, 0);
 

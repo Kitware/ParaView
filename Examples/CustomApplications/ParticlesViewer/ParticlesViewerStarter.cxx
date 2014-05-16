@@ -55,9 +55,6 @@ void ParticlesViewerStarter::startApplication()
   Ui::ParticlesViewerMainWindow ui;
   ui.setupUi(window);
 
-  // Enable automatic creation of representation on accept.
-  ui.objectInspector->setShowOnAccept(true);
- 
   new pqLoadDataReaction(ui.action_Open_Dataset);
   QObject::connect(ui.action_Exit, SIGNAL(triggered()),
     pqApplicationCore::instance(), SLOT(quit()));

@@ -41,6 +41,29 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set the input data arrays that this algorithm will process. Overridden to
+  // pass the array selection to the mapper.
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+    int fieldAssociation, const char *name);
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+    int fieldAssociation, int fieldAttributeType)
+    {
+    this->Superclass::SetInputArrayToProcess(
+      idx, port, connection, fieldAssociation, fieldAttributeType);
+    }
+  virtual void SetInputArrayToProcess(int idx, vtkInformation *info)
+    {
+    this->Superclass::SetInputArrayToProcess(idx, info);
+    }
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+                              const char* fieldAssociation,
+                              const char* attributeTypeorName)
+    {
+    this->Superclass::SetInputArrayToProcess(idx, port, connection,
+      fieldAssociation, attributeTypeorName);
+    }
+
+  // Description:
   // Overridden to handle various view passes.
   virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
     vtkInformation* inInfo, vtkInformation* outInfo);
@@ -68,8 +91,6 @@ public:
   // The following API is to simply provide the functionality similar to
   // vtkGeometryRepresentation.
   //---------------------------------------------------------------------------
-  void SetColorAttributeType(int type);
-  void SetColorArrayName(const char* arrayname);
   void SetLookupTable(vtkScalarsToColors*);
   void SetPointSize(double val);
     

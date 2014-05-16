@@ -58,9 +58,6 @@ public:
 
   virtual ~pqXYBagChartView();
 
-  /// Set property values.
-  virtual void setDefaultPropertyValues();
-
 private:
   pqXYBagChartView(const pqXYBagChartView&); // Not implemented.
   void operator=(const pqXYBagChartView&); // Not implemented.

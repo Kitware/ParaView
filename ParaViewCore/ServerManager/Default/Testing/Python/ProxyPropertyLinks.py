@@ -62,7 +62,7 @@ sphere3.GetProperty("ThetaResolution").SetElement(0, 10)
 sphere3.GetProperty("PhiResolution").SetElement(0, 10)
 sphere3.UpdateVTKObjects()
 
-rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
+rmProxy = servermanager.GetRenderView()
 rmProxy.StillRender()
 
 if not smtesting.DoRegressionTesting():

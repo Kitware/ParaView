@@ -21,13 +21,14 @@
 #define __vtkSMStateVersionController_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
-#include "vtkSMStateVersionControllerBase.h"
+#include "vtkSMObject.h"
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateVersionController : public vtkSMStateVersionControllerBase
+class vtkPVXMLElement;
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateVersionController : public vtkSMObject
 {
 public:
   static vtkSMStateVersionController* New();
-  vtkTypeMacro(vtkSMStateVersionController, vtkSMStateVersionControllerBase);
+  vtkTypeMacro(vtkSMStateVersionController, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -38,29 +39,9 @@ public:
   // Returns false if the conversion failed, else true.
   virtual bool Process(vtkPVXMLElement* root);
 
-  bool Process_3_0_To_3_2(vtkPVXMLElement* root);
-  bool Process_3_2_To_3_4(vtkPVXMLElement* root);
-  bool Process_3_4_to_3_6(vtkPVXMLElement* root);
-  bool Process_3_6_to_3_8(vtkPVXMLElement* root);
-  bool Process_3_8_to_3_10(vtkPVXMLElement* root);
-  bool Process_3_10_to_3_12(vtkPVXMLElement* root);
-  bool Process_3_12_to_3_14(vtkPVXMLElement* root, vtkPVXMLElement* parent);
-  bool Process_3_14_to_4_0(vtkPVXMLElement* root);
-  bool Process_4_0_to_next(vtkPVXMLElement* root);
-
-//BTX
-  bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
-  bool ConvertLegacyReader(vtkPVXMLElement* parent);
-  bool ConvertStreamTracer(vtkPVXMLElement* parent);
-  bool ConvertExodusIIReader(vtkPVXMLElement* parent);
-  bool ConvertPVAnimationSceneToAnimationScene(vtkPVXMLElement* parent);
-  bool ConvertRepresentationProperty(vtkPVXMLElement* element);
-  bool ConvertCTHPartProperties(vtkPVXMLElement* element);
 protected:
   vtkSMStateVersionController();
   ~vtkSMStateVersionController();
-
-  vtkPVXMLElement* ConvertMultiViewLayout(vtkPVXMLElement* xml);
 
 private:
   vtkSMStateVersionController(const vtkSMStateVersionController&); // Not implemented
@@ -69,4 +50,3 @@ private:
 };
 
 #endif
-

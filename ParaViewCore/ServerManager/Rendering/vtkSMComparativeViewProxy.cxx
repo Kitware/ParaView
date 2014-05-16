@@ -143,10 +143,10 @@ void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 }
 
 //----------------------------------------------------------------------------
-vtkSMRepresentationProxy* vtkSMComparativeViewProxy::CreateDefaultRepresentation(
-  vtkSMProxy* src, int outputport)
+const char* vtkSMComparativeViewProxy::GetRepresentationType(
+  vtkSMSourceProxy* src, int outputport)
 {
-  return this->GetRootView()->CreateDefaultRepresentation(src, outputport);
+  return this->GetRootView()->GetRepresentationType(src, outputport);
 }
 
 //----------------------------------------------------------------------------

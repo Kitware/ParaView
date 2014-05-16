@@ -9,6 +9,11 @@ vtk_module(vtkPVServerManagerCore
     vtkPVServerImplementationCore
   PRIVATE_DEPENDS
     vtksys
+    vtkjsoncpp
+    vtkpugixml
   TEST_LABELS
     PARAVIEW
+  TEST_DEPENDS
+    vtkPVServerManagerApplication
+
 )

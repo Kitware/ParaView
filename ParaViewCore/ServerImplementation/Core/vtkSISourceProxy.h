@@ -56,6 +56,7 @@ public:
   // Description:
   // Disables the creation of an extents translator.
   static void SetDisableExtentsTranslator(bool value);
+  static bool GetDisableExtentsTranslator();
 
   // Description:
   // Allow to shut down pipeline execution. This is particulary useful for

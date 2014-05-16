@@ -45,6 +45,7 @@ class pqPipelineSourceInternal;
 class pqView;
 class vtkObject;
 class vtkPVDataInformation;
+class vtkSMSourceProxy;
 
 /// PQ representation for a vtkSMProxy that can be involved in a pipeline.
 /// i.e that can have input and/or output. The public API is to observe
@@ -113,21 +114,13 @@ public:
   /// immediate render otherwise render on idle.
   void renderAllViews(bool force=false);
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
-  /// The default implementation iterates over all properties
-  /// of the proxy and sets them to default values. 
-  void setDefaultPropertyValues();
-
   /// Update the pipeline with the current time
   void updatePipeline();
 
-  /// Animation helper is used to animate display properties for this source.
-  void createAnimationHelpersIfNeeded();
-  
+  /// Return the vtkSMSourceProxy instance corresponding to this
+  /// pqPipelineSource.
+  vtkSMSourceProxy* getSourceProxy();
+
 signals:
   /// fired when a connection is created between two pqPipelineSources.
   void connectionAdded(pqPipelineSource* source, 
@@ -176,22 +169,6 @@ private slots:
 
 protected:
   friend class pqPipelineFilter;
-
-  /// For every source registered if it has any property that defines a proxy_list
-  /// domain, we create and register proxies for every type of proxy indicated 
-  /// in that domain. These are "internal proxies" for this pqProxy. Internal
-  /// proxies are registered under special groups and are unregistered with
-  /// the pqProxy object is destroyed i.e. when the vtkSMProxy represented
-  /// by this pqProxy is unregistered. These internal proxies
-  /// are used by pqSignalAdaptorProxyList to populate the combox box
-  /// widget thru which the user can choose one of the available proxies.
-  void createProxiesForProxyListDomains();
-  
-  void processProxyListHints(vtkSMProxy *proxy_list_proxy);
-
-  /// Overridden to add the proxies to the domain as well.
-  virtual void addInternalHelperProxy(const QString& key, vtkSMProxy*) const;
-  virtual void removeInternalHelperProxy(const QString& key, vtkSMProxy*) const;
 
   /// called by pqPipelineFilter when the connections change.
   void removeConsumer(int outputport, pqPipelineSource *);

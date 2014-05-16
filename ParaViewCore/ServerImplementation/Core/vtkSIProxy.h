@@ -70,6 +70,18 @@ public:
   vtkGetStringMacro(VTKClassName);
 
   // Description:
+  // Assigned by the XML parser. The name assigned in the XML
+  // configuration. Can be used to figure out the origin of the
+  // proxy.
+  vtkGetStringMacro(XMLName);
+
+  // Description:
+  // Assigned by the XML parser. The group in the XML configuration that
+  // this proxy belongs to. Can be used to figure out the origin of the
+  // proxy.
+  vtkGetStringMacro(XMLGroup);
+
+  // Description:
   // Return true if that Proxy is supposed to have NO vtk class, which means
   // its a NullProxy.
   bool IsNullProxy() { return (VTKClassName == NULL); };

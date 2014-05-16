@@ -38,13 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <QLineEdit>
 #include <QSpinBox>
-#include <QToolButton>
-#include "pqColorChooserButton.h"
+
+#include "pqColorChooserButtonWithPalettes.h"
 #include "pqComboBoxDomain.h"
 #include "pqSignalAdaptors.h"
-#include "pqStandardColorLinkAdaptor.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
+#include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
@@ -62,12 +61,15 @@ void pqPropertyGroupWidget::addPropertyLink(
   vtkSMProperty* smProperty = this->PropertyGroup->GetProperty(propertyName);
   if (smProperty)
     {
-    pqSignalAdaptorColor *adaptor =
-      new pqSignalAdaptorColor(
-        color, "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
     this->addPropertyLink(
-      adaptor, "color", SIGNAL(colorChanged(const QVariant&)),
+      color, "chosenColorRgbF", SIGNAL(chosenColorChanged(const QColor&)),
       smProperty, smindex);
+    if (pqColorChooserButtonWithPalettes* cbwp =
+      qobject_cast<pqColorChooserButtonWithPalettes*>(color))
+      {
+      new pqColorPaletteLinkHelper(cbwp, this->proxy(),
+        this->proxy()->GetPropertyName(smProperty));
+      }
     }
   else
     {

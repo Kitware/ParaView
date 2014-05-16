@@ -45,8 +45,6 @@ public:
 
 protected slots:
   void onTextLocationChanged(bool);
-  void beginUndoSet(const QString&);
-  void endUndoSet();
 
 private:
   /// Set the display whose properties this editor will edit.

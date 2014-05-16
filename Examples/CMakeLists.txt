@@ -12,16 +12,15 @@ add_subdirectory(Plugins/HiddenLinesRemoval)
 
 if (PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(Plugins/Autostart)
-  add_subdirectory(Plugins/DisplayPanelDecorator)
   add_subdirectory(Plugins/DockWidget)
-  add_subdirectory(Plugins/GUIObjectPanel)
   add_subdirectory(Plugins/GUIToolBar)
   add_subdirectory(Plugins/GUIView)
   add_subdirectory(Plugins/PropertyWidgets)
   add_subdirectory(Plugins/Reader)
   add_subdirectory(Plugins/ReaderXMLOnly)
   add_subdirectory(Plugins/RenderPassViews)
-  add_subdirectory(Plugins/RepresentationBehavior)
+  # TODO: update this plugin to use the pipeline controller instead.
+  #add_subdirectory(Plugins/RepresentationBehavior)
   add_subdirectory(Plugins/SourceToolbar)
   add_subdirectory(Plugins/Writer)
 
@@ -31,12 +30,9 @@ if (PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(CustomApplications/Demo1)
   add_subdirectory(CustomApplications/MultiServerClient)
   add_subdirectory(CustomApplications/Spreadsheet)
+  add_subdirectory(CustomApplications/ParticlesViewer)
 endif()
 
 if (TARGET vtkIOVisItBridge)
   # add_subdirectory(Plugins/VisItReader)
-elseif (PARAVIEW_BUILD_QT_GUI)
-  # ParticlesViewer requires PointSprite plugin which is not built when
-  # vtkIOVisItBridge is enabled.
-  add_subdirectory(CustomApplications/ParticlesViewer)
 endif ()

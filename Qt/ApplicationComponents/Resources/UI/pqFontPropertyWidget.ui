@@ -38,7 +38,7 @@
     </widget>
    </item>
    <item>
-    <widget class="pqStandardColorButton" name="FontColor">
+    <widget class="pqColorChooserButtonWithPalettes" name="FontColor">
      <property name="toolTip">
       <string>Set font color</string>
      </property>
@@ -102,9 +102,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqStandardColorButton</class>
+   <class>pqColorChooserButtonWithPalettes</class>
    <extends>QToolButton</extends>
-   <header>pqStandardColorButton.h</header>
+   <header>pqColorChooserButtonWithPalettes.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

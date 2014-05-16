@@ -85,25 +85,31 @@ public:
   vtkSetClampMacro(StreamingRequestSize, int, 1, 10000);
   vtkGetMacro(StreamingRequestSize, int);
 
+
+  // Description:
+  // Set the input data arrays that this algorithm will process.
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+    int fieldAssociation, const char *name);
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+    int fieldAssociation, int fieldAttributeType)
+    {
+    this->Superclass::SetInputArrayToProcess(
+      idx, port, connection, fieldAssociation, fieldAttributeType);
+    }
+  virtual void SetInputArrayToProcess(int idx, vtkInformation *info)
+    {
+    this->Superclass::SetInputArrayToProcess(idx, info);
+    }
+  virtual void SetInputArrayToProcess(int idx, int port, int connection,
+                              const char* fieldAssociation,
+                              const char* attributeTypeorName)
+    {
+    this->Superclass::SetInputArrayToProcess(idx, port, connection,
+      fieldAssociation, attributeTypeorName);
+    }
+
   //***************************************************************************
   // Scalar coloring API (forwarded for vtkSmartVolumeMapper.
-
-  // This is same a vtkDataObject::FieldAssociation types so you can use those
-  // as well.
-  enum AttributeTypes
-    {
-    POINT_DATA=0,
-    CELL_DATA=1
-    };
-
-  // Description:
-  // Methods to control scalar coloring. ColorAttributeType defines the
-  // attribute type.
-  void SetColorAttributeType(int val);
-
-  // Description:
-  // Pick the array to color with.
-  void SetColorArrayName(const char*);
 
   //***************************************************************************
   // Forwarded to Actor.

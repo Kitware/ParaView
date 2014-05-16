@@ -11,7 +11,7 @@ if clientsphere.GetNumberOfPolys() != 720L:
     raise smtesting.TestError('Test failed: Problem fetching polydata.')
 
 elev = Elevation(sphere)
-mm = MinMax(None)
+mm = servermanager.filters.MinMax()
 mm.Operation = "MIN"
 
 mindata = servermanager.Fetch(elev, mm, mm)
@@ -20,8 +20,9 @@ if mindata.GetPointData().GetNumberOfArrays() != 2:
     raise smtesting.TestError('Test failed: Wrong number of arrays.')
 
 array = mindata.GetPointData().GetArray('Elevation')
+print array.GetNumberOfTuples(), array.GetTuple1(0)
 
-if array.GetTuple1(0) != 0.0:
+if array.GetTuple1(0) < 0.2 and array.GetTuple1(0) > 0.29:
     raise smtesting.TestError('Test failed: Bad array value.')
 
 rep = Show(elev)
@@ -32,8 +33,7 @@ if ai.GetName() != 'Elevation':
 
 rng = ai.GetRange()
 rep.LookupTable = MakeBlueToRedLT(rng[0], rng[1])
-rep.ColorArrayName = 'Elevation'
-rep.ColorAttributeType = 'POINT_DATA'
+rep.ColorArrayName = ("POINT_DATA", 'Elevation')
 
 camera = GetActiveCamera()
 camera.Elevation(45)

@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 #include <QPointer>
 
-class pqApplicationOptionsDialog;
+class pqSettingsDialog;
 
 /// @ingroup Reactions
 /// pqApplicationSettingsReaction is a reaction to popup the application
-/// settings dialog. It creates pqApplicationOptionsDialog when required.
+/// settings dialog. It creates pqSettingsDialog when required.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqApplicationSettingsReaction : public pqReaction
 {
   Q_OBJECT
@@ -60,7 +60,7 @@ protected:
 private:
   Q_DISABLE_COPY(pqApplicationSettingsReaction)
 
-  static QPointer<pqApplicationOptionsDialog> Dialog;
+  static QPointer<pqSettingsDialog> Dialog;
 };
 
 #endif

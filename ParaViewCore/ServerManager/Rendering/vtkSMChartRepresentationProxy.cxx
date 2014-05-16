@@ -28,7 +28,6 @@ vtkStandardNewMacro(vtkSMChartRepresentationProxy);
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {
   this->SetSIClassName("vtkSIChartRepresentationProxy");
-  this->SetDefaults = true;
 }
 
 //----------------------------------------------------------------------------
@@ -78,12 +77,6 @@ int vtkSMChartRepresentationProxy::ReadXMLAttributes(
         }
       }
     }
-
-  const char* setDefaults = element->GetAttribute("set_defaults");
-  if (setDefaults)
-    {
-    this->SetDefaults = strcmp(setDefaults, "false") == 0 ? false : true;
-    }
   return 1;
 }
 
@@ -123,36 +116,4 @@ void vtkSMChartRepresentationProxy::SetPropertyModifiedFlag(
       }
     }
   this->Superclass::SetPropertyModifiedFlag(name, flag);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMChartRepresentationProxy::ResetPropertiesToDefault()
-{
-  this->Superclass::ResetPropertiesToDefault();
-
-  if (this->SetDefaults)
-    {
-    vtkSMProperty* useIndex = this->GetProperty("UseIndexForXAxis");
-    vtkSMProperty* xarrayName = this->GetProperty("XArrayName");
-
-    if (useIndex && xarrayName)
-      {
-      vtkSMPropertyHelper helper(xarrayName);
-      const char* value = helper.GetAsString();
-      const char** known_names =
-        vtkSMChartSeriesListDomain::GetKnownSeriesNames();
-      for (int cc=0; known_names[cc] != NULL && value != NULL; cc++)
-        {
-        if (strcmp(known_names[cc], value) == 0)
-          {
-          vtkSMPropertyHelper(useIndex).Set(0);
-          this->UpdateProperty("UseIndexForXAxis");
-          return;
-          }
-        }
-      }
-
-    vtkSMPropertyHelper(useIndex).Set(1);
-    this->UpdateProperty("UseIndexForXAxis");
-    }
 }

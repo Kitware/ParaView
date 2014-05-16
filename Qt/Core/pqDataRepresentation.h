@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataRepresentationInternal;
 class pqOutputPort;
 class pqPipelineSource;
-class pqScalarOpacityFunction;
 class pqScalarsToColors;
 class vtkPVArrayInformation;
 class vtkPVDataInformation;
@@ -94,23 +93,6 @@ public:
   /// provides access to the Lookup table, if one exists.
   virtual pqScalarsToColors* getLookupTable();
 
-  /// Returns the proxy for the piecewise function used to
-  /// map scalars to opacity.
-  virtual vtkSMProxy* getScalarOpacityFunctionProxy() {return 0;}
-
-  /// Returns the pqScalarOpacityFunction object for the piecewise
-  /// function used to map scalars to opacity.
-  virtual pqScalarOpacityFunction* getScalarOpacityFunction() {return 0;}
-
-  /// Sets default values for the underlying proxy.
-  /// This is during the initialization stage of the pqProxy
-  /// for proxies created by the GUI itself i.e.
-  /// for proxies loaded through state or created by python client
-  /// this method won't be called.
-  /// The default implementation iterates over all properties
-  /// of the proxy and sets them to default values.
-  virtual void setDefaultPropertyValues();
-
   /// Returns the data size for the full-res data.
   /// This may trigger a pipeline update to obtain correct data sizes.
   unsigned long getFullResMemorySize();
@@ -121,22 +103,18 @@ public:
   /// data-filter which has a valid input.
   pqDataRepresentation* getRepresentationForUpstreamSource() const;
 
-  /// Convenience method to return the name of the active scalar array.
-  virtual QString getProxyColorArrayName();
-  /// Convenience method to return the active scalar array field association.
-  virtual int getProxyScalarMode();
-  /// Convenience method to return the array information associated with the active scalars.
-  virtual vtkPVArrayInformation* getProxyColorArrayInfo();
-  /// Convenience method to return prominent value list associated with the active scalars.
-  virtual vtkPVProminentValuesInformation* getProxyColorProminentValuesInfo(
-    double uncertainty = 1e-6, double minFrequency = 5e-4);
-
-  virtual int getNumberOfComponents(const char* arrayname, int fieldType);
-  virtual QString getComponentName( const char* arrayname, int fieldtype, int component);
-
 signals:
   /// Fired when the representation proxy fires the vtkCommand::UpdateDataEvent.
   void dataUpdated();
+
+  /// Fired to indicate that the "LookupTable" property (if any) on the
+  /// representation was modified.
+  void colorTransferFunctionModified();
+
+  /// Signal fired to indicate that the "ColorArrayName" property (if any) on
+  /// the representation was modified. This property controls the scalar
+  /// coloring settings on the representation.
+  void colorArrayNameModified();
 
 protected slots:
   /// called when input property on display changes. We must detect if
@@ -152,11 +130,6 @@ protected:
     this->Superclass::initialize();
     this->onInputChanged();
     }
-
-  virtual vtkPVArrayInformation* getArrayInformation( const char* arrayname, const int &fieldType );
-  virtual vtkPVProminentValuesInformation* getProminentValuesInformation(
-    const char* arrayname, const int &fieldType, double uncertainty, double minFrequency );
-
 private:
   pqDataRepresentation(const pqDataRepresentation&); // Not implemented.
   void operator=(const pqDataRepresentation&); // Not implemented.

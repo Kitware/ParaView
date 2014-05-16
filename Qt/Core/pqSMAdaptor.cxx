@@ -283,21 +283,15 @@ void pqSMAdaptor::addInputProperty(vtkSMProperty* Property,
 }
 
 //-----------------------------------------------------------------------------
-void pqSMAdaptor::setInputProperty(vtkSMProperty* Property, 
+void pqSMAdaptor::setInputProperty(vtkSMProperty* Property,
                                    pqSMProxy Value, int opport)
 {
   vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(Property);
   if (ip)
     {
-    if (ip->GetNumberOfProxies() == 1)
-      {
-      ip->SetInputConnection(0, Value, opport);
-      }
-    else
-      {
-      ip->RemoveAllProxies();
-      ip->AddInputConnection(Value, opport);
-      }
+    vtkSMProxy* proxies[] = {Value.GetPointer()};
+    unsigned int ports[] = {static_cast<unsigned int>(opport)};
+    ip->SetProxies(1, proxies, ports);
     }
 }
 
@@ -319,15 +313,8 @@ void pqSMAdaptor::setProxyProperty(vtkSMProperty* Property,
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if(proxyProp)
     {
-    if (proxyProp->GetNumberOfProxies() == 1)
-      {
-      proxyProp->SetProxy(0, Value);
-      }
-    else
-      {
-      proxyProp->RemoveAllProxies();
-      proxyProp->AddProxy(Value);
-      }
+    vtkSMProxy* proxies[] = {Value.GetPointer()};
+    proxyProp->SetProxies(1, proxies);
     }
 }
 
@@ -357,17 +344,19 @@ QList<pqSMProxy> pqSMAdaptor::getProxyListProperty(vtkSMProperty* Property)
   return value;
 }
 
-void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property, 
+void pqSMAdaptor::setProxyListProperty(vtkSMProperty* Property,
                                        QList<pqSMProxy> Value)
 {
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if (proxyProp)
     {
-    proxyProp->RemoveAllProxies();
-    foreach(pqSMProxy p, Value)
+    vtkSMProxy** proxies = new vtkSMProxy*[Value.size() + 1];
+    for (int cc=0; cc < Value.size(); cc++)
       {
-      proxyProp->AddProxy(p);
+      proxies[cc] = Value[cc].GetPointer();
       }
+    proxyProp->SetProxies(Value.size(), proxies);
+    delete[] proxies;
     }
 }
 
@@ -2009,7 +1998,7 @@ void pqSMAdaptor::clearUncheckedProperties(vtkSMProperty *property)
     }
   else if(vtkSMProxyProperty *ProxyProperty = vtkSMProxyProperty::SafeDownCast(property))
     {
-    ProxyProperty->ClearUncheckedProxies();
+    ProxyProperty->RemoveAllUncheckedProxies();
     }
 }
 

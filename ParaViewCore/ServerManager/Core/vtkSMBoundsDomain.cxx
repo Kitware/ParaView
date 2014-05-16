@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMBoundsDomain.h"
 
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkMath.h"
 #include "vtkPVDataInformation.h"
@@ -206,6 +207,48 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
     entries.push_back(vtkEntry(0, maxbounds));
     this->SetEntries(entries);
     }
+  else if (this->Mode == vtkSMBoundsDomain::APPROXIMATE_CELL_LENGTH)
+    {
+    double diameter =
+      sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+        (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
+        (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
+    std::vector<vtkEntry> entries;
+    entries.push_back(vtkEntry(0, diameter));
+    }
+}
+
+//---------------------------------------------------------------------------
+int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* property)
+{
+  if (this->Mode == vtkSMBoundsDomain::APPROXIMATE_CELL_LENGTH)
+    {
+    vtkPVDataInformation* dataInfo =this->GetInputInformation();
+    if (dataInfo)
+      {
+      double bounds[6];
+      dataInfo->GetBounds(bounds);
+      double unitDistance = 1.0;
+      if(vtkMath::AreBoundsInitialized(bounds))
+        {
+        double diameter =
+          sqrt( (bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+            (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
+            (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]) );
+
+        int numCells = dataInfo->GetNumberOfCells();
+        double linearNumCells = pow( (double) numCells, (1.0/3.0) );
+        unitDistance = diameter;
+        if (linearNumCells != 0.0)
+          {
+          unitDistance = diameter / linearNumCells;
+          }
+        }
+      vtkSMPropertyHelper(property).Set(0, unitDistance);
+      }
+    return 1;
+    }
+  return this->Superclass::SetDefaultValues(property);
 }
 
 //---------------------------------------------------------------------------
@@ -240,6 +283,10 @@ int vtkSMBoundsDomain::ReadXMLAttributes(
         {
         this->DefaultMode = vtkSMDoubleRangeDomain::MAX;
         }
+      }
+    else if (strcmp(mode, "approximate_cell_length") == 0)
+      {
+      this->Mode = vtkSMBoundsDomain::APPROXIMATE_CELL_LENGTH;
       }
     else
       {

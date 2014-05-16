@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
 
 //Qt includes.
@@ -54,9 +55,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
+#include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
-#include "pqPipelineRepresentation.h"
+#include "pqServerManagerModel.h"
 
 uint qHash(QPair<QPointer<pqPipelineSource>, int> arg)
 {
@@ -453,38 +454,4 @@ int pqPipelineFilter::replaceInput() const
     return replace_input;
     }
   return 1; // default value.
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineFilter::hideInputIfRequired(pqView* view)
-{
-  int replace_input = this->replaceInput();
-  if (replace_input > 0)
-    {
-    // hide input source.
-    QList<pqOutputPort*> inputs = this->getAllInputs();
-    for(int kk=0; kk < inputs.size(); ++kk)
-      {
-      pqOutputPort* input = inputs[kk];
-      pqDataRepresentation* inputRepr = input->getRepresentation(view);
-      if (inputRepr)
-        {
-        pqPipelineRepresentation* sourceDisp =
-          qobject_cast<pqPipelineRepresentation*>(inputRepr);
-        if (sourceDisp && replace_input == 2)
-          {
-          // Conditionally turn off the input. The input should be turned
-          // off if the representation is surface and the opacity is 1.
-          QString reprType = sourceDisp->getRepresentationType();
-          if ((reprType != "Surface" &&
-              reprType != "Surface With Edges") ||
-            sourceDisp->getOpacity() < 1.0)
-            {
-            continue;
-            }
-          }
-        inputRepr->setVisible(false);
-        }
-      }
-    }
 }

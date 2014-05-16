@@ -28,7 +28,7 @@
 //
 // Each non-information property can have one or more domains. A domain represents a
 // set of acceptable values the property can have. Domains provide applications
-// mechanisms to extract semantic inform a property.
+// mechanisms to extract semantic information from a property.
 //
 // A property has two kinds of values: regular (or checked) values and unchecked
 // values. Regular values are the ones that are pushed to the VTK object when
@@ -73,7 +73,7 @@
 //        case.
 //
 // \li \b command: \c string: This is the name of the method to call on the VTK
-//        update for to property.
+//        update for the property.
 //
 // \li \b repeatable or \b repeat_command: \c{0, 1}: This used to indicate that
 //        the command can be called repeatedly to update the VTK object. e.g.
@@ -82,7 +82,7 @@
 //
 // \li \b information_only: \c{0, 1}: When set, it implies that this property
 //        is used to obtain values from the VTK object, rather than the default
-//        which is set values on the VTK object.
+//        behavior which is to set values on the VTK object.
 //
 // \li \b information_property: \c string: Value is the name of the property on the
 //        proxy to which this property belongs that can is information_only
@@ -132,6 +132,7 @@ class vtkSMDocumentation;
 class vtkSMDomain;
 class vtkSMDomainIterator;
 class vtkSMInformationHelper;
+class vtkSMPropertyLink;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 //BTX
@@ -232,6 +233,24 @@ public:
   // than given by the type of the propery and its values.
   void AddDomain(const char* name, vtkSMDomain* dom);
 
+  // Description:
+  // Add a link to a property whose value should be synchronized
+  // with this property value.
+  virtual void AddLinkedProperty(vtkSMProperty* targetProperty);
+
+  // Description:
+  // Remove a link to a property added with AddLinkedProperty()
+  virtual void RemoveLinkedProperty(vtkSMProperty* targetProperty);
+
+  // Description:
+  // Remove a link from the source property. This is a useful way for
+  // target properties to unlink themselves from a source property prior to,
+  // for instance, the deletion of the target property instance. This
+  // method only does any work if this instance was passed as the
+  // argument to AddLinkedProperty() on a different property instance
+  // at some point. Otherwise, it is a no-op.
+  virtual void RemoveFromSourceLink();
+
   // Description: 
   // Get/Set if the property is animateable. Non-animateable
   // properties are shown in the GUI only in advanced mode.
@@ -289,21 +308,33 @@ public:
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 
   // Description:
-  // Iterates over all domains and calls SetDefaultValues() on each
-  // until one of then returns 1, implying that it updated
-  // the property value. This is used to reset the property
-  // to its default value. Currently default values that depend
-  // on domain are reset. This method can also be called
-  // to reset the property value to the default specified
-  // in the configuration XML. If none of the domains
-  // updates the property value, then some property subclassess
-  // (viz. IntVectorProperty, DoubleVectorProperty and IdTypeVectorProperty)
-  // update the current value to that specified in the configuration XML.
+  // Simply calls this->ResetToDomainDefaults() and if that returns false, calls
+  // this->ResetToXMLDefaults().
   void ResetToDefault();
+
+  // Description:
+  // For properties that support specifying defaults in XML configuration, this
+  // method will reset the property value to the default values specified in the
+  // XML. Default implementation does nothing.
+  virtual void ResetToXMLDefaults() {}
+
+  // Description:
+  // Iterates over all domains and call SetDefaultValues() on each domain until
+  // the first one returns true i.e. indicate that it can set a default value
+  // and did so. Returns true if any domain can setup a default value for this
+  // property. Otherwise false.
+  bool ResetToDomainDefaults();
 
   // Description:
   // The label assigned by the xml parser.
   vtkGetStringMacro(XMLLabel);
+
+  // Description:
+  // The name assigned by the xml parser. Used to get the property
+  // from a proxy. Note that the name used to obtain a property
+  // that is on a subproxy may be different from the XMLName of the property,
+  // see the note on ExposedProperties for vtkSMProxy.
+  vtkGetStringMacro(XMLName);
 
   // Description:
   // If repeatable, a property can have 1 or more values of the same kind.
@@ -392,13 +423,6 @@ protected:
   vtkSetStringMacro(XMLName);
   
   // Description:
-  // The name assigned by the xml parser. Used to get the property
-  // from a proxy. Note that the name used to obtain a property
-  // that is on a subproxy may be different from the XMLName of the property,
-  // see the note on ExposedProperties for vtkSMProxy.
-  vtkGetStringMacro(XMLName);
-
-  // Description:
   // Internal. Used during XML parsing to get a property with
   // given name. Used by the domains when setting required properties.
   vtkSMProperty* NewProperty(const char* name);
@@ -478,10 +502,6 @@ protected:
   vtkSMDocumentation* Documentation;
   void SetDocumentation(vtkSMDocumentation*);
 
-  // Subclass may override this if ResetToDefault can reset to default
-  // value specified in the configuration file.
-  virtual void ResetToDefaultInternal() {};
-
   int Repeatable;
 
   // Description:
@@ -508,6 +528,9 @@ protected:
   bool StateIgnored;
   vtkSetMacro(StateIgnored, bool);
   vtkBooleanMacro(StateIgnored, bool);
+
+  // Links for properties that "subscribe" to changes to this property.
+  vtkSMPropertyLink* Links;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

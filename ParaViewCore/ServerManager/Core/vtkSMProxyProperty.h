@@ -65,9 +65,6 @@
 
 class vtkSMProxy;
 class vtkSMStateLocator;
-//BTX
-struct vtkSMProxyPropertyInternals;
-//ETX
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyProperty : public vtkSMProperty
 {
@@ -86,39 +83,20 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Add a proxy to the list of proxies.
-  virtual int AddProxy(vtkSMProxy* proxy);
+  // Add/remove/set a proxy to the list of proxies. For SetProxy, the property
+  // automatically resizes to accommodate the index specified.
+  virtual void AddProxy(vtkSMProxy* proxy);
+  virtual void SetProxy(unsigned int idx, vtkSMProxy* proxy);
   virtual void RemoveProxy(vtkSMProxy* proxy);
-  virtual int SetProxy(unsigned int idx, vtkSMProxy* proxy);
+  virtual void RemoveAllProxies();
 
   // Description:
   // Sets the value of the property to the list of proxies specified.
-  virtual void SetProxies(unsigned int numElements, 
-    vtkSMProxy* proxies[]);
+  virtual void SetProxies(unsigned int numElements, vtkSMProxy* proxies[]);
 
   // Description:
   // Returns if the given proxy is already added to the property.
   bool IsProxyAdded(vtkSMProxy* proxy);
-
-  // Description:
-  // Add a proxy to the list of proxies without calling Modified
-  // (if modify is false). This is commonly used when ImmediateUpdate
-  // is true but it is more efficient to avoid calling Update until
-  // the last proxy is added. To do this, add all proxies with modify=false
-  // and call Modified after the last.
-  // This will perform domain checking. If the domain check fails,
-  // the proxy will not be added and 0 will be returned.
-  // Returns 1 on success. If the domain check fails or the property
-  // is read only, returns 0.
-  // All proxies added with AddProxy() will become "consumers" of
-  // the proxy passed to AppendCommandToStream().
-  virtual int AddProxy(vtkSMProxy* proxy, int modify);
-
-  // Description:
-  // Removes a proxy from the vector of added Proxies (added by AddProxy).
-  // Returns the index of proxy removed. If the proxy was not found,
-  // returns NumberOfProxies.
-  virtual unsigned int RemoveProxy(vtkSMProxy* proxy, int modify);
 
   // Description:
   // Add an unchecked proxy. Does not modify the property.
@@ -131,39 +109,24 @@ public:
   // - IsInDomains()
   // @endverbatim
   virtual void AddUncheckedProxy(vtkSMProxy* proxy);
-  virtual unsigned int RemoveUncheckedProxy(vtkSMProxy* proxy);
   virtual void SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
   // Removes all unchecked proxies.
   virtual void RemoveAllUncheckedProxies();
 
-  virtual void ClearUncheckedProxies();
-
-  // Description:
-  // Remove all proxies from the list.
-  virtual void RemoveAllProxies()
-  {
-    this->RemoveAllProxies(1);
-  }
-
-  // Description:
-  // Sets the number of proxies. If the new number is greater than the current
-  // number of proxies, then NULL will be inserted.
-  virtual void SetNumberOfProxies(unsigned int num);
-
   // Description:
   // Returns the number of proxies.
   unsigned int GetNumberOfProxies();
 
   // Description:
-  // Sets the number of unchecked proxies. If the new number is greater than the current
-  // number of proxies, then NULL will be inserted.
-  virtual void SetNumberOfUncheckedProxies(unsigned int num);
-
-  // Description:
   // Returns the number of unchecked proxies.
   unsigned int GetNumberOfUncheckedProxies();
+
+  // Description:
+  // Set the number of proxies.
+  void SetNumberOfProxies(unsigned int count);
+  void SetNumberOfUncheckedProxies(unsigned int count);
 
   // Description:
   // Return a proxy. No bounds check is performed.
@@ -173,17 +136,9 @@ public:
   // Return a proxy. No bounds check is performed.
   vtkSMProxy* GetUncheckedProxy(unsigned int idx);
 
-  // Description: 
+  // Description:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
-
-  // Description:
-  // Copy all proxies added to the src over to this by creating new 
-  // instances for the proxies and inturn calling Copy to copy 
-  // the proxies. exceptionClass and proxyPropertyCopyFlag are
-  // used while copying over the values from the two proxy properties.
-  virtual void DeepCopy(vtkSMProperty* src, const char* exceptionClass, 
-    int proxyPropertyCopyFlag);
 
   // Description:
   // Returns whether the "skip_dependency" attribute is set.
@@ -194,6 +149,13 @@ public:
   virtual void UpdateAllInputs();
 
   virtual bool IsValueDefault();
+
+  // Description:
+  // For properties that support specifying defaults in XML configuration, this
+  // method will reset the property value to the default values specified in the
+  // XML.
+  // Simply clears the property.
+  virtual void ResetToXMLDefaults();
 
 //BTX
 protected:
@@ -208,12 +170,7 @@ protected:
   // Let the property read and set its content from the stream
   virtual void ReadFrom(const vtkSMMessage* msg, int msg_offset, vtkSMProxyLocator*);
 
-  virtual void RemoveAllProxies(int modify);
-
   friend class vtkSMProxy;
-  friend struct vtkSMProxyPropertyInternals;
-
-  vtkSMProxyPropertyInternals* PPInternals;
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
@@ -249,15 +206,12 @@ protected:
 
   bool SkipDependency;
 
+  class vtkPPInternals;
+  friend class vtkPPInternals;
+  vtkPPInternals* PPInternals;
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented
   void operator=(const vtkSMProxyProperty&); // Not implemented
-
-  class vtkProxyPointer;
-  friend class vtkSMProxyProperty::vtkProxyPointer;
-
-  void AddProducer(vtkSMProxy*);
-  void RemoveProducer(vtkSMProxy*);
 //ETX
 };
 

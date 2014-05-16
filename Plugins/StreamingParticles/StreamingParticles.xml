@@ -8,6 +8,17 @@
         the SurfaceRepresentation except that we are overriding the mapper with
         our mapper.
       </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array_any">
+        </InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
       <IntVectorProperty command="SetUseOutline"
                          default_values="0"
                          name="UseOutline"
@@ -31,28 +42,28 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetColorAttributeType"
-                         default_values="0"
-                         name="ColorAttributeType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="POINT_DATA"
-                 value="0" />
-          <Entry text="CELL_DATA"
-                 value="1" />
-          <Entry text="FIELD_DATA"
-                 value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetColorArrayName"
-                            default_values=""
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
                             name="ColorArrayName"
-                            number_of_elements="1">
-        <Documentation>Set the array name to color by. Set it to empty string
-        to use solid color.</Documentation>
-        <ArrayListDomain attribute_type="Scalars"
-                         input_domain_name="input_array_any"
-                         name="array_list"></ArrayListDomain>
+                            number_of_elements="5">
+        <Documentation>
+          Set the array to color with. One must specify the field association and
+          the array name of the array. If the array is missing, scalar coloring will
+          automatically be disabled.
+        </Documentation>
+        <RepresentedArrayListDomain name="array_list"
+                         input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </RepresentedArrayListDomain>
+        <FieldDataDomain name="field_list"
+                         disable_update_domain_entries="1"
+                         force_point_cell_data="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
       </StringVectorProperty>
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable"

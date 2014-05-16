@@ -220,7 +220,6 @@ FUNCTION (add_client_tests prefix)
             --enable-bt
             -dr
             ${CLIENT_SERVER_ARGS}
-            --disable-light-kit
             --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_tests)
@@ -236,7 +235,6 @@ FUNCTION (add_client_server_tests prefix)
        --enable-bt
          ${CLIENT_SERVER_ARGS}
        -dr
-       --disable-light-kit
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_server_tests)
@@ -255,7 +253,6 @@ FUNCTION (add_client_render_server_tests prefix)
        --enable-bt
             ${CLIENT_SERVER_ARGS}
        -dr
-       --disable-light-kit
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_render_server_tests)
@@ -282,7 +279,6 @@ FUNCTION(add_multi_client_tests prefix)
         --client ${CLIENT_EXECUTABLE}
         --enable-bt
         -dr
-        --disable-light-kit
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-script=${test_script}
         --test-master
@@ -292,7 +288,6 @@ FUNCTION(add_multi_client_tests prefix)
         --client ${CLIENT_EXECUTABLE}
         --enable-bt
         -dr
-        --disable-light-kit
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-slave
         ${extra_args}
@@ -324,7 +319,6 @@ FUNCTION(add_multi_server_tests prefix nbServers)
         --client ${CLIENT_EXECUTABLE}
         --enable-bt
         -dr
-        --disable-light-kit
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-script=${test_script}
         ${extra_args}
@@ -359,7 +353,6 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
             --enable-bt
             ${CLIENT_SERVER_ARGS}
             -dr
-            --disable-light-kit
             --test-directory=${PARAVIEW_TEST_DIR}
             --test-script=${test_script}
             --tile-image-prefix=${PARAVIEW_TEST_DIR}/${test_name}

@@ -75,6 +75,7 @@ vtkPVOptions::vtkPVOptions()
   this->SetStereoType("Anaglyph");
   this->Timeout = 0;
   this->EnableStackTrace = 0;
+  this->DisableRegistry = 0;
   this->ForceMPIInitOnClient = 0;
   this->ForceNoMPIInitOnClient = 0;
 
@@ -258,6 +259,9 @@ void vtkPVOptions::Initialize()
 
   this->AddBooleanArgument("--enable-bt", 0, &this->EnableStackTrace,
                            "Enable stack trace signal handler.");
+
+  this->AddBooleanArgument("--disable-registry", "-dr", &this->DisableRegistry,
+    "Do not use registry when running ParaView (for testing).");
 
 #if defined(PARAVIEW_USE_MPI)
   // We add these here so that "--help" on the process can print these variables

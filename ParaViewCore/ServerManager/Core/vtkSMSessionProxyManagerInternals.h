@@ -21,7 +21,6 @@
 #include "vtkNew.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
-#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMLink.h"
 #include "vtkSMMessage.h"
 #include "vtkSMOutputPort.h"

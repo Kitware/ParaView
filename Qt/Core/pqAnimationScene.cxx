@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqTimeKeeper.h"
@@ -126,110 +125,13 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
         timekeeper->getProxy()->GetProperty("TimeLabel"),
         vtkCommand::ModifiedEvent,
         this, SIGNAL(timeLabelChanged()));
-
-  // Initialize the time keeper.
-  this->setupTimeTrack();
+  this->connect(timekeeper, SIGNAL(timeStepsChanged()), SIGNAL(timeStepsChanged()));
 }
 
 //-----------------------------------------------------------------------------
 pqAnimationScene::~pqAnimationScene()
 {
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void  pqAnimationScene::setDefaultPropertyValues()
-{
-  this->Superclass::setDefaultPropertyValues();
-
-  // Create an animation cue for the pipeline time.
-  this->createCueInternal("TimeAnimationCue",
-    this->getServer()->getTimeKeeper()->getProxy(),
-    "Time", 0);
-  this->setAnimationTime(0.0);
-
-  // Sync to application settings.
-  this->updateApplicationSettings();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::setupTimeTrack()
-{
-  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->getProxy()->GetProperty("TimeKeeper"));
-  if (pp)
-    {
-    pp->RemoveAllProxies();
-    pp->AddProxy(timekeeper->getProxy());
-    this->getProxy()->UpdateVTKObjects();
-    }
-
-  QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
-    this, SLOT(updateTimeSteps()));
-  QObject::connect(timekeeper, SIGNAL(timeRangeChanged()),
-    this, SLOT(updateTimeSteps()));
-  this->updateTimeSteps();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::updateTimeSteps()
-{
-  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-  if (pqApplicationCore::instance()->isLoadingState() ||
-    this->getServer()->session()->IsProcessingRemoteNotification())
-    {
-    // If we are currently loading state then we don't want to change
-    // the currently set start/end times.
-
-    // however we still do need to relay the timeStepsChanged signal to ensure
-    // that GUI components are updated correctly.
-    emit this->timeStepsChanged();
-    return;
-    }
-
-  vtkSMProxy* sceneProxy = this->getProxy();
-
-  // Adjust the play mode based on whether or not we have time steps.
-  vtkSMProperty *playModeProperty = sceneProxy->GetProperty("PlayMode");
-  if (timekeeper->getNumberOfTimeStepValues() <= 1)
-    {
-    if (pqSMAdaptor::getEnumerationProperty(playModeProperty)
-      == "Snap To TimeSteps" )
-      {
-      pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
-      }
-    }
-  else
-    {
-    pqSMAdaptor::setEnumerationProperty(playModeProperty, "Snap To TimeSteps");
-    }
-
-  sceneProxy->UpdateVTKObjects();
-  // This will internally adjust the Start and End times for the animation scene
-  // based of the Locks for the times. We not simply need to copy the info
-  // property values.
-
-
-  /// If the animation time is not in the scene time range, set it to the min
-  /// value.
-  double min = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("StartTimeInfo")).toDouble();
-  double max = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("EndTimeInfo")).toDouble();
-  double cur = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("AnimationTime")).toDouble();
-
-  // Ensure that the values of the properties match the times used.
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("StartTime"), min);
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("EndTime"), max);
-  sceneProxy->UpdateVTKObjects();
-  if (cur < min || cur > max)
-    {
-    this->setAnimationTime(min);
-    }
-  emit this->timeStepsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -492,7 +394,6 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& cuetype,
     qDebug() << "Failed to create AnimationCue.";
     return 0;
     }
-  cue->setDefaultPropertyValues();
 
   if (proxy)
     {
@@ -627,62 +528,4 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
 
   this->setAnimationTime(cueInfo->AnimationTime);
   emit this->tick(progress);
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::updateApplicationSettings()
-{
-  vtkSMSessionProxyManager* pxm = this->getServer()->proxyManager();
-  vtkSMProxy* globalAnimationProperties =
-    pxm->NewProxy("misc", "GlobalAnimationProperties");
-  pqSMAdaptor::setElementProperty(globalAnimationProperties->GetProperty("CacheLimit"),
-    this->getCacheLimitSetting());
-  vtkSMProxy* sceneProxy = this->getProxy();
-  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Caching"),
-                                  this->getCacheGeometrySetting());
-  sceneProxy->UpdateVTKObjects();
-  globalAnimationProperties->UpdateVTKObjects();
-  globalAnimationProperties->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::setCacheGeometrySetting(bool flag)
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  settings->setValue("Animation/CacheGeometryForAnimations", flag);
-
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  foreach (pqAnimationScene* scene, smmodel->findItems<pqAnimationScene*>())
-    {
-    scene->updateApplicationSettings();
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool pqAnimationScene::getCacheGeometrySetting()
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  return settings->value("Animation/CacheGeometryForAnimations", false).toBool();
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationScene::setCacheLimitSetting(int kilobytes)
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  settings->setValue("Animation/CacheLimit", kilobytes);
-
-  pqServerManagerModel* smmodel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  foreach (pqAnimationScene* scene, smmodel->findItems<pqAnimationScene*>())
-    {
-    scene->updateApplicationSettings();
-    }
-}
-
-//-----------------------------------------------------------------------------
-int pqAnimationScene::getCacheLimitSetting()
-{
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  return settings->value("Animation/CacheLimit", 100*1024).toInt();
 }

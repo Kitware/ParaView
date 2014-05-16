@@ -35,7 +35,16 @@ public:
   ViewsType Views;
 
   typedef std::set<vtkSmartPointer<vtkSMSourceProxy> > SourcesType;
+
+  // Add sources added using AddTimeSource as saved in these two sets. Those
+  // that have timesteps are saved in "Sources" while those that don't are saved
+  // in "IrrelevantSources". We need IrrelevantSources to keep the reference to
+  // the source proxy, otherwise the proxy may get release prematurely when it
+  // is being removed from the "TimeSources" property.
   SourcesType Sources;
+  SourcesType IrrelevantSources;
+
+  std::set<void*> SuppressedSources;
 
   typedef std::map<void*, unsigned long> ObserverIdsMap;
   ObserverIdsMap ObserverIds;
@@ -61,6 +70,7 @@ public:
       }
     this->Sources.clear();
     this->ObserverIds.clear();
+    this->IrrelevantSources.clear();
     }
 };
 
@@ -129,6 +139,7 @@ void vtkSMTimeKeeper::AddTimeSource(vtkSMSourceProxy* src)
   if (!src->GetProperty("TimestepValues") && !src->GetProperty("TimeRange") &&
       !src->GetProperty("TimeLabelAnnotation"))
     {
+    this->Internal->IrrelevantSources.insert(src);
     return;
     }
 
@@ -147,15 +158,33 @@ void vtkSMTimeKeeper::RemoveTimeSource(vtkSMSourceProxy* src)
     {
     src->RemoveObserver(iter->second);
     this->Internal->ObserverIds.erase(iter);
+    this->Internal->Sources.erase(src);
+    this->UpdateTimeSteps();
     }
-  this->Internal->Sources.erase(src);
-  this->UpdateTimeSteps();
+  else
+    {
+    this->Internal->IrrelevantSources.erase(src);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMTimeKeeper::RemoveAllTimeSources()
 {
   this->Internal->ClearSourcesAndObservers();
+  this->UpdateTimeSteps();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTimeKeeper::AddSuppressedTimeSource(vtkSMSourceProxy* src)
+{
+  this->Internal->SuppressedSources.insert(src);
+  this->UpdateTimeSteps();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTimeKeeper::RemoveSuppressedTimeSource(vtkSMSourceProxy* src)
+{
+  this->Internal->SuppressedSources.erase(src);
   this->UpdateTimeSteps();
 }
 
@@ -194,6 +223,12 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
   for (iter = this->Internal->Sources.begin();
     iter != this->Internal->Sources.end(); ++iter)
     {
+    if (this->Internal->SuppressedSources.find(iter->GetPointer()) !=
+      this->Internal->SuppressedSources.end())
+      {
+      // source has been suppressed.
+      continue;
+      }
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       iter->GetPointer()->GetProperty("TimestepValues"));
     if (dvp)

@@ -45,12 +45,6 @@ set (Module_SRCS
   pqActiveServer.h
   pqActiveView.cxx
   pqActiveView.h
-  pqActiveViewOptions.cxx
-  pqActiveViewOptions.h
-  pqActiveViewOptionsManager.cxx
-  pqActiveViewOptionsManager.h
-  #pqAddSourceDialog.cxx
-  #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.cxx
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.cxx
@@ -59,10 +53,6 @@ set (Module_SRCS
   pqAnimationManager.h
   pqAnimationViewWidget.cxx
   pqAnimationViewWidget.h
-  pqApplicationOptions.cxx
-  pqApplicationOptionsDialog.cxx
-  pqApplicationOptionsDialog.h
-  pqApplicationOptions.h
   pqApplyPropertiesManager.cxx
   pqApplyPropertiesManager.h
   pqArrayListDomain.cxx
@@ -74,8 +64,6 @@ set (Module_SRCS
   pqBuiltinColorMaps.h
   pqBoxWidget.cxx
   pqBoxWidget.h
-  pqCalculatorPanel.cxx
-  pqCalculatorPanel.h
   pqCalculatorWidget.cxx
   pqCalculatorWidget.h
   pqCameraDialog.cxx
@@ -92,8 +80,8 @@ set (Module_SRCS
   pqClipPanel.h
   pqCollaborationPanel.cxx
   pqCollaborationPanel.h
-  pqColorMapEditor.cxx
-  pqColorMapEditor.h
+  pqColorChooserButtonWithPalettes.cxx
+  pqColorChooserButtonWithPalettes.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorPresetManager.cxx
@@ -112,8 +100,6 @@ set (Module_SRCS
   pqComponentsInit.h
   pqComponentsTestUtility.cxx
   pqComponentsTestUtility.h
-  pqContourPanel.cxx
-  pqContourPanel.h
   pqContourWidget.cxx
   pqContourWidget.h
   pqCubeAxesEditorDialog.cxx
@@ -138,22 +124,14 @@ set (Module_SRCS
   pqDataInformationWidget.h
   pqDialog.cxx
   pqDialog.h
-  pqDisplayArrayWidget.cxx
-  pqDisplayArrayWidget.h
   pqDisplayColorWidget.cxx
   pqDisplayColorWidget.h
   pqDisplayPanel.cxx
   pqDisplayPanel.h
-  pqDisplayPanelDecoratorInterface.cxx
-  pqDisplayPanelDecoratorInterface.h
   pqDisplayPanelInterface.cxx
   pqDisplayPanelInterface.h
   pqDisplayPanelPropertyWidget.cxx
   pqDisplayPanelPropertyWidget.h
-  pqDisplayProxyEditor.cxx
-  pqDisplayProxyEditor.h
-  pqDisplayProxyEditorWidget.cxx
-  pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.cxx
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.cxx
@@ -162,8 +140,6 @@ set (Module_SRCS
   pqDockWindowInterface.h
   pqDoubleVectorPropertyWidget.cxx
   pqDoubleVectorPropertyWidget.h
-  pqExodusIIPanel.cxx
-  pqExodusIIPanel.h
   pqExodusIIVariableSelectionWidget.cxx
   pqExodusIIVariableSelectionWidget.h
   pqExtractCTHPartsPanel.cxx
@@ -182,8 +158,6 @@ set (Module_SRCS
   pqFindDataDialog.h
   pqFixStateFilenamesDialog.cxx
   pqFixStateFilenamesDialog.h
-  pqGlobalRenderViewOptions.cxx
-  pqGlobalRenderViewOptions.h
   pqGlyphPanel.cxx
   pqGlyphPanel.h
   pqHandleWidget.cxx
@@ -198,8 +172,6 @@ set (Module_SRCS
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.cxx
   pqIntVectorPropertyWidget.h
-  pqIsoVolumePanel.cxx
-  pqIsoVolumePanel.h
   pqItemViewSearchWidget.cxx
   pqItemViewSearchWidget.h
   pqItemViewSearchWidgetEventPlayer.cxx
@@ -210,6 +182,8 @@ set (Module_SRCS
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.cxx
   pqKeyFrameTypeWidget.h
+  pqLabel.cxx
+  pqLabel.h
   pqLineSourceWidget.cxx
   pqLineSourceWidget.h
   pqLineWidget.cxx
@@ -220,8 +194,6 @@ set (Module_SRCS
   pqLinksManager.h
   pqLiveInsituVisualizationManager.cxx
   pqLiveInsituVisualizationManager.h
-  pqLoadedFormObjectPanel.cxx
-  pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.cxx
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.cxx
@@ -236,28 +208,19 @@ set (Module_SRCS
   pqNamedWidgets.h
   pqNetCDFPanel.cxx
   pqNetCDFPanel.h
-  pqObjectInspectorWidget.cxx
-  pqObjectInspectorWidget.h
   pqObjectPanel.cxx
   pqObjectPanel.h
   pqObjectPanelInterface.cxx
   pqObjectPanelInterface.h
   pqObjectPanelPropertyWidget.cxx
   pqObjectPanelPropertyWidget.h
-  pqOptionsContainer.cxx
-  pqOptionsContainer.h
-  pqOptionsDialog.cxx
-  pqOptionsDialog.h
-  pqOptionsPage.cxx
-  pqOptionsPage.h
+
   pqOrbitCreatorDialog.cxx
   pqOrbitCreatorDialog.h
   pqOrbitWidget.cxx
   pqOrbitWidget.h
   pqOutputPortComboBox.cxx
   pqOutputPortComboBox.h
-#  pqParticleTracerPanel.cxx
-#  pqParticleTracerPanel.h
   pqPassArraysPanel.cxx
   pqPassArraysPanel.h
   pqPipelineAnnotationFilterModel.cxx
@@ -279,8 +242,6 @@ set (Module_SRCS
   pqPluginTreeWidget.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
-  pqPQLookupTableManager.cxx
-  pqPQLookupTableManager.h
   pqPropertiesPanel.cxx
   pqPropertiesPanel.h
   pqPropertyGroupWidget.cxx
@@ -339,6 +300,8 @@ set (Module_SRCS
   pqServerConnectDialog.h
   pqServerLauncher.cxx
   pqServerLauncher.h
+  pqSettingsDialog.cxx
+  pqSettingsDialog.h
   pqSignalAdaptorCompositeTreeWidget.cxx
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.cxx
@@ -361,16 +324,10 @@ set (Module_SRCS
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.cxx
   pqSpreadSheetViewDecorator.h
-  pqStandardColorButton.cxx
-  pqStandardColorButton.h
-  pqStandardColorLinkAdaptor.cxx
-  pqStandardColorLinkAdaptor.h
   pqStandardLegacyCustomPanels.cxx
   pqStandardLegacyCustomPanels.h
   pqStandardLegacyDisplayPanels.cxx
   pqStandardLegacyDisplayPanels.h
-  pqStreamTracerPanel.cxx
-  pqStreamTracerPanel.h
   pqStringVectorPropertyWidget.cxx
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.cxx
@@ -383,8 +340,6 @@ set (Module_SRCS
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.cxx
   pqTextureSelectorPropertyWidget.h
-  pqThresholdPanel.cxx
-  pqThresholdPanel.h
   pqTimerLogDisplay.cxx
   pqTimerLogDisplay.h
   pqToolTipTrapper.cxx
@@ -408,8 +363,6 @@ set (Module_SRCS
   pqViewFrame.h
   pqViewManager.cxx
   pqViewManager.h
-  pqViewOptionsInterface.cxx
-  pqViewOptionsInterface.h
   pqWidgetRangeDomain.cxx
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx
@@ -425,28 +378,23 @@ set (Module_MOC_HDRS
   pqActiveObjects.h
   pqActiveServer.h
   pqActiveView.h
-  pqActiveViewOptions.h
-  pqActiveViewOptionsManager.h
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.h
   pqAnimationManager.h
   pqAnimationViewWidget.h
-  pqApplicationOptionsDialog.h
-  pqApplicationOptions.h
   pqApplyPropertiesManager.h
   pqArrayListDomain.h
   pqArrayStatusPropertyWidget.h
   pqAutoGeneratedObjectPanel.h
   pqBoxWidget.h
-  pqCalculatorPanel.h
   pqCalculatorWidget.h
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.h
   pqClipPanel.h
+  pqColorChooserButtonWithPalettes.h
   pqCollaborationPanel.h
-  pqColorMapEditor.h
   pqColorMapModel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
@@ -455,7 +403,6 @@ set (Module_MOC_HDRS
   pqComparativeCueWidget.h
   pqComparativeVisPanel.h
   pqComponentsTestUtility.h
-  pqContourPanel.h
   pqContourWidget.h
   pqCubeAxesEditorDialog.h
   pqCurrentTimeToolbar.h
@@ -467,16 +414,12 @@ set (Module_MOC_HDRS
   pqDataInformationModel.h
   pqDataInformationWidget.h
   pqDialog.h
-  pqDisplayArrayWidget.h
   pqDisplayColorWidget.h
   pqDisplayPanel.h
   pqDisplayPanelPropertyWidget.h
-  pqDisplayProxyEditor.h
-  pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.h
   pqDoubleVectorPropertyWidget.h
-  pqExodusIIPanel.h
   pqExodusIIVariableSelectionWidget.h
   pqExtractCTHPartsPanel.h
   pqFieldSelectionAdaptor.h
@@ -486,7 +429,6 @@ set (Module_MOC_HDRS
   pqFindDataDialog.h
   pqFindDataSelectionDisplayFrame.h
   pqFixStateFilenamesDialog.h
-  pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
   pqHandleWidget.h
   pqHighlightItemDelegate.h
@@ -494,34 +436,28 @@ set (Module_MOC_HDRS
   pqImplicitPlaneWidget.h
   pqIntRangeWidget.h
   pqIntVectorPropertyWidget.h
-  pqIsoVolumePanel.h
   pqItemViewSearchWidgetEventPlayer.h
   pqItemViewSearchWidget.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
+  pqLabel.h
   pqLineSourceWidget.h
   pqLineWidget.h
   pqLinksEditor.h
   pqLinksManager.h
   pqLiveInsituVisualizationManager.h
-  pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
   pqMultiBlockInspectorPanel.h
   pqMultiViewWidget.h
   pqNamedObjectPanel.h
   pqNetCDFPanel.h
-  pqObjectInspectorWidget.h
   pqObjectPanel.h
   pqObjectPanelPropertyWidget.h
-  pqOptionsContainer.h
-  pqOptionsDialog.h
-  pqOptionsPage.h
   pqOrbitCreatorDialog.h
   pqOrbitWidget.h
   pqOutputPortComboBox.h
-#  pqParticleTracerPanel.h
   pqPassArraysPanel.h
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.h
@@ -533,7 +469,6 @@ set (Module_MOC_HDRS
   pqPluginTreeWidgetEventTranslator.h
   pqPluginTreeWidget.h
   pqPointSourceWidget.h
-  pqPQLookupTableManager.h
   pqPropertiesPanel.h
   pqPropertyGroupWidget.h
   pqPropertyWidgetDecorator.h
@@ -562,6 +497,7 @@ set (Module_MOC_HDRS
   pqServerConfigurationImporter.h
   pqServerConnectDialog.h
   pqServerLauncher.h
+  pqSettingsDialog.h
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
@@ -573,18 +509,14 @@ set (Module_MOC_HDRS
   pqSplineWidget.h
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.h
-  pqStandardColorButton.h
-  pqStandardColorLinkAdaptor.h
   pqStandardLegacyCustomPanels.h
   pqStandardLegacyDisplayPanels.h
-  pqStreamTracerPanel.h
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.h
   pqTextEditSignalEndOfEdit.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.h
-  pqThresholdPanel.h
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
   pqTransferFunctionWidget.h
@@ -605,16 +537,12 @@ set (Module_UI_FILES
   Resources/UI/pqAboutDialog.ui
   #Resources/UI/pqAddSourceDialog.ui
   Resources/UI/pqAnimationSettings.ui
-  Resources/UI/pqApplicationOptions.ui
-  Resources/UI/pqBarChartOptionsWidget.ui
   Resources/UI/pqBoxWidget.ui
-  Resources/UI/pqCalculatorPanel.ui
   Resources/UI/pqCalculatorWidget.ui
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChangeInputDialog.ui
   Resources/UI/pqCollaborationPanel.ui
-  Resources/UI/pqColorMapEditor.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqComparativeParameterRangeDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -624,20 +552,15 @@ set (Module_UI_FILES
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqCustomViewButtonDialog.ui
-  Resources/UI/pqDisplayProxyEditor.ui
-  Resources/UI/pqDisplayProxyEditorWidget.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEmptyView.ui
-  Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqFindDataCreateSelectionFrame.ui
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
   Resources/UI/pqFindDataDialog.ui
   Resources/UI/pqFindDataSelectionDisplayFrame.ui
   Resources/UI/pqFixStateFilenamesDialog.ui
-  Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
-  Resources/UI/pqIsoVolumePanel.ui
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
@@ -647,9 +570,7 @@ set (Module_UI_FILES
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMemoryInspectorPanelForm.ui
-  Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
-#  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
@@ -670,13 +591,12 @@ set (Module_UI_FILES
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerConnectDialog.ui
   Resources/UI/pqServerLauncherDialog.ui
+  Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSplineWidget.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
   Resources/UI/pqSpreadSheetViewDecorator.ui
-  Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
-  Resources/UI/pqThresholdPanel.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqWriterDialog.ui
 )

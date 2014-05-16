@@ -39,7 +39,9 @@ reader.GlobalVariables = ['KE', 'XMOM', 'YMOM', 'ZMOM', 'NSTEPS', 'TMSTEP']
 reader.UpdatePipeline()
 
 # Time management
-timesteps = servermanager.ProxyManager().GetProxy('timekeeper','TimeKeeper').TimestepValues
+controller = servermanager.ParaViewPipelineController()
+timekeeper = controller.FindTimeKeeper(servermanager.ActiveConnection.Session)
+timesteps = timekeeper.TimestepValues
 time = timesteps[5]
 
 # Merge blocks

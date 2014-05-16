@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/MyConePanel" >
-        <file>pqConePanel.ui</file>
-    </qresource>
-</RCC>

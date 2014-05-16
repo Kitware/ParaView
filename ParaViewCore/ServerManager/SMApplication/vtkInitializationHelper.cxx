@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVInitializer.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPluginLoader.h"
+#include "vtkPVSession.h"
+#include "vtkSMSettings.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
@@ -30,6 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <string>
 #include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
 
 // Windows-only helper functionality:
 #ifdef _WIN32
@@ -183,6 +186,12 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   // These are always loaded (not merely located).
   vtkNew<vtkPVPluginLoader> loader;
   loader->LoadPluginsFromPluginSearchPath();
+
+  // Load settings files.
+  if (!options->GetDisableRegistry())
+    {
+    vtkInitializationHelper::LoadSettings();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -196,6 +205,17 @@ void vtkInitializationHelper::StandaloneInitialize()
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
+  // Write out settings file(s)
+  std::string userSettingsFile =
+    vtkInitializationHelper::GetUserSettingsDirectory();
+  userSettingsFile.append("UserSettings.json");
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  bool savingSucceeded = settings->SaveSettings(userSettingsFile.c_str());
+  if (!savingSucceeded)
+    {
+    cerr << "Saving settings file failed\n";
+    }
+
   vtkSMProxyManager::Finalize();
   vtkProcessModule::Finalize();
 
@@ -208,6 +228,91 @@ void vtkInitializationHelper::StandaloneFinalize()
 {
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::LoadSettings()
+{
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+  bool success = true;
+
+  // Load user-level settings
+  std::string userSettingsFileName = vtkInitializationHelper::GetUserSettingsDirectory();
+  userSettingsFileName.append("UserSettings.json");
+  success = success && settings->AddCollectionFromFile(userSettingsFileName, VTK_DOUBLE_MAX);
+
+  // Load site-level settings
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  std::string app_dir = options->GetApplicationPath();
+  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
+
+  std::vector<std::string> pathsToSearch;
+  pathsToSearch.push_back(app_dir);
+  pathsToSearch.push_back(app_dir + "/../lib/");
+#if defined(__APPLE__)
+  // paths for app
+  pathsToSearch.push_back(app_dir + "/../../..");
+  pathsToSearch.push_back(app_dir + "/../../../../lib");
+  
+  // paths when doing an unix style install.
+  pathsToSearch.push_back(app_dir +"/../lib/paraview-" PARAVIEW_VERSION);
+#endif
+  // On windows configuration files are in the parent directory
+  pathsToSearch.push_back(app_dir + "/../");
+
+  std::string filename = "SiteSettings.json";
+  std::string siteSettingsFile;
+
+  for (size_t cc = 0; cc < pathsToSearch.size(); cc++)
+    {
+    std::string path = pathsToSearch[cc];
+    if (vtksys::SystemTools::FileExists((path + "/" + filename).c_str(), true))
+      {
+      siteSettingsFile = path + "/" + filename;
+      break;
+      }
+    }
+
+  success = success && settings->AddCollectionFromFile(siteSettingsFile, 1.0);
+
+  settings->DistributeSettings();
+
+  return success;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkInitializationHelper::GetUserSettingsDirectory()
+{
+#if defined(WIN32)
+  const char* appData = getenv("APPDATA");
+  if (!appData)
+    {
+    return std::string();
+    }
+  std::string separator("\\");
+  std::string fileName(appData);
+  if (fileName[fileName.size()-1] != separator[0])
+    {
+    fileName.append(separator);
+    }
+  fileName += "ParaView" + separator;
+#else
+  const char* home = getenv("HOME");
+  if (!home)
+    {
+    return std::string();
+    }
+  std::string separator("/");
+  std::string fileName(home);
+  if (fileName[fileName.size()-1] != separator[0])
+    {
+    fileName.append(separator);
+    }
+  fileName += ".config" + separator + "ParaView" + separator;
+#endif
+
+  return fileName;
 }
 
 //----------------------------------------------------------------------------

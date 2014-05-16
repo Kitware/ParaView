@@ -133,10 +133,12 @@ static const char * white_xpm[] = { "40 20 1 1", "+    c #FFFFFF",
 #include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
 #include "pqSMAdaptor.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPointSpriteRepresentationProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 // vtk includes
@@ -658,10 +660,19 @@ void pqTransferFunctionEditor::onAutoScalarRange(bool autoRange)
         array, "") == 0)
       return;
 
-    QPair<double, double> range = repr->getColorFieldRange(array, comp);
-
-    this->Internals->scalarMin->setValue(range.first);
-    this->Internals->scalarMax->setValue(range.second);
+    double drange[2] = {0.0, 1.0};
+    if (vtkPVArrayInformation* arrayInfo =
+      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(reprProxy))
+      {
+      arrayInfo->GetComponentRange(comp, drange);
+      if (drange[1] < drange[0])
+        {
+        drange[0] = 0.0;
+        drange[1] = 1.0;
+        }
+      }
+    this->Internals->scalarMin->setValue(drange[0]);
+    this->Internals->scalarMax->setValue(drange[1]);
 
     if (pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
         this->Internals->IsProportional)).toInt() == 1)

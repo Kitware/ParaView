@@ -61,7 +61,7 @@ set (Module_SRCS
   vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMGlobalPropertiesLinkUndoElement.cxx
-  vtkSMGlobalPropertiesManager.cxx
+  vtkSMGlobalPropertiesProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
@@ -76,6 +76,7 @@ set (Module_SRCS
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutputPort.cxx
+  vtkSMParaViewPipelineController.cxx
   vtkSMPWriterProxy.cxx
   vtkSMPipelineState.cxx
   vtkSMPluginLoaderProxy.cxx
@@ -105,12 +106,13 @@ set (Module_SRCS
   vtkSMSession.cxx
   vtkSMSessionObject.cxx
   vtkSMSessionProxyManager.cxx
+  vtkSMSettings.cxx
+  vtkSMSettingsProxy.cxx
   vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateLocator.cxx
-  vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringVectorProperty.cxx
@@ -136,7 +138,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMRemoteObject
   vtkSMSession
   vtkSMSessionProxyManager # since New() is non-standard.
-  vtkSMStateVersionControllerBase
   vtkSMUncheckedPropertyHelper
   vtkSMUndoElement
   vtkSMVectorProperty

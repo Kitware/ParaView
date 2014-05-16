@@ -104,7 +104,7 @@ const char* ${vtk_module}Depends[] = { ")
   endif ()
 endforeach ()
 file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModules.h"
-"  { NULL, NULL }
+"  { NULL, NULL, NULL, false }
 };
 ")
 
