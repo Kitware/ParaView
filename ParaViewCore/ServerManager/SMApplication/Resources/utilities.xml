@@ -162,8 +162,7 @@
       <IntVectorProperty command="SetDiscretize"
                          default_values="1"
                          name="Discretize"
-                         number_of_elements="1"
-                         panel_visibility="advanced" >
+                         number_of_elements="1" >
         <BooleanDomain name="bool" />
         <Documentation>
           When set, the color transfer function will comprise of discrete colors
@@ -173,8 +172,7 @@
       <IntVectorProperty command="SetNumberOfValues"
                          default_values="256"
                          name="NumberOfTableValues"
-                         number_of_elements="1"
-                         panel_visibility="advanced" >
+                         number_of_elements="1" >
         <IntRangeDomain min="1" max="1024" name="range" />
         <Documentation>
           When Discretize is set, this specifies the number of discrete colors
@@ -263,9 +261,12 @@
       <PropertyGroup label="Color Mapping Parameters">
         <Property name="ColorSpace" />
         <Property name="NanColor" />
-        <Property name="Discretize" />
+        <Property name="LockScalarRange" function="LockScalarRange" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Color Discretization">
         <Property name="NumberOfTableValues" />
-	<Property name="LockScalarRange" function="LockScalarRange" />
+        <Property name="Discretize" />
       </PropertyGroup>
 
       <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
