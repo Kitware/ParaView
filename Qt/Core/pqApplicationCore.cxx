@@ -71,7 +71,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqStandardServerManagerModelInterface.h"
-#include "pqStandardViewModules.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
 #include "vtkInitializationHelper.h"

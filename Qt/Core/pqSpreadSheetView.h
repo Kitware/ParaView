@@ -47,7 +47,6 @@ class PQCORE_EXPORT pqSpreadSheetView : public pqView
   typedef pqView Superclass;
 public:
   static QString spreadsheetViewType() { return "SpreadSheetView"; }
-  static QString spreadsheetViewTypeName() { return "Spreadsheet View"; }
 
 public:
   pqSpreadSheetView(const QString& group, const QString& name, 

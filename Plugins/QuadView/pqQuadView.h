@@ -39,13 +39,11 @@ class pqQuadView : public pqRenderView
   Q_OBJECT
   typedef pqRenderView Superclass;
 public:
-  static QString pqQuadViewType() { return "QuadView"; }
-  static QString pqQuadViewTypeName() { return "Quad View";}
+  static QString quadViewType() { return "QuadView"; }
 
-  pqQuadView(const QString& viewtype,
-             const QString& group,
+  pqQuadView(const QString& group,
              const QString& name,
-             vtkSMViewProxy* viewmodule,
+             vtkSMProxy* viewmodule,
              pqServer* server,
              QObject* p);
   virtual ~pqQuadView();

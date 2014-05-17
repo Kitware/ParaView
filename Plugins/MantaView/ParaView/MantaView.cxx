@@ -60,16 +60,17 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "MantaView.h"
+#include "vtkSMViewProxy.h"
 
 //-----------------------------------------------------------------------------
 MantaView::MantaView(
-  const QString& viewType,
   const QString& group,
   const QString& name,
-  vtkSMViewProxy* viewProxy,
+  vtkSMProxy* viewProxy,
   pqServer* server,
   QObject* p)
-  : pqRenderView(viewType, group, name, viewProxy, server, p)
+  : pqRenderView(MantaView::mantaViewType(), group, name,
+    vtkSMViewProxy::SafeDownCast(viewProxy), server, p)
 {
 }
 

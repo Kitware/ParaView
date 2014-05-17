@@ -380,8 +380,98 @@ MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS)
       )
 ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL)
 
-# create implementation for a custom view
+#------------------------------------------------------------------------------
+# Register a pqProxy subclass with ParaView. This macro is used to register
+# pqProxy subclasses, including pqView subclasses, pqDataRepresentation
+# subclasses, etc. to create when a particular type of proxy is registered with
+# the application.
 # Usage:
+#   add_pqproxy(OUTIFACES OUTSRCS
+#     TYPE <pqProxy subclass name>
+#     XML_GROUP <xml group used to identify the vtkSMProxy>
+#     XML_NAME <xml name used to indentify the vtkSMProxy>
+#     ...)
+# The TYPE, XML_GROUP, and XML_NAME can be repeated to register multiple types
+# of pqProxy subclasses or reuse the same pqProxy for multiple proxy types.
+macro(add_pqproxy OUTIFACES OUTSRCS)
+  set (arg_types)
+  set (_doing)
+  set (_active_index)
+  foreach (arg ${ARGN})
+    if ((NOT _doing) AND ("${arg}" MATCHES "^(TYPE|XML_GROUP|XML_NAME)$"))
+      set (_doing "${arg}")
+    elseif (_doing STREQUAL "TYPE")
+      list(APPEND arg_types "${arg}")
+      list(LENGTH arg_types _active_index)
+      math(EXPR _active_index "${_active_index}-1")
+      set (_type_${_active_index}_xmlgroup)
+      set (_type_${_active_index}_xmlname)
+      set (_doing)
+    elseif (_doing STREQUAL "XML_GROUP")
+      set (_type_${_active_index}_xmlgroup "${arg}")
+      set (_doing)
+    elseif (_doing STREQUAL "XML_NAME")
+      set (_type_${_active_index}_xmlname "${arg}")
+      set (_doing)
+    else()
+      set (_doing)
+    endif()
+  endforeach()
+
+  list(LENGTH arg_types num_items)
+  math(EXPR max_index "${num_items}-1")
+  set (ARG_INCLUDES)
+  set (ARG_BODY)
+  foreach (index RANGE ${max_index})
+    list(GET arg_types ${index} arg_type)
+    set (arg_xml_group "${_type_${index}_xmlgroup}")
+    set (arg_xml_name "${_type_${index}_xmlname}")
+    set (ARG_INCLUDES "${ARG_INCLUDES}#include\"${arg_type}.h\"\n")
+    set (ARG_BODY "${ARG_BODY}
+    if (QString(\"${arg_xml_group}\") == proxy->GetXMLGroup() &&
+        QString(\"${arg_xml_name}\") == proxy->GetXMLName())
+        {
+        return new ${arg_type}(regGroup, regName, proxy, server, NULL);
+        }")
+  endforeach()
+
+  if (ARG_INCLUDES AND ARG_BODY)
+    list(GET arg_types 0 ARG_TYPE)
+    set (IMP_CLASS "${ARG_TYPE}ServerManagerModelImplementation")
+    configure_file(${ParaView_CMAKE_DIR}/pqServerManagerModelImplementation.h.in
+      ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.h @ONLY)
+    configure_file(${ParaView_CMAKE_DIR}/pqServerManagerModelImplementation.cxx.in
+      ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.cxx @ONLY)
+
+    set (_moc_srcs)
+    if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+      QT5_WRAP_CPP(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.h)
+    else()
+      QT4_WRAP_CPP(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.h)
+    endif()
+
+    set(${OUTIFACES} ${${OUTIFACES}} ${ARG_TYPE}ServerManagerModel) # don't add
+                                        # the extra "Implementation" here.
+    set(${OUTSRCS}
+      ${${OUTSRCS}}
+      ${_moc_srcs}
+      ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.h
+      ${CMAKE_CURRENT_BINARY_DIR}/${IMP_CLASS}.cxx
+      )
+  endif()
+
+  unset (ARG_TYPE)
+  unset (ARG_INCLUDES)
+  unset (ARG_BODY)
+endmacro()
+
+#------------------------------------------------------------------------------
+# *** OBSOLETE *** : No longer supported.
+# To add new view proxies (or representation proxies) simply add new proxies to
+# "views" or "representations" groups. To add new pqView or pqDataRepresentation
+# subclasses, use ADD_PQPROXY().
+# create implementation for a custom view
+# Obsolete Usage:
 # ADD_PARAVIEW_VIEW_MODULE( OUTIFACES OUTSRCS
 #     VIEW_TYPE Type
 #     VIEW_XML_GROUP Group
@@ -389,104 +479,13 @@ ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL)
 #     [VIEW_NAME Name]
 #     [DISPLAY_PANEL Display]
 #     [DISPLAY_TYPE Display]
-
-# for the given server manager XML
-#  <SourceProxy name="MyFilter" class="MyFilter" label="My Filter">
-#    ...
-#    <Hints>
-#      <View type="MyView" />
-#    </Hints>
-#  </SourceProxy>
-#  ....
-# <ProxyGroup name="plotmodules">
-#  <ViewProxy name="MyView"
-#      base_proxygroup="newviews" base_proxyname="ViewBase"
-#      representation_name="MyDisplay">
-#  </ViewProxy>
-# </ProxyGroup>
-
-#  VIEW_TYPE = "MyView"
-#  VIEW_XML_GROUP = "plotmodules"
-#  VIEW_XML_NAME is optional and defaults to VIEW_TYPE
-#  VIEW_NAME is optional and gives a friendly name for the view type
-#  DISPLAY_TYPE is optional and defaults to pqDataRepresentation
-#  DISPLAY_PANEL gives the name of the display panel
-#  DISPLAY_XML is the XML name of the display for this view and is required if
-#     DISPLAY_PANEL is set
-#
-#  if DISPLAY_PANEL is MyDisplay, then "MyDisplayPanel.h" is looked for.
-#  a class MyView derived from pqGenericViewModule is expected to be in "MyView.h"
-
 MACRO(ADD_PARAVIEW_VIEW_MODULE OUTIFACES OUTSRCS)
-
-  SET(PANEL_SRCS)
-  SET(ARG_VIEW_TYPE)
-  SET(ARG_VIEW_NAME)
-  SET(ARG_VIEW_XML_GROUP)
-  SET(ARG_VIEW_XML_NAME)
-  SET(ARG_DISPLAY_PANEL)
-  SET(ARG_DISPLAY_XML)
-  SET(ARG_DISPLAY_TYPE)
-
-  PV_PLUGIN_PARSE_ARGUMENTS(ARG "VIEW_TYPE;VIEW_XML_GROUP;VIEW_XML_NAME;VIEW_NAME;DISPLAY_PANEL;DISPLAY_TYPE;DISPLAY_XML"
-                  "" ${ARGN} )
-
-  IF(NOT ARG_VIEW_TYPE OR NOT ARG_VIEW_XML_GROUP)
-    MESSAGE(ERROR " ADD_PARAVIEW_VIEW_MODULE called without VIEW_TYPE or VIEW_XML_GROUP")
-  ENDIF(NOT ARG_VIEW_TYPE OR NOT ARG_VIEW_XML_GROUP)
-
-  IF(ARG_DISPLAY_PANEL)
-    IF(NOT ARG_DISPLAY_XML)
-      MESSAGE(ERROR " ADD_PARAVIEW_VIEW_MODULE called with DISPLAY_PANEL but DISPLAY_XML not specified")
-    ENDIF(NOT ARG_DISPLAY_XML)
-  ENDIF(ARG_DISPLAY_PANEL)
-
-  SET(${OUTIFACES} ${ARG_VIEW_TYPE})
-  IF(NOT ARG_VIEW_XML_NAME)
-    SET(ARG_VIEW_XML_NAME ${ARG_VIEW_TYPE})
-  ENDIF(NOT ARG_VIEW_XML_NAME)
-  IF(ARG_VIEW_NAME)
-    SET(VIEW_TYPE_NAME ${ARG_VIEW_NAME})
-  ELSE(ARG_VIEW_NAME)
-    SET(VIEW_TYPE_NAME ${ARG_VIEW_TYPE})
-  ENDIF(ARG_VIEW_NAME)
-
-  IF(NOT ARG_DISPLAY_TYPE)
-    SET(ARG_DISPLAY_TYPE "pqDataRepresentation")
-  ENDIF(NOT ARG_DISPLAY_TYPE)
-
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewModuleImplementation.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewModuleImplementation.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.cxx @ONLY)
-
-  IF(PARAVIEW_BUILD_QT_GUI)
-    SET(VIEW_MOC_SRCS)
-    IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-      QT5_WRAP_CPP(VIEW_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.h)
-    ELSE ()
-      QT4_WRAP_CPP(VIEW_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.h)
-    ENDIF ()
-  ENDIF(PARAVIEW_BUILD_QT_GUI)
-
-  IF(ARG_DISPLAY_PANEL)
-    ADD_PARAVIEW_DISPLAY_PANEL(OUT_PANEL_IFACES PANEL_SRCS
-                               CLASS_NAME ${ARG_DISPLAY_PANEL}
-                               XML_NAME ${ARG_DISPLAY_XML})
-    SET(${OUTIFACES} ${ARG_VIEW_TYPE} ${OUT_PANEL_IFACES})
-  ENDIF(ARG_DISPLAY_PANEL)
-
-  SET(${OUTSRCS}
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.h
-      ${VIEW_MOC_SRCS}
-      ${PANEL_SRCS}
-      )
-
+  message(FATAL_ERROR
+"'ADD_PARAVIEW_VIEW_MODULE' macro is no longer supported.  To add new view proxies, or representation proxies, simply add new proxies to 'views' or 'representations' groups. To add new pqView or pqDataRepresentation subclasses, use 'ADD_PQPROXY' macro.")
 ENDMACRO(ADD_PARAVIEW_VIEW_MODULE)
 
 #------------------------------------------------------------------------
-# DEPRECATED: create implementation for a custom view options interface
+# OBSOLETE: create implementation for a custom view options interface
 MACRO(ADD_PARAVIEW_VIEW_OPTIONS)
   message(FATAL_ERROR
 "'ADD_PARAVIEW_VIEW_OPTIONS' macro is no longer supported.

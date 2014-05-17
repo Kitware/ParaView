@@ -28,12 +28,10 @@ IF(PARAVIEW_BUILD_QT_GUI)
       )
   ENDIF ()
 
-  add_paraview_view_module(
-    VIEW1_IFACE VIEW1_IFACE_SRCS
-    VIEW_TYPE pqQuadView
-    VIEW_NAME "Quad View"
-    VIEW_XML_GROUP "views"
-    VIEW_XML_NAME "QuadView")
+  add_pqproxy(VIEW1_IFACE VIEW1_IFACE_SRCS
+    TYPE pqQuadView
+    XML_GROUP "views"
+    XML_NAME "QuadView")
 
   ADD_PARAVIEW_PLUGIN(QuadView "1.0"
 
@@ -48,13 +46,11 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
     GUI_INTERFACES
       ${VIEW1_IFACE}
-      ${VIEW1_OPTIONS_IFACE}
 
     GUI_SOURCES
       ${MOC_SRCS}
       ${UI_SRCS}
       ${VIEW1_IFACE_SRCS}
-      ${VIEW1_OPTIONS_IFACE_SRCS}
 
       pqQuadView.cxx
   )

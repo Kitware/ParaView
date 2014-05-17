@@ -19,13 +19,11 @@ IF(PARAVIEW_BUILD_QT_GUI)
     QT4_WRAP_CPP(MOC_SRCS
       ${MantaView_SRCS})
   ENDIF ()
-  ADD_PARAVIEW_VIEW_MODULE(
+  add_pqproxy(
     VIEW_IFACE VIEW_IFACE_SRCS
-    VIEW_TYPE MantaView
-    VIEW_NAME Manta
-    VIEW_XML_GROUP views
-    VIEW_XML_NAME Manta
-    )
+    TYPE MantaView
+    XML_GROUP views
+    XML_NAME Manta)
 ENDIF()
 
 LINK_DIRECTORIES ( ${MANTA_BUILD_LIB} )

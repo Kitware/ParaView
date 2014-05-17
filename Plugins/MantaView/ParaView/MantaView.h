@@ -73,15 +73,13 @@ class MantaView : public pqRenderView
   typedef pqRenderView Superclass;
 public:
   static QString mantaViewType() { return "MantaView"; }
-  static QString mantaViewTypeName() { return "Manta Rendered 3D View"; }
 
   /// constructor takes a bunch of init stuff and must have this signature to
   /// satisfy pqView
   MantaView(
-         const QString& viewtype,
          const QString& group,
          const QString& name,
-         vtkSMViewProxy* viewmodule,
+         vtkSMProxy* viewmodule,
          pqServer* server,
          QObject* p);
   ~MantaView();

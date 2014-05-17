@@ -71,7 +71,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
-#include "pqViewModuleInterface.h"
 #include "vtkSMAnimationSceneProxy.h"
 
 namespace pqObjectBuilderNS
@@ -330,8 +329,7 @@ void pqObjectBuilder::destroy(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-pqView* pqObjectBuilder::createView(const QString& type,
-  pqServer* server)
+pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
 {
   if (!server)
     {
@@ -339,19 +337,9 @@ pqView* pqObjectBuilder::createView(const QString& type,
     return NULL;
     }
 
+  vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
-
-  QList<pqViewModuleInterface*> ifaces =
-    pqApplicationCore::instance()->interfaceTracker()->interfaces<pqViewModuleInterface*>();
-  foreach(pqViewModuleInterface* vmi, ifaces)
-    {
-    if (vmi && vmi->viewTypes().contains(type))
-      {
-      proxy.TakeReference(vmi->createViewProxy(type, server));
-      break;
-      }
-    }
-
+  proxy.TakeReference(pxm->NewProxy("views", type.toLatin1().data()));
   if (!proxy)
     {
     qDebug() << "Failed to create a proxy for the requested view type:"

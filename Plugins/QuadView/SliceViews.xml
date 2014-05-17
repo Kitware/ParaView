@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
    <ProxyGroup name="views">
-      <QuadViewProxy name="QuadView" class="vtkPVQuadRenderView"
+      <QuadViewProxy name="QuadView" label="Quad View" class="vtkPVQuadRenderView"
          processes="client|renderserver|dataserver"
          base_proxygroup="views" base_proxyname="RenderView">
          <Documentation>

@@ -1,0 +1,30 @@
+#include "@ARG_TYPE@ServerManagerModelImplementation.h"
+#include "vtkSMProxy.h"
+
+// begin includes
+@ARG_INCLUDES@
+// end includes
+
+//-----------------------------------------------------------------------------
+@ARG_TYPE@ServerManagerModelImplementation::@ARG_TYPE@ServerManagerModelImplementation(QObject* parentObject)
+  : QObject(parentObject)
+{
+}
+
+//-----------------------------------------------------------------------------
+@ARG_TYPE@ServerManagerModelImplementation::~@ARG_TYPE@ServerManagerModelImplementation()
+{
+}
+
+//-----------------------------------------------------------------------------
+pqProxy* @ARG_TYPE@ServerManagerModelImplementation::createPQProxy(
+  const QString& regGroup, const QString& regName, vtkSMProxy* proxy, pqServer* server) const
+{
+  if (proxy!=NULL &&
+    proxy->GetXMLGroup() != NULL &&
+    proxy->GetXMLName() != NULL)
+    {
+    @ARG_BODY@
+    }
+  return NULL;
+}

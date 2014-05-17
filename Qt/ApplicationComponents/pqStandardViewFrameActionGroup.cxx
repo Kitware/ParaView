@@ -44,12 +44,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqRenderView.h"
 #include "pqRenderViewSelectionReaction.h"
+#include "pqServer.h"
 #include "pqToggleInteractionViewMode.h"
 #include "pqUndoStack.h"
 #include "pqViewFrame.h"
-#include "pqViewModuleInterface.h"
 #include "vtkChart.h"
 #include "vtkContextScene.h"
+#include "vtkPVProxyDefinitionIterator.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QMenu>
 #include <QPushButton>
@@ -286,25 +291,39 @@ namespace
     QString Name;
     };
 
+  // Comparator for strings with a twist. It tries to put strings with "Render
+  // View" at the top of the sorted list.
   bool ViewTypeComparator(const ViewType& one, const ViewType& two)
     {
-    return one.Label.toLower() < two.Label.toLower();
+    bool inone = one.Label.contains("Render View", Qt::CaseInsensitive);
+    bool intwo = two.Label.contains("Render View", Qt::CaseInsensitive);
+
+    if ((inone && intwo) || (!inone && !intwo))
+      {
+      return one.Label.toLower() < two.Label.toLower();
+      }
+    Q_ASSERT(inone || intwo);
+    // one is less if it has "Render View", else two is less.
+    return inone;
     }
 
   static QList<ViewType> availableViewTypes()
     {
+    // Iterate over all available "views".
     QList<ViewType> views;
-    pqInterfaceTracker* tracker =
-      pqApplicationCore::instance()->interfaceTracker();
-    foreach (pqViewModuleInterface* vi,
-      tracker->interfaces<pqViewModuleInterface*>())
+    pqServer* server = pqActiveObjects::instance().activeServer();
+    if (!server) { return views; }
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
+    vtkSmartPointer<vtkPVProxyDefinitionIterator> iter;
+    iter.TakeReference(pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("views"));
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
-      QStringList viewTypes = vi->viewTypes();
-      for (int cc=0; cc < viewTypes.size(); cc++)
+      vtkSMProxy* prototype = pxm->GetPrototypeProxy("views", iter->GetProxyName());
+      if (prototype)
         {
         ViewType info;
-        info.Label = vi->viewTypeName(viewTypes[cc]);
-        info.Name = viewTypes[cc];
+        info.Label = prototype->GetXMLLabel();
+        info.Name = iter->GetProxyName();
         views.push_back(info);
         }
       }

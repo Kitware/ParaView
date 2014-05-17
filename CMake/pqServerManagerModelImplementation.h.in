@@ -1,0 +1,32 @@
+/// Generated file. Do not edit.
+
+
+#ifndef __@ARG_TYPE@ServerManagerModelImplementation_h
+#define __@ARG_TYPE@ServerManagerModelImplementation_h
+
+#include "pqServerManagerModelInterface.h"
+
+/// Used by add_pqproxy() macro.
+class @ARG_TYPE@ServerManagerModelImplementation : public QObject,
+                    public pqServerManagerModelInterface
+{
+  Q_OBJECT;
+  Q_INTERFACES(pqServerManagerModelInterface);
+public:
+  @ARG_TYPE@ServerManagerModelImplementation(QObject* parentObject=NULL);
+  virtual ~@ARG_TYPE@ServerManagerModelImplementation();
+
+  /// Creates a pqProxy subclass for the vtkSMProxy given the details for its
+  /// registration with the proxy manager.
+  /// \arg \c regGroup - registration group for the proxy.
+  /// \arg \c regName  - registration name for the proxy.
+  /// \arg \c proxy    - vtkSMProxy instance to create the pqProxy for.
+  /// \arg \c server   - pqServer instance on which the proxy is present.
+  virtual pqProxy* createPQProxy(const QString& regGroup,
+    const QString& regName, vtkSMProxy* proxy, pqServer* server) const;
+
+private:
+  Q_DISABLE_COPY(@ARG_TYPE@ServerManagerModelImplementation);
+};
+
+#endif // endif ifndef

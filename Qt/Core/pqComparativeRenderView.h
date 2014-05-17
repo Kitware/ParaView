@@ -43,7 +43,6 @@ class PQCORE_EXPORT pqComparativeRenderView : public pqRenderView
   typedef pqRenderView Superclass;
 public:
   static QString comparativeRenderViewType() { return "ComparativeRenderView"; }
-  static QString comparativeRenderViewTypeName() { return "3D View (Comparative)"; }
 
   // Constructor:
   // \c group :- SManager registration group name.

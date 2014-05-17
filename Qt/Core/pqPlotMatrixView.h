@@ -48,7 +48,6 @@ public:
   virtual ~pqPlotMatrixView();
   
   static QString viewType() { return "PlotMatrixView"; }
-  static QString viewTypeName() { return "Plot Matrix View"; }
 
 protected:
 
