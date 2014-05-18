@@ -252,6 +252,8 @@ set (Module_SRCS
   pqPropertyWidgetDecorator.cxx
   pqPropertyWidgetInterface.cxx
   pqPropertyWidgetInterface.h
+  pqProxiesWidget.cxx
+  pqProxiesWidget.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
   pqProxyPanel.cxx
@@ -262,10 +264,10 @@ set (Module_SRCS
   pqProxySelectionWidget.h
   pqProxySILModel.cxx
   pqProxySILModel.h
-  pqProxyWidget.h
   pqProxyWidget.cxx
   pqProxyWidgetDialog.cxx
   pqProxyWidgetDialog.h
+  pqProxyWidget.h
   pqQueryClauseWidget.cxx
   pqQueryClauseWidget.h
   pqRecentFilesMenu.cxx
@@ -473,6 +475,7 @@ set (Module_MOC_HDRS
   pqPropertyGroupWidget.h
   pqPropertyWidgetDecorator.h
   pqPropertyWidget.h
+  pqProxiesWidget.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
   pqProxyPropertyWidget.h
