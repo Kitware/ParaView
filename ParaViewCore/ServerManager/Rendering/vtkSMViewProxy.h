@@ -123,9 +123,13 @@ public:
   vtkGetMacro(NeedsUpdate, bool);
 
   // Description:
-  // Return the render window from which offscreen rendering and interactor can
-  // be accessed
-  virtual vtkRenderWindow* GetRenderWindow();
+  // Return the vtkRenderWindow used by this view, if any. Note, views like
+  // vtkSMComparativeViewProxy can have more than 1 render window in play, in
+  // which case, using this method alone may yield incorrect results. Also,
+  // certain views don't use a vtkRenderWindow at all (e.g. Spreadsheet View),
+  // in which case, this method will return NULL. Default implementation returns
+  // NULL.
+  virtual vtkRenderWindow* GetRenderWindow() { return NULL; }
 
 //BTX
 protected:
@@ -141,6 +145,16 @@ protected:
   virtual vtkTypeUInt32 PreRender(bool vtkNotUsed(interactive))
     { return this->GetLocation(); }
   virtual void PostRender(bool vtkNotUsed(interactive)) {}
+
+  // Description:
+  // Subclasses should override this method and return false if the rendering
+  // context is not ready for rendering at this moment. This method is called in
+  // StillRender() and InteractiveRender() calls before the actual render to
+  // ensure that we don't attempt to render when the rendering context is not
+  // ready.
+  // Default implementation uses this->GetRenderWindow() and checks if that
+  // window is drawable.
+  virtual bool IsContextReadyForRendering();
 
   // Description:
   // Called at the end of CreateVTKObjects().

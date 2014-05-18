@@ -347,6 +347,15 @@ vtkPVGenericRenderWindowInteractor* vtkSMRenderViewProxy::GetInteractor()
 }
 
 //----------------------------------------------------------------------------
+vtkRenderWindow* vtkSMRenderViewProxy::GetRenderWindow()
+{
+  this->CreateVTKObjects();
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+    this->GetClientSideObject());
+  return rv? rv->GetRenderWindow() : NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
