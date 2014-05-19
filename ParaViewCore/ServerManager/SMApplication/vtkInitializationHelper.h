@@ -58,6 +58,13 @@ public:
   static void StandaloneInitialize();
   static void StandaloneFinalize();
 
+  // Description:
+  // During initialization, vtkInitializationHelper reads "settings" files for
+  // configuring vtkSMSettings. To disable this processing of the settings file
+  // for an application (e.g. in Catalyst), turn this off. On by default.
+  static void SetLoadSettingsFilesDuringInitialization(bool);
+  static bool GetLoadSettingsFilesDuringInitialization();
+
 protected:
   vtkInitializationHelper() {};
   virtual ~vtkInitializationHelper() {};
@@ -74,6 +81,7 @@ protected:
 private:
   vtkInitializationHelper(const vtkInitializationHelper&); // Not implemented
   void operator=(const vtkInitializationHelper&); // Not implemented
+  static bool LoadSettingsFilesDuringInitialization;
 };
 
 #endif
