@@ -48,6 +48,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   selectorWidget->setObjectName("SelectionWidget");
   selectorWidget->setRootIsDecorated(false);
   selectorWidget->setHeaderLabel(group->GetXMLLabel());
+  selectorWidget->setMaximumRowCountBeforeScrolling(20);
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);
@@ -79,6 +80,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *activeProxy
 
   selectorWidget->setRootIsDecorated(false);
   selectorWidget->setHeaderLabel(proxyProperty->GetXMLLabel());
+  selectorWidget->setMaximumRowCountBeforeScrolling(20);
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);

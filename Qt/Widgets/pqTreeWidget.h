@@ -59,6 +59,11 @@ public:
   QSize sizeHint() const;
   QSize minimumSizeHint() const;
 
+  void setMaximumRowCountBeforeScrolling(int val)
+    { this->MaximumRowCountBeforeScrolling = val; }
+  int maximumRowCountBeforeScrolling() const
+    { return this->MaximumRowCountBeforeScrolling; }
+
 public slots:
   void allOn();
   void allOff();
@@ -87,6 +92,7 @@ protected:
   QTimer* Timer;
 
   int itemCount(QTreeWidgetItem* item) const;
+  int MaximumRowCountBeforeScrolling;
 };
 
 #endif // !_pqTreeWidget_h

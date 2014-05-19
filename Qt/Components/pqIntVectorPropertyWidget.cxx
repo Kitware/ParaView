@@ -124,6 +124,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       treeWidget->setObjectName("TreeWidget");
       treeWidget->setColumnCount(1);
       treeWidget->setRootIsDecorated(false);
+      treeWidget->setMaximumRowCountBeforeScrolling(20);
 
       QTreeWidgetItem* header = new QTreeWidgetItem();
       header->setData(0, Qt::DisplayRole, smproperty->GetXMLLabel());
@@ -179,6 +180,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
     treeWidget->setObjectName("TreeWidget");
     treeWidget->setHeaderLabel(smproperty->GetXMLLabel());
+    treeWidget->setMaximumRowCountBeforeScrolling(20);
 
     pqSignalAdaptorCompositeTreeWidget *adaptor =
       new pqSignalAdaptorCompositeTreeWidget(treeWidget, ivp,

@@ -85,7 +85,8 @@ QPixmap pqTreeWidget::pixmap(Qt::CheckState cs, bool active)
 
 //-----------------------------------------------------------------------------
 pqTreeWidget::pqTreeWidget(QWidget* p)
-  : QTreeWidget(p)
+  : QTreeWidget(p),
+    MaximumRowCountBeforeScrolling(10)
 {
   QStyleOptionButton option;
   QRect r = this->style()->subElementRect(QStyle::SE_CheckBoxIndicator, 
@@ -270,7 +271,7 @@ void pqTreeWidget::doToggle(int column)
 //-----------------------------------------------------------------------------
 int pqTreeWidget::itemCount(QTreeWidgetItem* item) const
 {
-  int maxItemHint = 10;
+  int maxItemHint = this->MaximumRowCountBeforeScrolling;
   int numItems = item? item->childCount() : this->topLevelItemCount();
   int count = numItems;
   for (int cc=0; cc < numItems; cc++)
@@ -293,7 +294,7 @@ QSize pqTreeWidget::sizeHint() const
   // lets show X items before we get a scrollbar
   // probably want to make this a member variable
   // that a caller has access to
-  int maxItemHint = 10;
+  int maxItemHint = this->MaximumRowCountBeforeScrolling;
   // for no items, let's give a space of X pixels
   int minItemHeight = 20;
 
