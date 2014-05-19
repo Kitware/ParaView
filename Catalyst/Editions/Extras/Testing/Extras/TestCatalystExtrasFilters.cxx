@@ -14,7 +14,7 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkInitializationHelper.h"
 #include "vtkProcessModule.h"
-#include "vtkPVServerOptions.h"
+#include "vtkPVOptions.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
@@ -24,9 +24,9 @@ PURPOSE.  See the above copyright notice for more information.
 int main(int argc, char* argv[])
 {
   // Initialization
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkPVOptions* options = vtkPVOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_CLIENT,
+                                      vtkProcessModule::PROCESS_BATCH,
                                       options);
   vtkSMSession* session = vtkSMSession::New();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
