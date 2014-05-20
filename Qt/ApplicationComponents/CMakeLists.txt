@@ -193,6 +193,8 @@ set (Module_SRCS
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.cxx
   pqRepresentationToolbar.h
+  pqRescaleCustomScalarRangeReaction.cxx
+  pqRescaleCustomScalarRangeReaction.h
   pqResetScalarRangeReaction.cxx
   pqResetScalarRangeReaction.h
   pqSaveAnimationGeometryReaction.cxx
@@ -331,6 +333,7 @@ set (Module_MOC_HDRS
   pqReaction.h
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.h
+  pqRescaleCustomScalarRangeReaction.h
   pqResetScalarRangeReaction.h
   pqSaveAnimationGeometryReaction.h
   pqSaveAnimationReaction.h
@@ -443,7 +446,7 @@ vtk_module_library(pqApplicationComponents
 #  # Headers
 #  GLOB_INSTALL_DEVELOPMENT(
 #      ${CMAKE_CURRENT_SOURCE_DIR}
-#      ${PV_INSTALL_INCLUDE_DIR} 
+#      ${PV_INSTALL_INCLUDE_DIR}
 #      "*.h;*.hxx;*.txx")
 #  INSTALL(
 #      FILES ${dynamicHeaders}
