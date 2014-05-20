@@ -420,7 +420,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 
   if (this->ResolveBlocks)
     {
-             
     vtkTimerLog::MarkStartEvent ("Computing boundary regions");
 
     // Determine boundaries at the block that need to be sent to neighbors
@@ -488,19 +487,13 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         }
       }
 
-    vtkTimerLog::MarkEndEvent ("Computing boundary regions");
-  
 #ifdef PARAVIEW_USE_MPI
     // Exchange all boundaries between processes where block and neighbor are different procs
-    vtkTimerLog::MarkStartEvent ("Exchanging boundaries");
     if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
       {
       return 0;
       }
-    vtkTimerLog::MarkEndEvent ("Exchanging boundaries");
 #endif 
-
-    vtkTimerLog::MarkStartEvent ("Transferring equivalence");
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
     this->Equivalence = new vtkAMRConnectivityEquivalence;
 
@@ -517,7 +510,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         }
         this->BoundaryArrays[i].clear ();
       }
-
+    vtkTimerLog::MarkEndEvent ("Computing boundary regions");
+  
+    vtkTimerLog::MarkStartEvent ("Transferring equivalence");
     this->EquivPairs.resize (numProcs);
     while (true)
       {
@@ -628,6 +623,9 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
     NeighborList.clear ();
 
     vtkTimerLog::MarkEndEvent ("Transferring equivalence");
+
+    delete this->Equivalence;
+    this->Equivalence = 0;
     }
 
   if (PropagateGhosts) 
@@ -676,9 +674,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       }
 
     vtkTimerLog::MarkEndEvent ("Propagating ghosts");
-
-    delete this->Equivalence;
-    this->Equivalence = 0;
     }
 
 
