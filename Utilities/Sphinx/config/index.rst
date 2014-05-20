@@ -38,6 +38,7 @@ with ParaView 4.2.0.
 
 .. toctree::
    :maxdepth: 2
+
    api-changes
 
 ParaViewWeb

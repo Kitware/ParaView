@@ -20,7 +20,6 @@
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVOptions.h"
-#include "vtkPVRenderView.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
@@ -175,10 +174,7 @@ void vtkSMViewProxy::StillRender()
   // bug 0013947
   // on Mac OSX don't render into invalid drawable, all subsequent
   // OpenGL calls fail with invalid framebuffer operation.
-  vtkPVRenderView *rv
-    = dynamic_cast<vtkPVRenderView*>(this->GetClientSideObject());
-
-  if (rv && !rv->GetRenderWindow()->IsDrawable())
+  if (this->IsContextReadyForRendering() == false)
     {
     return;
     }
@@ -497,10 +493,11 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-vtkRenderWindow* vtkSMViewProxy::GetRenderWindow()
+bool vtkSMViewProxy::IsContextReadyForRendering()
 {
-  this->CreateVTKObjects();
-  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
-    this->GetClientSideObject());
-  return rv? rv->GetRenderWindow() : NULL;
+  if (vtkRenderWindow* window = this->GetRenderWindow())
+    {
+    return window->IsDrawable();
+    }
+  return true;
 }

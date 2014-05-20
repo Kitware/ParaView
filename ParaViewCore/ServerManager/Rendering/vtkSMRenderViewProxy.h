@@ -151,6 +151,10 @@ public:
   virtual const char* GetRepresentationType(
     vtkSMSourceProxy* producer, int outputPort);
 
+  // Description:
+  // Returns the render window used by this view.
+  virtual vtkRenderWindow* GetRenderWindow();
+
 //BTX
 protected:
   vtkSMRenderViewProxy();

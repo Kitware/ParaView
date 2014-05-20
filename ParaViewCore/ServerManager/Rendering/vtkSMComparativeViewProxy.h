@@ -69,6 +69,10 @@ public:
   virtual const char* GetRepresentationType(
     vtkSMSourceProxy* producer, int outputPort);
 
+  // Description:
+  // Returns the render-window used by the root view, if any.
+  virtual vtkRenderWindow* GetRenderWindow()
+    { return this->GetRootView()? this->GetRootView()->GetRenderWindow() : NULL; }
 protected:
   vtkSMComparativeViewProxy();
   ~vtkSMComparativeViewProxy();
