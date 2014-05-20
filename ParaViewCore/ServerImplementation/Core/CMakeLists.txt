@@ -82,7 +82,6 @@ set (${vtk-module}_HDRS
 #------------------------------------------------------------------------------
 # Generate the protbuf message file.
 #------------------------------------------------------------------------------
-get_target_property(PROTOC_LOCATION protoc_compiler LOCATION)
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
