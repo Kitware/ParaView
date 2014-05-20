@@ -1,8 +1,3 @@
-IF(COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(SET CMP0003 NEW)
-  CMAKE_POLICY(SET CMP0017 NEW)
-ENDIF(COMMAND CMAKE_POLICY)
-
 # Try building a test executable to see if all dependencies
 # of the plugin library are satisfied.
 #option(BUILD_TEST_EXE "Build a test executable." OFF)

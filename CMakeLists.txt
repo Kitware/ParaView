@@ -53,24 +53,6 @@ endif()
 option(BUILD_SHARED_LIBS "Build VTK with shared libraries." ON)
 set(VTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
-#------------------------------------------------------------------------------
-# Setup CMake Environment
-#------------------------------------------------------------------------------
-# Setup cmake policies.
-# TODO: We need to verify that these are still applicable after
-# VTK-modularization changes.
-foreach(policy CMP0012 CMP0013 CMP0014)
-  if(POLICY ${policy})
-    CMAKE_POLICY(SET ${policy} NEW)
-  endif()
-endforeach()
-
-foreach(policy CMP0017)
-  IF(POLICY ${policy})
-    CMAKE_POLICY(SET ${policy} OLD)
-  endif()
-endforeach()
-
 #-------------------------------------------------------------------------------
 set (ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
