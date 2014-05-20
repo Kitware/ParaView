@@ -22,6 +22,15 @@ if(PARAVIEW_ENABLE_COSMOTOOLS
     AND PARAVIEW_DATA_ROOT
     AND PARAVIEW_BUILD_QT_GUI)
     include(ParaViewTestingMacros)
+    paraview_test_load_data_dirs(StreamingParticles
+      adaptive-cosmo
+      )
+    paraview_test_load_baselines(StreamingParticles
+      StreamingParticles1.png
+      StreamingParticles2.png
+      )
+    paraview_test_data_target(StreamingParticles)
+
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client ${CLIENT_EXECUTABLE}
               --enable-bt
