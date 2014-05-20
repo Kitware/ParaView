@@ -51,10 +51,6 @@ if (BUILD_SHARED_LIBS
   list(APPEND PY_TESTS
     Plugins.py,NO_VALID)
 endif ()
-if ("1" STREQUAL ${HAS_NUMPY})
-  list(APPEND PY_TESTS
-    PythonFilters.py,NO_VALID)
-endif ()
 
 set(SMSTATE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(${vtk-module}_ARGS
@@ -83,17 +79,6 @@ set(PVBATCH_TESTS
   Simple.py
   UserTransformOnRepresentation.py
   )
-
-if ("1" STREQUAL ${HAS_NUMPY})
-  # The following line is commented out to make sure PythonFilters-Batch does
-  # not trash the DashBoard because it always fails. The solution, however, is
-  # out of my control. When the related problem is fixed, please uncomment this
-  # line to enable the Batch tests. The Batch tests are important because the
-  # global_* functions can only be correctly tested in Batch mode. Without the
-  # environment, they behave just like their un-global counterparts.
-  # set(PVBATCH_TESTS ${PVBATCH_TESTS}
-  #    PythonFilters.py)
-endif ()
 
 IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
   set(${vtk-module}_NUMPROCS 2)
