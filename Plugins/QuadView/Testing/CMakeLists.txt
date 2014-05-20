@@ -5,6 +5,18 @@ set(MULTI_SLICE_TESTS
   ${CMAKE_CURRENT_SOURCE_DIR}/QuadViewSliceWavelet.xml
 )
 
+paraview_test_load_baselines(QuadView
+  Tile1x2-QuadViewSliceWavelet-Tile0.png
+  Tile1x2-QuadViewSliceWavelet-Tile1.png
+  Tile2x1-QuadViewSliceWavelet-Tile0.png
+  Tile2x1-QuadViewSliceWavelet-Tile1.png
+  Tile2x2-QuadViewSliceWavelet-Tile0.png
+  Tile2x2-QuadViewSliceWavelet-Tile1.png
+  Tile2x2-QuadViewSliceWavelet-Tile2.png
+  Tile2x2-QuadViewSliceWavelet-Tile3.png
+  )
+paraview_test_data_target(QuadView)
+
 set(QuadViewSliceMultiBlock_BREAK TRUE)
 set(QuadViewSliceWavelet_BREAK TRUE)
 
