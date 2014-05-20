@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkAnimationPlayer.h"
 
-#include "vtkPVAnimationScene.h"
+#include "vtkSMAnimationScene.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
@@ -35,7 +35,7 @@ vtkAnimationPlayer::~vtkAnimationPlayer()
 }
 
 //----------------------------------------------------------------------------
-void vtkAnimationPlayer::SetAnimationScene(vtkPVAnimationScene* scene)
+void vtkAnimationPlayer::SetAnimationScene(vtkSMAnimationScene* scene)
 {
   if (this->AnimationScene != scene)
     {
@@ -45,7 +45,7 @@ void vtkAnimationPlayer::SetAnimationScene(vtkPVAnimationScene* scene)
 }
 
 //----------------------------------------------------------------------------
-vtkPVAnimationScene* vtkAnimationPlayer::GetAnimationScene()
+vtkSMAnimationScene* vtkAnimationPlayer::GetAnimationScene()
 {
   return this->AnimationScene;
 }

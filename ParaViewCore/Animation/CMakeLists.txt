@@ -32,7 +32,6 @@ set (Module_SRCS
   vtkAnimationPlayer.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkPVAnimationCue.cxx
-  vtkPVAnimationScene.cxx
   vtkPVBooleanKeyFrame.cxx
   vtkPVCameraAnimationCue.cxx
   vtkPVCameraCueManipulator.cxx

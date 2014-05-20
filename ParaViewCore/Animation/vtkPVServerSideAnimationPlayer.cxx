@@ -48,7 +48,12 @@ public:
   {
     this->Owner = parent;
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    if(pm->GetPartitionId() == 0)
+    if (!pm)
+      {
+      return;
+      }
+
+    if (pm->GetPartitionId() == 0)
       {
       // Root node
       // Grab SessionServer and attach the session core to our vtkObject which

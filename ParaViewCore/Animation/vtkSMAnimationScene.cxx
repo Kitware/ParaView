@@ -14,11 +14,12 @@
 =========================================================================*/
 #include "vtkSMAnimationScene.h"
 
-#include "vtkCacheSizeKeeper.h"
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCameraAnimationCue.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
 #include "vtkPVGeneralSettings.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
@@ -26,18 +27,26 @@
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
-#include <vector>
+#ifdef PARAVIEW_ENABLE_PYTHON
+# include "vtkPythonAnimationCue.h"
+#endif
+
+#include <algorithm>
 #include <cassert>
+#include <vector>
 
 //----------------------------------------------------------------------------
 class vtkSMAnimationScene::vtkInternals
 {
   vtkNew<vtkSMTransferFunctionManager> TransferFunctionManager;
 public:
+  typedef std::vector<vtkSmartPointer<vtkAnimationCue> > VectorOfAnimationCues;
+  VectorOfAnimationCues AnimationCues;
+
   typedef std::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
   VectorOfViews ViewModules;
 
-  void StillRenderAllViews()
+  void UpdateAllViews()
     {
     vtkSMSessionProxyManager* pxm = NULL;
     for (VectorOfViews::iterator iter=this->ViewModules.begin();
@@ -76,7 +85,10 @@ public:
       // nothing to do.
       break;
       }
+    }
 
+  void StillRenderAllViews()
+    {
     for (VectorOfViews::iterator iter=this->ViewModules.begin();
       iter != this->ViewModules.end(); ++iter)
       {
@@ -105,10 +117,105 @@ public:
     }
 };
 
+namespace
+{
+  // Helper class used by for_each() to call Tick on all cues if they are not
+  // one of the "exception" classes.
+  class vtkTickOnGenericCue
+    {
+    double StartTime;
+    double EndTime;
+    double CurrentTime;
+    double DeltaTime;
+    double ClockTime;
+  protected:
+    virtual bool IsAcceptable(vtkAnimationCue* cue) const
+      {
+      return (cue &&
+#ifdef PARAVIEW_ENABLE_PYTHON
+        (vtkPythonAnimationCue::SafeDownCast(cue) == NULL) &&
+#endif
+        (vtkPVCameraAnimationCue::SafeDownCast(cue) == NULL));
+      }
+  public:
+    vtkTickOnGenericCue(
+      double starttime, double endtime, double currenttime, double deltatime, double clocktime)
+      : StartTime(starttime),
+      EndTime(endtime),
+      CurrentTime(currenttime),
+      DeltaTime(deltatime),
+      ClockTime(clocktime)
+    {
+    }
+    virtual ~vtkTickOnGenericCue() {}
+    void operator()(vtkAnimationCue* cue) const
+      {
+      if (!this->IsAcceptable(cue))
+        {
+        return;
+        }
+
+      switch(cue->GetTimeMode())
+        {
+      case vtkAnimationCue::TIMEMODE_RELATIVE:
+        cue->Tick(this->CurrentTime - this->StartTime, this->DeltaTime, this->ClockTime);
+        break;
+      case vtkAnimationCue::TIMEMODE_NORMALIZED:
+        cue->Tick( (this->CurrentTime - this->StartTime) / (this->EndTime - this->StartTime),
+          this->DeltaTime / (this->EndTime - this->StartTime), this->ClockTime);
+        break;
+      default:
+        vtkGenericWarningMacro("Invalid cue time mode");
+        }
+      }
+    };
+
+  class vtkTickOnCameraCue : public vtkTickOnGenericCue
+    {
+  protected:
+    virtual bool IsAcceptable(vtkAnimationCue* cue) const
+      {
+      return (vtkPVCameraAnimationCue::SafeDownCast(cue) != NULL);
+      }
+
+  public:
+    vtkTickOnCameraCue(
+      double starttime, double endtime, double currenttime, double deltatime, double clocktime)
+      : vtkTickOnGenericCue(starttime, endtime, currenttime, deltatime, clocktime)
+      {
+      }
+    };
+
+  class vtkTickOnPythonCue : public vtkTickOnGenericCue
+    {
+  protected:
+    virtual bool IsAcceptable(vtkAnimationCue* cue) const
+      {
+      return (false
+#ifdef PARAVIEW_ENABLE_PYTHON
+        || (vtkPythonAnimationCue::SafeDownCast(cue) != NULL)
+#endif
+        );
+      }
+
+  public:
+    vtkTickOnPythonCue(
+      double starttime, double endtime, double currenttime, double deltatime, double clocktime)
+      : vtkTickOnGenericCue(starttime, endtime, currenttime, deltatime, clocktime)
+      {
+      }
+    };
+
+}
+
 vtkStandardNewMacro(vtkSMAnimationScene);
 //----------------------------------------------------------------------------
 vtkSMAnimationScene::vtkSMAnimationScene()
 {
+  this->SceneTime = 0;
+  this->PlaybackTimeWindow[0] = 1.0;
+  this->PlaybackTimeWindow[1] = -1.0;
+  this->InTick = false;
   this->Caching = false;
   this->LockEndTime = false;
   this->LockStartTime = false;
@@ -143,6 +250,48 @@ vtkSMAnimationScene::~vtkSMAnimationScene()
 
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::AddCue(vtkAnimationCue* cue)
+{
+  vtkInternals::VectorOfAnimationCues& cues = this->Internals->AnimationCues;
+  if (std::find(cues.begin(), cues.end(), cue) != cues.end())
+    {
+    vtkErrorMacro("Animation cue already present in the scene");
+    return;
+    }
+  cues.push_back(cue);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::RemoveCue(vtkAnimationCue* cue)
+{
+  vtkInternals::VectorOfAnimationCues& cues = this->Internals->AnimationCues;
+  vtkInternals::VectorOfAnimationCues::iterator iter =
+    std::find(cues.begin(), cues.end(), cue);
+  if (iter != cues.end())
+    {
+    cues.erase(iter);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::RemoveAllCues()
+{
+  if (this->Internals->AnimationCues.size() > 0)
+    {
+    this->Internals->AnimationCues.clear();
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkSMAnimationScene::GetNumberOfCues()
+{
+  return static_cast<int>(this->Internals->AnimationCues.size());
 }
 
 //----------------------------------------------------------------------------
@@ -268,9 +417,39 @@ vtkSMViewProxy* vtkSMAnimationScene::GetViewProxy(unsigned int cc)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMAnimationScene::StartCueInternal()
+{
+  this->Superclass::StartCueInternal();
+
+  // Initialize all the animation cues.
+  vtkInternals::VectorOfAnimationCues& cues = this->Internals->AnimationCues;
+  for (vtkInternals::VectorOfAnimationCues::iterator iter = cues.begin();
+    iter != cues.end(); ++iter)
+    {
+    iter->GetPointer()->Initialize();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationScene::EndCueInternal()
+{
+  // finalize all the animation cues.
+  vtkInternals::VectorOfAnimationCues& cues = this->Internals->AnimationCues;
+  for (vtkInternals::VectorOfAnimationCues::iterator iter = cues.begin();
+    iter != cues.end(); ++iter)
+    {
+    iter->GetPointer()->Finalize();
+    }
+
+  this->Superclass::EndCueInternal();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMAnimationScene::TickInternal(
   double currenttime, double deltatime, double clocktime)
 {
+  assert(!this->InTick);
+
   // We see that here we don't check if the cache is full at all. Views have
   // logic in them to periodically check and synchronize the "fullness" of cache
   // among all participating processes. So we don't have to manage that here at
@@ -280,11 +459,41 @@ void vtkSMAnimationScene::TickInternal(
     this->Internals->PassUseCache(true);
     this->Internals->PassCacheTime(currenttime);
     }
+
+  // this ensures that if this->SetSceneTime() is called, we don't call Tick()
+  // again.
+  this->InTick = true;
+
+  this->SceneTime = currenttime;
+
+  vtkInternals::VectorOfAnimationCues& cues = this->Internals->AnimationCues;
+  // Now the animation update loop is as follows:
+  //    - Update all cues not explicitly listed here
+  //    - Update all Python cues
+  // UpdateAllViews()
+  //    - Update all Camera cues
+  // Superclass::TickInternal
+  // RenderAllViews()
+
+  std::for_each(cues.begin(), cues.end(),
+    vtkTickOnGenericCue(this->StartTime, this->EndTime, currenttime, deltatime, clocktime));
+
+  std::for_each(cues.begin(), cues.end(),
+    vtkTickOnPythonCue(this->StartTime, this->EndTime, currenttime, deltatime, clocktime));
+
+  this->Internals->UpdateAllViews();
+
+  std::for_each(cues.begin(), cues.end(),
+    vtkTickOnCameraCue(this->StartTime, this->EndTime, currenttime, deltatime, clocktime));
+
   this->Superclass::TickInternal(currenttime, deltatime, clocktime);
+
   if (!this->OverrideStillRender)
     {
     this->Internals->StillRenderAllViews();
     }
+  this->InTick = false;
+
   if (this->Caching)
     {
     this->Internals->PassUseCache(false);

@@ -23,7 +23,7 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 #include "vtkPVAnimationModule.h" // needed for export macro
 
-class vtkPVAnimationScene;
+class vtkSMAnimationScene;
 class VTKPVANIMATION_EXPORT vtkAnimationPlayer : public vtkObject
 {
 public:
@@ -33,8 +33,8 @@ public:
   // Description:
   // Set the animation scene that is to be played by this player.
   // Note that the animation scene is not reference counted to avoid loops.
-  virtual void SetAnimationScene(vtkPVAnimationScene*);
-  vtkPVAnimationScene* GetAnimationScene();
+  virtual void SetAnimationScene(vtkSMAnimationScene*);
+  vtkSMAnimationScene* GetAnimationScene();
 
   // Description:
   // Start playing the animation.
@@ -91,7 +91,7 @@ private:
   vtkAnimationPlayer(const vtkAnimationPlayer&); // Not implemented
   void operator=(const vtkAnimationPlayer&); // Not implemented
 
-  vtkWeakPointer<vtkPVAnimationScene> AnimationScene;
+  vtkWeakPointer<vtkSMAnimationScene> AnimationScene;
   bool InPlay;
   bool StopPlay;
   bool Loop;

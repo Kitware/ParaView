@@ -120,8 +120,9 @@ void vtkPVCameraCueManipulator::UpdateValue(double currenttime,
     vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(this->DataSourceProxy);
     if (proxy)
       {
-      // update pipeline
-      proxy->UpdatePipeline();
+      // With changes in vtkSMAnimationScene when this cue "tick" is called,
+      // we no longer need to call UpdatePipeline(), the pipeline will already be updated.
+      // proxy->UpdatePipeline();
 
       // get the data bounds
       vtkPVDataInformation *info = proxy->GetDataInformation();
