@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkNew.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"

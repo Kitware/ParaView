@@ -1,6 +1,8 @@
 vtk_module(pqDeprecated
-  DEPENDS
+  PRIVATE_DEPENDS
     pqApplicationComponents
+    vtkChartsCore
+    vtkViewsContext2D
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW

@@ -1,0 +1,575 @@
+<!-- Proxy definitions for Animation related proxies -->
+<ServerManagerConfiguration>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="animation">
+    <Proxy name="AnimationCueBase">
+      <Documentation>Internal base interface for all animation
+      cues.</Documentation>
+      <IntVectorProperty command="SetTimeMode"
+                         default_values="0"
+                         name="TimeMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Normalized"
+                 value="0" />
+          <Entry text="Relative"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetStartTime"
+                            default_values="0"
+                            name="StartTime"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEndTime"
+                            default_values="1"
+                            name="EndTime"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <IntVectorProperty command="SetAnimatedElement"
+                         default_values="0"
+                         name="AnimatedElement"
+                         number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enables this animation cue.</Documentation>
+      </IntVectorProperty>
+      <!-- End of AnimationCueBase -->
+    </Proxy>
+    <ComparativeAnimationCueProxy class="vtkPVComparativeAnimationCue"
+                                  name="ComparativeAnimationCue"
+                                  processes="client">
+      <Documentation>Animation cue used by comparative views.</Documentation>
+      <IntVectorProperty command="SetAnimatedElement"
+                         default_values="0"
+                         name="AnimatedElement"
+                         number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enables this animation cue.</Documentation>
+      </IntVectorProperty>
+      <ProxyProperty argument_type="SMProxy"
+                     clean_command="RemoveAnimatedProxy"
+                     command="SetAnimatedProxy"
+                     name="AnimatedProxy">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <StringVectorProperty command="SetAnimatedPropertyName"
+                            name="AnimatedPropertyName"
+                            number_of_elements="1"></StringVectorProperty>
+      <StringVectorProperty command="SetAnimatedDomainName"
+                            name="AnimatedDomainName"
+                            number_of_elements="1"></StringVectorProperty>
+      <!-- end of ComparativeAnimationCue -->
+    </ComparativeAnimationCueProxy>
+    <Proxy base_proxygroup="animation"
+           base_proxyname="AnimationCueBase"
+           class="vtkPVKeyFrameAnimationCueForProxies"
+           name="KeyFrameAnimationCue"
+           processes="client">
+      <Documentation>Animation cue with keyframes.</Documentation>
+      <ProxyProperty argument_type="SMProxy"
+                     clean_command="RemoveAnimatedProxy"
+                     command="SetAnimatedProxy"
+                     name="AnimatedProxy">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <StringVectorProperty command="SetAnimatedPropertyName"
+                            name="AnimatedPropertyName"
+                            number_of_elements="1"></StringVectorProperty>
+      <StringVectorProperty command="SetAnimatedDomainName"
+                            name="AnimatedDomainName"
+                            number_of_elements="1"></StringVectorProperty>
+      <ProxyProperty command="AddKeyFrame"
+                     name="KeyFrames"
+                     remove_command="RemoveKeyFrame"
+                     repeat_command="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation_keyframes" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="GetLastAddedKeyFrameIndex"
+                         information_only="1"
+                         name="LastAddedKeyFrameIndex"></IntVectorProperty>
+      <!-- End of KeyFrameAnimationCue -->
+    </Proxy>
+    <Proxy base_proxygroup="animation"
+           base_proxyname="AnimationCueBase"
+           class="vtkPVCameraAnimationCue"
+           name="CameraAnimationCue"
+           processes="client">
+      <Documentation>Animation cue which can be used for animating Camera using
+      keyframes.</Documentation>
+      <ProxyProperty command="SetView"
+                     name="AnimatedProxy"></ProxyProperty>
+      <IntVectorProperty command="SetMode"
+                         default_values="0"
+                         name="Mode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolate Camera" value="0" />
+          <Entry text="Path-based" value="1" />
+          <Entry text="Follow-data" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <ProxyProperty command="AddKeyFrame"
+                     name="KeyFrames"
+                     remove_command="RemoveKeyFrame"
+                     repeat_command="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation_keyframes" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="GetLastAddedKeyFrameIndex"
+                         information_only="1"
+                         name="LastAddedKeyFrameIndex">
+      </IntVectorProperty>
+      <ProxyProperty name="DataSource"
+                     argument_type="SMProxy"
+                     command="SetDataSourceProxy">
+      </ProxyProperty>
+      <!-- End of CameraAnimationCue -->
+    </Proxy>
+    <Proxy base_proxygroup="animation"
+           base_proxyname="KeyFrameAnimationCue"
+           class="vtkPVKeyFrameAnimationCueForProxies"
+           name="TimeAnimationCue"
+           processes="client">
+      <Documentation>This is same as KeyFrameAnimationCue except that it has a
+      new property "UseAnimationTime" which when set overrides the keyframes
+      all together and directly uses the animation clock time to update the
+      animated property.</Documentation>
+      <IntVectorProperty command="SetUseAnimationTime"
+                         default_values="1"
+                         name="UseAnimationTime"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When enabled, the animated property is directly updated
+        with the value of the Animation clock. Default value it
+        true.</Documentation>
+      </IntVectorProperty>
+      <!-- end of TimeAnimationCue -->
+    </Proxy>
+    <!--Scene -->
+    <AnimationSceneProxy class="vtkSMAnimationScene"
+                         name="AnimationScene"
+                         processes="client">
+      <Documentation>Proxy for animation scene.</Documentation>
+      <ProxyProperty argument_type="SMProxy"
+                     clean_command="RemoveAllViewProxies"
+                     command="AddViewProxy"
+                     name="ViewModules"
+                     repeat_command="1"
+                     state_ignored="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="views" />
+        </ProxyGroupDomain>
+        <Documentation>Add views to this scene. These are all the views that
+        need to be updated when playing the animation.</Documentation>
+      </ProxyProperty>
+      <ProxyProperty command="AddCue"
+                     name="Cues"
+                     remove_command="RemoveCue"
+                     repeat_command="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation" />
+        </ProxyGroupDomain>
+        <Documentation>Add cues to this scene.</Documentation>
+      </ProxyProperty>
+      <DoubleVectorProperty command="SetSceneTime"
+                            default_values="none"
+                            name="AnimationTime"
+                            number_of_elements="1"
+                            precision="16">
+        <Documentation>Set the current animation time.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetStartTime"
+                            default_values="0.0"
+                            information_property="StartTimeInfo"
+                            label="Start Time"
+                            name="StartTime"
+                            number_of_elements="1"
+                            precision="16">
+        <Documentation>Set the start time for the animation
+        scene.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEndTime"
+                            default_values="1.0"
+                            information_property="EndTimeInfo"
+                            label="End Time"
+                            name="EndTime"
+                            number_of_elements="1"
+                            precision="16">
+        <Documentation>Set the end time for the animation
+        scene.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetStartTime"
+                            information_only="1"
+                            name="StartTimeInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetEndTime"
+                            information_only="1"
+                            name="EndTimeInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetLockStartTime"
+                         default_values="0"
+                         name="LockStartTime"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set the StartTime will not be changed when the data
+        time steps change.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLockEndTime"
+                         default_values="0"
+                         name="LockEndTime"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When set the EndTime will not be changed when the data
+        time steps change.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCaching"
+                         default_values="0"
+                         name="Caching"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Indicates if cache is to be used while playing the
+        animation.</Documentation>
+      </IntVectorProperty>
+      <ProxyProperty argument_type="SMProxy"
+                     command="SetTimeKeeper"
+                     name="TimeKeeper">
+        <Documentation>Set the time keeper. Time keeper is used to obtain the
+        information about timesteps. This is required to play animation in
+        "Snap To Timesteps" mode.</Documentation>
+      </ProxyProperty>
+      <IntVectorProperty command="SetLoop"
+                         default_values="0"
+                         name="Loop"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set to true to play the animation in a
+        loop.</Documentation>
+      </IntVectorProperty>
+      <Property command="Play"
+                name="Play" />
+      <Property command="Stop"
+                name="Stop" />
+      <Property command="GoToNext"
+                name="GoToNext" />
+      <Property command="GoToPrevious"
+                name="GoToPrevious" />
+      <Property command="GoToFirst"
+                name="GoToFirst" />
+      <Property command="GoToLast"
+                name="GoToLast" />
+      <IntVectorProperty command="SetPlayMode"
+                         default_values="0"
+                         name="PlayMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Sequence"
+                 value="0" />
+          <Entry text="Real Time"
+                 value="1" />
+          <Entry text="Snap To TimeSteps"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfFrames"
+                         default_values="10"
+                         name="NumberOfFrames"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>Set the number of frames in which to play the
+        animation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDuration"
+                         default_values="10"
+                         name="Duration"
+                         number_of_elements="1">
+        <Documentation>Set the duration for playing the animation in
+        seconds.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFramesPerTimestep"
+                         default_values="1"
+                         name="FramesPerTimestep"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The number of frames per timestep.</Documentation>
+      </IntVectorProperty>
+      <!-- End of AnimationScene -->
+    </AnimationSceneProxy>
+    <!-- End of animation -->
+  </ProxyGroup>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="animation_keyframes">
+    <!-- .................................................................. -->
+    <Proxy class="vtkPVKeyFrame"
+           name="KeyFrame"
+           processes="client">
+      <DoubleVectorProperty command="SetKeyTime"
+                            default_values="0.0"
+                            name="KeyTime"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty clean_command="RemoveAllKeyValues"
+                            command="SetKeyValue"
+                            default_values="0.0"
+                            name="KeyValues"
+                            number_of_elements="1"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"></DoubleVectorProperty>
+    </Proxy>
+    <!-- .................................................................. -->
+    <Proxy base_proxygroup="animation_keyframes"
+           base_proxyname="KeyFrame"
+           class="vtkPVCompositeKeyFrame"
+           name="CompositeKeyFrame"
+           processes="client">
+      <IntVectorProperty command="SetType"
+                         default_values="2"
+                         label="Interpolation"
+                         name="Type"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Boolean"
+                 value="1" />
+          <Entry text="Ramp"
+                 value="2" />
+          <Entry text="Exponential"
+                 value="3" />
+          <Entry text="Sinusoid"
+                 value="4" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBase"
+                            default_values="2.0"
+                            name="Base"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetStartPower"
+                            default_values="0.0"
+                            name="StartPower"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEndPower"
+                            default_values="1.0"
+                            name="EndPower"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPhase"
+                            default_values="0.0"
+                            name="Phase"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFrequency"
+                            default_values="1.0"
+                            name="Frequency"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOffset"
+                            default_values="0.0"
+                            name="Offset"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <!-- End of CompositeKeyFrame -->
+    </Proxy>
+    <!-- .................................................................. -->
+    <Proxy base_proxygroup="animation_keyframes"
+           base_proxyname="KeyFrame"
+           class="vtkPVBooleanKeyFrame"
+           name="BooleanKeyFrame"
+           processes="client"></Proxy>
+    <!-- .................................................................. -->
+    <Proxy base_proxygroup="animation_keyframes"
+           base_proxyname="KeyFrame"
+           class="vtkPVRampKeyFrame"
+           name="RampKeyFrame"
+           processes="client"></Proxy>
+    <!-- .................................................................. -->
+    <Proxy base_proxygroup="animation_keyframes"
+           base_proxyname="KeyFrame"
+           class="vtkPVExponentialKeyFrame"
+           name="ExponentialKeyFrame"
+           processes="client">
+      <DoubleVectorProperty command="SetBase"
+                            default_values="2.0"
+                            name="Base"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetStartPower"
+                            default_values="0.0"
+                            name="StartPower"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetEndPower"
+                            default_values="1.0"
+                            name="EndPower"
+                            number_of_elements="1"></DoubleVectorProperty>
+    </Proxy>
+    <!-- .................................................................. -->
+    <Proxy base_proxygroup="animation_keyframes"
+           base_proxyname="KeyFrame"
+           class="vtkPVSinusoidKeyFrame"
+           name="SinusoidKeyFrame"
+           processes="client">
+      <DoubleVectorProperty command="SetPhase"
+                            default_values="0.0"
+                            name="Phase"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFrequency"
+                            default_values="1.0"
+                            name="Frequency"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOffset"
+                            default_values="0.0"
+                            name="Offset"
+                            number_of_elements="1"></DoubleVectorProperty>
+    </Proxy>
+    <!-- .................................................................. -->
+    <Proxy base_proxygroup="animation_keyframes"
+           base_proxyname="KeyFrame"
+           class="vtkPVCameraKeyFrame"
+           name="CameraKeyFrame"
+           processes="client">
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.0 0.0 0.0"
+                            name="Position"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalPoint"
+                            default_values="0.0 0.0 0.0"
+                            name="FocalPoint"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetViewUp"
+                            default_values="0.0 1.0 0.0"
+                            name="ViewUp"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetViewAngle"
+                            default_values="30"
+                            name="ViewAngle"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetParallelScale"
+                            default_values="1.0"
+                            name="ParallelScale"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <!-- These are properties for the new style camera interpolation
+           using path
+      -->
+      <DoubleVectorProperty clean_command="ClearPositionPath"
+                            command="AddPositionPathPoint"
+                            default_values="5 0 0 5 5 0 5 0 0"
+                            name="PositionPathPoints"
+                            number_of_elements="9"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"></DoubleVectorProperty>
+      <DoubleVectorProperty clean_command="ClearFocalPath"
+                            command="AddFocalPathPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="FocalPathPoints"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"></DoubleVectorProperty>
+      <IntVectorProperty command="SetPositionMode"
+                         default_values="0"
+                         name="PositionMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Path"
+                 value="0" />
+          <Entry text="FixedDirection"
+                 value="1" />
+          <Entry text="LookAhead"
+                 value="2" />
+          <Entry text="Orthogonal"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFocalPointMode"
+                         default_values="0"
+                         name="FocalPointMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Path"
+                 value="0" />
+          <Entry text="FixedDirection"
+                 value="1" />
+          <Entry text="LookAhead"
+                 value="2" />
+          <Entry text="Orthogonal"
+                 value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetClosedFocalPath"
+                         default_values="0"
+                         name="ClosedFocalPath"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetClosedPositionPath"
+                         default_values="0"
+                         name="ClosedPositionPath"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- end of CameraKeyFrame -->
+    </Proxy>
+    <!-- end of keyframes -->
+  </ProxyGroup>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="remote_player">
+    <!-- .................................................................. -->
+    <!-- Proxy used to save animation remotely when the client disconnect -->
+    <Proxy class="vtkPVServerSideAnimationPlayer"
+           name="AnimationPlayer">
+      <ProxyProperty command="SetWriter"
+                     name="Writer"></ProxyProperty>
+      <StringVectorProperty command="SetSessionProxyManagerState"
+                            default_values=""
+                            name="XMLState"
+                            number_of_elements="1">
+        <Documentation>Set the XML content of the vtkSMSessionProxyManager
+        state.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+  <!-- ==================================================================== -->
+  <ProxyGroup name="misc">
+    <!-- .................................................................. -->
+    <Proxy class="vtkPVRepresentationAnimationHelper"
+           name="RepresentationAnimationHelper"
+           processes="client">
+      <Documentation>Used to help in animation representation
+      properties.</Documentation>
+      <ProxyProperty argument_type="SMProxy"
+                     command="SetSourceProxy"
+                     name="Source" />
+      <IntVectorProperty command="SetVisibility"
+                         default_values="none"
+                         is_internal="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="none"
+                            is_internal="1"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <!-- End of RepresentationAnimationHelper -->
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

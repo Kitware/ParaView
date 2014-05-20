@@ -63,6 +63,10 @@ try:
   from vtkPVServerManagerApplicationPython import *
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerApplicationPython")
+try:
+  from vtkPVAnimationPython import *
+except:
+  paraview.print_error("Error: Cannot import vtkPVAnimationPython")
 from vtkPVCommonPython import *
 
 def _wrap_property(proxy, smproperty):

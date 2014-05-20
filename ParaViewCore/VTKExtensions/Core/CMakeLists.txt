@@ -29,52 +29,29 @@
 #
 #==========================================================================
 set(Module_SRCS
-  vtkAnimationPlayer.cxx
-  vtkCacheSizeKeeper.cxx
   vtkCommunicationErrorCatcher.cxx
-  vtkCompositeAnimationPlayer.cxx
   vtkCompositeMultiProcessController.cxx
   vtkDistributedTrivialProducer.cxx
   vtkMultiProcessControllerHelper.cxx
-  vtkPVAnimationCue.cxx
-  vtkPVAnimationScene.cxx
-  vtkPVBooleanKeyFrame.cxx
   vtkPVCompositeDataPipeline.cxx
-  vtkPVCompositeKeyFrame.cxx
-  vtkPVCueManipulator.cxx
-  vtkPVExponentialKeyFrame.cxx
   vtkPVExtentTranslator.cxx
-  vtkPVKeyFrame.cxx
-  vtkPVKeyFrameAnimationCue.cxx
-  vtkPVKeyFrameCueManipulator.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
-  vtkPVRampKeyFrame.cxx
-  vtkPVSinusoidKeyFrame.cxx
   vtkPVTrivialExtentTranslator.cxx
   vtkPVTrivialProducer.cxx
-  vtkRealtimeAnimationPlayer.cxx
-  vtkSequenceAnimationPlayer.cxx
-  vtkTimestepsAnimationPlayer.cxx
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
 )
 
 set_source_files_properties(
-  vtkCacheSizeKeeper
   vtkCommunicationErrorCatcher
   vtkMultiProcessControllerHelper
   WRAP_EXCLUDE
   )
 
 set_source_files_properties(
-  vtkAnimationPlayer
-  vtkCacheSizeKeeper
   vtkCommunicationErrorCatcher
-  vtkPVAnimationCue
-  vtkPVCueManipulator
-  vtkPVKeyFrameAnimationCue
   vtkUndoElement
   ABSTRACT)
 

@@ -29,19 +29,8 @@
 #
 #==========================================================================
 set (Module_SRCS
-  vtkPVCameraAnimationCue.cxx
-  vtkPVCameraCueManipulator.cxx
-  vtkPVCameraKeyFrame.cxx
   vtkPVGeneralSettings.cxx
-  vtkPVKeyFrameAnimationCueForProxies.cxx
   vtkPVMultiServerDataSource.cxx
-  vtkPVRepresentationAnimationHelper.cxx
-  vtkPVServerSideAnimationPlayer.cxx
-  vtkSMAnimationScene.cxx
-  vtkSMAnimationSceneGeometryWriter.cxx
-  vtkSMAnimationSceneImageWriter.cxx
-  vtkSMAnimationSceneProxy.cxx
-  vtkSMAnimationSceneWriter.cxx
   vtkSMCSVExporterProxy.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
@@ -59,10 +48,8 @@ set (Module_SRCS
 )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMAnimationSceneWriter.cxx
   vtkSMExporterProxy.cxx
   ABSTRACT
   )
 
-vtk_module_library(vtkPVServerManagerDefault
-  ${Module_SRCS})
+vtk_module_library(vtkPVServerManagerDefault ${Module_SRCS})

@@ -1103,6 +1103,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     ENDIF(plugin_type_gui OR GUI_SRCS)
     IF(SM_SRCS)
       target_link_libraries(${NAME} LINK_PUBLIC vtkPVServerManagerApplication
+        vtkPVAnimation
         vtkPVServerManagerDefault
         vtkPVServerManagerApplicationCS)
     ENDIF(SM_SRCS)
