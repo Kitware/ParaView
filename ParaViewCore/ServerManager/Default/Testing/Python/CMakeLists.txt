@@ -60,15 +60,6 @@ paraview_add_test_python(
   ${PY_TESTS}
   )
 
-# This is necessary because PythonFilters generates and executes python scripts
-# on the fly which throws exceptions but cannot be caught by the host script
-# for some reason. Therefore, those exceptions are not considered as failures
-# by the ctest framework. Set this property causes ctest to parse the outputs of
-# the generated scripts for the regex "Error" which can cause a test failure.
-if ("1" STREQUAL ${HAS_NUMPY})
-  set_tests_properties(${vtk-module}Python-PythonFilters PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
-endif ("1" STREQUAL ${HAS_NUMPY})
-
 ###############################################################################
 # Add tests for pvbatch.
 
