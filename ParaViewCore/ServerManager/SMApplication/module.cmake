@@ -7,6 +7,8 @@ vtk_module(vtkPVServerManagerApplication
     # When creating a "custom" application, simply change this to
     # depend on the appropriate module.
     vtkPVServerManagerCore
+  PRIVATE_DEPENDS
+    vtksys
   COMPILE_DEPENDS
     vtkUtilitiesProcessXML
     # this enables the necesary modules.

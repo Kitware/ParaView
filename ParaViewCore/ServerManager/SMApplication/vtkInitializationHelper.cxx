@@ -82,6 +82,28 @@ std::string ListAttachedMonitors()
 
 } // end anon namespace
 
+bool vtkInitializationHelper::LoadSettingsFilesDuringInitialization = true;
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(bool val)
+{
+  if (vtkProcessModule::GetProcessModule() &&
+    val != vtkInitializationHelper::LoadSettingsFilesDuringInitialization)
+    {
+    vtkGenericWarningMacro("SetLoadSettingsFilesDuringInitialization should be called "
+      "before calling Initialize().");
+    }
+  else
+    {
+    vtkInitializationHelper::LoadSettingsFilesDuringInitialization = val;
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkInitializationHelper::GetLoadSettingsFilesDuringInitialization()
+{
+  return vtkInitializationHelper::LoadSettingsFilesDuringInitialization;
+}
+
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable, int type)
 {
@@ -205,15 +227,18 @@ void vtkInitializationHelper::StandaloneInitialize()
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
-  // Write out settings file(s)
-  std::string userSettingsFile =
-    vtkInitializationHelper::GetUserSettingsDirectory();
-  userSettingsFile.append("UserSettings.json");
-  vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  bool savingSucceeded = settings->SaveSettings(userSettingsFile.c_str());
-  if (!savingSucceeded)
+  if (vtkInitializationHelper::LoadSettingsFilesDuringInitialization)
     {
-    cerr << "Saving settings file failed\n";
+    // Write out settings file(s)
+    std::string userSettingsFile =
+      vtkInitializationHelper::GetUserSettingsDirectory();
+    userSettingsFile.append("UserSettings.json");
+    vtkSMSettings* settings = vtkSMSettings::GetInstance();
+    bool savingSucceeded = settings->SaveSettings(userSettingsFile.c_str());
+    if (!savingSucceeded)
+      {
+      cerr << "Saving settings file failed\n";
+      }
     }
 
   vtkSMProxyManager::Finalize();
@@ -233,6 +258,11 @@ void vtkInitializationHelper::StandaloneFinalize()
 //----------------------------------------------------------------------------
 bool vtkInitializationHelper::LoadSettings()
 {
+  if (vtkInitializationHelper::LoadSettingsFilesDuringInitialization == false)
+    {
+    return false;
+    }
+
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 
   bool success = true;
@@ -254,7 +284,7 @@ bool vtkInitializationHelper::LoadSettings()
   // paths for app
   pathsToSearch.push_back(app_dir + "/../../..");
   pathsToSearch.push_back(app_dir + "/../../../../lib");
-  
+
   // paths when doing an unix style install.
   pathsToSearch.push_back(app_dir +"/../lib/paraview-" PARAVIEW_VERSION);
 #endif

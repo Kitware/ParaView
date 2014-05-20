@@ -917,8 +917,7 @@
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
       "proxies":[
         "PiecewiseFunction",
-        "PVLookupTable",
-        "TimeKeeper"
+        "PVLookupTable"
       ]
     }
   ]

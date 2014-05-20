@@ -83,6 +83,9 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
     vtkCPCxxHelper::Instance->Options = vtkPVOptions::New();
     vtkCPCxxHelper::Instance->Options->SetSymmetricMPIMode(1);
 
+    // Disable vtkSMSettings processing for Catalyst applications.
+    vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(false);
+
     vtkInitializationHelper::Initialize(
         argc, argv, vtkProcessModule::PROCESS_BATCH,
         vtkCPCxxHelper::Instance->Options);
