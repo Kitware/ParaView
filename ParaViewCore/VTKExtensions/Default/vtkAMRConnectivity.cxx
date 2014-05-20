@@ -64,16 +64,14 @@ public:
 
   int AddEquivalence (int id1, int id2) 
     {
-    int min_id, max_id;
+    int min_id;
     if (id1 < id2)
       {
       min_id = id1;
-      max_id = id2;
       }
     else
       {
       min_id = id2;
-      max_id = id1;
       }
 
     std::map<int, int>::iterator iter;
@@ -606,8 +604,17 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         return 0;
         }
 #endif
+      // clear out the pairs after sending them.
+      for (int i = 0; i < numProcs; i ++)
+        {
+        if (this->EquivPairs[i] != 0)
+          {
+          this->EquivPairs[i]->SetNumberOfTuples (0);
+          }
+        }
       }
 
+    // clean up EquivPairs for the last time this update
     for (int i = 0; i < numProcs; i ++) 
       {
       if (this->EquivPairs[i] != 0)
