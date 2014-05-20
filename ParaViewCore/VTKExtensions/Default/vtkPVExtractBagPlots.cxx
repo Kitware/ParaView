@@ -204,6 +204,7 @@ int vtkPVExtractBagPlots::RequestData(vtkInformation*,
   if (cname)
     {
     outputHDRTable->AddColumn(cname);
+    outTable2->AddColumn(cname);
     }
   else
     {
