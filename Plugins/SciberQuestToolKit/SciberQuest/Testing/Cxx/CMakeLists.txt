@@ -59,7 +59,7 @@ else()
   # serial invocations, our reader needs mpi these tests use
   # an alternate reader when invoked serially.
   paraview_add_test_cxx(${vtk-module}CxxTests tests
-    NO_VALID # Outputs are validated manually.
+    CUSTOM_BASELINES
     TestKernelConvolution.cxx
     TestVortexFilter.cxx
     )
