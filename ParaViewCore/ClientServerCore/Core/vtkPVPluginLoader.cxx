@@ -158,9 +158,44 @@ public:
         delete *iter;
         }
       }
+    static vtkPVPluginLoaderCleaner* GetInstance()
+      {
+      if (!vtkPVPluginLoaderCleaner::LibCleaner)
+        {
+        vtkPVPluginLoaderCleaner::LibCleaner = new vtkPVPluginLoaderCleaner();
+        }
+      return vtkPVPluginLoaderCleaner::LibCleaner;
+      }
+    static void FinalizeInstance()
+      {
+      if (vtkPVPluginLoaderCleaner::LibCleaner)
+        {
+        delete vtkPVPluginLoaderCleaner::LibCleaner;
+        vtkPVPluginLoaderCleaner::LibCleaner = NULL;
+        }
+      }
+  private:
+    static vtkPVPluginLoaderCleaner *LibCleaner;
     };
-  static vtkPVPluginLoaderCleaner LibCleaner;
+  vtkPVPluginLoaderCleaner* vtkPVPluginLoaderCleaner::LibCleaner = NULL;
 };
+
+
+//=============================================================================
+static int nifty_counter = 0;
+vtkPVPluginLoaderCleanerInitializer::vtkPVPluginLoaderCleanerInitializer()
+{
+  nifty_counter++;
+}
+vtkPVPluginLoaderCleanerInitializer::~vtkPVPluginLoaderCleanerInitializer()
+{
+  nifty_counter--;
+  if (nifty_counter == 0)
+    {
+    vtkPVPluginLoaderCleaner::FinalizeInstance();
+    }
+}
+//=============================================================================
 
 
 vtkStandardNewMacro(vtkPVPluginLoader);
@@ -288,7 +323,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     vtkPVXMLOnlyPlugin* plugin = vtkPVXMLOnlyPlugin::Create(file);
     if (plugin)
       {
-      ::LibCleaner.Register(plugin);
+      vtkPVPluginLoaderCleaner::GetInstance()->Register(plugin);
       return this->LoadPlugin(file, plugin);
       }
     vtkPVPluginLoaderErrorMacro(
@@ -307,7 +342,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 
   // So that the lib is closed when the application quits.
   // BUG #10293.
-  ::LibCleaner.Register(lib);
+  vtkPVPluginLoaderCleaner::GetInstance()->Register(lib);
 
   vtkPVPluginLoaderDebugMacro("Loaded shared library successfully. "
     "Now trying to validate that it's a ParaView plugin.");

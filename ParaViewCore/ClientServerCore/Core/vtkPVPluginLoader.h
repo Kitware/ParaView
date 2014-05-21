@@ -119,6 +119,14 @@ private:
   void operator=(const vtkPVPluginLoader&); // Not implemented.
 };
 
-
+//BTX
+// Implementation of Schwartz counter idiom to ensure that the plugin library
+// unloading doesn't happen before the ParaView application is finalized.
+static class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginLoaderCleanerInitializer
+{
+public:
+  vtkPVPluginLoaderCleanerInitializer();
+  ~vtkPVPluginLoaderCleanerInitializer();
+} vtkPVPluginLoaderCleanerInitializerInstance; // object here in header.
+//ETX
 #endif
-

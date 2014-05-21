@@ -20,17 +20,16 @@
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDummyController.h"
-#include "vtkDynamicLoader.h"
 #include "vtkFloatingPointExceptions.h"
 #include "vtkMultiThreader.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPVConfig.h"
+#include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkSessionIterator.h"
 #include "vtkStdString.h"
 #include "vtkTCPNetworkAccessManager.h"
-#include "vtkPVConfig.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -43,9 +42,15 @@
 # include "vtkProcessModuleInitializePython.h"
 #endif
 
-#ifndef _WIN32
-#include <signal.h>
+#ifdef _WIN32
+# include "vtkDynamicLoader.h"
+#else
+# include <signal.h>
 #endif
+
+// this include is needed to ensure that vtkPVPluginLoader singleton doesn't get
+// destroyed before the process module singleton is cleaned up.
+#include "vtkPVPluginLoader.h"
 
 #include <assert.h>
 #include <stdexcept> // for runtime_error
