@@ -190,18 +190,21 @@ void pqImageOutputInfo::setupScreenshotInfo()
     thumbnailSize.setHeight(100);
     thumbnailSize.setWidth(100*viewSize.width()/viewSize.height());
     }
-  vtkSmartPointer<vtkImageData> image;
-  image.TakeReference(this->View->captureImage(thumbnailSize));
-  vtkNew<vtkPNGWriter> pngWriter;
-  pngWriter->SetInputData(image);
-  pngWriter->WriteToMemoryOn();
-  pngWriter->Update();
-  pngWriter->Write();
-  vtkUnsignedCharArray* result = pngWriter->GetResult();
-  QPixmap thumbnail;
-  thumbnail.loadFromData(
-    result->GetPointer(0),
-    result->GetNumberOfTuples()*result->GetNumberOfComponents(), "PNG");
+  if(this->View->getWidget()->isVisible())
+    {
+    vtkSmartPointer<vtkImageData> image;
+    image.TakeReference(this->View->captureImage(thumbnailSize));
+    vtkNew<vtkPNGWriter> pngWriter;
+    pngWriter->SetInputData(image);
+    pngWriter->WriteToMemoryOn();
+    pngWriter->Update();
+    pngWriter->Write();
+    vtkUnsignedCharArray* result = pngWriter->GetResult();
+    QPixmap thumbnail;
+    thumbnail.loadFromData(
+      result->GetPointer(0),
+      result->GetNumberOfTuples()*result->GetNumberOfComponents(), "PNG");
 
-  this->Info->thumbnailLabel->setPixmap(thumbnail);
+    this->Info->thumbnailLabel->setPixmap(thumbnail);
+    }
 }
