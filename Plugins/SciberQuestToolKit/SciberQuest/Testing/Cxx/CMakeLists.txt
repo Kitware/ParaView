@@ -7,6 +7,8 @@ include_directories(
 vtk_module_load(vtksys)
 vtk_module_load(vtkSciberQuest)
 
+include(ParaViewTestingMacros)
+
 include_directories(${vtksys_INCLUDE_DIRS})
 include_directories(${vtkSciberQuest_INCLUDE_DIRS})
 

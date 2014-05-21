@@ -1,4 +1,4 @@
-paraview_test_load_baselines_dirs(ParaViewData
+paraview_test_load_baselines_dirs(""
   SurfaceLICPlugin
   )
 paraview_test_load_data_dirs(SurfaceLIC

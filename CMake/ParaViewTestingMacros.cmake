@@ -105,9 +105,9 @@ function (_paraview_test_load_data name)
 endfunction ()
 
 function (paraview_test_data_target name)
-  ExternalData_Add_Target("ParaViewData${name}")
   # All non-default data targets should depend on the basic target.
   if (name)
+    ExternalData_Add_Target("ParaViewData${name}")
     add_dependencies("ParaViewData${name}"
       ParaViewData)
   endif ()

@@ -4,7 +4,7 @@ include(ParaViewTestingMacros)
 set(vtk-module pvpython)
 set(${vtk-module}_TEST_LABELS PARAVIEW)
 
-paraview_test_load_data(ParaViewData
+paraview_test_load_data(""
   can.ex2
   multicomb_0.vts
   )
