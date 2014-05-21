@@ -189,7 +189,7 @@ target_link_libraries(vtkPVVTKExtensionsDefault LINK_PRIVATE
 
 OPTION(PARAVIEW_ENABLE_SPYPLOT_MARKERS
        "Enables markers in the spyplot reader"
-       OFF)
+       ON)
 MARK_AS_ADVANCED(PARAVIEW_ENABLE_SPYPLOT_MARKERS)
 
 IF(${PARAVIEW_ENABLE_SPYPLOT_MARKERS})
