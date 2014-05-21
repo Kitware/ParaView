@@ -154,6 +154,7 @@ namespace
       return new pqPlotMatrixView(
         group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
       }
+    return NULL;
     }
 }
 
