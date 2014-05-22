@@ -24,12 +24,10 @@ if processId == 0:
         os.remove(fname)
 
 Wavelet1 = Wavelet()
-w = XMLPImageDataWriter()
-w.FileName = fname
+w = XMLPImageDataWriter(FileName=fname)
 w.UpdatePipeline()
 
-r = XMLPartitionedImageDataReader()
-r.FileName = fname
+r = XMLPartitionedImageDataReader(FileName = fname)
 r.UpdatePipeline()
 
 # if we're running in symmetric mode, numcells is the local process's
