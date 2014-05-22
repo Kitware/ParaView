@@ -23,6 +23,7 @@
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h" 
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 #include <string>  // STL required.
 #include <vector>  // STL required.
 
@@ -79,12 +80,12 @@ protected:
   // BTX
   std::vector<std::string> VolumeArrays;
 
-  std::vector<std::vector <vtkIdTypeArray*> > BoundaryArrays;
+  std::vector<std::vector <vtkSmartPointer<vtkIdTypeArray> > > BoundaryArrays;
   std::vector<std::vector <int> > ReceiveList;
 
   std::vector<bool> ValidNeighbor;
   std::vector<std::vector <std::vector <int> > > NeighborList;
-  std::vector<vtkIntArray*> EquivPairs;
+  std::vector< vtkSmartPointer<vtkIntArray> > EquivPairs;
 
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
