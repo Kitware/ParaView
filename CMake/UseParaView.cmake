@@ -46,4 +46,10 @@ include (ParaViewMacros)
 include (ParaViewPlugins)
 include (ParaViewBranding)
 
+# Workaround for MPICH bug that produces error messages:
+# "SEEK_SET is #defined but must not be for the C++ binding of MPI.
+if (PARAVIEW_USE_MPI)
+  add_definitions("-DMPICH_IGNORE_CXX_SEEK")
+endif()
+
 # FIXME: there was additional stuff about coprocessing and visit bridge here.
