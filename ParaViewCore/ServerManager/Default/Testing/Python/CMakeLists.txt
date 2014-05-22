@@ -73,14 +73,14 @@ set(PVBATCH_TESTS
 
 IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
   set(${vtk-module}_NUMPROCS 2)
-  paraview_add_test_python_mpi(
+  paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS}
     )
   set(PARAVIEW_PVBATCH_ARGS
     --symmetric)
   set(vtk_test_prefix Symmetric)
-  paraview_add_test_python_mpi(
+  paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS}
     )
