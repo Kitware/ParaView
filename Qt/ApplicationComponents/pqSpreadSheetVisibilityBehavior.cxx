@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
-#include "pqSpreadSheetViewDecorator.h"
 #include "pqSpreadSheetView.h"
 
 //-----------------------------------------------------------------------------
@@ -46,20 +45,6 @@ pqSpreadSheetVisibilityBehavior::pqSpreadSheetVisibilityBehavior(QObject* parent
   QObject::connect(pqApplicationCore::instance()->getObjectBuilder(),
     SIGNAL(viewCreated(pqView*)),
     this, SLOT(showActiveSource(pqView*)));
-
-  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(viewAdded(pqView*)),
-    this, SLOT(createDecorator(pqView*)));
-}
-
-//-----------------------------------------------------------------------------
-void pqSpreadSheetVisibilityBehavior::createDecorator(pqView* view)
-{
-  pqSpreadSheetView* spreadSheet = qobject_cast<pqSpreadSheetView*>(view);
-  if (spreadSheet)
-    {
-    new pqSpreadSheetViewDecorator(spreadSheet);
-    }
 }
 
 //-----------------------------------------------------------------------------

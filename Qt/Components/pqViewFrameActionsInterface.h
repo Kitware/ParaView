@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqViewFrameActionGroupInterface.h
+   Module:  pqViewFrameActionsInterface.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,38 +28,31 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-
-#ifndef _pqViewFrameActionGroupInterface_h
-#define _pqViewFrameActionGroupInterface_h
+========================================================================*/
+#ifndef __pqViewFrameActionsInterface_h
+#define __pqViewFrameActionsInterface_h
 
 #include <QtPlugin>
 #include "pqComponentsModule.h"
 
-class pqViewFrameActionGroup;
 class pqViewFrame;
 class pqView;
 
-/// interface class for plugins that create QActionGroups
-/// for adding actions to view frames
-class PQCOMPONENTS_EXPORT pqViewFrameActionGroupInterface
+/// pqViewFrameActionsInterface is an interface used by pqMultiViewWidget
+/// to add actions/toolbuttons to pqViewFrame placed in a pqMultiViewWidget.
+/// Thus, if you want to customize the buttons shown at the top of a view frame
+/// in your application/plugin, this is the interface to implement.
+class PQCOMPONENTS_EXPORT pqViewFrameActionsInterface
 {
 public:
-  /// destructor
-  virtual ~pqViewFrameActionGroupInterface();
+  virtual ~pqViewFrameActionsInterface();
 
-  /// Add/remove plugin's actions to/from the frame 
-  /// depending on the view type. Returns true if it did.
-  /// Note that pqView* may be NULL, implying that the frame is not being
-  /// assigned to any view.
-  virtual bool connect(pqViewFrame*, pqView*) = 0;
-  virtual bool disconnect(pqViewFrame*, pqView*) = 0;
+  /// This method is called after a frame is assigned to a view. The view may be
+  /// NULL, indicating the frame has been assigned to an empty view. Frames are
+  /// never reused (except a frame assigned to an empty view).
+  virtual void frameConnected(pqViewFrame* frame, pqView* view) = 0;
 
-  /// the instance of the QActionGroup that defines the actions
-  virtual pqViewFrameActionGroup* actionGroup() = 0;
+private:
 };
-
-Q_DECLARE_INTERFACE(pqViewFrameActionGroupInterface, "com.kitware/paraview/viewframeactiongroup")
-
+Q_DECLARE_INTERFACE(pqViewFrameActionsInterface, "com.kitware/paraview/viewframeactions");
 #endif
-
