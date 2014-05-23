@@ -937,7 +937,9 @@ int vtkSpyPlotReader::RequestData(
         }
       }
 
-    this->GlobalController->AllReduce (&maxMat, &maxMat, 1, vtkCommunicator::MAX_OP);
+    int gMaxMat=0;
+    this->GlobalController->AllReduce (&maxMat, &gMaxMat, 1, vtkCommunicator::MAX_OP);
+    maxMat = gMaxMat;
 
     this->PrepareBlocks (mbds, maxMat);
 
