@@ -788,7 +788,8 @@ bool vtkSMSettings::DistributeSettings()
 {
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
-      pm->GetSymmetricMPIMode())
+      pm->GetSymmetricMPIMode() &&
+      (pm->GetNumberOfLocalPartitions() > 1))
     {
     // Broadcast settings to satellite nodes
     vtkMultiProcessController * controller = pm->GetGlobalController();

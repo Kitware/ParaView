@@ -82,6 +82,7 @@ private:
   vtkInitializationHelper(const vtkInitializationHelper&); // Not implemented
   void operator=(const vtkInitializationHelper&); // Not implemented
   static bool LoadSettingsFilesDuringInitialization;
+  static bool SaveUserSettingsFileDuringFinalization;
 };
 
 #endif
