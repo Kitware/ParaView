@@ -36,12 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 
 #include "vtkNew.h"
-#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMParaViewPipelineController.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMSession.h"
-#include "vtkSMSessionProxyManager.h"
 
 
 //----------------------------------------------------------------------------
@@ -57,27 +52,6 @@ void pqPluginSettingsBehavior::updateSettings()
 {
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
   vtkSMSession* session = server->session();
-  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
-  vtkSMProxyDefinitionManager* pdm = pxm->GetProxyDefinitionManager();
-
   vtkNew<vtkSMParaViewPipelineController> controller;
-
-  vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator( "settings" );
-  for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkSMProxy* proxy = pxm->GetProxy(iter->GetGroupName(), iter->GetProxyName());
-    if (!proxy)
-      {
-      proxy = pxm->NewProxy(iter->GetGroupName(), iter->GetProxyName());
-      if (proxy)
-        {
-        controller->InitializeProxy(proxy);
-        pxm->RegisterProxy(iter->GetGroupName(), iter->GetProxyName(), proxy);
-        proxy->UpdateVTKObjects();
-        proxy->Delete();
-        }
-      }
-    }
-
-  iter->Delete();
+  controller->UpdateSettingsProxies(session);
 }

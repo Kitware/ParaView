@@ -17,6 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesProxy.h"
@@ -24,6 +25,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
@@ -459,43 +461,8 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     proxy->Delete();
     }
 
-  proxy = pxm->GetProxy("settings", "GeneralSettings");
-  if (!proxy)
-    {
-    proxy = pxm->NewProxy("settings", "GeneralSettings");
-    if (proxy)
-      {
-      this->InitializeProxy(proxy);
-      pxm->RegisterProxy("settings", "GeneralSettings", proxy);
-      proxy->UpdateVTKObjects();
-      proxy->Delete();
-      }
-    }
+  this->UpdateSettingsProxies(session);
 
-  proxy = pxm->GetProxy("settings", "RenderViewSettings");
-  if (!proxy)
-    {
-    proxy = pxm->NewProxy("settings", "RenderViewSettings");
-    if (proxy)
-      {
-      this->InitializeProxy(proxy);
-      pxm->RegisterProxy("settings", "RenderViewSettings", proxy);
-      proxy->UpdateVTKObjects();
-      proxy->Delete();
-      }
-    }
-  proxy = pxm->GetProxy("settings", "RenderViewInteractionSettings");
-  if (!proxy)
-    {
-    proxy = pxm->NewProxy("settings", "RenderViewInteractionSettings");
-    if (proxy)
-      {
-      this->InitializeProxy(proxy);
-      pxm->RegisterProxy("settings", "RenderViewInteractionSettings", proxy);
-      proxy->UpdateVTKObjects();
-      proxy->Delete();
-      }
-    }
   //---------------------------------------------------------------------------
   // Setup color palette and proxies for other global property groups (optional)
   proxy = pxm->GetProxy("global_properties", "ColorPalette");
@@ -1001,6 +968,30 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
       }
     }
   return true;
+}
+
+void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* session)
+{
+  // Set up the settings proxies
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
+  vtkSMProxyDefinitionManager* pdm = pxm->GetProxyDefinitionManager();
+  vtkPVProxyDefinitionIterator* iter = pdm->NewSingleGroupIterator( "settings" );
+  for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMProxy* proxy = pxm->GetProxy(iter->GetGroupName(), iter->GetProxyName());
+    if (!proxy)
+      {
+      proxy = pxm->NewProxy(iter->GetGroupName(), iter->GetProxyName());
+      if (proxy)
+        {
+        this->InitializeProxy(proxy);
+        pxm->RegisterProxy(iter->GetGroupName(), iter->GetProxyName(), proxy);
+        proxy->UpdateVTKObjects();
+        proxy->Delete();
+        }
+      }
+    }
+  iter->Delete();
 }
 
 //----------------------------------------------------------------------------
