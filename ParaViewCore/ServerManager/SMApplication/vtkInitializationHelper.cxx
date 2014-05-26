@@ -83,7 +83,11 @@ std::string ListAttachedMonitors()
 } // end anon namespace
 
 bool vtkInitializationHelper::LoadSettingsFilesDuringInitialization = true;
+
 bool vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
+
+std::string vtkInitializationHelper::ApplicationName = "ParaView";
+
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(bool val)
 {
@@ -103,6 +107,18 @@ void vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(bool val)
 bool vtkInitializationHelper::GetLoadSettingsFilesDuringInitialization()
 {
   return vtkInitializationHelper::LoadSettingsFilesDuringInitialization;
+}
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::SetApplicationName(const std::string & appName)
+{
+  vtkInitializationHelper::ApplicationName = appName;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkInitializationHelper::GetApplicationName()
+{
+  return vtkInitializationHelper::ApplicationName;
 }
 
 //----------------------------------------------------------------------------
@@ -326,6 +342,7 @@ bool vtkInitializationHelper::LoadSettings()
 //----------------------------------------------------------------------------
 std::string vtkInitializationHelper::GetUserSettingsDirectory()
 {
+  std::string applicationName(vtkInitializationHelper::GetApplicationName());
 #if defined(WIN32)
   const char* appData = getenv("APPDATA");
   if (!appData)
@@ -333,12 +350,12 @@ std::string vtkInitializationHelper::GetUserSettingsDirectory()
     return std::string();
     }
   std::string separator("\\");
-  std::string fileName(appData);
-  if (fileName[fileName.size()-1] != separator[0])
+  std::string directoryPath(appData);
+  if (directoryPath[directoryPath.size()-1] != separator[0])
     {
-    fileName.append(separator);
+    directoryPath.append(separator);
     }
-  fileName += "ParaView" + separator;
+  directoryPath += applicationName + separator;
 #else
   const char* home = getenv("HOME");
   if (!home)
@@ -346,15 +363,15 @@ std::string vtkInitializationHelper::GetUserSettingsDirectory()
     return std::string();
     }
   std::string separator("/");
-  std::string fileName(home);
-  if (fileName[fileName.size()-1] != separator[0])
+  std::string directoryPath(home);
+  if (directoryPath[directoryPath.size()-1] != separator[0])
     {
-    fileName.append(separator);
+    directoryPath.append(separator);
     }
-  fileName += ".config" + separator + "ParaView" + separator;
+  directoryPath += ".config" + separator + applicationName + separator;
 #endif
 
-  return fileName;
+  return directoryPath;
 }
 
 //----------------------------------------------------------------------------

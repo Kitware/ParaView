@@ -65,6 +65,12 @@ public:
   static void SetLoadSettingsFilesDuringInitialization(bool);
   static bool GetLoadSettingsFilesDuringInitialization();
 
+  // Description:
+  // Sets the name of the application. This is "ParaView" by default, but
+  // can be different for branded applications.
+  static void SetApplicationName(const std::string & appName);
+  static std::string GetApplicationName();
+
 protected:
   vtkInitializationHelper() {};
   virtual ~vtkInitializationHelper() {};
@@ -81,8 +87,12 @@ protected:
 private:
   vtkInitializationHelper(const vtkInitializationHelper&); // Not implemented
   void operator=(const vtkInitializationHelper&); // Not implemented
+
   static bool LoadSettingsFilesDuringInitialization;
+
   static bool SaveUserSettingsFileDuringFinalization;
+
+  static std::string ApplicationName;
 };
 
 #endif
