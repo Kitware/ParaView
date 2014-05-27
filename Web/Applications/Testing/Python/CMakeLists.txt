@@ -11,6 +11,15 @@ endif()
 include(ParaViewTestingMacros)
 include(FindPythonModules)
 
+# Ensure data exists for the listFiles tests. These files are selected for
+# being tiny since their names are the only required part for the test.
+paraview_test_load_data_dirs(""
+  GMV # 24K
+  )
+paraview_test_load_data(""
+  sonic.pht # 279 bytes
+  )
+
 set (pv_pymodule_build_dir ${VTK_BUILD_PYTHON_MODULE_DIR})
 
 # Make sure we can start the DataProber server
