@@ -198,6 +198,8 @@ vtkPVPluginLoaderCleanerInitializer::~vtkPVPluginLoaderCleanerInitializer()
 //=============================================================================
 
 
+vtkPluginLoadFunction vtkPVPluginLoader::StaticPluginLoadFunction = 0;
+
 vtkStandardNewMacro(vtkPVPluginLoader);
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::vtkPVPluginLoader()
@@ -312,6 +314,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     return false;
     }
 
+#ifdef BUILD_SHARED_LIBS
   this->SetFileName(file);
   std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
   this->SetPluginName(defaultname.c_str());
@@ -461,11 +464,33 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 
   vtkPVPlugin* plugin = pv_plugin_query_instance();
   return this->LoadPlugin(file, plugin);
+#else
+  if (StaticPluginLoadFunction &&
+      StaticPluginLoadFunction(file))
+    {
+    this->Loaded = true;
+    return true;
+    }
+  return false;
+#endif
 }
 
 //-----------------------------------------------------------------------------
 bool vtkPVPluginLoader::LoadPlugin(const char* file, vtkPVPlugin* plugin)
 {
+#ifndef BUILD_SHARED_LIBS
+  if (StaticPluginLoadFunction &&
+      StaticPluginLoadFunction(plugin->GetPluginName()))
+    {
+    this->Loaded = true;
+    return true;
+    }
+  else
+    {
+    this->SetErrorString("Failed to load static plugin.");
+    }
+#endif
+
   this->SetPluginName(plugin->GetPluginName());
   this->SetPluginVersion(plugin->GetPluginVersionString());
 
@@ -535,4 +560,13 @@ void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
     (this->FileName ? this->FileName : "(none)") << endl;
   os << indent << "SearchPaths: " <<
     (this->SearchPaths ? this->SearchPaths : "(none)") << endl;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPluginLoader::SetStaticPluginLoadFunction(vtkPluginLoadFunction function)
+{
+  if (!StaticPluginLoadFunction)
+    {
+    StaticPluginLoadFunction = function;
+    }
 }
