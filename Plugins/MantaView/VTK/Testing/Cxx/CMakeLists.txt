@@ -1,7 +1,7 @@
 include(ParaViewTestingMacros)
 
 paraview_add_test_cxx(${vtk-module}CxxTests tests
-  NO_DATA
+  NO_DATA NO_VALID
   ColorMap.cxx
   OddWidthImages.cxx
   CreateDeleteObjects.cxx
@@ -30,7 +30,7 @@ if (PARAVIEW_USE_MPI)
   include(vtkMPI)
   include_directories(${MPI_C_INCLUDE_PATH})
   paraview_add_test_cxx(${vtk-module}Cxx-MPI mpi_tests
-    NO_DATA
+    NO_DATA NO_VALID
     MantaBenchmark.cxx
     )
   vtk_test_cxx_executable(${vtk-module}Cxx-MPI mpi_tests)
