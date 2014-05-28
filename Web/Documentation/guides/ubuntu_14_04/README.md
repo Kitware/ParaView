@@ -247,3 +247,45 @@ Fix the home page to allow the access to the sample applications
 Add the ParaViewWeb code
 
     $ sudo cp -r /data/pv/pv-current/share/paraview-4.1/www/* /data/www/
+
+
+## 14.04 LTS on EC2
+
+Those are additional notes that are specific for EC2 instances that use Ubuntu 14.04 LTS.
+
+* The EC2 instance CAN NOT use the current NVidia drivers but at least the beta 337.19 (or higher).
+* Create file  /etc/modprobe.d/nvidia-graphics-drivers.conf
+
+---
+
+    blacklist nouveau
+    blacklist lbm-nouveau
+    blacklist nvidia-173
+    blacklist nvidia-96
+    blacklist nvidia-current
+    blacklist nvidia-173-updates
+    blacklist nvidia-96-updates
+    alias nvidia nvidia_current_updates
+    alias nouveau off
+    alias lbm-nouveau off
+
+
+* Purge nouveau drivers
+
+---
+
+    $ sudo apt-get purge nouveau*
+
+* Ensure the right kernel modules get loaded at boot time
+
+---
+
+    $ sudo update-initramfs -u
+
+    => then reboot
+
+* EC2 AMI needs specific stuff in xorg.conf
+
+---
+
+    $ sudo nvidia-xconfig  --busid="PCI:0:3:0"  --allow-empty-initial-configuration --virtual=1920x1080   --use-display-device=0
