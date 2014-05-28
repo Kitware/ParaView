@@ -42,10 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPipelineSource.h"
-#include "pqInterfaceTracker.h"
 #include "pqSpreadSheetViewDecorator.h"
 #include "pqSpreadSheetView.h"
-#include "pqStandardViewModules.h"
 #include "pqRecentFilesMenu.h"
 
 //-----------------------------------------------------------------------------
@@ -54,12 +52,6 @@ SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject,
 {
   Ui::SpreadSheetMainWindow ui;
   ui.setupUi(this);
-
-  // Register ParaView interfaces.
-  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
-
-  // * adds support for standard paraview views.
-  pgm->addInterface(new pqStandardViewModules(pgm));
 
   // Define default behaviors - create only small subset, since this application
   // is not really a ParaView-like application at all.

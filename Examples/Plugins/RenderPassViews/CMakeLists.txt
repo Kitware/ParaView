@@ -14,20 +14,6 @@ ELSE (ParaView_SOURCE_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
 
-IF(PARAVIEW_BUILD_QT_GUI)
-  IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    QT5_WRAP_CPP(MOC_SRCS RegisterRenderPassViews.h)
-  ELSE ()
-    QT4_WRAP_CPP(MOC_SRCS RegisterRenderPassViews.h)
-  ENDIF ()
-ENDIF()
-
-ADD_PARAVIEW_AUTO_START(
-  IFACES
-  IFACE_SRCS
-  CLASS_NAME RegisterRenderPassViews
-)
-
 add_paraview_plugin(
   RenderPassViews "1.0"
   REQUIRED_ON_SERVER
@@ -37,10 +23,4 @@ add_paraview_plugin(
     vtkPVRenderViewWithShadowMap.cxx
   SERVER_MANAGER_XML
     RenderPassViews.xml
-  GUI_INTERFACES
-    ${IFACES}
-  GUI_SOURCES
-    ${IFACE_SRCS}
-    ${MOC_SRCS}
-    RegisterRenderPassViews.cxx
 )

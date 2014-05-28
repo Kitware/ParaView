@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
-#include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqUndoStack.h"
 #include "pqVerifyRequiredPluginBehavior.h"
@@ -69,9 +68,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
 {
   // Register ParaView interfaces.
   pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
-
-  // * adds support for standard paraview views.
-  pgm->addInterface(new pqStandardViewModules(pgm));
 
   pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
 

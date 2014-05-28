@@ -77,9 +77,10 @@ protected:
 
 //-----------------------------------------------------------------------------
 pqQuadView::pqQuadView(
-   const QString& viewType, const QString& group, const QString& name,
-    vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
-  : Superclass(viewType, group, name, viewProxy, server, p)
+   const QString& group, const QString& name,
+    vtkSMProxy* viewProxy, pqServer* server, QObject* p)
+  : Superclass(pqQuadView::quadViewType(), group, name,
+    vtkSMViewProxy::SafeDownCast(viewProxy), server, p)
 {
   this->ObserverId =
       pqCoreUtilities::connect(

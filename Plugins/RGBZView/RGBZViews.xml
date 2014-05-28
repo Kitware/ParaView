@@ -1,6 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="views">
-    <RenderViewProxy name="RGBZView" class="vtkPVRenderViewForAssembly"
+    <RenderViewProxy name="RGBZView"
+        label="RGB+Z Exporter"
+        class="vtkPVRenderViewForAssembly"
         processes="client|renderserver|dataserver"
         base_proxygroup="views" base_proxyname="RenderView">
         <StringVectorProperty

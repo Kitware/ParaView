@@ -7,13 +7,11 @@
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
-#include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqStandardViewModules.h"
 #include "QVTKWidget.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -31,11 +29,6 @@ MainWindow::MainWindow()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   pqServer* server = core->getObjectBuilder()->createServer(pqServerResource("builtin:"));
-
-  // Register ParaView interfaces.
-  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
-  // * adds support for standard paraview views.
-  pgm->addInterface(new pqStandardViewModules(pgm));
 
   vtkSMSessionProxyManager* pxm = server->proxyManager();
 

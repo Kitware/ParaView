@@ -31,7 +31,6 @@ class PQCORE_EXPORT pqMultiSliceView : public pqRenderView
   typedef pqRenderView Superclass;
 public:
   static QString multiSliceViewType() { return "MultiSlice"; }
-  static QString multiSliceViewTypeName() { return "Slice View"; }
 
   /// constructor takes a bunch of init stuff and must have this signature to
   /// satisfy pqView

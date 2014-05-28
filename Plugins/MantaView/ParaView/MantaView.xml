@@ -9,7 +9,8 @@
   <ProxyGroup name="views">
     <MantaViewProxy name="MantaView" class="vtkPVMantaView"
         processes="client|renderserver|dataserver"
-        base_proxygroup="views" base_proxyname="RenderView">
+        base_proxygroup="views" base_proxyname="RenderView"
+        label="Manta Rendered 3D View">
 
      <SubProxy>
        <Proxy name="ActiveCamera" proxyname="MantaCamera" proxygroup="camera"

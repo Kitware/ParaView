@@ -50,7 +50,6 @@ class PQCORE_EXPORT pqRenderView : public pqRenderViewBase
   typedef pqRenderViewBase Superclass;
 public:
   static QString renderViewType() { return "RenderView"; }
-  static QString renderViewTypeName() { return "3D View"; }
 
   // Constructor:
   // \c group :- SManager registration group name.

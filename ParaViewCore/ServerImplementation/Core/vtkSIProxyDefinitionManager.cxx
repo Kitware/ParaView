@@ -982,6 +982,13 @@ vtkPVXMLElement* vtkSIProxyDefinitionManager::GetCollapsedProxyDefinition(
           originalDefinition = this->GetProxyDefinition( base_group.c_str(),
                                                          base_name.c_str(),
                                                          throwError);
+          if (!originalDefinition)
+            {
+            vtkErrorMacro("Failed to locate base proxy definition ("
+              << base_group.c_str() << ", " << base_name.c_str()
+              << "). Aborting for debugging purposes.");
+            abort();
+            }
           base_group =
               originalDefinition->GetAttributeOrEmpty("base_proxygroup");
           base_name  =

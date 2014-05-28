@@ -1,12 +1,14 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="views">
     <RenderViewProxy name="RenderViewWithSobel" class="vtkPVRenderViewWithSobel"
+        label="Render View With Edge Detection"
         processes="client|renderserver|dataserver"
         base_proxygroup="views" base_proxyname="RenderView">
     </RenderViewProxy>
 
     <RenderViewProxy name="RenderViewWithShadowMap"
         class="vtkPVRenderViewWithShadowMap"
+        label="Render View With Shadow Maps"
         processes="client|renderserver|dataserver"
         base_proxygroup="views" base_proxyname="RenderView" >
     </RenderViewProxy>

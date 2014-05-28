@@ -45,7 +45,6 @@ class PQCORE_EXPORT pqBoxChartView : public pqContextView
 
 public:
   static QString chartViewType() { return "BoxChartView"; }
-  static QString chartViewTypeName() { return "Box Chart View"; }
 
   pqBoxChartView(const QString& group,
                  const QString& name,

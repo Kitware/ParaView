@@ -27,7 +27,6 @@ class PQCORE_EXPORT pqPythonView : public pqView
 
 public:
   static QString pythonViewType() { return "PythonView"; }
-  static QString pythonViewTypeName() { return "Python View"; }
 
   // Constructor:
   // \c type  :- view type.

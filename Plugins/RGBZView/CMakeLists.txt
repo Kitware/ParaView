@@ -18,16 +18,6 @@ pv_process_modules()
 
 # Add headers for VTK classes
 include_directories(${VTK_INCLUDE_DIRS})
-
-# Process the plugin.
-add_paraview_view_module(
-  VIEW_IFACE VIEW_IFACE_SRCS
-  VIEW_TYPE pqRenderView
-  VIEW_NAME "RGB+Z Exporter"
-  VIEW_XML_GROUP "views"
-  VIEW_XML_NAME "RGBZView"
-)
-
 add_paraview_plugin(
   RGBZView "1.0"
   REQUIRED_ON_SERVER

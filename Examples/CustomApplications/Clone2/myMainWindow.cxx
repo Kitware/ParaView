@@ -35,13 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpReaction.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-#include "pqInterfaceTracker.h"
 #include "pqDefaultViewBehavior.h"
 #include "pqAlwaysConnectedBehavior.h"
 //#include "pqDeleteBehavior.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
 #include "pqApplicationCore.h"
-#include "pqStandardViewModules.h"
 //#include "pqPVNewSourceBehavior.h"
 
 #include <QToolBar>
@@ -129,8 +127,6 @@ myMainWindow::myMainWindow()
 #if 0
   new pqParaViewBehaviors(this, this);
 #else
-  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
-  pgm->addInterface(new pqStandardViewModules(pgm));
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
 //  new pqPVNewSourceBehavior(this);

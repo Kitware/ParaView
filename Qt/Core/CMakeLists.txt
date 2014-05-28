@@ -195,8 +195,6 @@ set(Module_SRCS
   pqSpreadSheetViewWidget.h
   pqStandardServerManagerModelInterface.cxx
   pqStandardServerManagerModelInterface.h
-  pqStandardViewModules.cxx
-  pqStandardViewModules.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
   pqTreeLayoutStrategyInterface.cxx
@@ -207,8 +205,6 @@ set(Module_SRCS
   pqViewExporterManager.cxx
   pqViewExporterManager.h
   pqView.h
-  pqViewModuleInterface.cxx
-  pqViewModuleInterface.h
   pqXMLEventObserver.cxx
   pqXMLEventObserver.h
   pqXMLEventSource.cxx
@@ -295,7 +291,6 @@ set (Module_MOC_HDRS
   pqSpreadSheetViewSelectionModel.h
   pqSpreadSheetViewWidget.h
   pqStandardServerManagerModelInterface.h
-  pqStandardViewModules.h
   pqTimeKeeper.h
   pqUndoStack.h
   pqViewExporterManager.h

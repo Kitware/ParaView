@@ -46,7 +46,6 @@ class PQCORE_EXPORT pqXYChartView : public pqContextView
 
 public:
   static QString XYChartViewType() { return "XYChartView"; }
-  static QString XYChartViewTypeName() { return "Line Chart View"; }
 
 public:
   pqXYChartView(const QString& group,

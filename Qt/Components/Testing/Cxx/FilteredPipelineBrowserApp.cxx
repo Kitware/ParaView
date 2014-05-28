@@ -15,13 +15,11 @@
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
-#include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineAnnotationFilterModel.h"
 #include "pqServer.h"
-#include "pqStandardViewModules.h"
 #include "vtkProcessModule.h"
 
 #include <QToolBar>
@@ -32,8 +30,6 @@ MainPipelineWindow::MainPipelineWindow()
   // Init ParaView
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* ob = core->getObjectBuilder();
-  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
-  pgm->addInterface(new pqStandardViewModules(pgm));
 
   // Set Filter/Annotation list
   this->FilterNames.append("No filtering");
