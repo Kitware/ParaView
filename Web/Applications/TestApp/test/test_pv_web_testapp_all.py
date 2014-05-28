@@ -1,9 +1,14 @@
 
-# import modules for automating web testing using a real browser
-import selenium
-
 from vtk.web import testing
 from vtk.web.testing import BrowserBasedWebTest
+
+dependencies_met = True
+
+try:
+    # import modules for automating web testing using a real browser
+    import selenium
+except:
+    dependencies_met = False
 
 
 # =============================================================================
@@ -33,6 +38,10 @@ class JavascriptTestsRunner(BrowserBasedWebTest) :
 
         # Continue with initialization of base classes
         BrowserBasedWebTest.__init__(self, url=appUrl, size=(800, 600), **kwargs)
+
+    def checkdependencies(self):
+        if dependencies_met == False:
+            raise testing.DependencyError("Python module 'selenium' is missing")
 
     def setup(self) :
         testing.wait_with_timeout(delay=8)

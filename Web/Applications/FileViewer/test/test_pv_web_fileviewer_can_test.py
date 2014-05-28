@@ -1,15 +1,19 @@
 
 import time
-
-# import modules for automating web testing using a real browser
-import selenium
-from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.keys import Keys
-
 from vtk.web import testing
+
+dependencies_met = True
+
+try:
+    # import modules for automating web testing using a real browser
+    import selenium, Image
+    from selenium import webdriver
+    from selenium.webdriver.common.action_chains import ActionChains
+    from selenium.webdriver.common.by import By
+    from selenium.common.exceptions import NoSuchElementException
+    from selenium.webdriver.common.keys import Keys
+except:
+    dependencies_met = False
 
 
 # =============================================================================
@@ -21,6 +25,9 @@ from vtk.web import testing
 def runTest(args) :
 
     # print 'We were passed the following args: ' + str(args)
+
+    if dependencies_met == False:
+        raise testing.DependencyError("One of python modules 'selenium' or 'Image' is missing or deficient")
 
     # This name is used in error reporting
     testName = 'pv_web_file_loader_open_browser_and_click_renderer.py'

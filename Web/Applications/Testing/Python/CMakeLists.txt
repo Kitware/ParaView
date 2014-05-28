@@ -9,7 +9,7 @@ if(NOT ${PythonInterp_FOUND})
 endif()
 
 include(ParaViewTestingMacros)
-include(FindPythonModules)
+#include(FindPythonModules)
 
 # Ensure data exists for the listFiles tests. These files are selected for
 # being tiny since their names are the only required part for the test.
@@ -62,8 +62,8 @@ add_pvweb_tests("pvweb"
   APP          Visualizer
   COMMAND      $<TARGET_FILE:pvpython>
   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_visualizer.py
-  DEPEND_MODS  Image
-               selenium
+  #DEPEND_MODS  Image
+  #             selenium
   BROWSER      chrome
                firefox
                internet_explorer
@@ -85,7 +85,7 @@ add_pvweb_tests("pvweb"
   COMMAND      $<TARGET_FILE:pvpython>
   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
   ARGS         --echo "test string to be retrieved by app"
-  DEPEND_MODS  requests
+  #DEPEND_MODS  requests
   TEST_SCRIPTS ${WEB_TESTS_WITH_REQUESTS}
   )
 
@@ -97,7 +97,7 @@ add_pvweb_tests("pvweb"
   APP          TestApp
   COMMAND      $<TARGET_FILE:pvpython>
   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
-  DEPEND_MODS  selenium
+  #DEPEND_MODS  selenium
   BROWSER      chrome
                firefox
                internet_explorer
