@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqPVApplicationCore.h"
 #include "pqSettings.h"
+#include "vtkInitializationHelper.h"
 #include "vtkPVPluginTracker.h"
 
 #ifdef Q_WS_X11
@@ -75,6 +76,8 @@ pq@BPC_NAME@Initializer::~pq@BPC_NAME@Initializer()
 //-----------------------------------------------------------------------------
 bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
 {
+  vtkInitializationHelper::SetApplicationName("@BPC_APPLICATION_NAME@");
+
   this->PVApp = new pqPVApplicationCore (argc, argv);
 
   // Attach custom event filter
@@ -90,7 +93,7 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
 
 #ifndef BUILD_SHARED_LIBS
 @ui_resource_init@
-#endif  
+#endif
 
   pqSettings *settings = this->PVApp->settings();
   bool show_splash = false;
