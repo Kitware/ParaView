@@ -32,7 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "ui_pqProxyWidgetDialog.h"
 
+#include "pqCoreUtilities.h"
 #include "pqProxyWidget.h"
+
+#include <QScrollArea>
 
 class pqProxyWidgetDialog::pqInternals
 {
@@ -60,15 +63,38 @@ public:
       new pqProxyWidget(proxy, properties, container):
       new pqProxyWidget(proxy, container);
     widget->setObjectName("ProxyWidget");
+    widget->filterWidgets(true);
+    QObject::connect(self, SIGNAL(accepted()), widget, SLOT(apply()));
     vbox->addWidget(widget);
 
-    QSpacerItem* spacer = new QSpacerItem(0, 0,QSizePolicy::Fixed,
+    QSpacerItem* spacer = new QSpacerItem(0, 6,QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
     vbox->addItem(spacer);
 
-    ui.scrollArea->setWidget(container);
-    widget->filterWidgets(true);
-    QObject::connect(self, SIGNAL(accepted()), widget, SLOT(apply()));
+    // We need to know the size of the dialog so (ideally) when first displayed
+    // the scroll area isn't visible (i.e. the proxy widget isn't squished in
+    // the scroll area).
+    // To do so, we force the layout to compute by showing it offscreen with
+    // the attribute WA_DontShowOnScreen and get the dialog size this way
+    ui.Layout->addWidget(container);
+    self->setAttribute(Qt::WA_DontShowOnScreen);
+    self->show();
+    QSize dialogSize = self->size();
+    self->hide();
+    self->setAttribute(Qt::WA_DontShowOnScreen, false);
+
+    // Now that we have the dialog ideal size, we can add the container widget
+    // to the scroll area.
+    ui.Layout->removeWidget(container);
+    QScrollArea* scrollArea = new QScrollArea(self);
+    scrollArea->setObjectName("scrollArea");
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    ui.Layout->insertWidget(0, scrollArea);
+    scrollArea->setWidget(container);
+
+    // Limit the dialog max size to be as big as the application
+    self->setMaximumSize(pqCoreUtilities::mainWidget()->size());
     }
 };
 

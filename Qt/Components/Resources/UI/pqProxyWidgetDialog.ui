@@ -13,27 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QScrollArea" name="scrollArea">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>375</width>
-        <height>324</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-   </item>
+  <layout class="QVBoxLayout" name="Layout">
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
