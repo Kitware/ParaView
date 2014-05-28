@@ -257,8 +257,8 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
   outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
 #ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
-  vtkInformation* outInfo2;
-  if ( this->GenerateMarkers )
+    vtkInformation* outInfo2 = 0;
+    if ( this->GenerateMarkers )
     {
     outInfo2 = outputVector->GetInformationObject(2);
     outInfo2->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
@@ -937,7 +937,9 @@ int vtkSpyPlotReader::RequestData(
         }
       }
 
-    this->GlobalController->AllReduce (&maxMat, &maxMat, 1, vtkCommunicator::MAX_OP);
+    int gMaxMat=0;
+    this->GlobalController->AllReduce (&maxMat, &gMaxMat, 1, vtkCommunicator::MAX_OP);
+    maxMat = gMaxMat;
 
     this->PrepareBlocks (mbds, maxMat);
 
