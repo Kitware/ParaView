@@ -185,6 +185,15 @@ public:
   virtual bool UnRegisterAnimationProxy(vtkSMProxy* proxy);
 
   //---------------------------------------------------------------------------
+  // *******  Methods for Settings   *********
+  //
+  // Description:
+  // Initializes and registers proxies in the "settings" group that
+  // haven't been already. This may be called whenever a new settings
+  // proxy definition becomes available, say, after loading a plugin.
+  virtual void UpdateSettingsProxies(vtkSMSession* session);
+
+  //---------------------------------------------------------------------------
   // ****** Methods for cleanup/finalization/deleting ******
   //
   // Description:
