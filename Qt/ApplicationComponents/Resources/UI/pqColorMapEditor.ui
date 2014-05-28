@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
+    <width>355</width>
     <height>129</height>
    </rect>
   </property>
@@ -20,38 +20,12 @@
       <number>2</number>
      </property>
      <item>
-      <widget class="QLineEdit" name="SearchLineEdit">
-       <property name="minimumSize">
-        <size>
-         <width>260</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for properties by name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="placeholderText">
-        <string>Search...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="AdvancedButton">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Toggle advanced properties&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../../../Components/Resources/pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
-       </property>
-       <property name="checkable">
+      <widget class="pqSearchBox" name="SearchBox" native="true">
+       <property name="advancedSearchEnabled" stdset="0">
         <bool>true</bool>
        </property>
-       <property name="checked">
-        <bool>false</bool>
+       <property name="settingKey" stdset="0">
+        <string notr="true">showAdvancedPropertiesColorMapEditor</string>
        </property>
       </widget>
      </item>
@@ -107,8 +81,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>334</width>
-        <height>76</height>
+        <width>337</width>
+        <height>81</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,1">
@@ -213,6 +187,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqSearchBox</class>
+   <extends>QWidget</extends>
+   <header>pqSearchBox.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>

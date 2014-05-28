@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqProxyWidget.h"
+#include "pqSearchBox.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqUndoStack.h"
@@ -55,32 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollArea>
 #include <QSpacerItem>
 #include <QVBoxLayout>
-
-namespace
-{
-  class pqClearTextOnEsc : public QObject
-  {
-public:
-  pqClearTextOnEsc(QLineEdit* parentObject) : QObject(parentObject)
-    {
-    }
-protected:
-  virtual bool eventFilter(QObject *obj, QEvent *evt)
-    {
-    (void) obj;
-    if (evt->type() == QEvent::KeyPress)
-      {
-      QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
-      if (keyEvent->key() == Qt::Key_Escape)
-        {
-        qobject_cast<QLineEdit*>(this->parent())->clear();
-        return true;
-        }
-      }
-    return false;
-    }
-  };
-}
 
 class pqSettingsDialog::pqInternals
 {
@@ -108,17 +83,6 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 
   // Hide restart message
   ui.restartRequiredLabel->setVisible(pqSettingsDialog::ShowRestartRequired);
-
-  // Setup configuration defaults using settings.
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  if (settings)
-    {
-    ui.AdvancedButton->setChecked(
-      settings->value("pqSettingsDialog/showAdvancedProperties", false).toBool());
-    }
-
-  // Setup shortcut to clear search text.
-  ui.SearchLineEdit->installEventFilter(new pqClearTextOnEsc(ui.SearchLineEdit));
 
   QList<vtkSMProxy*> proxies_to_show;
 
@@ -196,8 +160,8 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
   this->connect(this, SIGNAL(rejected()), SLOT(onRejected()));
   this->connect(ui.tabBar, SIGNAL(currentChanged(int)), this, SLOT(onTabIndexChanged(int)));
 
-  this->connect(ui.AdvancedButton, SIGNAL(toggled(bool)), SLOT(filterPanelWidgets()));
-  this->connect(ui.SearchLineEdit, SIGNAL(textChanged(QString)), SLOT(filterPanelWidgets()));
+  this->connect(ui.SearchBox, SIGNAL(advancedSearchActivated(bool)), SLOT(filterPanelWidgets()));
+  this->connect(ui.SearchBox, SIGNAL(textChanged(QString)), SLOT(filterPanelWidgets()));
 
   // After all the tabs are set up, select the first
   this->onTabIndexChanged(0);
@@ -208,14 +172,6 @@ pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
 //-----------------------------------------------------------------------------
 pqSettingsDialog::~pqSettingsDialog()
 {
-  Ui::SettingsDialog &ui = this->Internals->Ui;
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  if (settings)
-    {
-    // save the state of advanced button in the user config.
-    settings->setValue("pqSettingsDialog/showAdvancedProperties",
-      ui.AdvancedButton->isChecked());
-    }
   delete this->Internals;
   this->Internals = NULL;
 }
@@ -332,7 +288,8 @@ void pqSettingsDialog::onTabIndexChanged(int index)
 void pqSettingsDialog::filterPanelWidgets()
 {
   Ui::SettingsDialog &ui = this->Internals->Ui;
-  emit this->filterWidgets(ui.AdvancedButton->isChecked(), ui.SearchLineEdit->text());
+  emit this->filterWidgets(
+    ui.SearchBox->isAdvancedSearchActive(), ui.SearchBox->text());
 }
 
 //-----------------------------------------------------------------------------

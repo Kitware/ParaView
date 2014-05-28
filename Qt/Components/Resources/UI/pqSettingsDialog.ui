@@ -33,32 +33,12 @@
       <number>2</number>
      </property>
      <item>
-      <widget class="QLineEdit" name="SearchLineEdit">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for properties by name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <widget class="pqSearchBox" name="SearchBox" native="true">
+       <property name="settingKey" stdset="0">
+        <string notr="true">pqSettingsDialog/showAdvancedProperties</string>
        </property>
-       <property name="placeholderText">
-        <string>Search ... (use Esc to clear text)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="AdvancedButton">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Toggle advanced properties&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../pqComponents.qrc">
-         <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
-       </property>
-       <property name="checkable">
+       <property name="advancedSearchEnabled" stdset="0">
         <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -112,6 +92,12 @@
    <class>QTabBar</class>
    <extends>QWidget</extends>
    <header location="global">QTabBar</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqSearchBox</class>
+   <extends>QWidget</extends>
+   <header>pqSearchBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

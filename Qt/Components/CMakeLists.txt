@@ -288,6 +288,8 @@ set (Module_SRCS
   pqScalarSetModel.h
   pqScalarValueListPropertyWidget.cxx
   pqScalarValueListPropertyWidget.h
+  pqSearchBox.cxx
+  pqSearchBox.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
   pqSelectionInputWidget.cxx
@@ -487,6 +489,7 @@ set (Module_MOC_HDRS
   pqSaveSnapshotDialog.h
   pqScalarSetModel.h
   pqScalarValueListPropertyWidget.h
+  pqSearchBox.h
   pqSelectionAdaptor.h
   pqSelectionInputWidget.h
   pqSelectionManager.h
@@ -580,6 +583,7 @@ set (Module_UI_FILES
   Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqSaveSnapshotDialog.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui
+  Resources/UI/pqSearchBox.ui
   Resources/UI/pqSelectionInputWidget.ui
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerConnectDialog.ui
