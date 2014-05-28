@@ -13257,6 +13257,12 @@ found and the point will be rejected.</Documentation>
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
         <Documentation>Specify the array to use for blanking.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetReverse"
