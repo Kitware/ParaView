@@ -359,8 +359,8 @@ set (Module_SRCS
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.cxx
   pqViewContextMenuManager.h
-  pqViewFrameActionGroupInterface.cxx
-  pqViewFrameActionGroupInterface.h
+  pqViewFrameActionsInterface.cxx
+  pqViewFrameActionsInterface.h
   pqViewFrame.cxx
   pqViewFrame.h
   pqViewManager.cxx
@@ -527,7 +527,6 @@ set (Module_MOC_HDRS
   pqVCRController.h
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.h
-  pqViewFrameActionGroup.h
   pqViewFrame.h
   pqViewManager.h
   pqWidgetRangeDomain.h

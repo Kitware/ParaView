@@ -52,10 +52,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
+#include "pqStandardViewFrameActionsImplementation.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqUndoStack.h"
 #include "pqVerifyRequiredPluginBehavior.h"
-#include "pqViewFrameActionsBehavior.h"
 #include "pqViewStreamingBehavior.h"
 
 #include <QShortcut>
@@ -69,7 +69,11 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   // Register ParaView interfaces.
   pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
+  // Register standard types of property widgets.
   pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
+
+  // Register standard types of view-frame actions.
+  pgm->addInterface(new pqStandardViewFrameActionsImplementation(pgm));
 
   // Load plugins distributed with application.
   pqApplicationCore::instance()->loadDistributedPlugins();
@@ -77,7 +81,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   // Define application behaviors.
   new pqQtMessageHandlerBehavior(this);
   new pqDataTimeStepBehavior(this);
-  new pqViewFrameActionsBehavior(this);
   new pqSpreadSheetVisibilityBehavior(this);
   new pqPipelineContextMenuBehavior(this);
   new pqObjectPickingBehavior(this);

@@ -40,9 +40,7 @@ class pqView;
 /// @ingroup Behaviors
 /// Whenever spreadsheet view is created, ParaView wants to ensure that the
 /// active source is automatically displayed in that view. This is managed by
-/// this behavior. This also ensures that the spreadsheet view's decorator i.e.
-/// the toolbar where the user can choose the attribute to show is setup
-/// correctly as well.
+/// this behavior.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetVisibilityBehavior : public QObject
 {
   Q_OBJECT
@@ -52,7 +50,6 @@ public:
 
 protected slots:
   void showActiveSource(pqView*);
-  void createDecorator(pqView*);
 
 private:
   Q_DISABLE_COPY(pqSpreadSheetVisibilityBehavior)

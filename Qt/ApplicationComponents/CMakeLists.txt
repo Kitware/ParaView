@@ -221,8 +221,8 @@ set (Module_SRCS
   pqSpreadSheetVisibilityBehavior.h
   pqStandardPropertyWidgetInterface.cxx
   pqStandardPropertyWidgetInterface.h
-  pqStandardViewFrameActionGroup.cxx
-  pqStandardViewFrameActionGroup.h
+  pqStandardViewFrameActionsImplementation.cxx
+  pqStandardViewFrameActionsImplementation.h
   pqStatusBar.cxx
   pqStatusBar.h
   pqTestingReaction.cxx
@@ -241,8 +241,6 @@ set (Module_SRCS
   pqVCRToolbar.h
   pqVerifyRequiredPluginBehavior.cxx
   pqVerifyRequiredPluginBehavior.h
-  pqViewFrameActionsBehavior.cxx
-  pqViewFrameActionsBehavior.h
   pqViewMenuManager.cxx
   pqViewMenuManager.h
   pqViewStreamingBehavior.cxx
@@ -347,7 +345,7 @@ set (Module_MOC_HDRS
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.h
   pqStandardPropertyWidgetInterface.h
-  pqStandardViewFrameActionGroup.h
+  pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h
   pqTestingReaction.h
   pqTimerLogReaction.h
@@ -357,7 +355,6 @@ set (Module_MOC_HDRS
   pqUndoRedoReaction.h
   pqVCRToolbar.h
   pqVerifyRequiredPluginBehavior.h
-  pqViewFrameActionsBehavior.h
   pqViewMenuManager.h
   pqViewStreamingBehavior.h
   pqViewTypePropertyWidget.h
