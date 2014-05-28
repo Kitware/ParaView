@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>163</height>
+    <height>170</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -93,13 +93,16 @@
       </size>
      </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string>View not currently available</string>
      </property>
      <property name="scaledContents">
       <bool>false</bool>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
