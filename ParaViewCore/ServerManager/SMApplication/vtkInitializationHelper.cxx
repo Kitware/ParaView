@@ -83,6 +83,7 @@ std::string ListAttachedMonitors()
 } // end anon namespace
 
 bool vtkInitializationHelper::LoadSettingsFilesDuringInitialization = true;
+bool vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(bool val)
 {
@@ -209,8 +210,12 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   vtkNew<vtkPVPluginLoader> loader;
   loader->LoadPluginsFromPluginSearchPath();
 
-  // Load settings files.
-  if (!options->GetDisableRegistry())
+  vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
+  // Load settings files on client-processes.
+  if (!options->GetDisableRegistry() &&
+    type != vtkProcessModule::PROCESS_SERVER &&
+    type != vtkProcessModule::PROCESS_DATA_SERVER &&
+    type != vtkProcessModule::PROCESS_RENDER_SERVER)
     {
     vtkInitializationHelper::LoadSettings();
     }
@@ -227,7 +232,7 @@ void vtkInitializationHelper::StandaloneInitialize()
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
-  if (vtkInitializationHelper::LoadSettingsFilesDuringInitialization)
+  if (vtkInitializationHelper::SaveUserSettingsFileDuringFinalization)
     {
     // Write out settings file(s)
     std::string userSettingsFile =
@@ -264,8 +269,14 @@ bool vtkInitializationHelper::LoadSettings()
     }
 
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
-
+  int myRank = vtkProcessModule::GetProcessModule()->GetPartitionId();
   bool success = true;
+
+  if (myRank > 0) // don't read files on satellites.
+    {
+    settings->DistributeSettings();
+    return true;
+    }
 
   // Load user-level settings
   std::string userSettingsFileName = vtkInitializationHelper::GetUserSettingsDirectory();
@@ -308,6 +319,7 @@ bool vtkInitializationHelper::LoadSettings()
 
   settings->DistributeSettings();
 
+  vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = true;
   return success;
 }
 
