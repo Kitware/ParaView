@@ -6,7 +6,7 @@ import QtTestingImage
 object1 = 'pqClientMainWindow/MainControlsToolbar/actionOpenData'
 QtTesting.playCommand(object1, 'activate', '')
 object2 = 'pqClientMainWindow/FileOpenDialog'
-QtTesting.playCommand(object2, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/SPCTH/Dave_Karelitz_Small/spcth_a')
+QtTesting.playCommand(object2, 'filesSelected', '$PARAVIEW_DATA_ROOT/SPCTH/Dave_Karelitz_Small/spcth_a')
 object3 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus/1QHeaderView0'
 QtTesting.playCommand(object3, 'mousePress', '1,1,0,0,0,0')
 QtTesting.playCommand(object3, 'mouseRelease', '1,0,0,0,0,0')

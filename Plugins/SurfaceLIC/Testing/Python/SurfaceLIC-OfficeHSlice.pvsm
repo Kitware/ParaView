@@ -2777,10 +2777,10 @@
     </Proxy>
     <Proxy group="sources" type="LegacyVTKFileReader" id="5114" servers="1">
       <Property name="FileNameInfo" id="5114.FileNameInfo" number_of_elements="1">
-        <Element index="0" value="${DataDir}/Data/office.binary.vtk"/>
+        <Element index="0" value="${DataDir}/office.binary.vtk"/>
       </Property>
       <Property name="FileNames" id="5114.FileNames" number_of_elements="1">
-        <Element index="0" value="${DataDir}/Data/office.binary.vtk"/>
+        <Element index="0" value="${DataDir}/office.binary.vtk"/>
         <Domain name="files" id="5114.FileNames.files"/>
       </Property>
       <Property name="TimestepValues" id="5114.TimestepValues"/>

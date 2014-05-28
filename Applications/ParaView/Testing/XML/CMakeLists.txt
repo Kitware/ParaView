@@ -1,3 +1,61 @@
+# TODO: Split these up and put them in the conditional which actually requires
+# the data.
+paraview_test_load_data_dirs(""
+  "Iron Xdmf"
+  ANALYZE
+  dualSphereAnimation
+  EnSight
+  ExRestarts
+  FileSeries
+  GMV
+  GMV/invalid
+  GMV/partial-pyramid
+  GMV/quadratic_cells
+  RodPlate
+  SLAC/pic-example
+  SPCTH
+  SPCTH/Dave_Karelitz_Small
+  SPCTH/DerivedDensity
+  VisItBridge
+  amr
+  ensemble-wavelet
+  singleSphereAnimation
+  )
+paraview_test_load_data(""
+  ,REGEX:tensors_.*\\.vti
+  artifact.dta
+  "blow data.myvtk"
+  bluntfin.vts
+  can.ex2
+  comb.q
+  combxyz.bin
+  disk_out_ref.ex2
+  dualSphereAnimation.clone.pvd
+  dualSphereAnimation.pvd
+  "iron protein.vtk"
+  LoadStateMultiView.pvsm
+  LoadState.pvsm
+  minimal.nii
+  multicomb_0.vts
+  multicomb_1.vts
+  multicomb_2.vts
+  NE2_ps_bath.png
+  office.binary.vtk
+  PropertyLink.pvsm
+  quadraticTetra01.vtu
+  RectGrid2.vtk
+  sample.h5part
+  Scenario1_p1.h5
+  Scenario1_p1.xmf
+  servers-wiki.pvsc
+  singleSphereAnimation.pvd
+  tensors.pvti
+  Test1.h5
+  Test1.xmf
+  tube.exo
+  vehicle_data.csv
+  )
+
 SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FindWidget.xml
@@ -185,7 +243,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
   )
-  if (PARAVIEW_ENABLE_MATPLOTLIB AND PYTHON_MODULE_matplotlib_FOUND)
+  if (PARAVIEW_ENABLE_MATPLOTLIB)
     list(APPEND TESTS_WITH_BASELINES ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonView.xml)
   endif()
 endif()
@@ -198,7 +256,7 @@ find_file(smooth_flash NAMES smooth.flash
           DOC "Path to smooth.flash data file."
           NO_DEFAULT_PATH)
 mark_as_advanced(smooth_flash)
-if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
+if (EXISTS "${smooth_flash}")
   # we configure the file since we need to point to smooth_flash.
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.xml.in"
                  "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
@@ -217,7 +275,8 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
               -dr
               --enable-streaming
               --test-directory=${PARAVIEW_TEST_DIR}
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${tname})
 
     add_pv_test(pvcs "_DISABLE_CS"
@@ -230,7 +289,7 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
          -dr
          --enable-streaming
          --test-directory=${PARAVIEW_TEST_DIR}
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${tname})
   endforeach()
 endif()
@@ -573,96 +632,90 @@ set(TESTS_WITH_MULTI_SERVERS_3
   ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServer3.xml
 )
 
-IF (PARAVIEW_DATA_ROOT)
-  set (TESTS_WITHOUT_BASELINES
-    ${TESTS_WITHOUT_BASELINES}
-    ${TESTS_WITH_INLINE_COMPARES})
-ENDIF (PARAVIEW_DATA_ROOT)
+set (TESTS_WITHOUT_BASELINES
+  ${TESTS_WITHOUT_BASELINES}
+  ${TESTS_WITH_INLINE_COMPARES})
 
 add_client_tests("pv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
   )
 
-IF (PARAVIEW_DATA_ROOT)
-  add_client_tests("pv"
-    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+add_client_tests("pv"
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+)
+
+add_client_server_tests("pvcs"
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+)
+
+add_client_server_tests("pvcs"
+  TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
+)
+
+IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+  add_client_render_server_tests("pvcrs"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
   )
 
-  add_client_server_tests("pvcs"
-    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-    TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-  )
-
-  add_client_server_tests("pvcs"
+  add_client_render_server_tests("pvcrs"
     TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
   )
-
-  IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
-    add_client_render_server_tests("pvcrs"
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-      TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-    )
-
-    add_client_render_server_tests("pvcrs"
-      TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
-    )
-  ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 
 # TODO: remote rendering tests and reverse connect tests.
 
-  add_multi_client_tests("pvcs-collab"
-    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-    TEST_SCRIPTS ${TESTS_WITH_BASELINES})
+add_multi_client_tests("pvcs-collab"
+  BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+  TEST_SCRIPTS ${TESTS_WITH_BASELINES})
 
-  add_multi_server_tests("pvcs-multi-servers" 3
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
+add_multi_server_tests("pvcs-multi-servers" 3
+   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+   TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
 
-  set (TileDisplayScatterPlot-2x1_THRESHOLD 40)
-  add_tile_display_tests("pvcs-tile-display" 2 1
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x1.xml)
+set (TileDisplayScatterPlot-2x1_THRESHOLD 40)
+add_tile_display_tests("pvcs-tile-display" 2 1
+   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x1.xml)
 
-  set (TileDisplayScatterPlot-2x2_THRESHOLD 40)
-  add_tile_display_tests("pvcs-tile-display" 2 2
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x2.xml)
+set (TileDisplayScatterPlot-2x2_THRESHOLD 40)
+add_tile_display_tests("pvcs-tile-display" 2 2
+   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x2.xml)
 
-  set (TileDisplay3DTesting-1x2_THRESHOLD 40)
-  add_tile_display_tests("pvcs-tile-display" 1 2
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-1x2.xml)
+set (TileDisplay3DTesting-1x2_THRESHOLD 40)
+add_tile_display_tests("pvcs-tile-display" 1 2
+   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-1x2.xml)
 
-  set (TileDisplay3DTesting-2x1_THRESHOLD 40)
-  add_tile_display_tests("pvcs-tile-display" 2 1
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-2x1.xml)
+set (TileDisplay3DTesting-2x1_THRESHOLD 40)
+add_tile_display_tests("pvcs-tile-display" 2 1
+   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-2x1.xml)
 
-  set (TileDisplay3DTesting-2x2_THRESHOLD 40)
-  add_tile_display_tests("pvcs-tile-display" 2 2
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-2x2.xml)
+set (TileDisplay3DTesting-2x2_THRESHOLD 40)
+add_tile_display_tests("pvcs-tile-display" 2 2
+   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+   TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-2x2.xml)
 
 
-  #------------------------------------------------------------------
-  # Add tests that test command line arguments (among other things).
-  #------------------------------------------------------------------
-  if (PARAVIEW_DATA_ROOT)
-
-    # The state file need to point to the correct data file. We do that by
-    # configuring the state file.
-    configure_file (
-      "${CMAKE_CURRENT_SOURCE_DIR}/exodusStateFile.3.14.1.pvsm.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm" @ONLY)
-    add_pv_test("pv" "_DISABLE_C"
-      COMMAND --client $<TARGET_FILE:paraview>
-              --enable-bt
-              -dr
-              --test-directory=${PARAVIEW_TEST_DIR}
-              --state=${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm
-      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LoadExodusStateFile.xml)
-  endif()
-
-ENDIF (PARAVIEW_DATA_ROOT)
+#------------------------------------------------------------------
+# Add tests that test command line arguments (among other things).
+#------------------------------------------------------------------
+if (TARGET paraview)
+  # The state file need to point to the correct data file. We do that by
+  # configuring the state file.
+  configure_file (
+    "${CMAKE_CURRENT_SOURCE_DIR}/exodusStateFile.3.14.1.pvsm.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm" @ONLY)
+  add_pv_test("pv" "_DISABLE_C"
+    COMMAND --client $<TARGET_FILE:paraview>
+            --enable-bt
+            -dr
+            --test-directory=${PARAVIEW_TEST_DIR}
+            --state=${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LoadExodusStateFile.xml)
+endif()

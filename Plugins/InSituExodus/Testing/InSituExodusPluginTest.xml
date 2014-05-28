@@ -9,7 +9,7 @@
            arguments="actionFileOpen" />
   <pqevent object="pqClientMainWindow/FileOpenDialog"
            command="filesSelected"
-           arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+           arguments="$PARAVIEW_DATA_ROOT/can.ex2" />
 
   <!-- Select in-situ reader -->
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget"

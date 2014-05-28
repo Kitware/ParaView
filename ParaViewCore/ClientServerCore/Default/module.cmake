@@ -7,6 +7,8 @@ vtk_module(vtkPVClientServerCoreDefault
     vtkPVVTKExtensionsDefault
   PRIVATE_DEPENDS
     vtksys
+  TEST_DEPENDS
+    vtkTestingCore
   TEST_LABELS
     PARAVIEW
 )

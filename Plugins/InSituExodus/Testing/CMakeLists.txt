@@ -1,4 +1,4 @@
-if(PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_QT_GUI)
+if(PARAVIEW_BUILD_QT_GUI)
 
   include(ParaViewTestingMacros)
 
@@ -7,7 +7,7 @@ if(PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_QT_GUI)
   )
 
   add_client_tests("pv"
-    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${test_xmls}
     LOAD_PLUGIN "InSituExodus"
   )

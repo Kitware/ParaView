@@ -631,7 +631,7 @@ void MyProcess::Execute()
   this->ReturnValue=retVal;
 }
 
-int main(int argc, char **argv)
+int MantaBenchmark(int argc, char **argv)
 {
   // This is here to avoid false leak messages from vtkDebugLeaks when
   // using mpich. It appears that the root process which spawns all the

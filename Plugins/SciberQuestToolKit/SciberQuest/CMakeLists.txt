@@ -149,10 +149,6 @@ install(TARGETS vtkSciberQuest
    ARCHIVE DESTINATION ${VTK_INSTALL_ARCHIVE_DIR}
    LIBRARY DESTINATION ${VTK_INSTALL_LIBRARY_DIR})
 
-if (BUILD_TESTING)
-  add_subdirectory(Testing)
-endif()
-
 if(PARAVIEW_USE_MPI)
   include(vtkMPI)
   vtk_mpi_link(vtkSciberQuest)

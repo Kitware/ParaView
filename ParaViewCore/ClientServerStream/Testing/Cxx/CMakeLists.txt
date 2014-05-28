@@ -1,9 +1,7 @@
+include(ParaViewTestingMacros)
 
-vtk_module_test_executable(
-  ${vtk-module}CxxTests
-  coverClientServer.cxx)
-
-add_test(
-  NAME vtkClientServerCoverage
-  COMMAND ${vtk-module}CxxTests)
-set_tests_properties(vtkClientServerCoverage PROPERTIES LABELS "PARAVIEW")
+paraview_add_test_cxx(${vtk-module}CxxTests tests
+  NO_DATA NO_VALID NO_OUTPUT
+  coverClientServer.cxx
+  )
+vtk_test_cxx_executable(${vtk-module}CxxTests tests)

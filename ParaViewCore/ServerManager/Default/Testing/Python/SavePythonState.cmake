@@ -16,8 +16,8 @@ execute_process(
   COMMAND ${PVPYTHON_EXECUTABLE}
   ${TEST_DRIVER}
   StateFile.py
-  -T ${TEMPORARY_DIR}
-  -V ${PARAVIEW_DATA_ROOT}/Baseline/SavePythonState.png
+  -T ${PARAVIEW_TEST_OUTPUT_DIR}
+  -V ${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}/SavePythonState.png
   RESULT_VARIABLE rv)
 if(NOT rv EQUAL 0)
   message(FATAL_ERROR "PVPython return value was ${rv}")

@@ -43,7 +43,7 @@ public:
   const vtkClientServerStream* GetResultMessage();
   vtkClientServerID GetUniqueID()
     {
-    static vtkClientServerID id = {3};
+    static vtkClientServerID id(3);
     ++id.ID;
     return id;
     }
@@ -145,7 +145,7 @@ void ClientManager::RunTests()
   server->ProcessMessage(data, len);
 }
 
-int main()
+int TestSimple(int, char**)
 {
   Server server;
   ClientManager cmgr;

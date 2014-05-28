@@ -17,7 +17,7 @@
 
 vtkClientServerID GetUniqueID()
 {
-  static vtkClientServerID id = {3};
+  static vtkClientServerID id(3);
   ++id.ID;
   return id;
 }
@@ -30,7 +30,7 @@ extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
 
-int main()
+int TestSphere(int, char**)
 {
   vtkClientServerInterpreter* interp = vtkClientServerInterpreter::New();
   interp->SetLogStream(&cout);

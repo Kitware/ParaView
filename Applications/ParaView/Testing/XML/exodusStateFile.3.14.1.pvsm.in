@@ -670,11 +670,11 @@
     </Proxy>
     <Proxy group="sources" type="ExodusIIReader" id="3425" servers="1">
       <Property name="FileName" id="3425.FileName" number_of_elements="1">
-        <Element index="0" value="@PARAVIEW_DATA_ROOT@/Data/can.ex2"/>
+        <Element index="0" value="@PARAVIEW_DATA_ROOT@/can.ex2"/>
         <Domain name="files" id="3425.FileName.files"/>
       </Property>
       <Property name="FileNameInfo" id="3425.FileNameInfo" number_of_elements="1">
-        <Element index="0" value="@PARAVIEW_DATA_ROOT@/Data/can.ex2"/>
+        <Element index="0" value="@PARAVIEW_DATA_ROOT@/can.ex2"/>
       </Property>
       <Property name="TimestepValues" id="3425.TimestepValues" number_of_elements="44">
         <Element index="0" value="0"/>
@@ -829,13 +829,13 @@
         <Element index="0" value="%s"/>
       </Property>
       <Property name="FilePrefix" id="3425.FilePrefix" number_of_elements="1">
-        <Element index="0" value="@PARAVIEW_DATA_ROOT@/Data/can.ex2"/>
+        <Element index="0" value="@PARAVIEW_DATA_ROOT@/can.ex2"/>
         <Domain name="default_value" id="3425.FilePrefix.default_value">
-          <String text="@PARAVIEW_DATA_ROOT@/Data/can.ex2"/>
+          <String text="@PARAVIEW_DATA_ROOT@/can.ex2"/>
         </Domain>
       </Property>
       <Property name="FilePrefixInfo" id="3425.FilePrefixInfo" number_of_elements="1">
-        <Element index="0" value="@PARAVIEW_DATA_ROOT@/Data/can.ex2"/>
+        <Element index="0" value="@PARAVIEW_DATA_ROOT@/can.ex2"/>
       </Property>
       <Property name="FileRange" id="3425.FileRange" number_of_elements="2">
         <Element index="0" value="0"/>
@@ -966,13 +966,13 @@
         <Domain name="array_list" id="3425.SideSetResultArrayStatus.array_list"/>
       </Property>
       <Property name="XMLFileName" id="3425.XMLFileName" number_of_elements="1">
-        <Element index="0" value="@PARAVIEW_DATA_ROOT@/Data/artifact.dta"/>
+        <Element index="0" value="@PARAVIEW_DATA_ROOT@/artifact.dta"/>
         <Domain name="default_value" id="3425.XMLFileName.default_value">
-          <String text="@PARAVIEW_DATA_ROOT@/Data/artifact.dta"/>
+          <String text="@PARAVIEW_DATA_ROOT@/artifact.dta"/>
         </Domain>
       </Property>
       <Property name="XMLFileNameInfo" id="3425.XMLFileNameInfo" number_of_elements="1">
-        <Element index="0" value="@PARAVIEW_DATA_ROOT@/Data/artifact.dta"/>
+        <Element index="0" value="@PARAVIEW_DATA_ROOT@/artifact.dta"/>
       </Property>
     </Proxy>
     <Proxy group="misc" type="TimeKeeper" id="256" servers="16">

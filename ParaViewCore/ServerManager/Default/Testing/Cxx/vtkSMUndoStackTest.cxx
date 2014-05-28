@@ -15,9 +15,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMUndoStackTest.h"
 
-#include "vtkInitializationHelper.h"
-#include "vtkPVServerOptions.h"
-#include "vtkProcessModule.h"
 #include "vtkSMUndoStack.h"
 #include "vtkUndoSet.h"
 #include "vtkSMSession.h"
@@ -79,20 +76,4 @@ void vtkSMUndoStackTest::StackDepth()
   vtkSMUndoStack *stack = vtkSMUndoStack::New();
   QCOMPARE(stack->GetStackDepth(), 10);
   stack->Delete();
-}
-
-int main(int argc, char *argv[])
-{
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_CLIENT,
-                                      options);
-
-  vtkSMUndoStackTest test;
-  int ret = QTest::qExec(&test, argc, argv);
-
-  vtkInitializationHelper::Finalize();
-  options->Delete();
-
-  return ret;
 }

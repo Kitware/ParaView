@@ -13,11 +13,11 @@
   -->
   <pqevent object="pqSLACActionHolder/actionDataLoadManager" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/meshFile/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/meshFile/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/mesh.ncdf" />
+  <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/meshFile/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/SLAC/pic-example/mesh.ncdf" />
   <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/modeFile/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/modeFile/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/fields_..mod" />
+  <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/modeFile/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/SLAC/pic-example/fields_..mod" />
   <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/particlesFile/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/particlesFile/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/particles_..ncdf" />
+  <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/particlesFile/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/SLAC/pic-example/particles_..ncdf" />
   <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/buttonBox/1QPushButton0" command="activate" arguments="" />
   <!--
   For some reason, the snapshot is being grabbed before the image is updated

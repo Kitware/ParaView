@@ -15,10 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMProxyTest.h"
 
-#include "vtkInitializationHelper.h"
-#include "vtkPVServerOptions.h"
 #include "vtkSMProxyManager.h"
-#include "vtkProcessModule.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -98,20 +95,4 @@ void vtkSMProxyTest::GetVTKClassName()
   QCOMPARE(proxy->GetVTKClassName(), "vtkSphereSource");
 
   proxy->Delete();
-}
-
-int main(int argc, char *argv[])
-{
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_CLIENT,
-                                      options);
-
-  vtkSMProxyTest test;
-  int ret = QTest::qExec(&test, argc, argv);
-
-  vtkInitializationHelper::Finalize();
-  options->Delete();
-
-  return ret;
 }

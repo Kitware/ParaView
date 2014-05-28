@@ -5,7 +5,7 @@
 
 #define VTK_CREATE(type,name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New ()
 
-int main (int argc, char * argv[])
+int TestSpyPlotTracers(int argc, char * argv[])
 {
   char *fname = vtkTestUtilities::ExpandDataFileName (argc, argv, "Data/SPCTH/ball_and_box.spcth");
 

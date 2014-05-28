@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
-int main(int argc, char* argv[])
+int TestMultipleSessions(int argc, char* argv[])
 {
   vtkNew<vtkPVOptions> options;
   vtkInitializationHelper::Initialize(argc, argv,

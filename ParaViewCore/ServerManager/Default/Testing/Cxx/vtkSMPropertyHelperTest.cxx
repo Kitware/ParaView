@@ -15,10 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSMPropertyHelperTest.h"
 
-#include "vtkInitializationHelper.h"
-#include "vtkPVServerOptions.h"
 #include "vtkSMProxyManager.h"
-#include "vtkProcessModule.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -40,20 +37,4 @@ void vtkSMPropertyHelperTest::Set()
 
   proxy->Delete();
   session->Delete();
-}
-
-int main(int argc, char *argv[])
-{
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
-  vtkInitializationHelper::Initialize(argc, argv,
-                                      vtkProcessModule::PROCESS_CLIENT,
-                                      options);
-
-  vtkSMPropertyHelperTest test;
-  int ret = QTest::qExec(&test, argc, argv);
-
-  vtkInitializationHelper::Finalize();
-  options->Delete();
-
-  return ret;
 }

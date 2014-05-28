@@ -135,7 +135,7 @@
   cout << "Class: " << #classname << endl;\
   c = classname::New(); c->Print(cout); c->Delete();
 
-int main(int , char *[])
+int ParaViewCoreServerManagerPrintSelf(int , char *[])
 {
   vtkObject *c;
 

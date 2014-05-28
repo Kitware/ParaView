@@ -11,6 +11,15 @@ endif()
 include(ParaViewTestingMacros)
 include(FindPythonModules)
 
+# Ensure data exists for the listFiles tests. These files are selected for
+# being tiny since their names are the only required part for the test.
+paraview_test_load_data_dirs(""
+  GMV # 24K
+  )
+paraview_test_load_data(""
+  sonic.pht # 279 bytes
+  )
+
 set (pv_pymodule_build_dir ${VTK_BUILD_PYTHON_MODULE_DIR})
 
 # Make sure we can start the DataProber server
@@ -45,6 +54,10 @@ set(WEB_TESTS_WITH_CHROME
   ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_visualizer_can_test.py
   )
 
+paraview_test_load_baselines_dirs(""
+  WebTesting/ParaView
+  )
+
 add_pvweb_tests("pvweb"
   APP          Visualizer
   COMMAND      $<TARGET_FILE:pvpython>
@@ -55,7 +68,7 @@ add_pvweb_tests("pvweb"
                firefox
                internet_explorer
                safari
-  BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline/WebTesting/ParaView
+  BASELINE_DIR ${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}/WebTesting/ParaView
   TEST_SCRIPTS ${WEB_TESTS_WITH_CHROME}
   )
 

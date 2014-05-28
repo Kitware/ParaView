@@ -11,7 +11,7 @@
 #define PRINT_SELF(classname)\
   c = classname::New(); c->Print(cout); c->Delete();
 
-int main(int, char**)
+int ParaViewCoreCommonPrintSelf(int, char*[])
 {
   vtkObject* c;
   PRINT_SELF(vtkCommandOptions);

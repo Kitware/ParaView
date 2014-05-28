@@ -50,7 +50,7 @@ if (MSVC)
   set (opt "/maxcpucount")
 else ()
   set (install_tgt "install")
-  set (opt "-j"5)
+  set (opt "-j5")
 endif ()
 execute_process (COMMAND ${CMAKE_COMMAND}
   --build ${PARAVIEW_BINARY_DIR}

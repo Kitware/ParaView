@@ -9,7 +9,7 @@ if (PARAVIEW_USE_MPI)
   endif()
 endif()
 
-if(PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_MATPLOTLIB)
+if(PARAVIEW_ENABLE_MATPLOTLIB)
   list(APPEND __dependencies vtkRenderingMatplotlib)
 endif()
 
@@ -52,6 +52,7 @@ PRIVATE_DEPENDS
     vtkIOXML
     vtkRenderingOpenGL
     vtkRenderingLIC
+    vtkTestingCore
     vtkTestingRendering
 
   TEST_LABELS

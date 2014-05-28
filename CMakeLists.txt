@@ -237,7 +237,8 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 cmake_dependent_option(PARAVIEW_USE_UNIFIED_BINDINGS "If enabled, Python bindings will back the ClientServer wrapping implementation" OFF
   PARAVIEW_ENABLE_PYTHON OFF)
-option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON)
+cmake_dependent_option(PARAVIEW_ENABLE_MATPLOTLIB "Enable/Disable Python scripting support" ON
+  "PARAVIEW_ENABLE_PYTHON;PYTHON_MODULE_matplotlib_FOUND" OFF)
 mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
 
 # If building on Unix with MPI enabled, we will present another option to
@@ -257,10 +258,17 @@ else()
   set(PARAVIEW_BUILD_ARCHITECTURE "32")
 endif()
 
-FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
-  ${ParaView_SOURCE_DIR}/../ParaViewData
-  ${ParaView_BINARY_DIR}/../ParaViewData
-  $ENV{PARAVIEW_DATA_ROOT})
+# setup external data. this will automatically download the test
+# data and baseline files to the build tree and set PARAVIEW_DATA_ROOT.
+include(ParaViewExternalData)
+set(ExternalData_LINK_CONTENT MD5)
+set(ExternalData_BINARY_ROOT          "${CMAKE_BINARY_DIR}/ExternalData")
+set(PARAVIEW_TEST_DATA_DIR            "${CMAKE_CURRENT_SOURCE_DIR}/Testing/Data")
+set(PARAVIEW_TEST_BASELINE_DIR        "${PARAVIEW_TEST_DATA_DIR}/Baseline")
+set(PARAVIEW_TEST_OUTPUT_DATA_DIR     "${ExternalData_BINARY_ROOT}/Testing/Data")
+set(PARAVIEW_TEST_OUTPUT_BASELINE_DIR "${PARAVIEW_TEST_OUTPUT_DATA_DIR}/Baseline")
+set(PARAVIEW_TEST_OUTPUT_DIR          "${CMAKE_BINARY_DIR}/Testing/Temporary")
+set(PARAVIEW_DATA_ROOT "${PARAVIEW_TEST_OUTPUT_DATA_DIR}")
 
 if (APPLE)
   option(PARAVIEW_DO_UNIX_STYLE_INSTALLS
@@ -797,3 +805,8 @@ if (BUILD_TESTING)
   configure_file("${ParaView_CMAKE_DIR}/CTestCustom.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake" @ONLY)
 endif()
+
+#-----------------------------------------------------------------------------
+# Create target to download data from the ParaViewData group.  This must come
+# after all tests have been added that reference the group, so we put it last.
+ExternalData_Add_Target(ParaViewData)

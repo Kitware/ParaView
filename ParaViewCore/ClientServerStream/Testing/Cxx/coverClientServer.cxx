@@ -309,7 +309,7 @@ bool do_test()
   return true;
 }
 
-int main()
+int coverClientServer(int, char*[])
 {
   return do_test()? 0 : 1;
 }

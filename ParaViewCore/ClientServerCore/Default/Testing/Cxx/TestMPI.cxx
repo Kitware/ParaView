@@ -18,7 +18,7 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-int main(int , char* [])
+int TestMPI(int , char* [])
 {
   vtkConeSource *cone = vtkConeSource::New();
 //   cone->Update(); //For GetCenter
