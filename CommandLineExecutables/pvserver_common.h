@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 # ifdef PARAVIEW_ENABLE_PYTHON
 extern "C" {
-  void vtkPVInitializePythonModules();  
+  void vtkPVInitializePythonModules();
 }
 #endif
 
@@ -65,6 +65,7 @@ static bool RealMain(int argc, char* argv[],
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();
+
   vtkPVSessionServer* session = vtkPVSessionServer::New();
   session->SetMultipleConnection(options->GetMultiClientMode() != 0);
   int process_id = controller->GetLocalProcessId();
