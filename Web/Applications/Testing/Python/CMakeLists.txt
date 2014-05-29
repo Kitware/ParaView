@@ -62,8 +62,6 @@ add_pvweb_tests("pvweb"
   APP          Visualizer
   COMMAND      $<TARGET_FILE:pvpython>
   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_visualizer.py
-  #DEPEND_MODS  Image
-  #             selenium
   BROWSER      chrome
                firefox
                internet_explorer
@@ -85,7 +83,6 @@ add_pvweb_tests("pvweb"
   COMMAND      $<TARGET_FILE:pvpython>
   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
   ARGS         --echo "test string to be retrieved by app"
-  #DEPEND_MODS  requests
   TEST_SCRIPTS ${WEB_TESTS_WITH_REQUESTS}
   )
 
@@ -97,7 +94,6 @@ add_pvweb_tests("pvweb"
   APP          TestApp
   COMMAND      $<TARGET_FILE:pvpython>
   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
-  #DEPEND_MODS  selenium
   BROWSER      chrome
                firefox
                internet_explorer
