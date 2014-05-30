@@ -5,6 +5,7 @@ vtk_module(vtkPVServerManagerDefault
     vtksys
     vtkRenderingVolumeOpenGL
     vtkTestingRendering
+    vtkPVClientServerCoreDefault
   TEST_DEPENDS
     vtkPVServerManagerApplication
     vtkTestingCore
