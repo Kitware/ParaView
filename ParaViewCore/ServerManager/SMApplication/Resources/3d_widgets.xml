@@ -391,6 +391,7 @@
           <PropertyGroup label="Title Texts">
             <Property name="Title" />
             <Property name="ComponentTitle" />
+            <Property name="TitleJustification" />
           </PropertyGroup>
 
           <!-- properties for Title -->
@@ -417,17 +418,23 @@
             <Property name="LabelFontSize" function="Size" />
           </PropertyGroup>
 
-          <PropertyGroup label="Annotations">
-            <Property name="DrawAnnotations" />
-            <Property name="DrawNanAnnotation" />
-            <Property name="NanAnnotation" />
-            <Property name="TextPosition" panel_visibility="never" />
-          </PropertyGroup>
-
-          <PropertyGroup label="Miscellaneous">
+          <PropertyGroup label="Labels">
             <Property name="AutomaticLabelFormat" />
             <Property name="LabelFormat" />
             <Property name="NumberOfLabels" />
+            <Property name="DrawTickMarks" />
+            <Property name="DrawTickLabels" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Annotations">
+            <Property name="DrawAnnotations" />
+            <Property name="AddRangeAnnotations" />
+            <Property name="DrawNanAnnotation" />
+            <Property name="NanAnnotation" />
+            <Property name="TextPosition" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Miscellaneous">
             <Property name="AspectRatio" />
           </PropertyGroup>
         </ExposedProperties>

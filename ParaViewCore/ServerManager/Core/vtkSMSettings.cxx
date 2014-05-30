@@ -354,7 +354,8 @@ public:
         continue;
         }
 
-      if (proxy->GetXMLName() && property->GetXMLName())
+      if (proxy->GetXMLName() && property->GetXMLName() &&
+          !property->GetNoCustomDefault())
         {
         // Build the JSON reference string
         vtksys_ios::ostringstream settingStringStream;
@@ -589,7 +590,8 @@ public:
 
       if (strcmp(property->GetPanelVisibility(), "never") == 0 ||
           property->GetInformationOnly() ||
-          property->GetIsInternal())
+          property->GetIsInternal() ||
+          property->GetNoCustomDefault())
         {
         continue;
         }
