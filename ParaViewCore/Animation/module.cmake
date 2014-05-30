@@ -11,6 +11,7 @@ vtk_module(vtkPVAnimation
   DEPENDS
     vtkPVServerManagerCore
   PRIVATE_DEPENDS
+    vtksys
     vtkIOMovie
     vtkPVServerManagerDefault
     ${__extra_dependencies}
