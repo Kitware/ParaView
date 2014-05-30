@@ -29,6 +29,14 @@
 #
 #==========================================================================
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
+
+# Set a consistent MACOSX_RPATH default across all CMake versions.
+# When CMake 2.8.12 is required, change this default to 1.
+# When CMake 3.0.0 is required, remove this block (see CMP0042).
+if(NOT DEFINED CMAKE_MACOSX_RPATH)
+  set(CMAKE_MACOSX_RPATH 0)
+endif()
+
 project(ParaView)
 
 # Disallow in-source build
@@ -52,24 +60,6 @@ endif()
 # Choose static or shared libraries.
 option(BUILD_SHARED_LIBS "Build VTK with shared libraries." ON)
 set(VTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-
-#------------------------------------------------------------------------------
-# Setup CMake Environment
-#------------------------------------------------------------------------------
-# Setup cmake policies.
-# TODO: We need to verify that these are still applicable after
-# VTK-modularization changes.
-foreach(policy CMP0012 CMP0013 CMP0014)
-  if(POLICY ${policy})
-    CMAKE_POLICY(SET ${policy} NEW)
-  endif()
-endforeach()
-
-foreach(policy CMP0017)
-  IF(POLICY ${policy})
-    CMAKE_POLICY(SET ${policy} OLD)
-  endif()
-endforeach()
 
 #-------------------------------------------------------------------------------
 set (ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
