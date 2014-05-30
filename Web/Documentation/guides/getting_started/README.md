@@ -83,12 +83,12 @@ That script can be downloaded [here](guides/getting_started/data/pvw-setup).
 This will give you a start script that will use to launcher to serve the static web pages and will automatically start a new ParaView process
 for each user.
 
-Here is an example on how to use that script and its output:
+Here is an example on how to use that script and its output (note the use of quotes around url in `curl` command):
 
     $ cd /Users/seb/Desktop
     $ mkdir pvw-osx
     $ cd pvw-osx
-    $ curl http://www.paraview.org/ParaView3/Doc/Nightly/www/js-doc/guides/quick_start/data/pvw-setup -o pvw-setup.py 
+    $ curl -o pvw-setup.py "http://www.paraview.org/gitweb?p=ParaViewSuperbuild.git;a=blob_plain;f=Scripts/pvw-setup.py;hb=HEAD"
     $ python pvw-setup.py
 
     Is ParaViewWeb install path correct? (/Users/seb/Desktop/pvw-osx) yes/no/quit: y

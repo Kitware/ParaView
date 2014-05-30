@@ -97,6 +97,11 @@
         "url": "guides/webtest_setup",
         "title": "Setting up a machine for Web-based Testing",
         "description": "This document explains how to set up a computer to be able to run web-based tests."
+      },{
+        "name": "auto_deploy_update",
+        "url": "guides/auto_deploy_update",
+        "title": "Automatic deployment and updates",
+        "description": "This document describes an approach to setting up automatic updates and deployment of ParaViewWeb."
       }
     ]
   }
