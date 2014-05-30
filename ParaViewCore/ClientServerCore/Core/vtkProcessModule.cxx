@@ -148,9 +148,17 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
       throw std::runtime_error("Client process should be run with one process!");
       }
 
-    vtkProcessModule::GlobalController = vtkSmartPointer<vtkMPIController>::New();
-    vtkProcessModule::GlobalController->Initialize(
-      &argc, &argv, /*initializedExternally*/1);
+    if(vtkMPIController* controller = vtkMPIController::SafeDownCast(
+         vtkMultiProcessController::GetGlobalController()))
+      {
+      vtkProcessModule::GlobalController = controller;
+      }
+    else
+      {
+      vtkProcessModule::GlobalController = vtkSmartPointer<vtkMPIController>::New();
+      vtkProcessModule::GlobalController->Initialize(
+        &argc, &argv, /*initializedExternally*/1);
+      }
     }
 #else
   static_cast<void>(argc); // unused warning when MPI is off

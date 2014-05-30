@@ -7,11 +7,11 @@
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notice for more information.
 
-=========================================================================*/
+  =========================================================================*/
 #ifndef vtkCPProcessor_h
 #define vtkCPProcessor_h
 
@@ -21,9 +21,11 @@
 struct vtkCPProcessorInternals;
 class vtkCPDataDescription;
 class vtkCPPipeline;
+class vtkMPICommunicatorOpaqueComm;
+class vtkMultiProcessController;
 
 /// @defgroup CoProcessing ParaView CoProcessing
-/// The CoProcessing library is designed to be called from parallel 
+/// The CoProcessing library is designed to be called from parallel
 /// simulation codes to reduce the size of the information that is saved
 /// while also keeping the important information available as results.
 
@@ -42,7 +44,7 @@ class vtkCPPipeline;
 /// This gives the Co-Processor implemntation a chance to identify what
 /// (if any) of the available data it will process during this pass. By
 /// default all of the avaible data is selected, so that if the Co-Processor
-/// implementation does nothing it will receive all data during the Processing 
+/// implementation does nothing it will receive all data during the Processing
 /// step. The Co-Processor implementation should extract what ever meta-data
 /// it will need (or alternatively can save a reference to the DataDescription),
 /// during the Processing step.
@@ -54,13 +56,12 @@ class vtkCPPipeline;
 /// may be NULL.
 class VTKPVCATALYST_EXPORT vtkCPProcessor : public vtkObject
 {
-
 public:
   static vtkCPProcessor* New();
   vtkTypeMacro(vtkCPProcessor,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /// Add in a pipeline that is externally configured. Returns 1 if 
+  /// Add in a pipeline that is externally configured. Returns 1 if
   /// successful and 0 otherwise.
   virtual int AddPipeline(vtkCPPipeline* pipeline);
 
@@ -76,7 +77,12 @@ public:
 
   /// Initialize the co-processor. Returns 1 if successful and 0
   /// otherwise.
+  /// otherwise. If Catalyst is built with MPI then Initialize()
+  /// can also be called with a specific MPI communicator if
+  /// MPI_COMM_WORLD isn't the proper one. Catalyst is initialized
+  /// to use MPI_COMM_WORLD by default.
   virtual int Initialize();
+  virtual int Initialize(vtkMPICommunicatorOpaqueComm& comm);
 
   /// Configuration Step:
   /// The coprocessor first determines if any coprocessing needs to be done
@@ -110,6 +116,7 @@ private:
 
   vtkCPProcessorInternals* Internal;
   vtkObject* InitializationHelper;
+  static vtkMultiProcessController* Controller;
 };
 
 #endif
