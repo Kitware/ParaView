@@ -34,6 +34,7 @@
 #include "vtkRenderPass.h"
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkNew.h" // needed for vtkWeakPointer.
 
 class vtkMultiProcessController;
 class vtkPKdTree;
@@ -156,6 +157,11 @@ public:
   void GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
 
   // Description:
+  // Provides access to the last rendered depth-buffer, if any. May return NULL
+  // if depth buffer was not composited and available on the current rank.
+  vtkFloatArray* GetLastRenderedDepths();
+
+  // Description:
   // Obtains the composited depth-buffer from IceT and pushes it to the screen.
   // This is only done when DepthOnly is true.
   void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
@@ -212,7 +218,7 @@ protected:
 
   int ImageReductionFactor;
 
-  vtkFloatArray *LastRenderedDepths;
+  vtkNew<vtkFloatArray> LastRenderedDepths;
 
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;

@@ -85,6 +85,7 @@ vtkCxxSetObjectMacro(vtkIceTCompositePass, Controller,
   vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIceTCompositePass::vtkIceTCompositePass()
+  : LastRenderedDepths()
 {
   this->IceTContext = vtkIceTContext::New();
   this->IceTContext->UseOpenGLOn();
@@ -110,8 +111,6 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->LastRenderedEyes[0] = new vtkSynchronizedRenderers::vtkRawImage();
   this->LastRenderedEyes[1] = new vtkSynchronizedRenderers::vtkRawImage();
   this->LastRenderedRGBAColors = this->LastRenderedEyes[0];
-
-  this->LastRenderedDepths = vtkFloatArray::New();
 
   this->PBO=0;
   this->ZTexture=0;
@@ -148,9 +147,6 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
   this->LastRenderedEyes[0] = NULL;
   this->LastRenderedEyes[1] = NULL;
   this->LastRenderedRGBAColors = NULL;
-
-  this->LastRenderedDepths->Delete();
-  this->LastRenderedDepths = NULL;
 
   if(this->BackgroundTexture!=0)
     {
@@ -720,6 +716,13 @@ void vtkIceTCompositePass::GetLastRenderedTile(
     }
 
   tile = (*this->LastRenderedRGBAColors);
+}
+
+//----------------------------------------------------------------------------
+vtkFloatArray* vtkIceTCompositePass::GetLastRenderedDepths()
+{
+  return this->LastRenderedDepths->GetNumberOfTuples() >  0 ?
+    this->LastRenderedDepths.GetPointer() : NULL;
 }
 
 //----------------------------------------------------------------------------

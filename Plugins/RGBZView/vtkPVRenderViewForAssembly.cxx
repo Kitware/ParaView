@@ -34,19 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataRepresentation.h"
 #include "vtkDataSetWriter.h"
 #include "vtkFloatArray.h"
+#include "vtkIceTSynchronizedRenderers.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
+#include "vtkPointData.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVSynchronizedRenderer.h"
-#include "vtkPointData.h"
-#include "vtkRenderWindow.h"
+#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
@@ -196,10 +197,21 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
 
   vtkFloatArray* CaptureZBuffer()
   {
-    this->ArrayHolder = vtkSmartPointer<vtkFloatArray>::New();
+  this->ArrayHolder = vtkSmartPointer<vtkFloatArray>::New();
+  if (this->IceTSynchronizedRenderers)
+    {
+    vtkIceTCompositePass* iceTPass = this->IceTSynchronizedRenderers->GetIceTCompositePass();
+    if (iceTPass && iceTPass->GetLastRenderedDepths())
+      {
+      this->ArrayHolder->DeepCopy(iceTPass->GetLastRenderedDepths());
+      }
+    }
+  else
+    {
     this->ZGrabber->Modified();
     this->ZGrabber->Update();
     this->ArrayHolder->DeepCopy(this->ZGrabber->GetOutput()->GetPointData()->GetScalars());
+    }
 
     return this->ArrayHolder;
   }
@@ -467,6 +479,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   }
 
   //----------------------------------------------------------------------------
+  vtkWeakPointer<vtkIceTSynchronizedRenderers> IceTSynchronizedRenderers;
 
   vtkNew<vtkJPEGWriter> JPEGWriter;
   vtkNew<vtkPNGWriter> PNGWriter;
@@ -528,7 +541,11 @@ vtkPVRenderViewForAssembly::~vtkPVRenderViewForAssembly()
 void vtkPVRenderViewForAssembly::Initialize(unsigned int id)
 {
   this->Superclass::Initialize(id);
-  this->SynchronizedRenderers->SetUseDepthBuffer(true);
+
+  // If vtkIceTSynchronizedRenderers is used, we'll use that to access frame buffers.
+  this->Internal->IceTSynchronizedRenderers =
+    vtkIceTSynchronizedRenderers::SafeDownCast(
+      this->SynchronizedRenderers->GetParallelSynchronizer());
 }
 
 //----------------------------------------------------------------------------
