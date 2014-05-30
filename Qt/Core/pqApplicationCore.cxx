@@ -85,11 +85,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMSession.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -122,6 +121,8 @@ pqApplicationCore::pqApplicationCore(int& argc, char** argv, pqOptions* options,
 
   // Create output window before initializing server manager.
   this->createOutputWindow();
+  vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
+  vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
   vtkInitializationHelper::Initialize(argc, argv,
     vtkProcessModule::PROCESS_CLIENT, options);
   this->constructor();

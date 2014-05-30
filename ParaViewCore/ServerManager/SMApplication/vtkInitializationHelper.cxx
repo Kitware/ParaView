@@ -86,6 +86,7 @@ bool vtkInitializationHelper::LoadSettingsFilesDuringInitialization = true;
 
 bool vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
 
+std::string vtkInitializationHelper::OrganizationName = "ParaView";
 std::string vtkInitializationHelper::ApplicationName = "ParaView";
 
 //----------------------------------------------------------------------------
@@ -110,13 +111,25 @@ bool vtkInitializationHelper::GetLoadSettingsFilesDuringInitialization()
 }
 
 //----------------------------------------------------------------------------
+void vtkInitializationHelper::SetOrganizationName(const std::string & organizationName)
+{
+  vtkInitializationHelper::OrganizationName = organizationName;
+}
+
+//----------------------------------------------------------------------------
+const std::string & vtkInitializationHelper::GetOrganizationName()
+{
+  return vtkInitializationHelper::OrganizationName;
+}
+
+//----------------------------------------------------------------------------
 void vtkInitializationHelper::SetApplicationName(const std::string & appName)
 {
   vtkInitializationHelper::ApplicationName = appName;
 }
 
 //----------------------------------------------------------------------------
-std::string vtkInitializationHelper::GetApplicationName()
+const std::string & vtkInitializationHelper::GetApplicationName()
 {
   return vtkInitializationHelper::ApplicationName;
 }
@@ -251,14 +264,14 @@ void vtkInitializationHelper::Finalize()
   if (vtkInitializationHelper::SaveUserSettingsFileDuringFinalization)
     {
     // Write out settings file(s)
-    std::string userSettingsFile =
-      vtkInitializationHelper::GetUserSettingsDirectory();
-    userSettingsFile.append("UserSettings.json");
+    std::string userSettingsFilePath =
+      vtkInitializationHelper::GetUserSettingsFilePath();
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
-    bool savingSucceeded = settings->SaveSettings(userSettingsFile.c_str());
+    bool savingSucceeded = settings->SaveSettings(userSettingsFilePath.c_str());
     if (!savingSucceeded)
       {
-      cerr << "Saving settings file failed\n";
+      vtkGenericWarningMacro(<< "Saving settings file to '"
+                             << userSettingsFilePath << "' failed");
       }
     }
 
@@ -295,9 +308,8 @@ bool vtkInitializationHelper::LoadSettings()
     }
 
   // Load user-level settings
-  std::string userSettingsFileName = vtkInitializationHelper::GetUserSettingsDirectory();
-  userSettingsFileName.append("UserSettings.json");
-  success = success && settings->AddCollectionFromFile(userSettingsFileName, VTK_DOUBLE_MAX);
+  std::string userSettingsFilePath = vtkInitializationHelper::GetUserSettingsFilePath();
+  success = success && settings->AddCollectionFromFile(userSettingsFilePath, VTK_DOUBLE_MAX);
 
   // Load site-level settings
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
@@ -342,6 +354,7 @@ bool vtkInitializationHelper::LoadSettings()
 //----------------------------------------------------------------------------
 std::string vtkInitializationHelper::GetUserSettingsDirectory()
 {
+  std::string organizationName(vtkInitializationHelper::GetOrganizationName());
   std::string applicationName(vtkInitializationHelper::GetApplicationName());
 #if defined(WIN32)
   const char* appData = getenv("APPDATA");
@@ -368,10 +381,20 @@ std::string vtkInitializationHelper::GetUserSettingsDirectory()
     {
     directoryPath.append(separator);
     }
-  directoryPath += ".config" + separator + applicationName + separator;
+  directoryPath += ".config" + separator + organizationName + separator;
 #endif
 
   return directoryPath;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkInitializationHelper::GetUserSettingsFilePath()
+{
+  std::string path = vtkInitializationHelper::GetUserSettingsDirectory();
+  path.append(vtkInitializationHelper::GetApplicationName());
+  path.append("-UserSettings.json");
+
+  return path;
 }
 
 //----------------------------------------------------------------------------

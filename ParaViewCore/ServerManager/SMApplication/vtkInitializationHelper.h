@@ -66,10 +66,16 @@ public:
   static bool GetLoadSettingsFilesDuringInitialization();
 
   // Description:
+  // Sets the organization producing this application. This is
+  // "ParaView" by default, but can be different for branded applications.
+  static void SetOrganizationName(const std::string & organizationName);
+  static const std::string & GetOrganizationName();
+
+  // Description:
   // Sets the name of the application. This is "ParaView" by default, but
   // can be different for branded applications.
   static void SetApplicationName(const std::string & appName);
-  static std::string GetApplicationName();
+  static const std::string & GetApplicationName();
 
 protected:
   vtkInitializationHelper() {};
@@ -84,6 +90,10 @@ protected:
   // file path separator appropriate for the system.
   static std::string GetUserSettingsDirectory();
 
+  // Description:
+  // Get file path for the user settings file.
+  static std::string GetUserSettingsFilePath();
+
 private:
   vtkInitializationHelper(const vtkInitializationHelper&); // Not implemented
   void operator=(const vtkInitializationHelper&); // Not implemented
@@ -92,6 +102,7 @@ private:
 
   static bool SaveUserSettingsFileDuringFinalization;
 
+  static std::string OrganizationName;
   static std::string ApplicationName;
 };
 

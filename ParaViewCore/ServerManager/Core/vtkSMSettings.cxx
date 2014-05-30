@@ -29,6 +29,8 @@
 #include "vtkStringList.h"
 
 #include <vtksys/ios/sstream>
+#include <vtksys/String.hxx>
+#include <vtksys/SystemTools.hxx>
 #include "vtk_jsoncpp.h"
 
 #include <algorithm>
@@ -508,7 +510,7 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Save a property setting to the highest-priority collection.
+  // Set a property setting in the highest-priority collection.
   void SetPropertySetting(const char* settingName, vtkSMProperty* property)
   {
     this->CreateCollectionIfNeeded();
@@ -537,7 +539,7 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Save proxy settings to the highest-priority collection.
+  // Set proxy settings to the highest-priority collection.
   void SetProxySettings(vtkSMProxy* proxy)
   {
     if (!proxy)
@@ -553,7 +555,7 @@ public:
 
   //----------------------------------------------------------------------------
   // Description:
-  // Save proxy settings in the highest-priority collection under
+  // Set proxy settings in the highest-priority collection under
   // the setting prefix.
   void SetProxySettings(const char* settingPrefix, vtkSMProxy* proxy)
   {
@@ -850,6 +852,17 @@ bool vtkSMSettings::SaveSettings(const std::string & filePath)
     {
     // No settings to save, so we'll always succeed.
     return true;
+    }
+
+  // Get directory component of filePath and create it if it doesn't exist.
+  vtksys_stl::string directory =
+    vtksys::SystemTools::GetParentDirectory(filePath.c_str());
+  bool createdDirectory = vtksys::SystemTools::MakeDirectory(directory.c_str());
+  if (!createdDirectory)
+    {
+    vtkErrorMacro(<< "Directory '" << directory << "' does not exist and could "
+                  << "not be created.");
+    return false;
     }
 
   std::ofstream settingsFile(filePath.c_str(), ios::out | ios::binary );
