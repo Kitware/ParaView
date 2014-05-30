@@ -42,6 +42,7 @@
 #include "vtkMPIController.h"
 #endif
 
+#include <map>
 #include <list>
 
 vtkStandardNewMacro (vtkAMRConnectivity);
@@ -51,39 +52,33 @@ class vtkAMRConnectivityEquivalence
 public:
   vtkAMRConnectivityEquivalence () 
     {
-    id_to_set = vtkIntArray::New ();
-    id_to_set->SetNumberOfComponents (1);
-    id_to_set->SetNumberOfTuples (0);
-    set_to_min_id = vtkIntArray::New ();
+    set_to_min_id = vtkSmartPointer<vtkIntArray>::New ();
     set_to_min_id->SetNumberOfComponents (1);
     set_to_min_id->SetNumberOfTuples (0);
     }
 
   ~vtkAMRConnectivityEquivalence ()
     {
-    id_to_set->Delete ();
-    set_to_min_id->Delete ();
     }
 
   int AddEquivalence (int id1, int id2) 
     {
-    int min_id, max_id;
+    int min_id;
     if (id1 < id2)
       {
       min_id = id1;
-      max_id = id2;
       }
     else
       {
       min_id = id2;
-      max_id = id1;
       }
-    while (id_to_set->GetNumberOfTuples () <= max_id) 
-      {
-      id_to_set->InsertNextValue (-1);
-      }
-    int set1 = id_to_set->GetValue (id1);
-    int set2 = id_to_set->GetValue (id2);
+
+    std::map<int, int>::iterator iter;
+
+    iter = id_to_set.find (id1);
+    int set1 = (iter == id_to_set.end () ? -1 : iter->second);
+    iter = id_to_set.find (id2);
+    int set2 = (iter == id_to_set.end () ? -1 : iter->second);
 
     if (set1 >= 0 && set_to_min_id->GetValue (set1) < 0)  
       {
@@ -112,11 +107,11 @@ public:
         min_set = set2;
         max_set = set1;
         }
-      for (int i = 0; i < id_to_set->GetNumberOfTuples (); i ++) 
+      for (iter = id_to_set.begin (); iter != id_to_set.end (); iter ++) 
         {
-        if (id_to_set->GetValue (i) == max_set)
+        if (iter->second == max_set)
           {
-          id_to_set->SetValue (i, min_set);
+          id_to_set[iter->first] = min_set;
           }
         }
       int max_set_min = set_to_min_id->GetValue (max_set);
@@ -130,7 +125,7 @@ public:
       }
     else if (set1 >= 0)
       {
-      id_to_set->SetValue (id2, set1);
+      id_to_set[id2] = set1;
       if (id2 < set_to_min_id->GetValue (set1)) 
         {
         set_to_min_id->SetValue (set1, id2);
@@ -138,7 +133,7 @@ public:
       }
     else if (set2 >= 0)
       {
-      id_to_set->SetValue (id1, set2);
+      id_to_set[id1] = set2;
       if (id1 < set_to_min_id->GetValue (set2)) 
         {
         set_to_min_id->SetValue (set2, id1);
@@ -161,8 +156,8 @@ public:
         first_empty = set_to_min_id->InsertNextValue (-1);
         }
 
-      id_to_set->SetValue (id1, first_empty);
-      id_to_set->SetValue (id2, first_empty);
+      id_to_set[id1] = first_empty;
+      id_to_set[id2] = first_empty;
       set_to_min_id->SetValue (first_empty, min_id);
       // return zero here because its not values we've previously cared about.
       }
@@ -171,18 +166,19 @@ public:
 
   int GetMinimumSetId (int id)
     {
-    if (id < 0 || id >= id_to_set->GetNumberOfTuples ()) 
+    std::map<int, int>::iterator iter = id_to_set.find (id);
+    if (iter == id_to_set.end ())
       {
       // vtkErrorWithObjectMacro (id_to_set, << "ID out of range " << id << " (expected 0 <= x < " << id_to_set->GetNumberOfTuples () << ")");
       return -1;
       }
-    int set = id_to_set->GetValue (id);
+    int set = id_to_set[id];
     return (set >= 0 ? set_to_min_id->GetValue (set) : -1);
     }
     
 private:
-  vtkIntArray* id_to_set;
-  vtkIntArray* set_to_min_id;
+  std::map<int,int> id_to_set;
+  vtkSmartPointer<vtkIntArray> set_to_min_id;
 };
 
 
@@ -368,7 +364,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       vtkErrorMacro ("NonOverlappingAMR not made up of UniformGrids");
       return 0;
       }
-    vtkIdTypeArray* regionId = vtkIdTypeArray::New ();
+    vtkSmartPointer<vtkIdTypeArray> regionId = vtkSmartPointer<vtkIdTypeArray>::New ();
     regionId->SetName (this->RegionName.c_str());
     regionId->SetNumberOfComponents (1);
     regionId->SetNumberOfTuples (grid->GetNumberOfCells ());
@@ -377,7 +373,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       regionId->SetTuple1 (i, 0);
       }
     grid->GetCellData ()->AddArray (regionId);
-    regionId->Delete ();
 
     vtkDataArray* volArray = grid->GetCellData ()->GetArray (volumeName);
     if (!volArray)
@@ -423,7 +418,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
 
   if (this->ResolveBlocks)
     {
-             
     vtkTimerLog::MarkStartEvent ("Computing boundary regions");
 
     // Determine boundaries at the block that need to be sent to neighbors
@@ -491,19 +485,13 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         }
       }
 
-    vtkTimerLog::MarkEndEvent ("Computing boundary regions");
-  
 #ifdef PARAVIEW_USE_MPI
     // Exchange all boundaries between processes where block and neighbor are different procs
-    vtkTimerLog::MarkStartEvent ("Exchanging boundaries");
     if (numProcs > 1  && !this->ExchangeBoundaries (mpiController))
       {
       return 0;
       }
-    vtkTimerLog::MarkEndEvent ("Exchanging boundaries");
 #endif 
-
-    vtkTimerLog::MarkStartEvent ("Transferring equivalence");
     // Process all boundaries at the neighbors to find the equivalence pairs at the boundaries
     this->Equivalence = new vtkAMRConnectivityEquivalence;
 
@@ -516,11 +504,12 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
           {
           this->ProcessBoundaryAtNeighbor (volume, this->BoundaryArrays[myProc][j]);
           }
-        this->BoundaryArrays[i][j]->Delete ();
         }
         this->BoundaryArrays[i].clear ();
       }
-
+    vtkTimerLog::MarkEndEvent ("Computing boundary regions");
+  
+    vtkTimerLog::MarkStartEvent ("Transferring equivalence");
     this->EquivPairs.resize (numProcs);
     while (true)
       {
@@ -559,7 +548,7 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
                   int n = this->NeighborList[block->Level][block->BlockId][p];
                   if (this->EquivPairs[n] == 0)
                     {
-                    this->EquivPairs[n] = vtkIntArray::New ();
+                    this->EquivPairs[n] = vtkSmartPointer<vtkIntArray>::New ();
                     this->EquivPairs[n]->SetNumberOfComponents (1);
                     this->EquivPairs[n]->SetNumberOfTuples (0);
                     }
@@ -607,21 +596,25 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
         return 0;
         }
 #endif
-      }
-
-    for (int i = 0; i < numProcs; i ++) 
-      {
-      if (this->EquivPairs[i] != 0)
+      // clear out the pairs after sending them.
+      for (int i = 0; i < numProcs; i ++)
         {
-        this->EquivPairs[i]->Delete ();
-        this->EquivPairs[i] = 0;
+        if (this->EquivPairs[i] != 0)
+          {
+          this->EquivPairs[i]->SetNumberOfTuples (0);
+          }
         }
       }
+
+    // clean up EquivPairs for the last time this update
     this->EquivPairs.clear ();
     ValidNeighbor.clear ();
     NeighborList.clear ();
 
     vtkTimerLog::MarkEndEvent ("Transferring equivalence");
+
+    delete this->Equivalence;
+    this->Equivalence = 0;
     }
 
   if (PropagateGhosts) 
@@ -670,9 +663,6 @@ int vtkAMRConnectivity::DoRequestData (vtkNonOverlappingAMR* volume,
       }
 
     vtkTimerLog::MarkEndEvent ("Propagating ghosts");
-
-    delete this->Equivalence;
-    this->Equivalence = 0;
     }
 
 
@@ -848,7 +838,7 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock (
         }
       }
 
-    vtkIdTypeArray* array = vtkIdTypeArray::New ();
+    vtkSmartPointer<vtkIdTypeArray> array = vtkSmartPointer<vtkIdTypeArray>::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (9 + 
                               (extent[1] - extent[0]) *
@@ -975,7 +965,7 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
     if (messageLength == 0) { continue; }
     messageLength ++; // end of message marker
 
-    vtkIntArray* array = vtkIntArray::New ();
+    vtkSmartPointer<vtkIntArray> array = vtkSmartPointer<vtkIntArray>::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (messageLength);
 
@@ -992,14 +982,13 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
 
     this->ReceiveList[i].clear ();
     receiveList.push_back(request);
-    array->Delete ();
     } 
 
   vtkAMRConnectivityCommRequestList sendList;
   for (size_t i = 0; i < this->BoundaryArrays.size (); i ++)
     {
     if (i == static_cast<unsigned int> (myProc)) { continue; }
-    vtkIntArray* array = vtkIntArray::New ();
+    vtkSmartPointer<vtkIntArray> array = vtkSmartPointer<vtkIntArray>::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (0);
     for (size_t j = 0; j < this->BoundaryArrays[i].size (); j ++)
@@ -1028,13 +1017,12 @@ int vtkAMRConnectivity::ExchangeBoundaries (vtkMPIController *controller)
                             request.Request);
 
     sendList.push_back(request);
-    array->Delete ();
     }
 
   while (!receiveList.empty())
     {
     vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
-    vtkIntArray* array = request.Buffer;
+    vtkSmartPointer<vtkIntArray> array = request.Buffer;
     int total = array->GetNumberOfTuples ();
     int index = 0;
     while (index < total)
@@ -1082,7 +1070,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
       continue; 
       }
 
-    vtkIntArray* array = vtkIntArray::New ();
+    vtkSmartPointer<vtkIntArray> array = vtkSmartPointer<vtkIntArray>::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (1);
 
@@ -1099,7 +1087,6 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
 
     this->ReceiveList[i].clear ();
     receiveList.push_back(request);
-    array->Delete ();
     }
 
   vtkAMRConnectivityCommRequestList sendList;
@@ -1110,7 +1097,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
       continue; 
       }
 
-    vtkIntArray* array = vtkIntArray::New ();
+    vtkSmartPointer<vtkIntArray> array = vtkSmartPointer<vtkIntArray>::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (1);
     int size = this->EquivPairs[i] == 0 ? 0 : this->EquivPairs[i]->GetNumberOfTuples ();
@@ -1128,7 +1115,6 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
                             request.Request);
 
     sendList.push_back(request);
-    array->Delete ();
     }
 
   std::vector<int> receive_sizes (numProcs);
@@ -1140,10 +1126,11 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
   while (!receiveList.empty())
     {
     vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
-    vtkIntArray* array = request.Buffer;
+    vtkSmartPointer<vtkIntArray> array = request.Buffer;
     receive_sizes[request.SendProcess] = array->GetTuple1 (0);
     }
-
+  
+  receiveList.clear ();
   sendList.WaitAll();
   sendList.clear ();
 
@@ -1154,7 +1141,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
       continue; 
       }
 
-    vtkIntArray* array = vtkIntArray::New ();
+    vtkSmartPointer<vtkIntArray> array = vtkSmartPointer<vtkIntArray>::New ();
     array->SetNumberOfComponents (1);
     array->SetNumberOfTuples (receive_sizes[i]);
 
@@ -1171,7 +1158,6 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
 
     this->ReceiveList[i].clear ();
     receiveList.push_back(request);
-    array->Delete ();
     }
 
   for (size_t i = 0; i < static_cast<unsigned int>(numProcs); i ++)
@@ -1200,7 +1186,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
   while (!receiveList.empty())
     {
     vtkAMRConnectivityCommRequest request = receiveList.WaitAny();
-    vtkIntArray* array = request.Buffer;
+    vtkSmartPointer<vtkIntArray> array = request.Buffer;
     for (int i = 0; i < array->GetNumberOfTuples (); i += 2)  
       {
       int v1 = array->GetValue (i);
@@ -1209,6 +1195,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs (vtkMPIController *controller)
       }
     }
 
+  receiveList.clear ();
   sendList.WaitAll();
   sendList.clear ();
 #endif /* PARAVIEW_USE_MPI */
