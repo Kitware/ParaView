@@ -267,7 +267,7 @@ void vtkInitializationHelper::Finalize()
     std::string userSettingsFilePath =
       vtkInitializationHelper::GetUserSettingsFilePath();
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
-    bool savingSucceeded = settings->SaveSettings(userSettingsFilePath.c_str());
+    bool savingSucceeded = settings->SaveSettingsToFile(userSettingsFilePath.c_str());
     if (!savingSucceeded)
       {
       vtkGenericWarningMacro(<< "Saving settings file to '"

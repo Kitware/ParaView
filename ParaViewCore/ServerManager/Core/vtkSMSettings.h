@@ -64,7 +64,7 @@
 // This class supports setting setting values. Settings modified through the
 // "Set*" methods modify thet setting collection that has priority
 // over all other collections. This collection can be saved to a text file in
-// JSON format using the SaveSettings() method.
+// JSON format using the SaveSettingsToFile() method.
 //
 // Some convenience methods for getting and setting proxy property values are
 // provided. GetProxySettings() sets the values of proxy properties that are
@@ -115,8 +115,8 @@ public:
   bool DistributeSettings();
 
   // Description:
-  // Save highest priority setting collection to file
-  bool SaveSettings(const std::string & filePath);
+  // Save highest priority setting collection to file.
+  bool SaveSettingsToFile(const std::string & filePath);
 
   // Description:
   // Check whether a setting is defined for the requested names.

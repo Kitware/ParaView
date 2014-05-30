@@ -56,6 +56,12 @@ class vtkSMSettings::vtkSMSettingsInternal {
 public:
   std::vector< SettingsCollection > SettingCollections;
   bool SettingCollectionsAreSorted;
+  bool IsModified;
+
+  void Modified()
+  {
+    this->IsModified = true;
+  }
 
   //----------------------------------------------------------------------------
   // Description:
@@ -110,8 +116,34 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  const Json::Value & GetSettingAtOrBelowPriority(const char* settingName,
-                                                  double priority)
+  const Json::Value & GetSettingBelowPriority(const char* settingName, double priority)
+  {
+    if (!this->SettingCollectionsAreSorted)
+      {
+      this->SortSettingCollections();
+      }
+
+    // Iterate over settings, checking higher priority settings first
+    for (size_t i = 0; i < this->SettingCollections.size(); ++i)
+      {
+      if (this->SettingCollections[i].Priority >= priority)
+        {
+        continue;
+        }
+
+      Json::Path settingPath(settingName);
+      const Json::Value & setting = settingPath.resolve(this->SettingCollections[i].Value);
+      if (!setting.isNull())
+        {
+        return setting;
+        }
+      }
+
+    return Json::Value::null;
+  }
+
+  //----------------------------------------------------------------------------
+  const Json::Value & GetSettingAtOrBelowPriority(const char* settingName, double priority)
   {
     if (!this->SettingCollectionsAreSorted)
       {
@@ -419,6 +451,9 @@ public:
     std::string root, leaf;
     this->SeparateBranchFromLeaf(settingName, root, leaf);
 
+    std::vector< T > previousValues;
+    this->GetSetting(settingName, previousValues);
+
     Json::Path settingPath(root.c_str());
     Json::Value & jsonValue = settingPath.make(this->SettingCollections[0].Value);
     jsonValue[leaf] = Json::Value::null;
@@ -430,12 +465,20 @@ public:
 
       for (size_t i = 0; i < values.size(); ++i)
         {
+        if (i >= previousValues.size() || previousValues[i] != values[i])
+          {
+          this->Modified();
+          }
         jsonValue[leaf][static_cast<Json::Value::ArrayIndex>(i)] = values[i];
         }
       }
     else
       {
-      jsonValue[leaf] = values[0];
+      if (previousValues.size() < 1 || previousValues[0] != values[0])
+        {
+        jsonValue[leaf] = values[0];
+        this->Modified();
+        }
       }
   }
 
@@ -447,14 +490,22 @@ public:
     Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
-      jsonValue = property->GetElement(0);
+      if (jsonValue.isNull() || jsonValue.asInt() != property->GetElement(0))
+        {
+        jsonValue = property->GetElement(0);
+        this->Modified();
+        }
       }
     else
       {
       jsonValue.resize(property->GetNumberOfElements());
       for (unsigned int i = 0; i < property->GetNumberOfElements(); ++i)
         {
-        jsonValue[i] = property->GetElement(i);
+        if (jsonValue[i].isNull() || jsonValue[i].asInt() != property->GetElement(i))
+          {
+          jsonValue[i] = property->GetElement(i);
+          this->Modified();
+          }
         }
       }
   }
@@ -467,14 +518,22 @@ public:
     Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
-      jsonValue = property->GetElement(0);
+      if (jsonValue.isNull() || jsonValue.asDouble() != property->GetElement(0))
+        {
+        jsonValue = property->GetElement(0);
+        this->Modified();
+        }
       }
     else
       {
       jsonValue.resize(property->GetNumberOfElements());
       for (unsigned int i = 0; i < property->GetNumberOfElements(); ++i)
         {
-        jsonValue[i] = property->GetElement(i);
+        if (jsonValue[i].isNull() || jsonValue[i].asDouble() != property->GetElement(i))
+          {
+          jsonValue[i] = property->GetElement(i);
+          this->Modified();
+          }
         }
       }
   }
@@ -487,14 +546,22 @@ public:
     Json::Value & jsonValue = valuePath.make(this->SettingCollections[0].Value);
     if (property->GetNumberOfElements() == 1)
       {
-      jsonValue = property->GetElement(0);
+      if (jsonValue.isNull() || strcmp(jsonValue.asCString(), property->GetElement(0)) != 0)
+        {
+        jsonValue = property->GetElement(0);
+        this->Modified();
+        }
       }
     else
       {
       jsonValue.resize(property->GetNumberOfElements());
       for (unsigned int i = 0; i < property->GetNumberOfElements(); ++i)
         {
-        jsonValue[i] = property->GetElement(i);
+        if (jsonValue[i].isNull() || strcmp(jsonValue[i].asCString(), property->GetElement(i)) != 0)
+          {
+          jsonValue[i] = property->GetElement(i);
+          this->Modified();
+          }
         }
       }
   }
@@ -602,11 +669,18 @@ public:
         }
       else if (property->IsValueDefault())
         {
-        // Remove existing JSON entry only if there is no lower-priority setting
-        if (this->GetSettingAtOrBelowPriority(propertySettingCString,
-                                              highestPriority).isNull())
+        // Remove existing JSON entry only if there is no
+        // lower-priority setting.  That's because if there is a
+        // lower-priority setting that is not default, we want to be
+        // able to set the value back to the default in the higher
+        // priority setting collection.
+        if (this->GetSettingBelowPriority(propertySettingCString,
+                                          highestPriority).isNull())
           {
-          proxyValue.removeMember(propertyName);
+          if (!proxyValue.removeMember(property->GetXMLName()).isNull())
+            {
+            this->Modified();
+            }
           continue;
           }
         }
@@ -615,7 +689,7 @@ public:
       propertySet = true;
       }
 
-    // Check if the proxy Json::Value is empty. If so, remove it.
+    // Check if the property wasn't set, remove it.
     if (!propertySet)
       {
       Json::Path parentPath(settingPrefix);
@@ -688,6 +762,7 @@ public:
       SettingsCollection newCollection;
       newCollection.Priority = VTK_DOUBLE_MAX;
       this->SettingCollections.push_back(newCollection);
+      this->IsModified = true;
       }
   }
 
@@ -702,6 +777,7 @@ vtkSMSettings::vtkSMSettings()
 {
   this->Internal = new vtkSMSettingsInternal();
   this->Internal->SettingCollectionsAreSorted = false;
+  this->Internal->IsModified = false;
 }
 
 //----------------------------------------------------------------------------
@@ -788,6 +864,7 @@ void vtkSMSettings::ClearAllSettings()
 {
   this->Internal->SettingCollections.clear();
   this->Internal->SettingCollectionsAreSorted = false;
+  this->Internal->IsModified = false;
 }
 
 //----------------------------------------------------------------------------
@@ -846,9 +923,10 @@ bool vtkSMSettings::DistributeSettings()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSettings::SaveSettings(const std::string & filePath)
+bool vtkSMSettings::SaveSettingsToFile(const std::string & filePath)
 {
-  if (this->Internal->SettingCollections.size() == 0)
+  if (this->Internal->SettingCollections.size() == 0 ||
+      !this->Internal->IsModified)
     {
     // No settings to save, so we'll always succeed.
     return true;
@@ -870,6 +948,8 @@ bool vtkSMSettings::SaveSettings(const std::string & filePath)
     {
     std::string output = this->Internal->SettingCollections[0].Value.toStyledString();
     settingsFile << output;
+
+    this->Internal->IsModified = false;
     return true;
     }
 
