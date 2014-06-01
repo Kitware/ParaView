@@ -93,6 +93,18 @@ namespace
       return this->PropertiesWithModifiedDomains;
       }
     };
+
+  // method to create a new proxy safely i.e. not produce warnings if definition
+  // is not available.
+  inline vtkSMProxy* vtkSafeNewProxy(vtkSMSessionProxyManager* pxm,
+    const char* group, const char* name)
+    {
+    if (pxm && pxm->GetPrototypeProxy(group, name))
+      {
+      return pxm->NewProxy(group, name);
+      }
+    return NULL;
+    }
 }
 
 vtkObjectFactoryNewMacro(vtkSMParaViewPipelineController);
@@ -363,7 +375,7 @@ bool vtkSMParaViewPipelineController::CreateAnimationHelpers(vtkSMProxy* proxy)
   for (unsigned int cc=0, max=source->GetNumberOfOutputPorts(); cc < max; cc++)
     {
     vtkSmartPointer<vtkSMProxy> helper;
-    helper.TakeReference(pxm->NewProxy("misc", "RepresentationAnimationHelper"));
+    helper.TakeReference(vtkSafeNewProxy(pxm, "misc", "RepresentationAnimationHelper"));
     if (helper) // since this is optional
       {
       this->PreInitializeProxy(helper);
@@ -417,7 +429,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
   vtkSmartPointer<vtkSMProxy> timeKeeper = this->FindTimeKeeper(session);
   if (!timeKeeper)
     {
-    timeKeeper.TakeReference(pxm->NewProxy("misc", "TimeKeeper"));
+    timeKeeper.TakeReference(vtkSafeNewProxy(pxm, "misc", "TimeKeeper"));
     if (!timeKeeper)
       {
       vtkErrorMacro("Failed to create 'TimeKeeper' proxy. ");
@@ -444,7 +456,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
   // Create the GlobalMapperPropertiesProxy (optional)
   // FIXME: these probably should not be created in collaboration mode on
   // non-master nodes.
-  vtkSMProxy* proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
+  vtkSMProxy* proxy = vtkSafeNewProxy(pxm, "misc", "GlobalMapperProperties");
   if (proxy)
     {
     this->InitializeProxy(proxy);
@@ -453,7 +465,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     }
 
   // Create Strict Load Balancing Proxy
-  proxy = pxm->NewProxy("misc", "StrictLoadBalancing");
+  proxy = vtkSafeNewProxy(pxm, "misc", "StrictLoadBalancing");
   if (proxy)
     {
     this->InitializeProxy(proxy);
@@ -468,7 +480,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
   proxy = pxm->GetProxy("global_properties", "ColorPalette");
   if (!proxy)
     {
-    proxy = pxm->NewProxy("misc", "ColorPalette");
+    proxy = vtkSafeNewProxy(pxm, "misc", "ColorPalette");
     if (proxy)
       {
       this->InitializeProxy(proxy);
@@ -519,7 +531,7 @@ vtkSMProxy* vtkSMParaViewPipelineController::GetAnimationScene(vtkSMSession* ses
   vtkSmartPointer<vtkSMProxy> animationScene = this->FindAnimationScene(session);
   if (!animationScene)
     {
-    animationScene.TakeReference(pxm->NewProxy("animation", "AnimationScene"));
+    animationScene.TakeReference(vtkSafeNewProxy(pxm, "animation", "AnimationScene"));
     if (animationScene)
       {
       this->PreInitializeProxy(animationScene);
@@ -583,7 +595,7 @@ vtkSMProxy* vtkSMParaViewPipelineController::GetTimeAnimationTrack(vtkSMProxy* s
   vtkSMSessionProxyManager* pxm = scene->GetSessionProxyManager();
   assert(pxm);
 
-  cue.TakeReference(pxm->NewProxy("animation", "TimeAnimationCue"));
+  cue.TakeReference(vtkSafeNewProxy(pxm, "animation", "TimeAnimationCue"));
   if (!cue)
     {
     return NULL;
@@ -981,7 +993,7 @@ void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* sessio
     vtkSMProxy* proxy = pxm->GetProxy(iter->GetGroupName(), iter->GetProxyName());
     if (!proxy)
       {
-      proxy = pxm->NewProxy(iter->GetGroupName(), iter->GetProxyName());
+      proxy = vtkSafeNewProxy(pxm, iter->GetGroupName(), iter->GetProxyName());
       if (proxy)
         {
         this->InitializeProxy(proxy);
