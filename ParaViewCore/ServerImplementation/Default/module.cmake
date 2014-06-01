@@ -1,9 +1,0 @@
-vtk_module(vtkPVServerImplementationDefault
-  DEPENDS
-    vtkPVServerImplementationRendering
-    vtkPVClientServerCoreDefault
-  TEST_DEPENDS
-    vtkTestingCore
-  TEST_LABELS
-    PARAVIEW
-)

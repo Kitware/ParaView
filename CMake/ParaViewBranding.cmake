@@ -274,9 +274,11 @@ FUNCTION(build_paraview_client BPC_NAME)
                 )
     SET (EXE_SRCS)
     TARGET_LINK_LIBRARIES(pq${BPC_NAME}Initializer
-      pqApplicationComponents
-      ${QT_QTMAIN_LIBRARY}
-      ${BPC_EXTRA_DEPENDENCIES}
+      LINK_PRIVATE
+        pqApplicationComponents
+        vtkPVServerManagerApplication
+        ${QT_QTMAIN_LIBRARY}
+        ${BPC_EXTRA_DEPENDENCIES}
       )
 
     IF (PV_INSTALL_LIB_DIR)
@@ -301,14 +303,17 @@ FUNCTION(build_paraview_client BPC_NAME)
                  ${EXE_SRCS}
                  )
   TARGET_LINK_LIBRARIES(${BPC_NAME}
-    pqApplicationComponents
-    ${QT_QTMAIN_LIBRARY}
-    ${BPC_EXTRA_DEPENDENCIES}
+      LINK_PRIVATE
+        pqApplicationComponents
+        vtkPVServerManagerApplication
+        ${QT_QTMAIN_LIBRARY}
+        ${BPC_EXTRA_DEPENDENCIES}
     )
 
   IF (BPC_MAKE_INITIALIZER_LIBRARY)
     TARGET_LINK_LIBRARIES(${BPC_NAME}
-      pq${BPC_NAME}Initializer)
+      LINK_PRIVATE
+        pq${BPC_NAME}Initializer)
   ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
 
   if (pv_exe_suffix)

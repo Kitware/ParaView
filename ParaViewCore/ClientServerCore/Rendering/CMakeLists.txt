@@ -33,6 +33,7 @@ set (Module_SRCS
   vtkAMROutlineRepresentation.cxx
   vtkAMRStreamingPriorityQueue.cxx
   vtkAMRStreamingVolumeRepresentation.cxx
+  vtkCacheSizeKeeper.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkChartSelectionRepresentation.cxx
@@ -107,11 +108,13 @@ if (PARAVIEW_USE_ICE_T)
     vtkIceTSynchronizedRenderers.cxx)
 endif()
 
-#set_source_files_properties(
-#  WRAP_EXCLUDE
-#  )
+set_source_files_properties(
+  vtkCacheSizeKeeper
+  WRAP_EXCLUDE
+)
 
 set_source_files_properties(
+  vtkCacheSizeKeeper
   vtkPVContextView
   vtkPVDataRepresentation
   vtkPVSynchronizedRenderWindows

@@ -4,10 +4,13 @@ vtk_module(pqCore
   DEPENDS
     pqWidgets
     vtkGUISupportQt
+  PRIVATE_DEPENDS
+    vtkPVAnimation
+    vtkPVClientServerCoreDefault
     vtkPVServerManagerApplication
     vtkPVServerManagerDefault
-  PRIVATE_DEPENDS
     vtksys
+    vtkTestingRendering
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW

@@ -17,7 +17,6 @@
 #include "vtkAMRDualClip.h"
 #include "vtkAMRDualContour.h"
 #include "vtkAMRDualGridHelper.h"
-#include "vtkAnimationPlayer.h"
 #include "vtkAppendArcLength.h"
 #include "vtkAppendRectilinearGrid.h"
 #include "vtkAttributeDataReductionFilter.h"
@@ -31,7 +30,6 @@
 #include "vtkCellIntegrator.h"
 #include "vtkCleanArrays.h"
 #include "vtkCleanUnstructuredGrid.h"
-#include "vtkCompositeAnimationPlayer.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkCSVExporter.h"
 #include "vtkCSVWriter.h"
@@ -89,19 +87,15 @@
 #include "vtkPSciVizMultiCorrelativeStats.h"
 #include "vtkPSciVizPCAStats.h"
 #include "vtkPVAMRDualClip.h"
-#include "vtkPVAnimationCue.h"
-#include "vtkPVAnimationScene.h"
 #include "vtkPVArrayCalculator.h"
 #include "vtkPVArrowSource.h"
 #include "vtkPVAxesActor.h"
 #include "vtkPVAxesWidget.h"
-#include "vtkPVBooleanKeyFrame.h"
 #include "vtkPVBox.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVClipClosedSurface.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPVCompositeDataPipeline.h"
-#include "vtkPVCompositeKeyFrame.h"
 #include "vtkPVConnectivityFilter.h"
 #include "vtkPVContourFilter.h"
 #include "vtkPVCueManipulator.h"
@@ -110,7 +104,6 @@
 #include "vtkPVEnSightMasterServerReader.h"
 #include "vtkPVEnSightMasterServerReader2.h"
 #include "vtkPVEnSightMasterServerTranslator.h"
-#include "vtkPVExponentialKeyFrame.h"
 #include "vtkPVExtentTranslator.h"
 #include "vtkPVExtractVOI.h"
 #include "vtkPVFrustumActor.h"
@@ -121,9 +114,6 @@
 #include "vtkPVJoystickFly.h"
 #include "vtkPVJoystickFlyIn.h"
 #include "vtkPVJoystickFlyOut.h"
-#include "vtkPVKeyFrame.h"
-#include "vtkPVKeyFrameAnimationCue.h"
-#include "vtkPVKeyFrameCueManipulator.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLODVolume.h"
@@ -132,12 +122,10 @@
 #include "vtkPVPlane.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVPostFilterExecutive.h"
-#include "vtkPVRampKeyFrame.h"
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVScalarBarActor.h"
 #include "vtkPVSelectionSource.h"
-#include "vtkPVSinusoidKeyFrame.h"
 #include "vtkPVTextSource.h"
 #include "vtkPVTrackballMoveActor.h"
 #include "vtkPVTrackballMultiRotate.h"
@@ -150,7 +138,6 @@
 #include "vtkPVTrivialProducer.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkQuerySelectionSource.h"
-#include "vtkRealtimeAnimationPlayer.h"
 #include "vtkRectilinearGridConnectivity.h"
 #include "vtkReductionFilter.h"
 #include "vtkScatterPlotMapper.h"
@@ -158,7 +145,6 @@
 #include "vtkSciVizStatistics.h"
 #include "vtkSelectionConverter.h"
 #include "vtkSelectionSerializer.h"
-#include "vtkSequenceAnimationPlayer.h"
 #include "vtkSortedTableStreamer.h"
 #include "vtkSpyPlotBlock.h"
 #include "vtkSpyPlotBlockIterator.h"
@@ -172,7 +158,6 @@
 #include "vtkTexturePainter.h"
 #include "vtkTilesHelper.h"
 #include "vtkTileDisplayHelper.h"
-#include "vtkTimestepsAnimationPlayer.h"
 #include "vtkTimeToTextConvertor.h"
 #include "vtkTrackballPan.h"
 #include "vtkTransferFunctionEditorRepresentation.h"
@@ -219,7 +204,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkAMRDualClip);
   PRINT_SELF(vtkAMRDualContour);
   PRINT_SELF(vtkAMRDualGridHelper);
-  PRINT_SELF(vtkAnimationPlayer);
   PRINT_SELF(vtkAppendArcLength);
   PRINT_SELF(vtkAppendRectilinearGrid);
   PRINT_SELF(vtkAttributeDataReductionFilter);
@@ -232,7 +216,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkCellIntegrator);
   PRINT_SELF(vtkCleanArrays);
   PRINT_SELF(vtkCleanUnstructuredGrid);
-  PRINT_SELF(vtkCompositeAnimationPlayer);
   PRINT_SELF(vtkCompositeDataToUnstructuredGridFilter);
   PRINT_SELF(vtkCSVExporter);
   PRINT_SELF(vtkCSVWriter);
@@ -290,19 +273,15 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPSciVizMultiCorrelativeStats);
   PRINT_SELF(vtkPSciVizPCAStats);
   PRINT_SELF(vtkPVAMRDualClip);
-  PRINT_SELF(vtkPVAnimationCue);
-  PRINT_SELF(vtkPVAnimationScene);
   PRINT_SELF(vtkPVArrayCalculator);
   PRINT_SELF(vtkPVArrowSource);
   PRINT_SELF(vtkPVAxesActor);
   PRINT_SELF(vtkPVAxesWidget);
-  PRINT_SELF(vtkPVBooleanKeyFrame);
   PRINT_SELF(vtkPVBox);
   PRINT_SELF(vtkPVCenterAxesActor);
   PRINT_SELF(vtkPVClipClosedSurface);
   PRINT_SELF(vtkPVClipDataSet);
   PRINT_SELF(vtkPVCompositeDataPipeline);
-  PRINT_SELF(vtkPVCompositeKeyFrame);
   PRINT_SELF(vtkPVConnectivityFilter);
   PRINT_SELF(vtkPVContourFilter);
   PRINT_SELF(vtkPVCueManipulator);
@@ -311,7 +290,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVEnSightMasterServerReader);
   PRINT_SELF(vtkPVEnSightMasterServerReader2);
   PRINT_SELF(vtkPVEnSightMasterServerTranslator);
-  PRINT_SELF(vtkPVExponentialKeyFrame);
   PRINT_SELF(vtkPVExtentTranslator);
   PRINT_SELF(vtkPVExtractVOI);
   PRINT_SELF(vtkPVFrustumActor);
@@ -322,9 +300,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVJoystickFly);
   PRINT_SELF(vtkPVJoystickFlyIn);
   PRINT_SELF(vtkPVJoystickFlyOut);
-  PRINT_SELF(vtkPVKeyFrame);
-  PRINT_SELF(vtkPVKeyFrameAnimationCue);
-  PRINT_SELF(vtkPVKeyFrameCueManipulator);
   PRINT_SELF(vtkPVLinearExtrusionFilter);
   PRINT_SELF(vtkPVLODActor);
   PRINT_SELF(vtkPVLODVolume);
@@ -333,12 +308,10 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVPlane);
   PRINT_SELF(vtkPVPostFilter);
   PRINT_SELF(vtkPVPostFilterExecutive);
-  PRINT_SELF(vtkPVRampKeyFrame);
   PRINT_SELF(vtkPVRecoverGeometryWireframe);
   PRINT_SELF(vtkPVRenderViewProxy);
   PRINT_SELF(vtkPVScalarBarActor);
   PRINT_SELF(vtkPVSelectionSource);
-  PRINT_SELF(vtkPVSinusoidKeyFrame);
   PRINT_SELF(vtkPVTextSource);
   PRINT_SELF(vtkPVTrackballMoveActor);
   PRINT_SELF(vtkPVTrackballMultiRotate);
@@ -351,7 +324,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVTrivialProducer);
   PRINT_SELF(vtkPVUpdateSuppressor);
   PRINT_SELF(vtkQuerySelectionSource);
-  PRINT_SELF(vtkRealtimeAnimationPlayer);
   PRINT_SELF(vtkRectilinearGridConnectivity);
   PRINT_SELF(vtkReductionFilter);
   PRINT_SELF(vtkScatterPlotMapper);
@@ -359,7 +331,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkSciVizStatistics);
   PRINT_SELF(vtkSelectionConverter);
   PRINT_SELF(vtkSelectionSerializer);
-  PRINT_SELF(vtkSequenceAnimationPlayer);
   PRINT_SELF(vtkSortedTableStreamer);
   //PRINT_SELF(vtkSpyPlotBlock);
   //PRINT_SELF(vtkSpyPlotBlockIterator);
@@ -373,7 +344,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkTexturePainter);
   //PRINT_SELF(vtkTilesHelper);
   //PRINT_SELF(vtkTileDisplayHelper);
-  PRINT_SELF(vtkTimestepsAnimationPlayer);
   PRINT_SELF(vtkTimeToTextConvertor);
   PRINT_SELF(vtkTrackballPan);
   PRINT_SELF(vtkTransferFunctionEditorRepresentation);

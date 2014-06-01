@@ -178,9 +178,6 @@ set_source_files_properties(
   vtkTransferFunctionEditorWidget1D
   ABSTRACT)
 
-vtk_module_load(vtkIOInfovis)
-include_directories(${vtkIOInfovis_INCLUDE_DIRS})
-
 # Use a custom hints file for this module.
 set(${vtk-module}_WRAP_HINTS "${CMAKE_CURRENT_SOURCE_DIR}/hints")
 vtk_module_library(vtkPVVTKExtensionsDefault ${Module_SRCS})

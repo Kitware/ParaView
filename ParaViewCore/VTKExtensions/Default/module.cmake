@@ -19,7 +19,8 @@ vtk_module(vtkPVVTKExtensionsDefault
     vtkPVVTKExtensionsRendering
     vtkIOParallel
     ${_dependencies}
-    vtknetcdf
   PRIVATE_DEPENDS
+    vtkIOInfovis
+    vtknetcdf
     vtksys
 )

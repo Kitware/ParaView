@@ -338,6 +338,9 @@ set(_vtk_modules
 
   vtkPVServerManagerDefault
   # Needed by plugins
+
+  vtkPVAnimation
+  # Needed for animation support.
   )
 
 if (PARAVIEW_USE_MPI)

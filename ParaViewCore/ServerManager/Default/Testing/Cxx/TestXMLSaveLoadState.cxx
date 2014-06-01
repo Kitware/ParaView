@@ -14,7 +14,6 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkInitializationHelper.h"
 #include "vtkProcessModule.h"
-#include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"

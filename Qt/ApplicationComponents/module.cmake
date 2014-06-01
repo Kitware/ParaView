@@ -5,6 +5,9 @@ vtk_module(pqApplicationComponents
     pqComponents
     vtkGUISupportQt
   PRIVATE_DEPENDS
+    vtkPVAnimation
+    vtkPVServerManagerDefault
+    vtkPVServerManagerRendering
     vtksys
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
