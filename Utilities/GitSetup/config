@@ -1,0 +1,13 @@
+[hooks]
+	url = http://paraview.org/ParaView.git
+[ssh]
+	host = paraview.org
+	key = id_git_paraview
+	request-url = https://www.kitware.com/Admin/SendPassword.cgi
+[stage]
+	url = git://paraview.org/stage/ParaView.git
+	pushurl = git@paraview.org:stage/ParaView.git
+[gerrit]
+	project = ParaView
+	site = http://review.source.kitware.com
+	pushurl = $username@review.source.kitware.com:ParaView
