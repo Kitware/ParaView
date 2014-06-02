@@ -138,16 +138,6 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 
   if (use_mpi || mpi_already_initialized)
     {
-    // Get number of ranks passed to mpiexec/mpirun etc.
-    int numRanks = 0;
-    MPI_Comm_size(MPI_COMM_WORLD,&numRanks);
-
-    // Ensure that the user cannot run a client with more than one rank.
-    if (type==PROCESS_CLIENT && numRanks > 1)
-      {
-      throw std::runtime_error("Client process should be run with one process!");
-      }
-
     if(vtkMPIController* controller = vtkMPIController::SafeDownCast(
          vtkMultiProcessController::GetGlobalController()))
       {
@@ -159,6 +149,14 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
       vtkProcessModule::GlobalController->Initialize(
         &argc, &argv, /*initializedExternally*/1);
       }
+    // Get number of ranks in this process group
+    int numRanks = vtkProcessModule::GlobalController->GetNumberOfProcesses();
+    // Ensure that the user cannot run a client with more than one rank.
+    if (type==PROCESS_CLIENT && numRanks > 1)
+      {
+      throw std::runtime_error("Client process should be run with one process!");
+      }
+
     }
 #else
   static_cast<void>(argc); // unused warning when MPI is off
