@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataRepresentation.h"
 #include "vtkDataSetWriter.h"
 #include "vtkFloatArray.h"
-#include "vtkIceTSynchronizedRenderers.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
 #include "vtkNew.h"
@@ -43,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_USE_ICE_T
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
@@ -53,6 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedCharArray.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
+
+#ifdef PARAVIEW_USE_ICE_T
+# include "vtkIceTSynchronizedRenderers.h"
+#endif
 
 #include <map>
 #include <set>
@@ -198,6 +202,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   vtkFloatArray* CaptureZBuffer()
   {
   this->ArrayHolder = vtkSmartPointer<vtkFloatArray>::New();
+#ifdef PARAVIEW_USE_ICE_T
   if (this->IceTSynchronizedRenderers)
     {
     vtkIceTCompositePass* iceTPass = this->IceTSynchronizedRenderers->GetIceTCompositePass();
@@ -207,6 +212,7 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
       }
     }
   else
+#endif
     {
     this->ZGrabber->Modified();
     this->ZGrabber->Update();
@@ -479,7 +485,9 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   }
 
   //----------------------------------------------------------------------------
+#ifdef PARAVIEW_USE_ICE_T
   vtkWeakPointer<vtkIceTSynchronizedRenderers> IceTSynchronizedRenderers;
+#endif
 
   vtkNew<vtkJPEGWriter> JPEGWriter;
   vtkNew<vtkPNGWriter> PNGWriter;
@@ -542,10 +550,12 @@ void vtkPVRenderViewForAssembly::Initialize(unsigned int id)
 {
   this->Superclass::Initialize(id);
 
+#ifdef PARAVIEW_USE_ICE_T
   // If vtkIceTSynchronizedRenderers is used, we'll use that to access frame buffers.
   this->Internal->IceTSynchronizedRenderers =
     vtkIceTSynchronizedRenderers::SafeDownCast(
       this->SynchronizedRenderers->GetParallelSynchronizer());
+#endif
 }
 
 //----------------------------------------------------------------------------
