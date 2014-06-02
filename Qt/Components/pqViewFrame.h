@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QDragEnterEvent;
 class QDragMoveEvent;
 class QDropEvent;
+class QLabel;
 class QMenu;
 class QToolBar;
 class QToolButton;
@@ -59,8 +60,8 @@ public:
 
   /// Get/Set the window title. If not empty, the title is shown in the
   /// title-bar.
-  void setTitle(const QString& text) { this->Title = text; }
-  const QString& title() const { return this->Title; }
+  void setTitle(const QString& text);
+  QString title() const;
 
   /// Get/Set the central widget shown in this frame.
   void setCentralWidget(QWidget* widget);
@@ -165,11 +166,11 @@ protected:
   bool TitleBarVisible;
   bool BorderVisible;
   QColor BorderColor;
-  QString Title;
   StandardButtons Buttons;
   QPointer<QWidget> CentralWidget;
   QPointer<QWidget> TitleBar;
   QPointer<QToolBar> ToolBar;
+  QPointer<QLabel> TitleLabel;
   QMenu* ContextMenu;
   QUuid UniqueID;
   QPoint DragStartPosition;
