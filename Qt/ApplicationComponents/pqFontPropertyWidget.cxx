@@ -106,6 +106,17 @@ pqFontPropertyWidget::pqFontPropertyWidget(
     ui.FontColor->hide();
     }
   
+  smproperty = smgroup->GetProperty("Opacity");
+  if (smproperty)
+    {
+    this->addPropertyLink(ui.Opacity, "value", SIGNAL(valueChanged(double)),
+      smproperty);
+    }
+  else
+    {
+    ui.Opacity->hide();
+    }
+
   smproperty = smgroup->GetProperty("Bold");
   if (smproperty)
     {

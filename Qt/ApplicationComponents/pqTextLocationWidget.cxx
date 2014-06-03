@@ -70,7 +70,7 @@ pqTextLocationWidget::pqTextLocationWidget(
     {
     this->addPropertyLink(this, "windowLocation",
       SIGNAL(windowLocationChanged(QString&)), smproperty);
-    QObject::connect(ui.groupBoxLocation, SIGNAL(clicked(bool)),
+    QObject::connect(ui.groupBoxLocation, SIGNAL(toggled(bool)),
       this, SLOT(groupBoxLocationClicked(bool)));
     QObject::connect(ui.buttonGroupLocation, SIGNAL(
         buttonClicked(QAbstractButton*)),
@@ -85,7 +85,7 @@ pqTextLocationWidget::pqTextLocationWidget(
   smproperty = smgroup->GetProperty("Position");
   if(smproperty)
     {
-    QObject::connect(ui.groupBoxPosition, SIGNAL(clicked(bool)),
+    QObject::connect(ui.groupBoxPosition, SIGNAL(toggled(bool)),
       this, SLOT(groupBoxPositionClicked(bool)));
     this->addPropertyLink(ui.doubleSpinBox_Pos1X, "value",
       SIGNAL(valueChanged(double)), smproperty, 0);
@@ -125,7 +125,9 @@ QString pqTextLocationWidget::windowLocation() const
 //-----------------------------------------------------------------------------
 void pqTextLocationWidget::groupBoxLocationClicked(bool enable)
 {
+  this->Internals->Ui.groupBoxPosition->blockSignals(true);
   this->Internals->Ui.groupBoxPosition->setChecked(!enable);
+  this->Internals->Ui.groupBoxPosition->blockSignals(false);
   if(!enable)
     {
     QString str("AnyLocation");
@@ -140,7 +142,9 @@ void pqTextLocationWidget::groupBoxLocationClicked(bool enable)
 //-----------------------------------------------------------------------------
 void pqTextLocationWidget::groupBoxPositionClicked(bool enable)
 {
+  this->Internals->Ui.groupBoxLocation->blockSignals(true);
   this->Internals->Ui.groupBoxLocation->setChecked(!enable);
+  this->Internals->Ui.groupBoxLocation->blockSignals(false);
   if(enable)
     {
     QString str("AnyLocation");
