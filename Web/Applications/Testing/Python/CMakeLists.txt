@@ -3,7 +3,7 @@
 ###
 
 find_package(PythonInterp 2.7)
-if(NOT ${PythonInterp_FOUND})
+if(NOT ${PYTHONINTERP_FOUND})
   message(STATUS "Sufficient Python version not found, disabling pvweb tests")
   return()
 endif()
