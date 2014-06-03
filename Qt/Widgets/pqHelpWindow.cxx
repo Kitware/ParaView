@@ -32,156 +32,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpWindow.h"
 #include "ui_pqHelpWindow.h"
 
-#include <QByteArray>
-#include <QByteArray>
-#include <QFileInfo>
-#include <QHelpContentItem>
-#include <QHelpContentModel>
+#include <QDebug>
+#include <QDesktopServices>
 #include <QHelpContentWidget>
 #include <QHelpEngine>
 #include <QHelpIndexWidget>
 #include <QHelpSearchEngine>
 #include <QHelpSearchQueryWidget>
 #include <QHelpSearchResultWidget>
-#include <QPointer>
-#include <QtDebug>
-#include <QTimer>
+#include <QTextBrowser>
 #include <QUrl>
-#include <QLabel>
 
-#ifndef PQWIDGETS_DISABLE_QTWEBKIT
-# include <QtNetwork/QNetworkReply>
-# include <QNetworkAccessManager>
-# include <QNetworkProxy>
-# include <QWebPage>
-# include <QWebView>
-#endif
-
-#ifndef PQWIDGETS_DISABLE_QTWEBKIT
 namespace
 {
 
 // ****************************************************************************
-//            CLASS pqHelpWindowNetworkReply
+//            CLASS pqTextBrowser
 // ****************************************************************************
-/// Internal class used to add support to QWebView to load files from
-/// QHelpEngine.
-class pqHelpWindowNetworkReply : public QNetworkReply
+/// Internal class used to add overload the QTextBrowser
+class pqTextBrowser : public QTextBrowser
 {
-  typedef QNetworkReply Superclass;
 public:
-  pqHelpWindowNetworkReply(const QUrl& url, QHelpEngineCore* helpEngine);
-
-  virtual void abort() {}
-  virtual qint64 bytesAvailable() const
+  pqTextBrowser(QHelpEngine* helpEngine, QWidget* parent = 0)
     {
-    return (this->RawData.size() - this->Offset) +
-      this->Superclass::bytesAvailable();
+    this->HelpEngine = helpEngine;
+    this->setParent(parent);
     }
-  virtual bool isSequential() const {return true;}
+
 protected:
-  virtual qint64 readData(char *data, qint64 maxSize);
-
-  QByteArray RawData;
-  qint64 Offset;
-private:
-  Q_DISABLE_COPY(pqHelpWindowNetworkReply)
-};
-
-//-----------------------------------------------------------------------------
-pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(
-  const QUrl& my_url, QHelpEngineCore* engine) : Superclass(engine), Offset(0)
-{
-  Q_ASSERT(engine);
-
-  this->RawData = engine->fileData(my_url);
-
-  QString content_type = "text/plain";
-  QString extension = QFileInfo(my_url.path()).suffix().toLower();
-  QMap<QString, QString> extension_type_map;
-  extension_type_map["jpg"]   = "image/jpeg";
-  extension_type_map["jpeg"]  = "image/jpeg";
-  extension_type_map["png"]   = "image/png";
-  extension_type_map["gif"]   = "image/gif";
-  extension_type_map["tiff"]  = "image/tiff";
-  extension_type_map["htm"]   = "text/html";
-  extension_type_map["html"]  = "text/html";
-  extension_type_map["css"]   = "text/css";
-  extension_type_map["xml"]   = "text/xml";
-
-  if (extension_type_map.contains(extension))
+  /// Implementation reference from:
+  /// http://doc.qt.digia.com/qq/qq28-qthelp.html
+  QVariant loadResource(int type, const QUrl &url)
     {
-    content_type = extension_type_map[extension];
-    }
-
-  this->setHeader(QNetworkRequest::ContentLengthHeader,
-    QVariant(this->RawData.size()));
-  this->setHeader(QNetworkRequest::ContentTypeHeader, content_type);
-  this->open(QIODevice::ReadOnly|QIODevice::Unbuffered);
-  this->setUrl(my_url);
-  QTimer::singleShot(0, this, SIGNAL(readyRead()));
-  QTimer::singleShot(0, this, SLOT(finished()));
-}
-
-//-----------------------------------------------------------------------------
-qint64 pqHelpWindowNetworkReply::readData(char *data, qint64 maxSize)
-{
-  if (this->Offset <= this->RawData.size())
-    {
-    qint64 end = qMin(this->Offset + maxSize,
-      static_cast<qint64>(this->RawData.size()));
-    qint64 delta = end - this->Offset;
-    memcpy(data, this->RawData.constData() + this->Offset, delta);
-    this->Offset += delta;
-    return delta;
-    }
-  return -1;
-}
-}
-
-
-// ****************************************************************************
-//    CLASS pqHelpWindow::pqNetworkAccessManager
-// ****************************************************************************
-//-----------------------------------------------------------------------------
-class pqHelpWindow::pqNetworkAccessManager : public QNetworkAccessManager
-{
-  typedef QNetworkAccessManager Superclass;
-  QPointer<QHelpEngineCore> Engine;
-public:
-  pqNetworkAccessManager(
-    QHelpEngineCore* helpEngine, QNetworkAccessManager *manager,
-    QObject *parentObject) :
-    Superclass(parentObject),
-    Engine(helpEngine)
-  {
-  Q_ASSERT(manager != NULL && helpEngine != NULL);
-
-  this->setCache(manager->cache());
-  this->setCookieJar(manager->cookieJar());
-  this->setProxy(manager->proxy());
-  this->setProxyFactory(manager->proxyFactory());
-  }
-
-protected:    
-  virtual QNetworkReply *createRequest(
-    Operation operation, const QNetworkRequest &request, QIODevice *device)
-    {
-    if (request.url().scheme() == "qthelp" && operation == GetOperation)
+    if (url.scheme() == "qthelp")
       {
-      return new pqHelpWindowNetworkReply(request.url(), this->Engine);
+      return QVariant(this->HelpEngine->fileData(url));
       }
     else
       {
-      return this->Superclass::createRequest(operation, request, device);
+      return QTextBrowser::loadResource(type, url);
       }
     }
 
-private:
-  Q_DISABLE_COPY(pqNetworkAccessManager);
+  QHelpEngine* HelpEngine;
 };
 
-#endif // end of ifndef PQWIDGETS_DISABLE_QTWEBKIT
+} // end of namespace
 
 // ****************************************************************************
 //            CLASS pqHelpWindow
@@ -221,26 +117,16 @@ pqHelpWindow::pqHelpWindow(
     SIGNAL(requestShowLink(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
 
-#ifndef PQWIDGETS_DISABLE_QTWEBKIT
-  this->Browser = new QWebView(this);
+  this->Browser = new pqTextBrowser(engine, this);
+  this->Browser->setOpenLinks(false);
   this->setCentralWidget(this->Browser);
 
-  QNetworkAccessManager *oldManager = this->Browser->page()->networkAccessManager();
-  pqNetworkAccessManager* newManager = new pqNetworkAccessManager(
-    this->HelpEngine, oldManager, this);
-  this->Browser->page()->setNetworkAccessManager(newManager);
-  this->Browser->page()->setForwardUnsupportedContent(false);
-    
   QObject::connect(
     this->HelpEngine->contentWidget(), SIGNAL(linkActivated(const QUrl&)),
     this, SLOT(showPage(const QUrl&)));
-#else
-  this->Browser = NULL;
-  QLabel* label = new QLabel(this);
-  label->setText(
-    "<html><center><b>QtWebKit support was not enabled. Hence help is not available.</b></center></html>");
-  this->setCentralWidget(label);
-#endif
+  QObject::connect(
+    this->Browser, SIGNAL(anchorClicked(const QUrl&)),
+    this, SLOT(showPage(const QUrl&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -251,17 +137,20 @@ pqHelpWindow::~pqHelpWindow()
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QString& url)
 {
-#ifndef PQWIDGETS_DISABLE_QTWEBKIT
-  this->Browser->setUrl(url);
-#endif
+  this->showPage(QUrl(url));
 }
 
 //-----------------------------------------------------------------------------
 void pqHelpWindow::showPage(const QUrl& url)
 {
-#ifndef PQWIDGETS_DISABLE_QTWEBKIT
-  this->Browser->setUrl(url);
-#endif
+  if (url.scheme() == "http")
+    {
+    QDesktopServices::openUrl(url);
+    }
+  else
+    {
+    this->Browser->setSource(url);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -282,7 +171,7 @@ void pqHelpWindow::showHomePage(const QString& namespace_name)
     {
     if (url.path().endsWith("index.html"))
       {
-      this->showPage(url.toString());
+      this->showPage(url);
       return;
       }
     }

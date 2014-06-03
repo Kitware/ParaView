@@ -37,9 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 
 class QHelpEngine;
-class QHelpEngineCore;
 class QUrl;
-class QWebView;
+class QTextBrowser;
 
 /// pqHelpWindow provides a assistant-like window  for showing help provided by
 /// a QHelpEngine.
@@ -71,13 +70,10 @@ protected slots:
 
 protected:
   QHelpEngine* HelpEngine;
-  QWebView* Browser;
+  QTextBrowser* Browser;
 
 private:
   Q_DISABLE_COPY(pqHelpWindow)
-
-  class pqNetworkAccessManager;
-  friend class pqNetworkAccessManager;
 };
 
 #endif
