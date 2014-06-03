@@ -98,10 +98,8 @@ pqHelpWindow::pqHelpWindow(
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-  this->tabifyDockWidget(ui.contentsDock, ui.indexDock);
-  this->tabifyDockWidget(ui.indexDock, ui.searchDock);
+  this->tabifyDockWidget(ui.contentsDock, ui.searchDock);
   ui.contentsDock->setWidget(this->HelpEngine->contentWidget());
-  ui.indexDock->setWidget(this->HelpEngine->indexWidget());
   ui.contentsDock->raise();
 
   QWidget* searchPane = new QWidget(this);
