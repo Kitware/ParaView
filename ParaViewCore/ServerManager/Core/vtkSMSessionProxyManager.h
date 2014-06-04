@@ -13,79 +13,93 @@
 
 =========================================================================*/
 // .NAME vtkSMSessionProxyManager
-//       responsible for creating and managing proxies for a given session
+//  The vtkSMSessionProxyManager is esponsible for creating and
+//  managing proxies for a given session.
+
 // .SECTION Description
 // vtkSMSessionProxyManager is an instance that creates and manages proxies
 // for a given session/server.
 // It maintains a map of XML elements (populated by the XML parser) from
 // which it can create and initialize proxies and properties.
 // Once a proxy is created, it can either be managed by the user code or
-// the proxy manager. For latter, pass the control of the proxy to the
+// the proxy manager. In the latter case, pass the control of the proxy to the
 // manager with RegisterProxy() and unregister it. At destruction, proxy
 // manager deletes all managed proxies.
 //
 // vtkSMSessionProxyManager is designed to work with only one session. When
-// the session on which is attach close, it has no meaning to live and should be
+// the session on which it is attached closes, it has no role and should be
 // deleted right away.
 // .SECTION See Also
 // vtkSMProxyDefinitionManager
 //
 // Basic XML Proxy definition documentation:
 //
+// <pre>
 // ------------- Proxy definition -------------
-//  <SourceProxy                   => Will create vtkSM + SourceProxy class
-//         name="SphereSource"     => Key used to create the proxy
-//         class="vtkSphereSource" => Concreate vtkClass that do the real job
-//         label="Sphere">         => Nice name used in menu and python shell
+//  <SourceProxy                   => Will create vtkSM + SourceProxy class.
+//         name="SphereSource"     => Key used to create the proxy.
+//         class="vtkSphereSource" => Concrete VTK class that does the real job.
+//         label="Sphere">         => Nice name used in menu and python shell.
+// </pre>
 //
+// <pre>
 // ----------- Property definition -----------
 //    <DoubleVectorProperty        => Will create vtkSM + DoubleVectorProperty
 //                                    and vtkSI + DoubleVectorProperty class by
 //                                    default.
 //         name="Center"           => Name of the property:
-//                                    vtkPropertyHelper(proxy, "Center").Set(0,1,2)
+//                                    Example usage: vtkPropertyHelper(proxy, "Center").Set(0,1,2)
 //         command="SetCenter"     => Real method name that will be called on
-//                                    vtkObject when the property will be updated.
-//         number_of_elements="3"  => Size of the vector
+//                                    vtkObject when the property is updated.
+//         number_of_elements="3"  => Size of the vector.
 //         animateable="1"         => Tell the animation view that property
-//                                    can be used as an evolving property
+//                                    can be used as an evolving property.
 //         default_values="0 0 0"> => The value that will be set at the
-//    </DoubleVectorProperty>         construction to the VTK object
+//    </DoubleVectorProperty>         construction to the VTK object.
 //  </SourceProxy>
+// </pre>
 //
 // For custom behaviour the user can add some extra attributes:
 //
 //  - We can specify a custom SIProperty class to handle in a custom way the
-//    data on the server.
-//      <StringVectorProperty          => vtkSMStringVectorProperty class
-//         name="ElementBlocksInfo"    => Property name
-//         information_only="1"        => Can only be used to fecth data
-//         si_class="vtkSISILProperty" => Class name to instanciate on the other side
-//         subtree="Blocks"/>          => Extra attribute used by vtkSISILProperty
+//    data on the server:
+// <pre>
+//      <StringVectorProperty          => vtkSMStringVectorProperty class.
+//         name="ElementBlocksInfo"    => Property name.
+//         information_only="1"        => Can only be used to fetch data.
+//         si_class="vtkSISILProperty" => Class name to instantiate on the other side.
+//         subtree="Blocks"/>          => Extra attribute used by vtkSISILProperty.
+// </pre>
 //
-//  - We can trigger after any update a command to be executed
+//  - We can trigger after any update a command to be executed:
+// <pre>
 //      <Proxy name="LookupTable"
 //             class="vtkLookupTable"
 //             post_push="Build"       => The method Build() will be called each
 //                                        time a new property value is pushed to
 //                                        the VTK object.
 //             processes="dataserver|renderserver|client" >
+// </pre>
 //
-//  - We can force any property to push its value as soon has it get changed
+//  - We can force any property to push its value as soon as it is changed:
+// <pre>
 //          <Property name="ResetFieldCriteria"
 //             command="ResetFieldCriteria"
 //             immediate_update="1">     => Modifying the property will result
-//                                          of a push of it and the execution
-//                                          of the command on the vtkObject.
+//                                          in an immediate push of it and the
+//                                          execution of the command on the vtkObject.
+// </pre>
 //
-//  - To show a source proxy or a filter inside the menu of ParaView we use a hint
+//  - To show a source proxy or a filter inside the menu of ParaView we use a hint:
+// <pre>
 //       <SourceProxy ...>
 //           <Hints>
-//              <ShowInMenu                  => The category attribute allow to
-//                  category="PersoFilter"/>    specify in which sub-menu this
-//                                              proxy should be in. (optional)
+//              <ShowInMenu                  => The category attribute enables
+//                  category="PersoFilter"/>    specification of the sub-menu in which
+//                                              this proxy should be listed. (optional)
 //           </Hints>
 //       </SourceProxy>
+// </pre>
 
 #ifndef __vtkSMSessionProxyManager_h
 #define __vtkSMSessionProxyManager_h
@@ -197,7 +211,7 @@ public:
 
   // Description:
   // Returns the prototype proxy for the given type. This method may create
-  // a new prototype proxy, is one does not already exist.
+  // a new prototype proxy, if one does not already exist.
   vtkSMProxy* GetPrototypeProxy(const char* groupname, const char* name);
 
   // Description:
@@ -230,20 +244,20 @@ public:
   vtkStdString GetUniqueProxyName(const char* groupname, const char* prefix);
 
   // Description:
-  // Is the proxy is in the given group, return it's name, otherwise
+  // If the proxy is in the given group, return its name, otherwise
   // return null. NOTE: Any following call to proxy manager might make
   // the returned pointer invalid.
   const char* IsProxyInGroup(vtkSMProxy* proxy, const char* groupname);
 
   // Description:
-  // Given its name, unregisters a proxy and remove it from the list
+  // Given its name, unregisters a proxy and removes it from the list
   // of managed proxies.
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
   void UnRegisterProxy(const char* name);
 
   // Description:
   // Given a proxy, unregisters it. This method unregisters the proxy
-  // from all the groups it has been registered in.
+  // from all the groups in which it has been registered.
   void UnRegisterProxy(vtkSMProxy* proxy);
 
   // Description:
@@ -372,7 +386,7 @@ public:
   // The server manager configuration XML may define <Hints /> element for
   // a proxy/property. Hints are metadata associated with the
   // proxy/property. The Server Manager does not (and should not) interpret
-  // the hints. Hints provide a mechanism to add GUI pertinant information
+  // the hints. Hints provide a mechanism to add GUI-pertinent information
   // to the server manager XML.  Returns the XML element for the hints
   // associated with this proxy/property, if any, otherwise returns NULL.
   vtkPVXMLElement* GetProxyHints(const char* xmlgroup, const char* xmlname);
@@ -422,14 +436,14 @@ public:
 
   // Description:
   // Method used to fetch the last state of the ProxyManager from the pvserver.
-  // This is used in the collaboration context when the user connect to a remote
-  // server and wants to update it state before doing anything.
+  // This is used in the collaboration context when the user connects to a remote
+  // server and wants to update its state before doing anything.
   void UpdateFromRemote();
     
   // Description:
-  // Those methods allow the user to make atomic change set in the notification
-  // collaboration in term of set of proxy registration.
-  // This allow us to prevent deletion on remote sites of proxies that
+  // These methods allow the user to make atomic change set in the notification
+  // collaboration in terms of set of proxy registration.
+  // This enables us to prevent deletion on remote sites of proxies that
   // will end up in the ProxyManager but have not been set into it yet.
   bool IsStateUpdateNotificationEnabled();
   void DisableStateUpdateNotification();
@@ -439,7 +453,7 @@ public:
 //BTX
 
   // Description:
-  // This method return the full object state that can be used to create that
+  // This method returns the full object state that can be used to create that
   // object from scratch.
   // This method will be used to fill the undo stack.
   // If not overriden this will return NULL.
@@ -495,6 +509,7 @@ protected:
   // parentElement is NULL.
   vtkPVXMLElement* AddInternalState(vtkPVXMLElement* parentElement);
 
+  // Description:
   // Recursively collects all proxies referred by the proxy in the set.
   void CollectReferredProxies( vtkSMProxyManagerProxySet& setOfProxies,
                                vtkSMProxy* proxy);
