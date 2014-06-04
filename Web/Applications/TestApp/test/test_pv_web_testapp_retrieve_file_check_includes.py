@@ -1,8 +1,14 @@
 
-import requests
-
 from vtk.web import testing
 from vtk.web.testing import WebTest
+
+dependencies_met = True
+
+try:
+    # import module for scripting HTTP requests from Python
+    import requests
+except:
+    dependencies_met = False
 
 
 # =============================================================================
@@ -25,6 +31,10 @@ class SimpleRequestBasedTest(WebTest) :
 
         # Continue with initialization of base classes
         WebTest.__init__(self, url=appUrl, **kwargs)
+
+    def checkdependencies(self):
+        if dependencies_met == False:
+            raise testing.DependencyError("Python module 'requests' is missing")
 
     def setup(self) :
         self.requestResult = requests.get(self.url)

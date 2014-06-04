@@ -70,12 +70,7 @@ function ParaViewWebTestFunctions(connection) {
                   return elt.name;
               });
 
-              var expectedNames = [ 'dualSphereAnimation',
-              'SPCTH',
-              'ExRestarts',
-              'ANALYZE',
-              'Iron Xdmf',
-              'iron protein.vtk'];
+              var expectedNames = [ 'sonic.pht', 'GMV'];
 
               var errorMsg = "Error testing vtk:listFiles -- ";
 
@@ -92,8 +87,7 @@ function ParaViewWebTestFunctions(connection) {
                 }
 
                 if (foundExpectedName === false) {
-                    errorMsg += "Item " + idx + ": found " + obj[idx].name +
-                        ", expected " + expectedNames[idx] + " ";
+                    errorMsg += "Did not find expected data item: " + expectedNames[idx] + " ";
                     returnValue = false;
                 }
               }

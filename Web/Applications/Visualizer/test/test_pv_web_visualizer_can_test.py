@@ -1,9 +1,14 @@
 
-# import modules for automating web testing using a real browser
-import selenium
-
 from vtk.web import testing
 from vtk.web.testing import ImageComparatorWebTest
+
+dependencies_met = True
+
+try:
+    # import modules for automating web testing using a real browser
+    import selenium, Image
+except:
+    dependencies_met = False
 
 
 # =============================================================================
@@ -29,7 +34,11 @@ class VisualizerCrushedCanTest(ImageComparatorWebTest) :
         appUrl = 'http://' + self.host + ':' + str(self.port) + self.urlPath
 
         # Continue with initialization of base classes
-        ImageComparatorWebTest.__init__(self, url=appUrl, size=(720, 480), **kwargs)
+        ImageComparatorWebTest.__init__(self, url=appUrl, size=(720, 520), **kwargs)
+
+    def checkdependencies(self):
+        if dependencies_met == False:
+            raise testing.DependencyError("One of python modules 'selenium' or 'Image' is missing")
 
     def setup(self) :
         testing.wait_with_timeout(delay=8)

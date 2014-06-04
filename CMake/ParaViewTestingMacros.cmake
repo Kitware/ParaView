@@ -203,22 +203,9 @@ ENDFUNCTION (add_pv_test)
 # Add macro to support addition of paraview web tests
 FUNCTION(add_pvweb_tests prefix)
   PV_PARSE_ARGUMENTS(ACT
-    "APP;TEST_SCRIPTS;BASELINE_DIR;COMMAND;ARGS;SERVER;DEPEND_MODS;BROWSER"
+    "APP;TEST_SCRIPTS;BASELINE_DIR;COMMAND;ARGS;SERVER;BROWSER"
     ""
     ${ARGN})
-
-  set(go_ahead_with_tests TRUE)
-
-  # First check that all requested Python modules are present
-  if(DEFINED ACT_DEPEND_MODS)
-    foreach(module_name ${ACT_DEPEND_MODS})
-      find_python_module(${module_name} got_${module_name})
-      if(NOT ${got_${module_name}})
-        message(STATUS "Missing Python module: ${module_name}")
-        set(go_ahead_with_tests FALSE)
-      endif()
-    endforeach()
-  endif()
 
   # If this batch of tests has baseline images that need to be
   # compared against, make sure to include the baseline image
@@ -242,10 +229,6 @@ FUNCTION(add_pvweb_tests prefix)
   # keep the code clean.
   if (NOT DEFINED ACT_BROWSER)
     set(ACT_BROWSER "nobrowser")
-  else()
-    # There is at least one browser test requested, so we need
-    # to find the selenium drivers
-    find_package(SeleniumDrivers)
   endif()
 
   while(ACT_BROWSER)
@@ -253,76 +236,42 @@ FUNCTION(add_pvweb_tests prefix)
     list(GET ACT_BROWSER 0 browser)
     list(REMOVE_AT ACT_BROWSER 0)
 
-    set(browser_${browser}_ok TRUE)
+    # Create a copy of the scripts list so we keep the original intact
+    set(TEST_SCRIPTS_LIST ${ACT_TEST_SCRIPTS})
 
-    # In this section, we make sure that the needed browser driver is
-    # installed on the system.  Some tests might not require selenium
-    # or an actual browser.
-    if(${browser} STREQUAL "nobrowser")
-      # Anything you need to do in the case of no browser.  Currently, nothing.
-    else()
-      if(${browser} STREQUAL "chrome")
-        if(${CHROMEDRIVER_EXECUTABLE} MATCHES "NOTFOUND")
-          set(browser_${browser}_ok FALSE)
-        endif()
-      elseif(${browser} STREQUAL "firefox")
-        if(${FIREFOXDRIVER_EXTENSION} MATCHES "NOTFOUND")
-          set(browser_${browser}_ok FALSE)
-        endif()
-      elseif(${browser} STREQUAL "internet_explorer")
-        if(${IEDRIVER_EXECUTABLE} MATCHES "NOTFOUND")
-          set(browser_${browser}_ok FALSE)
-        endif()
-      elseif(${browser} STREQUAL "safari")
-        if(${SAFARIDRIVER_EXTENSION} MATCHES "NOTFOUND")
-          set(browser_${browser}_ok FALSE)
-        endif()
+    while (TEST_SCRIPTS_LIST)
+      # pop test script path from the top of the list
+      list(GET TEST_SCRIPTS_LIST 0 test_path)
+      list(REMOVE_AT TEST_SCRIPTS_LIST 0)
+      GET_FILENAME_COMPONENT(script_name ${test_path} NAME_WE)
+
+      set(short_script_name ${script_name})
+
+      # Use a regular expression to remove the first 4 batches of
+      # underscore-separated character strings
+      if(${script_name} MATCHES "^[^_]+_[^_]+_[^_]+_[^_]+_(.+)")
+        set(short_script_name ${CMAKE_MATCH_1})
       endif()
-    endif()
 
-    # If we made it through checks for python modules and browser driver
-    # then we are ready to add the tests.
-    if(${go_ahead_with_tests} AND ${browser_${browser}_ok})
+      set(test_name "${prefix}-${browser}.${ACT_APP}-${short_script_name}")
+      set(test_image_file_name "${test_name}.png")
 
-      # Create a copy of the scripts list so we keep the original intact
-      set(TEST_SCRIPTS_LIST ${ACT_TEST_SCRIPTS})
-
-      while (TEST_SCRIPTS_LIST)
-        # pop test script path from the top of the list
-        list(GET TEST_SCRIPTS_LIST 0 test_path)
-        list(REMOVE_AT TEST_SCRIPTS_LIST 0)
-        GET_FILENAME_COMPONENT(script_name ${test_path} NAME_WE)
-
-        set(short_script_name ${script_name})
-
-        # Use a regular expression to remove the first 4 batches of
-        # underscore-separated character strings
-        if(${script_name} MATCHES "^[^_]+_[^_]+_[^_]+_[^_]+_(.+)")
-          set(short_script_name ${CMAKE_MATCH_1})
-        endif()
-
-        set(test_name "${prefix}-${browser}.${ACT_APP}-${short_script_name}")
-        set(test_image_file_name "${test_name}.png")
-
-        ExternalData_add_test(ParaViewData
-          NAME ${test_name}
-          COMMAND ${ACT_COMMAND}
-                  ${ACT_SERVER}
-                  --content ${ParaView_BINARY_DIR}/www
-                  --data-dir ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
-                  --port 8080
-                  ${ARGS}
-                  ${BASELINE_IMG_DIR}
-                  --run-test-script ${test_path}
-                  --test-use-browser ${browser}
-                  --temporary-directory ${PARAVIEW_TEST_OUTPUT_DIR}
-                  --test-image-file-name ${test_image_file_name}
-                  )
-        set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
-      endwhile()
-    else()
-      message(STATUS "${prefix}-${ACT_APP}-${browser} tests disabled, missing requirements")
-    endif()
+      ExternalData_add_test(ParaViewData
+        NAME ${test_name}
+        COMMAND ${ACT_COMMAND}
+                ${ACT_SERVER}
+                --content ${ParaView_BINARY_DIR}/www
+                --data-dir ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
+                --port 8080
+                ${ARGS}
+                ${BASELINE_IMG_DIR}
+                --run-test-script ${test_path}
+                --test-use-browser ${browser}
+                --temporary-directory ${PARAVIEW_TEST_OUTPUT_DIR}
+                --test-image-file-name ${test_image_file_name}
+                )
+      set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
+    endwhile()
   endwhile()
 ENDFUNCTION()
 
