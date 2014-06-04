@@ -56,7 +56,7 @@ public:
     QWidget *container = new QWidget(self);
     container->setObjectName("Container");
     QVBoxLayout* vbox = new QVBoxLayout(container);
-    vbox->setMargin(0);
+    vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(0);
 
     pqProxyWidget *widget = properties.size() > 0?
@@ -67,34 +67,26 @@ public:
     QObject::connect(self, SIGNAL(accepted()), widget, SLOT(apply()));
     vbox->addWidget(widget);
 
-    QSpacerItem* spacer = new QSpacerItem(0, 6,QSizePolicy::Fixed,
+    QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
     vbox->addItem(spacer);
 
-    // We need to know the size of the dialog so (ideally) when first displayed
-    // the scroll area isn't visible (i.e. the proxy widget isn't squished in
-    // the scroll area).
-    // To do so, we force the layout to compute by showing it offscreen with
-    // the attribute WA_DontShowOnScreen and get the dialog size this way
-    ui.Layout->addWidget(container);
-    self->setAttribute(Qt::WA_DontShowOnScreen);
-    self->show();
-    QSize dialogSize = self->size();
-    self->hide();
-    self->setAttribute(Qt::WA_DontShowOnScreen, false);
+    /// Setup the scroll area. Its minimum size is set to fully contain the
+    /// proxy widget so we're sure it'll be completly displayed
+    ui.scrollArea->setWidget(container);
+    QSize oldMinSize = ui.scrollArea->minimumSize();
+    ui.scrollArea->setMinimumSize(container->size());
 
-    // Now that we have the dialog ideal size, we can add the container widget
-    // to the scroll area.
-    ui.Layout->removeWidget(container);
-    QScrollArea* scrollArea = new QScrollArea(self);
-    scrollArea->setObjectName("scrollArea");
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setFrameShape(QFrame::NoFrame);
-    ui.Layout->insertWidget(0, scrollArea);
-    scrollArea->setWidget(container);
+    /// Get the dialog size. It's the layout minSize since the widget
+    /// can't be any smaller right now.
+    QSize dialogSize = self->layout()->minimumSize();
 
-    // Limit the dialog max size to be as big as the application
+    /// Reset the scroll area so it can actually be used.
+    ui.scrollArea->setMinimumSize(oldMinSize);
+
+    // Finaly set the maximum and current dialog size
     self->setMaximumSize(pqCoreUtilities::mainWidget()->size());
+    self->resize(dialogSize);
     }
 };
 
