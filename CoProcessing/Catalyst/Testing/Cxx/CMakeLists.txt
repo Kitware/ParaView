@@ -20,6 +20,7 @@ else()
   paraview_add_test_mpi(${vtk-module}Cxx-MPI mpi_tests
     NO_DATA NO_VALID NO_OUTPUT
     CoProcessingTestOutputs.cxx
+    SubController.cxx
     )
   vtk_test_mpi_executable(${vtk-module}Cxx-MPI mpi_tests)
 endif()

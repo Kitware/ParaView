@@ -75,6 +75,9 @@ if (CMAKE_Fortran_COMPILER_WORKS)
 endif()
 
 vtk_module_library(${vtk-module} ${Module_SRCS})
+if(PARAVIEW_USE_MPI)
+  vtk_mpi_link(${vtk-module})
+endif()
 if (CATALYST_FORTRAN_USING_MANGLING)
   set_property(TARGET ${vtk-module} APPEND PROPERTY COMPILE_DEFINITIONS
       "CATALYST_FORTRAN_USING_MANGLING=1")
