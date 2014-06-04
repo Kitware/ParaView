@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDrag>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
@@ -66,6 +67,7 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
   Buttons(SplitVertical | SplitHorizontal | Maximize | Close),
   TitleBar(new QWidget(this)),
   ToolBar (new QToolBar(this)),
+  TitleLabel(new QLabel(this)),
   ContextMenu(new QMenu(this->TitleBar)),
   UniqueID(QUuid::createUuid())
 {
@@ -144,6 +146,18 @@ QWidget* pqViewFrame::centralWidget() const
 }
 
 //-----------------------------------------------------------------------------
+void pqViewFrame::setTitle(const QString& text)
+{
+  this->TitleLabel->setText(text);
+}
+
+//-----------------------------------------------------------------------------
+QString pqViewFrame::title() const
+{
+  return this->TitleLabel->text();
+}
+
+//-----------------------------------------------------------------------------
 void pqViewFrame::updateLayout()
 {
   QVBoxLayout* vbox = new QVBoxLayout();
@@ -188,6 +202,11 @@ void pqViewFrame::updateTitleBar()
   hbox->setSpacing(0);
   hbox->addWidget (this->ToolBar);
   hbox->addStretch();
+
+  this->TitleLabel->setAlignment(Qt::AlignRight);
+  this->TitleLabel->setIndent(10);
+  hbox->addWidget(this->TitleLabel);
+
   foreach (QToolButton* button, this->StandardToolButtons)
     {
     button->hide();
