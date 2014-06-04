@@ -18,6 +18,7 @@ paraview_test_load_data_dirs(""
   )
 paraview_test_load_data(""
   sonic.pht # 279 bytes
+  can.ex2   # ~16.8 MB
   )
 
 set (pv_pymodule_build_dir ${VTK_BUILD_PYTHON_MODULE_DIR})

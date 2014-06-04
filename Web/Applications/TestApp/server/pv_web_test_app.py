@@ -56,6 +56,7 @@ class _TestApp(pv_wamp.PVServerProtocol):
     dataDir = None
     authKey = "vtkweb-secret"
     echoStr = ""
+    colorMapsPath = None
 
     def initialize(self):
         # Bring used components
@@ -64,11 +65,13 @@ class _TestApp(pv_wamp.PVServerProtocol):
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortImageDelivery())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortGeometryDelivery())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebTimeHandler())
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager())
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager(baseDir=_TestApp.dataDir))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebColorManager(pathToColorMaps=_TestApp.colorMapsPath));
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileManager(_TestApp.dataDir))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebRemoteConnection())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader())
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebTestProtocols())
 
         # Update authentication key to use
         self.updateSecret(_TestApp.authKey)

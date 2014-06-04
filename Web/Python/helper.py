@@ -9,14 +9,15 @@ import traceback
 
 # import paraview modules.
 import paraview
-# for 4.1 compatibility till we fix ColorArrayName and ColorAttributeType usage.
-paraview.compatibility.major = 4
-paraview.compatibility.minor = 1
 
 from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 
 from vtkPVServerManagerCorePython import *
+
+# Needed for:
+#    vtkSMPVRepresentationProxy
+from vtkPVServerManagerRenderingPython import *
 
 # =============================================================================
 # Pipeline management
@@ -82,19 +83,19 @@ class Pipeline:
 
     # --------------------------------------------------------------------------
 
-    def getRootNode(self, lutManager = None):
+    def getRootNode(self, view = None):
         """
         Create a tree structure of the pipeline with the current proxy state.
         """
         self.root_node['children'] = []
-        self.__fill_children(self.root_node, self.children_ids['0'], lutManager)
+        self.__fill_children(self.root_node, self.children_ids['0'], view)
         return self.root_node
 
     # --------------------------------------------------------------------------
 
-    def __fill_children(self, nodeToFill, childrenIds, lutManager = None):
+    def __fill_children(self, nodeToFill, childrenIds, view = None):
         for id in childrenIds:
-            node = getProxyAsPipelineNode(id, lutManager)
+            node = getProxyAsPipelineNode(id, view)
             nid = str(node['proxy_id'])
 
             if nodeToFill.has_key('children'):
@@ -104,181 +105,6 @@ class Pipeline:
 
             if self.children_ids.has_key(nid):
                 self.__fill_children(node, self.children_ids[nid]);
-
-
-# =============================================================================
-# Lookup Table Management
-# =============================================================================
-
-class LookupTableManager:
-    """
-    Define a data structure that keep track of lookup tables and scalar bars
-    """
-
-    # --------------------------------------------------------------------------
-
-    def __init__(self):
-        self.luts = {}
-        self.scalarbars = {}
-        self.range = {}
-        self.view = None
-        if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
-            self.registerArray('vtkProcessId', 1, [0, servermanager.ActiveConnection.GetNumberOfDataPartitions()-1])
-
-    # --------------------------------------------------------------------------
-
-    def getLutId(self, name, number_of_components):
-        return "%s_%d" % (name, number_of_components)
-
-    # --------------------------------------------------------------------------
-
-    def clear(self):
-        """
-        Clear the set of lookup table and scalar bar.
-        """
-        self.luts = {}
-        self.scalarbars = {}
-
-    # --------------------------------------------------------------------------
-
-    def registerFieldData(self, data):
-        if data:
-            size = data.GetNumberOfArrays()
-            for i in range(size):
-                array = data.GetArray(i)
-                name = array.Name
-                nbComp = array.GetNumberOfComponents()
-                dataRange = [0.0, 1.0]
-                if nbComp != 1:
-                    dataRange = array.GetRange(-1)
-                else:
-                    dataRange = array.GetRange(0)
-                self.registerArray(name, nbComp, dataRange)
-
-    # --------------------------------------------------------------------------
-
-    def setDataRange(self, name, number_of_components, range):
-        self.registerArray(name, number_of_components, range)
-        key = self.getLutId(name, number_of_components)
-        self.range[key] = range
-        self.luts[key].RGBPoints = [range[0], 0, 0, 1, range[1], 1, 0, 0]
-
-    # --------------------------------------------------------------------------
-
-    def getDataRange(self, name, number_of_components):
-        key = self.getLutId(name, number_of_components)
-        if self.range.has_key(key):
-            return self.range[key]
-        return [0, 1]
-
-    # --------------------------------------------------------------------------
-
-    def registerArray(self, name, number_of_components, range):
-        key = self.getLutId(name, number_of_components)
-        if self.range.has_key(key):
-            minValue = min(range[0], self.luts[key].RGBPoints[0])
-            maxValue = max(range[1], self.luts[key].RGBPoints[-4])
-            self.range[key] = [minValue, maxValue];
-            self.luts[key].RGBPoints = [minValue, 0, 0, 1, maxValue, 1, 0, 0]
-            self.luts[key].VectorMode = 'Magnitude'
-            self.luts[key].VectorComponent = 0
-            self.luts[key].ColorSpace = 'HSV'
-        else:
-            self.range[key] = range;
-            # ... fixme ... Create default lut with proper range/title/color scheme
-            self.luts[key] = simple.GetLookupTableForArray(name, number_of_components)
-
-            # Setup default config
-            self.luts[key].RGBPoints  = [range[0], 0, 0, 1, range[1], 1, 0, 0]
-            self.luts[key].VectorMode = 'Magnitude'
-            self.luts[key].VectorComponent = 0
-            self.luts[key].ColorSpace = 'HSV'
-
-            self.scalarbars[key] = simple.CreateScalarBar(LookupTable=self.luts[key],
-                                                          TitleFontSize=6,
-                                                          LabelFontSize=6)
-            self.scalarbars[key].Title = name
-            self.scalarbars[key].Visibility = 0
-            self.scalarbars[key].Enabled = 0
-
-            # Add scalar bar to the view
-            if self.view:
-                self.view.Representations.append(self.scalarbars[key])
-
-    # --------------------------------------------------------------------------
-
-    def getLookupTable(self, name, number_of_components):
-        key = self.getLutId(name, number_of_components)
-        return self.getLookupTableFromId(key)
-
-    # --------------------------------------------------------------------------
-
-    def getLookupTableFromId(self, id):
-        if self.luts.has_key(id):
-            return self.luts[id]
-        return None
-
-    # --------------------------------------------------------------------------
-
-    def getScalarBar(self, name, number_of_components):
-        key = self.getLutId(name, number_of_components)
-        return self.getScalarBarFromId(key)
-
-
-    # --------------------------------------------------------------------------
-
-    def getScalarBarFromId(self, id):
-        if self.scalarbars.has_key(id):
-            return self.scalarbars[id]
-        return None
-
-    # --------------------------------------------------------------------------
-
-    def isScalarBarVisible(self, id):
-        if self.scalarbars.has_key(id):
-            return self.scalarbars[id].Visibility
-        return 0
-
-    # --------------------------------------------------------------------------
-
-    def enableScalarBar(self, name, number_of_components, show):
-        key = self.getLutId(name, number_of_components)
-        self.enableScalarBarFromId(key, show)
-
-    # --------------------------------------------------------------------------
-
-    def enableScalarBarFromId(self, id, show):
-        if self.scalarbars.has_key(id):
-            self.scalarbars[id].Visibility = show
-            self.scalarbars[id].Enabled = show
-            self.scalarbars[id].Repositionable = show
-            self.scalarbars[id].Selectable = show
-
-    # --------------------------------------------------------------------------
-
-    def setView(self, view):
-        if self.view:
-            for value in self.scalarbars.values():
-                try:
-                    view.Representations.remove(value)
-                except ValueError:
-                    pass
-
-        self.view = view
-        for value in self.scalarbars.values():
-            self.view.Representations.append(value)
-
-    # --------------------------------------------------------------------------
-
-    def getScalarbarVisibility(self):
-        status = {};
-        for key in self.scalarbars.keys():
-            status[key] = {        \
-                'lutId': key,       \
-                'name': key[0:-2],   \
-                'size': int(key[-1]), \
-                'enabled': self.scalarbars[key].Visibility }
-        return status
 
 # =============================================================================
 # Proxy management
@@ -308,7 +134,7 @@ def getParentProxyId(proxy):
 
 # --------------------------------------------------------------------------
 
-def getProxyAsPipelineNode(id, lutManager = None):
+def getProxyAsPipelineNode(id, view=None):
     """
     Create a representation for that proxy so it can be used within a pipeline
     browser.
@@ -319,7 +145,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
     nbActiveComp = 1
 
     pointData = []
-    searchArray = ('POINT_DATA' == rep.ColorAttributeType) and (len(rep.ColorArrayName) > 0)
+    searchArray = ('POINTS' == rep.ColorArrayName[0]) and (len(rep.ColorArrayName[1]) > 0)
 
     if servermanager.ActiveConnection.GetNumberOfDataPartitions() > 1:
         info = {                  \
@@ -348,7 +174,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
 
     for array in proxy.GetPointDataInformation():
         nbComponents = array.GetNumberOfComponents()
-        if searchArray and array.Name == rep.ColorArrayName:
+        if searchArray and array.Name == rep.ColorArrayName[1]:
             nbActiveComp = nbComponents
         rangeOn = (nbComponents == 1 if 0 else -1)
         info = {                                      \
@@ -359,10 +185,10 @@ def getProxyAsPipelineNode(id, lutManager = None):
         pointData.append(info)
 
     cellData = []
-    searchArray = ('CELL_DATA' == rep.ColorAttributeType) and (len(rep.ColorArrayName) > 0)
+    searchArray = ('CELLS' == rep.ColorArrayName[0]) and (len(rep.ColorArrayName[1]) > 0)
     for array in proxy.GetCellDataInformation():
         nbComponents = array.GetNumberOfComponents()
-        if searchArray and array.Name == rep.ColorArrayName:
+        if searchArray and array.Name == rep.ColorArrayName[1]:
             nbActiveComp = nbComponents
         rangeOn = (nbComponents == 1 if 0 else -1)
         info = {                                      \
@@ -373,9 +199,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
         cellData.append(info)
 
     state = getProxyAsState(proxy.GetGlobalID())
-    showScalarbar = 0
-    if lutManager and (len(rep.ColorArrayName) > 0):
-        showScalarbar = lutManager.isScalarBarVisible(rep.ColorArrayName + '_' + str(nbActiveComp))
+    showScalarbar = 1 if view and vtkSMPVRepresentationProxy.IsScalarBarVisible(rep.SMProxy, view.SMProxy) else 0
 
     repName = 'Hide'
     if rep.Visibility == 1:
@@ -386,7 +210,7 @@ def getProxyAsPipelineNode(id, lutManager = None):
              'bounds'    : proxy.GetDataInformation().GetBounds(),            \
              'pointData' : pointData,                                         \
              'cellData'  : cellData,                                          \
-             'activeData': rep.ColorAttributeType + ':' + rep.ColorArrayName, \
+             'activeData': str(rep.ColorArrayName[0]) + ':' + str(rep.ColorArrayName[1]), \
              'diffuseColor'  : str(rep.DiffuseColor),                         \
              'showScalarBar' : showScalarbar,                                 \
              'representation': repName,                                       \
