@@ -354,14 +354,15 @@ public:
         continue;
         }
 
-      if (proxy->GetXMLName() && property->GetXMLName() &&
-          !property->GetNoCustomDefault())
+      const char* proxyName = proxy->GetXMLName();
+      const char* propertyName = iter->GetKey();
+      if (proxyName && propertyName && !property->GetNoCustomDefault())
         {
         // Build the JSON reference string
         vtksys_ios::ostringstream settingStringStream;
         settingStringStream << settingPrefix
-                            << "." << proxy->GetXMLName()
-                            << "." << property->GetXMLName();
+                            << "." << proxyName
+                            << "." << propertyName;
 
         const std::string settingString = settingStringStream.str();
         const char* settingName = settingString.c_str();
@@ -566,8 +567,9 @@ public:
     double highestPriority = this->SettingCollections[0].Priority;
 
     // Get reference to JSON value
+    const char* proxyName = proxy->GetXMLName();
     vtksys_ios::ostringstream settingStringStream;
-    settingStringStream << settingPrefix << "." << proxy->GetXMLName();
+    settingStringStream << settingPrefix << "." << proxyName;
     std::string settingString(settingStringStream.str());
     const char* settingCString = settingString.c_str();
 
@@ -582,9 +584,10 @@ public:
       vtkSMProperty* property = iter->GetProperty();
       if (!property) continue;
 
+      const char* propertyName = iter->GetKey();
       vtksys_ios::ostringstream propertySettingStringStream;
       propertySettingStringStream << settingStringStream.str() << "."
-                                  << property->GetXMLName();
+                                  << propertyName;
       std::string propertySettingString(propertySettingStringStream.str());
       const char* propertySettingCString = propertySettingString.c_str();
 
@@ -601,7 +604,7 @@ public:
         if (this->GetSettingAtOrBelowPriority(propertySettingCString,
                                               highestPriority).isNull())
           {
-          proxyValue.removeMember(property->GetXMLName());
+          proxyValue.removeMember(propertyName);
           continue;
           }
         }
@@ -615,7 +618,7 @@ public:
       {
       Json::Path parentPath(settingPrefix);
       Json::Value & parentValue = parentPath.make(this->SettingCollections[0].Value);
-      parentValue.removeMember(proxy->GetXMLName());
+      parentValue.removeMember(proxyName);
       }
   }
 
