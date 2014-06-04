@@ -16,7 +16,7 @@ projectUrl="paraview.org"
 pushd .
 
 # enter VTK sub-directory
-cd ../../VTK
+cd VTK
 
 # configure PVVTK remote.
 if git config remote.pvvtk.url >/dev/null; then
