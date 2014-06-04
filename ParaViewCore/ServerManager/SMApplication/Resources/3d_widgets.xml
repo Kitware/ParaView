@@ -403,7 +403,8 @@
             <Property name="TitleBold" function="Bold" />
             <Property name="TitleItalic" function="Italics"/>
             <Property name="TitleShadow" function="Shadow" />
-            <Property name="TitleFontSize" function="Size" />
+            <Property name="TitleFontSize" function="Size"
+                      number_of_elements="1" default_values="6" />
           </PropertyGroup>
 
           <!-- properties for Label -->
@@ -415,7 +416,8 @@
             <Property name="LabelBold" function="Bold" />
             <Property name="LabelItalic" function="Italics" />
             <Property name="LabelShadow" function="Shadow" />
-            <Property name="LabelFontSize" function="Size" />
+            <Property name="LabelFontSize" function="Size"
+                      number_of_elements="1" default_values="6"/>
           </PropertyGroup>
 
           <PropertyGroup label="Labels">
