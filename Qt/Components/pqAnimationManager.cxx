@@ -494,6 +494,10 @@ bool pqAnimationManager::saveAnimation()
       {
       stereo = VTK_STEREO_CHECKERBOARD;
       }
+    else if (stereoMode == "Side By Side Horizontal")
+      {
+      stereo = VTK_STEREO_SPLITVIEWPORT_HORIZONTAL;
+      }
     else if (stereoMode == "Left Eye Only")
       {
       stereo = VTK_STEREO_LEFT;
