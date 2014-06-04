@@ -800,3 +800,11 @@ endif()
 # Create target to download data from the ParaViewData group.  This must come
 # after all tests have been added that reference the group, so we put it last.
 ExternalData_Add_Target(ParaViewData)
+if(PARAVIEW_DATA_EXCLUDE_FROM_ALL)
+  set_property(TARGET ParaViewData PROPERTY EXCLUDE_FROM_ALL 1)
+  if(BUILD_TESTING)
+    message(WARNING "PARAVIEW_DATA_EXCLUDE_FROM_ALL is ON so test data "
+      "(needed because BUILD_TESTING is ON) may not be available "
+      "without manually building the 'ParaViewData' target.")
+  endif()
+endif()
