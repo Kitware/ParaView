@@ -35,7 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqProxyWidget.h"
 
+#include "vtkCommand.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSettings.h"
+#include "vtkSMVectorProperty.h"
+
 #include <QScrollArea>
+#include <QStyle>
 
 class pqProxyWidgetDialog::pqInternals
 {
@@ -43,15 +52,16 @@ public:
   Ui::ProxyWidgetDialog Ui;
 
   pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self, 
-    const QStringList& properties = QStringList())
+    const QStringList& properties = QStringList()) :
+    Proxy(proxy)
     {
     Q_ASSERT(proxy != NULL);
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);
 
-    QObject::connect(ui.buttonBox, SIGNAL(clicked(QAbstractButton*)),
-      self, SLOT(buttonClicked(QAbstractButton*)));
+    // There should be no changes initially, so disable the Apply button
+    ui.ApplyButton->setEnabled(false);
 
     QWidget *container = new QWidget(self);
     container->setObjectName("Container");
@@ -59,13 +69,50 @@ public:
     vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(0);
 
+    // Set up the widget for the proxy
     pqProxyWidget *widget = properties.size() > 0?
       new pqProxyWidget(proxy, properties, container):
       new pqProxyWidget(proxy, container);
     widget->setObjectName("ProxyWidget");
     widget->filterWidgets(true);
-    QObject::connect(self, SIGNAL(accepted()), widget, SLOT(apply()));
     vbox->addWidget(widget);
+
+    // Set some icons for the buttons
+    QStyle* applicationStyle = QApplication::style();
+    ui.RestoreDefaultsButton->
+      setIcon(applicationStyle->standardIcon(QStyle::SP_BrowserReload));
+    ui.SaveButton->
+      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogSaveButton));
+    ui.ApplyButton->
+      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogApplyButton));
+    ui.CancelButton->
+      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogCancelButton));
+    ui.OKButton->
+      setIcon(applicationStyle->standardIcon(QStyle::SP_DialogOkButton));
+
+    QObject::connect(self, SIGNAL(accepted()), widget, SLOT(apply()));
+    QObject::connect(self, SIGNAL(accepted()), self, SLOT(onAccepted()));
+    QObject::connect(widget, SIGNAL(changeAvailable()),
+       self, SLOT(onChangeAvailable()));
+
+    // When restoring defaults, first restore the defaults in the
+    // server manager, then reset the values from the server manager
+    // after the defaults have been restored.
+    QObject::connect(ui.RestoreDefaultsButton, SIGNAL(clicked()),
+      self, SLOT(onRestoreDefaults()));
+    QObject::connect(ui.RestoreDefaultsButton, SIGNAL(clicked()),
+       widget, SLOT(reset()));
+
+    QObject::connect(ui.SaveButton, SIGNAL(clicked()),
+      self, SLOT(onSaveAsDefaults()));
+
+    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), self, SLOT(accept()));
+
+    QObject::connect(ui.CancelButton, SIGNAL(clicked()), widget, SLOT(reset()));
+    QObject::connect(ui.CancelButton, SIGNAL(clicked()), self, SLOT(reject()));
+
+    QObject::connect(ui.OKButton, SIGNAL(clicked()), self, SLOT(accept()));
+    QObject::connect(ui.OKButton, SIGNAL(clicked()), self, SLOT(close()));
 
     QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
@@ -88,6 +135,8 @@ public:
     self->setMaximumSize(pqCoreUtilities::mainWidget()->size());
     self->resize(dialogSize);
     }
+
+  vtkSMProxy* Proxy;
 };
 
 //-----------------------------------------------------------------------------
@@ -113,11 +162,63 @@ pqProxyWidgetDialog::~pqProxyWidgetDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyWidgetDialog::buttonClicked(QAbstractButton* button)
+void pqProxyWidgetDialog::accept()
 {
-  Ui::ProxyWidgetDialog& ui = this->Internals->Ui;
-  if (ui.buttonBox->buttonRole(button) == QDialogButtonBox::ApplyRole)
+  emit this->accepted();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::onChangeAvailable()
+{
+  Ui::ProxyWidgetDialog &ui = this->Internals->Ui;
+  ui.ApplyButton->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::onAccepted()
+{
+  Ui::ProxyWidgetDialog &ui = this->Internals->Ui;
+  ui.ApplyButton->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::onRestoreDefaults()
+{
+  bool anyReset = false;
+  if (this->Internals->Proxy)
     {
-    emit this->accepted();
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(this->Internals->Proxy->NewPropertyIterator());
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      vtkSMProperty * property = iter->GetProperty();
+      // Restore only basic type properties.
+      if (vtkSMVectorProperty::SafeDownCast(property) &&
+          !property->GetNoCustomDefault() &&
+          !property->GetInformationOnly())
+        {
+        if (!property->IsValueDefault())
+          {
+          anyReset = true;
+          }
+        property->ResetToXMLDefaults();
+        }
+      }
     }
+
+  // The code above bypasses the changeAvailable() signal from the
+  // pqProxyWidget, so we check here whether we should act as if
+  // changes are available only if any of the properties have been
+  // reset.
+  if (anyReset)
+    {
+    this->onChangeAvailable();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidgetDialog::onSaveAsDefaults()
+{
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  settings->SetProxySettings(this->Internals->Proxy);
 }
