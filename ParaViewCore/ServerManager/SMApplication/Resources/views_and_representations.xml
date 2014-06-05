@@ -3532,6 +3532,7 @@
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
+                            no_custom_default="1"
                             number_of_elements="5" >
         <Documentation>
           Set the array to color with. One must specify the field association and
@@ -3755,6 +3756,7 @@
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
+                            no_custom_default="1"
                             number_of_elements="5">
         <Documentation>
           Set the array to color with. One must specify the field association and
@@ -3979,6 +3981,7 @@
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
+                            no_custom_default="1"
                             number_of_elements="5">
         <Documentation>
           Set the array to color with. One must specify the field association and
@@ -7539,6 +7542,7 @@
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
+                            no_custom_default="1"
                             number_of_elements="5">
         <Documentation>
           Set the array to color with. One must specify the field association and
@@ -7762,6 +7766,7 @@
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
+                            no_custom_default="1"
                             number_of_elements="5">
         <Documentation>
           Set the array to color with. One must specify the field association and
