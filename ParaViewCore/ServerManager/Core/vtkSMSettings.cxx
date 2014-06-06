@@ -16,6 +16,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
@@ -388,9 +389,27 @@ public:
         continue;
         }
 
+      // Check to see if we save only to QSettings or to both QSettings
+      // and the JSON file.
+      if (property->GetHints())
+        {
+        vtkPVXMLElement* saveInQSettingsHint = property->GetHints()->FindNestedElementByName("SaveInQSettings");
+        if (saveInQSettingsHint)
+          {
+          int bothSettings = 0;
+          saveInQSettingsHint->GetScalarAttribute("both", &bothSettings);
+          if (!bothSettings)
+            {
+            continue;
+            }
+          }
+        }
+
       const char* proxyName = proxy->GetXMLName();
       const char* propertyName = iter->GetKey();
-      if (proxyName && propertyName && !property->GetNoCustomDefault())
+      if (proxyName &&
+          propertyName &&
+          !property->GetNoCustomDefault())
         {
         // Build the JSON reference string
         vtksys_ios::ostringstream settingStringStream;
@@ -652,6 +671,22 @@ public:
       {
       vtkSMProperty* property = iter->GetProperty();
       if (!property) continue;
+
+      // Check to see if we save only to QSettings or to both QSettings
+      // and the JSON file.
+      if (property->GetHints())
+        {
+        vtkPVXMLElement* saveInQSettingsHint = property->GetHints()->FindNestedElementByName("SaveInQSettings");
+        if (saveInQSettingsHint)
+          {
+          int bothSettings = 0;
+          saveInQSettingsHint->GetScalarAttribute("both", &bothSettings);
+          if (!bothSettings)
+            {
+            continue;
+            }
+          }
+        }
 
       const char* propertyName = iter->GetKey();
       vtksys_ios::ostringstream propertySettingStringStream;
