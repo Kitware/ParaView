@@ -137,6 +137,11 @@
        </item>
        <item>
         <property name="text">
+         <string>Side By Side Horizontal</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>Left Eye Only</string>
         </property>
        </item>

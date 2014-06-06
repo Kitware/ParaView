@@ -242,6 +242,10 @@ int pqSaveSnapshotDialog::getStereoMode() const
     {
     return VTK_STEREO_CHECKERBOARD;
     }
+  else if (stereoMode == "Side By Side Horizontal")
+    {
+    return VTK_STEREO_SPLITVIEWPORT_HORIZONTAL;
+    }
   else if (stereoMode == "Left Eye Only")
     {
     return VTK_STEREO_LEFT;
