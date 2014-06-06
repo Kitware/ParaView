@@ -107,7 +107,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateLevelArray=0; // by default, do not generate level array.
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
-  this->GenerateTracerArray = 0; // by default do not generate tracer array
+  this->GenerateTracerArray = 1; // by default do not generate tracer array
   this->GenerateMarkers = 1; // by default do generate markers
   this->IsAMR = 1;
   this->FileNameChanged = true;

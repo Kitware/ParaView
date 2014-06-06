@@ -4239,7 +4239,7 @@
         generated that stores the active status of a block.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetGenerateTracerArray"
-                         default_values="0"
+                         default_values="1"
                          name="GenerateTracers"
                          number_of_elements="1"
                          panel_visibility="advanced">
