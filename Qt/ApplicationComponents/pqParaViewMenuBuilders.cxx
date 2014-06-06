@@ -192,17 +192,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   new pqManageLinksReaction(menu.addAction("Manage Links...") <<
     pqSetName("actionToolsManageLinks"));
   //<addaction name="actionToolsAddCameraLink" />
-#ifdef BUILD_SHARED_LIBS
   // Add support for importing plugins only if ParaView was built shared.
   new pqManagePluginsReaction(menu.addAction("Manage Plugins...") <<
     pqSetName("actionManage_Plugins"));
-#else
-  QAction* action2 = menu.addAction("Manage Plugins...");
-  action2->setEnabled(false);
-  action2->setToolTip(
-    "Use BUILD_SHARED:ON while compiling to enable plugin support.");
-  action2->setStatusTip(action2->toolTip());
-#endif
 
 
   menu.addSeparator(); // --------------------------------------------------

@@ -90,7 +90,7 @@ endif()
 
 if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(paraview
-    ${PARAVIEW_PLUGINLIST})
+    vtkPVStaticPluginsInit)
 endif(NOT BUILD_SHARED_LIBS)
 
 

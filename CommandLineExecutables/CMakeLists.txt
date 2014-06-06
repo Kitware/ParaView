@@ -129,7 +129,7 @@ include_directories(${vtkPVServerManagerApplication_DEPENDS_INCLUDE_DIRS}
 
 set(STATIC_LINK_PLUGINS)
 if (NOT BUILD_SHARED_LIBS)
-  set(STATIC_LINK_PLUGINS ${PARAVIEW_PLUGINLIST})
+  set(STATIC_LINK_PLUGINS vtkPVStaticPluginsInit)
 endif()
 
 foreach (name pvserver pvdataserver pvrenderserver)

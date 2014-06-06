@@ -231,18 +231,33 @@ macro(pv_process_plugins root_src root_build)
           DESTINATION "${PV_INSTALL_PLUGIN_DIR}"
           COMPONENT Runtime)
 
-  # write the static plugins init file.
-  _write_static_plugins_init_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/pvStaticPluginsInit.h
-    ${PARAVIEW_PLUGINLIST})
+  if (NOT BUILD_SHARED_LIBS)
+    # write the static plugins init file.
+    _write_static_plugins_init_file(
+      ${CMAKE_CURRENT_BINARY_DIR}/pvStaticPluginsInit.h
+      ${CMAKE_CURRENT_BINARY_DIR}/pvStaticPluginsInit.cxx
+      ${PARAVIEW_PLUGINLIST})
+
+    vtk_module_dep_includes(vtkPVClientServerCoreCore)
+    include_directories(${vtkPVClientServerCoreCore_INCLUDE_DIRS} ${vtkPVClientServerCoreCore_DEPENDS_INCLUDE_DIRS})
+    add_library(vtkPVStaticPluginsInit
+      ${CMAKE_CURRENT_BINARY_DIR}/pvStaticPluginsInit.cxx)
+    target_link_libraries(vtkPVStaticPluginsInit
+      LINK_PRIVATE ${PARAVIEW_PLUGINLIST})
+  endif ()
 endmacro()
 
 #------------------------------------------------------------------------------
 # Internal function used to generate a header file initializing all plugins that
 # can be used by executables to link against the plugins when building
 # statically.
-function(_write_static_plugins_init_file filename)
-  set(plugins_init_function "#include \"vtkPVPlugin.h\"\n\n")
+function(_write_static_plugins_init_file header source)
+  file(WRITE "${header}" "void paraview_static_plugins_init();\n")
+
+  set(plugins_init_function "#include \"vtkPVPlugin.h\"\n")
+  set(plugins_init_function "${plugins_init_function}#include \"vtkPVPluginLoader.h\"\n\n")
+  set(plugins_init_function "${plugins_init_function}#include \"vtkPVPluginTracker.h\"\n\n")
+  set(plugins_init_function "${plugins_init_function}#include <string>\n\n")
 
   # write PV_PLUGIN_IMPORT_INIT calls
   foreach(plugin_name ${ARGN})
@@ -250,12 +265,42 @@ function(_write_static_plugins_init_file filename)
   endforeach()
   set(plugins_init_function "${plugins_init_function}\n")
 
+  set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_load(const char* name);\n\n")
+  set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_search(const char* name);\n\n")
+  set(plugins_init_function "${plugins_init_function}void paraview_static_plugins_init()\n{\n")
+  set(plugins_init_function "${plugins_init_function}  vtkPVPluginLoader::SetStaticPluginLoadFunction(paraview_static_plugins_load);\n")
+  set(plugins_init_function "${plugins_init_function}  vtkPVPluginTracker::SetStaticPluginSearchFunction(paraview_static_plugins_search);\n")
+  set(plugins_init_function "${plugins_init_function}}\n\n")
+
+  # write callback functions
+  set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_func(const char* name, bool load);\n\n")
+  set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_load(const char* name)\n{\n")
+  set(plugins_init_function "${plugins_init_function}  return paraview_static_plugins_func(name, true);\n")
+  set(plugins_init_function "${plugins_init_function}}\n\n")
+  set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_search(const char* name)\n{\n")
+  set(plugins_init_function "${plugins_init_function}  return paraview_static_plugins_func(name, false);\n")
+  set(plugins_init_function "${plugins_init_function}}\n\n")
+
   # write PV_PLUGIN_IMPORT calls
-  set(plugins_init_function "${plugins_init_function}inline void paraview_static_plugins_init()\n{\n")
+  set(plugins_init_function "${plugins_init_function}static bool paraview_static_plugins_func(const char* name, bool load)\n{\n")
+  set(plugins_init_function "${plugins_init_function}  std::string sname = name;\n\n")
   foreach(plugin_name ${ARGN})
-    set(plugins_init_function "${plugins_init_function}  PV_PLUGIN_IMPORT(${plugin_name});\n")
+    set(plugins_init_function "${plugins_init_function}  if (sname == \"${plugin_name}\")\n")
+    set(plugins_init_function "${plugins_init_function}    {\n")
+    set(plugins_init_function "${plugins_init_function}    if (load)\n")
+    set(plugins_init_function "${plugins_init_function}      {\n")
+    set(plugins_init_function "${plugins_init_function}      static bool loaded = false;\n")
+    set(plugins_init_function "${plugins_init_function}      if (!loaded)\n")
+    set(plugins_init_function "${plugins_init_function}        {\n")
+    set(plugins_init_function "${plugins_init_function}        PV_PLUGIN_IMPORT(${plugin_name});\n")
+    set(plugins_init_function "${plugins_init_function}        loaded = true;\n")
+    set(plugins_init_function "${plugins_init_function}        }\n")
+    set(plugins_init_function "${plugins_init_function}      }\n")
+    set(plugins_init_function "${plugins_init_function}    return true;\n")
+    set(plugins_init_function "${plugins_init_function}    }\n")
   endforeach()
+  set(plugins_init_function "${plugins_init_function}  return false;\n")
   set(plugins_init_function "${plugins_init_function}}\n")
 
-  file(WRITE "${filename}" "${plugins_init_function}")
+  file(WRITE "${source}" "${plugins_init_function}")
 endfunction()

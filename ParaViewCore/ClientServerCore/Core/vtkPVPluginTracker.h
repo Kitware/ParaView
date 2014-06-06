@@ -31,6 +31,8 @@
 class vtkPVPlugin;
 class vtkPVXMLElement;
 
+typedef bool (*vtkPluginSearchFunction)(const char*);
+
 class VTKPVCLIENTSERVERCORECORE_EXPORT  vtkPVPluginTracker : public vtkObject
 {
 public:
@@ -97,6 +99,10 @@ public:
   bool GetPluginLoaded(unsigned int index);
   bool GetPluginAutoLoad(unsigned int index);
 
+  // Description:
+  // Sets the function used to load static plugins.
+  static void SetStaticPluginSearchFunction(vtkPluginSearchFunction function);
+
 //BTX
 protected:
   vtkPVPluginTracker();
@@ -108,6 +114,8 @@ private:
 
   class vtkPluginsList;
   vtkPluginsList* PluginsList;
+
+  static vtkPluginSearchFunction StaticPluginSearchFunction;
 //ETX
 };
 
