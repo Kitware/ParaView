@@ -1245,7 +1245,7 @@ macro(pv_process_modules)
       "${CMAKE_CURRENT_SOURCE_DIR}/${base}"
       module.cmake
       "${CMAKE_CURRENT_BINARY_DIR}/${base}"
-      Cxx)
+      ${_test_languages})
   endforeach()
 
   set (current_module_set ${VTK_MODULES_ALL})
