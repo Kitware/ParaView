@@ -87,7 +87,7 @@ bool vtkInitializationHelper::LoadSettingsFilesDuringInitialization = true;
 bool vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = false;
 
 std::string vtkInitializationHelper::OrganizationName = "ParaView";
-std::string vtkInitializationHelper::ApplicationName = "ParaView";
+std::string vtkInitializationHelper::ApplicationName = "GenericParaViewApplication";
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::SetLoadSettingsFilesDuringInitialization(bool val)
