@@ -760,8 +760,8 @@ int vtkPGenericIOReader::RequestInformation(
 
   // tell the pipeline that this dataset is distributed
   outputVector->GetInformationObject(0)->Set(
-      vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-      this->Controller->GetNumberOfProcesses()
+      CAN_HANDLE_PIECE_REQUEST(),
+      1
       );
   outputVector->GetInformationObject(0)->Set(
       vtkDataObject::DATA_NUMBER_OF_PIECES(),

@@ -317,19 +317,6 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGeometryFilter::RequestInformation(
-  vtkInformation*, vtkInformationVector** vtkNotUsed(inVectors), vtkInformationVector* outputVector)
-{
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  // RequestData() synchronizes (communicates among processes), so we need
-  // all procs to call RequestData().
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)

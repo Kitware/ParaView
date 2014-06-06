@@ -84,22 +84,6 @@ bool vtkPVGeneralSettings::GetAutoConvertProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeneralSettings::SetStrictLoadBalancing(bool val)
-{
-  if (this->GetStrictLoadBalancing() != val)
-    {
-    vtkSISourceProxy::SetDisableExtentsTranslator(val);
-    this->Modified();
-    }
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVGeneralSettings::GetStrictLoadBalancing()
-{
-  return vtkSISourceProxy::GetDisableExtentsTranslator();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVGeneralSettings::SetEnableAutoMPI(bool val)
 {
   if (this->GetEnableAutoMPI() != val)

@@ -215,7 +215,7 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation * vtkNotU
     }
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
   for(unsigned int rIdx = 0; rIdx < this->Internal->RealReaders.size(); rIdx++)
     {
     this->Internal->RealReaders[rIdx]->SetReadAllVariables(

@@ -31,6 +31,8 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkFloatArray.h"
 #include "vtkSphereSource.h"
 
+#include "vtkPVInformationKeys.h"
+
 #include "vtkSQLog.h"
 #include "vtkSQMetaDataKeys.h"
 #include "GDAMetaDataKeys.h"
@@ -235,9 +237,9 @@ int vtkSQHemisphereSource::RequestInformation(
 //       }
 
   vtkInformation *outInfo = outInfos->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
   outInfo->Set(
-      vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+      vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),
       this->Center[0]-this->Radius,
       this->Center[0]+this->Radius,
       this->Center[1]-this->Radius,

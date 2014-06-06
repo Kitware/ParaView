@@ -1498,17 +1498,6 @@
       </ProxyProperty>
       <!-- End of TimeKeeper -->
     </TimeKeeperProxy>
-    <Proxy class="vtkSISourceProxy"
-           name="StrictLoadBalancing"
-           processes="client|dataserver|renderserver">
-      <IntVectorProperty command="SetDisableExtentsTranslator"
-                         default_values="0"
-                         name="DisableExtentsTranslator"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <!-- End of StrictLoadBalancing -->
-    </Proxy>
     <PluginLoaderProxy class="vtkPVPluginLoader"
                        name="PluginLoader"
                        processes="dataserver|renderserver">

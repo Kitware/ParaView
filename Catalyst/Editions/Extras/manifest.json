@@ -17,6 +17,10 @@
         "type":"BOOL",
         "value":"ON"
       },
+      { "name":"Module_vtkIOParallelXML",
+        "type":"BOOL",
+        "value":"ON"
+      },
       { "name":"Module_vtkFiltersGeometry",
         "type":"BOOL",
         "value":"ON"
@@ -153,8 +157,7 @@
     { "name": "vtkIOParallel",
       "path": "VTK/IO/Parallel",
       "include": [
-        { "class": "vtkPDataSetWriter" },
-        { "class": "vtkXMLPMultiBlockDataWriter" }
+        { "class": "vtkPDataSetWriter" }
       ],
       "replace": [
         { "path": "VTK/IO/Parallel/module.cmake" },
@@ -170,15 +173,7 @@
         { "class": "vtkXMLCompositeDataWriter" },
         { "class": "vtkXMLImageDataWriter" },
         { "class": "vtkXMLMultiBlockDataWriter" },
-        { "class": "vtkXMLPDataWriter" },
-        { "class": "vtkXMLPImageDataWriter" },
         { "class": "vtkXMLPolyDataWriter" },
-        { "class": "vtkXMLPPolyDataWriter" },
-        { "class": "vtkXMLPRectilinearGridWriter" },
-        { "class": "vtkXMLPStructuredGridWriter" },
-        { "class": "vtkXMLPStructuredDataWriter" },
-        { "class": "vtkXMLPUnstructuredDataWriter" },
-        { "class": "vtkXMLPUnstructuredGridWriter" },
         { "class": "vtkXMLRectilinearGridWriter" },
         { "class": "vtkXMLStructuredDataWriter" },
         { "class": "vtkXMLStructuredGridWriter" },
@@ -189,6 +184,25 @@
       "replace": [
         { "path": "VTK/IO/XML/module.cmake" },
         { "path": "VTK/IO/XML/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkIOParallelXML",
+      "path": "VTK/IO/ParallelXML",
+      "include": [
+        { "path": "module.cmake" },
+        { "class": "vtkXMLPDataWriter" },
+        { "class": "vtkXMLPImageDataWriter" },
+        { "class": "vtkXMLPPolyDataWriter" },
+        { "class": "vtkXMLPRectilinearGridWriter" },
+        { "class": "vtkXMLPStructuredGridWriter" },
+        { "class": "vtkXMLPStructuredDataWriter" },
+        { "class": "vtkXMLPUnstructuredDataWriter" },
+        { "class": "vtkXMLPUnstructuredGridWriter" }
+      ],
+      "replace": [
+        { "path": "VTK/IO/ParallelXML/CMakeLists.txt" }
       ],
       "cswrap": true,
       "pythonwrap": true

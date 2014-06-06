@@ -47,6 +47,8 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkMultiProcessController.h"
 #include "vtkMath.h"
 
+#include "vtkPVInformationKeys.h"
+
 #include "vtkSQLog.h"
 #include "vtkSQOOCReader.h"
 #include "vtkSQCellGenerator.h"
@@ -618,9 +620,6 @@ int vtkSQFieldTracer::RequestInformation(
   pCerr() << "=====vtkSQFieldTracer::RequestInformation" << std::endl;
   #endif
 
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
-
   return 1;
 }
 
@@ -682,13 +681,13 @@ int vtkSQFieldTracer::RequestData(
 
   // the bounds (problem domain) of the data should be provided by the
   // meta reader.
-  if (!info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()))
+  if (!info->Has(vtkPVInformationKeys::WHOLE_BOUNDING_BOX()))
     {
     vtkErrorMacro("Bounds are not present in the pipeline information.");
     return 1;
     }
   double pDomain[6];
-  info->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),pDomain);
+  info->Get(vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),pDomain);
 
   // the bounadry condition flags should be provided by the reader
   if (!info->Has(vtkSQOOCReader::PERIODIC_BC()))

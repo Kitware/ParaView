@@ -20,7 +20,6 @@
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVExtentTranslator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 

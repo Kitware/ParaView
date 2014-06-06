@@ -208,7 +208,6 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
     int wholeExtent[6];
     inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
     tp->SetWholeExtent(wholeExtent);
-    tp->GatherExtents();
     }
   this->Writer->SetInputConnection(tp->GetOutputPort());
   tp->FastDelete();

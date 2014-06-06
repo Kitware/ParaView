@@ -120,6 +120,9 @@ protected:
   vtkPVSelectionSource();
   ~vtkPVSelectionSource();
 
+  virtual int RequestInformation(vtkInformation* request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);

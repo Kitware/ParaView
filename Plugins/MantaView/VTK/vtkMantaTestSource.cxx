@@ -62,7 +62,7 @@ int vtkMantaTestSource::RequestInformation(
   vtkInformation *outInfo = output->GetInformationObject(0);
   outInfo->Set
     (
-     vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1
+     CAN_HANDLE_PIECE_REQUEST(), 1
      );
   return 1;
 }

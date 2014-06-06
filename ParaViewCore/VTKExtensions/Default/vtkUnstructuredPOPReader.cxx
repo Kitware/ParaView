@@ -408,11 +408,10 @@ int vtkUnstructuredPOPReader::RequestInformation(vtkInformation *request,
     return 0;
     }
 
-  // Superclass understands structured data, but we have to handle unstructured
-  // "extents" (pieces).
+  // We handle unstructured "extents" (pieces).
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(
-    vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+    CAN_HANDLE_PIECE_REQUEST(), 1);
 
   return 1;
 }

@@ -23,7 +23,7 @@ vtkStandardNewMacro(vtkPVArrowSource);
 
 void vtkPVArrowSource::ExecuteInformation()
 {
-  this->GetOutputInformation(0)->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+  this->GetOutputInformation(0)->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 }
 
 

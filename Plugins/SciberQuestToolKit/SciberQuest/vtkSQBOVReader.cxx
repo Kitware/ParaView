@@ -23,6 +23,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVInformationKeys.h"
 
 #include "vtkSQLog.h"
 #include "vtkSQOOCReader.h"
@@ -147,6 +148,8 @@ int vtkSQBOVReader::RequestInformation(
   // req->Append(
   //     vtkExecutive::KEYS_TO_COPY(),
   //     vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
+
+  info->Set(CAN_PRODUCE_SUB_EXTENT(), 1);
 
   #if defined SQTK_DEBUG
   oss << "WHOLE_EXTENT=" << Tuple<int>(wholeExtent,6) << std::endl;
@@ -289,12 +292,12 @@ int vtkSQBOVReader::RequestData(
           subsetBounds);
 
     info->Set(
-        vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+        vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),
         subsetBounds,
         6);
     req->Append(
         vtkExecutive::KEYS_TO_COPY(),
-        vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX());
+        vtkPVInformationKeys::WHOLE_BOUNDING_BOX());
     }
   else
   if (this->Reader->DataSetTypeIsRectilinear())
@@ -334,12 +337,12 @@ int vtkSQBOVReader::RequestData(
         subsetBounds);
 
     info->Set(
-        vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+        vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),
         subsetBounds,
         6);
     req->Append(
         vtkExecutive::KEYS_TO_COPY(),
-        vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX());
+        vtkPVInformationKeys::WHOLE_BOUNDING_BOX());
     }
   else
   if (this->Reader->DataSetTypeIsStructured())

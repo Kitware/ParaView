@@ -312,8 +312,7 @@ int vtkSQVPICReader::RequestInformation(
 
     // Maximum number of pieces (processors) is number of files
     this->NumberOfPieces = this->vpicData->getNumberOfParts();
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-                 this->NumberOfPieces);
+    outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
     // Collect temporal information
     this->NumberOfTimeSteps = this->vpicData->getNumberOfTimeSteps();

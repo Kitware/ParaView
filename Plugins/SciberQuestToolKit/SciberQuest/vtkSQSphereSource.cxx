@@ -24,6 +24,7 @@
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkPVInformationKeys.h"
 
 #include "vtkSQMetaDataKeys.h"
 
@@ -327,10 +328,10 @@ int vtkSQSphereSource::RequestInformation(
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-               -1);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(),
+               1);
 
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+  outInfo->Set(vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),
                this->Center[0] - this->Radius,
                this->Center[0] + this->Radius,
                this->Center[1] - this->Radius,

@@ -18,40 +18,34 @@
 #include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVTrivialExtentTranslator.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+
+
+#include "vtkImageData.h"
+#include "vtkStructuredGrid.h"
+#include "vtkRectilinearGrid.h"
 
 #include <vector>
 
 struct vtkPVTrivialProducerInternal
 {
   std::vector<double> TimeSteps;
+  std::vector<int> AllProcessExtents;
 };
 
 vtkStandardNewMacro(vtkPVTrivialProducer);
 //----------------------------------------------------------------------------
 vtkPVTrivialProducer::vtkPVTrivialProducer()
 {
-  this->PVExtentTranslator = vtkPVTrivialExtentTranslator::New();
-  vtkStreamingDemandDrivenPipeline::SafeDownCast(
-    this->GetExecutive())->SetExtentTranslator(0, this->PVExtentTranslator);
-
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
   this->Internals = new vtkPVTrivialProducerInternal;
 }
 
 //----------------------------------------------------------------------------
 vtkPVTrivialProducer::~vtkPVTrivialProducer()
 {
-  if (this->PVExtentTranslator)
-    {
-    this->PVExtentTranslator->SetDataSet(0);
-    this->PVExtentTranslator->Delete();
-    this->PVExtentTranslator = 0;
-    }
   if(this->Internals)
     {
     delete this->Internals;
@@ -63,13 +57,6 @@ vtkPVTrivialProducer::~vtkPVTrivialProducer()
 void vtkPVTrivialProducer::SetOutput(vtkDataObject* output)
 {
   this->Superclass::SetOutput(output);
-
-  if (this->PVExtentTranslator)
-    {
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(
-      this->GetExecutive())->SetExtentTranslator(0, this->PVExtentTranslator);
-    this->PVExtentTranslator->SetDataSet(vtkDataSet::SafeDownCast(output));
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -87,12 +74,27 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output, double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTrivialProducer::GatherExtents()
+int vtkPVTrivialProducerPieceToExtentThreadSafe(
+  int *resultExtent, vtkDataObject* dataSet)
 {
-  if(this->PVExtentTranslator)
+  // this is really only meant for topologically structured grids
+  if (vtkImageData* id = vtkImageData::SafeDownCast(dataSet))
     {
-    this->PVExtentTranslator->GatherExtents();
+    id->GetExtent(resultExtent);
     }
+  else if (vtkStructuredGrid* sd = vtkStructuredGrid::SafeDownCast(dataSet))
+    {
+    sd->GetExtent(resultExtent);
+    }
+  else if (vtkRectilinearGrid* rd = vtkRectilinearGrid::SafeDownCast(dataSet))
+    {
+    rd->GetExtent(resultExtent);
+    }
+  else
+    {
+    return 0;
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -126,22 +128,6 @@ vtkPVTrivialProducer::ProcessRequest(vtkInformation* request,
       vtkDataObject::DATA_TIME_STEP(), uTime);
     }
 
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()) &&
-     this->Output)
-    {
-    vtkInformation* dataInfo = this->Output->GetInformation();
-    if(dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == VTK_3D_EXTENT)
-      {
-      if (this->WholeExtent[0] <= this->WholeExtent[1] &&
-          this->WholeExtent[2] <= this->WholeExtent[3] &&
-          this->WholeExtent[4] <= this->WholeExtent[5])
-        {
-        outputInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
-                        this->WholeExtent, 6);
-        }
-      }
-    }
-
   if(this->Internals->TimeSteps.empty() == false)
     {
     // outputInfo->Set(
@@ -157,14 +143,6 @@ vtkPVTrivialProducer::ProcessRequest(vtkInformation* request,
 
 
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVTrivialProducer::ReportReferences(vtkGarbageCollector* collector)
-{
-  this->Superclass::ReportReferences(collector);
-  vtkGarbageCollectorReport(collector, this->PVExtentTranslator,
-    "PVExtentTranslator");
 }
 
 //----------------------------------------------------------------------------

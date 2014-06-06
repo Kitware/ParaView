@@ -25,6 +25,7 @@
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkType.h"
+#include "vtkPVInformationKeys.h"
 
 #include <time.h>
 
@@ -69,7 +70,7 @@ int vtkSQRandomSeedPoints::RequestInformation(
 {
   // tell the excutive that we are handling our own paralelization.
   vtkInformation *outInfo=outInfos->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
+  outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
   return 1;
 }
 
@@ -126,13 +127,13 @@ int vtkSQRandomSeedPoints::RequestData(
       = dynamic_cast<vtkDataSet*>(inInfo->Get(vtkDataObject::DATA_OBJECT()));
     if (input)
       {
-      if (!inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()))
+      if (!inInfo->Has(vtkPVInformationKeys::WHOLE_BOUNDING_BOX()))
         {
         vtkErrorMacro("Input must have WHOLE_BOUNDING_BOX set.");
         return 1;
         }
       double bounds[6];
-      inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),bounds);
+      inInfo->Get(vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),bounds);
       this->SetBounds(bounds);
       }
     }

@@ -46,12 +46,6 @@ public:
   bool GetAutoConvertProperties();
 
   // Description:
-  // Enable/disable strict load balancing. Forwards the call to
-  // vtkSISourceProxy::SetDisablePipelineExecution().
-  void SetStrictLoadBalancing(bool);
-  bool GetStrictLoadBalancing();
-
-  // Description:
   // Automatically apply changes in the 'Properties' panel.
   vtkGetMacro(AutoApply, bool);
   vtkSetMacro(AutoApply, bool);

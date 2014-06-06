@@ -137,6 +137,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkPVInformationKeys.h"
 
 using namespace VAPoR;
 
@@ -548,7 +549,7 @@ void vtkVDFReader::SetExtents(vtkInformation *outInfo)
                        (uExt[5]-uExt[2])/(ext[5]+1)};
 
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), ext, 6);
-  //outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+  //outInfo->Set(vtkPVInformationKeys::WHOLE_BOUNDING_BOX(),
   //bbox, 6);
   outInfo->Set(vtkDataObject::ORIGIN(), origin, 3);
   outInfo->Set(vtkDataObject::SPACING(), spacing, 3);

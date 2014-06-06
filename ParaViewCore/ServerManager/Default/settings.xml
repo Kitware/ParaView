@@ -107,18 +107,6 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty name="StrictLoadBalancing"
-        number_of_elements="1"
-        default_values="0"
-        command="SetStrictLoadBalancing"
-        panel_visibility="advanced">
-        <Documentation>
-          Use strict load balancing for structured datasets (fixme: need to
-          figure out what this one does).
-        </Documentation>
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-
       <IntVectorProperty name="TransferFunctionResetMode"
         number_of_elements="1"
         default_values="0"
@@ -263,7 +251,6 @@
 
       <PropertyGroup label="Data Processing Options">
         <Property name="AutoConvertProperties" />
-        <Property name="StrictLoadBalancing" />
       </PropertyGroup>
 
       <PropertyGroup label="Multicore Support">
