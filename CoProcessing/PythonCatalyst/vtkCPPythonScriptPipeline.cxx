@@ -16,6 +16,7 @@
 
 #include "vtkCPDataDescription.h"
 #include "vtkDataObject.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -71,7 +72,7 @@ namespace
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
     vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");
 #endif
- 
+
     // register callback to initialize modules statically. The callback is
     // empty when BUILD_SHARED_LIBS is ON.
     vtkPVInitializePythonModules();
@@ -111,7 +112,17 @@ vtkCPPythonScriptPipeline::~vtkCPPythonScriptPipeline()
 //----------------------------------------------------------------------------
 int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
 {
-  if(vtksys::SystemTools::FileExists(fileName) == 0)
+  // only process 0 checks if the file exists and broadcasts that information
+  // to the other processes
+  int fileExists = 0;
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::GetGlobalController();
+  if(controller->GetLocalProcessId()==0)
+    {
+    fileExists = vtksys::SystemTools::FileExists(fileName, true);
+    }
+  controller->Broadcast(&fileExists, 1, 0);
+  if(fileExists == 0)
     {
     vtkErrorMacro("Could not find file " << fileName);
     return 0;
