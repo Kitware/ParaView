@@ -46,10 +46,23 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget :
   public pqPropertyWidget
 {
   Q_OBJECT
+  Q_PROPERTY(QString justification READ justification WRITE setJustification)
+
   typedef pqPropertyWidget Superclass;
 public:
   pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
   virtual ~pqFontPropertyWidget();
+
+  QString justification() const;
+signals:
+  void justificationChanged(QString&);
+
+protected:
+  void setJustification(QString&);
+  void setupJustificationButton();
+
+protected slots:
+  void changeJustificationIcon(QAction*);
 
 private:
   Q_DISABLE_COPY(pqFontPropertyWidget)

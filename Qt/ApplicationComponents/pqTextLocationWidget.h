@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSpreadSheetDisplayEditor.h
+   Module:  pqTextLocationWidget.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,37 +29,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSpreadSheetDisplayEditor_h 
-#define __pqSpreadSheetDisplayEditor_h
+#ifndef __pqTextWindowLocationWidget_h
+#define __pqTextWindowLocationWidget_h
 
-#include "pqDisplayPanel.h"
+#include "pqApplicationComponentsModule.h"
+#include "pqPropertyWidget.h"
 
-/// Display properties page for a representation belonging to the spreadsheet
-/// view.
-class PQCOMPONENTS_EXPORT pqSpreadSheetDisplayEditor : public pqDisplayPanel
+class vtkSMPropertyGroup;
+
+/// pqTextLocationWidget is a pqPropertyWidget that can be used to set
+/// the location of the a text representation relative to the viewport.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqTextLocationWidget :
+  public pqPropertyWidget
 {
   Q_OBJECT
-  typedef pqDisplayPanel Superclass;
+  Q_PROPERTY(QString windowLocation READ windowLocation WRITE setWindowLocation)
+
+  typedef pqPropertyWidget Superclass;
+
 public:
-  pqSpreadSheetDisplayEditor(pqRepresentation* repr, QWidget* parent=0);
-  virtual ~pqSpreadSheetDisplayEditor();
+  pqTextLocationWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent=0);
+  virtual ~pqTextLocationWidget();
+
+  QString windowLocation() const;
+
+signals:
+  void windowLocationChanged(QString&);
+
+protected:
+  void setWindowLocation(QString&);
 
 protected slots:
-  /// Show/hide the process id controls based on whether mode 
-  /// is "Field Data" or not.
-  void onAttributeModeChanged(const QString &mode);
+  void emitWindowLocationChangedSignal();
+  void groupBoxLocationClicked(bool);
+  void groupBoxPositionClicked(bool);
 
 private:
-  pqSpreadSheetDisplayEditor(const pqSpreadSheetDisplayEditor&); // Not implemented.
-  void operator=(const pqSpreadSheetDisplayEditor&); // Not implemented.
-
-  /// Internal method called during initialization.
-  void setRepresentationInternal(pqRepresentation* repr);
-
-  class pqInternal;
-  pqInternal* Internal;
+  Q_DISABLE_COPY(pqTextLocationWidget)
+  class pqInternals;
+  pqInternals* Internals;
 };
 
-#endif
-
-
+#endif //__pqTextWindowLocationWidget_h

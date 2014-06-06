@@ -6371,14 +6371,16 @@
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Visibility of the representation.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetGenerateCellConnectivity"
                          default_values="0"
                          name="GenerateCellConnectivity"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Generation of the cell connectivity.</Documentation>
       </IntVectorProperty>
@@ -6464,7 +6466,8 @@
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetForceUseCache"
@@ -6498,29 +6501,37 @@
                          name="Interactivity"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether user should be able to interactively place the text in the view.
+        </Documentation>
       </IntVectorProperty>
       <SubProxy>
         <Proxy name="TextWidgetRepresentation"
                proxygroup="representations"
                proxyname="TextWidgetRepresentation"></Proxy>
         <ExposedProperties>
-          <Property name="Position" />
-          <Property name="Position2" />
-          <Property name="PositionInfo" />
-          <Property name="Position2Info" />
-          <Property name="WindowLocation" />
-          <Property name="TextScaleMode" />
-          <Property name="Resizable" />
           <!-- properties for Text -->
-          <Property name="Justification" />
-          <Property name="Orientation" />
-          <Property name="Color" />
-          <Property name="Opacity" />
-          <Property name="FontFamily" />
-          <Property name="Bold" />
-          <Property name="Italic" />
-          <Property name="Shadow" />
-          <Property name="FontSize" />
+          <Property name="Orientation" panel_visibility="never"/>
+          <PropertyGroup label="Font Properties" panel_widget="FontEditor">
+            <Property name="Color" function="Color"/>
+            <Property name="Opacity" function="Opacity"/>
+            <Property name="FontFamily" function="Family"/>
+            <Property name="Bold" function="Bold"/>
+            <Property name="Italic" function="Italics" />
+            <Property name="Shadow" function="Shadow"/>
+            <Property name="FontSize" function="Size"/>
+            <Property name="Justification" function="Justification"/>
+          </PropertyGroup>
+          <!-- properties for Text Position-->
+          <PropertyGroup label="Text Position" panel_widget="TextLocationEditor">
+            <Property name="WindowLocation" />
+            <Property name="Position" />
+            <Property name="Position2" panel_visibility="never"/>
+            <Property name="PositionInfo" />
+            <Property name="Position2Info" />
+          </PropertyGroup>
+          <Property name="TextScaleMode" panel_visibility="never"/>
+          <Property name="Resizable" panel_visibility="never"/>
         </ExposedProperties>
       </SubProxy>
       <!-- End of TextSourceRepresentation -->

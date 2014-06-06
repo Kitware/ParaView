@@ -279,5 +279,9 @@
         <file>Icons/pqItalics24.png</file>
         <file>Icons/pqShadow16.png</file>
         <file>Icons/pqShadow24.png</file>
+        <file>Icons/pqTextAlignRight16.png</file>
+        <file>Icons/pqTextAlignLeft16.png</file>
+        <file>Icons/pqTextAlignCenter16.png</file>
+        <file>Icons/pqTextAlignJustified16.png</file>
     </qresource>
 </RCC>
