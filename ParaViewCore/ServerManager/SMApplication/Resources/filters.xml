@@ -9362,15 +9362,6 @@ found and the point will be rejected.</Documentation>
         that produced each output vertex. This is useful for
         picking.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetMakeOutlineOfInput"
-                         default_values="0"
-                         name="MakeOutlineOfInput"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Causes filter to try to make geometry of input to the
-        algorithm on its input.</Documentation>
-      </IntVectorProperty>
       <!-- End GeometryFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
