@@ -467,6 +467,26 @@ bool vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(vtkSMProxy* view)
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::IsScalarBarVisible(vtkSMProxy* view)
+{
+  vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
+  if (!lutProperty)
+    {
+    return false;
+    }
+
+  vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+  if (lutPropertyHelper.GetNumberOfElements() == 0 ||
+    lutPropertyHelper.GetAsProxy(0) == NULL)
+    {
+    return false;
+    }
+
+  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+  return vtkSMTransferFunctionProxy::IsScalarBarVisible(lutProxy, view);
+}
+
+//----------------------------------------------------------------------------
 vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorArray()
 {
   if (!this->GetUsingScalarColoring())
