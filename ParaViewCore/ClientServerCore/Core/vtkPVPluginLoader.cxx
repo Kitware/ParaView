@@ -42,6 +42,12 @@
 #define vtkPVPluginLoaderErrorMacro(x)\
   if (!no_errors) {vtkErrorMacro(<< x);} this->SetErrorString(x);
 
+#if defined(_WIN32) && !defined(__CYGWIN__)
+const char ENV_PATH_SEP=';';
+#else
+const char ENV_PATH_SEP=':';
+#endif
+
 namespace
 {
   // This is an helper class used for plugins constructed from XMLs.
@@ -230,7 +236,7 @@ vtkPVPluginLoader::vtkPVPluginLoader()
       appDir += "/plugins";
       if(paths.size())
         {
-        paths += ";";
+        paths += ENV_PATH_SEP;
         }
       paths += appDir;
       }
@@ -262,10 +268,15 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
     << this->SearchPaths);
 
   std::vector<std::string> paths;
-  vtksys::SystemTools::Split(this->SearchPaths, paths, ';');
-  for (size_t cc=0; cc < paths.size(); cc++)
+  vtksys::SystemTools::Split(this->SearchPaths, paths, ENV_PATH_SEP);
+  for (size_t cc = 0; cc < paths.size(); cc++)
     {
-    this->LoadPluginsFromPath(paths[cc].c_str());
+    std::vector<std::string> subpaths;
+    vtksys::SystemTools::Split(paths[cc].c_str(), subpaths, ';');
+    for (size_t scc = 0; scc < subpaths.size(); scc++)
+      {
+      this->LoadPluginsFromPath(subpaths[scc].c_str());
+      }
     }
 #else
   vtkPVPluginLoaderDebugMacro(
