@@ -79,18 +79,20 @@ if( PARAVIEW_QT_VERSION VERSION_GREATER "4" )
 endif()
 
 # Link against the documentation module.
-target_link_libraries(paraview vtkParaViewDocumentation)
+target_link_libraries(paraview
+  LINK_PRIVATE vtkParaViewDocumentation)
 
 # link enabled plugins if not building in shared library mode and
 # add dependecies to linked python modules These are non-empty only when
 # building statically.
 if (PARAVIEW_ENABLE_PYTHON)
-  target_link_libraries(paraview vtkUtilitiesPythonInitializer)
+  target_link_libraries(paraview 
+    LINK_PRIVATE vtkUtilitiesPythonInitializer)
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(paraview
-    vtkPVStaticPluginsInit)
+    LINK_PRIVATE vtkPVStaticPluginsInit)
 endif(NOT BUILD_SHARED_LIBS)
 
 
