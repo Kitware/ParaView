@@ -51,6 +51,7 @@ class PQWIDGETS_EXPORT pqColorChooserButton : public QToolButton
   Q_PROPERTY(QVariantList chosenColorRgbaF
              READ chosenColorRgbaF
              WRITE setChosenColorRgbaF);
+  Q_PROPERTY(bool showAlphaChannel READ showAlphaChannel WRITE setShowAlphaChannel);
 public:
   /// constructor requires a QComboBox
   pqColorChooserButton(QWidget* p);
@@ -71,6 +72,11 @@ public:
     { this->IconRadiusHeightRatio = val; }
   double iconRadiusHeightRatio() const
     { return this->IconRadiusHeightRatio; }
+
+  /// When true, the widget will allow users to choose the alpha channel.
+  bool showAlphaChannel() const { return this->ShowAlphaChannel; }
+  void setShowAlphaChannel(bool val)
+    { this->ShowAlphaChannel = val; }
 
 signals:
   /// signal color changed. This is fired in setChosenColor() only
@@ -106,6 +112,8 @@ protected:
 
   /// the ratio of icon radius to button height
   double IconRadiusHeightRatio;
+
+  bool ShowAlphaChannel;
 };
 
 #endif

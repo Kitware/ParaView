@@ -40,7 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqColorChooserButton::pqColorChooserButton(QWidget* p)
-  : QToolButton(p)
+  : QToolButton(p),
+  ShowAlphaChannel(false)
 {
   this->IconRadiusHeightRatio = 0.75;
   this->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -104,7 +105,7 @@ void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
   newColor.setRedF(val[0].toDouble());
   newColor.setGreenF(val[1].toDouble());
   newColor.setBlueF(val[2].toDouble());
-  newColor.setAlphaF(val[2].toDouble());
+  newColor.setAlphaF(val[3].toDouble());
   this->setChosenColor(newColor);
 }
 
@@ -131,7 +132,13 @@ QIcon pqColorChooserButton::renderColorSwatch(const QColor& color)
 //-----------------------------------------------------------------------------
 void pqColorChooserButton::chooseColor()
 {
-  this->setChosenColor(QColorDialog::getColor(this->Color, this));
+  QColorDialog::ColorDialogOptions opts;
+  if (this->ShowAlphaChannel)
+    {
+    opts |= QColorDialog::ShowAlphaChannel;
+    }
+
+  this->setChosenColor(QColorDialog::getColor(this->Color, this, "Select Color", opts));
 }
 
 //-----------------------------------------------------------------------------
