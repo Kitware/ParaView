@@ -24,6 +24,8 @@
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
+class vtkStdString;
+
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonAnnotationFilter : public vtkTableAlgorithm
 {
 public:
@@ -52,13 +54,13 @@ public:
   vtkSetStringMacro(PythonExpression);
   vtkGetStringMacro(PythonExpression);
 
-
   // Description:
-  // Set the value that is going to be printed to the output
-  vtkSetStringMacro(AnnotationValue);
+  // Set the value that is going to be printed to the output. This is an
+  // internal method and should not be called directly. It is called by the
+  // python script executed internally to pass the computed annotation value
+  // back to the filter.
+  void SetAnnotationValue(const char* value);
   vtkGetStringMacro(AnnotationValue);
-
-
 //BTX
 protected:
   vtkPythonAnnotationFilter();

@@ -16,7 +16,7 @@
 // .SECTION Description
 // This filter is a helper to vtkPythonAnnotationFilter by providing a simpler
 // API and allowing the user to simply display FieldData without wondering
-// of the Python syntaxe.
+// of the Python syntax.
 
 #ifndef __vtkAnnotateGlobalDataFilter_h
 #define __vtkAnnotateGlobalDataFilter_h
