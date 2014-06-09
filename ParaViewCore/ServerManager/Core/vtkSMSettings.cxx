@@ -374,7 +374,6 @@ public:
   {
     if (!proxy)
       {
-      std::cout << "Null proxy\n";
       return false;
       }
 
@@ -502,7 +501,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void SetPropertySetting(const char* settingName,
+  bool SetPropertySetting(const char* settingName,
                           vtkSMIntVectorProperty* property)
   {
     Json::Path valuePath(settingName);
@@ -527,10 +526,12 @@ public:
           }
         }
       }
+
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void SetPropertySetting(const char* settingName,
+  bool SetPropertySetting(const char* settingName,
                           vtkSMDoubleVectorProperty* property)
   {
     Json::Path valuePath(settingName);
@@ -555,10 +556,12 @@ public:
           }
         }
       }
+
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void SetPropertySetting(const char* settingName,
+  bool SetPropertySetting(const char* settingName,
                           vtkSMStringVectorProperty* property)
   {
     Json::Path valuePath(settingName);
@@ -583,71 +586,77 @@ public:
           }
         }
       }
+
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void SetPropertySetting(const char* settingName,
+  bool SetPropertySetting(const char* settingName,
                           vtkSMInputProperty* property)
   {
     Json::Path valuePath(settingName);
-    std::cerr << "Unhandled property '" << property->GetXMLName() << "' of type '"
-              << property->GetClassName() << "'\n";
+    vtkGenericWarningMacro(<< "Unhandled property '" << property->GetXMLName()
+                           << "' of type '" << property->GetClassName());
+
+    return false;
   }
 
   //----------------------------------------------------------------------------
   // Description:
   // Set a property setting in the highest-priority collection.
-  void SetPropertySetting(const char* settingName, vtkSMProperty* property)
+  bool SetPropertySetting(const char* settingName, vtkSMProperty* property)
   {
     this->CreateCollectionIfNeeded();
 
     if (vtkSMIntVectorProperty* intVectorProperty =
         vtkSMIntVectorProperty::SafeDownCast(property))
       {
-      this->SetPropertySetting(settingName, intVectorProperty);
+      return this->SetPropertySetting(settingName, intVectorProperty);
       }
     else if (vtkSMDoubleVectorProperty* doubleVectorProperty =
              vtkSMDoubleVectorProperty::SafeDownCast(property))
       {
-      this->SetPropertySetting(settingName, doubleVectorProperty);
+      return this->SetPropertySetting(settingName, doubleVectorProperty);
       }
     else if (vtkSMStringVectorProperty* stringVectorProperty =
              vtkSMStringVectorProperty::SafeDownCast(property))
       {
-      this->SetPropertySetting(settingName, stringVectorProperty);
+      return this->SetPropertySetting(settingName, stringVectorProperty);
       }
     else if (vtkSMInputProperty* inputProperty =
              vtkSMInputProperty::SafeDownCast(property))
       {
-      this->SetPropertySetting(settingName, inputProperty);
+      return this->SetPropertySetting(settingName, inputProperty);
       }
+
+    return false;
   }
 
   //----------------------------------------------------------------------------
   // Description:
   // Set proxy settings to the highest-priority collection.
-  void SetProxySettings(vtkSMProxy* proxy)
+  bool SetProxySettings(vtkSMProxy* proxy)
   {
     if (!proxy)
       {
-      return;
+      return false;
       }
 
     std::string jsonPrefix(".");
     jsonPrefix.append(proxy->GetXMLGroup());
 
-    this->SetProxySettings(jsonPrefix.c_str(), proxy);
+    return this->SetProxySettings(jsonPrefix.c_str(), proxy);
   }
 
   //----------------------------------------------------------------------------
   // Description:
   // Set proxy settings in the highest-priority collection under
   // the setting prefix.
-  void SetProxySettings(const char* settingPrefix, vtkSMProxy* proxy)
+  bool SetProxySettings(const char* settingPrefix, vtkSMProxy* proxy)
   {
     if (!proxy)
       {
-      return;
+      return false;
       }
 
     this->CreateCollectionIfNeeded();
@@ -720,17 +729,40 @@ public:
           }
         }
 
-      this->SetPropertySetting(propertySettingCString, property);
-      propertySet = true;
+      if (this->SetPropertySetting(propertySettingCString, property))
+        {
+        propertySet = true;
+        }
       }
 
-    // Check if the property wasn't set, remove it.
+    // If no property was set, remove the proxy entry.
     if (!propertySet)
       {
       Json::Path parentPath(settingPrefix);
       Json::Value & parentValue = parentPath.make(this->SettingCollections[0].Value);
       parentValue.removeMember(proxyName);
+
+      if (parentValue.empty())
+        {
+        std::string parentRoot, parentLeaf;
+        SeparateBranchFromLeaf(settingPrefix, parentRoot, parentLeaf);
+        parentRoot.append(".");
+        // Need special handling when parent root is "." because
+        // Json::Path::make() doesn't appear to handle it correctly.
+        if (parentRoot == ".")
+          {
+          this->SettingCollections[0].Value.removeMember(parentLeaf);
+          }
+        else
+          {
+          Json::Path parentRootPath(parentRoot);
+          Json::Value & parentRootValue = parentRootPath.make(this->SettingCollections[0].Value);
+          parentRootValue.removeMember(parentLeaf);
+          }
+        }
       }
+
+    return true;
   }
 
   //----------------------------------------------------------------------------
@@ -759,7 +791,7 @@ public:
       }
     catch (...)
       {
-      std::cout << "Could not convert \n" << jsonValue.toStyledString() << "\n";
+      vtkGenericWarningMacro(<< "Could not convert \n" << jsonValue.toStyledString());
       }
 
     return true;
@@ -779,7 +811,7 @@ public:
       }
     catch (...)
       {
-      std::cout << "Could not convert \n" << jsonValue.toStyledString() << "\n";
+      vtkGenericWarningMacro(<< "Could not convert \n" << jsonValue.toStyledString());
       }
 
     return true;
