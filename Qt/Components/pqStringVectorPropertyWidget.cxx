@@ -203,6 +203,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       selectorWidget->setObjectName("ArraySelectionWidget");
       selectorWidget->setRootIsDecorated(false);
       selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+      selectorWidget->setMaximumRowCountBeforeScrolling(20);
 
       // hide widget label
       this->setShowLabel(false);
@@ -302,6 +303,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     selectorWidget->setObjectName("ArraySelectionWidget");
     selectorWidget->setRootIsDecorated(false);
     selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+    selectorWidget->setMaximumRowCountBeforeScrolling(20);
     this->addPropertyLink(
       selectorWidget, smProxy->GetPropertyName(smProperty),
       SIGNAL(widgetModified()), smProperty);
