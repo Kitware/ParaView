@@ -125,6 +125,11 @@ public:
       this->TimeStamp = ts;
       }
 
+    void SetActualMemorySize(unsigned long size)
+      {
+      this->ActualMemorySize = size;
+      }
+
     void SetDeliveredDataObject(vtkDataObject* data)
       {
       this->DeliveredDataObject = data;
@@ -352,7 +357,8 @@ void vtkPVDataDeliveryManager::SetStreamable(
 
 //----------------------------------------------------------------------------
 void vtkPVDataDeliveryManager::SetPiece(
-  vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res)
+  vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res,
+  unsigned long trueSize)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
   if (item)
@@ -366,6 +372,10 @@ void vtkPVDataDeliveryManager::SetPiece(
       item->GetDataObject() != data)
       {
       item->SetDataObject(data);
+      }
+    if (trueSize > 0)
+      {
+      item->SetActualMemorySize(trueSize);
       }
     }
   else

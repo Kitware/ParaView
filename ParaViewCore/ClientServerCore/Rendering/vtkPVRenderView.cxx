@@ -1241,7 +1241,8 @@ int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetPiece(vtkInformation* info,
-  vtkPVDataRepresentation* repr, vtkDataObject* data)
+  vtkPVDataRepresentation* repr, vtkDataObject* data,
+  unsigned long trueSize/*=0*/)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1250,7 +1251,7 @@ void vtkPVRenderView::SetPiece(vtkInformation* info,
     return;
     }
 
-  view->GetDeliveryManager()->SetPiece(repr, data, false);
+  view->GetDeliveryManager()->SetPiece(repr, data, false, trueSize);
 }
 
 //----------------------------------------------------------------------------

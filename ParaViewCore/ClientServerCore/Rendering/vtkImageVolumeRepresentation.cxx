@@ -58,6 +58,7 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->Actor->SetLODMapper(this->OutlineMapper);
 
   vtkMath::UninitializeBounds(this->DataBounds);
+  this->DataSize = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -94,7 +95,12 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
     vtkPVRenderView::SetPiece(inInfo, this,
-      this->OutlineSource->GetOutputDataObject(0));
+      this->OutlineSource->GetOutputDataObject(0),
+      this->DataSize);
+    // BUG #14792.
+    // We report this->DataSize explicitly since the data being "delivered" is
+    // not the data that should be used to make rendering decisions based on
+    // data size.
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
     vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
@@ -150,6 +156,7 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkMath::UninitializeBounds(this->DataBounds);
+  this->DataSize = 0;
 
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
@@ -172,6 +179,8 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
         this->CacheKeeper->GetOutputDataObject(0))->GetBounds());
     this->OutlineSource->GetBounds(this->DataBounds);
     this->OutlineSource->Update();
+
+    this->DataSize = this->CacheKeeper->GetOutputDataObject(0)->GetActualMemorySize();
     }
   else
     {

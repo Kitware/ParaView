@@ -322,8 +322,10 @@ public:
 
   // Description:
   // Convenience methods used by representations to pass represented data.
+  // If trueSize is non-zero, then that's the size used in making decisions
+  // about LOD/remote rendering etc and not the actual size of the dataset.
   static void SetPiece(vtkInformation* info,
-    vtkPVDataRepresentation* repr, vtkDataObject* data);
+    vtkPVDataRepresentation* repr, vtkDataObject* data, unsigned long trueSize=0);
   static vtkAlgorithmOutput* GetPieceProducer(vtkInformation* info,
     vtkPVDataRepresentation* repr);
   static void SetPieceLOD(vtkInformation* info,
