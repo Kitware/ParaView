@@ -81,12 +81,14 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
 
   if (vtkSMPropertyHelper(smProperty).GetNumberOfElements() == 3)
     {
+    button->setShowAlphaChannel(false);
     this->addPropertyLink(
       button, "chosenColorRgbF", SIGNAL(chosenColorChanged(const QColor&)),
       smProperty);
     }
   else if (vtkSMPropertyHelper(smProperty).GetNumberOfElements() == 4)
     {
+    button->setShowAlphaChannel(true);
     this->addPropertyLink(
       button, "chosenColorRgbaF", SIGNAL(chosenColorChanged(const QColor&)),
       smProperty);

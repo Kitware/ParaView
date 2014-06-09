@@ -131,7 +131,6 @@
       </DoubleVectorProperty>
       <PropertyGroup label="Title">
         <Property name="ChartTitle"/>
-        <Property name="ChartTitleAlignment"/>
       </PropertyGroup>
       <PropertyGroup label="Chart Title Properties"
                      panel_widget="FontEditor"
@@ -141,6 +140,7 @@
         <Property name="ChartTitleBold" function="Bold" />
         <Property name="ChartTitleItalic" function="Italics"/>
         <Property name="ChartTitleFontSize" function="Size" />
+        <Property name="ChartTitleAlignment" function="Justification" />
       </PropertyGroup>
     </Proxy>
     <!-- ================================================================== -->
@@ -172,7 +172,8 @@
       <IntVectorProperty command="SetLegendLocation"
                          default_values="1"
                          name="LegendLocation"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="TopLeft"
                  value="0" />
@@ -796,7 +797,8 @@
       <!-- title -->
       <StringVectorProperty command="SetRightAxisTitle"
                             name="RightAxisTitle"
-                            number_of_elements="1"/>
+                            number_of_elements="1"
+                            panel_visibility="advanced" />
       <IntVectorProperty command="SetRightGridVisibility"
                          default_values="1"
                          panel_visibility="advanced"
@@ -868,13 +870,15 @@
       <IntVectorProperty command="SetRightAxisLogScale"
                          default_values="0"
                          name="RightAxisLogScale"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetRightAxisUseCustomRange"
                          default_values="0"
                          name="RightAxisUseCustomRange"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Specify whether to use the axis range specified or whether the view
@@ -886,7 +890,8 @@
       <DoubleVectorProperty command="SetRightAxisRangeMinimum"
                             default_values="0"
                             name="RightAxisRangeMinimum"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>Set the axis range minimum for the Right axis.
         </Documentation>
         <Hints>
@@ -899,7 +904,8 @@
       <DoubleVectorProperty command="SetRightAxisRangeMaximum"
                             default_values="1"
                             name="RightAxisRangeMaximum"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>Set the axis range maximum for the Right axis.
         </Documentation>
         <Hints>
@@ -1062,7 +1068,8 @@
       <!-- title -->
       <StringVectorProperty command="SetTopAxisTitle"
                             name="TopAxisTitle"
-                            number_of_elements="1"/>
+                            number_of_elements="1"
+                            panel_visibility="advanced"/>
       <IntVectorProperty command="SetTopGridVisibility"
                          default_values="1"
                          panel_visibility="advanced"
@@ -1134,13 +1141,15 @@
       <IntVectorProperty command="SetTopAxisLogScale"
                          default_values="0"
                          name="TopAxisLogScale"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetTopAxisUseCustomRange"
                          default_values="0"
                          name="TopAxisUseCustomRange"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Specify whether to use the axis range specified or whether the view
@@ -1152,7 +1161,8 @@
       <DoubleVectorProperty command="SetTopAxisRangeMinimum"
                             default_values="0"
                             name="TopAxisRangeMinimum"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>Set the axis range minimum for the Top axis.
         </Documentation>
         <Hints>
@@ -1165,7 +1175,8 @@
       <DoubleVectorProperty command="SetTopAxisRangeMaximum"
                             default_values="1"
                             name="TopAxisRangeMaximum"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>Set the axis range maximum for the Top axis.
         </Documentation>
         <Hints>
@@ -2242,7 +2253,8 @@
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
                          default_values="0"
                          name="UseOffscreenRenderingForScreenshots"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Set whether offscreen rendering should be used during
         CaptureWindow calls.</Documentation>
@@ -2251,7 +2263,8 @@
                          default_values="0"
                          ignore_synchronization="1"
                          name="UseOffscreenRendering"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
       </IntVectorProperty>
@@ -2332,7 +2345,8 @@
                             default_values="0.8 0 0 0.4"
                             name="ScatterPlotSelectedRowColumnColor"
                             number_of_elements="4"
-                            panel_widget="color_selector">
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2342,7 +2356,8 @@
                             default_values="0 0.8 0 0.4"
                             name="ScatterPlotSelectedActiveColor"
                             number_of_elements="4"
-                            panel_widget="color_selector">
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2355,7 +2370,8 @@
                             default_values="1 1 1 0"
                             name="ActivePlotBackgroundColor"
                             number_of_elements="4"
-                            panel_widget="color_selector">
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2364,7 +2380,8 @@
                             default_values="0 0 0"
                             name="ActivePlotAxisColor"
                             panel_widget="color_selector"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
@@ -2373,7 +2390,8 @@
                             default_values="0.95 0.95 0.95"
                             name="ActivePlotGridColor"
                             panel_widget="color_selector"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
@@ -2381,13 +2399,15 @@
       <IntVectorProperty command="SetActivePlotGridVisibility"
                          default_values="1"
                          name="ActivePlotGridVisibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetActivePlotAxisLabelVisibility"
                          default_values="1"
                          name="ActivePlotAxisLabelVisibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetActivePlotAxisLabelNotation"
@@ -2476,7 +2496,8 @@
                             default_values="1 1 1 0"
                             name="ScatterPlotBackgroundColor"
                             number_of_elements="4"
-                            panel_widget="color_selector">
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2485,7 +2506,8 @@
                             default_values="0 0 0"
                             name="ScatterPlotAxisColor"
                             panel_widget="color_selector"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
@@ -2494,7 +2516,8 @@
                             default_values="0.95 0.95 0.95"
                             name="ScatterPlotGridColor"
                             panel_widget="color_selector"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
@@ -2502,13 +2525,15 @@
       <IntVectorProperty command="SetScatterPlotGridVisibility"
                          default_values="1"
                          name="ScatterPlotGridVisibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetScatterPlotAxisLabelVisibility"
                          default_values="1"
                          name="ScatterPlotAxisLabelVisibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetScatterPlotAxisLabelNotation"
@@ -2600,7 +2625,8 @@
                             default_values="0.5 0.5 0.5 0.4"
                             name="HistogramBackgroundColor"
                             number_of_elements="4"
-                            panel_widget="color_selector">
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1 1"
                            min="0 0 0 0"
                            name="range" />
@@ -2609,7 +2635,8 @@
                             default_values="0 0 0"
                             name="HistogramAxisColor"
                             panel_widget="color_selector"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
@@ -2618,7 +2645,8 @@
                             default_values="0.95 0.95 0.95"
                             name="HistogramGridColor"
                             panel_widget="color_selector"
-                            number_of_elements="3">
+                            number_of_elements="3"
+                            panel_visibility="advanced">
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
@@ -2626,13 +2654,15 @@
       <IntVectorProperty command="SetHistogramGridVisibility"
                          default_values="1"
                          name="HistogramGridVisibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetHistogramAxisLabelVisibility"
                          default_values="1"
                          name="HistogramAxisLabelVisibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetHistogramAxisLabelNotation"
@@ -2758,23 +2788,28 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <StringVectorProperty command="SetColumnNameToSort"
-                            name="ColumnToSort"></StringVectorProperty>
+                            name="ColumnToSort"
+                            panel_visibility="never">
+      </StringVectorProperty>
       <IntVectorProperty command="SetComponentToSort"
                          default_values="-1"
                          name="SelectedComponent"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain name="range" />
       </IntVectorProperty>
       <IntVectorProperty command="SetInvertSortOrder"
                          default_values="0"
                          name="InvertOrder"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IdTypeVectorProperty command="SetBlockSize"
                             default_values="1024"
                             name="BlockSize"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <Documentation>Get/Set the number of rows that fit within one block.
         The output of this filter will have at most BlockSize
         rows.</Documentation>
