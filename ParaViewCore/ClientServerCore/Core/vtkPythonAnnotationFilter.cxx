@@ -28,15 +28,16 @@
 #include <map>
 #include <vector>
 #include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPythonAnnotationFilter);
 //----------------------------------------------------------------------------
 vtkPythonAnnotationFilter::vtkPythonAnnotationFilter()
 {
   this->SetNumberOfInputPorts(1);
-  this->AnnotationValue = 0;
   this->PythonExpression = 0;
   this->TimeInformations = 0;
+  this->AnnotationValue = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -45,6 +46,16 @@ vtkPythonAnnotationFilter::~vtkPythonAnnotationFilter()
   this->SetTimeInformations(0);
   this->SetPythonExpression(0);
   this->SetAnnotationValue(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonAnnotationFilter::SetAnnotationValue(const char* value)
+{
+  delete [] this->AnnotationValue;
+  // SystemTools handles NULL strings.
+  this->AnnotationValue = vtksys::SystemTools::DuplicateString(value);
+
+  // don't call this->Modified. This method gets called in RequestData().
 }
 
 //----------------------------------------------------------------------------
@@ -107,6 +118,7 @@ int vtkPythonAnnotationFilter::RequestData(
     }
   this->SetTimeInformations(timeInfo.str().c_str());
 
+  this->SetAnnotationValue(NULL);
 
   // Execute the python script to process and generate the annotation
   this->EvaluateExpression();

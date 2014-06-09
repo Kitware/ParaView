@@ -98,20 +98,12 @@ void vtkSMFieldDataDomain::UpdateDomainEntries(
     if (
       // ... domain updates are disabled
       this->DisableUpdateDomainEntries ||
-      // ... field-data is enabled.
-      (this->EnableFieldDataSelection && idx == vtkSMInputArrayDomain::FIELD) ||
       // ... point/cell if forced.
       (this->ForcePointAndCellDataSelection &&
        (idx == vtkSMInputArrayDomain::POINT || idx == vtkSMInputArrayDomain::CELL))
       )
       {
       accepted_associations.insert(idx);
-      continue;
-      }
-
-    // field data is added only if this->EnableFieldDataSelection is true.
-    if (idx == vtkSMInputArrayDomain::FIELD && !this->EnableFieldDataSelection)
-      {
       continue;
       }
 
@@ -123,6 +115,12 @@ void vtkSMFieldDataDomain::UpdateDomainEntries(
       continue;
       }
     accepted_associations.insert(idx);
+    }
+
+  // field data is added only if this->EnableFieldDataSelection is true.
+  if (this->EnableFieldDataSelection)
+    {
+    accepted_associations.insert(vtkSMInputArrayDomain::FIELD);
     }
 
   if (accepted_associations.size() > 0)
