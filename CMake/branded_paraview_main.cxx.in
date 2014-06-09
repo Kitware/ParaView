@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include "pq@BPC_NAME@Initializer.h"
+#include "vtkPVConfig.h"
 #ifndef BUILD_SHARED_LIBS
 #include "pvStaticPluginsInit.h"
 #endif
