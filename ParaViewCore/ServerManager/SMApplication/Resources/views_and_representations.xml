@@ -1444,6 +1444,22 @@
                      processes="client|renderserver|dataserver">
       <Documentation>View proxy for a 3D interactive render
       view.</Documentation>
+      <IntVectorProperty command="SetShowAnnotation"
+                         default_values="0"
+                         number_of_elements="1"
+                         name="ShowAnnotation"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to see annotation providing advanced debugging and performance
+          information about each render.
+        </Documentation>
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="ShowAnnotation"/>
+        </Hints>
+      </IntVectorProperty>
       <IntVectorProperty command="SetUseOffscreenRendering"
                          default_values="0"
                          ignore_synchronization="1"

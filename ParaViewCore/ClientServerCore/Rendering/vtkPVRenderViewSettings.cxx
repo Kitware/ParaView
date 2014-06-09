@@ -57,7 +57,8 @@ vtkPVRenderViewSettings::~vtkPVRenderViewSettings()
 //----------------------------------------------------------------------------
 void vtkPVRenderViewSettings::SetUseDisplayLists(bool val)
 {
-  vtkMapper::SetGlobalImmediateModeRendering(val? 1 : 0);
+  // note: this is inverted.
+  vtkMapper::SetGlobalImmediateModeRendering(val? 0 : 1);
   this->Modified();
 }
 
