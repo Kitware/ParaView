@@ -379,7 +379,7 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
 bool vtkSMTransferFunctionProxy::ApplyColorMap(const char* text)
 {
   vtkNew<vtkPVXMLParser> parser;
-  if (parser->Parse(text))
+  if (!parser->Parse(text))
     {
     return false;
     }
