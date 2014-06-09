@@ -35,13 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -68,7 +69,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "pqSMAdaptor.h"
 #include "pqTimer.h"
 #include "pqRenderView.h"
 
@@ -265,8 +265,7 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
   vtkSMProxy* proxy = this->getProxy();
   if (getenv("PV_NO_OFFSCREEN_SCREENSHOTS"))
     {
-    pqSMAdaptor::setElementProperty(
-      proxy->GetProperty("UseOffscreenRenderingForScreenshots"), 0);
+    vtkSMPropertyHelper(proxy, "UseOffscreenRenderingForScreenshots", /*quiet*/true).Set(0);
     }
   proxy->UpdateVTKObjects();
 }
@@ -331,10 +330,16 @@ void pqRenderViewBase::setStereo(int mode)
   foreach (pqView* view, views)
     {
     vtkSMProxy* viewProxy = view->getProxy();
-    pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoType"),
-      mode!=0? mode : VTK_STEREO_RED_BLUE);
-    pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoRender"),
-      mode != 0? 1 : 0);
+    if (mode >= VTK_STEREO_CRYSTAL_EYES &&
+      mode <= VTK_STEREO_SPLITVIEWPORT_HORIZONTAL)
+      {
+      vtkSMPropertyHelper(viewProxy, "StereoType", /*quiet*/true).Set(mode);
+      vtkSMPropertyHelper(viewProxy, "StereoRender", /*quiet*/true).Set(1);
+      }
+    else
+      {
+      vtkSMPropertyHelper(viewProxy, "StereoRender", /*quiet*/true).Set(0);
+      }
     viewProxy->UpdateVTKObjects();
     if (mode != 0)
       {

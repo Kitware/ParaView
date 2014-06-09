@@ -1971,14 +1971,14 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoRender"
-                         default_values="none"
+                         default_values="0"
                          name="StereoRender"
                          panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
-                         default_values="none"
+                         default_values="3"
                          name="StereoType"
                          panel_visibility="never"
                          number_of_elements="1">
@@ -2001,7 +2001,6 @@
                  value="8" />
           <Entry text="SplitViewportHorizontal"
                  value="9" />
-        SplitViewportHorizontal
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetMultiSamples"
