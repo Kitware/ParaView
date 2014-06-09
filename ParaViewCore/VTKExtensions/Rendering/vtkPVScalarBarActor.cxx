@@ -340,6 +340,7 @@ std::vector<double> vtkPVScalarBarActor::LinearTickMarks(
       {
       ticks.push_back(tick);
       }
+
     int nticks = static_cast<int>(ticks.size());
     int leastDig = floor(log10(fabs(mag)));
     minDigits = leadDig - leastDig;
@@ -693,6 +694,17 @@ void vtkPVScalarBarActor::ConfigureTicks()
   vtkNew<vtkPoints> tickPoints;
   tickPoints->Allocate(ticks.size() * 20);
 
+  double targetWidth = this->P->TickBox.Size[this->P->TL[0]];
+  double targetHeight = this->P->TickBox.Size[this->P->TL[1]];
+  if (this->Orientation == VTK_ORIENT_HORIZONTAL)
+    {
+    targetWidth = (targetWidth - (ticks.size() - 1) * this->TextPad) / (ticks.size() + 1.);
+    }
+  else // VTK_ORIENT_VERTICAL
+    {
+    targetHeight = (targetHeight - (ticks.size() - 1) * this->TextPad) / (ticks.size() + 1.);
+    }
+
   bool precede = this->TextPosition == vtkScalarBarActor::PrecedeScalarBar;
   int minimumFontSize = VTK_INT_MAX;
   for (int i = 0; i < static_cast<int>(ticks.size()); i++)
@@ -708,16 +720,6 @@ void vtkPVScalarBarActor::ConfigureTicks()
       continue;
       }
 
-    double targetWidth = this->P->TickBox.Size[this->P->TL[0]];
-    double targetHeight = this->P->TickBox.Size[this->P->TL[1]];
-    if (this->Orientation == VTK_ORIENT_HORIZONTAL)
-      {
-      targetWidth = (targetWidth - (ticks.size() - 1) * this->TextPad) / (ticks.size() + 1.);
-      }
-    else // VTK_ORIENT_VERTICAL
-      {
-      targetHeight = (targetHeight - (ticks.size() - 1) * this->TextPad) / (ticks.size() + 1.);
-      }
     int labelIdx = this->CreateLabel(val, minDigits, targetWidth, targetHeight, this->P->Viewport);
     tickToLabelId[i] = labelIdx;
     vtkTextActor* textActor = this->P->TextActors[labelIdx];
@@ -914,6 +916,70 @@ void vtkPVScalarBarActor::ConfigureTicks()
     }
   vtkMath::HSVToRGB(color, color);
   this->TickMarksActor->GetProperty()->SetColor(color);
+
+  // Save state and set preferred parameters
+  int previousAutomaticLabelFormat = this->GetAutomaticLabelFormat();
+  this->SetAutomaticLabelFormat(0);
+
+  std::string previousLabelFormat(this->GetLabelFormat());
+  this->SetLabelFormat("%4.3e");
+
+  this->CreateLabel(range[0], minDigits, targetWidth, targetHeight, this->P->Viewport);
+  this->CreateLabel(range[1], minDigits, targetWidth, targetHeight, this->P->Viewport);
+
+  // Restore state
+  this->AutomaticLabelFormat = previousAutomaticLabelFormat;
+  this->SetLabelFormat(previousLabelFormat.c_str());
+
+  // Now change the font size of all the text actors to the minimum
+  // font size of all the text actors.
+  for (size_t i = this->P->TextActors.size()-2; i < this->P->TextActors.size(); ++i)
+    {
+    vtkTextActor* textActor = this->P->TextActors[i];
+
+    // Keep min/max labels the same size as the rest of the labels
+    textActor->GetTextProperty()->SetFontSize(minimumFontSize);
+
+    double val = range[i - (this->P->TextActors.size()-2)];
+
+    double normVal;
+    if (isLogTable)
+      {
+      normVal = ((log10(val) - log10(range[0])) /
+        (log10(range[1]) - log10(range[0])));
+      }
+    else
+      {
+      normVal = (val - range[0])/(range[1] - range[0]);
+      }
+
+    if (this->Orientation == VTK_ORIENT_VERTICAL)
+      {
+      double x = precede ?
+        this->P->TickBox.Posn[0] + this->P->TickBox.Size[0] :
+        this->P->TickBox.Posn[0];
+      double y = normVal * this->P->TickBox.Size[1] + this->P->TickBox.Posn[1];
+      double textSize[2];
+      textActor->GetSize(this->P->Viewport, textSize);
+      y -= textSize[1]/2;   // Adjust to center text.
+      textActor->GetTextProperty()->SetJustification(
+        precede ? VTK_TEXT_RIGHT : VTK_TEXT_LEFT);
+      textActor->SetPosition(
+        precede ? x - this->LabelSpace : x + this->LabelSpace,
+        y);
+      }
+    else // this->Orientation == VTK_ORIENT_HORIZONTAL
+      {
+      double x = this->P->TickBox.Posn[0] + normVal * this->P->TickBox.Size[1];
+      double y = precede ?
+        this->P->TickBox.Posn[1] + this->P->TickBox.Size[0] :
+        this->P->TickBox.Posn[1];
+      textActor->GetTextProperty()->SetJustificationToCentered();
+      textActor->GetTextProperty()->SetVerticalJustification(
+        precede ? VTK_TEXT_TOP : VTK_TEXT_BOTTOM);
+      textActor->SetPosition(x, precede ? y - this->LabelSpace : y + this->LabelSpace);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
