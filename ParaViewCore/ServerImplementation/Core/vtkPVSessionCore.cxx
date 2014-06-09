@@ -35,7 +35,6 @@
 #include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
-#include "vtkMPIUtilities.h"
 
 
 #include <assert.h>
