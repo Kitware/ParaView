@@ -325,7 +325,15 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     return false;
     }
 
-#ifdef BUILD_SHARED_LIBS
+#ifndef BUILD_SHARED_LIBS
+  if (StaticPluginLoadFunction &&
+      StaticPluginLoadFunction(file))
+    {
+    this->Loaded = true;
+    return true;
+    }
+#endif
+
   this->SetFileName(file);
   std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
   this->SetPluginName(defaultname.c_str());
@@ -475,15 +483,6 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 
   vtkPVPlugin* plugin = pv_plugin_query_instance();
   return this->LoadPlugin(file, plugin);
-#else
-  if (StaticPluginLoadFunction &&
-      StaticPluginLoadFunction(file))
-    {
-    this->Loaded = true;
-    return true;
-    }
-  return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
