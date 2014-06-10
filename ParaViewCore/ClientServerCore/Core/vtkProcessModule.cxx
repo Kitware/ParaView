@@ -162,6 +162,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
   static_cast<void>(argc); // unused warning when MPI is off
   static_cast<void>(argv); // unused warning when MPI is off
 #endif // PARAVIEW_USE_MPI
+  vtkProcessModule::GlobalController->BroadcastTriggerRMIOn();
   vtkMultiProcessController::SetGlobalController(
     vtkProcessModule::GlobalController);
 
