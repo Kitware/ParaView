@@ -974,7 +974,14 @@ void vtkPVScalarBarActor::ConfigureTicks()
       double y = precede ?
         this->P->TickBox.Posn[1] + this->P->TickBox.Size[0] :
         this->P->TickBox.Posn[1];
-      textActor->GetTextProperty()->SetJustificationToCentered();
+      if (i == this->P->TextActors.size()-2)
+        {
+        textActor->GetTextProperty()->SetJustificationToRight();
+        }
+      else
+        {
+        textActor->GetTextProperty()->SetJustificationToLeft();
+        }
       textActor->GetTextProperty()->SetVerticalJustification(
         precede ? VTK_TEXT_TOP : VTK_TEXT_BOTTOM);
       textActor->SetPosition(x, precede ? y - this->LabelSpace : y + this->LabelSpace);
