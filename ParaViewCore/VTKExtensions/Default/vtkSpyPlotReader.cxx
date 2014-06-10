@@ -2276,17 +2276,17 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
         x[2] = 0;
         b[2] = 0;
         }
-      points->SetPoint (mark, x);
-      vtkIdType id = mark;
+      points->SetPoint (mark + offset, x);
+      vtkIdType id = mark + offset;
       poly->InsertNextCell (VTK_VERTEX, 1, &id);
 
-      location->SetTupleValue (mark, b);
+      location->SetTupleValue (mark + offset, b);
 
-      blockId->SetValue (mark, reader->MarkersDumps[m].Block->GetValue (mark));
+      blockId->SetValue (mark + offset, reader->MarkersDumps[m].Block->GetValue (mark));
 
       for (int v = 0; v < reader->Markers[m].NumVars; v ++)
         {
-        vars[v]->SetValue (mark, reader->MarkersDumps[m].Variables[v]->GetValue(mark));
+        vars[v]->SetValue (mark + offset, reader->MarkersDumps[m].Variables[v]->GetValue(mark));
         }
       }
     }
