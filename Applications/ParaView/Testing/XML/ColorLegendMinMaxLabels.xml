@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="CylinderSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="TCoords" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/EditScalarBar" command="activate" arguments="" />
+  <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/AddRangeLabels/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="ColorLegendEditor/widget/ApplyButton" command="activate" arguments="" />
+  <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
+</pqevents>
