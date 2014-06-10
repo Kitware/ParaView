@@ -1658,10 +1658,13 @@ vtkSMProperty* vtkSMProxy::SetupExposedProperty(vtkPVXMLElement* propertyElement
                       << "' on subproxy '" << subproxy_name << "'");
       return 0;
       }
+    const std::string propertyName(prop->GetXMLName());
     if (!prop->ReadXMLAttributes(subproxy, propertyElement))
       {
+      prop->SetXMLName(propertyName.c_str());
       return 0;
       }
+    prop->SetXMLName(propertyName.c_str());
     }
   this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
 

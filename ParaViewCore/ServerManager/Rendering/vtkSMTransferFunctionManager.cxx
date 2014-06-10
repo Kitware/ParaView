@@ -183,8 +183,8 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetScalarBarRepresentation(
   vtkNew<vtkSMParaViewPipelineController> controller;
   // we set these values before PreInitializeProxy() so that can be overridden
   // by user settings, if needed.
-  vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(6);
-  vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(6);
+  //vtkSMPropertyHelper(scalarBarProxy, "TitleFontSize").Set(6);
+  //vtkSMPropertyHelper(scalarBarProxy, "LabelFontSize").Set(6);
 
   controller->PreInitializeProxy(scalarBarProxy);
   vtkSMPropertyHelper(scalarBarProxy, "LookupTable").Set(colorTransferFunction);

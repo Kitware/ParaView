@@ -40,7 +40,9 @@ class vtkSMProxy;
 
 /// pqProxyWidgetDialog is used to show properties of any proxy in a dialog. It
 /// simply wraps the pqProxyWidget for the proxy in a dialog with Apply,
-/// Cancel, and Ok buttons.
+/// Cancel, and Ok buttons. Tool buttons (QPushButtons with only icons) are
+/// also provided to save the currently applied settings as default properties
+/// as well as to reset the defaults to the application defaults.
 class PQCOMPONENTS_EXPORT pqProxyWidgetDialog : public QDialog
 {
   Q_OBJECT
@@ -51,8 +53,20 @@ public:
   virtual ~pqProxyWidgetDialog();
 
 protected slots:
-  /// slot to handle "Apply".
-  void buttonClicked(QAbstractButton*);
+  // override to not close the dialog
+  virtual void accept();
+
+  /// slot to enable appropriate buttons when changes are available
+  virtual void onChangeAvailable();
+
+  /// slot to handle accepted() signals
+  virtual void onAccepted();
+
+  /// restores application default proxy settings
+  virtual void onRestoreDefaults();
+
+  /// saves settings as defaults for proxy
+  void onSaveAsDefaults();
 
 private:
   Q_DISABLE_COPY(pqProxyWidgetDialog)

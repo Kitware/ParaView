@@ -16,7 +16,7 @@
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/EditScalarBar" command="activate" arguments="" />
   <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Title/Title" command="set_string" arguments="Title" />
   <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/DrawNanAnnotation/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="ColorLegendEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
   <!-- compare default color map -->
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/LogColorMap1.png" width="300" height="300" />
 

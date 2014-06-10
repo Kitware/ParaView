@@ -10,7 +10,7 @@
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/ShowScalarBar" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/ShowScalarBar" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/EditScalarBar" command="activate" arguments="" />
-  <pqevent object="ColorLegendEditor/buttonBox/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ChoosePreset" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqColorPresetDialog/Gradients" command="setCurrent" arguments="1.0" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/pqColorPresetDialog/OkButton" command="activate" arguments="" />
