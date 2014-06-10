@@ -66,6 +66,18 @@ public:
   vtkBooleanMacro(DrawTickMarks, int);
 
   // Description:
+  // Set whether the range endpoints (minimum and maximum) are added
+  // as labels alongside other value labels.
+  vtkGetMacro(AddRangeLabels, int);
+  vtkSetMacro(AddRangeLabels, int);
+  vtkBooleanMacro(AddRangeLabels, int);
+
+  // Description:
+  // Set the C-style format string for the range labels.
+  vtkGetStringMacro(RangeLabelFormat);
+  vtkSetStringMacro(RangeLabelFormat);
+
+  // Description:
   // Set the title justification. Valid values are VTK_TEXT_LEFT,
   // VTK_TEXT_CENTERED, and VTK_TEXT_RIGHT.
   vtkGetMacro(TitleJustification, int);
@@ -73,7 +85,7 @@ public:
 
   // Description:
   // Set whether the scalar data range endpoints (minimum and maximum)
-  // are used as annotations.
+  // are added as annotations.
   vtkGetMacro(AddRangeAnnotations, int);
   vtkSetMacro(AddRangeAnnotations, int);
   vtkBooleanMacro(AddRangeAnnotations, int);
@@ -140,6 +152,9 @@ protected:
   double AspectRatio;
   int AutomaticLabelFormat;
   int DrawTickMarks;
+  int AddRangeLabels;
+
+  char* RangeLabelFormat;
 
   vtkTexture* ScalarBarTexture;
   vtkPolyData* TickMarks;

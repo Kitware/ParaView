@@ -70,6 +70,9 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
   this->AspectRatio = 20.0;
   this->AutomaticLabelFormat = 1;
   this->DrawTickMarks = 1;
+  this->AddRangeLabels = 1;
+  this->RangeLabelFormat = NULL;
+  this->SetRangeLabelFormat("%4.3e");
   this->TitleJustification = VTK_TEXT_CENTERED;
   this->AddRangeAnnotations = 1;
   this->AnnotationTextScaling = 1;
@@ -106,7 +109,49 @@ void vtkPVScalarBarActor::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AspectRatio: " << this->AspectRatio << endl;
-  os << indent << "AutomaticLabelFormat: " << this->AutomaticLabelFormat <<endl;
+  os << indent << "AutomaticLabelFormat: " << this->AutomaticLabelFormat << endl;
+  os << indent << "DrawTickMarks: " << this->DrawTickMarks << endl;
+  os << indent << "AddRangeLabels: " << this->AddRangeLabels << endl;
+  os << indent << "RangeLabelFormat: " << (this->RangeLabelFormat ? this->RangeLabelFormat : "(null)") << endl;
+  os << indent << "ScalarBarTexture: ";
+  if (this->ScalarBarTexture)
+    {
+    this->ScalarBarTexture->PrintSelf(os << "\n", indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(null)\n";
+    }
+  os << indent << "TickMarks: ";
+  if (this->TickMarks)
+    {
+    this->TickMarks->PrintSelf(os << "\n", indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(null)\n";
+    }
+  os << indent << "TickMarksMapper: ";
+  if (this->TickMarksMapper)
+    {
+    this->TickMarksMapper->PrintSelf(os << "\n", indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(null)\n";
+    }
+  os << indent << "TickMarksActor: ";
+  if (this->TickMarksActor)
+    {
+    this->TickMarksActor->PrintSelf(os << "\n", indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(null)\n";
+    }
+  os << indent << "LabelSpace: " << this->LabelSpace << endl;
+  os << indent << "TitleJustification: " << this->TitleJustification << endl;
+  os << indent << "AddRangeAnnotations: " << this->AddRangeAnnotations << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -908,105 +953,109 @@ void vtkPVScalarBarActor::ConfigureTicks()
   vtkMath::HSVToRGB(color, color);
   this->TickMarksActor->GetProperty()->SetColor(color);
 
-  // Save state and set preferred parameters
-  int previousAutomaticLabelFormat = this->GetAutomaticLabelFormat();
-  this->SetAutomaticLabelFormat(0);
-
-  std::string previousLabelFormat(this->GetLabelFormat());
-  this->SetLabelFormat("%4.3e");
-
-  this->CreateLabel(range[0], minDigits, targetWidth, targetHeight, this->P->Viewport);
-  this->CreateLabel(range[1], minDigits, targetWidth, targetHeight, this->P->Viewport);
-
-  // Restore state
-  this->AutomaticLabelFormat = previousAutomaticLabelFormat;
-  this->SetLabelFormat(previousLabelFormat.c_str());
-
-  // Now change the font size of the min/max text actors to the minimum
-  // font size of all the text actors.
-  for (size_t i = this->P->TextActors.size()-2; i < this->P->TextActors.size(); ++i)
+  if (this->AddRangeLabels)
     {
-    vtkTextActor* textActor = this->P->TextActors[i];
 
-    // Keep min/max labels the same size as the rest of the labels
-    textActor->GetTextProperty()->SetFontSize(minimumFontSize);
+    // Save state and set preferred parameters
+    int previousAutomaticLabelFormat = this->GetAutomaticLabelFormat();
+    this->SetAutomaticLabelFormat(0);
 
-    double val = range[i - (this->P->TextActors.size()-2)];
+    std::string previousLabelFormat(this->GetLabelFormat());
+    this->SetLabelFormat(this->RangeLabelFormat);
 
-    double normVal;
-    if (isLogTable)
+    this->CreateLabel(range[0], minDigits, targetWidth, targetHeight, this->P->Viewport);
+    this->CreateLabel(range[1], minDigits, targetWidth, targetHeight, this->P->Viewport);
+
+    // Restore state
+    this->AutomaticLabelFormat = previousAutomaticLabelFormat;
+    this->SetLabelFormat(previousLabelFormat.c_str());
+
+    // Now change the font size of the min/max text actors to the minimum
+    // font size of all the text actors.
+    for (size_t i = this->P->TextActors.size()-2; i < this->P->TextActors.size(); ++i)
       {
-      normVal = ((log10(val) - log10(range[0])) /
-        (log10(range[1]) - log10(range[0])));
-      }
-    else
-      {
-      normVal = (val - range[0])/(range[1] - range[0]);
-      }
+      vtkTextActor* textActor = this->P->TextActors[i];
 
-    if (this->Orientation == VTK_ORIENT_VERTICAL)
-      {
-      double x = precede ?
-        this->P->TickBox.Posn[0] + this->P->TickBox.Size[0] :
-        this->P->TickBox.Posn[0];
-      double y = normVal * this->P->TickBox.Size[1] + this->P->TickBox.Posn[1];
-      double textSize[2];
-      textActor->GetSize(this->P->Viewport, textSize);
-      y -= textSize[1]/2;   // Adjust to center text.
-      textActor->GetTextProperty()->SetJustification(
-        precede ? VTK_TEXT_RIGHT : VTK_TEXT_LEFT);
-      textActor->SetPosition(
-        precede ? x - this->LabelSpace : x + this->LabelSpace,
-        y);
-      }
-    else // this->Orientation == VTK_ORIENT_HORIZONTAL
-      {
-      double x = this->P->TickBox.Posn[0] + normVal * this->P->TickBox.Size[1];
-      double y = precede ?
-        this->P->TickBox.Posn[1] + this->P->TickBox.Size[0] :
-        this->P->TickBox.Posn[1];
-      textActor->GetTextProperty()->SetJustificationToCentered();
-      textActor->GetTextProperty()->SetVerticalJustification(
-        precede ? VTK_TEXT_TOP : VTK_TEXT_BOTTOM);
-      textActor->SetPosition(x, precede ? y - this->LabelSpace : y + this->LabelSpace);
-      }
+      // Keep min/max labels the same size as the rest of the labels
+      textActor->GetTextProperty()->SetFontSize(minimumFontSize);
 
-    // Turn off visibility of any labels that overlap the min/max labels
-    double bbox[4];
-    textActor->GetBoundingBox(this->P->Viewport, bbox);
-    double *pos = textActor->GetPosition();
-    bbox[0] += pos[0];
-    bbox[1] += pos[0];
-    bbox[2] += pos[1];
-    bbox[3] += pos[1];
+      double val = range[i - (this->P->TextActors.size()-2)];
 
-    for (size_t j = 0; j < tickToLabelId.size(); ++j)
-      {
-      int labelIdx = tickToLabelId[j];
-      if (labelIdx == -1)
+      double normVal;
+      if (isLogTable)
         {
-        // No label
-        continue;
+        normVal = ((log10(val) - log10(range[0])) /
+                   (log10(range[1]) - log10(range[0])));
         }
-      vtkTextActor* labelActor = this->P->TextActors[labelIdx];
-
-      double labelbbox[4];
-      double *labelpos;
-      labelActor->GetBoundingBox(this->P->Viewport, labelbbox);
-      labelpos = labelActor->GetPosition();
-      labelbbox[0] += labelpos[0];
-      labelbbox[1] += labelpos[0];
-      labelbbox[2] += labelpos[1];
-      labelbbox[3] += labelpos[1];
-
-      // Does label bounding box intersect min/max label bounding box?
-      bool xoverlap = !((labelbbox[0] < bbox[0] && labelbbox[1] < bbox[0]) ||
-                        (labelbbox[0] > bbox[1] && labelbbox[1] > bbox[1]));
-      bool yoverlap = !((labelbbox[2] < bbox[2] && labelbbox[3] < bbox[2]) ||
-                        (labelbbox[2] > bbox[3] && labelbbox[3] > bbox[3]));
-      if (xoverlap && yoverlap)
+      else
         {
-        labelActor->SetVisibility(0);
+        normVal = (val - range[0])/(range[1] - range[0]);
+        }
+
+      if (this->Orientation == VTK_ORIENT_VERTICAL)
+        {
+        double x = precede ?
+          this->P->TickBox.Posn[0] + this->P->TickBox.Size[0] :
+          this->P->TickBox.Posn[0];
+        double y = normVal * this->P->TickBox.Size[1] + this->P->TickBox.Posn[1];
+        double textSize[2];
+        textActor->GetSize(this->P->Viewport, textSize);
+        y -= textSize[1]/2;   // Adjust to center text.
+        textActor->GetTextProperty()->SetJustification(
+          precede ? VTK_TEXT_RIGHT : VTK_TEXT_LEFT);
+        textActor->SetPosition(
+          precede ? x - this->LabelSpace : x + this->LabelSpace,
+          y);
+        }
+      else // this->Orientation == VTK_ORIENT_HORIZONTAL
+        {
+        double x = this->P->TickBox.Posn[0] + normVal * this->P->TickBox.Size[1];
+        double y = precede ?
+          this->P->TickBox.Posn[1] + this->P->TickBox.Size[0] :
+          this->P->TickBox.Posn[1];
+        textActor->GetTextProperty()->SetJustificationToCentered();
+        textActor->GetTextProperty()->SetVerticalJustification(
+          precede ? VTK_TEXT_TOP : VTK_TEXT_BOTTOM);
+        textActor->SetPosition(x, precede ? y - this->LabelSpace : y + this->LabelSpace);
+        }
+
+      // Turn off visibility of any labels that overlap the min/max labels
+      double bbox[4];
+      textActor->GetBoundingBox(this->P->Viewport, bbox);
+      double *pos = textActor->GetPosition();
+      bbox[0] += pos[0];
+      bbox[1] += pos[0];
+      bbox[2] += pos[1];
+      bbox[3] += pos[1];
+
+      for (size_t j = 0; j < tickToLabelId.size(); ++j)
+        {
+        int labelIdx = tickToLabelId[j];
+        if (labelIdx == -1)
+          {
+          // No label
+          continue;
+          }
+        vtkTextActor* labelActor = this->P->TextActors[labelIdx];
+
+        double labelbbox[4];
+        double *labelpos;
+        labelActor->GetBoundingBox(this->P->Viewport, labelbbox);
+        labelpos = labelActor->GetPosition();
+        labelbbox[0] += labelpos[0];
+        labelbbox[1] += labelpos[0];
+        labelbbox[2] += labelpos[1];
+        labelbbox[3] += labelpos[1];
+
+        // Does label bounding box intersect min/max label bounding box?
+        bool xoverlap = !((labelbbox[0] < bbox[0] && labelbbox[1] < bbox[0]) ||
+                          (labelbbox[0] > bbox[1] && labelbbox[1] > bbox[1]));
+        bool yoverlap = !((labelbbox[2] < bbox[2] && labelbbox[3] < bbox[2]) ||
+                          (labelbbox[2] > bbox[3] && labelbbox[3] > bbox[3]));
+        if (xoverlap && yoverlap)
+          {
+          labelActor->SetVisibility(0);
+          }
         }
       }
     }

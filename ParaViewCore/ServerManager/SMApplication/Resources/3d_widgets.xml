@@ -426,6 +426,8 @@
             <Property name="NumberOfLabels" />
             <Property name="DrawTickMarks" />
             <Property name="DrawTickLabels" />
+            <Property name="AddRangeLabels" />
+            <Property name="RangeLabelFormat" />
           </PropertyGroup>
 
           <PropertyGroup label="Annotations">

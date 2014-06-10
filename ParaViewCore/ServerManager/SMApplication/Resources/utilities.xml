@@ -852,6 +852,26 @@
                         name="range" />
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
+                         command="SetAddRangeLabels"
+                         number_of_elements="1"
+                         default_values="0"
+                         name="AddRangeLabels"
+                         label="Add Range Labels">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetRangeLabelFormat"
+                            number_of_elements="1"
+                            default_values="%4.3e"
+                            name="RangeLabelFormat"
+                            label="Range Label Format">
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="AddRangeLabels" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetDrawNanAnnotation"
                          default_values="0"
                          name="DrawNanAnnotation"
