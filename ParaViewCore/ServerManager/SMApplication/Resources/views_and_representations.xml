@@ -6613,6 +6613,7 @@
       <!-- End of FrustumWidget -->
     </Proxy>
 
+#ifdef PARAVIEW_ENABLE_MATPLOTLIB
     <!-- ================================================================== -->
     <RepresentationProxy name="PythonRepresentation"
                         class="vtkPythonRepresentation"
@@ -6652,7 +6653,7 @@
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
     </RepresentationProxy>
-
+#endif
 
     <!-- ================================================================== -->
 
@@ -7472,6 +7473,8 @@
          </IntVectorProperty>
 
      </MultiSliceViewProxy>
+
+#ifdef PARAVIEW_ENABLE_MATPLOTLIB
      <!-- ================================================================== -->
      <PythonViewProxy name="PythonView" class="vtkPythonView"
                       label="Python View"
@@ -7524,8 +7527,8 @@
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
 
-
      </PythonViewProxy>
+#endif
 
      <!-- ================================================================== -->
   </ProxyGroup>
