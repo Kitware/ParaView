@@ -931,7 +931,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
   this->AutomaticLabelFormat = previousAutomaticLabelFormat;
   this->SetLabelFormat(previousLabelFormat.c_str());
 
-  // Now change the font size of all the text actors to the minimum
+  // Now change the font size of the min/max text actors to the minimum
   // font size of all the text actors.
   for (size_t i = this->P->TextActors.size()-2; i < this->P->TextActors.size(); ++i)
     {
@@ -974,17 +974,49 @@ void vtkPVScalarBarActor::ConfigureTicks()
       double y = precede ?
         this->P->TickBox.Posn[1] + this->P->TickBox.Size[0] :
         this->P->TickBox.Posn[1];
-      if (i == this->P->TextActors.size()-2)
-        {
-        textActor->GetTextProperty()->SetJustificationToRight();
-        }
-      else
-        {
-        textActor->GetTextProperty()->SetJustificationToLeft();
-        }
+      textActor->GetTextProperty()->SetJustificationToCentered();
       textActor->GetTextProperty()->SetVerticalJustification(
         precede ? VTK_TEXT_TOP : VTK_TEXT_BOTTOM);
       textActor->SetPosition(x, precede ? y - this->LabelSpace : y + this->LabelSpace);
+      }
+
+    // Turn off visibility of any labels that overlap the min/max labels
+    double bbox[4];
+    textActor->GetBoundingBox(this->P->Viewport, bbox);
+    double *pos = textActor->GetPosition();
+    bbox[0] += pos[0];
+    bbox[1] += pos[0];
+    bbox[2] += pos[1];
+    bbox[3] += pos[1];
+
+    for (size_t j = 0; j < tickToLabelId.size(); ++j)
+      {
+      int labelIdx = tickToLabelId[j];
+      if (labelIdx == -1)
+        {
+        // No label
+        continue;
+        }
+      vtkTextActor* labelActor = this->P->TextActors[labelIdx];
+
+      double labelbbox[4];
+      double *labelpos;
+      labelActor->GetBoundingBox(this->P->Viewport, labelbbox);
+      labelpos = labelActor->GetPosition();
+      labelbbox[0] += labelpos[0];
+      labelbbox[1] += labelpos[0];
+      labelbbox[2] += labelpos[1];
+      labelbbox[3] += labelpos[1];
+
+      // Does label bounding box intersect min/max label bounding box?
+      bool xoverlap = !((labelbbox[0] < bbox[0] && labelbbox[1] < bbox[0]) ||
+                        (labelbbox[0] > bbox[1] && labelbbox[1] > bbox[1]));
+      bool yoverlap = !((labelbbox[2] < bbox[2] && labelbbox[3] < bbox[2]) ||
+                        (labelbbox[2] > bbox[3] && labelbbox[3] > bbox[3]));
+      if (xoverlap && yoverlap)
+        {
+        labelActor->SetVisibility(0);
+        }
       }
     }
 }
