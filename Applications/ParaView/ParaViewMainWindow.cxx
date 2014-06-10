@@ -229,11 +229,6 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
   new pqParaViewBehaviors(this, this);
-
-  // load static plugins
-#ifndef BUILD_SHARED_LIBS
-  paraview_static_plugins_init();
-#endif
 }
 
 //-----------------------------------------------------------------------------
