@@ -36,6 +36,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
 
+
 #include <assert.h>
 #include <fstream>
 #include <set>
@@ -929,68 +930,109 @@ void vtkPVSessionCore::GatherInformationStatelliteCallback()
 }
 
 //----------------------------------------------------------------------------
+#define SafeDeleteArray( array_ptr ) { \
+  if( array_ptr != NULL )              \
+    {                                  \
+    delete [] array_ptr;               \
+    array_ptr = NULL;                  \
+    }                                  \
+}
+
 bool vtkPVSessionCore::CollectInformation(vtkPVInformation* info)
 {
-  vtkMultiProcessController* controller = this->ParallelController;
-  int myid = controller->GetLocalProcessId();
-  int numProcs = controller->GetNumberOfProcesses();
+  // Sanity checks
+  assert("pre: NULL PV information!" && (info != NULL) );
 
-  int children[2] = {2*myid + 1, 2*myid + 2};
-  int parent = myid > 0? (myid-1)/2 : -1;
+  // STEP 0: temporary variables
+  int rank   = this->ParallelController->GetLocalProcessId();
+  int nranks = this->ParallelController->GetNumberOfProcesses();
 
-  // General rule is: receive from children and send to parent
-  for (int childno=0; childno < 2; childno++)
+  if( nranks == 1 )
     {
-    int childid = children[childno];
-    if (childid >= numProcs)
-      {
-      // Skip nonexistent children.
-      continue;
-      }
-
-    int length;
-    controller->Receive(&length, 1, childid, ROOT_SATELLITE_INFO_TAG);
-    if (length <= 0)
-      {
-      vtkErrorMacro(
-        "Failed to Gather Information from satellite no: " << childid);
-      continue;
-      }
-
-    unsigned char* data = new unsigned char[length];
-    controller->Receive(data, length, childid, ROOT_SATELLITE_INFO_TAG);
-    vtkClientServerStream stream;
-    stream.SetData(data, length);
-    vtkPVInformation* tempInfo = info->NewInstance();
-    tempInfo->CopyFromStream(&stream);
-    info->AddInformation(tempInfo);
-    tempInfo->Delete();
-    delete [] data;
+    /* short-circuit */
+    return true;
     }
 
-  // Now send to parent, if parent is indeed valid.
-  if (parent >= 0)
+  vtkIdType *rcvcounts     = NULL;   /* significant only at rank 0 */
+  vtkIdType *offSet        = NULL;   /* significant only at rank 0 */
+  int rbufsize             = 0;      /* significant only at rank 0 */
+  unsigned char* rcvbuffer = NULL;   /* significant only at rank 0 */
+
+  // STEP 1: Initialize data-structures at rank 0
+  if( rank == 0 )
     {
-    if (info)
+    rcvcounts = new vtkIdType[ nranks ];
+    offSet    = new vtkIdType[ nranks ];
+    } // END if rank == 0
+
+  // STEP 2: Serialize the vtkPVInformation object
+  vtkClientServerStream stream;
+  info->CopyToStream( &stream );
+
+  const unsigned char* data;
+  size_t length;
+
+  // Get pointer to the raw stream data. Note, this is a shallow copy, no
+  // need to delete the data.
+  stream.GetData( &data, &length);
+  vtkIdType local_length = static_cast<vtkIdType>( length );
+
+  // STEP 3: Get number of bytes that each process will send
+  this->ParallelController->Gather(&local_length,rcvcounts,1,0);
+
+  // STEP 4: Allocate temporary arrays at rank 0
+  if( rank == 0 )
+    {
+    // STEP 4.1: Calculate rcvbuffer size & allocate rcvbuffer
+    rbufsize = rcvcounts[0];
+    for( int i=1; i < nranks; ++i )
       {
-      vtkClientServerStream css;
-      info->CopyToStream(&css);
-      size_t length;
-      const unsigned char* data;
-      css.GetData(&data, &length);
-      int len = static_cast<int>(length);
-      controller->Send(&len, 1, parent, ROOT_SATELLITE_INFO_TAG);
-      controller->Send(const_cast<unsigned char*>(data),
-        length, parent, ROOT_SATELLITE_INFO_TAG);
+      rbufsize += rcvcounts[ i ];
       }
-    else
+    rcvbuffer = new unsigned char[ rbufsize ];
+
+    // STEP 4.2: populate offset array
+    offSet[ 0 ] = 0;
+    for( int i=1; i < nranks; ++i )
       {
-      int len = 0;
-      controller->Send(&len, 1, parent, ROOT_SATELLITE_INFO_TAG);
+      offSet[ i ] = offSet[ i-1 ] + rcvcounts[ i-1 ];
       }
-    }
+    } // END if rank==0
+
+  // STEP 5: GatherV all data from satellites
+  this->ParallelController->GatherV(
+      data, rcvbuffer, local_length, rcvcounts, offSet, 0);
+
+  // STEP 6: Deserialize data from other ranks at rank 0 and add them to
+  // the information object associated with rank 0.
+  if( rank == 0 )
+    {
+    vtkClientServerStream rcvStream;
+    for( int i=1; i < nranks; ++i )
+      {
+      rcvStream.SetData( &rcvbuffer[ offSet[i] ],rcvcounts[ i ] );
+      vtkPVInformation* tempInfo = info->NewInstance();
+      tempInfo->CopyFromStream( &rcvStream );
+      info->AddInformation( tempInfo );
+      tempInfo->Delete();
+      } // END for all remote ranks
+    } // END if rank == 0
+
+  // STEP 7: De-allocate temporary arrays at rank 0
+  SafeDeleteArray(rcvcounts);
+  SafeDeleteArray(offSet);
+  SafeDeleteArray(rcvbuffer);
+
+  // Sanity checks -- ensure we return all dynamically allocated memory
+  assert( "post: rcvcounts should be NULL" && (rcvcounts == NULL) );
+  assert( "post: offSet should be NULL" && (offSet == NULL) );
+  assert( "post: rcvbuffer should be NULL" && (rcvbuffer == NULL) );
+
+  // STEP 8: Barrier synchronization
+  this->ParallelController->Barrier();
   return true;
 }
+
 //----------------------------------------------------------------------------
 void vtkPVSessionCore::RegisterRemoteObject(vtkTypeUInt32 gid, vtkObject* obj)
 {
