@@ -731,8 +731,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
       }
     }
 
-  // Now change the font size of all the text actors to the minimum
-  // font size of all the text actors.
+  // Now place the label actors
   for (size_t i = 0; i < ticks.size(); i++)
     {
     int labelIdx = tickToLabelId[i];
@@ -766,10 +765,6 @@ void vtkPVScalarBarActor::ConfigureTicks()
         this->P->TickBox.Posn[0] + this->P->TickBox.Size[0] :
         this->P->TickBox.Posn[0];
       double y = normVal * this->P->TickBox.Size[1] + this->P->TickBox.Posn[1];
-      vtkIdType ids[2];
-      ids[0] = tickPoints->InsertNextPoint(x - this->LabelSpace + 2, y, 0.0);
-      ids[1] = tickPoints->InsertNextPoint(x + this->LabelSpace - 2, y, 0.0);
-      tickCells->InsertNextCell(2, ids);
       double textSize[2];
       textActor->GetSize(this->P->Viewport, textSize);
       y -= textSize[1]/2;   // Adjust to center text.
@@ -785,10 +780,6 @@ void vtkPVScalarBarActor::ConfigureTicks()
       double y = precede ?
         this->P->TickBox.Posn[1] + this->P->TickBox.Size[0] :
         this->P->TickBox.Posn[1];
-      vtkIdType ids[2];
-      ids[0] = tickPoints->InsertNextPoint(x, y - this->LabelSpace + 2, 0.0);
-      ids[1] = tickPoints->InsertNextPoint(x, y + this->LabelSpace - 2, 0.0);
-      tickCells->InsertNextCell(2, ids);
       textActor->GetTextProperty()->SetJustificationToCentered();
       textActor->GetTextProperty()->SetVerticalJustification(
         precede ? VTK_TEXT_TOP : VTK_TEXT_BOTTOM);
@@ -1017,6 +1008,58 @@ void vtkPVScalarBarActor::ConfigureTicks()
         {
         labelActor->SetVisibility(0);
         }
+      }
+    }
+
+  // Loop range accounts for "fake" min max ticks
+  for (size_t i = 1; i < ticks.size()-1; i++)
+    {
+    int labelIdx = tickToLabelId[i-1];
+    if (labelIdx == -1)
+      {
+      // No label
+      continue;
+      }
+    vtkTextActor* textActor = this->P->TextActors[labelIdx];
+    if (textActor->GetVisibility() == 0)
+      {
+      continue;
+      }
+
+    double val = ticks[i];
+
+    double normVal;
+    if (isLogTable)
+      {
+      normVal = ((log10(val) - log10(range[0])) /
+        (log10(range[1]) - log10(range[0])));
+      }
+    else
+      {
+      normVal = (val - range[0])/(range[1] - range[0]);
+      }
+
+    if (this->Orientation == VTK_ORIENT_VERTICAL)
+      {
+      double x = precede ?
+        this->P->TickBox.Posn[0] + this->P->TickBox.Size[0] :
+        this->P->TickBox.Posn[0];
+      double y = normVal * this->P->TickBox.Size[1] + this->P->TickBox.Posn[1];
+      vtkIdType ids[2];
+      ids[0] = tickPoints->InsertNextPoint(x - this->LabelSpace + 2, y, 0.0);
+      ids[1] = tickPoints->InsertNextPoint(x + this->LabelSpace - 2, y, 0.0);
+      tickCells->InsertNextCell(2, ids);
+      }
+    else // this->Orientation == VTK_ORIENT_HORIZONTAL
+      {
+      double x = this->P->TickBox.Posn[0] + normVal * this->P->TickBox.Size[1];
+      double y = precede ?
+        this->P->TickBox.Posn[1] + this->P->TickBox.Size[0] :
+        this->P->TickBox.Posn[1];
+      vtkIdType ids[2];
+      ids[0] = tickPoints->InsertNextPoint(x, y - this->LabelSpace + 2, 0.0);
+      ids[1] = tickPoints->InsertNextPoint(x, y + this->LabelSpace - 2, 0.0);
+      tickCells->InsertNextCell(2, ids);
       }
     }
 }
