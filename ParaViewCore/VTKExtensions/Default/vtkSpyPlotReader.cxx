@@ -2214,6 +2214,10 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
 {
   for (int m = 0; m < reader->GetNumberOfMaterials (); m ++)
     {
+    if (reader->Markers[m].NumMarks <= 0)
+      {
+      continue;
+      }
     vtkPolyData* poly = vtkPolyData::SafeDownCast (mbds->GetBlock (m));
     vtkPoints* points = poly->GetPoints ();
     vtkPointData* pd = poly->GetPointData ();
