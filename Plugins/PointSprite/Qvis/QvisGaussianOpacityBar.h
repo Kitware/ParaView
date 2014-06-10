@@ -77,10 +77,6 @@ class VTKQVIS_EXPORT QvisGaussianOpacityBar : public QvisAbstractOpacityBar
     void          paintToPixmap(int,int);
     void          drawControlPoints(QPainter &painter);
 
-  signals:
-    void          mouseReleased();
-    void          mouseMoved();
-
   private:
     enum Mode     {modeNone, modeX, modeH, modeW, modeWR, modeWL, modeB};
     // encapsulation of gaussian parameters

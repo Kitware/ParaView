@@ -259,9 +259,6 @@ void pqPointSpriteControls::setRepresentation(pqPipelineRepresentation* repr)
         {
         this->Internals->RenderMode->addItem(item.toString());
         }
-    this->Internals->Links.addPropertyLink(this->Internals->RenderMode,
-        "currentText", SIGNAL(currentIndexChanged(int)),
-        this->Internals->RepresentationProxy, prop);
     this->Internals->RenderMode->setEnabled(true);
     }
   else
