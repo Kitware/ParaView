@@ -117,7 +117,7 @@
   </action>
   <action name="actionDelete_All">
    <property name="text">
-    <string>Delete All</string>
+    <string>Reset Session</string>
    </property>
   </action>
   <action name="actionIgnoreTime">

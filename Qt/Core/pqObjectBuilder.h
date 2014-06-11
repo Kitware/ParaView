@@ -87,6 +87,10 @@ public:
   /// Destroy a server connection
   void removeServer(pqServer *server);
 
+  /// Resets the server by destroying the old pqServer instance and creating
+  /// a new one while keeping the same underlying session alive.
+  pqServer* resetServer(pqServer* server);
+
   /// Creates a source of the given server manager group (\c sm_group) and
   /// name (\c sm_name) on the given \c server. On success, returns the
   /// pqPipelineSource for the created proxy.
