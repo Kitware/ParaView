@@ -20,6 +20,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
+#include "vtkTimerLog.h"
 
 #include <vtksys/ios/sstream>
 
@@ -85,6 +86,7 @@ void vtkSMProxyDefinitionManager::SynchronizeDefinitions()
     return;
     }
 
+  vtkTimerLog::MarkStartEvent("Process Proxy definitions");
   vtkSMMessage message;
   this->SetLocation(vtkPVSession::SERVERS);
   if (this->PullState(&message) == false)
@@ -96,6 +98,7 @@ void vtkSMProxyDefinitionManager::SynchronizeDefinitions()
 
   this->SetLocation(vtkPVSession::CLIENT_AND_SERVERS);
   this->ProxyDefinitionManager->Push(&message);
+  vtkTimerLog::MarkEndEvent("Process Proxy definitions");
 }
 //----------------------------------------------------------------------------
 void vtkSMProxyDefinitionManager::LoadState( const vtkSMMessage* msg,
