@@ -452,32 +452,11 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
 
   //---------------------------------------------------------------------------
   // Setup global settings/state for the visualization state.
-
-  // Create the GlobalMapperPropertiesProxy (optional)
-  // FIXME: these probably should not be created in collaboration mode on
-  // non-master nodes.
-  vtkSMProxy* proxy = vtkSafeNewProxy(pxm, "misc", "GlobalMapperProperties");
-  if (proxy)
-    {
-    this->InitializeProxy(proxy);
-    proxy->UpdateVTKObjects();
-    proxy->Delete();
-    }
-
-  // Create Strict Load Balancing Proxy
-  proxy = vtkSafeNewProxy(pxm, "misc", "StrictLoadBalancing");
-  if (proxy)
-    {
-    this->InitializeProxy(proxy);
-    proxy->UpdateVTKObjects();
-    proxy->Delete();
-    }
-
   this->UpdateSettingsProxies(session);
 
   //---------------------------------------------------------------------------
   // Setup color palette and proxies for other global property groups (optional)
-  proxy = pxm->GetProxy("global_properties", "ColorPalette");
+  vtkSMProxy* proxy = pxm->GetProxy("global_properties", "ColorPalette");
   if (!proxy)
     {
     proxy = vtkSafeNewProxy(pxm, "misc", "ColorPalette");
@@ -982,6 +961,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
   return true;
 }
 
+//----------------------------------------------------------------------------
 void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* session)
 {
   // Set up the settings proxies
