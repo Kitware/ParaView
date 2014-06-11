@@ -130,9 +130,6 @@ MACRO (process_args out_extra_args)
 ENDMACRO (process_args)
 
 
-#Determine how many tests are to be grouped.
-SET (TEST_GROUP_SIZE 3)
-
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
   PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND;LOAD_PLUGIN;PLUGIN_PATH" "" ${ARGN})
   while (ACT_TEST_SCRIPTS)
@@ -140,6 +137,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     set (extra_args)
     set (full_test_name)
     set (force_serial FALSE)
+    # Leaving group size as 1.
+    # We need to fix "resetting" of application after each test correctly,
+    # before we re-enable to avoid flaky tests.
+    set (TEST_GROUP_SIZE 1)
 
     while (${counter} LESS ${TEST_GROUP_SIZE})
       list(LENGTH ACT_TEST_SCRIPTS num_tests)
@@ -164,9 +165,6 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
             set (full_test_name "${full_test_name}.${test_name}")
             set (extra_args ${extra_args} "--test-script=${test}")
             process_args(extra_args)
-            if (DEFINED ${test_name}_USE_OLD_PANELS)
-              set (extra_args ${extra_args} "--use-old-panels")
-            endif ()
           endif (NOT ${test_name}${skip_test_flag_suffix})
         endif (${counter} LESS 100000)
       endif (num_tests)
@@ -331,9 +329,6 @@ FUNCTION(add_multi_client_tests prefix)
       set (extra_args)
       set (use_old_panels)
       process_args(extra_args)
-      if (DEFINED ${test_name}_USE_OLD_PANELS)
-        set (use_old_panels "--use-old-panels")
-      endif ()
 
       ExternalData_add_test(ParaViewData
         NAME "${prefix}.${test_name}"
