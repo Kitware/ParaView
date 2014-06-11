@@ -53,8 +53,8 @@ public:
   /// The variable color is used to specify the highlight color
   /// \default QColor(Qt::white)
   pqHighlightItemDelegate(QColor color = QColor(Qt::white),
-    QObject *parent = 0) :
-    QStyledItemDelegate(parent),
+    QObject *parentObject = 0) :
+    QStyledItemDelegate(parentObject),
     HighlightColor(color)
     {
     }

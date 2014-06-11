@@ -191,17 +191,17 @@ void pqProxyWidgetDialog::onRestoreDefaults()
     iter.TakeReference(this->Internals->Proxy->NewPropertyIterator());
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
-      vtkSMProperty * property = iter->GetProperty();
+      vtkSMProperty * smproperty = iter->GetProperty();
       // Restore only basic type properties.
-      if (vtkSMVectorProperty::SafeDownCast(property) &&
-          !property->GetNoCustomDefault() &&
-          !property->GetInformationOnly())
+      if (vtkSMVectorProperty::SafeDownCast(smproperty) &&
+          !smproperty->GetNoCustomDefault() &&
+          !smproperty->GetInformationOnly())
         {
-        if (!property->IsValueDefault())
+        if (!smproperty->IsValueDefault())
           {
           anyReset = true;
           }
-        property->ResetToXMLDefaults();
+        smproperty->ResetToXMLDefaults();
         }
       }
     }

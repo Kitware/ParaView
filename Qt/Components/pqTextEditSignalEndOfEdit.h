@@ -41,8 +41,8 @@ class PQCOMPONENTS_EXPORT pqTextEditSignalEndOfEdit : public QTextEdit
 {
   Q_OBJECT
 public:
-  pqTextEditSignalEndOfEdit(QWidget *parent = 0) :
-    QTextEdit (parent)
+  pqTextEditSignalEndOfEdit(QWidget *parentObject = 0) :
+    QTextEdit (parentObject)
     {
     }
 
