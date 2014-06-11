@@ -793,7 +793,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty command="SetAspectRatio"
-                            default_values="15"
+                            default_values="20"
                             name="AspectRatio"
                             number_of_elements="1">
         <DoubleRangeDomain min="0.001"
