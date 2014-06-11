@@ -207,6 +207,13 @@ int vtkPVScalarBarActor::CreateLabel(
     textActor->ComputeScaledFont(this->P->Viewport);
     }
 
+  // One Windows, formats with exponents have three digits by default
+  // whereas on other systems, exponents have two digits. Set to two
+  // digits on Windows for consistent behavior.
+#ifdef _WIN32
+  unsigned int oldWin32ExponentFormat = _set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
+
   if (this->AutomaticLabelFormat)
     {
     // Iterate over all format lengths and find the highest precision that we
@@ -263,6 +270,10 @@ int vtkPVScalarBarActor::CreateLabel(
 
   // Set the txt label
   textActor->SetInput(string);
+
+#ifdef _WIN32
+  _set_output_format(oldWin32ExponentFormat);
+#endif
 
   // Size the font to fit in the targetHeight, which we are using
   // to size the font because it is (relatively?) constant.
