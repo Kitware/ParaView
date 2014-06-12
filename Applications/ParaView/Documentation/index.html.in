@@ -24,7 +24,7 @@ Released   : 20111010
 		<div id="header">
 			<div id="logo">
 				<h1><a href="http://www.paraview.org">ParaView </a></h1>
-        <p>User's Manual for v@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@</p>
+        <p></p>
 			</div>
 		</div>
 	</div>
@@ -48,16 +48,12 @@ Released   : 20111010
             for smaller data.
           </p>
         </div>
+        <div>
+          For the user's manual, refer to the ParaView User's Manual, a pdf for which is
+          included in your binary distribution or can be obtained from
+          <a href="http://www.paraview.org/download/">http://www.paraview.org/download/</a>.
+        </div>
       </div>
-			<div id="about">
-        <p>This is an abridged version of the ParaView User's Manual. For a
-        regularly updated version of the manual, refer to the
-        <a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">ParaView Wiki (Manual)</a>.
-        A pdf version of the Users Manual is also included in the official ParaView
-        Binary binaries and can be downloaded from the
-        <a href="http://www.paraview.org/paraview/resources/software.html">download page</a>
-        </p>
-			</div>
 		</div>
 		<div style="clear: both;">&nbsp;</div>
 	</div>
