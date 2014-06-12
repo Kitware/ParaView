@@ -138,6 +138,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorControls.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorVolumeControls.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ColorLegendMinMaxLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorOpacityTableEditing.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
