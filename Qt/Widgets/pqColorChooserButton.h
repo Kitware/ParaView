@@ -91,11 +91,11 @@ public slots:
   /// set the color
   virtual void setChosenColor(const QColor&);
 
-  /// set the color as a QVariantList with exatctly 3 QVariants with
+  /// set the color as a QVariantList with exactly 3 QVariants with
   /// values in the range [0, 1] for each of the 3 color components.
   void setChosenColorRgbF(const QVariantList&);
 
-  /// set the color as a QVariantList with exatctly 4 QVariants with
+  /// set the color as a QVariantList with exactly 4 QVariants with
   /// values in the range [0, 1] for each of the 4 color components.
   void setChosenColorRgbaF(const QVariantList&);
 
@@ -108,7 +108,9 @@ protected:
 
   /// renders an icon for the color.
   QIcon renderColorSwatch(const QColor&);
-  QColor Color;
+
+  /// RGBA values representing the chosen color
+  double Color[4];
 
   /// the ratio of icon radius to button height
   double IconRadiusHeightRatio;

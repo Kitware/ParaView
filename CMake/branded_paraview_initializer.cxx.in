@@ -76,8 +76,6 @@ pq@BPC_NAME@Initializer::~pq@BPC_NAME@Initializer()
 //-----------------------------------------------------------------------------
 bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
 {
-  vtkInitializationHelper::SetApplicationName("@BPC_APPLICATION_NAME@");
-
   this->PVApp = new pqPVApplicationCore (argc, argv);
 
   // Attach custom event filter

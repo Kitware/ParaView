@@ -61,6 +61,7 @@ namespace ParaViewPython {
     // main processes waits in MPI_Init() and calls exit() when
     // the others are done, causing apparent memory leaks for any non-static objects
     // created before MPI_Init().
+    vtkInitializationHelper::SetApplicationName("ParaView");
     static vtkSmartPointer<vtkPVPythonOptions> options =
       vtkSmartPointer<vtkPVPythonOptions>::New();
     vtkInitializationHelper::Initialize( argc, argv, processType, options );

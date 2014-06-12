@@ -43,6 +43,10 @@ pqColorChooserButton::pqColorChooserButton(QWidget* p)
   : QToolButton(p),
   ShowAlphaChannel(false)
 {
+  this->Color[0] = 0.0;
+  this->Color[1] = 0.0;
+  this->Color[2] = 0.0;
+  this->Color[3] = 1.0;
   this->IconRadiusHeightRatio = 0.75;
   this->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   this->connect(this, SIGNAL(clicked()), SLOT(chooseColor()));
@@ -51,14 +55,17 @@ pqColorChooserButton::pqColorChooserButton(QWidget* p)
 //-----------------------------------------------------------------------------
 QColor pqColorChooserButton::chosenColor() const
 {
-  return this->Color;
+  QColor color;
+  color.setRgbF(this->Color[0], this->Color[1], this->Color[2], this->Color[3]);
+
+  return color;
 }
 
 //-----------------------------------------------------------------------------
 QVariantList pqColorChooserButton::chosenColorRgbF() const
 {
   QVariantList val;
-  val << this->Color.redF() << this->Color.greenF() << this->Color.blueF();
+  val << this->Color[0] << this->Color[1] << this->Color[2];
   return val;
 }
 
@@ -66,8 +73,7 @@ QVariantList pqColorChooserButton::chosenColorRgbF() const
 QVariantList pqColorChooserButton::chosenColorRgbaF() const
 {
   QVariantList val;
-  val << this->Color.redF() << this->Color.greenF()
-    << this->Color.blueF() << this->Color.alphaF();
+  val << this->Color[0] << this->Color[1] << this->Color[2] << this->Color[3];
   return val;
 }
 
@@ -76,13 +82,9 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
 {
   if (color.isValid())
     {
-    if(color != this->Color)
-      {
-      this->Color = color;
-      this->setIcon(this->renderColorSwatch(color));
-      emit this->chosenColorChanged(this->Color);
-      }
-    emit this->validColorChosen(this->Color);
+    QVariantList val;
+    val << color.redF() << color.greenF() << color.blueF() << color.alphaF();
+    this->setChosenColorRgbaF(val);
     }
 }
 
@@ -90,23 +92,52 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
 void pqColorChooserButton::setChosenColorRgbF(const QVariantList& val)
 {
   Q_ASSERT(val.size() == 3);
-  QColor newColor = this->chosenColor();
-  newColor.setRedF(val[0].toDouble());
-  newColor.setGreenF(val[1].toDouble());
-  newColor.setBlueF(val[2].toDouble());
-  this->setChosenColor(newColor);
+  QColor color;
+  color.setRgbF(val[0].toDouble(), val[1].toDouble(), val[2].toDouble());
+
+  if (color.isValid())
+    {
+    if (val[0].toDouble() != this->Color[0] ||
+        val[1].toDouble() != this->Color[1] ||
+        val[2].toDouble() != this->Color[2])
+      {
+      this->Color[0] = val[0].toDouble();
+      this->Color[1] = val[1].toDouble();
+      this->Color[2] = val[2].toDouble();
+      
+      this->setIcon(this->renderColorSwatch(color));
+      emit this->chosenColorChanged(color);
+      }
+
+    emit this->validColorChosen(color);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
 {
   Q_ASSERT(val.size() == 4);
-  QColor newColor;
-  newColor.setRedF(val[0].toDouble());
-  newColor.setGreenF(val[1].toDouble());
-  newColor.setBlueF(val[2].toDouble());
-  newColor.setAlphaF(val[3].toDouble());
-  this->setChosenColor(newColor);
+  QColor color;
+  color.setRgbF(val[0].toDouble(), val[1].toDouble(),
+                val[2].toDouble(), val[3].toDouble());
+
+  if (color.isValid())
+    {
+    if (val[0].toDouble() != this->Color[0] ||
+        val[1].toDouble() != this->Color[1] ||
+        val[2].toDouble() != this->Color[2] ||
+        val[3].toDouble() != this->Color[3])
+      {
+      this->Color[0] = val[0].toDouble();
+      this->Color[1] = val[1].toDouble();
+      this->Color[2] = val[2].toDouble();
+      this->Color[3] = val[3].toDouble();
+
+      this->setIcon(this->renderColorSwatch(color));
+      emit this->chosenColorChanged(color);
+      }
+    emit this->validColorChosen(color);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -138,7 +169,7 @@ void pqColorChooserButton::chooseColor()
     opts |= QColorDialog::ShowAlphaChannel;
     }
 
-  this->setChosenColor(QColorDialog::getColor(this->Color, this, "Select Color", opts));
+  this->setChosenColor(QColorDialog::getColor(this->chosenColor(), this, "Select Color", opts));
 }
 
 //-----------------------------------------------------------------------------
@@ -146,5 +177,6 @@ void pqColorChooserButton::resizeEvent(QResizeEvent *rEvent)
 {
   (void) rEvent;
 
-  this->setIcon(this->renderColorSwatch(this->Color));
+  QColor color = this->chosenColor();
+  this->setIcon(this->renderColorSwatch(color));
 }
