@@ -144,8 +144,11 @@ void pqStandardColorButton::actionTriggered(QAction* action)
 //-----------------------------------------------------------------------------
 void pqStandardColorButton::chooseColor()
 {
-  QColor newColor = QColorDialog::getColor(this->Color, this);
-  if (newColor != this->Color)
+  QColor oldColor;
+  oldColor.setRgbF(
+    this->Color[0], this->Color[1], this->Color[2], this->Color[3]);
+  QColor newColor = QColorDialog::getColor(oldColor, this);
+  if (newColor != oldColor)
     {
   //  emit this->beginUndo(this->UndoLabel);
     this->setChosenColor(newColor);
