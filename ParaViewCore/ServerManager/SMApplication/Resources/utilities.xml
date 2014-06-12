@@ -851,10 +851,9 @@
         <IntRangeDomain min="2"
                         name="range" />
       </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetAddRangeLabels"
+      <IntVectorProperty command="SetAddRangeLabels"
                          number_of_elements="1"
-                         default_values="0"
+                         default_values="1"
                          name="AddRangeLabels"
                          label="Add Range Labels">
         <BooleanDomain name="bool" />

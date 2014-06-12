@@ -76,6 +76,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
   this->TitleJustification = VTK_TEXT_CENTERED;
   this->AddRangeAnnotations = 1;
   this->AnnotationTextScaling = 1;
+  this->SetVerticalTitleSeparation(4);
 
   this->ScalarBarTexture = vtkTexture::New();
 
