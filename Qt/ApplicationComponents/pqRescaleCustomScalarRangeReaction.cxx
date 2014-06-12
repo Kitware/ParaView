@@ -85,10 +85,10 @@ void pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange()
     return;
     }
 
-  vtkSMProxy* lut = vtkSMPropertyHelper(lutProperty).GetAsProxy();
+  vtkSMProxy* lutProxy = vtkSMPropertyHelper(lutProperty).GetAsProxy();
   vtkDiscretizableColorTransferFunction* stc =
     vtkDiscretizableColorTransferFunction::SafeDownCast(
-      lut->GetClientSideObject());
+      lutProxy->GetClientSideObject());
 
   double range[2];
   stc->GetRange(range);
@@ -101,9 +101,9 @@ void pqRescaleCustomScalarRangeReaction::rescaleCustomScalarRange()
     range[1] = dialog.getMaximum();
 
     BEGIN_UNDO_SET("Rescale Custom Range");
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range[0],range[1]);
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(lutProxy, range[0],range[1]);
     vtkSMTransferFunctionProxy::RescaleTransferFunction(
-      vtkSMPropertyHelper(lut, "ScalarOpacityFunction").GetAsProxy(),
+      vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").GetAsProxy(),
       range[0],range[1]);
 
     // disable auto-rescale of transfer function since the user has set on

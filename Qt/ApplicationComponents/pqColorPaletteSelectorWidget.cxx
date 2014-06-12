@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
-  vtkSMProxy *smproxy, vtkSMProperty *smproperty, QWidget *parentObject)
+  vtkSMProxy *smproxy, vtkSMProperty *vtkNotUsed(smproperty), QWidget *parentObject)
 : Superclass(smproxy, parentObject)
 {
   PV_DEBUG_PANELS() << "pqColorPaletteSelectorWidget for a property with "
@@ -101,10 +101,10 @@ void pqColorPaletteSelectorWidget::setCurrentIndex(int index)
   QString name = this->ComboBox->itemData(index).toString();
 
   vtkSMSessionProxyManager* pxm = smproxy->GetSessionProxyManager();
-  vtkSMProxy* palette = pxm->GetPrototypeProxy("palettes", name.toLatin1().data());
-  Q_ASSERT(palette);
+  vtkSMProxy* paletteProxy = pxm->GetPrototypeProxy("palettes", name.toLatin1().data());
+  Q_ASSERT(paletteProxy);
 
-  smproxy->Copy(palette);
+  smproxy->Copy(paletteProxy);
 
   // return the combobox back to the "select .." text.
   this->ComboBox->setCurrentIndex(0);
