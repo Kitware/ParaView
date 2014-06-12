@@ -142,6 +142,7 @@ protected:
   vtkOutlineSource* OutlineSource;
   vtkPolyDataMapper* OutlineMapper;;
 
+  unsigned long DataSize;
   double DataBounds[6];
 
 private:

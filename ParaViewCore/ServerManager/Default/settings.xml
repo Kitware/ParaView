@@ -490,6 +490,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ShowAnnotation"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to see annotation providing advanced debugging and performance
+          information about each render.
+        </Documentation>
+      </IntVectorProperty>
+
       <PropertyGroup label="Geometry Mapper Options">
         <Property name="UseDisplayLists" />
         <Property name="ResolveCoincidentTopology" />
@@ -515,13 +526,14 @@
       </PropertyGroup>
 
       <PropertyGroup label="Client/Server Rendering Options">
-        <PropertyGroup name="ImageReductionFactor" />
-        <PropertyGroup name="CompressorConfig" />
+        <Property name="ImageReductionFactor" />
+        <Property name="CompressorConfig" />
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">
-        <PropertyGroup name="OutlineThreshold" />
-        <PropertyGroup name="UseOffscreenRenderingForScreenshots" />
+        <Property name="OutlineThreshold" />
+        <Property name="UseOffscreenRenderingForScreenshots" />
+        <Property name="ShowAnnotation" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />

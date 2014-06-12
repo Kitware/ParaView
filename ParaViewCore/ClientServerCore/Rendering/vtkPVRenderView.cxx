@@ -20,9 +20,9 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkDataRepresentation.h"
-#include "vtkInformation.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationDoubleVectorKey.h"
+#include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
@@ -33,15 +33,16 @@
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLight.h"
 #include "vtkLightKit.h"
-#include "vtkMPIMoveData.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMemberFunctionCommand.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
+#include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVConfig.h"
@@ -54,23 +55,25 @@
 #include "vtkPVOptions.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVSynchronizedRenderer.h"
+#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVTrackballMultiRotate.h"
 #include "vtkPVTrackballRoll.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVTrackballZoom.h"
-#include "vtkProcessModule.h"
+#include "vtkRenderer.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkRenderer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTextActor.h"
+#include "vtkTextProperty.h"
+#include "vtkTextRepresentation.h"
 #include "vtkTimerLog.h"
 #include "vtkTrackballPan.h"
 #include "vtkTrackballPan.h"
@@ -86,6 +89,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <sstream>
 
 class vtkPVRenderView::vtkInternals
 {
@@ -147,6 +151,7 @@ vtkInformationKeyRestrictedMacro(
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
+  : Annotation()
 {
   this->Internals = new vtkInternals();
   // non-reference counted, so no worries about reference loops.
@@ -301,6 +306,20 @@ vtkPVRenderView::vtkPVRenderView()
   this->GetRenderer()->AddActor(this->CenterAxes);
 
   this->SetInteractionMode(INTERACTION_MODE_3D);
+
+  this->NonCompositedRenderer->AddActor(this->Annotation.GetPointer());
+  this->Annotation->SetRenderer(this->NonCompositedRenderer);
+  this->Annotation->SetText("Annotation");
+  this->Annotation->BuildRepresentation();
+  this->Annotation->SetWindowLocation(vtkTextRepresentation::UpperLeftCorner);
+  this->Annotation->GetTextActor()->SetTextScaleModeToNone();
+  this->Annotation->GetTextActor()->GetTextProperty()->SetJustificationToLeft();
+  this->Annotation->SetVisibility(0);
+  this->ShowAnnotation = false;
+
+  // We update the annotation text before the 2D renderer renders.
+  this->NonCompositedRenderer->AddObserver(
+    vtkCommand::StartEvent, this, &vtkPVRenderView::UpdateAnnotationText);
 }
 
 //----------------------------------------------------------------------------
@@ -1122,7 +1141,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->GetUseDistributedRenderingForInteractiveRender():
     this->GetUseDistributedRenderingForStillRender();
 
-  if (this->GetUseOrderedCompositing())
+  bool use_ordered_compositing = this->GetUseOrderedCompositing();
+  if (use_ordered_compositing)
     {
     this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(
       use_lod_rendering);
@@ -1168,6 +1188,15 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     in_cave_mode ||
     (!use_distributed_rendering && in_tile_display_mode));
 
+  if (this->ShowAnnotation)
+    {
+    std::ostringstream stream;
+    stream
+      << "Mode: " << (interactive? "interactive" : "still") << "\n"
+      << "Level-of-detail: " << (use_lod_rendering? "yes" : "no") << "\n"
+      << "Remote/parallel rendering (if applicable): " << (use_distributed_rendering? "yes" : "no") << "\n";
+    this->Annotation->SetText(stream.str().c_str());
+    }
 
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
@@ -1241,7 +1270,8 @@ int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetPiece(vtkInformation* info,
-  vtkPVDataRepresentation* repr, vtkDataObject* data)
+  vtkPVDataRepresentation* repr, vtkDataObject* data,
+  unsigned long trueSize/*=0*/)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1250,7 +1280,7 @@ void vtkPVRenderView::SetPiece(vtkInformation* info,
     return;
     }
 
-  view->GetDeliveryManager()->SetPiece(repr, data, false);
+  view->GetDeliveryManager()->SetPiece(repr, data, false, trueSize);
 }
 
 //----------------------------------------------------------------------------
@@ -1955,7 +1985,6 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
     MULTI_ROTATE=5
     };
 
-
   for (int manip=NONE; manip <=CTRL; manip++)
     {
     for (int button=0; button<3; button++)
@@ -1989,4 +2018,30 @@ void vtkPVRenderView::SetCameraManipulators(vtkPVInteractorStyle* style, const i
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetShowAnnotation(bool val)
+{
+  this->ShowAnnotation = val;
+  this->Annotation->SetVisibility(val? 1 : 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UpdateAnnotationText()
+{
+  if (this->ShowAnnotation)
+    {
+    std::ostringstream stream;
+    stream << this->Annotation->GetText();
+    this->BuildAnnotationText(stream);
+    this->Annotation->SetText(stream.str().c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::BuildAnnotationText(ostream& str)
+{
+  double time = this->RenderView->GetRenderer()->GetLastRenderTimeInSeconds();
+  str << "Frame rate: " << (time > 0.0? 1.0/time : 100000.0) << " fps\n";
 }

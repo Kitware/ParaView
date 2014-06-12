@@ -26,6 +26,8 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 #include "vtkBoundingBox.h" // needed for iVar
+#include "vtkNew.h" // needed for iVar
+
 
 class vtkAlgorithmOutput;
 class vtkCamera;
@@ -51,6 +53,7 @@ class vtkPVSynchronizedRenderer;
 class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
+class vtkTextRepresentation;
 class vtkTexture;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
@@ -322,8 +325,10 @@ public:
 
   // Description:
   // Convenience methods used by representations to pass represented data.
+  // If trueSize is non-zero, then that's the size used in making decisions
+  // about LOD/remote rendering etc and not the actual size of the dataset.
   static void SetPiece(vtkInformation* info,
-    vtkPVDataRepresentation* repr, vtkDataObject* data);
+    vtkPVDataRepresentation* repr, vtkDataObject* data, unsigned long trueSize=0);
   static vtkAlgorithmOutput* GetPieceProducer(vtkInformation* info,
     vtkPVDataRepresentation* repr);
   static void SetPieceLOD(vtkInformation* info,
@@ -382,6 +387,10 @@ public:
   void SetLightSwitch(bool enable);
   bool GetLightSwitch();
   vtkBooleanMacro(LightSwitch, bool);
+
+  // Description:
+  // Enable/disable showing of annotation for developers.
+  void SetShowAnnotation(bool val);
 
   //*****************************************************************
   // Forwarded to orientation axes widget.
@@ -603,6 +612,11 @@ protected:
   void SynchronizeForCollaboration();
 
   // Description:
+  // Method to build annotation text to annotate the view with runtime
+  // information.
+  virtual void BuildAnnotationText(ostream& str);
+
+  // Description:
   // SynchronizationCounter is used in multi-clients mode to ensure that the
   // views on two different clients are in the same state as the server side.
   vtkGetMacro(SynchronizationCounter, unsigned int);
@@ -637,6 +651,7 @@ protected:
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
   int InteractionMode;
+  bool ShowAnnotation;
 
   // 2D and 3D interactor style
   vtkPVInteractorStyle* TwoDInteractorStyle;
@@ -697,6 +712,9 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  vtkNew<vtkTextRepresentation> Annotation;
+  void UpdateAnnotationText();
 //ETX
 };
 

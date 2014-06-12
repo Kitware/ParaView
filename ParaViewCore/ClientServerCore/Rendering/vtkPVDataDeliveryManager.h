@@ -66,7 +66,8 @@ public:
   // method to register the geometry type they are rendering. Every
   // representation that requires delivering of any geometry must register with
   // the vtkPVDataDeliveryManager and never manage the delivery on its own.
-  void SetPiece(vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res);
+  void SetPiece(vtkPVDataRepresentation* repr, vtkDataObject* data,
+    bool low_res, unsigned long trueSize=0);
   void SetPiece(unsigned int repr_id, vtkDataObject* data, bool low_res);
 
   // Description:
