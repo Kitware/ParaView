@@ -265,7 +265,10 @@ if (EXISTS "${smooth_flash}")
                  "${CMAKE_CURRENT_BINARY_DIR}/AMRVolumeRendering.xml" @ONLY)
 
   set (streaming_tests
-    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml)
+
+  # AMRVolumeRendering is a non-streaming test.
+  list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_BINARY_DIR}/AMRVolumeRendering.xml)
   set(AMRVolumeRendering_BREAK TRUE)
 
