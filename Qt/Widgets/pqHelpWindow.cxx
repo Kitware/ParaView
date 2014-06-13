@@ -53,10 +53,10 @@ namespace
 class pqTextBrowser : public QTextBrowser
 {
 public:
-  pqTextBrowser(QHelpEngine* helpEngine, QWidget* parent = 0)
+  pqTextBrowser(QHelpEngine* helpEngine, QWidget* _parent = 0)
     {
     this->HelpEngine = helpEngine;
-    this->setParent(parent);
+    this->setParent(_parent);
     }
 
 protected:
