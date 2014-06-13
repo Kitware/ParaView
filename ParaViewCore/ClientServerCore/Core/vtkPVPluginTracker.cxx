@@ -69,6 +69,7 @@ namespace
 
   std::string vtkLocatePlugin(const char* plugin, bool add_extensions, vtkPluginSearchFunction searchFunction)
     {
+    (void)searchFunction;
     // Make sure we can get the options before going further
     if(vtkProcessModule::GetProcessModule() == NULL)
       {

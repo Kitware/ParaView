@@ -573,7 +573,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     {
     vtkTimerLog::MarkStartEvent("CaptureZBuffer" );
     this->Internal->StoreVisibilityState();
-    bool orientationVisibilityOrigin = this->OrientationWidget->GetEnabled();
+    bool orientationVisibilityOrigin = (this->OrientationWidget->GetEnabled() != 0);
     bool centerOfRotationOrigin = (this->CenterAxes->GetVisibility() != 0);
 
     // Init tmp vars
@@ -668,7 +668,7 @@ void vtkPVRenderViewForAssembly::Render(bool interactive, bool skip_rendering)
     {
     vtkTimerLog::MarkStartEvent("CaptureRGB" );
     this->Internal->StoreVisibilityState();
-    bool orientationVisibilityOrigin = this->OrientationWidget->GetEnabled();
+    bool orientationVisibilityOrigin = (this->OrientationWidget->GetEnabled() != 0);
     bool centerOfRotationOrigin = (this->CenterAxes->GetVisibility() != 0);
 
     // Capture Background

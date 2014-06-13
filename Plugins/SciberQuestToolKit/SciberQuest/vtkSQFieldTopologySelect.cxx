@@ -87,7 +87,7 @@ int vtkSQFieldTopologySelect::FillOutputPortInformation(
 int vtkSQFieldTopologySelect::RequestInformation(
     vtkInformation * /*req*/,
     vtkInformationVector ** /*inInfos*/,
-    vtkInformationVector *outInfos)
+    vtkInformationVector *vtkNotUsed(outInfos))
 {
   #ifdef SQTK_DEBUG
   std::cerr << "===============================vtkSQFieldTopologySelect::RequestInformation" << std::endl;

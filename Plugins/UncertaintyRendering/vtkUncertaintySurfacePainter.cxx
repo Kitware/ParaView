@@ -420,8 +420,8 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
 
   vtkOpenGLClearErrorMacro();
 
-  vtkOpenGLRenderWindow *renWin =
-    vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
+  //vtkOpenGLRenderWindow *renWin =
+  //  vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
 
   glPushAttrib(GL_ALL_ATTRIB_BITS);
 
