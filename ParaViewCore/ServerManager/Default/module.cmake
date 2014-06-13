@@ -8,7 +8,7 @@ vtk_module(vtkPVServerManagerDefault
     vtkPVClientServerCoreDefault
   TEST_DEPENDS
     vtkPVServerManagerApplication
-    vtkTestingCore
+    vtkTestingRendering
   TEST_LABELS
     PARAVIEW
 )
