@@ -204,14 +204,15 @@ void pqCommandLineOptionsBehavior::playTests()
   pqOptions* options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions());
 
-  pqPersistentMainWindowStateBehavior::saveState(
-    qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()));
+  QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+  pqPersistentMainWindowStateBehavior::saveState(mainWindow);
 
   bool success = true;
   for (int cc=0; success &&  cc < options->GetNumberOfTestScripts(); cc++)
     {
     if (cc > 0)
       {
+      pqPersistentMainWindowStateBehavior::restoreState(mainWindow);
       this->resetApplication();
       }
     else if (cc==0)
