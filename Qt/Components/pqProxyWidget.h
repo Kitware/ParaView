@@ -130,6 +130,11 @@ protected:
   void showEvent(QShowEvent *event);
   void hideEvent(QHideEvent *event);
 
+private slots:
+  /// Called when a pqPropertyWidget fires changeFinished() signal.
+  /// This callback fires changeFinished() signal and handles AutoUpdateVTKObjects.
+  void onChangeFinished();
+
 private:
   /// the actual constructor implementation.
   void constructor(

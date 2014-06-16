@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPVApplicationCore.h"
 #include "pqPythonManager.h"
+#include "vtkPVGeneralSettings.h"
+#include "vtkSMTrace.h"
 
 //-----------------------------------------------------------------------------
 pqTraceReaction::pqTraceReaction(QAction* parentObject, bool _start)
@@ -66,26 +68,41 @@ pqTraceReaction::pqTraceReaction(QAction* parentObject, bool _start)
 //-----------------------------------------------------------------------------
 void pqTraceReaction::start()
 {
-  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  if(!pythonManager)
+  if (!vtkSMTrace::GetActiveTracer())
     {
-    qCritical("No application wide python manager.");
-    return;
+    vtkSMTrace* trace = vtkSMTrace::StartTrace();
+    trace->SetPropertiesToTraceOnCreate(
+      vtkPVGeneralSettings::GetInstance()->GetPropertiesToTraceOnCreate());
     }
-  pythonManager->startTrace();
+  else
+    {
+    pqTraceReaction::stop();
+    }
+
+  //pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  //if(!pythonManager)
+  //  {
+  //  qCritical("No application wide python manager.");
+  //  return;
+  //  }
+  //pythonManager->startTrace();
 }
 
 //-----------------------------------------------------------------------------
 void pqTraceReaction::stop()
 {
-  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  if(!pythonManager)
-    {
-    qCritical("No application wide python manager.");
-    return;
-    }
-  pythonManager->stopTrace();
-  pythonManager->editTrace();
+  std::string str = vtkSMTrace::StopTrace();
+  cout << "Trace: " << endl
+     << str.c_str()<< endl;
+
+  //pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  //if(!pythonManager)
+  //  {
+  //  qCritical("No application wide python manager.");
+  //  return;
+  //  }
+  //pythonManager->stopTrace();
+  //pythonManager->editTrace();
 }
 
 //-----------------------------------------------------------------------------

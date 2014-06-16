@@ -25,10 +25,54 @@
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
+#include <string>
 #include <cassert>
+
+//namespace smtrace
+//{
+//  class Show : public Action
+//  {
+//  vtkSMProxy* Representation;
+//  vtkSMSourceProxy* Producer;
+//  int Port;
+//  vtkSMViewProxy* View;
+//  vtkTimeStamp TimeStamp;
+//public:
+//  Show(vtkSMProxy* rep, vtkSMSourceProxy* producer, int port, vtkSMViewProxy* view)
+//    : Representation(rep),
+//    Producer(producer),
+//    Port(port),
+//    View(view)
+//    {
+//    if (!this->IsTracingEnabled()) { return; }
+//    this->TimeStamp.Modified();
+//    }
+//  ~Show()
+//    {
+//    if (!this->IsTracingEnabled()) { return; }
+//
+//    // Ensure all necessary variables are accessible.
+//    std::string producerVarName = this->GetVariable(this->Producer);
+//    std::string viewVarName = this->GetVariable(this->View);
+//
+//    this->GetStream() << "var = Show("
+//                      << producerVarName
+//                      << ", "
+//                      << viewVarName
+//                      << ")" << endl;
+//
+////    this->TraceProperties(this->Representation,
+////      /*prefix=*/ "",
+////      /*suffix=*/ COMMA_NEWLINE_INDENT,
+////      /*modified_since=*/ this->TimeStamp.GetMTime());
+//
+//    }
+//  };
+//}
 
 namespace
 {
@@ -293,6 +337,11 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // find is there's already a representation in this view.
   if (vtkSMProxy* repr = view->FindRepresentation(producer, outputPort))
     {
+    SM_SCOPED_TRACE(Show).arg("producer", producer)
+      .arg("port", outputPort)
+      .arg("view", view)
+      .arg("display", repr);
+
     vtkSMPropertyHelper(repr, "Visibility").Set(1);
     repr->UpdateVTKObjects();
     return repr;
@@ -304,6 +353,11 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // Since no repr exists, create a new one if possible.
   if (vtkSMRepresentationProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
     {
+    SM_SCOPED_TRACE(Show).arg("producer", producer)
+      .arg("port", outputPort)
+      .arg("view", view)
+      .arg("display", repr);
+
     this->PreInitializeProxy(repr);
 
     vtkTimeStamp ts;
@@ -347,6 +401,10 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
     // already hidden, I guess :).
     return NULL;
     }
+
+  SM_SCOPED_TRACE(Hide).arg("producer", producer)
+    .arg("port", outputPort)
+    .arg("view", view);
 
   // find is there's already a representation in this view.
   if (vtkSMProxy* repr = view->FindRepresentation(producer, outputPort))

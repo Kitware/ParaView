@@ -28,6 +28,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 
@@ -340,6 +341,11 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
     return false;
     }
 
+  SM_SCOPED_TRACE(SetScalarColoring)
+    .arg("display", this)
+    .arg("arrayname", arrayname)
+    .arg("attribute_type", attribute_type);
+
   vtkSMPropertyHelper colorArrayHelper(colorArray);
   colorArrayHelper.SetInputArrayToProcess(attribute_type, arrayname);
 
@@ -372,7 +378,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visibile)
+bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool visible)
 {
   if (!view)
     {
@@ -394,12 +400,21 @@ bool vtkSMPVRepresentationProxy::SetScalarBarVisibility(vtkSMProxy* view, bool v
     return false;
     }
 
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("SetScalarBarVisibility")
+    .arg(view)
+    .arg(visible)
+    .arg("comment", visible?
+      "show color bar/color legend" :
+      "hide color bar/color legend");
+
   vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
 
   // if hiding the Scalar Bar, just look if there's a LUT and then hide the
   // corresponding scalar bar. We won't worry too much about whether scalar
   // coloring is currently enabled for this.
-  if (!visibile)
+  if (!visible)
     {
     if (vtkSMProxy* sbProxy = vtkSMTransferFunctionProxy::FindScalarBarRepresentation(
         lutPropertyHelper.GetAsProxy(), view))
@@ -460,6 +475,12 @@ bool vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(vtkSMProxy* view)
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("HideScalarBarIfNotNeeded")
+    .arg(view)
+    .arg("comment", "hide scalars not actively used");
 
   vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
   vtkNew<vtkSMTransferFunctionManager> tmgr;

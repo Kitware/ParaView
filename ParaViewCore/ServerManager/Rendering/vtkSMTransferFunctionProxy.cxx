@@ -21,10 +21,11 @@
 #include "vtkPVXMLParser.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkTuple.h"
 
@@ -141,6 +142,13 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     points[1].GetData()[0] = rangeMax;
     cntrlPoints.Set(points[0].GetData(), 8);
     this->UpdateVTKObjects();
+
+    SM_SCOPED_TRACE(CallMethod)
+      .arg(this)
+      .arg("RescaleTransferFunction")
+      .arg(rangeMin)
+      .arg(rangeMax)
+      .arg("comment", "Rescale transfer function");
     return true;
     }
 
@@ -159,6 +167,13 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     rangeMin = std::min(rangeMin, old_range[0]);
     rangeMax = std::max(rangeMax, old_range[1]);
     }
+
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("RescaleTransferFunction")
+    .arg(rangeMin)
+    .arg(rangeMax)
+    .arg("comment", "Rescale transfer function");
 
   if (old_range[0] == rangeMin && old_range[1] == rangeMax)
     {
@@ -267,6 +282,11 @@ bool vtkSMTransferFunctionProxy::InvertTransferFunction()
     return false;
     }
 
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("InvertTransferFunction")
+    .arg("comment", "invert the transfer function");
+
   vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
   unsigned int num_elements = cntrlPoints.GetNumberOfElements();
   if (num_elements == 0 || num_elements == 4)
@@ -325,6 +345,13 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg(inverse? "MapControlPointsToLinearSpace" : "MapControlPointsToLogSpace")
+    .arg("comment",
+      inverse? "convert from log to linear" : "convert to log space");
+
 
   vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
   unsigned int num_elements = cntrlPoints.GetNumberOfElements();

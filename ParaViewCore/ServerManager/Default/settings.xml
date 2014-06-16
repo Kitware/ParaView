@@ -588,5 +588,31 @@
         <UseDocumentationForLabels />
       </Hints>
     </SettingsProxy>
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+    <!-- Python functionality related settings -->
+    <SettingsProxy name="PythonTraceSettings"
+      label="Python Tracing"
+      processes="client"
+      class="vtkPVGeneralSettings">
+      <IntVectorProperty name="PropertiesToTraceOnCreate"
+        command="SetPropertiesToTraceOnCreate"
+        default_values="1"
+        number_of_elements="1">
+        <Documentation>
+          When tracing the creation of pipeline objects, specify which properties are
+          recorded in the trace.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Record all properties" value="0" />
+          <Entry text="Record all *modified* properties" value="1" />
+          <Entry text="Record only *user-modified* properites" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </SettingsProxy>
+#endif
   </ProxyGroup>
 </ServerManagerConfiguration>

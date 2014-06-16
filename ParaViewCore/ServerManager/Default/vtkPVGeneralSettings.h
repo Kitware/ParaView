@@ -122,6 +122,12 @@ public:
   vtkSetMacro(PropertiesPanelMode, int);
   vtkGetMacro(PropertiesPanelMode, int);
 
+
+  // Description:
+  // Affects vtkSMTrace's tracing capabilities.
+  vtkSetMacro(PropertiesToTraceOnCreate, int);
+  vtkGetMacro(PropertiesToTraceOnCreate, int);
+
 //BTX
 protected:
   vtkPVGeneralSettings();
@@ -135,6 +141,7 @@ protected:
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;
   int PropertiesPanelMode;
+  int PropertiesToTraceOnCreate;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&); // Not implemented

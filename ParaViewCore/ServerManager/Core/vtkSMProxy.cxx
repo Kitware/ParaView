@@ -430,7 +430,7 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
     }
 
   this->InvokeEvent(vtkCommand::PropertyModifiedEvent, (void*)name);
-  
+
   vtkSMProperty* prop = it->second.Property.GetPointer();
   if (prop->GetInformationOnly())
     {

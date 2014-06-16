@@ -20,6 +20,7 @@
 #include "vtkSISourceProxy.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMTrace.h"
 
 #include <cassert>
 
@@ -44,7 +45,8 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS),
   CacheGeometryForAnimation(false),
   AnimationGeometryCacheLimit(0),
-  PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
+  PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE),
+  PropertiesToTraceOnCreate(vtkSMTrace::RECORD_ALL_PROPERTIES)
 {
   this->SetDefaultViewType("RenderView");
 }

@@ -60,22 +60,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 
+#include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyGroup.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMProxyProperty.h"
 #include "vtkSMSettings.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMTrace.h"
 
 #include <QHideEvent>
 #include <QLabel>
@@ -671,6 +671,7 @@ void pqProxyWidget::hideEvent(QHideEvent *hevent)
 //-----------------------------------------------------------------------------
 void pqProxyWidget::apply() const
 {
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
   foreach (const pqProxyWidgetItem* item, this->Internals->Items)
     {
     item->apply();
@@ -699,11 +700,6 @@ void pqProxyWidget::setView(pqView* view)
 void pqProxyWidget::setApplyChangesImmediately(bool immediate_apply)
 {
   this->ApplyChangesImmediately = immediate_apply;
-  foreach (const pqProxyWidgetItem* item, this->Internals->Items)
-    {
-    item->propertyWidget()->setAutoUpdateVTKObjects(immediate_apply);
-    item->propertyWidget()->setUseUncheckedProperties(!immediate_apply);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -778,7 +774,7 @@ void pqProxyWidget::createWidgets(const QStringList &properties)
     QObject::connect(item->propertyWidget(), SIGNAL(changeAvailable()),
       this, SIGNAL(changeAvailable()));
     QObject::connect(item->propertyWidget(), SIGNAL(changeFinished()),
-      this, SIGNAL(changeFinished()));
+      this, SLOT(onChangeFinished()));
     QObject::connect(item->propertyWidget(), SIGNAL(restartRequired()),
       this, SIGNAL(restartRequired()));
     }
@@ -1227,4 +1223,19 @@ void pqProxyWidget::onSaveAsDefaults()
 {
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
   settings->SetProxySettings(this->Internals->Proxy);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::onChangeFinished()
+{
+  if (this->ApplyChangesImmediately)
+    {
+    pqPropertyWidget* pqSender = qobject_cast<pqPropertyWidget*>(this->sender());
+    if (pqSender)
+      {
+      SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxy());
+      pqSender->apply();
+      }
+    }
+  emit this->changeFinished();
 }

@@ -36,6 +36,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkWeakPointer.h"
+#include "vtkSMTrace.h"
 
 #include <cassert>
 #include <map>
@@ -602,6 +603,8 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
     return false;
     }
 
+  SM_SCOPED_TRACE(RegisterPipelineProxy).arg("proxy", proxy);
+
   // Create animation helpers for this proxy.
   this->CreateAnimationHelpers(proxy);
 
@@ -621,6 +624,7 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
     proxy->GetSessionProxyManager()->GetSelectionModel("ActiveSources");
   assert(selmodel != NULL);
   selmodel->SetCurrentProxy(proxy, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+
   return true;
 }
 
@@ -638,6 +642,9 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(UnRegisterPipelineProxy).arg("proxy", proxy);
+
   const std::string proxyname(_proxyname);
 
   // ensure proxy is no longer active.

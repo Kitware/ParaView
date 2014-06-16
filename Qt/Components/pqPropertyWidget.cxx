@@ -46,8 +46,7 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   : QWidget(parentObject),
     Proxy(smProxy),
     Property(0),
-    ChangeAvailableAsChangeFinished(true),
-    AutoUpdateVTKObjects(false)
+    ChangeAvailableAsChangeFinished(true)
 {
   this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
@@ -60,9 +59,6 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   // before changeAvailable() is handled by pqProxyWidget and see BUG #13029.
   this->connect(this, SIGNAL(changeAvailable()),
                 this, SLOT(onChangeAvailable()), Qt::QueuedConnection);
-
-  this->connect(this, SIGNAL(changeFinished()),
-    this, SLOT(onChangeFinished()));
 }
 
 //-----------------------------------------------------------------------------
@@ -82,17 +78,6 @@ void pqPropertyWidget::onChangeAvailable()
   if (this->ChangeAvailableAsChangeFinished)
     {
     emit this->changeFinished();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqPropertyWidget::onChangeFinished()
-{
-  if (this->AutoUpdateVTKObjects)
-    {
-    BEGIN_UNDO_SET("Property Changed");
-    this->apply();
-    END_UNDO_SET();
     }
 }
 
@@ -144,7 +129,9 @@ vtkSMProperty* pqPropertyWidget::property() const
 //-----------------------------------------------------------------------------
 void pqPropertyWidget::apply()
 {
+  BEGIN_UNDO_SET("Property Changed");
   this->Links.accept();
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
@@ -190,18 +177,6 @@ void pqPropertyWidget::addPropertyLink(QObject *qobject,
 {
   this->Links.addPropertyLink(qobject, qproperty, qsignal,
     smproxy, smproperty, smindex);
-}
-
-//-----------------------------------------------------------------------------
-void pqPropertyWidget::setAutoUpdateVTKObjects(bool autoUpdate)
-{
-  this->AutoUpdateVTKObjects = autoUpdate;
-}
-
-//-----------------------------------------------------------------------------
-void pqPropertyWidget::setUseUncheckedProperties(bool useUnchecked)
-{
-  this->Links.setUseUncheckedProperties(useUnchecked);
 }
 
 //-----------------------------------------------------------------------------

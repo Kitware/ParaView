@@ -153,25 +153,14 @@ protected:
     { return this->Links; }
 
 private:
-  /// setAutoUpdateVTKObjects no longer simply passes the flag to
-  /// pqPropertyLinks. Instead we set a flag so that when this->changeFinished()
-  /// is fired, we call this->apply(). Thus makes it possible for widgets with
-  /// AutoUpdateVTKObjects set to true handle editing of values correctly and
-  /// not push the values as the values are being edited.
-  void setAutoUpdateVTKObjects(bool autoUpdate);
-  void setUseUncheckedProperties(bool useUnchecked);
   void setProperty(vtkSMProperty *property);
 
-  friend class pqPropertiesPanel;
   friend class pqPropertyWidgetDecorator;
   friend class pqProxyWidget;
 
 private slots:
   /// check if changeFinished() must be fired as well.
   void onChangeAvailable();
-
-  /// if AutoUpdateVTKObjects is true, call this->apply();
-  void onChangeFinished();
 
 private:
   vtkSMProxy *Proxy;
@@ -182,7 +171,6 @@ private:
   pqPropertyLinks Links;
   bool ShowLabel;
   bool ChangeAvailableAsChangeFinished;
-  bool AutoUpdateVTKObjects;
 
   /// Deprecated signals. Making private so developers get errors when they
   /// use them.
