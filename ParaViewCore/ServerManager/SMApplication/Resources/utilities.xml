@@ -261,7 +261,6 @@
       <PropertyGroup label="Color Mapping Parameters">
         <Property name="ColorSpace" />
         <Property name="NanColor" />
-        <Property name="LockScalarRange" function="LockScalarRange" />
       </PropertyGroup>
 
       <PropertyGroup label="Color Discretization">
