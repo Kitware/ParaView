@@ -260,7 +260,6 @@ void vtkSMLiveInsituLinkProxy::MarkStateDirty()
 {
   this->StateDirty = true;
   vtkSMLiveInsituLinkProxyDebugMacro(<< "MarkStateDirty");
-  this->PushUpdatedState();
   this->LiveChanged();
 }
 

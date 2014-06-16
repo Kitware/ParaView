@@ -325,7 +325,7 @@ private slots:
   void serverDataChanged();
 
   /// called when visibility of the source may have changed.
-  void updateVisibility(pqPipelineSource*);
+  void updateVisibility(pqPipelineSource*, ItemType type = Proxy);
 
   /// provides a mechanism to delay updating of visibility while safely handling
   /// the case where the pqPipelineSource itself gets deleted in the mean time.
@@ -333,7 +333,8 @@ private slots:
   void delayedUpdateVisibilityTimeout();
 
   /// called when the item's name changes.
-  void updateData(pqServerManagerModelItem*);
+  void updateData(pqServerManagerModelItem*, ItemType type = Proxy);
+  void updateDataServer(pqServer* server);
 
 private:
   friend class pqPipelineModelDataItem;

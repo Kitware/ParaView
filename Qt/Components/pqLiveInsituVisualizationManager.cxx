@@ -112,6 +112,12 @@ pqServer* pqLiveInsituVisualizationManager::insituServer() const
 }
 
 //-----------------------------------------------------------------------------
+pqServer* pqLiveInsituVisualizationManager::displayServer() const
+{
+  return qobject_cast<pqServer*>(this->parent());
+}
+
+//-----------------------------------------------------------------------------
 pqLiveInsituVisualizationManager::~pqLiveInsituVisualizationManager()
 {
   pqApplicationCore* core = pqApplicationCore::instance();

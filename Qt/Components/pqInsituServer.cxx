@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqInsituServer.h"
 
+#include <limits>
+
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QVariant>
@@ -45,7 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMLiveInsituLinkProxy.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+
+double pqInsituServer::INVALID_TIME = - std::numeric_limits<double>().max();
 
 //-----------------------------------------------------------------------------
 pqInsituServer* pqInsituServer::instance()
@@ -59,18 +67,28 @@ pqInsituServer* pqInsituServer::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqInsituServer::pqInsituServer()
+pqInsituServer::pqInsituServer() :
+  BreakpointTime(INVALID_TIME),
+  CurrentTime(INVALID_TIME)
 {
+  pqServerManagerModel* model =
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(model,
+                   SIGNAL(sourceAdded(pqPipelineSource*)),
+                   this, SLOT(onSourceAdded(pqPipelineSource*)));
+  QObject::connect(this, SIGNAL(breakpointHit(pqServer*)),
+                   this, SLOT(onBreakpointHit(pqServer*)),
+                   Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
-bool pqInsituServer::isInsitu(pqServer* server)
+bool pqInsituServer::isInsituServer(pqServer* server)
 {
   return server ? (server->getResource().scheme() == "catalyst") : false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqInsituServer::hasInsitu(pqServer* server)
+bool pqInsituServer::isDisplayServer(pqServer* server)
 {
   return this->Managers.contains(server);
 }
@@ -78,19 +96,32 @@ bool pqInsituServer::hasInsitu(pqServer* server)
 //-----------------------------------------------------------------------------
 pqServer* pqInsituServer::insituServer()
 {
-  pqServerManagerModel *smModel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  QList<pqServer*> servers = smModel->findItems<pqServer*>();
-  for(QList<pqServer*>::Iterator it = servers.begin();
-      it != servers.end(); ++it)
+  pqActiveObjects& ao = pqActiveObjects::instance();
+  pqServer* as = ao.activeServer();
+  if (pqInsituServer::isInsituServer(as))
     {
-    pqServer* server = *it;
-    if (pqInsituServer::isInsitu(server))
-      {
-      return server;
-      }
+    return as;
     }
-  return NULL;
+  else if (this->isDisplayServer(as))
+    {
+    return managerFromDisplay(as)->insituServer();
+    }
+  else
+    {
+    pqServerManagerModel *smModel =
+      pqApplicationCore::instance()->getServerManagerModel();
+    QList<pqServer*> servers = smModel->findItems<pqServer*>();
+    for(QList<pqServer*>::Iterator it = servers.begin();
+        it != servers.end(); ++it)
+      {
+      pqServer* server = *it;
+      if (pqInsituServer::isInsituServer(server))
+        {
+        return server;
+        }
+      }
+    return NULL;
+    }
 }
 
 
@@ -100,10 +131,8 @@ vtkSMLiveInsituLinkProxy* pqInsituServer::linkProxy(
 {
   if (insituServer)
     {
-    pqLiveInsituVisualizationManager* mgr=
-      qobject_cast<pqLiveInsituVisualizationManager*>(
-        insituServer->property(
-          "LiveInsituVisualizationManager").value<QObject*>());
+    pqLiveInsituVisualizationManager* mgr =
+      pqInsituServer::managerFromInsitu(insituServer);
     if (mgr)
       {
       vtkSMLiveInsituLinkProxy* proxy = mgr->getProxy();
@@ -159,9 +188,18 @@ pqLiveInsituVisualizationManager* pqInsituServer::connect(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-pqLiveInsituVisualizationManager* pqInsituServer::manager(pqServer* server)
+pqLiveInsituVisualizationManager* pqInsituServer::managerFromDisplay(
+  pqServer* displayServer)
 {
-  return this->Managers[server];
+  return this->Managers[displayServer];
+}
+
+//-----------------------------------------------------------------------------
+pqLiveInsituVisualizationManager* pqInsituServer::managerFromInsitu(
+  pqServer* insituServer)
+{
+  return qobject_cast<pqLiveInsituVisualizationManager*>(
+    insituServer->property("LiveInsituVisualizationManager").value<QObject*>());
 }
 
 
@@ -195,6 +233,116 @@ void pqInsituServer::onCatalystDisconnected()
       {
       this->Managers.erase(iter);
       break;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqInsituServer::pipelineSource(pqServer* insituServer)
+{
+  if (insituServer)
+    {
+    vtkSMSessionProxyManager* manager = insituServer->proxyManager();
+    vtkSMProxy* proxy = manager->GetProxy("sources", "PVTrivialProducer");
+    return pqApplicationCore::instance()->getServerManagerModel()->
+      findItem<pqPipelineSource*>(proxy);
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+double pqInsituServer::time(pqPipelineSource* pipelineSource)
+{
+  if (pipelineSource)
+    {
+    pqOutputPort* port = pipelineSource->getOutputPort(0);
+    vtkPVDataInformation* dataInfo = port->getDataInformation();
+    if (dataInfo->GetHasTime())
+      {
+      double time = dataInfo->GetTime();
+      cerr << time << " " << pipelineSource << endl;
+      return time;
+      }
+    }
+  return INVALID_TIME;
+}
+
+//-----------------------------------------------------------------------------
+void pqInsituServer::onSourceAdded(pqPipelineSource* source)
+{
+  vtkSMSourceProxy* sourceProxy = source->getSourceProxy();
+  pqServerManagerModel* model =
+    pqApplicationCore::instance()->getServerManagerModel();
+  vtkSMSession* session = sourceProxy->GetSession();
+  pqServer* server = model->findServer(session);
+  if (QString(sourceProxy->GetXMLGroup()) == "sources" &&
+      QString(sourceProxy->GetXMLName()) == "PVTrivialProducer" &&
+      pqInsituServer::isInsituServer (server))
+    {
+    cerr << "onSourceAdded: " << source << endl;
+    QObject::connect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
+                     this, SLOT(onDataUpdated(pqPipelineSource*)));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqInsituServer::onDataUpdated(pqPipelineSource* source)
+{
+  this->CurrentTime = pqInsituServer::time(source);
+  emit currentTimeUpdated();
+  if (this->CurrentTime != INVALID_TIME &&
+      this->BreakpointTime != INVALID_TIME &&
+      this->BreakpointTime <= this->CurrentTime)
+    {
+    pqServerManagerModel* model =
+      pqApplicationCore::instance()->getServerManagerModel();
+    vtkSMSession* session = source->getSourceProxy()->GetSession();
+    pqServer* insituServer = model->findServer(session);
+    // The server talks to the client using vtkPVSessionBase::NotifyAllClients
+    // While vtkSMLiveInsituLinkProxy::LoadState notifies us that the time
+    // changed we try to send to the server an updated property. This does not
+    // work unless we send this update through the message queue (we wait
+    // for LoadState to finish).
+    emit breakpointHit(insituServer);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqInsituServer::onBreakpointHit(pqServer* insituServer)
+{
+  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy(insituServer);
+  if (proxy)
+    {
+    vtkSMPropertyHelper(proxy, "SimulationPaused").Set(true);
+    proxy->UpdateVTKObjects();
+    this->removeBreakpoint();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqInsituServer::setBreakpointTime(double time)
+{
+  if (this->BreakpointTime != time)
+    {
+    pqServer* insituServer = this->insituServer();
+    if (insituServer)
+      {
+      this->BreakpointTime = time;
+      emit breakpointAdded(insituServer);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqInsituServer::removeBreakpoint()
+{
+  if (this->BreakpointTime != INVALID_TIME)
+    {
+    pqServer* insituServer = this->insituServer();
+    if (insituServer)
+      {
+      this->BreakpointTime = INVALID_TIME;
+      emit breakpointRemoved(insituServer);
       }
     }
 }

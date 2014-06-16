@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqInsituServer.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineAnnotationFilterModel.h"
@@ -247,12 +248,10 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
           BEGIN_UNDO_SET(QString("%1 Selected").arg(visible? "Show" : "Hide"));
           }
         }
-      if (port->getServer()->getResource().scheme() == "catalyst")
+      if (pqInsituServer::isInsituServer(port->getServer()))
         {
-        pqLiveInsituVisualizationManager* mgr=
-          qobject_cast<pqLiveInsituVisualizationManager*>(
-            port->getServer()->property(
-              "LiveInsituVisualizationManager").value<QObject*>());
+        pqLiveInsituVisualizationManager* mgr =
+          pqInsituServer::managerFromInsitu(port->getServer());
         if (mgr && mgr->addExtract(port))
           {
           // refresh the pipeline browser icon.

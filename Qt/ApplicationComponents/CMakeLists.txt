@@ -62,6 +62,10 @@ set (Module_SRCS
   pqCatalystContinueReaction.h
   pqCatalystPauseSimulationReaction.cxx
   pqCatalystPauseSimulationReaction.h
+  pqCatalystSetBreakpointReaction.cxx
+  pqCatalystSetBreakpointReaction.h
+  pqCatalystRemoveBreakpointReaction.cxx
+  pqCatalystRemoveBreakpointReaction.h
   pqCategoryToolbarsBehavior.cxx
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.cxx
@@ -272,6 +276,8 @@ set (Module_MOC_HDRS
   pqCatalystConnectReaction.h
   pqCatalystContinueReaction.h
   pqCatalystPauseSimulationReaction.h
+  pqCatalystSetBreakpointReaction.h
+  pqCatalystRemoveBreakpointReaction.h
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h

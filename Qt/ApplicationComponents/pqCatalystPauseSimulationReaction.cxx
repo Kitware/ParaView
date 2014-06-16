@@ -52,12 +52,14 @@ pqCatalystPauseSimulationReaction::pqCatalystPauseSimulationReaction(
   QAction* parentObject)
   : Superclass(parentObject)
 {
+  QObject::connect(parentObject->parent(), SIGNAL(aboutToShow()),
+                   this, SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------
 void pqCatalystPauseSimulationReaction::setPauseSimulation(bool pause)
 {
-  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy();
+  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::instance()->linkProxy();
   if (proxy)
     {
     vtkSMPropertyHelper(proxy, "SimulationPaused").Set(pause);
@@ -72,15 +74,13 @@ void pqCatalystPauseSimulationReaction::setPauseSimulation(bool pause)
 //-----------------------------------------------------------------------------
 void pqCatalystPauseSimulationReaction::updateEnableState(Type type)
 {
-  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy();
-  if (proxy)
+  bool enabled = false;
+  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::instance()->linkProxy();
+  if (proxy &&
+      ((type == PAUSE) !=
+       (vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)))
     {
-    if ((type == PAUSE) !=
-        vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)
-      {
-      this->parentAction()->setEnabled(true);
-      return;
-      }
+    enabled = true;
     }
-  this->parentAction()->setEnabled(false);
+  this->parentAction()->setEnabled(enabled);
 }

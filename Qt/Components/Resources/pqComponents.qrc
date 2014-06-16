@@ -188,6 +188,7 @@
         <file>Icons/pqServer32.png</file>
         <file>Icons/pqInsituServerRunning16.png</file>
         <file>Icons/pqInsituServerPaused16.png</file>
+        <file>Icons/pqInsituBreakpoint16.png</file>
         <file>Icons/pqShowCenterAxes24.png</file>
         <file>Icons/pqShowCenterAxes32.png</file>
         <file>Icons/pqShowOrientationAxes24.png</file>

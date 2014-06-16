@@ -59,6 +59,7 @@ public:
   bool hasExtracts(pqOutputPort*) const;
 
   pqServer* insituServer() const;
+  pqServer* displayServer() const;
 
   /// create an extract to view the output from the given port. pqOutputPort
   /// must be an instance on the dummy session corresponding to the catalyst

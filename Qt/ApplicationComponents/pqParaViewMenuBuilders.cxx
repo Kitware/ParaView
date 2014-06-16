@@ -47,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCatalystConnectReaction.h"
 #include "pqCatalystContinueReaction.h"
 #include "pqCatalystPauseSimulationReaction.h"
+#include "pqCatalystRemoveBreakpointReaction.h"
+#include "pqCatalystSetBreakpointReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
@@ -366,15 +368,18 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 {
   new pqCatalystConnectReaction(menu.addAction("Connect...")
                                 << pqSetName("actionCatalystConnect"));
-  pqCatalystPauseSimulationReaction* pauseReaction =
-    new pqCatalystPauseSimulationReaction(
-      menu.addAction("Pause Simulation")
-      << pqSetName("actionCatalystPauseSimulation"));
-  QObject::connect(&menu, SIGNAL(aboutToShow()),
-                   pauseReaction, SLOT(updateEnableState()));
+  new pqCatalystPauseSimulationReaction(
+    menu.addAction("Pause Simulation")
+    << pqSetName("actionCatalystPauseSimulation"));
 
-  pqCatalystContinueReaction* continueReaction = new pqCatalystContinueReaction(
+  new pqCatalystContinueReaction(
     menu.addAction("Continue") << pqSetName("actionCatalystContinue"));
-  QObject::connect(&menu, SIGNAL(aboutToShow()),
-                   continueReaction, SLOT(updateEnableState()));
+
+  new pqCatalystSetBreakpointReaction(
+    menu.addAction("Set Breakpoint") <<
+    pqSetName("actionCatalystSetBreakpoint"));
+
+  new pqCatalystRemoveBreakpointReaction(
+    menu.addAction("Remove Breakpoint") <<
+    pqSetName("actionCatalystRemoveBreakpoint"));
 }

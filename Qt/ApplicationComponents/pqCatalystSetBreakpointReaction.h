@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCatalystPauseSimulationReaction_h 
-#define __pqCatalystPauseSimulationReaction_h
+#ifndef __pqCatalystSetBreakpointReaction_h 
+#define __pqCatalystSetBreakpointReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>
@@ -41,36 +41,24 @@ class vtkSMLiveInsituLinkProxy;
 /// @ingroup Reactions
 /// Reaction for setting a breakpoint to Catalyst CoProcessing Engine
 /// for Live-Data Visualization.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction :
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystSetBreakpointReaction :
   public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqCatalystPauseSimulationReaction(QAction* parent=0);
+  pqCatalystSetBreakpointReaction(QAction* parent=0);
 
 public slots:
-  virtual void updateEnableState()
-  {
-    updateEnableState(PAUSE);
-  }
+  virtual void updateEnableState();
 
 protected:
-  enum Type
-  {
-    CONTINUE,
-    PAUSE
-  };
-
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-  { this->setPauseSimulation(true); }
-
-  void setPauseSimulation (bool pause);
-  void updateEnableState (Type type);
+  virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqCatalystPauseSimulationReaction)
+  Q_DISABLE_COPY(pqCatalystSetBreakpointReaction)
+  class sbrInternal;
+  sbrInternal* Internal;
 };
 
 #endif

@@ -101,10 +101,11 @@ public:
     INDETERMINATE,
     EYEBALL,
     EYEBALL_GRAY,
-    CATALYST_EXTRACT,
-    CATALYST_EXTRACT_GRAY,
-    CATALYST_SERVER_RUNNING,
-    CATALYST_SERVER_PAUSED,
+    INSITU_EXTRACT,
+    INSITU_EXTRACT_GRAY,
+    INSITU_SERVER_RUNNING,
+    INSITU_SERVER_PAUSED,
+    INSITU_BREAKPOINT,
     LAST
     };
 
@@ -216,7 +217,7 @@ public:
       vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy(server);
       return proxy ?
         ((vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)?
-         CATALYST_SERVER_PAUSED : CATALYST_SERVER_RUNNING):
+         INSITU_SERVER_PAUSED : INSITU_SERVER_RUNNING):
         SERVER;
       }
 
@@ -296,6 +297,14 @@ public:
         }
       break;
 
+      case pqPipelineModel::Server:
+        {
+        pqServer* server = qobject_cast<pqServer*>(this->Object);
+        newIcon = (pqInsituServer::isInsituServer(server) ?
+                   this->getBreakpointVisibilityIcon() : LAST);
+        }
+        break;
+
     default:
       break;
       }
@@ -327,6 +336,12 @@ public:
     }
 
 private:
+  IconType getBreakpointVisibilityIcon() const
+  {
+    pqInsituServer* server = pqInsituServer::instance();
+    return (server->hasBreakpoint() ? INSITU_BREAKPOINT : LAST);
+  }
+
   IconType getVisibilityIcon(pqOutputPort* port, pqView* view) const
     {
     if (!port) { return LAST; }
@@ -334,16 +349,13 @@ private:
     // I'm not a huge fan of this hacky way we are dealing with catalyst. We'll
     // have to come back and cleanly address how the pqPipelineModel deals with
     // "visibility" in a more generic, session-centric way.
-    if (port->getServer() &&
-        port->getServer()->getResource().scheme() == "catalyst")
+    if (pqInsituServer::isInsituServer(port->getServer()))
       {
-      pqLiveInsituVisualizationManager* mgr=
-        qobject_cast<pqLiveInsituVisualizationManager*>(
-          port->getServer()->property(
-            "LiveInsituVisualizationManager").value<QObject*>());
+      pqLiveInsituVisualizationManager* mgr =
+        pqInsituServer::managerFromInsitu(port->getServer());
       if (mgr)
         {
-        return mgr->hasExtracts(port)? CATALYST_EXTRACT :CATALYST_EXTRACT_GRAY;
+        return mgr->hasExtracts(port)? INSITU_EXTRACT :INSITU_EXTRACT_GRAY;
         }
       return LAST;
       }
@@ -364,9 +376,9 @@ private:
     }
   IconType getIconType(pqOutputPort* port) const
     {
-    if (port->getSource()->property("CATALYST_EXTRACT").toBool())
+    if (port->getSource()->property("INSITU_EXTRACT").toBool())
       {
-      return CATALYST_EXTRACT;
+      return INSITU_EXTRACT;
       }
 
     QString type = this->Controller->GetPreferredViewType(
@@ -461,14 +473,16 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqEyeball16.png");
   this->PixmapList[pqPipelineModelDataItem::EYEBALL_GRAY].load(
     ":/pqWidgets/Icons/pqEyeballd16.png");
-  this->PixmapList[pqPipelineModelDataItem::CATALYST_EXTRACT].load(
+  this->PixmapList[pqPipelineModelDataItem::INSITU_EXTRACT].load(
     ":/pqWidgets/Icons/pqLinkIn16.png");
-  this->PixmapList[pqPipelineModelDataItem::CATALYST_EXTRACT_GRAY].load(
+  this->PixmapList[pqPipelineModelDataItem::INSITU_EXTRACT_GRAY].load(
     ":/pqWidgets/Icons/pqLinkIn16d.png");
-  this->PixmapList[pqPipelineModelDataItem::CATALYST_SERVER_RUNNING].load(
+  this->PixmapList[pqPipelineModelDataItem::INSITU_SERVER_RUNNING].load(
     ":/pqWidgets/Icons/pqInsituServerRunning16.png");
-  this->PixmapList[pqPipelineModelDataItem::CATALYST_SERVER_PAUSED].load(
+  this->PixmapList[pqPipelineModelDataItem::INSITU_SERVER_PAUSED].load(
     ":/pqWidgets/Icons/pqInsituServerPaused16.png");
+  this->PixmapList[pqPipelineModelDataItem::INSITU_BREAKPOINT].load(
+    ":/pqWidgets/Icons/pqInsituBreakpoint16.png");
 }
 
 //-----------------------------------------------------------------------------
@@ -552,10 +566,10 @@ pqPipelineModel::~pqPipelineModel()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::onCatalystConnected(pqServer* server)
+void pqPipelineModel::onCatalystConnected(pqServer* displayServer)
 {
   pqLiveInsituVisualizationManager* manager =
-    pqInsituServer::instance()->manager(server);
+    pqInsituServer::instance()->managerFromDisplay(displayServer);
   vtkSMLiveInsituLinkProxy* proxy =
     pqInsituServer::linkProxy(manager->insituServer());
   if (manager && proxy)
@@ -567,6 +581,14 @@ void pqPipelineModel::onCatalystConnected(pqServer* server)
     this->LinkCallback =
       new ModifiedLiveInsituLink(manager->insituServer(), this);
     proxy->AddObserver (vtkCommand::ModifiedEvent, this->LinkCallback);
+    QObject::connect(
+      pqInsituServer::instance(),
+      SIGNAL(breakpointAdded(pqServer*)),
+      this, SLOT(updateDataServer(pqServer*)));
+    QObject::connect(
+      pqInsituServer::instance(),
+      SIGNAL(breakpointRemoved(pqServer*)),
+      this, SLOT(updateDataServer(pqServer*)));
     }
 }
 
@@ -1357,10 +1379,11 @@ void pqPipelineModel::delayedUpdateVisibilityTimeout()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::updateVisibility(pqPipelineSource* source)
+void pqPipelineModel::updateVisibility(pqPipelineSource* source,
+                                       ItemType type /* = Proxy */)
 {
   pqPipelineModelDataItem* item = this->getDataItem(source,
-    &this->Internal->Root, pqPipelineModel::Proxy);
+    &this->Internal->Root, type);
   if (item)
     {
     item->updateVisibilityIcon(this->View, false);
@@ -1380,10 +1403,11 @@ void pqPipelineModel::updateVisibility(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::updateData(pqServerManagerModelItem* source)
+void pqPipelineModel::updateData(pqServerManagerModelItem* source,
+                                 ItemType type /* = Proxy */)
 {
-  pqPipelineModelDataItem* item = this->getDataItem(source,
-    &this->Internal->Root, pqPipelineModel::Proxy);
+  pqPipelineModelDataItem* item = this->getDataItem(
+    source, &this->Internal->Root, type);
   if (item)
     {
     item->updateVisibilityIcon(this->View, false);
@@ -1401,6 +1425,12 @@ void pqPipelineModel::updateData(pqServerManagerModelItem* source)
       this->itemDataChanged(child);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::updateDataServer(pqServer* server)
+{
+  updateData(server, Invalid);
 }
 
 //-----------------------------------------------------------------------------

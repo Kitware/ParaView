@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCatalystConnectReaction.h"
+#include "pqCatalystRemoveBreakpointReaction.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -37,56 +37,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "vtkProcessModule.h"
+#include "vtkSMLiveInsituLinkProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
+
 
 #include <QInputDialog>
 #include <QMessageBox>
 
 //-----------------------------------------------------------------------------
-pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
+pqCatalystRemoveBreakpointReaction::pqCatalystRemoveBreakpointReaction(
+  QAction* parentObject)
   : Superclass(parentObject)
 {
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
-    this, SLOT(updateEnableState()));
-  this->updateEnableState();
+  QObject::connect(parentObject->parent(), SIGNAL(aboutToShow()),
+                   this, SLOT(updateEnableState()));
 }
 
 //-----------------------------------------------------------------------------
-pqCatalystConnectReaction::~pqCatalystConnectReaction()
+void pqCatalystRemoveBreakpointReaction::onTriggered()
 {
+  pqInsituServer::instance()->removeBreakpoint();
 }
 
 //-----------------------------------------------------------------------------
-bool pqCatalystConnectReaction::connect()
+void pqCatalystRemoveBreakpointReaction::updateEnableState()
 {
-  pqInsituServer* cs = pqInsituServer::instance();
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  pqLiveInsituVisualizationManager* mgr = cs->connect(server);
-  if (mgr)
-    {
-    this->updateEnableState();
-    QObject::connect(mgr, SIGNAL(catalystDisconnected()),
-                     this, SLOT(updateEnableState()));
-    }
-  return mgr;
-}
-
-
-//-----------------------------------------------------------------------------
-void pqCatalystConnectReaction::updateEnableState()
-{
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  if (server && 
-      ! pqInsituServer::isInsituServer(server) &&
-      ! server->session()->IsMultiClients() &&
-      ! pqInsituServer::instance()->isDisplayServer(server))
-    {
-    this->parentAction()->setEnabled(true);
-    }
-  else
-    {
-    this->parentAction()->setEnabled(false);
-    }
+  pqInsituServer* server = pqInsituServer::instance();
+  this->parentAction()->setEnabled(
+    (server->linkProxy() &&
+     server->breakpointTime() != pqInsituServer::INVALID_TIME) ? 
+    true : false);
 }

@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:    $RCS $
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-   
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -28,49 +28,40 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef __pqCatalystPauseSimulationReaction_h 
-#define __pqCatalystPauseSimulationReaction_h
+=========================================================================*/
+#ifndef _pqSetBreakpointDialog_h
+#define _pqSetBreakpointDialog_h
 
-#include "pqReaction.h"
-#include <QPointer>
+#include <QDialog>
+#include "pqComponentsModule.h"
 
-class pqLiveInsituVisualizationManager;
-class vtkSMLiveInsituLinkProxy;
+namespace Ui { class pqSetBreakpointDialog; }
 
-/// @ingroup Reactions
-/// Reaction for setting a breakpoint to Catalyst CoProcessing Engine
-/// for Live-Data Visualization.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction :
-  public pqReaction
+class pqServer;
+class QTreeWidget;
+class pqPipelineSource;
+
+/// pqSetBreakpointDialog is the about dialog used by ParaView.
+/// It provides information about ParaView and current configuration.
+class PQCOMPONENTS_EXPORT pqSetBreakpointDialog :
+  public QDialog
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+
 public:
-  pqCatalystPauseSimulationReaction(QAction* parent=0);
+  pqSetBreakpointDialog(QWidget* Parent);
+  ~pqSetBreakpointDialog();
 
-public slots:
-  virtual void updateEnableState()
-  {
-    updateEnableState(PAUSE);
-  }
+signals:
+  void breakpointHit();
 
-protected:
-  enum Type
-  {
-    CONTINUE,
-    PAUSE
-  };
-
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-  { this->setPauseSimulation(true); }
-
-  void setPauseSimulation (bool pause);
-  void updateEnableState (Type type);
+protected slots:
+  void onAccepted();
+  void onCurrentTimeUpdated();
 
 private:
-  Q_DISABLE_COPY(pqCatalystPauseSimulationReaction)
+  Q_DISABLE_COPY(pqSetBreakpointDialog)
+  Ui::pqSetBreakpointDialog* const Ui;
 };
 
-#endif
+#endif // !_pqSetBreakpointDialog_h

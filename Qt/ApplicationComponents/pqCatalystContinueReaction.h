@@ -51,7 +51,7 @@ public:
   }
 
 public slots:
-  void updateEnableState()
+  virtual void updateEnableState()
   {
     pqCatalystPauseSimulationReaction::updateEnableState(CONTINUE);
   }
