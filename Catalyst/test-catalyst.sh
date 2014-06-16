@@ -22,6 +22,9 @@ editiondir="$scriptdir/Editions"
 src_output="$1"
 shift
 
+[ -d "$src_output/.git" ] && \
+    die "Refusing to use a git repository as the source output directory"
+
 # The output directory to build into.
 bin_output="$1"
 shift
