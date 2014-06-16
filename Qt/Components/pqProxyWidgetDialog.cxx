@@ -35,13 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqProxyWidget.h"
 
-#include "vtkCommand.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
-#include "vtkSMSettings.h"
-#include "vtkSMVectorProperty.h"
 
 #include <QScrollArea>
 #include <QStyle>
@@ -99,12 +93,12 @@ public:
     // server manager, then reset the values from the server manager
     // after the defaults have been restored.
     QObject::connect(ui.RestoreDefaultsButton, SIGNAL(clicked()),
-      self, SLOT(onRestoreDefaults()));
+      widget, SLOT(onRestoreDefaults()));
     QObject::connect(ui.RestoreDefaultsButton, SIGNAL(clicked()),
-       widget, SLOT(reset()));
+      widget, SLOT(reset()));
 
     QObject::connect(ui.SaveButton, SIGNAL(clicked()),
-      self, SLOT(onSaveAsDefaults()));
+      widget, SLOT(onSaveAsDefaults()));
 
     QObject::connect(ui.ApplyButton, SIGNAL(clicked()), self, SLOT(accept()));
 
@@ -119,7 +113,7 @@ public:
     vbox->addItem(spacer);
 
     /// Setup the scroll area. Its minimum size is set to fully contain the
-    /// proxy widget so we're sure it'll be completly displayed
+    /// proxy widget so we're sure it'll be completely displayed
     ui.scrollArea->setWidget(container);
     QSize oldMinSize = ui.scrollArea->minimumSize();
     ui.scrollArea->setMinimumSize(container->size());
@@ -179,46 +173,4 @@ void pqProxyWidgetDialog::onAccepted()
 {
   Ui::ProxyWidgetDialog &ui = this->Internals->Ui;
   ui.ApplyButton->setEnabled(false);
-}
-
-//-----------------------------------------------------------------------------
-void pqProxyWidgetDialog::onRestoreDefaults()
-{
-  bool anyReset = false;
-  if (this->Internals->Proxy)
-    {
-    vtkSmartPointer<vtkSMPropertyIterator> iter;
-    iter.TakeReference(this->Internals->Proxy->NewPropertyIterator());
-    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-      {
-      vtkSMProperty * smproperty = iter->GetProperty();
-      // Restore only basic type properties.
-      if (vtkSMVectorProperty::SafeDownCast(smproperty) &&
-          !smproperty->GetNoCustomDefault() &&
-          !smproperty->GetInformationOnly())
-        {
-        if (!smproperty->IsValueDefault())
-          {
-          anyReset = true;
-          }
-        smproperty->ResetToXMLDefaults();
-        }
-      }
-    }
-
-  // The code above bypasses the changeAvailable() signal from the
-  // pqProxyWidget, so we check here whether we should act as if
-  // changes are available only if any of the properties have been
-  // reset.
-  if (anyReset)
-    {
-    this->onChangeAvailable();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqProxyWidgetDialog::onSaveAsDefaults()
-{
-  vtkSMSettings* settings = vtkSMSettings::GetInstance();
-  settings->SetProxySettings(this->Internals->Proxy);
 }

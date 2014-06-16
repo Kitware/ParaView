@@ -62,12 +62,6 @@ protected slots:
   /// slot to handle accepted() signals
   virtual void onAccepted();
 
-  /// restores application default proxy settings
-  virtual void onRestoreDefaults();
-
-  /// saves settings as defaults for proxy
-  void onSaveAsDefaults();
-
 private:
   Q_DISABLE_COPY(pqProxyWidgetDialog)
 
