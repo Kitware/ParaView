@@ -1,13 +1,14 @@
 #include "vtkPVTransposeTable.h"
 
+#include "vtkAbstractArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkTable.h"
 
+#include <set>
 #include <string>
-#include <vector>
 
 //----------------------------------------------------------------------------
 // Internal class that holds selected columns
@@ -26,28 +27,20 @@ public:
 
   bool Has(const std::string& v)
   {
-    std::size_t len = this->Columns.size();
-    for (std::size_t i = 0; i < len; i++)
-      {
-      if (this->Columns[i] == v)
-        {
-        return true;
-        }
-      }
-    return false;
+    return this->Columns.find(v) != this->Columns.end();
   }
 
   bool Set(const std::string& v)
   {
-  if (this->Has(v))
-    {
-    return false;
-    }
-  this->Columns.push_back(v);
-  return true;
+    if (this->Has(v))
+      {
+      return false;
+      }
+    this->Columns.insert(v);
+    return true;
   }
 
-  std::vector<std::string> Columns;
+  std::set<std::string> Columns;
 };
 
 //----------------------------------------------------------------------------
@@ -108,23 +101,27 @@ int vtkPVTransposeTable::RequestData(vtkInformation*,
 
   // Construct a table that holds only the selected columns
   vtkNew<vtkTable> subTable;
-  std::vector<std::string>::iterator iter = this->Internal->Columns.begin();
   if (this->GetUseIdColumn())
     {
-    if (vtkAbstractArray* arr = inTable->GetColumnByName(this->GetIdColumnName()))
+    if (vtkAbstractArray* arr =
+      inTable->GetColumnByName(this->GetIdColumnName()))
       {
       subTable->AddColumn(arr);
       }
     }
-  for (; iter!=this->Internal->Columns.end(); ++iter)
+  
+  // To avoid alphabetical sorting issue, we need to take care of the
+  // order of the column we add in the table
+  for (vtkIdType c = 0; c < inTable->GetNumberOfColumns(); c++)
     {
-    if (!strcmp(iter->c_str(), this->GetIdColumnName()))
+    vtkAbstractArray* arr = inTable->GetColumn(c);
+    if (arr)
       {
-      continue;
-      }
-    if (vtkAbstractArray* arr = inTable->GetColumnByName(iter->c_str()))
-      {
-      subTable->AddColumn(arr);
+      if (arr->GetName() != this->GetIdColumnName() &&
+        this->Internal->Has(arr->GetName()))
+        {
+        subTable->AddColumn(arr);
+        }
       }
     }
 
