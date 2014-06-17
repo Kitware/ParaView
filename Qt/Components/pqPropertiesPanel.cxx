@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QKeyEvent>
 #include <QPointer>
+#include <QStyle>
 #include <QStyleFactory>
 
 #include <iostream>
@@ -177,20 +178,41 @@ public:
     // if XP Style is being used swap it out for cleanlooks which looks
     // almost the same so we can have a green apply button make all
     // the buttons the same
-    QString styleName = this->Ui.Accept->style()->metaObject()->className();
+    QStyle *styleLocal = this->Ui.Accept->style();
+    QString styleName = styleLocal->metaObject()->className();
     if (styleName == "QWindowsXPStyle")
       {
-      QStyle *styleLocal = QStyleFactory::create("cleanlooks");
+      styleLocal = QStyleFactory::create("cleanlooks");
       styleLocal->setParent(panel);
       this->Ui.Accept->setStyle(styleLocal);
       this->Ui.Reset->setStyle(styleLocal);
       this->Ui.Delete->setStyle(styleLocal);
+      this->Ui.PropertiesRestoreDefaults->setStyle(styleLocal);
+      this->Ui.PropertiesSaveAsDefaults->setStyle(styleLocal);
+      this->Ui.DisplayRestoreDefaults->setStyle(styleLocal);
+      this->Ui.DisplaySaveAsDefaults->setStyle(styleLocal);
+      this->Ui.ViewRestoreDefaults->setStyle(styleLocal);
+      this->Ui.DisplaySaveAsDefaults->setStyle(styleLocal);
       QPalette buttonPalette = this->Ui.Accept->palette();
       buttonPalette.setColor(QPalette::Button, QColor(244,246,244));
       this->Ui.Accept->setPalette(buttonPalette);
       this->Ui.Reset->setPalette(buttonPalette);
       this->Ui.Delete->setPalette(buttonPalette);
       }
+
+    // Add icons to the settings save/restore defaults buttons
+    this->Ui.PropertiesRestoreDefaults->
+      setIcon(styleLocal->standardIcon(QStyle::SP_BrowserReload));
+    this->Ui.PropertiesSaveAsDefaults->
+      setIcon(styleLocal->standardIcon(QStyle::SP_DialogSaveButton));
+    this->Ui.DisplayRestoreDefaults->
+      setIcon(styleLocal->standardIcon(QStyle::SP_BrowserReload));
+    this->Ui.DisplaySaveAsDefaults->
+      setIcon(styleLocal->standardIcon(QStyle::SP_DialogSaveButton));
+    this->Ui.ViewRestoreDefaults->
+      setIcon(styleLocal->standardIcon(QStyle::SP_BrowserReload));
+    this->Ui.ViewSaveAsDefaults->
+      setIcon(styleLocal->standardIcon(QStyle::SP_DialogSaveButton));
 
     // change the apply button palette so it is green when it is enabled.
     QPalette applyPalette = this->Ui.Accept->palette();
@@ -289,11 +311,23 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
                    this, SLOT(showHelp()));
   QObject::connect(this->Internals->Ui.SearchBox, SIGNAL(textChanged(QString)),
                    this, SLOT(updatePanel()));
+  QObject::connect(this->Internals->Ui.PropertiesRestoreDefaults, SIGNAL(clicked()),
+                   this, SLOT(propertiesRestoreDefaults()));
+  QObject::connect(this->Internals->Ui.PropertiesSaveAsDefaults, SIGNAL(clicked()),
+                   this, SLOT(propertiesSaveAsDefaults()));
   QObject::connect(this->Internals->Ui.SearchBox, SIGNAL(advancedSearchActivated(bool)),
                    this, SLOT(updatePanel()));
 
   QObject::connect(this->Internals->Ui.PropertiesButton, SIGNAL(toggled(bool)),
                    this->Internals->Ui.PropertiesFrame, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->Ui.DisplayRestoreDefaults, SIGNAL(clicked()),
+                   this, SLOT(displayRestoreDefaults()));
+  QObject::connect(this->Internals->Ui.DisplaySaveAsDefaults, SIGNAL(clicked()),
+                   this, SLOT(displaySaveAsDefaults()));
+  QObject::connect(this->Internals->Ui.ViewRestoreDefaults, SIGNAL(clicked()),
+                   this, SLOT(viewRestoreDefaults()));
+  QObject::connect(this->Internals->Ui.ViewSaveAsDefaults, SIGNAL(clicked()),
+                   this, SLOT(viewSaveAsDefaults()));
   QObject::connect(this->Internals->Ui.DisplayButton, SIGNAL(toggled(bool)),
                    this->Internals->Ui.DisplayFrame, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->Ui.ViewButton, SIGNAL(toggled(bool)),
@@ -480,6 +514,9 @@ void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource *source)
     {
     this->Internals->Ui.PropertiesButton->setText("Properties");
     }
+
+  this->Internals->Ui.PropertiesRestoreDefaults->setEnabled(source != NULL);
+  this->Internals->Ui.PropertiesSaveAsDefaults->setEnabled(source != NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -542,6 +579,9 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
     {
     this->Internals->Ui.DisplayButton->setText("Display");
     }
+
+  this->Internals->Ui.DisplayRestoreDefaults->setEnabled(this->Internals->DisplayWidgets != NULL);
+  this->Internals->Ui.DisplaySaveAsDefaults->setEnabled(this->Internals->DisplayWidgets != NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -592,6 +632,9 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
     {
     this->Internals->Ui.ViewButton->setText("View");
     }
+
+  this->Internals->Ui.ViewRestoreDefaults->setEnabled(this->Internals->ViewWidgets != NULL);
+  this->Internals->Ui.ViewSaveAsDefaults->setEnabled(this->Internals->ViewWidgets != NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -678,6 +721,8 @@ void pqPropertiesPanel::updateButtonState()
         << "proxy is uninitialized";
 
       this->Internals->Ui.Accept->setEnabled(true);
+      this->Internals->Ui.PropertiesRestoreDefaults->setEnabled(true);
+      this->Internals->Ui.PropertiesSaveAsDefaults->setEnabled(true);
       }
     else if (proxy->modifiedState() == pqProxy::MODIFIED)
       {
@@ -688,6 +733,8 @@ void pqPropertiesPanel::updateButtonState()
 
       this->Internals->Ui.Accept->setEnabled(true);
       this->Internals->Ui.Reset->setEnabled(true);
+      this->Internals->Ui.PropertiesRestoreDefaults->setEnabled(true);
+      this->Internals->Ui.PropertiesSaveAsDefaults->setEnabled(true);
       }
     }
 
@@ -786,6 +833,66 @@ void pqPropertiesPanel::showHelp()
     this->helpRequested(
       this->Internals->Source->getProxy()->GetXMLGroup(),
       this->Internals->Source->getProxy()->GetXMLName());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::propertiesRestoreDefaults()
+{
+  pqProxyWidgets* widgets = this->Internals->Source ?
+    this->Internals->SourceWidgets[this->Internals->Source] : NULL;
+  if (widgets && widgets->Panel)
+    {
+    widgets->Panel->onRestoreDefaults();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::propertiesSaveAsDefaults()
+{
+  pqProxyWidgets* widgets = this->Internals->Source?
+    this->Internals->SourceWidgets[this->Internals->Source] : NULL;
+  if (widgets && widgets->Panel)
+    {
+    widgets->Panel->onSaveAsDefaults();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::displayRestoreDefaults()
+{
+  if (this->Internals->DisplayWidgets)
+    {
+    this->Internals->DisplayWidgets->Panel->onRestoreDefaults();
+    this->Internals->DisplayWidgets->Panel->apply();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::displaySaveAsDefaults()
+{
+  if (this->Internals->DisplayWidgets)
+    {
+    this->Internals->DisplayWidgets->Panel->onSaveAsDefaults();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::viewRestoreDefaults()
+{
+  if (this->Internals->ViewWidgets)
+    {
+    this->Internals->ViewWidgets->Panel->onRestoreDefaults();
+    this->Internals->ViewWidgets->Panel->apply();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertiesPanel::viewSaveAsDefaults()
+{
+  if (this->Internals->ViewWidgets)
+    {
+    this->Internals->ViewWidgets->Panel->onSaveAsDefaults();
     }
 }
 

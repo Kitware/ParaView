@@ -115,6 +115,42 @@ public slots:
   /// properties panel.
   void showHelp();
 
+  /// Restores the application defaults for the source properties.
+  ///
+  /// This is triggered when the user clicks the button with the
+  /// reload button next to the properties button.
+  void propertiesRestoreDefaults();
+
+  /// Saves the current property settings as default.
+  ///
+  /// This is triggered when the user clicks the button with the
+  /// save icon next to the properties button.
+  void propertiesSaveAsDefaults();
+
+  /// Restores the application defaults for the display properties.
+  ///
+  /// This is triggered when the user clicks the button with the
+  /// reload button next to the display button.
+  void displayRestoreDefaults();
+
+  /// Saves the current display settings as default.
+  ///
+  /// This is triggered when the user clicks the button with the
+  /// save icon next to the display button.
+  void displaySaveAsDefaults();
+
+  /// Restores the application defaults for the view properties.
+  ///
+  /// This is triggered when the user clicks the button with the
+  /// reload button next to the view button.
+  void viewRestoreDefaults();
+
+  /// Saves the current view settings as default.
+  ///
+  /// This is triggered when the user clicks the button with the
+  /// save icon next to the view button.
+  void viewSaveAsDefaults();
+
 signals:
   /// This signal is emitted after the user clicks the apply button.
   void applied();
