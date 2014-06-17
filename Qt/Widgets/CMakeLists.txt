@@ -235,10 +235,6 @@ SET(QT_WIDGETS_ALL_SRCS ${Module_SRCS} ${QtWidgets_MOC_SOURCES}
 ##########################################################################
 # import Qt build settings
 
-# Option to disable WebKit since QtWebkit has build issues on certain platforms.
-option(PQWIDGETS_DISABLE_QTWEBKIT "Disable use of QtWebKit." OFF)
-mark_as_advanced(PQWIDGETS_DISABLE_QTWEBKIT)
-
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   set (Qt5_FIND_COMPONENTS
     Widgets
@@ -246,10 +242,6 @@ if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
     Help
     PrintSupport
     )
-  if (NOT PQWIDGETS_DISABLE_QTWEBKIT)
-    list (APPEND Qt5_FIND_COMPONENTS
-      WebKitWidgets)
-  endif()
   include (ParaViewQt5)
 
   # Setting this variable ensures that any module depending on pqWidgets
@@ -264,11 +256,6 @@ if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
 else (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   set (QT_USE_QTNETWORK 1)
   set (QT_USE_QTHELP 1)
-  if (PQWIDGETS_DISABLE_QTWEBKIT)
-    set (QT_USE_QTWEBKIT 0)
-  else ()
-    set (QT_USE_QTWEBKIT 1)
-  endif ()
 
   find_package (Qt4 REQUIRED QUIET)
   include (${QT_USE_FILE})
@@ -280,10 +267,6 @@ else (PARAVIEW_QT_VERSION VERSION_GREATER "4")
 endif (PARAVIEW_QT_VERSION VERSION_GREATER "4")
 
 set(${vtk-module}_NO_HeaderTest 1)
-
-if (PQWIDGETS_DISABLE_QTWEBKIT)
-  add_definitions(-DPQWIDGETS_DISABLE_QTWEBKIT)
-endif()
 
 vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
 target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})

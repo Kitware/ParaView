@@ -3,6 +3,6 @@
   <pqevent object="pqClientMainWindow/menubar/menu_Help" command="activate" arguments="actionHelp" />
   <!-- adding pause to allow help to load up -->
   <pqevent object="pqClientMainWindow" command="pause" arguments="500"/>
-  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="expand" arguments="0.0" />
-  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0.0.0" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="ConeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Help" command="activate" arguments="" />
 </pqevents>

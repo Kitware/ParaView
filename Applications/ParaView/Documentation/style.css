@@ -8,7 +8,6 @@ Released for free under a Creative Commons Attribution 2.5 License
 body {
 	margin: 0;
 	padding: 0;
-	background: #FFFFFF url(images/img01.jpg) repeat-x left top;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	color: #3C3D3F;
@@ -220,7 +219,6 @@ a:hover {
 
 .post {
 	margin-bottom: 30px;
-	padding: 0px 30px;
 }
 
 .post .title {
@@ -236,9 +234,6 @@ a:hover {
 }
 
 .post .entry {
-	padding: 10px 0px 20px 0px;
-	padding-bottom: 20px;
-	border-bottom: 1px solid #D1D9F0;
 	text-align: justify;
 }
 
@@ -414,8 +409,4 @@ a:hover {
 
 #about a {
 	color: #1CB543;
-}
-
-.post .entry img {
-  max-width: 100%;
 }
