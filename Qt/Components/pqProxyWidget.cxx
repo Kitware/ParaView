@@ -1212,13 +1212,14 @@ void pqProxyWidget::onRestoreDefaults()
       }
     }
 
-  // The code above bypasses the changeAvailable() signal from the
-  // pqProxyWidget, so we check here whether we should act as if
-  // changes are available only if any of the properties have been
-  // reset.
+  // The code above bypasses the changeAvailable() and
+  // changeFinished() signal from the pqProxyWidget, so we check here
+  // whether we should act as if changes are available only if any of
+  // the properties have been reset.
   if (anyReset)
     {
     emit changeAvailable();
+    emit changeFinished();
     }
 }
 
