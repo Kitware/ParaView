@@ -336,6 +336,13 @@ public:
   void SetTooltipPrecision(int precision);
 
   // Description:
+  // Set the visibility for the time-marker in the view. Note, you cannot force
+  // the time-marker to be shown. One can only hide it when the view would have
+  // shown it otherwise.
+  vtkSetMacro(HideTimeMarker, bool);
+  vtkGetMacro(HideTimeMarker, bool);
+
+  // Description:
   // Provides access to the chart view.
   virtual vtkChart* GetChart();
 
@@ -383,6 +390,8 @@ protected:
   vtkChartWarning* LogScaleWarningLabel;
 
   void SelectionChanged();
+
+  bool HideTimeMarker;
 
 private:
   vtkPVXYChartView(const vtkPVXYChartView&); // Not implemented

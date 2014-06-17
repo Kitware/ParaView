@@ -238,9 +238,23 @@
         <Documentation>Set whether to use offscreen rendering.</Documentation>
       </IntVectorProperty>
 
-      <PropertyGroup label="Legend">
+      <IntVectorProperty name="HideTimeMarker"
+                         command="SetHideTimeMarker"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <Documentation>
+          Hide the marker that is used to mark the current time, when one of the axes is
+          plotting time.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+
+      <PropertyGroup label="Annotation">
         <Property name="ShowLegend"/>
         <Property name="LegendLocation"/>
+        <Property name="HideTimeMarker" />
       </PropertyGroup>
       <PropertyGroup label="Tooltip"
                      panel_visibility="advanced">
