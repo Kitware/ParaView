@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxyWidget.h"
+#include "pqSearchBox.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqTimer.h"
@@ -62,26 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-  class pqClearTextOnEsc : public QObject
-  {
-public:
-  pqClearTextOnEsc(QLineEdit* parentObject) : QObject(parentObject)
-    {
-    }
-protected:
-  virtual bool eventFilter(QObject *obj, QEvent *evt)
-    {
-    if (evt->type() == QEvent::KeyPress)
-      {
-      QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
-      if (keyEvent->key() == Qt::Key_Escape)
-        {
-        qobject_cast<QLineEdit*>(this->parent())->clear();
-        }
-      }
-    return this->QObject::eventFilter(obj, evt);
-    }
-  };
 
   // internal class used to keep track of all the widgets associated with a
   // panel either for a source or representation.
@@ -263,14 +244,6 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
   Internals(new pqInternals(this)),
   PanelMode(pqPropertiesPanel::ALL_PROPERTIES)
 {
-  // Setup configuration defaults using settings.
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  if (settings)
-    {
-    this->Internals->Ui.AdvancedButton->setChecked(
-      settings->value("showAdvancedProperties", false).toBool());
-    }
-
   // Get AutoApply setting from GeneralSettings object.
   vtkPVGeneralSettings* generalSettings = vtkPVGeneralSettings::GetInstance();
   pqPropertiesPanel::AutoApply = generalSettings->GetAutoApply();
@@ -305,10 +278,6 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
     SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
     SLOT(updateButtonState()));
 
-  // Setup shortcut to clear search text.
-  this->Internals->Ui.SearchLineEdit->installEventFilter(
-    new pqClearTextOnEsc(this->Internals->Ui.SearchLineEdit));
-
   // Listen to UI signals.
   QObject::connect(this->Internals->Ui.Accept, SIGNAL(clicked()),
                    this, SLOT(apply()));
@@ -318,9 +287,9 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
                    this, SLOT(deleteProxy()));
   QObject::connect(this->Internals->Ui.Help, SIGNAL(clicked()),
                    this, SLOT(showHelp()));
-  QObject::connect(this->Internals->Ui.AdvancedButton, SIGNAL(toggled(bool)),
+  QObject::connect(this->Internals->Ui.SearchBox, SIGNAL(textChanged(QString)),
                    this, SLOT(updatePanel()));
-  QObject::connect(this->Internals->Ui.SearchLineEdit, SIGNAL(textChanged(QString)),
+  QObject::connect(this->Internals->Ui.SearchBox, SIGNAL(advancedSearchActivated(bool)),
                    this, SLOT(updatePanel()));
 
   QObject::connect(this->Internals->Ui.PropertiesButton, SIGNAL(toggled(bool)),
@@ -337,14 +306,6 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget* parentObject)
 //-----------------------------------------------------------------------------
 pqPropertiesPanel::~pqPropertiesPanel()
 {
-  pqSettings *settings = pqApplicationCore::instance()->settings();
-  if (settings)
-    {
-    // save the state of advanced button in the user config.
-    settings->setValue("showAdvancedProperties",
-      this->Internals->Ui.AdvancedButton->isChecked());
-    }
-
   delete this->Internals;
   this->Internals = 0;
 }
@@ -507,8 +468,8 @@ void pqPropertiesPanel::updatePropertiesPanel(pqPipelineSource *source)
     this->Internals->Ui.PropertiesButton->setText(
       QString("Properties (%1)").arg(source->getSMName()));
     this->Internals->SourceWidgets[source]->showWidgets(
-      this->Internals->Ui.AdvancedButton->isChecked(),
-      this->Internals->Ui.SearchLineEdit->text());
+      this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
+      this->Internals->Ui.SearchBox->text());
 
     if (pqPropertiesPanel::AutoApply)
       {
@@ -574,8 +535,8 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
     this->Internals->Ui.DisplayButton->setText(
       QString("Display (%1)").arg(repr->getProxy()->GetXMLName()));
     this->Internals->DisplayWidgets->showWidgets(
-      this->Internals->Ui.AdvancedButton->isChecked(),
-      this->Internals->Ui.SearchLineEdit->text());
+      this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
+      this->Internals->Ui.SearchBox->text());
     }
   else
     {
@@ -624,8 +585,8 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
     this->Internals->Ui.ViewButton->setText(
       QString ("View (%1)").arg (label != 0 ? label : _view->getViewType ()));
     this->Internals->ViewWidgets->showWidgets(
-      this->Internals->Ui.AdvancedButton->isChecked(),
-      this->Internals->Ui.SearchLineEdit->text());
+      this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
+      this->Internals->Ui.SearchBox->text());
     }
   else
     {
@@ -693,10 +654,6 @@ void pqPropertiesPanel::updateButtonState()
 {
   this->Internals->Ui.Accept->setEnabled(false);
   this->Internals->Ui.Reset->setEnabled(false);
-
-  // disable advanced button when searching.
-  this->Internals->Ui.AdvancedButton->setEnabled(
-    this->Internals->Ui.SearchLineEdit->text().isEmpty());
 
   this->Internals->Ui.Help->setEnabled(
     this->Internals->Source != NULL);

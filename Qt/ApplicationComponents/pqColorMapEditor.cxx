@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "pqProxyWidget.h"
 #include "pqScalarBarVisibilityReaction.h"
+#include "pqSearchBox.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 
@@ -53,30 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QKeyEvent>
 #include <QPointer>
 #include <QVBoxLayout>
-
-namespace
-{
-  class pqClearTextOnEsc : public QObject
-  {
-public:
-  pqClearTextOnEsc(QLineEdit* parentObject) : QObject(parentObject)
-    {
-    }
-protected:
-  virtual bool eventFilter(QObject *obj, QEvent *evt)
-    {
-    if (evt->type() == QEvent::KeyPress)
-      {
-      QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
-      if (keyEvent->key() == Qt::Key_Escape)
-        {
-        qobject_cast<QLineEdit*>(this->parent())->clear();
-        }
-      }
-    return this->QObject::eventFilter(obj, evt);
-    }
-  };
-}
 
 class pqColorMapEditor::pqInternals
 {
@@ -94,9 +71,6 @@ public:
     QVBoxLayout* vbox = new QVBoxLayout(this->Ui.PropertiesFrame);
     vbox->setMargin(0);
     vbox->setSpacing(0);
-
-    this->Ui.SearchLineEdit->installEventFilter(
-      new pqClearTextOnEsc(this->Ui.SearchLineEdit));
     }
 
   ~pqInternals()
@@ -109,9 +83,10 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
   : Superclass(parentObject),
   Internals(new pqColorMapEditor::pqInternals(this))
 {
-  QObject::connect(this->Internals->Ui.AdvancedButton, SIGNAL(toggled(bool)),
+  QObject::connect(this->Internals->Ui.SearchBox,
+                   SIGNAL(advancedSearchActivated(bool)),
                    this, SLOT(updatePanel()));
-  QObject::connect(this->Internals->Ui.SearchLineEdit, SIGNAL(textChanged(QString)),
+  QObject::connect(this->Internals->Ui.SearchBox, SIGNAL(textChanged(QString)),
                    this, SLOT(updatePanel()));
   QObject::connect(this->Internals->Ui.EditScalarBar, SIGNAL(clicked()),
                    this, SLOT(editScalarBar()));
@@ -140,8 +115,6 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
   pqSettings *settings = pqApplicationCore::instance()->settings();
   if (settings)
     {
-    this->Internals->Ui.AdvancedButton->setChecked(
-      settings->value("showAdvancedPropertiesColorMapEditor", false).toBool());
     this->Internals->Ui.AutoUpdate->setChecked(
       settings->value("autoUpdateColorMapEditor", false).toBool());
     }
@@ -155,8 +128,6 @@ pqColorMapEditor::~pqColorMapEditor()
   if (settings)
     {
     // save the state of advanced button in the user config.
-    settings->setValue("showAdvancedPropertiesColorMapEditor",
-      this->Internals->Ui.AdvancedButton->isChecked());
     settings->setValue("autoUpdateColorMapEditor",
       this->Internals->Ui.AutoUpdate->isChecked());
     }
@@ -171,8 +142,8 @@ void pqColorMapEditor::updatePanel()
   if (this->Internals->ProxyWidget)
     {
     this->Internals->ProxyWidget->filterWidgets(
-      this->Internals->Ui.AdvancedButton->isChecked(),
-      this->Internals->Ui.SearchLineEdit->text());
+      this->Internals->Ui.SearchBox->isAdvancedSearchActive(),
+      this->Internals->Ui.SearchBox->text());
     }
 }
 
