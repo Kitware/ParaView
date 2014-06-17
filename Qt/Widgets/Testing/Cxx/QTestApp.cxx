@@ -3,10 +3,11 @@
 
 #include <stdio.h>
 
-#include <QTimer>
-#include <QWidget>
+#include <QDebug>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QTimer>
+#include <QWidget>
 
 int QTestApp::Error = 0;
 
@@ -118,11 +119,8 @@ bool QTestApp::simulateEvent(QWidget* w, QEvent* e)
   return status;
 }
 
-void QTestApp::keyUp(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
+QString QTestApp::keyToAscii(Qt::Key key, Qt::KeyboardModifiers mod)
 {
-  if(!w)
-    return;
-  delay(ms);
   QString text;
   char off = 'a';
   if(mod & Qt::ShiftModifier)
@@ -131,38 +129,55 @@ void QTestApp::keyUp(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
     {
     text.append(QLatin1Char(key - Qt::Key_A + off));
     }
-  QKeyEvent e(QEvent::KeyRelease, key, mod, text);
+  return text;
+}
+
+void QTestApp::keyUp(QWidget* w, Qt::Key key,
+                     Qt::KeyboardModifiers mod, int ms)
+{
+  if(!w)
+    return;
+  delay(ms);
+  QKeyEvent e(QEvent::KeyRelease, key, mod, keyToAscii(key, mod));
   if(!simulateEvent(w, &e))
     {
     qWarning("keyUp not handled\n");
     }
 }
 
-void QTestApp::keyDown(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
+void QTestApp::keyDown(QWidget* w, Qt::Key key,
+                       Qt::KeyboardModifiers mod, int ms)
 {
   if(!w)
     return;
   delay(ms);
-  QString text;
-  char off = 'a';
-  if(mod & Qt::ShiftModifier)
-    off = 'A';
-  if(key >= Qt::Key_A && key <= Qt::Key_Z)
-    {
-    text.append(QLatin1Char(key - Qt::Key_A + off));
-    }
-  QKeyEvent e(QEvent::KeyPress, key, mod, text);
+  QKeyEvent e(QEvent::KeyPress, key, mod, keyToAscii(key, mod));
   if(!simulateEvent(w, &e))
     {
     qWarning("keyDown not handled\n");
     }
 }
 
-void QTestApp::keyClick(QWidget* w, Qt::Key key, Qt::KeyboardModifiers mod, int ms)
+void QTestApp::keyClick(QWidget* w, Qt::Key key,
+                        Qt::KeyboardModifiers mod, int ms)
 {
   delay(ms);
   keyDown(w, key, mod, 0);
   keyUp(w, key, mod, 0);
+}
+
+void QTestApp::keyClicks(QWidget* w, const QString& text,
+                         Qt::KeyboardModifiers mod, int ms)
+{
+  for (int i = 0; i < text.length(); ++i)
+    {
+    QChar letter = text.at(i);
+    Qt::Key key = static_cast<Qt::Key>(Qt::Key_A
+      + letter.toLower().unicode() - QChar('a').unicode());
+    Qt::KeyboardModifiers upper =
+      letter.isUpper() ? Qt::ShiftModifier : Qt::NoModifier;
+    keyClick(w, key, mod | upper, ms);
+    }
 }
 
 void QTestApp::mouseDown(QWidget* w, QPoint pos, Qt::MouseButton btn, 

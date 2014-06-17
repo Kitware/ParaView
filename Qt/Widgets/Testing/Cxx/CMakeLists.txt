@@ -2,6 +2,7 @@ SET(MyTests
   CTKSliders
   FlatTreeView
   Animation
+  pqTextEditTest
   )
 
 IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
