@@ -414,7 +414,9 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
                 lut.VectorComponent = int(options['vectorComponent'])
 
         # FIXME: This should happen once at the time the lookup table is created
-        vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, name, type)
+        # Also, the False is the default, but we need it here to avoid the
+        # ambiguous call error
+        vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, name, type, False)
 
         simple.Render()
 
