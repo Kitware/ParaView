@@ -56,6 +56,7 @@ public:
 
 protected slots:
   void updateAddRemoveButton();
+  void onShowAllSources(bool);
   void onAdd();
   void onRemove();
   void incrementView();
