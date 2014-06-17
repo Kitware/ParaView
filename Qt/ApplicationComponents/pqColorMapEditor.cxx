@@ -298,7 +298,7 @@ void pqColorMapEditor::saveAsDefault()
     }
 
   vtkSMProxy* scalarOpacityFunctionProxy =
-    pqSMAdaptor::getProxyProperty(proxy->GetProperty("ScalarOpacityFunction"));
+    pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction"));
   if (scalarOpacityFunctionProxy)
     {
     settings->SetProxySettings(scalarOpacityFunctionProxy);
