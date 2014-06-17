@@ -929,7 +929,7 @@ int vtkSpyPlotReader::RequestData(
       if (uniReader->GetMarkersOn () == false) 
         {
         // no markers available in this file, don't bother.
-        break;
+        continue;
         }
       int mat = uniReader->GetNumberOfMaterials ();
       if (mat > maxMat) 
@@ -952,7 +952,7 @@ int vtkSpyPlotReader::RequestData(
       if (uniReader->GetMarkersOn () == false) 
         {
         // no markers available in this file, don't bother.
-        break;
+        continue;
         }
       this->PrepareMarkers (mbds, uniReader);
       }
