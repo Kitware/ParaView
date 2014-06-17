@@ -332,8 +332,6 @@ set (Module_SRCS
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.cxx
   pqTabbedMultiViewWidget.h
-  pqTextEditSignalEndOfEdit.h
-  pqTextEditSignalEndOfEdit.cxx
   pqTextureComboBox.cxx
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.cxx
@@ -511,7 +509,6 @@ set (Module_MOC_HDRS
   pqStandardLegacyCustomPanels.h
   pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.h
-  pqTextEditSignalEndOfEdit.h
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.h
   pqTimerLogDisplay.h

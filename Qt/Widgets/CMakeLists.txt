@@ -108,6 +108,8 @@ set(Module_SRCS
   pqSpinBox.h
   pqTableView.cxx
   pqTableView.h
+  pqTextEdit.cxx
+  pqTextEdit.h
   pqTreeView.cxx
   pqTreeView.h
   pqTreeViewSelectionHelper.cxx
@@ -168,6 +170,7 @@ set (QtWidgets_SRCS
   pqSignalAdaptors.h
   pqSpinBox.h
   pqTableView.h
+  pqTextEdit.h
   pqTreeView.h
   pqTreeWidget.h
   pqTreeWidgetCheckHelper.h
