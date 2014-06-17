@@ -330,7 +330,7 @@ bool vtkInitializationHelper::LoadSettings()
   // On windows configuration files are in the parent directory
   pathsToSearch.push_back(app_dir + "/../");
 
-  std::string filename = "SiteSettings.json";
+  std::string filename = vtkInitializationHelper::GetApplicationName() + "-SiteSettings.json";
   std::string siteSettingsFile;
 
   for (size_t cc = 0; cc < pathsToSearch.size(); cc++)
