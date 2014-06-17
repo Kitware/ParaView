@@ -70,7 +70,7 @@ int vtkSQFieldTopologySplit::FillOutputPortInformation(
 int vtkSQFieldTopologySplit::RequestInformation(
     vtkInformation * /*req*/,
     vtkInformationVector ** /*inInfos*/,
-    vtkInformationVector *outInfos)
+    vtkInformationVector *vtkNotUsed(outInfos))
 {
   #ifdef SQTK_DEBUG
   std::cerr << "=====vtkSQFieldTopologySplit::RequestInformation" << std::endl;

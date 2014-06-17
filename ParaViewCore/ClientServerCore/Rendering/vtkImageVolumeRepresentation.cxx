@@ -128,6 +128,7 @@ void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
   // The KdTree generation code that uses the image cuts needs to be updated
   // bigtime. But due to time shortage, I'm leaving the old code as is. We
   // will get back to it later.
+  (void)inInfo;
   if (self->GetNumberOfInputConnections(0) == 1)
     {
     vtkAlgorithmOutput* connection = self->GetInputConnection(0, 0);
