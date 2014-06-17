@@ -77,7 +77,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
-#include <QGridLayout>
 #include <QHideEvent>
 #include <QLabel>
 #include <QPointer>

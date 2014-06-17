@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxy.h"
 
-#include <QScrollArea>
 #include <QStyle>
 
 class pqProxyWidgetDialog::pqInternals

@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include "pqComponentsModule.h"
 
-class QAbstractButton;
 class vtkSMProxy;
 
 /// pqProxyWidgetDialog is used to show properties of any proxy in a dialog. It
