@@ -452,32 +452,11 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
 
   //---------------------------------------------------------------------------
   // Setup global settings/state for the visualization state.
-
-  // Create the GlobalMapperPropertiesProxy (optional)
-  // FIXME: these probably should not be created in collaboration mode on
-  // non-master nodes.
-  vtkSMProxy* proxy = vtkSafeNewProxy(pxm, "misc", "GlobalMapperProperties");
-  if (proxy)
-    {
-    this->InitializeProxy(proxy);
-    proxy->UpdateVTKObjects();
-    proxy->Delete();
-    }
-
-  // Create Strict Load Balancing Proxy
-  proxy = vtkSafeNewProxy(pxm, "misc", "StrictLoadBalancing");
-  if (proxy)
-    {
-    this->InitializeProxy(proxy);
-    proxy->UpdateVTKObjects();
-    proxy->Delete();
-    }
-
   this->UpdateSettingsProxies(session);
 
   //---------------------------------------------------------------------------
   // Setup color palette and proxies for other global property groups (optional)
-  proxy = pxm->GetProxy("global_properties", "ColorPalette");
+  vtkSMProxy* proxy = pxm->GetProxy("global_properties", "ColorPalette");
   if (!proxy)
     {
     proxy = vtkSafeNewProxy(pxm, "misc", "ColorPalette");
@@ -982,6 +961,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
   return true;
 }
 
+//----------------------------------------------------------------------------
 void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* session)
 {
   // Set up the settings proxies
@@ -1291,44 +1271,6 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
       }
     }
   return false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::ResetSession(vtkSMSession* session)
-{
-  if (!session)
-    {
-    return false;
-    }
-  // remove all proxies except this animation scene and time keeper.
-  std::set<vtkSMProxy*> to_preserve;
-  to_preserve.insert(this->FindTimeKeeper(session));
-
-  typedef std::vector<vtkWeakPointer<vtkSMProxy> > proxyvectortype;
-  proxyvectortype proxies;
-
-  vtkNew<vtkSMProxyIterator> iter;
-  iter->SetSessionProxyManager(session->GetSessionProxyManager());
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProxy* proxy = iter->GetProxy();
-    if (proxy != NULL &&
-        to_preserve.find(proxy) == to_preserve.end())
-      {
-      proxies.push_back(proxy);
-      }
-    }
-  for (proxyvectortype::iterator piter = proxies.begin(), max=proxies.end(); piter != max; ++piter)
-    {
-    if (piter->GetPointer())
-      {
-      this->UnRegisterProxy(piter->GetPointer());
-      }
-    }
-
-  // Now create new time-animation track.
-  this->InitializeSession(session);
-  return true;
 }
 
 //----------------------------------------------------------------------------

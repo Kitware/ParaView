@@ -22,7 +22,9 @@
 #include "vtkScalarBarRepresentation.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkTuple.h"
 
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <vtksys/ios/sstream>
@@ -108,6 +110,8 @@ void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
         }
       repr->SetPosition(position);
       }
+    // user interacted. lock the position.
+    vtkSMPropertyHelper(this, "LockPosition").Set(1);
     }
   this->Superclass::ExecuteEvent(event);
 }
@@ -181,12 +185,20 @@ namespace
     return true;
     }
 
+  inline double clamp(double val, double min, double max)
+    {
+    val = std::max(val, min);
+    val = std::min(val, max);
+    return val;
+    }
+
   inline vtkBoundingBox GetBox(
-    const double anchor[2], const double position[2])
+    const vtkTuple<double, 2>& anchor,
+    const vtkTuple<double, 2>& size)
     {
     return vtkBoundingBox(
-      anchor[0], anchor[0] + position[0],
-      anchor[1], anchor[1] + position[1],
+      clamp(anchor[0], 0, 1), clamp(anchor[0] + size[0], 0, 1),
+      clamp(anchor[1], 0, 1), clamp(anchor[1] + size[1], 0, 1),
       0, 0);
     }
 };
@@ -194,7 +206,7 @@ namespace
 //----------------------------------------------------------------------------
 bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
 {
-  if (!view)
+  if (!view || vtkSMPropertyHelper(this, "LockPosition", /*quiet*/true).GetAsInt() == 1)
     {
     return false;
     }
@@ -209,7 +221,7 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
     vtkSMProxy* repr = reprHelper.GetAsProxy(cc);
     if (repr != this &&
       vtkSMScalarBarWidgetRepresentationProxy::SafeDownCast(repr) &&
-      vtkSMPropertyHelper(repr, "Visibility").GetAsInt() == 1)
+      vtkSMPropertyHelper(repr, "Visibility", /*quiet*/true).GetAsInt() == 1)
       {
       double pos1[2], pos2[2];
       vtkSMPropertyHelper(repr, "Position").Get(pos1, 2);
@@ -222,49 +234,83 @@ bool vtkSMScalarBarWidgetRepresentationProxy::PlaceInView(vtkSMProxy* view)
       }
     }
 
-  double mysize[2];
+  bool isVertical = (vtkSMPropertyHelper(this, "Orientation").GetAsInt() == 1);
+  double aspect = vtkSMPropertyHelper(this, "AspectRatio").GetAsDouble();
+  aspect = aspect? aspect : 20;
+
+  vtkTuple<double,2> mysize;
   vtkSMPropertyHelper pos2Helper(this, "Position2");
-  pos2Helper.Get(mysize, 2);
+  pos2Helper.Get(mysize.GetData(), 2);
   // if size is invalid, fix it.
   if (mysize[0] <= 0.0) { mysize[0] = 0.23; }
   if (mysize[1] <= 0.0) { mysize[1] = 0.13; }
-  pos2Helper.Set(mysize, 2);
+  pos2Helper.Set(mysize.GetData(), 2);
 
-  double myanchor[2];
+  vtkTuple<double,2> myanchor;
   vtkSMPropertyHelper posHelper(this, "Position");
-  posHelper.Get(myanchor, 2);
+  posHelper.Get(myanchor.GetData(), 2);
 
-  // if this scalar bar's current position is available, we don't bother moving
-  // it at all.
-  if (IsAvailable(GetBox(myanchor, mysize), occupiedBoxes))
+  vtkBoundingBox mybox = GetBox(myanchor, mysize);
+  // let call mybox as (x1,y1):(x2,y2)
+  if (IsAvailable(mybox, occupiedBoxes))
     {
-    // scalar bar doesn't need to be moved at all.
+    // current position and if available, just return.
     this->UpdateVTKObjects();
     return true;
     }
 
-  // FIXME: to respect mysize. Right now I'm just ignoring it.
-  // We try the 4 corners first starting with the lower-right corner.
-  const double anchorPositions[8][2] =
-    {
-      // four corners first, starting with lower right.
-      {0.75, 0.05},
-      {0.75, 0.90},
-      {0.02, 0.90},
-      {0.02, 0.05},
-      // 4 centers next.
-      {0.30, 0.05},
-      {0.75, 0.40},
-      {0.30, 0.90},
-      {0.02, 0.40}
-    };
+  std::vector<vtkBoundingBox> regions;
+  regions.push_back(mybox); // although we've tested mybox, we add
+  // it to the regions since it makes it easier to build the regions list.
 
-  for (int kk=0; kk < 8; ++kk)
+  // flip mybox along X axis i.e. (x1, 1-y2):(x2, 1-y1)
+  regions.push_back(vtkBoundingBox(
+      // xmin, xmax
+      mybox.GetMinPoint()[0], mybox.GetMaxPoint()[0],
+      // ymin, ymax
+      1.0 - mybox.GetMaxPoint()[1], 1.0 - mybox.GetMinPoint()[1],
+      // zmin, zmax
+      0,  0));
+
+  // flip both mybox and the flipped-X box along Y axis.
+  // i.e. (1-x2, y1):(1-x1: y2) and (1-x2, 1-y2):(1-x1, 1-y1)
+  for (int cc=1; cc >=0; cc--)
     {
-    vtkBoundingBox mybox = GetBox(anchorPositions[kk], mysize);
-    if (IsAvailable(mybox, occupiedBoxes))
+    const vtkBoundingBox& bbox = regions[cc];
+    double maxX = 1.0 - bbox.GetMinPoint()[0];
+    double minX = 1.0 - bbox.GetMaxPoint()[0];
+
+    if (isVertical)
       {
-      posHelper.Set(anchorPositions[kk], 2);
+      // Vertical scalar bars like to stick on the left edge of the bounding box.
+      // That results in the scalar bar getting too close the egde on flipping
+      // along Y axis. So we adjust it by offsetting the X position.
+      double barWidth = bbox.GetLength(1)/aspect;
+      double deltaX = maxX - minX;
+      minX = clamp(maxX - barWidth, 0, 1);
+      maxX = clamp(minX + deltaX, 0, 1);
+      }
+    vtkBoundingBox flippedYBox(
+        // xmin, xmax
+        //1.0 - bbox.GetMaxPoint()[0], 1.0 - bbox.GetMinPoint()[0],
+        minX, maxX,
+        // ymin, ymax
+        bbox.GetMinPoint()[1], bbox.GetMaxPoint()[1],
+        // zmin, zmax
+        0, 0);
+    regions.push_back(flippedYBox);
+    }
+
+  // we skip the front since we already tested it.
+  for (size_t cc=1; cc < regions.size(); ++cc)
+    {
+    const vtkBoundingBox &curbox = regions[cc];
+    if (IsAvailable(curbox, occupiedBoxes))
+      {
+      posHelper.Set(curbox.GetMinPoint(), 2);
+      double lengths[3];
+      curbox.GetLengths(lengths);
+      pos2Helper.Set(lengths, 2);
       break;
       }
     }

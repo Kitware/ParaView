@@ -203,6 +203,42 @@ bool vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationPrope
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::PostInitializeProxy(vtkSMProxy* proxy)
+{
+  // save current time, we can check is a property is modified by the superclass
+  // call.
+  vtkTimeStamp ts;
+  ts.Modified();
+
+  if (!this->Superclass::PostInitializeProxy(proxy))
+    {
+    return false;
+    }
+  // BUG #14773: The domains for ColorArrayName and Representation properties
+  // come up with a good default separately. In reality, we need the
+  // ColorArrayName to depend on Representation and not pick any value when
+  // using Outline representation. However, since ColorArrayName is on a property
+  // on a subproxy while Representation is a property on the outer proxy, we
+  // cannot add dependency between the two. So we explicitly manage that here.
+  // Note that if the user set the ColorArrayName manually, we should not be
+  // changing it here, hence the check of initTime.
+  vtkSMProperty* colorArrayName = proxy->GetProperty("ColorArrayName");
+  vtkSMProperty* representation = proxy->GetProperty("Representation");
+  if (colorArrayName && representation && (colorArrayName->GetMTime() > ts))
+    {
+    vtkSMPropertyHelper helperRep(representation);
+    if (helperRep.GetAsString(0) &&
+        strcmp(helperRep.GetAsString(0), "Outline") == 0)
+      {
+      vtkSMPropertyHelper helper(colorArrayName);
+      helper.SetInputArrayToProcess(helper.GetInputArrayAssociation(), "");
+      proxy->UpdateVTKObjects();
+      }
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(vtkSMProxy* proxy)
 {
   if (!this->Superclass::RegisterRepresentationProxy(proxy))

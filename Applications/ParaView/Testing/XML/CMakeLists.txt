@@ -266,7 +266,10 @@ if (EXISTS "${smooth_flash}")
                  "${CMAKE_CURRENT_BINARY_DIR}/AMRVolumeRendering.xml" @ONLY)
 
   set (streaming_tests
-    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml)
+
+  # AMRVolumeRendering is a non-streaming test.
+  list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_BINARY_DIR}/AMRVolumeRendering.xml)
   set(AMRVolumeRendering_BREAK TRUE)
 
@@ -320,12 +323,6 @@ set(PolygonCellSelection_DISABLE_CRS TRUE)
 set(PolygonPointSelection_DISABLE_CRS TRUE)
 set(NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
 
-# These tests should not be run along with those using the new panels
-set(3DWidgetInCustomFilter_BREAK TRUE)
-set(Threshold_BREAK TRUE)
-set(ExodusModeShapes_BREAK TRUE)
-set(DataOutlines_BREAK TRUE)
-
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
@@ -334,74 +331,24 @@ set (PolygonCellSelection_FORCE_SERIAL TRUE)
 set (PolygonPointSelection_FORCE_SERIAL TRUE)
 
 # Set properties for CTH tests
-set(CTHAMRBaseline_BREAK TRUE)
-
-set(CTHAMRContour_BREAK TRUE)
 set(CTHAMRContour_DISABLE_CS TRUE)
 set(CTHAMRContour_DISABLE_CRS TRUE)
-
-set(CTHAMRDualClip_BREAK TRUE)
 set(CTHAMRDualClip_DISABLE_CS TRUE)
 set(CTHAMRDualClip_DISABLE_CRS TRUE)
-
-set(CTHAMRClip_BREAK TRUE)
 set(CTHAMRClip_DISABLE_CS TRUE)
 set(CTHAMRClip_DISABLE_CRS TRUE)
-
-set(CTHAMRMaterialInterfaceFilter_BREAK TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
-set (TestIsoVolume_BREAK TRUE)
-set (TabbedViews_BREAK TRUE)
-
 # Since this test needs selection, disable in CRS mode.
-set (SelectionLabels_BREAK TRUE)
 set (SelectionLabels_DISABLE_CRS TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
-SET (XdmfReadImageData_BREAK TRUE)
-  # <-- since this changes light kit.
-SET (UndoRedo3_BREAK TRUE)
-SET (UndoRedo6_BREAK TRUE)
-  # <-- since this changes view settings.
 SET (UndoRedo1_BREAK TRUE)
 SET (UndoRedo2_BREAK TRUE)
 SET (UndoRedo7_BREAK TRUE)
   # <-- since these are just long tests, they result in timeouts.
-
-SET (BackgroundLights_BREAK TRUE)
-SET (ViewSettingsDialog_BREAK TRUE)
-SET (UnstructuredOutline_BREAK TRUE)
-  # <-- since this changes view settings.
-
-set (ColorEditorControls_BREAK TRUE)
-set (ColorEditorVolumeControls_BREAK TRUE)
-set (ColorOpacityTableEditing_BREAK TRUE)
-set (UpdateTransferFunctionRanges_BREAK TRUE)
-set (GridConnectivity_BREAK TRUE)
-set (H5PartReaderPlugin_BREAK TRUE)
-SET (PlotEdges2_BREAK TRUE)
-SET (PolygonCellSelection_BREAK TRUE)
-SET (PolygonPointSelection_BREAK TRUE)
-SET (PropertyConversion2_BREAK TRUE)
-SET (PropertyConversion3_BREAK TRUE)
-set (ReadXMLPolyDataFileSeries_BREAK TRUE)
-set (ExodusXML_BREAK TRUE)
-SET (ComparativeVisPanel_BREAK TRUE)
-SET (ComparativeOverlay_BREAK TRUE)
-SET (SpreadSheet1_BREAK TRUE)
-SET (SPTimeseries_BREAK TRUE)
-SET (TensorGlyph_BREAK TRUE)
-SET (XYChart_BREAK TRUE)
-SET (XYHistogram_BREAK TRUE)
-set (ChartAxisRangeAndLabels_BREAK TRUE)
-
-
-SET(ExtractLevel_BREAK TRUE)
-
-SET(Fractal2D_BREAK TRUE)
 
 # Add image threshold overrides for tests.
 # Generally all tests with wireframes need higher thresholds.
@@ -424,7 +371,6 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
-SET (SLACTools_BREAK TRUE)
 set (SLACTools_THRESHOLD 70)
 
 # Plot image leeway.
@@ -487,11 +433,6 @@ SET (SaveCSV_THRESHOLD 40)
 set (FFTOverTime_DISABLE_CRS TRUE)
 set (FFTOverTime_THRESHOLD 70) # since there's a plot, account for minor
                                # rendering differences.
-
-
-
-set (LoadStateMultiView_BREAK TRUE)
-set (RenderNan_BREAK TRUE)
 
 # ColorEditorVolumeControls does volume rendering of structrued data which required remote
 # rendering in client-serve mode.

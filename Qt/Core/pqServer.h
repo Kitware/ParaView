@@ -128,20 +128,6 @@ public:
   static void setHeartBeatTimeoutSetting(int msec);
   static int getHeartBeatTimeoutSetting();
 
-  /// Get/Set the application wide coincident topology resolution settings.
-  static void setCoincidentTopologyResolutionModeSetting(int mode);
-  static int coincidentTopologyResolutionModeSetting();
-  static void setPolygonOffsetParametersSetting(double factor, double value);
-  static void polygonOffsetParametersSetting(double &factor, double &value);
-  static void setPolygonOffsetFacesSetting(bool);
-  static bool polygonOffsetFacesSetting();
-  static void setZShiftSetting(double shift);
-  static double zShiftSetting();
-
-  /// Get/Set global immediate mode rendering.
-  static void setGlobalImmediateModeRenderingSetting(bool val);
-  static bool globalImmediateModeRenderingSetting();
-
   /// enable/disable monitoring of server notifications.
   void setMonitorServerNotifications(bool);
 
@@ -169,14 +155,6 @@ protected:
 
   /// Set the heartbeat timeout for this instance of pqServer.
   void setHeartBeatTimeout(int msec);
-  void setCoincidentTopologyResolutionMode(int);
-  void setPolygonOffsetParameters(double factor, double units);
-  void setPolygonOffsetFaces(bool offset_faces);
-  void setZShift(double shift);
-  void setGlobalImmediateModeRendering(bool);
-
-  // updates all servers with the current settings.
-  static void updateGlobalMapperProperties();
 
   // ---- Collaboration client-to-clients communication mechanisme ----
 

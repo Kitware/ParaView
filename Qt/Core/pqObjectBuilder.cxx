@@ -729,6 +729,45 @@ void pqObjectBuilder::removeServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
+pqServer* pqObjectBuilder::resetServer(pqServer* server)
+{
+  Q_ASSERT(server);
+
+  pqServerResource resource =  server->getResource();
+  vtkSmartPointer<vtkSMSession> session = server->session();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  // simulate disconnect.
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
+  smModel->beginRemoveServer(server);
+
+  // Unregister all proxies.
+  this->destroyAllProxies(server);
+
+  // Unregister session.
+  pm->UnRegisterSession(session);
+  smModel->endRemoveServer();
+
+  server = NULL;
+
+  // Let the pqServerManagerModel know the resource to use for the connection
+  // to be created.
+  smModel->setActiveResource(resource);
+
+  // re-register session.
+  vtkIdType id = pm->RegisterSession(session);
+
+  pqServer* newServer = NULL;
+  if (id != 0)
+    {
+    newServer = smModel->findServer(id);
+    emit this->finishedAddingServer(newServer);
+    }
+  return newServer;
+}
+
+//-----------------------------------------------------------------------------
 void pqObjectBuilder::destroy(pqAnimationCue* cue)
 {
   if (!cue)

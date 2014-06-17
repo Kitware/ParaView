@@ -204,14 +204,15 @@ void pqCommandLineOptionsBehavior::playTests()
   pqOptions* options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions());
 
-  pqPersistentMainWindowStateBehavior::saveState(
-    qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget()));
+  QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+  pqPersistentMainWindowStateBehavior::saveState(mainWindow);
 
   bool success = true;
   for (int cc=0; success &&  cc < options->GetNumberOfTestScripts(); cc++)
     {
     if (cc > 0)
       {
+      pqPersistentMainWindowStateBehavior::restoreState(mainWindow);
       this->resetApplication();
       }
     else if (cc==0)
@@ -282,44 +283,8 @@ void pqCommandLineOptionsBehavior::playTests()
 void pqCommandLineOptionsBehavior::resetApplication()
 {
   BEGIN_UNDO_EXCLUDE();
-
-  // delete all sources and representations
-  pqDeleteReaction::deleteAll();
-
-  // delete all views
-  QList<pqView*> current_views = 
-    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
-  foreach (pqView* view, current_views)
-    {
-    pqApplicationCore::instance()->getObjectBuilder()->destroy(view);
-    }
-
-  // delete all looktables.
-  QList<pqScalarsToColors*> luts = 
-    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqScalarsToColors*>();
-  foreach (pqScalarsToColors* lut, luts)
-    {
-    pqApplicationCore::instance()->getObjectBuilder()->destroy(lut);
-    }
-
-  // reset view layout.
-  pqTabbedMultiViewWidget* viewWidget = qobject_cast<pqTabbedMultiViewWidget*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
-  if (viewWidget)
-    {
-    viewWidget->reset();
-    }
-
-  // create default render view.
-  pqApplicationCore::instance()->getObjectBuilder()->createView(
-    pqRenderView::renderViewType(),
-    pqActiveObjects::instance().activeServer());
-
-  // reset animation time.
-  pqActiveObjects::instance().activeServer()->getTimeKeeper()->setTime(0.0);
-
-  pqEventDispatcher::processEventsAndWait(10);
-
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  server = pqApplicationCore::instance()->getObjectBuilder()->resetServer(server);
   END_UNDO_EXCLUDE();
   CLEAR_UNDO_STACK();
 }

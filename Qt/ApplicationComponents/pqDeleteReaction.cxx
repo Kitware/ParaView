@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqServer.h"
@@ -148,8 +149,7 @@ void pqDeleteReaction::deleteAll()
   BEGIN_UNDO_EXCLUDE();
   if (pqServer* server = pqActiveObjects::instance().activeServer())
     {
-    vtkNew<vtkSMParaViewPipelineController> controller;
-    controller->ResetSession(server->session());
+    pqApplicationCore::instance()->getObjectBuilder()->resetServer(server);
     }
   END_UNDO_EXCLUDE();
   CLEAR_UNDO_STACK();

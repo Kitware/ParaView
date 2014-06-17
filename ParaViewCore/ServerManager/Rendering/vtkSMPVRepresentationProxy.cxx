@@ -565,6 +565,9 @@ bool vtkSMPVRepresentationProxy::SetRepresentationType(const char* type)
           }
         if (this->SetScalarColoring(ald->GetString(index), ald->GetFieldAssociation(index)))
           {
+          // Ensure that the transfer function is rescaled, as if user picked the array to color
+          // with from the UI. I wonder if SetScalarColoring should really take care of it.
+          this->RescaleTransferFunctionToDataRange(true);
           throw CALL_SUPERCLASS;
           }
         }

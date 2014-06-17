@@ -104,6 +104,11 @@ public:
   // well.
   static void SetInheritRepresentationProperties(bool);
   static bool GetInheritRepresentationProperties();
+
+
+  // Description:
+  // Overridden to handle default ColorArrayName for representations correctly.
+  virtual bool PostInitializeProxy(vtkSMProxy* proxy);
 //BTX
 protected:
   vtkSMParaViewPipelineControllerWithRendering();
