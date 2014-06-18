@@ -38,7 +38,7 @@ from vtk.web import server
 from vtkWebCorePython import *
 
 # import annotations
-from autobahn.wamp import exportRpc
+from autobahn.wamp import procedure as exportRpc
 
 from twisted.python import log
 import logging
@@ -109,13 +109,14 @@ class _DataProber(pv_wamp.PVServerProtocol):
         scene.PlayMode = "Snap To TimeSteps"
 
     @classmethod
-    def endInteractionCallback(cls, factory):
+    def endInteractionCallback(cls, self):
         def callback(caller, event):
             caller.GetProperty("Point1WorldPosition").Copy(
                 caller.GetProperty("Point1WorldPositionInfo"))
             caller.GetProperty("Point2WorldPosition").Copy(
                 caller.GetProperty("Point2WorldPositionInfo"))
-            factory.dispatch("http://vtk.org/event#probeDataChanged", True)
+            self.publish("vtk.event.probe.data.changed", True)
+            print 'publish callback'
         return callback
 
     def update3DWidget(self):
@@ -128,7 +129,7 @@ class _DataProber(pv_wamp.PVServerProtocol):
             widget.Enabled = 1
             cls.Widget = widget
             widget.SMProxy.AddObserver(vtk.vtkCommand.EndInteractionEvent,
-                cls.endInteractionCallback(self.factory))
+                cls.endInteractionCallback(self))
 
         if cls.PipelineObjects:
             # compute bounds for all pipeline objects.
@@ -181,7 +182,8 @@ class _DataProber(pv_wamp.PVServerProtocol):
             text += "</ul></li>"
         return text
 
-    @exportRpc("loadData")
+    # RpcName: loadData => pv.data.prober.load.data
+    @exportRpc("pv.data.prober.load.data")
     def loadData(self, datafile):
         """Load a data file. The argument is a path relative to the DataPath
         pointing to the dataset to load.
@@ -208,7 +210,8 @@ class _DataProber(pv_wamp.PVServerProtocol):
         item["name"] = os.path.split(datafile)[1]
         _DataProber.PipelineObjects.append(item)
 
-    @exportRpc("loadDatasets")
+    # RpcName: loadDatasets => pv.data.prober.load.dataset
+    @exportRpc("pv.data.prober.load.dataset")
     def loadDatasets(self, datafiles):
         # initially, we'll only support loading 1 dataset.
         for item in _DataProber.PipelineObjects:
@@ -224,7 +227,8 @@ class _DataProber(pv_wamp.PVServerProtocol):
         simple.Render()
         return True
 
-    @exportRpc("getProbeData")
+    # RpcName: getProbeData => pv.data.prober.probe.data
+    @exportRpc("pv.data.prober.probe.data")
     def getProbeData(self):
         """Returns probe-data from all readers. The returned datastructure has
             the following syntax.
@@ -270,29 +274,35 @@ class _DataProber(pv_wamp.PVServerProtocol):
                 (bounds[2] + bounds[3]) * 0.5,
                 (bounds[4] + bounds[5]) * 0.5]
 
-    @exportRpc("getDatabase")
+    # RpcName: getDatabase => pv.data.prober.database.json
+    @exportRpc("pv.data.prober.database.json")
     def getDatabase(self):
         return _DataProber.Database
 
-    @exportRpc("getDatabaseAsHTML")
+    # RpcName: getDatabaseAsHTML => pv.data.prober.database.html
+    @exportRpc("pv.data.prober.database.html")
     def getDatabaseAsHTML(self):
         return _DataProber.toHTML(_DataProber.Database)
 
-    @exportRpc("goToNext")
+    # RpcName: goToNext => pv.data.prober.time.next
+    @exportRpc("pv.data.prober.time.next")
     def goToNext(self):
         oldTime = self.View.ViewTime
         simple.GetAnimationScene().GoToNext()
         if oldTime != self.View.ViewTime:
-            self.factory.dispatch("http://vtk.org/event#probeDataChanged", True)
+            self.publish("vtk.event.probe.data.changed", True)
+            print 'publish a'
             return True
         return False
 
-    @exportRpc("goToPrev")
+    # RpcName: goToPrev => pv.data.prober.time.previous
+    @exportRpc("pv.data.prober.time.previous")
     def goToPrev(self):
         oldTime = self.View.ViewTime
         simple.GetAnimationScene().GoToPrevious()
         if oldTime != self.View.ViewTime:
-            self.factory.dispatch("http://vtk.org/event#probeDataChanged", True)
+            self.publish("vtk.event.probe.data.changed", True)
+            print 'publish b'
             return True
         return False
 
@@ -302,7 +312,7 @@ class _DataProber(pv_wamp.PVServerProtocol):
 
 if __name__ == "__main__":
     # Create argument parser
-    parser = argparse.ArgumentParser(description="ParaView Web Data-Prober")
+    parser = argparse.ArgumentParser(description="ParaView Web data.prober")
 
     # Add default arguments
     server.add_arguments(parser)

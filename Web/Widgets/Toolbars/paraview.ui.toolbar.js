@@ -31,7 +31,7 @@
             var me = $(this);
 
             function disconnect() {
-                session.call("vtk:exit");
+                session.call("application.exit");
                 session.close();
                 setTimeout("window.close()", 100);
             }

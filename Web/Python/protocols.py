@@ -7,10 +7,11 @@ import os, sys, logging, types, inspect, traceback, logging, re, json
 from time import time
 
 # import RPC annotation
-from autobahn.wamp import exportRpc
+from autobahn.wamp import procedure as exportRpc
 
 # import paraview modules.
 import paraview
+
 from paraview import simple, servermanager
 from paraview.web import helper
 from vtk.web import protocols as vtk_protocols
@@ -79,7 +80,8 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
 class ParaViewWebMouseHandler(ParaViewWebProtocol):
 
-    @exportRpc("mouseInteraction")
+    # RpcName: mouseInteraction => viewport.mouse.interaction
+    @exportRpc("viewport.mouse.interaction")
     def mouseInteraction(self, event):
         """
         RPC Callback for mouse interactions.
@@ -122,7 +124,8 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
 
 class ParaViewWebViewPort(ParaViewWebProtocol):
 
-    @exportRpc("resetCamera")
+    # RpcName: resetCamera => viewport.camera.reset
+    @exportRpc("viewport.camera.reset")
     def resetCamera(self, view):
         """
         RPC callback to reset camera.
@@ -137,7 +140,8 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         self.getApplication().InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
-    @exportRpc("updateOrientationAxesVisibility")
+    # RpcName: updateOrientationAxesVisibility => viewport.axes.orientation.visibility.update
+    @exportRpc("viewport.axes.orientation.visibility.update")
     def updateOrientationAxesVisibility(self, view, showAxis):
         """
         RPC callback to show/hide OrientationAxis.
@@ -148,7 +152,8 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         self.getApplication().InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
-    @exportRpc("updateCenterAxesVisibility")
+    # RpcName: updateCenterAxesVisibility => viewport.axes.center.visibility.update
+    @exportRpc("viewport.axes.center.visibility.update")
     def updateCenterAxesVisibility(self, view, showAxis):
         """
         RPC callback to show/hide CenterAxesVisibility.
@@ -159,7 +164,8 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         self.getApplication().InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
-    @exportRpc("updateCamera")
+    # RpcName: updateCamera => viewport.camera.update
+    @exportRpc("viewport.camera.update")
     def updateCamera(self, view_id, focal_point, view_up, position):
         view = self.getView(view_id)
 
@@ -176,7 +182,8 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
 
 class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
 
-    @exportRpc("stillRender")
+    # RpcName: stillRender => viewport.image.render
+    @exportRpc("viewport.image.render")
     def stillRender(self, options):
         """
         RPC Callback to render a view and obtain the rendered image.
@@ -220,13 +227,15 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
 
 class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
 
-    @exportRpc("getSceneMetaData")
+    # RpcName: getSceneMetaData => viewport.webgl.metadata
+    @exportRpc("viewport.webgl.metadata")
     def getSceneMetaData(self, view_id):
         view  = self.getView(view_id);
         data = self.getApplication().GetWebGLSceneMetaData(view.SMProxy)
         return data
 
-    @exportRpc("getWebGLData")
+    # RpcName: getWebGLData => viewport.webgl.data
+    @exportRpc("viewport.webgl.data")
     def getWebGLData(self, view_id, object_id, part):
         view  = self.getView(view_id)
         data = self.getApplication().GetWebGLBinaryData(view.SMProxy, str(object_id), part-1)
@@ -247,7 +256,8 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         simple.GetTimeTrack()
         self.scene.PlayMode = "Snap To TimeSteps"
 
-    @exportRpc("updateTime")
+    # RpcName: updateTime => pv.vcr.action
+    @exportRpc("pv.vcr.action")
     def updateTime(self,action):
         view = simple.GetRenderView()
         animationScene = simple.GetAnimationScene()
@@ -312,7 +322,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         return None
 
-    @exportRpc("getScalarBarVisibilities")
+    # RpcName: getScalarBarVisibilities => pv.color.manager.scalarbar.visibility.get
+    @exportRpc("pv.color.manager.scalarbar.visibility.get")
     def getScalarBarVisibilities(self, proxyIdList):
         """
         Returns whether or not each specified scalar bar is visible.
@@ -327,7 +338,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         return visibilities
 
-    @exportRpc("setScalarBarVisibilities")
+    # RpcName: setScalarBarVisibilities => pv.color.manager.scalarbar.visibility.set
+    @exportRpc("pv.color.manager.scalarbar.visibility.set")
     def setScalarBarVisibilities(self, proxyIdMap):
         """
         Sets the visibility of the scalar bar corresponding to each specified
@@ -348,7 +360,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         return visibilities
 
-    @exportRpc("rescaleTransferFunction")
+    # RpcName: rescaleTransferFunction => pv.color.manager.rescale.transfer.function
+    @exportRpc("pv.color.manager.rescale.transfer.function")
     def rescaleTransferFunction(self, options):
         """
         Rescale the color transfer function to fit either the data range,
@@ -387,7 +400,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         return status
 
-    @exportRpc("colorBy")
+    # RpcName: colorBy => pv.color.manager.color.by
+    @exportRpc("pv.color.manager.color.by")
     def colorBy(self, options):
         """
         Choose the array to color by, and optionally specify magnitude or a
@@ -420,7 +434,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         simple.Render()
 
-    @exportRpc("selectColorMap")
+    # RpcName: selectColorMap => pv.color.manager.select.preset
+    @exportRpc("pv.color.manager.select.preset")
     def selectColorMap(self, options):
         """
         Choose the color map preset to use when coloring by an array.
@@ -448,7 +463,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         return { 'result': 'preset ' + presetName + ' not found' }
 
-    @exportRpc("listColorMapNames")
+    # RpcName: listColorMapNames => pv.color.manager.list.preset
+    @exportRpc("pv.color.manager.list.preset")
     def listColorMapNames(self):
         """
         List the names of all color map presets available on the server.  This
@@ -487,7 +503,8 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         lutMgr = vtkSMTransferFunctionManager()
         return lutMgr.GetColorTransferFunction(arrayName, sessionProxyMgr)
 
-    @exportRpc("reloadPipeline")
+    # RpcName: reloadPipeline => pv.pipeline.manager.reload
+    @exportRpc("pv.pipeline.manager.reload")
     def reloadPipeline(self):
         self.pipeline.clear()
         pxm = simple.servermanager.ProxyManager()
@@ -501,13 +518,15 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
         return self.pipeline.getRootNode(self.getView(-1))
 
-    @exportRpc("getPipeline")
+    # RpcName: getPipeline => pv.pipeline.manager.pipeline.get
+    @exportRpc("pv.pipeline.manager.pipeline.get")
     def getPipeline(self):
         if self.pipeline.isEmpty():
             return self.reloadPipeline()
         return self.pipeline.getRootNode(self.getView(-1))
 
-    @exportRpc("addSource")
+    # RpcName: addSource => pv.pipeline.manager.proxy.add
+    @exportRpc("pv.pipeline.manager.proxy.add")
     def addSource(self, algo_name, parent):
         pid = str(parent)
         parentProxy = helper.idToProxy(parent)
@@ -534,14 +553,16 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         # Return the newly created proxy pipeline node
         return helper.getProxyAsPipelineNode(newProxy.GetGlobalIDAsString(), self.getView(-1))
 
-    @exportRpc("deleteSource")
+    # RpcName: deleteSource => pv.pipeline.manager.proxy.delete
+    @exportRpc("pv.pipeline.manager.proxy.delete")
     def deleteSource(self, proxy_id):
         self.pipeline.removeNode(proxy_id)
         proxy = helper.idToProxy(proxy_id)
         simple.Delete(proxy)
         simple.Render()
 
-    @exportRpc("updateDisplayProperty")
+    # RpcName: updateDisplayProperty => pv.pipeline.manager.proxy.representation.update
+    @exportRpc("pv.pipeline.manager.proxy.representation.update")
     def updateDisplayProperty(self, options):
         proxy = helper.idToProxy(options['proxy_id'])
         rep = simple.GetDisplayProperties(proxy)
@@ -563,7 +584,8 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
         simple.Render()
 
-    @exportRpc("pushState")
+    # RpcName: pushState => pv.pipeline.manager.proxy.update
+    @exportRpc("pv.pipeline.manager.proxy.update")
     def pushState(self, state):
         proxy_type = None
         for proxy_id in state:
@@ -579,7 +601,8 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         elif proxy_type == 'widget_source':
             proxy.UpdateWidget(proxy.Observed)
 
-    @exportRpc("openFile")
+    # RpcName: openFile => pv.pipeline.manager.file.open
+    @exportRpc("pv.pipeline.manager.file.open")
     def openFile(self, path):
         reader = simple.OpenDataFile(path)
         simple.RenameSource( path.split("/")[-1], reader)
@@ -592,7 +615,8 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
         return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.getView(-1))
 
-    @exportRpc("openRelativeFile")
+    # RpcName: openRelativeFile => pv.pipeline.manager.file.ropen
+    @exportRpc("pv.pipeline.manager.file.ropen")
     def openRelativeFile(self, relativePath):
         fileToLoad = []
         if type(relativePath) == list:
@@ -615,7 +639,8 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
         return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.getView(-1))
 
-    @exportRpc("updateScalarbarVisibility")
+    # RpcName: updateScalarbarVisibility => pv.pipeline.manager.scalarbar.visibility.update
+    @exportRpc("pv.pipeline.manager.scalarbar.visibility.update")
     def updateScalarbarVisibility(self, options):
         lutMgr = vtkSMTransferFunctionManager()
         lutMap = {}
@@ -651,19 +676,22 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
                                         'enabled': visibility }
         return lutMap
 
-    @exportRpc("updateScalarRange")
+    # RpcName: updateScalarRange => pv.pipeline.manager.scalar.range.rescale
+    @exportRpc("pv.pipeline.manager.scalar.range.rescale")
     def updateScalarRange(self, proxyId):
         proxy = self.mapIdToProxy(proxyId);
         dataRepr = simple.GetRepresentation(proxy)
         vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, False)
 
-    @exportRpc("setLutDataRange")
+    # RpcName: setLutDataRange => pv.pipeline.manager.lut.range.update
+    @exportRpc("pv.pipeline.manager.lut.range.update")
     def setLutDataRange(self, name, number_of_components, customRange):
         lut = self.getColorTransferFunction(name)
         vtkSMTransferFunctionProxy.RescaleTransferFunction(lut, customRange[0],
                                                            customRange[1], False)
 
-    @exportRpc("getLutDataRange")
+    # RpcName: getLutDataRange => pv.pipeline.manager.lut.range.get
+    @exportRpc("pv.pipeline.manager.lut.range.get")
     def getLutDataRange(self, name, number_of_components):
         lut = self.getColorTransferFunction(name)
         rgbPoints = lut.GetProperty('RGBPoints')
@@ -683,7 +711,8 @@ class ParaViewWebFilterList(ParaViewWebProtocol):
         super(ParaViewWebFilterList, self).__init__()
         self.filterFile = filtersFile
 
-    @exportRpc("listFilters")
+    # RpcName: listFilters => pv.filters.list
+    @exportRpc("pv.filters.list")
     def listFilters(self):
         filterSet = []
         if self.filterFile is None :
@@ -736,7 +765,7 @@ class ParaViewWebFilterList(ParaViewWebProtocol):
 
 # =============================================================================
 #
-# Remote file list
+# Remote file list @DEPRECATED
 #
 # =============================================================================
 
@@ -747,7 +776,8 @@ class ParaViewWebFileManager(ParaViewWebProtocol):
         self.directory = defaultDirectoryToList
         self.dirCache = None
 
-    @exportRpc("listFiles")
+    # RpcName: listFiles => pv.files.list
+    @exportRpc("pv.files.list")
     def listFiles(self):
         if not self.dirCache:
             self.dirCache = helper.listFiles(self.directory)
@@ -762,7 +792,8 @@ class ParaViewWebFileManager(ParaViewWebProtocol):
 
 class ParaViewWebRemoteConnection(ParaViewWebProtocol):
 
-    @exportRpc("connect")
+    # RpcName: connect => pv.remote.connect
+    @exportRpc("pv.remote.connect")
     def connect(self, options):
         """
         Creates a connection to a remote pvserver.
@@ -795,7 +826,8 @@ class ParaViewWebRemoteConnection(ParaViewWebProtocol):
 
         simple.Connect(ds_host, ds_port, rs_host, rs_port)
 
-    @exportRpc("reverseConnect")
+    # RpcName: reverseConnect => pv.remote.reverse.connect
+    @exportRpc("pv.remote.reverse.connect")
     def reverseConnect(self, port=11111):
         """
         Create a reverse connection to a server.  Listens on port and waits for
@@ -803,7 +835,8 @@ class ParaViewWebRemoteConnection(ParaViewWebProtocol):
         """
         simple.ReverseConnect(port)
 
-    @exportRpc("pvDisconnect")
+    # RpcName: pvDisconnect => pv.remote.disconnect
+    @exportRpc("pv.remote.disconnect")
     def pvDisconnect(self, message):
         """Free the current active session"""
         simple.Disconnect()
@@ -856,7 +889,8 @@ class ParaViewWebStateLoader(ParaViewWebProtocol):
         if state_path and state_path[-5:] == '.pvsm':
             self.loadState(state_path)
 
-    @exportRpc("loadState")
+    # RpcName: loadState => pv.loader.state
+    @exportRpc("pv.loader.state")
     def loadState(self, state_file):
         """
         Load a state file and return the list of view ids
@@ -891,7 +925,8 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
         self.fileList = simple.servermanager.VectorProperty(self.directory_proxy,self.directory_proxy.GetProperty('FileList'))
         self.directoryList = simple.servermanager.VectorProperty(self.directory_proxy,self.directory_proxy.GetProperty('DirectoryList'))
 
-    @exportRpc("listServerDirectory")
+    # RpcName: listServerDirectory => file.server.directory.list
+    @exportRpc("file.server.directory.list")
     def listServerDirectory(self, relativeDir='.'):
         """
         RPC Callback to list a server directory relative to the basePath
@@ -966,7 +1001,8 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
         self.previous_interaction = -1
         self.selection_type = -1
 
-    @exportRpc("startSelection")
+    # RpcName: startSelection => pv.selection.start
+    @exportRpc("pv.selection.start")
     def startSelection(self, viewId, selectionType):
         """
         Method used to initialize an interactive selection
@@ -978,7 +1014,8 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
         else:
             self.active_view = None
 
-    @exportRpc("endSelection")
+    # RpcName: endSelection => pv.selection.end
+    @exportRpc("pv.selection.end")
     def endSelection(self, area, extract):
         """
         Method used to finalize an interactive selection by providing
@@ -1022,7 +1059,8 @@ class ParaViewWebExportData(ParaViewWebProtocol):
     def __init__(self, basePath):
         self.base_export_path = basePath
 
-    @exportRpc("exportData")
+    # RpcName: exportData => pv.export.data
+    @exportRpc("pv.export.data")
     def exportData(self, proxy_id, path):
         proxy = self.mapIdToProxy(proxy_id)
         fullpath = str(os.path.join(self.base_export_path, str(path)))
@@ -1044,12 +1082,14 @@ class ParaViewWebExportData(ParaViewWebProtocol):
 
 class ParaViewWebTestProtocols(ParaViewWebProtocol):
 
-    @exportRpc("clearAll")
+    # RpcName: clearAll => pv.test.reset
+    @exportRpc("pv.test.reset")
     def clearAll(self):
         simple.Disconnect()
         simple.Connect()
 
-    @exportRpc("getColoringInfo")
+    # RpcName: getColoringInfo => pv.test.color.info.get
+    @exportRpc("pv.test.color.info.get")
     def getColoringInfo(self, proxyId):
         proxy = self.mapIdToProxy(proxyId)
         rep = simple.GetRepresentation(proxy)
@@ -1099,13 +1139,15 @@ def _hide_plane(obj):
 
 class ParaViewWebWidgetManager(ParaViewWebProtocol):
 
-    @exportRpc("addRuler")
+    # RpcName: addRuler => pv.widgets.ruler.add
+    @exportRpc("pv.widgets.ruler.add")
     def addRuler(self, view_id=-1):
         proxy = simple.Ruler(Point1=[-1.0, -1.0, -1.0], Point2=[1.0, 1.0, 1.0])
         self.createWidgetRepresentation(proxy.GetGlobalID(), view_id)
         return proxy.GetGlobalIDAsString()
 
-    @exportRpc("createWidgetRepresentation")
+    # RpcName: createWidgetRepresentation => pv.widgets.representation.create
+    @exportRpc("pv.widgets.representation.create")
     def createWidgetRepresentation(self, proxy_id, view_id):
         proxy = self.mapIdToProxy(proxy_id)
         view = self.getView(view_id)

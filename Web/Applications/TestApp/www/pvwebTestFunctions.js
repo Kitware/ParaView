@@ -32,7 +32,7 @@ function ParaViewWebTestFunctions(connection) {
 
     // Issue the protocol rpc method to clean up the pipeline and all state
     function pipelineCleanup() {
-        connection.session.call('vtk:clearAll').then(function(result) {
+        connection.session.call('pv.test.reset').then(function(result) {
             console.log('Cleanup complete');
         }, function(error) {
             console.log('Encountered error attempting to clean up pipeline');
@@ -105,15 +105,15 @@ function ParaViewWebTestFunctions(connection) {
         },
 
         /**
-         * This function tests the 'vtk:listFiles' protocol.  It assumes
+         * This function tests the 'pv.files.list' protocol.  It assumes
          * that the pv_web_test_app.py server was started with a data dir
          * which contains the cloned ParaViewData repository.
          */
         protocolListFilesTest: function(testName, resultCallback) {
             try {
-                connection.session.call('vtk:listFiles').then(function(obj) {
+                connection.session.call('pv.files.list').then(function(obj) {
                     var returnValue = true;
-                    var msg = "Successful test of protocol vtk:listFiles";
+                    var msg = "Successful test of protocol pv.files.list";
 
                     var names = obj.map(function(elt) {
                         return elt.name;
@@ -121,7 +121,7 @@ function ParaViewWebTestFunctions(connection) {
 
                     var expectedNames = [ 'sonic.pht', 'can.ex2', 'GMV'];
 
-                    var errorMsg = "Error testing vtk:listFiles -- ";
+                    var errorMsg = "Error testing pv.files.list -- ";
 
                     for (var idx = 0; idx < expectedNames.length; ++idx) {
                         var foundExpectedName = false;
@@ -157,11 +157,11 @@ function ParaViewWebTestFunctions(connection) {
         /**
          * This function exercises the following protocol rpc methods:
          *
-         * 'vtk:openRelativeFile'
-         * 'vtk:updateDisplayProperty'
-         * 'vtk:rescaleTransferFunction'
-         * 'vtk:getLutDataRange'
-         * 'vtk:updateTime'
+         * 'pv.pipeline.manager.file.ropen'
+         * 'pv.pipeline.manager.proxy.representation.update'
+         * 'pv.color.manager.rescale.transfer.function'
+         * 'pv.pipeline.manager.lut.range.get'
+         * 'pv.vcr.action'
          *
          * It needs access to the 'can.ex2' dataset in order to fully
          * test the scalar range protocols.
@@ -174,8 +174,8 @@ function ParaViewWebTestFunctions(connection) {
                                     'type': 'custom',
                                     'min': 5,
                                     'max': 10 };
-                s.call('vtk:rescaleTransferFunction', rescaleOpts).then(function(success) {
-                    s.call('vtk:getLutDataRange', 'DISPL', '').then(function(range) {
+                s.call('pv.color.manager.rescale.transfer.function', [rescaleOpts]).then(function(success) {
+                    s.call('pv.pipeline.manager.lut.range.get', ['DISPL', '']).then(function(range) {
                         if (checkRangeEqualWithTolerance(range,
                                                          [5, 10],
                                                          testName,
@@ -192,15 +192,15 @@ function ParaViewWebTestFunctions(connection) {
 
             function testRescaleData(proxyId) {
                 var expectedLastTime = 0.004299988504499197
-                s.call('vtk:updateTime', 'last').then(function(lastTime) {
+                s.call('pv.vcr.action', ['last']).then(function(lastTime) {
                     if (!epsilonCompare(lastTime, expectedLastTime, compareTolerance)) {
                         throw "Error, the time at can's last timestep was: " +
                             lastTime + ", expected: " + expectedLastTime;
                     }
                     var rescaleOpts = { 'proxyId': proxyId,
                                         'type': 'data' };
-                    s.call('vtk:rescaleTransferFunction', rescaleOpts).then(function(success) {
-                        s.call('vtk:getLutDataRange', 'DISPL', '').then(function(range) {
+                    s.call('pv.color.manager.rescale.transfer.function', [rescaleOpts]).then(function(success) {
+                        s.call('pv.pipeline.manager.lut.range.get', ['DISPL', '']).then(function(range) {
                             if (checkRangeEqualWithTolerance(range,
                                                              [2.4611168269148833, 19.98399916713266],
                                                              testName,
@@ -217,8 +217,8 @@ function ParaViewWebTestFunctions(connection) {
             function testRescaleTime(proxyId) {
                 var rescaleOpts = { 'proxyId': proxyId,
                                     'type': 'time' }
-                s.call('vtk:rescaleTransferFunction', rescaleOpts).then(function(success) {
-                    s.call('vtk:getLutDataRange', 'DISPL', '').then(function(newRange) {
+                s.call('pv.color.manager.rescale.transfer.function', [rescaleOpts]).then(function(success) {
+                    s.call('pv.pipeline.manager.lut.range.get', ['DISPL', '']).then(function(newRange) {
                         if (checkRangeEqualWithTolerance(newRange,
                                                          [0, 19.98399916713266],
                                                          testName,
@@ -232,13 +232,13 @@ function ParaViewWebTestFunctions(connection) {
             }
 
             try {
-                s.call('vtk:openRelativeFile', 'can.ex2').then(function(dataProxy) {
+                s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyId = dataProxy['proxy_id'];
                     var opts = { 'proxy_id': proxyId,
                                  'ColorArrayName': 'DISPL',
                                  'ColorAttributeType': 'POINT_DATA' }
-                    s.call('vtk:updateDisplayProperty', opts).then(function(empty) {
-                        s.call('vtk:getLutDataRange', 'DISPL', '').then(function(range) {
+                    s.call('pv.pipeline.manager.proxy.representation.update', [opts]).then(function(empty) {
+                        s.call('pv.pipeline.manager.lut.range.get', ['DISPL', '']).then(function(range) {
                             if (checkRangeEqualWithTolerance(range,
                                                          [0, 0],
                                                          testName,
@@ -263,10 +263,10 @@ function ParaViewWebTestFunctions(connection) {
         /**
          * This function exercises the following protocol rpc methods:
          *
-         * 'vtk:openRelativeFile'
-         * 'vtk:updateDisplayProperty'
-         * 'vtk:getScalarBarVisibilities'
-         * 'vtk:setScalarBarVisibilities'
+         * 'pv.pipeline.manager.file.ropen'
+         * 'pv.pipeline.manager.proxy.representation.update'
+         * 'pv.color.manager.scalarbar.visibility.get'
+         * 'pv.color.manager.scalarbar.visibility.set'
          *
          * It needs access to the 'can.ex2' dataset in order to test
          * these protocols.
@@ -275,19 +275,19 @@ function ParaViewWebTestFunctions(connection) {
             var s = connection.session;
 
             try {
-                s.call('vtk:openRelativeFile', 'can.ex2').then(function(dataProxy) {
+                s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyId = dataProxy['proxy_id'];
                     var opts = { 'proxy_id': proxyId,
                                  'ColorArrayName': 'DISPL',
                                  'ColorAttributeType': 'POINT_DATA' };
-                    s.call('vtk:updateDisplayProperty', opts).then(function(empty) {
+                    s.call('pv.pipeline.manager.proxy.representation.update', [opts]).then(function(empty) {
                         var opts = {};
                         opts[proxyId] = 'true';
-                        s.call('vtk:setScalarBarVisibilities', opts).then(function(visibilities) {
+                        s.call('pv.color.manager.scalarbar.visibility.set', [opts]).then(function(visibilities) {
                             // Either of these next two lines will work as a protocol parameter
                             var params = [proxyId];
                             //var params = opts;
-                            s.call('vtk:getScalarBarVisibilities', params).then(function(vizzies) {
+                            s.call('pv.color.manager.scalarbar.visibility.get', [params]).then(function(vizzies) {
                                 pipelineCleanup();
                                 var msg = "protocolScalarBarVisibilityTests successful";
                                 var returnVal = true;
@@ -321,11 +321,11 @@ function ParaViewWebTestFunctions(connection) {
          *
          * This function exercises the following protocol rpc methods:
          *
-         * 'vtk:openRelativeFile'
-         * 'vtk:updateDisplayProperty'
-         * 'vtk:addSource'
-         * 'vtk:getScalarBarVisibilities'
-         * 'vtk:setScalarBarVisibilities'
+         * 'pv.pipeline.manager.file.ropen'
+         * 'pv.pipeline.manager.proxy.representation.update'
+         * 'pv.pipeline.manager.proxy.add'
+         * 'pv.color.manager.scalarbar.visibility.get'
+         * 'pv.color.manager.scalarbar.visibility.set'
          *
          * It needs access to the 'can.ex2' dataset in order to test
          * these protocols.
@@ -334,28 +334,28 @@ function ParaViewWebTestFunctions(connection) {
             var s = connection.session;
 
             try {
-                s.call('vtk:openRelativeFile', 'can.ex2').then(function(dataProxy) {
+                s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyIdOne = dataProxy['proxy_id'];
                     var opts = { 'proxy_id': proxyIdOne,
                                  'ColorArrayName': 'DISPL',
                                  'ColorAttributeType': 'POINT_DATA' };
-                    s.call('vtk:updateDisplayProperty', opts).then(function(empty) {
-                        s.call('vtk:addSource', 'Clip', proxyIdOne).then(function(clipProxy) {
+                    s.call('pv.pipeline.manager.proxy.representation.update', [opts]).then(function(empty) {
+                        s.call('pv.pipeline.manager.proxy.add', ['Clip', proxyIdOne]).then(function(clipProxy) {
                             var proxyIdTwo = clipProxy['proxy_id'];
                             opts['proxy_id'] = proxyIdTwo;
-                            s.call('vtk:updateDisplayProperty', opts).then(function(empty) {
-                                s.call('vtk:addSource', 'Slice', proxyIdTwo).then(function(sliceProxy) {
+                            s.call('pv.pipeline.manager.proxy.representation.update', [opts]).then(function(empty) {
+                                s.call('pv.pipeline.manager.proxy.add', ['Slice', proxyIdTwo]).then(function(sliceProxy) {
                                     var proxyIdThree = sliceProxy['proxy_id'];
                                     opts['proxy_id'] = proxyIdTwo;
-                                    s.call('vtk:updateDisplayProperty', opts).then(function(empty) {
+                                    s.call('pv.pipeline.manager.proxy.representation.update', [opts]).then(function(empty) {
                                         var setSbOpts = {};
                                         setSbOpts[proxyIdThree] = 'true';
-                                        s.call('vtk:setScalarBarVisibilities', setSbOpts).then(function(visibilities) {
+                                        s.call('pv.color.manager.scalarbar.visibility.set', [setSbOpts]).then(function(visibilities) {
                                             var getSbOpts = {};
                                             getSbOpts[proxyIdOne] = '';
                                             getSbOpts[proxyIdTwo] = '';
                                             getSbOpts[proxyIdThree] = '';
-                                            s.call('vtk:getScalarBarVisibilities', getSbOpts).then(function(vizzies) {
+                                            s.call('pv.color.manager.scalarbar.visibility.get', [getSbOpts]).then(function(vizzies) {
                                                 pipelineCleanup();
                                                 var msg = "protocolPipelineScalarBarTests successful";
                                                 var returnVal = true;
@@ -389,8 +389,8 @@ function ParaViewWebTestFunctions(connection) {
         /**
          * This function exercises the following protocol rpc methods:
          *
-         * 'vtk:openRelativeFile'
-         * 'vtk:colorBy'
+         * 'pv.pipeline.manager.file.ropen'
+         * 'pv.color.manager.color.by'
          *
          * It needs access to the 'can.ex2' dataset in order to test
          * these protocols.
@@ -399,13 +399,13 @@ function ParaViewWebTestFunctions(connection) {
             var s = connection.session;
 
             try {
-                s.call('vtk:openRelativeFile', 'can.ex2').then(function(dataProxy) {
+                s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyId = dataProxy['proxy_id'];
                     var opts = { 'proxyId': proxyId,
                                  'arrayName': 'GlobalNodeId',
                                  'attributeType': 'POINTS' };
-                    s.call('vtk:colorBy', opts).then(function(empty) {
-                        s.call('vtk:getColoringInfo', proxyId).then(function(firstInfo) {
+                    s.call('pv.color.manager.color.by', [opts]).then(function(empty) {
+                        s.call('pv.test.color.info.get', [proxyId]).then(function(firstInfo) {
                             if (firstInfo['arrayName'] !== 'GlobalNodeId') {
                                 pipelineCleanup();
                                 msg = "Error: expected to be coloring by GlobalNodeId, " +
@@ -417,8 +417,8 @@ function ParaViewWebTestFunctions(connection) {
                             opts['arrayName'] = 'ACCL';
                             opts['vectorMode'] = 'Component';
                             opts['vectorComponent'] = 0;
-                            s.call('vtk:colorBy', opts).then(function(empty) {
-                                s.call('vtk:getColoringInfo', proxyId).then(function(secondInfo) {
+                            s.call('pv.color.manager.color.by', [opts]).then(function(empty) {
+                                s.call('pv.test.color.info.get', [proxyId]).then(function(secondInfo) {
                                     if (secondInfo['arrayName'] !== opts['arrayName'] ||
                                         secondInfo['vectorMode'] !== opts['vectorMode'] ||
                                         secondInfo['vectorComponent'] != opts['vectorComponent']) {
@@ -451,9 +451,9 @@ function ParaViewWebTestFunctions(connection) {
         /**
          * This function exercises the following protocol rpc methods:
          *
-         * 'vtk:openRelativeFile'
-         * 'vtk:colorBy'
-         * 'vtk:selectColorMap'
+         * 'pv.pipeline.manager.file.ropen'
+         * 'pv.color.manager.color.by'
+         * 'pv.color.manager.select.preset'
          *
          * It needs access to the 'can.ex2' dataset in order to test
          * these protocols.
@@ -462,22 +462,22 @@ function ParaViewWebTestFunctions(connection) {
             var s = connection.session;
 
             try {
-                s.call('vtk:openRelativeFile', 'can.ex2').then(function(dataProxy) {
+                s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyId = dataProxy['proxy_id'];
                     var opts = { 'proxyId': proxyId,
                                  'arrayName': 'DISPL',
                                  'attributeType': 'POINTS' };
-                    s.call('vtk:colorBy', opts).then(function(empty) {
-                        s.call('vtk:updateTime', 'last').then(function(lastTime) {
+                    s.call('pv.color.manager.color.by', [opts]).then(function(empty) {
+                        s.call('pv.vcr.action', ['last']).then(function(lastTime) {
                             var rescaleOpts = { 'proxyId': proxyId,
                                                 'type': 'data' };
-                            s.call('vtk:rescaleTransferFunction', rescaleOpts).then(function(success) {
+                            s.call('pv.color.manager.rescale.transfer.function', [rescaleOpts]).then(function(success) {
                                 var mapOpts = { 'proxyId': proxyId,
                                                 'arrayName': 'DISPL',
                                                 'attributeType': 'POINTS',
                                                 'presetName': 'Blue to Red Rainbow' };
                                                 // 'presetName': 'Brewer Qualitative Set3' };
-                                s.call('vtk:selectColorMap', mapOpts).then(function(testResult) {
+                                s.call('pv.color.manager.select.preset', [mapOpts]).then(function(testResult) {
                                     console.log('select color map result:');
                                     console.log(testResult);
                                     pipelineCleanup();
@@ -502,7 +502,7 @@ function ParaViewWebTestFunctions(connection) {
         /**
          * This function exercises the following protocol rpc methods:
          *
-         * 'vtk:listColorMapNames'
+         * 'pv.color.manager.list.preset'
          */
         protocolListColorMapsTests: function(testName, resultCallback) {
             var s = connection.session,
@@ -511,7 +511,7 @@ function ParaViewWebTestFunctions(connection) {
             expectedPresets = ["Cool to Warm", "Blue to Red Rainbow", "Cold and Hot", "Rainbow Desaturated", "Wild Flower", "Brewer Sequential Yellow-Orange-Brown (9)"];
 
             try {
-                s.call('vtk:listColorMapNames').then(function(list) {
+                s.call('pv.color.manager.list.preset').then(function(list) {
                     var success = true;
                     var expectedButMissing = [];
                     for (var idx in expectedPresets) {
@@ -544,8 +544,8 @@ function ParaViewWebTestFunctions(connection) {
         /**
          * This function exercises the following protocol rpc methods:
          *
-         * 'vtk:setLutDataRange'
-         * 'vtk:getLutDataRange'
+         * 'pv.pipeline.manager.lut.range.update'
+         * 'pv.pipeline.manager.lut.range.get'
          *
          * This is a test of backwards compatibility of pipeline protocol
          * methods for setting and getting custom color range information.
@@ -554,14 +554,14 @@ function ParaViewWebTestFunctions(connection) {
             var s = connection.session;
 
             try {
-                s.call('vtk:openRelativeFile', 'can.ex2').then(function(dataProxy) {
+                s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyId = dataProxy['proxy_id'];
                     var opts = { 'proxy_id': proxyId,
                                  'ColorArrayName': 'DISPL',
                                  'ColorAttributeType': 'POINT_DATA' }
-                    s.call('vtk:updateDisplayProperty', opts).then(function(empty) {
+                    s.call('pv.pipeline.manager.proxy.representation.update', [opts]).then(function(empty) {
                         var expectedLastTime = 0.004299988504499197
-                        s.call('vtk:updateTime', 'last').then(function(lastTime) {
+                        s.call('pv.vcr.action', ['last']).then(function(lastTime) {
                             if (!epsilonCompare(lastTime, expectedLastTime, compareTolerance)) {
                                 throw "Error, the time at can's last timestep was: " +
                                     lastTime + ", expected: " + expectedLastTime;
@@ -569,8 +569,8 @@ function ParaViewWebTestFunctions(connection) {
                             var name = opts['ColorArrayName'];
                             var numComps = null;
                             var range = [ 5.0, 10.0 ];
-                            s.call('vtk:setLutDataRange', name, numComps, range).then(function(empty) {
-                                s.call('vtk:getLutDataRange', name, numComps).then(function(newRange) {
+                            s.call('pv.pipeline.manager.lut.range.update', [name, numComps, range]).then(function(empty) {
+                                s.call('pv.pipeline.manager.lut.range.get', [name, numComps]).then(function(newRange) {
                                     if (checkRangeEqualWithTolerance(newRange,
                                                                      range,
                                                                      testName,

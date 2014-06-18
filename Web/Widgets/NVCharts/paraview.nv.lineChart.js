@@ -87,7 +87,7 @@
             }
 
             var session = self.options.connection.session;
-            session.call("vtk:getProbeData").then(function(result) {
+            session.call("pv.data.prober.probe.data").then(function(result) {
                 var selection = d3.select(self.svg);
 
                 // save data selection, if any.

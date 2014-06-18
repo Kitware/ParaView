@@ -67,7 +67,7 @@
                     $('.rescale-data').show().click(function(){
                         if(session) {
                             proxyId = $('.pipelineBrowser').getProxy().proxy_id;
-                            session.call('vtk:updateScalarRange', proxyId).then(function(){
+                            session.call('pv.pipeline.manager.scalar.range.rescale', [proxyId]).then(function(){
                                 updateView();
                             });
                         }
@@ -106,13 +106,13 @@
 
                     // Update stop method to use the connection
                     stop = function() {
-                        connection.session.call('vtk:exit');
+                        connection.session.call('application.exit');
                     }
 
                     // Auto load file if any available
                     if(connection.hasOwnProperty('file')) {
-                        console.log("call vtk:openRelativeFile " + connection['file']);
-                        session.call('vtk:openRelativeFile', connection['file']).then(function(){
+                        console.log("call pv.pipeline.manager.file.ropen " + connection['file']);
+                        session.call('pv.pipeline.manager.file.ropen', [connection['file']]).then(function(){
                             console.log("result of " + connection['file']);
                             viewport.invalidateScene();
                         }).always(function(e){
@@ -122,9 +122,9 @@
                 };
 
                 // Let's get some data
-                session.call('vtk:getPipeline').then(function(a) {
+                session.call('pv.pipeline.manager.pipeline.get').then(function(a) {
                     pipeline = a;
-                    session.call('vtk:listFilters').then(function(b) {
+                    session.call('pv.filters.list').then(function(b) {
                         filters = b;
                         init();
                     });

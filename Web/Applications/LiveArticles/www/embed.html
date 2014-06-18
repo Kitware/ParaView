@@ -124,7 +124,7 @@
 
                         var filePath= getParameter("data");
                         if (filePath !== "") {
-                            pv.connection.session.call("vtk:openFileFromPath", filePath).then(
+                            pv.connection.session.call("pv.file.loader.open.file", [filePath]).then(
                             function(reply){pv.viewport.render();});
                         }
                         $("#options").show();
@@ -142,7 +142,7 @@
                         pv.viewport.unbind();
                     }
                     if (pv.connection) {
-                        pv.connection.session.call('vtk:exit');
+                        pv.connection.session.call('application.exit');
                         pv.connection.session.close();
                     }
                     $("#options").hide();

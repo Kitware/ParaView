@@ -437,7 +437,7 @@
                 toggleButton.removeClass('active');
 
                 fireBusy(pipeline, true);
-                session.call("vtk:openRelativeFile", e.relativePathList).then(function(newFile){
+                session.call("pv.pipeline.manager.file.ropen", [e.relativePathList]).then(function(newFile){
                     dataChanged(me);
                     addProxy(me, 0, newFile);
                     fireAddSource(pipeline, newFile, 0);
@@ -1191,7 +1191,7 @@
         pipelineBrowser.bind('addSource', function(e) {
             var parentId = (e.parent_id ? e.parent_id : 0);
             fireBusy(pipelineBrowser, true);
-            session.call('vtk:addSource', e.name, parentId).then(function(newNode) {
+            session.call('pv.pipeline.manager.proxy.add', [e.name, parentId]).then(function(newNode) {
                 fireBusy(pipelineBrowser, false);
                 addProxy(pipelineBrowser, parentId, newNode);
             }, idle);
@@ -1200,7 +1200,7 @@
         // Attach pipeline reload
         pipelineBrowser.bind('reloadPipeline', function(e) {
             fireBusy(pipelineBrowser, true);
-            session.call('vtk:reloadPipeline').then(function(rootNode) {
+            session.call('pv.pipeline.manager.reload').then(function(rootNode) {
                 fireBusy(pipelineBrowser, false);
                 var pipelineLineAfter, pipelineLineBefore;
 
@@ -1246,7 +1246,7 @@
                     options['Visibility'] = 1;
                     options['Representation'] = changeSet.representation;
                 }
-                session.call('vtk:updateDisplayProperty', options);
+                session.call('pv.pipeline.manager.proxy.representation.update', [options]);
             } else if(e.origin === 'colorBy') {
                 if(changeSet.hasOwnProperty('color')) {
                     // Solid color
@@ -1264,8 +1264,8 @@
 
                 // Update server
                 fireBusy(pipelineBrowser, true);
-                session.call('vtk:updateDisplayProperty', options).then(function(){
-                    session.call('vtk:updateScalarbarVisibility').then(function(status){
+                session.call('pv.pipeline.manager.proxy.representation.update', [options]).then(function(){
+                    session.call('pv.pipeline.manager.scalarbar.visibility.update').then(function(status){
                         pipelineBrowser.data('scalarbars', status);
                         updateUIPipeline(pipelineBrowser);
                         updateScalarBarUI(pipelineBrowser, status);
@@ -1274,7 +1274,7 @@
                 }, idle);
             } else if(e.origin === 'scalarbar') {
                 fireBusy(pipelineBrowser, true);
-                session.call('vtk:updateScalarbarVisibility', changeSet).then(function(status){
+                session.call('pv.pipeline.manager.scalarbar.visibility.update', [changeSet]).then(function(status){
                     fireBusy(pipelineBrowser, false);
                     pipelineBrowser.data('scalarbars', status);
                     updateScalarBarUI(pipelineBrowser, status);
@@ -1284,7 +1284,7 @@
                     options[key] = changeSet[key];
                 }
                 fireBusy(pipelineBrowser, true);
-                session.call('vtk:pushState', options).then(function(newState){
+                session.call('pv.pipeline.manager.proxy.update', [options]).then(function(newState){
                     fireBusy(pipelineBrowser, false);
                     updateProxy(pipelineBrowser, newState);
                 }, idle);
@@ -1292,14 +1292,14 @@
                 for(var key in changeSet) {
                     options[key] = changeSet[key];
                 }
-                session.call('vtk:updateDisplayProperty', options);
+                session.call('pv.pipeline.manager.proxy.representation.update', [options]);
             }
         });
 
         // Attach delete action
         pipelineBrowser.bind('deleteProxy', function(e) {
             fireBusy(pipelineBrowser, true);
-            session.call('vtk:deleteSource', e.proxy_id).then(function(){
+            session.call('pv.pipeline.manager.proxy.delete', [e.proxy_id]).then(function(){
                 removeProxy(pipelineBrowser, e.proxy_id);
 
                 var fullLutStatus = pipelineBrowser.data('scalarbars'),
@@ -1319,7 +1319,7 @@
                 fireBusy(pipelineBrowser, false);
                 if(needToUpdateServer) {
                     fireBusy(pipelineBrowser, true);
-                    session.call('vtk:updateScalarbarVisibility', lutToDelete).then(function(status){
+                    session.call('pv.pipeline.manager.scalarbar.visibility.update', [lutToDelete]).then(function(status){
                         updateScalarBarUI(pipelineBrowser, status);
                         fireBusy(pipelineBrowser, false);
                     }, idle);
@@ -1342,9 +1342,9 @@
             getProxy(pipelineBrowser, repState_OK['proxy_id']).opacity = repState_OK['Opacity'][0];
 
             fireBusy(pipelineBrowser, true);
-            session.call('vtk:pushState', proxyState).then(function(newState){
+            session.call('pv.pipeline.manager.proxy.update', [proxyState]).then(function(newState){
                 fireBusy(pipelineBrowser, false);
-                session.call('vtk:updateDisplayProperty', repState_OK).then(function(){
+                session.call('pv.pipeline.manager.proxy.representation.update', [repState_OK]).then(function(){
                     newState.opacity = repState_OK['Opacity'][0];
                     updateProxy(pipelineBrowser, newState);
                 });

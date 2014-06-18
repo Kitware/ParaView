@@ -52,7 +52,7 @@ from vtk.web import server
 from vtkWebCorePython import *
 
 # import annotations
-from autobahn.wamp import exportRpc
+from autobahn.wamp import procedure as exportRpc
 
 try:
     import argparse
@@ -124,7 +124,8 @@ class _FileOpener(pv_wamp.PVServerProtocol):
             _FileOpener.reader = None
         return id
 
-    @exportRpc("openFileFromPath")
+    # RpcName: openFileFromPath => pv.file-loader.open.file
+    @exportRpc("pv.file.loader.open.file")
     def openFileFromPath(self, files):
         fileToLoad = []
         if type(files) == list:
