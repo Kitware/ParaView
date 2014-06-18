@@ -496,8 +496,12 @@ def apply_domains(parentProxy, proxy_id):
                 domain = iter.GetDomain()
                 iter.Next()
 
-                if domain.IsA('vtkSMBoundsDomain'):
-                    domain.SetDomainValues(parentProxy.GetDataInformation().GetBounds())
+                try:
+                    if domain.IsA('vtkSMBoundsDomain'):
+                        domain.SetDomainValues(parentProxy.GetDataInformation().GetBounds())
+                except AttributeError as attrErr:
+                    print 'Caught exception setting domain values in apply_domains:'
+                    print attrErr
 
             prop.ResetToDefault()
 
