@@ -21,8 +21,8 @@
   -->
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/XYChart_Default.png" width="300" height="300" />
 
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/label" command="mousePress" arguments="1,1,0,63,8" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButton/label" command="mouseRelease" arguments="1,0,0,63,8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButtons/PropertiesButton/label" command="mousePress" arguments="1,1,0,63,8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesButtons/PropertiesButton/label" command="mouseRelease" arguments="1,0,0,63,8" />
   <!--
     Test what happens when we enable and then disable blocks in the composite
     dataset.
