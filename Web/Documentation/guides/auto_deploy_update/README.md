@@ -82,7 +82,7 @@ Now you're ready to set up a launcher config file which can launch the basic par
             "host": "localhost",
             "endpoint": "paraview",
             "sessionURL": "ws://<my-domain-dot-com>/proxy?sessionId=${id}",
-            "timeout": 5,
+            "timeout": 25,
             "fields": ["file", "host", "port"],
             "port": 8081,
             "proxy_file": "/pvw-test/proxy.txt"

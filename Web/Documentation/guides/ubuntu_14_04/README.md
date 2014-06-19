@@ -27,6 +27,10 @@ Once you've properly installed your new Unbuntu Desktop you may want to add all 
         build-essential python2.7-dev cmake-curses-gui       # (Optional) Needed if you want to build ParaView
         ssh wget emacs                                       # (Optional) Useful tools
 
+If you are using Ubuntu Server, you should also install kde to make sure you have a graphics environment:
+
+    $ sudo apt-get install kde-full
+
 In order to properly install the NVidia drivers, you will need to execute the following command line and restart:
 
     $ sudo nvidia-xconfig
@@ -109,6 +113,9 @@ We've already created the /data/pvw directory to embed the ParaView Process Laun
 Let's structure the content of that directory.
 
     $ sudo mkdir -p /data/pvw/bin /data/pvw/conf /data/pvw/data /data/pvw/logs
+
+When you edit the configuration file, shown below, be sure to replace `YOUR_HOST_NAME_TO_REPLACE` with your actual hostname.
+
     $ sudo vi /data/pvw/conf/launcher.json
 
       {
@@ -159,6 +166,9 @@ Let's structure the content of that directory.
 
     $ sudo vi /data/pvw/bin/start.sh
 
+      #!/bin/bash
+
+      export DISPLAY=:0.0
       /data/pv/pv-current/bin/pvpython /data/pv/pv-current/lib/paraview-4.1/site-packages/vtk/web/launcher.py /data/pvw/conf/launcher.json &
 
     $ sudo touch /data/proxy.txt
@@ -196,7 +206,7 @@ First of all, you will need to enable the modules that will be used by our ParaV
     $ sudo a2enmod proxy_wstunnel
     $ sudo a2enmod rewrite
 
-Then lets create our virtual host.
+Then lets create our virtual host.  Be sure to replace `YOUR_HOST_NAME_TO_REPLACE`, shown in the example below, with your actual host name.  Also include a real email address in place of `YOUR_EMAIL@COMPANY.COM`.
 
     $ vi  /etc/apache2/sites-available/001-pvw.conf
 
@@ -207,6 +217,14 @@ Then lets create our virtual host.
 
           ErrorLog /data/logs/error.log
           CustomLog /data/logs/access.log combined
+
+          <Directory /data/www>
+              Options Indexes FollowSymLinks
+              Order allow,deny
+              Allow from all
+              AllowOverride None
+              Require all granted
+          </Directory>
 
           # Handle launcher forwarding
           ProxyPass /paraview http://localhost:8080/paraview
@@ -222,6 +240,10 @@ Then enable that virtual host and restart Apache
 
     $ sudo a2ensite 001-pvw.conf
     $ sudo service apache2 restart
+
+If you run into problems with your new virtual host listening properly, you may need to disable the default virtual hosts file as follows:
+
+    $ sudo a2dissite 000-default.conf
 
 ## Setting up the ParaViewWeb Web Site
 
