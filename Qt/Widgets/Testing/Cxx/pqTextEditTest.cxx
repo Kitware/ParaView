@@ -1,234 +1,398 @@
 
-#include "pqTextEdit.h"
+#include "pqTextEditTest.h"
 
-#include "QTestApp.h"
-
+#include <QObject>
 #include <QDebug>
 #include <QSignalSpy>
-#include <QSpinBox>
+#include <QTest>
 
-namespace
+#include "pqTextEdit.h"
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::init()
 {
-bool testTextEdit(pqTextEdit& textEdit,
-                  QSignalSpy& spy, int numberOfSignals, QString text)
-{
-  bool success = (spy.count() == numberOfSignals);
-  success &= (textEdit.toPlainText() == text);
-
-  if (!success)
-    {
-    qDebug()<<"Signal count: ";
-    qDebug()<<"  Expected: "<<numberOfSignals<<" got: "<<spy.count();
-    qDebug()<<"toPlainText: ";
-    qDebug()<<"  Expected: "<<text<<" got: "<<textEdit.toPlainText();
-    }
-
-  spy.clear();
-  return success;
+  this->TextEdit = new pqTextEdit();
+  this->TextChangedSpy = new QSignalSpy(this->TextEdit, SIGNAL(textChanged()));
+  this->EditingFinishedSpy = new
+    QSignalSpy(this->TextEdit, SIGNAL(editingFinished()));
+  this->TextChangedAndEditingFinishedSpy = new QSignalSpy(
+    this->TextEdit, SIGNAL(textChangedAndEditingFinished()));
 }
 
-enum SIGNAL_TYPE
+// ----------------------------------------------------------------------------
+void pqTextEditTester::cleanup()
 {
-  Changed = 0,
-  EditingFinished,
-  EditingFinishedAndChanged,
-};
-
-bool test(pqTextEdit& textEdit,
-          QSignalSpy& spy,
-          SIGNAL_TYPE signal,
-          Qt::Key focusOutKey,
-          Qt::KeyboardModifiers focusOutMod)
-{
-  bool success = true;
-
-  int numberOfChangedSignals = 0;
-  int numberOfEditingFinishedAndChangedSignals = 0;
-  int numberOfEditingFinishedSignals = 0;
-  int numberOfClearedSignals = 0;
-
-  QString standard = "text";
-  QString weirUpperCases = "WiERdUppERCase";
-  QString additionText = "andsome";
-  int numberOfLettersReTyped = 3;
-
-  if (signal == Changed)
-    {
-    numberOfChangedSignals = (standard + weirUpperCases).length();
-    // 3*numberOfLettersReTyped because once for the backspaces, once for the
-    // text changed once the last letter is removed and once for the new letter
-    // added after that.
-    numberOfEditingFinishedAndChangedSignals =  additionText.length();
-    numberOfEditingFinishedSignals = 3*numberOfLettersReTyped;
-    numberOfClearedSignals = 1;
-    }
-  else if (signal == EditingFinished)
-    {
-    numberOfChangedSignals = 0;
-    numberOfEditingFinishedAndChangedSignals = 1;
-    numberOfEditingFinishedSignals = 1;
-    numberOfClearedSignals = 0;
-    }
-  else if (signal == EditingFinishedAndChanged)
-    {
-    numberOfChangedSignals = 0;
-    numberOfEditingFinishedAndChangedSignals = 1;
-    numberOfEditingFinishedSignals = 1; // See pqTextEdit doc
-    numberOfClearedSignals = 0;
-    }
-  else
-    {
-    qCritical()<<"Developer error: Check your signal !";
-    }
-
-  textEdit.setFocus();
-  QTestApp::keyClicks(&textEdit, standard);
-  QTestApp::keyClicks(&textEdit, weirUpperCases);
-  success &= testTextEdit(textEdit, spy,
-    numberOfChangedSignals,
-    standard + weirUpperCases);
-  success &= textEdit.hasFocus();
-
-  textEdit.setFocus();
-  QTestApp::keyClicks(&textEdit, additionText);
-  QTestApp::keyClick(&textEdit, focusOutKey, focusOutMod);
-  success &= testTextEdit(textEdit, spy,
-    numberOfEditingFinishedAndChangedSignals,
-    standard + weirUpperCases + additionText);
-  success &= !textEdit.hasFocus();
-
-  textEdit.setFocus();
-  for (int i = 0; i < numberOfLettersReTyped; ++i)
-    {
-    QTestApp::keyClick(&textEdit, Qt::Key_Backspace);
-    }
-  QString retyped = (standard + weirUpperCases + additionText).right(numberOfLettersReTyped);
-  QTestApp::keyClicks(&textEdit, retyped);
-  QTestApp::keyClick(&textEdit, focusOutKey, focusOutMod);
-
-  success &= testTextEdit(textEdit, spy,
-    numberOfEditingFinishedSignals,
-    standard + weirUpperCases + additionText);
-  success &= !textEdit.hasFocus();
-
-  textEdit.clear();
-  success &= testTextEdit(textEdit, spy, numberOfClearedSignals, "");
-
-  textEdit.clearFocus();
-  return success;
+  delete this->TextEdit;
+  delete this->TextChangedSpy;
+  delete this->EditingFinishedSpy;
+  delete this->TextChangedAndEditingFinishedSpy;
 }
 
-} // end namespace
+// ----------------------------------------------------------------------------
+QSignalSpy* pqTextEditTester::spy(int spyType)
+{
+  switch (spyType)
+    {
+    case pqTextEditTester::TextChanged:
+      {
+      return this->TextChangedSpy;
+      break;
+      }
+    case pqTextEditTester::EditingFinished:
+      {
+      return this->EditingFinishedSpy;
+      break;
+      }
+    case pqTextEditTester::TextChangedAndEditingFinished:
+      {
+      return this->TextChangedAndEditingFinishedSpy;
+      break;
+      }
+    default:
+      {
+      qCritical("Developer Error. No such spy (that's what a spy would say)");
+      return 0;
+      break;
+      }
+    }
+}
 
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testSets()
+{
+  QFETCH(int, spyType);
+  QFETCH(int, numberOfSignals);
+  QFETCH(QString, text);
+
+  this->TextEdit->setText(text);
+  QCOMPARE(this->TextEdit->toPlainText(), text);
+  QCOMPARE(this->spy(spyType)->count(), numberOfSignals);
+
+  this->spy(spyType)->clear();
+  this->TextEdit->setText(text);
+  QCOMPARE(this->TextEdit->toPlainText(), text);
+  QCOMPARE(this->spy(spyType)->count(), numberOfSignals);
+
+  this->spy(spyType)->clear();
+  this->TextEdit->setText("");
+  QCOMPARE(this->TextEdit->toPlainText(), QString(""));
+  QCOMPARE(this->spy(spyType)->count(), numberOfSignals);
+}
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testSets_data()
+{
+  QTest::addColumn<int>("spyType");
+  QTest::addColumn<int>("numberOfSignals");
+  QTest::addColumn<QString>("text");
+
+  QTest::newRow("textChanged()") << 0 << 1 << "New Text";
+  QTest::newRow("editingFinished()") << 1 << 0 << "New Text";
+  QTest::newRow("textChangedAndEditingFinished()") << 2 << 0 << "New Text";
+}
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testTypeText()
+{
+  QFETCH(int, spyType);
+  QFETCH(int, numberOfChangedSignals);
+  QFETCH(QString, text);
+  QFETCH(QString, expectedText);
+  QFETCH(int, focusOutKey);
+  QFETCH(int, focusOutModifier);
+  QFETCH(bool, focus);
+
+  this->TextEdit->show();
+  QTest::qWaitForWindowShown(this->TextEdit);
+  this->TextEdit->setFocus();
+
+  QTest::keyClicks(this->TextEdit, text);
+  QTest::keyClick(this->TextEdit,
+    static_cast<Qt::Key>(focusOutKey),
+    static_cast<Qt::KeyboardModifier>(focusOutModifier));
+
+  QCOMPARE(this->TextEdit->toPlainText(), expectedText);
+  QCOMPARE(this->spy(spyType)->count(), numberOfChangedSignals);
+  QCOMPARE(this->TextEdit->hasFocus(), focus);
+}
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testTypeText_data()
+{
+  QTest::addColumn<int>("spyType");
+  QTest::addColumn<int>("numberOfChangedSignals");
+  QTest::addColumn<QString>("text");
+  QTest::addColumn<QString>("expectedText");
+  QTest::addColumn<int>("focusOutKey");
+  QTest::addColumn<int>("focusOutModifier");
+  QTest::addColumn<bool>("focus");
+
+  QString text = "My WEIrD CaSIng !@#$%)%^_*)[]{}|:'\" text.";
+
+  QTest::newRow("textChanged: Key_A no modifier")
+    << 0 << text.length() +1 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("textChanged: Key_Return and SHIFT")
+    << 0 << text.length() +1 << text << text + "\n"
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("textChanged: Key_Return and CTRL")
+    << 0 << text.length() << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Return and ALT")
+    << 0 << text.length() << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and CTRL")
+    << 0 << text.length() << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and ALT")
+    << 0 << text.length() << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+
+
+  QTest::newRow("editingFinished: Key_A no modifier")
+    << 1<< 0 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("editingFinished: Key_Return and SHIFT")
+    << 1<< 0 << text << text + "\n"
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("editingFinished: Key_Return and CTRL")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Return and ALT")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and CTRL")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and ALT")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+
+
+  QTest::newRow("textChangedAndEditingFinished: Key_A no modifier")
+    << 2 << 0 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and SHIFT")
+    << 2 << 0 << text << text + "\n"
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and CTRL")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and ALT")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Enter and CTRL")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Enter and ALT")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+}
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testFocus()
+{
+  QFETCH(int, focusOutKey);
+  QFETCH(int, focusOutModifier);
+  QFETCH(bool, focus);
+
+  this->TextEdit->show();
+  QTest::qWaitForWindowShown(this->TextEdit);
+  this->TextEdit->setFocus();
+
+  QTest::keyClick(this->TextEdit,
+    static_cast<Qt::Key>(focusOutKey),
+    static_cast<Qt::KeyboardModifier>(focusOutModifier));
+  QCOMPARE(this->TextEdit->hasFocus(), focus);
+
+  this->TextEdit->setFocus();
+  this->TextEdit->clearFocus();
+  QCOMPARE(this->TextEdit->hasFocus(), false);
+}
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testFocus_data()
+{
+
+  QTest::addColumn<int>("focusOutKey");
+  QTest::addColumn<int>("focusOutModifier");
+  QTest::addColumn<bool>("focus");
+
+  QTest::newRow("textChanged: Key_A no modifier")
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("textChanged: Key_Return and SHIFT")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+  QTest::newRow("textChanged: Key_Enter and SHIFT")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("textChanged: Key_Return and CTRL")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Return and ALT")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and CTRL")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and ALT")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+
+
+  QTest::newRow("editingFinished: Key_A no modifier")
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("editingFinished: Key_Return and SHIFT")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+  QTest::newRow("editingFinished: Key_Enter and SHIFT")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("editingFinished: Key_Return and CTRL")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Return and ALT")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and CTRL")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and ALT")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+
+
+  QTest::newRow("textChangedAndEditingFinished: Key_A no modifier")
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and SHIFT")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+  QTest::newRow("textChangedAndEditingFinished: Key_Enter and SHIFT")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and CTRL")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and ALT")
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Enter and CTRL")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Enter and ALT")
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+}
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testReTypeText()
+{
+  QFETCH(int, spyType);
+  QFETCH(int, numberOfChangedSignals);
+  QFETCH(QString, text);
+  QFETCH(QString, expectedText);
+  QFETCH(int, focusOutKey);
+  QFETCH(int, focusOutModifier);
+  QFETCH(bool, focus);
+
+  this->TextEdit->append(text); // Init Text
+  this->spy(spyType)->clear(); // Reset spy
+
+  this->TextEdit->show();
+  QTest::qWaitForWindowShown(this->TextEdit);
+  this->TextEdit->setFocus();
+
+  for (int i = 0; i < text.length(); ++i) // Remove previous text
+    {
+    QTest::keyClick(this->TextEdit, Qt::Key_Backspace);
+    }
+
+  QTest::keyClicks(this->TextEdit, text); // Re-type it.
+  QTest::keyClick(this->TextEdit,
+    static_cast<Qt::Key>(focusOutKey),
+    static_cast<Qt::KeyboardModifier>(focusOutModifier));
+
+  QCOMPARE(this->TextEdit->toPlainText(), expectedText);
+  QCOMPARE(this->spy(spyType)->count(), numberOfChangedSignals);
+  QCOMPARE(this->TextEdit->hasFocus(), focus);
+}
+
+// ----------------------------------------------------------------------------
+void pqTextEditTester::testReTypeText_data()
+{
+  QTest::addColumn<int>("spyType");
+  QTest::addColumn<int>("numberOfChangedSignals");
+  QTest::addColumn<QString>("text");
+  QTest::addColumn<QString>("expectedText");
+  QTest::addColumn<int>("focusOutKey");
+  QTest::addColumn<int>("focusOutModifier");
+  QTest::addColumn<bool>("focus");
+
+  QString text = "My WEIrD CaSIng !@#$%)%^_*)[]{}|:'\" text.";
+
+  // textChanged signal is sent 3 times as many text letters.
+  // Once every time a backspace is entered.
+  // Once after each backspace with the new shortened text.
+  // Once after each letter is retyped
+
+  QTest::newRow("textChanged: Key_A no modifier")
+    << 0 << 3*text.length() + 1 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("textChanged: Key_Return and SHIFT")
+    << 0 << 3*text.length() +1 << text << text + "\n"
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("textChanged: Key_Return and CTRL")
+    << 0 << 3*text.length() << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Return and ALT")
+    << 0 << 3*text.length() << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and CTRL")
+    << 0 << 3*text.length() << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChanged: Key_Enter and ALT")
+    << 0 << 3*text.length() << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+
+
+  QTest::newRow("editingFinished: Key_A no modifier")
+    << 1<< 0 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("editingFinished: Key_Return and SHIFT")
+    << 1<< 0 << text << text + "\n"
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("editingFinished: Key_Return and CTRL")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Return and ALT")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and CTRL")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("editingFinished: Key_Enter and ALT")
+    << 1<< 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+
+
+  // Even though the text is the same, the textChangedAndEditingFinished
+  // signal is still sent. See pqTextEdit doc.
+
+  QTest::newRow("textChangedAndEditingFinished: Key_A no modifier")
+    << 2 << 0 << text << text + QTest::keyToAscii(Qt::Key_A)
+    << static_cast<int>(Qt::Key_A) << static_cast<int>(Qt::NoModifier) << true;
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and SHIFT")
+    << 2 << 0 << text << text + "\n"
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ShiftModifier) << true;
+
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and CTRL")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Return and ALT")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Return) << static_cast<int>(Qt::AltModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Enter and CTRL")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::ControlModifier) << false;
+  QTest::newRow("textChangedAndEditingFinished: Key_Enter and ALT")
+    << 2 << 1 << text << text
+    << static_cast<int>(Qt::Key_Enter) << static_cast<int>(Qt::AltModifier) << false;
+}
+
+// --------------------------------------------------------------------------
 int pqTextEditTest(int argc, char* argv[])
 {
-  QTestApp app(argc, argv);
-  bool success = false;
-  pqTextEdit textEdit;
-  textEdit.show();
-
-  //QSpinBox spinBox;
-  //QObject::connect(&textEdit, SIGNAL(textChanged()), &spinBox, SLOT(stepUp()));
-  //spinBox.show();
-
-  //
-  // Test text changed
-  //
-  QSignalSpy changedSpy(&textEdit, SIGNAL(textChanged()));
-
-  // 1- setText
-  textEdit.setText("New Text");
-  success = testTextEdit(textEdit, changedSpy, 1, "New Text");
-
-  textEdit.setText("New Text");
-  success &= testTextEdit(textEdit, changedSpy, 1, "New Text");
-
-  textEdit.setText("");
-  success &= testTextEdit(textEdit, changedSpy, 1, "");
-
-  // Qt::ControlModifier & Qt::Key_Enter
-  success &= test(textEdit, changedSpy, Changed, Qt::Key_Enter, Qt::ControlModifier);
-
-  // Qt::ControlModifier & Qt::Key_Return
-  success &= test(textEdit, changedSpy, Changed, Qt::Key_Return, Qt::ControlModifier);
-
-  // Qt::AltModifier & Qt::Key_Enter
-  success &= test(textEdit, changedSpy, Changed, Qt::Key_Enter, Qt::AltModifier);
-
-  // Qt::AltModifier & Qt::Key_Return
-  success &= test(textEdit, changedSpy, Changed, Qt::Key_Return, Qt::AltModifier);
-
-  if (!success)
-    {
-    qCritical()<<"Failed with changed event";
-    return EXIT_FAILURE;
-    }
-
-  //
-  // Test editing finished event
-  //
-  QSignalSpy editingFinishedSpy(&textEdit, SIGNAL(editingFinished()));
-
-  // 1- setText
-  // No editingFinished on set...() -> See pqTextEdit doc
-  textEdit.setText("New Text");
-  success &= testTextEdit(textEdit, editingFinishedSpy, 0, "New Text");
-  textEdit.setText("New Text");
-  success &= testTextEdit(textEdit, editingFinishedSpy, 0, "New Text");
-  textEdit.setText("");
-  success &= testTextEdit(textEdit, editingFinishedSpy, 0, "");
-
-  // Qt::ControlModifier & Qt::Key_Enter
-  success &= test(textEdit, editingFinishedSpy, EditingFinished, Qt::Key_Enter, Qt::ControlModifier);
-
-  // Qt::Key_Control & Qt::Key_Return
-  success &= test(textEdit, editingFinishedSpy, EditingFinished, Qt::Key_Return, Qt::ControlModifier);
-
-  // Qt::AltModifier & Qt::Key_Enter
-  success &= test(textEdit, editingFinishedSpy, EditingFinished, Qt::Key_Enter, Qt::AltModifier);
-
-  // Qt::AltModifier & Qt::Key_Return
-  success &= test(textEdit, editingFinishedSpy, EditingFinished, Qt::Key_Return, Qt::AltModifier);
-
-  if (!success)
-    {
-    qCritical()<<"Failed with editing finished event";
-    return EXIT_FAILURE;
-    }
-
-  //
-  // Test text changed and editing finished event
-  //
-  QSignalSpy changedAndFinishedSpy(&textEdit, SIGNAL(textChangedAndEditingFinished()));
-
-  // 1- setText
-  // No textChangedAndEditingFinished on set...() either -> See pqTextEdit doc
-  textEdit.setText("New Text");
-  success &= testTextEdit(textEdit, changedAndFinishedSpy, 0, "New Text");
-  textEdit.setText("New Text");
-  success &= testTextEdit(textEdit, changedAndFinishedSpy, 0, "New Text");
-  textEdit.setText("");
-  success &= testTextEdit(textEdit, changedAndFinishedSpy, 0, "");
-
-  // Qt::ControlModifier & Qt::Key_Enter
-  success &= test(textEdit, changedAndFinishedSpy, EditingFinishedAndChanged, Qt::Key_Enter, Qt::ControlModifier);
-
-  // Qt::ControlModifier & Qt::Key_Return
-  success &= test(textEdit, changedAndFinishedSpy, EditingFinishedAndChanged, Qt::Key_Return, Qt::ControlModifier);
-
-  // Qt::AltModifier & Qt::Key_Enter
-  success &= test(textEdit, changedAndFinishedSpy, EditingFinishedAndChanged, Qt::Key_Enter, Qt::AltModifier);
-
-  // Qt::AltModifier & Qt::Key_Return
-  success &= test(textEdit, changedAndFinishedSpy, EditingFinishedAndChanged, Qt::Key_Return, Qt::AltModifier);
-
-  if (!success)
-    {
-    qCritical()<<"Failed with changed and editing finished event";
-    return EXIT_FAILURE;
-    }
-
-  //QTestApp::delay(10000);
-
-  return app.exec();
+  QApplication app(argc, argv); 
+  pqTextEditTester test1;
+  return QTest::qExec(&test1);
 }
