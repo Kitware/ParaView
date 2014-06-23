@@ -922,8 +922,6 @@ bool vtkSMSettings::AddCollectionFromFile(const std::string & fileName,
     std::string emptyString;
     return this->AddCollectionFromString(emptyString, priority);
     }
-
-  return false;
 }
 
 //----------------------------------------------------------------------------
