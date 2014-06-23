@@ -11,8 +11,10 @@ if(NOT MPI_INCLUDE_PATH)
   find_package(MPI REQUIRED)
 endif()
 
-include_directories(
+include_directories(SYSTEM
   ${MPI_INCLUDE_PATH}
+  )
+include_directories(
   ${Nektar_SOURCE_DIR}/include
   )
 
