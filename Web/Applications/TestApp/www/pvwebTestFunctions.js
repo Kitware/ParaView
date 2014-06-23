@@ -47,10 +47,15 @@ function ParaViewWebTestFunctions(connection) {
         console.log("Encountered an error calling protocol:");
         console.log(errMsg);
 
-        console.log("About to call resultCallback");
+        var message = errMsg;
+
+        if (typeof(errMsg) !== 'string' && 'error' in errMsg && 'args' in errMsg) {
+            message = "Protocol error: " + errMsg.error + '\n  ' + errMsg.args.join('\n  ');
+        }
+
         callback({ 'name': testName,
                    'success': false,
-                   'message': "Protocol error: " + errMsg.detail.join('\n') });
+                   'message': message });
     }
 
     // Return true if expected and actual are within epsilon of each other
@@ -194,8 +199,11 @@ function ParaViewWebTestFunctions(connection) {
                 var expectedLastTime = 0.004299988504499197
                 s.call('pv.vcr.action', ['last']).then(function(lastTime) {
                     if (!epsilonCompare(lastTime, expectedLastTime, compareTolerance)) {
-                        throw "Error, the time at can's last timestep was: " +
+                        var msg = "Error, the time at can's last timestep was: " +
                             lastTime + ", expected: " + expectedLastTime;
+                        pipelineCleanup();
+                        protocolError(msg, testName, resultCallback);
+                        return;
                     }
                     var rescaleOpts = { 'proxyId': proxyId,
                                         'type': 'data' };
@@ -401,38 +409,40 @@ function ParaViewWebTestFunctions(connection) {
             try {
                 s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyId = dataProxy['proxy_id'];
-                    var opts = { 'proxyId': proxyId,
-                                 'arrayName': 'GlobalNodeId',
-                                 'attributeType': 'POINTS' };
-                    s.call('pv.color.manager.color.by', [opts]).then(function(empty) {
-                        s.call('pv.test.color.info.get', [proxyId]).then(function(firstInfo) {
-                            if (firstInfo['arrayName'] !== 'GlobalNodeId') {
-                                pipelineCleanup();
-                                msg = "Error: expected to be coloring by GlobalNodeId, " +
-                                    "instead coloring by: " + firstInfo['arrayName']
-                                resultCallback({ 'name': testName,
-                                                 'success': false,
-                                                 'message': msg });
-                            }
-                            opts['arrayName'] = 'ACCL';
-                            opts['vectorMode'] = 'Component';
-                            opts['vectorComponent'] = 0;
-                            s.call('pv.color.manager.color.by', [opts]).then(function(empty) {
-                                s.call('pv.test.color.info.get', [proxyId]).then(function(secondInfo) {
-                                    if (secondInfo['arrayName'] !== opts['arrayName'] ||
-                                        secondInfo['vectorMode'] !== opts['vectorMode'] ||
-                                        secondInfo['vectorComponent'] != opts['vectorComponent']) {
-                                        pipelineCleanup();
-                                        msg = "Error: expected results arrayName => " + opts['arrayName'] + ", vectorMode => " + opts['vectorMode'] + ", vectorComponent => " + opts['vectorComponent'] + ".  Instead got arrayName => " + secondInfo['arrayName'] + ", vectorMode => " + secondInfo['vectorMode'] + ", vectorComponent => " + secondInfo['vectorComponent'] + ".";
-                                        resultCallback({ 'name': testName,
-                                                         'success': false,
-                                                         'message': msg });
-                                    } else {
-                                        pipelineCleanup();
-                                        resultCallback({ 'name': testName,
-                                                         'success': true,
-                                                         'message': "protocolColorByTests completed successfully" });
-                                    }
+                    s.call('pv.test.repr.get', [proxyId]).then(function(reprStruct) {
+                        var reprId = reprStruct['reprProxyId'];
+                        var args = [reprId, 'ARRAY'];
+                        var kwargs = { 'arrayLocation': 'POINTS', 'arrayName': 'GlobalNodeId'};
+                        s.call('pv.color.manager.color.by', args, kwargs).then(function(empty) {
+                            s.call('pv.test.color.info.get', [proxyId]).then(function(firstInfo) {
+                                if (firstInfo['arrayName'] !== 'GlobalNodeId') {
+                                    pipelineCleanup();
+                                    msg = "Error: expected to be coloring by GlobalNodeId, " +
+                                        "instead coloring by: " + firstInfo['arrayName']
+                                    resultCallback({ 'name': testName,
+                                                     'success': false,
+                                                     'message': msg });
+                                }
+                                args = [reprId, 'ARRAY'];
+                                kwargs = {'arrayLocation': 'POINTS', 'arrayName': 'ACCL',
+                                          'vectorMode': 'Component', 'vectorComponent': 0};
+                                s.call('pv.color.manager.color.by', args, kwargs).then(function(empty) {
+                                    s.call('pv.test.color.info.get', [proxyId]).then(function(secondInfo) {
+                                        if (secondInfo['arrayName'] !== kwargs['arrayName'] ||
+                                            secondInfo['vectorMode'] !== kwargs['vectorMode'] ||
+                                            secondInfo['vectorComponent'] != kwargs['vectorComponent']) {
+                                            pipelineCleanup();
+                                            msg = "Error: expected results arrayName => " + kwargs['arrayName'] + ", vectorMode => " + kwargs['vectorMode'] + ", vectorComponent => " + kwargs['vectorComponent'] + ".  Instead got arrayName => " + secondInfo['arrayName'] + ", vectorMode => " + secondInfo['vectorMode'] + ", vectorComponent => " + secondInfo['vectorComponent'] + ".";
+                                            resultCallback({ 'name': testName,
+                                                             'success': false,
+                                                             'message': msg });
+                                        } else {
+                                            pipelineCleanup();
+                                            resultCallback({ 'name': testName,
+                                                             'success': true,
+                                                             'message': "protocolColorByTests completed successfully" });
+                                        }
+                                    }, function(e) { protocolError(e, testName, resultCallback); });
                                 }, function(e) { protocolError(e, testName, resultCallback); });
                             }, function(e) { protocolError(e, testName, resultCallback); });
                         }, function(e) { protocolError(e, testName, resultCallback); });
@@ -464,26 +474,23 @@ function ParaViewWebTestFunctions(connection) {
             try {
                 s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
                     var proxyId = dataProxy['proxy_id'];
-                    var opts = { 'proxyId': proxyId,
-                                 'arrayName': 'DISPL',
-                                 'attributeType': 'POINTS' };
-                    s.call('pv.color.manager.color.by', [opts]).then(function(empty) {
-                        s.call('pv.vcr.action', ['last']).then(function(lastTime) {
-                            var rescaleOpts = { 'proxyId': proxyId,
-                                                'type': 'data' };
-                            s.call('pv.color.manager.rescale.transfer.function', [rescaleOpts]).then(function(success) {
-                                var mapOpts = { 'proxyId': proxyId,
-                                                'arrayName': 'DISPL',
-                                                'attributeType': 'POINTS',
-                                                'presetName': 'Blue to Red Rainbow' };
-                                                // 'presetName': 'Brewer Qualitative Set3' };
-                                s.call('pv.color.manager.select.preset', [mapOpts]).then(function(testResult) {
-                                    console.log('select color map result:');
-                                    console.log(testResult);
-                                    pipelineCleanup();
-                                    resultCallback({ 'name': testName,
-                                                     'success': true,
-                                                     'message': "protocolSelectColorMapTests succeeded" });
+                    s.call('pv.test.repr.get', [proxyId]).then(function(reprStruct) {
+                        var reprId = reprStruct['reprProxyId'];
+                        var args = [reprId, 'ARRAY'];
+                        var kwargs = { 'arrayLocation': 'POINTS', 'arrayName': 'DISPL'};
+                        s.call('pv.color.manager.color.by', args, kwargs).then(function(empty) {
+                            s.call('pv.vcr.action', ['last']).then(function(lastTime) {
+                                var rescaleOpts = { 'proxyId': proxyId,
+                                                    'type': 'data' };
+                                s.call('pv.color.manager.rescale.transfer.function', [rescaleOpts]).then(function(success) {
+                                    args = [reprId, 'Blue to Red Rainbow'];
+                                    // 'presetName': 'Brewer Qualitative Set3' };
+                                    s.call('pv.color.manager.select.preset',args).then(function(testResult) {
+                                        pipelineCleanup();
+                                        resultCallback({ 'name': testName,
+                                                         'success': true,
+                                                         'message': "protocolSelectColorMapTests succeeded" });
+                                    }, function(e) { protocolError(e, testName, resultCallback); });
                                 }, function(e) { protocolError(e, testName, resultCallback); });
                             }, function(e) { protocolError(e, testName, resultCallback); });
                         }, function(e) { protocolError(e, testName, resultCallback); });
@@ -560,11 +567,14 @@ function ParaViewWebTestFunctions(connection) {
                                  'ColorArrayName': 'DISPL',
                                  'ColorAttributeType': 'POINT_DATA' }
                     s.call('pv.pipeline.manager.proxy.representation.update', [opts]).then(function(empty) {
-                        var expectedLastTime = 0.004299988504499197
+                        var expectedLastTime = 0.004299988504499197;
                         s.call('pv.vcr.action', ['last']).then(function(lastTime) {
                             if (!epsilonCompare(lastTime, expectedLastTime, compareTolerance)) {
-                                throw "Error, the time at can's last timestep was: " +
+                                var msg = "Error, the time at can's last timestep was: " +
                                     lastTime + ", expected: " + expectedLastTime;
+                                pipelineCleanup();
+                                protocolError(msg, testName, resultCallback);
+                                return;
                             }
                             var name = opts['ColorArrayName'];
                             var numComps = null;
@@ -588,6 +598,612 @@ function ParaViewWebTestFunctions(connection) {
                 }, function(e) { protocolError(e, testName, resultCallback); });
             } catch(error) {
                 console.log("Caught exception running test sequence for protocolGetSetLutDataRangeTests");
+                console.log(error);
+                pipelineCleanup();
+                resultCallback({ 'name': testName,
+                                 'success': false,
+                                 'message': error });
+            }
+        },
+
+        /**
+         * This function exercises the following protocol rpc methods:
+         *
+         * 'pv.proxy.manager.create'
+         * 'pv.proxy.manager.get'
+         * 'pv.proxy.manager.list'
+         * 'pv.proxy.manager.delete'
+         *
+         * This test creates three filters in a pipeline and then checks
+         * the properties of each proxy for existence and to ensure that
+         * certain relationships hold.  It tests the list proxies function
+         * and then tests the delete proxy functionality.
+         */
+        protocolProxyCreateGetDeleteTests: function(testName, resultCallback) {
+            var s = connection.session,
+            expectedWaveletProps = [ "Center", "Maximum", "StandardDeviation",
+                                     "SubsampleRate", "WholeExtent", "XFreq",
+                                     "XMag", "YFreq", "YMag", "ZFreq", "ZMag" ],
+            expectedContourProps = [ "ComputeGradients", "ComputeNormals", "ComputeScalars",
+                                     "ContourValues", "GenerateTriangles", "Divisions",
+                                     "NumberOfPointsPerBucket", "MaxPointsPerLeaf",
+                                     "Tolerance", "Locator", "SelectInputScalars"],
+            expectedClipProps = [ "Normal", "Offset", "Origin", "Bounds", "Position",
+                                  "Rotation", "Scale", "Center", "Radius", "ClipFunction",
+                                  "PreserveInputCells", "SelectInputScalars", "Value" ],
+            clipDependencies = { "Box": ["Bounds", "Position", "Rotation", "Scale"],
+                                 "Sphere": ["Center", "Radius"],
+                                 "Plane": ["Normal", "Offset", "Origin"] },
+            contourDependencies = { "NonMergingPointLocator": [ "Divisions", "NumberOfPointsPerBucket" ],
+                                    "IncrementalOctreeMergePoints": ["Tolerance", "MaxPointsPerLeaf"],
+                                    "MergePoints": [ "Divisions", "NumberOfPointsPerBucket" ] };
+
+            function checkExtendedProperties(proxyObj, expectedDependencies, proxyName) {
+                var targetProxy = null,
+                targetUi = null,
+                expectedProps = {};
+                // find the proxyName property
+                for (var pidx in proxyObj.properties) {
+                    if (proxyObj.properties[pidx]['name'] === proxyName) {
+                        targetProxy = proxyObj.properties[pidx];
+                        targetUi = proxyObj.ui[pidx];
+                        break;
+                    }
+                }
+                if (targetProxy === null || targetUi === null) {
+                    return [ false, 'Expected to find a proxy named ' + proxyName ];
+                }
+                var vals = targetUi['values'];
+                for (var key in expectedDependencies) {
+                    if (!(key in vals)) {
+                        return [ false, proxyName + ' expected possible value ' + key ];
+                    }
+                    expectedProps[vals[key]] = key;
+                }
+                for (var pidx in proxyObj.properties) {
+                    var prop = proxyObj.properties[pidx];
+                    if (prop['id'] in expectedProps) {
+                        var dependents = expectedDependencies[expectedProps[prop['id']]];
+                        var idxOf = dependents.indexOf(prop['name']);
+                        if (idxOf >= 0) {
+                            dependents.splice(idxOf, 1);
+                        } else {
+                            var msg = 'Expected find proxy ' + prop['name'] +
+                                ' in dependents of ' + expectedProps[prop['id']];
+                            return [ false, msg ];
+                        }
+                    }
+                }
+                var missing = [];
+                for (var key in expectedDependencies) {
+                    missing.concat(expectedDependencies[key])
+                }
+                if (missing.length != 0) {
+                    var msg = 'Proxy ' + proxyObj['id'] + ' missing expected ' +
+                        'dependent properties: ' + missing.join(',')
+                    return [ false, msg ];
+                }
+                return [ true, '' ];
+            }
+
+            function checkBasicProperties(proxyObj, expectedPropNames) {
+                var expectedKeys = ['name', 'id', 'value'];
+                for (var pidx in proxyObj.properties) {
+                    var prop = proxyObj.properties[pidx];
+                    for (var i = 0; i < expectedKeys.length; ++i) {
+                        if (!(expectedKeys[i] in prop)) {
+                            return [ false, 'property at index ' + pidx + ' has no ' + expectedKeys[i] ];
+                        }
+                    }
+                    var indexOfExpected = expectedPropNames.indexOf(prop['name']);
+                    if (indexOfExpected >= 0) {
+                        expectedPropNames.splice(indexOfExpected, 1);
+                    }
+                }
+                if (expectedPropNames.length > 0) {
+                    return [ false, 'Did not find the following expected properties: ' +
+                             expectedPropNames.join(',') ];
+                }
+                return [ true, '' ];
+            }
+
+            try {
+                var waveletArgs = ['Wavelet', -1],
+                expectedParents = {};
+                s.call('pv.proxy.manager.create', waveletArgs).then(function(waveletProxy) {
+                    var waveletOk = checkBasicProperties(waveletProxy, expectedWaveletProps);
+                    if (waveletOk[0] === false) {
+                        pipelineCleanup();
+                        var waveletErrMsg = "Wavelet proxy did not pass basic checks: " + waveletOk[1];
+                        protocolError(waveletErrMsg, testName, resultCallback);
+                        return;
+                    }
+                    var waveletPid = waveletProxy['id'];
+                    expectedParents[waveletPid] = "0";
+                    var contourArgs = ['Contour', waveletPid];
+                    s.call('pv.proxy.manager.create', contourArgs).then(function(contourProxy) {
+                        var contourOk = checkBasicProperties(contourProxy, expectedContourProps);
+                        if (contourOk[0] === false) {
+                            pipelineCleanup();
+                            var contourErrMsg = 'Contour proxy did not pass basic checks: ' + contourOk[1];
+                            protocolError(contourErrMsg, testName, resultCallback);
+                            return;
+                        }
+                        contourOk = checkExtendedProperties(contourProxy, contourDependencies, "Locator");
+                        if (contourOk[0] === false) {
+                            pipelineCleanup();
+                            var contourErrMsg = 'Contour proxy did not pass extended checks: ' + contourOk[1];
+                            protocolError(contourErrMsg, testName, resultCallback);
+                            return;
+                        }
+                        var contourPid = contourProxy['id'];
+                        expectedParents[contourPid] = waveletPid;
+                        var clipArgs = ['Clip', contourPid];
+                        s.call('pv.proxy.manager.create', clipArgs).then(function(clipProxy) {
+                            var clipOk = checkBasicProperties(clipProxy, expectedClipProps);
+                            if (clipOk[0] === false) {
+                                pipelineCleanup();
+                                var clipErrMsg = 'Clip proxy did not pass basic checks: ' + clipOk[1];
+                                protocolError(clipErrMsg, testName, resultCallback);
+                                return;
+                            }
+                            clipOk = checkExtendedProperties(clipProxy, clipDependencies, "ClipFunction");
+                            if (clipOk[0] === false) {
+                                pipelineCleanup();
+                                var clipErrMsg = 'Clip proxy did not pass extended checks: ' + clipOk[1];
+                                protocolError(clipErrMsg, testName, resultCallback);
+                                return;
+                            }
+                            var clipPid = clipProxy['id'];
+                            expectedParents[clipPid] = contourPid;
+                            s.call('pv.proxy.manager.list').then(function(proxyList) {
+                                for (var idx in proxyList) {
+                                    var elt = proxyList[idx];
+                                    if (elt['parent'] != expectedParents[elt['id']]) {
+                                        var message = "protocolProxyCreateGetDeleteTests failed because at " +
+                                            "least one proxy in the list had wrong parent: " +
+                                            "proxy " + elt['id'] + " had parent " + elt['parent'] +
+                                            ", but expected " + expectedParents[elt['id']];
+                                        pipelineCleanup();
+                                        resultCallback({ 'name': testName,
+                                                         'success': false,
+                                                         'message': message });
+                                        return;
+                                    }
+                                }
+                                s.call('pv.proxy.manager.delete', [contourPid]).then(function(result) {
+                                    if (result['success'] === 1) {
+                                        var message = "Should not have been able to delete proxy " +
+                                            contourPid + " while it is the input to another filter " +
+                                            "proxy".
+                                        pipelineCleanup();
+                                        resultCallback({ 'name': testName,
+                                                         'success': false,
+                                                         'message': message });
+                                        return;
+                                    }
+                                    s.call('pv.proxy.manager.delete', [clipPid]).then(function(result) {
+                                        if (result['success'] === 0) {
+                                            pipelineCleanup();
+                                            resultCallback({ 'name': testName,
+                                                             'success': false,
+                                                             'message': "Unable to delete clip proxy" });
+                                            return;
+                                        }
+                                        s.call('pv.proxy.manager.delete', [contourPid]).then(function(r) {
+                                            if (r['success'] === 0) {
+                                                var m = "Unable to delete contour proxy";
+                                                pipelineCleanup();
+                                                resultCallback({ 'name': testName,
+                                                                 'success': false,
+                                                                 'message': m });
+                                                return;
+                                            }
+                                            s.call('pv.proxy.manager.delete', [waveletPid]).then(function(d) {
+                                                if (d['success'] === 0) {
+                                                    var m = "Unable to delete wavelet proxy";
+                                                    pipelineCleanup();
+                                                    resultCallback({ 'name': testName,
+                                                                     'success': false,
+                                                                     'message': m });
+                                                    return;
+                                                }
+                                                s.call('pv.proxy.manager.list').then(function(emptyList) {
+                                                    if (emptyList.length > 0) {
+                                                        var m = "All proxies should have been deleted, " +
+                                                            "list still contains " + emptyList.join(",");
+                                                        pipelineCleanup();
+                                                        resultCallback({ 'name': testName,
+                                                                         'success': false,
+                                                                         'message': m });
+                                                        return;
+                                                    }
+                                                    var m = "protocolProxyCreateGetDeleteTests succeeded";
+                                                    pipelineCleanup();
+                                                    resultCallback({ 'name': testName,
+                                                                     'success': true,
+                                                                     'message': m });
+                                                }, function(e) { protocolError(e, testName, resultCallback); });
+                                            }, function(e) { protocolError(e, testName, resultCallback); });
+                                        }, function(e) { protocolError(e, testName, resultCallback); });
+                                    }, function(e) { protocolError(e, testName, resultCallback); });
+                                }, function(e) { protocolError(e, testName, resultCallback); });
+                            }, function(e) { protocolError(e, testName, resultCallback); });
+                        }, function(e) { protocolError(e, testName, resultCallback); });
+                    }, function(e) { protocolError(e, testName, resultCallback); });
+                }, function(e) { protocolError(e, testName, resultCallback); });
+            } catch(error) {
+                console.log("Caught exception running test sequence for protocolProxyCreateGetDeleteTests");
+                console.log(error);
+                pipelineCleanup();
+                resultCallback({ 'name': testName,
+                                 'success': false,
+                                 'message': error });
+            }
+        },
+
+        /**
+         * This function exercises the following protocol rpc methods:
+         *
+         * 'pv.proxy.manager.create'
+         * 'pv.proxy.manager.update'
+         *
+         * This tests checks that the update function actually updates
+         * the intended properties.
+         */
+        protocolProxyUpdateTests: function(testName, resultCallback) {
+            var s = connection.session;
+
+            try {
+                var waveletArgs = ['Wavelet', -1];
+                s.call('pv.proxy.manager.create', waveletArgs).then(function(waveletProxy) {
+                    var waveletPid = waveletProxy['id'];
+                    var clipArgs = ['Clip', waveletPid];
+                    s.call('pv.proxy.manager.create', clipArgs).then(function(clipProxy) {
+                        var clipPid = clipProxy['id'];
+                        for (var idx in clipProxy.properties) {
+                            var property = clipProxy.properties[idx];
+                            if (property['name'] === "Radius") {
+                                property['value'] = 3.0;
+                            } else if (property['name'] === "ClipFunction") {
+                                property['value'] = "Sphere";
+                            } else if (property['name'] === "PreserveInputCells") {
+                                property['value'] = 1;
+                            } else if (property['name'] === "InsideOut") {
+                                property['value'] = 1;
+                            }
+                        }
+                        s.call('pv.proxy.manager.update', [clipProxy.properties]).then(function(result) {
+                            var m = "protocolProxyUpdateTests succeeded";
+                            var success = true;
+                            if (!('success' in result) || result['success'] !== true) {
+                                success = false;
+                                if ('errorList' in result) {
+                                    m = "Proxy update failed: " + result['errorList'].join(',');
+                                }
+                                m = "Proxy update failed, no further information";
+                            }
+                            pipelineCleanup();
+                            resultCallback({ 'name': testName,
+                                             'success': success,
+                                             'message': m });
+                        }, function(e) { protocolError(e, testName, resultCallback); });
+                    }, function(e) { protocolError(e, testName, resultCallback); });
+                }, function(e) { protocolError(e, testName, resultCallback); });
+            } catch(error) {
+                console.log("Caught exception running test sequence for protocolProxyUpdateTests");
+                console.log(error);
+                pipelineCleanup();
+                resultCallback({ 'name': testName,
+                                 'success': false,
+                                 'message': error });
+            }
+        },
+
+        /**
+         * This function exercises the following protocol rpc methods:
+         *
+         * 'pv.proxy.manager.create'
+         * 'pv.proxy.manager.update'
+         *
+         * This function checks that updating properties which don't
+         * actually exist results in the proper error message.
+         */
+        protocolProxyUpdateFailTests: function(testName, resultCallback) {
+            var s = connection.session;
+
+            try {
+                var waveletArgs = ['Wavelet', -1];
+                s.call('pv.proxy.manager.create', waveletArgs).then(function(waveletProxy) {
+                    var waveletPid = waveletProxy['id'];
+                    var clipArgs = ['Clip', waveletPid];
+                    s.call('pv.proxy.manager.create', clipArgs).then(function(clipProxy) {
+                        var updateProps = [ { "id": clipProxy['id'],
+                                              "name": "NonexistentPropertyName",
+                                              "value": "empty" },
+                                            { "id": clipProxy['id'],
+                                              "name": "AnotherFakeOne",
+                                              "value": [ 0.0, 0.0, 0.0 ] } ];
+                        s.call('pv.proxy.manager.update', [updateProps]).then(function(newProps) {
+                            var m = "protocolProxyUpdateFailTests succeeded";
+                            var success = true;
+                            if (!('errorList' in newProps)) {
+                                success = false;
+                                m = "Expected this update to return an error";
+                            }
+                            pipelineCleanup();
+                            resultCallback({ 'name': testName,
+                                             'success': success,
+                                             'message': m });
+                        }, function(e) { protocolError(e, testName, resultCallback); });
+                    }, function(e) { protocolError(e, testName, resultCallback); });
+                }, function(e) { protocolError(e, testName, resultCallback); });
+            } catch(error) {
+                console.log("Caught exception running test sequence for protocolProxyUpdateFailTests");
+                console.log(error);
+                pipelineCleanup();
+                resultCallback({ 'name': testName,
+                                 'success': false,
+                                 'message': error });
+            }
+        },
+
+        /**
+         * This function exercises the following protocol rpc methods:
+         *
+         * 'pv.proxy.manager.create'
+         * 'pv.proxy.manager.update'
+         *
+         * This test checks that getting data info with a proxy object
+         * returns the expected information.
+         */
+        protocolProxyGetDataInfoTests: function(testName, resultCallback) {
+            var s = connection.session,
+            expectedInfo =   {
+                "ACCL": {
+                    "range": {
+                        "magnitude": [ 0.0, 1.3329898584157294e-05 ],
+                        "components": [ { "range": [ -4.965284006175352e-07, 3.212448973499704e-07 ],
+                                          "name": "X"
+                                        },
+                                        { "range": [ -5.920087460253853e-07, 5.920081207477779e-07 ],
+                                          "name": "Y"
+                                        },
+                                        { "range": [ -1.3328498425835278e-05, 1.0021663911174983e-05 ],
+                                          "name": "Z"
+                                        }
+                                      ]
+                    },
+                    "type": "POINT",
+                    "name": "ACCL",
+                    "size": 3
+                },
+                "DISPL": {
+                    "range": {
+                        "magnitude": [ 0.0, 0.0 ],
+                        "components": [ { "range": [ 0.0, 0.0 ],
+                                          "name": "X"
+                                        },
+                                        { "range": [ 0.0, 0.0 ],
+                                          "name": "Y"
+                                        },
+                                        { "range": [ 0.0, 0.0 ],
+                                          "name": "Z"
+                                        }
+                                      ]
+                    },
+                    "type": "POINT",
+                    "name": "DISPL",
+                    "size": 3
+                },
+                "GlobalNodeId":  {
+                    "range": {
+                        "magnitude": [ 1.0, 10088.0 ]
+                    },
+                    "type": "POINT",
+                    "name": "GlobalNodeId",
+                    "size": 1
+                },
+                "PedigreeNodeId": {
+                    "range": {
+                        "magnitude": [ 1.0, 10088.0 ]
+                    },
+                    "type": "POINT",
+                    "name": "PedigreeNodeId",
+                    "size": 1
+                },
+                "VEL": {
+                    "range": {
+                        "magnitude": [ 0.0, 5000.0 ],
+                        "components": [ { "range": [ 0.0, 0.0 ],
+                                          "name": "X"
+                                        },
+                                        { "range": [ 0.0, 0.0 ],
+                                          "name": "Y"
+                                        },
+                                        { "range": [ -5000.0, 0.0 ],
+                                          "name": "Z"
+                                        }
+                                      ]
+                    },
+                    "type": "POINT",
+                    "name": "VEL",
+                    "size": 3
+                },
+                "EQPS": {
+                    "range": {
+                        "magnitude": [ 0.0, 0.0 ]
+                    },
+                    "type": "CELL",
+                    "name": "EQPS",
+                    "size": 1
+                },
+                "GlobalElementId": {
+                    "range": {
+                        "magnitude": [ 1.0, 7152.0 ]
+                    },
+                    "type": "CELL",
+                    "name": "GlobalElementId",
+                    "size": 1
+                },
+                "ObjectId": {
+                    "range": {
+                        "magnitude": [ 1.0, 2.0 ]
+                    },
+                    "type": "CELL",
+                    "name": "ObjectId",
+                    "size": 1
+                },
+                "PedigreeElementId": {
+                    "range": {
+                        "magnitude": [ 1.0, 7152.0 ]
+                    },
+                    "type": "CELL",
+                    "name": "PedigreeElementId",
+                    "size": 1
+                }
+            };
+
+            function compareToExpected(arrayInfo, tname, cback) {
+                var expected = expectedInfo[arrayInfo['name']];
+                if (expected['type'] !== arrayInfo['type'] ||
+                    expected['size'] !== arrayInfo['size']) {
+                    pipelineCleanup();
+                    cback({ 'name': tname,
+                            'success': false,
+                            'message': 'Size or type are not equal for ' + arrayInfo['name'] });
+                    return false;
+                }
+                if (!checkRangeEqualWithTolerance(expected['range']['magnitude'],
+                                                  arrayInfo['range']['magnitude'],
+                                                  testName,
+                                                  resultCallback,
+                                                  "Data info magnitude range for " + arrayInfo['name'] + " incorrect")) {
+                    // Only carry on if the last check was successful/true
+                    return false;
+                }
+                return true;
+            }
+
+            try {
+                s.call('pv.pipeline.manager.file.ropen', ['can.ex2']).then(function(dataProxy) {
+                    var canProxyId = dataProxy['proxy_id'];
+                    s.call('pv.proxy.manager.get', [canProxyId]).then(function(infoProxy) {
+                        var arrayData = infoProxy['data']['arrayData'];
+                        for (var i in arrayData) {
+                            var arrayInfo = arrayData[i];
+                            var ok = compareToExpected(arrayInfo, testName, resultCallback);
+                            if (ok == false) {
+                                return;
+                            }
+                        }
+                        var m = "protocolProxyGetDataInfoTests succeeded";
+                        var success = true;
+                        pipelineCleanup();
+                        resultCallback({ 'name': testName,
+                                         'success': success,
+                                         'message': m });
+                    }, function(e) { protocolError(e, testName, resultCallback); });
+                }, function(e) { protocolError(e, testName, resultCallback); });
+            } catch(error) {
+                console.log("Caught exception running test sequence for protocolProxyGetDataInfoTests");
+                console.log(error);
+                pipelineCleanup();
+                resultCallback({ 'name': testName,
+                                 'success': false,
+                                 'message': error });
+            }
+        },
+
+        /**
+         * This function exercises the following protocol rpc methods:
+         *
+         * 'pv.proxy.manager.create'
+         *
+         * This function checks that an attempt to create a proxy which is not
+         * in the allowed list generates an error response.
+         */
+        protocolProxyIllegalCreateTests: function(testName, resultCallback) {
+            var s = connection.session;
+
+            try {
+                var waveletArgs = ['Wavelet', -1];
+                s.call('pv.proxy.manager.create', waveletArgs).then(function(waveletProxy) {
+                    var waveletPid = waveletProxy['id'];
+                    var sliceArgs = ['Compute Derivatives', waveletPid];
+                    s.call('pv.proxy.manager.create', sliceArgs).then(function(whoopsError) {
+                        var m = "protocolProxyIllegalCreateTests succeeded";
+                        var success = true;
+                        if (whoopsError['success'] !== false) {
+                            success = false;
+                            m = "Expected 'Compute Derivatives' creation to return an error";
+                        }
+                        pipelineCleanup();
+                        resultCallback({ 'name': testName,
+                                         'success': success,
+                                         'message': m });
+                    }, function(e) { protocolError(e, testName, resultCallback); });
+                }, function(e) { protocolError(e, testName, resultCallback); });
+            } catch(error) {
+                console.log("Caught exception running test sequence for protocolProxyIllegalCreateTests");
+                console.log(error);
+                pipelineCleanup();
+                resultCallback({ 'name': testName,
+                                 'success': false,
+                                 'message': error });
+            }
+        },
+
+        /**
+         * This function exercises the following protocol rpc methods:
+         *
+         * 'pv.proxy.manager.available'
+         *
+         * This function checks that the 'available' rpc method returns
+         * a properly formatted list of the available sources and filters.
+         */
+        protocolProxyAvailableTests: function(testName, resultCallback) {
+            var s = connection.session,
+            expectedFilters = ["Slice", "Warp By Scalar", "Clip", "Cell Data To Point Data", "Calculator", "Transform", "Extract CTH Parts", "Reflect", "Stream Tracer", "Threshold", "Contour"],
+            expectedSources = ["Box", "Cylinder", "Sphere", "Plane", "Cone", "Annotate Time", "Wavelet"];
+
+            function findMissingElements(expected, actual) {
+                var missing = [];
+                for (var idx in expected) {
+                    if ($.inArray(expected[idx], actual) < 0) {
+                        missing.push(expectedFilters[idx]);
+                    }
+                }
+                return missing;
+            }
+
+            try {
+                s.call('pv.proxy.manager.available', ['filters']).then(function(filterList) {
+                    var missing = findMissingElements(expectedFilters, filterList);
+                    if (missing.length > 0) {
+                        pipelineCleanup();
+                        resultCallback({ 'name': testName,
+                                         'success': false,
+                                         'message': 'Missing expected filters: ' + missing.join(',') });
+                        return;
+                    }
+                    s.call('pv.proxy.manager.available', ['sources']).then(function(sourceList) {
+                        missing = findMissingElements(expectedSources, sourceList);
+                        if (missing.length > 0) {
+                            pipelineCleanup();
+                            resultCallback({ 'name': testName,
+                                             'success': false,
+                                             'message': 'Missing expected sources: ' + missing.join(',') });
+                            return;
+                        }
+                        pipelineCleanup();
+                        resultCallback({ 'name': testName,
+                                         'success': true,
+                                         'message': "protocolProxyAvailableTests succeeded" });
+                    }, function(e) { protocolError(e, testName, resultCallback); });
+                }, function(e) { protocolError(e, testName, resultCallback); });
+            } catch(error) {
+                console.log("Caught exception running test sequence for protocolProxyAvailableTests");
                 console.log(error);
                 pipelineCleanup();
                 resultCallback({ 'name': testName,

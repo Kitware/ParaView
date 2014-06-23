@@ -355,8 +355,8 @@ def getProxyDomains(id):
                    jsonDefinition[key]['order'] = orderIndex
                    orderIndex = orderIndex + 1
            except:
-               print "(Def) Error on", property
-               print "(Def) Skip property: ", str(type(data))
+               print "(Def) Error on", property, ", skipping it..."
+               #print "(Def) Skip property: ", str(type(data))
 
    return jsonDefinition
 
@@ -367,6 +367,8 @@ def extractProperty(proxy, xmlPropertyElement):
     if xmlPropertyElement.GetAttribute('number_of_elements') != None:
         propInfo['size'] = xmlPropertyElement.GetAttribute('number_of_elements')
     propInfo['type'] = xmlPropertyElement.GetName()[:-14]
+    propInfo['panel_visibility'] = xmlPropertyElement.GetAttribute('panel_visibility')
+    propInfo['number_of_elements'] = xmlPropertyElement.GetAttribute('number_of_elements')
     propInfo['domains'] = []
     if xmlPropertyElement.GetAttribute('default_values') != None:
         propInfo['default_values'] = xmlPropertyElement.GetAttribute('default_values')

@@ -81,6 +81,9 @@ def _wrap_property(proxy, smproperty):
         if  al and al.IsA("vtkSMArraySelectionDomain") and \
             smproperty.GetRepeatable():
             property = ArrayListProperty(proxy, smproperty)
+        elif  al and al.IsA("vtkSMChartSeriesSelectionDomain") and \
+            smproperty.GetRepeatable() and al.GetDefaultMode() == 1:
+            property = ArrayListProperty(proxy, smproperty)
         elif al and al.IsA("vtkSMArrayListDomain") and smproperty.GetNumberOfElements() == 5:
             property = ArraySelectionProperty(proxy, smproperty)
         else:

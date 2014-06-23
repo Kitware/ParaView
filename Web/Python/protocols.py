@@ -13,8 +13,10 @@ from autobahn.wamp import procedure as exportRpc
 import paraview
 
 from paraview import simple, servermanager
+from paraview.servermanager import ProxyProperty, InputProperty
 from paraview.web import helper
 from vtk.web import protocols as vtk_protocols
+from decorators import *
 
 from vtkWebCorePython import vtkWebInteractionEvent
 
@@ -49,7 +51,10 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
         Maps global-id for a proxy to the proxy instance. May return None if the
         id is not valid.
         """
-        id = int(id)
+        try:
+            id = int(id)
+        except:
+            return None
         if id <= 0:
             return None
         return simple.servermanager._getPyProxy(\
@@ -68,9 +73,13 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
             view = simple.GetActiveView()
 
         if not view:
-            raise Exception("no view provided: " + vid)
+            raise Exception("no view provided: " + str(vid))
 
         return view
+
+    def debug(self, msg):
+        if self.debugMode == True:
+            print msg
 
 # =============================================================================
 #
@@ -334,7 +343,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             if proxy is not None:
                 rep = simple.GetRepresentation(proxy)
                 view = self.getView(-1)
-                visibilities[proxyId] = vtkSMPVRepresentationProxy.IsScalarBarVisible(rep.SMProxy, view.SMProxy);
+                visibilities[proxyId] = vtkSMPVRepresentationProxy.IsScalarBarVisible(rep.SMProxy, view.SMProxy)
 
         return visibilities
 
@@ -370,7 +379,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         """
         type = options['type']
         proxyId = options['proxyId']
-        proxy = helper.idToProxy(proxyId)
+        proxy = self.mapIdToProxy(proxyId)
         rep = simple.GetRepresentation(proxy)
 
         status = { 'success': False }
@@ -402,66 +411,52 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
     # RpcName: colorBy => pv.color.manager.color.by
     @exportRpc("pv.color.manager.color.by")
-    def colorBy(self, options):
+    def colorBy(self, representation, colorMode, arrayLocation='POINTS', arrayName='', vectorMode='Magnitude', vectorComponent=0, rescale=False):
         """
         Choose the array to color by, and optionally specify magnitude or a
         vector component in the case of vector array.
         """
-        proxyId = options['proxyId']
-        name = options['arrayName']
-        attrType = options['attributeType']
+        locationMap = { 'POINTS': vtkDataObject.POINT, 'CELLS': vtkDataObject.CELL }
+        repProxy = self.mapIdToProxy(representation)
+        lutProxy = repProxy.LookupTable
 
-        proxy = helper.idToProxy(proxyId)
-        dataRepr = simple.GetRepresentation(proxy)
+        if colorMode == 'SOLID':
+            # No array just diffuse color
+            repProxy.ColorArrayName = ''
+        else:
+            # Select data array
+            vtkSMPVRepresentationProxy.SetScalarColoring(repProxy.SMProxy, arrayName, locationMap[arrayLocation])
+            lut = repProxy.LookupTable
+            lut.VectorMode = str(vectorMode)
+            lut.VectorComponent = int(vectorComponent)
 
-        if attrType == 'POINTS':
-            type = vtkDataObject.POINT
-        elif attrType == 'CELLS':
-            type = vtkDataObject.CELL
-
-        vtkSMPVRepresentationProxy.SetScalarColoring(dataRepr.SMProxy, name, type)
-
-        if 'vectorMode' in options:
-            lut = dataRepr.LookupTable
-            lut.VectorMode = str(options['vectorMode'])
-            if 'vectorComponent' in options:
-                lut.VectorComponent = int(options['vectorComponent'])
-
-        # FIXME: This should happen once at the time the lookup table is created
-        # Also, the False is the default, but we need it here to avoid the
-        # ambiguous call error
-        vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, name, type, False)
+            # FIXME: This should happen once at the time the lookup table is created
+            # Also, the False is the default, but we need it here to avoid the
+            # ambiguous call error
+            if rescale or (lut != lutProxy):
+                vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(repProxy.SMProxy, arrayName, locationMap[arrayLocation], False)
 
         simple.Render()
 
     # RpcName: selectColorMap => pv.color.manager.select.preset
     @exportRpc("pv.color.manager.select.preset")
-    def selectColorMap(self, options):
+    def selectColorMap(self, representation, paletteName):
         """
         Choose the color map preset to use when coloring by an array.
         """
-        proxyId = options['proxyId']
-        arrayName = str(options['arrayName'])
-        attrType = str(options['attributeType'])
-        presetName = str(options['presetName'])
+        repProxy = self.mapIdToProxy(representation)
+        colorMapText = self.findColorMapText(paletteName)
 
-        # First make sure we're coloring by the desired array
-        self.colorBy(options)
-
-        proxy = helper.idToProxy(proxyId)
-        dataRepr = simple.GetRepresentation(proxy)
-
-        colorMapText = self.findColorMapText(presetName)
         if colorMapText is not None:
-            lutProxy = dataRepr.LookupTable
+            lutProxy = repProxy.LookupTable
             if lutProxy is not None:
                 vtkSMTransferFunctionProxy.ApplyColorMap(lutProxy.SMProxy, colorMapText)
                 simple.Render()
                 return { 'result': 'success' }
             else:
-                return { 'result': 'Representation for proxy ' + proxyId + ' is missing lookup table' }
+                return { 'result': 'Representation proxy ' + representation + ' is missing lookup table' }
 
-        return { 'result': 'preset ' + presetName + ' not found' }
+        return { 'result': 'preset ' + paletteName + ' not found' }
 
     # RpcName: listColorMapNames => pv.color.manager.list.preset
     @exportRpc("pv.color.manager.list.preset")
@@ -474,6 +469,879 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         self.findColorMapText('')
         return self.colorMapNames
 
+# =============================================================================
+#
+# Proxy management protocol
+#
+# =============================================================================
+class ParaViewWebProxyManager(ParaViewWebProtocol):
+
+    VTK_DATA_TYPES = [ 'void',            # 0
+                       'bit',             # 1
+                       'char',            # 2
+                       'unsigned_char',   # 3
+                       'short',           # 4
+                       'unsigned_short',  # 5
+                       'int',             # 6
+                       'unsigned_int',    # 7
+                       'long',            # 8
+                       'unsigned_long',   # 9
+                       'float',           # 10
+                       'double',          # 11
+                       'id_type',         # 12
+                       'unspecified',     # 13
+                       'unspecified',     # 14
+                       'signed_char' ]    # 15
+
+    def __init__(self, allowedProxiesFile=None, baseDir=None, allowUnconfiguredReaders=False):
+        super(ParaViewWebProxyManager, self).__init__()
+        self.debugMode = False
+        self.fieldMap = { "0": "POINTS", "1": "CELLS" }
+        self.domainFunctionMap = { "vtkSMBooleanDomain": booleanDomainDecorator,
+                                   "vtkSMProxyListDomain": proxyListDomainDecorator,
+                                   "vtkSMIntRangeDomain": numberRangeDomainDecorator,
+                                   "vtkSMDoubleRangeDomain": numberRangeDomainDecorator,
+                                   "vtkSMArrayRangeDomain": numberRangeDomainDecorator,
+                                   "vtkSMRepresentationTypeDomain": stringListDomainDecorator,
+                                   "vtkSMStringListDomain": stringListDomainDecorator,
+                                   "vtkSMArrayListDomain": arrayListDomainDecorator,
+                                   "vtkSMArraySelectionDomain": arraySelectionDomainDecorator,
+                                   "vtkSMEnumerationDomain": enumerationDomainDecorator }
+        self.alwaysIncludeProperties = [ 'CubeAxesVisibility' ]
+        self.alwaysExcludeProperties = [ 'LookupTable', 'Texture', 'ColorArrayName',
+                                         'Representations', 'HiddenRepresentations',
+                                         'HiddenProps', 'UseTexturedBackground',
+                                         'BackgroundTexture', 'KeyLightWarmth',
+                                         'KeyLightIntensity', 'KeyLightElevation',
+                                         'KeyLightAzimuth' ]
+        self.propertyTypeMap = { 'vtkSMIntVectorProperty': 'int',
+                                 'vtkSMDoubleVectorProperty': 'float',
+                                 'vtkSMStringVectorProperty': 'str',
+                                 'vtkSMProxyProperty': 'proxy' }
+        self.allowedProxies = {}
+        self.hintsMap = { 'PropertyWidgetDecorator': { 'ClipScalarsDecorator': clipScalarDecorator },
+                          'Widget': { 'multi_line': multiLineDecorator } }
+
+        self.baseDir = baseDir
+        self.allowUnconfiguredReaders = allowUnconfiguredReaders
+
+        # If there was a proxy list file, use it, otherwise use the default
+        if allowedProxiesFile:
+            self.readAllowedProxies(allowedProxiesFile)
+        else:
+            module_path = os.path.abspath(__file__)
+            path = os.path.dirname(module_path)
+            proxyFile = os.path.join(path, 'defaultProxies.json')
+            self.readAllowedProxies(proxyFile)
+
+        self.simpleTypes = [int, float, list, str]
+        self.view = simple.GetRenderView()
+        simple.SetActiveView(self.view)
+        simple.Render()
+
+    #--------------------------------------------------------------------------
+    # Read the configured proxies json file into a dictionary and process.
+    #--------------------------------------------------------------------------
+    def readAllowedProxies(self, filepath):
+        self.availableList = {}
+        self.allowedProxies = {}
+        with open(filepath, 'r') as fd:
+            configurationData = json.load(fd)
+            self.configureFiltersOrSources('sources', configurationData['sources'])
+            self.configureFiltersOrSources('filters', configurationData['filters'])
+            self.configureReaders(configurationData['readers'])
+
+    #--------------------------------------------------------------------------
+    # Handle filters and sources sections of the proxies config file.
+    #--------------------------------------------------------------------------
+    def configureFiltersOrSources(self, key, flist):
+        list = []
+        self.availableList[key] = list
+        for item in flist:
+            if 'label' in item:
+                self.allowedProxies[item['label']] = item['name']
+                list.append(item['label'])
+            else:
+                self.allowedProxies[item['name']] = item['name']
+                list.append(item['name'])
+
+    #--------------------------------------------------------------------------
+    # Handle the readers section of the proxies config file.
+    #--------------------------------------------------------------------------
+    def configureReaders(self, rlist):
+        self.readerFactoryMap = {}
+        for config in rlist:
+            readerName = config['name']
+            readerMethod = 'FileName'
+            if 'method' in config:
+                readerMethod = config['method']
+            for ext in config['extensions']:
+                self.readerFactoryMap[ext] = [ readerName, readerMethod ]
+
+    #--------------------------------------------------------------------------
+    # Look higher up in XML heirarchy for attributes on a property (useful if
+    # a property is an exposed property).
+    #--------------------------------------------------------------------------
+    def extractParentAttributes(self, property, attributes):
+        proxy = None
+        name = ''
+        try:
+            proxy = property.SMProperty.GetParent()
+            name = proxy.GetPropertyName(property.SMProperty)
+        except:
+            try:
+                proxy = property.GetParent()
+                name = proxy.GetPropertyName(property)
+            except:
+                print 'ERROR: unable to get property parent for property ' + property.Name
+                return {}
+
+        xmlElement = servermanager.ActiveConnection.Session.GetProxyDefinitionManager().GetCollapsedProxyDefinition(proxy.GetXMLGroup(), proxy.GetXMLName(), None)
+        attrMap = {}
+
+        nbChildren = xmlElement.GetNumberOfNestedElements()
+        for i in range(nbChildren):
+            xmlChild = xmlElement.GetNestedElement(i)
+            elementName = xmlChild.GetName()
+            if elementName.endswith('Property'):
+                propName = xmlChild.GetAttribute('name')
+                if propName == name:
+                    for attrName in attributes:
+                        if xmlChild.GetAttribute(attrName):
+                            attrMap[attrName] = xmlChild.GetAttribute(attrName)
+        return attrMap
+
+    #--------------------------------------------------------------------------
+    # If we have a proxy property, gather up the xml information from the
+    # possible proxy values it can take on.
+    #--------------------------------------------------------------------------
+    def getProxyListFromProperty(self, proxy, proxyPropElement):
+        propPropName = proxyPropElement.GetAttribute('name')
+        propInstance = proxy.GetProperty(propPropName)
+        nbChildren = proxyPropElement.GetNumberOfNestedElements()
+        foundPLDChild = False
+        proxyDefMgr = servermanager.ActiveConnection.Session.GetProxyDefinitionManager()
+        for i in range(nbChildren):
+            child = proxyPropElement.GetNestedElement(i)
+            if child.GetName() == 'ProxyListDomain':
+                domain = propInstance.GetDomain(child.GetAttribute('name'))
+                foundPLDChild = True
+                for j in range(domain.GetNumberOfProxies()):
+                    subProxy = domain.GetProxy(j)
+                    pelt = proxyDefMgr.GetCollapsedProxyDefinition(subProxy.GetXMLGroup(),
+                                                                   subProxy.GetXMLName(),
+                                                                   None)
+                    self.processXmlElement(subProxy, pelt)
+        return foundPLDChild
+
+    #--------------------------------------------------------------------------
+    # Gather information from the xml associated with a proxy and properties.
+    #--------------------------------------------------------------------------
+    def processXmlElement(self, proxy, xmlElement):
+        proxyId = proxy.GetGlobalIDAsString()
+        nbChildren = xmlElement.GetNumberOfNestedElements()
+        for i in range(nbChildren):
+            xmlChild = xmlElement.GetNestedElement(i)
+            name = xmlChild.GetName()
+            nameAttr = xmlChild.GetAttribute('name')
+            detailsKey = proxyId + ':' + str(nameAttr)
+
+            infoOnly = xmlChild.GetAttribute('information_only')
+            isInternal = xmlChild.GetAttribute('is_internal')
+            panelVis = xmlChild.GetAttribute('panel_visibility')
+            numElts = xmlChild.GetAttribute('number_of_elements')
+
+            size = -1
+            informationOnly = 0
+            internal = 0
+
+            # Check for attributes that might only exist on parent xml
+            parentQueryList = []
+            if not numElts:
+                parentQueryList.append('number_of_elements')
+            else:
+                size = int(numElts)
+
+            if not infoOnly:
+                parentQueryList.append('information_only')
+            else:
+                informationOnly = int(infoOnly)
+
+            if not isInternal:
+                parentQueryList.append('is_internal')
+            else:
+                internal = int(isInternal)
+
+            # Try to retrieve those attributes from parent xml
+            parentAttrs = {}
+            if len(parentQueryList) > 0:
+                propInstance = proxy.GetProperty(nameAttr)
+                if propInstance:
+                    parentAttrs = self.extractParentAttributes(propInstance,
+                                                               parentQueryList)
+
+            if 'number_of_elements' in parentAttrs and parentAttrs['number_of_elements']:
+                size = int(parentAttrs['number_of_elements'])
+            if 'information_only' in parentAttrs and parentAttrs['information_only']:
+                informationOnly = int(parentAttrs['information_only'])
+            if 'is_internal' in parentAttrs and parentAttrs['is_internal']:
+                internal = int(parentAttrs['is_internal'])
+
+            # Now decide whether we should filter out this property
+            if ((panelVis == 'never' or informationOnly == 1 or internal == 1) and nameAttr not in self.alwaysIncludeProperties) or nameAttr in self.alwaysExcludeProperties:
+                self.debug('Filtering out property ' + str(nameAttr) + ' because panelVis is never, infoOnly is 1, isInternal is 1, or ' + str(nameAttr) + ' is an ALWAYS EXCLUDE property')
+                continue
+
+            if name == 'Hints':
+                self.debug("    ((((((((((Got the hints))))))))) ")
+                for j in range(xmlChild.GetNumberOfNestedElements()):
+                    hintChild = xmlChild.GetNestedElement(j)
+                    if hintChild.GetName() == 'Visibility':
+                        replaceInputAttr = hintChild.GetAttribute('replace_input')
+                        if replaceInputAttr:
+                            self.propertyDetailsMap['specialHints'] = { 'replaceInput': int(replaceInputAttr) }
+                            self.debug("          Replace input value: " + str(replaceInputAttr))
+            elif name == 'InputProperty':
+                continue
+            elif name == 'ProxyProperty':
+                self.debug(str(nameAttr) + ' is a proxy property')
+                if detailsKey not in self.propertyDetailsMap:
+                    self.propertyDetailsMap[detailsKey] = {'type': name, 'panelVis': panelVis, 'size': size}
+                    self.orderedNameList.append(detailsKey)
+                foundProxyListDomain = self.getProxyListFromProperty(proxy, xmlChild)
+                if foundProxyListDomain == True:
+                    self.propertyDetailsMap[detailsKey]['size'] = 1
+            elif name.endswith('Property'):
+                # Add this property to the list that will be used both to
+                # order as well as to filter the properties retrieved earlier.
+                if detailsKey not in self.propertyDetailsMap:
+                    self.propertyDetailsMap[detailsKey] = {'type': name, 'panelVis': panelVis, 'size': size}
+                    self.orderedNameList.append(detailsKey)
+            else:
+                # Don't recurse on properties that might be within a
+                # PropertyGroup unless the PropertyGroup is itself within an
+                # ExposedProperties. Later we might want to make a note in the
+                # ui properties that the properties listed within here should be
+                # grouped
+                if name != 'PropertyGroup' or xmlChild.GetParent().GetName() == "ExposedProperties":
+                    self.processXmlElement(proxy, xmlChild)
+
+    #--------------------------------------------------------------------------
+    # Entry point for the xml processing methods.
+    #--------------------------------------------------------------------------
+    def getProxyXmlDefinitions(self, proxy):
+        self.orderedNameList = []
+        self.propertyDetailsMap = {}
+        self.propertyDetailsList = []
+        proxyDefMgr = servermanager.ActiveConnection.Session.GetProxyDefinitionManager()
+        xmlElement = proxyDefMgr.GetCollapsedProxyDefinition(proxy.GetXMLGroup(),
+                                                             proxy.GetXMLName(),
+                                                             None)
+        self.processXmlElement(proxy, xmlElement)
+
+        self.debug('Length of final ordered property list: ' + str(len(self.orderedNameList)))
+        for propName in self.orderedNameList:
+            propRec = self.propertyDetailsMap[propName]
+            self.debug('Property ' + str(propName) + ', type = ' + str(propRec['type']) + ', pvis = ' + str(propRec['panelVis']) + ', size = ' + str(propRec['size']))
+
+    #--------------------------------------------------------------------------
+    # Helper function to fill in all the properties of a proxy.  Delegates
+    # properties with specific domain types to other helpers.
+    #--------------------------------------------------------------------------
+    def fillPropertyList(self, proxy_id, propertyList, dependency=None):
+        proxy = self.mapIdToProxy(proxy_id)
+        if proxy:
+            for property in proxy.ListProperties():
+                propertyName = proxy.GetProperty(property).Name
+                displayName = proxy.GetProperty(property).GetXMLLabel()
+                if propertyName in ["Refresh", "Input"] or propertyName.__contains__("Info"):
+                    continue
+
+                prop = proxy.GetProperty(property)
+                pythonProp = servermanager._wrap_property(proxy, prop)
+
+                propJson = { 'name': propertyName,
+                             'id': proxy_id,
+                             'label': displayName }
+
+                if dependency is not None:
+                    propJson['dependency'] = dependency
+
+                if type(prop) == ProxyProperty:
+                    proxyListDomain = prop.FindDomain('vtkSMProxyListDomain')
+                    if proxyListDomain:
+                        # Set the value of this ProxyProperty
+                        propJson['value'] = prop.GetProxy(0).GetXMLName()
+
+                        # Now recursively fill in properties of this proxy property
+                        for i in range(proxyListDomain.GetNumberOfProxies()):
+                            subProxy = proxyListDomain.GetProxy(i)
+                            subProxyId = subProxy.GetGlobalIDAsString()
+                            depStr = proxy_id + ':' + propertyName + ':' + subProxy.GetXMLName() + ':1'
+                            self.fillPropertyList(subProxyId, propertyList, depStr)
+                    else:
+                        # The value of this ProxyProperty is the list of proxy ids
+                        value = []
+                        for i in range(prop.GetNumberOfProxies()):
+                            p = prop.GetProxy(i)
+                            value.append(p.GetGlobalIDAsString())
+                        propJson['value'] = value
+                else:
+                    # For everything but ProxyProperty, we should just be able to call GetData()
+                    try:
+                        propJson['value'] = proxy.GetProperty(property).GetData()
+                    except AttributeError as attrErr:
+                        print 'Property ' + propertyName + ' has no GetData() method, skipping'
+                        continue
+
+                self.debug('Adding a property to the pre-sorted list: ' + str(propJson))
+                propertyList.append(propJson)
+
+    #--------------------------------------------------------------------------
+    # Make a first pass over the properties, building up a couple of data
+    # structures we can use to reorder the properties to match the xml order.
+    #--------------------------------------------------------------------------
+    def reorderProperties(self, rootProxyId, proxyProperties):
+        self.getProxyXmlDefinitions(self.mapIdToProxy(rootProxyId))
+
+        propMap = {}
+        for prop in proxyProperties:
+            propMap[prop['id'] + ':' + prop['name']] = prop
+
+        orderedList = []
+        for name in self.orderedNameList:
+            if name in propMap:
+                orderedList.append(propMap[name])
+
+        return orderedList
+
+    #--------------------------------------------------------------------------
+    # Convenience function to set a property value.  Can be extended with other
+    # special cases as the need arises.
+    #--------------------------------------------------------------------------
+    def setProperty(self, property, propertyValue):
+        if propertyValue == 'vtkProcessId':
+            property.SetElement(0, propertyValue)
+        else:
+            property.SetData(propertyValue)
+
+    #--------------------------------------------------------------------------
+    # Taken directly from helper.py, applies domains so we can see real values.
+    #--------------------------------------------------------------------------
+    def applyDomains(self, parentProxy, proxy_id):
+        """
+        This function is used to apply the domains so that queries for
+        specific values like range min and max retrieve something useful.
+        """
+        proxy = self.mapIdToProxy(proxy_id)
+
+        # Call recursively on each sub-proxy if any
+        for property_name in proxy.ListProperties():
+            prop = proxy.GetProperty(property_name)
+            if prop.IsA('vtkSMProxyProperty'):
+                try:
+                    if len(prop.Available) and prop.GetNumberOfProxies() == 1:
+                        listdomain = prop.GetDomain('proxy_list')
+                        if listdomain:
+                            for i in xrange(listdomain.GetNumberOfProxies()):
+                                internal_proxy = listdomain.GetProxy(i)
+                                self.applyDomains(parentProxy, internal_proxy.GetGlobalIDAsString())
+                except:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+
+        # Reset all properties to leverage domain capabilities
+        for prop_name in proxy.ListProperties():
+            if prop_name == 'Input':
+                continue
+            try:
+                prop = proxy.GetProperty(prop_name)
+                iter = prop.NewDomainIterator()
+                iter.Begin()
+                while not iter.IsAtEnd():
+                    domain = iter.GetDomain()
+                    iter.Next()
+
+                    try:
+                        if domain.IsA('vtkSMBoundsDomain'):
+                            domain.SetDomainValues(parentProxy.GetDataInformation().GetBounds())
+                    except AttributeError as attrErr:
+                        print 'Caught exception setting domain values in apply_domains:'
+                        print attrErr
+
+                prop.ResetToDefault()
+
+                # Need to UnRegister to handle the ref count from the NewDomainIterator
+                iter.UnRegister(None)
+            except:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                print "Unexpected error:", exc_type, " line: " , exc_tb.tb_lineno
+
+        proxy.UpdateVTKObjects()
+
+    #--------------------------------------------------------------------------
+    # Helper function to gather information about the bounds, point, and cell
+    # data.
+    #--------------------------------------------------------------------------
+    def getDataInformation(self, proxy):
+        # The stuff in here works, but only after you have created the
+        # representation.
+        dataInfo = proxy.GetDataInformation()
+
+        # Get some basic statistics about the data
+        info = { 'bounds': dataInfo.DataInformation.GetBounds(),
+                 'points': dataInfo.DataInformation.GetNumberOfPoints(),
+                 'cells': dataInfo.DataInformation.GetNumberOfCells(),
+                 'type': dataInfo.DataInformation.GetPrettyDataTypeString(),
+                 'memory': dataInfo.DataInformation.GetMemorySize() }
+
+        arrayData = []
+
+        # Get information about point data arrays
+        pdInfo = proxy.GetPointDataInformation()
+        numberOfPointArrays = pdInfo.GetNumberOfArrays()
+        for idx in xrange(numberOfPointArrays):
+            array = pdInfo.GetArray(idx)
+            numComps = array.GetNumberOfComponents()
+            typeStr = ParaViewWebProxyManager.VTK_DATA_TYPES[array.GetDataType()]
+            data = { 'name': array.Name, 'size': numComps, 'location': 'POINTS', 'type': typeStr }
+            magRange = array.GetRange(-1)
+            rangeList = []
+            if numComps > 1:
+                rangeList.append({ 'name': 'Magnitude', 'min': magRange[0], 'max': magRange[1] })
+                for i in range(numComps):
+                    ithrange = array.GetRange(i)
+                    rangeList.append({ 'name': array.GetComponentName(i),
+                                       'min': ithrange[0],
+                                       'max': ithrange[1] })
+            else:
+                rangeList.append({ 'name': '', 'min': magRange[0], 'max': magRange[1] })
+
+            data['range'] = rangeList
+            arrayData.append(data)
+
+        # Get information about cell data arrays
+        cdInfo = proxy.GetCellDataInformation()
+        numberOfCellArrays = cdInfo.GetNumberOfArrays()
+        for idx in xrange(numberOfCellArrays):
+            array = cdInfo.GetArray(idx)
+            numComps = array.GetNumberOfComponents()
+            typeStr = ParaViewWebProxyManager.VTK_DATA_TYPES[array.GetDataType()]
+            data = { 'name': array.Name, 'size': numComps, 'location': 'CELLS', 'type': typeStr }
+            magRange = array.GetRange(-1)
+            rangeList = []
+            if numComps > 1:
+                rangeList.append({ 'name': 'Magnitude', 'min': magRange[0], 'max': magRange[1] })
+                for i in range(numComps):
+                    ithrange = array.GetRange(i)
+                    rangeList.append({ 'name': array.GetComponentName(i),
+                                       'min': ithrange[0],
+                                       'max': ithrange[1] })
+            else:
+                rangeList.append({ 'name': '', 'min': magRange[1], 'max': magRange[1] })
+
+            data['range'] = rangeList
+            arrayData.append(data)
+
+        # Get field data information
+        fdInfo = dataInfo.DataInformation.GetFieldDataInformation()
+        numFieldDataArrays = fdInfo.GetNumberOfArrays()
+        for idx in xrange(numFieldDataArrays):
+            array = fdInfo.GetArrayInformation(idx)
+            numComps = array.GetNumberOfComponents()
+            typeStr = ParaViewWebProxyManager.VTK_DATA_TYPES[array.GetDataType()]
+            data = { 'name': array.GetName(), 'size': numComps, 'location': 'FIELDS', 'type': typeStr }
+            rangeList = []
+            for i in range(numComps):
+                ithrange = array.GetComponentRange(i)
+                rangeList.append({ 'name': array.GetComponentName(i),
+                                   'min': ithrange[0],
+                                   'max': ithrange[1] })
+            data['range'] = rangeList
+            arrayData.append(data)
+
+        # Time data
+        timeKeeper = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+        tsVals = timeKeeper.TimestepValues
+        if tsVals:
+            tValStrings = []
+            for tsVal in tsVals:
+                tValStrings.append(str(tsVal))
+            info['time'] = tValStrings
+        else:
+            info['time'] = []
+
+        info['arrays'] = arrayData
+        return info
+
+    #--------------------------------------------------------------------------
+    # Helper function to gather information about the coloring used by this
+    # representation proxy.
+    #--------------------------------------------------------------------------
+    def getColorInformation(self, proxy):
+        """
+        Generates a block of color information, given a representation proxy.
+
+            colorBy: {
+                'representation': '652',
+                'scalarBar': 0,
+                'mode': 'color'    # 'array'
+                'color': [ 0.5, 1.0, 1.0 ],
+                'array': [ 'POINTS', 'RTData', -1 ],
+                'colorMap': 'Blue to Red'
+            }
+        """
+
+        colorInfo = { 'representation': proxy.GetGlobalIDAsString(),
+                      'color': proxy.GetProperty('DiffuseColor').GetData() }
+
+        arrayName = proxy.GetProperty('ColorArrayName').GetArrayName()
+        self.debug('  The arrayName is: ' + str(arrayName))
+
+        if arrayName == '':
+            colorInfo['mode'] = 'color'
+            colorInfo['scalarBar'] = 0
+        else:
+            colorInfo['mode'] = 'array'
+            view = self.getView(-1)
+            sbVisible = vtkSMPVRepresentationProxy.IsScalarBarVisible(proxy.SMProxy,
+                                                                      view.SMProxy);
+            colorInfo['scalarBar'] = 1 if sbVisible else 0
+            lut = proxy.GetProperty('LookupTable').GetData()
+            component = -1
+
+            if lut.GetProperty('VectorMode').GetData() == 'Component':
+                component = lut.GetProperty('VectorComponent').GetData()
+
+            colorInfo['array'] = [proxy.GetProperty('ColorArrayName').GetAssociation(),
+                                  arrayName,
+                                  component]
+
+        return colorInfo
+
+    #--------------------------------------------------------------------------
+    # Helper function populate the ui structures list, which corresponds with
+    # with the properties list, element by element, and provides information
+    # about the ui elements needed to represent each property.
+    #--------------------------------------------------------------------------
+    def getUiProperties(self, proxyId, proxyProperties):
+        """
+        Generates an array of objects, parallel to the properties, containing
+        the information needed to render ui for each property.  Not all of the
+        following attributes will always
+
+        ui : [ {
+                 'name': 'Clip Type',
+                 'advanced': 1,                 # 0
+                 'doc': 'Documentation string for the property',
+                 'dependency': '498:ClipFunction:Sphere:1',
+                 'values': { 'Plane': '456', 'Box': '457', 'Scalar': '458', 'Sphere': '459' },
+                 'type': 'int',                    # 'float', 'int', 'str', 'proxy', 'input', ...
+                 'widget': 'textfield',            # 'checkbox', 'textarea', 'list-1', 'list-n'
+                 'size': -1,                       # -1, 0, 2, 3, 6
+                 'range': [ { 'min': 0, 'max': 1 }, { 'min': 4, 'max': 7 }, ... ]
+               }, ...
+             ]
+        """
+        uiProps = []
+
+        for proxyProp in proxyProperties:
+            uiElt = {}
+
+            proxyId = proxyProp['id']
+            propertyName = proxyProp['name']
+            proxy = self.mapIdToProxy(proxyId)
+            prop = proxy.GetProperty(propertyName)
+
+            # Get the xml details we already parsed out for this property
+            xmlProps = self.propertyDetailsMap[proxyId + ':' + propertyName]
+
+            # Set a few defaults for the ui elements, which may be overridden
+            uiElt['size'] = xmlProps['size']
+            uiElt['widget'] = 'textfield'
+            uiElt['type'] = self.propertyTypeMap[prop.GetClassName()]
+
+            doc = prop.GetDocumentation()
+            if doc:
+                uiElt['doc'] = doc.GetDescription()
+
+            uiElt['name'] = proxyProp['label']
+            proxyProp.pop('label', None)
+
+            if 'dependency' in proxyProp:
+                uiElt['depends'] = proxyProp['dependency']
+                proxyProp.pop('dependency', None)
+            if xmlProps['panelVis'] == 'advanced':
+                uiElt['advanced'] = 1
+            else:
+                uiElt['advanced'] = 0
+
+            # Iterate over the property domains until we find the interesting one
+            domainIter = prop.NewDomainIterator()
+            domainIter.Begin()
+            foundDomain = False
+            while domainIter.IsAtEnd() == 0 and foundDomain == False:
+                nextDomain = domainIter.GetDomain()
+                domainName = nextDomain.GetClassName()
+                if domainName in self.domainFunctionMap:
+                    domainFunction = self.domainFunctionMap[domainName]
+                    foundDomain = domainFunction(proxyProp, xmlProps, uiElt, nextDomain)
+                    self.debug('Processed ' + str(propertyName) + ' as domain ' + str(domainName))
+                domainIter.Next()
+
+            if foundDomain == False:
+                self.debug('  ~~~|~~~ ' + str(propertyName) + ' did not have recognized domain')
+
+            domainIter.FastDelete()
+
+            # Now get hints for the property and provide an opportunity to decorate
+            hints = prop.GetHints()
+            if hints:
+                numHints = hints.GetNumberOfNestedElements()
+                for idx in range(numHints):
+                    hint = hints.GetNestedElement(idx)
+                    if hint.GetName() in self.hintsMap:
+                        hmap = self.hintsMap[hint.GetName()]
+                        hintType = hint.GetAttribute('type')
+                        if hintType and hintType in hmap:
+                            # We're intereseted in decorating based on this hint
+                            hintFunction = hmap[hintType]
+                            hintFunction(prop, uiElt, hint)
+
+            uiProps.append(uiElt)
+
+        return uiProps
+
+    #--------------------------------------------------------------------------
+    # Helper function validates the string we get from the client to make sure
+    # it is one of the allowed proxies that has been set up on the server side.
+    #--------------------------------------------------------------------------
+    def validate(self, functionName):
+        if functionName not in self.allowedProxies:
+            return None
+        else:
+            return functionName.strip()
+
+    @exportRpc("pv.proxy.manager.create")
+    def create(self, functionName, parentId):
+        """
+        Creates a new filter/source proxy as a child of the specified
+        parent proxy.  Returns the proxy state for the newly created
+        proxy as a JSON object.
+        """
+        name = self.validate(functionName)
+
+        if not name:
+            return { 'success': False,
+                     'reason': '"' + functionName + '" was not valid and could not be evaluated' }
+
+        pid = parentId
+        parentProxy = self.mapIdToProxy(parentId)
+        if parentProxy:
+            simple.SetActiveSource(parentProxy)
+        else:
+            pid = '0'
+
+        # Create new source/filter
+        allowed = self.allowedProxies[name]
+        newProxy = paraview.simple.__dict__[allowed]()
+
+        try:
+            self.applyDomains(parentProxy, newProxy.GetGlobalIDAsString())
+        except Exception as inst:
+            print 'Caught exception applying domains:'
+            print inst
+
+        return self.get(newProxy.GetGlobalIDAsString())
+
+    @exportRpc("pv.proxy.manager.create.reader")
+    def open(self, relativePath):
+        """
+        Open relative file paths, attempting to use the file extension to select
+        from the configured readers.
+        """
+        fileToLoad = []
+        if type(relativePath) == list:
+            for file in relativePath:
+               fileToLoad.append(os.path.join(self.baseDir, file))
+        else:
+            fileToLoad.append(os.path.join(self.baseDir, relativePath))
+
+        # Get file extension and look for configured reader
+        idx = fileToLoad[0].rfind('.')
+        extension = fileToLoad[0][idx+1:]
+        readerName = None
+        if extension in self.readerFactoryMap:
+            readerName = self.readerFactoryMap[extension][0]
+            customMethod = self.readerFactoryMap[extension][1]
+
+        # Open the file(s)
+        reader = None
+        if readerName:
+            kw = { customMethod: fileToLoad }
+            reader = paraview.simple.__dict__[readerName](**kw)
+        else:
+            if self.allowUnconfiguredReaders:
+                reader = simple.OpenDataFile(fileToLoad)
+            else:
+                return { 'success': False,
+                         'reason': 'No configured reader found for ' + extension + ' files, and unconfigured readers are not enabled.' }
+
+        # Rename the reader proxy
+        name = fileToLoad[0].split("/")[-1]
+        if len(name) > 15:
+            name = name[:15] + '*'
+        simple.RenameSource(name, reader)
+
+        # Representation, view, and camera setup
+        simple.Show()
+        simple.Render()
+        simple.ResetCamera()
+
+        return { "id": reader.GetGlobalIDAsString() }
+
+    @exportRpc("pv.proxy.manager.get")
+    def get(self, proxyId):
+        """
+        Returns the proxy state for the given proxyId as a JSON object.
+        """
+        proxyProperties = []
+        proxyId = str(proxyId)
+        self.fillPropertyList(proxyId, proxyProperties)
+        proxyProperties = self.reorderProperties(proxyId, proxyProperties)
+        uiProperties = self.getUiProperties(proxyId, proxyProperties)
+        proxyJson = { 'id': proxyId, 'properties': proxyProperties, 'ui': uiProperties }
+
+        if 'specialHints' in self.propertyDetailsMap:
+            proxyJson['hints'] = self.propertyDetailsMap['specialHints']
+
+        proxy = self.mapIdToProxy(proxyId)
+
+        if proxy.SMProxy.IsA('vtkSMRepresentationProxy') == 1:
+            colorInfo = self.getColorInformation(proxy)
+            proxyJson['colorBy'] = colorInfo
+        elif proxy.SMProxy.IsA('vtkSMSourceProxy') == 1:
+            dataInfo = self.getDataInformation(proxy)
+            proxyJson['data'] = dataInfo
+
+        return proxyJson
+
+    @exportRpc("pv.proxy.manager.update")
+    def update(self, propertiesList):
+        """
+        Takes a list of properties and updates the corresponding proxies.
+        """
+        failureList = []
+        for newPropObj in propertiesList:
+            try:
+                proxyId = str(newPropObj['id'])
+                proxy = self.mapIdToProxy(proxyId)
+                propertyName = servermanager._make_name_valid(newPropObj['name'])
+                propertyValue = helper.removeUnicode(newPropObj['value'])
+                proxyProperty = servermanager._wrap_property(proxy, proxy.GetProperty(propertyName))
+                self.setProperty(proxyProperty, propertyValue)
+            except:
+                failureList.append('Unable to set property for proxy ' + proxyId + ': ' + str(newPropObj))
+
+        if len(failureList) > 0:
+            return { 'success': False,
+                     'errorList': failureList }
+
+        return { 'success': True }
+
+    @exportRpc("pv.proxy.manager.delete")
+    def delete(self, proxyId):
+        """
+        Checks if the proxy can be deleted (it is not the input to another
+        proxy), and then deletes it if so.  Returns True if the proxy was
+        deleted, False otherwise.
+        """
+        proxy = self.mapIdToProxy(proxyId)
+        canDelete = True
+        pid = '0'
+        for proxyJson in self.list()['sources']:
+            if proxyJson['parent'] == proxyId:
+                canDelete = False
+            elif proxyJson['id'] == proxyId:
+                pid = proxyJson['parent']
+        if proxy is not None and canDelete is True:
+            simple.Delete(proxy)
+            return { 'success': 1, 'id': pid }
+        return { 'success': 0, 'id': '0' }
+
+    @exportRpc("pv.proxy.manager.list")
+    def list(self, viewId=None):
+        """
+        Returns the current proxy list, specifying for each proxy it's
+        name, id, and parent (input) proxy id.  A 'parent' of '0' means
+        the proxy has no input.
+
+            { 'view': '376',
+              'sources': [
+                {'name': 'disk_out_ref', 'id': '350', 'parent': '0', 'rep': '352', 'visible': 1 },
+                {'name': 'Contour0', 'id': '455', 'parent': '350', 'rep': '319', 'visible': 0 },
+                {'name': 'Clip0', 'id': '471', 'parent': '455', 'rep': '327', 'visible': 1 },
+                {'name': 'Calc0', 'id': '221', 'multiparent': 2,
+                 'parent': '471', 'parent_1': '455', 'rep': '756', 'visible': 1 }
+              ]
+            }
+        """
+        proxies = servermanager.ProxyManager().GetProxiesInGroup("sources")
+        viewProxy = self.getView(viewId)
+        proxyObj = { 'view': viewProxy.GetGlobalIDAsString() }
+        proxyList = []
+        for key in proxies:
+            listElt = {}
+            listElt['name'] = key[0]
+            listElt['id'] = key[1]
+            proxy = proxies[key]
+
+            rep = simple.GetRepresentation(proxy=proxy, view=viewProxy)
+            listElt['rep'] = rep.GetGlobalIDAsString()
+            listElt['visible'] = rep.Visibility
+            listElt['parent'] = '0'
+            if hasattr(proxy, 'Input') and proxy.Input:
+                inputProp = proxy.Input
+                if hasattr(inputProp, 'GetNumberOfProxies'):
+                    numProxies = inputProp.GetNumberOfProxies()
+                    if numProxies > 1:
+                        listElt['multiparent'] = numProxies
+                        for inputIdx in range(numProxies):
+                            proxyId = inputProp.GetProxy(inputIdx).GetGlobalIDAsString()
+                            if inputIdx == 0:
+                                listElt['parent'] = proxyId
+                            else:
+                                listElt['parent_%d' % inputIdx] = proxyId
+                    elif numProxies == 1:
+                        listElt['parent'] = inputProp.GetProxy(0).GetGlobalIDAsString()
+                else:
+                    listElt['parent'] = inputProp.GetGlobalIDAsString()
+
+            proxyList.append(listElt)
+
+        proxyObj['sources'] = proxyList
+        return proxyObj
+
+    @exportRpc("pv.proxy.manager.available")
+    def available(self, typeOfProxy):
+        """
+        Returns a list of the available sources or filters, depending on the
+        argument typeOfProxy, which can be either 'filters' or 'sources'.  If
+        typeOfProxy is anything other than 'filter' or 'source', the empty
+        list will be returned.
+
+        Any attempt to create a source or filter not returned by this method
+        will result in an error response.  The returned list has the following
+        form:
+
+        [ 'Wavelet', 'Cone', 'Sphere', ... ]
+
+           or
+
+        [ 'Contour', 'Clip', 'Slice', ... ]
+
+        """
+        return self.availableList[typeOfProxy]
 
 # =============================================================================
 #
@@ -1087,6 +1955,9 @@ class ParaViewWebTestProtocols(ParaViewWebProtocol):
     def clearAll(self):
         simple.Disconnect()
         simple.Connect()
+        view = simple.GetRenderView()
+        simple.SetActiveView(view)
+        simple.Render()
 
     # RpcName: getColoringInfo => pv.test.color.info.get
     @exportRpc("pv.test.color.info.get")
@@ -1100,6 +1971,12 @@ class ParaViewWebTestProtocols(ParaViewWebProtocol):
         return { 'arrayName': arrayName,
                  'vectorMode': lut.VectorMode,
                  'vectorComponent': lut.VectorComponent }
+
+    @exportRpc("pv.test.repr.get")
+    def getReprFromSource(self, srcProxyId):
+        proxy = self.mapIdToProxy(srcProxyId)
+        rep = simple.GetRepresentation(proxy)
+        return { 'reprProxyId': rep.GetGlobalIDAsString() }
 
 
 # =============================================================================

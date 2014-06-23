@@ -355,25 +355,39 @@
  * Choose the array to color by, and optionally specify magnitude or a
  * vector component in the case of vector array.
  *
- * @param {Object} options
+ * @param {String} representation
  *
- * An object containing the options for scalar coloring.
+ * Required.  The id of the representation on which to change the color.
  *
- *     {
- *         'proxyId': 352,                            // integer, required
- *         'arrayName': 'DISPL'         ,             // string, required
- *         'attributeType': 'POINTS' | 'CELLS',       // string, required
- *         'vectorMode': 'Component' | 'Magnitude',   // string, optional, default is 'Magnitude'
- *         'vectorComponent': 2                       // integer, required if 'vectorMode' is 'Component'
- *     }
+ * @param {String} colorMode
  *
- * The keys 'proxyId', 'arrayName', and 'attributeType' are required.
- * Currently the only attribute types supported are 'POINTS' and 'CELLS',
- * and these should correctly correspond to the data array specified by
- * 'arrayName'.  If the array to color by is a vector quantity, the keys
- * 'vectorMode' and 'vectorComponent' can be optionally specified to
- * choose whether to color by a specific component or to use the vector
- * magnitude.
+ * Required.  Must be either 'SOLID' or 'ARRAY'.
+ *
+ * @param {String} [arrayLocation="POINTS"]
+ *
+ * Must be one of 'POINTS' or 'CELLS'.
+ *
+ * @param {String} [arrayName=""]
+ *
+ * The name of the array you wish to color by.
+ *
+ * @param {String} [vectorMode="Magnitude"]
+ *
+ * This parameter should be 'Magnitude' if you wish to color by the
+ * vector magnitude, or 'Component' if you wish to color by one of the
+ * vector components. If the array does not contain vector values, but
+ * rather scalars, then 'Magnitude' will color by the scalar value.
+ *
+ * @param {Number} [vectorComponent=0]
+ *
+ * If you wish to color by a specific component of a vector-valued array,
+ * use this parameter to specify the index of the component.
+ *
+ * @param {Boolean} [rescale=False]
+ *
+ * If True, the fuction will rescale the transfer function to the data
+ * range after selecting the array to color by.  If False, no rescale
+ * will be done.
  */
 
 /**
@@ -384,24 +398,15 @@
  *
  * Choose the color map preset to use when coloring by an array.
  *
- * @param {Object} options
+ * @param {String} representation
  *
- * An object containing the id of the desired proxy, the array name, the
- * attribute type of that array, and the name of the preset color map.  The
- * representation will be colored by the specified array name before the
- * color map is applied.
+ * The id of the representation to which you wish to apply the color map.
  *
- *     {
- *         'proxyId': 352,                      // integer, required
- *         'arrayName': 'DISPL',                // string, required
- *         'attributeType': 'POINTS',           // string, required, 'POINTS' or 'CELLS'
- *         'presetName': 'Blue to Red Rainbow'  // string, required
- *     }
+ * @param {String} paletteName
  *
- * All the above keys are required in the options to this function.  The
- * function will assign the color map to the array name on the
- * representation associated with filter/source proxy idendified by
- * 'proxyId'.
+ * The name of the color map preset you wish to apply.  This name should
+ * be chosen from the list of available color map preset which you can
+ * query by calling the #listColorMapNames function.
  *
  * @return {Object}
  *
@@ -434,6 +439,380 @@
  *         "Preset Name #2",
  *          ...
  *     ]
+ */
+
+ // =====================================================================
+
+/**
+ * @class protocols.ParaViewWebProxyManager
+ * @new
+ *
+ * This protocol allows developers to perform CRUD operations on ParaView
+ * proxies.
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method __init__
+ *
+ * Construct an instance of the proxy manager class.
+ *
+ * @param {String} [allowedProxiesFile=None]
+ *
+ * A string containing the path to a file containing a json object giving
+ * the kinds of sources, filters, and readers that can be created by the
+ * proxy manager.  If no such file is specified, a default set of
+ * capabilities will be available  The file takes the following format:
+ *
+ *     {
+ *         "sources": [
+ *
+ *             { "name": "AnnotateTime",
+ *               "label": "Annotate Time" },
+ *
+ *             { "name": "Box" },
+ *
+ *             { "name": "Wavelet" },
+ *
+ *             ...
+ *         ],
+ *
+ *         "filters": [
+ *
+ *             { "name": "Calculator" },
+ *
+ *             { "name": "CellDataToPointData",
+ *               "label": "Cell Data To Point Data" },
+ *
+ *             { "name": "Clip" },
+ *
+ *             ...
+ *         ],
+ *
+ *         "readers": [
+ *             { "name": "LegacyVTKReader",
+ *               "extensions": [ "vtk" ],
+ *               "method": "FileNames" }
+ *         ]
+ *     }
+ *
+ * Some details about the "readers" section:  The "name" attribute should be
+ * a name which will be recognized by the paraview.simple module.  If any file
+ * to be opened has an extension found in the "extensions" list, then this
+ * reader will be used to open it.  Some readers have a FileName property,
+ * others have a FileNames property, and these are used to set the
+ * filenames to be read.  If no "method" is provided in a reader
+ * configuration section, then it will be assumed that FileName should be
+ * used.
+ *
+ * @param {String} [baseDir=None]
+ *
+ * The root directory where the proxy manager should look for data files
+ * when the #open method is called.
+ *
+ * @param {Boolean} [allowUnconfiguredReaders=False]
+ *
+ * When attempting to open a file, the configured proxies file will be
+ * used to try and map a file extension to the appropriate reader.  If
+ * no such mapping is found for a file, this variable determines whether
+ * or not to use the default file opening mechanism found in the
+ * paraview.simple module.
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method get
+ *
+ * Registered as pv.proxy.manager.get
+ *
+ * Get all the information about a proxy given its global id.
+ *
+ * @param {String} proxyId
+ *
+ * The id of the proxy for which you want the details
+ *
+ * @return {Object}
+ *
+ * Returns a JSON object containing several sections: The 'properties' and 'ui'
+ * sections are parallel lists describing all the proxy properties,
+ * including information about how to render them.  The ordering of these
+ * lists corresponds to the property order as given by the proxy property
+ * xml files.
+ *
+ * If the proxyId belongs to a source or filter proxy, then a 'data'
+ * section will be included in the result, whereas if the proxyId belongs
+ * to a representation proxy, then a 'colorBy' sections will be included.
+ * Also possibly included might be a 'hints' section.  The following
+ * listing illustrates the kind of information returned by this function:
+ *
+ *     {
+ *
+ *         'id': '445',
+ *
+ *         'properties': [       ### 'properties' and 'ui' are parallel arrays
+ *             {
+ *                 'id': '635',
+ *                 'name': 'ClipFunction',
+ *                 'value': 'Plane'
+ *             }, ...
+ *         ],
+ *
+ *         'ui': [               ### 'properties' and 'ui' are parallel arrays
+ *             {
+ *                 'name': 'Clip Type',
+ *                 'advanced': 1,         # 0
+ *                 'depends': '498:ClipFunction:Plane:[1|0]',
+ *                 'doc': 'Documentation for property from xml description',
+ *                 'values': { 'Plane': '456', 'Box': '457',
+ *                             'Scalar': '458', 'Sphere': '459' },
+ *                 'type': 'int',            # 'float', 'int', 'str', 'proxy', 'input'
+ *                 'widget': 'textfield',    # 'checkbox', 'textarea', 'list-1', 'list-n'
+ *                 'size': -1,               # -1, 0, 2, 3, 6
+ *                 'range': [ { 'min': 0, 'max': 1 }, { 'min': 4, 'max': 7 }, ... ]
+ *                 # 'range' will contain a single element if 'size' is -1 or 0, and
+ *                 # will contain 'size' elements otherwise.
+ *             }, ...
+ *         ],
+ *
+ *         'data': {             ### Only present when proxyId is a source proxy id
+ *             'points': 765239,
+ *             'cells': 1272,
+ *             'type': 'Multi-Block Dataset',
+ *             'time': ['0', '1', '2', ... ],
+ *             'memory': 2171,    # in Kilobytes
+ *             'bounds': [ -10, 10, -10, 10, -5, 5 ],
+ *             'arrays': [
+ *                 {
+ *                     'location': 'POINTS',  # 'CELLS'
+ *                     'type': 'double',      # 'idtype', 'int', 'char', 'string'
+ *                     'name': 'DISPL',
+ *                     'size': 3,
+ *                     'range': [
+ *                         # if 'size' is 1, there will be only one range element
+ *                         # and it will have an empty 'name'.
+ *                         { 'min': 0, 'max': 219, 'name': 'Magnitude' },
+ *                         { 'min': 1, 'max': 100, 'name': 'X' },
+ *                         { 'min': 0, 'max': 50, 'name': 'Y' },
+ *                         { 'min': 7, 'max': 21, 'name': 'Z' }
+ *                     ]
+ *                 }, ...
+ *             ]
+ *         },
+ *
+ *         'hints': {            ### Only if proxy has 'Hints' xml with 'replace_input'
+ *             'replaceInput': 2   # 0, 1, 2, ...
+ *         },
+ *
+ *         'colorBy': {          ### Only present when proxyId is a repr proxy id
+ *             'representation': '357',
+ *             'scalarBar': 0,                        # 0, 1
+ *             'mode': 'color'                        # 'array'
+ *             'color': [ 0.5, 1.0, 1.0 ],
+ *             'array': [ 'POINTS', 'RTData', -1 ]    # only present if 'mode' is 'array'
+ *         }
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method create
+ *
+ * Registered as pv.proxy.manager.create
+ *
+ * Create a new proxy whose Input property will be the proxy given
+ * by the supplied parent proxy id.  In order to create a proxy, it
+ * must be specified in the allowed proxies configuration, see the
+ * constructor documentation for details on the structure of the
+ * proxies configuration file.
+ *
+ * @param {String} functionName
+ *
+ * The name (or label, if label existed in the proxy configuration)
+ * of the proxy to be created.
+ *
+ * @param {String} parentId
+ *
+ * The id of the proxy which should act as the input to the new proxy.
+ *
+ * @return {Object}
+ *
+ * Returns the JSON object that results from calling the #get method
+ * on the newly created proxy.  In the case that the proxy could not
+ * be created, a JSON object indicating failure and the reason why
+ * should be returned:
+ *
+ *     {
+ *         'success': False,
+ *         'reason': 'Wav3let was not valid and could not be created'
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method open
+ *
+ * Registered as pv.proxy.manager.create.reader
+ *
+ * Open a file relative to the configured base directory.  Behavior
+ * when opening files is governed by the configured proxies file, as
+ * well as the allowUnconfiguredReaders parameter to the constructor.
+ * See the constructor documentation for more information.
+ *
+ * @param {String} relativePath
+ *
+ * The relative path to the file.
+ *
+ * @return {Object}
+ *
+ * Returns a JSON object.  In the case of a successful open, the id of
+ * new reader proxy is returned:
+ *
+ *     {
+ *         'id': '561'
+ *     }
+ *
+ * In case of failure:
+ *
+ *     {
+ *         'success': False,
+ *         'reason': 'No configured reader found for vtk files, and unconfigured readers are not enabled.'
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method update
+ *
+ * Registered as pv.proxy.manager.update
+ *
+ * Update a list of properties.
+ *
+ * @param {Object[]} propertiesList
+ *
+ * A list of the properties you wish to update, which could be on
+ * the same or different proxies.  An simple example:
+ *
+ *     [
+ *         {
+ *             'id': '321',
+ *             'name': 'Radius',
+ *             'value': 3.0
+ *         },
+ *         {
+ *             'id': '416',
+ *             'name': 'ClipFunction',
+ *             'value': 'Sphere'
+ *         }, ...
+ *     ]
+ *
+ * @return {Object}
+ *
+ * Returns a JSON object indicating either success or failure.  In
+ * the case of failure, a list of reasons is included in the result,
+ * indicating a reason for any failed property updates.  For example:
+ *
+ *     {
+ *         'success': False,
+ *         'errorList': [ 'Unable to set property for proxy 317: Representations' ]
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method delete
+ *
+ * Registered as pv.proxy.manager.delete
+ *
+ * Delete a proxy, as long as it is not currently the input to any
+ * other existing proxy.
+ *
+ * @param {String} proxyId
+ *
+ * The proxy id of the proxy to be deleted.
+ *
+ * @return {Object}
+ *
+ * Returns a JSON object indicating success or failure as well as the id
+ * of the deleted proxies parent (or else '0').  A success example:
+ *
+ *     {
+ *         'success': 1,
+ *         'id': '365'
+ *     }
+ *
+ * In case of failure:
+ *
+ *     {
+ *         'success': 0,
+ *         'id': '0'
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method list
+ *
+ * Registered as pv.proxy.manager.list
+ *
+ * Return a list of all sources and filters associated to a view.
+ *
+ * @param {String} [viewId=None]
+ *
+ * If no view proxy id string is provided, the current active
+ * view will be assumed.
+ *
+ * @return {Object}
+ *
+ * Returns a JSON object describing the state of the pipeline, and
+ * including the id of the view used.  Each proxy element in the
+ * returned list will indicate its parent proxy, and in the case
+ * multiple input proxies, all of the input proxies are referred
+ * to as in the last proxy in the example below:
+ *
+ *     {
+ *         'view': '370',
+ *         'sources': [
+ *             {
+ *                 'name': 'Wavelet0', 'id': '350',  'parent': '0', 'visible': 0, 'rep': '281'
+ *             },
+ *             {
+ *                 'name': 'Clip0', 'id': '455', 'parent': '350', 'visible': 1, 'rep': '467'
+ *             },
+ *             {
+ *                 'name': 'PF1', 'id': '276', 'parent': '455', 'visible': 1, 'rep': '541'
+ *             },
+ *             {
+ *                 'name': 'ProgrammableFilter0', 'id': '641',  'multiparent': 2, 'parent': '455', 'parent_1': '276', 'visible': 0, 'rep': '716'
+ *             }, ...
+ *         ]
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebProxyManager
+ * @method available
+ *
+ * Registered as pv.proxy.manager.available
+ *
+ * Returns a list of the sources or filters which are available to be
+ * created.  See the constructor documentation for notes on how to
+ * add to the default list of sources and filters.
+ *
+ * @param {String} typeOfProxy
+ *
+ * Request either the sources or the filters list.  This parameter must
+ * be one of 'sources' or 'filters'.
+ *
+ * @return {String[]}
+ *
+ * Returns a list of the names that can be used to create sources or
+ * filters, for example:
+ *
+ *     [ 'Wavelet', 'Cone', 'Sphere', ... ]
+ *
+ * or
+ *
+ *     [ 'Contour', 'Clip', 'Slice', ... ]
  */
 
  // =====================================================================
