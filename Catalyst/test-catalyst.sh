@@ -1,6 +1,6 @@
 #!/bin/sh
 
-usage="$0 <srcdir> <builddir> [--install] [--no-configure] [--no-build] [--no-test] [--remove-dirs] --input <edition> [--input <edition>]... [--] [<cmake arguments>...]"
+usage="$0 <catalyst srcdir> <catalyst builddir> [--install] [--no-configure] [--no-build] [--no-test] [--remove-dirs] --input <edition> [--input <edition>]... [--] [<cmake arguments>...]"
 
 # A handy function for handling errors.
 die () {
@@ -21,6 +21,9 @@ editiondir="$scriptdir/Editions"
 # The output directory to catalyze into.
 src_output="$1"
 shift
+
+[ -d "$src_output/.git" ] && \
+    die "Refusing to use a git repository as the source output directory"
 
 # The output directory to build into.
 bin_output="$1"

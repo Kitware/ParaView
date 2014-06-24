@@ -321,6 +321,8 @@ def main():
   config.repo = path.strip()
 
   # cleanup output directory.
+  if os.path.exists(os.path.join(config.output_dir, '.git')):
+    error('Refusing to output into a git repository')
   shutil.rmtree(config.output_dir, ignore_errors=True)
 
   process(config)
