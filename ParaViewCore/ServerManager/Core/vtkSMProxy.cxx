@@ -1742,9 +1742,14 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
         vtkPVXMLElement *groupElement = propertyElement;
         for (unsigned int k = 0; k < groupElement->GetNumberOfNestedElements(); k++)
           {
-          this->SetupExposedProperty(groupElement->GetNestedElement(k), subproxy_name);
+          vtkPVXMLElement* subElem = groupElement->GetNestedElement(k);
+          if (strcmp(subElem->GetName(), "Hints") == 0)
+            {
+            continue;
+            }
+          this->SetupExposedProperty(subElem, subproxy_name);
           }
-     
+
         // Now create the group.
         this->NewPropertyGroup(groupElement);
         }

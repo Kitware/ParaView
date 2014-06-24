@@ -9719,6 +9719,9 @@ found and the point will be rejected.</Documentation>
                       name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
+        <Hints>
+          <WidgetHeight number_of_rows="20" />
+        </Hints>
         <Documentation>This property lists the ids of the blocks to extract
         from the input multiblock dataset.</Documentation>
       </IntVectorProperty>

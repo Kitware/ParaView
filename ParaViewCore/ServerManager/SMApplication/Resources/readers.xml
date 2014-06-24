@@ -5180,6 +5180,9 @@
             <Property name="ElementSetResultArrayStatus" />
             <Property name="PointVariables" />
             <Property name="GlobalVariables" />
+            <Hints>
+              <WidgetHeight number_of_rows="20" />
+            </Hints>
           </PropertyGroup>
           <!-- fixme - need to group these two properties -->
           <Property name="ApplyDisplacements" />

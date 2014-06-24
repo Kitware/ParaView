@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
 #include <QTreeWidget>
 
+class vtkPVXMLElement;
+class vtkSMProperty;
+class vtkSMPropertyGroup;
 /**
   A convenience QTreeWidget with extra features:
   1.  Automatic size hints based on contents
@@ -59,6 +62,9 @@ public:
   QSize sizeHint() const;
   QSize minimumSizeHint() const;
 
+  void setMaximumRowCountBeforeScrolling(vtkSMPropertyGroup *smpropertygroup);
+  void setMaximumRowCountBeforeScrolling(vtkSMProperty *smproperty);
+  void setMaximumRowCountBeforeScrolling(vtkPVXMLElement* hints);
   void setMaximumRowCountBeforeScrolling(int val)
     { this->MaximumRowCountBeforeScrolling = val; }
   int maximumRowCountBeforeScrolling() const

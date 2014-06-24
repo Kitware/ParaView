@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -96,7 +96,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       multiline_text = true;
       }
     }
-  
+
   // find the domain(s)
   vtkSMEnumerationDomain *enumerationDomain = 0;
   vtkSMFileListDomain *fileListDomain = 0;
@@ -203,7 +203,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       selectorWidget->setObjectName("ArraySelectionWidget");
       selectorWidget->setRootIsDecorated(false);
       selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
-      selectorWidget->setMaximumRowCountBeforeScrolling(20);
+      selectorWidget->setMaximumRowCountBeforeScrolling(smProperty);
 
       // hide widget label
       this->setShowLabel(false);
@@ -303,7 +303,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     selectorWidget->setObjectName("ArraySelectionWidget");
     selectorWidget->setRootIsDecorated(false);
     selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
-    selectorWidget->setMaximumRowCountBeforeScrolling(20);
+    selectorWidget->setMaximumRowCountBeforeScrolling(smProperty);
+
     this->addPropertyLink(
       selectorWidget, smProxy->GetPropertyName(smProperty),
       SIGNAL(widgetModified()), smProperty);
