@@ -891,6 +891,11 @@ bool vtkSMSettings::AddCollectionFromString(const std::string & settings,
     this->Internal->SettingCollectionsAreSorted = false;
     return true;
     }
+  else
+    {
+    vtkErrorMacro(<< "Failed to parse settings from JSON" << endl
+                  << processedSettings << endl);
+    }
 
   return false;
 }
