@@ -185,6 +185,230 @@
  // =====================================================================
 
 /**
+ * @class protocols.ParaViewWebColorManager
+ * @new
+ *
+ * This protocol handles interactions related to color management on
+ * pipeline nodes.
+ */
+
+/**
+ * @member protocols.ParaViewWebColorManager
+ * @method __init__
+ *
+ * The constructor allows to specify the location of a file containing
+ * the color map presets that should be used.  This is an xml file with the
+ * following format:
+ *
+ *     <ColorMaps>
+ *         <ColorMap space="HSV" indexedLookup="false" name="Blue to Red Rainbow">
+ *             <Point x="0" o="0" r="0" g="0" b="1"/>
+ *             <Point x="1" o="0" r="1" g="0" b="0"/>
+ *             <NaN r="0.498039" g="0.498039" b="0.498039"/>
+ *         </ColorMap>
+ *         ...
+ *     </ColorMaps>
+ *
+ * @param {String} pathToColorMaps
+ *
+ * A string containing the path to the desired color maps file.  If none
+ * is specified, then the set of color maps typically used in ParaView
+ * is provided by default.
+ */
+
+/**
+ * @member protocols.ParaViewWebColorManager
+ * @method rescaleTransferFunction
+ *
+ * Rescale the color transfer function to fit either the data range,
+ * the data range over time, or to a custom range, for the array by
+ * which the representation is currently being colored.
+ *
+ * @param {Object} options
+ *
+ * An object containing the desired options for the transfer function
+ * rescale.  Possibilities are to rescale to the entire time series,
+ * just to the data, or to a custom range.  If the 'extend' option is
+ * true, then the range will only be extended, and then only if needed.
+ * The default for the 'extend' option is false, which will allow
+ * rescaling of the range that results in a contraction of the currently
+ * set color range.
+ *
+ *     options = {
+ *         'type': 'time' | 'data' | 'custom',  // string, required
+ *         'proxyId': 352,                      // integer, required
+ *         'extend': true | false,              // boolean, optional, default is false
+ *         'min': 10,                           // float, required for 'custom'
+ *         'max': 90                            // float, required for 'custom'
+ *     }
+ *
+ * The keys 'type' and 'proxyId' are required.  The key 'extend' is
+ * optional, but is only used if 'type' is 'data' or 'custom', and
+ * is ignored 'type' is time.  If not provided, 'extend' defaults
+ * to false.  The keys 'min' and 'max' are required if 'type' is
+ * 'custom', and it is an error if they are not provided.
+ *
+ * @return {Object} status
+ *
+ * Returns an object which contains at least the key 'success' mapping
+ * to either true or false.
+ *
+ *     status = {
+ *         'success': true | false
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebColorManager
+ * @method getScalarBarVisibilities
+ *
+ * Returns whether or not each specified scalar bar is visible
+ *
+ * @param {Object} proxies
+ *
+ * This parameter can actually be either a list:
+ *
+ *     [ '253', '457', '631' ]
+ *
+ * or a dictionary, where the values will be ignored:
+ *
+ *     {
+ *         '253': '',
+ *         '457': '',
+ *         '631': ''
+ *     }
+ *
+ * @return {Object} visibilities
+ *
+ * Returns a dictionary mapping each proxyId specified in the parameter
+ * to a boolean value indicating whether the scalar bar is visible for
+ * the representation given by the proxy id and the current view.  This
+ * object will have the form of the dictionary parameter documented for
+ * this method.
+ */
+
+/**
+ * @member protocols.ParaViewWebColorManager
+ * @method setScalarBarVisibilities
+ *
+ * Sets the visibility of the scalar bar corresponding to each specified
+ * proxy.  The representation for each proxy is found using the
+ * filter/source proxy id and the current view.
+ *
+ * Note that all proxies colored by the same array name share a color
+ * transfer function (lookup table), and therefore also share a scalar
+ * bar representation, so the behavior is undefined if you specify that
+ * multiple proxy ids should have different scalar bar visibilities when
+ * they are all being colored by the same array name.  Additionally, if
+ * you turn on scalar bar visibility for one proxy, then all proxies
+ * being colored by the same array name will appear to have their
+ * scalar bars turned on as well.
+ *
+ * @param {Object} visibilities
+ *
+ * A map containing the proxy ids as keys and the desired visibilities of the
+ * corresponding scalar bars as values.
+ *
+ *     visibilities = {
+ *         '253': true,
+ *         '457': false,
+ *         '631': true
+ *     }
+ *
+ * @return {Object} visibilities
+ *
+ * Returns an object of the same form as the parameter, where the boolean
+ * values are determined by the actual visibilities of the scalar bars
+ * for each proxy, as determined after the attempted set operation.
+ */
+
+/**
+ * @member protocols.ParaViewWebColorManager
+ * @method colorBy
+ *
+ * Choose the array to color by, and optionally specify magnitude or a
+ * vector component in the case of vector array.
+ *
+ * @param {Object} options
+ *
+ * An object containing the options for scalar coloring.
+ *
+ *     {
+ *         'proxyId': 352,                            // integer, required
+ *         'arrayName': 'DISPL'         ,             // string, required
+ *         'attributeType': 'POINTS' | 'CELLS',       // string, required
+ *         'vectorMode': 'Component' | 'Magnitude',   // string, optional, default is 'Magnitude'
+ *         'vectorComponent': 2                       // integer, required if 'vectorMode' is 'Component'
+ *     }
+ *
+ * The keys 'proxyId', 'arrayName', and 'attributeType' are required.
+ * Currently the only attribute types supported are 'POINTS' and 'CELLS',
+ * and these should correctly correspond to the data array specified by
+ * 'arrayName'.  If the array to color by is a vector quantity, the keys
+ * 'vectorMode' and 'vectorComponent' can be optionally specified to
+ * choose whether to color by a specific component or to use the vector
+ * magnitude.
+ */
+
+/**
+ * @member protocols.ParaViewWebColorManager
+ * @method selectColorMap
+ *
+ * Choose the color map preset to use when coloring by an array.
+ *
+ * @param {Object} options
+ *
+ * An object containing the id of the desired proxy, the array name, the
+ * attribute type of that array, and the name of the preset color map.  The
+ * representation will be colored by the specified array name before the
+ * color map is applied.
+ *
+ *     {
+ *         'proxyId': 352,                      // integer, required
+ *         'arrayName': 'DISPL',                // string, required
+ *         'attributeType': 'POINTS',           // string, required, 'POINTS' or 'CELLS'
+ *         'presetName': 'Blue to Red Rainbow'  // string, required
+ *     }
+ *
+ * All the above keys are required in the options to this function.  The
+ * function will assign the color map to the array name on the
+ * representation associated with filter/source proxy idendified by
+ * 'proxyId'.
+ *
+ * @return {Object}
+ *
+ * An object containing the results, at least the 'result' key will
+ * be present, but also more information may be provided.
+ *
+ *     {
+ *         'result': 'success' | 'preset nameOfPresetColorMap not found'
+ *     }
+ */
+
+/**
+ * @member protocols.ParaViewWebColorManager
+ * @method listColorMapNames
+ *
+ * List the names of all color map presets available on the server.  This
+ * list will contain the names of any presets you provided in the file
+ * you supplied to the constructor of this protocol.
+ *
+ * @return {String[]}
+ *
+ * A list of strings naming the individual color map presets that are
+ * available.  These are the names you can successfuly use when you invoke
+ * the rpc method 'selectColorMap'.
+ *
+ *     [
+ *         "Preset Name #1",
+ *         "Preset Name #2",
+ *          ...
+ *     ]
+ */
+
+ // =====================================================================
+
+/**
  * @class protocols.ParaViewWebPipelineManager
  *
  * This protocol handle PipelineBrowser interactions

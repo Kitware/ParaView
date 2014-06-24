@@ -24,6 +24,8 @@
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkTuple.h"
 
 #include <algorithm>
@@ -646,6 +648,20 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
   xml->AddNestedElement(nan.GetPointer());
 
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::IsScalarBarVisible(vtkSMProxy* view)
+{
+  if (vtkSMProxy* sbProxy = this->FindScalarBarRepresentation(view))
+    {
+    if (vtkSMPropertyHelper(sbProxy, "Visibility").GetAsInt() == 1)
+      {
+      return true;
+      }
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

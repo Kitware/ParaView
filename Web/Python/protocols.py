@@ -11,14 +11,26 @@ from autobahn.wamp import exportRpc
 
 # import paraview modules.
 import paraview
-# for 4.1 compatibility till we fix ColorArrayName and ColorAttributeType usage.
-paraview.compatibility.major = 4
-paraview.compatibility.minor = 1
 from paraview import simple, servermanager
 from paraview.web import helper
 from vtk.web import protocols as vtk_protocols
 
 from vtkWebCorePython import vtkWebInteractionEvent
+
+# Needed for:
+#    vtkSMPVRepresentationProxy
+#    vtkSMTransferFunctionProxy
+#    vtkSMTransferFunctionManager
+from vtkPVServerManagerRenderingPython import *
+
+# Needed for:
+#    vtkSMProxyManager
+from vtkPVServerManagerCorePython import *
+
+# Needed for:
+#    vtkDataObject
+from vtkCommonDataModelPython import *
+
 
 # =============================================================================
 #
@@ -258,6 +270,197 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
 
 # =============================================================================
 #
+# Color management
+#
+# =============================================================================
+
+class ParaViewWebColorManager(ParaViewWebProtocol):
+
+    def __init__(self, pathToColorMaps=None):
+        super(ParaViewWebColorManager, self).__init__()
+        self.colorMapNames = []
+        if pathToColorMaps is not None:
+            self.pathToLuts = pathToColorMaps
+        else:
+            module_path = os.path.abspath(__file__)
+            path = os.path.dirname(module_path)
+            self.pathToLuts = os.path.join(path, '..', 'ColorMaps.xml')
+
+    # Rather than keeping a map of these xml strings in memory, it's very
+    # quick to just scan the file when we need a color map.  This is a
+    # convenience function to read the colormaps file and find the one
+    # associated with a particular name, then return it as xml text.  Also
+    # builds a list of preset color names and stores them in an instance
+    # variable.
+    def findColorMapText(self, colorMapName):
+        content = None
+        self.colorMapNames = []
+        with open(self.pathToLuts, 'r') as fd:
+            content = fd.read()
+            if content is not None:
+                colorMapMatcher = re.compile('(<ColorMap.+?(?=</ColorMap>)</ColorMap>)', re.DOTALL)
+                nameMatcher = re.compile('name="([^"]+)"')
+                iterator = colorMapMatcher.finditer(content)
+                for match in iterator:
+                    colorMap = match.group(1)
+                    m = nameMatcher.search(colorMap)
+                    if m:
+                        mapName = m.group(1)
+                        self.colorMapNames.append(mapName)
+                        if mapName == colorMapName:
+                            return colorMap
+
+        return None
+
+    @exportRpc("getScalarBarVisibilities")
+    def getScalarBarVisibilities(self, proxyIdList):
+        """
+        Returns whether or not each specified scalar bar is visible.
+        """
+        visibilities = {}
+        for proxyId in proxyIdList:
+            proxy = self.mapIdToProxy(proxyId)
+            if proxy is not None:
+                rep = simple.GetRepresentation(proxy)
+                view = self.getView(-1)
+                visibilities[proxyId] = vtkSMPVRepresentationProxy.IsScalarBarVisible(rep.SMProxy, view.SMProxy);
+
+        return visibilities
+
+    @exportRpc("setScalarBarVisibilities")
+    def setScalarBarVisibilities(self, proxyIdMap):
+        """
+        Sets the visibility of the scalar bar corresponding to each specified
+        proxy.  The representation for each proxy is found using the
+        filter/source proxy id and the current view.
+        """
+        visibilities = {}
+        for proxyId in proxyIdMap:
+            proxy = self.mapIdToProxy(proxyId)
+            if proxy is not None:
+                rep = simple.GetDisplayProperties(proxy)
+                view = self.getView(-1)
+                vtkSMPVRepresentationProxy.SetScalarBarVisibility(rep.SMProxy,
+                                                                  view.SMProxy,
+                                                                  proxyIdMap[proxyId])
+                visibilities[proxyId] = vtkSMPVRepresentationProxy.IsScalarBarVisible(rep.SMProxy,
+                                                                                      view.SMProxy);
+
+        return visibilities
+
+    @exportRpc("rescaleTransferFunction")
+    def rescaleTransferFunction(self, options):
+        """
+        Rescale the color transfer function to fit either the data range,
+        the data range over time, or to a custom range, for the array by
+        which the representation is currently being colored.
+        """
+        type = options['type']
+        proxyId = options['proxyId']
+        proxy = helper.idToProxy(proxyId)
+        rep = simple.GetRepresentation(proxy)
+
+        status = { 'success': False }
+
+        if type == 'time':
+            status['success'] = \
+                vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRangeOverTime(rep.SMProxy)
+        elif type == 'data':
+            extend = False
+            if 'extend' in options:
+                extend = options['extend']
+            status['success'] = \
+                vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(rep.SMProxy, extend)
+        elif type == 'custom':
+            rangemin = float(options['min'])
+            rangemax = float(options['max'])
+            extend = False
+            if 'extend' in options:
+                extend = options['extend']
+            lookupTable = rep.LookupTable
+            if lookupTable is not None:
+                status['success'] = \
+                    vtkSMTransferFunctionProxy.RescaleTransferFunction(lookupTable.SMProxy,
+                                                                       rangemin,
+                                                                       rangemax,
+                                                                       extend)
+
+        return status
+
+    @exportRpc("colorBy")
+    def colorBy(self, options):
+        """
+        Choose the array to color by, and optionally specify magnitude or a
+        vector component in the case of vector array.
+        """
+        proxyId = options['proxyId']
+        name = options['arrayName']
+        attrType = options['attributeType']
+
+        proxy = helper.idToProxy(proxyId)
+        dataRepr = simple.GetRepresentation(proxy)
+
+        if attrType == 'POINTS':
+            type = vtkDataObject.POINT
+        elif attrType == 'CELLS':
+            type = vtkDataObject.CELL
+
+        vtkSMPVRepresentationProxy.SetScalarColoring(dataRepr.SMProxy, name, type)
+
+        if 'vectorMode' in options:
+            lut = dataRepr.LookupTable
+            lut.VectorMode = str(options['vectorMode'])
+            if 'vectorComponent' in options:
+                lut.VectorComponent = int(options['vectorComponent'])
+
+        # FIXME: This should happen once at the time the lookup table is created
+        # Also, the False is the default, but we need it here to avoid the
+        # ambiguous call error
+        vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, name, type, False)
+
+        simple.Render()
+
+    @exportRpc("selectColorMap")
+    def selectColorMap(self, options):
+        """
+        Choose the color map preset to use when coloring by an array.
+        """
+        proxyId = options['proxyId']
+        arrayName = str(options['arrayName'])
+        attrType = str(options['attributeType'])
+        presetName = str(options['presetName'])
+
+        # First make sure we're coloring by the desired array
+        self.colorBy(options)
+
+        proxy = helper.idToProxy(proxyId)
+        dataRepr = simple.GetRepresentation(proxy)
+
+        colorMapText = self.findColorMapText(presetName)
+        if colorMapText is not None:
+            lutProxy = dataRepr.LookupTable
+            if lutProxy is not None:
+                vtkSMTransferFunctionProxy.ApplyColorMap(lutProxy.SMProxy, colorMapText)
+                simple.Render()
+                return { 'result': 'success' }
+            else:
+                return { 'result': 'Representation for proxy ' + proxyId + ' is missing lookup table' }
+
+        return { 'result': 'preset ' + presetName + ' not found' }
+
+    @exportRpc("listColorMapNames")
+    def listColorMapNames(self):
+        """
+        List the names of all color map presets available on the server.  This
+        list will contain the names of any presets you provided in the file you
+        supplied to the constructor of this protocol.
+        """
+        self.findColorMapText('')
+        return self.colorMapNames
+
+
+# =============================================================================
+#
 # Pipeline manager
 #
 # =============================================================================
@@ -268,18 +471,21 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         super(ParaViewWebPipelineManager, self).__init__()
         # Setup global variables
         self.pipeline = helper.Pipeline('Kitware')
-        self.lutManager = helper.LookupTableManager()
         self.view = simple.GetRenderView()
         self.baseDir = baseDir;
         simple.SetActiveView(self.view)
         simple.Render()
-        self.view.ViewSize = [800,800]
-        self.lutManager.setView(self.view)
         if fileToLoad and fileToLoad[-5:] != '.pvsm':
             try:
                 self.openFile(fileToLoad)
             except:
                 print "error loading..."
+
+    def getColorTransferFunction(self, arrayName):
+        proxyMgr = vtkSMProxyManager.GetProxyManager()
+        sessionProxyMgr = proxyMgr.GetActiveSessionProxyManager()
+        lutMgr = vtkSMTransferFunctionManager()
+        return lutMgr.GetColorTransferFunction(arrayName, sessionProxyMgr)
 
     @exportRpc("reloadPipeline")
     def reloadPipeline(self):
@@ -293,13 +499,13 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
             parentId = helper.getParentProxyId(proxy)
             self.pipeline.addNode(parentId, id)
 
-        return self.pipeline.getRootNode(self.lutManager)
+        return self.pipeline.getRootNode(self.getView(-1))
 
     @exportRpc("getPipeline")
     def getPipeline(self):
         if self.pipeline.isEmpty():
             return self.reloadPipeline()
-        return self.pipeline.getRootNode(self.lutManager)
+        return self.pipeline.getRootNode(self.getView(-1))
 
     @exportRpc("addSource")
     def addSource(self, algo_name, parent):
@@ -325,13 +531,8 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         # Handle domains
         helper.apply_domains(parentProxy, newProxy.GetGlobalIDAsString())
 
-        # Create LUT if need be
-        if pid == '0':
-            self.lutManager.registerFieldData(newProxy.GetPointDataInformation())
-            self.lutManager.registerFieldData(newProxy.GetCellDataInformation())
-
         # Return the newly created proxy pipeline node
-        return helper.getProxyAsPipelineNode(newProxy.GetGlobalIDAsString(), self.lutManager)
+        return helper.getProxyAsPipelineNode(newProxy.GetGlobalIDAsString(), self.getView(-1))
 
     @exportRpc("deleteSource")
     def deleteSource(self, proxy_id):
@@ -342,30 +543,23 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
 
     @exportRpc("updateDisplayProperty")
     def updateDisplayProperty(self, options):
-        proxy = helper.idToProxy(options['proxy_id']);
+        proxy = helper.idToProxy(options['proxy_id'])
         rep = simple.GetDisplayProperties(proxy)
         helper.updateProxyProperties(rep, options)
 
-        # Try to bind the proper lookup table if need be
         if options.has_key('ColorArrayName') and len(options['ColorArrayName']) > 0:
             name = options['ColorArrayName']
             type = options['ColorAttributeType']
-            nbComp = 1
 
             if type == 'POINT_DATA':
-                data = rep.GetRepresentedDataInformation().GetPointDataInformation()
-                for i in range(data.GetNumberOfArrays()):
-                    array = data.GetArrayInformation(i)
-                    if array.GetName() == name:
-                        nbComp = array.GetNumberOfComponents()
+                attr_type = vtkDataObject.POINT
             elif type == 'CELL_DATA':
-                data = rep.GetRepresentedDataInformation().GetCellDataInformation()
-                for i in range(data.GetNumberOfArrays()):
-                    array = data.GetArrayInformation(i)
-                    if array.GetName() == name:
-                        nbComp = array.GetNumberOfComponents()
-            lut = self.lutManager.getLookupTable(name, nbComp)
-            rep.LookupTable = lut
+                attr_type = vtkDataObject.CELL
+
+            dataRepr = simple.GetRepresentation(proxy)
+
+            vtkSMPVRepresentationProxy.SetScalarColoring(dataRepr.SMProxy, name, attr_type)
+            vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, name, attr_type, True)
 
         simple.Render()
 
@@ -381,7 +575,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
             simple.Render()
 
         if proxy_type == 'proxy':
-            return helper.getProxyAsPipelineNode(state['proxy'], self.lutManager)
+            return helper.getProxyAsPipelineNode(state['proxy'], self.getView(-1))
         elif proxy_type == 'widget_source':
             proxy.UpdateWidget(proxy.Observed)
 
@@ -396,11 +590,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         # Add node to pipeline
         self.pipeline.addNode('0', reader.GetGlobalIDAsString())
 
-        # Create LUT if need be
-        self.lutManager.registerFieldData(reader.GetPointDataInformation())
-        self.lutManager.registerFieldData(reader.GetCellDataInformation())
-
-        return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.lutManager)
+        return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.getView(-1))
 
     @exportRpc("openRelativeFile")
     def openRelativeFile(self, relativePath):
@@ -423,35 +613,63 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         # Add node to pipeline
         self.pipeline.addNode('0', reader.GetGlobalIDAsString())
 
-        # Create LUT if need be
-        self.lutManager.registerFieldData(reader.GetPointDataInformation())
-        self.lutManager.registerFieldData(reader.GetCellDataInformation())
-
-        return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.lutManager)
+        return helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), self.getView(-1))
 
     @exportRpc("updateScalarbarVisibility")
     def updateScalarbarVisibility(self, options):
-        # Remove unicode
+        lutMgr = vtkSMTransferFunctionManager()
+        lutMap = {}
+        view = self.getView(-1)
         if options:
-            for lut in options.values():
+            for key, lut in options.iteritems():
+                visibility = lut['enabled']
                 if type(lut['name']) == unicode:
                     lut['name'] = str(lut['name'])
-                self.lutManager.enableScalarBar(lut['name'], lut['size'], lut['enabled'])
-        return self.lutManager.getScalarbarVisibility()
+                parts = key.split('_')
+                arrayName = parts[0]
+                numComps = int(parts[1])
+
+                lutProxy = self.getColorTransferFunction(arrayName)
+                barRep = servermanager._getPyProxy(lutMgr.GetScalarBarRepresentation(lutProxy, view.SMProxy))
+
+                if visibility == 1:
+                    barRep.Visibility = 1
+                    barRep.Enabled = 1
+                    barRep.Title = arrayName
+                    if numComps > 1:
+                        barRep.ComponentTitle = 'Magnitude'
+                    else:
+                        barRep.ComponentTitle = ''
+                    vtkSMScalarBarWidgetRepresentationProxy.PlaceInView(barRep.SMProxy, view.SMProxy)
+                else:
+                    barRep.Visibility = 0
+                    barRep.Enabled = 0
+
+                lutMap[key] = { 'lutId': lut['name'],
+                                        'name': arrayName,
+                                        'size': numComps,
+                                        'enabled': visibility }
+        return lutMap
 
     @exportRpc("updateScalarRange")
     def updateScalarRange(self, proxyId):
         proxy = self.mapIdToProxy(proxyId);
-        self.lutManager.registerFieldData(proxy.GetPointDataInformation())
-        self.lutManager.registerFieldData(proxy.GetCellDataInformation())
+        dataRepr = simple.GetRepresentation(proxy)
+        vtkSMPVRepresentationProxy.RescaleTransferFunctionToDataRange(dataRepr.SMProxy, False)
 
     @exportRpc("setLutDataRange")
     def setLutDataRange(self, name, number_of_components, customRange):
-        self.lutManager.setDataRange(name, number_of_components, customRange)
+        lut = self.getColorTransferFunction(name)
+        vtkSMTransferFunctionProxy.RescaleTransferFunction(lut, customRange[0],
+                                                           customRange[1], False)
 
     @exportRpc("getLutDataRange")
     def getLutDataRange(self, name, number_of_components):
-        return self.lutManager.getDataRange(name, number_of_components)
+        lut = self.getColorTransferFunction(name)
+        rgbPoints = lut.GetProperty('RGBPoints')
+        return [ rgbPoints.GetElement(0),
+                 rgbPoints.GetElement(rgbPoints.GetNumberOfElements() - 4) ]
+
 
 # =============================================================================
 #
@@ -817,6 +1035,32 @@ class ParaViewWebExportData(ParaViewWebProtocol):
             writer = simple.DataSetWriter(Input=proxy, FileName=fullpath)
             writer.UpdatePipeline()
             del writer
+
+# =============================================================================
+#
+# Protocols useful only for testing purposes
+#
+# =============================================================================
+
+class ParaViewWebTestProtocols(ParaViewWebProtocol):
+
+    @exportRpc("clearAll")
+    def clearAll(self):
+        simple.Disconnect()
+        simple.Connect()
+
+    @exportRpc("getColoringInfo")
+    def getColoringInfo(self, proxyId):
+        proxy = self.mapIdToProxy(proxyId)
+        rep = simple.GetRepresentation(proxy)
+        lut = rep.LookupTable
+        arrayInfo = rep.GetArrayInformationForColorArray()
+        arrayName = arrayInfo.GetName()
+
+        return { 'arrayName': arrayName,
+                 'vectorMode': lut.VectorMode,
+                 'vectorComponent': lut.VectorComponent }
+
 
 # =============================================================================
 #

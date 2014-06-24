@@ -177,6 +177,17 @@ public:
     }
 
   // Description:
+  // Check scalar bar visibility.  Return true if the scalar bar for this
+  // representation and view is visible, return false otherwise.
+  virtual bool IsScalarBarVisible(vtkSMProxy* view);
+  static bool IsScalarBarVisible(vtkSMProxy* repr, vtkSMProxy* view)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(repr);
+    return self? self->IsScalarBarVisible(view) : false;
+    }
+
+  // Description:
   // Returns the array information for the data array used for scalar coloring,
   // if any. Otherwise returns NULL.
   virtual vtkPVArrayInformation* GetArrayInformationForColorArray();

@@ -147,6 +147,22 @@ public:
     }
 
   // Description:
+  // Return true if the representation corresponding to the transfer function
+  // for the view is showing a Scalar-Bar (Color Legend).  Otherwise return
+  // false.
+  virtual bool IsScalarBarVisible(vtkSMProxy* view);
+
+  // Description:
+  // Safely call IsScalarBarVisible(..) after casting the proxy to the
+  // appropriate type.
+  static bool IsScalarBarVisible(vtkSMProxy* proxy, vtkSMProxy* view)
+    {
+    vtkSMTransferFunctionProxy* self =
+      vtkSMTransferFunctionProxy::SafeDownCast(proxy);
+    return self? self->IsScalarBarVisible(view) : false;
+    }
+
+  // Description:
   // Find and return the Scalar-Bar (Color Legend) representation corresponding
   // to the transfer function for the view, if any. This returns the proxy if
   // one exists, it won't create a new one.
