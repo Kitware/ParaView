@@ -138,6 +138,10 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
     {
     for (int n = 0; n < this->NumberOfMaterials; n ++) 
       {
+      if (this->Markers[n].NumMarks <= 0)
+        {
+        continue;
+        }
       this->MarkersDumps[n].XLoc->Delete ();
       this->MarkersDumps[n].ILoc->Delete ();
       if (this->NumberOfDimensions > 1)

@@ -929,7 +929,7 @@ int vtkSpyPlotReader::RequestData(
       if (uniReader->GetMarkersOn () == false) 
         {
         // no markers available in this file, don't bother.
-        break;
+        continue;
         }
       int mat = uniReader->GetNumberOfMaterials ();
       if (mat > maxMat) 
@@ -952,7 +952,7 @@ int vtkSpyPlotReader::RequestData(
       if (uniReader->GetMarkersOn () == false) 
         {
         // no markers available in this file, don't bother.
-        break;
+        continue;
         }
       this->PrepareMarkers (mbds, uniReader);
       }
@@ -2214,17 +2214,48 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
 {
   for (int m = 0; m < reader->GetNumberOfMaterials (); m ++)
     {
+    if (reader->Markers[m].NumMarks <= 0)
+      {
+      continue;
+      }
     vtkPolyData* poly = vtkPolyData::SafeDownCast (mbds->GetBlock (m));
-    vtkPoints* points = poly->GetPoints ();
     vtkPointData* pd = poly->GetPointData ();
-    vtkIntArray* location = vtkIntArray::SafeDownCast (pd->GetArray ("Location"));
-    vtkIntArray* blockId = vtkIntArray::SafeDownCast (pd->GetArray ("BlockId"));
 
-    int offset = points->GetNumberOfPoints ();
+    vtkPoints* oldPoints = poly->GetPoints ();
+    vtkIntArray* oldLocation = vtkIntArray::SafeDownCast (pd->GetArray ("Location"));
+    vtkIntArray* oldBlockId = vtkIntArray::SafeDownCast (pd->GetArray ("BlockId"));
+
+    int offset = oldPoints->GetNumberOfPoints ();
     int length = offset + reader->Markers[m].NumRealMarks;
+
+    vtkPoints* points = vtkPoints::New ();
     points->SetNumberOfPoints (length);
+
+    vtkIntArray* location = vtkIntArray::New ();
+    location->SetName ("Location");
+    location->SetNumberOfComponents (3);
     location->SetNumberOfTuples (length);
+
+    vtkIntArray* blockId = vtkIntArray::New ();
+    blockId->SetName ("BlockId");
+    blockId->SetNumberOfComponents (1);
     blockId->SetNumberOfTuples (length);
+
+    for (int o = 0; o < offset; o ++) 
+      {
+      points->SetPoint (o, oldPoints->GetPoint (o));
+      location->SetTuple (o, oldLocation->GetTuple (o));
+      blockId->SetTuple (o, oldBlockId->GetTuple (o));
+      }
+
+    poly->SetPoints (points);
+    points->Delete ();
+
+    pd->AddArray (location);
+    location->Delete ();
+
+    pd->AddArray (blockId);
+    blockId->Delete ();
 
     vtkFloatArray** vars = new vtkFloatArray*[reader->Markers[m].NumVars];
     for (int v = 0; v < reader->Markers[m].NumVars; v ++) 
@@ -2272,17 +2303,17 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
         x[2] = 0;
         b[2] = 0;
         }
-      points->SetPoint (mark, x);
-      vtkIdType id = mark;
+      points->SetPoint (mark + offset, x);
+      vtkIdType id = mark + offset;
       poly->InsertNextCell (VTK_VERTEX, 1, &id);
 
-      location->SetTupleValue (mark, b);
+      location->SetTupleValue (mark + offset, b);
 
-      blockId->SetValue (mark, reader->MarkersDumps[m].Block->GetValue (mark));
+      blockId->SetValue (mark + offset, reader->MarkersDumps[m].Block->GetValue (mark));
 
       for (int v = 0; v < reader->Markers[m].NumVars; v ++)
         {
-        vars[v]->SetValue (mark, reader->MarkersDumps[m].Variables[v]->GetValue(mark));
+        vars[v]->SetValue (mark + offset, reader->MarkersDumps[m].Variables[v]->GetValue(mark));
         }
       }
     }
