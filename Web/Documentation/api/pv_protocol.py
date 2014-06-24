@@ -9,7 +9,7 @@
  * to use the call method on the session with the name of the method like
  * shown below.
  *
- *      session.call("vtk:methodName", arg1, arg2).then(function(response) {
+ *      session.call("pv.service.name.method", [arg1, arg2]).then(function(response) {
  *          // Can process the response now
  *      });
  */
@@ -26,6 +26,8 @@
  * @member protocols.ParaViewWebMouseHandler
  * @method mouseInteraction
  * @param {Object} event
+ *
+ * Registered as viewport.mouse.interaction
  *
  *     event = {
  *        buttonLeft: true,
@@ -54,6 +56,8 @@
  * @member protocols.ParaViewWebViewPort
  * @method resetCamera
  * @param {String} viewId
+ *
+ * Registered as viewport.camera.reset
  */
 
 /**
@@ -61,6 +65,8 @@
  * @method updateOrientationAxesVisibility
  * @param {String} viewId
  * @param {boolean} show
+ *
+ * Registered as viewport.axes.orientation.visibility.update
  */
 
 /**
@@ -68,6 +74,8 @@
  * @method updateCenterAxesVisibility
  * @param {String} viewId
  * @param {boolean} show
+ *
+ * Registered as viewport.axes.center.visibility.update
  */
 
 /**
@@ -77,6 +85,8 @@
  * @param {Array} focalPoint
  * @param {Array} viewUp
  * @param {Array} position
+ *
+ * Registered as viewport.camera.update
  */
 
  // =====================================================================
@@ -91,6 +101,8 @@
  * @member protocols.ParaViewWebViewPortImageDelivery
  * @method stillRender
  * @param {Object} option
+ *
+ * Registered as viewport.image.render
  *
  *    option = {
  *         size: [200, 300],  // [Optional] if not provided will use server side size. Size of the Viewport for which the image should be render for.
@@ -148,6 +160,8 @@
  * @param {String} viewId
  * @return {Object} metadata
  *
+ * Registered as viewport.webgl.metadata
+ *
  *     metadata = {
  *         scene description...
  *     }
@@ -160,6 +174,8 @@
  * @param {String} objectId
  * @param {Number} part
  * @return {Object} binaryWebGLData
+ *
+ * Registered as viewport.webgl.data
  *
  *     binaryWebGLData = {
  *         ...
@@ -180,6 +196,8 @@
  * @param {String} action
  * Action can be ['next', 'prev', 'first', 'last']
  * @return {Number} time
+ *
+ * Registered as pv.vcr.action
  */
 
  // =====================================================================
@@ -219,6 +237,8 @@
 /**
  * @member protocols.ParaViewWebColorManager
  * @method rescaleTransferFunction
+ *
+ * Registered as pv.color.manager.rescale.transfer.function
  *
  * Rescale the color transfer function to fit either the data range,
  * the data range over time, or to a custom range, for the array by
@@ -262,6 +282,8 @@
  * @member protocols.ParaViewWebColorManager
  * @method getScalarBarVisibilities
  *
+ * Registered as pv.color.manager.scalarbar.visibility.get
+ *
  * Returns whether or not each specified scalar bar is visible
  *
  * @param {Object} proxies
@@ -290,6 +312,8 @@
 /**
  * @member protocols.ParaViewWebColorManager
  * @method setScalarBarVisibilities
+ *
+ * Registered as pv.color.manager.scalarbar.visibility.set
  *
  * Sets the visibility of the scalar bar corresponding to each specified
  * proxy.  The representation for each proxy is found using the
@@ -326,6 +350,8 @@
  * @member protocols.ParaViewWebColorManager
  * @method colorBy
  *
+ * Registered as pv.color.manager.color.by
+ *
  * Choose the array to color by, and optionally specify magnitude or a
  * vector component in the case of vector array.
  *
@@ -353,6 +379,8 @@
 /**
  * @member protocols.ParaViewWebColorManager
  * @method selectColorMap
+ *
+ * Registered as pv.color.manager.select.preset
  *
  * Choose the color map preset to use when coloring by an array.
  *
@@ -389,6 +417,8 @@
  * @member protocols.ParaViewWebColorManager
  * @method listColorMapNames
  *
+ * Registered as pv.color.manager.list.preset
+ *
  * List the names of all color map presets available on the server.  This
  * list will contain the names of any presets you provided in the file
  * you supplied to the constructor of this protocol.
@@ -418,12 +448,16 @@
  * @member protocols.ParaViewWebPipelineManager
  * @method reloadPipeline
  * @return {Object} rootNode
+ *
+ * Registered as pv.pipeline.manager.reload
  */
 
 /**
  * @member protocols.ParaViewWebPipelineManager
  * @method getPipeline
  * @return {Object} rootNode
+ *
+ * Registered as pv.pipeline.manager.pipeline.get
  */
 
 /**
@@ -432,18 +466,24 @@
  * @param {String} algo_name
  * @param {String} parentId
  * @return {Object} proxyInfo
+ *
+ * Registered as pv.pipeline.manager.proxy.add
  */
 
 /**
  * @member protocols.ParaViewWebPipelineManager
  * @method deleteSource
  * @param {String} proxyId
+ *
+ * Registered as pv.pipeline.manager.proxy.delete
  */
 
 /**
  * @member protocols.ParaViewWebPipelineManager
  * @method updateDisplayProperty
  * @param {Object} options
+ *
+ * Registered as pv.pipeline.manager.proxy.representation.update
  */
 
 /**
@@ -451,6 +491,8 @@
  * @method pushState
  * @param {Object} state
  * @return {Object} proxyInfo
+ *
+ * Registered as pv.pipeline.manager.proxy.update
  */
 
 /**
@@ -458,6 +500,8 @@
  * @method openFile
  * @param {String} path
  * @return {Number} proxyInfo
+ *
+ * Registered as pv.pipeline.manager.file.open
  */
 
 /**
@@ -465,6 +509,8 @@
  * @method openRelativeFile
  * @param {String} relativePath
  * @return {Number} proxyInfo
+ *
+ * Registered as pv.pipeline.manager.file.ropen
  */
 
 /**
@@ -472,12 +518,16 @@
  * @method updateScalarbarVisibility
  * @param {Object} options
  * @return {Object} visibilityInfo
+ *
+ * Registered as pv.pipeline.manager.scalarbar.visibility.update
  */
 
 /**
  * @member protocols.ParaViewWebPipelineManager
  * @method updateScalarRange
  * @param {String} proxyId
+ *
+ * Registered as pv.pipeline.manager.scalar.range.rescale
  */
 
 /**
@@ -504,6 +554,9 @@
 /**
  * @member protocols.ParaViewWebPipelineManager
  * @method getLutDataRange
+ *
+ * Registered as pv.pipeline.manager.lut.range.get
+ *
  * @param {String} name
  *
  *     The name of the data array for which data range is to be returned
@@ -533,6 +586,8 @@
  * @member protocols.ParaViewWebFilterList
  * @method listFilters
  * @return {Object} listOfFilters
+ *
+ * Registered as file.server.directory.list
  *
  * If a file path is given to the constructor of this protocol, then the
  * available filters will be those defined in the file.  Otherwise, the
@@ -582,14 +637,18 @@
 /**
  * @class protocols.ParaViewWebFileManager
  *
- * DEPRECATED
  * This protocol handle file listing.
+ *
+ * @deprecated
+ * Should be replaced by protocols.ParaViewWebFileListing
  */
 
 /**
  * @member protocols.ParaViewWebFileManager
  * @method listFiles
  * @return {Object} listOfFiles
+ *
+ * Registered as pv.files.list
  */
 
  // =====================================================================
@@ -605,6 +664,8 @@
  * @method connect
  * @param {Object} options
  *
+ * Registered as pv.remote.connect
+ *
  *     options = {
  *          'host': 'localhost',
  *          'port': 11111,
@@ -617,11 +678,15 @@
  * @member protocols.ParaViewWebRemoteConnection
  * @method reverseConnect
  * @param {Number} port
+ *
+ * Registered as pv.remote.reverse.connect
  */
 
 /**
  * @member protocols.ParaViewWebRemoteConnection
  * @method pvDisconnect
+ *
+ * Registered as pv.remote.disconnect
  */
 
  // =====================================================================
@@ -694,6 +759,8 @@
  * @member protocols.ParaViewWebStateLoader
  * @method loadState
  * @param {String} state_file
+ *
+ * Registered as pv.loader.state
  */
 
  // =====================================================================
@@ -709,6 +776,8 @@
  * @method listServerDirectory
  * @param {String} relativeDir
  * @return {Object} listOfFiles
+ *
+ * Registered as pv.server.directory.list
  *
  *     {
  *       label: 'relativeDir',

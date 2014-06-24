@@ -102,7 +102,7 @@
         // default options
         options : {
             id : null,
-            topicUri : "event:probeDataChanged",
+            topicUri : "vtk.event.probe.data.changed",
             connection : null,
             mask: "Element Status"
         },
@@ -201,7 +201,7 @@
                 self.options.connection.session == null) { return; }
 
             var session = self.options.connection.session;
-            session.call("vtk:getProbeData").then(function(result) {
+            session.call("pv.data.prober.probe.data").then(function(result) {
                 var data = processPlotData(result, -1, self.options.mask);
                 var key_map = {};
                 self.series.forEach(function(d) {

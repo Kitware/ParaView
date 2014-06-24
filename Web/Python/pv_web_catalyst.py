@@ -48,7 +48,7 @@ except ImportError:
     import _argparse as argparse
 
 # import annotations
-from autobahn.wamp import exportRpc
+from autobahn.wamp import procedure as exportRpc
 
 # =============================================================================
 # Handle function helpers
@@ -195,7 +195,7 @@ class _PVCatalystManager(pv_wamp.PVServerProtocol):
         view = simple.GetRenderView()
         view.Background = [1,1,1]
 
-    @exportRpc("openFileFromPath")
+    @exportRpc("catalyst.file.open")
     def openFileFromPath(self, files):
         fileToLoad = []
         number_of_time_steps = 1
@@ -210,13 +210,13 @@ class _PVCatalystManager(pv_wamp.PVServerProtocol):
         if _PVCatalystManager.pipeline_handler:
             _PVCatalystManager.pipeline_handler.apply_pipeline(reader, self.time_steps)
 
-    @exportRpc("initializePipeline")
+    @exportRpc("catalyst.pipeline.initialize")
     def initializePipeline(self, conf):
         if _PVCatalystManager.pipeline_handler and "initialize_pipeline" in dir(_PVCatalystManager.pipeline_handler):
             _PVCatalystManager.pipeline_handler.initialize_pipeline(conf)
 
 
-    @exportRpc("updateActiveArgument")
+    @exportRpc("catalyst.active.argument.update")
     def updateActiveArgument(self, key, value):
         if key == "time":
             simple.GetAnimationScene().TimeKeeper.Time = float(value)
@@ -224,7 +224,7 @@ class _PVCatalystManager(pv_wamp.PVServerProtocol):
             _PVCatalystManager.pipeline_handler.update_argument(key, value)
 
 
-    @exportRpc("getArguments")
+    @exportRpc("catalyst.arguments.get")
     def getArguments(self):
         if _PVCatalystManager.pipeline_handler:
             return _PVCatalystManager.pipeline_handler.get_metadata()

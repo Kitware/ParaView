@@ -32,7 +32,7 @@
 
                 // Create file browser widget
                 $('.file-list').fileBrowser({session: connection.session}).bind('file-click file-group-click', function(e){
-                    connection.session.call("vtk:openFileFromPath", e.relativePathList).then(function(reply){
+                    connection.session.call("pv.file.loader.open.file", [e.relativePathList]).then(function(reply){
                         viewport.render();
                         $('.file-list').hide();
                     });
@@ -67,12 +67,12 @@
 
                 // Update stop method to use the connection
                 stop = function() {
-                    connection.session.call('vtk:exit');
+                    connection.session.call('application.exit');
                 }
 
                 // Auto load file if any available
                 if(connection.hasOwnProperty('file')) {
-                    connection.session.call('vtk:openFileFromPath', connection['file']).then(function(){
+                    connection.session.call('pv.file.loader.open.file', [connection['file']]).then(function(){
                         viewport.invalidateScene();
                     });
                 }

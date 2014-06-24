@@ -12,9 +12,9 @@
 
     var BASE_REMOTE_TOOLBAR_HTML =
     "<ul>"
-    + "<li class='action' action='connect'        alt='Connect to a remote pvserver' title='Connect to a remote pvserver'><div class='icon'></div></li>"
-    + "<li class='action' action='pvDisconnect'     alt='Disconnect' title='Disconnect'><div class='icon'></div></li>"
-    + "<li class='action' action='reverseConnect' alt='Wait for a remote server to connect' title='Wait for a remote server to connect'><div class='icon'></div></li>"
+    + "<li class='action' action='pv.remote.connect'         alt='Connect to a remote pvserver' title='Connect to a remote pvserver'><div class='icon'></div></li>"
+    + "<li class='action' action='pv.remote.disconnect'      alt='Disconnect' title='Disconnect'><div class='icon'></div></li>"
+    + "<li class='action' action='pv.remote.reverse.connect' alt='Wait for a remote server to connect' title='Wait for a remote server to connect'><div class='icon'></div></li>"
     + "</ul>\n",
     SESSION_DATA_KEY = 'paraview-session',
     CONNECT_ARG_KEYS = ['host', 'port', 'rs_host', 'rs_port'],
@@ -126,9 +126,9 @@
                 arg = Number(prompt("Wait connection on port:", "11111"));
             }
 
-            session.call("vtk:" + action, arg).then(function(){
+            session.call(action, [arg]).then(function(){
                 if(me.hasClass('close')) {
-                    session.call("vtk:exit");
+                    session.call("application.exit");
                     session.close();
                     setTimeout("window.close()", 100);
                 }

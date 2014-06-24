@@ -141,7 +141,7 @@
                 }).click(function() {
                     try {
                         var session = pv.connection.session;
-                        session.call("vtk:goToPrev").then(function(changed) {
+                        session.call("pv.data.prober.time.previous").then(function(changed) {
                             if (changed) { pv.viewport.render(); }
                         });
                     } catch (e) {}
@@ -151,7 +151,7 @@
                 }).click(function() {
                     try {
                         var session = pv.connection.session;
-                        session.call("vtk:goToNext").then(function(changed) {
+                        session.call("pv.data.prober.time.next").then(function(changed) {
                             if (changed) { pv.viewport.render(); }
                         });
                     } catch (e) {}
@@ -277,8 +277,8 @@
                             return;
                         }
                         var session = pv.connection.session;
-                        session.call("vtk:loadDatasets",
-                        selected_datasets).then(function(){
+                        session.call("pv.data.prober.load.dataset",[
+                        selected_datasets]).then(function(){
                             pv.chart.graph("updatePlotData");
                             pv.viewport.render();
                         });
@@ -295,7 +295,7 @@
                     }
 
                     var session = pv.connection.session;
-                    session.call("vtk:getDatabaseAsHTML").then(function(database_content){
+                    session.call("pv.data.prober.database.html").then(function(database_content){
                         pv.databaseLoaded = true;
                         $("#database").html(database_content);
                         $("#t1").html("");

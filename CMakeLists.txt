@@ -342,8 +342,14 @@ if (UNIX AND NOT APPLE)
   set(VTK_BUILD_FORWARDING_EXECUTABLES TRUE)
 endif()
 
-cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" ON
+# ParaViewWeb on Windows needs win32api which is not provided by default
+# For now the default behavior would be to disable it on Windows build
+if (WIN32)
+  set(PARAVIEW_ENABLE_WEB OFF CACHE BOOL "" FORCE)
+else()
+  cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" ON
     "PARAVIEW_ENABLE_PYTHON" OFF)
+endif()
 
 mark_as_advanced(PARAVIEW_ENABLE_WEB)
 
