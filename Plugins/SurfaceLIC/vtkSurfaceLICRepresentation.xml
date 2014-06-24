@@ -596,5 +596,86 @@
       </SubProxy>
     </Extension>
 
+    <!--======================================================================-->
+    <Extension name="StructuredGridRepresentation">
+      <RepresentationType subproxy="SurfaceLICRepresentation"
+        subtype="Surface" text="Surface LIC" />
+      <SubProxy>
+        <Proxy name="SurfaceLICRepresentation"
+          proxygroup="representations" proxyname="SurfaceLICRepresentation" />
+
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+
+        <ExposedProperties>
+        <!--<PropertyGroup label="Surface LIC Parameters">-->
+         <!-- Integrator -->
+         <PropertyGroup label="SurfaceLIC: Integrator">
+           <Property name="SelectInputVectors"/>
+           <Property name="NumberOfSteps"/>
+           <Property name="StepSize" />
+           <Property name="NormalizeVectors" />
+           <Property name="EnhancedLIC" />
+         </PropertyGroup>
+
+         <!-- Rendering controls -->
+         <PropertyGroup label="SurfaceLIC: Rendering">
+           <Property name="ColorMode" />
+           <Property name="LICIntensity" />
+           <Property name="MapModeBias" />
+
+           <Property name="EnhanceContrast" />
+           <Property name="LowLICContrastEnhancementFactor" />
+           <Property name="HighLICContrastEnhancementFactor" />
+           <Property name="LowColorContrastEnhancementFactor" />
+           <Property name="HighColorContrastEnhancementFactor" />
+
+           <Property name="AntiAlias" />
+         </PropertyGroup>
+
+         <!-- Fragment Masking -->
+         <PropertyGroup label="SurfaceLIC: Fragment masking">
+           <Property name="MaskOnSurface" />
+           <Property name="MaskThreshold" />
+           <Property name="MaskIntensity" />
+           <Property name="MaskColor" />
+         </PropertyGroup>
+
+         <!-- Noise texture controls -->
+         <PropertyGroup label="SurfaceLIC: Noise texture generator">
+           <Property name="GenerateNoiseTexture" />
+           <Property name="NoiseType" />
+           <Property name="NoiseTextureSize" />
+           <Property name="NoiseGrainSize" />
+           <Property name="MinNoiseValue" />
+           <Property name="MaxNoiseValue" />
+           <Property name="NumberOfNoiseLevels" />
+           <Property name="ImpulseNoiseProbability" />
+           <Property name="ImpulseNoiseBackgroundValue" />
+           <Property name="NoiseGeneratorSeed" />
+         </PropertyGroup>
+
+         <!-- Parallel  controls -->
+         <PropertyGroup label="SurfaceLIC: Parallelization">
+           <Property name="CompositeStrategy" />
+         </PropertyGroup>
+
+         <!-- Interactivity controls -->
+         <PropertyGroup label="SurfaceLIC: Interactivity">
+           <Property name="UseLICForLOD" />
+         </PropertyGroup>
+
+         <!-- benchmarking -->
+         <PropertyGroup label="SurfaceLIC: Benchmark">
+           <Property name="WriteLog" />
+         </PropertyGroup>
+        <!-- </PropertyGroup> -->
+        </ExposedProperties>
+
+      </SubProxy>
+    </Extension>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
