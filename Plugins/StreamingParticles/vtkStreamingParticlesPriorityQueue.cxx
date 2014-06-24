@@ -68,7 +68,18 @@ public:
     }
   bool PlanesChanged(const double view_planes[24])
     {
+#ifdef _MSC_VER
+#pragma warning(push)
+// Disable C4996 because it warns us that the pointer range here cannot be
+// guaranteed by the runtime to not overflow (we're not using Microsoft's
+// checked iterators). Since we know that 24 is the size of everything here,
+// suppress the warning.
+#pragma warning(disable:4996)
+#endif
     return !std::equal(this->PreviousViewPlanes, this->PreviousViewPlanes + 24, view_planes);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
     }
   void SetViewPlanes(const double view_planes[24])
     {
