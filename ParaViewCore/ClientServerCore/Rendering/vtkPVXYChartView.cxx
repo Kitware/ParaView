@@ -72,6 +72,7 @@ vtkPVXYChartView::vtkPVXYChartView()
   this->Chart = NULL;
   this->InternalTitle = NULL;
   this->PlotTime = vtkPVPlotTime::New();
+  this->HideTimeMarker = false;
 
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);
@@ -690,7 +691,7 @@ void vtkPVXYChartView::Render(bool interactive)
   // Iterate over all visible representations and check is they have the array
   // named "Time" on either of the axes.
   int num_reprs = this->GetNumberOfRepresentations();
-  for (int cc=0; cc < num_reprs; cc++)
+  for (int cc=0; (this->HideTimeMarker == false) && (cc < num_reprs); cc++)
     {
     vtkXYChartRepresentation * repr = vtkXYChartRepresentation::SafeDownCast(
       this->GetRepresentation(cc));
