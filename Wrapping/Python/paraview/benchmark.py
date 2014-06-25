@@ -131,6 +131,25 @@ def maximize_logs () :
     prop.SetElements1(1000000)
     tl.UpdateVTKObjects()
 
+def get_memuse() :
+    session = servermanager.ProxyManager().GetSessionProxyManager().GetSession()
+
+    retval = []
+    infos = servermanager.vtkPVMemoryUseInformation()
+    session.GatherInformation(session.CLIENT, infos, 0)
+    procUse = str(infos.GetProcMemoryUse(0))
+    hostUse = str(infos.GetHostMemoryUse(0))
+    retval.append("CLIENT " + procUse + " / " + hostUse)
+
+    infos = servermanager.vtkPVMemoryUseInformation()
+    session.GatherInformation(session.DATA_SERVER, infos, 0)
+    for i in range(0,infos.GetSize()):
+        rank = str(infos.GetRank(i))
+        procUse = str(infos.GetProcMemoryUse(i))
+        hostUse = str(infos.GetHostMemoryUse(i))
+        retval.append("DS[" + rank + "] " + procUse + " / " + hostUse)
+    return retval
+
 def dump_logs( filename ) :
     """
     This saves off the logs we've gathered.
