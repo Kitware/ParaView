@@ -74,7 +74,6 @@ icetquirk = False
 
 start_frame = 0
 default_log_threshold = dict()
-default_buffer_length = dict()
 
 class OneLog :
     def __init__(self):
@@ -121,12 +120,16 @@ def maximize_logs () :
     if pm == None:
         return
 
-    # Not used here...
     ss = paraview.servermanager.vtkSMSession
     for ptype in [ss.CLIENT_AND_SERVERS, ss.CLIENT, ss.SERVERS,
                  ss.RENDER_SERVER, ss.DATA_SERVER]:
-      default_buffer_length[str(ptype)] = 1000000
       default_log_threshold[str(ptype)] = 0.0
+
+    pxm = paraview.servermanager.ProxyManager()
+    tl = pxm.NewProxy("misc", "TimerLog")
+    prop = tl.GetProperty("MaxEntries")
+    prop.SetElements1(1000000)
+    tl.UpdateVTKObjects()
 
 def dump_logs( filename ) :
     """
