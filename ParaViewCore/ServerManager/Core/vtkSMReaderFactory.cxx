@@ -428,10 +428,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
 {
   this->Readers->RemoveAllItems();
 
-  if (!filename || filename[0] == 0)
-    {
-    return this->Readers;
-    }
+  bool empty_filename =  (!filename || filename[0] == 0);
 
   std::vector<std::string> extensions;
   // purposefully set the extensions to empty, since we don't want the extension
@@ -442,7 +439,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
     iter != this->Internals->Prototypes.end(); ++iter)
     {
     if (iter->second.CanCreatePrototype(session) &&
-      (!filename || iter->second.CanReadFile(filename, extensions, session, true)))
+      (empty_filename || iter->second.CanReadFile(filename, extensions, session, true)))
       {
       iter->second.FillInformation(session);
       this->Readers->AddString(iter->second.Group.c_str());
