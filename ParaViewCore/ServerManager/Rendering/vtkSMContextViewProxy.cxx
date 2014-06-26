@@ -322,6 +322,14 @@ bool vtkSMContextViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outpu
 }
 
 //----------------------------------------------------------------------------
+vtkSelection* vtkSMContextViewProxy::GetCurrentSelection()
+{
+  vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
+    this->GetClientSideObject());
+  return pvview ? pvview->GetSelection() : NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMContextViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

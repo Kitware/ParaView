@@ -27,6 +27,7 @@ class vtkAbstractContextItem;
 class vtkContextView;
 class vtkImageData;
 class vtkRenderWindow;
+class vtkSelection;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMContextViewProxy : public vtkSMViewProxy
 {
@@ -61,6 +62,8 @@ public:
   // CreateDefaultRepresentation() will still work without regard for this
   // Plottable hint.
   virtual bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort);
+
+  vtkSelection* GetCurrentSelection();
 
 
 //BTX

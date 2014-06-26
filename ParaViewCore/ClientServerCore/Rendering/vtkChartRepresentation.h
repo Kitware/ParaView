@@ -156,6 +156,12 @@ protected:
   // Convenience method to get the first vtkTable from LocalOutput, if any.
   vtkTable* GetLocalOutput();
 
+  // Description:
+  // Method to be overrided to transform input data to a vtkTable.
+  // The default implementation just returns the data object provided in parameter.
+  virtual vtkDataObject* TransformInputData(vtkInformationVector** inputVector,
+                                            vtkDataObject* data);
+
   typedef std::map<std::string, vtkSmartPointer<vtkTable> > MapOfTables;
   // Description:
   // Convenience method to get all vtkTable instances with their associated

@@ -97,6 +97,7 @@ public:
   virtual void SetSelection(vtkChartRepresentation* repr,
     vtkSelection* selection) = 0;
 
+  virtual vtkSelection* GetSelection();
 //BTX
 protected:
   vtkPVContextView();

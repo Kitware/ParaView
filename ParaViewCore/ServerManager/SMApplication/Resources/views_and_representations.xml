@@ -2228,6 +2228,16 @@
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase"
+                      class="vtkPVXYHistogramChartView"
+                      name="XYHistogramChartView"
+                      label="Histogram Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="HistogramChartRepresentation">
+      <Documentation>This is the proxy for the histogram chart view.</Documentation>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewTitle"
                       class="vtkPVXYChartView"
                       name="BoxChartView"
@@ -5358,9 +5368,172 @@
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
+    <ChartRepresentationProxy base_proxygroup="representations"
+                              class="vtkPVHistogramChartRepresentation"
+                              name="HistogramChartRepresentation"
+                              processes="client|dataserver|renderserver">
+      <Documentation>Representation used by XYHistogramChartView.</Documentation>
+            <Documentation>API for representations used by XYChartView and XYBarChartView.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
+                         command="AddCompositeDataSetIndex"
+                         default_values="1"
+                         number_of_elements="1"
+                         name="CompositeDataSetIndex"
+                         number_of_elements_per_command="1"
+                         panel_visibility="never"
+                         repeat_command="1">
+        <CompositeTreeDomain mode="leaves" name="tree">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
+        <Documentation>This property lists the ids of the blocks to extract
+        from the input multiblock dataset.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetHistogramColor"
+                            default_values="0 0 1"
+                            name="HistogramColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="default">
+        <Documentation>Sets the color for the histograms.</Documentation>
+      </DoubleVectorProperty>
+      <SubProxy>
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
+
+      <IntVectorProperty command="SetBinCount"
+                         default_values="10"
+                         name="BinCount"
+                         number_of_elements="1">
+        <IntRangeDomain max="256"
+                        min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the number of bins
+        for the histogram.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComponent"
+                         default_values="0"
+                         name="Component"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>The value of this property specifies the array component
+        from which the histogram should be computed.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseCustomBinRanges"
+                         default_values="0"
+                         name="UseCustomBinRanges"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, CustomBinRanges will be used instead
+        of using the full range for the selected array. By default, set to
+        false.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomBinRanges"
+                            default_values="0.0 100.0"
+                            name="CustomBinRanges"
+                            number_of_elements="2"
+                            panel_visibility="advanced">
+        <Documentation>Set custom bin ranges to use. These are used only when
+        UseCustomBinRanges is set to true.</Documentation>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+      </DoubleVectorProperty>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
     <ChartRepresentationProxy class="vtkPVParallelCoordinatesRepresentation"
-                                            name="ParallelCoordinatesRepresentation"
-                                            processes="client|dataserver|renderserver">
+                              name="ParallelCoordinatesRepresentation"
+                              processes="client|dataserver|renderserver">
       <Documentation>Representation used by
       ParallelCoordinatesChartView.</Documentation>
       <InputProperty command="SetInputConnection"

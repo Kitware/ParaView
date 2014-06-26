@@ -65,6 +65,7 @@ set (Module_SRCS
   vtkPVDataRepresentationPipeline.cxx
   vtkPVDisplayInformation.cxx
   vtkPVHardwareSelector.cxx
+  vtkPVHistogramChartRepresentation.cxx
   vtkPVImageSliceMapper.cxx
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
@@ -84,6 +85,7 @@ set (Module_SRCS
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx
+  vtkPVXYHistogramChartView.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
   vtkSliceFriendGeometryRepresentation.cxx

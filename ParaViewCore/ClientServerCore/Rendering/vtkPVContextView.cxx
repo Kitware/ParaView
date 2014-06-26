@@ -14,7 +14,9 @@
 =========================================================================*/
 #include "vtkPVContextView.h"
 
+#include "vtkAnnotationLink.h"
 #include "vtkCamera.h"
+#include "vtkChart.h"
 #include "vtkCommand.h"
 #include "vtkContextInteractorStyle.h"
 #include "vtkContextView.h"
@@ -276,6 +278,16 @@ void vtkPVContextView::OnEndRender()
 
   vtkTileDisplayHelper::GetInstance()->FlushTiles(this->Identifier,
     this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
+}
+
+//----------------------------------------------------------------------------
+vtkSelection* vtkPVContextView::GetSelection()
+{
+  if (vtkChart *chart = vtkChart::SafeDownCast(this->GetContextItem()))
+    {
+    return chart->GetAnnotationLink()->GetCurrentSelection();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

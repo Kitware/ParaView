@@ -57,6 +57,7 @@ vtkChartRepresentation::vtkChartRepresentation()
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->EnableServerSideRendering = false;
   this->FlattenTable = 1;
+  this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_ROWS;
 }
 
 //----------------------------------------------------------------------------
@@ -179,6 +180,11 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     if (!this->CacheKeeper->IsCached())
       {
       data = vtkDataObject::GetData(inputVector[0], 0);
+      data = this->TransformInputData(inputVector, data);
+      if (!data)
+        {
+        return 0;
+        }
 
       // Prune input dataset to only process blocks on interest.
       // In input is not a multiblock dataset, we make it one so the rest of the
@@ -215,6 +221,7 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
       preprocessor->Update();
 
       data = preprocessor->GetOutputDataObject(0);
+
 
       // data must be a mutliblock dataset, no matter what.
       assert(data->IsA("vtkMultiBlockDataSet"));
@@ -261,6 +268,15 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkChartRepresentation::TransformInputData(
+  vtkInformationVector** inputVector, vtkDataObject* data)
+{
+  (void)inputVector;
+  // Default representation does not transform anything
+  return data;
 }
 
 //----------------------------------------------------------------------------
