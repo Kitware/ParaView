@@ -56,9 +56,6 @@ execute_process(
             -X twisted
             -X autobahn
 
-            # we will add support for numpy in near future.
-            -X numpy
-
             "${CMAKE_CURRENT_LIST_DIR}/dummy.py"
             -p "${PACKAGE_ROOT}"
     WORKING_DIRECTORY "${OUTPUT_DIRECTORY}"
