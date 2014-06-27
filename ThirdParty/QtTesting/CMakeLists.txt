@@ -42,6 +42,7 @@ set (QtTesting_QT_VERSION ${PARAVIEW_QT_VERSION})
 # import Qt build settings
 if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   set (Qt5_FIND_COMPONENTS Test)
+  set (${vtk-module}_INCLUDE_DIRS ${Qt5Test_INCLUDE_DIRS})
   include (ParaViewQt5)
 else ()
   find_package (Qt4 REQUIRED QUIET)
