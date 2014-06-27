@@ -52,7 +52,8 @@
                          name="ViewSize"
                          number_of_elements="2"
                          panel_visibility="never"
-                         state_ignored="1">
+                         state_ignored="1"
+                         no_custom_default="1">
         <Hints>
           <NoDefault />
         </Hints>
@@ -76,7 +77,8 @@
       <Documentation>This is the base proxy for XY chart views.</Documentation>
       <StringVectorProperty command="SetTitle"
                             name="ChartTitle"
-                            number_of_elements="1"></StringVectorProperty>
+                            number_of_elements="1"
+                            default_values=""></StringVectorProperty>
       <IntVectorProperty command="SetTitleAlignment"
                          default_values="1"
                          name="ChartTitleAlignment"
@@ -267,7 +269,8 @@
       <!-- title -->
       <StringVectorProperty command="SetLeftAxisTitle"
                             name="LeftAxisTitle"
-                            number_of_elements="1"/>
+                            number_of_elements="1"
+                            default_values=""/>
       <IntVectorProperty command="SetLeftGridVisibility"
                          default_values="1"
                          panel_visibility="advanced"
@@ -533,7 +536,8 @@
       <!-- title -->
       <StringVectorProperty command="SetBottomAxisTitle"
                             name="BottomAxisTitle"
-                            number_of_elements="1"/>
+                            number_of_elements="1"
+                            default_values=""/>
       <IntVectorProperty command="SetBottomGridVisibility"
                          default_values="1"
                          panel_visibility="advanced"
@@ -812,6 +816,7 @@
       <StringVectorProperty command="SetRightAxisTitle"
                             name="RightAxisTitle"
                             number_of_elements="1"
+                            default_values=""
                             panel_visibility="advanced" />
       <IntVectorProperty command="SetRightGridVisibility"
                          default_values="1"
@@ -1083,6 +1088,7 @@
       <StringVectorProperty command="SetTopAxisTitle"
                             name="TopAxisTitle"
                             number_of_elements="1"
+                            default_values=""
                             panel_visibility="advanced"/>
       <IntVectorProperty command="SetTopGridVisibility"
                          default_values="1"

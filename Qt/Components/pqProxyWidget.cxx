@@ -66,6 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -76,7 +77,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
-#include <QGridLayout>
 #include <QHideEvent>
 #include <QLabel>
 #include <QPointer>
@@ -1184,4 +1184,47 @@ void pqProxyWidget::updatePanel()
 {
   this->filterWidgets(this->Internals->CachedShowAdvanced,
     this->Internals->CachedFilterText);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::onRestoreDefaults()
+{
+  bool anyReset = false;
+  if (this->Internals->Proxy)
+    {
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(this->Internals->Proxy->NewPropertyIterator());
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      vtkSMProperty * smproperty = iter->GetProperty();
+      // Restore only basic type properties.
+      if (vtkSMVectorProperty::SafeDownCast(smproperty) &&
+          !smproperty->GetNoCustomDefault() &&
+          !smproperty->GetInformationOnly())
+        {
+        if (!smproperty->IsValueDefault())
+          {
+          anyReset = true;
+          }
+        smproperty->ResetToXMLDefaults();
+        }
+      }
+    }
+
+  // The code above bypasses the changeAvailable() and
+  // changeFinished() signal from the pqProxyWidget, so we check here
+  // whether we should act as if changes are available only if any of
+  // the properties have been reset.
+  if (anyReset)
+    {
+    emit changeAvailable();
+    emit changeFinished();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyWidget::onSaveAsDefaults()
+{
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  settings->SetProxySettings(this->Internals->Proxy);
 }

@@ -591,17 +591,6 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  bool SetPropertySetting(const char* settingName,
-                          vtkSMInputProperty* property)
-  {
-    Json::Path valuePath(settingName);
-    vtkGenericWarningMacro(<< "Unhandled property '" << property->GetXMLName()
-                           << "' of type '" << property->GetClassName());
-
-    return false;
-  }
-
-  //----------------------------------------------------------------------------
   // Description:
   // Set a property setting in the highest-priority collection.
   bool SetPropertySetting(const char* settingName, vtkSMProperty* property)
@@ -622,11 +611,6 @@ public:
              vtkSMStringVectorProperty::SafeDownCast(property))
       {
       return this->SetPropertySetting(settingName, stringVectorProperty);
-      }
-    else if (vtkSMInputProperty* inputProperty =
-             vtkSMInputProperty::SafeDownCast(property))
-      {
-      return this->SetPropertySetting(settingName, inputProperty);
       }
 
     return false;

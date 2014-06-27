@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include "pqComponentsModule.h"
 
-class QAbstractButton;
 class vtkSMProxy;
 
 /// pqProxyWidgetDialog is used to show properties of any proxy in a dialog. It
@@ -61,12 +60,6 @@ protected slots:
 
   /// slot to handle accepted() signals
   virtual void onAccepted();
-
-  /// restores application default proxy settings
-  virtual void onRestoreDefaults();
-
-  /// saves settings as defaults for proxy
-  void onSaveAsDefaults();
 
 private:
   Q_DISABLE_COPY(pqProxyWidgetDialog)
