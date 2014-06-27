@@ -38,9 +38,7 @@ execute_process(
     COMMAND ${PYTHON_EXECUTABLE}
             "${CMAKE_CURRENT_LIST_DIR}/freeze/freeze_paraview.py"
             -o "${OUTPUT_DIRECTORY}"
-            -X codecs
             -X distutils
-            -X encodings
             -X locale
             -X macpath
             -X matplotlib
