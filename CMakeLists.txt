@@ -224,6 +224,12 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
   "Build ParaView with Qt support (without GUI)" OFF
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
+# If PARAVIEW_BUILD_QT_GUI is OFF, provide an option to the user to turn other command line
+# executables ON/OFF.
+cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
+  "Build ParaView command-line tools" ON
+  "NOT PARAVIEW_BUILD_QT_GUI" ON)
+
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 cmake_dependent_option(PARAVIEW_USE_UNIFIED_BINDINGS "If enabled, Python bindings will back the ClientServer wrapping implementation" OFF
   PARAVIEW_ENABLE_PYTHON OFF)
@@ -350,18 +356,20 @@ else()
   cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" ON
     "PARAVIEW_ENABLE_PYTHON" OFF)
 endif()
-
 mark_as_advanced(PARAVIEW_ENABLE_WEB)
 
-set(Module_vtkParaViewWeb ${PARAVIEW_ENABLE_WEB} CACHE BOOL "" FORCE)
-mark_as_advanced(Module_vtkParaViewWeb)
+if (PARAVIEW_ENABLE_WEB)
+  # Request vtkParaViewWeb module
+  list(APPEND vtkParaViewWeb_REQUEST_BY "Option PARAVIEW_ENABLE_WEB")
+endif()
 
 option(PARAVIEW_BUILD_WEB_DOCUMENTATION "Enable/Disable web documentation" OFF)
 mark_as_advanced(PARAVIEW_BUILD_WEB_DOCUMENTATION)
 
-set(Module_vtkParaViewWebDocumentation ${PARAVIEW_BUILD_WEB_DOCUMENTATION}
-  CACHE BOOL "" FORCE)
-mark_as_advanced(Module_vtkParaViewWebDocumentation)
+if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
+  # Request vtkParaViewWebDocumentation module.
+  list(APPEND vtkParaViewWebDocumentation_REQUEST_BY "Option PARAVIEW_BUILD_WEB_DOCUMENTATION")
+endif()
 
 option(PARAVIEW_ENABLE_CATALYST "Enable Catalyst CoProcessing modules" ON)
 cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
@@ -369,11 +377,14 @@ cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
   "PARAVIEW_ENABLE_CATALYST" OFF)
 mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
 
-set (Module_vtkPVCatalyst ${PARAVIEW_ENABLE_CATALYST} CACHE BOOL "" FORCE)
-mark_as_advanced(Module_vtkPVCatalyst)
-
 if (PARAVIEW_ENABLE_CATALYST)
-  set (Module_vtkPVCatalystTestDriver ${BUILD_TESTING} CACHE BOOL "" FORCE)
+  # Request vtkPVCatalyst module.
+  list(APPEND vtkPVCatalyst_REQUEST_BY "Option PARAVIEW_ENABLE_CATALYST")
+
+  if (BUILD_TESTING)
+    # Request vtkPVCatalystTestDriver module for testing.
+    list(APPEND vtkPVCatalystTestDriver_REQUEST_BY "Option PARAVIEW_ENABLE_CATALYST, BUILD_TESTING")
+  endif()
   # When Catalyst is enabled, Fortran is optionally needed. Hence we enable
   # Fortran at the top level itself. When individual module called
   # enable_language(...), it failed during first cmake configure but worked o
@@ -387,10 +398,7 @@ if (PARAVIEW_ENABLE_CATALYST)
       enable_language(Fortran OPTIONAL)
     endif()
   endif()
-else()
-  set (Module_vtkPVCatalystTestDriver OFF CACHE BOOL "" FORCE)
 endif()
-mark_as_advanced(Module_vtkPVCatalystTestDriver)
 
 # Add ability to freeze Python modules.
 cmake_dependent_option(PARAVIEW_FREEZE_PYTHON
@@ -461,8 +469,17 @@ endif()
 # Setup default state for ParaView module groups.
 set (VTK_Group_ParaViewCore ON CACHE BOOL "")
 set (VTK_Group_ParaViewRendering ON CACHE BOOL "")
-set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
-set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
+
+if (PARAVIEW_ENABLE_COMMANDLINE_TOOLS)
+  # Request the vtkPVServerManagerApplication module.
+  list (APPEND vtkPVServerManagerApplication_REQUEST_BY
+    "Option PARAVIEW_ENABLE_COMMANDLINE_TOOLS")
+endif()
+
+if (PARAVIEW_BUILD_QT_GUI)
+  # Request the pqApplicationComponents module.
+  list (APPEND pqApplicationComponents_REQUEST_BY "Option PARAVIEW_BUILD_QT_GUI")
+endif()
 
 #------------------------------------------------------------------------------
 # Test to check install tree
@@ -688,7 +705,9 @@ pv_process_plugins(
   ${CMAKE_CURRENT_SOURCE_DIR}/Plugins
   ${CMAKE_CURRENT_BINARY_DIR}/Plugins)
 
-add_subdirectory(CommandLineExecutables)
+if (PARAVIEW_ENABLE_COMMANDLINE_TOOLS)
+  add_subdirectory(CommandLineExecutables)
+endif()
 add_subdirectory(Applications)
 
 #------------------------------------------------------------------------------
