@@ -316,34 +316,51 @@ bool vtkInitializationHelper::LoadSettings()
   std::string app_dir = options->GetApplicationPath();
   app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
 
+  // If the application path ends with lib/paraview-X.X, shared
+  // forwarding of the executable was used. Remove that part of the
+  // path to get back to the installation root.
+  std::string installDirectory = app_dir.substr(0, app_dir.find("/lib/paraview-" PARAVIEW_VERSION));
+
+  // Remove the trailing /bin if it is there.
+  if (installDirectory.substr(installDirectory.size()-4) == "/bin")
+    {
+    installDirectory = installDirectory.substr(0, installDirectory.size()-4);
+    }
+
   std::vector<std::string> pathsToSearch;
-  pathsToSearch.push_back(app_dir);
-  pathsToSearch.push_back(app_dir + "/../lib/");
+  pathsToSearch.push_back(installDirectory + "/share/paraview-" PARAVIEW_VERSION);
+  pathsToSearch.push_back(installDirectory + "/lib/");
+  pathsToSearch.push_back(installDirectory);
 #if defined(__APPLE__)
   // paths for app
-  pathsToSearch.push_back(app_dir + "/../../..");
-  pathsToSearch.push_back(app_dir + "/../../../../lib");
+  pathsToSearch.push_back(installDirectory + "/../../..");
+  pathsToSearch.push_back(installDirectory + "/../../../../lib");
 
-  // paths when doing an unix style install.
-  pathsToSearch.push_back(app_dir +"/../lib/paraview-" PARAVIEW_VERSION);
+  // paths when doing a unix style install.
+  pathsToSearch.push_back(installDirectory +"/../lib/paraview-" PARAVIEW_VERSION);
 #endif
   // On windows configuration files are in the parent directory
-  pathsToSearch.push_back(app_dir + "/../");
+  pathsToSearch.push_back(installDirectory + "/../");
 
   std::string filename = vtkInitializationHelper::GetApplicationName() + "-SiteSettings.json";
   std::string siteSettingsFile;
-
+  bool settingsFileFound = false;
   for (size_t cc = 0; cc < pathsToSearch.size(); cc++)
     {
     std::string path = pathsToSearch[cc];
+    std::cout << "path: " << path << std::endl;
     if (vtksys::SystemTools::FileExists((path + "/" + filename).c_str(), true))
       {
       siteSettingsFile = path + "/" + filename;
+      settingsFileFound = true;
       break;
       }
     }
 
-  success = success && settings->AddCollectionFromFile(siteSettingsFile, 1.0);
+  if (settingsFileFound)
+    {
+    success = success && settings->AddCollectionFromFile(siteSettingsFile, 1.0);
+    }
 
   settings->DistributeSettings();
 
