@@ -3223,24 +3223,24 @@
             <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" function="Color"/>
             <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
             <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" function="Size"/>
-            <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" />
             <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" function="Italics"/>
-            <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" />
+            <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" function="Justification"/>
             <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
             <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
           </PropertyGroup>
+          <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" />
           <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
           <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
             <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
             <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
             <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily" function="Family"/>
             <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize" function="Size"/>
-            <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat"/>
             <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic" function="Italics"/>
-            <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification"/>
+            <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification" function="Justification"/>
             <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity" function="Opacity"/>
             <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow" function="Shadow"/>
           </PropertyGroup>
+          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat"/>
         </ExposedProperties>
       </SubProxy>
     </PVRepresentationProxy>
@@ -4774,9 +4774,19 @@
                         name="range" />
       </IntVectorProperty>
       <StringVectorProperty command="SetPointLabelFormat"
-                            default_values=""
+                            default_values="%-#6.3g"
                             name="PointLabelFormat"
-                            number_of_elements="1"></StringVectorProperty>
+                            number_of_elements="1">
+        <Documentation>
+          This should be a printf-style format string. By default,
+          the mapper will try to print each component of the tuple
+          using a sane format: d for integers, f for floats, g for
+          doubles, ld for longs, et cetera. If you need a different
+          format, set it here. You can do things like limit the number
+          of significant digits, add prefixes/suffixes, basically
+          anything that printf can do.
+        </Documentation>
+      </StringVectorProperty>
       <IntVectorProperty command="SetPointLabelJustification"
                          default_values="0"
                          name="PointLabelJustification"
@@ -4883,9 +4893,19 @@
                         name="range" />
       </IntVectorProperty>
       <StringVectorProperty command="SetCellLabelFormat"
-                            default_values=""
+                            default_values="%-#6.3g"
                             name="CellLabelFormat"
-                            number_of_elements="1"></StringVectorProperty>
+                            number_of_elements="1">
+        <Documentation>
+          This should be a printf-style format string. By default,
+          the mapper will try to print each component of the tuple
+          using a sane format: d for integers, f for floats, g for
+          doubles, ld for longs, et cetera. If you need a different
+          format, set it here. You can do things like limit the number
+          of significant digits, add prefixes/suffixes, basically
+          anything that printf can do.
+        </Documentation>
+      </StringVectorProperty>
       <IntVectorProperty command="SetCellLabelJustification"
                          default_values="0"
                          name="CellLabelJustification"
@@ -6971,38 +6991,38 @@
         <Exception name="Opacity" />
         <Exception name="PointSize" />
       </ShareProperties>
-      <ExposedProperties>
-        <Property exposed_name="SelectionColor" name="Color" panel_visibility="never" />
-        <Property exposed_name="SelectionOpacity" name="Opacity" panel_visibility="never" />
-        <Property exposed_name="SelectionUseOutline" name="UseOutline" panel_visibility="never" />
-        <Property exposed_name="SelectionRepresentation" name="Representation" panel_visibility="never" />
-        <Property exposed_name="SelectionPointSize" name="PointSize" panel_visibility="never" />
-        <Property exposed_name="SelectionLineWidth" name="LineWidth" panel_visibility="never" />
-        <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
-          <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" />
-          <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" />
-          <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
-          <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" />
+        <ExposedProperties>
+          <Property exposed_name="SelectionColor" name="Color" panel_visibility="never" />
+          <Property exposed_name="SelectionOpacity" name="Opacity" panel_visibility="never" />
+          <Property exposed_name="SelectionUseOutline" name="UseOutline" panel_visibility="never" />
+          <Property exposed_name="SelectionRepresentation" name="Representation" panel_visibility="never" />
+          <Property exposed_name="SelectionPointSize" name="PointSize" panel_visibility="never" />
+          <Property exposed_name="SelectionLineWidth" name="LineWidth" panel_visibility="never" />
+          <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" panel_visibility="never"/>
+          <PropertyGroup label="Cell Label Font" panel_visibility="never" panel_widget="FontEditor">
+            <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" function="Bold"/>
+            <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" function="Color"/>
+            <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" function="Size"/>
+            <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" function="Italics"/>
+            <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" function="Justification"/>
+            <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
+            <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
+          </PropertyGroup>
           <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" />
-          <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" />
-          <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" />
-          <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" />
-          <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" />
-          <Property exposed_name="SelectionCellLabelVisibility" name="CellLabelVisibility" />
-        </PropertyGroup>
-        <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
-          <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold"/>
-          <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor"/>
-          <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily"/>
-          <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize"/>
+          <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
+          <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
+            <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
+            <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
+            <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize" function="Size"/>
+            <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic" function="Italics"/>
+            <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification" function="Justification"/>
+            <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity" function="Opacity"/>
+            <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow" function="Shadow"/>
+          </PropertyGroup>
           <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat"/>
-          <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic"/>
-          <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification"/>
-          <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity"/>
-          <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow"/>
-          <Property exposed_name="SelectionPtintLabelVisibility" name="PointLabelVisibility"/>
-        </PropertyGroup>
-      </ExposedProperties>
+        </ExposedProperties>
     </SubProxy>
     </PVRepresentationProxy>
   </ProxyGroup>
