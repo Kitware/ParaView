@@ -3228,7 +3228,7 @@
             <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
             <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
           </PropertyGroup>
-          <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" />
+          <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" panel_visibility="never"/>
           <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
           <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
             <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
@@ -3240,7 +3240,7 @@
             <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity" function="Opacity"/>
             <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow" function="Shadow"/>
           </PropertyGroup>
-          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat"/>
+          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat" panel_visibility="never"/>
         </ExposedProperties>
       </SubProxy>
     </PVRepresentationProxy>
@@ -7009,7 +7009,7 @@
             <Property exposed_name="SelectionCellLabelOpacity" name="CellLabelOpacity" function="Opacity"/>
             <Property exposed_name="SelectionCellLabelShadow" name="CellLabelShadow" function="Shadow"/>
           </PropertyGroup>
-          <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" />
+          <Property exposed_name="SelectionCellLabelFormat" name="CellLabelFormat" panel_visibility="never"/>
           <Property exposed_name="SelectionPointLabelVisibility" name="PointLabelVisibility" panel_visibility="never"/>
           <PropertyGroup label="Point Label Font" panel_visibility="never" panel_widget="FontEditor">
             <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
@@ -7021,7 +7021,7 @@
             <Property exposed_name="SelectionPointLabelOpacity" name="PointLabelOpacity" function="Opacity"/>
             <Property exposed_name="SelectionPointLabelShadow" name="PointLabelShadow" function="Shadow"/>
           </PropertyGroup>
-          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat"/>
+          <Property exposed_name="SelectionPointLabelFormat" name="PointLabelFormat" panel_visibility="never" />
         </ExposedProperties>
     </SubProxy>
     </PVRepresentationProxy>
