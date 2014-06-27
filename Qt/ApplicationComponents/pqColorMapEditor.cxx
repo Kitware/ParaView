@@ -67,6 +67,12 @@ public:
   pqInternals(pqColorMapEditor* self) : ObserverId(0)
     {
     this->Ui.setupUi(self);
+    this->Ui.RestoreDefaults->setIcon(
+      self->style()->standardIcon(QStyle::SP_BrowserReload));
+    this->Ui.SaveAsDefaults->setIcon(
+      self->style()->standardIcon(QStyle::SP_DialogSaveButton));
+    // temporarily hiding this till we get time to add support for this.
+    this->Ui.RestoreDefaults->hide();
 
     QVBoxLayout* vbox = new QVBoxLayout(this->Ui.PropertiesFrame);
     vbox->setMargin(0);
@@ -90,7 +96,7 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
                    this, SLOT(updatePanel()));
   QObject::connect(this->Internals->Ui.EditScalarBar, SIGNAL(clicked()),
                    this, SLOT(editScalarBar()));
-  QObject::connect(this->Internals->Ui.SaveAsDefault, SIGNAL(clicked()),
+  QObject::connect(this->Internals->Ui.SaveAsDefaults, SIGNAL(clicked()),
                    this, SLOT(saveAsDefault()));
   QObject::connect(this->Internals->Ui.AutoUpdate, SIGNAL(clicked(bool)),
                    this, SLOT(setAutoUpdate(bool)));
@@ -116,7 +122,7 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
   if (settings)
     {
     this->Internals->Ui.AutoUpdate->setChecked(
-      settings->value("autoUpdateColorMapEditor", false).toBool());
+      settings->value("autoUpdateColorMapEditor2", true).toBool());
     }
   this->updateActive();
 }
@@ -128,7 +134,7 @@ pqColorMapEditor::~pqColorMapEditor()
   if (settings)
     {
     // save the state of advanced button in the user config.
-    settings->setValue("autoUpdateColorMapEditor",
+    settings->setValue("autoUpdateColorMapEditor2",
       this->Internals->Ui.AutoUpdate->isChecked());
     }
 
@@ -218,7 +224,7 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
     delete this->Internals->ProxyWidget;
     }
 
-  ui.SaveAsDefault->setEnabled(ctf != NULL);
+  ui.SaveAsDefaults->setEnabled(ctf != NULL);
   if (!ctf)
     {
     return;
