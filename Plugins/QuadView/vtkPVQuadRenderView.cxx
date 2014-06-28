@@ -656,6 +656,7 @@ void vtkPVQuadRenderView::Update()
     this->GetOrthoRenderView(i)->CopyViewUpdateOptions(this);
     }
   this->QuadInternal->UpdateHandleSize();
+  this->QuadInternal->UpdateLabels();
 }
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::UpdateViewLayout()
