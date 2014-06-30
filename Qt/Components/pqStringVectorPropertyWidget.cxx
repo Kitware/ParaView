@@ -58,9 +58,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSILModel.h"
 #include "pqSILWidget.h"
-#include "pqTextEditSignalEndOfEdit.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"
+#include "pqTextEdit.h"
 #include "pqFieldSelectionAdaptor.h"
 
 #include <QComboBox>
@@ -348,7 +348,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     vbox->addWidget(label);
 
     // add a multiline text widget
-    pqTextEditSignalEndOfEdit *textEdit = new pqTextEditSignalEndOfEdit(this);
+    pqTextEdit *textEdit = new pqTextEdit(this);
     QFont textFont("Courier");
     textEdit->setFont(textFont);
     textEdit->setObjectName(smProxy->GetPropertyName(smProperty));
@@ -358,8 +358,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
     this->setChangeAvailableAsChangeFinished(false);
     this->addPropertyLink(textEdit, "plainText",
-                          SIGNAL(endOfEdit()), smProperty);
-    this->connect(textEdit, SIGNAL(endOfEdit()),
+                          SIGNAL(textChanged()), smProperty);
+    this->connect(textEdit, SIGNAL(textChangedAndEditingFinished()),
                   this, SIGNAL(changeFinished()));
 
     vbox->addWidget(textEdit);

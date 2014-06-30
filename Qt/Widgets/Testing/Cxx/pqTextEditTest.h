@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqStringVectorPropertyWidget.cxx
+   Module:    pqTextEditTest.h
 
-   Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,20 +28,48 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
 
-#include "pqTextEditSignalEndOfEdit.h"
+#ifndef __pqTextEditTest_h
+#define __pqTextEditTest_h
 
-#include <QKeyEvent>
+#include <QObject>
 
-void  pqTextEditSignalEndOfEdit::keyPressEvent(QKeyEvent* e)
+class QSignalSpy;
+class pqTextEdit;
+
+class pqTextEditTester: public QObject
 {
-  if (e->key() == Qt::Key_Tab)
+  Q_OBJECT
+
+public:
+  enum SpyType
     {
-    emit endOfEdit();
-    }
-  else
-    {
-    QTextEdit::keyPressEvent(e);
-    }
-}
+    TextChanged = 0,
+    EditingFinished,
+    TextChangedAndEditingFinished,
+    };
+
+private slots:
+  void init();
+  void cleanup();
+
+  void testSets();
+  void testSets_data();
+  void testTypeText();
+  void testTypeText_data();
+  void testFocus();
+  void testFocus_data();
+  void testReTypeText();
+  void testReTypeText_data();
+
+private:
+  pqTextEdit* TextEdit;
+  QSignalSpy* TextChangedSpy;
+  QSignalSpy* EditingFinishedSpy;
+  QSignalSpy* TextChangedAndEditingFinishedSpy;
+
+  QSignalSpy* spy(int spy);
+};
+
+#endif
