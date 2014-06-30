@@ -78,7 +78,6 @@ protected:
   vtkWeakPointer<vtkPVCatalystSessionCore> CatalystSessionCore;
 
   bool StateDirty;
-  bool LiveChangedCalled;
 private:
   vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&); // Not implemented
   void operator=(const vtkSMLiveInsituLinkProxy&); // Not implemented

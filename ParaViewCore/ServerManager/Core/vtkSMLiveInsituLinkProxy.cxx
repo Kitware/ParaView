@@ -33,8 +33,8 @@
 #include "vtkSMStateLoader.h"
 
 #include <vtksys/ios/sstream>
-//#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr << __LINE__ << " " x << endl;
-#define vtkSMLiveInsituLinkProxyDebugMacro(x)
+#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr << __LINE__ << " " x << endl;
+//#define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
 class vtkSMLiveInsituLinkProxy::vtkInternals
 {
@@ -50,7 +50,6 @@ vtkSMLiveInsituLinkProxy::vtkSMLiveInsituLinkProxy() :
   Internals(new vtkInternals())
 {
   this->StateDirty = false;
-  this->LiveChangedCalled = false;
 }
 
 //----------------------------------------------------------------------------
@@ -88,7 +87,6 @@ void vtkSMLiveInsituLinkProxy::LoadState(
   if(msg->HasExtension(ProxyState::xml_group) &&
       msg->GetExtension(ProxyState::xml_group) == "Catalyst_Communication")
     {
-    this->LiveChangedCalled = false;
     int numberOfUserData = msg->ExtensionSize(ProxyState::user_data);
     for(int i = 0; i < numberOfUserData; ++i)
       {
@@ -260,6 +258,10 @@ void vtkSMLiveInsituLinkProxy::MarkStateDirty()
 {
   this->StateDirty = true;
   vtkSMLiveInsituLinkProxyDebugMacro(<< "MarkStateDirty");
+  if (vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt())
+    {
+    PushUpdatedState();
+    }
   this->LiveChanged();
 }
 
@@ -267,13 +269,10 @@ void vtkSMLiveInsituLinkProxy::MarkStateDirty()
 //----------------------------------------------------------------------------
 void vtkSMLiveInsituLinkProxy::LiveChanged()
 {
-  int simulationPaused =
-    vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt();
-  if (! this->LiveChangedCalled && simulationPaused)
+  if (vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt())
     {
     vtkSMLiveInsituLinkProxyDebugMacro(<< "LiveChanged");
     this->InvokeCommand("LiveChanged");
-    this->LiveChangedCalled = true;
     }
 }
 

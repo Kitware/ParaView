@@ -96,6 +96,144 @@ namespace
     assert (self->GetProcessType() == vtkLiveInsituLink::INSITU);
     self->OnLiveChanged();
   }
+
+ /// Notifications from Live server to Live client.
+  //----------------------------------------------------------------------------
+  void NotifyClientDisconnected(
+    vtkWeakPointer<vtkPVSessionBase> liveSession, unsigned int proxyId)
+  {
+    if (liveSession)
+      {
+      vtkMultiProcessController* parallelController =
+        vtkMultiProcessController::GetGlobalController();
+      assert(parallelController->GetLocalProcessId() == 0);
+      vtkSMMessage message;
+      message.set_global_id(proxyId);
+      message.set_location(vtkPVSession::CLIENT);
+      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+      // Add custom user_data
+      ProxyState_UserData* user_data = 
+        message.AddExtension(ProxyState::user_data);
+      user_data->set_key("LiveAction");
+      Variant* variant = user_data->add_variant();
+      variant->set_type(Variant::INT); // Arbitrary
+      variant->add_integer(vtkLiveInsituLink::DISCONNECTED);
+
+      // Send message
+      liveSession->NotifyAllClients(&message);
+      }
+  }
+
+  //----------------------------------------------------------------------------
+  void NotifyClientConnected(
+    vtkWeakPointer<vtkPVSessionBase> liveSession, unsigned int proxyId,
+    const char* insituXMLState)
+  {
+    if (liveSession)
+      {
+      vtkSMMessage message;
+      message.set_global_id(proxyId);
+      message.set_location(vtkPVSession::CLIENT);
+      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+      // Add custom user_data
+      ProxyState_UserData* user_data =
+        message.AddExtension(ProxyState::user_data);
+      user_data->set_key("LiveAction");
+      Variant* variant = user_data->add_variant();
+      variant->set_type(Variant::INT); // Arbitrary
+      variant->add_integer(vtkLiveInsituLink::CONNECTED);
+      variant->add_txt(insituXMLState);
+
+      // Send message
+      liveSession->NotifyAllClients(&message);
+      }
+  }
+
+  //----------------------------------------------------------------------------
+  void NotifyClientIdMapping(
+    vtkWeakPointer<vtkPVSessionBase> liveSession, unsigned int proxyId,
+    int numberOfIds, vtkTypeUInt32* idMapTable)
+  {
+    if (liveSession)
+      {
+      // here we may let the client know exactly what extracts were updated, if
+      // all were not updated. Currently we just assume all extracts are
+      // redelivered and modified.
+      vtkSMMessage message;
+      message.set_global_id(proxyId);
+      message.set_location(vtkPVSession::CLIENT);
+      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+      // Add custom user_data
+      ProxyState_UserData* user_data = 
+        message.AddExtension(ProxyState::user_data);
+      user_data->set_key("IdMapping");
+      Variant* variant = user_data->add_variant();
+      variant->set_type(Variant::IDTYPE); // Arbitrary
+
+      for(int i=0; i < numberOfIds; ++i)
+        {
+        variant->add_idtype(idMapTable[i]);
+        }
+
+      // Send message
+      liveSession->NotifyAllClients(&message);
+      }
+  }
+
+  //----------------------------------------------------------------------------
+  void NotifyClientDataInformationNextTimestep(
+    vtkWeakPointer<vtkPVSessionBase> liveSession, unsigned int proxyId,
+    const std::map<std::pair<vtkTypeUInt32,unsigned int>,
+                   std::string>& information)
+  {
+    if (liveSession)
+      {
+      // here we may let the client know exactly what extracts were updated, if
+      // all were not updated. Currently we just assume all extracts are
+      // redelivered and modified.
+      vtkSMMessage message;
+      message.set_global_id(proxyId);
+      message.set_location(vtkPVSession::CLIENT);
+      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+      // Add custom user_data
+      ProxyState_UserData* user_data = message.AddExtension(
+        ProxyState::user_data);
+      user_data->set_key("LiveAction");
+      Variant* variant = user_data->add_variant();
+      variant->set_type(Variant::INT); // Arbitrary
+      variant->add_integer(vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE);
+
+      // Add custom user_data for data information
+      if(information.size() > 0)
+        {
+        ProxyState_UserData* dataInfo = message.AddExtension(
+          ProxyState::user_data);
+        dataInfo->set_key("UpdateDataInformation");
+        std::map<std::pair<vtkTypeUInt32,unsigned int>,
+                 std::string>::const_iterator iter;
+        for( iter = information.begin(); iter != information.end();
+             iter++ )
+          {
+          Variant* variant2 = dataInfo->add_variant();
+          variant2->set_type(Variant::PROXY); // Arbitrary
+          variant2->add_proxy_global_id(iter->first.first);
+          variant2->add_port_number(iter->first.second);
+          variant2->add_binary(iter->second);
+          }
+      }
+
+      // Send message
+      liveSession->NotifyAllClients(&message);
+    }
+  }
 }
 
 class vtkLiveInsituLink::vtkInternals
@@ -379,27 +517,7 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(
       parallelController->TriggerRMIOnAllChildren(DROP_CAT2PV_CONNECTION);
       }
     this->DropLiveInsituConnection();
-
-    // notify client.
-    if (this->LiveSession)
-      {
-      assert(parallelController->GetLocalProcessId() == 0);
-      vtkSMMessage message;
-      message.set_global_id(this->ProxyId);
-      message.set_location(vtkPVSession::CLIENT);
-      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
-      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
-
-      // Add custom user_data
-      ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
-      user_data->set_key("LiveAction");
-      Variant* variant = user_data->add_variant();
-      variant->set_type(Variant::INT); // Arbitrary
-      variant->add_integer(DISCONNECTED);
-
-      // Send message
-      this->LiveSession->NotifyAllClients(&message);
-      }
+    NotifyClientDisconnected(this->LiveSession, this->ProxyId);
     }
 }
 
@@ -495,28 +613,8 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
         sim2vis);
       sim2vis->Delete();
       }
-
-    // notify client.
-    if (this->LiveSession)
-      {
-      assert(myId == 0);
-      vtkSMMessage message;
-      message.set_global_id(this->ProxyId);
-      message.set_location(vtkPVSession::CLIENT);
-      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
-      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
-
-      // Add custom user_data
-      ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
-      user_data->set_key("LiveAction");
-      Variant* variant = user_data->add_variant();
-      variant->set_type(Variant::INT); // Arbitrary
-      variant->add_integer(CONNECTED);
-      variant->add_txt(this->InsituXMLState);
-
-      // Send message
-      this->LiveSession->NotifyAllClients(&message);
-      }
+    NotifyClientConnected(this->LiveSession, this->ProxyId,
+                          this->InsituXMLState);
     break;
     }
   case INSITU:
@@ -627,7 +725,7 @@ void vtkLiveInsituLink::InsituUpdate(double time)
   char* buffer = NULL;
   int buffer_size = 0;
 
-  vtkMultiProcessStream extractsMessage;
+  vtkMultiProcessStream extractsPauseMessage;
   std::vector<vtkTypeUInt32> idMappingInStateLoading;
 
   if (myId == 0)
@@ -656,7 +754,7 @@ void vtkLiveInsituLink::InsituUpdate(double time)
 
       // Get the information about extracts. When the extracts have changed or
       // not is encoded in the stream itself.
-      this->Controller->Receive(extractsMessage, 1, 8012);
+      this->Controller->Receive(extractsPauseMessage, 1, 8012);
       }
 
     if (numProcs > 1)
@@ -666,7 +764,7 @@ void vtkLiveInsituLink::InsituUpdate(double time)
         {
         pm->GetGlobalController()->Broadcast(buffer, buffer_size, 0);
         }
-      pm->GetGlobalController()->Broadcast(extractsMessage, 0);
+      pm->GetGlobalController()->Broadcast(extractsPauseMessage, 0);
       }
     }
   else
@@ -679,7 +777,7 @@ void vtkLiveInsituLink::InsituUpdate(double time)
       pm->GetGlobalController()->Broadcast(buffer, buffer_size, 0);
       buffer[buffer_size] = 0;
       }
-    pm->GetGlobalController()->Broadcast(extractsMessage, 0);
+    pm->GetGlobalController()->Broadcast(extractsPauseMessage, 0);
     }
 
   // ** here on, all the code is executed on all processes (root and
@@ -724,21 +822,21 @@ void vtkLiveInsituLink::InsituUpdate(double time)
     }
 
   // Read if the simulation should be paused on INSITU side
-  extractsMessage >> this->SimulationPaused;
+  extractsPauseMessage >> this->SimulationPaused;
   // Process information about extracts
   int extracts_valid = 0;
-  extractsMessage >> extracts_valid;
+  extractsPauseMessage >> extracts_valid;
   if (extracts_valid)
     {
     assert(this->ExtractsDeliveryHelper.GetPointer() != NULL);
     this->ExtractsDeliveryHelper->ClearAllExtracts();
     int numberOfExtracts;
-    extractsMessage >> numberOfExtracts;
+    extractsPauseMessage >> numberOfExtracts;
     for (int cc=0; cc < numberOfExtracts; cc++)
       {
       std::string group, name;
       int port;
-      extractsMessage >> group >> name >> port;
+      extractsPauseMessage >> group >> name >> port;
 
       vtkSMProxy* proxy = this->InsituProxyManager->GetProxy(
         group.c_str(), name.c_str());
@@ -882,9 +980,9 @@ void vtkLiveInsituLink::OnInsituUpdate(double time)
   if (myId == 0)
     {
     // The steps to perform are:
-    // 1. Send coprocessing pipeline state to the INSITU root node, if the
+    // 1. Send coprocessing pipeline state to the INSITU root, if the
     //    state has changed since the last time we sent it.
-    // 2. Send information about extracts to the simulation root, if the
+    // 2. Send information about extracts to the INSITU root, if the
     //    requested extracts has changed.
 
     int xml_state_size = 0;
@@ -901,23 +999,24 @@ void vtkLiveInsituLink::OnInsituUpdate(double time)
       this->Controller->Send(this->InsituXMLState, xml_state_size, 1, 8011);
       }
 
-    vtkMultiProcessStream extractsMessage;
-    extractsMessage << this->SimulationPaused;
+    vtkMultiProcessStream extractsPauseMessage;
+    extractsPauseMessage << this->SimulationPaused;
     if (this->ExtractsChanged)
       {
-      extractsMessage << 1;
-      extractsMessage << static_cast<int>(this->Internals->Extracts.size());
+      extractsPauseMessage << 1;
+      extractsPauseMessage << static_cast<int>(this->Internals->Extracts.size());
       for (vtkInternals::ExtractsMap::iterator iter=this->Internals->Extracts.begin();
         iter != this->Internals->Extracts.end(); ++iter)
         {
-        extractsMessage << iter->first.Group << iter->first.Name << iter->first.Port;
+        extractsPauseMessage << iter->first.Group 
+                             << iter->first.Name << iter->first.Port;
         }
       }
     else
       {
-      extractsMessage << 0;
+      extractsPauseMessage << 0;
       }
-    this->Controller->Send(extractsMessage, 1, 8012);
+    this->Controller->Send(extractsPauseMessage, 1, 8012);
 
     // Read the server id mapping
     int numberOfIds = 0;
@@ -926,34 +1025,9 @@ void vtkLiveInsituLink::OnInsituUpdate(double time)
       {
       vtkTypeUInt32* idMapTable = new vtkTypeUInt32[numberOfIds];
       this->Controller->Receive(idMapTable, numberOfIds, 1, 8014);
-
-      // notify the client with the updated ID mapping.
-      if (this->LiveSession)
-        {
-        // here we may let the client know exactly what extracts were updated, if
-        // all were not updated. Currently we just assume all extracts are
-        // redelivered and modified.
-        vtkSMMessage message;
-        message.set_global_id(this->ProxyId);
-        message.set_location(vtkPVSession::CLIENT);
-        message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
-        message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
-
-        // Add custom user_data
-        ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
-        user_data->set_key("IdMapping");
-        Variant* variant = user_data->add_variant();
-        variant->set_type(Variant::IDTYPE); // Arbitrary
-
-        for(int i=0; i < numberOfIds; ++i)
-          {
-          variant->add_idtype(idMapTable[i]);
-          }
-
-        // Send message
-        this->LiveSession->NotifyAllClients(&message);
-        delete[] idMapTable;
-        }
+      NotifyClientIdMapping(this->LiveSession, this->ProxyId, 
+                                  numberOfIds, idMapTable);
+      delete[] idMapTable;
       }
     }
   else
@@ -977,7 +1051,7 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time)
     pm->GetGlobalController()->TriggerRMIOnAllChildren(
       &time, static_cast<int>(sizeof(double)), POSTPROCESS_RMI_TAG);
     }
-  
+
   vtkLiveInsituLinkDebugMacro(
     "vtkLiveInsituLink::OnInsituPostProcess: " << time);
 
@@ -985,7 +1059,7 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time)
   bool dataAvailable = this->ExtractsDeliveryHelper->Update();
 
   // Retreive the vtkPVDataInformations
-  std::map<std::pair<vtkTypeUInt32,unsigned int>,std::string> dataInformationToSend;
+  std::map<std::pair<vtkTypeUInt32,unsigned int>,std::string> dataInformation;
   if (myId == 0 && this->Controller)
     {
     // Convert serialized version
@@ -1011,51 +1085,13 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time)
       stream.GetData(&oldStr, &oldStrSize);
       std::string newStr((const char*)oldStr, oldStrSize);
 
-      dataInformationToSend[std::pair<vtkTypeUInt32, unsigned int>(id,port)] = newStr;
+      dataInformation[std::pair<vtkTypeUInt32, unsigned int>(id,port)] = newStr;
       }
     }
-
-  // notify the client that updated data is available.
-  if (this->LiveSession && dataAvailable)
+  if (myId == 0 && dataAvailable)
     {
-    assert (myId == 0);
-
-    // here we may let the client know exactly what extracts were updated, if
-    // all were not updated. Currently we just assume all extracts are
-    // redelivered and modified.
-    vtkSMMessage message;
-    message.set_global_id(this->ProxyId);
-    message.set_location(vtkPVSession::CLIENT);
-    message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
-    message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
-
-    // Add custom user_data
-    ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
-    user_data->set_key("LiveAction");
-    Variant* variant = user_data->add_variant();
-    variant->set_type(Variant::INT); // Arbitrary
-    variant->add_integer(NEXT_TIMESTEP_AVAILABLE);
-
-    // Add custom user_data for data information
-    if(dataInformationToSend.size() > 0)
-      {
-      ProxyState_UserData* dataInfo = message.AddExtension(ProxyState::user_data);
-      dataInfo->set_key("UpdateDataInformation");
-      std::map<std::pair<vtkTypeUInt32,unsigned int>,std::string>::iterator iter;
-      for( iter = dataInformationToSend.begin();
-           iter != dataInformationToSend.end();
-           iter++ )
-        {
-        Variant* variant2 = dataInfo->add_variant();
-        variant2->set_type(Variant::PROXY); // Arbitrary
-        variant2->add_proxy_global_id(iter->first.first);
-        variant2->add_port_number(iter->first.second);
-        variant2->add_binary(iter->second);
-        }
-      }
-
-    // Send message
-    this->LiveSession->NotifyAllClients(&message);
+    NotifyClientDataInformationNextTimestep(this->LiveSession, this->ProxyId,
+                                            dataInformation);
     }
 }
 
@@ -1183,10 +1219,13 @@ int vtkLiveInsituLink::WaitForLiveChange()
   int processRMIError = vtkMultiProcessController::RMI_NO_ERROR;
   if (myId == 0)
     {
+    vtkLiveInsituLinkDebugMacro(<< "ProcessRMIs " << myId);
     processRMIError = this->Controller->ProcessRMIs(1, 1);
     }
   if (numProcs > 1)
     {
+    // children wait for parent
+    vtkLiveInsituLinkDebugMacro(<< "Broadcast" << myId);
     pm->GetGlobalController()->Broadcast(&processRMIError, 1, 0);
     }
   if (processRMIError != vtkMultiProcessController::RMI_NO_ERROR)

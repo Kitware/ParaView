@@ -260,7 +260,6 @@ double pqInsituServer::time(pqPipelineSource* pipelineSource)
     if (dataInfo->GetHasTime())
       {
       double time = dataInfo->GetTime();
-      cerr << time << " " << pipelineSource << endl;
       return time;
       }
     }
@@ -279,7 +278,6 @@ void pqInsituServer::onSourceAdded(pqPipelineSource* source)
       QString(sourceProxy->GetXMLName()) == "PVTrivialProducer" &&
       pqInsituServer::isInsituServer (server))
     {
-    cerr << "onSourceAdded: " << source << endl;
     QObject::connect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
                      this, SLOT(onDataUpdated(pqPipelineSource*)));
     }
