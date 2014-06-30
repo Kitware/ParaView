@@ -82,7 +82,7 @@
         <x>0</x>
         <y>0</y>
         <width>337</width>
-        <height>81</height>
+        <height>79</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,1">
@@ -106,22 +106,42 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
          <property name="spacing">
           <number>2</number>
          </property>
          <item>
-          <widget class="QPushButton" name="SaveAsDefault">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
+          <widget class="QPushButton" name="RestoreDefaults">
            <property name="toolTip">
-            <string>&lt;p&gt;Save current transfer function as the default to use next time a new transfer function is needed.&lt;/p&gt;</string>
+            <string>Restore application default setting values for color map</string>
            </property>
            <property name="text">
-            <string>Save as default</string>
+            <string/>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="SaveAsDefaults">
+           <property name="toolTip">
+            <string>Save current color map settings values as default</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
           <widget class="QPushButton" name="Update">
@@ -129,7 +149,7 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update views.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
-            <string>&amp;Update</string>
+            <string>Render Views</string>
            </property>
            <property name="icon">
             <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -146,7 +166,7 @@
          <item>
           <widget class="QPushButton" name="AutoUpdate">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, views are updated automatically after every change. Otherwise, use &lt;span style=&quot; font-weight:600;&quot;&gt;Update&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;/&gt;to update the views manually.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Render view(s) automatically.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string/>
