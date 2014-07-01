@@ -95,3 +95,7 @@ if(NOT DEFINED PARAVIEW_DATA_EXCLUDE_FROM_ALL)
     )
   mark_as_advanced(PARAVIEW_DATA_EXCLUDE_FROM_ALL)
 endif()
+
+# Tell VTK to act as we do but not to warn when we warn.
+set(VTK_DATA_EXCLUDE_FROM_ALL ${PARAVIEW_DATA_EXCLUDE_FROM_ALL})
+set(VTK_DATA_EXCLUDE_FROM_ALL_NO_WARNING 1)
