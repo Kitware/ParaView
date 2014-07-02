@@ -309,6 +309,8 @@ bool vtkSMTransferFunctionProxy::InvertTransferFunction()
       x = range[1] - (x - range[0]);
       }
     }
+  // sort again to ensure that the property value is set as min->max.
+  std::sort(points.begin(), points.end(), StrictWeakOrdering());
   cntrlPoints.Set(points[0].GetData(), num_elements);
   this->UpdateVTKObjects();
   return true;
