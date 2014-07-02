@@ -108,7 +108,9 @@ public:
   // register a view proxy with the proxy manager. This will also perform any
   // additional setups as needed e.g. registering the view with the
   // animation scene and the timer keeper.
-  virtual bool RegisterViewProxy(vtkSMProxy* proxy);
+  virtual bool RegisterViewProxy(vtkSMProxy* proxy)
+    { return this->RegisterViewProxy(proxy, NULL); }
+  virtual bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname);
 
   // Description:
   // Inverse of RegisterViewProxy.

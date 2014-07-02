@@ -472,20 +472,14 @@ class SetScalarColoring(TraceItem):
         if self.ArrayName:
             global_trace_output.append_separated([\
                 "# set scalar coloring",
-                "ColorBy(%s, ['%s', '%s'])" % (\
+                "ColorBy(%s, ('%s', '%s'))" % (\
                     str(Trace.get_accessor(self.Display)),
-                    self.get_association_as_str(self.AttributeType),
+                    sm.GetAssociationAsString(self.AttributeType),
                     self.ArrayName)])
         else:
             global_trace_output.append_separated([\
                 "# turn off scalar coloring",
                 "ColorBy(%s, None)" % str(Trace.get_accessor(self.Display))])
-
-    def get_association_as_str(self, ass):
-        for key, val in sm.ASSOCIATIONS.items():
-          if val == ass:
-              return key
-        raise Untraceable("Cannot detemine association '%d'" % ass)
 
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):
@@ -506,10 +500,8 @@ class CallMethod(TraceItem):
         try:
             if x.IsA("vtkSMProxy"):
                 return Trace.get_accessor(sm._getPyProxy(x))
-            if type(x) == str:
-                return "'%s'" % x
         except AttributeError:
-            return x
+            return "'%s'" % x if type(x) == str else x
 
 def createTraceItem(key, args=None, kwargs=None):
     g = globals()

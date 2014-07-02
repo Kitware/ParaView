@@ -908,11 +908,7 @@ class ArraySelectionProperty(VectorProperty):
         val = self.GetElement(3)
         if val == "":
             return None
-        for key, value in ASSOCIATIONS.iteritems():
-            if value == int(val):
-                return key
-
-        return None
+        return GetAssociationAsString(int(val))
 
     def GetArrayName(self):
         return self.GetElement(4)
@@ -961,14 +957,11 @@ class ArraySelectionProperty(VectorProperty):
             self.SMProperty.SetElement(4, values[0])
         elif len(values) == 2:
             if isinstance(values[0], str):
-                try:
-                    val = str(ASSOCIATIONS[values[0]])
-                except KeyError:
-                    val = str(_LEGACY_ASSOCIATIONS[values[0]])
+                val = GetAssociationFromString(values[0])
             else:
                 # In case user didn't specify valid association,
                 # just pick POINTS.
-                val = str(ASSOCIATIONS['POINTS'])
+                val = GetAssociationFromString("POINTS")
             self.SMProperty.SetElement(3,  str(val))
             self.SMProperty.SetElement(4, values[1])
         else:
@@ -2996,6 +2989,28 @@ def demo5():
 
 ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' : 6}
 _LEGACY_ASSOCIATIONS = { 'POINT_DATA' : 0, 'CELL_DATA' : 1 }
+
+def GetAssociationAsString(val):
+    """Returns array association string from its integer value"""
+    global ASSOCIATIONS
+    if not type(val) == int:
+        raise ValueError, "argument must be of type 'int'"
+    for k, v in ASSOCIATIONS.iteritems():
+        if v == val:
+            return k
+    raise RuntimeError, "invalid association type '%d'" % val
+
+def GetAssociationFromString(val):
+    """Returns array association interger value from its string representation"""
+    global ASSOCIATIONS, _LEGACY_ASSOCIATIONS
+    val = str(val).upper()
+    try:
+        return ASSOCIATIONS[val]
+    except KeyError:
+        try:
+            return _LEGACY_ASSOCIATIONS[val]
+        except KeyError:
+            raise RuntimeError, "invalid association string '%s'" % val
 
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.

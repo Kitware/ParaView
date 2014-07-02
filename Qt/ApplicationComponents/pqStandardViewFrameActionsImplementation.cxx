@@ -110,6 +110,7 @@ void pqStandardViewFrameActionsImplementation::frameConnected(pqViewFrame *frame
   else
     {
     // add view-type independent actions.
+    frame->setTitle(view->getSMName());
     this->addGenericActions(frame, view);
     if (pqContextView* const chart_view = qobject_cast<pqContextView*>(view))
       {

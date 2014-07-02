@@ -110,11 +110,21 @@ def CreateView(view_xml_name, **params):
     if not view:
         raise RuntimeError, "Failed to create requested view", view_xml_name
 
+    try:
+        registrationName = params["registrationName"]
+        del params["registrationName"]
+    except KeyError:
+        try:
+            registrationName = params["guiName"]
+            del params["guiName"]
+        except KeyError:
+            registrationName = None
+
     controller = servermanager.ParaViewPipelineController()
     controller.PreInitializeProxy(view)
     SetProperties(view, **params)
     controller.PostInitializeProxy(view)
-    controller.RegisterViewProxy(view)
+    controller.RegisterViewProxy(view, registrationName)
     return view
 
 # -----------------------------------------------------------------------------
@@ -350,6 +360,33 @@ def SetDisplayProperties(proxy=None, view=None, **params):
     SetProperties(rep, **params)
 
 # -----------------------------------------------------------------------------
+def ColorBy(rep=None, value=None):
+    """Set scalar color. This will automatically setup the color maps and others
+    necessary state for the representations. 'rep' must be the display
+    properties proxy i.e. the value returned by GetDisplayProperties() function.
+    If none is provided the display properties for the active source will be
+    used, if possible."""
+    rep = rep if rep else GetDisplayProperties()
+    if not rep:
+        raise ValueError, "No display properties can be determined."
+
+    association = rep.ColorArrayName.GetAssociation()
+    arrayname = rep.ColorArrayName.GetArrayName()
+
+    if value == None:
+        rep.SetScalarColoring(None, servermanager.GetAssociationFromString(association))
+        return
+    if not isinstance(value, tuple) and not isinstance(value, list):
+        value = (value,)
+    if len(value) == 1:
+        arrayname = value[0]
+    else:
+        association = value[0]
+        arrayname = value[1]
+    rep.SetScalarColoring(arrayname, servermanager.GetAssociationFromString(association))
+
+
+# -----------------------------------------------------------------------------
 def _DisableFirstRenderCameraReset():
     """Disable the first render camera reset.  Normally a ResetCamera is called
     automatically when Render is called for the first time after importing
@@ -443,6 +480,17 @@ def FindSource(name):
        myCone = FindSource('MySuperCone')
     """
     return servermanager.ProxyManager().GetProxy("sources", name)
+
+def FindView(name):
+    """
+    Return a view proxy on the name that was used to register it
+    into the ProxyManager.
+    Example usage::
+
+       CreateRenderView(guiName='RenderView1')
+       myView = FindSource('RenderView1')
+    """
+    return servermanager.ProxyManager().GetProxy("views", name)
 
 # -----------------------------------------------------------------------------
 
@@ -670,7 +718,7 @@ def UpdateScalarBars(view=None):
 def GetColorTransferFunction(arrayname, **params):
     """Get the color transfer function used to mapping a data array with the
     given name to colors. This may create a new color transfer function
-    if none exists, for return an existing one"""
+    if none exists, or return an existing one"""
     if not servermanager.ActiveConnection:
         raise RuntimeError, "Missing active session"
     session = servermanager.ActiveConnection.Session
@@ -679,6 +727,19 @@ def GetColorTransferFunction(arrayname, **params):
             tfmgr.GetColorTransferFunction(arrayname, session.GetSessionProxyManager()))
     SetProperties(lut, **params)
     return lut
+
+def GetOpacityTransferFunction(arrayname, **params):
+    """Get the opacity transfer function used to mapping a data array with the
+    given name to opacity. This may create a new opacity transfer function
+    if none exists, or return an existing one"""
+    if not servermanager.ActiveConnection:
+        raise RuntimeError, "Missing active session"
+    session = servermanager.ActiveConnection.Session
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    otf = servermanager._getPyProxy(\
+            tfmgr.GetOpacityTransferFunction(arrayname, session.GetSessionProxyManager()))
+    SetProperties(otf, **params)
+    return otf
 
 # -----------------------------------------------------------------------------
 def CreateLookupTable(**params):
