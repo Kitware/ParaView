@@ -103,7 +103,7 @@ public:
   // This method's primary goal is to obtain information from ParaView vis
   // engine. If no active connection to ParaView visualization engine exists,
   // this will make an attempt to connect to ParaView.
-  void InsituUpdate(double time);
+  void InsituUpdate(double time, vtkIdType timeStep);
 
   // Description:
   // Every time Insitu is ready to push extracts to ParaView visualization
@@ -111,7 +111,7 @@ public:
   // connection exists (or the connection dies), then this method does nothing
   // (besides some bookkeeping).  Otherwise, this will push any extracts
   // requested to the ParaView visualization engine.
-  void InsituPostProcess(double time);
+  void InsituPostProcess(double time, vtkIdType timeStep);
 
   // Description: Wait until something changes on ParaView Live. This
   // is called on the catalyst side. Insitu stops until the pipeline
@@ -131,8 +131,8 @@ public:
     const char* groupname, const char* proxyname, int portnumber);
   void UnRegisterExtract(vtkTrivialProducer* producer);
 
-  void OnInsituUpdate(double time);
-  void OnInsituPostProcess(double time);
+  void OnInsituUpdate(double time, vtkIdType timeStep);
+  void OnInsituPostProcess(double time, vtkIdType timeStep);
   // Description:
   // Signal a change on the ParaView Live side and transmit it to the Insitu
   // side. This is called when the state or extracts are changed or when

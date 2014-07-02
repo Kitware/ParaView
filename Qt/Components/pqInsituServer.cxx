@@ -54,6 +54,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 double pqInsituServer::INVALID_TIME = - std::numeric_limits<double>().max();
+vtkIdType pqInsituServer::INVALID_TIME_STEP =
+  std::numeric_limits<vtkIdType>().min();
+
 
 //-----------------------------------------------------------------------------
 pqInsituServer* pqInsituServer::instance()
@@ -69,7 +72,9 @@ pqInsituServer* pqInsituServer::instance()
 //-----------------------------------------------------------------------------
 pqInsituServer::pqInsituServer() :
   BreakpointTime(INVALID_TIME),
-  CurrentTime(INVALID_TIME)
+  Time(INVALID_TIME),
+  BreakpointTimeStep(INVALID_TIME_STEP),
+  TimeStep(INVALID_TIME_STEP)
 {
   pqServerManagerModel* model =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -251,7 +256,8 @@ pqPipelineSource* pqInsituServer::pipelineSource(pqServer* insituServer)
 }
 
 //-----------------------------------------------------------------------------
-double pqInsituServer::time(pqPipelineSource* pipelineSource)
+void pqInsituServer::time(pqPipelineSource* pipelineSource, double* time,
+                          vtkIdType* timeStep)
 {
   if (pipelineSource)
     {
@@ -259,11 +265,22 @@ double pqInsituServer::time(pqPipelineSource* pipelineSource)
     vtkPVDataInformation* dataInfo = port->getDataInformation();
     if (dataInfo->GetHasTime())
       {
-      double time = dataInfo->GetTime();
-      return time;
+      *time = dataInfo->GetTime();
+
+      pqServerManagerModel* model =
+        pqApplicationCore::instance()->getServerManagerModel();
+      vtkSMSession* session = pipelineSource->getSourceProxy()->GetSession();
+      pqServer* insituServer = model->findServer(session);
+      vtkSMLiveInsituLinkProxy* linkProxy = pqInsituServer::linkProxy(insituServer);
+      Q_ASSERT (linkProxy);
+      *timeStep = linkProxy->GetTimeStep();
       }
     }
-  return INVALID_TIME;
+  else
+    {
+    *time = INVALID_TIME;
+    *timeStep = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -284,13 +301,28 @@ void pqInsituServer::onSourceAdded(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
+bool pqInsituServer::isTimeBreakpointHit() const
+{
+  return this->Time != INVALID_TIME &&
+    this->BreakpointTime != INVALID_TIME &&
+    this->BreakpointTime <= this->Time;
+}
+
+//-----------------------------------------------------------------------------
+bool pqInsituServer::isTimeStepBreakpointHit() const
+{
+  return this->TimeStep != INVALID_TIME_STEP &&
+    this->BreakpointTimeStep != INVALID_TIME_STEP &&
+    this->BreakpointTimeStep <= this->TimeStep;
+}
+
+
+//-----------------------------------------------------------------------------
 void pqInsituServer::onDataUpdated(pqPipelineSource* source)
 {
-  this->CurrentTime = pqInsituServer::time(source);
-  emit currentTimeUpdated();
-  if (this->CurrentTime != INVALID_TIME &&
-      this->BreakpointTime != INVALID_TIME &&
-      this->BreakpointTime <= this->CurrentTime)
+  pqInsituServer::time(source, &this->Time, &this->TimeStep);
+  emit timeUpdated();
+  if (isTimeBreakpointHit() || isTimeStepBreakpointHit())
     {
     pqServerManagerModel* model =
       pqApplicationCore::instance()->getServerManagerModel();
@@ -318,7 +350,7 @@ void pqInsituServer::onBreakpointHit(pqServer* insituServer)
 }
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::setBreakpointTime(double time)
+void pqInsituServer::setBreakpoint(double time)
 {
   if (this->BreakpointTime != time)
     {
@@ -326,6 +358,22 @@ void pqInsituServer::setBreakpointTime(double time)
     if (insituServer)
       {
       this->BreakpointTime = time;
+      this->BreakpointTimeStep = INVALID_TIME_STEP;
+      emit breakpointAdded(insituServer);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqInsituServer::setBreakpoint(vtkIdType timeStep)
+{
+  if (this->BreakpointTimeStep != timeStep)
+    {
+    pqServer* insituServer = this->insituServer();
+    if (insituServer)
+      {
+      this->BreakpointTime = INVALID_TIME;
+      this->BreakpointTimeStep = timeStep;
       emit breakpointAdded(insituServer);
       }
     }
@@ -334,12 +382,13 @@ void pqInsituServer::setBreakpointTime(double time)
 //-----------------------------------------------------------------------------
 void pqInsituServer::removeBreakpoint()
 {
-  if (this->BreakpointTime != INVALID_TIME)
+  if (this->hasBreakpoint())
     {
     pqServer* insituServer = this->insituServer();
     if (insituServer)
       {
       this->BreakpointTime = INVALID_TIME;
+      this->BreakpointTimeStep = INVALID_TIME_STEP;
       emit breakpointRemoved(insituServer);
       }
     }

@@ -165,13 +165,14 @@ class CoProcessor(object):
            # Initialize the "link"
            self.__LiveVisualizationLink.InsituInitialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
 
-        currentTime = datadescription.GetTime()
+        time = datadescription.GetTime()
+        timeStep = datadescription.GetTimeStep()
 
         # stay in the loop while the simulation is paused
         while True:
             # Update the simulation state, extracts and simulationPaused
             # from ParaView Live
-            self.__LiveVisualizationLink.InsituUpdate(currentTime)
+            self.__LiveVisualizationLink.InsituUpdate(time, timeStep)
 
             # sources need to be updated by insitu
             # code. vtkLiveInsituLink never updates the pipeline, it
@@ -179,10 +180,10 @@ class CoProcessor(object):
             # pipeline, if any.
             from paraview import simple
             for source in simple.GetSources().values():
-                source.UpdatePipeline(currentTime)
+                source.UpdatePipeline(time)
 
             # push extracts to the visualization process.
-            self.__LiveVisualizationLink.InsituPostProcess(currentTime)
+            self.__LiveVisualizationLink.InsituPostProcess(time, timeStep)
 
             if (self.__LiveVisualizationLink.GetSimulationPaused()):
                 # This blocks until something changes on ParaView Live

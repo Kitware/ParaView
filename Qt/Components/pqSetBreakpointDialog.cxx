@@ -54,8 +54,8 @@ pqSetBreakpointDialog::pqSetBreakpointDialog(QWidget* Parent) :
   this->setObjectName("pqSetBreakpointDialog");
   QObject::connect(this->Ui->ButtonBox, SIGNAL(accepted()),
                    this, SLOT(onAccepted()));
-  QObject::connect(pqInsituServer::instance(), SIGNAL(currentTimeUpdated()),
-                   this, SLOT(onCurrentTimeUpdated()));
+  QObject::connect(pqInsituServer::instance(), SIGNAL(timeUpdated()),
+                   this, SLOT(onTimeUpdated()));
 }
 
 //-----------------------------------------------------------------------------
@@ -70,25 +70,41 @@ void pqSetBreakpointDialog::onAccepted()
   pqInsituServer* server = pqInsituServer::instance();
   QString timeString = this->Ui->BreakpointTime->text();
   bool ok = false;
-  double time = timeString.toDouble(&ok);
-  if (ok && time > server->currentTime())
+  if (this->Ui->buttonGroup->checkedButton() == this->Ui->radioButtonTime)
     {
-    server->setBreakpointTime(time);
-    this->accept();
+    double time = timeString.toDouble(&ok);
+    if (ok && time > server->time())
+      {
+      server->setBreakpoint(time);
+      this->accept();
+      return;
+      }
     }
   else
     {
-    QMessageBox message(this);
-    message.setText("Breakpoint time is invalid or "
-                    "it is smaller than current time");
-    message.exec();
+    // maybe vtkIdType is smaller
+    vtkIdType timeStep = static_cast<vtkIdType>(timeString.toLongLong(&ok));
+    if (ok && timeStep > server->timeStep())
+      {
+      server->setBreakpoint(timeStep);
+      this->accept();
+      return;
+      }
     }
+  QMessageBox message(this);
+  message.setText("Breakpoint time is invalid or "
+                  "it is smaller than current time");
+  message.exec();
 }
 
 //-----------------------------------------------------------------------------
-void pqSetBreakpointDialog::onCurrentTimeUpdated()
+void pqSetBreakpointDialog::onTimeUpdated()
 {
   QString timeString =
-    QString("%1").arg(pqInsituServer::instance()->currentTime());
-  this->Ui->CurrentTime->setText (timeString);
+    QString("%1").arg(pqInsituServer::instance()->time());
+  this->Ui->Time->setText (timeString);
+
+  QString timeStepString =
+    QString("%1").arg(pqInsituServer::instance()->timeStep());
+  this->Ui->TimeStep->setText (timeStepString);
 }

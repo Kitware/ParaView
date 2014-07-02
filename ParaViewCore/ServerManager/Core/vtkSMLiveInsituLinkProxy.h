@@ -51,6 +51,10 @@ public:
   // Wakes up Insitu side if simulation is paused. Handles corectly many calls
   // on the LIVE side.
   void LiveChanged();
+  vtkIdType GetTimeStep()
+  {
+    return this->TimeStep;
+  }
 
 //BTX
   // Description:
@@ -72,12 +76,13 @@ protected:
   void PushUpdatedState();
 
   void InsituConnected(const char* initialial_state);
-  void NewTimestepAvailable();
+  void NewTimestepAvailable(vtkIdType timeStep);
 
   vtkSmartPointer<vtkSMSessionProxyManager> InsituProxyManager;
   vtkWeakPointer<vtkPVCatalystSessionCore> CatalystSessionCore;
 
   bool StateDirty;
+  vtkIdType TimeStep;
 private:
   vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&); // Not implemented
   void operator=(const vtkSMLiveInsituLinkProxy&); // Not implemented

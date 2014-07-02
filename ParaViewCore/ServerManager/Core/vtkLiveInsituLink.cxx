@@ -15,7 +15,6 @@
 #include "vtkLiveInsituLink.h"
 
 #include "vtkAlgorithm.h"
-#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkCommunicationErrorCatcher.h"
 #include "vtkExtractsDeliveryHelper.h"
@@ -51,6 +50,41 @@
 
 namespace
 {
+  void TimeFromStream(void *remoteArg, int remoteArgLength, double* time,
+                      vtkIdType* timeStep)
+  {
+    vtkMultiProcessStream stream;
+    const unsigned char* data = static_cast<const unsigned char*>(remoteArg);
+    stream.SetRawData(data, remoteArgLength);
+    stream >> *time >> *timeStep;
+  }
+
+  void TriggerRMI(vtkMultiProcessController* controller, int tag,
+                  double time, vtkIdType timeStep)
+  {
+    vtkMultiProcessStream stream;
+    stream << time << timeStep;
+    unsigned char* data = NULL;
+    unsigned int dataSize;
+    stream.GetRawData(data, dataSize);
+    controller->TriggerRMI(
+      1, const_cast<unsigned char*>(data), dataSize, tag);
+    delete[] data;
+  }
+
+  void TriggerRMIOnAllChildren(vtkMultiProcessController* controller, int tag,
+                               double time, vtkIdType timeStep)
+  {
+    vtkMultiProcessStream stream;
+    stream << time << timeStep;
+    unsigned char* data = NULL;
+    unsigned int dataSize;
+    stream.GetRawData(data, dataSize);
+    controller->TriggerRMIOnAllChildren(
+      const_cast<unsigned char*>(data), dataSize, tag);
+    delete[] data;
+  }
+
   void InitializeConnectionRMI(void *localArg,
     void *vtkNotUsed(remoteArg),
     int vtkNotUsed(remoteArgLength),
@@ -69,23 +103,26 @@ namespace
     self->DropLiveInsituConnection();
     }
 
-  void UpdateRMI(void *localArg,
-    void *remoteArg, int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
+  void UpdateRMI(void *localArg, void *remoteArg, int remoteArgLength, 
+                 int vtkNotUsed(remoteProcessId))
     {
+      double time;
+      vtkIdType timeStep;
+      ::TimeFromStream(remoteArg, remoteArgLength, &time, &timeStep);
       vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
-      double time = *(reinterpret_cast<double*>(remoteArg));
       assert (self->GetProcessType() == vtkLiveInsituLink::LIVE);
-      self->OnInsituUpdate(time);
+      self->OnInsituUpdate(time, timeStep);
     }
 
-  void PostProcessRMI(void *localArg,
-    void *remoteArg, int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
+  void PostProcessRMI(void *localArg, void *remoteArg, int remoteArgLength,
+                      int vtkNotUsed(remoteProcessId))
     {
+      double time;
+      vtkIdType timeStep;
+      ::TimeFromStream(remoteArg, remoteArgLength, &time, &timeStep);
       vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
-      double time = *(reinterpret_cast<double*>(remoteArg));
-
       assert (self->GetProcessType() == vtkLiveInsituLink::LIVE);
-      self->OnInsituPostProcess(time);
+      self->OnInsituPostProcess(time, timeStep);
     }
 
   void LiveChangedRMI(
@@ -190,7 +227,7 @@ namespace
   void NotifyClientDataInformationNextTimestep(
     vtkWeakPointer<vtkPVSessionBase> liveSession, unsigned int proxyId,
     const std::map<std::pair<vtkTypeUInt32,unsigned int>,
-                   std::string>& information)
+                   std::string>& information, vtkIdType timeStep)
   {
     if (liveSession)
       {
@@ -210,6 +247,7 @@ namespace
       Variant* variant = user_data->add_variant();
       variant->set_type(Variant::INT); // Arbitrary
       variant->add_integer(vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE);
+      variant->add_idtype(timeStep);
 
       // Add custom user_data for data information
       if(information.size() > 0)
@@ -687,7 +725,7 @@ void vtkLiveInsituLink::InsituInitialize(vtkSMSessionProxyManager* pxm)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::InsituUpdate(double time)
+void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
 {
   assert(this->ProcessType == INSITU);
 
@@ -738,8 +776,7 @@ void vtkLiveInsituLink::InsituUpdate(double time)
     if (this->Controller)
       {
       // Notify LIVE root-node.
-      this->Controller->TriggerRMI(1, &time, static_cast<int>(sizeof(double)),
-        UPDATE_RMI_TAG);
+      ::TriggerRMI(this->Controller, UPDATE_RMI_TAG, time, timeStep);
 
       // Get status of the state. Did it change? If so receive the state and
       // broadcast it to satellites.
@@ -875,7 +912,7 @@ void vtkLiveInsituLink::InsituUpdate(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::InsituPostProcess(double time)
+void vtkLiveInsituLink::InsituPostProcess(double time, vtkIdType timeStep)
 {
   assert(this->ProcessType == INSITU);
 
@@ -893,8 +930,7 @@ void vtkLiveInsituLink::InsituPostProcess(double time)
   if (myId == 0 && this->Controller)
     {
     // notify vis root node that we are ready to ship extracts.
-    this->Controller->TriggerRMI(1, &time, static_cast<int>(sizeof(double)),
-      POSTPROCESS_RMI_TAG);
+    ::TriggerRMI(this->Controller, POSTPROCESS_RMI_TAG, time, timeStep);
     }
 
   int drop_connection = catcher.GetErrorsRaised()? 1 : 0;
@@ -959,7 +995,7 @@ void vtkLiveInsituLink::InsituPostProcess(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::OnInsituUpdate(double time)
+void vtkLiveInsituLink::OnInsituUpdate(double time, vtkIdType timeStep)
 {
   assert(this->ProcessType == LIVE);
 
@@ -973,8 +1009,8 @@ void vtkLiveInsituLink::OnInsituUpdate(double time)
   int myId = pm->GetPartitionId();
   if (myId == 0 && pm->GetNumberOfLocalPartitions() > 1)
     {
-    pm->GetGlobalController()->TriggerRMIOnAllChildren(
-      &time, static_cast<int>(sizeof(double)), UPDATE_RMI_TAG);
+    ::TriggerRMIOnAllChildren(pm->GetGlobalController(), UPDATE_RMI_TAG,
+                              time, timeStep);
     }
 
   if (myId == 0)
@@ -1040,7 +1076,7 @@ void vtkLiveInsituLink::OnInsituUpdate(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::OnInsituPostProcess(double time)
+void vtkLiveInsituLink::OnInsituPostProcess(double time, vtkIdType timeStep)
 {
   assert(this->ProcessType == LIVE);
 
@@ -1048,8 +1084,8 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time)
   int myId = pm->GetPartitionId();
   if (myId == 0 && pm->GetNumberOfLocalPartitions() > 1)
     {
-    pm->GetGlobalController()->TriggerRMIOnAllChildren(
-      &time, static_cast<int>(sizeof(double)), POSTPROCESS_RMI_TAG);
+    ::TriggerRMIOnAllChildren(pm->GetGlobalController(), POSTPROCESS_RMI_TAG,
+                              time, timeStep);
     }
 
   vtkLiveInsituLinkDebugMacro(
@@ -1090,8 +1126,8 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time)
     }
   if (myId == 0 && dataAvailable)
     {
-    NotifyClientDataInformationNextTimestep(this->LiveSession, this->ProxyId,
-                                            dataInformation);
+    NotifyClientDataInformationNextTimestep(
+      this->LiveSession, this->ProxyId, dataInformation, timeStep);
     }
 }
 

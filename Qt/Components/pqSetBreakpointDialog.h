@@ -57,7 +57,7 @@ signals:
 
 protected slots:
   void onAccepted();
-  void onCurrentTimeUpdated();
+  void onTimeUpdated();
 
 private:
   Q_DISABLE_COPY(pqSetBreakpointDialog)

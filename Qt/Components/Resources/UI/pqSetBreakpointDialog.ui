@@ -6,18 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>253</width>
-    <height>103</height>
+    <width>247</width>
+    <height>136</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Set Breakpoint</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Breakpoint Time:</string>
+      <string>Breakpoint:</string>
      </property>
     </widget>
    </item>
@@ -25,20 +25,43 @@
     <widget class="QLineEdit" name="BreakpointTime"/>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
+    <widget class="QRadioButton" name="radioButtonTime">
      <property name="text">
-      <string>Current Time:</string>
+      <string>Time</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLabel" name="CurrentTime">
+    <widget class="QLabel" name="Time">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="0">
+    <widget class="QRadioButton" name="radioButtonTimeStep">
+     <property name="text">
+      <string>Time Step</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLabel" name="TimeStep">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="ButtonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -69,4 +92,7 @@
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

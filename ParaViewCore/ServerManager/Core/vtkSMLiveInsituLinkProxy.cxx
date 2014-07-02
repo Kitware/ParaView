@@ -106,7 +106,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
           break;
 
         case vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE:
-          this->NewTimestepAvailable();
+          this->NewTimestepAvailable(value.idtype(0));
           break;
 
         case vtkLiveInsituLink::DISCONNECTED:
@@ -213,8 +213,9 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
+void vtkSMLiveInsituLinkProxy::NewTimestepAvailable(vtkIdType timeStep)
 {
+  this->TimeStep = timeStep;
   // Mark all extract producer proxies as dirty.
   vtkInternals::ExtractProxiesType::iterator iter;
   for (iter = this->Internals->ExtractProxies.begin();

@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include "pqComponentsModule.h"
 
+#include "vtkType.h"
+
 class pqLiveInsituVisualizationManager;
 class pqPipelineSource;
 class pqProxy;
@@ -52,6 +54,7 @@ class PQCOMPONENTS_EXPORT pqInsituServer : public QObject
 
 public:
   static double INVALID_TIME;
+  static vtkIdType INVALID_TIME_STEP;
   static pqInsituServer* instance();
 
   /// Returns the link proxy to Catalyst or NULL if not connected or if not
@@ -64,11 +67,12 @@ public:
   /// Is this the insitu server
   static bool isInsituServer(pqServer* server);
   static pqPipelineSource* pipelineSource(pqServer* insituServer);
-  static double time(pqPipelineSource* source);
+  static void time(pqPipelineSource* source, double* time,
+                     vtkIdType* timeStep);
 
 signals:
   void catalystConnected(pqServer* displayServer);
-  void currentTimeUpdated();
+  void timeUpdated();
   void breakpointAdded(pqServer* insituServer);
   void breakpointRemoved(pqServer* insituServer);
   void breakpointHit(pqServer* insituServer);
@@ -93,16 +97,26 @@ public:
   {
     return this->BreakpointTime;
   }
-  void setBreakpointTime(double time);
+  double breakpointTimeStep() const
+  {
+    return this->BreakpointTimeStep;
+  }
+  void setBreakpoint(double time);
+  void setBreakpoint(vtkIdType timeStep);
   void removeBreakpoint();
   bool hasBreakpoint() const
   {
-    return this->breakpointTime() != INVALID_TIME;
+    return this->breakpointTime() != INVALID_TIME ||
+      this->breakpointTimeStep() != INVALID_TIME_STEP;
   }
 
-  double currentTime() const
+  double time() const
   {
-    return this->CurrentTime;
+    return this->Time;
+  }
+  vtkIdType timeStep() const
+  {
+    return this->TimeStep;
   }
 
 protected slots:
@@ -114,10 +128,14 @@ protected slots:
 
 protected:
   pqInsituServer();
+  bool isTimeBreakpointHit() const;
+  bool isTimeStepBreakpointHit() const;
 
 protected:
   double BreakpointTime;
-  double CurrentTime;
+  double Time;
+  vtkIdType BreakpointTimeStep;
+  vtkIdType TimeStep;
 
 private:
   Q_DISABLE_COPY(pqInsituServer)
