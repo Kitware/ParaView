@@ -3,11 +3,15 @@ implemented by the vtkPythonCalculator to operate on datasets to compute
 derived quantities.
 """
 
-from numpy import *
+try:
+  import numpy as np
+except ImportError:
+  raise RuntimeError, "'numpy' module is not found. numpy is needed for "\
+    "this functionality to work. Please install numpy and try again."
 
-from paraview import vtk
-from paraview.vtk import dataset_adapter
-from paraview.vtk.algorithms import *
+import vtk
+import vtk.numpy_interface.dataset_adapter as dsa
+from vtk.numpy_interface.algorithms import *
 
 def compute(inputs, association, expression):
     import paraview
@@ -43,11 +47,11 @@ def execute(self, expression):
     inputs = []
 
     for index in range(self.GetNumberOfInputConnections(0)):
-        inputs.append(dataset_adapter.WrapDataObject(
-                self.GetInputDataObject(0, index)))
+        # wrap all input data objects using vtk.numpy_interface.dataset_adapter
+        inputs.append(dsa.WrapDataObject(self.GetInputDataObject(0, index)))
 
     # Setup output.
-    output = dataset_adapter.WrapDataObject(self.GetOutputDataObject(0))
+    output = dsa.WrapDataObject(self.GetOutputDataObject(0))
 
     if self.GetCopyArrays():
         output.GetPointData().PassData(inputs[0].GetPointData())
