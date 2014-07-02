@@ -165,6 +165,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ImageVolumeRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
@@ -412,6 +413,8 @@ SET (CompositeSurfaceSelection_DISABLE_CRS TRUE)
 # mode.
 SET (Clip_DISABLE_CRS TRUE)
 
+# Image volume rendering not supported in CRS mode.
+set (ImageVolumeRendering_DISABLE_CRS TRUE)
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)

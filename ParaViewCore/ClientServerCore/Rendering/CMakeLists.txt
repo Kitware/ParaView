@@ -51,6 +51,7 @@ set (Module_SRCS
   vtkMoleculeRepresentation.cxx
   vtkMPIMoveData.cxx
   vtkOutlineRepresentation.cxx
+  vtkPExtentTranslator.cxx
   vtkPVBagChartRepresentation.cxx
   vtkPVBoxChartRepresentation.cxx
   vtkPVCacheKeeper.cxx
@@ -111,6 +112,9 @@ endif()
 
 set_source_files_properties(
   vtkCacheSizeKeeper
+
+  # No need to wrap vtkPExtentTranslator, its an internal class.
+  vtkPExtentTranslator
   WRAP_EXCLUDE
 )
 
