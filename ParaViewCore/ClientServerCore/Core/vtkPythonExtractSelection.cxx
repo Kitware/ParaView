@@ -14,40 +14,31 @@
 =========================================================================*/
 #include "vtkPythonExtractSelection.h"
 
-#include "vtkCellData.h"
-#include "vtkCell.h"
-#include "vtkCellTypes.h"
-#include "vtkCharArray.h"
+#include "vtkAbstractArray.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTypes.h"
-#include "vtkIdTypeArray.h"
+#include "vtkExtractSelectedIds.h"
+#include "vtkExtractSelectedRows.h"
+#include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkPoints.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkSignedCharArray.h"
+#include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <assert.h>
-#include <map>
-#include <vector>
-#include <vtksys/ios/sstream>
+#include <cassert>
+#include <sstream>
 
 vtkStandardNewMacro(vtkPythonExtractSelection);
 //----------------------------------------------------------------------------
 vtkPythonExtractSelection::vtkPythonExtractSelection()
 {
-  this->PreserveTopology = 0;
-  this->Inverse = 0;
-  this->SetExecuteMethod(vtkPythonExtractSelection::ExecuteScript, this);
-
-  // eventually, once this class starts taking in a real vtkSelection.
-  this->SetNumberOfInputPorts(2);
 }
 
 //----------------------------------------------------------------------------
@@ -58,82 +49,93 @@ vtkPythonExtractSelection::~vtkPythonExtractSelection()
 //----------------------------------------------------------------------------
 int vtkPythonExtractSelection::FillInputPortInformation(int port, vtkInformation *info)
 {
-  if(port == 0)
+  if (port == 0)
     {
-    this->Superclass::FillInputPortInformation(port, info);
+    // This filter handles composite datasets, datasets and table. Not graphs and others.
+    info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
-    }
-  else if(port == 1)
-    {
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
-    info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
     }
   else
     {
-    return 0;
+    assert(port == 1);
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
+    info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     }
-
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkPythonExtractSelection::RequestDataObject(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformation *request, vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
   // Output type is same as input
   vtkDataObject *input = vtkDataObject::GetData(inputVector[0], 0);
   if (input)
     {
-    const char* outputType = "vtkUnstructuredGrid";
-    if (input->IsA("vtkCompositeDataSet"))
+    const char* outputType = NULL;
+    if (this->PreserveTopology)
       {
-      outputType = "vtkMultiBlockDataSet";
+      outputType = input->GetClassName();
       }
-    else if (input->IsA("vtkTable"))
+    else
       {
-      outputType = "vtkTable";
-      }
-
-    // for each output
-    for (int i=0; i < this->GetNumberOfOutputPorts(); ++i)
-      {
-      vtkInformation* info = outputVector->GetInformationObject(i);
-      vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
-
-      if (!output || !output->IsA(outputType))
+      outputType = "vtkUnstructuredGrid";
+      if (vtkCompositeDataSet::SafeDownCast(input))
         {
-        vtkDataObject* newOutput =
-          vtkDataObjectTypes::NewDataObject(outputType);
-        info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
-        newOutput->Delete();
-        this->GetOutputPortInformation(0)->Set(
-          vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+        outputType = "vtkMultiBlockDataSet";
         }
+      else if (vtkTable::SafeDownCast(input))
+        {
+        outputType = "vtkTable";
+        }
+      }
+    vtkInformation* info = outputVector->GetInformationObject(0);
+    vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+    if (!output || !output->IsA(outputType))
+      {
+      vtkDataObject* newOutput =
+        vtkDataObjectTypes::NewDataObject(outputType);
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
+      newOutput->Delete();
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
       }
     return 1;
     }
-
   return 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonExtractSelection::ExecuteScript(void* arg)
+int vtkPythonExtractSelection::RequestData(
+  vtkInformation *request, vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
-  vtkPythonExtractSelection* self =
-    static_cast<vtkPythonExtractSelection*>(arg);
-  if (self)
+  // if not selection is specified, return.
+  if (inputVector[1]->GetNumberOfInformationObjects() == 0)
     {
-    self->Exec();
+    return 1;
     }
-}
 
-//----------------------------------------------------------------------------
-void vtkPythonExtractSelection::Exec()
-{
-  // ensure Python is initialized.
-  vtkPythonInterpreter::Initialize();
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
+  vtkSelection* selection = vtkSelection::GetData(inputVector[1], 0);
+  if (selection == NULL || selection->GetNumberOfNodes() == 0)
+    {
+    // empty selection.
+    return 1;
+    }
+
+  if (selection->GetNumberOfNodes() > 1)
+    {
+    vtkWarningMacro("vtkPythonExtractSelection currently only supports a selection "
+      "with a single vtkSelectionNode instance. All other instances will be ignored, "
+      "except the first one.");
+    }
+
+  vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
+  this->InitializeOutput(output, input);
 
   // Set self to point to this
   char addrofthis[1024];
@@ -145,262 +147,189 @@ void vtkPythonExtractSelection::Exec()
     aplus += 2; //skip over "0x"
     }
 
-  vtksys_ios::ostringstream stream;
+  // ensure Python is initialized.
+  vtkPythonInterpreter::Initialize();
+
+  std::ostringstream stream;
   stream << "from paraview import extract_selection as pv_es" << endl
          << "from vtkPVClientServerCoreCorePython import vtkPythonExtractSelection" << endl
          << "me = vtkPythonExtractSelection('" << aplus << " ')" << endl
-         << "pv_es.Exec(me, me.GetInputDataObject(0, 0),  me.GetInputDataObject(1, 0), me.GetOutputDataObject(0))" << endl
+         << "pv_es.execute(me)" << endl
          << "del me" << endl;
-
   vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkPythonExtractSelection::ExtractElements(
-  vtkDataObject* data, vtkSelection *selection, vtkCharArray* mask)
+void vtkPythonExtractSelection::InitializeOutput(
+  vtkDataObject* output, vtkDataObject* input)
 {
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
-  vtkTable* table = vtkTable::SafeDownCast(data);
-  vtkSelectionNode* selNode = selection->GetNode(0);
-
-  // get the inverse flag for the selection
-  vtkInformation* selProperties = selNode->GetProperties();
-  this->Inverse = selProperties->Get(vtkSelectionNode::INVERSE());
-
-  if (ds)
-    {
-    switch (selNode->GetFieldType())
-      {
-    case vtkSelectionNode::POINT:
-      return this->ExtractPoints(ds, mask);
-
-    case vtkSelectionNode::CELL:
-      return this->ExtractCells(ds, mask);
-      }
-    }
-  else if (table)
-    {
-    return this->ExtractElements(table, mask);
-    }
-
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractPoints(
-  vtkDataSet* input, vtkCharArray* mask)
-{
-  assert(mask && input && mask->GetNumberOfTuples() ==
-    input->GetNumberOfPoints());
-  vtkIdType numPoints = input->GetNumberOfPoints();
-
-  vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
-  vtkDataSetAttributes* inputPD = input->GetPointData();
-  vtkDataSetAttributes* outputPD = output->GetPointData();
-
   if (this->PreserveTopology)
     {
-    // TODO: Determine whether either numpy_to_vtk can return a
-    //   vtkSignedCharArray in a backwards-compatible manner (unlikely)
-    //   or the vtkPVExtractSelection and vtkExtractSelection filters
-    //   can use a vtkCharArray instead of a vtkSignedCharArray (more
-    //   likely possible). That would save us a deep copy here.
+    // When preserving topology, we need to shallow copy input to output.
     output->ShallowCopy(input);
-    vtkSignedCharArray* inside = vtkSignedCharArray::New();
-    inside->DeepCopy(mask);
-    inside->SetName("vtkInsidedness");
-    outputPD->AddArray(inside);
-    inside->FastDelete();
+
+    vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(output);
+    if (!outputCD)
+      {
+      return;
+      }
+
+    // For composite datasets, the ShallowCopy simply shares the leaf datasets.
+    // We need to create new instances for those.
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(outputCD->NewIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      vtkDataObject* ds = iter->GetCurrentDataObject();
+      assert(ds != NULL);
+
+      vtkDataObject* clone = ds->NewInstance();
+      clone->ShallowCopy(ds);
+      outputCD->SetDataSet(iter, clone);
+      clone->FastDelete();
+      }
     }
   else
     {
-    vtkPoints* outputPoints = vtkPoints::New();
-    outputPoints->Allocate(numPoints);
-
-    output->SetPoints(outputPoints);
-    output->Allocate(1);
-    outputPoints->FastDelete();
-
-    outputPD->SetCopyGlobalIds(1);
-    outputPD->SetCopyPedigreeIds(1);
-    outputPD->CopyAllocate(inputPD, numPoints);
-
-    vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
-    originalIds->SetName("vtkOriginalPointIds");
-    originalIds->Allocate(numPoints);
-
-    const char* pmask = mask->GetPointer(0);
-
-    std::vector<vtkIdType> pointIds;
-    for (vtkIdType id = 0; id < numPoints; ++id)
+    // not preserving topology. In that case, we just ensure that the output
+    // composite dataset has same structure as the input.
+    if (vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(output))
       {
-      // extract selected points if inverse flag is false and vice versa
-      if (pmask[id] == this->Inverse)
+      vtkCompositeDataSet* inputCD = vtkCompositeDataSet::SafeDownCast(input);
+      assert(inputCD != NULL);
+      outputCD->CopyStructure(inputCD);
+
+      // To make it easier for the Python code to pass the "original ids" array back,
+      // we initialize the non-null leaf nodes in this composite dataset with empty datasets.
+      vtkSmartPointer<vtkCompositeDataIterator> iter;
+      iter.TakeReference(inputCD->NewIterator());
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
         {
-        continue;
-        }
+        vtkDataObject* ds = iter->GetCurrentDataObject();
+        assert(ds != NULL);
 
-      vtkIdType newId = outputPoints->InsertNextPoint(input->GetPoint(id));
-      outputPD->CopyData(inputPD, id, newId);
-      pointIds.push_back(newId);
-      originalIds->InsertValue(newId, id);
-      }
-
-    if(!pointIds.empty())
-      {
-      output->InsertNextCell(VTK_POLY_VERTEX,
-        static_cast<vtkIdType>(pointIds.size()), &pointIds[0]);
-      }
-
-    outputPD->AddArray(originalIds);
-    // unmark global and pedigree ids.
-    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
-    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
-
-    originalIds->FastDelete();
-
-    output->Squeeze();
-    }
-  return output;
-}
-
-//----------------------------------------------------------------------------
-vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
-  vtkDataSet* input, vtkCharArray* mask)
-{
-  assert(mask && input && mask->GetNumberOfTuples() ==
-    input->GetNumberOfCells());
-
-  vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
-  vtkCellData* inputCD = input->GetCellData();
-  vtkCellData* outputCD = output->GetCellData();
-
-  if (this->PreserveTopology)
-    {
-    // TODO: Determine whether either numpy_to_vtk can return a
-    //   vtkSignedCharArray in a backwards-compatible manner (unlikely)
-    //   or the vtkPVExtractSelection and vtkExtractSelection filters
-    //   can use a vtkCharArray instead of a vtkSignedCharArray (more
-    //   likely possible). That would save us a deep copy here.
-    output->ShallowCopy(input);
-    vtkSignedCharArray* inside = vtkSignedCharArray::New();
-    inside->DeepCopy(mask);
-    inside->SetName("vtkInsidedness");
-    outputCD->AddArray(inside);
-    inside->FastDelete();
-    }
-  else
-    {
-    vtkIdType numCells = input->GetNumberOfCells();
-    vtkIdType numPoints = input->GetNumberOfPoints();
-
-    vtkPoints* outputPoints = vtkPoints::New();
-    outputPoints->Allocate(numPoints);
-
-    output->SetPoints(outputPoints);
-    output->Allocate(numCells);
-    outputPoints->FastDelete();
-
-    vtkPointData *inputPD = input->GetPointData();
-    vtkPointData *outputPD = output->GetPointData();
-
-    outputCD->SetCopyGlobalIds(1);
-    outputPD->SetCopyGlobalIds(1);
-    outputCD->SetCopyPedigreeIds(1);
-    outputPD->SetCopyPedigreeIds(1);
-    outputCD->CopyAllocate(inputCD);
-    outputPD->CopyAllocate(inputPD);
-
-    vtkIdTypeArray* originalPointIds = vtkIdTypeArray::New();
-    originalPointIds->SetName("vtkOriginalPointIds");
-    originalPointIds->Allocate(numPoints);
-
-    vtkIdTypeArray* originalCellIds = vtkIdTypeArray::New();
-    originalCellIds->SetName("vtkOriginalCellIds");
-    originalCellIds->Allocate(numCells);
-
-    std::map<vtkIdType, vtkIdType> outPointIdMap;
-    const char* pmask = mask->GetPointer(0);
-
-    for (vtkIdType inCellId = 0; inCellId < numCells; inCellId++)
-      {
-      if (pmask[inCellId] == this->Inverse)
-        {
-        continue;
-        }
-
-      vtkCell *cell = input->GetCell(inCellId);
-
-      std::vector<vtkIdType> outPointsInCell;
-
-      // insert points from the cell
-      for (vtkIdType j = 0; j < cell->GetNumberOfPoints(); j++)
-        {
-        vtkIdType inPointId = cell->GetPointId(j);
-
-        vtkIdType outPointId = -1;
-
-        std::map<vtkIdType, vtkIdType>::iterator iter =
-          outPointIdMap.find(inPointId);
-        if (iter == outPointIdMap.end())
+        if (vtkTable::SafeDownCast(ds))
           {
-          // insert copy of the old point
-          outPointId = outputPoints->InsertNextPoint(input->GetPoint(inPointId));
-
-          // copy old point data
-          outputPD->CopyData(inputPD, inPointId, outPointId);
-
-          // add point id to the mapping
-          outPointIdMap[inPointId] = outPointId;
-
-          // add old point id to original point ids
-          originalPointIds->InsertNextValue(inPointId);
+          vtkTable* table = vtkTable::New();
+          outputCD->SetDataSet(iter, table);
+          table->FastDelete();
+          }
+        else if (vtkDataSet::SafeDownCast(ds))
+          {
+          vtkUnstructuredGrid* ug = vtkUnstructuredGrid::New();
+          outputCD->SetDataSet(iter, ug);
+          ug->FastDelete();
           }
         else
           {
-          // already added the point, use its new id
-          outPointId = iter->second;
+          vtkWarningMacro("Composite data has unsupported type: "
+            << ds->GetClassName());
           }
-
-        // add point id
-        outPointsInCell.push_back(outPointId);
         }
-
-      // add new cell
-      vtkIdType outCellId = output->InsertNextCell(cell->GetCellType(),
-        static_cast<vtkIdType>(outPointsInCell.size()),
-        outPointsInCell.size() > 0? &outPointsInCell[0] : NULL);
-
-      // copy cell data
-      outputCD->CopyData(inputCD, inCellId, outCellId);
-
-      originalCellIds->InsertNextValue(inCellId);
       }
-
-    outputPD->AddArray(originalPointIds);
-    // unmark global and pedigree ids.
-    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
-    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
-    originalPointIds->FastDelete();
-
-    outputCD->AddArray(originalCellIds);
-    // unmark global and pedigree ids.
-    outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
-    outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
-    originalCellIds->FastDelete();
-    output->Squeeze();
     }
-
-  return output;
 }
 
 //----------------------------------------------------------------------------
-vtkTable* vtkPythonExtractSelection::ExtractElements(
-  vtkTable* vtkNotUsed(data), vtkCharArray* vtkNotUsed(mask))
+bool vtkPythonExtractSelection::ExtractElements(
+  int attributeType, vtkDataObject* input, vtkDataObject* output)
 {
-  vtkErrorMacro("Not supported yet. Aborting for debugging purposes.");
-  abort();
-  return NULL;
+  assert(this->PreserveTopology == 0);
+  if (vtkCompositeDataSet* inputCD = vtkCompositeDataSet::SafeDownCast(input))
+    {
+    return this->ExtractElements(attributeType,
+      inputCD, vtkCompositeDataSet::SafeDownCast(output));
+    }
+
+  int fieldType;
+  switch (attributeType)
+    {
+  case vtkDataObject::CELL:
+    fieldType = vtkSelectionNode::CELL;
+    break;
+
+  case vtkDataObject::POINT:
+    fieldType = vtkSelectionNode::POINT;
+    break;
+
+  case vtkDataObject::ROW:
+    fieldType = vtkSelectionNode::ROW;
+    break;
+
+  default:
+    vtkWarningMacro("Unsupported attributeType: " << attributeType);
+    return false;
+    }
+
+  // sanity check: ensure that the attribute type specified is valid for the type of
+  // input dataset.
+  if (input->GetAttributes(attributeType) == NULL)
+    {
+    vtkWarningMacro("Incorrect attributeType '" << attributeType << "' "
+      "for input data type '" << input->GetClassName() << "'");
+    return false;
+    }
+
+  // extract_selection.execute() puts the selected ids array in field data of the output dataset.
+  // This is done so to keep the code clean for the case with composite datasets.
+  vtkAbstractArray* idsToExtact = output->GetFieldData()->GetAbstractArray("vtkSelectedIds");
+  if (idsToExtact && idsToExtact->GetNumberOfTuples() > 0)
+    {
+    vtkNew<vtkSelection> selection;
+    vtkNew<vtkSelectionNode> node;
+    selection->AddNode(node.GetPointer());
+    node->SetContentType(vtkSelectionNode::INDICES);
+    node->SetFieldType(fieldType);
+    node->SetSelectionList(idsToExtact);
+
+    vtkSmartPointer<vtkAlgorithm> extractor;
+    if (vtkTable::SafeDownCast(input))
+      {
+      vtkNew<vtkExtractSelectedRows> filter;
+      filter->SetAddOriginalRowIdsArray(true);
+      extractor = filter.GetPointer();
+      }
+    else
+      {
+      vtkNew<vtkExtractSelectedIds> filter;
+      filter->PreserveTopologyOff();
+      extractor = filter.GetPointer();
+      }
+    extractor->SetInputDataObject(0, input);
+    extractor->SetInputDataObject(1, selection.GetPointer());
+    extractor->Update();
+
+    idsToExtact = NULL;
+    // note: the ShallowCopy will overwrite output->FieldData, hence idsToExtact will be
+    // dangling.
+    output->ShallowCopy(extractor->GetOutputDataObject(0));
+    return true;
+    }
+
+  output->Initialize();
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPythonExtractSelection::ExtractElements(
+  int attributeType, vtkCompositeDataSet* input, vtkCompositeDataSet* output)
+{
+  assert(this->PreserveTopology == 0);
+
+  // this method simply iterates over all the leaf nodes in the dataset and calls
+  // ExtractElements.
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(input->NewIterator());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    if (!this->ExtractElements(attributeType,
+        iter->GetCurrentDataObject(), output->GetDataSet(iter)))
+      {
+      output->SetDataSet(iter, NULL);
+      }
+    }
+  return true;
 }
 
 //----------------------------------------------------------------------------
