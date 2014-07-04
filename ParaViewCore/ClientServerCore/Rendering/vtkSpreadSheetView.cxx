@@ -55,8 +55,8 @@ namespace
       "vtkOriginalPointIds",
       "Structured Coordinates",
       NULL};
-    std::string a1Name = a1->GetName()? a1->GetName() : NULL;
-    std::string a2Name = a2->GetName()? a2->GetName() : NULL;
+    std::string a1Name = a1->GetName()? a1->GetName() : "";
+    std::string a2Name = a2->GetName()? a2->GetName() : "";
     int a1Index = VTK_INT_MAX, a2Index = VTK_INT_MAX;
     for (int cc=0; order[cc] != NULL; cc++)
       {
