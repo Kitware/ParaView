@@ -21,8 +21,10 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
+#include "vtkPExtentTranslator.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODVolume.h"
@@ -135,20 +137,20 @@ void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
     vtkAlgorithm* inputAlgo = connection->GetProducer();
     vtkStreamingDemandDrivenPipeline* sddp =
       vtkStreamingDemandDrivenPipeline::SafeDownCast(inputAlgo->GetExecutive());
-//    vtkExtentTranslator* translator =
-//      sddp->GetExtentTranslator(connection->GetIndex());
 
     int extent[6] = {1, -1, 1, -1, 1, -1};
     sddp->GetWholeExtent(sddp->GetOutputInformation(connection->GetIndex()),
       extent);
-
     double origin[3], spacing[3];
     vtkImageData* image = vtkImageData::SafeDownCast(
       inputAlgo->GetOutputDataObject(connection->GetIndex()));
     image->GetOrigin(origin);
     image->GetSpacing(spacing);
-//    vtkPVRenderView::SetOrderedCompositingInformation(
-//      inInfo, self, translator, extent, origin, spacing);
+
+    vtkNew<vtkPExtentTranslator> translator;
+    translator->GatherExtents(image);
+    vtkPVRenderView::SetOrderedCompositingInformation(
+      inInfo, self, translator.GetPointer(), extent, origin, spacing);
     }
 }
 
