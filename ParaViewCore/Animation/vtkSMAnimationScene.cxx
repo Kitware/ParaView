@@ -191,6 +191,7 @@ namespace
   protected:
     virtual bool IsAcceptable(vtkAnimationCue* cue) const
       {
+      (void)cue;
       return (false
 #ifdef PARAVIEW_ENABLE_PYTHON
         || (vtkPythonAnimationCue::SafeDownCast(cue) != NULL)

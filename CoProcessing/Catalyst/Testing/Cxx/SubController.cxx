@@ -35,7 +35,7 @@ int SubController(int argc, char* argv[])
     subranks.push_back(0);
     }
   MPI_Group subgroup;
-  MPI_Group_incl(orig_group, subranks.size(), &(subranks[0]), &subgroup);
+  MPI_Group_incl(orig_group, static_cast<int>(subranks.size()), &(subranks[0]), &subgroup);
   MPI_Comm subcommunicator;
   MPI_Comm_create(MPI_COMM_WORLD, subgroup, &subcommunicator);
 

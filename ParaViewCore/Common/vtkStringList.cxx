@@ -174,7 +174,7 @@ void vtkStringList::Reallocate(int num)
   int i;
 
   // Check to see if we need to extent to array of commands.
-  if (this->StringArrayLength >= num)
+  if (num < 0 || this->StringArrayLength >= num)
     { // No
     return;
     }
