@@ -832,4 +832,7 @@ if(PARAVIEW_DATA_EXCLUDE_FROM_ALL)
       "(needed because BUILD_TESTING is ON) may not be available "
       "without manually building the 'ParaViewData' target.")
   endif()
+  if(TARGET VTKData)
+    add_dependencies(ParaViewData VTKData)
+  endif()
 endif()
