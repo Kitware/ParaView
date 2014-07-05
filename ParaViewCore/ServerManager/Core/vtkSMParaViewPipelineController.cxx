@@ -643,7 +643,7 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
     return false;
     }
 
-  SM_SCOPED_TRACE(UnRegisterPipelineProxy).arg("proxy", proxy);
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
 
   const std::string proxyname(_proxyname);
 
@@ -681,6 +681,8 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(RegisterViewProxy).arg("proxy", proxy);
 
   // Now register the proxy itself.
   proxy->GetSessionProxyManager()->RegisterProxy("views", proxyname, proxy);
@@ -721,6 +723,8 @@ bool vtkSMParaViewPipelineController::UnRegisterViewProxy(
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
   const std::string proxyname(_proxyname);
 
   // ensure proxy is no longer active.
@@ -816,6 +820,7 @@ bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* 
       return false;
       }
     }
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
   const std::string proxyname(_proxyname);
 
   //---------------------------------------------------------------------------
@@ -907,6 +912,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
     {
     return false;
     }
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
   const std::string proxyname(_proxyname);
 
   //---------------------------------------------------------------------------

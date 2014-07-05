@@ -1,3 +1,4 @@
+import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
 from paraview.vtk import vtkTimeStamp
@@ -301,6 +302,11 @@ class TraceItem(object):
         return not prop.Object.GetIsInternal() and not prop.Object.GetInformationOnly() \
                 and (trace_props_with_default_values or not prop.Object.IsValueDefault())
 
+class NestableTraceItem(TraceItem):
+    """Base class for trace item that can be nested i.e.
+    can trace when some other trace item is active."""
+    pass
+
 class RegisterPipelineProxy(TraceItem):
     """This traces the creation of a Pipeline Proxy such as
     sources/filters/readers etc."""
@@ -339,17 +345,17 @@ class RegisterPipelineProxy(TraceItem):
         TraceItem.finalize(self)
         global_trace_output.append_separator()
 
-class UnRegisterPipelineProxy(TraceItem):
+class Delete(TraceItem):
     """This traces the deletion of a Pipeline proxy"""
     def __init__(self, proxy):
         global global_trace_output
-
         TraceItem.__init__(self)
         proxy = sm._getPyProxy(proxy)
-
+        accessor = Trace.get_accessor(proxy)
         global_trace_output.append_separated([\
-                "# delete a pipeline object",
-                "Delete(%s)" % (Trace.get_accessor(proxy))])
+                "# destroy %s" % (accessor),
+                "Delete(%s)" % (accessor),
+                "del %s" % accessor])
 
 class PropertiesModified(TraceItem):
     """Traces properties modified on a specific proxy."""
@@ -481,6 +487,38 @@ class SetScalarColoring(TraceItem):
                 "# turn off scalar coloring",
                 "ColorBy(%s, None)" % str(Trace.get_accessor(self.Display))])
 
+
+class RegisterViewProxy(TraceItem):
+    """Traces creation of a new view (vtkSMParaViewPipelineController::RegisterViewProxy)."""
+    def __init__(self, proxy):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+        assert not self.Proxy is None
+
+    def finalize(self):
+        global global_trace_output
+
+        pname = Trace.get_registered_name(self.Proxy, "views")
+        varname = Trace.get_varname(pname)
+        accessor = ProxyAccessor(varname, self.Proxy)
+
+        # unlike for filters/sources, for views the CreateView function still takes the
+        # xml name for the view, not its label.
+        ctor = self.Proxy.GetXMLName()
+        ctor_props = accessor.get_ctor_properties()
+        other_props = [x for x in accessor.get_properties() if \
+            x not in ctor_props and self.should_trace_in_create(x)]
+        if ctor_props:
+            ctor = "%s = CreateView('%s', %s)" % (accessor, ctor, accessor.trace_properties(ctor_props, in_ctor=True))
+        else:
+            ctor = "%s = CreateView('%s')" % (accessor, ctor)
+        global_trace_output.append_separated([\
+            "# Create a new '%s'" % self.Proxy.GetXMLLabel(),
+            ctor,
+            accessor.trace_properties(other_props, in_ctor=False)])
+        # we assume views don't have proxy list domains for now, and ignore tracing them.
+        TraceItem.finalize(self)
+
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):
         global global_trace_output
@@ -503,12 +541,24 @@ class CallMethod(TraceItem):
         except AttributeError:
             return "'%s'" % x if type(x) == str else x
 
+ActiveTraceItems = []
+
 def createTraceItem(key, args=None, kwargs=None):
+    global ActiveTraceItems
+
+    # trim ActiveTraceItems to remove None references.
+    ActiveTraceItems = [x for x in ActiveTraceItems if not x() is None]
+
     g = globals()
     if g.has_key(key) and callable(g[key]):
         args = args if args else []
         kwargs = kwargs if kwargs else {}
-        return g[key](*args, **kwargs)
+        traceitemtype = g[key]
+        if len(ActiveTraceItems) == 0 or issubclass(traceitemtype, NestableTraceItem):
+            instance = traceitemtype(*args, **kwargs)
+            ActiveTraceItems.append(weakref.ref(instance))
+            return instance
+        raise Untraceable("Non-nestable trace item. Ignoring in current context.")
     raise Untraceable("Unknown trace item type %s" % key)
     #print "Hello again", key, args
     #return A(key)
