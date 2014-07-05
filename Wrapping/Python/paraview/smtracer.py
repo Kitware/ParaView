@@ -123,6 +123,13 @@ class Trace(object):
                     cls.Output.append_separated([\
                         "# find view",
                         "%s = FindView('%s')" % (accessor, pname)])
+                # trace view size, if present. We trace this commented out so
+                # that the playback in the GUI doesn't cause issues.
+                viewSizeAccessor = accessor.get_property("ViewSize")
+                if viewSizeAccessor:
+                    cls.Output.append([\
+                        "# uncomment following to set a specific view size",
+                        "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
                 return True
         if obj.SMProxy.IsA("vtkSMRepresentationProxy"):
             # handle representations.
@@ -229,6 +236,12 @@ class ProxyAccessor(Accessor):
     def trace_properties(self, props, in_ctor):
         joiner = "\n    " if in_ctor else "\n"
         return joiner.join([x.trace_property(in_ctor) for x in props])
+
+    def get_property(self, name):
+        for x in self.OrderedProperties:
+            if x.PropertyKey == name:
+                return x
+        return None
 
 class PropertyAccessor(Accessor):
     def __init__(self, propkey, prop, proxyAccessor):
@@ -498,14 +511,26 @@ class RegisterViewProxy(TraceItem):
         ctor_props = accessor.get_ctor_properties()
         other_props = [x for x in accessor.get_properties() if \
             x not in ctor_props and self.should_trace_in_create(x)]
+
+        trace = []
+        trace.append("# Create a new '%s'" % self.Proxy.GetXMLLabel())
         if ctor_props:
-            ctor = "%s = CreateView('%s', %s)" % (accessor, ctor, accessor.trace_properties(ctor_props, in_ctor=True))
+            trace.append("%s = CreateView('%s', %s)" %\
+                    (accessor, ctor, accessor.trace_properties(ctor_props, in_ctor=True)))
         else:
-            ctor = "%s = CreateView('%s')" % (accessor, ctor)
-        Trace.Output.append_separated([\
-            "# Create a new '%s'" % self.Proxy.GetXMLLabel(),
-            ctor,
-            accessor.trace_properties(other_props, in_ctor=False)])
+            trace.append("%s = CreateView('%s')" % (accessor, ctor))
+        if other_props:
+             trace.append(accessor.trace_properties(other_props, in_ctor=False))
+        Trace.Output.append_separated(trace)
+
+        viewSizeAccessor = accessor.get_property("ViewSize")
+        if viewSizeAccessor and not viewSizeAccessor in ctor_props and \
+                not viewSizeAccessor in other_props:
+                # trace view size, if present. We trace this commented out so
+                # that the playback in the GUI doesn't cause issues.
+                Trace.Output.append([\
+                        "# uncomment following to set a specific view size",
+                        "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
         # we assume views don't have proxy list domains for now, and ignore tracing them.
         TraceItem.finalize(self)
 
