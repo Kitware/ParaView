@@ -131,6 +131,9 @@ public:
   /// captureImage(int).
   virtual vtkImageData* captureImage(const QSize& size);
 
+  /// Capture an image and saves it out to a file.
+  bool writeImage(const QString& filename, const QSize&, int quality=-1);
+
   /// This method checks if the representation is shown in this view.
   bool hasRepresentation(pqRepresentation* repr) const;
 

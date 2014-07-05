@@ -554,19 +554,36 @@ class CallMethod(TraceItem):
         to_trace = []
         try:
             to_trace.append("# " + kwargs["comment"])
+            del kwargs["comment"]
         except KeyError:
             pass
         accessor = Trace.get_accessor(sm._getPyProxy(proxy))
-        args = [str(self.marshall(x)) for x in args]
+        args = [str(CallMethod.marshall(x)) for x in args]
+        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.iteritems()]
         to_trace.append("%s.%s(%s)" % (accessor, methodname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
 
-    def marshall(self, x):
+    @classmethod
+    def marshall(cls, x):
         try:
             if x.IsA("vtkSMProxy"):
                 return Trace.get_accessor(sm._getPyProxy(x))
         except AttributeError:
             return "'%s'" % x if type(x) == str else x
+
+class CallFunction(TraceItem):
+    def __init__(self, functionname, *args, **kwargs):
+        TraceItem.__init__(self)
+        to_trace = []
+        try:
+            to_trace.append("# " + kwargs["comment"])
+            del kwargs["comment"]
+        except KeyError:
+            pass
+        args = [str(CallMethod.marshall(x)) for x in args]
+        args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.iteritems()]
+        to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
+        Trace.Output.append_separated(to_trace)
 
 ActiveTraceItems = []
 

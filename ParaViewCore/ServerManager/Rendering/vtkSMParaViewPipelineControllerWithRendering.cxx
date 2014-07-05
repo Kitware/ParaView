@@ -14,8 +14,11 @@
 =========================================================================*/
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 
+#include "vtkErrorCode.h"
+#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -27,52 +30,12 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
+#include "vtkSMUtilities.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 
 #include <string>
 #include <cassert>
-
-//namespace smtrace
-//{
-//  class Show : public Action
-//  {
-//  vtkSMProxy* Representation;
-//  vtkSMSourceProxy* Producer;
-//  int Port;
-//  vtkSMViewProxy* View;
-//  vtkTimeStamp TimeStamp;
-//public:
-//  Show(vtkSMProxy* rep, vtkSMSourceProxy* producer, int port, vtkSMViewProxy* view)
-//    : Representation(rep),
-//    Producer(producer),
-//    Port(port),
-//    View(view)
-//    {
-//    if (!this->IsTracingEnabled()) { return; }
-//    this->TimeStamp.Modified();
-//    }
-//  ~Show()
-//    {
-//    if (!this->IsTracingEnabled()) { return; }
-//
-//    // Ensure all necessary variables are accessible.
-//    std::string producerVarName = this->GetVariable(this->Producer);
-//    std::string viewVarName = this->GetVariable(this->View);
-//
-//    this->GetStream() << "var = Show("
-//                      << producerVarName
-//                      << ", "
-//                      << viewVarName
-//                      << ")" << endl;
-//
-////    this->TraceProperties(this->Representation,
-////      /*prefix=*/ "",
-////      /*suffix=*/ COMMA_NEWLINE_INDENT,
-////      /*modified_since=*/ this->TimeStamp.GetMTime());
-//
-//    }
-//  };
-//}
 
 namespace
 {
@@ -567,6 +530,46 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
   double time = view? vtkSMPropertyHelper(view, "ViewTime").GetAsDouble() :
     vtkSMPropertyHelper(this->FindTimeKeeper(producer->GetSession()), "Time").GetAsDouble();
   producer->UpdatePipeline(time);
+}
+
+//----------------------------------------------------------------------------
+template<class T>
+bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int quality)
+{
+  if (!viewOrLayout)
+    {
+    return false;
+    }
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("SaveScreenshot")
+    .arg(viewOrLayout)
+    .arg("filename", filename)
+    .arg("magnification", magnification)
+    .arg("quality", quality)
+    .arg("comment", "save screenshot");
+
+  vtkSmartPointer<vtkImageData> img;
+  img.TakeReference(viewOrLayout->CaptureWindow(magnification));
+  if (img &&
+    vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
+    {
+    return vtkSMUtilities::SaveImage(img.GetPointer(), filename, quality) == vtkErrorCode::NoError;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
+  vtkSMViewProxy* view, const char* filename, int magnification, int quality)
+{
+  return vtkWriteImage<vtkSMViewProxy>(view, filename, magnification, quality);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
+  vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality)
+{
+  return vtkWriteImage<vtkSMViewLayoutProxy>(layout, filename, magnification, quality);
 }
 
 //----------------------------------------------------------------------------

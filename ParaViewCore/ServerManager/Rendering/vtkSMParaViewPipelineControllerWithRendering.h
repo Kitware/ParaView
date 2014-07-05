@@ -35,8 +35,9 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMParaViewPipelineController.h"
 
-class vtkSMViewProxy;
 class vtkSMSourceProxy;
+class vtkSMViewLayoutProxy;
+class vtkSMViewProxy;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMParaViewPipelineControllerWithRendering :
   public vtkSMParaViewPipelineController
@@ -105,6 +106,12 @@ public:
   static void SetInheritRepresentationProperties(bool);
   static bool GetInheritRepresentationProperties();
 
+  // Description:
+  // Methods to save/capture images from views.
+  virtual bool WriteImage(vtkSMViewProxy* view,
+      const char* filename, int magnification, int quality);
+  virtual bool WriteImage(vtkSMViewLayoutProxy* layout,
+      const char* filename, int magnification, int quality);
 
   // Description:
   // Overridden to handle default ColorArrayName for representations correctly.

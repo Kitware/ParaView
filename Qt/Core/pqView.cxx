@@ -35,13 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkProcessModule.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
-#include "vtkPVXMLElement.h"
 
 // Qt includes.
 #include <QList>
@@ -402,6 +404,38 @@ int pqView::computeMagnification(const QSize& fullsize, QSize& viewsize)
 
   viewsize = fullsize/magnification;
   return magnification;
+}
+
+//-----------------------------------------------------------------------------
+bool pqView::writeImage(const QString& filename, const QSize& fullsize, int quality)
+{
+  // FIXME: code duplicated with pqView::captureImage(). Fix it :).
+  if (!this->getWidget()->isVisible())
+    {
+    return NULL;
+    }
+
+  QWidget* vtkwidget = this->getWidget();
+  QSize cursize = vtkwidget->size();
+  QSize newsize = cursize;
+  int magnification = 1;
+  if (fullsize.isValid())
+    {
+    magnification = pqView::computeMagnification(fullsize, newsize);
+    vtkwidget->resize(newsize);
+    }
+  this->render();
+
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  bool status = controller->WriteImage(this->getViewProxy(),
+    filename.toLatin1().data(), magnification, quality);
+  if (fullsize.isValid())
+    {
+    vtkwidget->resize(newsize);
+    vtkwidget->resize(cursize);
+    this->render();
+    }
+  return status;
 }
 
 //-----------------------------------------------------------------------------

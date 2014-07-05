@@ -633,7 +633,10 @@ def WriteImage(filename, view=None, **params):
     Magnification is used to determine the size of the written image. The size
     is obtained by multiplying the size of the view with the magnification.
     Rendering may be done using tiling to obtain the correct size without
-    resizing the view."""
+    resizing the view.
+
+    ** DEPRECATED: Use SaveScreenshot() instead. **
+    """
     if not view:
         view = active_objects.view
     writer = None
@@ -645,6 +648,26 @@ def WriteImage(filename, view=None, **params):
     if not writer:
         writer = _find_writer(filename)
     view.WriteImage(filename, writer, mag)
+
+# -----------------------------------------------------------------------------
+def SaveScreenshot(filename,
+    viewOrLayout=None, magnification=None, quality=None, **params):
+
+    viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
+    if not viewOrLayout:
+        raise ValueError, "No 'viewOrLayout' specified and active view is not setup."
+    try:
+        magnification = int(magnification) if int(magnification) > 0 else 1
+    except TypeError:
+        magnification = 1
+    try:
+        quality = int(quality)
+    except TypeError:
+        quality = -1
+
+    controller = servermanager.ParaViewPipelineController()
+    return controller.WriteImage(\
+        viewOrLayout, filename, magnification, quality)
 
 # -----------------------------------------------------------------------------
 

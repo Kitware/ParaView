@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewFrame.h"
 #include "pqView.h"
 #include "vtkCommand.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
@@ -819,6 +821,18 @@ vtkImageData* pqMultiViewWidget::captureImage(int dx, int dy)
   vtkImageData* image = this->layoutManager()->CaptureWindow(magnification);
   this->cleanupAfterCapture();
   return image;
+}
+
+//-----------------------------------------------------------------------------
+bool pqMultiViewWidget::writeImage(
+  const QString& filename, int dx, int dy, int quality)
+{
+  int magnification = this->prepareForCapture(dx, dy);
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+  bool status = controller->WriteImage(this->layoutManager(),
+    filename.toLatin1().data(), magnification, quality);
+  this->cleanupAfterCapture();
+  return status;
 }
 
 //-----------------------------------------------------------------------------
