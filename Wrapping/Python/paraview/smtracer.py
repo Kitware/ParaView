@@ -3,8 +3,8 @@ import paraview.servermanager as sm
 import paraview.simple as simple
 from paraview.vtk import vtkTimeStamp
 
-class trace_output:
-  """Class used to collect the trace output. Everytime anything is pushed into
+class TraceOutput:
+  """Internal class used to collect the trace output. Everytime anything is pushed into
   this using the append API, we ensure that the trace is updated. Trace
   doesn't put commands to the trace-output as soon as modifications are noticed
   to try to consolidate the state changes."""
@@ -43,6 +43,13 @@ class trace_output:
 class Trace(object):
     __REGISTERED_ACCESSORS = {}
 
+    Output = None
+
+    @classmethod
+    def reset(cls):
+        cls.__REGISTERED_ACCESSORS.clear()
+        cls.Output = TraceOutput()
+
     @classmethod
     def get_registered_name(cls, proxy, reggroup):
         return proxy.SMProxy.GetSessionProxyManager().GetProxyName(reggroup, proxy.SMProxy)
@@ -68,10 +75,6 @@ class Trace(object):
         del cls.__REGISTERED_ACCESSORS[accessor.Object]
 
     @classmethod
-    def reset(cls):
-        cls.__REGISTERED_ACCESSORS.clear()
-
-    @classmethod
     def get_accessor(cls, obj):
         try:
             return cls.__REGISTERED_ACCESSORS[obj]
@@ -91,19 +94,18 @@ class Trace(object):
 
     @classmethod
     def _create_accessor(cls, obj):
-        global global_trace_output
         if isinstance(obj, sm.SourceProxy):
             # handle pipeline source/filter proxy.
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("sources", obj.SMProxy)
             if pname:
                 if obj == simple.GetActiveSource():
                     accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    global_trace_output.append_separated([\
+                    cls.Output.append_separated([\
                         "# get active source.",
                         "%s = GetActiveSource()" % accessor])
                 else:
                     accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    global_trace_output.append_separated([\
+                    cls.Output.append_separated([\
                         "# find source",
                         "%s = FindSource('%s')" % (accessor, pname)])
                 return True
@@ -113,12 +115,12 @@ class Trace(object):
             if pname:
                 if obj == simple.GetActiveView():
                     accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    global_trace_output.append_separated([\
+                    cls.Output.append_separated([\
                         "# get active view.",
                         "%s = GetActiveView()" % accessor])
                 else:
                     accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    global_trace_output.append_separated([\
+                    cls.Output.append_separated([\
                         "# find view",
                         "%s = FindView('%s')" % (accessor, pname)])
                 return True
@@ -132,7 +134,7 @@ class Trace(object):
                 if pname:
                     varname = "%sDisplay" % inputAccsr
                     accessor = ProxyAccessor(cls.get_varname(varname), obj)
-                    global_trace_output.append_separated([\
+                    cls.Output.append_separated([\
                         "# get display properties",
                         "%s = GetDisplayProperties(%s)" % (accessor, str(inputAccsr))])
                     return True
@@ -148,7 +150,6 @@ class Trace(object):
 
     @classmethod
     def _create_accessor_for_tf(cls, proxy, regname):
-        global global_trace_output
         import re
         m = re.match("^[0-9.]*(.+)\\.%s$" % proxy.GetXMLName(), regname)
         if m:
@@ -163,7 +164,7 @@ class Trace(object):
                 method = "GetOpacityTransferFunction"
             varname = cls.get_varname("%s%s" % (arrayName, varsuffix))
             accessor = ProxyAccessor(varname, proxy)
-            global_trace_output.append_separated([\
+            cls.Output.append_separated([\
                 "# get %s for '%s'" % (comment, arrayName),
                 "%s = %s('%s')" % (accessor, method, arrayName)])
             # FIXME: we should optionally log the current state for the transfer
@@ -316,8 +317,6 @@ class RegisterPipelineProxy(TraceItem):
         self.Proxy = sm._getPyProxy(proxy)
 
     def finalize(self):
-        global global_trace_output
-
         pname = Trace.get_registered_name(self.Proxy, "sources")
         varname = Trace.get_varname(pname)
         accessor = ProxyAccessor(varname, self.Proxy)
@@ -327,7 +326,7 @@ class RegisterPipelineProxy(TraceItem):
         other_props = [x for x in accessor.get_properties() if \
                 x not in ctor_props and self.should_trace_in_create(x)]
 
-        global_trace_output.append_separated([\
+        Trace.Output.append_separated([\
                 "# Create a new pipeline object",
                 "%s = %s(%s)" % (accessor, ctor, accessor.trace_properties(ctor_props, in_ctor=True)),
                 accessor.trace_properties(other_props, in_ctor=False)])
@@ -338,24 +337,23 @@ class RegisterPipelineProxy(TraceItem):
             paccessor = Trace.get_accessor(prop.get_property_value())
             pproperties = [x for x in paccessor.get_properties() if  self.should_trace_in_create(x)]
             if pproperties:
-                global_trace_output.append_separated([\
+                Trace.Output.append_separated([\
                     "# Init the %s selected for '%s'" % \
                     (prop.value(), prop.get_property_name()),
                     paccessor.trace_properties(pproperties, in_ctor=False)])
         TraceItem.finalize(self)
-        global_trace_output.append_separator()
+        Trace.Output.append_separator()
 
 class Delete(TraceItem):
     """This traces the deletion of a Pipeline proxy"""
     def __init__(self, proxy):
-        global global_trace_output
         TraceItem.__init__(self)
         proxy = sm._getPyProxy(proxy)
         accessor = Trace.get_accessor(proxy)
-        global_trace_output.append_separated([\
-                "# destroy %s" % (accessor),
-                "Delete(%s)" % (accessor),
-                "del %s" % accessor])
+        Trace.Output.append_separated([\
+            "# destroy %s" % (accessor),
+            "Delete(%s)" % (accessor),
+            "del %s" % accessor])
 
 class PropertiesModified(TraceItem):
     """Traces properties modified on a specific proxy."""
@@ -368,11 +366,10 @@ class PropertiesModified(TraceItem):
         self.MTime.Modified()
 
     def finalize(self):
-        global global_trace_output
         props = self.ProxyAccessor.get_properties()
         props_to_trace = [k for k in props if self.MTime.GetMTime() < k.Object.GetMTime()]
         if props_to_trace:
-            global_trace_output.append_separated([
+            Trace.Output.append_separated([
                 "# Properties modified on %s" % str(self.ProxyAccessor),
                 self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
 
@@ -384,7 +381,7 @@ class PropertiesModified(TraceItem):
                 props = valaccessor.get_properties()
                 props_to_trace = [k for k in props if self.MTime.GetMTime() < k.Object.GetMTime()]
                 if props_to_trace:
-                  global_trace_output.append_separated([
+                  Trace.Output.append_separated([
                       "# Properties modified on %s" % valaccessor,
                       valaccessor.trace_properties(props_to_trace, in_ctor=False)])
         TraceItem.finalize(self)
@@ -392,8 +389,6 @@ class PropertiesModified(TraceItem):
 class Show(TraceItem):
     """Traces Show"""
     def __init__(self, producer, port, view, display):
-        global global_trace_output
-
         TraceItem.__init__(self)
 
         producer = sm._getPyProxy(producer)
@@ -435,7 +430,7 @@ class Show(TraceItem):
                 output.append("# Trace defaults for the display properties")
                 output.append(self.Accessor.trace_properties(properties, in_ctor=False))
 
-        global_trace_output.append_separated(output)
+        Trace.Output.append_separated(output)
         TraceItem.finalize(self)
 
     def should_trace_in_create(self, prop):
@@ -448,7 +443,6 @@ class Show(TraceItem):
 class Hide(TraceItem):
     """Traces Hide"""
     def __init__(self, producer, port, view):
-        global global_trace_output
         TraceItem.__init__(self)
 
         producer = sm._getPyProxy(producer)
@@ -456,7 +450,7 @@ class Hide(TraceItem):
         producerAccessor = Trace.get_accessor(producer)
         viewAccessor = Trace.get_accessor(view)
 
-        global_trace_output.append_separated([\
+        Trace.Output.append_separated([\
           "# hide data in view",
           "Hide(%s, %s)" % (str(producerAccessor), str(viewAccessor)) if port == 0 else \
               "Hide(OutputPort(%s, %d), %s)" % (str(producerAccessor), port, str(viewAccessor))])
@@ -471,19 +465,17 @@ class SetScalarColoring(TraceItem):
         self.AttributeType = attribute_type
 
     def finalize(self):
-        global global_trace_output
-
         TraceItem.finalize(self)
 
         if self.ArrayName:
-            global_trace_output.append_separated([\
+            Trace.Output.append_separated([\
                 "# set scalar coloring",
                 "ColorBy(%s, ('%s', '%s'))" % (\
                     str(Trace.get_accessor(self.Display)),
                     sm.GetAssociationAsString(self.AttributeType),
                     self.ArrayName)])
         else:
-            global_trace_output.append_separated([\
+            Trace.Output.append_separated([\
                 "# turn off scalar coloring",
                 "ColorBy(%s, None)" % str(Trace.get_accessor(self.Display))])
 
@@ -496,8 +488,6 @@ class RegisterViewProxy(TraceItem):
         assert not self.Proxy is None
 
     def finalize(self):
-        global global_trace_output
-
         pname = Trace.get_registered_name(self.Proxy, "views")
         varname = Trace.get_varname(pname)
         accessor = ProxyAccessor(varname, self.Proxy)
@@ -512,7 +502,7 @@ class RegisterViewProxy(TraceItem):
             ctor = "%s = CreateView('%s', %s)" % (accessor, ctor, accessor.trace_properties(ctor_props, in_ctor=True))
         else:
             ctor = "%s = CreateView('%s')" % (accessor, ctor)
-        global_trace_output.append_separated([\
+        Trace.Output.append_separated([\
             "# Create a new '%s'" % self.Proxy.GetXMLLabel(),
             ctor,
             accessor.trace_properties(other_props, in_ctor=False)])
@@ -521,7 +511,6 @@ class RegisterViewProxy(TraceItem):
 
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):
-        global global_trace_output
         TraceItem.__init__(self)
 
         to_trace = []
@@ -532,7 +521,7 @@ class CallMethod(TraceItem):
         accessor = Trace.get_accessor(sm._getPyProxy(proxy))
         args = [str(self.marshall(x)) for x in args]
         to_trace.append("%s.%s(%s)" % (accessor, methodname, ", ".join(args)))
-        global_trace_output.append_separated(to_trace)
+        Trace.Output.append_separated(to_trace)
 
     def marshall(self, x):
         try:
@@ -565,21 +554,14 @@ def createTraceItem(key, args=None, kwargs=None):
 
 def startTrace():
     """Starts tracing"""
-    global global_trace_output
     Trace.reset()
-    global_trace_output = trace_output()
     return True
 
 def stopTrace():
     """Stops trace"""
-    global global_trace_output
-
-    trace = str(global_trace_output)
+    trace = str(Trace.Output)
     Trace.reset()
-    global_trace_output = None
     return trace
-
-global_trace_output = None
 
 if __name__ == "__main__":
     print "Running test"
