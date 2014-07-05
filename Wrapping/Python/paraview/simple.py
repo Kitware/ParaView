@@ -1138,6 +1138,25 @@ def ClearSelection(proxy=None):
     proxy.SMProxy.SetSelectionInput(proxy.Port, None, 0)
 
 #==============================================================================
+# Miscellaneous functions.
+#==============================================================================
+def Show3DWidgets(proxy=None):
+    """If possible in the current environment, this method will
+    request the application to show the 3D widget(s) for proxy"""
+    proxy = proxy if proxy else GetActiveSource()
+    if not proxy:
+        raise ValueError, "No 'proxy' was provided and no active source was found."
+    proxy.InvokeEvent('UserEvent', "ShowWidget")
+
+def Hide3DWidgets(proxy=None):
+    """If possible in the current environment, this method will
+    request the application to hide the 3D widget(s) for proxy"""
+    proxy = proxy if proxy else GetActiveSource()
+    if not proxy:
+        raise ValueError, "No 'proxy' was provided and no active source was found."
+    proxy.InvokeEvent('UserEvent', "HideWidget")
+
+#==============================================================================
 # Usage and demo code set
 #==============================================================================
 
