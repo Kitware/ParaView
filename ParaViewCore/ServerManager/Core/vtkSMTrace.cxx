@@ -21,6 +21,7 @@
 
 #include "vtkSMTrace.h"
 
+#include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMCoreUtilities.h"
@@ -30,7 +31,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
-
 
 #include <sstream>
 #include <map>
@@ -199,6 +199,29 @@ vtkStdString vtkSMTrace::StopTrace()
     {
     // no error.
     return vtkStdString(PyString_AsString(stopTrace));
+    }
+#endif
+  return vtkStdString();
+}
+
+//----------------------------------------------------------------------------
+vtkStdString vtkSMTrace::GetCurrentTrace()
+{
+  if (!vtkSMTrace::ActiveTracer)
+    {
+    vtkGenericWarningMacro("Use vtkSMTrace::StartTrace() to start a trace before calling "
+      "vtkSMTrace::GetCurrentTrace().");
+    return vtkStdString();
+    }
+
+  vtkSMTrace* active = vtkSMTrace::ActiveTracer;
+#ifdef PARAVIEW_ENABLE_PYTHON
+  SmartPyObject getTrace(
+    PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("getTrace"), NULL));
+  if (active->CheckForError() == false)
+    {
+    // no error.
+    return vtkStdString(PyString_AsString(getTrace));
     }
 #endif
   return vtkStdString();
@@ -508,6 +531,7 @@ vtkSMTrace::TraceItem::~TraceItem()
       PyObject_CallMethod(this->Internals->PyItem,
         const_cast<char*>("finalize"), NULL));
     tracer->CheckForError();
+    tracer->InvokeEvent(vtkCommand::UpdateEvent);
     }
 #endif
 

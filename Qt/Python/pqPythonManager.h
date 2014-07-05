@@ -78,21 +78,6 @@ public:
   void addWidgetForDeleteMacros(QWidget* widget);
 
   // Description:
-  // return true if the python tracing can be started
-  bool canStartTrace();
-  // Description:
-  // return true if the python tracing is already started and therefore can be stoped
-  bool canStopTrace();
-
-  // Description:
-  // start recording the python trace
-  void startTrace();
-
-  // Description:
-  // stop recording the python trace
-  void stopTrace();
-
-  // Description:
   // Show the python editor with the trace in it
   void editTrace();
 
@@ -115,15 +100,8 @@ public:
   void setSaveFullState(bool saveFullState);
 
 signals:
-
   void paraviewPythonModulesImported();
-  void canStartTrace(bool);
-  void canStopTrace(bool);
 
-  // Fired after start trace.
-  void startTraceDone();
-  // Fired after stop trace.
-  void stopTraceDone();
 
 public slots:
   // Description:

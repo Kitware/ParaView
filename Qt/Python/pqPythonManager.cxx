@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVConfig.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSMTrace.h"
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.
@@ -79,9 +80,6 @@ class pqPythonManager::pqInternal
     {
     const char* command = "try:\n"
       "  import paraview\n"
-      "  paraview.fromGUI = True\n"
-      "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
-      "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
       "except: pass\n";
     vtkPythonInterpreter::RunSimpleString(command);
     }
@@ -263,70 +261,11 @@ void pqPythonManager::onRemovingServer(pqServer* /*server*/)
     }
 }
 
-//-----------------------------------------------------------------------------
-bool pqPythonManager::canStartTrace()
-{
-  return !this->Internal->IsPythonTracing;
-}
-
-//-----------------------------------------------------------------------------
-bool pqPythonManager::canStopTrace()
-{
-  return this->Internal->IsPythonTracing;
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonManager::startTrace()
-{
-  QString script = "from paraview import smtrace\n"
-                   "smtrace.start_trace()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
-
-  // Update internal state
-  this->Internal->IsPythonTracing = true;
-
-  // Emit signals
-  emit startTraceDone();
-  emit canStartTrace(canStartTrace());
-  emit canStopTrace(canStopTrace());
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonManager::stopTrace()
-{
-  QString script = "from paraview import smtrace\n"
-                   "smtrace.stop_trace()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
-
-  // Update internal state
-  this->Internal->IsPythonTracing = false;
-
-  // Emit signals
-  emit stopTraceDone();
-  emit canStartTrace(canStartTrace());
-  emit canStopTrace(canStopTrace());
-}
-
 //----------------------------------------------------------------------------
 QString pqPythonManager::getTraceString()
 {
-  QString script = "from paraview import smtrace\n"
-                   "__smtraceString = smtrace.get_trace_string()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
-
-  PyObject* main_module = PyImport_AddModule((char*)"__main__");
-  PyObject* global_dict = PyModule_GetDict(main_module);
-  PyObject* string_object = PyDict_GetItemString(
-    global_dict, "__smtraceString");
-  char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
-
-  QString traceString;
-  if (string_ptr)
-    {
-    traceString = string_ptr;
-    }
-
-  return traceString;
+  return vtkSMTrace::GetActiveTracer()?
+    vtkSMTrace::GetActiveTracer()->GetCurrentTrace().c_str() : "";
 }
 
 //-----------------------------------------------------------------------------

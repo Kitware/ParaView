@@ -76,6 +76,10 @@ public:
     RECORD_ALL_PROPERTIES, RECORD_USER_MODIFIED_PROPERTIES);
   vtkGetMacro(PropertiesToTraceOnCreate, int);
 
+  // Description:
+  // Return the current trace.
+  vtkStdString GetCurrentTrace();
+
   // ************** BEGIN INTERNAL *************************
   // Description:
   // Internal class not meant to be used directly.

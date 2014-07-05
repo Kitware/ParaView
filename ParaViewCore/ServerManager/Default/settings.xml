@@ -609,6 +609,15 @@
           <Entry text="Record only *user-modified* properites" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty name="ShowIncrementalTrace"
+          command="SetShowIncrementalTrace"
+          default_values="0"
+          number_of_elements="1">
+          <BooleanDomain name="bool" />
+          <Documentation>
+            Show trace as it is being generated.
+          </Documentation>
+      </IntVectorProperty>
       <Hints>
         <UseDocumentationForLabels />
       </Hints>

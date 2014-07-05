@@ -46,7 +46,8 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   CacheGeometryForAnimation(false),
   AnimationGeometryCacheLimit(0),
   PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE),
-  PropertiesToTraceOnCreate(vtkSMTrace::RECORD_ALL_PROPERTIES)
+  PropertiesToTraceOnCreate(vtkSMTrace::RECORD_ALL_PROPERTIES),
+  ShowIncrementalTrace(false)
 {
   this->SetDefaultViewType("RenderView");
 }

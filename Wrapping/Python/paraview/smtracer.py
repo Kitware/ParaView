@@ -15,10 +15,10 @@ class TraceOutput:
   def append(self, data):
     if isinstance(data, list):
       self.__data += data
-      print "\n".join(data),"\n"
+      #print "\n".join(data),"\n"
     elif isinstance(data, str):
       self.__data.append(data)
-      print data,"\n"
+      #print data,"\n"
 
   def append_separator(self):
     try:
@@ -649,6 +649,9 @@ def stopTrace():
     trace = str(Trace.Output)
     Trace.reset()
     return trace
+
+def getTrace():
+    return str(Trace.Output)
 
 if __name__ == "__main__":
     print "Running test"
