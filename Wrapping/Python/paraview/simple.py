@@ -1156,6 +1156,22 @@ def Hide3DWidgets(proxy=None):
         raise ValueError, "No 'proxy' was provided and no active source was found."
     proxy.InvokeEvent('UserEvent', "HideWidget")
 
+def ExportView(filename, view=None, **params):
+    """Export a view to the specified output file."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError, "No 'view' was provided and no active view was found."
+    if not filename:
+        raise ValueError, "No filename specified"
+    helper = sm.vtkSMViewExportHelper()
+    proxy = helper.CreateExporter(filename, view.SMProxy)
+    if not proxy:
+        raise RuntimeError, "Failed to create exporter for ", filename
+    proxy = helper._getPyProxy(proxy)
+    SetProperties(proxy, **params)
+    proxy.Write()
+    del proxy
+
 #==============================================================================
 # Usage and demo code set
 #==============================================================================

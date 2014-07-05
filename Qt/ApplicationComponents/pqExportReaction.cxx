@@ -35,15 +35,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqProxyWidget.h"
-#include "pqViewExporterManager.h"
-
+#include "vtkNew.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMExporterProxy.h"
-#include "vtkSMProperty.h"
+#include "vtkSMExporterProxy.h"
+#include "vtkSMTrace.h"
+#include "vtkSMViewExportHelper.h"
+#include "vtkSMViewProxy.h"
 
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QtDebug>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -51,11 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqExportReaction::pqExportReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  this->Exporter = new pqViewExporterManager(this);
-
-  QObject::connect(this->Exporter, SIGNAL(exportable(bool)),
-    parentObject, SLOT(setEnabled(bool)));
-
   // load state enable state depends on whether we are connected to an active
   // server or not and whether
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
@@ -69,13 +68,26 @@ void pqExportReaction::updateEnableState()
 {
   // this results in firing of exportable(bool) signal which updates the
   // QAction's state.
-  this->Exporter->setView(pqActiveObjects::instance().activeView());
+  bool enabled = false;
+  if (pqView* view = pqActiveObjects::instance().activeView())
+    {
+    vtkSMViewProxy* viewProxy = view->getViewProxy();
+
+    vtkNew<vtkSMViewExportHelper> helper;
+    enabled = (helper->GetSupportedFileTypes(viewProxy).size() > 0);
+    }
+  this->parentAction()->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
 void pqExportReaction::exportActiveView()
 {
-  QString filters = this->Exporter->getSupportedFileTypes();
+  pqView* view = pqActiveObjects::instance().activeView();
+  if (!view) { return ;}
+  vtkSMViewProxy* viewProxy = view->getViewProxy();
+
+  vtkNew<vtkSMViewExportHelper> helper;
+  QString filters(helper->GetSupportedFileTypes(viewProxy).c_str());
   if (filters.isEmpty())
     {
     qCritical("Cannot export current view.");
@@ -89,12 +101,12 @@ void pqExportReaction::exportActiveView()
   if (file_dialog.exec() == QDialog::Accepted &&
     file_dialog.getSelectedFiles().size() > 0)
     {
-    vtkSMExporterProxy *proxy = this->Exporter->proxyForFile(
-      file_dialog.getSelectedFiles().first());
-
+    QString filename = file_dialog.getSelectedFiles().first();
+    vtkSmartPointer<vtkSMExporterProxy> proxy;
+    proxy.TakeReference(helper->CreateExporter(filename.toLatin1().data(), viewProxy));
     if (!proxy)
       {
-      qCritical("Couldn't handle export filename.");
+      qCritical("Couldn't handle export filename");
       return;
       }
 
@@ -102,6 +114,7 @@ void pqExportReaction::exportActiveView()
     proxyWidget->setApplyChangesImmediately(true);
 
     // Show a configuration dialog if options are available:
+    bool export_cancelled = false;
     if (proxyWidget->filterWidgets(true))
       {
       QDialog dialog(pqCoreUtilities::mainWidget());
@@ -117,7 +130,7 @@ void pqExportReaction::exportActiveView()
       advancedButton->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
       advancedButton->setCheckable(true);
       connect(advancedButton, SIGNAL(toggled(bool)),
-              proxyWidget, SLOT(filterWidgets(bool)));
+        proxyWidget, SLOT(filterWidgets(bool)));
       hbox->addWidget(advancedButton);
 
       vbox->addLayout(hbox);
@@ -127,7 +140,7 @@ void pqExportReaction::exportActiveView()
       vbox->addStretch();
 
       QDialogButtonBox *bbox =
-          new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
+        new QDialogButtonBox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
       connect(bbox, SIGNAL(accepted()), &dialog, SLOT(accept()));
       connect(bbox, SIGNAL(rejected()), &dialog, SLOT(reject()));
       vbox->addWidget(bbox);
@@ -145,19 +158,16 @@ void pqExportReaction::exportActiveView()
 
       // Show the dialog:
       int dialogCode = dialog.exec();
-
-      if (static_cast<QDialog::DialogCode>(dialogCode) == QDialog::Rejected)
-        {
-        proxy->Delete();
-        return;
-        }
+      export_cancelled = (static_cast<QDialog::DialogCode>(dialogCode) != QDialog::Accepted);
       }
-
     delete proxyWidget;
-
-    if (!this->Exporter->write(proxy))
+    if (!export_cancelled)
       {
-      qCritical("Failed to export correctly.");
+      SM_SCOPED_TRACE(ExportView)
+        .arg("view", viewProxy)
+        .arg("exporter", proxy)
+        .arg("filename", filename.toLatin1().data());
+      proxy->Write();
       }
     }
 }

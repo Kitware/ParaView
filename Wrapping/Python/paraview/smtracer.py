@@ -234,6 +234,11 @@ class ProxyAccessor(Accessor):
             oiter.Next()
         del oiter
 
+    def finalize(self):
+        for x in self.OrderedProperties:
+            x.finalize()
+        Accessor.finalize(self)
+
     def get_properties(self):
         return self.OrderedProperties[:]
 
@@ -247,7 +252,7 @@ class ProxyAccessor(Accessor):
                 prop.Object.FindDomain("vtkSMFileListDomain") != None
 
     def trace_properties(self, props, in_ctor):
-        joiner = "\n    " if in_ctor else "\n"
+        joiner = ",\n    " if in_ctor else "\n"
         return joiner.join([x.trace_property(in_ctor) for x in props])
 
     def get_property(self, name):
@@ -546,6 +551,33 @@ class RegisterViewProxy(TraceItem):
                         "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
         # we assume views don't have proxy list domains for now, and ignore tracing them.
         TraceItem.finalize(self)
+
+class ExportView(TraceItem):
+    def __init__(self, view, exporter, filename):
+        TraceItem.__init__(self)
+
+        view = sm._getPyProxy(view)
+        exporter = sm._getPyProxy(exporter)
+
+        viewAccessor = Trace.get_accessor(view)
+        exporterAccessor = ProxyAccessor("temporaryExporter", exporter)
+        exporterAccessor.finalize() # so that it will get deleted
+
+        props_to_trace = [x for x in exporterAccessor.get_properties() \
+            if  not x.PropertyKey == "FileName"]
+
+        if props_to_trace:
+            Trace.Output.append_separated([\
+                "# export view",
+                "ExportView('%s', view=%s, %s)" %\
+                    (filename, viewAccessor,
+                      exporterAccessor.trace_properties(props_to_trace, in_ctor=True))\
+                 ])
+        else:
+            Trace.Output.append_separated([\
+                "# export view",
+                "ExportView('%s', view=%s)" % (filename, viewAccessor)])
+        del exporterAccessor
 
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):
