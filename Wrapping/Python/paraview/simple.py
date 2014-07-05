@@ -714,6 +714,18 @@ def UpdateScalarBars(view=None):
     tfmgr = servermanager.vtkSMTransferFunctionManager()
     return tfmgr.UpdateScalarBars(view.SMProxy, tfmgr.HIDE_UNUSED_SCALAR_BARS | tfmgr.SHOW_USED_SCALAR_BARS)
 
+def GetScalarBar(ctf, view=None):
+    """Returns the scalar bar for color transfer function in the given view.
+    If view is None, the active view will be used, if possible.
+    This will either return an existing scalar bar or create a new one."""
+    view = view if view else active_objects.view
+    if not view:
+        raise ValueError, "'view' argument cannot be None when no active view is present"
+    tfmgr = servermanager.vtkSMTransferFunctionManager()
+    sb = servermanager._getPyProxy(\
+        tfmgr.GetScalarBarRepresentation(ctf.SMProxy, view.SMProxy))
+    return sb
+
 # -----------------------------------------------------------------------------
 def GetColorTransferFunction(arrayname, **params):
     """Get the color transfer function used to mapping a data array with the

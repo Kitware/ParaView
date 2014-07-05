@@ -153,6 +153,19 @@ class Trace(object):
             pname = cls.get_registered_name(obj, "piecewise_functions")
             if cls._create_accessor_for_tf(obj, pname):
                 return True
+        if cls.get_registered_name(obj, "scalar_bars"):
+            # trace scalar bar.
+            lutAccessor = cls.get_accessor(obj.LookupTable)
+            # FIXME: locate true view for the representation.
+            # For now, we'll just used the active view.
+            view = simple.GetActiveView()
+            viewAccessor = cls.get_accessor(view)
+            varname = cls.get_varname("%sColorBar" % lutAccessor)
+            accessor = ProxyAccessor(varname, obj)
+            cls.Output.append_separated([\
+                    "# get color legend/bar for %s in view %s" % (lutAccessor, viewAccessor),
+                    "%s = GetScalarBar(%s, %s)" % (accessor, lutAccessor, viewAccessor)])
+            return True
         return False
 
     @classmethod
@@ -368,7 +381,7 @@ class Delete(TraceItem):
             "Delete(%s)" % (accessor),
             "del %s" % accessor])
 
-class PropertiesModified(TraceItem):
+class PropertiesModified(NestableTraceItem):
     """Traces properties modified on a specific proxy."""
     def __init__(self, proxy):
         TraceItem.__init__(self)
@@ -590,7 +603,6 @@ def stopTrace():
 
 if __name__ == "__main__":
     print "Running test"
-    from paraview import simple
     sm.vtkSMTrace.StartTrace()
 
     s = simple.Sphere()
