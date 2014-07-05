@@ -166,6 +166,13 @@ class Trace(object):
                     "# get color legend/bar for %s in view %s" % (lutAccessor, viewAccessor),
                     "%s = GetScalarBar(%s, %s)" % (accessor, lutAccessor, viewAccessor)])
             return True
+        if obj == simple.GetAnimationScene():
+            varname = cls.get_varname(cls.get_registered_name(obj, "animation"))
+            sceneAccessor = ProxyAccessor(varname, obj)
+            cls.Output.append_separated([\
+                "# get animation scene",
+                "%s = GetAnimationScene()" % sceneAccessor])
+            return True
         return False
 
     @classmethod
