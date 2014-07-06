@@ -116,6 +116,16 @@ public:
   // Description:
   // Overridden to handle default ColorArrayName for representations correctly.
   virtual bool PostInitializeProxy(vtkSMProxy* proxy);
+
+  // Description:
+  // Overridden to place the view in a layout on creation.
+  virtual bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname);
+  using Superclass::RegisterViewProxy;
+
+  // Description:
+  // Register layout proxy.
+  virtual bool RegisterLayoutProxy(vtkSMProxy* proxy, const char* proxyname=NULL);
+
 //BTX
 protected:
   vtkSMParaViewPipelineControllerWithRendering();

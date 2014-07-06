@@ -194,6 +194,11 @@ public:
   // Resets the layout.
   void Reset();
 
+  // Description:
+  // Helper method to locate a layout, if any that contains the specified view
+  // proxy.
+  static vtkSMViewLayoutProxy* FindLayout(vtkSMViewProxy*, const char* reggroup="layouts");
+
 //BTX
 protected:
   vtkSMViewLayoutProxy();

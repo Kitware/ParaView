@@ -168,6 +168,16 @@ class Trace(object):
             return True
         if cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
+        if cls.get_registered_name(obj, "layouts"):
+            view = simple.GetActiveView()
+            if view and obj.GetViewLocation(view.SMProxy) != -1:
+                viewAccessor = cls.get_accessor(view)
+                varname = cls.get_varname(cls.get_registered_name(obj, "layouts"))
+                accessor = ProxyAccessor(varname, obj)
+                cls.Output.append_separated([\
+                    "# get layout ",
+                    "%s = GetLayout()" % accessor])
+                return True
         return False
 
     @classmethod
@@ -624,6 +634,24 @@ class ExportView(TraceItem):
                 "# export view",
                 "ExportView('%s', view=%s)" % (filename, viewAccessor)])
         del exporterAccessor
+
+class EnsureLayout(TraceItem):
+    def __init__(self, layout):
+        TraceItem.__init__(self)
+        layout = sm._getPyProxy(layout)
+        accessor = Trace.get_accessor(layout)
+
+class RegisterLayoutProxy(TraceItem):
+    def __init__(self, layout):
+        TraceItem.__init__(self)
+        self.Layout = sm._getPyProxy(layout)
+    def finalize(self):
+        pname = Trace.get_registered_name(self.Layout, "layouts")
+        accessor = ProxyAccessor(Trace.get_varname(pname), self.Layout)
+        Trace.Output.append_separated([\
+            "# create new layout object",
+            "%s = CreateLayout()" % accessor])
+        TraceItem.finalize(self)
 
 class CreateAnimationTrack(TraceItem):
     # FIXME: animation tracing support in general needs to be revamped after moving

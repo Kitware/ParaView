@@ -25,6 +25,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -570,6 +571,70 @@ bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
   vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality)
 {
   return vtkWriteImage<vtkSMViewLayoutProxy>(layout, filename, magnification, quality);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+
+  // locate layout (create a new one if needed).
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveView");
+  assert(selmodel != NULL);
+  vtkSMViewProxy* activeView = vtkSMViewProxy::SafeDownCast(selmodel->GetCurrentProxy());
+  vtkSMProxy* activeLayout = vtkSMViewLayoutProxy::FindLayout(activeView);
+  activeLayout = activeLayout? activeLayout : this->FindProxy(pxm, "layouts", "misc", "ViewLayout");
+  if (!activeLayout)
+    {
+    // no active layout is present at all. Create a new one.
+    activeLayout = pxm->NewProxy("misc", "ViewLayout");
+    if (activeLayout)
+      {
+      this->InitializeProxy(activeLayout);
+      this->RegisterLayoutProxy(activeLayout);
+      activeLayout->FastDelete();
+      }
+    }
+  if (activeLayout)
+    {
+    // ensure that we "access" the layout, before the view is created, other the
+    // trace ends up incorrect (this is needed since RegisterViewProxy() results
+    // in the Qt client assigning a frame for the view, if the Qt client didn't
+    // do that, this code will get a lot simpler.
+    SM_SCOPED_TRACE(EnsureLayout).arg(activeLayout);
+    }
+
+  bool retval = this->Superclass::RegisterViewProxy(proxy, proxyname);
+  if (activeLayout)
+    {
+    vtkSMProxy* layoutAssigned = vtkSMViewLayoutProxy::FindLayout(vtkSMViewProxy::SafeDownCast(proxy));
+    activeLayout = layoutAssigned? layoutAssigned : activeLayout;
+    vtkSMViewLayoutProxy::SafeDownCast(activeLayout)->AssignViewToAnyCell(
+      vtkSMViewProxy::SafeDownCast(proxy), 0);
+    }
+  return retval;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::RegisterLayoutProxy(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  SM_SCOPED_TRACE(RegisterLayoutProxy).arg("layout", proxy);
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  pxm->RegisterProxy("layouts", proxyname, proxy);
+  return true;
 }
 
 //----------------------------------------------------------------------------
