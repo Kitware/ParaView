@@ -65,6 +65,11 @@ public:
   vtkSetMacro(LogTraceToStdout, bool);
   vtkGetMacro(LogTraceToStdout, bool);
 
+  // Description:
+  // Whether to trace properties on proxies that have already been created.
+  vtkSetMacro(TracePropertiesOnExistingProxies, bool);
+  vtkGetMacro(TracePropertiesOnExistingProxies, bool);
+
   enum
     {
     RECORD_ALL_PROPERTIES=0,
@@ -139,6 +144,7 @@ protected:
   bool TraceXMLDefaults;
   bool LogTraceToStdout;
   int PropertiesToTraceOnCreate;
+  bool TracePropertiesOnExistingProxies;
 
 private:
   vtkSMTrace(const vtkSMTrace&); // Not implemented.

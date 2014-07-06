@@ -609,6 +609,16 @@
           <Entry text="Record only *user-modified* properites" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty name="TracePropertiesOnExistingProxies"
+        command="SetTracePropertiesOnExistingProxies"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          For views, transfer functions (color maps, and opacity maps), etc.
+          trace properties as needed for improved reproducibility.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty name="ShowIncrementalTrace"
           command="SetShowIncrementalTrace"
           default_values="0"
@@ -620,6 +630,7 @@
       </IntVectorProperty>
       <PropertyGroup label="Generated trace characteristics">
         <Property name="PropertiesToTraceOnCreate" />
+        <Property name="TracePropertiesOnExistingProxies" />
       </PropertyGroup>
       <PropertyGroup label="Miscellaneous">
         <Property name="ShowIncrementalTrace" />

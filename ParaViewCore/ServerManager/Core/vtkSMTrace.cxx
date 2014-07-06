@@ -113,6 +113,7 @@ vtkSMTrace::vtkSMTrace():
   TraceXMLDefaults(false),
   LogTraceToStdout(true),
   PropertiesToTraceOnCreate(vtkSMTrace::RECORD_MODIFIED_PROPERTIES),
+  TracePropertiesOnExistingProxies(false),
   Internals(new vtkSMTrace::vtkInternals())
 {
 #ifdef PARAVIEW_ENABLE_PYTHON

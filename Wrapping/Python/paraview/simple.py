@@ -492,6 +492,30 @@ def FindView(name):
     """
     return servermanager.ProxyManager().GetProxy("views", name)
 
+
+def GetActiveViewOrCreate(viewtype):
+    """
+    Returns the active view, if the active view is of the given type,
+    otherwise creates a new view of the requested type."""
+    view = GetActiveView()
+    if view is None or view.GetXMLName() != viewtype:
+        view = CreateView(viewtype)
+    if not view:
+        raise RuntimeError, "Failed to create/locate the specified view"
+    return view
+
+def FindViewOrCreate(name, viewtype):
+    """
+    Returns the view, if a view with the given name exists and is of the
+    the given type, otherwise creates a new view of the requested type."""
+    view = FindView(name)
+    if view is None or view.GetXMLName() != viewtype:
+        view = CreateView(viewtype)
+    if not view:
+        raise RuntimeError, "Failed to create/locate the specified view"
+    return view
+
+
 # -----------------------------------------------------------------------------
 
 def GetSources():

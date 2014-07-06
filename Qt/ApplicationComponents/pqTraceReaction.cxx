@@ -100,6 +100,8 @@ void pqTraceReaction::start()
   vtkSMTrace* trace = vtkSMTrace::StartTrace();
   trace->SetPropertiesToTraceOnCreate(
     vtkPVGeneralSettings::GetInstance()->GetPropertiesToTraceOnCreate());
+  trace->SetTracePropertiesOnExistingProxies(
+    vtkPVGeneralSettings::GetInstance()->GetTracePropertiesOnExistingProxies());
 }
 
 //-----------------------------------------------------------------------------

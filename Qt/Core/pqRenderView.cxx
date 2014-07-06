@@ -227,7 +227,7 @@ void pqRenderView::onResetCameraEvent()
 void pqRenderView::resetCamera()
 {
   this->fakeInteraction(true);
-  this->getRenderViewProxy()->InvokeCommand("ResetCamera");
+  this->getRenderViewProxy()->ResetCamera();
   this->fakeInteraction(false);
   this->render();
 }

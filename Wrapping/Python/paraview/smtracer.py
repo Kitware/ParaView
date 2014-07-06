@@ -111,23 +111,26 @@ class Trace(object):
             # handle view proxy.
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("views", obj.SMProxy)
             if pname:
+                trace = TraceOutput()
+                accessor = ProxyAccessor(cls.get_varname(pname), obj)
                 if obj == simple.GetActiveView():
-                    accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    cls.Output.append_separated([\
-                        "# get active view.",
-                        "%s = GetActiveView()" % accessor])
+                    ctor_args = "'%s'" % obj.GetXMLName()
+                    trace.append("# get active view")
+                    trace.append(accessor.trace_ctor(\
+                      "GetActiveViewOrCreate", ExistingProxy(ProxyFilter()), ctor_args))
                 else:
-                    accessor = ProxyAccessor(cls.get_varname(pname), obj)
-                    cls.Output.append_separated([\
-                        "# find view",
-                        "%s = FindView('%s')" % (accessor, pname)])
+                    ctor_args = "'%s', '%s'" % (obj.GetXMLName(), pname)
+                    trace.append("# find view")
+                    trace.append(accessor.trace_ctor(\
+                      "FindView", ExistingProxy(ProxyFilter()), ctor_args))
                 # trace view size, if present. We trace this commented out so
                 # that the playback in the GUI doesn't cause issues.
                 viewSizeAccessor = accessor.get_property("ViewSize")
                 if viewSizeAccessor:
-                    cls.Output.append([\
+                    trace.append([\
                         "# uncomment following to set a specific view size",
                         "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
+                cls.Output.append_separated(trace.raw_data())
                 return True
         if obj.SMProxy.IsA("vtkSMRepresentationProxy"):
             # handle representations.
@@ -200,7 +203,7 @@ class Trace(object):
             trace = TraceOutput()
             trace.append("# get %s for '%s'" % (comment, arrayName))
             trace.append(accessor.trace_ctor(\
-                method, TransferFunctionProxyFilter(), ctor_args="'%s'" % arrayName))
+                method, ExistingProxy(TransferFunctionProxyFilter()), ctor_args="'%s'" % arrayName))
             cls.Output.append_separated(trace.raw_data())
             return True
         return False
@@ -475,6 +478,18 @@ class TransferFunctionProxyFilter(ProxyFilter):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.PropertyKey in ["ScalarOpacityFunction"]: return True
         return False
+
+def ExistingProxy(cls):
+    setting = sm.vtkSMTrace.GetActiveTracer().GetTracePropertiesOnExistingProxies()
+    if setting: return cls
+
+    def should_trace_in_ctor(self, *args, **kwargs):
+        return False
+    def should_trace_in_create(self, *args, **kwargs):
+        return False
+    cls.should_trace_in_create = should_trace_in_create
+    cls.should_trace_in_ctor = should_trace_in_ctor
+    return cls
 
 # ===================================================================================================
 # === TraceItem types ==
@@ -840,6 +855,9 @@ def createTraceItem(key, args=None, kwargs=None):
 def startTrace():
     """Starts tracing"""
     Trace.reset()
+    Trace.Output.append([\
+        "# import the simple module from the paraview",
+        "from paraview.simple import *"])
     return True
 
 def stopTrace():

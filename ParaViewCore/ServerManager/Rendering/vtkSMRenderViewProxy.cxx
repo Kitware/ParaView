@@ -50,14 +50,15 @@
 #include "vtkSMDataDeliveryManager.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
@@ -598,8 +599,38 @@ void vtkSMRenderViewProxy::ZoomTo(vtkSMProxy* representation)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetCamera()
+{
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("ResetCamera")
+    .arg("comment", "reset view to fit data");
+  this->InvokeCommand("ResetCamera");
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ResetCamera(
+    double xmin, double xmax,
+    double ymin, double ymax,
+    double zmin, double zmax)
+{
+  double bds[6] = {xmin, xmax, ymin, ymax, zmin, zmax};
+  this->ResetCamera(bds);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 {
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("ResetCamera")
+    .arg(bounds[0])
+    .arg(bounds[1])
+    .arg(bounds[2])
+    .arg(bounds[3])
+    .arg(bounds[4])
+    .arg(bounds[5])
+    .arg("comment", "reset view to fit data bounds");
   this->CreateVTKObjects();
 
   vtkClientServerStream stream;
