@@ -34,13 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"
 #include "pqPVApplicationCore.h"
-
-#include "vtkPVConfig.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqPythonManager.h"
-#include "pqPythonDialog.h"
-#include "pqPythonShell.h"
-#endif
+#include "vtkSMTrace.h"
 
 #include <QDebug>
 
@@ -73,46 +67,5 @@ void pqSaveAnimationReaction::saveAnimation()
     qDebug() << "Cannot save animation since no active scene is present.";
     return;
     }
-
-  QObject::connect(mgr, SIGNAL(writeAnimation(const QString&, int, double)),
-    this, SLOT(onWriteAnimation(const QString&, int, double)));
   mgr->saveAnimation();
-  QObject::disconnect(mgr, SIGNAL(writeAnimation(const QString&, int, double)),
-    this, SLOT(onWriteAnimation(const QString&, int, double)));
-#ifdef PARAVIEW_ENABLE_PYTHON
-  pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
-  if (manager && manager->canStopTrace())
-    {
-    QString script =
-    "try:\n"
-    "  paraview.smtrace\n"
-    "  paraview.smtrace.trace_save_animation_end()\n"
-    "except AttributeError: pass\n";
-    pqPythonShell* shell = manager->pythonShellDialog()->shell();
-    shell->executeScript(script);
-    }
-#endif
-}
-
-//-----------------------------------------------------------------------------
-void pqSaveAnimationReaction::onWriteAnimation(
-  const QString& filename, int magnification, double framerate)
-{
-  (void)filename;
-  (void)magnification;
-  (void)framerate;
-#ifdef PARAVIEW_ENABLE_PYTHON
-  pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
-  if (manager && manager->interpreterIsInitialized())
-    {
-    QString script =
-    "try:\n"
-    "  paraview.smtrace\n"
-    "  paraview.smtrace.trace_save_animation('%1', %2, %3, %4)\n"
-    "except AttributeError: pass\n";
-    script = script.arg(filename).arg(magnification).arg(2).arg(framerate);
-    pqPythonShell* shell = manager->pythonShellDialog()->shell();
-    shell->executeScript(script);
-    }
-#endif
 }

@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -698,6 +699,13 @@ bool pqAnimationManager::saveAnimation()
   writer->SetCompression(compression);
   writer->SetPlaybackTimeWindow(playbackTimeWindow);
   writer->SetStartFileCount(startFrameCount);
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("WriteAnimation")
+    .arg(filename.toLatin1().data())
+    .arg("Magnification", magnification)
+    .arg("Compression", writer->GetCompression())
+    .arg("FrameRate", writer->GetFrameRate());
 
   pqProgressManager* progress_manager = 
     pqApplicationCore::instance()->getProgressManager();

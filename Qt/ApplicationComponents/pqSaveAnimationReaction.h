@@ -54,11 +54,6 @@ public slots:
   /// this.
   void updateEnableState();
 
-protected slots:
-  /// Slot to trace writing of animation to the Python trace.
-  void onWriteAnimation(
-    const QString& filename, int magnification, double framerate);
-
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered()
