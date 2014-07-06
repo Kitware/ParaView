@@ -1,4 +1,4 @@
-import weakref, itertools
+import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
 from paraview.vtk import vtkTimeStamp
@@ -57,18 +57,20 @@ class Trace(object):
         name = name[0].lower() + name[1:]
         original_name = name
         suffix = 1
-        while cls.__REGISTERED_ACCESSORS.has_key(name):
+        # build a set of existing variable names
+        varnameset = set([accessor.Varname for accessor in cls.__REGISTERED_ACCESSORS.values()])
+        while name in varnameset:
             name = "%s_%d" % (original_name, suffix)
             suffix += 1
         return name
 
     @classmethod
     def register_accessor(cls, accessor):
-        cls.__REGISTERED_ACCESSORS[accessor.Object] = accessor
+        cls.__REGISTERED_ACCESSORS[accessor.get_object()] = accessor
 
     @classmethod
     def unregister_accessor(cls, accessor):
-        del cls.__REGISTERED_ACCESSORS[accessor.Object]
+        del cls.__REGISTERED_ACCESSORS[accessor.get_object()]
 
     @classmethod
     def get_accessor(cls, obj):
@@ -257,7 +259,7 @@ class Untraceable(Exception):
 class Accessor(object):
     def __init__(self, varname, obj):
         self.Varname = varname
-        self.Object = obj
+        self.__Object = weakref.ref(obj)
         Trace.register_accessor(self)
 
     def finalize(self):
@@ -265,6 +267,11 @@ class Accessor(object):
 
     def __str__(self):
         return self.Varname
+
+    def get_object(self):
+        if not self.__Object() is None:
+            return self.__Object()
+        raise Untraceable("Object is no longer alive.")
 
 class ProxyAccessor(Accessor):
     def __init__(self, varname, proxy):
@@ -309,8 +316,8 @@ class ProxyAccessor(Accessor):
         return [x for x in self.OrderedProperties if self.is_ctor_property(x)]
 
     def is_ctor_property(self, prop):
-        return prop.Object.IsA("vtkSMInputProperty") or \
-                prop.Object.FindDomain("vtkSMFileListDomain") != None
+        return prop.get_object().IsA("vtkSMInputProperty") or \
+                prop.get_object().FindDomain("vtkSMFileListDomain") != None
 
     def trace_properties(self, props, in_ctor):
         joiner = ",\n    " if in_ctor else "\n"
@@ -380,12 +387,12 @@ class PropertyAccessor(Accessor):
 
     def value(self):
         # FIXME: need to ensure "object" is accessible.
-        if isinstance(self.Object, sm.ProxyProperty):
-            data = self.Object[:]
+        if isinstance(self.get_object(), sm.ProxyProperty):
+            data = self.get_object()[:]
             if self.has_proxy_list_domain():
-                data = ["'%s'" % x.GetXMLLabel() for x in self.Object[:]]
+                data = ["'%s'" % x.GetXMLLabel() for x in self.get_object()[:]]
             else:
-                data = [str(Trace.get_accessor(x)) for x in self.Object[:]]
+                data = [str(Trace.get_accessor(x)) for x in self.get_object()[:]]
             try:
                 if len(data) > 1:
                   return "[%s]" % (", ".join(data))
@@ -394,7 +401,7 @@ class PropertyAccessor(Accessor):
             except IndexError:
                 return "None"
         else:
-            return str(self.Object)
+            return str(self.get_object())
 
     def get_trace_value(self, val):
         """Returns the value to trace. For proxies, this refers to the variable
@@ -410,7 +417,7 @@ class PropertyAccessor(Accessor):
         return self.PropertyKey
 
     def get_property_value(self):
-        return self.ProxyAccessor.Object.GetPropertyValue(self.PropertyKey)
+        return self.ProxyAccessor.get_object().GetPropertyValue(self.PropertyKey)
 
 # ===================================================================================================
 # === Filters used to filter properties traced ===
@@ -418,9 +425,9 @@ class PropertyAccessor(Accessor):
 class ProxyFilter(object):
     def should_never_trace(self, prop):
         # should we hide properties hidden from panels?
-        return prop.Object.GetIsInternal() or \
-            prop.Object.GetInformationOnly() or \
-            prop.Object.GetPanelVisibility() == "never"
+        return prop.get_object().GetIsInternal() or \
+            prop.get_object().GetInformationOnly() or \
+            prop.get_object().GetPanelVisibility() == "never"
 
     def should_trace_in_create(self, prop, user_can_modify_in_create=True):
         if self.should_never_trace(prop): return False
@@ -432,7 +439,7 @@ class ProxyFilter(object):
             return False
         trace_props_with_default_values = True \
             if setting == sm.vtkSMTrace.RECORD_ALL_PROPERTIES else False
-        return (trace_props_with_default_values or not prop.Object.IsValueDefault())
+        return (trace_props_with_default_values or not prop.get_object().IsValueDefault())
 
     def should_trace_in_ctor(self, prop):
         return False
@@ -443,8 +450,8 @@ class PipelineProxyFilter(ProxyFilter):
 
     def should_trace_in_ctor(self, prop):
         if self.should_never_trace(prop): return False
-        return prop.Object.IsA("vtkSMInputProperty") or \
-            prop.Object.FindDomain("vtkSMFileListDomain") != None
+        return prop.get_object().IsA("vtkSMInputProperty") or \
+            prop.get_object().FindDomain("vtkSMFileListDomain") != None
 
 class RepresentationProxyFilter(PipelineProxyFilter):
     def should_trace_in_ctor(self, prop): return False
@@ -507,6 +514,11 @@ class NestableTraceItem(TraceItem):
     can trace when some other trace item is active."""
     pass
 
+class BookkeepingItem(NestableTraceItem):
+    """Base class for trace items that are only used for
+    book keeping and don't affect the trace itself."""
+    pass
+
 class RegisterPipelineProxy(TraceItem):
     """This traces the creation of a Pipeline Proxy such as
     sources/filters/readers etc."""
@@ -537,6 +549,21 @@ class Delete(TraceItem):
             "# destroy %s" % (accessor),
             "Delete(%s)" % (accessor),
             "del %s" % accessor])
+        accessor.finalize()
+        del accessor
+        import gc
+        gc.collect()
+
+class CleanupAccessor(BookkeepingItem):
+    def __init__(self, proxy):
+        self.Proxy = sm._getPyProxy(proxy)
+    def finalize(self):
+        if Trace.has_accessor(self.Proxy):
+            accessor = Trace.get_accessor(self.Proxy)
+            accessor.finalize()
+            del accessor
+        import gc
+        gc.collect()
 
 class PropertiesModified(NestableTraceItem):
     """Traces properties modified on a specific proxy."""
@@ -550,7 +577,7 @@ class PropertiesModified(NestableTraceItem):
 
     def finalize(self):
         props = self.ProxyAccessor.get_properties()
-        props_to_trace = [k for k in props if self.MTime.GetMTime() < k.Object.GetMTime()]
+        props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
         if props_to_trace:
             Trace.Output.append_separated([
                 "# Properties modified on %s" % str(self.ProxyAccessor),
@@ -562,7 +589,7 @@ class PropertiesModified(NestableTraceItem):
             if val:
                 valaccessor = Trace.get_accessor(val)
                 props = valaccessor.get_properties()
-                props_to_trace = [k for k in props if self.MTime.GetMTime() < k.Object.GetMTime()]
+                props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
                 if props_to_trace:
                   Trace.Output.append_separated([
                       "# Properties modified on %s" % valaccessor,
@@ -845,7 +872,8 @@ def createTraceItem(key, args=None, kwargs=None):
         traceitemtype = g[key]
         if len(ActiveTraceItems) == 0 or issubclass(traceitemtype, NestableTraceItem):
             instance = traceitemtype(*args, **kwargs)
-            ActiveTraceItems.append(weakref.ref(instance))
+            if not issubclass(traceitemtype, BookkeepingItem):
+                ActiveTraceItems.append(weakref.ref(instance))
             return instance
         raise Untraceable("Non-nestable trace item. Ignoring in current context.")
     raise Untraceable("Unknown trace item type %s" % key)

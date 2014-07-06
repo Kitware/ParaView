@@ -1238,6 +1238,8 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
     return false;
     }
 
+  SM_SCOPED_TRACE(CleanupAccessor).arg("proxy", proxy);
+
   // determine what type of proxy is this, based on that, we can finalize it.
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   if (pxm->GetProxyName("sources", proxy))
@@ -1268,6 +1270,8 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
       {
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))
         {
+        SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
+
         // unregister dependencies.
         if (!this->UnRegisterDependencies(proxy))
           {
