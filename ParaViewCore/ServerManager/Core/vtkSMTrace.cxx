@@ -323,9 +323,9 @@ vtkSMTrace::TraceItemArgs::~TraceItemArgs()
 
 //----------------------------------------------------------------------------
 vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
-  const char* key, vtkSMProxy* val)
+  const char* key, vtkObject* val)
 {
-  assert(key && val);
+  assert(key);
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -421,9 +421,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
 }
 
 //----------------------------------------------------------------------------
-vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(vtkSMProxy* val)
+vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(vtkObject* val)
 {
-  assert(val);
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON

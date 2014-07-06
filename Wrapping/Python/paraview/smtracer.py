@@ -76,6 +76,8 @@ class Trace(object):
 
     @classmethod
     def get_accessor(cls, obj):
+        if obj is None:
+            return None
         try:
             return cls.__REGISTERED_ACCESSORS[obj]
         except KeyError:
@@ -692,6 +694,46 @@ class CreateAnimationTrack(TraceItem):
     def should_never_trace(self, propAccessor):
         return TraceItem.should_never_trace(self, propAccessor) or propAccessor.PropertyKey in \
             ["AnimatedProxy", "AnimatedPropertyName", "AnimatedElement", "AnimatedDomainName"]
+
+class RenameProxy(TraceItem):
+    "Trace renaming of a source proxy."
+    def __init__(self, proxy):
+        TraceItem.__init__(self)
+        proxy = sm._getPyProxy(proxy)
+
+        if Trace.get_registered_name(proxy, "sources"):
+            self.Accessor = Trace.get_accessor(proxy)
+            self.Proxy = proxy
+        else:
+            raise Untraceable("Only source proxy renames are traced.")
+
+    def finalize(self):
+        if self.Accessor:
+            newname = Trace.get_registered_name(self.Proxy, "sources")
+            Trace.Output.append_separated([\
+                "# rename source object",
+                "RenameSource('%s', %s)" % (newname, self.Accessor)])
+        TraceItem.finalize(self)
+
+class SetCurrentProxy(TraceItem):
+    """Traces change in active view/source etc."""
+    def __init__(self, selmodel, proxy, command):
+        TraceItem.__init__(self)
+        proxy = sm._getPyProxy(proxy)
+        accessor = Trace.get_accessor(proxy)
+        pxm = selmodel.GetSessionProxyManager()
+        if selmodel is pxm.GetSelectionModel("ActiveView"):
+            Trace.Output.append_separated([\
+                "# set active view",
+                "SetActiveView(%s)" % accessor])
+        elif selmodel is pxm.GetSelectionModel("ActiveSources"):
+            Trace.Output.append_separated([\
+                "# set active source",
+                "SetActiveSource(%s)" % accessor])
+        else:
+            raise Untraceable("Unknown selection model")
+
+
 
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):

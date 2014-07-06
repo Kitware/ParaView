@@ -91,14 +91,14 @@ public:
     ~TraceItemArgs();
 
     // Overloads for keyword arguments.
-    TraceItemArgs& arg(const char* key, vtkSMProxy* val);
+    TraceItemArgs& arg(const char* key, vtkObject* val);
     TraceItemArgs& arg(const char* key, const char* val);
     TraceItemArgs& arg(const char* key, int val);
     TraceItemArgs& arg(const char* key, double val);
     TraceItemArgs& arg(const char* key, bool val);
 
     // Overloads for positional arguments.
-    TraceItemArgs& arg(vtkSMProxy* val);
+    TraceItemArgs& arg(vtkObject* val);
     TraceItemArgs& arg(const char* val);
     TraceItemArgs& arg(int val);
     TraceItemArgs& arg(double val);

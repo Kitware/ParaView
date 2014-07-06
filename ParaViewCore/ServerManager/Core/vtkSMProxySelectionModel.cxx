@@ -28,6 +28,7 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 
 #include <vector>
 #include <set>
@@ -128,6 +129,10 @@ void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy*  proxy,  int  command
 { 
   if (this->Current != proxy)
     {
+    SM_SCOPED_TRACE(SetCurrentProxy)
+      .arg("selmodel", this)
+      .arg("proxy", proxy)
+      .arg("command", command);
     this->Internal->DisableSessionStatePush = true;
     this->Current = proxy;
     this->Select(proxy, command);
