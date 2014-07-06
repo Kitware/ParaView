@@ -168,18 +168,18 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
     rangeMax = std::max(rangeMax, old_range[1]);
     }
 
+  if (old_range[0] == rangeMin && old_range[1] == rangeMax)
+    {
+    // nothing to do.
+    return true;
+    }
+
   SM_SCOPED_TRACE(CallMethod)
     .arg(this)
     .arg("RescaleTransferFunction")
     .arg(rangeMin)
     .arg(rangeMax)
     .arg("comment", "Rescale transfer function");
-
-  if (old_range[0] == rangeMin && old_range[1] == rangeMax)
-    {
-    // nothing to do.
-    return true;
-    }
 
   // determine if the interpolation has to happen in log-space.
   bool log_space =
