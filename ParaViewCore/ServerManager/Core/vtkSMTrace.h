@@ -159,9 +159,11 @@ private:
   const SmartPyObject& GetCreateItemFunction() const;
 };
 
+#define SM_SCOPED_TRACE_0(x, y) x ## y
+#define SM_SCOPED_TRACE_1(x, y) SM_SCOPED_TRACE_0(x, y)
 #define SM_SCOPED_TRACE(__A_TRACE_TYPE) \
-  vtkSMTrace::TraceItem _trace_item##__LINE__(#__A_TRACE_TYPE); \
-  _trace_item##__LINE__ = vtkSMTrace::TraceItemArgs()
+  vtkSMTrace::TraceItem SM_SCOPED_TRACE_1(_trace_item,__LINE__)(#__A_TRACE_TYPE); \
+  SM_SCOPED_TRACE_1(_trace_item,__LINE__) = vtkSMTrace::TraceItemArgs()
 
 
 //namespace smtrace
