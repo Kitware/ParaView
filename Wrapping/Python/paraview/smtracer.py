@@ -194,11 +194,14 @@ class Trace(object):
                 method = "GetOpacityTransferFunction"
             varname = cls.get_varname("%s%s" % (arrayName, varsuffix))
             accessor = ProxyAccessor(varname, proxy)
-            cls.Output.append_separated([\
-                "# get %s for '%s'" % (comment, arrayName),
-                "%s = %s('%s')" % (accessor, method, arrayName)])
-            # FIXME: we should optionally log the current state for the transfer
-            # function.
+            #cls.Output.append_separated([\
+            #    "# get %s for '%s'" % (comment, arrayName),
+            #    "%s = %s('%s')" % (accessor, method, arrayName)])
+            trace = TraceOutput()
+            trace.append("# get %s for '%s'" % (comment, arrayName))
+            trace.append(accessor.trace_ctor(\
+                method, TransferFunctionProxyFilter(), ctor_args="'%s'" % arrayName))
+            cls.Output.append_separated(trace.raw_data())
             return True
         return False
 
@@ -450,7 +453,6 @@ class RepresentationProxyFilter(PipelineProxyFilter):
             "SelectionPointFieldDataArrayName"] : return True
         return False
 
-
 class AnimationProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
@@ -465,6 +467,13 @@ class ExporterProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.PropertyKey == "FileName" : return True
+        return False
+
+class TransferFunctionProxyFilter(ProxyFilter):
+    def should_trace_in_ctor(self, prop): return False
+    def should_never_trace(self, prop):
+        if ProxyFilter.should_never_trace(self, prop): return True
+        if prop.PropertyKey in ["ScalarOpacityFunction"]: return True
         return False
 
 # ===================================================================================================

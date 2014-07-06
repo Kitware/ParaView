@@ -618,6 +618,12 @@
             Show trace as it is being generated.
           </Documentation>
       </IntVectorProperty>
+      <PropertyGroup label="Generated trace characteristics">
+        <Property name="PropertiesToTraceOnCreate" />
+      </PropertyGroup>
+      <PropertyGroup label="Miscellaneous">
+        <Property name="ShowIncrementalTrace" />
+      </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />
       </Hints>
