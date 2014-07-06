@@ -194,6 +194,16 @@ def GetRenderViews():
     "Returns all render views as a list."
     return servermanager.GetRenderViews()
 
+def GetViews(viewtype=None):
+    """Returns all views. If viewtype is specified, only the views of the
+       specified type are returned"""
+    val = []
+    for aProxy in servermanager.ProxyManager():
+        if aProxy.IsA("vtkSMViewProxy") and \
+            (viewtype is None or aProxy.GetXMLName() == viewtype):
+            val.append(aProxy)
+    return val
+
 # -----------------------------------------------------------------------------
 
 def SetViewProperties(view=None, **params):
@@ -222,6 +232,11 @@ def Render(view=None):
         except AttributeError: pass
         _funcs_internals.first_render = False
     return view
+
+# -----------------------------------------------------------------------------
+def RenderAllViews():
+    """Render all views"""
+    for view in GetViews(): Render(view)
 
 # -----------------------------------------------------------------------------
 

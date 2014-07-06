@@ -857,11 +857,16 @@ def startTrace():
     Trace.reset()
     Trace.Output.append([\
         "# import the simple module from the paraview",
-        "from paraview.simple import *"])
+        "from paraview.simple import *",
+        "# disable automatic camera reset on 'Show'",
+        "paraview.simple._DisableFirstRenderCameraReset()"])
     return True
 
 def stopTrace():
     """Stops trace"""
+    Trace.Output.append_separated([\
+        "# uncomment the following to render all views",
+        "# RenderAllViews()"])
     trace = str(Trace.Output)
     Trace.reset()
     return trace
