@@ -1,4 +1,4 @@
-import weakref
+import weakref, itertools
 import paraview.servermanager as sm
 import paraview.simple as simple
 from paraview.vtk import vtkTimeStamp
@@ -30,14 +30,10 @@ class TraceOutput:
       self.append_separator()
       self.append(data)
 
-  def clear(self):
-    self.__data = []
-
-  def raw_data(self):
-    return self.__data[:]
-
   def __str__(self):
     return '\n'.join(self.__data)
+
+  def raw_data(self): return self.__data
 
 
 class Trace(object):
@@ -292,6 +288,12 @@ class ProxyAccessor(Accessor):
             x.finalize()
         Accessor.finalize(self)
 
+    def get_property(self, name):
+        for x in self.OrderedProperties:
+            if x.PropertyKey == name:
+                return x
+        return None
+
     def get_properties(self):
         return self.OrderedProperties[:]
 
@@ -308,11 +310,43 @@ class ProxyAccessor(Accessor):
         joiner = ",\n    " if in_ctor else "\n"
         return joiner.join([x.trace_property(in_ctor) for x in props])
 
-    def get_property(self, name):
-        for x in self.OrderedProperties:
-            if x.PropertyKey == name:
-                return x
-        return None
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+        args_in_ctor = str(ctor_args) if not ctor_args is None else ""
+        # trace any properties that the 'filter' tells us should be traced
+        # in ctor.
+        ctor_props = [x for x in self.OrderedProperties if filter.should_trace_in_ctor(x)]
+        args_in_ctor += self.trace_properties(ctor_props, in_ctor=True)
+
+        # locate all the other properties that should be traced in create.
+        other_props = [x for x in self.OrderedProperties \
+            if filter.should_trace_in_create(x) and not filter.should_trace_in_ctor(x)]
+
+        trace = TraceOutput()
+        if not ctor is None:
+            if not skip_assignment:
+                trace.append("%s = %s(%s)" % (self, ctor, args_in_ctor))
+            else:
+                assert len(other_props) == 0
+                trace.append("%s(%s)" % (ctor, args_in_ctor))
+                return trace.raw_data()
+
+        # FIXME: would like trace_properties() to return a list instead of
+        # a string.
+        txt = self.trace_properties(other_props, in_ctor=False)
+        if txt: trace.append(txt)
+
+        # Now, if any of the props has ProxyListDomain, we should trace their
+        # "ctors" as well. Tracing ctors for ProxyListDomain proxies simply
+        # means tracing their property values.
+        pld_props = [x for x in self.OrderedProperties if x.has_proxy_list_domain()]
+        for prop in pld_props:
+            paccessor = Trace.get_accessor(prop.get_property_value())
+            sub_trace = paccessor.trace_ctor(None, filter)
+            if sub_trace:
+                trace.append_separated(\
+                    "# init the %s selected for '%s'" % (prop.value(), prop.get_property_name()))
+                trace.append(sub_trace)
+        return trace.raw_data()
 
 class PropertyAccessor(Accessor):
     def __init__(self, propkey, prop, proxyAccessor):
@@ -372,13 +406,19 @@ class PropertyAccessor(Accessor):
     def get_property_value(self):
         return self.ProxyAccessor.Object.GetPropertyValue(self.PropertyKey)
 
-class TraceItem(object):
-    def __init__(self):
-        pass
-    def finalize(self):
-        pass
+# ===================================================================================================
+# === Filters used to filter properties traced ===
+# ===================================================================================================
+class ProxyFilter(object):
+    def should_never_trace(self, prop):
+        # should we hide properties hidden from panels?
+        return prop.Object.GetIsInternal() or \
+            prop.Object.GetInformationOnly() or \
+            prop.Object.GetPanelVisibility() == "never"
 
-    def should_trace_in_create(self, prop, user_can_modify_in_create=False):
+    def should_trace_in_create(self, prop, user_can_modify_in_create=True):
+        if self.should_never_trace(prop): return False
+
         setting = sm.vtkSMTrace.GetActiveTracer().GetPropertiesToTraceOnCreate()
         if setting == sm.vtkSMTrace.RECORD_USER_MODIFIED_PROPERTIES and not user_can_modify_in_create:
             # In ParaView, user never changes properties in Create. It's only
@@ -386,11 +426,57 @@ class TraceItem(object):
             return False
         trace_props_with_default_values = True \
             if setting == sm.vtkSMTrace.RECORD_ALL_PROPERTIES else False
-        return not self.should_never_trace(prop) \
-            and (trace_props_with_default_values or not prop.Object.IsValueDefault())
+        return (trace_props_with_default_values or not prop.Object.IsValueDefault())
+
+    def should_trace_in_ctor(self, prop):
+        return False
+
+class PipelineProxyFilter(ProxyFilter):
+    def should_trace_in_create(self, prop):
+        return ProxyFilter.should_trace_in_create(self, prop, user_can_modify_in_create=False)
+
+    def should_trace_in_ctor(self, prop):
+        if self.should_never_trace(prop): return False
+        return prop.Object.IsA("vtkSMInputProperty") or \
+            prop.Object.FindDomain("vtkSMFileListDomain") != None
+
+class RepresentationProxyFilter(PipelineProxyFilter):
+    def should_trace_in_ctor(self, prop): return False
 
     def should_never_trace(self, prop):
-        return prop.Object.GetIsInternal() or prop.Object.GetInformationOnly()
+        if PipelineProxyFilter.should_never_trace(self, prop): return True
+        if prop.PropertyKey in ["Input",\
+            "SelectionCellFieldDataArrayName",\
+            "SelectionPointFieldDataArrayName"] : return True
+        return False
+
+
+class AnimationProxyFilter(ProxyFilter):
+    def should_never_trace(self, prop):
+        if ProxyFilter.should_never_trace(self, prop): return True
+        if prop.PropertyKey in ["AnimatedProxy", "AnimatedPropertyName",
+            "AnimatedElement", "AnimatedDomainName"]:
+            return True
+        return False
+
+class ExporterProxyFilter(ProxyFilter):
+    def should_trace_in_ctor(self, prop):
+        return not self.should_never_trace(prop)
+    def should_never_trace(self, prop):
+        if ProxyFilter.should_never_trace(self, prop): return True
+        if prop.PropertyKey == "FileName" : return True
+        return False
+
+# ===================================================================================================
+# === TraceItem types ==
+# TraceItems are units of traceable actions triggerred by the application using vtkSMTrace
+# ===================================================================================================
+
+class TraceItem(object):
+    def __init__(self):
+        pass
+    def finalize(self):
+        pass
 
 class NestableTraceItem(TraceItem):
     """Base class for trace item that can be nested i.e.
@@ -411,27 +497,11 @@ class RegisterPipelineProxy(TraceItem):
         accessor = ProxyAccessor(varname, self.Proxy)
 
         ctor = sm._make_name_valid(self.Proxy.GetXMLLabel())
-        ctor_props = accessor.get_ctor_properties()
-        other_props = [x for x in accessor.get_properties() if \
-                x not in ctor_props and self.should_trace_in_create(x)]
-
-        Trace.Output.append_separated([\
-                "# Create a new pipeline object",
-                "%s = %s(%s)" % (accessor, ctor, accessor.trace_properties(ctor_props, in_ctor=True)),
-                accessor.trace_properties(other_props, in_ctor=False)])
-
-        # Trace any Proxies that are values on properties with ProxyListDomains.
-        pld_props = [x for x in accessor.get_properties() if x.has_proxy_list_domain()]
-        for prop in pld_props:
-            paccessor = Trace.get_accessor(prop.get_property_value())
-            pproperties = [x for x in paccessor.get_properties() if  self.should_trace_in_create(x)]
-            if pproperties:
-                Trace.Output.append_separated([\
-                    "# Init the %s selected for '%s'" % \
-                    (prop.value(), prop.get_property_name()),
-                    paccessor.trace_properties(pproperties, in_ctor=False)])
+        trace = TraceOutput()
+        trace.append("# create a new '%s'" % self.Proxy.GetXMLLabel())
+        trace.append(accessor.trace_ctor(ctor, PipelineProxyFilter()))
+        Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
-        Trace.Output.append_separator()
 
 class Delete(TraceItem):
     """This traces the deletion of a Pipeline proxy"""
@@ -493,41 +563,30 @@ class Show(TraceItem):
         display = self.Display
         if not Trace.has_accessor(display):
             pname = "%sDisplay" % self.ProducerAccessor
-            self.Accessor = ProxyAccessor(Trace.get_varname(pname), display)
-            trace_defaults = True
+            accessor = ProxyAccessor(Trace.get_varname(pname), display)
+            trace_ctor = True
         else:
-            self.Accessor = Trace.get_accessor(display)
-            trace_defaults = False
+            accessor = Trace.get_accessor(display)
+            trace_ctor = False
         port = self.OutputPort
 
-        output = []
-        if port > 0:
-            txt = "%s = Show(OutputPort(%s, %d), %s)" % \
-                (str(self.Accessor), str(self.ProducerAccessor), port, str(self.ViewAccessor))
-        else:
-            txt = "%s = Show(%s, %s)" % \
-                (str(self.Accessor), str(self.ProducerAccessor), str(self.ViewAccessor))
-
+        output = TraceOutput()
         output.append("# show data in view")
-        output.append(txt)
-        if trace_defaults:
+        if port > 0:
+            output.append("%s = Show(OutputPort(%s, %d), %s)" % \
+                (str(accessor), str(self.ProducerAccessor), port, str(self.ViewAccessor)))
+        else:
+            output.append("%s = Show(%s, %s)" % \
+                (str(accessor), str(self.ProducerAccessor), str(self.ViewAccessor)))
+
+        if trace_ctor:
             # Now trace default values.
-            properties = [x for x in self.Accessor.get_properties() \
-                if  self.should_trace_in_create(x)]
-
-            if properties:
-                output.append("# Trace defaults for the display properties")
-                output.append(self.Accessor.trace_properties(properties, in_ctor=False))
-
-        Trace.Output.append_separated(output)
+            ctor_trace = accessor.trace_ctor(None, RepresentationProxyFilter())
+            if ctor_trace:
+                output.append("# trace defaults for the display properties.")
+                output.append(ctor_trace)
+        Trace.Output.append_separated(output.raw_data())
         TraceItem.finalize(self)
-
-    def should_trace_in_create(self, prop):
-        # avoid tracing "Input" property for representations.
-        return False if not TraceItem.should_trace_in_create(self, prop) else \
-            not prop.PropertyKey in ["Input",\
-                "SelectionCellFieldDataArrayName",\
-                "SelectionPointFieldDataArrayName"]
 
 class Hide(TraceItem):
     """Traces Hide"""
@@ -583,30 +642,20 @@ class RegisterViewProxy(TraceItem):
 
         # unlike for filters/sources, for views the CreateView function still takes the
         # xml name for the view, not its label.
-        ctor = self.Proxy.GetXMLName()
-        ctor_props = accessor.get_ctor_properties()
-        other_props = [x for x in accessor.get_properties() if \
-            x not in ctor_props and self.should_trace_in_create(x)]
-
-        trace = []
+        ctor_args = "'%s'" % self.Proxy.GetXMLName()
+        trace = TraceOutput()
         trace.append("# Create a new '%s'" % self.Proxy.GetXMLLabel())
-        if ctor_props:
-            trace.append("%s = CreateView('%s', %s)" %\
-                    (accessor, ctor, accessor.trace_properties(ctor_props, in_ctor=True)))
-        else:
-            trace.append("%s = CreateView('%s')" % (accessor, ctor))
-        if other_props:
-             trace.append(accessor.trace_properties(other_props, in_ctor=False))
-        Trace.Output.append_separated(trace)
+        filter = ProxyFilter()
+        trace.append(accessor.trace_ctor("CreateView", filter, ctor_args))
+        Trace.Output.append_separated(trace.raw_data())
 
         viewSizeAccessor = accessor.get_property("ViewSize")
-        if viewSizeAccessor and not viewSizeAccessor in ctor_props and \
-                not viewSizeAccessor in other_props:
-                # trace view size, if present. We trace this commented out so
-                # that the playback in the GUI doesn't cause issues.
-                Trace.Output.append([\
-                        "# uncomment following to set a specific view size",
-                        "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
+        if viewSizeAccessor and not filter.should_trace_in_create(viewSizeAccessor):
+            # trace view size, if present. We trace this commented out so
+            # that the playback in the GUI doesn't cause issues.
+            Trace.Output.append([\
+                "# uncomment following to set a specific view size",
+                "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
         # we assume views don't have proxy list domains for now, and ignore tracing them.
         TraceItem.finalize(self)
 
@@ -621,21 +670,14 @@ class ExportView(TraceItem):
         exporterAccessor = ProxyAccessor("temporaryExporter", exporter)
         exporterAccessor.finalize() # so that it will get deleted
 
-        props_to_trace = [x for x in exporterAccessor.get_properties() \
-            if  not x.PropertyKey == "FileName"]
-
-        if props_to_trace:
-            Trace.Output.append_separated([\
-                "# export view",
-                "ExportView('%s', view=%s, %s)" %\
-                    (filename, viewAccessor,
-                      exporterAccessor.trace_properties(props_to_trace, in_ctor=True))\
-                 ])
-        else:
-            Trace.Output.append_separated([\
-                "# export view",
-                "ExportView('%s', view=%s)" % (filename, viewAccessor)])
+        trace = TraceOutput()
+        trace.append("# export view")
+        trace.append(\
+            exporterAccessor.trace_ctor("ExportView", ExporterProxyFilter(),
+              ctor_args="'%s', view=%s" % (filename, viewAccessor),
+              skip_assignment=True))
         del exporterAccessor
+        Trace.Output.append(trace.raw_data())
 
 class EnsureLayout(TraceItem):
     def __init__(self, layout):
@@ -669,31 +711,21 @@ class CreateAnimationTrack(TraceItem):
         # default property values.
         accessor = Trace.get_accessor(self.Cue)
 
-        Trace.Output.append_separated("# create keyframes for this animation track")
+        trace = TraceOutput()
+        trace.append("# create keyframes for this animation track")
 
         # Create accessors for each of the animation key frames.
         for keyframeProxy in self.Cue.KeyFrames:
             pname = Trace.get_registered_name(keyframeProxy, "animation")
             kfaccessor = ProxyAccessor(Trace.get_varname(pname), keyframeProxy)
-            props = [x for x in kfaccessor.get_properties() if self.should_trace_in_create(x)]
-            Trace.Output.append_separated([\
-                "# create key frame",
-                "%s = %s()" % (kfaccessor, sm._make_name_valid(self.Cue.GetXMLLabel())),
-                kfaccessor.trace_properties(props, in_ctor=False)])
+            ctor = sm._make_name_valid(keyframeProxy.GetXMLLabel())
+            trace.append_separated("# create a key frame")
+            trace.append(kfaccessor.trace_ctor(ctor, AnimationProxyFilter()))
 
         # Now trace properties on the cue.
-        props = [x for x in accessor.get_properties() if self.should_trace_in_create(x)]
-        if props:
-            Trace.Output.append_separated([\
-                "# initialize the animation track",
-                accessor.trace_properties(props, in_ctor=False)])
-
-    def should_trace_in_create(self, propAccessor):
-        return TraceItem.should_trace_in_create(self, propAccessor, user_can_modify_in_create=True)
-
-    def should_never_trace(self, propAccessor):
-        return TraceItem.should_never_trace(self, propAccessor) or propAccessor.PropertyKey in \
-            ["AnimatedProxy", "AnimatedPropertyName", "AnimatedElement", "AnimatedDomainName"]
+        trace.append_separated("# initialize the animation track")
+        trace.append(accessor.trace_ctor(None, AnimationProxyFilter()))
+        Trace.Output.append_separated(trace.raw_data())
 
 class RenameProxy(TraceItem):
     "Trace renaming of a source proxy."
@@ -733,8 +765,6 @@ class SetCurrentProxy(TraceItem):
         else:
             raise Untraceable("Unknown selection model")
 
-
-
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):
         TraceItem.__init__(self)
@@ -773,6 +803,9 @@ class CallFunction(TraceItem):
         to_trace.append("%s(%s)" % (functionname, ", ".join(args)))
         Trace.Output.append_separated(to_trace)
 
+# ActiveTraceItems is simply used to keep track of items that are currently
+# active to avoid non-nestable trace items from being created when previous
+# items are active.
 ActiveTraceItems = []
 
 def createTraceItem(key, args=None, kwargs=None):
