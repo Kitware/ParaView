@@ -1013,6 +1013,9 @@ void pqAnimationViewWidget::createTrack()
     pname.toLatin1().data(), pindex, ren? "CameraAnimationCue" :
     "KeyFrameAnimationCue");
 
+  SM_SCOPED_TRACE(CreateAnimationTrack)
+    .arg("cue", cue->getProxy());
+
   if (ren)
     {
     if (mode=="path" || mode =="orbit")

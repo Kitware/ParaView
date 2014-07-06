@@ -166,13 +166,8 @@ class Trace(object):
                     "# get color legend/bar for %s in view %s" % (lutAccessor, viewAccessor),
                     "%s = GetScalarBar(%s, %s)" % (accessor, lutAccessor, viewAccessor)])
             return True
-        if obj == simple.GetAnimationScene():
-            varname = cls.get_varname(cls.get_registered_name(obj, "animation"))
-            sceneAccessor = ProxyAccessor(varname, obj)
-            cls.Output.append_separated([\
-                "# get animation scene",
-                "%s = GetAnimationScene()" % sceneAccessor])
-            return True
+        if cls.get_registered_name(obj, "animation"):
+            return cls._create_accessor_for_animation_proxies(obj)
         return False
 
     @classmethod
@@ -197,6 +192,45 @@ class Trace(object):
             # FIXME: we should optionally log the current state for the transfer
             # function.
             return True
+        return False
+
+    @classmethod
+    def _create_accessor_for_animation_proxies(cls, obj):
+        pname = cls.get_registered_name(obj, "animation")
+        if obj == simple.GetAnimationScene():
+            sceneAccessor = ProxyAccessor(cls.get_varname(pname), obj)
+            cls.Output.append_separated([\
+                "# get animation scene",
+                "%s = GetAnimationScene()" % sceneAccessor])
+            return True
+        if obj == simple.GetTimeTrack():
+            accessor = ProxyAccessor(cls.get_varname(pname), obj)
+            cls.Output.append_separated([\
+                "# get time animation track",
+                "%s = GetTimeTrack()" % accessor])
+            return True
+        if obj.GetXMLName() == "CameraAnimationCue":
+            # handle camera animation cue.
+            view = obj.AnimatedProxy
+            viewAccessor = cls.get_accessor(view)
+            accessor = ProxyAccessor(cls.get_varname(pname), obj)
+            cls.Output.append_separated([\
+                "# get camera animation track for the view",
+                "%s = GetCameraTrack(view=%s)" % (accessor, viewAccessor)])
+            return True
+        if obj.GetXMLName() == "KeyFrameAnimationCue":
+            animatedProxyAccessor = cls.get_accessor(obj.AnimatedProxy)
+            animatedElement = int(obj.AnimatedElement)
+            animatedPropertyName = obj.AnimatedPropertyName
+            varname = cls.get_varname("%s%sTrack" % (animatedProxyAccessor, animatedPropertyName))
+            accessor = ProxyAccessor(varname, obj)
+            cls.Output.append_separated([\
+                "# get animation track",
+                "%s = GetAnimationTrack('%s', index=%d, proxy=%s)" %\
+                    (accessor, animatedPropertyName, animatedElement, animatedProxyAccessor)])
+            return True
+        if obj.GetXMLName() == "PythonAnimationCue":
+            raise Untraceable("PythonAnimationCue's are currently not supported in trace")
         return False
 
 class Untraceable(Exception):
@@ -301,10 +335,12 @@ class PropertyAccessor(Accessor):
             else:
                 data = [str(Trace.get_accessor(x)) for x in self.Object[:]]
             try:
-                data = data if len(data) > 1 else data[0]
+                if len(data) > 1:
+                  return "[%s]" % (", ".join(data))
+                else:
+                  return data[0]
             except IndexError:
-                data = None
-            return str(data)
+                return "None"
         else:
             return str(self.Object)
 
@@ -330,16 +366,19 @@ class TraceItem(object):
     def finalize(self):
         pass
 
-    def should_trace_in_create(self, prop):
+    def should_trace_in_create(self, prop, user_can_modify_in_create=False):
         setting = sm.vtkSMTrace.GetActiveTracer().GetPropertiesToTraceOnCreate()
-        if setting == sm.vtkSMTrace.RECORD_USER_MODIFIED_PROPERTIES:
+        if setting == sm.vtkSMTrace.RECORD_USER_MODIFIED_PROPERTIES and not user_can_modify_in_create:
             # In ParaView, user never changes properties in Create. It's only
             # afterwords, so skip all properties.
             return False
         trace_props_with_default_values = True \
             if setting == sm.vtkSMTrace.RECORD_ALL_PROPERTIES else False
-        return not prop.Object.GetIsInternal() and not prop.Object.GetInformationOnly() \
-                and (trace_props_with_default_values or not prop.Object.IsValueDefault())
+        return not self.should_never_trace(prop) \
+            and (trace_props_with_default_values or not prop.Object.IsValueDefault())
+
+    def should_never_trace(self, prop):
+        return prop.Object.GetIsInternal() or prop.Object.GetInformationOnly()
 
 class NestableTraceItem(TraceItem):
     """Base class for trace item that can be nested i.e.
@@ -585,6 +624,46 @@ class ExportView(TraceItem):
                 "# export view",
                 "ExportView('%s', view=%s)" % (filename, viewAccessor)])
         del exporterAccessor
+
+class CreateAnimationTrack(TraceItem):
+    # FIXME: animation tracing support in general needs to be revamped after moving
+    # animation control logic to the server manager from Qt layer.
+    def __init__(self, cue):
+        TraceItem.__init__(self)
+        self.Cue = sm._getPyProxy(cue)
+
+    def finalize(self):
+        TraceItem.finalize(self)
+
+        # We let Trace create an accessor for the cue. We will then simply log the
+        # default property values.
+        accessor = Trace.get_accessor(self.Cue)
+
+        Trace.Output.append_separated("# create keyframes for this animation track")
+
+        # Create accessors for each of the animation key frames.
+        for keyframeProxy in self.Cue.KeyFrames:
+            pname = Trace.get_registered_name(keyframeProxy, "animation")
+            kfaccessor = ProxyAccessor(Trace.get_varname(pname), keyframeProxy)
+            props = [x for x in kfaccessor.get_properties() if self.should_trace_in_create(x)]
+            Trace.Output.append_separated([\
+                "# create key frame",
+                "%s = %s()" % (kfaccessor, sm._make_name_valid(self.Cue.GetXMLLabel())),
+                kfaccessor.trace_properties(props, in_ctor=False)])
+
+        # Now trace properties on the cue.
+        props = [x for x in accessor.get_properties() if self.should_trace_in_create(x)]
+        if props:
+            Trace.Output.append_separated([\
+                "# initialize the animation track",
+                accessor.trace_properties(props, in_ctor=False)])
+
+    def should_trace_in_create(self, propAccessor):
+        return TraceItem.should_trace_in_create(self, propAccessor, user_can_modify_in_create=True)
+
+    def should_never_trace(self, propAccessor):
+        return TraceItem.should_never_trace(self, propAccessor) or propAccessor.PropertyKey in \
+            ["AnimatedProxy", "AnimatedPropertyName", "AnimatedElement", "AnimatedDomainName"]
 
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):
