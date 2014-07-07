@@ -450,6 +450,14 @@ class PipelineProxyFilter(ProxyFilter):
     def should_trace_in_create(self, prop):
         return ProxyFilter.should_trace_in_create(self, prop, user_can_modify_in_create=False)
 
+    def should_never_trace(self, prop):
+        """overridden to avoid hiding "non-gui" properties such as FileName."""
+        # should we hide properties hidden from panels?
+        if not prop.get_object().FindDomain("vtkSMFileListDomain") is None:
+            return False
+        else:
+            return ProxyFilter.should_never_trace(self, prop)
+
     def should_trace_in_ctor(self, prop):
         if self.should_never_trace(prop): return False
         return prop.get_object().IsA("vtkSMInputProperty") or \
@@ -1007,6 +1015,7 @@ if __name__ == "__main__":
 
     s = simple.Sphere()
     c = simple.Clip()
+    simple.Show()
 
     print "***** TRACE RESULT *****"
     print sm.vtkSMTrace.StopTrace()
