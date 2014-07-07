@@ -814,7 +814,11 @@ class SetCurrentProxy(TraceItem):
     """Traces change in active view/source etc."""
     def __init__(self, selmodel, proxy, command):
         TraceItem.__init__(self)
-        proxy = sm._getPyProxy(proxy)
+        if proxy and proxy.IsA("vtkSMOutputPort"):
+            # FIXME: need to handle port number.
+            proxy = sm._getPyProxy(proxy.GetSourceProxy())
+        else:
+            proxy = sm._getPyProxy(proxy)
         accessor = Trace.get_accessor(proxy)
         pxm = selmodel.GetSessionProxyManager()
         if selmodel is pxm.GetSelectionModel("ActiveView"):
