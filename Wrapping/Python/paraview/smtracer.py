@@ -475,7 +475,7 @@ class AnimationProxyFilter(ProxyFilter):
 
 class ExporterProxyFilter(ProxyFilter):
     def should_trace_in_ctor(self, prop):
-        return not self.should_never_trace(prop)
+        return not self.should_never_trace(prop) and self.should_trace_in_create(prop)
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.PropertyKey == "FileName" : return True
@@ -483,7 +483,7 @@ class ExporterProxyFilter(ProxyFilter):
 
 class WriterProxyFilter(ProxyFilter):
     def should_trace_in_ctor(self, prop):
-        return not self.should_never_trace(prop)
+        return not self.should_never_trace(prop) and self.should_trace_in_create(prop)
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.PropertyKey in ["FileName", "Input"] : return True
