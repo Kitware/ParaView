@@ -700,6 +700,7 @@ bool pqAnimationManager::saveAnimation()
   writer->SetPlaybackTimeWindow(playbackTimeWindow);
   writer->SetStartFileCount(startFrameCount);
 
+  SM_SCOPED_TRACE(SaveCameras).arg("proxy", sceneProxy);
   SM_SCOPED_TRACE(CallFunction)
     .arg("WriteAnimation")
     .arg(filename.toLatin1().data())

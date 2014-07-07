@@ -275,6 +275,16 @@ def GetLayout(view=None):
             return layout
     return None
 
+
+def GetViewsInLayout(layout=None):
+    """Returns a list of views in the given layout. If not layout is specified,
+    the layout for the active view is used, if possible."""
+    layout = layout if layout else GetLayout()
+    if not layout:
+        raise RuntimeError, "Layout couldn't be determined. Please specify a valid layout."
+    views = GetViews()
+    return [x for x in views if layout.GetViewLocation(x) != -1]
+
 # -----------------------------------------------------------------------------
 
 def RemoveViewsAndLayouts():

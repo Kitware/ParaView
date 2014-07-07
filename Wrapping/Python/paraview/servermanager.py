@@ -2406,6 +2406,11 @@ def _getPyProxy(smproxy, outputPort=0):
     new one. Proxies register themselves in _pyproxies upon creation."""
     if not smproxy:
         return None
+    try:
+        # is argument is already a Proxy instance, this takes care of it.
+        return _getPyProxy(smproxy.SMProxy, outputPort)
+    except AttributeError:
+        pass
     if (smproxy, outputPort) in _pyproxies:
         return _pyproxies[(smproxy, outputPort)]()
 

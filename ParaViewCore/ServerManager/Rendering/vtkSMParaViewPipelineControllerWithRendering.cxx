@@ -541,6 +541,8 @@ bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int
     {
     return false;
     }
+  SM_SCOPED_TRACE(SaveCameras).arg("proxy", viewOrLayout);
+
   SM_SCOPED_TRACE(CallFunction)
     .arg("SaveScreenshot")
     .arg(viewOrLayout)
