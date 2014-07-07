@@ -665,7 +665,27 @@ def CreateWriter(filename, proxy=None, **extraArgs):
     if not proxy:
         raise RuntimeError, "Could not locate source to write"
     writer_proxy = writer_factory.CreateWriter(filename, proxy.SMProxy, proxy.Port)
-    return servermanager._getPyProxy(writer_proxy)
+    pyproxy = servermanager._getPyProxy(writer_proxy)
+    if pyproxy and extraArgs:
+        SetProperties(pyproxy, **extraArgs)
+    return pyproxy
+
+
+def SaveData(filename, proxy=None, **extraArgs):
+    """Save data produced by 'proxy' in a file. If no proxy is specified the
+    active source is used. Properties to configure the writer can be passed in
+    as keyword arguments. Example usage::
+
+        SaveData("sample.pvtp", source0)
+        SaveData("sample.csv", FieldAssociation="Points")
+    """
+    writer = CreateWriter(filename, proxy, extraArgs)
+    if not writer:
+        raise RuntimeError, "Could not create writer for specified file or data type"
+    writer.UpdateVTKObjects()
+    writer.UpdatePipeline()
+    del writer
+
 
 # -----------------------------------------------------------------------------
 

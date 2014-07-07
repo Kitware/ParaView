@@ -259,7 +259,7 @@ class Untraceable(Exception):
 class Accessor(object):
     def __init__(self, varname, obj):
         self.Varname = varname
-        self.__Object = weakref.ref(obj)
+        self.__Object = obj
         Trace.register_accessor(self)
 
     def finalize(self):
@@ -269,9 +269,7 @@ class Accessor(object):
         return self.Varname
 
     def get_object(self):
-        if not self.__Object() is None:
-            return self.__Object()
-        raise Untraceable("Object is no longer alive.")
+        return self.__Object
 
 class ProxyAccessor(Accessor):
     def __init__(self, varname, proxy):
@@ -328,7 +326,11 @@ class ProxyAccessor(Accessor):
         # trace any properties that the 'filter' tells us should be traced
         # in ctor.
         ctor_props = [x for x in self.OrderedProperties if filter.should_trace_in_ctor(x)]
-        args_in_ctor += self.trace_properties(ctor_props, in_ctor=True)
+        ctor_props_trace = self.trace_properties(ctor_props, in_ctor=True)
+        if args_in_ctor and ctor_props_trace:
+            args_in_ctor = "%s, %s" % (args_in_ctor, ctor_props_trace)
+        else:
+            args_in_ctor += ctor_props_trace
 
         # locate all the other properties that should be traced in create.
         other_props = [x for x in self.OrderedProperties \
@@ -477,6 +479,14 @@ class ExporterProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.PropertyKey == "FileName" : return True
+        return False
+
+class WriterProxyFilter(ProxyFilter):
+    def should_trace_in_ctor(self, prop):
+        return not self.should_never_trace(prop)
+    def should_never_trace(self, prop):
+        if ProxyFilter.should_never_trace(self, prop): return True
+        if prop.PropertyKey in ["FileName", "Input"] : return True
         return False
 
 class TransferFunctionProxyFilter(ProxyFilter):
@@ -740,7 +750,32 @@ class ExportView(TraceItem):
               ctor_args="'%s', view=%s" % (filename, viewAccessor),
               skip_assignment=True))
         del exporterAccessor
-        Trace.Output.append(trace.raw_data())
+        Trace.Output.append_separated(trace.raw_data())
+
+class SaveData(TraceItem):
+    def __init__(self, writer, filename, source, port):
+        TraceItem.__init__(self)
+
+        source = sm._getPyProxy(source, port)
+        sourceAccessor = Trace.get_accessor(source)
+        writer = sm._getPyProxy(writer)
+        writerAccessor = ProxyAccessor("temporaryWriter", writer)
+        writerAccessor.finalize() # so that it will get deleted.
+
+        if port > 0:
+            ctor_args_1 = "OutputPort(%s, %d)" % (sourceAccessor, port)
+        else:
+            ctor_args_1 = "%s" % sourceAccessor
+
+        trace = TraceOutput()
+        trace.append("# save data")
+        trace.append(\
+            writerAccessor.trace_ctor("SaveData", WriterProxyFilter(),
+              ctor_args="'%s', proxy=%s" % (filename, ctor_args_1),
+              skip_assignment=True))
+        del writerAccessor
+        del writer
+        Trace.Output.append_separated(trace.raw_data())
 
 class EnsureLayout(TraceItem):
     def __init__(self, layout):
