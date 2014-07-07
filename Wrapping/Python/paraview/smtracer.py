@@ -575,6 +575,14 @@ class PropertiesModified(NestableTraceItem):
         self.MTime = vtkTimeStamp()
         self.MTime.Modified()
 
+        try:
+            # Hack to track ScalarOpacityFunction property changes since that proxy
+            # is shown on the same pqProxyWidget as the ColorTransferFunction proxy --
+            # which is non-standard.
+            if proxy.ScalarOpacityFunction:
+                self.ScalarOpacityFunctionHack = PropertiesModified(proxy.ScalarOpacityFunction)
+        except: pass
+
     def finalize(self):
         props = self.ProxyAccessor.get_properties()
         props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
@@ -595,6 +603,11 @@ class PropertiesModified(NestableTraceItem):
                       "# Properties modified on %s" % valaccessor,
                       valaccessor.trace_properties(props_to_trace, in_ctor=False)])
         TraceItem.finalize(self)
+
+        try:
+            self.ScalarOpacityFunctionHack.finalize()
+            del self.ScalarOpacityFunctionHack
+        except AttributeError: pass
 
 class Show(TraceItem):
     """Traces Show"""
