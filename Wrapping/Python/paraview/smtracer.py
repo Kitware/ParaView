@@ -282,7 +282,7 @@ class ProxyAccessor(Accessor):
         oiter.SetProxy(proxy.SMProxy)
         while not oiter.IsAtEnd():
             prop_name = oiter.GetKey()
-            prop_label = oiter.GetProperty().GetXMLLabel()
+            prop_label = oiter.GetPropertyLabel()
             sanitized_label = sm._make_name_valid(prop_label)
 
             prop = proxy.GetProperty(prop_name)
@@ -382,7 +382,9 @@ class PropertyAccessor(Accessor):
 
     def trace_property(self, in_ctor):
         """return trace-text for the property."""
-        return "%s = %s" % (self.varname(in_ctor), self.value())
+        varname = self.varname(in_ctor)
+        if in_ctor: return "%s=%s" % (varname, self.value())
+        else: return "%s = %s" % (varname, self.value())
 
     def varname(self, not_fully_scoped=False):
         return self.PropertyKey if not_fully_scoped else self.Varname
@@ -1014,8 +1016,8 @@ if __name__ == "__main__":
     sm.vtkSMTrace.StartTrace()
 
     s = simple.Sphere()
-    c = simple.Clip()
-    simple.Show()
+    c = simple.PlotOverLine()
+    #simple.Show()
 
     print "***** TRACE RESULT *****"
     print sm.vtkSMTrace.StopTrace()

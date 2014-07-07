@@ -108,6 +108,35 @@ const char* vtkSMOrderedPropertyIterator::GetKey()
 }
 
 //---------------------------------------------------------------------------
+const char* vtkSMOrderedPropertyIterator::GetPropertyLabel()
+{
+  if (!this->Proxy)
+    {
+    vtkErrorMacro("Proxy is not set. Can not perform operation: GetPropertyLabel()");
+    return 0;
+    }
+
+  if (!this->IsAtEnd())
+    {
+    const char* pname = this->Proxy->Internals->PropertyNamesInOrder[this->Index];
+
+    if (vtkSMProperty* prop = this->Proxy->GetProperty(pname, /*selfOnly*/1))
+      {
+      // Self property
+      return prop->GetXMLLabel();
+      }
+    else
+      {
+      // Property of a sub-proxy
+      return this->GetKey();
+      }
+    }
+
+  return 0;
+}
+
+
+//---------------------------------------------------------------------------
 vtkSMProperty* vtkSMOrderedPropertyIterator::GetProperty()
 {
   if (!this->Proxy)

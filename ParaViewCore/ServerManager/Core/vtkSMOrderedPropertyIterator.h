@@ -66,6 +66,11 @@ public:
   // Returns the property at the current iterator position.
   vtkSMProperty* GetProperty();
 
+  // Description:
+  // Returns the XMLLabel for self properties and the exposed name for
+  // sub-proxy properties.
+  const char* GetPropertyLabel();
+
 protected:
   vtkSMOrderedPropertyIterator();
   ~vtkSMOrderedPropertyIterator();

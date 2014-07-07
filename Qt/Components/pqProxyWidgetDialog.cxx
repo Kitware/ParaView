@@ -157,7 +157,7 @@ pqProxyWidgetDialog::~pqProxyWidgetDialog()
 //-----------------------------------------------------------------------------
 void pqProxyWidgetDialog::accept()
 {
-  emit this->accepted();
+  this->Superclass::accept();
 }
 
 //-----------------------------------------------------------------------------
