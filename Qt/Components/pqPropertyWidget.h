@@ -36,11 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 #include <QWidget>
-
+#include <QScopedPointer>
 #include "pqPropertyLinks.h"
 #include "pqDebug.h"
 
 class pqPropertyWidgetDecorator;
+class pqTimer;
 class pqView;
 class vtkSMDomain;
 class vtkSMProperty;
@@ -171,6 +172,8 @@ private:
   pqPropertyLinks Links;
   bool ShowLabel;
   bool ChangeAvailableAsChangeFinished;
+
+  const QScopedPointer<pqTimer> Timer;
 
   /// Deprecated signals. Making private so developers get errors when they
   /// use them.

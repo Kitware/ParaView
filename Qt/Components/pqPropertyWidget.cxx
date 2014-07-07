@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqTimer.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
@@ -46,7 +47,8 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   : QWidget(parentObject),
     Proxy(smProxy),
     Property(0),
-    ChangeAvailableAsChangeFinished(true)
+    ChangeAvailableAsChangeFinished(true),
+    Timer(new pqTimer())
 {
   this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
@@ -55,10 +57,13 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   this->connect(&this->Links, SIGNAL(qtWidgetChanged()),
                 this, SIGNAL(changeAvailable()));
 
+
   // This has to be a QueuedConnection otherwise changeFinished() gets fired
   // before changeAvailable() is handled by pqProxyWidget and see BUG #13029.
-  this->connect(this, SIGNAL(changeAvailable()),
-                this, SLOT(onChangeAvailable()), Qt::QueuedConnection);
+  this->Timer->setSingleShot(true);
+  this->Timer->setInterval(0);
+  this->Timer->connect(this, SIGNAL(changeAvailable()), SLOT(start()));
+  this->connect(this->Timer.data(), SIGNAL(timeout()), SLOT(onChangeAvailable()));
 }
 
 //-----------------------------------------------------------------------------
