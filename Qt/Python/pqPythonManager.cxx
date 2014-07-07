@@ -269,7 +269,7 @@ QString pqPythonManager::getTraceString()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::editTrace()
+void pqPythonManager::editTrace(const QString& txt)
 {
   // Create the editor if needed and only the first time
   if(!this->Internal->Editor)
@@ -278,7 +278,7 @@ void pqPythonManager::editTrace()
     this->Internal->Editor->setPythonManager(this);
     }
 
-  QString traceString = this->getTraceString();
+  QString traceString = txt.isEmpty()? this->getTraceString() : txt;
   this->Internal->Editor->show();
   this->Internal->Editor->raise();
   this->Internal->Editor->activateWindow();

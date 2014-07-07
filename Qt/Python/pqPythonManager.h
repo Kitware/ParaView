@@ -78,8 +78,10 @@ public:
   void addWidgetForDeleteMacros(QWidget* widget);
 
   // Description:
-  // Show the python editor with the trace in it
-  void editTrace();
+  // Show the python editor with the trace in it.
+  // If txt is empty, the editor will obtain the state from active vtkSMTrace
+  // instance, if any.
+  void editTrace(const QString& txt=QString());
 
   // Description:
   // Trace state and save the trace string to a file with the given filename.

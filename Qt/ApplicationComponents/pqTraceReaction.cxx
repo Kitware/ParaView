@@ -107,11 +107,11 @@ void pqTraceReaction::start()
 //-----------------------------------------------------------------------------
 void pqTraceReaction::stop()
 {
+  QString tracetxt(vtkSMTrace::StopTrace().c_str());
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  pythonManager->editTrace();
+  pythonManager->editTrace(tracetxt);
 #endif
-  vtkSMTrace::StopTrace();
 }
 
 //-----------------------------------------------------------------------------
