@@ -199,7 +199,15 @@ vtkStdString vtkSMTrace::StopTrace()
   if (active->CheckForError() == false)
     {
     // no error.
-    return vtkStdString(PyString_AsString(stopTrace));
+    if (Py_None != stopTrace.GetPointer() && stopTrace.GetPointer() != NULL)
+      {
+      return vtkStdString(PyString_AsString(stopTrace));
+      }
+    else
+      {
+      vtkGenericWarningMacro("Empty trace returned!!!");
+      return vtkStdString();
+      }
     }
 #endif
   return vtkStdString();

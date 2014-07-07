@@ -928,7 +928,7 @@ class SaveCameras(BookkeepingItem):
     def get_trace(cls, proxy=None):
         trace = TraceOutput()
         proxy = sm._getPyProxy(proxy)
-        if not proxy:
+        if proxy is None:
             views = [x for x in simple.GetViews() if Trace.has_accessor(x)]
             for v in views:
                 trace.append_separated(cls.get_trace(proxy=v))
@@ -936,23 +936,25 @@ class SaveCameras(BookkeepingItem):
             views = simple.GetViewsInLayout(proxy)
             for v in views:
                 trace.append_separated(cls.get_trace(proxy=v))
-        elif proxy.IsA("vtkSMViewProxy") and proxy.GetProperty("CameraPosition"):
-            accessor = Trace.get_accessor(proxy)
-            trace.append("# current camera placement for %s" % accessor)
-            prop_names = ["CameraPosition", "CameraFocalPoint",
-                     "CameraViewUp", "CameraViewAngle",
-                     "CameraParallelScale", "CameraParallelProjection",
-                     "EyeAngle"]
-            props = [x for x in accessor.get_properties() \
-                if x.get_property_name() in prop_names and \
-                   not x.get_object().IsValueDefault()]
-            if props:
-                trace.append(accessor.trace_properties(props, in_ctor=False))
+        elif proxy.IsA("vtkSMViewProxy"):
+            if proxy.GetProperty("CameraPosition"):
+                accessor = Trace.get_accessor(proxy)
+                trace.append("# current camera placement for %s" % accessor)
+                prop_names = ["CameraPosition", "CameraFocalPoint",
+                         "CameraViewUp", "CameraViewAngle",
+                         "CameraParallelScale", "CameraParallelProjection",
+                         "EyeAngle"]
+                props = [x for x in accessor.get_properties() \
+                    if x.get_property_name() in prop_names and \
+                       not x.get_object().IsValueDefault()]
+                if props:
+                    trace.append(accessor.trace_properties(props, in_ctor=False))
+            else: pass # non-camera views
         elif proxy.IsA("vtkSMAnimationSceneProxy"):
             for view in proxy.GetProperty("ViewModules"):
                 trace.append_separated(cls.get_trace(proxy=view))
         else:
-            raise Untraceable("Invalid argument type")
+            raise Untraceable("Invalid argument type %r"% proxy)
         return trace.raw_data()
 
 
@@ -999,11 +1001,11 @@ def stopTrace():
         Trace.Output.append_separated(\
             "#### saving camera placements for all active views")
         Trace.Output.append_separated(camera_trace)
-        Trace.Output.append_separated([\
-            "#### uncomment the following to render all views ",
-            "# RenderAllViews()",
-            "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
-            ])
+    Trace.Output.append_separated([\
+        "#### uncomment the following to render all views ",
+        "# RenderAllViews()",
+        "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
+        ])
     trace = str(Trace.Output)
     Trace.reset()
     return trace
@@ -1017,7 +1019,7 @@ if __name__ == "__main__":
 
     s = simple.Sphere()
     c = simple.PlotOverLine()
-    #simple.Show()
+    simple.Show()
 
     print "***** TRACE RESULT *****"
     print sm.vtkSMTrace.StopTrace()
