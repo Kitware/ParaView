@@ -322,7 +322,8 @@ bool vtkInitializationHelper::LoadSettings()
   std::string installDirectory = app_dir.substr(0, app_dir.find("/lib/paraview-" PARAVIEW_VERSION));
 
   // Remove the trailing /bin if it is there.
-  if (installDirectory.substr(installDirectory.size()-4) == "/bin")
+  if (installDirectory.size() >= 4 &&
+      installDirectory.substr(installDirectory.size()-4) == "/bin")
     {
     installDirectory = installDirectory.substr(0, installDirectory.size()-4);
     }
