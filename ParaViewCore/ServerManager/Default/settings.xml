@@ -588,57 +588,5 @@
         <UseDocumentationForLabels />
       </Hints>
     </SettingsProxy>
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-    <!-- Python functionality related settings -->
-    <SettingsProxy name="PythonTraceSettings"
-      label="Python Tracing"
-      processes="client"
-      class="vtkPVGeneralSettings">
-      <IntVectorProperty name="PropertiesToTraceOnCreate"
-        command="SetPropertiesToTraceOnCreate"
-        default_values="1"
-        number_of_elements="1">
-        <Documentation>
-          When tracing the creation of pipeline objects, specify which properties are
-          recorded in the trace.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Record all properties" value="0" />
-          <Entry text="Record all *modified* properties" value="1" />
-          <Entry text="Record only *user-modified* properites" value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <IntVectorProperty name="TracePropertiesOnExistingProxies"
-        command="SetTracePropertiesOnExistingProxies"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          For views, transfer functions (color maps, and opacity maps), etc.
-          trace properties as needed for improved reproducibility.
-        </Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty name="ShowIncrementalTrace"
-          command="SetShowIncrementalTrace"
-          default_values="0"
-          number_of_elements="1">
-          <BooleanDomain name="bool" />
-          <Documentation>
-            Show trace as it is being generated.
-          </Documentation>
-      </IntVectorProperty>
-      <PropertyGroup label="Generated trace characteristics">
-        <Property name="PropertiesToTraceOnCreate" />
-        <Property name="TracePropertiesOnExistingProxies" />
-      </PropertyGroup>
-      <PropertyGroup label="Miscellaneous">
-        <Property name="ShowIncrementalTrace" />
-      </PropertyGroup>
-      <Hints>
-        <UseDocumentationForLabels />
-      </Hints>
-    </SettingsProxy>
-#endif
   </ProxyGroup>
 </ServerManagerConfiguration>

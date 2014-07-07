@@ -2425,4 +2425,49 @@
     </LiveInsituLinkProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="pythontracing">
+    <Proxy name="PythonTraceOptions">
+      <IntVectorProperty name="PropertiesToTraceOnCreate"
+        default_values="1"
+        number_of_elements="1">
+        <Documentation>
+          When tracing the creation of pipeline objects, specify which properties are
+          recorded in the trace.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Record all properties" value="0" />
+          <Entry text="Record all *modified* properties" value="1" />
+          <Entry text="Record only *user-modified* properites" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty name="TracePropertiesOnExistingProxies"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          For views, transfer functions (color maps, and opacity maps), etc.
+          trace properties as needed for improved reproducibility.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ShowIncrementalTrace"
+          default_values="0"
+          number_of_elements="1">
+          <BooleanDomain name="bool" />
+          <Documentation>
+            Show trace as it is being generated.
+          </Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Generated trace characteristics">
+        <Property name="PropertiesToTraceOnCreate" />
+        <Property name="TracePropertiesOnExistingProxies" />
+      </PropertyGroup>
+      <PropertyGroup label="Miscellaneous">
+        <Property name="ShowIncrementalTrace" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

@@ -31,10 +31,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTraceReaction.h"
 
+#include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
+#include "pqProxyWidgetDialog.h"
 #include "pqPVApplicationCore.h"
+#include "pqServer.h"
 #include "vtkCommand.h"
-#include "vtkPVGeneralSettings.h"
+#include "vtkNew.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 
 #include "vtkPVConfig.h"
@@ -78,12 +86,6 @@ void pqTraceReaction::onTriggered()
   if (vtkSMTrace::GetActiveTracer() == NULL)
     {
     this->start();
-    vtkSMTrace* trace = vtkSMTrace::GetActiveTracer();
-    if (trace && vtkPVGeneralSettings::GetInstance()->GetShowIncrementalTrace())
-      {
-      pqCoreUtilities::connect(
-        trace, vtkCommand::UpdateEvent, this, SLOT(updateTrace()));
-      }
     }
   else
     {
@@ -97,11 +99,36 @@ void pqTraceReaction::onTriggered()
 //-----------------------------------------------------------------------------
 void pqTraceReaction::start()
 {
+  vtkSMSessionProxyManager* pxm =
+    pqActiveObjects::instance().activeServer()->proxyManager();
+
+  vtkSmartPointer<vtkSMProxy> proxy;
+  proxy.TakeReference(pxm->NewProxy("pythontracing", "PythonTraceOptions"));
+  if (proxy)
+    {
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    controller->InitializeProxy(proxy);
+    pqProxyWidgetDialog dialog(proxy);
+    dialog.setWindowTitle("Trace Options");
+    dialog.setObjectName("TraceOptionsDialog");
+    if (dialog.exec() != QDialog::Accepted)
+      {
+      return;
+      }
+    }
   vtkSMTrace* trace = vtkSMTrace::StartTrace();
-  trace->SetPropertiesToTraceOnCreate(
-    vtkPVGeneralSettings::GetInstance()->GetPropertiesToTraceOnCreate());
-  trace->SetTracePropertiesOnExistingProxies(
-    vtkPVGeneralSettings::GetInstance()->GetTracePropertiesOnExistingProxies());
+  if (proxy)
+    {
+    trace->SetPropertiesToTraceOnCreate(
+      vtkSMPropertyHelper(proxy, "PropertiesToTraceOnCreate").GetAsInt());
+    trace->SetTracePropertiesOnExistingProxies(
+      vtkSMPropertyHelper(proxy, "TracePropertiesOnExistingProxies").GetAsInt());
+    if (vtkSMPropertyHelper(proxy, "ShowIncrementalTrace").GetAsInt() == 1)
+      {
+      pqCoreUtilities::connect(
+        trace, vtkCommand::UpdateEvent, this, SLOT(updateTrace()));
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

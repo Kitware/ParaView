@@ -48,10 +48,10 @@ public:
   virtual ~pqTraceReaction();
 
   /// start tracing.
-  static void start();
+  void start();
 
   /// stop tracing.
-  static void stop();
+  void stop();
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered();
