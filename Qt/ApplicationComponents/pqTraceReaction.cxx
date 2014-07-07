@@ -146,6 +146,6 @@ void pqTraceReaction::updateTrace()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  pythonManager->editTrace();
+  pythonManager->editTrace(QString(), true);
 #endif
 }

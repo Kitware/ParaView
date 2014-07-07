@@ -269,9 +269,10 @@ QString pqPythonManager::getTraceString()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::editTrace(const QString& txt)
+void pqPythonManager::editTrace(const QString& txt, bool update)
 {
   // Create the editor if needed and only the first time
+  bool new_editor = this->Internal->Editor == NULL;
   if(!this->Internal->Editor)
     {
     this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
@@ -280,13 +281,15 @@ void pqPythonManager::editTrace(const QString& txt)
 
   QString traceString = txt.isEmpty()? this->getTraceString() : txt;
   this->Internal->Editor->show();
-  this->Internal->Editor->raise();
-  this->Internal->Editor->activateWindow();
-  if (this->Internal->Editor->newFile())
+  if (new_editor || !update) // don't raise the window if we are just updating the trace.
+    {
+    this->Internal->Editor->raise();
+    this->Internal->Editor->activateWindow();
+    }
+  if (update || this->Internal->Editor->newFile())
     {
     this->Internal->Editor->setText(traceString);
     }
-
 }
 
 //----------------------------------------------------------------------------
