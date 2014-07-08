@@ -178,7 +178,7 @@ class Trace(object):
                 varname = cls.get_varname(cls.get_registered_name(obj, "layouts"))
                 accessor = ProxyAccessor(varname, obj)
                 cls.Output.append_separated([\
-                    "# get layout ",
+                    "# get layout",
                     "%s = GetLayout()" % accessor])
                 return True
         return False
@@ -1061,7 +1061,7 @@ def stopTrace():
             "#### saving camera placements for all active views")
         Trace.Output.append_separated(camera_trace)
     Trace.Output.append_separated([\
-        "#### uncomment the following to render all views ",
+        "#### uncomment the following to render all views",
         "# RenderAllViews()",
         "# alternatively, if you want to write images, you can use SaveScreenshot(...)."
         ])
