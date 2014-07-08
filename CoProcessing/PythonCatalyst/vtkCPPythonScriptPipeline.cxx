@@ -146,19 +146,14 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   int scriptSize = 0;
   if(rank == 0)
     {
-    vtksys_ios::ostringstream script;
-
-    std::string line;
-    ifstream myfile (fileName);
-    while ( getline (myfile,line) )
-      {
-      script << line << std::endl;
-      }
-    myfile.close();
-
-    scriptSize = script.str().size() + 1;
+    std::FILE *fp = std::fopen(fileName, "r");
+    std::fseek(fp, 0, SEEK_END);
+    scriptSize = static_cast<int>(std::ftell(fp)+1);
     scriptText = new char[scriptSize];
-    memcpy(scriptText, script.str().c_str(), scriptSize);
+    std::rewind(fp);
+    std::fread(scriptText, 1, scriptSize-1, fp);
+    std::fclose(fp);
+    scriptText[scriptSize-1] = '\0';
     }
 
   controller->Broadcast(&scriptSize, 1, 0);
@@ -268,7 +263,7 @@ vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
   sprintf(addressOfPointer, "%p", pointer);
 #endif
   char *aplus = addressOfPointer;
-  if ((addressOfPointer[0] == '0') && 
+  if ((addressOfPointer[0] == '0') &&
       ((addressOfPointer[1] == 'x') || addressOfPointer[1] == 'X'))
     {
     aplus += 2; //skip over "0x"
