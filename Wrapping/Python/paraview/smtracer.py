@@ -465,6 +465,16 @@ class PipelineProxyFilter(ProxyFilter):
         return prop.get_object().IsA("vtkSMInputProperty") or \
             prop.get_object().FindDomain("vtkSMFileListDomain") != None
 
+class ExodusIIReaderFilter(PipelineProxyFilter):
+    def should_never_trace(self, prop):
+        if PipelineProxyFilter.should_never_trace(self, prop): return True
+        # Exodus reader has way too many wacky properties tracing them causes
+        # the reader to segfault. We need to either remove those properties
+        # entirely or fix them. Until I get a chance to get to the bottom of it,
+        # I am opting to ignore those properties when tracing.
+        return prop.get_property_name() in [\
+            "FilePrefix", "XMLFileName", "FilePattern", "FileRange"]
+
 class RepresentationProxyFilter(PipelineProxyFilter):
     def should_trace_in_ctor(self, prop): return False
 
@@ -555,7 +565,9 @@ class RegisterPipelineProxy(TraceItem):
         ctor = sm._make_name_valid(self.Proxy.GetXMLLabel())
         trace = TraceOutput()
         trace.append("# create a new '%s'" % self.Proxy.GetXMLLabel())
-        trace.append(accessor.trace_ctor(ctor, PipelineProxyFilter()))
+        filter_type = ExodusIIReaderFilter() \
+            if isinstance(self.Proxy, sm.ExodusIIReaderProxy) else PipelineProxyFilter()
+        trace.append(accessor.trace_ctor(ctor, filter_type))
         Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
