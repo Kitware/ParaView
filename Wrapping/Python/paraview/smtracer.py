@@ -370,6 +370,7 @@ class PropertyAccessor(Accessor):
         self.ProxyAccessor = proxyAccessor
         pld_domain = prop.FindDomain("vtkSMProxyListDomain")
         self.HasProxyListDomain = isinstance(prop, sm.ProxyProperty) and pld_domain != None
+        self.ProxyListDomainProxyAccessors = []
 
         if self.HasProxyListDomain:
             # register accessors for proxies in the proxy list domain.
@@ -378,7 +379,13 @@ class PropertyAccessor(Accessor):
             # UI never modifies the other properties, we cheat
             for i in xrange(pld_domain.GetNumberOfProxies()):
                 domain_proxy = pld_domain.GetProxy(i)
-                ProxyAccessor(self.varname(), sm._getPyProxy(domain_proxy))
+                plda = ProxyAccessor(self.varname(), sm._getPyProxy(domain_proxy))
+                self.ProxyListDomainProxyAccessors.append(plda)
+
+    def finalize(self):
+        for x in self.ProxyListDomainProxyAccessors:
+            x.finalize()
+        Accessor.finalize(self)
 
     def trace_property(self, in_ctor):
         """return trace-text for the property."""
