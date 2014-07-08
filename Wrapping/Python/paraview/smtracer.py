@@ -119,12 +119,12 @@ class Trace(object):
                     ctor_args = "'%s'" % obj.GetXMLName()
                     trace.append("# get active view")
                     trace.append(accessor.trace_ctor(\
-                      "GetActiveViewOrCreate", ExistingProxy(ProxyFilter()), ctor_args))
+                      "GetActiveViewOrCreate", ExistingProxy(ViewProxyFilter()), ctor_args))
                 else:
                     ctor_args = "'%s', '%s'" % (obj.GetXMLName(), pname)
                     trace.append("# find view")
                     trace.append(accessor.trace_ctor(\
-                      "FindView", ExistingProxy(ProxyFilter()), ctor_args))
+                      "FindView", ExistingProxy(ViewProxyFilter()), ctor_args))
                 # trace view size, if present. We trace this commented out so
                 # that the playback in the GUI doesn't cause issues.
                 viewSizeAccessor = accessor.get_property("ViewSize")
@@ -484,6 +484,10 @@ class RepresentationProxyFilter(PipelineProxyFilter):
             "SelectionCellFieldDataArrayName",\
             "SelectionPointFieldDataArrayName"] : return True
         return False
+class ViewProxyFilter(ProxyFilter):
+    def should_never_trace(self, prop):
+        return False if prop.PropertyKey in ["InteractionMode"] else \
+            ProxyFilter.should_never_trace(self, prop)
 
 class AnimationProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
@@ -741,7 +745,7 @@ class RegisterViewProxy(TraceItem):
         ctor_args = "'%s'" % self.Proxy.GetXMLName()
         trace = TraceOutput()
         trace.append("# Create a new '%s'" % self.Proxy.GetXMLLabel())
-        filter = ProxyFilter()
+        filter = ViewProxyFilter()
         trace.append(accessor.trace_ctor("CreateView", filter, ctor_args))
         Trace.Output.append_separated(trace.raw_data())
 
@@ -991,7 +995,7 @@ class SaveCameras(BookkeepingItem):
                 prop_names = ["CameraPosition", "CameraFocalPoint",
                          "CameraViewUp", "CameraViewAngle",
                          "CameraParallelScale", "CameraParallelProjection",
-                         "EyeAngle"]
+                         "EyeAngle", "InteractionMode"]
                 props = [x for x in accessor.get_properties() \
                     if x.get_property_name() in prop_names and \
                        not x.get_object().IsValueDefault()]

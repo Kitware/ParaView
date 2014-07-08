@@ -193,6 +193,14 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     return false;
     }
 
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("RescaleTransferFunctionToDataRange")
+    .arg(extend)
+    .arg("comment",
+      (extend?
+       "rescale color and/or opacity maps used to include current data range" :
+       "rescale color and/or opacity maps used to exactly fit the current data range"));
   return this->RescaleTransferFunctionToDataRange(
     this->GetArrayInformationForColorArray(), extend);
 }
