@@ -354,11 +354,9 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     avi->SetQuality(this->Quality);
     avi->SetRate(
       static_cast<int>(this->GetFrameRate()));
-    // Use the "Microsoft MPEG-4 Video Codec v3" codec by default. This should
-    // get us better results than "MSVC", an old, outdated codec. MSDN states
-    // that it is supported in XP (http://support.microsoft.com/kb/291948) and
-    // it seems to be the same as http://www.fourcc.org/mp43/.
-    avi->SetCompressorFourCC("MP43");
+    // Also available are IYUV and I420, but these are ~10x larger than MSVC.
+    // No other encoder seems to be available on a stock Windows 7 install.
+    avi->SetCompressorFourCC("MSVC");
     mwriter = avi;
     }
 #else
