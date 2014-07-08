@@ -587,14 +587,15 @@ class CleanupAccessor(BookkeepingItem):
 
 class PropertiesModified(NestableTraceItem):
     """Traces properties modified on a specific proxy."""
-    def __init__(self, proxy):
+    def __init__(self, proxy, comment=None):
         TraceItem.__init__(self)
 
         proxy = sm._getPyProxy(proxy)
         self.ProxyAccessor = Trace.get_accessor(proxy)
         self.MTime = vtkTimeStamp()
         self.MTime.Modified()
-
+        self.Comment = "#%s" % comment if not comment is None else \
+            "# Properties modified on %s" % str(self.ProxyAccessor)
         try:
             # Hack to track ScalarOpacityFunction property changes since that proxy
             # is shown on the same pqProxyWidget as the ColorTransferFunction proxy --
@@ -608,7 +609,7 @@ class PropertiesModified(NestableTraceItem):
         props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
         if props_to_trace:
             Trace.Output.append_separated([
-                "# Properties modified on %s" % str(self.ProxyAccessor),
+                self.Comment,
                 self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
 
         # also handle properties on values for properties with ProxyListDomain.
@@ -880,7 +881,11 @@ class SetCurrentProxy(TraceItem):
 class CallMethod(TraceItem):
     def __init__(self, proxy, methodname, *args, **kwargs):
         TraceItem.__init__(self)
+        trace = self.get_trace(proxy, methodname, args, kwargs)
+        if trace:
+            Trace.Output.append_separated(trace)
 
+    def get_trace(self, proxy, methodname, args, kwargs):
         to_trace = []
         try:
             to_trace.append("# " + kwargs["comment"])
@@ -891,7 +896,7 @@ class CallMethod(TraceItem):
         args = [str(CallMethod.marshall(x)) for x in args]
         args += ["%s=%s" % (key, CallMethod.marshall(val)) for key, val in kwargs.iteritems()]
         to_trace.append("%s.%s(%s)" % (accessor, methodname, ", ".join(args)))
-        Trace.Output.append_separated(to_trace)
+        return to_trace
 
     @classmethod
     def marshall(cls, x):
@@ -900,6 +905,37 @@ class CallMethod(TraceItem):
                 return Trace.get_accessor(sm._getPyProxy(x))
         except AttributeError:
             return "'%s'" % x if type(x) == str else x
+
+
+def _bind_on_event(ref):
+    def _callback(obj, string):
+        ref().on_event(obj, string)
+    return _callback
+
+class CallMethodIfPropertiesModified(CallMethod):
+    """Similar to CallMethod, except that the trace will get logged only
+    if the proxy fires PropertiesModified event before the trace-item is
+    finalized."""
+    def __init__(self, proxy, methodname, *args, **kwargs):
+        self.proxy = proxy
+        self.methodname = methodname
+        self.args = args
+        self.kwargs = kwargs
+        self.tag = proxy.AddObserver("PropertyModifiedEvent", _bind_on_event(weakref.ref(self)))
+        self.modified = False
+    def on_event(self, obj, string):
+        self.modified = True
+    def finalize(self):
+        self.proxy.RemoveObserver(self.tag)
+        self.tag = None
+        if self.modified:
+            trace = self.get_trace(self.proxy, self.methodname, self.args, self.kwargs)
+            Trace.Output.append_separated(trace)
+        CallMethod.finalize(self)
+    def __del__(self):
+        if self.proxy and self.tag:
+            self.proxy.RemoveObserver(self.tag)
+
 
 class CallFunction(TraceItem):
     def __init__(self, functionname, *args, **kwargs):

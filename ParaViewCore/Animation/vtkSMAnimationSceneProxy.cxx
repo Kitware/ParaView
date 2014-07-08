@@ -21,6 +21,7 @@
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMTrace.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 //----------------------------------------------------------------------------
@@ -58,6 +59,10 @@ bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
     return false;
     }
 
+  SM_SCOPED_TRACE(CallMethodIfPropertiesModified)
+    .arg("proxy", this)
+    .arg("methodname", "UpdateAnimationUsingDataTimeSteps")
+    .arg("comment", "update animation scene based on data timesteps");
   vtkSMPropertyHelper timestepsHelper(timeKeeper, "TimestepValues");
   if (timestepsHelper.GetNumberOfElements() > 1)
     {
