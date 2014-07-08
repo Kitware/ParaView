@@ -2095,7 +2095,7 @@ def GetRenderView(connection=None):
 def GetRenderViews(connection=None):
     """Returns the set of all render views."""
     render_modules = []
-    for aProxy in ProxyManager():
+    for aProxy in ProxyManager().GetProxiesInGroup("views").values():
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_modules.append(aProxy)
     return render_modules

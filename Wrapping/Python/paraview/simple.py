@@ -198,7 +198,7 @@ def GetViews(viewtype=None):
     """Returns all views. If viewtype is specified, only the views of the
        specified type are returned"""
     val = []
-    for aProxy in servermanager.ProxyManager():
+    for aProxy in servermanager.ProxyManager().GetProxiesInGroup("views").values():
         if aProxy.IsA("vtkSMViewProxy") and \
             (viewtype is None or aProxy.GetXMLName() == viewtype):
             val.append(aProxy)
