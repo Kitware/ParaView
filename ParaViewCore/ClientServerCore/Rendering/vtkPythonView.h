@@ -23,11 +23,11 @@
 #include "vtkPVView.h"
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkImageData.h" // needed for member variable
 #include "vtkSmartPointer.h" //needed for member variables
 
 class vtkImageData;
 class vtkInformationRequestKey;
-class vtkMatplotlibUtilities;
 class vtkPythonRepresentation;
 class vtkRenderer;
 class vtkRenderWindow;
@@ -75,7 +75,7 @@ public:
   vtkGetStringMacro(Script);
 
   // Description:
-  // Magnification is needed to inform matplotlib of the requested size of the plot
+  // Magnification is needed to inform Python of the requested size of the plot
   vtkSetMacro(Magnification, int);
   vtkGetMacro(Magnification, int);
 
@@ -147,6 +147,12 @@ public:
 
   virtual void InteractiveRender();
 
+  // Description:
+  // Set the vtkImageData that will be displayed. This is an internal
+  // method meant only to be called from the python side, but must be
+  // exposed to be wrapped.
+  vtkSetObjectMacro(ImageData, vtkImageData);
+
 //BTX
 protected:
   vtkPythonView();
@@ -159,8 +165,6 @@ protected:
   // Needed to handle rendering at different magnifications
   int Magnification;
 
-  vtkSmartPointer<vtkMatplotlibUtilities> MatplotlibUtilities;
-
   vtkImageData* GenerateImage();
 
   // Description:
@@ -172,7 +176,11 @@ private:
   void operator=(const vtkPythonView&); // Not implemented
 //ETX
 
-  char * Script;
+  // The Python script
+  char* Script;
+
+  // The image data to be displayed in the view
+  vtkImageData* ImageData;
 };
 
 #endif

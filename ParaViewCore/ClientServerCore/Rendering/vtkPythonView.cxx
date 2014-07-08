@@ -12,14 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // must be the first thing that's included
 #include "vtkPythonView.h"
 
 #include "vtkObjectFactory.h"
 
 #include "vtkDataObject.h"
-#include "vtkImageData.h"
 #include "vtkInformationRequestKey.h"
-#include "vtkMatplotlibUtilities.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonRepresentation.h"
@@ -30,6 +29,28 @@
 #include "vtkTimerLog.h"
 
 #include <vtksys/ios/sstream>
+
+namespace {
+
+class PyObjectRefHelper {
+public:
+  PyObjectRefHelper(PyObject* object)
+  : Object(object)
+  {
+    this->Object = NULL;
+  }
+  ~PyObjectRefHelper()
+  {
+    if (this->Object)
+      {
+      Py_XDECREF(this->Object);
+      }
+  }
+
+  PyObject* Object;
+};
+
+}
 
 vtkStandardNewMacro(vtkPythonView);
 
@@ -42,7 +63,7 @@ vtkPythonView::vtkPythonView()
   this->RenderWindow.TakeReference(this->SynchronizedWindows->NewRenderWindow());
   this->RenderWindow->AddRenderer(this->Renderer);
   this->Magnification = 1;
-  this->MatplotlibUtilities = vtkSmartPointer<vtkMatplotlibUtilities>::New();
+  this->ImageData = NULL;
 
   this->Script = NULL;
 }
@@ -50,7 +71,9 @@ vtkPythonView::vtkPythonView()
 //----------------------------------------------------------------------------
 vtkPythonView::~vtkPythonView()
 {
+  // Clean up memory
   this->SetScript(NULL);
+  this->SetImageData(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -336,7 +359,7 @@ void vtkPythonView::StillRender()
     if (imageData)
       {
       this->RenderTexture->SetInputData(imageData);
-      imageData->Delete();
+      //imageData->Delete();
       this->Renderer->TexturedBackgroundOn();
       }
     else
@@ -356,20 +379,13 @@ void vtkPythonView::InteractiveRender()
 //----------------------------------------------------------------------------
 vtkImageData* vtkPythonView::GenerateImage()
 {
-  if (!this->MatplotlibUtilities)
-    {
-    vtkErrorMacro(<< "matplotlib is not available. Python views will not work.");
-    return NULL;
-    }
-
   // Now draw the image
   int width  = this->Size[0] * this->Magnification;
   int height = this->Size[1] * this->Magnification;
 
   if (!this->Script || strlen(this->Script) < 1)
     {
-    return this->MatplotlibUtilities->
-      ImageFromScript("", "pythonViewCanvas", width, height);
+    return NULL;
     }
 
   vtksys_ios::ostringstream renderCommandStream;
@@ -378,13 +394,16 @@ vtkImageData* vtkPythonView::GenerateImage()
                       << "  render\n"
                       << "  render_available = True\n"
                       << "except NameError:\n"
-                      << "  print 'No render(pythonView,figure) function defined'\n"
+                      << "  print 'No render(pythonView, width, height) function defined'\n"
                       << "if render_available:\n"
-                      << "  render(pythonView, pythonViewCanvasFigure)\n";
-  vtkImageData* imageData = this->MatplotlibUtilities->
-    ImageFromScript(renderCommandStream.str().c_str(), "pythonViewCanvas", width, height);
+                      << "  vtkPythonView_image = render(pythonView," << width << ", " << height << ")\n"
+                      << "  pythonView.SetImageData(vtkPythonView_image)\n";
 
-  return imageData;
+  vtkPythonInterpreter::RunSimpleString(renderCommandStream.str().c_str());
+  
+  // this->ImageData should be set by the python command stream above,
+  // so we just return it here.
+  return this->ImageData;
 }
 
 //----------------------------------------------------------------------------
@@ -418,9 +437,46 @@ void vtkPythonView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "RenderTexture: " << this->RenderTexture << endl;
-  os << indent << "Renderer: " << this->Renderer << endl;
-  os << indent << "RenderWindow: " << this->RenderWindow << endl;
+  os << indent << "RenderTexture: ";
+  if (this->RenderTexture)
+    {
+    os << endl;
+    this->RenderTexture->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "Renderer: ";
+  if (this->Renderer)
+    {
+    os << endl;
+    this->Renderer->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "RenderWindow: ";
+  if (this->RenderWindow)
+    {
+    os << endl;
+    this->RenderWindow->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
   os << indent << "Magnification: " << this->Magnification << endl;
   os << indent << "Script: \n" << this->Script << endl;
+  os << indent << "ImageData: ";
+  if (this->ImageData)
+    {
+    os << endl;
+    this->ImageData->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

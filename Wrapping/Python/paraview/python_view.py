@@ -36,3 +36,53 @@ try:
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerApplicationPython")
 from vtkPVCommonPython import *
+
+
+def figure_to_data(figure):
+  """
+  @brief Convert a Matplotlib figure to a numpy 2D array with RGBA uint8 channels and return it.
+  @param figure A matplotlib figure.
+  @return A numpy 2D array of RGBA values.
+  """
+  # Draw the renderer
+  import matplotlib
+  figure.canvas.draw()
+
+  # Get the RGBA buffer from the figure
+  w, h = figure.canvas.get_width_height()
+
+  import numpy
+  buf = numpy.fromstring(figure.canvas.tostring_argb(), dtype=numpy.uint8)
+  buf.shape = (h, w, 4)
+
+  # canvas.tostring_argb gives pixmap in ARGB mode. Roll the alpha channel to have it in RGBA mode
+  buf = numpy.roll(buf, 3, axis=2)
+
+  return buf
+
+
+def figure_to_image(figure):
+  """
+  @brief Convert a Matplotlib figure to a vtkImageData with RGBA unsigned char channels
+  @param figure A matplotlib figure.
+  @return a vtkImageData with the Matplotlib figure content
+  """
+  buf = figure_to_data(figure)
+  w, h = figure.canvas.get_width_height()
+
+  # Flip rows to be suitable for vtkImageData.
+  buf = buf[::-1,:,:].copy()
+
+  # Reshape 2D image to 1D array suitable for conversion to a
+  # vtkArray with numpy_support.numpy_to_vtk()
+  import numpy
+  buf = numpy.reshape(buf, (w*h, 4))
+
+  from vtk.util import numpy_support
+  vtk_array = numpy_support.numpy_to_vtk(buf)
+  image = vtk.vtkImageData()
+  image.SetDimensions(w, h, 1);
+  image.AllocateScalars(vtk_array.GetDataType(), 4);
+  image.GetPointData().GetScalars().DeepCopy(vtk_array)
+
+  return image
