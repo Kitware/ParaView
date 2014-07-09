@@ -612,7 +612,7 @@ void pqColorAnnotationsPropertyWidget::addAnnotation()
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::editPastLastRow()
 {
-  QModelIndex idx = this->Internals->Model.addAnnotation(
+  this->Internals->Model.addAnnotation(
     this->Internals->Ui.AnnotationsTable->currentIndex());
   emit this->annotationsChanged();
 }

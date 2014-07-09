@@ -387,7 +387,7 @@ void pqScalarValueListPropertyWidget::add()
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::editPastLastRow()
 {
-  QModelIndex idx = this->Internals->Model.addRow(
+  this->Internals->Model.addRow(
     this->Internals->Ui.Table->currentIndex());
   emit this->scalarsChanged();
 }
