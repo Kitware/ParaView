@@ -25,7 +25,7 @@ if (FOUND_NUMPY)
   if (PARAVIEW_ENABLE_MATPLOTLIB)
     paraview_add_test_python(
       NO_DATA NO_VALID NO_OUTPUT NO_RT
-      TestPythonView.py
+      TestPythonViewMatplotlibScript.py
       )
   endif()
 endif()
