@@ -28,6 +28,7 @@ class vtkSMProxyLocator::vtkInternal
 public:
   typedef std::map<vtkTypeUInt32, vtkSmartPointer<vtkSMProxy> > ProxiesType;
   ProxiesType Proxies;
+  ProxiesType AssignedProxies;
 };
 
 vtkStandardNewMacro(vtkSMProxyLocator);
@@ -56,6 +57,18 @@ vtkSMProxy* vtkSMProxyLocator::LocateProxy(vtkTypeUInt32 id)
   vtkInternal::ProxiesType::iterator iter = this->Internal->Proxies.find(id);
   if (iter != this->Internal->Proxies.end())
     {
+    return iter->second.GetPointer();
+    }
+
+  // if custom assignments are specified, use those.
+  iter = this->Internal->AssignedProxies.find(id);
+  if (iter != this->Internal->AssignedProxies.end())
+    {
+    if (iter->second.GetPointer() != NULL)
+      {
+      // add to the Proxies map.
+      this->Internal->Proxies[id] = iter->second;
+      }
     return iter->second.GetPointer();
     }
 
@@ -101,11 +114,18 @@ vtkSMProxy* vtkSMProxyLocator::NewProxy(vtkTypeUInt32 id)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMProxyLocator::AssignProxy(vtkTypeUInt32 gid, vtkSMProxy* proxy)
+{
+  this->Internal->AssignedProxies[gid] = proxy;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMProxyLocator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Deserializer: " << this->Deserializer << endl;
 }
+
 //----------------------------------------------------------------------------
 void vtkSMProxyLocator::GetLocatedProxies(vtkCollection* collectionToFill)
 {
