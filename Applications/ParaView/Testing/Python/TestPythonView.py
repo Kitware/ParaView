@@ -16,7 +16,15 @@ def setup_data(view):
   print "Setting up data"
 
 # This function must be defined. It is where the actual rendering commands for matplotlib go.
-def render(view,figure):
+def render(view,width,height):
+  from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+  from matplotlib.figure import Figure
+
+  figure = Figure()
+  figureCanvas = FigureCanvas(figure)
+  figure.set_dpi(72)
+  figure.set_size_inches(float(width)/72.0, float(height)/72.0)
+
   ax = figure.add_subplot(111)
   ax.hold = True
   numObjects = view.GetNumberOfVisibleDataObjects()
