@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 
-#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
+#if defined(PARAVIEW_ENABLE_PYTHON)
 #include "pqPythonView.h"
 #endif
 
@@ -84,7 +84,7 @@ namespace
       return new pqMultiSliceView(
         xmlname, group, name, proxy, server, parent);
       }
-#if defined(PARAVIEW_ENABLE_PYTHON) && defined(PARAVIEW_ENABLE_MATPLOTLIB)
+#if defined(PARAVIEW_ENABLE_PYTHON)
     if (xmlname == pqPythonView::pythonViewType())
       {
       return new pqPythonView(xmlname, group, name, proxy, server, parent);
