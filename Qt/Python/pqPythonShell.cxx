@@ -388,7 +388,7 @@ void pqPythonShell::HandleInterpreterEvents(
 
   case vtkCommand::UpdateEvent:
       {
-      vtkStdString* data = reinterpret_cast<vtkStdString*>(calldata);
+      vtkStdString* strData = reinterpret_cast<vtkStdString*>(calldata);
       bool ok;
       QString inputText = QInputDialog::getText(this,
         tr("Enter Input requested by Python"),
@@ -398,7 +398,7 @@ void pqPythonShell::HandleInterpreterEvents(
         &ok);
       if (ok)
         {
-        *data = inputText.toStdString();
+        *strData = inputText.toStdString();
         }
       }
     break;
