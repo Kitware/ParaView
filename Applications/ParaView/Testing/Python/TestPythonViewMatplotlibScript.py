@@ -40,6 +40,10 @@ def render(view,width,height):
         ax.scatter(x, y, color=color)
 
   ax.hold = False
+
+  from paraview import python_view
+
+  return python_view.figure_to_image(figure)
 """
 
 if len(sys.argv) > 2:
