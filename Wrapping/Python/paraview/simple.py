@@ -720,11 +720,14 @@ def WriteImage(filename, view=None, **params):
 
 # -----------------------------------------------------------------------------
 def SaveScreenshot(filename,
-    viewOrLayout=None, magnification=None, quality=None, **params):
+    view=None, layout=None, magnification=None, quality=None, **params):
+    if not view is None and not layout is None:
+        raise ValueError, "both view and layout cannot be specified"
 
+    viewOrLayout = view if view else layout
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
     if not viewOrLayout:
-        raise ValueError, "No 'viewOrLayout' specified and active view is not setup."
+        raise ValueError, "view or layout needs to be specified"
     try:
         magnification = int(magnification) if int(magnification) > 0 else 1
     except TypeError:
@@ -779,6 +782,20 @@ def WriteAnimation(filename, **params):
     if params.has_key("FrameRate"):
         iw.SetFrameRate(float(params["FrameRate"]))
     iw.Save()
+
+def WriteAnimationGeometry(filename, view=None):
+    """Save the animation geometry from a specific view to a file specified.
+    The animation geometry is written out as a PVD file. If no view is
+    specified, the active view will be used of possible."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError, "Please specify the view to use"
+    scene = GetAnimationScene()
+    writer = servermanager.vtkSMAnimationSceneImageWriter()
+    writer.SetFileName(filename)
+    writer.SetAnimationScene(scene.SMProxy)
+    writer.SetViewModule(view.SMProxy)
+    writer.Save()
 
 #==============================================================================
 # Lookup Table / Scalarbar methods

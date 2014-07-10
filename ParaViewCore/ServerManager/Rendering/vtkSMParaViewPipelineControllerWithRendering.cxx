@@ -545,8 +545,8 @@ bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int
 
   SM_SCOPED_TRACE(CallFunction)
     .arg("SaveScreenshot")
-    .arg(viewOrLayout)
-    .arg("filename", filename)
+    .arg(filename)
+    .arg((vtkSMViewProxy::SafeDownCast(viewOrLayout)? "view" : "layout"), viewOrLayout)
     .arg("magnification", magnification)
     .arg("quality", quality)
     .arg("comment", "save screenshot");
