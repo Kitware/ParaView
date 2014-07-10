@@ -312,7 +312,7 @@ set (Module_RESOURCE_FILES
   "${CMAKE_CURRENT_SOURCE_DIR}/Resources/pqCore.qrc"
 )
 
-if (PARAVIEW_ENABLE_MATPLOTLIB)
+if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND Module_SRCS
     pqPythonView.cxx
     pqPythonView.h
