@@ -45,13 +45,21 @@ def figure_to_data(figure):
   @return A numpy 2D array of RGBA values.
   """
   # Draw the renderer
-  import matplotlib
+  try:
+    import matplotlib
+  except:
+    paraview.print_error("Error: Cannot import matplotlib")
+
   figure.canvas.draw()
 
   # Get the RGBA buffer from the figure
   w, h = figure.canvas.get_width_height()
 
-  import numpy
+  try:
+    import numpy
+  except:
+    paraview.print_error("Error: Cannot import numpy")
+
   buf = numpy.fromstring(figure.canvas.tostring_argb(), dtype=numpy.uint8)
   buf.shape = (h, w, 4)
 
@@ -67,6 +75,11 @@ def numpy_to_image(numpy_array):
   @param numpy_array 2D or 3D numpy array containing image data
   @return vtkImageData with the numpy_array content
   """
+  try:
+    import numpy
+  except:
+    paraview.print_error("Error: Cannot import numpy")
+
   shape = numpy_array.shape
   if len(shape) < 2:
     raise Exception('numpy array must have dimensionality of at least 2')
@@ -78,15 +91,18 @@ def numpy_to_image(numpy_array):
 
   # Reshape 2D image to 1D array suitable for conversion to a
   # vtkArray with numpy_support.numpy_to_vtk()
-  import numpy
   linear_array = numpy.reshape(numpy_array, (w*h, c))
 
-  from vtk.util import numpy_support
+  try:
+    from vtk.util import numpy_support
+  except:
+    paraview.print_error("Error: Cannot import vtk.util.numpy_support")
+
   vtk_array = numpy_support.numpy_to_vtk(linear_array)
 
   image = vtk.vtkImageData()
-  image.SetDimensions(w, h, 1);
-  image.AllocateScalars(vtk_array.GetDataType(), 4);
+  image.SetDimensions(w, h, 1)
+  image.AllocateScalars(vtk_array.GetDataType(), 4)
   image.GetPointData().GetScalars().DeepCopy(vtk_array)
 
   return image
@@ -104,3 +120,27 @@ def figure_to_image(figure):
   buf = buf[::-1,:,:].copy()
 
   return numpy_to_image(buf)
+
+
+def matplotlib_figure(width, height):
+  """
+  @brief Create a Matplotlib figure with specified width and height for rendering
+  @param w Width of desired plot
+  @param h Height of desired plot
+  @return A Matplotlib figure
+  """
+  try:
+    from matplotlib.backends.backend_agg import FigureCanvasAgg
+  except:
+    paraview.print_error("Error: Cannot import matplotlib.backends.backend_agg.FigureCanvasAgg")
+  try:
+    from matplotlib.figure import Figure
+  except:
+    paraview.print_error("Error: Cannot import matplotlib.figure.Figure")
+
+  figure = Figure()
+  figureCanvas = FigureCanvasAgg(figure)
+  figure.set_dpi(72)
+  figure.set_size_inches(float(width)/72.0, float(height)/72.0)
+
+  return figure
