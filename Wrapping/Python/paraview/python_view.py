@@ -61,6 +61,37 @@ def figure_to_data(figure):
   return buf
 
 
+def numpy_to_image(numpy_array):
+  """
+  @brief Convert a numpy 2D or 3D array to a vtkImageData object
+  @param numpy_array 2D or 3D numpy array containing image data
+  @return vtkImageData with the numpy_array content
+  """
+  shape = numpy_array.shape
+  if len(shape) < 2:
+    raise Exception('numpy array must have dimensionality of at least 2')
+
+  h, w = shape[0], shape[1]
+  c = 1
+  if len(shape) == 3:
+    c = shape[2]
+
+  # Reshape 2D image to 1D array suitable for conversion to a
+  # vtkArray with numpy_support.numpy_to_vtk()
+  import numpy
+  linear_array = numpy.reshape(numpy_array, (w*h, c))
+
+  from vtk.util import numpy_support
+  vtk_array = numpy_support.numpy_to_vtk(linear_array)
+
+  image = vtk.vtkImageData()
+  image.SetDimensions(w, h, 1);
+  image.AllocateScalars(vtk_array.GetDataType(), 4);
+  image.GetPointData().GetScalars().DeepCopy(vtk_array)
+
+  return image
+
+
 def figure_to_image(figure):
   """
   @brief Convert a Matplotlib figure to a vtkImageData with RGBA unsigned char channels
@@ -68,21 +99,8 @@ def figure_to_image(figure):
   @return a vtkImageData with the Matplotlib figure content
   """
   buf = figure_to_data(figure)
-  w, h = figure.canvas.get_width_height()
 
   # Flip rows to be suitable for vtkImageData.
   buf = buf[::-1,:,:].copy()
 
-  # Reshape 2D image to 1D array suitable for conversion to a
-  # vtkArray with numpy_support.numpy_to_vtk()
-  import numpy
-  buf = numpy.reshape(buf, (w*h, 4))
-
-  from vtk.util import numpy_support
-  vtk_array = numpy_support.numpy_to_vtk(buf)
-  image = vtk.vtkImageData()
-  image.SetDimensions(w, h, 1);
-  image.AllocateScalars(vtk_array.GetDataType(), 4);
-  image.GetPointData().GetScalars().DeepCopy(vtk_array)
-
-  return image
+  return numpy_to_image(buf)
