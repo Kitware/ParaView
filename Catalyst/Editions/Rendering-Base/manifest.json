@@ -126,7 +126,6 @@
         { "class": "vtkPVJoystickFlyIn" },
         { "class": "vtkPVJoystickFlyOut" },
         { "class": "vtkPVLODActor" },
-        { "class": "vtkPVLODVolume" },
         { "class": "vtkPVMergeTables" },
         { "class": "vtkPVMergeTablesMultiBlock" },
         { "class": "vtkPVPlotTime" },
@@ -888,18 +887,13 @@
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/rendering.xml",
       "proxies":[
-        "DummyVolumeMapper",
-        "HAVSVolumeMapper",
-        "ProjectedTetrahedraMapper",
-        "UnstructuredGridVolumeRayCastMapper",
-        "UnstructuredGridVolumeZSweepMapper"
+        "ProjectedTetrahedraMapper"
       ]
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/views_and_representations.xml",
       "proxies":[
         "AMROutlineRepresentation",
         "AMRRepresentation",
-        "AMRVolumeRepresentation",
         "CubeAxesRepresentation",
         "DataLabelRepresentation",
         "GeometryRepresentation",
@@ -912,15 +906,12 @@
         "SelectionRepresentation",
         "StructuredGridBaseRepresentation",
         "StructuredGridRepresentation",
-        "StructuredGridVolumeRepresentation",
         "SurfaceRepresentation",
         "SurfaceRepresentationBase",
         "UniformGridBaseRepresentation",
         "UniformGridRepresentation",
-        "UniformGridVolumeRepresentation",
         "UnstructuredGridBaseRepresentation",
         "UnstructuredGridRepresentation",
-        "UnstructuredGridVolumeRepresentation",
         "ViewBase"
       ]
     },
