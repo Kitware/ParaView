@@ -105,7 +105,7 @@ public:
 
   struct RowIndex
     {
-    RowIndex(int t, bool hi, int i) { u.type = t; u.hasIndex = hi; u.index = i; }
+    RowIndex(int t, bool hi, int i) { u.idx.type = t; u.idx.hasIndex = hi; u.idx.index = i; }
     RowIndex(void* p) { u.ptr = p; }
 
     union
@@ -115,7 +115,7 @@ public:
         size_t type : 7;
         size_t hasIndex : 1;
         size_t index : 8 * (sizeof(size_t) - sizeof(char));
-        };
+        } idx;
       void* ptr;
       } u;
     };
@@ -123,14 +123,14 @@ public:
   void* encodeIndex(const RowIndex& row) const
     {
     RowIndex ri = row;
-    ri.u.type++;
+    ri.u.idx.type++;
     return ri.u.ptr;
     }
 
   RowIndex decodeIndex(void* p) const
     {
     RowIndex ri = p;
-    ri.u.type--;
+    ri.u.idx.type--;
     return ri;
     }
 
@@ -150,8 +150,8 @@ public:
     if(pidx.internalPointer() != NULL)
       {
       ri = this->decodeIndex(pidx.internalPointer());
-      ri.u.hasIndex = true;
-      ri.u.index = pidx.row();
+      ri.u.idx.hasIndex = true;
+      ri.u.idx.index = pidx.row();
       }
     return this->createIndex(row, column, this->encodeIndex(ri));
     }
@@ -163,12 +163,12 @@ public:
       return QModelIndex();
       }
     RowIndex ri = this->decodeIndex(idx.internalPointer());
-    int row = ri.u.type;
+    int row = ri.u.idx.type;
     void* p = NULL;
-    if(ri.u.hasIndex)
+    if(ri.u.idx.hasIndex)
       {
-      row = ri.u.index;
-      RowIndex ri2(ri.u.type, false, 0);
+      row = ri.u.idx.index;
+      RowIndex ri2(ri.u.idx.type, false, 0);
       p = this->encodeIndex(ri2);
       }
 
@@ -244,7 +244,7 @@ public:
         }
 
       RowIndex ri = this->decodeIndex(idx.internalPointer());
-      if(!ri.u.hasIndex)
+      if(!ri.u.idx.hasIndex)
         {
         vtkSMProxy* pxy = this->getProxy(idx);
         pqServerManagerModel* m;
@@ -338,13 +338,13 @@ public:
       RowIndex ri = this->decodeIndex(idx.internalPointer());
       pqServerManagerModel* m;
       m = pqApplicationCore::instance()->getServerManagerModel();
-      if(ri.u.type == 0)
+      if(ri.u.idx.type == 0)
         {
         return m->getItemAtIndex<pqRenderView*>(idx.row())->getProxy();
         }
-      else if(ri.u.type == 1)
+      else if(ri.u.idx.type == 1)
         {
-        if(!ri.u.hasIndex)
+        if(!ri.u.idx.hasIndex)
           {
           return m->getItemAtIndex<pqPipelineSource*>(idx.row())->getProxy();
           }
