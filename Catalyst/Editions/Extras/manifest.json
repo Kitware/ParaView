@@ -194,6 +194,7 @@
         { "path": "module.cmake" },
         { "class": "vtkXMLPDataWriter" },
         { "class": "vtkXMLPImageDataWriter" },
+        { "class": "vtkXMLPMultiBlockDataWriter" },
         { "class": "vtkXMLPPolyDataWriter" },
         { "class": "vtkXMLPRectilinearGridWriter" },
         { "class": "vtkXMLPStructuredGridWriter" },
