@@ -23,8 +23,11 @@ if (FOUND_NUMPY)
   set(PARAVIEW_PYTHON_ARGS)
 
   if (PARAVIEW_ENABLE_MATPLOTLIB)
+    paraview_test_load_baselines(""
+      TestPythonViewMatplotlibScript.png
+      )
     paraview_add_test_python(
-      NO_DATA NO_VALID NO_OUTPUT NO_RT
+      NO_DATA NO_RT
       TestPythonViewMatplotlibScript.py
       )
   endif()
