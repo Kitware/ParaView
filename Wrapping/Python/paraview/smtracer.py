@@ -121,10 +121,10 @@ class Trace(object):
                     trace.append(accessor.trace_ctor(\
                       "GetActiveViewOrCreate", ExistingProxy(ViewProxyFilter()), ctor_args))
                 else:
-                    ctor_args = "'%s', '%s'" % (obj.GetXMLName(), pname)
+                    ctor_args = "'%s', viewtype='%s'" % (pname, obj.GetXMLName())
                     trace.append("# find view")
                     trace.append(accessor.trace_ctor(\
-                      "FindView", ExistingProxy(ViewProxyFilter()), ctor_args))
+                      "FindViewOrCreate", ExistingProxy(ViewProxyFilter()), ctor_args))
                 # trace view size, if present. We trace this commented out so
                 # that the playback in the GUI doesn't cause issues.
                 viewSizeAccessor = accessor.get_property("ViewSize")
