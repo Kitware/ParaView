@@ -17,6 +17,10 @@
         "type": "BOOL",
         "value": "ON"
       },
+      { "name": "Module_vtkRenderingContextOpenGL",
+        "type": "BOOL",
+        "value": "ON"
+      },
       { "name":"Module_vtkImagingCore",
         "type":"BOOL",
         "value":"ON"
@@ -658,14 +662,12 @@
       "include": [
         { "path": "module.cmake" },
         { "path": "vtkContextScenePrivate.h" },
-        { "path": "vtkOpenGLContextDevice2DPrivate.h" },
         { "class": "vtkAbstractContextBufferId" },
         { "class": "vtkAbstractContextItem" },
         { "class": "vtkBrush" },
         { "class": "vtkContext2D" },
         { "class": "vtkContext3D" },
         { "class": "vtkContextActor" },
-        { "class": "vtkContextBufferId" },
         { "class": "vtkContextClip" },
         { "class": "vtkContextDevice2D" },
         { "class": "vtkContextDevice3D" },
@@ -675,15 +677,19 @@
         { "class": "vtkContextMouseEvent" },
         { "class": "vtkContextScene" },
         { "class": "vtkContextTransform" },
-        { "class": "vtkOpenGL2ContextDevice2D" },
-        { "class": "vtkOpenGLContextBufferId" },
-        { "class": "vtkOpenGLContextDevice2D" },
-        { "class": "vtkOpenGLContextDevice3D" },
         { "class": "vtkPen" },
         { "class": "vtkTooltipItem" }
       ],
       "replace": [
         { "path": "VTK/Rendering/Context2D/CMakeLists.txt" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
+    },
+    { "name": "vtkRenderingContextOpenGL",
+      "path": "VTK/Rendering/ContextOpenGL",
+      "exclude": [
+        { "path": "Testing" }
       ],
       "cswrap": true,
       "pythonwrap": true
