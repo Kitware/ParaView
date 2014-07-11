@@ -74,7 +74,6 @@ icetquirk = False
 
 start_frame = 0
 default_log_threshold = dict()
-default_buffer_length = dict()
 
 class OneLog :
     def __init__(self):
@@ -121,12 +120,35 @@ def maximize_logs () :
     if pm == None:
         return
 
-    # Not used here...
     ss = paraview.servermanager.vtkSMSession
     for ptype in [ss.CLIENT_AND_SERVERS, ss.CLIENT, ss.SERVERS,
                  ss.RENDER_SERVER, ss.DATA_SERVER]:
-      default_buffer_length[str(ptype)] = 1000000
       default_log_threshold[str(ptype)] = 0.0
+
+    pxm = paraview.servermanager.ProxyManager()
+    tl = pxm.NewProxy("misc", "TimerLog")
+    prop = tl.GetProperty("MaxEntries")
+    prop.SetElements1(1000000)
+    tl.UpdateVTKObjects()
+
+def get_memuse() :
+    session = servermanager.ProxyManager().GetSessionProxyManager().GetSession()
+
+    retval = []
+    infos = servermanager.vtkPVMemoryUseInformation()
+    session.GatherInformation(session.CLIENT, infos, 0)
+    procUse = str(infos.GetProcMemoryUse(0))
+    hostUse = str(infos.GetHostMemoryUse(0))
+    retval.append("CLIENT " + procUse + " / " + hostUse)
+
+    infos = servermanager.vtkPVMemoryUseInformation()
+    session.GatherInformation(session.DATA_SERVER, infos, 0)
+    for i in range(0,infos.GetSize()):
+        rank = str(infos.GetRank(i))
+        procUse = str(infos.GetProcMemoryUse(i))
+        hostUse = str(infos.GetHostMemoryUse(i))
+        retval.append("DS[" + rank + "] " + procUse + " / " + hostUse)
+    return retval
 
 def dump_logs( filename ) :
     """
