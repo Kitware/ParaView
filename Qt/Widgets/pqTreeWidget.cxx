@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqTreeWidget.h"
 
+#include "vtkPVXMLElement.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyGroup.h"
+
 #include <QApplication>
 #include <QPainter>
 #include <QStyle>
@@ -334,6 +338,36 @@ void pqTreeWidget::invalidateLayout()
   // invalidate() is not enough, we need to reset the cache of the 
   // QWidgetItemV2, so sizeHint() could be recomputed.
   this->updateGeometry();
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeWidget::setMaximumRowCountBeforeScrolling(vtkSMPropertyGroup *smpropertygroup)
+{
+  this->setMaximumRowCountBeforeScrolling(smpropertygroup->GetHints());
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeWidget::setMaximumRowCountBeforeScrolling(vtkSMProperty *smproperty)
+{
+  this->setMaximumRowCountBeforeScrolling(smproperty->GetHints());
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeWidget::setMaximumRowCountBeforeScrolling(vtkPVXMLElement* hints)
+{
+  if (hints)
+    {
+    vtkPVXMLElement* element = hints->FindNestedElementByName("WidgetHeight");
+    if (element)
+      {
+      const char* rowCount = element->GetAttribute("number_of_rows");
+      if (rowCount)
+        {
+        this->setMaximumRowCountBeforeScrolling(
+          QString(rowCount).toInt());
+        }
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

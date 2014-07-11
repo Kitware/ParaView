@@ -48,21 +48,21 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   selectorWidget->setObjectName("SelectionWidget");
   selectorWidget->setRootIsDecorated(false);
   selectorWidget->setHeaderLabel(group->GetXMLLabel());
-  selectorWidget->setMaximumRowCountBeforeScrolling(20);
+  selectorWidget->setMaximumRowCountBeforeScrolling(group);
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);
   hbox->setMargin(0);
   hbox->setSpacing(4);
 
-  for (unsigned int cc=0; cc < group->GetNumberOfProperties(); cc++)
+  for (unsigned int cc = 0; cc < group->GetNumberOfProperties(); cc++)
     {
-    if (group->GetProperty(cc) &&
-        group->GetProperty(cc)->GetInformationOnly() == 0)
+    vtkSMProperty* prop = group->GetProperty(cc);
+    if (prop && prop->GetInformationOnly() == 0)
       {
-      const char* property_name = activeProxy->GetPropertyName(group->GetProperty(cc));
+      const char* property_name = activeProxy->GetPropertyName(prop);
       this->addPropertyLink(selectorWidget, property_name,
-                            SIGNAL(widgetModified()), group->GetProperty(cc));
+                            SIGNAL(widgetModified()), prop);
       }
     }
 
@@ -80,7 +80,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *activeProxy
 
   selectorWidget->setRootIsDecorated(false);
   selectorWidget->setHeaderLabel(proxyProperty->GetXMLLabel());
-  selectorWidget->setMaximumRowCountBeforeScrolling(20);
+  selectorWidget->setMaximumRowCountBeforeScrolling(proxyProperty);
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);

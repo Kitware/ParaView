@@ -94,6 +94,15 @@ public:
   // Description:
   // Returns the documentation for this proxy.
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
+  
+  // Description:
+  // The server manager configuration XML may define <Hints /> element for
+  // a property. Hints are metadata associated with the property. The
+  // Server Manager does not (and should not) interpret the hints. Hints
+  // provide a mechanism to add GUI pertinant information to the server
+  // manager XML.  Returns the XML element for the hints associated with
+  // this property, if any, otherwise returns NULL.
+  vtkGetObjectMacro(Hints, vtkPVXMLElement);
 
 protected:
   vtkSMPropertyGroup();
@@ -101,6 +110,9 @@ protected:
 
   friend class vtkSMProxy;
   virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
+
+  void SetHints(vtkPVXMLElement* hints);
+  vtkPVXMLElement* Hints;
 
   vtkSMDocumentation* Documentation;
 private:

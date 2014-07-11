@@ -33,7 +33,9 @@ public:
   PropertiesMapType PropertiesMap;
 };
 
-vtkStandardNewMacro(vtkSMPropertyGroup)
+vtkStandardNewMacro(vtkSMPropertyGroup);
+vtkCxxSetObjectMacro(vtkSMPropertyGroup, Hints, vtkPVXMLElement);
+
  //---------------------------------------------------------------------------
 vtkSMPropertyGroup::vtkSMPropertyGroup()
   : Internals(new vtkSMPropertyGroupInternals)
@@ -47,6 +49,7 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
   this->SetPanelVisibility("default");
 
   this->Documentation = vtkSMDocumentation::New();
+  this->Hints = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -59,6 +62,7 @@ vtkSMPropertyGroup::~vtkSMPropertyGroup()
   delete this->Internals;
   this->Documentation->Delete();
   this->Documentation = NULL;
+  this->SetHints(0);
 }
 
 //---------------------------------------------------------------------------
@@ -177,6 +181,11 @@ int vtkSMPropertyGroup::ReadXMLAttributes(
     if (elem->GetName() && strcmp(elem->GetName(), "Documentation") == 0)
       {
       this->Documentation->SetDocumentationElement(elem);
+      continue;
+      }
+    else if (elem->GetName() && strcmp(elem->GetName(), "Hints") == 0)
+      {
+      this->SetHints(elem);
       continue;
       }
 
