@@ -39,7 +39,7 @@ def _get_argument_parser():
 
   return parser
 
-def filter_proxies(fin, fout, proxies):
+def filter_proxies(fin, fout, proxies, all_proxies):
   root = ET.fromstring(fin.read())
   if not root.tag == 'ServerManagerConfiguration':
     raise RuntimeError('Invalid ParaView XML file input')
@@ -71,6 +71,17 @@ def filter_proxies(fin, fout, proxies):
            proxy.attrib['name'] in proxies
   for group in root.iter('ProxyGroup'):
     new_proxies = filter(is_wanted, list(group))
+    for proxy in new_proxies:
+      removed_subproxies = []
+      for subproxy in proxy.iter('SubProxy'):
+        for p in subproxy.iter('Proxy'):
+          if p.attrib['proxyname'] not in all_proxies:
+            removed_subproxies.append(p.attrib['name'])
+            proxy.remove(subproxy)
+            break
+      for reptype in proxy.iter('RepresentationType'):
+        if reptype.attrib['subproxy'] in removed_subproxies:
+          proxy.remove(reptype)
     if new_proxies:
       new_group = ET.Element(group.tag, group.attrib)
       map(new_group.append, new_proxies)
@@ -285,12 +296,15 @@ def process(config):
       all_manifests.append(manifest)
 
   proxy_map = {}
+  _all_proxies = []
   for proxies in all_proxies:
     for proxy in proxies:
       path = proxy['path']
       if path not in proxy_map:
         proxy_map[path] = []
       proxy_map[path] += proxy['proxies']
+      _all_proxies += proxy['proxies']
+  all_proxies = set(_all_proxies)
 
   for proxy_file, proxies in proxy_map.items():
     input_path = os.path.join(config.repo, proxy_file)
@@ -301,7 +315,7 @@ def process(config):
 
     with open(input_path, 'r') as fin:
       with open(output_path, 'w+') as fout:
-        filter_proxies(fin, fout, set(proxies))
+        filter_proxies(fin, fout, set(proxies), all_proxies)
 
   create_cmake_script(config, all_manifests)
 
