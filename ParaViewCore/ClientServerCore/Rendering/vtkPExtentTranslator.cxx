@@ -69,8 +69,9 @@ int vtkPExtentTranslatorPieceToExtentThreadSafe(
 
 //-----------------------------------------------------------------------------
 int vtkPExtentTranslator::PieceToExtentThreadSafe(
-  int piece, int vtkNotUsed(numPieces), int vtkNotUsed(ghostLevel), int *wholeExtent,
-  int *resultExtent, int vtkNotUsed(splitMode), int vtkNotUsed(byPoints))
+  int piece, int vtkNotUsed(numPieces), int vtkNotUsed(ghostLevel),
+  int *vtkNotUsed(wholeExtent), int *resultExtent, int vtkNotUsed(splitMode),
+  int vtkNotUsed(byPoints))
 {
   assert(piece >= 0);
 

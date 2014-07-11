@@ -45,6 +45,7 @@ class PQCOMPONENTS_EXPORT pqStandardLegacyCustomPanels :
   public pqObjectPanelInterface
 {
   Q_OBJECT
+  Q_INTERFACES(pqObjectPanelInterface)
   typedef QObject Superclass;
 public:
   pqStandardLegacyCustomPanels(QObject* parent=0);
