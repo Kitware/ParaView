@@ -127,10 +127,10 @@ vtkSMTrace::vtkSMTrace():
   else
     {
     this->Internals->CreateItemFunction.TakeReference(
-      PyObject_GetAttrString(this->Internals->TraceModule, "createTraceItem"));
+      PyObject_GetAttrString(this->Internals->TraceModule, "_create_trace_item_internal"));
     if (!this->Internals->CreateItemFunction)
       {
-      vtkErrorMacro("Failed to locate the createTraceItem function in paraview.smtracer module.");
+      vtkErrorMacro("Failed to locate the _create_trace_item_internal function in paraview.smtracer module.");
       this->Internals->TraceModule.TakeReference(NULL);
       }
     this->Internals->UntraceableException.TakeReference(
@@ -166,9 +166,9 @@ vtkSMTrace* vtkSMTrace::StartTrace()
       }
     else
       {
-      SmartPyObject startTrace(
+      SmartPyObject _start_trace_internal(
         PyObject_CallMethod(vtkSMTrace::ActiveTracer->GetTraceModule(),
-          const_cast<char*>("startTrace"), NULL));
+          const_cast<char*>("_start_trace_internal"), NULL));
       vtkSMTrace::ActiveTracer->CheckForError();
       }
 #endif
@@ -194,14 +194,14 @@ vtkStdString vtkSMTrace::StopTrace()
   vtkSMTrace::ActiveTracer = NULL;
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-  SmartPyObject stopTrace(
-    PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("stopTrace"), NULL));
+  SmartPyObject _stop_trace_internal(
+    PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("_stop_trace_internal"), NULL));
   if (active->CheckForError() == false)
     {
     // no error.
-    if (Py_None != stopTrace.GetPointer() && stopTrace.GetPointer() != NULL)
+    if (Py_None != _stop_trace_internal.GetPointer() && _stop_trace_internal.GetPointer() != NULL)
       {
-      return vtkStdString(PyString_AsString(stopTrace));
+      return vtkStdString(PyString_AsString(_stop_trace_internal));
       }
     else
       {
@@ -225,12 +225,12 @@ vtkStdString vtkSMTrace::GetCurrentTrace()
 
   vtkSMTrace* active = vtkSMTrace::ActiveTracer;
 #ifdef PARAVIEW_ENABLE_PYTHON
-  SmartPyObject getTrace(
-    PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("getTrace"), NULL));
-  if (active->CheckForError() == false)
+  SmartPyObject get_current_trace_output(
+    PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("get_current_trace_output"), NULL));
+  if (active->CheckForError() == false && get_current_trace_output)
     {
     // no error.
-    return vtkStdString(PyString_AsString(getTrace));
+    return vtkStdString(PyString_AsString(get_current_trace_output));
     }
 #endif
   return vtkStdString();

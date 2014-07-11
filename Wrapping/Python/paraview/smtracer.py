@@ -1039,34 +1039,34 @@ class SaveCameras(BookkeepingItem):
         return trace.raw_data()
 
 
-# ActiveTraceItems is simply used to keep track of items that are currently
+# __ActiveTraceItems is simply used to keep track of items that are currently
 # active to avoid non-nestable trace items from being created when previous
 # items are active.
-ActiveTraceItems = []
+__ActiveTraceItems = []
 
-def createTraceItem(key, args=None, kwargs=None):
-    global ActiveTraceItems
+def _create_trace_item_internal(key, args=None, kwargs=None):
+    global __ActiveTraceItems
 
-    # trim ActiveTraceItems to remove None references.
-    ActiveTraceItems = [x for x in ActiveTraceItems if not x() is None]
+    # trim __ActiveTraceItems to remove None references.
+    __ActiveTraceItems = [x for x in __ActiveTraceItems if not x() is None]
 
     g = globals()
     if g.has_key(key) and callable(g[key]):
         args = args if args else []
         kwargs = kwargs if kwargs else {}
         traceitemtype = g[key]
-        if len(ActiveTraceItems) == 0 or issubclass(traceitemtype, NestableTraceItem):
+        if len(__ActiveTraceItems) == 0 or issubclass(traceitemtype, NestableTraceItem):
             instance = traceitemtype(*args, **kwargs)
             if not issubclass(traceitemtype, BookkeepingItem):
-                ActiveTraceItems.append(weakref.ref(instance))
+                __ActiveTraceItems.append(weakref.ref(instance))
             return instance
         raise Untraceable("Non-nestable trace item. Ignoring in current context.")
     raise Untraceable("Unknown trace item type %s" % key)
     #print "Hello again", key, args
     #return A(key)
 
-def startTrace():
-    """Starts tracing"""
+def _start_trace_internal():
+    """**internal** starts tracing. Called by vtkSMTrace::StartTrace()."""
     Trace.reset()
     Trace.Output.append([\
         "#### import the simple module from the paraview",
@@ -1075,8 +1075,8 @@ def startTrace():
         "paraview.simple._DisableFirstRenderCameraReset()"])
     return True
 
-def stopTrace():
-    """Stops trace"""
+def _stop_trace_internal():
+    """**internal** stops trace. Called by vtkSMTrace::StopTrace()."""
     camera_trace = SaveCameras.get_trace(None)
     if camera_trace:
         Trace.Output.append_separated(\
@@ -1091,16 +1091,48 @@ def stopTrace():
     Trace.reset()
     return trace
 
-def getTrace():
-    return str(Trace.Output)
+#------------------------------------------------------------------------------
+# Public methods
+#------------------------------------------------------------------------------
+def start_trace():
+    """Starting tracing. On successful start, will return a vtkSMTrace object.
+    One can set tracing options on it to control how the tracing. If tracing was
+    already started, calling this contine with the same trace."""
+    return sm.vtkSMTrace.StartTrace()
 
+def stop_trace():
+    """Stops the trace and returns the generated trace output string."""
+    return sm.vtkSMTrace.StopTrace()
+
+def get_current_trace_output(raw=False):
+    """Returns the trace generated so far in the tracing process."""
+    return str(Trace.Output) if not raw else Trace.Output.raw_data()
+
+def get_current_trace_output_and_reset(raw=False):
+    """Equivalent to calling::
+
+            get_current_trace_output(raw)
+            reset_trace_output()
+    """
+
+    output = get_current_trace_output(raw)
+    reset_trace_output()
+    return output
+
+
+def reset_trace_output():
+    """Resets the trace output without resetting the tracing datastructures
+    themselves."""
+    Trace.Output.reset()
+
+#------------------------------------------------------------------------------
 if __name__ == "__main__":
     print "Running test"
-    sm.vtkSMTrace.StartTrace()
+    start_trace()
 
     s = simple.Sphere()
     c = simple.PlotOverLine()
     simple.Show()
 
     print "***** TRACE RESULT *****"
-    print sm.vtkSMTrace.StopTrace()
+    print stop_trace()

@@ -70,7 +70,7 @@ def get_consumers(proxy, filter, consumer_set, recursive=True):
         consumer = sm._getPyProxy(consumer)
         if not consumer or consumer.IsPrototype() or consumer in consumer_set:
             continue
-        if filter is None or filter(consumer):
+        if filter(consumer):
             consumer_set.add(consumer)
             if recursive: get_consumers(consumer, filter, consumer_set)
 
@@ -83,17 +83,17 @@ def get_producers(proxy, filter, producer_set):
         producer = sm._getPyProxy(producer)
         if not producer or producer.IsPrototype() or producer in producer_set:
             continue
-        if filter is None or filter(producer):
+        if filter(producer):
             producer_set.add(producer)
             get_producers(producer, filter, producer_set)
     # FIXME: LookupTable is missed :/, darn subproxies!
     try:
-        if proxy.LookupTable and filter is None or filter(proxy.LookupTable):
+        if proxy.LookupTable and filter(proxy.LookupTable):
             producer_set.add(proxy.LookupTable)
             get_producers(proxy.LookupTable, filter, producer_set)
     except AttributeError: pass
     try:
-        if proxy.ScalarOpacityFunction and filter is None or filter(proxy.ScalarOpacityFunction):
+        if proxy.ScalarOpacityFunction and filter(proxy.ScalarOpacityFunction):
             producer_set.add(proxy.ScalarOpacityFunction)
             get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
     except AttributeError: pass
@@ -108,7 +108,7 @@ def get_state(source_set=[], filter=None):
 
     # build a set of proxies of interest
     start_set = source_set if source_set else simple.GetSources().values()
-    start_set = [x for x in start_set if filter is None or filter(x)]
+    start_set = [x for x in start_set if filter(x)]
 
     # now, locate dependencies for the start_set, pruning irrelevant branches
     consumers = set(start_set)
@@ -121,11 +121,10 @@ def get_state(source_set=[], filter=None):
 
     # proxies_of_interest is set of all proxies that we should trace.
     proxies_of_interest = producers.union(consumers)
-    print "proxies_of_interest", proxies_of_interest
+    #print "proxies_of_interest", proxies_of_interest
 
-    # FIXME: should we revisit this?
-    tracer = sm.vtkSMTrace.StartTrace()
-    smtracer.Trace.Output.reset()
+    trace_config = smtracer.start_trace()
+    smtracer.reset_trace_output()
 
     trace = smtracer.TraceOutput()
 
@@ -143,8 +142,7 @@ def get_state(source_set=[], filter=None):
             traceitem = smtracer.RegisterViewProxy(view)
             traceitem.finalize()
             del traceitem
-        trace.append_separated(smtracer.Trace.Output.raw_data())
-        smtracer.Trace.Output.reset()
+        trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
     # Next, trace data processing pipelines.
@@ -160,9 +158,8 @@ def get_state(source_set=[], filter=None):
             traceitem = smtracer.RegisterPipelineProxy(source)
             traceitem.finalize()
             del traceitem
-        trace.append_separated(smtracer.Trace.Output.raw_data())
-        smtracer.Trace.Output.reset()
-        tracer.SetTracePropertiesOnExistingProxies(False)
+        trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+        trace_config.SetTracePropertiesOnExistingProxies(False)
 
     #--------------------------------------------------------------------------
     # Now, trace the transfer functions (color maps and opacity maps) used.
@@ -171,7 +168,7 @@ def get_state(source_set=[], filter=None):
     if ctfs:
         # for transfer functions, we want the trace to save all properties.
         # FIXME: provide a cleaner way for doing this.
-        tracer.SetTracePropertiesOnExistingProxies(True)
+        trace_config.SetTracePropertiesOnExistingProxies(True)
         trace.append_separated([\
             "# ----------------------------------------------------------------",
             "# setup color maps and opacity mapes used in the visualization",
@@ -181,9 +178,8 @@ def get_state(source_set=[], filter=None):
             smtracer.Trace.get_accessor(ctf)
             if ctf.ScalarOpacityFunction in proxies_of_interest:
                 smtracer.Trace.get_accessor(ctf.ScalarOpacityFunction)
-        trace.append_separated(smtracer.Trace.Output.raw_data())
-        smtracer.Trace.Output.reset()
-        tracer.SetTracePropertiesOnExistingProxies(False)
+        trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+        trace_config.SetTracePropertiesOnExistingProxies(False)
 
     #--------------------------------------------------------------------------
     # Can't decide if the representations should be saved with the pipeline
@@ -213,31 +209,28 @@ def get_state(source_set=[], filter=None):
                         comment="show data from %s" % smtracer.Trace.get_accessor(producer))
                     traceitem.finalize()
                     del traceitem
+                    trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
 
                     if rep.IsScalarBarVisible(view):
                         # FIXME: this will save this multiple times, right now,
                         # if two representations use the same LUT.
-                        smtracer.Trace.Output.append_separated([\
+                        trace.append_separated([\
                             "# show color legend",
                             "%s.SetScalarBarVisibility(%s, True)" % (\
                                 smtracer.Trace.get_accessor(rep),
                                 smtracer.Trace.get_accessor(view))])
                 except AttributeError: pass
-            trace.append_separated(smtracer.Trace.Output.raw_data())
-            smtracer.Trace.Output.reset()
-
             # save the scalar bar properties themselves.
             if view_scalarbars:
                 trace.append_separated("# setup the color legend parameters for each legend in this view")
-                tracer.SetTracePropertiesOnExistingProxies(True)
+                trace_config.SetTracePropertiesOnExistingProxies(True)
                 for rep in view_scalarbars:
                     smtracer.Trace.get_accessor(rep)
-                tracer.SetTracePropertiesOnExistingProxies(False)
-            trace.append_separated(smtracer.Trace.Output.raw_data())
-            smtracer.Trace.Output.reset()
-    del tracer
-    sm.vtkSMTrace.StopTrace()
-    return trace
+                trace_config.SetTracePropertiesOnExistingProxies(False)
+            trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+    del trace_config
+    smtracer.stop_trace()
+    return str(trace)
 
 if __name__ == "__main__":
     print  "Running test"
