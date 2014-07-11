@@ -31,7 +31,17 @@ if (FOUND_NUMPY)
       TestPythonViewMatplotlibScript.py
       )
   endif()
+
+  paraview_add_test_python(
+    NO_DATA NO_RT
+    TestPythonViewNumpyScript.py
+    )
 endif()
+
+paraview_add_test_python(
+  NO_DATA NO_RT
+  TestPythonViewScript.py
+)
 
 # these tests could run safely in serial and
 # in parallel.
