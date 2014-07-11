@@ -35,6 +35,8 @@ class TraceOutput:
 
   def raw_data(self): return self.__data
 
+  def reset(self): self.__data = []
+
 
 class Trace(object):
     __REGISTERED_ACCESSORS = {}
@@ -138,15 +140,16 @@ class Trace(object):
             # handle representations.
             if hasattr(obj, "Input"):
                 inputAccsr = cls.get_accessor(obj.Input)
-                # FIXME: trace view.
-                #viewAccsr = cls.get_accessor(
+                view = simple.LocateView(obj)
+                viewAccessor = cls.get_accessor(view)
                 pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("representations", obj.SMProxy)
                 if pname:
                     varname = "%sDisplay" % inputAccsr
                     accessor = ProxyAccessor(cls.get_varname(varname), obj)
                     cls.Output.append_separated([\
                         "# get display properties",
-                        "%s = GetDisplayProperties(%s)" % (accessor, str(inputAccsr))])
+                        "%s = GetDisplayProperties(%s, view=%s)" %\
+                            (accessor, inputAccsr, viewAccessor)])
                     return True
         if cls.get_registered_name(obj, "lookup_tables"):
             pname = cls.get_registered_name(obj, "lookup_tables")
@@ -159,15 +162,18 @@ class Trace(object):
         if cls.get_registered_name(obj, "scalar_bars"):
             # trace scalar bar.
             lutAccessor = cls.get_accessor(obj.LookupTable)
-            # FIXME: locate true view for the representation.
-            # For now, we'll just used the active view.
-            view = simple.GetActiveView()
+            view = simple.LocateView(obj)
             viewAccessor = cls.get_accessor(view)
             varname = cls.get_varname("%sColorBar" % lutAccessor)
             accessor = ProxyAccessor(varname, obj)
-            cls.Output.append_separated([\
-                    "# get color legend/bar for %s in view %s" % (lutAccessor, viewAccessor),
-                    "%s = GetScalarBar(%s, %s)" % (accessor, lutAccessor, viewAccessor)])
+            trace = TraceOutput()
+            trace.append(\
+                "# get color legend/bar for %s in view %s" % (lutAccessor, viewAccessor))
+            trace.append(accessor.trace_ctor(\
+                "GetScalarBar",
+                ExistingProxy(ScalarBarProxyFilter()),
+                ctor_args="%s, %s" % (lutAccessor, viewAccessor)))
+            cls.Output.append_separated(trace.raw_data())
             return True
         if cls.get_registered_name(obj, "animation"):
             return cls._create_accessor_for_animation_proxies(obj)
@@ -493,6 +499,8 @@ class RepresentationProxyFilter(PipelineProxyFilter):
         return False
 class ViewProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
+        # skip "Representations" property.
+        if prop.PropertyKey in ["Representations"]: return True
         return False if prop.PropertyKey in ["InteractionMode"] else \
             ProxyFilter.should_never_trace(self, prop)
 
@@ -526,6 +534,16 @@ class TransferFunctionProxyFilter(ProxyFilter):
         if ProxyFilter.should_never_trace(self, prop): return True
         if prop.PropertyKey in ["ScalarOpacityFunction"]: return True
         return False
+
+class ScalarBarProxyFilter(ProxyFilter):
+    def should_trace_in_ctor(self, prop): return False
+    def should_never_trace(self, prop):
+        # despite being hidden from the panel, these properties should not be
+        # skipped in trace.
+        if prop.get_property_name() in ["Position", "Position2", "Orientation"]:
+            return False
+        return ProxyFilter.should_never_trace(self, prop)
+
 
 def ExistingProxy(cls):
     setting = sm.vtkSMTrace.GetActiveTracer().GetTracePropertiesOnExistingProxies()
@@ -655,7 +673,7 @@ class PropertiesModified(NestableTraceItem):
 
 class Show(TraceItem):
     """Traces Show"""
-    def __init__(self, producer, port, view, display):
+    def __init__(self, producer, port, view, display, comment=None):
         TraceItem.__init__(self)
 
         producer = sm._getPyProxy(producer)
@@ -666,6 +684,7 @@ class Show(TraceItem):
         self.ViewAccessor = Trace.get_accessor(view)
         self.OutputPort = port
         self.Display = display
+        self.Comment = comment
 
     def finalize(self):
         display = self.Display
@@ -679,7 +698,10 @@ class Show(TraceItem):
         port = self.OutputPort
 
         output = TraceOutput()
-        output.append("# show data in view")
+        if not self.Comment is None:
+            output.append("# %s" % self.Comment)
+        else:
+            output.append("# show data in view")
         if port > 0:
             output.append("%s = Show(OutputPort(%s, %d), %s)" % \
                 (str(accessor), str(self.ProducerAccessor), port, str(self.ViewAccessor)))

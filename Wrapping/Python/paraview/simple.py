@@ -368,6 +368,8 @@ def Hide(proxy=None, view=None):
     If pipeline object and/or view are not specified, active objects are used."""
     if not proxy:
       proxy = active_objects.source
+    if not view:
+        view = active_objects.view
     if not proxy:
         raise ValueError, "proxy argument cannot be None when no active source is present."
     controller = servermanager.ParaViewPipelineController()
@@ -539,6 +541,24 @@ def FindViewOrCreate(name, viewtype):
     if not view:
         raise RuntimeError, "Failed to create/locate the specified view"
     return view
+
+
+def LocateView(displayProperties=None):
+    """
+    Given a displayProperties object i.e. the object returned by
+    GetDisplayProperties() or Show() functions, this function will locate a view
+    to which the displayProperties object corresponds."""
+    if displayProperties is None:
+        displayProperties = GetDisplayProperties()
+    if displayProperties is None:
+        raise ValueError, "'displayProperties' must be set"
+    for view in GetViews():
+        try:
+            if displayProperties in view.Representations: return view
+        except AttributeError:
+            pass
+    return None
+
 
 
 # -----------------------------------------------------------------------------
