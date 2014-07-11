@@ -68,6 +68,13 @@ public:
   virtual void UseSessionToLocateProxy(bool useSessionToo)
     { this->LocateProxyWithSessionToo = useSessionToo; }
 
+  // Description:
+  // For custom applications managing custom state loading, one can use this
+  // method to register proxies with locator to use  when LocateProxy()
+  // before attempting the standard route i.e. using the deserializer or
+  // session.
+  virtual void AssignProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
+
 //BTX
 protected:
   vtkSMProxyLocator();
