@@ -146,13 +146,12 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   int scriptSize = 0;
   if(rank == 0)
     {
-    std::FILE *fp = std::fopen(fileName, "r");
-    std::fseek(fp, 0, SEEK_END);
-    scriptSize = static_cast<int>(std::ftell(fp)+1);
+    std::ifstream fin(fileName, ios::binary);
+    fin.seekg(0, ios::end);
+    scriptSize = static_cast<int>(fin.tellg())+1;
     scriptText = new char[scriptSize];
-    std::rewind(fp);
-    std::fread(scriptText, 1, scriptSize-1, fp);
-    std::fclose(fp);
+    fin.seekg(0, ios::beg);
+    fin.read(scriptText, scriptSize-1);
     scriptText[scriptSize-1] = '\0';
     }
 
