@@ -39,6 +39,17 @@ import paraview
 import servermanager
 import lookuptable
 
+
+def GetParaViewVersion():
+    """Returns the version of the ParaView build"""
+    return paraview._version(servermanager.vtkSMProxyManager.GetVersionMajor(),
+                             servermanager.vtkSMProxyManager.GetVersionMinor())
+def GetParaViewSourceVersion():
+    """Returns the paraview source version string e.g.
+    'paraview version x.x.x, Date: YYYY-MM-DD'."""
+    return servermanager.vtkSMProxyManager.GetParaViewSourceVersion()
+
+
 #==============================================================================
 # Client/Server Connection methods
 #==============================================================================

@@ -132,6 +132,7 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     trace_config.SetFullyTraceSupplementalProxies(True)
 
     trace = smtracer.TraceOutput()
+    trace.append("# state file generated using %s" % simple.GetParaViewSourceVersion())
 
     #--------------------------------------------------------------------------
     # First, we trace the views and layouts, if any.
