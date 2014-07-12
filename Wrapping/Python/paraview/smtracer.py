@@ -440,11 +440,20 @@ class PropertyAccessor(Accessor):
 # === Filters used to filter properties traced ===
 # ===================================================================================================
 class ProxyFilter(object):
-    def should_never_trace(self, prop):
-        # should we hide properties hidden from panels?
-        return prop.get_object().GetIsInternal() or \
-            prop.get_object().GetInformationOnly() or \
-            prop.get_object().GetPanelVisibility() == "never"
+    def should_never_trace(self, prop, hide_gui_hidden=True):
+        if prop.get_object().GetIsInternal() or prop.get_object().GetInformationOnly():
+            return True
+        # should we hide properties hidden from panels? yes, generally, except
+        # Views.
+        if hide_gui_hidden == True and prop.get_object().GetPanelVisibility() == "never":
+            if prop.get_property_name() == "ViewSize": print "skipping hidden"
+            return True
+        # if a property is "linked" to settings, then skip it here too. We
+        # should eventually add an option for user to save, yes, save these too.
+        if prop.get_object().GetHints():
+            plink = prop.get_object().GetHints().FindNestedElementByName("PropertyLink")
+            return True if plink and plink.GetAttribute("group") == "settings" else False
+        return False
 
     def should_trace_in_create(self, prop, user_can_modify_in_create=True):
         if self.should_never_trace(prop): return False
@@ -497,12 +506,12 @@ class RepresentationProxyFilter(PipelineProxyFilter):
             "SelectionCellFieldDataArrayName",\
             "SelectionPointFieldDataArrayName"] : return True
         return False
+
 class ViewProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         # skip "Representations" property.
         if prop.PropertyKey in ["Representations"]: return True
-        return False if prop.PropertyKey in ["InteractionMode"] else \
-            ProxyFilter.should_never_trace(self, prop)
+        return ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False)
 
 class AnimationProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):

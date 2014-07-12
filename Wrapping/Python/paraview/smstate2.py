@@ -228,7 +228,7 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
             trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
     del trace_config
     smtracer.stop_trace()
-    print trace
+    #print trace
     return str(trace)
 
 if __name__ == "__main__":
@@ -242,6 +242,7 @@ if __name__ == "__main__":
 
     rep = simple.Show()
     view = simple.Render()
+    view.ViewSize=[500, 500]
     rep.SetScalarBarVisibility(view, True)
     simple.Render()
 #    rep.SetScalarBarVisibility(view, False)
