@@ -546,7 +546,7 @@ class ScalarBarProxyFilter(ProxyFilter):
 
 
 def ExistingProxy(cls):
-    setting = sm.vtkSMTrace.GetActiveTracer().GetTracePropertiesOnExistingProxies()
+    setting = sm.vtkSMTrace.GetActiveTracer().GetFullyTraceSupplementalProxies()
     if setting: return cls
 
     def should_trace_in_ctor(self, *args, **kwargs):

@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkEventQtSlotConnect;
 class vtkSMProxySelectionModel;
+class vtkSMSessionProxyManager;
 
 /// pqActiveObjects is a singleton that keeps track of "active objects"
 /// including active view, active source, active representation etc.
@@ -85,6 +86,10 @@ public:
   /// Returns the current source selection.
   const pqProxySelection& selection() const
     { return this->Selection; }
+
+  /// Returns the proxyManager() from the active server, if any.
+  /// Equivalent to calling this->activeServer()->proxyManager();
+  vtkSMSessionProxyManager* proxyManager() const;
 
 public slots:
   void setActiveView(pqView * view);

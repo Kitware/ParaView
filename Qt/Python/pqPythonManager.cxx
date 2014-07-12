@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonScriptEditor.h"
 #include "pqPythonShell.h"
-#include "pqSettings.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkPVConfig.h"
@@ -52,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputWindowAdapter.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -292,29 +290,6 @@ void pqPythonManager::editTrace(const QString& txt, bool update)
     }
 }
 
-//----------------------------------------------------------------------------
-void pqPythonManager::saveTraceState(const QString& fileName)
-{
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if(settings)
-    {
-    this->setSaveFullState(settings->value("saveFullState", false).toBool());
-    }
-
-  std::string code = "smstate.run()\n";
-
-  vtkPythonInterpreter::RunSimpleString(code.c_str());
-  QFile file(fileName);
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-    qWarning() << "Could not open file:" << fileName;
-    return;
-    }
-
-  QString traceString = this->getTraceString();
-  QTextStream out(&file);
-  out << traceString;
-}
 //----------------------------------------------------------------------------
 void pqPythonManager::updateMacroList()
 {

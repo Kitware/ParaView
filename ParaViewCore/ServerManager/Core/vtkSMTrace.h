@@ -66,9 +66,13 @@ public:
   vtkGetMacro(LogTraceToStdout, bool);
 
   // Description:
-  // Whether to trace properties on proxies that have already been created.
-  vtkSetMacro(TracePropertiesOnExistingProxies, bool);
-  vtkGetMacro(TracePropertiesOnExistingProxies, bool);
+  // Supplemental proxies are proxies that not explicitly created by the user
+  // i.e. proxies such as lookup tables, scalar bars, animation scene, etc.
+  // When set to true (default is false), the first time such a proxy is
+  // encountered in the trace, the trace will log the property values on that
+  // proxy using the PropertiesToTraceOnCreate rules.
+  vtkSetMacro(FullyTraceSupplementalProxies, bool);
+  vtkGetMacro(FullyTraceSupplementalProxies, bool);
 
   enum
     {
@@ -84,6 +88,12 @@ public:
   // Description:
   // Return the current trace.
   vtkStdString GetCurrentTrace();
+
+  // Description:
+  // Save a Python state for the application and return it. Note this cannot be
+  // called when tracing is active.
+  static vtkStdString GetState(
+    int propertiesToTraceOnCreate, bool skipHiddenRepresentations);
 
   // ************** BEGIN INTERNAL *************************
   // Description:
@@ -144,7 +154,7 @@ protected:
   bool TraceXMLDefaults;
   bool LogTraceToStdout;
   int PropertiesToTraceOnCreate;
-  bool TracePropertiesOnExistingProxies;
+  bool FullyTraceSupplementalProxies;
 
 private:
   vtkSMTrace(const vtkSMTrace&); // Not implemented.

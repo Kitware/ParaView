@@ -2427,26 +2427,28 @@
 
   <ProxyGroup name="pythontracing">
     <Proxy name="PythonTraceOptions">
+      <Documentation>
+        Options proxy used to prompt user for tracing options when starting trace.
+      </Documentation>
       <IntVectorProperty name="PropertiesToTraceOnCreate"
         default_values="1"
         number_of_elements="1">
         <Documentation>
-          When tracing the creation of pipeline objects, specify which properties are
-          recorded in the trace.
+          Select which properties to save in trace
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Record all properties" value="0" />
-          <Entry text="Record all *modified* properties" value="1" />
-          <Entry text="Record only *user-modified* properites" value="2" />
+          <Entry text="all properties" value="0" />
+          <Entry text="any *modified* properties" value="1" />
+          <Entry text="only *user-modified* properites" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <IntVectorProperty name="TracePropertiesOnExistingProxies"
+      <IntVectorProperty name="FullyTraceSupplementalProxies"
         number_of_elements="1"
         default_values="0">
         <BooleanDomain name="bool"/>
         <Documentation>
-          For views, transfer functions (color maps, and opacity maps), etc.
-          trace properties as needed for improved reproducibility.
+          Fully trace supplemental objects, such as color maps, color bars, etc.
+          when accessed the first time in trace.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="ShowIncrementalTrace"
@@ -2457,12 +2459,51 @@
             Show trace as it is being generated.
           </Documentation>
       </IntVectorProperty>
-      <PropertyGroup label="Generated trace characteristics">
+      <PropertyGroup label="General options">
         <Property name="PropertiesToTraceOnCreate" />
-        <Property name="TracePropertiesOnExistingProxies" />
+      </PropertyGroup>
+      <PropertyGroup label="Color maps, color bar etc.">
+        <Property name="FullyTraceSupplementalProxies" />
       </PropertyGroup>
       <PropertyGroup label="Miscellaneous">
         <Property name="ShowIncrementalTrace" />
+      </PropertyGroup>
+      <Hints>
+        <UseDocumentationForLabels />
+      </Hints>
+    </Proxy>
+
+    <Proxy name="PythonStateOptions">
+      <Documentation>
+        Options proxy used to prompt user for python state options.
+      </Documentation>
+      <IntVectorProperty name="PropertiesToTraceOnCreate"
+        default_values="1"
+        number_of_elements="1">
+        <Documentation>
+          Select which properties to save in state
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="all properties" value="0" />
+          <Entry text="any *modified* properties" value="1" />
+          <!--
+              state cannot have this option since we don't know which properties
+              are user-modified when saving state.
+          <Entry text="only *user-modified* properites" value="2" />
+          -->
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty name="SkipHiddenDisplayProperties"
+          default_values="1"
+          number_of_elements="1">
+          <BooleanDomain name="bool"/>
+          <Documentation>
+            Skip displays properties/representations for elements hidden in a view.
+          </Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="General options">
+        <Property name="PropertiesToTraceOnCreate" />
+        <Property name="SkipHiddenDisplayProperties" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />

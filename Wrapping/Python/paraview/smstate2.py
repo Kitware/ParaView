@@ -98,16 +98,20 @@ def get_producers(proxy, filter, producer_set):
             get_producers(proxy.ScalarOpacityFunction, filter, producer_set)
     except AttributeError: pass
 
-def get_state(source_set=[], filter=None):
+def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES,
+    skipHiddenRepresentations=True, source_set=[]):
     """Returns the state string"""
     if sm.vtkSMTrace.GetActiveTracer():
         raise RuntimeError, "Cannot generate Python state when tracing is active."
 
-    if filter is None:
-      filter = visible_representations()
+    filter = visible_representations() if skipHiddenRepresentations else supported_proxies()
 
     # build a set of proxies of interest
-    start_set = source_set if source_set else simple.GetSources().values()
+    if source_set:
+        start_set = source_set
+    else:
+        # if nothing is specified, we save all views and sources.
+        start_set = simple.GetSources().values() + simple.GetViews()
     start_set = [x for x in start_set if filter(x)]
 
     # now, locate dependencies for the start_set, pruning irrelevant branches
@@ -124,7 +128,8 @@ def get_state(source_set=[], filter=None):
     #print "proxies_of_interest", proxies_of_interest
 
     trace_config = smtracer.start_trace()
-    smtracer.reset_trace_output()
+    # this ensures that lookup tables/scalar bars etc. are fully traced.
+    trace_config.SetFullyTraceSupplementalProxies(True)
 
     trace = smtracer.TraceOutput()
 
@@ -159,16 +164,12 @@ def get_state(source_set=[], filter=None):
             traceitem.finalize()
             del traceitem
         trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
-        trace_config.SetTracePropertiesOnExistingProxies(False)
 
     #--------------------------------------------------------------------------
     # Now, trace the transfer functions (color maps and opacity maps) used.
     ctfs = set([x for x in proxies_of_interest \
         if smtracer.Trace.get_registered_name(x, "lookup_tables")])
     if ctfs:
-        # for transfer functions, we want the trace to save all properties.
-        # FIXME: provide a cleaner way for doing this.
-        trace_config.SetTracePropertiesOnExistingProxies(True)
         trace.append_separated([\
             "# ----------------------------------------------------------------",
             "# setup color maps and opacity mapes used in the visualization",
@@ -179,7 +180,6 @@ def get_state(source_set=[], filter=None):
             if ctf.ScalarOpacityFunction in proxies_of_interest:
                 smtracer.Trace.get_accessor(ctf.ScalarOpacityFunction)
         trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
-        trace_config.SetTracePropertiesOnExistingProxies(False)
 
     #--------------------------------------------------------------------------
     # Can't decide if the representations should be saved with the pipeline
@@ -223,13 +223,12 @@ def get_state(source_set=[], filter=None):
             # save the scalar bar properties themselves.
             if view_scalarbars:
                 trace.append_separated("# setup the color legend parameters for each legend in this view")
-                trace_config.SetTracePropertiesOnExistingProxies(True)
                 for rep in view_scalarbars:
                     smtracer.Trace.get_accessor(rep)
-                trace_config.SetTracePropertiesOnExistingProxies(False)
             trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
     del trace_config
     smtracer.stop_trace()
+    print trace
     return str(trace)
 
 if __name__ == "__main__":

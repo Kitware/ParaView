@@ -84,10 +84,6 @@ public:
   void editTrace(const QString& txt=QString(), bool update=false);
 
   // Description:
-  // Trace state and save the trace string to a file with the given filename.
-  void saveTraceState(const QString& filename);
-
-  // Description:
   // Save the macro in ParaView configuration and update widget automatically
   void addMacro(const QString& fileName);
 

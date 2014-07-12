@@ -121,8 +121,8 @@ void pqTraceReaction::start()
     {
     trace->SetPropertiesToTraceOnCreate(
       vtkSMPropertyHelper(proxy, "PropertiesToTraceOnCreate").GetAsInt());
-    trace->SetTracePropertiesOnExistingProxies(
-      vtkSMPropertyHelper(proxy, "TracePropertiesOnExistingProxies").GetAsInt());
+    trace->SetFullyTraceSupplementalProxies(
+      vtkSMPropertyHelper(proxy, "FullyTraceSupplementalProxies").GetAsInt() == 1);
     if (vtkSMPropertyHelper(proxy, "ShowIncrementalTrace").GetAsInt() == 1)
       {
       pqCoreUtilities::connect(

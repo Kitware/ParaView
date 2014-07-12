@@ -113,7 +113,7 @@ vtkSMTrace::vtkSMTrace():
   TraceXMLDefaults(false),
   LogTraceToStdout(true),
   PropertiesToTraceOnCreate(vtkSMTrace::RECORD_MODIFIED_PROPERTIES),
-  TracePropertiesOnExistingProxies(false),
+  FullyTraceSupplementalProxies(false),
   Internals(new vtkSMTrace::vtkInternals())
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
@@ -150,6 +150,50 @@ vtkSMTrace::~vtkSMTrace()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+
+//----------------------------------------------------------------------------
+vtkStdString vtkSMTrace::GetState(
+  int propertiesToTraceOnCreate, bool skipHiddenRepresentations)
+{
+  if (vtkSMTrace::ActiveTracer.GetPointer() != NULL)
+    {
+    vtkGenericWarningMacro("Tracing is active. Cannot save state.");
+    return vtkStdString();
+    }
+
+  vtkPythonInterpreter::Initialize();
+  try
+    {
+    SmartPyObject module(PyImport_ImportModule("paraview.smstate2"));
+    if (!module || PyErr_Occurred())
+      {
+      vtkGenericWarningMacro("Failed to import paraview.smstate2 module.");
+      throw 1;
+      }
+
+    SmartPyObject result(
+      PyObject_CallMethod(module,
+        const_cast<char*>("get_state"),
+        const_cast<char*>("(ii)"), propertiesToTraceOnCreate,
+        (skipHiddenRepresentations? 1: 0)));
+    if (!result || PyErr_Occurred())
+      {
+      vtkGenericWarningMacro("Failed to generate state.");
+      throw 1;
+      }
+    return vtkStdString(PyString_AsString(result));
+    }
+  catch (int)
+    {
+    if (PyErr_Occurred())
+      {
+      PyErr_Print();
+      PyErr_Clear();
+      }
+    }
+  return vtkStdString();
 }
 
 //----------------------------------------------------------------------------

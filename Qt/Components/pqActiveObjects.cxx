@@ -548,3 +548,9 @@ void pqActiveObjects::updateRepresentation()
     }
   this->triggerSignals();
 }
+
+//-----------------------------------------------------------------------------
+vtkSMSessionProxyManager* pqActiveObjects::proxyManager() const
+{
+  return this->activeServer()? this->activeServer()->proxyManager() : NULL;
+}
