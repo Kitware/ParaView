@@ -25,34 +25,33 @@ def clear_proxies():
 
 ########################################################
 # Begin build pipeline
-view = CreateRenderView()
-view.Background=[0,0,1]
-sphere = Sphere(guiName="my sphere")
-Show()
-view2 = CreateRenderView() # create a second view for the remaining sources
-glyph = Glyph(guiName="my glyph")
-Show()
-glyph.GlyphType = "Cone"
-glyph.GlyphType.Radius = 0.1
-glyph.GlyphType.Resolution = 15
-clip = Clip(guiName="my clip")
-Show()
-clip.ClipType = "Sphere"
-clip.ClipType.Radius = 0.25
-group = GroupDatasets(Input=[sphere, clip], guiName="my group")
-Show()
-GetDisplayProperties().Representation = "Surface With Edges"
-Render()
+def create_pipeline():
+    view = CreateRenderView()
+    view.Background=[0,0,1]
+    sphere = Sphere(guiName="my sphere")
+    Show()
+    view2 = CreateRenderView() # create a second view for the remaining sources
+    glyph = Glyph(guiName="my glyph")
+    Show()
+    glyph.GlyphType = "Cone"
+    glyph.GlyphType.Radius = 0.1
+    glyph.GlyphType.Resolution = 15
+    clip = Clip(guiName="my clip")
+    Show()
+    clip.ClipType = "Sphere"
+    clip.ClipType.Radius = 0.25
+    group = GroupDatasets(Input=[sphere, clip], guiName="my group")
+    Show()
+    GetDisplayProperties().Representation = "Surface With Edges"
+    Render()
+create_pipeline()
 # End build pipeline
 ########################################################
 
 
 # Trace state and grab the trace output string
-smstate.run()
-trace_string = smstate.smtrace.get_trace_string()
-
-# Uncomment this line to save trace to a file
-#smtrace.save_trace(tempDir + "/PythonSMTraceTest2.py")
+state = smstate.get_state()
+print state
 
 # Clear all the proxies
 clear_proxies()
@@ -62,16 +61,16 @@ if len(GetRepresentations()) or len(GetRenderViews()) or len(GetSources()):
     fail("Not all proxies were cleaned up.")
 
 # Compile the trace code and run it
-code = compile(trace_string, "<string>", "exec")
+code = compile(state, "<string>", "exec")
 exec(code)
 
 # Get the recreated proxies
-view = GetRenderViews()[0]
-view2 = GetRenderViews()[1]
-sphere = FindSource("my sphere")
-glyph = FindSource("my glyph")
-clip = FindSource("my clip")
-group = FindSource("my group")
+view = FindView("RenderView0")
+view2 = FindView("RenderView1")
+sphere = FindSource("Sphere0")
+glyph = FindSource("Glyph0")
+clip = FindSource("Clip0")
+group = FindSource("GroupDatasets0")
 
 
 # Test the results
@@ -84,7 +83,7 @@ if abs(clip.ClipType.Radius - 0.25) > epsilon:
     fail("Clip sphere radius is incorrect.")
 if sphere not in group.Input or clip not in group.Input:
     fail("Group has wrong inputs.")
-if GetDisplayProperties(group).Representation != "Surface With Edges":
+if GetDisplayProperties(group, view2).Representation != "Surface With Edges":
     fail("Group representation is incorrect")
 if abs(view.Background[1] - 0) > epsilon or abs(view.Background[2] - 1) > epsilon:
     fail("View has incorrect background color")
