@@ -96,7 +96,6 @@
 #include "vtkSMPSWriterProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPWriterProxy.h"
-#include "vtkSMPythonTraceObserver.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
@@ -221,7 +220,6 @@ int ParaViewCoreServerManagerPrintSelf(int , char *[])
   PRINT_SELF(vtkSMPSWriterProxy);
   PRINT_SELF(vtkSMPVRepresentationProxy);
   PRINT_SELF(vtkSMPWriterProxy);
-  PRINT_SELF(vtkSMPythonTraceObserver);
   PRINT_SELF(vtkSMReaderFactory);
   PRINT_SELF(vtkSMRemoteObject);
   PRINT_SELF(vtkSMRemoteObjectUpdateUndoElement);

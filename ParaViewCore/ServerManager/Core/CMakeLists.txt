@@ -96,7 +96,6 @@ set (Module_SRCS
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
-  vtkSMPythonTraceObserver.cxx
   vtkSMRangeDomainTemplate.txx
   vtkSMReaderFactory.cxx
   vtkSMRemoteObject.cxx
