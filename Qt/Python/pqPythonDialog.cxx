@@ -125,21 +125,18 @@ pqPythonShell* pqPythonDialog::shell()
 
 void pqPythonDialog::runScript()
 {
-  pqFileDialog* const dialog = new pqFileDialog(
+  pqFileDialog dialog(
     NULL,
     this,
     tr("Run Script"),
     QString(),
     QString(tr("Python Script (*.py);;All files (*)")));
-    
-  dialog->setObjectName("PythonShellRunScriptDialog");
-  dialog->setFileMode(pqFileDialog::ExistingFile);
-  QObject::connect(
-    dialog,
-    SIGNAL(filesSelected(const QStringList&)), 
-    this,
-    SLOT(runScript(const QStringList&)));
-  dialog->show(); 
+  dialog.setObjectName("PythonShellRunScriptDialog");
+  dialog.setFileMode(pqFileDialog::ExistingFile);
+  if (dialog.exec() == QDialog::Accepted)
+    {
+    this->runScript(dialog.getSelectedFiles());
+    }
 }
 
 void pqPythonDialog::runScript(const QStringList& files)
