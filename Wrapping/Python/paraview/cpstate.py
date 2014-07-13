@@ -10,7 +10,7 @@ Also refer to paraview.cpexport Module which is used to generate a complete
 Python CoProcessing script that can be used with in a vtkCPPythonScriptPipeline.
 """
 
-from paraview import smtracer, smstate2, servermanager
+from paraview import smtrace, smstate, servermanager
 
 class cpstate_globals: pass
 
@@ -57,7 +57,7 @@ def locate_simulation_inputs_for_view(view_proxy):
     return all_sim_inputs
 
 # -----------------------------------------------------------------------------
-class ProducerAccessor(smtracer.RealProxyAccessor):
+class ProducerAccessor(smtrace.RealProxyAccessor):
     """This accessor is created instead of the standard one for proxies that
     have been marked as simulation inputs. This accessor override the
     trace_ctor() method to trace the constructor as the CreateProducer() call,
@@ -65,31 +65,31 @@ class ProducerAccessor(smtracer.RealProxyAccessor):
     """
     def __init__(self, varname, proxy, simname):
         self.SimulationInputName = simname
-        smtracer.RealProxyAccessor.__init__(self, varname, proxy)
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         # this cpSimulationInput attribute is used to locate the proxy later on.
         proxy.SMProxy.cpSimulationInput = simname
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
-        trace = smtracer.TraceOutput()
+        trace = smtrace.TraceOutput()
         trace.append("# create a producer from a simulation input")
         trace.append("%s = coprocessor.CreateProducer(datadescription, '%s')" % \
             (self, self.SimulationInputName))
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
-class ViewAccessor(smtracer.RealProxyAccessor):
+class ViewAccessor(smtrace.RealProxyAccessor):
     """Accessor for views. Overrides trace_ctor() to trace registering of the
     view with the coprocessor. (I wonder if this registering should be moved to
     the end of the state for better readability of the generated state files.
     """
     def __init__(self, varname, proxy, proxyname):
-        smtracer.RealProxyAccessor.__init__(self, varname, proxy)
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         self.ProxyName = proxyname
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
-        original_trace = smtracer.RealProxyAccessor.trace_ctor(\
+        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
-        trace = smtracer.TraceOutput(original_trace)
+        trace = smtrace.TraceOutput(original_trace)
         trace.append_separated(["# register the view with coprocessor",
           "# and provide it with information such as the filename to use,",
           "# how frequently to write the images, etc."])
@@ -103,14 +103,14 @@ class ViewAccessor(smtracer.RealProxyAccessor):
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
-class WriterAccessor(smtracer.RealProxyAccessor):
+class WriterAccessor(smtrace.RealProxyAccessor):
     """Accessor for writers. Overrides trace_ctor() to use the actual writer
     proxy name instead of the dummy-writer proxy's name. Also updates the
     write_frequencies maintained in cpstate_globals with the write frequencies
     for the writer.
     """
     def __init__(self, varname, proxy):
-        smtracer.RealProxyAccessor.__init__(self, varname, proxy)
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
         write_frequency = proxy.WriteFrequency
 
         # Locate which simulation input this write is connected to, if any. If so,
@@ -142,10 +142,10 @@ class WriterAccessor(smtracer.RealProxyAccessor):
         write_frequency = self.get_object().WriteFrequency
         filename = self.get_object().FileName
         ctor = self.get_proxy_label(xmlgroup, xmlname)
-        original_trace = smtracer.RealProxyAccessor.trace_ctor(\
+        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
 
-        trace = smtracer.TraceOutput(original_trace)
+        trace = smtrace.TraceOutput(original_trace)
         trace.append_separated(["# register the writer with coprocessor",
           "# and provide it with information such as the filename to use,",
           "# how frequently to write the data, etc."])
@@ -156,12 +156,12 @@ class WriterAccessor(smtracer.RealProxyAccessor):
 
 def cp_hook(varname, proxy):
     """callback to create our special accessors instead of the standard ones."""
-    pname = smtracer.Trace.get_registered_name(proxy, "sources")
+    pname = smtrace.Trace.get_registered_name(proxy, "sources")
     if pname and pname in cpstate_globals.simulation_input_map:
         return ProducerAccessor(varname, proxy, cpstate_globals.simulation_input_map[pname])
     if pname and proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):
         return WriterAccessor(varname, proxy)
-    pname = smtracer.Trace.get_registered_name(proxy, "views")
+    pname = smtrace.Trace.get_registered_name(proxy, "views")
     if pname:
         cpstate_globals.view_proxies.append(proxy)
         return ViewAccessor(varname, proxy, pname)
@@ -171,7 +171,7 @@ class cpstate_filter_proxies_to_serialize(object):
     """filter used to skip views and representations a when export_rendering is
     disabled."""
     def __call__(self, proxy):
-        if not smstate2.visible_representations()(proxy): return False
+        if not smstate.visible_representations()(proxy): return False
         if (not cpstate_globals.export_rendering) and \
             (proxy.GetXMLGroup() in ["views", "representations"]): return False
         return True
@@ -202,9 +202,9 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
 
     # Start trace
     filter = cpstate_filter_proxies_to_serialize()
-    smtracer.RealProxyAccessor.register_create_callback(cp_hook)
-    state = smstate2.get_state(filter=filter, raw=True)
-    smtracer.RealProxyAccessor.unregister_create_callback(cp_hook)
+    smtrace.RealProxyAccessor.register_create_callback(cp_hook)
+    state = smstate.get_state(filter=filter, raw=True)
+    smtrace.RealProxyAccessor.unregister_create_callback(cp_hook)
 
     # iterate over all views that were saved in state and update write requencies
     if export_rendering:

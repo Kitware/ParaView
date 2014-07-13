@@ -1,17 +1,17 @@
 r"""Module for generating a Python state for ParaView.
-This module uses paraview.smtracer to generate a trace for a selected set of
+This module uses paraview.smtrace to generate a trace for a selected set of
 proxies my mimicking the creating of various pipeline components in sequence.
 Typical usage of this module is as follows::
 
-    from paraview import smstate2
-    state = smstate2.get_state()
+    from paraview import smstate
+    state = smstate.get_state()
     print state
 
 Note, this cannot be called when Python tracing is active.
 """
 
 from paraview import servermanager as sm
-from paraview import smtracer
+from paraview import smtrace
 from paraview import simple
 
 class supported_proxies(object):
@@ -128,17 +128,17 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     proxies_of_interest = producers.union(consumers)
     #print "proxies_of_interest", proxies_of_interest
 
-    trace_config = smtracer.start_trace()
+    trace_config = smtrace.start_trace()
     # this ensures that lookup tables/scalar bars etc. are fully traced.
     trace_config.SetFullyTraceSupplementalProxies(True)
 
-    trace = smtracer.TraceOutput()
+    trace = smtrace.TraceOutput()
     trace.append("# state file generated using %s" % simple.GetParaViewSourceVersion())
 
     #--------------------------------------------------------------------------
     # First, we trace the views and layouts, if any.
     # TODO: add support for layouts.
-    views = [x for x in proxies_of_interest if smtracer.Trace.get_registered_name(x, "views")]
+    views = [x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "views")]
     if views:
         trace.append_separated([\
             "# ----------------------------------------------------------------",
@@ -146,31 +146,31 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
             "# ----------------------------------------------------------------"])
         for view in views:
             # FIXME: save view camera positions and size.
-            traceitem = smtracer.RegisterViewProxy(view)
+            traceitem = smtrace.RegisterViewProxy(view)
             traceitem.finalize()
             del traceitem
-        trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
     # Next, trace data processing pipelines.
     sorted_proxies_of_interest = __toposort(proxies_of_interest)
     sorted_sources = [x for x in sorted_proxies_of_interest \
-        if smtracer.Trace.get_registered_name(x, "sources")]
+        if smtrace.Trace.get_registered_name(x, "sources")]
     if sorted_sources:
         trace.append_separated([\
             "# ----------------------------------------------------------------",
             "# setup the data processing pipelines",
             "# ----------------------------------------------------------------"])
         for source in sorted_sources:
-            traceitem = smtracer.RegisterPipelineProxy(source)
+            traceitem = smtrace.RegisterPipelineProxy(source)
             traceitem.finalize()
             del traceitem
-        trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
     # Now, trace the transfer functions (color maps and opacity maps) used.
     ctfs = set([x for x in proxies_of_interest \
-        if smtracer.Trace.get_registered_name(x, "lookup_tables")])
+        if smtrace.Trace.get_registered_name(x, "lookup_tables")])
     if ctfs:
         trace.append_separated([\
             "# ----------------------------------------------------------------",
@@ -178,10 +178,10 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
             "# note: the Get..() functions create a new object, if needed",
             "# ----------------------------------------------------------------"])
         for ctf in ctfs:
-            smtracer.Trace.get_accessor(ctf)
+            smtrace.Trace.get_accessor(ctf)
             if ctf.ScalarOpacityFunction in proxies_of_interest:
-                smtracer.Trace.get_accessor(ctf.ScalarOpacityFunction)
-        trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+                smtrace.Trace.get_accessor(ctf.ScalarOpacityFunction)
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
     # Can't decide if the representations should be saved with the pipeline
@@ -189,9 +189,9 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     # sort doesn't guarantee that the representations will follow their sources
     # anyways.
     sorted_representations = [x for x in sorted_proxies_of_interest \
-        if smtracer.Trace.get_registered_name(x, "representations")]
+        if smtrace.Trace.get_registered_name(x, "representations")]
     scalarbar_representations = [x for x in sorted_proxies_of_interest\
-        if smtracer.Trace.get_registered_name(x, "scalar_bars")]
+        if smtrace.Trace.get_registered_name(x, "scalar_bars")]
     # print "sorted_representations", sorted_representations
     # print "scalarbar_representations", scalarbar_representations
     if sorted_representations or scalarbar_representations:
@@ -201,17 +201,17 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
             if view_representations or view_scalarbars:
                 trace.append_separated([\
                     "# ----------------------------------------------------------------",
-                    "# setup the visualization in view '%s'" % smtracer.Trace.get_accessor(view),
+                    "# setup the visualization in view '%s'" % smtrace.Trace.get_accessor(view),
                     "# ----------------------------------------------------------------"])
             for rep in view_representations:
                 try:
                     producer = rep.Input
                     port = rep.Input.Port
-                    traceitem = smtracer.Show(producer, port, view, rep,
-                        comment="show data from %s" % smtracer.Trace.get_accessor(producer))
+                    traceitem = smtrace.Show(producer, port, view, rep,
+                        comment="show data from %s" % smtrace.Trace.get_accessor(producer))
                     traceitem.finalize()
                     del traceitem
-                    trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+                    trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
                     if rep.IsScalarBarVisible(view):
                         # FIXME: this will save this multiple times, right now,
@@ -219,17 +219,17 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
                         trace.append_separated([\
                             "# show color legend",
                             "%s.SetScalarBarVisibility(%s, True)" % (\
-                                smtracer.Trace.get_accessor(rep),
-                                smtracer.Trace.get_accessor(view))])
+                                smtrace.Trace.get_accessor(rep),
+                                smtrace.Trace.get_accessor(view))])
                 except AttributeError: pass
             # save the scalar bar properties themselves.
             if view_scalarbars:
                 trace.append_separated("# setup the color legend parameters for each legend in this view")
                 for rep in view_scalarbars:
-                    smtracer.Trace.get_accessor(rep)
-            trace.append_separated(smtracer.get_current_trace_output_and_reset(raw=True))
+                    smtrace.Trace.get_accessor(rep)
+            trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
     del trace_config
-    smtracer.stop_trace()
+    smtrace.stop_trace()
     #print trace
     return str(trace) if not raw else trace.raw_data()
 

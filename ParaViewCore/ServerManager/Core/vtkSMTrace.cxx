@@ -119,10 +119,10 @@ vtkSMTrace::vtkSMTrace():
 #ifdef PARAVIEW_ENABLE_PYTHON
   // ensure Python interpreter is initialized.
   vtkPythonInterpreter::Initialize();
-  this->Internals->TraceModule.TakeReference(PyImport_ImportModule("paraview.smtracer"));
+  this->Internals->TraceModule.TakeReference(PyImport_ImportModule("paraview.smtrace"));
   if (!this->Internals->TraceModule)
     {
-    vtkErrorMacro("Failed to import paraview.smtracer module.");
+    vtkErrorMacro("Failed to import paraview.smtrace module.");
     }
   else
     {
@@ -130,14 +130,14 @@ vtkSMTrace::vtkSMTrace():
       PyObject_GetAttrString(this->Internals->TraceModule, "_create_trace_item_internal"));
     if (!this->Internals->CreateItemFunction)
       {
-      vtkErrorMacro("Failed to locate the _create_trace_item_internal function in paraview.smtracer module.");
+      vtkErrorMacro("Failed to locate the _create_trace_item_internal function in paraview.smtrace module.");
       this->Internals->TraceModule.TakeReference(NULL);
       }
     this->Internals->UntraceableException.TakeReference(
       PyObject_GetAttrString(this->Internals->TraceModule, "Untraceable"));
     if (!this->Internals->UntraceableException)
       {
-      vtkErrorMacro("Failed to locate the Untraceable exception class in paraview.smtracer module.");
+      vtkErrorMacro("Failed to locate the Untraceable exception class in paraview.smtrace module.");
       this->Internals->TraceModule.TakeReference(NULL);
       this->Internals->CreateItemFunction.TakeReference(NULL);
       }
@@ -166,10 +166,10 @@ vtkStdString vtkSMTrace::GetState(
   vtkPythonInterpreter::Initialize();
   try
     {
-    SmartPyObject module(PyImport_ImportModule("paraview.smstate2"));
+    SmartPyObject module(PyImport_ImportModule("paraview.smstate"));
     if (!module || PyErr_Occurred())
       {
-      vtkGenericWarningMacro("Failed to import paraview.smstate2 module.");
+      vtkGenericWarningMacro("Failed to import paraview.smstate module.");
       throw 1;
       }
 
