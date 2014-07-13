@@ -14,9 +14,7 @@ CoProcessing."""
 #  3) The boolean to know if we need to rescale the data range
 # -----------------------------------------------------------------------------
 __output_contents = """
-try: paraview.simple
-except: from paraview.simple import *
-
+from paraview.simple import *
 from paraview import coprocessing
 
 

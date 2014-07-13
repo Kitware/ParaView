@@ -297,23 +297,6 @@ void pqPythonManager::updateMacroList()
 }
 
 //----------------------------------------------------------------------------
-void pqPythonManager::setSaveFullState(bool saveFullState)
-{
-  std::string code;
-  code += "from paraview import smstate\n";
-  if(saveFullState)
-    {
-    code += "smstate._save_full_state = True\n";
-    }
-  else
-    {
-    code += "smstate._save_full_state = False\n";
-    }
-
-  vtkPythonInterpreter::RunSimpleString(code.c_str());
-}
-
-//----------------------------------------------------------------------------
 void pqPythonManager::addMacro(const QString& fileName)
 {
   QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";

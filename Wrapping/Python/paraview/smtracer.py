@@ -277,7 +277,25 @@ class Accessor(object):
     def get_object(self):
         return self.__Object
 
-class ProxyAccessor(Accessor):
+class RealProxyAccessor(Accessor):
+    __CreateCallbacks = []
+
+    @classmethod
+    def register_create_callback(cls, function):
+        cls.__CreateCallbacks.insert(0, function)
+
+    @classmethod
+    def unregister_create_callback(cls, function):
+        cls.__CreateCallbacks.remove(function)
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        for x in cls.__CreateCallbacks:
+            try:
+                return x(*args, **kwargs)
+            except NotImplementedError: pass
+        return RealProxyAccessor(*args, **kwargs)
+
     def __init__(self, varname, proxy):
         Accessor.__init__(self, varname, proxy)
 
@@ -368,6 +386,9 @@ class ProxyAccessor(Accessor):
                     "# init the %s selected for '%s'" % (prop.value(), prop.get_property_name()))
                 trace.append(sub_trace)
         return trace.raw_data()
+
+def ProxyAccessor(*args, **kwargs):
+    return RealProxyAccessor.create(*args, **kwargs)
 
 class PropertyAccessor(Accessor):
     def __init__(self, propkey, prop, proxyAccessor):

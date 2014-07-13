@@ -10,7 +10,7 @@ Also refer to paraview.cpexport Module which is used to generate a complete
 Python CoProcessing script that can be used with in a vtkCPPythonScriptPipeline.
 """
 
-from paraview import smstate, smtrace, servermanager
+from paraview import smtracer, smstate2, servermanager
 
 class cpstate_globals: pass
 
@@ -31,9 +31,9 @@ def locate_simulation_inputs(proxy):
         return [ proxy.cpSimulationInput ]
 
     input_proxies = []
-    for property in smtrace.servermanager.PropertyIterator(proxy):
+    for property in servermanager.PropertyIterator(proxy):
         if property.IsA("vtkSMInputProperty"):
-            ip = smtrace.servermanager.InputProperty(proxy, property)
+            ip = servermanager.InputProperty(proxy, property)
             input_proxies = input_proxies + ip[:]
 
     simulation_inputs = []
@@ -48,7 +48,7 @@ def locate_simulation_inputs(proxy):
 def locate_simulation_inputs_for_view(view_proxy):
     """Given a view proxy, retruns a list of source proxies that have been
         flagged as the 'simulation input' in the state exporting wizard."""
-    reprProp = smtrace.servermanager.ProxyProperty(view_proxy, view_proxy.GetProperty("Representations"))
+    reprProp = servermanager.ProxyProperty(view_proxy, view_proxy.GetProperty("Representations"))
     reprs = reprProp[:]
     all_sim_inputs = []
     for repr in reprs:
@@ -56,72 +56,125 @@ def locate_simulation_inputs_for_view(view_proxy):
         all_sim_inputs = all_sim_inputs + sim_inputs
     return all_sim_inputs
 
-def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
-    """Callback registered with the smtrace to control the code recorded by the
-       trace for simulation inputs and writers, among other things."""
-    if info.ProxyName in cpstate_globals.simulation_input_map.keys():
-        # mark this proxy as a simulation input to make it easier to locate the
-        # simulation input for the writers.
-        info.Proxy.cpSimulationInput = cpstate_globals.simulation_input_map[info.ProxyName]
-        return ('coprocessor.CreateProducer',\
-          [ 'datadescription', '\"%s\"' % (cpstate_globals.simulation_input_map[info.ProxyName]) ], '')
+# -----------------------------------------------------------------------------
+class ProducerAccessor(smtracer.RealProxyAccessor):
+    """This accessor is created instead of the standard one for proxies that
+    have been marked as simulation inputs. This accessor override the
+    trace_ctor() method to trace the constructor as the CreateProducer() call,
+    since the proxy is a dummy, in this case.
+    """
+    def __init__(self, varname, proxy, simname):
+        self.SimulationInputName = simname
+        smtracer.RealProxyAccessor.__init__(self, varname, proxy)
+        # this cpSimulationInput attribute is used to locate the proxy later on.
+        proxy.SMProxy.cpSimulationInput = simname
 
-    # handle views
-    proxy = info.Proxy
-    if proxy.GetXMLGroup() == 'views' and cpstate_globals.export_rendering:
-        proxyName = servermanager.ProxyManager().GetProxyName("views", proxy)
-        ctorArgs = [ctorMethod,
-                    "\"%s\"" % cpstate_globals.screenshot_info[proxyName][0],
-                    cpstate_globals.screenshot_info[proxyName][1],
-                    cpstate_globals.screenshot_info[proxyName][2],
-                    cpstate_globals.screenshot_info[proxyName][3],
-                    cpstate_globals.screenshot_info[proxyName][4],
-                    cpstate_globals.screenshot_info[proxyName][5]]
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+        trace = smtracer.TraceOutput()
+        trace.append("# create a producer from a simulation input")
+        trace.append("%s = coprocessor.CreateProducer(datadescription, '%s')" % \
+            (self, self.SimulationInputName))
+        return trace.raw_data()
+
+# -----------------------------------------------------------------------------
+class ViewAccessor(smtracer.RealProxyAccessor):
+    """Accessor for views. Overrides trace_ctor() to trace registering of the
+    view with the coprocessor. (I wonder if this registering should be moved to
+    the end of the state for better readability of the generated state files.
+    """
+    def __init__(self, varname, proxy, proxyname):
+        smtracer.RealProxyAccessor.__init__(self, varname, proxy)
+        self.ProxyName = proxyname
+
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+        original_trace = smtracer.RealProxyAccessor.trace_ctor(\
+            self, ctor, filter, ctor_args, skip_assignment)
+        trace = smtracer.TraceOutput(original_trace)
+        trace.append_separated(["# register the view with coprocessor",
+          "# and provide it with information such as the filename to use,",
+          "# how frequently to write the images, etc."])
+        params = cpstate_globals.screenshot_info[self.ProxyName]
+        assert len(params) == 6
+        trace.append([
+            "coprocessor.RegisterView(%s," % self,
+            "    filename='%s', freq=%s, fittoscreen=%s, magnification=%s, width=%s, height=%s)" %\
+                (params[0], params[1], params[2], params[3], params[4], params[5])])
+        trace.append_separator()
+        return trace.raw_data()
+
+# -----------------------------------------------------------------------------
+class WriterAccessor(smtracer.RealProxyAccessor):
+    """Accessor for writers. Overrides trace_ctor() to use the actual writer
+    proxy name instead of the dummy-writer proxy's name. Also updates the
+    write_frequencies maintained in cpstate_globals with the write frequencies
+    for the writer.
+    """
+    def __init__(self, varname, proxy):
+        smtracer.RealProxyAccessor.__init__(self, varname, proxy)
+        write_frequency = proxy.WriteFrequency
+
+        # Locate which simulation input this write is connected to, if any. If so,
+        # we update the write_frequencies datastructure accordingly.
+        sim_inputs = locate_simulation_inputs(proxy)
+        for sim_input_name in sim_inputs:
+            if not write_frequency in cpstate_globals.write_frequencies[sim_input_name]:
+                cpstate_globals.write_frequencies[sim_input_name].append(write_frequency)
+                cpstate_globals.write_frequencies[sim_input_name].sort()
+
+    def get_proxy_label(self, xmlgroup, xmlname):
+        pxm = servermanager.ProxyManager()
+        prototype = pxm.GetPrototypeProxy(xmlgroup, xmlname)
+        if not prototype:
+            # a bit of a hack but we assume that there's a stub of some
+            # writer that's not available in this build but is available
+            # with the build used by the simulation code (probably through a plugin)
+            # this stub must have the proper name in the coprocessing hints
+            print "WARNING: Could not find", xmlname, "writer in", xmlgroup, \
+                "XML group. This is not a problem as long as the writer is available with " \
+                "the ParaView build used by the simulation code."
+            return servermanager._make_name_valid(xmlname)
+        return servermanager._make_name_valid(prototype.GetXMLLabel())
+
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+        xmlElement = self.get_object().GetHints().FindNestedElementByName("WriterProxy")
+        xmlgroup = xmlElement.GetAttribute("group")
+        xmlname = xmlElement.GetAttribute("name")
+        write_frequency = self.get_object().WriteFrequency
+        filename = self.get_object().FileName
+        ctor = self.get_proxy_label(xmlgroup, xmlname)
+        original_trace = smtracer.RealProxyAccessor.trace_ctor(\
+            self, ctor, filter, ctor_args, skip_assignment)
+
+        trace = smtracer.TraceOutput(original_trace)
+        trace.append_separated(["# register the writer with coprocessor",
+          "# and provide it with information such as the filename to use,",
+          "# how frequently to write the data, etc."])
+        trace.append("coprocessor.RegisterWriter(%s, filename='%s', freq=%s)" % \
+            (self, filename, write_frequency))
+        trace.append_separator()
+        return trace.raw_data()
+
+def cp_hook(varname, proxy):
+    """callback to create our special accessors instead of the standard ones."""
+    pname = smtracer.Trace.get_registered_name(proxy, "sources")
+    if pname and pname in cpstate_globals.simulation_input_map:
+        return ProducerAccessor(varname, proxy, cpstate_globals.simulation_input_map[pname])
+    if pname and proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):
+        return WriterAccessor(varname, proxy)
+    pname = smtracer.Trace.get_registered_name(proxy, "views")
+    if pname:
         cpstate_globals.view_proxies.append(proxy)
-        return ("coprocessor.CreateView", ctorArgs, extraCtorCommands)
+        return ViewAccessor(varname, proxy, pname)
+    raise NotImplementedError
 
-    # handle writers.
-    if not proxy.GetHints() or \
-      not proxy.GetHints().FindNestedElementByName("WriterProxy"):
-        return (ctorMethod, ctorArgs, extraCtorCommands)
-
-    # this is a writer we are dealing with.
-    xmlElement = proxy.GetHints().FindNestedElementByName("WriterProxy")
-    xmlgroup = xmlElement.GetAttribute("group")
-    xmlname = xmlElement.GetAttribute("name")
-    pxm = smtrace.servermanager.ProxyManager()
-    ctorMethod = None
-    writer_proxy = pxm.GetPrototypeProxy(xmlgroup, xmlname)
-    if writer_proxy:
-        # we have a valid prototype based on the writer stub
-        ctorMethod =  \
-            smtrace.servermanager._make_name_valid(writer_proxy.GetXMLLabel())
-    else:
-        # a bit of a hack but we assume that there's a stub of some
-        # writer that's not available in this build but is available
-        # with the build used by the simulation code (probably through a plugin)
-        # this stub must have the proper name in the coprocessing hints
-        print "WARNING: Could not find", xmlname, "writer in", xmlgroup, \
-            "XML group. This is not a problem as long as the writer is available with " \
-            "the ParaView build used by the simulation code."
-        ctorMethod =  \
-            smtrace.servermanager._make_name_valid(xmlname)
-
-    write_frequency = proxy.GetProperty("WriteFrequency").GetElement(0)
-    ctorArgs = [ctorMethod, \
-                "\"%s\"" % proxy.GetProperty("FileName").GetElement(0),\
-                write_frequency]
-    ctorMethod = "coprocessor.CreateWriter"
-
-    # Locate which simulation input this write is connected to, if any. If so,
-    # we update the write_frequencies datastructure accordingly.
-    sim_inputs = locate_simulation_inputs(proxy)
-    for sim_input_name in sim_inputs:
-        if not write_frequency in cpstate_globals.write_frequencies[sim_input_name]:
-            cpstate_globals.write_frequencies[sim_input_name].append(write_frequency)
-            cpstate_globals.write_frequencies[sim_input_name].sort()
-
-    return (ctorMethod, ctorArgs, '')
+class cpstate_filter_proxies_to_serialize(object):
+    """filter used to skip views and representations a when export_rendering is
+    disabled."""
+    def __call__(self, proxy):
+        if not smstate2.visible_representations()(proxy): return False
+        if (not cpstate_globals.export_rendering) and \
+            (proxy.GetXMLGroup() in ["views", "representations"]): return False
+        return True
 
 # -----------------------------------------------------------------------------
 def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
@@ -148,45 +201,25 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
         cpstate_globals.write_frequencies[key] = []
 
     # Start trace
-    capture_modified_properties = not smstate._save_full_state
-    smtrace.start_trace(CaptureAllProperties=True,
-                        CaptureModifiedProperties=capture_modified_properties,
-                        UseGuiName=True)
+    filter = cpstate_filter_proxies_to_serialize()
+    smtracer.RealProxyAccessor.register_create_callback(cp_hook)
+    state = smstate2.get_state(filter=filter, raw=True)
+    smtracer.RealProxyAccessor.unregister_create_callback(cp_hook)
 
-    # Disconnect the smtrace module's observer.  It should not be
-    # active while tracing the state.
-    smtrace.reset_trace_observer()
-
-    # update trace globals.
-    smtrace.trace_globals.proxy_ctor_hook = staticmethod(cp_hook)
-    smtrace.trace_globals.trace_output.clear()
-
-    # Get list of proxy lists
-    proxy_lists = smstate.get_proxy_lists_ordered_by_group(WithRendering=cpstate_globals.export_rendering)
-    # Now register the proxies with the smtrace module
-    for proxy_list in proxy_lists:
-        smstate.register_proxies_by_dependency(proxy_list)
-
-    # Calling append_trace causes the smtrace module to sort out all the
-    # registered proxies and their properties and write them as executable
-    # python.
-    smtrace.append_trace()
-
-    # Stop trace and print it to the console
-    smtrace.stop_trace()
-
-    # During tracing, cp_hook() will fill up the cpstate_globals.view_proxies
-    # list with view proxies, if rendering was enabled.
-    for view_proxy in cpstate_globals.view_proxies:
-        # Locate which simulation input this write is connected to, if any. If so,
-        # we update the write_frequencies datastructure accordingly.
-        sim_inputs = locate_simulation_inputs_for_view(view_proxy)
-        proxyName = servermanager.ProxyManager().GetProxyName("views", view_proxy)
-        image_write_frequency = cpstate_globals.screenshot_info[proxyName][1]
-        for sim_input_name in sim_inputs:
-            if not image_write_frequency in cpstate_globals.write_frequencies[sim_input_name]:
-                cpstate_globals.write_frequencies[sim_input_name].append(image_write_frequency)
-                cpstate_globals.write_frequencies[sim_input_name].sort()
+    # iterate over all views that were saved in state and update write requencies
+    if export_rendering:
+        pxm = servermanager.ProxyManager()
+        for key, vtuple in screenshot_info.iteritems():
+            view = pxm.GetProxy("views", key)
+            if not view: continue
+            image_write_frequency = int(vtuple[1])
+            # Locate which simulation input this write is connected to, if any. If so,
+            # we update the write_frequencies datastructure accordingly.
+            sim_inputs = locate_simulation_inputs_for_view(view)
+            for sim_input_name in sim_inputs:
+                if not image_write_frequency in cpstate_globals.write_frequencies:
+                    cpstate_globals.write_frequencies[sim_input_name].append(image_write_frequency)
+                    cpstate_globals.write_frequencies[sim_input_name].sort()
 
     # Create global fields values
     pipelineClassDef = "\n"
@@ -198,10 +231,15 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
     pipelineClassDef += "    class Pipeline:\n";
 
     # add the traced code.
-    for original_line in smtrace.trace_globals.trace_output.raw_data():
+    for original_line in state:
         for line in original_line.split("\n"):
-            pipelineClassDef += "      " + line + "\n";
-    smtrace.clear_trace()
+            if line.find("import *") != -1 or \
+                line.find("#### import the simple") != -1:
+                continue
+            if line:
+                pipelineClassDef += "      " + line + "\n"
+            else:
+                pipelineClassDef += "\n"
     pipelineClassDef += "    return Pipeline()\n";
     pipelineClassDef += "\n"
     pipelineClassDef += "  class CoProcessor(coprocessing.CoProcessor):\n"
@@ -209,6 +247,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info):
     pipelineClassDef += "      self.Pipeline = _CreatePipeline(self, datadescription)\n"
     pipelineClassDef += "\n"
     pipelineClassDef += "  coprocessor = CoProcessor()\n";
+    pipelineClassDef += "  # these are the frequencies at which the coprocessor updates.\n"
     pipelineClassDef += "  freqs = " + str(cpstate_globals.write_frequencies) + "\n"
     pipelineClassDef += "  coprocessor.SetUpdateFrequencies(freqs)\n"
     pipelineClassDef += "  return coprocessor\n"
@@ -220,10 +259,13 @@ def run(filename=None):
         specified, if any, else dumps it out on stdout."""
 
     from paraview import simple, servermanager
+    simple.LoadDistributedPlugin("CoProcessingPlugin")
     wavelet = simple.Wavelet(registrationName="Wavelet1")
     contour = simple.Contour()
     display = simple.Show()
     view = simple.Render()
+    # create a new 'Parallel PolyData Writer'
+    parallelPolyDataWriter0 = simple.ParallelPolyDataWriter()
 
     viewname = servermanager.ProxyManager().GetProxyName("views", view.SMProxy)
     script = DumpPipeline(export_rendering=True,

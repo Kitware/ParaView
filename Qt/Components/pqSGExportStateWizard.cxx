@@ -31,30 +31,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSGExportStateWizard.h"
 
-#include <pqApplicationCore.h>
-#include <pqContextView.h>
-#include <pqFileDialog.h>
-#include <pqPipelineFilter.h>
-#include <pqPipelineRepresentation.h>
-#include <pqPipelineSource.h>
-#include <pqPythonDialog.h>
-#include <pqPythonManager.h>
-#include <pqRenderViewBase.h>
-#include <pqServerManagerModel.h>
-#include <pqSettings.h>
+#include "pqApplicationCore.h"
+#include "pqContextView.h"
 #include "pqImageOutputInfo.h"
+#include "pqPipelineFilter.h"
+#include "pqRenderViewBase.h"
+#include "pqServerManagerModel.h"
+#include "vtkPythonInterpreter.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMCoreUtilities.h"
 
-#include <vtkImageData.h>
-#include <vtkNew.h>
-#include <vtkPNGWriter.h>
-#include <vtkPVXMLElement.h>
-#include <vtkSMCoreUtilities.h>
-#include <vtkSMProxyManager.h>
-#include <vtkSMSessionProxyManager.h>
-#include <vtkSMSourceProxy.h>
-#include <vtkSMViewProxy.h>
-#include <vtkSmartPointer.h>
-#include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <QLabel>
@@ -398,33 +384,12 @@ bool pqSGExportStateWizard::validateCurrentPage()
     return true;
     }
 
-  // Last Page, export the state.
-  pqPythonManager* manager = qobject_cast<pqPythonManager*>(
-    pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
-
-  pqPythonDialog* dialog = 0;
-  if (manager)
-    {
-    dialog = manager->pythonShellDialog();
-    }
-  if (!dialog)
-    {
-    qCritical("Failed to locate Python dialog. Cannot save state.");
-    return true;
-    }
-
-  // Get from the settings whether or not we should save the full state
-  // or just non-default values.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if(settings)
-    {
-    manager->setSaveFullState(settings->value("saveFullState", false).toBool());
-    }
-
   QString command;
-  if(this->getCommandString(command))
+  if (this->getCommandString(command))
     {
-    dialog->runString(command);
+    // ensure Python in initialized.
+    vtkPythonInterpreter::Initialize();
+    vtkPythonInterpreter::RunSimpleString(command.toLatin1().data());
     return true;
     }
   return false;

@@ -99,12 +99,13 @@ def get_producers(proxy, filter, producer_set):
     except AttributeError: pass
 
 def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES,
-    skipHiddenRepresentations=True, source_set=[]):
+    skipHiddenRepresentations=True, source_set=[], filter=None, raw=False):
     """Returns the state string"""
     if sm.vtkSMTrace.GetActiveTracer():
         raise RuntimeError, "Cannot generate Python state when tracing is active."
 
-    filter = visible_representations() if skipHiddenRepresentations else supported_proxies()
+    if filter is None:
+        filter = visible_representations() if skipHiddenRepresentations else supported_proxies()
 
     # build a set of proxies of interest
     if source_set:
@@ -230,7 +231,7 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     del trace_config
     smtracer.stop_trace()
     #print trace
-    return str(trace)
+    return str(trace) if not raw else trace.raw_data()
 
 if __name__ == "__main__":
     print  "Running test"
