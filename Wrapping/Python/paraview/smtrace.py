@@ -1,3 +1,61 @@
+r"""smtrace module is used along with vtkSMTrace to generate Python trace for
+ParaView. While this module is primarily designed to be used from the ParaView
+GUI, Python scripts can use this module too to generate trace from the script
+executed.
+
+Typical usage is as follows::
+
+    from paraview import smtrace
+    config = smtracer.start_trace()
+
+    # config is an instance of vtkSMTrace. One can setup properties on this
+    # object to control  the generated trace. e.g.
+    config.SetFullyTraceSupplementalProxies(True)
+
+    # do the actions to trace.
+        ...
+
+    # stop trace. The generated trace is returned.
+    txt = smtracer.stop_trace()
+
+
+=========================
+Developer Documentation
+=========================
+
+This section describes the module design for developers wanted to extend this
+module or use this module for advance tracing/state generation.
+
+The design can be described as follows:
+
+C++ code (either in ServerManager or the GUI layer) should trace actions.
+This is done using SM_SCOPED_TRACE() macro provided by vtkSMTrace. When tracing
+is enabled, each SM_SCOPED_TRACE() call creates a :class:`.TraceItem`. The TraceItem
+instance is scoped, i.e. the object is finalized and destroyed when the scope
+exits.
+
+There are various types of TraceItem, ranging from those that trace specific
+action such as :class:`.Show`, or those that trace any modified properties
+(:class:`.PropertiesModified`). Generic TraceItem types, such as
+:class:`.CallMethod` and :class:`.CallFunction` can be used to trace methods
+called on vtkObject instances or functions in the global namespace.
+
+TraceItems create or use :class:`.Accessor` instances. Accessors are objects
+created for Proxies and Properties in ParaView. Accessor knows how to access
+that proxy or property in the Python trace. TraceItems that create new proxies
+such as :class:`.RegisterPipelineProxy` and :class:`.RegisterViewProxy`, create
+new :class:`.ProxyAccessor` instances. Other such as
+:class:`.PropertiesModified` trace item rely on accessors already created.
+:class:`.Trace` can provide access to already created accessor as well as create
+new accessor for proxies create before the tracing began
+(:method:`.Trace.get_accessor`).
+
+Additionally, there are filters such as :class:`.ProxyFilter`,
+:class:`.PipelineProxyFilter`, etc. which are used to filter properties that get
+traced and where they get traced i.e. in contructor call or right after it.
+
+"""
+
 import weakref
 import paraview.servermanager as sm
 import paraview.simple as simple
@@ -50,6 +108,7 @@ class Trace(object):
 
     @classmethod
     def get_registered_name(cls, proxy, reggroup):
+        """Returns the registered name for `proxy` in the given `reggroup`."""
         return proxy.SMProxy.GetSessionProxyManager().GetProxyName(reggroup, proxy.SMProxy)
 
     @classmethod
@@ -76,8 +135,13 @@ class Trace(object):
 
     @classmethod
     def get_accessor(cls, obj):
+        """Returns an accessor for obj. If none exists, a new one may be
+        created, if possible. Currently obj is expected to be a
+        :class:`servermanager.Proxy` instance. In future, we may change this to
+        be a vtkSMProxy instance instead."""
         if obj is None:
             return None
+        assert isinstance(obj, sm.Proxy)
         try:
             return cls.__REGISTERED_ACCESSORS[obj]
         except KeyError:
