@@ -182,15 +182,12 @@ class Trace(object):
                 trace = TraceOutput()
                 accessor = ProxyAccessor(cls.get_varname(pname), obj)
                 if obj == simple.GetActiveView():
-                    ctor_args = "'%s'" % obj.GetXMLName()
                     trace.append("# get active view")
-                    trace.append(accessor.trace_ctor(\
-                      "GetActiveViewOrCreate", ExistingProxy(ViewProxyFilter()), ctor_args))
+                    trace.append("%s = GetActiveViewOrCreate('%s')" % (accessor, obj.GetXMLName()))
                 else:
                     ctor_args = "'%s', viewtype='%s'" % (pname, obj.GetXMLName())
                     trace.append("# find view")
-                    trace.append(accessor.trace_ctor(\
-                      "FindViewOrCreate", ExistingProxy(ViewProxyFilter()), ctor_args))
+                    trace.append("%s = FindViewOrCreate(%s)" % (accessor, ctor_args))
                 # trace view size, if present. We trace this commented out so
                 # that the playback in the GUI doesn't cause issues.
                 viewSizeAccessor = accessor.get_property("ViewSize")
@@ -595,7 +592,7 @@ class RepresentationProxyFilter(PipelineProxyFilter):
 class ViewProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         # skip "Representations" property.
-        if prop.PropertyKey in ["Representations"]: return True
+        if prop.PropertyKey in ["Representations", "CameraClippingRange"]: return True
         return ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False)
 
 class AnimationProxyFilter(ProxyFilter):

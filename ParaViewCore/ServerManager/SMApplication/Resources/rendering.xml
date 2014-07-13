@@ -71,7 +71,6 @@
                             immediate_update="1"
                             information_property="CameraClippingRangeInfo"
                             name="CameraClippingRange"
-                            is_internal="1"
                             number_of_elements="2">
         <!-- bogus property, only left to avoid backwards compatibility issues
              for now-->
