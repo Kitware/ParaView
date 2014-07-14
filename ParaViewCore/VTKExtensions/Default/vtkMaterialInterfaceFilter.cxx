@@ -223,6 +223,28 @@ vtkUniformGrid* GetReferenceGrid(vtkNonOverlappingAMR *amrds)
   // This process has no grids
   return NULL;
 }
+
+// Construct a list of the selected array names
+int GetEnabledArrayNames(
+        vtkDataArraySelection *das,
+        vector<string> &names)
+{
+  int nEnabled=das->GetNumberOfArraysEnabled();
+  names.resize(nEnabled);
+  int nArraysTotal=das->GetNumberOfArrays();
+  for (int i=0,j=0; i<nArraysTotal; ++i)
+    {
+    // skip disabled arrays
+    if ( !das->GetArraySetting(i) )
+      {
+      continue;
+      }
+    // save names of enabled arrays, inc name count
+    names[j]=das->GetArrayName(i);
+    ++j;
+    }
+  return nEnabled;
+}
 };
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
