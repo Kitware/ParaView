@@ -1586,10 +1586,12 @@ class _active_objects(object):
         active_view_model = self.__get_selection_model("ActiveView")
         if view:
             active_view_model = self.__get_selection_model("ActiveView", view.GetSession())
-            active_view_model.SetCurrentProxy(view.SMProxy, 0)
+            active_view_model.SetCurrentProxy(view.SMProxy,
+                active_view_model.CLEAR_AND_SELECT)
         else:
             active_view_model = self.__get_selection_model("ActiveView")
-            active_view_model.SetCurrentProxy(None, 0)
+            active_view_model.SetCurrentProxy(None,
+                active_view_model.CLEAR_AND_SELECT)
 
     def get_view(self):
         "Returns the active view."
@@ -1602,10 +1604,12 @@ class _active_objects(object):
         if source:
             # 3 == CLEAR_AND_SELECT
             active_sources_model = self.__get_selection_model("ActiveSources", source.GetSession())
-            active_sources_model.SetCurrentProxy(source.SMProxy, 3)
+            active_sources_model.SetCurrentProxy(source.SMProxy,
+                active_sources_model.CLEAR_AND_SELECT)
         else:
             active_sources_model = self.__get_selection_model("ActiveSources")
-            active_sources_model.SetCurrentProxy(None, 3)
+            active_sources_model.SetCurrentProxy(None,
+                active_sources_model.CLEAR_AND_SELECT)
 
     def __convert_proxy(self, px):
         "Internal method."
