@@ -54,6 +54,23 @@ Additionally, there are filters such as :class:`.ProxyFilter`,
 :class:`.PipelineProxyFilter`, etc. which are used to filter properties that get
 traced and where they get traced i.e. in contructor call or right after it.
 
+=========================
+Future cleanups
+=========================
+
+Simplifying PropertyAccessor
+----------------------------
+These are first class accessors right now. They get registered
+with the Trace etc. The idea was we may need to discover these based on just a
+property that was modified. That really isn't true. We always have the proxy.
+Thus, there's no need register these. That will make cleanup easier.
+
+Using vtkSMProxy instead of servermanager.Proxy()
+-------------------------------------------------
+Currently, all ivars are expected to be Proxy() not vtkSMProxy. This adds extra
+burden for garbage collection. We should change that use vtkSMProxy. In my first
+attempt that failed before of how PropertyAccessor as structured. By simplifying
+them, I believe this is achievable.
 """
 
 import weakref
@@ -232,7 +249,7 @@ class Trace(object):
                 "# get color legend/bar for %s in view %s" % (lutAccessor, viewAccessor))
             trace.append(accessor.trace_ctor(\
                 "GetScalarBar",
-                ExistingProxy(ScalarBarProxyFilter()),
+                SupplementalProxy(ScalarBarProxyFilter()),
                 ctor_args="%s, %s" % (lutAccessor, viewAccessor)))
             cls.Output.append_separated(trace.raw_data())
             return True
@@ -272,7 +289,7 @@ class Trace(object):
             trace = TraceOutput()
             trace.append("# get %s for '%s'" % (comment, arrayName))
             trace.append(accessor.trace_ctor(\
-                method, ExistingProxy(TransferFunctionProxyFilter()), ctor_args="'%s'" % arrayName))
+                method, SupplementalProxy(TransferFunctionProxyFilter()), ctor_args="'%s'" % arrayName))
             cls.Output.append_separated(trace.raw_data())
             return True
         return False
@@ -635,8 +652,11 @@ class ScalarBarProxyFilter(ProxyFilter):
             return False
         return ProxyFilter.should_never_trace(self, prop)
 
-
-def ExistingProxy(cls):
+def SupplementalProxy(cls):
+    """This function decorates a ProxyFilter. Designed to be
+    used for supplemental proxies, so that we can centralize the logic
+    to decide whether to trace any of the properties on the supplemental
+    proxies the first time that proxy is accessed."""
     setting = sm.vtkSMTrace.GetActiveTracer().GetFullyTraceSupplementalProxies()
     if setting: return cls
 
