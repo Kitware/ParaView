@@ -58,10 +58,6 @@ def DoCoProcessing(datadescription):
   fname = 'CPPressure' + str(timestep) + '.png'
   WriteImage(fname)
 
-  # explicitly delete the proxies -- simple reset the session.
-  controller = servermanager.ParaViewPipelineController()
-  controller.ResetSession(servermanager.ActiveConnection.Session)
-
 
 def RequestDataDescription(datadescription):
   time = datadescription.GetTime()

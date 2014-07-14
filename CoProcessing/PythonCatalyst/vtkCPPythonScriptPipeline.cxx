@@ -139,10 +139,64 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   // need to save the script name as it is used as the name of the module
   this->SetPythonScriptName(fileNameName.c_str());
 
+  // only process 0 reads the actual script and then broadcasts it out
+  char* scriptText;
+
+  int rank = controller->GetLocalProcessId();
+  int scriptSize = 0;
+  if(rank == 0)
+    {
+    std::ifstream fin(fileName, ios::binary);
+    fin.seekg(0, ios::end);
+    scriptSize = static_cast<int>(fin.tellg())+1;
+    scriptText = new char[scriptSize];
+    fin.seekg(0, ios::beg);
+    fin.read(scriptText, scriptSize-1);
+    scriptText[scriptSize-1] = '\0';
+    }
+
+  controller->Broadcast(&scriptSize, 1, 0);
+
+  if (rank != 0)
+    {
+    scriptText = new char[scriptSize];
+    }
+
+  controller->Broadcast(scriptText, scriptSize, 0);
+
+  // The code below creates a module from the scriptText string.
+  // This requires the manual creation of a module object like this:
+  //
+  // import types
+  // _foo = types.ModuleType('foo')
+  // _foo.__file__ = 'foo.pyc'
+  // import sys
+  // sys.module['foo'] = _foo
+  // _source= scriptText
+  // _code = compile(_source, 'foo.py', 'exec')
+  // exec _code in _foo.__dict__
+  // del _source
+  // del _code
+  // import foo
   vtksys_ios::ostringstream loadPythonModules;
-  loadPythonModules
-    << "sys.path.append('" << fileNamePath << "')\n"
-    << "import " << fileNameName << "\n";
+  loadPythonModules << "import types" << std::endl;
+  loadPythonModules << "_" << fileNameName << " = types.ModuleType('" << fileNameName << "')" << std::endl;
+  loadPythonModules <<  "_" << fileNameName << ".__file__ = '" << fileNameName << ".pyc'" << std::endl;
+
+  loadPythonModules << "import sys" << std::endl;
+  loadPythonModules << "sys.modules['" << fileNameName << "'] = _" << fileNameName << std::endl;
+
+  loadPythonModules << "_source = \"\"\"" << std::endl;
+  loadPythonModules << scriptText;
+  loadPythonModules << "\"\"\"" << std::endl;
+
+  loadPythonModules << "_code = compile(_source, \"" << fileNameName << ".py\", \"exec\")" << std::endl;
+  loadPythonModules << "exec _code in _" << fileNameName << ".__dict__" << std::endl;
+  loadPythonModules << "del _source" << std::endl;
+  loadPythonModules << "del _code" << std::endl;
+  loadPythonModules << "import " << fileNameName << std::endl;
+
+  delete[] scriptText;
 
   vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
   return 1;
@@ -208,7 +262,7 @@ vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
   sprintf(addressOfPointer, "%p", pointer);
 #endif
   char *aplus = addressOfPointer;
-  if ((addressOfPointer[0] == '0') && 
+  if ((addressOfPointer[0] == '0') &&
       ((addressOfPointer[1] == 'x') || addressOfPointer[1] == 'X'))
     {
     aplus += 2; //skip over "0x"
