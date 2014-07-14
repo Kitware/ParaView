@@ -132,7 +132,7 @@ endif()
 
 # SavePythonState test
 if (PARAVIEW_BUILD_QT_GUI)
-  if(BUILD_SHARED_LIBS AND TARGET paraview)
+  if(BUILD_SHARED_LIBS)
     add_test(NAME SavePythonState
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>

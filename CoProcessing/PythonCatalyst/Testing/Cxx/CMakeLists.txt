@@ -81,7 +81,7 @@ if (PARAVIEW_BUILD_QT_GUI)
   # which will add in extra properties to objects in the created script
   # which can't be used when running the 'simulation' since those same
   # plugins won't be loaded then.
-  IF ( BUILD_SHARED_LIBS AND TARGET paraview )
+  IF ( BUILD_SHARED_LIBS )
     add_test(NAME CoProcessingFullWorkflow
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
