@@ -84,7 +84,7 @@ def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, write
         WriteImages(currentTimeStep, timeSteps[currentTimeStep], views)
         WriteFiles(currentTimeStep, timeSteps[currentTimeStep], writers)
 
-def CreateReader(ctor, args, fileInfo):
+def CreateReader(ctor, fileInfo, **kwargs):
     "Creates a reader, checks if it can be used, and sets the filenames"
     reader = ctor()
     CheckReader(reader)
@@ -92,20 +92,24 @@ def CreateReader(ctor, args, fileInfo):
     files = glob.glob(fileInfo)
     files.sort() # assume there is a logical ordering of the filenames that corresponds to time ordering
     reader.FileName = files
-    for a in args:
-        s = "reader."+a
-        exec (s)
-
+    if kwargs:
+        pvsimple.SetProperties(reader, **kwargs)
     return reader
 
 def CreateWriter(ctor, filename, tp_writers):
     writer = ctor()
+    return RegisterWriter(writer, filename, tp_writers)
+
+def RegisterWriter(writer, filename, tp_writers):
     writer.FileName = filename
     tp_writers.append(writer)
     return writer
 
 def CreateView(proxy_ctor, filename, magnification, width, height, tp_views):
     view = proxy_ctor()
+    return RegisterView(view, filename, magnification, width, height, tp_views)
+
+def RegisterView(view, filename, magnification, width, height, tp_views):
     view.add_attribute("tpFileName", filename)
     view.add_attribute("tpMagnification", magnification)
     tp_views.append(view)
