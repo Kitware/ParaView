@@ -359,7 +359,6 @@ void vtkPythonView::StillRender()
     if (imageData)
       {
       this->RenderTexture->SetInputData(imageData);
-      //imageData->Delete();
       this->Renderer->TexturedBackgroundOn();
       }
     else
