@@ -696,6 +696,7 @@ def CreateWriter(filename, proxy=None, **extraArgs):
     if not proxy:
         raise RuntimeError, "Could not locate source to write"
     writer_proxy = writer_factory.CreateWriter(filename, proxy.SMProxy, proxy.Port)
+    writer_proxy.UnRegister(None)
     pyproxy = servermanager._getPyProxy(writer_proxy)
     if pyproxy and extraArgs:
         SetProperties(pyproxy, **extraArgs)
@@ -710,7 +711,7 @@ def SaveData(filename, proxy=None, **extraArgs):
         SaveData("sample.pvtp", source0)
         SaveData("sample.csv", FieldAssociation="Points")
     """
-    writer = CreateWriter(filename, proxy, extraArgs)
+    writer = CreateWriter(filename, proxy, **extraArgs)
     if not writer:
         raise RuntimeError, "Could not create writer for specified file or data type"
     writer.UpdateVTKObjects()
@@ -1280,14 +1281,19 @@ def ExportView(filename, view=None, **params):
         raise ValueError, "No 'view' was provided and no active view was found."
     if not filename:
         raise ValueError, "No filename specified"
-    helper = sm.vtkSMViewExportHelper()
+
+    # ensure that the view is up-to-date.
+    view.StillRender()
+    helper = servermanager.vtkSMViewExportHelper()
     proxy = helper.CreateExporter(filename, view.SMProxy)
     if not proxy:
         raise RuntimeError, "Failed to create exporter for ", filename
-    proxy = helper._getPyProxy(proxy)
+    proxy.UnRegister(None)
+    proxy = servermanager._getPyProxy(proxy)
     SetProperties(proxy, **params)
     proxy.Write()
     del proxy
+    del helper
 
 #==============================================================================
 # Usage and demo code set
