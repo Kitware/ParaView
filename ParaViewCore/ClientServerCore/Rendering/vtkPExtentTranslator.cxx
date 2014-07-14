@@ -121,6 +121,7 @@ void vtkPExtentTranslator::GatherExtents(vtkDataSet* dataset)
   else
     {
     assert(myId == 0);
+    (void)myId; // "use" myId in non-assert'ing builds.
     memcpy(&this->Internals->AllProcessExtents[0], myExtent, sizeof(int)*6);
     }
 }

@@ -710,6 +710,7 @@ int vtkNektarReader::RequestData(
     }
 
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  (void)my_rank; // "use" for non-debug builds.
   vtkDebugMacro(<<"RequestData: ENTER: rank: "<< my_rank << "  outputPort: "
                 << outputPort << "  this->ActualTimeStep = "<< this->ActualTimeStep);
 
@@ -929,6 +930,7 @@ void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructur
   double timer_diff;
 
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  (void)my_rank; // "use" for non-debug builds.
   vtkDebugMacro(<<"vtkNektarReader::updateVtuData: ENTER: Rank: "<<my_rank); //<<" :: outputPort: "<< outputPort);
   // if the grid in the curObj is not NULL, we may have everything we need
   if(this->curObj->ugrid)
@@ -1552,6 +1554,7 @@ void vtkNektarReader::updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructur
 void vtkNektarReader::addCellsToContinuumMesh(int qa, double ***num)
 {
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  (void)my_rank; // "use" for non-debug builds.
   vtkDebugMacro(<< "addCellsToContinuumMesh(): my_rank= " << my_rank<<"  ENTER");
   vtkIdType pts[4];
   int index = 0;
@@ -1745,12 +1748,14 @@ void vtkNektarReader::interpolateAndCopyContinuumPoints(int alloc_res, int inter
 
   free(X.x); free(X.y); free(X.z);
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  (void)my_rank; // "use" for non-debug builds.
   vtkDebugMacro(<< "interpolateContinuumCoordinates: my_rank= " << my_rank<<" number of points added:"<< index);
 }// vtkNektarReader::interpolateContinuumCoordinates()
 
 void vtkNektarReader::interpolateAndCopyContinuumData(vtkUnstructuredGrid* pv_ugrid, double **data_array, int interp_res, int num_verts)
 {
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  (void)my_rank; // "use" for non-debug builds.
   vtkDebugMacro(<< "interpolateAndCopyContinuumData: my_rank= " << my_rank<<"  ENTER");
 
   int index = 0;
@@ -1888,6 +1893,7 @@ void vtkNektarReader::interpolateAndCopyContinuumData(vtkUnstructuredGrid* pv_ug
 void vtkNektarReader::interpolateAndCopyWSSPoints(int alloc_res, int interp_res, vtkPoints* wss_points)
 {
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  (void)my_rank; // "use" for non-debug builds.
   vtkDebugMacro(<< "interpolateAndCopyWSSPoints: my_rank= " << my_rank<<": ENTER: alloc_res= "<< alloc_res<< " interp_res: " << interp_res);
   int index=0;
   double *wk = dvector(0,alloc_res*alloc_res);
@@ -1957,6 +1963,7 @@ vtkDebugMacro(<<  "interpolateAndCopyWSSPoints: my_rank= " << my_rank<<": Wall e
 void vtkNektarReader::interpolateAndCopyWSSData(int alloc_res, int num_verts, int interp_res)
 {
   int my_rank = vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  (void)my_rank; // "use" for non-debug builds.
   vtkDebugMacro(<< "interpolateAndCopyWSSData(): my_rank= " << my_rank<<"  ENTER");
 
   int ntot =3;
