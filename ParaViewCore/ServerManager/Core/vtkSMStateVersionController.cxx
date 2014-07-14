@@ -41,14 +41,6 @@ namespace
     return ostr.str();
   }
 
-  string toString(double d)
-  {
-    ostringstream ostr;
-    ostr << d;
-    return ostr.str();
-  }
-
-
   class vtkSMVersion
     {
     public:

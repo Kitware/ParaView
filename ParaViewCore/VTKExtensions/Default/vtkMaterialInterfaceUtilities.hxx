@@ -341,40 +341,6 @@ int IsIn(string name, vector<string> names)
   return false;
 }
 
-// Merge selected array names form multiple data
-// array selections who list the same arrays.
-// Return the number of array that were merged.
-// Would like to use a std::set, but would require
-// more work than its worth.
-int MergeEnabledArrayNames(
-        vtkDataArraySelection *das,
-        vector<string> &mergedNames)
-{
-  // check each array in data array selection.
-  int nMerged=0;
-  int nArraysTotal=das->GetNumberOfArrays();
-  for (int i=0; i<nArraysTotal; ++i)
-    {
-    string name=das->GetArrayName(i);
-    // skip disabled (all arrays should be enabled)
-    if (!das->GetArraySetting(i))
-      {
-      vtkGenericWarningMacro(
-          "Array: " << name << " is present but not enabled.");
-      continue;
-      }
-    // Skip previosly merged arrays
-    if (IsIn(name, mergedNames))
-      {
-      continue;
-      }
-    ++nMerged;
-    // save names of enabled arrays, inc name count
-    mergedNames.push_back(name);
-    }
-  return nMerged;
-}
-
 #ifdef vtkMaterialInterfaceFilterDEBUG
 //
 int WritePidFile(vtkCommunicator *comm, string pidFileName)

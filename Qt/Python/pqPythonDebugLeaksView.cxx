@@ -49,12 +49,6 @@ namespace {
     return static_cast<PyObject*>(shell->consoleLocals());
   }
 
-  PyObject* mainContext()
-  {
-    PyObject* mainModule = PyImport_AddModule((char*)"__main__");
-    return PyModule_GetDict(mainModule);
-  }
-
 };
 
 //-----------------------------------------------------------------------------
