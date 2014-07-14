@@ -21,6 +21,7 @@ using std::vector;
 namespace
 {
 
+#if 0 // Its usage is commented out below.
 //-----------------------------------------------------------------------------
 void IdentifyDownStreamRecipients(
       int child,
@@ -44,6 +45,7 @@ void IdentifyDownStreamRecipients(
     }
   IdentifyDownStreamRecipients(child,nProcs,DSR);
 }
+#endif
 
 };
 

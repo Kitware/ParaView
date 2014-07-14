@@ -69,6 +69,7 @@
 namespace
 {
 
+#if !defined(__APPLE__)
   bool vtkIsImageEmpty(vtkImageData* image)
     {
     vtkDataArray* scalars = image->GetPointData()->GetScalars();
@@ -83,6 +84,7 @@ namespace
       }
     return true;
     }
+#endif
 
   class vtkRenderHelper : public vtkPVRenderViewProxy
   {
