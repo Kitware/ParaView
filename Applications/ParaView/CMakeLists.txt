@@ -51,6 +51,22 @@ endforeach()
 add_subdirectory(Documentation)
 
 #------------------------------------------------------------------------------
+# FIXME: This is necessary because the vtkPVStaticPluginsInit library cannot be
+# exported (because exporting plugins had other issues). We can't put the
+# paraview_static_plugins_init function call anywhere ParaView-specific because
+# anything we do would be too late to have any effect (it must be before
+# `.plugins` is loaded from the pq@BPC_NAME@Initializer.Initialize ->
+# pqApplicationCore::pqApplicationCore -> vtkPVPluginTracker::GetInstance call
+# chain occurs).
+#
+# Basically, what needs to happen to avoid this hack is for, in static builds,
+# branded clients to build their own vtkPVStaticPluginsInit library with any
+# plugins available at that time and link to it. We cannot do this in
+# build_paraview_client right now because the command line executables in
+# ParaView itself needs vtkPVStaticPluginsInit as well.
+set(SUPPORT_STATIC_PLUGINS TRUE)
+
+#------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
     APPLICATION_NAME "ParaView"
