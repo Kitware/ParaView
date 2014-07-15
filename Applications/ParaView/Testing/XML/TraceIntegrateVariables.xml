@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- traces creating of spreadsheet view does indeed get recoded in the trace -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="TraceOptionsDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock" command="mousePress" arguments="1,1,0,50,18" />
+  <pqevent object="pqClientMainWindow/propertiesDock" command="mouseRelease" arguments="1,0,0,50,18" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="IntegrateAttributes" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mousePress" arguments="1,1,0,12,19,/0:2" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mouseRelease" arguments="1,0,0,12,19,/0:2" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceIntegrateVariables.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceIntegrateVariables.py" />
+
+  <!-- Reset Session -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionDelete_All" />
+
+  <!-- load the trace -->
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsPythonShell" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/runScript" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pythonDialog/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceIntegrateVariables.py" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/close" command="activate" arguments="" />
+
+  <!-- click on the spreadsheet to verify that it was indeed created -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mousePress" arguments="1,1,0,12,19,/0:2" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mouseRelease" arguments="1,0,0,12,19,/0:2" />
+</pqevents>
