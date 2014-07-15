@@ -38,37 +38,6 @@ except:
 from vtkPVCommonPython import *
 
 
-def figure_to_data(figure):
-  """
-  @brief Convert a Matplotlib figure to a numpy 2D array with RGBA uint8 channels and return it.
-  @param figure A matplotlib figure.
-  @return A numpy 2D array of RGBA values.
-  """
-  # Draw the renderer
-  try:
-    import matplotlib
-  except:
-    paraview.print_error("Error: Cannot import matplotlib")
-
-  figure.canvas.draw()
-
-  # Get the RGBA buffer from the figure
-  w, h = figure.canvas.get_width_height()
-
-  try:
-    import numpy
-  except:
-    paraview.print_error("Error: Cannot import numpy")
-
-  buf = numpy.fromstring(figure.canvas.tostring_argb(), dtype=numpy.uint8)
-  buf.shape = (h, w, 4)
-
-  # canvas.tostring_argb gives pixmap in ARGB mode. Roll the alpha channel to have it in RGBA mode
-  buf = numpy.roll(buf, 3, axis=2)
-
-  return buf
-
-
 def numpy_to_image(numpy_array):
   """
   @brief Convert a numpy 2D or 3D array to a vtkImageData object
@@ -108,6 +77,37 @@ def numpy_to_image(numpy_array):
   return image
 
 
+def figure_to_data(figure):
+  """
+  @brief Convert a Matplotlib figure to a numpy 2D array with RGBA uint8 channels and return it.
+  @param figure A matplotlib figure.
+  @return A numpy 2D array of RGBA values.
+  """
+  # Draw the renderer
+  try:
+    import matplotlib
+  except:
+    paraview.print_error("Error: Cannot import matplotlib")
+
+  figure.canvas.draw()
+
+  # Get the RGBA buffer from the figure
+  w, h = figure.canvas.get_width_height()
+
+  try:
+    import numpy
+  except:
+    paraview.print_error("Error: Cannot import numpy")
+
+  buf = numpy.fromstring(figure.canvas.tostring_argb(), dtype=numpy.uint8)
+  buf.shape = (h, w, 4)
+
+  # canvas.tostring_argb gives pixmap in ARGB mode. Roll the alpha channel to have it in RGBA mode
+  buf = numpy.roll(buf, 3, axis=2)
+
+  return buf
+
+
 def figure_to_image(figure):
   """
   @brief Convert a Matplotlib figure to a vtkImageData with RGBA unsigned char channels
@@ -144,3 +144,56 @@ def matplotlib_figure(width, height):
   figure.set_size_inches(float(width)/72.0, float(height)/72.0)
 
   return figure
+
+
+def call_setup_data(view):
+  """
+  @brief Utility function to call the user-defined setup_data function. This is
+         meant to be called by the C++ side of the vtkPythonView class.
+  @parameter view vtkPythonView object
+  """
+  setup_data_available = False
+  try:
+    import __main__
+    from __main__ import setup_data
+    setup_data_available = True
+  except:
+    return
+
+  if setup_data_available:
+    setup_data(view)
+
+
+def call_render(view, width, height):
+  """
+  @brief Utility function to call the user-defined render function. This is
+         called by the C++ side of the vtkPythonView class.
+  @parameter view vtkPythonView object
+  @parameter width Width of view
+  @parameter height Height of view
+  """
+  render_available = False
+  try:
+    import __main__
+    from __main__ import render
+    render_available = True
+  except:
+    return
+
+  # Check whether render() function is available and how many
+  # parameters it takes.
+  num_args = render.__code__.co_argcount
+
+  image = None
+  if (render_available and num_args == 3):
+    # New-style render() function
+    image = render(view, width, height)
+
+  elif (render_available and num_args == 2):
+    # Old-style render() function introduced in ParaView 4.1
+    figure = matplotlib_figure(width, height)
+    render(view, figure)
+
+    image = figure_to_image(figure)
+
+  view.SetImageData(image)

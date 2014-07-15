@@ -106,7 +106,6 @@ void vtkPythonView::Update()
     // Import necessary items from ParaView
     vtksys_ios::ostringstream importStream;
     importStream << "import paraview" << endl
-                 << "from paraview import python_view as pv" << endl
                  << "from vtkPVClientServerCoreRenderingPython import vtkPythonView" << endl
                  << "pythonView  = vtkPythonView('" << addressOfThis << " ')" << endl;
     vtkPythonInterpreter::RunSimpleString(importStream.str().c_str());
@@ -124,14 +123,9 @@ void vtkPythonView::Update()
     if (this->IsLocalDataAvailable())
       {
       vtksys_ios::ostringstream setupDataCommandStream;
-      setupDataCommandStream << "setup_data_available = False\n"
-                             << "try:\n"
-                             << "  setup_data\n"
-                             << "  setup_data_available = True\n"
-                             << "except:\n"
-                             << "  print 'No setup_data(pythonView) function defined'\n"
-                             << "if setup_data_available:\n"
-                             << "  setup_data(pythonView)\n";
+      setupDataCommandStream
+        << "from paraview import python_view\n"
+        << "python_view.call_setup_data(pythonView)\n";
       vtkPythonInterpreter::RunSimpleString(setupDataCommandStream.str().c_str());
       }
 
@@ -388,15 +382,9 @@ vtkImageData* vtkPythonView::GenerateImage()
     }
 
   vtksys_ios::ostringstream renderCommandStream;
-  renderCommandStream << "render_available = False\n"
-                      << "try:\n"
-                      << "  render\n"
-                      << "  render_available = True\n"
-                      << "except NameError:\n"
-                      << "  print 'No render(pythonView, width, height) function defined'\n"
-                      << "if render_available:\n"
-                      << "  vtkPythonView_image = render(pythonView," << width << ", " << height << ")\n"
-                      << "  pythonView.SetImageData(vtkPythonView_image)\n";
+  renderCommandStream
+    << "from paraview import python_view\n"
+    << "python_view.call_render(pythonView, " << width << ", " << height << ")\n";
 
   vtkPythonInterpreter::RunSimpleString(renderCommandStream.str().c_str());
   
