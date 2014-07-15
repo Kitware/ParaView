@@ -823,7 +823,7 @@ def WriteAnimationGeometry(filename, view=None):
     if not view:
         raise ValueError, "Please specify the view to use"
     scene = GetAnimationScene()
-    writer = servermanager.vtkSMAnimationSceneImageWriter()
+    writer = servermanager.vtkSMAnimationSceneGeometryWriter()
     writer.SetFileName(filename)
     writer.SetAnimationScene(scene.SMProxy)
     writer.SetViewModule(view.SMProxy)

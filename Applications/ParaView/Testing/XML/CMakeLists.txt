@@ -247,6 +247,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceExodus.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceExportAndSaveData.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceSaveGeometry.xml
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceMultiViews.xml)
