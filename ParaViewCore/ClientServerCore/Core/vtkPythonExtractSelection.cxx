@@ -68,7 +68,7 @@ int vtkPythonExtractSelection::FillInputPortInformation(int port, vtkInformation
 
 //----------------------------------------------------------------------------
 int vtkPythonExtractSelection::RequestDataObject(
-  vtkInformation *request, vtkInformationVector **inputVector,
+  vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
   // Output type is same as input
@@ -110,7 +110,7 @@ int vtkPythonExtractSelection::RequestDataObject(
 
 //----------------------------------------------------------------------------
 int vtkPythonExtractSelection::RequestData(
-  vtkInformation *request, vtkInformationVector **inputVector,
+  vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
   // if not selection is specified, return.
