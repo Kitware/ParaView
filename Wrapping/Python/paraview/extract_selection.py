@@ -15,6 +15,13 @@ import vtk.numpy_interface.dataset_adapter as dsa
 import vtk.numpy_interface.algorithms as algos
 from paraview import calculator
 
+def maskarray_is_valid(maskArray):
+    """Validates that the maskArray is either a VTKArray or a
+    VTKCompositeDataArrays or a NoneArray other returns false."""
+    return maskArray is dsa.NoneArray or \
+        isinstance(maskArray, dsa.VTKArray) or \
+        isinstance(maskArray, dsa.VTKCompositeDataArray)
+
 def execute(self):
     inputDO = self.GetInputDataObject(0, 0)
     inputSEL = self.GetInputDataObject(1, 0)
@@ -38,10 +45,24 @@ def execute(self):
     # to produce a mask array.
     inputs = []
     inputs.append(dsa.WrapDataObject(inputDO))
-    maskArray = calculator.compute(inputs, attributeType, selectionNode.GetQueryString())
-    # TODO: add validation to ensure that maskArray is NoneArray or array(s) of
-    # booleans.
-    # print maskArray
+
+    try:
+        maskArray = calculator.compute(inputs, attributeType, selectionNode.GetQueryString())
+    except:
+        from sys import stderr
+        print >> stderr, "Error: Failed to evaluate Expression '%s'. "\
+            "The following exception stack should provide additional developer "\
+            "specific information. This typically implies a malformed "\
+            "expression. Verify that the expression is valid.\n" % \
+            selectionNode.GetQueryString()
+        raise
+
+    if not maskarray_is_valid(maskArray):
+        raise RuntimeError,\
+            "Expression '%s' did not produce a valid mask array. The value "\
+            "produced is of the type '%s'. This typically implies a malformed "\
+            "expression. Verify that the expression is valid." % \
+            (selectionNode.GetQueryString(), type(maskArray))
 
     # if inverse selection is requested, just logical_not the mask array.
     if selectionNode.GetProperties().Has(selectionNode.INVERSE()) and \
