@@ -11,6 +11,8 @@
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog1.png" width="300" height="300" />
 
+  <!--
+       Temporarily disabled, we don't support ID queries for the time being
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/criteria" command="set_string" arguments="ID" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="12" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
@@ -23,6 +25,7 @@
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/runQuery" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/FindDataDialog3.png" width="300" height="300" />
+  -->
 
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/criteria" command="set_string" arguments="Global ID" />
   <pqevent object="pqClientMainWindow/FindDataDialog/createSelectionFrame/queryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="12" />
