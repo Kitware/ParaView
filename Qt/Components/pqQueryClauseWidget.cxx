@@ -57,6 +57,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // for composite datasets (esp. in parallel) as expected.
 //#define REMOVE_COLLECTIVE_CLAUSES
 
+// Disable PROCESSID. This was cause major issues with collective operations.
+#define REMOVE_PROCESSID
+
 class pqQueryClauseWidget::pqInternals : public Ui::pqQueryClauseWidget
 {
 public:
@@ -397,6 +400,9 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
   bool multi_process = (server->getNumberOfPartitions() > 1);
   bool multi_block = false;
   bool amr = false;
+#ifdef REMOVE_PROCESSID
+  multi_process = false;
+#endif
 
   vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
   if (dataInfo->GetCompositeDataSetType() == VTK_MULTIBLOCK_DATA_SET)
