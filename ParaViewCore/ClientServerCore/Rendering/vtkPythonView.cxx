@@ -30,27 +30,6 @@
 
 #include <vtksys/ios/sstream>
 
-namespace {
-
-class PyObjectRefHelper {
-public:
-  PyObjectRefHelper(PyObject* object)
-  : Object(object)
-  {
-    this->Object = NULL;
-  }
-  ~PyObjectRefHelper()
-  {
-    if (this->Object)
-      {
-      Py_XDECREF(this->Object);
-      }
-  }
-
-  PyObject* Object;
-};
-
-}
 
 class vtkPythonView::vtkInternals
 {
@@ -409,11 +388,25 @@ void vtkPythonView::StillRender()
   if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
     this->SetImageData(NULL);
-    vtkImageData* imageData = this->GenerateImage();
 
-    if (imageData)
+    // Now draw the image
+    int width  = this->Size[0] * this->Magnification;
+    int height = this->Size[1] * this->Magnification;
+
+    vtksys_ios::ostringstream renderCommandStream;
+    renderCommandStream
+      << "from paraview import python_view\n"
+      << "try:\n"
+      << "  python_view.call_render(render, pythonView, " << width << ", " << height << ")\n"
+      << "except:\n"
+      << "  pass\n";
+    this->RunSimpleStringWithCustomLocals(renderCommandStream.str().c_str());
+
+    // this->ImageData should be set by the call_render() function
+    // invoked above.
+    if (this->ImageData)
       {
-      this->RenderTexture->SetInputData(imageData);
+      this->RenderTexture->SetInputData(this->ImageData);
       this->Renderer->TexturedBackgroundOn();
       }
     else
@@ -428,35 +421,6 @@ void vtkPythonView::StillRender()
 void vtkPythonView::InteractiveRender()
 {
   this->StillRender();
-}
-
-//----------------------------------------------------------------------------
-vtkImageData* vtkPythonView::GenerateImage()
-{
-  // Now draw the image
-  int width  = this->Size[0] * this->Magnification;
-  int height = this->Size[1] * this->Magnification;
-
-  if (!this->Script || strlen(this->Script) < 1)
-    {
-    return NULL;
-    }
-
-  char addressOfThis[1024];
-  sprintf(addressOfThis, "%p", this);
-
-  vtksys_ios::ostringstream renderCommandStream;
-  renderCommandStream
-    << "from paraview import python_view\n"
-    << "try:\n"
-    << "  python_view.call_render(render, pythonView, " << width << ", " << height << ")\n"
-    << "except:\n"
-    << "  pass\n";
-  this->RunSimpleStringWithCustomLocals(renderCommandStream.str().c_str());
-  
-  // this->ImageData should be set by the call_render() function above
-  // so we just return it here.
-  return this->ImageData;
 }
 
 //----------------------------------------------------------------------------

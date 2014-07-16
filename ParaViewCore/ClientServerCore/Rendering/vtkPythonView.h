@@ -165,8 +165,6 @@ protected:
   // Needed to handle rendering at different magnifications
   int Magnification;
 
-  vtkImageData* GenerateImage();
-
   // Description:
   // Is local data available?
   bool IsLocalDataAvailable();
