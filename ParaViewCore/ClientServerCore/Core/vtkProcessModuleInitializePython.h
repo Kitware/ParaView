@@ -234,7 +234,6 @@ namespace
         {
         std::string app_root = SELF_DIR + "/../..";
         app_root = vtksys::SystemTools::CollapseFullPath(app_root.c_str());
-        // The Contents/Libraries may not be needed. We should verify that.
         vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Libraries");
         vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Python");
         }
