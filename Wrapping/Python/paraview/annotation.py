@@ -16,19 +16,8 @@ r"""
 This module is used by vtkPythonAnnotationFilter.
 """
 import paraview
-from paraview.vtk import dataset_adapter
-from numpy import *
-from paraview.vtk.algorithms import *
-
-def __vtk_in1d(a, b):
-    return array([item in b for item in a])
-
-try:
-    contains = in1d
-except NameError:
-    # older versions of numpy don't have in1d function.
-    # in1d was introduced in numpy 1.4.0.
-    contains = __vtk_in1d
+from vtk.numpy_interface import dataset_adapter
+from vtk.numpy_interface.algorithms import *
 
 def _make_name_valid(name):
     return paraview.make_name_valid(name)
