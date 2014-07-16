@@ -69,7 +69,7 @@ public:
       return this->CustomLocals;
       }
 
-    const char* code = "__vtkPythonViewLocals=globals().copy()\n";
+    const char* code = "__vtkPythonViewLocals={'__builtins__':__builtins__}\n";
     PyRun_SimpleString(const_cast<char *>(code));
 
     PyObject* main_module = PyImport_AddModule((char*)"__main__");
@@ -97,6 +97,11 @@ public:
       vtkPythonInterpreter::RunSimpleString(code);
       }
     }
+
+  void ResetCustomLocals()
+  {
+    this->CleanupObjects();
+  }
 
 };
 
@@ -133,6 +138,8 @@ vtkInformationKeyMacro(vtkPythonView, REQUEST_DELIVER_DATA_TO_CLIENT, Request);
 void vtkPythonView::Update()
 {
   vtkTimerLog::MarkStartEvent("vtkPythonView::Update");
+
+  this->Internals->ResetCustomLocals();
 
   if (this->Script && strlen(this->Script) > 0)
     {
@@ -175,7 +182,10 @@ void vtkPythonView::Update()
       vtksys_ios::ostringstream setupDataCommandStream;
       setupDataCommandStream
         << "from paraview import python_view\n"
-        << "python_view.call_setup_data(setup_data, pythonView)\n";
+        << "try:\n"
+        << "  python_view.call_setup_data(setup_data, pythonView)\n"
+        << "except:\n"
+        << "  pass\n";
       this->RunSimpleStringWithCustomLocals(setupDataCommandStream.str().c_str());
       }
 
@@ -398,6 +408,7 @@ void vtkPythonView::StillRender()
   // Render only on the client
   if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
+    this->SetImageData(NULL);
     vtkImageData* imageData = this->GenerateImage();
 
     if (imageData)
@@ -437,8 +448,10 @@ vtkImageData* vtkPythonView::GenerateImage()
   vtksys_ios::ostringstream renderCommandStream;
   renderCommandStream
     << "from paraview import python_view\n"
-    << "python_view.call_render(render, pythonView, " << width << ", " << height << ")\n";
-
+    << "try:\n"
+    << "  python_view.call_render(render, pythonView, " << width << ", " << height << ")\n"
+    << "except:\n"
+    << "  pass\n";
   this->RunSimpleStringWithCustomLocals(renderCommandStream.str().c_str());
   
   // this->ImageData should be set by the call_render() function above
