@@ -146,25 +146,19 @@ def matplotlib_figure(width, height):
   return figure
 
 
-def call_setup_data(view):
+def call_setup_data(setup_data_function, view):
   """
   @brief Utility function to call the user-defined setup_data function. This is
          meant to be called by the C++ side of the vtkPythonView class.
   @parameter view vtkPythonView object
   """
-  setup_data_available = False
-  try:
-    import __main__
-    from __main__ import setup_data
-    setup_data_available = True
-  except:
+  if setup_data_function == None:
     return
 
-  if setup_data_available:
-    setup_data(view)
+  setup_data_function(view)
 
 
-def call_render(view, width, height):
+def call_render(render_function, view, width, height):
   """
   @brief Utility function to call the user-defined render function. This is
          called by the C++ side of the vtkPythonView class.
@@ -172,27 +166,21 @@ def call_render(view, width, height):
   @parameter width Width of view
   @parameter height Height of view
   """
-  render_available = False
-  try:
-    import __main__
-    from __main__ import render
-    render_available = True
-  except:
+  if render_function == None:
     return
 
-  # Check whether render() function is available and how many
-  # parameters it takes.
-  num_args = render.__code__.co_argcount
+  # Check how many parameters it takes.
+  num_args = render_function.__code__.co_argcount
 
   image = None
-  if (render_available and num_args == 3):
-    # New-style render() function
-    image = render(view, width, height)
+  if (num_args == 3):
+    # Current-style render() function
+    image = render_function(view, width, height)
 
-  elif (render_available and num_args == 2):
+  elif (num_args == 2):
     # Old-style render() function introduced in ParaView 4.1
     figure = matplotlib_figure(width, height)
-    render(view, figure)
+    render_function(view, figure)
 
     image = figure_to_image(figure)
 

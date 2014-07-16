@@ -174,7 +174,13 @@ protected:
 private:
   vtkPythonView(const vtkPythonView&); // Not implemented
   void operator=(const vtkPythonView&); // Not implemented
+
+  // Run Python code with custom local dictionary
+  int RunSimpleStringWithCustomLocals(const char* code);
 //ETX
+
+  class vtkInternals;
+  vtkInternals* Internals;
 
   // The Python script
   char* Script;

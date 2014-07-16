@@ -52,11 +52,60 @@ public:
 
 }
 
+class vtkPythonView::vtkInternals
+{
+  PyObject* CustomLocals;
+public:
+  vtkInternals() : CustomLocals(0) {}
+  ~vtkInternals()
+    {
+    this->CleanupObjects();
+    }
+
+  PyObject* GetCustomLocalsPyObject()
+    {
+    if (this->CustomLocals)
+      {
+      return this->CustomLocals;
+      }
+
+    const char* code = "__vtkPythonViewLocals=globals().copy()\n";
+    PyRun_SimpleString(const_cast<char *>(code));
+
+    PyObject* main_module = PyImport_AddModule((char*)"__main__");
+    PyObject* global_dict = PyModule_GetDict(main_module);
+    this->CustomLocals = PyDict_GetItemString(global_dict, "__vtkPythonViewLocals");
+    if (!this->CustomLocals)
+      {
+        vtkGenericWarningMacro("Failed to locate the __vtkPythonViewLocals object.");
+        return NULL;
+      }
+    Py_INCREF(this->CustomLocals);
+
+    PyRun_SimpleString(const_cast<char*>("del __vtkPythonViewLocals"));
+
+    return this->CustomLocals;
+    }
+
+  void CleanupObjects()
+    {
+    Py_XDECREF(this->CustomLocals);
+    this->CustomLocals = NULL;
+    if (vtkPythonInterpreter::IsInitialized())
+      {
+      const char* code = "import gc; gc.collect()\n";
+      vtkPythonInterpreter::RunSimpleString(code);
+      }
+    }
+
+};
+
 vtkStandardNewMacro(vtkPythonView);
 
 //----------------------------------------------------------------------------
 vtkPythonView::vtkPythonView()
 {
+  this->Internals = new vtkPythonView::vtkInternals();
   this->RenderTexture = vtkSmartPointer<vtkTexture>::New();
   this->Renderer = vtkSmartPointer<vtkRenderer>::New();
   this->Renderer->SetBackgroundTexture(this->RenderTexture);
@@ -72,6 +121,7 @@ vtkPythonView::vtkPythonView()
 vtkPythonView::~vtkPythonView()
 {
   // Clean up memory
+  delete this->Internals;
   this->SetScript(NULL);
   this->SetImageData(NULL);
 }
@@ -107,8 +157,8 @@ void vtkPythonView::Update()
     vtksys_ios::ostringstream importStream;
     importStream << "import paraview" << endl
                  << "from vtkPVClientServerCoreRenderingPython import vtkPythonView" << endl
-                 << "pythonView  = vtkPythonView('" << addressOfThis << " ')" << endl;
-    vtkPythonInterpreter::RunSimpleString(importStream.str().c_str());
+                 << "pythonView = vtkPythonView('" << addressOfThis << " ')" << endl;
+    this->RunSimpleStringWithCustomLocals(importStream.str().c_str());
 
     // Evaluate the user-defined script. It should define two functions,
     // setup_data(view) and render(view, figure) that each take a
@@ -117,7 +167,7 @@ void vtkPythonView::Update()
     // this script, they must be defined in the global Python
     // interpreter by some other means (e.g. a script executed by
     // pvpython).
-    vtkPythonInterpreter::RunSimpleString(this->Script);
+    this->RunSimpleStringWithCustomLocals(this->Script);
 
     // Update the data array settings. Do this only on servers where local data is available
     if (this->IsLocalDataAvailable())
@@ -125,8 +175,8 @@ void vtkPythonView::Update()
       vtksys_ios::ostringstream setupDataCommandStream;
       setupDataCommandStream
         << "from paraview import python_view\n"
-        << "python_view.call_setup_data(pythonView)\n";
-      vtkPythonInterpreter::RunSimpleString(setupDataCommandStream.str().c_str());
+        << "python_view.call_setup_data(setup_data, pythonView)\n";
+      this->RunSimpleStringWithCustomLocals(setupDataCommandStream.str().c_str());
       }
 
     this->CallProcessViewRequest(vtkPythonView::REQUEST_DELIVER_DATA_TO_CLIENT(),
@@ -381,14 +431,17 @@ vtkImageData* vtkPythonView::GenerateImage()
     return NULL;
     }
 
+  char addressOfThis[1024];
+  sprintf(addressOfThis, "%p", this);
+
   vtksys_ios::ostringstream renderCommandStream;
   renderCommandStream
     << "from paraview import python_view\n"
-    << "python_view.call_render(pythonView, " << width << ", " << height << ")\n";
+    << "python_view.call_render(render, pythonView, " << width << ", " << height << ")\n";
 
-  vtkPythonInterpreter::RunSimpleString(renderCommandStream.str().c_str());
+  this->RunSimpleStringWithCustomLocals(renderCommandStream.str().c_str());
   
-  // this->ImageData should be set by the python command stream above,
+  // this->ImageData should be set by the call_render() function above
   // so we just return it here.
   return this->ImageData;
 }
@@ -417,6 +470,26 @@ bool vtkPythonView::IsLocalDataAvailable()
     }
 
   return available;
+}
+
+//----------------------------------------------------------------------------
+int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
+{
+  PyObject* context = this->Internals->GetCustomLocalsPyObject();
+  PyObject* result = PyRun_String(const_cast<char*>(code), Py_file_input, context, context);
+
+  if (result == NULL)
+    {
+    PyErr_Print();
+    return -1;
+    }
+
+  Py_DECREF(result);
+  if (Py_FlushLine())
+    {
+    PyErr_Clear();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
