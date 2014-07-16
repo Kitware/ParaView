@@ -187,7 +187,7 @@ public:
             vtkSMPropertyHelper(selectionSource, "FieldType").GetAsInt()));
         if (index != -1)
           {
-          bool prev = this->Ui.showTypeComboBox->blockSignals(true);
+          prev = this->Ui.showTypeComboBox->blockSignals(true);
           this->Ui.showTypeComboBox->setCurrentIndex(index);
           this->Ui.showTypeComboBox->blockSignals(prev);
           }
