@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // BUG #13806, remove collective operations temporarily since they don't work
 // for composite datasets (esp. in parallel) as expected.
-#define REMOVE_COLLECTIVE_CLAUSES
+//#define REMOVE_COLLECTIVE_CLAUSES
 
 class pqQueryClauseWidget::pqInternals : public Ui::pqQueryClauseWidget
 {
@@ -672,16 +672,16 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       }
     break;
   case LIST_OF_VALUES:
-    if(query.isEmpty()) query = "contains(%1,[%2])";
     if (!this->Internals->value->text().isEmpty())
       {
-      query = query.arg(fieldName, this->Internals->value->text());
-      QStringList parts = this->Internals->value->text().split(',',
-        QString::SkipEmptyParts);
+      QStringList queryList;
+      QStringList parts = this->Internals->value->text().split(',', QString::SkipEmptyParts);
       foreach (QString part, parts)
         {
         values << part;
+        queryList << (QString("(%1 == %2)").arg(fieldName).arg(part));
         }
+      if (query.isEmpty()) query = queryList.join(" | ");
       }
     break;
 
@@ -737,27 +737,27 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       }
     break;
   case SINGLE_VALUE_MIN:
-    if(query.isEmpty()) query = "%1  == global_min(%1)";
+    if(query.isEmpty()) query = "%1  == min(%1)";
     query = query.arg(fieldName);
     ok_no_value = true;
     break;
   case SINGLE_VALUE_MAX:
-    if(query.isEmpty()) query = "%1  == global_max(%1)";
+    if(query.isEmpty()) query = "%1  == max(%1)";
     query = query.arg(fieldName);
     ok_no_value = true;
     break;
   case SINGLE_VALUE_LE_MEAN:
-    if(query.isEmpty()) query = "%1  <= global_mean(%1)";
+    if(query.isEmpty()) query = "%1  <= mean(%1)";
     query = query.arg(fieldName);
     ok_no_value = true;
     break;
   case SINGLE_VALUE_GE_MEAN:
-    if(query.isEmpty()) query = "%1  >= global_mean(%1)";
+    if(query.isEmpty()) query = "%1  >= mean(%1)";
     query = query.arg(fieldName);
     ok_no_value = true;
     break;
   case SINGLE_VALUE_MEAN_WITH_TOLERANCE:
-    if(query.isEmpty()) query = "abs(%1 - global_mean(%1)) < %2";
+    if(query.isEmpty()) query = "abs(%1 - mean(%1)) < %2";
     if (!this->Internals->value->text().isEmpty())
       {
       values << this->Internals->value->text();

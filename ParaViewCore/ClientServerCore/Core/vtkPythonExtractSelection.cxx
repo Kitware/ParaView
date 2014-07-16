@@ -151,11 +151,16 @@ int vtkPythonExtractSelection::RequestData(
   vtkPythonInterpreter::Initialize();
 
   std::ostringstream stream;
-  stream << "from paraview import extract_selection as pv_es" << endl
-         << "from vtkPVClientServerCoreCorePython import vtkPythonExtractSelection" << endl
-         << "me = vtkPythonExtractSelection('" << aplus << " ')" << endl
-         << "pv_es.execute(me)" << endl
-         << "del me" << endl;
+  stream
+    << "def vtkPythonExtractSelection_RequestData():" << endl
+    << "    from paraview import extract_selection as pv_es" << endl
+    << "    from vtkPVClientServerCoreCorePython import vtkPythonExtractSelection" << endl
+    << "    me = vtkPythonExtractSelection('" << aplus << " ')" << endl
+    << "    pv_es.execute(me)" << endl
+    << "    del me" << endl
+    << "    del pv_es" << endl
+    << "vtkPythonExtractSelection_RequestData()" << endl
+    << "del vtkPythonExtractSelection_RequestData" << endl;
   vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
   return 1;
 }
