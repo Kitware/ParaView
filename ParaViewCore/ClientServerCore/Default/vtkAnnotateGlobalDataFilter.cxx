@@ -112,7 +112,7 @@ int vtkAnnotateGlobalDataFilter::RequestData(
                << (timeDependent ? "t_index" : "0") << "))";
     }
 
-  this->SetPythonExpression(expression.str().c_str());
+  this->SetExpression(expression.str().c_str());
 
   return this->Superclass::RequestData(request, inputVector, outputVector);;
 }
