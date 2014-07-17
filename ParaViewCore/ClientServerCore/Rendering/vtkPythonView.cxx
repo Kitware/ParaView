@@ -367,6 +367,21 @@ int vtkPythonView::GetAttributeArrayStatus(int visibleObjectIndex,
 }
 
 //----------------------------------------------------------------------------
+void vtkPythonView::EnableAllAttributeArrays()
+{
+  int numRepresentations = this->GetNumberOfRepresentations();
+  for (int i = 0; i < numRepresentations; ++i)
+    {
+    vtkPythonRepresentation* representation =
+      vtkPythonRepresentation::SafeDownCast(this->GetRepresentation(i));    
+    if (representation)
+      {
+      representation->EnableAllAttributeArrays();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPythonView::DisableAllAttributeArrays()
 {
   int numRepresentations = this->GetNumberOfRepresentations();

@@ -78,8 +78,11 @@ public:
   int GetAttributeArrayStatus( int attributeType, const char* name);
 
   // Description:
-  // Disable all arrays. When called, no arrays will be transferred to the client
-  // until GetAttributeArrayStatus() is called.
+  // Enable all arrays. When called, all arrays will be marked as enabled.
+  void EnableAllAttributeArrays();
+
+  // Description:
+  // Disable all arrays. When called, all arrays will be marked as disabled.
   void DisableAllAttributeArrays();
 
 //BTX

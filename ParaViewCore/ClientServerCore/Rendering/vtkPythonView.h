@@ -140,6 +140,10 @@ public:
                               const char* name);
 
   // Description:
+  // Enable all attribute arrays.
+  void EnableAllAttributeArrays();
+
+  // Description:
   // Disable all attribute arrays.
   void DisableAllAttributeArrays();
 
