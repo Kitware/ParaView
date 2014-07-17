@@ -6,11 +6,10 @@ smtesting.ProcessCommandLineArguments()
 s = Sphere()
 c =Cone(Resolution=10)
 GroupDatasets(Input=[s,c])
-Show()
-
-SelectCells("id > 2")
-
-
+GenerateIds()
+r = Show()
+r.ColorArrayName = None
+SelectCells("Ids > 2")
 RenderView1 = Render()
 
 if not smtesting.DoRegressionTesting(RenderView1.SMProxy):
