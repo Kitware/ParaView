@@ -12,10 +12,17 @@ except ImportError:
 import paraview
 import vtk.numpy_interface.dataset_adapter as dsa
 from vtk.numpy_interface.algorithms import *
+    # -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
 
-def get_arrays(attribs):
+def get_arrays(attribs, controller=None):
     """Returns a 'dict' referring to arrays in dsa.DataSetAttributes or
-    dsa.CompositeDataSetAttributes instance."""
+    dsa.CompositeDataSetAttributes instance.
+
+    When running in parallel, this method will ensure that arraynames are
+    reduced across all ranks and for any arrays missing on the local process, a
+    NoneArray will be added to the returned dictionary. This ensures that
+    expressions evaluate without issues due to missing arrays on certain ranks.
+    """
     if not isinstance(attribs, dsa.DataSetAttributes) and \
         not isinstance(attribs, dsa.CompositeDataSetAttributes):
             raise ValueError, \
@@ -24,6 +31,34 @@ def get_arrays(attribs):
     for key in attribs.keys():
         varname = paraview.make_name_valid(key)
         arrays[varname] = attribs[key]
+
+
+    # If running in parallel, ensure that the arrays are synced up so that
+    # missing arrays get NoneArray assigned to them avoiding any unnecessary
+    # errors when evaluating expressions.
+    if controller is None and vtkMultiProcessController is not None:
+        controller = vtkMultiProcessController.GetGlobalController()
+    if controller and controller.IsA("vtkMPIController") and controller.GetNumberOfProcesses() > 1:
+        from mpi4py import MPI
+        comm = vtkMPI4PyCommunicator.ConvertToPython(controller.GetCommunicator())
+        rank = comm.Get_rank()
+
+        # reduce the array names across processes to ensure arrays missing on
+        # certain ranks are handled correctly.
+        arraynames = arrays.keys()
+        # gather to root and then broadcast
+        # I couldn't get Allgather/Allreduce to work properly with strings.
+        gathered_names = comm.gather(arraynames, root=0)
+          # gathered_names is a list of lists.
+        if rank == 0:
+            result = set()
+            for list in gathered_names:
+                for val in list: result.add(val)
+            gathered_names = [x for x in result]
+        arraynames = comm.bcast(gathered_names, root=0)
+        for name in arraynames:
+            if not arrays.has_key(name):
+                arrays[name] = dsa.NoneArray
     return arrays
 
 
