@@ -3,8 +3,6 @@ from paraview.simple import *
 import sys
 
 script = """
-import numpy
-import paraview.numpy_support
 import vtk
 
 def setup_data(view):
