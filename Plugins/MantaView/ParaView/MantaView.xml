@@ -39,7 +39,7 @@
         command="SetThreads"
         immediate_update="1"
         number_of_elements="1"
-        panel_visibility="never"
+        panel_visibility="default"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
@@ -51,7 +51,7 @@
         command="SetEnableShadows"
         immediate_update="1"
         number_of_elements="1"
-        panel_visibility="never"
+        panel_visibility="default"
         default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
@@ -63,7 +63,7 @@
         command="SetSamples"
         immediate_update="1"
         number_of_elements="1"
-        panel_visibility="never"
+        panel_visibility="default"
         default_values="1">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
@@ -75,7 +75,7 @@
         command="SetMaxDepth"
         immediate_update="1"
         number_of_elements="1"
-        panel_visibility="never"
+        panel_visibility="advanced"
         default_values="5">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
