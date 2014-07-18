@@ -12,14 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // must be the first thing that's included
 #include "vtkPythonView.h"
 
 #include "vtkObjectFactory.h"
 
 #include "vtkDataObject.h"
-#include "vtkImageData.h"
 #include "vtkInformationRequestKey.h"
-#include "vtkMatplotlibUtilities.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonRepresentation.h"
@@ -31,18 +30,73 @@
 
 #include <vtksys/ios/sstream>
 
+
+class vtkPythonView::vtkInternals
+{
+  PyObject* CustomLocals;
+public:
+  vtkInternals() : CustomLocals(0) {}
+  ~vtkInternals()
+    {
+    this->CleanupObjects();
+    }
+
+  PyObject* GetCustomLocalsPyObject()
+    {
+    if (this->CustomLocals)
+      {
+      return this->CustomLocals;
+      }
+
+    const char* code = "__vtkPythonViewLocals={'__builtins__':__builtins__}\n";
+    PyRun_SimpleString(const_cast<char *>(code));
+
+    PyObject* main_module = PyImport_AddModule((char*)"__main__");
+    PyObject* global_dict = PyModule_GetDict(main_module);
+    this->CustomLocals = PyDict_GetItemString(global_dict, "__vtkPythonViewLocals");
+    if (!this->CustomLocals)
+      {
+        vtkGenericWarningMacro("Failed to locate the __vtkPythonViewLocals object.");
+        return NULL;
+      }
+    Py_INCREF(this->CustomLocals);
+
+    PyRun_SimpleString(const_cast<char*>("del __vtkPythonViewLocals"));
+
+    return this->CustomLocals;
+    }
+
+  void CleanupObjects()
+    {
+    Py_XDECREF(this->CustomLocals);
+    this->CustomLocals = NULL;
+    if (vtkPythonInterpreter::IsInitialized())
+      {
+      const char* code = "import gc; gc.collect()\n";
+      vtkPythonInterpreter::RunSimpleString(code);
+      }
+    }
+
+  void ResetCustomLocals()
+  {
+    this->CleanupObjects();
+  }
+
+};
+
 vtkStandardNewMacro(vtkPythonView);
 
 //----------------------------------------------------------------------------
 vtkPythonView::vtkPythonView()
 {
+  this->Internals = new vtkPythonView::vtkInternals();
   this->RenderTexture = vtkSmartPointer<vtkTexture>::New();
   this->Renderer = vtkSmartPointer<vtkRenderer>::New();
   this->Renderer->SetBackgroundTexture(this->RenderTexture);
   this->RenderWindow.TakeReference(this->SynchronizedWindows->NewRenderWindow());
   this->RenderWindow->AddRenderer(this->Renderer);
   this->Magnification = 1;
-  this->MatplotlibUtilities = vtkSmartPointer<vtkMatplotlibUtilities>::New();
+  this->ImageData = NULL;
 
   this->Script = NULL;
 }
@@ -50,7 +104,10 @@ vtkPythonView::vtkPythonView()
 //----------------------------------------------------------------------------
 vtkPythonView::~vtkPythonView()
 {
+  // Clean up memory
+  delete this->Internals;
   this->SetScript(NULL);
+  this->SetImageData(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -60,6 +117,8 @@ vtkInformationKeyMacro(vtkPythonView, REQUEST_DELIVER_DATA_TO_CLIENT, Request);
 void vtkPythonView::Update()
 {
   vtkTimerLog::MarkStartEvent("vtkPythonView::Update");
+
+  this->Internals->ResetCustomLocals();
 
   if (this->Script && strlen(this->Script) > 0)
     {
@@ -83,10 +142,9 @@ void vtkPythonView::Update()
     // Import necessary items from ParaView
     vtksys_ios::ostringstream importStream;
     importStream << "import paraview" << endl
-                 << "from paraview import python_view as pv" << endl
                  << "from vtkPVClientServerCoreRenderingPython import vtkPythonView" << endl
-                 << "pythonView  = vtkPythonView('" << addressOfThis << " ')" << endl;
-    vtkPythonInterpreter::RunSimpleString(importStream.str().c_str());
+                 << "pythonView = vtkPythonView('" << addressOfThis << " ')" << endl;
+    this->RunSimpleStringWithCustomLocals(importStream.str().c_str());
 
     // Evaluate the user-defined script. It should define two functions,
     // setup_data(view) and render(view, figure) that each take a
@@ -95,21 +153,19 @@ void vtkPythonView::Update()
     // this script, they must be defined in the global Python
     // interpreter by some other means (e.g. a script executed by
     // pvpython).
-    vtkPythonInterpreter::RunSimpleString(this->Script);
+    this->RunSimpleStringWithCustomLocals(this->Script);
 
     // Update the data array settings. Do this only on servers where local data is available
     if (this->IsLocalDataAvailable())
       {
       vtksys_ios::ostringstream setupDataCommandStream;
-      setupDataCommandStream << "setup_data_available = False\n"
-                             << "try:\n"
-                             << "  setup_data\n"
-                             << "  setup_data_available = True\n"
-                             << "except:\n"
-                             << "  print 'No setup_data(pythonView) function defined'\n"
-                             << "if setup_data_available:\n"
-                             << "  setup_data(pythonView)\n";
-      vtkPythonInterpreter::RunSimpleString(setupDataCommandStream.str().c_str());
+      setupDataCommandStream
+        << "from paraview import python_view\n"
+        << "try:\n"
+        << "  python_view.call_setup_data(setup_data, pythonView)\n"
+        << "except:\n"
+        << "  pass\n";
+      this->RunSimpleStringWithCustomLocals(setupDataCommandStream.str().c_str());
       }
 
     this->CallProcessViewRequest(vtkPythonView::REQUEST_DELIVER_DATA_TO_CLIENT(),
@@ -311,6 +367,21 @@ int vtkPythonView::GetAttributeArrayStatus(int visibleObjectIndex,
 }
 
 //----------------------------------------------------------------------------
+void vtkPythonView::EnableAllAttributeArrays()
+{
+  int numRepresentations = this->GetNumberOfRepresentations();
+  for (int i = 0; i < numRepresentations; ++i)
+    {
+    vtkPythonRepresentation* representation =
+      vtkPythonRepresentation::SafeDownCast(this->GetRepresentation(i));    
+    if (representation)
+      {
+      representation->EnableAllAttributeArrays();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPythonView::DisableAllAttributeArrays()
 {
   int numRepresentations = this->GetNumberOfRepresentations();
@@ -331,12 +402,26 @@ void vtkPythonView::StillRender()
   // Render only on the client
   if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
-    vtkImageData* imageData = this->GenerateImage();
+    this->SetImageData(NULL);
 
-    if (imageData)
+    // Now draw the image
+    int width  = this->Size[0] * this->Magnification;
+    int height = this->Size[1] * this->Magnification;
+
+    vtksys_ios::ostringstream renderCommandStream;
+    renderCommandStream
+      << "from paraview import python_view\n"
+      << "try:\n"
+      << "  python_view.call_render(render, pythonView, " << width << ", " << height << ")\n"
+      << "except:\n"
+      << "  pass\n";
+    this->RunSimpleStringWithCustomLocals(renderCommandStream.str().c_str());
+
+    // this->ImageData should be set by the call_render() function
+    // invoked above.
+    if (this->ImageData)
       {
-      this->RenderTexture->SetInputData(imageData);
-      imageData->Delete();
+      this->RenderTexture->SetInputData(this->ImageData);
       this->Renderer->TexturedBackgroundOn();
       }
     else
@@ -351,40 +436,6 @@ void vtkPythonView::StillRender()
 void vtkPythonView::InteractiveRender()
 {
   this->StillRender();
-}
-
-//----------------------------------------------------------------------------
-vtkImageData* vtkPythonView::GenerateImage()
-{
-  if (!this->MatplotlibUtilities)
-    {
-    vtkErrorMacro(<< "matplotlib is not available. Python views will not work.");
-    return NULL;
-    }
-
-  // Now draw the image
-  int width  = this->Size[0] * this->Magnification;
-  int height = this->Size[1] * this->Magnification;
-
-  if (!this->Script || strlen(this->Script) < 1)
-    {
-    return this->MatplotlibUtilities->
-      ImageFromScript("", "pythonViewCanvas", width, height);
-    }
-
-  vtksys_ios::ostringstream renderCommandStream;
-  renderCommandStream << "render_available = False\n"
-                      << "try:\n"
-                      << "  render\n"
-                      << "  render_available = True\n"
-                      << "except NameError:\n"
-                      << "  print 'No render(pythonView,figure) function defined'\n"
-                      << "if render_available:\n"
-                      << "  render(pythonView, pythonViewCanvasFigure)\n";
-  vtkImageData* imageData = this->MatplotlibUtilities->
-    ImageFromScript(renderCommandStream.str().c_str(), "pythonViewCanvas", width, height);
-
-  return imageData;
 }
 
 //----------------------------------------------------------------------------
@@ -414,13 +465,70 @@ bool vtkPythonView::IsLocalDataAvailable()
 }
 
 //----------------------------------------------------------------------------
+int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
+{
+  PyObject* context = this->Internals->GetCustomLocalsPyObject();
+  PyObject* result = PyRun_String(const_cast<char*>(code), Py_file_input, context, context);
+
+  if (result == NULL)
+    {
+    PyErr_Print();
+    return -1;
+    }
+
+  Py_DECREF(result);
+  if (Py_FlushLine())
+    {
+    PyErr_Clear();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPythonView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "RenderTexture: " << this->RenderTexture << endl;
-  os << indent << "Renderer: " << this->Renderer << endl;
-  os << indent << "RenderWindow: " << this->RenderWindow << endl;
+  os << indent << "RenderTexture: ";
+  if (this->RenderTexture)
+    {
+    os << endl;
+    this->RenderTexture->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "Renderer: ";
+  if (this->Renderer)
+    {
+    os << endl;
+    this->Renderer->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "RenderWindow: ";
+  if (this->RenderWindow)
+    {
+    os << endl;
+    this->RenderWindow->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
   os << indent << "Magnification: " << this->Magnification << endl;
   os << indent << "Script: \n" << this->Script << endl;
+  os << indent << "ImageData: ";
+  if (this->ImageData)
+    {
+    os << endl;
+    this->ImageData->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

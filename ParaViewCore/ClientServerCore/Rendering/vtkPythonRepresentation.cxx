@@ -88,11 +88,6 @@ int vtkPythonRepresentation::GetNumberOfAttributeArrays(int attributeType)
       {
       return attributeData->GetNumberOfArrays();
       }
-    else
-      {
-      vtkErrorMacro(<< "No attribute " << attributeType
-                    << " available in the input");
-      }
     }
 
   return 0;
@@ -145,6 +140,19 @@ int vtkPythonRepresentation::GetAttributeArrayStatus(int attributeType,
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonRepresentation::EnableAllAttributeArrays()
+{
+  for (int attributeType = 0; attributeType < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES; ++attributeType)
+    {
+      for (int i = 0; i < this->GetNumberOfAttributeArrays(attributeType); ++i)
+        {
+          const char* attributeName = this->GetAttributeArrayName(attributeType, i);
+          this->SetAttributeArrayStatus(attributeType, attributeName, 1);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

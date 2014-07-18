@@ -1,5 +1,6 @@
 # Set up a basic scene for rendering.
 from paraview.simple import *
+import os
 import sys
 
 script = """
@@ -16,7 +17,10 @@ def setup_data(view):
   print "Setting up data"
 
 # This function must be defined. It is where the actual rendering commands for matplotlib go.
-def render(view,figure):
+def render(view,width,height):
+  from paraview import python_view
+  figure = python_view.matplotlib_figure(width,height)
+
   ax = figure.add_subplot(111)
   ax.hold = True
   numObjects = view.GetNumberOfVisibleDataObjects()
@@ -32,12 +36,9 @@ def render(view,figure):
         ax.scatter(x, y, color=color)
 
   ax.hold = False
-"""
 
-if len(sys.argv) > 2:
-  server = sys.argv[2]
-  if not Connect(server):
-    print "Could not connect to server", server
+  return python_view.figure_to_image(figure)
+"""
 
 view = CreateView("PythonView")
 view.Script = script
@@ -50,7 +51,17 @@ Show(sphere, view)
 
 Render()
 
-WriteImage("pvpython.png", view)
+try:
+  baselineIndex = sys.argv.index('-B')+1
+  baselinePath = sys.argv[baselineIndex]
+except:
+  print "Could not get baseline directory. Test failed."
+
+baseline_file = os.path.join(baselinePath, "TestPythonViewMatplotlibScript.png")
+import vtk.test.Testing
+vtk.test.Testing.VTK_TEMP_DIR = vtk.util.misc.vtkGetTempDir()
+vtk.test.Testing.compareImage(view.GetRenderWindow(), baseline_file, threshold=25)
+vtk.test.Testing.interact()
 
 Delete(cone)
 del cone

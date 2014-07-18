@@ -24,11 +24,21 @@ if (FOUND_NUMPY)
 
   if (PARAVIEW_ENABLE_MATPLOTLIB)
     paraview_add_test_python(
-      NO_DATA NO_VALID NO_OUTPUT NO_RT
-      TestPythonView.py
+      NO_DATA NO_RT
+      TestPythonViewMatplotlibScript.py
       )
   endif()
+
+  paraview_add_test_python(
+    NO_DATA NO_RT
+    TestPythonViewNumpyScript.py
+    )
 endif()
+
+paraview_add_test_python(
+  NO_DATA NO_RT
+  TestPythonViewScript.py
+)
 
 # these tests could run safely in serial and
 # in parallel.

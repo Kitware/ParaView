@@ -23,11 +23,11 @@
 #include "vtkPVView.h"
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkImageData.h" // needed for member variable
 #include "vtkSmartPointer.h" //needed for member variables
 
 class vtkImageData;
 class vtkInformationRequestKey;
-class vtkMatplotlibUtilities;
 class vtkPythonRepresentation;
 class vtkRenderer;
 class vtkRenderWindow;
@@ -75,7 +75,7 @@ public:
   vtkGetStringMacro(Script);
 
   // Description:
-  // Magnification is needed to inform matplotlib of the requested size of the plot
+  // Magnification is needed to inform Python of the requested size of the plot
   vtkSetMacro(Magnification, int);
   vtkGetMacro(Magnification, int);
 
@@ -140,12 +140,22 @@ public:
                               const char* name);
 
   // Description:
+  // Enable all attribute arrays.
+  void EnableAllAttributeArrays();
+
+  // Description:
   // Disable all attribute arrays.
   void DisableAllAttributeArrays();
 
   virtual void StillRender();
 
   virtual void InteractiveRender();
+
+  // Description:
+  // Set the vtkImageData that will be displayed. This is an internal
+  // method meant only to be called from the python side, but must be
+  // exposed to be wrapped.
+  vtkSetObjectMacro(ImageData, vtkImageData);
 
 //BTX
 protected:
@@ -159,10 +169,6 @@ protected:
   // Needed to handle rendering at different magnifications
   int Magnification;
 
-  vtkSmartPointer<vtkMatplotlibUtilities> MatplotlibUtilities;
-
-  vtkImageData* GenerateImage();
-
   // Description:
   // Is local data available?
   bool IsLocalDataAvailable();
@@ -170,9 +176,19 @@ protected:
 private:
   vtkPythonView(const vtkPythonView&); // Not implemented
   void operator=(const vtkPythonView&); // Not implemented
+
+  // Run Python code with custom local dictionary
+  int RunSimpleStringWithCustomLocals(const char* code);
 //ETX
 
-  char * Script;
+  class vtkInternals;
+  vtkInternals* Internals;
+
+  // The Python script
+  char* Script;
+
+  // The image data to be displayed in the view
+  vtkImageData* ImageData;
 };
 
 #endif

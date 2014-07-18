@@ -66,7 +66,7 @@ set (Module_SRCS
   vtkSMWidgetRepresentationProxy.cxx
 )
 
-if (PARAVIEW_ENABLE_MATPLOTLIB)
+if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS vtkSMPythonViewProxy.cxx)
 endif()
 

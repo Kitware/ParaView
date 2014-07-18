@@ -97,9 +97,8 @@ set (Module_SRCS
   vtkXYChartRepresentation.cxx
 )
 
-if (PARAVIEW_ENABLE_MATPLOTLIB)
+if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
-    vtkMatplotlibUtilities.cxx
     vtkPythonRepresentation.cxx
     vtkPythonView.cxx)
 endif()
