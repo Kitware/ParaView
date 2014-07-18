@@ -53,6 +53,7 @@ namespace
       "vtkOriginalIndices",
       "vtkOriginalCellIds",
       "vtkOriginalPointIds",
+      "vtkOriginalRowIds",
       "Structured Coordinates",
       NULL};
     std::string a1Name = a1->GetName()? a1->GetName() : "";

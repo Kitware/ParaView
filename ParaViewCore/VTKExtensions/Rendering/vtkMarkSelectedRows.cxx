@@ -187,13 +187,26 @@ int vtkMarkSelectedRows::RequestDataInternal(vtkTable* input,
 
   vtkIdTypeArray *selectedIdsArray = 0;
 
-  if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  switch (this->FieldAssociation)
     {
-    selectedIdsArray = vtkIdTypeArray::SafeDownCast(extractedInput->GetColumnByName("vtkOriginalPointIds"));
-    }
-  else if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    {
-    selectedIdsArray = vtkIdTypeArray::SafeDownCast(extractedInput->GetColumnByName("vtkOriginalCellIds"));
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    selectedIdsArray = vtkIdTypeArray::SafeDownCast(
+      extractedInput->GetColumnByName("vtkOriginalPointIds"));
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+    selectedIdsArray = vtkIdTypeArray::SafeDownCast(
+      extractedInput->GetColumnByName("vtkOriginalCellIds"));
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+    selectedIdsArray = vtkIdTypeArray::SafeDownCast(
+      extractedInput->GetColumnByName("vtkOriginalRowIds"));
+    break;
+
+  default:
+    vtkWarningMacro("FieldAssociation type not supported yet. Selected elements "
+      "may not be shown correctly.");
     }
 
   if (!selectedIdsArray)

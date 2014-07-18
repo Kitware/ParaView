@@ -38,18 +38,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSpreadSheetViewModel;
 class vtkSMSourceProxy;
 
-
 /// This is the selection model used by spread sheet view. It manages two
 /// operations:
-/// \li When user changes the selection by clicking on the view, it updates the
-///     selection source proxy on the visible source proxy to reflect the 
-///     current selection.
-/// \li When vtkSelection changes, is updated the selection in the view
-///     accordingly.
-/// When the model is updated by the Qt View, we intercept the select() calls
-/// and don't update the QItemSelectionModel, instead the updates are pushed on
-/// to the vtkSelection for the source. The Qt model is updated only when the
-/// vtkSelection delivered to the client changes.
+/// \li When the QItemSelectionModel is updated by the QAbstractItemView
+///     due to user interaction, pqSpreadSheetViewModel::select() gets called.
+///     In that overload, this class creates a 'ParaView Selection' i.e. create a
+///     selection source proxy for an ID based selection and set it as the
+///     selection-input (vtkSMSourceProxy::SetSelectionInput) on the
+///     data-source being shown in the view.
+/// \li Whenever the pqSpreadSheetViewModel receives new selection data from the
+///     data-server, it updates its internal QItemSelection and fires
+///     pqSpreadSheetViewModel::selectionChanged signal.
+///     pqSpreadSheetViewSelectionModel handles that signal by updating itself to
+///     mark the corresponding elements as selected.
 class PQCORE_EXPORT pqSpreadSheetViewSelectionModel : public QItemSelectionModel
 {
   Q_OBJECT
