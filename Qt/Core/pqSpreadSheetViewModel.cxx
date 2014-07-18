@@ -601,6 +601,11 @@ QVariant pqSpreadSheetViewModel::headerData (
         {
         title = "Point ID";
         }
+      else if (title == "vtkOriginalRowIds" &&
+        view->GetShowExtractedSelection())
+        {
+        title = "Row ID";
+        }
       else if (title == "vtkCompositeIndexArray")
         {
         title = "Block Number";
