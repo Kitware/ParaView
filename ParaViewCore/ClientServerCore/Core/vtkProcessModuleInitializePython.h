@@ -200,34 +200,47 @@ namespace
                                            (SELF_DIR + "/../../../../lib");
     lib_dir = vtksys::SystemTools::CollapseFullPath(lib_dir.c_str());
 
-    bool is_build_dir = vtksys::SystemTools::FileExists(lib_dir.c_str());
+    std::string cmakeconfig = (is_app==false)? (SELF_DIR + "/../ParaViewConfig.cmake") :
+                                               (SELF_DIR + "/../../../../ParaViewConfig.cmake");
+    cmakeconfig = vtksys::SystemTools::CollapseFullPath(cmakeconfig.c_str());
+
+    bool is_build_dir = vtksys::SystemTools::FileExists(cmakeconfig.c_str());
 
     // when we install on OsX using unix-style the test for is_build_dir is
     // valid for install dir too. So we do an extra check.
     bool is_unix_style_install = vtksys::SystemTools::FileExists(
       (lib_dir + "/paraview-" PARAVIEW_VERSION).c_str());
-    if (is_build_dir && !is_unix_style_install)
+    if (is_build_dir)
       {
-      vtkPythonAppInitPrependPythonPath(lib_dir);
-      vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages");
-      }
-    else if (is_unix_style_install)
-      {
-      lib_dir = lib_dir + "/paraview-" PARAVIEW_VERSION;
-      vtkPythonAppInitPrependPythonPath(lib_dir);
-      vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages");
-      // site-packages/vtk needs to be added so the Python wrapped VTK modules
-      // can be loaded from paraview e.g. import vtkCommonCorePython can work
-      // (BUG #14263).
-      vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages/vtk");
+      if (is_unix_style_install)
+        {
+        lib_dir = lib_dir + "/paraview-" PARAVIEW_VERSION;
+        vtkPythonAppInitPrependPythonPath(lib_dir);
+        vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages");
+        // site-packages/vtk needs to be added so the Python wrapped VTK modules
+        // can be loaded from paraview e.g. import vtkCommonCorePython can work
+        // (BUG #14263).
+        vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages/vtk");
+        }
+      else // App bundle in build dir
+        {
+        vtkPythonAppInitPrependPythonPath(lib_dir);
+        vtkPythonAppInitPrependPythonPath(lib_dir + "/site-packages");
+        }
       }
     else
       {
-      std::string app_root = SELF_DIR + "/../..";
-      app_root = vtksys::SystemTools::CollapseFullPath(app_root.c_str());
-      // The Contents/Libraries may not be needed. We should verify that.
-      vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Libraries");
-      vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Python");
+      if(is_app)
+        {
+        std::string app_root = SELF_DIR + "/../..";
+        app_root = vtksys::SystemTools::CollapseFullPath(app_root.c_str());
+        vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Libraries");
+        vtkPythonAppInitPrependPythonPath(app_root + "/Contents/Python");
+        }
+      else
+        {
+        vtkGenericWarningMacro("Non-app bundle in install directory not supported");
+        }
       }
     }
 
