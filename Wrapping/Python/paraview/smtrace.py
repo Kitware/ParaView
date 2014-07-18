@@ -54,23 +54,14 @@ Additionally, there are filters such as :class:`.ProxyFilter`,
 :class:`.PipelineProxyFilter`, etc. which are used to filter properties that get
 traced and where they get traced i.e. in contructor call or right after it.
 
-=========================
-Future cleanups
-=========================
+===============================
+Notes about references
+===============================
 
-Simplifying PropertyAccessor
-----------------------------
-These are first class accessors right now. They get registered
-with the Trace etc. The idea was we may need to discover these based on just a
-property that was modified. That really isn't true. We always have the proxy.
-Thus, there's no need register these. That will make cleanup easier.
+RealProxyAccessor keeps a hard reference to the servermanager.Proxy instance.
+This is required. If we don't, then the Python object for vtkSMProxy also gets
+garbage collected since there's no reference to it.
 
-Using vtkSMProxy instead of servermanager.Proxy()
--------------------------------------------------
-Currently, all ivars are expected to be Proxy() not vtkSMProxy. This adds extra
-burden for garbage collection. We should change that use vtkSMProxy. In my first
-attempt that failed before of how PropertyAccessor as structured. By simplifying
-them, I believe this is achievable.
 """
 
 import weakref
@@ -120,6 +111,7 @@ class Trace(object):
 
     @classmethod
     def reset(cls):
+        """Resets the Output and clears all register accessors."""
         cls.__REGISTERED_ACCESSORS.clear()
         cls.Output = TraceOutput()
 
@@ -130,7 +122,9 @@ class Trace(object):
 
     @classmethod
     def get_varname(cls, name):
-        """returns an unique variable name given a suggested variable name."""
+        """returns an unique variable name given a suggested variable name. If
+        the suggested variable name is already taken, this method will try to
+        find a good suffix that's available."""
         name = sm._make_name_valid(name)
         name = name[0].lower() + name[1:]
         original_name = name
@@ -144,6 +138,7 @@ class Trace(object):
 
     @classmethod
     def register_accessor(cls, accessor):
+        """Register an instance of an Accessor or subclass"""
         cls.__REGISTERED_ACCESSORS[accessor.get_object()] = accessor
 
     @classmethod
@@ -164,7 +159,7 @@ class Trace(object):
         except KeyError:
             # Create accessor if possible else raise
             # "untraceable" exception.
-            if cls._create_accessor(obj):
+            if cls.create_accessor(obj):
                 return cls.__REGISTERED_ACCESSORS[obj]
             #return "<unknown>"
             raise Untraceable(
@@ -176,7 +171,11 @@ class Trace(object):
         return cls.__REGISTERED_ACCESSORS.has_key(obj)
 
     @classmethod
-    def _create_accessor(cls, obj):
+    def create_accessor(cls, obj):
+        """Create a new accessor for a proxy. This returns True when a
+        ProxyAccessor has been created, other returns False. This is needed to
+        bring into trace proxies that were either already created when the trace
+        was started or were created indirectly and hence not explictly traced."""
         if isinstance(obj, sm.SourceProxy):
             # handle pipeline source/filter proxy.
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("sources", obj.SMProxy)
@@ -211,7 +210,7 @@ class Trace(object):
                 if viewSizeAccessor:
                     trace.append([\
                         "# uncomment following to set a specific view size",
-                        "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
+                        "# %s" % viewSizeAccessor.get_property_trace(in_ctor=False)])
                 cls.Output.append_separated(trace.raw_data())
                 return True
         if obj.SMProxy.IsA("vtkSMRepresentationProxy"):
@@ -389,9 +388,9 @@ class RealProxyAccessor(Accessor):
 
             prop = proxy.GetProperty(prop_name)
             if not type(prop) == sm.Property:
-                # Note: when PropertyAccessor for a property with ProxyListDomain is
+                # Note: when PropertyTraceHelper for a property with ProxyListDomain is
                 # created, it creates accessors for all proxies in the domain as well.
-                prop_accessor = PropertyAccessor(sanitized_label, prop, self)
+                prop_accessor = PropertyTraceHelper(sanitized_label, self)
                 self.OrderedProperties.append(prop_accessor)
             oiter.Next()
         del oiter
@@ -403,7 +402,7 @@ class RealProxyAccessor(Accessor):
 
     def get_property(self, name):
         for x in self.OrderedProperties:
-            if x.PropertyKey == name:
+            if x.get_property_name() == name:
                 return x
         return None
 
@@ -421,7 +420,7 @@ class RealProxyAccessor(Accessor):
 
     def trace_properties(self, props, in_ctor):
         joiner = ",\n    " if in_ctor else "\n"
-        return joiner.join([x.trace_property(in_ctor) for x in props])
+        return joiner.join([x.get_property_trace(in_ctor) for x in props])
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
         args_in_ctor = str(ctor_args) if not ctor_args is None else ""
@@ -461,20 +460,38 @@ class RealProxyAccessor(Accessor):
             sub_trace = paccessor.trace_ctor(None, filter)
             if sub_trace:
                 trace.append_separated(\
-                    "# init the %s selected for '%s'" % (prop.value(), prop.get_property_name()))
+                    "# init the %s selected for '%s'" % (prop.get_value(), prop.get_property_name()))
                 trace.append(sub_trace)
         return trace.raw_data()
 
 def ProxyAccessor(*args, **kwargs):
     return RealProxyAccessor.create(*args, **kwargs)
 
-class PropertyAccessor(Accessor):
-    def __init__(self, propkey, prop, proxyAccessor):
-        Accessor.__init__(self, "%s.%s" % (proxyAccessor, propkey), prop)
-        self.PropertyKey = propkey
+class PropertyTraceHelper(object):
+    """PropertyTraceHelper is used by RealProxyAccessor to help with tracing
+    properites. In its contructor, RealProxyAccessor creates a
+    PropertyTraceHelper for each of its properties that could potentially need
+    to be traced."""
+    def __init__(self, propertyname, proxyAccessor):
+        """Constructor.
+
+          :param propertyname: name used to access the property. This is the
+          sanitized property label.
+          :param proxyAccessor: RealProxyAccessor instance for the proxy.
+        """
+        assert isinstance(proxyAccessor, RealProxyAccessor)
+        assert type(propertyname) == str
+
+        self.__PyProperty = None
+        self.PropertyName = propertyname
         self.ProxyAccessor = proxyAccessor
-        pld_domain = prop.FindDomain("vtkSMProxyListDomain")
-        self.HasProxyListDomain = isinstance(prop, sm.ProxyProperty) and pld_domain != None
+        self.FullScopedName = "%s.%s" % (proxyAccessor, propertyname)
+
+        pyprop = self.get_object()
+        assert not pyprop is None
+
+        pld_domain = pyprop.FindDomain("vtkSMProxyListDomain")
+        self.HasProxyListDomain = isinstance(pyprop, sm.ProxyProperty) and pld_domain != None
         self.ProxyListDomainProxyAccessors = []
 
         if self.HasProxyListDomain:
@@ -484,25 +501,50 @@ class PropertyAccessor(Accessor):
             # UI never modifies the other properties, we cheat
             for i in xrange(pld_domain.GetNumberOfProxies()):
                 domain_proxy = pld_domain.GetProxy(i)
-                plda = ProxyAccessor(self.varname(), sm._getPyProxy(domain_proxy))
+                plda = ProxyAccessor(self.get_varname(), sm._getPyProxy(domain_proxy))
                 self.ProxyListDomainProxyAccessors.append(plda)
+
+    def __del__(self):
+        self.finalize()
 
     def finalize(self):
         for x in self.ProxyListDomainProxyAccessors:
             x.finalize()
-        Accessor.finalize(self)
+        self.ProxyListDomainProxyAccessors = []
 
-    def trace_property(self, in_ctor):
-        """return trace-text for the property."""
-        varname = self.varname(in_ctor)
-        if in_ctor: return "%s=%s" % (varname, self.value())
-        else: return "%s = %s" % (varname, self.value())
+    def get_object(self):
+        """Returns the servermanager.Property (or subclass) for the
+        vtkSMProperty this trace helper is helping with."""
+        if self.__PyProperty is None or self.__PyProperty() is None:
+            # This will raise Untraceable exception is the ProxyAccessor cannot
+            # locate the servermanager.Proxy for the SMProxy it refers to.
+            pyproperty = self.ProxyAccessor.get_object().GetProperty(self.get_property_name())
+            self.__PyProperty = weakref.ref(pyproperty)
+            return pyproperty
+        return self.__PyProperty()
 
-    def varname(self, not_fully_scoped=False):
-        return self.PropertyKey if not_fully_scoped else self.Varname
+    def get_property_trace(self, in_ctor):
+        """return trace-text for the property.
 
-    def value(self):
-        # FIXME: need to ensure "object" is accessible.
+        :param in_ctor: if False, the trace is generated trace will use
+        fully-scoped name when referring to the property e.g. sphere0.Radius=2,
+        else it will use just the property name e.g. Radius=2."""
+        varname = self.get_varname(in_ctor)
+        if in_ctor: return "%s=%s" % (varname, self.get_value())
+        else: return "%s = %s" % (varname, self.get_value())
+
+    def get_varname(self, not_fully_scoped=False):
+        """Returns the variable name to use when referring to this property.
+
+        :param not_fully_scoped: if False, this will return
+        fully-scoped name when referring to the property e.g. sphere0.Radius,
+        else it will use just the property name e.g. Radius"""
+        return self.PropertyName if not_fully_scoped else self.FullScopedName
+
+    def get_value(self):
+        """Returns the propery value as a string. For proxy properties, this
+        will either be a string used to refer to another proxy or a string used
+        to refer to the proxy in a proxy list domain."""
         if isinstance(self.get_object(), sm.ProxyProperty):
             data = self.get_object()[:]
             if self.has_proxy_list_domain():
@@ -519,21 +561,17 @@ class PropertyAccessor(Accessor):
         else:
             return str(self.get_object())
 
-    def get_trace_value(self, val):
-        """Returns the value to trace. For proxies, this refers to the variable
-        used to access the proxy"""
-        return "'%s'" % str(val) if not isinstance(val, sm.Proxy) else \
-            str(Trace.get_accessor(val))
-
     def has_proxy_list_domain(self):
         """Returns True if this property has a ProxyListDomain, else False."""
         return self.HasProxyListDomain
 
     def get_property_name(self):
-        return self.PropertyKey
+        return self.PropertyName
 
     def get_property_value(self):
-        return self.ProxyAccessor.get_object().GetPropertyValue(self.PropertyKey)
+        """Return the Property value as would be returned by
+        servermanager.Proxy.GetPropertyValue()."""
+        return self.ProxyAccessor.get_object().GetPropertyValue(self.get_property_name())
 
 # ===================================================================================================
 # === Filters used to filter properties traced ===
@@ -601,7 +639,7 @@ class RepresentationProxyFilter(PipelineProxyFilter):
 
     def should_never_trace(self, prop):
         if PipelineProxyFilter.should_never_trace(self, prop): return True
-        if prop.PropertyKey in ["Input",\
+        if prop.get_property_name() in ["Input",\
             "SelectionCellFieldDataArrayName",\
             "SelectionPointFieldDataArrayName"] : return True
         return False
@@ -609,13 +647,13 @@ class RepresentationProxyFilter(PipelineProxyFilter):
 class ViewProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         # skip "Representations" property.
-        if prop.PropertyKey in ["Representations", "CameraClippingRange"]: return True
+        if prop.get_property_name() in ["Representations", "CameraClippingRange"]: return True
         return ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False)
 
 class AnimationProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
-        if prop.PropertyKey in ["AnimatedProxy", "AnimatedPropertyName",
+        if prop.get_property_name() in ["AnimatedProxy", "AnimatedPropertyName",
             "AnimatedElement", "AnimatedDomainName"]:
             return True
         return False
@@ -625,7 +663,7 @@ class ExporterProxyFilter(ProxyFilter):
         return not self.should_never_trace(prop) and self.should_trace_in_create(prop)
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
-        if prop.PropertyKey == "FileName" : return True
+        if prop.get_property_name() == "FileName" : return True
         return False
 
 class WriterProxyFilter(ProxyFilter):
@@ -633,14 +671,14 @@ class WriterProxyFilter(ProxyFilter):
         return not self.should_never_trace(prop) and self.should_trace_in_create(prop)
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
-        if prop.PropertyKey in ["FileName", "Input"] : return True
+        if prop.get_property_name() in ["FileName", "Input"] : return True
         return False
 
 class TransferFunctionProxyFilter(ProxyFilter):
     def should_trace_in_ctor(self, prop): return False
     def should_never_trace(self, prop):
         if ProxyFilter.should_never_trace(self, prop): return True
-        if prop.PropertyKey in ["ScalarOpacityFunction"]: return True
+        if prop.get_property_name() in ["ScalarOpacityFunction"]: return True
         return False
 
 class ScalarBarProxyFilter(ProxyFilter):
@@ -895,7 +933,7 @@ class RegisterViewProxy(TraceItem):
             # that the playback in the GUI doesn't cause issues.
             Trace.Output.append([\
                 "# uncomment following to set a specific view size",
-                "# %s" % viewSizeAccessor.trace_property(in_ctor=False)])
+                "# %s" % viewSizeAccessor.get_property_trace(in_ctor=False)])
         # we assume views don't have proxy list domains for now, and ignore tracing them.
         TraceItem.finalize(self)
 
