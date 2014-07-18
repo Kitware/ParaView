@@ -60,10 +60,10 @@ if(NOT EXISTS "${COPROCESSING_IMAGE_TESTER}")
 endif()
 
 message("${COPROCESSING_IMAGE_TESTER} ${COPROCESSING_TEST_DIR}/image_0.png -V
-  ${COPROCESSING_DATA_DIR}/Baseline/CPFullWorkflow.png -T
+  ${COPROCESSING_DATA_DIR}/CPFullWorkflow.png -T
   ${COPROCESSING_TEST_DIR}")
 execute_process_with_echo(COMMAND
-  ${COPROCESSING_IMAGE_TESTER} ${COPROCESSING_TEST_DIR}/image_0.png 20 -V ${COPROCESSING_DATA_DIR}/Baseline/CPFullWorkflow.png -T ${COPROCESSING_TEST_DIR}
+  ${COPROCESSING_IMAGE_TESTER} ${COPROCESSING_TEST_DIR}/image_0.png 20 -V ${COPROCESSING_DATA_DIR}/CPFullWorkflow.png -T ${COPROCESSING_TEST_DIR}
   RESULT_VARIABLE failed)
 if(failed)
   message(FATAL_ERROR "CoProcessingCompareImageTester return value was = '${failed}' ")
