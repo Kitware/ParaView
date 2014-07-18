@@ -21,75 +21,45 @@
 #define __vtkPythonExtractSelection_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkProgrammableFilter.h"
+#include "vtkExtractSelectionBase.h"
 
-class vtkCharArray;
-class vtkDataSet;
-class vtkTable;
-class vtkSelection;
-class vtkUnstructuredGrid;
+class vtkCompositeDataSet;
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonExtractSelection : public vtkProgrammableFilter
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonExtractSelection : public vtkExtractSelectionBase
 {
 public:
   static vtkPythonExtractSelection* New();
-  vtkTypeMacro(vtkPythonExtractSelection, vtkProgrammableFilter);
+  vtkTypeMacro(vtkPythonExtractSelection, vtkExtractSelectionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Convenience method to specify the selection connection (2nd input
-  // port)
-  void SetSelectionConnection(vtkAlgorithmOutput* algOutput)
-    {
-    this->SetInputConnection(1, algOutput);
-    }
-
-  // Description:
-  // Match the PreserveTopology option available on vtkExtractSelectionBase.
-  vtkSetClampMacro(PreserveTopology, int, 0, 1);
-  vtkGetMacro(PreserveTopology, int);
-  vtkBooleanMacro(PreserveTopology, int);
-
-  // Description:
-  // Set/get the inverse flag.
-  vtkSetMacro(Inverse, int);
-  vtkGetMacro(Inverse, int);
-
-  // Description:
-  // Internal method.
-  vtkDataObject* ExtractElements(vtkDataObject* data, vtkSelection* selection, vtkCharArray* mask);
+  // Method called by Python code to handle the extraction logic.
+  // \c attributeType is vtkDataObject::AttributeTypes and not to be confused with
+  // vtkSelectionNode::SelectionField
+  bool ExtractElements(int attributeType, vtkDataObject* input, vtkDataObject* output);
+  bool ExtractElements(int attributeType, vtkCompositeDataSet* input, vtkCompositeDataSet* output);
 
 //BTX
 protected:
   vtkPythonExtractSelection();
   ~vtkPythonExtractSelection();
 
-  // Description:
-  // For internal use only.
-  void Exec();
-  
-  vtkUnstructuredGrid* ExtractPoints(vtkDataSet* data, vtkCharArray* mask);
-  vtkUnstructuredGrid* ExtractCells(vtkDataSet* data, vtkCharArray* mask);
-  vtkTable* ExtractElements(vtkTable* data, vtkCharArray* mask);
-
   virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int RequestDataObject(vtkInformation* request,
+    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  virtual int RequestData(
+    vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   // Description:
-  // Creates whatever output data set type is selected.
-  virtual int RequestDataObject(vtkInformation* request, 
-                                vtkInformationVector** inputVector, 
-                                vtkInformationVector* outputVector);
-
-  int PreserveTopology;
-  int Inverse;
+  // Method used to initialize the output data object in request data.
+  // The output data is initialized based on the state of
+  // this->PreserveTopology.
+  void InitializeOutput(vtkDataObject* output, vtkDataObject* input);
 
 private:
   vtkPythonExtractSelection(const vtkPythonExtractSelection&); // Not implemented
   void operator=(const vtkPythonExtractSelection&); // Not implemented
 
-  // Description: 
-  // For internal use only.
-  static void ExecuteScript(void *);
 //ETX
 };
 

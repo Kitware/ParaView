@@ -135,7 +135,6 @@ void vtkPythonCalculator::Exec(const char* expression)
   vtksys_ios::ostringstream python_stream;
   python_stream
     << "import paraview\n"
-    << "paraview.fromFilter = True\n"
     << "from paraview import calculator\n"
     << "from vtkPVClientServerCoreDefaultPython import vtkPythonCalculator\n"
     << "calculator.execute(vtkPythonCalculator('" << aplus << "'), '"

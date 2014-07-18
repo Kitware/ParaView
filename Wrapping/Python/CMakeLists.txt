@@ -38,8 +38,16 @@ endif()
 set(PV_PYTHON_MODULE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/paraview")
 set(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview")
 
+
 # Copy generated module files from VTK into place in the build tree
-set(_vtkpy_modules vtkpython_pyc)
+set(_vtkpy_modules
+  # Ninja BUG 760: In past this depended on vtkpython_pyc. However, due to Ninja
+  # bug, the dependency wasn't being setup properly. Hence we directly depend on
+  # the generated file. Once Ninja or Cmake is fixed, we can remove this file
+  # depedency and leave the target dependecy.
+  ${CMAKE_BINARY_DIR}/VTK/Wrapping/Python/vtk_compile_complete
+  vtkpython_pyc
+  )
 if (TARGET vtkWebPython)
   list(APPEND _vtkpy_modules vtkWebPython)
 endif()

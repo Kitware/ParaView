@@ -64,11 +64,12 @@ public:
     {
     QString ArrayName;
     int ComponentNo;
-    ArrayInfo(const QString& name, int comp)
-      : ArrayName(name), ComponentNo(comp)
+    int NumberOfComponents;
+    ArrayInfo(const QString& name, int comp, int num_comps)
+      : ArrayName(name), ComponentNo(comp), NumberOfComponents(num_comps)
       {
       }
-    ArrayInfo() : ComponentNo(0) {}
+    ArrayInfo() : ComponentNo(0), NumberOfComponents(1) {}
     };
 
   // key == index in the combo-box
@@ -195,7 +196,8 @@ void pqQueryClauseWidget::populateSelectionCriteria(
     for (int cc=0; cc < attrInfo->GetNumberOfArrays(); cc++)
       {
       vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(cc);
-      if (arrayInfo->GetNumberOfComponents() > 1)
+      int number_of_components = arrayInfo->GetNumberOfComponents();
+      if (number_of_components > 1)
         {
         this->Internals->criteria->addItem(
               QString("%1 (Magnitude)").arg(arrayInfo->GetName()),
@@ -203,7 +205,7 @@ void pqQueryClauseWidget::populateSelectionCriteria(
 
         int item_index = (this->Internals->criteria->count()-1);
         this->Internals->Arrays.insert(item_index,
-                                       pqInternals::ArrayInfo(arrayInfo->GetName(), -1));
+          pqInternals::ArrayInfo(arrayInfo->GetName(), -1, number_of_components));
 
         for (int kk=0; kk < arrayInfo->GetNumberOfComponents(); kk++)
           {
@@ -212,7 +214,7 @@ void pqQueryClauseWidget::populateSelectionCriteria(
                 THRESHOLD);
           item_index = (this->Internals->criteria->count()-1);
           this->Internals->Arrays.insert(item_index,
-                                         pqInternals::ArrayInfo(arrayInfo->GetName(), kk));
+            pqInternals::ArrayInfo(arrayInfo->GetName(), kk, number_of_components));
           }
         }
       else
@@ -221,7 +223,7 @@ void pqQueryClauseWidget::populateSelectionCriteria(
                                            THRESHOLD);
         int item_index = (this->Internals->criteria->count()-1);
         this->Internals->Arrays.insert(item_index,
-                                       pqInternals::ArrayInfo(arrayInfo->GetName(), 0));
+          pqInternals::ArrayInfo(arrayInfo->GetName(), 0, number_of_components));
         }
       }
     }
@@ -624,6 +626,8 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     break;
   case INDEX:
     fieldName = "id";
+    qCritical("INDEX based queries are temporarily disabled."
+      "They'll be fixed and working soon. Expect weird Python errors :)");
     break;
   case GLOBALID:
     fieldName =
@@ -633,15 +637,20 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   case THRESHOLD:
     pqInternals::ArrayInfo info = this->Internals->Arrays[
         this->Internals->criteria->currentIndex()];
-    if(info.ComponentNo == -1)
+    if (info.ComponentNo == -1)
       {
       // Magnitude
       fieldName.append("mag(").append(info.ArrayName).append(")");
       }
-    else
+    else if (info.NumberOfComponents > 1)
       {
       fieldName.append(info.ArrayName)
           .append("[:,").append(QString::number(info.ComponentNo)).append("]");
+      }
+    else
+      {
+      Q_ASSERT(info.ComponentNo == 0 && info.NumberOfComponents == 1);
+      fieldName.append(info.ArrayName);
       }
     break;
     }

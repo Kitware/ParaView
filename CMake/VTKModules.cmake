@@ -357,6 +357,9 @@ endif()
 
 if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules vtkFiltersPython)
+  if (PARAVIEW_USE_MPI)
+    list(APPEND _vtk_modules vtkParallelMPI4Py)
+  endif()
 endif()
 
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
