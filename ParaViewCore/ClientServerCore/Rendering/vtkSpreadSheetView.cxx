@@ -238,6 +238,7 @@ namespace
     return NULL;
     }
 
+#if 0 // Its usage is commented out below.
   vtkAlgorithmOutput* vtkGetSelectionProducer(
     vtkSpreadSheetView* self, vtkSpreadSheetRepresentation* repr)
     {
@@ -251,6 +252,7 @@ namespace
       }
     return NULL;
     }
+#endif
 }
 
 vtkStandardNewMacro(vtkSpreadSheetView);

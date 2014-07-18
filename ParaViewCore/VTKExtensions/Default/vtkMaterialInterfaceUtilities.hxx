@@ -308,28 +308,6 @@ int CopyTuple(T *dest,          // scalar/vector
   return 1;
 }
 
-// Construct a list of the selected array names
-int GetEnabledArrayNames(
-        vtkDataArraySelection *das,
-        vector<string> &names)
-{
-  int nEnabled=das->GetNumberOfArraysEnabled();
-  names.resize(nEnabled);
-  int nArraysTotal=das->GetNumberOfArrays();
-  for (int i=0,j=0; i<nArraysTotal; ++i)
-    {
-    // skip disabled arrays
-    if ( !das->GetArraySetting(i) )
-      {
-      continue;
-      }
-    // save names of enabled arrays, inc name count
-    names[j]=das->GetArrayName(i);
-    ++j;
-    }
-  return nEnabled;
-}
-
 // This is inefficient but not used often.
 int IsIn(string name, vector<string> names)
 {
@@ -339,40 +317,6 @@ int IsIn(string name, vector<string> names)
     if (names[i]==name) return true;
     }
   return false;
-}
-
-// Merge selected array names form multiple data
-// array selections who list the same arrays.
-// Return the number of array that were merged.
-// Would like to use a std::set, but would require
-// more work than its worth.
-int MergeEnabledArrayNames(
-        vtkDataArraySelection *das,
-        vector<string> &mergedNames)
-{
-  // check each array in data array selection.
-  int nMerged=0;
-  int nArraysTotal=das->GetNumberOfArrays();
-  for (int i=0; i<nArraysTotal; ++i)
-    {
-    string name=das->GetArrayName(i);
-    // skip disabled (all arrays should be enabled)
-    if (!das->GetArraySetting(i))
-      {
-      vtkGenericWarningMacro(
-          "Array: " << name << " is present but not enabled.");
-      continue;
-      }
-    // Skip previosly merged arrays
-    if (IsIn(name, mergedNames))
-      {
-      continue;
-      }
-    ++nMerged;
-    // save names of enabled arrays, inc name count
-    mergedNames.push_back(name);
-    }
-  return nMerged;
 }
 
 #ifdef vtkMaterialInterfaceFilterDEBUG

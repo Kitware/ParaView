@@ -1893,10 +1893,9 @@ double vtkGridConnectivity::IntegrateVoxel(vtkCell* voxel,
 }
 
 //-----------------------------------------------------------------------------
-double vtkGridConnectivity::IntegrateGeneral3DCell(vtkCell *cell,
+double vtkGridConnectivity::IntegrateGeneral3DCell(vtkCell *vtkNotUsed(cell),
   vtkUnstructuredGrid*, int)
 {
-  cell = cell;
   /*
   vtkIdType nPnts = ptIds->GetNumberOfIds();
   // There should be a number of points that is a multiple of 4
