@@ -139,11 +139,23 @@
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
+          <DataType value="vtkDataObject" />
         </DataTypeDomain>
         <Documentation>Set the input of the filter.</Documentation>
       </InputProperty>
-      <StringVectorProperty command="SetPythonExpression"
+      <IntVectorProperty command="SetArrayAssociation"
+                         default_values="2"
+                         name="ArrayAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute to use to popular array names from.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Point Data" value="0" />
+          <Entry text="Cell Data" value="1" />
+          <Entry text="Field Data" value="2" />
+          <Entry text="Row Data" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetExpression"
                             name="Expression"
                             number_of_elements="1">
         <Documentation>The Python expression evaluated during execution.
@@ -152,7 +164,7 @@
         FieldData, PointData, CellData] (i.e.: "Momentum: (%f, %f, %f)" %
         (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )</Documentation>
       </StringVectorProperty>
-      <StringVectorProperty command="GetAnnotationValue"
+      <StringVectorProperty command="GetComputedAnnotationValue"
                             information_only="1"
                             name="AnnotationValue">
         <Documentation>Text that is used as annotation</Documentation>

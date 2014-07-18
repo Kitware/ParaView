@@ -184,8 +184,12 @@ bool vtkMultiProcessControllerHelper::MergePieces(
     tp->SetOutput(iter->GetPointer());
     appender->AddInputConnection(0, tp->GetOutputPort());
     }
-  appender->Update();
-  result->ShallowCopy(appender->GetOutputDataObject(0));
+  // input connections may be 0, since we skip empty inputs in the loop above.
+  if (appender->GetNumberOfInputConnections(0) > 0)
+    {
+    appender->Update();
+    result->ShallowCopy(appender->GetOutputDataObject(0));
+    }
   appender->Delete();
   return true;
 }

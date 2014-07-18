@@ -46,8 +46,11 @@ def execute(self):
     inputs = []
     inputs.append(dsa.WrapDataObject(inputDO))
 
+    # get a dictionary for arrays in the dataset attributes. We pass that
+    # as the variables in the eval namespace for calculator.compute().
+    elocals = calculator.get_arrays(inputs[0].GetAttributes(attributeType))
     try:
-        maskArray = calculator.compute(inputs, attributeType, selectionNode.GetQueryString())
+        maskArray = calculator.compute(inputs, selectionNode.GetQueryString(), ns=elocals)
     except:
         from sys import stderr
         print >> stderr, "Error: Failed to evaluate Expression '%s'. "\

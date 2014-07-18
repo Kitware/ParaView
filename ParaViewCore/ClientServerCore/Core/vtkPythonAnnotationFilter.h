@@ -12,19 +12,31 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPythonAnnotationFilter
+// .NAME vtkPythonAnnotationFilter - filter used to generate text annotation
+// from Python expressions.
 // .SECTION Description
-// This filter allow the user to write an expression that can be use to
-// extract any field information and represent the result as a text annotation
-// in the 3D view
+// vtkPythonAnnotationFilter is designed to generate vtkTableAlgorithm with a
+// single string in it. The goal is that user will write a Python expression,
+// similar to an expression in Python Calculator (vtkPythonCalculator). The
+// generated result is converted to string and placed in the output.
+//
+// The variables available in the expression evaluation scope are as follows:
+// \li sanitized array names for all arrays in the chosen ArrayAssociation.
+// \li input: refers to the input dataset (wrapped as
+// vtk.numpy_interface.dataset_adapter.DataObject or subclass).
+// \li time_value: vtkDataObject::DATA_TIME_STEP() from input.
+// \li time_steps: vtkDataObject::TIME_STEPS() from the input, if any
+// \li time_range: vtkDataObject::TIME_RANGE() from the input, if any
+//
+// Examples of valid expressions are:
+// \li "Max temp is %s" % max(Temp)
+
 
 #ifndef __vtkPythonAnnotationFilter_h
 #define __vtkPythonAnnotationFilter_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
-
-class vtkStdString;
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonAnnotationFilter : public vtkTableAlgorithm
 {
@@ -34,33 +46,42 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Allow the user to customize the output annotation based on some arbitrary
-  // content processing
-  //
-  // Here is the set of preset variable available to you when you write your
-  // expression.
-  //   - input
-  //   - input.PointData['myArray']
-  //   - input.CellData['myArray']
-  //   - input.FieldData['myArray']
-  //   - t_value
-  //   - t_steps
-  //   - t_range
-  //   - t_index
-  //
+  // Set the expression to evaluate.
   // Here is a set of common expressions:
   //  - "Momentum %s" % str(Momentum[available_timesteps.index(provided_time)])
-  //
-  vtkSetStringMacro(PythonExpression);
-  vtkGetStringMacro(PythonExpression);
+  vtkSetStringMacro(Expression);
+  vtkGetStringMacro(Expression);
 
   // Description:
-  // Set the value that is going to be printed to the output. This is an
-  // internal method and should not be called directly. It is called by the
-  // python script executed internally to pass the computed annotation value
-  // back to the filter.
-  void SetAnnotationValue(const char* value);
-  vtkGetStringMacro(AnnotationValue);
+  // Set the input array association. This dictates which array names are made
+  // available in the namespace by default. You can still use
+  // input.PointData['foo'] or input.CellData['bar'] explicitly to pick a
+  // specific array in your expression.
+  vtkSetMacro(ArrayAssociation, int);
+  vtkGetMacro(ArrayAssociation, int);
+
+  // Description:
+  // Get the value that is going to be printed to the output.
+  vtkGetStringMacro(ComputedAnnotationValue);
+
+  //------------------------------------------------------------------------------
+  // Description:
+  // Get methods for use in annotation.py.
+  // The values are only valid during RequestData().
+  vtkGetMacro(DataTimeValid, bool);
+  vtkGetMacro(DataTime, double);
+
+  vtkGetMacro(NumberOfTimeSteps, int);
+  double GetTimeStep(int index)
+    {
+    return (index < this->NumberOfTimeSteps? this->TimeSteps[index] : 0.0);
+    }
+
+  vtkGetMacro(TimeRangeValid, bool);
+  vtkGetVector2Macro(TimeRange, double);
+  vtkGetObjectMacro(CurrentInputDataObject, vtkDataObject);
+  void SetComputedAnnotationValue(const char* value);
+
 //BTX
 protected:
   vtkPythonAnnotationFilter();
@@ -72,23 +93,24 @@ protected:
                           vtkInformationVector* outputVector);
 
   // Description:
-  // For internal use only.
   void EvaluateExpression();
 
-  char* AnnotationValue;
-  char* PythonExpression;
-
-  // Used internally to store time informations for Python
-  vtkSetStringMacro(TimeInformations);
-  char* TimeInformations;
+  char* Expression;
+  char* ComputedAnnotationValue;
+  int ArrayAssociation;
 
 private:
   vtkPythonAnnotationFilter(const vtkPythonAnnotationFilter&); // Not implemented
   void operator=(const vtkPythonAnnotationFilter&); // Not implemented
 
-  // Description: 
-  // For internal use only.
-  static void ExecuteScript(void *);
+  bool DataTimeValid;
+  double DataTime;
+  int NumberOfTimeSteps;
+  double* TimeSteps;
+  bool TimeRangeValid;
+  double TimeRange[2];
+  vtkDataObject* CurrentInputDataObject;
+
 //ETX
 };
 

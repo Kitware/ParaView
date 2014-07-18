@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>405</width>
+    <width>444</width>
     <height>38</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1,0">
      <item>
       <widget class="QComboBox" name="criteria">
        <property name="sizeAdjustPolicy">
@@ -35,6 +35,9 @@
      </item>
      <item>
       <widget class="QComboBox" name="condition">
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
        <item>
         <property name="text">
          <string>is</string>
@@ -154,11 +157,11 @@
           <number>0</number>
          </property>
          <item>
-	   <widget class="QLabel" name="label_empty_value">
-             <property name="text">
-               <string></string>
-             </property>
-           </widget>
+          <widget class="QLabel" name="label_empty_value">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

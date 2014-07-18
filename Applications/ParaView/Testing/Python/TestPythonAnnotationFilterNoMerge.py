@@ -49,7 +49,7 @@ time = timesteps[5]
 
 # Annotation filter
 annotation = PythonAnnotation()
-annotation.Expression = '"%f %f %f" % (inputMB[0].FieldData["XMOM"][t_index], inputMB[0].FieldData["YMOM"][t_index], inputMB[0].FieldData["ZMOM"][t_index])'
+annotation.Expression = '"%f %f %f" % (XMOM[t_index], YMOM[t_index], ZMOM[t_index])'
 
 # Update time and trigger pipeline execution
 time = timesteps[5]
@@ -84,7 +84,7 @@ annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
-expected = "7 0.000700 [0, 0.00429999]"
+expected = "7 0.000700 (0.0, 0.004299988504499197)"
 
 if not equal(value, expected):
   errors += 1
@@ -96,7 +96,7 @@ annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
-expected = "27 0.002700 [0, 0.00429999]"
+expected = "27 0.002700 (0.0, 0.004299988504499197)"
 
 if not equal(value, expected):
   errors += 1
@@ -108,7 +108,7 @@ annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
-expected = "43 0.004300 [0, 0.00429999]"
+expected = "43 0.004300 (0.0, 0.004299988504499197)"
 
 if not equal(value, expected):
   errors += 1

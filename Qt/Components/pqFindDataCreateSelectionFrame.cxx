@@ -211,29 +211,9 @@ void pqFindDataCreateSelectionFrame::runQuery()
     qWarning("Failed to create a selection based on the given criteria.");
     return;
     }
-
-  switch (ui.queryClauseWidget->attributeType())
-    {
-  case vtkDataObject::CELL:
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::CELL);
-    break;
-
-  case vtkDataObject::POINT:
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::POINT);
-    break;
-
-  case vtkDataObject::EDGE:
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::EDGE);
-    break;
-
-  case vtkDataObject::VERTEX:
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::VERTEX);
-    break;
-
-  case vtkDataObject::ROW:
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::ROW);
-    break;
-    }
+  vtkSMPropertyHelper(selectionSource, "FieldType").Set(
+    vtkSelectionNode::ConvertAttributeTypeToSelectionField(
+      ui.queryClauseWidget->attributeType()));
   selectionSource->UpdateVTKObjects();
   port->setSelectionInput(vtkSMSourceProxy::SafeDownCast(selectionSource), 0);
 

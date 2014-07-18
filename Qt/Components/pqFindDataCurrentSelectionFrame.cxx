@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqServer.h"
 #include "pqSpreadSheetViewModel.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
@@ -147,8 +148,7 @@ public:
   //---------------------------------------------------------------------------
   void showSelectedData(pqOutputPort* port, pqFindDataCurrentSelectionFrame* self)
     {
-    // FIXME: is port changes, let's pick the fieldtype based on the type of the
-    // selection that was created.
+    bool new_selection = (port != this->ShowingPort);
 
     if (this->ShowingPort)
       {
@@ -172,9 +172,28 @@ public:
       vtkSMPropertyHelper(this->RepresentationProxy, "Input").Set(
         port->getSource()->getProxy(),
         port->getPortNumber());
-      this->updateFieldType();
 
       vtkSMSourceProxy *selectionSource = port->getSelectionInput();
+      if (new_selection && selectionSource)
+        {
+        // if the selection is a new one, we try to show the element type more
+        // appropriate based on the type of selection itself, i.e. if points are
+        // being selected, show points. If cells are being selected show cells.
+        // We only do this if the selection is "new" so that is user is
+        // interactively updating the selection and he picked a specified
+        // attribute type, we don't force change it on him/her.
+        int index = this->Ui.showTypeComboBox->findData(
+          vtkSelectionNode::ConvertSelectionFieldToAttributeType(
+            vtkSMPropertyHelper(selectionSource, "FieldType").GetAsInt()));
+        if (index != -1)
+          {
+          prev = this->Ui.showTypeComboBox->blockSignals(true);
+          this->Ui.showTypeComboBox->setCurrentIndex(index);
+          this->Ui.showTypeComboBox->blockSignals(prev);
+          }
+        }
+      this->updateFieldType();
+
       bool checked = selectionSource &&
         (vtkSMPropertyHelper(selectionSource, "InsideOut").GetAsInt() != 0);
       prev = this->Ui.invertSelectionCheckBox->blockSignals(true);
