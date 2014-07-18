@@ -50,26 +50,28 @@ set_tests_properties(pvweb-nobrowser.FileViewer-StartTest PROPERTIES LABELS "PAR
 ### Add some tests which interact with the WebVisualizer
 ###
 
-set(WEB_TESTS_WITH_CHROME
-  ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_visualizer_renderer_click.py
-  ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_visualizer_can_test.py
-  )
-
-paraview_test_load_baselines_dirs(""
-  WebTesting/ParaView
-  )
-
-add_pvweb_tests("pvweb"
-  APP          Visualizer
-  COMMAND      $<TARGET_FILE:pvpython>
-  SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_visualizer.py
-  BROWSER      chrome
-               firefox
-               internet_explorer
-               safari
-  BASELINE_DIR ${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}/WebTesting/ParaView
-  TEST_SCRIPTS ${WEB_TESTS_WITH_CHROME}
-  )
+# COMMENT:
+#    => New Web Visualizer tests are directly in the test web app
+#
+# set(WEB_TESTS_WITH_CHROME
+#   ${pv_pymodule_build_dir}/paraview/web/test/test_xxx_.py
+#   )
+#
+# paraview_test_load_baselines_dirs(""
+#   WebTesting/ParaView
+#   )
+#
+# add_pvweb_tests("pvweb"
+#   APP          Visualizer
+#   COMMAND      $<TARGET_FILE:pvpython>
+#   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_visualizer.py
+#   BROWSER      chrome
+#                firefox
+#                internet_explorer
+#                safari
+#   BASELINE_DIR ${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}/WebTesting/ParaView
+#   TEST_SCRIPTS ${WEB_TESTS_WITH_CHROME}
+#   )
 
 ###
 ### Add some tests which interact with the TestApp

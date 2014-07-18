@@ -1,71 +1,96 @@
-html, body, div, span, h1, h2, h3, h4, p, a, big, em, font, img, s, small, strong,
-tt, var, b,u,i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, table,
-tbody, tfoot, thead, tr, th, td {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    font-size: 100%;
-    vertical-align: baseline;
-    font-family: Arial,sans-serif; font-size: 1em;
+/* ---- Visualizer specific ----- */
+
+.head-toolbar span { position: relative; top: 2px; font-size: 16px; }
+.fix-height { position: relative; top: 0; left: 0; }
+.property { margin: 5px -15px; }
+.pv-time-input { position: relative; top: 2px; width: 80px; border: solid 1px white; background: none; padding: 2px 10px; }
+
+/* ---- Font - colors - Cursor ----- */
+
+.clickable { cursor: pointer; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+
+.pv-h4-font { font-size: 16px }
+
+.pv-gray-darker  { background: #222; color: #eee; }
+.pv-gray-dark    { background: #333; color: #eee; }
+.pv-gray         { background: #555; color: #eee; }
+.pv-gray-light   { background: #777; color: #eee; }
+.pv-gray-lighter { background: #eee; color: #000; }
+
+.pv-gray-lighter-transparent { background: rgba(238,238,238,0.8); color: #000; }
+
+.pv-text-black { color: #000; }
+.pv-text-white { color: #FFFFFF; }
+.pv-text-gray  { color: #555; }
+.pv-text-red   { color: #e1002a; }
+.pv-text-green { color: #e9bc2f; }
+
+.pv-form-height  { height: 20px; padding: 0 5px;}
+.pv-round { border-radius: 10px; padding: 0 10px; }
+
+.hover-higlight:hover { background: #333; color: #eee; }
+
+/* ---- Layout related ---- */
+
+.float-right { float: right; }
+.float-left { float: left; }
+
+.padding { margin: 5px 2px; }
+.nopadding { padding-left: 0 !important; padding-right: 0 !important; }
+
+.pv-side-margin { margin: 0 5px; }
+.pv-side-padding { padding: 0 5px; }
+
+.lower-right-round-corner { border-radius: 0 0 10px 0; }
+
+/* ---- Scroll management ---- */
+
+.no-overflow { overflow: hidden; }
+.scroll-overflow { overflow: scroll; }
+
+.pv-fixed { position: absolute; top: 0; left: 15px; right: 15px; z-index: 1; }
+.pv-fixed .pv-editor-bar { margin: 0 !important; padding: 0 !important; }
+
+/* ---- Bootstrap override ---- */
+
+.breadcrumb { margin-bottom: 0; }
+
+.dl-horizontal dd { margin-left: 80px; }
+.dl-horizontal dt { width: 60px; }
+
+/* ---- Proxy editor ---- */
+
+.pv-absolute-left                   { position: absolute; left: -15px; top: -25px; }
+
+.pv-collapsable-content             { padding-top: 25px; }
+.pv-collapsable-content.pv-collapse { padding: 0; }
+div.pv-collapse-title               { display: none; position: relative; }
+div.pv-no-collapse-title            { display: block; position: relative; }
+.pv-collapse > div                 { display: none !important; }
+.pv-collapse div.pv-collapse-title { display: block !important; }
+
+
+/* ---- Information Tab ---- */
+
+.pv-data-info dl { margin-bottom: 0; }
+.pv-data-info .table { margin-bottom: 20px; }
+
+.pv-callout {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: #eee;
+    border-image: none;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 1px 1px 1px 5px;
+    margin: 20px 0;
+    padding: 20px;
+    background: white;
 }
-
-.header {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    margin: 0;
-    padding: 0;
-    padding-left: 10px;
-    padding-right: 10px;
-    background: #009999;
-    height: 35px;
-}
-
-.header > div {
-    float: left;
-    line-height: normal;
-    margin: 0;
-    padding: 5px;
-    padding-top: 0;
-    height: 30px;
-}
-
-/* ============================ Viewport ==================================== */
-
-.viewport-container {
-    margin: 0;
-    position: absolute;
-    left: 0px;
-    right: 0px;
-    top: 0;
-    bottom: 0;
-    z-index: 0;
-}
-
-.splitter {
-    position: absolute;
-    top: 35px;
-    left: 0;
-    right: 0;
-}
-
-/* ========================= Control panel ================================== */
-
-.control-panel {
-    width: 320px;
-    border-right: 1px solid black;
-    z-index: 10;
-    overflow: auto;
-}
-
-/* ========================= Override default ParaView css ================================== */
-
-.paraview.toolbar.viewport li.on {
-    background: #006666;
-}
-
-.paraview.toolbar li:hover, .paraview.toolbar.viewport li.on:hover {
-    background: #007878;
-}
+.pv-callout h4 { margin-bottom: 5px; margin-top: 0; }
+.pv-callout p:last-child { margin-bottom: 0; }
+.pv-callout + .pv-callout { margin-top: -5px; }
+.pv-callout-info { border-left-color: #222; }
+.pv-callout-info h4 { color: #222; }

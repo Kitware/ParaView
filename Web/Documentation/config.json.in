@@ -24,6 +24,11 @@
         "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.lineChart.js",
         "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.utils.js",
         "@JAVASCRIPT_WIDGETS_DIR@/RickshawCharts/paraview.rickshaw.graph.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/Pipeline/paraview.ui.action.list.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/Pipeline/paraview.ui.data.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/Pipeline/paraview.ui.files.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/Pipeline/paraview.ui.proxy.editor.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/Pipeline/paraview.ui.svg.pipeline.js",
         "@CMAKE_CURRENT_SOURCE_DIR@/api/pv_protocol.py"
     ]
 }

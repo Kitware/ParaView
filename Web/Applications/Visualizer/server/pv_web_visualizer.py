@@ -2,7 +2,7 @@ r"""
     This module is a ParaViewWeb server application.
     The following command line illustrate how to use it::
 
-        $ pvpython .../pv_web_visualizer.py --data-dir /.../path-to-your-data-directory
+        $ pvpython .../pv_web_visualizer2.py --data-dir /.../path-to-your-data-directory
 
         --data-dir is used to list that directory on the server and let the client choose a file to load.
 
@@ -29,8 +29,15 @@ r"""
         --plugins
             List of fully qualified path names to plugin objects to load
 
-        --filters
-            Path to a file with json text containing filters to load
+        --proxies
+            Path to a file with json text containing sources, filters and readers allowed to be used
+
+        --any-readers
+            Use provided readers along with the one naturally available in ParaView
+
+parser.add_argument("-d", "--debug",
+        help="log debugging messages to stdout",
+        action="store_true")
 
     Any ParaViewWeb executable script come with a set of standard arguments that
     can be overriden if need be::
@@ -58,6 +65,10 @@ import os
 from paraview.web import wamp      as pv_wamp
 from paraview.web import protocols as pv_protocols
 
+# import RPC annotation
+from autobahn.wamp import procedure as exportRpc
+
+from paraview import simple
 from vtk.web import server
 
 try:
@@ -71,7 +82,7 @@ except ImportError:
 # Create custom Pipeline Manager class to handle clients requests
 # =============================================================================
 
-class _PipelineManager(pv_wamp.PVServerProtocol):
+class _VisualizerServer(pv_wamp.PVServerProtocol):
 
     dataDir = None
     authKey = "vtkweb-secret"
@@ -84,11 +95,13 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
     excludeRegex = "^\\.|~$|^\\$"
     plugins = None
     filterFile = None
+    colorPalette = None
 
     @staticmethod
     def add_arguments(parser):
         parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list", dest="path")
         parser.add_argument("--load-file", default=None, help="File to load if any based on data-dir base path", dest="file")
+        parser.add_argument("--color-palette-file", default=None, help="File to load to define a set of color map", dest="palettes")
         parser.add_argument("--ds-host", default=None, help="Hostname to connect to for DataServer", dest="dsHost")
         parser.add_argument("--ds-port", default=11111, type=int, help="Port number to connect to for DataServer", dest="dsPort")
         parser.add_argument("--rs-host", default=None, help="Hostname to connect to for RenderServer", dest="rsHost")
@@ -96,44 +109,45 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
         parser.add_argument("--exclude-regex", default="^\\.|~$|^\\$", help="Regular expression for file filtering", dest="exclude")
         parser.add_argument("--group-regex", default="[0-9]+\\.", help="Regular expression for grouping files", dest="group")
         parser.add_argument("--plugins", default="", help="List of fully qualified path names to plugin objects to load", dest="plugins")
-        parser.add_argument("--filters", default=None, help="Path to a file with json text containing filters to load", dest="filters")
+        parser.add_argument("--proxies", default=None, help="Path to a file with json text containing filters to load", dest="proxies")
+        parser.add_argument("--any-readers", help="Use provided readers along with the one naturally available in ParaView", action="store_true", dest="all_readers")
 
     @staticmethod
     def configure(args):
-        _PipelineManager.authKey      = args.authKey
-        _PipelineManager.dataDir      = args.path
-        _PipelineManager.dsHost       = args.dsHost
-        _PipelineManager.dsPort       = args.dsPort
-        _PipelineManager.rsHost       = args.rsHost
-        _PipelineManager.rsPort       = args.rsPort
-        _PipelineManager.excludeRegex = args.exclude
-        _PipelineManager.groupRegex   = args.group
-        _PipelineManager.plugins      = args.plugins
-        _PipelineManager.filterFile   = args.filters
+        _VisualizerServer.authKey      = args.authKey
+        _VisualizerServer.dataDir      = args.path
+        _VisualizerServer.dsHost       = args.dsHost
+        _VisualizerServer.dsPort       = args.dsPort
+        _VisualizerServer.rsHost       = args.rsHost
+        _VisualizerServer.rsPort       = args.rsPort
+        _VisualizerServer.excludeRegex = args.exclude
+        _VisualizerServer.groupRegex   = args.group
+        _VisualizerServer.plugins      = args.plugins
+        _VisualizerServer.proxies      = args.proxies
+        _VisualizerServer.colorPalette = args.palettes
+        _VisualizerServer.allReaders   = args.all_readers
 
         if args.file:
-            _PipelineManager.fileToLoad = args.path + '/' + args.file
+            _VisualizerServer.fileToLoad = args.path + '/' + args.file
 
     def initialize(self):
         # Bring used components
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_PipelineManager.dsHost, _PipelineManager.dsPort, _PipelineManager.rsHost, _PipelineManager.rsPort))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupPluginLoader(_PipelineManager.plugins))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader(_PipelineManager.fileToLoad))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_PipelineManager.dataDir, "Home", _PipelineManager.excludeRegex, _PipelineManager.groupRegex))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager(_PipelineManager.dataDir, _PipelineManager.fileToLoad))
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFilterList(_PipelineManager.filterFile))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_VisualizerServer.dsHost, _VisualizerServer.dsPort, _VisualizerServer.rsHost, _VisualizerServer.rsPort))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupPluginLoader(_VisualizerServer.plugins))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader(_VisualizerServer.fileToLoad))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_VisualizerServer.dataDir, "Home", _VisualizerServer.excludeRegex, _VisualizerServer.groupRegex))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebProxyManager(allowedProxiesFile=_VisualizerServer.proxies, baseDir=_VisualizerServer.dataDir, allowUnconfiguredReaders=_VisualizerServer.allReaders))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebColorManager(pathToColorMaps=_VisualizerServer.colorPalette))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebMouseHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPort())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortImageDelivery())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortGeometryDelivery())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebTimeHandler())
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebRemoteConnection())
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileManager(_PipelineManager.dataDir))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebSelectionHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebWidgetManager())
 
         # Update authentication key to use
-        self.updateSecret(_PipelineManager.authKey)
+        self.updateSecret(_VisualizerServer.authKey)
 
 # =============================================================================
 # Main: Parse args and start server
@@ -141,17 +155,13 @@ class _PipelineManager(pv_wamp.PVServerProtocol):
 
 if __name__ == "__main__":
     # Create argument parser
-    parser = argparse.ArgumentParser(description="ParaView/Web Pipeline Manager web-application")
+    parser = argparse.ArgumentParser(description="ParaView Web Visualizer")
 
     # Add arguments
     server.add_arguments(parser)
-    _PipelineManager.add_arguments(parser)
-
-    # Exctract arguments
+    _VisualizerServer.add_arguments(parser)
     args = parser.parse_args()
-
-    # Configure our current application
-    _PipelineManager.configure(args)
+    _VisualizerServer.configure(args)
 
     # Start server
-    server.start_webserver(options=args, protocol=_PipelineManager)
+    server.start_webserver(options=args, protocol=_VisualizerServer)
