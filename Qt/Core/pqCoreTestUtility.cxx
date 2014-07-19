@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeViewEventPlayer.h"
 #include "pqFlatTreeViewEventTranslator.h"
 #include "pqImageUtil.h"
+#include "pqLineEditEventPlayer.h"
 #include "pqOptions.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
@@ -134,6 +135,8 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
   this->eventTranslator()->addWidgetEventTranslator(
        new pqConsoleWidgetEventTranslator(this));
 
+  this->eventPlayer()->addWidgetEventPlayer(
+       new pqLineEditEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
        new pqQVTKWidgetEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
