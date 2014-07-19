@@ -12,10 +12,46 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTrace
+// .NAME vtkSMTrace - vtkSMTrace is used to produce Python trace in the ParaView
+// application.
 // .SECTION Description
+// vtkSMTrace is used to produce Python trace in the ParaView
+// application. To start/stop trace, use the static API vtkSMTrace::StartTrace()
+// and vtkSMTrace::StopTrace(). That sets up the vtkSMTrace instance used as the
+// ActiveTracer. You can setup configuration parameters on the vtkSMTrace
+// instance returned by vtkSMTrace::StartTrace(). The configuration parameters
+// control various aspects of the trace.
 //
-
+// To effective tracing, the application logic should explicitly trace traceable
+// actions by using the SM_SCOPED_TRACE() macro. This macro will have any effect
+// only when there's an ActiveTracer setup i.e tracing is in effect. The result
+// on using SM_SCOPED_TRACE() when tracing is active, is to crate a Python class
+// instance. The name of the class is the argument to SM_SCOPED_TRACE() and the
+// class is defined in paraview.smtrace module. There are various classes
+// defined for tracing specific actions like Show, RegisterViewProxy, and
+// generic actions like PropertiesModified. Keyword or positional arguments can
+// be passed to the constructor using the following the syntax:
+//
+// \code{.cpp}
+//    // pass keyword arguments.
+//    SM_SCOPED_TRACE(PropertiesModified)
+//                .arg("proxy", aProxy)
+//                .arg("comment", "some comment");
+//
+//    // pass positional arguments.
+//    SM_SCOPED_TRACE(PropertiesModified)
+//                .arg(aProxy)
+//                .arg("some comment");
+//
+//    // mixing positional and keyword arguments.
+//    SM_SCOPED_TRACE(PropertiesModified)
+//                .arg(aProxy)
+//                .arg("comment", "some comment");
+// \endcode
+//
+// The constructed class instance is \c finalized and deleted when the temporary
+// variable created by the macro goes out of scope (hence the name
+// SM_SCOPED_TRACE).
 #ifndef __vtkSMTrace_h
 #define __vtkSMTrace_h
 
