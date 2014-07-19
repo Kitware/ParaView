@@ -185,15 +185,15 @@
         </Hints>
       </IntVectorProperty>
 
-      <IntVectorProperty default_values="0"
-                         name="ScalarRangeInitialized"
-                         number_of_elements="1"
-                         panel_visibility="never" >
+      <DoubleVectorProperty default_values="0"
+                            name="ScalarRangeInitialized"
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <Documentation>
          Set to 1 to indicate that the scalar range has been initialized.
         </Documentation>
         <BooleanDomain name="bool" />
-      </IntVectorProperty>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetHSVWrap"
                          default_values="0"
                          name="HSVWrap"
