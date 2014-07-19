@@ -429,6 +429,8 @@ int vtkSMViewLayoutProxy::LoadXMLState(
       cell.ViewProxy = NULL;
       }
     }
+
+  this->UpdateViewPositions();
   return 1;
 }
 

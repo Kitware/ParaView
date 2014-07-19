@@ -646,8 +646,12 @@ class RepresentationProxyFilter(PipelineProxyFilter):
 
 class ViewProxyFilter(ProxyFilter):
     def should_never_trace(self, prop):
-        # skip "Representations" property.
-        if prop.get_property_name() in ["Representations", "CameraClippingRange"]: return True
+        # skip "Representations" property and others.
+        # The fact that we need to skip so many properties means that we are
+        # missing something in the design of vtkSMProperties here. We need to
+        # reclassify properties to cleanly address all its "roles".
+        if prop.get_property_name() in [\
+            "ViewTime", "CacheKey", "Representations", "CameraClippingRange"]: return True
         return ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False)
 
 class AnimationProxyFilter(ProxyFilter):
