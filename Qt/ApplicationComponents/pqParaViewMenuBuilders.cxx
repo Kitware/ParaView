@@ -232,9 +232,11 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   new pqPythonShellReaction(menu.addAction("Python Shell")
     << pqSetName("actionToolsPythonShell"));
 
+#ifdef PARAVIEW_ENABLE_PYTHON
   menu.addSeparator(); // --------------------------------------------------
   new pqTraceReaction(menu.addAction("Start Trace") << pqSetName("actionToolsStartStopTrace"),
     "Start Trace", "Stop Trace");
+#endif
 }
 
 //-----------------------------------------------------------------------------

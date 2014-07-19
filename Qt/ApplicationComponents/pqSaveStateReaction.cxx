@@ -158,7 +158,7 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
   QTextStream out(&file);
   out << state;
 #else
-  qCritical("Failed to save '" << filename
-    << "' since Python support in not enabled in this build.");
+  qCritical() << "Failed to save '" << filename
+    << "' since Python support in not enabled in this build.";
 #endif
 }

@@ -163,6 +163,7 @@ vtkStdString vtkSMTrace::GetState(
     return vtkStdString();
     }
 
+#ifdef PARAVIEW_ENABLE_PYTHON
   vtkPythonInterpreter::Initialize();
   try
     {
@@ -193,6 +194,7 @@ vtkStdString vtkSMTrace::GetState(
       PyErr_Clear();
       }
     }
+#endif
   return vtkStdString();
 }
 
