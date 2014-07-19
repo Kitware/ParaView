@@ -19,11 +19,10 @@
 #ifndef __vtkSMTrace_h
 #define __vtkSMTrace_h
 
-#include "vtkPVServerManagerCoreModule.h"
-#include "vtkSmartPointer.h"
+#include "vtkPVServerManagerCoreModule.h" // needed for exports
+#include "vtkSmartPointer.h" // needed for iVar
 #include "vtkSMObject.h"
-#include "vtkStdString.h"
-#include "vtkWeakPointer.h"
+#include "vtkStdString.h" // needed for ivar
 
 class vtkSMProxy;
 class SmartPyObject;
