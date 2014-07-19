@@ -25,4 +25,5 @@
   <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="cancelled" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
   <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="StateFile.py" />
+  <pqevent object="StateOptionsDialog/widget/OKButton" command="activate" arguments="" />
 </pqevents>
