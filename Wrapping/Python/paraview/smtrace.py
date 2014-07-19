@@ -677,7 +677,7 @@ class WriterProxyFilter(ProxyFilter):
 class TransferFunctionProxyFilter(ProxyFilter):
     def should_trace_in_ctor(self, prop): return False
     def should_never_trace(self, prop):
-        if ProxyFilter.should_never_trace(self, prop): return True
+        if ProxyFilter.should_never_trace(self, prop, hide_gui_hidden=False): return True
         if prop.get_property_name() in ["ScalarOpacityFunction"]: return True
         return False
 
