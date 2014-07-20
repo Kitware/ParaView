@@ -195,6 +195,8 @@ vtkStdString vtkSMTrace::GetState(
       }
     }
 #endif
+  (void)propertiesToTraceOnCreate;
+  (void)skipHiddenRepresentations;
   return vtkStdString();
 }
 
@@ -269,8 +271,8 @@ vtkStdString vtkSMTrace::GetCurrentTrace()
     return vtkStdString();
     }
 
-  vtkSMTrace* active = vtkSMTrace::ActiveTracer;
 #ifdef PARAVIEW_ENABLE_PYTHON
+  vtkSMTrace* active = vtkSMTrace::ActiveTracer;
   SmartPyObject get_current_trace_output(
     PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("get_current_trace_output"), NULL));
   if (active->CheckForError() == false && get_current_trace_output)
@@ -393,6 +395,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
     assert(ret == 0);
 #endif
     }
+  (void)key;
+  (void)val;
   return *this;
 }
 
@@ -413,6 +417,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
     assert(ret == 0);
 #endif
     }
+  (void)key;
+  (void)val;
   return *this;
 }
 
@@ -433,6 +439,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
     assert(ret == 0);
 #endif
     }
+  (void)key;
+  (void)val;
   return *this;
 }
 
@@ -453,6 +461,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
     assert(ret == 0);
 #endif
     }
+  (void)key;
+  (void)val;
   return *this;
 }
 //----------------------------------------------------------------------------
@@ -472,6 +482,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
     assert(ret == 0);
 #endif
     }
+  (void)key;
+  (void)val;
   return *this;
 }
 
@@ -488,6 +500,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(vtkObject* val)
     assert(ret == 0);
 #endif
     }
+  (void)val;
   return *this;
 }
 
@@ -505,6 +518,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* val)
     assert(ret == 0);
 #endif
     }
+  (void)val;
   return *this;
 }
 
@@ -521,6 +535,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(int val)
     assert(ret == 0);
 #endif
     }
+  (void)val;
   return *this;
 }
 
@@ -537,6 +552,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(double val)
     assert(ret == 0);
 #endif
     }
+  (void)val;
   return *this;
 }
 
@@ -553,6 +569,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(bool val)
     assert(ret == 0);
 #endif
     }
+  (void)val;
   return *this;
 }
 
@@ -639,4 +656,5 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
     tracer->CheckForError();
 #endif
     }
+  (void)arguments;
 }
