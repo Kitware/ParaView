@@ -140,6 +140,10 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
     # TODO: add support for layouts.
     views = [x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "views")]
     if views:
+        # sort views by their names, so the state has some structure to it.
+        views = sorted(views, cmp=lambda x,y:\
+                cmp(smtrace.Trace.get_registered_name(x, "views"),
+                    smtrace.Trace.get_registered_name(y, "views")))
         trace.append_separated([\
             "# ----------------------------------------------------------------",
             "# setup views used in the visualization",
