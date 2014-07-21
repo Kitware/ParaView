@@ -44,9 +44,10 @@ class pqProxyWidgetDialog::pqInternals
 public:
   Ui::ProxyWidgetDialog Ui;
 
-  pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self, 
+  pqInternals(vtkSMProxy* proxy, pqProxyWidgetDialog* self,
     const QStringList& properties = QStringList()) :
-    Proxy(proxy)
+    Proxy(proxy),
+    HasVisibleWidgets(false)
     {
     Q_ASSERT(proxy != NULL);
 
@@ -67,7 +68,7 @@ public:
       new pqProxyWidget(proxy, properties, container):
       new pqProxyWidget(proxy, container);
     widget->setObjectName("ProxyWidget");
-    widget->filterWidgets(true);
+    this->HasVisibleWidgets = widget->filterWidgets(true);
     vbox->addWidget(widget);
 
     // Set some icons for the buttons
@@ -130,6 +131,7 @@ public:
     }
 
   vtkSMProxy* Proxy;
+  bool HasVisibleWidgets;
 };
 
 //-----------------------------------------------------------------------------
@@ -152,6 +154,12 @@ pqProxyWidgetDialog::~pqProxyWidgetDialog()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyWidgetDialog::hasVisibleWidgets() const
+{
+  return this->Internals->HasVisibleWidgets;
 }
 
 //-----------------------------------------------------------------------------
