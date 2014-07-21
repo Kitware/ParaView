@@ -147,6 +147,7 @@ private:
   friend class vtkPVComparativeView;
   void ClearMarkedModified() { this->MarkedModified = false; }
   bool MarkedModified;
+  bool VTKRepresentationUpdated;
 //ETX
 };
 

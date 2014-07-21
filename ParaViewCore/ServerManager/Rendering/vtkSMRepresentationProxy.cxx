@@ -41,6 +41,7 @@ vtkSMRepresentationProxy::vtkSMRepresentationProxy()
   this->ProminentValuesFraction = -1;
   this->ProminentValuesUncertainty = -1;
   this->MarkedModified = false;
+  this->VTKRepresentationUpdated = false;
 }
 
 //----------------------------------------------------------------------------
@@ -194,6 +195,7 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
     if (!this->MarkedModified && !this->SkipDependency(modifiedProxy))
       {
       this->MarkedModified = true;
+      this->VTKRepresentationUpdated = false;
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this)
@@ -258,15 +260,13 @@ bool vtkSMRepresentationProxy::SkipDependency(vtkSMProxy* producer)
 void vtkSMRepresentationProxy::OnVTKRepresentationUpdated()
 {
   this->MarkedModified = false;
+  this->VTKRepresentationUpdated = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::ViewUpdated(vtkSMProxy* view)
 {
-  if (this->MarkedModified == false)
-    {
-    this->PostUpdateData();
-    }
+  this->PostUpdateData();
 
   // If this class has sub-representations, we need to tell those that the view
   // has updated as well.
@@ -290,7 +290,7 @@ void vtkSMRepresentationProxy::PostUpdateData()
   // In that case, we should not let PostUpdateData() happen. The following
   // check ensures that PostUpdateData() call has any effect only after the VTK
   // representation has updated as well.
-  if (this->MarkedModified == false)
+  if (this->MarkedModified == false && this->VTKRepresentationUpdated == true)
     {
     this->Superclass::PostUpdateData();
     }
