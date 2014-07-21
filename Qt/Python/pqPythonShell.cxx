@@ -332,8 +332,11 @@ void pqPythonShell::clear()
 //-----------------------------------------------------------------------------
 void pqPythonShell::executeScript(const QString& script)
 {
-  emit this->executing(true);  
-  this->Interpreter->RunStringWithConsoleLocals(script.toLatin1().data());
+  emit this->executing(true);
+  QString command = script;
+  command.replace("\r\n", "\n");
+  command.replace("\r", "\n");
+  this->Interpreter->RunStringWithConsoleLocals(command.toLatin1().data());
   emit this->executing(false);
   CLEAR_UNDO_STACK();
 
