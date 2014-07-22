@@ -161,4 +161,8 @@ elseif (UNIX)
     FILES       "${CMAKE_CURRENT_BINARY_DIR}/paraview.desktop"
     DESTINATION share/applications
     COMPONENT   runtime)
+  install(
+    FILES       paraview.appdata.xml
+    DESTINATION share/appdata
+    COMPONENT   runtime)
 endif()
