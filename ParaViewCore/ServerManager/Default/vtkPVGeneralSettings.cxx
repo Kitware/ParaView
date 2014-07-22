@@ -20,6 +20,7 @@
 #include "vtkSISourceProxy.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMTrace.h"
 
 #include <cassert>
 

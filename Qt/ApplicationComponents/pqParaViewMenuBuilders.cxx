@@ -234,11 +234,8 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   menu.addSeparator(); // --------------------------------------------------
-
-  new pqTraceReaction( menu.addAction("Start Trace")
-                       << pqSetName("actionToolsStartTrace"), true);
-  new pqTraceReaction(menu.addAction("Stop Trace")
-                      << pqSetName("actionToolsStartTrace"), false);
+  new pqTraceReaction(menu.addAction("Start Trace") << pqSetName("actionToolsStartStopTrace"),
+    "Start Trace", "Stop Trace");
 #endif
 }
 

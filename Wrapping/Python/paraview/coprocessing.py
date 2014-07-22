@@ -5,7 +5,7 @@ pipeline. Additionally, this module has several other utility functions that are
 approriate for co-processing.
 """
 
-from paraview import simple
+from paraview import simple, servermanager
 from vtkPVVTKExtensionsCorePython import *
 import math
 
@@ -155,7 +155,6 @@ class CoProcessor(object):
         # make sure the live insitu is initialized
         if not self.__LiveVisualizationLink:
            # Create the vtkLiveInsituLink i.e.  the "link" to the visualization processes.
-           from paraview import servermanager
            self.__LiveVisualizationLink = servermanager.vtkLiveInsituLink()
 
            # Tell vtkLiveInsituLink what host/port must it connect to for the visualization
@@ -207,21 +206,23 @@ class CoProcessor(object):
         producer.UpdatePipeline()
         return producer
 
-    def CreateWriter(self, proxy_ctor, filename, freq):
-        """Creates a writer proxy. This method is generally used in
-           CreatePipeline() to create writers. All writes created as such will
+    def RegisterWriter(self, writer, filename, freq):
+        """Registers a writer proxy. This method is generally used in
+           CreatePipeline() to register writers. All writes created as such will
            write the output files appropriately in WriteData() is called."""
-        writer = proxy_ctor()
+        if not isinstance(writer, servermanager.Proxy):
+            raise RuntimeError, "Invalid 'writer' argument passed to RegisterWriter."
         writer.FileName = filename
         writer.add_attribute("cpFrequency", freq)
         writer.add_attribute("cpFileName", filename)
         self.__WritersList.append(writer)
         return writer
 
-    def CreateView(self, proxy_ctor, filename, freq, fittoscreen, magnification, width, height):
-        """Create a CoProcessing view for image capture with extra meta-data
-           such as magnification, size and frequency."""
-        view = proxy_ctor()
+    def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height):
+        """Register a view for image capture with extra meta-data such
+        as magnification, size and frequency."""
+        if not isinstance(view, servermanager.Proxy):
+            raise RuntimeError, "Invalid 'view' argument passed to RegisterView."
         view.add_attribute("cpFileName", filename)
         view.add_attribute("cpFrequency", freq)
         view.add_attribute("cpFileName", filename)
@@ -230,6 +231,21 @@ class CoProcessor(object):
         view.ViewSize = [ width, height ]
         self.__ViewsList.append(view)
         return view
+
+    def CreateWriter(self, proxy_ctor, filename, freq):
+        """ **** DEPRECATED!!! Use RegisterWriter instead ****
+           Creates a writer proxy. This method is generally used in
+           CreatePipeline() to create writers. All writes created as such will
+           write the output files appropriately in WriteData() is called."""
+        writer = proxy_ctor()
+        return self.RegisterWriter(writer, filename, freq)
+
+    def CreateView(self, proxy_ctor, filename, freq, fittoscreen, magnification, width, height):
+        """ **** DEPRECATED!!! Use RegisterView instead ****
+           Create a CoProcessing view for image capture with extra meta-data
+           such as magnification, size and frequency."""
+        view = proxy_ctor()
+        return self.RegisterView(view, filename, freq, fittoscreen, magnification, width, height)
 
     def RescaleDataRange(self, view, time):
         """DataRange can change across time, sometime we want to rescale the

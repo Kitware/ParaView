@@ -34,8 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
-class pqViewExporterManager;
-
 /// @ingroup Reactions
 /// Reaction for exporting a view. Uses pqViewExporterManager for actual
 /// exporting.
@@ -62,8 +60,6 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqExportReaction)
-
-  pqViewExporterManager* Exporter;
 };
 
 #endif

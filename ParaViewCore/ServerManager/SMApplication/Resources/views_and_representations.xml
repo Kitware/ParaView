@@ -39,7 +39,10 @@
                          default_values="0 0"
                          name="ViewPosition"
                          panel_visibility="never"
-                         number_of_elements="2">
+                         number_of_elements="2"
+                         is_internal="1">
+        <!-- ViewPosition is "internal" since vtkSMViewLayoutProxy typically
+             sets it up. -->
         <Documentation>Set the position on this view in the multiview
         configuration.</Documentation>
         <Hints>
@@ -1372,7 +1375,8 @@
                             name="CacheKey"
                             number_of_elements="1"
                             panel_visibility="never"
-                            state_ignored="1">
+                            state_ignored="1"
+                            is_internal="1">
         <DoubleRangeDomain name="range" />
         <Documentation>This is the cache key used to indentify which cache
         entry to use for rendering when caching is enabled.</Documentation>
@@ -1381,7 +1385,8 @@
                          name="UseCache"
                          number_of_elements="1"
                          panel_visibility="never"
-                         state_ignored="1">
+                         state_ignored="1"
+                         is_internal="1">
         <BooleanDomain name="bool" />
         <Documentation>Indicates whether to use cache for subsequent
         renderings.</Documentation>
@@ -2002,22 +2007,23 @@
       <IntVectorProperty command="SetStereoCapableWindow"
                          default_values="none"
                          name="StereoCapableWindow"
-                         panel_visibility="never"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         is_internal="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoRender"
                          default_values="0"
                          name="StereoRender"
-                         panel_visibility="never"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         is_internal="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
                          default_values="3"
                          name="StereoType"
                          panel_visibility="never"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         is_internal="1">
         <EnumerationDomain name="enum">
           <Entry text="Crystal Eyes"
                  value="1" />

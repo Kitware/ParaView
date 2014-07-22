@@ -96,7 +96,6 @@ set (Module_SRCS
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
-  vtkSMPythonTraceObserver.cxx
   vtkSMRangeDomainTemplate.txx
   vtkSMReaderFactory.cxx
   vtkSMRemoteObject.cxx
@@ -120,12 +119,13 @@ set (Module_SRCS
   vtkSMUndoElement.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
+  vtkSMNullProxy.cxx
+  vtkSMTimeKeeper.cxx
+  vtkSMTimeKeeperProxy.cxx
+  vtkSMTrace.cxx
   vtkSMVectorProperty.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
-  vtkSMTimeKeeper.cxx
-  vtkSMTimeKeeperProxy.cxx
-  vtkSMNullProxy.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkSMUndoStack.h"
 #include "vtkStructuredData.h"
 
@@ -227,7 +228,7 @@ void pqRenderView::onResetCameraEvent()
 void pqRenderView::resetCamera()
 {
   this->fakeInteraction(true);
-  this->getRenderViewProxy()->InvokeCommand("ResetCamera");
+  this->getRenderViewProxy()->ResetCamera();
   this->fakeInteraction(false);
   this->render();
 }
@@ -862,6 +863,10 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
       }
     }
 
+  // FIXME: move this logic to server-manager.
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg(this->getProxy())
+    .arg("comment", "changing interaction mode based on data extents");
   if(is2DDataSet)
     {
     // Update camera position

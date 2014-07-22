@@ -92,9 +92,12 @@ public:
 
   // Description:
   // For backwards compatibility in Python scripts.
-  void ResetCamera()
-    { this->InvokeCommand("ResetCamera"); }
+  void ResetCamera();
   void ResetCamera(double bounds[6]);
+  void ResetCamera(
+    double xmin, double xmax,
+    double ymin, double ymax,
+    double zmin, double zmax);
 
   // Description:
   // Convenience method for zooming to a representation.

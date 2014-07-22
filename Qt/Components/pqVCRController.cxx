@@ -32,9 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVCRController.h"
 
 // ParaView Server Manager includes.
-#include "vtkSMProxy.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMTrace.h"
 
 // Qt includes.
 #include <QtDebug>
@@ -110,6 +111,10 @@ void pqVCRController::onPlay()
 
   BEGIN_UNDO_EXCLUDE();
 
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this->Scene->getProxy())
+    .arg("Play");
+
   this->Scene->getProxy()->InvokeCommand("Play");
 
   // NOTE: This is a blocking call, returns only after the
@@ -177,6 +182,9 @@ void pqVCRController::onFirstFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToFirst");
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this->Scene->getProxy())
+    .arg("GoToFirst");
   emit this->endNonUndoableChanges();
 }
 
@@ -185,6 +193,9 @@ void pqVCRController::onPreviousFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToPrevious");
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this->Scene->getProxy())
+    .arg("GoToPrevious");
   emit this->endNonUndoableChanges();
 }
 
@@ -193,6 +204,9 @@ void pqVCRController::onNextFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToNext");
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this->Scene->getProxy())
+    .arg("GoToNext");
   emit this->endNonUndoableChanges();
 }
 
@@ -201,6 +215,9 @@ void pqVCRController::onLastFrame()
 {
   emit this->beginNonUndoableChanges();
   this->Scene->getProxy()->InvokeCommand("GoToLast");
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this->Scene->getProxy())
+    .arg("GoToLast");
   emit this->endNonUndoableChanges();
 }
 

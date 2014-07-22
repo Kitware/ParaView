@@ -94,7 +94,11 @@ private slots:
   void onEditingFinished();
 
 protected:
-  virtual void keyPressEvent(QKeyEvent *e);
+  friend class pqLineEditEventPlayer;
+  /// this is called by pqLineEditEventPlayer during event playback to ensure
+  /// that the textChangedAndEditingFinished() signal is fired when text is changed
+  /// using setText() in playback.
+  void triggerTextChangedAndEditingFinished();
 
 private:
   pqLineEdit(const pqLineEdit&); // Not implemented.

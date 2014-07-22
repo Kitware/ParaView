@@ -14,20 +14,28 @@
 =========================================================================*/
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 
+#include "vtkErrorCode.h"
+#include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxySelectionModel.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
+#include "vtkSMUtilities.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 
+#include <string>
 #include <cassert>
 
 namespace
@@ -293,6 +301,11 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // find is there's already a representation in this view.
   if (vtkSMProxy* repr = view->FindRepresentation(producer, outputPort))
     {
+    SM_SCOPED_TRACE(Show).arg("producer", producer)
+      .arg("port", outputPort)
+      .arg("view", view)
+      .arg("display", repr);
+
     vtkSMPropertyHelper(repr, "Visibility").Set(1);
     repr->UpdateVTKObjects();
     return repr;
@@ -304,6 +317,11 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // Since no repr exists, create a new one if possible.
   if (vtkSMRepresentationProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
     {
+    SM_SCOPED_TRACE(Show).arg("producer", producer)
+      .arg("port", outputPort)
+      .arg("view", view)
+      .arg("display", repr);
+
     this->PreInitializeProxy(repr);
 
     vtkTimeStamp ts;
@@ -347,6 +365,10 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
     // already hidden, I guess :).
     return NULL;
     }
+
+  SM_SCOPED_TRACE(Hide).arg("producer", producer)
+    .arg("port", outputPort)
+    .arg("view", view);
 
   // find is there's already a representation in this view.
   if (vtkSMProxy* repr = view->FindRepresentation(producer, outputPort))
@@ -509,6 +531,112 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
   double time = view? vtkSMPropertyHelper(view, "ViewTime").GetAsDouble() :
     vtkSMPropertyHelper(this->FindTimeKeeper(producer->GetSession()), "Time").GetAsDouble();
   producer->UpdatePipeline(time);
+}
+
+//----------------------------------------------------------------------------
+template<class T>
+bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int quality)
+{
+  if (!viewOrLayout)
+    {
+    return false;
+    }
+  SM_SCOPED_TRACE(SaveCameras).arg("proxy", viewOrLayout);
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("SaveScreenshot")
+    .arg(filename)
+    .arg((vtkSMViewProxy::SafeDownCast(viewOrLayout)? "view" : "layout"), viewOrLayout)
+    .arg("magnification", magnification)
+    .arg("quality", quality)
+    .arg("comment", "save screenshot");
+
+  vtkSmartPointer<vtkImageData> img;
+  img.TakeReference(viewOrLayout->CaptureWindow(magnification));
+  if (img &&
+    vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
+    {
+    return vtkSMUtilities::SaveImage(img.GetPointer(), filename, quality) == vtkErrorCode::NoError;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
+  vtkSMViewProxy* view, const char* filename, int magnification, int quality)
+{
+  return vtkWriteImage<vtkSMViewProxy>(view, filename, magnification, quality);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
+  vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality)
+{
+  return vtkWriteImage<vtkSMViewLayoutProxy>(layout, filename, magnification, quality);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+
+  // locate layout (create a new one if needed).
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveView");
+  assert(selmodel != NULL);
+  vtkSMViewProxy* activeView = vtkSMViewProxy::SafeDownCast(selmodel->GetCurrentProxy());
+  vtkSMProxy* activeLayout = vtkSMViewLayoutProxy::FindLayout(activeView);
+  activeLayout = activeLayout? activeLayout : this->FindProxy(pxm, "layouts", "misc", "ViewLayout");
+  if (!activeLayout)
+    {
+    // no active layout is present at all. Create a new one.
+    activeLayout = pxm->NewProxy("misc", "ViewLayout");
+    if (activeLayout)
+      {
+      this->InitializeProxy(activeLayout);
+      this->RegisterLayoutProxy(activeLayout);
+      activeLayout->FastDelete();
+      }
+    }
+  if (activeLayout)
+    {
+    // ensure that we "access" the layout, before the view is created, other the
+    // trace ends up incorrect (this is needed since RegisterViewProxy() results
+    // in the Qt client assigning a frame for the view, if the Qt client didn't
+    // do that, this code will get a lot simpler.
+    SM_SCOPED_TRACE(EnsureLayout).arg(activeLayout);
+    }
+
+  bool retval = this->Superclass::RegisterViewProxy(proxy, proxyname);
+  if (activeLayout)
+    {
+    vtkSMProxy* layoutAssigned = vtkSMViewLayoutProxy::FindLayout(vtkSMViewProxy::SafeDownCast(proxy));
+    activeLayout = layoutAssigned? layoutAssigned : activeLayout;
+    vtkSMViewLayoutProxy::SafeDownCast(activeLayout)->AssignViewToAnyCell(
+      vtkSMViewProxy::SafeDownCast(proxy), 0);
+    }
+  return retval;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineControllerWithRendering::RegisterLayoutProxy(
+  vtkSMProxy* proxy, const char* proxyname)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  SM_SCOPED_TRACE(RegisterLayoutProxy).arg("layout", proxy);
+
+  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
+  pxm->RegisterProxy("layouts", proxyname, proxy);
+  return true;
 }
 
 //----------------------------------------------------------------------------

@@ -36,14 +36,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqProxyWidgetDialog.h"
 #include "pqPVApplicationCore.h"
 #include "pqRecentlyUsedResourcesList.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
+#include "vtkNew.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqPythonManager.h"
-#endif
+#include <QtDebug>
+
+#include <QFile>
+#include <QTextStream>
 
 //-----------------------------------------------------------------------------
 pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
@@ -111,14 +120,45 @@ void pqSaveStateReaction::saveState(const QString& filename)
 void pqSaveStateReaction::savePythonState(const QString& filename)
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
-  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  if(!pythonManager)
+  vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
+  Q_ASSERT(pxm);
+
+  vtkSmartPointer<vtkSMProxy> options;
+  options.TakeReference(pxm->NewProxy("pythontracing", "PythonStateOptions"));
+  if (options.GetPointer() == NULL)
     {
-    qCritical("No application wide python manager.");
     return;
     }
-  pythonManager->saveTraceState(filename);
+
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  controller->InitializeProxy(options);
+
+  pqProxyWidgetDialog dialog(options);
+  dialog.setWindowTitle("Python State Options");
+  dialog.setObjectName("StateOptionsDialog");
+  if (dialog.exec() != QDialog::Accepted)
+    {
+    return;
+    }
+
+  vtkStdString state = vtkSMTrace::GetState(
+    vtkSMPropertyHelper(options, "PropertiesToTraceOnCreate").GetAsInt(),
+    vtkSMPropertyHelper(options, "SkipHiddenDisplayProperties").GetAsInt() == 1);
+  if (state.empty())
+    {
+    qWarning("Empty state generated.");
+    return;
+    }
+  QFile file(filename);
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+    qWarning() << "Could not open file:" << filename;
+    return;
+    }
+  QTextStream out(&file);
+  out << state;
 #else
-  static_cast<void>(filename); // unused warning with PARAVIEW_ENABLE_PYTHON is off.
+  qCritical() << "Failed to save '" << filename
+    << "' since Python support in not enabled in this build.";
 #endif
 }

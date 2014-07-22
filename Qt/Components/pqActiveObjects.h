@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkEventQtSlotConnect;
 class vtkSMProxySelectionModel;
+class vtkSMSessionProxyManager;
 
 /// pqActiveObjects is a singleton that keeps track of "active objects"
 /// including active view, active source, active representation etc.
@@ -86,6 +87,10 @@ public:
   const pqProxySelection& selection() const
     { return this->Selection; }
 
+  /// Returns the proxyManager() from the active server, if any.
+  /// Equivalent to calling this->activeServer()->proxyManager();
+  vtkSMSessionProxyManager* proxyManager() const;
+
 public slots:
   void setActiveView(pqView * view);
   void setActiveSource(pqPipelineSource * source);
@@ -115,13 +120,6 @@ signals:
   /// the active source's pipeline updates.
   void dataUpdated();
 
-  /// These signals are fired when a UserEvent is invoked from one of the active
-  /// objects. The introduction of those signal was to allow Python trace to
-  /// Show/Hide widget for a given active source.
-  void sourceNotification(pqPipelineSource*,char*);
-  void viewNotification(pqView*,char*);
-  void serverNotification(pqServer*,char*);
-
 private slots:
   /// if a new server connection was established, and no active server is set,
   /// this makes the new server active by default. This helps with single-session
@@ -141,9 +139,6 @@ private slots:
   void sourceSelectionChanged();
   void viewSelectionChanged();
 
-  /// VTK observer used to handle notification on active objects
-  void onNotification(vtkObject* src, unsigned long event, void* method, void* data);
- 
 protected:
   pqActiveObjects();
   ~pqActiveObjects();

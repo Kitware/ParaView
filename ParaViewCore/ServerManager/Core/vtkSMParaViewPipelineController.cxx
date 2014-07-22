@@ -36,6 +36,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkWeakPointer.h"
+#include "vtkSMTrace.h"
 
 #include <cassert>
 #include <map>
@@ -602,6 +603,8 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
     return false;
     }
 
+  SM_SCOPED_TRACE(RegisterPipelineProxy).arg("proxy", proxy);
+
   // Create animation helpers for this proxy.
   this->CreateAnimationHelpers(proxy);
 
@@ -621,6 +624,7 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
     proxy->GetSessionProxyManager()->GetSelectionModel("ActiveSources");
   assert(selmodel != NULL);
   selmodel->SetCurrentProxy(proxy, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+
   return true;
 }
 
@@ -638,6 +642,9 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
+
   const std::string proxyname(_proxyname);
 
   // ensure proxy is no longer active.
@@ -667,15 +674,18 @@ bool vtkSMParaViewPipelineController::UnRegisterPipelineProxy(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy)
+bool vtkSMParaViewPipelineController::RegisterViewProxy(
+  vtkSMProxy* proxy, const char* proxyname)
 {
   if (!proxy)
     {
     return false;
     }
 
+  SM_SCOPED_TRACE(RegisterViewProxy).arg("proxy", proxy);
+
   // Now register the proxy itself.
-  proxy->GetSessionProxyManager()->RegisterProxy("views", proxy);
+  proxy->GetSessionProxyManager()->RegisterProxy("views", proxyname, proxy);
 
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());
@@ -713,6 +723,8 @@ bool vtkSMParaViewPipelineController::UnRegisterViewProxy(
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
   const std::string proxyname(_proxyname);
 
   // ensure proxy is no longer active.
@@ -808,6 +820,7 @@ bool vtkSMParaViewPipelineController::UnRegisterRepresentationProxy(vtkSMProxy* 
       return false;
       }
     }
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
   const std::string proxyname(_proxyname);
 
   //---------------------------------------------------------------------------
@@ -899,6 +912,7 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
     {
     return false;
     }
+  SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
   const std::string proxyname(_proxyname);
 
   //---------------------------------------------------------------------------
@@ -1224,6 +1238,8 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
     return false;
     }
 
+  SM_SCOPED_TRACE(CleanupAccessor).arg("proxy", proxy);
+
   // determine what type of proxy is this, based on that, we can finalize it.
   vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
   if (pxm->GetProxyName("sources", proxy))
@@ -1254,6 +1270,8 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
       {
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))
         {
+        SM_SCOPED_TRACE(Delete).arg("proxy", proxy);
+
         // unregister dependencies.
         if (!this->UnRegisterDependencies(proxy))
           {

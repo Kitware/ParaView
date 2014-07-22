@@ -38,11 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonScriptEditor.h"
 #include "pqPythonShell.h"
-#include "pqSettings.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkPVConfig.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSMTrace.h"
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.
@@ -51,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputWindowAdapter.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -79,9 +78,6 @@ class pqPythonManager::pqInternal
     {
     const char* command = "try:\n"
       "  import paraview\n"
-      "  paraview.fromGUI = True\n"
-      "  paraview.compatibility.major=" __mySTR(PARAVIEW_VERSION_MAJOR) "\n"
-      "  paraview.compatibility.minor=" __mySTR(PARAVIEW_VERSION_MINOR) "\n"
       "except: pass\n";
     vtkPythonInterpreter::RunSimpleString(command);
     }
@@ -263,137 +259,41 @@ void pqPythonManager::onRemovingServer(pqServer* /*server*/)
     }
 }
 
-//-----------------------------------------------------------------------------
-bool pqPythonManager::canStartTrace()
-{
-  return !this->Internal->IsPythonTracing;
-}
-
-//-----------------------------------------------------------------------------
-bool pqPythonManager::canStopTrace()
-{
-  return this->Internal->IsPythonTracing;
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonManager::startTrace()
-{
-  QString script = "from paraview import smtrace\n"
-                   "smtrace.start_trace()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
-
-  // Update internal state
-  this->Internal->IsPythonTracing = true;
-
-  // Emit signals
-  emit startTraceDone();
-  emit canStartTrace(canStartTrace());
-  emit canStopTrace(canStopTrace());
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonManager::stopTrace()
-{
-  QString script = "from paraview import smtrace\n"
-                   "smtrace.stop_trace()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
-
-  // Update internal state
-  this->Internal->IsPythonTracing = false;
-
-  // Emit signals
-  emit stopTraceDone();
-  emit canStartTrace(canStartTrace());
-  emit canStopTrace(canStopTrace());
-}
-
 //----------------------------------------------------------------------------
 QString pqPythonManager::getTraceString()
 {
-  QString script = "from paraview import smtrace\n"
-                   "__smtraceString = smtrace.get_trace_string()\n";
-  vtkPythonInterpreter::RunSimpleString(script.toLatin1().data());
-
-  PyObject* main_module = PyImport_AddModule((char*)"__main__");
-  PyObject* global_dict = PyModule_GetDict(main_module);
-  PyObject* string_object = PyDict_GetItemString(
-    global_dict, "__smtraceString");
-  char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
-
-  QString traceString;
-  if (string_ptr)
-    {
-    traceString = string_ptr;
-    }
-
-  return traceString;
+  return vtkSMTrace::GetActiveTracer()?
+    vtkSMTrace::GetActiveTracer()->GetCurrentTrace().c_str() : "";
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::editTrace()
+void pqPythonManager::editTrace(const QString& txt, bool update)
 {
   // Create the editor if needed and only the first time
+  bool new_editor = this->Internal->Editor == NULL;
   if(!this->Internal->Editor)
     {
     this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
     this->Internal->Editor->setPythonManager(this);
     }
 
-  QString traceString = this->getTraceString();
+  QString traceString = txt.isEmpty()? this->getTraceString() : txt;
   this->Internal->Editor->show();
-  this->Internal->Editor->raise();
-  this->Internal->Editor->activateWindow();
-  if (this->Internal->Editor->newFile())
+  if (new_editor || !update) // don't raise the window if we are just updating the trace.
+    {
+    this->Internal->Editor->raise();
+    this->Internal->Editor->activateWindow();
+    }
+  if (update || this->Internal->Editor->newFile())
     {
     this->Internal->Editor->setText(traceString);
     }
-
 }
 
-//----------------------------------------------------------------------------
-void pqPythonManager::saveTraceState(const QString& fileName)
-{
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if(settings)
-    {
-    this->setSaveFullState(settings->value("saveFullState", false).toBool());
-    }
-
-  std::string code = "smstate.run()\n";
-
-  vtkPythonInterpreter::RunSimpleString(code.c_str());
-  QFile file(fileName);
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-    qWarning() << "Could not open file:" << fileName;
-    return;
-    }
-
-  QString traceString = this->getTraceString();
-  QTextStream out(&file);
-  out << traceString;
-}
 //----------------------------------------------------------------------------
 void pqPythonManager::updateMacroList()
 {
   this->Internal->MacroSupervisor->updateMacroList();
-}
-
-//----------------------------------------------------------------------------
-void pqPythonManager::setSaveFullState(bool saveFullState)
-{
-  std::string code;
-  code += "from paraview import smstate\n";
-  if(saveFullState)
-    {
-    code += "smstate._save_full_state = True\n";
-    }
-  else
-    {
-    code += "smstate._save_full_state = False\n";
-    }
-
-  vtkPythonInterpreter::RunSimpleString(code.c_str());
 }
 
 //----------------------------------------------------------------------------

@@ -86,6 +86,8 @@ set(Module_SRCS
   pqHelpWindow.h
   pqLineEdit.cxx
   pqLineEdit.h
+  pqLineEditEventPlayer.cxx
+  pqLineEditEventPlayer.h
   pqListWidgetCheckHelper.cxx
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
@@ -161,6 +163,7 @@ set (QtWidgets_SRCS
   pqExpanderButton.h
   pqFlatTreeView.h
   pqLineEdit.h
+  pqLineEditEventPlayer.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
   pqProgressBar.h

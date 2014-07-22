@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="TraceOptionsDialog/widget/OKButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/FileSeries/blow..vtk" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="WarpVector" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveAnimation" />
+  <pqevent object="pqAnimationSettingsDialog/cancelButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveGeometry" />
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.pvd" />
+  <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.pvd" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar" command="activate" arguments="File" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="C&amp;lose" />
+
+  <!-- Reset Session -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionDelete_All" />
+
+  <!-- load the trace -->
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsPythonShell" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/runScript" command="activate" arguments="" />
+
+  <!-- remove the trace file saved before loading the trace-->
+  <pqevent object="pqClientMainWindow/pythonDialog/PythonShellRunScriptDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.pvd" />
+  <pqevent object="pqClientMainWindow/pythonDialog/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.py" />
+  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/close" command="activate" arguments="" />
+
+  <!-- now, open the pvd file which should be been generated during trace playback -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceSaveGeometry.pvd" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="displacement" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
+</pqevents>

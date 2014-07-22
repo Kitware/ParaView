@@ -78,27 +78,10 @@ public:
   void addWidgetForDeleteMacros(QWidget* widget);
 
   // Description:
-  // return true if the python tracing can be started
-  bool canStartTrace();
-  // Description:
-  // return true if the python tracing is already started and therefore can be stoped
-  bool canStopTrace();
-
-  // Description:
-  // start recording the python trace
-  void startTrace();
-
-  // Description:
-  // stop recording the python trace
-  void stopTrace();
-
-  // Description:
-  // Show the python editor with the trace in it
-  void editTrace();
-
-  // Description:
-  // Trace state and save the trace string to a file with the given filename.
-  void saveTraceState(const QString& filename);
+  // Show the python editor with the trace in it.
+  // If txt is empty, the editor will obtain the state from active vtkSMTrace
+  // instance, if any.
+  void editTrace(const QString& txt=QString(), bool update=false);
 
   // Description:
   // Save the macro in ParaView configuration and update widget automatically
@@ -109,21 +92,9 @@ public:
   // the content of the Macros directories...
   void updateMacroList();
 
-  // Description:
-  // Set the option to save the full state (true) or just the non-default
-  // values (false). This modifies the _save_full_state value in smstate.py.
-  void setSaveFullState(bool saveFullState);
-
 signals:
-
   void paraviewPythonModulesImported();
-  void canStartTrace(bool);
-  void canStopTrace(bool);
 
-  // Fired after start trace.
-  void startTraceDone();
-  // Fired after stop trace.
-  void stopTraceDone();
 
 public slots:
   // Description:

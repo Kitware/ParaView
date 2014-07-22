@@ -21,8 +21,9 @@
   <pqevent object="pqClientMainWindow/representationToolbar" command="mouseRelease" arguments="1,0,0,4,20" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Components" command="set_string" arguments="Y" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
-  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
-  <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="cancelled" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
-  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="StateFile.py" />
+  <!-- remove old state file -->
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/StateFile.py" />
+  <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/StateFile.py" />
+  <pqevent object="StateOptionsDialog/widget/OKButton" command="activate" arguments="" />
 </pqevents>

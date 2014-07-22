@@ -22,114 +22,84 @@ settings.SetScalarBarMode(settings.MANUAL_SCALAR_BARS)
 smtesting.ProcessCommandLineArguments()
 tempDir = smtesting.TempDir
 
-# Set APPLY to be an alias for append_trace function.  When running paraview
-# from the gui append_trace is called whenever the user hits the Apply button.
-APPLY = smtrace.append_trace
-
 # Create a render view before starting trace
 ren = CreateRenderView()
 
 # Start trace
-smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
+config = smtrace.start_trace()
 
 ########################################################
 # Begin build pipeline
-wavelet = Wavelet(guiName="My Wavelet")
+def create_pipeline():
+  w = Wavelet()
+  Show()
+  Render()
 
-APPLY()
+  # note property changes won't be recorded directly so don't do any outside the
+  # constructor and expect that to work.
+  contour = Contour(ComputeScalars=1,
+      Isosurfaces=[100, 150, 200])
+  Show()
+  #Hide(w)
+  Render()
+  ColorBy(value=("POINTS", "RTData"))
+  GetDisplayProperties().SetScalarBarVisibility(ren, True)
+  Render()
 
-ren = GetRenderView()
-waveletRep = Show()
+  clip = Clip()
+  Show()
+  Hide(contour)
+  Render()
 
-contour = Contour(guiName="My Contour")
-contour.PointMergeMethod = "Uniform Binning"
-contour.ContourBy = ['POINTS', 'RTData']
-contour.Isosurfaces = [157.09096527099609]
-
-APPLY()
-
-contourRep = Show()
-waveletRep.Visibility = 0
-
-SetActiveSource(wavelet)
-clip = Clip(guiName="My Clip", ClipType="Plane" )
-clip.Scalars = ['POINTS', 'RTData']
-clip.ClipType = "Plane"
-
-APPLY()
-
-clipRep = Show()
-
-a1_RTData_PVLookupTable = GetLookupTableForArray( "RTData", 1, NanColor=[0.5, 0.5, 0.5], RGBPoints=[37.4, 1.0, 0.0, 0.0, 276.8, 0.0, 0.0, 1.0], VectorMode='Magnitude', ColorSpace='HSV', ScalarRangeInitialized=1.0 )
-
-a1_RTData_PiecewiseFunction = CreatePiecewiseFunction()
-
-clipRep.ScalarOpacityFunction = a1_RTData_PiecewiseFunction
-clipRep.ColorArrayName = 'RTData'
-clipRep.ScalarOpacityUnitDistance = 1.8307836667054274
-clipRep.LookupTable = a1_RTData_PVLookupTable
-
-APPLY()
-
-contour.ComputeScalars = 1
-
-APPLY()
-
-contourRep.ColorArrayName = 'RTData'
-contourRep.LookupTable = a1_RTData_PVLookupTable
-
-clip.ClipType.Normal = [0.0, 0.0, 1.0]
-
-APPLY()
-
-bar = CreateScalarBar( Orientation='Horizontal', Title='RTData', ComponentTitle="", Position2=[0.6, 0.2], Enabled=1, LabelFontSize=12, LookupTable=a1_RTData_PVLookupTable, TitleFontSize=20, Position=[0.2, 0.0] )
-GetRenderView().Representations.append(bar)
-
-APPLY()
-
-ren.CameraFocalPoint = [1.1645689199943594, -3.5914371885980554, 0.54379903964477228]
-ren.CameraClippingRange = [31.266692271900439, 107.69973132887634]
-ren.CameraViewUp = [-0.14069051476636268, 0.84334441613242261, 0.51862932315193999]
-ren.CameraPosition = [26.064234130736576, 31.908865377615712, -50.428704912804747]
-
-APPLY()
+create_pipeline()
 
 # End build pipeline
 ########################################################
 
 # Stop trace and grab the trace output string
-smtrace.stop_trace()
-trace_string = smtrace.get_trace_string()
+trace_string = smtrace.stop_trace()
+print trace_string
 # Uncomment these lines to print the trace string or save it to a file
-#print trace_string
+print trace_string
 #smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
 
 # Clear all the sources
-Delete(clip)
-Delete(contour)
-Delete(wavelet)
-Delete(bar)
+for source in GetSources().values():
+    Delete(source)
 
-# Confirm that all the representations have been removed from the view
-if len(ren.Representations):
-    print "View should not have any representations."
+
+# Confirm that all the representations have been removed from the view except 1
+# for the scalar bar.
+if len(ren.Representations) != 1:
+    print "View should not have any representations except the scalar bar!"
+    sys.exit(1)
+
+# destroy the scalar bar too
+Delete(ren.Representations[0])
+
+if len(ren.Representations) != 0:
+    print "View should not have any representations at this point!"
     sys.exit(1)
 
 # Confirm that the clip filter has been removed
-if FindSource("My Clip"):
-    print "Clip filter should have been cleaned up."
+if GetSources():
+    print "All sources should have be removed."
     sys.exit(1)
+
+# change camera to confirm that trace restores it.
+ren.CameraPosition = [-1, -1, -1]
+Render()
 
 # Compile the trace code and run it
 code = compile(trace_string, "<string>", "exec")
 exec(code)
 
 # Confirm that the clip filter has been recreated
-if not FindSource("My Clip"):
+clip = [x for x in GetSources().values() if x.GetXMLLabel() == "Clip"]
+if not clip:
     print "After replaying trace, could not find Clip filter."
     sys.exit(1)
 
 # Do a screenshot regression test
 if not smtesting.DoRegressionTesting(ren.SMProxy):
     raise smtesting.TestError('Image comparison failed.')
-

@@ -22,7 +22,7 @@ endfunction ()
 
 function (paraview_add_test_python)
   set(VTK_PYTHON_EXE "$<TARGET_FILE:pvpython>")
-  list(APPEND VTK_PYTHON_ARGS
+  list(APPEND VTK_PYTHON_ARGS -dr
     ${PARAVIEW_PYTHON_ARGS})
   _paraview_override_vtk_dirs()
   vtk_add_test_python(${ARGN})
@@ -30,7 +30,7 @@ endfunction ()
 
 function (paraview_add_test_python_mpi)
   set(VTK_PYTHON_EXE "$<TARGET_FILE:pvpython>")
-  list(APPEND VTK_PYTHON_ARGS
+  list(APPEND VTK_PYTHON_ARGS -dr
     ${PARAVIEW_PYTHON_ARGS})
   _paraview_override_vtk_dirs()
   vtk_add_test_python_mpi(${ARGN})
@@ -38,7 +38,7 @@ endfunction ()
 
 function (paraview_add_test_pvbatch)
   set(VTK_PYTHON_EXE "$<TARGET_FILE:pvbatch>")
-  list(APPEND VTK_PYTHON_ARGS
+  list(APPEND VTK_PYTHON_ARGS -dr
     ${PARAVIEW_PVBATCH_ARGS})
   _paraview_override_vtk_dirs()
   vtk_add_test_python(${ARGN})
@@ -46,7 +46,7 @@ endfunction ()
 
 function (paraview_add_test_pvbatch_mpi)
   set(VTK_PYTHON_EXE "$<TARGET_FILE:pvbatch>")
-  list(APPEND VTK_PYTHON_ARGS
+  list(APPEND VTK_PYTHON_ARGS -dr
     ${PARAVIEW_PVBATCH_ARGS})
   _paraview_override_vtk_dirs()
   vtk_add_test_python_mpi(${ARGN})
@@ -59,7 +59,7 @@ function(paraview_add_test_driven)
   set(VTK_PYTHON_EXE "$<TARGET_FILE:smTestDriver>")
   list(APPEND VTK_PYTHON_ARGS
     --server $<TARGET_FILE:pvserver>
-    --client $<TARGET_FILE:pvpython>)
+    --client $<TARGET_FILE:pvpython> -dr)
   _paraview_override_vtk_dirs()
   vtk_add_test_python(${ARGN})
 endfunction ()

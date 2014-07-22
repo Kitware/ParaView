@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
@@ -40,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMTrace.h"
 
 #include "pqApplicationCore.h"
 #include "pqServer.h"
@@ -216,6 +217,7 @@ void pqProxy::rename(const QString& newname)
 {
   if(newname != this->SMName)
     {
+    SM_SCOPED_TRACE(RenameProxy).arg("proxy", this->getProxy());
     vtkSMSessionProxyManager* pxm = this->proxyManager();
     pxm->RegisterProxy(this->getSMGroup().toLatin1().data(),
       newname.toLatin1().data(), this->getProxy());

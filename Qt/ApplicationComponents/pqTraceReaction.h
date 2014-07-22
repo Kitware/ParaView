@@ -35,44 +35,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 /// @ingroup Reactions
-/// Reaction for application python start/stop trace.
+/// Reaction for application python start/stop trace. This reaction will change the
+/// label on the QAction to reflect whether the trace is started or stopped.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTraceReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// if \c start is set to true, then this behaves as an start-trace-reaction otherwise
-  /// as a stop-trace-reaction.
-  pqTraceReaction(QAction* parent, bool start);
+  pqTraceReaction(QAction* parent,
+    const char* start_trace_label="Start Trace",
+    const char* stop_trace_label="Stop Trace");
+  virtual ~pqTraceReaction();
 
   /// start tracing.
-  static void start();
+  void start();
 
   /// stop tracing.
-  static void stop();
-
-protected slots:
-  void enable(bool);
-  void setLabel(const QString& label);
-
+  void stop();
 protected:
   /// Called when the action is triggered.
-  virtual void onTriggered()
-    {
-    if (this->Start)
-      {
-      pqTraceReaction::start();
-      }
-    else
-      {
-      pqTraceReaction::stop();
-      }
-    }
+  virtual void onTriggered();
+
+protected slots:
+  virtual void updateTrace();
 
 private:
   Q_DISABLE_COPY(pqTraceReaction)
-
-  bool Start;
+  QString StartTraceLabel;
+  QString StopTraceLabel;
 };
 
 #endif

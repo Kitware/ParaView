@@ -202,8 +202,6 @@ set(Module_SRCS
   pqUndoStack.cxx
   pqUndoStack.h
   pqView.cxx
-  pqViewExporterManager.cxx
-  pqViewExporterManager.h
   pqView.h
   pqXMLEventObserver.cxx
   pqXMLEventObserver.h
@@ -293,7 +291,6 @@ set (Module_MOC_HDRS
   pqStandardServerManagerModelInterface.h
   pqTimeKeeper.h
   pqUndoStack.h
-  pqViewExporterManager.h
   pqView.h
   pqXMLEventObserver.h
   pqXMLEventSource.h

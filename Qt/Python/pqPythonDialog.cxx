@@ -125,21 +125,18 @@ pqPythonShell* pqPythonDialog::shell()
 
 void pqPythonDialog::runScript()
 {
-  pqFileDialog* const dialog = new pqFileDialog(
+  pqFileDialog dialog(
     NULL,
     this,
     tr("Run Script"),
     QString(),
     QString(tr("Python Script (*.py);;All files (*)")));
-    
-  dialog->setObjectName("PythonShellRunScriptDialog");
-  dialog->setFileMode(pqFileDialog::ExistingFile);
-  QObject::connect(
-    dialog,
-    SIGNAL(filesSelected(const QStringList&)), 
-    this,
-    SLOT(runScript(const QStringList&)));
-  dialog->show(); 
+  dialog.setObjectName("PythonShellRunScriptDialog");
+  dialog.setFileMode(pqFileDialog::ExistingFile);
+  if (dialog.exec() == QDialog::Accepted)
+    {
+    this->runScript(dialog.getSelectedFiles());
+    }
 }
 
 void pqPythonDialog::runScript(const QStringList& files)
@@ -150,23 +147,7 @@ void pqPythonDialog::runScript(const QStringList& files)
     if(file.open(QIODevice::ReadOnly))
       {
       QByteArray code = file.readAll();
-
-      QString script =
-      "current_script_path = '%1'\n"
-      "try:\n"
-      "  paraview.smtrace\n"
-      "  paraview.smtrace.trace_save_execute_script('''%2''')\n"
-      "except AttributeError: pass\n";
-      this->Implementation->Ui.shellWidget->executeScript(script.arg(files[i]).arg(code.data()));
-
       this->Implementation->Ui.shellWidget->executeScript(code.data());
-
-      script =
-      "try:\n"
-      "  paraview.smtrace\n"
-      "  paraview.smtrace.trace_save_execute_script_end()\n"
-      "except AttributeError: pass\n";
-      this->Implementation->Ui.shellWidget->executeScript(script);
       }
     else
       {

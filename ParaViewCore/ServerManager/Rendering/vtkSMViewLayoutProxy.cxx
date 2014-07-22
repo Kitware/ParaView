@@ -18,15 +18,18 @@
 #include "vtkCommand.h"
 #include "vtkImageData.h"
 #include "vtkMemberFunctionCommand.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
@@ -426,6 +429,8 @@ int vtkSMViewLayoutProxy::LoadXMLState(
       cell.ViewProxy = NULL;
       }
     }
+
+  this->UpdateViewPositions();
   return 1;
 }
 
@@ -459,6 +464,13 @@ int vtkSMViewLayoutProxy::Split(int location, int direction, double fraction)
       << ". Must be in the range [0, 1]");
     return 0;
     }
+
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg(direction == VERTICAL? "SplitVertical" : "SplitHorizontal")
+    .arg(location)
+    .arg(fraction)
+    .arg("comment", "split cell");
 
   cell.Direction = (direction == VERTICAL)? VERTICAL : HORIZONTAL;
   cell.SplitFraction = fraction;
@@ -510,6 +522,13 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMViewProxy* view)
     return false;
     }
 
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("AssignView")
+    .arg(location)
+    .arg(view)
+    .arg("assign view to a paricular cell in the layout");
+
   if (cell.ViewProxy == view)
     {
     // nothing to do.
@@ -536,6 +555,19 @@ int vtkSMViewLayoutProxy::AssignViewToAnyCell(
   if (!view)
     {
     return 0;
+    }
+
+  int cur_location = this->GetViewLocation(view);
+  if (cur_location != -1)
+    {
+    // already assigned to a frame. return that index.
+    SM_SCOPED_TRACE(CallMethod)
+      .arg(this)
+      .arg("AssignView")
+      .arg(cur_location)
+      .arg(view)
+      .arg("comment", "place view in the layout");
+    return cur_location;
     }
 
   if (location_hint < 0)
@@ -634,6 +666,13 @@ bool vtkSMViewLayoutProxy::SwapCells(int location1, int location2)
     return false;
     }
 
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("SwapCells")
+    .arg(location1)
+    .arg(location2)
+    .arg("comment", "swap view locations");
+
   vtkInternals::Cell &cell1 = this->Internals->KDTree[location1];
   vtkInternals::Cell &cell2 = this->Internals->KDTree[location2];
   if (cell1.Direction == NONE && cell2.Direction == NONE)
@@ -675,6 +714,12 @@ bool vtkSMViewLayoutProxy::Collapse(int location)
     // sure, trying to collapse the root node...whatever!!!
     return true;
     }
+
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("Collapse")
+    .arg(location)
+    .arg("comment", "close an empty frame");
 
   int parent = (location - 1) / 2;
   int sibling = ((location % 2) == 0)? (2*parent + 1) : (2*parent + 2);
@@ -813,6 +858,14 @@ bool vtkSMViewLayoutProxy::SetSplitFraction(int location, double val)
     {
     return false;
     }
+
+
+  SM_SCOPED_TRACE(CallMethod)
+    .arg(this)
+    .arg("SetSplitFraction")
+    .arg(location)
+    .arg(val)
+    .arg("comment", "resize frame");
 
   if (this->Internals->KDTree[location].SplitFraction != val)
     {
@@ -970,6 +1023,29 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
     vtkSMUtilities::Merge(image, images[cc]);
     }
   return image;
+}
+
+//----------------------------------------------------------------------------
+vtkSMViewLayoutProxy* vtkSMViewLayoutProxy::FindLayout(
+  vtkSMViewProxy* view, const char* reggroup/*=layouts*/)
+{
+  if (!view)
+    {
+    return NULL;
+    }
+  vtkSMSessionProxyManager* pxm = view->GetSessionProxyManager();
+  vtkNew<vtkSMProxyIterator> iter;
+  iter->SetSessionProxyManager(pxm);
+  iter->SetModeToOneGroup();
+  for (iter->Begin(reggroup); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::SafeDownCast(iter->GetProxy());
+    if (layout != NULL && layout->GetViewLocation(view) != -1)
+      {
+      return layout;
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

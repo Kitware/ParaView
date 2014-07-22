@@ -1,3 +1,5 @@
+from paraview import smtrace, servermanager, smstate
+
 # boolean telling if we want to export rendering.
 export_rendering = %1
 
@@ -14,85 +16,143 @@ timeCompartmentSize = %4
 # the name of the Python script to be outputted
 scriptFileName = "%5"
 
-# this method replaces construction of proxies with methods
-# that will work on the remote machine
-def tp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
-    global reader_input_map, export_rendering
-    if info.ProxyName in reader_input_map.keys():
-        # mark this proxy as a reader input to make it easier to locate the
-        # reader input for the writers.
-        info.Proxy.tpReaderInput = reader_input_map[info.ProxyName]
-        # take out the guiName argument if it exists
-        newArgs = []
-        import re
-        for arg in ctorArgs:
-            if re.match("^FileName", arg) == None and re.match("^guiName", arg) == None:
-                newArgs.append(arg)
-        newArgs = [ctorMethod, newArgs, "\"%s\"" % info.Proxy.tpReaderInput]
-        ctorMethod = "STP.CreateReader"
-        extraCtorCommands = "timeSteps = GetActiveSource().TimestepValues if len(GetActiveSource().TimestepValues)!=0 else [0]"
-        return (ctorMethod, newArgs, extraCtorCommands)
-    proxy = info.Proxy
-    # handle views
-    if proxy.GetXMLGroup() == 'views' and export_rendering:
-        proxyName = servermanager.ProxyManager().GetProxyName("views", proxy)
-        ctorArgs = [ ctorMethod, "\"%s\"" % screenshot_info[proxyName][0], \
-                         screenshot_info[proxyName][1], screenshot_info[proxyName][2], \
-                         screenshot_info[proxyName][3], "tp_views" ]
-        return ("STP.CreateView", ctorArgs, extraCtorCommands)
 
-    # handle writers.
-    if not proxy.GetHints() or \
-      not proxy.GetHints().FindNestedElementByName("WriterProxy"):
-        return (ctorMethod, ctorArgs, extraCtorCommands)
-    # this is a writer we are dealing with.
-    xmlElement = proxy.GetHints().FindNestedElementByName("WriterProxy")
-    xmlgroup = xmlElement.GetAttribute("group")
-    xmlname = xmlElement.GetAttribute("name")
-    pxm = smtrace.servermanager.ProxyManager()
-    writer_proxy = pxm.GetPrototypeProxy(xmlgroup, xmlname)
-    ctorMethod =  \
-      smtrace.servermanager._make_name_valid(writer_proxy.GetXMLLabel())
-    ctorArgs = [ctorMethod, \
-                "\"%s\"" % proxy.GetProperty("FileName").GetElement(0), "tp_writers" ]
-    ctorMethod = "STP.CreateWriter"
+class ReaderFilter(smtrace.PipelineProxyFilter):
+    def should_never_trace(self, prop):
+        if smtrace.PipelineProxyFilter.should_never_trace(self, prop): return True
+        # skip filename related properties.
+        return prop.get_property_name() in [\
+            "FilePrefix", "XMLFileName", "FilePattern", "FileRange", "FileName",
+            "FileNames"]
 
-    return (ctorMethod, ctorArgs, '')
+# -----------------------------------------------------------------------------
+class ReaderAccessor(smtrace.RealProxyAccessor):
+    """This accessor is created instead of the standard one for proxies that
+    are the temporal readers. This accessor override the
+    trace_ctor() method to trace the constructor as the RegisterReader() call,
+    since the proxy is a dummy, in this case.
+    """
+    def __init__(self, varname, proxy, filenameglob):
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
+        self.FileNameGlob = filenameglob
 
-try:
-    from paraview import smstate, smtrace
-except:
-    raise RuntimeError('could not import paraview.smstate')
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+        # FIXME: ensures thate FileName doesn't get traced.
+
+        # change to call STP.CreateReader instead.
+        ctor_args = "%s, fileinfo='%s'" % (ctor, self.FileNameGlob)
+        ctor = "STP.CreateReader"
+        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
+            self, ctor, ReaderFilter(), ctor_args, skip_assignment)
+
+        trace = smtrace.TraceOutput()
+        trace.append(original_trace)
+        trace.append(\
+            "timeSteps = %s.TimestepValues if len(%s.TimestepValues) != 0 else [0]" % (self, self))
+        return trace.raw_data()
+
+# -----------------------------------------------------------------------------
+class ViewAccessor(smtrace.RealProxyAccessor):
+    """Accessor for views. Overrides trace_ctor() to trace registering of the
+    view with the STP. (I wonder if this registering should be moved to
+    the end of the state for better readability of the generated state files.
+    """
+    def __init__(self, varname, proxy, screenshot_info):
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
+        self.ScreenshotInfo = screenshot_info
+
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
+            self, ctor, filter, ctor_args, skip_assignment)
+        trace = smtrace.TraceOutput(original_trace)
+        trace.append_separated(["# register the view with coprocessor",
+          "# and provide it with information such as the filename to use,",
+          "# how frequently to write the images, etc."])
+        params = self.ScreenshotInfo
+        assert len(params) == 4
+        trace.append([
+            "STP.RegisterView(%s," % self,
+            "    filename='%s', magnification=%s, width=%s, height=%s, tp_views)" %\
+                (params[0], params[1], params[2], params[3])])
+        trace.append_separator()
+        return trace.raw_data()
+
+# -----------------------------------------------------------------------------
+class WriterAccessor(smtrace.RealProxyAccessor):
+    """Accessor for writers. Overrides trace_ctor() to use the actual writer
+    proxy name instead of the dummy-writer proxy's name.
+    """
+    def __init__(self, varname, proxy):
+        smtrace.RealProxyAccessor.__init__(self, varname, proxy)
+
+    def get_proxy_label(self, xmlgroup, xmlname):
+        pxm = servermanager.ProxyManager()
+        prototype = pxm.GetPrototypeProxy(xmlgroup, xmlname)
+        if not prototype:
+            # a bit of a hack but we assume that there's a stub of some
+            # writer that's not available in this build but is available
+            # with the build used by the simulation code (probably through a plugin)
+            # this stub must have the proper name in the coprocessing hints
+            print "WARNING: Could not find", xmlname, "writer in", xmlgroup, \
+                "XML group. This is not a problem as long as the writer is available with " \
+                "the ParaView build used by the simulation code."
+            return servermanager._make_name_valid(xmlname)
+        return servermanager._make_name_valid(prototype.GetXMLLabel())
+
+    def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
+        xmlElement = self.get_object().GetHints().FindNestedElementByName("WriterProxy")
+        xmlgroup = xmlElement.GetAttribute("group")
+        xmlname = xmlElement.GetAttribute("name")
+
+        filename = self.get_object().FileName
+        ctor = self.get_proxy_label(xmlgroup, xmlname)
+        original_trace = smtrace.RealProxyAccessor.trace_ctor(\
+            self, ctor, filter, ctor_args, skip_assignment)
+
+        trace = smtrace.TraceOutput(original_trace)
+        trace.append_separated(["# register the writer with STP",
+          "# and provide it with information such as the filename to use"])
+        trace.append("STP.RegisterWriter(%s, filename='%s', tp_writers)" % \
+            (self, filename))
+        trace.append_separator()
+        return trace.raw_data()
+
+class tpstate_filter_proxies_to_serialize(object):
+    """filter used to skip views and representations a when export_rendering is
+    disabled."""
+    def __call__(self, proxy):
+        global export_rendering
+        if not smstate.visible_representations()(proxy): return False
+        if (not export_rendering) and \
+            (proxy.GetXMLGroup() in ["views", "representations"]): return False
+        return True
+
+def tp_hook(varname, proxy):
+    global export_rendering, screenshot_info, reader_input_map
+    """callback to create our special accssors instead of the default ones."""
+    pname = smtrace.Trace.get_registered_name(proxy, "sources")
+    if pname and reader_input_map.has_key(pname):
+        # this is a reader.
+        return ReaderAccessor(varname, proxy, reader_input_map[pname])
+    pname = smtrace.Trace.get_registered_name(proxy, "views")
+    if pname:
+        # since view is being accessed, ensure that we were indeed saving
+        # rendering components.
+        assert export_rendering
+        return ViewAccessor(varname, proxy, screenshot_info[pname])
+    if pname and proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):
+        return WriterAccessor(varname, proxy)
+    raise NotImplementedError
 
 
 # Start trace
-capture_modified_properties = not smstate._save_full_state
-smtrace.start_trace(CaptureAllProperties=True,
-                    CaptureModifiedProperties=capture_modified_properties,
-                    UseGuiName=True)
-
-# update trace globals.
-smtrace.trace_globals.proxy_ctor_hook = staticmethod(tp_hook)
-smtrace.trace_globals.trace_output = []
-
-# Get list of proxy lists
-proxy_lists = smstate.get_proxy_lists_ordered_by_group(WithRendering=export_rendering)
-# Now register the proxies with the smtrace module
-for proxy_list in proxy_lists:
-    smstate.register_proxies_by_dependency(proxy_list)
-
-# Calling append_trace causes the smtrace module to sort out all the
-# registered proxies and their properties and write them as executable
-# python.
-smtrace.append_trace()
-
-# Stop trace and print it to the console
-smtrace.stop_trace()
+filter = tpstate_filter_proxies_to_serialize()
+smtrace.RealProxyAccessor.register_create_callback(tp_hook)
+state = smstate.get_state(filter=filter)
+smtrace.RealProxyAccessor.unregister_create_callback(tp_hook)
 
 output_contents = """
-try: paraview.simple
-except: from paraview.simple import *
-
+from paraview.simple import *
 from paraview import spatiotemporalparallelism as STP
 
 tp_writers = []
@@ -104,14 +164,9 @@ globalController, temporalController, timeCompartmentSize = STP.CreateController
 %s
 
 STP.IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, tp_writers, tp_views)
-"""
+""" % (timeCompartmentSize, state)
 
-pipeline_trace = ""
-for original_line in smtrace.trace_globals.trace_output:
-    for line in original_line.split("\n"):
-        pipeline_trace += line + "\n";
 
 outFile = open(scriptFileName, 'w')
-
-outFile.write(output_contents % (timeCompartmentSize, pipeline_trace))
+outFile.write(output_contents)
 outFile.close()

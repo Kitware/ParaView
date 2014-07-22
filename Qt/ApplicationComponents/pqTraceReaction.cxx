@@ -31,84 +31,121 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTraceReaction.h"
 
+#include "pqActiveObjects.h"
+#include "pqCoreUtilities.h"
+#include "pqProxyWidgetDialog.h"
 #include "pqPVApplicationCore.h"
-#include "pqPythonManager.h"
+#include "pqServer.h"
+#include "vtkCommand.h"
+#include "vtkNew.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
+
+#include "vtkPVConfig.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+# include "pqPythonManager.h"
+#endif
+//-----------------------------------------------------------------------------
+pqTraceReaction::pqTraceReaction(
+  QAction* parentObject, const char* start_trace_label, const char* stop_trace_label)
+  : Superclass(parentObject),
+  StartTraceLabel(start_trace_label),
+  StopTraceLabel(stop_trace_label)
+{
+#ifdef PARAVIEW_ENABLE_PYTHON
+  this->parentAction()->setEnabled(true);
+  this->parentAction()->setText(
+    vtkSMTrace::GetActiveTracer() == NULL?
+    this->StartTraceLabel : this->StopTraceLabel);
+#else
+  this->parentAction()->setEnabled(false);
+  this->parentAction()->setToolTip(
+    "Tracing unavailable since application built without Python support.");
+  this->parentAction()->setStatusTip(
+    "Tracing unavailable since application built without Python support.");
+#endif
+}
 
 //-----------------------------------------------------------------------------
-pqTraceReaction::pqTraceReaction(QAction* parentObject, bool _start)
-  : Superclass(parentObject)
+pqTraceReaction::~pqTraceReaction()
 {
-  this->Start = _start;
-  this->enable(_start);
-
-  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-
-  if(pythonManager)
+  // ensure to stop trace before the application quits
+  if (vtkSMTrace::GetActiveTracer())
     {
-    if (this->Start)
-      {
-      QObject::connect(pythonManager, SIGNAL(canStartTrace(bool)),
-        this, SLOT(enable(bool)));
-      }
-    else
-      {
-      QObject::connect(pythonManager, SIGNAL(canStopTrace(bool)),
-        this, SLOT(enable(bool)));
-      }
+    vtkSMTrace::StopTrace();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqTraceReaction::onTriggered()
+{
+  if (vtkSMTrace::GetActiveTracer() == NULL)
+    {
+    this->start();
     }
   else
     {
-    // No python available
-    this->enable(false);
+    this->stop();
     }
+  this->parentAction()->setText(
+    vtkSMTrace::GetActiveTracer() == NULL?
+    this->StartTraceLabel : this->StopTraceLabel);
 }
 
 //-----------------------------------------------------------------------------
 void pqTraceReaction::start()
 {
-  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  if(!pythonManager)
+  vtkSMSessionProxyManager* pxm =
+    pqActiveObjects::instance().activeServer()->proxyManager();
+
+  vtkSmartPointer<vtkSMProxy> proxy;
+  proxy.TakeReference(pxm->NewProxy("pythontracing", "PythonTraceOptions"));
+  if (proxy)
     {
-    qCritical("No application wide python manager.");
-    return;
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    controller->InitializeProxy(proxy);
+    pqProxyWidgetDialog dialog(proxy);
+    dialog.setWindowTitle("Trace Options");
+    dialog.setObjectName("TraceOptionsDialog");
+    if (dialog.exec() != QDialog::Accepted)
+      {
+      return;
+      }
     }
-  pythonManager->startTrace();
+  vtkSMTrace* trace = vtkSMTrace::StartTrace();
+  if (proxy)
+    {
+    trace->SetPropertiesToTraceOnCreate(
+      vtkSMPropertyHelper(proxy, "PropertiesToTraceOnCreate").GetAsInt());
+    trace->SetFullyTraceSupplementalProxies(
+      vtkSMPropertyHelper(proxy, "FullyTraceSupplementalProxies").GetAsInt() == 1);
+    if (vtkSMPropertyHelper(proxy, "ShowIncrementalTrace").GetAsInt() == 1)
+      {
+      pqCoreUtilities::connect(
+        trace, vtkCommand::UpdateEvent, this, SLOT(updateTrace()));
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqTraceReaction::stop()
 {
+  QString tracetxt(vtkSMTrace::StopTrace().c_str());
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
-  if(!pythonManager)
-    {
-    qCritical("No application wide python manager.");
-    return;
-    }
-  pythonManager->stopTrace();
-  pythonManager->editTrace();
+  pythonManager->editTrace(tracetxt);
+#endif
 }
 
 //-----------------------------------------------------------------------------
-void pqTraceReaction::enable(bool canDoAction)
+void pqTraceReaction::updateTrace()
 {
-  this->parentAction()->setEnabled(canDoAction);
-}
-
-//-----------------------------------------------------------------------------
-void pqTraceReaction::setLabel(const QString& label)
-{
-  if (this->Start)
-    {
-    this->parentAction()->setText(
-      label.isEmpty() ? tr("Can't start trace") : tr("Start trace"));
-    this->parentAction()->setStatusTip(
-      label.isEmpty() ? tr("Can't start trace") : tr("Start trace"));
-    }
-  else
-    {
-    this->parentAction()->setText(
-      label.isEmpty() ? tr("Can't stop trace") : tr("Stop trace"));
-    this->parentAction()->setStatusTip(
-      label.isEmpty() ? tr("Can't stop trace") : tr("Stop trace"));
-    }
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  pythonManager->editTrace(QString(), true);
+#endif
 }

@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkSMViewProxy.h"
@@ -471,6 +472,10 @@ void pqDisplayColorWidget::componentNumberChanged()
   if (this->ColorTransferFunction)
     {
     BEGIN_UNDO_SET("Change color component");
+    SM_SCOPED_TRACE(PropertiesModified)
+      .arg("proxy", this->ColorTransferFunction->getProxy())
+      .arg("comment", "change array component used for coloring");
+
     int number = this->componentNumber();
     this->ColorTransferFunction->setVectorMode(
       number<0? pqScalarsToColors::MAGNITUDE : pqScalarsToColors::COMPONENT,

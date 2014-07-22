@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMTrace.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -699,6 +700,15 @@ bool pqAnimationManager::saveAnimation()
   writer->SetPlaybackTimeWindow(playbackTimeWindow);
   writer->SetStartFileCount(startFrameCount);
 
+  SM_SCOPED_TRACE(SaveCameras).arg("proxy", sceneProxy);
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("WriteAnimation")
+    .arg(filename.toLatin1().data())
+    .arg("Magnification", magnification)
+    .arg("Compression", writer->GetCompression())
+    .arg("FrameRate", writer->GetFrameRate())
+    .arg("comment", "save animation images/movie");
+
   pqProgressManager* progress_manager = 
     pqApplicationCore::instance()->getProgressManager();
 
@@ -766,6 +776,13 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
     {
     return false;
     }
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("WriteAnimationGeometry")
+    .arg(filename.toLatin1().data())
+    .arg("view", view->getProxy())
+    .arg("comment", "save animation geometry from a view");
+
   vtkSMProxy* sceneProxy = scene->getProxy();
   vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
   writer->SetFileName(filename.toLatin1().data());

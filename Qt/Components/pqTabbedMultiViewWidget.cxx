@@ -526,6 +526,21 @@ void pqTabbedMultiViewWidget::cleanupAfterCapture()
 }
 
 //-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::writeImage(
+  const QString& filename, int dx, int dy, int quality)
+{
+  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(
+    this->Internals->TabWidget->currentWidget());
+  if (widget)
+    {
+    return widget->writeImage(filename, dx, dy, quality);
+    }
+
+  return 1;
+}
+
+
+//-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::toggleWidgetDecoration()
 {
   pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(

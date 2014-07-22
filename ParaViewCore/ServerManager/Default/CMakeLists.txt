@@ -31,20 +31,21 @@
 set (Module_SRCS
   vtkPVGeneralSettings.cxx
   vtkPVMultiServerDataSource.cxx
-  vtkSMCSVExporterProxy.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
+  vtkSMCSVExporterProxy.cxx
   vtkSMDirectoryProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMGL2PSExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMMultiServerSourceProxy.cxx
-  vtkSMPSWriterProxy.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
+  vtkSMPSWriterProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMTesting.cxx
+  vtkSMViewExportHelper.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

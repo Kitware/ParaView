@@ -24,6 +24,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMSession.h"
+#include "vtkSMTrace.h"
 #include "vtkTimerLog.h"
 
 #include <assert.h>
@@ -406,6 +407,12 @@ bool vtkSMRepresentationProxy::SetRepresentationType(const char* type)
 {
   if (this->GetProperty("Representation"))
     {
+    SM_SCOPED_TRACE(CallMethod)
+      .arg(this)
+      .arg("SetRepresentationType")
+      .arg(type)
+      .arg("comment", "change representation type");
+
     vtkSMPropertyHelper(this, "Representation").Set(type? type : "");
     this->UpdateVTKObjects();
     return true;

@@ -245,7 +245,16 @@ if(PARAVIEW_ENABLE_PYTHON)
   set(TESTS_WITH_BASELINES
     ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceExodus.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceExportAndSaveData.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceSaveGeometry.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceSupplementalProxiesFully.xml
   )
+  list(APPEND TESTS_WITH_INLINE_COMPARES
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceMultiViews.xml)
+  list(APPEND TESTS_WITHOUT_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/TraceIntegrateVariables.xml)
+
   if (PARAVIEW_ENABLE_MATPLOTLIB)
     list(APPEND TESTS_WITH_BASELINES ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonView.xml)
   endif()

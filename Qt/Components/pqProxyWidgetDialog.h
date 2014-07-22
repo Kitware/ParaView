@@ -51,6 +51,9 @@ public:
   pqProxyWidgetDialog(vtkSMProxy* proxy, const QStringList& properties, QWidget* parent=0);
   virtual ~pqProxyWidgetDialog();
 
+  /// Returns whether that dialog has any visible widgets.
+  bool hasVisibleWidgets() const;
+
 protected slots:
   // override to not close the dialog
   virtual void accept();

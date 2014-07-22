@@ -253,7 +253,9 @@ void pqPythonScriptEditor::createActions()
 //-----------------------------------------------------------------------------
 void pqPythonScriptEditor::createMenus()
 {
+  this->menuBar()->setObjectName("PythonScriptEditorMenuBar");
   this->fileMenu = menuBar()->addMenu(tr("&File"));
+  this->fileMenu->setObjectName("File");
   this->fileMenu->addAction(this->newAct);
   this->fileMenu->addAction(this->openAct);
   this->fileMenu->addAction(this->saveAct);
@@ -263,6 +265,7 @@ void pqPythonScriptEditor::createMenus()
   this->fileMenu->addAction(this->exitAct);
 
   this->editMenu = menuBar()->addMenu(tr("&Edit"));
+  this->editMenu->setObjectName("Edit");
   this->editMenu->addAction(this->cutAct);
   this->editMenu->addAction(this->copyAct);
   this->editMenu->addAction(this->pasteAct);

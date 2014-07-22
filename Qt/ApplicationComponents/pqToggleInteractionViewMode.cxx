@@ -34,8 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqRenderView.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkPVRenderView.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMTrace.h"
 
 //-----------------------------------------------------------------------------
 pqToggleInteractionViewMode::pqToggleInteractionViewMode(QAction* parentObject, pqView* view)
@@ -57,6 +58,10 @@ pqToggleInteractionViewMode::pqToggleInteractionViewMode(QAction* parentObject, 
 void pqToggleInteractionViewMode::onTriggered()
 { 
   pqRenderView* view = qobject_cast<pqRenderView*>(this->View);
+  SM_SCOPED_TRACE(PropertiesModified)
+    .arg(view->getProxy())
+    .arg("comment", "change interaction mode for render view");
+
   int currentMode = -1;
   int interactionMode = -1;
   vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Get(&currentMode);

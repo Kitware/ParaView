@@ -26,6 +26,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
@@ -137,6 +138,12 @@ vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(
 //----------------------------------------------------------------------------
 bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 {
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("LoadPlugin")
+    .arg(filename)
+    .arg("remote", false);
+//    .arg("ns=globals()"); <== FIXME
+
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
   vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
@@ -166,6 +173,12 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename,
   vtkSMSession* session)
 {
   assert("Session cannot be NULL" && session != NULL);
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("LoadPlugin")
+    .arg(filename)
+    .arg("remote", true);
+//    .arg("ns=globals()"); <== FIXME
 
   vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 

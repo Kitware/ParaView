@@ -71,6 +71,9 @@ public:
   /// cleans up the environment after image capture.
   virtual void cleanupAfterCapture();
 
+  /// Capture an image and saves it out to a file.
+  virtual bool writeImage(const QString& filename, int width, int height, int quality=-1);
+
 signals:
   /// fired when lockViewSize() is called.
   void viewSizeLocked(bool);
