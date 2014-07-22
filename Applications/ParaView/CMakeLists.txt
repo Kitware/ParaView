@@ -152,4 +152,13 @@ elseif (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
           \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR})
     "
     COMPONENT Runtime)
+elseif (UNIX)
+  configure_file(
+    paraview.desktop.in
+    "${CMAKE_CURRENT_BINARY_DIR}/paraview.desktop"
+    @ONLY)
+  install(
+    FILES       "${CMAKE_CURRENT_BINARY_DIR}/paraview.desktop"
+    DESTINATION share/applications
+    COMPONENT   runtime)
 endif()
