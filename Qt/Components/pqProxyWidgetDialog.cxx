@@ -100,13 +100,13 @@ public:
     QObject::connect(ui.SaveButton, SIGNAL(clicked()),
       widget, SLOT(onSaveAsDefaults()));
 
-    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), self, SLOT(accept()));
+    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), self, SLOT(onAccepted()));
+    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), widget, SLOT(apply()));
 
     QObject::connect(ui.CancelButton, SIGNAL(clicked()), widget, SLOT(reset()));
     QObject::connect(ui.CancelButton, SIGNAL(clicked()), self, SLOT(reject()));
 
     QObject::connect(ui.OKButton, SIGNAL(clicked()), self, SLOT(accept()));
-    QObject::connect(ui.OKButton, SIGNAL(clicked()), self, SLOT(close()));
 
     QSpacerItem* spacer = new QSpacerItem(0, 6, QSizePolicy::Fixed,
       QSizePolicy::MinimumExpanding);
@@ -160,12 +160,6 @@ pqProxyWidgetDialog::~pqProxyWidgetDialog()
 bool pqProxyWidgetDialog::hasVisibleWidgets() const
 {
   return this->Internals->HasVisibleWidgets;
-}
-
-//-----------------------------------------------------------------------------
-void pqProxyWidgetDialog::accept()
-{
-  this->Superclass::accept();
 }
 
 //-----------------------------------------------------------------------------

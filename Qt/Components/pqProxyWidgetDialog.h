@@ -55,9 +55,6 @@ public:
   bool hasVisibleWidgets() const;
 
 protected slots:
-  // override to not close the dialog
-  virtual void accept();
-
   /// slot to enable appropriate buttons when changes are available
   virtual void onChangeAvailable();
 
