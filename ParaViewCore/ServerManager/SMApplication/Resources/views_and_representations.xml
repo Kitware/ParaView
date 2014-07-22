@@ -3310,7 +3310,7 @@
           <Property name="ScalarOpacityFunction"
                     panel_visibility="never" />
           <Property name="ScalarOpacityUnitDistance"
-                    panel_visibility="never" />
+                    panel_visibility="advanced" />
           <Property name="ExtractedBlockIndex"
                     panel_visibility="never" />
           <Property name="SelectMapper"
@@ -3358,7 +3358,7 @@
           <Property name="ScalarOpacityFunction"
                     panel_visibility="never" />
           <Property name="ScalarOpacityUnitDistance"
-                    panel_visibility="never" />
+                    panel_visibility="advanced" />
           <Property name="ExtractedBlockIndex"
                     panel_visibility="never" />
           <Property name="SelectMapper"
@@ -3404,7 +3404,7 @@
             <Property name="ScalarOpacityFunction"
                       panel_visibility="never" />
             <Property name="ScalarOpacityUnitDistance"
-                      panel_visibility="never" />
+                      panel_visibility="advanced" />
             <Property name="ExtractedBlockIndex"
                       panel_visibility="never" />
             <Property name="SelectMapper"
@@ -3455,7 +3455,7 @@
         <ExposedProperties>
           <PropertyGroup label="Volume Rendering">
             <Property name="ScalarOpacityUnitDistance"
-                      panel_visibility="never" />
+                      panel_visibility="advanced" />
             <Property name="ScalarOpacityFunction"
                       panel_visibility="never" />
             <Property name="VolumeRenderingMode"
@@ -3525,7 +3525,8 @@
           <Exception name="Input" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ScalarOpacityUnitDistance"
+                    panel_visibility="advanced" />
           <Property name="ScalarOpacityFunction" />
           <Property name="VolumeRenderingMode" />
           <Property name="ResamplingMode" />
