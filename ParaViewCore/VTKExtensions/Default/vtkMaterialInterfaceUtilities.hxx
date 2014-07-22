@@ -308,17 +308,6 @@ int CopyTuple(T *dest,          // scalar/vector
   return 1;
 }
 
-// This is inefficient but not used often.
-int IsIn(string name, vector<string> names)
-{
-  size_t n=names.size();
-  for (size_t i=0; i<n; ++i)
-    {
-    if (names[i]==name) return true;
-    }
-  return false;
-}
-
 #ifdef vtkMaterialInterfaceFilterDEBUG
 //
 int WritePidFile(vtkCommunicator *comm, string pidFileName)
