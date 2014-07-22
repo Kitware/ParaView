@@ -161,6 +161,13 @@ elseif (UNIX)
     FILES       "${CMAKE_CURRENT_BINARY_DIR}/paraview.desktop"
     DESTINATION share/applications
     COMPONENT   runtime)
+  foreach (iconsize 22x22 32x32 96x96)
+    install(
+      FILES       "pvIcon-${iconsize}.png"
+      DESTINATION "share/icons/hicolor/${iconsize}/apps"
+      RENAME      paraview.png
+      COMPONENT   runtime)
+  endforeach ()
   install(
     FILES       paraview.appdata.xml
     DESTINATION share/appdata
