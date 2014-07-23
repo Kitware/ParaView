@@ -348,9 +348,9 @@ void vtkInitializationHelper::LoadSettings()
   for (size_t cc = 0; cc < pathsToSearch.size(); cc++)
     {
     std::string path = pathsToSearch[cc];
-    if (vtksys::SystemTools::FileExists((path + "/" + filename).c_str(), true))
+    siteSettingsFile = path + "/" + filename;
+    if (vtksys::SystemTools::FileExists(siteSettingsFile.c_str(), true))
       {
-      siteSettingsFile = path + "/" + filename;
       settingsFileFound = true;
       break;
       }

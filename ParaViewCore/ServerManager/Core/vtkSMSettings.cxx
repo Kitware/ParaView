@@ -37,6 +37,13 @@
 #include <algorithm>
 #include <cfloat>
 
+#define vtkSMSettingsDebugMacro(x)\
+  { if (vtksys::SystemTools::GetEnv("PV_SETTINGS_DEBUG")) {     \
+  vtksys_ios::ostringstream vtkerror;                           \
+  vtkerror << x << endl;                                        \
+  vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
+
+
 //----------------------------------------------------------------------------
 namespace {
 class SettingsCollection {
@@ -890,6 +897,7 @@ bool vtkSMSettings::AddCollectionFromFile(const std::string & fileName,
 {
   std::string settingsFileName(fileName);
   std::ifstream settingsFile(settingsFileName.c_str(), ios::in | ios::binary | ios::ate);
+  vtkSMSettingsDebugMacro("Attempting to load settings file '" << fileName << "'");
   if (settingsFile.is_open())
     {
     std::streampos size = settingsFile.tellg();
@@ -901,13 +909,18 @@ bool vtkSMSettings::AddCollectionFromFile(const std::string & fileName,
     settingsFile.close();
 
     bool success = this->AddCollectionFromString(std::string(settingsString),
-                                               priority);
+                                                 priority);
     delete[] settingsString;
+
+    vtkSMSettingsDebugMacro("Loading settings file '" << fileName << "' " << (success ? "succeeded" : "failed"));
 
     return success;
     }
   else
     {
+    vtkSMSettingsDebugMacro("Could not open settings file '" << fileName << "'");
+
+    // Shouldn't this return false?
     std::string emptyString;
     return this->AddCollectionFromString(emptyString, priority);
     }
