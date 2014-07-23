@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 
 #include "pqBoxChartView.h"
-#include "pqInsituServer.h"
+#include "pqLiveInsituManager.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -214,7 +214,7 @@ public:
     case pqPipelineModel::Server:
       {
       pqServer* server = qobject_cast<pqServer*>(this->Object);
-      vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy(server);
+      vtkSMLiveInsituLinkProxy* proxy = pqLiveInsituManager::linkProxy(server);
       return proxy ?
         ((vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)?
          INSITU_SERVER_PAUSED : INSITU_SERVER_RUNNING):
@@ -300,7 +300,7 @@ public:
       case pqPipelineModel::Server:
         {
         pqServer* server = qobject_cast<pqServer*>(this->Object);
-        newIcon = (pqInsituServer::isInsituServer(server) ?
+        newIcon = (pqLiveInsituManager::isInsituServer(server) ?
                    this->getBreakpointVisibilityIcon() : LAST);
         }
         break;
@@ -338,7 +338,7 @@ public:
 private:
   IconType getBreakpointVisibilityIcon() const
   {
-    pqInsituServer* server = pqInsituServer::instance();
+    pqLiveInsituManager* server = pqLiveInsituManager::instance();
     return (server->hasBreakpoint() ? INSITU_BREAKPOINT : LAST);
   }
 
@@ -349,10 +349,10 @@ private:
     // I'm not a huge fan of this hacky way we are dealing with catalyst. We'll
     // have to come back and cleanly address how the pqPipelineModel deals with
     // "visibility" in a more generic, session-centric way.
-    if (pqInsituServer::isInsituServer(port->getServer()))
+    if (pqLiveInsituManager::isInsituServer(port->getServer()))
       {
       pqLiveInsituVisualizationManager* mgr =
-        pqInsituServer::managerFromInsitu(port->getServer());
+        pqLiveInsituManager::managerFromInsitu(port->getServer());
       if (mgr)
         {
         return mgr->hasExtracts(port)? INSITU_EXTRACT :INSITU_EXTRACT_GRAY;
@@ -441,10 +441,10 @@ void pqPipelineModel::constructor()
   this->Editable = true;
   this->View = NULL;
 
-  QObject::connect(pqInsituServer::instance(),
-                   SIGNAL(catalystConnected(pqServer*)),
+  QObject::connect(pqLiveInsituManager::instance(),
+                   SIGNAL(connectionInitiated(pqServer*)),
                    this,
-                   SLOT(onCatalystConnected(pqServer*)));
+                   SLOT(onInsituConnectionInitiated(pqServer*)));
 
   // Initialize the pixmap list.
   this->PixmapList = new QPixmap[pqPipelineModelDataItem::LAST+1];
@@ -566,12 +566,12 @@ pqPipelineModel::~pqPipelineModel()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::onCatalystConnected(pqServer* displayServer)
+void pqPipelineModel::onInsituConnectionInitiated(pqServer* displayServer)
 {
   pqLiveInsituVisualizationManager* manager =
-    pqInsituServer::instance()->managerFromDisplay(displayServer);
+    pqLiveInsituManager::instance()->managerFromDisplay(displayServer);
   vtkSMLiveInsituLinkProxy* proxy =
-    pqInsituServer::linkProxy(manager->insituServer());
+    pqLiveInsituManager::linkProxy(manager->insituServer());
   if (manager && proxy)
     {
     if (this->LinkCallback)
@@ -582,11 +582,11 @@ void pqPipelineModel::onCatalystConnected(pqServer* displayServer)
       new ModifiedLiveInsituLink(manager->insituServer(), this);
     proxy->AddObserver (vtkCommand::ModifiedEvent, this->LinkCallback);
     QObject::connect(
-      pqInsituServer::instance(),
+      pqLiveInsituManager::instance(),
       SIGNAL(breakpointAdded(pqServer*)),
       this, SLOT(updateDataServer(pqServer*)));
     QObject::connect(
-      pqInsituServer::instance(),
+      pqLiveInsituManager::instance(),
       SIGNAL(breakpointRemoved(pqServer*)),
       this, SLOT(updateDataServer(pqServer*)));
     }

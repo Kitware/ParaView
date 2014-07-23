@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqInsituServer.h
+   Module:    pqLiveInsituManager.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqInsituServer_h
-#define __pqInsituServer_h
+#ifndef __pqLiveInsituManager_h
+#define __pqLiveInsituManager_h
 
 
 #include <QPointer>
@@ -46,23 +46,23 @@ class pqServer;
 class vtkSMLiveInsituLinkProxy;
 
 
-/// Singleton that provides access to Catalyst objects (pqServer,
+/// Singleton that provides access to Insitu objects (pqServer,
 /// pqLiveInsituVisualizationManager, vtkSMLiveInsituLinkProxy).
-class PQCOMPONENTS_EXPORT pqInsituServer : public QObject
+class PQCOMPONENTS_EXPORT pqLiveInsituManager : public QObject
 {
   Q_OBJECT
 
 public:
   static double INVALID_TIME;
   static vtkIdType INVALID_TIME_STEP;
-  static pqInsituServer* instance();
+  static pqLiveInsituManager* instance();
 
   /// Returns the link proxy to Catalyst or NULL if not connected or if not
   /// a catalyst server
   static vtkSMLiveInsituLinkProxy* linkProxy(pqServer* insituServer);
   vtkSMLiveInsituLinkProxy* linkProxy()
   {
-    return pqInsituServer::linkProxy(this->insituServer());
+    return pqLiveInsituManager::linkProxy(this->insituServer());
   }
   /// Is this the insitu server
   static bool isInsituServer(pqServer* server);
@@ -71,7 +71,7 @@ public:
                      vtkIdType* timeStep);
 
 signals:
-  void catalystConnected(pqServer* displayServer);
+  void connectionInitiated(pqServer* displayServer);
   void timeUpdated();
   void breakpointAdded(pqServer* insituServer);
   void breakpointRemoved(pqServer* insituServer);
@@ -85,7 +85,7 @@ public:
   pqServer* insituServer();
   /// Is this the server where Catalyst displays its extracts
   bool isDisplayServer(pqServer* server);
-  /// Returns the catalyst manager associated with 
+  /// Returns the catalyst visualization manager associated with 
   /// 'displayServer' or 'insituServer'
   pqLiveInsituVisualizationManager* managerFromDisplay(pqServer* displayServer);
   static pqLiveInsituVisualizationManager* managerFromInsitu(
@@ -118,6 +118,9 @@ public:
   {
     return this->TimeStep;
   }
+  void waitTimestep(vtkIdType timeStep);
+  void waitBreakpointHit();
+
 
 protected slots:
   /// called when Catalyst disconnects. We clean up the Catalyst connection.
@@ -127,7 +130,7 @@ protected slots:
   void onDataUpdated(pqPipelineSource* source);
 
 protected:
-  pqInsituServer();
+  pqLiveInsituManager();
   bool isTimeBreakpointHit() const;
   bool isTimeStepBreakpointHit() const;
 
@@ -138,7 +141,7 @@ protected:
   vtkIdType TimeStep;
 
 private:
-  Q_DISABLE_COPY(pqInsituServer)
+  Q_DISABLE_COPY(pqLiveInsituManager)
 
   typedef QMap<void*, QPointer<pqLiveInsituVisualizationManager> > ManagersType;
   ManagersType Managers;

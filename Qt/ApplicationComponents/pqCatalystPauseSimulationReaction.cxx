@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqInsituServer.h"
+#include "pqLiveInsituManager.h"
 #include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
@@ -59,7 +59,7 @@ pqCatalystPauseSimulationReaction::pqCatalystPauseSimulationReaction(
 //-----------------------------------------------------------------------------
 void pqCatalystPauseSimulationReaction::setPauseSimulation(bool pause)
 {
-  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::instance()->linkProxy();
+  vtkSMLiveInsituLinkProxy* proxy = pqLiveInsituManager::instance()->linkProxy();
   if (proxy)
     {
     vtkSMPropertyHelper(proxy, "SimulationPaused").Set(pause);
@@ -75,7 +75,7 @@ void pqCatalystPauseSimulationReaction::setPauseSimulation(bool pause)
 void pqCatalystPauseSimulationReaction::updateEnableState(Type type)
 {
   bool enabled = false;
-  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::instance()->linkProxy();
+  vtkSMLiveInsituLinkProxy* proxy = pqLiveInsituManager::instance()->linkProxy();
   if (proxy &&
       ((type == PAUSE) !=
        (vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)))

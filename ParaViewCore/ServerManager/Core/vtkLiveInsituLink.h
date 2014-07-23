@@ -157,7 +157,7 @@ public:
 //BTX
   // ***************************************************************
   // Internal methods, public for callbacks.
-  void InsituProcessConnected(vtkMultiProcessController* controller);
+  void InsituConnect(vtkMultiProcessController* controller);
 
   // Description:
   // Called to drop the connection between Insitu and ParaView Live.

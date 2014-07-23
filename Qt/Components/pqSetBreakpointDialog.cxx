@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 
 #include "pqApplicationCore.h"
-#include "pqInsituServer.h"
+#include "pqLiveInsituManager.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -54,7 +54,7 @@ pqSetBreakpointDialog::pqSetBreakpointDialog(QWidget* Parent) :
   this->setObjectName("pqSetBreakpointDialog");
   QObject::connect(this->Ui->ButtonBox, SIGNAL(accepted()),
                    this, SLOT(onAccepted()));
-  QObject::connect(pqInsituServer::instance(), SIGNAL(timeUpdated()),
+  QObject::connect(pqLiveInsituManager::instance(), SIGNAL(timeUpdated()),
                    this, SLOT(onTimeUpdated()));
 }
 
@@ -67,7 +67,7 @@ pqSetBreakpointDialog::~pqSetBreakpointDialog()
 //-----------------------------------------------------------------------------
 void pqSetBreakpointDialog::onAccepted()
 {
-  pqInsituServer* server = pqInsituServer::instance();
+  pqLiveInsituManager* server = pqLiveInsituManager::instance();
   QString timeString = this->Ui->BreakpointTime->text();
   bool ok = false;
   if (this->Ui->buttonGroup->checkedButton() == this->Ui->radioButtonTime)
@@ -101,10 +101,10 @@ void pqSetBreakpointDialog::onAccepted()
 void pqSetBreakpointDialog::onTimeUpdated()
 {
   QString timeString =
-    QString("%1").arg(pqInsituServer::instance()->time());
+    QString("%1").arg(pqLiveInsituManager::instance()->time());
   this->Ui->Time->setText (timeString);
 
   QString timeStepString =
-    QString("%1").arg(pqInsituServer::instance()->timeStep());
+    QString("%1").arg(pqLiveInsituManager::instance()->timeStep());
   this->Ui->TimeStep->setText (timeStepString);
 }

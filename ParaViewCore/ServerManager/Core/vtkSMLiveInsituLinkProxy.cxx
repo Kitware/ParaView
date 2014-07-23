@@ -31,8 +31,8 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
-
 #include <vtksys/ios/sstream>
+
 #define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr << __LINE__ << " " x << endl;
 //#define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
@@ -106,7 +106,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
           break;
 
         case vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE:
-          this->NewTimestepAvailable(value.idtype(0));
+          this->NextTimestepAvailable(value.idtype(0));
           break;
 
         case vtkLiveInsituLink::DISCONNECTED:
@@ -213,7 +213,7 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLiveInsituLinkProxy::NewTimestepAvailable(vtkIdType timeStep)
+void vtkSMLiveInsituLinkProxy::NextTimestepAvailable(vtkIdType timeStep)
 {
   this->TimeStep = timeStep;
   // Mark all extract producer proxies as dirty.

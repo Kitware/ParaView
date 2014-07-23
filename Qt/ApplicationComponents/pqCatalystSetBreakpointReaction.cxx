@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqInsituServer.h"
+#include "pqLiveInsituManager.h"
 #include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
@@ -80,5 +80,5 @@ void pqCatalystSetBreakpointReaction::onTriggered()
 void pqCatalystSetBreakpointReaction::updateEnableState()
 {
   this->parentAction()->setEnabled(
-    pqInsituServer::instance()->linkProxy() ? true : false);
+    pqLiveInsituManager::instance()->linkProxy() ? true : false);
 }

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqInsituServer.h"
+#include "pqLiveInsituManager.h"
 #include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
@@ -59,15 +59,15 @@ pqCatalystRemoveBreakpointReaction::pqCatalystRemoveBreakpointReaction(
 //-----------------------------------------------------------------------------
 void pqCatalystRemoveBreakpointReaction::onTriggered()
 {
-  pqInsituServer::instance()->removeBreakpoint();
+  pqLiveInsituManager::instance()->removeBreakpoint();
 }
 
 //-----------------------------------------------------------------------------
 void pqCatalystRemoveBreakpointReaction::updateEnableState()
 {
-  pqInsituServer* server = pqInsituServer::instance();
+  pqLiveInsituManager* server = pqLiveInsituManager::instance();
   this->parentAction()->setEnabled(
     (server->linkProxy() &&
-     server->breakpointTime() != pqInsituServer::INVALID_TIME) ? 
+     server->breakpointTime() != pqLiveInsituManager::INVALID_TIME) ? 
     true : false);
 }

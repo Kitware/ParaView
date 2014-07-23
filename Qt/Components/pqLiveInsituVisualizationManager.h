@@ -69,8 +69,9 @@ public:
   vtkSMLiveInsituLinkProxy* getProxy() const;
 
 signals:
-  void catalystConnected();
-  void catalystDisconnected();
+  void insituConnected();
+  void insituDisconnected();
+  void nextTimestepAvailable();
 
 protected slots:
   void timestepsUpdated();

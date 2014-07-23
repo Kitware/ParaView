@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   ParaView
@@ -48,7 +49,8 @@ namespace
     for(int i = startArg; i < maxArgs; ++i)
       {
       if(!strcmp(argv[i],"--data-server") || !strcmp(argv[i],"--render-server")
-         ||!strcmp(argv[i],"--client") || !strcmp(argv[i],"--server") )
+         || !strcmp(argv[i],"--client") || !strcmp(argv[i],"--server")
+         || !strcmp(argv[i], "--script"))
         {
         return i;
         }
@@ -71,6 +73,7 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->ServerExitTimeOut = 60;
   this->TestRenderServer = 0;
   this->TestServer = 0;
+  this->TestScript = 0;
   this->TestTiledDisplay = 0;
   this->ReverseConnection = 0;
   this->TestRemoteRendering = 0;
@@ -84,6 +87,8 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->DataServerExecutable.TypeName = "server";
   this->RenderServerExecutable.Type = RENDER_SERVER;
   this->RenderServerExecutable.TypeName = "renderserver";
+  this->ScriptExecutable.Type = SCRIPT;
+  this->ScriptExecutable.TypeName = "script";
 }
 
 vtkSMTestDriver::~vtkSMTestDriver()
@@ -159,6 +164,7 @@ void vtkSMTestDriver::CollectConfiguredOptions()
   char buf[1024];
   sprintf(buf, "%d", serverNumProc);
   this->MPIServerNumProcessFlag = buf;
+  this->MPIScriptNumProcessFlag = buf;
   sprintf(buf, "%d", renderNumProc);
   this->MPIRenderServerNumProcessFlag = buf;
 
@@ -248,6 +254,14 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->ServerExecutable.ArgEnd = FindLastExecutableArg(i+2, argc, argv);
       fprintf(stderr, "Test Server.\n");
       }
+    if(strcmp(argv[i], "--script") == 0)
+      {
+      this->TestScript = 1;
+      this->ScriptExecutable.Executable = ::FixExecutablePath(argv[i+1]);
+      this->ScriptExecutable.ArgStart = i+2;
+      this->ScriptExecutable.ArgEnd = FindLastExecutableArg(i+2, argc, argv);
+      fprintf(stderr, "Test Script.\n");
+      }
     if(strcmp(argv[i], "--test-tiled") == 0)
       {
       this->TestServer = 1;
@@ -267,6 +281,11 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       {
       this->NumberOfServers = atoi(argv[i+1]);
       fprintf(stderr, "Test multi-servers with %d servers.\n", this->NumberOfServers);
+      }
+    if(strcmp(argv[i], "--script-np") == 0)
+      {
+      this->MPIScriptNumProcessFlag = argv[i+1];
+      fprintf(stderr, "Test script with %s servers.\n", argv[i+1]);
       }
     if(strcmp(argv[i], "--one-mpi-np") == 0)
       {
@@ -679,6 +698,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   std::vector<vtksysProcess*> renderServers;
   std::vector<vtksysProcess*> servers;
   std::vector<vtksysProcess*> clients;
+  vtksysProcess* script = 0;
   for (int i=0; this->TestRenderServer && i < this->NumberOfServers; i++)
     {
     vtksysProcess* renderServer = vtksysProcess_New();
@@ -701,7 +721,6 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       }
     servers.push_back(server);
     }
-
   for (size_t cc=0; cc < this->ClientExecutables.size(); cc++)
     {
     vtksysProcess* client = vtksysProcess_New();
@@ -713,6 +732,16 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       }
     clients.push_back(client);
     }
+  if (this->TestScript)
+    {
+    script = vtksysProcess_New();
+    if(!script)
+      {
+      VTK_CLEAN_PROCESSES;
+      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the script.\n";
+      return 1;
+      }
+    }
 
   std::vector<char> ClientStdOut;
   std::vector<char> ClientStdErr;
@@ -720,6 +749,8 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   std::vector<char> ServerStdErr;
   std::vector<char> RenderServerStdOut;
   std::vector<char> RenderServerStdErr;
+  std::vector<char> ScriptStdOut;
+  std::vector<char> ScriptStdErr;
 
   if (this->ReverseConnection)
     {
@@ -893,6 +924,22 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
         }
       }
     }
+  // Start the script if there is one
+  if (script)
+    {
+    std::string output_to_ignore;
+    this->SetupServer(script, this->ScriptExecutable, argv);
+    vtksys_ios::ostringstream processName;
+    processName << "script";
+    if(!this->StartProcessAndWait(
+         script, processName.str().c_str(),ScriptStdOut, ScriptStdErr,
+         "", output_to_ignore))
+      {
+      cerr << "vtkSMTestDriver: Script never started.\n";
+      VTK_CLEAN_PROCESSES;
+      return -1;
+      }
+    }
 
   // Report the output of the processes.
   int clientPipe = 1;
@@ -947,6 +994,18 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
         mpiError = 1;
         }
       }
+
+    if (script)
+      {
+      output = "";
+      this->WaitForAndPrintLine("script", script, output, timeout,
+                                ScriptStdOut, ScriptStdErr, 0);
+      if(!mpiError && this->OutputStringHasError("script", output))
+        {
+        mpiError = 1;
+        }
+      }
+
     output = "";
     }
 
@@ -966,6 +1025,9 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
     vtksysProcess_WaitForExit(*exitIter, &this->ServerExitTimeOut);
     }
+  // the script must finish quickly as well
+  vtksysProcess_WaitForExit(script, &this->ServerExitTimeOut);
+
   for( std::vector<vtksysProcess*>::iterator exitIter = renderServers.begin();
        exitIter != renderServers.end();
        exitIter++ )
@@ -1002,6 +1064,12 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     serverResult += this->ReportStatus(*killIter, "server");
     vtksysProcess_Kill(*killIter);
     }
+  int scriptResult = 0;
+  if (script)
+    {
+    scriptResult += this->ReportStatus(script, "script");
+    vtksysProcess_Kill(script);
+    }
   int renderServerResult = 0;
   for( std::vector<vtksysProcess*>::iterator killIter = renderServers.begin();
        killIter != renderServers.end();
@@ -1024,6 +1092,10 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   if(renderServerResult)
     {
     return renderServerResult;
+    }
+  if (scriptResult)
+    {
+    return scriptResult;
     }
   if(mpiError)
     {
@@ -1269,6 +1341,8 @@ bool vtkSMTestDriver::SetupServer(vtksysProcess* server, const ExecutableInfo& i
     this->CreateCommandLine(serverCommand,
                             info.Executable.c_str(),
                             info.Type,
+                            info.Type == SCRIPT ?
+                            this->MPIScriptNumProcessFlag.c_str() :
                             this->MPIServerNumProcessFlag.c_str(),
                             info.ArgStart,
                             info.ArgEnd, argv);

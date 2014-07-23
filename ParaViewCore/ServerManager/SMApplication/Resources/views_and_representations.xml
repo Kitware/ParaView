@@ -149,19 +149,6 @@
       </PropertyGroup>
     </Proxy>
     <!-- ================================================================== -->
-    <!--
-        TODO: Address compatibility for the following XML Changes
-        - TitleFont  to   TitleFontFamily
-                          TitleFontSize
-                          TitleBold
-                          TitleItalic
-        - Axis...    to   LeftAxis...
-                          BottomAxis...
-                          RightAxis...
-                          TopAxis...
-         - AxisRange    to   AxisRangeMinimum
-                             AxisRangeMaximum
-    -->
     <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewTitle"
                       class="vtkPVXYChartView"

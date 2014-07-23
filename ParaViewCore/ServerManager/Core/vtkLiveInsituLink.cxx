@@ -91,7 +91,7 @@ namespace
     int vtkNotUsed(remoteProcessId))
     {
     vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
-    self->InsituProcessConnected(NULL);
+    self->InsituConnect(NULL);
     }
 
   void DropLiveInsituConnectionRMI(void *localArg,
@@ -427,7 +427,7 @@ void vtkLiveInsituLink::InitializeLive()
       // controller would generally be NULL, however due to magically timing,
       // the insitu lib may indeed connect just as we setup the socket, so we
       // handle that case.
-      this->InsituProcessConnected(controller);
+      this->InsituConnect(controller);
       controller->Delete();
       }
     else
@@ -498,7 +498,7 @@ void vtkLiveInsituLink::InitializeInsitu()
       // controller would generally be NULL, however due to magically timing,
       // the insitu lib may indeed connect just as we setup the socket, so we
       // handle that case.
-      this->InsituProcessConnected(controller);
+      this->InsituConnect(controller);
       controller->Delete();
       }
     // nothing to do, no server to connect to.
@@ -509,7 +509,7 @@ void vtkLiveInsituLink::InitializeInsitu()
     pm->GetGlobalController()->Broadcast(&connection_established, 1, 0);
     if (connection_established)
       {
-      this->InsituProcessConnected(NULL);
+      this->InsituConnect(NULL);
       }
     }
 }
@@ -525,7 +525,7 @@ void vtkLiveInsituLink::OnConnectionCreatedEvent()
   vtkMultiProcessController* controller = nam->NewConnection(this->URL);
   if (controller)
     {
-    this->InsituProcessConnected(controller);
+    this->InsituConnect(controller);
     controller->Delete();
     }
 }
@@ -568,7 +568,7 @@ void vtkLiveInsituLink::DropLiveInsituConnection()
 }
 
 //----------------------------------------------------------------------------
-void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* controller)
+void vtkLiveInsituLink::InsituConnect(vtkMultiProcessController* controller)
 {
   assert(this->Controller == NULL);
   assert(this->ExtractsDeliveryHelper.GetPointer() == NULL);
@@ -1094,7 +1094,7 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time, vtkIdType timeStep)
   // Obtains extracts from the simulations processes.
   bool dataAvailable = this->ExtractsDeliveryHelper->Update();
 
-  // Retreive the vtkPVDataInformations
+  // Retrieve the vtkPVDataInformations
   std::map<std::pair<vtkTypeUInt32,unsigned int>,std::string> dataInformation;
   if (myId == 0 && this->Controller)
     {

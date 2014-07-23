@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqInsituServer.h"
+#include "pqLiveInsituManager.h"
 #include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqServer.h"
@@ -61,13 +61,13 @@ pqCatalystConnectReaction::~pqCatalystConnectReaction()
 //-----------------------------------------------------------------------------
 bool pqCatalystConnectReaction::connect()
 {
-  pqInsituServer* cs = pqInsituServer::instance();
+  pqLiveInsituManager* cs = pqLiveInsituManager::instance();
   pqServer* server = pqActiveObjects::instance().activeServer();
   pqLiveInsituVisualizationManager* mgr = cs->connect(server);
   if (mgr)
     {
     this->updateEnableState();
-    QObject::connect(mgr, SIGNAL(catalystDisconnected()),
+    QObject::connect(mgr, SIGNAL(insituDisconnected()),
                      this, SLOT(updateEnableState()));
     }
   return mgr;
@@ -79,9 +79,9 @@ void pqCatalystConnectReaction::updateEnableState()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (server && 
-      ! pqInsituServer::isInsituServer(server) &&
+      ! pqLiveInsituManager::isInsituServer(server) &&
       ! server->session()->IsMultiClients() &&
-      ! pqInsituServer::instance()->isDisplayServer(server))
+      ! pqLiveInsituManager::instance()->isDisplayServer(server))
     {
     this->parentAction()->setEnabled(true);
     }

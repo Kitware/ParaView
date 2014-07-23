@@ -76,7 +76,7 @@ protected:
   void PushUpdatedState();
 
   void InsituConnected(const char* initialial_state);
-  void NewTimestepAvailable(vtkIdType timeStep);
+  void NextTimestepAvailable(vtkIdType timeStep);
 
   vtkSmartPointer<vtkSMSessionProxyManager> InsituProxyManager;
   vtkWeakPointer<vtkPVCatalystSessionCore> CatalystSessionCore;

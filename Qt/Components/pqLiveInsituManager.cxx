@@ -29,12 +29,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqInsituServer.h"
+#include "pqLiveInsituManager.h"
 
 #include <limits>
+#include <iostream>
 
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QTextStream>
 #include <QVariant>
 
 
@@ -45,6 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqTestUtility.h"
+#include "pqWidgetEventPlayer.h"
+#include "pqEventDispatcher.h"
 
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
@@ -53,29 +58,84 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
-double pqInsituServer::INVALID_TIME = - std::numeric_limits<double>().max();
-vtkIdType pqInsituServer::INVALID_TIME_STEP =
+namespace
+{
+class pqLiveInsituEventPlayer : public pqWidgetEventPlayer
+{
+  typedef pqWidgetEventPlayer Superclass;
+public:
+  QPointer<pqLiveInsituManager> Manager;
+
+  pqLiveInsituEventPlayer(QObject* p) :
+    Superclass(p)
+  {
+  }
+
+  virtual bool playEvent(
+    QObject*,
+    const QString& command, const QString& arguments, bool& error)
+  {
+    if (command == "pqLiveInsituManager" && this->Manager)
+      {
+      if (arguments.startsWith("wait_timestep"))
+        {
+        QString arg = arguments;
+        QString command;
+        vtkIdType timeStep;
+        QTextStream istr(&arg);
+        istr >> command >> timeStep;
+        this->Manager->waitTimestep(timeStep);
+        }
+      else if (arguments == "wait_breakpoint_hit")
+        {
+        this->Manager->waitBreakpointHit();
+        }
+      else
+        {
+        error = true;
+        }
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+  }
+};
+};
+
+
+
+double pqLiveInsituManager::INVALID_TIME =
+  - std::numeric_limits<double>().max();
+vtkIdType pqLiveInsituManager::INVALID_TIME_STEP =
   std::numeric_limits<vtkIdType>().min();
 
 
 //-----------------------------------------------------------------------------
-pqInsituServer* pqInsituServer::instance()
+pqLiveInsituManager* pqLiveInsituManager::instance()
 {
-  static pqInsituServer* s_insituServer = NULL;
+  static pqLiveInsituManager* s_insituServer = NULL;
   if (! s_insituServer)
     {
-    s_insituServer = new pqInsituServer();
+    s_insituServer = new pqLiveInsituManager();
     }
   return s_insituServer;
 }
 
 //-----------------------------------------------------------------------------
-pqInsituServer::pqInsituServer() :
+pqLiveInsituManager::pqLiveInsituManager() :
   BreakpointTime(INVALID_TIME),
   Time(INVALID_TIME),
   BreakpointTimeStep(INVALID_TIME_STEP),
   TimeStep(INVALID_TIME_STEP)
 {
+  pqLiveInsituEventPlayer* player = new pqLiveInsituEventPlayer(NULL);
+  player->Manager = this;
+  // the testUtility takes ownership of the player.
+  pqApplicationCore::instance()->testUtility()->eventPlayer()->
+    addWidgetEventPlayer(player);
+
   pqServerManagerModel* model =
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(model,
@@ -87,23 +147,23 @@ pqInsituServer::pqInsituServer() :
 }
 
 //-----------------------------------------------------------------------------
-bool pqInsituServer::isInsituServer(pqServer* server)
+bool pqLiveInsituManager::isInsituServer(pqServer* server)
 {
   return server ? (server->getResource().scheme() == "catalyst") : false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqInsituServer::isDisplayServer(pqServer* server)
+bool pqLiveInsituManager::isDisplayServer(pqServer* server)
 {
   return this->Managers.contains(server);
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqInsituServer::insituServer()
+pqServer* pqLiveInsituManager::insituServer()
 {
   pqActiveObjects& ao = pqActiveObjects::instance();
   pqServer* as = ao.activeServer();
-  if (pqInsituServer::isInsituServer(as))
+  if (pqLiveInsituManager::isInsituServer(as))
     {
     return as;
     }
@@ -120,7 +180,7 @@ pqServer* pqInsituServer::insituServer()
         it != servers.end(); ++it)
       {
       pqServer* server = *it;
-      if (pqInsituServer::isInsituServer(server))
+      if (pqLiveInsituManager::isInsituServer(server))
         {
         return server;
         }
@@ -131,13 +191,13 @@ pqServer* pqInsituServer::insituServer()
 
 
 //-----------------------------------------------------------------------------
-vtkSMLiveInsituLinkProxy* pqInsituServer::linkProxy(
+vtkSMLiveInsituLinkProxy* pqLiveInsituManager::linkProxy(
   pqServer* insituServer)
 {
   if (insituServer)
     {
     pqLiveInsituVisualizationManager* mgr =
-      pqInsituServer::managerFromInsitu(insituServer);
+      pqLiveInsituManager::managerFromInsitu(insituServer);
     if (mgr)
       {
       vtkSMLiveInsituLinkProxy* proxy = mgr->getProxy();
@@ -149,7 +209,7 @@ vtkSMLiveInsituLinkProxy* pqInsituServer::linkProxy(
 
 
 //-----------------------------------------------------------------------------
-pqLiveInsituVisualizationManager* pqInsituServer::connect(pqServer* server)
+pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server)
 {
   if (! server)
     {
@@ -175,14 +235,14 @@ pqLiveInsituVisualizationManager* pqInsituServer::connect(pqServer* server)
 
     pqLiveInsituVisualizationManager* mgr =
       new pqLiveInsituVisualizationManager(portNumber, server);
-    QObject::connect(mgr, SIGNAL(catalystDisconnected()),
+    QObject::connect(mgr, SIGNAL(insituDisconnected()),
       this, SLOT(onCatalystDisconnected()));
     this->Managers[server] = mgr;
     QMessageBox::information(pqCoreUtilities::mainWidget(),
       "Ready for Catalyst connections",
       QString("Accepting connections from Catalyst Co-Processor \n"
       "for live-coprocessing on port %1").arg(portNumber));
-    emit catalystConnected(server);
+    emit connectionInitiated(server);
     return mgr;
     }
   else
@@ -193,14 +253,14 @@ pqLiveInsituVisualizationManager* pqInsituServer::connect(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-pqLiveInsituVisualizationManager* pqInsituServer::managerFromDisplay(
+pqLiveInsituVisualizationManager* pqLiveInsituManager::managerFromDisplay(
   pqServer* displayServer)
 {
   return this->Managers[displayServer];
 }
 
 //-----------------------------------------------------------------------------
-pqLiveInsituVisualizationManager* pqInsituServer::managerFromInsitu(
+pqLiveInsituVisualizationManager* pqLiveInsituManager::managerFromInsitu(
   pqServer* insituServer)
 {
   return qobject_cast<pqLiveInsituVisualizationManager*>(
@@ -209,7 +269,7 @@ pqLiveInsituVisualizationManager* pqInsituServer::managerFromInsitu(
 
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::onCatalystDisconnected()
+void pqLiveInsituManager::onCatalystDisconnected()
 {
   pqLiveInsituVisualizationManager* mgr =
     qobject_cast<pqLiveInsituVisualizationManager*>(this->sender());
@@ -243,7 +303,7 @@ void pqInsituServer::onCatalystDisconnected()
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqInsituServer::pipelineSource(pqServer* insituServer)
+pqPipelineSource* pqLiveInsituManager::pipelineSource(pqServer* insituServer)
 {
   if (insituServer)
     {
@@ -256,7 +316,7 @@ pqPipelineSource* pqInsituServer::pipelineSource(pqServer* insituServer)
 }
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::time(pqPipelineSource* pipelineSource, double* time,
+void pqLiveInsituManager::time(pqPipelineSource* pipelineSource, double* time,
                           vtkIdType* timeStep)
 {
   if (pipelineSource)
@@ -271,7 +331,7 @@ void pqInsituServer::time(pqPipelineSource* pipelineSource, double* time,
         pqApplicationCore::instance()->getServerManagerModel();
       vtkSMSession* session = pipelineSource->getSourceProxy()->GetSession();
       pqServer* insituServer = model->findServer(session);
-      vtkSMLiveInsituLinkProxy* linkProxy = pqInsituServer::linkProxy(insituServer);
+      vtkSMLiveInsituLinkProxy* linkProxy = pqLiveInsituManager::linkProxy(insituServer);
       Q_ASSERT (linkProxy);
       *timeStep = linkProxy->GetTimeStep();
       }
@@ -284,7 +344,7 @@ void pqInsituServer::time(pqPipelineSource* pipelineSource, double* time,
 }
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::onSourceAdded(pqPipelineSource* source)
+void pqLiveInsituManager::onSourceAdded(pqPipelineSource* source)
 {
   vtkSMSourceProxy* sourceProxy = source->getSourceProxy();
   pqServerManagerModel* model =
@@ -293,7 +353,7 @@ void pqInsituServer::onSourceAdded(pqPipelineSource* source)
   pqServer* server = model->findServer(session);
   if (QString(sourceProxy->GetXMLGroup()) == "sources" &&
       QString(sourceProxy->GetXMLName()) == "PVTrivialProducer" &&
-      pqInsituServer::isInsituServer (server))
+      pqLiveInsituManager::isInsituServer (server))
     {
     QObject::connect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
                      this, SLOT(onDataUpdated(pqPipelineSource*)));
@@ -301,7 +361,7 @@ void pqInsituServer::onSourceAdded(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-bool pqInsituServer::isTimeBreakpointHit() const
+bool pqLiveInsituManager::isTimeBreakpointHit() const
 {
   return this->Time != INVALID_TIME &&
     this->BreakpointTime != INVALID_TIME &&
@@ -309,7 +369,7 @@ bool pqInsituServer::isTimeBreakpointHit() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqInsituServer::isTimeStepBreakpointHit() const
+bool pqLiveInsituManager::isTimeStepBreakpointHit() const
 {
   return this->TimeStep != INVALID_TIME_STEP &&
     this->BreakpointTimeStep != INVALID_TIME_STEP &&
@@ -318,9 +378,9 @@ bool pqInsituServer::isTimeStepBreakpointHit() const
 
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::onDataUpdated(pqPipelineSource* source)
+void pqLiveInsituManager::onDataUpdated(pqPipelineSource* source)
 {
-  pqInsituServer::time(source, &this->Time, &this->TimeStep);
+  pqLiveInsituManager::time(source, &this->Time, &this->TimeStep);
   emit timeUpdated();
   if (isTimeBreakpointHit() || isTimeStepBreakpointHit())
     {
@@ -338,9 +398,10 @@ void pqInsituServer::onDataUpdated(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::onBreakpointHit(pqServer* insituServer)
+void pqLiveInsituManager::onBreakpointHit(pqServer* insituServer)
 {
-  vtkSMLiveInsituLinkProxy* proxy = pqInsituServer::linkProxy(insituServer);
+  vtkSMLiveInsituLinkProxy* proxy =
+    pqLiveInsituManager::linkProxy(insituServer);
   if (proxy)
     {
     vtkSMPropertyHelper(proxy, "SimulationPaused").Set(true);
@@ -350,7 +411,7 @@ void pqInsituServer::onBreakpointHit(pqServer* insituServer)
 }
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::setBreakpoint(double time)
+void pqLiveInsituManager::setBreakpoint(double time)
 {
   if (this->BreakpointTime != time)
     {
@@ -365,7 +426,7 @@ void pqInsituServer::setBreakpoint(double time)
 }
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::setBreakpoint(vtkIdType timeStep)
+void pqLiveInsituManager::setBreakpoint(vtkIdType timeStep)
 {
   if (this->BreakpointTimeStep != timeStep)
     {
@@ -380,7 +441,7 @@ void pqInsituServer::setBreakpoint(vtkIdType timeStep)
 }
 
 //-----------------------------------------------------------------------------
-void pqInsituServer::removeBreakpoint()
+void pqLiveInsituManager::removeBreakpoint()
 {
   if (this->hasBreakpoint())
     {
@@ -392,4 +453,43 @@ void pqInsituServer::removeBreakpoint()
       emit breakpointRemoved(insituServer);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveInsituManager::waitTimestep(vtkIdType timeStep)
+{
+  pqEventDispatcher* dispatcher =
+    pqApplicationCore::instance()->testUtility()->dispatcher();
+  dispatcher->deferEventsIfBlocked(true);
+  pqLiveInsituVisualizationManager* visManager =
+    this->managerFromInsitu(this->insituServer());
+  std::cerr << "===== start waitTimestep(" << timeStep << ")" <<
+    " ===== " << this->timeStep() << endl;
+  while (timeStep > this->timeStep())
+    {
+    QEventLoop loop;
+    QObject::connect(visManager, SIGNAL(nextTimestepAvailable()),
+                     &loop, SLOT(quit()));
+    loop.exec();
+    std::cerr << "===== waitTimestep(" << timeStep << ")" <<
+      " ===== " << this->timeStep() << endl;
+    }
+  std::cerr << "===== end waitTimestep(" << timeStep << ")" <<
+    " ===== " << this->timeStep() << endl;
+  dispatcher->deferEventsIfBlocked(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveInsituManager::waitBreakpointHit()
+{
+  pqEventDispatcher* dispatcher =
+    pqApplicationCore::instance()->testUtility()->dispatcher();
+  dispatcher->deferEventsIfBlocked(true);
+  std::cerr << "=== begin waitConnected ===" << endl;
+  QEventLoop loop;
+  QObject::connect(this, SIGNAL(breakpointHit(pqServer*)),
+                   &loop, SLOT(quit()));
+  loop.exec();
+  std::cerr << "=== end waitConnected ===" << endl;
+  dispatcher->deferEventsIfBlocked(false);
 }

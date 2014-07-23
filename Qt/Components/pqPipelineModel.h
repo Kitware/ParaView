@@ -320,7 +320,7 @@ signals:
   void firstChildAdded(const QModelIndex &index);
 
 private slots:
-  void onCatalystConnected(pqServer* server);
+  void onInsituConnectionInitiated(pqServer* server);
 
   void serverDataChanged();
 
