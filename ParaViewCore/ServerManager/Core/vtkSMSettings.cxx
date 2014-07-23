@@ -709,8 +709,9 @@ public:
         // lower-priority setting that is not default, we want to be
         // able to set the value back to the default in the higher
         // priority setting collection.
-        if (this->GetSettingBelowPriority(propertySettingCString,
-                                          highestPriority).isNull())
+        Json::Value lowerPriorityValue = this->GetSettingBelowPriority(propertySettingCString,
+                                                                       highestPriority);
+        if (lowerPriorityValue.isNull())
           {
           if (!proxyValue.removeMember(property->GetXMLName()).isNull())
             {
@@ -865,6 +866,8 @@ bool vtkSMSettings::AddCollectionFromString(const std::string & settings,
   SettingsCollection collection;
   collection.Priority = priority;
 
+  vtkSMSettingsDebugMacro("Loading settings JSON string '" << settings << "'");
+
   // If the settings string is empty, the JSON parser can't handle it.
   // Replace the empty string with {}
   std::string processedSettings(settings);
@@ -880,6 +883,7 @@ bool vtkSMSettings::AddCollectionFromString(const std::string & settings,
     {
     this->Internal->SettingCollections.push_back(collection);
     this->Internal->SettingCollectionsAreSorted = false;
+    vtkSMSettingsDebugMacro("Successfully parsed settings string");
     return true;
     }
   else
@@ -993,6 +997,7 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string & filePath)
       !this->Internal->IsModified)
     {
     // No settings to save, so we'll always succeed.
+    vtkSMSettingsDebugMacro("No settings to save");
     return true;
     }
 
@@ -1007,6 +1012,7 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string & filePath)
     return false;
     }
 
+  vtkSMSettingsDebugMacro("Opening settings file '" << filePath << "' for writing");
   std::ofstream settingsFile(filePath.c_str(), ios::out | ios::binary );
   if (settingsFile.is_open())
     {
@@ -1014,9 +1020,12 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string & filePath)
     settingsFile << output;
 
     this->Internal->IsModified = false;
+
+    vtkSMSettingsDebugMacro("Succeeded writing settings file '" << filePath << "'");
     return true;
     }
 
+  vtkSMSettingsDebugMacro("Failed writing settings file '" << filePath << "'");
   return false;
 }
 
