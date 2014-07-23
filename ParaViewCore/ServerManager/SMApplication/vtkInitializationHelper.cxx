@@ -344,23 +344,15 @@ void vtkInitializationHelper::LoadSettings()
 
   std::string filename = vtkInitializationHelper::GetApplicationName() + "-SiteSettings.json";
   std::string siteSettingsFile;
-  bool settingsFileFound = false;
   for (size_t cc = 0; cc < pathsToSearch.size(); cc++)
     {
     std::string path = pathsToSearch[cc];
     siteSettingsFile = path + "/" + filename;
-    if (vtksys::SystemTools::FileExists(siteSettingsFile.c_str(), true))
+    if (settings->AddCollectionFromFile(siteSettingsFile, 1.0))
       {
-      settingsFileFound = true;
       break;
       }
     }
-
-  if (settingsFileFound)
-    {
-    settings->AddCollectionFromFile(siteSettingsFile, 1.0);
-    }
-
   settings->DistributeSettings();
 
   vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = true;

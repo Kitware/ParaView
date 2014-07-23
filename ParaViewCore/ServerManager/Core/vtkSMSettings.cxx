@@ -919,10 +919,7 @@ bool vtkSMSettings::AddCollectionFromFile(const std::string & fileName,
   else
     {
     vtkSMSettingsDebugMacro("Could not open settings file '" << fileName << "'");
-
-    // Shouldn't this return false?
-    std::string emptyString;
-    return this->AddCollectionFromString(emptyString, priority);
+    return false;
     }
 }
 
