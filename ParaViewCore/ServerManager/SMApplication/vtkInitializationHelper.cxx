@@ -290,26 +290,25 @@ void vtkInitializationHelper::StandaloneFinalize()
 }
 
 //----------------------------------------------------------------------------
-bool vtkInitializationHelper::LoadSettings()
+void vtkInitializationHelper::LoadSettings()
 {
   if (vtkInitializationHelper::LoadSettingsFilesDuringInitialization == false)
     {
-    return false;
+    return;
     }
 
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
   int myRank = vtkProcessModule::GetProcessModule()->GetPartitionId();
-  bool success = true;
 
   if (myRank > 0) // don't read files on satellites.
     {
     settings->DistributeSettings();
-    return true;
+    return;
     }
 
   // Load user-level settings
   std::string userSettingsFilePath = vtkInitializationHelper::GetUserSettingsFilePath();
-  success = success && settings->AddCollectionFromFile(userSettingsFilePath, VTK_DOUBLE_MAX);
+  settings->AddCollectionFromFile(userSettingsFilePath, VTK_DOUBLE_MAX);
 
   // Load site-level settings
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
@@ -359,13 +358,12 @@ bool vtkInitializationHelper::LoadSettings()
 
   if (settingsFileFound)
     {
-    success = success && settings->AddCollectionFromFile(siteSettingsFile, 1.0);
+    settings->AddCollectionFromFile(siteSettingsFile, 1.0);
     }
 
   settings->DistributeSettings();
 
   vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = true;
-  return success;
 }
 
 //----------------------------------------------------------------------------
