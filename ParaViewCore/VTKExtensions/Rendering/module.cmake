@@ -57,4 +57,6 @@ PRIVATE_DEPENDS
 
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVExtensions
 )

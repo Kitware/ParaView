@@ -11,6 +11,8 @@ vtk_module(vtkPVServerManagerDefault
     vtkTestingRendering
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVServerManager
 )
 
 # Add XML resources.

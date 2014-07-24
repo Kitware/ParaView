@@ -21,6 +21,8 @@ vtk_module(vtkPVServerManagerCore
     PARAVIEW
   TEST_DEPENDS
     vtkPVServerManagerApplication
+  KIT
+    vtkPVServerManager
 
 )
 unset (__dependencies)

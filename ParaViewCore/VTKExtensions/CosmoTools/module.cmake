@@ -6,6 +6,8 @@ vtk_module(vtkPVVTKExtensionsCosmoTools
       vtkParallelCore
    PRIVATE_DEPENDS
       vtkParallelMPI
+   KIT
+      vtkPVExtensions
 )
 
 # paraview-specific extensions to a module to bring in proxy XML configs

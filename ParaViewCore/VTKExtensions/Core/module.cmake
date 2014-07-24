@@ -7,4 +7,6 @@ vtk_module(vtkPVVTKExtensionsCore
     vtkPVCommon
   PRIVATE_DEPENDS
     vtksys
+  KIT
+    vtkPVExtensions
 )

@@ -6,4 +6,6 @@ vtk_module(vtkPVServerImplementationRendering
     vtkPVClientServerCoreRendering
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVServerImplementation
 )
