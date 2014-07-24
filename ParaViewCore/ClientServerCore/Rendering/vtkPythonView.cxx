@@ -48,6 +48,9 @@ public:
       return this->CustomLocals;
       }
 
+    // Make sure the python interpreter is initialized
+    vtkPythonInterpreter::Initialize(1);
+
     const char* code = "__vtkPythonViewLocals={'__builtins__':__builtins__}\n";
     PyRun_SimpleString(const_cast<char *>(code));
 
