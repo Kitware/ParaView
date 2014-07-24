@@ -3,7 +3,6 @@
     { "name": "vtkPVClientServerCoreRendering",
       "path": "ParaViewCore/ClientServerCore/Rendering",
       "include": [
-        { "class": "vtkMatplotlibUtilities" },
         { "class": "vtkPythonRepresentation" },
         { "class": "vtkPythonView" }
       ],
