@@ -28,6 +28,7 @@
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 
+#include <algorithm>
 #include <vtksys/ios/sstream>
 
 
@@ -47,6 +48,9 @@ public:
       {
       return this->CustomLocals;
       }
+
+    // Make sure the python interpreter is initialized
+    vtkPythonInterpreter::Initialize(1);
 
     const char* code = "__vtkPythonViewLocals={'__builtins__':__builtins__}\n";
     PyRun_SimpleString(const_cast<char *>(code));
@@ -467,8 +471,13 @@ bool vtkPythonView::IsLocalDataAvailable()
 //----------------------------------------------------------------------------
 int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
 {
+  // The embedded python interpreter cannot handle DOS line-endings, see
+  // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
+  std::string buffer = code ? code : "";
+  buffer.erase(std::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
+
   PyObject* context = this->Internals->GetCustomLocalsPyObject();
-  PyObject* result = PyRun_String(const_cast<char*>(code), Py_file_input, context, context);
+  PyObject* result = PyRun_String(const_cast<char*>(buffer.c_str()), Py_file_input, context, context);
 
   if (result == NULL)
     {
