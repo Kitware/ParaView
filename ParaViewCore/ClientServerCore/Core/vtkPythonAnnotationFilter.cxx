@@ -18,12 +18,13 @@
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
-#include "vtkStdString.h"
 
 #include <assert.h>
 #include <map>
@@ -125,6 +126,13 @@ int vtkPythonAnnotationFilter::RequestData(
   output->AddColumn(data);
   data->FastDelete();
   this->CurrentInputDataObject = NULL;
+
+  if (vtkMultiProcessController::GetGlobalController() &&
+    vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() > 0)
+    {
+    // reset output on all ranks except the 0 root node.
+    output->Initialize();
+    }
   return 1;
 }
 

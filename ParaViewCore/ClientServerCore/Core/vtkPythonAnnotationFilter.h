@@ -93,7 +93,7 @@ protected:
                           vtkInformationVector* outputVector);
 
   // Description:
-  void EvaluateExpression();
+  virtual void EvaluateExpression();
 
   char* Expression;
   char* ComputedAnnotationValue;
