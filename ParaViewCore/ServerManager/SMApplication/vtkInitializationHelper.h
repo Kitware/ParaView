@@ -82,8 +82,8 @@ protected:
   virtual ~vtkInitializationHelper() {};
 
   // Description:
-  // Load settings
-  static bool LoadSettings();
+  // Load user and site settings
+  static void LoadSettings();
 
   // Description:
   // Get directory for user settings file. The last character is always the

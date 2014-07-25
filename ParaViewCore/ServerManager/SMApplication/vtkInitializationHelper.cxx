@@ -290,26 +290,32 @@ void vtkInitializationHelper::StandaloneFinalize()
 }
 
 //----------------------------------------------------------------------------
-bool vtkInitializationHelper::LoadSettings()
+void vtkInitializationHelper::LoadSettings()
 {
   if (vtkInitializationHelper::LoadSettingsFilesDuringInitialization == false)
     {
-    return false;
+    return;
     }
 
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
   int myRank = vtkProcessModule::GetProcessModule()->GetPartitionId();
-  bool success = true;
 
   if (myRank > 0) // don't read files on satellites.
     {
     settings->DistributeSettings();
-    return true;
+    return;
     }
 
   // Load user-level settings
   std::string userSettingsFilePath = vtkInitializationHelper::GetUserSettingsFilePath();
-  success = success && settings->AddCollectionFromFile(userSettingsFilePath, VTK_DOUBLE_MAX);
+  if (!settings->AddCollectionFromFile(userSettingsFilePath, VTK_DOUBLE_MAX))
+    {
+    // Loading user settings failed, so we need to create an empty
+    // collection with highest priority manually. Otherwise, if a
+    // setting is changed, a lower-priority collection such as site
+    // settings may receive the modified setting values.
+    settings->AddCollectionFromString("{}", VTK_DOUBLE_MAX);
+    }
 
   // Load site-level settings
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
@@ -345,27 +351,18 @@ bool vtkInitializationHelper::LoadSettings()
 
   std::string filename = vtkInitializationHelper::GetApplicationName() + "-SiteSettings.json";
   std::string siteSettingsFile;
-  bool settingsFileFound = false;
   for (size_t cc = 0; cc < pathsToSearch.size(); cc++)
     {
     std::string path = pathsToSearch[cc];
-    if (vtksys::SystemTools::FileExists((path + "/" + filename).c_str(), true))
+    siteSettingsFile = path + "/" + filename;
+    if (settings->AddCollectionFromFile(siteSettingsFile, 1.0))
       {
-      siteSettingsFile = path + "/" + filename;
-      settingsFileFound = true;
       break;
       }
     }
-
-  if (settingsFileFound)
-    {
-    success = success && settings->AddCollectionFromFile(siteSettingsFile, 1.0);
-    }
-
   settings->DistributeSettings();
 
   vtkInitializationHelper::SaveUserSettingsFileDuringFinalization = true;
-  return success;
 }
 
 //----------------------------------------------------------------------------
