@@ -485,7 +485,7 @@ void vtkSMSessionProxyManager::GetProxies(const char* group,
         vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
         for (; it3 != it2->second.end(); ++it3)
           {
-          if(ids.find(it3->GetPointer()->Proxy->GetGlobalID()) != ids.end())
+          if(ids.find(it3->GetPointer()->Proxy->GetGlobalID()) == ids.end())
             {
             ids.insert(it3->GetPointer()->Proxy->GetGlobalID());
             collection->AddItem(it3->GetPointer()->Proxy);
