@@ -5590,10 +5590,9 @@
         <Documentation>This property specifies the file name for the TIFF
         reader.</Documentation>
       </StringVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="tif tiff"
-                       file_description="TIFF Image Files" />
-      </Hints>
+      <!-- this deliberately doesn't have ReaderFactory hints
+           TIFFSeriesReader can actually read whatever this reader reads. This is here
+           only for backward compatibility.  -->
       <!-- End TIFFReader -->
     </SourceProxy>
     <!-- Beginning of OpenFOAM Reader -->

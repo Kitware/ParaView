@@ -79,8 +79,9 @@ namespace
       return false;
       }
     // we can reach here only when both array names are not in the "priority"
-    // set.
-    assert(a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX);
+    // set or they are the same (which does happen, see BUG #9808).
+    assert( (a1Index == VTK_INT_MAX && a2Index == VTK_INT_MAX) ||
+            (a1Name == a2Name) );
     return (a1Name < a2Name);
     }
   };

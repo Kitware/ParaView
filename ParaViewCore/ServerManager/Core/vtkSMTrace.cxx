@@ -404,14 +404,23 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
 vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   const char* key, const char* val)
 {
-  assert(key && val);
+  assert(key);
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
     SmartPyObject keyObj(PyString_FromString(key));
-    SmartPyObject valObj(PyString_FromString(val));
+    SmartPyObject valObj;
+    if (val == NULL)
+      {
+      PyObject* none = Py_None;
+      Py_INCREF(none);
+      valObj.TakeReference(none);
+      }
+    else
+      {
+      valObj.TakeReference(PyString_FromString(val));
+      }
     assert(keyObj && valObj);
-
     int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, valObj);
     (void)ret;
     assert(ret == 0);
