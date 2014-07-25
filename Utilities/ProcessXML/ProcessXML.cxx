@@ -50,7 +50,7 @@ public:
     {
     this->Stream << endl
       << "// From file " << file << endl
-      << "static const char* " << this->Prefix.c_str() << title << this->Suffix.c_str() << this->Count 
+      << "static const char* const " << this->Prefix.c_str() << title << this->Suffix.c_str() << this->Count
       << " =" << endl;
     this->CurrentPosition = this->Stream.tellp();
     }
