@@ -360,14 +360,19 @@ void pqDisplayColorWidget::setArraySelection(
   int index = this->Variables->findData(idata);
   if (index == -1)
     {
+    // NOTE: it possible in several occasions (e.g. when domain is not
+    // up-to-date, or property value is explicitly set to something not in the
+    // domain) that the selected array is not present in the domain. In that
+    // case, based on what we know of the array selection, we update the UI and
+    // add that entry to the UI.
     bool prev = this->Variables->blockSignals(true);
     this->Variables->addItem(*icon, arrayName, idata);
     this->Variables->blockSignals(prev);
 
     index = this->Variables->findData(idata);
-    qDebug() << "(" << association << ", " << arrayName << " ) "
-      "is not an array shown in the pqDisplayColorWidget currently. "
-      "Will add a new entry for it";
+    //qDebug() << "(" << association << ", " << arrayName << " ) "
+    //  "is not an array shown in the pqDisplayColorWidget currently. "
+    //  "Will add a new entry for it";
     }
   Q_ASSERT(index != -1);
   this->Variables->setCurrentIndex(index);
@@ -433,6 +438,16 @@ void pqDisplayColorWidget::refreshColorArrayNames()
     }
   this->Variables->blockSignals(prev);
   this->Variables->setEnabled(this->Variables->count() > 0);
+
+  // since a change in domain could mean a change in components too,
+  // we should refresh those as well.
+  this->refreshComponents();
+
+  // now, refreshing the list of components is not enough. We also need to
+  // ensure that we are showing the correct selected component. Calling
+  // updateColorTransferFunction() ensures that widget is updated to reflect the
+  // current component number selection, if applicable.
+  this->updateColorTransferFunction();
 }
 
 //-----------------------------------------------------------------------------
