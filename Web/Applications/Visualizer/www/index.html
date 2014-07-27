@@ -1,141 +1,134 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel='stylesheet' href='main.css' type='text/css'>
-    </head>
-
-    <body onbeforeunload="stop()" onunload="stop()" class="page">
-        <div class="header toolbar">
-            <div class="logo" alt="Toggle pipeline browser visibility"></div>
-            <div class="viewport-toolbar"></div>
-            <div class="vcr-toolbar"></div>
-            <div class="rescale-data" style="display: none;"><img src="../../lib/css/paraview/pipeline/resetRange.png" style="position: relative; top: 5px;" title="Rescale data range to the current time step" alt="Rescale data range to the current time step"/></div>
-            <div class="connection-toolbar"></div>
-            <div class="loading"></div>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>ParaViewWeb - Visualizer</title>
+    <link rel="icon" type="image/png" href="../../lib/css/assets/favicon-32.png">
+    <link rel='stylesheet' href='main.css' type='text/css'>
+</head>
+<body class='container-fluid' onbeforeunload="stop()" onunload="stop()">
+    <div class='row pv-gray-darker head-toolbar'>
+        <div class='col-xs-12 col-sm-6 col-md-6 col-lg-3 '>
+            <img src='../../lib/css/assets/logo.svg'
+                 class='clickable toggle-inspector'
+                 height='20'
+                 style='margin: 5px 0;'
+                 tooltip='Toggle inspector panel'
+                 tooltip-placement='right'
+                 tooltip-popup-delay='1000'/>
+            <span
+                class='vtk-icon-flow-cascade clickable padding inspector-selector' data-type='pipeline'>
+            </span>
+            <span
+                class='vtk-icon-doc-text clickable padding inspector-selector' data-type='files'>
+            </span>
+            <span
+                class='vtk-icon-plus clickable padding inspector-selector' data-type='sources'>
+            </span>
+            <span
+                class='vtk-icon-filter clickable padding inspector-selector need-input-source' data-type='filters'>
+            </span>
+            <span
+                class='vtk-icon-info-1 clickable padding inspector-selector need-input-source' data-type='info'>
+            </span>
+            <span
+                class='vtk-icon-resize-full-alt-1 reset-camera clickable'>
+            </span>
+            <span
+                class='vtk-icon-clock-1 toggle-time-toolbar clickable'>
+            </span>
+            <span
+                class='vtk-icon-cog-alt clickable padding inspector-selector float-right not-busy' data-type='preferences' style="margin: 2px 0">
+            </span>
+            <span class='vtk-icon-spin4 busy animate-spin clickable float-right'>
+            </span>
         </div>
-        <div class="splitter">
-            <div class="viewport-container">
+        <div class='col-xs-12 col-sm-6 col-md-6 col-lg-9 vcr-control'>
+            <span class='vtk-icon-to-start vcr-action clickable' data-action='first'></span>
+            <span class='vtk-icon-fast-bw vcr-action clickable' data-action='prev'></span>
+            <span class='vtk-icon-play vcr-play clickable'></span>
+            <span class='vtk-icon-stop vcr-stop clickable'></span>
+            <span class='vtk-icon-fast-fw vcr-action clickable' data-action='next'></span>
+            <span class='vtk-icon-to-end vcr-action clickable' data-action='last'></span>
+            <input type='text' class='pv-time-input time-value pv-gray-darker' value='0.0'/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class='col-xs-12 col-sm-6 col-md-6 col-lg-3 scroll-overflow fix-height pv-gray-lighter-transparent lower-right-round-corner inspector-container' style='z-index: 1000;'>
+            <div class="row inspector" data-type="pipeline">
+                <div class='clickable col-xS-12 col-sm-12 col-md-12 col-lg-12 nopadding pv-pipeline'>
+                </div>
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-proxy-editor'>
+                </div>
             </div>
-            <div class="control-panel" style="display: none;">
+            <div class="row inspector" data-type="files">
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-files'>
+                </div>
+            </div>
+            <div class="row inspector" data-type="sources">
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-source-list nopadding'>
+                </div>
+            </div>
+            <div class="row inspector" data-type="filters">
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-filter-list nopadding'>
+                </div>
+            </div>
+            <div class="row inspector" data-type="info">
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-data-info'>
+                </div>
+            </div>
+            <div class="row inspector" data-type="preferences">
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-preferences'>
+                    <div class="row" style='margin-top: 15px;'>
+                        <label class='col-sm-6 control-label'>Rendering</label>
+                        <div class='col-sm-6'>
+                            <select class='pv-update-viewport' data-property-name='ActiveRendererType'>
+                                <option value='image'>Remote</option>
+                                <option value='vgl'>Local (VGL)</option>
+                                <option value='webgl'>Local (deprecated)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class='col-sm-6 control-label'>Rendering statistics</label>
+                        <div class='col-sm-6'>
+                            <input type='checkbox' class='pv-update-viewport checkbox' data-property-name='Stats'/>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class='no-overflow pv-viewport fix-height shift-top' style='width: 100%; position: absolute;'>
+        </div>
+    </div>
 
 
-        <script src="../../lib/core/vtkweb-loader.js" load="core, filebrowser, color, pv-pipeline, pv-toolbar"></script>
-        <script type="text/javascript">
-            var config = {
-                sessionManagerURL: vtkWeb.properties.sessionManagerURL,
-                application: "pipeline"
-            },
-            s = null,
-            stop = vtkWeb.NoOp,
-            start = function(connection) {
-                var pipeline = null,
-                filters = null,
-                session = connection.session;
+    <script src="../../lib/core/vtkweb-loader.js" load="core, pv-visualizer"></script>
+    <script src="main.js"></script>
+    <script type="text/javascript">
+        var config = {
+            sessionManagerURL: vtkWeb.properties.sessionManagerURL,
+            application: "visualizer"
+        },
+        stop = vtkWeb.NoOp,
+        start = function(connection) {
+            pv.initializeVisualizer(
+                connection.session,
+                '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info');
 
-                s = session;
+            // Update stop method to use the connection
+            stop = function() {
+                connection.session.call('application.exit');
+            }
+        };
 
-                // Build application
-                function init() {
-                    // - viewport
-                    $(".viewport-container").empty();
-                    viewport = vtkWeb.createViewport({session: session});
-                    viewport.bind(".viewport-container");
-
-                    // Update view callback
-                    function updateView() {
-                        viewport.invalidateScene();
-                    }
-
-                    // - pipeline browser
-                    $('.control-panel').pipelineBrowser({
-                        session: session,
-                        pipeline: pipeline,
-                        sources: filters,
-                        cacheFiles: false
-                    }).bind('dataChanged', updateView);
-
-                    // - vcr toolbar
-                    $('.vcr-toolbar').vcrToolbar(session).bind('dataChanged', updateView);
-
-                    // - viewport toolbar
-                    $('.viewport-toolbar').viewportToolbar(viewport);
-
-                    // - rescal data array
-                    $('.rescale-data').show().click(function(){
-                        if(session) {
-                            proxyId = $('.pipelineBrowser').getProxy().proxy_id;
-                            session.call('pv.pipeline.manager.scalar.range.rescale', [proxyId]).then(function(){
-                                updateView();
-                            });
-                        }
-                    });
-
-                    // - Toggle pipeline visibility
-                    $('.logo').unbind().bind('click', function(){
-                        var panel = $(".control-panel");
-                        var viewportContainer = $(".viewport-container");
-                        if(panel.is(":visible")) {
-                            panel.hide("slide",250, function(){
-                                viewportContainer.css("left", 0);
-                                if(viewport) {
-                                   viewport.render();
-                                }
-                            });
-                        } else {
-                            panel.show("slide",250, function(){
-                                viewportContainer.css("left", 320);
-                                if(viewport) {
-                                    viewport.render();
-                                }
-                            });
-                        }
-                    }).trigger('click');
-
-                    // - loading done...
-                    $(".loading").hide();
-
-                    // Add resize listener
-                    $(window).resize(function() {
-                        $(".splitter").height(window.innerHeight - 35);
-                        $(".control-panel").height(window.innerHeight - 35);
-                        viewport.render();
-                    }).trigger('resize');
-
-                    // Update stop method to use the connection
-                    stop = function() {
-                        connection.session.call('application.exit');
-                    }
-
-                    // Auto load file if any available
-                    if(connection.hasOwnProperty('file')) {
-                        console.log("call pv.pipeline.manager.file.ropen " + connection['file']);
-                        session.call('pv.pipeline.manager.file.ropen', [connection['file']]).then(function(){
-                            console.log("result of " + connection['file']);
-                            viewport.invalidateScene();
-                        }).always(function(e){
-                            console.log(e);
-                        });
-                    }
-                };
-
-                // Let's get some data
-                session.call('pv.pipeline.manager.pipeline.get').then(function(a) {
-                    pipeline = a;
-                    session.call('pv.filters.list').then(function(b) {
-                        filters = b;
-                        init();
-                    });
-                });
-            };
-
-            // Try to launch the Viz process
-            vtkWeb.smartConnect(config, start, function(code,reason){
-                $(".loading").hide();
-                console.log(reason);
-            });
-        </script>
-    </body>
+        // Try to launch the Viz process
+        vtkWeb.smartConnect(config, start, function(code,reason){
+            console.log(reason);
+        });
+    </script>
+</body>
 </html>

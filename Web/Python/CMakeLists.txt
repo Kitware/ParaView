@@ -17,3 +17,8 @@ build_python_package(
 install(DIRECTORY ${ParaViewPython_BINARY_DIR}
   DESTINATION ${VTK_INSTALL_PYTHON_MODULE_DIR}/paraview
   COMPONENT Runtime)
+
+# copy some default sources and proxies for ParaViewWeb
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/defaultProxies.json"
+  DESTINATION "${ParaViewPython_BINARY_DIR}"
+  USE_SOURCE_PERMISSIONS)

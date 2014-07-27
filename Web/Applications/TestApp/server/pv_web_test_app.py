@@ -57,6 +57,7 @@ class _TestApp(pv_wamp.PVServerProtocol):
     authKey = "vtkweb-secret"
     echoStr = ""
     colorMapsPath = None
+    proxyFile = None
 
     def initialize(self):
         # Bring used components
@@ -66,6 +67,9 @@ class _TestApp(pv_wamp.PVServerProtocol):
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebViewPortGeometryDelivery())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebTimeHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebPipelineManager(baseDir=_TestApp.dataDir))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebProxyManager(allowedProxiesFile=_TestApp.proxyFile,
+                                                                         baseDir=_TestApp.dataDir,
+                                                                         allowUnconfiguredReaders=True))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebColorManager(pathToColorMaps=_TestApp.colorMapsPath));
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileManager(_TestApp.dataDir))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebRemoteConnection())
@@ -97,6 +101,11 @@ if __name__ == "__main__":
                         default="",
                         help="A string that will be available through echo protocol",
                         dest="echoString")
+    parser.add_argument("--proxy-file",
+                        default=None,
+                        type=str,
+                        help="Path to a file containing the list of allowed filter and source proxies",
+                        dest="proxyFile")
 
     # Exctract arguments
     args = parser.parse_args()
@@ -105,6 +114,7 @@ if __name__ == "__main__":
     _TestApp.dataDir    = args.path
     _TestApp.authKey    = args.authKey
     _TestApp.echoStr    = args.echoString
+    _TestApp.proxyFile  = args.proxyFile
 
     # Start server
     server.start_webserver(options=args, protocol=_TestApp)
