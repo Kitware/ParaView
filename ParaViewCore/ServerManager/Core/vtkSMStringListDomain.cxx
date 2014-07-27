@@ -200,31 +200,6 @@ void vtkSMStringListDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStringListDomain::LoadState(vtkPVXMLElement* domainElement, 
-    vtkSMProxyLocator* loader)
-{
-  this->Superclass::LoadState(domainElement, loader);
-  
-  std::vector<vtkStdString> values; 
-  unsigned int numElems = domainElement->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < numElems; cc++)
-    {
-    vtkPVXMLElement* child = domainElement->GetNestedElement(cc);
-    if (child->GetName() && strcmp(child->GetName(), "String") == 0)
-      {
-      const char* text = child->GetAttribute("text");
-      if (text)
-        {
-        values.push_back(text);
-        }
-      }
-    }
-
-  this->SetStrings(values);
-  return 1;
-}
-
-//---------------------------------------------------------------------------
 void vtkSMStringListDomain::SetAnimationValue(vtkSMProperty *prop, int idx,
                                               double value)
 {

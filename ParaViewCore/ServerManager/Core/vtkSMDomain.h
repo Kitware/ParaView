@@ -110,8 +110,18 @@ protected:
   void SaveState(vtkPVXMLElement* parent, const char* uid);
   virtual void ChildSaveState(vtkPVXMLElement* domainElement);
 
+  // Description:
   // Load the state of the domain from the XML.
-  virtual int LoadState(vtkPVXMLElement* vtkNotUsed(domainElement), 
+  // Subclasses generally have no need to load XML state. In fact, serialization
+  // of state for domains, in general, is unnecessary for two reasons:
+  // 1. domains whose values are defined in XML will be populated from the
+  // configuration xml anyways.
+  // 2. domains whose values depend on data (at runtime) will be repopulated
+  // with data values when the XML state is loaded.
+  // The only exception to this rule is vtkSMProxyListDomain (presently).
+  // vtkSMProxyListDomain needs to try to restore proxies (with proper ids) for
+  // the domain.
+  virtual int LoadState(vtkPVXMLElement* vtkNotUsed(domainElement),
     vtkSMProxyLocator* vtkNotUsed(loader)) { return 1;  }
 
   // Description:

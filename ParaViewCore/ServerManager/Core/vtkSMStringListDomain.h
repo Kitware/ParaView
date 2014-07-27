@@ -90,10 +90,6 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   virtual void ChildSaveState(vtkPVXMLElement* domainElement);
-  
-  // Load the state of the domain from the XML.
-  virtual int LoadState(vtkPVXMLElement* domainElement, 
-    vtkSMProxyLocator* loader);
 
   // Description:
   // Call to set the strings. Will fire DomainModifiedEvent if the domain values
