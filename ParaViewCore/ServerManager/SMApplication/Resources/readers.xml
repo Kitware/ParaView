@@ -5178,7 +5178,27 @@
         <Documentation>This property lists which cell-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-
+      <StringVectorProperty information_only="1"
+                            name="SetInfo">
+        <ArraySelectionInformationHelper attribute_name="Set" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSetStatus"
+                            element_types="2 0"
+                            information_property="SetInfo"
+                            label="Sets"
+                            name="SetStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the sets to be loaded from the dataset, if
+        any.</Documentation>
+      </StringVectorProperty>
       <Hints>
         <ReaderFactory extensions="xmf xdmf"
                        file_description="Xdmf3 Reader" />
