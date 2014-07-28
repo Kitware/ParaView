@@ -12,13 +12,26 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/**
+ * @defgroup LiveInsitu Live Insitu
+ *
+ * The Live Insitu module visualizes and controls a remote simulation.
+ *
+ * It allows a user to visualize live data, control the visualization
+ *  pipeline, and pause a running simulation that was linked with the
+ *  Catalyst module.
+ */
+
+
 // .NAME vtkLiveInsituLink - link for live-coprocessing.
 // .SECTION Description
 // vtkLiveInsituLink manages the communication link between Insitu and
-// ParaView visualization server. vtkLiveInsituLink is created on both ends of
-// the live-coprocessing channel i.e. in Insitu code (by instantiating
-// vtkLiveInsituLink directly) and in ParaView application (by using a proxy
-// that instantiates the vtkLiveInsituLink).
+// Live visualization servers. vtkLiveInsituLink is created on both
+// ends of the live-insitu channel i.e. in Insitu code (by
+// instantiating vtkLiveInsituLink directly) and in the Live ParaView
+// application (by using a proxy that instantiates the
+// vtkLiveInsituLink).
+// @ingroup LiveInsitu
 
 #ifndef __vtkLiveInsituLink_h
 #define __vtkLiveInsituLink_h

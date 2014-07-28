@@ -38,9 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqLiveInsituVisualizationManager;
 class vtkSMLiveInsituLinkProxy;
 
-/// @ingroup Reactions
 /// Reaction for setting a breakpoint to Catalyst CoProcessing Engine
 /// for Live-Data Visualization.
+/// @ingroup Reactions
+/// @ingroup LiveInsitu
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystPauseSimulationReaction :
   public pqReaction
 {

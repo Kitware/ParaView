@@ -45,8 +45,8 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-#define vtkLiveInsituLinkDebugMacro(x) cerr << __LINE__ << " " x << endl;
-//#define vtkLiveInsituLinkDebugMacro(x)
+//#define vtkLiveInsituLinkDebugMacro(x) cerr << __LINE__ << " " x << endl;
+#define vtkLiveInsituLinkDebugMacro(x)
 
 namespace
 {
@@ -108,7 +108,7 @@ namespace
     {
       double time;
       vtkIdType timeStep;
-      ::TimeFromStream(remoteArg, remoteArgLength, &time, &timeStep);
+      TimeFromStream(remoteArg, remoteArgLength, &time, &timeStep);
       vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
       assert (self->GetProcessType() == vtkLiveInsituLink::LIVE);
       self->OnInsituUpdate(time, timeStep);
@@ -119,7 +119,7 @@ namespace
     {
       double time;
       vtkIdType timeStep;
-      ::TimeFromStream(remoteArg, remoteArgLength, &time, &timeStep);
+      TimeFromStream(remoteArg, remoteArgLength, &time, &timeStep);
       vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
       assert (self->GetProcessType() == vtkLiveInsituLink::LIVE);
       self->OnInsituPostProcess(time, timeStep);
@@ -141,9 +141,6 @@ namespace
   {
     if (liveSession)
       {
-      vtkMultiProcessController* parallelController =
-        vtkMultiProcessController::GetGlobalController();
-      assert(parallelController->GetLocalProcessId() == 0);
       vtkSMMessage message;
       message.set_global_id(proxyId);
       message.set_location(vtkPVSession::CLIENT);
@@ -1280,9 +1277,9 @@ int vtkLiveInsituLink::WaitForLiveChange()
 void vtkLiveInsituLink::OnLiveChanged()
 {
   assert(this->ProcessType == INSITU);
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int myId = pm->GetPartitionId();
-  vtkLiveInsituLinkDebugMacro(<< "OnLiveChanged " << myId);
+  vtkLiveInsituLinkDebugMacro(
+    << "OnLiveChanged " 
+    << vtkProcessModule::GetProcessModule()->GetPartitionId());
 }
 
 

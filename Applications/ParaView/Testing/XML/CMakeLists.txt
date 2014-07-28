@@ -113,15 +113,15 @@ endif()
 if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   set (catalyst_live_tests
     ${CMAKE_CURRENT_SOURCE_DIR}/CatalystLiveSetBreakpoint.xml)
-  set (EXTRA_PVBATCH_SCRIPT CatalystWaveletDriver.py)
-  set (EXTRA_PVBATCH_SCRIPT_PARAMETERS CatalystWaveletCoprocessing 21)
+  set (CATALYST_SIMULATION CatalystWaveletDriver.py)
+  set (INSITU_SCRIPT CatalystWaveletCoprocessing 21)
 
   foreach (tname ${catalyst_live_tests})
     add_pv_test("pv" "_DISABLE_C"
       COMMAND
       --script $<TARGET_FILE:pvbatch> -sym
-      ${CMAKE_CURRENT_SOURCE_DIR}/${EXTRA_PVBATCH_SCRIPT}
-      ${EXTRA_PVBATCH_SCRIPT_PARAMETERS}
+      ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
+      ${INSITU_SCRIPT}
 
       --client ${CLIENT_EXECUTABLE}
       --enable-bt
@@ -134,8 +134,8 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
       COMMAND
       --script-np 5
       --script $<TARGET_FILE:pvbatch> -sym
-      ${CMAKE_CURRENT_SOURCE_DIR}/${EXTRA_PVBATCH_SCRIPT}
-      ${EXTRA_PVBATCH_SCRIPT_PARAMETERS}
+      ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
+      ${INSITU_SCRIPT}
 
       --server $<TARGET_FILE:pvserver>
       --enable-bt

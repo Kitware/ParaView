@@ -41,8 +41,11 @@ class pqServer;
 class QTreeWidget;
 class pqPipelineSource;
 
-/// pqSetBreakpointDialog is the about dialog used by ParaView.
-/// It provides information about ParaView and current configuration.
+/// Sets a breakpoint for a remote simulation. It allows a user to
+/// specify a time in the future (using simulation time or time step)
+/// when a simulation linked with Catalyst should pause.
+/// 
+/// @ingroup LiveInsitu
 class PQCOMPONENTS_EXPORT pqSetBreakpointDialog :
   public QDialog
 {

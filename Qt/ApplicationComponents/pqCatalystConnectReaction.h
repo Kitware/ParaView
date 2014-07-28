@@ -37,9 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqLiveInsituVisualizationManager;
 
-/// @ingroup Reactions
 /// Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
 /// Visualization.
+/// @ingroup Reactions
+/// @ingroup LiveInsitu
 class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReaction
 {
   Q_OBJECT

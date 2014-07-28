@@ -41,12 +41,14 @@ class pqServer;
 class vtkEventQtSlotConnect;
 class vtkSMLiveInsituLinkProxy;
 
-/// pqLiveInsituVisualizationManager manages the live-coprocessing link. When
-/// pqLiveInsituVisualizationManager in instantiated, it creates a new dummy
-/// session that represents the catalyst pipeline. The proxy manager
-/// in this session reflects the state of the proxies on the coprocessing side.
-/// Next, it creates the (coprocessing, LiveInsituLink) proxy that sets up the
-/// server socket to accept connections from catalyst.
+/// Manages the live-coprocessing link. When
+/// pqLiveInsituVisualizationManager in instantiated, it creates a new
+/// dummy session that represents the catalyst pipeline. The proxy
+/// manager in this session reflects the state of the proxies on the
+/// coprocessing side.  Next, it creates the (coprocessing,
+/// LiveInsituLink) proxy that sets up the server socket to accept
+/// connections from catalyst.
+/// @ingroup LiveInsitu
 class PQCOMPONENTS_EXPORT pqLiveInsituVisualizationManager : public QObject
 {
   Q_OBJECT

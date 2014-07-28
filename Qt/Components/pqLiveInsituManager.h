@@ -46,8 +46,10 @@ class pqServer;
 class vtkSMLiveInsituLinkProxy;
 
 
-/// Singleton that provides access to Insitu objects (pqServer,
-/// pqLiveInsituVisualizationManager, vtkSMLiveInsituLinkProxy).
+/// Singleton that provides access to Insitu objects. Some of these
+/// objects are pqServer, pqLiveInsituVisualizationManager,
+/// vtkSMLiveInsituLinkProxy.
+/// @ingroup LiveInsitu
 class PQCOMPONENTS_EXPORT pqLiveInsituManager : public QObject
 {
   Q_OBJECT

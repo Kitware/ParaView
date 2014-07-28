@@ -58,6 +58,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
+
+//#define pqLiveInsituManagerDebugMacro(x) std::cerr << x << endl;
+#define pqLiveInsituManagerDebugMacro(x)
+
+
 namespace
 {
 class pqLiveInsituEventPlayer : public pqWidgetEventPlayer
@@ -458,38 +463,35 @@ void pqLiveInsituManager::removeBreakpoint()
 //-----------------------------------------------------------------------------
 void pqLiveInsituManager::waitTimestep(vtkIdType timeStep)
 {
-  pqEventDispatcher* dispatcher =
-    pqApplicationCore::instance()->testUtility()->dispatcher();
-  dispatcher->deferEventsIfBlocked(true);
+  pqEventDispatcher::deferEventsIfBlocked(true);
   pqLiveInsituVisualizationManager* visManager =
     this->managerFromInsitu(this->insituServer());
-  std::cerr << "===== start waitTimestep(" << timeStep << ")" <<
-    " ===== " << this->timeStep() << endl;
+  pqLiveInsituManagerDebugMacro("===== start waitTimestep("
+                                << timeStep << ")" << " ===== "
+                                << this->timeStep());
   while (timeStep > this->timeStep())
     {
     QEventLoop loop;
     QObject::connect(visManager, SIGNAL(nextTimestepAvailable()),
                      &loop, SLOT(quit()));
     loop.exec();
-    std::cerr << "===== waitTimestep(" << timeStep << ")" <<
-      " ===== " << this->timeStep() << endl;
+    pqLiveInsituManagerDebugMacro("===== waitTimestep(" << timeStep << ")" <<
+                                  " ===== " << this->timeStep());
     }
-  std::cerr << "===== end waitTimestep(" << timeStep << ")" <<
-    " ===== " << this->timeStep() << endl;
-  dispatcher->deferEventsIfBlocked(false);
+  pqLiveInsituManagerDebugMacro("===== end waitTimestep(" << timeStep
+                                << ")" << " ===== " << this->timeStep());
+  pqEventDispatcher::deferEventsIfBlocked(false);
 }
 
 //-----------------------------------------------------------------------------
 void pqLiveInsituManager::waitBreakpointHit()
 {
-  pqEventDispatcher* dispatcher =
-    pqApplicationCore::instance()->testUtility()->dispatcher();
-  dispatcher->deferEventsIfBlocked(true);
-  std::cerr << "=== begin waitConnected ===" << endl;
+  pqEventDispatcher::deferEventsIfBlocked(true);
+  pqLiveInsituManagerDebugMacro("=== begin waitConnected ===");
   QEventLoop loop;
   QObject::connect(this, SIGNAL(breakpointHit(pqServer*)),
                    &loop, SLOT(quit()));
   loop.exec();
-  std::cerr << "=== end waitConnected ===" << endl;
-  dispatcher->deferEventsIfBlocked(false);
+  pqLiveInsituManagerDebugMacro("=== end waitConnected ===");
+  pqEventDispatcher::deferEventsIfBlocked(false);
 }

@@ -12,9 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMLiveInsituLinkProxy
+// .NAME vtkSMLiveInsituLinkProxy - Performs additional operation on
+// the Live client
 // .SECTION Description
-//
+// Besides setting or getting parameters from its
+// object (vtkSMLiveInsituLink) it receives paraview state from its
+// object and applies it to the InsituProxyManager as well as sending
+// modified paraview state to its object.
+// @ingroup LiveInsitu
 
 #ifndef __vtkSMLiveInsituLinkProxy_h
 #define __vtkSMLiveInsituLinkProxy_h
