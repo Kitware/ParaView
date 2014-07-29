@@ -21,6 +21,7 @@
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTrace.h"
+#include "vtkSMViewLayoutProxy.h"
 
 #include <cassert>
 
@@ -167,6 +168,21 @@ void vtkPVGeneralSettings::SetScalarBarMode(int val)
 void vtkPVGeneralSettings::SetInheritRepresentationProperties(bool val)
 {
   vtkSMParaViewPipelineControllerWithRendering::SetInheritRepresentationProperties(val);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetMultiViewImageBorderColor(double r, double g, double b)
+{
+  vtkSMViewLayoutProxy::SetMultiViewImageBorderColor(r, g, b);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetMultiViewImageBorderWidth(int width)
+{
+  vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(width);
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------

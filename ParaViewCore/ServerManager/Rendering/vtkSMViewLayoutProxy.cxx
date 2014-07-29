@@ -204,6 +204,36 @@ private:
     }
 };
 
+//============================================================================
+double vtkSMViewLayoutProxy::MultiViewImageBorderColor[3] = {0.0, 0.0, 0.0};
+int vtkSMViewLayoutProxy::MultiViewImageBorderWidth = 0;
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::SetMultiViewImageBorderColor(double r, double g, double b)
+{
+  vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] = std::max(0.0, std::min(1.0, r));
+  vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] = std::max(0.0, std::min(1.0, g));
+  vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] = std::max(0.0, std::min(1.0, b));
+}
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(int width)
+{
+  vtkSMViewLayoutProxy::MultiViewImageBorderWidth = std::max(0, width);
+}
+
+//----------------------------------------------------------------------------
+const double* vtkSMViewLayoutProxy::GetMultiViewImageBorderColor()
+{
+  return vtkSMViewLayoutProxy::MultiViewImageBorderColor;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth()
+{
+  return vtkSMViewLayoutProxy::MultiViewImageBorderWidth;
+}
+
+//============================================================================
 vtkStandardNewMacro(vtkSMViewLayoutProxy);
 //----------------------------------------------------------------------------
 vtkSMViewLayoutProxy::vtkSMViewLayoutProxy() :
@@ -1012,16 +1042,22 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
   image->SetExtent(extent);
   image->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
-  unsigned char* image_data = 
+  unsigned char* image_data =
     reinterpret_cast<unsigned char*>(image->GetScalarPointer());
   std::fill(
     image_data, image_data + image->GetNumberOfPoints() * 3,
     static_cast<unsigned char>(0));
-  
+
+  unsigned char color[3];
+  color[0] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[0] *  0xff);
+  color[1] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[1] *  0xff);
+  color[2] = static_cast<unsigned char>(vtkSMViewLayoutProxy::MultiViewImageBorderColor[2] *  0xff);
   for (size_t cc=0; cc < images.size(); cc++)
     {
-    vtkSMUtilities::Merge(image, images[cc]);
+    vtkSMUtilities::Merge(image, images[cc],
+      vtkSMViewLayoutProxy::MultiViewImageBorderWidth, color);
     }
+
   return image;
 }
 
