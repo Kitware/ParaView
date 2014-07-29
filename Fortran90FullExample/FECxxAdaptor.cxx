@@ -28,7 +28,7 @@ extern "C" void createcpimagedata_(int* nxstart, int* nxend, int* nx,
     return;
     }
 
-  // The simulation grid is a 2-dimensional topologically and geometrically
+  // The simulation grid is a 3-dimensional topologically and geometrically
   // regular grid. In VTK/ParaView, this is considered an image data set.
   vtkSmartPointer<vtkImageData> grid = vtkSmartPointer<vtkImageData>::New();
 
