@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/ios/sstream>
+
 #include "string"
 #include "vector"
 #include "vtksys/Process.h"
@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 bool vtkProcessModuleAutoMPI::EnableAutoMPI = 0;
 int vtkProcessModuleAutoMPI::NumberOfCores = 0;
@@ -429,13 +430,8 @@ vtkProcessModuleAutoMPIInternals::CreateCommandLine(
       }
 
     }
-  char temp[100];
-  std::string portString;
-  sprintf(temp,"--server-port=%d",port);
-  portString+=temp;
-  portString+='\0';
+
   commandLine.push_back(paraView);
-  commandLine.push_back(portString.c_str());
 
   for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
     {
@@ -446,6 +442,18 @@ vtkProcessModuleAutoMPIInternals::CreateCommandLine(
     {
     commandLine.push_back(this->MPIServerPostFlags[i].c_str());
     }
+
+  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetConnectID() != 0)
+    {
+    std::ostringstream stream;
+    stream << "--connect-id="
+           << vtkProcessModule::GetProcessModule()->GetOptions()->GetConnectID();
+    commandLine.push_back(stream.str());
+    }
+
+  std::ostringstream stream;
+  stream << "--server-port=" << port;
+  commandLine.push_back(stream.str());
 }
 
 //--------------------------------------------------------------------internal
