@@ -1,4 +1,9 @@
 {
+  "edition": "Rendering-Base-Python",
+  "requires": [
+    "Rendering-Base",
+    "Enable-Python"
+  ],
   "modules": [
     { "name": "vtkPVClientServerCoreRendering",
       "path": "ParaViewCore/ClientServerCore/Rendering",

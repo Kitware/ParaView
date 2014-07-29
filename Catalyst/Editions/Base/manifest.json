@@ -1,4 +1,5 @@
 {
+  "edition": "Base",
   "cmake":{
     "cache":[
       { "name":"CMAKE_BUILD_TYPE",
