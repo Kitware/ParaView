@@ -59,4 +59,6 @@ vtk_module(vtkPVVTKExtensionsRendering
 
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVExtensions
 )

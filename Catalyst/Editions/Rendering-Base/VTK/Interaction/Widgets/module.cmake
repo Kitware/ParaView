@@ -21,4 +21,6 @@ vtk_module(vtkInteractionWidgets
     vtkFiltersFlowPaths
     vtkRenderingLOD
     vtkImagingStencil
+  KIT
+    vtkInteraction
   )

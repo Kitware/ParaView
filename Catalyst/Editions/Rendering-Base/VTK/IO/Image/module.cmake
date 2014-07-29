@@ -24,4 +24,6 @@ vtk_module(vtkIOImage
   #  vtkRenderingCore
   #  vtkTestingCore
   #  vtkTestingRendering
+  KIT
+    vtkIO
   )

@@ -37,4 +37,6 @@ vtk_module(vtkPVVTKExtensionsDefault
     ${_all_dependencies}
   PRIVATE_DEPENDS
     vtksys
+  KIT
+    vtkPVExtensions
 )

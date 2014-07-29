@@ -19,5 +19,7 @@ vtk_module(vtkPVServerManagerDefault
     vtkPVServerManagerApplication
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVServerManager
 )
 unset(__extra_dependencies)

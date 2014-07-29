@@ -12,4 +12,6 @@ vtk_module(vtkFiltersExtraction
     vtkRenderingOpenGL
     vtkTestingRendering
     vtkInteractionStyle
+  KIT
+    vtkFilters
   )
