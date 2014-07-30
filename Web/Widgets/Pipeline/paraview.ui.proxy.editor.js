@@ -106,6 +106,11 @@
                         values.push(convert(strValue[i]));
                     }
                 }
+            } else if(size && Number(size) > 1) {
+                var valueList = strValue.split(',');
+                for(var i=0; i < valueList.length; ++i) {
+                        values.push(convert(valueList[i]));
+                }
             } else {
                 values.push(convert(strValue));
             }
@@ -264,8 +269,6 @@
                             }
                         }
 
-                        console.log('color by info from server [' + (colorByInfo.hasOwnProperty('array') ? colorByInfo.array.join(', ') : 'SOLID') + ']');
-
                         // => Components
                         var internalCount = range.length;
                         for(var i = 0; i < internalCount; ++i) {
@@ -329,7 +332,7 @@
 
                         for(var key in ui.values) {
                             if(!optionTypeSimpleArray) {
-                                var selected = (key == value || ui.values[key] == value) ? 'SELECTED' : '';
+                                var selected = (key == value || ui.values[key].toString() == value) ? 'SELECTED' : '';
                                 optionsBuffer.push(TEMPLATE_OPTION.replace(/VALUE/g, ui.values[key])
                                                                   .replace(/SELECTED/g, selected)
                                                                   .replace(/LABEL/g, key)

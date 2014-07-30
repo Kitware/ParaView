@@ -45,6 +45,7 @@ def arrayListDomainDecorator(props, xmlProps, uiProps, domain):
     uiProps['type'] = 'str'
     uiProps['widget'] = 'list-1'
 
+    fieldMap = { "0": "POINTS", "1": "CELLS" }
     valuesMap = {}
     valuesList = []
 
@@ -52,7 +53,7 @@ def arrayListDomainDecorator(props, xmlProps, uiProps, domain):
         stringName = domain.GetString(arnum)
         try:
             assocVar = domain.GetFieldAssociation(arnum)
-            valuesMap[stringName] = [ self.fieldMap[str(assocVar)], stringName ]
+            valuesMap[stringName] = [ fieldMap[str(assocVar)], stringName ]
         except:
             valuesList.append(stringName)
 
@@ -116,7 +117,7 @@ def proxyListDomainDecorator(props, xmlProps, uiProps, domain):
 
     for i in xrange(domain.GetNumberOfProxies()):
         nextProxy = domain.GetProxy(i)
-        values[nextProxy.GetXMLName()] = nextProxy.GetGlobalIDAsString()
+        values[nextProxy.GetXMLLabel()] = nextProxy.GetGlobalIDAsString()
 
     uiProps['values'] = values
     return True
