@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.h
+   Module:    pqCPActionsGroup.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,32 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCPPluginManager_h
-#define __pqCPPluginManager_h
+#include "pqCPActionsGroup.h"
 
-#include <pqSGPluginManager.h>
+#include "pqCoreUtilities.h"
+#include "pqCPExportStateWizard.h"
 
-/// pqCPPluginManager is the central class that orchestrates the behaviour of
-/// this co-processing plugin.
-class pqCPPluginManager :  public pqSGPluginManager
+//-----------------------------------------------------------------------------
+pqCPActionsGroup::pqCPActionsGroup(QObject* parentObject)
+  : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef pqSGPluginManager Superclass;
-public:
-  pqCPPluginManager(QObject* parent=0);
-  ~pqCPPluginManager();
+  QAction* export_action = this->addAction("Export State");
+  export_action->setToolTip("Export state for co-processing");
+  export_action->setStatusTip("Export state for co-processing");
 
-  /// Get the name of the writers menu from the concrete subclass.
-  virtual const char* getWritersMenuName();
+  QObject::connect(export_action, SIGNAL(triggered()),
+                   this, SLOT(exportState()));
+}
 
-  /// Get the Qt name of the writers menu from the concrete subclass.
-  virtual const char* getObjectMenuName();
+//-----------------------------------------------------------------------------
+pqCPActionsGroup::~pqCPActionsGroup()
+{
+}
 
-private:
-  pqCPPluginManager(const pqCPPluginManager&); // Not implemented.
-  void operator=(const pqCPPluginManager&); // Not implemented.
-};
-
-#endif
-
-
+//-----------------------------------------------------------------------------
+void pqCPActionsGroup::exportState()
+{
+  pqCPExportStateWizard wizard(pqCoreUtilities::mainWidget());
+  wizard.customize();
+  wizard.exec();
+}

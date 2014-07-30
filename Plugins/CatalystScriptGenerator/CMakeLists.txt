@@ -1,4 +1,4 @@
-project(CoProcessingScriptGeneratorPlugin)
+project(CatalystScriptGeneratorPlugin)
 
 #--------------------------------------------------
 # Find and Use ParaView
@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/Resources)
 INCLUDE_DIRECTORIES(${ParaView_SOURCE_DIR}/Applications/ParaView)
 INCLUDE_DIRECTORIES(${ParaView_BINARY_DIR}/Applications/ParaView)
 
-# Plugins for ParaView that add support to export state for CoProcessing etc.
+# Plugins for ParaView that add support to export state for Catalyst etc.
 #------------------------------------------------------------------------------
 SET (CP_SOURCES
   pqCPActionsGroup.cxx
@@ -66,8 +66,8 @@ ADD_PARAVIEW_AUTO_START(
 
 
 ADD_PARAVIEW_PLUGIN(
-  CoProcessingPlugin
-  #"${CoProcessing_VERSION_MAJOR}.${CoProcessing_VERSION_MINOR}.${CoProcessing_VERSION_PATCH}"
+  CatalystScriptGeneratorPlugin
+  #"${Catalyst_VERSION_MAJOR}.${Catalyst_VERSION_MINOR}.${Catalyst_VERSION_PATCH}"
   "0.1.0"
   SERVER_MANAGER_XML Resources/servermanagercp.xml
   GUI_INTERFACES
@@ -83,23 +83,23 @@ ADD_PARAVIEW_PLUGIN(
 
 IF (BUILD_TESTING)
   include(ParaViewTestingMacros)
-  # this test is redundant with the CoProcessingFullWorkflow test
+  # this test is redundant with the CatalystFullWorkflow test
   # in the coprocessing library but that may not be built so we
   # add it here as well. this test though is a subset of that test.
   IF ( BUILD_SHARED_LIBS )
     add_client_tests("pv"
-      LOAD_PLUGIN "CoProcessingPlugin"
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
-    SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+      LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystGUI.xml )
+    SET_TESTS_PROPERTIES(pv.CatalystGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
   ELSE ( BUILD_SHARED_LIBS )
     add_client_tests("pv"
-      LOAD_PLUGIN "CoProcessingPlugin"
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI-static.xml )
-    SET_TESTS_PROPERTIES(pv.CoProcessingGUI-static PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+      LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CatalystGUI-static.xml )
+    SET_TESTS_PROPERTIES(pv.CatalystGUI-static PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
   ENDIF ( BUILD_SHARED_LIBS )
 ENDIF (BUILD_TESTING)
 
 if(PARAVIEW_USE_MPI)
   include(vtkMPI)
-  vtk_mpi_link(CoProcessingPlugin)
+  vtk_mpi_link(CatalystScriptGeneratorPlugin)
 endif()
