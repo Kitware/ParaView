@@ -1427,9 +1427,9 @@
                             repeatable="1">
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
-      <IntVectorProperty command="GetTimeStepRange"
+      <IntVectorProperty command="GetModeShapesRange"
                          information_only="1"
-                         name="TimeStepRangeInfo"></IntVectorProperty>
+                         name="ModeShapesRangeInfo"></IntVectorProperty>
       <IntVectorProperty command="SetModeShape"
                          default_values="1"
                          name="ModeShape"
@@ -1437,7 +1437,7 @@
         <IntRangeDomain name="range">
           <RequiredProperties>
             <Property function="Range"
-                      name="TimeStepRangeInfo" />
+                      name="ModeShapesRangeInfo" />
           </RequiredProperties>
         </IntRangeDomain>
         <Documentation>Specify which mode shape to animate when HasModeShapes
@@ -5296,11 +5296,11 @@
           <Property name="SideSetInfo" />
           <Property name="SideSetResultArrayInfo" />
           <Property name="SILUpdateStamp" />
-          <Property name="TimeStepRangeInfo" />
           <PropertyGroup label="Mode Shapes">
             <Property name="HasModeShapes" panel_visibility="advanced" />
             <Property name="ModeShape" panel_visibility="advanced" />
             <Property name="AnimateVibrations" panel_visibility="advanced" />
+            <Property name="ModeShapesRangeInfo" />
           </PropertyGroup>
           <PropertyGroup label="File Pattern">
             <Property name="FilePrefix" panel_visibility="advanced" />
@@ -5437,11 +5437,11 @@
           <Property name="SideSetInfo" />
           <Property name="SideSetResultArrayInfo" />
           <Property name="SILUpdateStamp" />
-          <Property name="TimeStepRangeInfo" />
           <PropertyGroup label="Mode Shapes">
             <Property name="HasModeShapes" panel_visibility="advanced" />
             <Property name="ModeShape" panel_visibility="advanced" />
             <Property name="AnimateVibrations" panel_visibility="advanced" />
+            <Property name="ModeShapesRangeInfo" />
           </PropertyGroup>
           <PropertyGroup label="File Pattern">
             <Property name="FilePrefix" panel_visibility="advanced"/>
