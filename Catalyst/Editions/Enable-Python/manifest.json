@@ -19,9 +19,14 @@
         { "path":"Testing" }
       ]
     },
+    { "path":"ParaViewCore/ClientServerCore/Core",
+      "patches": [
+        { "path": "ClientServerCore-remove-extraction.patch" }
+      ]
+    },
     { "path":"VTK/Wrapping/Python",
       "patches": [
-          { "path": "remove-references-to-ColorMaps.xml.patch" }
+        { "path": "remove-references-to-ColorMaps.xml.patch" }
       ]
     },
     { "name":"vtkFiltersProgrammable",

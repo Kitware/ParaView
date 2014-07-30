@@ -38,6 +38,7 @@
         { "class":"vtkPVExtractSelection" }
       ],
       "patches":[
+        { "path": "ClientServerCore-restore-extraction.patch" },
         { "path": "ClientServerCore-Core-CMake.patch" }
       ],
       "cswrap":true,
