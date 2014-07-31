@@ -230,12 +230,16 @@ vtkPoints* vtkSMUtilities::CreateOrbit(const double center[3],
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUtilities::Merge(vtkImageData* dest, vtkImageData* src)
+void vtkSMUtilities::Merge(vtkImageData* dest, vtkImageData* src,
+  int borderWidth, const unsigned char* borderColorRGB)
 {
   if (!src || !dest)
     {
     return;
     }
+
+  assert(dest->GetScalarType() == VTK_UNSIGNED_CHAR);
+  assert(src->GetScalarType() == VTK_UNSIGNED_CHAR);
 
   vtkImageIterator<unsigned char> inIt(src, src->GetExtent());
   int outextent[6];
@@ -268,6 +272,67 @@ void vtkSMUtilities::Merge(vtkImageData* dest, vtkImageData* src)
       }
     inIt.NextSpan();
     outIt.NextSpan();
+    }
+
+  if (borderWidth < 1 || borderColorRGB == NULL)
+    {
+    return;
+    }
+
+  // overlay the border.
+  int oddBorderWidth = static_cast<int>(std::floor(borderWidth/2.0));
+  int evenBorderWidth = static_cast<int>(std::ceil(borderWidth/2.0));
+  bool draw_border[4] = {
+    (outextent[0] != dest->GetExtent()[0]) && (evenBorderWidth > 0) ,
+    (outextent[1] != dest->GetExtent()[1]) && (oddBorderWidth > 0) ,
+    (outextent[2] != dest->GetExtent()[2]) && (evenBorderWidth > 0) ,
+    (outextent[3] != dest->GetExtent()[3]) && (oddBorderWidth > 0)
+  };
+
+  for (int cc=0; cc < 4; cc++)
+    {
+    if (draw_border[cc] == false)
+      {
+      // this is an outer edge. No need to put a border.
+      continue;
+      }
+
+    int border_extent[6];
+    memcpy(border_extent, outextent, 4*sizeof(int));
+    border_extent[4] = border_extent[5] = 0;
+
+    if ((cc % 2) == 0)
+      {
+      // even == start
+      border_extent[cc+1] = border_extent[cc] + evenBorderWidth;
+      }
+    else
+      {
+      // odd == end
+      border_extent[cc-1] = border_extent[cc] - oddBorderWidth;
+      }
+    vtkSMUtilities::FillImage(dest, border_extent, borderColorRGB);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUtilities::FillImage(vtkImageData* image, const int extent[6],
+  const unsigned char rgb[3])
+{
+  assert(image->GetScalarType() == VTK_UNSIGNED_CHAR);
+
+  vtkImageIterator<unsigned char> iter(image, const_cast<int*>(extent));
+  int num_comps = image->GetNumberOfScalarComponents();
+  int comps_to_fill = std::min(3, num_comps);
+  while (!iter.IsAtEnd())
+    {
+    unsigned char* start = iter.BeginSpan();
+    unsigned char* end = iter.EndSpan();
+    for (; start < end; start += num_comps)
+      {
+      memcpy(start, rgb, sizeof(unsigned char) * comps_to_fill);
+      }
+    iter.NextSpan();
     }
 }
 

@@ -122,6 +122,11 @@ public:
   vtkSetMacro(PropertiesPanelMode, int);
   vtkGetMacro(PropertiesPanelMode, int);
 
+  // Description:
+  // Forwarded to vtkSMViewLayoutProxy.
+  void SetMultiViewImageBorderColor(double r, double g, double b);
+  void SetMultiViewImageBorderWidth(int width);
+
 //BTX
 protected:
   vtkPVGeneralSettings();

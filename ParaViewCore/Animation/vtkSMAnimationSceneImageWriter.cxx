@@ -30,6 +30,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkTIFFWriter.h"
 #include "vtkToolkits.h"
@@ -186,7 +187,14 @@ vtkImageData* vtkSMAnimationSceneImageWriter::CaptureViewImage(
 //-----------------------------------------------------------------------------
 void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src)
 {
-  vtkSMUtilities::Merge(dest, src);
+  const double* colord = vtkSMViewLayoutProxy::GetMultiViewImageBorderColor();
+
+  unsigned char color[3];
+  color[0] = static_cast<unsigned char>(colord[0] *  0xff);
+  color[1] = static_cast<unsigned char>(colord[1] *  0xff);
+  color[2] = static_cast<unsigned char>(colord[2] *  0xff);
+  vtkSMUtilities::Merge(dest, src,
+    vtkSMViewLayoutProxy::GetMultiViewImageBorderWidth(), color);
 }
 
 //-----------------------------------------------------------------------------

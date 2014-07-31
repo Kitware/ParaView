@@ -216,6 +216,31 @@
         </Hints>
       </IntVectorProperty>
 
+      <DoubleVectorProperty name="MultiViewImageBorderColor"
+        command="SetMultiViewImageBorderColor"
+        number_of_elements="3"
+        default_values="0 0 0"
+        panel_visibility="advanced"
+        panel_widget="color_selector_with_palette">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+        <Documentation>
+          Select the color to use for the separator between views when saving screenshots
+          and animation images with multiple views.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="MultiViewImageBorderWidth"
+        command="SetMultiViewImageBorderWidth"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          Specify the width of border (in pixels) to use around views when saving screenshots
+          and animation images with multiple views.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="InheritRepresentationProperties"
         command="SetInheritRepresentationProperties"
         number_of_elements="1"
@@ -229,6 +254,7 @@
            should be transformed using the same transformation as well.
         </Documentation>
       </IntVectorProperty>
+
 
       <PropertyGroup label="General Options">
         <Property name="ShowSplashScreen" />
@@ -265,6 +291,11 @@
       <PropertyGroup label="Animation">
         <Property name="CacheGeometryForAnimation" />
         <Property name="AnimationGeometryCacheLimit" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Screenshot Options">
+        <Property name="MultiViewImageBorderColor" />
+        <Property name="MultiViewImageBorderWidth" />
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">
