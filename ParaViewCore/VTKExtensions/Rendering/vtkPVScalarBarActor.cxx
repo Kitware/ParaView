@@ -1073,7 +1073,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
     }
 
   // Loop range accounts for "fake" min max ticks
-  for (size_t i = 1; i < ticks.size()-1; i++)
+  for (size_t i = 1; ticks.size() > 0 && i < ticks.size()-1; i++)
     {
     int labelIdx = tickToLabelId[i-1];
     if (labelIdx == -1)
@@ -1093,13 +1093,13 @@ void vtkPVScalarBarActor::ConfigureTicks()
     if (isLogTable)
       {
       normVal = ((log10(val) - log10(range[0])) /
-        (log10(range[1]) - log10(range[0])));
+                 (log10(range[1]) - log10(range[0])));
       }
     else
       {
       normVal = (val - range[0])/(range[1] - range[0]);
       }
-
+    
     if (this->Orientation == VTK_ORIENT_VERTICAL)
       {
       double x = precede ?
