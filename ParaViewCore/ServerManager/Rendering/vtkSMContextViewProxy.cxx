@@ -257,6 +257,16 @@ void vtkSMContextViewProxy::OnInteractionEvent()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMContextViewProxy::PostRender(bool interactive)
+{
+  // BUG# 14899. Ensure that the axis ranges are up-to-date after each render
+  // ensuring that the property has the property values (similar in spirit to
+  // the camera properties on the Render View).
+  this->CopyAxisRangesFromChart();
+  this->Superclass::PostRender(interactive);
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
 {
   vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());

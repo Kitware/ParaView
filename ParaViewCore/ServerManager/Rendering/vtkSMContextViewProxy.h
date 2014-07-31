@@ -68,6 +68,7 @@ protected:
   vtkSMContextViewProxy();
   ~vtkSMContextViewProxy();
 
+
   // Description:
   // Subclasses should override this method to do the actual image capture.
   virtual vtkImageData* CaptureWindowInternal(int magnification);
@@ -79,6 +80,11 @@ protected:
   // Used to update the axis range properties on each interaction event.
   // This also fires the vtkCommand::InteractionEvent.
   void OnInteractionEvent();
+
+  // Description:
+  // Overridden to update ChartAxes ranges on every render. This ensures that
+  // the property's values are up-to-date.
+  virtual void PostRender(bool interactive);
 
   // Description:
   // The context view that is used for all context derived charts.
