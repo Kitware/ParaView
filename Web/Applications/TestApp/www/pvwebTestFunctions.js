@@ -634,9 +634,9 @@ function ParaViewWebTestFunctions(connection) {
             clipDependencies = { "Box": ["Bounds", "Position", "Rotation", "Scale"],
                                  "Sphere": ["Center", "Radius"],
                                  "Plane": ["Normal", "Offset", "Origin"] },
-            contourDependencies = { "NonMergingPointLocator": [ "Divisions", "NumberOfPointsPerBucket" ],
-                                    "IncrementalOctreeMergePoints": ["Tolerance", "MaxPointsPerLeaf"],
-                                    "MergePoints": [ "Divisions", "NumberOfPointsPerBucket" ] };
+            contourDependencies = { "Don't Merge Points": [ "Divisions", "NumberOfPointsPerBucket" ],
+                                    "Octree Binning": ["Tolerance", "MaxPointsPerLeaf"],
+                                    "Uniform Binning": [ "Divisions", "NumberOfPointsPerBucket" ] };
 
             function checkExtendedProperties(proxyObj, expectedDependencies, proxyName) {
                 var targetProxy = null,
