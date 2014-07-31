@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=@PARAVIEW_VERSION_FULL@
+Type=Application
+Name=ParaView
+Comment=Parallel visualization application
+TryExec=paraview
+Icon=paraview
