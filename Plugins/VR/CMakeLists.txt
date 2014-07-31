@@ -74,13 +74,6 @@ if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
     pqVRStarter.h
     ${VRPN_MOC_SRC}
     ${VRUI_MOC_SRC}
-    vtkVRControlSliceOrientationStyle.h
-    vtkVRControlSlicePositionStyle.h
-    vtkVRGrabWorldStyle.h
-    vtkVRInteractorStyle.h
-    vtkVRInteractorStyleFactory.h
-    vtkVRQueue.h
-    vtkVRTrackStyle.h
     )
 
   QT5_WRAP_UI(UI_SRCS
@@ -98,13 +91,6 @@ else()
     pqVRStarter.h
     ${VRPN_MOC_SRC}
     ${VRUI_MOC_SRC}
-    vtkVRControlSliceOrientationStyle.h
-    vtkVRControlSlicePositionStyle.h
-    vtkVRGrabWorldStyle.h
-    vtkVRInteractorStyle.h
-    vtkVRInteractorStyleFactory.h
-    vtkVRQueue.h
-    vtkVRTrackStyle.h
     )
 
   QT4_WRAP_UI(UI_SRCS
