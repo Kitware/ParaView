@@ -36,4 +36,6 @@ vtk_module(vtkPVClientServerCoreCore
     ${__compile_dependencies}
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVClientServer
 )

@@ -16,4 +16,6 @@ vtk_module(vtkClientServer
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVCore
 )

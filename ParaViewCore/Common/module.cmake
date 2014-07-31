@@ -11,4 +11,6 @@ vtk_module(vtkPVCommon
     vtkTestingCore
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVCore
 )

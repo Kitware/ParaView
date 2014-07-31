@@ -13,4 +13,6 @@ vtk_module(vtkPVServerManagerRendering
     vtkPVServerManagerApplication
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVServerManager
 )

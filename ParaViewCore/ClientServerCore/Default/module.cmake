@@ -11,4 +11,6 @@ vtk_module(vtkPVClientServerCoreDefault
     vtkTestingCore
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVClientServer
 )
