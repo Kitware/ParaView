@@ -1,4 +1,8 @@
 {
+  "edition": "Enable-Python",
+  "requires": [
+    "Base"
+  ],
   "cmake":{
     "cache":[
       { "name":"PARAVIEW_ENABLE_PYTHON",

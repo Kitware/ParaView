@@ -1,4 +1,8 @@
 {
+  "edition": "Rendering-Base",
+  "requires": [
+    "Extras"
+  ],
   "cmake": {
     "cache": [
       { "name": "Module_vtkPVVTKExtensionsRendering",

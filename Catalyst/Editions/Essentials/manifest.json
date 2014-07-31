@@ -1,4 +1,8 @@
 {
+  "edition": "Essentials",
+  "requires": [
+    "Base"
+  ],
   "cmake":{
     "cache":[
       { "name":"Module_vtkPVVTKExtensionsDefault",
