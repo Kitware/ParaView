@@ -33,6 +33,10 @@
       { "name":"PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED",
         "type":"BOOL",
         "value":"OFF"
+      },
+      { "name":"VTK_ENABLE_KITS",
+        "type":"BOOL",
+        "value":"ON"
       }
     ]
   },

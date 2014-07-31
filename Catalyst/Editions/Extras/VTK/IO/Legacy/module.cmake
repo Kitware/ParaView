@@ -13,4 +13,6 @@ vtk_module(vtkIOLegacy
     vtkInteractionStyle
     vtkRenderingOpenGL
     vtkTestingRendering
+  KIT
+    vtkIO
   )

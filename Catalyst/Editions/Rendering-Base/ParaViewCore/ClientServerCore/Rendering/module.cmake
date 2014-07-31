@@ -24,4 +24,6 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkzlib
   TEST_LABELS
     PARAVIEW
+  KIT
+    vtkPVClientServer
 )

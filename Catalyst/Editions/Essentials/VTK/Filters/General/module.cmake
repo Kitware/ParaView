@@ -12,4 +12,6 @@ vtk_module(vtkFiltersGeneral
     vtkRenderingFreeTypeOpenGL
     vtkRenderingAnnotation
     vtkTestingRendering
+  KIT
+    vtkFilters
   )
