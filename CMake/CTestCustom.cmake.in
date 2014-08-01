@@ -85,6 +85,10 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # exclude Nektar plugin warnings
   "Nektar.*overloaded-virtual"
   "Nektar/include.*unused"
+  "Nektar/Veclib"
+
+  # exclude warnings from external genericio library.
+  "genericio"
 )
 
 #------------------------------------------------------------------------------
