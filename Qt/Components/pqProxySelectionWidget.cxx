@@ -65,6 +65,7 @@ public:
     this->DomainObserver = NULL;
     this->Widget = NULL;
     this->Selected = false;
+    this->SelectedProxyWidgetVisibility = true;
     }
   QComboBox* Combo;
   vtkSMProxy* ReferenceProxy;
@@ -73,6 +74,7 @@ public:
   pqProxyPanel* Widget;
   QPointer<pqView> View;
   bool Selected;
+  bool SelectedProxyWidgetVisibility;
 
   typedef QMap<vtkSMProxy*, pqProxyPanel*> PanelMap;
   PanelMap Panels;
@@ -302,7 +304,8 @@ void pqProxySelectionWidget::initialize3DWidget()
     {
     this->Internal->Widget->deselect();
     }
-  this->Internal->Widget->show();
+
+  this->Internal->Widget->setVisible(this->Internal->SelectedProxyWidgetVisibility);
 }
 
 //-----------------------------------------------------------------------------
@@ -353,4 +356,12 @@ void pqProxySelectionWidget::setView(pqView* rm)
     }
 }
 
-
+//-----------------------------------------------------------------------------
+void pqProxySelectionWidget::setSelectedProxyWidgetVisibility(bool visible)
+{
+  this->Internal->SelectedProxyWidgetVisibility = visible;
+  if (this->Internal->Widget)
+    {
+    this->Internal->Widget->setVisible(visible);
+    }
+}

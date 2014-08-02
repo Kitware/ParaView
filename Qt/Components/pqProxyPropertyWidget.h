@@ -59,9 +59,15 @@ public:
   /// override these methods to select/deselect the 3D widgets.
   virtual void select();
   virtual void deselect();
+
+  /// Overridden to hide the properties for proxies in a vtkSMProxyListDomain if
+  /// requested.
+  virtual void updateWidget(bool showing_advanced_properties);
+
 private:
   QPointer<pqSelectionInputWidget> SelectionInputWidget;
   QPointer<pqProxySelectionWidget> ProxySelectionWidget;
+  bool HideWidgetsInDefaultView;
 };
 
 #endif // _pqProxyPropertyWidget_h
