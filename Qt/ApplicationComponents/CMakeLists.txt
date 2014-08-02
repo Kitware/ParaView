@@ -129,6 +129,8 @@ set (Module_SRCS
   pqFixPathsInStateFilesBehavior.h
   pqFontPropertyWidget.cxx
   pqFontPropertyWidget.h
+  pqGenericPropertyWidgetDecorator.cxx
+  pqGenericPropertyWidgetDecorator.h
   pqHelpReaction.cxx
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
@@ -302,6 +304,7 @@ set (Module_MOC_HDRS
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
   pqFontPropertyWidget.h
+  pqGenericPropertyWidgetDecorator.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.h

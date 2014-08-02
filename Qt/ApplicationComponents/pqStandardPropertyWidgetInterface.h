@@ -94,6 +94,7 @@ public:
   /// \li \c EnableWidgetDecorator : pqEnableWidgetDecorator
   /// \li \c ShowWidgetDecorator : pqShowWidgetDecorator
   /// \li \c InputDataTypeDecorator : pqInputDataTypeDecorator
+  /// \li \c GenericDecorator: pqGenericPropertyWidgetDecorator
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
 };

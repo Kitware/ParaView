@@ -61,7 +61,7 @@ pqObjectPanel* pqStandardLegacyCustomPanels::createPanel(pqProxy* proxy, QWidget
       return new pqPassArraysPanel(proxy, p);
       }
     if (QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
-      QString("Glyph") == proxy->getProxy()->GetXMLName())
+      QString("LegacyGlyph") == proxy->getProxy()->GetXMLName())
       {
       return new pqGlyphPanel(proxy, p);
       }
@@ -80,7 +80,7 @@ bool pqStandardLegacyCustomPanels::canCreatePanel(pqProxy* proxy) const
     {
     if(
       QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
-      QString("Glyph") == proxy->getProxy()->GetXMLName() ||
+      QString("LegacyGlyph") == proxy->getProxy()->GetXMLName() ||
       //         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
       //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
       QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
