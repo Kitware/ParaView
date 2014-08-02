@@ -158,7 +158,8 @@ struct Process_4_1_to_4_2
   {
     bool ret =
       ConvertRepresentationColorArrayName(document) &&
-      ConvertChartNodes(document);
+      ConvertChartNodes(document) &&
+      ConvertGlyphFilter(document);
     return ret;
   }
 
@@ -501,6 +502,39 @@ struct Process_4_1_to_4_2
     a.set_value(numberOfElements);
     return newNode;
   }
+
+  static bool ConvertGlyphFilter(xml_document& document)
+    {
+    bool warn = false;
+    //-------------------------------------------------------------------------
+    // Convert "Glyph" and "ArbitrarySourceGlyph" to "LegacyGlyph" and
+    // "ArbitrarySourceGlyph". We don't explicitly convert those filters to the
+    // new ones, we just create the old proxies for now.
+    //-------------------------------------------------------------------------
+    pugi::xpath_node_set glyph_elements =
+      document.select_nodes(
+        "//ServerManagerState/Proxy[@group='filters' and @type='Glyph']");
+    for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
+      iter != glyph_elements.end(); ++iter)
+      {
+      // It's possible that we are using a development version's state file in
+      // which case we don't want to change it.
+      if (iter->node().select_single_node("//Property[@name='GlyphMode']"))
+        {
+        continue;
+        }
+      iter->node().attribute("type").set_value("LegacyGlyph");
+      warn = true;
+      }
+    if (warn)
+      {
+      vtkGenericWarningMacro("The state file uses the old 'Glyph' filter implementation."
+        "The implementation has changed considerably in ParaView 4.2. "
+        "Consider replacing the Glyph filter with a new Glyph filter. The old implementation "
+        "is still available as 'Legacy Glyph' and will be used for loading this state file.");
+      }
+    return true;
+    }
 };
 const char* const Process_4_1_to_4_2::NAME = "name";
 const char* const Process_4_1_to_4_2::VALUE = "value";
