@@ -100,7 +100,7 @@ public:
     QObject::connect(ui.SaveButton, SIGNAL(clicked()),
       widget, SLOT(onSaveAsDefaults()));
 
-    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), self, SLOT(onAccepted()));
+    QObject::connect(ui.ApplyButton, SIGNAL(clicked()), self, SIGNAL(accepted()));
     QObject::connect(ui.ApplyButton, SIGNAL(clicked()), widget, SLOT(apply()));
 
     QObject::connect(ui.CancelButton, SIGNAL(clicked()), widget, SLOT(reset()));
