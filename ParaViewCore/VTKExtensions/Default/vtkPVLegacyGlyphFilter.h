@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVGlyphFilter.h
+  Module:    vtkPVLegacyGlyphFilter.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVGlyphFilter - Glyph filter
+// .NAME vtkPVLegacyGlyphFilter - Glyph filter
 //
 // .SECTION Description
 // This is a subclass of vtkGlyph3D that allows selection of input scalars
 
-#ifndef __vtkPVGlyphFilter_h
-#define __vtkPVGlyphFilter_h
+#ifndef __vtkPVLegacyGlyphFilter_h
+#define __vtkPVLegacyGlyphFilter_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGlyph3D.h"
 
 class vtkMaskPoints;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVLegacyGlyphFilter : public vtkGlyph3D
 {
 public:
-  vtkTypeMacro(vtkPVGlyphFilter,vtkGlyph3D);
+  vtkTypeMacro(vtkPVLegacyGlyphFilter,vtkGlyph3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description
-  static vtkPVGlyphFilter *New();
+  static vtkPVLegacyGlyphFilter *New();
 
   // Description:
   // Limit the number of points to glyph
@@ -63,8 +63,8 @@ public:
   vtkGetMacro(KeepRandomPoints,int);
 
 protected:
-  vtkPVGlyphFilter();
-  ~vtkPVGlyphFilter();
+  vtkPVLegacyGlyphFilter();
+  ~vtkPVLegacyGlyphFilter();
 
   virtual int RequestData(vtkInformation *,
                           vtkInformationVector **,
@@ -109,8 +109,8 @@ protected:
   vtkIdType MaximumNumberOfPointsOld;
 
 private:
-  vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
-  void operator=(const vtkPVGlyphFilter&);  // Not implemented.
+  vtkPVLegacyGlyphFilter(const vtkPVLegacyGlyphFilter&);  // Not implemented.
+  void operator=(const vtkPVLegacyGlyphFilter&);  // Not implemented.
 
 public:
 //BTX

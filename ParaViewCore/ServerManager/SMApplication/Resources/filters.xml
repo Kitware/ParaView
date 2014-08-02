@@ -6398,7 +6398,7 @@ found and the point will be rejected.</Documentation>
       <!-- End Contour -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVGlyphFilter"
+    <SourceProxy class="vtkPVLegacyGlyphFilter"
                  name="Glyph">
       <Documentation long_help="This filter generates an arrow, cone, cube, cylinder, line, sphere, or 2D glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
                      short_help="Generate a glyph symbol at each point of the input data set.">
@@ -6634,7 +6634,7 @@ found and the point will be rejected.</Documentation>
       <!-- End Glyph -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVGlyphFilter"
+    <SourceProxy class="vtkPVLegacyGlyphFilter"
                  label="Glyph With Custom Source"
                  name="ArbitrarySourceGlyph">
       <Documentation long_help="This filter generates a glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."

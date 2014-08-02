@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVGlyphFilter.cxx
+  Module:    vtkPVLegacyGlyphFilter.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVGlyphFilter.h"
+#include "vtkPVLegacyGlyphFilter.h"
 
 #include "vtkAppendPolyData.h"
 #include "vtkCompositeDataPipeline.h"
@@ -35,10 +35,10 @@
 #include <time.h>
 #include <algorithm>
 
-vtkStandardNewMacro(vtkPVGlyphFilter);
+vtkStandardNewMacro(vtkPVLegacyGlyphFilter);
 
 //-----------------------------------------------------------------------------
-vtkPVGlyphFilter::vtkPVGlyphFilter() :
+vtkPVLegacyGlyphFilter::vtkPVLegacyGlyphFilter() :
    RandomPtsInDataset()
 {
   this->SetColorModeToColorByScalar();
@@ -61,7 +61,7 @@ vtkPVGlyphFilter::vtkPVGlyphFilter() :
 }
 
 //-----------------------------------------------------------------------------
-vtkPVGlyphFilter::~vtkPVGlyphFilter()
+vtkPVLegacyGlyphFilter::~vtkPVLegacyGlyphFilter()
 {
   if(this->MaskPoints)
     {
@@ -70,7 +70,7 @@ vtkPVGlyphFilter::~vtkPVGlyphFilter()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::SetRandomMode(int mode)
+void vtkPVLegacyGlyphFilter::SetRandomMode(int mode)
 {
   if (mode==this->MaskPoints->GetRandomMode())
     {
@@ -85,13 +85,13 @@ void vtkPVGlyphFilter::SetRandomMode(int mode)
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVGlyphFilter::GetRandomMode()
+int vtkPVLegacyGlyphFilter::GetRandomMode()
 {
   return this->MaskPoints->GetRandomMode();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::SetUseMaskPoints(int useMaskPoints)
+void vtkPVLegacyGlyphFilter::SetUseMaskPoints(int useMaskPoints)
 {
   if (useMaskPoints==this->UseMaskPoints)
     {
@@ -104,7 +104,7 @@ void vtkPVGlyphFilter::SetUseMaskPoints(int useMaskPoints)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGlyphFilter::SetKeepRandomPoints(int keepRandomPoints)
+void vtkPVLegacyGlyphFilter::SetKeepRandomPoints(int keepRandomPoints)
 {
   if( keepRandomPoints == this->KeepRandomPoints )
   {
@@ -116,7 +116,7 @@ void vtkPVGlyphFilter::SetKeepRandomPoints(int keepRandomPoints)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGlyphFilter::FillInputPortInformation(int port,
+int vtkPVLegacyGlyphFilter::FillInputPortInformation(int port,
                                                vtkInformation* info)
 {
   if(!this->Superclass::FillInputPortInformation(port, info))
@@ -129,13 +129,13 @@ int vtkPVGlyphFilter::FillInputPortInformation(int port,
 }
 
 //----------------------------------------------------------------------------
-vtkExecutive* vtkPVGlyphFilter::CreateDefaultExecutive()
+vtkExecutive* vtkPVLegacyGlyphFilter::CreateDefaultExecutive()
 {
   return vtkCompositeDataPipeline::New();
 }
 
 //-----------------------------------------------------------------------------
-vtkIdType vtkPVGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
+vtkIdType vtkPVLegacyGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
 {
   // Although this is not perfectly process invariant, it is better
   // than we had before (divide by number of processes).
@@ -152,22 +152,22 @@ vtkIdType vtkPVGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
       // Sum points on all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
         {
-        controller->Receive(&tmp, 1, i, vtkPVGlyphFilter::GlyphNPointsGather);
+        controller->Receive(&tmp, 1, i, vtkPVLegacyGlyphFilter::GlyphNPointsGather);
         totalNumPts += tmp;
         }
       // Send results back to all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
         {
         controller->Send(&totalNumPts, 1, 
-                         i, vtkPVGlyphFilter::GlyphNPointsScatter);
+                         i, vtkPVLegacyGlyphFilter::GlyphNPointsScatter);
         }
       }
     else
       {
       controller->Send(&localNumPts, 1, 
-                       0, vtkPVGlyphFilter::GlyphNPointsGather);
+                       0, vtkPVLegacyGlyphFilter::GlyphNPointsGather);
       controller->Receive(&totalNumPts, 1, 
-                          0, vtkPVGlyphFilter::GlyphNPointsScatter);
+                          0, vtkPVLegacyGlyphFilter::GlyphNPointsScatter);
       }
     }
 
@@ -175,7 +175,7 @@ vtkIdType vtkPVGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVGlyphFilter::RequestData(
+int vtkPVLegacyGlyphFilter::RequestData(
     vtkInformation *request,
     vtkInformationVector **inputVector,
     vtkInformationVector *outputVector)
@@ -258,7 +258,7 @@ int vtkPVGlyphFilter::RequestData(
 //----------------------------------------------------------------------------
 // We are overloading this so that blanking will be supported
 // otehrwise we could use vtkMaskPoints filter.
-int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
+int vtkPVLegacyGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 {
   if (this->BlockGlyphAllPoints==1)
     {
@@ -315,7 +315,7 @@ int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
+int vtkPVLegacyGlyphFilter::RequestCompositeData(vtkInformation* request,
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector)
 {
@@ -461,7 +461,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
+void vtkPVLegacyGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
 {
   // When mask points is checked, we glyph the first N points. When mask points
   // and random mode is checked, we glyph N random points from the total number
@@ -513,14 +513,14 @@ void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::ReportReferences(vtkGarbageCollector* collector)
+void vtkPVLegacyGlyphFilter::ReportReferences(vtkGarbageCollector* collector)
 {
   this->Superclass::ReportReferences(collector);
   vtkGarbageCollectorReport(collector, this->MaskPoints, "MaskPoints");
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVLegacyGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   

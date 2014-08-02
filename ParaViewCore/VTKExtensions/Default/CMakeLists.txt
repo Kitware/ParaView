@@ -105,7 +105,7 @@ set(Module_SRCS
   vtkPVExtractBagPlots.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
-  vtkPVGlyphFilter.cxx
+  vtkPVLegacyGlyphFilter.cxx
   vtkPVImageReader.cxx
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMetaClipDataSet.cxx

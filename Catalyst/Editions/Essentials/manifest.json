@@ -23,7 +23,7 @@
         { "class":"vtkPVClipDataSet" },
         { "class":"vtkPVContourFilter" },
         { "class":"vtkPVDataSetAlgorithmSelectorFilter" },
-        { "class":"vtkPVGlyphFilter" },
+        { "class":"vtkPVLegacyGlyphFilter" },
         { "class":"vtkPVMetaClipDataSet" },
         { "class":"vtkPVMetaSliceDataSet" },
         { "class":"vtkPVPlane" }

@@ -109,7 +109,7 @@
 #include "vtkPVFrustumActor.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryFilter.h"
-#include "vtkPVGlyphFilter.h"
+#include "vtkPVLegacyGlyphFilter.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVJoystickFly.h"
 #include "vtkPVJoystickFlyIn.h"
@@ -294,7 +294,7 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVFrustumActor);
   PRINT_SELF(vtkPVGenericRenderWindowInteractor);
   PRINT_SELF(vtkPVGeometryFilter);
-  PRINT_SELF(vtkPVGlyphFilter);
+  PRINT_SELF(vtkPVLegacyGlyphFilter);
   PRINT_SELF(vtkPVInteractorStyle);
   PRINT_SELF(vtkPVJoystickFly);
   PRINT_SELF(vtkPVJoystickFlyIn);

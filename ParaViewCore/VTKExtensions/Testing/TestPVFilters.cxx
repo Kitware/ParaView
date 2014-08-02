@@ -17,7 +17,7 @@
 #include "vtkTesting.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkGlyphSource2D.h"
-#include "vtkPVGlyphFilter.h"
+#include "vtkPVLegacyGlyphFilter.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkContourFilter.h"
@@ -57,7 +57,7 @@ int TestPVFilters(int argc, char* argv[])
   gs->FilledOff();
   gs->CrossOff();
 
-  vtkPVGlyphFilter *glyph = vtkPVGlyphFilter::New();
+  vtkPVLegacyGlyphFilter *glyph = vtkPVLegacyGlyphFilter::New();
   glyph->SetInputConnection( clean->GetOutputPort() );
   glyph->SetSourceConnection( gs->GetOutputPort());
   glyph->SetScaleFactor( 0.75 );
