@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEnableWidgetDecorator.h"
 #include "pqFontPropertyWidget.h"
 #include "pqGenericPropertyWidgetDecorator.h"
+#include "pqGlyphScaleFactorPropertyWidget.h"
 #include "pqImageCompressorWidget.h"
 #include "pqInputDataTypeDecorator.h"
 #include "pqLightsEditor.h"
@@ -144,6 +145,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   else if (name == "viewtype_selector")
     {
     return new pqViewTypePropertyWidget(smProxy, smProperty);
+    }
+  else if (name == "glyph_scale_factor")
+    {
+    return new pqGlyphScaleFactorPropertyWidget(smProxy, smProperty);
     }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;

@@ -6536,7 +6536,8 @@ found and the point will be rejected.</Documentation>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
                             name="ScaleFactor"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_widget="glyph_scale_factor">
         <BoundsDomain mode="scaled_extent" name="bounds" scale_factor="0.1">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -6558,7 +6559,7 @@ found and the point will be rejected.</Documentation>
         </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetGlyphMode"
-                         default_values="1"
+                         default_values="3"
                          name="GlyphMode"
                          number_of_elements="1"
                          panel_visibility="default">
