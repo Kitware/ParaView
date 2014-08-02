@@ -421,7 +421,6 @@
         // Args: representation, colorMode, arrayLocation='POINTS', arrayName='', vectorMode='Magnitude', vectorComponent = 0, rescale=False
         var args = [].concat(event.colorBy.representation, event.colorBy.mode, event.colorBy.array, event.colorBy.component);
         startWorking();
-        console.log('color by [' + args.join(', ') + ']');
         session.call('pv.color.manager.color.by', args).then(invalidatePipeline, error);
         // Update palette ?
         if(event.colorBy.palette) {

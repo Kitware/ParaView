@@ -496,7 +496,6 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
     def __init__(self, allowedProxiesFile=None, baseDir=None, allowUnconfiguredReaders=False):
         super(ParaViewWebProxyManager, self).__init__()
         self.debugMode = False
-        self.fieldMap = { "0": "POINTS", "1": "CELLS" }
         self.domainFunctionMap = { "vtkSMBooleanDomain": booleanDomainDecorator,
                                    "vtkSMProxyListDomain": proxyListDomainDecorator,
                                    "vtkSMIntRangeDomain": numberRangeDomainDecorator,
@@ -513,11 +512,12 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                          'HiddenProps', 'UseTexturedBackground',
                                          'BackgroundTexture', 'KeyLightWarmth',
                                          'KeyLightIntensity', 'KeyLightElevation',
-                                         'KeyLightAzimuth' ]
+                                         'KeyLightAzimuth', 'FileName' ]
         self.propertyTypeMap = { 'vtkSMIntVectorProperty': 'int',
                                  'vtkSMDoubleVectorProperty': 'float',
                                  'vtkSMStringVectorProperty': 'str',
-                                 'vtkSMProxyProperty': 'proxy' }
+                                 'vtkSMProxyProperty': 'proxy',
+                                 'vtkSMInputProperty': 'proxy' }
         self.allowedProxies = {}
         self.hintsMap = { 'PropertyWidgetDecorator': { 'ClipScalarsDecorator': clipScalarDecorator },
                           'Widget': { 'multi_line': multiLineDecorator } }
@@ -701,9 +701,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                         if replaceInputAttr:
                             self.propertyDetailsMap['specialHints'] = { 'replaceInput': int(replaceInputAttr) }
                             self.debug("          Replace input value: " + str(replaceInputAttr))
-            elif name == 'InputProperty':
-                continue
-            elif name == 'ProxyProperty':
+            elif name == 'ProxyProperty' or name == 'InputProperty':
                 self.debug(str(nameAttr) + ' is a proxy property')
                 if detailsKey not in self.propertyDetailsMap:
                     self.propertyDetailsMap[detailsKey] = {'type': name, 'panelVis': panelVis, 'size': size}
@@ -767,17 +765,17 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 if dependency is not None:
                     propJson['dependency'] = dependency
 
-                if type(prop) == ProxyProperty:
+                if type(prop) == ProxyProperty or type(prop) == InputProperty:
                     proxyListDomain = prop.FindDomain('vtkSMProxyListDomain')
                     if proxyListDomain:
                         # Set the value of this ProxyProperty
-                        propJson['value'] = prop.GetProxy(0).GetXMLName()
+                        propJson['value'] = prop.GetProxy(0).GetXMLLabel()
 
                         # Now recursively fill in properties of this proxy property
                         for i in range(proxyListDomain.GetNumberOfProxies()):
                             subProxy = proxyListDomain.GetProxy(i)
                             subProxyId = subProxy.GetGlobalIDAsString()
-                            depStr = proxy_id + ':' + propertyName + ':' + subProxy.GetXMLName() + ':1'
+                            depStr = proxy_id + ':' + propertyName + ':' + subProxy.GetXMLLabel() + ':1'
                             self.fillPropertyList(subProxyId, propertyList, depStr)
                     else:
                         # The value of this ProxyProperty is the list of proxy ids
@@ -991,17 +989,11 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 'colorMap': 'Blue to Red'
             }
         """
+        colorInfo = { 'representation': proxy.GetGlobalIDAsString() }
+        if proxy.GetProperty('DiffuseColor'):
+            colorInfo['color'] = proxy.GetProperty('DiffuseColor').GetData()
 
-        colorInfo = { 'representation': proxy.GetGlobalIDAsString(),
-                      'color': proxy.GetProperty('DiffuseColor').GetData() }
-
-        arrayName = proxy.GetProperty('ColorArrayName').GetArrayName()
-        self.debug('  The arrayName is: ' + str(arrayName))
-
-        if arrayName == '':
-            colorInfo['mode'] = 'color'
-            colorInfo['scalarBar'] = 0
-        else:
+        if proxy.GetProperty('ColorArrayName'):
             colorInfo['mode'] = 'array'
             view = self.getView(-1)
             sbVisible = vtkSMPVRepresentationProxy.IsScalarBarVisible(proxy.SMProxy,
@@ -1010,12 +1002,16 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             lut = proxy.GetProperty('LookupTable').GetData()
             component = -1
 
-            if lut.GetProperty('VectorMode').GetData() == 'Component':
+            if lut and lut.GetProperty('VectorMode').GetData() == 'Component':
                 component = lut.GetProperty('VectorComponent').GetData()
 
-            colorInfo['array'] = [proxy.GetProperty('ColorArrayName').GetAssociation(),
-                                  arrayName,
+            colorArrayProp = proxy.GetProperty('ColorArrayName')
+            colorInfo['array'] = [colorArrayProp.GetAssociation(),
+                                  colorArrayProp.GetArrayName(),
                                   component]
+        else:
+            colorInfo['mode'] = 'color'
+            colorInfo['scalarBar'] = 0
 
         return colorInfo
 
@@ -1145,6 +1141,10 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Create new source/filter
         allowed = self.allowedProxies[name]
         newProxy = paraview.simple.__dict__[allowed]()
+
+        # To make WebGL export work
+        simple.Show()
+        simple.Render()
 
         try:
             self.applyDomains(parentProxy, newProxy.GetGlobalIDAsString())
