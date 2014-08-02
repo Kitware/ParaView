@@ -256,7 +256,10 @@ if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceIntegrateVariables.xml)
 
-  if (PARAVIEW_ENABLE_MATPLOTLIB)
+  # Check that matplotlib is available
+  include(FindPythonModules)
+  find_python_module(matplotlib matplotlib_found)
+  if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
     list(APPEND TESTS_WITH_BASELINES ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonView.xml)
   endif()
 endif()

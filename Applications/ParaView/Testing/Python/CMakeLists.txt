@@ -1,5 +1,9 @@
 include(ParaViewTestingMacros)
 
+# Check that matplotlib is available
+include(FindPythonModules)
+find_python_module(matplotlib matplotlib_found)
+
 # Set variables to make the testing functions.
 set(vtk-module pvpython)
 set(${vtk-module}_TEST_LABELS PARAVIEW)
@@ -22,7 +26,8 @@ if (FOUND_NUMPY)
     )
   set(PARAVIEW_PYTHON_ARGS)
 
-  if (PARAVIEW_ENABLE_MATPLOTLIB)
+  if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
+    # add Matplotlib tests only if matplotlib was found at configure time.
     paraview_add_test_python(
       NO_DATA NO_RT
       TestPythonViewMatplotlibScript.py
