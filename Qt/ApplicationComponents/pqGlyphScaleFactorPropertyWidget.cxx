@@ -130,7 +130,7 @@ void pqGlyphScaleFactorPropertyWidget::resetClicked()
     }
 
   double divisor = 1.0;
-  switch (vtkSMUncheckedPropertyHelper(smproxy, "ScaleMode").GetAsInt())
+  switch (vtkSMUncheckedPropertyHelper(smproxy, "ScaleMode", /*quiet*/true).GetAsInt())
     {
   case VTK_SCALE_BY_SCALAR:
     if (vtkSMArrayRangeDomain* domain = vtkSMArrayRangeDomain::SafeDownCast(

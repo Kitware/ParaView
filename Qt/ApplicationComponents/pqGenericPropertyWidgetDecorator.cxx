@@ -90,8 +90,9 @@ pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
   const char* propertyName = config->GetAttribute("property");
   if (propertyName == NULL || proxy->GetProperty(propertyName) == NULL)
     {
-    qCritical() << "Invalid property='" << (propertyName? propertyName : "(null)")
-      << " specified in the configuration.";
+    // this can happen with compound proxies. In which case, silently ignore.
+    // qCritical() << "Invalid property='" << (propertyName? propertyName : "(null)")
+    //  << "' specified in the configuration.";
     return;
     }
 

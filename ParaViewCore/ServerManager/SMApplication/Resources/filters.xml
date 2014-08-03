@@ -6681,6 +6681,9 @@ found and the point will be rejected.</Documentation>
         short_help="Generate a glyph symbol at each point of the input data set.">
         This the implementation of the Glyph filter available in ParaView version 4.1 and earlier.
       </Documentation>
+      <Deprecated deprecated_in="4.2" to_remove_in="4.3">
+        It has been replaced by 'Glyph'. Please consider using that instead.
+      </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -7164,7 +7167,7 @@ found and the point will be rejected.</Documentation>
 
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVLegacyGlyphFilter"
-                 name="ArbitrarySourceGlyph">
+                 name="LegacyArbitrarySourceGlyph">
       <Documentation long_help="This filter generates a glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
                      short_help="Generate a glyph symbol at each point of the input data set.">
       The Glyph filter generates a glyph at each point in the input dataset.
@@ -7172,6 +7175,9 @@ found and the point will be rejected.</Documentation>
       and vectors. The Glyph filter operates on any type of data set. Its
       output is polygonal. This filter is available on the
       Toolbar.</Documentation>
+      <Deprecated deprecated_in="4.2" to_remove_in="4.3">
+        It has been replaced by 'GlyphWithCustomSource'. Please consider using that instead.
+      </Deprecated>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -11393,27 +11399,8 @@ found and the point will be rejected.</Documentation>
             <DataType value="vtkDataSet" />
           </Domain>
         </Property>
-        <Property id="2429.MaximumNumberOfPoints"
-                  name="MaximumNumberOfPoints"
-                  number_of_elements="1">
-          <Element index="0"
-                   value="5000" />
-          <Domain id="2429.MaximumNumberOfPoints.range"
-                  name="range">
-            <Min index="0"
-                 value="0" />
-          </Domain>
-        </Property>
-        <Property id="2429.RandomMode"
-                  name="RandomMode"
-                  number_of_elements="1">
-          <Element index="0"
-                   value="1" />
-          <Domain id="2429.RandomMode.bool"
-                  name="bool" />
-        </Property>
-        <Property id="2429.SelectInputScalars"
-                  name="SelectInputScalars"
+        <Property id="2429.Scalars"
+                  name="Scalars"
                   number_of_elements="5">
           <Element index="0"
                    value="" />
@@ -11425,11 +11412,9 @@ found and the point will be rejected.</Documentation>
                    value="" />
           <Element index="4"
                    value="" />
-          <Domain id="2429.SelectInputScalars.array_list"
-                  name="array_list" />
         </Property>
-        <Property id="2429.SelectInputVectors"
-                  name="SelectInputVectors"
+        <Property id="2429.Vectors"
+                  name="Vectors"
                   number_of_elements="5">
           <Element index="0"
                    value="1" />
@@ -11441,10 +11426,6 @@ found and the point will be rejected.</Documentation>
                    value="" />
           <Element index="4"
                    value="Normals" />
-          <Domain id="2429.SelectInputVectors.array_list"
-                  name="array_list">
-            <String text="Normals" />
-          </Domain>
         </Property>
         <Property id="2429.SetOrient"
                   name="SetOrient"
@@ -11459,51 +11440,12 @@ found and the point will be rejected.</Documentation>
                   number_of_elements="1">
           <Element index="0"
                    value="1.0" />
-          <Domain id="2429.SetScaleFactor.bounds"
-                  name="bounds">
-            <Min index="0"
-                 value="0" />
-            <Max index="0"
-                 value="1.0" />
-          </Domain>
-          <Domain id="2429.SetScaleFactor.scalar_range"
-                  name="scalar_range" />
-          <Domain id="2429.SetScaleFactor.vector_range"
-                  name="vector_range">
-            <Min index="0"
-                 value="0" />
-            <Min index="1"
-                 value="0" />
-            <Min index="2"
-                 value="1" />
-            <Min index="3"
-                 value="1" />
-            <Max index="0"
-                 value="0" />
-            <Max index="1"
-                 value="0" />
-            <Max index="2"
-                 value="1" />
-            <Max index="3"
-                 value="1" />
-          </Domain>
         </Property>
-        <Property id="2429.SetScaleMode"
-                  name="SetScaleMode"
+        <Property id="2429.ScaleMode"
+                  name="ScaleMode"
                   number_of_elements="1">
           <Element index="0"
                    value="3" />
-          <Domain id="2429.SetScaleMode.enum"
-                  name="enum">
-            <Entry text="scalar"
-                   value="0" />
-            <Entry text="vector"
-                   value="1" />
-            <Entry text="vector_components"
-                   value="2" />
-            <Entry text="off"
-                   value="3" />
-          </Domain>
         </Property>
         <Property id="2429.Source"
                   name="Source"
@@ -11523,14 +11465,6 @@ found and the point will be rejected.</Documentation>
                   name="proxy_list">
             <Proxy value="2432" />
           </Domain>
-        </Property>
-        <Property id="2429.UseMaskPoints"
-                  name="UseMaskPoints"
-                  number_of_elements="1">
-          <Element index="0"
-                   value="1" />
-          <Domain id="2429.UseMaskPoints.bool"
-                  name="bool" />
         </Property>
       </Proxy>
       <Proxy compound_name="ArrowSource"
@@ -11605,18 +11539,15 @@ found and the point will be rejected.</Documentation>
         </Property>
       </Proxy>
       <ExposedProperties>
-        <Property exposed_name="Glyph Max. Points"
-                  name="MaximumNumberOfPoints"
-                  proxy_name="Glyph1" />
-        <Property exposed_name="Glyph Random Mode"
-                  name="RandomMode"
-                  proxy_name="Glyph1" />
-        <Property exposed_name="Glyph Scale Factor"
-                  name="SetScaleFactor"
-                  proxy_name="Glyph1" />
         <Property exposed_name="Consistency"
                   name="Consistency"
                   proxy_name="GenerateSurfaceNormals1" />
+        <Property exposed_name="Glyph Max. Points"
+                  name="MaximumNumberOfSamplePoints"
+                  proxy_name="Glyph1" />
+        <Property exposed_name="Glyph Scale Factor"
+                  name="ScaleFactor"
+                  proxy_name="Glyph1" />
         <Property exposed_name="Input"
                   name="Input"
                   proxy_name="ExtractSurface2" />
@@ -11627,6 +11558,19 @@ found and the point will be rejected.</Documentation>
       <OutputPort name="Output"
                   port_index="0"
                   proxy="Glyph1" />
+
+      <!-- FIXME: PropertyGroup doesn't work for compound proxies, it seems.
+      <PropertyGroup label="Normals Generator Parameters">
+        <Property name="Consistency" />
+      </PropertyGroup>
+      <PropertyGroup label="Glyph Parameters">
+        <Property name="Glyph Max. Points" />
+        <Property name="Glyph Scale Factor" />
+      </PropertyGroup>
+      <PropertyGroup label="Arrow Source Parameters">
+        <Property name="InvertArrow" />
+      </PropertyGroup>
+      -->
       <Hints>
         <!-- Visibility Element can be used to suggest the GUI about
              visibility of this filter (or its input) on creation.
