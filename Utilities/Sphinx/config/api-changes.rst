@@ -118,3 +118,19 @@ maximum element of the range.  Properties affected are:
 The new function names are obtained by using Minimum and Maximum
 suffixes after the old function name. So ``LeftAxisRange`` becomes
 ``LeftAxisRangeMinimum`` and ``LeftAxisRangeMaximum``.
+
+
+Glyph filters
+~~~~~~~~~~~~~
+
+The glyph filters (``Glyph`` and ``GlyphWithCustomSource``) have been refactored
+in this release. This new filters offer new APIs for sampling and masking
+points. The older implementation is still available. If you want to use the
+older version of the filters instead, replace the constructor functions by
+``LegacyGlyph`` and ``LegacyArbitrarySourceGlyph`` respectively.
+
+These older implementations, however, will be removed entirely in future
+releases. Hence, you should consider updating the script to use the newer
+version of this filter. If there is any functionality missing from the older
+implementation that you find useful, please use the mailing list to report to
+the developers.

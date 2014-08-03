@@ -508,7 +508,7 @@ struct Process_4_1_to_4_2
     bool warn = false;
     //-------------------------------------------------------------------------
     // Convert "Glyph" and "ArbitrarySourceGlyph" to "LegacyGlyph" and
-    // "ArbitrarySourceGlyph". We don't explicitly convert those filters to the
+    // "LegacyArbitrarySourceGlyph". We don't explicitly convert those filters to the
     // new ones, we just create the old proxies for now.
     //-------------------------------------------------------------------------
     pugi::xpath_node_set glyph_elements =
@@ -524,6 +524,14 @@ struct Process_4_1_to_4_2
         continue;
         }
       iter->node().attribute("type").set_value("LegacyGlyph");
+      warn = true;
+      }
+    glyph_elements = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='ArbitrarySourceGlyph']");
+    for (pugi::xpath_node_set::const_iterator iter = glyph_elements.begin();
+      iter != glyph_elements.end(); ++iter)
+      {
+      iter->node().attribute("type").set_value("LegacyArbitrarySourceGlyph");
       warn = true;
       }
     if (warn)
