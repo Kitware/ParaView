@@ -199,7 +199,17 @@ public:
 
       // since PointIds is a sorted list, and we know that IsPointVisible will
       // be called for in monotonically increasing fashion for a specific ds, we
-      // use this->NextPointId to simply the "contains" check.
+      // use this->NextPointId to simplify the "contains" check.
+
+      while ( (this->NextPointId < this->PointIds.size()) &&
+              (this->PointIds[this->NextPointId] < ptId) )
+        {
+        // this is need since it is possible (due to ghost cells or other
+        // masking employed by vtkGlyph3D) that certain ptIds are never tested
+        // since they are rejected earlier on.
+        this->NextPointId++;
+        }
+
       if (this->NextPointId < this->PointIds.size() &&
         ptId == this->PointIds[this->NextPointId])
         {
