@@ -56,9 +56,9 @@ public:
 
   pqInternals()
     : Inverse(false),
-    Mode(ENABLED_STATE),
     Enabled(true),
-    Visible(true)
+    Visible(true),
+    Mode(ENABLED_STATE)
   {
   }
 
