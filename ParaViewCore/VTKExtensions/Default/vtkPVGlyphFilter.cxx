@@ -162,12 +162,22 @@ public:
         this->Bounds.GetMinPoint()[2], this->Bounds.GetMaxPoint()[2]);
       }
 
-    double volume = this->Bounds.GetLength(0) * this->Bounds.GetLength(1) * this->Bounds.GetLength(2);
-    assert(volume > 0.0);
-    assert(self->GetMaximumNumberOfSamplePoints() > 0);
-    double volumePerGlyph = volume / self->GetMaximumNumberOfSamplePoints();
-    double delta = std::pow(volumePerGlyph, 1.0/3.0);
-    this->NearestPointRadius = std::pow(2 * delta, 1.0/2.0) / 2.0;
+    // we use diagonal, instead of actual length for each side to avoid the
+    // issue with one of the lengths being 0.
+    double side = std::sqrt(this->Bounds.GetDiagonalLength());
+    double volume = side * side * side;
+    if (volume > 0.0)
+      {
+      assert(volume > 0.0);
+      assert(self->GetMaximumNumberOfSamplePoints() > 0);
+      double volumePerGlyph = volume / self->GetMaximumNumberOfSamplePoints();
+      double delta = std::pow(volumePerGlyph, 1.0/3.0);
+      this->NearestPointRadius = std::pow(2 * delta, 1.0/2.0) / 2.0;
+      }
+    else
+      {
+      this->NearestPointRadius = 0.0001;
+      }
     }
 
   //---------------------------------------------------------------------------
