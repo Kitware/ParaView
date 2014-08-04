@@ -111,7 +111,6 @@
   <Proxy group="filters" name="Append" />
   <Proxy group="filters" name="AppendAttributes" />
   <Proxy group="filters" name="AppendPolyData" />
-  <Proxy group="filters" name="ArbitrarySourceGlyph" />
   <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
   <Proxy group="filters" name="BlockIdScalars" />
   <Proxy group="filters" name="RandomAttributeGenerator" />
@@ -148,6 +147,7 @@
   <Proxy group="filters" name="GaussianSplatter"/>
   <Proxy group="filters" name="GenerateIdScalars"/>
   <Proxy group="filters" name="Glyph" />
+  <Proxy group="filters" name="GlyphWithCustomSource" />
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" />
@@ -155,6 +155,7 @@
   <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
+  <Proxy group="filters" name="LegacyGlyph" />
   <!--  <Proxy group="filters" name="LevelIdScalars" /> -->
   <Proxy group="filters" name="LinearExtrusionFilter" />
   <Proxy group="filters" name="LoopSubdivisionFilter" />

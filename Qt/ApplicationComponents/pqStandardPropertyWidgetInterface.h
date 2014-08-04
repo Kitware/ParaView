@@ -65,6 +65,7 @@ public:
   /// \li \c texture_selector : pqTextureSelectorPropertyWidget
   /// \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
   /// \li \c viewtype_selector: pqViewTypePropertyWidget
+  /// \li \c glyph_scale_factor: pqGlyphScaleFactorPropertyWidget
   virtual pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy *proxy, vtkSMProperty *property);
 
@@ -94,6 +95,7 @@ public:
   /// \li \c EnableWidgetDecorator : pqEnableWidgetDecorator
   /// \li \c ShowWidgetDecorator : pqShowWidgetDecorator
   /// \li \c InputDataTypeDecorator : pqInputDataTypeDecorator
+  /// \li \c GenericDecorator: pqGenericPropertyWidgetDecorator
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
 };

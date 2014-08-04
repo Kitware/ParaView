@@ -58,7 +58,11 @@ public:
 
   /// get the selected proxy
   pqSMProxy proxy() const;
-  
+
+  /// Set whether the pqProxyPanel (or pqProxyPanel for legacy panels) for the
+  /// selected Proxy should be shown or not.
+  void setSelectedProxyWidgetVisibility(bool visible);
+
 signals:
   /// signal the proxy changed (QVariant wrapped pqSMProxy)
   void proxyChanged(pqSMProxy);

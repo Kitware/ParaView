@@ -116,7 +116,7 @@ int vtkSLACPlaneGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
 
   // TODO: Run the output of the threshold filter through the glyph filter.  It
   // would look something like this.
-  // VTK_CREATE(vtkPVGlyphFilter, glyph);
+  // VTK_CREATE(vtkPVLegacyGlyphFilter, glyph);
   // glyph->SetInputConnection(threshold->GetOutputPort());
   // Set up how you want the glyphs to look.
   // glyph->Update();

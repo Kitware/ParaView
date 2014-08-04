@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqEnableWidgetDecorator.h"
 #include "pqFontPropertyWidget.h"
+#include "pqGenericPropertyWidgetDecorator.h"
+#include "pqGlyphScaleFactorPropertyWidget.h"
 #include "pqImageCompressorWidget.h"
 #include "pqInputDataTypeDecorator.h"
 #include "pqLightsEditor.h"
@@ -55,8 +57,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyGroupButton.h"
 #include "pqSeriesEditorPropertyWidget.h"
 #include "pqShowWidgetDecorator.h"
-#include "pqTextureSelectorPropertyWidget.h"
 #include "pqTextLocationWidget.h"
+#include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 #include "pqViewTypePropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
@@ -144,6 +146,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
     {
     return new pqViewTypePropertyWidget(smProxy, smProperty);
     }
+  else if (name == "glyph_scale_factor")
+    {
+    return new pqGlyphScaleFactorPropertyWidget(smProxy, smProperty);
+    }
   // *** NOTE: When adding new types, please update the header documentation ***
   return NULL;
 }
@@ -227,6 +233,10 @@ pqStandardPropertyWidgetInterface::createWidgetDecorator(
   if (type == "ShowWidgetDecorator")
     {
     return new pqShowWidgetDecorator(config, widget);
+    }
+  if (type == "GenericDecorator")
+    {
+    return new pqGenericPropertyWidgetDecorator(config, widget);
     }
 
   // *** NOTE: When adding new types, please update the header documentation ***

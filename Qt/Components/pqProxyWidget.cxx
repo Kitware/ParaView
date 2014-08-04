@@ -335,7 +335,9 @@ namespace
       }
 
     void show(QGridLayout* layout, int &row_index,
-              const pqProxyWidgetItem* prevItem, bool enabled=true) const
+              const pqProxyWidgetItem* prevItem,
+              bool enabled=true,
+              bool show_advanced=false) const
       {
       if (this->GroupFooter)
         {
@@ -375,13 +377,16 @@ namespace
         {
         layout->addWidget(this->PropertyWidget, row_index, 0, 1, -1);
         }
-      this->PropertyWidget->show();
+      this->PropertyWidget->updateWidget(show_advanced);
       this->PropertyWidget->setEnabled(enabled);
+      this->PropertyWidget->show();
       row_index++;
       }
 
     void show(QVBoxLayout* layout, int &row_index,
-              const pqProxyWidgetItem* prevItem, bool enabled=true) const
+              const pqProxyWidgetItem* prevItem,
+              bool enabled=true,
+              bool show_advanced=false) const
       {
       if (this->GroupFooter)
         {
@@ -423,8 +428,9 @@ namespace
         {
         layout->addWidget(this->PropertyWidget);
         }
-      this->PropertyWidget->show();
+      this->PropertyWidget->updateWidget(show_advanced);
       this->PropertyWidget->setEnabled(enabled);
+      this->PropertyWidget->show();
       row_index++;
       }
 
@@ -1157,11 +1163,11 @@ bool pqProxyWidget::filterWidgets(bool show_advanced, const QString& filterText)
       bool enabled = item->enableWidget();
       if (this->UseDocumentationForLabels)
         {
-        item->show(vboxLayout, row_index, prevItem, enabled);
+        item->show(vboxLayout, row_index, prevItem, enabled, show_advanced);
         }
       else
         {
-        item->show(gridLayout, row_index, prevItem, enabled);
+        item->show(gridLayout, row_index, prevItem, enabled, show_advanced);
         }
       prevItem = item;
       }

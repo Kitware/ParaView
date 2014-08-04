@@ -68,6 +68,14 @@ public:
   virtual void select() {}
   virtual void deselect() {}
 
+  // This method is called on pqPropertyWidget instances that pqProxyWidget
+  // deems that should be shown in current configuration. Subclasses can
+  // override this method to change the appearance of the widget based on
+  // whether advanced properties are currently being shown by the pqProxyWidget
+  // or not.
+  virtual void updateWidget(bool showing_advanced_properties)
+    {Q_UNUSED(showing_advanced_properties);}
+
   pqView* view() const;
   vtkSMProxy* proxy() const;
   vtkSMProperty* property() const;

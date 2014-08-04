@@ -12,10 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVGlyphFilter - Glyph filter
+// .NAME vtkPVGlyphFilter - extended API for vtkGlyph3D for better control
+// over glyph placement.
 //
 // .SECTION Description
-// This is a subclass of vtkGlyph3D that allows selection of input scalars
+// vtkPVGlyphFilter extends vtkGlyph3D for adding control over which points are
+// glyphed using \c GlyphMode. Three modes are now provided:
+// \li ALL_POINTS: all points in the input dataset are glyphed. This same as using
+// vtkGlyph3D directly.
+//
+// \li EVERY_NTH_POINT: every n-th point in the input dataset when iterated
+// through the input points sequentially is glyphed. For composite datasets,
+// the counter resets every on block. In parallel, independent counter is used
+// on each rank. Use \c Stride to control now may points to skip.
+//
+// \li SPATIALLY_UNIFORM_DISTRIBUTION: points close to a randomly sampled spatial
+// distribution of points are glyphed. \c Seed controls the seed point for the random
+// number generator (vtkMinimalStandardRandomSequence). \c MaximumNumberOfSamplePoints
+// can be used to limit the number of sample points used for random sampling. This
+// doesn't not equal the number of points actually glyphed, since that depends on
+// several factors. In parallel, this filter ensures that spatial bounds are collected
+// across all ranks for generating identical sample points.
 
 #ifndef __vtkPVGlyphFilter_h
 #define __vtkPVGlyphFilter_h
@@ -23,103 +40,82 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGlyph3D.h"
 
-class vtkMaskPoints;
+class vtkMultiProcessController;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
 {
 public:
+  enum GlyphModeType
+    {
+    ALL_POINTS,
+    EVERY_NTH_POINT,
+    SPATIALLY_UNIFORM_DISTRIBUTION
+    };
+
   vtkTypeMacro(vtkPVGlyphFilter,vtkGlyph3D);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description
   static vtkPVGlyphFilter *New();
 
   // Description:
-  // Limit the number of points to glyph
-  vtkSetMacro(MaximumNumberOfPoints, int);
-  vtkGetMacro(MaximumNumberOfPoints, int);
+  // Get/Set the vtkMultiProcessController to use for parallel processing.
+  // By default, the vtkMultiProcessController::GetGlobalController() will be used.
+  void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
   // Description:
-  // Get the number of processes used to run this filter.
-  vtkGetMacro(NumberOfProcesses, int);
+  // Set/Get the mode at which glyphs will be generated.
+  vtkSetClampMacro(GlyphMode, int, ALL_POINTS, SPATIALLY_UNIFORM_DISTRIBUTION);
+  vtkGetMacro(GlyphMode, int);
 
   // Description:
-  // Set/get whether to mask points
-  void SetUseMaskPoints(int useMaskPoints);
-  vtkGetMacro(UseMaskPoints, int);
+  // Set/Get the stride at which to glyph the dataset.
+  // Note, only applicable with EVERY_NTH_POINT GlyphMode.
+  vtkSetClampMacro(Stride, int, 1, VTK_INT_MAX);
+  vtkGetMacro(Stride, int);
 
   // Description:
-  // Set/get flag to cause randomization of which points to mask.
-  void SetRandomMode(int mode);
-  int GetRandomMode();
+  // Set/Get Seed used for generating a spatially uniform distribution.
+  vtkSetMacro(Seed, int);
+  vtkGetMacro(Seed, int);
 
   // Description:
-  // In processing composite datasets, will check if a point
-  // is visible as long as the dataset being process if a
-  // vtkUniformGrid.
-  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
+  // Set/Get maximum number of sample points to use to sample the space when
+  // GlyphMode is set to SPATIALLY_UNIFORM_DISTRIBUTION.
+  vtkSetClampMacro(MaximumNumberOfSamplePoints, int, 1, VTK_INT_MAX);
+  vtkGetMacro(MaximumNumberOfSamplePoints, int);
 
-  void SetKeepRandomPoints(int keepRandomPoints);
-  vtkGetMacro(KeepRandomPoints,int);
-
+  // Description:
+  // Overridden to create output data of appropriate type.
+  virtual int ProcessRequest(
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
 
-  virtual int RequestData(vtkInformation *,
-                          vtkInformationVector **,
-                          vtkInformationVector *);
-  virtual int RequestCompositeData(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector);
-
+  // Standard Pipeline methods
+  virtual int RequestData(
+      vtkInformation*, vtkInformationVector**,vtkInformationVector*);
+  virtual int RequestDataObject(
+      vtkInformation*, vtkInformationVector**,vtkInformationVector*);
   virtual int FillInputPortInformation(int, vtkInformation*);
+  virtual int FillOutputPortInformation(int, vtkInformation*);
 
-  // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive();
+  // Description:
+  // Returns 1 if point is to be glyped, otherwise returns 0.
+  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
 
-  vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
-
-  //Description:
-  //This is a generic function that can be called per
-  //block of the dataset to calculate indices of points
-  //to be glyphed in the block
- void CalculatePtsToGlyph(double PtsNotBlanked);
-
-  vtkMaskPoints *MaskPoints;
-  int MaximumNumberOfPoints;
-  int NumberOfProcesses;
-  int UseMaskPoints;
-  int InputIsUniformGrid;
-
-  vtkIdType BlockGlyphAllPoints;
-  vtkIdType BlockMaxNumPts;
-  vtkIdType BlockOnRatio;
-  vtkIdType BlockPointCounter;
-  vtkIdType BlockNextPoint;
-  vtkIdType BlockNumGlyphedPts;
-
-  std::vector< vtkIdType > RandomPtsInDataset;
-
-  int RandomMode;
-
-  virtual void ReportReferences(vtkGarbageCollector*);
-
-  int KeepRandomPoints;
-  vtkIdType MaximumNumberOfPointsOld;
+  int GlyphMode;
+  int MaximumNumberOfSamplePoints;
+  int Seed;
+  int Stride;
+  vtkMultiProcessController* Controller;
 
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
   void operator=(const vtkPVGlyphFilter&);  // Not implemented.
 
-public:
-//BTX
-  enum CommunicationIds
-   {
-     GlyphNPointsGather=1000,
-     GlyphNPointsScatter
-   };
-//ETX
+  class vtkInternals;
+  vtkInternals* Internals;
 };
 
 #endif
