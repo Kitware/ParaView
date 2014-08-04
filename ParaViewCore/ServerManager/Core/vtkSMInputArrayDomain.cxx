@@ -160,6 +160,7 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
         }
       return true;
       }
+    break;
 
   case vtkDataObject::CELL:
     if (required_type == CELL)
@@ -178,10 +179,13 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
         }
       return true;
       }
+    break;
 
   default:
-    return required_type == attribute_type;
+    break;
     }
+
+  return required_type == attribute_type;
 }
 //----------------------------------------------------------------------------
 bool vtkSMInputArrayDomain::IsArrayAcceptable(
