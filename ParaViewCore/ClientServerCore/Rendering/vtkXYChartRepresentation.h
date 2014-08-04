@@ -85,6 +85,7 @@ public:
   void SetAxisCorner(const char* name, int corner);
   void SetMarkerStyle(const char* name, int style);
   void SetLabel(const char* name, const char* label);
+  const char* GetLabel(const char* name) const;
 
   void ClearSeriesVisibilities();
   void ClearLineThicknesses();
