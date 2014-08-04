@@ -11116,7 +11116,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetShowBounds"
                          default_values="0"
                          name="ShowBounds"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>For frustum selection, if this property is set to 1 the
         output is the outline of the frustum instead of the contents of the
