@@ -2889,6 +2889,109 @@
       </IntVectorProperty>
     </SourceProxy>
 
+#ifdef Module_vtkIOXdmf3
+    <SourceProxy name="Xdmf3ReaderCore" class="vtkXdmf3Reader">
+      <!--
+      <StringVectorProperty name="FileName"
+        command="SetFileName" number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      -->
+
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="SetInfo">
+        <ArraySelectionInformationHelper attribute_name="Set" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSetStatus"
+                            element_types="2 0"
+                            information_property="SetInfo"
+                            label="Sets"
+                            name="SetStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the sets to be loaded from the dataset, if
+        any.</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="xmf xdmf"
+                       file_description="Xdmf3 Reader" />
+      </Hints>
+      <!-- End of Xdmf3Reader -->
+#endif //Module_vtkIOXdmf3
+
+    </SourceProxy>
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -5124,86 +5227,48 @@
     </SourceProxy>
 
 #ifdef Module_vtkIOXdmf3
-    <SourceProxy name="Xdmf3Reader" class="vtkXdmf3Reader">
-      <StringVectorProperty name="FileName"
-        command="SetFileName" number_of_elements="1">
-        <FileListDomain name="files"/>
-      </StringVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues">
-        <TimeStepsInformationHelper />
-      </DoubleVectorProperty>
+    <SourceProxy base_proxygroup="internal_sources"
+                 base_proxyname="Xdmf3ReaderCore"
+                 class="vtkXdmf3Reader"
+                 name="Xdmf3ReaderT">
 
-      <StringVectorProperty information_only="1"
-                            name="PointArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Point" />
-      </StringVectorProperty>
-      <StringVectorProperty command="SetPointArrayStatus"
-                            element_types="2 0"
-                            information_property="PointArrayInfo"
-                            label="Point Arrays"
-                            name="PointArrayStatus"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            panel_visibility="default"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="PointArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>This property lists which point-centered arrays to
-        read.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="CellArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Cell" />
-      </StringVectorProperty>
-      <StringVectorProperty command="SetCellArrayStatus"
-                            element_types="2 0"
-                            information_property="CellArrayInfo"
-                            label="Cell Arrays"
-                            name="CellArrayStatus"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            panel_visibility="default"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="CellArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>This property lists which cell-centered arrays to
-        read.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="SetInfo">
-        <ArraySelectionInformationHelper attribute_name="Set" />
-      </StringVectorProperty>
-      <StringVectorProperty command="SetSetStatus"
-                            element_types="2 0"
-                            information_property="SetInfo"
-                            label="Sets"
-                            name="SetStatus"
-                            number_of_elements="2"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="SetInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>Select the sets to be loaded from the dataset, if
-        any.</Documentation>
-      </StringVectorProperty>
+      <IntVectorProperty command="SetFileSeriesAsTime"
+                         default_values="1"
+                         name="AsTime"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+        <Documentation>This hidden property controls whether the reader should
+        treat a file series as a temporal or spatial partitioning.</Documentation>
+      </IntVectorProperty>
+
       <Hints>
         <ReaderFactory extensions="xmf xdmf"
                        file_description="Xdmf3 Reader" />
       </Hints>
-      <!-- End of Xdmf3Reader -->
+      <!-- End of Xdmf3ReaderT -->
+    </SourceProxy>
+
+    <SourceProxy base_proxygroup="internal_sources"
+                 base_proxyname="Xdmf3ReaderCore"
+                 class="vtkXdmf3Reader"
+                 name="Xdmf3ReaderS">
+
+      <IntVectorProperty command="SetFileSeriesAsTime"
+                         default_values="0"
+                         name="AsTime"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <BooleanDomain name="bool" />
+        <Documentation>This hidden property controls whether the reader should
+        treat a file series as a temporal or spatial partitioning.</Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="xmf xdmf"
+                       file_description="Xdmf3 Reader (Top Level Partition)" />
+      </Hints>
+      <!-- End of Xdmf3ReaderS -->
     </SourceProxy>
 #endif
 
