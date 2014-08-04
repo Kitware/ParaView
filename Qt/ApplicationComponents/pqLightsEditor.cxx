@@ -151,7 +151,7 @@ void pqLightsEditor::reset()
   for (int i = 0; i < PROPERTY_COUNT; ++i)
     {
     vtkSMProperty* _property =
-      this->PropertyWidget->GetPropertyGroup()->GetProperty(PROPERTY_NAME[i]);
+      this->PropertyWidget->propertyGroup()->GetProperty(PROPERTY_NAME[i]);
     _property->ResetToDefault();
     }
   emit this->PropertyWidget->changeFinished();

@@ -203,3 +203,15 @@ void pqPropertyGroupWidget::addCheckedPropertyLink(
     widget->hide();
     }
 }
+
+//-----------------------------------------------------------------------------
+char* pqPropertyGroupWidget::panelVisibility() const
+{
+  return this->PropertyGroup->GetPanelVisibility();
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyGroupWidget::setPanelVisibility(const char* vis)
+{
+  return this->PropertyGroup->SetPanelVisibility(vis);
+}

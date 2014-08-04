@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 pqFontPropertyWidget::pqFontPropertyWidget(
   vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
-  : Superclass(smproxy, parentObject),
+  : Superclass(smproxy, smgroup, parentObject),
   Internals(new pqInternals(this))
 {
   Ui::FontPropertyWidget &ui = this->Internals->Ui;

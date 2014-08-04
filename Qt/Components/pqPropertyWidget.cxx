@@ -132,6 +132,19 @@ vtkSMProperty* pqPropertyWidget::property() const
 }
 
 //-----------------------------------------------------------------------------
+char* pqPropertyWidget::panelVisibility() const
+{
+  return this->Property->GetPanelVisibility();
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::setPanelVisibility(const char* vis)
+{
+  return this->Property->SetPanelVisibility(vis);
+}
+
+
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::apply()
 {
   BEGIN_UNDO_SET("Property Changed");
