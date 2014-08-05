@@ -64,7 +64,7 @@ public:
   static vtkSMLiveInsituLinkProxy* linkProxy(pqServer* insituServer);
   vtkSMLiveInsituLinkProxy* linkProxy()
   {
-    return pqLiveInsituManager::linkProxy(this->insituServer());
+    return pqLiveInsituManager::linkProxy(this->selectedInsituServer());
   }
   /// Is this the insitu server
   static bool isInsituServer(pqServer* server);
@@ -84,7 +84,7 @@ public:
   /// is either selected or its displayServer is selected. If no server is
   /// selected we choose the first Catalyst server we find.
   ///  We return NULL if the client is not connected to Catalyst.
-  pqServer* insituServer();
+  pqServer* selectedInsituServer();
   /// Is this the server where Catalyst displays its extracts
   bool isDisplayServer(pqServer* server);
   /// Returns the catalyst visualization manager associated with 

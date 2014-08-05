@@ -85,10 +85,10 @@ public:
       if (arguments.startsWith("wait_timestep"))
         {
         QString arg = arguments;
-        QString command;
+        QString subCommand;
         vtkIdType timeStep;
         QTextStream istr(&arg);
-        istr >> command >> timeStep;
+        istr >> subCommand >> timeStep;
         this->Manager->waitTimestep(timeStep);
         }
       else if (arguments == "wait_breakpoint_hit")
@@ -164,7 +164,7 @@ bool pqLiveInsituManager::isDisplayServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-pqServer* pqLiveInsituManager::insituServer()
+pqServer* pqLiveInsituManager::selectedInsituServer()
 {
   pqActiveObjects& ao = pqActiveObjects::instance();
   pqServer* as = ao.activeServer();
@@ -416,14 +416,14 @@ void pqLiveInsituManager::onBreakpointHit(pqServer* insituServer)
 }
 
 //-----------------------------------------------------------------------------
-void pqLiveInsituManager::setBreakpoint(double time)
+void pqLiveInsituManager::setBreakpoint(double t)
 {
-  if (this->BreakpointTime != time)
+  if (this->BreakpointTime != t)
     {
-    pqServer* insituServer = this->insituServer();
+    pqServer* insituServer = this->selectedInsituServer();
     if (insituServer)
       {
-      this->BreakpointTime = time;
+      this->BreakpointTime = t;
       this->BreakpointTimeStep = INVALID_TIME_STEP;
       emit breakpointAdded(insituServer);
       }
@@ -431,15 +431,15 @@ void pqLiveInsituManager::setBreakpoint(double time)
 }
 
 //-----------------------------------------------------------------------------
-void pqLiveInsituManager::setBreakpoint(vtkIdType timeStep)
+void pqLiveInsituManager::setBreakpoint(vtkIdType _timeStep)
 {
-  if (this->BreakpointTimeStep != timeStep)
+  if (this->BreakpointTimeStep != _timeStep)
     {
-    pqServer* insituServer = this->insituServer();
+    pqServer* insituServer = this->selectedInsituServer();
     if (insituServer)
       {
       this->BreakpointTime = INVALID_TIME;
-      this->BreakpointTimeStep = timeStep;
+      this->BreakpointTimeStep = _timeStep;
       emit breakpointAdded(insituServer);
       }
     }
@@ -450,7 +450,7 @@ void pqLiveInsituManager::removeBreakpoint()
 {
   if (this->hasBreakpoint())
     {
-    pqServer* insituServer = this->insituServer();
+    pqServer* insituServer = this->selectedInsituServer();
     if (insituServer)
       {
       this->BreakpointTime = INVALID_TIME;
@@ -461,24 +461,24 @@ void pqLiveInsituManager::removeBreakpoint()
 }
 
 //-----------------------------------------------------------------------------
-void pqLiveInsituManager::waitTimestep(vtkIdType timeStep)
+void pqLiveInsituManager::waitTimestep(vtkIdType ts)
 {
   pqEventDispatcher::deferEventsIfBlocked(true);
   pqLiveInsituVisualizationManager* visManager =
-    this->managerFromInsitu(this->insituServer());
+    this->managerFromInsitu(this->selectedInsituServer());
   pqLiveInsituManagerDebugMacro("===== start waitTimestep("
-                                << timeStep << ")" << " ===== "
+                                << ts << ")" << " ===== "
                                 << this->timeStep());
-  while (timeStep > this->timeStep())
+  while (ts > this->timeStep())
     {
     QEventLoop loop;
     QObject::connect(visManager, SIGNAL(nextTimestepAvailable()),
                      &loop, SLOT(quit()));
     loop.exec();
-    pqLiveInsituManagerDebugMacro("===== waitTimestep(" << timeStep << ")" <<
+    pqLiveInsituManagerDebugMacro("===== waitTimestep(" << ts << ")" <<
                                   " ===== " << this->timeStep());
     }
-  pqLiveInsituManagerDebugMacro("===== end waitTimestep(" << timeStep
+  pqLiveInsituManagerDebugMacro("===== end waitTimestep(" << ts
                                 << ")" << " ===== " << this->timeStep());
   pqEventDispatcher::deferEventsIfBlocked(false);
 }
