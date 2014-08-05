@@ -66,7 +66,7 @@ from paraview.web import wamp      as pv_wamp
 from paraview.web import protocols as pv_protocols
 
 # import RPC annotation
-from autobahn.wamp import procedure as exportRpc
+from autobahn.wamp import register as exportRpc
 
 from paraview import simple
 from vtk.web import server
@@ -110,7 +110,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         parser.add_argument("--group-regex", default="[0-9]+\\.", help="Regular expression for grouping files", dest="group")
         parser.add_argument("--plugins", default="", help="List of fully qualified path names to plugin objects to load", dest="plugins")
         parser.add_argument("--proxies", default=None, help="Path to a file with json text containing filters to load", dest="proxies")
-        parser.add_argument("--any-readers", help="Use provided readers along with the one naturally available in ParaView", action="store_true", dest="all_readers")
+        parser.add_argument("--no-auto-readers", help="If provided, disables ability to use non-configured readers", action="store_true", dest="no_auto_readers")
 
     @staticmethod
     def configure(args):
@@ -125,7 +125,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         _VisualizerServer.plugins      = args.plugins
         _VisualizerServer.proxies      = args.proxies
         _VisualizerServer.colorPalette = args.palettes
-        _VisualizerServer.allReaders   = args.all_readers
+        _VisualizerServer.allReaders   = not args.no_auto_readers
 
         if args.file:
             _VisualizerServer.fileToLoad = args.path + '/' + args.file

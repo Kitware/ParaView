@@ -75,11 +75,11 @@ Directory structure:
 
 ## Installation of ParaViewWeb
 
-ParaView which contains ParaViewWeb is available for download (here)[http://www.paraview.org/paraview/resources/software.php]
+ParaView which contains ParaViewWeb is available for download [here](http://www.paraview.org/paraview/resources/software.php).
 And you can even take the latest version that was build on the master branch of ParaView which is supposed to be stable.
-If you want to build ParaView yourself, you can refer to the Wiki (here)[http://paraview.org/Wiki/ParaView]
+If you want to build ParaView yourself, you can refer to the Wiki [here](http://paraview.org/Wiki/ParaView).
 
-In anycase, you should have a directory structure that looks like that:
+In any case, you should have a directory structure that looks like that:
 
     -> paraview-xxx
         + bin
@@ -140,24 +140,31 @@ When you edit the configuration file, shown below, be sure to replace `YOUR_HOST
           "python_exec": "/data/pv/pv-current/bin/pvpython"
         },
         "apps": {
-          "data_prober": {
-            "cmd": [
-              "${python_exec}", "${python_path}/paraview/web/pv_web_data_prober.py",
-              "--port", "${port}", "--data-dir", "${dataDir}"
-            ],
-            "ready_line" : "Starting factory"
-          },
           "pipeline": {
             "cmd": [
               "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
-              "--port", "${port}", "--data-dir", "${dataDir}"
+              "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
+            ],
+            "ready_line" : "Starting factory"
+          },
+          "visualizer": {
+            "cmd": [
+              "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
+              "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
           },
           "loader": {
             "cmd": [
               "${python_exec}", "${python_path}/paraview/web/pv_web_file_loader.py",
-              "--port", "${port}", "--data-dir", "${dataDir}"
+              "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
+            ],
+            "ready_line" : "Starting factory"
+          },
+          "data_prober": {
+            "cmd": [
+              "${python_exec}", "${python_path}/paraview/web/pv_web_data_prober.py",
+              "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
           }
@@ -247,7 +254,7 @@ If you run into problems with your new virtual host listening properly, you may 
 
 ## Setting up the ParaViewWeb Web Site
 
-You can download the documentation of ParaView here: http://paraview.org/paraview/resources/software.php
+You can download the documentation of ParaView [here](http://paraview.org/paraview/resources/software.php)
 And download the ParaView-API-docs-v4.1.zip file or any newer version.
 
 By uncompressing that file, you should get something like that:
@@ -273,7 +280,7 @@ Add the ParaViewWeb code
 
 ## 14.04 LTS on EC2
 
-Those are additional notes that are specific for EC2 instances that use Ubuntu 14.04 LTS.
+These are additional notes that are specific for EC2 instances that use Ubuntu 14.04 LTS.
 
 * The EC2 instance CAN NOT use the current NVidia drivers but at least the beta 337.19 (or higher).
 * Create file  /etc/modprobe.d/nvidia-graphics-drivers.conf
