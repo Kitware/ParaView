@@ -80,6 +80,11 @@ public:
   vtkSMProxy* proxy() const;
   vtkSMProperty* property() const;
 
+  /// Forward calls to vtkSMProperty. Are overwritten by pqPropertyGroupWidget 
+  ///   to forward calls to vtkSMPropertyGroup
+  virtual char* panelVisibility() const;
+  virtual void setPanelVisibility(const char* vis);
+
   bool showLabel() const;
 
   /// Description:

@@ -59,7 +59,7 @@ class PQCOMPONENTS_EXPORT pqPropertyGroupWidget : public pqPropertyWidget
 public:
   pqPropertyGroupWidget(vtkSMProxy *proxy,
                         vtkSMPropertyGroup* smGroup, QWidget *parent=0);
-  vtkSMPropertyGroup* GetPropertyGroup () const
+  vtkSMPropertyGroup* propertyGroup () const
   {
     return this->PropertyGroup;
   }
@@ -83,6 +83,11 @@ public:
                        int smindex = -1);
   // make this signal public
   using Superclass::changeFinished;
+
+  /// Overwrite pqPropertyWidget to forward calls to vtkSMPropertyGroup
+  virtual char* panelVisibility() const;
+  virtual void setPanelVisibility(const char* vis);
+
 
 private:
   void addCheckedPropertyLink(QWidget* button, const char* propertyName,

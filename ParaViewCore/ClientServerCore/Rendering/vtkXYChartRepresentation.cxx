@@ -375,6 +375,16 @@ void vtkXYChartRepresentation::SetLabel(const char* seriesname, const char* labe
 }
 
 //----------------------------------------------------------------------------
+const char* vtkXYChartRepresentation::GetLabel(const char* seriesname) const
+{
+  assert(seriesname != NULL);
+  return (this->Internals->Labels.find(seriesname) !=
+          this->Internals->Labels.end()) ?
+    this->Internals->Labels[seriesname].c_str() : NULL;
+}
+
+
+//----------------------------------------------------------------------------
 void vtkXYChartRepresentation::ClearSeriesVisibilities()
 {
   this->Internals->SeriesVisibilities.clear();
