@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardLegacyCustomPanels.h"
 
 #include "pqGlyphPanel.h"
-#include "pqPassArraysPanel.h"
 #include "pqProxy.h"
 #include "pqYoungsMaterialInterfacePanel.h"
 #include "vtkSMProxy.h"
@@ -54,12 +53,8 @@ pqStandardLegacyCustomPanels::~pqStandardLegacyCustomPanels()
 //-----------------------------------------------------------------------------
 pqObjectPanel* pqStandardLegacyCustomPanels::createPanel(pqProxy* proxy, QWidget* p)
 {
-  if(QString("filters") == proxy->getProxy()->GetXMLGroup())
+  if (QString("filters") == proxy->getProxy()->GetXMLGroup())
     {
-    if(QString("PassArrays") == proxy->getProxy()->GetXMLName())
-      {
-      return new pqPassArraysPanel(proxy, p);
-      }
     if (QString("LegacyArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
       QString("LegacyGlyph") == proxy->getProxy()->GetXMLName())
       {
@@ -78,17 +73,10 @@ bool pqStandardLegacyCustomPanels::canCreatePanel(pqProxy* proxy) const
 {
   if(QString("filters") == proxy->getProxy()->GetXMLGroup())
     {
-    if(
+    if (
       QString("LegacyArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
       QString("LegacyGlyph") == proxy->getProxy()->GetXMLName() ||
-      //         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
-      //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
-      QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
-      QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
-      //QString("Contour") == proxy->getProxy()->GetXMLName() ||
-      //QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
-      QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName() ||
-      QString("PassArrays") == proxy->getProxy()->GetXMLName() )
+      QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName())
       {
       return true;
       }

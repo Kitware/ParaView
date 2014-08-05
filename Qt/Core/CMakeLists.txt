@@ -157,8 +157,6 @@ set(Module_SRCS
   pqRenderView.h
   pqRepresentation.cxx
   pqRepresentation.h
-  pqRubberBandHelper.cxx
-  pqRubberBandHelper.h
   pqScalarBarRepresentation.cxx
   pqScalarBarRepresentation.h
   pqScalarsToColors.cxx
@@ -274,7 +272,6 @@ set (Module_MOC_HDRS
   pqRenderViewBase.h
   pqRenderView.h
   pqRepresentation.h
-  pqRubberBandHelper.h
   pqScalarBarRepresentation.h
   pqScalarsToColors.h
 #  pqScatterPlotRepresentation.h

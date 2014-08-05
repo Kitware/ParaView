@@ -11116,7 +11116,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetShowBounds"
                          default_values="0"
                          name="ShowBounds"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>For frustum selection, if this property is set to 1 the
         output is the outline of the frustum instead of the contents of the
@@ -13558,8 +13559,50 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
-        <InputArrayDomain name="input_array" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1"></InputArrayDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1"></InputArrayDomain>
+        <InputArrayDomain name="input_field_array" attribute_type="field" optional="1" />
       </InputProperty>
+      <StringVectorProperty clean_command="ClearPointDataArrays"
+                            command="AddPointDataArray"
+                            name="PointDataArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a point array by name to be passed.</Documentation>
+        <ArrayListDomain input_domain_name="input_array_point" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearCellDataArrays"
+                            command="AddCellDataArray"
+                            name="CellDataArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a cell array by name to be passed.</Documentation>
+        <ArrayListDomain input_domain_name="input_array_cell" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearFieldDataArrays"
+                            command="AddFieldDataArray"
+                            name="FieldDataArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a field array by name to be passed.</Documentation>
+        <ArrayListDomain name="array_list" input_domain_name="input_field_array">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
       <IntVectorProperty command="SetUseFieldTypes"
                          default_values="1"
                          name="UseFieldTypes"
@@ -13570,62 +13613,16 @@ found and the point will be rejected.</Documentation>
         proxy to work.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="AddFieldType"
-                         default_values="0"
-                         name="AddPointArrayType"
-                         number_of_elements="1"
+                         default_values="0 1 2"
+                         name="SelectedFieldTypes"
+                         number_of_elements="3"
+                         repeat_command="1"
+                         number_of_elements_per_command="1"
                          panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>This hidden property must always be set to 0 for this
         proxy to work.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="AddFieldType"
-                         default_values="1"
-                         name="AddCellArrayType"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>This hidden property must always be set to 1 for this
-        proxy to work.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="AddFieldType"
-                         default_values="2"
-                         name="AddFieldArrayType"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>This hidden property must always be set to 2 for this
-        proxy to work.</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="ClearPointDataArrays"
-                            command="AddPointDataArray"
-                            immediate_update="0"
-                            label="PointDataArrays"
-                            name="AddPointDataArray"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Add a point array by name to be passed.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="ClearCellDataArrays"
-                            command="AddCellDataArray"
-                            immediate_update="0"
-                            label="CellDataArrays"
-                            name="AddCellDataArray"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Add a cell array by name to be passed.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="ClearFieldDataArrays"
-                            command="AddFieldDataArray"
-                            immediate_update="0"
-                            label="FieldDataArrays"
-                            name="AddFieldDataArray"
-                            number_of_elements_per_command="1"
-                            repeat_command="1">
-        <Documentation>Add a field array by name to be passed.</Documentation>
-      </StringVectorProperty>
       <!-- End PassArrays -->
     </SourceProxy>
 

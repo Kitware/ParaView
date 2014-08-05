@@ -76,8 +76,6 @@ set (Module_SRCS
   pqChartPixelScale.h
   pqChartValue.cxx
   pqChartValue.h
-  pqClipPanel.cxx
-  pqClipPanel.h
   pqCollaborationPanel.cxx
   pqCollaborationPanel.h
   pqColorChooserButtonWithPalettes.cxx
@@ -116,8 +114,6 @@ set (Module_SRCS
   pqCustomFilterManagerModel.h
   pqCustomViewButtonDialog.cxx
   pqCustomViewButtonDialog.h
-  pqCutPanel.cxx
-  pqCutPanel.h
   pqDataInformationModel.cxx
   pqDataInformationModel.h
   pqDataInformationWidget.cxx
@@ -142,8 +138,6 @@ set (Module_SRCS
   pqDoubleVectorPropertyWidget.h
   pqExodusIIVariableSelectionWidget.cxx
   pqExodusIIVariableSelectionWidget.h
-  pqExtractCTHPartsPanel.cxx
-  pqExtractCTHPartsPanel.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
   pqFileChooserWidget.cxx
@@ -206,8 +200,6 @@ set (Module_SRCS
   pqNamedObjectPanel.h
   pqNamedWidgets.cxx
   pqNamedWidgets.h
-  pqNetCDFPanel.cxx
-  pqNetCDFPanel.h
   pqObjectPanel.cxx
   pqObjectPanel.h
   pqObjectPanelInterface.cxx
@@ -221,8 +213,6 @@ set (Module_SRCS
   pqOrbitWidget.h
   pqOutputPortComboBox.cxx
   pqOutputPortComboBox.h
-  pqPassArraysPanel.cxx
-  pqPassArraysPanel.h
   pqPipelineAnnotationFilterModel.cxx
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.cxx
@@ -388,7 +378,6 @@ set (Module_MOC_HDRS
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.h
-  pqClipPanel.h
   pqColorChooserButtonWithPalettes.h
   pqCollaborationPanel.h
   pqColorMapModel.h
@@ -406,7 +395,6 @@ set (Module_MOC_HDRS
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
   pqCustomViewButtonDialog.h
-  pqCutPanel.h
   pqDataInformationModel.h
   pqDataInformationWidget.h
   pqDialog.h
@@ -417,7 +405,6 @@ set (Module_MOC_HDRS
   pqDistanceWidget.h
   pqDoubleVectorPropertyWidget.h
   pqExodusIIVariableSelectionWidget.h
-  pqExtractCTHPartsPanel.h
   pqFieldSelectionAdaptor.h
   pqFileChooserWidget.h
   pqFindDataCreateSelectionFrame.h
@@ -448,13 +435,11 @@ set (Module_MOC_HDRS
   pqMultiBlockInspectorPanel.h
   pqMultiViewWidget.h
   pqNamedObjectPanel.h
-  pqNetCDFPanel.h
   pqObjectPanel.h
   pqObjectPanelPropertyWidget.h
   pqOrbitCreatorDialog.h
   pqOrbitWidget.h
   pqOutputPortComboBox.h
-  pqPassArraysPanel.h
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.h
   pqPipelineModel.h

@@ -43,6 +43,11 @@ class pqView;
 class pqPropertyManager;
 class vtkSMProxy;
 
+/// ******DEPRECATION WARNING*******
+/// pqProxyPanel and subclasses will soon be removed
+/// from ParaView. Please update your plugins and custom application to use the
+/// new design of creating panels for proxies (pqProxyWidget).
+/// ********************************
 /// Base class for Widget which provides an editor for editing properties
 /// of a proxy
 class PQCOMPONENTS_EXPORT pqProxyPanel : public QWidget
