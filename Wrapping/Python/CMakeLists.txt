@@ -105,6 +105,12 @@ configure_file(${PV_PYTHON_MODULE_SOURCE_DIR}/compile_all_pv.py.in
   ${PV_PYTHON_MODULE_BINARY_DIR}/compile_all_pv.py
   @ONLY IMMEDIATE)
 
+configure_file(${PV_PYTHON_MODULE_SOURCE_DIR}/cpexport.py.in
+  ${PV_PYTHON_MODULE_BINARY_DIR}/cpexport.py
+  @ONLY IMMEDIATE)
+
+
+
 add_custom_command(
   WORKING_DIRECTORY ${PV_PYTHON_MODULE_BINARY_DIR}
   COMMAND ${PYTHON_EXECUTABLE}
