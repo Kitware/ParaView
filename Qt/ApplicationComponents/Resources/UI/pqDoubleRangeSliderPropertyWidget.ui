@@ -46,6 +46,13 @@
    <item row="1" column="1">
     <widget class="pqDoubleRangeWidget" name="ThresholdBetween_1" native="true"/>
    </item>
+   <item row="0" column="2" rowspan="2">
+    <widget class="QPushButton" name="Reset" native="true">
+     <property name="toolTip">
+      <string>Reset using current data values</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

@@ -32,11 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "ui_pqDoubleRangeSliderPropertyWidget.h"
 
+#include "pqCoreUtilities.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqWidgetRangeDomain.h"
+#include "vtkCommand.h"
 #include "vtkSMProperty.h"
+#include "vtkSMBoundsDomain.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 
 #include <QGridLayout>
 
@@ -44,6 +48,7 @@ class pqDoubleRangeSliderPropertyWidget::pqInternals
 {
 public:
   Ui::DoubleRangeSliderPropertyWidget Ui;
+  QPalette ResetPalette;
 };
 
 //-----------------------------------------------------------------------------
@@ -58,6 +63,9 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   Ui::DoubleRangeSliderPropertyWidget &ui = this->Internals->Ui;
   ui.setupUi(this);
 
+  this->Internals->ResetPalette = ui.Reset->palette();
+
+  ui.Reset->setIcon(ui.Reset->style()->standardIcon(QStyle::SP_BrowserReload));
   ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
   ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
@@ -67,6 +75,13 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   this->addPropertyLink(ui.ThresholdBetween_1, "value", SIGNAL(valueChanged(double)),
                         smProperty, 1);
 
+  pqCoreUtilities::connect(smProperty, vtkCommand::DomainModifiedEvent,
+    this, SLOT(highlightResetButton()));
+  pqCoreUtilities::connect(smProperty, vtkCommand::UncheckedPropertyModifiedEvent,
+    this, SLOT(highlightResetButton()));
+
+  this->connect(ui.Reset, SIGNAL(clicked()),
+                    this, SLOT(resetClicked()));
   this->connect(ui.ThresholdBetween_0, SIGNAL(valueEdited(double)),
                    this, SLOT(lowerChanged(double)));
   this->connect(ui.ThresholdBetween_1, SIGNAL(valueEdited(double)),
@@ -85,6 +100,86 @@ pqDoubleRangeSliderPropertyWidget::~pqDoubleRangeSliderPropertyWidget()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::apply()
+{
+ this->Superclass::apply();
+ this->highlightResetButton(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::reset()
+{
+ this->Superclass::reset();
+ this->highlightResetButton(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::highlightResetButton(bool highlight)
+{
+ QPalette buttonPalette = this->Internals->ResetPalette;
+ if (highlight)
+   {
+   buttonPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
+   buttonPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
+   }
+ this->Internals->Ui.Reset->setPalette(buttonPalette);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::resetClicked()
+{
+  vtkSMProperty* smproperty = this->property();
+
+  double min = 1.0;
+  double max = 1.0;
+  if (vtkSMDoubleRangeDomain* domain = vtkSMDoubleRangeDomain::SafeDownCast(
+      smproperty->FindDomain("vtkSMDoubleRangeDomain")))
+    {
+    if (domain->GetMinimumExists(0))
+      {
+      min = domain->GetMinimum(0);
+      }
+    else if (domain->GetMaximumExists(0))
+      {
+      min = domain->GetMaximum(0);
+      }
+    if (domain->GetMaximumExists(1))
+      {
+      max = domain->GetMaximum(1);
+      // If the minimum-maximum is greater than the maximum-maximum (weird, but
+      // not impossible I guess), force the minimum to be this value instead.
+      if (max < min)
+        {
+        min = max;
+        }
+      }
+    else if (domain->GetMinimumExists(1))
+      {
+      max = domain->GetMinimum(1);
+      // If the minimum is greater than the maximum (possible if there's no
+      // minimum-minimum, but there is a maximum-minimum), use that value
+      // instead.
+      if (max < min)
+        {
+        max = min;
+        }
+      }
+    else
+      {
+      // No limits on the max; just copy the minimum to keep the logic valid.
+      max = min;
+      }
+    }
+
+  vtkSMUncheckedPropertyHelper helper(smproperty);
+  vtkSMUncheckedPropertyHelper(smproperty).Set(0, min);
+  vtkSMUncheckedPropertyHelper(smproperty).Set(1, max);
+  this->highlightResetButton(false);
+  emit this->changeAvailable();
+  emit this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------
