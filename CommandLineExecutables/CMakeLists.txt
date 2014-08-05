@@ -141,7 +141,7 @@ include_directories(${vtkPVServerManagerApplication_DEPENDS_INCLUDE_DIRS}
 
 set(STATIC_LINK_PLUGINS)
 if (NOT BUILD_SHARED_LIBS)
-  set(STATIC_LINK_PLUGINS vtkPVStaticPluginsInit util)
+  set(STATIC_LINK_PLUGINS vtkPVStaticPluginsInit)
 endif()
 if (PARAVIEW_USE_STATIC_NUMPY)
   find_library(UTIL_LIB util)
