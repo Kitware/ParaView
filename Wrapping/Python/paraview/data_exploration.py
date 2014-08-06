@@ -1078,6 +1078,7 @@ class CompositeImageExporter(object):
         self.codes = self.view.GetProperty('RepresentationCodes').GetData()
         self.camera_handler.set_view(self.view)
         self.representations = []
+
         index = 0
         for data in self.datasets:
             rep = simple.Show(data, self.view)
@@ -1151,6 +1152,8 @@ class CompositeImageExporter(object):
 
         # Compute the number of images by stack
         fieldset = set()
+        rangeset = {}
+
         nbImages = 1
         composite_size = len(self.representations)
         metadata_layers = ""
@@ -1198,7 +1201,12 @@ class CompositeImageExporter(object):
                     offset_field_name = reverse_field_map[str(field[1])]
                     if field[0] == 'SOLID_COLOR':
                         self.file_name_generator.update_active_arguments(field= "solid_" + str(index))
+                        rep.AmbientColor = field[1]
                         rep.DiffuseColor = field[1]
+                        rep.SpecularColor = field[1]
+                    elif field[0] == 'VALUE':
+                        #remember range for later storage in info file
+                        rangeset[field[1]] = self.luts[field[1]][3]
                     else:
                         self.file_name_generator.update_active_arguments(field=field[1])
                         data_bounds = self.datasets[compositeIdx].GetDataInformation().GetBounds()
@@ -1210,7 +1218,21 @@ class CompositeImageExporter(object):
 
                     self.view.ActiveRepresentation = rep
                     self.view.CompositeDirectory = self.file_name_generator.get_directory()
-                    self.view.CaptureActiveRepresentation()
+                    if field[0] == 'VALUE':
+                        rep.DiffuseColor = [1,1,1]
+                        specifics = self.luts[field[1]]
+                        if specifics[0] == "point":
+                            self.view.SetDrawCells = 0
+                        else:
+                            self.view.SetDrawCells = 1
+                        self.view.SetArrayNameToDraw = specifics[1]
+                        self.view.SetArrayComponentToDraw = specifics[2]
+                        self.view.SetScalarRange = specifics[3]
+                        self.view.StartCaptureValues()
+                        self.view.CaptureActiveRepresentation()
+                        self.view.StopCaptureValues()
+                    else:
+                        self.view.CaptureActiveRepresentation()
 
                     metadata_offset[offset_composite_name + offset_field_name] = offset_value
                     offset_value += 1
@@ -1231,6 +1253,7 @@ class CompositeImageExporter(object):
         self.file_name_generator.add_meta_data('layers', metadata_layers)
         self.file_name_generator.add_meta_data('layer_fields', metadata_layer_fields)
         self.file_name_generator.add_meta_data('offset', metadata_offset)
+        self.file_name_generator.add_meta_data('ranges', rangeset)
         self.file_name_generator.write_metadata()
 
         if self.analysis:
@@ -1406,3 +1429,177 @@ def test3(basePath):
     timeProber = TimeSerieDataProber( FileNameGenerator('/tmp/dataprober_time', 'data_{field}.csv'), w, time_serie, [ "RTData"], 100)
     for time in range(101):
         timeProber.UpdatePipeline(time)
+
+# -----------------------------------------------------------------------------
+
+def testDynamicLighting():
+
+    resolution = 500
+    center_of_rotation = [0.0, 0.0, 0.0]
+    rotation_axis = [0.0, 0.0, 1.0]
+    distance = 150.0
+
+    wavelet = simple.Wavelet()
+    wavelet.WholeExtent = [-20,20,-20,20,-20,20]
+    filters = [ wavelet ]
+    filters_description = [ {'name': 'Wavelet'} ]
+
+    brownianVectors = simple.RandomVectors()
+
+    calculator1 = simple.Calculator()
+    calculator1.Function = 'RTData'
+    calculator1.ResultArrayName = 'cRTData'
+
+    calculator2 = simple.Calculator()
+    calculator2.Function = 'BrownianVectors'
+    calculator2.ResultArrayName = 'cBrownianVectors'
+
+    topfilter = calculator2
+
+    simple.UpdatePipeline()
+
+    color_type = [
+        ('SOLID_COLOR', [0.8,0.8,0.8])
+        ]
+    color_by = [ color_type ]
+
+    color_type = [
+        #
+        #standard composite type fields examples
+        #
+        #('POINT_DATA', "RTData"),
+        #('POINT_DATA', "BrownianVectors"),
+        #('CELL_DATA', "cRTData"),
+        #('CELL_DATA', "cBrownianVectors"),
+        #
+        #dynamic rendering composite value type field examples
+        #
+        ('VALUE', "vRTData"),
+        ('VALUE', "vBrownianVectorsX"),
+        ('VALUE', "vBrownianVectorsY"),
+        ('VALUE', "vBrownianVectorsZ"),
+        ('VALUE', "nX"),
+        ('VALUE', "nY"),
+        ('VALUE', "nZ"),
+        ('VALUE', "vRTDataC"),
+        ('VALUE', "vBrownianVectorsXC"),
+        ('VALUE', "vBrownianVectorsYC"),
+        ('VALUE', "vBrownianVectorsZC"),
+        ('VALUE', "vnXC"),
+        ('VALUE', "vnYC"),
+        ('VALUE', "vnZC")
+        ]
+
+    pdi = topfilter.GetPointDataInformation()
+    cdi = topfilter.GetCellDataInformation()
+
+    luts = {
+        #
+        #standard composite type fields examples
+        #
+        #"RTData": simple.GetLookupTableForArray(
+        #"RTData", 1, RGBPoints=[
+        #     37, 0.23, 0.299, 0.754,
+        #    207, 0.865, 0.865, 0.865,
+        #     377, 0.706, 0.016, 0.15],
+        #VectorMode='Magnitude',
+        #NanColor=[0.25, 0.0, 0.0],
+        #ColorSpace='Diverging',
+        #ScalarRangeInitialized=1.0 ),
+        #"BrownianVectors": simple.GetLookupTableForArray(
+        #"BrownianVectors", 1, RGBPoints=[
+        #    0, 0.23, 0.299, 0.754,
+        #    0.5, 0.865, 0.865, 0.865,
+        #    1.0, 0.706, 0.016, 0.15],
+        #VectorMode='Magnitude',
+        #NanColor=[0.25, 0.0, 0.0],
+        #ColorSpace='Diverging',
+        #ScalarRangeInitialized=1.0 ),
+        #"cRTData": simple.GetLookupTableForArray(
+        #"cRTData", 1, RGBPoints=[
+        #    37, 0.23, 0.299, 0.754,
+        #    207, 0.865, 0.865, 0.865,
+        #    377, 0.706, 0.016, 0.15],
+        #VectorMode='Magnitude',
+        #NanColor=[0.25, 0.0, 0.0],
+        #ColorSpace='Diverging',
+        #ScalarRangeInitialized=1.0 ),
+        #"cBrownianVectors": simple.GetLookupTableForArray(
+        #"cBrownianVectors", 1, RGBPoints=[
+        #    0, 0.23, 0.299, 0.754,
+        #    0.5, 0.865, 0.865, 0.865,
+        #    1.0, 0.706, 0.016, 0.15],
+        #VectorMode='Magnitude',
+        #NanColor=[0.25, 0.0, 0.0],
+        #ColorSpace='Diverging',
+        #ScalarRangeInitialized=1.0 ),
+        #
+        #dynamic rendering composite value type field examples
+        #
+        "vRTData": ["point", "RTData", 0, pdi.GetArray("RTData").GetRange()],
+        "vBrownianVectorsX": ["point", "BrownianVectors", 0, pdi.GetArray("BrownianVectors").GetRange(0)],
+        "vBrownianVectorsY": ["point", "BrownianVectors", 1, pdi.GetArray("BrownianVectors").GetRange(1)],
+        "vBrownianVectorsZ": ["point", "BrownianVectors", 2, pdi.GetArray("BrownianVectors").GetRange(2)],
+        "nX": ["point", "Normals", 0, (-1,1)],
+        "nY": ["point", "Normals", 1, (-1,1)],
+        "nZ": ["point", "Normals", 2, (-1,1)],
+        "vRTDataC": ["cell", "RTData", 0, pdi.GetArray("RTData").GetRange()],
+        "vBrownianVectorsXC": ["cell", "BrownianVectors", 0, pdi.GetArray("BrownianVectors").GetRange(0)],
+        "vBrownianVectorsYC": ["cell", "BrownianVectors", 1, pdi.GetArray("BrownianVectors").GetRange(1)],
+        "vBrownianVectorsZC": ["cell", "BrownianVectors", 2, pdi.GetArray("BrownianVectors").GetRange(2)],
+        "vnXC": ["cell", "Normals", 0, (-1,1)],
+        "vnYC": ["cell", "Normals", 1, (-1,1)],
+        "vnZC": ["cell", "Normals", 2, (-1,1)]
+        }
+
+    contour_values = [ 64.0, 90.6, 117.2, 143.8, 170.4, 197.0, 223.6, 250.2 ]
+    contour_values = [ 64.0, 117.2, 170.4, 223.6 ]
+
+    for iso_value in contour_values:
+        simple.Contour(
+            Input=topfilter,
+            PointMergeMethod="Uniform Binning",
+            ContourBy = ['POINTS', 'RTData'],
+            Isosurfaces = [iso_value],
+            ComputeScalars = 1
+            )
+        #just to get cell aligned normals for testing
+        filters.append(
+           simple.PointDatatoCellData(PassPointData = 1)
+            )
+        color_by.append( color_type )
+        filters_description.append({'name': 'iso=%s' % str(iso_value)})
+
+    title = "Composite Dynamic Rendering Test"
+    description = "A sample file for dynamic rendering"
+    analysis = AnalysisManager( '/tmp/wavelet', title, description)
+
+    id = 'composite'
+    title = '3D composite'
+    description = "contour set"
+    analysis.register_analysis(id, title, description, '{theta}/{phi}/{filename}', CompositeImageExporter.get_data_type()+"-light")
+    fng = analysis.get_file_name_generator(id)
+
+    camera_handler = ThreeSixtyCameraHandler(
+        fng,
+        None,
+        [ float(r) for r in range(0, 360, 30) ],
+        [ float(r) for r in range(-60, 61, 30) ],
+        center_of_rotation,
+        rotation_axis,
+        distance)
+
+    exporter = CompositeImageExporter(
+        fng,
+        filters,
+        color_by,
+        luts,
+        camera_handler,
+        [resolution,resolution],
+        filters_description,
+        0, 0, 'png')
+    exporter.set_analysis(analysis)
+
+    analysis.begin()
+    exporter.UpdatePipeline(0)
+    analysis.end()

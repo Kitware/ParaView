@@ -51,8 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTIFFWriter.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkValuePasses.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
+
+#include "vtkAbstractMapper.h"
 
 #ifdef PARAVIEW_USE_ICE_T
 # include "vtkIceTSynchronizedRenderers.h"
@@ -106,6 +109,14 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
     this->JPEGWriter->SetInputData(this->ImageStack.GetPointer());
     this->TIFFWriter->SetInputData(this->ImageStack.GetPointer());
     this->PNGWriter->SetInputData(this->ImageStack.GetPointer());
+
+    this->FieldAssociation =  VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
+    this->FieldNameSet = false;
+    this->FieldAttributeType = 0;
+    this->Component = 0;
+    this->ScalarRangeSet = false;
+    this->ScalarRange[0] = 0.0;
+    this->ScalarRange[1] = -1.0;
   }
 
   //----------------------------------------------------------------------------
@@ -505,6 +516,21 @@ struct vtkPVRenderViewForAssembly::vtkInternals {
   static const char* CODING_TABLE;
   static const char* NUMBER_TABLE;
   std::map<std::string, int> PixelOrderCount;
+
+
+  vtkNew<vtkValuePasses> ValuePasses;
+  vtkRenderPass *SavedRenderPass;
+
+  int FieldAssociation;
+  int FieldAttributeType;
+  std::string FieldName;
+  bool FieldNameSet;
+  int Component;
+  double ScalarRange[2];
+  bool ScalarRangeSet;
+  bool SavedOrientationState;
+  bool SavedAnnotationState;
+
 };
 
 const char* vtkPVRenderViewForAssembly::vtkInternals::CODING_TABLE = "_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -904,4 +930,132 @@ void vtkPVRenderViewForAssembly::CaptureActiveRepresentation()
   this->InsideRGBDump = true;
   this->Render(false, false);
   this->InsideRGBDump = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::SetDrawCells(int choice)
+{
+  bool mod = false;
+  if (choice)
+    {
+    if (this->Internal->FieldAssociation != VTK_SCALAR_MODE_USE_CELL_FIELD_DATA)
+      {
+      this->Internal->FieldAssociation = VTK_SCALAR_MODE_USE_CELL_FIELD_DATA;
+      mod = true;
+      }
+    }
+  else
+    {
+    if (this->Internal->FieldAssociation != VTK_SCALAR_MODE_USE_POINT_FIELD_DATA)
+      {
+      this->Internal->FieldAssociation = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
+      mod = true;
+      }
+    }
+
+  if (mod)
+    {
+    if (this->Internal->FieldNameSet)
+      {
+      this->Internal->ValuePasses->SetInputArrayToProcess
+        (this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
+      }
+    else
+      {
+      this->Internal->ValuePasses->SetInputArrayToProcess
+        (this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
+      }
+    this->Modified();
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::SetArrayNameToDraw(const char *name)
+{
+  if ( !this->Internal->FieldNameSet
+       || (this->Internal->FieldName != name) )
+    {
+    this->Internal->FieldName = name;
+    this->Internal->FieldNameSet = true;
+    this->Internal->ValuePasses->SetInputArrayToProcess
+      (this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
+    this->Modified();
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::SetArrayNumberToDraw(int fieldAttributeType)
+{
+  if ( this->Internal->FieldNameSet
+       || (this->Internal->FieldAttributeType != fieldAttributeType) )
+    {
+    this->Internal->FieldAttributeType = fieldAttributeType;
+    this->Internal->FieldNameSet = false;
+    this->Internal->ValuePasses->SetInputArrayToProcess
+      (this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
+    this->Modified();
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::SetArrayComponentToDraw(int comp)
+{
+  if (this->Internal->Component != comp)
+    {
+    this->Internal->Component = comp;
+    this->Internal->ValuePasses->SetInputComponentToProcess(comp);
+    this->Modified();
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::SetScalarRange(double min, double max)
+{
+  if (this->Internal->ScalarRange[0] != min ||
+      this->Internal->ScalarRange[1] != max)
+    {
+    this->Internal->ScalarRange[0] = min;
+    this->Internal->ScalarRange[1] = max;
+    this->Internal->ValuePasses->SetScalarRange(min, max);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::StartCaptureValues()
+{
+  this->Internal->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
+  if (this->Internal->SavedRenderPass)
+    {
+    this->Internal->SavedRenderPass->Register(NULL);
+    }
+  this->Internal->SavedOrientationState = this->OrientationWidget->GetEnabled();
+  this->Internal->SavedAnnotationState = this->ShowAnnotation;
+  this->SetOrientationAxesVisibility(false);
+  this->SetShowAnnotation(false);
+
+  if (this->Internal->FieldNameSet)
+    {
+    this->Internal->ValuePasses->SetInputArrayToProcess
+      (this->Internal->FieldAssociation, this->Internal->FieldName.c_str());
+    }
+  else
+    {
+    this->Internal->ValuePasses->SetInputArrayToProcess
+      (this->Internal->FieldAssociation, this->Internal->FieldAttributeType);
+    }
+
+  this->SynchronizedRenderers->SetRenderPass(this->Internal->ValuePasses.GetPointer());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderViewForAssembly::StopCaptureValues()
+{
+  this->SynchronizedRenderers->SetRenderPass(this->Internal->SavedRenderPass);
+  if (this->Internal->SavedRenderPass)
+    {
+    this->Internal->SavedRenderPass->UnRegister(NULL);
+    }
+  this->SetOrientationAxesVisibility(this->Internal->SavedOrientationState);
+  this->SetShowAnnotation(this->Internal->SavedAnnotationState);
 }
