@@ -18,11 +18,14 @@
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
@@ -82,6 +85,8 @@ namespace
     return NULL;
     }
 };
+
+bool vtkSMViewProxy::TransparentBackground = false;
 
 vtkStandardNewMacro(vtkSMViewProxy);
 //----------------------------------------------------------------------------
@@ -425,8 +430,192 @@ int vtkSMViewProxy::ReadXMLAttributes(
   return 1;
 }
 
+class vtkSMViewProxy::vtkRendererSaveInfo
+{
+public:
+  vtkRendererSaveInfo(vtkRenderer* renderer)
+    : Gradient(renderer->GetGradientBackground())
+    , Textured(renderer->GetTexturedBackground())
+    , Red(renderer->GetBackground()[0])
+    , Green(renderer->GetBackground()[1])
+    , Blue(renderer->GetBackground()[2])
+  {
+  }
+
+  const bool Gradient;
+  const bool Textured;
+  const double Red;
+  const double Green;
+  const double Blue;
+};
+
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
+{
+  vtkRenderWindow* window = this->GetRenderWindow();
+
+  if (window && this->TransparentBackground)
+    {
+    vtkRendererCollection* renderers = window->GetRenderers();
+    vtkRenderer* renderer = renderers->GetFirstRenderer();
+    while (renderer)
+      {
+      if (renderer->GetErase())
+        {
+        // Found a background-writing renderer.
+        break;
+        }
+
+      renderer = renderers->GetNextItem();
+      }
+
+    if (!renderer)
+      {
+      // No renderer?
+      return NULL;
+      }
+
+    vtkRendererSaveInfo* info = this->PrepareRendererBackground(renderer, 255, 255, 255, true);
+    vtkImageData* captureWhite = this->CaptureWindowSingle(magnification);
+
+    this->PrepareRendererBackground(renderer, 0, 0, 0, false);
+    vtkImageData* captureBlack = this->CaptureWindowSingle(magnification);
+
+    vtkImageData* capture = vtkImageData::New();
+    capture->CopyStructure(captureWhite);
+    capture->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
+
+    const unsigned char* white;
+    const unsigned char* black;
+    unsigned char* out;
+    vtkIdType whiteStep[3];
+    vtkIdType blackStep[3];
+    vtkIdType outStep[3];
+
+    white = static_cast<const unsigned char*>(captureWhite->GetScalarPointerForExtent(captureWhite->GetExtent()));
+    black = static_cast<const unsigned char*>(captureBlack->GetScalarPointerForExtent(captureBlack->GetExtent()));
+    out = static_cast<unsigned char*>(capture->GetScalarPointerForExtent(capture->GetExtent()));
+
+    captureWhite->GetIncrements(whiteStep[0], whiteStep[1], whiteStep[2]);
+    captureBlack->GetIncrements(blackStep[0], blackStep[1], blackStep[2]);
+    capture->GetIncrements(outStep[0], outStep[1], outStep[2]);
+
+    int* extent = capture->GetExtent();
+
+    for (int i = extent[4]; i <= extent[5]; ++i)
+      {
+      const unsigned char* whiteRow = white;
+      const unsigned char* blackRow = black;
+      unsigned char* outRow = out;
+
+      for (int j = extent[2]; j <= extent[3]; ++j)
+        {
+        const unsigned char* whitePx = whiteRow;
+        const unsigned char* blackPx = blackRow;
+        unsigned char* outPx = outRow;
+
+        for (int k = extent[0]; k <= extent[1]; ++k)
+          {
+          if (whitePx[0] == blackPx[0] &&
+              whitePx[1] == blackPx[1] &&
+              whitePx[2] == blackPx[2])
+            {
+            outPx[0] = whitePx[0];
+            outPx[1] = whitePx[1];
+            outPx[2] = whitePx[2];
+            outPx[3] = 255;
+            }
+          else
+            {
+            // Some kind of translucency; use values from the black capture.
+            // The opacity is the derived from the V difference of the HSV
+            // colors.
+            double whiteHSV[3];
+            double blackHSV[3];
+
+            vtkMath::RGBToHSV(whitePx[0] / 255., whitePx[1] / 255., whitePx[2] / 255.,
+                              whiteHSV + 0, whiteHSV + 1, whiteHSV + 2);
+            vtkMath::RGBToHSV(blackPx[0] / 255., blackPx[1] / 255., blackPx[2] / 255.,
+                              blackHSV + 0, blackHSV + 1, blackHSV + 2);
+            double alpha = 1. - (whiteHSV[2] - blackHSV[2]);
+
+            outPx[0] = static_cast<unsigned char>(blackPx[0] / alpha);
+            outPx[1] = static_cast<unsigned char>(blackPx[1] / alpha);
+            outPx[2] = static_cast<unsigned char>(blackPx[2] / alpha);
+            outPx[3] = static_cast<unsigned char>(255 * alpha);
+            }
+
+          whitePx += whiteStep[0];
+          blackPx += blackStep[0];
+          outPx += outStep[0];
+          }
+
+        whiteRow += whiteStep[1];
+        blackRow += blackStep[1];
+        outRow += outStep[1];
+        }
+
+      white += whiteStep[2];
+      black += blackStep[2];
+      out += outStep[2];
+
+      if (white[0] == black[0] &&
+          white[1] == black[1] &&
+          white[2] == black[2])
+        {
+        out[0] = white[0];
+        out[1] = white[1];
+        out[2] = white[2];
+        out[3] = 1;
+        }
+      else
+        {
+        }
+      }
+
+    this->RestoreRendererBackground(renderer, info);
+
+    captureWhite->Delete();
+    captureBlack->Delete();
+    return capture;
+    }
+
+  // Fall back to using no transparency.
+  return this->CaptureWindowSingle(magnification);
+}
+
+//----------------------------------------------------------------------------
+vtkSMViewProxy::vtkRendererSaveInfo* vtkSMViewProxy::PrepareRendererBackground(
+  vtkRenderer* renderer,
+  double r, double g, double b, bool save)
+{
+  vtkRendererSaveInfo* info = NULL;
+
+  if (save)
+    {
+    info = new vtkRendererSaveInfo(renderer);
+    }
+
+  renderer->SetGradientBackground(false);
+  renderer->SetTexturedBackground(false);
+  renderer->SetBackground(r, g, b);
+
+  return info;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxy::RestoreRendererBackground(vtkRenderer* renderer,
+                                               vtkRendererSaveInfo* info)
+{
+  renderer->SetGradientBackground(info->Gradient);
+  renderer->SetTexturedBackground(info->Textured);
+  renderer->SetBackground(info->Red, info->Green, info->Blue);
+
+  delete info;
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
 {
   if (this->ObjectsCreated)
     {
@@ -490,6 +679,12 @@ int vtkSMViewProxy::WriteImage(const char* filename,
 void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxy::SetTransparentBackground(bool val)
+{
+  vtkSMViewProxy::TransparentBackground = val;
 }
 
 //----------------------------------------------------------------------------

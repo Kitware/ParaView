@@ -21,6 +21,7 @@
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTrace.h"
+#include "vtkSMViewProxy.h"
 #include "vtkSMViewLayoutProxy.h"
 
 #include <cassert>
@@ -182,6 +183,13 @@ void vtkPVGeneralSettings::SetMultiViewImageBorderColor(double r, double g, doub
 void vtkPVGeneralSettings::SetMultiViewImageBorderWidth(int width)
 {
   vtkSMViewLayoutProxy::SetMultiViewImageBorderWidth(width);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeneralSettings::SetTransparentBackground(bool val)
+{
+  vtkSMViewProxy::SetTransparentBackground(val);
   this->Modified();
 }
 

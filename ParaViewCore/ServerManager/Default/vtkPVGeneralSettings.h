@@ -127,6 +127,10 @@ public:
   void SetMultiViewImageBorderColor(double r, double g, double b);
   void SetMultiViewImageBorderWidth(int width);
 
+  // Description:
+  // Forwarded to vtkSMViewProxy.
+  void SetTransparentBackground(bool val);
+
 //BTX
 protected:
   vtkPVGeneralSettings();
