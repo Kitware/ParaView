@@ -11,7 +11,7 @@ if(NOT MPI_Fortran_LIBRARIES)
   find_package(MPI)
 endif()
 
-ADD_EXECUTABLE(FortranPoissonSolver FEDriver.f90 FEFortranAdaptor.f90 FECxxAdaptor.cxx)
+ADD_EXECUTABLE(FortranPoissonSolver FEDriver.f90 FEFortranAdaptor.f90 FECxxAdaptor.cxx Box.f90)
 TARGET_LINK_LIBRARIES(FortranPoissonSolver vtkPVPythonCatalyst ${MPI_Fortran_LIBRARIES})
 
 file(COPY SampleScripts/coproc.py DESTINATION ${CMAKE_BINARY_DIR})
