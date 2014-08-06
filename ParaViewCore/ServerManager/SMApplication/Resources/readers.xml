@@ -2988,9 +2988,9 @@
                        file_description="Xdmf3 Reader" />
       </Hints>
       <!-- End of Xdmf3Reader -->
-#endif //Module_vtkIOXdmf3
 
     </SourceProxy>
+#endif
 
     <!-- End of "internal_sources" -->
   </ProxyGroup>
