@@ -1,5 +1,6 @@
 #include "FEDataStructures.h"
 #include <mpi.h>
+#include <iostream>
 
 #include "FEAdaptor.h"
 
@@ -47,7 +48,7 @@ int main(int argc, char* argv[])
   MPI_Comm subcommunicator;
   MPI_Comm_create(MPI_COMM_WORLD, subgroup, &subcommunicator);
 
-  if (myrank < subranks.size())
+  if (myrank < static_cast<int>(subranks.size()))
     {
     int newrank;
     MPI_Comm_rank(MPI_COMM_WORLD, &newrank);

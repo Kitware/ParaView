@@ -9,6 +9,7 @@ endif()
 
 add_executable(MPISubCommunicatorExample FEDriver.cxx FEDataStructures.cxx FEAdaptor.cxx)
 target_link_libraries(MPISubCommunicatorExample LINK_PRIVATE vtkPVPythonCatalyst vtkParallelMPI)
+include(vtkModuleMacros)
 include(vtkMPI)
 vtk_mpi_link(MPISubCommunicatorExample)
 
