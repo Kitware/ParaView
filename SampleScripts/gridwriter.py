@@ -1,5 +1,4 @@
-try: paraview.simple
-except: from paraview.simple import *
+from paraview.simple import *
 
 from paraview import coprocessing
 
