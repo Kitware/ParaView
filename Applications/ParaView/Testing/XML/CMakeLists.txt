@@ -114,7 +114,7 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   set (catalyst_live_tests
     ${CMAKE_CURRENT_SOURCE_DIR}/CatalystLiveSetBreakpoint.xml)
   set (CATALYST_SIMULATION CatalystWaveletDriver.py)
-  set (INSITU_SCRIPT CatalystWaveletCoprocessing 21)
+  set (INSITU_SCRIPT CatalystWaveletCoprocessing 22)
 
   foreach (tname ${catalyst_live_tests})
     add_pv_test("pv" "_DISABLE_C"
