@@ -71,6 +71,7 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->AllowErrorInOutput = 0;
   this->TimeOut = 300;
   this->ServerExitTimeOut = 60;
+  this->ScriptExitTimeOut = 180;
   this->TestRenderServer = 0;
   this->TestServer = 0;
   this->TestScript = 0;
@@ -1025,8 +1026,8 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
     vtksysProcess_WaitForExit(*exitIter, &this->ServerExitTimeOut);
     }
-  // the script must finish quickly as well
-  vtksysProcess_WaitForExit(script, &this->ServerExitTimeOut);
+  // We wait a longer time for the script to finish
+  vtksysProcess_WaitForExit(script, &this->ScriptExitTimeOut);
 
   for( std::vector<vtksysProcess*>::iterator exitIter = renderServers.begin();
        exitIter != renderServers.end();

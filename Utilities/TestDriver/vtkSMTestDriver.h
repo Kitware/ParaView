@@ -141,6 +141,7 @@ private:
 
   double TimeOut;
   double ServerExitTimeOut; // time to wait for servers to finish.
+  double ScriptExitTimeOut; // time to wait for the script to finish.
   int TestRenderServer;
   int TestServer;
   int TestScript;  // additional process to run
