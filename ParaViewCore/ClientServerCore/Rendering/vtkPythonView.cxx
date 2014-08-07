@@ -21,6 +21,7 @@
 #include "vtkInformationRequestKey.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSmartPyObject.h"
 #include "vtkPythonRepresentation.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
@@ -477,15 +478,16 @@ int vtkPythonView::RunSimpleStringWithCustomLocals(const char* code)
   buffer.erase(std::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
 
   PyObject* context = this->Internals->GetCustomLocalsPyObject();
-  PyObject* result = PyRun_String(const_cast<char*>(buffer.c_str()), Py_file_input, context, context);
+  vtkSmartPyObject result(PyRun_String(const_cast<char*>(buffer.c_str()),
+                                       Py_file_input, context, context));
 
-  if (result == NULL)
+  if (result)
     {
     PyErr_Print();
     return -1;
     }
 
-  Py_DECREF(result);
+  result = NULL;
   if (Py_FlushLine())
     {
     PyErr_Clear();

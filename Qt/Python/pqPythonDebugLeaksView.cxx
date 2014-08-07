@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPythonUtil.h"
 #include "vtkQtDebugLeaksModel.h"
+#include "vtkSmartPyObject.h"
 
 //-----------------------------------------------------------------------------
 namespace {
@@ -79,22 +80,20 @@ void pqPythonDebugLeaksView::onClassNameDoubleClicked(const QString& className)
 void pqPythonDebugLeaksView::addObjectToPython(vtkObjectBase* object)
 {
 
-  PyObject* pyObj = vtkPythonUtil::GetObjectFromPointer(object);
+  vtkSmartPyObject pyObj(vtkPythonUtil::GetObjectFromPointer(object));
   PyDict_SetItemString(consoleContext(), "obj", pyObj);
-  Py_DECREF(pyObj);
 }
 
 //-----------------------------------------------------------------------------
 void pqPythonDebugLeaksView::addObjectsToPython(const QList<vtkObjectBase*>& objects)
 {
-  PyObject* pyListObj = PyList_New(objects.size());
+  vtkSmartPyObject pyListObj(PyList_New(objects.size()));
 
   for (int i = 0; i < objects.size(); ++i)
     {
     PyObject* pyObj = vtkPythonUtil::GetObjectFromPointer(objects[i]);
-    PyList_SET_ITEM(pyListObj, i, pyObj);
+    PyList_SET_ITEM(pyListObj.GetPointer(), i, pyObj);
     }
 
   PyDict_SetItemString(consoleContext(), "objs", pyListObj);
-  Py_DECREF(pyListObj);
 }

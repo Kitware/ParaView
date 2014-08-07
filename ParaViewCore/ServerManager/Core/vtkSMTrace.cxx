@@ -17,6 +17,7 @@
 # include "vtkPython.h"
 # include "vtkPythonInterpreter.h"
 # include "vtkPythonUtil.h"
+# include "vtkSmartPyObject.h"
 #endif
 
 #include "vtkSMTrace.h"
@@ -36,59 +37,8 @@
 #include <map>
 #include <cassert>
 
-#ifdef PARAVIEW_ENABLE_PYTHON
-// Smart pointer for PyObjects. Calls Py_XDECREF when scope ends.
-class SmartPyObject
-{
-  PyObject *Object;
-
-public:
-  SmartPyObject(PyObject *obj = NULL)
-    : Object(obj)
-    {
-    }
-  ~SmartPyObject()
-    {
-    Py_XDECREF(this->Object);
-    }
-  PyObject *operator->() const
-    {
-    return this->Object;
-    }
-  PyObject *GetPointer() const
-    {
-    return this->Object;
-    }
-  operator bool () const
-    {
-    return this->Object != NULL;
-    }
-  operator PyObject* () const
-    {
-    return this->Object;
-    }
-
-  void TakeReference(PyObject* obj)
-    {
-    if (this->Object)
-      {
-      Py_DECREF(this->Object);
-      }
-    this->Object = obj;
-    }
-  PyObject* ReleaseReference()
-    {
-    PyObject* ret = this->Object;
-    this->Object = NULL;
-    return ret;
-    }
-private:
-  SmartPyObject(const SmartPyObject&);
-  void operator=(const SmartPyObject&) const;
-
-};
-#else
-class SmartPyObject
+#ifndef PARAVIEW_ENABLE_PYTHON
+class vtkSmartPyObject
 {
 public:
   operator bool () const
@@ -101,9 +51,9 @@ public:
 class vtkSMTrace::vtkInternals
 {
 public:
-  SmartPyObject TraceModule;
-  SmartPyObject CreateItemFunction;
-  SmartPyObject UntraceableException;
+  vtkSmartPyObject TraceModule;
+  vtkSmartPyObject CreateItemFunction;
+  vtkSmartPyObject UntraceableException;
 };
 
 vtkSmartPointer<vtkSMTrace> vtkSMTrace::ActiveTracer;
@@ -167,14 +117,14 @@ vtkStdString vtkSMTrace::GetState(
   vtkPythonInterpreter::Initialize();
   try
     {
-    SmartPyObject module(PyImport_ImportModule("paraview.smstate"));
+    vtkSmartPyObject module(PyImport_ImportModule("paraview.smstate"));
     if (!module || PyErr_Occurred())
       {
       vtkGenericWarningMacro("Failed to import paraview.smstate module.");
       throw 1;
       }
 
-    SmartPyObject result(
+    vtkSmartPyObject result(
       PyObject_CallMethod(module,
         const_cast<char*>("get_state"),
         const_cast<char*>("(ii)"), propertiesToTraceOnCreate,
@@ -214,7 +164,7 @@ vtkSMTrace* vtkSMTrace::StartTrace()
       }
     else
       {
-      SmartPyObject _start_trace_internal(
+      vtkSmartPyObject _start_trace_internal(
         PyObject_CallMethod(vtkSMTrace::ActiveTracer->GetTraceModule(),
           const_cast<char*>("_start_trace_internal"), NULL));
       vtkSMTrace::ActiveTracer->CheckForError();
@@ -242,7 +192,7 @@ vtkStdString vtkSMTrace::StopTrace()
   vtkSMTrace::ActiveTracer = NULL;
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-  SmartPyObject _stop_trace_internal(
+  vtkSmartPyObject _stop_trace_internal(
     PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("_stop_trace_internal"), NULL));
   if (active->CheckForError() == false)
     {
@@ -273,7 +223,7 @@ vtkStdString vtkSMTrace::GetCurrentTrace()
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   vtkSMTrace* active = vtkSMTrace::ActiveTracer;
-  SmartPyObject get_current_trace_output(
+  vtkSmartPyObject get_current_trace_output(
     PyObject_CallMethod(active->GetTraceModule(), const_cast<char*>("get_current_trace_output"), NULL));
   if (active->CheckForError() == false && get_current_trace_output)
     {
@@ -291,13 +241,13 @@ void vtkSMTrace::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-const SmartPyObject& vtkSMTrace::GetTraceModule() const
+const vtkSmartPyObject& vtkSMTrace::GetTraceModule() const
 {
   return this->Internals->TraceModule;
 }
 
 //----------------------------------------------------------------------------
-const SmartPyObject& vtkSMTrace::GetCreateItemFunction() const
+const vtkSmartPyObject& vtkSMTrace::GetCreateItemFunction() const
 {
   return this->Internals->CreateItemFunction;
 }
@@ -333,8 +283,8 @@ class vtkSMTrace::TraceItemArgs::vtkInternals
 {
 public:
 #ifdef PARAVIEW_ENABLE_PYTHON
-  SmartPyObject KWArgs;
-  SmartPyObject PositionalArgs;
+  vtkSmartPyObject KWArgs;
+  vtkSmartPyObject PositionalArgs;
   vtkInternals()
     {
     }
@@ -386,8 +336,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject keyObj(PyString_FromString(key));
-    SmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(val));
+    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(val));
     assert(valObj && keyObj);
 
     int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, valObj);
@@ -408,8 +358,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject keyObj(PyString_FromString(key));
-    SmartPyObject valObj;
+    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject valObj;
     if (val == NULL)
       {
       PyObject* none = Py_None;
@@ -439,8 +389,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject keyObj(PyString_FromString(key));
-    SmartPyObject valObj(PyInt_FromLong(val));
+    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject valObj(PyInt_FromLong(val));
     assert(keyObj && valObj);
 
     int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, valObj);
@@ -461,8 +411,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject keyObj(PyString_FromString(key));
-    SmartPyObject valObj(PyFloat_FromDouble(val));
+    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject valObj(PyFloat_FromDouble(val));
     assert(keyObj && valObj);
 
     int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, valObj);
@@ -482,8 +432,8 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject keyObj(PyString_FromString(key));
-    SmartPyObject valObj(PyBool_FromLong(val? 1 : 0));
+    vtkSmartPyObject keyObj(PyString_FromString(key));
+    vtkSmartPyObject valObj(PyBool_FromLong(val? 1 : 0));
     assert(keyObj && valObj);
 
     int ret = PyDict_SetItem(this->Internals->GetKWArgs(), keyObj, valObj);
@@ -502,7 +452,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(vtkObject* val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(val));
+    vtkSmartPyObject valObj(vtkPythonUtil::GetObjectFromPointer(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
@@ -520,7 +470,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(const char* val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject valObj(PyString_FromString(val));
+    vtkSmartPyObject valObj(PyString_FromString(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
@@ -537,7 +487,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(int val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject valObj(PyInt_FromLong(val));
+    vtkSmartPyObject valObj(PyInt_FromLong(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
@@ -554,7 +504,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(double val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject valObj(PyFloat_FromDouble(val));
+    vtkSmartPyObject valObj(PyFloat_FromDouble(val));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
@@ -571,7 +521,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(bool val)
   if (vtkSMTrace::GetActiveTracer())
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    SmartPyObject valObj(PyBool_FromLong(val? 1 : 0));
+    vtkSmartPyObject valObj(PyBool_FromLong(val? 1 : 0));
     assert(valObj);
     int ret = PyList_Append(this->Internals->GetPositionalArgs(), valObj);
     (void)ret;
@@ -590,7 +540,7 @@ vtkSMTrace::TraceItemArgs& vtkSMTrace::TraceItemArgs::arg(bool val)
 class vtkSMTrace::TraceItem::TraceItemInternals
 {
 public:
-  SmartPyObject PyItem;
+  vtkSmartPyObject PyItem;
 };
 //----------------------------------------------------------------------------
 vtkSMTrace::TraceItem::TraceItem(const char* type)
@@ -607,7 +557,7 @@ vtkSMTrace::TraceItem::~TraceItem()
   vtkSMTrace* tracer = vtkSMTrace::GetActiveTracer();
   if (tracer && this->Internals->PyItem)
     {
-    SmartPyObject reply(
+    vtkSmartPyObject reply(
       PyObject_CallMethod(this->Internals->PyItem,
         const_cast<char*>("finalize"), NULL));
     tracer->CheckForError();
@@ -636,7 +586,7 @@ void vtkSMTrace::TraceItem::operator=(const TraceItemArgs& arguments)
     assert(tracer->GetTraceModule());
     assert(tracer->GetCreateItemFunction());
 
-    SmartPyObject args(PyTuple_New(3));
+    vtkSmartPyObject args(PyTuple_New(3));
     PyTuple_SET_ITEM(args.GetPointer(), 0, PyString_FromString(this->Type));
     if (arguments.Internals->PositionalArgs)
       {

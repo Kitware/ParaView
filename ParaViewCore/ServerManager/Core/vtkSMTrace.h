@@ -61,7 +61,7 @@
 #include "vtkStdString.h" // needed for ivar
 
 class vtkSMProxy;
-class SmartPyObject;
+class vtkSmartPyObject;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMTrace : public vtkSMObject
 {
@@ -200,8 +200,8 @@ private:
   vtkInternals* Internals;
 
   friend class TraceItem;
-  const SmartPyObject& GetTraceModule() const;
-  const SmartPyObject& GetCreateItemFunction() const;
+  const vtkSmartPyObject& GetTraceModule() const;
+  const vtkSmartPyObject& GetCreateItemFunction() const;
 };
 
 #define SM_SCOPED_TRACE_0(x, y) x ## y
