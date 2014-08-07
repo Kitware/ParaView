@@ -447,6 +447,9 @@ public:
   const double Red;
   const double Green;
   const double Blue;
+private:
+  vtkRendererSaveInfo(const vtkRendererSaveInfo&); // Not implemented
+  void operator=(const vtkRendererSaveInfo&); // Not implemented
 };
 
 //----------------------------------------------------------------------------
