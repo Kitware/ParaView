@@ -69,7 +69,6 @@ ADD_PARAVIEW_PLUGIN(
   CoProcessingPlugin
   #"${CoProcessing_VERSION_MAJOR}.${CoProcessing_VERSION_MINOR}.${CoProcessing_VERSION_PATCH}"
   "0.1.0"
-  SERVER_MANAGER_XML Resources/servermanagercp.xml
   GUI_INTERFACES
     ${PARAVIEW_PLUGIN_IFACES}
     ${PARAVIEW_PLUGIN_IFACES2}

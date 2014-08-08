@@ -132,8 +132,12 @@ class WriterAccessor(smtrace.RealProxyAccessor):
             print "WARNING: Could not find", xmlname, "writer in", xmlgroup, \
                 "XML group. This is not a problem as long as the writer is available with " \
                 "the ParaView build used by the simulation code."
-            return servermanager._make_name_valid(xmlname)
-        return servermanager._make_name_valid(prototype.GetXMLLabel())
+            ctor = servermanager._make_name_valid(xmlname)
+        else:
+            ctor = servermanager._make_name_valid(prototype.GetXMLLabel())
+        # we create the writer proxy such that it is not registered with the
+        # ParaViewPipelineController, so its state is not sent to ParaView Live.
+        return "servermanager.%s.%s" % (xmlgroup, ctor)
 
     def trace_ctor(self, ctor, filter, ctor_args=None, skip_assignment=False):
         xmlElement = self.get_object().GetHints().FindNestedElementByName("WriterProxy")

@@ -115,9 +115,12 @@ class CoProcessor(object):
            write-frequencies set on the writers."""
         timestep = datadescription.GetTimeStep()
         for writer in self.__WritersList:
-            if (timestep % writer.cpFrequency) == 0 or \
+            frequency = writer.parameters.GetProperty(
+                "WriteFrequency").GetElement(0)
+            fileName = writer.parameters.GetProperty("FileName").GetElement(0)
+            if (timestep % frequency) == 0 or \
                     datadescription.GetForceOutput() == True:
-                writer.FileName = writer.cpFileName.replace("%t", str(timestep))
+                writer.FileName = fileName.replace("%t", str(timestep))
                 writer.UpdatePipeline(datadescription.GetTime())
 
     def WriteImages(self, datadescription, rescale_lookuptable=False):
@@ -157,8 +160,8 @@ class CoProcessor(object):
            # Create the vtkLiveInsituLink i.e.  the "link" to the visualization processes.
            self.__LiveVisualizationLink = servermanager.vtkLiveInsituLink()
 
-           # Tell vtkLiveInsituLink what host/port must it connect to for the visualization
-           # process.
+           # Tell vtkLiveInsituLink what host/port must it connect to
+           # for the visualization process.
            self.__LiveVisualizationLink.SetHostname(hostname)
            self.__LiveVisualizationLink.SetInsituPort(int(port))
 
@@ -227,11 +230,32 @@ class CoProcessor(object):
            write the output files appropriately in WriteData() is called."""
         if not isinstance(writer, servermanager.Proxy):
             raise RuntimeError, "Invalid 'writer' argument passed to RegisterWriter."
+        writerParametersProxy = self.WriterParametersProxy(
+            writer, filename, freq)
+
         writer.FileName = filename
-        writer.add_attribute("cpFrequency", freq)
-        writer.add_attribute("cpFileName", filename)
+        writer.add_attribute("parameters", writerParametersProxy)
         self.__WritersList.append(writer)
+
         return writer
+
+    def WriterParametersProxy(self, writer, filename, freq):
+        """Creates a client only proxy that will be synchronized with ParaView
+        Live, allowing a user to set filename and frequency.
+        """
+        controller = servermanager.ParaViewPipelineController()
+        # assume that a client only proxy with the same name as a writer
+        # is available in "filters"
+        proxy = servermanager.ProxyManager().NewProxy(
+            "filters", writer.GetXMLName())
+        controller.PreInitializeProxy(proxy)
+        proxy.GetProperty("Input").SetInputConnection(
+            0, writer.Input.SMProxy, 0)
+        proxy.GetProperty("FileName").SetElement(0, filename)
+        proxy.GetProperty("WriteFrequency").SetElement(0, freq)
+        controller.PostInitializeProxy(proxy)
+        controller.RegisterPipelineProxy(proxy)
+        return proxy
 
     def RegisterView(self, view, filename, freq, fittoscreen, magnification, width, height):
         """Register a view for image capture with extra meta-data such

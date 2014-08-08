@@ -100,7 +100,6 @@ target_link_libraries(vtkPVServerManagerApplication
 #------------------------------------------------------------------------------
 SET(requestedResourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/catalyst.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
