@@ -52,9 +52,10 @@ public:
   pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager);
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
-  virtual void updateEnableState();
+  /// Updates the enabled state.  The actions in toolbars will
+  /// be updated automatically.  The containing widget of other actions
+  /// should connect its aboutToShow signal to this slot.
+  virtual void updateEnableState(bool updateOnlyToolbars = false);
 
   /// Creates a filter of the given type.
   static pqPipelineSource* createFilter(
@@ -64,11 +65,13 @@ protected slots:
   /// Called when the action is triggered.
   virtual void onTriggered(const QString& group, const QString& name)
     { pqFiltersMenuReaction::createFilter(group, name); } 
+  virtual void setEnableStateDirty();
 
 private:
   Q_DISABLE_COPY(pqFiltersMenuReaction)
 
   pqTimer Timer;
+  bool IsDirty;
 };
 
 #endif

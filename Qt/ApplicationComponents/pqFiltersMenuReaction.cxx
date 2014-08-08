@@ -115,7 +115,7 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
 : Superclass(menuManager)
 {
   QObject::connect(&this->Timer, SIGNAL(timeout()),
-    this, SLOT(updateEnableState()));
+    this, SLOT(setEnableStateDirty()));
   this->Timer.setInterval(10);
   this->Timer.setSingleShot(true);
 
@@ -140,18 +140,31 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
 
   QObject::connect(pqApplicationCore::instance(),
                    SIGNAL(updateMasterEnableState(bool)),
-                   this, SLOT(updateEnableState()));
+                   this, SLOT(setEnableStateDirty()));
 
-  this->updateEnableState();
+  // force the state to compute the first time
+  this->IsDirty = true;
+  this->updateEnableState(false);
 }
 
 //-----------------------------------------------------------------------------
-void pqFiltersMenuReaction::updateEnableState()
+void pqFiltersMenuReaction::setEnableStateDirty()
 {
+  this->IsDirty = true;
+  this->updateEnableState(true);
+}
+
+//-----------------------------------------------------------------------------
+void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
+{
+  if (!this->IsDirty)
+    {
+    return;
+    }
   // Impossible to validate anything without any SessionProxyManager
   if(!vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager())
     {
-    this->Timer.start(100); // Try later
+    pqTimer::singleShot(100,this,SLOT(updateEnableState())); // Try later
     return;
     }
 
@@ -212,7 +225,8 @@ void pqFiltersMenuReaction::updateEnableState()
     static_cast<pqProxyGroupMenuManager*>(this->parent());
   mgr->setEnabled(enabled);
   bool some_enabled = false;
-  foreach (QAction* action, mgr->actions())
+  const QList<QAction*> &actionsList = updateOnlyToolbars ? mgr->actionsInToolbars() : mgr->actions();
+  foreach (QAction* action, actionsList)
     {
     vtkSMProxy* prototype = mgr->getPrototype(action);
     if (!prototype || !enabled)
@@ -284,6 +298,9 @@ void pqFiltersMenuReaction::updateEnableState()
     {
     mgr->setEnabled(false);
     }
+  // If we updated only the toolbars, then the state of other actions may still
+  // be dirty
+  this->IsDirty = updateOnlyToolbars;
 }
 
 //-----------------------------------------------------------------------------

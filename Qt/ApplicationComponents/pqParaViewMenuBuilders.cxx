@@ -169,8 +169,15 @@ void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu,
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewFilters");
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
-  new pqFiltersMenuReaction(mgr);
-  pqPVApplicationCore::instance()->registerForQuicklaunch(mgr->widgetActionsHolder());
+  pqFiltersMenuReaction *menuReaction = new pqFiltersMenuReaction(mgr);
+  pqPVApplicationCore *appCore = pqPVApplicationCore::instance();
+  appCore->registerForQuicklaunch(mgr->widgetActionsHolder());
+
+  // Connect the filters menu about to show and the quick-launch dialog about to show
+  // to update the enabled/disabled state of the menu items via the
+  // pqFiltersMenuReaction
+  QObject::connect(&menu, SIGNAL(aboutToShow()),menuReaction,SLOT(updateEnableState()));
+  QObject::connect(appCore,SIGNAL(aboutToShowQuickLaunch()),menuReaction,SLOT(updateEnableState()));
 
   if (mainWindow)
     {

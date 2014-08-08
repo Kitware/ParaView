@@ -87,6 +87,9 @@ public:
   /// Returns the list of actions in a category.
   QList<QAction*> actions(const QString& category);
 
+  /// Returns this list of actions that appear in toolbars
+  QList<QAction*> actionsInToolbars();
+
   /// Returns whether or not the category's toolbar should be hidden initially.
   bool hideForTests(const QString& category) const;
 
