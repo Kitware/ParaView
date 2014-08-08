@@ -41,6 +41,8 @@ set(Module_SRCS
   pqPythonScriptEditor.h
   pqPythonShell.cxx
   pqPythonShell.h
+  pqPythonSyntaxHighlighter.cxx
+  pqPythonSyntaxHighlighter.h
 )
 
 set (Module_MOC_HDRS
@@ -50,6 +52,7 @@ set (Module_MOC_HDRS
   pqPythonManager.h
   pqPythonScriptEditor.h
   pqPythonShell.h
+  pqPythonSyntaxHighlighter.h
 )
 
 set (Module_UI_FILES

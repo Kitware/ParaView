@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqPythonManager.h"
 #include "pqSettings.h"
+#include "pqPythonSyntaxHighlighter.h"
 
 #include <QApplication>
 #include <QAction>
@@ -50,11 +51,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextEdit>
 #include <QTextStream>
 
+#include <vtkPythonInterpreter.h>
+
+
 //-----------------------------------------------------------------------------
 pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p) : Superclass(p)
 {
   this->pythonManager = NULL;
   this->TextEdit = new QTextEdit;
+  this->TextEdit->setTabStopWidth(4);
   this->setCentralWidget(this->TextEdit);
   this->createActions();
   this->createMenus();
@@ -66,6 +71,8 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p) : Superclass(p)
     this, SLOT(documentWasModified()));
   this->resize(300,450);
   pqApplicationCore::instance()->settings()->restoreState("PythonScriptEditor", *this);
+  vtkPythonInterpreter::Initialize();
+  this->SyntaxHighlighter = new pqPythonSyntaxHighlighter(this->TextEdit,this);
 }
 
 //-----------------------------------------------------------------------------

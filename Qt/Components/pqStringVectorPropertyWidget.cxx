@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetSelectionHelper.h"
 #include "pqTextEdit.h"
 #include "pqFieldSelectionAdaptor.h"
+#include "vtkPVConfig.h"
 
 #include <QComboBox>
 #include <QLabel>
@@ -71,6 +72,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqPythonSyntaxHighlighter.h"
+#endif
 
 
 pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProperty,
@@ -87,6 +91,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     }
 
   bool multiline_text = false;
+  bool python = false;
   if (svp->GetHints())
     {
     vtkPVXMLElement* widgetHint = svp->GetHints()->FindNestedElementByName("Widget");
@@ -94,6 +99,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
       {
       multiline_text = true;
+      }
+    if (widgetHint && widgetHint->GetAttribute("syntax") &&
+      strcmp(widgetHint->GetAttribute("syntax"), "python") == 0)
+      {
+      python = true;
       }
     }
 
@@ -356,6 +366,16 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     textEdit->setAcceptRichText(false);
     textEdit->setTabStopWidth(2);
     textEdit->setLineWrapMode(QTextEdit::NoWrap);
+
+    if (python)
+      {
+#ifdef PARAVIEW_ENABLE_PYTHON
+      PV_DEBUG_PANELS() << "Python text edit:";
+      new pqPythonSyntaxHighlighter(textEdit,textEdit);
+#else
+      PV_DEBUG_PANELS() << "Python text edit when python not enabled:";
+#endif
+      }
 
     this->setChangeAvailableAsChangeFinished(false);
     this->addPropertyLink(textEdit, "plainText",
