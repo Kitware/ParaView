@@ -69,6 +69,7 @@ int main(int argc, char* argv[])
 vtkSMTestDriver::vtkSMTestDriver()
 {
   this->AllowErrorInOutput = 0;
+  this->ScriptIgnoreOutputErrors = 0;
   this->TimeOut = 300;
   this->ServerExitTimeOut = 60;
   this->ScriptExitTimeOut = 180;
@@ -308,7 +309,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
         strlen("--server-exit-timeout")) == 0)
       {
       this->ServerExitTimeOut = atoi(argv[i+1]);
-      fprintf(stderr, "The server exit timeout was set to %f.\n", 
+      fprintf(stderr, "The server exit timeout was set to %f.\n",
         this->ServerExitTimeOut);
       }
     if(strncmp(argv[i], "--server-preflags",17) == 0)
@@ -319,8 +320,14 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
     if (strncmp(argv[i], "--allow-errors", strlen("--allow-errors"))==0)
       {
       this->AllowErrorInOutput = 1;
-      fprintf(stderr, "The allow erros in output flag was set to %d.\n", 
+      fprintf(stderr, "The allow errors in output flag was set to %d.\n",
         this->AllowErrorInOutput);
+      }
+    if(strcmp(argv[i], "--script-ignore-output-errors") == 0)
+      {
+      this->ScriptIgnoreOutputErrors = 1;
+      fprintf(stderr, "The ScriptIgnoreOutputErrors flag was set to %d.\n",
+              this->ScriptIgnoreOutputErrors);
       }
     }
 
@@ -1001,7 +1008,9 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       output = "";
       this->WaitForAndPrintLine("script", script, output, timeout,
                                 ScriptStdOut, ScriptStdErr, 0);
-      if(!mpiError && this->OutputStringHasError("script", output))
+      if(!mpiError &&
+         (!this->ScriptIgnoreOutputErrors &&
+          this->OutputStringHasError("script", output)))
         {
         mpiError = 1;
         }
@@ -1026,7 +1035,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
     vtksysProcess_WaitForExit(*exitIter, &this->ServerExitTimeOut);
     }
-  // We wait a longer time for the script to finish
+  // We wait for the script to finish
   vtksysProcess_WaitForExit(script, &this->ScriptExitTimeOut);
 
   for( std::vector<vtksysProcess*>::iterator exitIter = renderServers.begin();

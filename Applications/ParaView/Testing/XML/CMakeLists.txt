@@ -119,7 +119,7 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   foreach (tname ${catalyst_live_tests})
     add_pv_test("pv" "_DISABLE_C"
       COMMAND
-      --script $<TARGET_FILE:pvbatch> -sym
+      --script-ignore-output-errors --script $<TARGET_FILE:pvbatch> -sym
       ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
       ${INSITU_SCRIPT}
 
@@ -132,7 +132,7 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
 
     add_pv_test(pvcs "_DISABLE_CS"
       COMMAND
-      --script-np 5
+      --script-np 5 --script-ignore-output-errors
       --script $<TARGET_FILE:pvbatch> -sym
       ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
       ${INSITU_SCRIPT}

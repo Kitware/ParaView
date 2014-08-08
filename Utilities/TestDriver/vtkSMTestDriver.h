@@ -149,10 +149,10 @@ private:
   std::string TestTiledDisplayTDX;
   std::string TestTiledDisplayTDY;
   int AllowErrorInOutput;
+  int ScriptIgnoreOutputErrors;
   int TestRemoteRendering;
   int TestMultiClient;
   int NumberOfServers;
-  
   // Specify if the -rc flag was passed or not
   int ReverseConnection;
 };
