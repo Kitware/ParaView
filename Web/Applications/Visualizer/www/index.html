@@ -9,7 +9,11 @@
     <link rel='stylesheet' href='main.css' type='text/css'>
 </head>
 <body class='container-fluid' onbeforeunload="stop()" onunload="stop()">
-    <div class='row pv-gray-darker head-toolbar'>
+    <div class="row-fluid app-wait-start-page">
+        <img src="../../lib/css/paraview/toolbar/common/logo_title.png" class="span12 start-page-image">
+        <div class="vtk-icon-cog animate-spin start-page-busy-icon"></div>
+    </div>
+    <div class='row pv-gray-darker head-toolbar hide-on-start'>
         <div class='col-xs-12 col-sm-6 col-md-6 col-lg-3 '>
             <img src='../../lib/css/assets/logo.svg'
                  class='clickable toggle-inspector'
@@ -56,7 +60,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row hide-on-start">
         <div class='col-xs-12 col-sm-6 col-md-6 col-lg-3 scroll-overflow fix-height pv-gray-lighter-transparent lower-right-round-corner inspector-container' style='z-index: 1000;'>
             <div class="row inspector" data-type="pipeline">
                 <div class='clickable col-xS-12 col-sm-12 col-md-12 col-lg-12 nopadding pv-pipeline'>
@@ -115,6 +119,9 @@
         },
         stop = vtkWeb.NoOp,
         start = function(connection) {
+            $('.app-wait-start-page').remove();
+            $('.hide-on-start').removeClass('hide-on-start');
+
             pv.initializeVisualizer(
                 connection.session,
                 '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info');
