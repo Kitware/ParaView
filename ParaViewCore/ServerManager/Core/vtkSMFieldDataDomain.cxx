@@ -154,15 +154,22 @@ void vtkSMFieldDataDomain::UpdateDomainEntries(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMFieldDataDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMFieldDataDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
   if (ivp && this->DefaultValue != -1)
     {
-    ivp->SetElement(0, this->DefaultValue);
+    if (use_unchecked_values)
+      {
+      ivp->SetUncheckedElement(0, this->DefaultValue);
+      }
+    else
+      {
+      ivp->SetElement(0, this->DefaultValue);
+      }
     return 1;
     }
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

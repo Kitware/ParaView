@@ -264,7 +264,7 @@ void vtkSMEnumerationDomain::Update(vtkSMProperty* prop)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMEnumerationDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMEnumerationDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
   if (ivp && this->GetNumberOfEntries() > 0)
@@ -272,11 +272,18 @@ int vtkSMEnumerationDomain::SetDefaultValues(vtkSMProperty* prop)
     unsigned int idx=0;
     if (!this->IsInDomain(ivp->GetDefaultValue(0), idx))
       {
-      ivp->SetElement(0, this->GetEntryValue(0));
+      if (use_unchecked_values)
+        {
+        ivp->SetUncheckedElement(0, this->GetEntryValue(0));
+        }
+      else
+        {
+        ivp->SetElement(0, this->GetEntryValue(0));
+        }
       return 1;
       }
     }
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

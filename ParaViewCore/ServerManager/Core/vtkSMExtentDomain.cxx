@@ -18,6 +18,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMExtentDomain);
@@ -115,26 +116,28 @@ void vtkSMExtentDomain::SetAnimationValue(vtkSMProperty *property, int idx,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMExtentDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMExtentDomain::SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values)
 {
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(property);
   unsigned int numElems = ivp? ivp->GetNumberOfElements() : 0;
   if (ivp && (numElems%2 == 0))
     {
+    vtkSMPropertyHelper helper(property);
+    helper.SetUseUnchecked(use_unchecked_values);
     for (unsigned int cc=0; cc < numElems/2; cc++)
       {
       if (this->GetMinimumExists(cc))
         {
-        ivp->SetElement(2*cc, this->GetMinimum(cc));
+        helper.Set(2*cc, this->GetMinimum(cc));
         }
       if (this->GetMaximumExists(cc))
         {
-        ivp->SetElement(2*cc+1, this->GetMaximum(cc));
+        helper.Set(2*cc+1, this->GetMaximum(cc));
         }
       }
     return 1;
     }
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(property, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

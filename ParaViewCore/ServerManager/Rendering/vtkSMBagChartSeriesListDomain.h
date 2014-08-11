@@ -35,7 +35,7 @@ public:
 
   // Description:
   // Set the default values for the property.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 //BTX
 protected:

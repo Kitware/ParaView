@@ -96,7 +96,7 @@ public:
   // Note that unlike the compile-time default values, the
   // application must explicitly call this method to initialize the
   // property.
-  virtual int SetDefaultValues(vtkSMProperty* prop);
+  virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values);
 protected:
   vtkSMProxyListDomain();
   ~vtkSMProxyListDomain();

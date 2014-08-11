@@ -54,7 +54,7 @@ public:
 
   // Description:
   // Overridden to leave defaults unchanged.
-  virtual int SetDefaultValues(vtkSMProperty*){ return 1; }
+  virtual int SetDefaultValues(vtkSMProperty*, bool){ return 1; }
 
 //BTX
 protected:

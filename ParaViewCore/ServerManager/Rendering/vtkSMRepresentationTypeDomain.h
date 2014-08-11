@@ -43,7 +43,7 @@ public:
   // Returns 1 if the domain updated the property.
   // Overridden to use input data information to pick appropriate representation
   // type.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 //BTX
 protected:

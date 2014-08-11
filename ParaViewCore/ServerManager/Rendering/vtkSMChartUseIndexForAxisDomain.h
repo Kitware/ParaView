@@ -44,7 +44,7 @@ public:
   // any. UseIndexForXAxis needs to be OFF by default, if the required property
   // e.g. XArrayName property has one of the known types of arrays, otherwise it
   // must be ON.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
   // Description:
   // Overridden to fire DomainModified when the required property changes. This ensures

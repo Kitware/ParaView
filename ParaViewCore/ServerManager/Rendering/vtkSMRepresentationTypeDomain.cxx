@@ -53,13 +53,17 @@ vtkPVDataInformation* vtkSMRepresentationTypeDomain::GetInputInformation()
 }
 
 //----------------------------------------------------------------------------
-int vtkSMRepresentationTypeDomain::SetDefaultValues(vtkSMProperty* property)
+int vtkSMRepresentationTypeDomain::SetDefaultValues(
+  vtkSMProperty* property, bool use_unchecked_values)
 {
   vtkPVDataInformation* info = this->GetInputInformation();
   if (!info || this->GetNumberOfStrings() <= 1)
     {
-    return this->Superclass::SetDefaultValues(property);
+    return this->Superclass::SetDefaultValues(property, use_unchecked_values);
     }
+
+  vtkSMPropertyHelper helper(property);
+  helper.SetUseUnchecked(use_unchecked_values);
 
   unsigned int temp;
 
@@ -70,8 +74,8 @@ int vtkSMRepresentationTypeDomain::SetDefaultValues(vtkSMProperty* property)
   if (info->GetNumberOfCells() >= numCells &&
       this->IsInDomain("Outline", temp))
     {
-    vtkSMPropertyHelper(property).Set("Outline");
-    return 1; 
+    helper.Set("Outline");
+    return 1;
     }
 
   // for vtkImageData show slice (for 2D datasets) or outline (for all others).
@@ -82,16 +86,16 @@ int vtkSMRepresentationTypeDomain::SetDefaultValues(vtkSMProperty* property)
       (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5]) &&
       this->IsInDomain("Slice", temp))
       {
-      vtkSMPropertyHelper(property).Set("Slice");
+      helper.Set("Slice");
       return 1;
       }
     else if (this->IsInDomain("Outline", temp))
       {
-      vtkSMPropertyHelper(property).Set("Outline");
-      return 1; 
+      helper.Set("Outline");
+      return 1;
       }
     }
-  
+
   // for other structured data, show surface for 2D and outline for all others.
   if (info->IsDataStructured())
     {
@@ -99,23 +103,23 @@ int vtkSMRepresentationTypeDomain::SetDefaultValues(vtkSMProperty* property)
     if ((ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5]) &&
       this->IsInDomain("Surface", temp))
       {
-      vtkSMPropertyHelper(property).Set("Surface");
+      helper.Set("Surface");
       return 1;
       }
     else if (this->IsInDomain("Outline", temp))
       {
-      vtkSMPropertyHelper(property).Set("Outline");
-      return 1; 
+      helper.Set("Outline");
+      return 1;
       }
     }
 
   if (this->IsInDomain("Surface", temp))
     {
-    vtkSMPropertyHelper(property).Set("Surface");
+    helper.Set("Surface");
     return 1;
     }
 
-  return this->Superclass::SetDefaultValues(property);
+  return this->Superclass::SetDefaultValues(property, use_unchecked_values);
 }
 
 //----------------------------------------------------------------------------

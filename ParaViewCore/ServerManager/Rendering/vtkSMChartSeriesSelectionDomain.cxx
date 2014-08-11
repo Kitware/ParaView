@@ -351,13 +351,18 @@ std::vector<vtkStdString> vtkSMChartSeriesSelectionDomain::GetDefaultValue(const
 }
 
 //----------------------------------------------------------------------------
-int vtkSMChartSeriesSelectionDomain::SetDefaultValues(vtkSMProperty* property)
+int vtkSMChartSeriesSelectionDomain::SetDefaultValues(
+  vtkSMProperty* property, bool use_unchecked_values)
 {
   vtkSMStringVectorProperty* vp = vtkSMStringVectorProperty::SafeDownCast(property);
   if (!vp)
     {
     vtkErrorMacro("Property must be a vtkSMVectorProperty subclass.");
     return 0;
+    }
+  if (use_unchecked_values)
+    {
+    vtkWarningMacro("Developer warning: use_unchecked_values not implemented yet.");
     }
 
   this->UpdateDefaultValues(property, false);

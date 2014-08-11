@@ -233,7 +233,8 @@ int vtkSMRangeDomainTemplate<T>::ReadXMLAttributes(
 
 //-----------------------------------------------------------------------------
 template <class T>
-int vtkSMRangeDomainTemplate<T>::SetDefaultValues(vtkSMProperty* property)
+int vtkSMRangeDomainTemplate<T>::SetDefaultValues(
+  vtkSMProperty* property, bool use_unchecked_values)
 {
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(property);
   if (!vp)
@@ -251,6 +252,7 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(vtkSMProperty* property)
     }
 
   vtkSMPropertyHelper helper(vp);
+  helper.SetUseUnchecked(use_unchecked_values);
   if (vp->GetRepeatCommand())
     {
     // this is a resizable property, set just 1 value in it. This happens in
@@ -300,7 +302,7 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(vtkSMProperty* property)
     return 1;
     }
 
-  return 0;
+  return this->Superclass::SetDefaultValues(property, use_unchecked_values);
 }
 
 //-----------------------------------------------------------------------------

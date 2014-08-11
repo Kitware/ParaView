@@ -20,6 +20,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMCompositeTreeDomain);
@@ -160,10 +161,13 @@ int vtkSMCompositeTreeDomain::ReadXMLAttributes(
 }
 
 //----------------------------------------------------------------------------
-int vtkSMCompositeTreeDomain::SetDefaultValues(vtkSMProperty* property)
+int vtkSMCompositeTreeDomain::SetDefaultValues(
+  vtkSMProperty* property, bool use_unchecked_values)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(property);
-  if (ivp && this->Information && ivp->GetNumberOfElements() == 1)
+  vtkSMPropertyHelper helper(property);
+  helper.SetUseUnchecked(use_unchecked_values);
+  if (ivp && this->Information && helper.GetNumberOfElements() == 1)
     {
     if (this->Mode == LEAVES)
       {
@@ -178,12 +182,12 @@ int vtkSMCompositeTreeDomain::SetDefaultValues(vtkSMProperty* property)
         }
       if (info)
         {
-        ivp->SetElement(0, index);
+        helper.Set(0, index);
         return 1;
         }
       }
     }
-  return 0;
+  return this->Superclass::SetDefaultValues(property, use_unchecked_values);
 }
 
 //----------------------------------------------------------------------------
