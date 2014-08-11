@@ -17,6 +17,7 @@
 from pygments.formatters.html import HtmlFormatter
 from pygments.formatters.other import NullFormatter
 from pygments.formatters.other import RawTokenFormatter
+from pygments.formatters.redtabhtml import RedTabHtmlFormatter
 from pygments.formatters.rtf import RtfFormatter
 from pygments.formatters.terminal import TerminalFormatter
 
@@ -24,6 +25,7 @@ FORMATTERS = {
     HtmlFormatter: ('HTML', ('html',), ('*.html', '*.htm'), "Format tokens as HTML 4 ``<span>`` tags within a ``<pre>`` tag, wrapped in a ``<div>`` tag. The ``<div>``'s CSS class can be set by the `cssclass` option."),
     NullFormatter: ('Text only', ('text', 'null'), ('*.txt',), 'Output the text unchanged without any formatting.'),
     RawTokenFormatter: ('Raw tokens', ('raw', 'tokens'), ('*.raw',), 'Format tokens as a raw representation for storing token streams.'),
+    RedTabHtmlFormatter: ('HTML with highlighted tabs', ('html',), ('*.html', '*.htm'), "Format tokens as HTML 4 ``<span>`` tags within a ``<pre>`` tag, wrapped in a ``<div>`` tag. The ``<div>``'s CSS class can be set by the `cssclass` option."),
     RtfFormatter: ('RTF', ('rtf',), ('*.rtf',), 'Format tokens as RTF markup. This formatter automatically outputs full RTF documents with color information and other useful stuff. Perfect for Copy and Paste into Microsoft\xc2\xae Word\xc2\xae documents.'),
     TerminalFormatter: ('Terminal', ('terminal', 'console'), (), 'Format tokens with ANSI color sequences, for output in a text console. Color sequences are terminated at newlines, so that paging the output works correctly.')
 }
