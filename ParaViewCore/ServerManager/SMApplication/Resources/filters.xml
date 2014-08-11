@@ -5886,7 +5886,10 @@ found and the point will be rejected.</Documentation>
         name of the scalar array on which to perform the clip
         operation.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ClipScalarsDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipFunction"
+                                   value="Scalar" />
         </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetValue"
@@ -5908,7 +5911,10 @@ found and the point will be rejected.</Documentation>
         clipping operation. Neither functionality is currently available in
         ParaView's user interface.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ClipScalarsDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipFunction"
+                                   value="Scalar" />
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetInsideOut"
@@ -5941,7 +5947,11 @@ found and the point will be rejected.</Documentation>
         in the given region or clip those cells so all of the output one stay
         only inside that region.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ClipScalarsDecorator" exclude="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipFunction"
+                                   value="Scalar"
+                                   inverse="1" />
         </Hints>
       </IntVectorProperty>
       <Hints>

@@ -65,8 +65,6 @@ set (Module_SRCS
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.cxx
   pqChartSelectionReaction.h
-  pqClipScalarsDecorator.cxx
-  pqClipScalarsDecorator.h
   pqCollaborationBehavior.cxx
   pqCollaborationBehavior.h
   pqColorAnnotationsPropertyWidget.cxx
@@ -274,7 +272,6 @@ set (Module_MOC_HDRS
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h
-  pqClipScalarsDecorator.h
   pqCollaborationBehavior.h
   pqColorAnnotationsPropertyWidget.h
   pqColorEditorPropertyWidget.h
