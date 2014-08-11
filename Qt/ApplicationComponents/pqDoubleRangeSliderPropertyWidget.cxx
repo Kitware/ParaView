@@ -48,7 +48,6 @@ class pqDoubleRangeSliderPropertyWidget::pqInternals
 {
 public:
   Ui::DoubleRangeSliderPropertyWidget Ui;
-  QPalette ResetPalette;
 };
 
 //-----------------------------------------------------------------------------
@@ -62,8 +61,6 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
 
   Ui::DoubleRangeSliderPropertyWidget &ui = this->Internals->Ui;
   ui.setupUi(this);
-
-  this->Internals->ResetPalette = ui.Reset->palette();
 
   ui.Reset->setIcon(ui.Reset->style()->standardIcon(QStyle::SP_BrowserReload));
   ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -119,13 +116,7 @@ void pqDoubleRangeSliderPropertyWidget::reset()
 //-----------------------------------------------------------------------------
 void pqDoubleRangeSliderPropertyWidget::highlightResetButton(bool highlight)
 {
- QPalette buttonPalette = this->Internals->ResetPalette;
- if (highlight)
-   {
-   buttonPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
-   buttonPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
-   }
- this->Internals->Ui.Reset->setPalette(buttonPalette);
+  this->Internals->Ui.Reset->highlight(/*clear=*/highlight==false);
 }
 
 //-----------------------------------------------------------------------------
