@@ -132,51 +132,8 @@ void pqDoubleRangeSliderPropertyWidget::highlightResetButton(bool highlight)
 void pqDoubleRangeSliderPropertyWidget::resetClicked()
 {
   vtkSMProperty* smproperty = this->property();
+  smproperty->ResetToDomainDefaults(/*use_unchecked_values*/ true);
 
-  double min = 1.0;
-  double max = 1.0;
-  if (vtkSMDoubleRangeDomain* domain = vtkSMDoubleRangeDomain::SafeDownCast(
-      smproperty->FindDomain("vtkSMDoubleRangeDomain")))
-    {
-    if (domain->GetMinimumExists(0))
-      {
-      min = domain->GetMinimum(0);
-      }
-    else if (domain->GetMaximumExists(0))
-      {
-      min = domain->GetMaximum(0);
-      }
-    if (domain->GetMaximumExists(1))
-      {
-      max = domain->GetMaximum(1);
-      // If the minimum-maximum is greater than the maximum-maximum (weird, but
-      // not impossible I guess), force the minimum to be this value instead.
-      if (max < min)
-        {
-        min = max;
-        }
-      }
-    else if (domain->GetMinimumExists(1))
-      {
-      max = domain->GetMinimum(1);
-      // If the minimum is greater than the maximum (possible if there's no
-      // minimum-minimum, but there is a maximum-minimum), use that value
-      // instead.
-      if (max < min)
-        {
-        max = min;
-        }
-      }
-    else
-      {
-      // No limits on the max; just copy the minimum to keep the logic valid.
-      max = min;
-      }
-    }
-
-  vtkSMUncheckedPropertyHelper helper(smproperty);
-  vtkSMUncheckedPropertyHelper(smproperty).Set(0, min);
-  vtkSMUncheckedPropertyHelper(smproperty).Set(1, max);
   this->highlightResetButton(false);
   emit this->changeAvailable();
   emit this->changeFinished();
