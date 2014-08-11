@@ -13269,8 +13269,10 @@ found and the point will be rejected.</Documentation>
       <!-- End ImageDataToUniformGrid -->
     </SourceProxy>
 
-    <!-- Catalyst client only proxies, used to generate a coprocessing script
-         and to modify writer filename and frequency through ParaView Live -->
+    <!-- TODO: move these proxies to a different group
+         Catalyst client only proxies, used to generate a coprocessing script
+         and to modify writer filename and frequency through ParaView Live
+    -->
     <!-- ================================================================= -->
     <SourceProxy name="XMLPImageDataWriter" class="vtkPVNullSource"
       label="Parallel Image Data Writer">

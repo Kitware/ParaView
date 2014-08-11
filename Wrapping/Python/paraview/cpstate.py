@@ -135,6 +135,7 @@ class WriterAccessor(smtrace.RealProxyAccessor):
             ctor = servermanager._make_name_valid(xmlname)
         else:
             ctor = servermanager._make_name_valid(prototype.GetXMLLabel())
+        # TODO: use servermanager.ProxyManager().NewProxy() instead
         # we create the writer proxy such that it is not registered with the
         # ParaViewPipelineController, so its state is not sent to ParaView Live.
         return "servermanager.%s.%s" % (xmlgroup, ctor)
