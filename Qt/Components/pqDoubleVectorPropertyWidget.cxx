@@ -42,9 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
-#include "pqSignalAdaptors.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqScalarValueListPropertyWidget.h"
+#include "pqSignalAdaptors.h"
+#include "pqWidgetRangeDomain.h"
 
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
@@ -113,6 +114,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
       widget->setObjectName("DoubleRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
+
+      // ensures that the widget's range is updated whenever the domain changes.
+      new pqWidgetRangeDomain(widget, "minimum", "maximum", dvp, 0);
 
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
       this->connect(widget, SIGNAL(valueEdited(double)),

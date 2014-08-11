@@ -5893,7 +5893,7 @@ found and the point will be rejected.</Documentation>
                             default_values="0.0"
                             name="Value"
                             number_of_elements="1">
-        <ArrayRangeDomain name="scalar_range">
+        <ArrayRangeDomain name="range">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -5901,7 +5901,6 @@ found and the point will be rejected.</Documentation>
                       name="SelectInputScalars" />
           </RequiredProperties>
         </ArrayRangeDomain>
-        <DoubleRangeDomain name="range" />
         <Documentation>If clipping with scalars, this property sets the scalar
         value about which to clip the dataset based on the scalar array chosen.
         (See SelectInputScalars.) If clipping with a clip function, this
