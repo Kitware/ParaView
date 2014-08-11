@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
 #include "vtkImageData.h"
-#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMSessionProxyManager.h"
 
@@ -139,10 +138,13 @@ void pqSaveScreenshotReaction::saveScreenshot()
     pqActiveObjects::instance().activeServer()->proxyManager();
   vtkSMProxy* colorPalette = pxm->GetProxy(
     "global_properties", "ColorPalette");
-  vtkSmartPointer<vtkPVXMLElement> state;
+  vtkSmartPointer<vtkSMProxy> clone;
   if (colorPalette && !palette.isEmpty())
     {
-    state.TakeReference(colorPalette->SaveXMLState(NULL));
+    // save current property values
+    clone.TakeReference(pxm->NewProxy(colorPalette->GetXMLGroup(),
+        colorPalette->GetXMLName()));
+    clone->Copy(colorPalette);
 
     vtkSMProxy* chosenPalette =
       pxm->NewProxy("palettes", palette.toLatin1().data());
@@ -160,9 +162,9 @@ void pqSaveScreenshotReaction::saveScreenshot()
     size, ssDialog.quality(), ssDialog.saveAllViews());
 
   // restore color palette.
-  if (state)
+  if (clone)
     {
-    colorPalette->LoadXMLState(state, NULL);
+    colorPalette->Copy(clone);
     }
 
   // restore stereo
@@ -173,7 +175,7 @@ void pqSaveScreenshotReaction::saveScreenshot()
 
   // check if need to render to clear the changes we did
   // while saving the screenshot.
-  if (state || stereo)
+  if (clone || stereo)
     {
     pqApplicationCore::instance()->render();
     }
