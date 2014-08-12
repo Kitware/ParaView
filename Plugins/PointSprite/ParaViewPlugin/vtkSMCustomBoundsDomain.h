@@ -36,7 +36,7 @@ public:
   // Note that unlike the compile-time default values, the
   // application must explicitly call this method to initialize the
   // property.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 //BTX
 protected:
