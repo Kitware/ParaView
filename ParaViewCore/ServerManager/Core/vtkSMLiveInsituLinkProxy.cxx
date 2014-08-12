@@ -25,14 +25,15 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMMessage.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
-
 #include <vtksys/ios/sstream>
-// #define vtkSMLiveInsituLinkProxyDebugMacro(x) cout << __LINE__ << " " x << endl;
+
+//#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr << __LINE__ << " " x << endl;
 #define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
 class vtkSMLiveInsituLinkProxy::vtkInternals
@@ -96,7 +97,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
       if (user_data.key() == "LiveAction")
         {
         const Variant& value = user_data.variant(0);
-        vtkSMLiveInsituLinkProxyDebugMacro("Received message");
+        vtkSMLiveInsituLinkProxyDebugMacro(<< "Received message");
         switch (value.integer(0))
           {
         case vtkLiveInsituLink::CONNECTED:
@@ -105,11 +106,11 @@ void vtkSMLiveInsituLinkProxy::LoadState(
           break;
 
         case vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE:
-          this->NewTimestepAvailable();
+          this->NextTimestepAvailable(value.idtype(0));
           break;
 
         case vtkLiveInsituLink::DISCONNECTED:
-          vtkSMLiveInsituLinkProxyDebugMacro("Catalyst disconnected!!!");
+          vtkSMLiveInsituLinkProxyDebugMacro(<< "Catalyst disconnected!!!");
           this->InvokeEvent(vtkCommand::ConnectionClosedEvent);
           break;
           }
@@ -212,8 +213,9 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLiveInsituLinkProxy::NewTimestepAvailable()
+void vtkSMLiveInsituLinkProxy::NextTimestepAvailable(vtkIdType timeStep)
 {
+  this->TimeStep = timeStep;
   // Mark all extract producer proxies as dirty.
   vtkInternals::ExtractProxiesType::iterator iter;
   for (iter = this->Internals->ExtractProxies.begin();
@@ -233,7 +235,7 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
 {
   if (this->StateDirty)
     {
-    vtkSMLiveInsituLinkProxyDebugMacro("Push new state to server.");
+    vtkSMLiveInsituLinkProxyDebugMacro(<< "Push new state to server.");
     // push new state.
     vtkPVXMLElement* root = this->InsituProxyManager->SaveXMLState();
     vtksys_ios::ostringstream data;
@@ -246,10 +248,32 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
            << "UpdateInsituXMLState"
            << data.str().c_str()
            << vtkClientServerStream::End;
-    vtkSMLiveInsituLinkProxyDebugMacro("Push new state to server--done");
+    vtkSMLiveInsituLinkProxyDebugMacro(<< "Push new state to server--done");
     this->ExecuteStream(stream);
 
     this->StateDirty = false;
+    }
+}
+
+void vtkSMLiveInsituLinkProxy::MarkStateDirty()
+{
+  this->StateDirty = true;
+  vtkSMLiveInsituLinkProxyDebugMacro(<< "MarkStateDirty");
+  if (vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt())
+    {
+    PushUpdatedState();
+    }
+  this->LiveChanged();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkSMLiveInsituLinkProxy::LiveChanged()
+{
+  if (vtkSMPropertyHelper(this, "SimulationPaused").GetAsInt())
+    {
+    vtkSMLiveInsituLinkProxyDebugMacro(<< "LiveChanged");
+    this->InvokeCommand("LiveChanged");
     }
 }
 
@@ -267,8 +291,6 @@ bool vtkSMLiveInsituLinkProxy::HasExtract(
 vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
   const char* reg_group, const char* reg_name, int port_number)
 {
-  this->PushUpdatedState();
-
   vtkSMProxy* proxy = this->GetSessionProxyManager()->NewProxy("sources",
     "PVTrivialProducer");
   proxy->UpdateVTKObjects();
@@ -286,6 +308,7 @@ vtkSMProxy* vtkSMLiveInsituLinkProxy::CreateExtract(
   key << reg_group << ":" << reg_name << ":" << port_number;
   this->Internals->ExtractProxies[key.str()] = proxy;
   proxy->Delete();
+  this->LiveChanged();
 
   return proxy;
 }
@@ -312,6 +335,7 @@ void vtkSMLiveInsituLinkProxy::RemoveExtract(vtkSMProxy* proxy)
       break;
       }
     }
+  this->LiveChanged();
 }
 
 //----------------------------------------------------------------------------

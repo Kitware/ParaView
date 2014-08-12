@@ -12,13 +12,26 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+/**
+ * @defgroup LiveInsitu Live Insitu
+ *
+ * The Live Insitu module visualizes and controls a remote simulation.
+ *
+ * It allows a user to visualize live data, control the visualization
+ *  pipeline, and pause a running simulation that was linked with the
+ *  Catalyst module.
+ */
+
+
 // .NAME vtkLiveInsituLink - link for live-coprocessing.
 // .SECTION Description
-// vtkLiveInsituLink manages the communication link between Catalyst and
-// ParaView visualization server. vtkLiveInsituLink is created on both ends of
-// the live-coprocessing channel i.e. in Catalyst code (by instantiating
-// vtkLiveInsituLink directly) and in ParaView application (by using a proxy
-// that instantiates the vtkLiveInsituLink).
+// vtkLiveInsituLink manages the communication link between Insitu and
+// Live visualization servers. vtkLiveInsituLink is created on both
+// ends of the live-insitu channel i.e. in Insitu code (by
+// instantiating vtkLiveInsituLink directly) and in the Live ParaView
+// application (by using a proxy that instantiates the
+// vtkLiveInsituLink).
+// @ingroup LiveInsitu
 
 #ifndef __vtkLiveInsituLink_h
 #define __vtkLiveInsituLink_h
@@ -54,20 +67,15 @@ public:
   vtkSetStringMacro(Hostname);
   vtkGetStringMacro(Hostname);
 
-  // Called on the vis-process to register a producer for an extract.
-  void RegisterExtract(vtkTrivialProducer* producer,
-    const char* groupname, const char* proxyname, int portnumber);
-  void UnRegisterExtract(vtkTrivialProducer* producer);
-
   // Description:
   // Set/Get the link type i.e. whether the current process is the visualization
   // process or the insitu process.
   enum
     {
-    VISUALIZATION=0,
-    SIMULATION=1
+    LIVE=0,
+    INSITU=1
     };
-  vtkSetClampMacro(ProcessType, int, VISUALIZATION, SIMULATION);
+  vtkSetClampMacro(ProcessType, int, LIVE, INSITU);
   vtkGetMacro(ProcessType, int);
 
   // Description:
@@ -77,6 +85,12 @@ public:
   // visualization server can send to the client.
   vtkSetMacro(ProxyId, unsigned int);
   vtkGetMacro(ProxyId, unsigned int);
+
+  // Description:
+  // 'SimulationPaused' is set/reset on Paraview Live and sent to Insitu
+  // every time step.
+  vtkGetMacro(SimulationPaused, int);
+  void SetSimulationPaused (int paused);
 
   // Description:
   // Initializes the link.
@@ -91,33 +105,52 @@ public:
   // makes an attempt to connect to ParaView,  however that attempt may fail if
   // ParaView is not yet ready to accept connections. In that case,
   // vtkLiveInsituLink will make an attempt to connect on every subsequent
-  // SimulationUpdate() call.
-  void SimulationInitialize(vtkSMSessionProxyManager* pxm);
+  // InsituUpdate() call.
+  void InsituInitialize(vtkSMSessionProxyManager* pxm);
 
   // Description:
-  // Every time Catalyst is ready to communicate with ParaView visualization
+  // Every time Insitu is ready to communicate with ParaView visualization
   // engine call this method. The goal of this call is too get the latest
   // updates from ParaView including changes to state for the co-processing
   // pipeline or changes in what extract the visualization engine is expecting.
   // This method's primary goal is to obtain information from ParaView vis
   // engine. If no active connection to ParaView visualization engine exists,
   // this will make an attempt to connect to ParaView.
-  void SimulationUpdate(double time);
+  void InsituUpdate(double time, vtkIdType timeStep);
 
   // Description:
-  // Every time Catalyst is ready to push extracts to ParaView visualization
+  // Every time Insitu is ready to push extracts to ParaView visualization
   // engine, call this method. If no active ParaView visualization engine
   // connection exists (or the connection dies), then this method does nothing
   // (besides some bookkeeping).  Otherwise, this will push any extracts
   // requested to the ParaView visualization engine.
-  void SimulationPostProcess(double time);
+  void InsituPostProcess(double time, vtkIdType timeStep);
+
+  // Description: Wait until something changes on ParaView Live. This
+  // is called on the catalyst side. Insitu stops until the pipeline
+  // is edited, an extract is added or removed or the user continues
+  // the simulation. Returns != 0 if the visualization side disconnected,
+  // 0 otherwise
+  int WaitForLiveChange();
+  /// Description: Called on INSITU side when LIVE has changed
+  void OnLiveChanged();
 
   // **************************************************************************
 
   // **************************************************************************
-  // API to be used from the Visualization side.
-  void OnSimulationUpdate(double time);
-  void OnSimulationPostProcess(double time);
+  // API to be used from the LIVE side.
+  // Register/unregister a producer for an extract.
+  void RegisterExtract(vtkTrivialProducer* producer,
+    const char* groupname, const char* proxyname, int portnumber);
+  void UnRegisterExtract(vtkTrivialProducer* producer);
+
+  void OnInsituUpdate(double time, vtkIdType timeStep);
+  void OnInsituPostProcess(double time, vtkIdType timeStep);
+  // Description:
+  // Signal a change on the ParaView Live side and transmit it to the Insitu
+  // side. This is called when the state or extracts are changed or when
+  // the simulation is continued.
+  void LiveChanged();
   // **************************************************************************
 
   enum NotificationTags
@@ -127,11 +160,7 @@ public:
     DISCONNECTED = 1202
     };
 
-  void UpdateInsituXMLState(const char* txt)
-    {
-    this->InsituXMLStateChanged = true;
-    this->SetInsituXMLState(txt);
-    }
+  void UpdateInsituXMLState(const char* txt);
 
   // Description:
   // This method will remove references to proxy that shouldn't be shared with ParaView
@@ -141,11 +170,11 @@ public:
 //BTX
   // ***************************************************************
   // Internal methods, public for callbacks.
-  void InsituProcessConnected(vtkMultiProcessController* controller);
+  void InsituConnect(vtkMultiProcessController* controller);
 
   // Description:
-  // Called to drop the connection between Catalyst and ParaView.
-  void DropCatalystParaViewConnection();
+  // Called to drop the connection between Insitu and ParaView Live.
+  void DropLiveInsituConnection();
 
 protected:
   vtkLiveInsituLink();
@@ -156,16 +185,21 @@ protected:
     UPDATE_RMI_TAG=8800,
     POSTPROCESS_RMI_TAG=8801,
     INITIALIZE_CONNECTION=8802,
-    DROP_CAT2PV_CONNECTION=8803
+    DROP_CAT2PV_CONNECTION=8803,
+    // Message from LIVE, sent when simulation is paused,
+    // signalling a change.  INSITU wakes up and checks for new
+    // simulation state, changed extracts or if it should continue the
+    // simulation
+    LIVE_CHANGED=8804
     };
 
   // Description:
-  // Called by Initialize() to initialize on a visualization process.
-  void InitializeVisualization();
+  // Called by Initialize() to initialize on a ParaView Live process.
+  void InitializeLive();
 
   // Description:
-  // Called by Initialize() to initialize on a simulation process.
-  void InitializeSimulation();
+  // Called by Initialize() to initialize on a Insitu process.
+  void InitializeInsitu();
 
   // Description:
   // Callback on Visualization process when a simulation connects to it.
@@ -184,10 +218,11 @@ protected:
 
   bool InsituXMLStateChanged;
   bool ExtractsChanged;
+  int SimulationPaused;
 
   char* InsituXMLState;
   vtkSmartPointer<vtkPVXMLElement> XMLState;
-  vtkWeakPointer<vtkPVSessionBase> VisualizationSession;
+  vtkWeakPointer<vtkPVSessionBase> LiveSession;
   vtkSmartPointer<vtkMultiProcessController> Controller;
   vtkSmartPointer<vtkExtractsDeliveryHelper> ExtractsDeliveryHelper;
 
@@ -195,7 +230,7 @@ private:
   vtkLiveInsituLink(const vtkLiveInsituLink&); // Not implemented
   void operator=(const vtkLiveInsituLink&); // Not implemented
 
-  vtkWeakPointer<vtkSMSessionProxyManager> CoprocessorProxyManager;
+  vtkWeakPointer<vtkSMSessionProxyManager> InsituProxyManager;
 
   vtkSetStringMacro(URL);
   char* URL;

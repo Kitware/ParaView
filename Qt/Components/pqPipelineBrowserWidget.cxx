@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqLiveInsituManager.h"
 #include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineAnnotationFilterModel.h"
@@ -72,7 +73,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   // Connect the model to the ServerManager model.
   pqServerManagerModel *smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smModel, SIGNAL(preServerAdded(pqServer*)),
+  QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
     this->PipelineModel, SLOT(addServer(pqServer*)));
   QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
     this->PipelineModel, SLOT(removeServer(pqServer*)));
@@ -247,12 +248,10 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
           BEGIN_UNDO_SET(QString("%1 Selected").arg(visible? "Show" : "Hide"));
           }
         }
-      if (port->getServer()->getResource().scheme() == "catalyst")
+      if (pqLiveInsituManager::isInsituServer(port->getServer()))
         {
-        pqLiveInsituVisualizationManager* mgr=
-          qobject_cast<pqLiveInsituVisualizationManager*>(
-            port->getServer()->property(
-              "LiveInsituVisualizationManager").value<QObject*>());
+        pqLiveInsituVisualizationManager* mgr =
+          pqLiveInsituManager::managerFromInsitu(port->getServer());
         if (mgr && mgr->addExtract(port))
           {
           // refresh the pipeline browser icon.

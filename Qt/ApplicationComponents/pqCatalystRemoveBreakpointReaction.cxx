@@ -8,7 +8,7 @@
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-   
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,40 +29,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCatalystConnectReaction_h 
-#define __pqCatalystConnectReaction_h
+#include "pqCatalystRemoveBreakpointReaction.h"
 
-#include "pqReaction.h"
-#include <QPointer>
+#include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
+#include "pqLiveInsituManager.h"
+#include "pqCoreUtilities.h"
+#include "pqLiveInsituVisualizationManager.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
+#include "vtkProcessModule.h"
+#include "vtkSMLiveInsituLinkProxy.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSession.h"
 
-class pqLiveInsituVisualizationManager;
 
-/// Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
-/// Visualization.
-/// @ingroup Reactions
-/// @ingroup LiveInsitu
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReaction
+#include <QInputDialog>
+#include <QMessageBox>
+
+//-----------------------------------------------------------------------------
+pqCatalystRemoveBreakpointReaction::pqCatalystRemoveBreakpointReaction(
+  QAction* parentObject)
+  : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef pqReaction Superclass;
-public:
-  pqCatalystConnectReaction(QAction* parent=0);
-  virtual ~pqCatalystConnectReaction();
+  QObject::connect(parentObject->parent(), SIGNAL(aboutToShow()),
+                   this, SLOT(updateEnableState()));
+}
 
-  /// Connect to Catalyst 
-  bool connect();
+//-----------------------------------------------------------------------------
+void pqCatalystRemoveBreakpointReaction::onTriggered()
+{
+  pqLiveInsituManager::instance()->removeBreakpoint();
+}
 
-protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { this->connect(); }
-
-  /// reaction disabled when already connected to a catalyst server or in
-  /// collaboration mode.
-  virtual void updateEnableState();
-
-private:
-  Q_DISABLE_COPY(pqCatalystConnectReaction)
-};
-
-#endif
+//-----------------------------------------------------------------------------
+void pqCatalystRemoveBreakpointReaction::updateEnableState()
+{
+  pqLiveInsituManager* server = pqLiveInsituManager::instance();
+  this->parentAction()->setEnabled(
+    (server->linkProxy() &&
+     server->breakpointTime() != pqLiveInsituManager::INVALID_TIME) ? 
+    true : false);
+}

@@ -210,6 +210,9 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Populate Tools menu.
   pqParaViewMenuBuilders::buildToolsMenu(*this->Internals->menuTools);
 
+  // Populate Catalyst menu.
+  pqParaViewMenuBuilders::buildCatalystMenu(*this->Internals->menu_Catalyst);
+
   // setup the context menu for the pipeline browser.
   pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(
     *this->Internals->pipelineBrowser);

@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConnect" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+
+  <!-- wait for Catalyst pipeline to show-up -->
+  <pqevent object="pqClientMainWindow" command="pqLiveInsituManager"
+           arguments="wait_timestep 5"/>
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,12,13,/1:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,12,13,/1:0/0:1" />
+
+  <!-- wait for extract to arrive on the Live server-->
+  <pqevent object="pqClientMainWindow" command="pqLiveInsituManager"
+           arguments="wait_timestep 10"/>
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,9,8,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,9,8,/0:0/0:1" />
+
+  <!-- wait for splitter -->
+  <pqevent object="pqClientMainWindow" command="pqLiveInsituManager"
+           arguments="wait_timestep 12"/>
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystSetBreakpoint" />
+  <pqevent object="pqClientMainWindow/pqSetBreakpointDialog/BreakpointTime" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/pqSetBreakpointDialog/BreakpointTime" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/pqSetBreakpointDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,88,11,/1:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,88,11,/1:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,11,50" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,6,81" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,6,81" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="keyEvent" arguments="7,49,0,1,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="18" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="keyEvent" arguments="7,56,0,8,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table" command="keyEvent" arguments="7,56,0,8,0,1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Table/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="180" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Add" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ContourValues/ScalarValueList/Remove" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- set the active view -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mousePress" arguments="(0.287574,0.232601,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseMove" arguments="(0.287574,0.232601,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" command="mouseRelease" arguments="(0.287574,0.232601,1,0,0)" />
+
+
+  <!-- wait for breakpoint to be hit -->
+  <pqevent object="pqClientMainWindow" command="pqLiveInsituManager"
+           arguments="wait_breakpoint_hit"/>
+</pqevents>

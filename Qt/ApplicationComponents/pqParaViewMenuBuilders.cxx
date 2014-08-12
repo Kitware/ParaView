@@ -45,6 +45,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraToolbar.h"
 #include "pqCameraUndoRedoReaction.h"
 #include "pqCatalystConnectReaction.h"
+#include "pqCatalystContinueReaction.h"
+#include "pqCatalystPauseSimulationReaction.h"
+#include "pqCatalystRemoveBreakpointReaction.h"
+#include "pqCatalystSetBreakpointReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
@@ -221,12 +225,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     pqApplicationCore::instance(),
     SLOT(showOutputWindow()));
 
-
-  menu.addSeparator(); // --------------------------------------------------
-
-  new pqCatalystConnectReaction(menu.addAction("Connect To Catalyst")
-    << pqSetName("actionConnectCatalyst"));
-
   menu.addSeparator(); // --------------------------------------------------
 
   new pqPythonShellReaction(menu.addAction("Python Shell")
@@ -363,4 +361,25 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
     }
 #endif
+}
+
+//-----------------------------------------------------------------------------
+void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
+{
+  new pqCatalystConnectReaction(menu.addAction("Connect...")
+                                << pqSetName("actionCatalystConnect"));
+  new pqCatalystPauseSimulationReaction(
+    menu.addAction("Pause Simulation")
+    << pqSetName("actionCatalystPauseSimulation"));
+
+  new pqCatalystContinueReaction(
+    menu.addAction("Continue") << pqSetName("actionCatalystContinue"));
+
+  new pqCatalystSetBreakpointReaction(
+    menu.addAction("Set Breakpoint") <<
+    pqSetName("actionCatalystSetBreakpoint"));
+
+  new pqCatalystRemoveBreakpointReaction(
+    menu.addAction("Remove Breakpoint") <<
+    pqSetName("actionCatalystRemoveBreakpoint"));
 }

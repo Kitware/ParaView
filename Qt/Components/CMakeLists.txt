@@ -186,6 +186,8 @@ set (Module_SRCS
   pqLinksEditor.h
   pqLinksManager.cxx
   pqLinksManager.h
+  pqLiveInsituManager.h
+  pqLiveInsituManager.cxx
   pqLiveInsituVisualizationManager.cxx
   pqLiveInsituVisualizationManager.h
   pqLockViewSizeCustomDialog.cxx
@@ -294,6 +296,8 @@ set (Module_SRCS
   pqServerConnectDialog.h
   pqServerLauncher.cxx
   pqServerLauncher.h
+  pqSetBreakpointDialog.cxx
+  pqSetBreakpointDialog.h
   pqSettingsDialog.cxx
   pqSettingsDialog.h
   pqSignalAdaptorCompositeTreeWidget.cxx
@@ -429,6 +433,7 @@ set (Module_MOC_HDRS
   pqLineWidget.h
   pqLinksEditor.h
   pqLinksManager.h
+  pqLiveInsituManager.h
   pqLiveInsituVisualizationManager.h
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
@@ -480,6 +485,7 @@ set (Module_MOC_HDRS
   pqServerConfigurationImporter.h
   pqServerConnectDialog.h
   pqServerLauncher.h
+  pqSetBreakpointDialog.h
   pqSettingsDialog.h
   pqSignalAdaptorCompositeTreeWidget.h
   pqSignalAdaptorKeyFrameType.h
@@ -570,6 +576,7 @@ set (Module_UI_FILES
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerConnectDialog.ui
   Resources/UI/pqServerLauncherDialog.ui
+  Resources/UI/pqSetBreakpointDialog.ui
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSplineWidget.ui

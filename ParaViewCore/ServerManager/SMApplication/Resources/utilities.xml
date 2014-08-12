@@ -2420,7 +2420,18 @@
         default_values="localhost">
       </StringVectorProperty>
 
+      <IntVectorProperty name="SimulationPaused"
+                         command="SetSimulationPaused"
+                         default_values="0"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Pauses or continues the simulation.
+        </Documentation>
+      </IntVectorProperty>
+
       <Property name="Initialize" command="Initialize" />
+      <Property name="LiveChanged" command="LiveChanged" />
 
     </LiveInsituLinkProxy>
   </ProxyGroup>

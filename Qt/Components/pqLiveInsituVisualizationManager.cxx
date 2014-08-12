@@ -97,12 +97,24 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
   pqCoreUtilities::connect(adaptor, vtkCommand::UpdateEvent,
     this, SLOT(timestepsUpdated()));
   pqCoreUtilities::connect(adaptor, vtkCommand::ConnectionClosedEvent,
-    this, SIGNAL(catalystDisconnected()));
+    this, SIGNAL(insituDisconnected()));
   pqCoreUtilities::connect(adaptor, vtkCommand::ConnectionCreatedEvent,
-    this, SIGNAL(catalystConnected()));
+    this, SIGNAL(insituConnected()));
 
   this->Internals->CatalystSession = catalyst;
   this->Internals->LiveInsituLinkProxy = adaptor;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqLiveInsituVisualizationManager::insituServer() const
+{
+  return this->Internals->CatalystSession;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqLiveInsituVisualizationManager::displayServer() const
+{
+  return qobject_cast<pqServer*>(this->parent());
 }
 
 //-----------------------------------------------------------------------------
@@ -131,6 +143,12 @@ pqLiveInsituVisualizationManager::~pqLiveInsituVisualizationManager()
     }
 
   delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMLiveInsituLinkProxy* pqLiveInsituVisualizationManager::getProxy() const
+{
+  return this->Internals->LiveInsituLinkProxy;
 }
 
 //-----------------------------------------------------------------------------
@@ -231,4 +249,5 @@ void pqLiveInsituVisualizationManager::timestepsUpdated()
       }
     }
   this->Internals->ExtractSourceProxies.clear();
+  emit nextTimestepAvailable();
 }

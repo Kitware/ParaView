@@ -108,6 +108,47 @@ else()
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
 endif()
 
+# Catalyst-Live tests
+# ----------------------------------------------------------------------
+if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON AND NOT CMAKE_HOST_WIN32)
+  set (catalyst_live_tests
+    ${CMAKE_CURRENT_SOURCE_DIR}/CatalystLiveSetBreakpoint.xml)
+  set (CATALYST_SIMULATION CatalystWaveletDriver.py)
+  set (INSITU_SCRIPT CatalystWaveletCoprocessing 22)
+
+  foreach (tname ${catalyst_live_tests})
+    add_pv_test("pv" "_DISABLE_C"
+      COMMAND
+      --script-ignore-output-errors --script $<TARGET_FILE:pvbatch> -sym
+      ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
+      ${INSITU_SCRIPT}
+
+      --client ${CLIENT_EXECUTABLE}
+      --enable-bt
+      -dr
+      --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+      TEST_SCRIPTS ${tname})
+
+    add_pv_test(pvcs "_DISABLE_CS"
+      COMMAND
+      --script-np 5 --script-ignore-output-errors
+      --script $<TARGET_FILE:pvbatch> -sym
+      ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
+      ${INSITU_SCRIPT}
+
+      --server $<TARGET_FILE:pvserver>
+      --enable-bt
+
+      --client ${CLIENT_EXECUTABLE}
+      --enable-bt
+      -dr
+      --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+      TEST_SCRIPTS ${tname})
+  endforeach()
+endif()
+
 
 SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml

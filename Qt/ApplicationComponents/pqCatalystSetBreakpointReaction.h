@@ -29,40 +29,38 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCatalystConnectReaction_h 
-#define __pqCatalystConnectReaction_h
+#ifndef __pqCatalystSetBreakpointReaction_h 
+#define __pqCatalystSetBreakpointReaction_h
 
 #include "pqReaction.h"
 #include <QPointer>
 
 class pqLiveInsituVisualizationManager;
+class vtkSMLiveInsituLinkProxy;
 
-/// Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
-/// Visualization.
+/// Reaction for setting a breakpoint to Catalyst CoProcessing Engine
+/// for Live-Data Visualization.
 /// @ingroup Reactions
 /// @ingroup LiveInsitu
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReaction
+
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystSetBreakpointReaction :
+  public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqCatalystConnectReaction(QAction* parent=0);
-  virtual ~pqCatalystConnectReaction();
+  pqCatalystSetBreakpointReaction(QAction* parent=0);
 
-  /// Connect to Catalyst 
-  bool connect();
-
-protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { this->connect(); }
-
-  /// reaction disabled when already connected to a catalyst server or in
-  /// collaboration mode.
+public slots:
   virtual void updateEnableState();
 
+protected:
+  virtual void onTriggered();
+
 private:
-  Q_DISABLE_COPY(pqCatalystConnectReaction)
+  Q_DISABLE_COPY(pqCatalystSetBreakpointReaction)
+  class sbrInternal;
+  sbrInternal* Internal;
 };
 
 #endif

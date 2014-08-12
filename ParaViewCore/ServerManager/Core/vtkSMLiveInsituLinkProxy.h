@@ -12,9 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMLiveInsituLinkProxy
+// .NAME vtkSMLiveInsituLinkProxy - Performs additional operation on
+// the Live client
 // .SECTION Description
-//
+// Besides setting or getting parameters from its
+// object (vtkSMLiveInsituLink) it receives paraview state from its
+// object and applies it to the InsituProxyManager as well as sending
+// modified paraview state to its object.
+// @ingroup LiveInsitu
 
 #ifndef __vtkSMLiveInsituLinkProxy_h
 #define __vtkSMLiveInsituLinkProxy_h
@@ -34,7 +39,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Provides access to the a dummy proxy manager representing the 
+  // Provides access to the a dummy proxy manager representing the
   // insitu visualization pipeline.
   vtkSMSessionProxyManager* GetInsituProxyManager();
   void SetInsituProxyManager(vtkSMSessionProxyManager*);
@@ -47,6 +52,14 @@ public:
   vtkSMProxy* CreateExtract(
     const char* reg_group, const char* reg_name, int port_number);
   void RemoveExtract(vtkSMProxy*);
+  // Description:
+  // Wakes up Insitu side if simulation is paused. Handles corectly many calls
+  // on the LIVE side.
+  void LiveChanged();
+  vtkIdType GetTimeStep()
+  {
+    return this->TimeStep;
+  }
 
 //BTX
   // Description:
@@ -61,19 +74,20 @@ protected:
   // that the server-side can send messages to this proxy.
   virtual void CreateVTKObjects();
 
-  void MarkStateDirty() { this->StateDirty = true; }
+  void MarkStateDirty();
 
   // Description:
   // Pushes XML state to the server if needed.
   void PushUpdatedState();
 
   void InsituConnected(const char* initialial_state);
-  void NewTimestepAvailable();
+  void NextTimestepAvailable(vtkIdType timeStep);
 
   vtkSmartPointer<vtkSMSessionProxyManager> InsituProxyManager;
   vtkWeakPointer<vtkPVCatalystSessionCore> CatalystSessionCore;
 
   bool StateDirty;
+  vtkIdType TimeStep;
 private:
   vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&); // Not implemented
   void operator=(const vtkSMLiveInsituLinkProxy&); // Not implemented

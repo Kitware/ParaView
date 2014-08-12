@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -76,12 +76,18 @@
      <string>&amp;Macros</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menu_Catalyst">
+    <property name="title">
+     <string>&amp;Catalyst</string>
+    </property>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menuSources"/>
    <addaction name="menuFilters"/>
    <addaction name="menuTools"/>
+   <addaction name="menu_Catalyst"/>
    <addaction name="menu_Macros"/>
    <addaction name="menu_Help"/>
   </widget>
@@ -141,6 +147,25 @@
    </attribute>
    <widget class="pqCollaborationPanel" name="collaborationPanel"/>
   </widget>
+
+  <widget class="QDockWidget" name="displayDock">
+   <property name="windowTitle">
+    <string>Display</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="displayWidgetFrame">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+    </layout>
+   </widget>
+  </widget>
   <widget class="QDockWidget" name="informationDock">
    <property name="windowTitle">
     <string>Information</string>
@@ -166,8 +191,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>204</width>
-          <height>229</height>
+          <width>72</width>
+          <height>153</height>
          </rect>
         </property>
        </widget>

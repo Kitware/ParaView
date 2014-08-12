@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:    $RCS $
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-   
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -28,41 +28,43 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef __pqCatalystConnectReaction_h 
-#define __pqCatalystConnectReaction_h
+=========================================================================*/
+#ifndef _pqSetBreakpointDialog_h
+#define _pqSetBreakpointDialog_h
 
-#include "pqReaction.h"
-#include <QPointer>
+#include <QDialog>
+#include "pqComponentsModule.h"
 
-class pqLiveInsituVisualizationManager;
+namespace Ui { class pqSetBreakpointDialog; }
 
-/// Reaction for connecting to Catalyst CoProcessing Engine for Live-Data
-/// Visualization.
-/// @ingroup Reactions
+class pqServer;
+class QTreeWidget;
+class pqPipelineSource;
+
+/// Sets a breakpoint for a remote simulation. It allows a user to
+/// specify a time in the future (using simulation time or time step)
+/// when a simulation linked with Catalyst should pause.
+/// 
 /// @ingroup LiveInsitu
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReaction
+class PQCOMPONENTS_EXPORT pqSetBreakpointDialog :
+  public QDialog
 {
   Q_OBJECT
-  typedef pqReaction Superclass;
+
 public:
-  pqCatalystConnectReaction(QAction* parent=0);
-  virtual ~pqCatalystConnectReaction();
+  pqSetBreakpointDialog(QWidget* Parent);
+  ~pqSetBreakpointDialog();
 
-  /// Connect to Catalyst 
-  bool connect();
+signals:
+  void breakpointHit();
 
-protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { this->connect(); }
-
-  /// reaction disabled when already connected to a catalyst server or in
-  /// collaboration mode.
-  virtual void updateEnableState();
+protected slots:
+  void onAccepted();
+  void onTimeUpdated();
 
 private:
-  Q_DISABLE_COPY(pqCatalystConnectReaction)
+  Q_DISABLE_COPY(pqSetBreakpointDialog)
+  Ui::pqSetBreakpointDialog* const Ui;
 };
 
-#endif
+#endif // !_pqSetBreakpointDialog_h

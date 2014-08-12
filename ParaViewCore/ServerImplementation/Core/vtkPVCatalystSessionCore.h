@@ -17,6 +17,7 @@
 // vtkPVCatalystSessionCore is used by vtkSMSession.
 // vtkPVCatalystSessionCore handle catalyst based proxy which don't contains any
 // real data and therefore are not allowed to execute the VTK pipeline.
+// @ingroup LiveInsitu
 
 #ifndef __vtkPVCatalystSessionCore_h
 #define __vtkPVCatalystSessionCore_h

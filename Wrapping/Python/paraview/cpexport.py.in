@@ -20,6 +20,7 @@ from paraview import coprocessing
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
+# ParaView @PARAVIEW_VERSION_FULL@ @PARAVIEW_BUILD_ARCHITECTURE@ bits
 
 %s
 #--------------------------------------------------------------

@@ -38,7 +38,8 @@ protected:
     CLIENT,
     SERVER,
     DATA_SERVER,
-    RENDER_SERVER
+    RENDER_SERVER,
+    SCRIPT
     };
   void SeparateArguments(const char* str, 
                          std::vector<std::string>& flags);
@@ -95,6 +96,7 @@ private:
   ExecutableInfo ServerExecutable;  // fullpath to paraview server executable + args
   ExecutableInfo RenderServerExecutable;  // fullpath to paraview renderserver executable + args
   ExecutableInfo DataServerExecutable;  // fullpath to paraview dataserver executable + args
+  ExecutableInfo ScriptExecutable;  // fullpath to an additional executable + args
   std::string MPIRun;  // fullpath to mpirun executable
 
 
@@ -130,6 +132,7 @@ private:
   std::string MPINumProcessFlag;
   std::string MPIServerNumProcessFlag;
   std::string MPIRenderServerNumProcessFlag;
+  std::string MPIScriptNumProcessFlag;
 
   std::string CurrentPrintLineName;
 
@@ -138,16 +141,18 @@ private:
 
   double TimeOut;
   double ServerExitTimeOut; // time to wait for servers to finish.
+  double ScriptExitTimeOut; // time to wait for the script to finish.
   int TestRenderServer;
   int TestServer;
+  int TestScript;  // additional process to run
   int TestTiledDisplay;
   std::string TestTiledDisplayTDX;
   std::string TestTiledDisplayTDY;
   int AllowErrorInOutput;
+  int ScriptIgnoreOutputErrors;
   int TestRemoteRendering;
   int TestMultiClient;
   int NumberOfServers;
-  
   // Specify if the -rc flag was passed or not
   int ReverseConnection;
 };

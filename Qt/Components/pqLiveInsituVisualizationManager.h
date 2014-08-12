@@ -41,12 +41,14 @@ class pqServer;
 class vtkEventQtSlotConnect;
 class vtkSMLiveInsituLinkProxy;
 
-/// pqLiveInsituVisualizationManager manages the live-coprocessing link. When
-/// pqLiveInsituVisualizationManager in instantiated, it creates a new dummy
-/// session that represents the catalyst pipeline. The proxy manager
-/// in this session reflects the state of the proxies on the coprocessing side.
-/// Next, it creates the (coprocessing, LiveInsituLink) proxy that sets up the
-/// server socket to accept connections from catalyst.
+/// Manages the live-coprocessing link. When
+/// pqLiveInsituVisualizationManager in instantiated, it creates a new
+/// dummy session that represents the catalyst pipeline. The proxy
+/// manager in this session reflects the state of the proxies on the
+/// coprocessing side.  Next, it creates the (coprocessing,
+/// LiveInsituLink) proxy that sets up the server socket to accept
+/// connections from catalyst.
+/// @ingroup LiveInsitu
 class PQCOMPONENTS_EXPORT pqLiveInsituVisualizationManager : public QObject
 {
   Q_OBJECT
@@ -58,14 +60,20 @@ public:
   /// returns true of the port is extracted over to the visualization server.
   bool hasExtracts(pqOutputPort*) const;
 
+  pqServer* insituServer() const;
+  pqServer* displayServer() const;
+
   /// create an extract to view the output from the given port. pqOutputPort
   /// must be an instance on the dummy session corresponding to the catalyst
   /// pipeline.
   bool addExtract(pqOutputPort*);
 
+  vtkSMLiveInsituLinkProxy* getProxy() const;
+
 signals:
-  void catalystConnected();
-  void catalystDisconnected();
+  void insituConnected();
+  void insituDisconnected();
+  void nextTimestepAvailable();
 
 protected slots:
   void timestepsUpdated();
