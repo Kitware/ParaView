@@ -82,11 +82,22 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
+  // Description:
+  // Updates 'Enabled' on this->Widget.
   void UpdateEnabled();
+
+  // Description:
+  // Callback whenever the representation is modified. We call UpdateEnabled()
+  // to ensure that the widget is not left enabled when the representation is
+  // hidden.
+  void OnRepresentationModified();
+
+  // Description:
+  // Forwards this->CustomTransform to the representation.
+  void UpdateTransform();
 
   bool Enabled;
   bool UseNonCompositedRenderer;
-  bool UpdateTransform;
   vtkAbstractWidget* Widget;
   vtkWidgetRepresentation* Representation;
   vtkWeakPointer<vtkPVRenderView> View;
@@ -95,6 +106,7 @@ protected:
 private:
   vtk3DWidgetRepresentation(const vtk3DWidgetRepresentation&); // Not implemented
   void operator=(const vtk3DWidgetRepresentation&); // Not implemented
+  unsigned long RepresentationObserverTag;
 //ETX
 };
 
