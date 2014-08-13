@@ -235,7 +235,7 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server)
     if (!user_ok)
       {
       // user cancelled.
-      return false;
+      return NULL;
       }
 
     pqLiveInsituVisualizationManager* mgr =
