@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
@@ -124,17 +125,19 @@ const char* vtkSMProxyListDomain::GetProxyName(unsigned int cc)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMProxyListDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMProxyListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(prop);
   if (pp && this->GetNumberOfProxies() > 0)
     {
-    pp->RemoveAllProxies();
-    pp->AddProxy(this->GetProxy(0));
+    vtkSMPropertyHelper helper(prop);
+    helper.SetUseUnchecked(use_unchecked_values);
+    vtkSMProxy *values[1] = {this->GetProxy(0)};
+    helper.Set(values, 1);
     return 1;
     }
 
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //-----------------------------------------------------------------------------

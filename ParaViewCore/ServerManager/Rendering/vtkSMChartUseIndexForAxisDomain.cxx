@@ -42,12 +42,17 @@ void vtkSMChartUseIndexForAxisDomain::Update(vtkSMProperty* requestingProperty)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(vtkSMProperty* property)
+int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values)
 {
   vtkSMProperty* arrayName = this->GetRequiredProperty("ArraySelection");
   if (arrayName)
     {
     vtkSMPropertyHelper helper(arrayName);
+    helper.SetUseUnchecked(use_unchecked_values);
+
+    vtkSMPropertyHelper helper2(property);
+    helper2.SetUseUnchecked(use_unchecked_values);
+
     const char* value = helper.GetAsString();
     const char** known_names =
       vtkSMChartSeriesListDomain::GetKnownSeriesNames();
@@ -55,15 +60,15 @@ int vtkSMChartUseIndexForAxisDomain::SetDefaultValues(vtkSMProperty* property)
       {
       if (strcmp(known_names[cc], value) == 0)
         {
-        vtkSMPropertyHelper(property).Set(0);
+        helper2.Set(0);
         return 1;
         }
       }
-    vtkSMPropertyHelper(property).Set(1);
+    helper2.Set(1);
     return 1;
     }
 
-  return this->Superclass::SetDefaultValues(property);
+  return this->Superclass::SetDefaultValues(property, use_unchecked_values);
 }
 
 //----------------------------------------------------------------------------

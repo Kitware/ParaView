@@ -49,6 +49,13 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent=0);
   virtual ~pqDoubleRangeSliderPropertyWidget();
 
+  virtual void apply();
+  virtual void reset();
+
+protected slots:
+  void highlightResetButton(bool highlight = true);
+  void resetClicked();
+
 private slots:
   /// slots called when the slider(s) are moved.
   void lowerChanged(double);

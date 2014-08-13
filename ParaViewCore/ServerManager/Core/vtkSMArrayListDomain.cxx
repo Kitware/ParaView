@@ -23,6 +23,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
@@ -626,7 +627,7 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (!svp)
@@ -634,20 +635,23 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
     return 0;
     }
 
+  vtkSMPropertyHelper helper(prop);
+  helper.SetUseUnchecked(use_unchecked_values);
+
   // If vtkSMStringVectorProperty has a default value which is in domain, just
   // use it.
   const char* defaultValue = svp->GetDefaultValue(0);
   unsigned int temp;
   if (defaultValue && this->IsInDomain(defaultValue, temp))
     {
-    if (svp->GetNumberOfElements() == 5)
+    if (helper.GetNumberOfElements() == 5)
       {
-      svp->SetElement(4, defaultValue);
+      helper.Set(4, defaultValue);
       return 1;
       }
-    else if (svp->GetNumberOfElements() == 1)
+    else if (helper.GetNumberOfElements() == 1)
       {
-      svp->SetElement(0, defaultValue);
+      helper.Set(0, defaultValue);
       return 1;
       }
     }
@@ -662,26 +666,40 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
     }
   if (info)
     {
-    if (svp->GetNumberOfElements() == 5)
+    if (helper.GetNumberOfElements() == 5)
       {
       vtkNew<vtkStringList> values;
-      svp->GetElements(values.GetPointer());
+      if (use_unchecked_values)
+        {
+        svp->GetUncheckedElements(values.GetPointer());
+        }
+      else
+        {
+        svp->GetElements(values.GetPointer());
+        }
 
       vtksys_ios::ostringstream ass;
       ass << info->FieldAssociation;
       values->SetString(3, ass.str().c_str());
       values->SetString(4, info->ArrayName.c_str());
-      svp->SetElements(values.GetPointer());
+      if (use_unchecked_values)
+        {
+        svp->SetUncheckedElements(values.GetPointer());
+        }
+      else
+        {
+        svp->SetElements(values.GetPointer());
+        }
       return 1;
       }
     else if (svp->GetNumberOfElements() == 1)
       {
-      svp->SetElement(0, info->ArrayName.c_str());
+      helper.Set(0, info->ArrayName.c_str());
       return 1;
       }
     }
 
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

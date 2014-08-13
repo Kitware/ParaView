@@ -63,7 +63,7 @@ public:
   // Description:
   // Set the property's default value based on the domain. How the value is
   // determined using the range is controlled by DefaultMode.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
   // Description:
   // Get the default-mode that controls how SetDefaultValues() behaves.

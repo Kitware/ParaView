@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>94</width>
+    <width>130</width>
     <height>38</height>
    </rect>
   </property>
@@ -46,6 +46,13 @@
    <item row="1" column="1">
     <widget class="pqDoubleRangeWidget" name="ThresholdBetween_1" native="true"/>
    </item>
+   <item row="0" column="2" rowspan="2">
+    <widget class="pqHighlightablePushButton" name="Reset">
+     <property name="toolTip">
+      <string>Reset using current data values</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -53,6 +60,11 @@
    <class>pqDoubleRangeWidget</class>
    <extends>QWidget</extends>
    <header>pqDoubleRangeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqHighlightablePushButton</class>
+   <extends>QPushButton</extends>
+   <header>pqHighlightablePushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

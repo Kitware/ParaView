@@ -31,11 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqGenericPropertyWidgetDecorator.h"
 
+#include "pqCoreUtilities.h"
 #include "vtkCommand.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkWeakPointer.h"
-#include "pqCoreUtilities.h"
 
 #include <QtDebug>
 
@@ -70,6 +72,22 @@ public:
       qCritical() << "pqGenericPropertyWidgetDecorator may not work as expected.";
       // currently, we only support 1 element properties.
       return false;
+      }
+
+    if (vtkSMProxyProperty::SafeDownCast(this->Property))
+      {
+      vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+        this->Property->FindDomain("vtkSMProxyListDomain"));
+      if (!pld)
+        {
+        qCritical() << "ProxyProperty without vtkSMProxyListDomain is not supported. "
+          << "pqGenericPropertyWidgetDecorator may not work as expected.";
+        return false;
+        }
+
+      bool status = (helper.GetAsProxy(0) &&
+        (helper.GetAsProxy(0)->GetXMLName() == this->Value));
+      return this->Inverse? !status :  status;
       }
 
     vtkVariant val = helper.GetAsVariant(0);

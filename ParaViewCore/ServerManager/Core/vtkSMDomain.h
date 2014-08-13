@@ -76,9 +76,12 @@ public:
   // Note that unlike the compile-time default values, the
   // application must explicitly call this method to initialize the
   // property.
+  // If \c use_unchecked_values is true, the property's unchecked values will be
+  // changed by this method.
   // Returns 1 if the domain updated the property.
   // Default implementation does nothing.
-  virtual int SetDefaultValues(vtkSMProperty*) {return 0; };
+  virtual int SetDefaultValues(vtkSMProperty*, bool vtkNotUsed(use_unchecked_values))
+    {return 0; };
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML

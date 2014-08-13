@@ -80,7 +80,7 @@ public:
 
   // Description:
   //  Overridden to handle APPROXIMATE_CELL_LENGTH.
-  virtual int SetDefaultValues(vtkSMProperty* property);
+  virtual int SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values);
 
 protected:
   vtkSMBoundsDomain();

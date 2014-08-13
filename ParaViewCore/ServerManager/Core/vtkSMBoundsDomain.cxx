@@ -219,7 +219,8 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
 }
 
 //---------------------------------------------------------------------------
-int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* property)
+int vtkSMBoundsDomain::SetDefaultValues(
+  vtkSMProperty* property, bool use_unchecked_values)
 {
   if (this->Mode == vtkSMBoundsDomain::APPROXIMATE_CELL_LENGTH)
     {
@@ -244,11 +245,13 @@ int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* property)
           unitDistance = diameter / linearNumCells;
           }
         }
-      vtkSMPropertyHelper(property).Set(0, unitDistance);
+      vtkSMPropertyHelper helper(property);
+      helper.SetUseUnchecked(use_unchecked_values);
+      helper.Set(0, unitDistance);
       }
     return 1;
     }
-  return this->Superclass::SetDefaultValues(property);
+  return this->Superclass::SetDefaultValues(property, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

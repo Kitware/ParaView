@@ -14,9 +14,12 @@
 =========================================================================*/
 #include "vtkSMStringListDomain.h"
 
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkStringList.h"
 
 #include <vector>
 
@@ -217,41 +220,50 @@ void vtkSMStringListDomain::SetAnimationValue(vtkSMProperty *prop, int idx,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  vtkSMStringVectorProperty* svp = 
-    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   unsigned int num_string = this->GetNumberOfStrings();
   if (svp && num_string > 0)
     {
-    if (svp->GetNumberOfElements() == 1 && 
-      !svp->GetRepeatCommand() )
+    vtkSMPropertyHelper helper(prop);
+    helper.SetUseUnchecked(use_unchecked_values);
+    if (helper.GetNumberOfElements() == 1 && !svp->GetRepeatCommand())
       {
       const char* defaultValue = svp->GetDefaultValue(0);
       unsigned int temp;
       if (defaultValue && this->IsInDomain(defaultValue, temp))
         {
-        svp->SetElement(0, defaultValue);
+        helper.Set(0, defaultValue);
         }
       else
         {
-        svp->SetElement(0, this->GetString(0));
+        helper.Set(0, this->GetString(0));
         }
-
       return 1;
       }
+
     if (svp->GetRepeatCommand() && svp->GetNumberOfElementsPerCommand()==1)
       {
-      svp->SetNumberOfElements(num_string);
+      vtkNew<vtkStringList> strings;
       for (unsigned int cc=0; cc < num_string; cc++)
         {
-        svp->SetElement(cc, this->GetString(cc));
+        strings->AddString(this->GetString(cc));
+        }
+
+      if (use_unchecked_values)
+        {
+        svp->SetUncheckedElements(strings.GetPointer());
+        }
+      else
+        {
+        svp->SetElements(strings.GetPointer());
         }
       return 1;
       }
     }
 
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

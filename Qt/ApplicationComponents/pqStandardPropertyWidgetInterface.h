@@ -90,7 +90,6 @@ public:
   /// For unsupported/unknown, implementations should simply return NULL without
   /// raising any errors (or messages).
   /// Supported types are:
-  /// \li \c ClipScalarsDecorator : pqClipScalarsDecorator
   /// \li \c CTHArraySelectionDecorator : pqCTHArraySelectionDecorator
   /// \li \c EnableWidgetDecorator : pqEnableWidgetDecorator
   /// \li \c ShowWidgetDecorator : pqShowWidgetDecorator

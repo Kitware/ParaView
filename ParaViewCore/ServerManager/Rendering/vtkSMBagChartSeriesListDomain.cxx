@@ -63,7 +63,7 @@ int vtkSMBagChartSeriesListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVX
 }
 
 //----------------------------------------------------------------------------
-int vtkSMBagChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMBagChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   const std::vector<vtkStdString>& strings = this->GetStrings();
   std::vector<vtkStdString>::const_iterator iter = strings.begin();
@@ -93,14 +93,16 @@ int vtkSMBagChartSeriesListDomain::SetDefaultValues(vtkSMProperty* prop)
         (this->ArrayType == 1 && (*iter) == y) ||
         (this->ArrayType == 2 && (*iter) == hdr))
         {
-        vtkSMPropertyHelper(prop).Set(iter->c_str());
+        vtkSMPropertyHelper helper(prop);
+        helper.SetUseUnchecked(use_unchecked_values);
+        helper.Set(iter->c_str());
         return 1;
         }
       iter++;
       }
     }
 
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //----------------------------------------------------------------------------

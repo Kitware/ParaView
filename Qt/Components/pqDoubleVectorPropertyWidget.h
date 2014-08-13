@@ -38,11 +38,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQCOMPONENTS_EXPORT pqDoubleVectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-
+  typedef pqPropertyWidget Superclass;
 public:
   pqDoubleVectorPropertyWidget(vtkSMProperty *property,
                                vtkSMProxy *proxy,
                                QWidget *parent = 0);
+
+  virtual ~pqDoubleVectorPropertyWidget();
+
+
+  // Overridden to clear highlights from the pqHighlightablePushButton.
+  virtual void apply();
+  virtual void reset();
+
+signals:
+  /// internal signal used to clear highlights from pqHighlightablePushButton.
+  void clearHighlight();
+
+protected slots:
+  /// called when the user clicks the "reset" button for a specific property.
+  void resetButtonClicked();
+
+private:
+  Q_DISABLE_COPY(pqDoubleVectorPropertyWidget);
 };
 
 #endif // _pqDoubleVectorPropertyWidget_h

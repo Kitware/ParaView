@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGlyphScaleFactorPropertyWidget.h"
 
 #include "pqCoreUtilities.h"
+#include "pqHighlightablePushButton.h"
 #include "pqLineEdit.h"
 #include "vtkCommand.h"
 #include "vtkGlyph3D.h"
@@ -53,14 +54,13 @@ pqGlyphScaleFactorPropertyWidget::pqGlyphScaleFactorPropertyWidget(
   QLayout* layout = this->layout();
   Q_ASSERT(layout);
 
-  QPushButton* button = new QPushButton(this);
+  pqHighlightablePushButton* button = new pqHighlightablePushButton(this);
   button->setObjectName("Reset");
   button->setToolTip("Reset using current data values");
   button->setIcon(button->style()->standardIcon(QStyle::SP_BrowserReload));
   layout->addWidget(button);
 
   this->ResetButton = button;
-  this->ResetPalette = this->ResetButton->palette();
 
   this->connect(button, SIGNAL(clicked()), SLOT(resetClicked()));
 
@@ -98,13 +98,7 @@ void pqGlyphScaleFactorPropertyWidget::reset()
 //-----------------------------------------------------------------------------
 void pqGlyphScaleFactorPropertyWidget::highlightResetButton(bool highlight)
 {
-  QPalette palette = this->ResetPalette;
-  if (highlight)
-    {
-    palette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
-    palette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
-    }
-  this->ResetButton->setPalette(palette);
+  this->ResetButton->highlight(/*clear=*/ highlight == false);
 }
 
 //-----------------------------------------------------------------------------

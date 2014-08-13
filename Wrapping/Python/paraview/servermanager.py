@@ -982,9 +982,7 @@ class ArraySelectionProperty(VectorProperty):
         for i in range(0,3):
             if self.GetElement(i) == '':
                 self.SMProperty.SetElement(i, '0')
-        al = self.SMProperty.GetDomain("array_list")
-        al.Update(self.SMProperty)
-        al.SetDefaultValues(self.SMProperty)
+        self.SMProperty.ResetToDomainDefaults(False)
 
 class ArrayListProperty(VectorProperty):
     """This property provides a simpler interface for selecting arrays.
@@ -1140,7 +1138,7 @@ class ProxyProperty(Property):
                     iproxy = CreateProxy(igroup, name)
                     listdomain.AddProxy(iproxy)
                     pm.RegisterProxy(group, proxy.GetPropertyName(smproperty), iproxy)
-                listdomain.SetDefaultValues(self.SMProperty)
+                smproperty.ResetToDomainDefaults(False)
 
     def GetAvailable(self):
         """If this proxy has a list domain, then this function returns the

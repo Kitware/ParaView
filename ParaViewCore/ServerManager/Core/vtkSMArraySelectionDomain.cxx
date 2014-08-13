@@ -30,16 +30,20 @@ vtkSMArraySelectionDomain::~vtkSMArraySelectionDomain()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMArraySelectionDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMVectorProperty* vprop = vtkSMVectorProperty::SafeDownCast(prop);
   vtkSMVectorProperty* infoProp = vtkSMVectorProperty::SafeDownCast(prop->GetInformationProperty());
   if (vprop && infoProp)
     {
+    if (use_unchecked_values)
+      {
+      vtkWarningMacro("Developer Warnings: missing unchecked implementation.");
+      }
     vprop->Copy(infoProp);
     return 1;
     }
-  return this->Superclass::SetDefaultValues(prop);
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
 
 //---------------------------------------------------------------------------

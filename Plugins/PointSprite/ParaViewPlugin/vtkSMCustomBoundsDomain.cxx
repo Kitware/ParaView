@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMCustomBoundsDomain);
 //----------------------------------------------------------------------------
@@ -60,7 +61,8 @@ void vtkSMCustomBoundsDomain::UpdateFromInformation(vtkPVDataInformation* info)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMCustomBoundsDomain::SetDefaultValues(vtkSMProperty* prop)
+int vtkSMCustomBoundsDomain::SetDefaultValues(
+  vtkSMProperty* prop, bool use_unchecked_values)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
   if (!dvp)
@@ -68,21 +70,23 @@ int vtkSMCustomBoundsDomain::SetDefaultValues(vtkSMProperty* prop)
     vtkErrorMacro("vtkSMBoundsDomain only works on vtkSMDoubleVectorProperty.");
     return 0;
     }
+  vtkSMPropertyHelper helper(dvp);
+  helper.SetUseUnchecked(use_unchecked_values);
 
   if (this->GetMaximumExists(0) && this->GetMinimumExists(0))
     {
     double min = this->GetMinimum(0);
     double max = this->GetMaximum(0);
 
-    if (dvp->GetNumberOfElements() == 2)
+    if (helper.GetNumberOfElements() == 2)
       {
-      dvp->SetElement(0, min);
-      dvp->SetElement(1, max);
+      helper.Set(0, min);
+      helper.Set(1, max);
       return 1;
       }
-    else if(dvp->GetNumberOfElements() == 1)
+    else if(helper.GetNumberOfElements() == 1)
       {
-      dvp->SetElement(0, max);
+      helper.Set(0, max);
       return 1;
       }
     }

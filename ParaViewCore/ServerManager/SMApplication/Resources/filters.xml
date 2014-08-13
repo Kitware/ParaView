@@ -5886,14 +5886,17 @@ found and the point will be rejected.</Documentation>
         name of the scalar array on which to perform the clip
         operation.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ClipScalarsDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipFunction"
+                                   value="Scalar" />
         </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetValue"
                             default_values="0.0"
                             name="Value"
                             number_of_elements="1">
-        <ArrayRangeDomain name="scalar_range">
+        <ArrayRangeDomain name="range">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -5901,7 +5904,6 @@ found and the point will be rejected.</Documentation>
                       name="SelectInputScalars" />
           </RequiredProperties>
         </ArrayRangeDomain>
-        <DoubleRangeDomain name="range" />
         <Documentation>If clipping with scalars, this property sets the scalar
         value about which to clip the dataset based on the scalar array chosen.
         (See SelectInputScalars.) If clipping with a clip function, this
@@ -5909,7 +5911,10 @@ found and the point will be rejected.</Documentation>
         clipping operation. Neither functionality is currently available in
         ParaView's user interface.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ClipScalarsDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipFunction"
+                                   value="Scalar" />
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetInsideOut"
@@ -5942,7 +5947,11 @@ found and the point will be rejected.</Documentation>
         in the given region or clip those cells so all of the output one stay
         only inside that region.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="ClipScalarsDecorator" exclude="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipFunction"
+                                   value="Scalar"
+                                   inverse="1" />
         </Hints>
       </IntVectorProperty>
       <Hints>

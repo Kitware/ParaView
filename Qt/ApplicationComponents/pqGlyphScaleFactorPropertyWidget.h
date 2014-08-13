@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqDoubleVectorPropertyWidget.h"
 
-#include <QPalette>
+
+class pqHighlightablePushButton;
 
 /// pqGlyphScaleFactorPropertyWidget is used for the "Scale Factor" property on
 /// the Glyph filter. It adds a button to the widget that allows the user to
@@ -62,8 +63,7 @@ protected slots:
 
 private:
   Q_DISABLE_COPY(pqGlyphScaleFactorPropertyWidget);
-  QWidget* ResetButton;
-  QPalette ResetPalette;
+  pqHighlightablePushButton* ResetButton;
 };
 
 #endif

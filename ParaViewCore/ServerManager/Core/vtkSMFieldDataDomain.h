@@ -60,7 +60,7 @@ public:
   // Description:
   // Overridden to ensure that the property's default value is valid for the
   // enumeration, if not it will be set to the first enumeration value.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 protected:
   vtkSMFieldDataDomain();

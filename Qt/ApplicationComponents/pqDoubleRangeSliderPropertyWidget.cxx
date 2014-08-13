@@ -32,11 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "ui_pqDoubleRangeSliderPropertyWidget.h"
 
+#include "pqCoreUtilities.h"
 #include "pqPropertiesPanel.h"
 #include "pqProxyWidget.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqWidgetRangeDomain.h"
+#include "vtkCommand.h"
 #include "vtkSMProperty.h"
+#include "vtkSMBoundsDomain.h"
+#include "vtkSMUncheckedPropertyHelper.h"
 
 #include <QGridLayout>
 
@@ -58,6 +62,7 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   Ui::DoubleRangeSliderPropertyWidget &ui = this->Internals->Ui;
   ui.setupUi(this);
 
+  ui.Reset->setIcon(ui.Reset->style()->standardIcon(QStyle::SP_BrowserReload));
   ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
   ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
   ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
@@ -67,6 +72,13 @@ pqDoubleRangeSliderPropertyWidget::pqDoubleRangeSliderPropertyWidget(
   this->addPropertyLink(ui.ThresholdBetween_1, "value", SIGNAL(valueChanged(double)),
                         smProperty, 1);
 
+  pqCoreUtilities::connect(smProperty, vtkCommand::DomainModifiedEvent,
+    this, SLOT(highlightResetButton()));
+  pqCoreUtilities::connect(smProperty, vtkCommand::UncheckedPropertyModifiedEvent,
+    this, SLOT(highlightResetButton()));
+
+  this->connect(ui.Reset, SIGNAL(clicked()),
+                    this, SLOT(resetClicked()));
   this->connect(ui.ThresholdBetween_0, SIGNAL(valueEdited(double)),
                    this, SLOT(lowerChanged(double)));
   this->connect(ui.ThresholdBetween_1, SIGNAL(valueEdited(double)),
@@ -85,6 +97,37 @@ pqDoubleRangeSliderPropertyWidget::~pqDoubleRangeSliderPropertyWidget()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::apply()
+{
+ this->Superclass::apply();
+ this->highlightResetButton(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::reset()
+{
+ this->Superclass::reset();
+ this->highlightResetButton(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::highlightResetButton(bool highlight)
+{
+  this->Internals->Ui.Reset->highlight(/*clear=*/highlight==false);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeSliderPropertyWidget::resetClicked()
+{
+  vtkSMProperty* smproperty = this->property();
+  smproperty->ResetToDomainDefaults(/*use_unchecked_values*/ true);
+
+  this->highlightResetButton(false);
+  emit this->changeAvailable();
+  emit this->changeFinished();
 }
 
 //-----------------------------------------------------------------------------

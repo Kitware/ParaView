@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleVectorPropertyWidget.h"
 
+#include "vtkCommand.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDomain.h"
@@ -42,13 +43,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
-#include "pqSignalAdaptors.h"
+#include "pqCoreUtilities.h"
 #include "pqDoubleRangeWidget.h"
+#include "pqHighlightablePushButton.h"
+#include "pqLineEdit.h"
+#include "pqPropertiesPanel.h"
 #include "pqScalarValueListPropertyWidget.h"
+#include "pqSignalAdaptors.h"
+#include "pqWidgetRangeDomain.h"
 
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
-#include "pqLineEdit.h"
+#include <QStyle>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
@@ -82,7 +88,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
   QHBoxLayout *layoutLocal = new QHBoxLayout;
   layoutLocal->setMargin(0);
-  layoutLocal->setSpacing(0);
+  layoutLocal->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
   if(vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain))
     {
@@ -114,17 +120,37 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
 
+      // ensures that the widget's range is updated whenever the domain changes.
+      new pqWidgetRangeDomain(widget, "minimum", "maximum", dvp, 0);
+
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
       this->connect(widget, SIGNAL(valueEdited(double)),
                     this, SIGNAL(changeFinished()));
 
-      layoutLocal->setSpacing(4);
       layoutLocal->addWidget(widget);
 
       PV_DEBUG_PANELS() << "pqDoubleRangeWidget for an DoubleVectorProperty "
                     << "with a single element and a "
                     << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
                     << "with a minimum and a maximum";
+
+      if (vtkSMArrayRangeDomain::SafeDownCast(range))
+        {
+        // if this has an vtkSMArrayRangeDomain, add a "reset" button.
+        pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
+        resetButton->setObjectName("Reset");
+        resetButton->setToolTip("Reset using current data values");
+        resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+
+        pqCoreUtilities::connect(dvp, vtkCommand::DomainModifiedEvent,
+          resetButton, SLOT(highlight()));
+        pqCoreUtilities::connect(dvp, vtkCommand::UncheckedPropertyModifiedEvent,
+          resetButton, SLOT(highlight()));
+        this->connect(resetButton, SIGNAL(clicked()), SLOT(resetButtonClicked()));
+        resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
+
+        layoutLocal->addWidget(resetButton);
+        }
       }
     else
       {
@@ -199,4 +225,33 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     {
     defaultDomain->Delete();
     }
+}
+//-----------------------------------------------------------------------------
+pqDoubleVectorPropertyWidget::~pqDoubleVectorPropertyWidget()
+{
+}
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::resetButtonClicked()
+{
+  if (vtkSMProperty* smproperty = this->property())
+    {
+    smproperty->ResetToDomainDefaults(/*use_unchecked_values*/true);
+    emit this->changeAvailable();
+    emit this->changeFinished();
+    }
+  emit this->clearHighlight();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::apply()
+{
+  this->Superclass::apply();
+  emit this->clearHighlight();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::reset()
+{
+  this->Superclass::reset();
+  emit this->clearHighlight();
 }

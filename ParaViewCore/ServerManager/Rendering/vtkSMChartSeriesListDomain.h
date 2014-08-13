@@ -53,7 +53,7 @@ public:
 
   // Description:
   // Set the default values for the property.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
   // Description:
   // Returns the list of series that are know to this domain are are given a

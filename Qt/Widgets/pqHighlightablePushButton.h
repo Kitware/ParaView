@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqHighlightablePushButton.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqClipScalarsDecorator_h
-#define __pqClipScalarsDecorator_h
+#ifndef __pqHighlightablePushButton_h
+#define __pqHighlightablePushButton_h
 
-#include "pqApplicationComponentsModule.h"
-#include "pqPropertyWidgetDecorator.h"
-#include "vtkWeakPointer.h"
+#include <QPushButton>
+#include <QScopedPointer>
+#include "pqWidgetsModule.h"
 
-class vtkObject;
-
-/// pqClipScalarsDecorator is a pqPropertyWidgetDecorator subclass used by \c
-/// Clip filter (and similar filters) to control the visibility of widgets that
-/// let the user pick the scalars to clip with. This looks at the current state
-/// of the "ClipType" property and determine whether the widgets being decorated
-/// should be shown.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqClipScalarsDecorator : public pqPropertyWidgetDecorator
+/// pqHighlightablePushButton extents QPushButton to add support for
+/// highlighting the button.
+class PQWIDGETS_EXPORT pqHighlightablePushButton : public QPushButton
 {
   Q_OBJECT
-  typedef pqPropertyWidgetDecorator Superclass;
+  typedef QPushButton Superclass;
 public:
-  pqClipScalarsDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  virtual ~pqClipScalarsDecorator();
+  pqHighlightablePushButton(QWidget *parent=0);
+  pqHighlightablePushButton(const QString &text, QWidget *parent=0);
+  pqHighlightablePushButton(const QIcon &icon, const QString &text, QWidget *parent=0);
+  virtual ~pqHighlightablePushButton();
 
-  /// Overridden to hide the widget when not clipping by scalars.
-  virtual bool canShowWidget(bool show_advanced) const;
+public slots:
+  /// Slots to highlight (or clear the highlight).
+  void highlight(bool clear=false);
+  void clear() { this->highlight(true); }
 
 private:
-  Q_DISABLE_COPY(pqClipScalarsDecorator)
-
-  vtkWeakPointer<vtkObject> ObservedObject;
-  unsigned long ObserverId;
+  Q_DISABLE_COPY(pqHighlightablePushButton);
+  class pqInternals;
+  const QScopedPointer<pqInternals> Internals;
 };
 
 #endif

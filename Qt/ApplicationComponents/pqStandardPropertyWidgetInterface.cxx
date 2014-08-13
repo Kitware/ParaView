@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBackgroundEditorWidget.h"
 #include "pqCalculatorWidget.h"
 #include "pqCameraManipulatorWidget.h"
-#include "pqClipScalarsDecorator.h"
 #include "pqColorAnnotationsPropertyWidget.h"
 #include "pqColorEditorPropertyWidget.h"
 #include "pqColorOpacityEditorWidget.h"
@@ -214,10 +213,6 @@ pqStandardPropertyWidgetInterface::createWidgetDecorator(
   const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
 {
   // *** NOTE: When adding new types, please update the header documentation ***
-  if (type == "ClipScalarsDecorator")
-    {
-    return new pqClipScalarsDecorator(config, widget);
-    }
   if (type == "CTHArraySelectionDecorator")
     {
     return new pqCTHArraySelectionDecorator(config, widget);

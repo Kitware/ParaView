@@ -95,7 +95,7 @@ public:
   // application must explicitly call this method to initialize the
   // property.
   // Returns 1 if the domain updated the property.
-  virtual int SetDefaultValues(vtkSMProperty*);
+  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values);
 
 //BTX
 protected:

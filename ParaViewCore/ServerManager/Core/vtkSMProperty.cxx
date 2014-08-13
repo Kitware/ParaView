@@ -569,7 +569,7 @@ void vtkSMProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-bool vtkSMProperty::ResetToDomainDefaults()
+bool vtkSMProperty::ResetToDomainDefaults(bool use_unchecked_values)
 {
   if (vtkProcessModule::GetProcessModule() &&
     vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode())
@@ -582,7 +582,7 @@ bool vtkSMProperty::ResetToDomainDefaults()
   this->DomainIterator->Begin();
   while (!this->DomainIterator->IsAtEnd())
     {
-    if (this->DomainIterator->GetDomain()->SetDefaultValues(this))
+    if (this->DomainIterator->GetDomain()->SetDefaultValues(this, use_unchecked_values))
       {
       return true;
       }
@@ -595,7 +595,7 @@ bool vtkSMProperty::ResetToDomainDefaults()
 //---------------------------------------------------------------------------
 void vtkSMProperty::ResetToDefault()
 {
-  if (!this->ResetToDomainDefaults())
+  if (!this->ResetToDomainDefaults(false))
     {
     this->ResetToXMLDefaults();
     }

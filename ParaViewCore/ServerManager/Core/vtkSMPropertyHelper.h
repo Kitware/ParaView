@@ -217,6 +217,11 @@ public:
   int GetInputArrayAssociation();
   const char* GetInputArrayNameToProcess();
 
+  // Description:
+  // Get/Set whether to use unchecked properties.
+  void SetUseUnchecked(bool val) { this->UseUnchecked = val; }
+  bool GetUseUnchecked() { return this->UseUnchecked; }
+
 protected:
   void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
 
