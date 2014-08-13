@@ -88,6 +88,11 @@
     "title": "Developer corner",
     "items": [
       {
+      "name": "developer_howto",
+      "url": "guides/developer_howto",
+      "title": "Introduction for developers",
+      "description": "Components break down and introduction of ParaViewWeb's pieces."
+      },{
       "name": "developer_style",
       "url": "guides/developer_style",
       "title": "Code Style Guidelines",
