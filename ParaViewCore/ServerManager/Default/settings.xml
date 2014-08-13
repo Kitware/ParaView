@@ -241,6 +241,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="TransparentBackground"
+        command="SetTransparentBackground"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+           Set whether screenshots use an alpha channel to make the background
+           transparent.
+        </Documentation>
+      </IntVectorProperty>
+
+
       <IntVectorProperty name="InheritRepresentationProperties"
         command="SetInheritRepresentationProperties"
         number_of_elements="1"

@@ -33,6 +33,7 @@
 #include "vtkSMProxy.h"
 
 class vtkImageData;
+class vtkRenderer;
 class vtkRenderWindow;
 class vtkSMRepresentationProxy;
 class vtkSMSourceProxy;
@@ -131,6 +132,10 @@ public:
   // NULL.
   virtual vtkRenderWindow* GetRenderWindow() { return NULL; }
 
+  // Description:
+  // Sets whether screenshots have a transparent background.
+  static void SetTransparentBackground(bool val);
+
 //BTX
 protected:
   vtkSMViewProxy();
@@ -173,10 +178,18 @@ private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented
 
+  static bool TransparentBackground;
+
   // When view's time changes, there's no way for the client-side proxies to
   // know that they may re-execute and their data info is invalid. So mark those
   // dirty explicitly.
   void ViewTimeChanged();
+
+  // Actual logic for taking a screenshot.
+  vtkImageData* CaptureWindowSingle(int magnification);
+  class vtkRendererSaveInfo;
+  vtkRendererSaveInfo* PrepareRendererBackground(vtkRenderer*, double, double, double, bool);
+  void RestoreRendererBackground(vtkRenderer*, vtkRendererSaveInfo*);
 //ETX
 };
 
