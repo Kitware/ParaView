@@ -195,6 +195,7 @@
                 value = me.hasClass('checkbox') ? (me.prop('checked') ? 1 : 0) : me.val();
             if(propName === 'ActiveRendererType') {
                 viewport.setActiveRenderer(value);
+                viewport.invalidateScene();
             } else if(propName === 'Stats') {
                 viewport.showStatistics(value === 1);
             }
