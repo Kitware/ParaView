@@ -125,6 +125,7 @@ def proxyListDomainDecorator(props, xmlProps, uiProps, domain):
 #--------------------------------------------------------------------------
 # Decorate for PropertyWidgetDecorator hint with type="ClipScalarDecorator"
 #--------------------------------------------------------------------------
+# FIXME: Remove this when GenericDecorator goes into master
 def clipScalarDecorator(prop, uiElt, hint):
     proxy = None
     try:
@@ -141,6 +142,36 @@ def clipScalarDecorator(prop, uiElt, hint):
     else:
         depends = proxy.GetGlobalIDAsString() + ':ClipFunction:Scalar:0'
     uiElt['depends'] = depends
+
+#--------------------------------------------------------------------------
+# Decorate for PropertyWidgetDecorator hint with type="GenericDecorator"
+#--------------------------------------------------------------------------
+def genericDecorator(prop, uiElt, hint):
+    proxy = None
+    try:
+        proxy = prop.SMProperty.GetParent()
+    except:
+        try:
+            proxy = prop.GetParent()
+        except:
+            print 'ERROR: unable to get proxy for property ' + prop.Name
+            return
+
+    mode = hint.GetAttribute("mode")
+
+    # For now we just handle visbility mode
+    if mode == 'visibility':
+        propName = hint.GetAttribute("property")
+        value = hint.GetAttribute("value")
+        inverse = hint.GetAttribute("inverse")
+        visibility = '1'
+
+        if not inverse or inverse != '1':
+            visibility = '1'
+        else:
+            visibility = '0'
+
+        uiElt['depends'] = "%s:%s:%s:%s" % (proxy.GetGlobalIDAsString(), propName, value, visibility)
 
 
 #--------------------------------------------------------------------------

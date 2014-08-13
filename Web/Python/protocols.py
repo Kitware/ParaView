@@ -519,7 +519,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                  'vtkSMProxyProperty': 'proxy',
                                  'vtkSMInputProperty': 'proxy' }
         self.allowedProxies = {}
-        self.hintsMap = { 'PropertyWidgetDecorator': { 'ClipScalarsDecorator': clipScalarDecorator },
+        self.hintsMap = { 'PropertyWidgetDecorator': { 'ClipScalarsDecorator': clipScalarDecorator,
+                                                       'GenericDecorator': genericDecorator },
                           'Widget': { 'multi_line': multiLineDecorator } }
 
         self.baseDir = baseDir
