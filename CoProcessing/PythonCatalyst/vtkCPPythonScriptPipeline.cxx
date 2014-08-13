@@ -253,6 +253,20 @@ int vtkCPPythonScriptPipeline::CoProcess(
 }
 
 //----------------------------------------------------------------------------
+int vtkCPPythonScriptPipeline::Finalize()
+{
+  InitializePython();
+
+  vtksys_ios::ostringstream pythonInput;
+  pythonInput
+    << this->PythonScriptName << ".Finalize()\n";
+
+  vtkPythonInterpreter::RunSimpleString(pythonInput.str().c_str());
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
 {
   char addressOfPointer[1024];

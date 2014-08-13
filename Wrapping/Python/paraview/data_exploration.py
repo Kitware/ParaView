@@ -10,7 +10,7 @@ from paraview import simple, servermanager
 # Run management
 #==============================================================================
 
-class AnalysisManager():
+class AnalysisManager(object):
     """
     This class provide mechanism to keep track of a full data analysis and
     exploration so the generated analysis can be processed and viewed on
@@ -72,7 +72,7 @@ class AnalysisManager():
         If 2 begin_work with the same key, the second one will override the first one.
         """
         current_timer = None
-        if self.timers.has_key(key):
+        if key in self.timers:
             current_timer = self.timers[key]
         else:
             current_timer = { 'total_time': 0.0, 'work_count': 0 , 'last_begin': 0.0}
@@ -92,7 +92,7 @@ class AnalysisManager():
         be ignore as no begin_work will be done before.
         """
         delta = 0
-        if self.timers.has_key(key):
+        if key in self.timers:
             current_timer = self.timers[key]
             if current_timer['last_begin'] != 0.0:
                 delta = time.time()
@@ -150,7 +150,7 @@ class AnalysisManager():
 # File Name management
 #==============================================================================
 
-class FileNameGenerator():
+class FileNameGenerator(object):
     """
     This class provide some methods to help build a unique file name
     which map to a given simulation state.
@@ -194,7 +194,7 @@ class FileNameGenerator():
             value_str = "{value}".format(value=value)
             self.active_arguments[key] = value_str
             if store_value:
-                if self.arguments.has_key(key):
+                if key in self.arguments:
                     try:
                         self.arguments[key]["values"].index(value_str)
                     except ValueError:
@@ -215,7 +215,7 @@ class FileNameGenerator():
         Update label arguments, but argument must exist first
         """
         for key, value in kwargs.iteritems():
-            if self.arguments.has_key(key):
+            if key in self.arguments:
                 self.arguments[key]["label"] = value
 
     def get_filename(self):
@@ -472,7 +472,7 @@ class FixCameraHandler(CameraHandler):
 # Data explorer
 #==============================================================================
 
-class SliceExplorer():
+class SliceExplorer(object):
     """
     Class use to dump image stack of a data exploration. This data exploration
     is slicing the input data along an axis and save each slice as a new image
@@ -536,6 +536,7 @@ class SliceExplorer():
         if self.analysis:
             self.analysis.begin_work('SliceExplorer')
 
+        simple.SetActiveView(self.view_proxy)
         self.file_name_generator.update_active_arguments(time=time)
         self.slice.SMProxy.InvokeEvent('UserEvent', 'HideWidget')
         self.view_proxy.CameraParallelProjection = 1
@@ -578,7 +579,7 @@ class SliceExplorer():
 
 #==============================================================================
 
-class ContourExplorer():
+class ContourExplorer(object):
     """
     Class used to explore data. This Explorer won't dump any images but can be used
     along with the ThreeSixtyImageStackExporter() like in the following example.
@@ -667,7 +668,7 @@ class ContourExplorer():
 # Data explorer
 #==============================================================================
 
-class ImageResampler():
+class ImageResampler(object):
     def __init__(self, file_name_generator, data_to_probe, sampling_dimesions, array_colors, nanColor = [0,0,0,0], custom_probing_bounds = None):
         self.analysis = None
         self.file_name_generator = file_name_generator
@@ -707,6 +708,7 @@ class ImageResampler():
         self.file_name_generator.update_active_arguments(time=time)
         self.resampler.UpdatePipeline(time)
 
+        simple.SetActiveView(self.view_proxy)
         # Write resampled data as JSON files
         self.file_name_generator.update_active_arguments(format='json')
         writer = simple.JSONImageWriter(Input=self.resampler)
@@ -745,7 +747,7 @@ class ImageResampler():
 # Chart generator
 #==============================================================================
 
-class LineProber():
+class LineProber(object):
     def __init__(self, file_name_generator, data_to_probe, points_series, number_of_points):
         """
         file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
@@ -796,6 +798,7 @@ class LineProber():
 
         self.file_name_generator.update_active_arguments(time=time)
 
+        simple.SetActiveView(self.view_proxy)
         # Explore the data
         for serie in self.series:
             self.probe.Source.Point1 = serie['start_point']
@@ -821,7 +824,7 @@ class LineProber():
 
 #==============================================================================
 
-class DataProber():
+class DataProber(object):
     def __init__(self, file_name_generator, data_to_probe, points_series, fields):
         """
         file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
@@ -882,6 +885,7 @@ class DataProber():
 
         self.file_name_generator.update_active_arguments(time=time)
 
+        simple.SetActiveView(self.view_proxy)
         # Explore the data
         saved_data = {}
         for serie in self.series:
@@ -930,7 +934,7 @@ class DataProber():
 
 #==============================================================================
 
-class TimeSerieDataProber():
+class TimeSerieDataProber(object):
     def __init__(self, file_name_generator, data_to_probe, point_series, fields, time_to_write):
         """
         file_name_generator: the file name generator to use. Need to have ['phi', 'theta'] as keys.
@@ -1006,6 +1010,7 @@ class TimeSerieDataProber():
         if self.analysis:
             self.analysis.begin_work('TimeSerieDataProber')
 
+        simple.SetActiveView(self.view_proxy)
         for field in self.fields:
             self.data_arrays[field].append([ "%f" % time ])
 
@@ -1028,7 +1033,7 @@ class TimeSerieDataProber():
 # Image composite
 #==============================================================================
 
-class CompositeImageExporter():
+class CompositeImageExporter(object):
     """
     Class use to dump an image stack for a given view position so it can be
     recomposed later on in the web.
@@ -1075,8 +1080,8 @@ class CompositeImageExporter():
         for node in data_list_pipeline:
             entry = { 'name': node['name'], 'ids': [self.codes[index]], 'type': 'layer' }
 
-            if node.has_key('parent'):
-                if parentTree.has_key(node['parent']):
+            if 'parent' in node:
+                if node['parent'] in parentTree:
                     # add node as child
                     parentTree[node['parent']]['children'].append(entry)
                     parentTree[node['parent']]['ids'].append(entry['ids'][0])
@@ -1126,6 +1131,7 @@ class CompositeImageExporter():
             self.analysis.begin_work('CompositeImageExporter')
         self.file_name_generator.update_active_arguments(time=time)
 
+        simple.SetActiveView(self.view_proxy)
         # Fix camera bounds
         simple.Render(self.view)
         self.view.ResetClippingBounds()
@@ -1225,7 +1231,7 @@ class CompositeImageExporter():
 # Image exporter
 #==============================================================================
 
-class ThreeSixtyImageStackExporter():
+class ThreeSixtyImageStackExporter(object):
     """
     Class use to dump image stack of geometry exploration.
     This exporter will use the provided view to create a 360 view of the visible data.
@@ -1278,6 +1284,7 @@ class ThreeSixtyImageStackExporter():
         if self.analysis:
             self.analysis.begin_work('ThreeSixtyImageStackExporter')
 
+        simple.SetActiveView(self.view_proxy)
         self.file_name_generator.update_active_arguments(time=time)
         self.view_proxy.CameraFocalPoint = self.focal_point
         self.view_proxy.CameraViewUp     = self.phi_rotation_axis

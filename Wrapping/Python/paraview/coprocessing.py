@@ -129,8 +129,8 @@ class CoProcessor(object):
         timestep = datadescription.GetTimeStep()
 
         for view in self.__ViewsList:
-            if timestep % view.cpFrequency == 0 or \
-                                            datadescription.GetForceOutput() == True:
+            if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
+               datadescription.GetForceOutput() == True:
                 fname = view.cpFileName
                 fname = fname.replace("%t", str(timestep))
                 if view.cpFitToScreen != 0:
@@ -285,6 +285,14 @@ class CoProcessor(object):
            such as magnification, size and frequency."""
         view = proxy_ctor()
         return self.RegisterView(view, filename, freq, fittoscreen, magnification, width, height)
+
+    def Finalize(self):
+        for writer in self.__WritersList:
+            if hasattr(writer, 'Finalize'):
+                writer.Finalize()
+        for view in self.__ViewsList:
+            if hasattr(view, 'Finalize'):
+                view.Finalize()
 
     def RescaleDataRange(self, view, time):
         """DataRange can change across time, sometime we want to rescale the
