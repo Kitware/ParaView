@@ -15,18 +15,17 @@
 #include "vtk3DWidgetRepresentation.h"
 
 #include "vtkAbstractWidget.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVImplicitPlaneRepresentation.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
-#include "vtkPVImplicitPlaneRepresentation.h"
-#include "vtkWidgetRepresentation.h"
 #include "vtkTransform.h"
+#include "vtkWidgetRepresentation.h"
 
 vtkStandardNewMacro(vtk3DWidgetRepresentation);
 vtkCxxSetObjectMacro(vtk3DWidgetRepresentation, Widget, vtkAbstractWidget);
-vtkCxxSetObjectMacro(vtk3DWidgetRepresentation, Representation,
-  vtkWidgetRepresentation);
 //----------------------------------------------------------------------------
 vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
 {
@@ -35,11 +34,11 @@ vtk3DWidgetRepresentation::vtk3DWidgetRepresentation()
   this->Representation = 0;
   this->UseNonCompositedRenderer = false;
   this->Enabled = false;
-  this->UpdateTransform = false;
 
   this->CustomTransform = vtkTransform::New();
   this->CustomTransform->PostMultiply();
   this->CustomTransform->Identity();
+  this->RepresentationObserverTag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -50,35 +49,52 @@ vtk3DWidgetRepresentation::~vtk3DWidgetRepresentation()
   this->CustomTransform->Delete();
 }
 
+//-----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::SetRepresentation(vtkWidgetRepresentation* repr)
+{
+  if (this->Representation == repr)
+    {
+    return;
+    }
+
+  if (this->Representation)
+    {
+    this->Representation->RemoveObserver(this->RepresentationObserverTag);
+    this->RepresentationObserverTag = 0;
+    }
+  vtkSetObjectBodyMacro(Representation, vtkWidgetRepresentation, repr);
+  if (this->Representation)
+    {
+    this->RepresentationObserverTag = this->Representation->AddObserver(
+      vtkCommand::ModifiedEvent,
+      this, &vtk3DWidgetRepresentation::OnRepresentationModified);
+    }
+
+  this->UpdateEnabled();
+  this->UpdateTransform();
+}
+
 //----------------------------------------------------------------------------
 bool vtk3DWidgetRepresentation::AddToView(vtkView* view)
 {
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
     {
+    vtkRenderer* activeRenderer = this->UseNonCompositedRenderer?
+      pvview->GetNonCompositedRenderer() : pvview->GetRenderer();
     if (this->Widget)
       {
       this->Widget->SetInteractor(pvview->GetInteractor());
-      this->Widget->SetCurrentRenderer(
-        this->UseNonCompositedRenderer?
-        pvview->GetNonCompositedRenderer() :
-        pvview->GetRenderer());
+      this->Widget->SetCurrentRenderer(activeRenderer);
       }
     if (this->Representation)
       {
-      if (this->UseNonCompositedRenderer)
-        {
-        this->Representation->SetRenderer(pvview->GetNonCompositedRenderer());
-        pvview->GetNonCompositedRenderer()->AddActor(this->Representation);
-        }
-      else
-        {
-        this->Representation->SetRenderer(pvview->GetRenderer());
-        pvview->GetRenderer()->AddActor(this->Representation);
-        }
+      this->Representation->SetRenderer(activeRenderer);
+      activeRenderer->AddActor(this->Representation);
       }
     this->View = pvview;
     this->UpdateEnabled();
+    this->UpdateTransform();
     return true;
     }
 
@@ -94,45 +110,44 @@ void vtk3DWidgetRepresentation::SetEnabled(bool enable)
     this->UpdateEnabled();
     }
 }
+
 //-----------------------------------------------------------------------------
 void vtk3DWidgetRepresentation::UpdateEnabled()
 {
-  if (this->View && this->Widget)
+  if (this->Widget == NULL)
     {
-    // Ensure that correct current renderer otherwise the widget may locate the
-    // wrong renderer.
-    if (this->Enabled)
-      {
-      if (this->UseNonCompositedRenderer)
-        {
-        this->Widget->SetCurrentRenderer(this->View->GetNonCompositedRenderer());
-        }
-      else
-        {
-        this->Widget->SetCurrentRenderer(this->View->GetRenderer());
-        }
-
-      //set the transform to the repsentation
-      vtkPVImplicitPlaneRepresentation *plane = 
-        vtkPVImplicitPlaneRepresentation::SafeDownCast(this->Representation);
-        if (plane)
-          {
-          plane->SetTransform(this->CustomTransform);
-          if ( this->UpdateTransform )
-            {
-            this->UpdateTransform = false;
-            plane->UpdateTransformLocation();
-            }
-          }
-      }
-
-    // Not all processes have the interactor setup. Enable 3D widgets only on
-    // those processes that have an interactor.
-    if (this->View->GetInteractor())
-      {
-      this->Widget->SetEnabled(this->Enabled);
-      }
+    return;
     }
+
+  bool enable_widget = (this->View != NULL)? this->Enabled : false;
+
+  // BUG #14913: Don't enable widget when the representation is missing or not
+  // visible.
+  if (this->Representation == NULL ||
+    this->Representation->GetVisibility() == 0)
+    {
+    enable_widget = false;
+    }
+
+  // Not all processes have the interactor setup. Enable 3D widgets only on
+  // those processes that have an interactor.
+  if (this->View == NULL || this->View->GetInteractor() == NULL)
+    {
+    enable_widget = false;
+    }
+
+  if (this->Widget->GetEnabled() != (enable_widget? 1 : 0))
+    {
+    this->Widget->SetEnabled(enable_widget? 1 : 0);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::OnRepresentationModified()
+{
+  // This will be called everytime the representation is modified, but since the
+  // work done in this->UpdateEnabled() is minimal, we let it do it.
+  this->UpdateEnabled();
 }
 
 //----------------------------------------------------------------------------
@@ -141,6 +156,7 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
     {
+    this->View = NULL;
     if (this->Widget)
       {
       this->Widget->SetEnabled(0);
@@ -149,24 +165,16 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
       }
     if (this->Representation)
       {
-      if (this->UseNonCompositedRenderer)
+      vtkRenderer* renderer = this->Representation->GetRenderer();
+      if (renderer)
         {
-        pvview->GetNonCompositedRenderer()->RemoveActor(this->Representation);
+        renderer->RemoveActor(this->Representation);
+        // NOTE: this will modify the Representation and call
+        // this->OnRepresentationModified().
+        this->Representation->SetRenderer(0);
         }
-      else
-        {
-        pvview->GetRenderer()->RemoveActor(this->Representation);
-        }
-      //set the transform to the repsentation
-      vtkPVImplicitPlaneRepresentation *plane = 
-        vtkPVImplicitPlaneRepresentation::SafeDownCast(this->Representation);
-      if (plane)
-        {
-        plane->ClearTransform();
-        }
-
-      this->Representation->SetRenderer(0);
       }
+    this->UpdateTransform();
     return true;
     }
   return false;
@@ -177,14 +185,31 @@ void vtk3DWidgetRepresentation::SetCustomWidgetTransform(vtkTransform *transform
 {
   if (this->CustomTransform->GetInput () != transform)
     {
-    this->UpdateTransform = true;
+    this->CustomTransform->SetInput(transform);
+    if (!transform)
+      {
+      this->CustomTransform->Identity();
+      }
+    this->UpdateTransform();
     }
-  this->CustomTransform->SetInput(transform);
-  if (!transform)
+}
+
+//----------------------------------------------------------------------------
+void vtk3DWidgetRepresentation::UpdateTransform()
+{
+  if (vtkPVImplicitPlaneRepresentation *plane =
+    vtkPVImplicitPlaneRepresentation::SafeDownCast(this->Representation))
     {
-    this->CustomTransform->Identity();
+    if (this->View)
+      {
+      plane->SetTransform(this->CustomTransform);
+      plane->UpdateTransformLocation();
+      }
+    else
+      {
+      plane->ClearTransform();
+      }
     }
-  this->UpdateEnabled();
 }
 
 //----------------------------------------------------------------------------
@@ -196,7 +221,6 @@ void vtk3DWidgetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Widget: " << this->Widget << endl;
   os << indent << "Representation: " << this->Representation << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
-  os << indent << "UpdateTransform: " << this->UpdateTransform << endl;
   os << indent << "CustomTransform: ";
   this->CustomTransform->Print(os);
 }
