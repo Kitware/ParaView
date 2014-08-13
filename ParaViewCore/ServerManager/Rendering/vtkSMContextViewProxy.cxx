@@ -78,6 +78,7 @@ vtkStandardNewMacro(vtkSMContextViewProxy);
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
   this->ChartView = NULL;
+  this->SkipPlotableCheck = false;
 }
 
 //----------------------------------------------------------------------------
@@ -293,6 +294,14 @@ bool vtkSMContextViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outpu
     return false;
     }
 
+  if (this->SkipPlotableCheck)
+    {
+    // When SkipPlotableCheck is true, we only rely on the representation to
+    // select whether it can accept the data produce by the producer. That check
+    // happens in Superclass.
+    return true;
+    }
+
   if (producer->GetHints() &&
     producer->GetHints()->FindNestedElementByName("Plotable"))
     {
@@ -327,6 +336,18 @@ vtkSelection* vtkSMContextViewProxy::GetCurrentSelection()
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
     this->GetClientSideObject());
   return pvview ? pvview->GetSelection() : NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMContextViewProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element)
+{
+  int tmp;
+  if (element && element->GetScalarAttribute("skip_plotable_check", &tmp))
+    {
+    this->SkipPlotableCheck = (tmp == 1);
+    }
+
+  return this->Superclass::ReadXMLAttributes(pm, element);
 }
 
 //----------------------------------------------------------------------------

@@ -2231,9 +2231,10 @@
                       base_proxyname="XYChartViewBase"
                       class="vtkPVXYHistogramChartView"
                       name="XYHistogramChartView"
-                      label="Histogram Chart View"
+                      label="Histogram View"
                       processes="client|renderserver|dataserver"
-                      representation_name="HistogramChartRepresentation">
+                      representation_name="HistogramChartRepresentation"
+                      skip_plotable_check="1">
       <Documentation>This is the proxy for the histogram chart view.</Documentation>
     </ContextViewProxy>
     <!-- ================================================================== -->

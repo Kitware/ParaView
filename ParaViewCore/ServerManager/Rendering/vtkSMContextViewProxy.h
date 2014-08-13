@@ -71,7 +71,6 @@ protected:
   vtkSMContextViewProxy();
   ~vtkSMContextViewProxy();
 
-
   // Description:
   // Subclasses should override this method to do the actual image capture.
   virtual vtkImageData* CaptureWindowInternal(int magnification);
@@ -90,9 +89,21 @@ protected:
   virtual void PostRender(bool interactive);
 
   // Description:
+  // Overridden to process the "skip_plotable_check" attribute.
+  virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
+
+  // Description:
   // The context view that is used for all context derived charts.
   vtkContextView* ChartView;
 
+  // Description:
+  // To avoid showing large datasets in context views, that typically rely on
+  // delivering all data to the client side (or cloning it), by default make
+  // extra checks for data type and hints in CanDisplayData(). Certain views
+  // types however, (e.g. XYHistogramView) can show any type of data without
+  // this limitation. For such views, we set this flag to true using XML
+  // attribute "skip_plotable_check".
+  bool SkipPlotableCheck;
 private:
   vtkSMContextViewProxy(const vtkSMContextViewProxy&); // Not implemented
   void operator=(const vtkSMContextViewProxy&); // Not implemented
