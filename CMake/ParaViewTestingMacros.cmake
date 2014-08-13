@@ -131,7 +131,7 @@ ENDMACRO (process_args)
 
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
-  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND;LOAD_PLUGIN;PLUGIN_PATH" "" ${ARGN})
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND;LOAD_PLUGIN;PLUGIN_PATH;EXTRA_LABELS" "" ${ARGN})
   while (ACT_TEST_SCRIPTS)
     set (counter 0)
     set (extra_args)
@@ -191,8 +191,9 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
       endif()
 
       # add the "PARAVIEW" label to the test properties. this allows for the user
-      # to instruct cmake to run just the ParaView tests with the '-L' flag
-      set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "PARAVIEW")
+      # to instruct cmake to run just the ParaView tests with the '-L' flag.
+      # also add in any extra labels (e.g. CATALYST if they were passed in as arguments)
+      set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "PARAVIEW;${ACT_EXTRA_LABELS}")
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
