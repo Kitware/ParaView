@@ -100,6 +100,8 @@ protected:
 private:
   vtkPVHistogramChartRepresentation(const vtkPVHistogramChartRepresentation&); // Not implemented
   void operator=(const vtkPVHistogramChartRepresentation&); // Not implemented
+
+  vtkSmartPointer<vtkSelection> CachedSelection;
 //ETX
 };
 

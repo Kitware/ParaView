@@ -236,11 +236,16 @@ vtkSelection* vtkPVHistogramChartRepresentation::GetSelection()
     {
     sel = chart->GetAnnotationLink()->GetCurrentSelection();
     }
-
   if (!sel)
     {
     return NULL;
     }
+
+  if (this->CachedSelection && this->CachedSelection->GetMTime() > sel->GetMTime())
+    {
+    return this->CachedSelection;
+    }
+
   // Now we do the magic: convert chart row selection to threshold selection
   vtkNew<vtkDoubleArray> selRanges;
   selRanges->SetName(this->ArrayName.c_str());
@@ -295,6 +300,8 @@ vtkSelection* vtkPVHistogramChartRepresentation::GetSelection()
   newSel->AddNode(selNode.Get());
   selNode->SetSelectionList(selRanges.Get());
 
+  this->CachedSelection.TakeReference(newSel);
+  this->CachedSelection->Modified();
   return newSel;
 }
 
@@ -303,12 +310,12 @@ void vtkPVHistogramChartRepresentation::ResetSelection()
 {
   if (this->GetChart())
     {
-    vtkSelection* emptySel = vtkSelection::New();
+    vtkNew<vtkSelection> emptySel;
     vtkNew<vtkSelectionNode> selNode;
     selNode->SetContentType(vtkSelectionNode::INDICES);
     selNode->SetFieldType(vtkSelectionNode::ROW);
-    emptySel->AddNode(selNode.Get());
-    this->GetChart()->GetAnnotationLink()->SetCurrentSelection(emptySel);
+    emptySel->AddNode(selNode.GetPointer());
+    this->GetChart()->GetAnnotationLink()->SetCurrentSelection(emptySel.GetPointer());
     }
 }
 
