@@ -65,12 +65,12 @@ code = compile(state, "<string>", "exec")
 exec(code)
 
 # Get the recreated proxies
-view = FindView("RenderView0")
-view2 = FindView("RenderView1")
-sphere = FindSource("Sphere0")
-glyph = FindSource("Glyph0")
-clip = FindSource("Clip0")
-group = FindSource("GroupDatasets0")
+view = FindView("RenderView1")
+view2 = FindView("RenderView2")
+sphere = FindSource("Sphere1")
+glyph = FindSource("Glyph1")
+clip = FindSource("Clip1")
+group = FindSource("GroupDatasets1")
 
 
 # Test the results
