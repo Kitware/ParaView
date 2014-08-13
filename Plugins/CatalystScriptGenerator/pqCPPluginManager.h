@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPActionsGroup.cxx
+   Module:    pqCPPluginManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,33 +29,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPActionsGroup.h"
+#ifndef __pqCPPluginManager_h
+#define __pqCPPluginManager_h
 
-#include "pqCoreUtilities.h"
-#include "pqCPExportStateWizard.h"
+#include <pqSGPluginManager.h>
 
-//-----------------------------------------------------------------------------
-pqCPActionsGroup::pqCPActionsGroup(QObject* parentObject)
-  : Superclass(parentObject)
+/// pqCPPluginManager is the central class that orchestrates the behaviour of
+/// this co-processing plugin.
+class pqCPPluginManager :  public pqSGPluginManager
 {
-  QAction* export_action = this->addAction("Export State");
-  export_action->setToolTip("Export state for co-processing");
-  export_action->setStatusTip("Export state for co-processing");
+  Q_OBJECT
+  typedef pqSGPluginManager Superclass;
+public:
+  pqCPPluginManager(QObject* parent=0);
+  ~pqCPPluginManager();
 
-  QObject::connect(export_action, SIGNAL(triggered()),
-                   this, SLOT(exportState()));
-}
+  /// Get the name of the writers menu from the concrete subclass.
+  virtual const char* getWritersMenuName();
 
-//-----------------------------------------------------------------------------
-pqCPActionsGroup::~pqCPActionsGroup()
-{
-}
+  /// Get the Qt name of the writers menu from the concrete subclass.
+  virtual const char* getObjectMenuName();
 
-//-----------------------------------------------------------------------------
-void pqCPActionsGroup::exportState()
-{
-  pqCPExportStateWizard wizard(pqCoreUtilities::mainWidget());
-  wizard.customize();
-  wizard.exec();
-}
+private:
+  pqCPPluginManager(const pqCPPluginManager&); // Not implemented.
+  void operator=(const pqCPPluginManager&); // Not implemented.
+};
 
+#endif
