@@ -143,6 +143,36 @@ set(STATIC_LINK_PLUGINS)
 if (NOT BUILD_SHARED_LIBS)
   set(STATIC_LINK_PLUGINS vtkPVStaticPluginsInit)
 endif()
+if (PARAVIEW_USE_STATIC_NUMPY)
+  find_library(UTIL_LIB util)
+
+  set(extra_python_libs)
+  foreach (lib "${UTIL_LIB}")
+    if (lib)
+      list(APPEND extra_python_libs
+        "${lib}")
+    endif ()
+  endforeach ()
+
+  find_library(BLAS_LIB blas)
+  find_library(GSL_LIB gsl)
+  find_library(GSLCBLAS_LIB gslcblas)
+  find_library(LAPACK_LIB lapack)
+
+  set(extra_numpy_libs)
+  foreach (libvar BLAS_LIB GSL_LIB GSLCBLAS_LIB LAPACK_LIB)
+    if (${libvar})
+      list(APPEND extra_numpy_libs
+        "${${libvar}}")
+      add_definitions(-DHAVE_NUMPY_${libvar})
+    endif ()
+  endforeach ()
+  add_definitions(-DHAVE_NUMPY_STATIC)
+
+  list(APPEND STATIC_LINK_PLUGINS
+    ${extra_python_libs} "${PYTHON_LIBRARY}"
+    ${extra_numpy_libs} "${STATIC_NUMPY_LIBRARY}")
+endif()
 
 foreach (name pvserver pvdataserver pvrenderserver)
   pv_add_executable(${name} ${name}.cxx)

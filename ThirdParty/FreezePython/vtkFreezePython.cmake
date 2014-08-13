@@ -38,9 +38,7 @@ execute_process(
     COMMAND ${PYTHON_EXECUTABLE}
             "${CMAKE_CURRENT_LIST_DIR}/freeze/freeze_paraview.py"
             -o "${OUTPUT_DIRECTORY}"
-            -X codecs
             -X distutils
-            -X encodings
             -X locale
             -X macpath
             -X matplotlib
@@ -55,9 +53,6 @@ execute_process(
             -X zope
             -X twisted
             -X autobahn
-
-            # we will add support for numpy in near future.
-            -X numpy
 
             "${CMAKE_CURRENT_LIST_DIR}/dummy.py"
             -p "${PACKAGE_ROOT}"
