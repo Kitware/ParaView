@@ -42,7 +42,8 @@
         { "class":"vtkPVExtractSelection" }
       ],
       "patches":[
-        { "path": "ClientServerCore-restore-extraction.patch" },
+        { "path": "ClientServerCore-restore-extraction.patch",
+          "if-edition": "Enable-Python" },
         { "path": "ClientServerCore-Core-CMake.patch" }
       ],
       "cswrap":true,

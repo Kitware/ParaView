@@ -141,9 +141,12 @@ def patch_path(config, path_entry):
 
 def run_patches(config, path_entry):
   work_dir = config.output_dir
+  editions = map(os.path.basename, config.input_dirs)
 
   try:
     for patch in path_entry['patches']:
+      if 'if-edition' in patch and patch['if-edition'] not in editions:
+        continue
       p = subprocess.Popen(['patch', '-p1'], cwd=work_dir, stdin=subprocess.PIPE)
       patch_path = os.path.join(config.current_input_dir, patch['path'])
       with open(patch_path) as patch_file:
