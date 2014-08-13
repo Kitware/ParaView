@@ -111,6 +111,7 @@ void pqPVApplicationCore::registerForQuicklaunch(QWidget* menu)
 //-----------------------------------------------------------------------------
 void pqPVApplicationCore::quickLaunch()
 {
+  emit this->aboutToShowQuickLaunch();
   if (this->QuickLaunchMenus.size() > 0)
     {
     pqQuickLaunchDialog dialog(pqCoreUtilities::mainWidget());

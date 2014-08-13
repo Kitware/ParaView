@@ -680,15 +680,50 @@ QList<QAction*> pqProxyGroupMenuManager::actions(const QString& category)
   return category_actions;
 }
 
+QList<QAction*> pqProxyGroupMenuManager::actionsInToolbars()
+{
+  QList<QAction*> actions_in_toolbars;
+  for (pqInternal::CategoryInfoMap::iterator categoryIter =
+    this->Internal->Categories.begin();
+    categoryIter != this->Internal->Categories.end(); ++categoryIter)
+    {
+    const QString &categoryName = categoryIter.key();
+    pqInternal::CategoryInfo &category = categoryIter.value();
+    if (category.ShowInToolbar)
+      {
+      QPair<QString, QString> pname;
+      foreach (pname, category.Proxies)
+        {
+        QAction* action = this->getAction(pname.first,pname.second);
+        if (action)
+          {
+          QVariant v = action->property("OmitFromToolbar");
+          if (!v.isValid() || !v.toStringList().contains(categoryName))
+            {
+            if (!actions_in_toolbars.contains(action))
+              {
+              actions_in_toolbars.push_back(action);
+              }
+            }
+          }
+        }
+      }
+    }
+
+  return actions_in_toolbars;
+}
+
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::setEnabled(bool enable)
 {
   this->Enabled = enable;
-#ifndef Q_OS_MAC
   // on Mac, with Qt 4.8.1, the enabling/disabling of the menu itself causes
   // issues; the menu never re-enables itself after being disabled (BUG #13184).
-  this->menu()->setEnabled(enable);
-#endif
+
+  // Furthermore, with the change to recomputing the enabled state when the menu
+  // is shown using the aboutToShow signal, disabling the menu itself causes the
+  // signal not to be sent resulting in the menu never being re-enabled.
+//  this->menu()->setEnabled(enable);
 }
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::addProxyDefinitionUpdateListener(const QString& proxyGroupName)

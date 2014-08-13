@@ -94,6 +94,11 @@ public slots:
   /// QAsbstractItemView type.
   void startSearch();
 
+signals:
+  /// Emitted whenever the quickLaunch dialog is about to show.  This can be used
+  /// to update the menu items (QActions) that will be shown in the quick-launch
+  /// dialog.
+  void aboutToShowQuickLaunch();
 protected:
   /// Override event filter in order to catch file association mechanism
   virtual bool eventFilter ( QObject * obj, QEvent * event );
