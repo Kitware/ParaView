@@ -269,26 +269,41 @@ namespace
   //      - SELF_DIR/../lib
   //    + ParaView Python modules
   //      - SELF_DIR/../lib/site-packages
-  //  + INSTALL_LOCATION
+  //  + INSTALL_LOCATION (shared builds with shared forwarding)
   //    + ParaView C/C++ library location
   //      - SELF_DIR
   //    + ParaView Python modules
   //      - SELF_DIR/site-packages
   //    + VTK Python Module libraries
   //      - SELF_DIR/site-packages/vtk
+  //  + INSTALL_LOCATION (static builds)
+  //    + ParaView C/C++ library location
+  //      - (not applicable)
+  //    + ParaView Python modules
+  //      - SELF_DIR/../lib/paraview-<version>/site-packages
+  //    + VTK Python Module libraries
+  //      - SELF_DIR/../lib/paraview-<version>/site-packages/vtk
   void vtkPythonAppInitPrependPathLinux(const std::string& SELF_DIR)
     {
     // Determine if running from build or install dir.
-    //    If SELF_DIR/site-packages exists, it must be running from an installed
-    //    location.
+    //    If SELF_DIR/../ParaViewConfig.cmake, it must be running from the build
+    //    directory.
     bool is_build_dir = vtksys::SystemTools::FileExists(
-      (SELF_DIR + "/site-packages").c_str()) == false;
+      (SELF_DIR + "/../ParaViewConfig.cmake").c_str());
     if (is_build_dir)
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib");
       vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib/site-packages");
+      return;
       }
-    else
+
+    // We're running from installed directory. We could be either a shared build
+    // or a static build.
+    bool using_shared_libs = false;
+#ifdef BUILD_SHARED_LIBS
+    using_shared_libs = true;
+#endif
+    if (using_shared_libs)
       {
       vtkPythonAppInitPrependPythonPath(SELF_DIR);
       vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages");
@@ -296,6 +311,13 @@ namespace
       // can be loaded from paraview e.g. import vtkCommonCorePython can work
       // (BUG #14263).
       vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages/vtk");
+      }
+    else
+      {
+      vtkPythonAppInitPrependPythonPath(
+        SELF_DIR + "/../lib/paraview-" PARAVIEW_VERSION "/site-packages");
+      vtkPythonAppInitPrependPythonPath(
+        SELF_DIR + "/../lib/paraview-" PARAVIEW_VERSION "/site-packages/vtk");
       }
     }
   //===========================================================================
