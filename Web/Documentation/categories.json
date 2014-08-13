@@ -45,6 +45,8 @@
                       "protocols.ParaViewWebTimeHandler",
                       "protocols.ParaViewWebFilterList",
                       "protocols.ParaViewWebFileManager",
+                      "protocols.ParaViewWebColorManager",
+                      "protocols.ParaViewWebProxyManager",
                       "protocols.ParaViewWebMouseHandler",
                       "protocols.ParaViewWebPipelineManager",
                       "protocols.ParaViewWebRemoteConnection",

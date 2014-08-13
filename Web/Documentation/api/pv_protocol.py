@@ -819,8 +819,10 @@
 
 /**
  * @class protocols.ParaViewWebPipelineManager
+ * @deprecated Use {@link protocols.ParaViewWebProxyManager} and
+ * {@link protocols.ParaViewWebColorManager} instead.
  *
- * This protocol handle PipelineBrowser interactions
+ * This protocol handles PipelineBrowser interactions.
  */
 
 /**

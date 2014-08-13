@@ -48,7 +48,7 @@ except ImportError:
     import _argparse as argparse
 
 # import annotations
-from autobahn.wamp import procedure as exportRpc
+from autobahn.wamp import register as exportRpc
 
 # =============================================================================
 # Handle function helpers

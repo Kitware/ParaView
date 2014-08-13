@@ -7,7 +7,7 @@ import os, sys, logging, types, inspect, traceback, logging, re, json
 from time import time
 
 # import RPC annotation
-from autobahn.wamp import procedure as exportRpc
+from autobahn.wamp import register as exportRpc
 
 # import paraview modules.
 import paraview
@@ -493,7 +493,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                        'unspecified',     # 14
                        'signed_char' ]    # 15
 
-    def __init__(self, allowedProxiesFile=None, baseDir=None, allowUnconfiguredReaders=False):
+    def __init__(self, allowedProxiesFile=None, baseDir=None, allowUnconfiguredReaders=True):
         super(ParaViewWebProxyManager, self).__init__()
         self.debugMode = False
         self.domainFunctionMap = { "vtkSMBooleanDomain": booleanDomainDecorator,

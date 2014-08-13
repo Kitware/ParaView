@@ -110,7 +110,7 @@ __launcher.config__
       "apps" : {
         "cone" : {
           "cmd" : [
-            "${python_exec}", "${build_dir}/Wrapping/Python/vtk/web/vtk_web_cone.py", "--content", "${WWW}", "--port", "$port", "-f"
+            "${python_exec}", "${build_dir}/Wrapping/Python/vtk/web/vtk_web_cone.py", "--content", "${WWW}", "--port", "$port", "-f", "--authKey", "${secret}"
               ],
           "ready_line" : "Starting factory"
         },
@@ -176,4 +176,4 @@ The "sessionData" object is designed to allow you to specify that certain arbitr
 
 A caveat of this, however, is that the in the "configuration" section of the launcher config file, the "fields" key denotes a list of keys that will be used as a filter when deciding which data should be returned by the server in response to the client's JSON payload.  In other words, if you want a key/value pair returned to the client when the session has been successfully started, make sure to include the key name of this desired pair in the "fields" list of the "configuration" section.  In the example launcher config above, therefore, we have added the key "updir" to the "fields" filter list so that the "updir":"/Home" key pair will actually be returned to the client, instead of filtered out.
 
-The launcher can now start an optional file upload server to handle multipart POST requests on the same server and port as the launcher itself, as in the launcher config file example, above.  By specifying an "upload_dir" property in the "configuration" section of the launcher config file, you can tell the launcher to start the file upload server in such a way that uploaded files will get written in the path given by the value of the "upload_dir" property.  In order to use the upload server, you would then issue a POST request with a multipart file attachment to the url "http://<launcher-host>:<launcher-port>/upload".  Of course you must actually replace <launcher-host> and <launcher-port> with the correct values.
+The launcher can now start an optional file upload server to handle multipart POST requests on the same server and port as the launcher itself, as in the launcher config file example, above.  By specifying an "upload_dir" property in the "configuration" section of the launcher config file, you can tell the launcher to start the file upload server in such a way that uploaded files will get written in the path given by the value of the "upload_dir" property.  In order to use the upload server, you would then issue a POST request with a multipart file attachment to the url "http://<launcher-host>:<launcher-port>/upload", replacing "launcher-host" and "launcher-port" with the correct values.

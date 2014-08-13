@@ -120,15 +120,23 @@ To configure your launcher, you will need to create a configuration file like th
 
     "apps" : {
        "pipeline" : {
-         "cmd" : [ "${python_exec}", "${pvweb}/pv_web_visualizer.py", "--port", "$port", "--data-dir", "$data" ],
+         "cmd" : [ "${python_exec}", "${pvweb}/pv_web_visualizer.py",
+                   "--port", "$port", "--data-dir", "$data", "-f", "--authKey", "${secret}"],
+         "ready_line" : "Starting factory"
+       },
+       "visualizer" : {
+         "cmd" : [ "${python_exec}", "${pvweb}/pv_web_visualizer.py",
+                   "--port", "$port", "--data-dir", "$data", "-f", "--authKey", "${secret}"],
          "ready_line" : "Starting factory"
        },
        "loader" : {
-         "cmd" : [ "${python_exec}", "${pvweb}/pv_web_file_loader.py", "--port", "$port", "--data-dir", "$data" ],
+         "cmd" : [ "${python_exec}", "${pvweb}/pv_web_file_loader.py",
+                   "--port", "$port", "--data-dir", "$data", "-f", "--authKey", "${secret}"],
          "ready_line" : "Starting factory"
        },
        "data_prober" : {
-         "cmd" : [ "${python_exec}", "${pvweb}/pv_web_data_prober.py", "--port", "$port", "--data-dir", "$data"],
+         "cmd" : [ "${python_exec}", "${pvweb}/pv_web_data_prober.py",
+                   "--port", "$port", "--data-dir", "$data", "-f", "--authKey", "${secret}"],
          "ready_line" : "Starting factory"
        }
      }

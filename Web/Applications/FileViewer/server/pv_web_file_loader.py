@@ -52,7 +52,7 @@ from vtk.web import server
 from vtkWebCorePython import *
 
 # import annotations
-from autobahn.wamp import procedure as exportRpc
+from autobahn.wamp import register as exportRpc
 
 try:
     import argparse
