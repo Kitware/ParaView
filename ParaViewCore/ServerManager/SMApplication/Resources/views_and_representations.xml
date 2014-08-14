@@ -2859,6 +2859,14 @@
         The output of this filter will have at most BlockSize
         rows.</Documentation>
       </IdTypeVectorProperty>
+
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+
       <!-- End of SpreadSheetView -->
     </ViewProxy>
   </ProxyGroup>

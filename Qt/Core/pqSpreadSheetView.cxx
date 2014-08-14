@@ -181,19 +181,6 @@ void pqSpreadSheetView::updateRepresentationVisibility(
     return;
     }
 
-  __updating_visibility__ = true;
-
-  // If visible, turn-off visibility of all other representations.
-  QList<pqRepresentation*> reprs = this->getRepresentations();
-  foreach (pqRepresentation* cur_repr, reprs)
-    {
-    if (cur_repr != repr)
-      {
-      cur_repr->setVisible(false);
-      }
-    }
-  __updating_visibility__ = false;
-
   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
   this->Internal->Model->setActiveRepresentation(dataRepr);
   emit this->showing(dataRepr);
