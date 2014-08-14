@@ -141,79 +141,25 @@ int vtkPVHistogramChartRepresentation::GetComponent()
 void vtkPVHistogramChartRepresentation::SetHistogramColor(double r, double g, double b)
 {
   this->SetColor(BIN_VALUES, r, g, b);
-  this->HistogramColor[0] = r;
-  this->HistogramColor[1] = g;
-  this->HistogramColor[2] = b;
-  vtkChartXY* chart = this->GetChart();
-  if (chart)
-    {
-    vtkIdType nbPlots = chart->GetNumberOfPlots();
-    for (vtkIdType i = 0; i < nbPlots; i++)
-      {
-      vtkPlotBar* bar = vtkPlotBar::SafeDownCast(chart->GetPlot(i));
-      if (bar)
-        {
-        bar->SetColor(r, g, b);
-        }
-      }
-    }
-  this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
 vtkDataObject* vtkPVHistogramChartRepresentation::TransformInputData(
-  vtkInformationVector** inputVector, vtkDataObject* data)
+  vtkInformationVector** vtkNotUsed(inputVector), vtkDataObject* data)
 {
-  this->ArrayName = "";
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkCompositeDataSet *cdin = vtkCompositeDataSet::SafeDownCast(input);
-  if (cdin)
+  // NOTE: This method gets called in RequestData() and only on
+  // the server-side, so avoid doing anything that modifies the MTime.
+  if (this->ArrayName.empty())
     {
-    vtkCompositeDataIterator *cdit = cdin->NewIterator();
-    cdit->InitTraversal();
-    bool foundone = false;
-    while (!cdit->IsDoneWithTraversal())
-      {
-      vtkDataObject *dObj = cdit->GetCurrentDataObject();
-      vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
-      if (data_array)
-        {
-        foundone = true;
-        this->ArrayName = data_array->GetName();
-        this->AttributeType = dObj->GetAttributeTypeForArray(data_array);
-        break;
-        }
-      cdit->GoToNextItem();
-      }
-    cdit->Delete();
-    if (!foundone)
-      {
-      return 0;
-      }
-    }
-  else
-    {
-    vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
-    if (data_array)
-      {
-      this->ArrayName = data_array->GetName();
-      this->AttributeType = data->GetAttributeTypeForArray(data_array);
-      }
+    return NULL;
     }
 
-  if (this->ArrayName == "")
-    {
-    return 0;
-    }
   this->ExtractHistogram->SetInputArrayToProcess(0, 0, 0,
     this->AttributeType, this->ArrayName.c_str());
-  this->ExtractHistogram->CalculateAveragesOn();
+  this->ExtractHistogram->CalculateAveragesOff();
   this->ExtractHistogram->SetInputData(data);
   this->ExtractHistogram->Update();
-  this->SetColor(BIN_VALUES,
-    this->HistogramColor[0], this->HistogramColor[1], this->HistogramColor[2]);
-  this->SetLabel(BIN_VALUES, this->ArrayName.c_str());
+
   return this->ExtractHistogram->GetOutputDataObject(0);
 }
 
@@ -325,9 +271,22 @@ void vtkPVHistogramChartRepresentation::SetInputArrayToProcess(int idx,
                                           int fieldAssociation,
                                           const char *name)
 {
-  this->Superclass::SetInputArrayToProcess(idx, port, connection,
-                                           fieldAssociation, name);
-  this->MarkModified();
+  this->Superclass::SetInputArrayToProcess(
+    idx, port, connection, fieldAssociation, name);
+
+  if (this->AttributeType != fieldAssociation)
+    {
+    this->AttributeType = fieldAssociation;
+    this->MarkModified();
+    }
+
+  std::string arrayName(name? name : "");
+  if (this->ArrayName != name)
+    {
+    this->ArrayName = name;
+    this->SetLabel(BIN_VALUES, this->ArrayName.c_str());
+    this->MarkModified();
+    }
 }
 
 //----------------------------------------------------------------------------

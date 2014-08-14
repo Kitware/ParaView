@@ -75,8 +75,8 @@ public:
   // Description:
   // Overload the vtkAlgorithm method to update after the change
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
-                                      int fieldAssociation,
-                                      const char *name);
+    int fieldAssociation, const char *name);
+  using Superclass::SetInputArrayToProcess;
 
   // Description:
   // This needs to be called on all instances of vtkGeometryRepresentation when
@@ -93,14 +93,13 @@ protected:
   virtual void PrepareForRendering();
 
   vtkPExtractHistogram* ExtractHistogram;
-  std::string ArrayName;
-  int AttributeType;
-  double HistogramColor[3];
 
 private:
   vtkPVHistogramChartRepresentation(const vtkPVHistogramChartRepresentation&); // Not implemented
   void operator=(const vtkPVHistogramChartRepresentation&); // Not implemented
 
+  std::string ArrayName;
+  int AttributeType;
   vtkSmartPointer<vtkSelection> CachedSelection;
 //ETX
 };
