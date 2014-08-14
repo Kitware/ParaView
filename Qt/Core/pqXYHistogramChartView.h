@@ -37,8 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// pqContextView subclass for "Bar Chart View". Doesn't do much expect adds
-/// the API to get the chartview type and name.
+/// pqContextView subclass for "HistogramView". Doesn't do much expect adds
+/// the API to get the chartview type and indicates that this view supports
+/// selection.
 class PQCORE_EXPORT pqXYHistogramChartView : public pqContextView
 {
   Q_OBJECT
@@ -58,23 +59,8 @@ public:
 
   virtual ~pqXYHistogramChartView();
 
-signals:
-  /// Fired when the currently shown representation changes. \c repr may be
-  /// NULL.
-  void showing(pqDataRepresentation* repr);
-
-public slots:
-  /// Called when a new repr is added.
-  void onAddRepresentation(pqRepresentation*);
-  void onRemoveRepresentation(pqRepresentation*);
-
-protected slots:
-  /// Called to ensure that at most 1 repr is visible at a time.
-  void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
-
 private:
-  pqXYHistogramChartView(const pqXYHistogramChartView&); // Not implemented.
-  void operator=(const pqXYHistogramChartView&); // Not implemented.
+  Q_DISABLE_COPY(pqXYHistogramChartView);
 };
 
 #endif
