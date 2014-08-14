@@ -60,6 +60,10 @@ public:
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   // Description:
+  // Same as above, except that when we already have the representation located.
+  virtual void Hide(vtkSMProxy* repr, vtkSMViewProxy* view);
+
+  // Description:
   // Alternative method to call Show and Hide using a visibility flag.
   vtkSMProxy* SetVisibility(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view, bool visible)
