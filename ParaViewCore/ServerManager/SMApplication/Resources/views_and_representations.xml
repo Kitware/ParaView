@@ -5438,22 +5438,6 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
-                         command="AddCompositeDataSetIndex"
-                         default_values="1"
-                         number_of_elements="1"
-                         name="CompositeDataSetIndex"
-                         number_of_elements_per_command="1"
-                         panel_visibility="never"
-                         repeat_command="1">
-        <CompositeTreeDomain mode="leaves" name="tree">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </CompositeTreeDomain>
-        <Documentation>This property lists the ids of the blocks to extract
-        from the input multiblock dataset.</Documentation>
-      </IntVectorProperty>
       <DoubleVectorProperty command="SetHistogramColor"
                             default_values="0 0 1"
                             name="HistogramColor"
