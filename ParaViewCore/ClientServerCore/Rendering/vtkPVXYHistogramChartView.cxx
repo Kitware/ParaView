@@ -46,12 +46,6 @@ vtkPVXYHistogramChartView::~vtkPVXYHistogramChartView()
 }
 
 //----------------------------------------------------------------------------
-vtkAbstractContextItem* vtkPVXYHistogramChartView::GetContextItem()
-{
-  return this->GetChart();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVXYHistogramChartView::SetSelection(
   vtkChartRepresentation* repr, vtkSelection* selection)
 {
@@ -78,24 +72,6 @@ vtkSelection* vtkPVXYHistogramChartView::GetSelection()
       }
     }
   return NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYHistogramChartView::Render(bool interactive)
-{
-  this->Superclass::Render(interactive);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYHistogramChartView::SelectionChanged()
-{
-  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXYHistogramChartView::Update()
-{
-  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------

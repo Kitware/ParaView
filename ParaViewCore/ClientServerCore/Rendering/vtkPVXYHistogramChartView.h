@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get the context item.
-  virtual vtkAbstractContextItem* GetContextItem();
-
-  // Description:
   // Representations can use this method to set the selection for a particular
   // representation. Subclasses override this method to pass on the selection to
   // the chart using annotation link. Note this is meant to pass selection for
@@ -46,20 +42,10 @@ public:
   // Description:
   virtual vtkSelection* GetSelection();
 
-  // Description:
-  // Overridden to rescale axes range on every update.
-  virtual void Update();
-
 //BTX
 protected:
   vtkPVXYHistogramChartView();
   ~vtkPVXYHistogramChartView();
-
-  // Description:
-  // Actual rendering implementation.
-  virtual void Render(bool interactive);
-
-  void SelectionChanged();
 
 private:
   vtkPVXYHistogramChartView(const vtkPVXYHistogramChartView&); // Not implemented
