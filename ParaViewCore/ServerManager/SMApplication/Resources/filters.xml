@@ -2808,6 +2808,133 @@ found and the point will be rejected.</Documentation>
       <!-- End AMR Dual Contour -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkAMRFragmentsFilter"
+                 label="AMR Fragments Filter"
+                 name="AMRFragmentsFilter">
+      <Documentation short_help="Meta Fragment filter">Combines the running of
+      AMRContour, AMRFragmentIntegration, AMRDualContour and ExtractCTHParts</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the volume input of the
+        filter.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkNonOverlappingAMR" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1" />
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeArrayToProcess"
+                            command="AddInputVolumeArrayToProcess"
+                            name="SelectMaterialArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_UNSIGNED_CHAR VTK_INT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine fragments</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputMassArrayToProcess"
+                            command="AddInputMassArrayToProcess"
+                            name="SelectMassArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine fragment mass</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputVolumeWeightedArrayToProcess"
+                            command="AddInputVolumeWeightedArrayToProcess"
+                            name="SelectVolumeWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine volume weighted average values</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty clean_command="ClearInputMassWeightedArrayToProcess"
+                            command="AddInputMassWeightedArrayToProcess"
+                            name="SelectMassWeightedArrays"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <ArrayListDomain attribute_type="Scalars"
+                         data_type="VTK_DOUBLE VTK_FLOAT"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>This property specifies the cell arrays from which the
+        analysis will determine mass weighted average values</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
+                            default_values="0.1"
+                            label="Volume Fraction Value"
+                            name="VolumeFractionSurfaceValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="scalar_range" />
+        <Documentation>This property specifies the values at which to compute
+        the isosurface.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetExtractSurface"
+                         default_values="0"
+                         name="Extract Surface"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Whether or not to extract a surface from this data</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseWatertightSurface"
+                         default_values="0"
+                         name="Use Watertight Surface"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Whether the extracted surface should be watertight or not</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIntegrateFragments"
+                         default_values="1"
+                         name="Integrate Fragments"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Whether or not to integrate fragments in this data</Documentation>
+      </IntVectorProperty>
+      <!-- End AMR Fragments Filter -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkPVAMRFragmentIntegration"
                  label="AMR Fragment Integration"
                  name="AMRFragmentIntegration">

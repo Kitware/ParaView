@@ -34,6 +34,7 @@ set(Module_SRCS
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
   vtkAMRFragmentIntegration.cxx
+  vtkAMRFragmentsFilter.cxx
   vtkAMRFileSeriesReader.cxx
   vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx
