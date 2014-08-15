@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -147,25 +147,6 @@
    </attribute>
    <widget class="pqCollaborationPanel" name="collaborationPanel"/>
   </widget>
-
-  <widget class="QDockWidget" name="displayDock">
-   <property name="windowTitle">
-    <string>Display</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="displayWidgetFrame">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="informationDock">
    <property name="windowTitle">
     <string>Information</string>
@@ -191,8 +172,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>72</width>
-          <height>153</height>
+          <width>204</width>
+          <height>229</height>
          </rect>
         </property>
        </widget>
