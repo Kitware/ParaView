@@ -25,7 +25,6 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
-#include "vtkPVHistogramChartRepresentation.h"
 #include "vtkSelection.h"
 #include "vtkStringArray.h"
 
@@ -56,22 +55,6 @@ void vtkPVXYHistogramChartView::SetSelection(
     // we don't support multiple selection for now.
     this->Chart->GetAnnotationLink()->SetCurrentSelection(selection);
     }
-}
-
-//----------------------------------------------------------------------------
-vtkSelection* vtkPVXYHistogramChartView::GetSelection()
-{
-  int numReprs = this->GetNumberOfRepresentations();
-  for (int i = 0; i < numReprs; i++)
-    {
-    vtkPVHistogramChartRepresentation * repr =
-      vtkPVHistogramChartRepresentation::SafeDownCast(this->GetRepresentation(i));
-    if (repr && repr->GetVisibility())
-      {
-      return repr->GetSelection();
-      }
-    }
-  return NULL;
 }
 
 //----------------------------------------------------------------------------

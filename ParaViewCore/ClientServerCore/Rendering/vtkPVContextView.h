@@ -22,6 +22,7 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkAbstractContextItem;
 class vtkChart;
@@ -97,7 +98,13 @@ public:
   virtual void SetSelection(vtkChartRepresentation* repr,
     vtkSelection* selection) = 0;
 
-  virtual vtkSelection* GetSelection();
+  // Description:
+  // Get the current selection created in the view. This will call
+  // this->TransformSelection() to transform the selection every time a new
+  // selection is available. Subclasses should override TransformSelection() to
+  // convert the selection, as appropriate.
+  vtkSelection* GetSelection();
+
 //BTX
 protected:
   vtkPVContextView();
@@ -106,6 +113,17 @@ protected:
   // Description:
   // Actual rendering implementation.
   virtual void Render(bool interactive);
+
+  // Description:
+  // Called to transform the selection. This is only called on the client-side.
+  // Subclasses should transform the selection in place as needed. Default
+  // implementation simply goes to the first visible representation and asks it
+  // to transform (by calling vtkChartRepresentation::TransformSelection()).
+  // We need to extend the infrastructrue to work properly when making
+  // selections in views showing multiple representations, but until that
+  // happens, this naive approach works for most cases.
+  // Return false on failure.
+  virtual bool TransformSelection(vtkSelection*);
 
   // Description:
   // Callbacks called when the primary "renderer" in the vtkContextView
@@ -123,6 +141,10 @@ protected:
 private:
   vtkPVContextView(const vtkPVContextView&); // Not implemented
   void operator=(const vtkPVContextView&); // Not implemented
+
+  // Used in GetSelection to avoid modifying the selection obtained from the
+  // annotation link.
+  vtkSmartPointer<vtkSelection> SelectionClone;
 //ETX
 };
 

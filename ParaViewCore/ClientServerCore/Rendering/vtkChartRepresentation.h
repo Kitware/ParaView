@@ -104,6 +104,20 @@ public:
   vtkSetMacro(FlattenTable, int);
   vtkGetMacro(FlattenTable, int);
 
+  // Description:
+  // This method is called on the client-side by the vtkPVContextView whenever a
+  // new selection is made on all the visible representations in that view.
+  // The goal of this method is allow the representations to transform the
+  // selection created in the view (which is an id-based selection based on the
+  // vtkTable that is fed into the vtkChart) to an appropriate selection based
+  // on the data going into the representation.
+  // Return false if the selection is not applicable to this representation or
+  // the conversion cannot be made.
+  // Default implementation simply ensures that the FieldType on the
+  // selection nodes is set to match up with the FieldAssociation on the
+  // representation.
+  virtual bool TransformSelection(vtkSelection* sel);
+
 //BTX
 protected:
   vtkChartRepresentation();

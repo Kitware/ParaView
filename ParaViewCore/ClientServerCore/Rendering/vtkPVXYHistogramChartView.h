@@ -39,9 +39,6 @@ public:
   virtual void SetSelection(
     vtkChartRepresentation* repr, vtkSelection* selection);
 
-  // Description:
-  virtual vtkSelection* GetSelection();
-
 //BTX
 protected:
   vtkPVXYHistogramChartView();

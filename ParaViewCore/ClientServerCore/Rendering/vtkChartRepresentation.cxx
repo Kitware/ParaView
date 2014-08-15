@@ -36,6 +36,8 @@
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTablesMultiBlock.h"
 #include "vtkReductionFilter.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkTable.h"
 
 #include <vtksys/ios/sstream>
@@ -421,4 +423,18 @@ vtkStdString vtkChartRepresentation::GetDefaultSeriesLabel(
 {
   return tableName.empty()? vtkStdString(columnName) :
     vtkStdString(columnName + " (" + tableName + ")");
+}
+
+//----------------------------------------------------------------------------
+bool vtkChartRepresentation::TransformSelection(vtkSelection* sel)
+{
+  assert(sel != NULL);
+  // note: we don't work very well when there are multiple visible
+  // representations in the view and selections are made in it.
+  for (vtkIdType cc=0, max=sel->GetNumberOfNodes(); cc < max; ++cc)
+    {
+    sel->GetNode(cc)->SetFieldType(
+      vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->FieldAssociation));
+    }
+  return true;
 }

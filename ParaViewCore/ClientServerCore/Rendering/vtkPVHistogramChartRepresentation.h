@@ -65,10 +65,6 @@ public:
                                             vtkDataObject* data);
 
   // Description:
-  // Get the current selection.
-  virtual vtkSelection* GetSelection();
-
-  // Description:
   // Reset the current selection to an empty state.
   void ResetSelection();
 
@@ -85,10 +81,16 @@ public:
   // requests.
   virtual void MarkModified();
 
+  // Description:
+  // Called by vtkPVXYHistogramChartView to transform the selection in place.
+  // Return false on failure.
+  bool TransformSelection(vtkSelection*);
+
 //BTX
 protected:
   vtkPVHistogramChartRepresentation();
   ~vtkPVHistogramChartRepresentation();
+
 
   virtual void PrepareForRendering();
 
@@ -100,7 +102,6 @@ private:
 
   std::string ArrayName;
   int AttributeType;
-  vtkSmartPointer<vtkSelection> CachedSelection;
 //ETX
 };
 

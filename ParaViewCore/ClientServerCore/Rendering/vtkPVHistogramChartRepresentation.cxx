@@ -175,22 +175,9 @@ void vtkPVHistogramChartRepresentation::PrepareForRendering()
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkPVHistogramChartRepresentation::GetSelection()
+bool vtkPVHistogramChartRepresentation::TransformSelection(vtkSelection* sel)
 {
-  vtkSelection* sel = NULL;
-  if (vtkChart *chart = vtkChart::SafeDownCast(this->GetChart()))
-    {
-    sel = chart->GetAnnotationLink()->GetCurrentSelection();
-    }
-  if (!sel)
-    {
-    return NULL;
-    }
-
-  if (this->CachedSelection && this->CachedSelection->GetMTime() > sel->GetMTime())
-    {
-    return this->CachedSelection;
-    }
+  assert(sel != NULL);
 
   // Now we do the magic: convert chart row selection to threshold selection
   vtkNew<vtkDoubleArray> selRanges;
@@ -224,31 +211,15 @@ vtkSelection* vtkPVHistogramChartRepresentation::GetSelection()
     }
 
   // Construct threshold selection on input
-  vtkSelection* newSel = vtkSelection::New();
+  vtkNew<vtkSelection> newSel;
   vtkNew<vtkSelectionNode> selNode;
   selNode->SetContentType(vtkSelectionNode::THRESHOLDS);
-  int selType = 0;
-  switch (this->AttributeType)
-    {
-    case vtkDataObject::POINT:
-      selType = vtkSelectionNode::POINT;
-      break;
-    case vtkDataObject::CELL:
-      selType = vtkSelectionNode::CELL;
-      break;
-    case vtkDataObject::ROW:
-      selType = vtkSelectionNode::ROW;
-      break;
-    default:
-      break;
-    }
-  selNode->SetFieldType(selType);
+  selNode->SetFieldType(
+    vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->AttributeType));
   newSel->AddNode(selNode.Get());
   selNode->SetSelectionList(selRanges.Get());
-
-  this->CachedSelection.TakeReference(newSel);
-  this->CachedSelection->Modified();
-  return newSel;
+  sel->ShallowCopy(newSel.GetPointer());
+  return true;
 }
 
 //----------------------------------------------------------------------------

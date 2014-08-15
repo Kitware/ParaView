@@ -17,6 +17,7 @@
 #include "vtkAnnotationLink.h"
 #include "vtkCamera.h"
 #include "vtkChart.h"
+#include "vtkChartRepresentation.h"
 #include "vtkCommand.h"
 #include "vtkContextInteractorStyle.h"
 #include "vtkContextView.h"
@@ -31,7 +32,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkSmartPointer.h"
+#include "vtkSelection.h"
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
@@ -285,9 +286,49 @@ vtkSelection* vtkPVContextView::GetSelection()
 {
   if (vtkChart *chart = vtkChart::SafeDownCast(this->GetContextItem()))
     {
-    return chart->GetAnnotationLink()->GetCurrentSelection();
+    if (vtkSelection* selection = chart->GetAnnotationLink()->GetCurrentSelection())
+      {
+      if (this->SelectionClone == NULL ||
+        this->SelectionClone->GetMTime() < selection->GetMTime() ||
+        this->SelectionClone->GetMTime() < chart->GetAnnotationLink()->GetMTime())
+        {
+        // we need to treat vtkSelection obtained from vtkAnnotationLink as
+        // constant and not modify it. Hence, we create a clone.
+        this->SelectionClone = vtkSmartPointer<vtkSelection>::New();
+        this->SelectionClone->ShallowCopy(selection);
+
+        // Allow the view to transform the selection as appropriate since the raw
+        // selection created by the VTK view is on the "transformed" data put in
+        // the view and not original input data.
+        if (this->TransformSelection(this->SelectionClone) == false)
+          {
+          this->SelectionClone->Initialize();
+          }
+        }
+
+      return this->SelectionClone;
+      }
     }
+
+  this->SelectionClone = NULL;
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVContextView::TransformSelection(vtkSelection* sel)
+{
+  for (int cc = 0, max = this->GetNumberOfRepresentations(); cc < max; cc++)
+    {
+    vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
+      this->GetRepresentation(cc));
+    if (repr && repr->GetVisibility() && repr->TransformSelection(sel))
+      {
+      return true;
+      }
+    }
+  // error! we cannot have  a selection created in the view, there's no visible
+  // representation!
+  return false;
 }
 
 //----------------------------------------------------------------------------
