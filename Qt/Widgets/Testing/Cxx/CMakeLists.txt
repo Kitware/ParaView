@@ -34,3 +34,6 @@ FOREACH(test ${MyTests})
     COMMAND pqWidgetsTest ${test} --exit)
   set_tests_properties(pqWidgets${test} PROPERTIES LABELS "PARAVIEW")
 ENDFOREACH()
+
+# since serial since this relies on focus.
+set_tests_properties(pqWidgetspqTextEditTest PROPERTIES RUN_SERIAL ON)

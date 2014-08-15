@@ -386,6 +386,9 @@ set (AnimatePipelineTime_FORCE_SERIAL TRUE)
 set (ProbePicking_FORCE_SERIAL TRUE)
 set (PolygonCellSelection_FORCE_SERIAL TRUE)
 set (PolygonPointSelection_FORCE_SERIAL TRUE)
+set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
 
 # Set properties for CTH tests
 set(CTHAMRContour_DISABLE_CS TRUE)
