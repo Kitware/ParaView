@@ -563,7 +563,7 @@ vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(
     this->Internals->RegisteredProxyMap.find(groupname);
   if (it == this->Internals->RegisteredProxyMap.end())
     {
-    int suffix = 0;
+    int suffix = 1;
     vtksys_ios::ostringstream name_stream;
     name_stream << prefix << suffix;
     return name_stream.str();
@@ -577,7 +577,7 @@ vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(
     existingNames.insert(it2->first);
     }
 
-  for (int suffix=0; suffix < VTK_INT_MAX; ++suffix)
+  for (int suffix=1; suffix < VTK_INT_MAX; ++suffix)
     {
     vtksys_ios::ostringstream name_stream;
     name_stream << prefix << suffix;
