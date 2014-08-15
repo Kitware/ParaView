@@ -234,7 +234,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the transfer function will be rescaled using updated data ranges on Apply&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
-      <string>Automatically rescale transfer functions to fit data</string>
+      <string>Automatically rescale color map range to fit data</string>
      </property>
     </widget>
    </item>

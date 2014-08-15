@@ -117,11 +117,9 @@
           range used for this mapping.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Grow on each 'Apply' to include current data range" value="0" />
-          <Entry text="Grow on each 'Apply' and change in timestep" value="1" />
-          <Entry text="Clamp to available data range on each 'Apply'" value="2" />
-          <Entry text="Clamp on each 'Apply' and change in timestep"
-                 value="3" />
+          <Entry text="Grow and update on 'Apply'" value="0" />
+          <Entry text="Grow and update every timestep" value="1" />
+          <Entry text="Clamp and update every timestep" value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -283,7 +281,7 @@
         <Property name="AutoApplyActiveOnly" />
       </PropertyGroup>
 
-      <PropertyGroup label="Transfer Function Options">
+      <PropertyGroup label="Color/Opacity Map Range Options">
         <Property name="TransferFunctionResetMode" />
         <Property name="ScalarBarMode" />
       </PropertyGroup>
