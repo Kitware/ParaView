@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 
-/// Bar chart view
+/// pqView subclass of ParallelCoordinatesChartView chart view. Does not do
+/// anything specific besides passing the view type of pqView in the
+/// constructor.
 class PQCORE_EXPORT pqParallelCoordinatesChartView : public pqContextView
 {
   Q_OBJECT
@@ -51,26 +53,10 @@ public:
                  vtkSMContextViewProxy* viewModule,
                  pqServer* server,
                  QObject* parent=NULL);
-
   virtual ~pqParallelCoordinatesChartView();
 
-signals:
-  /// Fired when the currently shown representation changes. \c repr may be
-  /// NULL.
-  void showing(pqDataRepresentation* repr);
-
-public slots:
-  /// Called when a new repr is added.
-  void onAddRepresentation(pqRepresentation*);
-  void onRemoveRepresentation(pqRepresentation*);
-
-protected slots:
-  /// Called to ensure that at most 1 repr is visible at a time.
-  void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
-
 private:
-  pqParallelCoordinatesChartView(const pqParallelCoordinatesChartView&); // Not implemented.
-  void operator=(const pqParallelCoordinatesChartView&); // Not implemented.
+  Q_DISABLE_COPY(pqParallelCoordinatesChartView);
 };
 
 #endif

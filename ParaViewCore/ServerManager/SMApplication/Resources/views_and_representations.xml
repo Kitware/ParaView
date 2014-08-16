@@ -2292,7 +2292,8 @@
                       label="Parallel Coordinates View"
                       processes="client|renderserver|dataserver"
                       representation_name="ParallelCoordinatesRepresentation"
-                      post_creation="SetChartTypeToParallelCoordinates" >
+                      post_creation="SetChartTypeToParallelCoordinates"
+                      skip_plotable_check="1">
       <Documentation>This is the proxy for parallel coordinates chart
       view.</Documentation>
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
@@ -2313,6 +2314,12 @@
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <PlotMatrixViewProxy base_proxygroup="internal_views"
