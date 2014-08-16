@@ -84,7 +84,7 @@ public:
   // Description:
   // Called by vtkPVXYHistogramChartView to transform the selection in place.
   // Return false on failure.
-  bool TransformSelection(vtkSelection*);
+  virtual bool MapSelectionToInput(vtkSelection*);
 
 //BTX
 protected:

@@ -175,7 +175,7 @@ void vtkPVHistogramChartRepresentation::PrepareForRendering()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVHistogramChartRepresentation::TransformSelection(vtkSelection* sel)
+bool vtkPVHistogramChartRepresentation::MapSelectionToInput(vtkSelection* sel)
 {
   assert(sel != NULL);
 

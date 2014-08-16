@@ -105,8 +105,19 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
     vtkSelection* inputSelection = vtkSelection::GetData(inputVector[0], 0);
     assert(inputSelection);
 
+    vtkNew<vtkSelection> clone;
+    clone->ShallowCopy(inputSelection);
+
+    // map data-selection to view. We do this here so that the mapping logic is
+    // called on the processes that have the input data (which may come in
+    // handy at some point).
+    if (this->ChartRepresentation->MapSelectionToView(clone.GetPointer()) == false)
+      {
+      clone->Initialize();
+      }
+
     vtkNew<vtkSelectionDeliveryFilter> courier;
-    courier->SetInputDataObject(inputSelection);
+    courier->SetInputDataObject(clone.GetPointer());
     courier->Update();
     localSelection = vtkSelection::SafeDownCast(courier->GetOutputDataObject(0));
 
@@ -123,7 +134,7 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
         if (myId == 0)
           {
           vtksys_ios::ostringstream res;
-          vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, inputSelection);
+          vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, clone.GetPointer());
 
           // Send the size of the string.
           int size = static_cast<int>(res.str().size());
@@ -133,7 +144,7 @@ int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
           controller->Broadcast(
             const_cast<char*>(res.str().c_str()), size, 0);
 
-          localSelection = inputSelection;
+          localSelection = clone.GetPointer();
           }
         else
           {

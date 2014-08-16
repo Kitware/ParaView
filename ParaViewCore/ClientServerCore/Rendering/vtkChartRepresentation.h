@@ -116,7 +116,18 @@ public:
   // Default implementation simply ensures that the FieldType on the
   // selection nodes is set to match up with the FieldAssociation on the
   // representation.
-  virtual bool TransformSelection(vtkSelection* sel);
+  virtual bool MapSelectionToInput(vtkSelection* sel);
+
+  // Description:
+  // This is the inverse of MapSelectionToInput(). In this case, we are
+  // converting the selection defined on the input for the representation to a
+  // selection that corresponds to elements being rendered in the view.
+  // The default implementation checks removes vtkSelectionNode items in sel
+  // that don't have the FieldType that matches this->FieldAssociation.
+  // Similar to MapSelectionToInput(), this method is expected to transform the
+  // sel in place and return false is the selection is not applicable to this
+  // representation or the conversion cannot be made.
+  virtual bool MapSelectionToView(vtkSelection* sel);
 
 //BTX
 protected:

@@ -300,7 +300,7 @@ vtkSelection* vtkPVContextView::GetSelection()
         // Allow the view to transform the selection as appropriate since the raw
         // selection created by the VTK view is on the "transformed" data put in
         // the view and not original input data.
-        if (this->TransformSelection(this->SelectionClone) == false)
+        if (this->MapSelectionToInput(this->SelectionClone) == false)
           {
           this->SelectionClone->Initialize();
           }
@@ -315,13 +315,13 @@ vtkSelection* vtkPVContextView::GetSelection()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVContextView::TransformSelection(vtkSelection* sel)
+bool vtkPVContextView::MapSelectionToInput(vtkSelection* sel)
 {
   for (int cc = 0, max = this->GetNumberOfRepresentations(); cc < max; cc++)
     {
     vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
       this->GetRepresentation(cc));
-    if (repr && repr->GetVisibility() && repr->TransformSelection(sel))
+    if (repr && repr->GetVisibility() && repr->MapSelectionToInput(sel))
       {
       return true;
       }

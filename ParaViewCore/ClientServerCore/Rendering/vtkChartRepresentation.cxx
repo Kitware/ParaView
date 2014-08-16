@@ -426,15 +426,33 @@ vtkStdString vtkChartRepresentation::GetDefaultSeriesLabel(
 }
 
 //----------------------------------------------------------------------------
-bool vtkChartRepresentation::TransformSelection(vtkSelection* sel)
+bool vtkChartRepresentation::MapSelectionToInput(vtkSelection* sel)
 {
   assert(sel != NULL);
   // note: we don't work very well when there are multiple visible
   // representations in the view and selections are made in it.
-  for (vtkIdType cc=0, max=sel->GetNumberOfNodes(); cc < max; ++cc)
+  for (unsigned int cc=0, max=sel->GetNumberOfNodes(); cc < max; ++cc)
     {
     sel->GetNode(cc)->SetFieldType(
       vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->FieldAssociation));
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkChartRepresentation::MapSelectionToView(vtkSelection* sel)
+{
+  assert(sel != NULL);
+  // note: we don't work very well when there are multiple visible
+  // representations in the view and selections are made in it.
+  int fieldType = vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->FieldAssociation);
+  for (unsigned int cc=sel->GetNumberOfNodes(); cc > 0; --cc)
+    {
+    vtkSelectionNode* node = sel->GetNode(cc-1);
+    if (node == NULL || node->GetFieldType() != fieldType)
+      {
+      sel->RemoveNode(cc-1);
+      }
     }
   return true;
 }

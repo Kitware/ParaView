@@ -100,8 +100,8 @@ public:
 
   // Description:
   // Get the current selection created in the view. This will call
-  // this->TransformSelection() to transform the selection every time a new
-  // selection is available. Subclasses should override TransformSelection() to
+  // this->MapSelectionToInput() to transform the selection every time a new
+  // selection is available. Subclasses should override MapSelectionToInput() to
   // convert the selection, as appropriate.
   vtkSelection* GetSelection();
 
@@ -118,12 +118,12 @@ protected:
   // Called to transform the selection. This is only called on the client-side.
   // Subclasses should transform the selection in place as needed. Default
   // implementation simply goes to the first visible representation and asks it
-  // to transform (by calling vtkChartRepresentation::TransformSelection()).
+  // to transform (by calling vtkChartRepresentation::MapSelectionToInput()).
   // We need to extend the infrastructrue to work properly when making
   // selections in views showing multiple representations, but until that
   // happens, this naive approach works for most cases.
   // Return false on failure.
-  virtual bool TransformSelection(vtkSelection*);
+  virtual bool MapSelectionToInput(vtkSelection*);
 
   // Description:
   // Callbacks called when the primary "renderer" in the vtkContextView
