@@ -145,6 +145,9 @@ private:
   // Used in GetSelection to avoid modifying the selection obtained from the
   // annotation link.
   vtkSmartPointer<vtkSelection> SelectionClone;
+
+  template <class T>
+  vtkSelection* GetSelectionImplementation(T* chart);
 //ETX
 };
 
