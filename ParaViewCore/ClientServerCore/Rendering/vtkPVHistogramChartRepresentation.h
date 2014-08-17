@@ -60,6 +60,10 @@ public:
   void SetHistogramColor(double r, double g, double b);
 
   // Description:
+  // Set the line style for the histogram.
+  void SetHistogramLineStyle(int style);
+
+  // Description:
   // Method to be overrided to transform input data to a vtkTable.
   virtual vtkDataObject* TransformInputData(vtkInformationVector** inputVector,
                                             vtkDataObject* data);

@@ -5491,10 +5491,10 @@
       </SubProxy>
 
       <IntVectorProperty command="SetBinCount"
-                         default_values="10"
+                         default_values="256"
                          name="BinCount"
                          number_of_elements="1">
-        <IntRangeDomain max="256"
+        <IntRangeDomain max="1000"
                         min="1"
                         name="range" />
         <Documentation>The value of this property specifies the number of bins
@@ -5542,6 +5542,22 @@
           </RequiredProperties>
         </ArrayRangeDomain>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetHistogramLineStyle"
+                         name="HistogramLineStyle"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+         <Documentation>Set the line style to use for drawing a border around the histogram bins.
+         </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Solid" value="1" />
+          <Entry text="Dash" value="2" />
+          <Entry text="Dot" value="3" />
+          <Entry text="Dash Dot" value="4" />
+          <Entry text="Dash Dot Dot" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->

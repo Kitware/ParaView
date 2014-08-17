@@ -144,6 +144,12 @@ void vtkPVHistogramChartRepresentation::SetHistogramColor(double r, double g, do
 }
 
 //----------------------------------------------------------------------------
+void vtkPVHistogramChartRepresentation::SetHistogramLineStyle(int val)
+{
+  this->SetLineStyle(BIN_VALUES, val);
+}
+
+//----------------------------------------------------------------------------
 vtkDataObject* vtkPVHistogramChartRepresentation::TransformInputData(
   vtkInformationVector** vtkNotUsed(inputVector), vtkDataObject* data)
 {
