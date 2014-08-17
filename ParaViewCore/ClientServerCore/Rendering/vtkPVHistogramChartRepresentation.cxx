@@ -40,6 +40,15 @@
 static const char* BIN_EXTENTS = "bin_extents";
 static const char* BIN_VALUES = "bin_values";
 
+namespace
+{
+  template <class T>
+    T vtkRound(double value)
+      {
+      return static_cast<T>(std::floor(value + 0.5));
+      }
+}
+
 
 vtkStandardNewMacro(vtkPVHistogramChartRepresentation);
 //----------------------------------------------------------------------------
@@ -303,8 +312,8 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
 
       // now get the bin index for this range.
       vtkIdType index[2];
-      index[0] = static_cast<vtkIdType>(round((range[0] - dataRange[0])/delta));
-      index[1] = static_cast<vtkIdType>(round((range[1] - dataRange[0])/delta));
+      index[0] = vtkRound<vtkIdType>((range[0] - dataRange[0])/delta);
+      index[1] = vtkRound<vtkIdType>((range[1] - dataRange[0])/delta);
 
       // now only accept the range if it nearly matches the bins
       if (index[0] >=0 &&
