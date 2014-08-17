@@ -2329,7 +2329,8 @@
                          name="PlotMatrixView"
                          label="Plot Matrix View"
                          processes="client|renderserver|dataserver"
-                         representation_name="PlotMatrixRepresentation">
+                         representation_name="PlotMatrixRepresentation"
+                         skip_plotable_check="1">
       <Documentation>This is the proxy for the plot matrix
       view.</Documentation>
       <IntVectorProperty command="SetBorderLeft"
@@ -2799,11 +2800,6 @@
         <Property name="HistogramAxisLabelFontSize" function="Size" />
       </PropertyGroup>
 
-
-
-
-
-
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
                          default_values="0"
                          name="UseOffscreenRenderingForScreenshots"
@@ -2822,6 +2818,15 @@
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
       </IntVectorProperty>
+
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+
+      <!-- end of PlotMatrixViewProxy -->
     </PlotMatrixViewProxy>
     <!-- ================================================================== -->
     <ViewProxy base_proxygroup="internal_views"
