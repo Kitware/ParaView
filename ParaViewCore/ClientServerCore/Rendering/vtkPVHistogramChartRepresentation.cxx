@@ -35,7 +35,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkTable.h"
 
-#include <string>
+#include <cmath>
 
 static const char* BIN_EXTENTS = "bin_extents";
 static const char* BIN_VALUES = "bin_values";
@@ -202,6 +202,8 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToInput(vtkSelection* sel)
       vtkIdType nbRows = selRows->GetNumberOfTuples();
       for (vtkIdType j = 0; j < nbRows; j++)
         {
+        // FIXME: make this smart to collapse adjacent bins and specify a
+        // single range instead of multiple ones. That'll be faster to execute.
         vtkIdType row = (vtkIdType)selRows->GetTuple1(j);
         double binExtent = binExtents->GetValue(row);
         selRanges->InsertNextTuple1(binExtent - delta);
@@ -223,17 +225,106 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToInput(vtkSelection* sel)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVHistogramChartRepresentation::ResetSelection()
+bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
 {
-  if (this->GetChart())
+  assert(sel != NULL);
+
+  // For vtkPVHistogramChartRepresentation (in the ServerManagerConfiguration
+  // xml), we set the SelectionRepresentation up so that the original input
+  // selection is passed to the vtkChartSelectionRepresentation rather than the
+  // id-based selection. Here, we see if the sel is of type
+  // vtkSelection::THRESHOLDS and if so, are the thresholds applicable to the
+  // bins we are showing.
+
+  // build a list of vtkSelectionNode instances that are potentially relevant.
+  int fieldType = vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->AttributeType);
+  std::vector<vtkSmartPointer<vtkSelectionNode> > nodes;
+  for (unsigned int cc=0, max=sel->GetNumberOfNodes(); cc < max; ++cc)
     {
-    vtkNew<vtkSelection> emptySel;
-    vtkNew<vtkSelectionNode> selNode;
-    selNode->SetContentType(vtkSelectionNode::INDICES);
-    selNode->SetFieldType(vtkSelectionNode::ROW);
-    emptySel->AddNode(selNode.GetPointer());
-    this->GetChart()->GetAnnotationLink()->SetCurrentSelection(emptySel.GetPointer());
+    vtkSelectionNode* node = sel->GetNode(cc);
+    if (node &&
+      node->GetFieldType() == fieldType &&
+      node->GetContentType() == vtkSelectionNode::THRESHOLDS &&
+      node->GetSelectionList() != NULL &&
+      node->GetSelectionList()->GetName() != NULL &&
+      this->ArrayName == node->GetSelectionList()->GetName() &&
+      node->GetSelectionList()->GetNumberOfTuples() > 0)
+      {
+      // potentially applicable selection node.
+      nodes.push_back(node);
+      }
     }
+  sel->RemoveAllNodes();
+
+  if (nodes.size() == 0)
+    {
+    return true;
+    }
+
+  // now, check if the thresholds are applicable to the histogram being shown.
+  vtkTable* table = this->GetLocalOutput();
+  vtkDoubleArray* binExtents = table?
+    vtkDoubleArray::SafeDownCast(table->GetColumnByName(BIN_EXTENTS)) : NULL;
+  if (binExtents == NULL)
+    {
+    // Seems like the vtkPVHistogramChartRepresentation hasn't updated yet and
+    // the selection is being updated before it. Shouldn't happen, but let's
+    // handle it.
+    return false;
+    }
+
+  double delta = 1.;
+  if (binExtents->GetNumberOfTuples() >= 2)
+    {
+    delta = (binExtents->GetValue(1) - binExtents->GetValue(0));
+    }
+  const double halfDelta = delta / 2.0;
+  double dataRange[2];
+  binExtents->GetRange(dataRange); // this is range of bin-midpoints.
+
+  double episilon = delta * 1e-5; // we make this a factor of the delta.
+  std::set<vtkIdType> selectedBins;
+  for (size_t cc = 0; cc < nodes.size(); cc++)
+    {
+    vtkSelectionNode* node = nodes[cc];
+    vtkDoubleArray* selectionList = vtkDoubleArray::SafeDownCast(node->GetSelectionList());
+    for (vtkIdType j=0; (j+1) < selectionList->GetNumberOfTuples(); j+=2)
+      {
+      double range[2] = { selectionList->GetValue(j), selectionList->GetValue(j+1) };
+      // since range is bin-range, convert that to bin-mid-points based range.
+      range[0] += halfDelta;
+      range[1] -= halfDelta;
+
+      // now get the bin index for this range.
+      vtkIdType index[2];
+      index[0] = static_cast<vtkIdType>(round((range[0] - dataRange[0])/delta));
+      index[1] = static_cast<vtkIdType>(round((range[1] - dataRange[0])/delta));
+
+      // now only accept the range if it nearly matches the bins
+      if (index[0] >=0 &&
+        index[0] < binExtents->GetNumberOfTuples() &&
+        std::abs(range[0]-binExtents->GetValue(index[0])) < episilon &&
+        index[1] >= 0 &&
+        index[1] < binExtents->GetNumberOfTuples() &&
+        std::abs(range[1]-binExtents->GetValue(index[1])) < episilon)
+        {
+        for (vtkIdType i=index[0]; i <= index[1]; ++i)
+          {
+          selectedBins.insert(i);
+          }
+        }
+      }
+    }
+
+  vtkNew<vtkSelectionNode> node;
+  node->SetContentType(vtkSelectionNode::INDICES);
+  node->SetFieldType(vtkSelectionNode::POINT);
+  vtkNew<vtkIdTypeArray> convertedSelectionList;
+  convertedSelectionList->SetNumberOfTuples(static_cast<vtkIdType>(selectedBins.size()));
+  std::copy(selectedBins.begin(), selectedBins.end(), convertedSelectionList->GetPointer(0));
+  node->SetSelectionList(convertedSelectionList.GetPointer());
+  sel->AddNode(node.GetPointer());
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -258,11 +349,4 @@ void vtkPVHistogramChartRepresentation::SetInputArrayToProcess(int idx,
     this->SetLabel(BIN_VALUES, this->ArrayName.c_str());
     this->MarkModified();
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVHistogramChartRepresentation::MarkModified()
-{
-  this->ResetSelection();
-  this->Superclass::MarkModified();
 }

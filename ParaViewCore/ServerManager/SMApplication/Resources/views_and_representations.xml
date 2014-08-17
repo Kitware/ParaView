@@ -2229,10 +2229,11 @@
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewBase"
-                      class="vtkPVXYHistogramChartView"
+                      class="vtkPVXYChartView"
                       name="XYHistogramChartView"
                       label="Histogram View"
                       processes="client|renderserver|dataserver"
+                      post_creation="SetChartTypeToBar"
                       representation_name="HistogramChartRepresentation"
                       skip_plotable_check="1">
       <Documentation>This is the proxy for the histogram chart view.</Documentation>
@@ -5477,8 +5478,10 @@
         <RepresentationProxy name="SelectionRepresentation"
                class="vtkChartSelectionRepresentation"
                processes="client|dataserver|renderserver">
+               <!-- See vtkSMChartRepresentationProxy::SetPropertyModifiedFlag()
+                    for the details on naming this property -->
           <InputProperty command="SetInputConnection"
-                         name="SelectionInput"/>
+                         name="OriginalSelectionInput"/>
         </RepresentationProxy>
       </SubProxy>
 

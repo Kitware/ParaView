@@ -65,26 +65,19 @@ public:
                                             vtkDataObject* data);
 
   // Description:
-  // Reset the current selection to an empty state.
-  void ResetSelection();
-
-  // Description:
   // Overload the vtkAlgorithm method to update after the change
   virtual void SetInputArrayToProcess(int idx, int port, int connection,
     int fieldAssociation, const char *name);
   using Superclass::SetInputArrayToProcess;
 
   // Description:
-  // This needs to be called on all instances of vtkGeometryRepresentation when
-  // the input is modified. This is essential since the geometry filter does not
-  // have any real-input on the client side which messes with the Update
-  // requests.
-  virtual void MarkModified();
+  // Overridden to transform id-based selection produced by the histogram view
+  // to a threshold-based selection.
+  virtual bool MapSelectionToInput(vtkSelection*);
 
   // Description:
-  // Called by vtkPVXYHistogramChartView to transform the selection in place.
-  // Return false on failure.
-  virtual bool MapSelectionToInput(vtkSelection*);
+  // Inverse of MapSelectionToInput().
+  virtual bool MapSelectionToView(vtkSelection* sel);
 
 //BTX
 protected:

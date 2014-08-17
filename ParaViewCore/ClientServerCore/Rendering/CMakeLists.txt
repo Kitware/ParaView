@@ -85,7 +85,6 @@ set (Module_SRCS
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx
-  vtkPVXYHistogramChartView.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
   vtkSliceFriendGeometryRepresentation.cxx
