@@ -91,8 +91,6 @@ set(Module_SRCS
   pqFormBuilder.h
   pqGraphLayoutStrategyInterface.cxx
   pqGraphLayoutStrategyInterface.h
-  pqHistogramTableModel.cxx
-  pqHistogramTableModel.h
   pqImageUtil.cxx
   pqImageUtil.h
   pqInterfaceTracker.cxx
@@ -246,7 +244,6 @@ set (Module_MOC_HDRS
   pqFileDialogRecentDirsModel.h
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.h
-  pqHistogramTableModel.h
   pqInterfaceTracker.h
   pqLinksModel.h
   pqLinkViewWidget.h
