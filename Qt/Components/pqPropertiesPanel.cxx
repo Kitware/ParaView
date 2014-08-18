@@ -214,6 +214,13 @@ public:
     this->Ui.ViewSaveAsDefaults->
       setIcon(styleLocal->standardIcon(QStyle::SP_DialogSaveButton));
 
+    this->Ui.PropertiesButtons->layout()->setSpacing(
+      pqPropertiesPanel::suggestedHorizontalSpacing());
+    this->Ui.DisplayButtons->layout()->setSpacing(
+      pqPropertiesPanel::suggestedHorizontalSpacing());
+    this->Ui.ViewButtons->layout()->setSpacing(
+      pqPropertiesPanel::suggestedHorizontalSpacing());
+
     // change the apply button palette so it is green when it is enabled.
     QPalette applyPalette = this->Ui.Accept->palette();
     applyPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
