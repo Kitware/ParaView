@@ -3,6 +3,9 @@
   "requires": [
     "Essentials"
   ],
+  "after": [
+    "Enable-Python"
+  ],
   "cmake":{
     "cache":[
       { "name":"Module_vtkPVVTKExtensionsRendering",
