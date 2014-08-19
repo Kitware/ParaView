@@ -256,6 +256,9 @@
       "replace":[
         { "path":"ParaViewCore/ServerManager/SMApplication/Resources/catalyst.xml" }
       ],
+      "patches": [
+          { "path": "ParaViewCore-catalyst-xml.patch" }
+      ],
       "cswrap":true,
       "pythonwrap":true
     },
