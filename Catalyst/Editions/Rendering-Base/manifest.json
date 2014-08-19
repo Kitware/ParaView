@@ -783,6 +783,7 @@
         { "class": "vtkInteractorStyleDrawPolygon" },
         { "class": "vtkInteractorStyleJoystickActor" },
         { "class": "vtkInteractorStyleJoystickCamera" },
+        { "class": "vtkInteractorStyleMultiTouchCamera" },
         { "class": "vtkInteractorStyleRubberBand3D" },
         { "class": "vtkInteractorStyleRubberBandZoom" },
         { "class": "vtkInteractorStyleSwitch" },
@@ -922,7 +923,8 @@
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
       "proxies":[
         "PiecewiseFunction",
-        "PVLookupTable"
+        "PVLookupTable",
+        "ViewLayout"
       ]
     }
   ]
