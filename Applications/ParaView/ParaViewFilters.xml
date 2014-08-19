@@ -83,6 +83,7 @@
     <Proxy group="filters" name="AMRDualContour" />
     <Proxy group="filters" name="AMRConnectivity" />
     <Proxy group="filters" name="AMRFragmentIntegration" />
+    <Proxy group="filters" name="AMRFragmentsFilter"/>
     <Proxy group="filters" name="ExtractHierarchicalLevel" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
