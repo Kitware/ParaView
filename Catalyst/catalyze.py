@@ -283,6 +283,7 @@ def cmake_cache(config, manifest_list):
 def process(config):
 
   editions = set()
+  all_editions = set(map(os.path.basename, config.input_dirs))
   all_manifests = []
   all_proxies = []
   for input_dir in config.input_dirs:
@@ -297,6 +298,14 @@ def process(config):
         if len(diff):
           missing = ', '.join(list(diff))
           raise RuntimeError('Missing required editions: %s' % missing)
+      if manifest.has_key('after'):
+        after = set(manifest['after'])
+        adiff = after.difference(editions)
+        hdiff = after.intersection(all_editions)
+        diff = hdiff.intersection(adiff)
+        if len(diff):
+          missing = ', '.join(list(diff))
+          raise RuntimeError('Editions must come before %s: %s' % (manifest['edition'], missing))
       if manifest.has_key('paths'):
         copy_paths(config, manifest['paths'])
       if manifest.has_key('modules'):
