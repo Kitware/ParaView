@@ -64,6 +64,7 @@ def filter_proxies(fin, fout, proxies, all_proxies):
     'SpreadSheetRepresentationProxy',
     'TimeKeeperProxy',
     'TransferFunctionProxy',
+    'ViewLayoutProxy',
     'WriterProxy')
   def is_wanted(proxy):
     return proxy.tag in proxy_tags and \
