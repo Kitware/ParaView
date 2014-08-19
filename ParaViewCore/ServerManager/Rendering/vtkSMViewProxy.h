@@ -136,6 +136,19 @@ public:
   // Sets whether screenshots have a transparent background.
   static void SetTransparentBackground(bool val);
 
+  // Description:
+  // Method used to hide other representations if the view has a
+  // <ShowOneRepresentationAtATime/> hint.
+  // This only affects other representations that have data inputs, not non-data
+  // representations.
+  // Returns true if any representations were hidden by this call, otherwise
+  // returns false.
+  virtual bool HideOtherRepresentationsIfNeeded(vtkSMProxy* repr);
+  static bool HideOtherRepresentationsIfNeeded(vtkSMViewProxy* self, vtkSMProxy* repr)
+    {
+    return self? self->HideOtherRepresentationsIfNeeded(repr) : false;
+    }
+
 //BTX
 protected:
   vtkSMViewProxy();

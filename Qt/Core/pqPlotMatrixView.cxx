@@ -32,11 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPlotMatrixView.h"
 
 #include "vtkSMContextViewProxy.h"
-#include "vtkScatterPlotMatrix.h"
-#include "vtkAnnotationLink.h"
 
 //-----------------------------------------------------------------------------
-pqPlotMatrixView::pqPlotMatrixView(const QString &group, 
+pqPlotMatrixView::pqPlotMatrixView(const QString &group,
                                    const QString &name,
                                    vtkSMContextViewProxy *viewModule,
                                    pqServer *server,
@@ -48,26 +46,4 @@ pqPlotMatrixView::pqPlotMatrixView(const QString &group,
 //-----------------------------------------------------------------------------
 pqPlotMatrixView::~pqPlotMatrixView()
 {
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotMatrixView::selectionChanged()
-{
-  this->Superclass::selectionChanged();
-
-  // Fill the selection source with the selection from the view
-  vtkSelection* sel = 0;
-
-  if(vtkScatterPlotMatrix *chartMatrix = vtkScatterPlotMatrix::SafeDownCast(
-    this->getContextViewProxy()->GetContextItem()))
-    {
-    sel = chartMatrix->GetAnnotationLink() ?
-      chartMatrix->GetAnnotationLink()->GetCurrentSelection() : NULL;
-    }
-
-  if(!sel)
-    {
-    return;
-    }
-  this->setSelection(sel);
 }

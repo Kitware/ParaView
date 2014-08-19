@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqParallelCoordinatesChartView.h
+   Module:    pqXYHistogramChartView.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,34 +29,21 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqParallelCoordinatesChartView_h
-#define __pqParallelCoordinatesChartView_h
+#include "pqXYHistogramChartView.h"
 
-#include "pqContextView.h"
+#include "vtkSMContextViewProxy.h"
 
-class vtkSMSourceProxy;
-class pqDataRepresentation;
-
-/// pqView subclass of ParallelCoordinatesChartView chart view. Does not do
-/// anything specific besides passing the view type of pqView in the
-/// constructor.
-class PQCORE_EXPORT pqParallelCoordinatesChartView : public pqContextView
+//-----------------------------------------------------------------------------
+pqXYHistogramChartView::pqXYHistogramChartView(const QString& group,
+                             const QString& name,
+                             vtkSMContextViewProxy* viewModule,
+                             pqServer* server,
+                             QObject* p/*=NULL*/):
+  Superclass(XYHistogramChartViewType(), group, name, viewModule, server, p)
 {
-  Q_OBJECT
-  typedef pqContextView Superclass;
+}
 
-public:
-  static QString chartViewType() { return "ParallelCoordinatesChartView"; }
-
-  pqParallelCoordinatesChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
-  virtual ~pqParallelCoordinatesChartView();
-
-private:
-  Q_DISABLE_COPY(pqParallelCoordinatesChartView);
-};
-
-#endif
+//-----------------------------------------------------------------------------
+pqXYHistogramChartView::~pqXYHistogramChartView()
+{
+}

@@ -156,11 +156,6 @@ public:
   //vtkSMViewProxy::CanDisplayData().
   bool canDisplay(pqOutputPort* opPort) const;
 
-  /// The annotation link used on representations to share the selection
-  /// and annotations. This is only used in views aware of this link.
-  virtual void setAnnotationLink(vtkSMSourceProxy* link);
-  vtkSMSourceProxy* getAnnotationLink();
-
 signals:
   /// Fired when the vtkSMViewProxy fire the vtkCommand::UpdateDataEvent
   void updateDataEvent();

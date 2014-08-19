@@ -91,8 +91,6 @@ set(Module_SRCS
   pqFormBuilder.h
   pqGraphLayoutStrategyInterface.cxx
   pqGraphLayoutStrategyInterface.h
-  pqHistogramTableModel.cxx
-  pqHistogramTableModel.h
   pqImageUtil.cxx
   pqImageUtil.h
   pqInterfaceTracker.cxx
@@ -213,6 +211,8 @@ set(Module_SRCS
   pqXYBarChartView.h
   pqXYFunctionalBagChartView.cxx
   pqXYFunctionalBagChartView.h
+  pqXYHistogramChartView.cxx
+  pqXYHistogramChartView.h
   pqXYChartView.cxx
   pqXYChartView.h
   vtkPVGUIPluginInterface.cxx
@@ -244,7 +244,6 @@ set (Module_MOC_HDRS
   pqFileDialogRecentDirsModel.h
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.h
-  pqHistogramTableModel.h
   pqInterfaceTracker.h
   pqLinksModel.h
   pqLinkViewWidget.h
@@ -294,6 +293,7 @@ set (Module_MOC_HDRS
   pqXYBagChartView.h
   pqXYBarChartView.h
   pqXYFunctionalBagChartView.h
+  pqXYHistogramChartView.h
   pqXYChartView.h
 )
 

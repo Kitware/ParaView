@@ -74,6 +74,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HistogramSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMap.xml
@@ -532,6 +533,9 @@ SET(SaveLargeScreenshot_THRESHOLD 10000)
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
+
+# Since this involves charts.
+SET(HistogramSelection_THRESHOLD 40)
 
 ##########################################################
 # List of known incompatible tests for Collaboration

@@ -36,6 +36,8 @@
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTablesMultiBlock.h"
 #include "vtkReductionFilter.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkTable.h"
 
 #include <vtksys/ios/sstream>
@@ -57,6 +59,7 @@ vtkChartRepresentation::vtkChartRepresentation()
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->EnableServerSideRendering = false;
   this->FlattenTable = 1;
+  this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_ROWS;
 }
 
 //----------------------------------------------------------------------------
@@ -179,6 +182,11 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     if (!this->CacheKeeper->IsCached())
       {
       data = vtkDataObject::GetData(inputVector[0], 0);
+      data = this->TransformInputData(inputVector, data);
+      if (!data)
+        {
+        return 0;
+        }
 
       // Prune input dataset to only process blocks on interest.
       // In input is not a multiblock dataset, we make it one so the rest of the
@@ -215,6 +223,7 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
       preprocessor->Update();
 
       data = preprocessor->GetOutputDataObject(0);
+
 
       // data must be a mutliblock dataset, no matter what.
       assert(data->IsA("vtkMultiBlockDataSet"));
@@ -261,6 +270,15 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkChartRepresentation::TransformInputData(
+  vtkInformationVector** inputVector, vtkDataObject* data)
+{
+  (void)inputVector;
+  // Default representation does not transform anything
+  return data;
 }
 
 //----------------------------------------------------------------------------
@@ -405,4 +423,36 @@ vtkStdString vtkChartRepresentation::GetDefaultSeriesLabel(
 {
   return tableName.empty()? vtkStdString(columnName) :
     vtkStdString(columnName + " (" + tableName + ")");
+}
+
+//----------------------------------------------------------------------------
+bool vtkChartRepresentation::MapSelectionToInput(vtkSelection* sel)
+{
+  assert(sel != NULL);
+  // note: we don't work very well when there are multiple visible
+  // representations in the view and selections are made in it.
+  for (unsigned int cc=0, max=sel->GetNumberOfNodes(); cc < max; ++cc)
+    {
+    sel->GetNode(cc)->SetFieldType(
+      vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->FieldAssociation));
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkChartRepresentation::MapSelectionToView(vtkSelection* sel)
+{
+  assert(sel != NULL);
+  // note: we don't work very well when there are multiple visible
+  // representations in the view and selections are made in it.
+  int fieldType = vtkSelectionNode::ConvertAttributeTypeToSelectionField(this->FieldAssociation);
+  for (unsigned int cc=sel->GetNumberOfNodes(); cc > 0; --cc)
+    {
+    vtkSelectionNode* node = sel->GetNode(cc-1);
+    if (node == NULL || node->GetFieldType() != fieldType)
+      {
+      sel->RemoveNode(cc-1);
+      }
+    }
+  return true;
 }

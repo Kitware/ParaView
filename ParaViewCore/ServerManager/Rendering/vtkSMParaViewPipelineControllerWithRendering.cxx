@@ -308,6 +308,8 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
 
     vtkSMPropertyHelper(repr, "Visibility").Set(1);
     repr->UpdateVTKObjects();
+
+    vtkSMViewProxy::HideOtherRepresentationsIfNeeded(view, repr);
     return repr;
     }
 
@@ -343,6 +345,8 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     vtkSMPropertyHelper(view, "Representations").Add(repr);
     view->UpdateVTKObjects();
     repr->FastDelete();
+
+    vtkSMViewProxy::HideOtherRepresentationsIfNeeded(view, repr);
     return repr;
     }
 
@@ -373,6 +377,19 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
   // find is there's already a representation in this view.
   if (vtkSMProxy* repr = view->FindRepresentation(producer, outputPort))
     {
+    this->Hide(repr, view);
+    return repr;
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::Hide(
+  vtkSMProxy* repr, vtkSMViewProxy* view)
+{
+  if (repr)
+    {
     vtkSMPropertyHelper(repr, "Visibility").Set(0);
     repr->UpdateVTKObjects();
 
@@ -380,10 +397,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
       {
       vtkSMPVRepresentationProxy::HideScalarBarIfNotNeeded(repr, view);
       }
-    return repr;
     }
-
-  return NULL;
 }
 
 //----------------------------------------------------------------------------

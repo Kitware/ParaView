@@ -104,7 +104,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
       use_composite = true;
       }
     else if (!ignore_composite_keys &&
-      selProperties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) && 
+      selProperties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
        selProperties->Has(vtkSelectionNode::HIERARCHICAL_INDEX()))
       {
       proxyname = "HierarchicalDataIDSelectionSource";
@@ -121,6 +121,10 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     proxyname = "BlockSelectionSource";
     break;
 
+  case vtkSelectionNode::THRESHOLDS:
+    proxyname = "ThresholdSelectionSource";
+    break;
+
   default:
     vtkGenericWarningMacro("Unhandled ContentType: " << contentType);
     return selSource;
@@ -132,7 +136,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
       "This is not supported.");
     return selSource;
     }
-  
+
   if (!selSource)
     {
     // If selSource is not present we need to create a new one. The type of
@@ -278,6 +282,20 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
         }
       }
     }
+  else if (contentType == vtkSelectionNode::THRESHOLDS)
+    {
+    vtkDoubleArray* selectionList = vtkDoubleArray::SafeDownCast(
+      selection->GetSelectionList());
+    assert(selectionList);
+
+    vtkSMPropertyHelper(selSource, "ArrayName").Set(selectionList->GetName());
+    vtkSMPropertyHelper tHelper(selSource, "Thresholds");
+    for (vtkIdType cc=0, max=selectionList->GetNumberOfTuples(); (cc+1)<max; cc+=2)
+      {
+      tHelper.Set(cc, selectionList->GetValue(cc));
+      tHelper.Set(cc+1, selectionList->GetValue(cc+1));
+      }
+    }
 
   return selSource;
 }
@@ -287,7 +305,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
   vtkSMSession* session, vtkSelection* selection, bool ignore_composite_keys)
 {
   vtkSMProxy* selSource= 0;
-  unsigned int numNodes = selection->GetNumberOfNodes(); 
+  unsigned int numNodes = selection->GetNumberOfNodes();
   for (unsigned int cc=0; cc < numNodes; cc++)
     {
     vtkSelectionNode* node = selection->GetNode(cc);
@@ -306,7 +324,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
   vtkSMProxy* selectionSourceProxy,
   vtkSMSourceProxy* dataSource, int dataPort)
 {
-  const char* inproxyname = selectionSourceProxy? 
+  const char* inproxyname = selectionSourceProxy?
     selectionSourceProxy->GetXMLName() : 0;
   const char* outproxyname = 0;
   switch (outputType)
@@ -333,7 +351,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
 
   case vtkSelectionNode::INDICES:
       {
-      const char* dataName = 
+      const char* dataName =
         dataSource->GetOutputPort(dataPort)->GetDataClassName();
       outproxyname = "IDSelectionSource";
       if (dataName)
@@ -369,7 +387,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
       selectionSourceProxy->GetProperty("IDs"));
     // this "if" condition does not do any conversion in input is GLOBALIDS
     // selection with no ids.
-    
+
     if (!ids || ids->GetNumberOfElements() > 0)
       {
       // convert from *anything* to indices.
@@ -490,19 +508,19 @@ bool vtkSMSelectionHelper::MergeSelection(
   // Currently only index based selections i.e. ids, global ids based selections
   // are mergeable and that too only is input and output are identical in all
   // respects (except the indices ofcourse).
-  if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() != 
+  if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() !=
     vtkSMPropertyHelper(input, "FieldType").GetAsInt())
     {
     return false;
     }
 
-  if (vtkSMPropertyHelper(output, "ContainingCells").GetAsInt() != 
+  if (vtkSMPropertyHelper(output, "ContainingCells").GetAsInt() !=
     vtkSMPropertyHelper(input, "ContainingCells").GetAsInt())
     {
     return false;
     }
 
-  if (vtkSMPropertyHelper(output, "InsideOut").GetAsInt() != 
+  if (vtkSMPropertyHelper(output, "InsideOut").GetAsInt() !=
     vtkSMPropertyHelper(input, "InsideOut").GetAsInt())
     {
     return false;
@@ -518,7 +536,7 @@ bool vtkSMSelectionHelper::MergeSelection(
 
     if (
       (inputType == "GlobalIDSelectionSource" &&
-       outputType == "IDSelectionSource") || 
+       outputType == "IDSelectionSource") ||
       (inputType == "GlobalIDSelectionSource" &&
        outputType == "CompositeDataIDSelectionSource") ||
       (inputType == "IDSelectionSource" &&

@@ -19,14 +19,16 @@
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
-#include "vtkRenderWindow.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
@@ -698,4 +700,35 @@ bool vtkSMViewProxy::IsContextReadyForRendering()
     return window->IsDrawable();
     }
   return true;
+}
+
+
+//----------------------------------------------------------------------------
+bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
+{
+  if (repr == NULL ||
+    this->GetHints() == NULL ||
+    this->GetHints()->FindNestedElementByName("ShowOneRepresentationAtATime") == NULL)
+    {
+    return false;
+    }
+
+  vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+
+  bool modified = false;
+  vtkSMPropertyHelper helper(this, "Representations");
+  for (unsigned int cc=0, max=helper.GetNumberOfElements(); cc < max; ++cc)
+    {
+    vtkSMRepresentationProxy* arepr =
+      vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
+    if (arepr && arepr != repr)
+      {
+      if (vtkSMPropertyHelper(arepr, "Visibility", /*quiet*/true).GetAsInt() == 1)
+        {
+        controller->Hide(arepr, this);
+        modified = true;
+        }
+      }
+    }
+  return modified;
 }

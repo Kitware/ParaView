@@ -62,14 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimeKeeper.h"
 #include "pqTimer.h"
 
-inline int pqCeil(double val)
-{
-  if (static_cast<int>(val) == val)
-    {
-    return static_cast<int>(val);
-    }
-  return static_cast<int>(vtkMath::Round(val+0.5));
-}
+#include <cmath>
 
 template<class T>
 inline uint qHash(QPointer<T> p)
@@ -85,22 +78,13 @@ public:
   // List of representation shown by this view.
   QList<QPointer<pqRepresentation> > Representations;
 
-  // The annotation link for linking selections and annotations
-  // between views.
-  vtkSMSourceProxy* AnnotationLink;
-
   pqViewInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    this->AnnotationLink = 0;
     }
 
   ~pqViewInternal()
     {
-    if (this->AnnotationLink)
-      {
-      this->AnnotationLink->Delete();
-      }
     }
 
   pqTimer RenderTimer;
@@ -396,10 +380,10 @@ int pqView::computeMagnification(const QSize& fullsize, QSize& viewsize)
   int magnification = 1;
 
   // If fullsize > viewsize, then magnification is involved.
-  int temp = ::pqCeil(fullsize.width()/static_cast<double>(viewsize.width()));
+  int temp = std::ceil(fullsize.width()/static_cast<double>(viewsize.width()));
   magnification = (temp> magnification)? temp: magnification;
 
-  temp = ::pqCeil(fullsize.height()/static_cast<double>(viewsize.height()));
+  temp = std::ceil(fullsize.height()/static_cast<double>(viewsize.height()));
   magnification = (temp > magnification)? temp : magnification;
 
   viewsize = fullsize/magnification;
@@ -491,25 +475,4 @@ bool pqView::canDisplay(pqOutputPort* opPort) const
     }
 
   return this->getViewProxy()->CanDisplayData(sourceProxy, opPort->getPortNumber());
-}
-
-//-----------------------------------------------------------------------------
-void pqView::setAnnotationLink(vtkSMSourceProxy* link)
-{
-  if (this->Internal->AnnotationLink != link)
-    {
-    vtkSMSourceProxy* tempSGMacroVar = this->Internal->AnnotationLink;
-    this->Internal->AnnotationLink = link;
-    if (this->Internal->AnnotationLink != NULL) { this->Internal->AnnotationLink->Register(0); }
-    if (tempSGMacroVar != NULL)
-      {
-      tempSGMacroVar->UnRegister(0);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-vtkSMSourceProxy* pqView::getAnnotationLink()
-{
-  return this->Internal->AnnotationLink;
 }

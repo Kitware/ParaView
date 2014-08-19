@@ -104,6 +104,31 @@ public:
   vtkSetMacro(FlattenTable, int);
   vtkGetMacro(FlattenTable, int);
 
+  // Description:
+  // This method is called on the client-side by the vtkPVContextView whenever a
+  // new selection is made on all the visible representations in that view.
+  // The goal of this method is allow the representations to transform the
+  // selection created in the view (which is an id-based selection based on the
+  // vtkTable that is fed into the vtkChart) to an appropriate selection based
+  // on the data going into the representation.
+  // Return false if the selection is not applicable to this representation or
+  // the conversion cannot be made.
+  // Default implementation simply ensures that the FieldType on the
+  // selection nodes is set to match up with the FieldAssociation on the
+  // representation.
+  virtual bool MapSelectionToInput(vtkSelection* sel);
+
+  // Description:
+  // This is the inverse of MapSelectionToInput(). In this case, we are
+  // converting the selection defined on the input for the representation to a
+  // selection that corresponds to elements being rendered in the view.
+  // The default implementation checks removes vtkSelectionNode items in sel
+  // that don't have the FieldType that matches this->FieldAssociation.
+  // Similar to MapSelectionToInput(), this method is expected to transform the
+  // sel in place and return false is the selection is not applicable to this
+  // representation or the conversion cannot be made.
+  virtual bool MapSelectionToView(vtkSelection* sel);
+
 //BTX
 protected:
   vtkChartRepresentation();
@@ -155,6 +180,12 @@ protected:
   // Description:
   // Convenience method to get the first vtkTable from LocalOutput, if any.
   vtkTable* GetLocalOutput();
+
+  // Description:
+  // Method to be overrided to transform input data to a vtkTable.
+  // The default implementation just returns the data object provided in parameter.
+  virtual vtkDataObject* TransformInputData(vtkInformationVector** inputVector,
+                                            vtkDataObject* data);
 
   typedef std::map<std::string, vtkSmartPointer<vtkTable> > MapOfTables;
   // Description:

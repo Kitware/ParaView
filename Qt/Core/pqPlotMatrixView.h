@@ -50,10 +50,6 @@ public:
   static QString viewType() { return "PlotMatrixView"; }
 
 protected:
-
-  /// Listen for new selection events, and pass them back to ParaView
-  virtual void selectionChanged();
-
 };
 
 #endif

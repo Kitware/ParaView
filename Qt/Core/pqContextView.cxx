@@ -245,18 +245,11 @@ void pqContextView::resetDisplay()
 void pqContextView::selectionChanged()
 {
   // Fill the selection source with the selection from the view
-  vtkSelection* sel = 0;
-
-  if(vtkChart *chart = vtkChart::SafeDownCast(this->getContextViewProxy()->GetContextItem()))
+  vtkSelection* sel = this->getContextViewProxy()->GetCurrentSelection();
+  if (sel)
     {
-    sel = chart->GetAnnotationLink()->GetCurrentSelection();
+    this->setSelection(sel);
     }
-
-  if(!sel)
-    {
-    return;
-    }
-  this->setSelection(sel);
 }
 
 void pqContextView::setSelection(vtkSelection* sel)

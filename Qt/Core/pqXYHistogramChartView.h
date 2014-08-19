@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqHistogramTableModel.h
+   Module:    pqXYHistogramChartView.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,37 +28,39 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __pqHistogramTableModel_h
-#define __pqHistogramTableModel_h
+========================================================================*/
+#ifndef __pqXYHistogramChartView_h
+#define __pqXYHistogramChartView_h
 
-#include "pqCoreModule.h"
-#include <QAbstractTableModel>
+#include "pqContextView.h"
 
-class vtkDoubleArray;
-class vtkIntArray;
+class vtkSMSourceProxy;
+class pqDataRepresentation;
 
-class PQCORE_EXPORT pqHistogramTableModel :
-  public QAbstractTableModel
+/// pqContextView subclass for "HistogramView". Doesn't do much expect adds
+/// the API to get the chartview type and indicates that this view supports
+/// selection.
+class PQCORE_EXPORT pqXYHistogramChartView : public pqContextView
 {
-  typedef QAbstractTableModel Superclass;
-
   Q_OBJECT
-  
-public:
-  pqHistogramTableModel(vtkDoubleArray* bin_extents, vtkIntArray* bin_values, QObject* parent = 0);
-  ~pqHistogramTableModel();
+  typedef pqContextView Superclass;
 
-  int rowCount(const QModelIndex& parent = QModelIndex()) const;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const;
-  QVariant data(const QModelIndex& index, int role) const;
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
- 
+public:
+  static QString XYHistogramChartViewType() { return "XYHistogramChartView"; }
+
+  /// Currently the bar chart view is not supporting selection.
+  virtual bool supportsSelection() const {return true;}
+
+  pqXYHistogramChartView(const QString& group,
+                 const QString& name,
+                 vtkSMContextViewProxy* viewModule,
+                 pqServer* server,
+                 QObject* parent=NULL);
+
+  virtual ~pqXYHistogramChartView();
+
 private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  Q_DISABLE_COPY(pqXYHistogramChartView);
 };
 
-
 #endif
-

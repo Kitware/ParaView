@@ -2228,6 +2228,24 @@
     </ContextViewProxy>
     <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase"
+                      class="vtkPVXYChartView"
+                      name="XYHistogramChartView"
+                      label="Histogram View"
+                      processes="client|renderserver|dataserver"
+                      post_creation="SetChartTypeToBar"
+                      representation_name="HistogramChartRepresentation"
+                      skip_plotable_check="1">
+      <Documentation>This is the proxy for the histogram chart view.</Documentation>
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewTitle"
                       class="vtkPVXYChartView"
                       name="BoxChartView"
@@ -2275,7 +2293,8 @@
                       label="Parallel Coordinates View"
                       processes="client|renderserver|dataserver"
                       representation_name="ParallelCoordinatesRepresentation"
-                      post_creation="SetChartTypeToParallelCoordinates" >
+                      post_creation="SetChartTypeToParallelCoordinates"
+                      skip_plotable_check="1">
       <Documentation>This is the proxy for parallel coordinates chart
       view.</Documentation>
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
@@ -2296,6 +2315,12 @@
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
     </ContextViewProxy>
     <!-- ================================================================== -->
     <PlotMatrixViewProxy base_proxygroup="internal_views"
@@ -2304,7 +2329,8 @@
                          name="PlotMatrixView"
                          label="Plot Matrix View"
                          processes="client|renderserver|dataserver"
-                         representation_name="PlotMatrixRepresentation">
+                         representation_name="PlotMatrixRepresentation"
+                         skip_plotable_check="1">
       <Documentation>This is the proxy for the plot matrix
       view.</Documentation>
       <IntVectorProperty command="SetBorderLeft"
@@ -2774,11 +2800,6 @@
         <Property name="HistogramAxisLabelFontSize" function="Size" />
       </PropertyGroup>
 
-
-
-
-
-
       <IntVectorProperty command="SetUseOffscreenRenderingForScreenshots"
                          default_values="0"
                          name="UseOffscreenRenderingForScreenshots"
@@ -2797,6 +2818,15 @@
         <BooleanDomain name="bool" />
         <Documentation>Set whether to use offscreen rendering.</Documentation>
       </IntVectorProperty>
+
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+
+      <!-- end of PlotMatrixViewProxy -->
     </PlotMatrixViewProxy>
     <!-- ================================================================== -->
     <ViewProxy base_proxygroup="internal_views"
@@ -2842,6 +2872,14 @@
         The output of this filter will have at most BlockSize
         rows.</Documentation>
       </IdTypeVectorProperty>
+
+      <Hints>
+        <ShowOneRepresentationAtATime />
+        <!-- When present, vtkSMParaViewPipelineController::Show() will
+             result in hiding other representations that are currently visible
+             -->
+      </Hints>
+
       <!-- End of SpreadSheetView -->
     </ViewProxy>
   </ProxyGroup>
@@ -5358,9 +5396,174 @@
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
+    <ChartRepresentationProxy base_proxygroup="representations"
+                              class="vtkPVHistogramChartRepresentation"
+                              name="HistogramChartRepresentation"
+                              processes="client|dataserver|renderserver">
+      <Documentation>Representation used by XYHistogramChartView.</Documentation>
+            <Documentation>API for representations used by XYChartView and XYBarChartView.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetHistogramColor"
+                            default_values="0 0 1"
+                            name="HistogramColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="default">
+        <Documentation>Sets the color for the histograms.</Documentation>
+      </DoubleVectorProperty>
+      <SubProxy>
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+               <!-- See vtkSMChartRepresentationProxy::SetPropertyModifiedFlag()
+                    for the details on naming this property -->
+          <InputProperty command="SetInputConnection"
+                         name="OriginalSelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
+
+      <IntVectorProperty command="SetBinCount"
+                         default_values="256"
+                         name="BinCount"
+                         number_of_elements="1">
+        <IntRangeDomain max="1000"
+                        min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the number of bins
+        for the histogram.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetComponent"
+                         default_values="0"
+                         name="Component"
+                         number_of_elements="1">
+        <NumberOfComponentsDomain name="comps">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray" />
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
+        <Documentation>The value of this property specifies the array component
+        from which the histogram should be computed.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseCustomBinRanges"
+                         default_values="0"
+                         name="UseCustomBinRanges"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, CustomBinRanges will be used instead
+        of using the full range for the selected array. By default, set to
+        false.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetCustomBinRanges"
+                            default_values="0.0 100.0"
+                            name="CustomBinRanges"
+                            number_of_elements="2"
+                            panel_visibility="advanced">
+        <Documentation>Set custom bin ranges to use. These are used only when
+        UseCustomBinRanges is set to true.</Documentation>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetHistogramLineStyle"
+                         name="HistogramLineStyle"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+         <Documentation>Set the line style to use for drawing a border around the histogram bins.
+         </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Solid" value="1" />
+          <Entry text="Dash" value="2" />
+          <Entry text="Dot" value="3" />
+          <Entry text="Dash Dot" value="4" />
+          <Entry text="Dash Dot Dot" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
     <ChartRepresentationProxy class="vtkPVParallelCoordinatesRepresentation"
-                                            name="ParallelCoordinatesRepresentation"
-                                            processes="client|dataserver|renderserver">
+                              name="ParallelCoordinatesRepresentation"
+                              processes="client|dataserver|renderserver">
       <Documentation>Representation used by
       ParallelCoordinatesChartView.</Documentation>
       <InputProperty command="SetInputConnection"
