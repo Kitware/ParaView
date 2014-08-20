@@ -95,6 +95,9 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # optimization warnings.
   "vtkStringList.cxx.*X is always false"
   "QvisSpectrumBar.cpp.*X is always false"
+
+  # qmetatype.h uses a local variable destructor that shadows a typedef in Python.h
+  "qmetatype.h:892:59: warning: declaration of 'destructor' shadows a global declaration"
 )
 
 #------------------------------------------------------------------------------
