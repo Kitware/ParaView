@@ -155,7 +155,8 @@ vtkSMLiveInsituLinkProxy* pqLiveInsituVisualizationManager::getProxy() const
 bool pqLiveInsituVisualizationManager::hasExtracts(pqOutputPort* port) const
 {
   if (port == NULL ||
-    port->getServer() != this->Internals->CatalystSession)
+      port->getServer() != this->Internals->CatalystSession ||
+      this->Internals->LiveInsituLinkProxy == NULL)
     {
     return false;
     }
@@ -226,7 +227,8 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
 void pqLiveInsituVisualizationManager::sourceRemoved(pqPipelineSource* source)
 {
   if (source->getServer() != this->Internals->Session ||
-    !source->property("CATALYST_EXTRACT").toBool())
+      ! source->property("CATALYST_EXTRACT").toBool() ||
+      this->Internals->LiveInsituLinkProxy == NULL)
     {
     return;
     }
