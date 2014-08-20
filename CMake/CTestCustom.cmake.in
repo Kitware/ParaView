@@ -86,9 +86,15 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "Nektar.*overloaded-virtual"
   "Nektar/include.*unused"
   "Nektar/Veclib"
+  "f951: warning: command line option '-fvisibility-inlines-hidden' is valid"
+  "Nektar/ParaViewPlugin/.*"
 
   # exclude warnings from external genericio library.
   "genericio"
+
+  # optimization warnings.
+  "vtkStringList.cxx.*X is always false"
+  "QvisSpectrumBar.cpp.*X is always false"
 )
 
 #------------------------------------------------------------------------------
