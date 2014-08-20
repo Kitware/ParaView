@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
 #include <QApplication>
@@ -351,6 +352,12 @@ private:
     // "visibility" in a more generic, session-centric way.
     if (pqLiveInsituManager::isInsituServer(port->getServer()))
       {
+      vtkSMSourceProxy* proxy = port->getSourceProxy();
+      if (proxy &&
+          strcmp(proxy->GetXMLGroup(), "insitu_writer_parameters") == 0)
+        {
+        return LAST;
+        }
       pqLiveInsituVisualizationManager* mgr =
         pqLiveInsituManager::managerFromInsitu(port->getServer());
       if (mgr)
