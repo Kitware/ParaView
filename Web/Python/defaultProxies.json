@@ -27,6 +27,6 @@
 
     "readers": [
         { "name": "LegacyVTKReader", "extensions": [ "vtk" ], "method": "FileNames" },
-        { "name": "Xdmf3Reader", "extensions": [ "xmf", "xdmf" ] }
+        { "name": "Xdmf3ReaderS", "extensions": [ "xmf", "xdmf" ] }
     ]
 }
