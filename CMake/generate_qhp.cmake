@@ -2,6 +2,7 @@
 # The WORKING_DIRECTORY for this script must be the same as the location for the
 # qhp file otherwise the toc won't be generated correctly.
 # Input environment:
+# input_file :-
 # output_file :-
 # file_patterns :-
 # namespace :-
@@ -19,22 +20,6 @@ function (extract_title name filename)
     set (${name} "${filename_name}" PARENT_SCOPE)
   endif()
 endfunction()
-
-set (qhp_contents
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<QtHelpProject version=\"1.0\">
-    <namespace>@namespace@</namespace>
-    <virtualFolder>@folder@</virtualFolder>
-    <filterSection>
-        @toc@
-        <keywords>
-          <!-- how to handle keywords? -->
-        </keywords>
-        <files>
-          @files@
-        </files>
-    </filterSection>
-</QtHelpProject>")
 
 if (NOT output_file OR NOT file_patterns OR NOT namespace OR NOT folder OR NOT name)
   message(FATAL_ERROR "Missing one of the required arguments!!")
@@ -75,5 +60,7 @@ foreach(filename ${file_patterns})
   set (files "${files}<file>${filename}</file>\n")
 endforeach()
 
-string(CONFIGURE "${qhp_contents}" text @ONLY)
-file (WRITE "${output_file}" "${text}")
+configure_file(
+  "${input_file}"
+  "${output_file}"
+  @ONLY)

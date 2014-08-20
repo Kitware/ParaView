@@ -363,6 +363,7 @@ function(build_help_project name)
 
     # generate the toc at run-time.
     COMMAND ${CMAKE_COMMAND}
+            -Dinput_file:FILEPATH=${CMAKE_SOURCE_DIR}/CMake/qt_help.qhp.in
             -Doutput_file:FILEPATH=${qhp_filename}
             -Dfile_patterns:STRING="${arg_FILEPATTERNS}"
             -Dnamespace:STRING="${arg_NAMESPACE}"
