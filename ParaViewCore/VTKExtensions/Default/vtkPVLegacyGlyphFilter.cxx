@@ -460,6 +460,17 @@ int vtkPVLegacyGlyphFilter::RequestCompositeData(vtkInformation* request,
   return retVal;
 }
 
+// The problems this filter has are numerous. I will stick to fixing the
+// specific BUG #14279 in this change. A refactored vtkPVLegacyGlyphFilter is
+// imminent. BUG #14279 happens since rand() returns a number in 0 and RAND_MAX
+// and RAND_MAX can be less than maxId, which the old implementation missed.
+static vtkIdType vtkPVLegacyGlyphFilterRandomId(vtkIdType maxId)
+{
+  double randomNumber = rand() / static_cast<double>(RAND_MAX);
+  // randomNumber is now in range [0.0, 1.0]
+  return static_cast<vtkIdType>(randomNumber * maxId);
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVLegacyGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
 {
@@ -488,10 +499,10 @@ void vtkPVLegacyGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
     int r;
     for(int i = 0; i < this->BlockMaxNumPts; i++)
       {
-      r = rand() % static_cast<int>( floor(PtsNotBlanked));
+      r = vtkPVLegacyGlyphFilterRandomId(static_cast<vtkIdType>( floor(PtsNotBlanked)));
       while( std::find(this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end(), r) != this->RandomPtsInDataset.end() )
         {
-        r = rand() % static_cast<int>( floor(PtsNotBlanked) );
+        r = vtkPVLegacyGlyphFilterRandomId(static_cast<vtkIdType>( floor(PtsNotBlanked)));
         }
       this->RandomPtsInDataset.push_back( static_cast<vtkIdType>(r) );
       }
