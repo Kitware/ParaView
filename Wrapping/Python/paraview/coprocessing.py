@@ -245,9 +245,9 @@ class CoProcessor(object):
         """
         controller = servermanager.ParaViewPipelineController()
         # assume that a client only proxy with the same name as a writer
-        # is available in "filters"
+        # is available in "insitu_writer_paramters"
         proxy = servermanager.ProxyManager().NewProxy(
-            "filters", writer.GetXMLName())
+            "insitu_writer_parameters", writer.GetXMLName())
         controller.PreInitializeProxy(proxy)
         proxy.GetProperty("Input").SetInputConnection(
             0, writer.Input.SMProxy, 0)

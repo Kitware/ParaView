@@ -172,10 +172,10 @@ void pqSGWritersMenuManager::createMenu()
   vtkSMProxyDefinitionManager* proxyDefinitions =
     pxm->GetProxyDefinitionManager();
 
-  // For now we only worry about proxies in the filter group and
+  // For search proxies in the insitu_writer_parameters group and
   // we search specifically for proxies with a proxy writer hint
   // since we've marked them as special
-  const char proxyGroup[] = "filters";
+  const char proxyGroup[] = "insitu_writer_parameters";
   vtkPVProxyDefinitionIterator* iter =
     proxyDefinitions->NewSingleGroupIterator(proxyGroup);
   for(iter->InitTraversal();!iter->IsDoneWithTraversal();iter->GoToNextItem())
