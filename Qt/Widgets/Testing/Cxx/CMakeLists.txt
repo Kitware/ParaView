@@ -2,19 +2,23 @@ SET(MyTests
   CTKSliders
   FlatTreeView
   Animation
-  pqTextEditTest
   )
 
+SET(MocSources
+  SignalCatcher.h)
+
+if(NOT ${CMAKE_Cxx_Fortran_COMPILER_ID} STREQUAL "Intel")
+  # QtTest fails to compile on ICC. Hence we don't add this test on
+  # Intel compilers.
+  list(APPEND MyTests pqTextEditTest)
+  list(APPEND MocSources pqTextEditTest.h)
+endif()
+
+
 IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(Tests_MOC_SOURCES
-    SignalCatcher.h
-    pqTextEditTest.h
-  )
+  QT5_WRAP_CPP(Tests_MOC_SOURCES ${MocSources})
 ELSE()
-  QT4_WRAP_CPP(Tests_MOC_SOURCES
-    SignalCatcher.h
-    pqTextEditTest.h
-  )
+  QT4_WRAP_CPP(Tests_MOC_SOURCES ${MocSources})
 ENDIF()
 
 ADD_DEFINITIONS(-DQT_GUI_LIB)
@@ -35,5 +39,7 @@ FOREACH(test ${MyTests})
   set_tests_properties(pqWidgets${test} PROPERTIES LABELS "PARAVIEW")
 ENDFOREACH()
 
-# since serial since this relies on focus.
-set_tests_properties(pqWidgetspqTextEditTest PROPERTIES RUN_SERIAL ON)
+if(NOT ${CMAKE_Cxx_Fortran_COMPILER_ID} STREQUAL "Intel")
+  # since serial since this relies on focus.
+  set_tests_properties(pqWidgetspqTextEditTest PROPERTIES RUN_SERIAL ON)
+endif()
