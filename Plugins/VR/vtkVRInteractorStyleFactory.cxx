@@ -113,7 +113,7 @@ vtkVRInteractorStyleFactory::GetInteractorStyleDescriptions()
 std::string vtkVRInteractorStyleFactory::GetDescriptionFromClassName(
     const std::string &className)
 {
-  for (int i = 0; i < this->InteractorStyleClassNames.size(); ++i)
+  for (size_t i = 0; i < this->InteractorStyleClassNames.size(); ++i)
     {
     if (this->InteractorStyleClassNames[i] == className)
       {
@@ -157,7 +157,7 @@ vtkVRInteractorStyle *
 vtkVRInteractorStyleFactory::NewInteractorStyleFromDescription(
     const std::string &desc)
 {
-  for (int i = 0; i < this->InteractorStyleDescriptions.size(); ++i)
+  for (size_t i = 0; i < this->InteractorStyleDescriptions.size(); ++i)
     {
     if (this->InteractorStyleDescriptions[i] == desc)
       {
@@ -180,7 +180,7 @@ void vtkVRInteractorStyleFactory::PrintSelf(ostream &os, vtkIndent indent)
     }
   os << indent << "Known interactor styles:" << endl;
   vtkIndent iindent = indent.GetNextIndent();
-  for (int i = 0; i < this->InteractorStyleClassNames.size(); ++i)
+  for (size_t i = 0; i < this->InteractorStyleClassNames.size(); ++i)
     {
     os << iindent << "\"" << this->InteractorStyleDescriptions[i]
        << "\" (" << this->InteractorStyleClassNames[i] << ")\n";

@@ -122,7 +122,7 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
           if (vtkSMRenderViewProxy *rviewPxy =
               vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
             {
-            if (camera = rviewPxy->GetActiveCamera())
+            if ((camera = rviewPxy->GetActiveCamera()))
               {
               // vtkCamera API is misleading...view transform == modelview
               rotMatrix->DeepCopy(camera->GetModelViewTransformMatrix());
@@ -222,7 +222,7 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
               if (vtkSMRenderViewProxy *rviewPxy =
                   vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
                 {
-                if (camera = rviewPxy->GetActiveCamera())
+                if ((camera = rviewPxy->GetActiveCamera()))
                   {
                   // vtkCamera API is misleading...view transform == modelview
                   modelViewTransMatrix->Identity();
