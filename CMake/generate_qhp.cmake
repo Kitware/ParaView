@@ -8,6 +8,10 @@
 # folder :-
 # name :-
 
+if (POLICY CMP0053)
+  cmake_policy(SET CMP0053 NEW)
+endif ()
+
 # extracts title from the html page to generate a user-friendly index.
 function (extract_title name filename)
   file (READ ${filename} contents)
