@@ -33,24 +33,18 @@ macro(cleanup_bundle app app_root libdir pluginsdir datadir)
   endif()
 
   # Handle any python package/module
-  file(GLOB pyModules ${libdir}/site-packages/*)
-  foreach(pyModule IN LISTS pyModules)
-    if (EXISTS "${pyModule}/")
-      file(INSTALL "${pyModule}"
-           DESTINATION ${app_root}/Contents/Python
-           USE_SOURCE_PERMISSIONS)
-    endif()
-  endforeach()
+  if (IS_DIRECTORY "${libdir}/site-packages")
+    file(INSTALL "${libdir}/site-packages/"
+       DESTINATION ${app_root}/Contents/Python
+       USE_SOURCE_PERMISSIONS)
+  endif ()
 
   # Package web server content
-  file(GLOB webFiles ${datadir}/www/*)
-  foreach(webFile IN LISTS webFiles)
-    if (EXISTS "${webFile}/")
-      file(INSTALL "${webFile}"
-           DESTINATION ${app_root}/Contents/www
-           USE_SOURCE_PERMISSIONS)
-    endif()
-  endforeach()
+  if (IS_DIRECTORY "${datadir}/www")
+    file(INSTALL "${datadir}/www/"
+       DESTINATION ${app_root}/Contents/www
+       USE_SOURCE_PERMISSIONS)
+  endif ()
 
   # package other executables such as pvserver.
   get_filename_component(bin_dir "${app_root}" PATH)
