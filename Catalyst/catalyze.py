@@ -39,6 +39,12 @@ def _get_argument_parser():
 
   return parser
 
+def edition_name(dir):
+  base = os.path.basename(dir)
+  if not base:
+    base = os.path.basename(os.path.dirname(dir))
+  return base
+
 def filter_proxies(fin, fout, proxies, all_proxies):
   root = ET.fromstring(fin.read())
   if not root.tag == 'ServerManagerConfiguration':
@@ -142,7 +148,7 @@ def patch_path(config, path_entry):
 
 def run_patches(config, path_entry):
   work_dir = config.output_dir
-  editions = map(os.path.basename, config.input_dirs)
+  editions = map(edition_name, config.input_dirs)
 
   try:
     for patch in path_entry['patches']:
@@ -284,7 +290,7 @@ def cmake_cache(config, manifest_list):
 def process(config):
 
   editions = set()
-  all_editions = set(map(os.path.basename, config.input_dirs))
+  all_editions = set(map(edition_name, config.input_dirs))
   all_manifests = []
   all_proxies = []
   for input_dir in config.input_dirs:
@@ -302,8 +308,7 @@ def process(config):
       if manifest.has_key('after'):
         after = set(manifest['after'])
         adiff = after.difference(editions)
-        hdiff = after.intersection(all_editions)
-        diff = hdiff.intersection(adiff)
+        diff = adiff.intersection(all_editions)
         if len(diff):
           missing = ', '.join(list(diff))
           raise RuntimeError('Editions must come before %s: %s' % (manifest['edition'], missing))
