@@ -35,12 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsModule.h"
 #include "pqDoubleVectorPropertyWidget.h"
 
-
-class pqHighlightablePushButton;
-
 /// pqGlyphScaleFactorPropertyWidget is used for the "Scale Factor" property on
-/// the Glyph filter. It adds a button to the widget that allows the user to
-/// "reset" property value using the domain.
+/// the Glyph filter. It customizes the resetButtonClicked() logic since the
+/// Glyph filter's scale factor setup is custom.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqGlyphScaleFactorPropertyWidget : public pqDoubleVectorPropertyWidget
 {
   Q_OBJECT
@@ -50,20 +47,12 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent=0);
   virtual ~pqGlyphScaleFactorPropertyWidget();
 
-  /// overridden to clear the highlights on the "reset" button.
-  virtual void apply();
-  virtual void reset();
-
 protected slots:
-  /// highlights the button.
-  void highlightResetButton(bool highlight=true);
-
   /// update the property's value using the domain.
-  virtual void resetClicked();
+  virtual void resetButtonClicked();
 
 private:
   Q_DISABLE_COPY(pqGlyphScaleFactorPropertyWidget);
-  pqHighlightablePushButton* ResetButton;
 };
 
 #endif

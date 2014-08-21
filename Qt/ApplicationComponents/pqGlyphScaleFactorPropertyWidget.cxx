@@ -32,8 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqGlyphScaleFactorPropertyWidget.h"
 
 #include "pqCoreUtilities.h"
-#include "pqHighlightablePushButton.h"
-#include "pqLineEdit.h"
 #include "vtkCommand.h"
 #include "vtkGlyph3D.h"
 #include "vtkSMArrayRangeDomain.h"
@@ -41,9 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QStyle>
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
@@ -51,28 +46,11 @@ pqGlyphScaleFactorPropertyWidget::pqGlyphScaleFactorPropertyWidget(
   vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
   : Superclass(smproperty, smproxy, parentObject)
 {
-  QLayout* layout = this->layout();
-  Q_ASSERT(layout);
-
-  pqHighlightablePushButton* button = new pqHighlightablePushButton(this);
-  button->setObjectName("Reset");
-  button->setToolTip("Reset using current data values");
-  button->setIcon(button->style()->standardIcon(QStyle::SP_BrowserReload));
-  layout->addWidget(button);
-
-  this->ResetButton = button;
-
-  this->connect(button, SIGNAL(clicked()), SLOT(resetClicked()));
-
-  pqCoreUtilities::connect(smproperty, vtkCommand::DomainModifiedEvent,
-    this, SLOT(highlightResetButton()));
-  pqCoreUtilities::connect(smproperty, vtkCommand::UncheckedPropertyModifiedEvent,
-    this, SLOT(highlightResetButton()));
-
+  // We add this extra dependency for the reset button.
   if (vtkSMProperty* scaleMode = smproxy->GetProperty("ScaleMode"))
     {
     pqCoreUtilities::connect(scaleMode, vtkCommand::UncheckedPropertyModifiedEvent,
-      this, SLOT(highlightResetButton()));
+      this, SIGNAL(highlightResetButton()));
     }
 }
 
@@ -82,27 +60,7 @@ pqGlyphScaleFactorPropertyWidget::~pqGlyphScaleFactorPropertyWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqGlyphScaleFactorPropertyWidget::apply()
-{
-  this->Superclass::apply();
-  this->highlightResetButton(false);
-}
-
-//-----------------------------------------------------------------------------
-void pqGlyphScaleFactorPropertyWidget::reset()
-{
-  this->Superclass::reset();
-  this->highlightResetButton(false);
-}
-
-//-----------------------------------------------------------------------------
-void pqGlyphScaleFactorPropertyWidget::highlightResetButton(bool highlight)
-{
-  this->ResetButton->highlight(/*clear=*/ highlight == false);
-}
-
-//-----------------------------------------------------------------------------
-void pqGlyphScaleFactorPropertyWidget::resetClicked()
+void pqGlyphScaleFactorPropertyWidget::resetButtonClicked()
 {
   // Now this logic to hardcoded for the Glyph filter (hence the name of this
   // widget).
@@ -166,8 +124,9 @@ void pqGlyphScaleFactorPropertyWidget::resetClicked()
   if (helper.GetAsDouble() != scalefactor)
     {
     vtkSMUncheckedPropertyHelper(smproperty).Set(scalefactor);
-    this->highlightResetButton(false);
     emit this->changeAvailable();
     emit this->changeFinished();
     }
+
+  emit this->clearHighlight();
 }

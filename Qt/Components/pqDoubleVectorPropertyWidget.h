@@ -54,10 +54,11 @@ public:
 signals:
   /// internal signal used to clear highlights from pqHighlightablePushButton.
   void clearHighlight();
+  void highlightResetButton();
 
 protected slots:
   /// called when the user clicks the "reset" button for a specific property.
-  void resetButtonClicked();
+  virtual void resetButtonClicked();
 
 private:
   Q_DISABLE_COPY(pqDoubleVectorPropertyWidget);
