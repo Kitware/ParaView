@@ -537,6 +537,10 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 # Since this involves charts.
 SET(HistogramSelection_THRESHOLD 40)
 
+# Increate threshold for this one since the chart axes
+# tends to render slightly differently.
+set (LoadStateMultiView_THRESHOLD 20)
+
 ##########################################################
 # List of known incompatible tests for Collaboration
 #
