@@ -1043,6 +1043,99 @@
       <!-- End of XdmfWriter -->
     </WriterProxy>
 #endif
+#ifdef Module_vtkIOADIOS
+    <!-- ================================================================= -->
+    <PWriterProxy class="vtkADIOSWriter"
+                  name="ADIOSWriter">
+      <Documentation short_help="Write ADIOS BP files using VTKs schema.">
+        Writer to write ADIOS BP files using a VTK specific schema
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetTransportMethod"
+                         default_values="1"
+                         name="TransportMethod"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="NULL"          value="0" />
+          <Entry text="POSIX"         value="1" />
+          <Entry text="MPI"           value="2" />
+          <Entry text="MPILustre"     value="3" />
+          <Entry text="MPIAggregate"  value="4" />
+          <Entry text="VarMerge"      value="5" />
+          <Entry text="DataSpaces"    value="6" />
+          <Entry text="DIMES"         value="7" />
+          <Entry text="FlexPath"      value="8" />
+          <Entry text="PHDF5"         value="9" />
+          <Entry text="NetCDF4"       value="10" />
+        </EnumerationDomain>
+        <Documentation>
+          Select the specific ADIOS backend write method to use.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetTransportMethodArguments"
+                            name="TransportMethodArguments"
+                            default=""
+                            number_of_elements="1">
+        <Documentation>
+          Configuration parameters to pass to the specified ADIOS backend.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetTransform"
+                         default_values="0"
+                         name="CompressionMethod"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="None"  value="0" />
+          <Entry text="ZLib"  value="1" />
+          <Entry text="BZip2" value="2" />
+          <Entry text="SZip"  value="3" />
+        </EnumerationDomain>
+        <Documentation>
+          Select the specific array compression method to use.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to write to.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteAllTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each time step available from the
+        reader.</Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Transport">
+        <Property name="TransportMethod" />
+        <Property name="TransportMethodArguments" />
+      </PropertyGroup>
+      <Hints>
+        <Property name="Input"               show="0" />
+        <Property name="TransportMethod"     show="1" />
+        <Property name="TransportMethodArgs" show="1" />
+        <Property name="CompressionMethod"   show="1" />
+        <WriterFactory extensions="bp"
+                       file_description="VTK ADIOS File" />
+      </Hints>
+      <!-- End of ADIOSWriter -->
+    </PWriterProxy>
+#endif
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
                   base_proxyname="ParallelWriterBase"
