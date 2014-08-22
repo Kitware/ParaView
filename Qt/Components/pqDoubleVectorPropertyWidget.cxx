@@ -133,24 +133,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
                     << "with a single element and a "
                     << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
                     << "with a minimum and a maximum";
-
-      if (vtkSMArrayRangeDomain::SafeDownCast(range))
-        {
-        // if this has an vtkSMArrayRangeDomain, add a "reset" button.
-        pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
-        resetButton->setObjectName("Reset");
-        resetButton->setToolTip("Reset using current data values");
-        resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
-
-        pqCoreUtilities::connect(dvp, vtkCommand::DomainModifiedEvent,
-          resetButton, SLOT(highlight()));
-        pqCoreUtilities::connect(dvp, vtkCommand::UncheckedPropertyModifiedEvent,
-          resetButton, SLOT(highlight()));
-        this->connect(resetButton, SIGNAL(clicked()), SLOT(resetButtonClicked()));
-        resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
-
-        layoutLocal->addWidget(resetButton);
-        }
       }
     else
       {
@@ -217,6 +199,29 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
                       << "and more than one element";
         }
       }
+    }
+
+  if (dvp->FindDomain("vtkSMArrayRangeDomain") != NULL ||
+    dvp->FindDomain("vtkSMBoundsDomain") != NULL)
+    {
+    PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
+
+    // if this has an vtkSMArrayRangeDomain, add a "reset" button.
+    pqHighlightablePushButton* resetButton = new pqHighlightablePushButton(this);
+    resetButton->setObjectName("Reset");
+    resetButton->setToolTip("Reset using current data values");
+    resetButton->setIcon(resetButton->style()->standardIcon(QStyle::SP_BrowserReload));
+
+    pqCoreUtilities::connect(dvp, vtkCommand::DomainModifiedEvent,
+      this, SIGNAL(highlightResetButton()));
+    pqCoreUtilities::connect(dvp, vtkCommand::UncheckedPropertyModifiedEvent,
+      this, SIGNAL(highlightResetButton()));
+
+    this->connect(resetButton, SIGNAL(clicked()), SLOT(resetButtonClicked()));
+    resetButton->connect(this, SIGNAL(highlightResetButton()), SLOT(highlight()));
+    resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
+
+    layoutLocal->addWidget(resetButton);
     }
 
   this->setLayout(layoutLocal);
