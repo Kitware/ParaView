@@ -6,6 +6,7 @@ if(WIN32)
   add_definitions(-D_USE_MATH_DEFINES)
 endif()
 
+vtk_module_warnings_disable(C)
 
 set(metis_sources
   coarsen.c
