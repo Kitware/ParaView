@@ -68,6 +68,9 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   # Ignore clang warning when taking c++ file in c mode has they have .c extension
   "clang.*warning.*treating.*input as.*when in.*mode, this behavior is deprecated"
+  "clang: warning: argument unused during compilation: '-std=c99'"
+  # ignore all unused-.* warnings coming from support tools headers (e.g. Qt).
+  "Dashboards/Support.*Wunused"
 
   # Ignore empty link error
   "/usr/bin/ld.*warning.*init_array section has zero size"
