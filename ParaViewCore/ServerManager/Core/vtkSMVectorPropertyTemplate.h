@@ -45,6 +45,7 @@ namespace
       }
 
   template <>
+  vtkMaybeUnused("not used in non-string specializations")
     vtkStdString vtkSMVPConvertFromString<vtkStdString>(
       const std::string& string_representation)
       { return string_representation; }

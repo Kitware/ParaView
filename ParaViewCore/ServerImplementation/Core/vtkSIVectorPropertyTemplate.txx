@@ -27,6 +27,7 @@
 namespace
 {
   // ********* INT *************
+  vtkMaybeUnused("not used for non-int specializations")
   std::vector<int>&
     operator<< (std::vector<int>& values, const Variant& variant)
       {
@@ -39,6 +40,7 @@ namespace
       return values;
       }
 
+  vtkMaybeUnused("not used for non-int specializations")
   Variant& operator << (Variant& variant, const std::vector<int> &values)
     {
     variant.set_type(Variant::INT);
@@ -50,6 +52,7 @@ namespace
     return variant;
     }
 
+  vtkMaybeUnused("not used for non-int specializations")
   bool operator << (std::vector<int>& values, const vtkClientServerStream& stream)
     {
     size_t cur_size = values.size();
@@ -129,6 +132,7 @@ namespace
     }
 
   // ********* DOUBLE *************
+  vtkMaybeUnused("not used for non-double specializations")
   std::vector<double>&
     operator<< (std::vector<double>& values, const Variant& variant)
       {
@@ -141,6 +145,7 @@ namespace
       return values;
       }
 
+  vtkMaybeUnused("not used for non-double specializations")
   Variant& operator << (Variant& variant, const std::vector<double> &values)
     {
     variant.set_type(Variant::FLOAT64);
@@ -152,6 +157,7 @@ namespace
     return variant;
     }
 
+  vtkMaybeUnused("not used for non-double specializations")
   bool operator << (std::vector<double>& values, const vtkClientServerStream& stream)
     {
     size_t cur_size = values.size();
@@ -202,6 +208,7 @@ namespace
     }
 
   // ********* vtkIdType *************
+  vtkMaybeUnused("not used for non-vtkIdType specializations")
   void OperatorIdType(std::vector<vtkIdType>& values, const Variant& variant)
     {
     int num_elems = variant.idtype_size();
@@ -211,6 +218,7 @@ namespace
       values[cc] = variant.idtype(cc);
       }
     }
+  vtkMaybeUnused("not used for non-vtkIdType specializations")
   void OperatorIdType(Variant& variant, const std::vector<vtkIdType> &values)
     {
     variant.set_type(Variant::IDTYPE);
@@ -221,6 +229,7 @@ namespace
       }
     }
 
+  vtkMaybeUnused("not used for non-vtkIdType specializations")
   bool OperatorIdType(std::vector<vtkIdType>& values, const vtkClientServerStream& stream)
     {
     size_t cur_size = values.size();
@@ -259,6 +268,7 @@ namespace
     }
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
+  vtkMaybeUnused("not used for non-vtkIdType specializations")
   std::vector<vtkIdType>&
     operator<< (std::vector<vtkIdType>& values, const Variant& variant)
       {
@@ -266,12 +276,14 @@ namespace
       return values;
       }
 
+  vtkMaybeUnused("not used for non-vtkIdType specializations")
   Variant& operator << (Variant& variant, const std::vector<vtkIdType> &values)
     {
     OperatorIdType(variant, values);
     return variant;
     }
 
+  vtkMaybeUnused("not used for non-vtkIdType specializations")
   bool operator << (std::vector<vtkIdType>& values, const vtkClientServerStream& stream)
     {
     return OperatorIdType(values, stream);
