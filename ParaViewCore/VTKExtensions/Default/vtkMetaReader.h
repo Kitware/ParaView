@@ -25,7 +25,7 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
-#include <string>
+#include <string> // for std::string
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMetaReader :
   public vtkDataObjectAlgorithm
