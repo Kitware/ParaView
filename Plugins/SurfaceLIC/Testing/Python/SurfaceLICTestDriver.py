@@ -26,10 +26,8 @@ del rw
 
 if ok:
   smtesting.ProcessCommandLineArguments()
-  static = smtesting.SMStatesDir
 
-  if int(static) == 0:
-    LoadDistributedPlugin('SurfaceLIC', True, globals())
+  LoadDistributedPlugin('SurfaceLIC', True, globals())
 
   smtesting.LoadServerManagerState(smtesting.StateXMLFileName)
 

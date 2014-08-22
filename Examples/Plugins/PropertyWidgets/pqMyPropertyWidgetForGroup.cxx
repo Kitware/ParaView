@@ -36,7 +36,7 @@ pqMyPropertyWidgetForGroup::pqMyPropertyWidgetForGroup(
   vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup, QWidget *parentObject)
   : Superclass(smproxy, parentObject)
 {
-
+  Q_UNUSED(smgroup);
 }
 
 //-----------------------------------------------------------------------------
