@@ -63,4 +63,14 @@ set(metis_sources
   )
 
 vtk_module_library(metis STATIC ${metis_sources})
-set_target_properties(metis PROPERTIES LINKER_LANGUAGE CXX)
+if (CMAKE_VERSION VERSION_LESS "2.8.9")
+  if (NOT MSVC)
+    set_target_properties(metis
+      PROPERTIES
+        COMPILE_FLAGS "-fPIC")
+  endif ()
+else ()
+  set_target_properties(metis
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE TRUE)
+endif ()
