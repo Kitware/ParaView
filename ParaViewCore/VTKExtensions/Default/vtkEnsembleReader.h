@@ -39,8 +39,8 @@
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMetaReader.h"
-#include "vtkSmartPointer.h"
-#include <string>
+#include "vtkSmartPointer.h" // for internal API
+#include <string> // std string
 
 class vtkTable;
 

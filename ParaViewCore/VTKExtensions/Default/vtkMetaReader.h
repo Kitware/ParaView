@@ -25,7 +25,7 @@
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
-#include <string>
+#include <string> // for std::string
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMetaReader :
   public vtkDataObjectAlgorithm
@@ -130,6 +130,9 @@ protected:
   // Description:
   // Records the time when the meta-file was read.
   vtkTimeStamp MetaFileReadTime;
+private:
+  vtkMetaReader(const vtkMetaReader&); // Not implemented
+  void operator=(const vtkMetaReader&); // Not implemented
 };
 
 #endif
