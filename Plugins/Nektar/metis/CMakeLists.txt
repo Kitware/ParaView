@@ -4,22 +4,9 @@ include_directories(
 
 if(WIN32)
   add_definitions(-D_USE_MATH_DEFINES)
-else()
-# need some try compiles
-  set(CMAKE_C_FLAGS "-fPIC -O2 -ansi -w")
 endif()
 
-
-#OBJS = coarsen.o fm.o initpart.o match.o ccgraph.o memory.o \
-#       pmetis.o pqueue.o refine.o util.o timing.o debug.o \
-#       bucketsort.o graph.o stat.o kmetis.o kwayrefine.o \
-#       kwayfm.o balance.o ometis.o srefine.o sfm.o separator.o \
-#       mincover.o mmd.o mesh.o meshpart.o frename.o fortran.o \
-#       myqsort.o compress.o parmetis.o estmem.o \
-#       mpmetis.o mcoarsen.o mmatch.o minitpart.o mbalance.o \
-#       mrefine.o mutil.o mfm.o mkmetis.o mkwayrefine.o mkwayfmh.o \
-#       mrefine2.o minitpart2.o mbalance2.o mfm2.o \
-#       kvmetis.o kwayvolrefine.o kwayvolfm.o subdomains.o
+vtk_module_warnings_disable(C)
 
 set(metis_sources
   coarsen.c
@@ -77,4 +64,14 @@ set(metis_sources
   )
 
 vtk_module_library(metis STATIC ${metis_sources})
-set_target_properties(metis PROPERTIES LINKER_LANGUAGE CXX)
+if (CMAKE_VERSION VERSION_LESS "2.8.9")
+  if (NOT MSVC)
+    set_target_properties(metis
+      PROPERTIES
+        COMPILE_FLAGS "-fPIC")
+  endif ()
+else ()
+  set_target_properties(metis
+    PROPERTIES
+      POSITION_INDEPENDENT_CODE TRUE)
+endif ()
