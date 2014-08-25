@@ -248,6 +248,7 @@ def create_cmake_script(config, manifest_list):
 
   # ClientServer wrap
   cmake_script += 'cmake \\\n'
+  cmake_script += '  --no-warn-unused-cli\\\n'
   cmake_script += '  -DPARAVIEW_CS_MODULES:STRING="%s" \\\n' % (';'.join(cs_modules))
   # Python modules
   cmake_script+='  -DVTK_WRAP_PYTHON_MODULES:STRING="%s" \\\n' % (';'.join(python_modules))
