@@ -123,6 +123,7 @@ set(Module_SRCS
   vtkScatterPlotMapper.cxx
   vtkScatterPlotPainter.cxx
   vtkSciVizStatistics.cxx
+  vtkSliceAlongPolyPlane.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotFileSeriesReader.cxx

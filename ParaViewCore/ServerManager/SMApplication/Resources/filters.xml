@@ -13276,6 +13276,62 @@ found and the point will be rejected.</Documentation>
       <!-- End MaterialInterfaceFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkSliceAlongPolyPlane"
+                 label="Slice Along PolyLine"
+                 name="SliceAlongPolyLine">
+      <Documentation
+        long_help="Slice along the surface defined by sweeping a polyline parallel to the z-axis."
+        short_help="Slice along the surface defined by sweeping a polyline parallel to the z-axis.">
+        The Slice Along PolyLine filter is similar to the Slice Filter except that it slices along a surface that
+        is defined by sweeping the input polyline parallel to the z-axis.  Explained another way: take a laser
+        cutter and move it so that it hits every point on the input polyline while keeping it parallel
+        to the z-axis. The surface cut from the input dataset is the result.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Dataset" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          Set the vtkDataObject to slice.
+        </Documentation>
+      </InputProperty>
+      <InputProperty command="SetInputConnection" name="PolyLine" port_index="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>
+          Set the polyline to slice along.
+        </Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animatable="0"
+                            command="SetTolerance"
+                            default_values="10"
+                            label="Tolerance"
+                            name="Tolerance"
+                            number_of_elements="1">
+        <BoundsDomain mode="approximate_cell_length"
+                      name="bounds">
+          <RequiredProperties>
+            <Property function="Input" name="Dataset" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>
+          The threshold used internally to determine correspondence between the polyline
+          and the output slice.  If the output has sections missing, increasing this
+          value may help.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End Slice Along PolyLine -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkIntersectFragments"
                  label="Intersect Fragments"
                  name="IntersectFragments">
