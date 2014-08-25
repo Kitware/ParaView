@@ -10,10 +10,24 @@ except ImportError:
   raise RuntimeError, "'numpy' module is not found. numpy is needed for "\
     "this functionality to work. Please install numpy and try again."
 
+import re
 import vtk
 import vtk.numpy_interface.dataset_adapter as dsa
 import vtk.numpy_interface.algorithms as algos
 from paraview import calculator
+
+def _create_id_array(dataobject, attributeType):
+    """Returns a VTKArray or VTKCompositeDataArray for the ids"""
+    if not dataobject:
+        raise RuntimeError, "dataobject cannot be None"
+    if dataobject.IsA("vtkCompositeDataSet"):
+        ids = []
+        for ds in dataobject:
+            ids.append(_create_id_array(ds, attributeType))
+        return dsa.VTKCompositeDataArray(ids)
+    else:
+        return dsa.VTKArray(\
+                np.arange(dataobject.GetNumberOfElements(attributeType)))
 
 def maskarray_is_valid(maskArray):
     """Validates that the maskArray is either a VTKArray or a
@@ -46,18 +60,24 @@ def execute(self):
     inputs = []
     inputs.append(dsa.WrapDataObject(inputDO))
 
+    query = selectionNode.GetQueryString()
+
     # get a dictionary for arrays in the dataset attributes. We pass that
     # as the variables in the eval namespace for calculator.compute().
     elocals = calculator.get_arrays(inputs[0].GetAttributes(attributeType))
+    if not elocals.has_key("id") and re.search(r'\bid\b', query):
+        # add "id" array if the query string refers to id.
+        # This is a temporary fix. We should look into
+        # accelerating id-based selections in the future.
+        elocals["id"] = _create_id_array(inputs[0], attributeType)
     try:
-        maskArray = calculator.compute(inputs, selectionNode.GetQueryString(), ns=elocals)
+        maskArray = calculator.compute(inputs, query, ns=elocals)
     except:
         from sys import stderr
         print >> stderr, "Error: Failed to evaluate Expression '%s'. "\
             "The following exception stack should provide additional developer "\
             "specific information. This typically implies a malformed "\
-            "expression. Verify that the expression is valid.\n" % \
-            selectionNode.GetQueryString()
+            "expression. Verify that the expression is valid.\n" % query
         raise
 
     if not maskarray_is_valid(maskArray):
@@ -65,7 +85,7 @@ def execute(self):
             "Expression '%s' did not produce a valid mask array. The value "\
             "produced is of the type '%s'. This typically implies a malformed "\
             "expression. Verify that the expression is valid." % \
-            (selectionNode.GetQueryString(), type(maskArray))
+            (query, type(maskArray))
 
     # if inverse selection is requested, just logical_not the mask array.
     if selectionNode.GetProperties().Has(selectionNode.INVERSE()) and \
