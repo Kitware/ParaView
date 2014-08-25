@@ -241,7 +241,7 @@ class CoProcessor(object):
 
     def WriterParametersProxy(self, writer, filename, freq):
         """Creates a client only proxy that will be synchronized with ParaView
-        Live, allowing a user to set filename and frequency.
+        Live, allowing a user to set the filename and frequency.
         """
         controller = servermanager.ParaViewPipelineController()
         # assume that a client only proxy with the same name as a writer

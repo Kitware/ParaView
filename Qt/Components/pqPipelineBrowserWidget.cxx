@@ -250,10 +250,9 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
         }
       if (pqLiveInsituManager::isInsituServer(port->getServer()))
         {
-        vtkSMSourceProxy* proxy = port->getSourceProxy();
         // we don't need to add an extract for writer parameters proxies.
-        if (! (proxy &&
-               strcmp(proxy->GetXMLGroup(), "insitu_writer_parameters") == 0))
+        if (! pqLiveInsituManager::isWriterParametersProxy(
+              port->getSourceProxy()))
           {
           pqLiveInsituVisualizationManager* mgr =
             pqLiveInsituManager::managerFromInsitu(port->getServer());

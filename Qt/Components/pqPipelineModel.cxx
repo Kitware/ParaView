@@ -107,6 +107,7 @@ public:
     INSITU_SERVER_RUNNING,
     INSITU_SERVER_PAUSED,
     INSITU_BREAKPOINT,
+    INSITU_WRITER_PARAMETERS,
     LAST
     };
 
@@ -352,9 +353,7 @@ private:
     // "visibility" in a more generic, session-centric way.
     if (pqLiveInsituManager::isInsituServer(port->getServer()))
       {
-      vtkSMSourceProxy* proxy = port->getSourceProxy();
-      if (proxy &&
-          strcmp(proxy->GetXMLGroup(), "insitu_writer_parameters") == 0)
+      if (pqLiveInsituManager::isWriterParametersProxy(port->getSourceProxy()))
         {
         return LAST;
         }
@@ -386,6 +385,11 @@ private:
     if (port->getSource()->property("INSITU_EXTRACT").toBool())
       {
       return INSITU_EXTRACT;
+      }
+    else if (pqLiveInsituManager::isWriterParametersProxy(
+               port->getSourceProxy()))
+      {
+      return INSITU_WRITER_PARAMETERS;
       }
 
     QString type = this->Controller->GetPreferredViewType(
@@ -490,6 +494,8 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqInsituServerPaused16.png");
   this->PixmapList[pqPipelineModelDataItem::INSITU_BREAKPOINT].load(
     ":/pqWidgets/Icons/pqInsituBreakpoint16.png");
+  this->PixmapList[pqPipelineModelDataItem::INSITU_WRITER_PARAMETERS].load(
+    ":/pqWidgets/Icons/pqSave32.png");
 }
 
 //-----------------------------------------------------------------------------

@@ -158,6 +158,13 @@ bool pqLiveInsituManager::isInsituServer(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
+bool pqLiveInsituManager::isWriterParametersProxy(vtkSMProxy* proxy)
+{
+  return proxy && strcmp(proxy->GetXMLGroup(), "insitu_writer_parameters") == 0;
+}
+
+
+//-----------------------------------------------------------------------------
 bool pqLiveInsituManager::isDisplayServer(pqServer* server)
 {
   return this->Managers.contains(server);

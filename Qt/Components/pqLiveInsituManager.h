@@ -44,6 +44,7 @@ class pqPipelineSource;
 class pqProxy;
 class pqServer;
 class vtkSMLiveInsituLinkProxy;
+class vtkSMProxy;
 
 
 /// Singleton that provides access to Insitu objects. Some of these
@@ -68,6 +69,7 @@ public:
   }
   /// Is this the insitu server
   static bool isInsituServer(pqServer* server);
+  static bool isWriterParametersProxy(vtkSMProxy* proxy);
   static pqPipelineSource* pipelineSource(pqServer* insituServer);
   static void time(pqPipelineSource* source, double* time,
                      vtkIdType* timeStep);
