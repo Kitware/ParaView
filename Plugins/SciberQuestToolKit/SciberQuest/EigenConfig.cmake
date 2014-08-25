@@ -16,7 +16,7 @@ if (NOT EXISTS ${Eigen_DIR})
     "SQTK Set Eigen_DIR to the path to your Eigen install." )
 endif ()
 
-include_directories(${Eigen_DIR})
+include_directories(SYSTEM ${Eigen_DIR})
 
 # prevent intel compilers from errouniously using intrinsics packaged
 # with gcc
