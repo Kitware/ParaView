@@ -72,7 +72,7 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->ScriptIgnoreOutputErrors = 0;
   this->TimeOut = 300;
   this->ServerExitTimeOut = 60;
-  this->ScriptExitTimeOut = 180;
+  this->ScriptExitTimeOut = 0;
   this->TestRenderServer = 0;
   this->TestServer = 0;
   this->TestScript = 0;
@@ -1035,15 +1035,15 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
     vtksysProcess_WaitForExit(*exitIter, &this->ServerExitTimeOut);
     }
-  // We wait for the script to finish
-  vtksysProcess_WaitForExit(script, &this->ScriptExitTimeOut);
-
   for( std::vector<vtksysProcess*>::iterator exitIter = renderServers.begin();
        exitIter != renderServers.end();
        exitIter++ )
     {
     vtksysProcess_WaitForExit(*exitIter, &this->ServerExitTimeOut);
     }
+  // We wait for the script to finish
+  vtksysProcess_WaitForExit(script, &this->ScriptExitTimeOut);
+
 #ifdef PV_TEST_CLEAN_COMMAND
   // If any executable did not exit properly, run a user-specified
   // command to cleanup leftover processes.  This is needed for tests
@@ -1074,12 +1074,6 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     serverResult += this->ReportStatus(*killIter, "server");
     vtksysProcess_Kill(*killIter);
     }
-  int scriptResult = 0;
-  if (script)
-    {
-    scriptResult += this->ReportStatus(script, "script");
-    vtksysProcess_Kill(script);
-    }
   int renderServerResult = 0;
   for( std::vector<vtksysProcess*>::iterator killIter = renderServers.begin();
        killIter != renderServers.end();
@@ -1088,6 +1082,15 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     renderServerResult += this->ReportStatus(*killIter, "renderserver");
     vtksysProcess_Kill(*killIter);
     }
+  int scriptResult = 0;
+  int scriptState = 0;
+  if (script)
+    {
+    scriptResult += this->ReportStatus(script, "script");
+    scriptState = vtksysProcess_GetState(script);
+    vtksysProcess_Kill(script);
+    }
+
 
   // Free process managers.
   VTK_CLEAN_PROCESSES;
@@ -1103,7 +1106,8 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
     return renderServerResult;
     }
-  if (scriptResult)
+  // ignore script executing error
+  if (scriptResult && scriptState != vtksysProcess_State_Executing)
     {
     return scriptResult;
     }
