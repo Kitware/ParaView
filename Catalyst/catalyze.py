@@ -264,7 +264,7 @@ def create_cmake_script(config, manifest_list):
 
   cmake_script+='  -DPARAVIEW_GIT_DESCRIBE="%s" \\\n' % version.strip()
 
-  cmake_script += ' $@\n'
+  cmake_script += ' "$@"\n'
 
   file = os.path.join(config.output_dir, 'cmake.sh')
 
