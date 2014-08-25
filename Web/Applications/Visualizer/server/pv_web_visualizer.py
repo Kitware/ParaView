@@ -96,6 +96,8 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
     plugins = None
     filterFile = None
     colorPalette = None
+    proxies = None
+    allReaders = True
 
     @staticmethod
     def add_arguments(parser):
