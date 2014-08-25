@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqDebug.h"
+#include "pqLiveInsituManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxyWidget.h"
@@ -702,8 +703,9 @@ void pqPropertiesPanel::updateButtonState()
     this->Internals->Source != NULL);
 
   this->Internals->Ui.Delete->setEnabled(
-    (this->Internals->Source != NULL &&
-     this->Internals->Source->getNumberOfConsumers() == 0));
+    this->Internals->Source != NULL &&
+    this->Internals->Source->getNumberOfConsumers() == 0 &&
+    ! pqLiveInsituManager::isInsitu(this->Internals->Source));
 
   foreach (const pqProxyWidgets* widgets, this->Internals->SourceWidgets)
     {

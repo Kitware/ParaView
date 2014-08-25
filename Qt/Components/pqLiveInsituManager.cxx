@@ -120,12 +120,12 @@ vtkIdType pqLiveInsituManager::INVALID_TIME_STEP =
 //-----------------------------------------------------------------------------
 pqLiveInsituManager* pqLiveInsituManager::instance()
 {
-  static pqLiveInsituManager* s_insituServer = NULL;
-  if (! s_insituServer)
+  static pqLiveInsituManager* s_liveInsituManager = NULL;
+  if (! s_liveInsituManager)
     {
-    s_insituServer = new pqLiveInsituManager();
+    s_liveInsituManager = new pqLiveInsituManager();
     }
-  return s_insituServer;
+  return s_liveInsituManager;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,6 +163,19 @@ bool pqLiveInsituManager::isWriterParametersProxy(vtkSMProxy* proxy)
   return proxy && strcmp(proxy->GetXMLGroup(), "insitu_writer_parameters") == 0;
 }
 
+//-----------------------------------------------------------------------------
+bool pqLiveInsituManager::isInsitu(pqPipelineSource* pipelineSource)
+{
+  pqServer* insituSession =
+    pqLiveInsituManager::instance()->selectedInsituServer();
+  if (! insituSession)
+    {
+    return false;
+    }
+  return insituSession->session() == pipelineSource->getProxy()->GetSession();
+}
+
+
 
 //-----------------------------------------------------------------------------
 bool pqLiveInsituManager::isDisplayServer(pqServer* server)
@@ -181,7 +194,7 @@ pqServer* pqLiveInsituManager::selectedInsituServer()
     }
   else if (this->isDisplayServer(as))
     {
-    return managerFromDisplay(as)->insituServer();
+    return managerFromDisplay(as)->insituSession();
     }
   else
     {
@@ -204,12 +217,12 @@ pqServer* pqLiveInsituManager::selectedInsituServer()
 
 //-----------------------------------------------------------------------------
 vtkSMLiveInsituLinkProxy* pqLiveInsituManager::linkProxy(
-  pqServer* insituServer)
+  pqServer* insituSession)
 {
-  if (insituServer)
+  if (insituSession)
     {
     pqLiveInsituVisualizationManager* mgr =
-      pqLiveInsituManager::managerFromInsitu(insituServer);
+      pqLiveInsituManager::managerFromInsitu(insituSession);
     if (mgr)
       {
       vtkSMLiveInsituLinkProxy* proxy = mgr->getProxy();
@@ -266,17 +279,17 @@ pqLiveInsituVisualizationManager* pqLiveInsituManager::connect(pqServer* server)
 
 //-----------------------------------------------------------------------------
 pqLiveInsituVisualizationManager* pqLiveInsituManager::managerFromDisplay(
-  pqServer* displayServer)
+  pqServer* displaySession)
 {
-  return this->Managers[displayServer];
+  return this->Managers[displaySession];
 }
 
 //-----------------------------------------------------------------------------
 pqLiveInsituVisualizationManager* pqLiveInsituManager::managerFromInsitu(
-  pqServer* insituServer)
+  pqServer* insituSession)
 {
   return qobject_cast<pqLiveInsituVisualizationManager*>(
-    insituServer->property("LiveInsituVisualizationManager").value<QObject*>());
+    insituSession->property("LiveInsituVisualizationManager").value<QObject*>());
 }
 
 
@@ -315,11 +328,11 @@ void pqLiveInsituManager::onCatalystDisconnected()
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqLiveInsituManager::pipelineSource(pqServer* insituServer)
+pqPipelineSource* pqLiveInsituManager::pipelineSource(pqServer* insituSession)
 {
-  if (insituServer)
+  if (insituSession)
     {
-    vtkSMSessionProxyManager* manager = insituServer->proxyManager();
+    vtkSMSessionProxyManager* manager = insituSession->proxyManager();
     vtkSMProxy* proxy = manager->GetProxy("sources", "PVTrivialProducer");
     return pqApplicationCore::instance()->getServerManagerModel()->
       findItem<pqPipelineSource*>(proxy);
@@ -342,8 +355,8 @@ void pqLiveInsituManager::time(pqPipelineSource* pipelineSource, double* time,
       pqServerManagerModel* model =
         pqApplicationCore::instance()->getServerManagerModel();
       vtkSMSession* session = pipelineSource->getSourceProxy()->GetSession();
-      pqServer* insituServer = model->findServer(session);
-      vtkSMLiveInsituLinkProxy* linkProxy = pqLiveInsituManager::linkProxy(insituServer);
+      pqServer* insituSession = model->findServer(session);
+      vtkSMLiveInsituLinkProxy* linkProxy = pqLiveInsituManager::linkProxy(insituSession);
       Q_ASSERT (linkProxy);
       *timeStep = linkProxy->GetTimeStep();
       }
@@ -399,21 +412,21 @@ void pqLiveInsituManager::onDataUpdated(pqPipelineSource* source)
     pqServerManagerModel* model =
       pqApplicationCore::instance()->getServerManagerModel();
     vtkSMSession* session = source->getSourceProxy()->GetSession();
-    pqServer* insituServer = model->findServer(session);
+    pqServer* insituSession = model->findServer(session);
     // The server talks to the client using vtkPVSessionBase::NotifyAllClients
     // While vtkSMLiveInsituLinkProxy::LoadState notifies us that the time
     // changed we try to send to the server an updated property. This does not
     // work unless we send this update through the message queue (we wait
     // for LoadState to finish).
-    emit breakpointHit(insituServer);
+    emit breakpointHit(insituSession);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqLiveInsituManager::onBreakpointHit(pqServer* insituServer)
+void pqLiveInsituManager::onBreakpointHit(pqServer* insituSession)
 {
   vtkSMLiveInsituLinkProxy* proxy =
-    pqLiveInsituManager::linkProxy(insituServer);
+    pqLiveInsituManager::linkProxy(insituSession);
   if (proxy)
     {
     vtkSMPropertyHelper(proxy, "SimulationPaused").Set(true);
@@ -427,12 +440,12 @@ void pqLiveInsituManager::setBreakpoint(double t)
 {
   if (this->BreakpointTime != t)
     {
-    pqServer* insituServer = this->selectedInsituServer();
-    if (insituServer)
+    pqServer* insituSession = this->selectedInsituServer();
+    if (insituSession)
       {
       this->BreakpointTime = t;
       this->BreakpointTimeStep = INVALID_TIME_STEP;
-      emit breakpointAdded(insituServer);
+      emit breakpointAdded(insituSession);
       }
     }
 }
@@ -442,12 +455,12 @@ void pqLiveInsituManager::setBreakpoint(vtkIdType _timeStep)
 {
   if (this->BreakpointTimeStep != _timeStep)
     {
-    pqServer* insituServer = this->selectedInsituServer();
-    if (insituServer)
+    pqServer* insituSession = this->selectedInsituServer();
+    if (insituSession)
       {
       this->BreakpointTime = INVALID_TIME;
       this->BreakpointTimeStep = _timeStep;
-      emit breakpointAdded(insituServer);
+      emit breakpointAdded(insituSession);
       }
     }
 }
@@ -457,12 +470,12 @@ void pqLiveInsituManager::removeBreakpoint()
 {
   if (this->hasBreakpoint())
     {
-    pqServer* insituServer = this->selectedInsituServer();
-    if (insituServer)
+    pqServer* insituSession = this->selectedInsituServer();
+    if (insituSession)
       {
       this->BreakpointTime = INVALID_TIME;
       this->BreakpointTimeStep = INVALID_TIME_STEP;
-      emit breakpointRemoved(insituServer);
+      emit breakpointRemoved(insituSession);
       }
     }
 }

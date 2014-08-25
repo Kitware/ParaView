@@ -66,9 +66,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ModifiedLiveInsituLink : public vtkCommand
 {
 public:
-  ModifiedLiveInsituLink(pqServer* insituServer,
+  ModifiedLiveInsituLink(pqServer* insituSession,
                          pqPipelineModel* pipelineModel) :
-    InsituServer(insituServer), PipelineModel(pipelineModel)
+    InsituServer(insituSession), PipelineModel(pipelineModel)
   {
   }
   virtual void Execute(
@@ -579,12 +579,12 @@ pqPipelineModel::~pqPipelineModel()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::onInsituConnectionInitiated(pqServer* displayServer)
+void pqPipelineModel::onInsituConnectionInitiated(pqServer* displaySession)
 {
   pqLiveInsituVisualizationManager* manager =
-    pqLiveInsituManager::instance()->managerFromDisplay(displayServer);
+    pqLiveInsituManager::instance()->managerFromDisplay(displaySession);
   vtkSMLiveInsituLinkProxy* proxy =
-    pqLiveInsituManager::linkProxy(manager->insituServer());
+    pqLiveInsituManager::linkProxy(manager->insituSession());
   if (manager && proxy)
     {
     if (this->LinkCallback)
@@ -592,7 +592,7 @@ void pqPipelineModel::onInsituConnectionInitiated(pqServer* displayServer)
       this->LinkCallback->Delete();
       }
     this->LinkCallback =
-      new ModifiedLiveInsituLink(manager->insituServer(), this);
+      new ModifiedLiveInsituLink(manager->insituSession(), this);
     proxy->AddObserver (vtkCommand::ModifiedEvent, this->LinkCallback);
     QObject::connect(
       pqLiveInsituManager::instance(),
