@@ -146,33 +146,6 @@ string vtkEnsembleReader::GetReaderFileName(
   return FromRelativeToMetaFile(metaFileName, fileName.ToString().c_str());
 }
 
-
-
-//----------------------------------------------------------------------------
-int vtkEnsembleReader::CanReadFile(const char* metaFileName)
-{
-  vtkSmartPointer<vtkTable> ensemble =
-    vtkEnsembleReader::ReadMetaFile(metaFileName);
-  vtkIdType nRows = ensemble->GetNumberOfRows();
-  if (ensemble == NULL || nRows == 0)
-    {
-    vtkWarningMacro(<< "Cannot read ensemble file or number of rows is 0: "
-                    << metaFileName);
-    return 0;
-    }
-  for (vtkIdType i = 0; i < nRows; ++i)
-    {
-    string fileName = this->GetReaderFileName(metaFileName, ensemble, i);
-    if (! this->ReaderCanReadFile (fileName.c_str()))
-      {
-      vtkWarningMacro(<< "Cannot read ensemble member: "
-                      << fileName);
-      return 0;
-      }
-    }
-  return 1;
-}
-
 //----------------------------------------------------------------------------
 vtkSmartPointer<vtkTable> vtkEnsembleReader::ReadMetaFile(
   const char* metaFileName)
