@@ -10,6 +10,7 @@ endif()
 vtk_module(vtkPVAnimation
   DEPENDS
     vtkPVServerManagerCore
+    vtkPVVTKExtensionsDefault
   PRIVATE_DEPENDS
     vtksys
     vtkIOMovie
