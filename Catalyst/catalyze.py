@@ -248,6 +248,7 @@ def create_cmake_script(config, manifest_list):
 
   # ClientServer wrap
   cmake_script += 'cmake \\\n'
+  cmake_script += '  --no-warn-unused-cli\\\n'
   cmake_script += '  -DPARAVIEW_CS_MODULES:STRING="%s" \\\n' % (';'.join(cs_modules))
   # Python modules
   cmake_script+='  -DVTK_WRAP_PYTHON_MODULES:STRING="%s" \\\n' % (';'.join(python_modules))
@@ -263,7 +264,7 @@ def create_cmake_script(config, manifest_list):
 
   cmake_script+='  -DPARAVIEW_GIT_DESCRIBE="%s" \\\n' % version.strip()
 
-  cmake_script += ' $@\n'
+  cmake_script += ' "$@"\n'
 
   file = os.path.join(config.output_dir, 'cmake.sh')
 
