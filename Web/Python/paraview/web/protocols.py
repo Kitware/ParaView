@@ -1721,11 +1721,14 @@ class ParaViewWebStartupRemoteConnection(ParaViewWebProtocol):
 
     connected = False
 
-    def __init__(self, dsHost = None, dsPort = 11111, rsHost=None, rsPort=22222):
+    def __init__(self, dsHost = None, dsPort = 11111, rsHost=None, rsPort=22222, rcPort=-1):
         super(ParaViewWebStartupRemoteConnection, self).__init__()
         if not ParaViewWebStartupRemoteConnection.connected and dsHost:
             ParaViewWebStartupRemoteConnection.connected = True
             simple.Connect(dsHost, dsPort, rsHost, rsPort)
+        elif not ParaViewWebStartupRemoteConnection.connected and rcPort >= 0:
+            ParaViewWebStartupRemoteConnection.connected = True
+            simple.ReverseConnect(str(rcPort))
 
 
 # =============================================================================

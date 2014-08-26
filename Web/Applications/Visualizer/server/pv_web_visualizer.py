@@ -90,6 +90,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
     dsPort = 11111
     rsHost = None
     rsPort = 11111
+    rcPort = -1
     fileToLoad = None
     groupRegex = "[0-9]+\\."
     excludeRegex = "^\\.|~$|^\\$"
@@ -108,6 +109,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         parser.add_argument("--ds-port", default=11111, type=int, help="Port number to connect to for DataServer", dest="dsPort")
         parser.add_argument("--rs-host", default=None, help="Hostname to connect to for RenderServer", dest="rsHost")
         parser.add_argument("--rs-port", default=11111, type=int, help="Port number to connect to for RenderServer", dest="rsPort")
+        parser.add_argument("--reverse-connect-port", default=-1, type=int, help="If supplied, a reverse connection will be established on the given port", dest="reverseConnectPort")
         parser.add_argument("--exclude-regex", default="^\\.|~$|^\\$", help="Regular expression for file filtering", dest="exclude")
         parser.add_argument("--group-regex", default="[0-9]+\\.", help="Regular expression for grouping files", dest="group")
         parser.add_argument("--plugins", default="", help="List of fully qualified path names to plugin objects to load", dest="plugins")
@@ -122,6 +124,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         _VisualizerServer.dsPort       = args.dsPort
         _VisualizerServer.rsHost       = args.rsHost
         _VisualizerServer.rsPort       = args.rsPort
+        _VisualizerServer.rcPort       = args.reverseConnectPort
         _VisualizerServer.excludeRegex = args.exclude
         _VisualizerServer.groupRegex   = args.group
         _VisualizerServer.plugins      = args.plugins
@@ -134,7 +137,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
 
     def initialize(self):
         # Bring used components
-        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_VisualizerServer.dsHost, _VisualizerServer.dsPort, _VisualizerServer.rsHost, _VisualizerServer.rsPort))
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupRemoteConnection(_VisualizerServer.dsHost, _VisualizerServer.dsPort, _VisualizerServer.rsHost, _VisualizerServer.rsPort, _VisualizerServer.rcPort))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStartupPluginLoader(_VisualizerServer.plugins))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebStateLoader(_VisualizerServer.fileToLoad))
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebFileListing(_VisualizerServer.dataDir, "Home", _VisualizerServer.excludeRegex, _VisualizerServer.groupRegex))
