@@ -25,7 +25,9 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLine.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -36,6 +38,7 @@
 #include "vtkThreshold.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "vtkType.h"
 
 #include <list>
 #include <algorithm>
@@ -127,6 +130,14 @@ static bool operator==(const linePiece &a, const linePiece &b)
 //----------------------------------------------------------------------------
 static void appendLinesIntoOnePolyLine(vtkPolyData* input, vtkPolyData *output)
 {
+  if (input->GetNumberOfPoints() == 0 || input->GetNumberOfCells() == 0)
+    {
+    output->ShallowCopy(input);
+    return;
+    }
+  output->Initialize();
+  output->Allocate();
+
   // copy points to the output
   output->GetPointData()->ShallowCopy(input->GetPointData());
   vtkSmartPointer< vtkPoints > points =
@@ -234,20 +245,50 @@ static void appendLinesIntoOnePolyLine(vtkPolyData* input, vtkPolyData *output)
 }
 
 //----------------------------------------------------------------------------
+void vtkSliceAlongPolyPlane::CleanPolyLine(
+  vtkPolyData* input, vtkPolyData* output)
+{
+  output->ShallowCopy(input);
+
+  // remove other cell types that we don't care about.
+  output->SetVerts(NULL);
+  output->SetPolys(NULL);
+  output->SetVerts(NULL);
+
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  if (controller && controller->GetNumberOfProcesses() > 1)
+    {
+    // communicate this dataset among all processes. This will ensure that the
+    // polyline is cloned and communicated to all ranks.
+    vtkNew<vtkMPIMoveData> moveData;
+    moveData->SetController(controller);
+    moveData->SetServerToDataServer();
+    moveData->SetMoveModeToClone();
+    moveData->SetOutputDataType(VTK_POLY_DATA);
+    moveData->SetInputData(output);
+    moveData->Update();
+    output->ShallowCopy(moveData->GetOutputDataObject(0));
+    }
+
+  // this method conditions the input polydata to extract a single polyline from
+  // it. It also handles parallel use-cases.
+  vtkNew< vtkCleanPolyData > cleanFilter;
+  cleanFilter->SetInputData(output);
+  cleanFilter->Update();
+
+  appendLinesIntoOnePolyLine(cleanFilter->GetOutput(), output);
+}
+
+//----------------------------------------------------------------------------
 int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
                                vtkInformationVector** inputVector,
                                vtkInformationVector* outputVector)
 {
-  vtkPolyData* inputPolyLine = vtkPolyData::GetData(inputVector[1], 0);
 
-  vtkNew< vtkCleanPolyData > cleanFilter;
-  cleanFilter->SetInputData(inputPolyLine);
-  cleanFilter->Update();
+  vtkNew<vtkPolyData> polyLinePD;
+  this->CleanPolyLine(vtkPolyData::GetData(inputVector[1], 0), polyLinePD.GetPointer());
 
-  vtkNew< vtkPolyData > appendedLines;
-  appendedLines->Allocate();
-  appendLinesIntoOnePolyLine(cleanFilter->GetOutput(), appendedLines.GetPointer());
-  if (vtkPolyLine::SafeDownCast(appendedLines->GetCell(0)) == NULL)
+  if (vtkPolyLine::SafeDownCast(polyLinePD->GetCell(0)) == NULL)
     {
     vtkErrorMacro(<< " First cell in input polydata is not a vtkPolyLine.");
     return 0;
@@ -267,7 +308,7 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
       if (vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()))
         {
         vtkNew<vtkPolyData> pd;
-        if (!this->Execute(ds, appendedLines.GetPointer(), pd.GetPointer()))
+        if (!this->Execute(ds, polyLinePD.GetPointer(), pd.GetPointer()))
           {
           return 0;
           }
@@ -280,7 +321,7 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
     {
     vtkPolyData* output = vtkPolyData::GetData(outputVector, 0);
     assert(output);
-    return this->Execute(ds, appendedLines.GetPointer(), output)? 1 : 0;
+    return this->Execute(ds, polyLinePD.GetPointer(), output)? 1 : 0;
     }
 
   return 0;
@@ -301,13 +342,21 @@ bool vtkSliceAlongPolyPlane::Execute(
   vtkNew< vtkCutter > cutter;
   cutter->SetCutFunction(planes.GetPointer());
   cutter->SetInputData(inputDataset);
+  cutter->Update();
+
+  vtkDataSet* cutterOutput = vtkDataSet::SafeDownCast(cutter->GetOutputDataObject(0));
+  if (cutterOutput == NULL || cutterOutput->GetNumberOfPoints() == 0)
+    {
+    // shortcut if the cut produces an empty dataset.
+    return 1;
+    }
 
   vtkNew< vtkTransformPolyDataFilter > transformOutputFilter;
   vtkSmartPointer< vtkTransform > transform = vtkSmartPointer< vtkTransform >::New();
   transform->Identity();
   transform->Scale(1,1,0);
   transformOutputFilter->SetTransform(transform);
-  transformOutputFilter->SetInputConnection(cutter->GetOutputPort());
+  transformOutputFilter->SetInputData(cutterOutput);
   transformOutputFilter->Update();
 
   vtkNew< vtkAppendArcLength > arcLengthFilter;
