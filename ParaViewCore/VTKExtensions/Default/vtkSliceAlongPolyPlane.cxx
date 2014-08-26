@@ -32,7 +32,7 @@
 #include "vtkCleanPolyData.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
-#include "vtkProbeFilter.h"
+#include "vtkPProbeFilter.h"
 #include "vtkThreshold.h"
 #include "vtkAppendArcLength.h"
 #include "vtkUnstructuredGrid.h"
@@ -44,48 +44,56 @@
 
 vtkStandardNewMacro(vtkSliceAlongPolyPlane)
 
+//----------------------------------------------------------------------------
 void vtkSliceAlongPolyPlane::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  // TODO
+  os << indent << "Tolerance: " << this->Tolerance << endl;
 }
 
+//----------------------------------------------------------------------------
 vtkSliceAlongPolyPlane::vtkSliceAlongPolyPlane()
 {
   this->SetNumberOfInputPorts(2);
   this->Tolerance = 10;
 }
 
+//----------------------------------------------------------------------------
 vtkSliceAlongPolyPlane::~vtkSliceAlongPolyPlane()
 {
 }
 
+//----------------------------------------------------------------------------
 int vtkSliceAlongPolyPlane::FillInputPortInformation(int port, vtkInformation *info)
 {
   if (port == 0)
     {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataSet");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
     return 1;
     }
   else if (port == 1)
     {
-    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
     return 1;
     }
   return 0;
 }
 
 // A struct that holds the id and direction of a polyline to be appended
+namespace
+{
 typedef struct {
   vtkIdType id;
   bool forward;
 } linePiece;
 
+//----------------------------------------------------------------------------
 static bool operator==(const linePiece &a, const linePiece &b)
 {
   return a.id == b.id;
 }
 
+//----------------------------------------------------------------------------
 static void appendLinesIntoOnePolyLine(vtkPolyData* input, vtkPolyData *output)
 {
   // copy points to the output
@@ -194,6 +202,9 @@ static void appendLinesIntoOnePolyLine(vtkPolyData* input, vtkPolyData *output)
   output->InsertNextCell(VTK_POLY_LINE,idList);
 }
 
+}
+
+//----------------------------------------------------------------------------
 int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
                                vtkInformationVector** inputVector,
                                vtkInformationVector* outputVector)
@@ -239,7 +250,7 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
   transformLineFilter->SetInputConnection(arcLengthFilter->GetOutputPort());
   transformLineFilter->Update();
 
-  vtkNew< vtkProbeFilter > probe;
+  vtkNew< vtkPProbeFilter > probe;
   probe->SetInputConnection(transformOutputFilter->GetOutputPort());
   probe->SetSourceConnection(transformLineFilter->GetOutputPort());
   probe->SetPassPointArrays(1);
