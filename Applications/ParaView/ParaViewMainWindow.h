@@ -43,6 +43,10 @@ public:
   ParaViewMainWindow();
   ~ParaViewMainWindow();
 
+protected:
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dropEvent(QDropEvent *event);
+
 protected slots:
   void showHelpForProxy(const QString& proxyname, const QString& groupname);
 
