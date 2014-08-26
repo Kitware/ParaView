@@ -55,6 +55,7 @@ add_custom_command(
                        -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
                        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                        ${extra_params}
+                       --no-warn-unused-cli
   COMMAND ${CMAKE_COMMAND} -E touch
           "${ParaView_BINARY_DIR}/ParaViewExamples.done"
   COMMENT "Build examples as a separate project"
