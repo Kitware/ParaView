@@ -15,6 +15,7 @@
 #include "vtkExtractsDeliveryHelper.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkCellData.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
@@ -22,8 +23,11 @@
 #include "vtkMultiProcessControllerHelper.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkSocketController.h"
+#include "vtkStructuredGrid.h"
 #include "vtkTrivialProducer.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <assert.h>
 
@@ -104,12 +108,50 @@ void vtkExtractsDeliveryHelper::AddExtractProducer(
 vtkDataObject* vtkExtractsDeliveryHelper::Collect(
   int node_count, vtkDataObject* dObj)
 {
+  const char blankingName[] = "blanking do not use";
   int numProcs = this->ParallelController->GetNumberOfProcesses();
   int myId = this->ParallelController->GetLocalProcessId();
   if (myId >= node_count)
     {
+    bool addedPointBlanking = false;
+    bool addedCellBlanking = false;
+    // hack to pass structured grid blanking
+    if(vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(dObj))
+      {
+      if(sg->GetPointBlanking())
+        {
+        vtkUnsignedCharArray* blanking = sg->GetPointVisibilityArray();
+        blanking->SetName(blankingName);
+        sg->GetPointData()->AddArray(blanking);
+        addedPointBlanking = true;
+        }
+      if(sg->GetCellBlanking())
+        {
+        vtkUnsignedCharArray* blanking = sg->GetCellVisibilityArray();
+        blanking->SetName(blankingName);
+        sg->GetCellData()->AddArray(blanking);
+        addedCellBlanking = true;
+        }
+      }
     int destination = myId % node_count;
     this->ParallelController->Send(dObj, destination, 13001);
+    if(vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(dObj))
+      {
+      if(addedPointBlanking)
+        {
+        vtkDataArray* blanking =
+          sg->GetPointData()->GetArray(blankingName);
+        blanking->SetName("");
+        sg->GetPointData()->RemoveArray(blankingName);
+        }
+      if(addedCellBlanking)
+        {
+        vtkDataArray* blanking =
+          sg->GetCellData()->GetArray(blankingName);
+        blanking->SetName("");
+        sg->GetCellData()->RemoveArray(blankingName);
+        }
+      }
     return NULL;
     }
   else
@@ -126,6 +168,23 @@ vtkDataObject* vtkExtractsDeliveryHelper::Collect(
           vtkMultiProcessController::ANY_SOURCE, 13001);
       if (piece)
         {
+        if(vtkStructuredGrid* sg = vtkStructuredGrid::SafeDownCast(piece))
+          {
+          if(vtkUnsignedCharArray* blanking = vtkUnsignedCharArray::SafeDownCast(
+               sg->GetPointData()->GetArray(blankingName)))
+            {
+            sg->SetPointVisibilityArray(blanking);
+            sg->GetPointData()->RemoveArray(blankingName);
+            blanking->SetName("");
+            }
+          if(vtkUnsignedCharArray* blanking = vtkUnsignedCharArray::SafeDownCast(
+               sg->GetCellData()->GetArray(blankingName)))
+            {
+            sg->SetCellVisibilityArray(blanking);
+            sg->GetCellData()->RemoveArray(blankingName);
+            blanking->SetName("");
+            }
+          }
         pieces.push_back(piece);
         }
       }

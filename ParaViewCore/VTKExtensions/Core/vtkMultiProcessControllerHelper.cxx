@@ -24,6 +24,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkStructuredGridAppend.h"
 #include "vtkTrivialProducer.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -150,6 +151,10 @@ bool vtkMultiProcessControllerHelper::MergePieces(
     vtkImageAppend* ia = vtkImageAppend::New();
     ia->PreserveExtentsOn();
     appender = ia;
+    }
+  else if (vtkStructuredGrid::SafeDownCast(result))
+    {
+    appender = vtkStructuredGridAppend::New();;
     }
   else if (vtkGraph::SafeDownCast(result))
     {
