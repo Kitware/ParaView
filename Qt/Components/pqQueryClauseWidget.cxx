@@ -607,7 +607,7 @@ vtkSMProxy* pqQueryClauseWidget::newSelectionSource()
 //-----------------------------------------------------------------------------
 void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
 {
-  CriteriaType criteria_type = this->currentCriteriaType(); 
+  CriteriaType criteria_type = this->currentCriteriaType();
   if (criteria_type == INVALID)
     {
     return;
@@ -632,8 +632,6 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     break;
   case INDEX:
     fieldName = "id";
-    qCritical("INDEX based queries are temporarily disabled."
-      "They'll be fixed and working soon. Expect weird Python errors :)");
     break;
   case GLOBALID:
     fieldName =
