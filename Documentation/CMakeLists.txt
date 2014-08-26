@@ -5,5 +5,4 @@ add_custom_target(ParaViewWelcomeDoc
   COMMAND ${CMAKE_COMMAND} -E copy "${ParaView_SOURCE_DIR}/Documentation/kitware.css" ${PARAVIEW_WWW_DIR}
 )
 
-add_dependencies(ParaViewWelcomeDoc ParaViewWWW)
 add_dependencies(ParaViewDoc ParaViewWelcomeDoc)

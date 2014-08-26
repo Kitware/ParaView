@@ -149,5 +149,4 @@ The Client initialization step can be decomposed as follow:
 2. We define a __start__ method that will be called onced a connection to the server side has been establised. The connection provided as argument will give us an handle on the session which will allow
 us to make Remote Procedure Call (RPC) on the server side.
 3. Then we try to connect to the remote server using the convinient method vtkWeb.smartConnect.
-4. In the __start__ method, we override the __stop__ function which will be automatically called if the user quit his browser or close its tab. And we attach to the ".viewport-container" \<div> an interactive
-3D renderer.
+4. In the __start__ method, we override the __stop__ function which will be automatically called if the user quit his browser or close its tab. And we attach to the ".viewport-container" `<div>` an interactive 3D renderer.

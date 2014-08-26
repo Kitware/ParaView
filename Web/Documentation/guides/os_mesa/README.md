@@ -82,8 +82,7 @@ __Only needed for real deployment.__
 
 ### Launcher
 
-We provide two implementations of the process launcher. One, however, is already embedded inside ParaView. Hence, we will explain how to configure this one. More information can be read on the Java-based implementation, which can be found [here](index.html#!/guide/jetty_session_manager) or on the python-based implementation, which can be found
-[here](index.html#!/guide/py_launcher).
+We provide two implementations of the process launcher. One, however, is already embedded inside ParaView. Hence, we will explain how to configure this one. More information can be read on the Java-based implementation, which can be found [here](index.html#!/guide/jetty_session_manager) or on the python-based implementation, which can be found [here](index.html#!/guide/python_launcher).
 
 
 Path to replace:
