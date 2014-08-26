@@ -15,28 +15,27 @@
 
 #include "vtkSliceAlongPolyPlane.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkNew.h"
-#include "vtkSmartPointer.h"
-#include "vtkPolyPlane.h"
-#include "vtkLine.h"
-#include "vtkPolyLine.h"
-#include "vtkCutter.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkImageData.h"
-#include "vtkFloatArray.h"
-#include "vtkPointData.h"
+#include "vtkAppendArcLength.h"
 #include "vtkCellArray.h"
 #include "vtkCleanPolyData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCutter.h"
+#include "vtkDataSetSurfaceFilter.h"
+#include "vtkFloatArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkLine.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPolyLine.h"
+#include "vtkPolyPlane.h"
+#include "vtkProbeFilter.h"
+#include "vtkSmartPointer.h"
+#include "vtkThreshold.h"
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
-#include "vtkPProbeFilter.h"
-#include "vtkThreshold.h"
-#include "vtkAppendArcLength.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkDataSetSurfaceFilter.h"
 
 #include <list>
 #include <algorithm>
@@ -64,11 +63,44 @@ vtkSliceAlongPolyPlane::~vtkSliceAlongPolyPlane()
 }
 
 //----------------------------------------------------------------------------
+int vtkSliceAlongPolyPlane::RequestDataObject(
+  vtkInformation*,
+  vtkInformationVector** inputVector ,
+  vtkInformationVector* outputVector)
+{
+  // If input is vtkCompositeDataSet, output will be a vtkMultiBlockDataSet
+  // otherwise it will be a vtkPolyData.
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  if (vtkCompositeDataSet::SafeDownCast(inputDO))
+    {
+    if (vtkMultiBlockDataSet::GetData(outputVector, 0) == NULL)
+      {
+      vtkNew<vtkMultiBlockDataSet> output;
+      outputVector->GetInformationObject(0)->Set(
+        vtkDataObject::DATA_OBJECT(), output.GetPointer());
+      }
+    return 1;
+    }
+  else if (vtkDataSet::GetData(inputVector[0], 0))
+    {
+    if (vtkPolyData::GetData(outputVector, 0) == NULL)
+      {
+      vtkNew<vtkPolyData> output;
+      outputVector->GetInformationObject(0)->Set(
+        vtkDataObject::DATA_OBJECT(), output.GetPointer());
+      }
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkSliceAlongPolyPlane::FillInputPortInformation(int port, vtkInformation *info)
 {
   if (port == 0)
     {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
     return 1;
     }
   else if (port == 1)
@@ -79,9 +111,8 @@ int vtkSliceAlongPolyPlane::FillInputPortInformation(int port, vtkInformation *i
   return 0;
 }
 
+//----------------------------------------------------------------------------
 // A struct that holds the id and direction of a polyline to be appended
-namespace
-{
 typedef struct {
   vtkIdType id;
   bool forward;
@@ -202,16 +233,12 @@ static void appendLinesIntoOnePolyLine(vtkPolyData* input, vtkPolyData *output)
   output->InsertNextCell(VTK_POLY_LINE,idList);
 }
 
-}
-
 //----------------------------------------------------------------------------
 int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
                                vtkInformationVector** inputVector,
                                vtkInformationVector* outputVector)
 {
-  vtkDataSet* inputDataset = vtkDataSet::GetData(inputVector[0],0);
-  vtkPolyData* inputPolyLine = vtkPolyData::GetData(inputVector[1],0);
-  vtkPolyData* output = vtkPolyData::GetData(outputVector,0);
+  vtkPolyData* inputPolyLine = vtkPolyData::GetData(inputVector[1], 0);
 
   vtkNew< vtkCleanPolyData > cleanFilter;
   cleanFilter->SetInputData(inputPolyLine);
@@ -220,12 +247,54 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
   vtkNew< vtkPolyData > appendedLines;
   appendedLines->Allocate();
   appendLinesIntoOnePolyLine(cleanFilter->GetOutput(), appendedLines.GetPointer());
-  vtkPolyLine* line = vtkPolyLine::SafeDownCast(appendedLines->GetCell(0));
-  if (!line)
+  if (vtkPolyLine::SafeDownCast(appendedLines->GetCell(0)) == NULL)
     {
     vtkErrorMacro(<< " First cell in input polydata is not a vtkPolyLine.");
     return 0;
     }
+
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  if (vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(inputDO))
+    {
+    vtkCompositeDataSet* output = vtkCompositeDataSet::GetData(outputVector, 0);
+    assert(output);
+    output->CopyStructure(cd);
+
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(cd->NewIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      if (vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()))
+        {
+        vtkNew<vtkPolyData> pd;
+        if (!this->Execute(ds, appendedLines.GetPointer(), pd.GetPointer()))
+          {
+          return 0;
+          }
+        output->SetDataSet(iter, pd.GetPointer());
+        }
+      }
+    return 1;
+    }
+  else if (vtkDataSet* ds = vtkDataSet::SafeDownCast(inputDO))
+    {
+    vtkPolyData* output = vtkPolyData::GetData(outputVector, 0);
+    assert(output);
+    return this->Execute(ds, appendedLines.GetPointer(), output)? 1 : 0;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSliceAlongPolyPlane::Execute(
+  vtkDataSet* inputDataset, vtkPolyData* lineDataSet, vtkPolyData* output)
+{
+  assert(inputDataset && lineDataSet && output);
+
+  vtkPolyLine* line = vtkPolyLine::SafeDownCast(lineDataSet->GetCell(0));
+  assert(line);
+
   vtkNew< vtkPolyPlane > planes;
   planes->SetPolyLine(line);
 
@@ -242,7 +311,7 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
   transformOutputFilter->Update();
 
   vtkNew< vtkAppendArcLength > arcLengthFilter;
-  arcLengthFilter->SetInputData(appendedLines.GetPointer());
+  arcLengthFilter->SetInputData(lineDataSet);
   arcLengthFilter->Update();
 
   vtkNew< vtkTransformPolyDataFilter > transformLineFilter;
@@ -250,7 +319,7 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
   transformLineFilter->SetInputConnection(arcLengthFilter->GetOutputPort());
   transformLineFilter->Update();
 
-  vtkNew< vtkPProbeFilter > probe;
+  vtkNew< vtkProbeFilter > probe;
   probe->SetInputConnection(transformOutputFilter->GetOutputPort());
   probe->SetSourceConnection(transformLineFilter->GetOutputPort());
   probe->SetPassPointArrays(1);
@@ -280,5 +349,5 @@ int vtkSliceAlongPolyPlane::RequestData(vtkInformation* vtkNotUsed(request),
   output->GetPointData()->RemoveArray("functionValues");
   output->GetPointData()->RemoveArray("vtkValidPointMaskArrayName");
 
-  return 1;
+  return true;
 }

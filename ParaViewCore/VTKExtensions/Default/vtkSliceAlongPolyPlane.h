@@ -26,15 +26,17 @@
 #define __vtkSliceAlongPolyPlane_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" // for export macro
-#include "vtkPolyDataAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSliceAlongPolyPlane : public vtkPolyDataAlgorithm
+class vtkDataSet;
+class vtkPolyData;
+
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSliceAlongPolyPlane : public vtkDataObjectAlgorithm
 {
 public:
-  vtkTypeMacro(vtkSliceAlongPolyPlane,vtkPolyDataAlgorithm)
-  void PrintSelf(ostream& os, vtkIndent indent);
-
   static vtkSliceAlongPolyPlane* New();
+  vtkTypeMacro(vtkSliceAlongPolyPlane, vtkDataObjectAlgorithm)
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description
   vtkSetMacro(Tolerance, double)
@@ -44,9 +46,14 @@ protected:
   vtkSliceAlongPolyPlane();
   virtual ~vtkSliceAlongPolyPlane();
 
+  virtual int RequestDataObject(
+    vtkInformation*, vtkInformationVector** inputVector , vtkInformationVector* outputVector);
   virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-
   virtual int FillInputPortInformation( int port, vtkInformation* info);
+
+  // Description:
+  // The actual algorithm for slice a dataset along a polyline.
+  virtual bool Execute(vtkDataSet* inputDataset, vtkPolyData* lineDataSet, vtkPolyData* output);
 
 private:
   vtkSliceAlongPolyPlane(const vtkSliceAlongPolyPlane&); // Not implemented
