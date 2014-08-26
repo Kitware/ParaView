@@ -133,17 +133,6 @@ set(Module_SRCS
   vtkSpyPlotUniReader.cxx
   vtkSurfaceVectors.cxx
   vtkTimeToTextConvertor.cxx
-# vtkTransferFunctionEditorRepresentation.cxx
-# vtkTransferFunctionEditorRepresentation1D.cxx
-# vtkTransferFunctionEditorRepresentationShapes1D.cxx
-# vtkTransferFunctionEditorRepresentationShapes2D.cxx
-# vtkTransferFunctionEditorRepresentationSimple1D.cxx
-# vtkTransferFunctionEditorWidget.cxx
-# vtkTransferFunctionEditorWidget1D.cxx
-# vtkTransferFunctionEditorWidgetShapes1D.cxx
-# vtkTransferFunctionEditorWidgetShapes2D.cxx
-# vtkTransferFunctionEditorWidgetSimple1D.cxx
-# vtkTransferFunctionViewer.cxx
   vtkUnstructuredPOPReader.cxx
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
@@ -173,10 +162,6 @@ set_source_files_properties(
   vtkCellIntegrator
   vtkPEnSightReader
   vtkSciVizStatistics
-  vtkTransferFunctionEditorRepresentation
-  vtkTransferFunctionEditorRepresentation1D
-  vtkTransferFunctionEditorWidget
-  vtkTransferFunctionEditorWidget1D
   ABSTRACT)
 
 # Use a custom hints file for this module.
