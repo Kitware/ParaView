@@ -396,7 +396,7 @@ bool pqView::writeImage(const QString& filename, const QSize& fullsize, int qual
   // FIXME: code duplicated with pqView::captureImage(). Fix it :).
   if (!this->getWidget()->isVisible())
     {
-    return NULL;
+    return false;
     }
 
   QWidget* vtkwidget = this->getWidget();
