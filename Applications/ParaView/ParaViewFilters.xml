@@ -106,6 +106,7 @@
     <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
   </Category>
 
+
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />
   <Proxy group="filters" name="AnnotateGlobalData" />
@@ -230,4 +231,5 @@
   <Proxy group="filters" name="GenericCut" />
   <Proxy group="filters" name="GenericStreamTracer" />
   <Proxy group="filters" name="GenericGeometryFilter" />
+  <Proxy group="filters" name="SliceAlongPolyLine" />
 </ParaViewFilters>
