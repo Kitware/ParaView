@@ -84,7 +84,7 @@ except ImportError:
 
 class _VisualizerServer(pv_wamp.PVServerProtocol):
 
-    dataDir = None
+    dataDir = os.getcwd()
     authKey = "vtkweb-secret"
     dsHost = None
     dsPort = 11111
