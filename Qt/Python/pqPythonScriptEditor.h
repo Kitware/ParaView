@@ -40,6 +40,7 @@ class QMenu;
 class QTextEdit;
 
 class pqPythonManager;
+class pqPythonSyntaxHighlighter;
 
 class PQPYTHON_EXPORT pqPythonScriptEditor : public QMainWindow
 {
@@ -105,6 +106,8 @@ private:
     QAction*  pasteAct;
 
     pqPythonManager* pythonManager;
+
+    pqPythonSyntaxHighlighter *SyntaxHighlighter;
 };
 
 #endif

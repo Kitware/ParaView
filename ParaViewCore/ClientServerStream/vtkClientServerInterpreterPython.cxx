@@ -19,6 +19,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
 
 namespace
 {
@@ -181,15 +182,13 @@ static vtkObjectBase* NewInstanceCallback(void* ctx)
 {
   PythonCSShimData* data = (PythonCSShimData*)ctx;
 
-  PyObject* args = PyTuple_New(0);
-  PyObject* instance = PyObject_Call(data->Object, args, NULL);
-  Py_DECREF(args);
+  vtkSmartPyObject args(PyTuple_New(0));
+  vtkSmartPyObject instance(PyObject_Call(data->Object, args, NULL));
 
   vtkObjectBase* obj = PyVTKObject_GetObject(instance);
   obj->Register(NULL);
   // The caller owns the new object, so kick it out of the object cache.
   vtkPythonUtil::RemoveObjectFromMap(instance);
-  Py_DECREF(instance);
 
   return obj;
 }
@@ -307,27 +306,27 @@ static vtkStdString GetPythonErrorString()
 
   // Increments refcounts for returns.
   PyErr_Fetch(&type, &value, &traceback);
+  // place the results in vtkSmartPyObjects so the reference counts
+  // are automatically decremented
+  vtkSmartPyObject sType(type);
+  vtkSmartPyObject sValue(value);
+  vtkSmartPyObject sTraceback(traceback);
 
-  if (!type)
+  if (!sType)
     {
     return "No error from Python?!";
     }
 
-  PyObject* pyexc_string = PyObject_Str(value);
+  vtkSmartPyObject pyexc_string(PyObject_Str(sValue));
   vtkStdString exc_string;
   if (pyexc_string)
     {
     exc_string = PyString_AsString(pyexc_string);
-    Py_DECREF(pyexc_string);
     }
   else
     {
     exc_string = "<Unable to convert Python error to string>";
     }
-
-  Py_XDECREF(type);
-  Py_XDECREF(value);
-  Py_XDECREF(traceback);
 
   PyErr_Clear();
 
@@ -364,12 +363,12 @@ static int CommandFunctionCallback(vtkClientServerInterpreter* /*interp*/,
     return 0;
     }
 
-  PyObject* vtkObject = PyVTKObject_New(data->Object, NULL, ptr);
+  vtkSmartPyObject vtkObject(PyVTKObject_New(data->Object, NULL, ptr));
   PyObject* methodObject = PyObject_GetAttrString(vtkObject, method);
 
   const int argOffset = 2;
   int numArgs = msg.GetNumberOfArguments(0) - argOffset;
-  PyObject* args = PyTuple_New(numArgs);
+  vtkSmartPyObject args(PyTuple_New(numArgs));
 
   for (Py_ssize_t i = 0; i < numArgs; ++i)
     {
@@ -401,7 +400,7 @@ static int CommandFunctionCallback(vtkClientServerInterpreter* /*interp*/,
   case vtkClientServerStream::msgType##_array:                 \
     {                                                          \
     PyObject* obj = MakeArrayOf<cxxType>(msg, msgArg, length); \
-    PyTuple_SET_ITEM(args, pyArg, obj);                        \
+    PyTuple_SET_ITEM(args.GetPointer(), pyArg, obj);           \
     break;                                                     \
     }
 
@@ -413,7 +412,7 @@ static int CommandFunctionCallback(vtkClientServerInterpreter* /*interp*/,
   case vtkClientServerStream::msgType##_value:        \
     {                                                 \
     PyObject* obj = MakeScalar<cxxType>(msg, msgArg); \
-    PyTuple_SET_ITEM(args, pyArg, obj);               \
+    PyTuple_SET_ITEM(args.GetPointer(), pyArg, obj);  \
     break;                                            \
     }
 
@@ -431,12 +430,12 @@ static int CommandFunctionCallback(vtkClientServerInterpreter* /*interp*/,
           {
           PyObject* cls = vtkPythonUtil::FindNearestBaseClass(argObj);
           PyObject* obj = PyVTKObject_New(cls, NULL, argObj);
-          PyTuple_SET_ITEM(args, pyArg, obj);
+          PyTuple_SET_ITEM(args.GetPointer(), pyArg, obj);
           }
         else
           {
           Py_INCREF(Py_None);
-          PyTuple_SET_ITEM(args, pyArg, Py_None);
+          PyTuple_SET_ITEM(args.GetPointer(), pyArg, Py_None);
           }
         break;
         }
@@ -447,19 +446,17 @@ static int CommandFunctionCallback(vtkClientServerInterpreter* /*interp*/,
       // If we don't recognize it, pass None as the argument.
       default:
         Py_INCREF(Py_None);
-        PyTuple_SET_ITEM(args, pyArg, Py_None);
+        PyTuple_SET_ITEM(args.GetPointer(), pyArg, Py_None);
         break;
       }
     }
 
-  PyObject* callResult = PyObject_CallObject(methodObject, args);
-  Py_DECREF(args);
+  vtkSmartPyObject callResult(PyObject_CallObject(methodObject, args));
 
   // Stop tracking the created Python object within VTK. Without this, the
   // vtkPython code tries to delete `ptr`, but we can't let that happen since
   // even this function doesn't own `ptr`.
   vtkPythonUtil::RemoveObjectFromMap(vtkObject);
-  Py_DECREF(vtkObject);
 
   if (!callResult)
     {
@@ -477,7 +474,6 @@ static int CommandFunctionCallback(vtkClientServerInterpreter* /*interp*/,
 
   ReturnResult(callResult, result);
 
-  Py_DECREF(callResult);
   return 1;
 }
 
@@ -490,14 +486,14 @@ int vtkClientServerInterpreter::LoadImpl(const char* moduleName)
     }
 
   static std::string const moduleSuffix = "Python";
-  PyObject* module = PyImport_ImportModule((moduleName + moduleSuffix).c_str());
+  vtkSmartPyObject module(PyImport_ImportModule((moduleName + moduleSuffix).c_str()));
 
   if (!module)
     {
     return 1;
     }
 
-  PyObject* properties = PyObject_Dir(module);
+  vtkSmartPyObject properties(PyObject_Dir(module));
   Py_ssize_t size = PyList_Size(properties);
 
   for (Py_ssize_t i = 0; i < size; ++i)
@@ -506,7 +502,7 @@ int vtkClientServerInterpreter::LoadImpl(const char* moduleName)
     const char* name = PyString_AsString(item);
     if (!strncmp("vtk", name, 3))
       {
-      PyObject* cls = PyObject_GetAttr(module, item);
+      vtkSmartPyObject cls(PyObject_GetAttr(module, item));
 
       PythonCSShimData* newInstanceData = new PythonCSShimData(cls);
       this->AddNewInstanceFunction(name, NewInstanceCallback, newInstanceData, FreePythonCSShimData);
@@ -514,12 +510,8 @@ int vtkClientServerInterpreter::LoadImpl(const char* moduleName)
       PythonCSShimData* commandData = new PythonCSShimData(cls);
       this->AddCommandFunction(name, CommandFunctionCallback, commandData, FreePythonCSShimData);
 
-      Py_DECREF(cls);
       }
     }
-
-  Py_DECREF(properties);
-  Py_DECREF(module);
 
   return 0;
 }

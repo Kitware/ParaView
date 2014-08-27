@@ -234,6 +234,8 @@ set (Module_SRCS
   pqPluginTreeWidget.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
+  pqPopOutWidget.cxx
+  pqPopOutWidget.h
   pqPropertiesPanel.cxx
   pqPropertiesPanel.h
   pqPropertyGroupWidget.cxx
@@ -455,6 +457,7 @@ set (Module_MOC_HDRS
   pqPluginTreeWidgetEventTranslator.h
   pqPluginTreeWidget.h
   pqPointSourceWidget.h
+  pqPopOutWidget.h
   pqPropertiesPanel.h
   pqPropertyGroupWidget.h
   pqPropertyWidgetDecorator.h

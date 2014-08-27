@@ -18,6 +18,7 @@
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPython.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSmartPyObject.h"
 #endif // PARAVIEW_ENABLE_PYTHON
 
 #include "vtkPVPythonInformation.h"
@@ -99,16 +100,15 @@ void vtkPVPythonInformation::DeepCopy(vtkPVPythonInformation *info)
 namespace {
 bool hasModule(const char *module)
 {
-  PyObject *mod = PyImport_ImportModule(module);
-  bool result = mod != NULL;
-  Py_XDECREF(mod);
+  vtkSmartPyObject mod(PyImport_ImportModule(module));
+  bool result = mod;
   return result;
 }
 
 // Returns empty string on error.
 std::string getModuleAttrAsString(const char *module, const char *attribute)
 {
-  PyObject *mod = PyImport_ImportModule(module);
+  vtkSmartPyObject mod(PyImport_ImportModule(module));
   if (!mod)
     {
     std::ostringstream result;
@@ -116,10 +116,9 @@ std::string getModuleAttrAsString(const char *module, const char *attribute)
     return result.str();
     }
 
-  PyObject *attr = PyObject_GetAttrString(mod, attribute);
+  vtkSmartPyObject attr(PyObject_GetAttrString(mod, attribute));
   if (!attr)
     {
-    Py_XDECREF(mod);
     std::ostringstream result;
     result << "('" << module << "' module found, missing '" << attribute
            << "' attribute)";
@@ -128,8 +127,6 @@ std::string getModuleAttrAsString(const char *module, const char *attribute)
 
   std::string result = PyBytes_AsString(attr);
 
-  Py_XDECREF(mod);
-  Py_XDECREF(attr);
   return result;
 }
 

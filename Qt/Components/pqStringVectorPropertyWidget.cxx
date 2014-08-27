@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqExodusIIVariableSelectionWidget.h"
 #include "pqFileChooserWidget.h"
+#include "pqPopOutWidget.h"
 #include "pqProxySILModel.h"
 #include "pqServerManagerModel.h"
 #include "pqSILModel.h"
@@ -62,16 +63,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetSelectionHelper.h"
 #include "pqTextEdit.h"
 #include "pqFieldSelectionAdaptor.h"
+#include "vtkPVConfig.h"
+#include "pqDialog.h"
 
 #include <QComboBox>
 #include <QLabel>
 #include <QTextEdit>
 #include <QTreeWidget>
 #include <QVBoxLayout>
+#include <QPushButton>
+#include <QStyle>
 
 #include <QDebug>
 
-
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqPythonSyntaxHighlighter.h"
+#endif
 
 pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
@@ -87,6 +94,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     }
 
   bool multiline_text = false;
+  bool python = false;
   if (svp->GetHints())
     {
     vtkPVXMLElement* widgetHint = svp->GetHints()->FindNestedElementByName("Widget");
@@ -94,6 +102,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
       {
       multiline_text = true;
+      }
+    if (widgetHint && widgetHint->GetAttribute("syntax") &&
+      strcmp(widgetHint->GetAttribute("syntax"), "python") == 0)
+      {
+      python = true;
       }
     }
 
@@ -345,8 +358,13 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     }
   else if (multiline_text)
     {
-    QLabel* label = new QLabel(smProperty->GetXMLLabel(), this);
-    vbox->addWidget(label);
+    QWidget* w = new QWidget(this);
+    QHBoxLayout* hbox = new QHBoxLayout(this);
+    hbox->setMargin(0);
+    hbox->setSpacing(0);
+    QLabel* label = new QLabel(smProperty->GetXMLLabel(), w);
+    hbox->addWidget(label);
+    hbox->addStretch();
 
     // add a multiline text widget
     pqTextEdit *textEdit = new pqTextEdit(this);
@@ -363,7 +381,31 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     this->connect(textEdit, SIGNAL(textChangedAndEditingFinished()),
                   this, SIGNAL(changeFinished()));
 
-    vbox->addWidget(textEdit);
+    w->setLayout(hbox);
+    vbox->addWidget(w);
+    if (python)
+      {
+#ifdef PARAVIEW_ENABLE_PYTHON
+      PV_DEBUG_PANELS() << "Python text edit:";
+      new pqPythonSyntaxHighlighter(textEdit,textEdit);
+#else
+      PV_DEBUG_PANELS() << "Python text edit when python not enabled:";
+#endif
+      pqPopOutWidget* popOut = new pqPopOutWidget(
+        textEdit,
+        QString("%1 - %2").arg(
+          smProperty->GetParent()->GetXMLLabel(),
+          smProperty->GetXMLLabel()),
+        this);
+      QPushButton *popToDialogButton = new QPushButton(this);
+      popOut->setPopOutButton(popToDialogButton);
+      hbox->addWidget(popToDialogButton);
+      vbox->addWidget(popOut);
+      }
+    else
+      {
+      vbox->addWidget(textEdit);
+      }
     this->setShowLabel(false);
 
     PV_DEBUG_PANELS() << "QTextEdit for a StringVectorProperty with multi line text";

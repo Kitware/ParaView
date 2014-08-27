@@ -248,7 +248,7 @@
                             number_of_elements="1"
                             panel_visibility="default">
         <Hints>
-          <Widget type="multi_line" />
+          <Widget type="multi_line" syntax="python" />
         </Hints>
         <Documentation>This property contains the text of a python program that
         the programmable filter runs.</Documentation>
@@ -259,7 +259,7 @@
                             number_of_elements="1"
                             panel_visibility="advanced">
         <Hints>
-          <Widget type="multi_line" />
+          <Widget type="multi_line" syntax="python" />
         </Hints>
         <Documentation>This property is a python script that is executed during
         the RequestInformation pipeline pass. Use this to provide information
@@ -271,7 +271,7 @@
                             number_of_elements="1"
                             panel_visibility="advanced">
         <Hints>
-          <Widget type="multi_line" />
+          <Widget type="multi_line" syntax="python" />
         </Hints>
         <Documentation>This property is a python script that is executed during
         the RequestUpdateExtent pipeline pass. Use this to modify the update
@@ -362,7 +362,7 @@
                             number_of_elements="1"
                             panel_visibility="default">
         <Hints>
-          <Widget type="multi_line" />
+          <Widget type="multi_line" syntax="python" />
         </Hints>
         <Documentation>This property contains the text of a python program that
         the programmable source runs.</Documentation>
@@ -373,7 +373,7 @@
                             number_of_elements="1"
                             panel_visibility="advanced">
         <Hints>
-          <Widget type="multi_line" />
+          <Widget type="multi_line" syntax="python" />
         </Hints>
         <Documentation>This property is a python script that is executed during
         the RequestInformation pipeline pass. Use this to provide information
