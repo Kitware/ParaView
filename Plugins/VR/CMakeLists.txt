@@ -152,4 +152,8 @@ if(PARAVIEW_USE_VRPN)
   target_link_libraries (VRPlugin LINK_PRIVATE "${VRPN_LIBRARY}")
 endif()
 
-target_link_libraries (VRPlugin LINK_PRIVATE pqApplicationComponents)
+target_link_libraries (VRPlugin
+  LINK_PRIVATE
+    pqApplicationComponents
+    vtkPVServerManagerRendering 
+)

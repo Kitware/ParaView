@@ -105,7 +105,7 @@ void pqVRDockPanel::constructor()
       vtkVRInteractorStyleFactory::GetInstance();
   std::vector<std::string> styleDescs =
       styleFactory->GetInteractorStyleDescriptions();
-  for (int i = 0; i < styleDescs.size(); ++i)
+  for (size_t i = 0; i < styleDescs.size(); ++i)
     {
     this->Internals->stylesCombo->addItem(
           QString::fromStdString(styleDescs[i]));
@@ -316,22 +316,17 @@ void pqVRDockPanel::removeConnection()
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
 
   pqVRAddConnectionDialog dialog(this);
-  bool done = false;
 #ifdef PARAVIEW_USE_VRPN
   if (pqVRPNConnection *vrpnConn = mgr->GetVRPNConnection(name))
     {
-    done = true;
     mgr->remove(vrpnConn);
+    return;
     }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  if (!done)
+  if (pqVRUIConnection *vruiConn = mgr->GetVRUIConnection(name))
     {
-    if (pqVRUIConnection *vruiConn = mgr->GetVRUIConnection(name))
-      {
-      done = true;
-      mgr->remove(vruiConn);
-      }
+    mgr->remove(vruiConn);
     }
 #endif
 }

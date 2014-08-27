@@ -100,7 +100,6 @@ void vtkVRQueue::Dequeue(vtkVREventData& data)
 bool vtkVRQueue::TryDequeue(std::queue<vtkVREventData> &data)
 {
   this->Mutex->Lock();
-  bool result = false;
   if (!this->Queue.empty())
     {
     data = this->Queue;
@@ -108,7 +107,6 @@ bool vtkVRQueue::TryDequeue(std::queue<vtkVREventData> &data)
       {
       this->Queue.pop();
       }
-    result = true;
     }
   this->Mutex->Unlock();
   return true;
