@@ -53,8 +53,8 @@ public:
     const char* reg_group, const char* reg_name, int port_number);
   void RemoveExtract(vtkSMProxy*);
   // Description:
-  // Wakes up Insitu side if simulation is paused. Handles corectly many calls
-  // on the LIVE side.
+  // Wakes up Insitu side if simulation is paused. Handles corectly
+  // several calls on the LIVE side.
   void LiveChanged();
   vtkIdType GetTimeStep()
   {

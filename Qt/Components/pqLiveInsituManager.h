@@ -44,6 +44,7 @@ class pqPipelineSource;
 class pqProxy;
 class pqServer;
 class vtkSMLiveInsituLinkProxy;
+class vtkSMProxy;
 
 
 /// Singleton that provides access to Insitu objects. Some of these
@@ -61,39 +62,40 @@ public:
 
   /// Returns the link proxy to Catalyst or NULL if not connected or if not
   /// a catalyst server
-  static vtkSMLiveInsituLinkProxy* linkProxy(pqServer* insituServer);
+  static vtkSMLiveInsituLinkProxy* linkProxy(pqServer* insituSession);
   vtkSMLiveInsituLinkProxy* linkProxy()
   {
     return pqLiveInsituManager::linkProxy(this->selectedInsituServer());
   }
-  /// Is this the insitu server
   static bool isInsituServer(pqServer* server);
-  static pqPipelineSource* pipelineSource(pqServer* insituServer);
+  static bool isInsitu(pqPipelineSource* pipelineSource);
+  static bool isWriterParametersProxy(vtkSMProxy* proxy);
+  static pqPipelineSource* pipelineSource(pqServer* insituSession);
   static void time(pqPipelineSource* source, double* time,
                      vtkIdType* timeStep);
 
 signals:
-  void connectionInitiated(pqServer* displayServer);
+  void connectionInitiated(pqServer* displaySession);
   void timeUpdated();
-  void breakpointAdded(pqServer* insituServer);
-  void breakpointRemoved(pqServer* insituServer);
-  void breakpointHit(pqServer* insituServer);
+  void breakpointAdded(pqServer* insituSession);
+  void breakpointRemoved(pqServer* insituSession);
+  void breakpointHit(pqServer* insituSession);
 
 public:
   /// Returns current Catalyst server. The current Catalyst server
-  /// is either selected or its displayServer is selected. If no server is
+  /// is either selected or its displaySession is selected. If no server is
   /// selected we choose the first Catalyst server we find.
   ///  We return NULL if the client is not connected to Catalyst.
   pqServer* selectedInsituServer();
   /// Is this the server where Catalyst displays its extracts
   bool isDisplayServer(pqServer* server);
   /// Returns the catalyst visualization manager associated with 
-  /// 'displayServer' or 'insituServer'
-  pqLiveInsituVisualizationManager* managerFromDisplay(pqServer* displayServer);
+  /// 'displaySession' or 'insituSession'
+  pqLiveInsituVisualizationManager* managerFromDisplay(pqServer* displaySession);
   static pqLiveInsituVisualizationManager* managerFromInsitu(
-    pqServer* insituServer);
+    pqServer* insituSession);
   /// Creates the manager and accept connections from Catalyst
-  pqLiveInsituVisualizationManager* connect(pqServer* displayServer);
+  pqLiveInsituVisualizationManager* connect(pqServer* displaySession);
 
   double breakpointTime() const
   {
@@ -127,7 +129,7 @@ public:
 protected slots:
   /// called when Catalyst disconnects. We clean up the Catalyst connection.
   void onCatalystDisconnected();
-  void onBreakpointHit(pqServer* insituServer);
+  void onBreakpointHit(pqServer* insituSession);
   void onSourceAdded(pqPipelineSource* source);
   void onDataUpdated(pqPipelineSource* source);
 

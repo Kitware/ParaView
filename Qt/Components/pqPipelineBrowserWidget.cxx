@@ -250,11 +250,16 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
         }
       if (pqLiveInsituManager::isInsituServer(port->getServer()))
         {
-        pqLiveInsituVisualizationManager* mgr =
-          pqLiveInsituManager::managerFromInsitu(port->getServer());
-        if (mgr && mgr->addExtract(port))
+        // we don't need to add an extract for writer parameters proxies.
+        if (! pqLiveInsituManager::isWriterParametersProxy(
+              port->getSourceProxy()))
           {
-          // refresh the pipeline browser icon.
+          pqLiveInsituVisualizationManager* mgr =
+            pqLiveInsituManager::managerFromInsitu(port->getServer());
+          if (mgr && mgr->addExtract(port))
+            {
+            // refresh the pipeline browser icon.
+            }
           }
         }
       else

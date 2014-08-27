@@ -241,13 +241,13 @@ class CoProcessor(object):
 
     def WriterParametersProxy(self, writer, filename, freq):
         """Creates a client only proxy that will be synchronized with ParaView
-        Live, allowing a user to set filename and frequency.
+        Live, allowing a user to set the filename and frequency.
         """
         controller = servermanager.ParaViewPipelineController()
         # assume that a client only proxy with the same name as a writer
-        # is available in "filters"
+        # is available in "insitu_writer_paramters"
         proxy = servermanager.ProxyManager().NewProxy(
-            "filters", writer.GetXMLName())
+            "insitu_writer_parameters", writer.GetXMLName())
         controller.PreInitializeProxy(proxy)
         proxy.GetProperty("Input").SetInputConnection(
             0, writer.Input.SMProxy, 0)

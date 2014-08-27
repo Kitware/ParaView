@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMLiveInsituLinkProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 
 #include <QApplication>
@@ -65,9 +66,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ModifiedLiveInsituLink : public vtkCommand
 {
 public:
-  ModifiedLiveInsituLink(pqServer* insituServer,
+  ModifiedLiveInsituLink(pqServer* insituSession,
                          pqPipelineModel* pipelineModel) :
-    InsituServer(insituServer), PipelineModel(pipelineModel)
+    InsituServer(insituSession), PipelineModel(pipelineModel)
   {
   }
   virtual void Execute(
@@ -107,6 +108,7 @@ public:
     INSITU_SERVER_RUNNING,
     INSITU_SERVER_PAUSED,
     INSITU_BREAKPOINT,
+    INSITU_WRITER_PARAMETERS,
     LAST
     };
 
@@ -352,6 +354,10 @@ private:
     // "visibility" in a more generic, session-centric way.
     if (pqLiveInsituManager::isInsituServer(port->getServer()))
       {
+      if (pqLiveInsituManager::isWriterParametersProxy(port->getSourceProxy()))
+        {
+        return LAST;
+        }
       pqLiveInsituVisualizationManager* mgr =
         pqLiveInsituManager::managerFromInsitu(port->getServer());
       if (mgr)
@@ -380,6 +386,11 @@ private:
     if (port->getSource()->property("INSITU_EXTRACT").toBool())
       {
       return INSITU_EXTRACT;
+      }
+    else if (pqLiveInsituManager::isWriterParametersProxy(
+               port->getSourceProxy()))
+      {
+      return INSITU_WRITER_PARAMETERS;
       }
 
     QString type = this->Controller->GetPreferredViewType(
@@ -490,6 +501,8 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqInsituServerPaused16.png");
   this->PixmapList[pqPipelineModelDataItem::INSITU_BREAKPOINT].load(
     ":/pqWidgets/Icons/pqInsituBreakpoint16.png");
+  this->PixmapList[pqPipelineModelDataItem::INSITU_WRITER_PARAMETERS].load(
+    ":/pqWidgets/Icons/pqSave32.png");
 }
 
 //-----------------------------------------------------------------------------
@@ -573,12 +586,12 @@ pqPipelineModel::~pqPipelineModel()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::onInsituConnectionInitiated(pqServer* displayServer)
+void pqPipelineModel::onInsituConnectionInitiated(pqServer* displaySession)
 {
   pqLiveInsituVisualizationManager* manager =
-    pqLiveInsituManager::instance()->managerFromDisplay(displayServer);
+    pqLiveInsituManager::instance()->managerFromDisplay(displaySession);
   vtkSMLiveInsituLinkProxy* proxy =
-    pqLiveInsituManager::linkProxy(manager->insituServer());
+    pqLiveInsituManager::linkProxy(manager->insituSession());
   if (manager && proxy)
     {
     if (this->LinkCallback)
@@ -586,7 +599,7 @@ void pqPipelineModel::onInsituConnectionInitiated(pqServer* displayServer)
       this->LinkCallback->Delete();
       }
     this->LinkCallback =
-      new ModifiedLiveInsituLink(manager->insituServer(), this);
+      new ModifiedLiveInsituLink(manager->insituSession(), this);
     proxy->AddObserver (vtkCommand::ModifiedEvent, this->LinkCallback);
     QObject::connect(
       pqLiveInsituManager::instance(),

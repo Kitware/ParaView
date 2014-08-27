@@ -111,7 +111,7 @@ class WriterAccessor(smtrace.RealProxyAccessor):
     """
     def __init__(self, varname, proxy):
         smtrace.RealProxyAccessor.__init__(self, varname, proxy)
-        write_frequency = proxy.WriteFrequency
+        write_frequency = proxy.GetProperty("WriteFrequency").GetElement(0)
 
         # Locate which simulation input this write is connected to, if any. If so,
         # we update the write_frequencies datastructure accordingly.
@@ -144,8 +144,8 @@ class WriterAccessor(smtrace.RealProxyAccessor):
         xmlElement = self.get_object().GetHints().FindNestedElementByName("WriterProxy")
         xmlgroup = xmlElement.GetAttribute("group")
         xmlname = xmlElement.GetAttribute("name")
-        write_frequency = self.get_object().WriteFrequency
-        filename = self.get_object().FileName
+        write_frequency = self.get_object().GetProperty("WriteFrequency").GetElement(0)
+        filename = self.get_object().GetProperty("FileName").GetElement(0)
         ctor = self.get_proxy_label(xmlgroup, xmlname)
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
             self, ctor, filter, ctor_args, skip_assignment)
