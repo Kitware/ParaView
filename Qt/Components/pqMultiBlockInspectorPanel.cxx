@@ -180,7 +180,9 @@ void pqMultiBlockInspectorPanel::setRepresentation(pqRepresentation *representat
     {
     this->BlockVisibilites.clear();
     this->BlockColors.clear();
+    this->TreeWidget->blockSignals(true);
     this->TreeWidget->clear();
+    this->TreeWidget->blockSignals(false);
     }
 }
 
