@@ -60,11 +60,6 @@ public:
   vtkIdType GetNumberOfParameters () const;
 
   // Description:
-  // Test whether the file with the given name can be read by this
-  // reader.
-  virtual int CanReadFile(const char* fileName);
-
-  // Description:
   // Initialize the current reader on REQUEST_INFORMATION, forward all
   // other requests to it.
   virtual int ProcessRequest(
