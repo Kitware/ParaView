@@ -154,6 +154,7 @@
         { "class":"vtkPointDataToCellData" },
         { "class":"vtkProbeFilter" },
         { "class":"vtkQuadricClustering" },
+        { "class":"vtkStructuredGridAppend" },
         { "class":"vtkThreshold" }
       ],
       "replace":[
