@@ -7607,6 +7607,70 @@ found and the point will be rejected.</Documentation>
       </Hints>
       <!-- End ExtractGrid -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkHybridProbeFilter"
+                 label="Extract Location"
+                 name="ExtractLocation">
+      <Documentation long_help="Sample or extract cells at a point."
+        short_help="Sample or extracy cells at a point.">
+        This filter allows you to specify a location and then either interpolate
+        the data attributes from the input dataset at that location or extract the
+        cell(s) at the location.
+      </Documentation>
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
+        <Documentation>Set the input dataset producer</Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolate At Location" value="0" />
+          <Entry text="Extract Cell At Location" value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          Select whether to interpolate (probe) data attributes at the specified
+          location, or to extract cell(s) containing the specified location.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetLocation"
+                            default_values="0.0 0.0 0.0"
+                            name="Location"
+                            number_of_elements="3"
+                            panel_visibility="never">
+        <Documentation>Select the location of interest in 3D space.</Documentation>
+        <BoundsDomain default_mode="mid"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <Visibility replace_input="2" />
+        <PropertyGroup type="Handle">
+          <Property function="WorldPosition" name="Location" />
+        </PropertyGroup>
+        <ShowInMenu category="DataAnalysis" />
+      </Hints>
+
+      <!-- End ProbePoint -->
+    </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPProbeFilter"
                  label="Probe Location"

@@ -54,6 +54,7 @@ set(Module_SRCS
   vtkFlashContour.cxx
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
+  vtkHybridProbeFilter.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
 #  vtkInteractorStyleTransferFunctionEditor.cxx
