@@ -100,4 +100,6 @@
 
 #cmakedefine Module_vtkIOXdmf3
 
+#cmakedefine Module_vtkIOADIOS
+
 #endif
