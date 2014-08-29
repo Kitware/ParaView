@@ -101,6 +101,9 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   # qmetatype.h uses a local variable destructor that shadows a typedef in Python.h
   "qmetatype.h:892:59: warning: declaration of 'destructor' shadows a global declaration"
+
+  # ignore incorrect inline warnings from ICC for Eigen.
+  "Eigen.*warning #2196"
 )
 
 #------------------------------------------------------------------------------
