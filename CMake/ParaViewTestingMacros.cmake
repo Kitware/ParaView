@@ -230,7 +230,7 @@ FUNCTION(add_pvweb_tests prefix)
     set(ACT_BROWSER "nobrowser")
   endif()
 
-  set(port_number 8080)
+  set(pvw_port_number 8080)
 
   while(ACT_BROWSER)
     # Pull another browser off the list
@@ -263,7 +263,7 @@ FUNCTION(add_pvweb_tests prefix)
                 ${ACT_SERVER}
                 --content ${ParaView_BINARY_DIR}/www
                 --data-dir ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
-                --port ${port_number}
+                --port ${pvw_port_number}
                 ${ARGS}
                 ${BASELINE_IMG_DIR}
                 --run-test-script ${test_path}
@@ -272,7 +272,7 @@ FUNCTION(add_pvweb_tests prefix)
                 --test-image-file-name ${test_image_file_name}
                 )
       set_tests_properties(${test_name} PROPERTIES LABELS "PARAVIEW")
-      MATH(EXPR port_number "${port_number}+1")
+      MATH(EXPR pvw_port_number "${pvw_port_number}+1")
     endwhile()
   endwhile()
 ENDFUNCTION()
