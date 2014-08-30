@@ -262,8 +262,10 @@ void vtkMinMax::FlagsForCells()
 //-----------------------------------------------------------------------------
 void vtkMinMax::OperateOnField(vtkFieldData *ifd, vtkFieldData *ofd)
 {
-  this->GhostLevels = vtkUnsignedCharArray::SafeDownCast(
-    ifd->GetArray("vtkGhostLevels"));
+  assert ((int)vtkDataSetAttributes::DUPLICATECELL ==
+          (int)vtkDataSetAttributes::DUPLICATEPOINT);
+  this->GhostArray = vtkUnsignedCharArray::SafeDownCast(
+    ifd->GetArray(vtkDataSetAttributes::GhostArrayName()));
 
   int numArrays = ofd->GetNumberOfArrays();
   for (int idx = 0; idx < numArrays; idx++)
@@ -311,8 +313,8 @@ void vtkMinMax::OperateOnArray(vtkAbstractArray *ia, vtkAbstractArray *oa)
     this->Idx = idx;
 
     if (
-      (this->GhostLevels != NULL) &&
-      (this->GhostLevels->GetValue(idx)>0)
+      (this->GhostArray != NULL) &&
+      (this->GhostArray->GetValue(idx) & vtkDataSetAttributes::DUPLICATECELL)
       )
       {
       //skip cell and point attributes that don't belong to me

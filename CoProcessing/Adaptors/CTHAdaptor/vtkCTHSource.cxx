@@ -467,7 +467,7 @@ void vtkCTHSource::AddGhostArray (Block& b, int dx, int dy, int dz)
   // The outside edge cells (not global bounds) are ghost cells level 1
   vtkUnsignedCharArray *ghostArray = vtkUnsignedCharArray::New ();
   ghostArray->SetNumberOfTuples (dx*dy*dz);
-  ghostArray->SetName ("vtkGhostLevels");
+  ghostArray->SetName (vtkDataSetAttributes::GhostArrayName());
   cd->AddArray (ghostArray);
   ghostArray->Delete ();
 
@@ -485,7 +485,7 @@ void vtkCTHSource::AddGhostArray (Block& b, int dx, int dy, int dz)
     if ((dz > 1) && ((ghostsLower[2] && (k == 0)) ||
                       (ghostsUpper[2] && (k == (dz - 1)))))
       {
-      memset (ptr, 1, dx * dy);
+      memset (ptr, vtkDataSetAttributes::DUPLICATECELL, dx * dy);
       ptr += dx * dy;
       continue;
       }
@@ -494,7 +494,7 @@ void vtkCTHSource::AddGhostArray (Block& b, int dx, int dy, int dz)
       if ((dy > 1) && ((ghostsLower[1] && (j == 0)) ||
                         (ghostsUpper[1] && (j == (dy - 1)))))
         {
-        memset (ptr, 1, dx);
+        memset (ptr, vtkDataSetAttributes::DUPLICATECELL, dx);
         }
       else
         {

@@ -411,7 +411,7 @@ int vtkSQImageGhosts::RequestData(
         transactions,
         false);
 
-  outIm->GenerateGhostLevelArray(inPoints.GetData());
+  outIm->GenerateGhostArray(inPoints.GetData());
 
   if ( this->LogLevel || globalLogLevel)
     {

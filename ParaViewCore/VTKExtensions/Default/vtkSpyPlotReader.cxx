@@ -2013,10 +2013,10 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
     createSpyPlotLevelArray(cd, totalSize, level);
     }
 
-  // Mark the bounding cells as ghost cells of level 1.
+  // Mark the bounding cells as ghost cells
   vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
   ghostArray->SetNumberOfTuples(totalSize);
-  ghostArray->SetName("vtkGhostLevels");
+  ghostArray->SetName(vtkDataSetAttributes::GhostArrayName());
   cd->AddArray(ghostArray);
   ghostArray->Delete();
   int planeSize = dims[0]*dims[1];
@@ -2028,7 +2028,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
     // Is the entire ij plane a set of ghosts
     if ((dims[2] != 1) && ((!k) || (k == dims[2]-1)))
       {
-      memset(ptr, 1, planeSize);
+      memset(ptr, vtkDataSetAttributes::DUPLICATECELL, planeSize);
       ptr += planeSize;
       continue;
       }
@@ -2039,7 +2039,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
       // Is the entire row a set of ghosts
       if ((dims[1] != 1) && ((!j) || (j == dims[1] - 1)))
         {
-        memset(ptr, 1, dims[0]);
+        memset(ptr, vtkDataSetAttributes::DUPLICATECELL, dims[0]);
         ptr+= dims[0];
         continue;
         }
@@ -2126,7 +2126,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
   // Mark the remains ghost cell as real ghost cells of level 1.
   vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
   ghostArray->SetNumberOfTuples(totalSize);
-  ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
+  ghostArray->SetName(vtkDataSetAttributes::GhostArrayName());
   cd->AddArray(ghostArray);
   ghostArray->Delete();
   unsigned char *ptr
@@ -2145,7 +2145,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
     if ((realDims[2] != 1) && ((checkKLower && (!k)) ||
                                (checkKUpper && (k == realDims[2]-1))))
       {
-      memset(ptr, 1, planeSize);
+      memset(ptr, vtkDataSetAttributes::DUPLICATECELL, planeSize);
       ptr += planeSize;
       continue;
       }
@@ -2157,7 +2157,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
       if ((realDims[1] != 1) && ((checkJLower && (!j)) ||
                                  (checkJUpper && (j == realDims[1] - 1))))
         {
-        memset(ptr, 1, realDims[0]);
+        memset(ptr, vtkDataSetAttributes::DUPLICATECELL, realDims[0]);
         ptr+= realDims[0];
         continue;
         }

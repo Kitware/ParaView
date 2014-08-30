@@ -242,7 +242,7 @@ int vtkOrderedCompositeDistributor::RequestData(
       {
       vtkNew<vtkDataSetSurfaceFilter> converter;
       converter->UnstructuredGridExecute(
-        distributedData, vtkPolyData::SafeDownCast(output), 0);
+        distributedData, vtkPolyData::SafeDownCast(output));
       }
     else
       {

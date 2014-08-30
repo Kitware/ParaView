@@ -3835,9 +3835,9 @@ int vtkPEnSightGoldBinaryReader::CreateStructuredGridOutput(
   else
     {
     pointGhostArray = vtkUnsignedCharArray::New();
-    pointGhostArray->SetName("vtkGhostLevels");
+    pointGhostArray->SetName(vtkDataSetAttributes::GhostArrayName());
     cellGhostArray = vtkUnsignedCharArray::New();
-    cellGhostArray->SetName("vtkGhostLevels");
+    cellGhostArray->SetName(vtkDataSetAttributes::GhostArrayName());
     this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, this->GhostLevels, pointGhostArray, cellGhostArray);
     }
 
@@ -3997,9 +3997,9 @@ int vtkPEnSightGoldBinaryReader::CreateRectilinearGridOutput(
   else
     {
     pointGhostArray = vtkUnsignedCharArray::New();
-    pointGhostArray->SetName("vtkGhostLevels");
+    pointGhostArray->SetName(vtkDataSetAttributes::GhostArrayName());
     cellGhostArray = vtkUnsignedCharArray::New();
-    cellGhostArray->SetName("vtkGhostLevels");
+    cellGhostArray->SetName(vtkDataSetAttributes::GhostArrayName());
     this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, this->GhostLevels, pointGhostArray, cellGhostArray);
     }
 
@@ -4120,9 +4120,9 @@ int vtkPEnSightGoldBinaryReader::CreateImageDataOutput(
   else
     {
     pointGhostArray = vtkUnsignedCharArray::New();
-    pointGhostArray->SetName("vtkGhostLevels");
+    pointGhostArray->SetName(vtkDataSetAttributes::GhostArrayName());
     cellGhostArray = vtkUnsignedCharArray::New();
-    cellGhostArray->SetName("vtkGhostLevels");
+    cellGhostArray->SetName(vtkDataSetAttributes::GhostArrayName());
     this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, this->GhostLevels, pointGhostArray, cellGhostArray);
     }
 

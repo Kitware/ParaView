@@ -35,6 +35,7 @@ class vtkAMRDualGridHelper;
 class vtkAMRDualGridHelperBlock; 
 class vtkAMRConnectivityEquivalence;
 class vtkMPIController;
+class vtkUnsignedCharArray;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
@@ -98,7 +99,7 @@ protected:
                        vtkUniformGrid* grid, 
                        vtkIdTypeArray* regionId,
                        vtkDataArray* volArray,
-                       vtkDataArray* ghostLevels);
+                       vtkUnsignedCharArray* ghostArray);
 
   vtkAMRDualGridHelperBlock* GetBlockNeighbor (
                        vtkAMRDualGridHelperBlock* block, 

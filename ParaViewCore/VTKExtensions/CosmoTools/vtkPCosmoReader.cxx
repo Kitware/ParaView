@@ -297,7 +297,7 @@ int vtkPCosmoReader::RequestData(
   owner->SetName("ghost");
   owner->Allocate(numberOfParticles);
   vtkUnsignedCharArray* ghost = vtkUnsignedCharArray::New();
-  ghost->SetName("vtkGhostLevels");
+  ghost->SetName(vtkDataSetAttributes::GhostArrayName());
   ghost->Allocate(numberOfParticles);
 
   // put it into the correct VTK structure
@@ -344,7 +344,7 @@ int vtkPCosmoReader::RequestData(
     status->pop_back();
 
     owner->InsertNextValue(neighbor);
-    ghost->InsertNextValue(level);
+    ghost->InsertNextValue((level > 0) ? vtkDataSetAttributes::DUPLICATEPOINT : 0);
     }
 
   // cleanup

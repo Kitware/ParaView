@@ -565,15 +565,13 @@ void vtkGridConnectivityExecuteProcess(
                      inputs[ii]->GetCellData()->GetArray("STATUS"));
     // locate cell-ghost levels if present. We are going to skip over ghost
     // cells.
-    vtkUnsignedCharArray * ghostLevels =
-      vtkUnsignedCharArray::SafeDownCast(
-        inputs[ii]->GetCellData()->GetArray("vtkGhostLevels"));
-    if (ghostLevels && (
-        ghostLevels->GetNumberOfComponents() != 1 ||
-        ghostLevels->GetNumberOfTuples() != numCells))
+    vtkUnsignedCharArray * ghostArray = inputs[ii]->GetCellGhostArray();
+    if (ghostArray && (
+        ghostArray->GetNumberOfComponents() != 1 ||
+        ghostArray->GetNumberOfTuples() != numCells))
       {
       vtkGenericWarningMacro("Poorly formed ghost cells. Ignoring them.");
-      ghostLevels = NULL;
+      ghostArray = NULL;
       }
     double* statusPtr = 0;
     if (statusArray)
@@ -582,7 +580,8 @@ void vtkGridConnectivityExecuteProcess(
       }
     for (vtkIdType jj = 0; jj < numCells; ++jj)
       {
-      if (ghostLevels && ghostLevels->GetValue(jj) > 0)
+      if (ghostArray && 
+          ghostArray->GetValue(jj) & vtkDataSetAttributes::DUPLICATECELL)
         {
         continue;
         }

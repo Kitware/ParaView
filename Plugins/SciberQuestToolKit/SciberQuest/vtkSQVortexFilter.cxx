@@ -28,6 +28,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkPVXMLElement.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <string>
 #include <utility>
@@ -453,19 +454,8 @@ int vtkSQVortexFilter::RequestData(
 
   if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)
     {
-    vtkDataArray* gl = inData->GetCellData()->GetArray("vtkGhostLevels");
-    if (gl)
-      {
-      double range[2];
-      gl->GetRange(range);
-      if (range[1] < nGhost)
-        {
-        vtkErrorMacro("Did not receive " << nGhost << " ghost levels as requested."
-          " Received " << range[1] << " instead. Cannot execute.")
-        return 0;
-        }
-      }
-    else
+    vtkUnsignedCharArray* gl = inData->GetCellGhostArray();
+    if (! gl)
       {
       vtkErrorMacro("Did not receive ghost levels. Cannot execute.");
       return 0;
