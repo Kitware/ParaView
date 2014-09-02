@@ -27,8 +27,8 @@ set (pv_pymodule_build_dir ${VTK_BUILD_PYTHON_MODULE_DIR})
 add_test(NAME pvweb-nobrowser.DataProber-StartTest
   COMMAND $<TARGET_FILE:pvpython>
   ${pv_pymodule_build_dir}/paraview/web/pv_web_data_prober.py
-  #--data-dir ${VTK_TEST_DATA_DIR}
   --data-dir ${PARAVIEW_DATA_ROOT}
+  --port 8077
   --timeout 1)
 set_tests_properties(pvweb-nobrowser.DataProber-StartTest PROPERTIES LABELS "PARAVIEW")
 
@@ -36,6 +36,7 @@ set_tests_properties(pvweb-nobrowser.DataProber-StartTest PROPERTIES LABELS "PAR
 add_test(NAME pvweb-nobrowser.Visualizer-StartTest
   COMMAND $<TARGET_FILE:pvpython>
   ${pv_pymodule_build_dir}/paraview/web/pv_web_visualizer.py
+  --port 8078
   --timeout 1)
 set_tests_properties(pvweb-nobrowser.Visualizer-StartTest PROPERTIES LABELS "PARAVIEW")
 
@@ -43,6 +44,7 @@ set_tests_properties(pvweb-nobrowser.Visualizer-StartTest PROPERTIES LABELS "PAR
 add_test(NAME pvweb-nobrowser.FileViewer-StartTest
   COMMAND $<TARGET_FILE:pvpython>
   ${pv_pymodule_build_dir}/paraview/web/pv_web_file_loader.py
+  --port 8079
   --timeout 1)
 set_tests_properties(pvweb-nobrowser.FileViewer-StartTest PROPERTIES LABELS "PARAVIEW")
 
@@ -76,18 +78,6 @@ set_tests_properties(pvweb-nobrowser.FileViewer-StartTest PROPERTIES LABELS "PAR
 ###
 ### Add some tests which interact with the TestApp
 ###
-
-set(WEB_TESTS_WITH_REQUESTS
-  ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_testapp_retrieve_file_check_includes.py
-  )
-
-add_pvweb_tests("pvweb"
-  APP          TestApp
-  COMMAND      $<TARGET_FILE:pvpython>
-  SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
-  ARGS         --echo "test string to be retrieved by app"
-  TEST_SCRIPTS ${WEB_TESTS_WITH_REQUESTS}
-  )
 
 set(TESTAPP_WEB_TESTS_WITH_CHROME
   ${pv_pymodule_build_dir}/paraview/web/test/test_pv_web_testapp_all.py
