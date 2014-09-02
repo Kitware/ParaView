@@ -34,6 +34,7 @@ set(Module_SRCS
   vtkACosmoReader.cxx
   vtkPCosmoReader.cxx
   vtkPGenericIOReader.cxx
+  vtkPGenericIOMultiBlockReader.cxx
 
   ## Filters
   vtkMinkowskiFilter.cxx
@@ -47,8 +48,8 @@ endif()
 
 vtk_module_library(vtkPVVTKExtensionsCosmoTools ${Module_SRCS})
 target_link_libraries(vtkPVVTKExtensionsCosmoTools
-                      LINK_PRIVATE 
-                        ${CosmoToolsExternalLibs} 
+                      LINK_PRIVATE
+                        ${CosmoToolsExternalLibs}
                         pthread
                       )
 vtk_mpi_link(vtkPVVTKExtensionsCosmoTools)
