@@ -1,4 +1,4 @@
-import os
+import os, json
 
 from paraview import simple
 from paraview import smtesting
@@ -74,7 +74,6 @@ rep.ColorArrayName = arrayName
 exp = cinema.ThreeSixtyImageStackExporter(fng, view2, center_of_rotation, distance, rotation_axis, angle_steps)
 for progress in cExplorer:
     exp.UpdatePipeline()
-    print progress
 
 # === ImageResampler ==========================================================
 
@@ -129,6 +128,13 @@ if has_rgbz_view:
 # === TODO ====================================================================
 
 analysis.end()
+
+# Print analysis info.json
+analysisInfo = None
+with open(os.path.join(work_directory, 'info.json'), 'r') as json_file:
+    analysisInfo = json.load(json_file)
+
+print json.dumps(analysisInfo, sort_keys=True, indent=4, separators=(',', ': '))
 
 # === Execute embedded test functions =========================================
 

@@ -1361,8 +1361,6 @@ def test(basePath):
     exp = ThreeSixtyImageStackExporter(fileGenerator, view, [0,0,0], 100, [0,0,1], [30, 45])
     for progress in cExplorer:
         exp.UpdatePipeline()
-        print progress
-
 
 # -----------------------------------------------------------------------------
 
