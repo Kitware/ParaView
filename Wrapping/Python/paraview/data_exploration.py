@@ -873,7 +873,7 @@ class DataProber(object):
 
     @staticmethod
     def get_data_type():
-        return "point-serie-prober-csv-stack"
+        return "point-series-prober-csv-stack"
 
     def UpdatePipeline(self, time=0):
         """
