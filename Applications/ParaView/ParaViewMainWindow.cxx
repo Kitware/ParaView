@@ -252,15 +252,15 @@ void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const
 }
 
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::dragEnterEvent(QDragEnterEvent *event)
+void ParaViewMainWindow::dragEnterEvent(QDragEnterEvent *evt)
 {
-  event->acceptProposedAction();
+  evt->acceptProposedAction();
 }
 
 //-----------------------------------------------------------------------------
-void ParaViewMainWindow::dropEvent(QDropEvent *event)
+void ParaViewMainWindow::dropEvent(QDropEvent *evt)
 {
-  QList<QUrl> urls = event->mimeData()->urls();
+  QList<QUrl> urls = evt->mimeData()->urls();
   if (urls.isEmpty())
     {
     return;
