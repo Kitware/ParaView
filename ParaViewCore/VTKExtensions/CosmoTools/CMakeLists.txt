@@ -35,6 +35,7 @@ set(Module_SRCS
   vtkPCosmoReader.cxx
   vtkPGenericIOReader.cxx
   vtkPGenericIOMultiBlockReader.cxx
+  vtkPMultiResolutionGenericIOReader.cxx
 
   ## Filters
   vtkMinkowskiFilter.cxx

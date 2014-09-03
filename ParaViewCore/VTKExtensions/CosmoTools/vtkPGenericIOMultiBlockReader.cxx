@@ -788,7 +788,7 @@ int vtkPGenericIOMultiBlockReader::RequestData(
 
   output->SetNumberOfBlocks(this->MetaData->NumberOfBlocks);
 
-  if (outInfo->Has(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES()))
+  if (outInfo->Has(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS()))
     {
     int size = outInfo->Length(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
     int* ids = outInfo->Get(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
@@ -816,7 +816,6 @@ int vtkPGenericIOMultiBlockReader::RequestData(
       output->SetBlock(blockItr->first,grid);
       }
     }
-  //MPI_Barrier(this->MetaData->MPICommunicator);
 
   return 1;
 }

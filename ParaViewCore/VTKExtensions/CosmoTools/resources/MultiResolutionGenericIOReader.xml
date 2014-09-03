@@ -1,0 +1,90 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ================================================================== -->
+    <SourceProxy class="vtkPMultiResolutionGenericIOReader"
+                 name="MultiResGenericIO"
+                 mpi_required="1">
+      <Documentation
+        long_help=""
+        short_help="">
+      </Documentation>
+      <StringVectorProperty animatable="0"
+        command="SetFileName"
+        name="FileName"
+        number_of_elements="1"
+        panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty information_only="1" name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+
+      <StringVectorProperty command="GetArrayList"
+                            information_only="1"
+                            name="PointArrayListInfo">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="xAxis"
+                            command="SetXAxisVariableName"
+                            number_of_elements="1">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayListInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="yAxis"
+                            command="SetYAxisVariableName"
+                            number_of_elements="1">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayListInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="zAxis"
+                            command="SetZAxisVariableName"
+                            number_of_elements="1">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayListInfo" />
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Particle Data"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="gios"
+                       file_description="Meta-GenericIO files" />
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
