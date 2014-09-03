@@ -14,7 +14,7 @@ min = 63.96153259277344
 max = 250.22056579589844
 center_of_rotation = [0.0, 0.0, 0.0]
 rotation_axis = [0.0, 0.0, 1.0]
-angle_steps = (45, 45)
+angle_steps = (72, 60)
 distance = 60
 lut = simple.GetLookupTableForArray(
     "RTData", 1,
@@ -109,7 +109,7 @@ for iso_value in contour_values:
 
 
 # Data exploration ------------------------------------------------------------
-camera_handler = cinema.ThreeSixtyCameraHandler(fng, None, [ float(r) for r in range(0, 360, 45)], [ float(r) for r in range(-60, 61, 45)], center_of_rotation, rotation_axis, distance)
+camera_handler = cinema.ThreeSixtyCameraHandler(fng, None, [ float(r) for r in range(0, 360, 72)], [ float(r) for r in range(-60, 61, 45)], center_of_rotation, rotation_axis, distance)
 exporter = cinema.CompositeImageExporter(fng, filters, color_by, luts, camera_handler, [400,400], filters_description, 0, 0)
 exporter.set_analysis(analysis)
 exporter.UpdatePipeline()

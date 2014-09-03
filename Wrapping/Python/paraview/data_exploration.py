@@ -1344,11 +1344,11 @@ class ThreeSixtyImageStackExporter(object):
 def test(basePath):
     w = simple.Wavelet()
 
-    dataRange = [40.0, 270.0]
+    dataRange = [60.0, 250.0]
     arrayName = ('POINT_DATA', 'RTData')
     fileGenerator = FileNameGenerator(os.path.join(basePath, 'iso'), '{contourBy}/{contourValue}/{theta}_{phi}.jpg')
 
-    cExplorer = ContourExplorer(fileGenerator, w, arrayName, dataRange, 25)
+    cExplorer = ContourExplorer(fileGenerator, w, arrayName, dataRange, 10)
     proxy = cExplorer.getContour()
     view = simple.CreateRenderView()
     rep = simple.Show(proxy, view)
@@ -1382,15 +1382,15 @@ def test2(basePath):
         ColorSpace='Diverging',
         ScalarRangeInitialized=1.0 )
 
-    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'z'), 'w_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,0,1], [15, 20])
+    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'z'), 'w_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,0,1], [72, 45])
     exp.UpdatePipeline()
-    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'y'), 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,1,0], [15, 20])
+    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'y'), 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,1,0], [72, 45])
     exp.UpdatePipeline()
-    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'x'), 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [1,0,0], [15, 20])
+    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'x'), 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [1,0,0], [72, 45])
     exp.UpdatePipeline()
     simple.ResetCamera(view)
     simple.Hide(c, view)
-    slice = SliceExplorer(FileNameGenerator(os.path.join(basePath, 'slice'), 'w_{sliceColor}_{slicePosition}.jpg'), view, w, { "RTData": { "lut": lut, "type": 'POINT_DATA'} }, 50, [0,1,0])
+    slice = SliceExplorer(FileNameGenerator(os.path.join(basePath, 'slice'), 'w_{sliceColor}_{slicePosition}.jpg'), view, w, { "RTData": { "lut": lut, "type": 'POINT_DATA'} }, 30, [0,1,0])
     slice.UpdatePipeline()
 
 
