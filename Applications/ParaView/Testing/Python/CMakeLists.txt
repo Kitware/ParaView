@@ -90,3 +90,6 @@ if(BUILD_SHARED_LIBS)
     TestRemoteProgrammableFilter.py
     )
 endif()
+
+# Extend timeout for CinemaTest
+set_tests_properties(pvpythonPython-CinemaTest PROPERTIES TIMEOUT 500)
