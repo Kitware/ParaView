@@ -546,8 +546,8 @@ class SliceExplorer(object):
         self.slice.SliceType.Origin = [ (self.dataBounds[0] + self.dataBounds[1])/2,
                                         (self.dataBounds[2] + self.dataBounds[3])/2,
                                         (self.dataBounds[4] + self.dataBounds[5])/2 ]
-        simple.Render()
-        simple.ResetCamera()
+        simple.Render(self.view_proxy)
+        simple.ResetCamera(self.view_proxy)
         self.view_proxy.CameraParallelScale = self.view_proxy.CameraParallelScale / self.parallelScaleRatio
 
         for step in range(int(self.number_of_steps)):
@@ -669,6 +669,21 @@ class ContourExplorer(object):
 #==============================================================================
 
 class ImageResampler(object):
+    """
+    Class used to explore data. This Explorer will resample the original dataset
+    and produce a stack of images that correspond to XY slice along with numerical
+    data so 2D chart can be use to plot along a line on X, Y or Z.
+
+        data_to_probe = simple.Wavelet()
+
+        fileGenerator = FileNameGenerator('/tmp/probe-slice', '{time}/{field}/{slice}.{format}')
+        array_colors = {
+            "RTData": simple.GetLookupTableForArray( "RTData", 1, RGBPoints=[43.34006881713867, 0.23, 0.299, 0.754, 160.01158714294434, 0.865, 0.865, 0.865, 276.68310546875, 0.706, 0.016, 0.15] ),
+        }
+
+        exp = ImageResampler(fileGenerator, data_to_probe, [21,21,21], array_colors)
+        exp.UpdatePipeline()
+    """
     def __init__(self, file_name_generator, data_to_probe, sampling_dimesions, array_colors, nanColor = [0,0,0,0], custom_probing_bounds = None):
         self.analysis = None
         self.file_name_generator = file_name_generator
@@ -681,7 +696,7 @@ class ImageResampler(object):
             self.resampler.UseInputBounds = 0
             self.resampler.CustomSamplingBounds = custom_probing_bounds
         field = array_colors.keys()[0]
-        self.color = simple.ColorByArray(Input=self.resampler, LookupTable=array_colors[field]['lut'], RGBANaNColor=nanColor, ColorBy=field )
+        self.color = simple.ColorByArray(Input=self.resampler, LookupTable=array_colors[field], RGBANaNColor=nanColor, ColorBy=field )
 
         self.file_name_generator.add_image_width(sampling_dimesions[0])
 
@@ -708,7 +723,6 @@ class ImageResampler(object):
         self.file_name_generator.update_active_arguments(time=time)
         self.resampler.UpdatePipeline(time)
 
-        simple.SetActiveView(self.view_proxy)
         # Write resampled data as JSON files
         self.file_name_generator.update_active_arguments(format='json')
         writer = simple.JSONImageWriter(Input=self.resampler)
@@ -727,7 +741,7 @@ class ImageResampler(object):
         for field in self.array_colors:
             self.file_name_generator.update_active_arguments(field=field)
             self.file_name_generator.update_active_arguments(False, slice='%d')
-            self.color.LookupTable = self.array_colors[field]['lut']
+            self.color.LookupTable = self.array_colors[field]
             self.color.ColorBy = field
             self.color.UpdatePipeline(time)
             writer = simple.JPEGWriter(Input=self.color, FileName=self.file_name_generator.get_fullpath())
@@ -885,7 +899,6 @@ class DataProber(object):
 
         self.file_name_generator.update_active_arguments(time=time)
 
-        simple.SetActiveView(self.view_proxy)
         # Explore the data
         saved_data = {}
         for serie in self.series:
@@ -1010,7 +1023,6 @@ class TimeSerieDataProber(object):
         if self.analysis:
             self.analysis.begin_work('TimeSerieDataProber')
 
-        simple.SetActiveView(self.view_proxy)
         for field in self.fields:
             self.data_arrays[field].append([ "%f" % time ])
 
@@ -1131,7 +1143,6 @@ class CompositeImageExporter(object):
             self.analysis.begin_work('CompositeImageExporter')
         self.file_name_generator.update_active_arguments(time=time)
 
-        simple.SetActiveView(self.view_proxy)
         # Fix camera bounds
         simple.Render(self.view)
         self.view.ResetClippingBounds()
@@ -1195,8 +1206,7 @@ class CompositeImageExporter(object):
                             rep.ColorArrayName = ''
                         else:
                             rep.LookupTable = self.luts[field[1]]
-                            rep.ColorArrayName = field[1]
-                            rep.ColorAttributeType = field[0]
+                            rep.ColorArrayName = field
 
                     self.view.ActiveRepresentation = rep
                     self.view.CompositeDirectory = self.file_name_generator.get_directory()
@@ -1331,21 +1341,22 @@ class ThreeSixtyImageStackExporter(object):
 
 # -----------------------------------------------------------------------------
 
-def test():
+def test(basePath):
     w = simple.Wavelet()
 
     dataRange = [40.0, 270.0]
     arrayName = ('POINT_DATA', 'RTData')
-    fileGenerator = FileNameGenerator('/tmp/iso', '{contourBy}_{contourValue}_{theta}_{phi}.jpg')
+    fileGenerator = FileNameGenerator(os.path.join(basePath, 'iso'), '{contourBy}/{contourValue}/{theta}_{phi}.jpg')
 
     cExplorer = ContourExplorer(fileGenerator, w, arrayName, dataRange, 25)
     proxy = cExplorer.getContour()
-    rep = simple.Show(proxy)
+    view = simple.CreateRenderView()
+    rep = simple.Show(proxy, view)
 
     lut = simple.GetLookupTableForArray( "RTData", 1, RGBPoints=[43.34006881713867, 0.23, 0.299, 0.754, 160.01158714294434, 0.865, 0.865, 0.865, 276.68310546875, 0.706, 0.016, 0.15] )
     rep.LookupTable = lut
     rep.ColorArrayName = arrayName
-    view = simple.Render()
+    simple.Render(view)
 
     exp = ThreeSixtyImageStackExporter(fileGenerator, view, [0,0,0], 100, [0,0,1], [30, 45])
     for progress in cExplorer:
@@ -1355,37 +1366,43 @@ def test():
 
 # -----------------------------------------------------------------------------
 
-def test2():
+def test2(basePath):
+    min = 63.96153259277344
+    max = 250.22056579589844
     w = simple.Wavelet()
-    c = simple.Contour(ComputeScalars=1, Isosurfaces=range(50, 250, 10))
-    r = simple.Show(c)
+    c = simple.Contour(Input=w, ComputeScalars=1, PointMergeMethod="Uniform Binning", ContourBy = ['POINTS', 'RTData'], Isosurfaces=[ 80.0, 100.0, 120.0, 140.0, 160.0, 180.0, 200.0, 220.0, 240.0 ])
+    view = simple.CreateRenderView()
+    simple.Show(w,view)
+    r = simple.Show(c,view)
+    simple.Render(view)
 
-    lut = simple.GetLookupTableForArray( "RTData", 1, RGBPoints=[43.34006881713867, 0.23, 0.299, 0.754, 160.01158714294434, 0.865, 0.865, 0.865, 276.68310546875, 0.706, 0.016, 0.15] )
-    r.LookupTable = lut
-    r.ColorArrayName = ('POINT_DATA','RTData')
+    lut = simple.GetLookupTableForArray(
+        "RTData", 1,
+        RGBPoints=[min, 0.23, 0.299, 0.754, (min+max)*0.5, 0.865, 0.865, 0.865, max, 0.706, 0.016, 0.15],
+        ColorSpace='Diverging',
+        ScalarRangeInitialized=1.0 )
 
-    view = simple.Render()
-    exp = ThreeSixtyImageStackExporter(FileNameGenerator('/tmp/z', 'w_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,0,1], [10, 20])
+    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'z'), 'w_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,0,1], [15, 20])
     exp.UpdatePipeline()
-    exp = ThreeSixtyImageStackExporter(FileNameGenerator('/tmp/y', 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,1,0], [10, 20])
+    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'y'), 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [0,1,0], [15, 20])
     exp.UpdatePipeline()
-    exp = ThreeSixtyImageStackExporter(FileNameGenerator('/tmp/x', 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [1,0,0], [10, 20])
+    exp = ThreeSixtyImageStackExporter(FileNameGenerator(os.path.join(basePath, 'x'), 'cone_{theta}_{phi}.jpg'), view, [0,0,0], 100, [1,0,0], [15, 20])
     exp.UpdatePipeline()
-    simple.ResetCamera()
-    simple.Hide(c)
-    slice = SliceExplorer(FileNameGenerator('/tmp/slice', 'w_{sliceColor}_{slicePosition}.jpg'), view, w, { "RTData": { "lut": lut, "type": 'POINT_DATA'} }, 50, [0,1,0])
+    simple.ResetCamera(view)
+    simple.Hide(c, view)
+    slice = SliceExplorer(FileNameGenerator(os.path.join(basePath, 'slice'), 'w_{sliceColor}_{slicePosition}.jpg'), view, w, { "RTData": { "lut": lut, "type": 'POINT_DATA'} }, 50, [0,1,0])
     slice.UpdatePipeline()
 
 
 # -----------------------------------------------------------------------------
 
-def test3():
+def test3(basePath):
     w = simple.Wavelet()
     points_series = [ { "name": "Diagonal" , "probes": [ [ float(x), float(x), float(x) ] for x in range(-10, 10)] }, \
                       { "name": "Slice", "probes": [ [ float(x), float(y), 0.0 ] for x in range(-10, 10) for y in range(-10, 10)] } ]
     time_serie = [ {"name": "Origin", "probe": [0.0, 0.0, 0.0]}, {"name": "FaceCenter", "probe": [10.0, 0.0, 0.0]} ]
 
-    prober = DataProber( FileNameGenerator('/tmp/dataprober', 'data_{time}_{field}_{serie}.csv'), w, points_series, [ "RTData" ])
+    prober = DataProber( FileNameGenerator(os.path.join(basePath, 'dataprober'), 'data_{time}_{field}_{serie}.csv'), w, points_series, [ "RTData" ])
     prober.UpdatePipeline(0.0)
 
     timeProber = TimeSerieDataProber( FileNameGenerator('/tmp/dataprober_time', 'data_{field}.csv'), w, time_serie, [ "RTData"], 100)
