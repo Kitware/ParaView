@@ -530,9 +530,9 @@ size_t CartesianExtent::Size() const
 template<typename T>
 void CartesianExtent::Size(const CartesianExtent &ext, T nCells[3])
 {
-  nCells[0]=ext[1]-ext[0]+1;
-  nCells[1]=ext[3]-ext[2]+1;
-  nCells[2]=ext[5]-ext[4]+1;
+  nCells[0]=static_cast<T>(ext[1])-static_cast<T>(ext[0])+1;
+  nCells[1]=static_cast<T>(ext[3])-static_cast<T>(ext[2])+1;
+  nCells[2]=static_cast<T>(ext[5])-static_cast<T>(ext[4])+1;
 }
 
 //-----------------------------------------------------------------------------
@@ -540,9 +540,9 @@ inline
 size_t CartesianExtent::Size(const CartesianExtent &ext)
 {
   return
-       (ext[1]-ext[0]+1)
-      *(ext[3]-ext[2]+1)
-      *(ext[5]-ext[4]+1);
+       (static_cast<size_t>(ext[1])-static_cast<size_t>(ext[0])+1)
+      *(static_cast<size_t>(ext[3])-static_cast<size_t>(ext[2])+1)
+      *(static_cast<size_t>(ext[5])-static_cast<size_t>(ext[4])+1);
 }
 
 //-----------------------------------------------------------------------------
