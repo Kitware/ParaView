@@ -205,7 +205,7 @@ public:
   GENERATE_AXIS_FUNCTIONS(AxisLabelBold,bool);
 
   // Description:
-  // Set the axis label font bold for the given axis.
+  // Set the axis label font italic for the given axis.
   void SetAxisLabelItalic(int index, bool italic);
   GENERATE_AXIS_FUNCTIONS(AxisLabelItalic,bool);
 
@@ -300,7 +300,7 @@ public:
   GENERATE_AXIS_FUNCTIONS(AxisTitleBold,bool);
 
   // Description:
-  // Set the chart axis title's font bold for the given index.
+  // Set the chart axis title's font italic for the given index.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
