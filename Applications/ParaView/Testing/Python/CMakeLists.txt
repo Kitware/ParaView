@@ -43,6 +43,7 @@ endif()
 paraview_add_test_python(
   NO_DATA NO_RT
   TestPythonViewScript.py
+  CinemaTest.py
 )
 
 # these tests could run safely in serial and
@@ -89,3 +90,6 @@ if(BUILD_SHARED_LIBS)
     TestRemoteProgrammableFilter.py
     )
 endif()
+
+# Extend timeout for CinemaTest
+set_tests_properties(pvpythonPython-CinemaTest PROPERTIES TIMEOUT 500)
