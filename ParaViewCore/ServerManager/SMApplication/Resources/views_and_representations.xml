@@ -185,6 +185,37 @@
                  value="7" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty command="SetLegendFontFamily"
+                            default_values="Arial"
+                            name="LegendFontFamily"
+                            number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="Arial" />
+          <String value="Courier" />
+          <String value="Times" />
+        </StringListDomain>
+        <Documentation>Set the legend font familyname.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetLegendFontSize"
+                            default_values="12"
+                            name="LegendFontSize"
+                            number_of_elements="1">
+        <Documentation>Set the legend font size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLegendBold"
+                            default_values="0"
+                            name="LegendBold"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the legend font bold.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLegendItalic"
+                            default_values="0"
+                            name="LegendItalic"
+                            number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the legend font italic.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetTooltipNotation"
                          default_values="0"
                          name="TooltipNotation"
@@ -242,6 +273,18 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <PropertyGroup label="Legend Properties"
+                     panel_widget="FontEditor"
+                     panel_visibility="advanced">
+        <Property name="LegendFontFamily" function="Family"/>
+        <Property name="LegendBold" function="Bold" />
+        <Property name="LegendItalic" function="Italics"/>
+        <Property name="LegendFontSize" function="Size" />
+        <!-- next properties are not available -->
+        <!-- <Property name="LegendColor" function="Color"/> -->
+        <!-- <Property name="LegendOpacity" function="Opacity"/> -->
+        <!-- <Property name="LegendShadow" function="Shadow" /> -->
+      </PropertyGroup>
 
       <PropertyGroup label="Annotation">
         <Property name="ShowLegend"/>
@@ -7354,6 +7397,14 @@
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
           </PropertyGroup>
+	  <PropertyGroup label="Legend Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+	    <Property name="LegendFontFamily" function="Family"/>
+	    <Property name="LegendBold" function="Bold"/>
+	    <Property name="LegendItalic" function="Italics"/>
+	    <Property name="LegendFontSize" function="Size"/>
+	  </PropertyGroup>
           <PropertyGroup label="Tooltip"
                          panel_visibility="advanced">
             <Property name="TooltipNotation"/>
@@ -7553,6 +7604,14 @@
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
           </PropertyGroup>
+	  <PropertyGroup label="Legend Properties"
+                         panel_widget="FontEditor"
+                         panel_visibility="advanced">
+	    <Property name="LegendFontFamily" function="Family"/>
+	    <Property name="LegendBold" function="Bold"/>
+	    <Property name="LegendItalic" function="Italics"/>
+	    <Property name="LegendFontSize" function="Size"/>
+	  </PropertyGroup>
           <PropertyGroup label="Tooltip"
                          panel_visibility="advanced">
             <Property name="TooltipNotation"/>

@@ -150,6 +150,22 @@ public:
   void SetLegendLocation(int location);
 
   // Description:
+  // Set the legend font family.
+  void SetLegendFontFamily(const char* family);
+
+  // Description:
+  // Set the legend font size.
+  void SetLegendFontSize(int pointSize);
+
+  // Description:
+  // Set the legend font bold.
+  void SetLegendBold(bool bold);
+
+  // Description:
+  // Set the legend font italic.
+  void SetLegendItalic(bool italic);
+
+  // Description:
   // Sets whether or not the grid for the given axis is visible.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the

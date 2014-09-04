@@ -279,6 +279,47 @@ void vtkPVXYChartView::SetTitleAlignment(int alignment)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendFontFamily(const char* family)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetLegend()->GetLabelProperties();
+    prop->SetFontFamilyAsString(family);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendFontSize(int pointSize)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetLegend()->GetLabelProperties();
+    prop->SetFontSize(pointSize);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendBold(bool bold)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetLegend()->GetLabelProperties();
+    prop->SetBold(static_cast<int>(bold));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendItalic(bool italic)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetLegend()->GetLabelProperties();
+    prop->SetItalic(static_cast<int>(italic));
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetLegendVisibility(int visible)
 {
   if (this->Chart)
