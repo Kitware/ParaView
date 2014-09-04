@@ -365,7 +365,10 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
                                                                   view.SMProxy,
                                                                   proxyIdMap[proxyId])
                 visibilities[proxyId] = vtkSMPVRepresentationProxy.IsScalarBarVisible(rep.SMProxy,
-                                                                                      view.SMProxy);
+                                                                                      view.SMProxy)
+
+        # Render to get scalar bars in correct position when doing local rendering (webgl)
+        simple.Render()
 
         return visibilities
 
