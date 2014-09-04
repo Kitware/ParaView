@@ -8,15 +8,6 @@
           showing slices from a 3D dataset.
          </Documentation>
 
-         <IntVectorProperty command="SetShowOutline"
-                            default_values="1"
-                            name="ShowOutline"
-                            label="Show Outline in 3D View"
-                            panel_visibility="advanced"
-                            number_of_elements="1">
-           <BooleanDomain name="bool" />
-         </IntVectorProperty>
-
          <IntVectorProperty command="SetSizeTopLeft"
                             default_values="400 400"
                             ignore_synchronization="1"
@@ -248,7 +239,7 @@
          <IntVectorProperty command="SetLabelFontSize"
                             default_values="20"
                             name="LabelFontSize"
-                            panel_visibility="advanced"
+                            panel_visibility="default"
                             number_of_elements="1">
          </IntVectorProperty>
 
@@ -258,10 +249,20 @@
                                panel_visibility="never"
                                default_values="50 50"/>
 
+
+         <IntVectorProperty command="SetShowOutline"
+                            default_values="1"
+                            name="ShowOutline"
+                            label="Show Outline in 3D View"
+                            panel_visibility="default"
+                            number_of_elements="1">
+           <BooleanDomain name="bool" />
+         </IntVectorProperty>
+
          <IntVectorProperty command="SetShowCubeAxes"
                             default_values="0"
                             name="ShowCubeAxes"
-                            panel_visibility="advanced"
+                            panel_visibility="default"
                             number_of_elements="1">
            <BooleanDomain name="bool" />
          </IntVectorProperty>
@@ -270,20 +271,28 @@
                             default_values="0"
                             name="SliceOrientationAxesVisibility"
                             label="Show Orientation Axes"
-                            panel_visibility="advanced"
+                            panel_visibility="default"
                             number_of_elements="1">
            <BooleanDomain name="bool" />
          </IntVectorProperty>
 
-         <PropertyGroup label="Slice Views">
+         <PropertyGroup label="Slice Normals">
            <Property name="XSlicesNormal"/>
            <Property name="YSlicesNormal"/>
            <Property name="ZSlicesNormal"/>
+         </PropertyGroup>
+
+         <PropertyGroup label="Slice View-Ups">
            <Property name="TopLeftViewUp"/>
            <Property name="TopRightViewUp"/>
            <Property name="BottomLeftViewUp"/>
+         </PropertyGroup>
+         <PropertyGroup label="Slice Origin">
            <Property name="SlicesCenter"/>
+         </PropertyGroup>
+         <PropertyGroup label="Miscellaneous">
            <Property name="LabelFontSize"/>
+           <Property name="ShowOutline" />
            <Property name="ShowCubeAxes"/>
            <Property name="SliceOrientationAxesVisibility"/>
          </PropertyGroup>
