@@ -37,6 +37,7 @@
 
 #include <sstream>
 #include <set>
+#include <algorithm>
 
 class vtkQuadInternal;
 vtkQuadInternal* QuadInternal;
