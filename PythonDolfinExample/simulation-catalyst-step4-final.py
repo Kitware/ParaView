@@ -240,10 +240,6 @@ while tstep < maxtimestep:
     ugrid = Mesh2VTKUGrid( u1.function_space().mesh() , [ ("Velocity",velocity) , ("Pressure",pressure) ] , [] )
  
     # [SC14-Catalyst] trigger catalyst execution
-    #w=vtk.vtkXMLUnstructuredGridWriter()
-    #w.SetFileName("output-%04d.vtu" %tstep)
-    #w.SetInput(ugrid)
-    #w.Write()
     coProcess(ugrid,t,tstep)
 
     # Move to next time step
