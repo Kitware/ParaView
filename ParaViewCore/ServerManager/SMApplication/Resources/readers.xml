@@ -2996,6 +2996,52 @@
   </ProxyGroup>
 
   <ProxyGroup name="sources">
+    <!--  VTK ADIOS BP Reader -->
+#ifdef Module_vtkIOADIOS
+    <SourceProxy name="ADIOSReader"
+                 label="VTK ADIOS Reader"
+                 class="vtkADIOSReader">
+      <Documentation short_help="Read ADIOS BP files using VTKs schema.">
+          Reader to read ADIOS BP files using a VTK specific schema
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the ADIOS filename.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- Special sauce needed for timesteps -->
+      <DoubleVectorProperty information_only="1"
+                            repeatable="1"
+                            name="TimestepValues">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ReadMethod"
+                         command="SetReadMethod"
+                         number_of_elements="1"
+                         default_values="0"
+                         label="Read Method"
+                         panel_visibility="never">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="BP"/>
+          <Entry value="1" text="BPAggregate"/>
+          <Entry value="3" text="DataSpaces"/>
+          <Entry value="4" text="DIMES"/>
+          <Entry value="5" text="FlexPath"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="bp"
+                       file_description="VTK ADIOS File" />
+      </Hints>
+    </SourceProxy>
+#endif
+
     <!--  AMR Flash Particles Reader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
