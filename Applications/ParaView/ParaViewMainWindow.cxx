@@ -42,6 +42,7 @@ extern "C" {
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDeleteReaction.h"
+#include "pqLoadDataReaction.h"
 #include "pqHelpReaction.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
@@ -55,6 +56,10 @@ extern "C" {
 # include "pvStaticPluginsInit.h"
 #endif
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QUrl>
+#include <QMimeData>
 
 #include "ParaViewDocumentationInitializer.h"
 
@@ -245,4 +250,37 @@ void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const
   QString& proxyname)
 {
   pqHelpReaction::showProxyHelp(groupname, proxyname);
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::dragEnterEvent(QDragEnterEvent *evt)
+{
+  evt->acceptProposedAction();
+}
+
+//-----------------------------------------------------------------------------
+void ParaViewMainWindow::dropEvent(QDropEvent *evt)
+{
+  QList<QUrl> urls = evt->mimeData()->urls();
+  if (urls.isEmpty())
+    {
+    return;
+    }
+
+  QList<QString> files;
+
+  foreach(QUrl url,urls)
+    {
+    if(!url.toLocalFile().isEmpty())
+      {
+      files.append(url.toLocalFile());
+      }
+    }
+
+  // If we have no file we return
+  if(files.empty() || files.first().isEmpty())
+    {
+    return;
+    }
+  pqLoadDataReaction::loadData(files);
 }
