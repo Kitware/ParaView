@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <string>
 #include <vector>
 #include <iterator>
-
+#include <algorithm>
 
 
 namespace

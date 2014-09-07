@@ -38,6 +38,7 @@
 #include "vtkPolyhedron.h"
 #include "vtkCellArray.h"
 #include <set>
+#include <algorithm>
 
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMultiProcessController.h"
