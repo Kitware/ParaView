@@ -22,11 +22,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="script">
-     <property name="lineWrapMode">
-      <enum>QPlainTextEdit::NoWrap</enum>
-     </property>
-    </widget>
+    <widget class="QTextEdit" name="script"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
