@@ -77,7 +77,7 @@ namespace
         {
         // if port is present, it must match "port".
         int xmlPort;
-        if (!child->GetScalarAttribute("port", &xmlPort) == 0 ||
+        if (child->GetScalarAttribute("port", &xmlPort) == 0 ||
           xmlPort == port)
           {
           return child->GetAttribute("type");
