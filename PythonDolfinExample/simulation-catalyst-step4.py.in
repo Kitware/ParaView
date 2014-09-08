@@ -90,7 +90,7 @@ def Values2VTKArray(values,n,name):
 	return array
 
 # [SC14-Catalyst] convert dolfin mesh to a VTK unstructured grid
-def Mesh2VTKUGrid(mesh,pointArrays,cellArrays):
+def Mesh2VTKUGrid(mesh):
 	vtkcelltypes=((),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_QUAD,vtk.VTK_POLYGON,vtk.VTK_POLYGON),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_TETRA,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_HEXAHEDRON))
 	npoints=mesh.num_vertices()
 	geom=mesh.geometry()
@@ -118,10 +118,6 @@ def Mesh2VTKUGrid(mesh,pointArrays,cellArrays):
 	ugrid = vtk.vtkUnstructuredGrid()
 	ugrid.SetPoints(pts)
 	ugrid.SetCells(cellTypes,cellLocations,cells)
-	for (name,values) in pointArrays:
-		ugrid.GetPointData().AddArray( Values2VTKArray(values,npoints,name) )
-	for (name,values) in cellArrays:
-		ugrid.GetCellData().AddArray( Values2VTKArray(values,ncells,name) )
 	return ugrid
 
 # Begin demo
@@ -236,9 +232,7 @@ while tstep < maxtimestep:
     # pfile << p1
 
     # [SC14-Catalyst] convert solution to VTK grid
-    velocity = u1.compute_vertex_values()
-    pressure = p1.compute_vertex_values()
-    ugrid = Mesh2VTKUGrid( u1.function_space().mesh() , [ ("Velocity",velocity) , ("Pressure",pressure) ] , [] )
+    ugrid = Mesh2VTKUGrid( u1.function_space().mesh() )
  
     # [SC14-Catalyst] trigger catalyst execution
     coProcess(ugrid,t,tstep)
