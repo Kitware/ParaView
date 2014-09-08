@@ -70,10 +70,11 @@ def coProcess(grid, time, step):
     inputdescription = datadescription.GetInputDescriptionByName("input")
     if inputdescription.GetIfGridIsNecessary() == False:
         return
-    # attach VTK data set to pipeline input
-    inputdescription.SetGrid(grid)
-    # execute catalyst processing
-    cpscript.DoCoProcessing(datadescription)
+    if grid != None:
+        # attach VTK data set to pipeline input
+        inputdescription.SetGrid(grid)
+        # execute catalyst processing
+        cpscript.DoCoProcessing(datadescription)
 
 # [SC14-Catalyst] convert a flattened sequence of values to VTK double array
 def Values2VTKArray(values,n,name):
