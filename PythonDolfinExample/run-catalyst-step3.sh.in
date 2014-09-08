@@ -7,4 +7,4 @@ export LD_LIBRARY_PATH=$PV_INSTALL_DIR/lib/paraview-4.2
 export PATH=$PV_INSTALL_DIR/bin:$PATH
 
 set -x
-python $BUILD_DIR/simulation-catalyst-step4.py $SOURCE_DIR/CatalystScriptTest.py 1000
+python $BUILD_DIR/simulation-catalyst-step3.py $SOURCE_DIR/CatalystScriptTest.py 1000

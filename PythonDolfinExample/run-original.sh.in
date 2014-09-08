@@ -1,2 +1,3 @@
-python simulation.py
+export SCRIPT_PATH=@DOLFIN_EXAMPLE_SOURCE_DIR@
 
+python $SCRIPT_PATH/simulation.py
