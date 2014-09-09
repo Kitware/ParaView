@@ -64,11 +64,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineTimeKeyFrameEditor.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
-#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
 #include "pqSignalAdaptors.h"
+#include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 
@@ -80,6 +80,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMTrace.h"
 
+#ifdef PARAVIEW_ENABLE_PYTHON
+# include "pqPythonSyntaxHighlighter.h"
+#endif
 //-----------------------------------------------------------------------------
 // FIXME: this could be generalized. Seems like a useful extension to
 // pqPropertyLinksConnection. Makes it easy to trace property changes.
@@ -721,6 +724,9 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     QDialog dialog(this);
     Ui::PythonAnimationCue ui;
     ui.setupUi(&dialog);
+#ifdef PARAVIEW_ENABLE_PYTHON
+    new pqPythonSyntaxHighlighter(ui.script, ui.script);
+#endif
     ui.script->setPlainText(
       vtkSMPropertyHelper(cue->getProxy(), "Script").GetAsString());
     if (dialog.exec() == QDialog::Accepted)
