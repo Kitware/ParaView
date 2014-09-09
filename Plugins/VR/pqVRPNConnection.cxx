@@ -222,6 +222,7 @@ bool pqVRPNConnection::start()
     }
 
   this->Listener->addConnection(this);
+  return true;
 }
 
 // ---------------------------------------------------------------------private
