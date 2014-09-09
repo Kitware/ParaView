@@ -1,34 +1,33 @@
 # ParaViewWeb quick start
 
-ParaViewWeb is a collection of components that enable the use of ParaView's visualization and data analysis capabilities within Web applications.
-Using the latest HTML 5.0 based technologies, such as WebSocket and WebGL, ParaViewWeb enables communication with a ParaView server running on a remote visualization node or cluster using a light-weight JavaScript API. Using this API, Web applications can easily embed interactive 3D visualization components. Application developers can write simple Python scripts to extend the server capabilities to do things such as create custom visualization pipelines.
-ParaViewWeb makes it possible to extend web-based scientific workflows to easily visualize and analyze datasets.
-More samples and tutorials are forthcoming. In the meantime, one can access the JavaScript and Python API documentation on ParaView's website.
+## Introduction
 
-This documentation will focus on how to test ParaViewWeb locally using the easiest path. In order to perform real deployment, you can refer to [these other documentations, which explain how to make it run on the "EC2 Amazon Web Service"](index.html#!/guide/paraviewweb_on_aws_ec2).
+ParaViewWeb is a collection of components that enable the use of ParaView's visualization and data analysis capabilities within Web applications.  Using the latest HTML 5.0 based technologies, such as WebSockets and WebGL, ParaViewWeb enables communication with a ParaView server running on a remote visualization node or cluster using a light-weight JavaScript API. Using this API, Web applications can easily embed interactive 3D visualization components. Application developers can write simple Python scripts to extend the server capabilities to do things such as create custom visualization pipelines.  ParaViewWeb makes it possible to extend web-based scientific workflows to easily visualize and analyze datasets.
+
+More samples and tutorials are forthcoming.  In the meantime, one can access the JavaScript and Python API documentation on ParaView's website.
+
+This documentation will focus on how to test ParaViewWeb locally using the easiest path.  In order to perform real deployments, you can refer to the [Ubuntu 14.04 LTS](index.html#!/guide/ubuntu_14_04) or [Amazon EC2 AMI instance](index.html#!/guide/paraviewweb_on_aws_ec2) guides.
 
 ## Getting the software
 
-In order to have ParaViewWeb working on your system, you will need to either build or download it.
-In either case, you will need ParaView 4.1 or newer.
-To download Paraview, you can follow the [link](http://www.paraview.org/paraview/resources/software.php "Official ParaView Download page").
+Simply stated, ParaViewWeb is just ParaView with Python turned on.  To get started with ParaViewWeb, you either need to download a binary release of ParaView, or else you can get the source and build it yourself.  In either case, you will need ParaView 4.1 or newer.  To download Paraview, you can follow this [link](http://www.paraview.org/paraview/resources/software.php "Official ParaView Download page").
+
+To get more information about building ParaView yourself, please see the [Configure and build ParaView](index.html#!/guide/configure_and_build) guide.  Also, this ParaView wiki [section](http://www.paraview.org/Wiki/ParaView#Compile.2FInstall) has a lot of information on compiling/building ParaView.
 
 ## Getting some data
 
-You can download the VTK dataset with the following [link](http://www.paraview.org/files/v4.1/ParaViewData-v4.1.0-RC1.zip).
-You should unzip the dataset somewhere on your disk. Once this is done, you should replace the __--data-dir__ option with the appropriate absolute path.
+You can download the VTK dataset with the following [link](http://www.paraview.org/download/).  When you get there choose "Data, Documentation, and Tutorials" under "Type of Download".  You should unzip the dataset somewhere on your disk.  Once this is done, you should replace the __--data-dir__ option with the appropriate absolute path.
 
     --data-dir /path-to-share/
 
 ## How does it work
 
-In order to run a visualization session with ParaViewWeb, you will need to run a Python script that will act as a web server.
-Here is the set of command lines that can be run for each platform when the binaries are used.
+In order to run a visualization session with ParaViewWeb, you will need to run a Python script that will act as a web server.  Here is the set of command lines that can be run for each platform when the binaries are used.  As of the time of this writing, the latest stable release is ParaView 4.1, and the following instructions assume you have downloaded this binary release version of the software.  If you have downloaded a different version, you will need to update the commands appropriately.
 
 __Windows__
 
-    $ unzip ParaView-4.1.0-RC1-Windows-64bit.zip
-    $ cd ParaView-4.1.0-RC1-Windows-64bit\bin
+    $ unzip ParaView-4.1.0-Windows-64bit.exe
+    $ cd ParaView-4.1.0-Windows-64bit\bin
     $ pvpython.exe ..\lib\paraview-4.1\site-packages\paraview\web\pv_web_visualizer.py  \
                 --content ..\share\paraview-4.1\www                                     \
                 --data-dir .\path-to-share                                              \
@@ -38,10 +37,8 @@ __Windows__
 
 __Linux__
 
-As an example, we used the 4.1-RC1. However, depending on what you have downloaded, you should update the path and file name.
-
-    $ tar xvzf ParaView-4.1.0-RC1-Linux-64bit.tar.gz
-    $ cd ParaView-4.1.0-RC1-Linux-64bit
+    $ tar xvzf ParaView-4.1.0-Linux-64bit-glibc-2.3.6.tar.gz
+    $ cd ParaView-4.1.0-Linux-64bit
     $ ./bin/pvpython lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py  \
                 --content ./share/paraview-4.1/www                                     \
                 --data-dir /path-to-share/                                             \
@@ -73,15 +70,11 @@ http://localhost:8080/apps/LiveArticles and http://localhost:8080/apps/Parallel 
 
 ### Interacting with the web visualizer
 
-In order to play with the Web visualizer, you can either click on the __"+"__ icon of the pipeline browser to add a source or you can load a file by clicking on the __"folder"__ icon.
-Then, further interaction can be executed, as is shown in the video available [here](index.html#!/video/WebVisualizer).
+In order to play with the Web visualizer, you can either click on the __"+"__ icon of the pipeline browser to add a source or you can load a file by clicking on the __"folder"__ icon.  Then, further interaction can be executed, as is shown in the video available [here](index.html#!/video/WebVisualizer).
 
 ## Simple install
 
-We've developed a Python script that will download for you the binaries and some data so you can have a local setup of ParaViewWeb in no time.
-That script can be downloaded [here](guides/getting_started/data/pvw-setup).
-This will give you a start script that will use to launcher to serve the static web pages and will automatically start a new ParaView process
-for each user.
+We've developed a Python script that will download for you the binaries and some data so you can have a local setup of ParaViewWeb in no time.  That script can be downloaded [here](http://www.paraview.org/gitweb?p=ParaViewSuperbuild.git;a=blob_plain;f=Scripts/pvw-setup.py;hb=HEAD).  This will give you a start script that will use to launcher to serve the static web pages and will automatically start a new ParaView process for each user.
 
 Here is an example on how to use that script and its output (note the use of quotes around url in `curl` command):
 

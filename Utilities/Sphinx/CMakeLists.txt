@@ -45,5 +45,4 @@ add_custom_target(ParaViewPythonDoc
           config/api-changes.rst
           config/conf.py.in)
 
-add_dependencies(ParaViewPythonDoc ParaViewWWW)
 add_dependencies(ParaViewDoc ParaViewPythonDoc)

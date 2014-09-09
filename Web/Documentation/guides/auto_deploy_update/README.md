@@ -2,6 +2,9 @@
 Automating ParaViewWeb Deployment
 =================================
 
+Introduction
+------------
+
 The goal of this document is to describe the steps needed to set up a machine to routinely download, install, and configure everything necessary to deploy the latest version of ParaViewWeb for automated testing.  We describe a system which uses Apache HTTP server to serve static content and do websocket forwarding, and which uses the python launcher to start ParaViewWeb processes for clients.
 
 In this document, we avoid explicitly typing `sudo` anywhere, so please assume its use wherever it might be necessary.  Additionally, we frequently use angle brackets, <>, to enclose some string that should be replaced with a value appropriate to the target system.  Use cautious judgement however, as we may have missed one or two strings that still need to be replaced.

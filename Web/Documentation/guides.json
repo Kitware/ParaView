@@ -8,19 +8,84 @@
       "title": "Quick start",
       "description": "This quick start guide show how to test quicly ParaViewWeb locally."
     },{
-          "name": "architecture",
-          "url": "guides/architecture",
-          "title": "Architecture",
-          "description": "This guide go through the design evolution while explaining why we made the choices that we made."
+      "name": "architecture",
+      "url": "guides/architecture",
+      "title": "Architecture",
+      "description": "This guide goes through the design evolution while explaining why we made certain choices."
     },{
-          "name": "ipython",
-          "url": "guides/ipython",
-          "title": "ParaViewWeb inside iPython",
-          "description": "This documentation explain how to setup iPython/notebook along ParaViewWeb with distributed MPI engines and live visualization."
+      "name": "ipython",
+      "url": "guides/ipython",
+      "title": "ParaViewWeb inside iPython",
+      "description": "This documentation explain how to setup iPython/notebook along ParaViewWeb with distributed MPI engines and live visualization."
+    },{
+      "name": "multi_user_setup",
+      "url": "guides/multi_user_setup",
+      "title": "Multi-User Setup",
+      "description": "This document explains the three required components for multi-user ParaViewWeb"
     }
   ]
   },{
-   "title": "Deployment Guide",
+  "title": "Front Ends",
+  "items": [
+      {
+        "name": "apache_front_end",
+        "url": "guides/apache_front_end",
+        "title": "Apache as a front end",
+        "description": "This document explains how to use Apache as a front end in conjunction with a launcher."
+      }
+    ]
+  },{
+  "title": "Launchers",
+  "items": [
+      {
+        "name": "launcher_api",
+        "url": "guides/launcher_api",
+        "title": "Launcher RESTful API",
+        "description": "This document explains the RESTful API which must be implemented by any launcher."
+      },{
+        "name": "python_launcher",
+        "url": "guides/python_launcher",
+        "title": "Python Launcher",
+        "description": "This document explains how to use the provided Python Launcher for ParaViewWeb."
+      },{
+        "name": "jetty_session_manager",
+        "url": "guides/jetty_session_manager",
+        "title": "Jetty Launcher",
+        "description": "This document explains how to use the Jetty Session Manager for ParaViewWeb."
+      },{
+        "name": "launching_examples",
+        "url": "guides/launching_examples",
+        "title": "Launching Examples",
+        "description": "This document describes some of the possible depoyment configurations that can be achieved with the supplied launchers."
+      }
+    ]
+  },{
+  "title": "ParaViewWeb",
+  "items": [
+      {
+        "name": "pvw_setup",
+        "url": "guides/pvw_setup",
+        "title": "ParaViewWeb",
+        "description": "This document covers the various ways of obtaining, configuring, building, and running ParaViewWeb"
+      }
+    ]
+  },{
+  "title": "Graphics Setup Guides",
+  "items": [
+      {
+        "name": "graphics_on_ec2_g2",
+        "url": "guides/graphics_on_ec2_g2",
+        "title": "EC2 Graphics Setup",
+        "description": "This document describes how to set up a graphics card on various kinds of g2.2xlarge instances."
+      },{
+        "name": "virtualgl_turbovnc_howto",
+        "url": "guides/virtualgl_turbovnc_howto",
+        "title": "VirtualGL and TurboVNC",
+        "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
+      }
+    ]
+  },{
+   "title": "Deployment Guides",
    "items": [
       {
         "name": "ubuntu_14_04",
@@ -38,32 +103,12 @@
         "title": "Using Apache < 2.4 (Deprecated)",
         "description": "This document explains how to use Apache as the front-end for ParaViewWeb."
       },{
-        "name": "virtualgl_turbovnc_howto",
-        "url": "guides/virtualgl_turbovnc_howto",
-        "title": "VirtualGL and TurboVNC",
-        "description": "This document explains how to set up ParaViewWeb to do hardware-accelerated, offscreen rendering."
-      },{
         "name": "parallel_app",
         "url": "guides/parallel_app",
         "title": "Parallel Visualization",
         "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
       }
     ]
-  },{
-   "title": "Session managers",
-   "items": [
-    {
-      "name": "jetty_session_manager",
-      "url": "guides/jetty_session_manager",
-      "title": "Jetty launcher",
-      "description": "This document explains how to use the Jetty Session Manager for ParaViewWeb."
-    },{
-      "name": "py_launcher",
-      "url": "guides/py_launcher",
-      "title": "Python Launcher",
-      "description": "This document explains how to use the provided Python Launcher for ParaViewWeb."
-    }
-   ]
   },{
     "title": "Compilation guides",
     "items": [
@@ -88,15 +133,15 @@
     "title": "Developer corner",
     "items": [
       {
-      "name": "developer_howto",
-      "url": "guides/developer_howto",
-      "title": "Introduction for developers",
-      "description": "Components break down and introduction of ParaViewWeb's pieces."
+        "name": "developer_howto",
+        "url": "guides/developer_howto",
+        "title": "Introduction for developers",
+        "description": "Components break down and introduction of ParaViewWeb's pieces."
       },{
-      "name": "developer_style",
-      "url": "guides/developer_style",
-      "title": "Code Style Guidelines",
-      "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
+        "name": "developer_style",
+        "url": "guides/developer_style",
+        "title": "Code Style Guidelines",
+        "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
       },{
         "name": "webtest_setup",
         "url": "guides/webtest_setup",
