@@ -140,6 +140,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         RPC callback to reset camera.
         """
         view = self.getView(view)
+        simple.Render(view)
         simple.ResetCamera(view)
         try:
             view.CenterOfRotation = view.CameraFocalPoint

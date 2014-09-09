@@ -343,7 +343,7 @@
 
     function resetCamera() {
         if(viewport) {
-            viewport.invalidateScene(viewport.resetCamera);
+            viewport.resetCamera();
         }
     }
 
