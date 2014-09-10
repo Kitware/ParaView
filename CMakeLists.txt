@@ -23,6 +23,7 @@ endif()
 
 add_subdirectory(CxxOverlappingAMRExample)
 add_subdirectory(Fortran90FullExample)
+add_subdirectory(FortranPoissonSolver)
 add_subdirectory(CxxNonOverlappingAMRExample)
 add_subdirectory(CFullExample2)
 add_subdirectory(CxxFullExample)

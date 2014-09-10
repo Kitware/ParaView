@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 2.6)
+PROJECT(CatalystFortranPoissonSolver CXX Fortran)
+
+set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
+if(USE_CATALYST)
+  find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
+  include("${PARAVIEW_USE_FILE}")
+  set(Adaptor_SRCS FEFortranAdaptor.F90 FECxxAdaptor.cxx)
+  add_library(CatalystAdaptor ${Adaptor_SRCS})
+  target_link_libraries(CatalystAdaptor vtkPVPythonCatalyst vtkParallelMPI)
+  add_definitions("-DUSE_CATALYST")
+  if(NOT PARAVIEW_USE_MPI)
+    message(SEND_ERROR "ParaView must be built with MPI enabled")
+  endif()
+else()
+  find_package(MPI REQUIRED)
+  include_directories(${MPI_Fortran_INCLUDE_PATH})
+endif()
+
+ADD_EXECUTABLE(FortranPoissonSolver
+  FEDriver.F90 Box.F90 SparseMatrix.F90 ConjugateGradient.F90 PoissonDiscretization.F90)
+TARGET_LINK_LIBRARIES(FortranPoissonSolver ${MPI_Fortran_LIBRARIES})
+if(USE_CATALYST)
+  TARGET_LINK_LIBRARIES(FortranPoissonSolver CatalystAdaptor)
+endif()
+
+option(BUILD_TESTING "Build Testing" OFF)
+# Setup testing.
+if (BUILD_TESTING)
+  file(COPY SampleScripts/coproc.py DESTINATION ${CMAKE_BINARY_DIR})
+  include(CTest)
+  add_test(FortranPoissonSolverTest FortranPoissonSolver)
+endif()
