@@ -458,6 +458,7 @@ int vtkPMultiResolutionGenericIOReader::RequestInformation(vtkInformation *reque
   infoSet->SetNumberOfBlocks(this->GetNumberOfLevels());
   this->Internal->NumberOfBlocksPerLevel = -1;
 
+
   // request the information from each internal reader and put them
   // into the information object for this reader as blocks
   for (unsigned i = 0; i < this->Internal->Resolutions.size(); ++i)
@@ -492,7 +493,31 @@ int vtkPMultiResolutionGenericIOReader::RequestInformation(vtkInformation *reque
     outInfo->Remove(
       vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA());
     }
-  //infoSet->Print(std::cerr);
+  // We assume all datasets have blocks with the same bounds.  The rest of the pipeline
+  // does not know this, so this loop first finds which resolution has bounds and copies
+  // those bounds to all the other resolutions for each block
+  for (int i = 0; i < this->Internal->NumberOfBlocksPerLevel; ++i) // for each block
+    {
+    double bounds[6] = {0,0,0,0,0,0};
+    // find the resolution with nonzero bounds (zero is default from GenericIO reader
+    for (unsigned j = 0; j < this->Internal->Resolutions.size(); ++j)
+      {
+      if (bounds[0] == 0 && bounds[1] == 0)
+        {
+        static_cast<vtkMultiBlockDataSet*>(
+              infoSet->GetBlock(j))
+            ->GetMetaData(i)->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(),bounds);
+        }
+      }
+    // copy bounds to all resolutions
+    for (unsigned j = 0; j < this->Internal->Resolutions.size(); ++j)
+      {
+      static_cast<vtkMultiBlockDataSet*>(
+            infoSet->GetBlock(j))
+          ->GetMetaData(i)->Set(vtkStreamingDemandDrivenPipeline::BOUNDS(),bounds,6);
+      }
+    }
+
   std::cerr.flush();
   // return the computed object as the composite data metadata
   outInfo->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(),
