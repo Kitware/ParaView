@@ -135,10 +135,12 @@ public:
   double ScreenCoverage;   // computed coverage for the block.
   double Priority;         // Computed priority for this block.
   double Distance;
+  double AmountOfDetail;
   vtkBoundingBox Bounds;   // Bounds for the block.
 
   vtkStreamingPriorityQueueItem() :
-    Identifier(0), Refinement(0), ScreenCoverage(0), Priority(0), Distance(0)
+    Identifier(0), Refinement(0), ScreenCoverage(0), Priority(0), Distance(0),
+    AmountOfDetail(-1)
   {
   }
 };
@@ -201,6 +203,7 @@ public:
       double coverage = vtkComputeScreenCoverage(view_planes, block_bounds, distance);
       item.ScreenCoverage = coverage;
       item.Distance = distance;
+
       if (coverage > 0)
         {
 //        item.Priority =  coverage / (item.Refinement/* * distance*/) ;// / distance; //coverage * coverage / ( 1 + refinement2 + distance);

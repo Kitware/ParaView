@@ -25,6 +25,7 @@ class vtkDataArraySelection;
 class vtkMultiProcessController;
 class vtkStringArray;
 class vtkUnstructuredGrid;
+class vtkInformationDoubleKey;
 
 // GenericIO forward declarations
 namespace gio
@@ -112,6 +113,7 @@ public:
   // Sets the status of the array corresponding to the given name.
   void SetPointArrayStatus(const char* name, int status);
 
+  static vtkInformationDoubleKey* BLOCK_AMOUNT_OF_DETAIL();
 protected:
   vtkPGenericIOMultiBlockReader();
   ~vtkPGenericIOMultiBlockReader();

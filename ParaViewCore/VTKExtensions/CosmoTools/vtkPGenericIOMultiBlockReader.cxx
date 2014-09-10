@@ -21,6 +21,8 @@
 #include "vtkDataArraySelection.h"
 #include "vtkGenericIOUtilities.h"
 #include "vtkInformation.h"
+#include "vtkInformationKey.h"
+#include "vtkInformationDoubleKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiBlockDataSet.h"
@@ -40,6 +42,9 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+
+
+vtkInformationKeyMacro(vtkPGenericIOMultiBlockReader,BLOCK_AMOUNT_OF_DETAIL,Double)
 
 // Uncomment the line below to get debugging information
 //#define DEBUG
@@ -762,6 +767,9 @@ int vtkPGenericIOMultiBlockReader::RequestInformation(
         vtkStreamingDemandDrivenPipeline::BOUNDS(),
         this->MetaData->Blocks[i].bounds,6
       );
+      blockInfo->Set(
+        vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL(),
+            this->MetaData->Blocks[i].NumberOfElements);
       }
     }
   outputVector->GetInformationObject(0)->Set(

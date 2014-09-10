@@ -87,6 +87,11 @@ public:
   // Set the opacity.
   void SetOpacity(double val);
 
+  // Description:
+  void SetUseBlockDetailInformation(bool newVal);
+  bool GetUseBlockDetailInformation() const;
+  vtkBooleanMacro(UseBlockDetailInformation,bool)
+
   //---------------------------------------------------------------------------
   // The following API is to simply provide the functionality similar to
   // vtkGeometryRepresentation.

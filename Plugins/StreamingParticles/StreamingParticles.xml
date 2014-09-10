@@ -25,6 +25,12 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseBlockDetailInformation"
+                         default_values="0"
+                         name="UseBlockDetailInformation"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetStreamingRequestSize"
                          default_values="1"
                          name="StreamingRequestSize"
@@ -103,6 +109,7 @@
         </ShareProperties>
         <ExposedProperties>
           <Property name="UseOutline" />
+          <Property name="UseBlockDetailInformation" />
           <Property name="StreamingRequestSize" />
         </ExposedProperties>
       </SubProxy>
@@ -128,6 +135,7 @@
         </ShareProperties>
         <ExposedProperties>
           <Property name="UseOutline" />
+          <Property name="UseBlockDetailInformation" />
           <Property name="StreamingRequestSize" />
         </ExposedProperties>
       </SubProxy>

@@ -48,6 +48,7 @@ vtkStreamingParticlesRepresentation::vtkStreamingParticlesRepresentation()
   this->StreamingRequestSize = 1;
 
   this->PriorityQueue = vtkSmartPointer<vtkStreamingParticlesPriorityQueue>::New();
+  this->PriorityQueue->UseBlockDetailInformationOn();
   this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
 
   this->Actor = vtkSmartPointer<vtkPVLODActor>::New();
@@ -75,6 +76,21 @@ void vtkStreamingParticlesRepresentation::SetVisibility(bool val)
 void vtkStreamingParticlesRepresentation::SetOpacity(double val)
 {
   this->Actor->GetProperty()->SetOpacity(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamingParticlesRepresentation::SetUseBlockDetailInformation(bool newVal)
+{
+  if (newVal != this->PriorityQueue->GetUseBlockDetailInformation())
+    {
+    this->PriorityQueue->SetUseBlockDetailInformation(newVal);
+    this->Modified();
+    }
+}
+//----------------------------------------------------------------------------
+bool vtkStreamingParticlesRepresentation::GetUseBlockDetailInformation() const
+{
+  return this->PriorityQueue->GetUseBlockDetailInformation();
 }
 
 //----------------------------------------------------------------------------

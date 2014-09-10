@@ -87,6 +87,15 @@ public:
   // given the current view.
   const std::set<unsigned int>& GetBlocksToPurge() const;
 
+  // Description:
+  // If this variable is set to true and the blocks have
+  // vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL information, use this
+  // information to determine the blocks to load, otherwise use a default selection
+  // method.  Defaults to false.
+  vtkGetMacro(UseBlockDetailInformation,bool)
+  vtkBooleanMacro(UseBlockDetailInformation,bool)
+  vtkSetMacro(UseBlockDetailInformation,bool)
+
 //BTX
 protected:
   vtkStreamingParticlesPriorityQueue();
@@ -97,6 +106,8 @@ protected:
   void UpdatePriorities(const double view_planes[24]);
 
   vtkMultiProcessController* Controller;
+
+  bool UseBlockDetailInformation;
 
 private:
   vtkStreamingParticlesPriorityQueue(const vtkStreamingParticlesPriorityQueue&); // Not implemented

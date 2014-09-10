@@ -19,6 +19,7 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPGenericIOMultiBlockReader.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStreamingPriorityQueue.h"
 
@@ -94,6 +95,7 @@ vtkStreamingParticlesPriorityQueue::vtkStreamingParticlesPriorityQueue()
 {
   this->Internals = new vtkInternals();
   this->Controller = 0;
+  this->UseBlockDetailInformation = false;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -178,8 +180,14 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
       item.Refinement = level;
 
       double bounds[6];
-      mb->GetMetaData(cc)->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(), bounds);
+      vtkInformation* blockInfo = mb->GetMetaData(cc);
+      blockInfo->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(), bounds);
       item.Bounds.SetBounds(bounds);
+      if (blockInfo->Has(vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL()))
+        {
+        item.AmountOfDetail = mb->GetMetaData(cc)->Get(
+              vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL());
+        }
 
       queue.push(item);
       }
@@ -195,7 +203,17 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
     {
     vtkStreamingPriorityQueueItem item = queue.top();
     queue.pop();
-    if (item.Refinement <= 1 || item.ScreenCoverage >= 0.75)
+//    if (item.Distance + item.Refinement <= 0 || item.Refinement < 1)
+    double lengths[3];
+    item.Bounds.GetLengths(lengths);
+    double size = (lengths[0] + lengths[1] + lengths[2])/3.0;
+    bool detailMethodNeedsBlock = (this->UseBlockDetailInformation && item.AmountOfDetail > 0) &&
+        (item.Refinement <= 0 || (item.Distance < 0 && item.ScreenCoverage > 0.1) ||
+        (std::atan(size*size/(2*item.AmountOfDetail*item.Distance)) > 8.5e-5));
+    bool genericMethodNeedsBlock = !(this->UseBlockDetailInformation && item.AmountOfDetail > 0) &&
+        (item.Refinement <= 1 || item.ScreenCoverage >= 0.75);
+
+    if (detailMethodNeedsBlock || genericMethodNeedsBlock)
       {
       if (blocksRequested.find(item.Identifier) != blocksRequested.end())
         {
