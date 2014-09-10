@@ -281,6 +281,9 @@ bool vtkProcessModule::Finalize()
     {
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
+
+    // prevent caling MPI_Finalize() twice
+    vtkProcessModule::FinalizeMPI = false;
     }
 #endif
 
