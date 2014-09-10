@@ -1,0 +1,11 @@
+import sys
+
+DOLFIN_EXAMPLE_DATA_DIR='@DOLFIN_EXAMPLE_DATA_DIR@'
+PV_INSTALL_DIR='@PARAVIEW_INSTALL_DIR@'
+BUILD_DIR='@DOLFIN_EXAMPLE_BUILD_DIR@'
+SOURCE_DIR='@DOLFIN_EXAMPLE_SOURCE_DIR@'
+
+PV_PYTHON_PATH = [PV_INSTALL_DIR+'/lib/paraview-4.2/site-packages', PV_INSTALL_DIR+'/lib/paraview-4.2',PV_INSTALL_DIR+'/lib/paraview-4.2/site-packages/vtk']
+
+sys.path = PV_PYTHON_PATH + sys.path
+

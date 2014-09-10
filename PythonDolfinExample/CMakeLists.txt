@@ -36,26 +36,7 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/run-catalyst-step6.sh)
 
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation-catalyst-step1.py.in
-    ${CMAKE_CURRENT_BINARY_DIR}/simulation-catalyst-step1.py)
+    ${CMAKE_CURRENT_SOURCE_DIR}/simulation-env.py.in
+    ${CMAKE_CURRENT_BINARY_DIR}/simulation-env.py)
 
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation-catalyst-step2.py.in
-    ${CMAKE_CURRENT_BINARY_DIR}/simulation-catalyst-step2.py)
-
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation-catalyst-step3.py.in
-    ${CMAKE_CURRENT_BINARY_DIR}/simulation-catalyst-step3.py)
-
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation-catalyst-step4.py.in
-    ${CMAKE_CURRENT_BINARY_DIR}/simulation-catalyst-step4.py)
-
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation-catalyst-step6.py.in
-    ${CMAKE_CURRENT_BINARY_DIR}/simulation-catalyst-step6.py)
-
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation.py.in
-    ${CMAKE_CURRENT_BINARY_DIR}/simulation.py)
 

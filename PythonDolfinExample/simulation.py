@@ -23,6 +23,9 @@ on an L-shaped domain using Chorin's splitting method."""
 # First added:  2010-08-30
 # Last changed: 2011-06-30
 
+# [SC14-Catalyst] we need a python environment that enables import of both Dolfin and ParaView
+execfile("simulation-env.py")
+
 # Begin demo
 
 from dolfin import *
@@ -31,7 +34,7 @@ from dolfin import *
 parameters["std_out_all_processes"] = False;
 
 # Load mesh from file
-mesh = Mesh("@DOLFIN_EXAMPLE_DATA_DIR@/lshape.xml.gz")
+mesh = Mesh(DOLFIN_EXAMPLE_DATA_DIR+"/lshape.xml.gz")
 
 # Define function spaces (P2-P1)
 V = VectorFunctionSpace(mesh, "Lagrange", 2)

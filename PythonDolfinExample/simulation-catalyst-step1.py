@@ -27,8 +27,11 @@ on an L-shaped domain using Chorin's splitting method."""
 #
 # SC14 Paraview's Catalyst tutorial
 #
-# Step 2 : plug to catalyst python API
+# Step 1 : initialization
 #
+
+# [SC14-Catalyst] we need a python environment that enables import of both Dolfin and ParaView
+execfile("simulation-env.py")
 
 # [SC14-Catalyst] import paraview, vtk and paraview's simple API
 import sys
@@ -60,21 +63,6 @@ except:
     print 'Cannot find ', scriptname, ' -- no coprocessing will be performed.'
     sys.exit(1)
 
-# [SC14-Catalyst] Co-Processing routine to be called at the end of each simulation time step
-def coProcess(grid, time, step):
-    # initialize data description
-    datadescription = vtkPVCatalystPython.vtkCPDataDescription()
-    datadescription.SetTimeData(time, step)
-    datadescription.AddInput("input")
-    cpscript.RequestDataDescription(datadescription)
-    inputdescription = datadescription.GetInputDescriptionByName("input")
-    if inputdescription.GetIfGridIsNecessary() == False:
-        return
-    if grid != None:
-        # attach VTK data set to pipeline input
-        inputdescription.SetGrid(grid)
-        # execute catalyst processing
-        cpscript.DoCoProcessing(datadescription)
 
 # Begin demo
 
@@ -84,7 +72,7 @@ from dolfin import *
 parameters["std_out_all_processes"] = False;
 
 # Load mesh from file
-mesh = Mesh("@DOLFIN_EXAMPLE_DATA_DIR@/lshape.xml.gz")
+mesh = Mesh(DOLFIN_EXAMPLE_DATA_DIR+"/lshape.xml.gz")
 
 # Define function spaces (P2-P1)
 V = VectorFunctionSpace(mesh, "Lagrange", 2)
@@ -186,12 +174,6 @@ while tstep < maxtimestep:
     # Save to file [SC14-Catalyst] Not anymore
     # ufile << u1
     # pfile << p1
-
-    # [SC14-Catalyst] convert solution to VTK grid
-    ugrid = None 
- 
-    # [SC14-Catalyst] trigger catalyst execution
-    coProcess(ugrid,t,tstep)
 
     # Move to next time step
     u0.assign(u1)

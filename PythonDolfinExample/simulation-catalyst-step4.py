@@ -27,8 +27,11 @@ on an L-shaped domain using Chorin's splitting method."""
 #
 # SC14 Paraview's Catalyst tutorial
 #
-# Step 2 : plug to catalyst python API
+# Step 4 : convert simulation mesh to a VTK grid
 #
+
+# [SC14-Catalyst] we need a python environment that enables import of both Dolfin and ParaView
+execfile("simulation-env.py")
 
 # [SC14-Catalyst] import paraview, vtk and paraview's simple API
 import sys
@@ -76,6 +79,19 @@ def coProcess(grid, time, step):
         # execute catalyst processing
         cpscript.DoCoProcessing(datadescription)
 
+# [SC14-Catalyst] convert a flattened sequence of values to VTK double array
+def Values2VTKArray(values,n,name):
+	ncomps=len(values)/n
+	array=vtk.vtkDoubleArray()
+	array.SetNumberOfComponents(ncomps)
+	array.SetNumberOfTuples(n)
+	i=0
+	for x in values:
+		array.SetValue(i,x)
+		i+=1
+	array.SetName(name)
+	return array
+
 # [SC14-Catalyst] convert dolfin mesh to a VTK unstructured grid
 def Mesh2VTKUGrid(mesh):
 	vtkcelltypes=((),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_QUAD,vtk.VTK_POLYGON,vtk.VTK_POLYGON),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_TETRA,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_HEXAHEDRON))
@@ -107,29 +123,6 @@ def Mesh2VTKUGrid(mesh):
 	ugrid.SetCells(cellTypes,cellLocations,cells)
 	return ugrid
 
-# [SC14-Catalyst] convert a flattened sequence of values to VTK double array
-def Values2VTKArray(values,n,name):
-	ncomps=len(values)/n
-	array=vtk.vtkDoubleArray()
-	array.SetNumberOfComponents(ncomps)
-	array.SetNumberOfTuples(n)
-	i=0
-	for x in values:
-		array.SetValue(i,x)
-		i+=1
-	array.SetName(name)
-	return array
-
-def AddFieldData(ugrid, pointArrays, cellArrays ):
-	# add Point data fields
-	npoints = ugrid.GetNumberOfPoints()
-	for (name,values) in pointArrays:
-		ugrid.GetPointData().AddArray( Values2VTKArray(values,npoints,name) )
-	# add Cell data fields
-	ncells = ugrid.GetNumberOfCells()
-	for (name,values) in cellArrays:
-		ugrid.GetCellData().AddArray( Values2VTKArray(values,ncells,name) )
-
 # Begin demo
 
 from dolfin import *
@@ -138,7 +131,7 @@ from dolfin import *
 parameters["std_out_all_processes"] = False;
 
 # Load mesh from file
-mesh = Mesh("@DOLFIN_EXAMPLE_DATA_DIR@/lshape.xml.gz")
+mesh = Mesh(DOLFIN_EXAMPLE_DATA_DIR+"/lshape.xml.gz")
 
 # Define function spaces (P2-P1)
 V = VectorFunctionSpace(mesh, "Lagrange", 2)
@@ -244,11 +237,6 @@ while tstep < maxtimestep:
     # [SC14-Catalyst] convert solution to VTK grid
     ugrid = Mesh2VTKUGrid( u1.function_space().mesh() )
  
-    # [SC14-Catalyst] add field data to the VTK grid
-    velocity = u1.compute_vertex_values()
-    pressure = p1.compute_vertex_values()
-    AddFieldData( ugrid, [ ("Velocity",velocity) , ("Pressure",pressure) ] , [] )
-
     # [SC14-Catalyst] trigger catalyst execution
     coProcess(ugrid,t,tstep)
 

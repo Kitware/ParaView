@@ -1,10 +1,2 @@
-PV_INSTALL_DIR=@PARAVIEW_INSTALL_DIR@
-BUILD_DIR=@DOLFIN_EXAMPLE_BUILD_DIR@
-SOURCE_DIR=@DOLFIN_EXAMPLE_SOURCE_DIR@
-
-export PYTHONPATH=$PV_INSTALL_DIR/lib/paraview-4.2/site-packages:$PV_INSTALL_DIR/lib/paraview-4.2:$PV_INSTALL_DIR/lib/paraview-4.2/site-packages/vtk
-export LD_LIBRARY_PATH=$PV_INSTALL_DIR/lib/paraview-4.2
-export PATH=$PV_INSTALL_DIR/bin:$PATH
-
-set -x
-python $BUILD_DIR/simulation-catalyst-step3.py $SOURCE_DIR/CatalystScriptTest.py 1000
+LD_LIBRARY_PATH=@PARAVIEW_INSTALL_DIR@/lib/paraview-4.2 \
+python @DOLFIN_EXAMPLE_SOURCE_DIR@/simulation-catalyst-step3.py @DOLFIN_EXAMPLE_SOURCE_DIR@/CatalystScriptTest.py 1000

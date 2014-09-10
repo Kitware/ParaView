@@ -27,8 +27,11 @@ on an L-shaped domain using Chorin's splitting method."""
 #
 # SC14 Paraview's Catalyst tutorial
 #
-# Step 2 : plug to catalyst python API
+# Step 2 : plug to catalyst python API, add a coProcess function
 #
+
+# [SC14-Catalyst] we need a python environment that enables import of both Dolfin and ParaView
+execfile("simulation-env.py")
 
 # [SC14-Catalyst] import paraview, vtk and paraview's simple API
 import sys
@@ -67,58 +70,7 @@ def coProcess(grid, time, step):
     datadescription.SetTimeData(time, step)
     datadescription.AddInput("input")
     cpscript.RequestDataDescription(datadescription)
-    inputdescription = datadescription.GetInputDescriptionByName("input")
-    if inputdescription.GetIfGridIsNecessary() == False:
-        return
-    if grid != None:
-        # attach VTK data set to pipeline input
-        inputdescription.SetGrid(grid)
-        # execute catalyst processing
-        cpscript.DoCoProcessing(datadescription)
-
-# [SC14-Catalyst] convert a flattened sequence of values to VTK double array
-def Values2VTKArray(values,n,name):
-	ncomps=len(values)/n
-	array=vtk.vtkDoubleArray()
-	array.SetNumberOfComponents(ncomps)
-	array.SetNumberOfTuples(n)
-	i=0
-	for x in values:
-		array.SetValue(i,x)
-		i+=1
-	array.SetName(name)
-	return array
-
-# [SC14-Catalyst] convert dolfin mesh to a VTK unstructured grid
-def Mesh2VTKUGrid(mesh):
-	vtkcelltypes=((),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_QUAD,vtk.VTK_POLYGON,vtk.VTK_POLYGON),(vtk.VTK_EMPTY_CELL,vtk.VTK_VERTEX,vtk.VTK_LINE,vtk.VTK_TRIANGLE,vtk.VTK_TETRA,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_CONVEX_POINT_SET,vtk.VTK_HEXAHEDRON))
-	npoints=mesh.num_vertices()
-	geom=mesh.geometry()
-	pts=vtk.vtkPoints()
-	pts.SetNumberOfPoints(npoints)
-	for i in xrange(npoints):
-		p=geom.point(i)
-		pts.SetPoint(i,p.x(),p.y(),p.z())
-	dim = mesh.topology().dim()
-	ncells=mesh.num_cells()
-	cells=vtk.vtkCellArray()
-	cellTypes=vtk.vtkUnsignedCharArray()
-	cellTypes.SetNumberOfTuples(ncells)
-	cellLocations=vtk.vtkIdTypeArray()
-	cellLocations.SetNumberOfTuples(ncells)
-	loc=0
-	for (cell,i) in zip(mesh.cells(),xrange(ncells)) :
-		ncellpoints=len(cell)
-		cells.InsertNextCell(ncellpoints)
-		for cpoint in cell:
-			cells.InsertCellPoint(cpoint)
-		cellTypes.SetTuple1(i,vtkcelltypes[dim][ncellpoints])
-		cellLocations.SetTuple1(i,loc)
-		loc+=1+ncellpoints
-	ugrid = vtk.vtkUnstructuredGrid()
-	ugrid.SetPoints(pts)
-	ugrid.SetCells(cellTypes,cellLocations,cells)
-	return ugrid
+    # to be continued ...
 
 # Begin demo
 
@@ -128,7 +80,7 @@ from dolfin import *
 parameters["std_out_all_processes"] = False;
 
 # Load mesh from file
-mesh = Mesh("@DOLFIN_EXAMPLE_DATA_DIR@/lshape.xml.gz")
+mesh = Mesh(DOLFIN_EXAMPLE_DATA_DIR+"/lshape.xml.gz")
 
 # Define function spaces (P2-P1)
 V = VectorFunctionSpace(mesh, "Lagrange", 2)
@@ -232,7 +184,7 @@ while tstep < maxtimestep:
     # pfile << p1
 
     # [SC14-Catalyst] convert solution to VTK grid
-    ugrid = Mesh2VTKUGrid( u1.function_space().mesh() )
+    ugrid = None 
  
     # [SC14-Catalyst] trigger catalyst execution
     coProcess(ugrid,t,tstep)
