@@ -10654,7 +10654,7 @@ found and the point will be rejected.</Documentation>
         from which the histogram should be computed.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCalculateAverages"
-                         default_values="1"
+                         default_values="0"
                          name="CalculateAverages"
                          number_of_elements="1"
                          panel_visibility="advanced">
