@@ -9,6 +9,14 @@ from paraview.simple import *
 
 smtesting.ProcessCommandLineArguments()
 
+# add a text source #1
+Text(Text="Hello World")
+Show()
+
+# add empty text source
+Text(Text="")
+Show()
+
 data = Sphere()
 display = Show()
 

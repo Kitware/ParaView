@@ -14,9 +14,11 @@
 =========================================================================*/
 #include "vtkPVTextSource.h"
 
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkTable.h"
 #include "vtkStringArray.h"
+#include "vtkTable.h"
 
 vtkStandardNewMacro(vtkPVTextSource);
 //----------------------------------------------------------------------------
@@ -40,8 +42,20 @@ int vtkPVTextSource::FillInputPortInformation(
 }
 
 //----------------------------------------------------------------------------
+int vtkPVTextSource::RequestInformation(vtkInformation* request,
+  vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
+{
+  // This is needed to ensure that vtkPVTextSource::RequestData() gets called on
+  // all ranks.
+  outputVector->GetInformationObject(0)->Set(
+    vtkAlgorithm::CAN_HANDLE_PIECE_REQUEST(), 1);
+  return this->Superclass::RequestInformation(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
 int vtkPVTextSource::RequestData(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector), 
+  vtkInformationVector** vtkNotUsed(inputVector),
   vtkInformationVector* vtkNotUsed(outputVector))
 {
   vtkTable* output = this->GetOutput();
@@ -52,7 +66,6 @@ int vtkPVTextSource::RequestData(vtkInformation* vtkNotUsed(request),
   data->InsertNextValue(this->Text? this->Text : "");
   output->AddColumn(data);
   data->Delete();
-
   return 1;
 }
 

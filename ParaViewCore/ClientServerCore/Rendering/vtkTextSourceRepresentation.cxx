@@ -30,6 +30,21 @@
 #include "vtkTextRepresentation.h"
 #include "vtkVariant.h"
 
+namespace
+{
+  std::string vtkExtractString(vtkDataObject* data)
+    {
+    std::string text;
+    vtkFieldData* fieldData = data->GetFieldData();
+    vtkAbstractArray* array = fieldData->GetAbstractArray(0);
+    if (array && array->GetNumberOfTuples() > 0)
+      {
+      text = array->GetVariantValue(0).ToString();
+      }
+    return text;
+    }
+}
+
 vtkStandardNewMacro(vtkTextSourceRepresentation);
 vtkCxxSetObjectMacro(vtkTextSourceRepresentation, TextWidgetRepresentation,
   vtk3DWidgetRepresentation);
@@ -177,23 +192,16 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
     // since there's no direct connection between the mapper and the collector,
     // we don't put an update-suppressor in the pipeline.
 
-    std::string text;
-    vtkFieldData* fieldData =
+    std::string text = vtkExtractString(
       producerPort->GetProducer()->GetOutputDataObject(
-        producerPort->GetIndex())->GetFieldData();
-
-    vtkAbstractArray* array = fieldData->GetAbstractArray(0);
-    if (array && array->GetNumberOfTuples() > 0)
-      {
-      text = array->GetVariantValue(0).ToString();
-      }
-
+        producerPort->GetIndex()));
     vtkTextRepresentation* repr = vtkTextRepresentation::SafeDownCast(
       this->TextWidgetRepresentation?
       this->TextWidgetRepresentation->GetRepresentation() : NULL);
     if (repr)
       {
       repr->SetText(text.c_str());
+      repr->SetVisibility(text.empty()? 0:  1);
       }
     }
 
