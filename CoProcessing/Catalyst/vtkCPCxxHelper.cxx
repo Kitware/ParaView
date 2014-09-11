@@ -26,6 +26,9 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 
+// for PARAVIEW_INSTALL_DIR and PARAVIEW_BINARY_DIR variables
+#include "vtkCPConfig.h"
+
 #include <assert.h>
 #include <string>
 #include <vtksys/ios/sstream>
@@ -73,8 +76,12 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
 
     // Since when coprocessing, we have no information about the executable, we
     // make one up using the current working directory.
-    std::string self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
-    std::string programname = self_dir + "/unknown_exe";
+    //std::string self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
+#if defined(_WIN32) && defined(CMAKE_INTDIR)
+    std::string bin_dir = PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR "/unknown_exe";
+# else
+    std::string programname =  PARAVIEW_BINARY_DIR "/bin/unknown_exe";
+#endif
 
     int argc = 1;
     char** argv = new char*[1];
