@@ -78,7 +78,7 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
     // make one up using the current working directory.
     //std::string self_dir = vtksys::SystemTools::GetCurrentWorkingDirectory(/*collapse=*/true);
 #if defined(_WIN32) && defined(CMAKE_INTDIR)
-    std::string bin_dir = PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR "/unknown_exe";
+    std::string programname = PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR "/unknown_exe";
 # else
     std::string programname =  PARAVIEW_BINARY_DIR "/bin/unknown_exe";
 #endif
