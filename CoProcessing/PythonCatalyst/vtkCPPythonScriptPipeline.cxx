@@ -156,7 +156,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   this->SetPythonScriptName(fileNameName.c_str());
 
   // only process 0 reads the actual script and then broadcasts it out
-  char* scriptText;
+  char* scriptText = NULL;;
 
   int rank = controller->GetLocalProcessId();
   int scriptSize = 0;
