@@ -85,6 +85,13 @@ public:
   vtkBooleanMacro(GenerateCellNormals, int);
 
   // Description:
+  // Whether to triangulate mesh for rendering. This parameter avoid
+  // rendering issues of non-convex polygons.
+  vtkSetMacro(Triangulate, int);
+  vtkGetMacro(Triangulate, int);
+  vtkBooleanMacro(Triangulate, int);
+
+  // Description:
   // Nonlinear faces are approximated with flat polygons.  This parameter
   // controls how many times to subdivide nonlinear surface cells.  Higher
   // subdivisions generate closer approximations but take more memory and
@@ -101,8 +108,7 @@ public:
   // Description:
   // If on, the output polygonal dataset will have a celldata array that
   // holds the cell index of the original 3D cell that produced each output
-  // cell. This is useful for picking. The default is off to conserve
-  // memory.
+  // cell. This is useful for picking but it takes memory. The default is on.
   void SetPassThroughCellIds(int);
   vtkGetMacro(PassThroughCellIds,int);
   vtkBooleanMacro(PassThroughCellIds,int);
@@ -110,8 +116,7 @@ public:
   // Description:
   // If on, the output polygonal dataset will have a pointdata array that
   // holds the point index of the original vertex that produced each output
-  // vertex. This is useful for picking. The default is off to conserve
-  // memory.
+  // vertex. This is useful for picking but it takes memory. The default is on.
   void SetPassThroughPointIds(int);
   vtkGetMacro(PassThroughPointIds,int);
   vtkBooleanMacro(PassThroughPointIds,int);
@@ -176,7 +181,7 @@ protected:
   virtual vtkExecutive* CreateDefaultExecutive();
 
   // Description:
-  // Produce geometry for a block in the dataset. 
+  // Produce geometry for a block in the dataset.
   // This does not handle producing outlines. Call only when this->UseOutline ==
   // 0; \c extractface mask it is used to determine external faces.
   void ExecuteAMRBlock(vtkUniformGrid* input,
@@ -250,6 +255,7 @@ protected:
   int UseOutline;
   int UseStrips;
   int GenerateCellNormals;
+  int Triangulate;
   int NonlinearSubdivisionLevel;
 
   vtkMultiProcessController* Controller;

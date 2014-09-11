@@ -19,7 +19,7 @@
 // It handles non-polygonal datasets by extracting external surfaces. One can
 // use this representation to show surface/wireframe/points/surface-with-edges.
 // .SECTION Thanks
-// The addition of a transformation matrix was supported by CEA/DIF 
+// The addition of a transformation matrix was supported by CEA/DIF
 // Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
 
 #ifndef __vtkGeometryRepresentation_h
@@ -109,7 +109,7 @@ public:
   // Description:
   // Returns true if this class would like to get ghost-cells if available for
   // the connection whose information object is passed as the argument.
-  static bool DoRequestGhostCells(vtkInformation* information); 
+  static bool DoRequestGhostCells(vtkInformation* information);
 
   // Description:
   // Representations that use geometry representation as the internal
@@ -122,6 +122,7 @@ public:
   //***************************************************************************
   // Forwarded to vtkPVGeometryFilter
   virtual void SetUseOutline(int);
+  void SetTriangulate(int);
   void SetNonlinearSubdivisionLevel(int);
 
   //***************************************************************************
@@ -145,7 +146,7 @@ public:
   virtual void SetPosition(double, double, double);
   virtual void SetScale(double, double, double);
   virtual void SetTexture(vtkTexture*);
-  virtual void SetUserTransform(const double[16]); 
+  virtual void SetUserTransform(const double[16]);
 
   //***************************************************************************
   // Forwarded to Mapper and LODMapper.

@@ -172,6 +172,7 @@ void vtkGeometryRepresentation::SetupDefaults()
   if (geomFilter)
     {
     geomFilter->SetUseOutline(0);
+    geomFilter->SetTriangulate(0);
     geomFilter->SetNonlinearSubdivisionLevel(1);
     geomFilter->SetPassThroughCellIds(1);
     geomFilter->SetPassThroughPointIds(1);
@@ -236,7 +237,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     vtkPVRenderView::MarkAsRedistributable(inInfo, this);
 
     // Tell the view if this representation needs ordered compositing. We need
-    // ordered compositing when rendering translucent geometry. 
+    // ordered compositing when rendering translucent geometry.
     if (this->Actor->HasTranslucentPolygonalGeometry())
       {
       // We need to extend this condition to consider translucent LUTs once we
@@ -270,7 +271,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
         this->LODOutlineFilter->Update();
         // Pass along the LOD geometry to the view so that it can deliver it to
         // the rendering node as and when needed.
-        vtkPVRenderView::SetPieceLOD(inInfo, this, 
+        vtkPVRenderView::SetPieceLOD(inInfo, this,
           this->LODOutlineFilter->GetOutputDataObject(0));
         }
       else
@@ -290,7 +291,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
         // Pass along the LOD geometry to the view so that it can deliver it to
         // the rendering node as and when needed.
-        vtkPVRenderView::SetPieceLOD(inInfo, this, 
+        vtkPVRenderView::SetPieceLOD(inInfo, this,
           this->Decimator->GetOutputDataObject(0));
         }
       }
@@ -772,6 +773,19 @@ void vtkGeometryRepresentation::SetUseOutline(int val)
   if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
     {
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(val);
+    }
+
+  // since geometry filter needs to execute, we need to mark the representation
+  // modified.
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetTriangulate(int val)
+{
+  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+    {
+    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetTriangulate(val);
     }
 
   // since geometry filter needs to execute, we need to mark the representation

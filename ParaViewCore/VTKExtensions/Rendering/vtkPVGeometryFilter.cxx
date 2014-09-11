@@ -64,6 +64,7 @@
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkTimerLog.h"
+#include "vtkTriangleFilter.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
@@ -78,8 +79,6 @@
 #include <set>
 #include <algorithm>
 
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 vtkStandardNewMacro(vtkPVGeometryFilter);
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -149,6 +148,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->UseOutline = 1;
   this->UseStrips = 0;
   this->GenerateCellNormals = 1;
+  this->Triangulate = false;
   this->NonlinearSubdivisionLevel = 1;
 
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
@@ -1348,8 +1348,8 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
     {
     this->OutlineFlag = 0;
 
-    bool handleSubdivision = false;
-    if (this->NonlinearSubdivisionLevel > 0)
+    bool handleSubdivision = (this->Triangulate != 0);
+    if (!handleSubdivision && (this->NonlinearSubdivisionLevel > 0))
       {
       // Check to see if the data actually has nonlinear cells.  Handling
       // nonlinear cells adds unnecessary work if we only have linear cells.
@@ -1445,6 +1445,16 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output, updateghostlevel);
       }
 
+    if (this->Triangulate && (output->GetNumberOfPolys() > 0))
+      {
+      // Triangulate the polygonal mesh if requested to avoid rendering
+      // issues of non-convex polygons.
+      vtkNew<vtkTriangleFilter> triangleFilter;
+      triangleFilter->SetInputData(output);
+      triangleFilter->Update();
+      output->ShallowCopy(triangleFilter->GetOutput());
+      }
+
     if (handleSubdivision)
       {
       // Restore state of DataSetSurfaceFilter.
@@ -1456,9 +1466,9 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
       // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
       // that will cause the wireframe to be rendered correctly.
-      VTK_CREATE(vtkPolyData, nextStageInput);
+      vtkNew<vtkPolyData> nextStageInput;
       nextStageInput->ShallowCopy(output);  // Yes output is correct.
-      this->RecoverWireframeFilter->SetInputData(nextStageInput);
+      this->RecoverWireframeFilter->SetInputData(nextStageInput.Get());
 
       // Observe the progress of the internal filter.
       // TODO: Make the consecutive internal filter execution have monotonically
@@ -1489,7 +1499,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
           return;
           }
         vtkIdType numPts = polyPtIds2FacePtIds->GetNumberOfTuples();
-        VTK_CREATE(vtkIdTypeArray, polyPtIds2OriginalPtIds);
+        vtkNew<vtkIdTypeArray> polyPtIds2OriginalPtIds;
         polyPtIds2OriginalPtIds->SetName("vtkOriginalPointIds");
         polyPtIds2OriginalPtIds->SetNumberOfComponents(1);
         polyPtIds2OriginalPtIds->SetNumberOfTuples(numPts);
@@ -1503,7 +1513,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
             }
           polyPtIds2OriginalPtIds->SetValue(polyPtId, originalPtId);
           }
-        output->GetPointData()->AddArray(polyPtIds2OriginalPtIds);
+        output->GetPointData()->AddArray(polyPtIds2OriginalPtIds.Get());
         }
       }
 
@@ -1518,7 +1528,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::PolyDataExecute(
-  vtkPolyData* input, vtkPolyData* out, int doCommunicate)
+  vtkPolyData* input, vtkPolyData* output, int doCommunicate)
 {
   if (!this->UseOutline)
     {
@@ -1533,54 +1543,90 @@ void vtkPVGeometryFilter::PolyDataExecute(
       inCopy->RemoveGhostCells(1);
       stripper->SetInputData(inCopy);
       stripper->Update();
-      out->CopyStructure(stripper->GetOutput());
-      out->GetPointData()->ShallowCopy(stripper->GetOutput()->GetPointData());
-      out->GetCellData()->ShallowCopy(stripper->GetOutput()->GetCellData());
+      output->CopyStructure(stripper->GetOutput());
+      output->GetPointData()->ShallowCopy(stripper->GetOutput()->GetPointData());
+      output->GetCellData()->ShallowCopy(stripper->GetOutput()->GetCellData());
       inCopy->Delete();
       stripper->Delete();
       }
     else
       {
-      out->ShallowCopy(input);
+      output->ShallowCopy(input);
       if (this->PassThroughCellIds)
         {
-        vtkIdTypeArray *originalCellIds = vtkIdTypeArray::New();
+        vtkNew<vtkIdTypeArray> originalCellIds;
         originalCellIds->SetName("vtkOriginalCellIds");
         originalCellIds->SetNumberOfComponents(1);
-        vtkCellData *outputCD = out->GetCellData();
-        outputCD->AddArray(originalCellIds);
-        vtkIdType numTup = out->GetNumberOfCells();
+        vtkNew<vtkIdTypeArray> originalFaceIds;
+        originalFaceIds->SetName(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+        originalFaceIds->SetNumberOfComponents(1);
+        vtkCellData *outputCD = output->GetCellData();
+        outputCD->AddArray(originalCellIds.Get());
+        if (this->Triangulate)
+          {
+          outputCD->AddArray(originalFaceIds.Get());
+          }
+        vtkIdType numTup = output->GetNumberOfCells();
         originalCellIds->SetNumberOfValues(numTup);
+        originalFaceIds->SetNumberOfValues(numTup);
         for (vtkIdType cId = 0; cId < numTup; cId++)
           {
           originalCellIds->SetValue(cId, cId);
+          originalFaceIds->SetValue(cId, cId);
           }
-        originalCellIds->Delete();
-        originalCellIds = NULL;
         }
       if (this->PassThroughPointIds)
         {
-        vtkIdTypeArray *originalPointIds = vtkIdTypeArray::New();
+        vtkNew<vtkIdTypeArray> originalPointIds;
         originalPointIds->SetName("vtkOriginalPointIds");
         originalPointIds->SetNumberOfComponents(1);
-        vtkPointData *outputPD = out->GetPointData();
-        outputPD->AddArray(originalPointIds);
-        vtkIdType numTup = out->GetNumberOfPoints();
+        vtkPointData *outputPD = output->GetPointData();
+        outputPD->AddArray(originalPointIds.Get());
+        vtkIdType numTup = output->GetNumberOfPoints();
         originalPointIds->SetNumberOfValues(numTup);
         for (vtkIdType pId = 0; pId < numTup; pId++)
           {
           originalPointIds->SetValue(pId, pId);
           }
-        originalPointIds->Delete();
-        originalPointIds = NULL;
         }
-      out->RemoveGhostCells(1);
+
+      output->RemoveGhostCells(1);
+
+      if (this->Triangulate)
+        {
+        // Triangulate the polygonal mesh.
+        vtkNew<vtkTriangleFilter> triangleFilter;
+        triangleFilter->SetInputData(output);
+        triangleFilter->Update();
+
+        // Now use vtkPVRecoverGeometryWireframe to create an edge flag attribute
+        // that will cause the wireframe to be rendered correctly.
+        this->RecoverWireframeFilter->SetInputData(triangleFilter->GetOutput());
+
+        // Observe the progress of the internal filter.
+        // TODO: Make the consecutive internal filter execution have monotonically
+        // increasing progress rather than restarting for every internal filter.
+        this->RecoverWireframeFilter->AddObserver(
+          vtkCommand::ProgressEvent,
+          this->InternalProgressObserver);
+        this->RecoverWireframeFilter->Update();
+        // The internal filter finished.  Remove the observer.
+        this->RecoverWireframeFilter->RemoveObserver(
+          this->InternalProgressObserver);
+
+        this->RecoverWireframeFilter->SetInputData(NULL);
+
+        // Get what should be the final output.
+        output->ShallowCopy(this->RecoverWireframeFilter->GetOutput());
+
+        output->GetCellData()->RemoveArray(vtkPVRecoverGeometryWireframe::ORIGINAL_FACE_IDS());
+        }
       }
     return;
     }
 
   this->OutlineFlag = 1;
-  this->DataSetExecute(input, out, doCommunicate);
+  this->DataSetExecute(input, output, doCommunicate);
 }
 
 //----------------------------------------------------------------------------
