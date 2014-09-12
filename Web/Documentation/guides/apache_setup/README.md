@@ -1,4 +1,4 @@
-# How to use Apache as front-end
+# How to use Apache as front-end (DEPRECATED)
 
 ## Introduction
 

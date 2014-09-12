@@ -8,9 +8,17 @@ In either case, once Apache is ready to run, you will need to configure it toget
 
 If you build Apache yourself, it's usually a good idea to put it somewhere out of the way, where it won't conflict with any system Apache you may have in place.  We usually choose somewhere in `/opt`.  Otherwise, if you use a package-installed version of Apache, it's typically already located in `/etc/apache2`.
 
+## Getting Apache
+
+The easiest thing to do is just to install Apache from a package.  On recent Ubuntu distributions, this can be done as follows:
+
+    $ sudo apt-get install apache2-dev apache2 libapr1-dev apache2-utils
+
+If the packaged version of Apache is not recent enough on your system, or in case you want to compile it yourself for some other reason, there are instructions on how to do that at the bottom of this guide.
+
 ## Configure Apache httpd for use with ParaViewWeb
 
-First, we'll address the configuration of Apache for use with ParaViewWeb.
+Next we address the configuration of Apache for use with ParaViewWeb.
 
 ### Create a proxy/mapping file
 
@@ -27,7 +35,17 @@ Choose a directory for the mapping file that the launcher and Apache use to comm
 
 ### Add a virtual host
 
-Now add a virtual host to the Apache configuration.  If you built Apache yourself, this will probably be the `httpd-vhosts.conf` file, located in `/opt/apache-2.4.7/conf/extra/` or similar.  If you use a recent, package-installed Apache, you'll probably create a file in `/etc/apache2/sites-available/` and make a symbolic link to it from `/etc/apache2/sites-enabled/`.  There are some specifics about how to do this in the [Ubuntu 14.04 LTS](index.html#!/guide/ubuntu_14_04) guide.  Make sure to replace the `ServerName` value (shown here as `<MY-SERVER-NAME>`) with the correct host name.  Also make sure the `DocumentRoot` value (shown here as `<MY-DOCUMENT-ROOT>`) makes sense for your particular deployment, we typically point it at the `www` directory of the ParaView build or install tree.
+Now add a virtual host to the Apache configuration.
+
+#### If you compiled Apache yourself
+
+In this case, you will probably find a file named `httpd-vhosts.conf` located in `/opt/apache-2.4.7/conf/extra/` or similar.  You should remove the contents of that file and replace them with the virtual host configuration shown below.
+
+#### If you installed Apache 2.4.7 from a package
+
+In this case you should create a file in `/etc/apache2/sites-available/` and make a symbolic link to it from `/etc/apache2/sites-enabled/`.  We'll assume you named this file `001-pvw.conf`.
+
+In either case, make sure to replace the `ServerName` value (shown below as `<MY-SERVER-NAME>`) with the correct host name.  Also make sure the `DocumentRoot` value (shown below as `<MY-DOCUMENT-ROOT>`) makes sense for your particular deployment, we typically point it at the `www` directory of the ParaView build or install tree.
 
     <VirtualHost *:80>
         ServerName <MY-SERVER-NAME>
@@ -63,7 +81,7 @@ Now add a virtual host to the Apache configuration.  If you built Apache yoursel
 
 #### If you compiled Apache yourself
 
-The following notes are only relevant if you compiled Apache yourself.  If you installed Apache >= 2.4.7 from a package, skip to the next section.
+The following notes are only relevant if you compiled Apache yourself.  If you installed Apache >= 2.4.7 from a package, skip to the next subsection.
 
 Include the virtual host file you configured above in the main httpd configuration file.  Find the following line in `httpd.conf` and uncomment it:
 
@@ -80,11 +98,22 @@ Start the httpd daemon.
 
 #### If you installed Apache 2.4.7 from a package
 
-If you installed Apache >= 2.4.7 from a package, the [Ubuntu 14.04 LTS](index.html#!/guide/ubuntu_14_04) guide has some specific details on how to enable the virtual host you configured above.
+First of all, you will need to enable the modules that will be used by our ParaViewWeb virtual host.
 
-In this case, you will typically start your apache server with something like:
+    $ sudo a2enmod vhost_alias
+    $ sudo a2enmod proxy
+    $ sudo a2enmod proxy_http
+    $ sudo a2enmod proxy_wstunnel
+    $ sudo a2enmod rewrite
 
-    $ sudo apachectl -k start
+Then enable the virtual host you created above and restart Apache
+
+    $ sudo a2ensite 001-pvw.conf
+    $ sudo service apache2 restart
+
+If you run into problems with your new virtual host listening properly, you may need to disable the default virtual hosts file as follows:
+
+    $ sudo a2dissite 000-default.conf
 
 ## Building Apache: EC2 Amazon Linux AMI
 

@@ -180,41 +180,37 @@ If you did everything right and got a little lucky, you should be able to fire u
 
 ## Ubuntu 14.04 LTS
 
-These are additional notes that are specific for EC2 instances that use Ubuntu 14.04 LTS.
+These notes are specific for EC2 instances that use Ubuntu 14.04 LTS and were tested on the following instance type:
 
-* The EC2 instance CAN NOT use the current NVidia drivers but at least the beta 337.19 (or higher).
-* Create file  /etc/modprobe.d/nvidia-graphics-drivers.conf
+    ubuntu-trusty-14.04-amd64-server-20140607.1 (ami-864d84ee)
 
----
+In order to add the latest nvidia drivers, you must first add a package repo that provides these packages.  This can be done as follows:
 
-    blacklist nouveau
-    blacklist lbm-nouveau
-    blacklist nvidia-173
-    blacklist nvidia-96
-    blacklist nvidia-current
-    blacklist nvidia-173-updates
-    blacklist nvidia-96-updates
-    alias nvidia nvidia_current_updates
-    alias nouveau off
-    alias lbm-nouveau off
+    $ sudo add-apt-repository ppa:xorg-edgers/ppa -y
+    $ sudo apt-get update
+    $ sudo apt-get dist-upgrade
 
+At the end of the `dist-upgrade` process you will be presented with some Grub options to select, here is how you should choose those:
 
-* Purge nouveau drivers
+- keep the local version currently installed
+- Select /dev/xvda
 
----
+Now you can install the needed packages.  Below we have chosen the `nvidia-343` driver version, but as newer versions become available, those should probably be used instead.  To find out what versions are available, try:
 
-    $ sudo apt-get purge nouveau*
+    $ sudo apt-cache search nvidia
 
-* Ensure the right kernel modules get loaded at boot time
+When you have identified an nvidia driver package, then run:
 
----
+    $ sudo apt-get install libglu1-mesa libglu1-mesa-dev mesa-utils xorg linux-image-extra-virtual nvidia-343
 
-    $ sudo update-initramfs -u
+The following command will set up your `xorg.conf` file properly so that no editing is needed:
 
-    => then reboot
+    $ sudo nvidia-xconfig --busid="0:3:0" --allow-empty-initial-configuration --virtual=1920x1080 --use-display-device=0
 
-* EC2 AMI needs specific stuff in xorg.conf
+The next command will keep the desktop manager from starting up on its own:
 
----
+    $ echo  "manual" | sudo tee -a /etc/init/lightdm.override
 
-    $ sudo nvidia-xconfig  --busid="PCI:0:3:0"  --allow-empty-initial-configuration --virtual=1920x1080   --use-display-device=0
+Now you can reboot, and you should be good to go:
+
+    $ sudo reboot
