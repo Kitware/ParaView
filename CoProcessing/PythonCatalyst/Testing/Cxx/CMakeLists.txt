@@ -4,6 +4,19 @@ include_directories(
 set(CP_LABELS PARAVIEW CATALYST)
 
 #------------------------------------------------------------------------------
+if (PARAVIEW_USE_MPI)
+  vtk_module_test_executable(CoProcessingProgrammableFilter
+    TestCPProgrammableFilter.cxx)
+
+  add_test(NAME CoProcessingProgrammableFilter
+    COMMAND CoProcessingProgrammableFilter
+    ${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py)
+  set_tests_properties(CoProcessingProgrammableFilter PROPERTIES 
+    LABELS "${CP_LABELS}"
+    FAIL_REGULAR_EXPRESSION "SyntaxError")
+endif()
+
+#------------------------------------------------------------------------------
 vtk_module_test_executable(CoProcessingPythonScriptExample
   PythonScriptCoProcessingExample.cxx
   vtkPVCustomTestDriver.cxx)
