@@ -175,7 +175,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
       myfile.close();
       }
 
-    scriptSize = desiredString.size()+1;
+    scriptSize = static_cast<int>(desiredString.size()+1);
     scriptText = new char[scriptSize];
     memcpy(scriptText, desiredString.c_str(), sizeof(char)*scriptSize);
     }
