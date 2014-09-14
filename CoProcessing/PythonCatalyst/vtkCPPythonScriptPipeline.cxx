@@ -7,11 +7,11 @@
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notice for more information.
 
-=========================================================================*/
+  =========================================================================*/
 #include "vtkCPPythonScriptPipeline.h"
 
 #include "vtkCPDataDescription.h"
@@ -39,9 +39,9 @@ extern "C" {
 
 namespace
 {
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
   void InitializePython()
-    {
+  {
     static bool initialized = false;
     if (initialized) { return; }
     initialized = true;
@@ -93,7 +93,23 @@ namespace
       << "paraview.print_debug_info = f2\n"
       << "import vtkPVCatalystPython\n";
     vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
-    }
+  }
+
+//----------------------------------------------------------------------------
+  // for things like programmable filters that have a '\n' in their strings,
+  // we need to fix them to have \\n so that everything works smoothly
+  void fixEOL(std::string& str)
+  {
+    const std::string from = "\\n";
+    const std::string to = "\\\\n";
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos)
+      {
+      str.replace(start_pos, from.length(), to);
+      start_pos += to.length();
+      }
+    return;
+  }
 }
 
 vtkStandardNewMacro(vtkCPPythonScriptPipeline);
@@ -140,19 +156,28 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   this->SetPythonScriptName(fileNameName.c_str());
 
   // only process 0 reads the actual script and then broadcasts it out
-  char* scriptText;
+  char* scriptText = NULL;;
 
   int rank = controller->GetLocalProcessId();
   int scriptSize = 0;
   if(rank == 0)
     {
-    std::ifstream fin(fileName, ios::binary);
-    fin.seekg(0, ios::end);
-    scriptSize = static_cast<int>(fin.tellg())+1;
+    std::string line;
+    std::ifstream myfile (fileName);
+    std::string desiredString;
+    if (myfile.is_open())
+      {
+      while ( getline (myfile,line) )
+        {
+        fixEOL(line);
+        desiredString.append(line).append("\n");
+        }
+      myfile.close();
+      }
+
+    scriptSize = static_cast<int>(desiredString.size()+1);
     scriptText = new char[scriptSize];
-    fin.seekg(0, ios::beg);
-    fin.read(scriptText, scriptSize-1);
-    scriptText[scriptSize-1] = '\0';
+    memcpy(scriptText, desiredString.c_str(), sizeof(char)*scriptSize);
     }
 
   controller->Broadcast(&scriptSize, 1, 0);
