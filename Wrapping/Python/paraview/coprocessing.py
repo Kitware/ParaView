@@ -36,6 +36,7 @@ class CoProcessor(object):
         self.__PipelineCreated = False
         self.__ProducersMap = {}
         self.__WritersList = []
+        self.__ExporterList = []
         self.__ViewsList = []
         self.__EnableLiveVisualization = False
         self.__LiveVisualizationFrequency = 1;
@@ -122,6 +123,9 @@ class CoProcessor(object):
                     datadescription.GetForceOutput() == True:
                 writer.FileName = fileName.replace("%t", str(timestep))
                 writer.UpdatePipeline(datadescription.GetTime())
+
+        for exporter in self.__ExporterList:
+            exporter.UpdatePipeline(datadescription.GetTime())
 
     def WriteImages(self, datadescription, rescale_lookuptable=False):
         """This method will update all views, if present and write output
@@ -224,6 +228,25 @@ class CoProcessor(object):
         producer.UpdatePipeline()
         return producer
 
+    def RegisterExporter(self, exporter):
+        """
+        Registers a python object that will be responsible to export any
+        kind of data. That exporter needs to provide the following set of
+        methods:
+            UpdatePipeline(time)
+            Finalize()
+
+        It will be the responsability of the exporter to skip timestep inside
+        the UpdatePipeline(time) method when the given time does not match the
+        targetted frequency.
+
+        The coprocessing engine will automatically call UpdatePipeline(time)
+        for each timestep on each registered exporter.
+        Once the simulation is done, the Finalize() method will then be called
+        to all exporter.
+        """
+        self.__ExporterList.append(exporter)
+
     def RegisterWriter(self, writer, filename, freq):
         """Registers a writer proxy. This method is generally used in
            CreatePipeline() to register writers. All writes created as such will
@@ -293,6 +316,9 @@ class CoProcessor(object):
         for view in self.__ViewsList:
             if hasattr(view, 'Finalize'):
                 view.Finalize()
+        for exporter in self.__ExporterList:
+            if hasattr(view, 'Finalize'):
+                exporter.Finalize()
 
     def RescaleDataRange(self, view, time):
         """DataRange can change across time, sometime we want to rescale the
