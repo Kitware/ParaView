@@ -43,7 +43,6 @@ struct vtkCPProcessorInternals
   PipelineList Pipelines;
 };
 
-
 vtkStandardNewMacro(vtkCPProcessor);
 vtkMultiProcessController* vtkCPProcessor::Controller = NULL;
 //----------------------------------------------------------------------------
@@ -256,6 +255,16 @@ int vtkCPProcessor::Finalize()
     {
     this->Controller->SetGlobalController(NULL);
     this->Controller->Delete();
+    }
+
+  for(vtkCPProcessorInternals::PipelineListIterator it=
+        this->Internal->Pipelines.begin();
+      it!=this->Internal->Pipelines.end();it++)
+    {
+    if(!it->GetPointer()->Finalize())
+      {
+      vtkWarningMacro("Problems finalizing a Catalyst pipeline.");
+      }
     }
 
   this->RemoveAllPipelines();

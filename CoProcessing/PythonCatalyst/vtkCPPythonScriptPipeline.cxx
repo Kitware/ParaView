@@ -284,7 +284,8 @@ int vtkCPPythonScriptPipeline::Finalize()
 
   vtksys_ios::ostringstream pythonInput;
   pythonInput
-    << this->PythonScriptName << ".Finalize()\n";
+    << "if hasattr(" << this->PythonScriptName << ", 'Finalize'):\n"
+    << "  " << this->PythonScriptName << ".Finalize()\n";
 
   vtkPythonInterpreter::RunSimpleString(pythonInput.str().c_str());
 
