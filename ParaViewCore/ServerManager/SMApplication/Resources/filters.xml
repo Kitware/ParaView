@@ -116,6 +116,30 @@
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
       <!-- End ProbeLine -->
     </SourceProxy>
     <!-- End of internal_filters -->
@@ -7722,6 +7746,30 @@ found and the point will be rejected.</Documentation>
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Documentation>Set the tolerance to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
+
       <Hints>
         <Visibility replace_input="0" />
       </Hints>
@@ -7766,6 +7814,12 @@ found and the point will be rejected.</Documentation>
                   proxy_name="PlotOverLine1" />
         <Property exposed_name="PassPartialArrays"
                   name="PassPartialArrays"
+                  proxy_name="PlotOverLine1" />
+        <Property exposed_name="ComputeTolerance"
+                  name="ComputeTolerance"
+                  proxy_name="PlotOverLine1" />
+        <Property exposed_name="Tolerance"
+                  name="Tolerance"
                   proxy_name="PlotOverLine1" />
       </ExposedProperties>
       <OutputPort name="Output"
@@ -7856,6 +7910,29 @@ found and the point will be rejected.</Documentation>
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetComputeTolerance"
+                         default_values="1"
+                         name="ComputeTolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Set whether to compute the tolerance or to use a user provided
+        value. On by default.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="2.2204460492503131e-16"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain min="2.2204460492503131e-16"
+                           name="range" />
+        <Documentation>Set the tolernce to use for
+        vtkDataSet::FindCell</Documentation>
+      </DoubleVectorProperty>
 
       <Hints>
         <Visibility replace_input="0" />
