@@ -13,11 +13,6 @@
       "title": "Architecture",
       "description": "This guide goes through the design evolution while explaining why we made certain choices."
     },{
-      "name": "ipython",
-      "url": "guides/ipython",
-      "title": "ParaViewWeb inside iPython",
-      "description": "This documentation explain how to setup iPython/notebook along ParaViewWeb with distributed MPI engines and live visualization."
-    },{
       "name": "multi_user_setup",
       "url": "guides/multi_user_setup",
       "title": "Multi-User Setup",
@@ -78,6 +73,11 @@
         "title": "EC2 Graphics Setup",
         "description": "This document describes how to set up a graphics card on various kinds of g2.2xlarge instances."
       },{
+        "name": "os_mesa",
+        "url": "guides/os_mesa",
+        "title": "Offscreen OSMesa",
+        "description": "This document explains how to build ParaViewWeb with support for OSMesa."
+      },{
         "name": "virtualgl_turbovnc_howto",
         "url": "guides/virtualgl_turbovnc_howto",
         "title": "VirtualGL and TurboVNC",
@@ -92,21 +92,26 @@
         "url": "guides/ubuntu_14_04",
         "title": "Ubuntu 14.04 LTS",
         "description": "This document explains how to setup a ParaViewWeb server on Ubuntu 14.04 LTS Desktop."
-      },{
-        "name": "paraviewweb_on_aws_ec2",
-        "url": "guides/paraviewweb_on_aws_ec2",
-        "title": "Amazon EC2 AMI Instance",
-        "description": "This document explains how to set up an Amazon EC2 AMI instance with Apache, Jetty and ParaViewWeb using Apache 2.4+."
-      },{
-        "name": "apache_setup",
-        "url": "guides/apache_setup",
-        "title": "Using Apache < 2.4 (Deprecated)",
-        "description": "This document explains how to use Apache as the front-end for ParaViewWeb."
+      }
+    ]
+  },{
+    "title": "Sample Applications",
+    "items": [
+      {
+        "name": "app_gallery",
+        "url": "guides/app_gallery",
+        "title": "Gallery",
+        "description": "This guide illustrates some of the applications which have been built with ParaViewWeb."
       },{
         "name": "parallel_app",
         "url": "guides/parallel_app",
         "title": "Parallel Visualization",
         "description": "This document explains how to set up the Parallel Web application in order to load data on a visualization cluster."
+      },{
+        "name": "ipython",
+        "url": "guides/ipython",
+        "title": "ParaViewWeb inside iPython",
+        "description": "This documentation explain how to setup iPython/notebook along ParaViewWeb with distributed MPI engines and live visualization."
       }
     ]
   },{
@@ -122,11 +127,6 @@
         "url": "guides/configure_and_build_pvweb",
         "title": "Configure and build Paraview",
         "description": "This document explains how to configure and build ParaView from source."
-      },{
-        "name": "os_mesa",
-        "url": "guides/os_mesa",
-        "title": "Offscreen OSMesa ParaviewWeb",
-        "description": "This document explains how to build an headless server with ParaViewWeb and OSMesa."
       }
     ]
   },{
