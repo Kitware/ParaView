@@ -87,8 +87,8 @@ add_pvweb_tests("pvweb"
   APP          TestApp
   COMMAND      $<TARGET_FILE:pvpython>
   SERVER       ${pv_pymodule_build_dir}/paraview/web/pv_web_test_app.py
-  BROWSER      chrome
-               firefox
+  BROWSER      firefox
+               chrome
                internet_explorer
                safari
   TEST_SCRIPTS ${TESTAPP_WEB_TESTS_WITH_CHROME}
