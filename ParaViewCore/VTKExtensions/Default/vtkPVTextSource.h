@@ -44,6 +44,9 @@ protected:
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
+  virtual int RequestInformation(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector);
   char* Text;
 private:
   vtkPVTextSource(const vtkPVTextSource&); // Not implemented
