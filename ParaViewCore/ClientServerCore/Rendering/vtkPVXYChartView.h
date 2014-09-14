@@ -150,6 +150,22 @@ public:
   void SetLegendLocation(int location);
 
   // Description:
+  // Set the legend font family.
+  void SetLegendFontFamily(const char* family);
+
+  // Description:
+  // Set the legend font size.
+  void SetLegendFontSize(int pointSize);
+
+  // Description:
+  // Set the legend font bold.
+  void SetLegendBold(bool bold);
+
+  // Description:
+  // Set the legend font italic.
+  void SetLegendItalic(bool italic);
+
+  // Description:
   // Sets whether or not the grid for the given axis is visible.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
@@ -205,7 +221,7 @@ public:
   GENERATE_AXIS_FUNCTIONS(AxisLabelBold,bool);
 
   // Description:
-  // Set the axis label font bold for the given axis.
+  // Set the axis label font italic for the given axis.
   void SetAxisLabelItalic(int index, bool italic);
   GENERATE_AXIS_FUNCTIONS(AxisLabelItalic,bool);
 
@@ -300,7 +316,7 @@ public:
   GENERATE_AXIS_FUNCTIONS(AxisTitleBold,bool);
 
   // Description:
-  // Set the chart axis title's font bold for the given index.
+  // Set the chart axis title's font italic for the given index.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
