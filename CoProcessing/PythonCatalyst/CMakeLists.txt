@@ -38,10 +38,6 @@ set_source_files_properties(
   vtkCPPythonAdaptorAPI
   ABSTRACT)
 
-configure_file(vtkCPPythonScriptPipelineConfig.h.in
-               vtkCPPythonScriptPipelineConfig.h @ONLY)
-
-
 set (${vtk-module}_HDRS CPythonAdaptorAPI.h)
 
 set (CATALYST_FORTRAN_USING_MANGLING)

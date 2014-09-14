@@ -50,6 +50,9 @@ set_source_files_properties(
 
 set (${vtk-module}_HDRS CAdaptorAPI.h)
 
+configure_file(vtkCPConfig.h.in
+               vtkCPConfig.h @ONLY)
+
 set (CATALYST_FORTRAN_USING_MANGLING)
 
 if (CMAKE_Fortran_COMPILER_WORKS)

@@ -26,9 +26,6 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-// for PARAVIEW_INSTALL_DIR and PARAVIEW_BINARY_DIR variables
-#include "vtkCPPythonScriptPipelineConfig.h"
-
 #include <string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
@@ -43,35 +40,11 @@ namespace
   void InitializePython()
   {
     static bool initialized = false;
-    if (initialized) { return; }
+    if (initialized)
+      {
+      return;
+      }
     initialized = true;
-
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_INSTALL_DIR "/lib");
-    vtkPythonInterpreter::PrependPythonPath(
-      PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION);
-    vtkPythonInterpreter::PrependPythonPath(
-      PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
-
-#if defined(_WIN32)
-# if defined(CMAKE_INTDIR)
-    std::string bin_dir = PARAVIEW_BINARY_DIR "/bin/" CMAKE_INTDIR;
-# else
-    std::string bin_dir = PARAVIEW_BINARY_DIR "/bin";
-# endif
-    // Also update PATH to include the bin_dir so when the DLLs for the Python
-    // modules are searched, they can located.
-    std::string cpathEnv = vtksys::SystemTools::GetEnv("PATH");
-    cpathEnv = "PATH=" + bin_dir + ";" + cpathEnv;
-    vtksys::SystemTools::PutEnv(cpathEnv.c_str());
-
-    vtkPythonInterpreter::PrependPythonPath(bin_dir.c_str());
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
-
-#else // UNIX/OsX
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib");
-    vtkPythonInterpreter::PrependPythonPath(PARAVIEW_BINARY_DIR "/lib/site-packages");
-#endif
 
     // register callback to initialize modules statically. The callback is
     // empty when BUILD_SHARED_LIBS is ON.
