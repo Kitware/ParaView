@@ -112,6 +112,20 @@
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="ResetRangeToVisibleData">
+         <property name="toolTip">
+          <string>Rescale to visible range</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../Components/Resources/pqComponents.qrc">
+           <normaloff>:/pqWidgets/Icons/pqResetRange24.png</normaloff>:/pqWidgets/Icons/pqResetRange24.png</iconset>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="InvertTransferFunctions">
          <property name="toolTip">
           <string>Invert the transfer functions</string>

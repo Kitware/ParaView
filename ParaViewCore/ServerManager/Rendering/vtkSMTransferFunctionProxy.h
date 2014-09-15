@@ -26,6 +26,8 @@
 #include "vtkPVServerManagerRenderingModule.h" // needed for export macro
 
 class vtkPVArrayInformation;
+class vtkSMPVRepresentationProxy;
+class vtkSMRenderViewProxy;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionProxy : public vtkSMProxy
 {
@@ -66,6 +68,10 @@ public:
       vtkSMTransferFunctionProxy::SafeDownCast(proxy);
     return self? self->RescaleTransferFunctionToDataRange(extend) : false;
     }
+
+  static bool RescaleTransferFunctionToVisibleRange(
+    vtkSMPVRepresentationProxy* repProxy,
+    vtkSMRenderViewProxy* rvproxy);
 
   // Description:
   // Invert the transfer function. Returns true if successful.

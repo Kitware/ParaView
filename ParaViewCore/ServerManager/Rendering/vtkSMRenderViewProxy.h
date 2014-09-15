@@ -66,6 +66,10 @@ public:
     vtkCollection* selectionSources,
     bool multiple_selections=false);
 
+  bool ComputeVisibleScalarRange(int region[4],
+    int fieldAssociation, const char* scalarName,
+    int component, double range[]);
+
   // Description:
   // Convenience method to pick a location. Internally uses SelectSurfaceCells
   // to locate the picked object. In future, we can make this faster.

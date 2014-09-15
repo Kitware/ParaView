@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorTableModel.h"
 #include "pqDataRepresentation.h"
 #include "pqOpacityTableModel.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqRescaleRange.h"
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkVector.h"
@@ -208,6 +210,10 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   QObject::connect(
     ui.ResetRangeToDataOverTime, SIGNAL(clicked()),
     this, SLOT(resetRangeToDataOverTime()));
+
+  QObject::connect(
+    ui.ResetRangeToVisibleData, SIGNAL(clicked()),
+    this, SLOT(resetRangeToVisibleData()));
 
   QObject::connect(
     ui.InvertTransferFunctions, SIGNAL(clicked()),
@@ -597,6 +603,43 @@ void pqColorOpacityEditorWidget::resetRangeToDataOverTime()
     emit this->changeFinished();
     END_UNDO_SET();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::resetRangeToVisibleData()
+{
+  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
+    pqActiveObjects::instance().activeRepresentation());
+  if (!repr)
+    {
+    qCritical() << "No active representation.";
+    return;
+    }
+
+  vtkSMPVRepresentationProxy* repProxy =
+    vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+  if (!repProxy)
+    {
+    return ;
+    }
+
+  pqView* view = pqActiveObjects::instance().activeView();
+  if (!view)
+    {
+    qCritical() << "No active view.";
+    return;
+    }
+
+  vtkSMRenderViewProxy* rvproxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
+  if (!rvproxy)
+    {
+    return;
+    }
+
+  BEGIN_UNDO_SET("Reset transfer function ranges using visible data");
+  vtkSMTransferFunctionProxy::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
+  repr->renderViewEventually();
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

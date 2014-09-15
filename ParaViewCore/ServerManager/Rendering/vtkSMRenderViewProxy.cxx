@@ -48,6 +48,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManager.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
@@ -231,7 +232,7 @@ void vtkSMRenderViewProxy::UpdateLOD()
     this->GetSession()->PrepareProgress();
     this->ExecuteStream(stream);
     this->GetSession()->CleanupPendingProgress();
-   
+
     this->NeedsUpdateLOD = false;
     }
 }
@@ -427,7 +428,7 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     // rendering.
     remote_rendering_available = false;
     }
- 
+
   if (remote_rendering_available)
     {
     // Update whether render servers can open display i.e. remote rendering is
@@ -943,6 +944,94 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
     return (selectionSources->GetNumberOfItems() > 0);
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(int region[4],
+  int fieldAssociation,
+  const char* scalarName,
+  int component,
+  double range[])
+{
+  bool multiple_selections = true;
+
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = VTK_DOUBLE_MIN;
+
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
+
+  if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    this->SelectSurfacePoints(region,
+                              selectedRepresentations.Get(),
+                              selectionSources.Get(),
+                              multiple_selections);
+    }
+  else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+    {
+    this->SelectSurfaceCells(region,
+                             selectedRepresentations.Get(),
+                             selectionSources.Get(),
+                             multiple_selections);
+    }
+  else
+    {
+    return false;
+    }
+
+  vtkWarningMacro( << "Number of sources = " << selectionSources->GetNumberOfItems());
+  vtkWarningMacro( << "Number of repr = " << selectedRepresentations->GetNumberOfItems());
+
+  assert(selectedRepresentations->GetNumberOfItems() == selectionSources->GetNumberOfItems());
+
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  vtkSmartPointer<vtkSMProxy> rangeExtractor;
+  rangeExtractor.TakeReference(pxm->NewProxy("filters", "ExtractSelectionRange"));
+  for (int cc=0, max = selectionSources->GetNumberOfItems(); cc < max; cc++)
+    {
+    vtkGenericWarningMacro( << "Representation num " << cc);
+
+    vtkSMProxy* selectedRepresentation = vtkSMProxy::SafeDownCast(
+      selectedRepresentations->GetItemAsObject(cc));
+    vtkSMProxy* selectionSource = vtkSMProxy::SafeDownCast(
+      selectionSources->GetItemAsObject(cc));
+
+    vtkSMPropertyHelper(rangeExtractor, "Input").Set(
+      vtkSMPropertyHelper(selectedRepresentation, "Input").GetAsProxy(),
+      vtkSMPropertyHelper(selectedRepresentation, "Input").GetOutputPort());
+    vtkSMPropertyHelper(rangeExtractor, "Selection").Set(selectionSource);
+    vtkSMPropertyHelper(rangeExtractor, "ArrayName").Set(scalarName);
+    vtkSMPropertyHelper(rangeExtractor, "Component").Set(component);
+    vtkSMPropertyHelper(rangeExtractor, "FieldType").Set(fieldAssociation);
+    rangeExtractor->UpdateVTKObjects();
+
+    vtkSMSourceProxy::SafeDownCast(rangeExtractor)->UpdatePipeline();
+    vtkSMSourceProxy::SafeDownCast(rangeExtractor)->UpdatePropertyInformation();
+
+    vtkSMProperty* rangeProp = rangeExtractor->GetProperty("Range");
+    vtkSMDoubleVectorProperty* rangeDoubleProp =
+      vtkSMDoubleVectorProperty::SafeDownCast(rangeProp);
+    if (!rangeDoubleProp)
+      {
+      continue;
+      }
+
+    double tempRange[2];
+    tempRange[0] = rangeDoubleProp->GetElement(0);
+    tempRange[1] = rangeDoubleProp->GetElement(1);
+
+    if (tempRange[0] < range[0])
+      {
+      range[0] = tempRange[0];
+      }
+    if (tempRange[1] > range[1])
+      {
+      range[1] = tempRange[1];
+      }
+    }
+
+  return (range[1] >= range[0]);
 }
 
 //----------------------------------------------------------------------------

@@ -204,6 +204,8 @@ set (Module_SRCS
   pqRepresentationToolbar.h
   pqRescaleCustomScalarRangeReaction.cxx
   pqRescaleCustomScalarRangeReaction.h
+  pqRescaleVisibleScalarRangeReaction.cxx
+  pqRescaleVisibleScalarRangeReaction.h
   pqResetScalarRangeReaction.cxx
   pqResetScalarRangeReaction.h
   pqSaveAnimationGeometryReaction.cxx
@@ -348,6 +350,7 @@ set (Module_MOC_HDRS
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.h
   pqRescaleCustomScalarRangeReaction.h
+  pqRescaleVisibleScalarRangeReaction.h
   pqResetScalarRangeReaction.h
   pqSaveAnimationGeometryReaction.h
   pqSaveAnimationReaction.h
