@@ -31,6 +31,14 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetDetailLevelToLoad"
+                            default_values="8.5e-5"
+                            name="DetailLevel"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           max="5e-4"
+                           range="range" />
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetStreamingRequestSize"
                          default_values="1"
                          name="StreamingRequestSize"
@@ -110,6 +118,7 @@
         <ExposedProperties>
           <Property name="UseOutline" />
           <Property name="UseBlockDetailInformation" />
+          <Property name="DetailLevel" />
           <Property name="StreamingRequestSize" />
         </ExposedProperties>
       </SubProxy>
@@ -136,6 +145,7 @@
         <ExposedProperties>
           <Property name="UseOutline" />
           <Property name="UseBlockDetailInformation" />
+          <Property name="DetailLevel" />
           <Property name="StreamingRequestSize" />
         </ExposedProperties>
       </SubProxy>

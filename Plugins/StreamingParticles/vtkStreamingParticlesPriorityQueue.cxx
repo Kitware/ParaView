@@ -14,12 +14,12 @@
 =========================================================================*/
 #include "vtkStreamingParticlesPriorityQueue.h"
 
+#include "vtkCompositeDataPipeline.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkInformation.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPGenericIOMultiBlockReader.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStreamingPriorityQueue.h"
 
@@ -96,6 +96,7 @@ vtkStreamingParticlesPriorityQueue::vtkStreamingParticlesPriorityQueue()
   this->Internals = new vtkInternals();
   this->Controller = 0;
   this->UseBlockDetailInformation = false;
+  this->DetailLevelToLoad = 8.5e-5;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -183,10 +184,10 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
       vtkInformation* blockInfo = mb->GetMetaData(cc);
       blockInfo->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(), bounds);
       item.Bounds.SetBounds(bounds);
-      if (blockInfo->Has(vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL()))
+      if (blockInfo->Has(vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL()))
         {
         item.AmountOfDetail = mb->GetMetaData(cc)->Get(
-              vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL());
+              vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL());
         }
 
       queue.push(item);
@@ -209,7 +210,7 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
     double size = (lengths[0] + lengths[1] + lengths[2])/3.0;
     bool detailMethodNeedsBlock = (this->UseBlockDetailInformation && item.AmountOfDetail > 0) &&
         (item.Refinement <= 0 || (item.Distance < 0 && item.ScreenCoverage > 0.1) ||
-        (std::atan(size*size/(2*item.AmountOfDetail*item.Distance)) > 8.5e-5));
+        (std::atan(size*size/(2*item.AmountOfDetail*item.Distance)) > this->DetailLevelToLoad));
     bool genericMethodNeedsBlock = !(this->UseBlockDetailInformation && item.AmountOfDetail > 0) &&
         (item.Refinement <= 1 || item.ScreenCoverage >= 0.75);
 

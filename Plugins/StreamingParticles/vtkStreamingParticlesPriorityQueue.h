@@ -96,6 +96,16 @@ public:
   vtkBooleanMacro(UseBlockDetailInformation,bool)
   vtkSetMacro(UseBlockDetailInformation,bool)
 
+  // Description:
+  // When UseBlockDetailInformation is on, this variable controls the minimum level of
+  // detail a block can have and still be loaded.  More specifically, the value from
+  // vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL is used with the distance to
+  // the block to compute approximate distance between features in the dataset.  This
+  // computed distance is compared with this value.  Default: 8.5e-5 seems to work
+  // well with point clouds where the BLOCK_AMOUNT_OF_DETAIL is the number of points.
+  vtkGetMacro(DetailLevelToLoad,double)
+  vtkSetMacro(DetailLevelToLoad,double)
+
 //BTX
 protected:
   vtkStreamingParticlesPriorityQueue();
@@ -108,6 +118,7 @@ protected:
   vtkMultiProcessController* Controller;
 
   bool UseBlockDetailInformation;
+  double DetailLevelToLoad;
 
 private:
   vtkStreamingParticlesPriorityQueue(const vtkStreamingParticlesPriorityQueue&); // Not implemented

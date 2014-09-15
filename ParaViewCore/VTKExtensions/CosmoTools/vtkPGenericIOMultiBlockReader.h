@@ -112,8 +112,6 @@ public:
   // Description:
   // Sets the status of the array corresponding to the given name.
   void SetPointArrayStatus(const char* name, int status);
-
-  static vtkInformationDoubleKey* BLOCK_AMOUNT_OF_DETAIL();
 protected:
   vtkPGenericIOMultiBlockReader();
   ~vtkPGenericIOMultiBlockReader();

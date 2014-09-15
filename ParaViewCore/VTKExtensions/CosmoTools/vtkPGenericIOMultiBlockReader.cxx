@@ -44,8 +44,6 @@
 #include <vector>
 
 
-vtkInformationKeyMacro(vtkPGenericIOMultiBlockReader,BLOCK_AMOUNT_OF_DETAIL,Double)
-
 // Uncomment the line below to get debugging information
 //#define DEBUG
 
@@ -64,6 +62,7 @@ class vtkPGenericIOMultiBlockReader::vtkGenericIOMultiBlockMetaData
 {
 public:
   int NumberOfBlocks; // Total number of blocks across all ranks
+  int TotalNumberOfElements; // Total number of points across all blocks
   std::map < std::string, gio::VariableInfo > VariableInformation;
   std::map < std::string, int > VariableGenericIOType;
   std::map < int, vtkPGenericIOMultiBlockReader::block_t > Blocks;
@@ -405,6 +404,7 @@ void vtkPGenericIOMultiBlockReader::LoadMetaData()
     std::cout.flush();
 #endif
   this->Reader->OpenAndReadHeader();
+  this->MetaData->TotalNumberOfElements = this->Reader->GetNumberOfElements();
 
   // load variable information
   for (int i = 0; i < this->Reader->GetNumberOfVariablesInFile(); ++i)
@@ -768,10 +768,12 @@ int vtkPGenericIOMultiBlockReader::RequestInformation(
         this->MetaData->Blocks[i].bounds,6
       );
       blockInfo->Set(
-        vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL(),
+        vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL(),
             this->MetaData->Blocks[i].NumberOfElements);
       }
     }
+  outline->GetInformation()->Set(vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL(),
+                                 this->MetaData->TotalNumberOfElements);
   outputVector->GetInformationObject(0)->Set(
     vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(), outline);
   return 1;

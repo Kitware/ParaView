@@ -92,6 +92,21 @@ bool vtkStreamingParticlesRepresentation::GetUseBlockDetailInformation() const
 {
   return this->PriorityQueue->GetUseBlockDetailInformation();
 }
+//----------------------------------------------------------------------------
+void vtkStreamingParticlesRepresentation::SetDetailLevelToLoad(double level)
+{
+  if (level != this->PriorityQueue->GetDetailLevelToLoad())
+    {
+    this->PriorityQueue->SetDetailLevelToLoad(level);
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+double vtkStreamingParticlesRepresentation::GetDetailLevelToLoad()
+{
+  return this->PriorityQueue->GetDetailLevelToLoad();
+}
 
 //----------------------------------------------------------------------------
 int vtkStreamingParticlesRepresentation::ProcessViewRequest(

@@ -92,6 +92,10 @@ public:
   bool GetUseBlockDetailInformation() const;
   vtkBooleanMacro(UseBlockDetailInformation,bool)
 
+  // Description:
+  void SetDetailLevelToLoad(double level);
+  double GetDetailLevelToLoad();
+
   //---------------------------------------------------------------------------
   // The following API is to simply provide the functionality similar to
   // vtkGeometryRepresentation.
