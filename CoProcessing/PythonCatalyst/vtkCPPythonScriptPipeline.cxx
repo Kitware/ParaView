@@ -129,10 +129,12 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   this->SetPythonScriptName(fileNameName.c_str());
 
   // only process 0 reads the actual script and then broadcasts it out
-  char* scriptText = NULL;;
+  char* scriptText = NULL;
+  // we need to add the script path to PYTHONPATH
+  char* scriptPath = NULL;
 
   int rank = controller->GetLocalProcessId();
-  int scriptSize = 0;
+  int scriptSizes[2] = {0, 0};
   if(rank == 0)
     {
     std::string line;
@@ -148,19 +150,31 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
       myfile.close();
       }
 
-    scriptSize = static_cast<int>(desiredString.size()+1);
-    scriptText = new char[scriptSize];
-    memcpy(scriptText, desiredString.c_str(), sizeof(char)*scriptSize);
+    if(fileNamePath.empty())
+      {
+      fileNamePath = ".";
+      }
+    scriptSizes[0] = static_cast<int>(fileNamePath.size()+1);
+    scriptPath = new char[scriptSizes[0]];
+    memcpy(scriptPath, fileNamePath.c_str(), sizeof(char)*scriptSizes[0]);
+
+    scriptSizes[1] = static_cast<int>(desiredString.size()+1);
+    scriptText = new char[scriptSizes[1]];
+    memcpy(scriptText, desiredString.c_str(), sizeof(char)*scriptSizes[1]);
     }
 
-  controller->Broadcast(&scriptSize, 1, 0);
+  controller->Broadcast(scriptSizes, 2, 0);
 
   if (rank != 0)
     {
-    scriptText = new char[scriptSize];
+    scriptPath = new char[scriptSizes[0]];
+    scriptText = new char[scriptSizes[1]];
     }
 
-  controller->Broadcast(scriptText, scriptSize, 0);
+  controller->Broadcast(scriptPath, scriptSizes[0], 0);
+  controller->Broadcast(scriptText, scriptSizes[1], 0);
+
+  vtkPythonInterpreter::PrependPythonPath(scriptPath);
 
   // The code below creates a module from the scriptText string.
   // This requires the manual creation of a module object like this:
@@ -194,6 +208,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   loadPythonModules << "del _code" << std::endl;
   loadPythonModules << "import " << fileNameName << std::endl;
 
+  delete[] scriptPath;
   delete[] scriptText;
 
   vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());

@@ -22,10 +22,6 @@ if(NOT EXISTS "${COPROCESSING_TEST_DRIVER}")
   message(FATAL_ERROR "'${COPROCESSING_TEST_DRIVER}' does not exist")
 endif()
 
-if(NOT EXISTS "${COPROCESSING_IMAGE_TESTER}")
-  message(FATAL_ERROR "'${COPROCESSING_IMAGE_TESTER}' does not exist")
-endif()
-
 if (USE_MPI)
   message("Executing :
       ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_NUMPROCS} ${MPIEXEC_PREFLAGS}
@@ -48,25 +44,27 @@ if(NOT rv EQUAL 0)
   message(FATAL_ERROR "Test executable return value was ${rv}")
 endif()
 
-if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CPGrid0.png")
-  message(FATAL_ERROR "'${COPROCESSING_TEST_DIR}/CPGrid0.png' was not created")
-endif()
+if(EXISTS "${COPROCESSING_IMAGE_TESTER}")
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CPGrid0.png")
+    message(FATAL_ERROR "'${COPROCESSING_TEST_DIR}/CPGrid0.png' was not created")
+  endif()
 
-if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CPPressure0.png")
-  message(FATAL_ERROR "'${COPROCESSING_TEST_DIR}/CPPressure0.png' was not created")
-endif()
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CPPressure0.png")
+    message(FATAL_ERROR "'${COPROCESSING_TEST_DIR}/CPPressure0.png' was not created")
+  endif()
 
-execute_process(COMMAND "${COPROCESSING_IMAGE_TESTER}"
+  execute_process(COMMAND "${COPROCESSING_IMAGE_TESTER}"
     "${COPROCESSING_TEST_DIR}/CPGrid0.png" 20 -V "${COPROCESSING_DATA_DIR}/CPGrid0.png" -T "${COPROCESSING_TEST_DIR}"
     RESULT_VARIABLE failed)
-if(failed)
-  message(FATAL_ERROR "CPGrid0 image compare failed.")
-endif()
+  if(failed)
+    message(FATAL_ERROR "CPGrid0 image compare failed.")
+  endif()
 
-execute_process(COMMAND "${COPROCESSING_IMAGE_TESTER}"
+  execute_process(COMMAND "${COPROCESSING_IMAGE_TESTER}"
     "${COPROCESSING_TEST_DIR}/CPPressure0.png" 20 -V "${COPROCESSING_DATA_DIR}/CPPressure0.png" -T "${COPROCESSING_TEST_DIR}"
     RESULT_VARIABLE failed)
 
-if(failed)
-  message(FATAL_ERROR "CPPressure0 image compare failed.")
+  if(failed)
+    message(FATAL_ERROR "CPPressure0 image compare failed.")
+  endif()
 endif()

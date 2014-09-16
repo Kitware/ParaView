@@ -31,14 +31,12 @@ def CreateCoProcessor():
       programmableFilter1.PythonPath = ''
 
       # create a new 'Parallel UnstructuredGrid Writer'
-      parallelUnstructuredGridWriter1 = servermanager.writers.XMLPUnstructuredGridWriter(Input=programmableFilter1)
-      #parallelUnstructuredGridWriter1.FileName = 'cppf_%t.pvtu'
-      #parallelUnstructuredGridWriter1.WriteFrequency = 10
+      #parallelUnstructuredGridWriter1 = servermanager.writers.XMLPUnstructuredGridWriter(Input=programmableFilter1)
 
       # register the writer with coprocessor
       # and provide it with information such as the filename to use,
       # how frequently to write the data, etc.
-      coprocessor.RegisterWriter(parallelUnstructuredGridWriter1, filename='cppf_%t.pvtu', freq=10)
+      #coprocessor.RegisterWriter(parallelUnstructuredGridWriter1, filename='cppf_%t.pvtu', freq=10)
 
     return Pipeline()
 
