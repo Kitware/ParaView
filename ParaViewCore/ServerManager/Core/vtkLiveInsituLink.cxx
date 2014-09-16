@@ -45,8 +45,8 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-//#define vtkLiveInsituLinkDebugMacro(x) cerr << __LINE__ << " " x << endl;
-#define vtkLiveInsituLinkDebugMacro(x)
+#define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
+//#define vtkLiveInsituLinkDebugMacro(x)
 
 namespace
 {
@@ -780,7 +780,7 @@ void vtkLiveInsituLink::InsituUpdate(double time, vtkIdType timeStep)
       this->Controller->Receive(&buffer_size, 1, 1, 8010);
       if (buffer_size > 0)
         {
-        vtkLiveInsituLinkDebugMacro("receiving modified state from Vis");
+        vtkLiveInsituLinkDebugMacro(<< "receiving modified state from Vis");
         buffer = new char[buffer_size + 1];
         this->Controller->Receive(buffer, buffer_size, 1, 8011);
         buffer[buffer_size] = 0;
@@ -999,8 +999,7 @@ void vtkLiveInsituLink::OnInsituUpdate(double time, vtkIdType timeStep)
   // this method get called on:
   // - root node when "sim" notifies the root viz node.
   // - satellizes when "root" viz node notifies the satellizes.
-  vtkLiveInsituLinkDebugMacro(
-    "vtkLiveInsituLink::OnInsituUpdate: " << time);
+  vtkLiveInsituLinkDebugMacro(<< "vtkLiveInsituLink::OnInsituUpdate: " << time);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
@@ -1028,7 +1027,7 @@ void vtkLiveInsituLink::OnInsituUpdate(double time, vtkIdType timeStep)
     this->Controller->Send(&xml_state_size, 1, 1, 8010);
     if (xml_state_size > 0)
       {
-      vtkLiveInsituLinkDebugMacro("Sending modified state to simulation.");
+      vtkLiveInsituLinkDebugMacro(<< "Sending modified state to simulation.");
       this->Controller->Send(this->InsituXMLState, xml_state_size, 1, 8011);
       }
 
@@ -1085,8 +1084,8 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time, vtkIdType timeStep)
                               time, timeStep);
     }
 
-  vtkLiveInsituLinkDebugMacro(
-    "vtkLiveInsituLink::OnInsituPostProcess: " << time);
+  vtkLiveInsituLinkDebugMacro(<<"vtkLiveInsituLink::OnInsituPostProcess: " 
+                              << time);
 
   // Obtains extracts from the simulations processes.
   bool dataAvailable = this->ExtractsDeliveryHelper->Update();
@@ -1140,7 +1139,7 @@ void vtkLiveInsituLink::RegisterExtract(vtkTrivialProducer* producer,
     return;
     }
 
-  vtkLiveInsituLinkDebugMacro(
+  vtkLiveInsituLinkDebugMacro(<<
     "Adding Extract: " << groupname << ", " << proxyname);
 
   vtkInternals::Key key(groupname, proxyname, portnumber);
