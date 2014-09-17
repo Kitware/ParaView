@@ -399,7 +399,7 @@ void vtkPVComparativeAnimationCue::UpdateYRange(
       changeXML->AddNestedElement(removeXML);
       removeXML->FastDelete();
 
-      this->Internals->CommandQueue.erase(iter);
+      iter = this->Internals->CommandQueue.erase(iter);
       }
     else
       {
