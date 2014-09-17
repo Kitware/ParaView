@@ -112,7 +112,7 @@ endif()
 
 # Catalyst-Live tests
 # ----------------------------------------------------------------------
-if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON AND NOT CMAKE_HOST_WIN32)
+if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   set (catalyst_live_tests
     ${CMAKE_CURRENT_SOURCE_DIR}/CatalystLiveSetBreakpoint.xml)
   set (CATALYST_SIMULATION CatalystWaveletDriver.py)

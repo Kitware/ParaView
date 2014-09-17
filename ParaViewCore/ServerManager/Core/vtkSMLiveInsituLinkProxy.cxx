@@ -33,8 +33,8 @@
 #include "vtkSMStateLoader.h"
 #include <vtksys/ios/sstream>
 
-//#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr << __LINE__ << " " x << endl;
-#define vtkSMLiveInsituLinkProxyDebugMacro(x)
+#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr x << endl;
+//#define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
 class vtkSMLiveInsituLinkProxy::vtkInternals
 {
@@ -97,15 +97,18 @@ void vtkSMLiveInsituLinkProxy::LoadState(
       if (user_data.key() == "LiveAction")
         {
         const Variant& value = user_data.variant(0);
-        vtkSMLiveInsituLinkProxyDebugMacro(<< "Received message");
         switch (value.integer(0))
           {
         case vtkLiveInsituLink::CONNECTED:
           this->InsituConnected(value.txt(0).c_str());
+          vtkSMLiveInsituLinkProxyDebugMacro(<< "Catalyst connected");
           this->InvokeEvent(vtkCommand::ConnectionCreatedEvent);
           break;
 
         case vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE:
+          vtkSMLiveInsituLinkProxyDebugMacro(
+            << "vktLiveInsituLink::NEXT_TIMESTEP_AVAILABLE: "
+            << value.idtype(0));
           this->NextTimestepAvailable(value.idtype(0));
           break;
 
