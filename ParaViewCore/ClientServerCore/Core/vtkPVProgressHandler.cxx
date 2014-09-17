@@ -382,7 +382,7 @@ void vtkPVProgressHandler::RefreshMessage(const char* message)
   if (client_controller != NULL && message != NULL)
     {
     // only true of server-nodes.
-    client_controller->Send(message, strlen(message), 1,
+    client_controller->Send(message, strlen(message)+1, 1,
       vtkPVProgressHandler::MESSAGE_EVENT_TAG);
     }
 
