@@ -67,6 +67,12 @@ public:
   bool valueMatch()
     {
     vtkSMUncheckedPropertyHelper helper(this->Property);
+    if (helper.GetNumberOfElements() == 0)
+      {
+      // if there is no proxy, 'its value' does not match this->Value.
+      bool status = false;
+      return this->Inverse ? ! status : status;
+      }
     if (helper.GetNumberOfElements() != 1)
       {
       qCritical() << "pqGenericPropertyWidgetDecorator may not work as expected.";
