@@ -4,19 +4,6 @@ include_directories(
 set(CP_LABELS PARAVIEW CATALYST)
 
 #------------------------------------------------------------------------------
-if (PARAVIEW_USE_MPI)
-  vtk_module_test_executable(CoProcessingProgrammableFilter
-    TestCPProgrammableFilter.cxx)
-
-  add_test(NAME CoProcessingProgrammableFilter
-    COMMAND CoProcessingProgrammableFilter
-    ${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py)
-  set_tests_properties(CoProcessingProgrammableFilter PROPERTIES 
-    LABELS "${CP_LABELS}"
-    FAIL_REGULAR_EXPRESSION "SyntaxError")
-endif()
-
-#------------------------------------------------------------------------------
 vtk_module_test_executable(CoProcessingPythonScriptExample
   PythonScriptCoProcessingExample.cxx
   vtkPVCustomTestDriver.cxx)
@@ -35,9 +22,73 @@ add_test(NAME CoProcessingTestInput
   )
 set_tests_properties(CoProcessingTestInput PROPERTIES LABELS "${CP_LABELS}")
 
+
+
 # the CoProcessingTestPythonScript needs to be run with ${MPIEXEC} if
 # CoProcessingPythonScriptExample was built with MPI because certain
 # machines only allow running MPI programs with the proper ${MPIEXEC}
+
+# just test if a given Catalyst Python script can import another script
+if (NOT PARAVIEW_USE_MPI)
+  add_test(NAME CoProcessingImport
+    COMMAND ${CMAKE_COMMAND}
+    -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+    -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+    -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/cpimport.py
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+else()
+  add_test(NAME CoProcessingImport
+    COMMAND ${CMAKE_COMMAND}
+    -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+    -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+    -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/cpimport.py
+    -DUSE_MPI:BOOL=TRUE
+    -DMPIEXEC:FILEPATH=${MPIEXEC}
+    -DMPIEXEC_NUMPROC_FLAG:STRING=${MPIEXEC_NUMPROC_FLAG}
+    -DMPIEXEC_NUMPROCS=2
+    -DMPIEXEC_PREFLAGS:STRING=${MPIEXEC_PREFLAGS}
+    -DVTK_MPI_POSTFLAGS:STRING=${VTK_MPI_POSTFLAGS}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+endif()
+
+set_tests_properties(CoProcessingImport PROPERTIES LABELS "${CP_LABELS}")
+
+# test if we can use a Python programmable filter in a Catalyst Python script
+if (NOT PARAVIEW_USE_MPI)
+  add_test(NAME CoProcessingProgrammableFilter
+    COMMAND ${CMAKE_COMMAND}
+    -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+    -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+    -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+else()
+  add_test(NAME CoProcessingProgrammableFilter
+    COMMAND ${CMAKE_COMMAND}
+    -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+    -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_OUTPUT_DIR}
+    -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py
+    -DUSE_MPI:BOOL=TRUE
+    -DMPIEXEC:FILEPATH=${MPIEXEC}
+    -DMPIEXEC_NUMPROC_FLAG:STRING=${MPIEXEC_NUMPROC_FLAG}
+    -DMPIEXEC_NUMPROCS=2
+    -DMPIEXEC_PREFLAGS:STRING=${MPIEXEC_PREFLAGS}
+    -DVTK_MPI_POSTFLAGS:STRING=${VTK_MPI_POSTFLAGS}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+endif()
+
+set_tests_properties(CoProcessingProgrammableFilter PROPERTIES LABELS "${CP_LABELS}")
+#-  add_test(NAME CoProcessingProgrammableFilter
+#-    COMMAND CoProcessingProgrammableFilter
+#-    ${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py)
+
+
+
+
+
+
+
+
+
 if (NOT PARAVIEW_USE_MPI)
   add_test(NAME CoProcessingTestPythonScript
     COMMAND ${CMAKE_COMMAND}
