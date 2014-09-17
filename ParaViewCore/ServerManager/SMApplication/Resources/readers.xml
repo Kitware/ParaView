@@ -5093,6 +5093,66 @@
       </Hints>
     </SourceProxy>
     <!-- NrrdReader -->
+    <SourceProxy label="DICOM Reader (Single File)"
+                 name="DICOMReaderSingle"
+                 class="vtkDICOMImageReader">
+      <Documentation long_help="Reads DICOM regular rectilinear grid data from a lone file."
+                     short_help="Reads DICOM file">
+        DICOM is a file format often used in medical imaging. This version
+        of the reader reads a single file (as opposed to a collection of
+        files). The DICOM reader currently only supports uncompressed
+        files.
+      </Documentation>
+      <Hints>
+        <ReaderFactory extensions="dcm"
+                       file_description="DICOM Files (single)" />
+      </Hints>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+          DICOM file to load. This version of the reader only supports
+          loading one file at a time.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+    <!-- End DICOMReaderSingle -->
+    <SourceProxy label="DICOM Reader (directory)"
+                 name="DICOMReader"
+                 class="vtkDICOMImageReader">
+      <Documentation long_help="Reads DICOM regular rectilinear grid data from a directory containing a file."
+                     short_help="Reads DICOM files.">
+        DICOM is a file format often used in medical imaging. This version
+        of the reader will look at all files in the same directory of the
+        selected file and load them as planes of the same data set. It is
+        typically for 3D medical scanners to store planes as set of files
+        in a directory.
+      </Documentation>
+      <Hints>
+        <ReaderFactory extensions="dcm"
+                       file_description="DICOM Files (directory)" />
+      </Hints>
+      <StringVectorProperty animateable="0"
+                            command="SetDirectoryName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>
+          A file in the directory of files to be loaded. The DICOM reader
+          will actually load all valid DICOM files in the same directory as
+          this file as part of the same dataset. This is typical of how
+          DICOM files are often stored.
+        </Documentation>
+        <Hints>
+          <UseDirectoryName />
+        </Hints>
+      </StringVectorProperty>
+    </SourceProxy>
+      <!-- End DICOMReaderDirectory -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="PNG Series Reader"
