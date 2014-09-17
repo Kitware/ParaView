@@ -166,7 +166,6 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
   vtkMultiProcessController::SetGlobalController(
     vtkProcessModule::GlobalController);
 
-#ifdef PARAVIEW_USE_X
   // Hack to support -display parameter.  vtkPVOptions requires parameters to be
   // specified as -option=value, but it is generally expected that X window
   // programs allow you to set the display as -display host:port (i.e. without
@@ -191,7 +190,6 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
       break;
       }
     }
-#endif // VTK_USE_X
 
 #ifdef _WIN32
   // Avoid Ghost windows on windows XP

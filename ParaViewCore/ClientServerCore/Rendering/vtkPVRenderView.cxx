@@ -196,6 +196,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->PreviousParallelProjectionStatus = 0;
   this->NeedsOrderedCompositing = false;
   this->RenderEmptyImages = false;
+  this->DistributedRenderingRequired = false;
+  this->NonDistributedRenderingRequired = false;
+  this->DistributedRenderingRequiredLOD = false;
+  this->NonDistributedRenderingRequiredLOD = false;
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -944,6 +948,10 @@ void vtkPVRenderView::Update()
   // information during update.
   this->GeometryBounds.Reset();
 
+  // reset flags that representations set in REQUEST_UPDATE() pass.
+  this->DistributedRenderingRequired = false;
+  this->NonDistributedRenderingRequired = false;
+
   this->Superclass::Update();
 
   // After every update we can expect the representation geometries to change.
@@ -981,7 +989,8 @@ void vtkPVRenderView::Update()
 
   // Update decisions about lod-rendering and remote-rendering.
   this->UseLODForInteractiveRender = this->ShouldUseLODRendering(local_size);
-  this->UseDistributedRenderingForStillRender = this->ShouldUseDistributedRendering(local_size);
+  this->UseDistributedRenderingForStillRender =
+    this->ShouldUseDistributedRendering(local_size, /*using_lod=*/false);
   if (!this->UseLODForInteractiveRender)
     {
     this->UseDistributedRenderingForInteractiveRender =
@@ -1036,6 +1045,10 @@ void vtkPVRenderView::UpdateLOD()
     this->RequestInformation->Set(USE_OUTLINE_FOR_LOD(), 1);
     }
 
+  // reset flags that representations set in REQUEST_UPDATE_LOD() pass.
+  this->DistributedRenderingRequiredLOD = false;
+  this->NonDistributedRenderingRequiredLOD = false;
+
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_UPDATE_LOD(),
     this->RequestInformation, this->ReplyInformationVector);
@@ -1045,7 +1058,7 @@ void vtkPVRenderView::UpdateLOD()
   // cout << "LOD Geometry size: " << local_size << endl;
 
   this->UseDistributedRenderingForInteractiveRender =
-    this->ShouldUseDistributedRendering(local_size);
+    this->ShouldUseDistributedRendering(local_size, /*using_lod=*/true);
 
   this->InteractiveRenderProcesses = vtkPVSession::CLIENT;
   bool in_tile_display_mode = this->InTileDisplayMode();
@@ -1464,9 +1477,74 @@ vtkDataObject* vtkPVRenderView::GetCurrentStreamedPiece(
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size)
+void vtkPVRenderView::SetRequiresDistributedRendering(
+  vtkInformation* info, vtkPVDataRepresentation* vtkNotUsed(repr), bool value, bool for_lod)
 {
-  if (this->GetRemoteRenderingAvailable() == false)
+  vtkPVRenderView* self = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  bool &nonDistributedRenderingRequired = for_lod?
+    self->NonDistributedRenderingRequiredLOD :
+    self->NonDistributedRenderingRequired;
+
+  bool &distributedRenderingRequired = for_lod?
+    self->DistributedRenderingRequiredLOD :
+    self->DistributedRenderingRequired;
+
+  if ( (nonDistributedRenderingRequired == true && value == true) ||
+       (distributedRenderingRequired == true && value == false) )
+    {
+    vtkGenericWarningMacro(
+      "Conflicting distributed rendering requests. "
+      "Rendering may not work as expected.");
+    return;
+    }
+
+  if (value)
+    {
+    distributedRenderingRequired = true;
+    }
+  else
+    {
+    nonDistributedRenderingRequired = true;
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::ShouldUseDistributedRendering(
+  double geometry_size, bool using_lod)
+{
+  // both can never be true.
+  assert ((this->DistributedRenderingRequired && this->NonDistributedRenderingRequired) == false);
+  assert ((this->DistributedRenderingRequiredLOD && this->NonDistributedRenderingRequiredLOD)  == false);
+
+  bool remote_rendering_available = this->GetRemoteRenderingAvailable();
+
+  // First check if any representations explicitly told us to use either remote
+  // or local render. In that case, we pick accordingly without taking
+  // remote-rendering thresholds into consideration (BUG #0013749).
+  const bool &distributedRenderingRequired = using_lod?
+    this->DistributedRenderingRequiredLOD :
+    this->DistributedRenderingRequired;
+  const bool &nonDistributedRenderingRequired = using_lod?
+    this->NonDistributedRenderingRequiredLOD :
+    this->NonDistributedRenderingRequired;
+  if (distributedRenderingRequired == true && remote_rendering_available == false)
+    {
+    vtkErrorMacro("Some of the representations in this view require remote rendering "
+      "which, however, is not available. Rendering may not work as expected.");
+    }
+  else if (distributedRenderingRequired || nonDistributedRenderingRequired)
+    {
+    // implies that at least a representation requested a specific mode.
+    return distributedRenderingRequired? true : false;
+    }
+
+  if (remote_rendering_available == false)
     {
     return false;
     }

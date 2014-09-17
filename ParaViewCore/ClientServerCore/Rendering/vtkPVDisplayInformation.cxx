@@ -20,7 +20,8 @@
 #include "vtkProcessModule.h"
 #include "vtkToolkits.h"
 
-#if defined(PARAVIEW_USE_X)
+#include "vtkRenderingOpenGLConfigure.h" // needed for VTK_USE_X
+#if defined(VTK_USE_X)
 # include <X11/Xlib.h>
 #endif
 
@@ -48,15 +49,7 @@ void vtkPVDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 {
-#if defined(PARAVIEW_USE_X)
-# if defined(VTK_OPENGL_HAS_OSMESA)
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetOptions()->GetUseOffscreenRendering())
-    {
-    return true;
-    }
-# endif
-
+#if defined(VTK_USE_X)
   Display* dId = XOpenDisplay((char *)NULL);
   if (dId)
     {
@@ -64,9 +57,9 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
     return true;
     }
   return false;
-#else
-  return true;
 #endif
+
+  return true;
 }
 
 //----------------------------------------------------------------------------
