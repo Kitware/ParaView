@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc">
-    <normaloff>:/pqWidgets/Icons/pqAppIcon64.png</normaloff>:/pqWidgets/Icons/pqAppIcon64.png</iconset>
+    <normaloff>:/pqWidgets/Icons/pvIcon512.png</normaloff>:/pqWidgets/Icons/pvIcon512.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">

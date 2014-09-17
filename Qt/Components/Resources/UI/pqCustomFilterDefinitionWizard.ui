@@ -66,7 +66,7 @@
          <string/>
         </property>
         <property name="pixmap" >
-         <pixmap resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqAppIcon64.png</pixmap>
+         <pixmap resource="../pqComponents.qrc" >:/pqWidgets/Icons/pvIcon64.png</pixmap>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
