@@ -109,6 +109,12 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 
     vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
       this, inInfo);
+
+    vtkPVRenderView::SetRequiresDistributedRendering(inInfo, this, true);
+    }
+  else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
+    {
+    vtkPVRenderView::SetRequiresDistributedRenderingLOD(inInfo, this, true);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {

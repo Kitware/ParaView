@@ -374,6 +374,21 @@ public:
     const int whole_extents[6], const double origin[3], const double spacing[3]);
 
   // Description:
+  // Some representation only work when remote rendering or local rendering. Use
+  // this method in REQUEST_UPDATE() pass to tell the view if the representation
+  // requires a particular mode. Note, only use this to "require" a remote or
+  // local render. \c value == true indicates that the representation requires
+  // distributed rendering, \c value == false indicates the representation can
+  // only render property on the client or root node.
+  static void SetRequiresDistributedRendering(
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool value, bool for_lod=false);
+  static void SetRequiresDistributedRenderingLOD(
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool value)
+    {
+    vtkPVRenderView::SetRequiresDistributedRendering(info, repr, value, true);
+    }
+
+  // Description:
   // Representations that support hardware (render-buffer based) selection,
   // should register the prop that they use for selection rendering. They can do
   // that in the vtkPVDataRepresentation::AddToView() implementation.
@@ -575,8 +590,10 @@ protected:
 
   // Description:
   // Returns true if distributed rendering should be used based on the geometry
-  // size.
-  bool ShouldUseDistributedRendering(double geometry_size);
+  // size. \c using_lod will be true if this method is called to determine
+  // distributed rendering status for renders using lower LOD i.e when called in
+  // UpdateLOD().
+  bool ShouldUseDistributedRendering(double geometry_size, bool using_lod);
 
   // Description:
   // Returns true if LOD rendering should be used based on the geometry size.
@@ -707,6 +724,12 @@ private:
   // This flag is set to false when not all processes cannot render e.g. cannot
   // open the DISPLAY etc.
   bool RemoteRenderingAvailable;
+
+  // Flags used to maintain rendering modes requested by representations.
+  bool DistributedRenderingRequired;
+  bool NonDistributedRenderingRequired;
+  bool DistributedRenderingRequiredLOD;
+  bool NonDistributedRenderingRequiredLOD;
 
   int PreviousParallelProjectionStatus;
 
