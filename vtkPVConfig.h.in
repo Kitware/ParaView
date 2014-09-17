@@ -87,9 +87,6 @@
 # define PARAVIEW_BUILD_SHARED_LIBS
 #endif
 
-// The ParaView version of VTK_USE_X
-#cmakedefine PARAVIEW_USE_X
-
 // The default prevision value for conversion for string to double
 // and double to string
 #define DEFAULT_DOUBLE_PRECISION_VALUE 16
