@@ -98,7 +98,7 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
   if (!this->PVApp->getOptions()->GetDisableRegistry())
     {
     show_splash = settings->value(
-      "GeneralSettings.ShowSplashScreen", false).toBool();
+      "GeneralSettings.ShowSplashScreen", true).toBool();
     }
 
   if(show_splash)

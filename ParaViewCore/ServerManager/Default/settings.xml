@@ -10,7 +10,7 @@
 
       <IntVectorProperty name="ShowSplashScreen"
         number_of_elements="1"
-        default_values="0"
+        default_values="1"
         panel_visibility="advanced">
         <Documentation>
           Show splash screen at startup.
