@@ -239,6 +239,7 @@ void pqContextView::resetDisplay()
   if (proxy)
     {
     proxy->ResetDisplay();
+    this->render();
     }
 }
 
