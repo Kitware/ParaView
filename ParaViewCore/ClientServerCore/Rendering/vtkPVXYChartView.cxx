@@ -511,7 +511,6 @@ void vtkPVXYChartView::SetAxisRangeMinimum(int index, double min)
       if (axis->GetUnscaledMinimum() != min)
         {
         axis->SetUnscaledMinimum(min);
-        this->Chart->RecalculateBounds();
         }
       }
     }
@@ -533,7 +532,6 @@ void vtkPVXYChartView::SetAxisRangeMaximum(int index, double max)
       if (axis->GetUnscaledMaximum() != max)
         {
         axis->SetUnscaledMaximum(max);
-        this->Chart->RecalculateBounds();
         }
       }
     }
@@ -551,7 +549,6 @@ void vtkPVXYChartView::SetAxisUseCustomRange(int index, bool useCustomRange)
       axis->SetBehavior(vtkAxis::FIXED);
       axis->SetUnscaledMinimum(this->Internals->AxisRanges[index][0]);
       axis->SetUnscaledMaximum(this->Internals->AxisRanges[index][1]);
-      this->Chart->RecalculateBounds();
       }
     else if (!useCustomRange && (axis->GetBehavior() != vtkAxis::AUTO))
       {
@@ -559,7 +556,6 @@ void vtkPVXYChartView::SetAxisUseCustomRange(int index, bool useCustomRange)
       // set to some value so we notice when this gets used.
       axis->SetMinimum(0.0);
       axis->SetMaximum(6.66);
-      this->Chart->RecalculateBounds();
       }
     }
 }
@@ -571,7 +567,6 @@ void vtkPVXYChartView::SetAxisLogScale(int index, bool logScale)
     {
     this->Chart->GetAxis(index)->SetLogScale(logScale);
     this->Chart->Update();
-    this->Chart->RecalculateBounds();
     }
 }
 
@@ -746,7 +741,6 @@ void vtkPVXYChartView::Render(bool interactive)
         }
       }
     }
-  // For now we only handle X-axis time. If needed we can add support for Y-axis.
 
   // handle custom labels. We specify custom labels in render since vtkAxis will
   // discard the custom labels when the mode was set to not use custom labels,
@@ -782,6 +776,7 @@ void vtkPVXYChartView::Render(bool interactive)
     chartAxis->Update();
     }
 
+  // For now we only handle X-axis time. If needed we can add support for Y-axis.
   this->Superclass::Render(interactive);
 }
 
@@ -795,12 +790,37 @@ void vtkPVXYChartView::SelectionChanged()
 void vtkPVXYChartView::Update()
 {
   this->Superclass::Update();
-  if (this->Chart)
+
+  // At this point, all representations must have updated which series are
+  // visible, etc. So we can now recalculate the axes bounds to pick a good
+  // value.
+  if (this->Chart == NULL)
     {
-    // Note this will recompute the bounds only for those axes that are not
-    // FIXED.
-    this->Chart->RecalculateBounds();
+    return;
     }
+
+  // This will recompute the bounds for each of the axes as appropriate.
+  // Note, this doesn't happen immediately. vtkChartXY recomputes the bounds
+  // on the subsequent "paint" or the next time vtkPVXYChartView::Render()
+  // is called.
+  this->Chart->RecalculateBounds();
+
+  // Things to remember:
+  // When any property on the chart representations change, including series
+  // visibility, color, etc., the view is marked "dirty" and hence this
+  // vtkPVXYChartView::Update(), would indeed get called before the next Render.
+  // Representations' RequestData may not get called, however since the
+  // representations use 'update-supression' mechanisms (unless the
+  // representations called MarkModified on itself).
+  // In short, if anything changes on representation: data or display properties,
+  // or anything changes on the view, this method will be called.
+  // We still cannot update the axes ranges here since vtkChartXY doesn't update
+  // axes range until paint.
+  // Also, when new data arrays show up in the representation's input,
+  // the ServerManager sets up default series visibilities, and that code
+  // excutes in "PostUpdate". Hence, we don't trigger
+  // vtkChartRepresentation::PrepareForRendering() here, instead wait for the
+  // subsequent render call.
 }
 
 //----------------------------------------------------------------------------
