@@ -166,7 +166,6 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   window->SwapBuffersOff();
 
   this->StillRender();
-  this->GetContextView()->Render();
 
   vtkSmartPointer<vtkWindowToImageFilter> w2i =
     vtkSmartPointer<vtkWindowToImageFilter>::New();
@@ -232,7 +231,14 @@ void vtkSMContextViewProxy::CopyAxisRangesFromChart()
         this->GetProperty("TopAxisRangeMinimum"),
         this->GetProperty("TopAxisRangeMaximum"));
       }
+    // HACK: This overcomes a issue where we mark the chart modified, in Render.
+    // We seems to be lacking a mechanism in vtkSMProxy to say "here's the
+    // new property value, however it's already set on the server side too,
+    // so no need to push it or mark pipelines dirty".
+    int prev = this->InMarkModified;
+    this->InMarkModified = 1;
     this->UpdateVTKObjects();
+    this->InMarkModified = prev;
     }
 }
 
@@ -254,6 +260,9 @@ void vtkSMContextViewProxy::OnInteractionEvent()
       }
     this->UpdateVTKObjects();
     this->InvokeEvent(vtkCommand::InteractionEvent);
+
+    // Note: OnInteractionEvent gets called before this->StillRender() gets called
+    // as a consequence of this interaction.
     }
 }
 
