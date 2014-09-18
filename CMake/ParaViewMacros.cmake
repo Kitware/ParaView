@@ -19,7 +19,7 @@ FUNCTION(GENERATE_QT_RESOURCE_FROM_FILES resource_file resource_prefix file_list
     FILE(TO_NATIVE_PATH "${resource}" resource)
     SET (pq_resource_file_contents
       "${pq_resource_file_contents}    <file alias=\"${alias}\">${resource}</file>\n")
-  ENDFOREACH (resource)
+  ENDFOREACH ()
   SET (pq_resource_file_contents
     "${pq_resource_file_contents}  </qresource>\n</RCC>\n")
 
@@ -28,7 +28,7 @@ FUNCTION(GENERATE_QT_RESOURCE_FROM_FILES resource_file resource_prefix file_list
   configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
                  "${resource_file}")
   unset (CMAKE_CONFIGURABLE_FILE_CONTENT)
-ENDFUNCTION(GENERATE_QT_RESOURCE_FROM_FILES)
+ENDFUNCTION()
 
 #----------------------------------------------------------------------------
 # PV_PARSE_ARGUMENTS is a macro useful for writing macros that take a key-word
@@ -38,10 +38,10 @@ MACRO(PV_PARSE_ARGUMENTS prefix arg_names option_names)
   SET(DEFAULT_ARGS)
   FOREACH(arg_name ${arg_names})    
     SET(${prefix}_${arg_name})
-  ENDFOREACH(arg_name)
+  ENDFOREACH()
   FOREACH(option ${option_names})
     SET(${prefix}_${option} FALSE)
-  ENDFOREACH(option)
+  ENDFOREACH()
 
   SET(current_arg_name DEFAULT_ARGS)
   SET(current_arg_list)
@@ -52,18 +52,18 @@ MACRO(PV_PARSE_ARGUMENTS prefix arg_names option_names)
       SET(${prefix}_${current_arg_name} ${current_arg_list})
       SET(current_arg_name ${arg})
       SET(current_arg_list)
-    ELSE (is_arg_name GREATER -1)
+    ELSE ()
       SET(loption_names ${option_names})    
       LIST(FIND loption_names "${arg}" is_option)            
       IF (is_option GREATER -1)
        SET(${prefix}_${arg} TRUE)
-      ELSE (is_option GREATER -1)
+      ELSE ()
        SET(current_arg_list ${current_arg_list} ${arg})
-      ENDIF (is_option GREATER -1)
-    ENDIF (is_arg_name GREATER -1)
-  ENDFOREACH(arg)
+      ENDIF ()
+    ENDIF ()
+  ENDFOREACH()
   SET(${prefix}_${current_arg_name} ${current_arg_list})
-ENDMACRO(PV_PARSE_ARGUMENTS)
+ENDMACRO()
 
 #----------------------------------------------------------------------------
 # Macro for extracting Plugin path and name from arguments
@@ -80,7 +80,7 @@ MACRO(PV_EXTRACT_CLIENT_SERVER_ARGS)
   if(PV_LOAD_PLUGIN)
     set(CLIENT_SERVER_ARGS ${CLIENT_SERVER_ARGS} "--test-plugin=${PV_LOAD_PLUGIN}")
   endif()
-ENDMACRO(PV_EXTRACT_CLIENT_SERVER_ARGS)
+ENDMACRO()
 
 #----------------------------------------------------------------------------
 # Macro for setting values if a user did not overwrite them
@@ -88,8 +88,8 @@ ENDMACRO(PV_EXTRACT_CLIENT_SERVER_ARGS)
 MACRO(pv_set_if_not_set name value)
   IF(NOT DEFINED "${name}")
     SET(${name} "${value}")
-  ENDIF(NOT DEFINED "${name}")
-ENDMACRO(pv_set_if_not_set)
+  ENDIF()
+ENDMACRO()
 
 #----------------------------------------------------------------------------
 # When installing system libraries, on non-windows machines, the CMake variable
@@ -105,19 +105,19 @@ FUNCTION (pv_install_library libpath dest component)
     IF (APPLE)
       GET_FILENAME_COMPONENT(name_tmp ${libpath} NAME_WE)
       FILE(GLOB lib_list "${dir_tmp}/${name_tmp}*")
-    ELSE (APPLE)
+    ELSE ()
       GET_FILENAME_COMPONENT(dir_tmp ${libpath} PATH)
       GET_FILENAME_COMPONENT(name_tmp ${libpath} NAME)
       FILE(GLOB lib_list RELATIVE "${dir_tmp}" "${libpath}*")
-    ENDIF (APPLE)
+    ENDIF ()
     INSTALL(CODE "
           MESSAGE(STATUS \"Installing ${name_tmp}\")
           EXECUTE_PROCESS (WORKING_DIRECTORY ${dir_tmp}
                COMMAND tar c ${lib_list}
                COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${dest})
                " COMPONENT ${component})
-  ENDIF (NOT WIN32)
-ENDFUNCTION (pv_install_library)
+  ENDIF ()
+ENDFUNCTION ()
 
 #########################################################################
 # Function to compile a proto file to generate a .h and .cc file
@@ -138,7 +138,7 @@ FUNCTION (protobuf_generate out_cpp_file in_proto_file)
       --proto_path ${path} ${absolute}
     DEPENDS ${in_proto_file} protoc_compiler
   )
-ENDFUNCTION (protobuf_generate)
+ENDFUNCTION ()
 
 #########################################################################
 # Function to generate header file from any file(s). Support ASCII as well as
@@ -398,7 +398,7 @@ function(build_help_project name)
 
     WORKING_DIRECTORY "${arg_DESTINATION_DIRECTORY}"
   )
-endfunction(build_help_project)
+endfunction()
 
 macro(pv_set_link_interface_libs target)
   # if not lion then we need to set LINK_INTERFACE_LIBRARIES to reduce the number

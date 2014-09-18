@@ -394,9 +394,9 @@ target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})
 #    "${CMAKE_CURRENT_SOURCE_DIR}"
 #    "${PV_INSTALL_INCLUDE_DIR}/Qt/Core/Resources/Icons"
 #    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
-#ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+#ENDIF ()
 #
 #IF(BUILD_TESTING)
 #  ADD_SUBDIRECTORY(Testing)
-#ENDIF(BUILD_TESTING)
+#ENDIF()
 

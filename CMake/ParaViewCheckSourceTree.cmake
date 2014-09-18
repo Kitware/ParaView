@@ -12,7 +12,7 @@ function(CheckGitDirectory path submodule)
  git submodule update --init
  ")
   endif()
-endfunction(CheckGitDirectory)
+endfunction()
 
 set(ParaView_Submodules VTK Utilities/IceT Utilities/Xdmf2 Qt/Testing)
 

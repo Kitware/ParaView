@@ -19,7 +19,7 @@ FOREACH ( manta_build_name ${MANTA_BUILD_NAMES} )
     /usr/bin/${manta_build_name}
     /usr/local/bin/${manta_build_name}
     )
-ENDFOREACH ( manta_build_name )
+ENDFOREACH ()
 
 FIND_PATH ( MANTA_BUILD 
   MantaConfigure.cmake ${MANTA_BUILD_SEARCH_PATH} 
@@ -28,7 +28,7 @@ FIND_PATH ( MANTA_BUILD
 IF ( MANTA_BUILD )
   SET ( MANTA_BUILD_INCLUDE ${MANTA_BUILD}/include)
   SET ( MANTA_BUILD_LIB ${MANTA_BUILD}/lib)
-ENDIF ( MANTA_BUILD )
+ENDIF ()
 
 #TODO: Change Manta's config.h.in to point to source tree then autofind it
 # Locate Manta source directory through Manta build directory
@@ -39,7 +39,7 @@ FIND_PATH ( MANTA_SOURCE
 IF ( MANTA_BUILD AND NOT MANTA_SOURCE )
   INCLUDE ( ${MANTA_BUILD}/CMakeFiles/CMakeDirectoryInformation.cmake )
   SET ( MANTA_SOURCE ${CMAKE_RELATIVE_PATH_TOP_SOURCE} )
-ENDIF ( MANTA_BUILD AND NOT MANTA_SOURCE )
+ENDIF ()
 
 # Include Manta source and build-include directories
 INCLUDE_DIRECTORIES(${MANTA_SOURCE} ${MANTA_BUILD_INCLUDE})

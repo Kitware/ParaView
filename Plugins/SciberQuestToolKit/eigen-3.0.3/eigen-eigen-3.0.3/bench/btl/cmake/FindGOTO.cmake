@@ -1,7 +1,7 @@
 
 if (GOTO_LIBRARIES)
   set(GOTO_FIND_QUIETLY TRUE)
-endif (GOTO_LIBRARIES)
+endif ()
 
 find_library(GOTO_LIBRARIES goto PATHS $ENV{GOTODIR} ${LIB_INSTALL_DIR})
 

@@ -36,7 +36,7 @@ MACRO(build_paraview_client_cpack_config_init)
     SET(CPACK_BINARY_DRAGNDROP ON)
     SET(CPACK_BINARY_PACKAGEMAKER OFF)
     SET(CPACK_BINARY_STGZ OFF)
-  ENDIF(APPLE)
+  ENDIF()
 
   SET(CPACK_PACKAGE_NAME "${BCC_PACKAGE_NAME}")
   SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${BCC_DESCRIPTION}")
@@ -60,26 +60,26 @@ MACRO(build_paraview_client_cpack_config_init)
 
   IF (CMAKE_SYSTEM_PROCESSOR MATCHES "unknown")
     SET (CMAKE_SYSTEM_PROCESSOR "x86")
-  ENDIF (CMAKE_SYSTEM_PROCESSOR MATCHES "unknown")
+  ENDIF ()
   IF(NOT DEFINED CPACK_SYSTEM_NAME)
     SET(CPACK_SYSTEM_NAME ${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR})
-  ENDIF(NOT DEFINED CPACK_SYSTEM_NAME)
+  ENDIF()
   IF(${CPACK_SYSTEM_NAME} MATCHES Windows)
     IF(CMAKE_CL_64)
       SET(CPACK_SYSTEM_NAME Win64-${CMAKE_SYSTEM_PROCESSOR})
-    ELSE(CMAKE_CL_64)
+    ELSE()
       SET(CPACK_SYSTEM_NAME Win32-${CMAKE_SYSTEM_PROCESSOR})
-    ENDIF(CMAKE_CL_64)
-  ENDIF(${CPACK_SYSTEM_NAME} MATCHES Windows)
+    ENDIF()
+  ENDIF()
 
   IF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
     list(LENGTH CMAKE_OSX_ARCHITECTURES _length)
     IF(_length GREATER 1)
       SET(CPACK_SYSTEM_NAME Darwin-Universal)
-    ELSE(_length GREATER 1)
+    ELSE()
       SET(CPACK_SYSTEM_NAME Darwin-${CMAKE_OSX_ARCHITECTURES})
-    ENDIF(_length GREATER 1)
-  ENDIF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
+    ENDIF()
+  ENDIF()
 
 
   SET (CPACK_INSTALL_CMAKE_PROJECTS 
@@ -92,7 +92,7 @@ MACRO(build_paraview_client_cpack_config_init)
     LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
       "${ParaView_BINARY_DIR}" "HDF5 C++ Library" "cpplibraries" "/"
     )
-  ENDIF(HDF5_BUILD_CPP_LIB)
+  ENDIF()
 
   IF(HDF5_BUILD_HL_LIB)
     LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
@@ -102,8 +102,8 @@ MACRO(build_paraview_client_cpack_config_init)
       LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
         "${ParaView_BINARY_DIR}" "HDF5 HL C++ Library" "hlcpplibraries" "/"
       )
-    ENDIF(HDF5_BUILD_CPP_LIB)
-  ENDIF(HDF5_BUILD_HL_LIB)
+    ENDIF()
+  ENDIF()
 
   # Append in CPACK rule for the Development Component
   IF(NOT PV_INSTALL_NO_DEVELOPMENT)
@@ -116,7 +116,7 @@ MACRO(build_paraview_client_cpack_config_init)
       LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
         "${ParaView_BINARY_DIR}" "HDF5 C++ Library" "cppheaders" "/"
       )
-    ENDIF(HDF5_BUILD_CPP_LIB)
+    ENDIF()
 
     IF(HDF5_BUILD_HL_LIB)
       LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
@@ -127,9 +127,9 @@ MACRO(build_paraview_client_cpack_config_init)
         LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
           "${ParaView_BINARY_DIR}" "HDF5 HL C++ Library" "hlcppheaders" "/"
         )
-      ENDIF(HDF5_BUILD_CPP_LIB)
-    ENDIF(HDF5_BUILD_HL_LIB)
-  ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
+      ENDIF()
+    ENDIF()
+  ENDIF()
 
   LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
     "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "/"
@@ -139,7 +139,7 @@ MACRO(build_paraview_client_cpack_config_init)
   # generator.
   SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
     ${CPACK_INSTALL_CMAKE_PROJECTS})
-ENDMACRO(build_paraview_client_cpack_config_init)
+ENDMACRO()
 
 MACRO(build_paraview_client_cpack_config)
   CONFIGURE_FILE("${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in"
@@ -149,7 +149,7 @@ MACRO(build_paraview_client_cpack_config)
   SET (CPACK_PROJECT_CONFIG_FILE
     "${CMAKE_CURRENT_BINARY_DIR}/CPack${CPACK_PACKAGE_NAME}Options.cmake")
   INCLUDE(CPack)
-ENDMACRO(build_paraview_client_cpack_config)
+ENDMACRO()
 
 
 # Function to install qt libraries. qtliblist is a list of libraries to install
@@ -169,19 +169,19 @@ FUNCTION(install_qt_libs qtliblist componentname)
           #         COMMAND tar c ${QT_LIB_LIST}
           #         COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
           #         " COMPONENT ${componentname})
-          # ENDIF(NOT ${QT_LIB_NAME_tmp} MATCHES "\\.debug$")
+          # ENDIF()
           # Install .so and versioned .so.x.y
           GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
           GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
           INSTALL(DIRECTORY ${QT_LIB_DIR_tmp}/ DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
                 FILES_MATCHING PATTERN "${QT_LIB_NAME_tmp}*"
                 PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
-        ELSE (NOT WIN32)
+        ELSE ()
           GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
           GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME_WE)
           INSTALL(FILES ${QT_DLL_PATH_tmp}/${QT_LIB_NAME_tmp}.dll DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime)
-        ENDIF (NOT WIN32)
-      ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
-    ENDFOREACH(qtlib)
-  ENDIF (NOT APPLE)
-ENDFUNCTION(install_qt_libs)
+        ENDIF ()
+      ENDIF ()
+    ENDFOREACH()
+  ENDIF ()
+ENDFUNCTION()

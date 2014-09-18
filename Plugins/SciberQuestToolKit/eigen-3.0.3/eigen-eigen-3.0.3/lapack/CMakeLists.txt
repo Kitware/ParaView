@@ -375,4 +375,4 @@ add_dependencies(lapack eigen_lapack_static)
 
 
 #   add_subdirectory(testing)
-endif(CMAKE_Fortran_COMPILER_WORKS)
+endif()

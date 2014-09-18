@@ -30,40 +30,40 @@ if(WITH_THREAD)
     set(THREAD_SRC Python/thread.c)
     set(_REENTRANT 1)
     set(extraLibs ${extraLibs} ${HAVE_LIBPTHREAD})
-  endif(HAVE_LIBPTHREAD)
+  endif()
   if(WIN32)
     set(THREAD_SRC Python/thread.c)
-  endif(WIN32)
-endif(WITH_THREAD)
+  endif()
+endif()
 
 if(HAVE_LIBM)
   set(extraLibs ${extraLibs} ${HAVE_LIBM})
-endif(HAVE_LIBM)
+endif()
 
 if(HAVE_LIBUTIL)
   set(extraLibs ${extraLibs} ${HAVE_LIBUTIL})
-endif(HAVE_LIBUTIL)
+endif()
 
 set(DYNLOAD_SRC)
 if(HAVE_DYNAMIC_LOADING)
   if(HAVE_LIBDL)
     set(extraLibs ${extraLibs} ${HAVE_LIBDL})
     set(DYNLOAD_SRC ${DYNLOAD_SRC} Python/dynload_shlib.c)
-  endif(HAVE_LIBDL)
+  endif()
   if(WIN32)
     set(DYNLOAD_SRC ${DYNLOAD_SRC} Python/dynload_win.c PC/import_nt.c PC/dl_nt.c)
-  endif(WIN32)
+  endif()
   set(BUILD_LIBS_SHARED_DEFAULT TRUE)
-else(HAVE_DYNAMIC_LOADING)
+else()
   set(BUILD_LIBS_SHARED_DEFAULT FALSE)
-endif(HAVE_DYNAMIC_LOADING)
+endif()
 
 option(PYTHON_BUILD_LIB_SHARED "Build libpython shared" ${BUILD_LIBS_SHARED_DEFAULT})
 if(PYTHON_BUILD_LIB_SHARED)
   set(LIB_BUILD_TYPE SHARED)
-else(PYTHON_BUILD_LIB_SHARED)
+else()
   set(LIB_BUILD_TYPE STATIC)
-endif(PYTHON_BUILD_LIB_SHARED)
+endif()
 
 set(MACHDEP_SRCS )   #TODO: configure
 
@@ -91,25 +91,25 @@ macro(ADD_PYTHON_MODULE _NAME _STATIC_SRCS)
       set(DYNAMIC_MODULES ${DYNAMIC_MODULES} ${_NAME})
       add_library(${_NAME} MODULE ${ARGN})
       set_target_properties(${_NAME} PROPERTIES PREFIX "")
-    else(MODULE_${_NAME}_SHARED)
+    else()
       message(STATUS "Adding ${_NAME} as static module")
       set(STATIC_MODULES ${STATIC_MODULES} ${_NAME})
       set(${_STATIC_SRCS} ${${_STATIC_SRCS}} ${ARGN})
       set(PY_STATIC_MODULES_INIT_FUNCTIONS "${PY_STATIC_MODULES_INIT_FUNCTIONS}extern void init${_NAME}(void);\n")
       set(PY_STATIC_MODULES_INITTAB        "${PY_STATIC_MODULES_INITTAB}  {\"${_NAME}\", init${_NAME}},\n")
-    endif(MODULE_${_NAME}_SHARED)
-  endif(MODULE_${_NAME}_ENABLE)
-endmacro(ADD_PYTHON_MODULE)
+    endif()
+  endif()
+endmacro()
 
 if(WITH_THREAD)
   add_python_module(thread  MOD_SRCS Modules/threadmodule.c)
-endif(WITH_THREAD)
+endif()
 
 if(WIN32)
   set(PY_POSIX_NAME nt)
-else(WIN32)
+else()
   set(PY_POSIX_NAME posix)
-endif(WIN32)
+endif()
 
 add_python_module(${PY_POSIX_NAME}  MOD_SRCS Modules/posixmodule.c)
 #add_python_module(signal    MOD_SRCS Modules/signalmodule.c)
@@ -147,15 +147,15 @@ if(BUILD_UNTESTED_MODULES)
   add_python_module(math          MOD_SRCS Modules/mathmodule.c )
   add_python_module(operator      MOD_SRCS Modules/operator.c )
   add_python_module(parser        MOD_SRCS Modules/parsermodule.c )
-endif(BUILD_UNTESTED_MODULES)
+endif()
 
 
 file(MAKE_DIRECTORY ${Python_BINARY_DIR}/Modules)
 if(WIN32)
   configure_file(PC/pyconfig.h ${Python_BINARY_DIR}/pyconfig.h COPYONLY)
-else(WIN32)
+else()
   configure_file(pyconfig.h.cmake ${Python_BINARY_DIR}/pyconfig.h @ONLY)
-endif(WIN32)
+endif()
 configure_file(Modules/config.c.cmake ${CMAKE_CURRENT_BINARY_DIR}/Modules/modules-config.c @ONLY)
 file(WRITE ${Python_BINARY_DIR}/Modules/Setup "#created by cmake, do not edit\n")
 
@@ -219,7 +219,7 @@ if(Py_USING_UNICODE)
    set(OBJECT_SRCS ${OBJECT_SRCS} 
                    Objects/unicodeobject.c 
                    Objects/unicodectype.c)
-endif(Py_USING_UNICODE)
+endif()
 
 set(PYTHON_SRCS Python/Python-ast.c 
                 Python/asdl.c 
@@ -280,13 +280,13 @@ include_directories(Include ${Python_BINARY_DIR})
 if(WIN32)
   include_directories(PC Python)
   add_definitions(-DWIN32 -D_WINDOWS)
-endif(WIN32)
+endif()
 
 add_definitions(-DPy_BUILD_CORE)
 
 if(NOT HAVE_HYPOT)
   add_definitions(-DWITHOUT_COMPLEX)
-endif(NOT HAVE_HYPOT)
+endif()
 
 
 add_library(pythonLib  ${LIB_BUILD_TYPE}
@@ -306,7 +306,7 @@ target_link_libraries(python pythonLib)
 #if(CMAKE_SYSTEM MATCHES BlueGene)
 #  get_target_property(EXE_LOCATION python LOCATION)
 #  configure_file(runcone.ksh.in ${CMAKE_CURRENT_BINARY_DIR}/runpy.ksh)
-#endif(CMAKE_SYSTEM MATCHES BlueGene)
+#endif()
 
 add_subdirectory(Lib)
 
@@ -329,7 +329,7 @@ install(FILES ${Python_BINARY_DIR}/pyconfig.h ${pyHeaders} DESTINATION include/p
 # install the dynamic python modules
 if(DYNAMIC_MODULES)
   install(TARGETS ${DYNAMIC_MODULES} DESTINATION lib/python${PY_MAJOR}.${PY_MINOR}/lib-dynload )
-endif(DYNAMIC_MODULES)
+endif()
 
 # install the python config tool
 set(EXENAME ${CMAKE_INSTALL_PREFIX}/bin/python)

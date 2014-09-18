@@ -16,25 +16,25 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR IS_ICPC)
   IF(NOT BTL_NOVEC)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
     SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -msse2")
-  ELSE(NOT BTL_NOVEC)
+  ELSE()
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEIGEN_DONT_VECTORIZE")
-  ENDIF(NOT BTL_NOVEC)
-ENDIF(CMAKE_COMPILER_IS_GNUCXX OR IS_ICPC)
+  ENDIF()
+ENDIF()
 
 IF(MSVC)
   SET(CMAKE_CXX_FLAGS " /O2 /Ot /GL /fp:fast -DNDEBUG")
 #   SET(CMAKE_Fortran_FLAGS "-g0 -O3 -DNDEBUG")
   IF(NOT BTL_NOVEC)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
-  ELSE(NOT BTL_NOVEC)
+  ELSE()
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEIGEN_DONT_VECTORIZE")
-  ENDIF(NOT BTL_NOVEC)
-ENDIF(MSVC)
+  ENDIF()
+ENDIF()
 
 if(IS_ICPC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fast")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fast")
-endif(IS_ICPC)
+endif()
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/actions
@@ -46,13 +46,13 @@ include_directories(
 # if (MKL_FOUND)
 #   add_definitions(-DHAVE_MKL)
 #   set(DEFAULT_LIBRARIES ${MKL_LIBRARIES})
-# endif (MKL_FOUND)
+# endif ()
 
 MACRO(BTL_ADD_BENCH targetname)
 
   foreach(_current_var ${ARGN})
     set(_last_var ${_current_var})
-  endforeach(_current_var)
+  endforeach()
 
   set(_sources ${ARGN})
   list(LENGTH _sources _argn_length)
@@ -63,7 +63,7 @@ MACRO(BTL_ADD_BENCH targetname)
 
   if (${_argn_length} EQUAL ${_src_length})
     set(_last_var ON)
-  endif (${_argn_length} EQUAL ${_src_length})
+  endif ()
 
   OPTION(BUILD_${targetname} "Build benchmark ${targetname}" ${_last_var})
 
@@ -71,9 +71,9 @@ MACRO(BTL_ADD_BENCH targetname)
     ADD_EXECUTABLE(${targetname} ${_sources})
     ADD_TEST(${targetname} "${targetname}")
     target_link_libraries(${targetname} ${DEFAULT_LIBRARIES} rt)
-  ENDIF(BUILD_${targetname})
+  ENDIF()
 
-ENDMACRO(BTL_ADD_BENCH)
+ENDMACRO()
 
 macro(btl_add_target_property target prop value)
 
@@ -85,7 +85,7 @@ macro(btl_add_target_property target prop value)
     set_target_properties(${target} PROPERTIES ${prop} "${previous} ${value}")
   endif()
 
-endmacro(btl_add_target_property)
+endmacro()
 
 ENABLE_TESTING()
 

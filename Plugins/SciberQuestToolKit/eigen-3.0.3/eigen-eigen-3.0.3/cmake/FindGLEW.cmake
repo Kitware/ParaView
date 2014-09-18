@@ -23,7 +23,7 @@ IF (WIN32)
     )
 
 
-  ELSE(CYGWIN)
+  ELSE()
   
     FIND_PATH( GLEW_INCLUDE_DIR GL/glew.h
       $ENV{GLEW_ROOT_PATH}/include
@@ -36,9 +36,9 @@ IF (WIN32)
       ${OPENGL_LIBRARY_DIR}
     )
 
-  ENDIF(CYGWIN)
+  ENDIF()
 
-ELSE (WIN32)
+ELSE ()
 
   IF (APPLE)
 # These values for Apple could probably do with improvement.
@@ -48,7 +48,7 @@ ELSE (WIN32)
     )
     SET(GLEW_GLEW_LIBRARY "-framework GLEW" CACHE STRING "GLEW library for OSX")
     SET(GLEW_cocoa_LIBRARY "-framework Cocoa" CACHE STRING "Cocoa framework for OSX")
-  ELSE (APPLE)
+  ELSE ()
 
     FIND_PATH( GLEW_INCLUDE_DIR GL/glew.h
       /usr/include/GL
@@ -65,9 +65,9 @@ ELSE (WIN32)
       /usr/X11R6/lib
     )
 
-  ENDIF (APPLE)
+  ENDIF ()
 
-ENDIF (WIN32)
+ENDIF ()
 
 SET( GLEW_FOUND "NO" )
 IF(GLEW_INCLUDE_DIR)
@@ -84,18 +84,18 @@ IF(GLEW_INCLUDE_DIR)
     SET (GLEW_LIBRARY ${GLEW_LIBRARIES})
     SET (GLEW_INCLUDE_PATH ${GLEW_INCLUDE_DIR})
 
-  ENDIF(GLEW_GLEW_LIBRARY)
-ENDIF(GLEW_INCLUDE_DIR)
+  ENDIF()
+ENDIF()
 
 IF(GLEW_FOUND)
   IF(NOT GLEW_FIND_QUIETLY)
     MESSAGE(STATUS "Found Glew: ${GLEW_LIBRARIES}")
-  ENDIF(NOT GLEW_FIND_QUIETLY)
-ELSE(GLEW_FOUND)
+  ENDIF()
+ELSE()
   IF(GLEW_FIND_REQUIRED)
     MESSAGE(FATAL_ERROR "Could not find Glew")
-  ENDIF(GLEW_FIND_REQUIRED)
-ENDIF(GLEW_FOUND)
+  ENDIF()
+ENDIF()
 
 MARK_AS_ADVANCED(
   GLEW_INCLUDE_DIR

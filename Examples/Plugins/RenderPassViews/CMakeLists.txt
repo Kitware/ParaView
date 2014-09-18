@@ -9,10 +9,10 @@ IF (ParaView_SOURCE_DIR)
     ${VTK_INCLUDE_DIR}
     ${PARAVIEW_INCLUDE_DIRS}
   )
-ELSE (ParaView_SOURCE_DIR)
+ELSE ()
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
+ENDIF ()
 
 add_paraview_plugin(
   RenderPassViews "1.0"

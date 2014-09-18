@@ -45,7 +45,7 @@ ei_add_test(eigen2_stdvector)
 ei_add_test(eigen2_newstdvector)
 if(QT5_FOUND OR QT4_FOUND)
   ei_add_test(eigen2_qtvector " " "${QT_LIBRARIES}")
-endif(QT5_FOUND OR QT4_FOUND)
+endif()
 # no support for eigen2 sparse module
 # if(NOT EIGEN_DEFAULT_TO_ROW_MAJOR)
 #   ei_add_test(eigen2_sparse_vector)

@@ -38,7 +38,7 @@ foreach(file ${KIT_GLSL_SRCS})
     ARGS ${res} ${src} ${file}
     )
   set(KIT_EXTRA_SRCS ${KIT_EXTRA_SRCS} ${res})
-endforeach(file)
+endforeach()
 
 # -----------------------------------------------------------------------------
 # Create the library

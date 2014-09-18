@@ -45,4 +45,4 @@ else()
   add_subdirectory(testing EXCLUDE_FROM_ALL)
 endif()
 
-endif(CMAKE_Fortran_COMPILER_WORKS)
+endif()

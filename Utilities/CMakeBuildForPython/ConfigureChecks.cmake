@@ -11,15 +11,15 @@ include(CMake/CheckTypeExists.cmake)
 if(WIN32)
   set(HAVE_DYNAMIC_LOADING 1)
 
-else(WIN32)
+else()
 
 
 
 macro(ADD_COND var cond item)
   if(${cond})
     set(${var} ${${var}} ${item})
-  endif(${cond})
-endmacro(ADD_COND)
+  endif()
+endmacro()
 
 check_include_files(asm/types.h HAVE_ASM_TYPES_H)
 check_include_files(arpa/inet.h HAVE_ARPA_INET_H)
@@ -164,7 +164,7 @@ set(WITH_NEXT_FRAMEWORK 0)
 if(APPLE)
   set(WITH_DYLD 1)
   set(WITH_NEXT_FRAMEWORK 1)
-endif(APPLE)
+endif()
 
 
 set(CFG_HEADERS )
@@ -197,7 +197,7 @@ add_cond(CFG_HEADERS HAVE_WCHAR_H wchar.h)
 
 if(HAVE_PTY_H)
   set(CFG_HEADERS ${CFG_HEADERS} pty.h utmp.h)
-endif(HAVE_PTY_H)
+endif()
 
 set(CFG_HEADERS ${CFG_HEADERS} time.h stdio.h math.h)
 
@@ -331,9 +331,9 @@ set(HAVE_TM_ZONE ${HAVE_STRUCT_TM_TM_ZONE})
 
 if(NOT HAVE_STRUCT_TM_TM_ZONE)
   check_variable_exists(tzname HAVE_TZNAME)
-else(NOT HAVE_STRUCT_TM_TM_ZONE)
+else()
   set(HAVE_TZNAME 0)
-endif(NOT HAVE_STRUCT_TM_TM_ZONE)
+endif()
 
 check_type_exists("struct tm" sys/time.h TM_IN_SYS_TIME)
 
@@ -341,9 +341,9 @@ check_c_source_compiles("#include <sys/time.h>\n int main() {gettimeofday((struc
 
 if(GETTIMEOFDAY_WITH_TZ)
   set(GETTIMEOFDAY_NO_TZ 0)
-else(GETTIMEOFDAY_WITH_TZ)
+else()
   set(GETTIMEOFDAY_NO_TZ 1)
-endif(GETTIMEOFDAY_WITH_TZ)
+endif()
 
 #######################################################################
 #
@@ -360,31 +360,31 @@ if   ("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_WCHAR_T}")
   set(PY_UNICODE_TYPE wchar_t)
   set(HAVE_USABLE_WCHAR_T 1)
   message(STATUS "Using wchar_t for unicode")
-else ("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_WCHAR_T}")
+else ()
 
   if   ("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_SHORT}")
     set(PY_UNICODE_TYPE "unsigned short")
     set(HAVE_USABLE_WCHAR_T 0)
     message(STATUS "Using unsigned short for unicode")
-  else ("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_SHORT}")
+  else ()
 
     if   ("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_LONG}")
       set(PY_UNICODE_TYPE "unsigned long")
       set(HAVE_USABLE_WCHAR_T 0)
       message(STATUS "Using unsigned long for unicode")
-    else ("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_LONG}")
+    else ()
 
       if(Py_USING_UNICODE)
         message(SEND_ERROR "No usable unicode type found, disable Py_USING_UNICODE to be able to build Python")
-      else(Py_USING_UNICODE)
+      else()
         message(STATUS "No usable unicode type found")
-      endif(Py_USING_UNICODE)
+      endif()
 
-    endif("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_LONG}")
+    endif()
 
-  endif("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_SHORT}")
+  endif()
 
-endif("${Py_UNICODE_SIZE}" STREQUAL "${SIZEOF_WCHAR_T}")
+endif()
 
 
 
@@ -445,7 +445,7 @@ macro_pop_required_vars()
 
 if(CMAKE_SYSTEM MATCHES BlueGene)
   set(WITH_THREAD OFF CACHE STRING "System doesn't support multithreading" FORCE)
-endif(CMAKE_SYSTEM MATCHES BlueGene)
+endif()
 
 
 #######################################################################
@@ -467,7 +467,7 @@ if(HAVE_READLINE_READLINE_H)
 
   set(CFG_HEADERS ${CFG_HEADERS_SAVE})
   macro_pop_required_vars()
-endif(HAVE_READLINE_READLINE_H)
+endif()
 
 
 #######################################################################
@@ -490,7 +490,7 @@ if(HAVE_CURSES_H)
 
   set(CFG_HEADERS ${CFG_HEADERS_SAVE})
   macro_pop_required_vars()
-endif(HAVE_CURSES_H)
+endif()
 
 
 #######################################################################
@@ -508,14 +508,14 @@ if(HAVE_DLFCN_H)
 
   set(CFG_HEADERS ${CFG_HEADERS_SAVE})
   macro_pop_required_vars()
-endif(HAVE_DLFCN_H)
+endif()
 
 
 if(HAVE_DLOPEN) # OR .... )
   set(HAVE_DYNAMIC_LOADING 1)
-else(HAVE_DLOPEN)
+else()
   set(HAVE_DYNAMIC_LOADING 0)
-endif(HAVE_DLOPEN)
+endif()
 
 
 #######################################################################
@@ -526,92 +526,92 @@ endif(HAVE_DLOPEN)
 check_type_exists(gid_t sys/types.h gid_t)
 if(NOT gid_t)
   set(gid_t int)
-else(NOT gid_t)
+else()
   set(gid_t 0)
-endif(NOT gid_t)
+endif()
 
 check_type_exists(mode_t sys/types.h mode_t)
 if(NOT mode_t)
   set(mode_t int)
-else(NOT mode_t)
+else()
   set(mode_t 0)
-endif(NOT mode_t)
+endif()
 
 check_type_exists(off_t sys/types.h off_t)
 if(NOT off_t)
   set(off_t "long int")
-else(NOT off_t)
+else()
   set(off_t 0)
-endif(NOT off_t)
+endif()
 
 check_type_exists(pid_t sys/types.h pid_t)
 if(NOT pid_t)
   set(pid_t int)
-else(NOT pid_t)
+else()
   set(pid_t 0)
-endif(NOT pid_t)
+endif()
 
 check_type_exists(size_t sys/types.h size_t)
 if(NOT size_t)
   set(size_t "unsigned int")
-else(NOT size_t)
+else()
   set(size_t 0)
-endif(NOT size_t)
+endif()
 
 check_type_exists(socklen_t sys/socket.h socklen_t)
 if(NOT socklen_t)
   set(socklen int)
-else(NOT socklen_t)
+else()
   set(socklen_t 0)
-endif(NOT socklen_t)
+endif()
 
 check_type_exists(uid_t sys/types.h uid_t)
 if(NOT uid_t)
   set(uid_t int)
-else(NOT uid_t)
+else()
   set(uid_t 0)
-endif(NOT uid_t)
+endif()
 
 check_type_exists(clock_t time.h clock_t)
 if(NOT clock_t)
   set(clock_t long)
-else(NOT clock_t)
+else()
   set(clock_t 0)
-endif(NOT clock_t)
+endif()
 
 
 check_c_source_compiles("int main() {const int i;}" const_WORKS)
 if(NOT const_WORKS)
   set(const 1)
-else(NOT const_WORKS)
+else()
   set(const 0)
-endif(NOT const_WORKS)
+endif()
 
 check_c_source_compiles("int main() {signed int i;}" signed_WORKS)
 if(NOT signed_WORKS)
   set(signed 1)
-else(NOT signed_WORKS)
+else()
   set(signed 0)
-endif(NOT signed_WORKS)
+endif()
 
 check_c_source_compiles("int main() {volatile int i;}" volatile_WORKS)
 if(NOT volatile_WORKS)
   set(volatile 1)
-else(NOT volatile_WORKS)
+else()
   set(volatile 0)
-endif(NOT volatile_WORKS)
+endif()
 
 if(HAVE_STDARG_PROTOTYPES)
    set(vaargsHeader "stdarg.h")
-else(HAVE_STDARG_PROTOTYPES)
+else()
    set(vaargsHeader "varargs.h")
-endif(HAVE_STDARG_PROTOTYPES)
+endif()
 check_c_source_compiles("#include <${vaargsHeader}>\n int main() {va_list list1, list2; list1 = list2;}" NOT_VA_LIST_IS_ARRAY)
 if(NOT_VA_LIST_IS_ARRAY)
   set(VA_LIST_IS_ARRAY 0)
-else(NOT_VA_LIST_IS_ARRAY)
+else()
   set(VA_LIST_IS_ARRAY 1)
-endif(NOT_VA_LIST_IS_ARRAY)
+endif()
 
 
 #######################################################################
@@ -644,15 +644,15 @@ check_c_source_runs(" #include <poll.h>
 
 if(HAVE_SYS_TIME_H)
   check_include_files("sys/time.h;time.h" TIME_WITH_SYS_TIME)
-else(HAVE_SYS_TIME_H)
+else()
   set(TIME_WITH_SYS_TIME 0)
-endif(HAVE_SYS_TIME_H)
+endif()
 
 if(HAVE_SYS_TIME_H AND HAVE_SYS_SELECT_H)
   check_include_files("sys/select.h;sys/time.h" SYS_SELECT_WITH_SYS_TIME)
-else(HAVE_SYS_TIME_H AND HAVE_SYS_SELECT_H)
+else()
   set(SYS_SELECT_WITH_SYS_TIME 0)
-endif(HAVE_SYS_TIME_H AND HAVE_SYS_SELECT_H)
+endif()
 
 
 ##########################################################
@@ -668,7 +668,7 @@ if(ZLIB_FOUND)
 
   set(CFG_HEADERS ${CFG_HEADERS_SAVE})
   macro_pop_required_vars()
-endif(ZLIB_FOUND)
+endif()
 
 ############################################
 
@@ -677,43 +677,43 @@ set(PY_PLATFORM generic)
 
 if(CMAKE_SYSTEM MATCHES Linux)
   set(PY_PLATFORM linux2)
-endif(CMAKE_SYSTEM MATCHES Linux)
+endif()
 
 if(CMAKE_SYSTEM MATCHES Darwin)
   set(PY_PLATFORM darwin)
-endif(CMAKE_SYSTEM MATCHES Darwin)
+endif()
 
 if(CMAKE_SYSTEM MATCHES FreeBSD)
   set(PY_PLATFORM freebsd5)  # which version to use ?
-endif(CMAKE_SYSTEM MATCHES FreeBSD)
+endif()
 
 if(CMAKE_SYSTEM MATCHES NetBSD)
   set(PY_PLATFORM netbsd1)
-endif(CMAKE_SYSTEM MATCHES NetBSD)
+endif()
 
 if(CMAKE_SYSTEM MATCHES AIX)
   set(PY_PLATFORM aix4)
-endif(CMAKE_SYSTEM MATCHES AIX)
+endif()
 
 if(CMAKE_SYSTEM MATCHES BeOS)
   set(PY_PLATFORM beos5)
-endif(CMAKE_SYSTEM MATCHES BeOS)
+endif()
 
 if(CMAKE_SYSTEM MATCHES IRIX)
   set(PY_PLATFORM irix6)
-endif(CMAKE_SYSTEM MATCHES IRIX)
+endif()
 
 if(CMAKE_SYSTEM MATCHES SunOS)
   set(PY_PLATFORM sunos5)
-endif(CMAKE_SYSTEM MATCHES SunOS)
+endif()
 
 if(CMAKE_SYSTEM MATCHES UnixWare)
   set(PY_PLATFORM unixware7)
-endif(CMAKE_SYSTEM MATCHES UnixWare)
+endif()
 
 if(CMAKE_SYSTEM MATCHES Windows)
   set(PY_PLATFORM win32)
-endif(CMAKE_SYSTEM MATCHES Windows)
+endif()
 
 # todo 
 set(HAVE_UCS4_TCL 0)
@@ -729,4 +729,4 @@ set(HAVE_GETHOSTBYNAME_R_3_ARG 0)
 set(HAVE_GETHOSTBYNAME_R_5_ARG 0)
 set(HAVE_GETHOSTBYNAME_R_6_ARG 0)
 
-endif(WIN32)
+endif()

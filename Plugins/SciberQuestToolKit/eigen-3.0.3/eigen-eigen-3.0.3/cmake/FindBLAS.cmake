@@ -76,8 +76,8 @@ macro(check_fortran_libraries DEFINITIONS LIBRARIES _prefix _name _flags _list _
       mark_as_advanced(${_prefix}_${_library}_LIBRARY)
       set(${LIBRARIES} ${${LIBRARIES}} ${${_prefix}_${_library}_LIBRARY})
       set(_libraries_found ${${_prefix}_${_library}_LIBRARY})
-    endif(_libraries_found)
-  endforeach(_library ${_list})
+    endif()
+  endforeach()
   if(_libraries_found)
     set(_libraries_found ${${LIBRARIES}})
   endif()
@@ -104,7 +104,7 @@ macro(check_fortran_libraries DEFINITIONS LIBRARIES _prefix _name _flags _list _
     set(CMAKE_REQUIRED_LIBRARIES    "")
     mark_as_advanced(${_prefix}_${_name}_${_combined_name}_f2c_WORKS)
     set(_libraries_work ${${_prefix}_${_name}_${_combined_name}_f2c_WORKS})
-  endif(_libraries_found AND NOT _libraries_work)
+  endif()
 
   # If not found, test this combination of libraries with a C interface.
   # A few implementations (ie ACML) provide a C interface. Unfortunately, there is no standard.
@@ -118,7 +118,7 @@ macro(check_fortran_libraries DEFINITIONS LIBRARIES _prefix _name _flags _list _
     set(CMAKE_REQUIRED_LIBRARIES "")
     mark_as_advanced(${_prefix}_${_name}${_combined_name}_WORKS)
     set(_libraries_work ${${_prefix}_${_name}${_combined_name}_WORKS})
-  endif(_libraries_found AND NOT _libraries_work)
+  endif()
 
   # on failure
   if(NOT _libraries_work)
@@ -127,7 +127,7 @@ macro(check_fortran_libraries DEFINITIONS LIBRARIES _prefix _name _flags _list _
   endif()
   #message("DEBUG: ${DEFINITIONS} = ${${DEFINITIONS}}")
   #message("DEBUG: ${LIBRARIES} = ${${LIBRARIES}}")
-endmacro(check_fortran_libraries)
+endmacro()
 
 
 #
@@ -363,7 +363,7 @@ else()
       "vecLib"
       "${CGAL_TAUCS_LIBRARIES_DIR} ENV BLAS_LIB_DIR"
       )
-    endif ( NOT BLAS_LIBRARIES )
+    endif ()
 
     # Generic BLAS library?
     # This configuration *must* be the last try as this library is notably slow.
@@ -388,14 +388,14 @@ else()
   if(NOT BLAS_FIND_QUIETLY)
     if(BLAS_FOUND)
       message(STATUS "A library with BLAS API found.")
-    else(BLAS_FOUND)
+    else()
       if(BLAS_FIND_REQUIRED)
         message(FATAL_ERROR "A required library with BLAS API not found. Please specify library location.")
       else()
         message(STATUS "A library with BLAS API not found. Please specify library location.")
       endif()
-    endif(BLAS_FOUND)
-  endif(NOT BLAS_FIND_QUIETLY)
+    endif()
+  endif()
 
   # Add variables to cache
   set( BLAS_INCLUDE_DIR   "${BLAS_INCLUDE_DIR}"
@@ -416,4 +416,4 @@ else()
   #message("DEBUG: BLAS_LIBRARIES_DIR = ${BLAS_LIBRARIES_DIR}")
   #message("DEBUG: BLAS_FOUND = ${BLAS_FOUND}")
 
-endif(BLAS_LIBRARIES_DIR OR BLAS_LIBRARIES)
+endif()

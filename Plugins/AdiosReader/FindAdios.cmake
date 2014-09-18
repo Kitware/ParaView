@@ -43,4 +43,4 @@ IF (ADIOS_INCLUDE_PATH)
       /opt/adios/lib
   )
 
-ENDIF (ADIOS_INCLUDE_PATH)
+ENDIF ()

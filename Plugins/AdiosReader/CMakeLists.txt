@@ -8,10 +8,10 @@ IF (ParaView_SOURCE_DIR)
     ${PARAVIEW_KWSYS_INCLUDE_DIRS}
     ${VTK_INCLUDE_DIRS}
   )
-ELSE (ParaView_SOURCE_DIR)
+ELSE ()
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
+ENDIF ()
 
 IF(PARAVIEW_BUILD_QT_GUI)
   IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
@@ -20,7 +20,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
   ELSE()
     INCLUDE(${QT_USE_FILE})
   ENDIF()
-ENDIF(PARAVIEW_BUILD_QT_GUI)
+ENDIF()
 
 #------------------------------------------------------------------------------
 # Create client side plugin for any platform
@@ -45,9 +45,9 @@ if(PARAVIEW_USE_MPI)
       message("
         The Adios Plugin can not be compiled on Windows.
         Therefore, only a client side plugin will be created.")
-   else(WIN32)
+   else()
       include(FindAdios.cmake)
-   endif(WIN32)
+   endif()
 
    #--------------------------------------------------
    # Real plugin management
@@ -68,6 +68,6 @@ if(PARAVIEW_USE_MPI)
       TARGET_LINK_LIBRARIES( Adios
               LINK_PRIVATE ${ADIOS_READ_LIBRARY} ${MPI_LIBRARIES})
 
-   ENDIF(ADIOS_INCLUDE_PATH)
+   ENDIF()
 
-endif(PARAVIEW_USE_MPI)
+endif()

@@ -71,7 +71,7 @@ if(PARAVIEW_BUILD_QT_GUI)
     pqSQTranslateDialog.cxx
     pqSQVolumeSource.cxx
     )
-endif (PARAVIEW_BUILD_QT_GUI)
+endif ()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/GetDate.cmake")
 # identify the build

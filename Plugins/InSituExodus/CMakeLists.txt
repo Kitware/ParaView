@@ -9,4 +9,4 @@ add_paraview_plugin(
 # Add testing if necessary
 if(BUILD_TESTING)
   add_subdirectory(Testing)
-endif(BUILD_TESTING)
+endif()

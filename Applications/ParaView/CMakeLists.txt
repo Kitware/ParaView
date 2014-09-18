@@ -109,12 +109,12 @@ endif()
 if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(paraview
     LINK_PRIVATE vtkPVStaticPluginsInit)
-endif(NOT BUILD_SHARED_LIBS)
+endif()
 
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
-endif (BUILD_TESTING)
+endif ()
 
 #------------------------------------------------------------------------------
 if (APPLE AND NOT PARAVIEW_DO_UNIX_STYLE_INSTALLS)

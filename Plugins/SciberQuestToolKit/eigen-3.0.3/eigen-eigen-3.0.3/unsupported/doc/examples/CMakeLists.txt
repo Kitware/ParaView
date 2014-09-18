@@ -19,4 +19,4 @@ FOREACH(example_src ${examples_SRCS})
     ARGS >${CMAKE_CURRENT_BINARY_DIR}/${example}.out
   )
   ADD_DEPENDENCIES(unsupported_examples example_${example})
-ENDFOREACH(example_src)
+ENDFOREACH()
