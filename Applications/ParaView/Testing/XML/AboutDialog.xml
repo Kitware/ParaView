@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menu_Help" command="activate" arguments="actionAbout" />
-  <pqevent object="pqClientMainWindow/pqAboutDialog/OK" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqAboutDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
 </pqevents>
