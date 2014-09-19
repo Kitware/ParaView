@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QKeyEvent>
 #include <QPointer>
+#include <QScrollBar>
 #include <QString>
 #include <QTextEdit>
 #include <QTextCursor>
@@ -156,6 +157,8 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
   this->Internals->IsSyntaxHighlighting = true;
   QString text = this->Internals->TextEdit->toPlainText();
   int cursorPosition = this->Internals->TextEdit->textCursor().position();
+  int vScrollBarValue = this->Internals->TextEdit->verticalScrollBar()->value();
+  int hScrollBarValue = this->Internals->TextEdit->horizontalScrollBar()->value();
   int leadingWhiteSpaceLength = 0;
   int trailingWhiteSpaceLength = 0;
   while (leadingWhiteSpaceLength < text.length() &&
@@ -194,6 +197,8 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
     QTextCursor cursor = this->Internals->TextEdit->textCursor();
     cursor.setPosition(cursorPosition);
     this->Internals->TextEdit->setTextCursor(cursor);
+    this->Internals->TextEdit->verticalScrollBar()->setValue(vScrollBarValue);
+    this->Internals->TextEdit->horizontalScrollBar()->setValue(hScrollBarValue);
   }
   this->Internals->IsSyntaxHighlighting = false;
 }
