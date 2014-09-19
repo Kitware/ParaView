@@ -50,15 +50,19 @@ void vtkPVDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 {
 #if defined(VTK_USE_X)
-  Display* dId = XOpenDisplay((char *)NULL);
-  if (dId)
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
+    vtkProcessModule::GetProcessModule()->GetOptions() : NULL;
+  if (options && options->GetDisableXDisplayTests() != 0)
     {
-    XCloseDisplay(dId);
-    return true;
+    Display* dId = XOpenDisplay((char *)NULL);
+    if (dId)
+      {
+      XCloseDisplay(dId);
+      return true;
+      }
+    return false;
     }
-  return false;
 #endif
-
   return true;
 }
 
