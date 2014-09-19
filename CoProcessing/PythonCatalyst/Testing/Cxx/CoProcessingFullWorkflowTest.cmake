@@ -46,7 +46,7 @@ endif()
 
 message("Running pvpython")
 execute_process_with_echo(COMMAND
-  ${PVPYTHON_EXECUTABLE}
+  ${PVPYTHON_EXECUTABLE} -dr
   ${COPROCESSING_DRIVER_SCRIPT}
   ${COPROCESSING_TEST_DIR}/cptest.py 1
   WORKING_DIRECTORY ${COPROCESSING_TEST_DIR}
@@ -70,7 +70,7 @@ if(rv)
 endif()
 
 execute_process_with_echo(COMMAND
-  ${PVPYTHON_EXECUTABLE}
+  ${PVPYTHON_EXECUTABLE} -dr
   ${COPROCESSING_OUTPUTCHECK_SCRIPT}
   ${COPROCESSING_TEST_DIR}/filename_0.pvtp
   RESULT_VARIABLE rv)
