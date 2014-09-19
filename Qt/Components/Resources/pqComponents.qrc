@@ -4,10 +4,6 @@
         <file>Icons/pq3DView16.png</file>
         <file>Icons/pqAdvanced26.png</file>
         <file>Icons/pqAddFavorites16.png</file>
-        <file>Icons/pqAppIcon16.png</file>
-        <file>Icons/pqAppIcon22.png</file>
-        <file>Icons/pqAppIcon32.png</file>
-        <file>Icons/pqAppIcon64.png</file>
         <file>Icons/pqArrowDown16.png</file>
         <file>Icons/pqArrowUp16.png</file>
         <file>Icons/pqAutoApply32.png</file>
@@ -286,5 +282,11 @@
         <file>Icons/pqTextAlignLeft16.png</file>
         <file>Icons/pqTextAlignCenter16.png</file>
         <file>Icons/pqTextAlignJustified16.png</file>
+        <file>Icons/pvIcon16.png</file>
+        <file>Icons/pvIcon22.png</file>
+        <file>Icons/pvIcon32.png</file>
+        <file>Icons/pvIcon64.png</file>
+        <file>Icons/pvIcon96.png</file>
+        <file>Icons/pvIcon512.png</file>
     </qresource>
 </RCC>

@@ -1,246 +1,177 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqAboutDialog</class>
- <widget class="QDialog" name="pqAboutDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="pqAboutDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>528</width>
-    <height>627</height>
+    <height>726</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>About ParaView</string>
   </property>
-  <property name="modal" >
+  <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" >
-   <property name="leftMargin" >
-    <number>9</number>
-   </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>9</number>
-   </property>
-   <property name="horizontalSpacing" >
-    <number>6</number>
-   </property>
-   <property name="verticalSpacing" >
-    <number>6</number>
-   </property>
-   <item row="1" column="1" >
-    <widget class="QLabel" name="VersionLabel" >
-     <property name="text" >
-      <string>&lt;html>&lt;b>Version: &lt;i>3.x.x&lt;/i>&lt;/b>&lt;/html></string>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="Image">
+     <property name="text">
+      <string/>
      </property>
-     <property name="textFormat" >
-      <enum>Qt::AutoText</enum>
+     <property name="pixmap">
+      <pixmap resource="../pqComponents.qrc">:/pqWidgets/Icons/PVSplashScreen.png</pixmap>
      </property>
-     <property name="alignment" >
+     <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
-      <string>&lt;a href=\"http://www.kitware.com\">www.kitware.com&lt;/a></string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>&lt;a href=\"http://www.paraview.org\">www.paraview.org&lt;/a></string>
-     </property>
-     <property name="textFormat" >
-      <enum>Qt::RichText</enum>
-     </property>
-     <property name="alignment" >
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="3" >
-    <widget class="QLabel" name="Image" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text" >
-      <string/>
-     </property>
-     <property name="pixmap" >
-      <pixmap resource="../pqComponents.qrc" >:/pqWidgets/Icons/PVSplashScreen.png</pixmap>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="3" >
-    <widget class="QTabWidget" name="tabWidget" >
-     <property name="currentIndex" >
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tabClient" >
-      <attribute name="title" >
-       <string>Client Information</string>
-      </attribute>
-      <layout class="QVBoxLayout" >
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <property name="leftMargin" >
-        <number>9</number>
-       </property>
-       <property name="topMargin" >
-        <number>9</number>
-       </property>
-       <property name="rightMargin" >
-        <number>9</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>9</number>
-       </property>
-       <item>
-        <widget class="QTreeWidget" name="ClientInformation" >
-         <property name="alternatingRowColors" >
-          <bool>true</bool>
-         </property>
-         <property name="rootIsDecorated" >
-          <bool>false</bool>
-         </property>
-         <column>
-          <property name="text" >
-           <string>Item</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>Description</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabServer" >
-      <attribute name="title" >
-       <string>Connection Information</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
-        <number>9</number>
-       </property>
-       <property name="topMargin" >
-        <number>9</number>
-       </property>
-       <property name="rightMargin" >
-        <number>9</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>9</number>
-       </property>
-       <property name="horizontalSpacing" >
-        <number>6</number>
-       </property>
-       <property name="verticalSpacing" >
-        <number>6</number>
-       </property>
-       <item row="0" column="0" >
-        <widget class="QTreeWidget" name="ServerInformation" >
-         <property name="alternatingRowColors" >
-          <bool>true</bool>
-         </property>
-         <property name="rootIsDecorated" >
-          <bool>false</bool>
-         </property>
-         <column>
-          <property name="text" >
-           <string>Item</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>Description</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="3" >
-    <layout class="QHBoxLayout" >
-     <property name="spacing" >
-      <number>6</number>
-     </property>
-     <property name="leftMargin" >
-      <number>0</number>
-     </property>
-     <property name="topMargin" >
-      <number>0</number>
-     </property>
-     <property name="rightMargin" >
-      <number>0</number>
-     </property>
-     <property name="bottomMargin" >
-      <number>0</number>
-     </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
      <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>&lt;a href=\&quot;http://www.kitware.com\&quot;&gt;www.kitware.com&lt;/a&gt;</string>
        </property>
-       <property name="sizeHint" >
-        <size>
-         <width>0</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="OK" >
-       <property name="text" >
-        <string>OK</string>
+      <widget class="QLabel" name="VersionLabel">
+       <property name="text">
+        <string>&lt;html&gt;&lt;b&gt;Version: &lt;i&gt;3.x.x&lt;/i&gt;&lt;/b&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>&lt;a href=\&quot;http://www.paraview.org\&quot;&gt;www.paraview.org&lt;/a&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabClient">
+      <attribute name="title">
+       <string>Client Information</string>
+      </attribute>
+      <layout class="QVBoxLayout">
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <property name="margin">
+        <number>9</number>
+       </property>
+       <item>
+        <widget class="QTreeWidget" name="ClientInformation">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Item</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabServer">
+      <attribute name="title">
+       <string>Connection Information</string>
+      </attribute>
+      <layout class="QGridLayout">
+       <property name="margin">
+        <number>9</number>
+       </property>
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QTreeWidget" name="ServerInformation">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Item</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources>
-  <include location="../pqComponents.qrc" />
+  <include location="../pqComponents.qrc"/>
  </resources>
  <connections>
   <connection>
-   <sender>OK</sender>
-   <signal>clicked()</signal>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
    <receiver>pqAboutDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
-     <x>278</x>
-     <y>253</y>
+    <hint type="sourcelabel">
+     <x>263</x>
+     <y>703</y>
     </hint>
-    <hint type="destinationlabel" >
-     <x>96</x>
-     <y>254</y>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>362</y>
     </hint>
    </hints>
   </connection>

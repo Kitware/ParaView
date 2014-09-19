@@ -78,8 +78,8 @@ build_paraview_client(paraview
     SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/PVSplashScreen.png"
     PVMAIN_WINDOW ParaViewMainWindow
     PVMAIN_WINDOW_INCLUDE ParaViewMainWindow.h
-    BUNDLE_ICON   "${CMAKE_CURRENT_SOURCE_DIR}/MacIcon.icns"
-    APPLICATION_ICON  "${CMAKE_CURRENT_SOURCE_DIR}/WinIcon.ico"
+    BUNDLE_ICON   "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.icns"
+    APPLICATION_ICON  "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.ico"
     GUI_CONFIGURATION_XMLS
       ${application_gui_xmls} # Add any compiled in GUI configuration xmls
     SOURCES ${ParaView_SOURCE_FILES}

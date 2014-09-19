@@ -178,7 +178,7 @@ void pqRecentFilesMenu::onResourcesChanged()
         
       QAction* const act = new QAction(resource.path(), &this->Implementation->Menu);
       act->setData(resource.serializeString());
-      act->setIcon(QIcon(":/pqWidgets/Icons/pqAppIcon16.png"));
+      act->setIcon(QIcon(":/pqWidgets/Icons/pvIcon32.png"));
       
       this->Implementation->Menu.addAction(act);
       }
