@@ -325,19 +325,9 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     return false;
     }
 
-#ifndef BUILD_SHARED_LIBS
-  if (StaticPluginLoadFunction &&
-      StaticPluginLoadFunction(file))
-    {
-    this->Loaded = true;
-    return true;
-    }
-#endif
-
   this->SetFileName(file);
   std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
   this->SetPluginName(defaultname.c_str());
-
 
   if (vtksys::SystemTools::GetFilenameLastExtension(file) == ".xml")
     {
@@ -352,7 +342,18 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
       "Failed to load XML plugin. Not a valid XML or file could not be read.");
     return false;
     }
-
+#ifndef BUILD_SHARED_LIBS
+  if (StaticPluginLoadFunction &&
+      StaticPluginLoadFunction(file))
+    {
+    this->Loaded = true;
+    return true;
+    }
+  vtkPVPluginLoaderErrorMacro(
+    "Could not find the plugin statically linked in, and "
+    "cannot load dynamic plugins  in static builds.");
+  return false;
+#else // ifndef BUILD_SHARED_LIBS
   vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
   if (!lib)
     {
@@ -483,6 +484,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 
   vtkPVPlugin* plugin = pv_plugin_query_instance();
   return this->LoadPlugin(file, plugin);
+#endif // ifndef BUILD_SHARED_LIBS else
 }
 
 //-----------------------------------------------------------------------------
