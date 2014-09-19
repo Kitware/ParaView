@@ -19,5 +19,5 @@ Render()
 
 for i in xrange(5):
     w.Maximum = 2**i
-    WriteImage(smtesting.TempDir + "/LinePlotInScripts_%d.png" % i)
+    WriteImage(smtesting.TempDir + "/LinePlotInScripts_%d.png" % i, Magnification=2)
 print "Done"

@@ -167,6 +167,14 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
 
   this->StillRender();
 
+  // This is a hack. The only reason we do this is so that in symmetric-batch
+  // mode, when the vtkWindowToImageFilter tries to grab frame buffers on the
+  // satellites, it doesn't die. In reality, we shouldn't grab the frame buffers
+  // at all on satellites. We still need to call
+  // vtkWindowToImageFilter::Update() otherwise we can end up with mismatched
+  // renders esp when magnification > 1.
+  this->GetContextView()->Render();
+
   vtkSmartPointer<vtkWindowToImageFilter> w2i =
     vtkSmartPointer<vtkWindowToImageFilter>::New();
   w2i->SetInput(window);
