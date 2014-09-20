@@ -157,6 +157,7 @@ void vtkPVPluginsInformation::PrintSelf(ostream& os, vtkIndent indent)
   for (unsigned int cc=0; cc < this->GetNumberOfPlugins(); cc++)
     {
     os << indent << this->GetPluginName(cc) << ": " << endl;
+    os << indent.GetNextIndent() << "Filename: " << this->GetPluginFileName(cc) << endl;
     }
 
 }

@@ -98,10 +98,10 @@ namespace
     paths_to_search.push_back(app_dir + "/../Plugins");
     paths_to_search.push_back(app_dir + "/../../..");
     paths_to_search.push_back(app_dir + "/../../../../lib");
-
-    // paths when doing an unix style install.
-    paths_to_search.push_back(app_dir +"/../lib/paraview-" PARAVIEW_VERSION);
 #endif
+    // paths when doing an unix style install on OsX and static builds on Linux.
+    paths_to_search.push_back(app_dir +"/../lib/paraview-" PARAVIEW_VERSION);
+
     // On windows configuration files are in the parent directory
     paths_to_search.push_back(app_dir + "/../");
 
@@ -301,8 +301,7 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
           "Missing required attribute name or auto_load. Skipping element.");
         continue;
         }
-      vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: "
-        << name.c_str());
+      vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: " << name.c_str());
       std::string plugin_filename;
       if (child->GetAttribute("filename") &&
         vtksys::SystemTools::FileExists(child->GetAttribute("filename"), true))
@@ -367,7 +366,10 @@ unsigned int vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
     }
   else
     {
-    iter->FileName = filename;
+    // don't update the filename here. This avoids cloberring of paths for
+    // distributed plugins between servers that are named the same (as far as
+    // the client goes).
+    // iter->FileName = filename;
     return static_cast<unsigned int>(iter - this->PluginsList->begin());
     }
 }
