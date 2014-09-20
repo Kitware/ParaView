@@ -166,6 +166,13 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   window->SwapBuffersOff();
 
   this->StillRender();
+
+  // This is a hack. The only reason we do this is so that in symmetric-batch
+  // mode, when the vtkWindowToImageFilter tries to grab frame buffers on the
+  // satellites, it doesn't die. In reality, we shouldn't grab the frame buffers
+  // at all on satellites. We still need to call
+  // vtkWindowToImageFilter::Update() otherwise we can end up with mismatched
+  // renders esp when magnification > 1.
   this->GetContextView()->Render();
 
   vtkSmartPointer<vtkWindowToImageFilter> w2i =
@@ -232,7 +239,14 @@ void vtkSMContextViewProxy::CopyAxisRangesFromChart()
         this->GetProperty("TopAxisRangeMinimum"),
         this->GetProperty("TopAxisRangeMaximum"));
       }
+    // HACK: This overcomes a issue where we mark the chart modified, in Render.
+    // We seems to be lacking a mechanism in vtkSMProxy to say "here's the
+    // new property value, however it's already set on the server side too,
+    // so no need to push it or mark pipelines dirty".
+    int prev = this->InMarkModified;
+    this->InMarkModified = 1;
     this->UpdateVTKObjects();
+    this->InMarkModified = prev;
     }
 }
 
@@ -254,6 +268,9 @@ void vtkSMContextViewProxy::OnInteractionEvent()
       }
     this->UpdateVTKObjects();
     this->InvokeEvent(vtkCommand::InteractionEvent);
+
+    // Note: OnInteractionEvent gets called before this->StillRender() gets called
+    // as a consequence of this interaction.
     }
 }
 

@@ -69,6 +69,7 @@ set(PVBATCH_TESTS
   ParallelSerialWriter.py
   Simple.py
   UserTransformOnRepresentation.py
+  LinePlotInScripts.py,NO_VALID
   )
 
 IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)

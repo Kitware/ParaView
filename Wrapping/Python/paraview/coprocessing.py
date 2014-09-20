@@ -251,8 +251,6 @@ class CoProcessor(object):
         """Registers a writer proxy. This method is generally used in
            CreatePipeline() to register writers. All writes created as such will
            write the output files appropriately in WriteData() is called."""
-        if not isinstance(writer, servermanager.Proxy):
-            raise RuntimeError, "Invalid 'writer' argument passed to RegisterWriter."
         writerParametersProxy = self.WriterParametersProxy(
             writer, filename, freq)
 
@@ -269,11 +267,19 @@ class CoProcessor(object):
         controller = servermanager.ParaViewPipelineController()
         # assume that a client only proxy with the same name as a writer
         # is available in "insitu_writer_paramters"
+
+        # Since coprocessor sometimes pass writer as a custom object and not
+        # a proxy, we need to handle that. Just creating any arbitrary writer
+        # proxy to store the parameters it acceptable. So let's just do that
+        # when the writer is not a proxy.
+        writerIsProxy = isinstance(writer, servermanager.Proxy)
+        helperName = writer.GetXMLName() if writerIsProxy else "XMLPImageDataWriter"
         proxy = servermanager.ProxyManager().NewProxy(
-            "insitu_writer_parameters", writer.GetXMLName())
+            "insitu_writer_parameters", helperName)
         controller.PreInitializeProxy(proxy)
-        proxy.GetProperty("Input").SetInputConnection(
-            0, writer.Input.SMProxy, 0)
+        if writerIsProxy:
+            proxy.GetProperty("Input").SetInputConnection(
+                0, writer.Input.SMProxy, 0)
         proxy.GetProperty("FileName").SetElement(0, filename)
         proxy.GetProperty("WriteFrequency").SetElement(0, freq)
         controller.PostInitializeProxy(proxy)

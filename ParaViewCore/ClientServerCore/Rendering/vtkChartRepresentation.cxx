@@ -97,10 +97,16 @@ int vtkChartRepresentation::ProcessViewRequest(
   if (request == vtkPVView::REQUEST_RENDER())
     {
     assert(this->ContextView != NULL);
-
     // this is called before every render, so don't do expensive things here.
+    // Hence, we'll use this check to avoid work unless really needed.
     if (this->GetMTime() > this->PrepareForRenderingTime)
       {
+      // NOTE: despite the fact that we're only looking at this->MTime,
+      // this->PrepareForRendering() will get called even when the
+      // representation's upstream pipeline has changed. This is because for
+      // representations, when upstream changes, the ServerManager ensures that
+      // vtkPVDataRepresentation::MarkModified() gets called.
+
       this->PrepareForRendering();
       this->PrepareForRenderingTime.Modified();
       }

@@ -486,14 +486,4 @@ void vtkXYChartRepresentation::PrepareForRendering()
   this->Internals->UpdatePlots(this, tables);
 
   assert(this->UseIndexForXAxis == true || this->XAxisSeriesName != NULL);
-
-  // if the x axis selection changed, we need to reset the chart bounds.
-  if ((this->Internals->PreviousUseIndexForXAxis != this->UseIndexForXAxis) ||
-       (this->UseIndexForXAxis == false &&
-        this->Internals->PreviousXAxisSeriesName != this->XAxisSeriesName))
-    {
-    this->Internals->PreviousUseIndexForXAxis = this->UseIndexForXAxis;
-    this->Internals->PreviousXAxisSeriesName = (this->UseIndexForXAxis==false? this->XAxisSeriesName : "");
-    chartXY->RecalculateBounds();
-    }
 }
