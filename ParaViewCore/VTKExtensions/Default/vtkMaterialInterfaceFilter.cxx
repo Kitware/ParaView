@@ -2742,16 +2742,16 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(
         dMsg[12+ii] = globalBounds[ii];
         dMsg[15+ii] = globalBounds[ii+3];
         }
-      controller->Send(iMsg, 9, 0, 8973432);
-      controller->Send(dMsg, 15, 0, 8973432);
+      controller->Send(iMsg, 9, 0, 973432);
+      controller->Send(dMsg, 18, 0, 973432);
       }
     else
       {
       // Collect results from all processes.
       for (int id = 1; id < numProcs; ++id)
         {
-        controller->Receive(iMsg, 9, id, 8973432);
-        controller->Receive(dMsg, 18, id, 8973432);
+        controller->Receive(iMsg, 9, id, 973432);
+        controller->Receive(dMsg, 18, id, 973432);
         numCells = iMsg[2];
         cellDims[0] = iMsg[6];
         cellDims[1] = iMsg[7];
@@ -2853,12 +2853,12 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(
       }
     for (int ii = 1; ii < numProcs; ++ii)
       {
-      controller->Send(dMsg, 9, ii, 8973439);
+      controller->Send(dMsg, 9, ii, 973439);
       }
     }
   else
     {
-    controller->Receive(dMsg, 9, 0, 8973439);
+    controller->Receive(dMsg, 9, 0, 973439);
     for (int ii = 0; ii < 3; ++ii)
       {
       this->GlobalOrigin[ii] = dMsg[ii];

@@ -115,9 +115,9 @@ int vtkCompleteArrays::RequestData(
     for (idx = 1; idx < numProcs; ++idx)
       {
       int length = 0;
-      this->Controller->Receive(&length, 1, idx, 3389002);
+      this->Controller->Receive(&length, 1, idx, 389002);
       unsigned char* data = new unsigned char[length];
-      this->Controller->Receive(data, length, idx, 3389003);
+      this->Controller->Receive(data, length, idx, 389003);
       css.SetData(data, length);
       tmpInfo->CopyFromStream(&css);
       delete [] data;
@@ -164,8 +164,8 @@ int vtkCompleteArrays::RequestData(
     const unsigned char* data;
     css.GetData(&data, &length);
     int len = static_cast<int>(length);
-    this->Controller->Send(&len, 1, 0, 3389002);
-    this->Controller->Send(const_cast<unsigned char*>(data), len, 0, 3389003);
+    this->Controller->Send(&len, 1, 0, 389002);
+    this->Controller->Send(const_cast<unsigned char*>(data), len, 0, 389003);
     dataInfo->Delete();
     }
 

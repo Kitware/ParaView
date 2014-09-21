@@ -735,7 +735,7 @@ void vtkGridConnectivity::InitializeFaceHash(
   int numProcs = this->Controller->GetNumberOfProcesses();
   if (this->Controller->GetLocalProcessId() != 0)
     {
-    this->Controller->Send(&maxId, 1, 0, 8897324);
+    this->Controller->Send(&maxId, 1, 0, 897324);
     // Only process 0 needs a hash to hold all procs faces.
     }
   else
@@ -743,7 +743,7 @@ void vtkGridConnectivity::InitializeFaceHash(
     for (int ii = 1; ii < numProcs; ++ii)
       {
       vtkIdType tmp;
-      this->Controller->Receive(&tmp, 1, ii, 8897324);
+      this->Controller->Receive(&tmp, 1, ii, 897324);
       if (tmp > maxId)
         {
         maxId = tmp;
@@ -1258,7 +1258,7 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdMap,
     vtkIdType numFragments = this->EquivalenceSet->GetNumberOfResolvedSets();
     msg1[0] = numFragments;
     msg1[1] = numFaces;
-    this->Controller->Send(msg1, 2, 0, 9890831);
+    this->Controller->Send(msg1, 2, 0, 890831);
     if (numFaces > 0)
       {
       // Lets put everything into a single vtkIdType array
@@ -1276,13 +1276,13 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdMap,
         *msgPtr++ = face->FaceId;
         *msgPtr++ = face->FragmentId;
         }
-      this->Controller->Send(msg2, msgLength, 0, 1344897);
+      this->Controller->Send(msg2, msgLength, 0, 344897);
       delete [] msg2;
       // Now send the integration arrays (volume).
-      this->Controller->Send(this->FragmentVolumes->GetPointer(0), numFragments, 0, 5634780);
+      this->Controller->Send(this->FragmentVolumes->GetPointer(0), numFragments, 0, 634780);
 
       //send all point and cell information
-      int tag = 5634780;
+      int tag = 634780;
       int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
       this->Controller->Send(&numArrays,1,0,++tag);
       for (int i = 0; i < numArrays; ++i)
@@ -1308,7 +1308,7 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdMap,
     for (int procIdx = 1; procIdx < numProcs; ++procIdx)
       { // loop over every process. 
       // Receive
-      this->Controller->Receive(msg1, 2, procIdx, 9890831);
+      this->Controller->Receive(msg1, 2, procIdx, 890831);
       numberOfFragments = msg1[0];
       numFaces = msg1[1];
       // Create a map to assign global fragment ids.
@@ -1319,7 +1319,7 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdMap,
         // Receive faces from a remote process.
         msgLength = numFaces * 7;
         msg2 = new vtkIdType[msgLength];
-        this->Controller->Receive(msg2,msgLength,procIdx,1344897);
+        this->Controller->Receive(msg2,msgLength,procIdx,344897);
         msgPtr = msg2;
         for (int faceIdx = 0; faceIdx < numFaces; ++faceIdx)
           {
@@ -1363,11 +1363,11 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdMap,
           this->FragmentVolumes->GetPointer(fragmentIdMap[procIdx]),
           numberOfFragments,
           procIdx,
-          5634780);
+          634780);
 
         //get all the point and cell information from each processor
         //we don't use gather, since it presumes equal length arrays on each processor
-        int tag = 5634780;
+        int tag = 634780;
         int numArrays = 0;
         vtkDoubleArray *da;
         vtkDoubleArray *rec;
@@ -1464,7 +1464,7 @@ void vtkGridConnectivity::ResolveProcessesFaces()
     int* fragmentIdPtr = fragmentIds;
     if (numFaces)
       {
-      this->Controller->Receive(fragmentIds, numFaces, 0, 2034301);
+      this->Controller->Receive(fragmentIds, numFaces, 0, 234301);
       // Get rid of faces shared by multiple processe and
       // set the resolved fragment ids.
       this->FaceHash->InitTraversal();
@@ -1530,7 +1530,7 @@ void vtkGridConnectivity::ResolveProcessesFaces()
             } // end if face belongs to process.
           } // endloop face in hash
         // Send the mask to the remote process.
-        this->Controller->Send(faceMask, numFaces, procIdx, 2034301);
+        this->Controller->Send(faceMask, numFaces, procIdx, 234301);
         delete [] faceMask;
         
         // We need to send the volume array to the remote processes too.
@@ -1571,7 +1571,7 @@ void vtkGridConnectivity::ResolveProcessesFaces()
   double* msgVolume;
 
       // Now receive the volume array index on partial fragmentIds.
-      this->Controller->Receive(msgVolume, numberOfFragments,procIdx,8729987);
+      this->Controller->Receive(msgVolume, numberOfFragments,procIdx,729987);
 
 */
 
