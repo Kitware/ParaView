@@ -154,13 +154,13 @@ FUNCTION(build_paraview_client BPC_NAME)
     ENDIF (BPC_BUNDLE_ICON)
 
     IF(QT_MAC_USE_COCOA)
-      IF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+      IF (IS_DIRECTORY "${QT_QTGUI_LIBRARY_RELEASE}")
             GET_FILENAME_COMPONENT(qt_menu_nib
-              "@QT_QTGUI_LIBRARY_RELEASE@/Resources/qt_menu.nib"
+              "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
               REALPATH)
       ELSE (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
         GET_FILENAME_COMPONENT(qt_menu_nib
-          "@QT_LIBRARY_DIR@/Resources/qt_menu.nib"
+          "${QT_LIBRARY_DIR}/Resources/qt_menu.nib"
           REALPATH)
       ENDIF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
 
