@@ -488,6 +488,52 @@ def GetProperty(*arguments, **keywords):
         proxy = active_objects.source
     return proxy.GetProperty(name)
 
+# -----------------------------------------------------------------------------
+def GetDisplayProperty(*arguments, **keywords):
+    """Same as GetProperty, except that if no 'proxy' is passed, it will use
+    the active display properties, rather than the active source"""
+    proxy = None
+    name = None
+    for key in keywords:
+        if key == "name":
+            name = keywords[key]
+        if key == "proxy":
+            proxy = keywords[key]
+    if len(arguments) == 1 :
+        name = arguments[0]
+    if len(arguments) == 2 :
+        proxy = arguments[0]
+        name  = arguments[1]
+    if not proxy:
+        proxy = GetDisplayProperties()
+    return GetProperty(proxy, name)
+
+# -----------------------------------------------------------------------------
+def GetViewProperty(*arguments, **keywords):
+    """Same as GetProperty, except that if no 'proxy' is passed, it will use
+    the active view properties, rather than the active source"""
+    proxy = None
+    name = None
+    for key in keywords:
+        if key == "name":
+            name = keywords[key]
+        if key == "proxy":
+            proxy = keywords[key]
+    if len(arguments) == 1 :
+        name = arguments[0]
+    if len(arguments) == 2 :
+        proxy = arguments[0]
+        name  = arguments[1]
+    if not proxy:
+        proxy = GetViewProperties()
+    return GetProperty(proxy, name)
+
+# -----------------------------------------------------------------------------
+def GetViewProperties(view=None):
+    """"Same as GetActiveView(), this API is provided just for consistency with
+    GetDisplayProperties()."""
+    return GetActiveView()
+
 #==============================================================================
 # ServerManager methods
 #==============================================================================
