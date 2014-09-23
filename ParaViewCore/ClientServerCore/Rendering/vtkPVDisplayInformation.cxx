@@ -52,7 +52,7 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 #if defined(VTK_USE_X)
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()?
     vtkProcessModule::GetProcessModule()->GetOptions() : NULL;
-  if (options && options->GetDisableXDisplayTests() != 0)
+  if (options && options->GetDisableXDisplayTests() == 0)
     {
     Display* dId = XOpenDisplay((char *)NULL);
     if (dId)
