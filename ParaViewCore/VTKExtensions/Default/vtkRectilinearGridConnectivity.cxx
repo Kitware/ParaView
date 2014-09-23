@@ -1114,7 +1114,7 @@ int vtkRectilinearGridConnectivity::RequestData( vtkInformation *,
       {
       for ( i = 0; i < numParts; i ++ )
         {
-        this->Controller->Send( theParts[i], 0, 9890831 + i );
+        this->Controller->Send( theParts[i], 0, 890831 + i );
         }
       }
 
@@ -1368,7 +1368,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments
     if ( this->Controller->GetLocalProcessId() != 0 )
       {
       // this is a remote process
-      this->Controller->Send( polyData, 0, 9890831 + partIndx );
+      this->Controller->Send( polyData, 0, 890831 + partIndx );
       polyData->Initialize();
       }
     else
@@ -1398,7 +1398,7 @@ void vtkRectilinearGridConnectivity::ExtractFragments
       for ( procIndx = 1; procIndx < numProcs; procIndx ++ )
         {
         this->Controller->Receive
-                          ( tempPlys[procIndx], procIndx, 9890831 + partIndx );
+                          ( tempPlys[procIndx], procIndx, 890831 + partIndx );
         }
 
       // obtain the global bounding box (note that vtkPolyData objects provided
