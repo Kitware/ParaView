@@ -121,7 +121,7 @@
          </property>
          <property name="icon">
           <iconset resource="../../../Components/Resources/pqComponents.qrc">
-           <normaloff>:/pqWidgets/Icons/pqResetRange24.png</normaloff>:/pqWidgets/Icons/pqResetRange24.png</iconset>
+           <normaloff>:/pqWidgets/Icons/pqResetToVisibleRange32.png</normaloff>:/pqWidgets/Icons/pqResetToVisibleRange32.png</iconset>
          </property>
         </widget>
        </item>
