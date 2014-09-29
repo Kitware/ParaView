@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqUndoStack.h"
 #include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>
 
@@ -69,13 +67,6 @@ void pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange()
     return;
     }
 
-  vtkSMPVRepresentationProxy* repProxy =
-    vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
-  if (!repProxy)
-    {
-    return ;
-    }
-
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
     {
@@ -83,14 +74,9 @@ void pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange()
     return;
     }
 
-  vtkSMRenderViewProxy* rvproxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
-  if (!rvproxy)
-    {
-    return;
-    }
-
   BEGIN_UNDO_SET("Rescale Visible Range");
-  vtkSMTransferFunctionProxy::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
+  vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
+    repr->getProxy(), view->getProxy());
   repr->renderViewEventually();
   END_UNDO_SET();
 }

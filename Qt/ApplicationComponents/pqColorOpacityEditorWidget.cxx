@@ -637,7 +637,7 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
     }
 
   BEGIN_UNDO_SET("Reset transfer function ranges using visible data");
-  vtkSMTransferFunctionProxy::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
+  vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(repProxy, rvproxy);
   repr->renderViewEventually();
   END_UNDO_SET();
 }

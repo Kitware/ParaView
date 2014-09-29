@@ -48,7 +48,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataDeliveryManager.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
@@ -826,7 +825,7 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
+bool vtkSMRenderViewProxy::SelectSurfaceCells(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -851,7 +850,7 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
+bool vtkSMRenderViewProxy::SelectSurfacePoints(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -947,7 +946,21 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(int region[4],
+bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
+  int fieldAssociation,
+  const char* scalarName,
+  int component,
+  double range[])
+{
+  const int *size = this->GetRenderer()->GetSize();
+  int region[4] = {0, 0, size[0]-1, size[1]-1};
+  return this->ComputeVisibleScalarRange(
+    region, fieldAssociation, scalarName, component, range);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
+  const int region[4],
   int fieldAssociation,
   const char* scalarName,
   int component,
@@ -979,19 +992,21 @@ bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(int region[4],
     {
     return false;
     }
-
-  vtkWarningMacro( << "Number of sources = " << selectionSources->GetNumberOfItems());
-  vtkWarningMacro( << "Number of repr = " << selectedRepresentations->GetNumberOfItems());
-
   assert(selectedRepresentations->GetNumberOfItems() == selectionSources->GetNumberOfItems());
 
   vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-  vtkSmartPointer<vtkSMProxy> rangeExtractor;
-  rangeExtractor.TakeReference(pxm->NewProxy("filters", "ExtractSelectionRange"));
+  vtkSmartPointer<vtkSMProxy> _rangeExtractor;
+  _rangeExtractor.TakeReference(pxm->NewProxy("internal_filters", "ExtractSelectionRange"));
+  vtkSMSourceProxy* rangeExtractor = vtkSMSourceProxy::SafeDownCast(_rangeExtractor);
+  if (!rangeExtractor)
+    {
+    vtkErrorMacro("Failed to create 'ExtractSelectionRange' proxy. "
+      "ComputeVisibleScalarRange() cannot work as expected.");
+    return false;
+    }
+
   for (int cc=0, max = selectionSources->GetNumberOfItems(); cc < max; cc++)
     {
-    vtkGenericWarningMacro( << "Representation num " << cc);
-
     vtkSMProxy* selectedRepresentation = vtkSMProxy::SafeDownCast(
       selectedRepresentations->GetItemAsObject(cc));
     vtkSMProxy* selectionSource = vtkSMProxy::SafeDownCast(
@@ -1006,21 +1021,11 @@ bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(int region[4],
     vtkSMPropertyHelper(rangeExtractor, "FieldType").Set(fieldAssociation);
     rangeExtractor->UpdateVTKObjects();
 
-    vtkSMSourceProxy::SafeDownCast(rangeExtractor)->UpdatePipeline();
-    vtkSMSourceProxy::SafeDownCast(rangeExtractor)->UpdatePropertyInformation();
-
-    vtkSMProperty* rangeProp = rangeExtractor->GetProperty("Range");
-    vtkSMDoubleVectorProperty* rangeDoubleProp =
-      vtkSMDoubleVectorProperty::SafeDownCast(rangeProp);
-    if (!rangeDoubleProp)
-      {
-      continue;
-      }
+    rangeExtractor->UpdatePipeline();
+    rangeExtractor->UpdatePropertyInformation();
 
     double tempRange[2];
-    tempRange[0] = rangeDoubleProp->GetElement(0);
-    tempRange[1] = rangeDoubleProp->GetElement(1);
-
+    vtkSMPropertyHelper(rangeExtractor, "Range").Get(tempRange, 2);
     if (tempRange[0] < range[0])
       {
       range[0] = tempRange[0];
@@ -1035,7 +1040,7 @@ bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(int region[4],
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectFrustumCells(int region[4],
+bool vtkSMRenderViewProxy::SelectFrustumCells(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -1045,7 +1050,7 @@ bool vtkSMRenderViewProxy::SelectFrustumCells(int region[4],
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectFrustumPoints(int region[4],
+bool vtkSMRenderViewProxy::SelectFrustumPoints(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -1055,7 +1060,7 @@ bool vtkSMRenderViewProxy::SelectFrustumPoints(int region[4],
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
+bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections,

@@ -41,19 +41,19 @@ public:
 
   // Description:
   // Makes a new selection source proxy.
-  bool SelectSurfaceCells(int region[4],
+  bool SelectSurfaceCells(const int region[4],
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     bool multiple_selections=false);
-  bool SelectSurfacePoints(int region[4],
+  bool SelectSurfacePoints(const int region[4],
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     bool multiple_selections=false);
-  bool SelectFrustumCells(int region[4],
+  bool SelectFrustumCells(const int region[4],
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     bool multiple_selections=false);
-  bool SelectFrustumPoints(int region[4],
+  bool SelectFrustumPoints(const int region[4],
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     bool multiple_selections=false);
@@ -66,7 +66,12 @@ public:
     vtkCollection* selectionSources,
     bool multiple_selections=false);
 
-  bool ComputeVisibleScalarRange(int region[4],
+  // Description:
+  // Returns the range for visible elements in the current view.
+  bool ComputeVisibleScalarRange(const int region[4],
+    int fieldAssociation, const char* scalarName,
+    int component, double range[]);
+  bool ComputeVisibleScalarRange(
     int fieldAssociation, const char* scalarName,
     int component, double range[]);
 
@@ -182,7 +187,7 @@ protected:
   virtual vtkImageData* CaptureWindowInternal(int magnification);
   virtual void CaptureWindowInternalRender();
 
-  bool SelectFrustumInternal(int region[4],
+  bool SelectFrustumInternal(const int region[4],
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     bool multiple_selections,

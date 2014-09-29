@@ -33,13 +33,6 @@
 #include <math.h>
 #include <vector>
 
-#include "vtkSMPVRepresentationProxy.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkRenderWindow.h"
-#include "vtkRendererCollection.h"
-#include "vtkRenderer.h"
-
 vtkStandardNewMacro(vtkSMTransferFunctionProxy);
 //----------------------------------------------------------------------------
 vtkSMTransferFunctionProxy::vtkSMTransferFunctionProxy()
@@ -270,93 +263,6 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunctionToDataRange(bool extend)
     return this->RescaleTransferFunction(range[0], range[1], extend);
     }
   return false;
-}
-
-bool vtkSMTransferFunctionProxy::RescaleTransferFunctionToVisibleRange(
-  vtkSMPVRepresentationProxy* repProxy,
-  vtkSMRenderViewProxy* rvproxy)
-{
-  if (!repProxy->GetUsingScalarColoring())
-    {
-    // we are not using scalar coloring, nothing to do.
-    return false;
-    }
-
-  vtkPVArrayInformation* info = repProxy->GetArrayInformationForColorArray();
-  if (!info)
-    {
-    // Could not determine array range
-    return false;
-    }
-
-  const char* scalarName = info->GetName();
-
-  vtkGenericWarningMacro( << "scalarName " << scalarName );
-
-  vtkSMProperty* lutProperty = repProxy->GetProperty("LookupTable");
-  vtkSMProperty* sofProperty = repProxy->GetProperty("ScalarOpacityFunction");
-  if (!lutProperty && !sofProperty)
-    {
-    // No LookupTable and ScalarOpacityFunction found.
-    return false;
-    }
-
-  vtkSMPropertyHelper colorArrayHelper(repProxy, "ColorArrayName");
-  int fieldAssociation = colorArrayHelper.GetInputArrayAssociation();
-
-  vtkGenericWarningMacro( << "fieldAssociation " << fieldAssociation );
-
-  vtkSMProxy* lut = vtkSMPropertyHelper(lutProperty).GetAsProxy();
-  vtkSMProxy* sof = vtkSMPropertyHelper(sofProperty).GetAsProxy();
-
-  // We need to determine the component number to use from the lut.
-  int component = -1;
-  if (lut && vtkSMPropertyHelper(lut, "VectorMode").GetAsInt() != 0)
-    {
-    component = vtkSMPropertyHelper(lut, "VectorComponent").GetAsInt();
-    }
-
-  if (component >= info->GetNumberOfComponents())
-    {
-    return false;
-    }
-
-  vtkGenericWarningMacro( << "component " << component );
-
-  int* size = rvproxy->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetSize();
-  int region[4] = { 0, 0, size[0], size[1] };
-
-  vtkGenericWarningMacro( << "region " << size[0] << " " << size[1] );
-
-  double range[2];
-  if (!rvproxy->ComputeVisibleScalarRange(region, fieldAssociation, scalarName, component, range))
-    {
-    return false;
-    }
-  if ( (range[1] - range[0]) < 1e-6 )
-    {
-    range[1] = range[0] + 1e-6;
-    }
-
-  vtkGenericWarningMacro( << "Range = " << range[0] << " " << range[1] );
-
-  if (lut)
-    {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, false);
-    vtkSMProxy* sof_lut = vtkSMPropertyHelper(
-      lut, "ScalarOpacityFunction", true).GetAsProxy();
-    if (sof_lut && sof != sof_lut)
-      {
-      vtkSMTransferFunctionProxy::RescaleTransferFunction(
-        sof_lut, range, false);
-      }
-    }
-  if (sof)
-    {
-    vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range, false);
-    }
-
-  return true;
 }
 
 //----------------------------------------------------------------------------
