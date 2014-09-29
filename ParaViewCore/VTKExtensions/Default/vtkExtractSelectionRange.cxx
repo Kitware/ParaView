@@ -15,14 +15,15 @@
 #include "vtkExtractSelectionRange.h"
 
 #include "vtkCellData.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
-#include "vtkInformationVector.h"
 #include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -32,9 +33,9 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
 
-#include <vector>
-#include <set>
 #include <map>
+#include <set>
+#include <vector>
 
 vtkStandardNewMacro(vtkExtractSelectionRange);
 //----------------------------------------------------------------------------
@@ -55,37 +56,6 @@ vtkExtractSelectionRange::~vtkExtractSelectionRange()
 }
 
 //----------------------------------------------------------------------------
-void vtkExtractSelectionRange::SetArrayName(const char* arrayName)
-{
-  if (this->ArrayName == NULL && arrayName == NULL)
-    {
-    return;
-    }
-
-  if (this->ArrayName && arrayName && strcmp(this->ArrayName, arrayName) == 0)
-    {
-    return;
-    }
-
-  delete [] this->ArrayName;
-  this->ArrayName = 0;
-  if (arrayName)
-    {
-    size_t n = strlen(arrayName) + 1;
-    char *cp1 =  new char[n];
-    const char *cp2 = (arrayName);
-    this->ArrayName = cp1;
-    do
-      {
-      *cp1++ = *cp2++;
-      }
-    while (--n);
-    }
-
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
 int vtkExtractSelectionRange::FillInputPortInformation(
   int port, vtkInformation* info)
 {
@@ -98,22 +68,6 @@ int vtkExtractSelectionRange::FillInputPortInformation(
     {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
     }
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-vtkTable* vtkExtractSelectionRange::GetOutput()
-{
-  return vtkTable::SafeDownCast(this->GetOutputDataObject(0));
-}
-
-//----------------------------------------------------------------------------
-int vtkExtractSelectionRange::RequestInformation(
-  vtkInformation* info,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
-{
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
   return 1;
 }
 
@@ -136,7 +90,7 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
 
     if (!node)
       {
-      vtkGenericWarningMacro( << "Selection node null" );
+      vtkDebugMacro( << "Selection node null" );
       continue;
       }
 
@@ -144,14 +98,14 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
         node->GetSelectionList());
     if (!idList)
       {
-      vtkGenericWarningMacro( << "Selection node list null" );
+      vtkDebugMacro( << "Selection node list null" );
       continue;
       }
 
     int contentType = node->GetContentType();
     if (contentType != vtkSelectionNode::INDICES)
       {
-      vtkGenericWarningMacro("Unhandled ContentType: " << contentType);
+      vtkDebugMacro("Unhandled ContentType: " << contentType);
       continue;
       }
 
@@ -162,7 +116,7 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
       composite_index = selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
       }
 
-    vtkGenericWarningMacro( << "composite_index " << composite_index );
+    vtkDebugMacro( << "composite_index " << composite_index );
 
     vtkDataSet* dataSet = vtkDataSet::SafeDownCast(input);
     if (!dataSet)
@@ -183,7 +137,7 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
           }
         if (compDataIt->IsDoneWithTraversal())
           {
-          vtkGenericWarningMacro( << "dataSet no found" );
+          vtkDebugMacro( << "dataSet no found" );
           continue;
           }
 
@@ -194,11 +148,11 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
 
     if (!dataSet)
       {
-      vtkGenericWarningMacro( << "dataSet no found " << input->GetClassName() );
+      vtkDebugMacro( << "dataSet no found " << input->GetClassName() );
       continue;
       }
 
-    vtkGenericWarningMacro( << "dataset nb points " << dataSet->GetNumberOfPoints());
+    vtkDebugMacro( << "dataset nb points " << dataSet->GetNumberOfPoints());
 
     vtkDataArray* dataArray;
     if (this->FieldType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
@@ -211,13 +165,13 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
       }
     else
       {
-      vtkGenericWarningMacro( << "Field type not supported" );
+      vtkDebugMacro( << "Field type not supported" );
       continue;
       }
 
     if (!dataArray)
       {
-      vtkGenericWarningMacro( << "No data array found" );
+      vtkDebugMacro( << "No data array found" );
       continue;
       }
 
@@ -238,7 +192,7 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
       }
     if (idmax > dataArray->GetNumberOfTuples())
       {
-      vtkGenericWarningMacro( << "max id > array max id" );
+      vtkDebugMacro( << "max id > array max id" );
       continue;
       }
 
@@ -277,13 +231,24 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
       this->Range[1] = tempRange[1];
       }
 
-    vtkGenericWarningMacro( << "Current range " << this->Range[0] << " " << this->Range[1] );
+    vtkDebugMacro( << "Current range " << this->Range[0] << " " << this->Range[1] );
 
     }
 
-  vtkGenericWarningMacro( << "Final range " << this->Range[0] << " " << this->Range[1] );
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  if (controller && controller->GetNumberOfProcesses() > 1)
+    {
+    double range[2];
+    controller->AllReduce(&this->Range[0], &range[0], 1, vtkCommunicator::MIN_OP);
+    controller->AllReduce(&this->Range[1], &range[1], 1, vtkCommunicator::MAX_OP);
+    this->Range[0] = range[0];
+    this->Range[1] = range[1];
+    }
+
+  vtkDebugMacro( << "Final range " << this->Range[0] << " " << this->Range[1] );
 
   vtkNew<vtkDoubleArray> rangeArray;
+  rangeArray->SetName("Range");
   rangeArray->SetNumberOfValues(2);
   rangeArray->SetValue(0, this->Range[0]);
   rangeArray->SetValue(1, this->Range[1]);
@@ -291,7 +256,6 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
   vtkTable* output = vtkTable::GetData(outputVector);
   output->SetNumberOfRows(2);
   output->AddColumn(rangeArray.Get());
-
   return 1;
 }
 
@@ -299,4 +263,8 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
 void vtkExtractSelectionRange::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ArrayName: " <<
+    (this->ArrayName? this->ArrayName : "") << endl;
+  os << indent << "FieldType: " << this->FieldType << endl;
+  os << indent << "Component: " << this->Component << endl;
 }

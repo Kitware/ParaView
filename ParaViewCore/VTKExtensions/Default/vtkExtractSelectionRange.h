@@ -15,14 +15,14 @@
 // .NAME vtkExtractSelectionRange - compute the range of the input selection.
 // .SECTION Description
 // vtkExtractSelectionRange is used to compute the range of an input selection.
+// This is an internal filter designed to be used to "compute visible range" for
+// a dataset.
 
 #ifndef __vtkExtractSelectionRange_h
 #define __vtkExtractSelectionRange_h
 
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
-
-class vtkTable;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractSelectionRange : public vtkTableAlgorithm
 {
@@ -33,7 +33,8 @@ public:
 
   // Description:
   // Set the name of the array used to compute the range.
-  void SetArrayName(const char* arrayName);
+  vtkSetStringMacro(ArrayName);
+  vtkGetStringMacro(ArrayName);
 
   // Description:
   // Set/Get the field type of the selection.
@@ -49,23 +50,15 @@ public:
   // Get the output range
   vtkGetVector2Macro(Range, double);
 
-  // Description:
-  // Get the output
-  vtkTable* GetOutput();
-
 //BTX
 protected:
   vtkExtractSelectionRange();
   ~vtkExtractSelectionRange();
 
   int FillInputPortInformation(int port, vtkInformation* info);
-
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation* request,
-                          vtkInformationVector** inputVector,
-                          vtkInformationVector* outputVector);
+  virtual int RequestData(
+    vtkInformation* request,
+    vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
   int FieldType;
   int Component;
