@@ -36,11 +36,11 @@ set(_vtk_modules
   vtkRenderingVolume
   vtkRenderingLabel
   vtkRenderingFreeType
-  vtkRenderingFreeTypeOpenGL
-  vtkRenderingVolumeOpenGL
-  vtkRenderingOpenGL
+  vtkRenderingFreeType${VTK_RENDERING_BACKEND}
+  vtkRenderingVolume${VTK_RENDERING_BACKEND}
+  vtkRendering${VTK_RENDERING_BACKEND}
   vtkRenderingLOD
-  vtkRenderingLIC
+#  vtkRenderingLIC
   vtkRenderingContext2D
   vtkRenderingAnnotation
   vtkInteractionStyle
@@ -60,7 +60,7 @@ set(_vtk_modules
   vtkIOGeometry
   vtklibxml2
   vtkViewsContext2D
-  vtkIOExport
+#  vtkIOExport
   vtkIOInfovis
   vtkFiltersAMR
   vtkChartsCore

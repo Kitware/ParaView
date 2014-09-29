@@ -3,7 +3,7 @@ vtk_module(vtkPVServerManagerDefault
     vtkPVServerManagerRendering
   PRIVATE_DEPENDS
     vtksys
-    vtkRenderingVolumeOpenGL
+    vtkRenderingVolume${VTK_RENDERING_BACKEND}
     vtkTestingRendering
     vtkPVClientServerCoreDefault
   TEST_DEPENDS

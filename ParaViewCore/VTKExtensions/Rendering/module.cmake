@@ -31,14 +31,14 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkFiltersParallel
     vtkInteractionStyle
     vtkInteractionWidgets
-    vtkIOExport
+#    vtkIOExport
     vtkIOXML
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
-    vtkRenderingFreeTypeOpenGL
-    vtkRenderingOpenGL
+    vtkRenderingFreeType${VTK_RENDERING_BACKEND}
+    vtkRendering${VTK_RENDERING_BACKEND}
     vtkRenderingParallel
-    vtkRenderingLIC
+#    vtkRenderingLIC
 
     ${__dependencies}
 PRIVATE_DEPENDS
@@ -50,8 +50,7 @@ PRIVATE_DEPENDS
     vtkInteractionStyle
     vtkIOAMR
     vtkIOXML
-    vtkRenderingOpenGL
-    vtkRenderingLIC
+#    vtkRenderingLIC
     vtkTestingCore
     vtkTestingRendering
 
