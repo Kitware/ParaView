@@ -966,6 +966,12 @@ bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
   int component,
   double range[])
 {
+  if (!this->IsSelectionAvailable())
+    {
+    vtkErrorMacro("Cannot ComputeVisibleScalarRange since surface selection is currently "
+      "unsupported.");
+    return false;
+    }
   bool multiple_selections = true;
 
   range[0] = VTK_DOUBLE_MAX;
