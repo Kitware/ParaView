@@ -3139,6 +3139,8 @@
                       panel_visibility="advanced" />
             <Property name="UserTransform"
                       panel_visibility="never" />
+            <Property name="Triangulate"
+                      panel_visibility="advanced" />
             <Property name="NonlinearSubdivisionLevel"
                       panel_visibility="advanced" />
             <Property name="BlockVisibility"
@@ -8228,6 +8230,15 @@
                  value="1" />
           <!--<Entry value="2" text="Phong" />-->
         </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTriangulate"
+                         default_values="0"
+                         name="Triangulate"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Triangulate the geometry internally to avoid rendering
+        issues of non-convex polygons. This feature has a processing and memory
+        cost, it should be enabled only when needed.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNonlinearSubdivisionLevel"
                          default_values="1"
