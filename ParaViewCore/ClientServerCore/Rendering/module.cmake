@@ -3,7 +3,7 @@ if(PARAVIEW_USE_PISTON)
   list(APPEND __dependencies vtkAcceleratorsPiston)
 endif()
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND __dependencies vtkWebGLExporter)
+  list(APPEND __dependencies vtkWebGLExporter vtkRenderingVolumeAMR)
 endif()
 
 vtk_module(vtkPVClientServerCoreRendering
@@ -16,7 +16,6 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkPVVTKExtensionsDefault
     vtkPVVTKExtensionsRendering
     vtkRenderingLabel
-    vtkRenderingVolumeAMR
     vtkRenderingVolume${VTK_RENDERING_BACKEND}
     vtkViewsContext2D
     vtkViewsCore

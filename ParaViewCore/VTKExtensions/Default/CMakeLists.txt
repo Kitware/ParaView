@@ -122,8 +122,6 @@ set(Module_SRCS
   vtkPVTransposeTable.cxx
   vtkQuerySelectionSource.cxx
   vtkRectilinearGridConnectivity.cxx
-  vtkScatterPlotMapper.cxx
-  vtkScatterPlotPainter.cxx
   vtkSciVizStatistics.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
@@ -140,6 +138,14 @@ set(Module_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVDWriter.cxx
 )
+
+# Disabled unless using the OpenGL backend.
+if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  list(APPEND Module_SRCS
+    vtkScatterPlotPainter.cxx
+    vtkScatterPlotMapper.cxx
+    )
+endif()
 
 set_source_files_properties(
   vtkAMRDualGridHelper

@@ -14,11 +14,15 @@
 =========================================================================*/
 #include "vtkAMROutlineRepresentation.h"
 
+#ifdef VTKGL2
+# include "vtkCompositePolyDataMapper.h"
+#else
+# include "vtkCompositePolyDataMapper2.h"
+#endif
 #include "vtkAlgorithmOutput.h"
 #include "vtkAMRStreamingPriorityQueue.h"
 #include "vtkAppendCompositeDataLeaves.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
@@ -47,7 +51,7 @@ vtkAMROutlineRepresentation::vtkAMROutlineRepresentation()
   this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
 
   this->Actor = vtkSmartPointer<vtkPVLODActor>::New();
-  this->Actor->SetMapper(this->Mapper);
+  this->Actor->SetMapper(this->Mapper.Get());
   this->Actor->GetProperty()->SetRepresentationToWireframe();
   this->Actor->GetProperty()->SetAmbient(1.0);
   this->Actor->GetProperty()->SetDiffuse(0.0);

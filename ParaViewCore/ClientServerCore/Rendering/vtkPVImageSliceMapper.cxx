@@ -14,12 +14,14 @@
 =========================================================================*/
 #include "vtkPVImageSliceMapper.h"
 
+#ifndef VTKGL2
+# include "vtkTexturePainter.h"
+#endif
+
 #include "vtkObjectFactory.h"
 #include "vtkInformation.h"
-#include "vtkTexturePainter.h"
 #include "vtkImageData.h"
 #include "vtkCommand.h"
-#include "vtkScalarsToColorsPainter.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -34,11 +36,13 @@ public:
 
   virtual void Execute(vtkObject* caller, unsigned long event, void*)
     {
+#ifndef VTKGL2
     vtkPainter* p = vtkPainter::SafeDownCast(caller);
     if (this->Target && p && event == vtkCommand::ProgressEvent)
       {
       this->Target->UpdateProgress(p->GetProgress());
       }
+#endif
     }
   vtkObserver()
     {
@@ -65,9 +69,12 @@ vtkPVImageSliceMapper::vtkPVImageSliceMapper()
   this->Painter = 0;
   
   this->PainterInformation = vtkInformation::New();
+#ifndef VTKGL2
+  // FIXME: This will need some equivalent code.
   vtkTexturePainter* painter = vtkTexturePainter::New();
   this->SetPainter(painter);
   painter->Delete();
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -83,6 +90,7 @@ vtkPVImageSliceMapper::~vtkPVImageSliceMapper()
 //-----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::SetPainter(vtkPainter* p)
 {
+#ifndef VTKGL2
   if (this->Painter)
     {
     this->Painter->RemoveObservers(vtkCommand::ProgressEvent, this->Observer);
@@ -94,12 +102,15 @@ void vtkPVImageSliceMapper::SetPainter(vtkPainter* p)
     this->Painter->AddObserver(vtkCommand::ProgressEvent, this->Observer);
     this->Painter->SetInformation(this->PainterInformation);
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::ReleaseGraphicsResources (vtkWindow *win)
 {
+#ifndef VTKGL2
   this->Painter->ReleaseGraphicsResources(win);
+#endif
   this->Superclass::ReleaseGraphicsResources(win);
 }
 
@@ -145,7 +156,9 @@ void vtkPVImageSliceMapper::Update(int port)
 {
   // Set the whole extent on the painter because it needs it internally
   // and it has no access to the pipeline information.
+#ifndef VTKGL2
   vtkTexturePainter* ptr = vtkTexturePainter::SafeDownCast(this->GetPainter());
+#endif
 
   if (!this->Static)
     {
@@ -171,7 +184,9 @@ void vtkPVImageSliceMapper::Update(int port)
     vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
   if (wext)
     {
+#ifndef VTKGL2
     ptr->SetWholeExtent(wext);
+#endif
     }
 }
 
@@ -259,6 +274,7 @@ int vtkPVImageSliceMapper::FillInputPortInformation(
 //----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::UpdatePainterInformation()
 {
+#ifndef VTKGL2
   vtkInformation* info = this->PainterInformation;
   info->Set(vtkPainter::STATIC_DATA(), this->Static);
   
@@ -303,6 +319,7 @@ void vtkPVImageSliceMapper::UpdatePainterInformation()
     info->Set(vtkTexturePainter::SLICE_MODE(), vtkTexturePainter::XY_PLANE);
     break;
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -340,6 +357,7 @@ void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
   // make sure our window is current
   ren->GetRenderWindow()->MakeCurrent();
   this->TimeToDraw = 0.0;
+#ifndef VTKGL2
   if (this->Painter)
     {
     // Update Painter information if obsolete.
@@ -356,6 +374,7 @@ void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
     this->Painter->Render(ren, actor, 0xff,this->ForceCompileOnly==1);
     this->TimeToDraw = this->Painter->GetTimeToDraw();
     }
+#endif
 
   // If the timer is not accurate enough, set it to a small
   // time so that it is not zero

@@ -19,8 +19,6 @@
 #include "vtkRenderState.h"
 #include "vtkOpenGLError.h"
 
-#include "vtkgl.h"
-
 vtkStandardNewMacro(vtkPVDefaultPass);
 //----------------------------------------------------------------------------
 vtkPVDefaultPass::vtkPVDefaultPass()

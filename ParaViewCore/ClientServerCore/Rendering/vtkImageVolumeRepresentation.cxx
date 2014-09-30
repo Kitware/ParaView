@@ -43,8 +43,13 @@ vtkStandardNewMacro(vtkImageVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 {
+#ifdef VTKGL2
+  this->VolumeMapper = NULL;
+  this->Property = NULL;
+#else
   this->VolumeMapper = vtkSmartVolumeMapper::New();
   this->Property = vtkVolumeProperty::New();
+#endif
 
   this->Actor = vtkPVLODVolume::New();
   this->Actor->SetProperty(this->Property);
@@ -388,5 +393,7 @@ void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
+#ifndef VTKGL2
   this->VolumeMapper->SetRequestedRenderMode(mode);
+#endif
 }

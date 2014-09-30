@@ -14,7 +14,12 @@
 =========================================================================*/
 #include "vtkGeometryRepresentationWithFaces.h"
 
-#include "vtkCompositePolyDataMapper2.h"
+#ifdef VTKGL2
+# include "vtkCompositePolyDataMapper.h"
+# define vtkCompositePolyDataMapper2 vtkCompositePolyDataMapper
+#else
+# include "vtkCompositePolyDataMapper2.h"
+#endif
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"

@@ -14,7 +14,9 @@
 =========================================================================*/
 #include "vtkSMRenderViewExporterProxy.h"
 
+#ifndef VTKGL2
 #include "vtkExporter.h"
+#endif
 #include "vtkObjectFactory.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
@@ -40,7 +42,8 @@ bool vtkSMRenderViewExporterProxy::CanExport(vtkSMProxy* view)
 void vtkSMRenderViewExporterProxy::Write()
 {
   this->CreateVTKObjects();
-
+#ifndef VTKGL2
+  // FIXME: One of the more evil ones - fix this soon!
   vtkExporter* exporter = vtkExporter::SafeDownCast(this->GetClientSideObject());
   vtkSMRenderViewProxy* rv = vtkSMRenderViewProxy::SafeDownCast(this->View);
   if (exporter && rv)
@@ -63,6 +66,7 @@ void vtkSMRenderViewExporterProxy::Write()
       vtkSMPropertyHelper(rv, "RemoteRenderThreshold").Set(old_threshold);
       }
     }
+#endif
 }
 
 //----------------------------------------------------------------------------

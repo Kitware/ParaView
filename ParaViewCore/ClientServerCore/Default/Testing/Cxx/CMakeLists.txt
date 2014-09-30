@@ -1,10 +1,12 @@
 include(ParaViewTestingMacros)
 
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
 paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ParaViewCoreClientServerCorePrintSelf.cxx
   TestSystemCaps.cxx
   )
+endif()
 
 if (PARAVIEW_USE_MPI)
   vtk_add_test_mpi(${vtk-module}CxxTests mpi_tests
