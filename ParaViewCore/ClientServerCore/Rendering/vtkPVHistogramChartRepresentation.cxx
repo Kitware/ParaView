@@ -29,7 +29,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkNew.h"
 #include "vtkPExtractHistogram.h"
-#include "vtkPlotBar.h"
 #include "vtkPVContextView.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -150,6 +149,18 @@ int vtkPVHistogramChartRepresentation::GetComponent()
 void vtkPVHistogramChartRepresentation::SetHistogramColor(double r, double g, double b)
 {
   this->SetColor(BIN_VALUES, r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVHistogramChartRepresentation::SetUseColorMapping(bool colorMapping)
+{
+  this->vtkXYChartRepresentation::SetUseColorMapping(BIN_VALUES, colorMapping);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVHistogramChartRepresentation::SetLookupTable(vtkScalarsToColors* lut)
+{
+  this->vtkXYChartRepresentation::SetLookupTable(BIN_VALUES, lut);
 }
 
 //----------------------------------------------------------------------------

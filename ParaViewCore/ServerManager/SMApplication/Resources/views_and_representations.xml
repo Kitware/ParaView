@@ -5508,14 +5508,38 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseColorMapping"
+                         number_of_elements="1"
+                         default_values="0"
+                         name="UseColorMapping"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use color mapping for the histogram.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetHistogramColor"
                             default_values="0 0 1"
                             name="HistogramColor"
                             number_of_elements="3"
                             panel_widget="color_selector"
                             panel_visibility="default">
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseColorMapping" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Sets the color for the histograms.</Documentation>
       </DoubleVectorProperty>
+      <ProxyProperty command="SetLookupTable"
+                     name="LookupTable"
+                     panel_visibility="never">
+        <Documentation>Sets the lookup table to use for scalar
+        mapping.</Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
       <SubProxy>
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
@@ -5584,6 +5608,11 @@
                       name="SelectInputArray" />
           </RequiredProperties>
         </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomBinRanges" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetHistogramLineStyle"
                          name="HistogramLineStyle"

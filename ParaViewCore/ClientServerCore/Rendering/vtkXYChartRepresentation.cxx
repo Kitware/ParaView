@@ -21,8 +21,10 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
+#include "vtkPlotBar.h"
 #include "vtkPlotPoints.h"
 #include "vtkPVContextView.h"
+#include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkWeakPointer.h"
@@ -50,9 +52,9 @@ class vtkXYChartRepresentation::vtkInternals
   // name alone. (1) is always checked before (2).
   template <class T>
   T GetSeriesParameter(const std::string& tableName,
-    const std::string& columnName,
-    const std::map<std::string, T> &parameter_map,
-    const T &default_value=T()) const
+                       const std::string& columnName,
+                       const std::map<std::string, T> &parameter_map,
+                       const T default_value=T()) const
     {
     typename std::map<std::string, T>::const_iterator iter;
 
@@ -117,6 +119,8 @@ public:
   std::map<std::string, int> AxisCorners;
   std::map<std::string, int> MarkerStyles;
   std::map<std::string, std::string> Labels;
+  std::map<std::string, bool> UseColorMapping;
+  std::map<std::string, vtkScalarsToColors*> Lut;
 
   // These are used to determine when to recalculate chart bounds. If user
   // changes the X axis, we force recalculation of the chart bounds
@@ -248,6 +252,23 @@ public:
 
         chartXY->SetPlotCorner(plot, this->GetSeriesParameter(tableName, columnName,
             this->AxisCorners, 0));
+
+        // for now only vtkPlotBar has color mapping
+        vtkPlotBar* plotBar = vtkPlotBar::SafeDownCast(plot);
+        if (plotBar && columnName == "bin_values")
+          {
+          bool colorMapping = this->GetSeriesParameter(
+            tableName, columnName, this->UseColorMapping, false);
+          plotBar->SetScalarVisibility(colorMapping);
+          plotBar->SelectColorArray("bin_extents");
+          vtkScalarsToColors* lut = this->GetSeriesParameter(
+            tableName, columnName, this->Lut,
+            static_cast<vtkScalarsToColors*>(NULL));
+          if (lut)
+            {
+            plotBar->SetLookupTable(lut);
+            }
+          }
         }
       }
     }
@@ -349,6 +370,25 @@ void vtkXYChartRepresentation::SetColor(const char* seriesname, double r, double
   this->Internals->Colors[seriesname] = vtkColor3d(r, g, b);
   this->Modified();
 }
+
+//----------------------------------------------------------------------------
+void vtkXYChartRepresentation::SetUseColorMapping(const char* seriesname,
+                                                  bool useColorMapping)
+{
+  assert(seriesname != NULL);
+  this->Internals->UseColorMapping[seriesname] = useColorMapping;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkXYChartRepresentation::SetLookupTable(const char* seriesname,
+                                              vtkScalarsToColors* lut)
+{
+  assert(seriesname != NULL);
+  this->Internals->Lut[seriesname] = lut;
+  this->Modified();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetAxisCorner(const char* seriesname, int corner)
