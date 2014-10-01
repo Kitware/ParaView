@@ -44,6 +44,7 @@ paraview_add_test_python(
   NO_DATA NO_RT
   TestPythonViewScript.py
   CinemaTest.py
+  TestColorHistogram.py
 )
 
 # these tests could run safely in serial and
