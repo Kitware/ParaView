@@ -255,12 +255,9 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
     vtkStreamingPriorityQueueItem item = queue.top();
     queue.pop();
 //    if (item.Distance + item.Refinement <= 0 || item.Refinement < 1)
-    double lengths[3];
-    item.Bounds.GetLengths(lengths);
-    double size = (lengths[0] + lengths[1] + lengths[2])/3.0;
     bool detailMethodNeedsBlock =
-        (item.Refinement <= 0 || (item.Distance < 0 && item.ScreenCoverage > 0.1) ||
-        (std::atan(size*size/(2*item.AmountOfDetail*item.Distance)) > this->DetailLevelToLoad));
+        (item.Refinement <= 0 ||
+         (item.ItemCoverage > 0 && item.ScreenCoverage / (item.AmountOfDetail * item.ItemCoverage ) > this->DetailLevelToLoad));
     bool genericMethodNeedsBlock =
         (item.Refinement <= 1 || item.ScreenCoverage >= 0.75);
 

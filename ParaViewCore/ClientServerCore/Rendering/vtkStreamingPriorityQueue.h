@@ -33,7 +33,8 @@ namespace
 {
   // this code is stolen from vtkFrustumCoverageCuller.
   double vtkComputeScreenCoverage(const double planes[24],
-    const double bounds[6], double &distance, double &centeredness)
+    const double bounds[6], double &distance, double &centeredness,
+    double& itemCoverage)
     {
     distance = 0.0;
     centeredness = 0.0;
@@ -106,6 +107,26 @@ namespace
       }
     centeredness = measure_w * measure_h;
 
+    double w = 2 * radius;
+    double h = 2 * radius;
+    if (screen_bounds[0] < 0.0)
+      {
+      w += screen_bounds[0];
+      }
+    if (screen_bounds[1] < 0.0)
+      {
+      w += screen_bounds[1];
+      }
+    if (screen_bounds[2] < 0.0)
+      {
+      h += screen_bounds[2];
+      }
+    if (screen_bounds[3] < 0.0)
+      {
+      h += screen_bounds[3];
+      }
+    itemCoverage = h*w / (4 * radius * radius);
+
     // Subtract from the full width to get the width of the square
     // enclosing the circle slice from the sphere in the plane
     // through the center of the sphere. If the screen bounds for
@@ -157,6 +178,7 @@ public:
   double Priority;         // Computed priority for this block.
   double Distance;
   double AmountOfDetail;
+  double ItemCoverage;     // amount of the item that is onscreen (fraction, if whole item is onscreen it is 1)
   vtkBoundingBox Bounds;   // Bounds for the block.
 
   vtkStreamingPriorityQueueItem() :
@@ -220,11 +242,12 @@ public:
         }
 
       double refinement2 = item.Refinement * item.Refinement;
-      double distance, centeredness;
-      double coverage = vtkComputeScreenCoverage(view_planes, block_bounds, distance, centeredness);
+      double distance, centeredness, itemCoverage;
+      double coverage = vtkComputeScreenCoverage(view_planes, block_bounds, distance, centeredness, itemCoverage);
       item.ScreenCoverage = coverage;
       item.Distance = distance;
       item.Centeredness = centeredness;
+      item.ItemCoverage = itemCoverage;
 
 
       if (coverage > 0)
