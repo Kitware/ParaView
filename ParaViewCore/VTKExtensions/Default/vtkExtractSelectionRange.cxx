@@ -110,10 +110,10 @@ int vtkExtractSelectionRange::RequestData(vtkInformation* vtkNotUsed(request),
       }
 
     vtkInformation* selProperties = node->GetProperties();
-    vtkIdType composite_index = 0;
+    unsigned int composite_index = 0;
     if (selProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
       {
-      composite_index = selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
+      composite_index = (unsigned int)selProperties->Get(vtkSelectionNode::COMPOSITE_INDEX());
       }
 
     vtkDebugMacro( << "composite_index " << composite_index );

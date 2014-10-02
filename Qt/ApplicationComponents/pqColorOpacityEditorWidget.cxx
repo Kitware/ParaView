@@ -623,14 +623,14 @@ void pqColorOpacityEditorWidget::resetRangeToVisibleData()
     return ;
     }
 
-  pqView* view = pqActiveObjects::instance().activeView();
-  if (!view)
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  if (!activeView)
     {
     qCritical() << "No active view.";
     return;
     }
 
-  vtkSMRenderViewProxy* rvproxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
+  vtkSMRenderViewProxy* rvproxy = vtkSMRenderViewProxy::SafeDownCast(activeView->getViewProxy());
   if (!rvproxy)
     {
     return;
