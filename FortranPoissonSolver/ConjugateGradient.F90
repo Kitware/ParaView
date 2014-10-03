@@ -1,7 +1,7 @@
 module ConjugateGradient
   use SparseMatrix
 #ifdef USE_CATALYST
-  use tcp
+  use CoProcessor
 #endif
   implicit none
   private :: dotproduct
@@ -28,10 +28,10 @@ contains
     real(kind=8), intent(in) :: rhs(:)
     real(kind=8), intent(inout) :: x(:)
     integer :: k, i
-    real(kind=8) :: alpha, beta, rdotproduct, rnewdotproduct, origresid
-    real(kind=8), DIMENSION(:), allocatable :: r(:), rnew(:), p(:), ap(:)
+    real(kind=8) :: alpha, beta, rdotproduct, rnewdotproduct, sqrtorigresid
+    real(kind=8), DIMENSION(:), allocatable :: r(:), p(:), ap(:)
 
-    allocate(r(sm%globalsize), rnew(sm%globalsize), p(sm%globalsize), ap(sm%globalsize))
+    allocate(r(sm%globalsize), p(sm%globalsize), ap(sm%globalsize))
 
 #ifdef USE_CATALYST
     x(:) = 0.d0
@@ -42,24 +42,24 @@ contains
     p(:) = rhs(:)
     k = 1
     rdotproduct = dotproduct(sm, r, r)
-    origresid = rdotproduct
-    do while(k .le. sm%globalsize .and. rdotproduct .gt. origresid*0.00001d0)
+    sqrtorigresid = sqrt(rdotproduct)
+    do while(k .le. sm%globalsize .and. sqrt(rdotproduct) .gt. sqrtorigresid*0.000001d0)
        call matvec(sm, p, ap)
        alpha = rdotproduct/dotproduct(sm, ap, p)
        x(:) = x(:) + alpha*p(:)
-       rnew(:) = r(:) - alpha*ap(:)
-       rnewdotproduct = dotproduct(sm, rnew, rnew)
+       r(:) = r(:) - alpha*ap(:)
+       rnewdotproduct = dotproduct(sm, r, r)
        beta = rnewdotproduct/rdotproduct
-       p(:) = rnew(:) + beta*p(:)
+       p(:) = r(:) + beta*p(:)
        rdotproduct = rnewdotproduct
-       !write(*,*) 'on iteration ', k, origresid, rdotproduct, alpha
+       !write(*,*) 'on iteration ', k, sqrtorigresid, sqrt(rdotproduct), alpha
 #ifdef USE_CATALYST
        call runcoprocessor(dimensions, k, k*1.d0, x)
 #endif
        k = k+1
     end do
 
-    deallocate(r, rnew, p, ap)
+    deallocate(r, p, ap)
 
   end subroutine solve
 

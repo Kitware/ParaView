@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.8)
 project(CatalystMPISubCommunicatorExample)
 
-find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
+find_package(ParaView 4.2 REQUIRED COMPONENTS vtkPVPythonCatalyst)
 include("${PARAVIEW_USE_FILE}")
 if(NOT PARAVIEW_USE_MPI)
   message(SEND_ERROR "ParaView must be built with MPI enabled")

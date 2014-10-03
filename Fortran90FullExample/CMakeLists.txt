@@ -14,10 +14,10 @@ endif()
 ADD_EXECUTABLE(Fortran90FullExample FEDriver.f90 FEFortranAdaptor.f90 FECxxAdaptor.cxx)
 TARGET_LINK_LIBRARIES(Fortran90FullExample vtkPVPythonCatalyst ${MPI_Fortran_LIBRARIES})
 
-file(COPY SampleScripts/coproc.py DESTINATION ${CMAKE_BINARY_DIR})
 option(BUILD_TESTING "Build Testing" OFF)
 # Setup testing.
 if (BUILD_TESTING)
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/coproc.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   include(CTest)
   add_test(Fortran90FullExampleTest Fortran90FullExample)
 endif()

@@ -2,7 +2,7 @@ module SparseMatrix
   ! this uses the MKL sparse matrix storage scheme. it assumes we have a
   ! node-based partitioning of the grid.
   implicit none
-  public :: initialize, insert, finalize
+  public :: initialize, insert, finalize, allreducevector, matvec
 
   type SparseMatrixData
      real(kind=8), DIMENSION(:), allocatable :: values
@@ -16,6 +16,7 @@ contains
     integer, intent(in) :: ownedbox(6), dimensions(3)
     integer :: numpoints, i, j, k, numx, numy, numz, counter, rowcounter, globalindex
     logical :: negativey, positivey, negativez, positivez
+    integer :: allocatestatus
 
     numpoints = 1
     numx = ownedbox(2)-ownedbox(1)+1
@@ -26,9 +27,12 @@ contains
     if(numz < 1) numz = 1
     numpoints = numx*numy*numz
 
-    ! over-allocate both m_values and m_columns
-    allocate(sm%values(7*numpoints), sm%columns(7*numpoints), sm%rowindices(numpoints+1))
+    ! over-allocate both values and columns
+    allocate(sm%rowindices(numpoints+1), sm%columns(7*numpoints), sm%values(7*numpoints), STAT = allocatestatus)
+    if (allocatestatus /= 0) STOP "*** SparseMatrix.F90: Not enough memory for arrays ***"
+
     sm%values(:) = 0.d0
+    sm%columns(:) = -1
 
     ! a mapping from the global row index to the local row index
     sm%globalsize = dimensions(1)*dimensions(2)*dimensions(3)
@@ -48,7 +52,7 @@ contains
           positivey = .TRUE.
           if(j .eq. numy .and. ownedbox(4) .eq. dimensions(2)) positivey = .FALSE.
           do i=1, numx
-             globalindex = (k-1)*dimensions(1)*dimensions(2)+(j-1)*dimensions(1)+i
+             globalindex = (ownedbox(5)+k-2)*dimensions(1)*dimensions(2)+(ownedbox(3)+j-2)*dimensions(1)+ownedbox(1)+i-1
              sm%rowindices(rowcounter) = counter
              sm%mapping(globalindex) = rowcounter
              rowcounter = rowcounter + 1
@@ -83,7 +87,6 @@ contains
     end do
     ! the final value for ending the row
     sm%rowindices(rowcounter) = counter
-
   end subroutine initialize
 
   subroutine finalize(sm)
@@ -108,6 +111,7 @@ contains
           return
        endif
     end do
+
     write(*,*) 'SparseMatrix: bad indices for insert() ', row, column
   end subroutine insert
 
@@ -138,11 +142,36 @@ contains
     do i=1, sm%globalsize
        b(i) = 0.d0
        if(sm%mapping(i) .gt. 0) then
-          do j=sm%rowindices(i), sm%rowindices(i+1)-1
+          do j=sm%rowindices(sm%mapping(i)), sm%rowindices(sm%mapping(i)+1)-1
              b(i) = b(i) + sm%values(j)*x(sm%columns(j))
           end do
        endif
     end do
+
+    call allreducevector(sm%globalsize, b)
   end subroutine matvec
+
+  subroutine allreducevector(globalsize, vec)
+    implicit none
+    include 'mpif.h'
+    integer, intent(in) :: globalsize
+    real(kind=8), intent(inout) :: vec(:)
+    real(kind=8), DIMENSION(:), allocatable :: temp
+    integer :: ierr, i, numtasks, allocatestatus
+
+    call mpi_comm_size(MPI_COMM_WORLD, numtasks, ierr)
+    if(numtasks .eq. 1) then
+       return
+    endif
+
+    allocate(temp(globalsize), STAT = allocatestatus)
+    if (allocatestatus /= 0) STOP "*** SparseMatrix.F90: Not enough memory for temp array ***"
+    do i=1, globalsize
+       temp(i) = vec(i)
+    enddo
+    call mpi_allreduce(temp, vec, globalsize, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, ierr)
+    deallocate(temp)
+
+  end subroutine allreducevector
 
 end module SparseMatrix

@@ -23,9 +23,9 @@ contains
 
     rhs(:) = 0.0
 
-    dxsqinverse = 1.d0/((dimensions(1)-1)*dimensions(1)-1)
-    dysqinverse = 1.d0/((dimensions(2)-1)*dimensions(2)-1)
-    dzsqinverse = 1.d0/((dimensions(3)-1)*dimensions(3)-1)
+    dxsqinverse = 1.d0/((dimensions(1)-1)*(dimensions(1)-1))
+    dysqinverse = 1.d0/((dimensions(2)-1)*(dimensions(2)-1))
+    dzsqinverse = 1.d0/((dimensions(3)-1)*(dimensions(3)-1))
 
     do k=1, numz
        negativez = .TRUE.
@@ -118,6 +118,9 @@ contains
           enddo
        enddo
     endif
+
+    ! now do an mpi_allreduce on the rhs
+    call allreducevector(sm%globalsize, rhs)
 
   end subroutine fillmatrixandrhs
 
