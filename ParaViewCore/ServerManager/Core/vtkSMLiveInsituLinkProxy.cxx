@@ -33,8 +33,8 @@
 #include "vtkSMStateLoader.h"
 #include <vtksys/ios/sstream>
 
-#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr x << endl;
-//#define vtkSMLiveInsituLinkProxyDebugMacro(x)
+//#define vtkSMLiveInsituLinkProxyDebugMacro(x) cerr x << endl;
+#define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
 class vtkSMLiveInsituLinkProxy::vtkInternals
 {

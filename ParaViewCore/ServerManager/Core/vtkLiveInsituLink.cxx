@@ -45,8 +45,8 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-#define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
-//#define vtkLiveInsituLinkDebugMacro(x)
+//#define vtkLiveInsituLinkDebugMacro(x) cerr x << endl;
+#define vtkLiveInsituLinkDebugMacro(x)
 
 namespace
 {
