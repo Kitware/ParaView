@@ -54,4 +54,7 @@
   <!-- wait for breakpoint to be hit -->
   <pqevent object="pqClientMainWindow" command="pqLiveInsituManager"
            arguments="wait_breakpoint_hit"/>
+  <!-- wait for time step 21 (one after the breakpoint) -->
+  <pqevent object="pqClientMainWindow" command="pqLiveInsituManager"
+           arguments="wait_timestep 21"/>
 </pqevents>
