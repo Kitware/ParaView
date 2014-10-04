@@ -59,6 +59,14 @@ public:
   // Sets the color for the histograms.
   void SetHistogramColor(double r, double g, double b);
 
+  // Description
+  // Sets the histogram to be color mapped by the scalar.
+  void SetUseColorMapping(bool colorMapping);
+
+  // Description
+  // Sets the lookup table that is used for color mapping by the scalar.
+  void SetLookupTable(vtkScalarsToColors* lut);
+
   // Description:
   // Set the line style for the histogram.
   void SetHistogramLineStyle(int style);

@@ -137,6 +137,11 @@
                             panel_visibility="advanced">
         <DoubleRangeDomain min="2.2204460492503131e-16"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the tolerance to use for
         vtkDataSet::FindCell</Documentation>
       </DoubleVectorProperty>
@@ -7766,6 +7771,11 @@ found and the point will be rejected.</Documentation>
                             panel_visibility="advanced">
         <DoubleRangeDomain min="2.2204460492503131e-16"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the tolerance to use for
         vtkDataSet::FindCell</Documentation>
       </DoubleVectorProperty>
@@ -7930,6 +7940,11 @@ found and the point will be rejected.</Documentation>
                             panel_visibility="advanced">
         <DoubleRangeDomain min="2.2204460492503131e-16"
                            name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ComputeTolerance" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
         <Documentation>Set the tolernce to use for
         vtkDataSet::FindCell</Documentation>
       </DoubleVectorProperty>

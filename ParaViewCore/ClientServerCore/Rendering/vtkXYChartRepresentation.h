@@ -32,6 +32,7 @@
 #include "vtkChartRepresentation.h"
 
 class vtkChartXY;
+class vtkScalarsToColors;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkXYChartRepresentation : public vtkChartRepresentation
 {
@@ -85,6 +86,8 @@ public:
   void SetAxisCorner(const char* name, int corner);
   void SetMarkerStyle(const char* name, int style);
   void SetLabel(const char* name, const char* label);
+  void SetUseColorMapping(const char* name, bool useColorMapping);
+  void SetLookupTable(const char* name, vtkScalarsToColors* lut);
   const char* GetLabel(const char* name) const;
 
   void ClearSeriesVisibilities();
