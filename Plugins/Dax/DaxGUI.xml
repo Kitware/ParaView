@@ -1,0 +1,11 @@
+<ParaViewFilters>
+
+  <Category name="Dax"
+            menu_label="Dax"
+            preserve_order="1"
+            show_in_toolbar="1">
+    <Proxy group="filters" name="DaxContour" />
+    <Proxy group="filters" name="DaxThreshold" />
+  </Category>
+
+</ParaViewFilters>
