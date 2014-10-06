@@ -80,5 +80,5 @@ except:
 baseline_file = os.path.join(baselinePath, "TestColorHistogram.png")
 import vtk.test.Testing
 vtk.test.Testing.VTK_TEMP_DIR = vtk.util.misc.vtkGetTempDir()
-vtk.test.Testing.compareImage(histogramView1.GetRenderWindow(), baseline_file, threshold=25)
+vtk.test.Testing.compareImage(histogramView1.GetRenderWindow(), baseline_file, threshold=40)
 vtk.test.Testing.interact()
