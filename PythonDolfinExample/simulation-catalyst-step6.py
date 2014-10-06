@@ -116,10 +116,12 @@ def Values2VTKArray(values,n,name):
 	array=vtk.vtkDoubleArray()
 	array.SetNumberOfComponents(ncomps)
 	array.SetNumberOfTuples(n)
-	i=0
-	for x in values:
-		array.SetValue(i,x)
-		i+=1
+        for i in range(n):
+            a = []
+            for j in range(ncomps):
+                a.append(values[i+j*n])
+            array.SetTupleValue(i, a)
+
 	array.SetName(name)
 	return array
 
