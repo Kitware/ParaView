@@ -34,13 +34,20 @@ set(Module_SRCS
   vtkACosmoReader.cxx
   vtkPCosmoReader.cxx
   vtkPGenericIOReader.cxx
+  vtkGenericIOUtilities.cxx
   vtkPGenericIOMultiBlockReader.cxx
+  vtkPGenericIOMultiBlockWriter.cxx
   vtkPMultiResolutionGenericIOReader.cxx
 
   ## Filters
   vtkMinkowskiFilter.cxx
   vtkPLANLHaloFinder.cxx
   vtkPMergeConnected.cxx
+  )
+
+set_source_files_properties(
+  vtkGenericIOUtilities.cxx
+  WRAP_EXCLUDE
   )
 
 if (${COSMOTOOLS_HAS_VORONOI})

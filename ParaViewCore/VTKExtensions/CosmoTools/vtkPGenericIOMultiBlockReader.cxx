@@ -33,6 +33,9 @@
 #include "vtkStringArray.h"
 #include "vtkType.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkDoubleArray.h"
+#include "vtkUnsignedLongLongArray.h"
+#include "vtkFieldData.h"
 
 #include "GenericIOReader.h"
 #include "GenericIOUtilities.h"
@@ -52,6 +55,7 @@ struct vtkPGenericIOMultiBlockReader::block_t
   vtkTypeUInt64 GlobalId;
   vtkTypeUInt64 NumberOfElements;
   double bounds[6];
+  uint64_t coords[3];
 
   std::map< std::string, void* > RawCache;
   std::map< std::string, bool > VariableStatus;
@@ -442,13 +446,25 @@ void vtkPGenericIOMultiBlockReader::LoadMetaData()
       myBlock.VariableStatus[vname] = false;
       }
 
-    this->Reader->GetBlockBounds(i,min,max);
-    myBlock.bounds[0] = min[0];
-    myBlock.bounds[1] = max[0];
-    myBlock.bounds[2] = min[1];
-    myBlock.bounds[3] = max[1];
-    myBlock.bounds[4] = min[2];
-    myBlock.bounds[5] = max[2];
+    if (this->Reader->IsSpatiallyDecomposed())
+      {
+      this->Reader->GetBlockBounds(i,min,max);
+      this->Reader->GetBlockCoords(i,myBlock.coords);
+      myBlock.bounds[0] = min[0];
+      myBlock.bounds[1] = max[0];
+      myBlock.bounds[2] = min[1];
+      myBlock.bounds[3] = max[1];
+      myBlock.bounds[4] = min[2];
+      myBlock.bounds[5] = max[2];
+      }
+    else
+      {
+      for (int i = 0; i < 6; ++i)
+        {
+        myBlock.bounds[i] = 0;
+        }
+      myBlock.coords[0] = myBlock.coords[1] = myBlock.coords[2] = 0;
+      }
 
     this->MetaData->Blocks[ block.GlobalRank ] = myBlock;
     }
@@ -714,6 +730,18 @@ vtkUnstructuredGrid* vtkPGenericIOMultiBlockReader::LoadBlock(int blockId)
   // STEP 3: Load data
   this->LoadDataArraysForBlock(grid,blockId);
 
+  if (this->Reader->IsSpatiallyDecomposed())
+    {
+    vtkSmartPointer< vtkUnsignedLongLongArray > coords =
+        vtkSmartPointer< vtkUnsignedLongLongArray >::New();
+    coords->SetNumberOfComponents(3);
+    coords->SetNumberOfTuples(1);
+    coords->SetName("genericio_block_coords");
+    assert(sizeof(uint64_t) == sizeof(unsigned long long));
+    coords->SetTupleValue(0,(unsigned long long*)this->MetaData->Blocks[blockId].coords);
+    grid->GetFieldData()->AddArray(coords);
+    }
+
   return grid;
 }
 
@@ -763,10 +791,14 @@ int vtkPGenericIOMultiBlockReader::RequestInformation(
       {
       vtkInformation* blockInfo = outline->GetMetaData(i);
       assert("pre: block info is NULL!" && (blockInfo != NULL));
-      blockInfo->Set(
-        vtkStreamingDemandDrivenPipeline::BOUNDS(),
-        this->MetaData->Blocks[i].bounds,6
-      );
+      // bounds are meaningless if this is false
+      if (this->Reader->IsSpatiallyDecomposed())
+        {
+        blockInfo->Set(
+              vtkStreamingDemandDrivenPipeline::BOUNDS(),
+              this->MetaData->Blocks[i].bounds,6
+              );
+        }
       blockInfo->Set(
         vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL(),
             this->MetaData->Blocks[i].NumberOfElements);
@@ -797,6 +829,35 @@ int vtkPGenericIOMultiBlockReader::RequestData(
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   output->SetNumberOfBlocks(this->MetaData->NumberOfBlocks);
+
+  // Get the global dimensions and physical orign & scale from
+  // the genericio file and add them to the dataset
+  uint64_t tmpDims[3];
+  double tmpDouble[3];
+  vtkSmartPointer< vtkUnsignedLongLongArray > dims =
+      vtkSmartPointer< vtkUnsignedLongLongArray >::New();
+  vtkSmartPointer< vtkDoubleArray > origin =
+      vtkSmartPointer< vtkDoubleArray >::New();
+  vtkSmartPointer< vtkDoubleArray > scale =
+      vtkSmartPointer< vtkDoubleArray >::New();
+  dims->SetNumberOfComponents(3);
+  dims->SetName("genericio_global_dimensions");
+  origin->SetNumberOfComponents(3);
+  origin->SetName("genericio_phys_origin");
+  scale->SetNumberOfComponents(3);
+  scale->SetName("genericio_phys_scale");
+
+  this->Reader->GetGlobalDimensions(tmpDims);
+  assert(sizeof(unsigned long long) == sizeof(uint64_t));
+  dims->InsertNextTupleValue((unsigned long long*)tmpDims);
+  this->Reader->GetPhysOrigin(tmpDouble);
+  origin->InsertNextTupleValue(tmpDouble);
+  this->Reader->GetPhysScale(tmpDouble);
+  scale->InsertNextTupleValue(tmpDouble);
+
+  output->GetFieldData()->AddArray(origin);
+  output->GetFieldData()->AddArray(scale);
+  output->GetFieldData()->AddArray(dims);
 
   if (outInfo->Has(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS()))
     {
