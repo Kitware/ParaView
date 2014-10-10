@@ -2,7 +2,7 @@
   <ProxyGroup name="representations">
     <RepresentationProxy name="VisibleLinesRepresentation"
       base_proxygroup="representations"
-      base_proxyname="SurfaceRepresentationBase"
+      base_proxyname="SurfaceRepresentation"
       processes="client|dataserver|renderserver"
       class="vtkGeometryRepresentationWithHiddenLinesRemoval" >
       <Documentation>
@@ -10,12 +10,6 @@
         the SurfaceRepresentation except that we are overriding the mapper with
         our mapper.
       </Documentation>
-
-      <InputProperty name="Input" command="SetInputConnection">
-        <InputArrayDomain name="input_array_any"
-          attribute_type="any">
-        </InputArrayDomain>
-      </InputProperty>
 
     <!-- End of SurfaceRepresentation -->
     </RepresentationProxy>
