@@ -20,7 +20,6 @@ include (TestNumPy)
 
 # Add python script names here.
 set(PY_TESTS
-  AnnotationVisibility.py
   Animation.py
   ProxyPropertyLinks.py
   PythonPVLookupTables.py
