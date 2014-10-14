@@ -133,7 +133,7 @@ FUNCTION(build_paraview_client BPC_NAME)
     FILE (WRITE "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc"
       "// Icon with lowest ID value placed first to ensure application icon\n"
       "// remains consistent on all systems.\n"
-      "IDI_ICON1 ICON \"@BPC_APPLICATION_ICON@\"")
+      "IDI_ICON1 ICON \"${BPC_APPLICATION_ICON}\"")
     SET(exe_icon "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc")
   ENDIF (WIN32 AND BPC_APPLICATION_ICON)
 
