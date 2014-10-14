@@ -20,6 +20,7 @@ include (TestNumPy)
 
 # Add python script names here.
 set(PY_TESTS
+  AnnotationVisibility.py
   Animation.py
   ProxyPropertyLinks.py
   PythonPVLookupTables.py
@@ -64,6 +65,7 @@ paraview_add_test_python(
 # Add tests for pvbatch.
 
 set(PVBATCH_TESTS
+  AnnotationVisibility.py
   MultiView.py
   ParallelImageWriter.py,NO_VALID
   ParallelSerialWriter.py

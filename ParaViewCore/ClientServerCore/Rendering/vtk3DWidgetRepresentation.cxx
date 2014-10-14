@@ -85,7 +85,13 @@ bool vtk3DWidgetRepresentation::AddToView(vtkView* view)
     if (this->Widget)
       {
       this->Widget->SetInteractor(pvview->GetInteractor());
+      // If DefaultRenderer is non-null, SetCurrentRenderer() will have no
+      // effect.
+      this->Widget->SetDefaultRenderer(NULL);
       this->Widget->SetCurrentRenderer(activeRenderer);
+      // Set the DefaultRenderer to ensure that it doesn't get overridden by the
+      // Widget. The Widget should use the specified renderer. Period.
+      this->Widget->SetDefaultRenderer(activeRenderer);
       }
     if (this->Representation)
       {
@@ -160,6 +166,7 @@ bool vtk3DWidgetRepresentation::RemoveFromView(vtkView* view)
     if (this->Widget)
       {
       this->Widget->SetEnabled(0);
+      this->Widget->SetDefaultRenderer(0);
       this->Widget->SetCurrentRenderer(0);
       this->Widget->SetInteractor(0);
       }
