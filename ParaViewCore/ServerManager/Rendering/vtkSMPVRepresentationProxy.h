@@ -151,6 +151,32 @@ public:
       self->RescaleTransferFunctionToDataRangeOverTime(arrayname, attribute_type) : false;
     }
 
+
+  // Description:
+  // Rescales the color transfer function and the opacity transfer function
+  // using the current data range, limited to the currernt visible elements.
+  virtual bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* view);
+  virtual bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* view,
+    const char* arrayname, int attribute_type);
+
+  // Description:
+  // Safely call RescaleTransferFunctionToVisibleRange() after casting the proxy
+  // to the appropriate type.
+  static bool RescaleTransferFunctionToVisibleRange(vtkSMProxy* proxy, vtkSMProxy* view)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self? self->RescaleTransferFunctionToVisibleRange(view) : false;
+    }
+  static bool RescaleTransferFunctionToVisibleRange(
+    vtkSMProxy* proxy, vtkSMProxy* view, const char* arrayname, int attribute_type)
+    {
+    vtkSMPVRepresentationProxy* self =
+      vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self?
+      self->RescaleTransferFunctionToVisibleRange(view, arrayname, attribute_type) : false;
+    }
+
   // Description:
   // Set the scalar bar visibility. This will create a new scalar bar as needed.
   // Scalar bar is only shown if scalar coloring is indeed being used.

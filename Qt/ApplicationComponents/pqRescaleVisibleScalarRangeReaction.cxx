@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorToolbar.cxx
+   Module:    pqRescaleVisibleScalarRangeReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,38 +29,54 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqColorToolbar.h"
-#include "ui_pqColorToolbar.h"
+#include "pqRescaleVisibleScalarRangeReaction.h"
 
 #include "pqActiveObjects.h"
-#include "pqDisplayColorWidget.h"
-#include "pqEditColorMapReaction.h"
-#include "pqRescaleCustomScalarRangeReaction.h"
-#include "pqRescaleVisibleScalarRangeReaction.h"
-#include "pqResetScalarRangeReaction.h"
-#include "pqScalarBarVisibilityReaction.h"
-#include "pqSetName.h"
+#include "pqPipelineRepresentation.h"
+#include "pqUndoStack.h"
+#include "vtkSMPVRepresentationProxy.h"
+
+#include <QDebug>
 
 //-----------------------------------------------------------------------------
-void pqColorToolbar::constructor()
+pqRescaleVisibleScalarRangeReaction::pqRescaleVisibleScalarRangeReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
-  Ui::pqColorToolbar ui;
-  ui.setupUi(this);
-
-  new pqScalarBarVisibilityReaction(ui.actionScalarBarVisibility);
-  new pqEditColorMapReaction(ui.actionEditColorMap);
-  new pqResetScalarRangeReaction(ui.actionResetRange);
-  new pqRescaleCustomScalarRangeReaction(ui.actionRescaleCustomRange);
-  new pqRescaleVisibleScalarRangeReaction(ui.actionRescaleVisibleRange);
-
-  pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this)
-    << pqSetName("displayColor");
-  this->addWidget(display_color);
-
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(representationChanged(pqDataRepresentation*)),
-    display_color,
-    SLOT(setRepresentation(pqDataRepresentation*)));
+    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+  this->updateEnableState();
 }
 
+//-----------------------------------------------------------------------------
+void pqRescaleVisibleScalarRangeReaction::updateEnableState()
+{
+  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
+    pqActiveObjects::instance().activeRepresentation());
+  this->parentAction()->setEnabled(repr != NULL);
+}
 
+//-----------------------------------------------------------------------------
+void pqRescaleVisibleScalarRangeReaction::rescaleVisibleScalarRange()
+{
+  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
+    pqActiveObjects::instance().activeRepresentation());
+  if (!repr)
+    {
+    qCritical() << "No active representation.";
+    return;
+    }
+
+  pqView* view = pqActiveObjects::instance().activeView();
+  if (!view)
+    {
+    qCritical() << "No active view.";
+    return;
+    }
+
+  BEGIN_UNDO_SET("Rescale Visible Range");
+  vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
+    repr->getProxy(), view->getProxy());
+  repr->renderViewEventually();
+  END_UNDO_SET();
+}

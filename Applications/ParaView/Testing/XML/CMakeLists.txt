@@ -82,6 +82,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ResetToVisibleRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
@@ -541,6 +542,9 @@ SET(HistogramSelection_THRESHOLD 40)
 # Increate threshold for this one since the chart axes
 # tends to render slightly differently.
 set (LoadStateMultiView_THRESHOLD 20)
+
+# Selection not supported in CRS and is needed for this test.
+set (ResetToVisibleRange_DISABLE_CRS TRUE)
 
 ##########################################################
 # List of known incompatible tests for Collaboration

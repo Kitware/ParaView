@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.1"
+   width="64"
+   height="64"
+   id="svg3075">
+  <defs
+     id="defs3077">
+    <radialGradient
+       cx="48.041668"
+       cy="9.458333"
+       r="15.041667"
+       fx="48.041668"
+       fy="9.458333"
+       id="radialGradient47849"
+       xlink:href="#linearGradient42005"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.1285428,-2.1327724e-8,0,0.6629435,-6.2170784,3.1879943)" />
+    <linearGradient
+       id="linearGradient42005">
+      <stop
+         id="stop42007"
+         style="stop-color:#daf2cd;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop42009"
+         style="stop-color:#66cc33;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <radialGradient
+       cx="48.041668"
+       cy="9.458333"
+       r="15.041667"
+       fx="48.041668"
+       fy="9.458333"
+       id="radialGradient3073"
+       xlink:href="#linearGradient42005"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.1285428,-2.1327724e-8,0,0.6629435,-6.2170784,3.1879943)" />
+  </defs>
+  <metadata
+     id="metadata3080">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1">
+    <g
+       transform="matrix(1.8121212,0,0,1.8121212,-54.981818,2.5447021)"
+       id="g49807">
+      <path
+         d="m 33.5,17.5 0,11"
+         id="path26711"
+         style="fill:none;stroke:#555542;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         d="m 62.5,17.5 0,11"
+         id="path26713"
+         style="fill:none;stroke:#555542;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         d="m 33.5,23 28.916667,0"
+         id="path26715"
+         style="fill:none;stroke:#555542;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         d="m 43,26.058031 0,-6.199395"
+         id="path26717"
+         style="fill:none;stroke:#555542;stroke-width:0.94107795;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         d="M 53,26.136593 53,19.94674"
+         id="path26719"
+         style="fill:none;stroke:#555542;stroke-width:0.94600129;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         d="m 33.909186,9.5000562 6.298473,5.5074238 0,-3.00405 15.584682,-0.08344 0.08075,3.00405 6.217722,-5.4239788 -6.379222,-5.5908695 0,3.087495 -15.503932,-0.083446 0,-3.0040494 -6.298473,5.5908695 z"
+         id="path36757"
+         style="fill:url(#radialGradient3073);fill-opacity:1;fill-rule:evenodd;stroke:#6f6f58;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       transform="matrix(-0.02117194,0,0,-0.02059373,65.969382,56.682532)"
+       id="g4">
+      <path
+         d="m 1664,576 q -152,236 -381,353 61,-104 61,-225 0,-185 -131.5,-316.5 Q 1081,256 896,256 711,256 579.5,387.5 448,519 448,704 448,825 509,929 280,812 128,576 261,371 461.5,249.5 662,128 896,128 1130,128 1330.5,249.5 1531,371 1664,576 z M 944,960 q 0,20 -14,34 -14,14 -34,14 -125,0 -214.5,-89.5 Q 592,829 592,704 q 0,-20 14,-34 14,-14 34,-14 20,0 34,14 14,14 14,34 0,86 61,147 61,61 147,61 20,0 34,14 14,14 14,34 z m 848,-384 q 0,-34 -20,-69 Q 1632,277 1395.5,138.5 1159,0 896,0 633,0 396.5,139 160,278 20,507 0,542 0,576 q 0,34 20,69 140,229 376.5,368 236.5,139 499.5,139 263,0 499.5,-139 236.5,-139 376.5,-368 20,-35 20,-69 z"
+         id="path6"
+         style="fill:currentColor" />
+    </g>
+  </g>
+</svg>

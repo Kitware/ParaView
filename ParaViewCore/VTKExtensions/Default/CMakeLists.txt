@@ -48,6 +48,7 @@ set(Module_SRCS
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
+  vtkExtractSelectionRange.cxx
   vtkFileSequenceParser.cxx
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx

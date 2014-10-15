@@ -231,7 +231,7 @@ void vtkSMRenderViewProxy::UpdateLOD()
     this->GetSession()->PrepareProgress();
     this->ExecuteStream(stream);
     this->GetSession()->CleanupPendingProgress();
-   
+
     this->NeedsUpdateLOD = false;
     }
 }
@@ -427,7 +427,7 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     // rendering.
     remote_rendering_available = false;
     }
- 
+
   if (remote_rendering_available)
     {
     // Update whether render servers can open display i.e. remote rendering is
@@ -825,7 +825,7 @@ bool vtkSMRenderViewProxy::ConvertDisplayToPointOnSurface(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
+bool vtkSMRenderViewProxy::SelectSurfaceCells(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -850,7 +850,7 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
+bool vtkSMRenderViewProxy::SelectSurfacePoints(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -946,7 +946,107 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectFrustumCells(int region[4],
+bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
+  int fieldAssociation,
+  const char* scalarName,
+  int component,
+  double range[])
+{
+  const int *size = this->GetRenderer()->GetSize();
+  int region[4] = {0, 0, size[0]-1, size[1]-1};
+  return this->ComputeVisibleScalarRange(
+    region, fieldAssociation, scalarName, component, range);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::ComputeVisibleScalarRange(
+  const int region[4],
+  int fieldAssociation,
+  const char* scalarName,
+  int component,
+  double range[])
+{
+  if (!this->IsSelectionAvailable())
+    {
+    vtkErrorMacro("Cannot ComputeVisibleScalarRange since surface selection is currently "
+      "unsupported.");
+    return false;
+    }
+  bool multiple_selections = true;
+
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = VTK_DOUBLE_MIN;
+
+  vtkNew<vtkCollection> selectedRepresentations;
+  vtkNew<vtkCollection> selectionSources;
+
+  if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    this->SelectSurfacePoints(region,
+                              selectedRepresentations.Get(),
+                              selectionSources.Get(),
+                              multiple_selections);
+    }
+  else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+    {
+    this->SelectSurfaceCells(region,
+                             selectedRepresentations.Get(),
+                             selectionSources.Get(),
+                             multiple_selections);
+    }
+  else
+    {
+    return false;
+    }
+  assert(selectedRepresentations->GetNumberOfItems() == selectionSources->GetNumberOfItems());
+
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+  vtkSmartPointer<vtkSMProxy> _rangeExtractor;
+  _rangeExtractor.TakeReference(pxm->NewProxy("internal_filters", "ExtractSelectionRange"));
+  vtkSMSourceProxy* rangeExtractor = vtkSMSourceProxy::SafeDownCast(_rangeExtractor);
+  if (!rangeExtractor)
+    {
+    vtkErrorMacro("Failed to create 'ExtractSelectionRange' proxy. "
+      "ComputeVisibleScalarRange() cannot work as expected.");
+    return false;
+    }
+
+  for (int cc=0, max = selectionSources->GetNumberOfItems(); cc < max; cc++)
+    {
+    vtkSMProxy* selectedRepresentation = vtkSMProxy::SafeDownCast(
+      selectedRepresentations->GetItemAsObject(cc));
+    vtkSMProxy* selectionSource = vtkSMProxy::SafeDownCast(
+      selectionSources->GetItemAsObject(cc));
+
+    vtkSMPropertyHelper(rangeExtractor, "Input").Set(
+      vtkSMPropertyHelper(selectedRepresentation, "Input").GetAsProxy(),
+      vtkSMPropertyHelper(selectedRepresentation, "Input").GetOutputPort());
+    vtkSMPropertyHelper(rangeExtractor, "Selection").Set(selectionSource);
+    vtkSMPropertyHelper(rangeExtractor, "ArrayName").Set(scalarName);
+    vtkSMPropertyHelper(rangeExtractor, "Component").Set(component);
+    vtkSMPropertyHelper(rangeExtractor, "FieldType").Set(fieldAssociation);
+    rangeExtractor->UpdateVTKObjects();
+
+    rangeExtractor->UpdatePipeline();
+    rangeExtractor->UpdatePropertyInformation();
+
+    double tempRange[2];
+    vtkSMPropertyHelper(rangeExtractor, "Range").Get(tempRange, 2);
+    if (tempRange[0] < range[0])
+      {
+      range[0] = tempRange[0];
+      }
+    if (tempRange[1] > range[1])
+      {
+      range[1] = tempRange[1];
+      }
+    }
+
+  return (range[1] >= range[0]);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectFrustumCells(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -956,7 +1056,7 @@ bool vtkSMRenderViewProxy::SelectFrustumCells(int region[4],
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectFrustumPoints(int region[4],
+bool vtkSMRenderViewProxy::SelectFrustumPoints(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections)
@@ -966,7 +1066,7 @@ bool vtkSMRenderViewProxy::SelectFrustumPoints(int region[4],
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
+bool vtkSMRenderViewProxy::SelectFrustumInternal(const int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
   bool multiple_selections,

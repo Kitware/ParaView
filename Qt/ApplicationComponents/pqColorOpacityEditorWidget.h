@@ -116,6 +116,10 @@ public slots:
   /// source.
   void resetRangeToDataOverTime();
 
+  /// Reset the transfer function ranges to visible range for active data
+  /// source.
+  void resetRangeToVisibleData();
+
   /// Inverts the transfer functions.
   void invertTransferFunctions();
 

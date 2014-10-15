@@ -26,6 +26,7 @@
 #include "vtkSMOutputPort.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
@@ -331,6 +332,97 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
 
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
+  vtkSMProxy* view)
+{
+  if (!this->GetUsingScalarColoring())
+    {
+    // we are not using scalar coloring, nothing to do.
+    return false;
+    }
+
+  vtkSMPropertyHelper helper(this->GetProperty("ColorArrayName"));
+  return this->RescaleTransferFunctionToVisibleRange(view,
+    helper.GetAsString(4), helper.GetAsInt(3));
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
+  vtkSMProxy* view, const char* arrayname, int attribute_type)
+{
+  vtkSMRenderViewProxy* rview = vtkSMRenderViewProxy::SafeDownCast(view);
+  if (!rview || !arrayname || arrayname[0] == 0)
+    {
+    return false;
+    }
+
+  vtkSMPropertyHelper inputHelper(this->GetProperty("Input"));
+  vtkSMSourceProxy* inputProxy =
+    vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+  int port = inputHelper.GetOutputPort();
+  if (!inputProxy || !inputProxy->GetOutputPort(port))
+    {
+    // no input.
+    vtkWarningMacro("No input present. Cannot determine data ranges.");
+    return false;
+    }
+
+  vtkPVDataInformation* dataInfo =
+    inputProxy->GetOutputPort(port)->GetDataInformation();
+  vtkPVArrayInformation* info = dataInfo->GetArrayInformation(arrayname, attribute_type);
+  if (!info)
+    {
+    return false;
+    }
+
+  vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
+  vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction");
+  if (!lutProperty && !sofProperty)
+    {
+    // No LookupTable and ScalarOpacityFunction found.
+    return false;
+    }
+
+  vtkSMProxy* lut = lutProperty? vtkSMPropertyHelper(lutProperty).GetAsProxy() : NULL;
+  vtkSMProxy* sof = sofProperty? vtkSMPropertyHelper(sofProperty).GetAsProxy() : NULL;
+
+  // We need to determine the component number to use from the lut.
+  int component = -1;
+  if (lut && vtkSMPropertyHelper(lut, "VectorMode").GetAsInt() != 0)
+    {
+    component = vtkSMPropertyHelper(lut, "VectorComponent").GetAsInt();
+    }
+  if (component >= info->GetNumberOfComponents())
+    {
+    // somethign amiss, the component request is not present in the dataset.
+    // give up.
+    return false;
+    }
+
+  double range[2];
+  if (!rview->ComputeVisibleScalarRange(attribute_type, arrayname, component, range))
+    {
+    return false;
+    }
+
+  if (lut)
+    {
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, false);
+    vtkSMProxy* sof_lut = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
+    if (sof_lut && sof != sof_lut)
+      {
+      vtkSMTransferFunctionProxy::RescaleTransferFunction(
+        sof_lut, range, false);
+      }
+    }
+  if (sof)
+    {
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range, false);
+    }
+  return true;
 }
 
 //----------------------------------------------------------------------------

@@ -391,7 +391,7 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
       {
       // log-to-linear
       double norm = log10(x/range[0]) / log10(range[1]/range[0]);
-      x = range[0] + norm * (range[1] - range[0]);  
+      x = range[0] + norm * (range[1] - range[0]);
       }
     else
       {
@@ -427,7 +427,7 @@ bool vtkSMTransferFunctionProxy::ApplyColorMap(vtkPVXMLElement* xml)
     return false;
     }
 
-  bool indexedLookup = 
+  bool indexedLookup =
     (strcmp(xml->GetAttributeOrDefault("indexedLookup", "false"), "true") == 0);
   vtkSMPropertyHelper(this, "IndexedLookup").Set(indexedLookup? 1 : 0);
 
@@ -445,7 +445,7 @@ bool vtkSMTransferFunctionProxy::ApplyColorMap(vtkPVXMLElement* xml)
       vtkSMPropertyHelper(this, "HSVWrap").Set(0);
       vtkSMPropertyHelper(this, "ColorSpace").Set(colorSpace.c_str());
       }
-    } 
+    }
 
   vtkPVXMLElement* nanElement = xml->FindNestedElementByName("NaN");
   if (nanElement && nanElement->GetAttribute("r") &&
