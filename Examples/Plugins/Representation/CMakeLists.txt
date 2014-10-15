@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
+
 IF (NOT ParaView_BINARY_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})

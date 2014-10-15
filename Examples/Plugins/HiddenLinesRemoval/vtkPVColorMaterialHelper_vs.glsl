@@ -14,11 +14,13 @@
 //=========================================================================
 // Id: Id
 
-#define GL_AMBIENT 1
-#define GL_DIFFUSE 2
-#define GL_SPECULAR 3
-#define GL_AMBIENT_AND_DIFFUSE 4
-#define GL_EMISSION 5
+// symbols beginning with GL_ are reserved, so use lower-case
+// instead
+#define gl_ambient 1
+#define gl_diffuse 2
+#define gl_specular 3
+#define gl_ambient_and_diffuse 4
+#define gl_emission 5
 
 uniform int vtkPVColorMaterialHelper_Mode;
 gl_MaterialParameters getMaterialParameters()
@@ -29,24 +31,24 @@ gl_MaterialParameters getMaterialParameters()
     }
 
   gl_MaterialParameters materialParams = gl_FrontMaterial;
-  if (vtkPVColorMaterialHelper_Mode == GL_AMBIENT)
+  if (vtkPVColorMaterialHelper_Mode == gl_ambient)
     {
     materialParams.ambient = gl_Color;
     }
-  else if (vtkPVColorMaterialHelper_Mode == GL_DIFFUSE)
+  else if (vtkPVColorMaterialHelper_Mode == gl_diffuse)
     {
     materialParams.diffuse = gl_Color;
     }
-  else if (vtkPVColorMaterialHelper_Mode == GL_SPECULAR)
+  else if (vtkPVColorMaterialHelper_Mode == gl_specular)
     {
     materialParams.specular = gl_Color;
     }
-  else if (vtkPVColorMaterialHelper_Mode == GL_AMBIENT_AND_DIFFUSE)
+  else if (vtkPVColorMaterialHelper_Mode == gl_ambient_and_diffuse)
     {
     materialParams.ambient = gl_Color;
     materialParams.diffuse = gl_Color;
     }
-  else if (vtkPVColorMaterialHelper_Mode == GL_EMISSION)
+  else if (vtkPVColorMaterialHelper_Mode == gl_emission)
     {
     materialParams.emission = gl_Color;
     }
