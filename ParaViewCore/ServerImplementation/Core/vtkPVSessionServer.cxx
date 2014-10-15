@@ -411,12 +411,12 @@ bool vtkPVSessionServer::Connect(const char* url)
     }
   else if (pvrenderserver_reverse.find(url))
     {
-    std::string dataserverhost = pvrenderserver.match(1);
-    int dsport = atoi(pvrenderserver.match(3).c_str());
+    std::string dataserverhost = pvrenderserver_reverse.match(1);
+    int dsport = atoi(pvrenderserver_reverse.match(3).c_str());
     dsport = (dsport <= 0)? 11111 : dsport;
 
-    std::string renderserverhost = pvrenderserver.match(4);
-    int rsport = atoi(pvrenderserver.match(6).c_str());
+    std::string renderserverhost = pvrenderserver_reverse.match(4);
+    int rsport = atoi(pvrenderserver_reverse.match(6).c_str());
     rsport = (rsport <= 0)? 22221 : rsport;
 
     if (vtkProcessModule::GetProcessType() ==
