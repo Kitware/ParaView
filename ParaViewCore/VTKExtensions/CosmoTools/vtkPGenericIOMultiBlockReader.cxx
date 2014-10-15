@@ -50,16 +50,28 @@
 // Uncomment the line below to get debugging information
 //#define DEBUG
 
-struct vtkPGenericIOMultiBlockReader::block_t
+namespace {
+struct block_t
 {
   vtkTypeUInt64 GlobalId;
   vtkTypeUInt64 NumberOfElements;
   double bounds[6];
   uint64_t coords[3];
+  int ProcessId;
 
   std::map< std::string, void* > RawCache;
   std::map< std::string, bool > VariableStatus;
 };
+
+struct most_of_block_t {
+  vtkTypeUInt64 GlobalId;
+  vtkTypeUInt64 NumberOfElements;
+  double bounds[6];
+  uint64_t coords[3];
+  int ProcessId;
+};
+
+}
 
 //------------------------------------------------------------------------------
 class vtkPGenericIOMultiBlockReader::vtkGenericIOMultiBlockMetaData
@@ -69,7 +81,7 @@ public:
   int TotalNumberOfElements; // Total number of points across all blocks
   std::map < std::string, gio::VariableInfo > VariableInformation;
   std::map < std::string, int > VariableGenericIOType;
-  std::map < int, vtkPGenericIOMultiBlockReader::block_t > Blocks;
+  std::map < int, block_t > Blocks;
 
 
   /**
@@ -90,6 +102,12 @@ public:
   bool HasBlock( const int blockId )
   {
     return (this->Blocks.find(blockId) != this->Blocks.end());
+  }
+
+  bool BlockIsOnMyProcess(const int blockId, const int myProcessId)
+  {
+    return this->Blocks.find(blockId) != this->Blocks.end() &&
+        this->Blocks[blockId].ProcessId == myProcessId;
   }
 
   /**
@@ -427,11 +445,15 @@ void vtkPGenericIOMultiBlockReader::LoadMetaData()
 
   // load block information
   this->MetaData->NumberOfBlocks = this->Reader->GetTotalNumberOfBlocks();
-  block_t myBlock;
+
+  std::vector< most_of_block_t > localBlocks;
+  localBlocks.resize(this->Reader->GetNumberOfAssignedBlocks());
   double min[3];
   double max[3];
+  int myProcessId = this->Controller->GetLocalProcessId();
   for (int i = 0; i < this->Reader->GetNumberOfBlockHeaders(); ++i)
     {
+    most_of_block_t& myBlock = localBlocks[i];
     gio::RankHeader block = this->Reader->GetBlockHeader(i);
     assert("pre: loading duplicate block in metadata!" &&
       !this->MetaData->HasBlock(block.GlobalRank));
@@ -439,12 +461,6 @@ void vtkPGenericIOMultiBlockReader::LoadMetaData()
     myBlock.GlobalId = block.GlobalRank;
     myBlock.NumberOfElements = block.NElems;
 
-    for (int var = 0; var < this->Reader->GetNumberOfVariablesInFile(); ++var)
-      {
-      std::string vname = this->Reader->GetVariableName(var);
-      myBlock.RawCache[vname] = NULL;
-      myBlock.VariableStatus[vname] = false;
-      }
 
     if (this->Reader->IsSpatiallyDecomposed())
       {
@@ -465,8 +481,40 @@ void vtkPGenericIOMultiBlockReader::LoadMetaData()
         }
       myBlock.coords[0] = myBlock.coords[1] = myBlock.coords[2] = 0;
       }
+    myBlock.ProcessId = myProcessId;
+    }
+  std::vector< most_of_block_t > allBlocks;
+  allBlocks.resize(this->Reader->GetTotalNumberOfBlocks());
+  assert(allBlocks.size() == localBlocks.size() * this->Controller->GetNumberOfProcesses());
+  this->Controller->AllGather((const char*)&localBlocks[0],(char*)&allBlocks[0],
+      localBlocks.size() * sizeof(most_of_block_t));
 
-    this->MetaData->Blocks[ block.GlobalRank ] = myBlock;
+  for (unsigned i = 0; i < allBlocks.size(); ++i)
+    {
+    most_of_block_t& blockData = allBlocks[i];
+    block_t block;
+    block.GlobalId = blockData.GlobalId;
+    block.NumberOfElements = blockData.NumberOfElements;
+    block.ProcessId = blockData.ProcessId;
+    block.coords[0] = blockData.coords[0];
+    block.coords[1] = blockData.coords[1];
+    block.coords[2] = blockData.coords[2];
+    block.bounds[0] = blockData.bounds[0];
+    block.bounds[1] = blockData.bounds[1];
+    block.bounds[2] = blockData.bounds[2];
+    block.bounds[3] = blockData.bounds[3];
+    block.bounds[4] = blockData.bounds[4];
+    block.bounds[5] = blockData.bounds[5];
+    if (block.ProcessId == myProcessId)
+      {
+      for (int var = 0; var < this->Reader->GetNumberOfVariablesInFile(); ++var)
+        {
+        std::string vname = this->Reader->GetVariableName(var);
+        block.RawCache[vname] = NULL;
+        block.VariableStatus[vname] = false;
+        }
+      }
+    this->MetaData->Blocks[ block.GlobalId ] = block;
     }
 
   this->BuildMetaData = false;
@@ -784,6 +832,7 @@ int vtkPGenericIOMultiBlockReader::RequestInformation(
   vtkSmartPointer< vtkMultiBlockDataSet > outline =
     vtkSmartPointer< vtkMultiBlockDataSet >::New();
   outline->SetNumberOfBlocks(this->MetaData->NumberOfBlocks);
+  int myProcessId = this->Controller->GetLocalProcessId();
   for (int i = 0; i < this->MetaData->NumberOfBlocks; ++i)
     {
     outline->SetBlock(i,NULL);
@@ -802,6 +851,9 @@ int vtkPGenericIOMultiBlockReader::RequestInformation(
       blockInfo->Set(
         vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL(),
             this->MetaData->Blocks[i].NumberOfElements);
+      blockInfo->Set(
+            vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK(),
+            this->MetaData->Blocks[i].ProcessId == myProcessId ? 1 : 0);
       }
     }
   outline->GetInformation()->Set(vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL(),
@@ -859,6 +911,8 @@ int vtkPGenericIOMultiBlockReader::RequestData(
   output->GetFieldData()->AddArray(scale);
   output->GetFieldData()->AddArray(dims);
 
+  int myProcessId = this->Controller->GetLocalProcessId();
+
   if (outInfo->Has(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS()))
     {
     int size = outInfo->Length(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES());
@@ -866,7 +920,7 @@ int vtkPGenericIOMultiBlockReader::RequestData(
     for (int i = 0; i < size; ++i)
       {
       int blockId = ids[i];
-      if (this->MetaData->HasBlock(blockId))
+      if (this->MetaData->BlockIsOnMyProcess(blockId,myProcessId))
         {
         vtkSmartPointer< vtkUnstructuredGrid > grid =
           vtkSmartPointer< vtkUnstructuredGrid >::Take(
@@ -880,11 +934,13 @@ int vtkPGenericIOMultiBlockReader::RequestData(
     std::map< int, block_t >::iterator blockItr = this->MetaData->Blocks.begin();
     for ( ; blockItr != this->MetaData->Blocks.end(); ++blockItr)
       {
-      vtkSmartPointer< vtkUnstructuredGrid > grid =
-          vtkSmartPointer< vtkUnstructuredGrid >::Take(
-            this->LoadBlock(blockItr->first));
-
-      output->SetBlock(blockItr->first,grid);
+      if (blockItr->second.ProcessId == myProcessId)
+        {
+        vtkSmartPointer< vtkUnstructuredGrid > grid =
+            vtkSmartPointer< vtkUnstructuredGrid >::Take(
+              this->LoadBlock(blockItr->first));
+        output->SetBlock(blockItr->first,grid);
+        }
       }
     }
 

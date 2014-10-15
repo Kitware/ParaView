@@ -172,8 +172,6 @@ private:
   vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader& other);
   vtkPGenericIOMultiBlockReader& operator=(
       const vtkPGenericIOMultiBlockReader& other);
-  // Internal struct -- must be here to avoid conflict with vtkACosmoReader's block_t
-  struct block_t;
   // Internal helper class
   class vtkGenericIOMultiBlockMetaData;
   vtkGenericIOMultiBlockMetaData* MetaData;
