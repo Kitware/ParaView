@@ -255,14 +255,17 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
   while (!queue.empty())
     {
     vtkStreamingPriorityQueueItem item = queue.top();
+
     queue.pop();
 //    if (item.Distance + item.Refinement <= 0 || item.Refinement < 1)
+    double diagonal = item.Bounds.GetDiagonalLength();
+    double factor = item.Refinement == 0 ? 0 : this->DetailLevelToLoad / (double) item.Refinement;
     bool detailMethodNeedsBlock =
-        (item.Refinement <= 0 ||
-         (item.ItemCoverage > 0 && item.ScreenCoverage / (item.AmountOfDetail * item.ItemCoverage ) > this->DetailLevelToLoad));
+        (item.Refinement <= 0 || (item.Distance / diagonal < factor && item.ScreenCoverage > 0));
+//        (item.Refinement <= 0 ||
+//         (item.ItemCoverage > 0 && item.ScreenCoverage / (item.AmountOfDetail * item.ItemCoverage ) > this->DetailLevelToLoad));
     bool genericMethodNeedsBlock =
         (item.Refinement <= 1 || item.ScreenCoverage >= 0.75);
-
 
     if ( (this->UseBlockDetailInformation && item.AmountOfDetail > 0) ? detailMethodNeedsBlock : genericMethodNeedsBlock)
       {
