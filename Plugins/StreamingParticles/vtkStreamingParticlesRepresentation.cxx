@@ -19,6 +19,7 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositePolyDataMapper2.h"
+#include "vtkFieldData.h"
 #include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -35,9 +36,33 @@
 #include "vtkPVTrivialProducer.h"
 #include "vtkRenderer.h"
 #include "vtkStreamingParticlesPriorityQueue.h"
+#include "vtkUnsignedIntArray.h"
 
 #include <algorithm>
 #include <assert.h>
+
+
+static char const BLOCKS_TO_PURGE_ARRAY_NAME[] = "__blocks_to_purge";
+
+static inline void purge_blocks(vtkMultiBlockDataSet* data, const std::set< unsigned int >& blocksToPurge)
+{
+  unsigned int block_index = 0;
+  unsigned int num_levels = data->GetNumberOfBlocks();
+  for (unsigned int level=0; level < num_levels; level++)
+    {
+    vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(data->GetBlock(level));
+    assert(mb != NULL);
+
+    unsigned int num_blocks = mb->GetNumberOfBlocks();
+    for (unsigned int cc=0; cc < num_blocks; cc++, block_index++)
+      {
+      if (blocksToPurge.find(block_index) != blocksToPurge.end())
+        {
+        mb->SetBlock(cc, NULL);
+        }
+      }
+    }
+}
 
 vtkStandardNewMacro(vtkStreamingParticlesRepresentation);
 //----------------------------------------------------------------------------
@@ -171,6 +196,20 @@ int vtkStreamingParticlesRepresentation::ProcessViewRequest(
       {
       assert (this->RenderedData != NULL);
       vtkStreamingStatusMacro( << this << ": received new piece.");
+
+      vtkSmartPointer< vtkUnsignedIntArray > array =
+          vtkUnsignedIntArray::SafeDownCast(piece->GetFieldData()->GetArray(BLOCKS_TO_PURGE_ARRAY_NAME));
+      if (array != NULL)
+        {
+        piece->GetFieldData()->RemoveArray(BLOCKS_TO_PURGE_ARRAY_NAME);
+        vtkMultiBlockDataSet* data = vtkMultiBlockDataSet::SafeDownCast(this->RenderedData);
+        std::set< unsigned int > blocksToPurge;
+        for (int i = 0; i < array->GetNumberOfTuples(); ++i)
+          {
+          blocksToPurge.insert(array->GetValue(i));
+          }
+        purge_blocks(data,blocksToPurge);
+        }
 
       // merge with what we are already rendering.
       vtkNew<vtkAppendCompositeDataLeaves> appender;
@@ -365,22 +404,8 @@ bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_plan
 
     vtkMultiBlockDataSet* data = vtkMultiBlockDataSet::SafeDownCast(
       this->RenderedData);
-    unsigned int block_index = 0;
-    unsigned int num_levels = data->GetNumberOfBlocks();
-    for (unsigned int level=0; level < num_levels; level++)
-      {
-      vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(data->GetBlock(level));
-      assert(mb != NULL);
 
-      unsigned int num_blocks = mb->GetNumberOfBlocks();
-      for (unsigned int cc=0; cc < num_blocks; cc++, block_index++)
-        {
-        if (blocksToPurge.find(block_index) != blocksToPurge.end())
-          {
-          mb->SetBlock(cc, NULL);
-          }
-        }
-      }
+    purge_blocks(data,blocksToPurge);
 
     this->RenderedData->Modified();
     if (this->PriorityQueue->IsEmpty())
@@ -392,13 +417,32 @@ bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_plan
       }
     }
 
+  const std::set< unsigned int >& toPurge = this->PriorityQueue->GetBlocksToPurge();
+  vtkSmartPointer< vtkUnsignedIntArray > localPurgeArray =
+      vtkSmartPointer< vtkUnsignedIntArray >::New();
+  localPurgeArray->SetNumberOfTuples(toPurge.size());
+  int i = 0;
+  for (std::set< unsigned int >::iterator itr = toPurge.begin(); itr != toPurge.end(); ++itr, ++i)
+    {
+    localPurgeArray->SetValue(i,*itr);
+    }
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  vtkSmartPointer< vtkUnsignedIntArray > globalPurgeArray =
+      vtkSmartPointer< vtkUnsignedIntArray >::New();
+  controller->GatherV(localPurgeArray,globalPurgeArray,0);
+  globalPurgeArray->SetName(BLOCKS_TO_PURGE_ARRAY_NAME);
+
   int needsToStream = !this->PriorityQueue->IsEmpty();
   int allNeedToStream;
-  vtkMultiProcessController::GetGlobalController()->AllReduce(&needsToStream,&allNeedToStream,1,vtkCommunicator::LOGICAL_OR_OP);
+  controller->AllReduce(&needsToStream,&allNeedToStream,1,vtkCommunicator::LOGICAL_OR_OP);
   // If this process doesn't need to fetch another block, return without executing the pipeline
   // The return value should be true if ANY process needs to fetch another block
   if (!needsToStream)
     {
+    if (controller->GetLocalProcessId() == 0 && globalPurgeArray->GetNumberOfTuples() > 0)
+      {
+      this->ProcessedPiece->GetFieldData()->AddArray(globalPurgeArray);
+      }
     return allNeedToStream;
     }
 
@@ -418,6 +462,11 @@ bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_plan
 
   // Execute the pipeline.
   this->Update();
+
+  if (controller->GetLocalProcessId() == 0 && globalPurgeArray->GetNumberOfTuples() > 0)
+    {
+    this->ProcessedPiece->GetFieldData()->AddArray(globalPurgeArray);
+    }
 
   this->InStreamingUpdate = false;
   return true;
