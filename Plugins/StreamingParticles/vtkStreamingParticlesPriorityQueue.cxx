@@ -227,11 +227,13 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
       item.Bounds.SetBounds(bounds);
       if (blockInfo->Has(vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL()))
         {
-        item.AmountOfDetail = mb->GetMetaData(cc)->Get(
+        item.AmountOfDetail = blockInfo->Get(
               vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL());
         }
-
-      queue.push(item);
+      if (blockInfo->Get(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK()))
+        {
+        queue.push(item);
+        }
       }
     }
   double clamp_bounds[6];
@@ -322,10 +324,6 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
       }
     }
 
-  // - anything in blocksRequested is what is "extra" and should
-  // be purged.
-  // - anything in this->Internals->BlocksToRequest is to be requested.
-
   for (std::deque<unsigned int>::iterator itr = toRequest.begin(); itr != toRequest.end(); ++itr)
     {
     std::map<unsigned,unsigned>::iterator keep = keepInRequest.find(*itr % num_block_per_level);
@@ -360,24 +358,15 @@ unsigned int vtkStreamingParticlesPriorityQueue::Pop()
     return VTK_UNSIGNED_INT_MAX;
     }
 
-  int num_procs = this->Controller? this->Controller->GetNumberOfProcesses() : 1;
-  int myid = this->Controller? this->Controller->GetLocalProcessId() : 0;
-  assert(myid < num_procs);
+  unsigned int item;
 
-  std::vector<unsigned int> items;
-  items.resize(num_procs, VTK_UNSIGNED_INT_MAX);
+  item = this->Internals->BlocksToRequest.front();
+  this->Internals->BlocksToRequest.pop();
+  this->Internals->BlocksRequested.insert(item);
 
-  for (int cc=0; cc < num_procs && !this->Internals->BlocksToRequest.empty(); cc++)
-    {
-    items[cc] = this->Internals->BlocksToRequest.front();
-    this->Internals->BlocksToRequest.pop();
-    this->Internals->BlocksRequested.insert(items[cc]);
-    }
-
-  // at the end, when the queue empties out in the middle of a pop, right now,
-  // all other processes are simply going to ask for block 0 (set in
-  // initialization of vtkPriorityQueueItem). We can change that, if needed.
-  return items[myid];
+  // As the queue is assumed to be of the local process's blocks now, return
+  // the first block in the queue (will be different on each process
+  return item;
 }
 
 //----------------------------------------------------------------------------

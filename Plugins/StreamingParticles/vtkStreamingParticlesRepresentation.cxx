@@ -23,6 +23,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -286,6 +287,7 @@ int vtkStreamingParticlesRepresentation::RequestData(vtkInformation *rqst,
 
     vtkNew<vtkPVGeometryFilter> geomFilter;
     geomFilter->SetUseOutline(this->UseOutline? 1 : 0);
+    geomFilter->SetController(NULL);
 
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
     geomFilter->SetInputData(input);
@@ -390,9 +392,14 @@ bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_plan
       }
     }
 
-  if (this->PriorityQueue->IsEmpty())
+  int needsToStream = !this->PriorityQueue->IsEmpty();
+  int allNeedToStream;
+  vtkMultiProcessController::GetGlobalController()->AllReduce(&needsToStream,&allNeedToStream,1,vtkCommunicator::LOGICAL_OR_OP);
+  // If this process doesn't need to fetch another block, return without executing the pipeline
+  // The return value should be true if ANY process needs to fetch another block
+  if (!needsToStream)
     {
-    return false;
+    return allNeedToStream;
     }
 
   // determine if we need to stream any blocks.
