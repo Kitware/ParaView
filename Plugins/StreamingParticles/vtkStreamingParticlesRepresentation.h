@@ -88,11 +88,25 @@ public:
   void SetOpacity(double val);
 
   // Description:
+  // Set to true to use a different method to determine which blocks are loaded.
+  // The default method assumes an octree of blocks, where the alternative assumes
+  // that the blocks correspond exactly between levels and are just more detailed.
+  // Defaults to false.
   void SetUseBlockDetailInformation(bool newVal);
   bool GetUseBlockDetailInformation() const;
   vtkBooleanMacro(UseBlockDetailInformation,bool)
 
   // Description:
+  // Should be true if any server process can load any block.  This is not true
+  // for all data formats.  Defaults to true.
+  void SetProcessesCanLoadAnyBlock(bool newVal);
+  bool GetProcessesCanLoadAnyBlock() const;
+  vtkBooleanMacro(ProcessesCanLoadAnyBlock,bool)
+
+  // Description:
+  // Used in conjunction with SetUseBlockDetailInformation.  This determines how
+  // far from the camera highly detailed blocks are loaded.  Units: 1 = block diagonal.
+  // Defaults to 2
   void SetDetailLevelToLoad(double level);
   double GetDetailLevelToLoad();
 

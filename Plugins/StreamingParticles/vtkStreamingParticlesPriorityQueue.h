@@ -97,6 +97,17 @@ public:
   vtkSetMacro(UseBlockDetailInformation,bool)
 
   // Description:
+  // If this variable is set to true then the priority queue will internally manage
+  // round-robining the blocks across the processes.  If this is set to false, then
+  // the dataset should have the vtkCompositeData::CURRENT_PROCESS_CAN_LOAD_BLOCK
+  // key on each block's metadata to indicate which process can load each block and
+  // this information will be used to determine the process to use for each block.
+  // Defaults to true.
+  vtkGetMacro(AnyProcessCanLoadAnyBlock,bool)
+  vtkBooleanMacro(AnyProcessCanLoadAnyBlock,bool)
+  vtkSetMacro(AnyProcessCanLoadAnyBlock,bool)
+
+  // Description:
   // When UseBlockDetailInformation is on, this variable controls the minimum level of
   // detail a block can have and still be loaded.  More specifically, the value from
   // vtkPGenericIOMultiBlockReader::BLOCK_AMOUNT_OF_DETAIL is used with the distance to
@@ -118,6 +129,7 @@ protected:
   vtkMultiProcessController* Controller;
 
   bool UseBlockDetailInformation;
+  bool AnyProcessCanLoadAnyBlock;
   double DetailLevelToLoad;
 
 private:

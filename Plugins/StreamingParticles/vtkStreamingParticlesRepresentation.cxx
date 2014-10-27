@@ -119,6 +119,20 @@ bool vtkStreamingParticlesRepresentation::GetUseBlockDetailInformation() const
   return this->PriorityQueue->GetUseBlockDetailInformation();
 }
 //----------------------------------------------------------------------------
+void vtkStreamingParticlesRepresentation::SetProcessesCanLoadAnyBlock(bool newVal)
+{
+  if (newVal != this->PriorityQueue->GetAnyProcessCanLoadAnyBlock())
+    {
+    this->PriorityQueue->SetAnyProcessCanLoadAnyBlock(newVal);
+    this->Modified();
+    }
+}
+//----------------------------------------------------------------------------
+bool vtkStreamingParticlesRepresentation::GetProcessesCanLoadAnyBlock() const
+{
+  return this->PriorityQueue->GetAnyProcessCanLoadAnyBlock();
+}
+//----------------------------------------------------------------------------
 void vtkStreamingParticlesRepresentation::SetDetailLevelToLoad(double level)
 {
   if (level != this->PriorityQueue->GetDetailLevelToLoad())

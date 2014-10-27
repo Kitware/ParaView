@@ -97,6 +97,7 @@ vtkStreamingParticlesPriorityQueue::vtkStreamingParticlesPriorityQueue()
   this->Internals = new vtkInternals();
   this->Controller = 0;
   this->UseBlockDetailInformation = false;
+  this->AnyProcessCanLoadAnyBlock = true;
   this->DetailLevelToLoad = 8.5e-5;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
@@ -200,7 +201,8 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
 
   unsigned int block_index = 0;
   unsigned int num_levels = metadata->GetNumberOfBlocks();
-  unsigned int num_block_per_level = vtkMultiBlockDataSet::SafeDownCast(metadata->GetBlock(0))->GetNumberOfBlocks();
+  unsigned int num_block_per_level = 0;
+  bool all_levels_have_same_block_count = true;
   for (unsigned int level=0; level < num_levels; level++)
     {
     vtkMultiBlockDataSet* mb =
@@ -208,6 +210,11 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
     assert(mb != NULL);
 
     unsigned int num_blocks = mb->GetNumberOfBlocks();
+    if (num_blocks > num_block_per_level)
+      {
+      num_block_per_level = num_blocks;
+      all_levels_have_same_block_count = level == 0;
+      }
     for (unsigned int cc=0; cc < num_blocks; cc++, block_index++)
       {
       if (!mb->HasMetaData(cc) ||
@@ -230,11 +237,17 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
         item.AmountOfDetail = blockInfo->Get(
               vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL());
         }
-      if (blockInfo->Get(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK()))
+      if (this->AnyProcessCanLoadAnyBlock ||
+          (blockInfo->Has(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK()) &&
+          blockInfo->Get(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK())))
         {
         queue.push(item);
         }
       }
+    }
+  if (!all_levels_have_same_block_count)
+    {
+    num_block_per_level *= num_levels;
     }
   double clamp_bounds[6];
   vtkMath::UninitializeBounds(clamp_bounds);
@@ -259,6 +272,11 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
     queue.pop();
 //    if (item.Distance + item.Refinement <= 0 || item.Refinement < 1)
     double diagonal = item.Bounds.GetDiagonalLength();
+    // avoid division by 0
+    if (diagonal < 1e-10)
+      {
+      diagonal = 1e-10;
+      }
     double factor = item.Refinement == 0 ? 0 : this->DetailLevelToLoad / (double) item.Refinement;
     bool detailMethodNeedsBlock =
         (item.Refinement <= 0 || (item.Distance / diagonal < factor && item.ScreenCoverage > 0));
@@ -361,15 +379,32 @@ unsigned int vtkStreamingParticlesPriorityQueue::Pop()
     return VTK_UNSIGNED_INT_MAX;
     }
 
-  unsigned int item;
+  if (this->AnyProcessCanLoadAnyBlock)
+    {
+    int myid = this->Controller->GetLocalProcessId();
+    int num_ranks = this->Controller->GetNumberOfProcesses();
+    std::vector< unsigned int > items;
+    items.resize(num_ranks);
+    for (int i = 0; i < num_ranks; ++i)
+      {
+      items[i] = this->Internals->BlocksToRequest.front();
+      this->Internals->BlocksToRequest.pop();
+      this->Internals->BlocksRequested.insert(items[i]);
+      }
+    return items[myid];
+    }
+  else
+    {
+    unsigned int item;
 
-  item = this->Internals->BlocksToRequest.front();
-  this->Internals->BlocksToRequest.pop();
-  this->Internals->BlocksRequested.insert(item);
+    item = this->Internals->BlocksToRequest.front();
+    this->Internals->BlocksToRequest.pop();
+    this->Internals->BlocksRequested.insert(item);
 
-  // As the queue is assumed to be of the local process's blocks now, return
-  // the first block in the queue (will be different on each process
-  return item;
+    // As the queue is assumed to be of the local process's blocks now, return
+    // the first block in the queue (will be different on each process
+    return item;
+    }
 }
 
 //----------------------------------------------------------------------------
