@@ -3,8 +3,6 @@ if (MKL_LIBRARIES)
   set(MKL_FIND_QUIETLY TRUE)
 endif ()
 
-if(CMAKE_MINOR_VERSION GREATER 4)
-
 if(${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "x86_64")
 
 find_library(MKL_LIBRARIES
@@ -53,8 +51,6 @@ find_library(MKL_GUIDE
 
 if(MKL_LIBRARIES AND MKL_GUIDE)
   set(MKL_LIBRARIES ${MKL_LIBRARIES} mkl_intel mkl_sequential ${MKL_GUIDE} pthread)
-endif()
-
 endif()
 
 endif()
