@@ -105,6 +105,13 @@ public:
   vtkGetMacro(QueryRankNeighbors,int);
 
   // Description:
+  // Set/Get whether the reader should append the coordinates of the block each
+  // point was read from as a point data array.  Defaults to false (Off).
+  vtkSetMacro(AppendBlockCoordinates,bool);
+  vtkBooleanMacro(AppendBlockCoordinates,bool);
+  vtkGetMacro(AppendBlockCoordinates,bool);
+
+  // Description:
   // Returns the list of arrays used to select the variables to be used
   // for the x,y and z axis.
   vtkGetObjectMacro(ArrayList,vtkStringArray);
@@ -208,6 +215,7 @@ protected:
   int RankInQuery;
 
   bool BuildMetaData;
+  bool AppendBlockCoordinates;
 
 
   vtkMultiProcessController* Controller;

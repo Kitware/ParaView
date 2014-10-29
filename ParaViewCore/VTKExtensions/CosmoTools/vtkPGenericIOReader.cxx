@@ -36,6 +36,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkType.h"
+#include "vtkUnsignedLongLongArray.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtkGenericIOUtilities.h"
@@ -170,6 +171,7 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->GenericIOType     = IOTYPEMPI;
   this->BlockAssignment   = ROUND_ROBIN;
   this->BuildMetaData     = false;
+  this->AppendBlockCoordinates = true;
 
   this->MetaData  = new vtkGenericIOMetaData();
   this->MetaData->InitCommunicator( this->Controller );
@@ -661,6 +663,30 @@ void vtkPGenericIOReader::LoadData(vtkUnstructuredGrid *grid)
       dataArray->Delete();
       } // END if the array is enabled
     } // END for all arrays
+  if (this->AppendBlockCoordinates && this->Reader->IsSpatiallyDecomposed())
+    {
+    vtkUnsignedLongLongArray* dataArray = vtkUnsignedLongLongArray::New();
+    dataArray->SetNumberOfComponents(3);
+    dataArray->SetNumberOfTuples(this->MetaData->NumberOfElements);
+    dataArray->SetName("gio_block_indices");
+    int nextBlockIdx = 0;
+    int nextBlockStart = 0;
+    unsigned long long coords[3];
+    // since the compiler can't tell if they're the same....
+    assert (sizeof(unsigned long long) == sizeof(uint64_t));
+    for (int i = 0; i < this->MetaData->NumberOfElements; ++i)
+      {
+      if (i == nextBlockStart)
+        {
+        this->Reader->GetBlockCoords(nextBlockIdx,(uint64_t*)coords);
+        nextBlockStart += this->Reader->GetNumberOfElementsInBlock(nextBlockIdx);
+        ++nextBlockIdx;
+        }
+      dataArray->SetTupleValue(i,coords);
+      }
+    PD->AddArray( dataArray );
+    dataArray->Delete();
+    }
 
 }
 
