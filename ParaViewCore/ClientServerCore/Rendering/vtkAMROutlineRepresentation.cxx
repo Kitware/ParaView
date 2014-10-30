@@ -14,11 +14,7 @@
 =========================================================================*/
 #include "vtkAMROutlineRepresentation.h"
 
-#ifdef VTKGL2
-# include "vtkCompositePolyDataMapper.h"
-#else
-# include "vtkCompositePolyDataMapper2.h"
-#endif
+#include "vtkCompositePolyDataMapper2.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkAMRStreamingPriorityQueue.h"
 #include "vtkAppendCompositeDataLeaves.h"

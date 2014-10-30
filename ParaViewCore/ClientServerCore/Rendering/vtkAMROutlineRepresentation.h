@@ -29,12 +29,7 @@
 #include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 
 class vtkAMRStreamingPriorityQueue;
-#ifdef VTKGL2
-class vtkCompositePolyDataMapper;
-# define vtkCompositePolyDataMapper2 vtkCompositePolyDataMapper
-#else
 class vtkCompositePolyDataMapper2;
-#endif
 class vtkPVLODActor;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMROutlineRepresentation :

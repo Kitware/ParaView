@@ -15,8 +15,7 @@
 #include "vtkGeometryRepresentation.h"
 
 #ifdef VTKGL2
-# include "vtkCompositePolyDataMapper.h"
-# define vtkCompositePolyDataMapper2 vtkCompositePolyDataMapper
+# include "vtkCompositePolyDataMapper2.h"
 #else
 # include "vtkCompositePolyDataMapper2.h"
 # include "vtkHardwareSelectionPolyDataPainter.h"
@@ -127,7 +126,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->Property = vtkProperty::New();
 
   // setup composite display attributes
-#ifndef VTKGL2
   vtkCompositeDataDisplayAttributes *compositeAttributes =
     vtkCompositeDataDisplayAttributes::New();
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->
@@ -135,7 +133,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper)->
     SetCompositeDataDisplayAttributes(compositeAttributes);
   compositeAttributes->Delete();
-#endif
 
   this->RequestGhostCellsIfNeeded = true;
   this->Ambient = 0.0;
@@ -831,33 +828,25 @@ bool vtkGeometryRepresentation::GenerateMetaData(vtkInformation*,
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockVisibility(unsigned int index, bool visible)
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->SetBlockVisibility(index, visible);
-#endif
 }
 
 //----------------------------------------------------------------------------
 bool vtkGeometryRepresentation::GetBlockVisibility(unsigned int index) const
 {
-#ifndef VTKGL2
   return vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->GetBlockVisibility(index);
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockVisibility(unsigned int index, bool)
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockVisibility(index);
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockVisibilities()
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockVisibilites();
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -870,41 +859,31 @@ void vtkGeometryRepresentation::SetBlockColor(unsigned int index, double r, doub
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockColor(unsigned int index, double *color)
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->SetBlockColor(index, color);
-#endif
 }
 
 //----------------------------------------------------------------------------
 double* vtkGeometryRepresentation::GetBlockColor(unsigned int index)
 {
-#ifndef VTKGL2
   return vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->GetBlockColor(index);
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockColor(unsigned int index)
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockColor(index);
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockColors()
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockColors();
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockOpacity(unsigned int index, double opacity)
 {
-#ifndef VTKGL2
   return vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->SetBlockOpacity(index, opacity);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -919,23 +898,17 @@ void vtkGeometryRepresentation::SetBlockOpacity(unsigned int index, double *opac
 //----------------------------------------------------------------------------
 double vtkGeometryRepresentation::GetBlockOpacity(unsigned int index)
 {
-#ifndef VTKGL2
   return vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->GetBlockOpacity(index);
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockOpacity(unsigned int index)
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockOpacity(index);
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockOpacities()
 {
-#ifndef VTKGL2
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockOpacities();
-#endif
 }
