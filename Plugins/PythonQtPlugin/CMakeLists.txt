@@ -11,7 +11,7 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(PythonQt REQUIRED)
 
-include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${PYTHON_INCLUDE_DIRS})
 include_directories(${PYTHONQT_INCLUDE_DIR})
 include_directories(${VTK_INCLUDE_DIRS})
 

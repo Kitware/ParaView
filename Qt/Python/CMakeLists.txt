@@ -62,7 +62,7 @@ set (Module_UI_FILES
 include_directories(
   "${VTK_SOURCE_DIR}/Wrapping/Python"
   "${VTK_BINARY_DIR}/Wrapping/Python"
-  "${PYTHON_INCLUDE_PATH}"
+  "${PYTHON_INCLUDE_DIRS}"
   )
 
 #-------------------------------------------------------------------------
