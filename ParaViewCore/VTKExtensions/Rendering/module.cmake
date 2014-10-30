@@ -17,6 +17,10 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
   list(APPEND __dependencies vtkGUISupportQt)
 endif(PARAVIEW_ENABLE_QT_SUPPORT)
 
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  list(APPEND __dependencies vtkRenderingLIC vtkIOExport)
+endif()
+
 vtk_module(vtkPVVTKExtensionsRendering
   GROUPS
     Qt
@@ -31,17 +35,15 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkFiltersParallel
     vtkInteractionStyle
     vtkInteractionWidgets
-#    vtkIOExport
     vtkIOXML
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
     vtkRenderingFreeType${VTK_RENDERING_BACKEND}
     vtkRendering${VTK_RENDERING_BACKEND}
     vtkRenderingParallel
-#    vtkRenderingLIC
 
     ${__dependencies}
-PRIVATE_DEPENDS
+  PRIVATE_DEPENDS
     vtkzlib
   COMPILE_DEPENDS
     vtkUtilitiesEncodeString
@@ -50,7 +52,6 @@ PRIVATE_DEPENDS
     vtkInteractionStyle
     vtkIOAMR
     vtkIOXML
-#    vtkRenderingLIC
     vtkTestingCore
     vtkTestingRendering
 
