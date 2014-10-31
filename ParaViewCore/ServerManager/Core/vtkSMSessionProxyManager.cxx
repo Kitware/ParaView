@@ -1845,3 +1845,26 @@ void vtkSMSessionProxyManager::TriggerStateUpdate()
         this->PipelineState->ValidateState();
     }
 }
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSessionProxyManager::FindProxy(
+  const char* reggroup, const char* xmlgroup, const char* xmltype)
+{
+  vtkNew<vtkSMProxyIterator> iter;
+  iter->SetSessionProxyManager(this);
+  iter->SetModeToOneGroup();
+
+  for (iter->Begin(reggroup); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxy* proxy = iter->GetProxy();
+    if (proxy != NULL &&
+      proxy->GetXMLGroup() &&
+      proxy->GetXMLName() &&
+      strcmp(proxy->GetXMLGroup(), xmlgroup) == 0 &&
+      strcmp(proxy->GetXMLName(), xmltype) == 0)
+      {
+      return proxy;
+      }
+    }
+  return NULL;
+}
