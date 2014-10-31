@@ -133,6 +133,9 @@
    <widget class="pqPVAnimationWidget" name="animationView"/>
   </widget>
   <widget class="QDockWidget" name="comparativePanelDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Comparative View Inspector</string>
    </property>
@@ -142,6 +145,9 @@
    <widget class="pqComparativeVisPanel" name="comparativeVisPanel"/>
   </widget>
   <widget class="QDockWidget" name="collaborationPanelDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Collaboration Panel</string>
    </property>
@@ -151,6 +157,9 @@
    <widget class="pqCollaborationPanel" name="collaborationPanel"/>
   </widget>
   <widget class="QDockWidget" name="informationDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Information</string>
    </property>
@@ -175,8 +184,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>204</width>
-          <height>229</height>
+          <width>78</width>
+          <height>188</height>
          </rect>
         </property>
        </widget>
@@ -186,6 +195,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="memoryInspectorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Memory Inspector</string>
    </property>
@@ -195,6 +207,15 @@
    <widget class="pqMemoryInspectorPanel" name="dockWidgetContents"/>
   </widget>
   <widget class="QDockWidget" name="propertiesDock">
+   <property name="minimumSize">
+    <size>
+     <width>80</width>
+     <height>41</height>
+    </size>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Properties</string>
    </property>
@@ -204,6 +225,9 @@
    <widget class="pqPropertiesPanel" name="propertiesPanel"/>
   </widget>
   <widget class="QDockWidget" name="multiBlockInspectorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Multi-block Inspector</string>
    </property>
@@ -213,6 +237,9 @@
    <widget class="pqMultiBlockInspectorPanel" name="multiBlockInspectorPanel"/>
   </widget>
   <widget class="QDockWidget" name="colorMapEditorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Color Map Editor</string>
    </property>
@@ -228,6 +255,9 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Selection Display Inspector</string>
    </property>
@@ -241,6 +271,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="displayPropertiesDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>Display</string>
    </property>
@@ -254,6 +287,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="viewPropertiesDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
    <property name="windowTitle">
     <string>View</string>
    </property>
