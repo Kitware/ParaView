@@ -736,4 +736,37 @@ if (TARGET paraview)
             --state=${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LoadExodusStateFile.xml)
+
+  #----------------------------------------------------------------------
+  # Add test to test stereo rendering modes.
+  add_client_tests("pv"
+    --stereo
+    --stereo-type=Interlaced
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/StereoInterlaced.xml)
+  add_client_server_tests("pvcs"
+    --stereo
+    --stereo-type=Interlaced
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/StereoInterlaced.xml)
+  add_client_render_server_tests("pvcrs"
+    --stereo
+    --stereo-type=Interlaced
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/StereoInterlaced.xml)
+  add_client_tests("pv"
+    --stereo
+    --stereo-type=SplitViewportHorizontal
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/StereoSplitViewportHorizontal.xml)
+  add_client_server_tests("pvcs"
+    --stereo
+    --stereo-type=SplitViewportHorizontal
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/StereoSplitViewportHorizontal.xml)
+  add_client_render_server_tests("pvcrs"
+    --stereo
+    --stereo-type=SplitViewportHorizontal
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/StereoSplitViewportHorizontal.xml)
 endif()

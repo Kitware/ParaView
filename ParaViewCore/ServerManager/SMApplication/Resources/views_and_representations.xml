@@ -2049,7 +2049,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
-                         default_values="3"
+                         default_values="none"
                          name="StereoType"
                          panel_visibility="never"
                          number_of_elements="1"
