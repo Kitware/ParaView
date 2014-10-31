@@ -255,6 +255,7 @@
         { "class": "vtkAppendSelection" },
         { "class": "vtkStripper" },
         { "class": "vtkStructuredGridOutlineFilter" },
+        { "class": "vtkTriangleFilter" },
         { "class": "vtkTubeFilter" }
       ],
       "cswrap": true,
