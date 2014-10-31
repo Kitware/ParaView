@@ -59,6 +59,8 @@ set (Module_UI_FILES
   pqPythonDialog.ui
 )
 
+find_package(PythonLibs REQUIRED)
+
 include_directories(
   "${VTK_SOURCE_DIR}/Wrapping/Python"
   "${VTK_BINARY_DIR}/Wrapping/Python"
