@@ -54,6 +54,8 @@ pqImageCompressorWidget::pqImageCompressorWidget(
   : Superclass(smproxy, parentObject),
   Internals(new pqImageCompressorWidget::pqInternals())
 {
+  this->setShowLabel(false);
+
   Ui::ImageCompressorWidget& ui = this->Internals->Ui;
   ui.setupUi(this);
   ui.mainLayout->setContentsMargins(0, 0, 0, 0);
