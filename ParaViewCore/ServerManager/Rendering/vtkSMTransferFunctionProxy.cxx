@@ -220,9 +220,10 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMTransferFunctionProxy::RescaleTransferFunctionToDataRange(bool extend)
+bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
 {
-  double range[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = VTK_DOUBLE_MIN;
   int component = -1;
   if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
     {
@@ -258,7 +259,14 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunctionToDataRange(bool extend)
         }
       }
     }
-  if (range[0] <= range[1])
+  return (range[0] <= range[1]);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTransferFunctionProxy::RescaleTransferFunctionToDataRange(bool extend)
+{
+  double range[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+  if (this->ComputeDataRange(range))
     {
     return this->RescaleTransferFunction(range[0], range[1], extend);
     }

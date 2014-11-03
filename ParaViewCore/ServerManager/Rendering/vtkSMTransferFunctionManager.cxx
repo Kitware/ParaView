@@ -213,8 +213,19 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
     assert(lutProxy != NULL);
     if (vtkSMPropertyHelper(lutProxy, "LockScalarRange", true).GetAsInt() == 0)
       {
-      vtkSMTransferFunctionProxy::RescaleTransferFunctionToDataRange(
-        lutProxy, extend);
+      double range[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+      if (vtkSMTransferFunctionProxy::ComputeDataRange(lutProxy, range))
+        {
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(
+          lutProxy, range[0], range[1], extend);
+        // BUG #0015076: Also reset the opacity function, if any.
+        if (vtkSMProxy* sof = vtkSMPropertyHelper(
+            lutProxy, "ScalarOpacityFunction", /*quiet*/true).GetAsProxy())
+          {
+          vtkSMTransferFunctionProxy::RescaleTransferFunction(
+            sof, range[0], range[1], extend);
+          }
+        }
       }
     }
 }
