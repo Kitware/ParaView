@@ -687,11 +687,11 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
   endif()
 
   set_property(TARGET vtkPVPythonCatalystPythonD PROPERTY INCLUDE_DIRECTORIES
-    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR}
+    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS}
     ${vtkPVPythonCatalyst_INCLUDE_DIRS}
     ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
   set_property(TARGET vtkPVPythonCatalystPython PROPERTY INCLUDE_DIRECTORIES
-    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR}
+    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS}
     ${vtkPVPythonCatalyst_INCLUDE_DIRS}
     ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
 endif()
