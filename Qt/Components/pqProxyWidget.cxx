@@ -993,8 +993,10 @@ void pqProxyWidget::createPropertyWidgets(const QStringList &properties)
       }
     propertyWidget->setObjectName(propertyKeyName);
 
-    const char* itemLabel = this->UseDocumentationForLabels?
-      xmlDocumentation : xmlLabel;
+    QString itemLabel = this->UseDocumentationForLabels?
+      QString("<p><b>%1</b>: %2</p>")
+      .arg(xmlLabel).arg(xmlDocumentation) :
+      QString(xmlLabel);
 
     pqProxyWidgetItem *item = property_group_tag == -1?
       pqProxyWidgetItem::newItem(propertyWidget, QString(itemLabel), this) :
