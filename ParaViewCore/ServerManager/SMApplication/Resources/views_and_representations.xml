@@ -81,7 +81,14 @@
       <StringVectorProperty command="SetTitle"
                             name="ChartTitle"
                             number_of_elements="1"
-                            default_values=""></StringVectorProperty>
+                            default_values="">
+        <Documentation>
+          Set the title to use for the chart. Use ${TIME} to display the current time.
+        </Documentation>
+        <Hints>
+          <PlaceholderText>Use ${TIME} to display current time</PlaceholderText>
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty command="SetTitleAlignment"
                          default_values="1"
                          name="ChartTitleAlignment"
