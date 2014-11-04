@@ -21,6 +21,7 @@
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMTimeKeeperProxy.h"
 #include "vtkSMTrace.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
@@ -63,10 +64,13 @@ bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
     .arg("proxy", this)
     .arg("methodname", "UpdateAnimationUsingDataTimeSteps")
     .arg("comment", "update animation scene based on data timesteps");
+
+  bool using_snap_to_timesteps_mode = false;
   vtkSMPropertyHelper timestepsHelper(timeKeeper, "TimestepValues");
   if (timestepsHelper.GetNumberOfElements() > 1)
     {
     vtkSMPropertyHelper(this, "PlayMode").Set(vtkCompositeAnimationPlayer::SNAP_TO_TIMESTEPS);
+    using_snap_to_timesteps_mode = true;
     }
   else
     {
@@ -93,6 +97,13 @@ bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
   if (animationTime < minTime || animationTime > maxTime)
     {
     vtkSMPropertyHelper(this, "AnimationTime").Set(minTime);
+    }
+  else if (using_snap_to_timesteps_mode)
+    {
+    // BUG #15060. When using SNAP_TO_TIMESTEPS mode, ensure that the timestep
+    // is "snapped".
+    vtkSMPropertyHelper(this, "AnimationTime").Set(
+      vtkSMTimeKeeperProxy::GetLowerBoundTimeStep(timeKeeper, animationTime));
     }
   this->UpdateVTKObjects();
   return true;
