@@ -53,7 +53,7 @@ if(PARAVIEW_USE_MPI)
    # Real plugin management
    #--------------------------------------------------
    IF(ADIOS_INCLUDE_PATH)
-      INCLUDE_DIRECTORIES(
+      INCLUDE_DIRECTORIES(SYSTEM
          ${ADIOS_INCLUDE_PATH}
          ${MPI_INCLUDE_PATH})
 
