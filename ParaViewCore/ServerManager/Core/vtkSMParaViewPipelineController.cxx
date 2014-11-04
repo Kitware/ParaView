@@ -1082,7 +1082,10 @@ bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
       {
       vtkSMProperty* smproperty = iter->GetProperty();
 
-      if ((smproperty->GetMTime() > ts) || smproperty->GetInformationOnly())
+      if ((smproperty->GetMTime() > ts) ||
+        smproperty->GetInformationOnly() ||
+        // doesn't make sense to set property values for internal properties.
+        smproperty->GetIsInternal())
         {
         // Property was modified between since the PreInitializeProxy() call. We
         // leave it untouched.
