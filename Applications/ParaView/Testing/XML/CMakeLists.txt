@@ -253,6 +253,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/TensorGlyph.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Tessellate.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Threshold.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo.xml
