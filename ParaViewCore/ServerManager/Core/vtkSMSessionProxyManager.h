@@ -463,6 +463,12 @@ public:
   // This method is used to initialise the ProxyManager to the given state
   virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
+  // Description:
+  // Find proxy of the group type (xmlgroup, xmltype) registered under a
+  // particular group (reggroup). Returns the first proxy found, if any.
+  vtkSMProxy* FindProxy(
+    const char* reggroup, const char* xmlgroup, const char* xmltype);
+
 protected:
   vtkSMSessionProxyManager(vtkSMSession*);
   ~vtkSMSessionProxyManager();

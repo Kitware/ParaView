@@ -116,21 +116,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     && strcmp(xml_name, "AnimationScene")==0)
     {
     // If an animation scene already exists, we use that.
-    vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
-    iter->SetSessionProxyManager(pxm);
-    iter->SetModeToOneGroup();
-    vtkSMProxy* scene = 0;
-    for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
-      {
-      if (iter->GetProxy() &&
-        strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
-        strcmp(iter->GetProxy()->GetXMLName(), xml_name) == 0)
-        {
-        scene = iter->GetProxy();
-        break;
-        }
-      }
-    iter->Delete();
+    vtkSMProxy* scene = pxm->FindProxy("animation", "animation", "AnimationScene");
     if (scene)
       {
       scene->Register(this);
@@ -141,21 +127,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
            && strcmp(xml_name, "TimeAnimationCue")==0)
     {
     // If an animation cue already exists, we use that.
-    vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
-    iter->SetSessionProxyManager(pxm);
-    iter->SetModeToOneGroup();
-    vtkSMProxy* cue = 0;
-    for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
-      {
-      if (iter->GetProxy() &&
-        strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
-        strcmp(iter->GetProxy()->GetXMLName(), xml_name) == 0)
-        {
-        cue = iter->GetProxy();
-        break;
-        }
-      }
-    iter->Delete();
+    vtkSMProxy* cue = pxm->FindProxy("animation", "animation", "TimeAnimationCue");
     if (cue)
       {
       cue->Register(this);
@@ -167,7 +139,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
     {
     // There is only one time keeper per connection, simply
     // load the state on the timekeeper.
-    vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
+    vtkSMProxy* timekeeper = pxm->FindProxy("timekeeper", xml_group, xml_name);
     if (timekeeper)
       {
       timekeeper->Register(this);
