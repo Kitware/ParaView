@@ -35,24 +35,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqEditColorMapReaction.h"
 #include "pqMultiBlockInspectorPanel.h"
-#include "pqPVApplicationCore.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPVApplicationCore.h"
 #include "pqRenderView.h"
-#include "pqSMAdaptor.h"
 #include "pqScalarsToColors.h"
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
+#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+#include "vtkDataObject.h"
+#include "vtkNew.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMArrayListDomain.h"
-#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkDataObject.h"
+#include "vtkSMTransferFunctionManager.h"
+#include "vtkSMViewProxy.h"
 
 #include <QAction>
 #include <QApplication>
@@ -388,15 +391,46 @@ void pqPipelineContextMenuBehavior::colorMenuTriggered(QAction* action)
   if (this->PickedRepresentation)
     {
     BEGIN_UNDO_SET("Change coloring");
+    vtkSMViewProxy* view = pqActiveObjects::instance().activeView()->getViewProxy();
     vtkSMProxy* reprProxy = this->PickedRepresentation->getProxy();
-    if (vtkSMPVRepresentationProxy::SetScalarColoring(
-        reprProxy, array.second.toLatin1().data(), array.first))
+
+    vtkSMProxy* oldLutProxy = vtkSMPropertyHelper(reprProxy, "LookupTable", true).GetAsProxy();
+
+    vtkSMPVRepresentationProxy::SetScalarColoring(
+      reprProxy, array.second.toLatin1().data(), array.first);
+
+    vtkNew<vtkSMTransferFunctionManager> tmgr;
+
+    // Hide unused scalar bars, if applicable.
+    vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
+    switch (gsettings->GetScalarBarMode())
+      {
+    case vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS:
+    case vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS:
+      tmgr->HideScalarBarIfNotNeeded(oldLutProxy, view);
+      break;
+      }
+
+    if (!array.second.isEmpty())
       {
       // we could now respect some application setting to determine if the LUT is
       // to be reset.
       vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy, true);
-      this->PickedRepresentation->renderViewEventually();
+
+      /// BUG #0011858. Users often do silly things!
+      bool reprVisibility =
+        vtkSMPropertyHelper(reprProxy, "Visibility", /*quiet*/true).GetAsInt() == 1;
+
+      // now show used scalar bars if applicable.
+      if (reprVisibility &&
+        gsettings->GetScalarBarMode() ==
+        vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+        {
+        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
+        }
       }
+
+    this->PickedRepresentation->renderViewEventually();
     END_UNDO_SET();
     }
 }
