@@ -145,8 +145,13 @@ protected:
       // to be reset.
       vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(reprProxy, true);
 
+      /// BUG #0011858. Users often do silly things!
+      bool reprVisibility =
+        vtkSMPropertyHelper(reprProxy, "Visibility", /*quiet*/true).GetAsInt() == 1;
+
       // now show used scalar bars if applicable.
-      if (gsettings->GetScalarBarMode() ==
+      if (reprVisibility &&
+        gsettings->GetScalarBarMode() ==
         vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
         {
         vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, view, true);
