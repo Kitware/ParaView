@@ -103,6 +103,14 @@ class ViewAccessor(smtrace.RealProxyAccessor):
         return trace.raw_data()
 
 # -----------------------------------------------------------------------------
+class WriterFilter(smtrace.PipelineProxyFilter):
+    def should_never_trace(self, prop):
+        """overridden to never trace 'WriteFrequency' and 'FileName' properties
+           on writers."""
+        if prop.get_property_name() in ["WriteFrequency", "FileName"]: return True
+        return super(WriterFilter, self).should_never_trace(prop)
+
+# -----------------------------------------------------------------------------
 class WriterAccessor(smtrace.RealProxyAccessor):
     """Accessor for writers. Overrides trace_ctor() to use the actual writer
     proxy name instead of the dummy-writer proxy's name. Also updates the
@@ -148,7 +156,7 @@ class WriterAccessor(smtrace.RealProxyAccessor):
         filename = self.get_object().GetProperty("FileName").GetElement(0)
         ctor = self.get_proxy_label(xmlgroup, xmlname)
         original_trace = smtrace.RealProxyAccessor.trace_ctor(\
-            self, ctor, filter, ctor_args, skip_assignment)
+            self, ctor, WriterFilter(), ctor_args, skip_assignment)
 
         trace = smtrace.TraceOutput(original_trace)
         trace.append_separated(["# register the writer with coprocessor",
