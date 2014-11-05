@@ -305,8 +305,8 @@ void pqColorMapEditor::saveAsDefault()
     qCritical() << "No LookupTable property found.";
     }
 
-  vtkSMProxy* scalarOpacityFunctionProxy =
-    pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction"));
+  vtkSMProxy* scalarOpacityFunctionProxy = lutProxy?
+    pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction")) : NULL;
   if (scalarOpacityFunctionProxy)
     {
     settings->SetProxySettings(scalarOpacityFunctionProxy);
