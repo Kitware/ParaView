@@ -71,6 +71,17 @@ public:
     return self? self->SetSuppressTimeSource(proxy, suppress) : false;
     }
 
+  // Description:
+  // Returns a time value after snapping to a lower-bound in the current
+  // timesteps.
+  virtual double GetLowerBoundTimeStep(double value);
+  static double GetLowerBoundTimeStep(vtkSMProxy* timeKeeper, double value)
+    {
+    vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
+    return self? self->GetLowerBoundTimeStep(value) : value;
+    }
+
+
 
 //BTX
 protected:
