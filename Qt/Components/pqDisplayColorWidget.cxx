@@ -195,6 +195,12 @@ public:
   pqPropertyLinks Links;
   vtkNew<vtkEventQtSlotConnect> Connector;
   vtkWeakPointer<vtkSMArrayListDomain> Domain;
+  int OutOfDomainEntryIndex;
+
+  pqInternals() :
+    OutOfDomainEntryIndex(-1)
+    {
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -228,6 +234,8 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *parentObject ) :
 
   this->connect(this->Variables,
     SIGNAL(currentIndexChanged(int)), SLOT(refreshComponents()));
+  this->connect(this->Variables,
+    SIGNAL(currentIndexChanged(int)), SLOT(pruneOutOfDomainEntries()));
   this->connect(this->Variables,
     SIGNAL(currentIndexChanged(int)), SIGNAL(arraySelectionChanged()));
   this->connect(this->Components,
@@ -291,6 +299,7 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
   this->Internals->Domain = NULL;
   this->Variables->clear();
   this->Components->clear();
+  this->Internals->OutOfDomainEntryIndex = -1;
 
   // now, save the new repr.
   this->CachedRepresentation = repr;
@@ -355,24 +364,17 @@ void pqDisplayColorWidget::setArraySelection(
     }
 
   QVariant idata = this->itemData(association, arrayName);
-  QIcon* icon = this->itemIcon(association, arrayName);
-
   int index = this->Variables->findData(idata);
   if (index == -1)
     {
-    // NOTE: it possible in several occasions (e.g. when domain is not
+    // NOTE: it is possible in several occasions (e.g. when domain is not
     // up-to-date, or property value is explicitly set to something not in the
     // domain) that the selected array is not present in the domain. In that
     // case, based on what we know of the array selection, we update the UI and
     // add that entry to the UI.
     bool prev = this->Variables->blockSignals(true);
-    this->Variables->addItem(*icon, arrayName, idata);
+    index = this->addOutOfDomainEntry(association, arrayName);
     this->Variables->blockSignals(prev);
-
-    index = this->Variables->findData(idata);
-    //qDebug() << "(" << association << ", " << arrayName << " ) "
-    //  "is not an array shown in the pqDisplayColorWidget currently. "
-    //  "Will add a new entry for it";
     }
   Q_ASSERT(index != -1);
   this->Variables->setCurrentIndex(index);
@@ -406,6 +408,7 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   bool prev = this->Variables->blockSignals(true);
 
   this->Variables->clear();
+  this->Internals->OutOfDomainEntryIndex = -1;
 
   // add solid color.
   this->Variables->addItem(*this->SolidColorIcon, "Solid Color", QVariant());
@@ -431,10 +434,20 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   // popup menu shows resonably on OsX.
   this->Variables->setMaxVisibleItems(
     this->Variables->count()+1);
+
   int idx = this->Variables->findData(current);
-  if (idx >= 0)
+  if (idx > 0)
     {
     this->Variables->setCurrentIndex(idx);
+    }
+  else if (current.isValid())
+    {
+    // The previous value set on the widget is no longer available in the
+    // "domain". This happens when the pipeline is modified, for example. In
+    // that case, the UI still needs to reflect the value. So we add it.
+    QPair<int, QString> currentColoring = PropertyLinksConnection::convert(current);
+    this->Variables->setCurrentIndex(this->addOutOfDomainEntry(
+        currentColoring.first, currentColoring.second));
     }
   this->Variables->blockSignals(prev);
   this->Variables->setEnabled(this->Variables->count() > 0);
@@ -592,5 +605,31 @@ void pqDisplayColorWidget::updateColorTransferFunction()
       lut->getVectorComponent());
     this->connect(lut, SIGNAL(componentOrModeChanged()),
       SLOT(updateColorTransferFunction()), Qt::UniqueConnection);
+    }
+}
+
+//-----------------------------------------------------------------------------
+int pqDisplayColorWidget::addOutOfDomainEntry(int association, const QString& arrayName)
+{
+  this->Internals->OutOfDomainEntryIndex = this->Variables->count();
+  // typically, we'd ask the domain to tell us if this is an array being
+  // "auto-converted" and if so, we'll use that icon type. But we don't have
+  // that information anymore. So just use the association indicated on the
+  // property.
+  this->Variables->addItem(
+    *this->itemIcon(association, arrayName), arrayName + " (?)",
+    this->itemData(association, arrayName));
+  return this->Internals->OutOfDomainEntryIndex;
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::pruneOutOfDomainEntries()
+{
+  if (this->Internals->OutOfDomainEntryIndex != -1 &&
+    this->Variables->currentIndex() != this->Internals->OutOfDomainEntryIndex)
+    {
+    // Yay! Prune that entry!
+    this->Variables->removeItem(this->Internals->OutOfDomainEntryIndex);
+    this->Internals->OutOfDomainEntryIndex = -1;
     }
 }
