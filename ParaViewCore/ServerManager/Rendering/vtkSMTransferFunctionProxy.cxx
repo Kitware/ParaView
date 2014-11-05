@@ -750,6 +750,52 @@ bool vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(
 }
 
 //----------------------------------------------------------------------------
+void vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(
+  bool preserve_range)
+{
+  try
+    {
+    if (!preserve_range)
+      {
+      throw true;
+      }
+
+    vtkSMProperty* controlPointsProperty = GetControlPointsProperty(this);
+    if (!controlPointsProperty)
+      {
+      throw true;
+      }
+
+    vtkSMPropertyHelper cntrlPoints(controlPointsProperty);
+    unsigned int num_elements = cntrlPoints.GetNumberOfElements();
+    if (num_elements == 0 || num_elements == 4)
+      {
+      // nothing to do, but not an error, so return true.
+      throw true;
+      }
+
+    std::vector<vtkTuple<double, 4> > points;
+    points.resize(num_elements/4);
+    cntrlPoints.Get(points[0].GetData(), num_elements);
+
+    // sort the points by x, just in case user didn't add them correctly.
+    std::sort(points.begin(), points.end(), StrictWeakOrdering());
+
+    double range[2] = {points.front().GetData()[0],
+      points.back().GetData()[0]};
+    this->ResetPropertiesToXMLDefaults();
+    this->RescaleTransferFunction(range[0], range[1], false);
+    }
+  catch (bool val)
+    {
+    if (val)
+      {
+      this->ResetPropertiesToXMLDefaults();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTransferFunctionProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

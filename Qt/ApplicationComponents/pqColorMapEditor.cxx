@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSearchBox.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 
 #include "vtkCommand.h"
 #include "vtkSMProperty.h"
@@ -71,8 +72,6 @@ public:
       self->style()->standardIcon(QStyle::SP_BrowserReload));
     this->Ui.SaveAsDefaults->setIcon(
       self->style()->standardIcon(QStyle::SP_DialogSaveButton));
-    // temporarily hiding this till we get time to add support for this.
-    this->Ui.RestoreDefaults->hide();
 
     QVBoxLayout* vbox = new QVBoxLayout(this->Ui.PropertiesFrame);
     vbox->setMargin(0);
@@ -98,6 +97,8 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
                    this, SLOT(editScalarBar()));
   QObject::connect(this->Internals->Ui.SaveAsDefaults, SIGNAL(clicked()),
                    this, SLOT(saveAsDefault()));
+  QObject::connect(this->Internals->Ui.RestoreDefaults, SIGNAL(clicked()),
+                   this, SLOT(restoreDefaults()));
   QObject::connect(this->Internals->Ui.AutoUpdate, SIGNAL(clicked(bool)),
                    this, SLOT(setAutoUpdate(bool)));
   QObject::connect(this->Internals->Ui.Update, SIGNAL(clicked()),
@@ -225,6 +226,7 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
     }
 
   ui.SaveAsDefaults->setEnabled(ctf != NULL);
+  ui.RestoreDefaults->setEnabled(ctf != NULL);
   if (!ctf)
     {
     return;
@@ -313,6 +315,23 @@ void pqColorMapEditor::saveAsDefault()
     {
     qCritical("No ScalarOpacityFunction property found");
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapEditor::restoreDefaults()
+{
+  vtkSMProxy* proxy = this->Internals->ActiveRepresentation->getProxy();
+  BEGIN_UNDO_SET("Reset to defaults");
+  if (vtkSMProxy* lutProxy = vtkSMPropertyHelper(proxy, "LookupTable").GetAsProxy())
+    {
+    vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(lutProxy, true);
+    if (vtkSMProxy* sofProxy = vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").GetAsProxy())
+      {
+      vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(sofProxy, true);
+      }
+    }
+  END_UNDO_SET();
+  this->renderViews();
 }
 
 //-----------------------------------------------------------------------------
