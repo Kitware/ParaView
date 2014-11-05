@@ -110,6 +110,7 @@ pqPythonSyntaxHighlighter::pqPythonSyntaxHighlighter(
   // Set tab width equal to 4 spaces
   QFontMetrics metrics = this->Internals->TextEdit->fontMetrics();
   this->Internals->TextEdit->setTabStopWidth(metrics.width("    "));
+  this->rehighlightSyntax();
 }
 
 pqPythonSyntaxHighlighter::~pqPythonSyntaxHighlighter()
@@ -175,11 +176,17 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
     }
     QString leadingWhitespace = text.left(leadingWhiteSpaceLength);
     QString trailingWhitespace = text.right(trailingWhiteSpaceLength);
-    vtkSmartPyObject args(Py_BuildValue("sOO",text.trimmed().toStdString().c_str(),
+
+    QByteArray bytes = text.trimmed().toUtf8();
+    vtkSmartPyObject unicode(PyUnicode_DecodeUTF8(bytes.data(),bytes.size(),NULL));
+    vtkSmartPyObject args(Py_BuildValue("OOO",unicode.GetPointer(),
                                        this->Internals->PythonLexer.GetPointer(),this->Internals->HtmlFormatter.GetPointer()));
     vtkSmartPyObject resultingText(PyObject_Call(this->Internals->HighlightFunction,args,NULL));
-    const char *resultingTextAsCString = PyString_AsString(resultingText);
-    QString pygmentsOutput(resultingTextAsCString);
+
+    vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
+    char* resultingTextAsCString = PyString_AsString(resultingTextBytes);
+    QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
+
     // the first span tag always should follow the pre tag like this; <pre ...><span
     int startOfPre = pygmentsOutput.indexOf(">",pygmentsOutput.indexOf("<pre"))+1;
     int endOfPre = pygmentsOutput.lastIndexOf("</pre>");
