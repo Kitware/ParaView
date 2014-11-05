@@ -14,8 +14,8 @@ paraview_test_load_data(""
   )
 
 # only enable TestPythonAnnotationFilter test if numpy is available
-include(TestNumPy)
-if (FOUND_NUMPY)
+find_python_module(numpy numpy_found)
+if (numpy_found)
   set(PARAVIEW_PYTHON_ARGS
     --data=${PARAVIEW_TEST_OUTPUT_DATA_DIR}/can.ex2)
   # Add pvpython tests

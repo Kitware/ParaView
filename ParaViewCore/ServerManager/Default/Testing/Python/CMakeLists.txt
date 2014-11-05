@@ -16,8 +16,6 @@ paraview_test_load_data(""
 ###############################################################################
 # For python scripts for testing.
 #
-include (TestNumPy)
-
 # Add python script names here.
 set(PY_TESTS
   Animation.py
@@ -41,10 +39,13 @@ set(PY_TESTS
   ValidateSources.py,NO_VALID
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   )
-if (FOUND_NUMPY)
-  list(APPEND PY_TESTS
-    PythonSelection.py)
+
+include(FindPythonModules)
+find_python_module(numpy numpy_found)
+if (numpy_found)
+  list(APPEND PY_TESTS PythonSelection.py)
 endif ()
+
 if (BUILD_SHARED_LIBS
   AND PARAVIEW_BUILD_PLUGIN_SurfaceLIC
   AND PARAVIEW_BUILD_PLUGIN_SLACTools)
@@ -105,7 +106,7 @@ else ()
   set(vtk_test_prefix)
 endif ()
 
-IF ("1" STREQUAL ${HAS_NUMPY})
+if (numpy_found)
   # This is necessary because PythonFilters generates and executes python scripts
   # on the fly which throws exceptions but cannot be caught by the host script
   # for some reason. Therefore, those exceptions are not considered as failures
@@ -120,7 +121,7 @@ IF ("1" STREQUAL ${HAS_NUMPY})
   # set_tests_properties(${vtk-module}Python-MPI-SymmetricPythonFilters PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
   # set_tests_properties(${vtk-module}Python-PythonFilters PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
   # set_tests_properties(${vtk-module}Python-SymmetricPythonFilters PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
-ENDIF ("1" STREQUAL ${HAS_NUMPY})
+endif()
 
 if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE AND NOT WIN32)
   set(PARAVIEW_PVBATCH_ARGS

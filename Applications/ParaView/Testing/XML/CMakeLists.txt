@@ -308,6 +308,14 @@ if(PARAVIEW_ENABLE_PYTHON)
   if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
     list(APPEND TESTS_WITH_BASELINES ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonView.xml)
   endif()
+
+  find_python_module(numpy numpy_found)
+  if (numpy_found)
+    list(APPEND TESTS_WITH_BASELINES
+      ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml)
+    list(APPEND TESTS_WITH_INLINE_COMPARES
+      ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
+  endif()
 endif()
 
 #------------------------------------------------------------------------------
@@ -364,14 +372,6 @@ endif()
 # Probe picking does not work in render server mode
 set(ProbePicking_DISABLE_CRS TRUE)
 set(ProbePicking_THRESHOLD 120)
-
-# only enable find data tests if numpy is available
-include("TestNumPy")
-
-IF ("1" STREQUAL ${HAS_NUMPY})
-  SET(TESTS_WITH_INLINE_COMPARES ${TESTS_WITH_INLINE_COMPARES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
-ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 #------------------------------------------------------------------------------
 set (TestPythonConsole_BREAK TRUE)
