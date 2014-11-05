@@ -95,6 +95,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
   bool multiline_text = false;
   bool python = false;
+  QString placeholderText;
   if (svp->GetHints())
     {
     vtkPVXMLElement* widgetHint = svp->GetHints()->FindNestedElementByName("Widget");
@@ -107,6 +108,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       strcmp(widgetHint->GetAttribute("syntax"), "python") == 0)
       {
       python = true;
+      }
+    if (vtkPVXMLElement* phtElement = svp->GetHints()->FindNestedElementByName("PlaceholderText"))
+      {
+      placeholderText = phtElement->GetCharacterData();
+      placeholderText = placeholderText.trimmed();
       }
     }
 
@@ -443,6 +449,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
                   this, SIGNAL(changeFinished()));
     this->setChangeAvailableAsChangeFinished(false);
+
+    if (!placeholderText.isEmpty())
+      {
+      lineEdit->setPlaceholderText(placeholderText);
+      }
 
     vbox->addWidget(lineEdit);
 
