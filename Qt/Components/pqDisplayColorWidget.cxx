@@ -416,6 +416,12 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   vtkSMArrayListDomain* domain = this->Internals->Domain;
   Q_ASSERT (domain);
 
+  QSet<QString> uniquifier; // we sometimes end up with duplicate entries.
+  // overcome that for now. We need a proper fix in
+  // vtkSMArrayListDomain/vtkSMRepresentedArrayListDomain/vtkPVDataInformation.
+  // for now, just do this. To reproduce the problem, skip the uniquifier check,
+  // and the load can.ex2, uncheck all blocks, and check all sets. The color-by
+  // combo will have duplicated ObjectId, SourceElementId, and SourceElementSide entries.
   for (unsigned int cc=0, max = domain->GetNumberOfStrings(); cc < max; cc++)
     {
     int icon_association = domain->GetDomainAssociation(cc);
@@ -428,7 +434,12 @@ void pqDisplayColorWidget::refreshColorArrayNames()
       }
     QIcon* icon = this->itemIcon(icon_association, name);
     QVariant idata = this->itemData(association, name);
-    this->Variables->addItem(*icon, label, idata);
+    QString key = QString("%1.%2").arg(association).arg(name);
+    if (!uniquifier.contains(key))
+      {
+      this->Variables->addItem(*icon, label, idata);
+      uniquifier.insert(key);
+      }
     }
   // doing this here, instead of in the construtor ensures that the
   // popup menu shows resonably on OsX.
