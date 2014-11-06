@@ -14,10 +14,13 @@
 =========================================================================*/
 #include "vtkPVSynchronizedRenderer.h"
 
+#ifndef VTKGL2
+# include "vtkCameraPass.h"
+# include "vtkImageProcessingPass.h"
+#endif
+
 #include "vtkBoundingBox.h"
-#include "vtkCameraPass.h"
 #include "vtkCaveSynchronizedRenderers.h"
-#include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVClientServerSynchronizedRenderers.h"
@@ -287,8 +290,9 @@ void vtkPVSynchronizedRenderer::SetImageProcessingPass(
     {
     return;
     }
-
+#ifndef VTKGL2
   vtkSetObjectBodyMacro(ImageProcessingPass, vtkImageProcessingPass, pass);
+#endif
   this->SetupPasses();
 }
 
@@ -361,7 +365,8 @@ void vtkPVSynchronizedRenderer::SetupPasses()
     {
     return;
     }
-
+#ifndef VTKGL2
+  // FIXME The OpenGL2 backend will need to do something to replace this.
   vtkCameraPass* cameraPass = vtkCameraPass::New();
   if (this->ImageProcessingPass)
     {
@@ -384,6 +389,7 @@ void vtkPVSynchronizedRenderer::SetupPasses()
     defaultPass->Delete();
     }
   cameraPass->Delete();
+#endif
 }
 
 //----------------------------------------------------------------------------

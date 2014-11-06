@@ -14,13 +14,18 @@
 =========================================================================*/
 #include "vtkGeometryRepresentation.h"
 
+#ifdef VTKGL2
+# include "vtkCompositePolyDataMapper2.h"
+#else
+# include "vtkCompositePolyDataMapper2.h"
+# include "vtkHardwareSelectionPolyDataPainter.h"
+# include "vtkShadowMapBakerPass.h"
+#endif
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkCompositePolyDataMapper2.h"
-#include "vtkHardwareSelectionPolyDataPainter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -42,7 +47,6 @@
 #include "vtkSelectionConverter.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkShadowMapBakerPass.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
@@ -106,6 +110,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
   vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::New();
+#ifndef VTKGL2
   vtkHardwareSelectionPolyDataPainter* selPainter =
     vtkHardwareSelectionPolyDataPainter::SafeDownCast(
       mapper->GetSelectionPainter()->GetDelegatePainter());
@@ -113,6 +118,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   selPainter->SetCellIdArrayName("vtkOriginalCellIds");
   selPainter->SetProcessIdArrayName("vtkProcessId");
   selPainter->SetCompositeIdArrayName("vtkCompositeIndex");
+#endif
 
   this->Mapper = mapper;
   this->LODMapper = vtkCompositePolyDataMapper2::New();
@@ -604,6 +610,7 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
     }
 
   // Update shadow map properties, in case we are using shadow maps.
+#ifndef VTKGL2
   if (this->Representation == SURFACE ||
     this->Representation == SURFACE_WITH_EDGES)
     {
@@ -616,6 +623,7 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
     this->Actor->GetPropertyKeys()->Set(vtkShadowMapBakerPass::OCCLUDER(), 0);
     this->Actor->GetPropertyKeys()->Remove(vtkShadowMapBakerPass::RECEIVER());
     }
+#endif
 }
 
 //----------------------------------------------------------------------------

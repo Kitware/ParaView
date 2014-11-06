@@ -14,10 +14,12 @@
 =========================================================================*/
 #include "vtkSliceFriendGeometryRepresentation.h"
 
-#include "vtkCompositePolyDataMapper2.h"
+#ifndef VTKGL2
+# include "vtkCompositePolyDataMapper2.h"
+# include "vtkHardwareSelectionPolyDataPainter.h"
+#endif
 #include "vtkCubeAxesRepresentation.h"
 #include "vtkGarbageCollector.h"
-#include "vtkHardwareSelectionPolyDataPainter.h"
 #include "vtkObjectFactory.h"
 #include "vtkView.h"
 
@@ -109,6 +111,9 @@ void vtkSliceFriendGeometryRepresentation::RemoveInputConnection(int port, int i
 //----------------------------------------------------------------------------
 void vtkSliceFriendGeometryRepresentation::InitializeMapperForSliceSelection()
 {
+#ifdef VTKGL2
+  // FIXME: Figure out selection for the OpenGL2 backend.
+#else
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
   vtkCompositePolyDataMapper2* mapper =
@@ -119,6 +124,7 @@ void vtkSliceFriendGeometryRepresentation::InitializeMapperForSliceSelection()
   selPainter->SetPointIdArrayName("-");
   selPainter->SetCellIdArrayName("vtkSliceOriginalCellIds");
   selPainter->SetCompositeIdArrayName("vtkSliceCompositeIndex");
+#endif
 }
 
 //----------------------------------------------------------------------------

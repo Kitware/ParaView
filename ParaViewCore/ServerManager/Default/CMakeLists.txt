@@ -36,7 +36,6 @@ set (Module_SRCS
   vtkSMCSVExporterProxy.cxx
   vtkSMDirectoryProxy.cxx
   vtkSMExporterProxy.cxx
-  vtkSMGL2PSExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMMultiServerSourceProxy.cxx
   vtkSMPropertyModificationUndoElement.cxx
@@ -47,6 +46,16 @@ set (Module_SRCS
   vtkSMTesting.cxx
   vtkSMViewExportHelper.cxx
 )
+
+# Disabled unless using the OpenGL backend.
+if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  list(APPEND Module_SRCS
+    vtkSMGL2PSExporterProxy.cxx
+    )
+endif()
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+  add_definitions(-DVTKGL2)
+endif()
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMExporterProxy.cxx

@@ -1,6 +1,9 @@
 set (__dependencies)
-if (PARAVIEW_USE_PISTON)
-  list (APPEND __dependencies vtkAcceleratorsPiston)
+if(PARAVIEW_USE_PISTON)
+  list(APPEND __dependencies vtkAcceleratorsPiston)
+endif()
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  list(APPEND __dependencies vtkWebGLExporter vtkRenderingVolumeAMR)
 endif()
 
 vtk_module(vtkPVClientServerCoreRendering
@@ -12,10 +15,8 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkPVClientServerCoreCore
     vtkPVVTKExtensionsDefault
     vtkPVVTKExtensionsRendering
-    vtkWebGLExporter
     vtkRenderingLabel
-    vtkRenderingVolumeAMR
-    vtkRenderingVolumeOpenGL
+    vtkRenderingVolume${VTK_RENDERING_BACKEND}
     vtkViewsContext2D
     vtkViewsCore
     ${__dependencies}

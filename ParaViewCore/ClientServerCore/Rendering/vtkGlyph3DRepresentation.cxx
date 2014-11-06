@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkGlyph3DRepresentation.h"
 
-#include "vtkCompositePolyDataMapper2.h"
 #include "vtkDataObject.h"
 #include "vtkGlyph3DMapper.h"
 #include "vtkInformation.h"

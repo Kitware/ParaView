@@ -50,7 +50,6 @@ set(Module_SRCS
   vtkPVDefaultPass.cxx
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
-  vtkPVGL2PSExporter.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
@@ -76,7 +75,6 @@ set(Module_SRCS
   vtkSelectionSerializer.cxx
   vtkSortedTableStreamer.cxx
   vtkSquirtCompressor.cxx
-  vtkTexturePainter.cxx
   vtkTileDisplayHelper.cxx
   vtkTilesHelper.cxx
   vtkTrackballPan.cxx
@@ -85,6 +83,14 @@ set(Module_SRCS
   vtkVolumeRepresentationPreprocessor.cxx
   vtkZlibImageCompressor.cxx
 )
+
+# Disabled unless using the OpenGL backend.
+if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  list(APPEND Module_SRCS
+    vtkPVGL2PSExporter.cxx
+    vtkTexturePainter.cxx
+    )
+endif()
 
 if (PARAVIEW_USE_MPI)
   list(APPEND Module_SRCS

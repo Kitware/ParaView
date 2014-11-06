@@ -14,13 +14,19 @@
 =========================================================================*/
 #include "vtkPVOpenGLExtensionsInformation.h"
 
+#ifdef VTKGL2
+
+#else
+# include "vtkOpenGLExtensionManager.h"
+#endif
+
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkOpenGLExtensionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+#include "vtkNew.h"
 
 #include <string>
 #include <vector>
@@ -79,13 +85,17 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
     vtkErrorMacro("Cannot downcast to render window.");
     return;
     }
-  vtkOpenGLExtensionManager* mgr = vtkOpenGLExtensionManager::New();
+  std::vector<std::string> extensions;
+
+#ifdef VTKGL2
+  // FIXME: Add something to pass the equivalent string here.
+#else
+  vtkNew<vtkOpenGLExtensionManager> mgr;
   mgr->SetRenderWindow(renWin);
   mgr->Update();
-
-  std::vector<std::string> extensions;
   vtksys::SystemTools::Split(mgr->GetExtensionsString(), 
     extensions, ' ');
+#endif
 
   this->Internal->Extensions.clear();
   std::vector<std::string>::iterator iter;
@@ -93,7 +103,7 @@ void vtkPVOpenGLExtensionsInformation::CopyFromObject(vtkObject* obj)
     {
     this->Internal->Extensions.insert(*iter);
     }
-  mgr->Delete();
+
 }
 
 //-----------------------------------------------------------------------------

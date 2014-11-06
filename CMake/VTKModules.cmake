@@ -36,11 +36,10 @@ set(_vtk_modules
   vtkRenderingVolume
   vtkRenderingLabel
   vtkRenderingFreeType
-  vtkRenderingFreeTypeOpenGL
-  vtkRenderingVolumeOpenGL
-  vtkRenderingOpenGL
+  vtkRenderingFreeType${VTK_RENDERING_BACKEND}
+  vtkRenderingVolume${VTK_RENDERING_BACKEND}
+  vtkRendering${VTK_RENDERING_BACKEND}
   vtkRenderingLOD
-  vtkRenderingLIC
   vtkRenderingContext2D
   vtkRenderingAnnotation
   vtkInteractionStyle
@@ -60,7 +59,6 @@ set(_vtk_modules
   vtkIOGeometry
   vtklibxml2
   vtkViewsContext2D
-  vtkIOExport
   vtkIOInfovis
   vtkFiltersAMR
   vtkChartsCore
@@ -342,6 +340,10 @@ set(_vtk_modules
   vtkPVAnimation
   # Needed for animation support.
   )
+
+if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+  list(APPEND _vtk_modules vtkRenderingLIC vtkIOExport)
+endif()
 
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
