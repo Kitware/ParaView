@@ -103,9 +103,22 @@ private slots:
   /// selection on this->ColorTransferFunction, if present.
   void componentNumberChanged();
 
+  /// called when this->Variables is changed. If we added an entry to the
+  /// Variables combobox for an array not in the domain, then if it's not longer
+  /// needed, we prune that value.
+  void pruneOutOfDomainEntries();
+
 private:
   QVariant itemData(int association, const QString& arrayName) const;
   QIcon* itemIcon(int association, const QString& arrayName) const;
+
+  /// called to add an out-of-domain value to the combo-box. Such a value is
+  /// needed when the SM property has a value which is no longer present in the
+  /// domain. In such a case, we still need the UI to show that value. But as
+  /// soon as the UI selection changes, we prune that value so the user cannot
+  /// select it again. Also, such a value is marked with a "(?)" suffix.
+  /// Returns the index for the newly added entry.
+  int addOutOfDomainEntry(int association, const QString& arrayName);
 
 private:
   QIcon* CellDataIcon;
