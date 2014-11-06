@@ -95,7 +95,7 @@ public:
     }
   static QVariant convert(const ValueType& value)
     {
-    if (value.first < vtkDataObject::POINT || value.first > vtkDataObject::CELL ||
+    if (value.first < vtkDataObject::POINT || value.first > vtkDataObject::FIELD ||
       value.second.isEmpty())
       {
       return QVariant();
@@ -216,6 +216,7 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *parentObject ) :
 {
   this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
   this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData16.png");
+  this->FieldDataIcon = new QIcon(":/pqWidgets/Icons/pqGlobalData16.png");
   this->SolidColorIcon = new QIcon(":/pqWidgets/Icons/pqSolidColor16.png");
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
@@ -253,6 +254,7 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *parentObject ) :
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::~pqDisplayColorWidget()
 {
+  delete this->FieldDataIcon;
   delete this->CellDataIcon;
   delete this->PointDataIcon;
   delete this->SolidColorIcon;
@@ -362,9 +364,9 @@ void pqDisplayColorWidget::setArraySelection(
   int association = value.first;
   const QString& arrayName = value.second;
 
-  if (association < vtkDataObject::POINT || association > vtkDataObject::CELL)
+  if (association < vtkDataObject::POINT || association > vtkDataObject::FIELD)
     {
-    qCritical("Only cell/point data coloring is currently supported by this widget.");
+    qCritical("Only cell/point/field data coloring is currently supported by this widget.");
     association = vtkDataObject::POINT;
     }
 
@@ -400,7 +402,18 @@ QIcon* pqDisplayColorWidget::itemIcon(int association, const QString& arrayName)
     {
     return this->SolidColorIcon;
     }
-  return association == vtkDataObject::CELL?  this->CellDataIcon: this->PointDataIcon;
+  if (association == vtkDataObject::FIELD)
+    {
+    return this->FieldDataIcon;
+    }
+  else if (association == vtkDataObject::CELL)
+    {
+    return this->CellDataIcon;
+    }
+  else
+    {
+    return this->PointDataIcon;
+    }
 }
 
 //-----------------------------------------------------------------------------

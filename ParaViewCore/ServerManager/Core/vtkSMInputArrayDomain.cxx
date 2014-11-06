@@ -136,6 +136,7 @@ bool vtkSMInputArrayDomain::IsAttributeTypeAcceptable(
     {
     return attribute_type == POINT||
       attribute_type == CELL||
+      attribute_type == FIELD ||
       attribute_type == EDGE||
       attribute_type == VERTEX||
       attribute_type == ROW;
