@@ -68,6 +68,9 @@ protected slots:
   /// Save the current transfer function(s) as default.
   void saveAsDefault();
 
+  /// Restore the defaults (opposite of saveAsDefault()).
+  void restoreDefaults();
+
   /// called when AutoUpdate button is toggled.
   void setAutoUpdate(bool);
 

@@ -97,7 +97,13 @@
       </IntVectorProperty>
 
       <ProxyProperty name="ScalarOpacityFunction"
-                     command="SetScalarOpacityFunction">
+        command="SetScalarOpacityFunction">
+        <Hints>
+          <!-- when resetting to XML defaults, we don't want this property to
+               get reset. This is managed explicitly. So let's just skip this
+               from the default mechanism -->
+          <NoDefault />
+        </Hints>
       </ProxyProperty>
 
       <DoubleVectorProperty clean_command="RemoveAllPoints"

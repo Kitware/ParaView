@@ -118,6 +118,9 @@
          </property>
          <item>
           <widget class="QPushButton" name="RestoreDefaults">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="toolTip">
             <string>Restore application default setting values for color map</string>
            </property>
@@ -128,6 +131,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="SaveAsDefaults">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="toolTip">
             <string>Save current color map settings values as default</string>
            </property>
