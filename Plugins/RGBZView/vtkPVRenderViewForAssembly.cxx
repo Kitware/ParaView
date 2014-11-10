@@ -1025,7 +1025,7 @@ void vtkPVRenderViewForAssembly::SetScalarRange(double min, double max)
 void vtkPVRenderViewForAssembly::StartCaptureValues()
 {
   this->Internal->SavedRenderPass = this->SynchronizedRenderers->GetRenderPass();
-  if (this->Internal->SavedRenderPass)
+  if (this->Internal->SavedRenderPass != NULL)
     {
     this->Internal->SavedRenderPass->Register(NULL);
     }
