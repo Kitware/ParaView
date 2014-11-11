@@ -198,7 +198,7 @@ MACRO (QT4_ADD_RESOURCES outfiles )
     # let's make a configured file and add it as a dependency so cmake is run
     # again when dependencies need to be recomputed.
     QT4_MAKE_OUTPUT_FILE("${infile}" "" "qrc.depends" out_depends)
-    CONFIGURE_FILE("${infile}" "${out_depends}" COPY_ONLY)
+    CONFIGURE_FILE("${infile}" "${out_depends}" COPYONLY)
     ADD_CUSTOM_COMMAND(OUTPUT ${outfile}
       COMMAND ${QT_RCC_EXECUTABLE}
       ARGS ${rcc_options} -name ${outfilename} -o ${outfile} ${infile}
