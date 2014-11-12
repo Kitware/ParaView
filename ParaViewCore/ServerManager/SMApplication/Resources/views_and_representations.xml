@@ -2060,16 +2060,14 @@
       <IntVectorProperty command="SetStereoRender"
                          default_values="0"
                          name="StereoRender"
-                         number_of_elements="1"
-                         is_internal="1">
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetStereoType"
                          default_values="none"
                          name="StereoType"
                          panel_visibility="never"
-                         number_of_elements="1"
-                         is_internal="1">
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Crystal Eyes"
                  value="1" />
@@ -2090,12 +2088,16 @@
           <Entry text="SplitViewportHorizontal"
                  value="9" />
         </EnumerationDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetMultiSamples"
                          default_values="0"
                          name="MultiSamples"
                          panel_visibility="never"
-                         number_of_elements="1"></IntVectorProperty>
+                         number_of_elements="1">
+      </IntVectorProperty>
       <IntVectorProperty command="SetAlphaBitPlanes"
                          default_values="1"
                          name="AlphaBitPlanes"
