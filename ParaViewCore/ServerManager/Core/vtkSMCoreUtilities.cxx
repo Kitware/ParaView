@@ -25,6 +25,7 @@
 
 #include <vtksys/ios/sstream>
 #include <ctype.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkSMCoreUtilities);
 //----------------------------------------------------------------------------
@@ -113,6 +114,28 @@ vtkStdString vtkSMCoreUtilities::SanitizeName(const char* name)
     {
     return "a" + cname.str();
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMCoreUtilities::AdjustRangeForLog(double range[2])
+{
+  assert(range[0] <= range[1]);
+  if (range[0] <= 0.0 || range[1] <= 0.0)
+    {
+    // ranges not valid for log-space. Cannot convert.
+    if (range[1] <= 0.0)
+      {
+      range[0] = 1.0e-4;
+      range[1] = 1.0;
+      }
+    else
+      {
+      range[0] =  range[1] * 0.0001;
+      range[0] =  (range[0] < 1.0)? range[0] : 1.0;
+      }
+    return true;
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------
