@@ -77,12 +77,6 @@ int vtkCompleteArrays::RequestData(
   vtkDataSet *input = vtkDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  int noNeed = 0;
-  int myProcId;
-  int numProcs;
-  int idx;
-  vtkClientServerStream css;
-
   // Initialize
   //
   vtkDebugMacro(<<"Completing array");
@@ -91,38 +85,70 @@ int vtkCompleteArrays::RequestData(
   output->GetPointData()->PassData(input->GetPointData());
   output->GetCellData()->PassData(input->GetCellData());
 
-  myProcId = this->Controller->GetLocalProcessId();
-  numProcs = this->Controller->GetNumberOfProcesses();
-  if (numProcs <= 1)
+  if(this->Controller->GetNumberOfProcesses() <= 1)
     {
     return 1;
+    }
+  int myProcId = this->Controller->GetLocalProcessId();
+
+  // array is [num points on proc 0, num cells on proc 0,
+  //           num points on this proc, num cells on this proc,
+  //           proc id if this process has point,
+  //           proc id if this process has cells]
+
+  vtkIdType localInfo[6] = {-1, -1, input->GetNumberOfPoints(),
+                           input->GetNumberOfCells(), -1, -1};
+  if(myProcId == 0)
+    {
+    localInfo[0] = input->GetNumberOfPoints();
+    localInfo[1] = input->GetNumberOfCells();
+    }
+  if(input->GetNumberOfPoints() > 0)
+    {
+    localInfo[4] = myProcId;
+    }
+  if(input->GetNumberOfCells() > 0)
+    {
+    localInfo[5] = myProcId;
+    }
+  vtkIdType globalInfo[6];
+  this->Controller->AllReduce(localInfo, globalInfo, 6, vtkCommunicator::MAX_OP);
+
+  // Idea is that if process 0 doesn't have the proper point data and cell data
+  // arrays (if cells exist) then we need to get that information from another proc.
+  // We only need to get that information from one process so we look for the highest
+  // process id with cells (if they exist) or points (if no cells exist) to
+  // provide that information.
+  if( globalInfo[1] > 0 || (globalInfo[3] == 0 && globalInfo[0] > 0) ||
+      globalInfo[2] == 0 )
+    {
+    // process 0 has all of the needed information already (globalInfo[2] == 0
+    // means there is no information at all)
+    return 1;
+    }
+
+  int infoProc = globalInfo[5]; // a process that has the information proc 0 needs
+  if(globalInfo[3] == 0)
+    { // there are no cells so we find a process with points
+    infoProc = globalInfo[4];
     }
 
   if (myProcId == 0)
     {
-    if (input->GetNumberOfPoints() > 0 && input->GetNumberOfCells() > 0)
-      {
-      noNeed = 1;
-      }
-    this->Controller->Broadcast(&noNeed, 1, 0);
-    if (noNeed)
-      {
-      return 1;
-      }
     // Receive and collected information from the remote processes.
     vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
     vtkPVDataInformation* tmpInfo = vtkPVDataInformation::New();
-    for (idx = 1; idx < numProcs; ++idx)
-      {
-      int length = 0;
-      this->Controller->Receive(&length, 1, idx, 389002);
-      unsigned char* data = new unsigned char[length];
-      this->Controller->Receive(data, length, idx, 389003);
-      css.SetData(data, length);
-      tmpInfo->CopyFromStream(&css);
-      delete [] data;
-      dataInfo->AddInformation(tmpInfo);
-      }
+
+    int length = 0;
+    this->Controller->Receive(&length, 1, infoProc, 389002);
+    unsigned char* data = new unsigned char[length];
+    this->Controller->Receive(data, length, infoProc, 389003);
+    vtkClientServerStream css;
+    css.SetData(data, length);
+    tmpInfo->CopyFromStream(&css);
+    delete [] data;
+    dataInfo->AddInformation(tmpInfo);
+
     this->FillArrays(
       output->GetPointData(), dataInfo->GetPointDataInformation());
     this->FillArrays(
@@ -135,7 +161,7 @@ int vtkCompleteArrays::RequestData(
       if (!pointArray)
         {
         vtkErrorMacro("Could not create point array. "
-                      "The output will not contain points");
+                      "The output will not contain points.");
         }
       else
         {
@@ -149,13 +175,9 @@ int vtkCompleteArrays::RequestData(
     dataInfo->Delete();
     tmpInfo->Delete();
     }
-  else
-    { // remote processes
-    this->Controller->Broadcast(&noNeed, 1, 0);
-    if (noNeed)
-      {
-      return 1;
-      }
+  else if(myProcId == infoProc)
+    {
+    vtkClientServerStream css;
     vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
     dataInfo->SetSortArrays(0);
     dataInfo->CopyFromObject(output);
