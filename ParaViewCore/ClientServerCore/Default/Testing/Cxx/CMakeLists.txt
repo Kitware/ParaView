@@ -4,6 +4,7 @@ if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
 paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ParaViewCoreClientServerCorePrintSelf.cxx
+  TestSpecialDirectories.cxx
   TestSystemCaps.cxx
   )
 endif()
