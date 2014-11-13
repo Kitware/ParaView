@@ -371,10 +371,17 @@ void pqPropertiesPanel::setPanelMode(int val)
   this->Internals->Ui.Delete->setVisible(has_source);
   this->Internals->Ui.Help->setVisible(has_source);
   this->Internals->Ui.Reset->setVisible(has_source);
+  this->Internals->Ui.PropertiesSaveAsDefaults->setVisible(has_source);
+  this->Internals->Ui.PropertiesRestoreDefaults->setVisible(has_source);
 
   this->Internals->Ui.PropertiesFrame->setVisible(has_source);
   this->Internals->Ui.ViewFrame->setVisible(has_view);
+  this->Internals->Ui.ViewSaveAsDefaults->setVisible(has_view);
+  this->Internals->Ui.ViewRestoreDefaults->setVisible(has_view);
+
   this->Internals->Ui.DisplayFrame->setVisible(has_display);
+  this->Internals->Ui.DisplaySaveAsDefaults->setVisible(has_display);
+  this->Internals->Ui.DisplayRestoreDefaults->setVisible(has_display);
 
   // the buttons need not be shown if there's only 1 type in the panel.
   bool has_multiples_types =
@@ -593,14 +600,15 @@ void pqPropertiesPanel::updateDisplayPanel(pqDataRepresentation* repr)
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertiesPanel::updateViewPanel (pqView* _view)
+void pqPropertiesPanel::updateViewPanel (pqView* argView)
 {
+  pqView* _view = argView;
   if ( (this->PanelMode & pqPropertiesPanel::VIEW_PROPERTIES) == 0)
     {
     _view = NULL;
     }
 
-  if (this->Internals->View != _view)
+  if (this->Internals->View != argView)
     {
     // The view has changed.
     if (this->Internals->View)
@@ -611,8 +619,8 @@ void pqPropertiesPanel::updateViewPanel (pqView* _view)
         delete this->Internals->ViewWidgets;
         }
       }
-    this->Internals->View = _view;
-    emit this->viewChanged(_view);
+    this->Internals->View = argView;
+    emit this->viewChanged(argView);
     if (_view)
       {
       // create the widgets for this view
