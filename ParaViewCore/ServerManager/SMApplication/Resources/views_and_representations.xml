@@ -6406,21 +6406,26 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
-                         command="AddCompositeDataSetIndex"
-                         default_values="1"
-                         number_of_elements="1"
+      <IntVectorProperty command="SetCompositeDataSetIndex"
+                         default_values="2"
                          name="CompositeDataSetIndex"
-                         number_of_elements_per_command="1"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <CompositeTreeDomain mode="leaves" name="tree">
+                         number_of_elements="1">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the
+          dataset to pass. The flat index must point to a non-empty,
+          non-composite dataset for anything to be passed through. If the input
+          is not a composite dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain mode="leaves"
+                             name="tree">
           <RequiredProperties>
             <Property function="Input" name="Input" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
         </CompositeTreeDomain>
-        <Documentation>This property lists the ids of the blocks to extract
-        from the input multiblock dataset.</Documentation>
+        <Hints>
+          <NoDefault/>
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
@@ -6455,11 +6460,12 @@
         <Documentation>Set the array to use on X axis. This is used only when
         UseIndexForXAxis is set to 0.</Documentation>
         <BagChartSeriesListDomain name="array_list"
-                                  hide_partial_arrays="1"
+                                  hide_partial_arrays="0"
                                   array_type="x">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
         </BagChartSeriesListDomain>
         <Hints>
@@ -6476,11 +6482,12 @@
                             number_of_elements="1">
         <Documentation>Set the bag plot Y serie.</Documentation>
         <BagChartSeriesListDomain name="array_list"
-                                  hide_partial_arrays="1"
+                                  hide_partial_arrays="0"
                                   array_type="y">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
         </BagChartSeriesListDomain>
       </StringVectorProperty>
@@ -6490,11 +6497,12 @@
                             number_of_elements="1">
         <Documentation>Set the bag plot density serie.</Documentation>
         <BagChartSeriesListDomain name="array_list"
-                                  hide_partial_arrays="1"
+                                  hide_partial_arrays="0"
                                   array_type="density">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
         </BagChartSeriesListDomain>
       </StringVectorProperty>
@@ -6586,8 +6594,9 @@
       <InputProperty command="SetInputConnection"
                      name="Input">
         <Documentation>Data input for the representation.</Documentation>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject" />
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkTable" />
         </DataTypeDomain>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
@@ -6624,21 +6633,23 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
-                         command="AddCompositeDataSetIndex"
+      <IntVectorProperty command="SetCompositeDataSetIndex"
                          default_values="1"
-                         number_of_elements="1"
                          name="CompositeDataSetIndex"
-                         number_of_elements_per_command="1"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <CompositeTreeDomain mode="leaves" name="tree">
+                         number_of_elements="1">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the
+          dataset to pass. The flat index must point to a non-empty,
+          non-composite dataset for anything to be passed through. If the input
+          is not a composite dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain mode="leaves"
+                             name="tree">
           <RequiredProperties>
-            <Property function="Input" name="Input" />
+            <Property function="Input"
+                      name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
-        <Documentation>This property lists the ids of the blocks to extract
-        from the input multiblock dataset.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetFieldAssociation"
                          default_values="0"
@@ -6775,6 +6786,20 @@
         <Property name="SeriesLabel"
                   function="SeriesLabel" />
       </PropertyGroup>
+      <SubProxy>
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
