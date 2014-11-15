@@ -20,6 +20,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkScalarsToColors.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -379,12 +380,15 @@ bool vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(
   double range[2] = {points.front().GetData()[0],
                      points.back().GetData()[0]};
 
-  if (inverse == false && (range[0] <= 0.0 || range[1] <= 0.0))
+  if (inverse == false)
     {
-    // ranges not valid for log-space. Cannot convert.
-    vtkWarningMacro("Ranges not valid for log-space. "
-      "Cannot map control points to log-space.");
-    return false;
+    if (vtkSMCoreUtilities::AdjustRangeForLog(range))
+      {
+      // ranges not valid for log-space. Will convert them.
+      vtkWarningMacro(
+        "Ranges not valid for log-space. "
+        "Changed the range to (" << range[0] <<", " << range[1] << ").");
+      }
     }
   if (range[0] >= range[1])
     {

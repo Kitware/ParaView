@@ -42,6 +42,11 @@ public:
   // Sanitize a label/name to be remove spaces, delimiters etc.
   static vtkStdString SanitizeName(const char*);
 
+  // Description:
+  // Given a range, converts it to be a valid range to switch to log space. If
+  // the range is changed, returns true, otherwise returns false.
+  static bool AdjustRangeForLog(double range[2]);
+
 //BTX
 protected:
   vtkSMCoreUtilities();
