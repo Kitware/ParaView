@@ -104,7 +104,7 @@ FUNCTION(build_paraview_client BPC_NAME)
   IF (NOT DEFINED BPC_VERSION_MAJOR OR NOT DEFINED BPC_VERSION_MINOR OR NOT DEFINED BPC_VERSION_PATCH)
     MESSAGE(ERROR 
       "VERSION_MAJOR, VERSION_MINOR and VERSION_PATCH must be specified")
-  ENDIF (NOT DEFINED BPC_VERSION_MAJOR OR NOT DEFINED BPC_VERSION_MINOR OR NOT DEFINED BPC_VERSION_PATCH)
+  ENDIF ()
 
   # If no title is provided, make one up using the name.
   pv_set_if_not_set(BPC_TITLE "${BPC_NAME}")
@@ -135,7 +135,7 @@ FUNCTION(build_paraview_client BPC_NAME)
       "// remains consistent on all systems.\n"
       "IDI_ICON1 ICON \"${BPC_APPLICATION_ICON}\"")
     SET(exe_icon "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc")
-  ENDIF (WIN32 AND BPC_APPLICATION_ICON)
+  ENDIF ()
 
   # executable_flags are used to pass options to add_executable(..) call such as
   # WIN32 or MACOSX_BUNDLE
@@ -151,18 +151,18 @@ FUNCTION(build_paraview_client BPC_NAME)
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources
       )
-    ENDIF (BPC_BUNDLE_ICON)
+    ENDIF ()
 
     IF(QT_MAC_USE_COCOA)
       IF (IS_DIRECTORY "${QT_QTGUI_LIBRARY_RELEASE}")
             GET_FILENAME_COMPONENT(qt_menu_nib
               "${QT_QTGUI_LIBRARY_RELEASE}/Resources/qt_menu.nib"
               REALPATH)
-      ELSE (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+      ELSE ()
         GET_FILENAME_COMPONENT(qt_menu_nib
           "${QT_LIBRARY_DIR}/Resources/qt_menu.nib"
           REALPATH)
-      ENDIF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+      ENDIF ()
 
       set(qt_menu_nib_sources
         "${qt_menu_nib}/classes.nib"
@@ -174,17 +174,17 @@ FUNCTION(build_paraview_client BPC_NAME)
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
       )
-    ELSE(QT_MAC_USE_COCOA)
+    ELSE()
       set(qt_menu_nib_sources)
-    ENDIF(QT_MAC_USE_COCOA)
+    ENDIF()
 
     SET(executable_flags MACOSX_BUNDLE)
-  ENDIF (APPLE)
+  ENDIF ()
 
   IF(WIN32)
     LINK_DIRECTORIES(${QT_LIBRARY_DIR})
     set (executable_flags WIN32)
-  ENDIF(WIN32)
+  ENDIF()
 
   # If splash image is not specified, use the standard ParaView splash image.
   pv_set_if_not_set(BPC_SPLASH_IMAGE "${branding_source_dir}/branded_splash.png")
@@ -200,7 +200,7 @@ FUNCTION(build_paraview_client BPC_NAME)
   SET (BPC_HAS_GUI_CONFIGURATION_XMLS 0)
   IF (BPC_GUI_CONFIGURATION_XMLS)
     SET (BPC_HAS_GUI_CONFIGURATION_XMLS 1)
-  ENDIF (BPC_GUI_CONFIGURATION_XMLS)
+  ENDIF ()
 
   # Generate a resource file out of the splash image.
   GENERATE_QT_RESOURCE_FROM_FILES(
@@ -233,7 +233,7 @@ FUNCTION(build_paraview_client BPC_NAME)
     SET (ui_resources ${ui_resources} "${outfile}")
     set (ui_resource_init
       "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_help);\n")
-  ENDIF (BPC_COMPRESSED_HELP_FILE)
+  ENDIF ()
 
   IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
     QT5_ADD_RESOURCES(rcs_sources
@@ -285,8 +285,8 @@ FUNCTION(build_paraview_client BPC_NAME)
       INSTALL(TARGETS pq${BPC_NAME}Initializer
             DESTINATION ${PV_INSTALL_LIB_DIR}
             COMPONENT Runtime)
-    ENDIF (PV_INSTALL_LIB_DIR)
-  ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
+    ENDIF ()
+  ENDIF ()
 
   SET (PV_EXE_LIST ${BPC_NAME})
 
@@ -314,7 +314,7 @@ FUNCTION(build_paraview_client BPC_NAME)
     TARGET_LINK_LIBRARIES(${BPC_NAME}
       LINK_PRIVATE
         pq${BPC_NAME}Initializer)
-  ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
+  ENDIF ()
 
   if (pv_exe_suffix)
     install(TARGETS ${BPC_NAME}
@@ -332,13 +332,13 @@ FUNCTION(build_paraview_client BPC_NAME)
     IF (BPC_BUNDLE_ICON)
       SET_TARGET_PROPERTIES(${BPC_NAME} PROPERTIES
         MACOSX_BUNDLE_ICON_FILE ${bundle_icon_file})
-    ENDIF (BPC_BUNDLE_ICON)
+    ENDIF ()
     SET_TARGET_PROPERTIES(${BPC_NAME} PROPERTIES 
       MACOSX_BUNDLE_BUNDLE_NAME "${BPC_APPLICATION_NAME}")
-  ENDIF (APPLE)
+  ENDIF ()
 
   IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
     SET_TARGET_PROPERTIES(${BPC_NAME} PROPERTIES
       COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-  ENDIF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-ENDFUNCTION(build_paraview_client)
+  ENDIF ()
+ENDFUNCTION()

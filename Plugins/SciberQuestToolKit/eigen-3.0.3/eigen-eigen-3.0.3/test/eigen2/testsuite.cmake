@@ -72,11 +72,11 @@ while(${ARGLIST} MATCHES  ".+.*")
   # set the variable to the specified value
   if(VALUE)
     SET(${KEY} ${VALUE})
-  else(VALUE)
+  else()
     SET(${KEY} ON)
-  endif(VALUE)
+  endif()
 
-endwhile(${ARGLIST} MATCHES ".+.*")
+endwhile()
 
 ####################################################################
 # Automatically set some user variables if they have not been defined manually
@@ -85,11 +85,11 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 
 if(NOT EIGEN_SITE)
   site_name(EIGEN_SITE)
-endif(NOT EIGEN_SITE)
+endif()
 
 if(NOT EIGEN_CMAKE_DIR)
   SET(EIGEN_CMAKE_DIR "")
-endif(NOT EIGEN_CMAKE_DIR)
+endif()
 
 if(NOT EIGEN_BUILD_STRING)
 
@@ -102,33 +102,33 @@ if(NOT EIGEN_BUILD_STRING)
   set(EIGEN_ARCH ${CMAKE_SYSTEM_PROCESSOR})
   if(WIN32)
     set(EIGEN_ARCH $ENV{PROCESSOR_ARCHITECTURE})
-  else(WIN32)
+  else()
     execute_process(COMMAND uname -m OUTPUT_VARIABLE EIGEN_ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
-  endif(WIN32)
+  endif()
 
   set(EIGEN_BUILD_STRING ${EIGEN_OS_VERSION}${EIGEN_ARCH}-${EIGEN_CXX})
 
-endif(NOT EIGEN_BUILD_STRING)
+endif()
 
 if(DEFINED EIGEN_EXPLICIT_VECTORIZATION)
   set(EIGEN_BUILD_STRING ${EIGEN_BUILD_STRING}-${EIGEN_EXPLICIT_VECTORIZATION})
-endif(DEFINED EIGEN_EXPLICIT_VECTORIZATION)
+endif()
 
 if(NOT EIGEN_WORK_DIR)
   set(EIGEN_WORK_DIR ${CTEST_SCRIPT_DIRECTORY})
-endif(NOT EIGEN_WORK_DIR)
+endif()
 
 if(NOT CTEST_SOURCE_DIRECTORY)
   SET (CTEST_SOURCE_DIRECTORY "${EIGEN_WORK_DIR}/src")
-endif(NOT CTEST_SOURCE_DIRECTORY)
+endif()
 
 if(NOT CTEST_BINARY_DIRECTORY)
   SET (CTEST_BINARY_DIRECTORY "${EIGEN_WORK_DIR}/nightly_${EIGEN_CXX}")
-endif(NOT CTEST_BINARY_DIRECTORY)
+endif()
 
 if(NOT EIGEN_MODE)
   set(EIGEN_MODE Nightly)
-endif(NOT EIGEN_MODE)
+endif()
 
 ## mandatory variables (the default should be ok in most cases):
 
@@ -165,18 +165,18 @@ if(WIN32 AND NOT UNIX)
     BUILDNAME:STRING=${EIGEN_BUILD_STRING}
     SITE:STRING=${EIGEN_SITE}
   ")
-else(WIN32 AND NOT UNIX)
+else()
   SET (CTEST_INITIAL_CACHE "
     BUILDNAME:STRING=${EIGEN_BUILD_STRING}
     SITE:STRING=${EIGEN_SITE}
   ")
-endif(WIN32 AND NOT UNIX)
+endif()
 
 # set any extra environment variables to use during the execution of the script here:
 
 if(EIGEN_CXX)
   set(CTEST_ENVIRONMENT "CXX=${EIGEN_CXX}")
-endif(EIGEN_CXX)
+endif()
 
 if(DEFINED EIGEN_EXPLICIT_VECTORIZATION)
   if(EIGEN_EXPLICIT_VECTORIZATION MATCHES SSE2)
@@ -187,11 +187,11 @@ if(DEFINED EIGEN_EXPLICIT_VECTORIZATION)
     set(CTEST_CMAKE_COMMAND "${CTEST_CMAKE_COMMAND} -DEIGEN_TEST_ALTIVEC=ON")
   elseif(EIGEN_EXPLICIT_VECTORIZATION MATCHES novec)
     set(CTEST_CMAKE_COMMAND "${CTEST_CMAKE_COMMAND} -DEIGEN_TEST_NO_EXPLICIT_VECTORIZATION=ON")
-  else(EIGEN_EXPLICIT_VECTORIZATION MATCHES SSE2)
+  else()
     message(FATAL_ERROR "Invalid value for EIGEN_EXPLICIT_VECTORIZATION (${EIGEN_EXPLICIT_VECTORIZATION}), must be: novec, SSE2, SSE3, Altivec")
-  endif(EIGEN_EXPLICIT_VECTORIZATION MATCHES SSE2)
-endif(DEFINED EIGEN_EXPLICIT_VECTORIZATION)
+  endif()
+endif()
 
 if(DEFINED EIGEN_CMAKE_ARGS)
   set(CTEST_CMAKE_COMMAND "${CTEST_CMAKE_COMMAND} ${EIGEN_CMAKE_ARGS}")
-endif(DEFINED EIGEN_CMAKE_ARGS)
+endif()

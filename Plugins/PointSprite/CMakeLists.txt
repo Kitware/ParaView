@@ -14,14 +14,14 @@ add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
 IF (ParaView_SOURCE_DIR)
   # we are building from within ParaView Source. The environment is already set.
   # Nothign more to do.
-ELSE (ParaView_SOURCE_DIR)
+ELSE ()
   find_package(ParaView)
   include("${PARAVIEW_USE_FILE}")
   include (ParaViewPlugins)
 
   # Load information about VTK/ParaView modules loaded/available.
   pv_setup_module_environment("PointSpritePlugin")
-ENDIF (ParaView_SOURCE_DIR)
+ENDIF ()
 
 # -----------------------------------------------------------------------------
 # Process all vtk-modules defined in this plugin. This generates the necessary
@@ -40,11 +40,11 @@ add_subdirectory(ParaViewPlugin)
 #IF (DEFINED BUILD_EXAMPLES)
 #  IF (BUILD_EXAMPLES)
 #      add_subdirectory(Examples)
-#  ENDIF (BUILD_EXAMPLES)
-#ELSE (DEFINED BUILD_EXAMPLES)
+#  ENDIF ()
+#ELSE ()
 #  set(PointSpritePlugin_BUILD_EXAMPLES ON CACHE BOOL "Build the example.")
 #  IF(PointSpritePlugin_BUILD_EXAMPLES)
 #      add_subdirectory(Examples)
-#  ENDIF(PointSpritePlugin_BUILD_EXAMPLES)
+#  ENDIF()
 #  mark_as_advanced(PointSpritePlugin_BUILD_EXAMPLES)
-#ENDIF (DEFINED BUILD_EXAMPLES)
+#ENDIF ()

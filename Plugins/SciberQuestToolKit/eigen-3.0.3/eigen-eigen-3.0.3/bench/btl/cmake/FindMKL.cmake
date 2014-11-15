@@ -1,9 +1,7 @@
 
 if (MKL_LIBRARIES)
   set(MKL_FIND_QUIETLY TRUE)
-endif (MKL_LIBRARIES)
-
-if(CMAKE_MINOR_VERSION GREATER 4)
+endif ()
 
 if(${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "x86_64")
 
@@ -30,7 +28,7 @@ if(MKL_LIBRARIES AND MKL_GUIDE)
   set(MKL_LIBRARIES ${MKL_LIBRARIES} mkl_intel_lp64 mkl_sequential ${MKL_GUIDE} pthread)
 endif()
 
-else(${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "x86_64")
+else()
 
 find_library(MKL_LIBRARIES
   mkl_core
@@ -55,9 +53,7 @@ if(MKL_LIBRARIES AND MKL_GUIDE)
   set(MKL_LIBRARIES ${MKL_LIBRARIES} mkl_intel mkl_sequential ${MKL_GUIDE} pthread)
 endif()
 
-endif(${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "x86_64")
-
-endif(CMAKE_MINOR_VERSION GREATER 4)
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(MKL DEFAULT_MSG MKL_LIBRARIES)

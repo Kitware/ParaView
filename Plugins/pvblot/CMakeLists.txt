@@ -67,12 +67,12 @@ IF (PARAVIEW_BUILD_QT_GUI)
     REQUIRED_ON_CLIENT
     SOURCES ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS} ${CLIENT_SRCS}
     )
-ELSE (PARAVIEW_BUILD_QT_GUI)
+ELSE ()
   ADD_PARAVIEW_PLUGIN(pvblot "1.0"
     PYTHON_MODULES ${PYMODULES}
     REQUIRED_ON_CLIENT
     )
-ENDIF (PARAVIEW_BUILD_QT_GUI)
+ENDIF ()
 
 #############################################################################
 # Set up a simple shell script to run pvblot from the command line.
@@ -82,7 +82,7 @@ SET(PVBLOT_BLOTISH_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 SET(script_ext)
 IF(WIN32 AND NOT CYGWIN)
   SET(script_ext ".bat")
-ENDIF(WIN32 AND NOT CYGWIN)
+ENDIF()
 
 #############################################################################
 # Set up pvblot script for when ParaView is installed.  This includes

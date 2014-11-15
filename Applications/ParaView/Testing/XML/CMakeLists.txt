@@ -465,7 +465,7 @@ IF (PARAVIEW_USE_MPI)
   # Hence disable them.
   set (LineChartSelection_DISABLE_CS TRUE)
   set (LineChartSelection_DISABLE_CRS TRUE)
-ENDIF (PARAVIEW_USE_MPI)
+ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but bultin
 SET (CompositeSurfaceSelection_DISABLE_CS TRUE)
@@ -519,7 +519,7 @@ IF (NOT BUILD_SHARED_LIBS)
   SET (LoadPlugins_DISABLE_C TRUE)
   SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
   SET (SLACTools_DISABLE_C TRUE)
-ENDIF (NOT BUILD_SHARED_LIBS)
+ENDIF ()
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CS TRUE)
@@ -681,7 +681,7 @@ IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
   add_client_render_server_tests("pvcrs"
     TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
   )
-ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+ENDIF ()
 
 # TODO: remote rendering tests and reverse connect tests.
 

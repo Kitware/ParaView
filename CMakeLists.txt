@@ -432,13 +432,13 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     if (NOT QT5_FOUND)
       message( SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found. "
         "Please set the Qt5Core_DIR variable." )
-    endif (NOT QT5_FOUND)
-  else (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+    endif ()
+  else ()
     find_package (Qt4)
     if (NOT QT4_FOUND)
       message (SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found. "
         "Please set the QT_QMAKE_EXECUTABLE variable.")
-    else (NOT QT4_FOUND)
+    else ()
       # check is Qtversion  is 4.8.*. If so, we are good. Otherwise we will post a
       # warning of versions (>= 4.7 && < 4.8). However we report errors for any
       # version less than 4.7
@@ -449,14 +449,14 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
           message(SEND_ERROR "Qt ${QTVERSION} not supported. "
             "Please use ${QT_OFFICIAL_VERSION} (you may need to clean your dirtied cache)."
             "Minium required version is ${QT_MIN_VERSION}.")
-        else (qt_version46_x_tmp)
+        else ()
           message(WARNING "Warning: You are using Qt ${QTVERSION}. "
             "Officially supported version is Qt ${QT_OFFICIAL_VERSION}")
-        endif (qt_version46_x_tmp)
-      endif (NOT qt_version_match)
-    endif (NOT QT4_FOUND)
-  endif (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-endif (PARAVIEW_ENABLE_QT_SUPPORT)
+        endif ()
+      endif ()
+    endif ()
+  endif ()
+endif ()
 SET(PARAVIEW_QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE})
 
 # Setup testing.
@@ -733,8 +733,8 @@ foreach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
     message (STATUS "***** Incorporating custom cmake file : ${rule_file} ****")
     include("${rule_file}")
     message (STATUS "*********************************************************")
-  endif (EXISTS "${rule_file}")
-endforeach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
+  endif ()
+endforeach()
 
 #------------------------------------------------------------------------------
 # Lastly generate the ParaViewConfig.cmake so that other projects can depend on

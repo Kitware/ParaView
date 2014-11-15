@@ -5,7 +5,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 IF(NOT ParaView_BINARY_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF(NOT ParaView_BINARY_DIR)
+ENDIF()
 
 IF(PARAVIEW_BUILD_QT_GUI)
   # We need to wrap for Qt stuff such as signals/slots etc. to work correctly.
@@ -26,4 +26,4 @@ IF(PARAVIEW_BUILD_QT_GUI)
                       GUI_INTERFACES ${IFACES}
                       SOURCES ${MOC_SRCS} ${IFACE_SRCS}
                       SourceToolbarActions.cxx)
-ENDIF(PARAVIEW_BUILD_QT_GUI)
+ENDIF()

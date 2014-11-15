@@ -29,12 +29,12 @@ IF(SILO_INCLUDE_DIR)
     #The following deprecated settings are for backwards compatibility with CMake1.4
     SET (SILO_INCLUDE_PATH ${SILO_INCLUDE_DIR})
 
-  ELSE(SILO_LIBRARY)
+  ELSE()
     IF(SILO_FIND_REQURIED)
       message(SEND_ERROR "Unable to find the requested SILO libraries.")
-    ENDIF(SILO_FIND_REQURIED)
-  ENDIF(SILO_LIBRARY)
-ENDIF(SILO_INCLUDE_DIR)
+    ENDIF()
+  ENDIF()
+ENDIF()
 
 # handle the QUIETLY and REQUIRED arguments and set SILO_FOUND to TRUE if 
 # all listed variables are TRUE

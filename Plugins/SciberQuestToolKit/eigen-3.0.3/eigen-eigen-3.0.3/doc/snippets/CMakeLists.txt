@@ -25,6 +25,6 @@ foreach(snippet_src ${snippets_SRCS})
   add_dependencies(all_snippets ${compile_snippet_target})
   set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${compile_snippet_src}
                               PROPERTIES OBJECT_DEPENDS ${snippet_src})
-endforeach(snippet_src)
+endforeach()
 
 ei_add_target_property(compile_tut_arithmetic_transpose_aliasing COMPILE_FLAGS -DEIGEN_NO_DEBUG)

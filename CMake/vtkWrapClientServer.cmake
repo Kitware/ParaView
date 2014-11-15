@@ -104,7 +104,7 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         )
 
     endif ()
-  endforeach(FILE)
+  endforeach()
 
   # Create the Init File
   configure_file(
@@ -123,4 +123,4 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
 
   unset(NO_PYTHON_BINDINGS_AVAILABLE)
 
-endmacro(VTK_WRAP_ClientServer)
+endmacro()

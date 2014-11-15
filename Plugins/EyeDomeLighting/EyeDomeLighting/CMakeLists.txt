@@ -31,6 +31,6 @@ foreach(file ${GLSL_SRCS})
     ARGS ${res} ${src} ${file}
     )
   list(APPEND ${vtk-module}_HDRS ${res})
-endforeach(file)
+endforeach()
 
 vtk_module_library(vtkEyeDomeLighting ${SRC_FILES})

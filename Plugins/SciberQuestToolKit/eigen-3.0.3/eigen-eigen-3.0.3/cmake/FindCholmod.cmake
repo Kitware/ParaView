@@ -3,7 +3,7 @@
 
 if (CHOLMOD_INCLUDES AND CHOLMOD_LIBRARIES)
   set(CHOLMOD_FIND_QUIETLY TRUE)
-endif (CHOLMOD_INCLUDES AND CHOLMOD_LIBRARIES)
+endif ()
 
 find_path(CHOLMOD_INCLUDES
   NAMES
@@ -28,7 +28,7 @@ if(CHOLMOD_LIBRARIES)
     set(CHOLMOD_LIBRARIES FALSE)
   endif ()
 
-endif(CHOLMOD_LIBRARIES)
+endif()
 
 if(CHOLMOD_LIBRARIES)
 
@@ -39,7 +39,7 @@ if(CHOLMOD_LIBRARIES)
     set(CHOLMOD_LIBRARIES FALSE)
   endif ()
 
-endif(CHOLMOD_LIBRARIES)
+endif()
 
 if(CHOLMOD_LIBRARIES)
 
@@ -50,7 +50,7 @@ if(CHOLMOD_LIBRARIES)
     set(CHOLMOD_LIBRARIES FALSE)
   endif ()
 
-endif(CHOLMOD_LIBRARIES)
+endif()
 
 if(CHOLMOD_LIBRARIES)
 
@@ -61,7 +61,7 @@ if(CHOLMOD_LIBRARIES)
     set(CHOLMOD_LIBRARIES FALSE)
   endif ()
 
-endif(CHOLMOD_LIBRARIES)
+endif()
 
 if(CHOLMOD_LIBRARIES)
 
@@ -70,7 +70,7 @@ if(CHOLMOD_LIBRARIES)
     set(CHOLMOD_LIBRARIES ${CHOLMOD_LIBRARIES} ${CHOLMOD_METIS_LIBRARY})
   endif ()
 
-endif(CHOLMOD_LIBRARIES)
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CHOLMOD DEFAULT_MSG

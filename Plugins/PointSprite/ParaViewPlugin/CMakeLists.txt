@@ -93,7 +93,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
         ${iface_sources_2})
     target_link_libraries(${PLUGIN_NAME} LINK_PUBLIC vtkQvis)
 
-ELSE(PARAVIEW_BUILD_QT_GUI)
+ELSE()
     add_paraview_plugin(${PLUGIN_NAME} "1.0"
         SERVER_MANAGER_SOURCES
             ${SM_SOURCES}
@@ -101,5 +101,5 @@ ELSE(PARAVIEW_BUILD_QT_GUI)
             ${SM_XMLS_Rendering}
             ${SM_XMLS_Graphics}
     )
-ENDIF(PARAVIEW_BUILD_QT_GUI)
+ENDIF()
 target_link_libraries(${PLUGIN_NAME} LINK_PUBLIC vtkPointSpriteGraphics vtkPointSpriteRendering)

@@ -470,4 +470,4 @@ vtk_module_library(pqApplicationComponents
 #      FILES ${dynamicHeaders}
 #      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
 #      COMPONENT Development)
-#ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+#ENDIF ()

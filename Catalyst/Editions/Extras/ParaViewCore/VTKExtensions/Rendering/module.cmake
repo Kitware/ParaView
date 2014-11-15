@@ -15,7 +15,7 @@ endif()
 
 if (PARAVIEW_ENABLE_QT_SUPPORT)
   list(APPEND __dependencies vtkGUISupportQt)
-endif(PARAVIEW_ENABLE_QT_SUPPORT)
+endif()
 
 if (Module_vtkRenderingCore)
   list(APPEND __dependencies

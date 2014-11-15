@@ -7,6 +7,6 @@ if (EIGEN2_FOUND)
   btl_add_bench(btl_hand_peeling main.cpp OFF)
   if (BUILD_btl_hand_peeling)
     set_target_properties(btl_hand_peeling PROPERTIES COMPILE_FLAGS "-DPEELING")
-  endif (BUILD_btl_hand_peeling)
+  endif ()
 
-endif (EIGEN2_FOUND)
+endif ()

@@ -41,7 +41,7 @@ IF (BUILD_AGAINST_PARAVIEW)
     vtkMantaLODActor.cxx
     vtkPVMantaRepresentation.cxx
     vtkMantaCompositeMapper.cxx)
-ENDIF (BUILD_AGAINST_PARAVIEW)
+ENDIF ()
 
 SET ( MANTA_SRCS
   ${MANTA_CLASSES}
@@ -61,4 +61,4 @@ endif()
 #Examples ####################################################################
 IF ( BUILD_EXAMPLES )
   ADD_SUBDIRECTORY(Examples)
-ENDIF ( BUILD_EXAMPLES )
+ENDIF ()

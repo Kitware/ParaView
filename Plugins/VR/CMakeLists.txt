@@ -52,7 +52,7 @@ if(PARAVIEW_USE_VRPN)
     pqVRPNConnection.cxx
     pqVRPNEventListener.cxx
     vtkVRPNCallBackHandlers.cxx)
-endif(PARAVIEW_USE_VRPN)
+endif()
 
 # if VRUI
 if(PARAVIEW_USE_VRUI)
@@ -62,7 +62,7 @@ if(PARAVIEW_USE_VRUI)
     vtkVRUIPipe.cxx
     vtkVRUIServerState.cxx
     vtkVRUITrackerState.cxx)
-endif(PARAVIEW_USE_VRUI)
+endif()
 
 if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
   QT5_WRAP_CPP(MOC_SRCS
@@ -102,7 +102,7 @@ endif()
 
 if(PARAVIEW_USE_VRPN)
   INCLUDE_DIRECTORIES(${VRPN_INCLUDE_DIR} ${VRPN_LIBUSB_INCLUDE_DIR})
-endif(PARAVIEW_USE_VRPN)
+endif()
 
 SET( VR_SOURCE_FILES
   pqVRConnectionManager.cxx

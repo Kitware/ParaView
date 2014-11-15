@@ -45,13 +45,13 @@ execute_process(COMMAND hg branch -R ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE EIGEN_B
 if(EIGEN_BRANCH_OUTPUT MATCHES "default")
 string(REGEX MATCH "^changeset: *[0-9]*:([0-9;a-f]+).*" EIGEN_HG_CHANGESET_MATCH "${EIGEN_HGTIP_OUTPUT}")
 set(EIGEN_HG_CHANGESET "${CMAKE_MATCH_1}")
-endif(EIGEN_BRANCH_OUTPUT MATCHES "default")
+endif()
 #...and show it next to the version number
 if(EIGEN_HG_CHANGESET)
   set(EIGEN_VERSION "${EIGEN_VERSION_NUMBER} (mercurial changeset ${EIGEN_HG_CHANGESET})")
-else(EIGEN_HG_CHANGESET)
+else()
   set(EIGEN_VERSION "${EIGEN_VERSION_NUMBER}")
-endif(EIGEN_HG_CHANGESET)
+endif()
 
 
 include(CheckCXXCompilerFlag)
@@ -90,7 +90,7 @@ endif()
 option(EIGEN_BUILD_BTL "Build benchmark suite" OFF)
 if(NOT WIN32)
   option(EIGEN_BUILD_PKGCONFIG "Build pkg-config .pc file for Eigen" ON)
-endif(NOT WIN32)
+endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -171,7 +171,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     endif()
   endif()
 
-endif(CMAKE_COMPILER_IS_GNUCXX)
+endif()
 
 if(MSVC)
   # C4127 - conditional expression is constant
@@ -200,10 +200,10 @@ if(MSVC)
     if(NOT CMAKE_CL_64)
       # arch is not supported on 64 bit systems, SSE is enabled automatically.
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
-    endif(NOT CMAKE_CL_64)
+    endif()
     message(STATUS "Enabling SSE2 in tests/examples")
-  endif(EIGEN_TEST_SSE2)
-endif(MSVC)
+  endif()
+endif()
 
 option(EIGEN_TEST_NO_EXPLICIT_VECTORIZATION "Disable explicit vectorization in tests/examples" OFF)
 option(EIGEN_TEST_X87 "Force using X87 instructions. Implies no vectorization." OFF)
@@ -269,9 +269,9 @@ macro(ei_add_target_property target prop value)
   # if the property wasn't previously set, ${previous} is now "previous-NOTFOUND" which cmake allows catching with plain if()
   if(NOT previous)
     set(previous "")
-  endif(NOT previous)
+  endif()
   set_target_properties(${target} PROPERTIES ${prop} "${previous} ${value}")
-endmacro(ei_add_target_property)
+endmacro()
 
 install(FILES
   signature_of_eigen3_matrix_library
@@ -289,7 +289,7 @@ if(EIGEN_BUILD_PKGCONFIG)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/eigen3.pc
         DESTINATION ${pkg_config_libdir}/pkgconfig
         )
-endif(EIGEN_BUILD_PKGCONFIG)
+endif()
 
 add_subdirectory(Eigen)
 
@@ -349,7 +349,7 @@ if(NOT MSVC)
     add_subdirectory(blas EXCLUDE_FROM_ALL)
     add_subdirectory(lapack EXCLUDE_FROM_ALL)
   endif()
-endif(NOT MSVC)
+endif()
 
 add_subdirectory(unsupported)
 
@@ -361,7 +361,7 @@ add_subdirectory(scripts EXCLUDE_FROM_ALL)
 # TODO: consider also replacing EIGEN_BUILD_BTL by a custom target "make btl"?
 if(EIGEN_BUILD_BTL)
   add_subdirectory(bench/btl EXCLUDE_FROM_ALL)
-endif(EIGEN_BUILD_BTL)
+endif()
 
 ei_testing_print_summary()
 

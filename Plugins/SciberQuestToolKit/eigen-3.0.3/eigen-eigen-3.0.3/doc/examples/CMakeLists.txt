@@ -17,4 +17,4 @@ foreach(example_src ${examples_SRCS})
     ARGS >${CMAKE_CURRENT_BINARY_DIR}/${example}.out
   )
   add_dependencies(all_examples ${example})
-endforeach(example_src)
+endforeach()

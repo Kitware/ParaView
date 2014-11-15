@@ -16,15 +16,15 @@ IF (ParaView_SOURCE_DIR)
       INCLUDE(${QT_USE_FILE})
     ENDIF()
     INCLUDE_DIRECTORIES(${PARAVIEW_GUI_INCLUDE_DIRS})
-  ENDIF(PARAVIEW_BUILD_QT_GUI)
+  ENDIF()
 
-ELSE (ParaView_SOURCE_DIR)
+ELSE ()
   #building outside of the source tree
 
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
 
-ENDIF (ParaView_SOURCE_DIR)
+ENDIF ()
 
 #find where all vapor header files live (especially vaporinternal/common.h)
 #include the parts of vapor that we need to compile the reader

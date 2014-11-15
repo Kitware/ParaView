@@ -115,7 +115,7 @@ if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND requestedResourceFiles
       ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
   )
-endif(PARAVIEW_ENABLE_PYTHON)
+endif()
 set(resourceFiles)
 foreach(requestedResourceFile IN LISTS requestedResourceFiles)
   if (EXISTS "${requestedResourceFile}")

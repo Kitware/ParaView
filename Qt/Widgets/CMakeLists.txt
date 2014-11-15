@@ -264,7 +264,7 @@ if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
     ${Qt5Test_INCLUDE_DIRS}
     ${Qt5WebKitWidgets_INCLUDE_DIRS})
   
-else (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+else ()
   set (QT_USE_QTNETWORK 1)
   set (QT_USE_QTHELP 1)
 
@@ -275,7 +275,7 @@ else (PARAVIEW_QT_VERSION VERSION_GREATER "4")
   # automatically inherits the Qt include dirs.
   set (${vtk-module}_INCLUDE_DIRS
     ${QT_INCLUDES})
-endif (PARAVIEW_QT_VERSION VERSION_GREATER "4")
+endif ()
 
 set(${vtk-module}_NO_HeaderTest 1)
 
@@ -308,4 +308,4 @@ target_link_libraries(${vtk-module} LINK_PUBLIC ${QT_LIBRARIES})
 #    "${CMAKE_CURRENT_SOURCE_DIR}"
 #    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources"
 #    "${resPath}/*.ui;${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc;${resPath}/*.qrc")
-#ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+#ENDIF ()

@@ -7,8 +7,8 @@ project(EigenDoc)
 if(CMAKE_COMPILER_IS_GNUCXX)
   if(CMAKE_SYSTEM_NAME MATCHES Linux)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -g1")
-  endif(CMAKE_SYSTEM_NAME MATCHES Linux)
-endif(CMAKE_COMPILER_IS_GNUCXX)
+  endif()
+endif()
 
 configure_file(
   ${Eigen_SOURCE_DIR}/unsupported/doc/Doxyfile.in

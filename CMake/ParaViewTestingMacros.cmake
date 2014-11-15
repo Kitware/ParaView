@@ -122,12 +122,12 @@ MACRO (process_args out_extra_args)
   SET (temp_args)
   IF (ACT_BASELINE_DIR)
     SET (temp_args "--test-baseline=DATA{${ACT_BASELINE_DIR}/${test_name}.png}")
-  ENDIF (ACT_BASELINE_DIR)
+  ENDIF ()
   IF (${test_name}_THRESHOLD)
     SET (temp_args ${temp_args} "--test-threshold=${${test_name}_THRESHOLD}")
-  ENDIF (${test_name}_THRESHOLD)
+  ENDIF ()
   SET (${out_extra_args} ${${out_extra_args}} ${temp_args})
-ENDMACRO (process_args)
+ENDMACRO ()
 
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
@@ -157,25 +157,25 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
             set (counter 100000) # stop the group;
             # push the test back into the list.
             list(INSERT ACT_TEST_SCRIPTS 0 ${test})
-          endif (${test_name}_BREAK)
-        endif (${counter} GREATER 0)
+          endif ()
+        endif ()
 
         if (${counter} LESS 100000)
           if (NOT ${test_name}${skip_test_flag_suffix})
             set (full_test_name "${full_test_name}.${test_name}")
             set (extra_args ${extra_args} "--test-script=${test}")
             process_args(extra_args)
-          endif (NOT ${test_name}${skip_test_flag_suffix})
-        endif (${counter} LESS 100000)
-      endif (num_tests)
+          endif ()
+        endif ()
+      endif ()
       math(EXPR counter "${counter} + 1")
       if (DEFINED ${test_name}_BREAK)
         set (counter 100000) # stop the group.
-      endif (DEFINED ${test_name}_BREAK)
+      endif ()
       if (${test_name}_FORCE_SERIAL)
         set (force_serial TRUE)
-      endif (${test_name}_FORCE_SERIAL)
-    endwhile (${counter} LESS ${TEST_GROUP_SIZE})
+      endif ()
+    endwhile ()
 
     if (extra_args)
       ExternalData_add_test(ParaViewData
@@ -194,10 +194,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
       # to instruct cmake to run just the ParaView tests with the '-L' flag.
       # also add in any extra labels (e.g. CATALYST if they were passed in as arguments)
       set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "PARAVIEW;${ACT_EXTRA_LABELS}")
-    endif (extra_args)
-  endwhile (ACT_TEST_SCRIPTS)
+    endif ()
+  endwhile ()
 
-ENDFUNCTION (add_pv_test)
+ENDFUNCTION ()
 
 # Add macro to support addition of paraview web tests
 FUNCTION(add_pvweb_tests prefix)
@@ -289,7 +289,7 @@ FUNCTION (add_client_tests prefix)
             ${CLIENT_SERVER_ARGS}
             --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
-ENDFUNCTION (add_client_tests)
+ENDFUNCTION ()
 
 FUNCTION (add_client_server_tests prefix)
   PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
@@ -304,7 +304,7 @@ FUNCTION (add_client_server_tests prefix)
        -dr
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
-ENDFUNCTION (add_client_server_tests)
+ENDFUNCTION ()
 
 FUNCTION (add_client_render_server_tests prefix)
   PV_EXTRACT_CLIENT_SERVER_ARGS(${ARGN})
@@ -322,7 +322,7 @@ FUNCTION (add_client_render_server_tests prefix)
        -dr
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
-ENDFUNCTION (add_client_render_server_tests)
+ENDFUNCTION ()
 
 FUNCTION(add_multi_client_tests prefix)
   PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
@@ -361,12 +361,12 @@ FUNCTION(add_multi_client_tests prefix)
       if (${test_name}_FORCE_SERIAL)
         set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
         message(STATUS "Running in serial \"${prefix}.${test_name}\"")
-      endif (${test_name}_FORCE_SERIAL)
+      endif ()
 
       set_tests_properties("${prefix}.${test_name}" PROPERTIES LABELS "PARAVIEW")
     endif()
-  endforeach(test_script)
-ENDFUNCTION(add_multi_client_tests)
+  endforeach()
+ENDFUNCTION()
 
 FUNCTION(add_multi_server_tests prefix nbServers)
   PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
@@ -391,8 +391,8 @@ FUNCTION(add_multi_server_tests prefix nbServers)
         --exit
         )
       set_tests_properties("${prefix}.${test_name}" PROPERTIES LABELS "PARAVIEW")
-  endforeach(test_script)
-ENDFUNCTION(add_multi_server_tests)
+  endforeach()
+ENDFUNCTION()
 
 FUNCTION (add_tile_display_tests prefix tdx tdy )
   PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;LOAD_PLUGIN;PLUGIN_PATH" "" ${ARGN})
@@ -431,7 +431,7 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
                      PROPERTY ENVIRONMENT "PV_ICET_WINDOW_BORDERS=1")
         set_tests_properties("${prefix}-${tdx}x${tdy}.${test_name}" PROPERTIES RUN_SERIAL ON)
         set_tests_properties("${prefix}-${tdx}x${tdy}.${test_name}" PROPERTIES LABELS "PARAVIEW")
-      endforeach(test_script)
-    endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+      endforeach()
+    endif()
   endif()
-ENDFUNCTION (add_tile_display_tests)
+ENDFUNCTION ()
