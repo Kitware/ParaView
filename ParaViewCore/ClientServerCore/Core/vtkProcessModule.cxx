@@ -22,6 +22,7 @@
 #include "vtkDummyController.h"
 #include "vtkFloatingPointExceptions.h"
 #include "vtkMultiThreader.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPVConfig.h"
@@ -70,6 +71,21 @@ namespace
       }
     return false;
     }
+
+  // This is used to avoid creating vtkWin32OutputWindow on ParaView executables.
+  // vtkWin32OutputWindow is not a useful window for any of the ParaView commandline
+  // executables.
+  class vtkPVGenericOutputWindow : public vtkOutputWindow
+  {
+public:
+  vtkTypeMacro(vtkPVGenericOutputWindow, vtkOutputWindow);
+  static vtkPVGenericOutputWindow* New();
+
+private:
+  vtkPVGenericOutputWindow() {}
+  ~vtkPVGenericOutputWindow() {}
+  };
+  vtkStandardNewMacro(vtkPVGenericOutputWindow);
 }
 
 //----------------------------------------------------------------------------
@@ -209,6 +225,14 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 #ifdef PARAVIEW_ENABLE_FPE
   vtkFloatingPointExceptions::Enable();
 #endif //PARAVIEW_ENABLE_FPE
+
+  if (vtkProcessModule::ProcessType != PROCESS_CLIENT)
+    {
+    // On non-client processes, we don't want VTK default output window esp. on
+    // Windows since that pops up too many windows. Hence we replace it.
+    vtkNew<vtkPVGenericOutputWindow> window;
+    vtkOutputWindow::SetInstance(window.GetPointer());
+    }
 
   // In general turn off error prompts. This is where the process waits for
   // user-input on any error/warning. In past, we turned on prompts on Windows.
