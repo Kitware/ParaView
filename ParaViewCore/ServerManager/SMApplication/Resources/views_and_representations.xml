@@ -3066,10 +3066,8 @@
           <PropertyGroup panel_visibility="default"
                          panel_widget="ColorEditor"
                          label="Coloring" >
-            <Property name="Ambient" />
             <Property name="AmbientColor" />
             <Property name="ColorArrayName" />
-            <Property name="Diffuse" />
             <Property name="DiffuseColor" />
             <Property name="LookupTable" />
           </PropertyGroup>
@@ -3102,6 +3100,8 @@
                       panel_visibility="advanced" />
             <Property name="SpecularPower"
                       panel_visibility="advanced" />
+            <Property name="Ambient" panel_visibility="advanced"/>
+            <Property name="Diffuse" panel_visibility="advanced"/>
           </PropertyGroup>
 
           <PropertyGroup label="Edge Styling">
