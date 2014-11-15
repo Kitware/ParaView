@@ -110,7 +110,7 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   configure_file(
     ${ParaView_CMAKE_DIR}/vtkWrapClientServer.cxx.in
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
-    COPY_ONLY
+    @ONLY
     IMMEDIATE
     )
   #add it to the list of files to compile for the CS wrapped lib
