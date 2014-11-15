@@ -64,8 +64,8 @@ public:
   // Get/Set if the query is for special directories.
   // Off by default. If set to true, Path and DirectoryListing 
   // are ignored and the vtkPVFileInformation object
-  // is populated with information about sepcial directories
-  // such as "My Documents", "Destop" etc on Windows systems
+  // is populated with information about special directories
+  // such as "My Documents", "Desktop" etc on Windows systems
   // and "Home" on Unix based systems.
   vtkGetMacro(SpecialDirectories, int);
   vtkSetMacro(SpecialDirectories, int);
