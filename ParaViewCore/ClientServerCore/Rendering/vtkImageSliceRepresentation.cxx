@@ -89,6 +89,10 @@ void vtkImageSliceRepresentation::SetInputArrayToProcess(
     this->SliceMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     break;
 
+  case vtkDataObject::FIELD_ASSOCIATION_NONE:
+    this->SliceMapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
+    break;
+
   case vtkDataObject::FIELD_ASSOCIATION_POINTS:
   default:
     this->SliceMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
