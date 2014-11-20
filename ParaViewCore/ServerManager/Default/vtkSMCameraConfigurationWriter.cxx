@@ -30,6 +30,7 @@ vtkSMCameraConfigurationWriter::vtkSMCameraConfigurationWriter()
   propNames->AddString("CameraFocalPoint");
   propNames->AddString("CameraViewUp");
   propNames->AddString("CenterOfRotation");
+  propNames->AddString("RotationFactor");
   propNames->AddString("CameraViewAngle");
   propNames->AddString("CameraParallelScale");
   propNames->AddString("CameraParallelProjection");

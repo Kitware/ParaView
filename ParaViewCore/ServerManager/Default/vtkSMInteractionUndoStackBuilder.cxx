@@ -132,6 +132,7 @@ void vtkSMInteractionUndoStackBuilder::StartInteraction()
   this->PropertyModified("CameraViewAngle");
   this->PropertyModified("CameraClippingRange");
   this->PropertyModified("CenterOfRotation");
+  this->PropertyModified("RotationFactor");
 }
 
 //-----------------------------------------------------------------------------
@@ -152,6 +153,7 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
   this->PropertyModified("CameraViewAngle");
   this->PropertyModified("CameraClippingRange");
   this->PropertyModified("CenterOfRotation");
+  this->PropertyModified("RotationFactor");
 
   if (this->UndoStack)
     {

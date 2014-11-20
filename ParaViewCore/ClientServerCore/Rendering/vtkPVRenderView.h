@@ -421,6 +421,7 @@ public:
   //*****************************************************************
   // Forward to vtkPVGenericRenderWindowInteractor.
   void SetCenterOfRotation(double x, double y, double z);
+  void SetRotationFactor(double factor);
   void SetNonInteractiveRenderDelay(double seconds);
 
   //*****************************************************************

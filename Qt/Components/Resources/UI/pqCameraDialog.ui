@@ -305,7 +305,7 @@
             <string>Configure custom view buttons.</string>
            </property>
            <property name="text">
-            <string>configure...</string>
+            <string>Configure...</string>
            </property>
           </widget>
          </item>
@@ -352,6 +352,28 @@
            </property>
            <property name="text">
             <string>Reset Center of Rotation When Camera is Reset</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="RotationFactorGroup">
+        <property name="title">
+         <string>Rotation Factor</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <layout class="QGridLayout">
+         <item row="0" column="0">
+          <widget class="pqDoubleRangeWidget" name="rotationFactor" native="true">
+           <property name="StrictRange" stdset="1">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>Define the rotation speed factor.</string>
            </property>
           </widget>
          </item>
@@ -462,7 +484,7 @@
            <string>Load camera properties.</string>
           </property>
           <property name="text">
-           <string>load</string>
+           <string>Load</string>
           </property>
          </widget>
         </item>
@@ -472,7 +494,7 @@
            <string>Save camera properties.</string>
           </property>
           <property name="text">
-           <string>save</string>
+           <string>Save</string>
           </property>
          </widget>
         </item>
@@ -684,6 +706,12 @@
    <class>pqCollapsedGroup</class>
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

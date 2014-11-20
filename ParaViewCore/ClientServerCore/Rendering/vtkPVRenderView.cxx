@@ -798,7 +798,7 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
     return true;
 
   default:
-    return using_distributed_rendering || 
+    return using_distributed_rendering ||
       this->InTileDisplayMode() ||
       this->SynchronizedWindows->GetIsInCave();
     }
@@ -1796,6 +1796,15 @@ void vtkPVRenderView::SetCenterOfRotation(double x, double y, double z)
   if (this->Interactor)
     {
     this->Interactor->SetCenterOfRotation(x, y, z);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetRotationFactor(double factor)
+{
+  if (this->Interactor)
+    {
+    this->Interactor->SetRotationFactor(factor);
     }
 }
 

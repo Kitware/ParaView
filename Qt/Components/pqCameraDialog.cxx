@@ -260,6 +260,10 @@ void pqCameraDialog::setupGUI()
       proxy, proxy->GetProperty("CenterOfRotation"), 2);
 
     this->Internal->CameraLinks.addPropertyLink(
+      this->Internal->rotationFactor, "value", SIGNAL(valueChanged(double)),
+      proxy, proxy->GetProperty("RotationFactor"), 0);
+
+    this->Internal->CameraLinks.addPropertyLink(
       this->Internal->viewAngle, "value", SIGNAL(valueChanged(double)),
       proxy, proxy->GetProperty("CameraViewAngle"), 0);
 
