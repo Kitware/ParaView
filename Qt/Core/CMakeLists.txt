@@ -236,12 +236,14 @@ set (Module_MOC_HDRS
   pqCoreUtilities.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
+  pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.h
   pqFileDialogFavoriteModel.h
   pqFileDialogFilter.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqFileDialogRecentDirsModel.h
+  pqFlatTreeViewEventPlayer.h
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.h
   pqInterfaceTracker.h
@@ -265,6 +267,7 @@ set (Module_MOC_HDRS
   pqPropertyLinks.h
   pqPropertyManager.h
   pqProxy.h
+  pqQVTKWidgetEventPlayer.h
   pqQVTKWidgetEventTranslator.h
   pqQVTKWidget.h
   pqRecentlyUsedResourcesList.h

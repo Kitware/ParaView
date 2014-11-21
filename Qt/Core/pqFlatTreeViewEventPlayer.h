@@ -44,6 +44,7 @@ Concrete implementation of pqWidgetEventPlayer that translates high-level ParaVi
 
 class PQCORE_EXPORT pqFlatTreeViewEventPlayer : public pqWidgetEventPlayer
 {
+    Q_OBJECT
 public:
   pqFlatTreeViewEventPlayer(QObject* p=0);
 
