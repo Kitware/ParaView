@@ -70,6 +70,7 @@ vtkPVScalarBarActor::vtkPVScalarBarActor()
   this->AspectRatio = 20.0;
   this->AutomaticLabelFormat = 1;
   this->DrawTickMarks = 1;
+  this->DrawSubTickMarks = 1;
   this->AddRangeLabels = 1;
   this->RangeLabelFormat = NULL;
   this->SetRangeLabelFormat("%4.3e");
@@ -112,6 +113,7 @@ void vtkPVScalarBarActor::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "AspectRatio: " << this->AspectRatio << endl;
   os << indent << "AutomaticLabelFormat: " << this->AutomaticLabelFormat << endl;
   os << indent << "DrawTickMarks: " << this->DrawTickMarks << endl;
+  os << indent << "DrawSubTickMarks: " << this->DrawSubTickMarks << endl;
   os << indent << "AddRangeLabels: " << this->AddRangeLabels << endl;
   os << indent << "RangeLabelFormat: " << (this->RangeLabelFormat ? this->RangeLabelFormat : "(null)") << endl;
   os << indent << "ScalarBarTexture: ";
@@ -896,7 +898,7 @@ void vtkPVScalarBarActor::ConfigureTicks()
     ticks.insert(ticks.end(), fakeMax);
     numTicks = static_cast<int>(ticks.size());
 
-    for (int i = 0; i < numTicks-1; i++)
+    for (int i = 0; this->DrawSubTickMarks && i < numTicks-1; i++)
       {
       double minorTickRange[2];
       minorTickRange[0] = ticks[i];  minorTickRange[1] = ticks[i+1];

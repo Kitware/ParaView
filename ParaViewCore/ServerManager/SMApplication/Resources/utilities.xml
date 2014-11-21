@@ -925,6 +925,19 @@
         <Documentation>Enable/disable drawing the color legend tick marks.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
+                         command="SetDrawSubTickMarks"
+                         default_values="1"
+                         name="DrawSubTickMarks"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/disable drawing the color legend sub-tick marks.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DrawTickMarks" function="boolean" index="0" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetDrawTickLabels"
                          default_values="1"
                          name="DrawTickLabels"

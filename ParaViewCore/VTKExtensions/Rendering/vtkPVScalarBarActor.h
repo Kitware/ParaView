@@ -66,6 +66,12 @@ public:
   vtkBooleanMacro(DrawTickMarks, int);
 
   // Description:
+  // If true (the default), sub-tick marks will be drawn.
+  vtkGetMacro(DrawSubTickMarks, int);
+  vtkSetMacro(DrawSubTickMarks, int);
+  vtkBooleanMacro(DrawSubTickMarks, int);
+
+  // Description:
   // Set whether the range endpoints (minimum and maximum) are added
   // as labels alongside other value labels.
   vtkGetMacro(AddRangeLabels, int);
@@ -152,6 +158,7 @@ protected:
   double AspectRatio;
   int AutomaticLabelFormat;
   int DrawTickMarks;
+  int DrawSubTickMarks;
   int AddRangeLabels;
 
   char* RangeLabelFormat;
