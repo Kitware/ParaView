@@ -78,8 +78,9 @@ public:
   /// get a track at an index
   pqAnimationTrack* track(int);
 
-  /// add a track
-  pqAnimationTrack* addTrack();
+  /// add a track.
+  /// If \c trackToAdd is NULL, we create a new pqAnimationTrack instance.
+  pqAnimationTrack* addTrack(pqAnimationTrack* trackToAdd=NULL);
   /// remove a track
   void removeTrack(pqAnimationTrack* track);
 
@@ -101,6 +102,11 @@ public:
 
   void setRowHeight(int);
   int rowHeight() const;
+
+  /// provides access to the custom ticks set using
+  /// setTickMarks() method.
+  const QList<double>& customTicks() const
+    { return this->CustomTicks; }
 
 public slots:
 
@@ -155,6 +161,9 @@ protected:
   double timeToNormalizedTime(double) const;
   double normalizedTimeToTime(double) const;
 
+  /// Based on this->Mode, this will either returns the number of custom ticks
+  /// or return this->ticks().
+  int currentTicks() const;
 private:
 
   ModeType Mode;

@@ -96,9 +96,10 @@ pqAnimationTrack* pqAnimationModel::track(int i)
   return NULL;
 }
 
-pqAnimationTrack* pqAnimationModel::addTrack()
+pqAnimationTrack* pqAnimationModel::addTrack(
+  pqAnimationTrack* trackToAdd)
 {
-  pqAnimationTrack* t = new pqAnimationTrack(this);
+  pqAnimationTrack* t = trackToAdd? trackToAdd : new pqAnimationTrack(this);
   this->Tracks.append(t);
   this->addItem(t);
   this->resizeTracks();
@@ -160,6 +161,12 @@ int pqAnimationModel::ticks() const
 {
   return this->Ticks;
 }
+
+int pqAnimationModel::currentTicks() const
+{
+  return this->Mode == Custom? this->CustomTicks.size() : this->ticks();
+}
+
 double pqAnimationModel::currentTime() const
 {
   return this->CurrentTime;
@@ -202,7 +209,6 @@ void pqAnimationModel::setTicks(int f)
 
 void pqAnimationModel::setTickMarks(int cnt, double* times)
 {
-  this->Ticks = cnt;
   this->CustomTicks.clear();
   for (int cc=0; cc < cnt; cc++)
     {
@@ -252,12 +258,13 @@ double pqAnimationModel::timeFromPosition(double pos)
 
 double pqAnimationModel::timeFromTick(int tick)
 {
-  if (this->Mode == Custom && tick <= this->CustomTicks.size())
+  if (this->Mode == Custom)
     {
+    Q_ASSERT(tick <= this->CustomTicks.size());
     return this->CustomTicks[tick];
     }
 
-  double fraction = tick / (this->Ticks-1.0);
+  double fraction = tick / (this->currentTicks()-1.0);
   return fraction * (this->EndTime - this->StartTime) + this->StartTime;
 }
 
@@ -351,9 +358,9 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
 
   
   // if sequence, draw a tick mark for each frame
-  if ((this->mode() == Sequence || this->mode() == Custom) && this->Ticks > 2)
+  if ((this->mode() == Sequence || this->mode() == Custom) && this->currentTicks() > 2)
     {
-    for(int i=0; i<this->Ticks; i++)
+    for(int i=0, max=this->currentTicks(); i<max; i++)
       {
       double tickTime = this->timeFromTick(i);
       double tickPos = this->positionFromTime(tickTime);

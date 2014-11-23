@@ -240,6 +240,8 @@ set (Module_SRCS
   pqTestingReaction.h
   pqTextLocationWidget.cxx
   pqTextLocationWidget.h
+  pqTimeInspectorWidget.cxx
+  pqTimeInspectorWidget.h
   pqTimerLogReaction.cxx
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.cxx
@@ -368,6 +370,7 @@ set (Module_MOC_HDRS
   pqStatusBar.h
   pqTestingReaction.h
   pqTextLocationWidget.h
+  pqTimeInspectorWidget.h
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.h
   pqTransferFunctionWidgetPropertyWidget.h
@@ -415,6 +418,7 @@ set (Module_UI_FILES
   Resources/UI/pqPipelineBrowserContextMenu.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui
   Resources/UI/pqTextLocationWidget.ui
+  Resources/UI/pqTimeInspectorWidget.ui
   Resources/UI/pqTransferFunctionWidgetPropertyWidgetDialog.ui
   Resources/UI/pqVCRToolbar.ui
 )
