@@ -4858,7 +4858,7 @@
                         name="range" />
       </IntVectorProperty>
       <StringVectorProperty command="SetPointLabelFormat"
-                            default_values="%-#6.3g"
+                            default_values=""
                             name="PointLabelFormat"
                             number_of_elements="1">
         <Documentation>
@@ -4868,7 +4868,8 @@
           doubles, ld for longs, et cetera. If you need a different
           format, set it here. You can do things like limit the number
           of significant digits, add prefixes/suffixes, basically
-          anything that printf can do.
+          anything that printf can do. Leave empty to auto select an
+          appropriate format.
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetPointLabelJustification"
@@ -4977,7 +4978,7 @@
                         name="range" />
       </IntVectorProperty>
       <StringVectorProperty command="SetCellLabelFormat"
-                            default_values="%-#6.3g"
+                            default_values=""
                             name="CellLabelFormat"
                             number_of_elements="1">
         <Documentation>
@@ -4987,7 +4988,8 @@
           doubles, ld for longs, et cetera. If you need a different
           format, set it here. You can do things like limit the number
           of significant digits, add prefixes/suffixes, basically
-          anything that printf can do.
+          anything that printf can do. Leave empty to auto select an
+          appropriate format.
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetCellLabelJustification"
