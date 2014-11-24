@@ -108,6 +108,12 @@ public:
   const QList<double>& customTicks() const
     { return this->CustomTicks; }
 
+  /// set the tooltip to use for the checkbox in the EnabledHeader.
+  /// default is "Enable/Disable Track".
+  void setEnabledHeaderToolTip(const QString& val);
+  const QString& enabledHeaderToolTip() const
+    { return this->EnabledHeaderToolTip; }
+
 public slots:
 
   /// set the animation mode
@@ -195,6 +201,7 @@ private:
 
   pqCheckBoxPixMaps* CheckBoxPixMaps;
 
+  QString EnabledHeaderToolTip;
 };
 
 #endif // pqAnimationModel_h

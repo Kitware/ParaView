@@ -49,7 +49,8 @@ pqAnimationModel::pqAnimationModel(QGraphicsView* p)
   CurrentTimeGrabbed(false),
   CurrentTrackGrabbed(NULL),
   CurrentKeyFrameGrabbed(NULL),
-  CurrentKeyFrameEdge(0)
+  CurrentKeyFrameEdge(0),
+  EnabledHeaderToolTip("Enable/Disable Track")
 {
   QObject::connect(this, SIGNAL(sceneRectChanged(QRectF)),
                    this, SLOT(resizeTracks()));
@@ -183,6 +184,15 @@ double pqAnimationModel::endTime() const
 bool pqAnimationModel::interactive() const
 {
   return this->Interactive;
+}
+
+void pqAnimationModel::setEnabledHeaderToolTip(const QString& val)
+{
+  if (this->EnabledHeaderToolTip != val)
+    {
+    this->EnabledHeaderToolTip = val;
+    this->enabledChanged();
+    }
 }
 
 void pqAnimationModel::setRowHeight(int rh)
@@ -428,7 +438,7 @@ void pqAnimationModel::enabledChanged()
       this->CheckBoxPixMaps->getPixmap(Qt::Unchecked, false),
       Qt::DecorationRole);
     this->EnabledHeader.setHeaderData(i+1, Qt::Vertical,
-      "Enable/Disable Track", Qt::ToolTipRole);
+      this->EnabledHeaderToolTip, Qt::ToolTipRole);
     }
 }
 

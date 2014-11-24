@@ -254,6 +254,8 @@ public:
   this->Ui.setupUi(self);
   this->Ui.AnimationWidget->createDeleteHeader()->hide();
   this->Ui.AnimationWidget->animationModel()->setInteractive(true);
+  this->Ui.AnimationWidget->animationModel()->setEnabledHeaderToolTip(
+    "<p>Uncheck to ignore timesteps from animation.</p>");
   }
 };
 
