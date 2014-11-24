@@ -1046,7 +1046,8 @@
 #ifdef Module_vtkIOADIOS
     <!-- ================================================================= -->
     <PWriterProxy class="vtkADIOSWriter"
-                  name="ADIOSWriter">
+                  name="ADIOSWriter"
+                  mpi_required="true">
       <Documentation short_help="Write ADIOS BP files using VTKs schema.">
         Writer to write ADIOS BP files using a VTK specific schema
       </Documentation>

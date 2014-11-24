@@ -94,6 +94,18 @@ public:
         {
         return false;
         }
+
+      // if the writer requires MPI but the server doesn't have MPI initialized
+      // we can't write the file out.
+      if(vtkSMSourceProxy* writerProxy = vtkSMSourceProxy::SafeDownCast(prototype))
+        {
+        if(writerProxy->GetMPIRequired() &&
+           source->GetSession()->IsMPIInitialized(source->GetLocation()) == false)
+           {
+           return false;
+           }
+        }
+
       vtkSMWriterProxy* writer = vtkSMWriterProxy::SafeDownCast(prototype);
       // If it's not a vtkSMWriterProxy, then we assume that it can
       // always work in parallel.
