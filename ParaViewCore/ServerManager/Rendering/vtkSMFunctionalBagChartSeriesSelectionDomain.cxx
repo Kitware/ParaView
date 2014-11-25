@@ -42,11 +42,11 @@ bool vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaultSeriesVisibility(co
 //----------------------------------------------------------------------------
 std::vector<vtkStdString> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefaultValue(const char* series)
 {
+  std::vector<vtkStdString> values;
+  std::string name(series);
   if (this->DefaultMode == LABEL)
     {
-    std::vector<vtkStdString> values;
     // Remove _outlier extension in the series label
-    std::string name(series);
     if (vtksys::SystemTools::StringEndsWith(series, "_outlier"))
       {
       vtksys::SystemTools::ReplaceString(name, "_outlier", "");
@@ -65,6 +65,30 @@ std::vector<vtkStdString> vtkSMFunctionalBagChartSeriesSelectionDomain::GetDefau
       }
     values.push_back(name.c_str());
     return values;
+    }
+  else if (this->DefaultMode == COLOR)
+    {
+    if (name == "Q3Points")
+      {
+      values.push_back("0.50");
+      values.push_back("0.00");
+      values.push_back("0.00");
+      return values;
+      }
+    else if (name == "QMedPoints")
+      {
+      values.push_back("0.75");
+      values.push_back("0.00");
+      values.push_back("0.00");
+      return values;
+      }
+    else if (name == "QMedianLine")
+      {
+      values.push_back("0.00");
+      values.push_back("0.00");
+      values.push_back("0.00");
+      return values;
+      }
     }
   return this->Superclass::GetDefaultValue(series);
 }

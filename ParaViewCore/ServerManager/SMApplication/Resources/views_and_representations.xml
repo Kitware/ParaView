@@ -6368,8 +6368,9 @@
       <InputProperty command="SetInputConnection"
                      name="Input">
         <Documentation>Data input for the representation.</Documentation>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject" />
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkTable" />
         </DataTypeDomain>
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
@@ -6420,7 +6421,6 @@
                              name="tree">
           <RequiredProperties>
             <Property function="Input" name="Input" />
-            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
         </CompositeTreeDomain>
         <Hints>
@@ -6744,8 +6744,8 @@
         <EnumerationDomain name="enum">
           <Entry text="Line" value="0" />
           <Entry text="Bar" value="2" />
-      <Entry text="Bag" value="4" />
-      <Entry text="FunctionalBag" value="5" />
+          <Entry text="Bag" value="4" />
+          <Entry text="FunctionalBag" value="5" />
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetFlattenTable"

@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
 #include "vtkPlotBar.h"
+#include "vtkPlotFunctionalBag.h"
 #include "vtkPlotPoints.h"
 #include "vtkPVContextView.h"
 #include "vtkScalarsToColors.h"
@@ -187,6 +188,7 @@ public:
     assert(self != NULL);
 
     vtkChartXY* chartXY = self->GetChart();
+    vtkPlot* lastFunctionalBagPlot = 0;
     for (MapOfTables::const_iterator tablesIter = tables.begin();
       tablesIter != tables.end(); ++tablesIter)
       {
@@ -197,14 +199,20 @@ public:
       for (vtkIdType cc=0; cc < numCols; ++cc)
         {
         std::string columnName = table->GetColumnName(cc);
-        if (!this->GetSeriesParameter(tableName, columnName, this->SeriesVisibilities, false))
+        const bool visible = this->GetSeriesParameter(
+          tableName, columnName, this->SeriesVisibilities, false);
+        if (!visible)
           {
-          // skip invisible series.
           if (vtkPlot* plot = this->GetSeriesPlot(tableName, columnName))
             {
             plot->SetVisible(false);
             }
-          continue;
+          // skip invisible series except for functionalbag that needs them all
+          // for the sake of selection.
+          if (self->GetChartType() != vtkChart::FUNCTIONALBAG)
+            {
+            continue;
+            }
           }
 
         // Now, we know the series needs to be shown, so update the vtkPlot.
@@ -221,7 +229,7 @@ public:
           this->AddSeriesPlot(tableName, columnName, plot);
           }
 
-        plot->SetVisible(true);
+        plot->SetVisible(visible);
 
         std::string default_label = vtkChartRepresentation::GetDefaultSeriesLabel(
           tableName, columnName);
@@ -268,6 +276,20 @@ public:
             {
             plotBar->SetLookupTable(lut);
             }
+          }
+        // Functional bag plots shall be stacked under the other plots.
+        vtkPlotFunctionalBag* plotBag = vtkPlotFunctionalBag::SafeDownCast(plot);
+        if (plotBag && plotBag->IsBag())
+          {
+          if (!lastFunctionalBagPlot)
+            {
+            chartXY->LowerPlot(plotBag);
+            }
+          else
+            {
+            chartXY->StackPlotAbove(plotBag, lastFunctionalBagPlot);
+            }
+          lastFunctionalBagPlot = plotBag;
           }
         }
       }
@@ -522,6 +544,13 @@ void vtkXYChartRepresentation::PrepareForRendering()
     }
   this->PlotDataHasChanged = false;
 
+  if (this->GetChartType() == vtkChart::FUNCTIONALBAG)
+    {
+    chartXY->SetSelectionMethod(vtkChart::SELECTION_COLUMNS);
+    }
+  chartXY->SetSelectionMethod(
+    this->GetChartType() == vtkChart::FUNCTIONALBAG ?
+      vtkChart::SELECTION_COLUMNS : vtkChart::SELECTION_ROWS);
   // Update plots. This will create new vtkPlot if needed.
   this->Internals->UpdatePlots(this, tables);
 
