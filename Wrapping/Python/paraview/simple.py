@@ -1271,10 +1271,7 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
 #==============================================================================
 # Selection Management
 #==============================================================================
-
-def SelectCells(query=None, proxy=None):
-    """Select cells satisfying the query. If query is None, then all cells are
-       selected. If proxy is None, then the active source is used."""
+def _select(seltype, query=None, proxy=None):
     if not proxy:
         proxy = GetActiveSource()
     if not proxy:
@@ -1286,10 +1283,24 @@ def SelectCells(query=None, proxy=None):
 
     # Note, selSource is not registered with the proxy manager.
     selSource = servermanager.sources.SelectionQuerySource()
-    selSource.FieldType = "CELL"
+    selSource.FieldType = seltype
     selSource.QueryString = str(query)
     proxy.SMProxy.SetSelectionInput(proxy.Port, selSource.SMProxy, 0)
     return selSource
+
+# -----------------------------------------------------------------------------
+
+def SelectCells(query=None, proxy=None):
+    """Select cells satisfying the query. If query is None, then all cells are
+    selected. If proxy is None, then the active source is used."""
+    return _select("CELL", query, proxy)
+
+# -----------------------------------------------------------------------------
+
+def SelectPoints(query=None, proxy=None):
+    """Select points satisfying the query. If query is None, then all points are
+    selected. If proxy is None, then the active source is used."""
+    return _select("POINT", query, proxy)
 
 # -----------------------------------------------------------------------------
 
