@@ -185,13 +185,20 @@ bool vtkSMTransferFunctionProxy::RescaleTransferFunction(
   // determine if the interpolation has to happen in log-space.
   bool log_space =
     (vtkSMPropertyHelper(this, "UseLogScale", true).GetAsInt() != 0);
-  // ensure that log_space is valid for the ranges (before and after).
-  if (rangeMin <= 0.0 || rangeMax <= 0.0 ||
-      old_range[0] <= 0.0 || old_range[1] <= 0.0)
+  if (log_space)
     {
-    log_space = false;
+    // ensure the range is valid for log space.
+    double range[2] = {rangeMin, rangeMax};
+    if (vtkSMCoreUtilities::AdjustRangeForLog(range))
+      {
+      // ranges not valid for log-space. Will convert them.
+      vtkWarningMacro(
+        "Ranges not valid for log-space. "
+        "Changed the range to (" << range[0] <<", " << range[1] << ").");
+      }
+    rangeMin = range[0];
+    rangeMax = range[1];
     }
-
   double dnew = log_space? log10(rangeMax/rangeMin) :
                            (rangeMax - rangeMin);
   // don't set empty ranges. Tweak it a bit.
