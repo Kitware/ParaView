@@ -435,6 +435,7 @@
             <Property name="LabelFormat" />
             <Property name="NumberOfLabels" />
             <Property name="DrawTickMarks" />
+            <Property name="DrawSubTickMarks" />
             <Property name="DrawTickLabels" />
             <Property name="AddRangeLabels" />
             <Property name="RangeLabelFormat" />
