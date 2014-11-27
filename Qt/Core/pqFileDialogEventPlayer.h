@@ -44,6 +44,7 @@ Concrete implementation of pqWidgetEventPlayer that handles playback of recorded
 class PQCORE_EXPORT pqFileDialogEventPlayer :
   public pqWidgetEventPlayer
 {
+    Q_OBJECT
 public:
   pqFileDialogEventPlayer(QObject* p=0);
 

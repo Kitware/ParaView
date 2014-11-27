@@ -44,6 +44,7 @@ Concrete implementation of pqWidgetEventPlayer that handles playback of "activat
 class PQCORE_EXPORT pqQVTKWidgetEventPlayer :
   public pqWidgetEventPlayer
 {
+    Q_OBJECT
 public:
   pqQVTKWidgetEventPlayer(QObject* p = 0);
 
