@@ -1748,6 +1748,15 @@
                             number_of_elements="3">
         <Documentation>Center of rotation for the interactor.</Documentation>
       </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetRotationFactor"
+                            default_values="1"
+                            name="RotationFactor"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Rotation speed factor for the interactor. This default
+          rotation speed is multipied by this factor. Default value is 1.
+        </Documentation>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetNonInteractiveRenderDelay"
                          default_values="0"
                          name="NonInteractiveRenderDelay"
@@ -7435,14 +7444,14 @@
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
           </PropertyGroup>
-	  <PropertyGroup label="Legend Properties"
+          <PropertyGroup label="Legend Properties"
                          panel_widget="FontEditor"
                          panel_visibility="advanced">
-	    <Property name="LegendFontFamily" function="Family"/>
-	    <Property name="LegendBold" function="Bold"/>
-	    <Property name="LegendItalic" function="Italics"/>
-	    <Property name="LegendFontSize" function="Size"/>
-	  </PropertyGroup>
+            <Property name="LegendFontFamily" function="Family"/>
+            <Property name="LegendBold" function="Bold"/>
+            <Property name="LegendItalic" function="Italics"/>
+            <Property name="LegendFontSize" function="Size"/>
+          </PropertyGroup>
           <PropertyGroup label="Tooltip"
                          panel_visibility="advanced">
             <Property name="TooltipNotation"/>
@@ -7642,14 +7651,14 @@
             <Property name="ShowLegend"/>
             <Property name="LegendLocation"/>
           </PropertyGroup>
-	  <PropertyGroup label="Legend Properties"
+          <PropertyGroup label="Legend Properties"
                          panel_widget="FontEditor"
                          panel_visibility="advanced">
-	    <Property name="LegendFontFamily" function="Family"/>
-	    <Property name="LegendBold" function="Bold"/>
-	    <Property name="LegendItalic" function="Italics"/>
-	    <Property name="LegendFontSize" function="Size"/>
-	  </PropertyGroup>
+            <Property name="LegendFontFamily" function="Family"/>
+              <Property name="LegendBold" function="Bold"/>
+              <Property name="LegendItalic" function="Italics"/>
+              <Property name="LegendFontSize" function="Size"/>
+          </PropertyGroup>
           <PropertyGroup label="Tooltip"
                          panel_visibility="advanced">
             <Property name="TooltipNotation"/>

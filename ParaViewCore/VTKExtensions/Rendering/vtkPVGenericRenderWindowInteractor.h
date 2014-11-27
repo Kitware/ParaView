@@ -32,7 +32,7 @@ public:
   static vtkPVGenericRenderWindowInteractor *New();
   vtkTypeMacro(vtkPVGenericRenderWindowInteractor, vtkRenderWindowInteractor);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   void SetPVRenderView(vtkPVRenderViewProxy *view);
   vtkGetObjectMacro(PVRenderView, vtkPVRenderViewProxy);
 
@@ -90,7 +90,7 @@ public:
 
   // Description:
   // Propagates the center to the interactor style.
-  // Currently, center of rotation is propagated only with the 
+  // Currently, center of rotation is propagated only with the
   // interactor style is a vtkPVInteractorStyle or subclass.
   vtkGetVector3Macro(CenterOfRotation, double);
   void SetCenterOfRotation(double x, double y, double z);
@@ -98,6 +98,11 @@ public:
     {
     this->SetCenterOfRotation(xyz[0], xyz[1], xyz[2]);
     }
+
+  // Description:
+  // Propagates the rotation factor to the interactor style.
+  void SetRotationFactor(double factor);
+  vtkGetMacro(RotationFactor, double);
 
   // Description:
   // These events are fired to mark the beginning and ending of the wait for the
@@ -118,6 +123,7 @@ protected:
 
   unsigned long NonInteractiveRenderDelay;
   double CenterOfRotation[3];
+  double RotationFactor;
 
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented

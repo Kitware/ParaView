@@ -61,7 +61,7 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
     {
     return;
     }
-  
+
   vtkTransform *transform = vtkTransform::New();
   vtkCamera *camera = ren->GetActiveCamera();
 
@@ -83,23 +83,23 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   // translate to center
   transform->Identity();
   transform->Translate(this->Center[0]/scale, this->Center[1]/scale, this->Center[2]/scale);
-  
+
   int dx = rwi->GetLastEventPosition()[0] - x;
   int dy = rwi->GetLastEventPosition()[1] - y;
-  
+
   // azimuth
   camera->OrthogonalizeViewUp();
   double *viewUp = camera->GetViewUp();
   int *size = ren->GetSize();
-  transform->RotateWXYZ(360.0 * dx / size[0], viewUp[0], viewUp[1], viewUp[2]);
-  
+  transform->RotateWXYZ(360.0 * dx / size[0] * this->RotationFactor, viewUp[0], viewUp[1], viewUp[2]);
+
   // elevation
   vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
-  transform->RotateWXYZ(-360.0 * dy / size[1], v2[0], v2[1], v2[2]);
-  
+  transform->RotateWXYZ(-360.0 * dy / size[1] * this->RotationFactor, v2[0], v2[1], v2[2]);
+
   // translate back
   transform->Translate(-this->Center[0]/scale, -this->Center[1]/scale, -this->Center[2]/scale);
-  
+
   camera->ApplyTransform(transform);
   camera->OrthogonalizeViewUp();
 
@@ -110,7 +110,7 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   camera->SetPosition(temp[0]*scale, temp[1]*scale, temp[2]*scale);
 
   ren->ResetCameraClippingRange();
-  
+
   rwi->Render();
   transform->Delete();
 }
@@ -119,7 +119,7 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
 void vtkPVTrackballRotate::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Center: " << this->Center[0] << ", " 
+  os << indent << "Center: " << this->Center[0] << ", "
      << this->Center[1] << ", " << this->Center[2] << endl;
 }
 

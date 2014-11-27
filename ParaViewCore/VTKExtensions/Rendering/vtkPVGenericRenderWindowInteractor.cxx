@@ -169,6 +169,7 @@ vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 
   this->CenterOfRotation[0] = this->CenterOfRotation[1]
     = this->CenterOfRotation[2] = 0;
+  this->RotationFactor = 1.0;
 
   this->Timer = vtkPVGenericRenderWindowInteractorTimer::New();
   this->Timer->SetTarget(this);
@@ -208,6 +209,23 @@ void vtkPVGenericRenderWindowInteractor::SetCenterOfRotation(double x,
     if (style)
       {
       style->SetCenterOfRotation(this->CenterOfRotation);
+      }
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGenericRenderWindowInteractor::SetRotationFactor(double factor)
+{
+  if (this->RotationFactor != factor)
+    {
+    this->RotationFactor = factor;
+    vtkPVInteractorStyle* style = vtkPVInteractorStyle::SafeDownCast(
+      this->GetInteractorStyle());
+    // Pass rotation factor.
+    if (style)
+      {
+      style->SetRotationFactor(this->RotationFactor);
       }
     this->Modified();
     }
@@ -278,7 +296,7 @@ void vtkPVGenericRenderWindowInteractor::Render()
     return;
     }
 
-  // This should fix the problem of the plane widget render 
+  // This should fix the problem of the plane widget render
   if (this->InteractiveRenderEnabled)
     {
     this->InvokeEvent(vtkCommand::InteractionEvent);
@@ -321,7 +339,7 @@ void vtkPVGenericRenderWindowInteractor::SetInteractiveRenderEnabled(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnLeftPress(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnLeftPress(int x, int y,
                                                      int control, int shift)
 {
   this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
@@ -329,7 +347,7 @@ void vtkPVGenericRenderWindowInteractor::OnLeftPress(int x, int y,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnMiddlePress(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnMiddlePress(int x, int y,
                                                        int control, int shift)
 {
   this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
@@ -337,7 +355,7 @@ void vtkPVGenericRenderWindowInteractor::OnMiddlePress(int x, int y,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnRightPress(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnRightPress(int x, int y,
                                                       int control, int shift)
 {
   this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
@@ -345,7 +363,7 @@ void vtkPVGenericRenderWindowInteractor::OnRightPress(int x, int y,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnLeftRelease(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnLeftRelease(int x, int y,
                                                        int control, int shift)
 {
   this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
@@ -353,7 +371,7 @@ void vtkPVGenericRenderWindowInteractor::OnLeftRelease(int x, int y,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnMiddleRelease(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnMiddleRelease(int x, int y,
                                                          int control, int shift)
 {
   this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
@@ -361,7 +379,7 @@ void vtkPVGenericRenderWindowInteractor::OnMiddleRelease(int x, int y,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnRightRelease(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnRightRelease(int x, int y,
                                                         int control, int shift)
 {
   this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
@@ -369,9 +387,9 @@ void vtkPVGenericRenderWindowInteractor::OnRightRelease(int x, int y,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnMove(int x, int y) 
+void vtkPVGenericRenderWindowInteractor::OnMove(int x, int y)
 {
-  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, 
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y,
                             this->ControlKey, this->ShiftKey,
                             this->KeyCode, this->RepeatCount,
                             this->KeySym);
@@ -379,7 +397,7 @@ void vtkPVGenericRenderWindowInteractor::OnMove(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::OnKeyPress(char keyCode, int x, int y) 
+void vtkPVGenericRenderWindowInteractor::OnKeyPress(char keyCode, int x, int y)
 {
   this->SetEventPosition(x, this->RenderWindow->GetSize()[1]-y);
   this->KeyCode = keyCode;
@@ -394,9 +412,10 @@ void vtkPVGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "PVRenderView: " << this->GetPVRenderView() << endl;
-  os << indent << "InteractiveRenderEnabled: " 
+  os << indent << "InteractiveRenderEnabled: "
      << this->InteractiveRenderEnabled << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
   os << indent << "CenterOfRotation: " << this->CenterOfRotation[0] << ", "
     << this->CenterOfRotation[1] << ", " << this->CenterOfRotation[2] << endl;
+  os << indent << "RotationFactor: " << this->RotationFactor << endl;
 }

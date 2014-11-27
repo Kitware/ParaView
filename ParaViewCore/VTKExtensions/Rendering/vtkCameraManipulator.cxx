@@ -31,6 +31,7 @@ vtkCameraManipulator::vtkCameraManipulator()
   this->Control = 0;
 
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
+  this->RotationFactor = 1.0;
   this->DisplayCenter[0] = this->DisplayCenter[1] = 0.0;
 
   this->ManipulatorName = 0;
@@ -44,10 +45,12 @@ vtkCameraManipulator::~vtkCameraManipulator()
   this->SetGUIHelper(0);
 }
 
+//-------------------------------------------------------------------------
 void vtkCameraManipulator::StartInteraction()
 {
 }
 
+//-------------------------------------------------------------------------
 void vtkCameraManipulator::EndInteraction()
 {
 }
@@ -57,7 +60,6 @@ void vtkCameraManipulator::OnButtonDown(int, int, vtkRenderer*,
                                           vtkRenderWindowInteractor*)
 {
 }
-
 
 //-------------------------------------------------------------------------
 void vtkCameraManipulator::OnButtonUp(int, int, vtkRenderer*,
@@ -91,15 +93,13 @@ void vtkCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "ManipulatorName: " 
+  os << indent << "ManipulatorName: "
      << (this->ManipulatorName?this->ManipulatorName:"none") << endl;
   os << indent << "Button: " << this->Button << endl;
   os << indent << "Shift: " << this->Shift << endl;
   os << indent << "Control: " << this->Control << endl;
-  
-  os << indent << "Center: " << this->Center[0] << ", " 
+  os << indent << "Center: " << this->Center[0] << ", "
      << this->Center[1] << ", " << this->Center[2] << endl;
+  os << indent << "RotationFactor: " << this->RotationFactor << endl;
   os << indent << "GUIHelper: " << this->GUIHelper << endl;
 }
-
-

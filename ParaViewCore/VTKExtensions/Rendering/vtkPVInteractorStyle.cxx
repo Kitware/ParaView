@@ -35,6 +35,7 @@ vtkPVInteractorStyle::vtkPVInteractorStyle()
   this->Current = NULL;
   this->CenterOfRotation[0] = this->CenterOfRotation[1]
     = this->CenterOfRotation[2] = 0;
+  this->RotationFactor = 1.0;
  }
 
 //-------------------------------------------------------------------------
@@ -59,21 +60,21 @@ void vtkPVInteractorStyle::AddManipulator(vtkCameraManipulator *m)
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnLeftButtonDown()
 {
-  this->OnButtonDown(1, this->Interactor->GetShiftKey(), 
+  this->OnButtonDown(1, this->Interactor->GetShiftKey(),
                      this->Interactor->GetControlKey());
 }
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnMiddleButtonDown()
 {
-  this->OnButtonDown(2, this->Interactor->GetShiftKey(), 
+  this->OnButtonDown(2, this->Interactor->GetShiftKey(),
                      this->Interactor->GetControlKey());
 }
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnRightButtonDown()
 {
-  this->OnButtonDown(3, this->Interactor->GetShiftKey(), 
+  this->OnButtonDown(3, this->Interactor->GetShiftKey(),
                      this->Interactor->GetControlKey());
 }
 
@@ -104,7 +105,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
   while ((manipulator = (vtkCameraManipulator*)
                         this->CameraManipulators->GetNextItemAsObject()))
     {
-    if (manipulator->GetButton() == button && 
+    if (manipulator->GetButton() == button &&
         manipulator->GetShift() == shift &&
         manipulator->GetControl() == control)
       {
@@ -112,6 +113,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
       this->Current->Register(this);
       this->InvokeEvent(vtkCommand::StartInteractionEvent);
       this->Current->SetCenter(this->CenterOfRotation);
+      this->Current->SetRotationFactor(this->RotationFactor);
       this->Current->StartInteraction();
       this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
                                   this->Interactor->GetEventPosition()[1],
@@ -166,7 +168,7 @@ void vtkPVInteractorStyle::OnMouseMove()
     this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
                             this->Interactor->GetEventPosition()[1]);
     }
-  
+
   if (this->Current)
     {
     this->Current->OnMouseMove(this->Interactor->GetEventPosition()[0],
@@ -184,12 +186,12 @@ void vtkPVInteractorStyle::ResetLights()
     {
     return;
     }
-  
+
   vtkLight *light;
-  
+
   vtkLightCollection *lights = this->CurrentRenderer->GetLights();
   vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
-  
+
   lights->InitTraversal();
   light = lights->GetNextItem();
   if ( ! light)
@@ -208,6 +210,7 @@ void vtkPVInteractorStyle::PrintSelf(ostream& os, vtkIndent indent)
     << this->CenterOfRotation[0] << ", "
     << this->CenterOfRotation[1] << ", "
     << this->CenterOfRotation[2] << endl;
+  os << indent << "RotationFactor: "<< this->RotationFactor << endl;
   os << indent << "CameraManipulators: " << this->CameraManipulators << endl;
 
 }
