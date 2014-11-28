@@ -1,5 +1,111 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
+    <SourceProxy name="ShearedWavelet" class="vtkShearedWaveletSource">
+      <DoubleVectorProperty
+        name="U"
+        command="SetBasisU"
+        number_of_elements="3"
+        default_values="1.0 0.0 0.0"
+        panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding X axis direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="V"
+        command="SetBasisV"
+        number_of_elements="3"
+        default_values="0.0 1.0 0.0"
+        panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding Y axis direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="W"
+        command="SetBasisW"
+        number_of_elements="3"
+        default_values="0.0 0.0 1.0"
+        panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding Z axis direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="UTitle"
+        command="SetAxisUTitle"
+        number_of_elements="1"
+        default_values="Base U"
+        panel_visibility="default">
+        <Documentation>
+          This property specifies the text to display for the X axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="VTitle"
+        command="SetAxisVTitle"
+        number_of_elements="1"
+        default_values="Base V"
+        panel_visibility="default">
+        <Documentation>
+          This property specifies the text to display for the Y axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="WTitle"
+        command="SetAxisWTitle"
+        number_of_elements="1"
+        default_values="Base W"
+        panel_visibility="default">
+        <Documentation>
+          This property specifies the text to display for the Z axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="EnableAxisTitles"
+        command="SetEnableAxisTitles"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableTimeLabel"
+        command="SetEnableTimeLabel"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="ModelBoundingBox"
+        command="SetModelBoundingBox"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <StringVectorProperty name="TimeLabel"
+        command="SetTimeLabel"
+        number_of_elements="1"
+        default_values="Time"
+        panel_visibility="default">
+        <Documentation>
+          This property specifies the text to use for time label.
+        </Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty name="TimeLabelAnnotation"
+        command="GetTimeLabelAnnotation"
+        information_only="1">
+      </StringVectorProperty>
+    </SourceProxy>
+
   <SourceProxy name="ShearedCube" class="vtkShearedCubeSource" label="ShearedCube">
       <Documentation
          long_help="Create a shearded 3D cube."

@@ -69,6 +69,8 @@ public:
   // corresponding render window.
   virtual void AddRenderer(unsigned int id, vtkRenderer*);
   virtual void RemoveAllRenderers(unsigned int id);
+  virtual void AddRenderer(unsigned int id, vtkRenderer*, const double viewport[4]);
+  virtual bool UpdateRendererViewport(unsigned int id, vtkRenderer*, const double viewport[4]);
 
   // Description:
   // The views are not supposed to updated the render window position or size

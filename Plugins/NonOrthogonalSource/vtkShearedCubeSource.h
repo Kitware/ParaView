@@ -62,6 +62,7 @@ public:
 
   // Description:
   // Set the oriented bounding box
+  // Specified as (xmin, xmax, ymin, ymax, zmin, zmax).
   vtkSetVector6Macro(OrientedBoundingBox,double);
   vtkGetVectorMacro(OrientedBoundingBox,double,6);
 

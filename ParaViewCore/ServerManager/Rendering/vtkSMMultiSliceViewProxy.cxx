@@ -15,27 +15,110 @@
 #include "vtkSMMultiSliceViewProxy.h"
 
 #include "vtkBoundingBox.h"
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVMultiSliceView.h"
+#include "vtkPVSession.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
-#include <assert.h>
+#include <cassert>
+#include <string>
 #include <vector>
+
+class vtkSMMultiSliceViewProxy::vtkInternals
+{
+public:
+  std::pair<bool, std::string> AxisLabels[3];
+  bool AxisLabelsUpdated;
+  vtkInternals() :  AxisLabelsUpdated(false)
+    {
+    }
+};
 
 vtkStandardNewMacro(vtkSMMultiSliceViewProxy);
 //----------------------------------------------------------------------------
 vtkSMMultiSliceViewProxy::vtkSMMultiSliceViewProxy()
+  : Internals(new vtkSMMultiSliceViewProxy::vtkInternals())
 {
 }
 
 //----------------------------------------------------------------------------
 vtkSMMultiSliceViewProxy::~vtkSMMultiSliceViewProxy()
 {
+  delete this->Internals;
+  this->Internals = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMMultiSliceViewProxy::PostUpdateData()
+{
+  this->Internals->AxisLabelsUpdated = false;
+  this->Superclass::PostUpdateData();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMMultiSliceViewProxy::GetDataBounds(double bounds[6])
+{
+  vtkPVMultiSliceView* view = vtkPVMultiSliceView::SafeDownCast(
+    this->GetClientSideObject());
+  if (view)
+    {
+    view->GetDataBounds(bounds);
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMMultiSliceViewProxy::GetAxisLabel(int axis)
+{
+  if (axis < 0 || axis > 2)
+    {
+    vtkErrorMacro("Invalid axis: " << axis);
+    return NULL;
+    }
+
+  if (this->Internals->AxisLabelsUpdated == false)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "GetAxisLabels"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
+    stream.Reset();
+
+    vtkClientServerStream result = this->GetLastResult(vtkPVSession::DATA_SERVER_ROOT);
+    if (result.GetArgument(0, 0, &stream))
+      {
+      for (int cc=0; cc < 3; cc++)
+        {
+        bool valid;
+        std::string name;
+        if (stream.GetArgument(0, 2*cc, &valid) && stream.GetArgument(0, 2*cc+1, &name))
+          {
+          this->Internals->AxisLabels[cc].first = valid;
+          this->Internals->AxisLabels[cc].second = name;
+          }
+        else
+          {
+          vtkErrorMacro("Invalid reply received for axis "<< cc);
+          this->Internals->AxisLabels[cc].first = false;
+          }
+        }
+      }
+    else
+      {
+      vtkErrorMacro("Invalid reply received!!");
+      }
+    this->Internals->AxisLabelsUpdated = true;
+    }
+  return this->Internals->AxisLabels[axis].first?
+    this->Internals->AxisLabels[axis].second.c_str() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -59,7 +142,8 @@ const char* vtkSMMultiSliceViewProxy::GetRepresentationType(
   pp->AddUncheckedInputConnection(producer, outputPort);
   bool sg = (pp->IsInDomains()>0);
   pp->RemoveAllUncheckedProxies();
-  return sg? "CompositeMultiSliceRepresentation" : NULL;
+  return sg? "CompositeMultiSliceRepresentation" :
+    this->Superclass::GetRepresentationType(producer, outputPort);
 }
 
 
@@ -71,7 +155,7 @@ vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
     proxy,outputPort);
   if (repr)
     {
-    this->InitDefaultSlices(vtkSMSourceProxy::SafeDownCast(proxy), outputPort);
+    this->InitDefaultSlices(vtkSMSourceProxy::SafeDownCast(proxy), outputPort, repr);
     return repr;
     }
 
@@ -82,12 +166,14 @@ vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
 
 //-----------------------------------------------------------------------------
 void vtkSMMultiSliceViewProxy::InitDefaultSlices(
-  vtkSMSourceProxy* source, int opport)
+  vtkSMSourceProxy* source, int opport, vtkSMRepresentationProxy*)
 {
   if (!source)
     {
     return;
     }
+  // FIXME:UDA
+    return;
   double bounds[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
                        VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
                        VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
@@ -102,7 +188,6 @@ void vtkSMMultiSliceViewProxy::InitDefaultSlices(
         {
         center[i] = (bounds[2*i] + bounds[2*i+1])/2.0;
         }
-
       // Add orthogonal X,Y,Z slices based on center position.
       std::vector<double> xSlices =
         vtkSMPropertyHelper(this, "XSlicesValues").GetDoubleArray();

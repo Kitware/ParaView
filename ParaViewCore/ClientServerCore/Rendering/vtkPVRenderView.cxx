@@ -1228,6 +1228,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
      in_tile_display_mode || in_cave_mode) &&
     vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_DATA_SERVER)
     {
+    this->AboutToRenderOnLocalProcess(interactive);
     this->GetRenderWindow()->Render();
     }
 

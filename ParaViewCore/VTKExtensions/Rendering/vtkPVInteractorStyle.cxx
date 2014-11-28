@@ -98,7 +98,27 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
     }
 
   // Look for a matching camera interactor.
+  this->Current = this->FindManipulator(button, shift, control);
+  if (this->Current)
+    {
+    this->Current->Register(this);
+    this->InvokeEvent(vtkCommand::StartInteractionEvent);
+    this->Current->SetCenter(this->CenterOfRotation);
+    this->Current->SetRotationFactor(this->RotationFactor);
+    this->Current->StartInteraction();
+    this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
+                                this->Interactor->GetEventPosition()[1],
+                                this->CurrentRenderer,
+                                this->Interactor);
+    }
+}
+
+//-------------------------------------------------------------------------
+vtkCameraManipulator* vtkPVInteractorStyle::FindManipulator(int button, int shift, int control)
+{
+  // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
+  vtkCameraManipulator* manipulator = NULL;
   while ((manipulator = (vtkCameraManipulator*)
                         this->CameraManipulators->GetNextItemAsObject()))
     {
@@ -106,19 +126,10 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
         manipulator->GetShift() == shift &&
         manipulator->GetControl() == control)
       {
-      this->Current = manipulator;
-      this->Current->Register(this);
-      this->InvokeEvent(vtkCommand::StartInteractionEvent);
-      this->Current->SetCenter(this->CenterOfRotation);
-      this->Current->SetRotationFactor(this->RotationFactor);
-      this->Current->StartInteraction();
-      this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
-                                  this->Interactor->GetEventPosition()[1],
-                                  this->CurrentRenderer,
-                                  this->Interactor);
-      return;
+      return manipulator;
       }
     }
+  return NULL;
 }
 
 //-------------------------------------------------------------------------

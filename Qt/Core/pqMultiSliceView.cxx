@@ -28,16 +28,17 @@
 #include "vtkChartXY.h"
 #include "vtkDataRepresentation.h"
 #include "vtkMath.h"
+#include "vtkPlot.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
-#include "vtkPlot.h"
+#include "vtkSMMultiSliceViewProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkView.h"
 
-#define MULTI_SLICE_AXIS_THIKNESS 60
+#define MULTI_SLICE_AXIS_THIKNESS 80
 #define MULTI_SLICE_AXIS_ACTIVE_SIZE 20
 #define MULTI_SLICE_AXIS_EDGE_MARGIN 10
 
@@ -52,10 +53,6 @@ pqMultiSliceView::pqMultiSliceView(
 
   // When data change make sure the bounds are updated
   QObject::connect(this, SIGNAL(updateDataEvent()),
-                   this, SLOT(updateAxisBounds()));
-
-  // Make sure all the representations share the same slice values
-  QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*,bool)),
                    this, SLOT(updateAxisBounds()));
 
   // Make sure if the proxy change by undo-redo, we properly update the Qt UI
@@ -156,55 +153,42 @@ QWidget* pqMultiSliceView::createWidget()
 
   return container;
 }
-//-----------------------------------------------------------------------------
-void pqMultiSliceView::updateAxisBounds(double bounds[6])
-{
-  if (this->AxisX && this->AxisY && this->AxisZ)
-    {
-    this->AxisX->setRange(bounds[0], bounds[1]);
-    this->AxisY->setRange(bounds[2], bounds[3]);
-    this->AxisZ->setRange(bounds[4], bounds[5]);
-
-    // Make sure we render the new range
-    this->AxisX->renderView();
-    this->AxisY->renderView();
-    this->AxisZ->renderView();
-    }
-}
 
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::updateAxisBounds()
 {
-  double bounds[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
-                       VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
-                       VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
-  double repB[6];
-  foreach(pqRepresentation* rep, this->getRepresentations())
+  double bounds[6];
+  vtkSMMultiSliceViewProxy* viewPxy = vtkSMMultiSliceViewProxy::SafeDownCast(
+    this->getProxy());
+  Q_ASSERT(viewPxy);
+
+  viewPxy->GetDataBounds(bounds);
+  if (vtkMath::AreBoundsInitialized(bounds))
     {
-    pqDataRepresentation* repData = qobject_cast<pqDataRepresentation*>(rep);
-    if(!rep->isVisible() || rep->isWidgetType() || repData == NULL)
-      {
-      continue;
-      }
-    vtkPVDataInformation* info = repData->getInputDataInformation();
-    if(info)
-      {
-      info->GetBounds(repB);
-      for(int i=0;i<3;i++)
-        {
-        int index = 2*i;
-        bounds[index] = (bounds[index] < repB[index]) ? bounds[index] : repB[index];
-        index++;
-        bounds[index] = (bounds[index] > repB[index]) ? bounds[index] : repB[index];
-        }
-      }
+    this->AxisX->setRange(bounds[0], bounds[1]);
+    this->AxisY->setRange(bounds[2], bounds[3]);
+    this->AxisZ->setRange(bounds[4], bounds[5]);
+    }
+  else
+    {
+    this->AxisX->setRange(-10, 10);
+    this->AxisY->setRange(-10, 10);
+    this->AxisZ->setRange(-10, 10);
     }
 
-  if(bounds[0] != VTK_DOUBLE_MAX)
-    {
-    this->updateAxisBounds(bounds);
-    }
+  const char* xlabel = viewPxy->GetAxisLabel(0);
+  const char* ylabel = viewPxy->GetAxisLabel(1);
+  const char* zlabel = viewPxy->GetAxisLabel(2);
+  this->AxisX->setTitle(xlabel? xlabel : "X");
+  this->AxisY->setTitle(ylabel? ylabel : "Y");
+  this->AxisZ->setTitle(zlabel? zlabel : "Z");
+
+  // Make sure we render the new range
+  this->AxisX->renderView();
+  this->AxisY->renderView();
+  this->AxisZ->renderView();
 }
+
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::updateSlices()
 {

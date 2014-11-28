@@ -88,6 +88,10 @@ public:
   // Do not let the superclass do anything with a char event.
   virtual void OnChar() {};
 
+  // Description:
+  // Returns the chosen manipulator based on the modifiers.
+  virtual vtkCameraManipulator* FindManipulator(int button, int shift, int control);
+
 protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();

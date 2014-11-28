@@ -191,6 +191,12 @@ public:
   // Description:
   // Convenience method to get the array name used to scalar color with.
   const char* GetColorArrayName();
+
+  // Description:
+  // Convenience method to get bounds from a dataset/composite dataset.
+  // Returns true if valid bounds were computed.
+  static bool GetBounds(vtkDataObject* dataObject, double bounds[6]);
+
 //BTX
 protected:
   vtkGeometryRepresentation();
