@@ -322,6 +322,7 @@ void pqTimeInspectorWidget::updateScene()
     animationModel->setStartTime(0.0);
     animationModel->setEndTime(1.0);
     animationModel->setMode(pqAnimationModel::Sequence);
+    this->Internals->Ui.AnimationTimeWidget->setAnimationScene(NULL);
     // FIXME: remove all tracks.
     return;
     }
@@ -331,6 +332,8 @@ void pqTimeInspectorWidget::updateScene()
 
   vtkSMProxy* sceneProxy = controller->FindAnimationScene(session);
   Q_ASSERT(sceneProxy);
+
+  this->Internals->Ui.AnimationTimeWidget->setAnimationScene(sceneProxy);
 
   links.addPropertyLink(this, "sceneStartTime", SIGNAL(dummySignal()),
     sceneProxy, sceneProxy->GetProperty("StartTime"));

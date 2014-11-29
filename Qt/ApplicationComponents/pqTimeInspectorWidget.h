@@ -52,6 +52,11 @@ class vtkSMProxy;
 /// The implementation relies on linking (using pqPropertyLinks) sm-properties on TimeKeeper
 /// and AnimationScene proxy for the active session to qt-properties on this
 /// widget.
+///
+/// To use this widget since set the animation scene using setAnimationScene().
+/// The widget takes care of the rest. One typically never needs to use any of
+/// the other public API which is internally "linked" to the properties on the
+/// animation scene proxy.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTimeInspectorWidget : public QWidget
 {
   Q_OBJECT
