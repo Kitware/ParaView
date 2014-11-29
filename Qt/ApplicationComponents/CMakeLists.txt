@@ -35,6 +35,8 @@ set (Module_SRCS
   pqAlwaysConnectedBehavior.h
   pqAnimationTimeToolbar.cxx
   pqAnimationTimeToolbar.h
+  pqAnimationTimeWidget.cxx
+  pqAnimationTimeWidget.h
   pqApplicationSettingsReaction.cxx
   pqApplicationSettingsReaction.h
   pqApplyBehavior.cxx
@@ -268,6 +270,7 @@ set (Module_MOC_HDRS
   pqAboutDialogReaction.h
   pqAlwaysConnectedBehavior.h
   pqAnimationTimeToolbar.h
+  pqAnimationTimeWidget.h
   pqApplicationSettingsReaction.h
   pqApplyBehavior.h
   pqAutoApplyReaction.h
@@ -398,6 +401,7 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif()
 
 set (Module_UI_FILES
+  Resources/UI/pqAnimationTimeWidget.ui
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqBackgroundEditorWidget.ui
   Resources/UI/pqCameraManipulatorWidget.ui

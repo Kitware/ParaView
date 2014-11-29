@@ -156,6 +156,22 @@ double vtkSMTimeKeeperProxy::GetLowerBoundTimeStep(double value)
   return value;
 }
 
+
+//----------------------------------------------------------------------------
+int vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(double value)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("TimestepValues"));
+  if (dvp && dvp->GetNumberOfElements() > 0)
+    {
+    const double* first = dvp->GetElements();
+    const double* last = dvp->GetElements() + dvp->GetNumberOfElements() - 1; // note: this is "last"
+    const double* iter = std::lower_bound(first, last, value);
+    return static_cast<int>(iter - first);
+    }
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 void vtkSMTimeKeeperProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
