@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>350</width>
+    <height>466</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,7 +62,14 @@
     </widget>
    </item>
    <item>
-    <widget class="pqAnimationWidget" name="AnimationWidget" native="true"/>
+    <widget class="pqAnimationWidget" name="AnimationWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>350</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
