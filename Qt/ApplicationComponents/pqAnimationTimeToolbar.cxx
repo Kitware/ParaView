@@ -31,17 +31,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnimationTimeToolbar.h"
 
-#include "pqPVApplicationCore.h"
 #include "pqAnimationManager.h"
+#include "pqAnimationScene.h"
+#include "pqAnimationTimeWidget.h"
+#include "pqPVApplicationCore.h"
 
 //-----------------------------------------------------------------------------
 void pqAnimationTimeToolbar::constructor()
 {
   this->setWindowTitle("Current Time Controls");
-  QObject::connect(pqPVApplicationCore::instance()->animationManager(),
+  this->AnimationTimeWidget = new pqAnimationTimeWidget(this);
+  this->AnimationTimeWidget->setPlayModeReadOnly(true);
+  this->addWidget(this->AnimationTimeWidget);
+  this->connect(pqPVApplicationCore::instance()->animationManager(),
     SIGNAL(activeSceneChanged(pqAnimationScene*)),
-    this, SLOT(setAnimationScene(pqAnimationScene*)));
+    SLOT(setAnimationScene(pqAnimationScene*)));
 }
 
+//-----------------------------------------------------------------------------
+void pqAnimationTimeToolbar::setAnimationScene(pqAnimationScene* scene)
+{
+  this->AnimationTimeWidget->setAnimationScene(
+    scene? scene->getProxy() : NULL);
+}
 
-
+//-----------------------------------------------------------------------------
+pqAnimationTimeWidget* pqAnimationTimeToolbar::animationTimeWidget() const
+{
+  return this->AnimationTimeWidget;
+}

@@ -102,8 +102,6 @@ set (Module_SRCS
   pqContourWidget.h
   pqCubeAxesEditorDialog.cxx
   pqCubeAxesEditorDialog.h
-  pqCurrentTimeToolbar.cxx
-  pqCurrentTimeToolbar.h
   pqCustomFilterDefinitionModel.cxx
   pqCustomFilterDefinitionModel.h
   pqCustomFilterDefinitionWizard.cxx
@@ -396,7 +394,6 @@ set (Module_MOC_HDRS
   pqComponentsTestUtility.h
   pqContourWidget.h
   pqCubeAxesEditorDialog.h
-  pqCurrentTimeToolbar.h
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h

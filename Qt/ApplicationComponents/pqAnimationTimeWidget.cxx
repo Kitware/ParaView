@@ -145,6 +145,9 @@ void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* animationScene)
   internals.Links.addPropertyLink<pqAnimationTimeWidgetLinks>(
     this, "timeStepCount", SIGNAL(dummySignal()),
     timeKeeper, timeKeeper->GetProperty("TimestepValues"));
+  internals.Links.addPropertyLink(
+    this, "timeLabel", SIGNAL(dummySignal()),
+    timeKeeper, timeKeeper->GetProperty("TimeLabel"));
 }
 
 //-----------------------------------------------------------------------------
@@ -248,6 +251,20 @@ void pqAnimationTimeWidget::timestepValueChanged()
     this->setTimeValue(helper.GetAsDouble(index));
     emit this->timeValueChanged();
     }
+}
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::setTimeLabel(const QString& val)
+{
+  Ui::AnimationTimeWidget &ui = this->Internals->Ui;
+  ui.timeLabel->setText(val + ":");
+}
+
+//-----------------------------------------------------------------------------
+QString pqAnimationTimeWidget::timeLabel() const
+{
+  Ui::AnimationTimeWidget &ui = this->Internals->Ui;
+  QString txt = ui.timeLabel->text();
+  return txt.left(txt.length()-1);
 }
 
 //-----------------------------------------------------------------------------

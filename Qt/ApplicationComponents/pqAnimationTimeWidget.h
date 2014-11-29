@@ -58,6 +58,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
   Q_PROPERTY(int timeStepCount READ timeStepCount WRITE setTimeStepCount)
   Q_PROPERTY(QString playMode READ playMode WRITE setPlayMode)
   Q_PROPERTY(bool playModeReadOnly READ playModeReadOnly WRITE setPlayModeReadOnly)
+  Q_PROPERTY(QString timeLabel READ timeLabel WRITE setTimeLabel)
 
   typedef QWidget Superclass;
 public:
@@ -85,6 +86,9 @@ public:
   void setPlayModeReadOnly(bool val);
   bool playModeReadOnly() const;
 
+  /// Get/set the label text to use for the "time" parameter.
+  void setTimeLabel(const QString& val);
+  QString timeLabel() const;
 signals:
   void timeValueChanged();
   void playModeChanged();
