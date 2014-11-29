@@ -114,40 +114,40 @@ pqAnimationTimeWidget::~pqAnimationTimeWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* animationScene)
+void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* ascene)
 {
   pqInternals& internals = *this->Internals;
-  if (internals.AnimationSceneVoidPtr == animationScene)
+  if (internals.AnimationSceneVoidPtr == ascene)
     {
     return;
     }
 
   internals.Links.clear();
-  internals.AnimationScene = animationScene;
-  internals.AnimationSceneVoidPtr = animationScene;
-  this->setEnabled(animationScene != NULL);
-  if (!animationScene)
+  internals.AnimationScene = ascene;
+  internals.AnimationSceneVoidPtr = ascene;
+  this->setEnabled(ascene != NULL);
+  if (!ascene)
     {
     return;
     }
 
   internals.Links.addPropertyLink(
     this, "timeValue", SIGNAL(timeValueChanged()),
-    animationScene, animationScene->GetProperty("AnimationTime"));
+    ascene, ascene->GetProperty("AnimationTime"));
   internals.Links.addPropertyLink(this, "playMode", SIGNAL(playModeChanged()),
-    animationScene, animationScene->GetProperty("PlayMode"));
+    ascene, ascene->GetProperty("PlayMode"));
 
   // In a ParaView application, it's safe to assume that the timekeeper an
   // animation scene is using doesn't change in the life span of the scene.
-  vtkSMProxy* timeKeeper = vtkSMPropertyHelper(animationScene, "TimeKeeper").GetAsProxy();
-  Q_ASSERT(timeKeeper != NULL);
+  vtkSMProxy* atimekeeper = vtkSMPropertyHelper(ascene, "TimeKeeper").GetAsProxy();
+  Q_ASSERT(atimekeeper != NULL);
 
   internals.Links.addPropertyLink<pqAnimationTimeWidgetLinks>(
     this, "timeStepCount", SIGNAL(dummySignal()),
-    timeKeeper, timeKeeper->GetProperty("TimestepValues"));
+    atimekeeper, atimekeeper->GetProperty("TimestepValues"));
   internals.Links.addPropertyLink(
     this, "timeLabel", SIGNAL(dummySignal()),
-    timeKeeper, timeKeeper->GetProperty("TimeLabel"));
+    atimekeeper, atimekeeper->GetProperty("TimeLabel"));
 }
 
 //-----------------------------------------------------------------------------

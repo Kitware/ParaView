@@ -92,8 +92,8 @@ protected:
     std::vector<vtkSMProxy*> proxies;
     foreach (const QVariant& var, value.toList())
       {
-      vtkSMProxy* proxy = reinterpret_cast<vtkSMProxy*>(var.value<void*>());
-      proxies.push_back(proxy);
+      vtkSMProxy* aproxy = reinterpret_cast<vtkSMProxy*>(var.value<void*>());
+      proxies.push_back(aproxy);
       }
     proxies.push_back(NULL);
     Q_ASSERT(proxies.size() > 0);
@@ -126,8 +126,8 @@ class pqTimeInspectorWidget::TimeTrack : public pqAnimationTrack
   bool HasDataTime;
   double DataTime;
 public:
-  TimeTrack(vtkSMProxy* sourceProxy, QObject* parentObject=NULL)
-    : Superclass(parentObject),
+  TimeTrack(vtkSMProxy* sourceProxy, QObject* parentObj=NULL)
+    : Superclass(parentObj),
     Source(sourceProxy),
     HasDataTime(false),
     DataTime(0.0)
@@ -162,6 +162,9 @@ protected:
     const QStyleOptionGraphicsItem * option,
     QWidget * widget)
     {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     // draw border for this track
     p->save();
     p->setBrush(QBrush(QColor(255, 255, 255)));
@@ -289,12 +292,12 @@ pqTimeInspectorWidget::~pqTimeInspectorWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqTimeInspectorWidget::setServer(pqServer* server)
+void pqTimeInspectorWidget::setServer(pqServer* aserver)
 {
-  if (server != this->Internals->VoidServer)
+  if (aserver != this->Internals->VoidServer)
     {
-    this->Internals->VoidServer = server;
-    this->Internals->Server = server;
+    this->Internals->VoidServer = aserver;
+    this->Internals->Server = aserver;
 
     this->updateScene();
     }
