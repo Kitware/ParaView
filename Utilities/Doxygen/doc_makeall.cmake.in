@@ -287,9 +287,9 @@ execute_process(COMMAND ${PERL}
 #  -- Here we differ from VTK, we simply install the generated
 #  doc_ParaView_version.dox file instead.
 step(4 "extract ParaView version")
-file(INSTALL "${DOXTEMP}/doc_ParaView_version.dox"
-     DESTINATION "${INTERMEDIATE_DOX_DIR}"
-     USE_SOURCE_PERMISSIONS)
+#file(INSTALL "${DOXTEMP}/doc_ParaView_version.dox"
+#     DESTINATION "${INTERMEDIATE_DOX_DIR}"
+#     USE_SOURCE_PERMISSIONS)
 
 # ----------------------------------------------------------------------------
 # Generate the 'Class to Examples' page cross-linking each class to these
