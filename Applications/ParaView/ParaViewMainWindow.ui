@@ -302,6 +302,18 @@
     </property>
    </widget>
   </widget>
+  <widget class="QDockWidget" name="timeInspectorDock">
+   <property name="allowedAreas">
+    <set>Qt::AllDockWidgetAreas</set>
+   </property>
+   <property name="windowTitle">
+    <string>Time Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqTimeInspectorWidget" name="timeInspectorPanel"/>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -379,6 +391,12 @@
    <class>pqFindDataSelectionDisplayFrame</class>
    <extends>QWidget</extends>
    <header>pqFindDataSelectionDisplayFrame.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqTimeInspectorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqTimeInspectorWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

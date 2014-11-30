@@ -1029,7 +1029,7 @@ void vtkPVRenderViewForAssembly::StartCaptureValues()
     {
     this->Internal->SavedRenderPass->Register(NULL);
     }
-  this->Internal->SavedOrientationState = this->OrientationWidget->GetEnabled();
+  this->Internal->SavedOrientationState = (this->OrientationWidget->GetEnabled() != 0);
   this->Internal->SavedAnnotationState = this->ShowAnnotation;
   this->SetOrientationAxesVisibility(false);
   this->SetShowAnnotation(false);

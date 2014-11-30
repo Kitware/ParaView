@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,18 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqAnimationTimeToolbar_h 
+#ifndef __pqAnimationTimeToolbar_h
 #define __pqAnimationTimeToolbar_h
 
-#include "pqCurrentTimeToolbar.h"
 #include "pqApplicationComponentsModule.h"
+#include <QToolBar>
+#include <QPointer>
 
-/// pqAnimationTimeToolbar is subclass of pqCurrentTimeToolbar that connects to
-/// the pqPVApplicationCore::animationManager() to keep track of the active scene.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeToolbar : public pqCurrentTimeToolbar
+class pqAnimationTimeWidget;
+class pqAnimationScene;
+
+
+/// pqAnimationTimeToolbar is a QToolBar containing a pqAnimationTimeWidget.
+/// pqAnimationTimeToolbar also ensures that the pqAnimationTimeWidget is
+/// tracking the animation scene on the active session.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeToolbar : public QToolBar
 {
   Q_OBJECT
-  typedef pqCurrentTimeToolbar Superclass;
+  typedef QToolBar Superclass;
 public:
   pqAnimationTimeToolbar(const QString &_title, QWidget *_parent = 0)
     : Superclass(_title, _parent)
@@ -53,10 +59,15 @@ public:
     this->constructor();
     }
 
+  /// Provides access to the pqAnimationTimeWidget used.
+  pqAnimationTimeWidget* animationTimeWidget() const;
+private slots:
+  void setAnimationScene(pqAnimationScene* scene);
+
 private:
   Q_DISABLE_COPY(pqAnimationTimeToolbar)
-
   void constructor();
+  QPointer<pqAnimationTimeWidget> AnimationTimeWidget;
 };
 
 #endif

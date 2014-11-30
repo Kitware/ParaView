@@ -81,6 +81,15 @@ public:
     return self? self->GetLowerBoundTimeStep(value) : value;
     }
 
+  // Description:
+  // Returns the index for the lower bound of the time specified in current
+  // timestep values, if possible. If there are no timestep values, returns 0.
+  virtual int GetLowerBoundTimeStepIndex(double value);
+  static int GetLowerBoundTimeStepIndex(vtkSMProxy* timeKeeper, double value)
+    {
+    vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper);
+    return self? self->GetLowerBoundTimeStepIndex(value) : 0;
+    }
 
 
 //BTX

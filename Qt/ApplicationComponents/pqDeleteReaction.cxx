@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -236,6 +237,14 @@ void pqDeleteReaction::deleteSources(QSet<pqPipelineSource*>& sources)
       tmgr->UpdateScalarBars(view->getProxy(),
         vtkSMTransferFunctionManager::HIDE_UNUSED_SCALAR_BARS);
       }
+    }
+
+  if (something_deleted)
+    {
+    // update animation playback mode.
+    vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps(
+      controller->GetAnimationScene(
+        pqActiveObjects::instance().activeServer()->session()));
     }
 
   END_UNDO_SET();

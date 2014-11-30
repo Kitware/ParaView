@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMTimeKeeperProxy.h"
 
 #include <QList>
 #include <QtDebug>
@@ -106,22 +107,7 @@ double pqTimeKeeper::getTimeStepValue(int index) const
 //-----------------------------------------------------------------------------
 int pqTimeKeeper::getTimeStepValueIndex(double time) const
 {
-  int num_values = this->getNumberOfTimeStepValues();
-  double *values = new double[num_values+1];
-  vtkSMPropertyHelper(this->getProxy(), "TimestepValues").Get(values,
-    num_values);
-
-  int cc=1;
-  for (cc=1; cc < num_values; cc++)
-    {
-    if (values[cc] > time)
-      {
-      delete[] values;
-      return (cc-1);
-      }
-    }
-  delete[] values;
-  return (cc-1); 
+  return vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->getProxy(), time);
 }
 
 //-----------------------------------------------------------------------------
