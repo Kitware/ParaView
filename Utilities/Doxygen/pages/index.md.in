@@ -1,0 +1,24 @@
+ParaView C++ API Documentation                      {#index}
+===============================
+
+![Version: @PARAVIEW_VERSION_FULL@](paraview-logo.png)
+
+This is doxygen generated documentation for the C++ API for developers of
+ParaView as well as those writing plugins and custom applications based on
+ParaView.
+
+Navigation
+-----------
+
+Page | Description
+-----|----------------------------------------
+[Major API Changes](@ref MajorAPIChanges) | Descriptions for major API chages.
+
+Developer notes
+----------------
+
+This file is available in the ParaView source repository as
+**Utilities/Doxygen/pages/index.md.in**. All other pages to document the code
+are also available under that directory.
+As new pages are added, please ensure that the *Navigation* table above it
+kept up-to-date to make it easier to navigate the documentation.

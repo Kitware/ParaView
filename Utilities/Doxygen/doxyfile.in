@@ -34,13 +34,14 @@ MAX_DOT_GRAPH_DEPTH  = 3
 
 ALLEXTERNALS         = NO
 
-IMAGE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@"
+IMAGE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@/images"
 
 OUTPUT_DIRECTORY     = "@CMAKE_CURRENT_BINARY_DIR@/doc"
 
 INPUT                = \
+          "@CMAKE_CURRENT_SOURCE_DIR@/pages" \
+          "@CMAKE_CURRENT_BINARY_DIR@/pages" \
           "@CMAKE_CURRENT_BINARY_DIR@/dox" \
-          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_version.dox" \
           "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events2.dox" \
           "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events.dox" \
           "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_index.dox" \
@@ -49,6 +50,7 @@ INPUT                = \
 
 EXCLUDE_PATTERNS     =
 EXCLUDE              = \
+    "@ParaView_SOURCE_DIR@/Web/Documentation" \
     "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/Core/vtkSetGet.h" \
     "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/DataModel/vtkMarchingSquaresCases.h" \
     "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/DataModel/vtkMarchingCubesCases.h" \
@@ -93,7 +95,7 @@ DETAILS_AT_TOP       = YES
 SHORT_NAMES          = @DOXYGEN_SHORT_NAMES@
 # PAPER_TYPE           = letter
 
-FILE_PATTERNS        = *.h
+FILE_PATTERNS        = *.h *.md
 RECURSIVE            = YES
 
 HTML_ALIGN_MEMBERS   = YES

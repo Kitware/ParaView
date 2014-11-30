@@ -5,6 +5,11 @@ find_package(Doxygen REQUIRED)
 find_package(Perl REQUIRED)
 find_package(HTMLHelp)
 
+if (DOXYGEN_VERSION VERSION_LESS "1.8.0")
+  message(FATAL_ERROR
+    "Doxygen version 1.8 or greater is required (for Markdown support)")
+endif()
+
 find_program(GUNZIPCOMMAND gunzip DOC "Path to gunzip executable")
 mark_as_advanced(GUNZIPCOMMAND)
 
@@ -45,8 +50,8 @@ if (EXISTS "${QT_TAG_FILE}")
 endif()
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/doc_ParaView_version.dox.in
-  ${CMAKE_CURRENT_BINARY_DIR}/doc_ParaView_version.dox)
+  ${CMAKE_CURRENT_SOURCE_DIR}/pages/index.md.in
+  ${CMAKE_CURRENT_BINARY_DIR}/pages/index.md)
 
 configure_file(
   ${ParaView_SOURCE_DIR}/Utilities/Doxygen/doxyfile.in
