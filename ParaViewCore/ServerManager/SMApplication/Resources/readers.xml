@@ -2999,7 +2999,7 @@
     <!--  VTK ADIOS BP Reader -->
 #ifdef Module_vtkIOADIOS
     <SourceProxy name="ADIOSReader"
-                 label="VTK ADIOS Reader"
+                 label="ADIOSReader"
                  class="vtkADIOSReader"
                  mpi_required="true">
       <Documentation short_help="Read ADIOS BP files using VTKs schema.">
