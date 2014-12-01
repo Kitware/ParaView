@@ -20,7 +20,6 @@
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkRendererCollection.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkPVConfig.h"
 
@@ -156,13 +155,11 @@ protected:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 {
   this->PVRenderView = NULL;
-  this->Renderer = NULL;
   this->InteractiveRenderEnabled = 0;
   this->Observer = vtkPVGenericRenderWindowInteractorObserver::New();
   this->Observer->SetTarget(this);
@@ -189,7 +186,6 @@ vtkPVGenericRenderWindowInteractor::~vtkPVGenericRenderWindowInteractor()
   this->Timer->Delete();
 
   this->SetPVRenderView(NULL);
-  this->SetRenderer(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -275,18 +271,6 @@ void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderViewProxy *v
       }
     }
 }
-
-//----------------------------------------------------------------------------
-vtkRenderer* vtkPVGenericRenderWindowInteractor::FindPokedRenderer(int,int)
-{
-  if (this->Renderer == NULL)
-    {
-    vtkErrorMacro("Renderer has not been set.");
-    }
-
-  return this->Renderer;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVGenericRenderWindowInteractor::Render()
@@ -414,7 +398,6 @@ void vtkPVGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent
   os << indent << "PVRenderView: " << this->GetPVRenderView() << endl;
   os << indent << "InteractiveRenderEnabled: "
      << this->InteractiveRenderEnabled << endl;
-  os << indent << "Renderer: " << this->Renderer << endl;
   os << indent << "CenterOfRotation: " << this->CenterOfRotation[0] << ", "
     << this->CenterOfRotation[1] << ", " << this->CenterOfRotation[2] << endl;
   os << indent << "RotationFactor: " << this->RotationFactor << endl;

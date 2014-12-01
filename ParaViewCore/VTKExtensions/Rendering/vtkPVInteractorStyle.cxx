@@ -90,14 +90,11 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
     }
 
   // Get the renderer.
-  if (!this->CurrentRenderer)
+  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
+    this->Interactor->GetEventPosition()[1]);
+  if (this->CurrentRenderer == NULL)
     {
-    this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                            this->Interactor->GetEventPosition()[1]);
-    if (this->CurrentRenderer == NULL)
-      {
-      return;
-      }
+    return;
     }
 
   // Look for a matching camera interactor.
@@ -163,10 +160,15 @@ void vtkPVInteractorStyle::OnButtonUp(int button)
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnMouseMove()
 {
-  if (!this->CurrentRenderer)
+  if (this->CurrentRenderer && this->Current)
+    {
+    // When an interaction is active, we should not change the renderer being
+    // interacted with.
+    }
+  else
     {
     this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                            this->Interactor->GetEventPosition()[1]);
+      this->Interactor->GetEventPosition()[1]);
     }
 
   if (this->Current)

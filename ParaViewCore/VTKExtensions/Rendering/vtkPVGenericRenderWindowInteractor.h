@@ -22,7 +22,6 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkPVRenderViewProxy;
-class vtkRenderer;
 class vtkPVGenericRenderWindowInteractorObserver;
 class vtkPVGenericRenderWindowInteractorTimer;
 
@@ -35,14 +34,6 @@ public:
 
   void SetPVRenderView(vtkPVRenderViewProxy *view);
   vtkGetObjectMacro(PVRenderView, vtkPVRenderViewProxy);
-
-  // Description:
-  // My sollution to the poked renderer problem.
-  // This interactor class always returns this renderer as poked render.
-  // This insures the 2D renderer will never be poked.
-  void SetRenderer(vtkRenderer *view);
-  vtkGetObjectMacro(Renderer,vtkRenderer);
-  virtual vtkRenderer *FindPokedRenderer(int,int);
 
   // Description:
   // 3D widgets call render on this interactor directly.
@@ -119,7 +110,6 @@ protected:
 
   vtkPVRenderViewProxy *PVRenderView;
   int InteractiveRenderEnabled;
-  vtkRenderer* Renderer;
 
   unsigned long NonInteractiveRenderDelay;
   double CenterOfRotation[3];

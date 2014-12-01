@@ -255,7 +255,6 @@ vtkPVRenderView::vtkPVRenderView()
         this->ThreeDInteractorStyle = vtkPVInteractorStyle::New();
     this->TwoDInteractorStyle = vtkPVInteractorStyle::New();
 
-    this->Interactor->SetRenderer(this->GetRenderer());
     this->Interactor->SetRenderWindow(this->GetRenderWindow());
     this->Interactor->SetInteractorStyle(this->ThreeDInteractorStyle);
 
