@@ -56,6 +56,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoRedoBehavior.h"
 #include "pqUndoStack.h"
 #include "pqVerifyRequiredPluginBehavior.h"
+
+#include "pqCoreTestUtility.h"
+#include "pqStreamingTestingEventPlayer.h"
 #include "pqViewStreamingBehavior.h"
 
 #include <QShortcut>
@@ -96,7 +99,28 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqCollaborationBehavior(this);
-  new pqViewStreamingBehavior(this);
+
+  // some special handling for pqStreamingTestingEventPlayer
+  pqViewStreamingBehavior* vsbehv = new pqViewStreamingBehavior(this);
+  pqWidgetEventPlayer* player = pqApplicationCore::instance()->
+    testUtility()->eventPlayer()->getWidgetEventPlayer("pqStreamingTestingEventPlayer");
+  pqStreamingTestingEventPlayer* splayer = NULL;
+  if(!player)
+    {
+    splayer = new pqStreamingTestingEventPlayer(NULL);
+    // the testUtility takes ownership of the player.
+    pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(
+      splayer);
+    }
+  else
+    {
+    splayer = qobject_cast<pqStreamingTestingEventPlayer*>(player);
+    }
+  if(splayer)
+    {
+    splayer->setViewStreamingBehavior(vsbehv);
+    }
+
   new pqPluginSettingsBehavior(this);
 
   pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);

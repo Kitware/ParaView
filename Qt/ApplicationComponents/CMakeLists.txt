@@ -236,6 +236,8 @@ set (Module_SRCS
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.cxx
   pqStatusBar.h
+  pqStreamingTestingEventPlayer.cxx
+  pqStreamingTestingEventPlayer.h
   pqTestingReaction.cxx
   pqTestingReaction.h
   pqTextLocationWidget.cxx
@@ -366,6 +368,7 @@ set (Module_MOC_HDRS
   pqStandardPropertyWidgetInterface.h
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h
+  pqStreamingTestingEventPlayer.h
   pqTestingReaction.h
   pqTextLocationWidget.h
   pqTimerLogReaction.h
