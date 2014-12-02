@@ -355,7 +355,7 @@ void vtkPMultiResolutionGenericIOReader::RemoveAllLevels()
 
 //------------------------------------------------------------------------------
 void vtkPMultiResolutionGenericIOReader::SelectionModifiedCallback(
-  vtkObject* caller, unsigned long eid, void* clientdata, void* calldata)
+  vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eid), void* clientdata, void* vtkNotUsed(calldata))
 {
   assert(clientdata != NULL);
   vtkPMultiResolutionGenericIOReader* reader =
@@ -578,7 +578,8 @@ int vtkPMultiResolutionGenericIOReader::RequestUpdateExtent(vtkInformation* requ
 
 //----------------------------------------------------------------------------
 int vtkPMultiResolutionGenericIOReader::RequestData(vtkInformation *request,
-        vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+        vtkInformationVector** vtkNotUsed(inputVector),
+        vtkInformationVector* outputVector)
 {
   // Get the output dataset
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
@@ -624,10 +625,10 @@ int vtkPMultiResolutionGenericIOReader::RequestData(vtkInformation *request,
     {
     // compute new bounds for current reader's blocks
     uBound = binSearch(&idVector[0],idVector.size(),this->Internal->NumberOfBlocksPerLevel*(i+1));
-    int size = uBound - lBound;
+    int levelSize = uBound - lBound;
 
     vtkNew< vtkMultiBlockDataSet > dataset;
-    if (size > 0)
+    if (levelSize > 0)
       {
       // create a new request
       vtkNew< vtkInformation > internalRequestData;
@@ -642,7 +643,7 @@ int vtkPMultiResolutionGenericIOReader::RequestData(vtkInformation *request,
                            outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()));
       internalOutInfo->Set(vtkDataObject::DATA_OBJECT(),dataset.GetPointer());
       internalOutInfo->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(),
-                           &localIdVector[lBound],size);
+                           &localIdVector[lBound],levelSize);
       internalOutInfo->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(),1);
 
       // put the output info in a vector

@@ -38,6 +38,7 @@ namespace
     {
     distance = 0.0;
     centeredness = 0.0;
+    itemCoverage = 0.0;
 
     // a duff dataset like a polydata with no cells will have bad bounds
     if (!vtkMath::AreBoundsInitialized(const_cast<double*>(bounds)))

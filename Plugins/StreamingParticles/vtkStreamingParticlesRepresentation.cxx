@@ -436,7 +436,8 @@ bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_plan
       vtkSmartPointer< vtkUnsignedIntArray >::New();
   localPurgeArray->SetNumberOfTuples(toPurge.size());
   int i = 0;
-  for (std::set< unsigned int >::iterator itr = toPurge.begin(); itr != toPurge.end(); ++itr, ++i)
+  for (std::set< unsigned int >::const_iterator itr = toPurge.begin();
+       itr != toPurge.end(); ++itr, ++i)
     {
     localPurgeArray->SetValue(i,*itr);
     }
@@ -457,7 +458,7 @@ bool vtkStreamingParticlesRepresentation::StreamingUpdate(const double view_plan
       {
       this->ProcessedPiece->GetFieldData()->AddArray(globalPurgeArray);
       }
-    return allNeedToStream;
+    return (allNeedToStream == 0) ? false : true;
     }
 
   // determine if we need to stream any blocks.
