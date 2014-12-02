@@ -475,9 +475,9 @@ void vtkPGenericIOMultiBlockReader::LoadMetaData()
       }
     else
       {
-      for (int i = 0; i < 6; ++i)
+      for (int j = 0; j < 6; ++j)
         {
-        myBlock.bounds[i] = 0;
+        myBlock.bounds[j] = 0;
         }
       myBlock.coords[0] = myBlock.coords[1] = myBlock.coords[2] = 0;
       }
@@ -733,9 +733,8 @@ void vtkPGenericIOMultiBlockReader::LoadDataArraysForBlock(vtkUnstructuredGrid *
 
   block_t& dataBlock = this->MetaData->Blocks[blockId];
 
-  vtkTypeUInt64 N = grid->GetNumberOfPoints();
   assert("pre: # points in dataset different from points in block" &&
-    (N == dataBlock.NumberOfElements));
+    (grid->GetNumberOfPoints() == dataBlock.NumberOfElements));
   vtkPointData* PD = grid->GetPointData();
 
   int arrayIdx = 0;
@@ -795,7 +794,8 @@ vtkUnstructuredGrid* vtkPGenericIOMultiBlockReader::LoadBlock(int blockId)
 
 //------------------------------------------------------------------------------
 void vtkPGenericIOMultiBlockReader::SelectionModifiedCallback(
-    vtkObject *caller, unsigned long eid, void *clientdata, void *calldata)
+    vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eid),
+    void *clientdata, void* vtkNotUsed(calldata))
 {
   assert("pre: clientdata is NULL!" && (clientdata != NULL) );
   static_cast<vtkPGenericIOMultiBlockReader*>(clientdata)->Modified();
