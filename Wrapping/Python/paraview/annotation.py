@@ -125,3 +125,26 @@ def execute_on_global_data(self):
     expression += str(chosen_element)
     self.SetComputedAnnotationValue(expression)
     return True
+
+def execute_on_attribute_data(self, evaluate_locally):
+    """Called by vtkAnnotateAttributeDataFilter."""
+    inputDO = self.GetCurrentInputDataObject()
+    if not inputDO:
+        return True
+
+    inputs = [dsa.WrapDataObject(inputDO)]
+    association = self.GetArrayAssociation()
+    ns = _get_ns(self, inputs[0], association)
+    if not ns.has_key(self.GetArrayName()):
+        print >> stderr, "Failed to locate array '%s'." % self.GetArrayName()
+        raise RuntimeError, "Failed to locate array"
+
+    if not evaluate_locally:
+        return True
+
+    array = ns[self.GetArrayName()]
+    chosen_element = array[self.GetElementId()]
+    expression = self.GetPrefix() if self.GetPrefix() else ""
+    expression += str(chosen_element)
+    self.SetComputedAnnotationValue(expression)
+    return True

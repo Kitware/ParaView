@@ -113,6 +113,92 @@
       </Hints>
       <!-- End AnnotateGlobalData -->
     </SourceProxy>
+    <SourceProxy class="vtkAnnotateAttributeDataFilter"
+                 label="Annotate Attribute Data"
+                 name="AnnotateAttributeData">
+      <Documentation>
+        This filter can be used to add a text annotation to a Render View (or similar)
+        using a tuple from any attribute array (point/cell/field/row etc.) from a specific rank
+        (when running in parallel). Use 'ArrayName' property to select the array association and
+        array name. Use 'ElementId' property to set the element number to extract the value to label
+        with. When running on multiple ranks, use 'ProcessId' property to select the rank of interest.
+        The 'Prefix' property can be used to specify a string that will be used as the prefix to the
+        generated annotation text.
+      </Documentation>
+      <InputProperty clean_command="RemoveAllInputs"
+                     command="AddInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups" >
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="any"
+                          name="input_array"
+                          number_of_components="1" />
+           <Documentation>
+             Set the input of the filter. To avoid the complications/confusion when identifying
+             elements in a composite dataset, this filter doesn't support composite datasets
+             currently.
+           </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetArrayAssociation"
+                         default_values="2"
+                         name="ArrayAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute to use to popular array names from.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Point Data" value="0" />
+          <Entry text="Cell Data" value="1" />
+          <Entry text="Field Data" value="2" />
+          <Entry text="Row Data" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetArrayName"
+                            name="ArrayName"
+                            number_of_elements="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose arrays that is going to be displayed</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="ElementId"
+                         command="SetElementId"
+                         number_of_elements="1"
+                         default_values="0">
+        <!-- this should really be an IdTypeVectorProperty, but the UI doesn't
+             support those yet -->
+        <IntRangeDomain name="range"/>
+        <Documentation>
+          Set the element index to annotate with.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ProcessId"
+                         command="SetProcessId"
+                         number_of_elements="1"
+                         default_values="0">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+            Set the process rank to extract element from.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetPrefix"
+                            default_values="Value is: "
+                            name="Prefix"
+                            number_of_elements="1">
+        <Documentation>Text that is used as a prefix to the field value</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Visibility replace_input="0" />
+        <OutputPort index="0" name="Output-0" type="text" />
+      </Hints>
+    </SourceProxy>
     <SourceProxy class="vtkPythonAnnotationFilter"
                  label="Python Annotation"
                  name="PythonAnnotation">

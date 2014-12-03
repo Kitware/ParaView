@@ -106,10 +106,15 @@
     <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
   </Category>
 
+  <Category name="Annotation" menu_label="Annotation">
+    <Proxy group="filters" name="AnnotateGlobalData" />
+    <Proxy group="filters" name="AnnotateAttributeData" />
+    <Proxy group="filters" name="PythonAnnotation" />
+    <Proxy group="filters" name="TimeToTextConvertor" />
+  </Category>
 
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />
-  <Proxy group="filters" name="AnnotateGlobalData" />
   <Proxy group="filters" name="Append" />
   <Proxy group="filters" name="AppendAttributes" />
   <Proxy group="filters" name="AppendPolyData" />
@@ -185,7 +190,6 @@
   <Proxy group="filters" name="ProgrammableFilter" />
   <Proxy group="filters" name="PVConnectivityFilter" />
   <Proxy group="filters" name="PythonCalculator" />
-  <Proxy group="filters" name="PythonAnnotation" />
   <Proxy group="filters" name="PythonExtractSelection" />
 
   <Proxy group="filters" name="QuadricClustering" />
@@ -213,7 +217,6 @@
   <Proxy group="filters" name="TextureMapToPlane" />
   <Proxy group="filters" name="TextureMapToSphere" />
   <Proxy group="filters" name="Threshold" />
-  <Proxy group="filters" name="TimeToTextConvertor" />
   <Proxy group="filters" name="TransformFilter" />
   <Proxy group="filters" name="TriangleFilter" />
   <Proxy group="filters" name="TubeFilter" />
