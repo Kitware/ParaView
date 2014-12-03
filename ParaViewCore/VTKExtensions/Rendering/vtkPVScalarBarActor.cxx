@@ -431,7 +431,7 @@ std::vector<double> vtkPVScalarBarActor::LogTickMarks(
 
   double logrange[2];
   logrange[0] = log10(range[0]);  logrange[1] = log10(range[1]);
-  ticks = this->LinearTickMarks(logrange, maxTicks, minDigits, true);
+  ticks = this->LinearTickMarks(logrange, maxTicks, minDigits, false);
 
 #if 0
   // Figure out how many digits we must show in order for tic labels
