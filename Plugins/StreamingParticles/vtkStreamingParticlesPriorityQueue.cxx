@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkStreamingParticlesPriorityQueue.h"
 
+#include "vtkCompositeDataPipeline.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkInformation.h"
 #include "vtkMultiBlockDataSet.h"
@@ -27,6 +28,7 @@
 #include <queue>
 #include <vector>
 #include <set>
+#include <map>
 
 namespace
 {
@@ -94,6 +96,9 @@ vtkStreamingParticlesPriorityQueue::vtkStreamingParticlesPriorityQueue()
 {
   this->Internals = new vtkInternals();
   this->Controller = 0;
+  this->UseBlockDetailInformation = false;
+  this->AnyProcessCanLoadAnyBlock = true;
+  this->DetailLevelToLoad = 8.5e-5;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -129,6 +134,45 @@ void vtkStreamingParticlesPriorityQueue::Reinitialize()
     }
 }
 
+static inline bool hasOneLikeXButGreater(unsigned int x, unsigned int stride,
+                           std::map<unsigned, unsigned>& map)
+{
+  std::map<unsigned, unsigned>::iterator itr = map.find(x % stride);
+  if (itr == map.end())
+    {
+    return false;
+    }
+  else
+    {
+    return itr->second >= x;
+    }
+}
+
+static inline bool hasOneLikeXButLess(unsigned int x, unsigned int stride,
+                                      std::map<unsigned, unsigned>& map)
+{
+  std::map<unsigned,unsigned>::iterator itr = map.find(x%stride);
+  if (itr == map.end())
+    {
+    return false;
+    }
+  else
+    {
+    return itr->second < x;
+    }
+}
+
+static inline void printMap(std::map<unsigned, unsigned> map)
+{
+  cout << "{ ";
+  for (std::map<unsigned,unsigned>::iterator itr = map.begin();
+       itr != map.end(); ++itr)
+    {
+    cout << "(" << itr->first << ", " << itr->second << "), ";
+    }
+  cout << "}" << endl;
+}
+
 //----------------------------------------------------------------------------
 void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
   const double view_planes[24])
@@ -157,6 +201,8 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
 
   unsigned int block_index = 0;
   unsigned int num_levels = metadata->GetNumberOfBlocks();
+  unsigned int num_block_per_level = 0;
+  bool all_levels_have_same_block_count = true;
   for (unsigned int level=0; level < num_levels; level++)
     {
     vtkMultiBlockDataSet* mb =
@@ -164,6 +210,11 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
     assert(mb != NULL);
 
     unsigned int num_blocks = mb->GetNumberOfBlocks();
+    if (num_blocks > num_block_per_level)
+      {
+      num_block_per_level = num_blocks;
+      all_levels_have_same_block_count = level == 0;
+      }
     for (unsigned int cc=0; cc < num_blocks; cc++, block_index++)
       {
       if (!mb->HasMetaData(cc) ||
@@ -178,46 +229,136 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(
       item.Refinement = level;
 
       double bounds[6];
-      mb->GetMetaData(cc)->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(), bounds);
+      vtkInformation* blockInfo = mb->GetMetaData(cc);
+      blockInfo->Get(vtkStreamingDemandDrivenPipeline::BOUNDS(), bounds);
       item.Bounds.SetBounds(bounds);
-
-      queue.push(item);
+      if (blockInfo->Has(vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL()))
+        {
+        item.AmountOfDetail = blockInfo->Get(
+              vtkCompositeDataPipeline::BLOCK_AMOUNT_OF_DETAIL());
+        }
+      if (this->AnyProcessCanLoadAnyBlock ||
+          (blockInfo->Has(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK()) &&
+          blockInfo->Get(vtkCompositeDataSet::CURRENT_PROCESS_CAN_LOAD_BLOCK())))
+        {
+        queue.push(item);
+        }
       }
+    }
+  if (!all_levels_have_same_block_count)
+    {
+    num_block_per_level *= num_levels;
     }
   double clamp_bounds[6];
   vtkMath::UninitializeBounds(clamp_bounds);
   queue.UpdatePriorities(view_planes, clamp_bounds);
 
-  std::set<unsigned int> blocksRequested;
-  blocksRequested.swap(this->Internals->BlocksRequested);
+  std::map<unsigned, unsigned> blocksRequested;
+  for (std::set<unsigned>::iterator itr = this->Internals->BlocksRequested.begin();
+       itr != this->Internals->BlocksRequested.end(); ++itr)
+    {
+    blocksRequested[*itr % num_block_per_level] = *itr;
+    }
+  this->Internals->BlocksRequested.clear();
 
+  this->Internals->BlocksToPurge.clear();
+
+  std::deque<unsigned int> toRequest;
+  std::map<unsigned, unsigned> keepInRequest;
   while (!queue.empty())
     {
     vtkStreamingPriorityQueueItem item = queue.top();
+
     queue.pop();
-    if (item.Refinement <= 1 || item.ScreenCoverage >= 0.75)
+//    if (item.Distance + item.Refinement <= 0 || item.Refinement < 1)
+    double diagonal = item.Bounds.GetDiagonalLength();
+    // avoid division by 0
+    if (diagonal < 1e-10)
       {
-      if (blocksRequested.find(item.Identifier) != blocksRequested.end())
+      diagonal = 1e-10;
+      }
+    double factor = item.Refinement == 0 ? 0 : this->DetailLevelToLoad / (double) item.Refinement;
+    bool detailMethodNeedsBlock =
+        (item.Refinement <= 0 || (item.Distance / diagonal < factor && item.ScreenCoverage > 0));
+//        (item.Refinement <= 0 ||
+//         (item.ItemCoverage > 0 && item.ScreenCoverage / (item.AmountOfDetail * item.ItemCoverage ) > this->DetailLevelToLoad));
+    bool genericMethodNeedsBlock =
+        (item.Refinement <= 1 || item.ScreenCoverage >= 0.75);
+
+    if ( (this->UseBlockDetailInformation && item.AmountOfDetail > 0) ? detailMethodNeedsBlock : genericMethodNeedsBlock)
+      {
+      if (hasOneLikeXButGreater(item.Identifier,num_block_per_level,keepInRequest) ||
+          hasOneLikeXButGreater(item.Identifier,num_block_per_level,blocksRequested))
         {
-        // this block was previously requested, pretend we already requested it
-        // in the current iteration as well.
-        this->Internals->BlocksRequested.insert(item.Identifier);
-        blocksRequested.erase(item.Identifier);
+        // we already requested a greater resolution of the block, do nothing
+        }
+      else if (hasOneLikeXButLess(item.Identifier,num_block_per_level,blocksRequested))
+        {
+        // we have loaded a lower resolution of the block:
+        // 1: request the new (higher) one
+        toRequest.push_back(item.Identifier);
+        keepInRequest[item.Identifier % num_block_per_level] = item.Identifier;
+        // 2: delete the one we currently have loaded
+        this->Internals->BlocksToPurge.insert(blocksRequested[item.Identifier % num_block_per_level]);
+        blocksRequested.erase(item.Identifier % num_block_per_level);
+        }
+      else if (hasOneLikeXButLess(item.Identifier,num_block_per_level,keepInRequest))
+        {
+        // we are requesting a lower resolution of the block, so change the request
+        // to the highest resolution we need
+        keepInRequest[item.Identifier % num_block_per_level] = item.Identifier;
+        toRequest.push_back(item.Identifier);
         }
       else
         {
-        // we need to request this block.
-        this->Internals->BlocksToRequest.push(item.Identifier);
+        // we don't have this block loaded or requested at all, request the current
+        // resolution
+        keepInRequest[item.Identifier % num_block_per_level] = item.Identifier;
+        toRequest.push_back(item.Identifier);
+        }
+      }
+    else
+      {
+      // if we don't need the block at this resolution, but we have it requested at this
+      // level or higher then delete the resolution we have and request the resolution
+      // below the current one we don't need.  We have to check the request list too since
+      // we are adding to the request list without knowing for sure that we need the resolution
+      // we are reqeusting.  Ideally if we are seeing a higher res block in this list, we have
+      // already seen the lower resolution, but that is not guaranteed by the priority of the blocks.
+      if (hasOneLikeXButGreater(item.Identifier,num_block_per_level,blocksRequested) ||
+          hasOneLikeXButGreater(item.Identifier,num_block_per_level,keepInRequest))
+        {
+        // request the next one lower than this one (may not need that one, but we should show something for each)
+        // use max to ensure we show the lowest one not an invalid block index
+        keepInRequest[item.Identifier % num_block_per_level] =
+            std::max((int)item.Identifier - (int)num_block_per_level,(int)(item.Identifier % num_block_per_level));
+        toRequest.push_back(
+              std::max((int)item.Identifier - (int)num_block_per_level,(int)(item.Identifier % num_block_per_level)));
+        // this may be called when the block in question is merely to be requested and not loaded yet
+        // if the block is loaded, delete it
+        if (hasOneLikeXButGreater(item.Identifier,num_block_per_level,blocksRequested))
+          {
+          this->Internals->BlocksToPurge.insert(blocksRequested[item.Identifier % num_block_per_level]);
+          blocksRequested.erase(item.Identifier % num_block_per_level);
+          }
         }
       }
     }
 
-  // - anything in blocksRequested is what is "extra" and should
-  // be purged.
-  // - anything in this->Internals->BlocksToRequest is to be requested.
+  for (std::deque<unsigned int>::iterator itr = toRequest.begin(); itr != toRequest.end(); ++itr)
+    {
+    std::map<unsigned,unsigned>::iterator keep = keepInRequest.find(*itr % num_block_per_level);
+    if (keep != keepInRequest.end() && keep->second == *itr)
+      {
+      this->Internals->BlocksToRequest.push(*itr);
+      }
+    }
+  for (std::map<unsigned,unsigned>::iterator itr = blocksRequested.begin();
+       itr != blocksRequested.end(); ++itr)
+    {
+    this->Internals->BlocksRequested.insert(itr->second);
+    }
 
-  this->Internals->BlocksToPurge.clear();
-  this->Internals->BlocksToPurge.swap(blocksRequested);
   cout << "Update information  : "  << endl
        << "  To request        : " << this->Internals->BlocksToRequest.size() << endl
        << "  Already requested : " << this->Internals->BlocksRequested.size() << endl
@@ -238,24 +379,32 @@ unsigned int vtkStreamingParticlesPriorityQueue::Pop()
     return VTK_UNSIGNED_INT_MAX;
     }
 
-  int num_procs = this->Controller? this->Controller->GetNumberOfProcesses() : 1;
-  int myid = this->Controller? this->Controller->GetLocalProcessId() : 0;
-  assert(myid < num_procs);
-
-  std::vector<unsigned int> items;
-  items.resize(num_procs, VTK_UNSIGNED_INT_MAX);
-
-  for (int cc=0; cc < num_procs && !this->Internals->BlocksToRequest.empty(); cc++)
+  if (this->AnyProcessCanLoadAnyBlock)
     {
-    items[cc] = this->Internals->BlocksToRequest.front();
-    this->Internals->BlocksToRequest.pop();
-    this->Internals->BlocksRequested.insert(items[cc]);
+    int myid = this->Controller->GetLocalProcessId();
+    int num_ranks = this->Controller->GetNumberOfProcesses();
+    std::vector< unsigned int > items;
+    items.resize(num_ranks);
+    for (int i = 0; i < num_ranks; ++i)
+      {
+      items[i] = this->Internals->BlocksToRequest.front();
+      this->Internals->BlocksToRequest.pop();
+      this->Internals->BlocksRequested.insert(items[i]);
+      }
+    return items[myid];
     }
+  else
+    {
+    unsigned int item;
 
-  // at the end, when the queue empties out in the middle of a pop, right now,
-  // all other processes are simply going to ask for block 0 (set in
-  // initialization of vtkPriorityQueueItem). We can change that, if needed.
-  return items[myid];
+    item = this->Internals->BlocksToRequest.front();
+    this->Internals->BlocksToRequest.pop();
+    this->Internals->BlocksRequested.insert(item);
+
+    // As the queue is assumed to be of the local process's blocks now, return
+    // the first block in the queue (will be different on each process
+    return item;
+    }
 }
 
 //----------------------------------------------------------------------------

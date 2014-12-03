@@ -33,9 +33,12 @@ namespace
 {
   // this code is stolen from vtkFrustumCoverageCuller.
   double vtkComputeScreenCoverage(const double planes[24],
-    const double bounds[6], double &distance)
+    const double bounds[6], double &distance, double &centeredness,
+    double& itemCoverage)
     {
     distance = 0.0;
+    centeredness = 0.0;
+    itemCoverage = 0.0;
 
     // a duff dataset like a polydata with no cells will have bad bounds
     if (!vtkMath::AreBoundsInitialized(const_cast<double*>(bounds)))
@@ -86,6 +89,45 @@ namespace
     // view frustum that contains the center of the sphere
     double full_w = screen_bounds[0] + screen_bounds[1] + 2.0 * radius;
     double full_h = screen_bounds[2] + screen_bounds[3] + 2.0 * radius;
+
+    // Multiply the distances from each side to get a measure of how centered
+    // the sphere is on the screen (divide by half the length in that dimension
+    // squared to get a measure of how centered the object is in that dimension).
+    double measure_w = (screen_bounds[0] + radius) * (screen_bounds[1] + radius) / (full_w * full_w / 4.0);
+    double measure_h = (screen_bounds[2] + radius) * (screen_bounds[3] + radius) / (full_h * full_h / 4.0);
+
+    // If the object is off the edge of the screen, treat it as if it is just
+    // inside the edge (which we know it is since it wasn't culled)
+    if (measure_w < 0.01)
+      {
+      measure_w = 0.01;
+      }
+    if (measure_h < 0.01)
+      {
+      measure_h = 0.01;
+      }
+    centeredness = measure_w * measure_h;
+
+    double w = 2 * radius;
+    double h = 2 * radius;
+    if (screen_bounds[0] < 0.0)
+      {
+      w += screen_bounds[0];
+      }
+    if (screen_bounds[1] < 0.0)
+      {
+      w += screen_bounds[1];
+      }
+    if (screen_bounds[2] < 0.0)
+      {
+      h += screen_bounds[2];
+      }
+    if (screen_bounds[3] < 0.0)
+      {
+      h += screen_bounds[3];
+      }
+    itemCoverage = h*w / (4 * radius * radius);
+
     // Subtract from the full width to get the width of the square
     // enclosing the circle slice from the sphere in the plane
     // through the center of the sphere. If the screen bounds for
@@ -133,12 +175,16 @@ public:
                            // processing for this block. 0 is considered as
                            // undefined.
   double ScreenCoverage;   // computed coverage for the block.
+  double Centeredness;     // how centered the object is on the screen (1 is centered, 0.0001 is near the edge)
   double Priority;         // Computed priority for this block.
   double Distance;
+  double AmountOfDetail;
+  double ItemCoverage;     // amount of the item that is onscreen (fraction, if whole item is onscreen it is 1)
   vtkBoundingBox Bounds;   // Bounds for the block.
 
   vtkStreamingPriorityQueueItem() :
-    Identifier(0), Refinement(0), ScreenCoverage(0), Priority(0), Distance(0)
+    Identifier(0), Refinement(0), ScreenCoverage(0), Priority(0), Distance(0),
+    AmountOfDetail(-1)
   {
   }
 };
@@ -197,14 +243,18 @@ public:
         }
 
       double refinement2 = item.Refinement * item.Refinement;
-      double distance;
-      double coverage = vtkComputeScreenCoverage(view_planes, block_bounds, distance);
+      double distance, centeredness, itemCoverage;
+      double coverage = vtkComputeScreenCoverage(view_planes, block_bounds, distance, centeredness, itemCoverage);
       item.ScreenCoverage = coverage;
       item.Distance = distance;
+      item.Centeredness = centeredness;
+      item.ItemCoverage = itemCoverage;
+
+
       if (coverage > 0)
         {
 //        item.Priority =  coverage / (item.Refinement/* * distance*/) ;// / distance; //coverage * coverage / ( 1 + refinement2 + distance);
-        item.Priority = coverage * coverage / ( 1 + refinement2 + distance);
+        item.Priority = coverage * coverage * centeredness / ( 1 + refinement2 + distance);
         }
       else
         {

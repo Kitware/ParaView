@@ -73,7 +73,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>    // For STL set
 
 // Forward declarations
-struct block_t; // defined in the implementation
 
 class vtkInformation;
 class vtkInformationVector;
@@ -177,7 +176,10 @@ protected:
 
   vtkMultiBlockDataSet *MetaData;
 
+
 // BTX
+  struct block_t; // defined in the implementation
+
   std::vector< int > NBlocks; // Number of blocks at level "i"
   std::vector< block_t > ParticleBlocks; // stores block info for each block
   std::vector< int > RequestedBlocks; // list of blocks to load

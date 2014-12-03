@@ -110,7 +110,7 @@ vtkStandardNewMacro(vtkACosmoReader);
 #define NUMBER_OF_INTS 1
 
 // Data-structure to store information about individual blocks
-struct block_t {
+struct vtkACosmoReader::block_t {
   int Level; // starts from 1
   int IndexWithinLevel; // starts from 0
   size_t FileOffSet;

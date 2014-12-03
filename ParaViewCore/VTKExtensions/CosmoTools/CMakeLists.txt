@@ -23,6 +23,10 @@ set(vtkPVVTKExtensionsCosmoTools_INCLUDE_DIRS
     ${GENERIC_IO_INCLUDE_DIR}
     )
 
+# advanced option for whether to use voronoi.h from cosmotools
+option(COSMOTOOLS_HAS_VORONOI OFF)
+mark_as_advanced(COSMOTOOLS_HAS_VORONOI)
+
 # List of module sources
 set(Module_SRCS
 
@@ -30,7 +34,10 @@ set(Module_SRCS
   vtkACosmoReader.cxx
   vtkPCosmoReader.cxx
   vtkPGenericIOReader.cxx
-  vtkPVoronoiReader.cxx
+  vtkGenericIOUtilities.cxx
+  vtkPGenericIOMultiBlockReader.cxx
+  vtkPGenericIOMultiBlockWriter.cxx
+  vtkPMultiResolutionGenericIOReader.cxx
 
   ## Filters
   vtkMinkowskiFilter.cxx
@@ -38,10 +45,19 @@ set(Module_SRCS
   vtkPMergeConnected.cxx
   )
 
+set_source_files_properties(
+  vtkGenericIOUtilities.cxx
+  WRAP_EXCLUDE
+  )
+
+if (${COSMOTOOLS_HAS_VORONOI})
+  list(APPEND Module_SRCS vtkPVoronoiReader.cxx)
+endif()
+
 vtk_module_library(vtkPVVTKExtensionsCosmoTools ${Module_SRCS})
 target_link_libraries(vtkPVVTKExtensionsCosmoTools
-                      LINK_PRIVATE 
-                        ${CosmoToolsExternalLibs} 
+                      LINK_PRIVATE
+                        ${CosmoToolsExternalLibs}
                         pthread
                       )
 vtk_mpi_link(vtkPVVTKExtensionsCosmoTools)
