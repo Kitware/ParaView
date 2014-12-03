@@ -60,7 +60,7 @@ pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
   pqEventTranslator* testRecorder = testUtil ? testUtil->eventTranslator() : NULL;
   if (testPlayer)
     {
-    QObject::connect(testPlayer, SIGNAL(started()),
+    QObject::connect(testPlayer, SIGNAL(restarted()),
       this, SLOT(prepareForTest()));
     }
   if (testRecorder)
