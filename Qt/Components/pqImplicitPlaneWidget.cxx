@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
+#include "vtkMath.h"
 #include "vtkBoundingBox.h"
 #include "vtkCamera.h"
 #include "vtkPVDataInformation.h"
@@ -68,15 +69,15 @@ public:
     NormalProperty(0)
   {
   }
-  
+
   ~pqImplementation()
   {
     delete this->UI;
   }
-  
+
   /// Stores the Qt widgets
   Ui::pqImplicitPlaneWidget* const UI;
-  
+
   vtkSMDoubleVectorProperty* OriginProperty;
   vtkSMDoubleVectorProperty* NormalProperty;
   pqPropertyLinks Links;
@@ -142,28 +143,30 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
     SIGNAL(clicked()), this, SLOT(resetBounds()));
   connect(this->Implementation->UI->useCenterBounds,
     SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
+  connect(this->Implementation->UI->resetCameraToNormal,
+    SIGNAL(clicked()), this, SLOT(resetCameraToNormal()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
 
   // Trigger a render when use explicitly edits the positions.
-  QObject::connect(this->Implementation->UI->originX, 
-    SIGNAL(editingFinished()), 
+  QObject::connect(this->Implementation->UI->originX,
+    SIGNAL(editingFinished()),
     this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->originY, 
-    SIGNAL(editingFinished()), 
+  QObject::connect(this->Implementation->UI->originY,
+    SIGNAL(editingFinished()),
     this, SLOT(render()), Qt::QueuedConnection);
   QObject::connect(this->Implementation->UI->originZ,
-    SIGNAL(editingFinished()), 
+    SIGNAL(editingFinished()),
     this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalX, 
-    SIGNAL(editingFinished()), 
+  QObject::connect(this->Implementation->UI->normalX,
+    SIGNAL(editingFinished()),
     this, SLOT(render()), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->UI->normalY, 
-    SIGNAL(editingFinished()), 
+  QObject::connect(this->Implementation->UI->normalY,
+    SIGNAL(editingFinished()),
     this, SLOT(render()), Qt::QueuedConnection);
   QObject::connect(this->Implementation->UI->normalZ,
-    SIGNAL(editingFinished()), 
+    SIGNAL(editingFinished()),
     this, SLOT(render()), Qt::QueuedConnection);
 
   // We need to mark the plane when inteaction starts.
@@ -183,7 +186,7 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::createWidget(pqServer* server)
 {
-  vtkSMNewWidgetRepresentationProxy* widget = 
+  vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
     get3DWidget("ImplicitPlaneWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
@@ -195,7 +198,7 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
   // The adaptor is used to format the text value.
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->originX, 
+    this->Implementation->UI->originX,
     "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Origin"), 0);
 
@@ -243,7 +246,7 @@ void pqImplicitPlaneWidget::setControlledProperty(const char* function,
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* origin_property)
 {
-  this->Implementation->OriginProperty = 
+  this->Implementation->OriginProperty =
     vtkSMDoubleVectorProperty::SafeDownCast(origin_property);
   if (origin_property->GetXMLLabel())
     {
@@ -255,7 +258,7 @@ void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* origin_property)
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* normal_property)
 {
-  this->Implementation->NormalProperty = 
+  this->Implementation->NormalProperty =
     vtkSMDoubleVectorProperty::SafeDownCast(normal_property);
   if (normal_property->GetXMLLabel())
     {
@@ -331,7 +334,7 @@ void pqImplicitPlaneWidget::select()
   vtkBoundingBox box(input_bounds);
   box.AddPoint(center);
   pqFixBounds(box);
-  box.GetBounds(input_bounds);  
+  box.GetBounds(input_bounds);
 
   vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
   widget->UpdateVTKObjects();
@@ -459,7 +462,7 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
   if (widget)
     {
     pqRenderView* renView = qobject_cast<pqRenderView*>(this->renderView());
-    if (vtkCamera* const camera = renView? 
+    if (vtkCamera* const camera = renView ?
       renView->getRenderViewProxy()->GetActiveCamera() : 0)
       {
       double camera_normal[3];
@@ -471,6 +474,29 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
       widget->UpdateVTKObjects();
       this->render();
       this->setModified();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::resetCameraToNormal()
+{
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  if (widget)
+    {
+    pqRenderView* renView = qobject_cast<pqRenderView*>(this->renderView());
+    if (vtkCamera* const camera = renView ?
+        renView->getRenderViewProxy()->GetActiveCamera() : 0)
+      {
+      double up[3], forward[3];
+      camera->GetViewUp(up);
+      vtkSMPropertyHelper(widget, "Normal").Get(forward, 3);
+      vtkMath::Cross(up, forward, up);
+      vtkMath::Cross(forward, up, up);
+      renView->resetViewDirection(
+        forward[0], forward[1], forward[2], up[0], up[1], up[2]);
+
+      this->render();
       }
     }
 }

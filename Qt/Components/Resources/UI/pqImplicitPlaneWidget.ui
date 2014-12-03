@@ -151,6 +151,13 @@
        </property>
       </widget>
      </item>
+      <item row="4" column="0" >
+        <widget class="QPushButton" name="resetCameraToNormal" >
+          <property name="text" >
+            <string>Reset Camera to Normal</string>
+          </property>
+        </widget>
+      </item>
     </layout>
    </item>
   </layout>
@@ -171,11 +178,12 @@
   <tabstop>normalY</tabstop>
   <tabstop>normalZ</tabstop>
   <tabstop>useXNormal</tabstop>
-  <tabstop>resetBounds</tabstop>
   <tabstop>useYNormal</tabstop>
   <tabstop>useZNormal</tabstop>
   <tabstop>useCameraNormal</tabstop>
+  <tabstop>resetBounds</tabstop>
   <tabstop>useCenterBounds</tabstop>
+  <tabstop>resetCameraToNormal</tabstop>
  </tabstops>
  <resources/>
  <connections/>
