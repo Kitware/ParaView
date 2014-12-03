@@ -28,8 +28,12 @@
 #include "vtkRenderer.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
+#include "vtkTextActor.h"
+#include "vtkTextProperty.h"
+#include "vtkTextRepresentation.h"
 
 #include <cassert>
+#include <sstream>
 
 class vtkPVOrthographicSliceViewInteractorStyle : public vtkPVInteractorStyle
 {
@@ -82,7 +86,9 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
   : Renderers(),
   OrthographicInteractorStyle(),
   SlicePositionAxes2D(),
-  SlicePositionAxes3D()
+  SlicePositionAxes3D(),
+  SliceAnnotations(),
+  SliceAnnotationsVisibility(false)
 {
   this->CenterAxes->SetVisibility(0);
   this->SliceIncrements[0] = this->SliceIncrements[1] = this->SliceIncrements[2] = 1.0;
@@ -94,11 +100,21 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
     this->Renderers[cc]->SetBackground(0.5, 0.5, 0.5);
     this->Renderers[cc]->GetActiveCamera()->SetParallelProjection(1);
     window->AddRenderer(this->Renderers[cc].GetPointer());
+
     this->SlicePositionAxes2D[cc]->SetComputeNormals(0);
     this->SlicePositionAxes2D[cc]->SetPickable(0);
     this->SlicePositionAxes2D[cc]->SetUseBounds(1);
     this->SlicePositionAxes2D[cc]->SetScale(10, 10, 10);
     this->Renderers[cc]->AddActor(this->SlicePositionAxes2D[cc].GetPointer());
+
+    this->SliceAnnotations[cc]->SetRenderer(this->Renderers[cc].GetPointer());
+    this->SliceAnnotations[cc]->SetText("Slice Annotation");
+    this->SliceAnnotations[cc]->BuildRepresentation();
+    this->SliceAnnotations[cc]->SetWindowLocation(vtkTextRepresentation::AnyLocation);
+    this->SliceAnnotations[cc]->GetTextActor()->SetTextScaleModeToNone();
+    this->SliceAnnotations[cc]->GetTextActor()->GetTextProperty()->SetJustificationToLeft();
+    this->SliceAnnotations[cc]->SetVisibility(0);
+    this->Renderers[cc]->AddActor(this->SliceAnnotations[cc].GetPointer());
     }
 
   this->SlicePositionAxes3D->SetComputeNormals(0);
@@ -165,14 +181,28 @@ void vtkPVOrthographicSliceView::SetInteractionMode(int mode)
 //----------------------------------------------------------------------------
 void vtkPVOrthographicSliceView::ResetCamera()
 {
+  this->Superclass::ResetCamera();
+  double bounds[6];
+  this->GeometryBounds.GetBounds(bounds);
   for (int cc=0; cc < 3; cc++)
     {
-    this->SlicePositionAxes2D[cc]->SetUseBounds(0);
-    this->Renderers[cc]->ResetCamera();
-    this->SlicePositionAxes2D[cc]->SetUseBounds(1);
+    this->Renderers[cc]->ResetCamera(bounds);
+    // do this explicitly to ensure the SlicePositionAxes2D doesn't get clipped.
     this->Renderers[cc]->ResetCameraClippingRange();
     }
-  this->Superclass::ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+// Note this is called on all processes.
+void vtkPVOrthographicSliceView::ResetCamera(double bounds[6])
+{
+  this->Superclass::ResetCamera(bounds);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->Renderers[cc]->ResetCamera(bounds);
+    // do this explicitly to ensure the SlicePositionAxes2D doesn't get clipped.
+    this->Renderers[cc]->ResetCameraClippingRange();
+    }
 }
 //----------------------------------------------------------------------------
 vtkRenderer* vtkPVOrthographicSliceView::GetRenderer(int index)
@@ -210,6 +240,16 @@ void vtkPVOrthographicSliceView::Initialize(unsigned int id)
   double lowerLeft[]={0, 0, 0.5, 0.5};
   this->Renderers[FRONT_VIEW]->SetViewport(lowerLeft);
   this->SynchronizedWindows->AddRenderer(id, this->Renderers[FRONT_VIEW].GetPointer(), lowerLeft);
+
+  for (int cc=0; cc < 3; cc++)
+    {
+    double viewport[4];
+    this->Renderers[cc]->GetViewport(viewport);
+    // BUG: one would think x coordinate should be viewport[0]. But there's
+    // something funny with vtkTextRepresentation. We x coordinate relative to
+    // the renderer's viewport, but y coordinate relative to the window!
+    this->SliceAnnotations[cc]->SetPosition(0+0.01, viewport[1] + 0.01);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -249,12 +289,6 @@ void vtkPVOrthographicSliceView::UpdateCenterAxes()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOrthographicSliceView::ResetCameraClippingRange()
-{
-  this->Superclass::ResetCameraClippingRange();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
 {
   if (this->ModelTransformationMatrix->GetMTime() > this->ModelTransformationMatrixUpdateTime)
@@ -284,6 +318,28 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
       fp[0] + axis[cc].GetData()[0] * focaldistance,
       fp[1] + axis[cc].GetData()[1] * focaldistance,
       fp[2] + axis[cc].GetData()[2] * focaldistance);
+    }
+
+  // Setup slice annotations.
+  // const char* axis_names[] = {"Sagittal", "Axial", "Coronal" };
+  const char* view_names[] = {"Right Side", "Top", "Front" };
+  const char* axis_names[] = {"X", "Y", "Z" };
+  for (int cc=0; cc <3; cc++)
+    {
+    if (const char* label = this->GetAxisLabel(cc))
+      {
+      axis_names[cc] = label;
+      view_names[cc] = label;
+      }
+    }
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->SliceAnnotations[cc]->SetVisibility(this->SliceAnnotationsVisibility? 1 : 0);
+    std::ostringstream stream;
+    stream << view_names[cc] << " View ( " << axis_names[cc] << "=" << this->SlicePosition[cc] << ")\n";
+    stream << axis_names[(cc+1)%3] << "=" << this->SlicePosition[(cc+1)%3] << ",";
+    stream << axis_names[(cc+2)%3] << "=" << this->SlicePosition[(cc+2)%3];
+    this->SliceAnnotations[cc]->SetText(stream.str().c_str());
     }
   this->Superclass::AboutToRenderOnLocalProcess(interactive);
 }
@@ -332,6 +388,56 @@ void vtkPVOrthographicSliceView::OnMouseWheelBackwardEvent()
       }
     }
   this->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, pos);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetBackground(double r, double g, double b)
+{
+  this->Superclass::SetBackground(r, g, b);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->Renderers[cc]->SetBackground(r, g, b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetBackground2(double r, double g, double b)
+{
+  this->Superclass::SetBackground2(r, g, b);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->Renderers[cc]->SetBackground2(r, g, b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetBackgroundTexture(vtkTexture* val)
+{
+  this->Superclass::SetBackgroundTexture(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->Renderers[cc]->SetBackgroundTexture(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetGradientBackground(int val)
+{
+  this->Superclass::SetGradientBackground(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->Renderers[cc]->SetGradientBackground(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetTexturedBackground(int val)
+{
+  this->Superclass::SetTexturedBackground(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->Renderers[cc]->SetTexturedBackground(val);
+    }
 }
 
 //----------------------------------------------------------------------------

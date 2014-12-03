@@ -363,6 +363,7 @@ public:
   // manager XML.  Returns the XML element for the hints associated with
   // this property, if any, otherwise returns NULL.
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
+  void SetHints(vtkPVXMLElement* hints);
 
   // Description:
   // Overridden to support blocking of modified events.
@@ -480,7 +481,6 @@ protected:
   // Updates state from an XML element. Returns 0 on failure.
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
 
-  void SetHints(vtkPVXMLElement* hints);
   vtkPVXMLElement* Hints;
 
   char* Command;

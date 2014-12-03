@@ -60,6 +60,14 @@ public:
   // synced among all ranks in Update().
   void GetDataBounds(double bounds[6]);
 
+  // Description:
+  // HACK: method to force representation type to "Slices".
+  static void ForceRepresentationType(vtkSMProxy* reprProxy, const char* type);
+
+  // Description:
+  // HACK: Get source's input data bounds (or BoundingBoxInModelCoordinates if
+  // present).
+  static bool GetDataBounds(vtkSMSourceProxy* source, int opport, double bounds[6]);
 //BTX
 protected:
   vtkSMMultiSliceViewProxy();

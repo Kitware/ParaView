@@ -20,6 +20,7 @@
 #define __vtkSMOrthographicSliceViewProxy_h
 
 #include "vtkSMRenderViewProxy.h"
+class vtkSMRepresentationProxy;
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMOrthographicSliceViewProxy : public vtkSMRenderViewProxy
 {
@@ -33,10 +34,21 @@ public:
   virtual const char* GetRepresentationType(
     vtkSMSourceProxy* producer, int outputPort);
 
+  // Description:
+  // Overridden to set initial default slices when a representation is created.
+  // Not sure that's the best way to do this, but leaving the logic unchanged in
+  // this pass.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy* proxy, int outputPort);
+
 //BTX
 protected:
   vtkSMOrthographicSliceViewProxy();
   ~vtkSMOrthographicSliceViewProxy();
+
+  // Description:
+  void InitDefaultSlices(vtkSMSourceProxy* source, int opport,
+    vtkSMRepresentationProxy* repr);
 
   virtual void CreateVTKObjects();
   void OnMouseWheelBackwardEvent(vtkObject*, unsigned long, void* calldata);

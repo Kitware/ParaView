@@ -16,10 +16,14 @@
 
 #include "vtkBoundingBox.h"
 #include "vtkClientServerStream.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVMultiSliceView.h"
 #include "vtkPVSession.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
@@ -153,60 +157,103 @@ vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
 {
   vtkSMRepresentationProxy* repr = this->Superclass::CreateDefaultRepresentation(
     proxy,outputPort);
-  if (repr)
+  if (repr && strcmp(repr->GetXMLName(), "CompositeMultiSliceRepresentation") == 0)
     {
     this->InitDefaultSlices(vtkSMSourceProxy::SafeDownCast(proxy), outputPort, repr);
-    return repr;
     }
 
-  // Currently only images can be shown
-  // vtkErrorMacro("This view only supports Multi-Slice representation.");
-  return 0;
+  return repr;
+}
+
+//-----------------------------------------------------------------------------
+// HACK: method to force representation type to "Slices".
+void vtkSMMultiSliceViewProxy::ForceRepresentationType(
+  vtkSMProxy* repr, const char* type)
+{
+  // HACK: to set default representation type to Slices.
+  vtkSMPropertyHelper reprProp(repr, "Representation");
+  reprProp.Set(type);
+  vtkNew<vtkPVXMLElement> nodefault;
+  nodefault->SetName("NoDefault");
+  if (vtkPVXMLElement* hints = repr->GetProperty("Representation")->GetHints())
+    {
+    hints->AddNestedElement(nodefault.GetPointer());
+    }
+  else
+    {
+    vtkNew<vtkPVXMLElement> hints2;
+    hints2->SetName("Hints");
+    hints2->AddNestedElement(nodefault.GetPointer());
+    repr->GetProperty("Representation")->SetHints(hints2.GetPointer());
+    }
+}
+
+//-----------------------------------------------------------------------------
+// HACK: Get representation's input data bounds.
+bool vtkSMMultiSliceViewProxy::GetDataBounds(
+  vtkSMSourceProxy* source, int opport, double bounds[6])
+{
+  vtkPVDataInformation* info = source? source->GetDataInformation(opport) : NULL;
+  if (info)
+    {
+    if (vtkPVArrayInformation* ainfo =
+      info->GetFieldDataInformation()->GetArrayInformation("BoundingBoxInModelCoordinates"))
+      {
+      // use "original basis" bounds,  if present.
+      if (ainfo->GetNumberOfTuples() == 1 && ainfo->GetNumberOfComponents() == 6)
+        {
+        for (int cc=0; cc < 6; cc++)
+          {
+          bounds[cc] = ainfo->GetComponentRange(cc)[0];
+          }
+        return true;
+        }
+      }
+    info->GetBounds(bounds);
+    return vtkBoundingBox::IsValid(bounds);
+    }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMMultiSliceViewProxy::InitDefaultSlices(
-  vtkSMSourceProxy* source, int opport, vtkSMRepresentationProxy*)
+  vtkSMSourceProxy* source, int opport, vtkSMRepresentationProxy* repr)
 {
   if (!source)
     {
     return;
     }
-  // FIXME:UDA
-    return;
-  double bounds[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
-                       VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
-                       VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
-  vtkPVDataInformation* info = source->GetDataInformation(opport);
-  if(info)
-    {
-    info->GetBounds(bounds);
-    if(vtkBoundingBox::IsValid(bounds))
-      {
-      double center[3];
-      for(int i=0;i<3;i++)
-        {
-        center[i] = (bounds[2*i] + bounds[2*i+1])/2.0;
-        }
-      // Add orthogonal X,Y,Z slices based on center position.
-      std::vector<double> xSlices =
-        vtkSMPropertyHelper(this, "XSlicesValues").GetDoubleArray();
-      std::vector<double> ySlices =
-        vtkSMPropertyHelper(this, "YSlicesValues").GetDoubleArray();
-      std::vector<double> zSlices =
-        vtkSMPropertyHelper(this, "ZSlicesValues").GetDoubleArray();
+  vtkSMMultiSliceViewProxy::ForceRepresentationType(repr, "Slices");
 
+  double bounds[6];
+  if (vtkSMMultiSliceViewProxy::GetDataBounds(source, opport, bounds))
+    {
+    vtkBoundingBox bbox(bounds);
+    double center[3];
+    bbox.GetCenter(center);
+
+    // Add orthogonal X,Y,Z slices based on center position.
+    std::vector<double> xSlices =
+      vtkSMPropertyHelper(this, "XSlicesValues").GetDoubleArray();
+    std::vector<double> ySlices =
+      vtkSMPropertyHelper(this, "YSlicesValues").GetDoubleArray();
+    std::vector<double> zSlices =
+      vtkSMPropertyHelper(this, "ZSlicesValues").GetDoubleArray();
+
+    if (xSlices.size() == 0 && ySlices.size() == 0 && zSlices.size() == 0)
+      {
       xSlices.push_back(center[0]);
       ySlices.push_back(center[1]);
       zSlices.push_back(center[2]);
 
       vtkSMPropertyHelper(this, "XSlicesValues").Set(&xSlices[0],
-       static_cast<unsigned int>(xSlices.size()));
+        static_cast<unsigned int>(xSlices.size()));
       vtkSMPropertyHelper(this, "YSlicesValues").Set(&ySlices[0],
-       static_cast<unsigned int>(ySlices.size()));
+        static_cast<unsigned int>(ySlices.size()));
       vtkSMPropertyHelper(this, "ZSlicesValues").Set(&zSlices[0],
-       static_cast<unsigned int>(ySlices.size()));
+        static_cast<unsigned int>(ySlices.size()));
       }
+    this->UpdateVTKObjects();
     }
 }
 

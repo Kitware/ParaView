@@ -63,6 +63,7 @@ public:
   using Superclass::GetRenderer;
 
   virtual void ResetCamera();
+  virtual void ResetCamera(double bounds[6]);
   virtual void SetInteractionMode(int mode);
 
   // Description:
@@ -75,8 +76,22 @@ public:
   vtkSetVector3Macro(SliceIncrements, double);
 
   // Description:
+  // Get/Set whether to show slice annotations.
+  vtkSetMacro(SliceAnnotationsVisibility, bool);
+  vtkGetMacro(SliceAnnotationsVisibility, bool);
+
+
+  // Description:
   // To avoid confusion, we don't show the center axes at all in this view.
   virtual void SetCenterAxesVisibility(bool){}
+
+  //*****************************************************************
+  virtual void SetBackground(double r, double g, double b);
+  virtual void SetBackground2(double r, double g, double b);
+  virtual void SetBackgroundTexture(vtkTexture* val);
+  virtual void SetGradientBackground(int val);
+  virtual void SetTexturedBackground(int val);
+
 
 //BTX
 protected:
@@ -85,14 +100,16 @@ protected:
 
   virtual void AboutToRenderOnLocalProcess(bool interactive);
   virtual void UpdateCenterAxes();
-  virtual void ResetCameraClippingRange();
 
   vtkNew<vtkRenderer> Renderers[3];
   vtkNew<vtkPVOrthographicSliceViewInteractorStyle> OrthographicInteractorStyle;
   vtkNew<vtkPVCenterAxesActor> SlicePositionAxes2D[3];
   vtkNew<vtkPVCenterAxesActor> SlicePositionAxes3D;
+  vtkNew<vtkTextRepresentation> SliceAnnotations[3];
+
   double SliceIncrements[3];
   double SlicePosition[3];
+  bool SliceAnnotationsVisibility;
 private:
   vtkPVOrthographicSliceView(const vtkPVOrthographicSliceView&); // Not implemented
   void operator=(const vtkPVOrthographicSliceView&); // Not implemented

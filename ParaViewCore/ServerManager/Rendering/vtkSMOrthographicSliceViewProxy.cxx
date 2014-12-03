@@ -14,11 +14,14 @@
 =========================================================================*/
 #include "vtkSMOrthographicSliceViewProxy.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVOrthographicSliceView.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMMultiSliceViewProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
@@ -81,6 +84,47 @@ const char* vtkSMOrthographicSliceViewProxy::GetRepresentationType(
   pp->RemoveAllUncheckedProxies();
   return sg? "CompositeOrthographicSliceRepresentation" :
     this->Superclass::GetRepresentationType(producer, outputPort);
+}
+
+//----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMOrthographicSliceViewProxy::CreateDefaultRepresentation(
+  vtkSMProxy* proxy, int outputPort)
+{
+  vtkSMRepresentationProxy* repr = this->Superclass::CreateDefaultRepresentation(
+    proxy,outputPort);
+  if (repr && strcmp(repr->GetXMLName(), "CompositeOrthographicSliceRepresentation") == 0)
+    {
+    this->InitDefaultSlices(vtkSMSourceProxy::SafeDownCast(proxy), outputPort, repr);
+    }
+  return repr;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMOrthographicSliceViewProxy::InitDefaultSlices(
+  vtkSMSourceProxy* source, int opport, vtkSMRepresentationProxy* repr)
+{
+  if (!source)
+    {
+    return;
+    }
+
+  // HACK: to set default representation type to Slices.
+  vtkSMMultiSliceViewProxy::ForceRepresentationType(repr, "Slices");
+  double bounds[6];
+  if (vtkSMMultiSliceViewProxy::GetDataBounds(source, opport, bounds))
+    {
+    vtkBoundingBox bbox(bounds);
+
+    double center[3];
+    bbox.GetCenter(center);
+    vtkSMPropertyHelper(this, "SlicePosition").Set(center, 3);
+
+    double lengths[3];
+    bbox.Scale(0.1, 0.1, 0.1);
+    bbox.GetLengths(lengths);
+    vtkSMPropertyHelper(this, "SliceIncrements").Set(lengths, 3);
+    this->UpdateVTKObjects();
+    }
 }
 
 //----------------------------------------------------------------------------

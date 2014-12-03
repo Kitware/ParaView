@@ -2256,12 +2256,25 @@
         </Documentation>
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+
       <DoubleVectorProperty name="SliceIncrements"
         command="SetSliceIncrements"
         number_of_elements="3"
         default_values="1 1 1">
         <DoubleRangeDomain name="range" />
-    </DoubleVectorProperty>
+        <Documentation>
+          When interacting using the thumb wheel, set the increments to use
+          to change the slice position.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ShowSliceAnnotations"
+        command="SetSliceAnnotationsVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
     </OrthographicSliceViewProxy>
 
     <!-- ================================================================== -->
