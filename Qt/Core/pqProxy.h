@@ -126,6 +126,11 @@ public:
   /// Returns the proxy manager by calling this->getProxy()->GetProxyManager();
   vtkSMSessionProxyManager* proxyManager() const;
 
+  /// Returns a pqProxy instance, of any, whose helper proxy is the *aproxy*.
+  /// This is not the fastest implementation, so beware of that.
+  /// If found, the key is set to the helper key.
+  static pqProxy* findProxyWithHelper(vtkSMProxy* aproxy, QString& key);
+
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);

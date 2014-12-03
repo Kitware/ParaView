@@ -173,20 +173,19 @@ public:
     }
   QString cueName(pqAnimationCue* cue)
     {
-    QString name;
     if(this->cameraCue(cue))
       {
-      name = "Camera";
+      return "Camera";
       }
     else if (this->pythonCue(cue))
       {
-      name = "Python";
+      return "Python";
       }
     else
       {
-      pqServerManagerModel* model = 
+      pqServerManagerModel* model =
         pqApplicationCore::instance()-> getServerManagerModel();
-      
+
       vtkSMProxy* pxy = cue->getAnimatedProxy();
       vtkSMProperty* pty = cue->getAnimatedProperty();
       QString p = pty->GetXMLLabel();
@@ -194,50 +193,26 @@ public:
         {
         p = QString("%1 (%2)").arg(p).arg(cue->getAnimatedPropertyIndex());
         }
-      
-      QList<pqProxy*> pxys = model->findItems<pqProxy*>();
-      for(int i=0; i<pxys.size(); i++)
+
+      if (pqProxy* animation_pqproxy = model->findItem<pqProxy*>(pxy))
         {
-        if(pxys[i]->getProxy() == pxy)
-          {
-          QString n = pxys[i]->getSMName();
-          name = QString("%1 - %2").arg(n).arg(p);
-          }
+        return QString("%1 - %2").arg(animation_pqproxy->getSMName()).arg(p);
         }
-      
+
       // could be a helper proxy
-      for(int i=0; i<pxys.size(); i++)
+      QString helper_key;
+      if (pqProxy* pqproxy = pqProxy::findProxyWithHelper(pxy, helper_key))
         {
-        pqProxy* pqproxy = pxys[i];
-        QList<QString> keys = pqproxy->getHelperKeys();
-        for(int j=0; j<keys.size(); j++)
+        vtkSMProperty* prop = pqproxy->getProxy()->GetProperty(helper_key.toLatin1().data());
+        if (prop)
           {
-          QString key = keys[j];
-          QList<vtkSMProxy*> helpers = pqproxy->getHelperProxies(keys[j]);
-          int idx = helpers.indexOf(pxy);
-          if(idx != -1)
-            {
-            vtkSMProperty* prop =
-              pqproxy->getProxy()->GetProperty(key.toLatin1().data());
-            QString n = pqproxy->getSMName();
-            if (prop)
-              {
-              QString pp = prop->GetXMLLabel();
-              name = QString("%1 - %2 - %3").arg(n).arg(pp).arg(p);
-              }
-            else
-              {
-              name = QString("%1 - %2").arg(n).arg(p);
-              if (helpers.size() > 0)
-                {
-                name = QString("%1 [%2]").arg(name).arg(idx);
-                }
-              }
-            }
+          return QString("%1 - %2 - %3")
+            .arg(pqproxy->getSMName()).arg(prop->GetXMLLabel()).arg(p);
           }
+        return QString("%1 - %2").arg(pqproxy->getSMName()).arg(p);
         }
       }
-    return name;
+    return QString("<unrecognized>");
     }
   // returns if this is a cue for animating a camera
   bool cameraCue(pqAnimationCue* cue)
