@@ -336,7 +336,7 @@ void vtkPVOrthographicSliceView::AboutToRenderOnLocalProcess(bool interactive)
     {
     this->SliceAnnotations[cc]->SetVisibility(this->SliceAnnotationsVisibility? 1 : 0);
     std::ostringstream stream;
-    stream << view_names[cc] << " View ( " << axis_names[cc] << "=" << this->SlicePosition[cc] << ")\n";
+    stream << view_names[cc] << " View (" << axis_names[cc] << "=" << this->SlicePosition[cc] << ")\n";
     stream << axis_names[(cc+1)%3] << "=" << this->SlicePosition[(cc+1)%3] << ",";
     stream << axis_names[(cc+2)%3] << "=" << this->SlicePosition[(cc+2)%3];
     this->SliceAnnotations[cc]->SetText(stream.str().c_str());
