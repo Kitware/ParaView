@@ -7,7 +7,7 @@ started tracking these (starting after version 4.2).
 Changes in 4.3
 --------------
 
-###1. Replaced `pqCurrentTimeToolbar` with `pqAnimationTimeWidget`###
+###Replaced `pqCurrentTimeToolbar` with `pqAnimationTimeWidget`###
 
 `pqCurrentTimeToolbar` was a `QToolbar` subclass designed to be used in an
 application to allow the users to view/change the animation time. We
@@ -22,3 +22,9 @@ applications to change the animation *play mode*, if desired. The rest of the
 behavior of this class is similar to `pqCurrentTimeToolbar` and hence should not
 affect applications (besides need to update any tests since the widget names
 have now changed).
+
+###vtkSITimeLabelProperty is no longer available###
+
+`vtkSITimeLabelProperty` was used as the *si\_class* for **TimeLabelAnnotation**
+property. This was unnecessary. The default `vtkSIStringVectorProperty` will
+work just fine.
