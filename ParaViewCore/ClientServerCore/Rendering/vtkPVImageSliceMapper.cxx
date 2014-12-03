@@ -28,6 +28,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkExecutive.h"
 #include "vtkDataArray.h"
+#include "vtkScalarsToColors.h"
 //-----------------------------------------------------------------------------
 class vtkPVImageSliceMapper::vtkObserver : public vtkCommand
 {
