@@ -42,6 +42,8 @@ vtkPVBagChartRepresentation::vtkPVBagChartRepresentation() :
 {
   this->BagColor[0] = 1.0;
   this->BagColor[1] = this->BagColor[2] = 0.0;
+  this->SelectionColor[0] = this->SelectionColor[2] = 1.0;
+  this->SelectionColor[1] = 0.0;
   this->LineColor[0] = this->LineColor[1] = this->LineColor[2] = 0.0;
   this->PointColor[0] = this->PointColor[1] = this->PointColor[2] = 0.0;
 }
@@ -150,6 +152,9 @@ void vtkPVBagChartRepresentation::PrepareForRendering()
   plot->GetPen()->SetLineType(this->LineStyle);
   plot->GetPen()->SetColorF(this->PointColor);
   plot->GetPen()->SetOpacityF(1.0);
+
+  // Set selection point pen properties
+  plot->GetSelectionPen()->SetColorF(this->SelectionColor);
 
   if (plotInput)
     {

@@ -239,6 +239,7 @@ public:
         vtkColor3d color = this->GetSeriesParameter(tableName, columnName,
           this->Colors, vtkColor3d(0, 0, 0));
         plot->SetColor(color.GetRed(), color.GetGreen(), color.GetBlue());
+        plot->GetSelectionPen()->SetColorF(self->SelectionColor);
 
         plot->SetWidth(this->GetSeriesParameter(tableName, columnName,
             this->LineThicknesses, 2));
@@ -305,6 +306,9 @@ vtkXYChartRepresentation::vtkXYChartRepresentation()
   UseIndexForXAxis(true),
   PlotDataHasChanged(false)
 {
+  this->SelectionColor[0] = 1.;
+  this->SelectionColor[1] = 0.;
+  this->SelectionColor[2] = 1.;
 }
 
 //----------------------------------------------------------------------------

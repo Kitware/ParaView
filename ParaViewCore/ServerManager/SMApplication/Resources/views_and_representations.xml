@@ -5477,7 +5477,21 @@
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
       </StringVectorProperty>
-
+      <!--
+          Set the palette SelectionColor color to all the plots in the chart.
+        -->
+      <DoubleVectorProperty command="SetSelectionColor"
+                            default_values="1.0 0.0 1.0"
+                            name="Color"
+                            number_of_elements="3"
+                            panel_visibility="never">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+        </Hints>
+      </DoubleVectorProperty>
       <SubProxy>
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
@@ -6583,6 +6597,35 @@
         <Property name="PointSize" />
         <Property name="PointColor" />
       </PropertyGroup>
+      <!--
+          Set the palette SelectionColor color to all the plots in the chart.
+        -->
+      <DoubleVectorProperty command="SetSelectionColor"
+                            default_values="1.0 0.0 1.0"
+                            name="Color"
+                            number_of_elements="3"
+                            panel_visibility="never">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <SubProxy>
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->
@@ -6786,6 +6829,21 @@
         <Property name="SeriesLabel"
                   function="SeriesLabel" />
       </PropertyGroup>
+      <!--
+          Set the palette SelectionColor color to all the plots in the chart.
+        -->
+      <DoubleVectorProperty command="SetSelectionColor"
+                            default_values="1.0 0.0 1.0"
+                            name="Color"
+                            number_of_elements="3"
+                            panel_visibility="never">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+        </Hints>
+      </DoubleVectorProperty>
       <SubProxy>
         <!--
           SelectionRepresentation proxy is used to convey the selection to view.
