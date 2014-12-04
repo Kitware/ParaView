@@ -39,6 +39,53 @@ def stringListDomainDecorator(props, xmlProps, uiProps, domain):
     return True
 
 #--------------------------------------------------------------------------
+# Handle TreeDomain
+#--------------------------------------------------------------------------
+def treeDomainDecorator(props, xmlProps, uiProps, domain):
+    uiProps['type'] = 'int'
+    uiProps['widget'] = 'list-n'
+
+    valMap = {}
+
+    index = 0
+    stack = []
+    stack.append([ domain.GetInformation(), [] ])
+
+    while len(stack) > 0:
+        me = stack.pop()
+
+        dataInformation = me[0]
+        accumulatedName = me[1]
+
+        if len(accumulatedName) > 1 and accumulatedName[0] == 'Element Blocks':
+            print index,' -> ',' + '.join(accumulatedName)
+            valMap[accumulatedName[-1]] = index
+
+        index += 1
+
+        infoName = None
+
+        if dataInformation:
+            infoName = dataInformation.GetCompositeDataClassName()
+
+        if infoName:
+            # May have children
+            info = dataInformation.GetCompositeDataInformation()
+            numChildren = info.GetNumberOfChildren()
+            if numChildren > 0:
+                for i in range(numChildren - 1, -1, -1):
+                    child = info.GetDataInformation(i)
+                    childName = info.GetName(i)
+                    stack.append([ child, accumulatedName + [childName] ])
+
+    #valMap = { 'Block 1': 2, 'Block 2': 3 }
+
+    uiProps['values'] = valMap
+
+    return True
+
+
+#--------------------------------------------------------------------------
 # Handle ArrayListDomain
 #--------------------------------------------------------------------------
 def arrayListDomainDecorator(props, xmlProps, uiProps, domain):
