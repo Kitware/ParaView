@@ -6,7 +6,6 @@
 set(_vtk_mpi_modules
   vtkParallelMPI
   vtkFiltersParallelImaging
-  vtkRenderingParallelLIC
   vtkIOMPIImage
   vtkFiltersParallelMPI
   # Note: Not in ParaViewXXX.xml but required by a test.
@@ -343,6 +342,7 @@ set(_vtk_modules
 
 if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
   list(APPEND _vtk_modules vtkRenderingLIC vtkIOExport)
+  list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
 endif()
 
 if (PARAVIEW_USE_MPI)

@@ -15,7 +15,6 @@
 #include "vtkIceTCompositePass.h"
 
 #include "vtkBoundingBox.h"
-#include "vtkCamera.h"
 #include "vtkCubeAxesActor.h"
 #include "vtkFloatArray.h"
 #include "vtkFrameBufferObject.h"
@@ -29,21 +28,34 @@
 #include "vtkRenderWindow.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkRenderer.h"
-#include "vtkShader2.h"
-#include "vtkShader2Collection.h"
-#include "vtkShaderProgram2.h"
 #include "vtkSmartPointer.h"
 #include "vtkTextureObject.h"
-#include "vtkTextureUnitManager.h"
 #include "vtkTilesHelper.h"
-#include "vtkUniformVariables.h"
 #include "vtkOpenGLError.h"
 
 #include <assert.h>
-#include "vtkgl.h"
 #include "vtk_icet.h"
 
+#ifdef VTKGL2
+# include "vtkMatrix3x3.h"
+# include "vtkMatrix4x4.h"
+# include "vtkOpenGLCamera.h"
+# include "vtkOpenGLShaderCache.h"
+# include "vtkShaderProgram.h"
+# include "vtkglVBOHelper.h"
+# include "vtkTextureObjectVS.h"
+# include "vtkCompositeZPassFS.h"
+#else
+# include "vtkCamera.h"
+# include "vtkgl.h"
+# include "vtkShader2.h"
+# include "vtkShader2Collection.h"
+# include "vtkShaderProgram2.h"
+# include "vtkTextureUnitManager.h"
+# include "vtkUniformVariables.h"
 extern const char *vtkIceTCompositeZPassShader_fs;
+#endif
+
 
 namespace
 {
@@ -133,7 +145,12 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
     }
   if(this->Program!=0)
     {
-    this->Program->Delete();
+#ifdef VTKGL2
+     delete this->Program;
+#else
+     this->Program->Delete();
+#endif
+    this->Program = 0;
     }
 
   this->SetKdTree(0);
@@ -178,7 +195,11 @@ void vtkIceTCompositePass::ReleaseGraphicsResources(vtkWindow* window)
     }
   if(this->Program!=0)
     {
+#ifdef VTKGL2
+    this->Program->ReleaseGraphicsResources(window);
+#else
     this->Program->ReleaseGraphicsResources();
+#endif
     }
   if(this->BackgroundTexture!=0)
     {
@@ -198,6 +219,18 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   vtkOpenGLClearErrorMacro();
 
   //icetDiagnostics(ICET_DIAG_DEBUG | ICET_DIAG_ALL_NODES);
+
+#ifdef VTKGL2
+  vtkOpenGLCamera *cam = vtkOpenGLCamera::SafeDownCast(render_state->GetRenderer()->GetActiveCamera());
+  vtkMatrix4x4 *wcvc;
+  vtkMatrix3x3 *norms;
+  vtkMatrix4x4 *vcdc;
+  cam->GetKeyMatrices(render_state->GetRenderer(),wcvc,norms,vcdc);
+  glMatrixMode(GL_PROJECTION);
+  glLoadMatrixd(vcdc->Element[0]);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadMatrixd(wcvc->Element[0]);
+#endif
 
   // Irrespective of whether we are rendering in tile/display mode or not, we
   // need to pass appropriate tile parameters to IceT.
@@ -492,6 +525,17 @@ void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow *context)
   assert("pre: context_exists" && context!=0);
   assert("pre: Program_void" && this->Program==0);
 
+#ifdef VTKGL2
+  this->Program = new vtkgl::CellBO;
+  this->Program->Program =
+    context->GetShaderCache()->ReadyShader(vtkTextureObjectVS,
+                                           vtkCompositeZPassFS,
+                                           "");
+  if (!this->Program->Program)
+    {
+    vtkErrorMacro("Shader program failed to build.");
+    }
+#else
   this->Program=vtkShaderProgram2::New();
   this->Program->SetContext(context);
 
@@ -507,6 +551,7 @@ void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow *context)
     {
     vtkErrorMacro("prog build failed");
     }
+#endif
 
   assert("post: Program_exists" && this->Program!=0);
 }
@@ -539,7 +584,25 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
   glClear(clear_mask);
   if (this->RenderPass)
     {
+#ifdef VTKGL2
+    // IceT messes with the old fixed pipeline matrices
+    // so we need to get the updated ones and pass them
+    // on to thecamera for use
+
+    vtkOpenGLCamera *cam = vtkOpenGLCamera::SafeDownCast(render_state->GetRenderer()->GetActiveCamera());
+    vtkMatrix4x4 *wcvc;
+    vtkMatrix3x3 *norms;
+    vtkMatrix4x4 *vcdc;
+    cam->GetKeyMatrices(render_state->GetRenderer(),wcvc,norms,vcdc);
+    // double projection_matrix[16];
+    // double modelview_matrix[16];
+    glGetDoublev(GL_PROJECTION_MATRIX, vcdc->Element[0]);
+    glGetDoublev(GL_MODELVIEW_MATRIX, wcvc->Element[0]);
     this->RenderPass->Render(render_state);
+    cam->Modified();
+#else
+    this->RenderPass->Render(render_state);
+#endif
     }
   if(this->DepthOnly)
     {
@@ -810,6 +873,16 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
     this->CreateProgram(context);
     }
 
+#ifdef VTKGL2
+  context->GetShaderCache()->ReadyShader(this->Program->Program);
+  this->ZTexture->Activate();
+  this->Program->Program->SetUniformi("depth", this->ZTexture->GetTextureUnit());
+  this->ZTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1,
+                                    0, 0, w, h,
+                                    this->Program->Program,
+                                    &this->Program->vao);
+  this->ZTexture->Deactivate();
+#else
   vtkTextureUnitManager *tu=context->GetTextureUnitManager();
   int sourceId=tu->Allocate();
   this->Program->GetUniformVariables()->SetUniformi("depth",1,&sourceId);
@@ -824,6 +897,7 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
 
   tu->Free(sourceId);
   vtkgl::ActiveTexture(vtkgl::TEXTURE0);
+#endif
 
   glPopAttrib();
 
@@ -881,6 +955,21 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
   glDisable(GL_INDEX_LOGIC_OP);
   glDisable(GL_COLOR_LOGIC_OP);
 
+
+  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+  glPixelStorei(GL_UNPACK_ALIGNMENT,1);// client to server
+
+  vtkOpenGLRenderWindow *context=
+    vtkOpenGLRenderWindow::SafeDownCast(
+      render_state->GetRenderer()->GetRenderWindow());
+
+#ifdef VTKGL2
+  // framebuffers have their color premultiplied by alpha.
+  glBlendFuncSeparate(GL_ONE,GL_ONE_MINUS_SRC_ALPHA,
+    GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+  this->BackgroundTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1,
+                                    0, 0, w, h, NULL, NULL);
+#else
   // framebuffers have their color premultiplied by alpha.
   vtkgl::BlendFuncSeparate(GL_ONE,GL_ONE_MINUS_SRC_ALPHA,
     GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
@@ -892,21 +981,15 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_FOG);
 
-  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1);// client to server
-
   // Copy background to colorbuffer
   vtkgl::ActiveTexture(vtkgl::TEXTURE0);
   // fixed-pipeline for vertex and fragment shaders.
   this->BackgroundTexture->Bind();
   this->BackgroundTexture->CopyToFrameBuffer(0,0,w-1,h-1,0,0,w,h);
   this->BackgroundTexture->UnBind();
+#endif
 
   // Apply (with blending) IceT color buffer on top of background
-
-  vtkOpenGLRenderWindow *context=
-    vtkOpenGLRenderWindow::SafeDownCast(
-      render_state->GetRenderer()->GetRenderWindow());
 
   if(this->PBO==0)
     {
@@ -937,11 +1020,16 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
 
   glEnable(GL_BLEND);
 
+#ifdef VTKGL2
+  this->IceTTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1,
+                                    0, 0, w, h, NULL, NULL);
+#else
   vtkgl::ActiveTexture(vtkgl::TEXTURE0);
   // fixed-pipeline for vertex and fragment shaders.
   this->IceTTexture->Bind();
   this->IceTTexture->CopyToFrameBuffer(0,0,w-1,h-1,0,0,w,h);
   this->IceTTexture->UnBind();
+#endif
 
   glPopAttrib();
 

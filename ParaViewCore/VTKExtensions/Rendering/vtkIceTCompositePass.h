@@ -41,10 +41,17 @@ class vtkPKdTree;
 class vtkIceTContext;
 class vtkPixelBufferObject;
 class vtkTextureObject;
-class vtkShaderProgram2;
 class vtkOpenGLRenderWindow;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
+#ifdef VTKGL2
+namespace vtkgl
+{
+class CellBO;
+}
+#else
+class vtkShaderProgram2;
+#endif
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -222,7 +229,11 @@ protected:
 
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;
+#ifdef VTKGL2
+  vtkgl::CellBO *Program;
+#else
   vtkShaderProgram2 *Program;
+#endif
 
   bool FixBackground;
   vtkTextureObject *BackgroundTexture;

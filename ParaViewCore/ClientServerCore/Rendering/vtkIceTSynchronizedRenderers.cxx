@@ -32,7 +32,6 @@
 #include "vtkOpenGLError.h"
 
 #include <assert.h>
-#include <vtkgl.h>
 #include <IceT.h>
 #include <IceTGL.h>
 
@@ -40,7 +39,7 @@
 
 // This pass is used to simply render an image onto the frame buffer. Used when
 // an ImageProcessingPass is set to paste the IceT composited image into the
-// frame buffer for th ImageProcessingPass.
+// frame buffer for the ImageProcessingPass.
 class vtkMyImagePasterPass : public vtkRenderPass
 {
 public:
@@ -66,7 +65,7 @@ public:
     if (this->Image.IsValid())
       {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      this->Image.PushToFrameBuffer();
+      this->Image.PushToFrameBuffer(render_state->GetRenderer());
       if (this->UseDepthBuffer)
         {
         this->IceTCompositePass->PushIceTDepthBufferToScreen(render_state);

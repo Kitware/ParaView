@@ -76,8 +76,7 @@ public:
   vtkBooleanMacro(ForceUseStrips, int);
 
   // Description:
-  // Whether to generate cell normals.  Cell normals should speed up
-  // rendering when point normals are not available.  They can only be used
+  // Whether to generate cell normals.  They can only be used
   // for poly cells now.  This option does nothing if the output
   // contains lines, verts, or strips.
   vtkSetMacro(GenerateCellNormals, int);

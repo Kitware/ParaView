@@ -388,7 +388,5 @@ void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
-#ifndef VTKGL2
   this->VolumeMapper->SetRequestedRenderMode(mode);
-#endif
 }
