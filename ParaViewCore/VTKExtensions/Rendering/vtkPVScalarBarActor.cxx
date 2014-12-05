@@ -1208,7 +1208,6 @@ void vtkPVScalarBarActor::AddValueLabelIfUnoccluded(
   double value, double pos, double diff)
 {
   double lVal = log10(value);
-  double lDiff = log10(diff);
   // The least significant digit
   int least = (lVal > 0 ? +1 : -1) * static_cast<int>(floor(fabs(lVal)));
   // The most significant digit
