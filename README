@@ -5,6 +5,9 @@ Catalyst and how to set up several different types of pipelines. The examples ca
 either be built individually or as a group. Many work in parallel as well. The tests
 are very simple and just verify that the examples run -- they don't not verify
 correctness of outputs. A description of the examples are:
+* FortranPoissonSolver -- An example of a parallel, finite difference discretization of the Poisson equation
+                          implemented in Fortran using a Conjugate Gradient solver. Instead of co-processing
+                          at the end of each time step it co-processes at the end of each iteration.
 * Fortran90FullExample -- An example of a simulation code written in Fortran
                           that is linked with Catalyst.
 * CFullExample -- An example of a simulation code written in C. This uses some
@@ -17,6 +20,7 @@ correctness of outputs. A description of the examples are:
                     This assumes a vtkUnstructuredGrid.
 * PythonFullExample -- An example of a simulation code written in Python
                        that uses Catalyst.
+* PythonDolfinExample -- An example that uses the Dolfin simulation code.
 * CxxImageDataExample -- A C++ example of a simulation code interfacing with
                          Catalyst. The grid is a vtkImageData.
 * CxxMultiPieceExample -- A C++ example of a simulation code interfacing with
