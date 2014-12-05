@@ -556,24 +556,21 @@ void vtkPGenericIOReader::LoadRawData()
 #endif
 }
 
+
 //------------------------------------------------------------------------------
 void vtkPGenericIOReader::GetPointFromRawData(
-        std::string xName, std::string yName, std::string zName,
+        int xType, void* xBuffer, int yType, void* yBuffer, int zType, void* zBuffer,
         vtkIdType idx, double pnt[3])
 {
-  std::string name[3];
-  name[0] = xName;
-  name[1] = yName;
-  name[2] = zName;
+  void* buffer[3] = {xBuffer, yBuffer, zBuffer};
 
-  int type = -1;
+  int type[3] = {xType, yType, zType};
+
   for( int i=0; i < 3; ++i )
     {
-    type = this->MetaData->VariableGenericIOType[ name[i] ];
-    void *rawBuffer = this->MetaData->RawCache[ name[i] ];
-    assert("pre: raw buffer is NULL!" && (rawBuffer != NULL) );
+    assert("pre: raw buffer is NULL!" && (buffer[i] != NULL) );
 
-    pnt[i] = vtkGenericIOUtilities::GetDoubleFromRawBuffer(type,rawBuffer,idx);
+    pnt[i] = vtkGenericIOUtilities::GetDoubleFromRawBuffer(type[i],buffer[i],idx);
     } // END for all dimensions
 }
 
@@ -605,6 +602,13 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
     return;
     }
 
+  int xType = this->MetaData->VariableGenericIOType[xaxis];
+  void* xBuffer = this->MetaData->RawCache[xaxis];
+  int yType = this->MetaData->VariableGenericIOType[yaxis];
+  void* yBuffer = this->MetaData->RawCache[yaxis];
+  int zType = this->MetaData->VariableGenericIOType[zaxis];
+  void* zBuffer = this->MetaData->RawCache[zaxis];
+
   vtkCellArray *cells = vtkCellArray::New();
   cells->Allocate(cells->EstimateSize(this->MetaData->NumberOfElements,1));
 
@@ -618,7 +622,7 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
   vtkIdType idx = 0;
   for( ;idx < nparticles; ++idx)
     {
-    this->GetPointFromRawData(xaxis,yaxis,zaxis, idx, pnt);
+    this->GetPointFromRawData(xType,xBuffer,yType,yBuffer,zType,zBuffer, idx, pnt);
     pnts->SetPoint(idx,pnt);
     cells->InsertNextCell(1,&idx);
     } // END for all points

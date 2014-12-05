@@ -171,9 +171,9 @@ protected:
   // Description:
   // Return the point from the raw data.
   void GetPointFromRawData(
-          std::string xName,
-          std::string yName,
-          std::string zName,
+          int xType, void* xBuffer,
+          int yType, void* yBuffer,
+          int zType, void* zBuffer,
           vtkIdType idx,
           double pnt[3]);
 
