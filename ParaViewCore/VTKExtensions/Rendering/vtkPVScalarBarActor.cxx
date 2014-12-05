@@ -1205,7 +1205,7 @@ void vtkPVScalarBarActor::EditAnnotations()
 
 //-----------------------------------------------------------------------------
 void vtkPVScalarBarActor::AddValueLabelIfUnoccluded(
-  double value, double pos, double diff)
+  double value, double pos, double /*diff*/)
 {
   double lVal = log10(value);
   // The least significant digit
