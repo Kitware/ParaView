@@ -509,7 +509,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                    "vtkSMStringListDomain": stringListDomainDecorator,
                                    "vtkSMArrayListDomain": arrayListDomainDecorator,
                                    "vtkSMArraySelectionDomain": arraySelectionDomainDecorator,
-                                   "vtkSMEnumerationDomain": enumerationDomainDecorator }
+                                   "vtkSMEnumerationDomain": enumerationDomainDecorator,
+                                   "vtkSMCompositeTreeDomain": treeDomainDecorator }
         self.alwaysIncludeProperties = [ 'CubeAxesVisibility' ]
         self.alwaysExcludeProperties = [ 'LookupTable', 'Texture', 'ColorArrayName',
                                          'Representations', 'HiddenRepresentations',
@@ -1029,7 +1030,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         """
         Generates an array of objects, parallel to the properties, containing
         the information needed to render ui for each property.  Not all of the
-        following attributes will always
+        following attributes will always be present.
 
         ui : [ {
                  'name': 'Clip Type',

@@ -332,24 +332,27 @@
 
                         for(var key in ui.values) {
                             if(!optionTypeSimpleArray) {
-                                var selected = (key == value || ui.values[key].toString() == value) ? 'SELECTED' : '';
+                                var selected = '';
+                                if(ui.widget === 'list-n') {
+                                    selected = (value.indexOf(ui.values[key]) !== -1) ? 'SELECTED' : '';
+                                } else {
+                                    selected = (key == value || ui.values[key].toString() == value) ? 'SELECTED' : '';
+                                }
                                 optionsBuffer.push(TEMPLATE_OPTION.replace(/VALUE/g, ui.values[key])
                                                                   .replace(/SELECTED/g, selected)
                                                                   .replace(/LABEL/g, key)
                                                                   .replace(/SIZE/g, ui.size));
                             } else {
+                                var selected = '';
                                 if(ui.widget === 'list-n') {
-                                    optionsBuffer.push(TEMPLATE_OPTION.replace(/VALUE/g, ui.values[key])
-                                                                      .replace(/SELECTED/g, (value.indexOf(ui.values[key]) !== -1) ? 'SELECTED' : '')
-                                                                      .replace(/LABEL/g, ui.values[key])
-                                                                      .replace(/SIZE/g, ui.size));
+                                    selected = (value.indexOf(ui.values[key]) !== -1) ? 'SELECTED' : '';
                                 } else {
-                                    var selected = (ui.values[key] == value) ? 'SELECTED' : '';
-                                    optionsBuffer.push(TEMPLATE_OPTION.replace(/VALUE/g, ui.values[key])
-                                                                      .replace(/SELECTED/g, selected)
-                                                                      .replace(/LABEL/g, ui.values[key])
-                                                                      .replace(/SIZE/g, ui.size));
+                                    selected = (ui.values[key] == value) ? 'SELECTED' : '';
                                 }
+                                optionsBuffer.push(TEMPLATE_OPTION.replace(/VALUE/g, ui.values[key])
+                                                                    .replace(/SELECTED/g, selected)
+                                                                    .replace(/LABEL/g, ui.values[key])
+                                                                    .replace(/SIZE/g, ui.size));
                             }
                         }
                         if(optionsBuffer.length) {

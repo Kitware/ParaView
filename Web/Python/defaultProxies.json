@@ -22,7 +22,8 @@
         { "name": "Transform" },
         { "name": "Tube" },
         { "name": "Ribbon" },
-        { "name": "WarpByScalar", "label": "Warp By Scalar" }
+        { "name": "WarpByScalar", "label": "Warp By Scalar" },
+        { "name": "ExtractBlock", "label": "Extract Blocks" }
     ],
 
     "readers": [
