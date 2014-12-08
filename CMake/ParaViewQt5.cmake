@@ -24,7 +24,6 @@ IF( NOT Qt5_FIND_COMPONENTS )
   SET (Qt5_FIND_COMPONENTS
     Concurrent
     Core
-    DBus
     Declarative
     Designer
     Gui
@@ -37,7 +36,6 @@ IF( NOT Qt5_FIND_COMPONENTS )
     Svg
     Test
     UiTools
-    WebKit
     WebKitWidgets
     Widgets
     Xml
