@@ -568,7 +568,10 @@ void vtkPVFileInformation::GetSpecialDirectories()
         if (!gotName)
           {
           cfname = CFStringCreateWithCString(kCFAllocatorDefault, "<unknown>", kCFStringEncodingASCII);
-          CFRelease(nameErr);
+          if (nameErr)
+            {
+            CFRelease(nameErr);
+            }
           }
 
         CFIndex pathSize = CFStringGetLength(url)+1;
@@ -632,8 +635,6 @@ void vtkPVFileInformation::GetSpecialDirectories()
               CFDataGetBytes(alias, CFRangeMake( 0, dataSize),
                   ( UInt8*) *tAliasHdl );
               Boolean stale;
-              CFURLRef resolvedUrl;
-              CFErrorRef err;
               if ((resolvedUrl = CFURLCreateByResolvingBookmarkData(kCFAllocatorDefault, alias, 0, NULL, NULL, &stale, &err)))
                 {
                 url = CFURLCopyFileSystemPath(resolvedUrl,
