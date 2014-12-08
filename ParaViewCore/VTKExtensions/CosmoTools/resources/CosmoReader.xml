@@ -27,18 +27,6 @@
           format.
         </Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty command="SetByteSwap"
-                         default_values="1"
-                         name="ByteSwap"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If checked, the data will be read and swapped after. This
-          option is only applicable to the LANL Cosmo format.
-        </Documentation>
-      </IntVectorProperty>
-
       <DoubleVectorProperty command="SetRL"
                             default_values="100"
                             name="BoxSideLength"
@@ -86,7 +74,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="CosmoFormat" />
-          <Property name="ByteSwap" />
+<!--          <Property name="ByteSwap" /> -->
           <Property name="BoxSideLength" />
           <Property name="Overlap" />
         </ExposedProperties>

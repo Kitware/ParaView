@@ -110,7 +110,7 @@ vtkPCosmoReader::vtkPCosmoReader()
   this->Overlap = 5;
   this->ReadMode = 1;
   this->CosmoFormat = 1;
-  this->ByteSwap = 0;
+//  this->ByteSwap = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -223,14 +223,14 @@ int vtkPCosmoReader::RequestData(
     distribute.setParameters(this->FileName, this->RL, "BLOCK");
     }
 
-  if( this->ByteSwap )
-    {
-    distribute.setByteSwap(true);
-    }
-  else
-    {
-    distribute.setByteSwap(false);
-    }
+//  if( this->ByteSwap )
+//    {
+//    distribute.setByteSwap(true);
+//    }
+//  else
+//    {
+//    distribute.setByteSwap(false);
+//    }
 
   exchange.setParameters(this->RL, this->Overlap);
 
