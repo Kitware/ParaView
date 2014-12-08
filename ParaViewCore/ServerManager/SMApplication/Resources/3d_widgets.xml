@@ -444,6 +444,7 @@
           <PropertyGroup label="Annotations">
             <Property name="DrawAnnotations" />
             <Property name="AddRangeAnnotations" />
+            <Property name="AutomaticAnnotations" />
             <Property name="DrawNanAnnotation" />
             <Property name="NanAnnotation" />
             <Property name="TextPosition" />

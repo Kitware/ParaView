@@ -905,6 +905,17 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetAutomaticAnnotations"
+                         default_values="0"
+                         name="AutomaticAnnotations"
+                         number_of_elements="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, annotations are automatically created according the number
+          of colors shown on the scalar bar.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetNanAnnotation"
                             default_values="NaN"
