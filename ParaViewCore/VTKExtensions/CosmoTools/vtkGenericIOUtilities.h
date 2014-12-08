@@ -24,6 +24,7 @@
 #include "vtkType.h"
 
 #include <algorithm>
+#include <functional>
 #include <string>
 
 #include "mpi.h"
