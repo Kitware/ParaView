@@ -24,6 +24,7 @@
 #include "vtkCommand.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkScalarsToColors.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkExecutive.h"
 #include "vtkDataArray.h"

@@ -653,8 +653,17 @@ void vtkGeometryRepresentation::SetLookupTable(vtkScalarsToColors* val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetMapScalars(int val)
 {
-  this->Mapper->SetColorMode(val);
-  this->LODMapper->SetColorMode(val);
+  if (val < 0 || val > 1)
+    {
+    vtkWarningMacro(<< "Invalid parameter for vtkGeometryRepresentation::SetMapScalars: " << val);
+    val = 0;
+    }
+  int mapToColorMode[] = {
+    VTK_COLOR_MODE_DIRECT_SCALARS,
+    VTK_COLOR_MODE_MAP_SCALARS
+  };
+  this->Mapper->SetColorMode(mapToColorMode[val]);
+  this->LODMapper->SetColorMode(mapToColorMode[val]);
 }
 
 //----------------------------------------------------------------------------
