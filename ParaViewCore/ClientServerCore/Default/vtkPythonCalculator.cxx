@@ -121,6 +121,7 @@ void vtkPythonCalculator::Exec(const char* expression)
       orgscript.push_back(expression[i]);
       }
     }
+  std::replace(orgscript.begin(), orgscript.end(), '\'', '"');
 
   // Set self to point to this
   char addrofthis[1024];
