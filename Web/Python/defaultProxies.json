@@ -11,7 +11,7 @@
 
     "filters": [
         { "name": "Calculator" },
-        { "name": "CellDataToPointData", "label": "Cell Data To Point Data" },
+        { "name": "CellDatatoPointData", "label": "Cell Data To Point Data" },
         { "name": "Clip" },
         { "name": "Contour" },
         { "name": "ExtractCTHParts", "label": "Extract CTH Parts" },
