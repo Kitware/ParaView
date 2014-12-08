@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,9 +46,9 @@ class vtkSMDoubleVectorProperty;
 class PQCOMPONENTS_EXPORT pqImplicitPlaneWidget : public pq3DWidget
 {
   typedef pq3DWidget Superclass;
-  
+
   Q_OBJECT
-  
+
 public:
   pqImplicitPlaneWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
   ~pqImplicitPlaneWidget();
@@ -69,7 +69,7 @@ public slots:
   virtual void select();
 
 protected:
-  
+
   /// Makes the 3D widget plane visible (respects the overall visibility flag)
   virtual void showPlane();
 
@@ -78,7 +78,7 @@ protected:
 
   /// Subclasses can override this method to map properties to
   /// GUI. Default implementation updates the internal datastructures
-  /// so that default implementations can be provided for 
+  /// so that default implementations can be provided for
   /// accept/reset.
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
@@ -86,7 +86,7 @@ protected:
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
-  
+
 private slots:
   /// Called to show/hide the 3D widget
   void onShow3DWidget(bool);
@@ -104,6 +104,8 @@ private slots:
   void onStartInteraction();
   /// Called whenever the 3D widget visibility is modified
   void onWidgetVisibilityChanged(bool visible);
+  /// Called to set the reset the camera to face the widget
+  void resetCameraToNormal();
 
 private:
   void get3DWidgetState(double* origin, double* normal);
