@@ -39,17 +39,29 @@ struct  vtkPVDataSetAttributesInformationSortArray
   const char * arrayName;
 };
 
-bool    vtkPVDataSetAttributesInformationAlphabeticSorting
-( const vtkPVDataSetAttributesInformationSortArray & thisArray,
+bool vtkPVDataSetAttributesInformationAlphabeticSorting(
+  const vtkPVDataSetAttributesInformationSortArray & thisArray,
   const vtkPVDataSetAttributesInformationSortArray & thatArray )
 {
+  int strcasecmpResult = 0;
 #if defined(_WIN32)
-  return  (  stricmp( thisArray.arrayName, thatArray.arrayName )  <=  0  )
-          ?  true  :  false;
+  strcasecmpResult = stricmp(thisArray.arrayName, thatArray.arrayName );
 #else
-  return  (  strcasecmp( thisArray.arrayName, thatArray.arrayName )  <=  0  )
-          ?  true  :  false;
+  strcasecmpResult = strcasecmp(thisArray.arrayName, thatArray.arrayName);
 #endif
+  if (strcasecmpResult < 0)
+    {
+     return true;
+    }
+  else if (strcasecmpResult == 0)
+    {
+    int strcmpResult = strcmp(thisArray.arrayName, thatArray.arrayName);
+    return (strcmpResult <= 0) ? true : false;
+    }
+  else
+    {
+    return false;
+    }
 }
 
 //----------------------------------------------------------------------------
