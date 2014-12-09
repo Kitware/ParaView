@@ -66,10 +66,9 @@ void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
     return;
     }
 
-  pqTimeKeeper* timeKeeper = reader->getServer()->getTimeKeeper();
   pqAnimationScene* scene =
-    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqAnimationScene*>(
-      reader->getServer())[0];
+    pqApplicationCore::instance()->getServerManagerModel()->
+    findItems<pqAnimationScene*>(reader->getServer())[0];
   vtkSMProxy* readerProxy = reader->getProxy();
   if (readerProxy->GetProperty("TimestepValues"))
     {
