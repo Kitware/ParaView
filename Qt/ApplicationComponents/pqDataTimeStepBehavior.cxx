@@ -38,10 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSettings.h"
 #include "pqTimeKeeper.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSettings.h"
 
 //-----------------------------------------------------------------------------
 pqDataTimeStepBehavior::pqDataTimeStepBehavior(QObject* parentObject)
@@ -56,39 +57,37 @@ pqDataTimeStepBehavior::pqDataTimeStepBehavior(QObject* parentObject)
 //-----------------------------------------------------------------------------
 void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
 {
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  // FIXME: Need some better organization for keep track for such global
-  // settings.
-  if (settings->value("DefaultTimeStepMode",0) == 0)
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  int defaultTimeStep = settings->GetSettingAsInt(
+    ".settings.GeneralSettings.DefaultTimeStep",
+    vtkPVGeneralSettings::DEFAULT_TIME_STEP_UNCHANGED);
+  if (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_UNCHANGED)
     {
     return;
     }
 
-  pqTimeKeeper* timeKeeper = reader->getServer()->getTimeKeeper();
   pqAnimationScene* scene =
-    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqAnimationScene*>(
-      reader->getServer())[0];
+    pqApplicationCore::instance()->getServerManagerModel()->
+    findItems<pqAnimationScene*>(reader->getServer())[0];
   vtkSMProxy* readerProxy = reader->getProxy();
   if (readerProxy->GetProperty("TimestepValues"))
     {
     vtkSMPropertyHelper helper(readerProxy, "TimestepValues");
     unsigned int num_timesteps = helper.GetNumberOfElements();
     std::vector<double> timesteps = helper.GetDoubleArray();
-    if (num_timesteps > 1)
-      {
-      if (timeKeeper->getTime() < timesteps[num_timesteps-1])
-        {
-        scene->setAnimationTime(timesteps[num_timesteps-1]);
-        }
-      }
+    unsigned int newTimeStep = 
+      (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_FIRST) ? 0 :
+      (num_timesteps - 1);
+    scene->setAnimationTime(timesteps[newTimeStep]);
     }
   else if (readerProxy->GetProperty("TimeRange"))
     {
-    double max_time = vtkSMPropertyHelper(readerProxy, "TimeRange").GetAsDouble(1);
-    if (timeKeeper->getTime() < max_time)
-      {
-      scene->setAnimationTime(max_time);
-      }
+    vtkSMPropertyHelper helper(readerProxy, "TimeRange");
+    std::vector<double> timeRange = helper.GetDoubleArray();
+    double newTime = 
+      (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_FIRST) ? 
+      timeRange[0] : timeRange[1];
+    scene->setAnimationTime(newTime);
     }
 }
 

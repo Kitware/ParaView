@@ -71,6 +71,15 @@ public:
   vtkSetStringMacro(DefaultViewType);
 
   // Description:
+  // Enum for DefaultTimeStep
+  enum
+  {
+    DEFAULT_TIME_STEP_UNCHANGED,
+    DEFAULT_TIME_STEP_FIRST,
+    DEFAULT_TIME_STEP_LAST
+  };
+
+  // Description:
   // Enum for TransferFunctionResetMode
   enum
     {
