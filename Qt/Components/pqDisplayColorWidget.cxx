@@ -506,7 +506,9 @@ void pqDisplayColorWidget::setComponentNumber(int val)
         "Will add a new entry for it.";
       }
     Q_ASSERT(index != -1);
+    this->Components->blockSignals(true);
     this->Components->setCurrentIndex(index);
+    this->Components->blockSignals(false);
     }
 }
 
