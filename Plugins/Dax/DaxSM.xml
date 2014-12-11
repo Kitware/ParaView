@@ -72,6 +72,7 @@
       </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
+        <ShowInMenu category="Dax" />
       </Hints>
 
       <PropertyGroup label="Isosurfaces">
@@ -157,6 +158,7 @@
       </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
+        <ShowInMenu category="Dax" />
       </Hints>
       <!-- End Threshold -->
     </SourceProxy>

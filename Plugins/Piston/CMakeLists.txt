@@ -18,6 +18,4 @@ add_paraview_plugin(
     vtkPVDataSetToPiston.cxx
   SERVER_MANAGER_XML
     PistonSM.xml
-  GUI_RESOURCE_FILES
-    PistonGUI.xml
 )

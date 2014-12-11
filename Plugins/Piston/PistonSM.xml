@@ -36,6 +36,7 @@ Copies a CPU resident data set into a PISTON compatible representation that exis
         <DefaultRepresentations>
           <myrep representation="PistonRepresentation"/>
         </DefaultRepresentations>
+        <ShowInMenu category="Piston" />
       </Hints>
 
    <!-- End SendToPiston -->
@@ -96,6 +97,9 @@ Copies a GPU resident dataset produced by PISTON back to the CPU.
           Piston filters either produce polydata or image data. Set this to the correct choice for the upstream filter in question.
         </Documentation>
      </IntVectorProperty>
+     <Hints>
+      <ShowInMenu category="Piston" />
+     </Hints>
 
    <!-- End GetFromPiston -->
    </SourceProxy>
@@ -139,6 +143,7 @@ Uses PISTON to iso-contour on GPU.
         <DefaultRepresentations>
           <myrep representation="PistonRepresentation"/>
         </DefaultRepresentations>
+        <ShowInMenu category="Piston" />
       </Hints>
 
    <!-- End PistonContour -->
@@ -194,6 +199,7 @@ Uses PISTON to extract threshold on GPU.
         <DefaultRepresentations>
           <myrep representation="PistonRepresentation"/>
         </DefaultRepresentations>
+        <ShowInMenu category="Piston" />
       </Hints>
 
    <!-- End PistonThreshold -->
@@ -253,6 +259,7 @@ Uses PISTON to slice on GPU.
         <DefaultRepresentations>
           <myrep representation="PistonRepresentation"/>
         </DefaultRepresentations>
+        <ShowInMenu category="Piston" />
       </Hints>
 
       <!-- End PistonSlice -->
@@ -286,6 +293,7 @@ Uses PISTON to sort on GPU.
         <DefaultRepresentations>
           <myrep representation="PistonRepresentation"/>
         </DefaultRepresentations>
+        <ShowInMenu category="Piston" />
       </Hints>
 
    <!-- End PistonSort -->

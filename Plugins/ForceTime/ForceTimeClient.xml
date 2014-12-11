@@ -1,5 +1,0 @@
-<ParaViewFilters>
-  <Category name="Temporal" menu_label="&amp;Temporal">    
-    <Filter name="ForceTime"/>
-  </Category>
-</ParaViewFilters>
