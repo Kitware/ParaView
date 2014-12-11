@@ -193,7 +193,6 @@ class vtkGeometrySliceRepresentation::vtkInternals
 {
 public:
   double OriginalDataBounds[6];
-  std::pair<bool, std::string> AxisLabels[3];
 };
 
 vtkStandardNewMacro(vtkGeometrySliceRepresentation);
@@ -276,14 +275,6 @@ int vtkGeometrySliceRepresentation::ProcessViewRequest(
     if (view)
       {
       vtkPVMultiSliceView::SetDataBounds(inInfo, this->Internals->OriginalDataBounds);
-      for (int axis=0; axis<3; axis++)
-        {
-        if (this->Internals->AxisLabels[axis].first)
-          {
-          vtkPVMultiSliceView::SetAxisTitle(inInfo, axis,
-            this->Internals->AxisLabels[axis].second.c_str());
-          }
-        }
       }
     if (this->Mode != ALL_SLICES)
       {
@@ -303,9 +294,19 @@ int vtkGeometrySliceRepresentation::ProcessViewRequest(
       {
       vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
       vtkAlgorithm* algo = producerPort->GetProducer();
+      vtkDataObject* localData =  algo->GetOutputDataObject(producerPort->GetIndex());
+
       view->SetModelTransformationMatrix(
-        vtkPVChangeOfBasisHelper::GetChangeOfBasisMatrix(
-          algo->GetOutputDataObject(producerPort->GetIndex())));
+        vtkPVChangeOfBasisHelper::GetChangeOfBasisMatrix(localData));
+      const char* titles[3] = {NULL, NULL, NULL};
+      vtkPVChangeOfBasisHelper::GetBasisName(localData, titles[0], titles[1], titles[2]);
+      for (int axis=0; axis < 3; ++axis)
+        {
+        if (titles[axis] != NULL)
+          {
+          vtkPVMultiSliceView::SetAxisTitle(inInfo, axis, titles[axis]);
+          }
+        }
       }
     }
   return retVal;
@@ -317,9 +318,6 @@ int vtkGeometrySliceRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkMath::UninitializeBounds(this->Internals->OriginalDataBounds);
-  this->Internals->AxisLabels[0].first = false;
-  this->Internals->AxisLabels[1].first = false;
-  this->Internals->AxisLabels[2].first = false;
   if (this->Superclass::RequestData(request, inputVector, outputVector))
     {
     // If data-bounds are provided in the meta-data, we will report those to the
@@ -328,14 +326,7 @@ int vtkGeometrySliceRepresentation::RequestData(vtkInformation* request,
     vtkDataObject* localData = this->CacheKeeper->GetOutputDataObject(0);
     vtkGSRGeometryFilter::ExtractCachedBounds(
       localData, this->Internals->OriginalDataBounds);
-    const char* titles[3] = {NULL, NULL, NULL};
-    vtkPVChangeOfBasisHelper::GetBasisName(localData, titles[0], titles[1], titles[2]);
-    for (int axis=0; axis < 3; ++axis)
-      {
-      std::pair<bool, std::string>& label = this->Internals->AxisLabels[axis];
-      label.first = (titles[axis] != NULL);
-      label.second = titles[axis]? titles[axis] : "";
-      }
+
     return 1;
     }
   return 0;
