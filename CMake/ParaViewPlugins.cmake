@@ -827,7 +827,7 @@ ENDMACRO()
 #  PYTHON_MODULES allows you to embed python sources as modules
 #  GUI_INTERFACES is to specify which GUI plugin interfaces were implemented
 #  GUI_RESOURCES is to specify qrc files
-#  GUI_RESOURCE_FILES is to specify xml files to create a qrc file from
+#  GUI_RESOURCE_FILES warns about removed behavoir
 #  GUI_SOURCES is to other GUI sources
 #  SOURCES is deprecated, please use SERVER_SOURCES or GUI_SOURCES
 #  REQUIRED_ON_SERVER is to specify whether this plugin should be loaded on server
@@ -978,15 +978,9 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     endif()
 
     IF(ARG_GUI_RESOURCE_FILES)
-      # The generated qrc file has resource prefix "/name/ParaViewResources"
-      # which helps is avoiding conflicts with resources from different
-      # plugins
-      GENERATE_QT_RESOURCE_FROM_FILES(
-        "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.qrc"
-         "/${NAME}/ParaViewResources"
-         "${ARG_GUI_RESOURCE_FILES}")
-      SET(ARG_GUI_RESOURCES ${ARG_GUI_RESOURCES}
-        "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.qrc")
+        message(WARNING "GUI resource files in plugins are no longer supported. The same"
+                " functionality can be obtained using Hints in the Server Manager xml files."
+                "  See the Major API Changes document for details.")
     ENDIF()
 
     IF(ARG_GUI_INTERFACES OR ARG_GUI_RESOURCES OR ARG_GUI_SOURCES)
