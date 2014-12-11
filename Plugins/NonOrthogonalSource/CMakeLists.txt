@@ -8,3 +8,7 @@ ADD_PARAVIEW_PLUGIN(NonOrthogonalSource "1.0"
      SERVER_MANAGER_SOURCES
       vtkShearedWaveletSource.cxx
 )
+
+if(BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()
