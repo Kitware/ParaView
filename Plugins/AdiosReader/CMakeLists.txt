@@ -28,8 +28,7 @@ ENDIF()
 ADD_PARAVIEW_PLUGIN( AdiosClientOnly "1.4"
    SERVER_MANAGER_XML
       Adios.xml
-   GUI_RESOURCE_FILES
-      AdiosGUISources.xml)
+   )
 
 #------------------------------------------------------------------------------
 # We enable Adios only on MPI ParaView build
@@ -62,8 +61,7 @@ if(PARAVIEW_USE_MPI)
             Adios.xml
          SERVER_MANAGER_SOURCES
             vtkAdiosPixieReader.cxx
-         GUI_RESOURCE_FILES
-            AdiosGUISources.xml)
+         )
 
       TARGET_LINK_LIBRARIES( Adios
               LINK_PRIVATE ${ADIOS_READ_LIBRARY} ${MPI_LIBRARIES})

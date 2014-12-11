@@ -76,6 +76,7 @@ Copyright 2012 SciberQuest Inc.
 
       <Hints>
         <View type="RenderView"/>
+        <ShowInMenu category="Sciber Quest" />
       </Hints>
     </SourceProxy>
 
@@ -241,6 +242,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <Visibility replace_input="2" />
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   </SourceProxy>
@@ -279,6 +281,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <Visibility replace_input="2" />
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   </SourceProxy>
@@ -584,6 +587,7 @@ Copyright 2012 SciberQuest Inc.
     <Hints>
       <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
     <!-- End OOCFieldTracer -->
@@ -1143,6 +1147,7 @@ Copyright 2012 SciberQuest Inc.
       <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
       <Property name="ForwardOnly" show="0"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End Topology Mapper -->
@@ -1426,6 +1431,7 @@ Copyright 2012 SciberQuest Inc.
     <Hints>
       <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
    <!-- End SQ Poincare Mapper -->
@@ -1959,6 +1965,7 @@ Copyright 2012 SciberQuest Inc.
       <Property name="Mode" show="0"/>
       <Property name="MaxLineLength" show="0"/>
       <Property name="ForwardOnly" show="0"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
    <!-- End SQ Displacement Mapper -->
@@ -2311,6 +2318,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <View type="RenderView"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQEdgeFilter -->
@@ -2395,6 +2403,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <View type="RenderView"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   </SourceProxy>
@@ -2632,6 +2641,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <View type="RenderView"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQVortexFilter -->
@@ -2711,6 +2721,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <View type="RenderView"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQAgyrotropyFilter -->
@@ -2827,6 +2838,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <View type="RenderView"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQBinaryThreshold -->
@@ -2909,6 +2921,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <View type="RenderView"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQMedianFilter -->
@@ -3146,6 +3159,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <View type="RenderView"/>
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQKernelConvolution -->
@@ -3173,6 +3187,9 @@ Copyright 2012 SciberQuest Inc.
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
     </InputProperty>
+    <Hints>
+      <ShowInMenu category="Sciber Quest" />
+    </Hints>
 
   <!-- End vtkSQSurfaceVectors -->
   </SourceProxy>
@@ -3343,6 +3360,9 @@ Copyright 2012 SciberQuest Inc.
          The value of this property specifies the normal to use when the UseDefaultNormal property is set to 1 or the input contains no vector array (SelectInputVectors property).
        </Documentation>
      </DoubleVectorProperty>
+     <Hints>
+      <ShowInMenu category="Sciber Quest" />
+     </Hints>
 
    <!-- End TubeFilter -->
    </SourceProxy>
@@ -3453,6 +3473,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <Visibility replace_input="0" />
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQSeedPointLatice -->
@@ -3508,6 +3529,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <Visibility replace_input="0" />
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQSeedPointLatice -->
@@ -3547,6 +3569,7 @@ Copyright 2012 SciberQuest Inc.
 
     <Hints>
       <Visibility replace_input="0" />
+      <ShowInMenu category="Sciber Quest" />
     </Hints>
 
   <!-- End vtkSQRandomSeedPoints -->

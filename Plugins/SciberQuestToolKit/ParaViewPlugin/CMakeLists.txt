@@ -81,10 +81,6 @@ GetDate(SQTK_BUILD_DATE)
 set (SQTK_VERSION "SQTK-${SQTK_RELEASE} ${CMAKE_SYSTEM} ${CMAKE_CXX_COMPILER} ${SQTK_BUILD_DATE}")
 #message(STATUS "SQTK version ${SQTK_VERSION}")
 
-set (SQTK_XML
-  SciberQuestToolKitSources.xml
-  SciberQuestToolKitFilters.xml)
-
 set (SQTK_SM_XML
   SciberQuestToolKitSMReaders.xml
   SciberQuestToolKitSMWriters.xml
@@ -99,7 +95,6 @@ add_paraview_plugin(
   GUI_INTERFACES ${_IFACES}
   SERVER_MANAGER_SOURCES ${SM_CXX_SOURCES}
   SERVER_MANAGER_XML ${SQTK_SM_XML}
-  GUI_RESOURCE_FILES ${SQTK_XML}
   SOURCES ${CXX_SOURCES})
 
 target_link_libraries(SciberQuestToolKit

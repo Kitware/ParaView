@@ -15,6 +15,8 @@ add_paraview_plugin(StreamingParticles "1.0"
     vtkStreamingParticlesRepresentation.h
     vtkStreamingParticlesPriorityQueue.cxx
     vtkStreamingParticlesPriorityQueue.h
+    vtkPVRandomPointsStreamingSource.cxx
+    vtkPVRandomPointsStreamingSource.h
 )
 
 if(PARAVIEW_ENABLE_COSMOTOOLS

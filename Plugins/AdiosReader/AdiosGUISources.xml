@@ -1,3 +1,0 @@
-<ParaViewSources>
-  <Proxy group="sources" name="PixieAdiosStream" />
-</ParaViewSources>

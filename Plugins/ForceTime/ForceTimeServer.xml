@@ -43,6 +43,9 @@
           If the IgnorePipelineTime property is set, then this value will override any time request in the VTK pipeline.
         </Documentation>
       </DoubleVectorProperty>
+      <Hints>
+        <ShowInMenu category="Temporal" />
+      </Hints>
 
     </SourceProxy>
   </ProxyGroup>
