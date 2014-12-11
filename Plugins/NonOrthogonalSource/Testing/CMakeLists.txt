@@ -4,7 +4,9 @@ endif()
 
 include(ParaViewTestingMacros)
 set (xmls
-  ${CMAKE_CURRENT_SOURCE_DIR}/NonOrthogonalSliceView.xml)
+  ${CMAKE_CURRENT_SOURCE_DIR}/NonOrthogonalSliceView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NonOrthographicOrthographicView.xml
+)
 
 add_client_tests("pv"
   LOAD_PLUGIN "NonOrthogonalSource"
