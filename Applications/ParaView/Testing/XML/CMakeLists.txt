@@ -29,6 +29,7 @@ paraview_test_load_data(""
   can.ex2
   comb.q
   combxyz.bin
+  CubeStringArray.vtk
   disk_out_ref.ex2
   dualSphereAnimation.clone.pvd
   dualSphereAnimation.pvd
@@ -188,6 +189,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorLegendMinMaxLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorOpacityTableEditing.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColors.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ColorByCellDataStringArray.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   # disabling overlay test for now. It has issues with Time 0.
   #  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeOverlay.xml
