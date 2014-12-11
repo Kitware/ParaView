@@ -67,11 +67,6 @@ vtkPVMantaView::vtkPVMantaView()
 
 //  this->OrderedCompositingBSPCutsSource = vtkBSPCutsGenerator::New();
 
-  if (this->Interactor)
-    {
-    this->Interactor->SetRenderer(mantaRenderer);
-    }
-
   this->OrientationWidget->SetParentRenderer(mantaRenderer);
 
   //this->GetRenderer()->AddActor(this->CenterAxes);

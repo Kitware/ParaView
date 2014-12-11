@@ -84,14 +84,14 @@ void vtkAnnotateAttributeDataFilter::EvaluateExpression()
     controller->GetNumberOfProcesses() > 1 &&
     this->ProcessId != -1)
     {
-    vtkMultiProcessStream stream;
+    vtkMultiProcessStream stream2;
     if (this->ProcessId == controller->GetLocalProcessId())
       {
-      stream << (this->GetComputedAnnotationValue()?  this->GetComputedAnnotationValue() : "");
+      stream2 << (this->GetComputedAnnotationValue()?  this->GetComputedAnnotationValue() : "");
       }
-    controller->Broadcast(stream, this->ProcessId);
+    controller->Broadcast(stream2, this->ProcessId);
     std::string val;
-    stream >> val;
+    stream2 >> val;
     this->SetComputedAnnotationValue(val.c_str());
     }
 }

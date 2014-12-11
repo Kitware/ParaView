@@ -81,8 +81,6 @@ void vtkPVInteractorStyle::OnRightButtonDown()
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 {
-  vtkCameraManipulator *manipulator;
-
   // Must not be processing an interaction to start another.
   if (this->Current)
     {

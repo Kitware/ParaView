@@ -90,6 +90,7 @@ public:
     boundsArray->SetNumberOfTuples(1);
     std::copy(bounds, bounds+6, boundsArray->GetPointer(0));
     dataObject->GetFieldData()->AddArray(boundsArray.GetPointer());
+    return true;
     }
   static bool ExtractCachedBounds(vtkDataObject* dataObject, double bounds[6])
     {
