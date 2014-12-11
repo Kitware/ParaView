@@ -426,7 +426,7 @@ void vtkPVOrthographicSliceView::SetGradientBackground(int val)
   this->Superclass::SetGradientBackground(val);
   for (int cc=0; cc < 3; cc++)
     {
-    this->Renderers[cc]->SetGradientBackground(val);
+    this->Renderers[cc]->SetGradientBackground(val? true: false);
     }
 }
 
@@ -436,7 +436,7 @@ void vtkPVOrthographicSliceView::SetTexturedBackground(int val)
   this->Superclass::SetTexturedBackground(val);
   for (int cc=0; cc < 3; cc++)
     {
-    this->Renderers[cc]->SetTexturedBackground(val);
+    this->Renderers[cc]->SetTexturedBackground(val? true: false);
     }
 }
 

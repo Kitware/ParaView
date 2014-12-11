@@ -110,7 +110,7 @@ public:
       fd->GetArray("vtkGSRGeometryFilter_Bounds")->GetNumberOfComponents() == 6)
       {
       fd->GetArray("vtkGSRGeometryFilter_Bounds")->GetTuple(0, bounds);
-      return vtkMath::AreBoundsInitialized(bounds);
+      return (vtkMath::AreBoundsInitialized(bounds) == 1);
       }
     return false;
     }

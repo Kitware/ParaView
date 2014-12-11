@@ -210,7 +210,7 @@ bool vtkSMMultiSliceViewProxy::GetDataBounds(
         }
       }
     info->GetBounds(bounds);
-    return vtkBoundingBox::IsValid(bounds);
+    return (vtkBoundingBox::IsValid(bounds) != 0);
     }
   return false;
 }

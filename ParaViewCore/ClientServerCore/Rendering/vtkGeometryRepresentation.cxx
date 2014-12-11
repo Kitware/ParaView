@@ -446,7 +446,7 @@ bool vtkGeometryRepresentation::GetBounds(
   else if (vtkDataSet* ds = vtkDataSet::SafeDownCast(dataObject))
     {
     ds->GetBounds(bounds);
-    return vtkMath::AreBoundsInitialized(bounds);
+    return (vtkMath::AreBoundsInitialized(bounds) == 1);
     }
   return false;
 }
