@@ -7053,6 +7053,16 @@
         </DataTypeDomain>
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
+
+      <IntVectorProperty name="ShowOutline"
+        command="SetShowOutline"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Check to show data outline when showing "Slices".
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
     </RepresentationProxy>
 
     <!-- ================================================================ -->
@@ -7072,6 +7082,13 @@
            <Exception name="Input" />
            <Exception name="Visibility" />
          </ShareProperties>
+         <ExposedProperties>
+           <PropertyGroup label="Slices Parameters">
+             <Property name="ShowOutline"
+                       panel_visibility="advanced"
+                       panel_visibility_default_for_representation="slices" />
+           </PropertyGroup>
+         </ExposedProperties>
        </SubProxy>
     </PVRepresentationProxy>
 
@@ -7580,12 +7597,6 @@
           argument_is_array="1"
           panel_visibility="never">
         </DoubleVectorProperty>
-        <IntVectorProperty command="SetShowOutline"
-                            default_values="1"
-                            name="ShowOutline"
-                            number_of_elements="1">
-          <BooleanDomain name="bool" />
-        </IntVectorProperty>
      </MultiSliceViewProxy>
 
      <!-- ================================================================== -->

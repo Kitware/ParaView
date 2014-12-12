@@ -46,7 +46,6 @@ vtkStandardNewMacro(vtkPVMultiSliceView);
 vtkPVMultiSliceView::vtkPVMultiSliceView()
   : ModelTransformationMatrix()
 {
-  this->ShowOutline = 1;
   this->Internal = new vtkSliceInternal();
   this->ModelTransformationMatrix->Identity();
 }

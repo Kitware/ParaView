@@ -59,11 +59,6 @@ public:
 
   const vtkClientServerStream& GetAxisLabels() const;
 
-  // Description:
-  // Show/hide the bounding box outline
-  vtkSetMacro(ShowOutline, int);
-  vtkGetMacro(ShowOutline, int);
-
   // Convenience methods used by representations to pass information to the view
   // in vtkPVView::REQUEST_UPDATE() pass. SetAxisTitle can be used to tell the
   // view if the representation's data has information about titles to use for
@@ -88,7 +83,6 @@ protected:
 
   vtkTimeStamp ModelTransformationMatrixUpdateTime;
 
-  int ShowOutline;
 private:
   vtkPVMultiSliceView(const vtkPVMultiSliceView&); // Not implemented
   void operator=(const vtkPVMultiSliceView&); // Not implemented

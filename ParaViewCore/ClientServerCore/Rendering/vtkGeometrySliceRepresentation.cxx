@@ -14,7 +14,9 @@
 =========================================================================*/
 #include "vtkGeometrySliceRepresentation.h"
 
+#include "vtkActor.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkOutlineSource.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
@@ -25,6 +27,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVChangeOfBasisHelper.h"
 #include "vtkPVGeometryFilter.h"
@@ -194,6 +197,9 @@ class vtkGeometrySliceRepresentation::vtkInternals
 {
 public:
   double OriginalDataBounds[6];
+  vtkNew<vtkOutlineSource> OutlineSource;
+  vtkNew<vtkPolyDataMapper> OutlineMapper;
+  vtkNew<vtkActor> OutlineActor;
 };
 
 vtkStandardNewMacro(vtkGeometrySliceRepresentation);
@@ -205,6 +211,7 @@ vtkGeometrySliceRepresentation::vtkGeometrySliceRepresentation()
   this->GeometryFilter = vtkGSRGeometryFilter::New();
   this->SetupDefaults();
   this->Mode = ALL_SLICES;
+  this->ShowOutline = false;
 }
 
 //----------------------------------------------------------------------------
@@ -229,6 +236,13 @@ void vtkGeometrySliceRepresentation::SetupDefaults()
   selPainter->SetCellIdArrayName("vtkSliceOriginalCellIds");
   selPainter->SetCompositeIdArrayName("vtkSliceCompositeIndex");
 #endif
+
+  this->Internals->OutlineMapper->SetInputConnection(
+    this->Internals->OutlineSource->GetOutputPort());
+  this->Internals->OutlineActor->SetMapper(
+    this->Internals->OutlineMapper.GetPointer());
+  this->Internals->OutlineActor->SetUseBounds(0);
+  this->Internals->OutlineActor->SetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -288,17 +302,19 @@ int vtkGeometrySliceRepresentation::ProcessViewRequest(
     }
   if (request_type == vtkPVView::REQUEST_RENDER())
     {
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    vtkAlgorithm* algo = producerPort->GetProducer();
+    vtkDataObject* localData =  algo->GetOutputDataObject(producerPort->GetIndex());
+
+    vtkSmartPointer<vtkMatrix4x4> changeOfBasisMatrix =
+      vtkPVChangeOfBasisHelper::GetChangeOfBasisMatrix(localData);
+
     // This is called on the "rendering" nodes. We use this pass to communicate
     // the "ModelTransformationMatrix" to the view.
     if (vtkPVMultiSliceView* view = vtkPVMultiSliceView::SafeDownCast(
       inInfo->Get(vtkPVView::VIEW())))
       {
-      vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-      vtkAlgorithm* algo = producerPort->GetProducer();
-      vtkDataObject* localData =  algo->GetOutputDataObject(producerPort->GetIndex());
-
-      view->SetModelTransformationMatrix(
-        vtkPVChangeOfBasisHelper::GetChangeOfBasisMatrix(localData));
+      view->SetModelTransformationMatrix(changeOfBasisMatrix);
       const char* titles[3] = {NULL, NULL, NULL};
       vtkPVChangeOfBasisHelper::GetBasisName(localData, titles[0], titles[1], titles[2]);
       for (int axis=0; axis < 3; ++axis)
@@ -307,6 +323,17 @@ int vtkGeometrySliceRepresentation::ProcessViewRequest(
           {
           vtkPVMultiSliceView::SetAxisTitle(inInfo, axis, titles[axis]);
           }
+        }
+      double bds[6];
+      if (vtkGSRGeometryFilter::ExtractCachedBounds(localData, bds))
+        {
+        this->Internals->OutlineSource->SetBounds(bds);
+        this->Internals->OutlineActor->SetUserMatrix(changeOfBasisMatrix);
+        this->Internals->OutlineActor->SetVisibility(this->ShowOutline? 1 : 0);
+        }
+      else
+        {
+        this->Internals->OutlineActor->SetVisibility(0);
         }
       }
     }
@@ -342,6 +369,11 @@ bool vtkGeometrySliceRepresentation::AddToView(vtkView* view)
     rview->GetRenderer(this->Mode)->AddActor(this->Actor);
     return true;
     }
+
+  if (vtkPVRenderView* rvview = vtkPVRenderView::SafeDownCast(view))
+    {
+    rvview->GetRenderer()->AddActor(this->Internals->OutlineActor.GetPointer());
+    }
   return this->Superclass::AddToView(view);
 }
 
@@ -354,10 +386,15 @@ bool vtkGeometrySliceRepresentation::RemoveFromView(vtkView* view)
     rview->GetRenderer(this->Mode)->RemoveActor(this->Actor);
     return true;
     }
+  if (vtkPVRenderView* rvview = vtkPVRenderView::SafeDownCast(view))
+    {
+    rvview->GetRenderer()->RemoveActor(this->Internals->OutlineActor.GetPointer());
+    }
   return this->Superclass::RemoveFromView(view);
 }
 //----------------------------------------------------------------------------
 void vtkGeometrySliceRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ShowOutline: " << this->ShowOutline << endl;
 }

@@ -45,6 +45,11 @@ public:
   vtkSetClampMacro(Mode, int, X_SLICE_ONLY, ALL_SLICES);
   vtkGetMacro(Mode, int);
 
+  // Description:
+  // Get/Set whether original data outline should be shown in the view.
+  vtkSetMacro(ShowOutline, bool);
+  vtkGetMacro(ShowOutline, bool);
+
 //BTX
 protected:
   vtkGeometrySliceRepresentation();
@@ -63,6 +68,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   int Mode;
+  bool ShowOutline;
 //ETX
 };
 
