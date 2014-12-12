@@ -24,7 +24,7 @@
 #define __vtkPVCompositeOrthographicSliceRepresentation_h
 
 #include "vtkPVCompositeRepresentation.h"
-#include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeOrthographicSliceRepresentation : public vtkPVCompositeRepresentation
 {

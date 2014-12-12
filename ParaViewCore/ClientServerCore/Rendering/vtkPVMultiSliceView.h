@@ -22,7 +22,7 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVRenderView.h"
-#include "vtkNew.h"
+#include "vtkNew.h" // needed for vtkNew
 #include <vector> // needed for std::vector
 
 class vtkClientServerStream;
