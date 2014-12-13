@@ -69,9 +69,10 @@ signals:
   void sliceClicked(int axisIndex, double sliceOffsetOnAxis, int button, int modifier);
 
 public slots:
-  void updateAxisBounds();
-  void updateAxisBounds(double bounds[6]);
   void updateSlices();
+
+private slots:
+  void updateAxisBounds();
 
 protected:
   void updateViewModelCallBack(vtkObject*,unsigned long, void*);

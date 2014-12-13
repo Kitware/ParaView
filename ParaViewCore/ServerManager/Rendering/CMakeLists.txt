@@ -48,6 +48,7 @@ set (Module_SRCS
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
+  vtkSMOrthographicSliceViewProxy.cxx
   vtkSMPlotMatrixViewProxy.cxx
   vtkSMPVRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx

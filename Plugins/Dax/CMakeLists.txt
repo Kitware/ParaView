@@ -20,5 +20,4 @@ endif()
 add_paraview_plugin(Dax "0.1"
   REQUIRED_ON_CLIENT
   SERVER_MANAGER_XML DaxSM.xml
-  GUI_RESOURCE_FILES DaxGUI.xml
   )

@@ -808,13 +808,6 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
         continue;
         }
 
-      // Old readers don't have ReaderFactory hints. To handle those, we check
-      // for existence of "FileName" property.
-      if (findFileNameProperty(iter->GetProxyDefinition()))
-        {
-        continue;
-        }
-
       vtkNew<vtkCollection> collection;
       hints->FindNestedElementByName("ShowInMenu", collection.GetPointer());
       int size = collection->GetNumberOfItems();

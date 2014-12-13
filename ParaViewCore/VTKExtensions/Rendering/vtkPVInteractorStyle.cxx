@@ -81,8 +81,6 @@ void vtkPVInteractorStyle::OnRightButtonDown()
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 {
-  vtkCameraManipulator *manipulator;
-
   // Must not be processing an interaction to start another.
   if (this->Current)
     {
@@ -90,18 +88,35 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
     }
 
   // Get the renderer.
-  if (!this->CurrentRenderer)
+  this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
+    this->Interactor->GetEventPosition()[1]);
+  if (this->CurrentRenderer == NULL)
     {
-    this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                            this->Interactor->GetEventPosition()[1]);
-    if (this->CurrentRenderer == NULL)
-      {
-      return;
-      }
+    return;
     }
 
   // Look for a matching camera interactor.
+  this->Current = this->FindManipulator(button, shift, control);
+  if (this->Current)
+    {
+    this->Current->Register(this);
+    this->InvokeEvent(vtkCommand::StartInteractionEvent);
+    this->Current->SetCenter(this->CenterOfRotation);
+    this->Current->SetRotationFactor(this->RotationFactor);
+    this->Current->StartInteraction();
+    this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
+                                this->Interactor->GetEventPosition()[1],
+                                this->CurrentRenderer,
+                                this->Interactor);
+    }
+}
+
+//-------------------------------------------------------------------------
+vtkCameraManipulator* vtkPVInteractorStyle::FindManipulator(int button, int shift, int control)
+{
+  // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
+  vtkCameraManipulator* manipulator = NULL;
   while ((manipulator = (vtkCameraManipulator*)
                         this->CameraManipulators->GetNextItemAsObject()))
     {
@@ -109,19 +124,10 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
         manipulator->GetShift() == shift &&
         manipulator->GetControl() == control)
       {
-      this->Current = manipulator;
-      this->Current->Register(this);
-      this->InvokeEvent(vtkCommand::StartInteractionEvent);
-      this->Current->SetCenter(this->CenterOfRotation);
-      this->Current->SetRotationFactor(this->RotationFactor);
-      this->Current->StartInteraction();
-      this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
-                                  this->Interactor->GetEventPosition()[1],
-                                  this->CurrentRenderer,
-                                  this->Interactor);
-      return;
+      return manipulator;
       }
     }
+  return NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -163,10 +169,15 @@ void vtkPVInteractorStyle::OnButtonUp(int button)
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnMouseMove()
 {
-  if (!this->CurrentRenderer)
+  if (this->CurrentRenderer && this->Current)
+    {
+    // When an interaction is active, we should not change the renderer being
+    // interacted with.
+    }
+  else
     {
     this->FindPokedRenderer(this->Interactor->GetEventPosition()[0],
-                            this->Interactor->GetEventPosition()[1]);
+      this->Interactor->GetEventPosition()[1]);
     }
 
   if (this->Current)

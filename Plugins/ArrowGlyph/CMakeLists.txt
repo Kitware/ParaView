@@ -7,6 +7,4 @@ add_paraview_plugin(ArrowGlyph "1.0"
     vtkArrowGlyphFilter.xml
   SERVER_MANAGER_SOURCES
     vtkArrowGlyphFilter.cxx
-  GUI_RESOURCE_FILES
-  ArrowGlyph_Filters.xml
 )

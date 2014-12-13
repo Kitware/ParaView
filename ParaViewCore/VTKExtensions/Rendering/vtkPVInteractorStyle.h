@@ -24,17 +24,17 @@
 #ifndef __vtkPVInteractorStyle_h
 #define __vtkPVInteractorStyle_h
 
-#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkInteractorStyle.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkCameraManipulator;
 class vtkCollection;
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractorStyle : public vtkInteractorStyleTrackballCamera
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractorStyle : public vtkInteractorStyle
 {
 public:
   static vtkPVInteractorStyle *New();
-  vtkTypeMacro(vtkPVInteractorStyle, vtkInteractorStyleTrackballCamera);
+  vtkTypeMacro(vtkPVInteractorStyle, vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -87,6 +87,10 @@ public:
   // Description:
   // Do not let the superclass do anything with a char event.
   virtual void OnChar() {};
+
+  // Description:
+  // Returns the chosen manipulator based on the modifiers.
+  virtual vtkCameraManipulator* FindManipulator(int button, int shift, int control);
 
 protected:
   vtkPVInteractorStyle();

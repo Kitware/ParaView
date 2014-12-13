@@ -40,8 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // vtk includes
 #include "vtkConfigure.h"   // for 64-bitness
-#include "vtkStringList.h"
+#include "vtkNew.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringList.h"
 
 // server manager includes
 #include "vtkSMArrayListDomain.h"
@@ -688,12 +689,12 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
     return;
     }
 
-  QList<QVariant> sm_value;
+  std::vector<int> smValueInts;
+  vtkNew<vtkStringList> smValueStrings;
 
   vtkSMArraySelectionDomain* StringDomain = NULL;
   vtkSMStringListDomain* StringListDomain = NULL;
   vtkSMEnumerationDomain* EnumerationDomain = NULL;
-
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
   while(!iter->IsAtEnd())
@@ -721,38 +722,58 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
       {
       qCritical() << "Method expected a list of pairs. Incorrect API." << endl;
       }
-
+    QString name = value[0].toString();
+    int status = value[1].toInt();
     if (StringDomain)
       {
-      QString name = value[0].toString();
-      QVariant status = value[1];
-      if (status.type() == QVariant::Bool)
-        {
-        status = status.toInt();
-        }
-      sm_value.push_back(name);
-      sm_value.push_back(status);
+      smValueStrings->AddString(name.toLatin1().data());
+      smValueStrings->AddString(QString::number(status).toLatin1().data());
       }
-    else if(EnumerationDomain)
+    else if (EnumerationDomain)
       {
-      QList<QVariant> domainStrings =
-        pqSMAdaptor::getEnumerationPropertyDomain(Property);
-      int idx = domainStrings.indexOf(value[0]);
-      if (value[1].toInt() && idx != -1)
+      if (status &&
+        EnumerationDomain->HasEntryText(name.toLatin1().data()))
         {
-        sm_value.push_back(EnumerationDomain->GetEntryValue(idx));
+        int entryValue = EnumerationDomain->GetEntryValueForText(name.toLatin1().data());
+        smValueInts.push_back(entryValue);
         }
       }
     else if(StringListDomain)
       {
-      if (value[1].toInt())
+      if (status)
         {
-        sm_value.push_back(value[0]);
+        smValueStrings->AddString(name.toLatin1().data());
         }
       }
     }
 
-  pqSMAdaptor::setMultipleElementProperty(Property, sm_value, Type);
+  if (StringListDomain || StringDomain)
+    {
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(Property);
+    Q_ASSERT(svp);
+    if (Type == CHECKED)
+      {
+      svp->SetElements(smValueStrings.GetPointer());
+      }
+    else
+      {
+      svp->SetUncheckedElements(smValueStrings.GetPointer());
+      }
+    }
+  else if (EnumerationDomain)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
+    Q_ASSERT(ivp);
+    smValueInts.push_back(0); // avoids need to check for size==0.
+    if (Type ==CHECKED)
+      {
+      ivp->SetElements(&smValueInts[0], static_cast<unsigned int>(smValueInts.size()-1));
+      }
+    else
+      {
+      ivp->SetUncheckedElements(&smValueInts[0], static_cast<unsigned int>(smValueInts.size()-1));
+      }
+    }
 }
 
 QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)

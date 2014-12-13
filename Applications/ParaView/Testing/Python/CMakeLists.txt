@@ -23,6 +23,7 @@ if (numpy_found)
     NO_DATA NO_VALID NO_OUTPUT NO_RT
     TestPythonAnnotationFilter.py
     TestPythonAnnotationFilterNoMerge.py
+    TestAnnotateAttributeData.py
     )
   set(PARAVIEW_PYTHON_ARGS)
 
@@ -64,12 +65,25 @@ if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
     JUST_VALID
     ${PVBATCH_TESTS}
     )
+
+  if (numpy_found)
+    paraview_add_test_pvbatch_mpi(
+      NO_DATA NO_VALID NO_OUTPUT NO_RT
+      TestAnnotateAttributeData.py
+      )
+  endif()
 else()
   # run the test serially
   paraview_add_test_pvbatch(
     JUST_VALID
     ${PVBATCH_TESTS}
     )
+  if (numpy_found)
+    paraview_add_test_pvbatch(
+      NO_DATA NO_VALID NO_OUTPUT NO_RT
+      TestAnnotateAttributeData.py
+      )
+  endif()
 endif()
 
 # Python Multi-servers test

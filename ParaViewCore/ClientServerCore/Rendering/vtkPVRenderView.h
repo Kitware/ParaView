@@ -590,6 +590,12 @@ protected:
   virtual void Render(bool interactive, bool skip_rendering);
 
   // Description:
+  // Called  just before the local process renders. This is only called on the
+  // nodes where the rendering is going to happen.
+  virtual void AboutToRenderOnLocalProcess(bool interactive)
+    {(void) interactive;}
+
+  // Description:
   // Returns true if distributed rendering should be used based on the geometry
   // size. \c using_lod will be true if this method is called to determine
   // distributed rendering status for renders using lower LOD i.e when called in
@@ -612,7 +618,7 @@ protected:
   // Description:
   // UpdateCenterAxes().
   // Updates CenterAxes's scale and position.
-  void UpdateCenterAxes();
+  virtual void UpdateCenterAxes();
 
   // Description
   // Returns true if the local process is doing to do actual render or

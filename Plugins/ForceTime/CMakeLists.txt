@@ -13,5 +13,4 @@ include_directories(${VTK_INCLUDE_DIRS})
 add_paraview_plugin(ForceTime "1.0"
   SERVER_MANAGER_SOURCES vtkForceTime.cxx
   SERVER_MANAGER_XML ForceTimeServer.xml
-  GUI_RESOURCE_FILES ForceTimeClient.xml
 )

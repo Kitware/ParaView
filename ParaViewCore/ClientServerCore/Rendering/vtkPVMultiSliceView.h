@@ -22,6 +22,11 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVRenderView.h"
+#include "vtkNew.h" // needed for vtkNew
+#include <vector> // needed for std::vector
+
+class vtkClientServerStream;
+class vtkMatrix4x4;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVMultiSliceView : public vtkPVRenderView
 {
@@ -30,132 +35,54 @@ public:
   vtkTypeMacro(vtkPVMultiSliceView, vtkPVRenderView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // ====== For Slices along X axis ========================================
+  virtual void Update();
 
   // Description:
-  // Return the number of offset values that are used for slices along X axis
-  int GetNumberOfSliceX() const;
+  void SetNumberOfXSlices(unsigned int count) { this->SetNumberOfSlices(0, count); }
+  void SetXSlices(const double* values) { this->SetSlices(0, values); }
+  void SetNumberOfYSlices(unsigned int count) { this->SetNumberOfSlices(1, count); }
+  void SetYSlices(const double* values) { this->SetSlices(1, values); }
+  void SetNumberOfZSlices(unsigned int count) { this->SetNumberOfSlices(2, count); }
+  void SetZSlices(const double* values) { this->SetSlices(2, values); }
 
-  // Description:
-  // Set the number of offset values that are used for slices along X axis
-  void SetNumberOfSliceX(int size);
+  const std::vector<double>& GetSlices(int axis) const;
+  const std::vector<double>& GetXSlices() const { return this->GetSlices(0); }
+  const std::vector<double>& GetYSlices() const { return this->GetSlices(1); }
+  const std::vector<double>& GetZSlices() const { return this->GetSlices(2); }
 
-  // Description:
-  // Set an offset value for slice along X axis
-  void SetSliceX(int index, double value);
+  void GetDataBounds(double bounds[6]) const;
 
-  // Description:
-  // Return a pointer to a list of offset values for slice along X axis.
-  // The contents of the list will be garbage if the number of offset <= 0.
-  const double* GetSliceX() const;
+  // These return NULL when no overrides were specified.
+  const char* GetXAxisLabel() const { return this->GetAxisLabel(0); }
+  const char* GetYAxisLabel() const { return this->GetAxisLabel(1); }
+  const char* GetZAxisLabel() const { return this->GetAxisLabel(2); }
 
-  // Description:
-  // Set the origin of the cut for slices along Z axis.
-  void SetSliceXOrigin(double x, double y, double z);
+  const vtkClientServerStream& GetAxisLabels() const;
 
-  // Description:
-  // Set the origin of the cut for slices along Z axis.
-  const double* GetSliceXOrigin() const;
+  // Convenience methods used by representations to pass information to the view
+  // in vtkPVView::REQUEST_UPDATE() pass. SetAxisTitle can be used to tell the
+  // view if the representation's data has information about titles to use for
+  // each of the axis. SetDataBounds can be used to tell the view the raw data
+  // bounds which are to be use when showing the slice-sliders.
+  static void SetAxisTitle(vtkInformation* info, int axis, const char* title);
+  static void SetDataBounds(vtkInformation* info, const double bounds[6]);
 
-  // Description:
-  // Set the normal of the cut for slices along Z axis.
-  void SetSliceXNormal(double x, double y, double z);
-
-  // Description:
-  // Set the normal of the cut for slices along Z axis.
-  const double* GetSliceXNormal() const;
-
-  // ====== For Slices along Y axis ========================================
-
-  // Description:
-  // Return the number of offset values that are used for slices along X axis
-  int GetNumberOfSliceY() const;
-
-  // Description:
-  // Set the number of offset values that are used for slices along X axis
-  void SetNumberOfSliceY(int size);
-
-  // Description:
-  // Set an offset value for slice along X axis
-  void SetSliceY(int index, double value);
-
-  // Description:
-  // Return a pointer to a list of offset values for slice along X axis.
-  // The contents of the list will be garbage if the number of offset <= 0.
-  const double* GetSliceY() const;
-
-  // Description:
-  // Set the origin of the cut for slices along Z axis.
-  void SetSliceYOrigin(double x, double y, double z);
-
-  // Description:
-  // Set the origin of the cut for slices along Z axis.
-  const double* GetSliceYOrigin() const;
-
-  // Description:
-  // Set the normal of the cut for slices along Z axis.
-  void SetSliceYNormal(double x, double y, double z);
-
-  // Description:
-  // Set the normal of the cut for slices along Z axis.
-  const double* GetSliceYNormal() const;
-
-  // ====== For Slices along Z axis ========================================
-
-  // Description:
-  // Return the number of offset values that are used for slices along X axis
-  int GetNumberOfSliceZ() const;
-
-  // Description:
-  // Set the number of offset values that are used for slices along X axis
-  void SetNumberOfSliceZ(int size);
-
-  // Description:
-  // Set an offset value for slice along X axis
-  void SetSliceZ(int index, double value);
-
-  // Description:
-  // Return a pointer to a list of offset values for slice along X axis.
-  // The contents of the list will be garbage if the number of offset <= 0.
-  const double* GetSliceZ() const;
-
-  // Description:
-  // Set the origin of the cut for slices along Z axis.
-  void SetSliceZOrigin(double x, double y, double z);
-
-  // Description:
-  // Set the origin of the cut for slices along Z axis.
-  const double* GetSliceZOrigin() const;
-
-  // Description:
-  // Set the normal of the cut for slices along Z axis.
-  void SetSliceZNormal(double x, double y, double z);
-
-  // Description:
-  // Set the normal of the cut for slices along Z axis.
-  const double* GetSliceZNormal() const;
-
-  // ==== Generic methods where sliceIndex represent the slice [X, Y, Z]
-  int GetNumberOfSlice(int sliceIndex) const;
-  void SetNumberOfSlice(int sliceIndex, int size);
-  void SetSlice(int sliceIndex, int index, double value);
-  const double* GetSlice(int sliceIndex) const;
-  void SetSliceOrigin(int sliceIndex, double x, double y, double z);
-  double* GetSliceOrigin(int sliceIndex) const;
-  void SetSliceNormal(int sliceIndex, double x, double y, double z);
-  double* GetSliceNormal(int sliceIndex) const;
-
-  // Description:
-  // Show/hide the bounding box outline
-  vtkSetMacro(ShowOutline, int);
-  vtkGetMacro(ShowOutline, int);
+  void SetModelTransformationMatrix(vtkMatrix4x4*);
 
 //BTX
 protected:
   vtkPVMultiSliceView();
   ~vtkPVMultiSliceView();
 
-  int ShowOutline;
+  virtual void AboutToRenderOnLocalProcess(bool interactive);
+
+  void SetNumberOfSlices(int type, unsigned int count);
+  void SetSlices(int type, const double* values);
+  const char* GetAxisLabel(int axis) const;
+  vtkNew<vtkMatrix4x4> ModelTransformationMatrix;
+
+  vtkTimeStamp ModelTransformationMatrixUpdateTime;
+
 private:
   vtkPVMultiSliceView(const vtkPVMultiSliceView&); // Not implemented
   void operator=(const vtkPVMultiSliceView&); // Not implemented

@@ -67,6 +67,22 @@ public:
   ProxyListsType ProxyLists;
   vtkSmartPointer<vtkSMProxy> Proxy;
   vtkSmartPointer<vtkEventQtSlotConnect> Connection;
+
+  /// Returns true if the ProxyLists (the collection of helper proxies)
+  /// contains the given proxy.
+  bool containsHelperProxy(vtkSMProxy* aproxy, QString& key) const
+    {
+    for (ProxyListsType::const_iterator iter = this->ProxyLists.begin();
+      iter != this->ProxyLists.end(); ++iter)
+      {
+      if (iter.value().contains(aproxy))
+        {
+        key = iter.key();
+        return true;
+        }
+      }
+    return false;
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -210,6 +226,24 @@ QList<vtkSMProxy*> pqProxy::getHelperProxies() const
         }
       }
   return list;
+}
+
+//-----------------------------------------------------------------------------
+pqProxy* pqProxy::findProxyWithHelper(vtkSMProxy* aproxy, QString& key)
+{
+  if (!aproxy) { return NULL; }
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqServer* server = smmodel->findServer(aproxy->GetSession());
+  QList<pqProxy*> proxies = smmodel->findItems<pqProxy*>(server);
+  foreach (pqProxy* pqproxy, proxies)
+    {
+    if (pqproxy->Internal->containsHelperProxy(aproxy, key))
+      {
+      return pqproxy;
+      }
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

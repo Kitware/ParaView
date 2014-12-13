@@ -30,6 +30,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkTilesHelper.h"
+#include "vtkTuple.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
@@ -41,7 +42,8 @@
 class vtkPVSynchronizedRenderWindows::vtkInternals
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkRenderer> > VectorOfRenderers;
+  typedef std::pair<vtkSmartPointer<vtkRenderer>, vtkTuple<double, 4> > RendererInfo;
+  typedef std::vector<RendererInfo> VectorOfRenderers;
 
   struct RenderWindowInfo
     {
@@ -94,16 +96,24 @@ public:
     }
 
   // Updates the viewport for all the renderers in the collection.
-  void UpdateViewports(VectorOfRenderers& renderers, double viewport[4])
+  void UpdateViewports(VectorOfRenderers& renderers, const double viewport[4])
     {
+    double dx = (viewport[2] - viewport[0]);
+    double dy = (viewport[3] - viewport[1]);
     VectorOfRenderers::iterator iter;
     for (iter = renderers.begin(); iter != renderers.end(); ++iter)
       {
       // HACK: This allows us to skip changing the viewport for orientation
       // widget for now.
-      if ((*iter)->GetLayer() != vtkPVAxesWidget::RendererLayer)
+      if ((*iter).first->GetLayer() != vtkPVAxesWidget::RendererLayer)
         {
-        (*iter)->SetViewport(viewport);
+        const vtkTuple<double, 4> &rViewport = iter->second;
+        (*iter).first->SetViewport(
+          viewport[0] + dx * rViewport[0], // xmin
+          viewport[1] + dy * rViewport[1], // ymin
+          viewport[0] + dx * rViewport[2], // xmax
+          viewport[1] + dy * rViewport[3] // ymax
+        );
         }
       }
     }
@@ -706,7 +716,42 @@ void vtkPVSynchronizedRenderWindows::RemoveRenderWindow(unsigned int id)
 void vtkPVSynchronizedRenderWindows::AddRenderer(unsigned int id,
   vtkRenderer* renderer)
 {
-  this->Internals->RenderWindows[id].Renderers.push_back(renderer);
+  double viewport[4] = {0, 0, 1, 1 };
+  this->AddRenderer(id, renderer, viewport);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::AddRenderer(unsigned int id,
+  vtkRenderer* renderer, const double viewport[4])
+{
+  this->Internals->RenderWindows[id].Renderers.push_back(
+    vtkInternals::RendererInfo(renderer, vtkTuple<double, 4>(viewport)));
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::UpdateRendererViewport(unsigned int id,
+  vtkRenderer* renderer, const double viewport[4])
+{
+  this->Internals->RenderWindows[id].Renderers.push_back(
+    vtkInternals::RendererInfo(renderer, vtkTuple<double, 4>(viewport)));
+
+  vtkInternals::RenderWindowsMap::iterator iter =
+    this->Internals->RenderWindows.find(id);
+  if (iter == this->Internals->RenderWindows.end())
+    {
+    return false;
+    }
+  vtkInternals::VectorOfRenderers::iterator iterRen;
+  for (iterRen = iter->second.Renderers.begin();
+    iterRen != iter->second.Renderers.end(); ++iterRen)
+    {
+    if (iterRen->first.GetPointer() == renderer)
+      {
+      iterRen->second = vtkTuple<double, 4>(viewport);
+      return true;
+      }
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -808,7 +853,7 @@ void vtkPVSynchronizedRenderWindows::UpdateRendererDrawStates(unsigned int id)
   for (iterRen = iter->second.Renderers.begin();
     iterRen != iter->second.Renderers.end(); ++iterRen)
     {
-    to_enable.insert(iterRen->GetPointer());
+    to_enable.insert(iterRen->first.GetPointer());
     }
 
   // disable all other renderers.
@@ -819,10 +864,12 @@ void vtkPVSynchronizedRenderWindows::UpdateRendererDrawStates(unsigned int id)
     if (to_enable.find(ren) != to_enable.end())
       {
       ren->DrawOn();
+      cout << __LINE__ << endl;
       }
     else
       {
       ren->DrawOff();
+      cout << __LINE__ << endl;
       }
     }
 

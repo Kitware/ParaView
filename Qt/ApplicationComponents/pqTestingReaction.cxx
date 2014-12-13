@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTabbedMultiViewWidget.h"
 #include "pqTestUtility.h"
 
+#include <QApplication>
 //-----------------------------------------------------------------------------
 pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode,Qt::ConnectionType type)
   : Superclass(parentObject,type)
@@ -78,6 +79,7 @@ void pqTestingReaction::recordTest(const QString& filename)
 {
   if (!filename.isEmpty())
     {
+    QApplication::setActiveWindow(pqCoreUtilities::mainWidget());
     pqApplicationCore::instance()->testUtility()->recordTests(filename);
     }
 }

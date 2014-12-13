@@ -206,6 +206,9 @@
           If the value of this property is 1, then the points to glyph are chosen randomly. Otherwise the point ids chosen are evenly spaced.
         </Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ShowInMenu category="Custom" />
+      </Hints>
 
     </SourceProxy>
 

@@ -37,6 +37,7 @@ set (Module_SRCS
   vtkSITextSourceRepresentationProxy.cxx
   vtkSIUniformGridVolumeRepresentationProxy.cxx
   vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
+  vtkSICompositeOrthographicSliceRepresentationProxy.cxx
 )
 
 #------------------------------------------------------------------------------

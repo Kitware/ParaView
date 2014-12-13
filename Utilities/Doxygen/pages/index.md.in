@@ -12,7 +12,14 @@ Navigation
 
 Page | Description
 -----|----------------------------------------
-[Major API Changes](@ref MajorAPIChanges) | Descriptions for major API chages.
+[Major API Changes](@ref MajorAPIChanges) | Descriptions for major API changes.
+
+Design/Implementation Details
+-----------------------------
+
+Page | Description
+-----|---------------------------------------------------------------
+[Slice View](@ref DesignSliceView) | Implementing the **Slice View**
 
 Developer notes
 ----------------

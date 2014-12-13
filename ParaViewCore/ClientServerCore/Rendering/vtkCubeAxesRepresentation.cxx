@@ -31,10 +31,11 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
-#include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkProperty.h"
+#include "vtkPVChangeOfBasisHelper.h"
+#include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
@@ -525,123 +526,75 @@ void vtkCubeAxesRepresentation::SetCenterStickyAxes(int val)
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
 {
-
   // Update axes title informations
-  vtkFieldData* fieldData = input->GetFieldData();
-  vtkStringArray* titleX =
-      vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForX"));
-  vtkStringArray* titleY =
-      vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForY"));
-  vtkStringArray* titleZ =
-      vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForZ"));
-  if(titleX && titleX->GetNumberOfValues() > 0 && this->UseDefaultXTitle == 1)
+  const char* utitle = NULL;
+  const char* vtitle = NULL;
+  const char* wtitle = NULL;
+  vtkPVChangeOfBasisHelper::GetBasisName(input, utitle, vtitle, wtitle);
+  if (this->UseDefaultXTitle == 1 && utitle != NULL)
     {
-    this->CubeAxesActor->SetXTitle(titleX->GetValue(0).c_str());
+    this->CubeAxesActor->SetXTitle(utitle);
     }
   else if(this->UserXTitle)
     {
     this->CubeAxesActor->SetXTitle(this->UserXTitle);
     }
-  if(titleY && titleY->GetNumberOfValues() > 0 && this->UseDefaultYTitle == 1)
+  if (this->UseDefaultYTitle == 1 && vtitle != NULL)
     {
-    this->CubeAxesActor->SetYTitle(titleY->GetValue(0).c_str());
+    this->CubeAxesActor->SetYTitle(vtitle);
     }
   else if(this->UserYTitle)
     {
     this->CubeAxesActor->SetYTitle(this->UserYTitle);
     }
-  if(titleZ && titleZ->GetNumberOfValues() > 0 && this->UseDefaultZTitle == 1)
+  if(this->UseDefaultZTitle == 1 && wtitle != NULL)
     {
-    this->CubeAxesActor->SetZTitle(titleZ->GetValue(0).c_str());
+    this->CubeAxesActor->SetZTitle(wtitle);
     }
   else if(this->UserZTitle)
     {
     this->CubeAxesActor->SetZTitle(this->UserZTitle);
     }
 
-  // Update Axis orientation
-  vtkFloatArray* uBase =
-      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForX"));
-  if(uBase && uBase->GetNumberOfTuples() > 0)
+  // Update axis orientation and bounds. This is where we loose all rhyme and
+  // reason. vtkCubeAxesActor has a bad API to support basis vectors. It takes
+  // normalized basis vectors for the 3 axis only. Hence, we do this trick -- we
+  // pass normalized basis vectors, then scale the oriented bounds (which should
+  // have been called data bounds in the coordinate system defined by basis
+  // vectors).
+  vtkVector3d u(1, 0, 0), v(0, 1, 0), w(0, 0, 1);
+  vtkSmartPointer<vtkMatrix4x4> changeOfBasisMatrix =
+    vtkPVChangeOfBasisHelper::GetChangeOfBasisMatrix(input);
+  double unorm =1.0, vnorm = 1.0, wnorm = 1.0;
+  if (changeOfBasisMatrix)
     {
-    this->CubeAxesActor->SetAxisBaseForX(uBase->GetTuple(0));
+    vtkPVChangeOfBasisHelper::GetBasisVectors(changeOfBasisMatrix, u, v, w);
+    unorm = u.Normalize();
+    vnorm = v.Normalize();
+    wnorm = w.Normalize();
     }
-  else
-    {
-    this->CubeAxesActor->SetAxisBaseForX(1,0,0);
-    }
-  vtkFloatArray* vBase =
-      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForY"));
-  if(vBase && vBase->GetNumberOfTuples() > 0)
-    {
-    this->CubeAxesActor->SetAxisBaseForY(vBase->GetTuple(0));
-    }
-  else
-    {
-    this->CubeAxesActor->SetAxisBaseForY(0,1,0);
-    }
-  vtkFloatArray* wBase =
-      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForZ"));
-  if(wBase && wBase->GetNumberOfTuples() > 0)
-    {
-    this->CubeAxesActor->SetAxisBaseForZ(wBase->GetTuple(0));
-    }
-  else
-    {
-    this->CubeAxesActor->SetAxisBaseForZ(0,0,1);
-    }
+  this->CubeAxesActor->SetAxisBaseForX(u.GetData());
+  this->CubeAxesActor->SetAxisBaseForY(v.GetData());
+  this->CubeAxesActor->SetAxisBaseForZ(w.GetData());
 
   // Make sure we enable oriented bounding box if any
-  vtkFloatArray* orientedboundingBox =
-      vtkFloatArray::SafeDownCast(fieldData->GetArray("OrientedBoundingBox"));
-  vtkFloatArray* sliceAt =
-      vtkFloatArray::SafeDownCast(fieldData->GetArray("SliceAt"));
-  vtkIdTypeArray* sliceAlongAxis =
-      vtkIdTypeArray::SafeDownCast(fieldData->GetArray("SliceAlongAxis"));
-  if(orientedboundingBox)
+  double orientedBounds[6] = {0,0,0,0,0,0};
+  if (vtkPVChangeOfBasisHelper::GetBoundingBoxInBasis(input, orientedBounds))
     {
+    double minpoint[4] = {orientedBounds[0], orientedBounds[2], orientedBounds[4], 1};
+    double maxpoint[4] = {orientedBounds[1], orientedBounds[3], orientedBounds[5], 1};
     this->UseOrientedBounds = true;
-    double orientedBounds[6] = {0,0,0,0,0,0};
-    orientedboundingBox->GetTuple(0, orientedBounds);
-    if(sliceAlongAxis && sliceAt)
-      {
-      int axisIndex = sliceAlongAxis->GetValue(0);
-      orientedBounds[axisIndex*2 + 1] = orientedBounds[axisIndex*2] =
-          (double)sliceAt->GetValue(axisIndex);
-      }
-    this->CubeAxesActor->SetUseOrientedBounds(1);
-    this->CubeAxesActor->SetOrientedBounds(orientedBounds);
-    this->CubeAxesActor->SetXAxisRange(&orientedBounds[0]);
-    this->CubeAxesActor->SetYAxisRange(&orientedBounds[2]);
-    this->CubeAxesActor->SetZAxisRange(&orientedBounds[4]);
+    this->CubeAxesActor->SetUseOrientedBounds(true);
+    this->CubeAxesActor->SetOrientedBounds(
+      minpoint[0]*unorm, maxpoint[0]*unorm,
+      minpoint[1]*vnorm, maxpoint[1]*vnorm,
+      minpoint[2]*wnorm, maxpoint[2]*wnorm);
+    this->CustomRangeActive[0] = this->CustomRangeActive[1] = this->CustomRangeActive[2] = 1;
+    std::copy(orientedBounds, orientedBounds+6, this->CustomRange);
     }
   else
     {
     this->UseOrientedBounds = false;
-    this->CubeAxesActor->SetUseOrientedBounds(0);
-    }
-
-  // Read custom Label Range
-  const char* labelRangeFieldNames[3] =
-                          {"LabelRangeForX","LabelRangeForY","LabelRangeForZ"};
-  vtkUnsignedCharArray* customRangeActiveFlag =
-      vtkUnsignedCharArray::SafeDownCast(
-        fieldData->GetArray("LabelRangeActiveFlag"));
-
-  for(int i=0; i < 3; ++i)
-    {
-    vtkFloatArray* range = vtkFloatArray::SafeDownCast(
-          fieldData->GetArray(labelRangeFieldNames[i]));
-    if(range && range->GetNumberOfTuples() > 0)
-      {
-      range->GetTuple(0, &this->CustomRange[i*2]);
-      }
-
-
-    if(customRangeActiveFlag)
-      {
-      this->CustomRangeActive[i] = (customRangeActiveFlag->GetValue(i) == 0)
-                                   ? 0 : 1;
-      }
+    this->CubeAxesActor->SetUseOrientedBounds(false);
     }
 }

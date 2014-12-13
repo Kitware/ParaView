@@ -191,7 +191,7 @@ void vtkThreeSliceFilter::SetNumberOfSlice(int cutIndex, int size)
 //-----------------------------------------------------------------------
 int vtkThreeSliceFilter::FillInputPortInformation(int, vtkInformation *info)
 {
-  info->Set( vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject" );
+  info->Set( vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet" );
   return 1;
 }
 //-----------------------------------------------------------------------
@@ -218,6 +218,8 @@ int vtkThreeSliceFilter::RequestData( vtkInformation *,
 
   if(inputComposite)
     {
+    //FIXME:UDA
+    abort();
     // Composite DS
     vtkCompositeDataSet* innerOutputs[4];
     for(int i=0;i<4;++i)

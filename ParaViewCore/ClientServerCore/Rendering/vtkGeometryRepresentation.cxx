@@ -414,9 +414,17 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
   this->CacheKeeper->Update();
 
   // Determine data bounds.
-  vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(
-    this->CacheKeeper->GetOutputDataObject(0));
-  if (cd)
+  this->GetBounds(this->CacheKeeper->GetOutputDataObject(0),
+    this->DataBounds);
+  return this->Superclass::RequestData(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
+bool vtkGeometryRepresentation::GetBounds(
+  vtkDataObject* dataObject, double bounds[6])
+{
+  vtkMath::UninitializeBounds(bounds);
+  if (vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(dataObject))
     {
     vtkBoundingBox bbox;
     vtkCompositeDataIterator* iter = cd->NewIterator();
@@ -431,11 +439,16 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
     iter->Delete();
     if (bbox.IsValid())
       {
-      bbox.GetBounds(this->DataBounds);
+      bbox.GetBounds(bounds);
+      return true;
       }
     }
-
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  else if (vtkDataSet* ds = vtkDataSet::SafeDownCast(dataObject))
+    {
+    ds->GetBounds(bounds);
+    return (vtkMath::AreBoundsInitialized(bounds) == 1);
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------

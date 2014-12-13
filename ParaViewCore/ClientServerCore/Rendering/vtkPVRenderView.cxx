@@ -255,7 +255,6 @@ vtkPVRenderView::vtkPVRenderView()
         this->ThreeDInteractorStyle = vtkPVInteractorStyle::New();
     this->TwoDInteractorStyle = vtkPVInteractorStyle::New();
 
-    this->Interactor->SetRenderer(this->GetRenderer());
     this->Interactor->SetRenderWindow(this->GetRenderWindow());
     this->Interactor->SetInteractorStyle(this->ThreeDInteractorStyle);
 
@@ -1229,6 +1228,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
      in_tile_display_mode || in_cave_mode) &&
     vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_DATA_SERVER)
     {
+    this->AboutToRenderOnLocalProcess(interactive);
     this->GetRenderWindow()->Render();
     }
 
