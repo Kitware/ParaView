@@ -37,6 +37,7 @@ set(Module_SRCS
   ## Filters
   vtkMinkowskiFilter.cxx
   vtkPLANLHaloFinder.cxx
+  vtkPANLHaloFinder.cxx
   vtkPMergeConnected.cxx
   )
 
