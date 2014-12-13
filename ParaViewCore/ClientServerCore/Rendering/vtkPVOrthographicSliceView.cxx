@@ -37,6 +37,13 @@
 
 class vtkPVOrthographicSliceViewInteractorStyle : public vtkPVInteractorStyle
 {
+  vtkPVInteractorStyle* PrimaryInteractorStyle;
+  vtkPVInteractorStyle* OrthographicInteractorStyle;
+  vtkRenderer* PrimaryRenderer;
+  vtkWeakPointer<vtkPVOrthographicSliceView> View;
+  vtkVector2i ClickPosition;
+  int ClickCounter;
+
 public:
   static vtkPVOrthographicSliceViewInteractorStyle* New();
   vtkTypeMacro(vtkPVOrthographicSliceViewInteractorStyle, vtkPVInteractorStyle);
@@ -44,12 +51,62 @@ public:
   vtkSetObjectMacro(OrthographicInteractorStyle, vtkPVInteractorStyle);
   vtkSetObjectMacro(PrimaryInteractorStyle, vtkPVInteractorStyle);
   vtkSetObjectMacro(PrimaryRenderer, vtkRenderer);
+  vtkSetMacro(View, vtkPVOrthographicSliceView*);
+
+  virtual void OnLeftButtonDown()
+    {
+    this->Superclass::OnLeftButtonDown();
+
+    vtkVector2i eventPosition;
+    this->Interactor->GetEventPosition(eventPosition.GetData());
+    if (std::abs(eventPosition[0] - this->ClickPosition[0]) < 2 &&
+      std::abs(eventPosition[1] - this->ClickPosition[1]) < 2)
+      {
+      }
+    else
+      {
+      // reset ClickPosition/ClickCounter since the mouse position is different
+      // from last time.
+      this->ClickPosition = eventPosition;
+      this->ClickCounter = 0;
+      }
+    }
+  virtual void OnLeftButtonUp()
+    {
+    this->Superclass::OnLeftButtonUp();
+
+    vtkVector2i eventPosition;
+    this->Interactor->GetEventPosition(eventPosition.GetData());
+    if (std::abs(eventPosition[0] - this->ClickPosition[0]) < 2 &&
+      std::abs(eventPosition[1] - this->ClickPosition[1]) < 2)
+      {
+      // ClickCounter == 1: down & up happened at same location once.
+      // ClickCounter == 2: down & up happened at same location twice! -- double click!!!
+      this->ClickCounter++;
+      }
+    else
+      {
+      // reset ClickPosition/ClickCounter since the mouse position is different
+      // from last time.
+      this->ClickPosition = vtkVector2i(-1, -1);
+      this->ClickCounter = 0;
+      }
+
+    if (this->ClickCounter == 2) // double-click!
+      {
+      double worldPos[3];
+      this->GetEventWorldPosition(worldPos);
+      this->View->MoveSlicePosition(this->CurrentRenderer, worldPos);
+      this->ClickCounter = 0;
+      }
+    }
 
 protected:
   vtkPVOrthographicSliceViewInteractorStyle():
     PrimaryInteractorStyle(NULL),
     OrthographicInteractorStyle(NULL),
-    PrimaryRenderer(NULL)
+    PrimaryRenderer(NULL),
+    ClickCounter(0)
     {
     }
   ~vtkPVOrthographicSliceViewInteractorStyle()
@@ -68,9 +125,24 @@ protected:
     return this->OrthographicInteractorStyle->FindManipulator(button, shift, control);
     }
 
-  vtkPVInteractorStyle* PrimaryInteractorStyle;
-  vtkPVInteractorStyle* OrthographicInteractorStyle;
-  vtkRenderer* PrimaryRenderer;
+
+  void GetEventWorldPosition(double position[3])
+    {
+    assert(this->CurrentRenderer && this->Interactor);
+    int eventPosition[3]={0, 0, 0};
+    this->Interactor->GetEventPosition(eventPosition);
+
+    // Now convert this eventPosition to world coordinates.
+    this->CurrentRenderer->SetDisplayPoint(eventPosition[0],
+      eventPosition[1], eventPosition[2]);
+    this->CurrentRenderer->DisplayToWorld();
+
+    double worldPoint[4];
+    this->CurrentRenderer->GetWorldPoint(worldPoint);
+    position[0] = worldPoint[0] / worldPoint[3];
+    position[1] = worldPoint[1] / worldPoint[3];
+    position[2] = worldPoint[2] / worldPoint[3];
+    }
 
 private:
   vtkPVOrthographicSliceViewInteractorStyle(const vtkPVOrthographicSliceViewInteractorStyle&);
@@ -102,7 +174,7 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
     window->AddRenderer(this->Renderers[cc].GetPointer());
 
     this->SlicePositionAxes2D[cc]->SetComputeNormals(0);
-    this->SlicePositionAxes2D[cc]->SetPickable(0);
+    this->SlicePositionAxes2D[cc]->SetPickable(1);
     this->SlicePositionAxes2D[cc]->SetUseBounds(1);
     this->SlicePositionAxes2D[cc]->SetScale(10, 10, 10);
     this->Renderers[cc]->AddActor(this->SlicePositionAxes2D[cc].GetPointer());
@@ -141,6 +213,7 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
     this->OrthographicInteractorStyle->SetPrimaryInteractorStyle(this->ThreeDInteractorStyle);
     this->OrthographicInteractorStyle->SetOrthographicInteractorStyle(this->TwoDInteractorStyle);
     this->OrthographicInteractorStyle->SetPrimaryRenderer(this->GetRenderer());
+    this->OrthographicInteractorStyle->SetView(this);
 
     this->Interactor->AddObserver(vtkCommand::MouseWheelForwardEvent,
       this, &vtkPVOrthographicSliceView::OnMouseWheelForwardEvent);
@@ -388,6 +461,25 @@ void vtkPVOrthographicSliceView::OnMouseWheelBackwardEvent()
       }
     }
   this->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, pos);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::MoveSlicePosition(vtkRenderer* ren, double position[3])
+{
+  int viewIndex = -1;
+  for (int cc=0; cc < 3; cc++)
+    {
+    if (ren == this->Renderers[cc].GetPointer())
+      {
+      viewIndex = cc;
+      break;
+      }
+    }
+  if (viewIndex != -1)
+    {
+    position[viewIndex] = this->SlicePosition[viewIndex];
+    this->InvokeEvent(vtkCommand::PlacePointEvent, position);
+    }
 }
 
 //----------------------------------------------------------------------------

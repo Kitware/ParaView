@@ -53,6 +53,7 @@ protected:
   virtual void CreateVTKObjects();
   void OnMouseWheelBackwardEvent(vtkObject*, unsigned long, void* calldata);
   void OnMouseWheelForwardEvent(vtkObject*, unsigned long, void* calldata);
+  void OnPlacePointEvent(vtkObject*, unsigned long, void* calldata);
 private:
   vtkSMOrthographicSliceViewProxy(const vtkSMOrthographicSliceViewProxy&); // Not implemented
   void operator=(const vtkSMOrthographicSliceViewProxy&); // Not implemented

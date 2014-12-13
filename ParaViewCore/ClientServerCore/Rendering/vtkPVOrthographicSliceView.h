@@ -12,10 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVOrthographicSliceView
+// .NAME vtkPVOrthographicSliceView -- vtkView subclass for Orthographic Slice
+// View.
 // .SECTION Description
+// vtkPVOrthographicSliceView extends vtkPVMultiSliceView to support showing a
+// quad-view with orthographic views along with the 3D view. Work with
+// vtkPVCompositeOrthographicSliceRepresentation and vtkGeometrySliceRepresentation,
+// this class create a 3 slices for any dataset shown in this view and shows
+// those slices in the orthographic views. The orthographic views themselves are
+// non-composited i.e. the data is simply cloned on all rendering processes
+// (hence we limit ourselves to showing slices alone).
 //
-
+// .SECTION Interactions
+// In the orthographic views, users can use the thumb-wheel to change the slice
+// plane (in which case the \c SliceIncrements are used to update the slice
+// position). Additionally, users can double click in any of the orthographic
+// views to move the slice position to that location.
 #ifndef __vtkPVOrthographicSliceView_h
 #define __vtkPVOrthographicSliceView_h
 
@@ -23,7 +35,6 @@
 
 class vtkPVOrthographicSliceViewInteractorStyle;
 
-// FIXME: rename this class to vtkPVQuadSliceView
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOrthographicSliceView : public vtkPVMultiSliceView
 {
 public:
@@ -116,6 +127,9 @@ private:
 
   void OnMouseWheelForwardEvent();
   void OnMouseWheelBackwardEvent();
+  void MoveSlicePosition(vtkRenderer* ren, double position[3]);
+
+  friend class vtkPVOrthographicSliceViewInteractorStyle;
 
 //ETX
 };
