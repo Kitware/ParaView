@@ -342,8 +342,11 @@ std::vector<double> vtkPVScalarBarActor::LinearTickMarks(
 
   // If we have too many ticks, try reducing the number of ticks by applying
   // these scaling factors to originalMag in this order.
-  const double magScale[] = { 1.0, 2.0, 2.5, 4.0, 10.0,
-                              20.0, 25.0, 40.0, 100.0 };
+  const double magScale[] = { 1.0, 1.5, 2.0, 2.5, 3.0, 3.5,
+                              4.0, 5.0, 6.0, 7.0, 8.0, 9.0,
+                              10.0, 15.0, 20.0, 25.0, 30.0, 35.0,
+                              40.0, 50.0, 60.0, 70.0, 80.0, 90.0,
+                              100.0 };
   const int numScales = static_cast<int>(sizeof(magScale)/sizeof(double));
 
   for (int scaleIdx = 0; scaleIdx < numScales; scaleIdx++)
