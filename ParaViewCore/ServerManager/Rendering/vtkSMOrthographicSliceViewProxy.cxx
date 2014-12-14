@@ -59,6 +59,8 @@ void vtkSMOrthographicSliceViewProxy::CreateVTKObjects()
     this, &vtkSMOrthographicSliceViewProxy::OnMouseWheelForwardEvent);
   view->AddObserver(vtkCommand::MouseWheelBackwardEvent,
     this, &vtkSMOrthographicSliceViewProxy::OnMouseWheelBackwardEvent);
+  view->AddObserver(vtkCommand::PlacePointEvent,
+    this, &vtkSMOrthographicSliceViewProxy::OnPlacePointEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -135,7 +137,7 @@ void vtkSMOrthographicSliceViewProxy::OnMouseWheelBackwardEvent(
   vtkSMPropertyHelper posHelper(this, "SlicePosition");
   posHelper.Set(data, 3);
   this->UpdateVTKObjects();
-  this->InvokeEvent(vtkCommand::MouseWheelBackwardEvent);
+  this->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, data);
   this->StillRender(); // FIXME: I want the Qt layer to do this.
 }
 
@@ -147,7 +149,19 @@ void vtkSMOrthographicSliceViewProxy::OnMouseWheelForwardEvent(
   vtkSMPropertyHelper posHelper(this, "SlicePosition");
   posHelper.Set(data, 3);
   this->UpdateVTKObjects();
-  this->InvokeEvent(vtkCommand::MouseWheelForwardEvent);
+  this->InvokeEvent(vtkCommand::MouseWheelForwardEvent, data);
+  this->StillRender(); // FIXME: I want the Qt layer to do this.
+}
+
+//----------------------------------------------------------------------------
+void vtkSMOrthographicSliceViewProxy::OnPlacePointEvent(
+  vtkObject*, unsigned long, void* calldata)
+{
+  double* data = reinterpret_cast<double*>(calldata);
+  vtkSMPropertyHelper posHelper(this, "SlicePosition");
+  posHelper.Set(data, 3);
+  this->UpdateVTKObjects();
+  this->InvokeEvent(vtkCommand::PlacePointEvent, data);
   this->StillRender(); // FIXME: I want the Qt layer to do this.
 }
 

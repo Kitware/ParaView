@@ -37,9 +37,3 @@ This change also modifies how readers are detected.  Readers now must provide a
 hint to the ReaderManager in the server xml file to be detected as readers rather
 than sources.  The backwards compatibility behavior that assumed any source with
 a FileName attribute was a reader has been removed.
-
-###vtkSITimeLabelProperty is no longer available###
-
-`vtkSITimeLabelProperty` was used as the *si\_class* for **TimeLabelAnnotation**
-property. This was unnecessary. The default `vtkSIStringVectorProperty` will
-work just fine.
