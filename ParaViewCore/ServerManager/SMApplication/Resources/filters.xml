@@ -7770,7 +7770,6 @@ found and the point will be rejected.</Documentation>
         <PropertyGroup type="Handle">
           <Property function="WorldPosition" name="Location" />
         </PropertyGroup>
-        <ShowInMenu category="DataAnalysis" />
       </Hints>
 
       <!-- End ProbePoint -->
