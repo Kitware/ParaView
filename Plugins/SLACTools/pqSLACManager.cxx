@@ -37,7 +37,7 @@
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 
-#include "pqActiveView.h"
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
@@ -230,7 +230,7 @@ pqView *pqSLACManager::findView(pqPipelineSource *source, int port,
     }
 
   // Step 2, check to see if the active view is the right type.
-  pqView *view = pqActiveView::instance().current();
+  pqView *view = pqActiveObjects::instance().activeView();
   if (view->getViewType() == viewType) return view;
 
   // Step 3, check all the views and see if one is the right type and not

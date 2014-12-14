@@ -43,8 +43,6 @@ set (Module_SRCS
   pqActiveObjects.h
   pqActiveServer.cxx
   pqActiveServer.h
-  pqActiveView.cxx
-  pqActiveView.h
   pqAnimatablePropertiesComboBox.cxx
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.cxx
@@ -367,7 +365,6 @@ set (Module_MOC_HDRS
   pqAboutDialog.h
   pqActiveObjects.h
   pqActiveServer.h
-  pqActiveView.h
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.h

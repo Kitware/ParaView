@@ -52,7 +52,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
-#include "pqActiveView.h"
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
 #include "pqXYChartView.h"
@@ -681,7 +681,7 @@ pqView *pqSierraPlotToolsManager::findView(pqPipelineSource *source, int port,
     }
 
   // Step 2, check to see if the active view is the right type.
-  pqView *view = pqActiveView::instance().current();
+  pqView *view = pqActiveObjects::instance().activeView();
 
   if (view == NULL)
     {

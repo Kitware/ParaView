@@ -37,3 +37,9 @@ This change also modifies how readers are detected.  Readers now must provide a
 hint to the ReaderManager in the server xml file to be detected as readers rather
 than sources.  The backwards compatibility behavior that assumed any source with
 a FileName attribute was a reader has been removed.
+
+###Removed pqActiveView (use pqActiveObjects instead)###
+
+`pqActiveView` was a long deprecated class which internally indeed used
+pqActiveObjects. `pqActiveView` has now been removed. Any code using
+`pqActiveView` can switch to using pqActiveObjects with very few code changes.
