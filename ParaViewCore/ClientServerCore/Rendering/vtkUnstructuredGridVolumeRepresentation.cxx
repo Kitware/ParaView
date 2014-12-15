@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkUnstructuredGridVolumeRepresentation.h"
 
+#include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
@@ -385,6 +386,7 @@ void vtkUnstructuredGridVolumeRepresentation::SetInterpolationType(int val)
 void vtkUnstructuredGridVolumeRepresentation::SetColor(vtkColorTransferFunction* lut)
 {
   this->Property->SetColor(lut);
+  this->LODMapper->SetLookupTable(lut);
 }
 
 //----------------------------------------------------------------------------
