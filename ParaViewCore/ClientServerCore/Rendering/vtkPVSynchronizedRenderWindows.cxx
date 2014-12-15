@@ -864,12 +864,10 @@ void vtkPVSynchronizedRenderWindows::UpdateRendererDrawStates(unsigned int id)
     if (to_enable.find(ren) != to_enable.end())
       {
       ren->DrawOn();
-      cout << __LINE__ << endl;
       }
     else
       {
       ren->DrawOff();
-      cout << __LINE__ << endl;
       }
     }
 

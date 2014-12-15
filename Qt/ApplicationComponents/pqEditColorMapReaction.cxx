@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMTrace.h"
 
 #include <QColorDialog>
 #include <QDebug>
@@ -78,6 +79,10 @@ void pqEditColorMapReaction::editColorMap()
     {
     // Get the color property.
     vtkSMProxy *proxy = repr->getProxy();
+    SM_SCOPED_TRACE(PropertiesModified)
+      .arg(proxy)
+      .arg("comment", " change solid color");
+
     vtkSMProperty *diffuse = proxy->GetProperty("DiffuseColor");
     vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
     QString reprType = vtkSMPropertyHelper(
