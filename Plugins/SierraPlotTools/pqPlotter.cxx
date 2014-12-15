@@ -24,7 +24,7 @@
 #include "pqPlotter.h"
 #include "pqSierraPlotToolsManager.h"
 
-#include "pqActiveView.h"
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqXYChartView.h"
@@ -572,7 +572,7 @@ pqView * pqPlotter::findView(pqPipelineSource *source, int port,
     }
 
   // Step 2, check to see if the active view is the right type.
-  pqView *view = pqActiveView::instance().current();
+  pqView *view = pqActiveObjects::instance().activeView();
 
   if (view == NULL)
     {

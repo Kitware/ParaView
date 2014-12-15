@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraKeyFrameWidget.h"
 #include "ui_pqCameraKeyFrameWidget.h"
 
-#include "pqActiveView.h"
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqServer.h"
 #include "pqSplineWidget.h"
@@ -206,11 +206,9 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
     this->Internal->PSplineProxy->GetHints()->FindNestedElementByName(
       "PropertyGroup"));
 
-  QObject::connect(&pqActiveView::instance(),
-    SIGNAL(changed(pqView*)),
-    this->Internal->PSplineWidget,
-    SLOT(setView(pqView*)));
-  this->Internal->PSplineWidget->setView(pqActiveView::instance().current());
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this->Internal->PSplineWidget, SLOT(setView(pqView*)));
+  this->Internal->PSplineWidget->setView(pqActiveObjects::instance().activeView());
   this->Internal->PSplineWidget->deselect();
 
   (new QVBoxLayout(this->Internal->positionContainer))->addWidget(
@@ -228,11 +226,9 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
     this->Internal->FSplineProxy->GetHints()->FindNestedElementByName(
       "PropertyGroup"));
 
-  QObject::connect(&pqActiveView::instance(),
-    SIGNAL(changed(pqView*)),
-    this->Internal->FSplineWidget,
-    SLOT(setView(pqView*)));
-  this->Internal->FSplineWidget->setView(pqActiveView::instance().current());
+  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this->Internal->FSplineWidget, SLOT(setView(pqView*)));
+  this->Internal->FSplineWidget->setView(pqActiveObjects::instance().activeView());
   this->Internal->FSplineWidget->deselect();
 
   (new QVBoxLayout(this->Internal->focusContainer))->addWidget(
