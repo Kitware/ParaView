@@ -546,8 +546,8 @@ void vtkPVFileInformation::GetSpecialDirectories()
 
   CFURLEnumeratorRef volumeEnum = CFURLEnumeratorCreateForMountedVolumes(kCFAllocatorDefault,
       kCFURLEnumeratorGenerateFileReferenceURLs, NULL);
-  CFURLRef resolvedUrl;
-  CFErrorRef err;
+  CFURLRef resolvedUrl = NULL;
+  CFErrorRef err = NULL;
   CFURLEnumeratorResult res;
   while (kCFURLEnumeratorEnd != (res = CFURLEnumeratorGetNextURL(volumeEnum, &resolvedUrl, &err)))
     {
@@ -600,8 +600,11 @@ void vtkPVFileInformation::GetSpecialDirectories()
       }
     else
       {
-      CFRelease(err);
-      err = NULL;
+      if (err)
+        {
+        CFRelease(err);
+        err = NULL;
+        }
       }
     }
   //-- Read the com.apple.sidebar.plist file to get the user's list of directories
@@ -644,8 +647,11 @@ void vtkPVFileInformation::GetSpecialDirectories()
                 }
               else
                 {
-                CFRelease(err);
-                err = NULL;
+                if (err)
+                  {
+                  CFRelease(err);
+                  err = NULL;
+                  }
                 }
               free(tAliasHdl);
               }
