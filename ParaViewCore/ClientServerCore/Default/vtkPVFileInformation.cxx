@@ -635,6 +635,8 @@ void vtkPVFileInformation::GetSpecialDirectories()
               CFDataGetBytes(alias, CFRangeMake( 0, dataSize),
                   ( UInt8*) *tAliasHdl );
               Boolean stale;
+              CFURLRef resolvedUrl;
+              CFErrorRef err;
               if ((resolvedUrl = CFURLCreateByResolvingBookmarkData(kCFAllocatorDefault, alias, 0, NULL, NULL, &stale, &err)))
                 {
                 url = CFURLCopyFileSystemPath(resolvedUrl,
