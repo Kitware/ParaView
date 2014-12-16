@@ -632,7 +632,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
               == CFGetTypeID(alias) )
             {
             CFIndex dataSize = CFDataGetLength(alias);
-            AliasHandle tAliasHdl = (AliasHandle) malloc(dataSize);
+            AliasHandle tAliasHdl = (AliasHandle) NewHandle(dataSize); // XXX: deprecated, but crashes when malloc is used
             if (tAliasHdl)
               {
               CFDataGetBytes(alias, CFRangeMake( 0, dataSize),
@@ -653,7 +653,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
                   err = NULL;
                   }
                 }
-              free(tAliasHdl);
+              DisposeHandle((Handle) tAliasHdl); // XXX: deprecated, but malloc crashes things
               }
 
             if(!url || !name)
