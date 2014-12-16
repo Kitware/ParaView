@@ -544,32 +544,21 @@ void vtkPVFileInformation::GetSpecialDirectories()
 #if defined (__APPLE__ )
   //-------- Get the List of Mounted Volumes from the System
 
-  CFURLEnumeratorRef volumeEnum = CFURLEnumeratorCreateForMountedVolumes(kCFAllocatorDefault,
-      kCFURLEnumeratorGenerateFileReferenceURLs, NULL);
-  CFURLRef resolvedUrl;
-  CFErrorRef err;
-  CFURLEnumeratorResult res;
-  while (kCFURLEnumeratorEnd != (res = CFURLEnumeratorGetNextURL(volumeEnum, &resolvedUrl, &err)))
+  int idx = 1;
+  HFSUniStr255 hfsname;
+  FSRef ref;
+  while (noErr == FSGetVolumeInfo(kFSInvalidVolumeRefNum, idx++, NULL,
+      kFSVolInfoNone, NULL, &hfsname, &ref))
     {
-    if (res == kCFURLEnumeratorSuccess)
+    CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &ref);
+    if (resolvedUrl)
       {
       CFStringRef url;
       url = CFURLCopyFileSystemPath(resolvedUrl, kCFURLPOSIXPathStyle);
       if(url)
         {
-        CFStringRef cfname = NULL;
-        CFErrorRef nameErr = NULL;
-        Boolean gotName = FALSE;
-
-        // kCFURLVolumeNameKey is only available in 10.7.
-#ifdef kCFCoreFoundationVersionNumber10_7
-        gotName = CFURLCopyResourcePropertyForKey(resolvedUrl, kCFURLVolumeNameKey, &cfname, &nameErr);
-#endif
-        if (!gotName)
-          {
-          cfname = CFStringCreateWithCString(kCFAllocatorDefault, "<unknown>", kCFStringEncodingASCII);
-          CFRelease(nameErr);
-          }
+        CFStringRef cfname = CFStringCreateWithCharacters(kCFAllocatorDefault,
+            hfsname.unicode, hfsname.length);
 
         CFIndex pathSize = CFStringGetLength(url)+1;
         std::vector<char> pathChars(pathSize, 0);
@@ -593,12 +582,6 @@ void vtkPVFileInformation::GetSpecialDirectories()
         CFRelease(cfname);
         }
       CFRelease(resolvedUrl);
-      resolvedUrl = NULL;
-      }
-    else
-      {
-      CFRelease(err);
-      err = NULL;
       }
     }
   //-- Read the com.apple.sidebar.plist file to get the user's list of directories
@@ -626,27 +609,24 @@ void vtkPVFileInformation::GetSpecialDirectories()
               == CFGetTypeID(alias) )
             {
             CFIndex dataSize = CFDataGetLength(alias);
-            AliasHandle tAliasHdl = (AliasHandle) malloc(dataSize);
+            AliasHandle tAliasHdl = (AliasHandle) NewHandle(dataSize);
             if (tAliasHdl)
               {
               CFDataGetBytes(alias, CFRangeMake( 0, dataSize),
                   ( UInt8*) *tAliasHdl );
-              Boolean stale;
-              CFURLRef resolvedUrl;
-              CFErrorRef err;
-              if ((resolvedUrl = CFURLCreateByResolvingBookmarkData(kCFAllocatorDefault, alias, 0, NULL, NULL, &stale, &err)))
+              FSRef tFSRef;
+              Boolean changed;
+              if (noErr == FSResolveAlias(NULL, tAliasHdl, &tFSRef, &changed))
                 {
-                url = CFURLCopyFileSystemPath(resolvedUrl,
-                    kCFURLPOSIXPathStyle);
-                CFRelease(resolvedUrl);
-                resolvedUrl = NULL;
+                CFURLRef resolvedUrl = CFURLCreateFromFSRef(NULL, &tFSRef);
+                if (resolvedUrl)
+                  {
+                  url = CFURLCopyFileSystemPath(resolvedUrl,
+                      kCFURLPOSIXPathStyle);
+                  CFRelease(resolvedUrl);
+                  }
                 }
-              else
-                {
-                CFRelease(err);
-                err = NULL;
-                }
-              free(tAliasHdl);
+              DisposeHandle((Handle)tAliasHdl);
               }
 
             if(!url || !name)
