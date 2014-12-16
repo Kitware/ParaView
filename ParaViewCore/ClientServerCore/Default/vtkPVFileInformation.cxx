@@ -546,8 +546,8 @@ void vtkPVFileInformation::GetSpecialDirectories()
 
   CFURLEnumeratorRef volumeEnum = CFURLEnumeratorCreateForMountedVolumes(kCFAllocatorDefault,
       kCFURLEnumeratorGenerateFileReferenceURLs, NULL);
-  CFURLRef resolvedUrl = NULL;
-  CFErrorRef err = NULL;
+  CFURLRef resolvedUrl;
+  CFErrorRef err;
   CFURLEnumeratorResult res;
   while (kCFURLEnumeratorEnd != (res = CFURLEnumeratorGetNextURL(volumeEnum, &resolvedUrl, &err)))
     {
@@ -600,11 +600,8 @@ void vtkPVFileInformation::GetSpecialDirectories()
       }
     else
       {
-      if (err)
-        {
-        CFRelease(err);
-        err = NULL;
-        }
+      CFRelease(err);
+      err = NULL;
       }
     }
   //-- Read the com.apple.sidebar.plist file to get the user's list of directories
@@ -632,7 +629,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
               == CFGetTypeID(alias) )
             {
             CFIndex dataSize = CFDataGetLength(alias);
-            AliasHandle tAliasHdl = (AliasHandle) NewHandle(dataSize); // XXX: deprecated, but crashes when malloc is used
+            AliasHandle tAliasHdl = (AliasHandle) malloc(dataSize);
             if (tAliasHdl)
               {
               CFDataGetBytes(alias, CFRangeMake( 0, dataSize),
@@ -647,13 +644,10 @@ void vtkPVFileInformation::GetSpecialDirectories()
                 }
               else
                 {
-                if (err)
-                  {
-                  CFRelease(err);
-                  err = NULL;
-                  }
+                CFRelease(err);
+                err = NULL;
                 }
-              DisposeHandle((Handle) tAliasHdl); // XXX: deprecated, but malloc crashes things
+              free(tAliasHdl);
               }
 
             if(!url || !name)
