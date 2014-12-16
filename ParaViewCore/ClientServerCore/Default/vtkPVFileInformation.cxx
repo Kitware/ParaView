@@ -568,10 +568,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
         if (!gotName)
           {
           cfname = CFStringCreateWithCString(kCFAllocatorDefault, "<unknown>", kCFStringEncodingASCII);
-          if (nameErr)
-            {
-            CFRelease(nameErr);
-            }
+          CFRelease(nameErr);
           }
 
         CFIndex pathSize = CFStringGetLength(url)+1;
