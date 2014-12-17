@@ -165,9 +165,9 @@
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetBelowRangeColor"
-                            default_values="0 0 0 1"
+                            default_values="0 0 0"
                             name="BelowRangeColor"
-                            number_of_elements="4"
+                            number_of_elements="3"
                             panel_widget="color_selector" >
         <Documentation>
           Set the color to use when a data value is below the range of the color map.
@@ -188,9 +188,9 @@
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetAboveRangeColor"
-                            default_values="1 1 1 1"
+                            default_values="1 1 1"
                             name="AboveRangeColor"
-                            number_of_elements="4"
+                            number_of_elements="3"
                             panel_widget="color_selector" >
         <Documentation>
           Set the color to use when a data value is above the range of the color map.
