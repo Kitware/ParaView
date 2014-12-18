@@ -15,9 +15,9 @@
 #include "vtkPVExtractVOI.h"
 
 #include "vtkExtentTranslator.h"
-#include "vtkExtractGrid.h"
-#include "vtkExtractVOI.h"
-#include "vtkExtractRectilinearGrid.h"
+#include "vtkPExtractGrid.h"
+#include "vtkPExtractVOI.h"
+#include "vtkPExtractRectilinearGrid.h"
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -40,9 +40,9 @@ vtkPVExtractVOI::vtkPVExtractVOI()
   
   this->IncludeBoundary = 0;
 
-  this->ExtractGrid = vtkExtractGrid::New();
-  this->ExtractVOI  = vtkExtractVOI::New();
-  this->ExtractRG   = vtkExtractRectilinearGrid::New();
+  this->ExtractGrid = vtkPExtractGrid::New();
+  this->ExtractVOI  = vtkPExtractVOI::New();
+  this->ExtractRG   = vtkPExtractRectilinearGrid::New();
 }
 
 //----------------------------------------------------------------------------
