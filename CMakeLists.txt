@@ -177,10 +177,12 @@ set (PV_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 # Setting this ensures that "make install" will leave rpaths to external
 # libraries (not part of the build-tree e.g. Qt, ffmpeg, etc.) intact on
 # "make install". This ensures that one can install a version of ParaView on the
-# build machine without any issues. If this not desired, simply comment the
-# following line and "make install" will strip all rpaths, which is default
-# behavior.
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# build machine without any issues. If this not desired, simply specify
+# CMAKE_INSTALL_RPATH_USE_LINK_PATH when configuring Paraview and
+# "make install" will strip all rpaths, which is default behavior.
+if(NOT CMAKE_INSTALL_RPATH_USE_LINK_PATH )
+  set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
