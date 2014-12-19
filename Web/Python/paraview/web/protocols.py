@@ -45,6 +45,9 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
     def __init__(self):
         self.Application = None
+        self.multiRoot = False
+        self.baseDirectory = ''
+        self.baseDirectoryMap = {}
 
     def mapIdToProxy(self, id):
         """
@@ -80,6 +83,30 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
     def debug(self, msg):
         if self.debugMode == True:
             print msg
+
+    def setBaseDirectory(self, basePath):
+        if basePath.find('|') < 0:
+            self.multiRoot = False
+            self.baseDirectory = basePath
+        else:
+            self.multiRoot = True
+            self.baseDirectoryMap = {}
+            baseDirs = basePath.split('|')
+            for baseDir in baseDirs:
+                basePair = baseDir.split('=')
+                self.baseDirectoryMap[basePair[0]] = basePair[1]
+
+    def getAbsolutePath(self, relativePath):
+        absolutePath = None
+
+        if self.multiRoot == True:
+            relPathParts = relativePath.replace('\\', '/').split('/')
+            realBasePath = self.baseDirectoryMap[relPathParts[0]]
+            absolutePath = os.path.join(realBasePath, *relPathParts[1:])
+        else:
+            absolutePath = os.path.join(self.baseDirectory, relativePath)
+
+        return os.path.normpath(absolutePath)
 
 # =============================================================================
 #
@@ -498,6 +525,12 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                        'signed_char' ]    # 15
 
     def __init__(self, allowedProxiesFile=None, baseDir=None, allowUnconfiguredReaders=True):
+        """
+        - basePath: specify the base directory (or directories) that we should start with, if this
+         parameter takes the form: "name1=path1|name2=path2|...", then we will treat this as the
+         case where multiple data directories are required.  In this case, each top-level directory
+         will be given the name associated with the directory in the argument.
+        """
         super(ParaViewWebProxyManager, self).__init__()
         self.debugMode = False
         self.domainFunctionMap = { "vtkSMBooleanDomain": booleanDomainDecorator,
@@ -528,7 +561,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                                        'GenericDecorator': genericDecorator },
                           'Widget': { 'multi_line': multiLineDecorator } }
 
-        self.baseDir = baseDir
+        self.setBaseDirectory(baseDir)
         self.allowUnconfiguredReaders = allowUnconfiguredReaders
 
         # If there was a proxy list file, use it, otherwise use the default
@@ -1169,9 +1202,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         fileToLoad = []
         if type(relativePath) == list:
             for file in relativePath:
-               fileToLoad.append(os.path.join(self.baseDir, file))
+               fileToLoad.append(self.getAbsolutePath(file))
         else:
-            fileToLoad.append(os.path.join(self.baseDir, relativePath))
+            fileToLoad.append(self.getAbsolutePath(relativePath))
 
         # Get file extension and look for configured reader
         idx = fileToLoad[0].rfind('.')
@@ -1789,11 +1822,15 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
     def __init__(self, basePath, name, excludeRegex=r"^\.|~$|^\$", groupRegex=r"[0-9]+\."):
         """
         Configure the way the WebFile browser will expose the server content.
-         - basePath: specify the base directory that we should start with
+         - basePath: specify the base directory (or directories) that we should start with, if this
+         parameter takes the form: "name1=path1|name2=path2|...", then we will treat this as the
+         case where multiple data directories are required.  In this case, each top-level directory
+         will be given the name associated with the directory in the argument.
          - name: Name of that base directory that will show up on the web
          - excludeRegex: Regular expression of what should be excluded from the list of files/directories
         """
-        self.baseDirectory = basePath
+        self.setBaseDirectory(basePath)
+
         self.rootName = name
         self.pattern = re.compile(excludeRegex)
         self.gPattern = re.compile(groupRegex)
@@ -1802,19 +1839,13 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
         self.fileList = simple.servermanager.VectorProperty(self.directory_proxy,self.directory_proxy.GetProperty('FileList'))
         self.directoryList = simple.servermanager.VectorProperty(self.directory_proxy,self.directory_proxy.GetProperty('DirectoryList'))
 
-    # RpcName: listServerDirectory => file.server.directory.list
-    @exportRpc("file.server.directory.list")
-    def listServerDirectory(self, relativeDir='.'):
-        """
-        RPC Callback to list a server directory relative to the basePath
-        provided at start-up.
-        """
-        path = [ self.rootName ]
+    def handleSingleRoot(self, baseDirectory, relativeDir, startPath=None):
+        path = startPath or [ self.rootName ]
         if len(relativeDir) > len(self.rootName):
             relativeDir = relativeDir[len(self.rootName)+1:]
             path += relativeDir.replace('\\','/').split('/')
 
-        currentPath = os.path.join(self.baseDirectory, relativeDir)
+        currentPath = os.path.join(baseDirectory, relativeDir)
 
         self.directory_proxy.List(currentPath)
 
@@ -1862,6 +1893,29 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
                 groups.remove(groupIdx[gName])
 
         return result
+
+    def handleMultiRoot(self, relativeDir):
+        if relativeDir == '.':
+            return { 'label': self.rootName, 'files': [], 'dirs': self.baseDirectoryMap.keys(), 'groups': [], 'path': [ self.rootName ] }
+
+        pathList = relativeDir.replace('\\', '/').split('/')
+        currentBaseDir = self.baseDirectoryMap[pathList[1]]
+        if len(pathList) == 2:
+            return self.handleSingleRoot(currentBaseDir, '.', pathList)
+        else:  # must be greater than 2
+            return self.handleSingleRoot(currentBaseDir, '/'.join([pathList[0]] + pathList[2:]), pathList[0:2])
+
+    # RpcName: listServerDirectory => file.server.directory.list
+    @exportRpc("file.server.directory.list")
+    def listServerDirectory(self, relativeDir='.'):
+        """
+        RPC Callback to list a server directory relative to the basePath
+        provided at start-up.
+        """
+        if self.multiRoot == True:
+            return self.handleMultiRoot(relativeDir)
+        else:
+            return self.handleSingleRoot(self.baseDirectory, relativeDir)
 
 # =============================================================================
 #
