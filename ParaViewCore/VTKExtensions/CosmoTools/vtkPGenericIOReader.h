@@ -41,6 +41,11 @@ namespace gio {
   class GenericIOReader;
 }
 
+class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPGenericIOReader :
+  public vtkUnstructuredGridAlgorithm
+{
+public:
+
 enum IOType {
   IOTYPEMPI,
   IOTYPEPOSIX
@@ -52,10 +57,6 @@ enum BlockAssignment {
 };
 
 
-class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPGenericIOReader :
-  public vtkUnstructuredGridAlgorithm
-{
-public:
   static vtkPGenericIOReader *New();
   vtkTypeMacro(vtkPGenericIOReader,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
