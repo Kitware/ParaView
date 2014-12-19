@@ -472,6 +472,7 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
       if (colorArrayInfo->GetDataType() == VTK_STRING)
         {
         vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).Set(1);
+        lutProxy->UpdateVTKObjects();
         }
       }
     }
