@@ -160,6 +160,48 @@
     <string>Set view direction to -Z</string>
    </property>
   </action>
+  <action name="actionRotate90degCW">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqRotateCameraCW24.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCW24.png</iconset>
+   </property>
+   <property name="text">
+    <string></string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate 90° clockwise</string>
+   </property>
+   <property name="statusTip">
+    <string>Rotate 90° clockwise</string>
+   </property>
+   <property name="whatsThis">
+    <string>Rotate 90° clockwise</string>
+   </property>
+  </action>
+  <action name="actionRotate90degCCW">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqRotateCameraCCW24.png</normaloff>:/pqWidgets/Icons/pqRotateCameraCCW24.png</iconset>
+   </property>
+   <property name="text">
+    <string></string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate 90° counterclockwise</string>
+   </property>
+   <property name="statusTip">
+    <string>Rotate 90° counterclockwise</string>
+   </property>
+   <property name="whatsThis">
+    <string>Rotate 90° counterclockwise</string>
+   </property>
+  </action>
   <action name="actionZoomToBox">
    <property name="checkable">
     <bool>true</bool>
@@ -196,6 +238,8 @@
   <addaction name="actionNegativeY"/>
   <addaction name="actionPositiveZ"/>
   <addaction name="actionNegativeZ"/>
+  <addaction name="actionRotate90degCW"/>
+  <addaction name="actionRotate90degCCW"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
