@@ -2128,9 +2128,6 @@
         secretly. e.g. 3D widgets etc. This property is not saved in states nor
         it recorded by undo-redo.</Documentation>
       </ProxyProperty>
-      <Property command="ResetCamera"
-                panel_visibility="never"
-                name="ResetCamera" />
       <SubProxy>
         <Proxy name="ActiveCamera"
                proxygroup="camera"
@@ -7151,7 +7148,6 @@
           <Property name="HiddenProps" />
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
-          <Property name="ResetCamera" />
 
           <Property name="CenterAxesVisibility" />
           <PropertyGroup label="Orientation Axes">
