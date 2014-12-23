@@ -88,6 +88,6 @@ else()
 endif()
 
 # Add testing if necessary
-# if (BUILD_TESTING)
-#   add_subdirectory(Testing)
-# endif()
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()

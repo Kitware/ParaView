@@ -309,71 +309,71 @@ int GetVTKElemType(CGNS_ENUMT(ElementType_t) elemType, bool &higherOrderWarning,
     }
   return cellType;
 }
+//----------------------------------------------------------------------
+//static const int NULL_translate[27] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+//                                  16,17,18,19,20,21,22,23,24,25,26};
+
+//CGNS --> VTK ordering of Elements
+static const int NODE_ToVTK[1]  = {0};
+
+static const int BAR_2_ToVTK[2] = {0,1};
+
+static const int BAR_3_ToVTK[3] = {0,1,2};
+
+static const int BAR_4_ToVTK[4] = {0,1,2,3};
+
+static const int TRI_3_ToVTK[3] = {0,1,2};
+
+static const int TRI_6_ToVTK[6] = {0,1,2,3,4,5};
+
+static const int QUAD_4_ToVTK[4] = {0,1,2,3};
+
+static const int QUAD_8_ToVTK[8] = {0,1,2,3,4,5,6,7};
+
+static const int QUAD_9_ToVTK[9] = {0,1,2,3,4,5,6,7,8};
+
+static const int TETRA_4_ToVTK[4] = {0,1,2,3};
+
+static const int TETRA_10_ToVTK[10] = {0,1,2,3,4,5,6,7,8,9};
+
+static const int PYRA_5_ToVTK[5] = {0,1,2,3,4};
+
+static const int PYRA_14_ToVTK[14] = {0,1,2,3,4,
+                                      5,6,7,8,9,
+                                      10,11,12,13
+                                     };
+
+static const int PENTA_6_ToVTK[6] = {0,1,2,3,4,5};
+
+static const int PENTA_15_ToVTK[15] = {0,1,2,3,4,5,6,7,8,
+                                       12,13,14,
+                                       9,10,11
+                                      };
+
+static const int PENTA_18_ToVTK[18] = {0,1,2,3,4,5,6,7,8,
+                                       12,13,14,
+                                       9,10,11,
+                                       15,16,17
+                                      };
+
+static const int HEXA_8_ToVTK[8] = {0,1,2,3,4,5,6,7};
+
+static const int HEXA_20_ToVTK[20] = {0,1,2,3,4,5,6,7,
+                                      8,9,10,11,
+                                      16,17,18,19,
+                                      12,13,14,15
+                                     };
+
+static const int HEXA_27_ToVTK[27] = {0,1,2,3,4,5,6,7,
+                                      8,9,10,11,
+                                      16,17,18,19,
+                                      12,13,14,15,
+                                      24,22,21,23,
+                                      20,25,26
+                                     };
 //------------------------------------------------------------------------------
 inline const int * getTranslator(const int cellType)
 {
-  //static const int NULL_translate[27] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
-  //                                  16,17,18,19,20,21,22,23,24,25,26};
-
-  //CGNS --> VTK ordering of Elements
-  static const int NODE_ToVTK[1]  = {0};
-
-  static const int BAR_2_ToVTK[2] = {0,1};
-
-  static const int BAR_3_ToVTK[3] = {0,1,2};
-
-  static const int BAR_4_ToVTK[4] = {0,1,2,3};
-
-  static const int TRI_3_ToVTK[3] = {0,1,2};
-
-  static const int TRI_6_ToVTK[6] = {0,1,2,3,4,5};
-
-  static const int QUAD_4_ToVTK[4] = {0,1,2,3};
-
-  static const int QUAD_8_ToVTK[8] = {0,1,2,3,4,5,6,7};
-
-  static const int QUAD_9_ToVTK[9] = {0,1,2,3,4,5,6,7,8};
-
-  static const int TETRA_4_ToVTK[4] = {0,1,2,3};
-
-  static const int TETRA_10_ToVTK[10] = {0,1,2,3,4,5,6,7,8,9};
-
-  static const int PYRA_5_ToVTK[5] = {0,1,2,3,4};
-
-  static const int PYRA_14_ToVTK[14] = {0,1,2,3,4,
-                                        5,6,7,8,9,
-                                        10,11,12,13
-                                       };
-
-  static const int PENTA_6_ToVTK[6] = {0,1,2,3,4,5};
-
-  static const int PENTA_15_ToVTK[15] = {0,1,2,3,4,5,6,7,8,
-                                         12,13,14,
-                                         9,10,11
-                                        };
-
-  static const int PENTA_18_ToVTK[18] = {0,1,2,3,4,5,6,7,8,
-                                         12,13,14,
-                                         9,10,11,
-                                         15,16,17
-                                        };
-
-  static const int HEXA_8_ToVTK[8] = {0,1,2,3,4,5,6,7};
-
-  static const int HEXA_20_ToVTK[20] = {0,1,2,3,4,5,6,7,
-                                        8,9,10,11,
-                                        16,17,18,19,
-                                        12,13,14,15
-                                       };
-
-  static const int HEXA_27_ToVTK[27] = {0,1,2,3,4,5,6,7,
-                                        8,9,10,11,
-                                        16,17,18,19,
-                                        12,13,14,15,
-                                        24,22,21,23,
-                                        20,25,26
-                                       };
-
   switch (cellType)
     {
     case VTK_VERTEX:
@@ -392,15 +392,15 @@ inline const int * getTranslator(const int cellType)
     case VTK_WEDGE:
       return NULL;
     case VTK_QUADRATIC_WEDGE:
-      return PENTA_15_ToVTK;
+      return CGNSRead::PENTA_15_ToVTK;
     case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
-      return PENTA_18_ToVTK;
+      return CGNSRead::PENTA_18_ToVTK;
     case VTK_HEXAHEDRON:
       return NULL;
     case VTK_QUADRATIC_HEXAHEDRON:
-      return HEXA_20_ToVTK;
+      return CGNSRead::HEXA_20_ToVTK;
     case VTK_TRIQUADRATIC_HEXAHEDRON:
-      return HEXA_27_ToVTK;
+      return CGNSRead::HEXA_27_ToVTK;
     default:
       return NULL;
     }
