@@ -16,6 +16,14 @@
       ],
       "cswrap": true,
       "pythonwrap": true
+    },
+    { "name": "vtkPVServerManagerRendering",
+      "path": "ParaViewCore/ServerManager/Rendering",
+      "include": [
+        { "class": "vtkSMPythonViewProxy" }
+      ],
+      "cswrap": true,
+      "pythonwrap": true
     }
   ]
 }
