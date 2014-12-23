@@ -62,13 +62,8 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
 
   this->CacheKeeper = vtkPVCacheKeeper::New();
 
-#ifdef VTKGL2
-  this->DefaultMapper = NULL;
-  this->Property = NULL;
-#else
   this->DefaultMapper = vtkProjectedTetrahedraMapper::New();
   this->Property = vtkVolumeProperty::New();
-#endif
   this->Actor = vtkPVLODVolume::New();
 
   this->LODGeometryFilter = vtkPVGeometryFilter::New();

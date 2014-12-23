@@ -14,10 +14,8 @@
 =========================================================================*/
 #include "vtkPVSynchronizedRenderer.h"
 
-#ifndef VTKGL2
-# include "vtkCameraPass.h"
-# include "vtkImageProcessingPass.h"
-#endif
+#include "vtkCameraPass.h"
+#include "vtkImageProcessingPass.h"
 
 #include "vtkBoundingBox.h"
 #include "vtkCaveSynchronizedRenderers.h"
@@ -184,7 +182,7 @@ void vtkPVSynchronizedRenderer::Initialize(
       this->ParallelSynchronizer->WriteBackImagesOn();
       }
     else if (pm->GetNumberOfLocalPartitions() > 1 ||
-      (pm->GetNumberOfLocalPartitions() == 1 && in_tile_display_mode))        
+      (pm->GetNumberOfLocalPartitions() == 1 && in_tile_display_mode))
       {
       //ICET now handles stereo properly, so use it no matter the number
       //of partitions
@@ -290,9 +288,7 @@ void vtkPVSynchronizedRenderer::SetImageProcessingPass(
     {
     return;
     }
-#ifndef VTKGL2
   vtkSetObjectBodyMacro(ImageProcessingPass, vtkImageProcessingPass, pass);
-#endif
   this->SetupPasses();
 }
 
@@ -365,8 +361,6 @@ void vtkPVSynchronizedRenderer::SetupPasses()
     {
     return;
     }
-#ifndef VTKGL2
-  // FIXME The OpenGL2 backend will need to do something to replace this.
   vtkCameraPass* cameraPass = vtkCameraPass::New();
   if (this->ImageProcessingPass)
     {
@@ -389,7 +383,6 @@ void vtkPVSynchronizedRenderer::SetupPasses()
     defaultPass->Delete();
     }
   cameraPass->Delete();
-#endif
 }
 
 //----------------------------------------------------------------------------

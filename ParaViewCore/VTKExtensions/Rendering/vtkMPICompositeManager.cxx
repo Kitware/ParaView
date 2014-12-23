@@ -22,7 +22,7 @@
 vtkStandardNewMacro(vtkMPICompositeManager);
 
 //-----------------------------------------------------------------------------
-static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 
+static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg,
                                                     int pLength, int)
 {
   vtkMPICompositeManager* self = (vtkMPICompositeManager*)local;
@@ -77,14 +77,14 @@ float vtkMPICompositeManager::GetZBufferValue(int x, int y)
     // We could always composite, and always consider client z.
     return z; // no need to collect from other processes.
     }
-  
+
   int myId = this->Controller->GetLocalProcessId();
   if (myId != 0)
     {
     vtkErrorMacro("GetZBufferValue must be called only on Root Node.");
     return 0;
     }
-  
+
   float otherZ;
   int numProcs = this->Controller->GetNumberOfProcesses();
   int idx;
@@ -95,7 +95,7 @@ float vtkMPICompositeManager::GetZBufferValue(int x, int y)
   for (idx = 1; idx < numProcs; ++idx)
     {
     // Request the Z from all other processes.
-    this->Controller->TriggerRMI(1, (void*)pArg, sizeof(int)*3, 
+    this->Controller->TriggerRMI(1, (void*)pArg, sizeof(int)*3,
       vtkMPICompositeManager::GATHER_Z_RMI_TAG);
     }
   for (idx = 1; idx < numProcs; ++idx)
@@ -157,7 +157,7 @@ void vtkMPICompositeManager::InitializeRMIs()
     return;
     }
   this->Superclass::InitializeRMIs();
-  
+
   this->Controller->AddRMI(::vtkMPICompositeManagerGatherZBufferValueRMI, this,
     vtkMPICompositeManager::GATHER_Z_RMI_TAG);
 }
@@ -170,7 +170,7 @@ void vtkMPICompositeManager::StartRender()
     // Make adjustments for window size.
     int *sizeptr = this->RenderWindow->GetActualSize();
     int size[2];
-    size[0] = sizeptr[0];  
+    size[0] = sizeptr[0];
     size[1] = sizeptr[1];
     if ((size[0] == 0) || (size[1] == 0))
       {
@@ -181,7 +181,7 @@ void vtkMPICompositeManager::StartRender()
       }
     this->FullImageSize[0] = size[0];
     this->FullImageSize[1] = size[1];
-    
+
     //Round up.
     this->ReducedImageSize[0] =
       (int)((size[0]+this->ImageReductionFactor-1)/this->ImageReductionFactor);

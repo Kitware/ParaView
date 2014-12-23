@@ -106,6 +106,10 @@ if (PARAVIEW_USE_MPI)
     list(APPEND Module_SRCS
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx)
+    if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
+      set_source_files_properties(vtkIceTCompositePass.cxx vtkPVGeometryFilter.cxx
+        PROPERTIES COMPILE_FLAGS -DVTKGL2)
+    endif()
   endif()
 endif()
 

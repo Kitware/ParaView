@@ -14,10 +14,8 @@
 =========================================================================*/
 #include "vtkGeometryRepresentation.h"
 
-#ifdef VTKGL2
 # include "vtkCompositePolyDataMapper2.h"
-#else
-# include "vtkCompositePolyDataMapper2.h"
+#ifndef VTKGL2
 # include "vtkHardwareSelectionPolyDataPainter.h"
 # include "vtkShadowMapBakerPass.h"
 #endif

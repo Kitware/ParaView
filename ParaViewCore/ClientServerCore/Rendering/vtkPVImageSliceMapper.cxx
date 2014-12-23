@@ -69,7 +69,7 @@ vtkPVImageSliceMapper::vtkPVImageSliceMapper()
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
   this->Painter = 0;
-  
+
   this->PainterInformation = vtkInformation::New();
 #ifndef VTKGL2
   // FIXME: This will need some equivalent code.
@@ -279,7 +279,7 @@ void vtkPVImageSliceMapper::UpdatePainterInformation()
 #ifndef VTKGL2
   vtkInformation* info = this->PainterInformation;
   info->Set(vtkPainter::STATIC_DATA(), this->Static);
-  
+
   // tell which array to color with.
   if (this->ScalarMode == VTK_SCALAR_MODE_USE_FIELD_DATA)
     {
@@ -302,7 +302,7 @@ void vtkPVImageSliceMapper::UpdatePainterInformation()
   info->Set(vtkTexturePainter::USE_XY_PLANE(), this->UseXYPlane);
 
   // tell is we should map unsiged chars thorough LUT.
-  info->Set(vtkTexturePainter::MAP_SCALARS(), 
+  info->Set(vtkTexturePainter::MAP_SCALARS(),
     (this->ColorMode == VTK_COLOR_MODE_MAP_SCALARS)? 1 : 0);
 
   // tell information about the slice.
@@ -335,7 +335,7 @@ void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
     {
     return;
     }
-  if ( input == NULL ) 
+  if ( input == NULL )
     {
     vtkErrorMacro(<< "No input!");
     return;
