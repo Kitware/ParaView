@@ -164,19 +164,19 @@ private:
 //ETX
 };
 
-// This defines a manipulator for the vtkClientServerStream that can be used on
-// the to indicate to the interpreter that the placeholder is to be replaced by
-// the vtkSIProxy instance for the given vtkSMProxy instance.
-// e.g.
-// <code>
-// vtkClientServerStream stream;
-// stream << vtkClientServerStream::Invoke
-//        << SIOBJECT(proxyA)
-//        << "MethodName"
-//        << vtkClientServerStream::End;
-// </code>
-// Will result in calling the vtkSIProxy::MethodName() when the stream in
-// interpreted.
+/// This defines a manipulator for the vtkClientServerStream that can be used
+/// to indicate to the interpreter that the placeholder is to be replaced by
+/// the vtkSIProxy instance for the given vtkSMProxy instance.
+/// e.g.
+/// \code
+/// vtkClientServerStream stream;
+/// stream << vtkClientServerStream::Invoke
+///        << SIOBJECT(proxyA)
+///        << "MethodName"
+///        << vtkClientServerStream::End;
+/// \endcode
+/// Will result in calling the vtkSIProxy::MethodName() when the stream in
+/// interpreted.
 class VTKPVSERVERMANAGERCORE_EXPORT SIOBJECT
 {
   vtkSMRemoteObject* Reference;

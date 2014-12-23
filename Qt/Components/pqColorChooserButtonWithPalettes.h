@@ -41,7 +41,7 @@ class QActionGroup;
 class vtkSMGlobalPropertiesProxy;
 class vtkSMProxy;
 
-///============================================================================
+//============================================================================
 /// pqColorChooserButtonWithPalettes extends pqColorChooserButton to add support
 /// for a menu that allows the user to connect the color to a color in the
 /// ParaView application's color palettes.
@@ -83,7 +83,7 @@ private:
   friend class pqColorPaletteLinkHelper;
 };
 
-///============================================================================
+//============================================================================
 /// pqColorPaletteLinkHelper is designed to be used with
 /// pqColorChooserButtonWithPalettes to manage setting up of property links with
 /// ParaView application's color palette.
