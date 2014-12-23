@@ -605,7 +605,13 @@ void vtkSMRenderViewProxy::ResetCamera()
     .arg(this)
     .arg("ResetCamera")
     .arg("comment", "reset view to fit data");
-  this->InvokeCommand("ResetCamera");
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "ResetCamera"
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------
