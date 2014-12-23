@@ -19,43 +19,43 @@
                  class='clickable toggle-inspector'
                  height='20'
                  style='margin: 5px 0;'
-                 tooltip='Toggle inspector panel'
-                 tooltip-placement='right'
-                 tooltip-popup-delay='1000'/>
+                 data-toggle='tooltip'
+                 data-placement='bottom'
+                 title='Toggle Inspector Panel'/>
             <span
-                class='vtk-icon-flow-cascade clickable padding inspector-selector' data-type='pipeline'>
+                class='vtk-icon-flow-cascade clickable padding inspector-selector' data-type='pipeline' data-toggle='tooltip' data-placement='bottom' title='Show Pipeline'>
             </span>
             <span
-                class='vtk-icon-doc-text clickable padding inspector-selector' data-type='files'>
+                class='vtk-icon-doc-text clickable padding inspector-selector' data-type='files' data-toggle='tooltip' data-placement='bottom' title='Show File List'>
             </span>
             <span
-                class='vtk-icon-plus clickable padding inspector-selector' data-type='sources'>
+                class='vtk-icon-plus clickable padding inspector-selector' data-type='sources' data-toggle='tooltip' data-placement='bottom' title='Show Sources'>
             </span>
             <span
-                class='vtk-icon-filter clickable padding inspector-selector need-input-source' data-type='filters'>
+                class='vtk-icon-filter clickable padding inspector-selector need-input-source' data-type='filters' data-toggle='tooltip' data-placement='bottom' title='Show Filters'>
             </span>
             <span
-                class='vtk-icon-info-1 clickable padding inspector-selector need-input-source' data-type='info'>
+                class='vtk-icon-info-1 clickable padding inspector-selector need-input-source' data-type='info' data-toggle='tooltip' data-placement='bottom' title='Show Data Info'>
             </span>
             <span
-                class='vtk-icon-resize-full-alt-1 reset-camera clickable'>
+                class='vtk-icon-resize-full-alt-1 reset-camera clickable' data-toggle='tooltip' data-placement='bottom' title='Reset Camera'>
             </span>
             <span
-                class='vtk-icon-clock-1 toggle-time-toolbar clickable'>
+                class='vtk-icon-clock-1 toggle-time-toolbar clickable' data-toggle='tooltip' data-placement='bottom' title='Toggle VCR Controls'>
             </span>
             <span
-                class='vtk-icon-cog-alt clickable padding inspector-selector float-right not-busy' data-type='preferences' style="margin: 2px 0">
+                class='vtk-icon-cog-alt clickable padding inspector-selector float-right not-busy' data-type='preferences' style="margin: 2px 0" data-toggle='tooltip' data-placement='bottom' title='Show Preferences'>
             </span>
             <span class='vtk-icon-spin4 busy animate-spin clickable float-right'>
             </span>
         </div>
         <div class='col-xs-12 col-sm-6 col-md-6 col-lg-9 vcr-control'>
-            <span class='vtk-icon-to-start vcr-action clickable' data-action='first'></span>
-            <span class='vtk-icon-fast-bw vcr-action clickable' data-action='prev'></span>
-            <span class='vtk-icon-play vcr-play clickable'></span>
-            <span class='vtk-icon-stop vcr-stop clickable'></span>
-            <span class='vtk-icon-fast-fw vcr-action clickable' data-action='next'></span>
-            <span class='vtk-icon-to-end vcr-action clickable' data-action='last'></span>
+            <span class='vtk-icon-to-start vcr-action clickable' data-action='first' data-toggle='tooltip' data-placement='bottom' title='To First'></span>
+            <span class='vtk-icon-fast-bw vcr-action clickable' data-action='prev' data-toggle='tooltip' data-placement='bottom' title='To Previous'></span>
+            <span class='vtk-icon-play vcr-play clickable' data-toggle='tooltip' data-placement='bottom' title='Play'></span>
+            <span class='vtk-icon-stop vcr-stop clickable' data-toggle='tooltip' data-placement='bottom' title='Stop'></span>
+            <span class='vtk-icon-fast-fw vcr-action clickable' data-action='next' data-toggle='tooltip' data-placement='bottom' title='To Next'></span>
+            <span class='vtk-icon-to-end vcr-action clickable' data-action='last' data-toggle='tooltip' data-placement='bottom' title='To Last'></span>
             <input type='text' class='pv-time-input time-value pv-gray-darker' value='0.0'/>
         </div>
     </div>
@@ -125,6 +125,8 @@
             pv.initializeVisualizer(
                 connection.session,
                 '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info');
+
+            $('[data-toggle="tooltip"]').tooltip({container: 'body'})
 
             // Update stop method to use the connection
             stop = function() {

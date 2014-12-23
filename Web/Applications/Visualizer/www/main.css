@@ -46,7 +46,7 @@
 /* ---- Scroll management ---- */
 
 .no-overflow { overflow: hidden; }
-.scroll-overflow { overflow: scroll; }
+.scroll-overflow { overflow: auto; }
 
 .pv-fixed { position: absolute; top: 0; left: 15px; right: 15px; z-index: 1; }
 .pv-fixed .pv-editor-bar { margin: 0 !important; padding: 0 !important; }
