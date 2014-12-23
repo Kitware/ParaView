@@ -155,6 +155,52 @@
           interpolating between two saturated colors.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseBelowRangeColor"
+                         default_values="0"
+                         name="UseBelowRangeColor"
+                         number_of_elements="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use special color to use when a data value is below the range of the color map.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBelowRangeColor"
+                            default_values="0 0 0"
+                            name="BelowRangeColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector" >
+        <Documentation>
+          Set the color to use when a data value is below the range of the color map.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseBelowRangeColor" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseAboveRangeColor"
+                         default_values="0"
+                         name="UseAboveRangeColor"
+                         number_of_elements="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Use special color to use when a data value is above the range of the color map.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetAboveRangeColor"
+                            default_values="1 1 1"
+                            name="AboveRangeColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector" >
+        <Documentation>
+          Set the color to use when a data value is above the range of the color map.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseAboveRangeColor" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </DoubleVectorProperty>
       <DoubleVectorProperty command="SetNanColor"
                             default_values="0.5 0 0"
                             name="NanColor"
