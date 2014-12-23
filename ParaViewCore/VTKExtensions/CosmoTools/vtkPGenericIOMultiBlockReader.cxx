@@ -734,7 +734,7 @@ void vtkPGenericIOMultiBlockReader::LoadDataArraysForBlock(vtkUnstructuredGrid *
   block_t& dataBlock = this->MetaData->Blocks[blockId];
 
   assert("pre: # points in dataset different from points in block" &&
-    (grid->GetNumberOfPoints() == dataBlock.NumberOfElements));
+    (static_cast<uint64_t>(grid->GetNumberOfPoints()) == dataBlock.NumberOfElements));
   vtkPointData* PD = grid->GetPointData();
 
   int arrayIdx = 0;

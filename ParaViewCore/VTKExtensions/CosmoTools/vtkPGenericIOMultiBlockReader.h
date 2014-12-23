@@ -33,19 +33,21 @@ namespace gio
   class GenericIOReader;
 }
 
-enum IOType {
-  IOTYPEMPI,
-  IOTYPEPOSIX
-};
-
-enum BlockAssignment {
-  ROUND_ROBIN,
-  RCB
-};
-
 class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPGenericIOMultiBlockReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
+
+  enum IOType {
+    IOTYPEMPI,
+    IOTYPEPOSIX
+  };
+
+  enum BlockAssignment {
+    ROUND_ROBIN,
+    RCB
+  };
+
+
   static vtkPGenericIOMultiBlockReader* New();
   vtkTypeMacro(vtkPGenericIOMultiBlockReader,vtkMultiBlockDataSetAlgorithm)
   void PrintSelf(ostream &os, vtkIndent indent);

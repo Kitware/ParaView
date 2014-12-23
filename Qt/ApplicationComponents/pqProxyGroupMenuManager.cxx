@@ -56,23 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 #include <QStringList>
 
-namespace
-{
-  bool findFileNameProperty(vtkPVXMLElement* proxyXML)
-    {
-    for (unsigned int cc=0; cc < proxyXML->GetNumberOfNestedElements(); cc++)
-      {
-      vtkPVXMLElement* child = proxyXML->GetNestedElement(cc);
-      if (child && child->GetAttribute("name") &&
-        strcmp(child->GetAttribute("name"), "FileName") == 0)
-        {
-        return true;
-        }
-      }
-    return false;
-    }
-}
-
 class pqProxyGroupMenuManager::pqInternal
 {
 public:
