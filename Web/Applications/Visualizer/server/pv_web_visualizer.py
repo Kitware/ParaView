@@ -4,7 +4,13 @@ r"""
 
         $ pvpython .../pv_web_visualizer2.py --data-dir /.../path-to-your-data-directory
 
-        --data-dir is used to list that directory on the server and let the client choose a file to load.
+        --data-dir
+             Path used to list that directory on the server and let the client choose a file to load.
+        You may also specify multiple directories, each with a name that should be displayed as the
+        top-level name of the directory in the UI.  If this parameter takes the form:
+        "name1=path1|name2=path2|...", then we will treat this as the case where multiple data
+        directories are required.  In this case, each top-level directory will be given the name
+        associated with the directory in the argument.
 
         --load-file try to load the file relative to data-dir if any.
 
@@ -102,7 +108,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
 
     @staticmethod
     def add_arguments(parser):
-        parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list", dest="path")
+        parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list, or else multiple directories given as 'name1=path1|name2=path2|...'", dest="path")
         parser.add_argument("--load-file", default=None, help="File to load if any based on data-dir base path", dest="file")
         parser.add_argument("--color-palette-file", default=None, help="File to load to define a set of color map", dest="palettes")
         parser.add_argument("--ds-host", default=None, help="Hostname to connect to for DataServer", dest="dsHost")
