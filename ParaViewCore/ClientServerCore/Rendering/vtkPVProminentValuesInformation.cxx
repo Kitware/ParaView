@@ -335,6 +335,9 @@ void vtkPVProminentValuesInformation::CopyFromLeafDataObject(
   case vtkDataObject::FIELD_ASSOCIATION_CELLS:
     fieldData = dset ? dset->GetCellData() : 0;
     break;
+  case vtkDataObject::FIELD_ASSOCIATION_NONE:
+    fieldData = dset ? dset->GetFieldData() : 0;
+    break;
   case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
     fieldData = dset ? dset->GetPointData() : 0;
     array = fieldData ? fieldData->GetAbstractArray(this->FieldName) : 0;

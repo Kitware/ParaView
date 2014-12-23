@@ -2993,7 +2993,7 @@ def demo5():
     scene.Play()
     return scene
 
-ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' : 6}
+ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'FIELD' : 2, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' : 6}
 _LEGACY_ASSOCIATIONS = { 'POINT_DATA' : 0, 'CELL_DATA' : 1 }
 
 def GetAssociationAsString(val):

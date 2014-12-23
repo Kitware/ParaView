@@ -575,6 +575,14 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
         this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
         break;
 
+      case vtkDataObject::FIELD_ASSOCIATION_NONE:
+        this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
+        // Color entire block by zeroth tuple in the field data
+        this->Mapper->SetFieldDataTupleId(0);
+        this->LODMapper->SetScalarMode(VTK_SCALAR_MODE_USE_FIELD_DATA);
+        this->LODMapper->SetFieldDataTupleId(0);
+        break;
+
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
       default:
         this->Mapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);

@@ -464,6 +464,17 @@ bool vtkSMPVRepresentationProxy::SetScalarColoring(const char* arrayname, int at
     vtkSMProxy* lutProxy =
       mgr->GetColorTransferFunction(arrayname, this->GetSessionProxyManager());
     vtkSMPropertyHelper(lutProperty).Set(lutProxy);
+
+    // Get the array information for the color array to determine transfer function properties
+    vtkPVArrayInformation* colorArrayInfo = this->GetArrayInformationForColorArray();
+    if (colorArrayInfo)
+      {
+      if (colorArrayInfo->GetDataType() == VTK_STRING)
+        {
+        vtkSMPropertyHelper(lutProxy, "IndexedLookup", true).Set(1);
+        lutProxy->UpdateVTKObjects();
+        }
+      }
     }
 
   if (vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction"))

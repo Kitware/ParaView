@@ -129,6 +129,7 @@ private:
 private:
   QIcon* CellDataIcon;
   QIcon* PointDataIcon;
+  QIcon* FieldDataIcon;
   QIcon* SolidColorIcon;
   QComboBox* Variables;
   QComboBox* Components;
