@@ -5414,7 +5414,9 @@
                      timesteps in any single Exodus II file. However, multiple
                      files which specify a single time-evolution of a mesh may
                      be used to represent meshes which exhibit changes in
-                     connectivity infrequently.</Documentation>
+                     connectivity infrequently. Field variable mode_shape[0]
+                     represents the time step (t_index) if HasModeShapes is
+                     not set or the ModeShape otherwise.</Documentation>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"
