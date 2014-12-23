@@ -8,6 +8,7 @@ vtk_module(vtkPVVTKExtensionsCosmoTools
       vtkParallelMPI
       vtkPVVTKExtensionsDefault
       vtkjsoncpp
+      vtkCosmoHaloFinder
    KIT
       vtkPVExtensions
 )
