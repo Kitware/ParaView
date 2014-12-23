@@ -54,7 +54,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef Partition_h
 #define Partition_h
 
-
+#include "vtkCosmoHaloFinderModule.h"
 
 #include "Definition.h"
 #include <string>
@@ -62,7 +62,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cosmotk {
 
-class Partition {
+class VTKCOSMOHALOFINDER_EXPORT Partition {
 public:
   Partition();
   ~Partition();

@@ -70,6 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CosmoHaloFinderP_h
 #define CosmoHaloFinderP_h
 
+#include "vtkCosmoHaloFinderModule.h"
 
 #include "Definition.h"
 
@@ -84,7 +85,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cosmotk {
 
 
-class CosmoHaloFinderP {
+class VTKCOSMOHALOFINDER_EXPORT CosmoHaloFinderP {
 public:
   CosmoHaloFinderP();
   ~CosmoHaloFinderP();

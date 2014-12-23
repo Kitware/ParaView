@@ -66,6 +66,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ParticleExchange_h
 #define ParticleExchange_h
 
+#include "vtkCosmoHaloFinderModule.h"
+
 #include "Message.h"
 
 #include "Definition.h"
@@ -77,7 +79,7 @@ using std::vector;
 namespace cosmotk {
 
 
-class ParticleExchange {
+class VTKCOSMOHALOFINDER_EXPORT ParticleExchange {
 
 public:
   ParticleExchange();

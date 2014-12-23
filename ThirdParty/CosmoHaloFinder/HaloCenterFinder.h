@@ -61,6 +61,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef HaloCenterFinder_h
 #define HaloCenterFinder_h
 
+#include "vtkCosmoHaloFinderModule.h"
+
 #include "Definition.h"
 
 #include "ChainingMesh.h"
@@ -71,7 +73,7 @@ using std::string;
 namespace cosmotk {
 
 
-class HaloCenterFinder {
+class VTKCOSMOHALOFINDER_EXPORT HaloCenterFinder {
 
 public:
   HaloCenterFinder();

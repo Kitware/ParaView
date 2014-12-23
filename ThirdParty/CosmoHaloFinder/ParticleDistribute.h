@@ -58,6 +58,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ParticleDistribute_h
 #define ParticleDistribute_h
 
+#include "vtkCosmoHaloFinderModule.h"
+
 #include "Message.h"
 
 #include <cstdlib>
@@ -75,7 +77,7 @@ using std::vector;
 namespace cosmotk {
 
 
-class ParticleDistribute {
+class VTKCOSMOHALOFINDER_EXPORT ParticleDistribute {
 
 public:
   ParticleDistribute();

@@ -51,6 +51,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FOFHaloProperties_h
 #define FOFHaloProperties_h
 
+#include "vtkCosmoHaloFinderModule.h"
 
 #include "Definition.h"
 
@@ -64,7 +65,7 @@ using std::string;
 namespace cosmotk {
 
 
-class FOFHaloProperties {
+class VTKCOSMOHALOFINDER_EXPORT FOFHaloProperties {
 
 public:
   FOFHaloProperties();

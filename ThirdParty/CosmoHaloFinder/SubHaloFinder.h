@@ -53,6 +53,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SubHaloFinder_h
 #define SubHaloFinder_h
 
+#include "vtkCosmoHaloFinderModule.h"
 #include "Definition.h"
 #include "BHTree.h"
 #include <string>
@@ -109,7 +110,7 @@ public:
 //
 /////////////////////////////////////////////////////////////////////////
 
-class SubHaloFinder {
+class VTKCOSMOHALOFINDER_EXPORT SubHaloFinder {
 public:
   SubHaloFinder();
   ~SubHaloFinder();

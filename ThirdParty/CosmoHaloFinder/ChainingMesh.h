@@ -56,6 +56,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ChainingMesh_h
 #define ChainingMesh_h
 
+#include "vtkCosmoHaloFinderModule.h"
+
 #include "Definition.h"
 
 #include <vector>
@@ -64,7 +66,7 @@ using std::vector;
 
 namespace cosmotk {
 
-class ChainingMesh {
+class VTKCOSMOHALOFINDER_EXPORT ChainingMesh {
 
 public:
   // Chaining mesh for all particles on a processor

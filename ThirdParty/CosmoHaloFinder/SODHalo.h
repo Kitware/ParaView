@@ -52,6 +52,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SODHalo_h
 #define SODHalo_h
 
+#include "vtkCosmoHaloFinderModule.h"
+
 #include "Definition.h"
 #include <string>
 #include <vector>
@@ -86,7 +88,7 @@ public:
 //
 ///////////////////////////////////////////////////////////////////////////
 
-class SODHalo
+class VTKCOSMOHALOFINDER_EXPORT SODHalo
 {
 public:
   SODHalo();

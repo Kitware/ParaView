@@ -10,9 +10,9 @@
 #include <mpi.h>
 
 // Type compatible with HACC
-#ifdef ID_64
+//#ifdef ID_64
   #define TYPE_IDS_64BITS
-#endif
+//#endif
 
 #ifdef USEDIY
   // DIY library
