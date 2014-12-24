@@ -41,8 +41,6 @@ set (Module_SRCS
   pqActionGroupInterface.h
   pqActiveObjects.cxx
   pqActiveObjects.h
-  pqActiveServer.cxx
-  pqActiveServer.h
   pqAnimatablePropertiesComboBox.cxx
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.cxx
@@ -364,8 +362,6 @@ set (Module_MOC_HDRS
   pq3DWidgetPropertyWidget.h
   pqAboutDialog.h
   pqActiveObjects.h
-  pqActiveServer.h
-  #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.h
   pqAnimationManager.h
@@ -516,7 +512,6 @@ set (Module_MOC_HDRS
 set (Module_UI_FILES
   Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui
-  #Resources/UI/pqAddSourceDialog.ui
   Resources/UI/pqAnimationSettings.ui
   Resources/UI/pqBoxWidget.ui
   Resources/UI/pqCalculatorWidget.ui

@@ -434,7 +434,9 @@
         <DoubleRangeDomain name="range" min="0.0" max="1.0" />
         <Documentation>
           Set the factor used to compute the decimated geometry when employed.
-          0 implies minimal decimation (highest detail, hence more polygons that 1.
+          This affects the size of the grid used for
+          quadric clustering, for example. 1.0 implies maximum resolution while 0
+          implies minimum resolution.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
