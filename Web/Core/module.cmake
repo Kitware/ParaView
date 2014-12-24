@@ -3,6 +3,7 @@
 vtk_module(vtkParaViewWebCore
   DEPENDS
     vtkWebCore
+    vtkWebGLExporter
     vtkPVServerManagerDefault
   TEST_DEPENDS
     vtkImagingSources
