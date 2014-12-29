@@ -35,7 +35,7 @@ int setUpRind(const int cgioNum, const double rindId, int *rind)
     {
     std::vector<int> mdata;
     CGNSRead::readNodeData<int>(cgioNum, rindId, mdata);
-    for (size_t index=0; index < mdata.size(); index++)
+    for (std::size_t index=0; index < mdata.size(); index++)
       {
       rind[index] = static_cast<int>(mdata[index]);
       }
@@ -44,7 +44,7 @@ int setUpRind(const int cgioNum, const double rindId, int *rind)
     {
     std::vector<cglong_t> mdata;
     CGNSRead::readNodeData<cglong_t> ( cgioNum, rindId, mdata );
-    for (size_t index=0; index < mdata.size(); index++)
+    for (std::size_t index=0; index < mdata.size(); index++)
       {
       rind[index] = static_cast<int>(mdata[index]);
       }
@@ -128,7 +128,7 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId,
   const char *connectivityPath = "ElementConnectivity";
   double cgioElemConnectId;
   char dataType[3];
-  size_t sizeOfCnt;
+  std::size_t sizeOfCnt;
 
   cgio_get_node_id(cgioNum, cgioSectionId, connectivityPath, &cgioElemConnectId);
   cgio_get_data_type(cgioNum, cgioElemConnectId, dataType);
@@ -478,17 +478,17 @@ void fillVectorsFromVars(std::vector< CGNSRead::CGNSVariable >&  vars,
                             const int physicalDim)
 {
   // get number of scalars and vectors
-  const size_t nvar = vars.size();
-  size_t len;
+  const std::size_t nvar = vars.size();
+  std::size_t len;
   char_33 name;
 
-  for (size_t n = 0; n < nvar; ++n)
+  for (std::size_t n = 0; n < nvar; ++n)
     {
     vars[n].isComponent = false;
     vars[n].xyzIndex = 0;
     }
 
-  for (size_t n = 0; n < nvar; ++n)
+  for (std::size_t n = 0; n < nvar; ++n)
     {
     len = strlen(vars[n].name) - 1;
     switch (vars[n].name[len])
@@ -639,7 +639,7 @@ bool vtkCGNSMetaData::Parse(const char* cgnsFileName)
     }
   this->baseList.resize(baseIds.size());
   // Read base list
-  for (size_t numBase=0; numBase < baseIds.size(); numBase++)
+  for (std::size_t numBase=0; numBase < baseIds.size(); numBase++)
     {
     // base names for later selection
     readBaseCoreInfo(cgioNum, baseIds[numBase], this->baseList[numBase]);
@@ -648,8 +648,8 @@ bool vtkCGNSMetaData::Parse(const char* cgnsFileName)
 
     getNodeChildrenId(cgioNum, baseIds[numBase], baseChildId);
 
-    size_t nzones = 0;
-    size_t nn;
+    std::size_t nzones = 0;
+    std::size_t nn;
     for (nzones = 0, nn = 0; nn < baseChildId.size(); ++nn)
       {
       if (cgio_get_label(cgioNum, baseChildId[nn], nodeLabel) != CG_OK)
@@ -709,7 +709,7 @@ bool vtkCGNSMetaData::Parse(const char* cgnsFileName)
   // or separated time range by root nodes
   // timesteps need to be sorted for each root node
   this->GlobalTime.clear();
-  for (size_t numBase=0; numBase < baseList.size(); numBase++)
+  for (std::size_t numBase=0; numBase < baseList.size(); numBase++)
     {
     if (numBase == 0)
       {
@@ -749,7 +749,7 @@ void vtkCGNSMetaData::PrintSelf(std::ostream& os)
   os << "--> vtkCGNSMetaData"  << std::endl;
   os << "LastReadFileName: " << this->LastReadFilename << std::endl;
   os << "Base information:"  << std::endl;
-  for (size_t b=0; b < this->baseList.size(); b++)
+  for (std::size_t b=0; b < this->baseList.size(); b++)
     {
     os << "  Base name: "  << this->baseList[b].name << std::endl ;
     os << "    number of zones: " << this->baseList[b].nzones << std::endl;
@@ -778,7 +778,7 @@ void vtkCGNSMetaData::PrintSelf(std::ostream& os)
       }
 
     os << "    Family Number: "<< this->baseList[b].family.size() << std::endl;
-    for (size_t fam=0; fam< this->baseList[b].family.size(); fam++)
+    for (std::size_t fam=0; fam< this->baseList[b].family.size(); fam++)
       {
       os << "      Family: " << this->baseList[b].family[fam].name << " is BC: "
          << this->baseList[b].family[fam].isBC << std::endl;

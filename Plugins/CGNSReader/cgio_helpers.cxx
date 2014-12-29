@@ -76,8 +76,8 @@ int readBaseIds(int cgioNum, double rootId,
                     std::vector<double>& baseIds)
 {
   CGNSRead::char_33 nodeLabel;
-  size_t nbases = 0;
-  size_t nc;
+  std::size_t nbases = 0;
+  std::size_t nc;
 
   baseIds.clear();
   getNodeChildrenId(cgioNum, rootId, baseIds);
@@ -193,7 +193,7 @@ int readBaseIteration(int cgioNum, double nodeId,
 
   getNodeChildrenId(cgioNum, nodeId, childrenIterative);
 
-  for(size_t nc = 0; nc < childrenIterative.size(); ++nc)
+  for(std::size_t nc = 0; nc < childrenIterative.size(); ++nc)
     {
     if (cgio_get_label(cgioNum, childrenIterative[nc], nodeLabel) != CG_OK)
       {
@@ -230,7 +230,7 @@ int readBaseIteration(int cgioNum, double nodeId,
                                       childrenIterative[nc],
                                       iteData);
         baseInfo.times.resize(iteData.size());
-        for (size_t ii = 0; ii < iteData.size(); ii++)
+        for (std::size_t ii = 0; ii < iteData.size(); ii++)
           {
           baseInfo.times[ii] = (double) iteData[ii];
           }
@@ -310,7 +310,7 @@ int readZoneIterInfo(int cgioNum, double nodeId,
 
   getNodeChildrenId(cgioNum, nodeId, iterChildId);
 
-  for (size_t nn = 0; nn < iterChildId.size(); nn++)
+  for (std::size_t nn = 0; nn < iterChildId.size(); nn++)
     {
 
     if (cgio_get_name(cgioNum, iterChildId[nn], nodeName) != CG_OK)
@@ -354,8 +354,8 @@ int readSolInfo(int cgioNum, double nodeId,
   std::vector< CGNSRead::CGNSVariable > cgnsVars;
   std::vector< CGNSRead::CGNSVector > cgnsVectors;
 
-  size_t nn;
-  size_t nvars = 0;
+  std::size_t nn;
+  std::size_t nvars = 0;
 
   for (nvars = 0, nn = 0; nn < solChildId.size(); nn++)
     {
@@ -456,7 +456,7 @@ int readSolInfo(int cgioNum, double nodeId,
 
   CGNSRead::fillVectorsFromVars(cgnsVars, cgnsVectors, baseInfo.physicalDim);
 
-  for (size_t ii=0; ii < cgnsVars.size(); ++ii)
+  for (std::size_t ii=0; ii < cgnsVars.size(); ++ii)
     {
     if (cgnsVars[ii].isComponent == true)
       {
@@ -479,7 +479,7 @@ int readSolInfo(int cgioNum, double nodeId,
         break;
       }
     }
-  for (size_t jj = 0; jj < cgnsVectors.size(); ++jj)
+  for (std::size_t jj = 0; jj < cgnsVectors.size(); ++jj)
     {
     switch (varCentering)
       {
@@ -517,7 +517,7 @@ int readBaseFamily(int cgioNum, double nodeId,
 
   getNodeChildrenId(cgioNum, nodeId, famChildId);
 
-  for (size_t nn = 0; nn < famChildId.size(); nn++)
+  for (std::size_t nn = 0; nn < famChildId.size(); nn++)
     {
     if (cgio_get_label(cgioNum, famChildId[nn], nodeLabel) != CG_OK)
       {
@@ -544,7 +544,7 @@ int readBaseReferenceState(int cgioNum, double nodeId,
   std::vector<double> children;
   getNodeChildrenId(cgioNum, nodeId, children);
 
-  size_t nn;
+  std::size_t nn;
   for (nn = 0; nn < children.size(); nn++)
     {
     if (cgio_get_label(cgioNum, children[nn], nodeLabel) != CG_OK)
@@ -608,7 +608,7 @@ int readZoneInfo(int cgioNum, double nodeId,
   getNodeChildrenId(cgioNum, nodeId, zoneChildId);
 
   int nflows = 0;
-  size_t nn;
+  std::size_t nn;
   for (nflows = 0, nn = 0; nn < zoneChildId.size(); nn++)
     {
 

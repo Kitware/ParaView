@@ -162,11 +162,11 @@ protected:
                              bool& readGridCoordName, bool& readSolutionName);
 
   int getCoordsIdAndFillRind(const CGNSRead::char_33 GridCoordName,
-                             const int physicalDim, size_t& nCoordsArray,
+                             const int physicalDim, std::size_t& nCoordsArray,
                              std::vector<double>& gridChildId, int* rind);
 
   int getVarsIdAndFillRind(const double cgioSolId,
-                           size_t& nVarArray, CGNS_ENUMT(GridLocation_t)& varCentering,
+                           std::size_t& nVarArray, CGNS_ENUMT(GridLocation_t)& varCentering,
                            std::vector<double>& solChildId, int* rind);
 
   int fillArrayInformation(const std::vector<double>& solChildId,
