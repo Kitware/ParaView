@@ -44,14 +44,24 @@
 #include "vtkMultiProcessController.h"
 #endif
 
-#ifdef _WIN32
-#include <type_traits>
-#else
-#include <tr1/type_traits> // for get_XYZ_mesh
-#endif
-
 namespace CGNSRead
 {
+
+namespace detail
+{
+  template <typename T>
+  struct is_double { static const bool value = false; };
+
+  template <>
+  struct is_double<double> { static const bool value = true; };
+
+  template <typename T>
+  struct is_float { static const bool value = false; };
+
+  template <>
+  struct is_float<float> { static const bool value = true; };
+}
+
 
 typedef char char_33[33];
 
@@ -383,12 +393,12 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
 
     if (strcmp(dataType, "R8") == 0)
       {
-      const bool doubleType = std::tr1::is_same<T,double>::value;
+      const bool doubleType = detail::is_double<T>::value;
       sameType = doubleType;
       }
     else if (strcmp (dataType, "R4") == 0)
       {
-      const bool floatType = std::tr1::is_same<T,float>::value;
+      const bool floatType = detail::is_float<T>::value;
       sameType = floatType;
       }
     else
