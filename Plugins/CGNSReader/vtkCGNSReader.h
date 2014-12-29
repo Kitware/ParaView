@@ -37,6 +37,7 @@
 
 #include "vtkCGNSReaderInternal.h" // For parsing information request
 
+class vtkDataSet;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
 
