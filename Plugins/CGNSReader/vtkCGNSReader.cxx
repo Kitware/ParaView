@@ -375,14 +375,21 @@ int vtkCGNSReader::getVarsIdAndFillRind(const double cgioSolId,
         return 1;
         }
 
-      std::vector<char> location;
-      CGNSRead::readNodeData<char>(this->cgioNum, solChildId[na], location);
+      std::vector<char> location_data;
+      CGNSRead::readNodeData<char>(this->cgioNum, solChildId[na], location_data);
 
-      if ( strcmp(location.data(), "Vertex") == 0)
+      std::string location;
+      if( location_data.size() > 0)
+        { //conditionally dereference location_data as this avoids throwing
+          //runtime asserts on windows in debug mode when the vector is size 0
+        location = std::string(&location_data.front(), location_data.size());
+        }
+
+      if (location == "Vertex")
         {
         varCentering = CGNS_ENUMV(Vertex);
         }
-      else if (strcmp(location.data(), "CellCenter") == 0)
+      else if (location == "CellCenter")
         {
         varCentering = CGNS_ENUMV(CellCenter);
         }
@@ -2498,11 +2505,18 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
       if (CGNSRead::getFirstNodeId(this->cgioNum,
                                    baseChildId[zone], "FamilyName_t", &famId) == CG_OK)
         {
-        std::vector<char> familyName;
-        CGNSRead::readNodeData<char>(this->cgioNum, famId, familyName);
+        std::vector<char> familyName_data;
+        CGNSRead::readNodeData<char>(this->cgioNum, famId, familyName_data);
+        std::string familyName;
+        if( familyName_data.size() > 0)
+          { //conditionally dereference familyName_data as this avoids throwing
+            //runtime asserts on windows in debug mode when the vector is size 0
+          familyName = std::string(&familyName_data.front(), familyName_data.size());
+          }
+
         vtkInformationStringKey* zonefamily =
             new vtkInformationStringKey("FAMILY","vtkCompositeDataSet");
-        mbase->GetMetaData(zone)->Set(zonefamily, familyName.data());
+        mbase->GetMetaData(zone)->Set(zonefamily, familyName.c_str());
         }
 
       this->currentId = baseChildId[zone];
@@ -2512,21 +2526,29 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
       if (CGNSRead::getFirstNodeId(this->cgioNum,
                                    baseChildId[zone], "ZoneType_t", &zoneTypeId) == CG_OK)
         {
-        std::vector<char> zoneType;
-        CGNSRead::readNodeData<char>(this->cgioNum, zoneTypeId, zoneType);
-        if (strcmp(zoneType.data(), "Structured") == 0)
+        std::vector<char> zoneType_data;
+        CGNSRead::readNodeData<char>(this->cgioNum, zoneTypeId, zoneType_data);
+
+        std::string zoneType;
+        if( zoneType_data.size() > 0)
+          { //conditionally dereference zoneType_data as this avoids throwing
+            //runtime asserts on windows in debug mode when the vector is size 0
+          zoneType = std::string(&zoneType_data.front(), zoneType_data.size());
+          }
+
+        if (zoneType == "Structured")
           {
           zt = CGNS_ENUMV(Structured);
           }
-        else if (strcmp(zoneType.data(),"Unstructured") == 0)
+        else if (zoneType == "Unstructured")
           {
           zt = CGNS_ENUMV(Unstructured);
           }
-        else if (strcmp(zoneType.data(),"Null") == 0)
+        else if (zoneType == "Null")
           {
           zt = CGNS_ENUMV(ZoneTypeNull);
           }
-        else if (strcmp(zoneType.data(),"UserDefined" ) == 0)
+        else if (zoneType == "UserDefined")
           {
           zt = CGNS_ENUMV(ZoneTypeUserDefined);
           }
@@ -2633,7 +2655,7 @@ int vtkCGNSReader::RequestInformation(vtkInformation * request,
 
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-                 timeSteps.data(),
+                 &timeSteps.front(),
                  static_cast<int>(timeSteps.size()));
     double timeRange[2];
     timeRange[0] = timeSteps.front();

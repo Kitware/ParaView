@@ -423,14 +423,21 @@ int readSolInfo(int cgioNum, double nodeId,
         return 1;
         }
 
-      std::vector<char> location;
-      CGNSRead::readNodeData<char>(cgioNum, solChildId[nn], location);
+      std::vector<char> location_data;
+      CGNSRead::readNodeData<char>(cgioNum, solChildId[nn], location_data);
 
-      if (strcmp(location.data(), "Vertex") == 0)
+      std::string location;
+      if( location_data.size() > 0)
+        { //conditionally dereference location_data as this avoids throwing
+          //runtime asserts on windows in debug mode when the vector is size 0
+        location = std::string(&location_data.front(), location_data.size());
+        }
+
+      if (location == "Vertex")
         {
         varCentering = CGNS_ENUMV(Vertex);
         }
-      else if (strcmp(location.data(), "CellCenter") == 0)
+      else if (location == "CellCenter")
         {
         varCentering = CGNS_ENUMV(CellCenter);
         }
