@@ -49,12 +49,6 @@
 #include <vector>
 #include <map>
 
-#ifdef _WIN32
-#include <array>
-#else
-#include <tr1/array>
-#endif
-
 #include <vtksys/SystemTools.hxx>
 
 #ifdef PARAVIEW_USE_MPI
@@ -64,6 +58,23 @@
 #include "cgio_helpers.h"
 
 vtkStandardNewMacro ( vtkCGNSReader );
+
+namespace
+{
+  struct duo_t
+  {
+    duo_t()
+    {
+      pair[0] = 0;
+      pair[1] = 0;
+    }
+
+    int& operator[](std::size_t n) { return pair[n]; }
+    const int& operator[](std::size_t n) const { return pair[n]; }
+    private:
+      int pair[2];
+  };
+}
 
 //----------------------------------------------------------------------------
 vtkCGNSReader::vtkCGNSReader()
@@ -2196,7 +2207,6 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
   // Each process computes which sequence of files it needs to read in
   int left_over_zones = numZones - (num_zones_per_process*numProcessors);
   // base --> startZone,endZone
-  typedef std::tr1::array<int, 2> duo_t;
   std::map<int, duo_t> baseToZoneRange;
 
   // REDO this part !!!!
@@ -2207,7 +2217,7 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
     endRange = startRange + (num_zones_per_process+1);
     for (int bb = 0; bb < numBases; bb++)
       {
-      duo_t zoneRange = {0,0};
+      duo_t zoneRange;
       startRange = startRange - accumulated;
       endRange = endRange - accumulated;
       int startInterZone = std::max(startRange, 0);
@@ -2229,7 +2239,7 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
     endRange = startRange + num_zones_per_process;
     for (int bb = 0; bb < numBases; bb++)
       {
-      duo_t zoneRange = {0,0};
+      duo_t zoneRange;
       startRange = startRange - accumulated;
       endRange = endRange  - accumulated;
       int startInterZone = std::max(startRange, 0);
