@@ -81,6 +81,14 @@ vtkDataArray* GetVtkDataArray(
 //==============================================================================
 // Description:
 // This method accesses the user-supplied buffer at the given index and
+// returns the data as a vtkIdType. It is intended as a convenience method
+// to allow the user to access the data in an agnostic-type fashion.
+vtkIdType GetIdFromRawBuffer(
+      const int type, void* buffer, vtkIdType buffer_idx);
+
+//==============================================================================
+// Description:
+// This method accesses the user-supplied buffer at the given index and
 // returns the data as a double. It is intended as a convenience method
 // to allow the user to access the data in an agnostic-type fashion.
 double GetDoubleFromRawBuffer(

@@ -156,6 +156,59 @@ double GetDoubleFromRawBuffer(
 }
 
 //==============================================================================
+vtkIdType GetIdFromRawBuffer(
+      const int type, void* buffer, vtkIdType buffer_idx)
+{
+  assert("pre: cannot read from null buffer!" && (buffer != NULL) );
+
+  vtkIdType dataItem = 0;
+
+  switch( type )
+    {
+   case gio::GENERIC_IO_INT32_TYPE:
+     {
+     int32_t *dataPtr = static_cast<int32_t*>(buffer);
+     dataItem = static_cast<vtkIdType>(dataPtr[buffer_idx]);
+     }
+     break;
+   case gio::GENERIC_IO_INT64_TYPE:
+     {
+     int64_t *dataPtr = static_cast<int64_t*>(buffer);
+     dataItem = static_cast<vtkIdType>(dataPtr[buffer_idx]);
+     }
+     break;
+   case gio::GENERIC_IO_UINT32_TYPE:
+     {
+     uint32_t *dataPtr = static_cast<uint32_t*>(buffer);
+     dataItem = static_cast<vtkIdType>(dataPtr[buffer_idx]);
+     }
+     break;
+   case gio::GENERIC_IO_UINT64_TYPE:
+     {
+     uint64_t *dataPtr = static_cast<uint64_t*>(buffer);
+     dataItem = static_cast<vtkIdType>(dataPtr[buffer_idx]);
+     }
+     break;
+   case gio::GENERIC_IO_DOUBLE_TYPE:
+     {
+     double *dataPtr = static_cast<double*>(buffer);
+     dataItem = static_cast<vtkIdType>(dataPtr[buffer_idx]);
+     }
+     break;
+   case gio::GENERIC_IO_FLOAT_TYPE:
+     {
+     float *dataPtr = static_cast<float*>(buffer);
+     dataItem = static_cast<vtkIdType>(dataPtr[buffer_idx]);
+     }
+     break;
+   default:
+     assert("pre: Undefined GENERIC IO type: " && true);
+    } // END switch
+
+  return( dataItem );
+}
+
+//==============================================================================
 gio::GenericIOReader* GetReader(
     MPI_Comm comm, bool posix, int distribution, const std::string& fileName)
 {
