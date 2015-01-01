@@ -3037,7 +3037,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <Hints>
-        <ReaderFactory extensions="bp"
+        <ReaderFactory extensions="vta"
                        file_description="VTK ADIOS File" />
       </Hints>
     </SourceProxy>

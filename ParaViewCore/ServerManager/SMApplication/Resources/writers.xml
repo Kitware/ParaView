@@ -1131,7 +1131,7 @@
         <Property name="TransportMethod"     show="1" />
         <Property name="TransportMethodArgs" show="1" />
         <Property name="CompressionMethod"   show="1" />
-        <WriterFactory extensions="bp"
+        <WriterFactory extensions="vta"
                        file_description="VTK ADIOS File" />
       </Hints>
       <!-- End of ADIOSWriter -->
