@@ -12,13 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMNewWidgetRepresentationProxy - representation that can be used to
-// show a 3D surface in a render view.
+// .NAME vtkSMNewWidgetRepresentationProxy - proxy for 3D widgets and
+// their representations in ParaView.
 // .SECTION Description
-// vtkSMNewWidgetRepresentationProxy is a concrete representation that can be used
-// to render the surface in a vtkSMRenderViewProxy. It uses a
-// vtkPVGeometryFilter to convert non-polydata input to polydata that can be
-// rendered. It supports rendering the data as a surface, wireframe or points.
+// vtkSMNewWidgetRepresentationProxy is a proxy for 3D widgets and their
+// representations. It has several responsibilities.
+// \li Sets up the link between the Widget and its representation on VTK side.
+// \li Sets up event handlers to ensure that the representation proxy's info
+// properties are updated any time the widget fires interaction events.
+// \li Provides API to perform tasks typical with 3DWidgets in ParaView e.g.
+// picking, placing widget on data bounds.
 
 #ifndef vtkSMNewWidgetRepresentationProxy_h
 #define vtkSMNewWidgetRepresentationProxy_h
@@ -38,7 +41,7 @@ public:
   static vtkSMNewWidgetRepresentationProxy* New();
   vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
- 
+
   // Description:
   // Get the widget for the representation.
   vtkGetObjectMacro(Widget, vtkAbstractWidget);
@@ -85,9 +88,8 @@ protected:
 private:
 
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMNewWidgetRepresentationProxy&); // Not implemented  
+  void operator=(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
 //ETX
 };
 
 #endif
-

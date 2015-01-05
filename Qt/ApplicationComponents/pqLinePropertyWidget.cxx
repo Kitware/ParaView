@@ -1,0 +1,301 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:  pqLinePropertyWidget.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#include "pqLinePropertyWidget.h"
+#include "ui_pqLinePropertyWidget.h"
+
+#include "pqCoreUtilities.h"
+#include "pqPointPickingHelper.h"
+#include "vtkBoundingBox.h"
+#include "vtkCommand.h"
+#include "vtkMath.h"
+#include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMPropertyGroup.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+
+#include <QDoubleValidator>
+
+class pqLinePropertyWidget::pqInternals
+{
+public:
+  Ui::LinePropertyWidget Ui;
+  bool PickPoint1;
+  pqInternals()
+    : PickPoint1(true)
+  {
+  }
+};
+
+//-----------------------------------------------------------------------------
+pqLinePropertyWidget::pqLinePropertyWidget(
+    vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject)
+  : Superclass(
+    "representations", "LineSourceWidgetRepresentation",
+    smproxy, smgroup, parentObject),
+  Internals(new pqLinePropertyWidget::pqInternals())
+{
+  Ui::LinePropertyWidget &ui = this->Internals->Ui;
+  ui.setupUi(this);
+
+  new QDoubleValidator(ui.point1X);
+  new QDoubleValidator(ui.point1Y);
+  new QDoubleValidator(ui.point1Z);
+  new QDoubleValidator(ui.point2X);
+  new QDoubleValidator(ui.point2Y);
+  new QDoubleValidator(ui.point2Z);
+
+  if (vtkSMProperty* p1 = smgroup->GetProperty("Point1WorldPosition"))
+    {
+    ui.labelPoint1->setText(tr(p1->GetXMLLabel()));
+    this->addPropertyLink(
+      ui.point1X, "text2", SIGNAL(textChangedAndEditingFinished()), p1, 0);
+    this->addPropertyLink(
+      ui.point1Y, "text2", SIGNAL(textChangedAndEditingFinished()), p1, 1);
+    this->addPropertyLink(
+      ui.point1Z, "text2", SIGNAL(textChangedAndEditingFinished()), p1, 2);
+    ui.labelPoint1->setText(p1->GetXMLLabel());
+    }
+  else
+    {
+    qCritical("Missing required property for function 'Point1WorldPosition'.");
+    }
+
+  if (vtkSMProperty* p2 = smgroup->GetProperty("Point2WorldPosition"))
+    {
+    ui.labelPoint2->setText(tr(p2->GetXMLLabel()));
+    this->addPropertyLink(
+      ui.point2X, "text2", SIGNAL(textChangedAndEditingFinished()), p2, 0);
+    this->addPropertyLink(
+      ui.point2Y, "text2", SIGNAL(textChangedAndEditingFinished()), p2, 1);
+    this->addPropertyLink(
+      ui.point2Z, "text2", SIGNAL(textChangedAndEditingFinished()), p2, 2);
+    ui.labelPoint2->setText(p2->GetXMLLabel());
+    }
+  else
+    {
+    qCritical("Missing required property for function 'Point2WorldPosition'.");
+    }
+
+  if (smgroup->GetProperty("Input"))
+    {
+    this->connect(ui.centerOnBounds, SIGNAL(clicked()), SLOT(centerOnBounds()));
+    }
+  else
+    {
+    ui.centerOnBounds->hide();
+    }
+
+  // link show3DWidget checkbox
+  this->connect(ui.show3DWidget, SIGNAL(toggled(bool)), SLOT(setWidgetVisible(bool)));
+  ui.show3DWidget->connect(this, SIGNAL(widgetVisibilityToggled(bool)), SLOT(setChecked(bool)));
+  this->setWidgetVisible(ui.show3DWidget->isChecked());
+
+  this->connect(ui.xAxis, SIGNAL(clicked()), SLOT(useXAxis()));
+  this->connect(ui.yAxis, SIGNAL(clicked()), SLOT(useYAxis()));
+  this->connect(ui.zAxis, SIGNAL(clicked()), SLOT(useZAxis()));
+
+  pqPointPickingHelper* pickHelper = new pqPointPickingHelper(QKeySequence(tr("P")), false, this);
+  pickHelper->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickHelper->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickHelper, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
+
+  pqPointPickingHelper* pickHelper2 = new pqPointPickingHelper(QKeySequence(tr("Ctrl+P")), true, this);
+  pickHelper2->connect(this, SIGNAL(viewChanged(pqView*)), SLOT(setView(pqView*)));
+  pickHelper2->connect(this, SIGNAL(widgetVisibilityUpdated(bool)), SLOT(setShortcutEnabled(bool)));
+  this->connect(pickHelper2, SIGNAL(pick(double, double, double)), SLOT(pick(double, double, double)));
+
+  pqCoreUtilities::connect(this->widgetProxy(), vtkCommand::PropertyModifiedEvent,
+    this, SLOT(updateLengthLabel()));
+  this->updateLengthLabel();
+}
+
+//-----------------------------------------------------------------------------
+pqLinePropertyWidget::~pqLinePropertyWidget()
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::updateLengthLabel()
+{
+  double p1[3], p2[3];
+  vtkSMProxy* wproxy = this->widgetProxy();
+  vtkSMPropertyHelper(wproxy, "Point1WorldPosition").Get(p1, 3);
+  vtkSMPropertyHelper(wproxy, "Point2WorldPosition").Get(p2, 3);
+
+  double distance = sqrt(vtkMath::Distance2BetweenPoints(p1, p2));
+  Ui::LinePropertyWidget &ui = this->Internals->Ui;
+  ui.labelLength->setText(QString("<b>Length:</b> <i>%1</i> ").arg(distance));
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::placeWidget()
+{
+  // nothing to do.
+}
+
+//-----------------------------------------------------------------------------
+vtkBoundingBox pqLinePropertyWidget::referenceBounds() const
+{
+  vtkBoundingBox bbox = this->dataBounds();
+  if (!bbox.IsValid())
+    {
+    vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+    double pt[3];
+    vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Get(pt, 3);
+    bbox.AddPoint(pt);
+
+    vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Get(pt, 3);
+    bbox.AddPoint(pt);
+    }
+  return bbox;
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::useXAxis()
+{
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  vtkBoundingBox bbox = this->referenceBounds();
+  if (bbox.IsValid())
+    {
+    double center[3];
+    bbox.GetCenter(center);
+    center[0] -= bbox.GetLength(0) * 0.5;
+    vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(center, 3);
+
+    bbox.GetCenter(center);
+    center[0] += bbox.GetLength(0) * 0.5;
+    vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(center, 3);
+    wdgProxy->UpdateVTKObjects();
+    emit this->changeAvailable();
+    this->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::useYAxis()
+{
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  vtkBoundingBox bbox = this->referenceBounds();
+  if (bbox.IsValid())
+    {
+    double center[3];
+    bbox.GetCenter(center);
+    center[1] -= bbox.GetLength(1) * 0.5;
+    vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(center, 3);
+
+    bbox.GetCenter(center);
+    center[1] += bbox.GetLength(1) * 0.5;
+    vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(center, 3);
+    wdgProxy->UpdateVTKObjects();
+    emit this->changeAvailable();
+    this->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::useZAxis()
+{
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  vtkBoundingBox bbox = this->referenceBounds();
+  if (bbox.IsValid())
+    {
+    double center[3];
+    bbox.GetCenter(center);
+    center[2] -= bbox.GetLength(2) * 0.5;
+    vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(center, 3);
+
+    bbox.GetCenter(center);
+    center[2] += bbox.GetLength(2) * 0.5;
+    vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(center, 3);
+    wdgProxy->UpdateVTKObjects();
+    emit this->changeAvailable();
+    this->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::centerOnBounds()
+{
+  vtkBoundingBox bbox = this->dataBounds();
+  if (!bbox.IsValid())
+    {
+    return;
+    }
+
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  vtkSMPropertyHelper(wdgProxy, "Point1WorldPosition").Set(bbox.GetMinPoint(), 3);
+  vtkSMPropertyHelper(wdgProxy, "Point2WorldPosition").Set(bbox.GetMaxPoint(), 3);
+  wdgProxy->UpdateVTKObjects();
+  emit this->changeAvailable();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::setLineColor(const QColor& color)
+{
+  vtkSMProxy* widget = this->widgetProxy();
+  vtkSMPropertyHelper(widget, "LineColor").Set(0, color.redF());
+  vtkSMPropertyHelper(widget, "LineColor").Set(1,color.greenF());
+  vtkSMPropertyHelper(widget, "LineColor").Set(2 , color.blueF());
+  widget->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqLinePropertyWidget::pick(double wx, double wy, double wz)
+{
+  Ui::LinePropertyWidget &ui = this->Internals->Ui;
+  bool pick_point1;
+  switch (ui.pickPoint->currentIndex())
+    {
+  case 1:
+    pick_point1 = true;
+    break;
+
+  case 2:
+    pick_point1 = false;
+    break;
+
+  case 0:
+  default:
+    pick_point1 = this->Internals->PickPoint1;
+    this->Internals->PickPoint1 = !this->Internals->PickPoint1;
+    break;
+    }
+
+  double position[3] = {wx, wy, wz};
+  vtkSMNewWidgetRepresentationProxy* wdgProxy = this->widgetProxy();
+  vtkSMPropertyHelper(wdgProxy,
+    pick_point1? "Point1WorldPosition" : "Point2WorldPosition").Set(position, 3);
+  wdgProxy->UpdateVTKObjects();
+  emit this->changeAvailable();
+  this->render();
+}

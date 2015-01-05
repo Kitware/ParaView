@@ -94,14 +94,10 @@ Copyright 2012 SciberQuest Inc.
           This property specifies the number of pieces into which to divide the line.
         </Documentation>
       </IntVectorProperty>
-
-      <Hints>
-        <PropertyGroup type="LineSource" label="Line">
+      <PropertyGroup label="Line Parameters" panel_widget="InteractiveLine">
           <Property function="Point1WorldPosition" name="Point1" />
           <Property function="Point2WorldPosition" name="Point2" />
-          <Property function="Resolution"          name="Resolution" />
-        </PropertyGroup>
-      </Hints>
+      </PropertyGroup>
    <!-- End Line -->
    </SourceProxy>
 

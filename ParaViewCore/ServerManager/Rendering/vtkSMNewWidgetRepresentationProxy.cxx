@@ -287,8 +287,13 @@ bool vtkSMNewWidgetRepresentationProxy::LinkProperties(
         vtkCommand::UncheckedPropertyModifiedEvent, this->Observer);
       widgetProperty->AddObserver(
         vtkCommand::ModifiedEvent, this->Observer);
+
+      vtkSMUncheckedPropertyHelper helper(prop);
+      vtkSMPropertyHelper(widgetProperty).Copy(helper);
       }
     }
+  this->UpdateVTKObjects();
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -306,6 +311,7 @@ bool vtkSMNewWidgetRepresentationProxy::UnlinkProperties(vtkSMProxy* controlledP
     vtkSMProperty* prop = controlledPropertyGroup->GetProperty(cc);
     prop->RemoveObserver(this->Observer);
     }
+  return true;
 }
 
 //----------------------------------------------------------------------------

@@ -29,339 +29,170 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqProxySelectionWidget.h"
+#include "ui_pqProxySelectionWidget.h"
 
-// Qt includes
-#include <QComboBox>
-#include <QDebug>
-#include <QPointer>
-#include <QLabel>
-#include <QStackedLayout>
-
-// VTK/Server Manager includes
+#include "pqComboBoxDomain.h"
+#include "pqPropertiesPanel.h"
+#include "pqProxyWidget.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
-#include "vtkSMDomain.h"
+#include "vtkSMProxyListDomain.h"
+#include "vtkWeakPointer.h"
 
-// ParaView GUI includes
-#include "pqProxy.h"
-#include "pqComboBoxDomain.h"
-#include "pqSMAdaptor.h"
-#include "pqView.h"
-#include "pq3DWidget.h"
-#include "pqNamedWidgets.h"
-#include "pqCollapsedGroup.h"
-#include "pqNamedWidgets.h"
-#include "pqPropertyWidget.h"
+#include <QPointer>
 
 //-----------------------------------------------------------------------------
 class pqProxySelectionWidget::pqInternal
 {
 public:
-  pqInternal()
+  vtkWeakPointer<vtkSMProxy> ChosenProxy;
+  vtkSmartPointer<vtkSMProxyListDomain> Domain;
+  Ui::ProxySelectionWidget Ui;
+  QPointer<pqProxyWidget> ProxyWidget;
+  bool ShowingAdvancedProperties;
+  pqInternal(pqProxySelectionWidget* self) : ShowingAdvancedProperties(false)
     {
-    this->Combo = NULL;
-    this->DomainObserver = NULL;
-    this->Widget = NULL;
-    this->Selected = false;
-    this->SelectedProxyWidgetVisibility = true;
+    this->Ui.setupUi(self);
+    this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+    this->Ui.verticalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.horizontalLayout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+    this->Ui.horizontalLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+    this->Ui.frameLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
     }
-  QComboBox* Combo;
-  vtkSMProxy* ReferenceProxy;
-  QString Property;
-  pqComboBoxDomain* DomainObserver;
-  pqProxyPanel* Widget;
-  QPointer<pqView> View;
-  bool Selected;
-  bool SelectedProxyWidgetVisibility;
 
-  typedef QMap<vtkSMProxy*, pqProxyPanel*> PanelMap;
-  PanelMap Panels;
+  void setChosenProxy(vtkSMProxy* proxy, pqProxySelectionWidget* self)
+    {
+    delete this->ProxyWidget;
+    this->ChosenProxy = proxy;
+    if (proxy)
+      {
+      this->ProxyWidget = new pqProxyWidget(proxy, this->Ui.frame);
+      this->ProxyWidget->setObjectName("ChosenProxyWidget");
+      this->ProxyWidget->setApplyChangesImmediately(false);
+      this->Ui.frameLayout->insertWidget(0, this->ProxyWidget);
+      this->ProxyWidget->filterWidgets(this->ShowingAdvancedProperties);
+      this->ProxyWidget->setView(self->view());
+
+      // Propagate signals from the internal ProxyWidget out from `self`.
+      self->connect(this->ProxyWidget, SIGNAL(changeAvailable()), SIGNAL(changeAvailable()));
+      self->connect(this->ProxyWidget, SIGNAL(changeFinished()), SIGNAL(changeFinished()));
+      }
+    }
 };
 
 //-----------------------------------------------------------------------------
-pqProxySelectionWidget::pqProxySelectionWidget(vtkSMProxy* ref_proxy, 
-                                     const QString& prop,
-                                     const QString& label,
-                                     QWidget* p)
-  : QWidget(p) 
+pqProxySelectionWidget::pqProxySelectionWidget(
+  vtkSMProperty *smproperty, vtkSMProxy *smproxy, QWidget *parentObject)
+  : Superclass(smproxy, parentObject),
+  Internal(new pqProxySelectionWidget::pqInternal(this))
 {
-  this->Internal = new pqInternal();
-  QGridLayout* l = new QGridLayout(this);
-  l->setMargin(0);
-  this->Internal->Combo = new QComboBox(this);
-  if(label.isNull())
-    {
-    l->addWidget(this->Internal->Combo, 0, 0, 1, 2);
-    }
-  else
-    {
-    QLabel* labelWidget = new QLabel(label, this);
-    l->addWidget(labelWidget, 0, 0, 1, 1);
-    l->addWidget(this->Internal->Combo, 0, 1, 1, 1);
-    }
+  this->Internal->Ui.label->setText(smproperty->GetXMLLabel());
+  this->Internal->Domain = vtkSMProxyListDomain::SafeDownCast(
+    smproperty->FindDomain("vtkSMProxyListDomain"));
 
-  QObject::connect(this->Internal->Combo,
-                   SIGNAL(currentIndexChanged(int)), 
-                   this, SLOT(handleProxyChanged()));
-
-  this->Internal->ReferenceProxy = ref_proxy;
-  this->Internal->Property = prop;
-
-  this->Internal->DomainObserver = new pqComboBoxDomain(this->Internal->Combo,
-    ref_proxy->GetProperty(prop.toLatin1().data()), "proxy_list");
+  // This widget is intended to be used for properties with ProxyListDomains
+  // alone.
+  Q_ASSERT(this->Internal->Domain);
+  this->connect(this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)),
+    SLOT(currentIndexChanged(int)));
+  new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, "proxy_list");
+  this->addPropertyLink(
+    this, "chosenProxy", SIGNAL(chosenProxyChanged()),
+    smproperty);
 }
 
 //-----------------------------------------------------------------------------
 pqProxySelectionWidget::~pqProxySelectionWidget()
 {
-  foreach (pqProxyPanel* panel, this->Internal->Panels)
-    {
-    delete panel;
-    }
-  this->Internal->Panels.clear();
-  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-pqSMProxy pqProxySelectionWidget::proxy() const
+vtkSMProxy* pqProxySelectionWidget::chosenProxy() const
 {
-  QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
-    this->Internal->ReferenceProxy->GetProperty(
-      this->Internal->Property.toLatin1().data()));
-
-  int index = this->Internal->Combo->currentIndex();
-  if (index < 0 || index >= proxies.size())
-    {
-    return NULL;
-    }
-
-  return proxies[index];
+  return this->Internal->ChosenProxy;
 }
 
 //-----------------------------------------------------------------------------
-void pqProxySelectionWidget::setProxy(pqSMProxy var)
+void pqProxySelectionWidget::setChosenProxy(vtkSMProxy* cproxy)
 {
-  QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(
-    this->Internal->ReferenceProxy->GetProperty(
-      this->Internal->Property.toLatin1().data()));
-
-  int index = proxies.indexOf(var.GetPointer());
-
-  if(var.GetPointer() && index < 0 && this->Internal->Combo->count() > 0)
+  if (this->Internal->ChosenProxy != cproxy)
     {
-    qDebug() << "Selected proxy value not in the list: " << var->GetXMLLabel();
-    }
-  else if (var.GetPointer() && index != this->Internal->Combo->currentIndex())
-    {
-    this->Internal->Combo->setCurrentIndex(index);
-    }
-}
+    this->Internal->setChosenProxy(cproxy, this);
 
-//-----------------------------------------------------------------------------
-void pqProxySelectionWidget::handleProxyChanged()
-{
-  this->initialize3DWidget();
-  pqSMProxy p = this->proxy();
-  emit this->proxyChanged(p);
-}
-
-//-----------------------------------------------------------------------------
-void pqProxySelectionWidget::initialize3DWidget()
-{
-  // proxy panel is the parent widget with the old panels
-  pqProxyPanel* panel = qobject_cast<pqProxyPanel*>(this->parentWidget());
-
-  // property widget is the parent widget with the new properties panel
-  pqPropertyWidget *propertyWidget =
-    qobject_cast<pqPropertyWidget*>(this->parentWidget());
-
-  if (this->Internal->Widget)
-    {
-    this->Internal->Widget->deselect();
-    this->Internal->Widget->setView(0);
-    this->Internal->Widget->hide();
-
-    if(panel)
+    // Update the QComboBox.
+    for (unsigned int cc=0; cc < this->Internal->Domain->GetNumberOfProxies(); ++cc)
       {
-      QObject::disconnect(panel, 0, this->Internal->Widget, 0);
-      }
-    else if(propertyWidget)
-      {
-      QObject::disconnect(propertyWidget, 0, this->Internal->Widget, 0);
-      }
-
-    this->Internal->Widget = NULL;
-    }
-
-  if (!this->Internal->ReferenceProxy)
-    {
-    return;
-    }
-
-  vtkSMProxy* smProxy = this->proxy();
-  // If there's a sub-panel already created for this proxy, don't create a new
-  // one.
-  this->Internal->Widget = this->Internal->Panels[smProxy];
-  if (this->Internal->Widget)
-    {
-    pq3DWidget* widget3D = qobject_cast<pq3DWidget*>(this->Internal->Widget);
-    if (widget3D)
-      {
-      widget3D->resetBounds();
-      widget3D->reset();
-      }
-    }
-  else
-    {
-    vtkPVXMLElement* hints = (smProxy) ? smProxy->GetHints() : NULL;
-    if (hints)
-      {
-      // We need to create a widget for the proxy.
-      QList<pq3DWidget*> widgets =
-        pq3DWidget::createWidgets(this->Internal->ReferenceProxy, smProxy);
-      if (widgets.size() > 1)
+      if (this->Internal->Domain->GetProxy(cc) == cproxy)
         {
-        qDebug() << "pqProxySelectionWidget currently only supports one "
-          " 3D widget per proxy.";
-        }
-      for (int cc=1; cc < widgets.size(); cc++)
-        {
-        delete widgets[cc];
-        }
-      if(!widgets.isEmpty())
-        {
-        pq3DWidget* w = widgets[0];
-        this->Internal->Widget = w;
-        w->resetBounds();
-        w->reset();
-
-        QGridLayout* l = qobject_cast<QGridLayout*>(this->layout());
-        l->addWidget(w, 1, 0, 1, 2);
+        this->Internal->Ui.comboBox->setCurrentIndex(cc);
         }
       }
-
-    // auto generate one
-    if(!this->Internal->Widget)
-      {
-      pqProxyPanel* sub_panel = new pqProxyPanel(smProxy, this);
-      QGridLayout* gl = new QGridLayout(sub_panel);
-      gl->setMargin(2);
-      pqNamedWidgets::createWidgets(gl, smProxy);
-      if (gl->rowCount() <= 2)
-        {
-        // no widgets were added for the proxy...so don't show any sub_panel.
-        delete sub_panel;
-        }
-      else
-        {
-        pqNamedWidgets::link(sub_panel, smProxy, sub_panel->propertyManager());
-        QGridLayout* l = qobject_cast<QGridLayout*>(this->layout());
-        this->Internal->Widget = sub_panel;
-        l->addWidget(this->Internal->Widget, 1, 0, 1, 2);
-        }
-      }
-    }
- 
-  if (!this->Internal->Widget)
-    {
-    return;
-    }
-
-  // Save the panel for later.
-  this->Internal->Panels[smProxy] = this->Internal->Widget;
-  
-  if(panel)
-    {
-    QObject::connect(panel, SIGNAL(onselect()),
-                     this->Internal->Widget, SLOT(select()));
-    QObject::connect(panel, SIGNAL(ondeselect()),
-                     this->Internal->Widget, SLOT(deselect()));
-    QObject::connect(panel, SIGNAL(onaccept()),
-                     this->Internal->Widget, SLOT(accept()));
-    QObject::connect(panel, SIGNAL(onreset()),
-                     this->Internal->Widget, SLOT(reset()));
-    QObject::connect(this->Internal->Widget, SIGNAL(modified()),
-                     panel, SLOT(setModified()));
-    QObject::connect(panel, SIGNAL(viewChanged(pqView*)),
-                     this->Internal->Widget, SLOT(setView(pqView*)));
-    }
-  else if(propertyWidget)
-    {
-    QObject::connect(this->Internal->Widget, SIGNAL(modified()),
-                     this, SIGNAL(modified()));
-    QObject::connect(propertyWidget, SIGNAL(viewChanged(pqView*)),
-                     this->Internal->Widget, SLOT(setView(pqView*)));
-    }
-
-  this->Internal->Widget->setView(this->Internal->View);
-  if (this->Internal->Selected)
-    {
-    this->Internal->Widget->select();
-    }
-  else
-    {
-    this->Internal->Widget->deselect();
-    }
-
-  this->Internal->Widget->setVisible(this->Internal->SelectedProxyWidgetVisibility);
-}
-
-//-----------------------------------------------------------------------------
-void pqProxySelectionWidget::select()
-{
-  this->Internal->Selected = true;
-  if(this->Internal->Widget)
-    {
-    this->Internal->Widget->select();
+    emit this->chosenProxyChanged();
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqProxySelectionWidget::deselect()
+void pqProxySelectionWidget::currentIndexChanged(int idx)
 {
-  this->Internal->Selected = false;
-  if(this->Internal->Widget)
-    {
-    this->Internal->Widget->deselect();
-    }
+  this->setChosenProxy(this->Internal->Domain->GetProxy(idx));
 }
 
 //-----------------------------------------------------------------------------
-void pqProxySelectionWidget::accept()
+void pqProxySelectionWidget::apply()
 {
-  if(this->Internal->Widget)
+  if (this->Internal->ProxyWidget)
     {
-    this->Internal->Widget->accept();
+    this->Internal->ProxyWidget->apply();
     }
+  this->Superclass::apply();
 }
 
 //-----------------------------------------------------------------------------
 void pqProxySelectionWidget::reset()
 {
-  if(this->Internal->Widget)
+  if (this->Internal->ProxyWidget)
     {
-    this->Internal->Widget->reset();
+    this->Internal->ProxyWidget->reset();
     }
+  this->Superclass::reset();
 }
 
 //-----------------------------------------------------------------------------
-void pqProxySelectionWidget::setView(pqView* rm)
+void pqProxySelectionWidget::select()
 {
-  this->Internal->View = rm;
-  if(this->Internal->Widget)
-    {
-    this->Internal->Widget->setView(rm);
-    }
+  this->Superclass::select();
 }
 
 //-----------------------------------------------------------------------------
-void pqProxySelectionWidget::setSelectedProxyWidgetVisibility(bool visible)
+void pqProxySelectionWidget::deselect()
 {
-  this->Internal->SelectedProxyWidgetVisibility = visible;
-  if (this->Internal->Widget)
+  this->Superclass::deselect();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxySelectionWidget::updateWidget(bool showing_advanced_properties)
+{
+  this->Internal->ShowingAdvancedProperties = showing_advanced_properties;
+  if (this->Internal->ProxyWidget)
     {
-    this->Internal->Widget->setVisible(visible);
+    this->Internal->ProxyWidget->filterWidgets(showing_advanced_properties);
     }
+  this->Superclass::updateWidget(showing_advanced_properties);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxySelectionWidget::setPanelVisibility(const char* vis)
+{
+  this->Superclass::setPanelVisibility(vis);
+}
+
+//-----------------------------------------------------------------------------
+void pqProxySelectionWidget::setView(pqView* aview)
+{
+  if (this->Internal->ProxyWidget)
+    {
+    this->Internal->ProxyWidget->setView(aview);
+    }
+  this->Superclass::setView(aview);
 }

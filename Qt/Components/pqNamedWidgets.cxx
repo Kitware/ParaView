@@ -81,7 +81,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanel.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
-#include "pqProxySelectionWidget.h"
 #include "pqProxySILModel.h"
 #include "pqSelectionInputWidget.h"
 #include "pqServerManagerModel.h"
@@ -279,28 +278,28 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     }
   else if (pt == pqSMAdaptor::PROXYSELECTION)
     {
-    pqProxySelectionWidget* w = qobject_cast<pqProxySelectionWidget*>(object);
-    if(w)
-      {
-      property_manager->registerLink(
-        w, "proxy", SIGNAL(proxyChanged(pqSMProxy)),
-        proxy, SMProperty);
+    //pqProxySelectionWidget* w = qobject_cast<pqProxySelectionWidget*>(object);
+    //if(w)
+    //  {
+    //  property_manager->registerLink(
+    //    w, "proxy", SIGNAL(proxyChanged(pqSMProxy)),
+    //    proxy, SMProperty);
 
-      QWidget* parent = w->parentWidget();
-      pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
-      if(object_panel)
-        {
-        w->setView(object_panel->view());
-        QObject::connect(parent, SIGNAL(viewChanged(pqView*)),
-                         w, SLOT(setView(pqView*)));
-        QObject::connect(parent, SIGNAL(onaccept()), w, SLOT(accept()));
-        QObject::connect(parent, SIGNAL(onreset()), w, SLOT(reset()));
-        QObject::connect(parent, SIGNAL(onselect()), w, SLOT(select()));
-        QObject::connect(parent, SIGNAL(ondeselect()), w, SLOT(deselect()));
-        QObject::connect(w, SIGNAL(modified()), parent, SLOT(setModified()));
-        }
+    //  QWidget* parent = w->parentWidget();
+    //  pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
+    //  if(object_panel)
+    //    {
+    //    w->setView(object_panel->view());
+    //    QObject::connect(parent, SIGNAL(viewChanged(pqView*)),
+    //                     w, SLOT(setView(pqView*)));
+    //    QObject::connect(parent, SIGNAL(onaccept()), w, SLOT(accept()));
+    //    QObject::connect(parent, SIGNAL(onreset()), w, SLOT(reset()));
+    //    QObject::connect(parent, SIGNAL(onselect()), w, SLOT(select()));
+    //    QObject::connect(parent, SIGNAL(ondeselect()), w, SLOT(deselect()));
+    //    QObject::connect(w, SIGNAL(modified()), parent, SLOT(setModified()));
+    //    }
 
-      }
+    //  }
     }
   else if(pt == pqSMAdaptor::SINGLE_ELEMENT || pt == pqSMAdaptor::FILE_LIST)
     {
@@ -935,17 +934,17 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy, bo
     else if (pt==pqSMAdaptor::PROXYSELECTION)
       {
       // for now, support only one level deep of proxy selections
-      pqProxySelectionWidget* w = 
-        new pqProxySelectionWidget(pxy, iter->GetKey(),
-                                   propertyLabel,
-                                   panelLayout->parentWidget());
-      if(informationOnly)
-        {
-        w->setEnabled(false);
-        }
-      w->setObjectName(propertyName);
-      panelLayout->addWidget(w, rowCount, 0, 1, 2);
-      rowCount++;
+      //pqProxySelectionWidget* w = 
+      //  new pqProxySelectionWidget(pxy, iter->GetKey(),
+      //                             propertyLabel,
+      //                             panelLayout->parentWidget());
+      //if(informationOnly)
+      //  {
+      //  w->setEnabled(false);
+      //  }
+      //w->setObjectName(propertyName);
+      //panelLayout->addWidget(w, rowCount, 0, 1, 2);
+      //rowCount++;
       }
     else if(pt == pqSMAdaptor::ENUMERATION)
       {

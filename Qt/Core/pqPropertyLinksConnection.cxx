@@ -113,6 +113,7 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
     {
   case pqSMAdaptor::PROXY:
   case pqSMAdaptor::PROXYSELECTION:
+  case pqSMAdaptor::PROXYLIST:
       {
       pqSMProxy smproxy = pqSMAdaptor::getProxyProperty(this->PropertySM, value_type);
       currentSMValue.setValue(smproxy);
@@ -169,7 +170,6 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
     break;
 
   case pqSMAdaptor::UNKNOWN:
-  case pqSMAdaptor::PROXYLIST:
     break;
     }
 

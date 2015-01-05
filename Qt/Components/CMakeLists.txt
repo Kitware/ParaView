@@ -557,6 +557,7 @@ set (Module_UI_FILES
   Resources/UI/pqPresetDialog.ui
   Resources/UI/pqPropertiesPanel.ui
   Resources/UI/pqProxyInformationWidget.ui
+  Resources/UI/pqProxySelectionWidget.ui
   Resources/UI/pqProxyWidgetDialog.ui
   Resources/UI/pqPythonAnimationCue.ui
   Resources/UI/pqQueryClauseWidget.ui
