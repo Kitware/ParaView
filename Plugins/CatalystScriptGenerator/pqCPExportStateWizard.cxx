@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMViewProxy.h>
 #include <vtkPVXMLElement.h>
 
+#include <pqCinemaTrack.h>
 #include <pqApplicationCore.h>
 #include <pqFileDialog.h>
 #include <pqImageOutputInfo.h>
@@ -58,7 +59,8 @@ namespace
     "   rescale_data_range=%4,\n"
     "   enable_live_viz=%5,\n"
     "   live_viz_frequency=%6,\n"
-    "   filename='%7')\n";
+    "   cinema_info={%7},\n"
+    "   filename='%8')\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -150,15 +152,70 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
       pqView* view = viewInfo->getView();
       QSize viewSize = view->getSize();
       vtkSMViewProxy* viewProxy = view->getViewProxy();
-      QString info = QString(" '%1' : ['%2', %3, '%4', '%5', '%6', '%7'],").
+
+      //cinema camera parameters
+      QString cinemaCam = "{None}";
+      QString camType = viewInfo->getCameraType();
+      if (camType != "None")
+        {
+        cinemaCam = QString("{\"camera\":\"");
+        cinemaCam += camType;
+        cinemaCam += "\", \"phi\":[";
+        for (int i = -180; i < 180; i+= (360/viewInfo->getPhi()))
+          {
+          cinemaCam += QString::number(i) + ",";
+          }
+        cinemaCam.chop(1);
+        cinemaCam += "], \"theta\":[";
+        for (int i = -180; i < 180; i+= (360/viewInfo->getTheta()))
+          {
+          cinemaCam += QString::number(i) + ",";
+          }
+        cinemaCam.chop(1);
+        cinemaCam += "] }";
+        }
+
+      QString info = QString(" '%1' : ['%2', %3, '%4', '%5', '%6', '%7', '%8'],").
         arg(proxyManager->GetProxyName("views", viewProxy)).
         arg(viewInfo->getImageFileName()).arg(viewInfo->getWriteFrequency()).
         arg(static_cast<int>(viewInfo->fitToScreen())).
-        arg(viewInfo->getMagnification()).arg(viewSize.width()).arg(viewSize.height());
+        arg(viewInfo->getMagnification()).
+        arg(viewSize.width()).
+        arg(viewSize.height()).
+        arg(cinemaCam);
       rendering_info+= info;
       }
     // remove the last comma -- assume that there's at least one view
     rendering_info.chop(1);
+    }
+
+  QString cinema_info = "None";
+  if(this->Internals->outputCinema->isChecked())
+    {
+    cinema_info = "";
+
+    for(int i=0;i<this->Internals->cinemaContainer->count();i++)
+      {
+      pqCinemaTrack *p = dynamic_cast<pqCinemaTrack*>(this->Internals->cinemaContainer->widget(i));
+      if (!p->explore())
+        {
+        continue;
+        }
+      QString name = p->filterName();
+      QString values = "[";
+      QVariantList vals = p->scalars();
+      for (int j = 0; j < vals.count(); j++)
+        {
+        values += QString::number(vals.value(j).toDouble());
+        values += ",";
+        }
+      values.chop(1);
+      values += "]";
+      QString info = QString(" '%1' : %2,").arg(name).arg(values);
+      cinema_info+= info;
+      }
+
+    cinema_info.chop(1);
     }
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
@@ -209,6 +266,7 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
                    .arg(rescale_data_range)
                    .arg(live_visualization)
                    .arg(live_visualization_frequency)
+                   .arg(cinema_info)
                    .arg(filename);
 
   return true;

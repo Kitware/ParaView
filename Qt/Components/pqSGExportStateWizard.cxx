@@ -41,6 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMCoreUtilities.h"
 
+#include "pqPipelineFilter.h"
+#include "vtkSMProperty.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "pqCinemaTrack.h"
+
 #include <vtksys/SystemTools.hxx>
 
 #include <QLabel>
@@ -177,6 +182,19 @@ pqSGExportStateWizard::pqSGExportStateWizard(
   QObject::connect(this->Internals->previousView, SIGNAL(pressed()),
                    this, SLOT(decrementView()));
 
+  this->CurrentTrack = 0;
+  this->Internals->cinemaContainer->hide();
+  this->Internals->previousTrack->hide();
+  this->Internals->nextTrack->hide();
+  QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
+                   this->Internals->cinemaContainer, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputCinema, SIGNAL(toggled(bool)),
+                   this, SLOT(toggleCinema(bool)));
+  QObject::connect(this->Internals->nextTrack, SIGNAL(pressed()),
+                   this, SLOT(incrementTrack()));
+  QObject::connect(this->Internals->previousTrack, SIGNAL(pressed()),
+                   this, SLOT(decrementTrack()));
+
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqRenderViewBase*> renderViews = smModel->findItems<pqRenderViewBase*>();
   QList<pqContextView*> contextViews = smModel->findItems<pqContextView*>();
@@ -208,6 +226,22 @@ pqSGExportStateWizard::pqSGExportStateWizard(
     this->Internals->nextView->setEnabled(true);
     }
   this->Internals->viewsContainer->setCurrentIndex(0);
+
+
+  //look for filters that cinema can parameterize
+  QList<pqPipelineFilter*> filters = smModel->findItems<pqPipelineFilter*>();
+  for(QList<pqPipelineFilter*>::Iterator it=filters.begin();
+      it!=filters.end();it++)
+    {
+    const QString &name =(*it)->getSMName();
+    if (strcmp((*it)->getProxy()->GetVTKClassName(), "Cut") ||
+        strcmp((*it)->getProxy()->GetVTKClassName(), "Contour"))
+      {
+      pqCinemaTrack *track = new pqCinemaTrack(this->Internals->cinemaContainer, parentFlags, *it);
+      this->Internals->cinemaContainer->addWidget(track);
+      }
+    }
+  this->Internals->cinemaContainer->setCurrentIndex(0);
 
   // a bit of a hack but we name the finish button here since for testing
   // it's having a hard time finding that button otherwise.
@@ -393,4 +427,73 @@ bool pqSGExportStateWizard::validateCurrentPage()
     return true;
     }
   return false;
+}
+
+//-----------------------------------------------------------------------------
+void pqSGExportStateWizard::toggleCinema(bool state)
+{
+  QList<pqImageOutputInfo*> imageOuts = this->getImageOutputInfos();
+  QList<pqImageOutputInfo*>::iterator i;
+  if(state)
+    {
+    this->Internals->cinemaContainer->setEnabled(true);
+    this->Internals->nextTrack->setEnabled(true);
+    this->Internals->previousTrack->setEnabled(true);
+    //cinema depends on rendering being on
+    this->Internals->outputRendering->setChecked(true);
+    //add cinema controls to each view
+    for (i = imageOuts.begin(); i != imageOuts.end(); i++)
+      {
+      (*i)->showCinema();
+      }
+    }
+  else
+    {
+    this->Internals->cinemaContainer->setEnabled(false);
+    this->Internals->nextTrack->setEnabled(false);
+    this->Internals->previousTrack->setEnabled(false);
+    for (i = imageOuts.begin(); i != imageOuts.end(); i++)
+      {
+      (*i)->hideCinema();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSGExportStateWizard::incrementTrack()
+{
+  if(this->CurrentTrack >= this->Internals->cinemaContainer->count()-1)
+    {
+    this->Internals->nextTrack->setEnabled(false);
+    return;
+    }
+  if(this->CurrentTrack == 0)
+    {
+    this->Internals->previousTrack->setEnabled(true);
+    }
+  this->CurrentTrack++;
+  this->Internals->cinemaContainer->setCurrentIndex(this->CurrentTrack);
+  if(this->CurrentTrack >= this->Internals->cinemaContainer->count()-1)
+    {
+    this->Internals->nextTrack->setEnabled(false);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqSGExportStateWizard::decrementTrack()
+{
+  if(this->CurrentTrack <= 0)
+    {
+    this->Internals->previousTrack->setEnabled(false);
+    return;
+    }
+  if(this->CurrentTrack == this->Internals->cinemaContainer->count()-1)
+    {
+    this->Internals->nextTrack->setEnabled(true);
+    }
+  this->CurrentTrack--;
+  this->Internals->cinemaContainer->setCurrentIndex(this->CurrentTrack);
+  if(this->CurrentTrack <= 0)
+    {
+    this->Internals->previousTrack->setEnabled(false);
+    }
 }

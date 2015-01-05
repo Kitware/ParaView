@@ -62,6 +62,12 @@ pqImageOutputInfo::pqImageOutputInfo(
     this->Info->imageType, SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateImageFileNameExtension(const QString&)));
 
+  QObject::connect(
+    this->Info->cinemaExport, SIGNAL(currentIndexChanged(const QString&)),
+    this, SLOT(updateCinemaType(const QString&)));
+
+  this->hideCinema();
+
   this->setupScreenshotInfo();
 };
 
@@ -207,4 +213,77 @@ void pqImageOutputInfo::setupScreenshotInfo()
 
     this->Info->thumbnailLabel->setPixmap(thumbnail);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::hideCinema()
+{
+  this->Info->cinemaLabel->hide();
+  this->Info->cinemaExport->setEnabled(false);
+  this->Info->cinemaExport->hide();
+  this->Info->phiLabel->hide();
+  this->Info->phiResolution->setEnabled(false);
+  this->Info->phiResolution->hide();
+  this->Info->thetaLabel->hide();
+  this->Info->thetaResolution->setEnabled(false);
+  this->Info->thetaResolution->hide();
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::showCinema()
+{
+  this->Info->cinemaLabel->show();
+  this->Info->cinemaExport->setEnabled(true);
+  this->Info->cinemaExport->show();
+  this->updateSpherical();
+}
+
+//-----------------------------------------------------------------------------
+void pqImageOutputInfo::updateCinemaType(
+  const QString&)
+{
+  this->updateSpherical();
+}
+
+//------------------------------------------------------------------------------
+void pqImageOutputInfo::updateSpherical()
+{
+  const QString& exportChoice =
+    this->Info->cinemaExport->currentText();
+  if (exportChoice == "Spherical")
+    {
+    this->Info->phiLabel->show();
+    this->Info->phiResolution->setEnabled(true);
+    this->Info->phiResolution->show();
+    this->Info->thetaLabel->show();
+    this->Info->thetaResolution->setEnabled(true);
+    this->Info->thetaResolution->show();
+    }
+  else
+    {
+    this->Info->phiLabel->hide();
+    this->Info->phiResolution->setEnabled(false);
+    this->Info->phiResolution->hide();
+    this->Info->thetaLabel->hide();
+    this->Info->thetaResolution->setEnabled(false);
+    this->Info->thetaResolution->hide();
+    }
+}
+
+//------------------------------------------------------------------------------
+const QString pqImageOutputInfo::getCameraType()
+{
+  return this->Info->cinemaExport->currentText();
+}
+
+//------------------------------------------------------------------------------
+double pqImageOutputInfo::getPhi()
+{
+  return this->Info->phiResolution->value();
+}
+
+//------------------------------------------------------------------------------
+double pqImageOutputInfo::getTheta()
+{
+  return this->Info->thetaResolution->value();
 }
