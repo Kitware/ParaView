@@ -104,11 +104,16 @@ int main(int argc, char* argv[])
   QApplication qtapp(argc, argv);
   setlocale(LC_NUMERIC,"C");
   pq@BPC_NAME@Initializer pvInitializer;
-  if (!pvInitializer.Initialize(argc, argv))
+  pq@BPC_NAME@Initializer::Status status = pvInitializer.Initialize(argc, argv);
+  switch (status)
     {
-    return 1;
+    case pq@BPC_NAME@Initializer::ExitSuccess:
+      return 0;
+    case pq@BPC_NAME@Initializer::ExitFailure:
+      return 1;
+    case pq@BPC_NAME@Initializer::RunApplication:
+      return qtapp.exec();
     }
 
-  return qtapp.exec();
 }
 // ***************** DO NOT EDIT ***********************************
