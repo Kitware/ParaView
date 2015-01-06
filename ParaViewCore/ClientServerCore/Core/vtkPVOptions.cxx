@@ -276,10 +276,10 @@ void vtkPVOptions::Initialize()
   // the vtkPVOptions parsing these arguments since vtkPVOptions is called on to
   // parse the arguments only after MPI has been initialized.
   this->AddBooleanArgument("--mpi", 0, &this->ForceMPIInitOnClient,
-                           "Initialize MPI on client processes, if possible. "
+                           "Initialize MPI on processes, if possible. "
                            "Cannot be used with --no-mpi.");
   this->AddBooleanArgument("--no-mpi", 0, &this->ForceNoMPIInitOnClient,
-                           "Don't initialize MPI on client processes. "
+                           "Don't initialize MPI on processes. "
                            "Cannot be used with --mpi.");
 #endif
 }
