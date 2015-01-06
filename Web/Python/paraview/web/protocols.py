@@ -78,6 +78,7 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
         if not view:
             raise Exception("no view provided: " + str(vid))
 
+        view.SMProxy.GetRenderWindow().GetInteractor().RenderCallsEnabledOff()
         return view
 
     def debug(self, msg):

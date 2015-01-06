@@ -161,6 +161,7 @@ vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 {
   this->PVRenderView = NULL;
   this->InteractiveRenderEnabled = 0;
+  this->RenderCallsEnabled = 1;
   this->Observer = vtkPVGenericRenderWindowInteractorObserver::New();
   this->Observer->SetTarget(this);
 
@@ -277,6 +278,11 @@ void vtkPVGenericRenderWindowInteractor::Render()
 {
   if ( this->PVRenderView == NULL || this->RenderWindow == NULL)
     { // The case for interactors on the satellite processes.
+    return;
+    }
+
+  if (this->RenderCallsEnabled == 0)
+    { // We do not want automatic interaction-triggered rendering
     return;
     }
 
