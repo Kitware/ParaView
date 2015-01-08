@@ -70,6 +70,17 @@
     <SourceProxy class="vtkAnnotateGlobalDataFilter"
                  label="Annotate Global Data"
                  name="AnnotateGlobalData">
+      <Documentation short_help="Filter for annotating with global data (designed for ExodusII reader)">
+Annotate Global Data provides a simpler API for creating text
+annotations using vtkPythonAnnotationFilter. Instead of users
+specifying the annotation expression, this filter determines the
+expression based on the array selected by limiting the scope of the
+functionality. This filter only allows the user to annotate using
+"global-data" aka field data and specify the string prefix to use.  If
+the field array chosen has as many elements as number of timesteps,
+the array is assumed to be "temporal" and indexed using the current
+timestep.
+      </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
@@ -116,14 +127,16 @@
     <SourceProxy class="vtkAnnotateAttributeDataFilter"
                  label="Annotate Attribute Data"
                  name="AnnotateAttributeData">
-      <Documentation>
-        This filter can be used to add a text annotation to a Render View (or similar)
-        using a tuple from any attribute array (point/cell/field/row etc.) from a specific rank
-        (when running in parallel). Use 'ArrayName' property to select the array association and
-        array name. Use 'ElementId' property to set the element number to extract the value to label
-        with. When running on multiple ranks, use 'ProcessId' property to select the rank of interest.
-        The 'Prefix' property can be used to specify a string that will be used as the prefix to the
-        generated annotation text.
+      <Documentation short_help="Adds a text annotation to a Rander View">
+This filter can be used to add a text annotation to a Render View (or
+similar) using a tuple from any attribute array (point/cell/field/row
+etc.) from a specific rank (when running in parallel). Use **ArrayName**
+property to select the array association and array name. Use
+**ElementId* property to set the element number to extract the value to
+label with. When running on multiple ranks, use **ProcessId** property
+to select the rank of interest.  The **Prefix** property can be used to
+specify a string that will be used as the prefix to the generated
+annotation text.
       </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"

@@ -252,10 +252,11 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
   add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml"
 
-    # process each html file to sperate it out into files for each proxy.
+    # process each html file to separate it out into files for each proxy.
     COMMAND ${CMAKE_COMMAND}
             -Dxmlpatterns:FILEPATH=${QT_XMLPATTERNS_EXECUTABLE}
             -Dxml_to_xml_xsl:FILEPATH=${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
+            -Dgenerate_category_rw_xsl:FILEPATH=${ParaView_CMAKE_DIR}/generate_category_rw.xsl
             -Dxml_to_html_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_html.xsl
             -Dxml_to_wiki_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_wiki.xsl.in
             -Dinput_xmls:STRING=${xmls_string}

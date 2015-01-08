@@ -632,16 +632,19 @@ bool pqProxyWidget::useDocumentationForLabels(vtkSMProxy* smproxy)
 }
 
 //-----------------------------------------------------------------------------
-const char* pqProxyWidget::documentationText(vtkSMProperty* smProperty)
+QString pqProxyWidget::documentationText(vtkSMProperty* smProperty)
 {
-  const char *xmlLabel = smProperty->GetXMLLabel();
   const char* xmlDocumentation = smProperty->GetDocumentation()?
     smProperty->GetDocumentation()->GetDescription() : NULL;
   if (!xmlDocumentation || xmlDocumentation[0] == 0)
     {
-    xmlDocumentation = xmlLabel;
+    const char *xmlLabel = smProperty->GetXMLLabel();
+    return xmlLabel;
     }
-  return xmlDocumentation;
+  else
+    {
+    return pqProxy::rstToHtml(xmlDocumentation).c_str();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -893,7 +896,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList &properties)
     propertyKeyName.replace(" ", "");
     const char *xmlLabel = smProperty->GetXMLLabel()? smProperty->GetXMLLabel():
       propertyIter->GetKey();
-    const char* xmlDocumentation = pqProxyWidget::documentationText(smProperty);
+    QString xmlDocumentation = pqProxyWidget::documentationText(smProperty);
 
     bool ignorePanelVisibility = false;
     if(!properties.isEmpty())

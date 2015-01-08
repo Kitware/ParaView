@@ -322,11 +322,11 @@
     <SourceProxy class="vtkAMRResampleFilter"
                  label="Resample AMR"
                  name="AMRResampleFilter">
-      <Documentaion long_help="Converts AMR data to a uniform grid"
+      <Documentation long_help="Converts AMR data to a uniform grid"
                     short_help="Converts AMR data to a uniform grid">This
                     filter allows the user to specify a Region of Interest(ROI)
                     within the AMR data-set and extract it as a uniform
-                    grid.</Documentaion>
+                    grid.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -2035,69 +2035,70 @@ found and the point will be rejected.</Documentation>
     <SourceProxy class="vtkPVArrayCalculator"
                  name="Calculator">
       <Documentation long_help="Compute new attribute arrays as function of existing arrays."
-                     short_help="Compute new attribute arrays.">The Calculator
-                     filter computes a new data array or new point coordinates
-                     as a function of existing scalar or vector arrays. If
-                     point-centered arrays are used in the computation of a new
-                     data array, the resulting array will also be
-                     point-centered. Similarly, computations using
-                     cell-centered arrays will produce a new cell-centered
-                     array. If the function is computing point coordinates, the
-                     result of the function must be a three-component vector.
-                     The Calculator interface operates similarly to a
-                     scientific calculator. In creating the function to
-                     evaluate, the standard order of operations applies. Each
-                     of the calculator functions is described below. Unless
-                     otherwise noted, enclose the operand in parentheses using
-                     the ( and ) buttons. Clear: Erase the current function
-                     (displayed in the read-only text box above the calculator
-                     buttons). /: Divide one scalar by another. The operands
-                     for this function are not required to be enclosed in
-                     parentheses. *: Multiply two scalars, or multiply a vector
-                     by a scalar (scalar multiple). The operands for this
-                     function are not required to be enclosed in parentheses.
-                     -: Negate a scalar or vector (unary minus), or subtract
-                     one scalar or vector from another. The operands for this
-                     function are not required to be enclosed in parentheses.
-                     +: Add two scalars or two vectors. The operands for this
-                     function are not required to be enclosed in parentheses.
-                     sin: Compute the sine of a scalar. cos: Compute the cosine
-                     of a scalar. tan: Compute the tangent of a scalar. asin:
-                     Compute the arcsine of a scalar. acos: Compute the
-                     arccosine of a scalar. atan: Compute the arctangent of a
-                     scalar. sinh: Compute the hyperbolic sine of a scalar.
-                     cosh: Compute the hyperbolic cosine of a scalar. tanh:
-                     Compute the hyperbolic tangent of a scalar. min: Compute
-                     minimum of two scalars. max: Compute maximum of two
-                     scalars. x^y: Raise one scalar to the power of another
-                     scalar. The operands for this function are not required to
-                     be enclosed in parentheses. sqrt: Compute the square root
-                     of a scalar. e^x: Raise e to the power of a scalar. log:
-                     Compute the logarithm of a scalar (deprecated. same as
-                     log10). log10: Compute the logarithm of a scalar to the
-                     base 10. ln: Compute the logarithm of a scalar to the base
-                     'e'. ceil: Compute the ceiling of a scalar. floor: Compute
-                     the floor of a scalar. abs: Compute the absolute value of
-                     a scalar. v1.v2: Compute the dot product of two vectors.
-                     The operands for this function are not required to be
-                     enclosed in parentheses. cross: Compute cross product of
-                     two vectors. mag: Compute the magnitude of a vector. norm:
-                     Normalize a vector. The operands are described below. The
-                     digits 0 - 9 and the decimal point are used to enter
-                     constant scalar values. iHat, jHat, and kHat are vector
-                     constants representing unit vectors in the X, Y, and Z
-                     directions, respectively. The scalars menu lists the names
-                     of the scalar arrays and the components of the vector
-                     arrays of either the point-centered or cell-centered data.
-                     The vectors menu lists the names of the point-centered or
-                     cell-centered vector arrays. The function will be computed
-                     for each point (or cell) using the scalar or vector value
-                     of the array at that point (or cell). The filter operates
-                     on any type of data set, but the input data set must have
-                     at least one scalar or vector array. The arrays can be
-                     either point-centered or cell-centered. The Calculator
-                     filter's output is of the same data set type as the
-                     input.</Documentation>
+                     short_help="Compute new attribute arrays.">
+The Calculator filter computes a new data array or new point
+coordinates as a function of existing scalar or vector arrays. If
+point-centered arrays are used in the computation of a new data array,
+the resulting array will also be point-centered. Similarly,
+computations using cell-centered arrays will produce a new
+cell-centered array. If the function is computing point coordinates,
+the result of the function must be a three-component vector.
+
+The Calculator interface operates similarly to a scientific
+calculator. In creating the function to evaluate, the standard order
+of operations applies. Each of the calculator functions is described
+below. Unless otherwise noted, enclose the operand in parentheses
+using the ( and ) buttons.
+
+- Clear: Erase the current function (displayed in the read-only text
+  box above the calculator buttons).
+- /: Divide one scalar by another. The operands for this function are
+  not required to be enclosed in parentheses.
+- *: Multiply two scalars, or multiply a vector by a scalar (scalar multiple).
+  The operands for this function are not required to be enclosed in parentheses.
+- -: Negate a scalar or vector (unary minus), or subtract one scalar or vector
+  from another. The operands for this function are not required to be enclosed
+  in parentheses.
+- +: Add two scalars or two vectors. The operands for this function are not
+  required to be enclosed in parentheses.
+- sin: Compute the sine of a scalar. cos: Compute the cosine of a scalar.
+- tan: Compute the tangent of a scalar.
+- asin: Compute the arcsine of a scalar.
+- acos: Compute the arccosine of a scalar.
+- atan: Compute the arctangent of a scalar.
+- sinh: Compute the hyperbolic sine of a scalar.
+- cosh: Compute the hyperbolic cosine of a scalar.
+- tanh: Compute the hyperbolic tangent of a scalar.
+- min: Compute minimum of two scalars.
+- max: Compute maximum of two scalars.
+- x^y: Raise one scalar to the power of another scalar. The operands for
+  this function are not required to be enclosed in parentheses.
+- sqrt: Compute the square root of a scalar.
+- e^x: Raise e to the power of a scalar.
+- log: Compute the logarithm of a scalar (deprecated. same as log10).
+- log10: Compute the logarithm of a scalar to the base 10.
+- ln: Compute the logarithm of a scalar to the base 'e'.
+- ceil: Compute the ceiling of a scalar. floor: Compute the floor of a scalar.
+- abs: Compute the absolute value of a scalar.
+- v1.v2: Compute the dot product of two vectors. The operands for this
+  function are not required to be enclosed in parentheses.
+- cross: Compute cross product of two vectors.
+- mag: Compute the magnitude of a vector.
+- norm: Normalize a vector.
+
+The operands are described below. The digits 0 - 9 and the decimal
+point are used to enter constant scalar values. **iHat**, **jHat**,
+and **kHat** are vector constants representing unit vectors in the X,
+Y, and Z directions, respectively. The scalars menu lists the names of
+the scalar arrays and the components of the vector arrays of either
+the point-centered or cell-centered data.  The vectors menu lists the
+names of the point-centered or cell-centered vector arrays. The
+function will be computed for each point (or cell) using the scalar or
+vector value of the array at that point (or cell). The filter operates
+on any type of data set, but the input data set must have at least one
+scalar or vector array. The arrays can be either point-centered or
+cell-centered. The Calculator filter's output is of the same data set
+type as the input.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -2166,8 +2167,10 @@ found and the point will be rejected.</Documentation>
                             name="Function"
                             number_of_elements="1"
                             panel_widget="calculator" >
-        <Documentation>This property contains the equation for computing the
-        new array.</Documentation>
+        <Documentation>
+This property contains the equation for computing the new
+array.
+        </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetReplaceInvalidValues"
                          default_values="1"
@@ -4820,8 +4823,9 @@ found and the point will be rejected.</Documentation>
     <SourceProxy class="vtkPlotEdges"
                  label="Plot On Sorted Lines"
                  name="PlotOnSortedLines">
-      <Documentation long_help=""
-                     short_help=""></Documentation>
+      <Documentation long_help="The Plot on Sorted Lines filter sorts and orders polylines for graph visualization."
+      short_help="">The Plot on Sorted Lines filter sorts and orders
+      polylines for graph visualization. See http://www.paraview.org/ParaView3/index.php/Plotting_Over_Curves for more information.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -6642,21 +6646,21 @@ found and the point will be rejected.</Documentation>
                  name="Glyph">
       <Documentation long_help="This filter produces a glyph at each point of in input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
                      short_help="Generate a glyph at each point of the input data set.">
-      The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder,
-      line, sphere, or 2D glyph) at each point in the input dataset. The glyphs
-      can be oriented and scaled by the input point-centered scalars and
-      vectors. The Glyph filter operates on any type of data set. Its output is
-      polygonal
+The Glyph filter generates a glyph (i.e., an arrow, cone, cube,
+cylinder, line, sphere, or 2D glyph) at each point in the input
+dataset. The glyphs can be oriented and scaled by the input
+point-centered scalars and vectors. The Glyph filter operates on any
+type of data set. Its output is polygonal
 
-      To use this filter, you first select the arrays to use for as the "Scalars" and
-      "Vectors", if any.
-      To orient the glyphs using the selected "Vectors", use "Orient" property.
-      To scale the glyphs using the selected "Scalars" or "Vectors", use the "Scale Mode"
-      property.
+To use this filter, you first select the arrays to use for as the
+**Scalars** and **Vectors**, if any.  To orient the glyphs using the
+selected **Vectors**, use **Orient** property.  To scale the glyphs using
+the selected **Scalars** or **Vectors**, use the **Scale Mode** property.
 
-      The "Glyph Mode" property controls which points in the input dataset are selected
-      for glyphing (since in most cases, glyping all points in the input dataset can be
-      both performance impeding as well as visually cluttred.
+The **Glyph Mode** property controls which points in the input dataset
+are selected for glyphing (since in most cases, glyping all points in
+the input dataset can be both performance impeding as well as visually
+cluttred.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -6675,8 +6679,9 @@ found and the point will be rejected.</Documentation>
                           name="input_array2"
                           number_of_components="3"
                           optional="1" />
-        <Documentation>This property specifies the input to the Glyph filter.
-        This is the dataset from which the points are selecetd to be glyphed.
+        <Documentation>
+This property specifies the input to the Glyph filter.  This is the
+dataset from which the points are selecetd to be glyphed.
         </Documentation>
       </InputProperty>
       <InputProperty command="SetSourceConnection"
@@ -6717,9 +6722,10 @@ found and the point will be rejected.</Documentation>
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Select the input array to be treated as the active "Scalars".
-          You can scale the glyphs using the selected scalars by setting the
-          "Scale Mode" property to "scalar"
+        <Documentation>
+Select the input array to be treated as the active **Scalars**.  You
+can scale the glyphs using the selected scalars by setting the **Scale
+Mode** property to **scalar**.
         </Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
@@ -6736,10 +6742,11 @@ found and the point will be rejected.</Documentation>
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Select the input array to be treated as the active "Vectors".
-          You can scale the glyphs using the selected vectors by setting the "Scale Mode"
-          property to "vector" or "vector_components". You can orient the glyphs using the
-          selected vectors by checking the "Orient" property.
+        <Documentation>
+Select the input array to be treated as the active **Vectors**.  You can
+scale the glyphs using the selected vectors by setting the **Scale
+Mode** property to **vector** or **vector_components**. You can orient the
+glyphs using the selected vectors by checking the **Orient** property.
         </Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetOrient"
@@ -6747,8 +6754,9 @@ found and the point will be rejected.</Documentation>
                          name="Orient"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>If this property is set to 1, the glyphs will be
-          oriented based on the vectors selected using the "Vectors" property.
+        <Documentation>
+If this property is set to 1, the glyphs will be oriented based on the
+vectors selected using the **Vectors** property.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetScaleMode"
@@ -6765,12 +6773,13 @@ found and the point will be rejected.</Documentation>
           <Entry text="off"
                  value="3" />
         </EnumerationDomain>
-        <Documentation>Select how to scale the glyphs. Set to "off" to disable
-          scaling entirely. Set to "scalar" to scale the glyphs using the
-          array selected using the "Scalars" property. Set to "vector" to scale the
-          glyphs using the magnitude of the array selected using the "Vectors" property.
-          Set to "vector_components" to scale using the "Vectors", scaling each component
-          individually.
+        <Documentation>
+Select how to scale the glyphs. Set to **off** to disable scaling
+entirely. Set to **scalar** to scale the glyphs using the array selected
+using the **Scalars** property. Set to **vector** to scale the glyphs
+using the magnitude of the array selected using the **Vectors**
+property.  Set to **vector_components** to scale using the **Vectors**,
+scaling each component individually.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetScaleFactor"
@@ -6819,8 +6828,8 @@ found and the point will be rejected.</Documentation>
                         name="MaximumNumberOfSamplePoints">
         <IntRangeDomain min="1" name="range" />
         <Documentation>
-          This property specifies the maximum number of sample points to use
-          when sampling the space when Uniform Spatial Distribution is used.
+This property specifies the maximum number of sample points to use
+when sampling the space when Uniform Spatial Distribution is used.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -6836,9 +6845,9 @@ found and the point will be rejected.</Documentation>
                         name="Seed">
         <IntRangeDomain min="1" name="range"/>
         <Documentation>
-          This property specifies the seed that will be used for generating
-          a uniform distribution of glyph points when a Uniform Spatial
-          Distribution is used.
+This property specifies the seed that will be used for generating a
+uniform distribution of glyph points when a Uniform Spatial
+Distribution is used.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -6854,8 +6863,8 @@ found and the point will be rejected.</Documentation>
                          name="Stride">
         <IntRangeDomain min="1" name="range"/>
         <Documentation>
-          This property specifies the stride that will be used when glyphing
-          by Every Nth Point.
+This property specifies the stride that will be used when glyphing by
+Every Nth Point.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -6873,9 +6882,10 @@ found and the point will be rejected.</Documentation>
           <Proxy group="extended_sources"
                  name="Transform2" />
         </ProxyListDomain>
-        <Documentation>The values in this property allow you to specify the
-        transform (translation, rotation, and scaling) to apply to the glyph
-        source.</Documentation>
+        <Documentation>
+The values in this property allow you to specify the transform
+(translation, rotation, and scaling) to apply to the glyph
+source.</Documentation>
       </ProxyProperty>
 
       <PropertyGroup label="Glyph Source">
@@ -10268,12 +10278,14 @@ found and the point will be rejected.</Documentation>
     <SourceProxy class="vtkImageDataToPointSet"
                  label="Image Data to Point Set"
                  name="ImageDataToPointSet">
-      <Documentation>The Image Data to Point Set filter takes an image data
-      (uniform rectilinear grid) object and outputs an equivalent structured
-      grid (which as a type of point set). This brings the data to a broader
-      category of data storage but only adds a small amount of overhead. This
-      filter can be helpful in applying filters that expect or manipulate point
-      coordinates.</Documentation>
+      <Documentation long_help="Converts an Image Data to a Point Set"
+      short_help="Converts an Image Data to a Point Set">The Image
+      Data to Point Set filter takes an image data (uniform
+      rectilinear grid) object and outputs an equivalent structured
+      grid (which as a type of point set). This brings the data to a
+      broader category of data storage but only adds a small amount of
+      overhead. This filter can be helpful in applying filters that
+      expect or manipulate point coordinates.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -10289,11 +10301,13 @@ found and the point will be rejected.</Documentation>
     <SourceProxy class="vtkRectilinearGridToPointSet"
                  label="Rectilinear Data to Point Set"
                  name="RectilinearGridToPointSet">
-      <Documentation>The Rectilinear Grid to Point Set filter takes an
-      rectilinear grid object and outputs an equivalent structured grid (which
-      as a type of point set). This brings the data to a broader category of
-      data storage but only adds a small amount of overhead. This filter can be
-      helpful in applying filters that expect or manipulate point
+      <Documentation short_help="Converts a rectilinear grid to an
+      equivalend structured grid">The Rectilinear Grid to Point Set
+      filter takes an rectilinear grid object and outputs an
+      equivalent Structured Grid (which is a type of point set). This
+      brings the data to a broader category of data storage but only
+      adds a small amount of overhead. This filter can be helpful in
+      applying filters that expect or manipulate point
       coordinates.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">

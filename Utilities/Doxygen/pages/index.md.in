@@ -14,6 +14,7 @@ Page | Description
 -----|----------------------------------------
 [Major API Changes](@ref MajorAPIChanges) | Descriptions for major API changes.
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.
+[Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
 
 Design/Implementation Details
 -----------------------------
