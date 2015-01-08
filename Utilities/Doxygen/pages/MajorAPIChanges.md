@@ -27,9 +27,18 @@ have now changed).
 
 It is cleaner and easier to update one xml file for each plugin.
 Hints in the server manager xml file already perform the same functionality and
-the GUI xml file was deprecated.  Sources are now added to the 'Sources' menu
-and filters are added to the 'Filters' menu when they are detected in the server
-xml file.  To place filters in a category, add the hint \<ShowInMenu category="c" /\>.
+the GUI xml file was deprecated.  Sources are now added to the **Sources** menu
+and filters are added to the **Filters** menu when they are detected in the server
+xml file.  To place sources/filters in a category, add the following hint to the
+Proxy XML element (`category` and `icon` attributes are optional):
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <ShowInMenu category="<category-name>" icon="<qt-image-resource>" />
+      </Hints>
+    </SourceProxy>
+
 The ability to add filters to the sources menu (as done by a few plugins) is
 removed by this change.
 

@@ -94,9 +94,11 @@ public:
   bool hideForTests(const QString& category) const;
 
   /// Attach an observer to proxy manager to monitor any proxy definition update
-  /// The detected proxy have to own a hint
-  ///     <ShowInMenu category=""/>
-  /// where those attribute are fully optional
+  /// The detected proxy have to own a hint:
+  /// \code
+  ///     <ShowInMenu category="" icon=""/>
+  /// \endcode
+  /// where all the attribute are fully optional.
   void addProxyDefinitionUpdateListener(const QString& proxyGroupName);
   void removeProxyDefinitionUpdateListener(const QString& proxyGroupName);
 

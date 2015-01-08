@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
-#include "vtkCollection.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
@@ -790,19 +789,19 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
         // skip readers.
         continue;
         }
-
-      vtkNew<vtkCollection> collection;
-      hints->FindNestedElementByName("ShowInMenu", collection.GetPointer());
-      int size = collection->GetNumberOfItems();
-      vtkPVXMLElement* hint = NULL;
-      for(int i=0; i<size; i++)
+      for (unsigned int cc=0; cc < hints->GetNumberOfNestedElements(); cc++)
         {
-        hint = vtkPVXMLElement::SafeDownCast(collection->GetItemAsObject(i));
-        const char* categoryName = hint->GetAttribute("category");
+        vtkPVXMLElement* showInMenu = hints->GetNestedElement(cc);
+        if (showInMenu == NULL ||
+          showInMenu->GetName() == NULL ||
+          strcmp(showInMenu->GetName(), "ShowInMenu") != 0)
+          {
+          continue;
+          }
 
         definitionSet.insert(QPair<QString, QString>(group, name));
-        this->Internal->addProxy(group, name, NULL);
-        if(categoryName != NULL)
+        this->Internal->addProxy(group, name, showInMenu->GetAttribute("icon"));
+        if (const char* categoryName = showInMenu->GetAttribute("category"))
           {
           pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
           // If no label just make it up
