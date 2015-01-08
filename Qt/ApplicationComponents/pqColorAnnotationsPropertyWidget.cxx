@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidgetDecorator.h"
 #include "pqUndoStack.h"
 #include "vtkAbstractArray.h"
+#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkTuple.h"
 #include "vtkVariant.h"
@@ -61,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPointer>
 #include <QPointer>
+#include <QSet>
 
 
 namespace
@@ -469,6 +472,8 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
   Ui::ColorAnnotationsPropertyWidget &ui = this->Internals->Ui;
   QObject::connect(ui.Add, SIGNAL(clicked()), this, SLOT(addAnnotation()));
   QObject::connect(ui.AddActive, SIGNAL(clicked()), this, SLOT(addActiveAnnotations()));
+  QObject::connect(ui.AddActiveFromVisible, SIGNAL(clicked()),
+                   this, SLOT(addActiveAnnotationsFromVisibleSources()));
   QObject::connect(ui.Remove, SIGNAL(clicked()), this, SLOT(removeAnnotation()));
   QObject::connect(ui.DeleteAll, SIGNAL(clicked()), this, SLOT(removeAllAnnotations()));
   QObject::connect(ui.ChoosePreset, SIGNAL(clicked()), this, SLOT(choosePreset()));
@@ -678,6 +683,89 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
       annotationList.push_back(unique_values->GetVariantValue(idx).ToString().c_str());
       annotationList.push_back(unique_values->GetVariantValue(idx).ToString().c_str());
       }
+    this->setAnnotations(annotationList);
+    }
+
+  catch (int)
+    {
+    QMessageBox::warning(
+      this, "Couldn't determine discrete values",
+      "Could not determine discrete values using the data produced by the "
+      "current source/filter. Please add annotations manually.",
+      QMessageBox::Ok);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
+{
+  try
+    {
+    pqServer* server =
+      pqActiveObjects::instance().activeServer();
+    if (!server)
+      {
+      throw 0;
+      }
+
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
+
+    // Iterate over representations, collecting prominent values from each.
+    QSet<QString> uniqueAnnotations;
+    vtkSmartPointer<vtkCollection> collection = vtkSmartPointer<vtkCollection>::New();
+    pxm->GetProxies("representations", collection);
+    for (int i = 0; i < collection->GetNumberOfItems(); ++i)
+      {
+      vtkSMProxy* representationProxy =
+        vtkSMProxy::SafeDownCast(collection->GetItemAsObject(i));
+      if (!representationProxy || !vtkSMPropertyHelper(representationProxy, "Visibility").GetAsInt())
+        {
+        continue;
+        }
+
+      vtkPVProminentValuesInformation* info =
+        vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
+          representationProxy);
+      if (!info)
+        {
+        continue;
+        }
+
+      int component_no = -1;
+      if (QString("Component") ==
+          vtkSMPropertyHelper(this->proxy(), "VectorMode", true).GetAsString())
+        {
+        component_no = vtkSMPropertyHelper(this->proxy(),
+          "VectorComponent").GetAsInt();
+        }
+      if (component_no == -1 && info->GetNumberOfComponents() == 1)
+        {
+        component_no = 0;
+        }
+
+      vtkSmartPointer<vtkAbstractArray> unique_values;
+      unique_values.TakeReference(
+        info->GetProminentComponentValues(component_no));
+      if (unique_values == NULL)
+        {
+        continue;
+        }
+      for (vtkIdType idx=0; idx < unique_values->GetNumberOfTuples(); idx++)
+        {
+        uniqueAnnotations.insert(QString(unique_values->GetVariantValue(idx).ToString().c_str()));
+        }
+      }
+
+    QList<QString> uniqueList = uniqueAnnotations.values();
+    qSort(uniqueList);
+
+    QList<QVariant> annotationList;
+    for (int idx = 0; idx < uniqueList.size(); ++idx)
+      {
+      annotationList.push_back(uniqueList[idx]);
+      annotationList.push_back(uniqueList[idx]);
+      }
+
     this->setAnnotations(annotationList);
     }
 

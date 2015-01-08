@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>358</width>
-    <height>200</height>
+    <height>230</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,7 +47,7 @@
      <item>
       <widget class="QToolButton" name="AddActive">
        <property name="toolTip">
-        <string>Add active values</string>
+        <string>Add active values from selected source</string>
        </property>
        <property name="text">
         <string>...</string>
@@ -55,6 +55,20 @@
        <property name="icon">
         <iconset resource="../../../Components/Resources/pqComponents.qrc">
          <normaloff>:/pqWidgets/Icons/pqFilter16.png</normaloff>:/pqWidgets/Icons/pqFilter16.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="AddActiveFromVisible">
+       <property name="toolTip">
+        <string>Add active values from visible pipeline objects</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Components/Resources/pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqFilterEyeball16.png</normaloff>:/pqWidgets/Icons/pqFilterEyeball16.png</iconset>
        </property>
       </widget>
      </item>

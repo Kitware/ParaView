@@ -79,6 +79,7 @@ private slots:
   void addAnnotation();
   void removeAnnotation();
   void addActiveAnnotations();
+  void addActiveAnnotationsFromVisibleSources();
   void removeAllAnnotations();
 
   /// called whenever the internal model's data changes. We fire
