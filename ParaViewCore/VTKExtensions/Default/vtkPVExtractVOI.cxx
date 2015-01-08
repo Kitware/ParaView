@@ -15,9 +15,6 @@
 #include "vtkPVExtractVOI.h"
 
 #include "vtkExtentTranslator.h"
-#include "vtkExtractGrid.h"
-#include "vtkExtractVOI.h"
-#include "vtkExtractRectilinearGrid.h"
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -26,6 +23,17 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
+
+#include "vtkPVConfig.h"
+#ifdef PARAVIEW_USE_MPI
+# include "vtkPExtractGrid.h"
+# include "vtkPExtractVOI.h"
+# include "vtkPExtractRectilinearGrid.h"
+#else
+# include "vtkExtractGrid.h"
+# include "vtkExtractVOI.h"
+# include "vtkExtractRectilinearGrid.h"
+#endif
 
 vtkStandardNewMacro(vtkPVExtractVOI);
 
@@ -37,12 +45,18 @@ vtkPVExtractVOI::vtkPVExtractVOI()
   this->VOI[1] = this->VOI[3] = this->VOI[5] = VTK_INT_MAX;
 
   this->SampleRate[0] = this->SampleRate[1] = this->SampleRate[2] = 1;
-  
+
   this->IncludeBoundary = 0;
 
+#ifdef PARAVIEW_USE_MPI
+  this->ExtractGrid = vtkPExtractGrid::New();
+  this->ExtractVOI  = vtkPExtractVOI::New();
+  this->ExtractRG   = vtkPExtractRectilinearGrid::New();
+#else
   this->ExtractGrid = vtkExtractGrid::New();
   this->ExtractVOI  = vtkExtractVOI::New();
   this->ExtractRG   = vtkExtractRectilinearGrid::New();
+#endif
 }
 
 //----------------------------------------------------------------------------

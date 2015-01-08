@@ -141,6 +141,12 @@ public:
     this->BuildFallback();
     this->Fallback->InsertTuples(dstIds, srcIds, source);
   }
+  virtual void InsertTuples(vtkIdType dstStart, vtkIdType n, vtkIdType srcStart,
+                            vtkAbstractArray* source)
+  {
+    this->BuildFallback();
+    this->Fallback->InsertTuples(dstStart, n, srcStart, source);
+  }
 
   vtkIdType InsertNextTuple(vtkIdType i, vtkAbstractArray* aa)
   {
