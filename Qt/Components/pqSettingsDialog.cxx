@@ -240,6 +240,9 @@ void pqSettingsDialog::onAccepted()
   // In theory, the above changes are undo-redo able, the only things that's not
   // undo-able is the "serialized" values. Hence we just clear the undo stack.
   CLEAR_UNDO_STACK();
+
+  // Render all views.
+  pqApplicationCore::instance()->render();
 }
 
 //-----------------------------------------------------------------------------
