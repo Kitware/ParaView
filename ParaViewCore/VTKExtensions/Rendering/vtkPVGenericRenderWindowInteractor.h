@@ -45,6 +45,15 @@ public:
   vtkBooleanMacro(InteractiveRenderEnabled,int);
 
   // Description:
+  // In some cases, we may not want to automatically render in response
+  // to mouse interaction events.  In those cases, set RenderCallsEnabled
+  // to 0.  By default, this value is set to 1 so that render calls are
+  // enabled.
+  vtkSetMacro(RenderCallsEnabled, int);
+  vtkGetMacro(RenderCallsEnabled, int);
+  vtkBooleanMacro(RenderCallsEnabled,int);
+
+  // Description:
   // vtkPVGenericRenderWindowInteractor allows applications to support
   // "delayed-switch-to-non-interative-render" mode i.e. when user stops
   // interacting, the application does not want the scene to be immediately
@@ -110,6 +119,7 @@ protected:
 
   vtkPVRenderViewProxy *PVRenderView;
   int InteractiveRenderEnabled;
+  int RenderCallsEnabled;
 
   unsigned long NonInteractiveRenderDelay;
   double CenterOfRotation[3];
