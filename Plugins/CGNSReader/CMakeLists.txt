@@ -29,7 +29,7 @@ if (PARAVIEW_BUILD_QT_GUI)
 endif()
 
 # -----------------------------------------------------------------------------
-# Disable some warnings + Add c++11
+# Disable some warnings
 # -----------------------------------------------------------------------------
 if (WIN32)
   if (MSVC_VERSION GREATER 1400)
@@ -81,10 +81,9 @@ endif()
 set(CGNS_LINK_TO_HDF5 ON CACHE BOOL "use -lhdf5 for linking cgns to hdf5" )
 mark_as_advanced(CGNS_LINK_TO_HDF5)
 
+target_link_libraries(CGNSReader LINK_PRIVATE vtksys ${CGNS_LIBRARIES})
 if (CGNS_LINK_TO_HDF5)
-  target_link_libraries(CGNSReader LINK_PRIVATE ${CGNS_LIBRARIES} -lhdf5)
-else()
-  target_link_libraries(CGNSReader LINK_PRIVATE ${CGNS_LIBRARIES})
+  target_link_libraries(CGNSReader LINK_PRIVATE -lhdf5)
 endif()
 
 # Add testing if necessary

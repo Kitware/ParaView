@@ -44,14 +44,24 @@
 #include "vtkMultiProcessController.h"
 #endif
 
-#ifdef _WIN32
-#include <type_traits>
-#else
-#include <tr1/type_traits> // for get_XYZ_mesh
-#endif
-
 namespace CGNSRead
 {
+
+namespace detail
+{
+  template <typename T>
+  struct is_double { static const bool value = false; };
+
+  template <>
+  struct is_double<double> { static const bool value = true; };
+
+  template <typename T>
+  struct is_float { static const bool value = false; };
+
+  template <>
+  struct is_float<float> { static const bool value = true; };
+}
+
 
 typedef char char_33[33];
 
@@ -349,7 +359,7 @@ void CGNS2VTKorderMonoElem(const vtkIdType size, const int cell_type,
 //------------------------------------------------------------------------------
 template <typename T, typename Y>
 int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
-                 const size_t& nCoordsArray, const int cellDim, const vtkIdType nPts,
+                 const std::size_t& nCoordsArray, const int cellDim, const vtkIdType nPts,
                  const cgsize_t* srcStart, const cgsize_t* srcEnd, const cgsize_t* srcStride,
                  const cgsize_t* memStart, const cgsize_t* memEnd, const cgsize_t* memStride,
                  const cgsize_t* memDims, vtkPoints* points)
@@ -358,13 +368,13 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
   T *currentCoord = static_cast<T * >(&(coords[0]));
 
   CGNSRead::char_33 coordName;
-  size_t len;
+  std::size_t len;
   bool sameType = true;
   double coordId;
 
   memset(coords, 0, 3*nPts*sizeof(T));
 
-  for (size_t c = 1; c <= nCoordsArray; ++c)
+  for (std::size_t c = 1; c <= nCoordsArray; ++c)
     {
     // Read CoordName
     if (cgio_get_name(cgioNum, gridChildId[c-1], coordName) != CG_OK)
@@ -383,12 +393,12 @@ int get_XYZ_mesh(const int cgioNum, const std::vector<double>& gridChildId,
 
     if (strcmp(dataType, "R8") == 0)
       {
-      const bool doubleType = std::tr1::is_same<T,double>::value;
+      const bool doubleType = detail::is_double<T>::value;
       sameType = doubleType;
       }
     else if (strcmp (dataType, "R4") == 0)
       {
-      const bool floatType = std::tr1::is_same<T,float>::value;
+      const bool floatType = detail::is_float<T>::value;
       sameType = floatType;
       }
     else
