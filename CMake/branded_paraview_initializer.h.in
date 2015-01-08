@@ -43,11 +43,18 @@ class QSplashScreen;
 class pq@BPC_NAME@Initializer
 {
 public:
+  enum Status
+    {
+    ExitSuccess,
+    ExitFailure,
+    RunApplication
+    };
+
   pq@BPC_NAME@Initializer();
   ~pq@BPC_NAME@Initializer();
 
   /// Initialize ParaView. It returns false if the initialization failed.
-  bool Initialize(int argc, char* argv[]);
+  Status Initialize(int argc, char* argv[]);
 private:
   pqPVApplicationCore* PVApp;
   QMainWindow* MainWindow;

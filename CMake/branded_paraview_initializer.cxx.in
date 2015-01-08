@@ -74,19 +74,23 @@ pq@BPC_NAME@Initializer::~pq@BPC_NAME@Initializer()
   this->PVApp = 0;
 }
 //-----------------------------------------------------------------------------
-bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
+pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
 {
   this->PVApp = new pqPVApplicationCore (argc, argv);
 
   // Attach custom event filter
   QApplication::instance()->installEventFilter(this->PVApp);
 
+  if (this->PVApp->getOptions()->GetUnknownArgument() ||
+      this->PVApp->getOptions()->GetErrorMessage())
+    {
+    return ExitFailure;
+    }
+
   if (this->PVApp->getOptions()->GetHelpSelected() ||
-      this->PVApp->getOptions()->GetUnknownArgument() ||
-      this->PVApp->getOptions()->GetErrorMessage() ||
       this->PVApp->getOptions()->GetTellVersion())
     {
-    return false;
+    return ExitSuccess;
     }
 
 #ifndef BUILD_SHARED_LIBS
@@ -169,6 +173,6 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
     {
     this->Splash->finish(this->MainWindow);
     }
-  return true;
+  return RunApplication;
 }
 // ***************** DO NOT EDIT ***********************************
