@@ -23,6 +23,7 @@
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSettings.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <assert.h>
@@ -97,6 +98,13 @@ vtkSMProxy* vtkSMTransferFunctionManager::GetColorTransferFunction(
 
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(proxy);
+
+  // Look up array-specific transfer function
+  vtksys_ios::ostringstream prefix;
+  prefix << ".array_" << proxy->GetXMLGroup() << "." << arrayName;
+
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+  settings->GetProxySettings(prefix.str().c_str(), proxy);
 
   vtksys_ios::ostringstream proxyName;
   proxyName << arrayName << ".PVLookupTable";

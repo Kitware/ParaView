@@ -45,12 +45,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSettings.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkWeakPointer.h"
+
+#include "vtksys/ios/sstream"
 
 #include <QDebug>
 #include <QKeyEvent>
@@ -71,8 +74,6 @@ public:
     this->Ui.setupUi(self);
     this->Ui.RestoreDefaults->setIcon(
       self->style()->standardIcon(QStyle::SP_BrowserReload));
-    this->Ui.SaveAsDefaults->setIcon(
-      self->style()->standardIcon(QStyle::SP_DialogSaveButton));
 
     QVBoxLayout* vbox = new QVBoxLayout(this->Ui.PropertiesFrame);
     vbox->setMargin(0);
@@ -96,10 +97,12 @@ pqColorMapEditor::pqColorMapEditor(QWidget* parentObject)
                    this, SLOT(updatePanel()));
   QObject::connect(this->Internals->Ui.EditScalarBar, SIGNAL(clicked()),
                    this, SLOT(editScalarBar()));
-  QObject::connect(this->Internals->Ui.SaveAsDefaults, SIGNAL(clicked()),
-                   this, SLOT(saveAsDefault()));
   QObject::connect(this->Internals->Ui.RestoreDefaults, SIGNAL(clicked()),
                    this, SLOT(restoreDefaults()));
+  QObject::connect(this->Internals->Ui.SaveAsDefaults, SIGNAL(clicked()),
+                   this, SLOT(saveAsDefault()));
+  QObject::connect(this->Internals->Ui.SaveAsArrayDefaults, SIGNAL(clicked()),
+                   this, SLOT(saveAsArrayDefault()));
   QObject::connect(this->Internals->Ui.AutoUpdate, SIGNAL(clicked(bool)),
                    this, SLOT(setAutoUpdate(bool)));
   QObject::connect(this->Internals->Ui.Update, SIGNAL(clicked()),
@@ -238,8 +241,9 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
     delete this->Internals->ProxyWidget;
     }
 
-  ui.SaveAsDefaults->setEnabled(ctf != NULL);
   ui.RestoreDefaults->setEnabled(ctf != NULL);
+  ui.SaveAsDefaults->setEnabled(ctf != NULL);
+  ui.SaveAsArrayDefaults->setEnabled(ctf != NULL);
   if (!ctf)
     {
     return;
@@ -306,6 +310,10 @@ void pqColorMapEditor::saveAsDefault()
   vtkSMSettings* settings = vtkSMSettings::GetInstance();
 
   vtkSMProxy* proxy = this->Internals->ActiveRepresentation->getProxy();
+  if (!proxy)
+    {
+    return;
+    }
 
   vtkSMProxy* lutProxy =
     pqSMAdaptor::getProxyProperty(proxy->GetProperty("LookupTable"));
@@ -331,10 +339,53 @@ void pqColorMapEditor::saveAsDefault()
 }
 
 //-----------------------------------------------------------------------------
+void pqColorMapEditor::saveAsArrayDefault()
+{
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+  vtkSMProxy* proxy = this->Internals->ActiveRepresentation->getProxy();
+  if (!proxy)
+    {
+    return;
+    }
+
+  vtkSMPropertyHelper colorArrayHelper(proxy, "ColorArrayName");
+
+  vtkSMProxy* lutProxy =
+    pqSMAdaptor::getProxyProperty(proxy->GetProperty("LookupTable"));
+  if (lutProxy)
+    {
+    // Remove special characters from the array name
+    std::string sanitizedArrayName =
+      vtkSMCoreUtilities::SanitizeName(colorArrayHelper.GetInputArrayNameToProcess());
+
+    vtksys_ios::ostringstream prefix;
+    prefix << ".array_" << lutProxy->GetXMLGroup() << "." << sanitizedArrayName;
+
+    settings->SetProxySettings(prefix.str().c_str(), lutProxy);
+    }
+  else
+    {
+    qCritical() << "No LookupTable property found.";
+    }
+
+  vtkSMProxy* scalarOpacityFunctionProxy = lutProxy?
+    pqSMAdaptor::getProxyProperty(lutProxy->GetProperty("ScalarOpacityFunction")) : NULL;
+  if (scalarOpacityFunctionProxy)
+    {
+    settings->SetProxySettings(scalarOpacityFunctionProxy);
+    }
+  else
+    {
+    qCritical("No ScalarOpacityFunction property found");
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqColorMapEditor::restoreDefaults()
 {
   vtkSMProxy* proxy = this->Internals->ActiveRepresentation->getProxy();
-  BEGIN_UNDO_SET("Reset to defaults");
+  BEGIN_UNDO_SET("Reset color map to defaults");
   if (vtkSMProxy* lutProxy = vtkSMPropertyHelper(proxy, "LookupTable").GetAsProxy())
     {
     vtkSMTransferFunctionProxy::ResetPropertiesToXMLDefaults(lutProxy, true);

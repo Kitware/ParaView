@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="/pqWidgets">
     <file>Icons/pqFilterEyeball16.png</file>
+    <file>Icons/pqSaveArray16.png</file>
     <file>Icons/PVSplashScreen.png</file>
     <file>Icons/pq3DView16.png</file>
     <file>Icons/pqAdvanced26.png</file>

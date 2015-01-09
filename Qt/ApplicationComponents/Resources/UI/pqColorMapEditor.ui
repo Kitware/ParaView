@@ -128,7 +128,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0">
          <property name="spacing">
           <number>2</number>
          </property>
@@ -142,6 +142,27 @@
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Components/Resources/pqComponents.qrc">
+             <normaloff>:/pqWidgets/Icons/pqSave16.png</normaloff>:/pqWidgets/Icons/pqSave16.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="SaveAsArrayDefaults">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Save current color map settings values as default for array</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../Components/Resources/pqComponents.qrc">
+             <normaloff>:/pqWidgets/Icons/pqSaveArray16.png</normaloff>:/pqWidgets/Icons/pqSaveArray16.png</iconset>
            </property>
           </widget>
          </item>
