@@ -160,6 +160,9 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         # Update authentication key to use
         self.updateSecret(_VisualizerServer.authKey)
 
+        # Disable interactor-based render calls
+        simple.GetRenderView().GetRenderWindow().GetInteractor().RenderCallsEnabledOff()
+
 # =============================================================================
 # Main: Parse args and start server
 # =============================================================================
