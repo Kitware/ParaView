@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLabel.h"
 #include "pqLineEdit.h"
 #include "pqProxyWidget.h"
+#include "pqScalarValueListPropertyWidget.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
@@ -205,7 +206,22 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     {
     int elementCount = ivp->GetNumberOfElements();
 
-    if(elementCount == 1 &&
+    if(ivp->GetRepeatable())
+      {
+      pqScalarValueListPropertyWidget *widget =
+        new pqScalarValueListPropertyWidget(smproperty, smProxy, this);
+      widget->setObjectName("ScalarValueList");
+      widget->setRangeDomain(range);
+      this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smproperty);
+
+      this->setChangeAvailableAsChangeFinished(true);
+      layoutLocal->addWidget(widget);
+      this->setShowLabel(false);
+
+      PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for IntVectorProperty "
+                           << "that is repeatable.";
+      }
+    else if(elementCount == 1 &&
        range->GetMinimumExists(0) &&
        range->GetMaximumExists(0))
       {

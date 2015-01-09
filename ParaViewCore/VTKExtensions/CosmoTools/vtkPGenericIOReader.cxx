@@ -309,6 +309,13 @@ vtkIdType vtkPGenericIOReader::GetNumberOfRequestedHaloIds()
 }
 
 //------------------------------------------------------------------------------
+void vtkPGenericIOReader::SetNumberOfRequestedHaloIds(vtkIdType numIds)
+{
+  this->HaloList->SetNumberOfIds(numIds);
+  this->Modified();
+}
+
+//------------------------------------------------------------------------------
 void vtkPGenericIOReader::AddRequestedHaloId(vtkIdType haloId)
 {
   this->SetRequestedHaloId(this->GetNumberOfRequestedHaloIds(),haloId);
@@ -318,12 +325,14 @@ void vtkPGenericIOReader::AddRequestedHaloId(vtkIdType haloId)
 void vtkPGenericIOReader::ClearRequestedHaloIds()
 {
   this->HaloList->Reset();
+  this->Modified();
 }
 
 //------------------------------------------------------------------------------
 void vtkPGenericIOReader::SetRequestedHaloId(vtkIdType i, vtkIdType haloId)
 {
   *this->HaloList->WritePointer(i,1) = haloId;
+  this->Modified();
 }
 
 //------------------------------------------------------------------------------

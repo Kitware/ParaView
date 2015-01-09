@@ -122,6 +122,39 @@
      </Documentation>
     </IntVectorProperty>
 
+    <StringVectorProperty name="Halo Id"
+                          command="SetHaloIdVariableName"
+                          number_of_elements="1"
+                          panel_visibility="advanced">
+      <StringListDomain name="array_list">
+         <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayListInfo" />
+         </RequiredProperties>
+      </StringListDomain>
+      <Documentation>
+        Which data array in the file contains the halo ids.  This is used with
+        the halo ids to load to determine which points to load.
+      </Documentation>
+    </StringVectorProperty>
+
+
+    <IntVectorProperty
+        name="HalosToLoad"
+        command="SetRequestedHaloId"
+        label="Halos To Load"
+        number_of_elements="0"
+        number_of_elements_per_command="1"
+        repeat_command="1"
+        set_number_command="SetNumberOfRequestedHaloIds"
+        use_index="1"
+        panel_visibility="advanced" >
+      <Documentation>
+        Only load in points with these halo ids from the file.
+        If no halo ids are specified, load all the points.
+      </Documentation>
+      <IntRangeDomain min="0" name="range" />
+    </IntVectorProperty>
+
   </SourceProxy>
 </ProxyGroup>
 
@@ -151,6 +184,8 @@
         <Property name="zAxis" />
         <Property name="QueryRankNeighbors" />
         <Property name="RankInQuery" />
+        <Property name="Halo Id" />
+        <Property name="HalosToLoad" />
       </ExposedProperties>
     </SubProxy>
     <StringVectorProperty command="GetCurrentFileName"

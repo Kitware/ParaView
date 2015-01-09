@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QListWidgetItem;
 class vtkSMDoubleRangeDomain;
-class vtkSMDoubleVectorPropertyWidget;
+class vtkSMIntRangeDomain;
 
 /// pqScalarValueListPropertyWidget provides a table widget to which users are
 /// add values e.g. for IsoValues for the Contour filter.
@@ -59,6 +59,7 @@ public:
 
   /// Sets range domain that will be used to initialize the scalar range.
   void setRangeDomain(vtkSMDoubleRangeDomain* smRangeDomain);
+  void setRangeDomain(vtkSMIntRangeDomain* smRangeDomain);
 
 signals:
   void scalarsChanged();
@@ -76,6 +77,7 @@ private:
   Q_DISABLE_COPY(pqScalarValueListPropertyWidget);
 
   bool getRange(double& range_min, double& range_max);
+  bool getRange(int& range_min, int& range_max);
 
   class pqInternals;
   pqInternals* Internals;

@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
 #include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMIntRangeDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkWeakPointer.h"
@@ -57,6 +58,7 @@ class pqTableModel : public QAbstractTableModel
   typedef QAbstractTableModel Superclass;
   int NumberOfColumns;
   QVector<QVariant> Values;
+  bool AllowIntegralValuesOnly;
 
   int computeOffset(const QModelIndex& idx) const
     {
@@ -69,9 +71,10 @@ class pqTableModel : public QAbstractTableModel
       offset % this->NumberOfColumns);
     }
 public:
-  pqTableModel(int num_columns, QObject* parentObject=NULL)
+  pqTableModel(int num_columns, bool integers_only=false, QObject* parentObject=NULL)
     : Superclass(parentObject),
-    NumberOfColumns(num_columns)
+    NumberOfColumns(num_columns),
+    AllowIntegralValuesOnly(integers_only)
     {
     Q_ASSERT(num_columns > 0);
     }
@@ -79,6 +82,11 @@ public:
   virtual ~pqTableModel()
     {
     }
+
+  void setAllowIntegerValuesOnly(bool allow)
+  {
+    this->AllowIntegralValuesOnly = allow;
+  }
 
   // QAbstractTableModel API -------------------------------------------------
   virtual Qt::ItemFlags flags(const QModelIndex &idx) const
@@ -121,7 +129,14 @@ public:
         }
       if (this->Values[offset] != aValue)
         {
-        this->Values[offset] = aValue;
+        if (this->AllowIntegralValuesOnly)
+          {
+          this->Values[offset] = aValue.toInt();
+          }
+        else
+          {
+          this->Values[offset] = aValue;
+          }
         emit this->dataChanged(idx, idx);
         }
       }
@@ -153,7 +168,14 @@ public:
       this->Values.resize(new_size);
       for (int cc=old_size; cc < new_size; cc++)
         {
-        this->Values[cc] = values[cc];
+        if (this->AllowIntegralValuesOnly)
+          {
+          this->Values[cc] = values[cc].toInt();
+          }
+        else
+          {
+          this->Values[cc] = values[cc];
+          }
         }
       emit this->endInsertRows();
       }
@@ -165,7 +187,14 @@ public:
       {
       if (this->Values[cc] != values[cc])
         {
-        this->Values[cc] = values[cc];
+        if (this->AllowIntegralValuesOnly)
+          {
+          this->Values[cc] = values[cc].toInt();
+          }
+        else
+          {
+          this->Values[cc] = values[cc];
+          }
         QModelIndex idx = this->computeIndex(cc);
         emit this->dataChanged(idx, idx);
         }
@@ -289,13 +318,15 @@ class pqScalarValueListPropertyWidget::pqInternals
 {
   QString DefaultText;
 public:
+  enum ValueMode { MODE_INT, MODE_DOUBLE };
   Ui::ScalarValueListPropertyWidget Ui;
   vtkNew<vtkEventQtSlotConnect> VTKRangeConnector;
-  vtkWeakPointer<vtkSMDoubleRangeDomain> RangeDomain;
+  vtkWeakPointer<vtkSMDomain> RangeDomain;
   pqTableModel Model;
+  ValueMode Mode;
 
   pqInternals(pqScalarValueListPropertyWidget* self, int columnCount)
-    : Model(columnCount)
+    : Model(columnCount), Mode(MODE_DOUBLE)
     {
     this->Ui.setupUi(self);
     this->Ui.Table->setModel(&this->Model);
@@ -320,6 +351,11 @@ public:
     }
 
   void setScalarRangeLabel(double min, double max)
+    {
+    this->Ui.ScalarRangeLabel->setText(
+      this->DefaultText.arg(min).arg(max));
+    }
+  void setScalarRangeLabel(int min, int max)
     {
     this->Ui.ScalarRangeLabel->setText(
       this->DefaultText.arg(min).arg(max));
@@ -417,24 +453,27 @@ void pqScalarValueListPropertyWidget::removeAll()
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::addRange()
 {
-  double range_min, range_max;
-  if(!this->getRange(range_min, range_max))
+  if (this->Internals->Mode == pqInternals::MODE_DOUBLE)
     {
-    range_min=0.0;
-    range_max=10.0;
+    double range_min, range_max;
+    if(!this->getRange(range_min, range_max))
+      {
+      range_min=0.0;
+      range_max=10.0;
+      }
+
+    pqSampleScalarAddRangeDialog dialog(range_min, range_max, 10, false);
+    if (dialog.exec() != QDialog::Accepted)
+      {
+      return;
+      }
+
+    QVariantList value = this->Internals->Model.value().toList();
+    value += dialog.getRange();
+
+    this->Internals->Model.setValue(value);
+    emit this->scalarsChanged();
     }
-
-  pqSampleScalarAddRangeDialog dialog(range_min, range_max, 10, false);
-  if (dialog.exec() != QDialog::Accepted)
-    {
-    return;
-    }
-
-  QVariantList value = this->Internals->Model.value().toList();
-  value += dialog.getRange();
-
-  this->Internals->Model.setValue(value);
-  emit this->scalarsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -443,7 +482,9 @@ void pqScalarValueListPropertyWidget::setRangeDomain(
 {
   this->Internals->VTKRangeConnector->Disconnect();
   this->Internals->RangeDomain = smRangeDomain;
-  if (smRangeDomain && 
+  this->Internals->Mode = pqInternals::MODE_DOUBLE;
+  this->Internals->Model.setAllowIntegerValuesOnly(false);
+  if (smRangeDomain &&
       (smRangeDomain->GetMinimumExists(0) || 
        smRangeDomain->GetMinimumExists(0)))
     {
@@ -458,10 +499,36 @@ void pqScalarValueListPropertyWidget::setRangeDomain(
     this->Internals->Ui.ScalarRangeLabel->hide();
     }
 }
+//-----------------------------------------------------------------------------
+void pqScalarValueListPropertyWidget::setRangeDomain(
+  vtkSMIntRangeDomain* smRangeDomain)
+{
+  this->Internals->VTKRangeConnector->Disconnect();
+  this->Internals->RangeDomain = smRangeDomain;
+  this->Internals->Mode = pqInternals::MODE_INT;
+  this->Internals->Model.setAllowIntegerValuesOnly(true);
+  if (smRangeDomain &&
+      (smRangeDomain->GetMinimumExists(0) ||
+       smRangeDomain->GetMinimumExists(0)))
+    {
+    this->Internals->VTKRangeConnector->Connect(
+      smRangeDomain, vtkCommand::DomainModifiedEvent,
+      this, SLOT(smRangeModified()));
+    this->Internals->Ui.ScalarRangeLabel->show();
+    this->smRangeModified();
+    }
+  else
+    {
+    this->Internals->Ui.ScalarRangeLabel->hide();
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::smRangeModified()
 {
+  if (this->Internals->Mode == pqInternals::MODE_DOUBLE)
+    {
   double range_min, range_max;
   if (this->getRange(range_min, range_max))
     {
@@ -471,17 +538,52 @@ void pqScalarValueListPropertyWidget::smRangeModified()
     {
     this->Internals->clearScalarRangeLabel();
     }
+    }
+  else if (this->Internals->Mode == pqInternals::MODE_INT)
+    {
+    int range_min, range_max;
+    if (this->getRange(range_min, range_max))
+      {
+      this->Internals->setScalarRangeLabel(range_min, range_max);
+      }
+    else
+      {
+      this->Internals->clearScalarRangeLabel();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
 bool pqScalarValueListPropertyWidget::getRange(double& range_min, double& range_max)
 {
+  assert(this->Internals->Mode == pqInternals::MODE_DOUBLE);
   // Return the range of values in the input (if available)
   if (this->Internals->RangeDomain)
     {
     int min_exists = 0, max_exists=0;
-    range_min = this->Internals->RangeDomain->GetMinimum(0, min_exists);
-    range_max = this->Internals->RangeDomain->GetMaximum(0, max_exists);
+    vtkSMDoubleRangeDomain* doubleRange = vtkSMDoubleRangeDomain::SafeDownCast(
+                                            this->Internals->RangeDomain);
+    assert(doubleRange != NULL);
+    range_min = doubleRange->GetMinimum(0, min_exists);
+    range_max = doubleRange->GetMaximum(0, max_exists);
+    return (min_exists && max_exists);
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqScalarValueListPropertyWidget::getRange(int& range_min, int& range_max)
+{
+  assert(this->Internals->Mode == pqInternals::MODE_INT);
+  // Return the range of values in the input (if available)
+  if (this->Internals->RangeDomain)
+    {
+    int min_exists = 0, max_exists=0;
+    vtkSMIntRangeDomain* doubleRange = vtkSMIntRangeDomain::SafeDownCast(
+                                            this->Internals->RangeDomain);
+    assert(doubleRange != NULL);
+    range_min = doubleRange->GetMinimum(0, min_exists);
+    range_max = doubleRange->GetMaximum(0, max_exists);
     return (min_exists && max_exists);
     }
   return false;

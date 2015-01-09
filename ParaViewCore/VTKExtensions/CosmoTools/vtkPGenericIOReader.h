@@ -168,6 +168,14 @@ enum BlockAssignment {
   vtkIdType GetNumberOfRequestedHaloIds();
 
   // Description:
+  // Sets the number of requested halo ids.
+  // Use SetRequestedHaloId() to se the ids after this is called
+  // If the number of requested halo ids is
+  // greater than 0, only points with those halo ids will be read in.
+  // Otherwise all points will be read in.
+  void SetNumberOfRequestedHaloIds(vtkIdType numIds);
+
+  // Description:
   // Adds the given halo id to the list of halo ids to request.
   // If the number of requested halo ids is
   // greater than 0, only points with those halo ids will be read in.
