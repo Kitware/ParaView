@@ -809,7 +809,11 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
             {
             category.Label = categoryName;
             }
-
+          int show_in_toolbar = 0;
+          if (showInMenu->GetScalarAttribute("show_in_toolbar", &show_in_toolbar))
+            {
+            category.ShowInToolbar = category.ShowInToolbar || (show_in_toolbar == 1);
+            }
           if(!category.Proxies.contains(QPair<QString, QString>(group, name)))
             {
             category.Proxies.push_back(QPair<QString, QString>(group, name));
