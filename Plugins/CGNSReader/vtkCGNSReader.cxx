@@ -386,15 +386,8 @@ int vtkCGNSReader::getVarsIdAndFillRind(const double cgioSolId,
         return 1;
         }
 
-      std::vector<char> location_data;
-      CGNSRead::readNodeData<char>(this->cgioNum, solChildId[na], location_data);
-
       std::string location;
-      if( location_data.size() > 0)
-        { //conditionally dereference location_data as this avoids throwing
-          //runtime asserts on windows in debug mode when the vector is size 0
-        location = std::string(&location_data.front(), location_data.size());
-        }
+      CGNSRead::readNodeStringData(this->cgioNum, solChildId[na], location);
 
       if (location == "Vertex")
         {
@@ -2515,14 +2508,8 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
       if (CGNSRead::getFirstNodeId(this->cgioNum,
                                    baseChildId[zone], "FamilyName_t", &famId) == CG_OK)
         {
-        std::vector<char> familyName_data;
-        CGNSRead::readNodeData<char>(this->cgioNum, famId, familyName_data);
         std::string familyName;
-        if( familyName_data.size() > 0)
-          { //conditionally dereference familyName_data as this avoids throwing
-            //runtime asserts on windows in debug mode when the vector is size 0
-          familyName = std::string(&familyName_data.front(), familyName_data.size());
-          }
+        CGNSRead::readNodeStringData(this->cgioNum, famId, familyName);
 
         vtkInformationStringKey* zonefamily =
             new vtkInformationStringKey("FAMILY","vtkCompositeDataSet");
@@ -2536,15 +2523,8 @@ int vtkCGNSReader::RequestData(vtkInformation *vtkNotUsed(request),
       if (CGNSRead::getFirstNodeId(this->cgioNum,
                                    baseChildId[zone], "ZoneType_t", &zoneTypeId) == CG_OK)
         {
-        std::vector<char> zoneType_data;
-        CGNSRead::readNodeData<char>(this->cgioNum, zoneTypeId, zoneType_data);
-
         std::string zoneType;
-        if( zoneType_data.size() > 0)
-          { //conditionally dereference zoneType_data as this avoids throwing
-            //runtime asserts on windows in debug mode when the vector is size 0
-          zoneType = std::string(&zoneType_data.front(), zoneType_data.size());
-          }
+        CGNSRead::readNodeStringData(this->cgioNum, zoneTypeId, zoneType);
 
         if (zoneType == "Structured")
           {

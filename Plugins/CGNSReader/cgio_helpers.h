@@ -82,6 +82,9 @@ template <>
 int readNodeData<char>(int cgioNum, double nodeId, std::vector<char>& data);
 
 //------------------------------------------------------------------------------
+int readNodeStringData(int cgioNum, double nodeId, std::string& data);
+
+//------------------------------------------------------------------------------
 int getNodeChildrenId(int cgioNum, double fatherId, std::vector<double>& childrenIds);
 
 //------------------------------------------------------------------------------
