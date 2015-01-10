@@ -84,7 +84,7 @@ public:
   static QWidget* newGroupLabelWidget(const QString& label, QWidget* parentWidget);
 
   static bool useDocumentationForLabels(vtkSMProxy* proxy);
-  static const char* documentationText(vtkSMProperty* property);
+  static QString documentationText(vtkSMProperty* property);
 
 signals:
   /// This signal is fired as soon as the user starts editing in the widget. The

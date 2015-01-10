@@ -5,6 +5,8 @@ cmake_minimum_required(VERSION 2.8)
 # INPUT VARIABLES:
 # xmlpatterns       :- xmlpatterns executable.
 # xml_to_xml_xsl    :- xsl file to convert SM xml to internal xml Model.
+# generate_category_rw_xsl
+#                   :- xsl file to generate a categoryindex for Readers and Writers
 # xml_to_html_xsl   :- xsl file to conevrt the internal xml to html.
 # xml_to_wiki_xsl   :- xsl file to conevrt the internal xml to wiki.
 # input_xmls        :- + separated list of SM xml files
@@ -52,6 +54,15 @@ endforeach()
 set (xslt_xml "<xml>\n${xslt_xml}\n</xml>")
 file (WRITE "${output_file}" "${xslt_xml}")
 
+# process the temporary xml to generate categoryindex for readers and writers
+execute_process(
+  COMMAND "${xmlpatterns}"
+          "${generate_category_rw_xsl}"
+          "${output_file}"
+          OUTPUT_VARIABLE temp
+  )
+file (WRITE "${output_file}" "${temp}")
+
 # process the temporary.xml using the second XSL to generate a combined html
 # file.
 set (multiple_htmls)
@@ -74,10 +85,23 @@ foreach (single_html ${multiple_htmls_as_list})
   string(REGEX MATCH "<meta name=\"filename\" contents=\"([a-zA-Z0-9._-]+)\"" tmp "${single_html}")
   set (filename ${CMAKE_MATCH_1})
   if (filename)
-    # process formatting strings.
+    # revert the semicolon placeholder
     string (REPLACE "\\semicolon" ";" single_html "${single_html}")
-    string (REGEX REPLACE "\\\\bold{([^}]+)}" "<b>\\1</b>" single_html "${single_html}")
-    string (REGEX REPLACE "\\\\emph{([^}]+)}" "<i>\\1</i>" single_html "${single_html}")
+
+    # convert RST formatting strings into HTML
+    # bold
+    string (REGEX REPLACE "[*][*]([^*]+)[*][*]" "<b>\\1</b>" single_html 
+      "${single_html}")
+    # italic
+    string (REGEX REPLACE "[*]([^*]+)[*]" "<i>\\1</i>" single_html 
+      "${single_html}")
+    # unordered list
+    string (REPLACE "\n\n- " "\n<ul><li>" single_html "${single_html}")
+    string (REPLACE "\n- " "\n<li>" single_html "${single_html}")
+    string (REGEX REPLACE "<li>(.*)\n\n([^-])" "<li>\\1</ul>\n\\2" single_html 
+      "${single_html}")
+    # paragraph
+    string (REPLACE "\n\n" "\n<p>\n" single_html "${single_html}")
     file (WRITE "${output_dir}/${filename}" "${single_html}")
   endif()
 endforeach()

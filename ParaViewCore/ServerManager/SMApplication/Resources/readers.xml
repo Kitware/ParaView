@@ -5338,6 +5338,14 @@
                  base_proxyname="Xdmf3ReaderCore"
                  class="vtkXdmf3Reader"
                  name="Xdmf3ReaderT">
+      <Documentation short_help=
+                     "Reads XDMF data files so that they can be visualized using VTK.">
+Reads XDMF data files so that they can be visualized using VTK. The
+output data produced by this reader depends on the number of grids in
+the data file. If the data file has a single domain with a single
+grid, then the output type is a vtkDataSet subclass of the appropriate
+type, otherwise it's a vtkMultiBlockDataSet.
+      </Documentation>
 
       <IntVectorProperty command="SetFileSeriesAsTime"
                          default_values="1"
@@ -5360,6 +5368,14 @@
                  base_proxyname="Xdmf3ReaderCore"
                  class="vtkXdmf3Reader"
                  name="Xdmf3ReaderS">
+      <Documentation short_help=
+                     "Reads XDMF data files so that they can be visualized using VTK.">
+Reads XDMF data files so that they can be visualized using VTK. The
+output data produced by this reader depends on the number of grids in
+the data file. If the data file has a single domain with a single
+grid, then the output type is a vtkDataSet subclass of the appropriate
+type, otherwise it's a vtkMultiBlockDataSet.
+      </Documentation>
 
       <IntVectorProperty command="SetFileSeriesAsTime"
                          default_values="0"
@@ -6387,10 +6403,13 @@
     <SourceProxy class="vtkPSLACReader"
                  label="SLAC Data Reader"
                  name="SLACReader">
-      <Documentation>A reader for a data format used by Omega3p, Tau3p, and
-      several other tools used at the Standford Linear Accelerator Center
-      (SLAC). The underlying format uses netCDF to store arrays, but also
-      imposes several conventions to form an unstructured grid of
+      <Documentation short_help="A reader for a data format used by
+      Omega3p, Tau3p, and several other tools used at the Standford
+      Linear Accelerator Center (SLAC)">A reader for a data format
+      used by Omega3p, Tau3p, and several other tools used at the
+      Standford Linear Accelerator Center (SLAC). The underlying
+      format uses netCDF to store arrays, but also imposes several
+      conventions to form an unstructured grid of
       elements.</Documentation>
       <OutputPort index="0"
                   name="External Surface" />
@@ -6534,7 +6553,7 @@
                  label="SLAC Particle Data Reader"
                  name="SLACParticleReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Documentation>The SLAC Particle data reader.</Documentation>
+      <Documentation short_help="The SLAC Particle data reader.">The SLAC Particle data reader.</Documentation>
       <SubProxy>
         <Proxy name="Reader"
                proxygroup="internal_sources"
@@ -7418,6 +7437,17 @@
     <SourceProxy class="vtkPlot3DMetaReader"
                  label="PLOT3D Meta-File Reader"
                  name="Plot3DMetaReader">
+      <Documentation short_help="The main goal of this reader is to make it easy to read PLOT3D files or time series of PLOT3D files.">
+The main goal of this reader is to make it easy to read PLOT3D files,
+specifically time series of PLOT3D files. PLOT3D files can take many
+different forms based on their content. Unfortunately, it is not a
+self-describing format therefore the user needs to pass information
+about the contents of the file to the reader. Normally, this is done
+by setting a number of member variables. The goal of this reader is to
+provide a simple format that enable the writer of the PLOT3D file to
+describe its settings as well as group a number of files as a time
+series.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
@@ -7443,6 +7473,10 @@
     <SourceProxy class="vtkCMLMoleculeReader"
                  label="CML Molecule Reader"
                  name="CMLMoleculeReader">
+      <Documentation short_help="A reader for Chemical Markup Language (CML)">
+        This is a reader for Chemical Markup Language (CML) which
+        describes chemical information using XML.
+      </Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"

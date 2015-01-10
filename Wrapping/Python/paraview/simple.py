@@ -1509,14 +1509,13 @@ def _create_func(key, module):
 def _create_doc(new, old):
     "Internal function."
     import string
-    res = ""
-    for doc in (new, old):
-        ts = []
-        strpd = doc.split('\n')
-        for s in strpd:
-            ts.append(s.lstrip())
-        res += string.join(ts)
-        res += '\n'
+    res = new + '\n'
+    ts = []
+    strpd = old.split('\n')
+    for s in strpd:
+        ts.append(s.lstrip())
+    res += string.join(ts)
+    res += '\n'
     return res
 
 # -----------------------------------------------------------------------------

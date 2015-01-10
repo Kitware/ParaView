@@ -111,7 +111,8 @@ void pqPropertyWidget::setProperty(vtkSMProperty *smproperty)
   this->Property = smproperty;
   if (smproperty && smproperty->GetDocumentation())
     {
-    QString doc = smproperty->GetDocumentation()->GetDescription();
+    QString doc = pqProxy::rstToHtml(
+      smproperty->GetDocumentation()->GetDescription()).c_str();
     doc = doc.trimmed();
     doc = doc.replace(QRegExp("\\s+")," ");
     this->setToolTip(

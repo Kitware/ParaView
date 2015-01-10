@@ -6,7 +6,7 @@
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="xml"/>
 <xsl:template match="ServerManagerConfiguration/ProxyGroup">
-  <xsl:for-each select="SourceProxy|Proxy|PWriterProxy|WriterProxy|PSWriterProxy">
+  <xsl:for-each select="CompoundSourceProxy|SourceProxy|Proxy|PWriterProxy|WriterProxy|PSWriterProxy">
     <proxy>
       <group><xsl:value-of select="../@name" /></group>
       <name><xsl:value-of select="@name" /></name>
@@ -31,6 +31,12 @@
         <domains><xsl:call-template name="WriteDomain" /></domains>
       </property>
     </xsl:for-each>
+    <xsl:if test="Hints/ReaderFactory">
+      <xsl:copy-of select="Hints/ReaderFactory" />
+    </xsl:if>
+    <xsl:if test="Hints/WriterFactory">
+      <xsl:copy-of select="Hints/WriterFactory" />
+    </xsl:if>
     </proxy>
   </xsl:for-each>
 </xsl:template>
@@ -242,22 +248,8 @@
   </categoryindex>
 </xsl:template>
 
-<xsl:template match="ParaViewReaders">
-  <categoryindex>
-    <label>Readers</label>
-    <xsl:call-template name="GenerateCategoryIndex" />
-  </categoryindex>
-</xsl:template>
-
-<xsl:template match="ParaViewWriters">
-  <categoryindex>
-    <label>Writers</label>
-    <xsl:call-template name="GenerateCategoryIndex" />
-  </categoryindex>
-</xsl:template>
-
 <xsl:template name="GenerateCategoryIndex" >
-  <xsl:for-each select="Proxy">
+  <xsl:for-each select="//Proxy">
     <xsl:element name="item">
       <xsl:attribute name="proxy_name"><xsl:value-of select="@name"/></xsl:attribute>
       <xsl:attribute name="proxy_group"><xsl:value-of select="@group"/></xsl:attribute>
