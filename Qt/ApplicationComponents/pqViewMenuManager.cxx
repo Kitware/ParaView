@@ -85,9 +85,9 @@ void pqViewMenuManager::buildMenu()
 
   foreach (QToolBar* toolbar, all_toolbars)
     {
-    // Toolbars with empty names are added to views and we don't want
-    // to show those in the menu.
-    if (toolbar->toggleViewAction()->text() != "")
+    // Nested toolbars should be skipped. These are the non-top-level toolbars
+    // such as those on the view frame or other widgets.
+    if (toolbar->parentWidget() == this->Window)
       {
       toolbars->addAction(toolbar->toggleViewAction());
       }
