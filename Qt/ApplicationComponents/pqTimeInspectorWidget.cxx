@@ -334,7 +334,12 @@ void pqTimeInspectorWidget::updateScene()
   vtkNew<vtkSMParaViewPipelineController> controller;
 
   vtkSMProxy* sceneProxy = controller->FindAnimationScene(session);
-  Q_ASSERT(sceneProxy);
+  if (!sceneProxy)
+    {
+    // The sceneProxy may be null when cleaning up a session. Hence,
+    // we handle that case.
+    return;
+    }
 
   this->Internals->Ui.AnimationTimeWidget->setAnimationScene(sceneProxy);
 
