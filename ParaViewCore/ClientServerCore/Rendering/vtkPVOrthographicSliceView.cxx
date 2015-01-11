@@ -101,6 +101,10 @@ public:
       }
     }
 
+  // Disable wheel-to-zoom in this view.
+  virtual void OnMouseWheelForward() {}
+  virtual void OnMouseWheelBackward() {}
+
 protected:
   vtkPVOrthographicSliceViewInteractorStyle():
     PrimaryInteractorStyle(NULL),
