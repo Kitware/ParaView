@@ -74,21 +74,25 @@ void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
     {
     vtkSMPropertyHelper helper(readerProxy, "TimestepValues");
     unsigned int num_timesteps = helper.GetNumberOfElements();
-    std::vector<double> timesteps = helper.GetDoubleArray();
-    unsigned int newTimeStep = 
-      (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_FIRST) ? 0 :
-      (num_timesteps - 1);
-    scene->setAnimationTime(timesteps[newTimeStep]);
+    if (num_timesteps > 0)
+      {
+      std::vector<double> timesteps = helper.GetDoubleArray();
+      unsigned int newTimeStep =
+        (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_FIRST) ? 0 :
+        (num_timesteps - 1);
+      scene->setAnimationTime(timesteps[newTimeStep]);
+      }
     }
   else if (readerProxy->GetProperty("TimeRange"))
     {
     vtkSMPropertyHelper helper(readerProxy, "TimeRange");
     std::vector<double> timeRange = helper.GetDoubleArray();
-    double newTime = 
-      (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_FIRST) ? 
-      timeRange[0] : timeRange[1];
-    scene->setAnimationTime(newTime);
+    if (timeRange.size() > 0)
+      {
+      double newTime =
+        (defaultTimeStep == vtkPVGeneralSettings::DEFAULT_TIME_STEP_FIRST) ?
+        timeRange[0] : timeRange[1];
+      scene->setAnimationTime(newTime);
+      }
     }
 }
-
-
