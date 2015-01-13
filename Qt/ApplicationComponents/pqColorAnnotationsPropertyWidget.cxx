@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -708,6 +709,25 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
       throw 0;
       }
 
+    // obtain prominent values from all visible sources colored by the same
+    // array name as the name of color array for the active representation.
+    pqDataRepresentation* repr =
+      pqActiveObjects::instance().activeRepresentation();
+    if (!repr)
+      {
+      throw 0;
+      }
+
+    vtkSMPVRepresentationProxy* activeRepresentationProxy =
+      vtkSMPVRepresentationProxy::SafeDownCast(repr->getProxy());
+    if (!activeRepresentationProxy)
+      {
+      throw 0;
+      }
+
+    vtkPVArrayInformation* activeArrayInfo =
+      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(activeRepresentationProxy);
+
     vtkSMSessionProxyManager* pxm = server->proxyManager();
 
     // Iterate over representations, collecting prominent values from each.
@@ -719,6 +739,15 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
       vtkSMProxy* representationProxy =
         vtkSMProxy::SafeDownCast(collection->GetItemAsObject(i));
       if (!representationProxy || !vtkSMPropertyHelper(representationProxy, "Visibility").GetAsInt())
+        {
+        continue;
+        }
+
+      vtkPVArrayInformation* currentArrayInfo =
+        vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(representationProxy);
+      if (!activeArrayInfo || !activeArrayInfo->GetName() ||
+          !currentArrayInfo || !currentArrayInfo->GetName() ||
+          strcmp(activeArrayInfo->GetName(), currentArrayInfo->GetName()))
         {
         continue;
         }
