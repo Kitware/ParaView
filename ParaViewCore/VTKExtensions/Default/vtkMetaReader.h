@@ -84,6 +84,8 @@ public:
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
 
+  void PrintSelf(ostream& os, vtkIndent indent);
+
 protected:
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
