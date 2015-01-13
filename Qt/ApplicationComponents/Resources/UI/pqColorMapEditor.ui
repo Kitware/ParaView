@@ -72,6 +72,22 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="ArrayLabel">
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Array Name:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -88,7 +104,7 @@
         <x>0</x>
         <y>0</y>
         <width>372</width>
-        <height>76</height>
+        <height>53</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,1">

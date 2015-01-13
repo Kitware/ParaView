@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 #include "vtkCommand.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -162,16 +163,28 @@ void pqColorMapEditor::updateActive()
 
   this->setDataRepresentation(repr);
 
+  QString arrayNameLabel("Array Name: ");
+
   // Set the current LUT proxy to edit.
   if (repr && vtkSMPVRepresentationProxy::GetUsingScalarColoring(repr->getProxy()))
     {
     this->setColorTransferFunction(
       vtkSMPropertyHelper(repr->getProxy(), "LookupTable", true).GetAsProxy());
+
+    vtkPVArrayInformation* arrayInfo =
+      vtkSMPVRepresentationProxy::GetArrayInformationForColorArray(repr->getProxy());
+    if (arrayInfo)
+      {
+      arrayNameLabel.append(arrayInfo->GetName());
+      }
     }
   else
     {
     this->setColorTransferFunction(NULL);
+    arrayNameLabel.append("<none>");
     }
+
+  this->Internals->Ui.ArrayLabel->setText(arrayNameLabel);
 }
 
 //-----------------------------------------------------------------------------
