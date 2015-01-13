@@ -62,7 +62,7 @@
 #define CMAKE_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@"
 @PARAVIEW_CONFIG_EXTRA_DEFINES@
 
-// defined when SSEND must be used for communication by default.
+// defined when ParaView is built with MPI.
 #cmakedefine PARAVIEW_USE_MPI
 
 // defined when SSEND must be used for communication by default.
