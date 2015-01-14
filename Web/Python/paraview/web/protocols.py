@@ -85,16 +85,34 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
             print msg
 
     def setBaseDirectory(self, basePath):
+        self.overrideDataDirKey = None
+        self.baseDirectory = ''
+        self.baseDirectoryMap = {}
+        self.multiRoot = False
+
         if basePath.find('|') < 0:
-            self.multiRoot = False
-            self.baseDirectory = basePath
+            if basePath.find('=') >= 0:
+                basePair = basePath.split('=')
+                if os.path.exists(basePair[1]):
+                    self.baseDirectory = basePair[1]
+                    self.overrideDataDirKey = basePair[0]
+            else:
+                self.baseDirectory = basePath
         else:
-            self.multiRoot = True
-            self.baseDirectoryMap = {}
             baseDirs = basePath.split('|')
             for baseDir in baseDirs:
                 basePair = baseDir.split('=')
-                self.baseDirectoryMap[basePair[0]] = basePair[1]
+                if os.path.exists(basePair[1]):
+                    self.baseDirectoryMap[basePair[0]] = basePair[1]
+
+            # Check if we ended up with just a single directory
+            bdKeys = self.baseDirectoryMap.keys()
+            if len(bdKeys) == 1:
+                self.baseDirectory = self.baseDirectoryMap[bdKeys[0]]
+                self.overrideDataDirKey = bdKeys[0]
+                self.baseDirectoryMap = {}
+            elif len(bdKeys) > 1:
+                self.multiRoot = True
 
     def getAbsolutePath(self, relativePath):
         absolutePath = None
@@ -1836,7 +1854,7 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
         """
         self.setBaseDirectory(basePath)
 
-        self.rootName = name
+        self.rootName = self.overrideDataDirKey or name
         self.pattern = re.compile(excludeRegex)
         self.gPattern = re.compile(groupRegex)
         pxm = simple.servermanager.ProxyManager()
