@@ -26,6 +26,7 @@
 .pv-text-green { color: #e9bc2f; }
 
 .pv-form-height  { height: 20px; padding: 0 5px;}
+select.pv-form-height  { font-size: 12px; }
 .pv-round { border-radius: 10px; padding: 0 10px; }
 
 .hover-higlight:hover { background: #333; color: #eee; }

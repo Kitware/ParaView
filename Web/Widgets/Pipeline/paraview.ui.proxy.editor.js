@@ -12,7 +12,7 @@
 
     var TEMPLATE_START_GROUP = '<div class="alert pv-gray-light pv-collapsable-content EXPANDED" role="alert"><div class="pv-collapse-title pv-collapsable-action clickable"><span class="vtk-icon-plus-circled">NAME</span></div><div class="pv-no-collapse-title pv-collapsable-action clickable"><span class="vtk-icon-minus-circled pv-absolute-left">NAME</span></div>',
         TEMPLATE_END_GROUP = "</div>",
-        TEMPLATE_COLOR_BY_PANEL = "<div class='row pv-color-panel' data-proxy-id='REP_ID'><label class='col-sm-4 control-label'>Color By</label><div class='col-sm-8 text-center'><select class='form-control pv-form-height array' style='margin-bottom: 5px;' data-cancel-value='VALUES'>ARRAY_OPTIONS</select><select class='form-control pv-form-height component' style='margin-bottom: 5px;'></select><select class='form-control pv-form-height palette' style='margin-bottom: 5px;'>PALETTE_OPTIONS</select></div></div>",
+        TEMPLATE_COLOR_BY_PANEL = "<div class='row pv-color-panel' style='margin-bottom: 17px;' data-proxy-id='REP_ID'><label class='col-sm-4 control-label'>Color By</label><div class='col-sm-8 text-center'><select class='form-control pv-form-height array' style='margin-bottom: 5px;' data-cancel-value='VALUES'>ARRAY_OPTIONS</select><select class='form-control pv-form-height component' style='margin-bottom: 5px;'></select><select class='form-control pv-form-height palette' style='margin-bottom: 5px;'>PALETTE_OPTIONS</select><div class='color-options-button-panel col-sm-4' style='position: absolute; bottom: 4px; left: -50%; width: 50%; text-align: left; margin-left: -2px'><span class='vtk-icon-chart-area clickable' data-action='toggle-scalar-opacity-editor' data-toggle='tooltip' data-placement='bottom' title='Toggle Scalar Opacity Function Editor'></span></div></div><div class='scalar-opacity-editor-container row-property'></div></div>",
         TEMPLATE_DELETE = "<span class='vtk-icon-trash clickable' data-action='delete-proxy' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Delete Pipeline Component'></span>",
         TEMPLATE_EDITOR = "<div class='pv-editor-bar text-center pv-gray-dark row' style='padding-bottom: 5px;margin-bottom: 15px;'><span class='float-left vtk-icon-tools clickable' data-action='toggle-advance-properties' data-toggle='tooltip' data-placement='bottom' title='Toggle Advanced Properties'></span><span class='float-left clickable vtk-icon-bookmarkEMPTY' data-action='toggle-scalarbar' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Legend'></span><span class='float-left vtk-icon-resize-horizontal-1 clickable' data-action='rescale-data' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Rescale Colors To Data Range'></span>TITLE CAN_DELETE<span class='float-right vtk-icon-cancel clickable' data-action='reset-property-values' data-toggle='tooltip' data-placement='bottom' title='Reset Properties'></span><span class='float-right vtk-icon-ok clickable' data-action='apply-property-values' data-toggle='tooltip' data-placement='bottom' title='Apply Properties'></span></div>PROPERTIES",
         TEMPLATE_OPTION = "<option SELECTED value='VALUE'>LABEL</option>",
@@ -235,7 +235,12 @@
                 scalarbarVisibility = (colorByInfo.scalarBar === 1) ? true : false,
                 activeArrayStr = (colorByInfo.mode === 'array') ? colorByInfo.array.slice(0,2).join(':') : 'solid',
                 activeArrayComp = (colorByInfo.mode === 'array') ? colorByInfo.array[2].toString() : '0',
-                activePalette = 'FIXME not yet available';
+                activePalette = 'FIXME not yet available',
+                scalarOpacityEditorDisabled = false,
+                scalarOpacityEditorInitialized = false;
+
+            // Make sure all old tooltips are cleaned up...
+            $('.tooltip').remove();
 
             // Update DOM
             for(var idx = 0; idx < count; ++idx) {
@@ -395,6 +400,12 @@
                 .replace(/_ID_/g, proxyId)
                 .replace(/EMPTY/g, scalarbarVisibility ? '' : '-empty');
 
+            // Disable editing of scalar opacity function if not coloring by an array
+            if (colorByInfo.array.length < 2 || colorByInfo.array[1] === '') {
+                $('[data-action=toggle-scalar-opacity-editor]').css('opacity', 0.3);
+                scalarOpacityEditorDisabled = true;
+            }
+
             // Annotate properties with dependencies with 'has-dependency' class
             for(var key in propertiesWithDependencies) {
                 try {
@@ -427,6 +438,8 @@
                             type: 'delete-proxy',
                             id: target_container.attr('data-proxy-id')
                         });
+                        // Make sure all old tooltips are cleaned up...
+                        $('.tooltip').remove();
                     } else if (action === 'apply-property-values') {
                         apply(me);
                     } else if (action === 'toggle-scalarbar') {
@@ -448,6 +461,37 @@
                         var propertyContainer = target_container.parent().parent();
                         propertyContainer.addClass('has-change');
                         propertyContainer.append(TEMPLATE_VALUE.replace(/VALUE/g, 0).replace(/TYPE/g, propertyContainer.attr('data-type')));
+                    } else if (action === 'toggle-scalar-opacity-editor' && scalarOpacityEditorDisabled === false) {
+                        var opacityEditorElt = $('.scalar-opacity-editor-container');
+                        if (!opacityEditorElt.is(':visible')) {
+                            opacityEditorElt.show();
+                            if (scalarOpacityEditorInitialized === false) {
+                                var currentColorBy = extractColorBy();
+                                me.trigger({
+                                    type: 'initialize-scalar-opacity-widget',
+                                    container: opacityEditorElt,
+                                    colorArray: currentColorBy.array
+                                });
+
+                                opacityEditorElt.on('update-opacity-points', function(opEvt) {
+                                    var proxyId = $(this).parent().attr('data-proxy-id');
+                                    var newColorBy = extractColorBy();
+                                    me.trigger({
+                                        colorBy: newColorBy,
+                                        type: 'update-scalar-opacity-function',
+                                        points: opEvt.opacityPoints
+                                    });
+                                    me.trigger({
+                                        colorBy: newColorBy,
+                                        type: 'store-scalar-opacity-parameters',
+                                        parameters: { 'linearPoints': opEvt.linearPoints, 'gaussianPoints': opEvt.gaussianPoints }
+                                    });
+                                });
+                                scalarOpacityEditorInitialized = true;
+                            }
+                        } else {
+                            opacityEditorElt.hide();
+                        }
                     }
                 });
             }

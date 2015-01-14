@@ -404,6 +404,9 @@
         proxyEditor.bind('apply', onProxyApply);
         proxyEditor.bind('scalarbar-visibility', onScalarBarVisibility);
         proxyEditor.bind('rescale-transfer-function', onRescaleTransferFunction);
+        proxyEditor.bind('update-scalar-opacity-function', onUpdateOpacityPoints);
+        proxyEditor.bind('store-scalar-opacity-parameters', onStoreOpacityParameters);
+        proxyEditor.bind('initialize-scalar-opacity-widget', onInitializeScalarOpacityWidget);
     }
 
     // ------------------------------------------------------------------------
@@ -441,6 +444,30 @@
 
     // ------------------------------------------------------------------------
 
+    function onUpdateOpacityPoints(event) {
+        var colorBy = event.colorBy;
+        if (colorBy.array.length >= 2 && colorBy.array[1] !== '') {
+            var args = [colorBy.representation, colorBy.array, event.points];
+            startWorking();
+            session.call('pv.color.manager.opacity.points.set', args).then(function(successResult) {
+                viewport.invalidateScene();
+                workDone();
+            }, workDone);
+        }
+    }
+
+    function onStoreOpacityParameters(event) {
+        var colorArray = event.colorBy.array;
+        if (colorArray.length >= 2 && colorArray[1] !== '') {
+            var storeKey = colorArray[1] + ":opacityParameters";
+            var args = [storeKey, event.parameters];
+            startWorking();
+            session.call('pv.keyvaluepair.store', args).then(workDone, workDone);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
     function onRescaleTransferFunction(event) {
         startWorking();
         var options = { proxyId: event.id, type: event.mode };
@@ -456,13 +483,15 @@
     function onNewProxyLoaded() {
         if(pipelineDataModel.metadata && pipelineDataModel.source && pipelineDataModel.representation && pipelineDataModel.view) {
             var props = [].concat(
+                    "ColorByPanel",
                     "+Source", pipelineDataModel.source.properties, '_Source',
-                    "-Representation", "ColorByPanel", pipelineDataModel.representation.properties, '_Representation',
+                    "-Representation", pipelineDataModel.representation.properties, '_Representation',
                     "-View", pipelineDataModel.view.properties, "_View"
                     ),
                 ui = [].concat(
+                    "ColorByPanel",
                     "+Source", pipelineDataModel.source.ui, '_Source',
-                    "-Representation", "ColorByPanel", pipelineDataModel.representation.ui, '_Representation',
+                    "-Representation", pipelineDataModel.representation.ui, '_Representation',
                     "-View", pipelineDataModel.view.ui, "_View"
                     );
 
@@ -489,6 +518,37 @@
                 updateView();
             }
         }
+    }
+
+    // ========================================================================
+    // Opacity editor widget creation
+    // ========================================================================
+    function onInitializeScalarOpacityWidget(event) {
+        var container = event.container;
+        var colorArray = event.colorArray;
+
+        var initOptions = {
+            'buttonsPosition': 'top',
+            'topMargin': 10,
+            'rightMargin': 15,
+            'bottomMargin': 10,
+            'leftMargin': 15
+        };
+
+        if (colorArray.length >= 2 && colorArray[1] !== '') {
+            var retrieveKey = colorArray[1] + ":opacityParameters";
+
+            session.call('pv.keyvaluepair.retrieve', [retrieveKey]).then(function(result) {
+                if (result !== null) {
+                    initOptions.gaussiansList = result.gaussianPoints;
+                    initOptions.linearPoints = result.linearPoints;
+                }
+                container.opacityEditor(initOptions);
+                workDone();
+            }, workDone);
+        }
+
+        container.opacityEditor(initOptions);
     }
 
     // ========================================================================

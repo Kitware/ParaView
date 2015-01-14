@@ -474,6 +474,28 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         simple.Render()
 
+    # RpcName: setOpacityFunctionPoints => pv.color.manager.opacity.points.set
+    @exportRpc("pv.color.manager.opacity.points.set")
+    def setOpacityFunctionPoints(self, representation, arrayName, pointArray):
+        repProxy = self.mapIdToProxy(representation)
+        lutProxy = repProxy.LookupTable
+
+        # Use whatever the current scalar range is for this array
+        cMin = lutProxy.RGBPoints[0]
+        cMax = lutProxy.RGBPoints[-4]
+
+        # Scale and bias the x values, which come in between 0.0 and 1.0, to the
+        # current scalar range
+        for i in range(len(pointArray) / 4):
+            idx = i * 4
+            x = pointArray[idx]
+            pointArray[idx] = (x * (cMax - cMin)) + cMin
+
+        # Set the Points property to scaled and biased points array
+        repProxy.ScalarOpacityFunction.Points = pointArray
+
+        simple.Render()
+
     # RpcName: selectColorMap => pv.color.manager.select.preset
     @exportRpc("pv.color.manager.select.preset")
     def selectColorMap(self, representation, paletteName):
@@ -1609,6 +1631,32 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
         rgbPoints = lut.GetProperty('RGBPoints')
         return [ rgbPoints.GetElement(0),
                  rgbPoints.GetElement(rgbPoints.GetNumberOfElements() - 4) ]
+
+
+# =============================================================================
+#
+# Key/Value Store Protocol
+#
+# =============================================================================
+
+class ParaViewWebKeyValuePairStore(ParaViewWebProtocol):
+
+    def __init__(self):
+        super(ParaViewWebKeyValuePairStore, self).__init__()
+        self.keyValStore = {}
+
+    # RpcName: storeKeyPair => 'pv.keyvaluepair.store'
+    @exportRpc("pv.keyvaluepair.store")
+    def storeKeyPair(self, key, value):
+        self.keyValStore[key] = value
+
+    # RpcName: retrieveKeyPair => 'pv.keyvaluepair.retrieve'
+    @exportRpc("pv.keyvaluepair.retrieve")
+    def retrieveKeyPair(self, key):
+        if key in self.keyValStore:
+            return self.keyValStore[key]
+        else:
+            return None
 
 
 # =============================================================================
