@@ -1,5 +1,6 @@
 This repository gives examples of how to use ParaView Catalyst (catalyst.paraview.org)
-for in situ analysis and visualization. The examples show how to create VTK data
+for in situ analysis and visualization. For assistance, please email the ParaView
+mailing list at paraview@paraview.org. The examples show how to create VTK data
 structures from native simulation code data structures, how to interface to ParaView
 Catalyst and how to set up several different types of pipelines. The examples can
 either be built individually or as a group. Many work in parallel as well. The tests
