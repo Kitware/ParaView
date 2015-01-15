@@ -1292,6 +1292,13 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
         return proxyJson
 
+    @exportRpc("pv.proxy.manager.find.id")
+    def findProxyId(self, groupName, proxyName):
+        proxyMgr = servermanager.ProxyManager()
+        proxy = proxyMgr.GetProxy(groupName, proxyName)
+        proxyId = proxy.SMProxy.GetGlobalIDAsString()
+        return proxyId
+
     @exportRpc("pv.proxy.manager.update")
     def update(self, propertiesList):
         """

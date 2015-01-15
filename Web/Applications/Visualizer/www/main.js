@@ -3,6 +3,8 @@
         viewport,
         pipeline,
         proxyEditor,
+        settingsEditor,
+        rvSettingsProxyId = null,
         infoManager,
         busyElement = $('.busy').hide(),
         notBusyElement = $('.not-busy').show(),
@@ -174,10 +176,15 @@
 
     function addScrollBehavior() {
         $('.inspector-container').scroll(function (event) {
-            var y = $(this).scrollTop(),
-                pipelineHeight = $('.pv-pipeline').height();
-            if (y >= pipelineHeight) {
-                $('.pv-editor-bar').addClass('pv-fixed').css('top', (y-pipelineHeight)+'px');
+            var y = $(this).scrollTop();
+                reservedHeight = 0;
+            if ($('.pv-pipeline').is(':visible') === true) {
+                reservedHeight = $('.pv-pipeline').height();
+            } else if ($('.pv-preferences').is(':visible') === true) {
+                reservedHeight = $('.pv-preferences').height();
+            }
+            if (y >= reservedHeight) {
+                $('.pv-editor-bar').addClass('pv-fixed').css('top', (y-reservedHeight)+'px');
             } else {
                 $('.pv-editor-bar').removeClass('pv-fixed');
             }
@@ -395,6 +402,67 @@
     }
 
     // ========================================================================
+    // Global settings management
+    // ========================================================================
+
+    function reloadSettingsEditor() {
+        startWorking();
+        settingsEditor.empty();
+
+        if (rvSettingsProxyId !== null) {
+            session.call('pv.proxy.manager.get', [rvSettingsProxyId]).then(function(rvSettingsProps) {
+
+                var props = [].concat(
+                    "+RenderViewSettings", rvSettingsProps.properties, '_RenderViewSettings'
+                    ),
+                ui = [].concat(
+                    "+RenderViewSettings", rvSettingsProps.ui, '_RenderViewSettings'
+                    );
+
+                settingsEditor.proxyEditor("Global Settings", false, 0, props, ui, [], [], {});
+
+                workDone();
+            }, function(rvSettingsErr) {
+                console.log("Failed to get the RenderViewSettings proxy properties:");
+                console.log(rvSettingsErr);
+                workDone();
+            });
+        }
+    }
+
+    function createGlobalSettingsPanel(settingsSelector) {
+        startWorking();
+        settingsEditor = $(settingsSelector);
+
+        // Get the proxy id of the RenderViewSettings proxy
+        session.call('pv.proxy.manager.find.id', ['settings', 'RenderViewSettings']).then(function(proxyId) {
+            rvSettingsProxyId = proxyId;
+            workDone();
+            reloadSettingsEditor();
+        }, function(proxyIdErr) {
+            console.log('Error getting RenderViewSettings proxy id:');
+            console.log(proxyIdErr);
+            workDone();
+        });
+
+        // To apply render view settings, first update the proxy, then reload it
+        settingsEditor.bind('apply', function(evt) {
+            startWorking();
+            session.call('pv.proxy.manager.update', [evt.properties]).then(function(updateResult) {
+                console.log("Successfully updated RenderViewSettings proxy:")
+                console.log(updateResult);
+                viewport.invalidateScene();
+                reloadSettingsEditor();
+                workDone();
+            }, function(updateError) {
+                console.log("Failed to update RenderViewSettings proxy:")
+                console.log(updateError);
+                workDone();
+            });
+        });
+    }
+
+    // ========================================================================
     // Proxy Editor management (update + delete)
     // ========================================================================
 
@@ -604,7 +672,7 @@
     // Main - Visualizer Setup
     // ========================================================================
 
-    function initializeVisualizer(session_, viewportSelector, pipelineSelector, proxyEditorSelector, fileSelector, sourceSelector, filterSelector, dataInfoSelector) {
+    function initializeVisualizer(session_, viewportSelector, pipelineSelector, proxyEditorSelector, fileSelector, sourceSelector, filterSelector, dataInfoSelector, settingsSelector) {
         session = session_;
 
         // Initialize data and DOM behavior
@@ -623,6 +691,7 @@
         createPipelineManagerView(pipelineSelector);
         createProxyEditorView(proxyEditorSelector);
         createDataInformationPanel(dataInfoSelector);
+        createGlobalSettingsPanel(settingsSelector);
 
         // Set initial state
         $('.need-input-source').hide();
