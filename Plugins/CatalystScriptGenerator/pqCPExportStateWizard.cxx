@@ -173,6 +173,13 @@ bool pqCPExportStateWizard::getCommandString(QString& command)
     }
 
   QString filename = file_dialog.getSelectedFiles()[0];
+#ifdef _WIN32
+  // Convert to forward slashes. The issue is that the path is interpreted as a
+  // Python string when passed to the interpreter, so a path such as "C:\tests"
+  // is read as "C:<TAB>ests" which isn't what we want. Since Windows is
+  // flexible anyways, just use Unix separators.
+  filename.replace('\\', '/');
+#endif
 
   // the map from the simulation inputs in the paraview gui
   // to the adaptor's named inputs (usually 'input')

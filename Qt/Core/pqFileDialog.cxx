@@ -139,7 +139,7 @@ public:
   Ui::pqFileDialog Ui;
   QList<QStringList> SelectedFiles;
   QStringList Filters;
-  bool SupressOverwriteWarning;
+  bool SuppressOverwriteWarning;
   bool ShowMultipleFileHelp;
   QString FileNamesSeperator;  
 
@@ -155,7 +155,7 @@ public:
     FileFilter(this->Model),
     Completer(new QCompleter(&this->FileFilter, NULL)),
     Mode(ExistingFile),
-    SupressOverwriteWarning(false),
+    SuppressOverwriteWarning(false),
     ShowMultipleFileHelp(false),
     FileNamesSeperator(";")
   {
@@ -1052,7 +1052,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files,
         break;
       case AnyFile:
         // User chose an existing file, prompt before overwrite
-        if(!this->Implementation->SupressOverwriteWarning)
+        if(!this->Implementation->SuppressOverwriteWarning)
           {
           if(QMessageBox::No == QMessageBox::warning(
             this,
@@ -1175,7 +1175,7 @@ bool pqFileDialog::selectFile(const QString& f)
   QPointer<QDialog> diag = this;
   this->Implementation->Model->setCurrentPath(dirname.c_str());
   this->Implementation->Ui.FileName->setText(filename.c_str());
-  this->Implementation->SupressOverwriteWarning = true;
+  this->Implementation->SuppressOverwriteWarning = true;
   this->accept();
   if(diag && diag->result() != QDialog::Accepted)
     {
