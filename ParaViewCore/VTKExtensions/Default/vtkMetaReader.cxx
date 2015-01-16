@@ -153,3 +153,21 @@ std::string vtkMetaReader::FromRelativeToMetaFile(const char* metaFileName,
     return filePath;
     }
 }
+
+//-----------------------------------------------------------------------------
+void vtkMetaReader::PrintSelf(ostream& os,
+                              vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  if (this->Reader)
+    {
+    os << indent << "Reader:" << endl;
+    this->Reader->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "Reader: (null)" << endl;
+    }
+  os << indent << "FileIndexRange: " << this->FileIndexRange << endl;
+  os << indent << "FileNameMethod: " << (this->FileNameMethod ? this->FileNameMethod : "(null)") << endl;
+}
