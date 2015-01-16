@@ -237,6 +237,20 @@ void vtkSMRenderViewProxy::UpdateLOD()
 }
 
 //-----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::GetNeedsUpdate() {
+  vtkPVRenderView* view =
+    vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  if (view->GetUseInteractiveRenderingForScreenshots())
+    {
+    return this->NeedsUpdateLOD;
+    }
+  else
+    {
+    return this->NeedsUpdate;
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::StreamingUpdate(bool render_if_needed)
 {
   // FIXME: add a check to not do anything when in multi-client mode. We don't

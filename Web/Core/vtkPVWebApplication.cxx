@@ -163,7 +163,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
 
   if (value.NeedsRender == false &&
     value.Data != NULL &&
-    view->HasDirtyRepresentation() == false)
+    view->GetNeedsUpdate() == false)
     {
     //cout <<  "Reusing cache" << endl;
     bool latest = this->Internals->Encoder->GetLatestOutput(view->GetGlobalID(), value.Data);
