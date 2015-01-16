@@ -1,13 +1,19 @@
 r"""
     This module is a ParaViewWeb server application.
-    The following command line illustrate how to use it::
+    The following command line illustrates how to use it::
 
         $ pvpython .../pv_web_file_loader.py --data-dir /.../path-to-your-data-directory --file-to-load /.../any-vtk-friendly-file.vtk
 
         --file-to-load is optional and allow the user to pre-load a given dataset.
 
-        --data-dir is used to list that directory on the server and let the client
-                   choose a file to load.
+        --data-dir
+            Path used to list that directory on the server and let the client choose a
+            file to load.  You may also specify multiple directories, each with a name
+            that should be displayed as the top-level name of the directory in the UI.
+            If this parameter takes the form: "name1=path1|name2=path2|...",
+            then we will treat this as the case where multiple data directories are
+            required.  In this case, each top-level directory will be given the name
+            associated with the directory in the argument.
 
         --ds-host None
              Host name where pvserver has been started
@@ -21,22 +27,21 @@ r"""
         --rs-port 22222
               Port number to use to connect to the renderserver
 
-    Any ParaViewWeb executable script come with a set of standard arguments that
-    can be overriden if need be::
+    Any ParaViewWeb executable script comes with a set of standard arguments that can be overriden if need be::
 
         --port 8080
-             Port number on which the HTTP server will listen to.
+             Port number on which the HTTP server will listen.
 
         --content /path-to-web-content/
-             Directory that you want to server as static web content.
-             By default, this variable is empty which mean that we rely on another server
-             to deliver the static content and the current process only focus on the
-             WebSocket connectivity of clients.
+             Directory that you want to serve as static web content.
+             By default, this variable is empty which means that we rely on another
+             server to deliver the static content and the current process only
+             focuses on the WebSocket connectivity of clients.
 
         --authKey vtkweb-secret
              Secret key that should be provided by the client to allow it to make any
              WebSocket communication. The client will assume if none is given that the
-             server expect "vtkweb-secret" as secret key.
+             server expects "vtkweb-secret" as secret key.
 """
 
 # import to process args

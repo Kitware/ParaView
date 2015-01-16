@@ -47,7 +47,7 @@ __Python launcher config__
           ...,
           "visualizer": {
             "cmd": [
-              "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
+              "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py",
               "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
@@ -64,7 +64,7 @@ __Jetty launcher config__
     # ==================================================
     # Process command: pipeline_manager.py | pipeline
     # ==================================================
-    pw.pipeline.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py -f --data-dir <DATA-DIR> --port PORT --authKey SECRET
+    pw.pipeline.cmd=./bin/pvpython -dr ./lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py -f --data-dir <DATA-DIR> --port PORT --authKey SECRET
     pw.pipeline.cmd.run.dir=<PARAVIEW-INSTALL-DIRECTORY>
     pw.pipeline.cmd.map=PORT:getPort|SECRET:secret
 
@@ -117,7 +117,7 @@ __Python launcher config__
           ...,
           "visualizer": {
             "cmd": [
-              "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
+              "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py",
               "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
@@ -134,7 +134,7 @@ __Jetty launcher config__
     # ==================================================
     # Process command: pipeline_manager.py | pipeline
     # ==================================================
-    pw.pipeline.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py -f --data-dir <DATA-DIR> --port PORT --authKey SECRET
+    pw.pipeline.cmd=./bin/pvpython -dr ./lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py -f --data-dir <DATA-DIR> --port PORT --authKey SECRET
     pw.pipeline.cmd.run.dir=<PARAVIEW-INSTALL-DIRECTORY>
     pw.pipeline.cmd.map=PORT:getPort|SECRET:secret
 
@@ -218,7 +218,7 @@ __customScript.sh__
     export PATH=/opt/python-2.7.3/bin:\$PATH
     export LD_LIBRARY_PATH=/opt/python-2.7.3/lib
 
-    "/home/pvw-user/projects/ParaView/build/bin/pvpython" "/home/pvw-user/projects/ParaView/build/lib/site-packages/${app}" "--data-dir" "${datadir}" "--port" "${port}"
+    "/home/pvw-user/projects/ParaView/build/bin/pvpython" "-dr" "/home/pvw-user/projects/ParaView/build/lib/site-packages/${app}" "--data-dir" "${datadir}" "--port" "${port}"
     EOF
 
 In the above example, we made many simplifying assumptions in order to keep the configuration and script concise while still illustrating the important concepts.

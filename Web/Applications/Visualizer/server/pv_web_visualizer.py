@@ -1,16 +1,17 @@
 r"""
     This module is a ParaViewWeb server application.
-    The following command line illustrate how to use it::
+    The following command line illustrates how to use it::
 
-        $ pvpython .../pv_web_visualizer2.py --data-dir /.../path-to-your-data-directory
+        $ pvpython -dr .../pv_web_visualizer.py --data-dir /.../path-to-your-data-directory
 
         --data-dir
-             Path used to list that directory on the server and let the client choose a file to load.
-        You may also specify multiple directories, each with a name that should be displayed as the
-        top-level name of the directory in the UI.  If this parameter takes the form:
-        "name1=path1|name2=path2|...", then we will treat this as the case where multiple data
-        directories are required.  In this case, each top-level directory will be given the name
-        associated with the directory in the argument.
+             Path used to list that directory on the server and let the client choose a
+             file to load.  You may also specify multiple directories, each with a name
+             that should be displayed as the top-level name of the directory in the UI.
+             If this parameter takes the form: "name1=path1|name2=path2|...",
+             then we will treat this as the case where multiple data directories are
+             required.  In this case, each top-level directory will be given the name
+             associated with the directory in the argument.
 
         --load-file try to load the file relative to data-dir if any.
 
@@ -33,34 +34,43 @@ r"""
               Regular expression used to group files into a single loadable entity.
 
         --plugins
-            List of fully qualified path names to plugin objects to load
+            Colon-separated (':') list of fully qualified path names to plugin objects
+            to load.
+
+        --color-palette-file
+            File to load to define a set of color maps.  File format is the same as
+            for ParaViews 'ColorMaps.xml' configuration file.
 
         --proxies
-            Path to a file with json text containing sources, filters and readers allowed to be used
+            Path to a file with json text containing sources, filters and readers
+            allowed to be used by ParaViewWeb.
 
-        --any-readers
-            Use provided readers along with the one naturally available in ParaView
+        --no-auto-readers
+            If provided, disallows the use of readers not specifically mentioned in
+            the above proxies configuration file.  Do not provide this option if you
+            want paraview.simple to try and figure out the appropriate reader for
+            files you try to open.
 
-parser.add_argument("-d", "--debug",
-        help="log debugging messages to stdout",
-        action="store_true")
+        --reverse-connect-port
+            If supplied, a reverse connection will be established on the given port.
+            This option is useful when running in mpi mode and you want pvservers to
+            connect to this pvpython application.
 
-    Any ParaViewWeb executable script come with a set of standard arguments that
-    can be overriden if need be::
+    Any ParaViewWeb executable script comes with a set of standard arguments that can be overriden if need be::
 
         --port 8080
-             Port number on which the HTTP server will listen to.
+             Port number on which the HTTP server will listen.
 
         --content /path-to-web-content/
-             Directory that you want to server as static web content.
-             By default, this variable is empty which mean that we rely on another server
-             to deliver the static content and the current process only focus on the
-             WebSocket connectivity of clients.
+             Directory that you want to serve as static web content.
+             By default, this variable is empty which means that we rely on another
+             server to deliver the static content and the current process only
+             focuses on the WebSocket connectivity of clients.
 
         --authKey vtkweb-secret
-             Secret key that should be provided by the client to allow it to make any
-             WebSocket communication. The client will assume if none is given that the
-             server expect "vtkweb-secret" as secret key.
+             Secret key that should be provided by the client to allow it to make
+             any WebSocket communication. The client will assume if none is given
+             that the server expects "vtkweb-secret" as secret key.
 
 """
 

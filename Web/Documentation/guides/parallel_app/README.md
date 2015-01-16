@@ -119,8 +119,8 @@ Here is the content of the launcher.sh bash script:
 
     # Wait for the server to start and run the client
     sleep 1
-    echo $PVPYTHON $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --authKey $secret
-    $PVPYTHON $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --authKey $secret
+    echo $PVPYTHON -dr $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --authKey $secret
+    $PVPYTHON -dr $server -f --ds-host localhost --ds-port $MPIport --port $HTTPport --data-dir $DATA_DIR --authKey $secret
 
 ## Customize the values of the form
 

@@ -34,21 +34,21 @@ This section discusses the configuration of the Jetty launcher in such a way tha
     # ==================================================
     # Process command: data_prober.py      | data_prober
     # ==================================================
-    pw.data_prober.cmd=./bin/pvpython ../src/Web/Python/data_prober.py --data-dir /Data --port PORT -f --authKey SECRET
+    pw.data_prober.cmd=./bin/pvpython -dr ../src/Web/Python/data_prober.py --data-dir /Data --port PORT -f --authKey SECRET
     pw.data_prober.cmd.run.dir=/.../paraview-build/
     pw.data_prober.cmd.map=PORT:getPort|SECRET:secret
 
     # ==================================================
     # Process command: file_loader.py      | loader
     # ==================================================
-    pw.loader.cmd=./bin/pvpython ../src/Web/Python/file_loader.py --data-dir /Data --port PORT -f --authKey SECRET
+    pw.loader.cmd=./bin/pvpython -dr ../src/Web/Python/file_loader.py --data-dir /Data --port PORT -f --authKey SECRET
     pw.loader.cmd.run.dir=/.../paraview-build/
     pw.loader.cmd.map=PORT:getPort|SECRET:secret
 
     # ==================================================
     # Process command: pipeline_manager.py | pipeline
     # ==================================================
-    pw.pipeline.cmd=./bin/pvpython ../src/Web/Python/pipeline_manager.py --data-dir /Data --port PORT -f --authKey SECRET
+    pw.pipeline.cmd=./bin/pvpython -dr ../src/Web/Python/pipeline_manager.py --data-dir /Data --port PORT -f --authKey SECRET
     pw.pipeline.cmd.run.dir=/.../paraview-build/
     pw.pipeline.cmd.map=PORT:getPort|SECRET:secret
 
@@ -115,21 +115,21 @@ This section discusses configuring the Jetty launcher when it is to be used as o
     # ==================================================
     # Process command: data_prober.py      | data_prober
     # ==================================================
-    pw.data_prober.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_data_prober.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
+    pw.data_prober.cmd=./bin/pvpython -dr ./lib/paraview-4.1/site-packages/paraview/web/pv_web_data_prober.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
     pw.data_prober.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-RC1-Linux-64bit
     pw.data_prober.cmd.map=PORT:getPort|SECRET:secret
 
     # ==================================================
     # Process command: file_loader.py      | loader
     # ==================================================
-    pw.loader.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_file_loader.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
+    pw.loader.cmd=./bin/pvpython -dr ./lib/paraview-4.1/site-packages/paraview/web/pv_web_file_loader.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
     pw.loader.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-RC1-Linux-64bit
     pw.loader.cmd.map=PORT:getPort|SECRET:secret
 
     # ==================================================
     # Process command: pipeline_manager.py | pipeline
     # ==================================================
-    pw.pipeline.cmd=./bin/pvpython ./lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
+    pw.pipeline.cmd=./bin/pvpython -dr ./lib/paraview-4.1/site-packages/paraview/web/pv_web_visualizer.py -f --data-dir /home/ec2-user/ParaView/ParaViewData/Data --port PORT --authKey SECRET
     pw.pipeline.cmd.run.dir=/home/ec2-user/ParaView/ParaView-4.1.0-RC1-Linux-64bit
     pw.pipeline.cmd.map=PORT:getPort|SECRET:secret
 
