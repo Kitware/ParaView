@@ -12,7 +12,7 @@
 
     var TEMPLATE_START_GROUP = '<div class="alert pv-gray-light pv-collapsable-content EXPANDED" role="alert"><div class="pv-collapse-title pv-collapsable-action clickable"><span class="vtk-icon-plus-circled">NAME</span></div><div class="pv-no-collapse-title pv-collapsable-action clickable"><span class="vtk-icon-minus-circled pv-absolute-left">NAME</span></div>',
         TEMPLATE_END_GROUP = "</div>",
-        TEMPLATE_COLOR_BY_PANEL = "<div class='row pv-color-panel' data-proxy-id='REP_ID'><label class='col-sm-4 control-label'>Color By</label><div class='col-sm-8 text-center'><select class='form-control pv-form-height array' style='margin-bottom: 5px;' data-cancel-value='VALUES'>ARRAY_OPTIONS</select><select class='form-control pv-form-height component' style='margin-bottom: 5px;'></select><select class='form-control pv-form-height palette' style='margin-bottom: 5px;'>PALETTE_OPTIONS</select></div></div>",
+        TEMPLATE_COLOR_BY_PANEL = "<div class='row pv-color-panel' style='margin-bottom: 17px;' data-proxy-id='REP_ID'><label class='col-sm-4 control-label'>Color By</label><div class='col-sm-8 text-center'><select class='form-control pv-form-height array' style='margin-bottom: 5px;' data-cancel-value='VALUES'>ARRAY_OPTIONS</select><select class='form-control pv-form-height component' style='margin-bottom: 5px;'></select><select class='form-control pv-form-height palette' style='margin-bottom: 5px;'>PALETTE_OPTIONS</select><div class='color-options-button-panel col-sm-4' style='position: absolute; bottom: 4px; left: -50%; width: 50%; text-align: left; margin-left: -2px'><span class='vtk-icon-chart-area clickable' data-action='toggle-scalar-opacity-editor' data-toggle='tooltip' data-placement='bottom' title='Toggle Scalar Opacity Function Editor'></span></div></div><div class='scalar-opacity-editor-container row-property'></div></div>",
         TEMPLATE_DELETE = "<span class='vtk-icon-trash clickable' data-action='delete-proxy' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Delete Pipeline Component'></span>",
         TEMPLATE_EDITOR = "<div class='pv-editor-bar text-center pv-gray-dark row' style='padding-bottom: 5px;margin-bottom: 15px;'><span class='float-left vtk-icon-tools clickable' data-action='toggle-advance-properties' data-toggle='tooltip' data-placement='bottom' title='Toggle Advanced Properties'></span><span class='float-left clickable vtk-icon-bookmarkEMPTY' data-action='toggle-scalarbar' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Legend'></span><span class='float-left vtk-icon-resize-horizontal-1 clickable' data-action='rescale-data' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Rescale Colors To Data Range'></span>TITLE CAN_DELETE<span class='float-right vtk-icon-cancel clickable' data-action='reset-property-values' data-toggle='tooltip' data-placement='bottom' title='Reset Properties'></span><span class='float-right vtk-icon-ok clickable' data-action='apply-property-values' data-toggle='tooltip' data-placement='bottom' title='Apply Properties'></span></div>PROPERTIES",
         TEMPLATE_OPTION = "<option SELECTED value='VALUE'>LABEL</option>",
@@ -20,38 +20,38 @@
         // ID, NAME, LABEL, TYPE(str,number), DEPENDENCY, VALUE, VALUE1-6, CHECKED, OPTIONS, MIN, MAX, VALUES
         TEMPLATE_PROPERTIES = {
             checkbox: function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8'><input type='checkbox' class='checkbox value' data-type='TYPE' CHECKED cancel-value='VALUE'></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'><input type='checkbox' class='checkbox value' data-type='TYPE' CHECKED cancel-value='VALUE'></div></div>";
             },
 
             textfield: function(layout) {
                 switch(layout) {
                     case 1:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8 text-center'><input class='form-control pv-form-height value' data-type='TYPE' type='text' value='VALUE' cancel-value='VALUE'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='form-control pv-form-height value' data-type='TYPE' type='text' value='VALUE' cancel-value='VALUE'/></div></div>";
                     case 2:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='2'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8 text-center'><input class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input class='pv-form-height value float-right' style='width: 48%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='2'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value float-right' style='width: 48%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/></div></div>";
                     case 3:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='3'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8 text-center'><input class='pv-form-height value float-left' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input class='pv-form-height value' style='width: 30%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input class='pv-form-height value float-right' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='3'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value float-left' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value' style='width: 30%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input TOOLTIPRANGE3 class='pv-form-height value float-right' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/></div></div>";
                     case 6:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8 text-center'><input class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input class='pv-form-height value float-right' style='width: 48%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/><input class='pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/><input class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/><input class='pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value float-right' style='width: 48%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input TOOLTIPRANGE3 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/><input TOOLTIPRANGE4 class='pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/><input TOOLTIPRANGE5 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/><input TOOLTIPRANGE6 class='pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/></div></div>";
                     case 16:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8 text-center'><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input class='pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE7' cancel-value='VALUE7'/><input class='pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE8' cancel-value='VALUE8'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE9' cancel-value='VALUE9'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE10' cancel-value='VALUE10'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE11' cancel-value='VALUE11'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE12' cancel-value='VALUE12'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE13' cancel-value='VALUE13'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE14' cancel-value='VALUE14'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE15' cancel-value='VALUE15'/><input class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE16' cancel-value='VALUE16'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input TOOLTIPRANGE3 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/><input TOOLTIPRANGE4 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/><input TOOLTIPRANGE5 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/><input TOOLTIPRANGE6 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/><input TOOLTIPRANGE7 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE7' cancel-value='VALUE7'/><input TOOLTIPRANGE8 class='pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE8' cancel-value='VALUE8'/><input TOOLTIPRANGE9 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE9' cancel-value='VALUE9'/><input TOOLTIPRANGE10 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE10' cancel-value='VALUE10'/><input TOOLTIPRANGE11 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE11' cancel-value='VALUE11'/><input TOOLTIPRANGE12 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE12' cancel-value='VALUE12'/><input TOOLTIPRANGE13 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE13' cancel-value='VALUE13'/><input TOOLTIPRANGE14 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE14' cancel-value='VALUE14'/><input TOOLTIPRANGE15 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE15' cancel-value='VALUE15'/><input TOOLTIPRANGE16 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE16' cancel-value='VALUE16'/></div></div>";
                     case -1:
                     case 0:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='-1' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-12 control-label'>LABEL<span class='vtk-icon-plus clickable float-right' data-action='add-value'></span></label>VALUES</div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='-1' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-12 control-label' TOOLTIPDOC>LABEL<span class='vtk-icon-plus clickable float-right' data-action='add-value'></span></label>VALUES</div>";
                 }
                 return "NOT FOUND layout " + layout;
             },
             slider: function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8'><input class='form-control pv-form-height' type='range' value='VALUE' min='MIN' max='MAX' step='1'></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8' TOOLTIPRANGE1><input class='form-control pv-form-height' type='range' value='VALUE' min='MIN' max='MAX' step='1'></div></div>";
             },
             'list-1': function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8'><select class='form-control pv-form-height value' data-type='TYPE' cancel-value='VALUE'>OPTIONS</select></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'><select class='form-control pv-form-height value' data-type='TYPE' cancel-value='VALUE'>OPTIONS</select></div></div>";
             },
             'list-n': function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8'><select class='form-control pv-form-height value multiple' data-type='TYPE' multiple cancel-value='VALUE'>OPTIONS</select></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'><select class='form-control pv-form-height value multiple' data-type='TYPE' multiple cancel-value='VALUE'>OPTIONS</select></div></div>";
             },
             textarea:function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label'>LABEL</label><div class='col-sm-8 text-center'><textarea rows='5' class='form-control pv-form-height value textarea' data-type='TYPE' cancel-value='VALUE'>VALUE</textarea></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center' TOOLTIPRANGE1><textarea rows='5' class='form-control pv-form-height value textarea' data-type='TYPE' cancel-value='VALUE'>VALUE</textarea></div></div>";
             },
             'unknown': function(layout) {
                 return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'>No widget type defined for prop NAME</div>";
@@ -125,7 +125,7 @@
 
     // ------------------------------------------------------------------------
 
-    function apply(container) {
+    function apply(container, doColorExtract) {
         var propertyList = [];
         $('.property').each(function(){
             var change = extractProperty($(this));
@@ -133,10 +133,14 @@
                 propertyList.push(change);
             }
         });
+        var cb = {};
+        if (doColorExtract === true) {
+            cb = extractColorBy();
+        }
         container.trigger({
             type: 'apply',
             properties: propertyList,
-            colorBy: extractColorBy()
+            colorBy: cb
         });
     }
 
@@ -158,8 +162,8 @@
     }
 
     function showAdvanceProperty(mainContainer, show) {
-        var advanceProps = $('.property[data-advanced=1]'),
-            advanceButton = $('.pv-editor-bar span[data-action="toggle-advance-properties"]');
+        var advanceProps = $('.property[data-advanced=1]', mainContainer),
+            advanceButton = $('.pv-editor-bar span[data-action="toggle-advance-properties"]', mainContainer);
         if(show) {
             advanceButton.addClass('pv-text-red');
             mainContainer.addClass('advance-on');
@@ -235,7 +239,13 @@
                 scalarbarVisibility = (colorByInfo.scalarBar === 1) ? true : false,
                 activeArrayStr = (colorByInfo.mode === 'array') ? colorByInfo.array.slice(0,2).join(':') : 'solid',
                 activeArrayComp = (colorByInfo.mode === 'array') ? colorByInfo.array[2].toString() : '0',
-                activePalette = 'FIXME not yet available';
+                activePalette = 'FIXME not yet available',
+                wantColorManagement = !$.isEmptyObject(colorByInfo),
+                scalarOpacityEditorDisabled = false,
+                scalarOpacityEditorInitialized = false;
+
+            // Make sure all old tooltips are cleaned up...
+            $('.tooltip').remove();
 
             // Update DOM
             for(var idx = 0; idx < count; ++idx) {
@@ -324,6 +334,25 @@
                                .replace(/ADVANCED/g, ui.advanced ? '1' : '0')
                                .replace(/DEPENDENCY/g, dependency);
 
+                    // Set the tooltip values based on the retrieved documentation
+                    if (ui.doc !== undefined) {
+                        html = html.replace(/TOOLTIPDOC/g, "data-toggle='tooltip' data-placement='right' title='" + ui.doc + "'");
+                    } else {
+                        html = html.replace(/TOOLTIPDOC/g, '');
+                    }
+
+                    // If the server had range information for this property, add tooltip/s for it
+                    if (ui.range !== undefined) {
+                        // deliberately start at the end to avoid TOOLTIPRANGE1 matching on TOOLTIPRANGE11
+                        for (var rangeIdx = ui.range.length - 1; rangeIdx >= 0; rangeIdx -= 1) {
+                            var ttRegex = new RegExp('TOOLTIPRANGE' + (rangeIdx + 1), 'g');
+                            var range = ui.range[rangeIdx];
+                            html = html.replace(ttRegex, "data-toggle='tooltip' data-placement='right' title='Range: [" + range.min + ', ' + range.max + "]'");
+                        }
+                    } else {
+                        html = html.replace(/TOOLTIPRANGE1/g, '');
+                    }
+
                     // Handle values based on type
                     if(ui.widget.indexOf('list') != -1) {
                         html = html.replace(/VALUE/g, value).replace(/SIZE/g, ui.size).replace(/TYPE/g, ui.type);
@@ -395,6 +424,17 @@
                 .replace(/_ID_/g, proxyId)
                 .replace(/EMPTY/g, scalarbarVisibility ? '' : '-empty');
 
+            if (wantColorManagement === true) {
+                // Disable editing of scalar opacity function if not coloring by an array
+                if (colorByInfo.array.length < 2 || colorByInfo.array[1] === '') {
+                    $('[data-action=toggle-scalar-opacity-editor]').css('opacity', 0.3);
+                    scalarOpacityEditorDisabled = true;
+                }
+            } else {
+                $('[data-action=toggle-scalarbar]', me).hide();
+                $('[data-action=rescale-data]', me).hide();
+            }
+
             // Annotate properties with dependencies with 'has-dependency' class
             for(var key in propertiesWithDependencies) {
                 try {
@@ -427,8 +467,10 @@
                             type: 'delete-proxy',
                             id: target_container.attr('data-proxy-id')
                         });
+                        // Make sure all old tooltips are cleaned up...
+                        $('.tooltip').remove();
                     } else if (action === 'apply-property-values') {
-                        apply(me);
+                        apply(me, wantColorManagement);
                     } else if (action === 'toggle-scalarbar') {
                         me.trigger({
                             type: 'scalarbar-visibility',
@@ -448,6 +490,37 @@
                         var propertyContainer = target_container.parent().parent();
                         propertyContainer.addClass('has-change');
                         propertyContainer.append(TEMPLATE_VALUE.replace(/VALUE/g, 0).replace(/TYPE/g, propertyContainer.attr('data-type')));
+                    } else if (action === 'toggle-scalar-opacity-editor' && scalarOpacityEditorDisabled === false) {
+                        var opacityEditorElt = $('.scalar-opacity-editor-container');
+                        if (!opacityEditorElt.is(':visible')) {
+                            opacityEditorElt.show();
+                            if (scalarOpacityEditorInitialized === false) {
+                                var currentColorBy = extractColorBy();
+                                me.trigger({
+                                    type: 'initialize-scalar-opacity-widget',
+                                    container: opacityEditorElt,
+                                    colorArray: currentColorBy.array
+                                });
+
+                                opacityEditorElt.on('update-opacity-points', function(opEvt) {
+                                    var proxyId = $(this).parent().attr('data-proxy-id');
+                                    var newColorBy = extractColorBy();
+                                    me.trigger({
+                                        colorBy: newColorBy,
+                                        type: 'update-scalar-opacity-function',
+                                        points: opEvt.opacityPoints
+                                    });
+                                    me.trigger({
+                                        colorBy: newColorBy,
+                                        type: 'store-scalar-opacity-parameters',
+                                        parameters: { 'linearPoints': opEvt.linearPoints, 'gaussianPoints': opEvt.gaussianPoints }
+                                    });
+                                });
+                                scalarOpacityEditorInitialized = true;
+                            }
+                        } else {
+                            opacityEditorElt.hide();
+                        }
                     }
                 });
             }

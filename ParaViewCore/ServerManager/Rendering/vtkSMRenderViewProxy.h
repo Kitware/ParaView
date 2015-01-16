@@ -153,6 +153,10 @@ public:
   virtual void Update();
 
   // Description:
+  // We override that method to handle LOD and non-LOD NeedsUpdate in transparent manner.
+  virtual bool GetNeedsUpdate();
+
+  // Description:
   // Called to render a streaming pass. Returns true if the view "streamed" some
   // geometry.
   bool StreamingUpdate(bool render_if_needed);

@@ -3,6 +3,8 @@
         viewport,
         pipeline,
         proxyEditor,
+        settingsEditor,
+        rvSettingsProxyId = null,
         infoManager,
         busyElement = $('.busy').hide(),
         notBusyElement = $('.not-busy').show(),
@@ -174,10 +176,15 @@
 
     function addScrollBehavior() {
         $('.inspector-container').scroll(function (event) {
-            var y = $(this).scrollTop(),
-                pipelineHeight = $('.pv-pipeline').height();
-            if (y >= pipelineHeight) {
-                $('.pv-editor-bar').addClass('pv-fixed').css('top', (y-pipelineHeight)+'px');
+            var y = $(this).scrollTop();
+                reservedHeight = 0;
+            if ($('.pv-pipeline').is(':visible') === true) {
+                reservedHeight = $('.pv-pipeline').height();
+            } else if ($('.pv-preferences').is(':visible') === true) {
+                reservedHeight = $('.pv-preferences').height();
+            }
+            if (y >= reservedHeight) {
+                $('.pv-editor-bar').addClass('pv-fixed').css('top', (y-reservedHeight)+'px');
             } else {
                 $('.pv-editor-bar').removeClass('pv-fixed');
             }
@@ -395,6 +402,67 @@
     }
 
     // ========================================================================
+    // Global settings management
+    // ========================================================================
+
+    function reloadSettingsEditor() {
+        startWorking();
+        settingsEditor.empty();
+
+        if (rvSettingsProxyId !== null) {
+            session.call('pv.proxy.manager.get', [rvSettingsProxyId]).then(function(rvSettingsProps) {
+
+                var props = [].concat(
+                    "+RenderViewSettings", rvSettingsProps.properties, '_RenderViewSettings'
+                    ),
+                ui = [].concat(
+                    "+RenderViewSettings", rvSettingsProps.ui, '_RenderViewSettings'
+                    );
+
+                settingsEditor.proxyEditor("Global Settings", false, 0, props, ui, [], [], {});
+
+                workDone();
+            }, function(rvSettingsErr) {
+                console.log("Failed to get the RenderViewSettings proxy properties:");
+                console.log(rvSettingsErr);
+                workDone();
+            });
+        }
+    }
+
+    function createGlobalSettingsPanel(settingsSelector) {
+        startWorking();
+        settingsEditor = $(settingsSelector);
+
+        // Get the proxy id of the RenderViewSettings proxy
+        session.call('pv.proxy.manager.find.id', ['settings', 'RenderViewSettings']).then(function(proxyId) {
+            rvSettingsProxyId = proxyId;
+            workDone();
+            reloadSettingsEditor();
+        }, function(proxyIdErr) {
+            console.log('Error getting RenderViewSettings proxy id:');
+            console.log(proxyIdErr);
+            workDone();
+        });
+
+        // To apply render view settings, first update the proxy, then reload it
+        settingsEditor.bind('apply', function(evt) {
+            startWorking();
+            session.call('pv.proxy.manager.update', [evt.properties]).then(function(updateResult) {
+                console.log("Successfully updated RenderViewSettings proxy:")
+                console.log(updateResult);
+                viewport.invalidateScene();
+                reloadSettingsEditor();
+                workDone();
+            }, function(updateError) {
+                console.log("Failed to update RenderViewSettings proxy:")
+                console.log(updateError);
+                workDone();
+            });
+        });
+    }
+
+    // ========================================================================
     // Proxy Editor management (update + delete)
     // ========================================================================
 
@@ -404,6 +472,9 @@
         proxyEditor.bind('apply', onProxyApply);
         proxyEditor.bind('scalarbar-visibility', onScalarBarVisibility);
         proxyEditor.bind('rescale-transfer-function', onRescaleTransferFunction);
+        proxyEditor.bind('update-scalar-opacity-function', onUpdateOpacityPoints);
+        proxyEditor.bind('store-scalar-opacity-parameters', onStoreOpacityParameters);
+        proxyEditor.bind('initialize-scalar-opacity-widget', onInitializeScalarOpacityWidget);
     }
 
     // ------------------------------------------------------------------------
@@ -441,6 +512,30 @@
 
     // ------------------------------------------------------------------------
 
+    function onUpdateOpacityPoints(event) {
+        var colorBy = event.colorBy;
+        if (colorBy.array.length >= 2 && colorBy.array[1] !== '') {
+            var args = [colorBy.representation, colorBy.array, event.points];
+            startWorking();
+            session.call('pv.color.manager.opacity.points.set', args).then(function(successResult) {
+                viewport.invalidateScene();
+                workDone();
+            }, workDone);
+        }
+    }
+
+    function onStoreOpacityParameters(event) {
+        var colorArray = event.colorBy.array;
+        if (colorArray.length >= 2 && colorArray[1] !== '') {
+            var storeKey = colorArray[1] + ":opacityParameters";
+            var args = [storeKey, event.parameters];
+            startWorking();
+            session.call('pv.keyvaluepair.store', args).then(workDone, workDone);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
     function onRescaleTransferFunction(event) {
         startWorking();
         var options = { proxyId: event.id, type: event.mode };
@@ -456,13 +551,15 @@
     function onNewProxyLoaded() {
         if(pipelineDataModel.metadata && pipelineDataModel.source && pipelineDataModel.representation && pipelineDataModel.view) {
             var props = [].concat(
+                    "ColorByPanel",
                     "+Source", pipelineDataModel.source.properties, '_Source',
-                    "-Representation", "ColorByPanel", pipelineDataModel.representation.properties, '_Representation',
+                    "-Representation", pipelineDataModel.representation.properties, '_Representation',
                     "-View", pipelineDataModel.view.properties, "_View"
                     ),
                 ui = [].concat(
+                    "ColorByPanel",
                     "+Source", pipelineDataModel.source.ui, '_Source',
-                    "-Representation", "ColorByPanel", pipelineDataModel.representation.ui, '_Representation',
+                    "-Representation", pipelineDataModel.representation.ui, '_Representation',
                     "-View", pipelineDataModel.view.ui, "_View"
                     );
 
@@ -489,6 +586,37 @@
                 updateView();
             }
         }
+    }
+
+    // ========================================================================
+    // Opacity editor widget creation
+    // ========================================================================
+    function onInitializeScalarOpacityWidget(event) {
+        var container = event.container;
+        var colorArray = event.colorArray;
+
+        var initOptions = {
+            'buttonsPosition': 'top',
+            'topMargin': 10,
+            'rightMargin': 15,
+            'bottomMargin': 10,
+            'leftMargin': 15
+        };
+
+        if (colorArray.length >= 2 && colorArray[1] !== '') {
+            var retrieveKey = colorArray[1] + ":opacityParameters";
+
+            session.call('pv.keyvaluepair.retrieve', [retrieveKey]).then(function(result) {
+                if (result !== null) {
+                    initOptions.gaussiansList = result.gaussianPoints;
+                    initOptions.linearPoints = result.linearPoints;
+                }
+                container.opacityEditor(initOptions);
+                workDone();
+            }, workDone);
+        }
+
+        container.opacityEditor(initOptions);
     }
 
     // ========================================================================
@@ -544,7 +672,7 @@
     // Main - Visualizer Setup
     // ========================================================================
 
-    function initializeVisualizer(session_, viewportSelector, pipelineSelector, proxyEditorSelector, fileSelector, sourceSelector, filterSelector, dataInfoSelector) {
+    function initializeVisualizer(session_, viewportSelector, pipelineSelector, proxyEditorSelector, fileSelector, sourceSelector, filterSelector, dataInfoSelector, settingsSelector) {
         session = session_;
 
         // Initialize data and DOM behavior
@@ -563,6 +691,7 @@
         createPipelineManagerView(pipelineSelector);
         createProxyEditorView(proxyEditorSelector);
         createDataInformationPanel(dataInfoSelector);
+        createGlobalSettingsPanel(settingsSelector);
 
         // Set initial state
         $('.need-input-source').hide();

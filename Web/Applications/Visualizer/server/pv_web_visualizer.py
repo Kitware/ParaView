@@ -156,6 +156,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebTimeHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebSelectionHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebWidgetManager())
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebKeyValuePairStore())
 
         # Update authentication key to use
         self.updateSecret(_VisualizerServer.authKey)
