@@ -10,48 +10,141 @@
  */
 (function (GLOBAL, $) {
 
-    var TEMPLATE_START_GROUP = '<div class="alert pv-gray-light pv-collapsable-content EXPANDED" role="alert"><div class="pv-collapse-title pv-collapsable-action clickable"><span class="vtk-icon-plus-circled">NAME</span></div><div class="pv-no-collapse-title pv-collapsable-action clickable"><span class="vtk-icon-minus-circled pv-absolute-left">NAME</span></div>',
+    var TEMPLATE_START_GROUP = '<div class="pv-collapsable-content EXPANDED"><div class="pv-collapse-title pv-collapsable-action clickable">' +
+        '<span class="vtk-icon-plus">NAME</span></div><div class="pv-collapse-title no-collapse pv-collapsable-action clickable">' +
+        '<span class="vtk-icon-minus">NAME</span></div>',
         TEMPLATE_END_GROUP = "</div>",
-        TEMPLATE_COLOR_BY_PANEL = "<div class='row pv-color-panel' style='margin-bottom: 17px;' data-proxy-id='REP_ID'><label class='col-sm-4 control-label'>Color By</label><div class='col-sm-8 text-center'><select class='form-control pv-form-height array' style='margin-bottom: 5px;' data-cancel-value='VALUES'>ARRAY_OPTIONS</select><select class='form-control pv-form-height component' style='margin-bottom: 5px;'></select><select class='form-control pv-form-height palette' style='margin-bottom: 5px;'>PALETTE_OPTIONS</select><div class='color-options-button-panel col-sm-4' style='position: absolute; bottom: 4px; left: -50%; width: 50%; text-align: left; margin-left: -2px'><span class='vtk-icon-chart-area clickable' data-action='toggle-scalar-opacity-editor' data-toggle='tooltip' data-placement='bottom' title='Toggle Scalar Opacity Function Editor'></span></div></div><div class='scalar-opacity-editor-container row-property'></div></div>",
-        TEMPLATE_DELETE = "<span class='vtk-icon-trash clickable' data-action='delete-proxy' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Delete Pipeline Component'></span>",
-        TEMPLATE_EDITOR = "<div class='pv-editor-bar text-center pv-gray-dark row' style='padding-bottom: 5px;margin-bottom: 15px;'><span class='float-left vtk-icon-tools clickable' data-action='toggle-advance-properties' data-toggle='tooltip' data-placement='bottom' title='Toggle Advanced Properties'></span><span class='float-left clickable vtk-icon-bookmarkEMPTY' data-action='toggle-scalarbar' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Legend'></span><span class='float-left vtk-icon-resize-horizontal-1 clickable' data-action='rescale-data' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Rescale Colors To Data Range'></span>TITLE CAN_DELETE<span class='float-right vtk-icon-cancel clickable' data-action='reset-property-values' data-toggle='tooltip' data-placement='bottom' title='Reset Properties'></span><span class='float-right vtk-icon-ok clickable' data-action='apply-property-values' data-toggle='tooltip' data-placement='bottom' title='Apply Properties'></span></div>PROPERTIES",
+        TEMPLATE_COLOR_BY_PANEL = "<div class='row pv-color-panel' data-proxy-id='REP_ID'><div class='col-sm-4'><div class='row'>" +
+        "<label class='clickable color-by-label col-sm-12 col-xs-6 control-label top-property' data-proxy-id='_ID_' data-action='toggle-scalarbar' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Legend'>" +
+        "<span class='toggle-scalarbar-button clickable vtk-icon-bookmarkEMPTY' data-proxy-id='_ID_' data-action='toggle-scalarbar'></span>" +
+        "Color</label>" +
+        "<span class='hidden-xs pv-form-height col-sm-12 color-by-column-empty-row top-property'></span>" +
+        "<div class='pv-form-height col-sm-12 col-xs-6 color-options-button-panel top-property'>" +
+        "<div class='btn-group' role='group'>" +
+        "<span class='vtk-icon-tint color-customization-button btn btn-default btn-xs' data-action='toggle-color-editor' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Editor'></span>" +
+        "<span class='vtk-icon-chart-area color-customization-button btn btn-default btn-xs' data-action='toggle-scalar-opacity-editor' data-toggle='tooltip' data-placement='bottom' title='Toggle Opacity Editor'></span>" +
+        "<span class='vtk-icon-resize-horizontal-1 color-customization-button btn btn-default btn-xs' data-action='toggle-scalar-range-editor' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Range Editor'></span>" +
+        "</div></div></div></div>" +
+        "<div class='col-sm-8 text-center'>" +
+        "<select class='form-control pv-form-height array bottom-property top-property' data-cancel-value='VALUES' data-action='rescale-to-data' data-toggle='tooltip' data-placement='bottom' title='Array Name'>ARRAY_OPTIONS</select>" +
+        "<select class='form-control pv-form-height component bottom-property top-property' data-action='rescale-to-data' data-toggle='tooltip' data-placement='bottom' title='Array Component'></select>" +
+        "<select class='form-control pv-form-height palette bottom-property top-property' data-action='rescale-to-data' data-toggle='tooltip' data-placement='bottom' title='Preset Color Map'>PALETTE_OPTIONS</select>" +
+        "</div>" +
+        "<div class='scalar-opacity-editor-container'></div>" +
+        "<div class='color-editor-container row' style='margin-top: 5px; margin-right: 30px; margin-left: 0;'>" +
+        "<span class='coming-soon-placeholder col-xs-12 col-sm-12 top-property bottom-property'>Coming Soon: Color Map Editor</span>" +
+        "</div>" +
+        "<div class='scalar-range-editor-container' style='display: none;'><div class='col-sm-4'><div class='row'>" +
+        "<label class='col-sm-12 col-xs-6 color-by-label control-label top-property' data-toggle='tooltip' data-placement='bottom' title='Scalar Color Range'>Range</label>" +
+        "<div class='top-property pv-form-height col-sm-12 col-xs-6 scalar-range-button-container color-options-button-panel' data-proxy-id='_ID_'>" +
+        "<span class='vtk-icon-resize-horizontal-1 scalar-range-button btn btn-default btn-xs' data-action='rescale-to-data' data-toggle='tooltip' data-placement='bottom' title='Rescale to Data Range'></span>" +
+        "<span class='vtk-icon-clock-1 scalar-range-button btn btn-default btn-xs' data-action='rescale-to-time' data-toggle='tooltip' data-placement='bottom' title='Rescale Over All Timesteps'></span>" +
+        "<span class='vtk-icon-ok scalar-range-button btn btn-default btn-xs' data-action='rescale-to-custom' data-toggle='tooltip' data-placement='bottom' title='Apply Color Range'></span>" +
+        "</div></div></div>" +
+        "<div class='scalar-range-input-container col-sm-8 text-center'>" +
+        "<input type='text' class='bottom-property top-property scalar-range-min form-control pv-form-height value' data-toggle='tooltip' data-placement='bottom' title='Minimum Scalar Color'>" +
+        "<input type='text' class='bottom-property top-property scalar-range-max form-control pv-form-height value' data-toggle='tooltip' data-placement='bottom' title='Maximum Scalar Color'>" +
+        "</div></div></div>",
+        TEMPLATE_DELETE = "<span class='button-padding-right button-padding-left-small vtk-icon-trash clickable' data-action='delete-proxy' data-proxy-id='_ID_' data-toggle='tooltip' data-placement='bottom' title='Delete Pipeline Component'></span>",
+        TEMPLATE_EDITOR = "<div class='pv-editor-bar text-center pv-gray-dark row' style='padding-bottom: 5px;'>" +
+        "<span class='float-left button-padding-right vtk-icon-tools clickable' data-action='toggle-advance-properties' data-toggle='tooltip' data-placement='bottom' title='Toggle Advanced Properties'></span>" +
+        "<span class='button-padding-left button-padding-right-small clickable' data-action='reset-property-values' data-toggle='tooltip' data-placement='bottom' title='Reset Properties'>TITLE</span>" +
+        "CAN_DELETE" +
+        "<span class='float-right button-padding-left vtk-icon-ok clickable' data-action='apply-property-values' data-toggle='tooltip' data-placement='bottom' title='Apply Properties'></span>" +
+        "</div>" +
+        "PROPERTIES",
         TEMPLATE_OPTION = "<option SELECTED value='VALUE'>LABEL</option>",
-        TEMPLATE_VALUE = "<div class='col-sm-12'style='margin: 5px 0'><input type='text' class='form-control pv-form-height value' data-type='TYPE' value='VALUE' cancel-value='VALUE' style='width: 90%;display: inline-block;'><span class='vtk-icon-trash clickable float-right' data-action='delete-value'></span></div>",
+        TEMPLATE_VALUE = "<div class='col-sm-12'style='margin: 5px 0'>" +
+        "<input type='text' class='form-control pv-form-height value' data-type='TYPE' value='VALUE' cancel-value='VALUE' style='width: 90%;display: inline-block;'>" +
+        "<span class='vtk-icon-trash clickable float-right' data-action='delete-value'></span></div>",
         // ID, NAME, LABEL, TYPE(str,number), DEPENDENCY, VALUE, VALUE1-6, CHECKED, OPTIONS, MIN, MAX, VALUES
         TEMPLATE_PROPERTIES = {
             checkbox: function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'><input type='checkbox' class='checkbox value' data-type='TYPE' CHECKED cancel-value='VALUE'></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                       "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'>" +
+                       "<input type='checkbox' class='checkbox value' data-type='TYPE' CHECKED cancel-value='VALUE'></div></div>";
             },
 
             textfield: function(layout) {
                 switch(layout) {
                     case 1:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='form-control pv-form-height value' data-type='TYPE' type='text' value='VALUE' cancel-value='VALUE'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                               "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'>" +
+                               "<input TOOLTIPRANGE1 class='form-control pv-form-height value' data-type='TYPE' type='text' value='VALUE' cancel-value='VALUE'/>" +
+                               "</div></div>";
                     case 2:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='2'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value float-right' style='width: 48%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='2'  data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                               "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'>" +
+                               "<input TOOLTIPRANGE1 class='light-form-control pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/>" +
+                               "<input TOOLTIPRANGE2 class='light-form-control pv-form-height value float-right' style='width: 48%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/>" +
+                               "</div></div>";
                     case 3:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='3'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value float-left' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value' style='width: 30%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input TOOLTIPRANGE3 class='pv-form-height value float-right' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='3'  data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                               "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'>" +
+                               "<input TOOLTIPRANGE1 class='light-form-control pv-form-height value float-left' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/>" +
+                               "<input TOOLTIPRANGE2 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE2' cancel-value='VALUE2'/>" +
+                               "<input TOOLTIPRANGE3 class='light-form-control pv-form-height value float-right' data-type='TYPE' style='width: 30%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/>" +
+                               "</div></div>";
                     case 6:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value float-right' style='width: 48%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input TOOLTIPRANGE3 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/><input TOOLTIPRANGE4 class='pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/><input TOOLTIPRANGE5 class='pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/><input TOOLTIPRANGE6 class='pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                               "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'>" +
+                               "<input TOOLTIPRANGE1 class='light-form-control pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/>" +
+                               "<input TOOLTIPRANGE2 class='light-form-control pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE2' cancel-value='VALUE2'/>" +
+                               "<input TOOLTIPRANGE3 class='light-form-control pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/>" +
+                               "<input TOOLTIPRANGE4 class='light-form-control pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/>" +
+                               "<input TOOLTIPRANGE5 class='light-form-control pv-form-height value float-left' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/>" +
+                               "<input TOOLTIPRANGE6 class='light-form-control pv-form-height value float-right' data-type='TYPE' style='width: 48%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/>" +
+                               "</div></div>";
                     case 16:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'><input TOOLTIPRANGE1 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/><input TOOLTIPRANGE2 class='pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/><input TOOLTIPRANGE3 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/><input TOOLTIPRANGE4 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/><input TOOLTIPRANGE5 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/><input TOOLTIPRANGE6 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/><input TOOLTIPRANGE7 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE7' cancel-value='VALUE7'/><input TOOLTIPRANGE8 class='pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE8' cancel-value='VALUE8'/><input TOOLTIPRANGE9 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE9' cancel-value='VALUE9'/><input TOOLTIPRANGE10 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE10' cancel-value='VALUE10'/><input TOOLTIPRANGE11 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE11' cancel-value='VALUE11'/><input TOOLTIPRANGE12 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE12' cancel-value='VALUE12'/><input TOOLTIPRANGE13 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE13' cancel-value='VALUE13'/><input TOOLTIPRANGE14 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE14' cancel-value='VALUE14'/><input TOOLTIPRANGE15 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE15' cancel-value='VALUE15'/><input TOOLTIPRANGE16 class='pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE16' cancel-value='VALUE16'/></div></div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='6'  data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                               "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center'>" +
+                               "<input TOOLTIPRANGE1 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE1' cancel-value='VALUE1'/>" +
+                               "<input TOOLTIPRANGE2 class='light-form-control pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE2' cancel-value='VALUE2'/>" +
+                               "<input TOOLTIPRANGE3 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE3' cancel-value='VALUE3'/>" +
+                               "<input TOOLTIPRANGE4 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE4' cancel-value='VALUE4'/>" +
+                               "<input TOOLTIPRANGE5 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE5' cancel-value='VALUE5'/>" +
+                               "<input TOOLTIPRANGE6 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE6' cancel-value='VALUE6'/>" +
+                               "<input TOOLTIPRANGE7 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE7' cancel-value='VALUE7'/>" +
+                               "<input TOOLTIPRANGE8 class='light-form-control pv-form-height value' style='width: 22%;color: #555;background-color: #fff;' data-type='TYPE' type='text' value='VALUE8' cancel-value='VALUE8'/>" +
+                               "<input TOOLTIPRANGE9 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE9' cancel-value='VALUE9'/>" +
+                               "<input TOOLTIPRANGE10 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE10' cancel-value='VALUE10'/>" +
+                               "<input TOOLTIPRANGE11 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE11' cancel-value='VALUE11'/>" +
+                               "<input TOOLTIPRANGE12 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE12' cancel-value='VALUE12'/>" +
+                               "<input TOOLTIPRANGE13 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE13' cancel-value='VALUE13'/>" +
+                               "<input TOOLTIPRANGE14 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE14' cancel-value='VALUE14'/>" +
+                               "<input TOOLTIPRANGE15 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE15' cancel-value='VALUE15'/>" +
+                               "<input TOOLTIPRANGE16 class='light-form-control pv-form-height value' data-type='TYPE' style='width: 22%;color: #555;background-color: #fff;' type='text' value='VALUE16' cancel-value='VALUE16'/>" +
+                               "</div></div>";
                     case -1:
                     case 0:
-                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='-1' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-12 control-label' TOOLTIPDOC>LABEL<span class='vtk-icon-plus clickable float-right' data-action='add-value'></span></label>VALUES</div>";
+                        return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='-1' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                               "<label class='col-sm-12 control-label' TOOLTIPDOC>LABEL<span class='vtk-icon-plus clickable float-right' data-action='add-value'></span></label>VALUES</div>";
                 }
                 return "NOT FOUND layout " + layout;
             },
             slider: function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8' TOOLTIPRANGE1><input class='form-control pv-form-height' type='range' value='VALUE' min='MIN' max='MAX' step='1'></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                       "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label>" +
+                       "<div class='col-sm-8' TOOLTIPRANGE1><input class='form-control pv-form-height' type='range' value='VALUE' min='MIN' max='MAX' step='1'>" +
+                       "</div></div>";
             },
             'list-1': function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'><select class='form-control pv-form-height value' data-type='TYPE' cancel-value='VALUE'>OPTIONS</select></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                       "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'>" +
+                       "<select class='form-control pv-form-height value' data-type='TYPE' cancel-value='VALUE'>OPTIONS</select>" +
+                       "</div></div>";
             },
             'list-n': function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'><select class='form-control pv-form-height value multiple' data-type='TYPE' multiple cancel-value='VALUE'>OPTIONS</select></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='SIZE' data-type='TYPE' data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                       "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8'>" +
+                       "<select class='form-control pv-form-height value multiple' data-type='TYPE' multiple cancel-value='VALUE'>OPTIONS</select>" +
+                       "</div></div>";
             },
             textarea:function(layout) {
-                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'><label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center' TOOLTIPRANGE1><textarea rows='5' class='form-control pv-form-height value textarea' data-type='TYPE' cancel-value='VALUE'>VALUE</textarea></div></div>";
+                return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'>" +
+                       "<label class='col-sm-4 control-label' TOOLTIPDOC>LABEL</label><div class='col-sm-8 text-center' TOOLTIPRANGE1>" +
+                       "<textarea rows='5' class='form-control pv-form-height value textarea' data-type='TYPE' cancel-value='VALUE'>VALUE</textarea>" +
+                       "</div></div>";
             },
             'unknown': function(layout) {
                 return "<div class='row property' data-advanced='ADVANCED' data-proxy-id='_ID_' data-size='1' data-property-name='NAME' data-dependency='DEPENDENCY'>No widget type defined for prop NAME</div>";
@@ -175,6 +268,21 @@
         }
     }
 
+    function updateColorManagementVisibility(targetElt, disableElts, toggleActive, removeActives) {
+        toggleActive.toggleClass('active');
+        for (var j = 0; j < removeActives.length; j += 1) {
+            removeActives[j].removeClass('active');
+        }
+        if (!targetElt.is(':visible')) {
+            targetElt.show();
+            for (var i = 0; i < disableElts.length; i += 1) {
+                disableElts[i].hide();
+            }
+        } else {
+            targetElt.hide();
+        }
+    }
+
     // ------------------------------------------------------------------------
     /**
      * Graphical component use to create a panel for editing proxy properties.
@@ -241,11 +349,19 @@
                 activeArrayComp = (colorByInfo.mode === 'array') ? colorByInfo.array[2].toString() : '0',
                 activePalette = 'FIXME not yet available',
                 wantColorManagement = !$.isEmptyObject(colorByInfo),
-                scalarOpacityEditorDisabled = false,
+                colorToolsDisabled = false,
                 scalarOpacityEditorInitialized = false;
 
             // Make sure all old tooltips are cleaned up...
             $('.tooltip').remove();
+
+            if (wantColorManagement === true) {
+                // Listen to event asking me to update the scalar range
+                me.unbind('update-scalar-range-values').bind('update-scalar-range-values', function(newRange) {
+                    $('.scalar-range-min', me).val(newRange.min);
+                    $('.scalar-range-max', me).val(newRange.max);
+                });
+            }
 
             // Update DOM
             for(var idx = 0; idx < count; ++idx) {
@@ -428,11 +544,17 @@
                 // Disable editing of scalar opacity function if not coloring by an array
                 if (colorByInfo.array.length < 2 || colorByInfo.array[1] === '') {
                     $('[data-action=toggle-scalar-opacity-editor]').css('opacity', 0.3);
-                    scalarOpacityEditorDisabled = true;
+                    $('[data-action=toggle-scalar-range-editor]').css('opacity', 0.3);
+                    $('[data-action=toggle-color-editor]').css('opacity', 0.3);
+                    colorToolsDisabled = true;
+                } else {
+                    me.trigger({
+                        type: 'request-scalar-range',
+                        proxyId: proxyId
+                    });
                 }
             } else {
                 $('[data-action=toggle-scalarbar]', me).hide();
-                $('[data-action=rescale-data]', me).hide();
             }
 
             // Annotate properties with dependencies with 'has-dependency' class
@@ -474,13 +596,7 @@
                     } else if (action === 'toggle-scalarbar') {
                         me.trigger({
                             type: 'scalarbar-visibility',
-                            visible: target_container.hasClass('vtk-icon-bookmark-empty'),
-                            id: target_container.attr('data-proxy-id')
-                        });
-                    } else if (action === 'rescale-data') {
-                        me.trigger({
-                            type: 'rescale-transfer-function',
-                            mode: 'data',
+                            visible: $('.toggle-scalarbar-button', me).hasClass('vtk-icon-bookmark-empty'),
                             id: target_container.attr('data-proxy-id')
                         });
                     } else if (action === 'delete-value') {
@@ -490,36 +606,76 @@
                         var propertyContainer = target_container.parent().parent();
                         propertyContainer.addClass('has-change');
                         propertyContainer.append(TEMPLATE_VALUE.replace(/VALUE/g, 0).replace(/TYPE/g, propertyContainer.attr('data-type')));
-                    } else if (action === 'toggle-scalar-opacity-editor' && scalarOpacityEditorDisabled === false) {
-                        var opacityEditorElt = $('.scalar-opacity-editor-container');
-                        if (!opacityEditorElt.is(':visible')) {
-                            opacityEditorElt.show();
-                            if (scalarOpacityEditorInitialized === false) {
-                                var currentColorBy = extractColorBy();
-                                me.trigger({
-                                    type: 'initialize-scalar-opacity-widget',
-                                    container: opacityEditorElt,
-                                    colorArray: currentColorBy.array
-                                });
+                    } else if (action === 'toggle-scalar-range-editor' && colorToolsDisabled === false) {
+                        updateColorManagementVisibility($('.scalar-range-editor-container', me),
+                                                        [$('.color-editor-container', me),  $('.scalar-opacity-editor-container', me)],
+                                                        target_container,
+                                                        [$('[data-action=toggle-scalar-opacity-editor]', me), $('[data-action=toggle-color-editor]', me)]);
+                    } else if (action === 'toggle-color-editor' && colorToolsDisabled === false) {
+                        updateColorManagementVisibility($('.color-editor-container', me),
+                                                        [$('.scalar-range-editor-container', me),  $('.scalar-opacity-editor-container', me)],
+                                                        target_container,
+                                                        [$('[data-action=toggle-scalar-opacity-editor]', me), $('[data-action=toggle-scalar-range-editor]', me)]);
+                    } else if (action === 'rescale-to-data') {
+                        me.trigger({
+                            type: 'rescale-transfer-function',
+                            mode: 'data',
+                            id: target_container.parent().attr('data-proxy-id')
+                        });
+                    } else if (action === 'rescale-to-custom') {
+                        me.trigger({
+                            type: 'rescale-transfer-function',
+                            mode: 'custom',
+                            min: $('.scalar-range-min', me).val(),
+                            max: $('.scalar-range-max', me).val(),
+                            id: target_container.parent().attr('data-proxy-id')
+                        });
+                    } else if (action === 'rescale-to-time') {
+                        me.trigger({
+                            type: 'rescale-transfer-function',
+                            mode: 'time',
+                            id: target_container.parent().attr('data-proxy-id')
+                        });
+                    } else if (action === 'toggle-scalar-opacity-editor' && colorToolsDisabled === false) {
+                        var opacityEditorElt = $('.scalar-opacity-editor-container', me);
+                        updateColorManagementVisibility(opacityEditorElt,
+                                                        [$('.scalar-range-editor-container', me),  $('.color-editor-container', me)],
+                                                        target_container,
+                                                        [$('[data-action=toggle-color-editor]', me), $('[data-action=toggle-scalar-range-editor]', me)]);
 
-                                opacityEditorElt.on('update-opacity-points', function(opEvt) {
-                                    var proxyId = $(this).parent().attr('data-proxy-id');
-                                    var newColorBy = extractColorBy();
-                                    me.trigger({
-                                        colorBy: newColorBy,
-                                        type: 'update-scalar-opacity-function',
-                                        points: opEvt.opacityPoints
-                                    });
-                                    me.trigger({
-                                        colorBy: newColorBy,
-                                        type: 'store-scalar-opacity-parameters',
-                                        parameters: { 'linearPoints': opEvt.linearPoints, 'gaussianPoints': opEvt.gaussianPoints }
-                                    });
+                        if (opacityEditorElt.is(':visible') && scalarOpacityEditorInitialized === false) {
+                            var currentColorBy = extractColorBy();
+                            me.trigger({
+                                type: 'initialize-scalar-opacity-widget',
+                                container: opacityEditorElt,
+                                colorBy: currentColorBy
+                            });
+                            opacityEditorElt.on('update-opacity-points', function(opEvt) {
+                                var newColorBy = extractColorBy();
+                                me.trigger({
+                                    colorBy: newColorBy,
+                                    type: 'update-scalar-opacity-function',
+                                    points: opEvt.opacityPoints
                                 });
-                                scalarOpacityEditorInitialized = true;
-                            }
-                        } else {
-                            opacityEditorElt.hide();
+                                me.trigger({
+                                    colorBy: newColorBy,
+                                    type: 'store-scalar-opacity-parameters',
+                                    parameters: {
+                                        'linearPoints': opEvt.linearPoints,
+                                        'gaussianPoints': opEvt.gaussianPoints,
+                                        'gaussianMode': opEvt.gaussianMode,
+                                        'interactiveMode': opEvt.interactiveMode
+                                    }
+                                });
+                            });
+                            opacityEditorElt.on('update-surface-opacity', function(surfOpEvt) {
+                                me.trigger({
+                                    type: 'push-new-surface-opacity',
+                                    colorBy: extractColorBy(),
+                                    opacity: surfOpEvt.enabled
+                                });
+                            });
+                            scalarOpacityEditorInitialized = true;
                         }
                     }
                 });
@@ -577,6 +733,7 @@
                 if(componentsInfo) {
                     if(componentsInfo.length === 1) {
                         componentContainer.hide();
+                        $('.color-by-column-empty-row', me).hide();
                     } else {
                         var compBuffer = [];
                         for(var i = 0; i < componentsInfo.length; ++i) {
@@ -586,9 +743,11 @@
                                 .replace(/LABEL/g, componentsInfo[i].name));
                         }
                         componentContainer.show()[0].innerHTML = compBuffer.join('');
+                        $('.color-by-column-empty-row', me).show();
                     }
                 } else {
                     componentContainer.hide();
+                    $('.color-by-column-empty-row', me).hide();
                 }
             }).trigger('change');
 

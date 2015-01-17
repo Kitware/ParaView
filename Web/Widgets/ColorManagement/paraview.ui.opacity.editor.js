@@ -23,7 +23,8 @@
     '<div class="opacity-editor-delete-all vtk-icon-trash opacity-editor-button buttons-right shift-right shift-down" data-toggle="tooltip" data-placement="left" title="Delete All"></div>' +
     '</div>' +
     '<div class="right-button-panel">' +
-    '<div class="opacity-editor-toggle-interactive vtk-icon-play-circled2 opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Toggle Interactive Mode"></div>' +
+    '<div class="opacity-editor-toggle-surface-opacity vtk-icon-cancel-squared opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Toggle Opacity Mapping for Surfaces"></div>' +
+    '<div class="opacity-editor-toggle-interactive vtk-icon-lock opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Toggle Interactive Mode"></div>' +
     '<div class="opacity-editor-apply vtk-icon-ok opacity-editor-button buttons-right shift-left shift-up" data-toggle="tooltip" data-placement="left" title="Apply"></div>' +
     '</div>' +
     '</div>' +
@@ -427,7 +428,7 @@
             var me = $(this).empty().addClass('pv-opacity-editor'),
             buffer = [],
             addNewMode = false,
-            gaussianMode = true,
+            gaussianMode = opts.gaussianMode,
             cpDragKey = '',
             dragging = false,
             lastCoords = {},
@@ -439,7 +440,8 @@
             disableClick = false,
             gaussiansList = $.extend(true, [], opts.gaussiansList),
             linearPoints = $.extend(true, [], opts.linearPoints),
-            interactiveMode = true,
+            interactiveMode = opts.interactiveMode,
+            surfaceOpacity = opts.surfaceOpacityEnabled,
             offset = {},
             size = {};
 
@@ -522,6 +524,8 @@
                 newPointsEvent.opacityPoints = points;
                 newPointsEvent.gaussianPoints = gaussiansList;
                 newPointsEvent.linearPoints = linearPoints;
+                newPointsEvent.gaussianMode = gaussianMode;
+                newPointsEvent.interactiveMode = interactiveMode;
                 me.trigger(newPointsEvent);
             }
 
@@ -570,6 +574,34 @@
                     pwfCanvas.hide();
                     linearPwfCanvas.show();
                 }
+            }
+
+            /*
+             * Internal convenience function to handle change in interactive mode
+             */
+            function updateInteractiveMode(element) {
+                if (interactiveMode === true) {
+                    $('.opacity-editor-apply', me).css('opacity', 0.3);
+                    element.removeClass('vtk-icon-lock-open').addClass('vtk-icon-lock');
+                } else {
+                    $('.opacity-editor-apply', me).css('opacity', 1.0);
+                    element.removeClass('vtk-icon-lock').addClass('vtk-icon-lock-open');
+                }
+            }
+
+            /*
+             * Internal convenience function to handle change in surface opacity mode
+             */
+            function updateSurfaceOpacityMode(element) {
+                if (surfaceOpacity === true) {
+                    element.removeClass('vtk-icon-cancel-squared').addClass('vtk-icon-ok-squared');
+                } else {
+                    element.removeClass('vtk-icon-ok-squared').addClass('vtk-icon-cancel-squared');
+                }
+                me.trigger({
+                    type: 'update-surface-opacity',
+                    enabled: surfaceOpacity
+                });
             }
 
             // Single-clicking the center point of a gaussian makes it the "active"
@@ -824,7 +856,7 @@
 
             $('.opacity-editor-toggle-interactive', me).click(function(evt) {
                 interactiveMode = !interactiveMode;
-                $(this).toggleClass('vtk-icon-block').toggleClass('vtk-icon-play-circled2');
+                updateInteractiveMode($(this));
             });
 
             $('.opacity-editor-apply', me).click(function(evt) {
@@ -839,9 +871,16 @@
                 fireNewPoints();
             });
 
+            $('.opacity-editor-toggle-surface-opacity', me).click(function(evt) {
+                surfaceOpacity = !surfaceOpacity;
+                updateSurfaceOpacityMode($(this));
+            });
+
             $('[data-toggle="tooltip"]').tooltip({container: 'body'})
 
             // Finally draw the initial view
+            updateInteractiveMode($('.opacity-editor-toggle-interactive', me));
+            updateSurfaceOpacityMode($('.opacity-editor-toggle-surface-opacity', me));
             exposeCanvasForMode();
             render();
         });
@@ -849,6 +888,9 @@
 
     $.fn.opacityEditor.defaults = {
         buttonsPosition: 'right',
+        surfaceOpacityEnabled: false,
+        gaussianMode: false,
+        interactiveMode: true,
         topMargin: 10,
         rightMargin: 10,
         bottomMargin: 10,

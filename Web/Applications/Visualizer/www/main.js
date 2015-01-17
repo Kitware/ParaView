@@ -475,6 +475,8 @@
         proxyEditor.bind('update-scalar-opacity-function', onUpdateOpacityPoints);
         proxyEditor.bind('store-scalar-opacity-parameters', onStoreOpacityParameters);
         proxyEditor.bind('initialize-scalar-opacity-widget', onInitializeScalarOpacityWidget);
+        proxyEditor.bind('request-scalar-range', onRequestScalarRange);
+        proxyEditor.bind('push-new-surface-opacity', onSurfaceOpacityChanged);
     }
 
     // ------------------------------------------------------------------------
@@ -515,7 +517,7 @@
     function onUpdateOpacityPoints(event) {
         var colorBy = event.colorBy;
         if (colorBy.array.length >= 2 && colorBy.array[1] !== '') {
-            var args = [colorBy.representation, colorBy.array, event.points];
+            var args = [colorBy.array[1], event.points];
             startWorking();
             session.call('pv.color.manager.opacity.points.set', args).then(function(successResult) {
                 viewport.invalidateScene();
@@ -523,6 +525,22 @@
             }, workDone);
         }
     }
+
+    // ------------------------------------------------------------------------
+
+    function onSurfaceOpacityChanged(event) {
+        var colorBy = event.colorBy;
+        if (colorBy.array.length >= 2 && colorBy.array[1] !== '') {
+            var args = [colorBy.representation, (event.opacity === true ? 1 : 0)];
+            startWorking();
+            session.call('pv.color.manager.surface.opacity.set', args).then(function(successResult) {
+                viewport.invalidateScene();
+                workDone();
+            }, workDone);
+        }
+    }
+
+    // ------------------------------------------------------------------------
 
     function onStoreOpacityParameters(event) {
         var colorArray = event.colorBy.array;
@@ -536,6 +554,21 @@
 
     // ------------------------------------------------------------------------
 
+    function onRequestScalarRange(event) {
+        var proxyId = event.proxyId;
+        startWorking();
+        session.call('pv.color.manager.scalar.range.get', [proxyId]).then(function(curScalarRange) {
+            proxyEditor.trigger({
+                'type': 'update-scalar-range-values',
+                'min': curScalarRange.min,
+                'max': curScalarRange.max
+            });
+            workDone();
+        }, workDone);
+    }
+
+    // ------------------------------------------------------------------------
+
     function onRescaleTransferFunction(event) {
         startWorking();
         var options = { proxyId: event.id, type: event.mode };
@@ -543,7 +576,29 @@
             options.min = event.min;
             options.max = event.max;
         }
-        session.call('pv.color.manager.rescale.transfer.function', [options]).then(invalidatePipeline, invalidatePipeline);
+        session.call('pv.color.manager.rescale.transfer.function', [options]).then(function(successResult) {
+            if (successResult['success'] === true) {
+                viewport.invalidateScene();
+                proxyEditor.trigger({
+                    'type': 'update-scalar-range-values',
+                    'min': successResult.range.min,
+                    'max': successResult.range.max
+                });
+            }
+            workDone();
+        }, workDone);
+    }
+
+    // ------------------------------------------------------------------------
+
+    function extractRepresentation(list) {
+        var count = list.length;
+        while(count--) {
+            if(list[count].name === 'Representation') {
+                return [list[count]];
+            }
+        }
+        return [];
     }
 
     // ------------------------------------------------------------------------
@@ -551,13 +606,19 @@
     function onNewProxyLoaded() {
         if(pipelineDataModel.metadata && pipelineDataModel.source && pipelineDataModel.representation && pipelineDataModel.view) {
             var props = [].concat(
+                    "+Color Management",
+                    extractRepresentation(pipelineDataModel.representation.properties),
                     "ColorByPanel",
+                    "_Color Management",
                     "+Source", pipelineDataModel.source.properties, '_Source',
                     "-Representation", pipelineDataModel.representation.properties, '_Representation',
                     "-View", pipelineDataModel.view.properties, "_View"
                     ),
                 ui = [].concat(
+                    "+Color Management",
+                    extractRepresentation(pipelineDataModel.representation.ui),
                     "ColorByPanel",
+                    "_Color Management",
                     "+Source", pipelineDataModel.source.ui, '_Source',
                     "-Representation", pipelineDataModel.representation.ui, '_Representation',
                     "-View", pipelineDataModel.view.ui, "_View"
@@ -565,7 +626,14 @@
 
 
             try {
-                proxyEditor.proxyEditor(pipelineDataModel.metadata.name, pipelineDataModel.metadata.leaf, pipelineDataModel.metadata.id, props, ui, pipelineDataModel.source.data.arrays, paletteNameList, pipelineDataModel.representation.colorBy);
+                proxyEditor.proxyEditor(pipelineDataModel.metadata.name,
+                                        pipelineDataModel.metadata.leaf,
+                                        pipelineDataModel.metadata.id,
+                                        props,
+                                        ui,
+                                        pipelineDataModel.source.data.arrays,
+                                        paletteNameList,
+                                        pipelineDataModel.representation.colorBy);
                 $('.inspector-container').scrollTop(0);
             } catch(err) {
                 console.log(err);
@@ -592,31 +660,51 @@
     // Opacity editor widget creation
     // ========================================================================
     function onInitializeScalarOpacityWidget(event) {
-        var container = event.container;
-        var colorArray = event.colorArray;
+        var container = event.container,
+            colorArray = event.colorBy.array,
+            needParams = [ 'currentPointSet', 'surfaceOpacityEnabled' ],
+            initOptions = {
+                'buttonsPosition': 'top',
+                'topMargin': 10,
+                'rightMargin': 15,
+                'bottomMargin': 10,
+                'leftMargin': 15
+            };
 
-        var initOptions = {
-            'buttonsPosition': 'top',
-            'topMargin': 10,
-            'rightMargin': 15,
-            'bottomMargin': 10,
-            'leftMargin': 15
-        };
+        function gotInitParam(paramName) {
+            needParams.splice(needParams.indexOf(paramName), 1);
+            if (needParams.length === 0) {
+                container.opacityEditor(initOptions);
+            }
+        }
 
         if (colorArray.length >= 2 && colorArray[1] !== '') {
-            var retrieveKey = colorArray[1] + ":opacityParameters";
 
+            var retrieveKey = colorArray[1] + ":opacityParameters";
             session.call('pv.keyvaluepair.retrieve', [retrieveKey]).then(function(result) {
                 if (result !== null) {
                     initOptions.gaussiansList = result.gaussianPoints;
                     initOptions.linearPoints = result.linearPoints;
+                    initOptions.gaussianMode = result.gaussianMode;
+                    initOptions.interactiveMode = result.interactiveMode;
                 }
-                container.opacityEditor(initOptions);
+                gotInitParam('currentPointSet');
                 workDone();
             }, workDone);
-        }
 
-        container.opacityEditor(initOptions);
+            var representation = event.colorBy.representation;
+            session.call('pv.color.manager.surface.opacity.get', [representation]).then(function(result) {
+                if (result !== null) {
+                    initOptions.surfaceOpacityEnabled = (result === 1 ? true : false);
+                }
+                gotInitParam('surfaceOpacityEnabled');
+                workDone();
+            }, workDone);
+
+        } else {
+            console.log("WARNING: Initializing the opacity editor while not coloring by an array.");
+            container.opacityEditor(initOptions);
+        }
     }
 
     // ========================================================================
