@@ -49,6 +49,7 @@ paraview_test_load_data(""
   Scenario1_p1.h5
   Scenario1_p1.xmf
   servers-wiki.pvsc
+  sineWaves.csv
   singleSphereAnimation.pvd
   tensors.pvti
   Test1.h5
@@ -213,6 +214,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalBagPlots.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ImageVolumeRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml
