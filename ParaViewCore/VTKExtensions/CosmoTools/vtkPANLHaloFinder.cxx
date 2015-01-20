@@ -376,8 +376,7 @@ void vtkPANLHaloFinder::ExecuteHaloFinder(vtkUnstructuredGrid *allParticles,
   haloTags->SetNumberOfTuples(this->Internal->xx.size());
 
   allParticles->Allocate(this->Internal->xx.size());
-  float v[3];
-  for (vtkIdType i = 0; i < this->Internal->xx.size(); ++i)
+  for (vtkIdType i = 0; static_cast<size_t>(i) < this->Internal->xx.size(); ++i)
     {
     points->InsertNextPoint(this->Internal->xx[i],
                             this->Internal->yy[i],
@@ -601,7 +600,7 @@ void vtkPANLHaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid *allParticles,
 
   subFofProperties->Allocate(subMass.size());
   float com[3], vel[3];
-  for (vtkIdType i = 0; i < subMass.size(); ++i)
+  for (vtkIdType i = 0; static_cast<size_t>(i) < subMass.size(); ++i)
     {
     points->SetPoint(i,subAvgX[i],subAvgY[i],subAvgZ[i]);
     com[0] = subCenterOfMassX[i];

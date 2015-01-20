@@ -76,14 +76,14 @@ public:
   {
     vtkPointData* pd = input->GetPointData();
     assert(pd);
-    vtkDataArray* vx = pd->GetArray("vx");
-    assert(vx);
-    vtkDataArray* vy = pd->GetArray("vy");
-    assert(vy);
-    vtkDataArray* vz = pd->GetArray("vz");
-    assert(vz);
-    vtkDataArray* id = pd->GetArray("id");
-    assert(id);
+    vtkDataArray* vx_array = pd->GetArray("vx");
+    assert(vx_array);
+    vtkDataArray* vy_array = pd->GetArray("vy");
+    assert(vy_array);
+    vtkDataArray* vz_array = pd->GetArray("vz");
+    assert(vz_array);
+    vtkDataArray* id_array = pd->GetArray("id");
+    assert(id_array);
     double point[3];
     std::vector< vtkIdType >& haloIdxs = haloIndices[haloId];
     this->xx.resize(haloIdxs.size());
@@ -102,11 +102,11 @@ public:
       this->xx[i] = point[0];
       this->yy[i] = point[1];
       this->zz[i] = point[2];
-      this->vx[i] = vx->GetTuple1(idx);
-      this->vy[i] = vy->GetTuple1(idx);
-      this->vz[i] = vz->GetTuple1(idx);
+      this->vx[i] = vx_array->GetTuple1(idx);
+      this->vy[i] = vy_array->GetTuple1(idx);
+      this->vz[i] = vz_array->GetTuple1(idx);
       this->mass[i] = particleMass;
-      this->id[i] = id->GetTuple1(idx);
+      this->id[i] = id_array->GetTuple1(idx);
       this->actualIndex[i] = idx;
       }
   }
@@ -329,7 +329,7 @@ void vtkPANLSubhaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
 
   subFofProperties->Allocate(subMass.size());
   float com[3], vel[3];
-  for (vtkIdType i = 0; i < subMass.size(); ++i)
+  for (vtkIdType i = 0; static_cast<size_t>(i) < subMass.size(); ++i)
     {
     points->SetPoint(i,subAvgX[i],subAvgY[i],subAvgZ[i]);
     com[0] = subCenterOfMassX[i];
