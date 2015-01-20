@@ -41,6 +41,7 @@ vtkSMRepresentationProxy::vtkSMRepresentationProxy()
   this->ProminentValuesInformation = vtkPVProminentValuesInformation::New();
   this->ProminentValuesFraction = -1;
   this->ProminentValuesUncertainty = -1;
+  this->ProminentValuesInformationValid = false;
   
   this->MarkedModified = false;
   this->VTKRepresentationUpdated = false;
@@ -303,6 +304,7 @@ void vtkSMRepresentationProxy::InvalidateDataInformation()
 {
   this->Superclass::InvalidateDataInformation();
   this->RepresentedDataInformationValid = false;
+  this->ProminentValuesInformationValid = false;
 }
 
 //----------------------------------------------------------------------------
@@ -338,7 +340,10 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   bool largerFractionOrLessCertain =
     this->ProminentValuesFraction < fraction ||
     this->ProminentValuesUncertainty > uncertaintyAllowed;
-  if (differentAttribute || invalid || largerFractionOrLessCertain)
+  if (!this->ProminentValuesInformationValid ||
+      differentAttribute ||
+      invalid ||
+      largerFractionOrLessCertain)
     {
     vtkTimerLog::MarkStartEvent(
       "vtkSMRepresentationProxy::GetProminentValues");
@@ -361,6 +366,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
       "vtkSMRepresentationProxy::GetProminentValues");
     this->ProminentValuesFraction = fraction;
     this->ProminentValuesUncertainty = uncertaintyAllowed;
+    this->ProminentValuesInformationValid = true;
     }
 
   return this->ProminentValuesInformation;
