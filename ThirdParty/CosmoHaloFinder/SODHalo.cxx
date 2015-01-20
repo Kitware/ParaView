@@ -396,6 +396,8 @@ void SODHalo::calculateMassProfile()
             for (int dim = 0; dim < DIMENSION; dim++)
               if (dist > 0.0)
                 unit[dim] = diff[dim] / dist;
+              else
+                unit[dim] = 0.0;
 
             // Calculate the relative velocity vector of particle wrt center
             POSVEL_T relVel[DIMENSION];
