@@ -684,10 +684,10 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
     }
   else
     {
-    std::string haloId = std::string(this->HaloIdVariableName);
-    haloId = vtkGenericIOUtilities::trim(haloId);
-    int haloType = this->MetaData->VariableGenericIOType[haloId];
-    void* haloBuffer = this->MetaData->RawCache[haloId];
+    std::string haloVarName = std::string(this->HaloIdVariableName);
+    haloVarName = vtkGenericIOUtilities::trim(haloVarName);
+    int haloType = this->MetaData->VariableGenericIOType[haloVarName];
+    void* haloBuffer = this->MetaData->RawCache[haloVarName];
     for (vtkIdType i = 0; idx < nparticles; ++idx)
       {
       vtkIdType haloId = vtkGenericIOUtilities::GetIdFromRawBuffer(haloType,haloBuffer,idx);
