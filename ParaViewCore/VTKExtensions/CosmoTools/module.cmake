@@ -25,6 +25,7 @@ set_property(GLOBAL PROPERTY
 
     ## CosmoTools Filters
     ${CMAKE_CURRENT_LIST_DIR}/resources/LANLHaloFinder.xml
+    ${CMAKE_CURRENT_LIST_DIR}/resources/ANLHaloFinder.xml
     ${CMAKE_CURRENT_LIST_DIR}/resources/MergeConnected.xml
     ${CMAKE_CURRENT_LIST_DIR}/resources/MinkowskiFilter.xml
     )
