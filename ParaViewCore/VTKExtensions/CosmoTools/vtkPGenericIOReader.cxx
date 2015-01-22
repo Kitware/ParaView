@@ -23,6 +23,7 @@
 #include "vtkDataArray.h"
 #include "vtkDataArraySelection.h"
 #include "vtkDataObject.h"
+#include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMPI.h"
@@ -168,6 +169,7 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->XAxisVariableName = NULL;
   this->YAxisVariableName = NULL;
   this->ZAxisVariableName = NULL;
+  this->HaloIdVariableName= NULL;
   this->GenericIOType     = IOTYPEMPI;
   this->BlockAssignment   = ROUND_ROBIN;
   this->BuildMetaData     = false;
@@ -183,6 +185,7 @@ vtkPGenericIOReader::vtkPGenericIOReader()
   this->QueryRankNeighbors = 0;
 
   this->ArrayList = vtkStringArray::New();
+  this->HaloList = vtkIdList::New();
   this->PointDataArraySelection = vtkDataArraySelection::New();
   this->SelectionObserver  = vtkCallbackCommand::New();
   this->SelectionObserver->SetCallback(
@@ -205,6 +208,7 @@ vtkPGenericIOReader::~vtkPGenericIOReader()
  vtkGenericIOUtilities::SafeDeleteString(this->XAxisVariableName);
  vtkGenericIOUtilities::SafeDeleteString(this->YAxisVariableName);
  vtkGenericIOUtilities::SafeDeleteString(this->ZAxisVariableName);
+ vtkGenericIOUtilities::SafeDeleteString(this->HaloIdVariableName);
 
  if( this->MetaData != NULL )
    {
@@ -212,6 +216,7 @@ vtkPGenericIOReader::~vtkPGenericIOReader()
    }
 
  this->ArrayList->Delete();
+ this->HaloList->Delete();
 
  this->PointDataArraySelection->RemoveObserver( this->SelectionObserver );
  this->SelectionObserver->Delete();
@@ -287,6 +292,47 @@ void vtkPGenericIOReader::SetPointArrayStatus(
     this->PointDataArraySelection->DisableArray( name );
     assert(!this->PointDataArraySelection->ArrayIsEnabled(name));
     }
+}
+
+//------------------------------------------------------------------------------
+vtkIdType vtkPGenericIOReader::GetRequestedHaloId(vtkIdType i)
+{
+  assert("pre: array index out of bounds" &&
+         (i >= 0 && this->HaloList->GetNumberOfIds() > i));
+  return this->HaloList->GetId(i);
+}
+
+//------------------------------------------------------------------------------
+vtkIdType vtkPGenericIOReader::GetNumberOfRequestedHaloIds()
+{
+  return this->HaloList->GetNumberOfIds();
+}
+
+//------------------------------------------------------------------------------
+void vtkPGenericIOReader::SetNumberOfRequestedHaloIds(vtkIdType numIds)
+{
+  this->HaloList->SetNumberOfIds(numIds);
+  this->Modified();
+}
+
+//------------------------------------------------------------------------------
+void vtkPGenericIOReader::AddRequestedHaloId(vtkIdType haloId)
+{
+  this->SetRequestedHaloId(this->GetNumberOfRequestedHaloIds(),haloId);
+}
+
+//------------------------------------------------------------------------------
+void vtkPGenericIOReader::ClearRequestedHaloIds()
+{
+  this->HaloList->Reset();
+  this->Modified();
+}
+
+//------------------------------------------------------------------------------
+void vtkPGenericIOReader::SetRequestedHaloId(vtkIdType i, vtkIdType haloId)
+{
+  *this->HaloList->WritePointer(i,1) = haloId;
+  this->Modified();
 }
 
 //------------------------------------------------------------------------------
@@ -512,6 +558,13 @@ void vtkPGenericIOReader::LoadRawData()
   this->LoadRawVariableData( yaxis );
   this->LoadRawVariableData( zaxis );
 
+  if (this->HaloList->GetNumberOfIds() > 0)
+    {
+    std::string haloIds = std::string(this->HaloIdVariableName);
+    haloIds = vtkGenericIOUtilities::trim(haloIds);
+    this->LoadRawVariableData(haloIds);
+    }
+
 #ifdef DEBUG
   std::cout << "\t==========\n";
   std::cout << "\tNUMBER OF ARRAYS: "
@@ -620,12 +673,42 @@ void vtkPGenericIOReader::LoadCoordinates(vtkUnstructuredGrid *grid)
   int nparticles = this->MetaData->NumberOfElements;
   double pnt[3];
   vtkIdType idx = 0;
-  for( ;idx < nparticles; ++idx)
+  if (this->HaloList->GetNumberOfIds() == 0)
     {
-    this->GetPointFromRawData(xType,xBuffer,yType,yBuffer,zType,zBuffer, idx, pnt);
-    pnts->SetPoint(idx,pnt);
-    cells->InsertNextCell(1,&idx);
-    } // END for all points
+    for( ;idx < nparticles; ++idx)
+      {
+      this->GetPointFromRawData(xType,xBuffer,yType,yBuffer,zType,zBuffer, idx, pnt);
+      pnts->SetPoint(idx,pnt);
+      cells->InsertNextCell(1,&idx);
+      } // END for all points
+    }
+  else
+    {
+    std::string haloVarName = std::string(this->HaloIdVariableName);
+    haloVarName = vtkGenericIOUtilities::trim(haloVarName);
+    int haloType = this->MetaData->VariableGenericIOType[haloVarName];
+    void* haloBuffer = this->MetaData->RawCache[haloVarName];
+    for (vtkIdType i = 0; idx < nparticles; ++idx)
+      {
+      vtkIdType haloId = vtkGenericIOUtilities::GetIdFromRawBuffer(haloType,haloBuffer,idx);
+      bool isInRequestedHalo = false;
+      for (vtkIdType j = 0; j < this->GetNumberOfRequestedHaloIds(); ++j)
+        {
+        if (haloId == this->HaloList->GetId(j))
+          {
+          isInRequestedHalo = true;
+          break;
+          }
+        }
+      if (isInRequestedHalo)
+        {
+        this->GetPointFromRawData(xType,xBuffer,yType,yBuffer,zType,zBuffer,idx,pnt);
+        pnts->SetPoint(i,pnt);
+        cells->InsertNextCell(1,&i);
+        ++i;
+        }
+      }
+    }
 
   grid->SetPoints(pnts);
   pnts->Delete();

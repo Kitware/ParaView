@@ -1296,7 +1296,7 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProperty* Property,
 
     if(Type == CHECKED)
       {
-      if (num>0)
+      if (num>0 || ivp->GetRepeatable())
         {
         ivp->SetElements(ivalues, num);
         }
