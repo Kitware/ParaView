@@ -16,6 +16,7 @@
 
   <Category name="CosmoTools" menu_label="&amp;CosmoTools" show_in_toolbar="0">
     <Proxy group="filters" name="ANLHaloFinder" />
+    <Proxy group="filters" name="ANLSubhaloFinder" />
     <Proxy group="filters" name="LANLHaloFinder" />
     <Proxy group="filters" name="MinkowskiFilter" />
     <Proxy group="filters" name="PMergeConnected" />
