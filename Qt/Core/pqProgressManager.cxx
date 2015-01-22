@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqOutputWindow.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkCommand.h"
@@ -269,8 +270,27 @@ void pqProgressManager::onProgress(vtkObject* caller)
 //-----------------------------------------------------------------------------
 void pqProgressManager::onMessage(vtkObject* caller)
 {
-
   vtkPVProgressHandler* handler = vtkPVProgressHandler::SafeDownCast(caller);
   QString text = handler->GetLastMessage();
-  vtkOutputWindow::GetInstance()->DisplayText(text.toStdString().c_str());
+  if (text.startsWith("ERROR: "))
+    {
+    vtkOutputWindow::GetInstance()->DisplayErrorText(text.toStdString().c_str());
+    }
+  else if (text.startsWith("Warning: "))
+    {
+    vtkOutputWindow::GetInstance()->DisplayWarningText(text.toStdString().c_str());
+    }
+  else if (text.startsWith("Generic Warning: "))
+    {
+    vtkOutputWindow::GetInstance()->DisplayGenericWarningText(
+      text.toStdString().c_str());
+    }
+  else if (text.startsWith("Debug : "))
+    {
+    vtkOutputWindow::GetInstance()->DisplayText(text.toStdString().c_str());
+    }
+  else
+    {
+    vtkOutputWindow::GetInstance()->DisplayText(text.toStdString().c_str());
+    }  
 }

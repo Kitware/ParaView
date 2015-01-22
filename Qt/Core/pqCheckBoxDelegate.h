@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqOutputWindowAdapter.cxx
+   Module:    pqOutputWindow.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,70 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqOutputWindowAdapter.h"
+#include "pqCoreModule.h"
+#include <QStyledItemDelegate>
 
-#include <vtkObjectFactory.h>
-
-vtkStandardNewMacro(pqOutputWindowAdapter);
-
-pqOutputWindowAdapter::pqOutputWindowAdapter()
+/// Delegate for QTableView to draw a checkbox as an left-right (unchecked)
+/// and top-bottom (checked) arrow.
+/// The checkbox has an extra state for unchecked disabled.
+/// Based on a Stack overflow answer:
+/// http://stackoverflow.com/questions/3363190/qt-qtableview-how-to-have-a-checkbox-only-column
+class PQCORE_EXPORT pqCheckBoxDelegate : public QStyledItemDelegate
 {
-  this->Active=true;
-}
+  Q_OBJECT
 
-pqOutputWindowAdapter::~pqOutputWindowAdapter()
-{
-}
+public:
+  enum CheckBoxValues
+  {
+    NOT_EXPANDED,
+    EXPANDED,
+    NOT_EXPANDED_DISABLED
+  };
 
-void pqOutputWindowAdapter::setActive(bool active)
-{
-  this->Active=active;
-}
+  pqCheckBoxDelegate(QObject *parent);
+  ~pqCheckBoxDelegate();
 
-void pqOutputWindowAdapter::DisplayTextInWindow(const QString& text)
-{
-  if (this->Active)
-    {
-    emit displayTextInWindow(text);
-    }
-}
-
-void pqOutputWindowAdapter::DisplayErrorTextInWindow(const QString& text)
-{
-  if (this->Active)
-    {
-    emit displayErrorTextInWindow(text);
-    }
-}
-
-void pqOutputWindowAdapter::DisplayText(const char* text)
-{
-  if(this->Active)
-    {
-    emit displayText(text);
-    }
-}
-
-void pqOutputWindowAdapter::DisplayErrorText(const char* text)
-{
-  if(this->Active)
-    {
-    emit displayErrorText(text);
-    }
-}
-
-void pqOutputWindowAdapter::DisplayWarningText(const char* text)
-{
-  if(this->Active)
-    {
-    emit displayWarningText(text);
-    }
-}
-
-void pqOutputWindowAdapter::DisplayGenericWarningText(const char* text)
-{
-  if(this->Active)
-    {
-    emit displayGenericWarningText(text);
-    }
-}
+  void paint(QPainter *painter, const QStyleOptionViewItem &option,
+             const QModelIndex &index) const;
+  bool editorEvent(QEvent *event,
+                   QAbstractItemModel *model,
+                   const QStyleOptionViewItem &option,
+                   const QModelIndex &index);
+private:
+  Q_DISABLE_COPY(pqCheckBoxDelegate)
+  struct pqInternals;
+  pqInternals* Internals;
+};
