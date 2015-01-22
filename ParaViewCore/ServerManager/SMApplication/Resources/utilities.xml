@@ -2768,6 +2768,42 @@
      </Hints>
      <!-- End of XMLHierarchicalBoxDataWriter -->
     </SourceProxy>
+
+    <SourceProxy name="CSVWriter" class="vtkPVNullSource"
+      label="CSV Table Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkTable" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.csv">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="CSVWriter" />
+     </Hints>
+     <!-- End of XMLHierarchicalBoxDataWriter -->
+    </SourceProxy>
   </ProxyGroup>
 
   <ProxyGroup name="pythontracing">
