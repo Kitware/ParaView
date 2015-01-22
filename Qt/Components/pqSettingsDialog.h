@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include "pqComponentsModule.h"
 
+class pqServer;
 class QAbstractButton;
 class vtkSMProperty;
 
@@ -61,6 +62,10 @@ private slots:
   void showRestartRequiredMessage();
 
   void filterPanelWidgets();
+
+  /// Callback for when pqServerManagerModel notifies the application that the
+  /// server is being removed. We close the dialog.
+  void serverRemoved(pqServer*);
 
 signals:
   void filterWidgets(bool showAdvanced, const QString& text);
