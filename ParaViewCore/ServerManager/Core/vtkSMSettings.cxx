@@ -1144,7 +1144,18 @@ bool vtkSMSettings::GetProxySettings(vtkSMProxy* proxy)
   std::string jsonPrefix(".");
   jsonPrefix.append(proxy->GetXMLGroup());
 
-  return this->Internal->GetProxySettings(jsonPrefix.c_str(), proxy);
+  return this->GetProxySettings(jsonPrefix.c_str(), proxy);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSettings::GetProxySettings(const char* prefix, vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    return false;
+    }
+
+  return this->Internal->GetProxySettings(prefix, proxy);
 }
 
 //----------------------------------------------------------------------------
@@ -1211,6 +1222,12 @@ void vtkSMSettings::SetSetting(const char* settingName, unsigned int index, cons
 void vtkSMSettings::SetProxySettings(vtkSMProxy* proxy)
 {
   this->Internal->SetProxySettings(proxy);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSettings::SetProxySettings(const char* prefix, vtkSMProxy* proxy)
+{
+  this->Internal->SetProxySettings(prefix, proxy);
 }
 
 //----------------------------------------------------------------------------

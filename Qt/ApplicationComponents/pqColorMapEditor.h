@@ -68,7 +68,11 @@ protected slots:
   /// Save the current transfer function(s) as default.
   void saveAsDefault();
 
-  /// Restore the defaults (opposite of saveAsDefault()).
+  /// Save the current transfer function(s) as default for arrays with
+  /// the same name as the selected array.
+  void saveAsArrayDefault();
+
+  /// Restore the defaults (undoes effects of saveAsDefault()).
   void restoreDefaults();
 
   /// called when AutoUpdate button is toggled.
