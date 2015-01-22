@@ -2,6 +2,39 @@
 
 namespace CGNSRead
 {
+//----------------------------------------------------------------------------
+int readNodeStringData(int cgioNum, double nodeId, std::string& data)
+{
+  int n;
+  cgsize_t size=1;
+  cgsize_t dimVals[12];
+  int ndim;
+
+  if (cgio_get_dimensions(cgioNum, nodeId, &ndim, dimVals) != CG_OK)
+    {
+    cgio_error_exit("cgio_get_dimensions");
+    return 1;
+    }
+
+  // allocate data
+  for (n = 0; n < ndim; n++)
+    {
+    size *= dimVals[n];
+    }
+  if (size <= 0)
+    {
+    return 1;
+    }
+
+  data.resize(size);
+  // read data
+  if (cgio_read_all_data(cgioNum, nodeId, (void *)data.c_str()) != CG_OK)
+    {
+    return 1;
+    }
+
+  return 0;
+}
 //------------------------------------------------------------------------------
 // Specialize char array
 template <>
@@ -423,15 +456,8 @@ int readSolInfo(int cgioNum, double nodeId,
         return 1;
         }
 
-      std::vector<char> location_data;
-      CGNSRead::readNodeData<char>(cgioNum, solChildId[nn], location_data);
-
       std::string location;
-      if( location_data.size() > 0)
-        { //conditionally dereference location_data as this avoids throwing
-          //runtime asserts on windows in debug mode when the vector is size 0
-        location = std::string(&location_data.front(), location_data.size());
-        }
+      CGNSRead::readNodeStringData(cgioNum, solChildId[nn], location);
 
       if (location == "Vertex")
         {
