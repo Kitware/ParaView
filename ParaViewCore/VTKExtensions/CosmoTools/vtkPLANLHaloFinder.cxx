@@ -399,8 +399,8 @@ void vtkPLANLHaloFinder::ComputeSODHalos(
   // STEP 1: Construct the ChainingMesh
   cosmotk::ChainingMesh *chainMesh =
       new cosmotk::ChainingMesh(
-          this->RL,this->Overlap,cosmotk::CHAIN_SIZE,
-          &this->Particles->xx,&this->Particles->yy,&this->Particles->zz);
+          this->RL,this->Overlap,cosmotk::CHAIN_SIZE,this->Particles->xx.size(),
+          &this->Particles->xx[0],&this->Particles->yy[0],&this->Particles->zz[0]);
 
   // STEP 2: Loop through all halos and compute SOD halos
   for(unsigned int i=0; i < this->Halos->ExtractedHalos.size(); ++i)
@@ -420,10 +420,11 @@ void vtkPLANLHaloFinder::ComputeSODHalos(
                         this->RhoC, this->SODMass, this->RhoC,
                         this->MinRadiusFactor, this->MaxRadiusFactor );
     sod->setParticles(
-        &(this->Particles->xx),&(this->Particles->yy),&(this->Particles->zz),
-        &(this->Particles->vx),&(this->Particles->vy),&(this->Particles->vz),
-        &(this->Particles->mass),
-        &(this->Particles->tag)
+        this->Particles->xx.size(),
+        &(this->Particles->xx[0]),&(this->Particles->yy[0]),&(this->Particles->zz[0]),
+        &(this->Particles->vx[0]),&(this->Particles->vy[0]),&(this->Particles->vz[0]),
+        &(this->Particles->mass[0]),
+        &(this->Particles->tag[0])
         );
 
     double center[3];
@@ -620,18 +621,19 @@ void vtkPLANLHaloFinder::ComputeFOFHalos(
   this->HaloFinder->setParameters(
       "",this->RL,this->Overlap,this->NP,this->PMin,this->BB);
   this->HaloFinder->setParticles(
-      &this->Particles->xx,&this->Particles->yy,&this->Particles->zz,
-      &this->Particles->vx,&this->Particles->vy,&this->Particles->vz,
-      &this->Particles->potential,
-      &this->Particles->tag,
-      &this->Particles->mask,
-      &this->Particles->status
+      this->Particles->xx.size(),
+      &this->Particles->xx[0],&this->Particles->yy[0],&this->Particles->zz[0],
+      &this->Particles->vx[0],&this->Particles->vy[0],&this->Particles->vz[0],
+      &this->Particles->potential[0],
+      &this->Particles->tag[0],
+      &this->Particles->mask[0],
+      &this->Particles->status[0]
       );
 
   // STEP 3: Execute the halo-finder
   this->HaloFinder->executeHaloFinder();
   this->HaloFinder->collectHalos();
-  this->HaloFinder->mergeHalos();
+//  this->HaloFinder->mergeHalos();
 
   // STEP 4: Calculate basic FOF halo properties
   this->ComputeFOFHaloProperties();
@@ -721,13 +723,14 @@ void vtkPLANLHaloFinder::MarkHaloParticlesAndGetCenter(
   fof->setHalos(numberOfHalos,fofHalos,fofHaloCount,fofHaloList);
   fof->setParameters("",this->RL,this->Overlap,this->BB);
   fof->setParticles(
-      &this->Particles->xx,&this->Particles->yy,&this->Particles->zz,
-      &this->Particles->vx,&this->Particles->vy,&this->Particles->vz,
-      &this->Particles->mass,
-      &this->Particles->potential,
-      &this->Particles->tag,
-      &this->Particles->mask,
-      &this->Particles->status
+      this->Particles->xx.size(),
+      &this->Particles->xx[0],&this->Particles->yy[0],&this->Particles->zz[0],
+      &this->Particles->vx[0],&this->Particles->vy[0],&this->Particles->vz[0],
+      &this->Particles->mass[0],
+      &this->Particles->potential[0],
+      &this->Particles->tag[0],
+      &this->Particles->mask[0],
+      &this->Particles->status[0]
       );
 
   // STEP 2: Get the particle halo information for the given halo with the given
@@ -791,7 +794,8 @@ void vtkPLANLHaloFinder::MarkHaloParticlesAndGetCenter(
 
       cosmotk::HaloCenterFinder centerFinder;
       centerFinder.setParticles(size,xLocHalo,yLocHalo,zLocHalo,massHalo,id);
-      centerFinder.setParameters(this->BB,this->Overlap);
+      // TODO FIXME - find out what the zeroes should be
+      centerFinder.setParameters(this->BB,0.0,this->Overlap,0.0,0,0.0,0.0,0.0,0.0);
 
       if( this->CenterFindingMethod == MBP )
         {
@@ -906,13 +910,14 @@ void vtkPLANLHaloFinder::ComputeFOFHaloProperties()
   fof->setHalos(numberOfHalos,fofHalos,fofHaloCount,fofHaloList);
   fof->setParameters("",this->RL,this->Overlap,this->BB);
   fof->setParticles(
-      &this->Particles->xx,&this->Particles->yy,&this->Particles->zz,
-      &this->Particles->vx,&this->Particles->vy,&this->Particles->vz,
-      &this->Particles->mass,
-      &this->Particles->potential,
-      &this->Particles->tag,
-      &this->Particles->mask,
-      &this->Particles->status);
+      this->Particles->xx.size(),
+      &this->Particles->xx[0],&this->Particles->yy[0],&this->Particles->zz[0],
+      &this->Particles->vx[0],&this->Particles->vy[0],&this->Particles->vz[0],
+      &this->Particles->mass[0],
+      &this->Particles->potential[0],
+      &this->Particles->tag[0],
+      &this->Particles->mask[0],
+      &this->Particles->status[0]);
 
   // Compute average halo position if that's what will be used as the halo
   // center position
@@ -928,8 +933,8 @@ void vtkPLANLHaloFinder::ComputeFOFHaloProperties()
       &this->Halos->fofXCofMass,&this->Halos->fofYCofMass,&this->Halos->fofZCofMass);
     }
 
-  fof->FOFAttributes(
-      &this->Halos->fofMass,
+  fof->FOFHaloMass(&this->Halos->fofMass);
+  fof->FOFVelocityDispersion(
       &this->Halos->fofXVel, &this->Halos->fofYVel,&this->Halos->fofZVel,
       &this->Halos->fofVelDisp);
 

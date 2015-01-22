@@ -8,6 +8,7 @@ vtk_module(vtkPVVTKExtensionsCosmoTools
       vtkParallelMPI
       vtkPVVTKExtensionsDefault
       vtkjsoncpp
+      vtkCosmoHaloFinder
    KIT
       vtkPVExtensions
 )
@@ -27,9 +28,3 @@ set_property(GLOBAL PROPERTY
     ${CMAKE_CURRENT_LIST_DIR}/resources/MergeConnected.xml
     ${CMAKE_CURRENT_LIST_DIR}/resources/MinkowskiFilter.xml
     )
-
-if (${COSMOTOOLS_HAS_VORONOI})
-  set_property(GLOBAL APPEND PROPERTY
-    vtkPVVTKExtensionsCosmoTools_SERVERMANAGER_XMLS
-    ${CMAKE_CURRENT_LIST_DIR}/resources/VoronoiReader.xml)
-endif()
