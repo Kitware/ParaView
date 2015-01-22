@@ -1,6 +1,30 @@
   [ { "title": "ParaView 4",
       "items": [
 	 {
+     "name": "WebVisualizerQuickStart",
+     "title": "ParaViewWeb Visualizer - Quick start",
+     "description": "The ParaView Web Visualizer is a Web application that tries to provide functionality similar to the ParaView Qt application. This 5 minute video will walk you through the basic usage of Web Visualizer.",
+     "id": "116987128",
+     "thumb": "http://i.vimeocdn.com/video/503531370_150x84.jpg"
+   },{
+     "name": "VisualizerVolumeRendering",
+     "title": "ParaViewWeb Visualizer - Volume Rendering",
+     "description": "The ParaView Web Visualizer is a Web application that tries to provide functionality similar to the ParaView Qt application. This 1 minute video highlights how to edit the transfer function for volume rendering inside the Web Visualizer.",
+     "id": "116991628",
+     "thumb": "http://i.vimeocdn.com/video/503537675_150x84.jpg"
+   },{
+     "name": "VisualizerSettingsLOD",
+     "title": "ParaViewWeb Visualizer - View Settings for interactive LOD rendering",
+     "description": "The ParaView Web Visualizer is a Web application that tries to provide functionality similar to the ParaView Qt application. This 1 minute video highlights how to edit the view settings to adjust when the LOD should be used while interacting with large data.",
+     "id": "116991985",
+     "thumb": "http://i.vimeocdn.com/video/503538159_150x84.jpg"
+   },{
+     "name": "VisualizerContextualHelp",
+     "title": "ParaViewWeb Visualizer - Contextual help",
+     "description": "The ParaView Web Visualizer is a Web application that tries to provide functionality similar to the ParaView Qt application. This 20 second video highlights how the application aids the user by providing contextual descriptions of properties and range information.",
+     "id": "116992670",
+     "thumb": "http://i.vimeocdn.com/video/503539077_150x84.jpg"
+   },{
      "name": "WebVisualizer",
      "title": "ParaViewWeb generic visualizer",
      "description": "Generic web visualization and data processing with the WebVisualizer application that comes with ParaView 4.",

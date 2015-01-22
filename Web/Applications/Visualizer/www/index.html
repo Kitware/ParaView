@@ -128,13 +128,16 @@
                 connection.session,
                 '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info', '.pv-global-settings-editor');
 
-            $('[data-toggle="tooltip"]').tooltip({container: 'body'})
+            $('[data-toggle="tooltip"]').tooltip({container: 'body'});
 
             // Update stop method to use the connection
             stop = function() {
                 connection.session.call('application.exit');
             }
         };
+
+        // Pass any url parameters to the launcher
+        vtkWeb.udpateConnectionFromURL(config);
 
         // Try to launch the Viz process
         vtkWeb.smartConnect(config, start, function(code,reason){

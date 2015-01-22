@@ -142,28 +142,28 @@ When you edit the configuration file, shown below, be sure to replace `YOUR_HOST
         "apps": {
           "pipeline": {
             "cmd": [
-              "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
+              "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py",
               "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
           },
           "visualizer": {
             "cmd": [
-              "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
+              "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py",
               "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
           },
           "loader": {
             "cmd": [
-              "${python_exec}", "${python_path}/paraview/web/pv_web_file_loader.py",
+              "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_file_loader.py",
               "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
           },
           "data_prober": {
             "cmd": [
-              "${python_exec}", "${python_path}/paraview/web/pv_web_data_prober.py",
+              "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_data_prober.py",
               "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"

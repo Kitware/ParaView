@@ -62,28 +62,28 @@ __launcher.config__
       "apps": {
         "pipeline": {
           "cmd": [
-            "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
+            "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py",
             "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
           ],
           "ready_line" : "Starting factory"
         },
         "visualizer": {
             "cmd": [
-                "${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py",
+                "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py",
                 "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
         },
         "loader": {
             "cmd": [
-                "${python_exec}", "${python_path}/paraview/web/pv_web_file_loader.py",
+                "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_file_loader.py",
                 "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
         },
         "data_prober": {
             "cmd": [
-                "${python_exec}", "${python_path}/paraview/web/pv_web_data_prober.py",
+                "${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_data_prober.py",
                 "--port", "${port}", "--data-dir", "${dataDir}", "-f", "--authKey", "${secret}"
             ],
             "ready_line" : "Starting factory"
@@ -105,7 +105,7 @@ or inside VTK
 
  It is important to take special note a few of the details:
 
-- The `apps` section gives the command lines required to start any of the visualization processes the launcher will be capable of starting.
+- The `apps` section gives the command lines required to start any of the visualization processes the launcher will be capable of starting.  We recommend always providing the `-dr` argument to `pvpython` so that it never tries to load any saved preferences it might find.
 
 - The `configuration` section gives several important values:
   - `sessionURL` gives the url needed to communicate with the visualization processes.  In the case of the Apache front end, Apache will recognize this url and re-write it so that Apache websocket forwarding can send the packets to the correct running process on the back end.  This `sessionURL` value needs to match what is expected by the Apache RewriteRule (given in the Apache virtual host configuration).  See the [Apache as a front end](index.html#!/guide/apache_front_end) guide for details.

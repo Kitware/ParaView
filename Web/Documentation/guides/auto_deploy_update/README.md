@@ -98,19 +98,19 @@ Now you're ready to set up a launcher config file which can launch the basic par
         },
         "apps": {
             "pipeline": {
-                "cmd": ["${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
+                "cmd": ["${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
                 "ready_line" : "Starting factory"
              },
              "visualizer": {
-                "cmd": ["${python_exec}", "${python_path}/paraview/web/pv_web_visualizer.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
+                "cmd": ["${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_visualizer.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
                 "ready_line" : "Starting factory"
              },
              "loader": {
-                "cmd": ["${python_exec}", "${python_path}/paraview/web/pv_web_file_loader.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
+                "cmd": ["${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_file_loader.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
                 "ready_line" : "Starting factory"
              }
              "data_prober": {
-                "cmd": ["${python_exec}", "${python_path}/paraview/web/pv_web_data_prober.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
+                "cmd": ["${python_exec}", "-dr", "${python_path}/paraview/web/pv_web_data_prober.py", "--port", "${port}", "--data-dir", "${data}", "-f", "--authKey", "${secret}"],
                 "ready_line" : "Starting factory"
              }
          }
