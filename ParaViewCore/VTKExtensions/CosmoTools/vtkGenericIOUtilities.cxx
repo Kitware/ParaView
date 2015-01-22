@@ -93,9 +93,12 @@ vtkDataArray* GetVtkDataArray(
   dataArray->SetNumberOfComponents(1);
   dataArray->SetNumberOfTuples( N );
   dataArray->SetName(name.c_str());
-  void *dataBuffer = dataArray->GetVoidPointer(0);
-  assert("pre: encountered NULL data buffer!" && (dataBuffer != NULL) );
-  memcpy(dataBuffer,rawBuffer,N*dataSize);
+  if (N > 0)
+    {
+    void *dataBuffer = dataArray->GetVoidPointer(0);
+    assert("pre: encountered NULL data buffer!" && (dataBuffer != NULL) );
+    memcpy(dataBuffer,rawBuffer,N*dataSize);
+    }
   return( dataArray );
 }
 
