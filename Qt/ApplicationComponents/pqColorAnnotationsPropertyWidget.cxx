@@ -571,6 +571,8 @@ void pqColorAnnotationsPropertyWidget::setAnnotations(
     }
 
   this->Internals->Model.setAnnotations(annotationsData);
+
+  emit this->annotationsChanged();
 }
 
 //-----------------------------------------------------------------------------
