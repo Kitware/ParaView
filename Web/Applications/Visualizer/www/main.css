@@ -2,7 +2,6 @@
 
 .head-toolbar span { position: relative; top: 2px; font-size: 16px; }
 .fix-height { position: relative; top: 0; left: 0; }
-.property { margin: 5px -15px; }
 .pv-time-input { position: relative; top: 2px; width: 80px; border: solid 1px white; background: none; padding: 2px 10px; }
 
 /* ---- Font - colors - Cursor ----- */
@@ -58,18 +57,6 @@ select.pv-form-height  { font-size: 12px; }
 
 .dl-horizontal dd { margin-left: 80px; }
 .dl-horizontal dt { width: 60px; }
-
-/* ---- Proxy editor ---- */
-
-.pv-absolute-left                   { position: absolute; left: -15px; top: -25px; }
-
-.pv-collapsable-content             { padding-top: 25px; }
-.pv-collapsable-content.pv-collapse { padding: 0; }
-div.pv-collapse-title               { display: none; position: relative; }
-div.pv-no-collapse-title            { display: block; position: relative; }
-.pv-collapse > div                 { display: none !important; }
-.pv-collapse div.pv-collapse-title { display: block !important; }
-
 
 /* ---- Information Tab ---- */
 

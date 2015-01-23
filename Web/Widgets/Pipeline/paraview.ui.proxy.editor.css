@@ -1,0 +1,82 @@
+.pv-color-panel {
+    padding: 0 15px;
+}
+
+.scalar-range-editor-container {
+    display: none;
+    clear: both;
+    position: relative;
+}
+
+span.scalar-range-button {
+    padding: 1px 3px;
+}
+
+span.color-customization-button {
+    padding: 1px 3px;
+    border-radius: 5px;
+}
+
+input.scalar-range-min, input.scalar-range-max {
+    font-size: 12px;
+}
+
+@media (max-width: 767px) {
+    div.color-options-button-panel {
+        text-align: right;
+        padding-right: 15px;
+    }
+}
+
+@media (min-width: 768px) {
+    div.color-options-button-panel {
+        text-align: center;
+        padding-left: 15px;
+        position: relative;
+        top: -2px;
+    }
+}
+
+.color-editor-container {
+    display: none;
+    clear: both;
+    position: relative;
+}
+
+.coming-soon-placeholder {
+    background-color: #a0b0d0;
+    border-radius: 5px;
+    left: 15px;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-style: italic;
+}
+
+.light-form-control {
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+    color: #555;
+    padding: 6px 12px;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+}
+
+.button-padding-left  { padding-left: 20px; }
+.button-padding-right { padding-right: 20px; }
+.button-padding-left-small  { padding-left: 5px; }
+.button-padding-right-small { padding-right: 5px; }
+
+.pv-collapsable-content label        { font-weight: normal; margin: 0;}
+.pv-color-panel .top-property    { margin-top: 5px; }
+.pv-color-panel .bottom-property { margin-bottom: 5px; }
+
+.pv-collapsable-content            { padding: 0; margin: 0 -15px 15px; }
+.property                          { padding: 0 15px; margin: 5px -15px; }
+div.pv-collapse-title              { display: none; position: relative; background: rgba(150, 150, 150, 0.5); font-weight: bold; padding: 5px 0; color: #404040; margin-bottom: 15px;}
+div.pv-collapse-title.no-collapse  { display: block; }
+.pv-collapse > div                 { display: none !important; }
+.pv-collapse div.pv-collapse-title:not(.no-collapse) { display: block !important; }
+.pv-color-panel                    { margin-bottom: 15px; }

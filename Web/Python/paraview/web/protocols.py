@@ -461,7 +461,23 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
                                                                        rangemax,
                                                                        extend)
 
+        if status['success']:
+            currentRange = self.getCurrentScalarRange(proxyId)
+            status['range'] = currentRange
+
         return status
+
+    # RpcName: getCurrentScalarRange => pv.color.manager.scalar.range.get
+    @exportRpc("pv.color.manager.scalar.range.get")
+    def getCurrentScalarRange(self, proxyId):
+        proxy = self.mapIdToProxy(proxyId)
+        rep = simple.GetRepresentation(proxy)
+
+        lookupTable = rep.LookupTable
+        cMin = lookupTable.RGBPoints[0]
+        cMax = lookupTable.RGBPoints[-4]
+
+        return { 'min': cMin, 'max': cMax }
 
     # RpcName: colorBy => pv.color.manager.color.by
     @exportRpc("pv.color.manager.color.by")
@@ -494,9 +510,9 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
     # RpcName: setOpacityFunctionPoints => pv.color.manager.opacity.points.set
     @exportRpc("pv.color.manager.opacity.points.set")
-    def setOpacityFunctionPoints(self, representation, arrayName, pointArray):
-        repProxy = self.mapIdToProxy(representation)
-        lutProxy = repProxy.LookupTable
+    def setOpacityFunctionPoints(self, arrayName, pointArray):
+        lutProxy = simple.GetColorTransferFunction(arrayName)
+        pwfProxy = simple.GetOpacityTransferFunction(arrayName)
 
         # Use whatever the current scalar range is for this array
         cMin = lutProxy.RGBPoints[0]
@@ -510,9 +526,27 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             pointArray[idx] = (x * (cMax - cMin)) + cMin
 
         # Set the Points property to scaled and biased points array
-        repProxy.ScalarOpacityFunction.Points = pointArray
+        pwfProxy.Points = pointArray
 
         simple.Render()
+
+    # RpcName: setSurfaceOpacity => pv.color.manager.surface.opacity.set
+    @exportRpc("pv.color.manager.surface.opacity.set")
+    def setSurfaceOpacity(self, representation, enabled):
+        repProxy = self.mapIdToProxy(representation)
+        lutProxy = repProxy.LookupTable
+
+        lutProxy.EnableOpacityMapping = enabled
+
+        simple.Render()
+
+    # RpcName: getSurfaceOpacity => pv.color.manager.surface.opacity.get
+    @exportRpc("pv.color.manager.surface.opacity.get")
+    def getSurfaceOpacity(self, representation):
+        repProxy = self.mapIdToProxy(representation)
+        lutProxy = repProxy.LookupTable
+
+        return lutProxy.EnableOpacityMapping
 
     # RpcName: selectColorMap => pv.color.manager.select.preset
     @exportRpc("pv.color.manager.select.preset")
