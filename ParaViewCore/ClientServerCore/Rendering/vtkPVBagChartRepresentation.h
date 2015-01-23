@@ -61,6 +61,11 @@ public:
   vtkGetVector3Macro(BagColor, double);
 
   // Description:
+  // Set/get the color to used for the bag in the plot.
+  vtkSetVector3Macro(SelectionColor, double);
+  vtkGetVector3Macro(SelectionColor, double);
+
+  // Description:
   // Set/get the opacity for the bag in the plot.
   vtkSetMacro(Opacity, double);
   vtkGetMacro(Opacity, double);
@@ -122,6 +127,7 @@ private:
   int LineStyle;
   double LineColor[3];
   double BagColor[3];
+  double SelectionColor[3];
   double Opacity;
   int PointSize;
   double PointColor[3];

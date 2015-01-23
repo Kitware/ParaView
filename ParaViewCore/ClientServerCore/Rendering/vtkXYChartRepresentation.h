@@ -98,6 +98,8 @@ public:
   void ClearMarkerStyles();
   void ClearLabels();
 
+  vtkSetVector3Macro(SelectionColor, double);
+  vtkGetVector3Macro(SelectionColor, double);
 //BTX
 protected:
   vtkXYChartRepresentation();
@@ -123,6 +125,7 @@ private:
   char* XAxisSeriesName;
   bool UseIndexForXAxis;
   bool PlotDataHasChanged;
+  double SelectionColor[3];
 //ETX
 };
 
