@@ -218,6 +218,14 @@ vtkPANLHaloFinder::vtkPANLHaloFinder()
   this->MinCandidateSize = 200;
   this->NumSPHNeighbors = 64;
   this->NumNeighbors = 20;
+
+  this->CenterFindingMode = NONE;
+  this->SmoothingLength = 0.0;
+  this->OmegaDM = 0.26627;
+  this->OmegaNU = 0.0;
+  this->Deut = 0.02258;
+  this->Hubble = 0.673;
+  this->RedShift = 0.0;
 }
 
 vtkPANLHaloFinder::~vtkPANLHaloFinder()
@@ -630,6 +638,9 @@ void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid *fofProperties)
     }
   int numberOfFOFHalos = this->Internal->haloFinder->getNumberOfHalos();
   int* fofHaloCount = this->Internal->haloFinder->getHaloCount();
+  double OmegaBar = this->Deut/this->Hubble/this->Hubble;
+  double OmegaCB = OmegaDM + OmegaBar;
+  double OmegaMatter = OmegaCB + this->OmegaNU;
 
   vtkNew< vtkFloatArray > centers;
   centers->SetName("fof_center");
@@ -644,7 +655,7 @@ void vtkPANLHaloFinder::FindCenters(vtkUnstructuredGrid *fofProperties)
     haloData.SetParticles(centerFinder);
     centerFinder.setParameters(this->BB,this->SmoothingLength,
                                this->DistanceConvertFactor,this->RL,
-                               this->NP,this->OmegaMatter,this->OmegaCB,
+                               this->NP,OmegaMatter,OmegaCB,
                                this->Hubble,this->RedShift);
     int centerIndex = -1;
     if (this->CenterFindingMode == MOST_BOUND_PARTICLE)

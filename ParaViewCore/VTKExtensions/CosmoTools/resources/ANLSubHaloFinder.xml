@@ -1,0 +1,149 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="ANLSubhaloFinder"
+                 class="vtkPANLSubhaloFinder"
+                 label="ANL Subhalo Finder">
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the filter.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="HalosToProcess"
+                         command="SetHaloToProcess"
+                         label="Halos To Process"
+                         repeat_command="1"
+                         use_index="1"
+                         set_number_command="SetNumberOfHalosToProcess"
+                         number_of_elements_per_command="1"
+                         number_of_elements="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="RL"
+                            command="SetRL"
+                            label="Box size"
+                            number_of_elements="1"
+                            default_values="100" >
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          The box side length used to wrap particles around if they exceed rL
+          (or less than 0) in any dimension (only positive positions are allowed
+          in the input, or they are wrapped around).
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Overlap"
+                            command="SetDeadSize"
+                            label="Overlap"
+                            number_of_elements="1"
+                            default_values="5" >
+      <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          The space (in rL units) to extend processor particle ownership for ghost
+          particles/cells.  Needed for correct halo calculation when halos cross
+          processor boundaries in parallel computation.  Called DeadSize in the
+          hacc config files.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BB"
+                            command="SetBB"
+                            label="Linking length"
+                            number_of_elements="1"
+                            default_values="0.20" >
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Linking length measured in units of interparticle spacing and is
+          dimensionless.  Used to link particles into halos for the
+          friends-of-friends (FOF) algorithm.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ParticleMass"
+                            command="SetParticleMass"
+                            label="Particle Mass"
+                            number_of_elements="1"
+                            default_values="1.307087181e+09">
+        <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          The mass of each particle.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="AlphaFactor"
+                            command="SetAlphaFactor"
+                            label="Alpha Factor"
+                            panel_visibility="advanced"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
+        <Documentation>
+          A tuning parameter of subhalo finding.  This controls how aggressively small
+          suhalos will be grown.  Alpha factor of 1.0 is the least agrressive.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="BetaFactor"
+                            command="SetBetaFactor"
+                            label="Beta Factor"
+                            panel_visibility="advanced"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
+        <Documentation>
+          A tuning parameter of subhalo finding.  This controls how saddle points between
+          subhalos are treated.  Larger values allow identification of smaller scale
+          structures such as tails.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="MinCandidateSize"
+                         command="SetMinCandidateSize"
+                         label="Minimum Subhalo Size"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="20">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          A subhalo candidate must have at least this many particles to be a subhalo.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumSPHNeighbors"
+                         command="SetNumSPHNeighbors"
+                         label="SPH Neighbors"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="64">
+        <Documentation>
+          A parameter of the subhalo finder.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumNeighbors"
+                         command="SetNumNeighbors"
+                         label="Number of Neighbors"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="20">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          The nearest X particles will be used to determine the local density in
+          the subhalo finder where X is the value of this parameter.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="CosmoTools"/>
+      </Hints>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

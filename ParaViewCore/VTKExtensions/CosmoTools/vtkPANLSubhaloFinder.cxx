@@ -163,9 +163,29 @@ int vtkPANLSubhaloFinder::RequestData(
   return 1;
 }
 
+vtkIdType vtkPANLSubhaloFinder::GetHaloToProcess(vtkIdType idx)
+{
+  return this->HalosToProcess->GetId(idx);
+}
+
 void vtkPANLSubhaloFinder::AddHaloToProcess(vtkIdType haloId)
 {
   this->HalosToProcess->InsertNextId(haloId);
+}
+
+void vtkPANLSubhaloFinder::SetHaloToProcess(vtkIdType idx, vtkIdType haloId)
+{
+  this->HalosToProcess->SetId(idx,haloId);
+}
+
+void vtkPANLSubhaloFinder::SetNumberOfHalosToProcess(vtkIdType num)
+{
+  this->HalosToProcess->SetNumberOfIds(num);
+}
+
+vtkIdType vtkPANLSubhaloFinder::GetNumberOfHalosToProcess()
+{
+  return this->HalosToProcess->GetNumberOfIds();
 }
 
 void vtkPANLSubhaloFinder::ClearHalosToProcess()
