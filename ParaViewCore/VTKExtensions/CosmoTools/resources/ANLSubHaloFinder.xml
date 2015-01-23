@@ -3,6 +3,11 @@
     <SourceProxy name="ANLSubhaloFinder"
                  class="vtkPANLSubhaloFinder"
                  label="ANL Subhalo Finder">
+      <Documentation>
+      This filter assumes input similar to the output of the ANL Halo Finder's
+      first output port.  It runs the CosmoTools subhalo finder on specified
+      halos to determine significant subclumps of particles.
+      </Documentation>
       <InputProperty name="Input"
                      command="SetInputConnection">
         <ProxyGroupDomain name="groups">
@@ -17,6 +22,37 @@
         </Documentation>
       </InputProperty>
 
+      <IntVectorProperty name="Mode"
+                         command="SetMode"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="All Halos"/>
+          <Entry value="1" text="Halos Larger Than Threshold"/>
+          <Entry value="2" text="Only Specified Halos"/>
+        </EnumerationDomain>
+        <Documentation>
+          This property specifies which halos the filter will process.  When
+          'All Halos' is selected, all input halos will be processed.   When
+          'Only Halos Larger Than Threshold' is selected, only halos with
+          more than SizeThreshold particles will be processed.  When 'Only
+          Specified Halos' is selected, the halos whose ids are in the
+          HalosToProcess list will be used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="SizeThreshold"
+                         command="SetSizeThreshold"
+                         label="Size Threshold"
+                         number_of_elements="1"
+                         default_values="1000">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          This is the minimum size of a halo that will be processed if the
+          filter is in 'Halos Larger Than Threshold' mode.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="HalosToProcess"
                          command="SetHaloToProcess"
                          label="Halos To Process"
@@ -26,6 +62,10 @@
                          number_of_elements_per_command="1"
                          number_of_elements="0">
         <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          This list of halo ids which will be processed (if they exist in the
+          data) by the filter when in 'Only Specified Halos' mode.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty name="RL"

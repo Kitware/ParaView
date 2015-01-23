@@ -33,8 +33,9 @@
 // data arrays for summary information such as average velocity, mass, and
 // center of mass.
 
-#include "vtkPVVTKExtensionsCosmoToolsModule.h"
+#include "vtkPVVTKExtensionsCosmoToolsModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"
+#include "vtkNew.h" // for vtkNew
 
 class vtkMultiProcessController;
 class vtkIdList;
@@ -46,28 +47,54 @@ public:
   static vtkPANLSubhaloFinder* New();
   void PrintSelf(ostream &os, vtkIndent indent);
 
+  enum {
+    ALL_HALOS = 0,
+    HALOS_LARGER_THAN_THRESHOLD = 1,
+    ONLY_SELECTED_HALOS = 2
+  };
+
+
+  // Description:
+  // Sets/Gets the mode of the subhalo finding filter.  It should be one of the values
+  // ALL_HALOS - find subhalos of all halos (default)
+  // HALOS_LARGER_THAN_THRESHOLD - finds subhalos of all halos with more than
+  //                               SizeThreshold values (sizeThreshold is a settable
+  //                               parameter)
+  // ONLY_SELECTED_HALOS - finds subhalos of only the halos in the HalosToProcess list
+  vtkSetClampMacro(Mode,int,ALL_HALOS,ONLY_SELECTED_HALOS)
+  vtkGetMacro(Mode,int)
+
+  // Description:
+  // Sets/Gets the size threshold which is the minimum number of particles in the halos
+  // that will have the subhalo finder run on them in HALOS_LARGER_THAN_THRESHOLD mode.
+  // Defaults to 1000.
+  vtkSetMacro(SizeThreshold,vtkIdType)
+  vtkGetMacro(SizeThreshold,vtkIdType)
+
   // Description:
   // Gets the halo to process at the given index
+  // This list is used when the filter is in ONLY_SELECTED_HALOS mode
   vtkIdType GetHaloToProcess(vtkIdType idx);
   // Description:
   // Adds a halo to the list of halos that will have the subhalo finder run on them
+  // This list is used when the filter is in ONLY_SELECTED_HALOS mode
   void AddHaloToProcess(vtkIdType haloId);
   // Description:
   // Sets the halo id to process at the given index in the list
+  // This list is used when the filter is in ONLY_SELECTED_HALOS mode
   void SetHaloToProcess(vtkIdType idx, vtkIdType haloId);
   // Description:
   // Sets the number of halos to process
+  // This list is used when the filter is in ONLY_SELECTED_HALOS mode
   void SetNumberOfHalosToProcess(vtkIdType num);
   // Description:
   // Gets the number of halos to process
+  // This list is used when the filter is in ONLY_SELECTED_HALOS mode
   vtkIdType GetNumberOfHalosToProcess();
   // Description:
   // Clears the list of halos that will have the subhalo finder run on them
+  // This list is used when the filter is in ONLY_SELECTED_HALOS mode
   void ClearHalosToProcess();
-
-  // Description:
-  // Gets the list of halos that will have the subhalo finder run on them
-  vtkGetMacro(HalosToProcess,vtkIdList*)
 
   // Description:
   // Gets/Sets RL, the physical coordinate box size
@@ -147,7 +174,10 @@ protected:
   int NumSPHNeighbors;
   int NumNeighbors;
 
-  vtkIdList* HalosToProcess;
+  int Mode;
+  vtkIdType SizeThreshold;
+
+  vtkNew< vtkIdList > HalosToProcess;
   vtkMultiProcessController* Controller;
 
   class vtkInternals;

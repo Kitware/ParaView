@@ -30,6 +30,7 @@
 #include "FOFHaloProperties.h"
 
 #include <map>
+#include <set>
 #include <vector>
 
 namespace {
@@ -116,8 +117,10 @@ vtkPANLSubhaloFinder::vtkPANLSubhaloFinder()
 {
   this->Controller = vtkMultiProcessController::GetGlobalController();
   this->Internal = new vtkPANLSubhaloFinder::vtkInternals;
-  this->HalosToProcess = vtkIdList::New();
   this->SetNumberOfOutputPorts(2);
+
+  this->Mode = ALL_HALOS;
+  this->SizeThreshold = 1000;
 
   this->RL = 256;
   this->DeadSize = 8;
@@ -133,7 +136,6 @@ vtkPANLSubhaloFinder::vtkPANLSubhaloFinder()
 vtkPANLSubhaloFinder::~vtkPANLSubhaloFinder()
 {
   delete this->Internal;
-  this->HalosToProcess->Delete();
 }
 
 vtkStandardNewMacro(vtkPANLSubhaloFinder)
@@ -165,22 +167,33 @@ int vtkPANLSubhaloFinder::RequestData(
 
 vtkIdType vtkPANLSubhaloFinder::GetHaloToProcess(vtkIdType idx)
 {
+  assert(idx >= 0 && idx < this->HalosToProcess->GetNumberOfIds());
   return this->HalosToProcess->GetId(idx);
 }
 
 void vtkPANLSubhaloFinder::AddHaloToProcess(vtkIdType haloId)
 {
   this->HalosToProcess->InsertNextId(haloId);
+  this->Modified();
 }
 
 void vtkPANLSubhaloFinder::SetHaloToProcess(vtkIdType idx, vtkIdType haloId)
 {
-  this->HalosToProcess->SetId(idx,haloId);
+  assert(idx >= 0 && idx < this->HalosToProcess->GetNumberOfIds());
+  if (this->HalosToProcess->GetId(idx) != haloId)
+    {
+    this->HalosToProcess->SetId(idx,haloId);
+    this->Modified();
+    }
 }
 
 void vtkPANLSubhaloFinder::SetNumberOfHalosToProcess(vtkIdType num)
 {
-  this->HalosToProcess->SetNumberOfIds(num);
+  if (num != this->HalosToProcess->GetNumberOfIds())
+    {
+    this->HalosToProcess->SetNumberOfIds(num);
+    this->Modified();
+    }
 }
 
 vtkIdType vtkPANLSubhaloFinder::GetNumberOfHalosToProcess()
@@ -190,7 +203,11 @@ vtkIdType vtkPANLSubhaloFinder::GetNumberOfHalosToProcess()
 
 void vtkPANLSubhaloFinder::ClearHalosToProcess()
 {
-  this->HalosToProcess->Reset();
+  if (this->HalosToProcess->GetNumberOfIds() > 0)
+    {
+    this->HalosToProcess->Reset();
+    this->Modified();
+    }
 }
 
 
@@ -211,11 +228,48 @@ void vtkPANLSubhaloFinder::ExecuteSubHaloFinder(vtkUnstructuredGrid* input,
   subhaloId->SetNumberOfTuples(input->GetNumberOfPoints());
   subhaloId->FillComponent(0,-1);
 
-  this->Internal->ReadHalos(input->GetPointData()->GetArray("fof_halo_tag"),this->HalosToProcess);
-
-  for (int i = 0; i < this->HalosToProcess->GetNumberOfIds(); ++i)
+  vtkDataArray* haloTagArray = input->GetPointData()->GetArray("fof_halo_tag");
+  std::set< vtkIdType > uniqueIds;
+  for (vtkIdType i = 0; i < haloTagArray->GetNumberOfTuples(); ++i)
     {
-    vtkIdType haloId = this->HalosToProcess->GetId(i);
+    vtkIdType halo =
+        static_cast< vtkIdType >(haloTagArray->GetTuple1(i));
+    if (halo >= 0)
+      {
+      uniqueIds.insert(halo);
+      }
+    }
+  vtkNew< vtkIdList > allHaloIds;
+  for (std::set< vtkIdType >::iterator itr = uniqueIds.begin();
+       itr != uniqueIds.end(); ++itr)
+    {
+    allHaloIds->InsertNextId(*itr);
+    }
+
+  vtkNew< vtkIdList > finalHalosToProcess;
+  finalHalosToProcess->DeepCopy(
+        this->Mode == ONLY_SELECTED_HALOS ? this->HalosToProcess.GetPointer() :
+                                            allHaloIds.GetPointer());
+
+  this->Internal->ReadHalos(haloTagArray,finalHalosToProcess.GetPointer());
+
+  if (this->Mode == HALOS_LARGER_THAN_THRESHOLD)
+    {
+    for (vtkIdType i = finalHalosToProcess->GetNumberOfIds() - 1; i >= 0; --i)
+      {
+        if (this->Internal->haloIndices[finalHalosToProcess->GetId(i)].size() <
+            this->SizeThreshold)
+          {
+          finalHalosToProcess->DeleteId(finalHalosToProcess->GetId(i));
+          i = std::min(i,finalHalosToProcess->GetNumberOfIds());
+          }
+      }
+    }
+
+  for (int i = 0; i < finalHalosToProcess->GetNumberOfIds(); ++i)
+    {
+    vtkIdType haloId = finalHalosToProcess->GetId(i);
+    vtkDebugMacro(<<"Processing halo: " << haloId);
     this->Internal->LoadHalo(haloId,this->ParticleMass,input);
     long particleCount = this->Internal->xx.size();
     if (particleCount == 0)
