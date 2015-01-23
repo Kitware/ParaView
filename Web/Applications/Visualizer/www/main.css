@@ -58,6 +58,10 @@ select.pv-form-height  { font-size: 12px; }
 .dl-horizontal dd { margin-left: 80px; }
 .dl-horizontal dt { width: 60px; }
 
+/* ---- Save Data Panel ---- */
+.inspector-container .active-panel-btn  { border-radius: 15px; }
+.label-spacing     { margin-top: 15px; margin-bottom: 5px;}
+
 /* ---- Information Tab ---- */
 
 .pv-data-info dl { margin-bottom: 0; }

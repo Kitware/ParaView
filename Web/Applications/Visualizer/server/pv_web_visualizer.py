@@ -56,6 +56,10 @@ r"""
             This option is useful when running in mpi mode and you want pvservers to
             connect to this pvpython application.
 
+        --save-data-dir
+            Server directory under which all data will be saved.  Data, state, and
+            screenshots can be saved to relative paths under this directory.
+
     Any ParaViewWeb executable script comes with a set of standard arguments that can be overriden if need be::
 
         --port 8080
@@ -115,6 +119,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
     colorPalette = None
     proxies = None
     allReaders = True
+    saveDataDir = os.getcwd()
 
     @staticmethod
     def add_arguments(parser):
@@ -131,25 +136,32 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         parser.add_argument("--plugins", default="", help="List of fully qualified path names to plugin objects to load", dest="plugins")
         parser.add_argument("--proxies", default=None, help="Path to a file with json text containing filters to load", dest="proxies")
         parser.add_argument("--no-auto-readers", help="If provided, disables ability to use non-configured readers", action="store_true", dest="no_auto_readers")
+        parser.add_argument("--save-data-dir", default='', help="Server directory under which all data will be saved", dest="saveDataDir")
 
     @staticmethod
     def configure(args):
-        _VisualizerServer.authKey      = args.authKey
-        _VisualizerServer.dataDir      = args.path
-        _VisualizerServer.dsHost       = args.dsHost
-        _VisualizerServer.dsPort       = args.dsPort
-        _VisualizerServer.rsHost       = args.rsHost
-        _VisualizerServer.rsPort       = args.rsPort
-        _VisualizerServer.rcPort       = args.reverseConnectPort
-        _VisualizerServer.excludeRegex = args.exclude
-        _VisualizerServer.groupRegex   = args.group
-        _VisualizerServer.plugins      = args.plugins
-        _VisualizerServer.proxies      = args.proxies
-        _VisualizerServer.colorPalette = args.palettes
-        _VisualizerServer.allReaders   = not args.no_auto_readers
+        _VisualizerServer.authKey         = args.authKey
+        _VisualizerServer.dataDir         = args.path
+        _VisualizerServer.dsHost          = args.dsHost
+        _VisualizerServer.dsPort          = args.dsPort
+        _VisualizerServer.rsHost          = args.rsHost
+        _VisualizerServer.rsPort          = args.rsPort
+        _VisualizerServer.rcPort          = args.reverseConnectPort
+        _VisualizerServer.excludeRegex    = args.exclude
+        _VisualizerServer.groupRegex      = args.group
+        _VisualizerServer.plugins         = args.plugins
+        _VisualizerServer.proxies         = args.proxies
+        _VisualizerServer.colorPalette    = args.palettes
+        _VisualizerServer.allReaders      = not args.no_auto_readers
+
+        # If no save directory is provided, default it to the data directory
+        if args.saveDataDir == '':
+            _VisualizerServer.saveDataDir = _VisualizerServer.dataDir
+        else:
+            _VisualizerServer.saveDataDir = args.saveDataDir
 
         if args.file:
-            _VisualizerServer.fileToLoad = args.path + '/' + args.file
+            _VisualizerServer.fileToLoad  = args.path + '/' + args.file
 
     def initialize(self):
         # Bring used components
@@ -167,6 +179,7 @@ class _VisualizerServer(pv_wamp.PVServerProtocol):
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebSelectionHandler())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebWidgetManager())
         self.registerVtkWebProtocol(pv_protocols.ParaViewWebKeyValuePairStore())
+        self.registerVtkWebProtocol(pv_protocols.ParaViewWebSaveData(baseSavePath=_VisualizerServer.saveDataDir))
 
         # Update authentication key to use
         self.updateSecret(_VisualizerServer.authKey)

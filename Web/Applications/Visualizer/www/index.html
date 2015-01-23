@@ -41,6 +41,9 @@
                 class='vtk-icon-resize-full-alt-1 reset-camera clickable' data-toggle='tooltip' data-placement='bottom' title='Reset Camera'>
             </span>
             <span
+                class='vtk-icon-floppy clickable padding inspector-selector' data-type='saveopts' data-toggle='tooltip' data-placement='bottom' title='Show Save Options'>
+            </span>
+            <span
                 class='vtk-icon-clock-1 toggle-time-toolbar clickable' data-toggle='tooltip' data-placement='bottom' title='Toggle VCR Controls'>
             </span>
             <span
@@ -106,6 +109,53 @@
                 <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-global-settings-editor'>
                 </div>
             </div>
+            <div class="row inspector" data-type="saveopts" style="display: none;">
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-savedata-options'>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 btn-group btn-group-sm" role="group" aria-label="Save Types" style="margin-top: 15px;">
+                            <button type="button" data-action="screen" class="btn btn-default active-panel-btn col-xs-4 col-sm-4 col-md-4 col-lg-4">Screenshot</button>
+                            <button type="button" data-action="data" class="btn btn-default active-panel-btn col-xs-4 col-sm-4 col-md-4 col-lg-4">Data</button>
+                            <button type="button" data-action="state" class="btn btn-default active-panel-btn col-xs-4 col-sm-4 col-md-4 col-lg-4">State</button>
+                        </div>
+                    </div>
+                    <div class="row screenshot-save-only label-spacing">
+                        <div class="col-xs-12">
+                            Desired Resolution
+                            <span class="vtk-icon-arrows-cw screenshot-reset-size-btn clickable float-right" data-toggle='tooltip' data-placement='bottom' title='Current Screen Size'></span>
+                        </div>
+                    </div>
+                    <div class="row screenshot-save-only">
+                        <div class="col-xs-12 text-center">
+                            <input type="text" style="width: 45%" class="screenshot-pixel-width light-form-control input-sm float-left">
+                            x
+                            <input type="text" style="width: 45%" class="screenshot-pixel-height light-form-control input-sm float-right">
+                        </div>
+                    </div>
+                    <div class="row label-spacing">
+                        <div class="col-xs-12">
+                            Filename
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <input type="text" class="save-data-filename form-control input-sm"/>
+                        </div>
+                    </div>
+                    <div class="row label-spacing">
+                        <div class="col-xs-6">
+                            <button type="button" class="screenshot-save-only screenshot-grab-image-btn btn btn-default btn-sm">Capture</button>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <button type="button" class="save-data-button btn btn-default btn-sm">Save</button>
+                        </div>
+                    </div>
+                    <div class="row label-spacing captured-screenshot-container screenshot-save-only">
+                        <div class="col-xs-12">
+                            <img class="captured-screenshot-image hidden" width="100%" style="border: 1px solid black;" data-toggle='tooltip' data-placement='top' title='To save full size image locally, right-click image and choose "Save Image As..."'></img>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class='no-overflow pv-viewport fix-height shift-top' style='width: 100%; position: absolute;'>
         </div>
@@ -126,7 +176,8 @@
 
             pv.initializeVisualizer(
                 connection.session,
-                '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info', '.pv-global-settings-editor');
+                '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list',
+                '.pv-filter-list', '.pv-data-info', '.pv-global-settings-editor', '.pv-savedata-options');
 
             $('[data-toggle="tooltip"]').tooltip({container: 'body'});
 
@@ -135,9 +186,6 @@
                 connection.session.call('application.exit');
             }
         };
-
-        // Pass any url parameters to the launcher
-        vtkWeb.udpateConnectionFromURL(config);
 
         // Try to launch the Viz process
         vtkWeb.smartConnect(config, start, function(code,reason){

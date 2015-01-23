@@ -1165,7 +1165,7 @@ function ParaViewWebTestFunctions(connection) {
         protocolProxyAvailableTests: function(testName, resultCallback) {
             var s = connection.session,
             expectedFilters = ["Slice", "Warp By Scalar", "Clip", "Cell Data To Point Data", "Calculator", "Transform", "Extract CTH Parts", "Reflect", "Stream Tracer", "Threshold", "Contour"],
-            expectedSources = ["Box", "Cylinder", "Sphere", "Plane", "Cone", "Annotate Time", "Wavelet"];
+            expectedSources = ["Annotate Time", "Cone", "Sphere", "Text", "Wavelet"];
 
             function findMissingElements(expected, actual) {
                 var missing = [];
