@@ -85,10 +85,6 @@ public:
   /// options will be created.
   pqApplicationCore(int& argc, char** argv, pqOptions* options=0, QObject* parent=0);
 
-  /// Dangerous option that disables the debug output window, intended for
-  /// demo purposes only
-  void disableOutputWindow();
-
   /// Provides access to the command line options object.
   pqOptions* getOptions() const
     { return this->Options; }
@@ -179,6 +175,9 @@ public:
   /// Returns the output window.
   pqOutputWindowAdapter* outputWindowAdapter()
     { return this->OutputWindowAdapter; }
+
+  pqOutputWindow* outputWindow()
+  { return this->OutputWindow; }
 
   /// It is possible to change the display policy used by
   /// the application. Used to change the active display

@@ -48,16 +48,20 @@ to the corresponding pqOutputWindow slots.
 class PQCORE_EXPORT pqOutputWindow :
   public QDialog
 {
-  typedef QDialog Superclass;
-  
+  typedef QDialog Superclass;  
   Q_OBJECT
 
 public:
+  enum MessageType
+  {
+    ERROR,
+    WARNING,
+    DEBUG,
+    MESSAGE_TYPE_COUNT
+  };
+
   pqOutputWindow(QWidget* Parent);
   ~pqOutputWindow();
-
-  void setShowOutput(bool state)
-    { this->ShowOutput = state; }
 
   ///
   static pqOutputWindow* instance();
@@ -75,20 +79,33 @@ public slots:
   void onDisplayErrorTextInWindow(const QString&);
 
 private slots:
+  /// Standard methods for a QDialog. Both hide the dialog.
   void accept();
   void reject();
+  /// Clears all messages from the output window
   void clear();
+  /// Sets the console view if 'on' is true or the table view if 'on' is false.
+  void setConsoleView(int on);
+  /// Slots called to filter (on or off) errors, warnings or debug messages.
+  void errorToggled(bool checked);
+  void warningToggled(bool checked);
+  void debugToggled(bool checked);
 
 private:
   pqOutputWindow(const pqOutputWindow&);
   pqOutputWindow& operator=(const pqOutputWindow&);
+  void addMessage(int messageType, const QString& text);
+  void addPythonMessages(int messageType, const QString& text);
+
+  void addMessage(int messageType, const QString& location, 
+                  const QString& message);
   
   virtual void showEvent(QShowEvent*);
   virtual void hideEvent(QHideEvent*);
   
-  int ShowOutput;
+  bool Show[MESSAGE_TYPE_COUNT];
   struct pqImplementation;
-  pqImplementation* const Implementation;
+  const QScopedPointer<pqImplementation> Implementation;
 };
 
 #endif // !_pqOutputWindow_h
