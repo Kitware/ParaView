@@ -324,7 +324,7 @@ def LoadState(filename, connection=None):
 # -----------------------------------------------------------------------------
 
 def SaveState(filename):
-    servermanager.SaveXMLState(filename)
+    servermanager.SaveState(filename)
 
 #==============================================================================
 # Representation methods

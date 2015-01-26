@@ -1288,6 +1288,15 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Get file extension and look for configured reader
         idx = fileToLoad[0].rfind('.')
         extension = fileToLoad[0][idx+1:]
+
+        # Check if we were asked to load a state file
+        if extension == 'pvsm':
+            simple.LoadState(fileToLoad[0])
+            simple.Render()
+            simple.ResetCamera()
+
+            return { 'success': True }
+
         readerName = None
         if extension in self.readerFactoryMap:
             readerName = self.readerFactoryMap[extension][0]
@@ -1316,7 +1325,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         simple.Render()
         simple.ResetCamera()
 
-        return { "id": reader.GetGlobalIDAsString() }
+        return { 'success': True, 'id': reader.GetGlobalIDAsString() }
 
     @exportRpc("pv.proxy.manager.get")
     def get(self, proxyId):
@@ -1716,6 +1725,88 @@ class ParaViewWebKeyValuePairStore(ParaViewWebProtocol):
             return self.keyValStore[key]
         else:
             return None
+
+
+# =============================================================================
+#
+# Save Data Protocol
+#
+# =============================================================================
+
+class ParaViewWebSaveData(ParaViewWebProtocol):
+
+    def __init__(self, baseSavePath=''):
+        super(ParaViewWebSaveData, self).__init__()
+        self.baseSavePath = baseSavePath
+
+        self.imageExtensions = [ 'jpg', 'png' ]
+        self.dataExtensions = [ 'vtk', 'ex2' ]
+        self.stateExtensions = [ 'pvsm' ]
+
+    # RpcName: saveData => 'pv.data.save'
+    @exportRpc("pv.data.save")
+    def saveData(self, filePath, options=None):
+        """
+        Save some data on the server side.  Can save data from a proxy, a
+        screenshot, or else the current state.  Options may be different
+        depending on the type of data to be save.  Saving a screenshot
+        can take an optional size array indicating the desired width and
+        height of the saved image.  Saving data can take an optional proxy
+        id specifying which filter or source to save output from.
+
+            options = {
+                'proxyId': '426',
+                'size': [ <imgWidth>, <imgHeight> ]
+            }
+
+        """
+
+        # make sure file path exists
+        fullPath = os.path.join(self.baseSavePath, filePath)
+        if not os.path.exists(os.path.dirname(fullPath)):
+            os.makedirs(os.path.dirname(fullPath))
+
+        # Get file extension and look for configured reader
+        idx = filePath.rfind('.')
+        extension = filePath[idx+1:]
+
+        # Now find out what kind of save it is, and do it
+        if extension in self.imageExtensions:
+            if options and 'size' in options:
+                # Get the active view
+                v = self.getView(-1)
+
+                # Keep track of current size
+                cw = v.ViewSize[0]
+                ch = v.ViewSize[1]
+
+                # Resize to desired screenshot size
+                v.ViewSize = [ int(str(options['size'][0])), int(str(options['size'][1])) ]
+                simple.Render()
+
+                # Save actual screenshot
+                simple.SaveScreenshot(fullPath)
+
+                # Put the size back the way we found it
+                v.ViewSize = [cw, ch]
+                simple.Render()
+            else:
+                simple.SaveScreenshot(fullPath)
+        elif extension in self.dataExtensions:
+            proxy = None
+            if options and 'proxyId' in options:
+                proxyId = str(options['proxyId'])
+                proxy = self.mapIdToProxy(proxyId)
+            simple.SaveData(fullPath, proxy)
+        elif extension in self.stateExtensions:
+            # simple.SaveState(fullPath) # FIXME: Fixed after 4.3.1
+            servermanager.SaveState(fullPath)
+        else:
+            msg = 'ERROR: Could not recognize type of data to save from filename: %s' % filePath
+            print msg
+            return { 'success': False, 'message': msg }
+
+        return { 'success': True }
 
 
 # =============================================================================
