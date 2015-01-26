@@ -18,6 +18,27 @@ and return it when `getWidget()` was called the first time.
 instead. This method internally calls the pqView::createWidget() when
 appropriate.
 
+###Removed vtkPVGenericRenderWindowInteractor, vtkPVRenderViewProxy###
+
+ParaView was subclassing vtkRenderWindowInteractor to create
+`vtkPVGenericRenderWindowInteractor` to handle interaction. That piece of code
+was potentially derrived from an older implementation of
+vtkRenderWindowInteractor and hence did what it did. Current implementation of
+vtkRenderWindowInteractor lets the vtkInteractionStyle (and subclasses) do all
+the heavy lifting. ParaView did that to some extent (since it has a
+vtkPVInteractorStyle), but will was relying on
+`vtkPVGenericRenderWindowInteractor`, `vtkPVRenderViewProxy` to propage
+interaction/still renders and other things. This has been refactored. ParaView
+no longer uses a special vtkRenderWindowInteractor. All logic is handled by
+observers on the standard vtkRenderWindowInteractor.
+
+This change was done to make it easier to enable interactivity in `pvpython`.
+
+See also: vtkSMRenderViewProxy::SetupInteractor(). Subclasses of pqView now pass
+the interactor created by QVTKWidget to this method to initialize it.
+
+See also: vtkSMViewProxyInteractorHelper.
+
 Changes in 4.3
 --------------
 

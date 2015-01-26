@@ -16,12 +16,12 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMMessage.h"
 
 #include <list>
 
@@ -72,9 +72,11 @@ public:
       vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(proxy);
       if (rmp)
         {
-        vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
-        iren->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
-        iren->AddObserver(vtkCommand::EndInteractionEvent, this->Observer);
+        if (vtkRenderWindowInteractor* iren = rmp->GetInteractor())
+          {
+          iren->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
+          iren->AddObserver(vtkCommand::EndInteractionEvent, this->Observer);
+          }
         rmp->AddObserver(vtkCommand::ResetCameraEvent, this->Observer);
         }
       };
@@ -85,10 +87,9 @@ public:
         vtkSMRenderViewProxy::SafeDownCast(this->Proxy);
       if (rmp)
         {
-        vtkPVGenericRenderWindowInteractor* iren = rmp->GetInteractor();
+        vtkRenderWindowInteractor* iren = rmp->GetInteractor();
         if(iren)
           {
-          iren->RemoveObserver(this->Observer);
           iren->RemoveObserver(this->Observer);
           }
         rmp->RemoveObserver(this->Observer);

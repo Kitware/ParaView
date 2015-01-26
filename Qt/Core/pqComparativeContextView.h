@@ -62,12 +62,9 @@ public:
 
 protected slots:
   /// Called when the layout on the comparative vis changes.
-  void onComparativeVisLayoutChanged();
+  void updateViewWidgets();
 
 protected:
-  /// On creation of the view, we need to layout the initial plots.
-  virtual void initialize();
-
   /// Create the QWidget for this view.
   virtual QWidget* createWidget();
 

@@ -48,7 +48,6 @@ set(Module_SRCS
   vtkPVAxesWidget.cxx
   vtkPVCenterAxesActor.cxx
   vtkPVDefaultPass.cxx
-  vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
@@ -60,7 +59,6 @@ set(Module_SRCS
   vtkPVMergeTablesMultiBlock.cxx
   vtkPVPlotTime.cxx
   vtkPVRecoverGeometryWireframe.cxx
-  vtkPVRenderViewProxy.cxx
   vtkPVScalarBarActor.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballMultiRotate.cxx
@@ -126,7 +124,6 @@ set_source_files_properties(
   vtkCameraManipulatorGUIHelper
   vtkImageCompressor
   vtkPVJoystickFly
-  vtkPVRenderViewProxy
   ABSTRACT)
 
 #---------------------------------------------------------

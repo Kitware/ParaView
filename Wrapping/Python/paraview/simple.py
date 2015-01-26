@@ -250,6 +250,34 @@ def RenderAllViews():
     for view in GetViews(): Render(view)
 
 # -----------------------------------------------------------------------------
+def Interact(view=None):
+    """Call this method to start interacting with a view. This method will
+    block till the interaction is done."""
+    if not view:
+        view = active_objects.view
+    if not view:
+        raise ValueError, "view argument cannot be None"
+    try:
+        renWin = view.GetRenderWindow()
+    except AttributeError:
+        raise ValueError, "%r doesn't support interaction." % view
+    iren = renWin.GetInteractor()
+    if not iren:
+        if renWin.GetMapped():
+            raise RuntimeError, "Window is currently mapped. "\
+                    "Currently, interaction is only supported on unmapped windows.  "\
+                    "To avoid this, call Interact() before calling Render() on the view."
+        iren = renWin.MakeRenderWindowInteractor()
+        try:
+            view.SetupInteractor(iren)
+        except AttributeError: pass
+    if not iren:
+        raise RuntimeError, "Configuration doesn't support interaction."
+    paraview.print_debug_info("Staring interaction. Use 'q' to quit.")
+    iren.Start()
+
+
+# -----------------------------------------------------------------------------
 
 def ResetCamera(view=None):
     """Resets the settings of the camera to preserver orientation but include

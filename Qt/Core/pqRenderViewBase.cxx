@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -46,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxyInteractorHelper.h"
 
 // Qt Includes.
 #include <QList>
@@ -78,13 +78,11 @@ class pqRenderViewBase::pqInternal
 {
 public:
   QPoint MouseOrigin;
-  bool InitializedAfterObjectsCreated;
   bool IsInteractiveDelayActive;
   double TimeLeftBeforeFullResolution;
 
   pqInternal()
     {
-    this->InitializedAfterObjectsCreated=false;
     }
   ~pqInternal()
     {
@@ -212,30 +210,17 @@ void pqRenderViewBase::initialize()
 //-----------------------------------------------------------------------------
 void pqRenderViewBase::initializeAfterObjectsCreated()
 {
-  if (!this->Internal->InitializedAfterObjectsCreated)
-    {
-    this->Internal->InitializedAfterObjectsCreated = true;
-    this->initializeWidgets();
-    }
-
   // Attach Qt Signal to VTK interactor Delay event
   vtkSMRenderViewProxy* renderViewProxy;
   renderViewProxy = vtkSMRenderViewProxy::SafeDownCast(this->getProxy());
   if( renderViewProxy != NULL )
     {
-    // Generate Signals when interaction event occurs ??? Here ???
-    this->getConnector()->Connect(
-        renderViewProxy->GetInteractor(),
-        vtkPVGenericRenderWindowInteractor::EndDelayNonInteractiveRenderEvent,
-        this, SLOT(endDelayInteractiveRender()));
-    this->getConnector()->Connect( renderViewProxy->GetInteractor(),
-                                   vtkCommand::StartInteractionEvent,
-                                   this,
-                                   SLOT(endDelayInteractiveRender()));
-    this->getConnector()->Connect( renderViewProxy->GetInteractor(),
-                                   vtkPVGenericRenderWindowInteractor::BeginDelayNonInteractiveRenderEvent,
-                                   this,
-                                   SLOT(beginDelayInteractiveRender()));
+    vtkSMViewProxyInteractorHelper* helper = renderViewProxy->GetInteractorHelper();
+    Q_ASSERT(helper);
+    vtkEventQtSlotConnect* cntor = this->getConnector();
+    cntor->Connect(helper, vtkCommand::CreateTimerEvent, this, SLOT(beginDelayInteractiveRender()));
+    cntor->Connect(helper, vtkCommand::DestroyTimerEvent, this, SLOT(endDelayInteractiveRender()));
+    cntor->Connect(helper, vtkCommand::TimerEvent, this, SLOT(endDelayInteractiveRender()));
 
     this->InteractiveDelayUpdateTimer->setSingleShot(false);
     QObject::connect( this->InteractiveDelayUpdateTimer,

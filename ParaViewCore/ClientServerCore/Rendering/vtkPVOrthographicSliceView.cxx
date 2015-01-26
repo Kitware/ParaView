@@ -21,13 +21,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVChangeOfBasisHelper.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 #include "vtkTextRepresentation.h"
@@ -164,7 +164,9 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
   SlicePositionAxes2D(),
   SlicePositionAxes3D(),
   SliceAnnotations(),
-  SliceAnnotationsVisibility(false)
+  SliceAnnotationsVisibility(false),
+  MouseWheelForwardEventId(0),
+  MouseWheelBackwardEventId(0)
 {
   this->CenterAxes->SetVisibility(0);
   this->SliceIncrements[0] = this->SliceIncrements[1] = this->SliceIncrements[2] = 1.0;
@@ -211,18 +213,12 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
   this->Renderers[XY_PLANE]->GetActiveCamera()->SetFocalPoint(0, 0, 0);
   this->Renderers[XY_PLANE]->GetActiveCamera()->SetViewUp(0, 1, 0);
 
-  if (this->Interactor)
+  if (this->InteractorStyle) //  bother creating interactor styles only if superclass did as well.
     {
-    this->Interactor->SetInteractorStyle(this->OrthographicInteractorStyle.GetPointer());
     this->OrthographicInteractorStyle->SetPrimaryInteractorStyle(this->ThreeDInteractorStyle);
     this->OrthographicInteractorStyle->SetOrthographicInteractorStyle(this->TwoDInteractorStyle);
     this->OrthographicInteractorStyle->SetPrimaryRenderer(this->GetRenderer());
     this->OrthographicInteractorStyle->SetView(this);
-
-    this->Interactor->AddObserver(vtkCommand::MouseWheelForwardEvent,
-      this, &vtkPVOrthographicSliceView::OnMouseWheelForwardEvent);
-    this->Interactor->AddObserver(vtkCommand::MouseWheelBackwardEvent,
-      this, &vtkPVOrthographicSliceView::OnMouseWheelBackwardEvent);
     }
 
   this->SetSlicePosition(0, 0, 0);
@@ -231,6 +227,26 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
 //----------------------------------------------------------------------------
 vtkPVOrthographicSliceView::~vtkPVOrthographicSliceView()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrthographicSliceView::SetupInteractor(vtkRenderWindowInteractor* iren)
+{
+  if (this->Interactor)
+    {
+    this->Interactor->RemoveObserver(this->MouseWheelForwardEventId);
+    this->Interactor->RemoveObserver(this->MouseWheelBackwardEventId);
+    this->MouseWheelForwardEventId = 0;
+    this->MouseWheelBackwardEventId = 0;
+    }
+  this->Superclass::SetupInteractor(iren);
+  if (this->Interactor)
+    {
+    this->MouseWheelForwardEventId = this->Interactor->AddObserver(vtkCommand::MouseWheelForwardEvent,
+      this, &vtkPVOrthographicSliceView::OnMouseWheelForwardEvent);
+    this->MouseWheelBackwardEventId = this->Interactor->AddObserver(vtkCommand::MouseWheelBackwardEvent,
+      this, &vtkPVOrthographicSliceView::OnMouseWheelBackwardEvent);
+    }
 }
 
 //----------------------------------------------------------------------------

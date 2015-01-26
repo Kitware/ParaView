@@ -16,7 +16,7 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkRenderWindowInteractor.h"
 #include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMUndoStack.h"

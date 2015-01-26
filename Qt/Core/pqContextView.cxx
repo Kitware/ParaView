@@ -137,62 +137,13 @@ QWidget* pqContextView::createWidget()
   vtkwidget->setViewProxy(this->getProxy());
   vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
   vtkwidget->installEventFilter(this);
-  vtkwidget->setObjectName("Viewport");
-  this->initializeInteractors();
+
+  vtkSMContextViewProxy* proxy = this->getContextViewProxy();
+  Q_ASSERT(proxy);
+
+  vtkwidget->SetRenderWindow(proxy->GetRenderWindow());
+  proxy->SetupInteractor(vtkwidget->GetInteractor());
   return vtkwidget;
-}
-
-//-----------------------------------------------------------------------------
-void pqContextView::initialize()
-{
-  this->Superclass::initialize();
-
-  // The render module needs to obtain client side objects
-  // for the RenderWindow etc. to initialize the QVTKWidget
-  // correctly. It cannot do this unless the underlying proxy
-  // has been created. Since any pqProxy should never call
-  // UpdateVTKObjects() on itself in the constructor, we
-  // do the following.
-  vtkSMProxy* proxy = this->getProxy();
-  if (!proxy->GetObjectsCreated())
-    {
-    // Wait till first UpdateVTKObjects() call on the render module.
-    // Under usual circumstances, after UpdateVTKObjects() the
-    // render module objects will be created.
-    this->getConnector()->Connect(proxy, vtkCommand::UpdateEvent,
-      this, SLOT(initializeAfterObjectsCreated()));
-    }
-  else
-    {
-    this->initializeAfterObjectsCreated();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqContextView::initializeAfterObjectsCreated()
-{
-  if (!this->Internal->InitializedAfterObjectsCreated)
-    {
-    this->Internal->InitializedAfterObjectsCreated = true;
-    // Initialize the interactors and all global settings. global-settings
-    // override the values specified in state files or through python client.
-    this->initializeInteractors();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqContextView::initializeInteractors()
-{
-  vtkSMContextViewProxy* proxy =
-    vtkSMContextViewProxy::SafeDownCast(this->getProxy());
-  QVTKWidget* qvtk = qobject_cast<QVTKWidget*>(this->widget());
-
-  if(proxy && qvtk)
-    {
-    vtkContextView* view = proxy->GetContextView();
-    view->SetInteractor(qvtk->GetInteractor());
-    qvtk->SetRenderWindow(view->GetRenderWindow());
-    }
 }
 
 //-----------------------------------------------------------------------------

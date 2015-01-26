@@ -17,7 +17,6 @@
 #include "vtkAbstractWidget.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVImplicitPlaneRepresentation.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"

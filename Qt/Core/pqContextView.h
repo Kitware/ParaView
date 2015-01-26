@@ -68,12 +68,6 @@ public:
   /// Resets the zoom level to 100%.
   virtual void resetDisplay();
 
-protected slots:
-  virtual void initializeAfterObjectsCreated();
-
-  /// Sets up the interactors correctly.
-  virtual void initializeInteractors();
-
 protected:
   /// Constructor:
   /// \c type  :- view type.
@@ -92,9 +86,6 @@ protected:
   /// Creates a new instance of the QWidget subclass to be used to show this
   /// view. This will create a pqQVTKWidget for the render window.
   virtual QWidget* createWidget();
-
-  /// Overridden to set up some default signal-slot connections.
-  virtual void initialize();
 
   /// Listen for new selection events, and pass them back to ParaView
   virtual void selectionChanged();

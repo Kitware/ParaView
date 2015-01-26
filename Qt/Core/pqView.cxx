@@ -177,6 +177,12 @@ void pqView::initialize()
   // registered, this method will detect them and sync the GUI state with the 
   // SM state.
   this->onRepresentationsChanged();
+
+  // Create the widget.
+  if (this->widget() == NULL)
+    {
+    qWarning("This view doesn't have a QWidget. May not work as expected.");
+    }
 }
 
 //-----------------------------------------------------------------------------

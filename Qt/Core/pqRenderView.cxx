@@ -38,8 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIntArray.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVInteractorStyle.h"
 #include "vtkPVRenderView.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -108,11 +106,9 @@ public:
   bool UpdatingStack;
   int CurrentInteractionMode;
 
-  bool InitializedWidgets;
   pqInternal()
     {
     this->CurrentInteractionMode = -1;
-    this->InitializedWidgets = false;
     this->UpdatingStack = false;
     this->InteractionUndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
     // FIXME this->InteractionUndoStack->SetClientOnly(true);
@@ -186,6 +182,16 @@ vtkSMRenderViewProxy* pqRenderView::getRenderViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderView::initialize()
+{
+  this->Superclass::initialize();
+
+  // initialize the interaction undo-redo stack.
+  vtkSMRenderViewProxy* viewProxy = this->getRenderViewProxy();
+  this->Internal->UndoStackBuilder->SetRenderView(viewProxy);
+}
+
+//-----------------------------------------------------------------------------
 QWidget* pqRenderView::createWidget()
 {
   QWidget* vtkwidget = this->Superclass::createWidget();
@@ -194,26 +200,10 @@ QWidget* pqRenderView::createWidget()
     vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
     qvtkwidget->SetRenderWindow(renModule->GetRenderWindow());
     // This is needed to ensure that the interactor is initialized with
-    // ParaView specific interactor styles.
-    renModule->SetInteractor(qvtkwidget->GetInteractor());
+    // ParaView specific interactor styles etc.
+    renModule->SetupInteractor(qvtkwidget->GetInteractor());
     }
   return vtkwidget;
-}
-
-//-----------------------------------------------------------------------------
-// This method is called for all pqRenderView objects irrespective
-// of whether it is created from state/undo-redo/python or by the GUI. Hence
-// don't change any render module properties here.
-void pqRenderView::initializeWidgets()
-{
-  if (this->Internal->InitializedWidgets)
-    {
-    return;
-    }
-
-  this->Internal->InitializedWidgets = true;
-  vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
-  this->Internal->UndoStackBuilder->SetRenderView(renModule);
 }
 
 //-----------------------------------------------------------------------------

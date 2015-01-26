@@ -107,7 +107,6 @@
 #include "vtkPVExponentialKeyFrame.h"
 #include "vtkPVExtractVOI.h"
 #include "vtkPVFrustumActor.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLegacyGlyphFilter.h"
 #include "vtkPVInteractorStyle.h"
@@ -123,7 +122,6 @@
 #include "vtkPVPostFilter.h"
 #include "vtkPVPostFilterExecutive.h"
 #include "vtkPVRecoverGeometryWireframe.h"
-#include "vtkPVRenderViewProxy.h"
 #include "vtkPVScalarBarActor.h"
 #include "vtkPVSelectionSource.h"
 #include "vtkPVTextSource.h"
@@ -292,7 +290,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVExponentialKeyFrame);
   PRINT_SELF(vtkPVExtractVOI);
   PRINT_SELF(vtkPVFrustumActor);
-  PRINT_SELF(vtkPVGenericRenderWindowInteractor);
   PRINT_SELF(vtkPVGeometryFilter);
   PRINT_SELF(vtkPVLegacyGlyphFilter);
   PRINT_SELF(vtkPVInteractorStyle);
@@ -308,7 +305,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int , char *[])
   PRINT_SELF(vtkPVPostFilter);
   PRINT_SELF(vtkPVPostFilterExecutive);
   PRINT_SELF(vtkPVRecoverGeometryWireframe);
-  PRINT_SELF(vtkPVRenderViewProxy);
   PRINT_SELF(vtkPVScalarBarActor);
   PRINT_SELF(vtkPVSelectionSource);
   PRINT_SELF(vtkPVTextSource);

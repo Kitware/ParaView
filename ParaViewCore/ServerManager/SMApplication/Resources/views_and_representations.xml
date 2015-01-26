@@ -1757,19 +1757,28 @@
           rotation speed is multipied by this factor. Default value is 1.
         </Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetNonInteractiveRenderDelay"
-                         default_values="0"
+      <DoubleVectorProperty default_values="0"
                          name="NonInteractiveRenderDelay"
                          panel_visibility="never"
                          number_of_elements="1">
         <Documentation>Set the delay (in seconds) after an interactive render
-        before switching to a full-rese render.</Documentation>
+          before switching to a full-rese render.</Documentation>
         <Hints>
           <PropertyLink group="settings"
                         proxy="RenderViewSettings"
                         property="NonInteractiveRenderDelay"/>
         </Hints>
       </DoubleVectorProperty>
+      <IntVectorProperty name="EnableRenderOnInteraction"
+                         default_values="1"
+                         panel_visibility="never"
+                         number_of_elements="1">
+                         <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether the view must render automatically on interaction. If application
+          wants to manage renders explicitly, set this to 0 (Off). 1 (On) by default.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty name="Camera3DManipulators"
         command="SetCamera3DManipulators"
         argument_is_array="1"
@@ -7306,6 +7315,9 @@
           <Property name="Camera3DManipulators" panel_visibility="never"/>
           <Property name="Camera2DManipulators" panel_visibility="never"/>
           <Property name="CenterOfRotation" panel_visibility="never"/>
+          <Property name="RotationFactor" panel_visibility="never"/>
+          <Property name="NonInteractiveRenderDelay" panel_visibility="never"/>
+          <Property name="EnableRenderOnInteraction" panel_visibility="never"/>
           <!-- Renderer -->
           <Property name="StereoRender" panel_visibility="never"/>
           <Property name="StereoType" panel_visibility="never"/>

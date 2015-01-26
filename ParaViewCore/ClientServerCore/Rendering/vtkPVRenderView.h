@@ -27,6 +27,7 @@
 #include "vtkPVView.h"
 #include "vtkBoundingBox.h" // needed for iVar
 #include "vtkNew.h" // needed for iVar
+#include "vtkSmartPointer.h" // needed for iVar
 
 
 class vtkAlgorithmOutput;
@@ -46,13 +47,13 @@ class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
 class vtkPVDataDeliveryManager;
 class vtkPVDataRepresentation;
-class vtkPVGenericRenderWindowInteractor;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
 class vtkPVSynchronizedRenderer;
 class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
+class vtkRenderWindowInteractor;
 class vtkTextRepresentation;
 class vtkTexture;
 
@@ -110,7 +111,13 @@ public:
 
   // Description:
   // Returns the interactor. .
-  vtkGetObjectMacro(Interactor, vtkPVGenericRenderWindowInteractor);
+  vtkRenderWindowInteractor* GetInteractor();
+
+  // Description:
+  // Set the interactor. Client applications must set the interactor to enable
+  // interactivity. Note this method will also change the interactor styles set
+  // on the interactor.
+  virtual void SetupInteractor(vtkRenderWindowInteractor*);
 
   // Description:
   // Returns the interactor style.
@@ -419,10 +426,9 @@ public:
   virtual void SetCenterAxesVisibility(bool);
 
   //*****************************************************************
-  // Forward to vtkPVGenericRenderWindowInteractor.
+  // Forward to vtkPVInteractorStyle instances.
   void SetCenterOfRotation(double x, double y, double z);
   void SetRotationFactor(double factor);
-  void SetNonInteractiveRenderDelay(double seconds);
 
   //*****************************************************************
   // Forward to vtkLightKit.
@@ -579,13 +585,6 @@ protected:
   virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
 
   // Description:
-  // These methods are used to setup the view for capturing screen shots.
-  // In batch mode, since the server-side has just 1 render window, we need to
-  // make sure that the right interactor is activated, otherwise, we end up
-  // capturing images from the wrong view.
-  virtual void PrepareForScreenshot();
-
-  // Description:
   // Actual render method.
   virtual void Render(bool interactive, bool skip_rendering);
 
@@ -663,7 +662,7 @@ protected:
   vtkRenderViewBase* RenderView;
   vtkRenderer* NonCompositedRenderer;
   vtkPVSynchronizedRenderer* SynchronizedRenderers;
-  vtkPVGenericRenderWindowInteractor* Interactor;
+  vtkSmartPointer<vtkRenderWindowInteractor> Interactor;
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
   vtkInteractorStyleRubberBandZoom* RubberBandZoom;
   vtkInteractorStyleDrawPolygon* PolygonStyle;
@@ -745,6 +744,8 @@ private:
 
   vtkNew<vtkTextRepresentation> Annotation;
   void UpdateAnnotationText();
+
+  bool OrientationWidgetVisibility;
 //ETX
 };
 

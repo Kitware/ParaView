@@ -190,6 +190,22 @@ void vtkPVInteractorStyle::OnMouseMove()
     }
 }
 
+//-------------------------------------------------------------------------
+void vtkPVInteractorStyle::OnChar()
+{
+  vtkRenderWindowInteractor *rwi = this->Interactor;
+
+  switch (rwi->GetKeyCode())
+    {
+    case 'Q' :
+    case 'q' :
+      // It must be noted that this has no effect in QVTKInteractor and hence
+      // we're assured that the Qt application won't exit because the user hit
+      // 'q'.
+      rwi->ExitCallback();
+      break;
+    }
+}
 
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::ResetLights()
