@@ -73,8 +73,8 @@ struct pqCheckBoxDelegate::pqInternals
   QPolygonF ExpandedPolygon;
 };
 
-pqCheckBoxDelegate::pqCheckBoxDelegate(QObject *parent)
-  : QStyledItemDelegate(parent)
+pqCheckBoxDelegate::pqCheckBoxDelegate(QObject *_parent)
+  : QStyledItemDelegate(_parent)
 {
   this->Internals = new pqInternals();
 }
@@ -122,7 +122,7 @@ void pqCheckBoxDelegate::paint(QPainter *painter,
     }
 }
 
-bool pqCheckBoxDelegate::editorEvent(QEvent *event,
+bool pqCheckBoxDelegate::editorEvent(QEvent *_event,
                                      QAbstractItemModel *model,
                                      const QStyleOptionViewItem &option,
                                      const QModelIndex &index)
@@ -133,24 +133,24 @@ bool pqCheckBoxDelegate::editorEvent(QEvent *event,
     int checked = d.toInt();
     if (checked != pqCheckBoxDelegate::NOT_EXPANDED_DISABLED)
       {
-      if ((event->type() == QEvent::MouseButtonRelease) ||
-          (event->type() == QEvent::MouseButtonDblClick))
+      if ((_event->type() == QEvent::MouseButtonRelease) ||
+          (_event->type() == QEvent::MouseButtonDblClick))
         {
-        QMouseEvent *mouse_event = static_cast<QMouseEvent*>(event);
+        QMouseEvent *mouse_event = static_cast<QMouseEvent*>(_event);
         if (mouse_event->button() != Qt::LeftButton ||
             !CheckBoxRect(option).contains(mouse_event->pos()))
           {
           return false;
           }
-        if (event->type() == QEvent::MouseButtonDblClick)
+        if (_event->type() == QEvent::MouseButtonDblClick)
           {
           return true;
           }
         }
-      else if (event->type() == QEvent::KeyPress)
+      else if (_event->type() == QEvent::KeyPress)
         {
-        if (static_cast<QKeyEvent*>(event)->key() != Qt::Key_Space &&
-            static_cast<QKeyEvent*>(event)->key() != Qt::Key_Select)
+        if (static_cast<QKeyEvent*>(_event)->key() != Qt::Key_Space &&
+            static_cast<QKeyEvent*>(_event)->key() != Qt::Key_Select)
           {
           return false;
           }
@@ -163,4 +163,5 @@ bool pqCheckBoxDelegate::editorEvent(QEvent *event,
       return model->setData(index, !checked, Qt::EditRole);
       }
     }
+  return false;
 }

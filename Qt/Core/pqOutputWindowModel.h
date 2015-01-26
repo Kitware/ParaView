@@ -84,7 +84,7 @@ private:
   QList<int> Rows;  // element is index in Messages,
                     // when an element is expanded, the index is duplicated
   QTableView* View;
-  class pqInternals;
+  struct pqInternals;
   QScopedPointer<pqInternals> Internals;
 };
 

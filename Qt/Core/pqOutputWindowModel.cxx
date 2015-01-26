@@ -46,7 +46,6 @@ namespace
 {
 const int EXPANDED_ROW_EXTRA = 1;
 // WARNING: The string order has to match the order in pqOutputWindow::MessageType
-const char* MessageTypeString[] = {"Error", "Warning", "Debug"};
 const QStyle::StandardPixmap MessageTypeIcon[] =
 {
   QStyle::SP_MessageBoxCritical,
@@ -69,7 +68,8 @@ struct pqOutputWindowModel::pqInternals
 };
 
 pqOutputWindowModel::pqOutputWindowModel(
-  QObject *parent, const QList<MessageT>& messages) :
+  QObject *_parent, const QList<MessageT>& messages) :
+  QAbstractTableModel(_parent),
   Messages(messages),
   View(NULL),
   Internals(new pqInternals())
@@ -81,33 +81,33 @@ pqOutputWindowModel::~pqOutputWindowModel()
 {
 }
 
-int pqOutputWindowModel::rowCount(const QModelIndex &parent) const
+int pqOutputWindowModel::rowCount(const QModelIndex &_parent) const
 {
-  (void)parent;
+  (void)_parent;
   return this->Rows.size();
 }
 
-int pqOutputWindowModel::columnCount(const QModelIndex &parent) const
+int pqOutputWindowModel::columnCount(const QModelIndex &_parent) const
 {
-  (void)parent;
+  (void)_parent;
   return COUNT;
 }
 
-Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & index) const
+Qt::ItemFlags pqOutputWindowModel::flags(const QModelIndex & _index) const
 {
-  int r = index.row();
+  int r = _index.row();
   Qt::ItemFlags f;
   if (! this->Messages[this->Rows[r]].Location.isEmpty() ||
-      index.column() != COLUMN_EXPANDED)
+      _index.column() != COLUMN_EXPANDED)
     {
     f |= Qt::ItemIsEnabled;
     }
   return f;
 }
 
-QVariant pqOutputWindowModel::data(const QModelIndex &index, int role) const
+QVariant pqOutputWindowModel::data(const QModelIndex &_index, int role) const
 {
-  int r = index.row();
+  int r = _index.row();
   switch(role)
     {
     case Qt::DisplayRole:
@@ -116,14 +116,14 @@ QVariant pqOutputWindowModel::data(const QModelIndex &index, int role) const
           this->Rows[r] == this->Rows[r - EXPANDED_ROW_EXTRA])
         {
         // row expansion.
-        return (index.column() == COLUMN_MESSAGE) ? 
+        return (_index.column() == COLUMN_MESSAGE) ? 
           this->Messages[this->Rows[r]].Location :
           QVariant();
         }
       else
         {
         // regular row (not an expansion)
-        switch (index.column())
+        switch (_index.column())
           {
           case COLUMN_EXPANDED:
             return this->Messages[this->Rows[r]].Location.isEmpty() ? 
@@ -142,7 +142,7 @@ QVariant pqOutputWindowModel::data(const QModelIndex &index, int role) const
       }
     case Qt::TextAlignmentRole:
       {      
-      if (index.column() == COLUMN_COUNT)
+      if (_index.column() == COLUMN_COUNT)
         {
         return Qt::AlignCenter;
         }
@@ -152,7 +152,7 @@ QVariant pqOutputWindowModel::data(const QModelIndex &index, int role) const
       {
       if ((r - EXPANDED_ROW_EXTRA < 0 ||
            this->Rows[r] != this->Rows[r - EXPANDED_ROW_EXTRA]) &&
-          (index.column() == COLUMN_TYPE))
+          (_index.column() == COLUMN_TYPE))
         {
         return this->Internals->Icons[this->Messages[this->Rows[r]].Type];
         }
@@ -162,17 +162,17 @@ QVariant pqOutputWindowModel::data(const QModelIndex &index, int role) const
   return QVariant();
 }
 
-bool pqOutputWindowModel::setData(const QModelIndex & index, 
+bool pqOutputWindowModel::setData(const QModelIndex & _index, 
                                   const QVariant & value, int role)
 {
-  int r = index.row();  
+  int r = _index.row();  
   if (role == Qt::EditRole)
     {
       if (r - EXPANDED_ROW_EXTRA < 0 ||
           this->Rows[r] != this->Rows[r - EXPANDED_ROW_EXTRA])
         {
         // regular row (not an expansion)
-        if (index.column() == COLUMN_EXPANDED)
+        if (_index.column() == COLUMN_EXPANDED)
           {
           switch (value.toInt())
             {
@@ -233,20 +233,20 @@ void pqOutputWindowModel::clear()
 void pqOutputWindowModel::ShowMessages(bool* show)
 {
   this->clear();
-  int rowCount = 0;
+  int _rowCount = 0;
   for (int i = 0; i < this->Messages.size(); ++i)
     {
     for (int j = 0; j < pqOutputWindow::MESSAGE_TYPE_COUNT; ++j)
       {
       if (show[j] && this->Messages[i].Type == j)
         {
-        ++rowCount;
+        ++_rowCount;
         break;
         }
       }
     }
-  this->Rows.reserve(rowCount);
-  this->beginInsertRows(QModelIndex(), 0, rowCount - 1);
+  this->Rows.reserve(_rowCount);
+  this->beginInsertRows(QModelIndex(), 0, _rowCount - 1);
   for (int i = 0; i < this->Messages.size(); ++i)
     {
     for (int j = 0; j < pqOutputWindow::MESSAGE_TYPE_COUNT; ++j)
