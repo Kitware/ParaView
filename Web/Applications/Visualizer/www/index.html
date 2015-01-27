@@ -29,10 +29,7 @@
                 class='vtk-icon-doc-text clickable padding inspector-selector' data-type='files' data-toggle='tooltip' data-placement='bottom' title='Show File List'>
             </span>
             <span
-                class='vtk-icon-plus clickable padding inspector-selector' data-type='sources' data-toggle='tooltip' data-placement='bottom' title='Show Sources'>
-            </span>
-            <span
-                class='vtk-icon-filter clickable padding inspector-selector need-input-source' data-type='filters' data-toggle='tooltip' data-placement='bottom' title='Show Filters'>
+                class='vtk-icon-plus clickable padding inspector-selector' data-type='sources' data-toggle='tooltip' data-placement='bottom' title='Show Sources/Filters'>
             </span>
             <span
                 class='vtk-icon-info-1 clickable padding inspector-selector need-input-source' data-type='info' data-toggle='tooltip' data-placement='bottom' title='Show Data Info'>
@@ -75,9 +72,7 @@
             <div class="row inspector" data-type="sources">
                 <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-source-list nopadding'>
                 </div>
-            </div>
-            <div class="row inspector" data-type="filters">
-                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-filter-list nopadding'>
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-filter-list nopadding need-input-source'>
                 </div>
             </div>
             <div class="row inspector" data-type="info">
@@ -87,7 +82,10 @@
             <div class="row inspector" data-type="preferences">
                 <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-preferences'>
                     <div class="row" style='margin-top: 15px;'>
-                        <label class='col-sm-5 control-label'>Rendering</label>
+                        <label class='col-sm-5 control-label'
+                               data-toggle='tooltip'
+                               data-placement='right'
+                               title='Select rendering mode'>Rendering</label>
                         <div class='col-sm-5'>
                             <select class='pv-update-viewport' data-property-name='ActiveRendererType'>
                                 <option value='image'>Remote</option>
@@ -97,11 +95,24 @@
                         </div>
                     </div>
                     <div class="row">
-                        <label class='col-sm-5 control-label'>Rendering statistics</label>
+                        <label class='col-sm-5 control-label'
+                               data-toggle='tooltip'
+                               data-placement='right'
+                               title='Toggle local rendering statistics'>Statistics</label>
                         <div class='col-sm-5'>
                             <input type='checkbox' class='pv-update-viewport checkbox' data-property-name='Stats'/>
                         </div>
                     </div>
+                    <div class="row">
+                        <label class='col-sm-5 control-label'
+                               data-toggle='tooltip'
+                               data-placement='right'
+                               title='Shutdown server process when leaving page'>Auto&nbsp;shutdown</label>
+                        <div class='col-sm-5'>
+                            <input type='checkbox' class='pv-update-viewport checkbox' data-property-name='CloseBehavior' checked/>
+                        </div>
+                    </div>
+                    <div class="row" style="height: 15px;"><br/></div>
                 </div>
                 <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-global-settings-editor'>
                 </div>
@@ -119,6 +130,7 @@
             sessionManagerURL: vtkWeb.properties.sessionManagerURL,
             application: "visualizer"
         },
+        reallyStop = true,
         stop = vtkWeb.NoOp,
         start = function(connection) {
             $('.app-wait-start-page').remove();
@@ -132,7 +144,9 @@
 
             // Update stop method to use the connection
             stop = function() {
-                connection.session.call('application.exit');
+                if (reallyStop === true) {
+                    connection.session.call('application.exit');
+                }
             }
         };
 

@@ -205,6 +205,12 @@
                 viewport.invalidateScene();
             } else if(propName === 'Stats') {
                 viewport.showStatistics(value === 1);
+            } else if(propName === 'CloseBehavior') {
+                if(value === 1) {
+                    reallyStop = true;
+                } else {
+                    reallyStop = false;
+                }
             }
         });
     }

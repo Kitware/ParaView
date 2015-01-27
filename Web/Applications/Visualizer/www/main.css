@@ -4,6 +4,19 @@
 .fix-height { position: relative; top: 0; left: 0; }
 .pv-time-input { position: relative; top: 2px; width: 80px; border: solid 1px white; background: none; padding: 2px 10px; }
 
+/* ---- Sources/Filters Icons ---- */
+
+.pv-source-list ul, .pv-filter-list ul {
+    margin-bottom: 0;
+}
+.pvActionList li:before {
+  font-family: "fontello";
+  width: 16px;
+  display: inline-block;
+}
+.pv-source-list li:before { content: '\e94e'; }
+.pv-filter-list li:before { content: '\e81c'; }
+
 /* ---- Font - colors - Cursor ----- */
 
 .clickable { cursor: pointer; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; }
