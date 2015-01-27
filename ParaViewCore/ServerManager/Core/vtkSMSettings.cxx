@@ -236,6 +236,7 @@ public:
       if (hasInt)
         {
         property->SetElement(0, enumValue);
+        return true;
         }
       else
         {
@@ -245,28 +246,22 @@ public:
           {
           enumValue = enumDomain->GetEntryValueForText(stringValue.c_str());
           property->SetElement(0, enumValue);
+          return true;
           }
         }
       }
-    else
+    std::vector<int> vector;
+    if (!this->GetSetting(settingName, vector) ||
+      vector.size() != property->GetNumberOfElements())
       {
-      std::vector<int> vector;
-      if (!this->GetSetting(settingName, vector) ||
-          vector.size() != property->GetNumberOfElements())
-        {
-        return false;
-        }
-      else if (property->GetRepeatable())
-        {
-        property->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
-        }
-      else if (vector.size() != property->GetNumberOfElements())
-        {
-        return false;
-        }
-
-      property->SetElements(&vector[0]);
+      return false;
       }
+    if (property->GetRepeatable())
+      {
+      property->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
+      }
+
+    property->SetElements(&vector[0]);
 
     return true;
   }
