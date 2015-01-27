@@ -325,7 +325,7 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
     // This ensures that the QVTKWidget (or any other rendering
     // widget) for the view is created thus avoiding the window from ever
     // popping up and causing issues as as seen in BUG #13855.
-    view->getWidget();
+    view->widget();
 
     emit this->preViewAdded(view);
     }

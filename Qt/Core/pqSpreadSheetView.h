@@ -54,10 +54,6 @@ public:
     QObject* parent=NULL);
   virtual ~pqSpreadSheetView();
 
-  /// Return a widget associated with this view.
-  /// This view has no widget.
-  virtual QWidget* getWidget();
-
   /// Get the internal model for the view
   pqSpreadSheetViewModel* getViewModel();
 
@@ -87,7 +83,9 @@ protected slots:
 
   /// Called when checkbox "Show Only Selected Elements" is updated
   void onSelectionOnly();
-  
+
+  /// Create a QWidget for the view's viewport.
+  virtual QWidget* createWidget();
 private:
   pqSpreadSheetView(const pqSpreadSheetView&); // Not implemented.
   void operator=(const pqSpreadSheetView&); // Not implemented.

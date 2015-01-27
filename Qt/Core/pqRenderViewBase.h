@@ -64,9 +64,6 @@ public:
   // Destructor.
   virtual ~pqRenderViewBase();
 
-  /// Returns the QVTKWidget for this render Window.
-  virtual QWidget* getWidget();
-
   /// Resets the camera to include all visible data.
   /// It is essential to call this resetCamera, to ensure that the reset camera
   /// action gets pushed on the interaction undo stack.

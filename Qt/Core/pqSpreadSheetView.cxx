@@ -148,8 +148,9 @@ pqSpreadSheetView::~pqSpreadSheetView()
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqSpreadSheetView::getWidget()
+QWidget* pqSpreadSheetView::createWidget()
 {
+  // The viewport is already created. Just return that.
   return this->Internal->Container;
 }
 

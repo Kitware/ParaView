@@ -74,17 +74,21 @@ class pqViewInternal
 {
 public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  QPointer<QWidget> Widget;
+  bool WidgetCreated;
 
   // List of representation shown by this view.
   QList<QPointer<pqRepresentation> > Representations;
 
-  pqViewInternal()
+  pqViewInternal() :
+    WidgetCreated(false)
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     }
 
   ~pqViewInternal()
     {
+    delete this->Widget;
     }
 
   pqTimer RenderTimer;
@@ -158,6 +162,7 @@ vtkSMViewProxy* pqView::getViewProxy() const
   return vtkSMViewProxy::SafeDownCast(this->getProxy());
 }
 
+//-----------------------------------------------------------------------------
 vtkView* pqView::getClientSideView() const
 {
   return 0;
@@ -172,6 +177,21 @@ void pqView::initialize()
   // registered, this method will detect them and sync the GUI state with the 
   // SM state.
   this->onRepresentationsChanged();
+}
+
+//-----------------------------------------------------------------------------
+QWidget* pqView::widget()
+{
+  if (this->Internal->WidgetCreated == false)
+    {
+    this->Internal->Widget = this->createWidget();
+    this->Internal->WidgetCreated = true;
+    if (this->Internal->Widget)
+      {
+      this->Internal->Widget->setObjectName("Viewport");
+      }
+    }
+  return this->Internal->Widget;
 }
 
 //-----------------------------------------------------------------------------
@@ -370,8 +390,8 @@ void pqView::onRepresentationVisibilityChanged(bool visible)
 //-----------------------------------------------------------------------------
 QSize pqView::getSize()
 {
-  QWidget* widget = this->getWidget();
-  return widget? widget->size(): QSize(0, 0);
+  QWidget* wdg = this->widget();
+  return wdg? wdg->size(): QSize(0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -394,12 +414,12 @@ int pqView::computeMagnification(const QSize& fullsize, QSize& viewsize)
 bool pqView::writeImage(const QString& filename, const QSize& fullsize, int quality)
 {
   // FIXME: code duplicated with pqView::captureImage(). Fix it :).
-  if (!this->getWidget()->isVisible())
+  if (!this->widget()->isVisible())
     {
     return false;
     }
 
-  QWidget* vtkwidget = this->getWidget();
+  QWidget* vtkwidget = this->widget();
   QSize cursize = vtkwidget->size();
   QSize newsize = cursize;
   int magnification = 1;
@@ -425,12 +445,12 @@ bool pqView::writeImage(const QString& filename, const QSize& fullsize, int qual
 //-----------------------------------------------------------------------------
 vtkImageData* pqView::captureImage(const QSize& fullsize)
 {
-  if (!this->getWidget()->isVisible())
+  if (!this->widget()->isVisible())
     {
     return NULL;
     }
 
-  QWidget* vtkwidget = this->getWidget();
+  QWidget* vtkwidget = this->widget();
   QSize cursize = vtkwidget->size();
   QSize newsize = cursize;
   int magnification = 1;
@@ -454,7 +474,7 @@ vtkImageData* pqView::captureImage(const QSize& fullsize)
 //-----------------------------------------------------------------------------
 vtkImageData* pqView::captureImage(int magnification)
 {
-  if (this->getWidget() && this->getWidget()->isVisible())
+  if (this->widget() && this->widget()->isVisible())
     {
     vtkSMViewProxy *view = this->getViewProxy();
     Q_ASSERT(view);
@@ -476,3 +496,10 @@ bool pqView::canDisplay(pqOutputPort* opPort) const
 
   return this->getViewProxy()->CanDisplayData(sourceProxy, opPort->getPortNumber());
 }
+
+#ifndef VTK_LEGACY_REMOVE
+QWidget* pqView::getWidget()
+{
+  return this->widget();
+}
+#endif

@@ -78,9 +78,9 @@ pqComparativeContextView::pqComparativeContextView(const QString& type,
 //-----------------------------------------------------------------------------
 pqComparativeContextView::~pqComparativeContextView()
 {
-  foreach (QVTKWidget* widget, this->Internal->RenderWidgets.values())
+  foreach (QVTKWidget* wdg, this->Internal->RenderWidgets.values())
     {
-    delete widget;
+    delete wdg;
     }
   delete this->Internal;
   delete this->Widget;
@@ -107,8 +107,9 @@ vtkSMContextViewProxy* pqComparativeContextView::getContextViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqComparativeContextView::getWidget()
+QWidget* pqComparativeContextView::createWidget()
 {
+  // widget is already created. Return that.
   return this->Widget;
 }
 
@@ -166,12 +167,12 @@ void pqComparativeContextView::onComparativeVisLayoutChanged()
     vtkSMContextViewProxy* renView = vtkSMContextViewProxy::SafeDownCast(key);
     renView->UpdateVTKObjects();
 
-    QVTKWidget* widget = new QVTKWidget();
-    renView->GetContextView()->SetInteractor(widget->GetInteractor());
-    widget->SetRenderWindow(renView->GetContextView()->GetRenderWindow());
-    widget->installEventFilter(this);
-    widget->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->RenderWidgets[key] = widget;
+    QVTKWidget* wdg = new QVTKWidget();
+    renView->GetContextView()->SetInteractor(wdg->GetInteractor());
+    wdg->SetRenderWindow(renView->GetContextView()->GetRenderWindow());
+    wdg->installEventFilter(this);
+    wdg->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->RenderWidgets[key] = wdg;
     }
 
   // Now layout the views.
@@ -183,10 +184,10 @@ void pqComparativeContextView::onComparativeVisLayoutChanged()
     }
 
   // destroy the old layout and create a new one.
-  QWidget* widget = this->getWidget();
-  delete widget->layout();
+  QWidget* wdg = this->widget();
+  delete wdg->layout();
 
-  QGridLayout* layout = new QGridLayout(widget);
+  QGridLayout* layout = new QGridLayout(wdg);
   layout->setSpacing(1);
   layout->setMargin(0);
   for (int x = 0; x < dimensions[0]; ++x)

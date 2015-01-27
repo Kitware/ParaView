@@ -316,7 +316,7 @@ void pq3DWidget::setView(pqView* pqview)
   if (rview && !this->Internal->PickSequence.isEmpty())
     {
     this->Internal->PickShortcut = new QShortcut(
-      this->Internal->PickSequence, pqview->getWidget());
+      this->Internal->PickSequence, pqview->widget());
     QObject::connect(this->Internal->PickShortcut, SIGNAL(activated()),
       this, SLOT(pickPoint()));
     }

@@ -42,9 +42,6 @@ public:
                     QObject* p);
   virtual ~pqMultiSliceView();
 
-  /// Override to decorate the QVTKWidget
-  virtual QWidget* createWidget();
-
   /// Provide access to slices positions for any axis.
   /// 0 <= axisIndex <= 2
   const double* GetSlices(int axisIndex, int &numberOfSlices);
@@ -76,6 +73,9 @@ private slots:
 
 protected:
   void updateViewModelCallBack(vtkObject*,unsigned long, void*);
+
+  /// Override to decorate the QVTKWidget
+  virtual QWidget* createWidget();
 
   /// Helper method to get the concreate 3D widget
   QVTKWidget* getInternalWidget();

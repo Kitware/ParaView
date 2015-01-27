@@ -49,9 +49,6 @@ public:
   void setPythonScript(QString & script);
   QString getPythonScript();
 
-  /// Returns the QVTKWidget for this render Window.
-  virtual QWidget* getWidget();
-
   /// Get the view proxy as a vtkSMPythonViewProxy
   vtkSMPythonViewProxy* getPythonViewProxy();
 
@@ -70,7 +67,7 @@ protected:
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
   /// Creates a new instance of the QWidget subclass to be used to show this
-  /// view. Default implementation creates a QVTKWidget.
+  /// view.
   virtual QWidget* createWidget();
 
   /// Use this method to initialize the pqObject state using the

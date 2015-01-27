@@ -66,7 +66,7 @@ SpreadSheetMainWindow::SpreadSheetMainWindow(QWidget* parentObject,
     pqApplicationCore::instance()->getObjectBuilder()->createView(
       pqSpreadSheetView::spreadsheetViewType(),
       pqActiveObjects::instance().activeServer()));
-  this->setCentralWidget(view->getWidget());
+  this->setCentralWidget(view->widget());
   new pqSpreadSheetViewDecorator(view);
   
   pqActiveObjects::instance().setActiveView(view);

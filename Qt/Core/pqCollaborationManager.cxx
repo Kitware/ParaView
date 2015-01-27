@@ -364,7 +364,7 @@ void pqCollaborationManager::showMousePointer(vtkTypeUInt32 viewId,
       pqApplicationCore::instance()->getServerManagerModel();
   pqView* view = smmodel->findItem<pqView*>(viewId);
   pqQVTKWidget* widget = NULL;
-  if(view && (widget = qobject_cast<pqQVTKWidget*>(view->getWidget())))
+  if(view && (widget = qobject_cast<pqQVTKWidget*>(view->widget())))
     {
     double xRatioBase = 1;
     double yRatioBase = 1;

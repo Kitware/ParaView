@@ -68,7 +68,7 @@ void pqObjectPickingBehavior::onViewAdded(pqView* view)
   if (qobject_cast<pqRenderView*>(view))
     {
     // add a link view menu
-    view->getWidget()->installEventFilter(this);
+    view->widget()->installEventFilter(this);
     }
 }
 

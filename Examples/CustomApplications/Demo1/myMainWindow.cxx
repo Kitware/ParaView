@@ -57,7 +57,7 @@ myMainWindow::myMainWindow(QWidget* parentObject,
   pqActiveObjects::instance().setActiveView(view);
 
   // Set it as the central widget
-  this->setCentralWidget(view->getWidget());  
+  this->setCentralWidget(view->widget());
 }
 
 

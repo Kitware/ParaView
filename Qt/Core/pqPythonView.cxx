@@ -42,7 +42,6 @@
 class pqPythonView::pqInternal
 {
 public:
-  QPointer<QWidget> Viewport;
   QPoint MouseOrigin;
   bool InitializedWidgets;
   bool InitializedAfterObjectsCreated;
@@ -54,7 +53,6 @@ public:
     }
   ~pqInternal()
     {
-    delete this->Viewport;
     }
 };
 
@@ -76,22 +74,6 @@ pqPythonView::pqPythonView(
 pqPythonView::~pqPythonView()
 {
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-QWidget* pqPythonView::getWidget()
-{
-  if (!this->Internal->Viewport)
-    {
-    this->Internal->Viewport = this->createWidget();
-    // we manage the context menu ourself, so it doesn't interfere with
-    // render window interactions
-    this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->Viewport->installEventFilter(this);
-    this->Internal->Viewport->setObjectName("Viewport");
-    }
-
-  return this->Internal->Viewport;
 }
 
 //-----------------------------------------------------------------------------
@@ -147,6 +129,8 @@ QWidget* pqPythonView::createWidget()
     }
 #endif
 
+  vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
+  vtkwidget->installEventFilter(this);
   return vtkwidget;
 }
 
@@ -195,17 +179,14 @@ void pqPythonView::initializeWidgets()
     }
 
   this->Internal->InitializedWidgets = true;
-
   vtkSMPythonViewProxy* renModule = this->getPythonViewProxy();
-
-  QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->getWidget());
-  if (vtkwidget)
+  if (QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->widget()))
     {
     vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
     this->render();
     }
 }
-  
+
 //-----------------------------------------------------------------------------
 bool pqPythonView::eventFilter(QObject* caller, QEvent* e)
 {
@@ -238,10 +219,10 @@ bool pqPythonView::eventFilter(QObject* caller, QEvent* e)
       QPoint delta = newPos - this->Internal->MouseOrigin;
       if (delta.manhattanLength() < 3 && qobject_cast<QWidget*>(caller))
         {
-        QList<QAction*> actions = this->Internal->Viewport->actions();
+        QList<QAction*> actions = this->widget()->actions();
         if (!actions.isEmpty())
           {
-          QMenu* menu = new QMenu(this->Internal->Viewport);
+          QMenu* menu = new QMenu(this->widget());
           menu->setAttribute(Qt::WA_DeleteOnClose);
           menu->addActions(actions);
           menu->popup(qobject_cast<QWidget*>(caller)->mapToGlobal(newPos));

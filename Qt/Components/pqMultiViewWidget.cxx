@@ -145,7 +145,7 @@ namespace
     // collaborative sessions.
     if (pqview != NULL)
       {
-      QWidget* viewWidget = pqview->getWidget();
+      QWidget* viewWidget = pqview->widget();
       frame->setCentralWidget(viewWidget);
       viewWidget->setParent(frame);
       }

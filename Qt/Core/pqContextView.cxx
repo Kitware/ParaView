@@ -89,7 +89,6 @@ private:
 class pqContextView::pqInternal
 {
 public:
-  QPointer<QWidget> Viewport;
   bool InitializedAfterObjectsCreated;
   int SelectionAction;
 
@@ -100,7 +99,6 @@ public:
     }
   ~pqInternal()
     {
-    delete this->Viewport;
     }
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
@@ -137,7 +135,10 @@ QWidget* pqContextView::createWidget()
   // correctly when an overlapping window is present, unlike 3D views.
   vtkwidget->setAutomaticImageCacheEnabled(false);
   vtkwidget->setViewProxy(this->getProxy());
+  vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
+  vtkwidget->installEventFilter(this);
   vtkwidget->setObjectName("Viewport");
+  this->initializeInteractors();
   return vtkwidget;
 }
 
@@ -184,7 +185,7 @@ void pqContextView::initializeInteractors()
 {
   vtkSMContextViewProxy* proxy =
     vtkSMContextViewProxy::SafeDownCast(this->getProxy());
-  QVTKWidget* qvtk = qobject_cast<QVTKWidget*>(this->Internal->Viewport);
+  QVTKWidget* qvtk = qobject_cast<QVTKWidget*>(this->widget());
 
   if(proxy && qvtk)
     {
@@ -192,23 +193,6 @@ void pqContextView::initializeInteractors()
     view->SetInteractor(qvtk->GetInteractor());
     qvtk->SetRenderWindow(view->GetRenderWindow());
     }
-}
-
-//-----------------------------------------------------------------------------
-/// Return a widget associated with this view.
-QWidget* pqContextView::getWidget()
-{
-  if(!this->Internal->Viewport)
-    {
-    this->Internal->Viewport = this->createWidget();
-    // we manage the context menu ourself, so it doesn't interfere with
-    // render window interactions
-    this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->Viewport->installEventFilter(this);
-    this->Internal->Viewport->setObjectName("Viewport");
-    this->initializeInteractors();
-    }
-  return this->Internal->Viewport;
 }
 
 //-----------------------------------------------------------------------------

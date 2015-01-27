@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqLinkViewWidget::pqLinkViewWidget(pqRenderView* firstLink)
-  : QWidget(firstLink->getWidget(), 
+  : QWidget(firstLink->widget(), 
             Qt::Window | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint),
     RenderView(firstLink)
 {
@@ -119,7 +119,7 @@ bool pqLinkViewWidget::eventFilter(QObject* watched, QEvent* e)
     QList<pqRenderView*> views = smModel->findItems<pqRenderView*>();
     foreach (pqRenderView* view, views)
       {
-      if (view && view->getWidget() == wid)
+      if (view && view->widget() == wid)
         {
         otherView = view;
         break;

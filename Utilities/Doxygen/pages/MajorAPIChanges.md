@@ -4,6 +4,20 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 4.4
+--------------
+
+###Refactored pqView widget creation mechanisms###
+
+pqView now adds a pure virtual method pqView::createWidget(). Subclasses should
+override that method to create the QWidget in which the view is *rendered*. In
+the past the subclasses implemented their own mechanisms to create the widget
+and return it when `getWidget()` was called the first time.
+
+`pqView::getWidget()` is now deprecated. Users should use pqView::widget()
+instead. This method internally calls the pqView::createWidget() when
+appropriate.
+
 Changes in 4.3
 --------------
 

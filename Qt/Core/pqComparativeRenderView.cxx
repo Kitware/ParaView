@@ -157,12 +157,13 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
     vtkSMRenderViewProxy* renView = vtkSMRenderViewProxy::SafeDownCast(key);
     renView->UpdateVTKObjects();
 
-    pqQVTKWidget* widget = new pqQVTKWidget();
-    widget->SetRenderWindow(renView->GetRenderWindow());
-    widget->setSession(compView->GetSession());
-    widget->installEventFilter(this);
-    widget->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->RenderWidgets[key] = widget;
+    pqQVTKWidget* wdg = new pqQVTKWidget();
+    wdg->SetRenderWindow(renView->GetRenderWindow());
+    renView->SetInteractor(wdg->GetInteractor());
+    wdg->setSession(compView->GetSession());
+    wdg->installEventFilter(this);
+    wdg->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->RenderWidgets[key] = wdg;
     }
 
   // Now layout the views.
@@ -174,10 +175,10 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
     }
 
   // destroy the old layout and create a new one. 
-  QWidget* widget = this->getWidget();
-  delete widget->layout();
+  QWidget* wdg = this->widget();
+  delete wdg->layout();
 
-  QGridLayout* layout = new QGridLayout(widget);
+  QGridLayout* layout = new QGridLayout(wdg);
   layout->setSpacing(1);
   layout->setMargin(0);
   for (int x=0; x < dimensions[0]; x++)
@@ -215,7 +216,7 @@ void adjustImageExtent(vtkImageData * image, int topLeftX, int topLeftY)
 //-----------------------------------------------------------------------------
 vtkImageData* pqComparativeRenderView::captureImage(int magnification)
 {
-  if (!this->getWidget()->isVisible())
+  if (!this->widget()->isVisible())
     {
     // Don't return any image when the view is not visible.
     return NULL;

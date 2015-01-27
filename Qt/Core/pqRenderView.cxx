@@ -186,9 +186,17 @@ vtkSMRenderViewProxy* pqRenderView::getRenderViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderView::createWidget() 
+QWidget* pqRenderView::createWidget()
 {
   QWidget* vtkwidget = this->Superclass::createWidget();
+  if (QVTKWidget* qvtkwidget = qobject_cast<QVTKWidget*>(vtkwidget))
+    {
+    vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
+    qvtkwidget->SetRenderWindow(renModule->GetRenderWindow());
+    // This is needed to ensure that the interactor is initialized with
+    // ParaView specific interactor styles.
+    renModule->SetInteractor(qvtkwidget->GetInteractor());
+    }
   return vtkwidget;
 }
 
@@ -204,14 +212,7 @@ void pqRenderView::initializeWidgets()
     }
 
   this->Internal->InitializedWidgets = true;
-
   vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
-
-  QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->getWidget());
-  if (vtkwidget)
-    {
-    vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
-    }
   this->Internal->UndoStackBuilder->SetRenderView(renModule);
 }
 
@@ -366,7 +367,7 @@ void pqRenderView::linkToOtherView()
 {
   pqLinkViewWidget* linkWidget = new pqLinkViewWidget(this);
   linkWidget->setAttribute(Qt::WA_DeleteOnClose);
-  QPoint pos = this->getWidget()->mapToGlobal(QPoint(2,2));
+  QPoint pos = this->widget()->mapToGlobal(QPoint(2,2));
   linkWidget->move(pos);
   linkWidget->show();
 }
@@ -900,5 +901,5 @@ void pqRenderView::onInteractionModeChange()
 //-----------------------------------------------------------------------------
 void pqRenderView::setCursor(const QCursor &c)
 {
-  this->getWidget()->setCursor(c);
+  this->widget()->setCursor(c);
 }

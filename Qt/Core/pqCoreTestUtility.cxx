@@ -298,7 +298,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget,
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
   foreach (pqView* view, views)
     {
-    if (view && (view->getWidget() == widget))
+    if (view && (view->widget() == widget))
       {
       cout << "Using View API for capture" << endl;
       return pqCoreTestUtility::CompareView(view, referenceImage, threshold,
@@ -340,7 +340,7 @@ bool pqCoreTestUtility::CompareView(
   const QSize& size/*=QSize()*/)
 {
   Q_ASSERT(curView != NULL);
-  pqCoreTestUtilityInternal::WidgetSizer sizer(curView->getWidget(), size);
+  pqCoreTestUtilityInternal::WidgetSizer sizer(curView->widget(), size);
 
   vtkImageData* test_image = curView->captureImage(1);
   if (!test_image)

@@ -190,7 +190,7 @@ void pqImageOutputInfo::setupScreenshotInfo()
     thumbnailSize.setHeight(100);
     thumbnailSize.setWidth(100*viewSize.width()/viewSize.height());
     }
-  if(this->View->getWidget()->isVisible())
+  if(this->View->widget()->isVisible())
     {
     vtkSmartPointer<vtkImageData> image;
     image.TakeReference(this->View->captureImage(thumbnailSize));

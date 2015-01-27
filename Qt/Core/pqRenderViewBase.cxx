@@ -77,7 +77,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRenderViewBase::pqInternal
 {
 public:
-  QPointer<QWidget> Viewport;
   QPoint MouseOrigin;
   bool InitializedAfterObjectsCreated;
   bool IsInteractiveDelayActive;
@@ -89,7 +88,6 @@ public:
     }
   ~pqInternal()
     {
-    delete this->Viewport;
     }
 
   void writeToStatusBar(const char* txt)
@@ -155,22 +153,6 @@ pqRenderViewBase::~pqRenderViewBase()
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderViewBase::getWidget()
-{
-  if (!this->Internal->Viewport)
-    {
-    this->Internal->Viewport = this->createWidget();
-    // we manage the context menu ourself, so it doesn't interfere with
-    // render window interactions
-    this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
-    this->Internal->Viewport->installEventFilter(this);
-    this->Internal->Viewport->setObjectName("Viewport");
-    }
-
-  return this->Internal->Viewport;
-}
-
-//-----------------------------------------------------------------------------
 QWidget* pqRenderViewBase::createWidget()
 {
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
@@ -196,6 +178,8 @@ QWidget* pqRenderViewBase::createWidget()
     }
 #endif
 
+  vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
+  vtkwidget->installEventFilter(this);
   return vtkwidget;
 }
 
@@ -306,10 +290,10 @@ bool pqRenderViewBase::eventFilter(QObject* caller, QEvent* e)
       QPoint delta = newPos - this->Internal->MouseOrigin;
       if (delta.manhattanLength() < 3 && qobject_cast<QWidget*>(caller))
         {
-        QList<QAction*> actions = this->Internal->Viewport->actions();
+        QList<QAction*> actions = this->widget()->actions();
         if (!actions.isEmpty())
           {
-          QMenu* menu = new QMenu(this->Internal->Viewport);
+          QMenu* menu = new QMenu(this->widget());
           menu->setAttribute(Qt::WA_DeleteOnClose);
           menu->addActions(actions);
           menu->popup(qobject_cast<QWidget*>(caller)->mapToGlobal(newPos));
