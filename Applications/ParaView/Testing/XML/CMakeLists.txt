@@ -473,6 +473,11 @@ IF (PARAVIEW_USE_MPI)
   # Hence disable them.
   set (LineChartSelection_DISABLE_CS TRUE)
   set (LineChartSelection_DISABLE_CRS TRUE)
+
+  # Selections end up highlighting different set of ID based points in parallel.
+  # Hence disable them.
+  set (FunctionalBagPlots_DISABLE_CS TRUE)
+  set (FunctionalBagPlots_DISABLE_CRS TRUE)
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but bultin
@@ -546,6 +551,8 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 
 # Since this involves charts.
 SET(HistogramSelection_THRESHOLD 40)
+SET(LineChartSelection_THRESHOLD 40)
+SET(FunctionalBagPlots_THRESHOLD 40)
 
 # Increate threshold for this one since the chart axes
 # tends to render slightly differently.
