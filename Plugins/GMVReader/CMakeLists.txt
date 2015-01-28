@@ -63,6 +63,10 @@ ELSEIF (UNIX)
   ENDIF ()
 ENDIF ()
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 # ---------------------------------------------------------------------------
 # Combined plugin
 # -----------------------------------------------------------------------------
@@ -101,6 +105,5 @@ IF (BUILD_TESTING)
 ENDIF ()
 
 if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
   vtk_mpi_link(GMVReader)
 endif()

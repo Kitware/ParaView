@@ -19,6 +19,10 @@ ADD_DEFINITIONS(-DH5_USE_16_API)
 # needed for mpich
 add_definitions("-DMPICH_IGNORE_CXX_SEEK")
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 ADD_PARAVIEW_PLUGIN(H5PartReader "1.0"
   SERVER_MANAGER_SOURCES
     vtkH5PartReader.cxx
@@ -38,7 +42,6 @@ target_link_libraries(H5PartReader LINK_PRIVATE
   vtksys)
 
 if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
   vtk_mpi_link(H5PartReader)
 endif()
 

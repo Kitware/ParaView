@@ -65,6 +65,10 @@ ADD_PARAVIEW_AUTO_START(
   CLASS_NAME pqCPPluginManager)
 
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 ADD_PARAVIEW_PLUGIN(
   CatalystScriptGeneratorPlugin
   #"${Catalyst_VERSION_MAJOR}.${Catalyst_VERSION_MINOR}.${Catalyst_VERSION_PATCH}"
@@ -100,6 +104,5 @@ IF (BUILD_TESTING)
 ENDIF ()
 
 if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
   vtk_mpi_link(CatalystScriptGeneratorPlugin)
 endif()

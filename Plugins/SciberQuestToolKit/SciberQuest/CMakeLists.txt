@@ -137,6 +137,10 @@ if (SQTK_DEBUG)
   add_definitions(-DSQTK_DEBUG)
 endif()
 
+if(PARAVIEW_USE_MPI)
+  include(vtkMPI)
+endif()
+
 vtk_module_library(vtkSciberQuest ${CXX_SOURCES})
 
 if (SQTK_CUDA AND CUDA_FOUND)
@@ -150,6 +154,5 @@ install(TARGETS vtkSciberQuest
    LIBRARY DESTINATION ${VTK_INSTALL_LIBRARY_DIR})
 
 if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
   vtk_mpi_link(vtkSciberQuest)
 endif()

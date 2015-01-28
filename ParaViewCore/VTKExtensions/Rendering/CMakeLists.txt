@@ -149,8 +149,10 @@ foreach (file vtkIceTCompositeZPassShader_fs.glsl)
 endforeach()
 #---------------------------------------------------------
 
-vtk_module_library(vtkPVVTKExtensionsRendering ${Module_SRCS})
 if(PARAVIEW_USE_MPI)
   include(vtkMPI)
+endif()
+vtk_module_library(vtkPVVTKExtensionsRendering ${Module_SRCS})
+if(PARAVIEW_USE_MPI)
   vtk_mpi_link(${vtk-module})
 endif()
