@@ -96,7 +96,7 @@ protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();
 
-  vtkCameraManipulator *Current;
+  vtkCameraManipulator *CurrentManipulator;
   double CenterOfRotation[3];
   double RotationFactor;
 
