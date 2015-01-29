@@ -162,6 +162,7 @@
         </Documentation>
         <BooleanDomain name="bool" />
         <Hints>
+          <SaveInQSettings both="1" />
           <RestartRequired />
         </Hints>
       </IntVectorProperty>
@@ -176,6 +177,7 @@
         </Documentation>
         <IntRangeDomain min="1" max="64" />
         <Hints>
+          <SaveInQSettings both="1" />
           <RestartRequired />
         </Hints>
       </IntVectorProperty>
