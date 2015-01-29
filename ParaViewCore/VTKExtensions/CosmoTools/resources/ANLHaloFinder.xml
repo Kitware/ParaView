@@ -1,0 +1,313 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="ANLHaloFinder"
+                 class="vtkPANLHaloFinder"
+                 label="ANL Halo Finder">
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input of the filter.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty name="RL"
+                            command="SetRL"
+                            label="Box size"
+                            number_of_elements="1"
+                            default_values="100" >
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          The box side length used to wrap particles around if they exceed rL
+          (or less than 0) in any dimension (only positive positions are allowed
+          in the input, or they are wrapped around).
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Overlap"
+                            command="SetDeadSize"
+                            label="Overlap"
+                            number_of_elements="1"
+                            default_values="5" >
+      <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          The space (in rL units) to extend processor particle ownership for ghost
+          particles/cells.  Needed for correct halo calculation when halos cross
+          processor boundaries in parallel computation.  Called DeadSize in the
+          hacc config files.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NP"
+                         command="SetNP"
+                         label="Seed particles"
+                         number_of_elements="1"
+                         default_values="256" >
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Number of seeded particles in one dimension.  Therefore, total simulation
+          particles is np^3 (cubed).
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="BB"
+                            command="SetBB"
+                            label="Linking length"
+                            number_of_elements="1"
+                            default_values="0.20" >
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Linking length measured in units of interparticle spacing and is
+          dimensionless.  Used to link particles into halos for the
+          friends-of-friends (FOF) algorithm.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="PMin"
+                         command="SetPMin"
+                         label="FOF particle threshold"
+                         number_of_elements="1"
+                         default_values="100" >
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Minimum number of particles (threshold) needed before a group is called
+          a friends-of-friends (FOF) halo.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ParticleMass"
+                            command="SetParticleMass"
+                            label="Particle Mass"
+                            number_of_elements="1"
+                            default_values="1.307087181e+09">
+        <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          The mass of each particle.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DistanceConvertFactor"
+                            command="SetDistanceConvertFactor"
+                            label="Distance Conversion Factor"
+                            panel_visibility="advanced"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <Documentation>
+          Some input files may have the world coordinates scaled from what the
+          halo finder expects.  This parameter is the conversion factor that
+          will be multiplied by the positions of all particles.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="MassConvertFactor"
+                            command="SetMassConvertFactor"
+                            label="Mass Conversion Factor"
+                            panel_visibility="advanced"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <Documentation>
+          For some inputs the particle mass may need to be converted before the
+          halo finder can be run.  This is the number that is multiplied by the
+          particle mass.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="CenterFindingMethod"
+                         command="SetCenterFindingMode"
+                         label="Center Finding Method"
+                         number_of_elements="1"
+                         default_values="0">
+        <EnumerationDomain name="enum" >
+          <Entry value="0" text="None"/>
+          <Entry value="1" text="Most Bound Particle"/>
+          <Entry value="2" text="Most Connected Particle"/>
+          <Entry value="3" text="Hist Center Finding"/>
+        </EnumerationDomain>
+        <Documentation>
+          Set the method used to determine the halo "center".
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="SmoothingLength"
+                            command="SetSmoothingLength"
+                            label="Smoothing Length"
+                            number_of_elements="1"
+                            default_values="0">
+        <DoubleRangeDomain name="range" min="0.0"/>
+        <Documentation>
+          Sets the smoothing length used by some of the center finding
+          techniques.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="OmegaDM"
+                            command="SetOmegaDM"
+                            number_of_elements="1"
+                            default_values="0.26627">
+        <Documentation>
+          Sets the OmegaDM parameter of the center finding algorithms.  This
+          parameter comes from the simulation input and is not needed if
+          Center Finding Method is set to None.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="OmegaNU"
+                            command="SetOmegaNU"
+                            number_of_elements="1"
+                            default_values="0">
+        <Documentation>
+          Sets the OmegaNU parameter of the center finding algorithms.  This
+          parameter comes from the simulation input and is not needed if
+          Center Finding Method is set to None.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Deut"
+                            command="SetDeut"
+                            number_of_elements="1"
+                            default_values="0.02258">
+        <Documentation>
+          Sets the Deut parameter of the center finding algorithms.  This
+          parameter comes from the simulation input and is not needed if
+          Center Finding Method is set to None.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Hubble"
+                            command="SetHubble"
+                            number_of_elements="1"
+                            default_values="0.673">
+        <Documentation>
+          Sets the Hubble parameter of the center finding algorithms.  This
+          parameter comes from the simulation input and is not needed if
+          Center Finding Method is set to None.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="RedShift"
+                            command="SetRedShift"
+                            number_of_elements="1"
+                            default_values="0">
+        <Documentation>
+          Sets the Redshift parameter of the center finding algorithms.  This
+          parameter comes from the simulation input and is not needed if
+          Center Finding Method is set to None.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FindSubhalos"
+                         command="SetRunSubHaloFinder"
+                         label="Find Subhalos"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn this on to also find subhalos in halos of sufficient size. See
+          the advanced parameters to set subhalo finder options.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="AlphaFactor"
+                            command="SetAlphaFactor"
+                            label="Alpha Factor"
+                            panel_visibility="advanced"
+                            number_of_elements="1"
+                            default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
+        <Documentation>
+          A tuning parameter of subhalo finding.  This controls how aggressively small
+          suhalos will be grown.  Alpha factor of 1.0 is the least agrressive.
+          Only used if subhalo finding is enabled.
+        </Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="BetaFactor"
+                            command="SetBetaFactor"
+                            label="Beta Factor"
+                            panel_visibility="advanced"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0"/>
+        <Documentation>
+          A tuning parameter of subhalo finding.  This controls how saddle points between
+          subhalos are treated.  Larger values allow identification of smaller scale
+          structures such as tails.  Only used if subhalo finding is enabled.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="NMin"
+                         command="SetNMin"
+                         label="NMin"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          The minimum number of close neighbors for a halo candidate to include a particle.
+          If this many particles in the halo are close enough to the particle, then the
+          particle is considered inside the halo.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MinFOFSubhaloSize"
+                         command="SetMinFOFSubhaloSize"
+                         label="Minimum size for suhalo finding"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="10000">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          The miminum sized halo to run the subhalo finder of to subdivide further.  Only used
+          if subhalo finding is enabled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MinCandidateSize"
+                         command="SetMinCandidateSize"
+                         label="Minimum Subhalo Size"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="20">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          A subhalo candidate must have at least this many particles to be a subhalo.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumSPHNeighbors"
+                         command="SetNumSPHNeighbors"
+                         label="SPH Neighbors"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="64">
+        <Documentation>
+          A parameter of the subhalo finder.  Only used if subhalo finding is enabled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumNeighbors"
+                         command="SetNumNeighbors"
+                         label="Number of Neighbors"
+                         panel_visibility="advanced"
+                         number_of_elements="1"
+                         default_values="20">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          The nearest X particles will be used to determine the local density in
+          the subhalo finder where X is the value of this parameter.  Only used
+          if subhalo finding is enabled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="CosmoTools"/>
+      </Hints>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -47,8 +47,20 @@ public:
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
+  // Gets the halo to process at the given index
+  vtkIdType GetHaloToProcess(vtkIdType idx);
+  // Description:
   // Adds a halo to the list of halos that will have the subhalo finder run on them
   void AddHaloToProcess(vtkIdType haloId);
+  // Description:
+  // Sets the halo id to process at the given index in the list
+  void SetHaloToProcess(vtkIdType idx, vtkIdType haloId);
+  // Description:
+  // Sets the number of halos to process
+  void SetNumberOfHalosToProcess(vtkIdType num);
+  // Description:
+  // Gets the number of halos to process
+  vtkIdType GetNumberOfHalosToProcess();
   // Description:
   // Clears the list of halos that will have the subhalo finder run on them
   void ClearHalosToProcess();
