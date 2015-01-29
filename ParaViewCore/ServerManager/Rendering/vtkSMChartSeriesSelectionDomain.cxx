@@ -312,8 +312,12 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
         blockNameStream << compositeIndexHelper.GetAsInt(cc);
         }
       }
+    // if there is only 1 element, use the element to avoid having partial data.
+    vtkPVDataInformation* dataInfoWithArrays =
+      numElems == 1 ? childInfo : dataInfo;
     this->Internals->PopulateAvailableArrays(blockNameStream.str(),
-      column_names, dataInfo, fieldAssociation, this->FlattenTable);
+      column_names, dataInfoWithArrays, fieldAssociation,
+      this->FlattenTable);
     }
   this->SetStrings(column_names);
 }

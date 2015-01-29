@@ -49,6 +49,7 @@ paraview_test_load_data(""
   Scenario1_p1.h5
   Scenario1_p1.xmf
   servers-wiki.pvsc
+  sineWaves.csv
   singleSphereAnimation.pvd
   tensors.pvti
   Test1.h5
@@ -213,6 +214,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/FunctionalBagPlots.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ImageVolumeRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml
@@ -471,6 +473,11 @@ IF (PARAVIEW_USE_MPI)
   # Hence disable them.
   set (LineChartSelection_DISABLE_CS TRUE)
   set (LineChartSelection_DISABLE_CRS TRUE)
+
+  # Selections end up highlighting different set of ID based points in parallel.
+  # Hence disable them.
+  set (FunctionalBagPlots_DISABLE_CS TRUE)
+  set (FunctionalBagPlots_DISABLE_CRS TRUE)
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but bultin
@@ -544,6 +551,8 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 
 # Since this involves charts.
 SET(HistogramSelection_THRESHOLD 40)
+SET(LineChartSelection_THRESHOLD 40)
+SET(FunctionalBagPlots_THRESHOLD 40)
 
 # Increate threshold for this one since the chart axes
 # tends to render slightly differently.
