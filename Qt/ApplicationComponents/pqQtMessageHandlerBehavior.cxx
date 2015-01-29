@@ -78,7 +78,7 @@ static void QtMessageOutput(QtMsgType type, const char *msg)
     vtkOutputWindow::GetInstance()->DisplayText(msg);
     break;
   case QtWarningMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+    vtkOutputWindow::GetInstance()->DisplayWarningText(msg);
     break;
   case QtCriticalMsg:
     vtkOutputWindow::GetInstance()->DisplayErrorText(msg);

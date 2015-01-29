@@ -279,7 +279,7 @@ namespace
       reinterpret_cast<vtkPVSynchronizedRenderWindows*>(localArg);
     self->OnGetZBufferValue(id, x, y);
     }
-};
+}
 
 vtkCxxSetObjectMacro(vtkPVSynchronizedRenderWindows, ClientDataServerController,
   vtkMultiProcessController);

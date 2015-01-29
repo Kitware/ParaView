@@ -36,37 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 vtkStandardNewMacro(pqOutputWindowAdapter);
 
-pqOutputWindowAdapter::pqOutputWindowAdapter() :
-  TextCount(0),
-  ErrorCount(0),
-  WarningCount(0),
-  GenericWarningCount(0)
+pqOutputWindowAdapter::pqOutputWindowAdapter()
 {
   this->Active=true;
 }
 
 pqOutputWindowAdapter::~pqOutputWindowAdapter()
 {
-}
-
-unsigned int pqOutputWindowAdapter::getTextCount()
-{
-  return this->TextCount;
-}
-
-unsigned int pqOutputWindowAdapter::getErrorCount()
-{
-  return this->ErrorCount;
-}
-
-unsigned int pqOutputWindowAdapter::getWarningCount()
-{
-  return this->WarningCount;
-}
-
-unsigned int pqOutputWindowAdapter::getGenericWarningCount()
-{
-  return this->GenericWarningCount;
 }
 
 void pqOutputWindowAdapter::setActive(bool active)
@@ -76,7 +52,6 @@ void pqOutputWindowAdapter::setActive(bool active)
 
 void pqOutputWindowAdapter::DisplayTextInWindow(const QString& text)
 {
-  ++this->TextCount;
   if (this->Active)
     {
     emit displayTextInWindow(text);
@@ -85,7 +60,6 @@ void pqOutputWindowAdapter::DisplayTextInWindow(const QString& text)
 
 void pqOutputWindowAdapter::DisplayErrorTextInWindow(const QString& text)
 {
-  ++this->ErrorCount;
   if (this->Active)
     {
     emit displayErrorTextInWindow(text);
@@ -94,7 +68,6 @@ void pqOutputWindowAdapter::DisplayErrorTextInWindow(const QString& text)
 
 void pqOutputWindowAdapter::DisplayText(const char* text)
 {
-  ++this->TextCount;
   if(this->Active)
     {
     emit displayText(text);
@@ -103,7 +76,6 @@ void pqOutputWindowAdapter::DisplayText(const char* text)
 
 void pqOutputWindowAdapter::DisplayErrorText(const char* text)
 {
-  ++this->ErrorCount;
   if(this->Active)
     {
     emit displayErrorText(text);
@@ -112,7 +84,6 @@ void pqOutputWindowAdapter::DisplayErrorText(const char* text)
 
 void pqOutputWindowAdapter::DisplayWarningText(const char* text)
 {
-  ++this->WarningCount;
   if(this->Active)
     {
     emit displayWarningText(text);
@@ -121,7 +92,6 @@ void pqOutputWindowAdapter::DisplayWarningText(const char* text)
 
 void pqOutputWindowAdapter::DisplayGenericWarningText(const char* text)
 {
-  ++this->GenericWarningCount;
   if(this->Active)
     {
     emit displayGenericWarningText(text);

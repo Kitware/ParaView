@@ -85,7 +85,7 @@ namespace
       }
     return 0;
     }
-};
+}
 
 vtkStandardNewMacro(vtkSelectionConverter);
 

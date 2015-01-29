@@ -83,7 +83,7 @@ namespace {
       return this->z < other.z;
     }
   };
-};
+}
 
 //----------------------------------------------------------------------------
 struct vtkPVRenderViewForAssembly::vtkInternals {

@@ -43,6 +43,8 @@ set(Module_SRCS
   pqAutoStartInterface.h
   pqBoxChartView.cxx
   pqBoxChartView.h
+  pqCheckBoxDelegate.h
+  pqCheckBoxDelegate.cxx
   pqCollaborationEventPlayer.cxx
   pqCollaborationEventPlayer.h
   pqCollaborationManager.cxx
@@ -115,6 +117,8 @@ set(Module_SRCS
   pqOutputWindowAdapter.h
   pqOutputWindow.cxx
   pqOutputWindow.h
+  pqOutputWindowModel.cxx
+  pqOutputWindowModel.h
   pqParallelCoordinatesChartView.cxx
   pqParallelCoordinatesChartView.h
   pqPipelineFilter.cxx
@@ -225,6 +229,7 @@ set (Module_MOC_HDRS
   pqAnimationScene.h
   pqApplicationCore.h
   pqBoxChartView.h
+  pqCheckBoxDelegate.h
   pqCollaborationEventPlayer.h
   pqCollaborationManager.h
   pqComparativeContextView.h
@@ -256,6 +261,7 @@ set (Module_MOC_HDRS
   pqOutputPort.h
   pqOutputWindowAdapter.h
   pqOutputWindow.h
+  pqOutputWindowModel.h
   pqParallelCoordinatesChartView.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h

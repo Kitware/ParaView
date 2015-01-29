@@ -94,7 +94,7 @@ private:
   void operator=(const vtkTimerLogSmartMarkEvent &); // Not implemented
 };
 
-};
+}
 #endif
 
 
@@ -2681,7 +2681,7 @@ class vtkReduceMeta : public vtkCommunicator::Operation
   virtual int Commutative () { return 1; }
 };
 
-};
+}
 
 void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
 {

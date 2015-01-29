@@ -112,7 +112,7 @@ public:
   vtkWeakPointer<vtkSMRenderViewProxy> Proxy;
   };
   vtkStandardNewMacro(vtkRenderHelper);
-};
+}
 
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------

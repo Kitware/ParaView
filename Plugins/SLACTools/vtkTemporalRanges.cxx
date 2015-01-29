@@ -106,7 +106,7 @@ namespace vtkTemporalRangesNamespace{
                                               target->GetValue(MAXIMUM_ROW)));
     target->SetValue(COUNT_ROW, totalCount);
   }
-};
+}
 using namespace vtkTemporalRangesNamespace;
 
 //=============================================================================

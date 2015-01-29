@@ -49,7 +49,7 @@ int search(
     return -1;
   }
 }
-};
+}
 
 //
 void vtkMaterialInterfaceIdList::Initialize(vector<int> ids, bool preSorted)

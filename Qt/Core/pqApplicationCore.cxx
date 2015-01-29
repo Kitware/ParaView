@@ -511,8 +511,11 @@ pqSettings* pqApplicationCore::settings()
         QApplication::applicationName() + QApplication::applicationVersion(),
         this);
       }
-    vtkProcessModuleAutoMPI::SetEnableAutoMPI(this->Settings->value("autoMPI").toBool());
-    vtkProcessModuleAutoMPI::SetNumberOfCores(this->Settings->value("autoMPI_NumberOfCores").toInt());
+
+    vtkProcessModuleAutoMPI::SetEnableAutoMPI(
+      this->Settings->value("GeneralSettings.EnableAutoMPI").toBool());
+    vtkProcessModuleAutoMPI::SetNumberOfCores(
+      this->Settings->value("GeneralSettings.AutoMPILimit").toInt());
     }
   return this->Settings;
 }
@@ -568,12 +571,6 @@ void pqApplicationCore::showOutputWindow()
   this->OutputWindow->show();
   this->OutputWindow->raise();
   this->OutputWindow->activateWindow();
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::disableOutputWindow()
-{
-  this->OutputWindowAdapter->setActive(false);
 }
 
 //-----------------------------------------------------------------------------

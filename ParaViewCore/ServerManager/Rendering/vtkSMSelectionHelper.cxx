@@ -684,7 +684,7 @@ namespace
       }
     return false;
     }
-};
+}
 
 //----------------------------------------------------------------------------
 void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(

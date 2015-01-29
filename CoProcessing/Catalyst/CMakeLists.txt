@@ -77,6 +77,12 @@ if (CMAKE_Fortran_COMPILER_WORKS)
        ${CMAKE_CURRENT_BINARY_DIR}/FortranAdaptorAPIMangling.h)
 endif()
 
+if (PARAVIEW_USE_MPI)
+  # this needs to be done before the vtk_module_library() since
+  # vtkMPI has add_definitions() call it in.
+  include(vtkMPI)
+endif()
+
 vtk_module_library(${vtk-module} ${Module_SRCS})
 if(PARAVIEW_USE_MPI)
   vtk_mpi_link(${vtk-module})

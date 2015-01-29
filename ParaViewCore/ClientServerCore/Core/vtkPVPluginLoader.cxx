@@ -184,7 +184,7 @@ public:
     static vtkPVPluginLoaderCleaner *LibCleaner;
     };
   vtkPVPluginLoaderCleaner* vtkPVPluginLoaderCleaner::LibCleaner = NULL;
-};
+}
 
 
 //=============================================================================

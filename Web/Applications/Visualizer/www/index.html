@@ -29,16 +29,16 @@
                 class='vtk-icon-doc-text clickable padding inspector-selector' data-type='files' data-toggle='tooltip' data-placement='bottom' title='Show File List'>
             </span>
             <span
-                class='vtk-icon-plus clickable padding inspector-selector' data-type='sources' data-toggle='tooltip' data-placement='bottom' title='Show Sources'>
-            </span>
-            <span
-                class='vtk-icon-filter clickable padding inspector-selector need-input-source' data-type='filters' data-toggle='tooltip' data-placement='bottom' title='Show Filters'>
+                class='vtk-icon-plus clickable padding inspector-selector' data-type='sources' data-toggle='tooltip' data-placement='bottom' title='Show Sources/Filters'>
             </span>
             <span
                 class='vtk-icon-info-1 clickable padding inspector-selector need-input-source' data-type='info' data-toggle='tooltip' data-placement='bottom' title='Show Data Info'>
             </span>
             <span
                 class='vtk-icon-resize-full-alt-1 reset-camera clickable' data-toggle='tooltip' data-placement='bottom' title='Reset Camera'>
+            </span>
+            <span
+                class='vtk-icon-floppy clickable padding inspector-selector' data-type='saveopts' data-toggle='tooltip' data-placement='bottom' title='Show Save Options'>
             </span>
             <span
                 class='vtk-icon-clock-1 toggle-time-toolbar clickable' data-toggle='tooltip' data-placement='bottom' title='Toggle VCR Controls'>
@@ -75,9 +75,7 @@
             <div class="row inspector" data-type="sources">
                 <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-source-list nopadding'>
                 </div>
-            </div>
-            <div class="row inspector" data-type="filters">
-                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-filter-list nopadding'>
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-filter-list nopadding need-input-source'>
                 </div>
             </div>
             <div class="row inspector" data-type="info">
@@ -87,7 +85,10 @@
             <div class="row inspector" data-type="preferences">
                 <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-preferences'>
                     <div class="row" style='margin-top: 15px;'>
-                        <label class='col-sm-5 control-label'>Rendering</label>
+                        <label class='col-sm-5 control-label'
+                               data-toggle='tooltip'
+                               data-placement='right'
+                               title='Select rendering mode'>Rendering</label>
                         <div class='col-sm-5'>
                             <select class='pv-update-viewport' data-property-name='ActiveRendererType'>
                                 <option value='image'>Remote</option>
@@ -97,13 +98,73 @@
                         </div>
                     </div>
                     <div class="row">
-                        <label class='col-sm-5 control-label'>Rendering statistics</label>
+                        <label class='col-sm-5 control-label'
+                               data-toggle='tooltip'
+                               data-placement='right'
+                               title='Toggle local rendering statistics'>Statistics</label>
                         <div class='col-sm-5'>
                             <input type='checkbox' class='pv-update-viewport checkbox' data-property-name='Stats'/>
                         </div>
                     </div>
+                    <div class="row">
+                        <label class='col-sm-5 control-label'
+                               data-toggle='tooltip'
+                               data-placement='right'
+                               title='Shutdown server process when leaving page'>Auto&nbsp;shutdown</label>
+                        <div class='col-sm-5'>
+                            <input type='checkbox' class='pv-update-viewport checkbox' data-property-name='CloseBehavior' checked/>
+                        </div>
+                    </div>
+                    <div class="row" style="height: 15px;"><br/></div>
                 </div>
                 <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-global-settings-editor'>
+                </div>
+            </div>
+            <div class="row inspector" data-type="saveopts" style="display: none;">
+                <div class='col-xs-12 col-sm-12 col-md-12 col-lg-12 pv-savedata-options'>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 btn-group btn-group-sm" role="group" aria-label="Save Types" style="margin-top: 15px;">
+                            <button type="button" data-action="screen" class="btn btn-default active-panel-btn col-xs-4 col-sm-4 col-md-4 col-lg-4">Screenshot</button>
+                            <button type="button" data-action="data" class="btn btn-default active-panel-btn col-xs-4 col-sm-4 col-md-4 col-lg-4">Data</button>
+                            <button type="button" data-action="state" class="btn btn-default active-panel-btn col-xs-4 col-sm-4 col-md-4 col-lg-4">State</button>
+                        </div>
+                    </div>
+                    <div class="row screenshot-save-only label-spacing">
+                        <div class="col-xs-12">
+                            Desired Resolution
+                            <span class="vtk-icon-arrows-cw screenshot-reset-size-btn clickable float-right" data-toggle='tooltip' data-placement='bottom' title='Current Screen Size'></span>
+                        </div>
+                    </div>
+                    <div class="row screenshot-save-only">
+                        <div class="col-xs-12 text-center">
+                            <input type="text" style="width: 45%" class="screenshot-pixel-width light-form-control input-sm float-left">
+                            x
+                            <input type="text" style="width: 45%" class="screenshot-pixel-height light-form-control input-sm float-right">
+                        </div>
+                    </div>
+                    <div class="row label-spacing">
+                        <div class="col-xs-12">
+                            Filename
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <input type="text" class="save-data-filename form-control input-sm"/>
+                        </div>
+                    </div>
+                    <div class="row label-spacing">
+                        <div class="col-xs-6">
+                            <button type="button" class="screenshot-save-only screenshot-grab-image-btn btn btn-default btn-sm">Capture</button>
+                        </div>
+                        <div class="col-xs-6 text-right">
+                            <button type="button" class="save-data-button btn btn-default btn-sm">Save</button>
+                        </div>
+                    </div>
+                    <div class="row label-spacing captured-screenshot-container screenshot-save-only">
+                        <div class="col-xs-12">
+                            <img class="captured-screenshot-image hidden" width="100%" style="border: 1px solid black;" data-toggle='tooltip' data-placement='top' title='To save full size image locally, right-click image and choose "Save Image As..."'></img>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -119,6 +180,7 @@
             sessionManagerURL: vtkWeb.properties.sessionManagerURL,
             application: "visualizer"
         },
+        reallyStop = true,
         stop = vtkWeb.NoOp,
         start = function(connection) {
             $('.app-wait-start-page').remove();
@@ -126,18 +188,18 @@
 
             pv.initializeVisualizer(
                 connection.session,
-                '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list', '.pv-filter-list', '.pv-data-info', '.pv-global-settings-editor');
+                '.pv-viewport', '.pv-pipeline', '.pv-proxy-editor', '.pv-files', '.pv-source-list',
+                '.pv-filter-list', '.pv-data-info', '.pv-global-settings-editor', '.pv-savedata-options');
 
             $('[data-toggle="tooltip"]').tooltip({container: 'body'});
 
             // Update stop method to use the connection
             stop = function() {
-                connection.session.call('application.exit');
+                if (reallyStop === true) {
+                    connection.session.call('application.exit');
+                }
             }
         };
-
-        // Pass any url parameters to the launcher
-        vtkWeb.udpateConnectionFromURL(config);
 
         // Try to launch the Viz process
         vtkWeb.smartConnect(config, start, function(code,reason){

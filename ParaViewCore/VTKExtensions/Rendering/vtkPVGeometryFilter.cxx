@@ -667,7 +667,7 @@ namespace
     metadata->Set(vtkPVGeometryFilter::STRIPS_OFFSETS(),
       &strips_offsets[0], static_cast<int>(num_pieces));
     }
-};
+}
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------

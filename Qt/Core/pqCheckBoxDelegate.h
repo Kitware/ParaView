@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqXYFunctionalBagChartView.h
+   Module:    pqOutputWindow.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,38 +28,39 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef __pqXYFunctionalBagChartView_h
-#define __pqXYFunctionalBagChartView_h
+=========================================================================*/
 
-#include "pqContextView.h"
+#include "pqCoreModule.h"
+#include <QStyledItemDelegate>
 
-class vtkSMSourceProxy;
-class pqDataRepresentation;
-
-/// FunctionalBag chart view
-class PQCORE_EXPORT pqXYFunctionalBagChartView : public pqContextView
+/// Delegate for QTableView to draw a checkbox as an left-right (unchecked)
+/// and top-bottom (checked) arrow.
+/// The checkbox has an extra state for unchecked disabled.
+/// Based on a Stack overflow answer:
+/// http://stackoverflow.com/questions/3363190/qt-qtableview-how-to-have-a-checkbox-only-column
+class PQCORE_EXPORT pqCheckBoxDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
-  typedef pqContextView Superclass;
 
 public:
-  static QString XYFunctionalBagChartViewType() { return "XYFunctionalBagChartView"; }
+  enum CheckBoxValues
+  {
+    NOT_EXPANDED,
+    EXPANDED,
+    NOT_EXPANDED_DISABLED
+  };
 
-  virtual bool supportsSelection() const { return true; }
+  pqCheckBoxDelegate(QObject *parent);
+  ~pqCheckBoxDelegate();
 
-public:
-  pqXYFunctionalBagChartView(const QString& group,
-                 const QString& name,
-                 vtkSMContextViewProxy* viewModule,
-                 pqServer* server,
-                 QObject* parent=NULL);
-
-  virtual ~pqXYFunctionalBagChartView();
-
+  void paint(QPainter *painter, const QStyleOptionViewItem &option,
+             const QModelIndex &index) const;
+  bool editorEvent(QEvent *event,
+                   QAbstractItemModel *model,
+                   const QStyleOptionViewItem &option,
+                   const QModelIndex &index);
 private:
-  pqXYFunctionalBagChartView(const pqXYFunctionalBagChartView&); // Not implemented.
-  void operator=(const pqXYFunctionalBagChartView&); // Not implemented.
+  Q_DISABLE_COPY(pqCheckBoxDelegate)
+  struct pqInternals;
+  pqInternals* Internals;
 };
-
-#endif
