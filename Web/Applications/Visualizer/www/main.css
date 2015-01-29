@@ -4,6 +4,8 @@
 .fix-height { position: relative; top: 0; left: 0; }
 .pv-time-input { position: relative; top: 2px; width: 80px; border: solid 1px white; background: none; padding: 2px 10px; }
 
+.active-data-type-label { font-style: italic; }
+
 /* ---- Sources/Filters Icons ---- */
 
 .pv-source-list ul, .pv-filter-list ul {

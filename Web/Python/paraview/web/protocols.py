@@ -34,7 +34,6 @@ from vtkPVServerManagerCorePython import *
 #    vtkDataObject
 from vtkCommonDataModelPython import *
 
-
 # =============================================================================
 #
 # Base class for any ParaView based protocol
@@ -1741,7 +1740,7 @@ class ParaViewWebSaveData(ParaViewWebProtocol):
         self.baseSavePath = baseSavePath
 
         self.imageExtensions = [ 'jpg', 'png' ]
-        self.dataExtensions = [ 'vtk', 'ex2' ]
+        self.dataExtensions = [ 'vtk', 'ex2', 'vtp', 'vti', 'vtu', 'vtm', 'vts', 'vtr', 'csv' ]
         self.stateExtensions = [ 'pvsm' ]
 
     # RpcName: saveData => 'pv.data.save'
@@ -1803,7 +1802,7 @@ class ParaViewWebSaveData(ParaViewWebProtocol):
             # simple.SaveState(fullPath) # FIXME: Fixed after 4.3.1
             servermanager.SaveState(fullPath)
         else:
-            msg = 'ERROR: Could not recognize type of data to save from filename: %s' % filePath
+            msg = 'ERROR: Unrecognized extension (%s) in relative path: %s' % (extension, filePath)
             print msg
             return { 'success': False, 'message': msg }
 

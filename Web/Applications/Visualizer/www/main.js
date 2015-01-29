@@ -7,6 +7,26 @@
         rvSettingsProxyId = null,
         saveOptionsEditor,
         defaultSaveFilenames = { 'data': 'server-data/savedData.vtk', 'state': 'server-state/savedState.pvsm', 'screen': 'server-images/savedScreen.png' },
+        saveTypesMap = {
+            'AMR Dataset (Deprecated)': 'vtm',
+            'Composite Dataset': 'vtm',
+            'Hierarchical DataSet (Deprecated)': 'vtm',
+            'Image (Uniform Rectilinear Grid) with blanking': 'vti',
+            'Image (Uniform Rectilinear Grid)': 'vti',
+            'Multi-block Dataset': 'vtm',
+            'Multi-group Dataset': 'vtm',
+            'Multi-piece Dataset': 'vtm',
+            'Non-Overlapping AMR Dataset': 'vtm',
+            'Overlapping AMR Dataset': 'vtm',
+            'Point Set': 'vts',
+            'Polygonal Mesh': 'vtp',
+            'Polygonal Mesh': 'vtp',
+            'Rectilinear Grid': 'vtr',
+            'Structured (Curvilinear) Grid': 'vts',
+            'Structured Grid': 'vts',
+            'Table': 'csv',
+            'Unstructured Grid': 'vtu'
+        },
         currentSaveType = 'state',
         infoManager,
         busyElement = $('.busy').hide(),
@@ -334,6 +354,8 @@
 
     function updateDataInformationPanel(data) {
         if(data) {
+            $('.active-data-type-label').text(data.type);
+            updateSaveDataFilename(data.type);
             infoManager.pvDataInformation(data);
         } else {
             infoManager.empty();
@@ -497,7 +519,11 @@
 
     function onProxyDelete(event) {
         startWorking();
-        session.call('pv.proxy.manager.delete', [event.id]).then(invalidatePipeline, invalidatePipeline);
+        session.call('pv.proxy.manager.delete', [event.id]).then(function(result) {
+            invalidatePipeline(result);
+            // Make sure all old tooltips are cleaned up...
+            $('.tooltip').remove();
+        }, invalidatePipeline);
     }
 
     // ------------------------------------------------------------------------
@@ -776,8 +802,21 @@
 
         startWorking()
         session.call('pv.data.save', [filename, saveOptions]).then(function(saveResult) {
+            if (saveResult.success !== true) {
+                alert(saveResult.message);
+            }
             workDone();
         }, workDone);
+    }
+
+    function updateSaveDataFilename(activeType) {
+        var xmlExt = saveTypesMap[activeType] || 'vtk';
+        var replName = defaultSaveFilenames['data'].replace(/\.[^\.]+$/, '.' + xmlExt);
+        defaultSaveFilenames['data'] = replName;
+        if ($('.active[data-action=data]').length === 1) {
+            // Additionally, if 'data' is the active save panel, update the text field itself
+            $('.save-data-filename').val(replName);
+        }
     }
 
     function setActiveSaveProperties(event) {
@@ -790,7 +829,12 @@
 
         if (action === 'screen') {
             $('.screenshot-save-only').show();
+            $('.data-save-only').hide();
+        } else if (action === 'data') {
+            $('.data-save-only').show();
+            $('.screenshot-save-only').hide();
         } else {
+            $('.data-save-only').hide();
             $('.screenshot-save-only').hide();
         }
 
