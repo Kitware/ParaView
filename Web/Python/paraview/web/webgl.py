@@ -1,8 +1,7 @@
 r"""
-   This module provide classes to handle Rest API for WebGL piece request.
+   This module provides classes to handle Rest API for WebGL piece request.
 
-   This module need more work to be truly available.
-   Right now it is left here for further work but you should not expect to work as is.
+   This module is now deprecated.
 """
 
 from twisted.web import server, resource
@@ -11,6 +10,7 @@ from twisted.web.error import Error
 
 from paraview import simple
 from paraview.web import helper
+from vtkParaViewWebCorePython import vtkPVWebApplication
 
 import exceptions
 import base64

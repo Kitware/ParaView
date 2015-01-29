@@ -16,8 +16,8 @@
         TEMPLATE_END_GROUP = "</div>",
         TEMPLATE_COLOR_BY_PANEL = "<div class='row pv-color-panel' data-proxy-id='REP_ID'><div class='col-sm-4'><div class='row'>" +
         "<label class='clickable color-by-label col-sm-12 col-xs-6 control-label top-property' data-proxy-id='_ID_' data-action='toggle-scalarbar' data-toggle='tooltip' data-placement='bottom' title='Toggle Color Legend'>" +
-        "<span class='toggle-scalarbar-button clickable vtk-icon-bookmarkEMPTY' data-proxy-id='_ID_' data-action='toggle-scalarbar'></span>" +
-        "Color</label>" +
+        "Color<span class='toggle-scalarbar-button clickable vtk-icon-bookmarkEMPTY' data-proxy-id='_ID_' data-action='toggle-scalarbar'></span>" +
+        "</label>" +
         "<span class='hidden-xs pv-form-height col-sm-12 color-by-column-empty-row top-property'></span>" +
         "<div class='pv-form-height col-sm-12 col-xs-6 color-options-button-panel top-property'>" +
         "<div class='btn-group' role='group'>" +
@@ -348,7 +348,7 @@
                 activeArrayStr = (colorByInfo.mode === 'array') ? colorByInfo.array.slice(0,2).join(':') : 'solid',
                 activeArrayComp = (colorByInfo.mode === 'array') ? colorByInfo.array[2].toString() : '0',
                 activePalette = 'FIXME not yet available',
-                wantColorManagement = !$.isEmptyObject(colorByInfo),
+                wantColorManagement = !$.isEmptyObject(colorByInfo) && colorByInfo.hasOwnProperty('array'),
                 colorToolsDisabled = false,
                 scalarOpacityEditorInitialized = false;
 
@@ -553,8 +553,6 @@
                         proxyId: proxyId
                     });
                 }
-            } else {
-                $('[data-action=toggle-scalarbar]', me).hide();
             }
 
             // Annotate properties with dependencies with 'has-dependency' class
