@@ -93,12 +93,16 @@ pqSearchBox::~pqSearchBox()
 //-----------------------------------------------------------------------------
 void pqSearchBox::keyPressEvent(QKeyEvent* keyEvent)
 {
-  this->Superclass::keyPressEvent(keyEvent);
-
   // Remove the current text in the line edit on escape pressed
-  if (keyEvent && keyEvent->key() == Qt::Key_Escape)
+  if (keyEvent &&
+    keyEvent->key() == Qt::Key_Escape &&
+    !this->Internals->SearchLineEdit->text().isEmpty())
     {
     this->Internals->SearchLineEdit->clear();
+    }
+  else
+    {
+    this->Superclass::keyPressEvent(keyEvent);
     }
 }
 
